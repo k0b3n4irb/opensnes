@@ -40,7 +40,7 @@ $(TARGET): $(OBJECTS)
 	@echo "[LD] $@"
 	@$(CC) $(CFLAGS) $(OBJECTS) -o $@ -lm
 
-$(BUILD)/%.o: $(SRC)/%.c | $(BUILD)
+$(BUILD)/%.o: $(SRC)/%.c $(wildcard $(SRC)/*.h) | $(BUILD)
 	@echo "[CC] $<"
 	@$(CC) $(CFLAGS) -I$(SRC) -c $< -o $@
 

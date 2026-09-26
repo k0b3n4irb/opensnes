@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: examples/color/hicolor_* (hires variant). Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # Chantier: ports #117 (HiColorPseudoHiRes) + #118 (HiColor3840)
 
 Status: IN PROGRESS (2026-07-15). Branch wip/hicolor-hires.

@@ -1,6 +1,6 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.24.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.27.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
 > Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
@@ -35,7 +35,7 @@ luna v1.24.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `chips/dsp1_cube` | OK | live (400f/398nmi) |
 | `chips/sa1_hello` | OK | live (200f/198nmi) |
 | `chips/sa1_starfield` | OK | live (200f/198nmi) |
-| `chips/superfx_3d` | OK | live (200f/134nmi) |
+| `chips/superfx_3d` | OK | live (200f/198nmi) |
 | `chips/superfx_hello` | OK | live (200f/198nmi) |
 | `color/direct_color` | OK | live (200f/198nmi) |
 | `color/gradient_9bit` | OK | live (200f/198nmi) |
@@ -46,7 +46,7 @@ luna v1.24.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `color/transparency` | OK | live (400f/398nmi) |
 | `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
 | `games/breakout` | OK | live (200f/198nmi) |
-| `games/likemario` | OK | live (200f/190nmi) |
+| `games/likemario` | OK | live (200f/189nmi) |
 | `games/mapandobjects` | OK | live (200f/198nmi) |
 | `games/mode7_flying` | OK | live (200f/198nmi) |
 | `games/mode7_racing` | OK | live (200f/198nmi) |

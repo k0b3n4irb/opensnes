@@ -178,7 +178,32 @@ main:
         )
 
 
+def test_no_combined_asm_far_pointer_push() -> None:
+    """The build no longer produces combined.asm (112cfc23): the lint must
+    still find a callback and its port write from the .c.asm alone, in the
+    4-byte far-pointer push cproc/QBE emit today (`pea.w :cb` + `pea.w cb`).
+    Until 2026-09-26 common.mk only ran the lint when combined.asm existed,
+    so it never ran at all on a fresh tree."""
+    main_asm = """
+my_nmi_cb:
+    lda #$05
+    sta.l $002181
+    rtl
+main:
+    pea.w :my_nmi_cb
+    pea.w my_nmi_cb
+    jsl nmiSet
+    rtl
+"""
+    with tempfile.TemporaryDirectory() as td:
+        td_path = Path(td)
+        (td_path / "main.c.asm").write_text(main_asm)
+        rc, out = run_lint(td_path)
+        assert rc == 1, f"port write without combined.asm must be flagged, got rc={rc}\n{out}"
+
+
 TESTS = [
+    test_no_combined_asm_far_pointer_push,
     test_clean_callback,
     test_direct_port_write,
     test_transitive_port_write,

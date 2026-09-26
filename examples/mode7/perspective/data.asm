@@ -10,7 +10,7 @@
 ;----------------------------------------------------------------------
 ; Ground data (Mode 7 format: interleaved tilemap + tile pixels)
 ;----------------------------------------------------------------------
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ground_tiles:
 .incbin "res/ground.pc7"
@@ -29,7 +29,7 @@ ground_pal_end:
 ;----------------------------------------------------------------------
 ; Sky data (Mode 3 format: regular 4bpp tiles + tilemap)
 ;----------------------------------------------------------------------
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 sky_tiles:
 .incbin "res/sky.pic"

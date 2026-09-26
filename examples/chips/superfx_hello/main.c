@@ -14,7 +14,8 @@
  *
  * @par SNES Concepts
  * - SuperFX (GSU) coprocessor detection and communication
- * - WRAM stub execution (CPU cannot read ROM while GSU owns the bus)
+ * - gsuSetProgram() + gsuLaunch(): the library runs the job from WRAM (the CPU
+ *   cannot read ROM while the GSU owns the bus) and keeps interrupts alive
  * - SRAM shared memory between SNES CPU and GSU
  *
  * @par Modules Used
@@ -27,9 +28,10 @@
 #include <snes/superfx.h>
 
 /** @brief Launch GSU program, wait for completion (defined in gsu_loader.asm) */
-extern void launchGSU(void);
+extern const u8 gsu_program[];      /* gsu_loader.asm: the assembled GSU binary */
+extern void gsuHelloReadResults(void); /* gsu_loader.asm: R0 + SRAM[0..7] -> WRAM */
 
-/** @brief GSU R0 result after launchGSU() (set by gsu_loader.asm) */
+/** @brief GSU R0 result after gsuLaunch() (copied by gsuHelloReadResults) */
 extern u16 gsu_result;
 extern u8 gsu_sram_byte0;
 extern u8 gsu_sram_byte1;
@@ -65,7 +67,11 @@ int main(void) {
         textPrintAt(3, 8, "LAUNCHING GSU...");
         WaitForVBlank();
 
-        launchGSU();
+        gsu_cfgr = 0xA0;              /* IRQ mask + fast multiply (FMULT tests) */
+        gsu_scmr = 0x18;              /* RAN + RON */
+        gsuSetProgram(gsu_program);
+        gsuLaunch();
+        gsuHelloReadResults();
 
         result = gsu_result;
         buf[0] = '$';
@@ -131,7 +137,7 @@ int main(void) {
     } else {
         textPrintAt(3, 6, "GSU: NOT DETECTED");
         textPrintAt(3, 8, "USE SUPERFX-CAPABLE");
-        textPrintAt(3, 9, "EMULATOR (MESEN2)");
+        textPrintAt(3, 9, "EMULATOR (LUNA, BSNES)");
     }
 
     setScreenOn();

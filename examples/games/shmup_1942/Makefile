@@ -43,8 +43,6 @@ res/bullet.pic res/bullet.pal: res/bullet.png
 	@echo "[GFX] Converting bullet sprite..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-combined.asm: res/scene.pic res/player.pic res/enemy.pic res/bullet.pic
-
 clean: clean-shmup_1942
 .PHONY: clean-shmup_1942
 clean-shmup_1942:

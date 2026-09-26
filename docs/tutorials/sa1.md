@@ -114,10 +114,11 @@ SA1Start:
     sep #$20
     .ACCU 8
 
-    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable on Mesen2/snes9x;
-    ; polarity is disputed vs the wiki — see the gotcha box above.
+    ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable: fullsnes, the
+    ; Nintendo manual §4.1.25 and nocash agree (resolved 2026-09-02; the
+    ; sfc-dev-wiki states the inverse — see the box above).
     lda #$FF
-    sta.l $00222A           ; CIWP = $FF (writable per our emulators)
+    sta.l $00222A           ; CIWP = $FF (all I-RAM writable)
 
     ; Signal ready to main CPU
     lda #$A5
@@ -318,20 +319,25 @@ sep #$20
 ; ... 8-bit code ...
 ```
 
-## Debugging in Mesen2
+## Debugging
 
-Mesen2 has a dedicated SA-1 debugger:
+luna, the SDK's emulator, runs the SA-1 natively:
 
-1. **Debug → SA-1 Debugger** — separate window for SA-1 registers, disassembly
-2. **Uncheck "Break on Power/Reset"** — otherwise the SA-1 freezes at boot
-3. **Memory viewer** — switch to "SA-1 Bus" to see I-RAM from SA-1's perspective
-4. **Watch $3000** — verify the $A5 magic byte appears after boot
+1. **`luna state rom.sfc --until-frame 60 --out -`** — the `sa1` block gives
+   the SA-1's `pc`, `pb`, `p` and whether it is `running`
+2. **`--peek 00:3000:4`** — read I-RAM (shared by both CPUs) to check the
+   `$A5` handshake byte after boot
+3. **`luna mcp`** — step, breakpoints and memory reads over MCP
+   (`docs/tutorials/debugging.md`)
+
+A GUI emulator with an SA-1 debugger (Mesen2, bsnes-plus) remains useful
+for stepping the SA-1 side by hand.
 
 Common issues:
 - **SA-1 PC stuck at $0000**: reset vector ($2203/$2204) wrong, or I-RAM
   write-protection (CIWP $222A) left in the protected state so the SA-1
-  can't write its handshake — set it the same way the crt0 does (`$FF` on
-  Mesen2/snes9x; see the polarity note above)
+  can't write its handshake — set it the same way the crt0 does (`$FF`,
+  write-enabled; see the polarity note above)
 - **I-RAM reads return $FF**: SIWP/CIWP only gate *writes*, never reads —
   so this is not a protection problem; the SA-1 simply hasn't written
   I-RAM yet (not released from reset, or wrong reset vector)

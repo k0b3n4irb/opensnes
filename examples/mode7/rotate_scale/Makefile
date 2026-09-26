@@ -21,8 +21,6 @@ res/mode7bg.pc7 res/mode7bg.mp7 res/mode7bg.pal: res/mode7bg.png
 	@echo "[GFX] Converting Mode 7 background..."
 	@$(GFX4SNES) -p -m -M 7 -i $<
 
-combined.asm: res/mode7bg.pc7
-
 clean: clean-mode7
 .PHONY: clean-mode7
 clean-mode7:

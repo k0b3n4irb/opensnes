@@ -2,6 +2,81 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.45.0] — 2026-09-26
+
+The state-of-the-project release. Eight audit agents read the SDK aspect by
+aspect on 2026-09-26; this release is what their first wave fixed. The two
+headline fixes are for users: **the release zip could not build a project**
+(every zip since July), and **SNESMOD's stop and pause sometimes left a
+note sounding** (a bug of the original driver, shared with PVSnesLib). The
+Super FX gets interrupts that keep working during GSU jobs, the build
+refuses the knob combinations it used to build wrong, and the docs stop
+citing functions that do not exist.
+
+### Fixed
+- fix(build,ci): **the release zip builds a user project again.**
+  `make/common.mk` has run `devtools/check_bank_reads.py` after every link
+  since July, and `make release` did not ship it, so the zip's starter
+  failed at its first `make`. The zip now carries every script `common.mk`
+  runs (read from `common.mk` itself), ships the starter without build
+  output, and CI extracts the zip and builds and tests a project from it
+  on all four OS at every push (`make release-smoke`).
+- fix(lib): **SNESMOD stop and pause no longer leave a voice sounding.** The
+  driver cleared KOFF about 60 SPC cycles after setting it, under the
+  S-DSP's 64-cycle poll, so a key-off was sometimes missed (8 times in 161
+  on luna). One instruction moved into the gap, same size: 0 in 161.
+  Music started this way also begins two DSP polls earlier.
+- fix(runtime,lib): **`padIsConnected()` tells an empty port from a pad.**
+  It answered 1 for an empty port; the NMI handler now reads the 17th
+  serial bit of each pad port.
+- fix(runtime): **Super FX: interrupts keep working during a GSU job.** The
+  interrupt vectors live in WRAM, where the GSU sends them (Nintendo dev
+  manual Book II §5.4.1): the NMI counts the frame and uploads OAM while
+  the GSU owns the cartridge (one VBlank in three was lost before), an
+  H/V-timer or GSU IRQ is acknowledged instead of running garbage from
+  ROM, BRK and COP return. `gsuLaunch()` no longer touches `$4200`.
+- fix(build): the build **refuses** two coprocessors at once, Super FX /
+  SA-1 / DSP-1 with HiROM, SRAM with Super FX, `SRAM_SIZE` outside 1..7 and
+  a non-numeric `ROM_BANKS` — each with its reason. DSP-1 + SRAM declares
+  `$FFD6 = $05` (was `$03`); `ROMSIZE` is rounded up. A knob changed after
+  the first build (`USE_FASTROM`, `USE_SRAM`, `ROM_BANKS`…) is no longer
+  ignored; an unknown `LIB_MODULES` name is an error listing the modules;
+  local headers are dependencies; the lib and the tools depend on their
+  headers and included files.
+- fix(build): the NMI / WRAM-port race lint runs again. It only ran when a
+  `combined.asm` existed — a file the build stopped producing long ago.
+- fix(tools): `smconv` refuses a file that is not an Impulse Tracker module
+  (a PNG used to build a silent soundbank); two allocation bombs the fuzzer
+  found (IT table counts, lodepng's pre-inflate reservation).
+- fix(examples): the object engine read the map from bank $00 whatever bank
+  it was in; examples' assets left bank $00 (`ASSET_SECTION`), bank $00
+  minimum across the corpus 12 → 1912 bytes free.
+
+### Added
+- feat(lib): `gsuSetProgram(const void *program)` — `superfx.h` asked for it
+  but only an example defined it.
+- feat(build): `ROM_BANKS` and `GSU_RAM_KB` knobs; the Super FX header
+  declares its Game Pak RAM (`$FFBD`, `$FFDA = $33`).
+- test: luna pinned at v1.27.0: a measured stack gate on every coverage leg
+  (the stack must never reach the C variables), mouse / Super Scope /
+  pad 2 replayed in the coverage, `[asserts.gsu] bus_violations = 0` on the
+  Super FX manifests, `padIsConnected` tested with both ports unplugged.
+
+### Changed
+- build(compiler): the cc65816 retry on a cproc segfault is retired (zero
+  firings in 25 Windows builds); a crash is now reported, not absorbed.
+- ci: the 50-minute fuzz session runs when `tools/` changes and weekly;
+  scheduled workflows test `develop`, not the last release.
+- docs: `BENCHMARK.md` re-measured — about **20 %** faster than PVSnesLib +
+  816-opt on 33 functions, slower on pointer-heavy code since 4-byte
+  pointers (it said 32 %). `ABI.md` documents the 32-bit return
+  convention. Tutorials and tool pages no longer cite
+  `colorMathSetMaskMain/Sub`, `objRegisterTypes`, `spcLoad/spcPlay`; the
+  sentinel (`make lint-docs`) now fails on an SDK-shaped call no header
+  declares and on a deprecated name cited as current.
+- docs: `ATTRIBUTION.md` lists cmdparser (Apache-2.0, licence shipped in
+  the zip), stb_image and cute_tiled.
+
 ## [0.44.0] — 2026-09-22
 
 The audit release. Every public function of the SDK is now executed by a

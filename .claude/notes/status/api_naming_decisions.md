@@ -1,6 +1,8 @@
 # API naming decisions — owner's call before the v1.0 freeze
 
-Status: N1-N6 done 2026-09-22 (owner: "go N1, puis N2 à N6"); D1-D5 open.
+Status: N1-N6 done 2026-09-22 (owner: "go N1, puis N2 à N6"); D1-D5 open —
+decision sheet with measured costs and recommendations:
+`2026-09-26_fiche_decision_D1-D5.md` (this directory).
 Written 2026-09-21.
 Source: `.claude/notes/reviews/2026-09-20_api_audit.md` §3.2 / §3.3.
 

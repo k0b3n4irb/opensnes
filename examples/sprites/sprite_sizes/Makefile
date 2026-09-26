@@ -34,8 +34,6 @@ res/sprite64.pic res/sprite64.pal: res/sprite64.png
 	@echo "[GFX] Converting 64x64 sprite..."
 	@$(GFX4SNES) -s 64 -o 16 -u 16 -p -i $<
 
-combined.asm: res/sprite8.pic res/sprite16.pic res/sprite32.pic res/sprite64.pic
-
 clean: clean-sprite_sizes
 .PHONY: clean-sprite_sizes
 clean-sprite_sizes:

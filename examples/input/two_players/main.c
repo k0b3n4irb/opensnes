@@ -80,9 +80,11 @@ static const u8 pal_red[] = {
 /*============================================================================
  * Player State
  *
- * NOTE: Using a struct with s16 coordinates is REQUIRED for reliable
- * sprite movement. Separate u16 variables cause horizontal movement
- * issues due to a compiler quirk. See .claude/KNOWLEDGE.md for details.
+ * One struct per player keeps each pad's state together. (An older comment
+ * said separate u16 variables broke horizontal movement through "a compiler
+ * quirk" documented in a file that no longer exists; no such quirk is
+ * catalogued in KNOWN_LIMITATIONS.md, and the example's input manifest
+ * pins both pads' movement.)
  *============================================================================*/
 
 /**

@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: examples/audio/speech_synth, sfx_from_wav, apu_switch. Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # Chantier: SPC700 arc (#119) — raw APU path
 
 Status: IN PROGRESS (2026-07-15). Branch wip/spc700. Port 1: PlayBRRSample.

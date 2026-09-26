@@ -2211,6 +2211,16 @@ static unsigned zlib_decompress(unsigned char** out, size_t* outsize, size_t exp
     ucvector v = ucvector_init(*out, *outsize);
     if(expected_size) {
       /*reserve the memory to avoid intermediate reallocations*/
+      /* OpenSNES local patch (2026-09-25, tools/fuzz): expected_size comes
+       * from the IHDR's width x height, i.e. from the file, and was reserved
+       * before a single byte was inflated — a 114-byte PNG declaring
+       * 1073741872 x 16 asked for 17 GB. Deflate cannot expand input by more
+       * than ~1032:1, so reserve no more than that; a genuine image still
+       * gets its buffer in one go, and a lying header ends in error 91
+       * (decompressed size does not match the prediction) as upstream
+       * intends, without the allocation. */
+      size_t cap = (insize > ((size_t)-1 - 1024) / 1032) ? (size_t)-1 : insize * 1032 + 1024;
+      if(expected_size > cap) expected_size = cap;
       ucvector_resize(&v, *outsize + expected_size);
       v.size = *outsize;
     }

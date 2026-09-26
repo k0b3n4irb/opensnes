@@ -32,7 +32,6 @@ res/player.pic res/player.pal: res/player.png
 	@echo "[GFX] $< -> player.pic/.pal"
 	@$(GFX4SNES) -s 32 -o 16 -u 16 -p -i $<
 
-combined.asm: res/player.pic
 
 clean: clean-assets
 .PHONY: clean-assets

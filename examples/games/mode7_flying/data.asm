@@ -3,7 +3,7 @@
 ; the landing class map with its banked-data accessor.
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 terrain_til:
 .incbin "res/terrain.pc7"
@@ -15,7 +15,7 @@ terrain_pal_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 terrain_map:
 .incbin "res/terrain.mp7"
@@ -23,7 +23,7 @@ terrain_map_end:
 
 .ends
 
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 ; 128x128 bytes: 0 = field, 1 = water, 2 = landing pad.
 terrain_class:

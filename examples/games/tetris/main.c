@@ -100,12 +100,12 @@ extern const char str_start[];
  * Index = level number. Level 0 = 48 frames/drop (slowest), level 29+ = 1
  * frame/drop (fastest). Values match the original NES Tetris for authentic feel.
  *
- * NOT const -- const arrays go to SUPERFREE ROM which may land in bank $01+.
- * The compiler generates `lda.l $0000,x` (always bank $00) for array access,
- * so const data in bank $01 would read garbage. Mutable arrays go to WRAM
- * (bank $00) via CopyInitData at startup.
+ * `const`: it lives in ROM, in whichever bank the linker picks, and every C
+ * read of const data is a far read (since v0.41.0). Until 2026-09-26 these
+ * tables were left non-const out of an older fear of bank-$00-only reads,
+ * which cost WRAM for nothing.
  */
-static u8 speed_table[] = {
+static const u8 speed_table[] = {
     48, 43, 38, 33, 28, 23, 18, 13, 8, 6,   /* L0-9: NES NTSC */
     5, 5, 5, 4, 4, 4, 3, 3, 3,              /* L10-18 */
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1         /* L19-29+ */
@@ -132,9 +132,8 @@ static u8 speed_table[] = {
  *
  * Index 0 = 0 lines (unused), 1 = single (40), 2 = double (100),
  * 3 = triple (300), 4 = Tetris (1200). Multiplied by (level + 1).
- * Not const -- see speed_table comment about bank $00 requirement.
  */
-static u16 line_scores[] = { 0, 40, 100, 300, 1200 };
+static const u16 line_scores[] = { 0, 40, 100, 300, 1200 };
 
 /*============================================================================
  * Game State Variables
@@ -172,9 +171,8 @@ static u16 prev_pad;
  *
  * Cycled through at MSG_COLOR_SPEED frames per color to create a
  * rainbow shimmer on "PRESS START" and "GAME OVER" overlay text.
- * Not const -- see speed_table comment about bank $00 requirement.
  */
-static u16 msg_colors[] = {
+static const u16 msg_colors[] = {
     0x7FFF,  /* white */
     0x307C,  /* magenta (#e71861) */
     0x0B5E,  /* yellow (#f6d714) */
@@ -496,11 +494,11 @@ static void statePlaying(void) {
  * @brief Screen shake X offsets during line clear animation.
  *
  * Indexed by (flash_timer & 7). Alternating positive/negative values
- * create a jarring shake effect. Not const -- bank $00 requirement.
+ * create a jarring shake effect.
  */
-static s8 shake_dx[] = { 2, -2, 1, -1, 2, -1, 1, 0 };
+static const s8 shake_dx[] = { 2, -2, 1, -1, 2, -1, 1, 0 };
 /** @brief Screen shake Y offsets during line clear animation */
-static s8 shake_dy[] = { -1, 1, -2, 1, 0, -1, 1, 0 };
+static const s8 shake_dy[] = { -1, 1, -2, 1, 0, -1, 1, 0 };
 
 /**
  * @brief Line clear animation state: flash rows, shake screen, then collapse.

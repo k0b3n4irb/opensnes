@@ -24,7 +24,7 @@
  * @endcode
  *
  * @warning VRAM writes must happen during VBlank or force blank.
- *          LzssDecodeVram disables interrupts internally, so call it
+ *          lzssDecodeVram disables interrupts internally, so call it
  *          during force blank for safety.
  *
  * @author OpenSNES Team (ported from PVSnesLib by Alekmaul)

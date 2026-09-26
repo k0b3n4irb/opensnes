@@ -21,8 +21,6 @@ res/sprite32.pic res/sprite32.pal: res/sprite32.png
 	@echo "[GFX] Converting sprite..."
 	@$(GFX4SNES) -s 32 -o 16 -u 16 -p -i $<
 
-combined.asm: res/sprite32.pic
-
 clean: clean-move_sprite
 .PHONY: clean-move_sprite
 clean-move_sprite:

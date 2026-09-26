@@ -6,7 +6,7 @@
 ; the bank byte and dmaCopyVram reads it directly; no ASM loader needed.
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ; First 32KB of tiles (may end up in bank $01+)
 tiles:      .incbin "res/bg.pic" skip 0 read 32768
@@ -14,7 +14,7 @@ tiles_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 ; Remaining tiles
 tiles2:     .incbin "res/bg.pic" skip 32768

@@ -1,4 +1,4 @@
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tileset:
 .incbin "res/tilesMario.pic"
@@ -21,7 +21,7 @@ tilesetdef:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 sprmario:
 .incbin "res/mario.pic"

@@ -92,6 +92,13 @@ int main(int argc, char *argv[])
     }
 
     itl_bank_t *bank = itl_bank_create(od.files, od.file_count);
+    for (int i = 0; i < bank->module_count; i++) {
+        if (bank->modules[i]->invalid) {
+            printf("%s: " ERRORRED("fatal error") ": no soundbank written\n", ERRORBRIGHT("smconv"));
+            itl_bank_destroy(bank);
+            exit(EXIT_FAILURE);
+        }
+    }
 
     if (od.verbose_mode) {
         printf("%s: Starting conversion...\n", ERRORBRIGHT("smconv"));

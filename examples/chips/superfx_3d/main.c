@@ -21,9 +21,10 @@
  * - A wireframe cube rotates continuously on two axes (X and Y).
  * - No input — the rotation is autonomous; reset to restart from
  *   the initial angle.
- * - GSU presence is detected via the ROM header bits; Mesen2 is the
- *   canonical emulator for this example (snes9x's GSU detection
- *   is unreliable on our header layout — see KNOWN_LIMITATIONS).
+ * - GSU presence is detected via the ROM header bits; luna (the SDK's
+ *   emulator) and bsnes run it (snes9x's GSU detection is unreliable on
+ *   our header layout).
+ * - A V-timer IRQ stays armed through GSU jobs (vtimer_irq, irq_ticks).
  *
  * @par Modules Used
  * console, sprite, dma, background, input, superfx
@@ -35,8 +36,10 @@
 #include <snes/superfx.h>
 
 /* Per-example functions (gsu_loader.asm) */
-extern void gsuSetProgram(void);
+extern const u8 gsu_program[];  /* gsu_loader.asm: the assembled GSU binary */
 extern void writeEdgesToSRAM(void);
+extern void vtimer_irq(void);   /* gsu_loader.asm: counts V-timer IRQs */
+extern u16 irq_ticks;
 extern u8 edge_buffer[48];
 
 /* Library functions are in superfx.h: gsuLaunch, gsuSetupBitmapTilemap,
@@ -165,7 +168,7 @@ int main(void) {
     for (i = 0; i < 8; i++) { rotateVertex(i); }
     buildEdges();
     writeEdgesToSRAM();
-    gsuSetProgram();          /* tell library where GSU binary is (once) */
+    gsuSetProgram(gsu_program);  /* tell the library where the GSU binary is (once) */
     gsuLaunch();
     WaitForVBlank();
     setScreenOff();
@@ -174,6 +177,13 @@ int main(void) {
     /* Now enable HDMA + screen */
     gsuSetupHdmaBlanking(40, 40);
     setScreenOn();
+
+    /* A V-timer IRQ on line 200, armed for good: it must survive GSU jobs.
+     * During a job the CPU cannot read ROM, so crt0's WRAM stub acknowledges
+     * it; outside jobs vtimer_irq runs and counts it. */
+    irqSet(vtimer_irq);
+    irqSetVTimer(200);
+    irqEnable(IRQ_VTIMER);
 
     while (1) {
         g_say = sin_tab[angle_y];

@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: examples/backgrounds/mode5_hires. Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # Chantier: Interlace / hi-res port (#108) — video.h surface
 
 Status: IN PROGRESS (started 2026-07-15). Arc effets 3/7 (dernier gros).

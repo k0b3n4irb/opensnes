@@ -38,8 +38,6 @@ res/character.pic res/character.pal: res/character.png
 	@echo "[GFX] Converting character sprite..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-combined.asm: res/BG1.pic res/BG2.pic res/BG3.pic res/character.pic
-
 clean: clean-continuous_scroll
 .PHONY: clean-continuous_scroll
 clean-continuous_scroll:

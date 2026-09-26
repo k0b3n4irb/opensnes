@@ -8,14 +8,14 @@
 ; The tilemap is generated in C (fixed pattern — see main.c).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 sunset_pic:     .incbin "res/sunset.pic"
 sunset_pic_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 sunset_pal:     .incbin "res/sunset.pal"
 sunset_pal_end:

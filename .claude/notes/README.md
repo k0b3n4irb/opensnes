@@ -24,6 +24,7 @@ routing convention.
 | [`archive/`](archive/) | Historical context: bugs that were FIXED, decisions made, kept for context if a related symptom resurfaces. |
 | [`reviews/`](reviews/) | Structured project reviews with ISO date prefixes (`YYYY-MM-DD_topic.md`). |
 | [`projects/`](projects/) | Sub-project notes (e.g. `rpg.md` for the RPG project under `projects/rpg/`). |
+| [`partners/`](partners/) | The exchanges with our two partners, luna and snes-rag (`.claude/rules/partners.md`): `<partner>/YYYY-MM-DD_to_*.md` is ours, `_from_*.md` is theirs, `OPEN_<partner>.md` is the report being accumulated for the next send. |
 
 ## Conventions
 

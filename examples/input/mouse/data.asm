@@ -2,7 +2,7 @@
 ; Mouse Example - Graphics Data
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 ; 16x16 cursor sprite tiles (4bpp)
 cursor_tiles:

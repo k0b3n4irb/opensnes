@@ -22,7 +22,7 @@
  *   coprocessor ran. The expected value here is `0xA5` (set by the
  *   bundled `sa1_boot.asm`).
  * - If status is 0x00, the SA-1 didn't run — check that the emulator
- *   recognises SA-1 from the ROM header (Mesen2 is reliable; some
+ *   recognises SA-1 from the ROM header (luna and bsnes do; some
  *   snes9x builds miss it).
  *
  * @par Modules Used

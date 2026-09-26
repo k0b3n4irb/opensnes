@@ -21,11 +21,10 @@
 .ENDS
 
 ;------------------------------------------------------------------------------
-; String constants (must be in bank 0 ROM section for correct addressing)
-; SLOT 0 = ROM area $8000-$FFFF in bank 0
+; String constants — read from C through const char * (far reads), so they
+; live in the asset banks since 2026-09-23
 ;------------------------------------------------------------------------------
-.SECTION ".strings" SEMIFREE BANK 0 SLOT 0
-
+ASSET_SECTION ".strings"
 str_ready:
 .db "PLAYER 1", 10, 10, " READY", 0
 
@@ -41,12 +40,11 @@ str_blank:
 .ENDS
 
 ;------------------------------------------------------------------------------
-; Default brick layout (must be in bank 0 ROM section for mycopy to work)
+; Default brick layout — read through a const pointer (far read)
 ; Values: 0-7 = brick colors, 8 = empty
 ; SLOT 0 = ROM area $8000-$FFFF in bank 0
 ;------------------------------------------------------------------------------
-.SECTION ".brickmap" SEMIFREE BANK 0 SLOT 0
-
+ASSET_SECTION ".brickmap"
 brick_map:
 .db 7, 8, 8, 8, 8, 8, 8, 8, 8, 7  ; Row 0
 .db 8, 7, 8, 7, 8, 8, 7, 8, 7, 8  ; Row 1
@@ -60,9 +58,7 @@ brick_map:
 .db 7, 7, 7, 7, 8, 8, 7, 7, 7, 7  ; Row 9
 
 .ENDS
-
-.section ".rodata1" SEMIFREE BANK 0 SLOT 0
-
+ASSET_SECTION ".rodata1"
 ; Palette data (512 bytes - full 256 color palette)
 palette:
 .incbin "res/palette.dat"

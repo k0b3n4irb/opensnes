@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: examples/mode7/perspective, perspective_rotate. Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # Chantier: Mode 7 per-line HDMA port (#110) — Perspective
 
 Status: IN PROGRESS (started 2026-07-14). Predecessor: hicolor_port.md

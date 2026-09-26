@@ -106,6 +106,20 @@ C_OBJECTS_SUPERFX = $(C_SOURCES:$(SRCDIR)/%.c=$(BUILDDIR_SUPERFX)/%.o)
 ASM_OBJECTS_SUPERFX = $(call asm_objects,$(BUILDDIR_SUPERFX)) $(call asm_objects_superfx_only,$(BUILDDIR_SUPERFX))
 OBJECTS_SUPERFX = $(C_OBJECTS_SUPERFX) $(ASM_OBJECTS_SUPERFX)
 
+# Dependencies the pattern rules below do not name (build audit 2026-09-26).
+# An asm object also depends on what its source .INCLUDEs — sm_spc.asm (the
+# SNESMOD SPC700 driver, included by snesmod.asm), blockcopy.inc, the memory
+# maps — and a C object on the public headers. Without these, editing the
+# driver or a header left the old object in place and every ROM linked it:
+# found 2026-09-26 when a driver fix did not reach the ROM. Blanket rather
+# than exact: the whole lib rebuilds in seconds, a stale object is silent.
+# These rules come before `all:` in the file: pin the default goal.
+.DEFAULT_GOAL := all
+LIB_ASM_DEPS := $(wildcard $(SRCDIR)/*.inc $(CONTRIBDIR)/*.inc ../templates/*.inc) $(SRCDIR)/sm_spc.asm
+LIB_C_DEPS   := $(wildcard $(INCDIR)/snes.h $(INCDIR)/snes/*.h)
+$(ASM_OBJECTS_LOROM) $(ASM_OBJECTS_HIROM) $(ASM_OBJECTS_SA1) $(ASM_OBJECTS_SUPERFX): $(LIB_ASM_DEPS)
+$(C_OBJECTS_LOROM) $(C_OBJECTS_HIROM) $(C_OBJECTS_SA1) $(C_OBJECTS_SUPERFX): $(LIB_C_DEPS)
+
 #------------------------------------------------------------------------------
 # Main Target - Build All
 #------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 ; -M 7) and the collision class map (1 byte/tile, far-pointer read).
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 track_til:
 .incbin "res/track.pc7"
@@ -15,7 +15,7 @@ track_pal_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 track_map:
 .incbin "res/track.mp7"
@@ -23,7 +23,7 @@ track_map_end:
 
 .ends
 
-.section ".rodata3" superfree
+ASSET_SECTION ".rodata3"
 
 ; 128x128 bytes: 0 = road, 1 = grass, 2 = wall. Read from C through a
 ; far pointer ONLY (16 KB — lives outside bank $00 by design).

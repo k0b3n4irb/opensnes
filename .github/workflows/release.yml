@@ -138,22 +138,9 @@ jobs:
         run: |
           set -o pipefail
           export OPENSNES_HOME=$(pwd)
-          # Make-level retry dismantled 2026-07-04 (segfault class believed
-          # FIXED since cproc ea95cac; the loop could mask real failures).
-          # The cc65816-level retry stays, with telemetry below.
-          export CC65816_RETRY_LOG=$(pwd)/cproc_retries.log
+          # The MSYS2 cproc segfault class is fixed since cproc ea95cac;
+          # both retry layers are retired (2026-07-04, 2026-09-26).
           make release VERSION=${{ steps.version.outputs.tag }} 2>&1 | tee opensnes_release_${{ matrix.name }}.log
-
-      - name: Report cproc segfault-retry count (Windows)
-        if: matrix.name == 'windows'
-        shell: msys2 {0}
-        run: |
-          n=0
-          [ -f cproc_retries.log ] && n=$(wc -l < cproc_retries.log)
-          echo "### cproc segfault retries: $n" >> "$GITHUB_STEP_SUMMARY"
-          if [ "$n" -gt 0 ]; then
-            echo "::warning::cproc segfault retry fired $n time(s) during the release build (see KNOWN_LIMITATIONS.md)"
-          fi
 
       - name: Build release (macOS)
         if: matrix.name == 'darwin'
@@ -205,7 +192,7 @@ jobs:
       - name: Smoke-test ROMs with luna (Linux)
         # A shipped artifact must have EXECUTED ROMs on its own arch before
         # publishing — build success alone proved nothing about the arm64
-        # zip until now. Corpus liveness boots all 56 examples (incl. SA-1,
+        # zip until now. Corpus liveness boots every example (incl. SA-1,
         # SuperFX and DSP-1, which luna runs natively) in ~1 minute. The
         # full 3-pillar suite still gates PRs in opensnes_build.yml; this
         # is the release-side execution check (luna ships for both linux
@@ -216,6 +203,20 @@ jobs:
         run: |
           scripts/install-luna.sh
           python3 tools/luna-test/luna_runner.py --coverage
+
+      # The zip users download must build and test a project on its own
+      # (devtools/release_smoke.py). On Linux luna is installed by the step
+      # above, so the scaffolded project's `make test` runs too.
+      - name: Smoke-test the release zip (Linux/macOS)
+        if: matrix.name != 'windows'
+        env:
+          LUNA_BIN: ${{ github.workspace }}/tools/luna-test/bin/luna
+        run: make release-smoke VERSION=${{ steps.version.outputs.tag }}
+
+      - name: Smoke-test the release zip (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: make release-smoke VERSION=${{ steps.version.outputs.tag }}
 
       # ------------------------------------ #
       # Upload zip as artifact for release   #

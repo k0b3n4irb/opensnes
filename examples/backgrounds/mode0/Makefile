@@ -27,5 +27,3 @@ res/bg2.pic res/bg2.map res/bg2.pal: res/bg2.bmp
 res/bg3.pic res/bg3.map res/bg3.pal: res/bg3.bmp
 	@echo "[GFX] $< -> BG3 (2bpp, 8-color pal)"
 	@$(GFX4SNES) -s 8 -o 8 -u 4 -e 0 -p -t bmp -m -i $<
-
-combined.asm: res/bg0.pic res/bg1.pic res/bg2.pic res/bg3.pic

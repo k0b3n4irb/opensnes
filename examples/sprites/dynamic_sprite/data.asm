@@ -20,7 +20,7 @@ spr16_properpal_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 ; 32x32 sprite tiles (4bpp)
 ; Source: sprite32.png = 32x256 = 8 frames of 32x32

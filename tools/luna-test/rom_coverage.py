@@ -19,9 +19,19 @@ before that, input-driven code was under-counted: 167 "never" of which 53
 were only ever reached by a button). The library fixture
 (`devtools/libtests/libtest.sfc`) counts too: a function it asserts on is
 tested, and a ratchet that said otherwise was asking for an example nobody
-needs. `luna profile` takes `--input` only (no `--mouse`, `--superscope`,
-`--input2`), so the mouse and Super Scope legs still run input-free — the
-one remaining under-count, a luna request once validated (luna_tooling.md).
+needs. Since luna v1.26.0 `luna profile` takes the peripherals too, so a
+manifest's mouse (port 1), Super Scope (port 2) and joypad-2 scripts are
+replayed on its leg — the under-count that remained until 2026-09-26.
+
+Every leg also runs the **stack-floor gate** (`--stack-floor`, luna
+v1.26.0): the stack starts at $1FFF and grows down toward the C variables
+of the plain RAM band, whose top (`used_top`) comes from the ROM's `.sym`.
+A leg whose deepest stack pointer went below `used_top` has written over a
+global — the silent corruption the link-time `RAM_FAIL_THRESHOLD` (a
+guess) could only approximate. The margin is measured on every leg under
+real input, and the smallest one is reported. It runs in the same
+`profile` invocation as `--pc-set` because no `--budget` is passed there:
+exit 1 can only mean the stack gate (luna's 2026-09-22 note).
 
 Usage
 -----
@@ -52,7 +62,7 @@ from luna_runner import (  # noqa: E402
     HERE, REPO_ROOT, LUNA_VERSION, capture_frames, discover_example_roms, example_key,
     find_luna, firmware_dir, load_manifest, missing_firmware,
 )
-from symmap import rom_bank  # noqa: E402  (mirror folding, one source of truth)
+from symmap import SymbolTable, rom_bank  # noqa: E402  (mirror folding, one source of truth)
 
 HEADERS = REPO_ROOT / "lib" / "include" / "snes"
 RATCHET = HERE / "baselines" / "never_executed.txt"
@@ -79,11 +89,30 @@ FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120
 ]
 
 
+# Manifest keys replayed on a profile leg, with the port each device sits on
+# in `luna test` (measured 2026-09-26: the mouse example reads port 1, the
+# Super Scope example port 2) and the entry separator of its grammar.
+PERIPHERALS = [("input2", ["--input2"], ","),
+               ("mouse", ["--port1", "mouse", "--mouse"], ";"),
+               ("superscope", ["--port2", "superscope", "--superscope"], ";")]
+
+
+def _merge(scripts: list[str], sep: str) -> str | None:
+    events = []
+    for sc in scripts:
+        for ev in filter(None, (e.strip() for e in sc.split(sep))):
+            frame, rest = ev.split(":", 1)
+            events.append((int(frame), rest))
+    events.sort(key=lambda e: e[0])
+    return sep.join(f"{f}:{r}" for f, r in events) or None
+
+
 def manifest_runs(rom: Path) -> list[tuple[str, list[str], str | None]]:
-    """(manifest name, run-bound flags, merged joypad-1 script or None) for every
+    """(manifest name, run flags, merged joypad-1 script or None) for every
     `luna test` manifest whose `rom` is this ROM. Checkpoint scripts merge into
     one timeline exactly as `luna test` merges them (README: "input scripts from
-    all checkpoints are merged")."""
+    all checkpoints are merged"). The run flags carry the bound and, since
+    2026-09-26, the joypad-2 / mouse / Super Scope scripts."""
     import tomllib
     runs = []
     for toml in sorted(MANIFESTS.glob("*.toml")):
@@ -105,28 +134,50 @@ def manifest_runs(rom: Path) -> list[tuple[str, list[str], str | None]]:
             bound = ["-n", str(m["steps"])]
         else:
             continue
-        scripts = [m.get("input", "")] + [c.get("input", "") for c in cps]
-        events = []
-        for sc in scripts:
-            for ev in filter(None, (e.strip() for e in sc.split(","))):
-                frame, mask = ev.split(":", 1)
-                events.append((int(frame), mask))
-        events.sort(key=lambda e: e[0])
-        script = ",".join(f"{f}:{mk}" for f, mk in events) or None
+        script = _merge([m.get("input", "")] + [c.get("input", "") for c in cps], ",")
+        for key, flags, sep in PERIPHERALS:
+            merged = _merge([m.get(key, "")] + [c.get(key, "") for c in cps], sep)
+            if merged:
+                bound = bound + flags + [merged]
         runs.append((toml.stem, bound, script))
     return runs
 
 
-def profile_pcs(luna: str, rom: Path, sym: Path, bound: list[str], script: str | None, pcs: Path) -> str | None:
-    """One `luna profile --pc-set` run; returns an error string or None."""
+def ram_band_top(sym: Path) -> int | None:
+    """Top of the plain C RAM band ($00:0000-$1FFF) in this ROM: the first byte
+    above the highest bank-$00 RAMSECTION — what symmap --check-ram-budget
+    reports as `top at $XXXX`. The stack must never reach below it."""
+    table = SymbolTable()
+    table.parse(sym)
+    band = [s for s in table.ramsections if s.bank == 0x00 and s.address < 0x2000]
+    return max(s.address + s.size for s in band) if band else None
+
+
+_STACK_RE = re.compile(r"^stack: deepest S \$([0-9A-Fa-f]+)(.*)$", re.MULTILINE)
+
+
+def profile_pcs(luna: str, rom: Path, sym: Path, bound: list[str], script: str | None,
+                pcs: Path, floor: int | None) -> tuple[str | None, int | None, str]:
+    """One `luna profile --pc-set [--stack-floor]` run.
+
+    Returns (error or None, deepest stack pointer or None, luna's stack line).
+    Exit 1 with a `stack:` line ending in UNDER is the stack gate, not an error:
+    no --budget is passed here, so it is the only gate that can fail."""
     cmd = [luna, "profile", str(rom), *bound, "--sym", str(sym),
            "--pc-set", str(pcs), "--out", "/dev/null", "--top", "0"]
     if script:
         cmd += ["--input", script]
+    if floor is not None:
+        cmd += ["--stack-floor", f"0x{floor:04X}"]
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
-    if proc.returncode != 0 or not pcs.is_file():
-        return proc.stderr.strip()[:200]
-    return None
+    out = proc.stdout + proc.stderr
+    m = _STACK_RE.search(out)
+    deepest = int(m.group(1), 16) if m else None
+    line = m.group(0).strip() if m else ""
+    gate_failed = proc.returncode == 1 and "UNDER" in line
+    if (proc.returncode != 0 and not gate_failed) or not pcs.is_file():
+        return proc.stderr.strip()[:200], deepest, line
+    return None, deepest, line
 
 
 def public_functions() -> dict[str, str]:
@@ -200,6 +251,8 @@ def main() -> int:
     tmp = Path("/tmp/luna-pcset"); tmp.mkdir(parents=True, exist_ok=True)
     roms = 0
     legs = 0
+    stack_under: list[str] = []                 # legs whose stack crossed the band top
+    stack_margins: list[tuple[int, str]] = []    # (bytes between deepest S and band top, leg)
     skipped_fw: list[str] = []
     gated = {k for k, v in manifest.get("examples", {}).items() if v.get("firmware")}
     targets: list[tuple[Path, str, int]] = []
@@ -229,14 +282,20 @@ def main() -> int:
             print(f"  SKIP  {key}: no .sym", file=sys.stderr)
             continue
         labels = load_labels(sym)
+        floor = ram_band_top(sym)
         runs = [("idle", ["--until-frame", str(frame)], None)] + manifest_runs(rom)
         for name, bound, script in runs:
             pcs = tmp / (key.replace("/", "_") + "." + name + ".bin")
-            err = profile_pcs(luna, rom, sym, bound, script, pcs)
+            err, deepest, stack_line = profile_pcs(luna, rom, sym, bound, script, pcs, floor)
             if err is not None:
                 print(f"  ERROR {key} [{name}]: {err}", file=sys.stderr)
                 return 2
             legs += 1
+            if floor is not None and deepest is not None:
+                # S points at the next free byte: the deepest byte written is S+1.
+                stack_margins.append((deepest + 1 - floor, f"{key} [{name}]"))
+                if "UNDER" in stack_line:
+                    stack_under.append(f"{key} [{name}]: {stack_line} (band top ${floor:04X})")
             for fn in executed_labels(pcs, labels) & public.keys():
                 hits.setdefault(fn, set()).add(key)
         roms += 1
@@ -255,9 +314,8 @@ def main() -> int:
         f"**{len(public) - len(never)} of {len(public)} public functions executed, {len(never)} never**",
         "",
         "> Executed = at least one PC inside the function's `.sym` label range on at least one "
-        "leg. Mouse and Super Scope scripts are not replayed (`luna profile` has no `--mouse` / "
-        "`--superscope`), so those legs run input-free. The never-executed list is the ratchet "
-        "in `baselines/never_executed.txt`.",
+        "leg. Joypad-2, mouse (port 1) and Super Scope (port 2) scripts are replayed like "
+        "joypad 1. The never-executed list is the ratchet in `baselines/never_executed.txt`.",
         "",
         "| header | never executed |",
         "|---|---|",
@@ -272,6 +330,17 @@ def main() -> int:
         REPORT.write_text("\n".join(lines) + "\n")
     print(f"ROM coverage: {len(public) - len(never)}/{len(public)} public functions executed "
           f"by {roms} ROMs; {len(never)} never.")
+    if stack_margins:
+        stack_margins.sort()
+        low = ", ".join(f"{leg} {m} B" for m, leg in stack_margins[:3])
+        print(f"Stack floor: {len(stack_margins)} legs measured; smallest margins "
+              f"between the deepest stack byte and the C variables: {low}")
+    if stack_under:
+        print("ERROR: the stack reached into the C variables of the plain RAM band "
+              "(silent corruption):", file=sys.stderr)
+        for s in stack_under:
+            print(f"  {s}", file=sys.stderr)
+        return 1
 
     if args.only:
         return 0

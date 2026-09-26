@@ -13,7 +13,14 @@
 .ENDME
 
 .ROMBANKSIZE $10000         ; 64KB per bank (HiROM standard)
-.ROMBANKS 8                 ; Match ROM configuration
+; ROM size is a project knob since 2026-09-24: make passes -D ROM_BANKS_VAL and
+; -D ASSET_BANKS_VAL (make/common.mk, ROM_BANKS); the prebuilt library keeps
+; the default. wlalink takes the largest bank count it is given.
+.IFDEF ROM_BANKS_VAL
+.ROMBANKS ROM_BANKS_VAL
+.ELSE
+.ROMBANKS 8                 ; default; the header's ROMSIZE byte follows it
+.ENDIF
 
 ; Bank byte of every 24-bit address and `:label` in this unit = $C0 + linker
 ; bank (#127.3, 2026-09-07). HiROM maps the FULL 64 KB of each ROM bank only
@@ -32,8 +39,11 @@
 ; Bank search order for bulk read-only payload: highest first, so it lands
 ; away from the code bank. A STRING define — a bare 7-1 would be read as an
 ; expression and BANKS needs the literal text.
-.DEFINE ASSET_BANKS "7-1"
-
+.IFDEF ASSET_BANKS_VAL
+.DEFINE ASSET_BANKS ASSET_BANKS_VAL
+.ELSE
+.DEFINE ASSET_BANKS "7-1"   ; highest asset bank first, bank $00 never
+.ENDIF
 ; Suppress WLA-DX "No .ASCIITABLE defined" warning for .ASC directives
 .ASCIITABLE
 MAP ' ' TO '~' = ' '

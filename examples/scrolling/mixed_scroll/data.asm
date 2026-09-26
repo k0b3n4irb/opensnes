@@ -9,7 +9,7 @@
 ;------------------------------------------------------------------------------
 ; BG2 (opensnes logo) - palette slot 0
 ;------------------------------------------------------------------------------
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 bg2_tiles: .incbin "res/opensnes.pic"
 bg2_tiles_end:
@@ -25,7 +25,7 @@ bg2_pal_end:
 ;------------------------------------------------------------------------------
 ; BG1 (shader pattern) - palette slot 1
 ;------------------------------------------------------------------------------
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 bg1_tiles: .incbin "res/shader.pic"
 bg1_tiles_end:

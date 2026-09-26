@@ -35,7 +35,7 @@ suites on the fork binaries against known-fail ratchets
 (`devtools/toolchain-suites/`); it is the check for every PIN bump and
 runs inside the sanitizer job. A regression or an XPASS fails it.
 `make fuzz` runs the libFuzzer harnesses of `tools/fuzz/` (lodepng, the
-IT loader, cute_tiled, the aseprite2snes JSON parser, stb_image) for `FUZZ_SECONDS` each; the nightly `fuzz.yml` gives them ten
+IT loader, cute_tiled, the aseprite2snes JSON parser, stb_image) for `FUZZ_SECONDS` each; `fuzz.yml` (on any push touching `tools/`, and weekly) gives them ten
 minutes, `make fuzz-replay` (in the sanitizer job) replays the committed
 crash inputs. `make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
 where cppcheck is absent, CI installs it). `make test-link-modules` links every lib module alone with only the

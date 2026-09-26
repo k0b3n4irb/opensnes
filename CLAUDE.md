@@ -121,12 +121,15 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `porting.md` — PVSnesLib→OpenSNES porting guide, API mapping, argument order
 - `nmi_audit.md` — NMI handler rules, must consult before crt0.asm changes
 - `regression_method.md` — Mandatory bisection-based debugging, never guess
+- `debugging.md` — root cause, never the symptom: identify the layer (compiler, library, templates, build) before any fix; never work around in an example.
+- `memory_routing.md` — project knowledge goes to `.claude/notes/` in the repo, not to the per-user memory directory.
 - `release.md` — Release workflow, CHANGELOG format, version tagging
 - `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
 - `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.
 - `abi_lint.md` — ASM ABI lint policy and the `; lint-asm-abi: skip-file` marker; must consult before adding a new ASM file or retrofitting for an ABI change.
 - `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → luna issue → luna ships → delete). Must consult before adding any internal validation/analysis script.
 - `hardware_claims.md` — every new hardware claim in docs/ or KNOWN_LIMITATIONS.md must be verified against the Cartouche corpus (`snes_search` with opensnes-docs excluded; `contrast=true` on conflicts); unexplained hardware-shaped symptoms get a corpus query before blaming the toolchain.
+- `partners.md` — the two shoulders, luna and snes-rag: the three work jointly, and feedback to each is a duty, not an option. A gap in a partner is written down the same day in `.claude/notes/partners/<partner>/`; snes-rag is passive and only learns what we and luna report; we are the bridge between the two.
 
 ## Strategic Planning
 

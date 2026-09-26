@@ -50,7 +50,13 @@
 ; and collide with whatever bank-0 helper happened to land there. This
 ; was the bug that broke tetris via `__mul32` colliding with `tcc_mul16`
 ; (see commit 1208c53).
-.SECTION ".div32" BANK 7 FREE
+; Any bank but $00, highest first — the same placement as the asset
+; sections (templates/assets.inc). Reached by `jsl` only, so any bank works;
+; it was pinned `BANK 7 FREE`, which left no room once assets moved to the
+; asset banks (2026-09-23: four examples failed to link, "No room for
+; section .div32 in ROM bank 7"). The literal list is deliberate: a .DEFINE
+; is not expanded inside BANKS, and banks 1-7 exist in every memory map.
+.SECTION ".div32" SEMISUPERFREE BANKS 7-1
 
 .ACCU 16
 .INDEX 16

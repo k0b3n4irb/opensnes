@@ -6,8 +6,11 @@ and the ROADMAP footer-date anchor."""
 import unittest
 
 from check_doc_drift import (COUNT_PATTERNS, ROADMAP_FOOTER_RE,
+                             deprecated_citations_in_text,
                              extract_example_paths, parse_category_rows,
-                             phantom_names_in_code, soft_wrap)
+                             phantom_names_in_code, retired_tool_lines,
+                             sdk_phantoms_in_text,
+                             sdk_prefixes, soft_wrap)
 
 API = {"textPrintAt", "textModeInit", "setScreenOn", "WaitForVBlank",
        "oamSet", "audioPlaySample"}
@@ -102,6 +105,53 @@ class TestFooterDate(unittest.TestCase):
         self.assertEqual(m.group(1), "2026-07-04")
         self.assertIsNone(ROADMAP_FOOTER_RE.search("Last update was recent"))
 
+
+
+class TestSdkNamesInDocs(unittest.TestCase):
+    """2026-09-26: the misses of the audit, as negative controls."""
+    API = {"colorMathSetCondition", "colorMathSetLayers", "objInitFunctions",
+           "objInitEngine", "snesmodPlay", "snesmodLoadModule", "setScreenOn",
+           "setMode"}
+
+    def setUp(self):
+        self.prefixes = sdk_prefixes(self.API)
+
+    def test_prefixes_are_shared_module_words(self):
+        self.assertIn("colorMath".split("M")[0], self.prefixes)  # "color"
+        self.assertIn("obj", self.prefixes)
+        self.assertIn("spc", self.prefixes)            # retired PVSnesLib prefix
+        self.assertNotIn("set", self.prefixes)         # too generic
+
+    def test_flags_renamed_and_pvsneslib_calls(self):
+        text = ("colorMathSetMaskMain(COLORMATH_INSIDE);\n"
+                "objRegisterTypes();\n"
+                "Load it with `spcLoad(MOD_X)`.\n")
+        names = [n for n, _ in sdk_phantoms_in_text(text, self.API, self.prefixes)]
+        self.assertEqual(names, ["colorMathSetMaskMain", "objRegisterTypes", "spcLoad"])
+
+    def test_real_calls_user_functions_and_local_definitions_pass(self):
+        text = ("colorMathSetCondition(1); startGame(); renderBoard();\n"
+                "void objHelper(void) { }\nobjHelper();\n")
+        self.assertEqual(sdk_phantoms_in_text(text, self.API, self.prefixes), [])
+
+    def test_deprecated_cited_as_current(self):
+        hits = deprecated_citations_in_text("Call `dmaCopyVramBank(src, 1, 0, n)`.\n",
+                                            {"dmaCopyVramBank"})
+        self.assertEqual(hits, [("dmaCopyVramBank", 1)])
+
+    def test_deprecated_said_so_on_the_line_or_the_one_before(self):
+        text = ("| `dmaCopyVramBank` | **Deprecated** (2026-09-20). |\n"
+                "It takes the bank. (Deprecated since 2026-09-20:\n"
+                "`dmaCopyVramBank`.)\n")
+        self.assertEqual(deprecated_citations_in_text(text, {"dmaCopyVramBank"}), [])
+
+
+class TestRetiredTools(unittest.TestCase):
+    def test_flags_current_use(self):
+        self.assertEqual(retired_tool_lines("ok\nvalidate in Mesen2\ncd tools/opensnes-emu\n"), [2, 3])
+
+    def test_allows_saying_it_is_retired(self):
+        self.assertEqual(retired_tool_lines("Mesen2 was retired on 2026-07-05\n"), [])
 
 if __name__ == "__main__":
     unittest.main()

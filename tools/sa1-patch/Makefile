@@ -43,7 +43,7 @@ $(EXE)$(EXT): $(OBJS)
 $(OBJ):
 	@mkdir -p $(OBJ)
 
-$(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
+$(OBJ)/%.o: $(SRC)/%.c $(wildcard $(SRC)/*.h) | $(OBJ)
 	@echo "Compiling $<"
 	$(CC) $(CFLAGS) -I$(SRC) -c $< -o $@
 

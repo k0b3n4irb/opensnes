@@ -7,7 +7,7 @@
 ;                 gfx4snes -s 8 -o 16 -u 16 -e 1 -p -m -i res/bg2.png
 ;==============================================================================
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tiles_bg1:
 .incbin "res/bg1.pic"
@@ -22,7 +22,7 @@ palette_bg1:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 tiles_bg2:
 .incbin "res/bg2.pic"

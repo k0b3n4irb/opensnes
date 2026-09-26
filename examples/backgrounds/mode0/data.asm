@@ -2,7 +2,7 @@
 ; Mode 0 — 4 background layers (2bpp each)
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 t0:     .incbin "res/bg0.pic"
 t0_end:
@@ -18,7 +18,7 @@ bgm1_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 t2:     .incbin "res/bg2.pic"
 t2_end:

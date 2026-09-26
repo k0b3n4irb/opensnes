@@ -30,8 +30,6 @@ res/ground.pc7 res/ground.mp7 res/ground.pal: res/ground.png
 	@echo "[GFX] Converting Mode 7 ground..."
 	@$(GFX4SNES) -p -m -M 7 -i $<
 
-combined.asm: res/sky.pic res/ground.pc7
-
 clean: clean-mode7_dsp1_ground
 .PHONY: clean-mode7_dsp1_ground
 clean-mode7_dsp1_ground:

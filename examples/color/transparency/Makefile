@@ -30,8 +30,6 @@ res/clouds.pic res/clouds.pal res/clouds.map: res/clouds.bmp
 	@echo "[GFX] Converting clouds (2bpp)..."
 	@$(GFX4SNES) -s 8 -o 2 -u 4 -p -m -t bmp -i $<
 
-combined.asm: res/backgrounds.pic res/clouds.pic
-
 clean: clean-transparency
 .PHONY: clean-transparency
 clean-transparency:

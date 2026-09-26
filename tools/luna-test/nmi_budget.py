@@ -95,23 +95,22 @@ def main() -> int:
         for key, why in SUBSET:
             rom = rom_for(key)
             sym = folded_sym(rom, Path(td))
+            # --report still asks for a budget, with a ceiling nothing reaches:
+            # luna then prints its `budget:` line (worst frame and its number)
+            # and never gates. Reading the `--top` table instead broke the day
+            # WaitForVBlank outranked the handler (2026-09-26 audit).
+            ceiling = 10**9 if args.report else CEILING
             cmd = [luna, "profile", str(rom), "--until-frame", str(FRAMES),
-                   "--sym", str(sym), "--top", "1"]
-            if not args.report:
-                cmd += ["--budget", f"NmiHandler={CEILING}"]
+                   "--sym", str(sym), "--top", "0", "--budget", f"NmiHandler={ceiling}"]
             proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             if proc.returncode == 2:
                 sys.exit(f"nmi-budget: luna rejected the symbol on {key}: "
                          f"{proc.stdout.strip()[-200:]}")
             m = BUDGET_RE.search(proc.stdout)
-            if m:
-                worst, frame = int(m.group(2)), m.group(3)
-            else:  # --report mode: read the row luna printed
-                row = [l for l in proc.stdout.splitlines() if l.rstrip().endswith("NmiHandler")]
-                if not row:
-                    sys.exit(f"nmi-budget: no NmiHandler row for {key} — did the "
-                             f"handler get renamed?")
-                worst, frame = int(row[0].split()[-2]), "?"
+            if not m:
+                sys.exit(f"nmi-budget: luna printed no budget line for {key}: "
+                         f"{(proc.stdout + proc.stderr).strip()[-200:]}")
+            worst, frame = int(m.group(2)), m.group(3)
             pct = 100.0 * worst / CEILING
             verdict = "OVER" if proc.returncode == 1 else "ok"
             if proc.returncode == 1:

@@ -1,9 +1,10 @@
 ;==============================================================================
-; GSU Code Loader — WRAM-safe launch + SRAM readback
+; GSU program + result readback
 ;==============================================================================
-; ALL GSU launches MUST use the WRAM stub. The SNES CPU cannot read ROM
-; while the GSU is running (RON=1). Even a 3-instruction GSU program can
-; race the CPU's instruction prefetch.
+; The launch itself is the library's (gsuSetProgram + gsuLaunch, called from
+; main.c): it runs the GSU from a WRAM loop and keeps interrupts alive during
+; the job. Until 2026-09-26 this file carried its own WRAM launcher, which
+; disabled NMI for the job and re-enabled it with a hardcoded $81.
 ;==============================================================================
 
 .ifdef SUPERFX
@@ -11,7 +12,7 @@
 ;------------------------------------------------------------------------------
 ; GSU program binary
 ;------------------------------------------------------------------------------
-.SECTION ".gsu_code" SUPERFREE
+ASSET_SECTION ".gsu_code"
 gsu_program:
     .incbin "gsu_hello.sfx.bin"
 gsu_program_end:
@@ -21,7 +22,6 @@ gsu_program_end:
 ; WRAM area + result variables
 ;------------------------------------------------------------------------------
 .RAMSECTION ".gsu_vars" BANK 0 SLOT 1
-gsu_hello_wram: dsb 64
 gsu_result: dsb 2
 gsu_sram_byte0: dsb 1
 gsu_sram_byte1: dsb 1
@@ -33,36 +33,18 @@ gsu_fmult_test2: dsb 2     ; FMULT 1.5*3.0 result (expected $4800)
 ;------------------------------------------------------------------------------
 ; launchGSU + WRAM stub (same section for label arithmetic)
 ;------------------------------------------------------------------------------
-.SECTION ".gsu_launcher" SEMIFREE
-
+.SECTION ".gsu_readback" SEMIFREE
 .ACCU 16
 .INDEX 16
-
-launchGSU:
+; gsuHelloReadResults — copy what the GSU program left in R0 and in the
+; first bytes of Game Pak RAM into the WRAM variables main.c prints. Call it
+; after gsuLaunch() returns (the CPU owns the cartridge again).
+gsuHelloReadResults:
     php
-
-    ; Copy WRAM stub from ROM to WRAM
-    sep #$20
-    .ACCU 8
-    rep #$10
-    .INDEX 16
-    ldx #$0000
--   lda.l _wram_stub,x
-    sta.l gsu_hello_wram,x
-    inx
-    cpx #(_wram_stub_end - _wram_stub)
-    bne -
-
-    ; Execute from WRAM
-    jsl gsu_hello_wram
-
-    ; GSU finished — read results
     rep #$20
     .ACCU 16
     lda.l $3000              ; GSU R0
     sta.l gsu_result
-
-    ; Read SRAM bytes written by GSU
     sep #$20
     .ACCU 8
     lda.l $700000            ; SRAM[0]
@@ -77,55 +59,8 @@ launchGSU:
     sta.l gsu_fmult_test1
     lda.l $700006            ; SRAM[6..7] (FMULT test 2)
     sta.l gsu_fmult_test2
-
     plp
     rtl
-
-;--- WRAM stub (copied and executed from WRAM) ---
-_wram_stub:
-    sep #$20
-    .ACCU 8
-
-    ; Disable NMI (vector is in ROM)
-    lda #$00
-    sta.l $4200
-
-    ; Configure GSU
-    lda #$A0
-    sta.l $3037              ; CFGR: IRQ mask + fast multiply
-
-    ; Give buses to GSU
-    lda #$18
-    sta.l $303A              ; SCMR: RAN+RON
-
-    ; Set program bank
-    lda #:gsu_program
-    sta.l $3034              ; PBR
-
-    ; Start GSU
-    rep #$20
-    .ACCU 16
-    lda #gsu_program
-    sta.l $301E              ; R15 → GO!
-
-    ; Poll SFR
-    sep #$20
-    .ACCU 8
--   lda.l $3030
-    and #$20
-    bne -
-
-    ; Reclaim buses
-    lda #$00
-    sta.l $303A
-
-    ; Re-enable NMI
-    lda #$81
-    sta.l $4200
-
-    rtl
-_wram_stub_end:
-
 .ENDS
 
 .endif

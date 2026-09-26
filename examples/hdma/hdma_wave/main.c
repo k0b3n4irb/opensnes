@@ -132,8 +132,8 @@ static const u16 amp_offsets[AMP_LEVELS] = {
 int main(void) {
     u16 i;
 
-    /* Initialize state explicitly (not relying on C static init because
-     * the compiler's .data_init section handling can be fragile) */
+    /* State set explicitly at the top of main (C static initialisers work
+     * too: crt0 copies them from ROM before main runs) */
     wave_on = 0;
     amp_idx = AMP_DEFAULT;
     animating = 0;

@@ -38,9 +38,14 @@ jobs:
             base-devel
             git
 
+      # A scheduled run starts on the default branch (main), which lags
+      # develop by days between releases: every night re-tested the last
+      # release and re-found bugs already fixed (fuzz: 0 green of 8,
+      # 2026-09-18 to 25). Scheduled runs test develop's tip instead.
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || '' }}
           submodules: recursive
 
       # --------------------------------------------------------

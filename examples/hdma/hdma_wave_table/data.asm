@@ -7,14 +7,14 @@
 ; dmaCopyVram reads it directly.
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 tiles:      .incbin "res/water.pic" skip 0 read 32768
 tiles_end:
 
 .ends
 
-.section ".rodata2" superfree
+ASSET_SECTION ".rodata2"
 
 tiles2:     .incbin "res/water.pic" skip 32768
 tiles2_end:

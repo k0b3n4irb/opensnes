@@ -1,60 +1,45 @@
 ---
 name: test
-description: Run OpenSNES test suite (compiler tests, example validation, visual regression)
-argument-hint: "[all|compiler|validate|<example-name>]"
+description: Run the OpenSNES test suite on luna (corpus liveness, visual regression, manifests, WRAM oracle, coverage ratchet, compiler fixtures)
+argument-hint: "[all|compiler|manifests|<example-path>]"
 allowed-tools: Bash(*), Read
 ---
 
 # /test - Run Tests
 
-Run tests for OpenSNES SDK.
+Every runtime check goes through **luna**, the project's only emulator
+backend (`.claude/rules/testing.md`, `.claude/rules/luna_tooling.md`).
+Install the pinned binary once with `scripts/install-luna.sh`.
 
 ## Usage
 ```
-/test                    # Run all tests
-/test black-screen       # Run black screen tests (mandatory before commit)
-/test compiler           # Run compiler tests
-/test validate           # Validate all examples build
-/test <example>          # Test specific example in Mesen2
+/test                        # the full suite: make tests
+/test compiler               # compiler C→ASM checks: make test-compiler
+/test manifests              # scripted-input probes: make test-manifests
+/test <category>/<example>   # one example: liveness + fbhash
 ```
 
-## Requirements
-- Mesen2 emulator for ROM testing
+## Commands
 
-## Test Scripts
-
-| Script | Purpose |
-|--------|---------|
-| `tests/run_black_screen_tests.sh` | Detect broken ROMs (mandatory) |
-| `tests/run_tests.sh` | General ROM tests with Mesen2 |
-| `tests/compiler/run_tests.sh` | Compiler regression tests |
-| `tests/examples/validate_examples.sh` | Build validation |
-
-## Implementation
-
-### Black Screen Test (Mandatory)
 ```bash
-./tests/run_black_screen_tests.sh /path/to/Mesen
-```
-Detects broken ROMs by checking if they display content after 90 frames.
+# Everything CI runs (about 15 minutes)
+make tests
 
-### Compiler Tests
-```bash
-./tests/compiler/run_tests.sh
-```
+# Compiler fixtures only
+make test-compiler
 
-### Example Validation
-```bash
-./tests/examples/validate_examples.sh --quick
-```
+# luna test manifests (input → WRAM asserts)
+make test-manifests
 
-### Single ROM Test
-```bash
-/path/to/Mesen examples/$1/*.sfc --testrunner --lua tests/mesen/test.lua
+# One example
+python3 tools/luna-test/luna_runner.py --coverage --only $1
+python3 tools/luna-test/luna_runner.py --compare  --only $1
+
+# Class A changes: the A/B proof against ROMs built before the change
+python3 tools/luna-test/diff_corpus.py --ref /tmp/examples_before
 ```
 
-## Reporting
-After testing, report:
-1. Tests passed/failed
-2. Any build errors
-3. Screenshots saved for failed tests
+## Report
+1. Pass/fail per pillar, with the failing example and luna's message.
+2. For a visual DIFF: the frame, and whether `luna diff` explains it.
+3. Never re-baseline (`--update`) before the cause of a change is known.

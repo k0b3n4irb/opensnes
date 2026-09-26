@@ -44,7 +44,9 @@ If NMI fires mid-sequence and touches $2180-$2183, the address/data will be **co
 ### Static lint (chantier E1, 2026-05-09)
 
 `devtools/check_nmi_wram_race.py` builds the call graph from each
-example's `combined.asm` + `*.c.asm` intermediates, identifies the
+example's `*.c.asm` intermediates (`combined.asm` is no longer
+produced; until 2026-09-26 the build only ran the lint when that file
+existed, i.e. never on a fresh tree), identifies the
 NMI closure (NmiHandler + DefaultNmiCallback + every function passed
 to `nmiSet`/`nmiSetBank`), and **fails the build** if any reachable
 function writes to `$2180-$2183`.

@@ -30,8 +30,6 @@ res/mario_sprite.pic res/mario_sprite.pal: res/mario_sprite.png
 	@echo "[GFX] Converting mario sprites..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-combined.asm: res/tiles.pic res/mario_sprite.pic
-
 clean: clean-slope_collision
 .PHONY: clean-slope_collision
 clean-slope_collision:

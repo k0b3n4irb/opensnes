@@ -281,12 +281,9 @@ cd opensnes
 make
 ```
 
-This takes a few minutes. Expected output:
+The first build compiles the toolchain (cproc, QBE, WLA-DX) and takes a few
+minutes; later builds take seconds. It ends with:
 ```
-Building cc65816 compiler...
-Building WLA-DX assembler...
-Building OpenSNES library...
-Building examples... (74 ROMs)
 OpenSNES SDK build complete!
 ```
 
@@ -342,7 +339,7 @@ ls examples/*/
 
 ## Tutorials
 
-The full set (all 19 tutorials, always current) is on the docs home page —
+The full set of tutorials, always current, is on the docs home page —
 see @ref index "the tutorial navigation in mainpage". The most common
 starting points:
 
@@ -397,11 +394,14 @@ Your ROM built but doesn't display anything. Common causes:
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 
-### Build fails with "unhandled op" or assembly errors
+### Build fails with "refusing to emit silently-wrong code"
 
-This is usually a compiler limitation. Check:
-- Are you using `u32`/`s32`? Prefer `u16`/`s16` when possible
-- Use `u8`, `u16`, `s16`, `u32` types from `snes.h` (not `int` or `long`)
+The compiler stops, with the feature named, rather than generate wrong code
+for what it does not support: struct assignment, structs passed or returned
+by value, variadic functions and inline assembly. Pass a pointer, copy the
+fields, or move the code to a `.asm` file. 32-bit `u32`/`s32` arithmetic is
+fully supported (it is slower than 16-bit, not wrong). See
+`KNOWN_LIMITATIONS.md` for the full list.
 
 ## Getting Help
 

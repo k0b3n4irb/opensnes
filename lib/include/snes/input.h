@@ -156,27 +156,28 @@ u16 padRaw(u8 pad);
  *
  * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
  *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
- * @return 1 if connected, 0 otherwise (0xFF for "yes" until 2026-09-22)
+ * @return 1 if a standard pad answered on that port during the last VBlank,
+ *         0 otherwise (0xFF for "yes" until 2026-09-22)
  *
- * @warning Not reliable today for pads 0 and 1: it answers 1 for an empty
- *          port. Auto-joypad reading cannot tell the two cases apart — an
- *          empty port and an idle pad both auto-read $0000; the difference
- *          only exists past bit 16 of a manual serial read (a pad's line
- *          idles high, an empty port returns 0s) — modelled identically by
- *          luna, ares and Mesen2, not measured on a console (it is on the
- *          real-hardware checklist, docs/HARDWARE_VERIFICATION.md). Open item
- *          B12 of the 2026-09-20 API audit; the fix needs crt0 to clock that
- *          17th bit and publish a per-port flag, and a luna release with an
- *          unplugged port to test it against.
+ * The NMI handler reads one serial bit past the 16 of auto-joypad reading:
+ * a joypad returns 1s after its 16 bits (anomie's register doc, Joypads),
+ * which is how the snesdev-wiki Multitap page detects controllers. A port
+ * holding another device (mouse, Super Scope) reads 0: it is not a pad.
+ * Valid from the first VBlank after `consoleInit()` / `setScreenOn()`.
  *
- * @warning For whoever writes that fix: **mask the serial ports before
- *          testing them.** `REG_JOYA` (`$4016`) and `REG_JOYB` (`$4017`) are
- *          whole-byte reads; only bits 0-1 are the port's data lines. On
- *          `$4017` bits 2-4 are tied and always read 1, bits 5-7 are open
- *          bus; on `$4016` bits 2-7 are open bus (fullsnes, "Unused bits in
- *          ports"; snesdev-wiki, JOYSER1: "D4-2 always 1"). So
- *          `if (REG_JOYB)` is true on every console and every emulator —
- *          test `REG_JOYB & 1` (data 1) or `& 3` (both lines).
+ * @note Until 2026-09-26 it answered 1 for an empty port: an empty port
+ *       and an idle pad both auto-read $0000, and only the 17th bit tells
+ *       them apart. What an empty port returns there is modelled as 0 by
+ *       luna, ares and Mesen2; no reference states it and it is not yet
+ *       measured on a console.
+ *
+ * @warning Reading the serial ports yourself: **mask them first.**
+ *          `REG_JOYA` (`$4016`) and `REG_JOYB` (`$4017`) are whole-byte
+ *          reads; only bits 0-1 are the port's data lines. On `$4017` bits
+ *          2-4 are tied and always read 1, bits 5-7 are open bus; on
+ *          `$4016` bits 2-7 are open bus (fullsnes, "Unused bits in ports";
+ *          snesdev-wiki, JOYSER1: "D4-2 always 1"). So `if (REG_JOYB)` is
+ *          true on every console and every emulator — test `REG_JOYB & 1`.
  */
 u8 padIsConnected(u8 pad);
 

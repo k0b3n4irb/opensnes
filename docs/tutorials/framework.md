@@ -281,7 +281,7 @@ The three outputs are then given labels in `data.asm`, which is the entire
 contract between the converter and the macro:
 
 ```asm
-.section ".rodata1" superfree
+ASSET_SECTION "rodata1"          ; templates/assets.inc: any bank but $00
 
 bg_tiles: .incbin "res/opensnes.pic"
 bg_tiles_end:
@@ -305,9 +305,11 @@ The macro is sugar; the struct is the contract. Nothing stops you from filling
 a `BgAsset` yourself when the symbols do not follow the convention, or when
 the pointers are computed rather than linked.
 
-> New asset sections should prefer the `ASSET_SECTION` macro from
-> `templates/assets.inc` over a bare `superfree` section — it keeps payload
-> out of bank $00. The examples above predate it.
+> `ASSET_SECTION` (`templates/assets.inc`, included in every assembled file)
+> is the way to declare asset data: `SEMISUPERFREE BANKS 7-1`, so bank $00
+> is never a candidate. A bare `superfree` section lets the linker pick the
+> first bank that fits — bank $00 — which is how 14 examples ended up within
+> 28 bytes of a full code bank before the corpus moved over on 2026-09-23.
 
 ## Side by side with the hand-written equivalent
 

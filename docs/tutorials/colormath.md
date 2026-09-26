@@ -136,11 +136,12 @@ windowSetMainMask(WINDOW_BG1 | WINDOW_BG2);   /* layers windowed too */
 colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
 colorMathSetOp(COLORMATH_ADD);
 colorMathSetHalf(1);
-colorMathSetMaskMain(COLORMATH_INSIDE);       /* math inside window only */
+colorMathSetCondition(COLORMATH_INSIDE);      /* math inside window only */
 colorMathSetLayers(COLORMATH_BG1);
 ```
 
-The four constants for `colorMathSetMaskMain(condition)`:
+`colorMathSetCondition(condition)` writes CGWSEL bits 5-4, the region where
+colour math is allowed. The four constants:
 
 | `COLORMATH_*` | Math fires when… |
 |---|---|
@@ -149,9 +150,14 @@ The four constants for `colorMathSetMaskMain(condition)`:
 | `_OUTSIDE` | pixel is outside it |
 | `_NEVER` | never (use to disable math without unwinding all enables) |
 
-The pair `colorMathSetMaskSub(condition)` does the same for the sub
-screen — usually less interesting, but `_INSIDE` on sub is the right
-gate for "blend with sub-screen colour only inside the window".
+The other half of CGWSEL, bits 7-6, uses the same four regions for a
+different effect: it clips the main screen's colours to **black** before
+the math (never / outside / inside / always). There is no sub-screen
+twin of the math region — see [anomie's register
+doc](https://www.romhacking.net/documents/196/) ("cc = Clip colors to
+black before math, mm = Prevent color math") and
+[snesdev-wiki](https://snes.nesdev.org/wiki/PPU_registers#CGWSEL). The
+lib has no function for the clip bits yet.
 
 ## The lib API
 
@@ -164,8 +170,7 @@ gate for "blend with sub-screen colour only inside the window".
 | `colorMathSetHalf(half)` | 0 = don't divide result, 1 = divide by 2 (true 50 % blend). |
 | `colorMathSetSource(src)` | `COLORMATH_SRC_SUBSCREEN` or `COLORMATH_SRC_FIXED`. |
 | `colorMathSetFixedColor(r, g, b)` | Set the fixed-colour value (5-bit per channel). Used when source is `_FIXED`. |
-| `colorMathSetMaskMain(condition)` | Window gate for the main-screen path: `_ALWAYS` / `_INSIDE` / `_OUTSIDE` / `_NEVER`. |
-| `colorMathSetMaskSub(condition)` | Same for the sub screen. |
+| `colorMathSetCondition(condition)` | Window region where math is allowed: `_ALWAYS` / `_INSIDE` / `_OUTSIDE` / `_NEVER` (CGWSEL bits 5-4). |
 
 ## Worked patterns (the two shipped examples)
 

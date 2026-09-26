@@ -1,3 +1,6 @@
+> **Archived 2026-09-26** — shipped / closed: examples/games/likemario (port retrospective). Kept for context; the
+> "Status" below is the state when the note was last edited.
+
 # LikeMario Port — Lessons Learned
 
 ## Input System Architecture

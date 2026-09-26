@@ -31,10 +31,9 @@
 .ENDS
 
 ;------------------------------------------------------------------------------
-; ROM assets (bank 0 for C accessibility)
+; ROM assets — DMA sources and const-read strings, asset banks (2026-09-23)
 ;------------------------------------------------------------------------------
-.SECTION ".rodata1" SEMIFREE BANK 0 SLOT 0
-
+ASSET_SECTION ".rodata1"
 tiles_gfx:
 .incbin "res/tiles.pic"
 tiles_gfx_end:
@@ -157,8 +156,7 @@ orange_pal_end:
 ;------------------------------------------------------------------------------
 ; String constants
 ;------------------------------------------------------------------------------
-.SECTION ".strings" SEMIFREE BANK 0 SLOT 0
-
+ASSET_SECTION ".strings"
 str_tetris:
 .db "TETRIS", 0
 

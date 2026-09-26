@@ -12,8 +12,8 @@
  * Key technical patterns: RAM tilemap buffers for runtime brick destruction,
  * overlapping BG1/BG3 tilemaps in VRAM to save memory (requiring atomic
  * dual-DMA updates), palette cycling for per-level color variation, and
- * direct oamMemory[] writes instead of oamSet() for performance (10 sprites
- * per frame would cause visible slowdown with oamSet's 158-byte stack frame).
+ * direct oamMemory[] writes (the escape hatch next to oamSet(); oamSet has
+ * been an asm routine since 2026-03-03, so either is fine at 10 sprites).
  *
  * Ball bounce angle varies by paddle hit zone (4 zones), creating the
  * classic Breakout aiming mechanic. Scoring uses level multipliers.
@@ -110,9 +110,8 @@ extern const char str_blank[];
 /*============================================================================
  * RAM Buffers (defined in data.asm)
  *
- * These buffers are placed at specific addresses to avoid WRAM mirroring
- * issues. Bank 0 addresses $0000-$1FFF mirror Bank $7E:$0000-$1FFF, so
- * we place these at $0800+ to avoid overlap with OAM buffer at $0300.
+ * They are `FAR` (bank $7E, above the 8 KB plain C band — data.asm), so the
+ * linker places them and every access carries its bank (chantier B2).
  *
  * Why RAM buffers?
  * - Tilemaps need runtime modification (brick destruction, score updates)
@@ -121,21 +120,21 @@ extern const char str_blank[];
  *============================================================================*/
 
 /**
- * @brief BG1 tilemap RAM copy (0x400 entries = 2KB) at WRAM $0800.
+ * @brief BG1 tilemap RAM copy (0x400 entries = 2KB), far RAM.
  *
  * Modified at runtime when bricks are destroyed and HUD text updates.
  * DMAs to VRAM $0000-$07FF each time visuals change.
  */
 extern FAR u16 blockmap[];
 /**
- * @brief BG3 tilemap RAM copy (0x400 entries = 2KB) at WRAM $1000.
+ * @brief BG3 tilemap RAM copy (0x400 entries = 2KB), far RAM.
  *
  * Modified for shadow effects under bricks (palette bit toggling).
  * DMAs to VRAM $0400-$0BFF. Overlaps BG1 at VRAM $0400-$07FF, so
  * both must be uploaded atomically in the same VBlank.
  */
 extern FAR u16 backmap[];
-/** @brief Palette RAM copy (0x100 entries = 512 bytes) at WRAM $1800 */
+/** @brief Palette RAM copy (0x100 entries = 512 bytes), far RAM */
 extern FAR u16 pal[];
 /**
  * @brief Mutable brick state array (100 entries, one per grid cell).
@@ -153,7 +152,7 @@ extern FAR u8  blocks[];
  * their values are copied from ROM to RAM at startup.
  *============================================================================*/
 
-static u8  i, j, k;          /**< Loop counters (global to reduce 65816 stack overhead) */
+static u8  i, j, k;          /**< Loop counters, shared by the functions below */
 static u16 a, c, b;          /**< Brick init temporaries (reused in new_level/main) */
 static u16 blockcount;       /**< Number of bricks remaining (0 triggers next level) */
 static u16 bx, by;           /**< Ball position in brick grid coordinates (0-9 each) */
@@ -169,8 +168,9 @@ static u16 pad0;             /**< Current frame's joypad button bitmask */
 /**
  * @brief Ball X velocity (-2 to +2 pixels/frame).
  *
- * Separate from a struct because the cc65816 compiler has quirks with
- * compound operations on struct members (e.g., negation, += assignment).
+ * Kept as two variables for readability. (An older comment blamed compiler
+ * quirks with compound operations on struct members; the C-feature runtime
+ * ROM pins those operations since 2026-09-13.)
  */
 static s16 vel_x;
 static s16 vel_y;             /**< Ball Y velocity (-2 to +2 pixels/frame) */
@@ -245,8 +245,8 @@ static void writenum(u16 num, u8 len, u16 FAR *tilemap, u16 pos, u16 offset) {
 /**
  * @brief Simple byte-by-byte memory copy
  *
- * Used instead of library memcpy to avoid bank addressing complexity.
- * Works for Bank 0 addresses only (ROM $8000+ and RAM $0000-$1FFF).
+ * `src` is a const (far) pointer and `dest` a FAR RAM buffer, so both may
+ * live in any bank.
  */
 static void mycopy(u8 FAR *dest, const u8 *src, u16 len) {
     while (len--) {
@@ -263,7 +263,8 @@ static void mycopy(u8 FAR *dest, const u8 *src, u16 len) {
  *
  * SPRITE ORGANIZATION:
  * This game uses 10 hardware sprites for the ball and paddle.
- * Sprite 0 is skipped due to a corruption issue (possibly WRAM mirroring).
+ * Sprite 0 is left unused: an old comment reported a corruption there that
+ * was never reproduced nor explained; nothing in the SDK reserves it.
  *
  * Sprite Assignment:
  *   Sprite 1:     Ball
@@ -292,8 +293,8 @@ static void mycopy(u8 FAR *dest, const u8 *src, u16 len) {
  */
 static void draw_screen(void) {
     /*
-     * Direct OAM buffer writes — replaces 10x oamSet() calls.
-     * oamSet() has framesize=158 per call; 10 calls = 1580 bytes stack overhead.
+     * Direct OAM buffer writes — the escape hatch next to oamSet(), shown
+     * here on purpose (oamSet's old 158-byte frame is gone since 2026-03-03).
      *
      * OAM low table: 4 bytes per sprite at offset id*4
      *   [0] X low, [1] Y, [2] tile low, [3] attributes (vhoopppc)
@@ -567,11 +568,11 @@ static void move_paddle(void) {
 /**
  * @brief Update ball position and handle wall collision
  *
- * NOTE: Uses explicit temp variables instead of direct assignment
- * to work around QBE compiler issues with compound operations.
+ * Explicit temporaries, for readability: the compound operations an older
+ * comment worried about are pinned by the C-feature runtime ROM.
  */
 static void move_ball(void) {
-    /* Explicit temp vars avoid compiler issues with += */
+    /* Explicit temporaries (readability; += works) */
     s16 new_x = pos_x + vel_x;
     s16 new_y = pos_y + vel_y;
     pos_x = new_x;
@@ -814,7 +815,7 @@ int main(void) {
     for (j = 0; j < 10; j++) {
         for (i = 0; i < 20; i += 2) {
             a = blocks[b];
-            b++;  /* Separate increment avoids compiler issues */
+            b++;
             if (a < 8) {
                 c = (j << 5) + i;
                 blockcount++;

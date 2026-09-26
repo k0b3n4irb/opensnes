@@ -22,6 +22,10 @@
 #   USE_HIROM     - Set to 1 for HiROM mode (64KB banks instead of 32KB)
 #   USE_FASTROM   - Set to 1 for FastROM (~33% faster ROM access)
 #   USE_SRAM      - Set to 1 to enable battery-backed save (8KB default)
+#   ROM_BANKS     - Linker bank count (default 8: 256 KB LoROM / 512 KB HiROM);
+#                   the header's ROMSIZE byte and the asset bank range follow it
+#   GSU_RAM_KB    - Super FX Game Pak RAM declared in the extended header
+#                   ($FFBD; default 64)
 #
 # SNESMOD audio options:
 #   USE_SNESMOD   - Set to 1 to enable SNESMOD tracker audio
@@ -62,12 +66,12 @@ TEMPLATES := $(OPENSNES)/templates
 # Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.
 # 8 sits below the current example minimum on the A6+A7 chantier branch
 # (12 bytes free in likemario / tetris / mapandobjects post-A6 — see
-# .claude/notes/chantiers/a6_a7_unified_audit.md). Pre-chantier it was 16
+# .claude/notes/archive/a6_a7_unified_audit.md). Pre-chantier it was 16
 # (28-byte minimum in mapscroll.sfc as of v0.16.0); A6's 4-byte pointer push
 # at every call site shaved ~12-16 bytes off tight examples. Bumping back to
 # 16 is a follow-up once lib code-size optimisations or section-routing land.
 # See .claude/rules/bank0_budget.md for the policy.
-BANK0_FAIL_THRESHOLD ?= 8
+BANK0_FAIL_THRESHOLD ?= 1024
 
 # C RAM band ($00:0000-$1FFF) budget — the RAM twin of the ROM ratchet
 # above (structural defect B2: all C-accessible RAM must sit in the 8 KB
@@ -110,7 +114,20 @@ SOUNDBANK_SRC ?=
 SOUNDBANK_OUT ?= soundbank
 SOUNDBANK_BANK ?= 1
 GSUSRC      ?=
-ROMSIZE     ?= $$08
+# ROM size as a project knob (2026-09-24). ROM_BANKS is the linker's bank
+# count (32 KB banks on LoROM / SA-1 / Super FX, 64 KB on HiROM); the header
+# byte ROMSIZE (1 KB << n) and the asset bank range follow it unless set by
+# hand. Defaults reproduce the historical 8 banks: 256 KB LoROM, 512 KB HiROM
+# (whose header used to claim 256 KB — a lie fixed by computing it).
+ROM_BANKS   ?= 8
+ROM_BANK_KB := $(if $(filter 1,$(USE_HIROM)),64,32)
+# Rounded UP to the next power of two: snesdev-wiki, ROM header ($FFD7,
+# "rounded up"); int(log2) declared 256 KB for a 384 KB ROM until 2026-09-26.
+ROMSIZE     ?= $(shell python3 -c "import math; print('$$%02X' % math.ceil(math.log2($(ROM_BANKS) * $(ROM_BANK_KB))))")
+ASSET_BANKS_RANGE ?= $(shell echo $$(( $(ROM_BANKS) - 1 )))-1
+# Super FX Game Pak RAM declared in the extended header ($FFBD, 1 KB << n).
+GSU_RAM_KB  ?= 64
+GSU_RAM_SIZE_VAL := $(shell python3 -c "import math; print('$$%02X' % int(math.log2($(GSU_RAM_KB))))")
 
 # Derived configuration (one-liners using $(if))
 LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_SUPERFX)),superfx,$(if $(filter 1,$(USE_HIROM)),hirom,lorom)))
@@ -124,13 +141,44 @@ HDR_TEMPLATE := $(TEMPLATES)/$(if $(filter 1,$(USE_SA1)),hdr_sa1.asm,$(if $(filt
 # No superfx memmap branch: GSU cartridges are LoROM-mapped on the 65816
 # side (the GSU has its own ROM view), so plain memmap.inc is intentional.
 MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE_HIROM)),memmap_hirom.inc,memmap.inc))
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_DSP1)),$$03,$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
+# $FFD6 (snesdev-wiki, ROM header, cartouche dc4d4f3adf2cd2f3): high nibble
+# = coprocessor ($0x DSP, $1x GSU, $3x SA-1), low nibble = what sits beside
+# it ($x0 ROM, $x2 ROM+RAM+battery; with a coprocessor $x3, $x5 +RAM+battery).
+# DSP-1 + SRAM is $05 (it was $03, "no RAM", with the sram module linked).
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_DSP1)),$(if $(filter 1,$(USE_SRAM)),$$05,$$03),$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
 SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
 # SRAM/SNESMOD/SuperFX auto-add modules (duplicates are harmless — the
 # dependency resolver below runs $(sort) which dedups)
 LIB_MODULES ?= console
+# Knob combinations that would build a ROM with a wrong header or three
+# memory maps, refused with the reason (2026-09-26; until then only SA-1 +
+# SRAM was). One ROM, one coprocessor, one mapping.
+_COPROCS := $(strip $(filter 1,$(USE_SA1)) $(filter 1,$(USE_SUPERFX)) $(filter 1,$(USE_DSP1)))
+ifneq ($(words $(_COPROCS)),$(filter 0 1,$(words $(_COPROCS))))
+$(error USE_SA1, USE_SUPERFX and USE_DSP1 are exclusive: a cartridge has one coprocessor (header byte $$FFD6 names one))
+endif
+ifeq ($(USE_HIROM)$(USE_SUPERFX),11)
+$(error USE_HIROM=1 with USE_SUPERFX=1 is not supported: Super FX carts are LoROM-mapped on the 65816 side (hdr_superfx.asm, memmap.inc); the build would mix the HiROM memory map into a LoROM header)
+endif
+ifeq ($(USE_HIROM)$(USE_SA1),11)
+$(error USE_HIROM=1 with USE_SA1=1 is not supported: SA-1 has its own mapping (memmap_sa1.inc, hdr_sa1.asm))
+endif
+ifeq ($(USE_HIROM)$(USE_DSP1),11)
+$(error USE_HIROM=1 with USE_DSP1=1 is not supported: the dsp1 module drives the LoROM board ($$30:8000 data, $$30:C000 status); the HiROM DSP-1 board maps it elsewhere)
+endif
+ifeq ($(USE_SRAM)$(USE_SUPERFX),11)
+$(error USE_SRAM=1 with USE_SUPERFX=1 is not supported: the sram module writes bank $$70, which on a Super FX cart is the GSU's own Game Pak RAM (GSU_RAM_KB). Save data there needs a design that no module has yet)
+endif
+ifeq ($(USE_SRAM),1)
+ifeq ($(filter 1 2 3 4 5 6 7,$(SRAM_SIZE)),)
+$(error SRAM_SIZE=$(SRAM_SIZE) is out of range: the header byte $$FFD8 is 1 KB << n, n = 1..7 (2 KB..128 KB); 3 = 8 KB is the default)
+endif
+endif
+ifeq ($(shell [ "$(ROM_BANKS)" -gt 0 ] 2>/dev/null && echo ok),)
+$(error ROM_BANKS=$(ROM_BANKS) must be a positive number of banks)
+endif
 ifeq ($(USE_SRAM)$(USE_SA1),11)
 $(error USE_SRAM=1 with USE_SA1=1 is not supported: on SA-1 the save memory is BW-RAM ($$40-$$4F), which the SNES CPU can only write after enabling SBWE, and the sram module does not do that. See lib/source/sram.asm and KNOWN_LIMITATIONS.md)
 endif
@@ -148,7 +196,7 @@ LIB_MODULES += dsp1
 endif
 
 # Assembler flags
-ASFLAGS := $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ASFLAGS := -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
 
 
 # Check library is built (skip for 'clean')
@@ -206,6 +254,20 @@ LIB_MODULES := $(call _resolve_deps,$(LIB_MODULES))
 #------------------------------------------------------------------------------
 
 LIB_OBJS := $(foreach mod,$(LIB_MODULES),$(wildcard $(LIBDIR)/$(mod).o) $(wildcard $(LIBDIR)/$(mod)-asm.o))
+# A module name that matches no object is an error, not a silent omission
+# (until 2026-09-26 `LIB_MODULES := consol dma` linked dma alone and the typo
+# surfaced as an "unknown symbol" from wlalink). superfx gets its own reason:
+# its asm half exists only in the Super FX flavour of the lib.
+ifeq ($(USE_LIB),1)
+ifneq ($(filter superfx,$(LIB_MODULES)),)
+ifneq ($(USE_SUPERFX),1)
+$(error LIB_MODULES: `superfx` needs USE_SUPERFX=1 — its C half is in every lib flavour but its asm half (gsu_cfgr, gsuLaunch…) only in lib/build/superfx, so it cannot link elsewhere)
+endif
+endif
+_LIB_AVAILABLE = $(sort $(patsubst %-asm,%,$(basename $(notdir $(wildcard $(LIBDIR)/*.o)))))
+$(foreach mod,$(LIB_MODULES),$(if $(wildcard $(LIBDIR)/$(mod).o $(LIBDIR)/$(mod)-asm.o),,\
+  $(error LIB_MODULES: no library module `$(mod)` in $(LIBDIR). Available: $(_LIB_AVAILABLE))))
+endif
 INCLUDES := -I$(OPENSNES)/lib/include -I.
 ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 
@@ -351,7 +413,11 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # Step 3: wrap with memmap and assemble via wla-65816.
 # SKIP_LINT=1 disables the syntax check (escape hatch for environments
 # without clang; CI always runs with the check enabled).
-%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS)
+# Local headers count too (2026-09-26): tetris's main.c includes board.h,
+# piece.h, render.h and hud.h, and editing them rebuilt nothing. Every .h
+# next to a C source, rather than exact -MD deps: cheap and never stale.
+LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
+%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
@@ -366,14 +432,29 @@ endif
 # Assembly Objects
 #------------------------------------------------------------------------------
 
+# Build-config stamp (2026-09-26). project_config.inc had no prerequisite:
+# once it existed, changing USE_SRAM, USE_FASTROM, ROM_BANKS, SRAM_SIZE… was
+# ignored, and the old header shipped. The stamp holds every knob that
+# reaches the header, the assembler flags or the link; it is rewritten only
+# when that text changes, so a rebuild with the same knobs stays a no-op.
+_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) \
+  [$(ROM_NAME)] [$(ASFLAGS)] [$(CFLAGS)] [$(LIB_MODULES)] [$(LIBDIR)] \
+  [$(USE_SNESMOD) $(SOUNDBANK_BANK)]
+.opensnes_config: FORCE
+	@printf '%s\n' '$(subst ','"'"',$(_CONFIG_TEXT))' > $@.tmp
+	@if cmp -s $@.tmp $@; then rm -f $@.tmp; else mv $@.tmp $@; fi
+.PHONY: FORCE
+FORCE:
+
 # Project config (numeric values via .DEFINE)
-project_config.inc:
+project_config.inc: .opensnes_config
 	@echo '.DEFINE CARTRIDGETYPE $(CARTRIDGETYPE)' > $@
 	@echo '.DEFINE ROMSIZE_VAL $(ROMSIZE)' >> $@
 	@echo '.DEFINE SRAMSIZE_VAL $(SRAMSIZE)' >> $@
+	@echo '.DEFINE GSU_RAM_SIZE_VAL $(GSU_RAM_SIZE_VAL)' >> $@
 
 # Project header (ROM_NAME padded to 21 chars with spaces, then sed into template)
-project_hdr.asm: $(HDR_TEMPLATE) project_config.inc
+project_hdr.asm: $(HDR_TEMPLATE) project_config.inc .opensnes_config
 	@echo "[HDR] Generating project header ($(if $(filter 1,$(USE_HIROM)),HiROM,LoROM))..."
 	@padded=$$(printf "%-21.21s" "$(ROM_NAME)") && sed "s/__ROM_NAME__/$$padded/" $(HDR_TEMPLATE) > $@
 
@@ -383,7 +464,7 @@ project_sa1_boot.asm: $(SA1_BOOT_SRC)
 	@cp $< $@
 
 # crt0: has its own MEMORYMAP via project_hdr.asm
-crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boot.asm
+crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boot.asm .opensnes_config
 	@echo "[AS] crt0"
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
 
@@ -394,7 +475,7 @@ data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP)
 
 # User ASM sources (explicit rules to avoid matching library objects)
 define ASM_OBJ_RULE
-$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP)
+$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP) .opensnes_config
 	@echo "[AS] $(1)"
 	$$(call wrap_asm,$(1),$$@)
 endef
@@ -423,7 +504,7 @@ LINK_OBJS += $(LIB_OBJS)
 endif
 LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) data_init_end.o
 
-linkfile: $(LINK_OBJS)
+linkfile: $(LINK_OBJS) .opensnes_config
 	@echo "[objects]" > $@
 ifeq ($(OS),Windows_NT)
 	@$(foreach obj,$(LINK_OBJS),echo "$$(cygpath -m $(obj))" >> $@;)
@@ -517,20 +598,20 @@ endif
 	@# build if any reachable function writes to $$2180-$$2183.
 	@# Lib + crt0 are NOT followed (audited via
 	@# .claude/rules/nmi_audit.md); the lint only walks user code
-	@# in this example's .c.asm intermediates and combined.asm.
+	@# in this example's .c.asm intermediates.
 	@# Set SKIP_NMI_RACE_CHECK=1 to disable for a build.
 ifneq ($(SKIP_NMI_RACE_CHECK),1)
-	@if [ -f combined.asm ]; then \
-		python3 $(OPENSNES)/devtools/check_nmi_wram_race.py \
-			--rom-dir . --quiet; \
-		rc=$$?; \
-		if [ "$$rc" -ne 0 ]; then \
-			echo "ERROR: NMI / WRAM port race — see report above."; \
-			echo "       Functions reachable from an NMI callback must"; \
-			echo "       NOT touch \$$2180-\$$2183 (silent corruption)."; \
-			echo "       Set SKIP_NMI_RACE_CHECK=1 to bypass for this build."; \
-			exit 1; \
-		fi; \
+	@# Unconditional since 2026-09-26: it used to run only if combined.asm
+	@# existed, a file the build stopped producing (112cfc23), so the lint
+	@# had not run on a fresh tree or a user project since.
+	@python3 $(OPENSNES)/devtools/check_nmi_wram_race.py --rom-dir . --quiet; \
+	rc=$$?; \
+	if [ "$$rc" -ne 0 ]; then \
+		echo "ERROR: NMI / WRAM port race — see report above."; \
+		echo "       Functions reachable from an NMI callback must"; \
+		echo "       NOT touch \$$2180-\$$2183 (silent corruption)."; \
+		echo "       Set SKIP_NMI_RACE_CHECK=1 to bypass for this build."; \
+		exit 1; \
 	fi
 endif
 
@@ -562,7 +643,7 @@ clean:
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
 	@rm -f data_init_end.o data_init_end.wrap.asm
-	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET)
+	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
 	@rm -f $(GSU_BINS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link)

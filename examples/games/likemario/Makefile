@@ -33,9 +33,6 @@ res/mario_sprite.pic res/mario_sprite.pal: res/mario_sprite.png
 	@echo "[GFX] Converting mario sprites..."
 	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
-# Ensure graphics are converted before assembly
-combined.asm: res/tiles.pic res/mario_sprite.pic
-
 # Extended clean
 clean: clean-likemario
 .PHONY: clean-likemario

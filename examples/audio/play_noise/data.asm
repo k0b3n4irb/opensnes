@@ -3,7 +3,7 @@
 ; uploaded to $0200 by apuUpload().
 ;----------------------------------------------------------------------
 
-.section ".rodata1" superfree
+ASSET_SECTION ".rodata1"
 
 spc_image:      .incbin "player.spc700.bin"
 spc_image_end:

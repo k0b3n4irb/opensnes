@@ -1,5 +1,11 @@
 # luna stress-test campaign — running log
 
+> **Status 2026-09-26:** dormant since the 2026-08-08 wave. The method below
+> dates from then: the pin is now v1.27.0 (not v1.13.0), Mesen2 is retired
+> (luna is the only emulator; a second opinion comes from the Cartouche
+> corpus), and findings go to luna directly as reports
+> (`.claude/rules/partners.md`), not through an owner sign-off.
+
 Goal (owner challenge, 2026-08-08): éprouver luna à son maximum — surface
 weaknesses/gaps so luna becomes the project's ultimate, most reliable tool.
 Each *validated* finding → a detailed issue on `k0b3n4irb/luna` (owner-validate

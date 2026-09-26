@@ -24,7 +24,7 @@ Most assets flow through a short, one-way pipeline from source art to ROM data:
 
   font.png ──► font2snes ──► text tiles      (dmaCopyVram)
   sound.wav ─► wav2brr   ──► .brr sample     (audioLoadSample)
-  music.it ──► smconv    ──► SNESMOD bank    (spcLoad / spcPlay)
+  music.it ──► smconv    ──► SNESMOD bank    (snesmodLoadModule / snesmodPlay)
 
   hero.ase ─┬► gfx4snes -P    ──► tiles + metasprite table   (oamDrawMeta)
             └► aseprite2snes  ──► AnimClip tables            (animPlay / animTick)
