@@ -121,6 +121,7 @@ The asset pipeline, one page per tool, under [tools/](tools/).
 | [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md) | Every trap that fails silently, with its mitigation |
 | [Code Style](CODE_STYLE.md) | Coding standards |
 | [Benchmark](BENCHMARK.md) | Compiler performance against PVSnesLib |
+| [Frame costs](PERF.md) | What the library functions cost per frame in real scenes, measured on luna |
 | [Third Party](THIRD_PARTY.md) | Attribution and licences |
 
 ## Header → tutorial map
