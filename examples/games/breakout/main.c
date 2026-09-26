@@ -477,15 +477,91 @@ static void new_level(void) {
 }
 
 /**
+ * @brief Set up a new game: fresh maps, bricks, palette, score, lives, level
+ *
+ * Called once at boot and again after GAME OVER, so the game loops title →
+ * play → game over → play (until 2026-09-26 GAME OVER froze the console in
+ * a `while (1)`). The fresh map carries the HUD's starting values; the
+ * caller keeps a beaten high score. Works on the RAM buffers only; the
+ * caller uploads them.
+ */
+static void start_game(void) {
+    /* Copy ROM data to RAM for runtime modification */
+    mycopy((u8 FAR *)blockmap, bg1map, 0x800);
+    mycopy((u8 FAR *)backmap, bg2map, 0x800);
+    mycopy((u8 FAR *)blocks, brick_map, 100);
+    mycopy((u8 FAR *)pal, palette, 0x200);
+
+    /* Initialize game state */
+    blockcount = 0;
+    bx = 5;
+    by = 11;
+    score = 0;
+    level2 = 1;
+    color = 0;
+    level = 0;
+    lives = 4;
+    px = 80;
+    vel_x = 2;
+    vel_y = 1;
+    pos_x = 94;
+    pos_y = 109;
+
+    /* Build initial brick wall in tilemap buffer */
+    b = 0;
+    for (j = 0; j < 10; j++) {
+        for (i = 0; i < 20; i += 2) {
+            a = blocks[b];
+            b++;
+            if (a < 8) {
+                c = (j << 5) + i;
+                blockcount++;
+                blockmap[0x62 + c] = 13 + (a << 10);
+                blockmap[0x63 + c] = 14 + (a << 10);
+                backmap[0x83 + c] += 0x400;
+                backmap[0x84 + c] += 0x400;
+            }
+        }
+    }
+
+    /* Update HUD in tilemap */
+    writenum(lives, 8, blockmap, 0x136, 0x426);
+    writestring(ST_READY, blockmap, 0x248, 0x3F6);
+}
+
+/**
  * @brief Handle player losing a life
  */
 static void die(void) {
     if (lives == 0) {
-        /* Game over - display message and halt */
+        /* Game over: show it, wait for START, start a new game */
         writestring(ST_GAMEOVER, blockmap, 0x267, 0x3F6);
         WaitForVBlank();
         dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
-        while (1) { WaitForVBlank(); }
+        do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
+        do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+
+        start_game();
+        /* The fresh map shows the ROM's high score; keep a beaten one */
+        if (hiscore > 50000) {
+            writenum(hiscore, 8, blockmap, 0x95, 0x426);
+        }
+        /* Both tilemaps overlap and the palette changes: force blank */
+        WaitForVBlank();
+        setScreenOff();
+        dmaCopyCGram((const u8 *)pal, 0, 256 * 2);
+        dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
+        dmaCopyVram((const u8 *)backmap, 0x0400, 0x800);
+        setScreenOn();
+        draw_screen();
+
+        do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
+        do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+        writestring(ST_BLANK, blockmap, 0x248, 0x3F6);
+        writestring(ST_BLANK, blockmap, 0x289, 0x3F6);
+        WaitForVBlank();
+        dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
+        return;
     }
 
     /* Reset ball and paddle, decrement lives */
@@ -788,48 +864,8 @@ int main(void) {
     dmaCopyVram(tiles1, 0x1000, 0x0F00);  /* 3840 bytes of BG tiles */
     dmaCopyVram(tiles2, 0x2000, 0x0250);  /* 592 bytes of sprite tiles */
 
-    /* Copy ROM data to RAM for runtime modification */
-    mycopy((u8 FAR *)blockmap, bg1map, 0x800);
-    mycopy((u8 FAR *)backmap, bg2map, 0x800);
-    mycopy((u8 FAR *)blocks, brick_map, 100);
-    mycopy((u8 FAR *)pal, palette, 0x200);
-
-    /* Initialize game state */
-    blockcount = 0;
-    bx = 5;
-    by = 11;
-    score = 0;
     hiscore = 50000;
-    level2 = 1;
-    color = 0;
-    level = 0;
-    lives = 4;
-    px = 80;
-    vel_x = 2;
-    vel_y = 1;
-    pos_x = 94;
-    pos_y = 109;
-
-    /* Build initial brick wall in tilemap buffer */
-    b = 0;
-    for (j = 0; j < 10; j++) {
-        for (i = 0; i < 20; i += 2) {
-            a = blocks[b];
-            b++;
-            if (a < 8) {
-                c = (j << 5) + i;
-                blockcount++;
-                blockmap[0x62 + c] = 13 + (a << 10);
-                blockmap[0x63 + c] = 14 + (a << 10);
-                backmap[0x83 + c] += 0x400;
-                backmap[0x84 + c] += 0x400;
-            }
-        }
-    }
-
-    /* Update HUD in tilemap */
-    writenum(lives, 8, blockmap, 0x136, 0x426);
-    writestring(ST_READY, blockmap, 0x248, 0x3F6);
+    start_game();
 
     /* BACKGROUND CONFIGURATION:
      * BG1: Tilemap at 0x0000, tiles at 0x1000

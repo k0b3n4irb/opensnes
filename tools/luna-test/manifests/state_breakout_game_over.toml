@@ -1,0 +1,23 @@
+# breakout's whole game cycle (2026-09-26): until then GAME OVER froze the
+# console in a while (1). START begins; the paddle never moves, so each
+# ball is lost; B answers each "READY" after a lost life; after the fifth
+# loss GAME OVER waits for START (frame 2000), which sets up a new game,
+# and START again (frame 2060) starts playing it.
+rom = "../../../examples/games/breakout/breakout.sfc"
+input = "60:0x1000,64:0,200:0x8000,204:0,300:0x8000,304:0,400:0x8000,404:0,500:0x8000,504:0,600:0x8000,604:0,700:0x8000,704:0,800:0x8000,804:0,900:0x8000,904:0,1000:0x8000,1004:0,1100:0x8000,1104:0,1200:0x8000,1204:0,1300:0x8000,1304:0,1400:0x8000,1404:0,1500:0x8000,1504:0,1600:0x8000,1604:0,1700:0x8000,1704:0,1800:0x8000,1804:0,1900:0x8000,1904:0,2000:0x1000,2004:0,2060:0x1000,2064:0"
+
+[[checkpoint]]
+at_frame = 1950                  # GAME OVER on screen, waiting for START
+[checkpoint.values]
+lives = { eq = 0, width = 2 }
+
+[[checkpoint]]
+at_frame = 2030                  # new game set up, waiting for START
+[checkpoint.values]
+lives = { eq = 4, width = 2 }
+score = { eq = 0, width = 2 }
+
+[[checkpoint]]
+at_frame = 2200                  # playing again: the idle paddle loses a ball
+[checkpoint.values]
+lives = { eq = 3, width = 2 }

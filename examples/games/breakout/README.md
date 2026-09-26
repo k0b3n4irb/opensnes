@@ -11,7 +11,8 @@
 |--------|--------|
 | D-Pad Left/Right | Move paddle |
 | A (hold) | Move faster |
-| Start | Pause |
+| Start | Begin; pause during play; after GAME OVER, a new game |
+| Any button | Continue after losing a ball |
 
 ## Build & Run
 
