@@ -94,9 +94,10 @@ def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
     if env and Path(env).is_file():
         return env
-    installed = HERE / "bin" / "luna"  # scripts/install-luna.sh target
-    if installed.is_file():
-        return str(installed)
+    for name in ("luna", "luna.exe"):  # scripts/install-luna.sh target (.exe on Windows)
+        installed = HERE / "bin" / name
+        if installed.is_file():
+            return str(installed)
     on_path = shutil.which("luna")
     if on_path:
         return on_path
