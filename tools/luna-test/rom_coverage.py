@@ -55,6 +55,7 @@ import re
 import struct
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -275,6 +276,10 @@ def main() -> int:
     if not all(rom.is_file() for rom, _, _ in FIXTURES):
         missing = [key for rom, key, _ in FIXTURES if not rom.is_file()]
         print(f"  note: fixture ROM(s) not built, skipped: {', '.join(missing)}", file=sys.stderr)
+    # Every leg is an independent luna run: they go through a pool
+    # (LUNA_JOBS, default the CPU count), and the results are folded in
+    # the same order afterwards, so the report does not depend on timing.
+    jobs = []
     for rom, key, frame in targets:
         if args.only and args.only not in key:
             continue
@@ -282,24 +287,31 @@ def main() -> int:
         if not sym.is_file():
             print(f"  SKIP  {key}: no .sym", file=sys.stderr)
             continue
-        labels = load_labels(sym)
         floor = ram_band_top(sym)
         runs = [("idle", ["--until-frame", str(frame)], None)] + manifest_runs(rom)
         for name, bound, script in runs:
             pcs = tmp / (key.replace("/", "_") + "." + name + ".bin")
-            err, deepest, stack_line = profile_pcs(luna, rom, sym, bound, script, pcs, floor)
-            if err is not None:
-                print(f"  ERROR {key} [{name}]: {err}", file=sys.stderr)
-                return 2
-            legs += 1
-            if floor is not None and deepest is not None:
-                # S points at the next free byte: the deepest byte written is S+1.
-                stack_margins.append((deepest + 1 - floor, f"{key} [{name}]"))
-                if "UNDER" in stack_line:
-                    stack_under.append(f"{key} [{name}]: {stack_line} (band top ${floor:04X})")
-            for fn in executed_labels(pcs, labels) & public.keys():
-                hits.setdefault(fn, set()).add(key)
+            jobs.append((rom, key, sym, floor, name, bound, script, pcs))
         roms += 1
+    workers = max(1, int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(
+            lambda j: profile_pcs(luna, j[0], j[2], j[5], j[6], j[7], j[3]), jobs))
+    labels_of: dict[Path, dict] = {}
+    for (rom, key, sym, floor, name, _, _, pcs), (err, deepest, stack_line) in zip(jobs, results):
+        if err is not None:
+            print(f"  ERROR {key} [{name}]: {err}", file=sys.stderr)
+            return 2
+        legs += 1
+        if floor is not None and deepest is not None:
+            # S points at the next free byte: the deepest byte written is S+1.
+            stack_margins.append((deepest + 1 - floor, f"{key} [{name}]"))
+            if "UNDER" in stack_line:
+                stack_under.append(f"{key} [{name}]: {stack_line} (band top ${floor:04X})")
+        if sym not in labels_of:
+            labels_of[sym] = load_labels(sym)
+        for fn in executed_labels(pcs, labels_of[sym]) & public.keys():
+            hits.setdefault(fn, set()).add(key)
 
     never = sorted(n for n in public if n not in hits)
     by_header: dict[str, list[str]] = {}

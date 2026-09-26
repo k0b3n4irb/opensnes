@@ -1,6 +1,6 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.27.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 94 ROMs (examples + the library fixture), 206 legs · **312 of 312 public functions executed, 0 never**
+luna v1.27.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 93 ROMs (examples + the library fixture), 205 legs · **312 of 312 public functions executed, 0 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one leg. Joypad-2, mouse (port 1) and Super Scope (port 2) scripts are replayed like joypad 1. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 
@@ -41,7 +41,6 @@ luna v1.27.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `colorMathEnable` | `libtest` |
 | `colorMathSetBrightness` | `libtest` |
 | `colorMathSetChannel` | `libtest` |
-| `colorMathSetCondition` | `libtest` |
 | `colorMathSetDirectColor` | `color/direct_color` |
 | `colorMathShadow` | `color/shadow_tint` |
 | `colorMathTint` | `color/shadow_tint` |
@@ -85,10 +84,6 @@ luna v1.27.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `hdmaSetupBank` | `libtest_fx` |
 | `hdmaSetupIndirect` | `hdma/hdma_indirect_gradient` |
 | `hdmaWaterRipple` | `hdma/hdma_helpers` |
-| `hdmaWaveH` | `libtest_fx` |
-| `hdmaWaveInit` | `libtest_fx` |
-| `hdmaWaveStop` | `hdma/hdma_helpers` |
-| `hdmaWaveUpdate` | `hdma/hdma_helpers` |
 | `hdmaWindowShape` | `libtest_fx` |
 | `irqClear` | `libtest` |
 | `irqDisable` | `libtest` |
@@ -177,7 +172,6 @@ luna v1.27.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `videoSetPseudoHires` | `libtest` |
 | `windowCentered` | `libtest` |
 | `windowDisable` | `libtest` |
-| `windowDisableAll` | `libtest` |
 | `windowInit` | `libtest` |
 | `windowSetPos` | `libtest` |
 | `windowSetSubMask` | `libtest` |

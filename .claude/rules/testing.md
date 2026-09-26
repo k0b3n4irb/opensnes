@@ -12,6 +12,8 @@ scripts/install-luna.sh                              # fetch pinned luna (tools/
 python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state; a second snapshot 30 frames later catches an NMI that dies after boot)
 python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `frames = [a, b]`)
 make test-manifests                                  # functional probes: `luna test` on tools/luna-test/manifests/*.toml (scripted input → WRAM asserts)
+# luna_runner.py, rom_coverage.py and wram_regress.py run their luna calls in parallel
+# (LUNA_JOBS, default the CPU count; LUNA_JOBS=1 = serial, same output)
 python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
 python3 tools/luna-test/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)

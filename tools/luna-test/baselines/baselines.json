@@ -332,8 +332,8 @@
       200,
       400
     ],
-    "luna_version": "v1.21.0",
-    "rom_sha256": "7b3ca1de30b52790c3add5efeb45f537b257e9206482adcbe15e3368844e53f0"
+    "luna_version": "v1.27.0",
+    "rom_sha256": "9c3a662e409cb98f374d4b815f394152d03d9fc3c9016242c74abb768fde5d29"
   },
   "input_controller": {
     "fbhash": "05151eefd8351b2c",

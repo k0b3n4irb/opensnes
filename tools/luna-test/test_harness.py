@@ -78,6 +78,29 @@ class FramePoints(unittest.TestCase):
         self.assertEqual(points, [60, 300])
 
 
+class PoolMap(unittest.TestCase):
+    """The luna runs go through a pool; the report must not depend on which
+    run finishes first."""
+
+    def test_order_kept_when_later_items_finish_first(self):
+        import time
+        def slow_first(i):
+            time.sleep(0.02 * (5 - i))
+            return i * 10
+        with mock.patch.dict("os.environ", {"LUNA_JOBS": "5"}):
+            self.assertEqual(luna_runner._pool_map(slow_first, range(5)),
+                             [0, 10, 20, 30, 40])
+
+    def test_serial_width(self):
+        import threading
+        seen = set()
+        def who(_):
+            seen.add(threading.get_ident())
+        with mock.patch.dict("os.environ", {"LUNA_JOBS": "1"}):
+            luna_runner._pool_map(who, range(8))
+        self.assertEqual(len(seen), 1)
+
+
 class BudgetLine(unittest.TestCase):
     # Verbatim `luna profile --budget` lines, v1.27.0.
     OK = "budget: NmiHandler max 8490 mclk (frame 30) <= 1000000000 — ok"

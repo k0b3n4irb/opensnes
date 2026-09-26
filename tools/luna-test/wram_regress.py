@@ -53,7 +53,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from luna_runner import (  # noqa: E402
-    find_luna, discover_example_roms, example_key, load_manifest, missing_firmware,
+    _pool_map, find_luna, discover_example_roms, example_key, load_manifest,
+    missing_firmware,
 )
 
 BASELINE = HERE / "baselines" / "wram.json"
@@ -176,7 +177,22 @@ def main() -> int:
 
     manifest = load_manifest()
     fails = updated = count = skipped = 0
-    for rom in discover_example_roms():
+    roms = discover_example_roms()
+
+    # The wram-trace runs are independent: computed up front through the
+    # pool (LUNA_JOBS, default the CPU count), consumed in corpus order.
+    def trace(rom: Path):
+        label = example_key(rom).replace("/", "_")
+        if ((args.only and args.only not in label)
+                or missing_firmware(example_key(rom), manifest)):
+            return None
+        try:
+            return stream_hash(luna, rom)
+        except RuntimeError as e:
+            return e
+    traced = dict(zip(roms, _pool_map(trace, roms)))
+
+    for rom in roms:
         key = example_key(rom)
         label = key.replace("/", "_")
         if args.only and args.only not in label:
@@ -196,10 +212,9 @@ def main() -> int:
             print(f"  SKIP  {label} (cross-arch-fragile — use --all on a same-arch baseline)")
             continue
         count += 1
-        try:
-            h = stream_hash(luna, rom)
-        except RuntimeError as e:
-            print(f"  ERROR {label}: {e}")
+        h = traced[rom]
+        if isinstance(h, RuntimeError):
+            print(f"  ERROR {label}: {h}")
             fails += 1
             continue
         if args.update:
