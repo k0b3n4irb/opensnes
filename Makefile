@@ -429,7 +429,7 @@ test-link-modules:
 # Fuzzing the asset parsers (gaps review H5): libFuzzer harnesses under
 # tools/fuzz/ for lodepng (gfx4snes, img2snes) and smconv's IT loader,
 # built with ASan + UBSan. `fuzz` runs each for FUZZ_SECONDS from the golden
-# fixtures (the nightly workflow fuzz.yml gives it 600 s per target);
+# fixtures (fuzz.yml — on tools/ changes and weekly — gives it 600 s per target);
 # `fuzz-replay` runs the committed regression inputs under
 # tools/fuzz/crashes/ once — cheap, part of test-sanitizers.
 FUZZ_SECONDS ?= 60

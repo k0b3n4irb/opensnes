@@ -1,12 +1,18 @@
 name: Fuzz
 
-# Nightly libFuzzer session on the asset parsers (gaps review H5): lodepng
-# (the PNG decoder gfx4snes and img2snes vendor), smconv's Impulse Tracker
-# loader, cute_tiled (tmx2snes), the Aseprite JSON parser and stb_image
-# (font2snes) — five targets, each for ten minutes under ASan + UBSan from
-# the golden fixtures, one after the other. A crash fails the run and uploads the input; the fix commits it
-# under tools/fuzz/crashes/<target>/, which `make fuzz-replay` runs on every
-# push inside the sanitizer job, so a found bug stays fixed.
+# libFuzzer sessions on the asset parsers (gaps review H5): lodepng (the PNG
+# decoder gfx4snes and img2snes vendor), smconv's Impulse Tracker loader,
+# cute_tiled (tmx2snes), the Aseprite JSON parser and stb_image (font2snes)
+# — five targets, each for ten minutes under ASan + UBSan from the golden
+# fixtures, one after the other. A crash fails the run and uploads the
+# input; the fix commits it under tools/fuzz/crashes/<target>/, which
+# `make fuzz-replay` runs on EVERY push inside the sanitizer job, so a found
+# bug stays fixed.
+#
+# When (owner decision 2026-09-26): the parsers only change with tools/, so
+# the 50-minute session runs when a push or a pull request touches tools/,
+# plus once a week on develop to keep exploring — not every night on code
+# that did not move.
 
 on:
   workflow_dispatch:
@@ -14,8 +20,17 @@ on:
       seconds:
         description: seconds per target
         default: "600"
+  push:
+    branches: [develop]
+    paths: ['tools/**', '.github/workflows/fuzz.yml']
+  pull_request:
+    paths: ['tools/**', '.github/workflows/fuzz.yml']
   schedule:
-    - cron: '30 3 * * *'   # nightly, 03:30 UTC
+    - cron: '30 3 * * 0'   # weekly, Sunday 03:30 UTC
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   fuzz:
