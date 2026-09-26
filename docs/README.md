@@ -26,7 +26,7 @@ map for people reading the repository on GitHub.
 
 ## Tutorials
 
-Twenty-seven task-shaped walkthroughs under [tutorials/](tutorials/).
+Twenty-eight task-shaped walkthroughs under [tutorials/](tutorials/).
 
 **Drawing the screen**
 
@@ -45,6 +45,7 @@ Twenty-seven task-shaped walkthroughs under [tutorials/](tutorials/).
 |---|---|
 | [DMA](tutorials/dma.md) | Bulk transfers and the VBlank budget |
 | [HDMA](tutorials/hdma.md) | Per-scanline register writes |
+| [Interrupts](tutorials/interrupts.md) | VBlank callbacks and H/V timer IRQs |
 | [Colour Math](tutorials/colormath.md) | Transparency, blending, the sub-screen |
 | [Window Masking](tutorials/window.md) | Clipping layers, spotlights, iris fades |
 | [Mosaic](tutorials/mosaic.md) | The pixelation transition |

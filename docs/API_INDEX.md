@@ -105,6 +105,39 @@ nothing you do not list is linked.
 | polygons | Super FX (`USE_SUPERFX=1`) | GSU assembly only, no C compiler |
 | fixed-point maths | `fixed32.h` | |
 
+## The rest, by header
+
+Functions the tables above do not name, each with the page that shows it
+in use. Anything not listed here or above is in the Doxygen reference of
+its header.
+
+| Header | Functions | Where it is explained |
+|---|---|---|
+| `anim.h` | `animRestart` | [animation](tutorials/animation.md) |
+| `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopAll` | [audio: choosing the voice](tutorials/audio.md) |
+| `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch` | [audio: volume and pitch](tutorials/audio.md) |
+| `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio.md) |
+| `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho` | [audio: echo](tutorials/audio.md) |
+| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState`, `audioUpdate` (does nothing, kept for old code) | [audio: asking the engine](tutorials/audio.md) |
+| `background.h` | `bgInitTileSetData`, `bgInit` | [graphics](tutorials/graphics.md) |
+| `collision.h` | `rectSetPos`, `rectGetCenter` | [collision](tutorials/collision.md) |
+| `colormath.h` | `colorMathSetChannel`, `colorMathSetBrightness`, `colorMathTransparency50`, `colorMathSetDirectColor` | [colour math](tutorials/colormath.md) |
+| `console.h` | `rngNext`, `rngSeed` | [math: random numbers](tutorials/math.md) |
+| `console.h` | `resetFrameCount` | [animation](tutorials/animation.md) |
+| `console.h` | `isInVBlank` | [DMA](tutorials/dma.md) |
+| `console.h` | `consoleInitEx` — the same as `consoleInit()`; its argument is reserved | — |
+| `debug.h` | `consoleMesenBreakpoint`, `consoleNocashMessage` (behind `SNES_BREAK`, `SNES_NOCASH`) | [debugging](tutorials/debugging.md) |
+| `hdma.h` | `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaBrightnessGradientStop`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWindowShape`, `hdmaGetEnabled`, `hdmaDisableAll` | [HDMA: ready-made effects](tutorials/hdma.md) |
+| `input.h` | `padIsConnected` | [input: is a pad plugged in?](tutorials/input.md) |
+| `input.h` | `mouseInit`, `mouseIsConnected`, `mouseGetX`, `mouseGetY`, `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseSetSensitivity`, `mouseGetSensitivity` | [input: the mouse](tutorials/input.md) |
+| `input.h` | `scopeInit`, `scopeIsConnected`, `scopeGetX`, `scopeGetY`, `scopeGetRawX`, `scopeGetRawY`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeButtonsRepeat`, `scopeSetHoldDelay`, `scopeSetRepeatDelay`, `scopeSinceShot` | [input: the Super Scope](tutorials/input.md) |
+| `interrupt.h` | `nmiSet`, `nmiClear`, `irqSet`, `irqClear`, `irqSetHTimer`, `irqSetVTimer`, `irqEnable`, `irqDisable` | [interrupts](tutorials/interrupts.md) |
+| `math.h` | `ease_in_quad`, `ease_out_quad` (module `math_ease`) | [math: easing curves](tutorials/math.md) |
+| `profile.h` | `profileGetScanline` | [profiling](tutorials/profiling.md) |
+| `snesmod.h` | `snesmodGetPosition`, `snesmodFlush`, `snesmodSetSoundTable`, `snesmodAllocateSoundRegion` | [audio: following the music](tutorials/audio.md) |
+| `sprite.h` | `oamSetX` | [sprites](tutorials/sprites.md) |
+| `superfx.h` | `gsuIsPresent`, `gsuSetupBitmapTilemap`, `gsuDmaFullFrame`, `gsuSetupHdmaBlanking` | [Super FX](tutorials/superfx.md) |
+
 ## When something silently does nothing
 
 The SNES fails quietly. `KNOWN_LIMITATIONS.md` is the catalogue; the

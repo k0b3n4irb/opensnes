@@ -266,16 +266,39 @@ tilemap[row * 32 + col] = col * tiles_per_column + row
 
 For 4bpp height=128: `tilemap[row*32 + col] = col*16 + row`
 
+The library writes that tilemap for you: `gsuSetupBitmapTilemap(vram)`
+fills a 32×32 tilemap at that VRAM word address with the column-major
+order of a 4bpp, 128-line framebuffer (tile `col * 16 + row`), and tile 0
+below it.
+
 ### SRAM to VRAM Transfer
 
-After the GSU finishes, DMA the framebuffer during forced blank:
+A 4bpp 256×128 framebuffer is 16 KB, far more than a VBlank carries. The
+library's answer, used by `examples/chips/superfx_3d`, is to cut the
+visible picture down and send the frame during the lines that are dark:
 
 ```c
-setScreenOff();
-/* DMA 16KB from SRAM $70:0000 to VRAM $0000 */
-/* (see gsu_loader.asm dmaBitmapToVRAM function) */
-setScreenOn();
+gsuSetupBitmapTilemap(0x4000);   /* once, in force blank */
+/* ... each frame, once the GSU job is done: */
+gsuDmaFullFrame();               /* waits for line 184, then DMAs 16 KB */
+/* ... once, after the first frame: */
+gsuSetupHdmaBlanking(40, 40);    /* 40 black lines at the top and bottom */
 ```
+
+`gsuDmaFullFrame()` copies 16 KB from Game Pak RAM (`$70`, offset
+`gsu_dma_src_hi` × 256) to VRAM `$0000` on DMA channel 0, after polling
+the vertical counter until line 184. `gsuSetupHdmaBlanking(top, bottom)`
+uses HDMA channel 1 to force blank that many lines at the top and the
+bottom of the screen, the bars that give the transfer its time.
+
+It writes `HDMAEN` itself with channel 1 only: any other HDMA channel is
+switched off, and the `hdma` module does not know channel 1 is on, so its
+next `hdmaEnable()` or `hdmaDisable()` switches the bars off. Do not mix
+it with the `hdma` module.
+
+`gsuIsPresent()` returns 1 when crt0 found a GSU at boot; use it to fall
+back gracefully, as `gsuInit()` does, without `gsuInit()`'s side
+effects.
 
 ## Example ROMs
 

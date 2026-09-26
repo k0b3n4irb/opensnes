@@ -70,6 +70,24 @@ void load_tiles(void) {
 }
 ```
 
+The `background` module does the same with DMA, and points the layer at
+the tiles in one call. `bgInitTileSetData()` loads tiles only (no
+palette), for a second tile set or a layer that shares a palette:
+
+```c
+extern u8 hud_tiles[], hud_tiles_end[];
+extern u8 extra_tiles[], extra_tiles_end[];
+
+/* DMA the tiles to VRAM $3000 and set BG3's tile base there */
+bgInitTileSetData(2, hud_tiles, (u16)(hud_tiles_end - hud_tiles), 0x3000);
+
+/* 0xFF as the layer: load the tiles, leave every tile base alone */
+bgInitTileSetData(0xFF, extra_tiles, (u16)(extra_tiles_end - extra_tiles), 0x5000);
+```
+
+Like any DMA to VRAM, call it during force blank or VBlank.
+`bgInit(bg)` puts a layer's scroll back to (0, 0).
+
 ## Setting Up Tilemaps
 
 Tilemaps define which tiles appear where on screen. Each entry is 2 bytes:
