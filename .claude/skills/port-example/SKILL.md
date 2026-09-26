@@ -158,16 +158,16 @@ read; `devtools/check_bank_reads.py` fails the link on a bank-blind one.
 | `setMode(BG_MODE1, 0)` | `setMode(BG_MODE1, 0)` | Same |
 | `setScreenOn()` | `setScreenOn()` | Same |
 | `WaitForVBlank()` | `WaitForVBlank()` | Same |
-| `bgInitTileSet(bg, ...)` | Assembly DMA loader | See Phase 3 |
-| `bgInitMapSet(bg, ...)` | Assembly DMA loader | See Phase 3 |
+| `bgInitTileSet(bg, ...)` | `bgInitTileSet(bg, ...)` | Same shape; the bank comes from the pointer (Phase 3) |
+| `bgInitMapSet(bg, ...)` | `dmaCopyVram(map, vramAddr, size)` + `bgSetMapPtr(...)` | No single call; see docs/MIGRATING_FROM_PVSNESLIB.md |
 | `bgSetScroll(bg, x, y)` | `bgSetScroll(bg, x, y)` | Same (bg 0-indexed) |
 | `bgSetDisable(bg)` | `setMainScreen(LAYER_BG1 \| ...)` | Use bitmask |
 | `bgSetEnableSub(bg)` | `setSubScreen(LAYER_BGx)` | Macro in video.h |
 | `setColorEffect(a, b)` | `colorMathInit()` + library calls | See below |
 | `padsCurrent(0)` | `padHeld(0)` | Held buttons |
 | `padsDown(0)` | `padPressed(0)` | New presses |
-| `oamSet(...)` | Direct `oamMemory[]` writes | oamSet has framesize=158! |
-| `oamSetEx(...)` | Direct `oamMemory[512+]` writes | High table |
+| `oamSet(...)` | `oamSet(...)` | Same, 7 arguments (see Pitfall 2) |
+| `oamSetEx(...)`, `oamSetVisible(...)` | `oamSetSize()`, `oamHide()`, `oamSetXY()` | Split by concern |
 | `hdmaSetup(ch, ...)` | `hdmaSetup(ch, ...)` | Same |
 | `hdmaEnable(ch)` | `hdmaEnable(1 << ch)` | **BITMASK not channel number!** |
 
@@ -246,8 +246,10 @@ clean-example:
 ### Phase 6 — Build and Verify
 
 1. Full rebuild: `make clean && make`
-2. Compiler tests: `./tests/compiler/run_tests.sh --allow-known-bugs`
-3. Example validation: `OPENSNES_HOME=$(pwd) ./tests/examples/validate_examples.sh --quick`
+2. The example alone: `python3 tools/luna-test/luna_runner.py --coverage --only <category>/<name>`
+   then `--compare --only …` once a baseline exists (`--update` for a new example)
+3. A `luna test` manifest under `tools/luna-test/manifests/` if the example
+   takes input (scripted input → WRAM asserts), then `make tests`
 4. **STOP** — Ask user to validate interactively (luna GUI / `luna mcp`;
    Category C protocol)
 5. Compare side-by-side with PVSnesLib ROM if possible
@@ -271,10 +273,11 @@ framesize=158 cliff is RESOLVED (see KNOWN_LIMITATIONS.md). Do NOT write to
 PVSnesLib ASM functions ported verbatim have SWAPPED stack offsets.
 `f(a, b)` → our compiler: b at lower SP offset, a at higher.
 
-### 4. HDMA bank byte bug
-`hdmaSetup()` hardcodes bank $00 for ROM addresses. SUPERFREE const data
-may be in bank $01+. Use non-const tables (RAM = bank $7E = $00 mirror)
-or `hdmaSetupBank()` with explicit bank.
+### 4. HDMA tables may live in any bank
+`hdmaSetup()` reads the bank from the table pointer (chantier A6); a `const`
+table works wherever the linker puts it. (This pitfall used to say it
+hardcoded bank $00; `hdmaSetupBank()` is deprecated since 2026-09-20.)
+Tables on `BGnVOFS` carry the vertical-scroll -1 themselves (KNOWN_LIMITATIONS).
 
 ### 5. Tilemap padding for 256×224 images
 gfx4snes generates 32×28 tilemap (1792 bytes). SC_32x32 needs 2048 bytes.
@@ -285,8 +288,9 @@ Unwritten rows 28-31 show VRAM garbage. Pad .map to 2048 bytes or use
 NMI overhead (~8600 cycles) leaves ~41K cycles. DMA = 8 cycles/byte.
 For large transfers, use forced blank (`REG_INIDISP = 0x80`) before DMA.
 
-### 7. `unsigned int` is 4 bytes, `unsigned long` is 8 bytes
-NOT the x86 convention. Use `u16` / `u32` explicitly.
+### 7. `unsigned int` is 2 bytes, `unsigned long` is 4 bytes, pointers 4
+NOT the x86 convention (chantier A1; pointers carry their bank since A6).
+Use `u8` / `u16` / `u32` explicitly.
 
 ### 8. Never use PIL quantize() on BMP→PNG conversion
 PIL's quantizer creates an entirely different palette. Either:
@@ -314,20 +318,23 @@ USE_SNESMOD    := 1
 SOUNDBANK_SRC  := res/music.it res/sfx.it
 ```
 
-PVSnesLib audio API maps 1:1:
-- `spcLoad(0)` → `spcLoad(0)`
-- `spcPlay(0)` → `spcPlay(0)`
-- `spcPlaySound(sfx)` → `spcPlaySound(sfx)`
-- `spcProcess()` → `spcProcess()`
+PVSnesLib's audio calls map to the `snesmod` module (same SNESMOD driver):
+- `spcBoot()` → `snesmodInit()` + `snesmodSetSoundbank(SOUNDBANK_BANK)`
+- `spcLoad(n)` → `snesmodLoadModule(n)`
+- `spcPlay(0)` → `snesmodPlay(0)`
+- `spcPlaySound(sfx)` → `slot = snesmodLoadEffect(sfx)` once, then
+  `snesmodPlayEffect(slot, volume, pan, pitch)`
+- `spcProcess()` → `snesmodProcess()`, once per frame
+`examples/games/likemario` shows the whole sequence.
 
 ## Checklist Before Requesting User Validation
 
 - [ ] All source assets (.bmp/.png/.it/.brr) in `res/`
 - [ ] gfx4snes flags match PVSnesLib exactly
-- [ ] Assembly DMA loader with `:label` bank bytes
+- [ ] Assets in `ASSET_SECTION`, loaded from C with the DMA helpers (Phase 3)
 - [ ] Palette loaded at correct CGRAM offset (check `-e` flag)
 - [ ] `hdmaEnable(1 << ch)` not `hdmaEnable(ch)`
-- [ ] No `oamSet()` in hot loops (use `oamMemory[]`)
+- [ ] Sprites through `oamSet()` / `oamSetFast()` (no hand-written `oamMemory[]`)
 - [ ] `make clean && make` passes
-- [ ] `validate_examples.sh --quick` passes
+- [ ] `luna_runner.py --coverage --only <example>` and `make tests` pass
 - [ ] Side-by-side screenshot comparison prepared

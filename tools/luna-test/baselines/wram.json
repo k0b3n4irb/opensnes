@@ -184,8 +184,8 @@
     "rom_sha256": "1b6e8b4ae040dd9a78ebacb51afc79f9792d6da2066b024a77b87b75efaff4b0"
   },
   "games_tetris": {
-    "stream": "5d6b63838b0febf2f048dab960dc4e5d7934b9e157154aebcdde64ca78d9da69",
-    "rom_sha256": "60808d53c85e62a2d540f84c5a13dfea25cc4ab0b2509e84d6d945ed9f47a69a"
+    "stream": "b07b35534827521c4662f30de7ecb1fab4c44b9f2142f58c94e6a387552b9b4d",
+    "rom_sha256": "8f08656644f82a1e018f771a2f3d7bb9d74c6383cadc305d10cf99d1900a5f41"
   },
   "hdma_gradient_colors": {
     "stream": "742c5a72d7980fb3184adbf4d1d3c0fa648b00d972b67c0874a0b1da7127684a",
