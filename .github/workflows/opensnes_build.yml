@@ -167,6 +167,19 @@ jobs:
           export OPENSNES_HOME=$(pwd)
           make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
+      # Consume the zip just built the way a user does: extract it, build
+      # the starter and a scaffolded project (devtools/release_smoke.py).
+      # Until 2026-09-26 CI tested only the source tree, and every zip from
+      # July to v0.44.0 failed at the first `make` of a user project.
+      - name: Smoke-test the release zip (Linux/macOS)
+        if: matrix.name != 'windows'
+        run: make release-smoke
+
+      - name: Smoke-test the release zip (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        run: make release-smoke
+
       # Cooper source-level debug path: a normal build must stay debug-free
       # (byte-identical release codegen), and a CC65816_G=1 build must emit
       # @cline / @dbglocal / the .dbg sidecar. Reuses the toolchain just built.

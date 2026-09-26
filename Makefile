@@ -46,6 +46,9 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
+# devtools scripts that make/common.mk executes on every user build — the
+# release zip must ship each of them (see the `release` recipe).
+RELEASE_DEVTOOLS := $(sort $(shell grep 'python3' make/common.mk | grep -oE 'devtools/[A-Za-z0-9_/]+\.py'))
 VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
 ifneq ($(VERSION),)
     RELEASE_NAME := opensnes_$(VERSION)_$(PLATFORM)_$(ARCH)
@@ -54,7 +57,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release clean-release hardware-kit
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -524,7 +527,9 @@ release: all docs
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@# Starter project — extract the zip and `make` in opensnes/starter/ works
 	@# with zero config (its OPENSNES default resolves to the SDK root at ..).
-	@cp -r starter $(RELEASE_DIR)/opensnes/
+	@# Tracked files only: a plain `cp -r` shipped the local game.sfc and
+	@# objects, so the user's first `make` linked nothing.
+	@git ls-files starter | tar -cf - -T - | tar -xf - -C $(RELEASE_DIR)/opensnes
 	@# Project test harness (`make test` in user projects) + the pinned-luna
 	@# installer. Only the pieces project_test.py imports — not the SDK's
 	@# corpus manifest/baselines.
@@ -534,12 +539,13 @@ release: all docs
 		tools/luna-test/luna.version $(RELEASE_DIR)/opensnes/tools/luna-test/
 	@cp tools/luna-test/probes/lib.py $(RELEASE_DIR)/opensnes/tools/luna-test/probes/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
-	@# Post-link checks common.mk runs on every user build (bank $$00
-	@# overflow ratchet + NMI/WRAM race lint) — without these the zip's
-	@# make/common.mk references scripts that don't exist.
-	@mkdir -p $(RELEASE_DIR)/opensnes/devtools/symmap
-	@cp devtools/symmap/symmap.py $(RELEASE_DIR)/opensnes/devtools/symmap/
-	@cp devtools/check_nmi_wram_race.py $(RELEASE_DIR)/opensnes/devtools/
+	@# Every devtools script make/common.mk runs on a user build (post-link
+	@# ratchets and lints). The list is read from common.mk itself: until
+	@# 2026-09-26 it was two hand-written cp lines, check_bank_reads.py was
+	@# missing, and every zip from July to v0.44.0 failed at the first link.
+	@for f in $(RELEASE_DEVTOOLS); do \
+		mkdir -p $(RELEASE_DIR)/opensnes/$$(dirname $$f) && cp $$f $(RELEASE_DIR)/opensnes/$$f || exit 1; \
+	done
 	@cp -r examples $(RELEASE_DIR)/opensnes/examples/
 	@mkdir -p $(RELEASE_DIR)/opensnes/examples/bin
 	@find $(RELEASE_DIR)/opensnes/examples -path "*/bin" -prune -o -name "*.sfc" -exec cp {} $(RELEASE_DIR)/opensnes/examples/bin/ \;
@@ -548,12 +554,24 @@ release: all docs
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp ATTRIBUTION.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
+	@# Apache-2.0 §4: the binaries built with cmdparser ship with its licence.
+	@cp tools/common/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
+	@# zip -r updates an existing archive in place; start from nothing so no
+	@# entry of an earlier build survives.
+	@rm -f $(RELEASE_DIR)/$(RELEASE_NAME).zip
 	@cd $(RELEASE_DIR) && zip -q -r $(RELEASE_NAME).zip opensnes
 	@rm -rf $(RELEASE_DIR)/opensnes
 	@echo ""
 	@echo "=========================================="
 	@echo "Release created: $(RELEASE_DIR)/$(RELEASE_NAME).zip"
 	@echo "=========================================="
+
+# Consume the release zip the way a user does: extract it, build the
+# starter and a scaffolded project, run the project test when luna is here.
+# CI runs it right after `make release` on every OS (opensnes_build.yml,
+# release.yml).
+release-smoke:
+	@python3 devtools/release_smoke.py $(RELEASE_DIR)/$(RELEASE_NAME).zip
 
 clean-release:
 	-rm -rf $(RELEASE_DIR)
