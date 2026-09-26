@@ -168,6 +168,7 @@ CASES = [
     # pressed — almost every frame — reported unplugged.
     ("r_pad_conn",  2, 1),      # TRUE = 1 since 2026-09-22 (was 0xFF)
     ("r_pad_idle",  2, 0),      # nothing pressed
+    ("r_pad_conn1", 2, 1),      # port 2 holds a pad too (luna's default)
     ("r_pad_conn4", 2, 0),      # multitap slot: nothing can fill it, so FALSE
     ("r_pad_oob",   2, 0),      # out of range
     # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
@@ -235,6 +236,13 @@ VRAM_CASES = [
 # regression pin.
 KNOWN_FAIL = set()
 
+# padIsConnected() with nothing plugged in (luna v1.26.0 `--port1/--port2
+# none`). Until 2026-09-26 it answered 1 here: the auto-read word of an empty
+# port and of an idle pad are both $0000. The negative control of the
+# 17th-bit read in crt0's NMI handler.
+UNPLUGGED = ["--port1", "none", "--port2", "none"]
+UNPLUGGED_CASES = [("r_pad_conn", 2, 0), ("r_pad_conn1", 2, 0)]
+
 
 def le_bytes(value: int, width: int) -> str:
     return "".join(f"{(value >> (8 * i)) & 0xFF:02X}" for i in range(width))
@@ -272,6 +280,14 @@ def run(region: str = "ntsc") -> int:
         else:
             print(f"  FAIL  {name} == 0x{want:0{width*2}X}  [{detail}]")
             fails += 1
+    for name, width, want in UNPLUGGED_CASES:
+        ok, detail = assert_mem(luna, ROM, STEPS, [(name, le_bytes(want, width))],
+                                extra=extra + UNPLUGGED)
+        if ok:
+            print(f"  PASS  {name} == 0x{want:0{width*2}X}  (both ports unplugged)")
+        else:
+            print(f"  FAIL  {name} == 0x{want:0{width*2}X}  (both ports unplugged)  [{detail}]")
+            fails += 1
     ppu = ppu_state(luna, region)
     for field, want in PPU_CASES:
         got = ppu
@@ -294,7 +310,8 @@ def run(region: str = "ntsc") -> int:
         else:
             print(f"  FAIL  vram[{addr:#06x}..+{len(want)}] == pattern  [got {got.hex()}]")
             fails += 1
-    total = len(CASES) + len(REGION_CASES[region]) + len(PPU_CASES) + len(VRAM_CASES)
+    total = (len(CASES) + len(REGION_CASES[region]) + len(UNPLUGGED_CASES)
+             + len(PPU_CASES) + len(VRAM_CASES))
     print(f"\nLib runtime assertions ({region}): {total - fails}/{total} ok")
     return 1 if fails else 0
 

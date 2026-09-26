@@ -4,16 +4,20 @@
 # fullsnes during the stress campaign. res[] block at $00:00AC (linker-placed, shifts with crt0 low-var size), 3 raw product
 # bytes per case (low u16 + high u8).
 rom = "ppumul.sfc"
+# Raw addresses: luna resolves a symbol or BANK:OFFSET, not symbol+N, and
+# these read array elements. They moved by +2 on 2026-09-26 when crt0 gained
+# pad_present; derive them from the .sym (`res`) when RAM moves again.
+# (symbol+N keys asked of luna, partners/luna/OPEN_luna.md)
 steps = 500000
 
 [asserts]
 wdm_empty = true               # no SNES_ASSERT fired
 
 [asserts.values]               # low u16 (+ high u8 where the sign matters)
-"00:AC" = 0x1388               # 1000 * 5      = +5000        (0x001388)
-"00:AF" = 0xEC78               # -1000 * 5     = -5000        (low 16 of 0xFFEC78)
-"00:B1" = 0xFF                 #   ...high byte $FF -> negative
-"00:B8" = 0x7F81               # 32767 * 127   = +4161409     (low 16 of 0x3F7F81)
-"00:BA" = 0x3F                 #   ...high byte $3F
-"00:BD" = 0x40                 # -32768 * -128 = +4194304     (0x400000) high byte
-"00:C4" = 0xC0DE               # done marker
+"00:AE" = 0x1388               # 1000 * 5      = +5000        (0x001388)
+"00:B1" = 0xEC78               # -1000 * 5     = -5000        (low 16 of 0xFFEC78)
+"00:B3" = 0xFF                 #   ...high byte $FF -> negative
+"00:BA" = 0x7F81               # 32767 * 127   = +4161409     (low 16 of 0x3F7F81)
+"00:BC" = 0x3F                 #   ...high byte $3F
+"00:BF" = 0x40                 # -32768 * -128 = +4194304     (0x400000) high byte
+"00:C6" = 0xC0DE               # done marker

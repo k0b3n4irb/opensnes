@@ -139,6 +139,7 @@
     pad_keysold     dsb 10  ; Previous frame button state
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
     snes_mplay5     dsb 1   ; 1 if MultiPlayer5 adapter is connected
+    pad_present     dsb 2   ; [port]: 1 = a pad answered its 17th serial bit (padIsConnected)
     mp5read         dsb 1   ; Temporary for MultiPlayer5 plug detection
     bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
     bg_scroll_y     dsb 8   ; u16[4] BG1-4 vertical scroll shadows
@@ -1260,6 +1261,40 @@ FastNmi:
     eor.w pad_keysold+2
     and.w pad_keys+2
     sta.w pad_keysdown+2
+
+    ;--------------------------------------------------------------------------
+    ; 5b. Pad presence: the 17th serial bit (padIsConnected)
+    ;--------------------------------------------------------------------------
+    ; Auto-read clocked 16 bits out of each port. A joypad then returns 1s
+    ; until it is latched again (anomie-regs, Joypads: "16 bits of data out
+    ; Data1, then one bits until latched again"), so one more manual read of
+    ; the port's data line says whether a pad answered — the detection the
+    ; snesdev-wiki Multitap page uses ("read $4017 one extra time for the
+    ; 17th bit"). What an EMPTY port returns is stated by no reference;
+    ; luna, ares and Mesen2 all return 0 there, and this is not yet measured
+    ; on a console.
+    ; Only bit 0 of $4016/$4017 is the data line ($4017 bits 2-4 read 1).
+    ; A port whose signature nibble is not 0 holds another device: its
+    ; flag stays 0 and its serial line is left alone — ReadMouse clocks the
+    ; mouse's bits 17-32 itself below.
+    sep #$20
+    .ACCU 8
+    stz.w pad_present
+    stz.w pad_present+1
+    lda $4218               ; JOY1L: bits 0-3 = device signature, 0 for a pad
+    and #$0F
+    bne @p1_present_done
+        lda $4016
+        and #$01
+        sta.w pad_present
+@p1_present_done:
+    lda $421A               ; JOY2L
+    and #$0F
+    bne @p2_present_done
+        lda $4017
+        and #$01
+        sta.w pad_present+1
+@p2_present_done:
 
     ;--------------------------------------------------------------------------
     ; 5c. Skip mouse/scope if MultiPlayer5 active (incompatible devices)

@@ -481,6 +481,16 @@ the two (same bytes, same size; the gap is 65 cycles, over one poll).
 0 stuck voices in 161 × 2 × 2 runs (pause and stop, both luna versions).
 Pinned by `tools/luna-test/manifests/audio_snesmod_music_{pause,stop}.toml`.
 
+### 🟢 `padIsConnected()` answered 1 for an empty port (fixed 2026-09-26)
+
+An empty port and an idle pad both auto-read `$0000`, so the old test could
+not tell them apart. The NMI handler now reads one serial bit past the 16 of
+auto-read on each port whose signature is a pad's: a joypad returns 1s
+there (anomie's register doc). What an *empty* port returns is stated by no
+reference — luna, ares and Mesen2 return 0 — and has not been measured on
+a console: no example displays it yet, so the protocol has no row for it. Pinned by `devtools/libtests`
+with luna's `--port1 none --port2 none` (both read 0; both read 1 with pads).
+
 ### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)
 
 `make/common.mk` defaulted the header's `ROMSIZE` byte to `$08` (256 KB)

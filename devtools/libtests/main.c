@@ -362,6 +362,7 @@ static volatile u8 sin_angle = 192;   /* 270 degrees */
  * case that was broken. */
 u16 r_pad_conn;     /* padIsConnected(0) with no input -> 1 (TRUE was 0xFF until 2026-09-22) */
 u16 r_pad_idle;     /* padHeld(0) with no input        -> 0 */
+u16 r_pad_conn1;    /* padIsConnected(1): pad on port 2 -> 1; with --port2 none -> 0 */
 u16 r_pad_conn4;    /* padIsConnected(4) — multitap slot, never read -> 0 */
 u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 
@@ -905,6 +906,7 @@ static void part_objects_irq(void) {
     /* --- input: the idle-pad connection test (see the comment above) --- */
     r_pad_conn  = padIsConnected(0);
     r_pad_idle  = padHeld(0);
+    r_pad_conn1 = padIsConnected(1);
     r_pad_conn4 = padIsConnected(4);
     r_pad_oob   = padIsConnected(9);
 
