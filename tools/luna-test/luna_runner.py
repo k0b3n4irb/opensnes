@@ -190,10 +190,29 @@ def liveness(state: dict) -> tuple[bool, str]:
         return False, "no NMIs serviced (VBlank handshake dead)"
     # NOTE: frames - nmis is the boot offset (frames before NMI was enabled),
     # which varies by example init (audio drivers load in forced blank; GSU
-    # compute) — it is NOT lag, so we do not gate on the ratio. Catching a
-    # frozen-after-boot ROM would need a two-snapshot delta (nmis advanced
-    # between N1 and N2) — noted as future hardening.
+    # compute) — it is NOT lag, so we do not gate on the ratio. An NMI that
+    # dies after boot is caught by the second snapshot in coverage().
     return True, f"live ({frames}f/{nmis}nmi)"
+
+
+# Second liveness snapshot, SECOND_SNAPSHOT frames after the first: the NMI
+# count must still advance. `nmis_serviced > 0` alone passes a ROM whose NMI
+# died after boot (NMI disabled, or a hang with interrupts masked). Transitory
+# prototype (luna_tooling.md): a `last_nmi_frame` in luna's scheduler state
+# would give the same answer from the first run; requested in
+# .claude/notes/partners/luna/OPEN_luna.md.
+SECOND_SNAPSHOT = 30
+
+
+def nmi_still_alive(first: dict, second: dict) -> tuple[bool, str]:
+    n1 = first.get("scheduler", {}).get("nmis_serviced", 0)
+    n2 = second.get("scheduler", {}).get("nmis_serviced", 0)
+    if second.get("cpu", {}).get("stopped"):
+        return False, "CPU stopped (STP) after the first snapshot"
+    if n2 <= n1:
+        return False, (f"NMI died after boot: {n1} NMIs at the first snapshot, "
+                       f"{n2} {SECOND_SNAPSHOT} frames later")
+    return True, f"+{n2 - n1}nmi/{SECOND_SNAPSHOT}f"
 
 
 def discover_example_roms() -> list[Path]:
@@ -356,13 +375,16 @@ def run(update: bool, only: str | None) -> int:
     return 1 if failures else 0
 
 
-def render_state(luna: str, rom: Path, frame: int, png: Path,
+def render_state(luna: str, rom: Path, frame: int, png: Path | None,
                  extra: list[str] | None = None) -> dict:
     """Run `luna state --until-frame` → parsed EmulatorState JSON (+ write a PNG)."""
-    png.parent.mkdir(parents=True, exist_ok=True)
+    shot = []
+    if png is not None:
+        png.parent.mkdir(parents=True, exist_ok=True)
+        shot = ["--screenshot", str(png)]
     proc = subprocess.run(
         [luna, "state", "--until-frame", str(frame), *power_on_args(), *region_args(),
-         *(extra or []), "--out", "-", "--screenshot", str(png), str(rom)],
+         *(extra or []), "--out", "-", *shot, str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0:
@@ -397,6 +419,14 @@ def coverage(luna: str) -> int:
             print(f"  {'FAIL':9} {key}: {str(e)[:80]}")
             continue
         live, why = liveness(state)
+        if live and not POWER_ON:
+            try:
+                later = render_state(luna, rom, frame + SECOND_SNAPSHOT, None,
+                                     extra=res_args(key, manifest))
+                live, why2 = nmi_still_alive(state, later)
+                why = f"{why}, {why2}" if live else why2
+            except Exception as e:  # noqa: BLE001
+                live, why = False, f"second snapshot failed: {str(e)[:60]}"
         if not live:
             dead += 1
             status = "DEAD"
@@ -419,7 +449,8 @@ def coverage(luna: str) -> int:
         f"{' --power-on ' + POWER_ON if POWER_ON else ''} per ROM · {len(roms)} ROMs · "
         f"**{ok} OK, {inputdep} INPUT-DEP, {dead} DEAD, {fail} FAIL**",
         "",
-        "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not "
+        "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and "
+        f"the NMI count still advancing {SECOND_SNAPSHOT} frames later) — not "
         "a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input "
         "(Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a "
         "clean functional pass. **DEAD** = ran but not live (crash/hang). "

@@ -9,7 +9,7 @@ binary — no Node/WASM/Mesen2). One-shot via `make tests`, or step by step:
 
 ```bash
 scripts/install-luna.sh                              # fetch pinned luna (tools/luna-test/luna.version)
-python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state)
+python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state; a second snapshot 30 frames later catches an NMI that dies after boot)
 python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `frames = [a, b]`)
 make test-manifests                                  # functional probes: `luna test` on tools/luna-test/manifests/*.toml (scripted input → WRAM asserts)
 python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
