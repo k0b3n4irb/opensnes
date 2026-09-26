@@ -52,11 +52,14 @@ ls -la <rom>.sfc
 grep -E "^[0-9A-F]+:" <rom>.sym | wc -l
 ```
 
-### Mesen2 Debug Launch
+### Debug in luna
 ```bash
-# Launch in debugger mode (Mesen must be in PATH)
-Mesen --debugger <rom>.sfc &
+# State snapshot (CPU, PPU, chips) after N frames
+tools/luna-test/bin/luna state <rom>.sfc --until-frame 300 --out -
+# Interactive: luna's MCP server (run_until_pc, run_until_mem_write, peek_memory)
+tools/luna-test/bin/luna mcp
 ```
+See `docs/tutorials/debugging.md`.
 
 ## Output
 Report:

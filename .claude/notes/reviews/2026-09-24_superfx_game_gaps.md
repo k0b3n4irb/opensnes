@@ -147,14 +147,22 @@ output through cart-RAM peeks is possible today).
 
 ### G7 — Real hardware
 
-The FXPak Pro chip list in the corpus (`sfc-dev-wiki` "Testing Code / Real
-Hardware / SD2SNES" `4ec0785bcc6b469b`: DSP1-4, ST-010, Cx4, S-RTC) does not
-include Super FX — the SuperFX3 RP2350 cartridge project exists for that
-reason and is "under active development", with the caveat that FX3 adds
-features the real GSU lacks (`4ac1598847196c16`). So the GSU rows of
-`docs/HARDWARE_VERIFICATION.md` cannot run on our FXPak Pro; they need a
-donor cartridge or the FX3 cart. **Unmeasured** until then; luna is the
-reference, and the corpus is the arbiter of what luna does.
+> **Corrected 2026-09-26.** The first version of this section concluded,
+> from an omission, that the FXPak Pro does not run the Super FX. That was
+> wrong. The sd2snes author's blog, firmware v1.10.3 (April 2019, chunk
+> `c94f64959972104e`): "[All] Fix swapped logic terms in SA-1 and SuperFX
+> RAM write cycles … on Mk.II units; the bug was also present in the Pro
+> firmware". The cart runs both chips (as FPGA cores, firmware 1.10.x and
+> later). The `sfc-dev-wiki` chip list (`4ec0785bcc6b469b`: DSP1-4, ST-010,
+> Cx4, S-RTC) is simply older than those cores. An omission is a hypothesis,
+> not a conclusion — `hardware_claims.md` step 3, which this section broke.
+
+The GSU rows of `docs/HARDWARE_VERIFICATION.md` can run on our FXPak Pro,
+with its firmware version recorded. A failure there is not yet evidence
+against the SDK: the cart's Super FX is a reimplementation with its own
+history of write-cycle bugs, so it needs a second reference (a donor
+cartridge) before blaming the toolchain. The SuperFX3 RP2350 cart is not a
+reference either: it adds features the real GSU lacks (`4ac1598847196c16`).
 
 ### G8 — "C for the GSU": still no, and that is fine
 

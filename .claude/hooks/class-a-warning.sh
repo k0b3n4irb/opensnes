@@ -16,13 +16,13 @@ except:
 
 case "$FILE_PATH" in
     *templates/crt0.asm*)
-        echo "CLASS A WARNING: crt0.asm modified — consult .claude/rules/nmi_audit.md before commit. Requires: make clean && make + full test suite + Mesen2 on ALL examples."
+        echo "CLASS A WARNING: crt0.asm modified — consult .claude/rules/nmi_audit.md before commit. Requires: make clean && make + make tests + diff_corpus.py A/B proof on ALL examples."
         ;;
     *templates/*)
-        echo "CLASS A WARNING: template modified — requires: make clean && make + full test suite + Mesen2."
+        echo "CLASS A WARNING: template modified — requires: make clean && make + make tests + diff_corpus.py A/B proof."
         ;;
     *compiler/*)
-        echo "CLASS A WARNING: compiler modified — requires: make clean && make + full test suite + Mesen2 on ALL examples."
+        echo "CLASS A WARNING: compiler modified — requires: make clean && make + make tests + diff_corpus.py A/B proof on ALL examples."
         ;;
 esac
 
