@@ -27,6 +27,18 @@ stale-ROM rebaseline — which shipped a wrong aim_target baseline on
 2026-07-17 — fails loudly at capture time instead of in CI. Legacy entries
 (bare stream strings) are still readable; a full --update migrates them.
 
+Stack pages are left out (2026-09-26). Until then the hash covered every
+page, stack included, so any change in a library function's size moved the
+return addresses on the stack of every example linking it, and the baseline
+was re-captured on 37 % of commits (20 of 54, 2026-09-16 to 26) without the
+oracle ever catching a bug on its own. The trace now uses 256-byte pages and
+drops those of the plain C band ($00:0000-$1FFF, mirrored at $7E) that lie
+wholly above the ROM's last C variable (from its .sym, like the stack-floor
+gate of rom_coverage.py): only the stack lives there, and how deep it goes is
+gated separately. Measured on the compiler change of 2026-09-26 (qbe
+9a17010): tetris and rpg differed in stack pages only — no re-capture needed
+now; the direct page and moved globals still count, as they should.
+
 Exit 0 = all match, 1 = any drift.
 """
 from __future__ import annotations
@@ -104,6 +116,22 @@ def corpus_is_fresh() -> bool:
     return check_corpus_fresh.main() == 0
 
 
+PAGE = 256
+
+
+def stack_only_pages(rom: Path) -> range:
+    """Page indices (PAGE bytes, bank $7E numbering) above the last C variable
+    of the plain band: the stack's region. Empty when the .sym has no
+    [ramsections] block."""
+    sys.path.insert(0, str(HERE))
+    from rom_coverage import ram_band_top  # noqa: E402  (one reader of the .sym)
+    sym = rom.with_suffix(".sym")
+    top = ram_band_top(sym) if sym.is_file() else None
+    if top is None:
+        return range(0)
+    return range((top + PAGE - 1) // PAGE, 0x2000 // PAGE)
+
+
 def stream_hash(luna: str, rom: Path) -> str:
     out = Path("/tmp/luna-wram") / f"{example_key(rom).replace('/', '_')}.txt"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -112,13 +140,20 @@ def stream_hash(luna: str, rom: Path) -> str:
     # the baseline with an outdated stream instead of surfacing the failure.
     out.unlink(missing_ok=True)
     proc = subprocess.run(
-        [luna, "wram-trace", "-n", "0", "-c", str(FRAMES), "--out", str(out), str(rom)],
+        [luna, "wram-trace", "-n", "0", "-c", str(FRAMES), "--page-size", str(PAGE),
+         "--out", str(out), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0 or not out.is_file() or out.stat().st_size == 0:
         raise RuntimeError(f"wram-trace failed for {rom.name} "
                            f"(exit {proc.returncode}): {proc.stderr.strip()[:200]}")
-    return hashlib.sha256(out.read_bytes()).hexdigest()
+    skip = stack_only_pages(rom)
+    kept = []
+    for line in out.read_text(encoding="utf-8").splitlines():
+        cols = line.split()
+        # cols[0] is the frame number, cols[1 + i] the hash of page i
+        kept.append(" ".join([cols[0]] + [h for i, h in enumerate(cols[1:]) if i not in skip]))
+    return hashlib.sha256(("\n".join(kept) + "\n").encode()).hexdigest()
 
 
 def main() -> int:

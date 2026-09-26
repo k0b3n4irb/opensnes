@@ -45,13 +45,17 @@ not declare fails here instead of in a user's project. Runs in
 `make tests`. A new module or a new cross-module reference must come
 with its `_DEP_` line.
 
-The WRAM oracle hashes every WRAM page at each vblank, **including the
-stack**, so it moves on any codegen change even when behaviour is
-identical. That is the point: it makes you justify the change rather
-than notice it three commits later. After an intentional codegen change,
-rebuild clean and `wram_regress.py --update` — and say in the commit why
-the drift is benign. Precedent: `aa595933` after the indexed-long
-fusion, `912fb24a` after the #132 compiler fix.
+The WRAM oracle hashes every WRAM page at each vblank **except the pages of
+the plain C band that lie wholly above the ROM's last C variable** — the
+stack's region (since 2026-09-26; before, it included the stack and moved on
+any change in a library function's size: 20 re-captures in 54 commits,
+without ever catching a bug alone). It still moves on codegen changes that
+touch the direct page or move globals, and that is the point: it makes you
+justify the change rather than notice it three commits later. After an
+intentional change, rebuild clean and `wram_regress.py --update` — and say
+in the commit why the drift is benign. Precedent: `aa595933` after the
+indexed-long fusion, `912fb24a` after the #132 compiler fix. How deep the
+stack goes is gated separately (the stack floor of `rom_coverage.py`).
 
 Coverage covers every example (`luna_runner.py --list`). Static analysis
 (`symmap.py`), the build (`make`), and compiler C→ASM checks remain separate
