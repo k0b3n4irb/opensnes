@@ -291,10 +291,8 @@ the vertical counter until line 184. `gsuSetupHdmaBlanking(top, bottom)`
 uses HDMA channel 1 to force blank that many lines at the top and the
 bottom of the screen, the bars that give the transfer its time.
 
-It writes `HDMAEN` itself with channel 1 only: any other HDMA channel is
-switched off, and the `hdma` module does not know channel 1 is on, so its
-next `hdmaEnable()` or `hdmaDisable()` switches the bars off. Do not mix
-it with the `hdma` module.
+It uses HDMA channel 1 and arms it like `hdmaEnable()` does, so it
+combines with your own HDMA channels; just leave channel 1 to it.
 
 `gsuIsPresent()` returns 1 when crt0 found a GSU at boot; use it to fall
 back gracefully, as `gsuInit()` does, without `gsuInit()`'s side

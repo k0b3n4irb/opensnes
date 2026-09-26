@@ -12,3 +12,10 @@ superfx = { min = 1 }
 [asserts.gsu]
 bus_violations = 0
 instructions_executed = { gt = 10000 }   # a frame of the 3D demo runs tens of thousands of GSU instructions
+
+# gsuSetupHdmaBlanking arms HDMA channel 1 through the hdma module's shadow
+# of the write-only $420C (2026-09-26): the shadow must say channel 1 is on,
+# or the next hdmaEnable/hdmaDisable would switch the blanking off. Before
+# the fix it wrote $420C = $02 directly and the shadow did not exist here.
+[asserts.values]
+hdma_enabled_state = { eq = 0x02, width = 1 }

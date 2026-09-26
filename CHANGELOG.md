@@ -12,6 +12,11 @@ All notable changes to OpenSNES are documented in this file.
   y drew one line lower. Five examples move their sprites up one line:
   dynamic_sprite, dynamic_metasprite, slope_collision, mapandobjects,
   likemario.
+- fix(lib): `gsuSetupHdmaBlanking()` no longer switches off every other
+  HDMA channel, nor gets switched off by the next `hdmaEnable()` /
+  `hdmaDisable()`: it arms its channel through the `hdma` module's record
+  of `$420C` (write-only) instead of writing the register. The `superfx`
+  module now depends on `hdma`.
 - fix(luna-test): project tests (`make test`) run on Windows. The harness
   passed `--out /dev/null` to luna, which `luna.exe` cannot open; the
   failure was reported as "all assertions pass" next to a FAIL. It now

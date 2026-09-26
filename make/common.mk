@@ -223,7 +223,7 @@ _DEP_snesmod         := console
 # console's C references clearNmiFlag/unmaskIrq/clearIrqFlag (dma.asm) —
 # surfaced by the first example linking console WITHOUT dma (SPC700 arc)
 _DEP_console         := dma
-_DEP_superfx         := dma
+_DEP_superfx         := dma hdma
 _DEP_hdma            := dma math_sqrt
 # math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt
 # only) and the larger trig + arithmetic module (math = sine LUT +
