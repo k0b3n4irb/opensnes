@@ -54,13 +54,20 @@ FRAMES = 150
 # shape of NMI work, and the first four are the examples closest to the
 # ceiling today. Profiling all 85 would cost minutes per push to re-measure
 # handlers that do the same thing.
+# Each entry carries its measured worst frame (luna v1.27.0, 2026-09-26,
+# including the +378 mclk of the pad-presence read added that day): a
+# handler that grows more than DRIFT over it fails, even far below CEILING —
+# the single ceiling alone let map_scroll go from 7298 to 11999 unnoticed.
+# Re-measure with --report after an intentional NMI change and update here,
+# saying why in the commit.
+DRIFT = 0.10
 SUBSET = [
-    ("games/breakout",        "the corpus worst (8112): sprites + tilemap + text"),
-    ("games/likemario",       "sprites, scrolling and audio together"),
-    ("games/rpg",             "map module, panel and text"),
-    ("sprites/dynamic_sprite", "the dynamic-sprite VRAM queue flush"),
-    ("maps/map_scroll",       "the map module's scroll DMA"),
-    ("audio/snesmod_music",   "the audio driver's per-frame work"),
+    ("games/breakout",        8490, "the corpus worst: sprites + tilemap + text"),
+    ("games/likemario",       8170, "sprites, scrolling and audio together"),
+    ("games/rpg",             8170, "map module, panel and text"),
+    ("sprites/dynamic_sprite", 7676, "the dynamic-sprite VRAM queue flush"),
+    ("maps/map_scroll",       7668, "the map module's scroll DMA"),
+    ("audio/snesmod_music",   5650, "the audio driver's per-frame work"),
 ]
 
 BUDGET_RE = re.compile(r"budget: (\S+) max (\d+) mclk \(frame (\d+)\)")
@@ -92,7 +99,7 @@ def main() -> int:
     luna = find_luna()
     over = 0
     with tempfile.TemporaryDirectory() as td:
-        for key, why in SUBSET:
+        for key, ref, why in SUBSET:
             rom = rom_for(key)
             sym = folded_sym(rom, Path(td))
             # --report still asks for a budget, with a ceiling nothing reaches:
@@ -112,13 +119,15 @@ def main() -> int:
                          f"{(proc.stdout + proc.stderr).strip()[-200:]}")
             worst, frame = int(m.group(2)), m.group(3)
             pct = 100.0 * worst / CEILING
-            verdict = "OVER" if proc.returncode == 1 else "ok"
-            if proc.returncode == 1:
+            grew = worst > ref * (1 + DRIFT)
+            verdict = "OVER" if proc.returncode == 1 else ("GREW" if grew else "ok")
+            if proc.returncode == 1 or (grew and not args.report):
                 over += 1
             print(f"  {verdict:4}  {key:24} {worst:6} mclk  ({pct:4.0f}% of {CEILING}, "
-                  f"worst frame {frame})  — {why}")
+                  f"reference {ref}, worst frame {frame})  — {why}")
     print(f"\nNMI VBlank budget: {len(SUBSET) - over}/{len(SUBSET)} within "
-          f"{CEILING} master cycles" + (f", {over} OVER" if over else ""))
+          f"{CEILING} master cycles and {int(DRIFT * 100)} % of their reference"
+          + (f", {over} OVER or GREW" if over else ""))
     return 1 if over else 0
 
 
