@@ -1,92 +1,92 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.28.0 · `luna state --until-frame <N>` per ROM · 84 ROMs · **82 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.30.0 · `luna state --until-frame <N>` per ROM · 84 ROMs · **82 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
-> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and the NMI count still advancing 30 frames later) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
+> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and the latest NMI within one frame of the capture) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
 | Example | Status | Detail |
 |---|---|---|
-| `audio/apu_switch` | OK | live (200f/198nmi), +30nmi/30f |
-| `audio/echo` | OK | live (200f/198nmi), +30nmi/30f |
-| `audio/pitch_mod` | OK | live (200f/198nmi), +30nmi/30f |
-| `audio/play_noise` | OK | live (200f/198nmi), +30nmi/30f |
-| `audio/sfx_from_wav` | OK | live (200f/198nmi), +30nmi/30f |
-| `audio/snesmod_music` | OK | live (200f/190nmi), +30nmi/30f |
-| `audio/snesmod_music_large` | OK | live (200f/190nmi), +30nmi/30f |
-| `audio/snesmod_sfx` | OK | live (200f/190nmi), +30nmi/30f |
-| `audio/soundboard` | OK | live (200f/198nmi), +30nmi/30f |
-| `audio/speech_synth` | OK | live (200f/198nmi), +30nmi/30f |
-| `backgrounds/mode0` | OK | live (200f/198nmi), +30nmi/30f |
-| `backgrounds/mode1` | OK | live (200f/198nmi), +30nmi/30f |
-| `backgrounds/mode1_bg3_priority` | OK | live (200f/198nmi), +30nmi/30f |
-| `backgrounds/mode1_lz77` | OK | live (200f/198nmi), +30nmi/30f |
-| `backgrounds/mode2` | OK | live (400f/398nmi), +30nmi/30f |
-| `backgrounds/mode3` | OK | live (200f/198nmi), +30nmi/30f |
-| `backgrounds/mode5` | OK | live (200f/198nmi), +30nmi/30f |
-| `backgrounds/mode5_hires` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/aim_target` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/collision_demo` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/fix32_orbit` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/game_skeleton` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/panel_hud` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/random` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/scene_stack` | OK | live (200f/198nmi), +30nmi/30f |
-| `basics/timer` | OK | live (200f/198nmi), +30nmi/30f |
-| `chips/dsp1_cube` | OK | live (400f/398nmi), +30nmi/30f |
-| `chips/sa1_hello` | OK | live (200f/198nmi), +30nmi/30f |
-| `chips/sa1_starfield` | OK | live (200f/198nmi), +30nmi/30f |
-| `chips/superfx_3d` | OK | live (200f/198nmi), +30nmi/30f |
-| `chips/superfx_hello` | OK | live (200f/198nmi), +30nmi/30f |
-| `color/direct_color` | OK | live (200f/198nmi), +30nmi/30f |
-| `color/gradient_9bit` | OK | live (200f/198nmi), +30nmi/30f |
-| `color/hicolor_1792` | OK | live (200f/198nmi), +30nmi/30f |
-| `color/hicolor_blend` | OK | live (200f/198nmi), +30nmi/30f |
-| `color/palette_cycle` | OK | live (400f/398nmi), +30nmi/30f |
-| `color/shadow_tint` | OK | live (200f/198nmi), +30nmi/30f |
-| `color/transparency` | OK | live (400f/398nmi), +30nmi/30f |
-| `fundamentals/text_glyphs` | OK | live (200f/198nmi), +30nmi/30f |
-| `games/breakout` | OK | live (200f/198nmi), +30nmi/30f |
-| `games/likemario` | OK | live (200f/189nmi), +30nmi/30f |
-| `games/mapandobjects` | OK | live (200f/198nmi), +30nmi/30f |
-| `games/mode7_flying` | OK | live (200f/198nmi), +30nmi/30f |
-| `games/mode7_racing` | OK | live (200f/198nmi), +30nmi/30f |
-| `games/rpg` | OK | live (200f/198nmi), +30nmi/30f |
-| `games/shmup_1942` | OK | live (200f/198nmi), +30nmi/30f |
-| `games/tetris` | OK | live (200f/190nmi), +30nmi/30f |
-| `hdma/gradient_colors` | OK | live (200f/198nmi), +30nmi/30f |
-| `hdma/hdma_helpers` | OK | live (200f/198nmi), +30nmi/30f |
-| `hdma/hdma_indirect_gradient` | OK | live (200f/198nmi), +30nmi/30f |
-| `hdma/hdma_wave` | OK | live (400f/398nmi), +30nmi/30f |
-| `input/controller` | OK | live (200f/198nmi), +30nmi/30f |
-| `input/mouse` | INPUT-DEP | live (200f/198nmi), +30nmi/30f |
-| `input/move_sprite` | OK | live (200f/198nmi), +30nmi/30f |
-| `input/superscope` | INPUT-DEP | live (200f/198nmi), +30nmi/30f |
-| `input/two_players` | OK | live (200f/198nmi), +30nmi/30f |
-| `maps/dynamic_map` | OK | live (200f/198nmi), +30nmi/30f |
-| `maps/map_scroll` | OK | live (200f/198nmi), +30nmi/30f |
-| `maps/slope_collision` | OK | live (200f/198nmi), +30nmi/30f |
-| `maps/tiled` | OK | live (200f/198nmi), +30nmi/30f |
-| `memory/hirom_demo` | OK | live (200f/198nmi), +30nmi/30f |
-| `memory/save_game` | OK | live (200f/198nmi), +30nmi/30f |
-| `mode7/dsp1_ground` | OK | live (200f/198nmi), +30nmi/30f |
-| `mode7/perspective` | OK | live (200f/198nmi), +30nmi/30f |
-| `mode7/perspective_rotate` | OK | live (200f/198nmi), +30nmi/30f |
-| `mode7/rotate_scale` | OK | live (200f/198nmi), +30nmi/30f |
-| `scrolling/continuous_scroll` | OK | live (200f/198nmi), +30nmi/30f |
-| `scrolling/mixed_scroll` | OK | live (200f/198nmi), +30nmi/30f |
-| `scrolling/parallax_scroll` | OK | live (400f/398nmi), +30nmi/30f |
-| `sprites/animated_sprite` | OK | live (200f/198nmi), +30nmi/30f |
-| `sprites/aseprite_pipeline` | OK | live (200f/198nmi), +30nmi/30f |
-| `sprites/dynamic_metasprite` | OK | live (200f/198nmi), +30nmi/30f |
-| `sprites/dynamic_sprite` | OK | live (200f/198nmi), +30nmi/30f |
-| `sprites/metasprite` | OK | live (400f/398nmi), +30nmi/30f |
-| `sprites/simple_sprite` | OK | live (200f/198nmi), +30nmi/30f |
-| `sprites/sprite_sizes` | OK | live (200f/198nmi), +30nmi/30f |
-| `sprites/sprite_swarm` | OK | live (400f/398nmi), +30nmi/30f |
-| `text/print_string` | OK | live (200f/198nmi), +30nmi/30f |
-| `text/scroll_message` | OK | live (200f/198nmi), +30nmi/30f |
-| `transitions/fading` | OK | live (200f/198nmi), +30nmi/30f |
-| `transitions/mosaic` | OK | live (200f/198nmi), +30nmi/30f |
-| `windows/transparent_window` | OK | live (200f/198nmi), +30nmi/30f |
-| `windows/window` | OK | live (200f/198nmi), +30nmi/30f |
-| `windows/window_multi_hdma` | OK | live (200f/198nmi), +30nmi/30f |
+| `audio/apu_switch` | OK | live (200f/198nmi) |
+| `audio/echo` | OK | live (200f/198nmi) |
+| `audio/pitch_mod` | OK | live (200f/198nmi) |
+| `audio/play_noise` | OK | live (200f/198nmi) |
+| `audio/sfx_from_wav` | OK | live (200f/198nmi) |
+| `audio/snesmod_music` | OK | live (200f/190nmi) |
+| `audio/snesmod_music_large` | OK | live (200f/190nmi) |
+| `audio/snesmod_sfx` | OK | live (200f/190nmi) |
+| `audio/soundboard` | OK | live (200f/198nmi) |
+| `audio/speech_synth` | OK | live (200f/198nmi) |
+| `backgrounds/mode0` | OK | live (200f/198nmi) |
+| `backgrounds/mode1` | OK | live (200f/198nmi) |
+| `backgrounds/mode1_bg3_priority` | OK | live (200f/198nmi) |
+| `backgrounds/mode1_lz77` | OK | live (200f/198nmi) |
+| `backgrounds/mode2` | OK | live (400f/398nmi) |
+| `backgrounds/mode3` | OK | live (200f/198nmi) |
+| `backgrounds/mode5` | OK | live (200f/198nmi) |
+| `backgrounds/mode5_hires` | OK | live (200f/198nmi) |
+| `basics/aim_target` | OK | live (200f/198nmi) |
+| `basics/collision_demo` | OK | live (200f/198nmi) |
+| `basics/fix32_orbit` | OK | live (200f/198nmi) |
+| `basics/game_skeleton` | OK | live (200f/198nmi) |
+| `basics/panel_hud` | OK | live (200f/198nmi) |
+| `basics/random` | OK | live (200f/198nmi) |
+| `basics/scene_stack` | OK | live (200f/198nmi) |
+| `basics/timer` | OK | live (200f/198nmi) |
+| `chips/dsp1_cube` | OK | live (400f/398nmi) |
+| `chips/sa1_hello` | OK | live (200f/198nmi) |
+| `chips/sa1_starfield` | OK | live (200f/198nmi) |
+| `chips/superfx_3d` | OK | live (200f/198nmi) |
+| `chips/superfx_hello` | OK | live (200f/198nmi) |
+| `color/direct_color` | OK | live (200f/198nmi) |
+| `color/gradient_9bit` | OK | live (200f/198nmi) |
+| `color/hicolor_1792` | OK | live (200f/198nmi) |
+| `color/hicolor_blend` | OK | live (200f/198nmi) |
+| `color/palette_cycle` | OK | live (400f/398nmi) |
+| `color/shadow_tint` | OK | live (200f/198nmi) |
+| `color/transparency` | OK | live (400f/398nmi) |
+| `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
+| `games/breakout` | OK | live (200f/198nmi) |
+| `games/likemario` | OK | live (200f/189nmi) |
+| `games/mapandobjects` | OK | live (200f/198nmi) |
+| `games/mode7_flying` | OK | live (200f/198nmi) |
+| `games/mode7_racing` | OK | live (200f/198nmi) |
+| `games/rpg` | OK | live (200f/198nmi) |
+| `games/shmup_1942` | OK | live (200f/198nmi) |
+| `games/tetris` | OK | live (200f/190nmi) |
+| `hdma/gradient_colors` | OK | live (200f/198nmi) |
+| `hdma/hdma_helpers` | OK | live (200f/198nmi) |
+| `hdma/hdma_indirect_gradient` | OK | live (200f/198nmi) |
+| `hdma/hdma_wave` | OK | live (400f/398nmi) |
+| `input/controller` | OK | live (200f/198nmi) |
+| `input/mouse` | INPUT-DEP | live (200f/198nmi) |
+| `input/move_sprite` | OK | live (200f/198nmi) |
+| `input/superscope` | INPUT-DEP | live (200f/198nmi) |
+| `input/two_players` | OK | live (200f/198nmi) |
+| `maps/dynamic_map` | OK | live (200f/198nmi) |
+| `maps/map_scroll` | OK | live (200f/198nmi) |
+| `maps/slope_collision` | OK | live (200f/198nmi) |
+| `maps/tiled` | OK | live (200f/198nmi) |
+| `memory/hirom_demo` | OK | live (200f/198nmi) |
+| `memory/save_game` | OK | live (200f/198nmi) |
+| `mode7/dsp1_ground` | OK | live (200f/198nmi) |
+| `mode7/perspective` | OK | live (200f/198nmi) |
+| `mode7/perspective_rotate` | OK | live (200f/198nmi) |
+| `mode7/rotate_scale` | OK | live (200f/198nmi) |
+| `scrolling/continuous_scroll` | OK | live (200f/198nmi) |
+| `scrolling/mixed_scroll` | OK | live (200f/198nmi) |
+| `scrolling/parallax_scroll` | OK | live (400f/398nmi) |
+| `sprites/animated_sprite` | OK | live (200f/198nmi) |
+| `sprites/aseprite_pipeline` | OK | live (200f/198nmi) |
+| `sprites/dynamic_metasprite` | OK | live (200f/198nmi) |
+| `sprites/dynamic_sprite` | OK | live (200f/198nmi) |
+| `sprites/metasprite` | OK | live (400f/398nmi) |
+| `sprites/simple_sprite` | OK | live (200f/198nmi) |
+| `sprites/sprite_sizes` | OK | live (200f/198nmi) |
+| `sprites/sprite_swarm` | OK | live (400f/398nmi) |
+| `text/print_string` | OK | live (200f/198nmi) |
+| `text/scroll_message` | OK | live (200f/198nmi) |
+| `transitions/fading` | OK | live (200f/198nmi) |
+| `transitions/mosaic` | OK | live (200f/198nmi) |
+| `windows/transparent_window` | OK | live (200f/198nmi) |
+| `windows/window` | OK | live (200f/198nmi) |
+| `windows/window_multi_hdma` | OK | live (200f/198nmi) |
