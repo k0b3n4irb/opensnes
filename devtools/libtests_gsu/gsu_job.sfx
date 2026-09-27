@@ -30,7 +30,5 @@ _outer:
     IBT R1, #$04
     STW (R1)                ; SRAM[4..5] = marker
     NOP
-    NOP
-    NOP
     STOP
     NOP

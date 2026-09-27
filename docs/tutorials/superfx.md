@@ -212,10 +212,6 @@ this way; its manifest checks that the game loop counted seven frames during
 the job and that the CPU never read the ROM the GSU owned (luna's
 `gsu.bus_violations` stays 0, against 149 340 when RON is left at 1).
 
-> **Open on luna (2026-09-27):** run from the cache, that job's last Game Pak
-> RAM writes come out incomplete in luna, where the same program run from
-> ROM writes them all. Not settled on hardware; until it is, read back only
-> what the job wrote well before its `STOP`, and check the results.
 
 ## SuperFX Assembly Rules
 

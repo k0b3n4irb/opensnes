@@ -12,12 +12,15 @@
 #     violations, the loop stuck at 1 frame, 26 NMIs instead of 58.
 #   * The job's result reaches the CPU after gsuWait(): the sum of the loop,
 #     200 x 3000 x 7 mod 65536 = $1640, in Game Pak RAM $70:0000.
-# Not asserted: the $C0DE marker the job stores last reads $00DE after a
-# run from the cache (full from ROM) — reported to luna, OPEN_luna.md
-# 2026-09-27; to add once settled.
+#   * The job's last store reaches RAM: the $C0DE marker, written by an
+#     STW followed by a single NOP and STOP. From the cache those take
+#     6, 1, 1 GSU clocks, less than the RAM buffer needs to write the
+#     second byte (5-6 clocks); luna before v1.28.1 stopped clocking the
+#     buffer at STOP and lost it ($00DE), a console does not (luna's reply
+#     of 2026-09-27, after ares superfx.cpp).
 #
 # Measured: `luna state --until-frame 60 --peek <sym>:2 --out -` on
-# devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.0.
+# devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.1.
 rom = "../../../devtools/libtests_gsu/libtest_gsu.sfc"
 frames = 60
 
@@ -28,6 +31,7 @@ r_frames_during = 7
 r_busy_after_wait = 0
 r_sum = 0x1640
 r_outer = 0
+r_marker = 0xC0DE
 r_done = 0xD0E5
 
 [asserts.gsu]

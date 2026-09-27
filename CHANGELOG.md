@@ -5,6 +5,10 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Changed
+- test(luna-test): luna v1.28.1. The Super FX cache-job fixture now checks
+  the job's last RAM write too: luna before 1.28.1 dropped it (a stopped
+  GSU no longer clocked its RAM write buffer), a console does not; the
+  tutorial's warning about it is gone.
 - refactor(examples): **`sa1_starfield` runs its SA-1 code from I-RAM**,
   copied there at boot: measured on luna, ~10.7 MHz with 0.4 % of clocks
   lost to bus conflicts, against ~8.6 MHz and 20 % from ROM, the same frames
