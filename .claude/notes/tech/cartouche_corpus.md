@@ -24,10 +24,11 @@ after it (their consensus-floor ranking change). Golden queries rerun on
 `bb5dbf5eff5d`: 9 of 9 green, no. 7 (TMX flip flags) green for the first
 time; the negative control still never answered by qbe-docs.
 
-**`snes_verify` on the service still answers `confirmed` for sprite Y + 1
-on the off-topic 34-slivers passage**, although their report says their
-harness now gives `unsettled` (verify fix `6354031`): the fix is not live
-on the instance we query. Keep reading the citation before the verdict.
+**`snes_verify` fixed on the service (checked later on 2026-09-27, index
+rebuilt 08:02, same fingerprint):** sprite Y + 1 now comes out `unsettled`
+on the off-topic 34-slivers passage, and a well-cited claim (SCMR bits,
+fullsnes `725e8061d576404e`) still comes out `confirmed`. Read the
+citation anyway: a `confirmed` must quote the claim.
 The fact itself is arbitrated: snesdev-wiki `857cd9077cef3a88` ("sprites
 appear 1 line lower than their Y value … the first line of rendering is
 always hidden"), buried at the end of a long OAM chunk, so search does not
