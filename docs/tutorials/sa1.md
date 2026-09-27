@@ -22,9 +22,22 @@ speed tests measured ([higan test ROMs](https://gitlab.com/higan/snes-test-roms)
 | any | BW-RAM | ~5.4 MHz, ~2.7 MHz if both use BW-RAM |
 
 So "3× the main CPU" holds only for SA-1 code that keeps off the ROM while the
-main CPU is on it. `examples/chips/sa1_starfield` runs its SA-1 code from ROM
-while the main CPU also runs from ROM: the ~5.4 MHz case. (Until 2026-09-26 this
-page promised 3× flat. luna does not yet report SA-1 cycles; asked of it.) Games like
+main CPU is on it. The table gives the rate while both CPUs are in a case; a
+real program moves between cases, so its effective speed is a mix, and a
+property of the scene rather than of the cartridge. Measure it:
+
+```sh
+luna profile examples/chips/sa1_starfield/sa1_starfield.sfc \
+    --from-frame 60 --until-frame 180 --top 0
+# sa1: 4390440 instr, 21441240 clocks (0.0% idle in WAI), 20.2% of busy clocks
+#      lost to bus conflicts (rom 4327500, bwram 0, iram 13140) — ~8.56 MHz while running
+# sa1: accesses 85.9% rom, 14.1% iram, 0.0% bwram, 0.0% other
+```
+
+`sa1_starfield` runs its SA-1 code from ROM: 86 % of its accesses are ROM, but
+the penalty only applies when the main CPU is on ROM at the same moment, so it
+loses a fifth of its clocks, not half — about 8.6 MHz, 2.4× the main CPU
+(luna v1.28.0). Code moved to I-RAM would approach 10.74 MHz. Games like
 *Kirby Super Star*, *Super Mario RPG*, and *Kirby's Dream Land 3* used it to handle
 AI, physics, and decompression that the main CPU couldn't keep up with.
 

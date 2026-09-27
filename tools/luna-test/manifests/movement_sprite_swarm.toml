@@ -32,7 +32,7 @@ by           = { eq = 118, width = 1 }
 bvx          = { eq = 2, width = 1 }
 bvy          = { eq = 2, width = 1 }
 oamMemory    = { eq = 110, width = 1 }       # oamMemory[0] == bx[0]
-"7E:0301"    = { eq = 117, width = 1 }       # oamMemory[1] == by[0] - 1
+"oamMemory+1"    = { eq = 117, width = 1 }       # oamMemory[1] == by[0] - 1
 
 [[checkpoint]]                 # after both edge bounces: both negative
 at_frame = 160
@@ -43,7 +43,7 @@ by           = { eq = 98,  width = 1 }
 bvx          = { eq = 0xFE, width = 1 }      # -2: reversed at XMAX
 bvy          = { eq = 0xFE, width = 1 }      # -2: reversed at YMAX
 oamMemory    = { eq = 186, width = 1 }
-"7E:0301"    = { eq = 97,  width = 1 }
+"oamMemory+1"    = { eq = 97,  width = 1 }
 
 [[checkpoint]]                 # X has bounced back off XMIN, Y still inbound
 at_frame = 300
@@ -54,7 +54,7 @@ by           = { eq = 202, width = 1 }
 bvx          = { eq = 2, width = 1 }
 bvy          = { eq = 0xFE, width = 1 }
 oamMemory    = { eq = 110, width = 1 }
-"7E:0301"    = { eq = 201, width = 1 }
+"oamMemory+1"    = { eq = 201, width = 1 }
 
 [asserts.oam]                  # the whole flock really reaches the PPU
 visible = 32
