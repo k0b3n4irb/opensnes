@@ -18,7 +18,7 @@ trust the source files and update this doc.
 | **Argument push order** | LEFT-TO-RIGHT (rightmost arg ends closest to SP) |
 | **First argument lives at** | `framesize + 4` from SP, in callee's frame |
 | **Return value (≤ 16-bit)** | `A` register (16-bit) |
-| **Return value (> 16-bit)** | passed via stack (caller-provided slot) |
+| **Return value (32-bit: u32, s32, pointer)** | low 16 bits in `A`, high 16 bits (a pointer's bank) in `tcc__retval_hi` |
 | **Caller-saved registers** | A, X, Y, P, all `tcc__r*` direct-page slots |
 | **Callee-saved registers** | none (cc65816 ABI saves nothing) |
 | **Frame discipline** | callee adjusts SP by `framesize`; caller cleans up args via `plx` |
@@ -133,7 +133,7 @@ canonical symptom of having missed this swap.
 
 ## Return values
 
-### Up to 16 bits (u8, u16, s8, s16, pointer)
+### Up to 16 bits (u8, u16, s8, s16)
 
 Returned in `A`. The callee leaves `A` set; the caller reads it after `jsl`.
 
@@ -145,7 +145,7 @@ adc.w #F / tas / txa` (save A in X, fix SP, restore A) — never `tsa` then
 
 Convention depends on call shape:
 
-**A function returning a 32-bit value** (`u32`, `s32`, `long`, `fixed32`,
+**A function returning a 32-bit value** (`u32`, `s32`, `long`, `fixed32`, and a pointer since chantier A6 — its bank rides in the high half,
 since qbe `3e79c8c`, 2026-05-21): the callee returns the **low 16 bits in
 `A`** and the **high 16 bits in the direct-page global `tcc__retval_hi`**
 (`templates/crt0.asm`), written just before the return:
