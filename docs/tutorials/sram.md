@@ -48,17 +48,19 @@ The SNES MMU maps SRAM into bank space differently for LoROM vs HiROM:
 |---|---|---|---|
 | **LoROM** | `$70`–`$7D` | `$70:0000–$77:7FFF` | 32 KB max (eight 4 KB regions). Most common. |
 | **HiROM** | `$30`–`$3F` (mirror to `$B0`–`$BF`) | `$30:6000–$3F:7FFF` | 8 KB per bank in the lower half, 32 KB max. |
-| **SA-1** | Different — see SA-1 chapter | — | SA-1 cart layouts depend on per-cart configuration. |
+| **SA-1** | `$40`–`$4F` (BW-RAM) | `$40:0000–$40:7FFF` | The cart's battery RAM; the SDK declares 32 KB. The SNES CPU may write it only once SBWE (`$2226`) is set, which crt0 does. |
 
-The lib's `sramSave`/`sramLoad` hide the LoROM / HiROM difference: you pass
-a pointer and a byte count, and the helper uses `$70:0000` on a LoROM build
-and `$30:6000` on a HiROM one. Two limits to know:
+The lib's `sramSave`/`sramLoad` hide the layout: you pass a pointer and a
+byte count, and the helper uses `$70:0000` on a LoROM build, `$30:6000` on a
+HiROM one and `$40:0000` (BW-RAM) on an SA-1 one. Two limits to know:
 
 - on **HiROM** the helpers address the first 8 KB window only
   (`offset + size <= 8192`, the default `SRAM_SIZE`);
-- on **SA-1** they are not available: `USE_SRAM=1` with `USE_SA1=1` stops the
-  build with an explanation rather than linking a module that would write
-  nowhere.
+- on **SA-1** they work since 2026-09-26 (crt0 sets SBWE); until then the
+  build refused `USE_SRAM=1` with `USE_SA1=1`, because the writes were
+  dropped. luna does not yet write an SA-1 cart's BW-RAM to its `.srm`
+  file, so persistence across runs can only be checked on hardware or in
+  another emulator for now.
 
 This paragraph claimed the helpers "hide these details" long before they
 did — until 2026-09-20 they used the LoROM address on every build. The HiROM
@@ -394,5 +396,5 @@ MVN is the fastest option available.
   show save state on screen.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — covers the
   bank-mapping rules and the emulator persistence variance.
-- [SA-1 tutorial](sa1.md) — relevant if your project uses SA-1; SA-1
-  cart layouts handle SRAM differently per cartridge.
+- [SA-1 tutorial](sa1.md) — the SA-1 side of BW-RAM (the SA-1 CPU has its
+  own write enable, CBWE `$2227`).

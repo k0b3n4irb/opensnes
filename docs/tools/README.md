@@ -68,6 +68,12 @@ right one:
 All binaries live in `bin/` and are built by `make tools`. Every tool prints
 `--help`; the pages here are the guided version.
 
+## Your Makefile
+
+The build itself has knobs — cartridge mapping, save RAM, coprocessor,
+ROM size, the link-time checks. @subpage tools_build lists every one with
+its default.
+
 ## The emulator: luna
 
 Testing is not a converter, but it is the other tool you will run every

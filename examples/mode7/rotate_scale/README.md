@@ -136,3 +136,7 @@ fractional part is the low byte.
 - **Explore related examples**:
   - `mode7/perspective` -- Per-scanline scaling for pseudo-3D (F-Zero style)
   - `effects/hdma_wave` -- HDMA can modify Mode 7 parameters per scanline
+
+## Modules Used
+
+`console`, `dma`, `background`, `sprite`, `input`, `mode7` (`LIB_MODULES` in the Makefile).

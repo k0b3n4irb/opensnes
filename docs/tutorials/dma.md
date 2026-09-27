@@ -119,6 +119,11 @@ Two windows, two patterns:
    frame. Budget is small (~4 KB of DMA). The lib's NMI handler uses this for
    the OAM DMA and the optional tilemap-streaming path.
 
+`isInVBlank()` returns 1 while the PPU is in VBlank (it reads the VBlank
+flag of `HVBJOY`, `$4212` bit 7 — anomie's timing doc, S-CPU registers):
+a cheap assertion for code that must only run there. Force blank is a
+separate question, which `isInVBlank()` does not answer.
+
 A `dmaCopyVram()` call outside both windows produces a build that
 *compiles, links, and runs* with no error, then displays garbage tiles
 or nothing at all. The catch is silent. `KNOWN_LIMITATIONS.md` flags

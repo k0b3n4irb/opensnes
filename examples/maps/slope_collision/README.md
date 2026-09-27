@@ -127,3 +127,7 @@ make -C examples/maps/slope_collision
 ```
 
 Then open `slope_collision.sfc` in your emulator (Mesen2 recommended).
+
+## Modules Used
+
+`console`, `sprite`, `sprite_dynamic`, `sprite_lut`, `dma`, `input`, `background`, `map`, `object` (`LIB_MODULES` in the Makefile).

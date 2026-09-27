@@ -31,6 +31,7 @@ volatile u16 in_one = 1;
 volatile u16 in_seven = 7;
 volatile u16 in_100 = 100;
 volatile u16 in_1000 = 1000;
+volatile u16 in_60000 = 60000;  /* a u16 whose x*10 overflows 16 bits */
 volatile u16 in_30000 = 30000;
 volatile u16 in_30000b = 30000;
 volatile s16 in_neg7 = -7;
@@ -128,6 +129,21 @@ u16 r_fp_cb;        /* apply(dbl, 21)        -> 42 */
 u16 r_fp_struct;    /* op_rec.f(op_rec.k)    -> 16 */
 u16 r_fp_eq;        /* (p == dbl) + 2*(p != inc) -> 3 */
 
+/* ---- 32-bit return values -------------------------------------------------
+ * A u32 or a far pointer comes back in two words (A + tcc__retval_hi, see
+ * compiler/ABI.md); the caller must consume both. Until 2026-09-26 no
+ * runtime fixture called a C function returning a 32-bit value. */
+u32 mk32(u16 hi, u16 lo) { return ((u32)hi << 16) | lo; }
+s32 neg32(u16 v) { return -(s32)v * 1000; }
+static const u8 ret_tab[4] = { 0x11, 0x22, 0x33, 0x44 };
+const u8 *ret_ptr(u16 i) { return &ret_tab[i & 3]; }
+
+u32 r_ret32;        /* mk32(1, 0x2345)                  -> 0x00012345 */
+u32 r_ret32_carry;  /* mk32(1, 0xFFFF) + mk32(0, 1)     -> 0x00020000 */
+u16 r_ret32_cmp;    /* mk32(1, 0) > mk32(0, 0xFFFF)     -> 1 */
+u32 r_ret32_neg;    /* neg32(100)                       -> -100000 */
+u16 r_ret32_ptr;    /* *ret_ptr(7): a far pointer into ROM -> 0x44 */
+
 static u16 apply(fn_t f, u16 v) { return f(v); }
 
 /* ---- bit-fields, enum ----------------------------------------------------- */
@@ -168,6 +184,11 @@ static u16 is_odd(u16 n)  { return n == 0 ? 0 : is_even(n - 1); }
 
 /* ---- 32-bit arithmetic with runtime operands ------------------------------ */
 u32 r_mul32;        /* 0x12345 * 0x100          -> 0x01234500 */
+u32 r_mulk_u8;      /* (u32)(u8)7 * 10: inlined since 2026-09-26 */
+u32 r_mulk_u8x24;   /* (u32)(u8)7 * 24: composite 3 * 8 */
+u32 r_mulk_u16;     /* (u32)60000 * 10 = 600000: must NOT be inlined */
+u16 r_mulk_2d;      /* big[row][col] with a byte row: the tetris case */
+u8 big2d[24][10];
 u32 r_mul32_wrap;   /* 0xFFFFFFFF * 2           -> 0xFFFFFFFE */
 u32 r_div32;        /* 0xFFFFFFFF / 0x10000     -> 0x0000FFFF */
 u32 r_mod32;        /* 0x12345 % 0x10000        -> 0x00002345 */
@@ -262,6 +283,13 @@ sw_done:
     f = in_one ? dbl : inc;
     r_fp_eq = (f == dbl ? 1 : 0) + (f != inc ? 2 : 0);
 
+    /* 32-bit return values */
+    r_ret32 = mk32(in_one, 0x2345);
+    r_ret32_carry = mk32(in_one, 0xFFFF) + mk32(0, in_one);
+    r_ret32_cmp = mk32(in_one, 0) > mk32(0, 0xFFFF);
+    r_ret32_neg = (u32)neg32(in_100);
+    r_ret32_ptr = *ret_ptr(in_seven);
+
     /* bit-fields, enum */
     bf.a = 5; bf.b = 17; bf.c = (u16)in_200;
     r_bf_sum = bf.a + bf.b + bf.c;
@@ -345,6 +373,11 @@ nested_out:
     r_postinc = (u16)((i << 8) | a);
     r_str = (u8)msg[in_one + 1];
     r_2d = grid[in_one + 1][3];
+    r_mulk_u8 = (u32)(u8)in_seven * 10;
+    r_mulk_u8x24 = (u32)(u8)in_seven * 24;
+    r_mulk_u16 = (u32)in_60000 * 10;
+    big2d[(u8)(in_seven + 16)][(u8)(in_seven + 2)] = 0x5A;
+    r_mulk_2d = big2d[(u8)(in_seven + 16)][(u8)(in_seven + 2)];
     recs[0].id = 1; recs[0].v = 100; recs[1].id = 2; recs[1].v = 200;
     rp = &recs[in_one];
     r_struct_arr = rp->v;

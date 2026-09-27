@@ -2,9 +2,14 @@
  * @file sa1.h
  * @brief SA-1 Enhancement Chip Interface
  *
- * The SA-1 is a 65c816 coprocessor at 10.74 MHz (3× main CPU speed)
- * integrated into SA-1 cartridges. It shares the same ISA as the main
- * CPU, so compiled C code runs on it unmodified.
+ * The SA-1 is a 65c816 coprocessor clocked at 10.74 MHz, integrated into
+ * SA-1 cartridges. Its effective speed depends on where both CPUs run
+ * from: ~10.7 MHz when the SA-1 runs from I-RAM, about 5.4 MHz when both
+ * CPUs run from ROM, ~2.7 MHz when both hit BW-RAM (higan SA-1 speed test
+ * table). It shares the main CPU's instruction set, but the SDK runs
+ * assembly on it, not C: the SA-1 cannot see work RAM, where the C
+ * runtime keeps its globals and its register file (see
+ * docs/tutorials/sa1.md).
  *
  * Memory accessible by SA-1:
  *   - ROM ($00-$3F:$8000-$FFFF via Super MMC)

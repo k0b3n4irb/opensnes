@@ -123,6 +123,10 @@ ASMSRC      := data.asm
 | `text` | Font loading and text rendering |
 | `background` | `bgSetGfxPtr()`, `bgSetMapPtr()`, `bgSetScroll()` |
 
+## Modules Used
+
+`console`, `input`, `sprite`, `dma`, `text`, `background` (`LIB_MODULES` in the Makefile).
+
 ## Technical Reference
 
 | Register | Address | Role in this example |

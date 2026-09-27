@@ -55,7 +55,7 @@ behaviour, and the note under the table says which.
 | 2 | `input/controller` | press every button on pad 1, then hold two at once | Each name appears while held and disappears on release. Pad 2 is checked by row 14. |
 | 3 | `scrolling/parallax_scroll` | watch the top line | The first visible line must be picture, not a strip of garbage or a line from the bottom of the map. This is the vertical-scroll-by-one fix (`KNOWN_LIMITATIONS.md`, "the PPU never outputs scanline 0"); emulators forgive it, the console does not. Layers scroll at different speeds without tearing. |
 | 4 | `sprites/sprite_swarm` | watch the densest moments | Sprites flicker or drop out only where more than the per-line budget overlap; no garbage tiles, no sprite stuck at the top-left corner. |
-| 5 | `hdma/hdma_wave` | A toggles the wave, D-pad up starts the animation | A smooth horizontal sine, no horizontal tearing, no line where the wave jumps. |
+| 5 | `hdma/hdma_wave` | watch, then A to switch to the hdma module, LEFT/RIGHT for the amplitude | A smooth horizontal sine flowing up the water image, no horizontal tearing, no line where the wave jumps — in both modes, and across the switch. |
 | 6 | `windows/window_multi_hdma` | D-pad scrolls the artwork | The window shapes keep their edges while scrolling; nothing shows through the mask. |
 | 7 | `color/hicolor_1792` | nothing | A vertical gradient of many more than 256 colours, with no bands of wrong colour. This is a general DMA into CGRAM on every scanline, driven by an H-IRQ: the strictest timing row in the list. |
 | 8 | `backgrounds/mode5_hires` | nothing | 512-pixel-wide text is sharp and interlaced without judder. On an upscaler, try its 480i/interlace setting if the picture is unstable, and say so in the note. |

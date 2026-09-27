@@ -13,7 +13,11 @@ nothing: the SPC700/DSP are integer machines).
 Examples covered are the self-playing ones — sound within the captured
 window without input: apu_switch (raw-APU driver), snesmod_music (snesmod
 driver), pitch_mod (LFO pitch sweeps), play_noise (DSP noise generator).
-sfx_from_wav is silent until a button press and is left out.
+The six button-driven examples (sfx_from_wav, snesmod_sfx, soundboard,
+echo, speech_synth, snesmod_music_large) wait on luna: with `--input`,
+`--audio-out` keeps only the samples after the script's last checkpoint,
+which cuts the button's sound out (OPEN_luna.md, 2026-09-26). Their
+manifests assert the DSP state (KON, ENDX, SRCN) meanwhile.
 
 Run:  python3 tools/luna-test/audio_regress.py            # compare
       python3 tools/luna-test/audio_regress.py --update   # re-capture after an intended change
@@ -74,13 +78,13 @@ def main() -> int:
         got[key] = capture(luna, rom)
     if args.update:
         BASELINE.write_text(json.dumps({"luna": LUNA_VERSION, "frames": FRAMES, "examples": got},
-                                       indent=2) + "\n")
+                                       indent=2) + "\n", encoding="utf-8")
         print(f"wrote {BASELINE.relative_to(REPO_ROOT)} ({len(got)} examples)")
         return 0
     if not BASELINE.is_file():
         print(f"no baseline: run with --update first ({BASELINE.relative_to(REPO_ROOT)})")
         return 1
-    want = json.loads(BASELINE.read_text())["examples"]
+    want = json.loads(BASELINE.read_text(encoding="utf-8"))["examples"]
     fails = 0
     for key, cur in got.items():
         ref = want.get(key)

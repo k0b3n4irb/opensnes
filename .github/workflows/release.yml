@@ -83,6 +83,7 @@ jobs:
             base-devel
             git
             zip
+            unzip
 
       - name: Install dependencies for macOS
         if: matrix.name == 'darwin'

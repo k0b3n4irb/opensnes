@@ -1,0 +1,12 @@
+# After `pha`, the shift count is read 2 bytes further up the stack
+# (emitload_adj(r1, fn, 2)); the historical bug read the pre-push offset,
+# i.e. the value itself. All three shift kinds (ported from opensnes-emu
+# test_variable_shift_runtime).
+in var_shl: present lda 6,s\n\tpha\n\tlda 6,s\n\ttax\n\tpla
+in var_shl: present -\tasl a\n\tdex\n\tbne -
+in var_shr: present lda 6,s\n\tpha\n\tlda 6,s\n\ttax\n\tpla
+in var_shr: present -\tlsr a\n\tdex\n\tbne -
+# Signed: each step copies the sign bit into the carry before ror.
+in var_sar: present lda 6,s\n\tpha\n\tlda 6,s\n\ttax\n\tpla
+in var_sar: present -\tcmp\.w #\$8000\n\tror a\n\tdex\n\tbne -
+in var_sar: absent lsr

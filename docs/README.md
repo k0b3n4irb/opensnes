@@ -26,7 +26,7 @@ map for people reading the repository on GitHub.
 
 ## Tutorials
 
-Twenty-seven task-shaped walkthroughs under [tutorials/](tutorials/).
+Twenty-eight task-shaped walkthroughs under [tutorials/](tutorials/).
 
 **Drawing the screen**
 
@@ -45,6 +45,7 @@ Twenty-seven task-shaped walkthroughs under [tutorials/](tutorials/).
 |---|---|
 | [DMA](tutorials/dma.md) | Bulk transfers and the VBlank budget |
 | [HDMA](tutorials/hdma.md) | Per-scanline register writes |
+| [Interrupts](tutorials/interrupts.md) | VBlank callbacks and H/V timer IRQs |
 | [Colour Math](tutorials/colormath.md) | Transparency, blending, the sub-screen |
 | [Window Masking](tutorials/window.md) | Clipping layers, spotlights, iris fades |
 | [Mosaic](tutorials/mosaic.md) | The pixelation transition |
@@ -121,6 +122,7 @@ The asset pipeline, one page per tool, under [tools/](tools/).
 | [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md) | Every trap that fails silently, with its mitigation |
 | [Code Style](CODE_STYLE.md) | Coding standards |
 | [Benchmark](BENCHMARK.md) | Compiler performance against PVSnesLib |
+| [Frame costs](PERF.md) | What the library functions cost per frame in real scenes, measured on luna |
 | [Third Party](THIRD_PARTY.md) | Attribution and licences |
 
 ## Header → tutorial map

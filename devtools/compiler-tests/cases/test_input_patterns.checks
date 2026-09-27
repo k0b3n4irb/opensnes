@@ -1,0 +1,13 @@
+# Joypad masks keep their exact bit values (KEY_x = 1 << n, pre-shifted,
+# never an index), and the position bounds are unsigned compares (ported
+# from opensnes-emu test_input_button_masks).
+in handle_input: present lda\.w pad_value\n\tand\.w #2048\n
+in handle_input: present lda\.w pad_value\n\tand\.w #1024\n
+in handle_input: present lda\.w pad_value\n\tand\.w #512\n
+in handle_input: present lda\.w pad_value\n\tand\.w #256\n
+in check_button_a: present lda\.w pad_value\n\tand\.w #128\n
+in check_button_b: present lda\.w pad_value\n\tand\.w #32768\n
+# x < 255 and y < 223 on u16: carry branch, not sign branch.
+in handle_input: present cmp\.w #255\n\tbcc \+
+in handle_input: present cmp\.w #223\n\tbcc \+
+in handle_input: absent \bb(mi|pl)\b

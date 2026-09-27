@@ -77,6 +77,7 @@ jobs:
             base-devel
             git
             zip
+            unzip
 
       - name: Install dependencies for macOS
         if: matrix.name == 'darwin'
@@ -119,6 +120,13 @@ jobs:
       # Drift between submodule pointer and compiler/PINS.md fails fast before
       # any build cost. Skipped on Windows because the MSYS2 shell wraps make
       # itself, but the Linux/macOS legs cover the same submodule SHAs.
+      # The checkout's submodules are shallow, so verify_toolchain.py skips
+      # the patch counts of PINS.md; one leg fetches their history to check
+      # them (a few MB, seconds).
+      - name: Fetch submodule history (PINS.md patch counts)
+        if: matrix.name == 'linux' && matrix.arch == 'x86_64'
+        run: git submodule foreach --quiet 'git fetch --quiet --unshallow --tags origin'
+
       - name: Verify compiler toolchain pins
         if: matrix.name != 'windows'
         run: python3 devtools/verify_toolchain.py
@@ -149,6 +157,27 @@ jobs:
           export OPENSNES_HOME=$(pwd)
           make release 2>&1 | tee opensnes_release_${{ matrix.name }}.log
 
+      # The first ROMs ever executed on macOS and Windows (2026-09-26): the
+      # corpus liveness pass on luna's own build for each OS. Before this,
+      # both legs only compiled, and install-luna.sh only knew Linux.
+      - name: Execute the corpus on luna (macOS)
+        if: matrix.name == 'darwin'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          scripts/install-luna.sh
+          python3 tools/luna-test/luna_runner.py --coverage
+
+      - name: Execute the corpus on luna (Windows)
+        if: matrix.name == 'windows'
+        shell: msys2 {0}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONUTF8: '1'   # the reports carry non-ASCII; cp1252 crashed the first run
+        run: |
+          scripts/install-luna.sh
+          python3 tools/luna-test/luna_runner.py --coverage
+
       # Consume the zip just built the way a user does: extract it, build
       # the starter and a scaffolded project (devtools/release_smoke.py).
       # Until 2026-09-26 CI tested only the source tree, and every zip from
@@ -160,6 +189,8 @@ jobs:
       - name: Smoke-test the release zip (Windows)
         if: matrix.name == 'windows'
         shell: msys2 {0}
+        env:
+          PYTHONUTF8: '1'
         run: make release-smoke
 
       # Cooper source-level debug path: a normal build must stay debug-free

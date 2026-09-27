@@ -12,18 +12,18 @@ rom = "../../../examples/input/move_sprite/move_sprite.sfc"
 at_frame = 60
 [checkpoint.values]
 oamMemory = { eq = 112, width = 1 }      # x = 112
-"7E:0301" = { eq = 95, width = 1 }       # y = 96 - 1
+"oamMemory+1" = { eq = 95, width = 1 }       # y = 96 - 1
 
 [[checkpoint]]                 # RIGHT for 29 frames -> x += 58, y untouched
 at_frame = 120
 input = "60:0x0100,89:0"
 [checkpoint.values]
 oamMemory = { eq = 170, width = 1 }      # 112 + 29*2
-"7E:0301" = { eq = 95, width = 1 }
+"oamMemory+1" = { eq = 95, width = 1 }
 
 [[checkpoint]]                 # DOWN for 29 frames -> y += 58, x untouched
 at_frame = 180
 input = "120:0x0400,149:0"
 [checkpoint.values]
 oamMemory = { eq = 170, width = 1 }
-"7E:0301" = { eq = 153, width = 1 }      # 95 + 29*2
+"oamMemory+1" = { eq = 153, width = 1 }      # 95 + 29*2

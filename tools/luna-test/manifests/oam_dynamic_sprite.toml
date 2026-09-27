@@ -54,11 +54,13 @@ frame3 = { eq = 6, width = 2 }
 [checkpoint.delta]
 oamMemory = { dir = "unchanged", width = 4 }
 
-# Sprite 0's OAM entry, spelled out: x = xpos[0] = 64, y = 100, tile slot 0,
-# attr $30 (priority 3, palette 0). The dynamic engine owns this; a change
-# here means the allocator moved a sprite that should have stayed put.
+# Sprite 0's OAM entry, spelled out: x = xpos[0] = 64, y = 100 stored as
+# $63 (y - 1, like oamSet: OAM Y = N draws from line N+1; the dynamic engine
+# stored y itself until 2026-09-26), tile slot 0, attr $30 (priority 3,
+# palette 0). The dynamic engine owns this; a change here means the
+# allocator moved a sprite that should have stayed put.
 [asserts.blocks]
-oamMemory = "40640030"
+oamMemory = "40630030"
 # The large-tile pool at VRAM word $0000 after a whole animation cycle:
 # the same 32 bytes the streamer put there at frame 60.
 dyn_tile0 = { space = "vram", offset = "0000", hex = "00ff7f80639c5ea167985fa0639c7f8000007f0063005e0067005f0063007f00" }

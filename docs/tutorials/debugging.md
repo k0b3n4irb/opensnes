@@ -139,6 +139,9 @@ SNES_BREAK();                       /* break here, unconditionally */
 - `SNES_NOCASH(msg)` writes a null-terminated string byte by byte to the
   debug port at `$21FC`, which luna, Mesen2 and no$sns all log. It takes a
   plain string — there is no format-string support.
+- The macros call `consoleMesenBreakpoint()` and `consoleNocashMessage()`
+  (`<snes/debug.h>`); use the functions directly only where a macro does
+  not fit, such as a function pointer.
 - `SNES_ASSERT(cond)` is `SNES_BREAK()` behind a test, and compiles to
   nothing when `NDEBUG` is defined, so assertions can stay in the source.
 

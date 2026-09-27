@@ -185,14 +185,15 @@ Every shipped example exercises a distinct HDMA case. Read the
 `@par What to Observe` block at the top of each `main.c` for the
 interactive demo; the patterns themselves are reusable building blocks.
 
-### Per-scanline wave distortion — `examples/hdma/hdma_wave`
+### Per-scanline wave: by hand, then by the module — `examples/hdma/hdma_wave`
 
-Pre-computes seven sine tables (224 + 111 wrap entries each) at amplitudes
-0–24 pixels, then runs HDMA channel 6 in `HDMA_MODE_1REG_2X` to write
-both bytes of `BG1HOFS` ($210D) every scanline. Animation advances the
-table pointer by 3 bytes per frame to scroll the wave continuously. The
-alternating solid/empty tile pattern in the background makes the
-distortion clearly visible.
+At boot, krom's WaveHDMA idiom: 896 pre-built `[1][offset16]` entries on
+channel 0 in `HDMA_MODE_1REG_2X` (both bytes of `BG1HOFS`, $210D, every
+line), and the per-frame "animation" is just `hdmaSetup(..., table +
+phase * 3)` — a zero-copy pointer bump, cheaper than regenerating the
+table and immune to the VBlank budget. Press A and `hdmaWaveH()` /
+`hdmaWaveUpdate()` produce nearly the same ripple on channel 6 from a
+table the module computes in RAM, with the amplitude as a parameter.
 
 ### Parallax scrolling — `examples/scrolling/parallax_scroll`
 
@@ -244,13 +245,6 @@ with 32 shared 4-byte CGRAM blocks. The data bank for the pointed-to
 blocks goes in `$43x7` — pass it with the bank-extraction idiom
 (`(u8)((u32)(void *)table >> 16)`).
 
-### Table repointing as animation — `examples/hdma/hdma_wave_table`
-
-krom's WaveHDMA idiom: 896 pre-built `[1][offset16]` entries, and the
-per-frame "animation" is just `hdmaSetup(..., table + phase * 3)` — a
-zero-copy pointer bump. Cheaper than regenerating tables and immune to
-the VBlank budget.
-
 ### Full Mode 7 matrix per line — `examples/mode7/perspective_rotate`
 
 Four channels, one per matrix register (M7A/B/C/D ← `HDMA_DEST_M7A..D`),
@@ -267,6 +261,64 @@ CGADD: `[addr16][data16]`), channel 1 rewrites INIDISP brightness per
 line. Colour x brightness plus per-line jitter dithers the gradient into
 more perceptual steps than the PPU's 5 bits — and INIDISP is owned by the
 stream: the demo never calls `setScreenOn()`.
+
+## The module's ready-made effects
+
+The `hdma` module builds the table, arms the channel and keeps the state
+for a few classic effects. Each takes the channel to use (6 or lower —
+see the channel 7 gotcha below) and has a matching stop call.
+
+```c
+/* Sky: palette colour 0 from deep blue at the top to orange at the bottom */
+hdmaColorGradient(HDMA_CHANNEL_6, 0, RGB(4, 8, 28), RGB(28, 16, 4));
+/* ... */
+hdmaColorGradientStop(HDMA_CHANNEL_6);
+```
+
+`hdmaColorGradientStop()` stops the channel but cannot restore the colour:
+CGRAM keeps the last value the gradient wrote, so reload your palette
+entry if the scene needs it back. `hdmaBrightnessGradientStop(channel)`
+ends an `hdmaBrightnessGradient()` and sets the screen back to full
+brightness.
+
+```c
+/* Iris: only a circle of BG1 stays visible */
+u8 r;
+for (r = 0; r < 128; r += 2) {
+    hdmaIrisWipe(HDMA_CHANNEL_6, TM_BG1, 128, 112, r);
+}
+hdmaIrisWipeStop(HDMA_CHANNEL_6);        /* also clears the window registers */
+```
+
+`hdmaIrisWipe()` sets up the window registers for you, and it waits for a
+VBlank inside, before switching the window mask on: each call costs one
+frame, which is what makes the loop above an animation.
+
+```c
+/* Underwater: BG1 ripples, more at the bottom of the screen */
+hdmaWaveInit();
+hdmaWaterRipple(HDMA_CHANNEL_6, 0, 8, 2);   /* bg, max amplitude, speed */
+while (underwater) {
+    WaitForVBlank();
+    hdmaWaveUpdate();
+}
+hdmaWaveStop();                          /* stops it and resets the BG's scroll */
+```
+
+`hdmaWaveInit()` switches **every** HDMA channel off, yours included:
+call it before setting up your own channels, not after. The ripple and
+`hdmaWaveH()` share the same buffers, so only one of them runs at a time;
+`hdmaWaveStop()` ends either.
+
+`hdmaWindowShape(channel, table)` points a channel at your own table of
+window edges (a line count, then left and right, written to `WH0`/`WH1`).
+It only configures the channel: enable it with `hdmaEnable()` and choose
+which layers the window masks with the `window` module, as
+`examples/windows/transparent_window` does.
+
+Two calls read or reset the enable state the module keeps:
+`hdmaGetEnabled()` returns the bitmask of channels the module has
+enabled, and `hdmaDisableAll()` switches them all off.
 
 ## When HDMA isn't enough: H-timer IRQ streaming
 

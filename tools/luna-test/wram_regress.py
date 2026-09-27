@@ -27,6 +27,18 @@ stale-ROM rebaseline — which shipped a wrong aim_target baseline on
 2026-07-17 — fails loudly at capture time instead of in CI. Legacy entries
 (bare stream strings) are still readable; a full --update migrates them.
 
+Stack pages are left out (2026-09-26). Until then the hash covered every
+page, stack included, so any change in a library function's size moved the
+return addresses on the stack of every example linking it, and the baseline
+was re-captured on 37 % of commits (20 of 54, 2026-09-16 to 26) without the
+oracle ever catching a bug on its own. The trace now uses 256-byte pages and
+drops those of the plain C band ($00:0000-$1FFF, mirrored at $7E) that lie
+wholly above the ROM's last C variable (from its .sym, like the stack-floor
+gate of rom_coverage.py): only the stack lives there, and how deep it goes is
+gated separately. Measured on the compiler change of 2026-09-26 (qbe
+9a17010): tetris and rpg differed in stack pages only — no re-capture needed
+now; the direct page and moved globals still count, as they should.
+
 Exit 0 = all match, 1 = any drift.
 """
 from __future__ import annotations
@@ -41,7 +53,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from luna_runner import (  # noqa: E402
-    find_luna, discover_example_roms, example_key, load_manifest, missing_firmware,
+    _pool_map, find_luna, discover_example_roms, example_key, load_manifest,
+    missing_firmware,
 )
 
 BASELINE = HERE / "baselines" / "wram.json"
@@ -104,6 +117,22 @@ def corpus_is_fresh() -> bool:
     return check_corpus_fresh.main() == 0
 
 
+PAGE = 256
+
+
+def stack_only_pages(rom: Path) -> range:
+    """Page indices (PAGE bytes, bank $7E numbering) above the last C variable
+    of the plain band: the stack's region. Empty when the .sym has no
+    [ramsections] block."""
+    sys.path.insert(0, str(HERE))
+    from rom_coverage import ram_band_top  # noqa: E402  (one reader of the .sym)
+    sym = rom.with_suffix(".sym")
+    top = ram_band_top(sym) if sym.is_file() else None
+    if top is None:
+        return range(0)
+    return range((top + PAGE - 1) // PAGE, 0x2000 // PAGE)
+
+
 def stream_hash(luna: str, rom: Path) -> str:
     out = Path("/tmp/luna-wram") / f"{example_key(rom).replace('/', '_')}.txt"
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -112,13 +141,20 @@ def stream_hash(luna: str, rom: Path) -> str:
     # the baseline with an outdated stream instead of surfacing the failure.
     out.unlink(missing_ok=True)
     proc = subprocess.run(
-        [luna, "wram-trace", "-n", "0", "-c", str(FRAMES), "--out", str(out), str(rom)],
+        [luna, "wram-trace", "-n", "0", "-c", str(FRAMES), "--page-size", str(PAGE),
+         "--out", str(out), str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0 or not out.is_file() or out.stat().st_size == 0:
         raise RuntimeError(f"wram-trace failed for {rom.name} "
                            f"(exit {proc.returncode}): {proc.stderr.strip()[:200]}")
-    return hashlib.sha256(out.read_bytes()).hexdigest()
+    skip = stack_only_pages(rom)
+    kept = []
+    for line in out.read_text(encoding="utf-8").splitlines():
+        cols = line.split()
+        # cols[0] is the frame number, cols[1 + i] the hash of page i
+        kept.append(" ".join([cols[0]] + [h for i, h in enumerate(cols[1:]) if i not in skip]))
+    return hashlib.sha256(("\n".join(kept) + "\n").encode()).hexdigest()
 
 
 def main() -> int:
@@ -132,7 +168,7 @@ def main() -> int:
                          "NEVER commit a baseline captured with this)")
     args = ap.parse_args()
     luna = find_luna()
-    db = json.loads(BASELINE.read_text()) if BASELINE.is_file() else {}
+    db = json.loads(BASELINE.read_text(encoding="utf-8")) if BASELINE.is_file() else {}
 
     if args.update and not args.force_stale and not corpus_is_fresh():
         print("REFUSED: --update from a stale tree writes wrong baselines "
@@ -141,7 +177,22 @@ def main() -> int:
 
     manifest = load_manifest()
     fails = updated = count = skipped = 0
-    for rom in discover_example_roms():
+    roms = discover_example_roms()
+
+    # The wram-trace runs are independent: computed up front through the
+    # pool (LUNA_JOBS, default the CPU count), consumed in corpus order.
+    def trace(rom: Path):
+        label = example_key(rom).replace("/", "_")
+        if ((args.only and args.only not in label)
+                or missing_firmware(example_key(rom), manifest)):
+            return None
+        try:
+            return stream_hash(luna, rom)
+        except RuntimeError as e:
+            return e
+    traced = dict(zip(roms, _pool_map(trace, roms)))
+
+    for rom in roms:
         key = example_key(rom)
         label = key.replace("/", "_")
         if args.only and args.only not in label:
@@ -161,10 +212,9 @@ def main() -> int:
             print(f"  SKIP  {label} (cross-arch-fragile — use --all on a same-arch baseline)")
             continue
         count += 1
-        try:
-            h = stream_hash(luna, rom)
-        except RuntimeError as e:
-            print(f"  ERROR {label}: {e}")
+        h = traced[rom]
+        if isinstance(h, RuntimeError):
+            print(f"  ERROR {label}: {h}")
             fails += 1
             continue
         if args.update:
@@ -201,7 +251,7 @@ def main() -> int:
 
     if args.update:
         BASELINE.parent.mkdir(parents=True, exist_ok=True)
-        BASELINE.write_text(json.dumps(dict(sorted(db.items())), indent=2) + "\n")
+        BASELINE.write_text(json.dumps(dict(sorted(db.items())), indent=2) + "\n", encoding="utf-8")
         print(f"\nwrote {BASELINE.relative_to(HERE.parent.parent)} ({updated} entries)")
     print(f"\nWRAM regression: {count - fails}/{count} ok"
           + (f", {fails} drift/err" if fails else "")

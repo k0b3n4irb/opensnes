@@ -42,8 +42,7 @@ Browse by category: @ref examples_by_category
 - @ref window/main.c "Window" — Clipping regions
 - @ref transparent_window/main.c "Transparent Window" — Window + color math
 - @ref gradient_colors/main.c "Gradient Colors" — HDMA per-scanline palette
-- @ref hdma_wave/main.c "HDMA Wave" — Sine distortion
-- @ref hdma_wave_table/main.c "HDMA Wave Table" — Raw HDMA table in C (krom port)
+- @ref hdma_wave/main.c "HDMA Wave" — A hand-built HDMA table (krom port), then the hdma module's wave
 - @ref hdma_indirect_gradient/main.c "HDMA Indirect Gradient" — Pointer-table gradient (krom port)
 - @ref hdma_helpers/main.c "HDMA Helpers" — Library helper effects
 - @ref parallax_scroll/main.c "Parallax" — HDMA scroll offsets

@@ -1,7 +1,8 @@
 {
   "add_u16": 21,
-  "array_read": 93,
-  "array_write": 103,
+  "array2d_read": 150,
+  "array_read": 101,
+  "array_write": 111,
   "bitwise_and": 19,
   "bitwise_or": 19,
   "byte_store_loop": 158,
@@ -28,7 +29,7 @@
   "shift_right_4": 22,
   "signed_shift_right_1": 19,
   "signed_shift_right_8": 28,
-  "struct_sum": 99,
+  "struct_sum": 94,
   "sub_u16": 21,
   "swap": 127,
   "zero_store_global": 14

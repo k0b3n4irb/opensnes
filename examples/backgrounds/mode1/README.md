@@ -160,6 +160,10 @@ Then open `mode1.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `dma`, `background`, `asset` (`LIB_MODULES` in the Makefile).
+
 ## Files
 
 | File | Purpose |

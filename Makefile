@@ -49,7 +49,11 @@ RELEASE_DIR := release
 # devtools scripts that make/common.mk executes on every user build — the
 # release zip must ship each of them (see the `release` recipe).
 RELEASE_DEVTOOLS := $(sort $(shell grep 'python3' make/common.mk | grep -oE 'devtools/[A-Za-z0-9_/]+\.py'))
-VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null)
+# The version of the tree, not the nearest tag: release tags sit on main's
+# merge commits, which develop never contains, so `git describe` on develop
+# named its zips after v0.17.0. snes.h is held equal to CHANGELOG by
+# `make lint-docs`; release.yml still passes VERSION=<tag> explicitly.
+VERSION ?= v$(shell sed -n 's/^\#define OPENSNES_VERSION_STRING "\(.*\)"/\1/p' lib/include/snes.h)
 ifneq ($(VERSION),)
     RELEASE_NAME := opensnes_$(VERSION)_$(PLATFORM)_$(ARCH)
 else
@@ -151,6 +155,7 @@ lint-vram:
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
+	@cd tools/luna-test && python3 -m unittest -q test_harness
 	@python3 devtools/check_bank_reads.py --selftest
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
@@ -200,6 +205,7 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests_fx
 	@$(MAKE) -s -C devtools/libtests_dsp1
 	@$(MAKE) -s -C devtools/libtests_hirom
+	@$(MAKE) -s -C devtools/libtests_gsu
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
@@ -257,6 +263,11 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests_hirom clean
 	@$(MAKE) -s -C devtools/libtests_hirom
 	@python3 devtools/libtests_hirom/test_libtest_hirom.py
+	@# Fifth fixture: the sram module on SA-1 — BW-RAM at $$40:0000, writable
+	@# once crt0 sets SBWE (2026-09-26; USE_SRAM with USE_SA1 was refused).
+	@$(MAKE) -s -C devtools/libtests_sa1_sram clean
+	@$(MAKE) -s -C devtools/libtests_sa1_sram
+	@python3 devtools/libtests_sa1_sram/test_libtest_sa1_sram.py
 	@python3 devtools/link_modules.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
@@ -307,6 +318,7 @@ rom-coverage:
 	@$(MAKE) -s -C devtools/libtests_fx
 	@$(MAKE) -s -C devtools/libtests_dsp1
 	@$(MAKE) -s -C devtools/libtests_hirom
+	@$(MAKE) -s -C devtools/libtests_gsu
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
@@ -449,6 +461,7 @@ test-manifests:
 	@$(MAKE) -s -C tools/luna-test/stress/bcd
 	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
 	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
+	@$(MAKE) -s -C devtools/libtests_gsu        # libtest_gsu_cached.toml fixture
 	@tools/luna-test/bin/luna test \
 		tools/luna-test/stress/hwmath/hwmath.toml \
 		tools/luna-test/stress/ppumul/ppumul.toml \
@@ -458,10 +471,10 @@ test-manifests:
 		tools/luna-test/manifests
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
-# CI-gated on 54/56 examples — the two whose WRAM stream is arch-dependent
-# (mapandobjects, slope_collision) are skipped by default; add --all on a machine
-# matching the baseline capture arch. Re-baseline after an intentional change
-# with `python3 tools/luna-test/wram_regress.py --update` (same commit).
+# CI-gated on every example, both arches (the old arch-dependent pair was a
+# stale-luna artefact, re-verified 2026-08-09); the stack's pages are left
+# out. Re-baseline after an intentional change with
+# `python3 tools/luna-test/wram_regress.py --update` (same commit).
 test-wram:
 	@python3 tools/luna-test/wram_regress.py
 

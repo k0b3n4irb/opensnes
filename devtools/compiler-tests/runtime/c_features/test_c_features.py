@@ -35,6 +35,11 @@ CASES = [
     ("r_fp_cb",      2, 42),
     ("r_fp_struct",  2, 16),
     ("r_fp_eq",      2, 3),
+    ("r_ret32",       4, 0x00012345),
+    ("r_ret32_carry", 4, 0x00020000),
+    ("r_ret32_cmp",   2, 1),
+    ("r_ret32_neg",   4, (-100000) & 0xFFFFFFFF),
+    ("r_ret32_ptr",   2, 0x44),
     # bit-fields, enum
     ("r_bf_sum",     2, 222),
     ("r_bf_ovf",     2, 1),
@@ -51,6 +56,12 @@ CASES = [
     ("r_mutual", 2, 1),
     # 32-bit with runtime operands
     ("r_mul32",      4, 0x01234500),
+    # Kl multiply by a constant (2026-09-26): inlined when the product fits
+    # 16 bits, still the real 32-bit multiply when it may not
+    ("r_mulk_u8",    4, 70),
+    ("r_mulk_u8x24", 4, 168),
+    ("r_mulk_u16",   4, 600000),
+    ("r_mulk_2d",    2, 0x5A),
     ("r_mul32_wrap", 4, 0xFFFFFFFE),
     ("r_div32",      4, 0x0000FFFF),
     ("r_mod32",      4, 0x00002345),

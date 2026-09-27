@@ -123,3 +123,7 @@ make -C examples/sprites/metasprite
 ```
 
 Then open `metasprite.sfc` in your emulator (Mesen2 recommended).
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `text`, `text4bpp`, `background`, `input`, `anim` (`LIB_MODULES` in the Makefile).

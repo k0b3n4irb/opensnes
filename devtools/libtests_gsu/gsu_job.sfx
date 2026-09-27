@@ -1,0 +1,36 @@
+; A GSU job for the cache: 200 x 3000 additions of 7 (wrapping), about seven
+; frames at 21 MHz, then the sum, the outer count left and a marker in Game
+; Pak RAM. No CACHE, no LJMP, no ROM read: it can run from the code cache with
+; the ROM left to the CPU (gsuCacheLoad + gsuStartCached).
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+gsu_start:
+    IBT R0, #$70
+    RAMB                    ; RAM bank for STW
+    IWT R0, #0              ; accumulator
+    IWT R4, #200            ; outer count
+_outer:
+    IWT R12, #3000          ; inner count (LOOP)
+    MOVE R13, R15           ; inner loop address = next instruction
+    ADD #7
+    LOOP
+    NOP
+    DEC R4
+    BNE _outer
+    NOP
+    IBT R1, #$00
+    STW (R1)                ; SRAM[0..1] = 200*3000*7 mod 65536
+    MOVE R0, R4
+    IBT R1, #$02
+    STW (R1)                ; SRAM[2..3] = 0 (outer count ran out)
+    IWT R0, #$C0DE
+    IBT R1, #$04
+    STW (R1)                ; SRAM[4..5] = marker
+    NOP
+    NOP
+    NOP
+    STOP
+    NOP

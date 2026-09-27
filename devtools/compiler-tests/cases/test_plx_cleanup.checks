@@ -1,0 +1,12 @@
+# Named for the PLX argument cleanup after a call; since the tail-call
+# optimisation (chantier C.1) these wrappers pass their arguments through
+# untouched and jump: no push, no call, no cleanup, no rtl. That is the
+# property checked here (ported from opensnes-emu test_plx_cleanup, whose
+# jml/no-rtl part was already a hard failure; its PLX part compiled a
+# second, generated source and is not reachable from this fixture).
+in wrapper_one: present \tjml add_one\n\.ENDS
+in wrapper_one: absent \b(rtl|jsl|pha|plx)\b
+in wrapper_two: present \tjml add_two\n\.ENDS
+in wrapper_two: absent \b(rtl|jsl|pha|plx)\b
+in void_wrapper: present \tjml do_something\n\.ENDS
+in void_wrapper: absent \b(rtl|jsl|pha|plx)\b

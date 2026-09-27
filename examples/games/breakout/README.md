@@ -11,7 +11,8 @@
 |--------|--------|
 | D-Pad Left/Right | Move paddle |
 | A (hold) | Move faster |
-| Start | Pause |
+| Start | Begin; pause during play; after GAME OVER, a new game |
+| Any button | Continue after losing a ball |
 
 ## Build & Run
 
@@ -339,6 +340,10 @@ This tells `make/common.mk` to run `gfx4snes` on each PNG, producing `.pic` (til
 | `input` | Joypad buffers — though Breakout reads `pad_keys[0]` directly |
 
 ---
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `background`, `input` (`LIB_MODULES` in the Makefile).
 
 ## Technical Reference
 

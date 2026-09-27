@@ -43,6 +43,8 @@ u8 drop = (rngNext() % 100) < 20;     // 20% chance of item drop
 | `text` | `textInit()`, `textPrintAt()`, `textFlush()` for number display |
 | `input` | `padPressed()` for single-press button detection |
 
+Also linked: `gameloop` — the `gameLoopRun()` frame loop.
+
 ## Build & Run
 
 ```bash

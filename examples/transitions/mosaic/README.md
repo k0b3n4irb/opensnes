@@ -120,3 +120,7 @@ a transition, making characters stand out against the dissolving background.
 - **Explore related examples**:
   - `effects/fading` -- Brightness fading in detail
   - `effects/hdma_wave` -- More advanced PPU effects with HDMA
+
+## Modules Used
+
+`console`, `dma`, `background`, `sprite`, `input`, `mosaic` (`LIB_MODULES` in the Makefile).

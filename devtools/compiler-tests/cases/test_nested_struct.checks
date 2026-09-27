@@ -1,0 +1,10 @@
+# Field offsets through nested structs and an array of structs (ported from
+# opensnes-emu test_nested_struct, which only looked for the symbol).
+# Entity = {Point, Point, u8} = 5 bytes, byte-aligned; enemies[4] at 5.
+# score is a u16: aligned to 26 (the source comment's 25 predates the
+# alignment), so sizeof(GameState) = 28.
+present game:\n\tdsb 28\n
+in test_nested_access: present sta\.w game\+2\n\tstz\.w game\+3\n\tlda #1\n\tsta\.w game\+4\n
+# enemies[0].position.x = 5; enemies[2].velocity.y = 5 + 2*5 + 3 = 18.
+in test_nested_access: present lda #50\n\tsta\.w game\+5\n\tlda #255\n\tsta\.w game\+18\n
+in test_nested_access: present rep #\$20\n\tlda\.w #1000\n\tsta\.w game\+26\n

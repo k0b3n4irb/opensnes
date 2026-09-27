@@ -238,6 +238,111 @@ if (pad_pressed & KEY_B) {
 }
 ```
 
+## Is a Pad Plugged In?
+
+An empty port and an idle pad both read as "no button pressed". To tell
+them apart, `padIsConnected(pad)` returns 1 when a standard pad answered
+on that port during the last VBlank:
+
+```c
+if (!padIsConnected(1)) {
+    textPrintAt(4, 20, "PLUG IN CONTROLLER 2");
+}
+```
+
+Pads are 0 and 1; a mouse or a Super Scope on the port reads 0 (it is not
+a pad). The answer is valid from the first VBlank after `consoleInit()`.
+
+## The SNES Mouse
+
+`mouseInit(port)` looks for a mouse on port 0 or 1 and, if it finds one,
+turns on mouse reading in the NMI handler. It reads the result of the
+automatic joypad read, so call it after a `WaitForVBlank()`, as
+`examples/input/mouse` does:
+
+```c
+s16 cursor_x = 128, cursor_y = 112;
+
+WaitForVBlank();
+if (!mouseInit(0)) {
+    textPrintAt(2, 5, "No mouse detected.");
+}
+
+while (1) {
+    WaitForVBlank();
+    cursor_x += mouseGetX(0);        /* signed motion since last frame */
+    cursor_y += mouseGetY(0);        /* positive = down */
+    if (mouseButtonsPressed(0) & MOUSE_BUTTON_LEFT) {
+        /* click: pressed this frame */
+    }
+    if (mouseButtonsHeld(0) & MOUSE_BUTTON_RIGHT) {
+        /* right button is down */
+    }
+}
+```
+
+The mouse reports motion, not a position: keep your own cursor and clamp
+it to the screen. `mouseGetX()` / `mouseGetY()` return -127..+127.
+`mouseIsConnected(port)` says whether the NMI handler still sees the
+mouse this frame (it can be unplugged mid-game).
+
+Sensitivity has three steps (`MOUSE_SENS_LOW`, `MOUSE_SENS_MEDIUM`,
+`MOUSE_SENS_HIGH`). `mouseSetSensitivity(port, level)` queues the change,
+which the NMI handler applies; `mouseGetSensitivity(port)` returns the
+level in effect, so it may lag one frame behind the request.
+
+## The Super Scope
+
+The Super Scope is a light gun on port 2 only. When it sees the screen's
+light it makes the PPU latch its horizontal and vertical counters (a
+transition on pin 6 of the second controller connector — fullsnes, PPU
+timers and status; anomie's register doc, `$213C`/`$213D`). The NMI
+handler reads that latch and the gun's buttons every frame once
+`scopeInit()` has found it:
+
+```c
+WaitForVBlank();
+if (scopeInit()) {
+    /* ask the player to shoot the centre of the screen, then: */
+    scopeCalibrate();
+}
+
+while (1) {
+    WaitForVBlank();
+    if (scopeButtonsPressed() & SSC_FIRE) {
+        u16 x = scopeGetX();         /* 0-255, calibrated */
+        u16 y = scopeGetY();         /* 0-223 */
+        /* hit test at (x, y) */
+    }
+}
+```
+
+The raw counter values (`scopeGetRawX()`, `scopeGetRawY()`) are not
+screen coordinates: the visible picture starts part-way along the
+horizontal counter, and every gun aims a little differently.
+`scopeCalibrate()` takes the last shot as the screen centre (128, 112)
+and offsets every later reading; `scopeGetX()` / `scopeGetY()` return the
+corrected position. `examples/input/superscope` shows the whole
+detect / calibrate / fire loop.
+
+Buttons come as a mask of `SSC_FIRE`, `SSC_CURSOR`, `SSC_TURBO`,
+`SSC_PAUSE`, plus two status flags, `SSC_OFFSCREEN` (aimed off the TV)
+and `SSC_NOISE`:
+
+| Call | Returns |
+|---|---|
+| `scopeButtonsHeld()` | buttons down now (like `padHeld()`) |
+| `scopeButtonsPressed()` | buttons that went down this frame |
+| `scopeButtonsRepeat()` | a held button re-triggering: first after the hold delay, then every repeat delay |
+| `scopeSinceShot()` | frames since the gun last latched a position |
+
+`scopeSetHoldDelay(frames)` (default 60) and `scopeSetRepeatDelay(frames)`
+(default 20) tune the auto-repeat. `scopeIsConnected()` returns whether
+`scopeInit()` found the gun, and drops to 0 if the gun is unplugged; a gun
+plugged in later is not detected on its own, so call
+`scopeInit()` again (for example once per frame on a "connect the Super
+Scope" screen) to notice a gun plugged in later.
+
 ## Hardware Registers
 
 For reference, the joypad registers:

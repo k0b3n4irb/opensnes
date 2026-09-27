@@ -58,8 +58,11 @@ def find_luna() -> str | None:
     env = os.environ.get("LUNA_BIN")
     if env and Path(env).is_file():
         return env
-    tree = SDK_TREE / "tools" / "luna-test" / "bin" / "luna"
-    return str(tree) if tree.is_file() else None
+    for name in ("luna", "luna.exe"):   # .exe on Windows
+        tree = SDK_TREE / "tools" / "luna-test" / "bin" / name
+        if tree.is_file():
+            return str(tree)
+    return None
 
 
 def main() -> int:

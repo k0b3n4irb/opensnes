@@ -22,8 +22,9 @@ The SNES has a dedicated **SPC700** sound processor with:
 Reach for **direct BRR samples** when you want a jump, a hit, a coin, or a
 voice clip played on demand — you load a `.brr` into the SPC700 and trigger it
 from C (see @ref examples_audio_soundboard). Reach for **SNESMOD** when you
-want music, or SFX that share a tracker soundbank with it. The two can
-coexist. To *make* a `.brr` from your own audio, see
+want music, or SFX that share a tracker soundbank with it. Pick one per
+ROM: `audio` and `snesmod` both own the SPC700, so they are never linked
+together. To *make* a `.brr` from your own audio, see
 [One-shot samples from WAV](#audio_wav2brr) below.
 
 ## SNESMOD (Recommended)
@@ -163,9 +164,10 @@ audioPlaySample(0);
 See @ref audio_samples in the API reference for the full sample API
 (`audioLoadSample`, `audioPlaySample`, `audioUnloadSample`).
 
-> A `.brr` is a build input, like a converted PNG — generate it with `wav2brr`
-> and commit it next to your source WAV. There is no automatic `.wav` → `.brr`
-> build step yet; run the tool when the source audio changes.
+> The build converts a one-shot sample for you: when an assembly file
+> `.incbin`s `res/jump.brr` and `res/jump.wav` exists, `make` runs `wav2brr`
+> on it. A looping sample needs its loop points, so run `wav2brr --loop` by
+> hand and commit the `.brr` next to its source WAV.
 
 ### Volume Control
 
@@ -229,6 +231,28 @@ while (1) {
     // ... game logic
 }
 ```
+
+## Following the music and managing the queue
+
+`snesmodGetPosition()` returns the playback position the driver reports
+(the current row), for syncing game events to the music:
+
+```c
+if (snesmodGetPosition() == 32) {
+    start_boss_flash();              /* on the beat of row 32 */
+}
+```
+
+Every `snesmod*` command goes through a queue that `snesmodProcess()`
+drains a little each frame. `snesmodFlush()` blocks until the queue is
+empty, for the rare moment you need every command applied now, such as
+before loading another module.
+
+`snesmodSetSoundTable(table)` and `snesmodAllocateSoundRegion(size)` set
+up the driver's streamed-sample path; the allocation must come before
+`snesmodLoadModule()`, since it reorganises the SPC700's memory and stops
+a module already loaded. No SDK call starts a stream yet, so today they
+only prepare it.
 
 ## Example: Music + SFX
 
@@ -313,13 +337,93 @@ Total audio RAM: 64KB
 For sound effects and sample playback, `LIB_MODULES += audio` gives
 you the full engine with no SPC700 code of your own: the lib ships a
 resident driver (built from source at lib build time) and `audio.h`'s
-22 functions drive it — `audioInit()`, `audioLoadSample()` (BRR
+functions drive it — `audioInit()`, `audioLoadSample()` (BRR
 streamed into APU RAM at runtime), `audioPlaySampleEx()` (volume/pan/
 pitch, 8-voice round-robin polyphony), per-voice ADSR/GAIN, and a
 configurable echo with FIR filter. Every call is bounded — the API
 returns `AUDIO_ERR_TIMEOUT` rather than hanging. Worked example:
 `audio/soundboard`. Main-thread only; one engine per ROM (don't link
 `audio` and `snesmod` together).
+
+### Choosing the voice
+
+`audioPlaySample()` and `audioPlaySampleEx()` pick a voice round-robin
+and return it (or `AUDIO_VOICE_NONE`). `audioPlaySampleOn(voice, sample,
+volume, pan, pitch)` plays on the voice you name — reserve one for a
+long sound that must not be cut by the next effects, and shape its
+envelope before the key-on:
+
+```c
+#define VOICE_ENGINE 7
+audioSetADSR(VOICE_ENGINE, 4, 7, 7, 0);                /* slow attack */
+audioPlaySampleOn(VOICE_ENGINE, SFX_ENGINE, 90, AUDIO_PAN_CENTER, 0x1000);
+/* ... */
+audioStopVoice(VOICE_ENGINE);                          /* key-off */
+```
+
+`audioStopAll()` keys off all eight voices. Passing `AUDIO_VOICE_AUTO`
+as the voice gives the round-robin choice.
+
+### Volume and pitch
+
+```c
+audioSetVolume(100);                     /* master, 0-127 */
+u8 v = audioGetVolume();                 /* the value last set */
+audioSetVoiceVolume(3, 127, 40);         /* voice 3, left/right */
+audioSetVoicePitch(3, 0x1800);           /* 0x1000 = the sample's own rate */
+```
+
+Pitch is clamped to 0x3FFF, the S-DSP's 14-bit range.
+
+### Shaping the envelope: ADSR or GAIN
+
+`audioSetADSR(voice, attack, decay, sustain, release)` gives a voice the
+classic envelope (the `AUDIO_ATTACK_*`, `AUDIO_DECAY_*`,
+`AUDIO_SUSTAIN_*`, `AUDIO_RELEASE_*` constants). `audioSetGain(voice,
+mode)` switches the voice to GAIN instead and writes `mode` to its GAIN
+register as is: `$00-$7F` hold the envelope at a fixed level (value × 16);
+with bit 7 set, bits 5-6 choose linear decrease, exponential decrease,
+linear increase or bent increase, and bits 0-4 the rate (snesdev-wiki,
+S-DSP registers, VxGAIN; anomie's S-DSP doc). They shape the attack, so
+set them before playing on that voice — which is why
+`audioPlaySampleOn()` lets you choose it.
+
+```c
+audioSetGain(2, 0x7F);                   /* voice 2 at a steady full level */
+audioSetGain(2, 0xC0 | 20);              /* voice 2 fades in linearly */
+```
+
+### Echo
+
+Echo takes three steps, in this order: the delay and levels, the filter,
+then the voices that feed it.
+
+```c
+static const s8 fir_flat[8] = { 0x7F, 0, 0, 0, 0, 0, 0, 0 };
+
+audioSetEcho(4, 40, 50, 50);             /* 64 ms, feedback 40, volume L/R */
+audioSetEchoFilter(fir_flat);
+audioEnableEcho(0x03);                   /* voices 0 and 1 */
+/* ... */
+audioDisableEcho();                      /* mutes the echo and stops the ring writes */
+```
+
+`{ 0x7F, 0, 0, 0, 0, 0, 0, 0 }` is the identity filter: the echo comes
+back unfiltered (snesdev-wiki, S-DSP registers, FIRx, which also says to
+set the filter before echo is enabled). `audioSetEcho()` clears the whole
+echo ring, which takes several milliseconds per delay step: call it when
+a scene starts, not every frame.
+
+### Asking the engine
+
+| Call | Returns |
+|---|---|
+| `audioIsReady()` | 1 once `audioInit()` has started the driver; 0 if the driver did not answer |
+| `audioGetFreeMemory()` | bytes left for samples in the SPC700's RAM |
+| `audioGetVoiceState(voice, &state)` | whether the voice's envelope is still sounding, and the sample, volume, pan and pitch last sent to it |
+
+`audioUpdate()` does nothing: the engine sends each command as you call
+it. It is kept so code written for the older engine still builds.
 
 Choosing a path: **snesmod** for tracker music (IT modules),
 **audio** for C-driven samples and DSP effects, **apu** (below) for

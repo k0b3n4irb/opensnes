@@ -1,0 +1,12 @@
+# Pointer-free code stays pointer-free: arguments read stack-relative,
+# globals by absolute address, no X-indexed dereference, no 4-byte pointer
+# traffic (tcc__r9). No original check existed (opensnes-emu only compiled
+# it; the file dates from the storel type issues).
+absent \$0000,x
+absent tcc__r9
+in get_value: present lda\.w #42\n\trtl
+# a + b: a (first, deeper) at 6,s, b at 4,s.
+in add_numbers: present lda 6,s\n\tclc\n\tadc 4,s\n\trtl
+in get_counter: present lda\.w global_counter\n\trtl
+in inc_counter: present lda\.w global_counter\n\tinc a\n\tsta \d+,s\n\tsta\.w global_counter
+section global_counter: present \.RAMSECTION

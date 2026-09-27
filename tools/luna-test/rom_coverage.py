@@ -49,11 +49,13 @@ Exit 0 = no new never-executed function, 1 = the ratchet grew, 2 = usage.
 from __future__ import annotations
 
 import argparse
+import os
 import bisect
 import re
 import struct
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -83,7 +85,9 @@ _RT = REPO_ROOT / "devtools" / "compiler-tests" / "runtime"
 FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120),
             # the second fixture reaches r_done around frame 170 (SNESMOD upload first)
             (REPO_ROOT / "devtools" / "libtests_fx" / "libtest_fx.sfc", "libtest_fx", 240),
-            (REPO_ROOT / "devtools" / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60)] + [
+            (REPO_ROOT / "devtools" / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60),
+            # the cache-resident GSU job (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait)
+            (REPO_ROOT / "devtools" / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
     for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel")
 ]
@@ -117,7 +121,7 @@ def manifest_runs(rom: Path) -> list[tuple[str, list[str], str | None]]:
     runs = []
     for toml in sorted(MANIFESTS.glob("*.toml")):
         try:
-            m = tomllib.loads(toml.read_text())
+            m = tomllib.loads(toml.read_text(encoding="utf-8"))
         except tomllib.TOMLDecodeError:
             continue
         target = (toml.parent / m.get("rom", "")).resolve()
@@ -164,7 +168,7 @@ def profile_pcs(luna: str, rom: Path, sym: Path, bound: list[str], script: str |
     Exit 1 with a `stack:` line ending in UNDER is the stack gate, not an error:
     no --budget is passed here, so it is the only gate that can fail."""
     cmd = [luna, "profile", str(rom), *bound, "--sym", str(sym),
-           "--pc-set", str(pcs), "--out", "/dev/null", "--top", "0"]
+           "--pc-set", str(pcs), "--out", os.devnull, "--top", "0"]
     if script:
         cmd += ["--input", script]
     if floor is not None:
@@ -184,7 +188,7 @@ def public_functions() -> dict[str, str]:
     """name -> header, for every function declared in lib/include/snes/*.h."""
     out: dict[str, str] = {}
     for h in sorted(HEADERS.glob("*.h")):
-        s = h.read_text()
+        s = h.read_text(encoding="utf-8")
         s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
         s = re.sub(r"//.*", "", s)
         for m in re.finditer(r"^\s*(?:extern\s+)?[A-Za-z_][\w\s\*]*?\b([a-zA-Z_]\w*)\s*\([^;{]*\)\s*;",
@@ -274,6 +278,10 @@ def main() -> int:
     if not all(rom.is_file() for rom, _, _ in FIXTURES):
         missing = [key for rom, key, _ in FIXTURES if not rom.is_file()]
         print(f"  note: fixture ROM(s) not built, skipped: {', '.join(missing)}", file=sys.stderr)
+    # Every leg is an independent luna run: they go through a pool
+    # (LUNA_JOBS, default the CPU count), and the results are folded in
+    # the same order afterwards, so the report does not depend on timing.
+    jobs = []
     for rom, key, frame in targets:
         if args.only and args.only not in key:
             continue
@@ -281,24 +289,31 @@ def main() -> int:
         if not sym.is_file():
             print(f"  SKIP  {key}: no .sym", file=sys.stderr)
             continue
-        labels = load_labels(sym)
         floor = ram_band_top(sym)
         runs = [("idle", ["--until-frame", str(frame)], None)] + manifest_runs(rom)
         for name, bound, script in runs:
             pcs = tmp / (key.replace("/", "_") + "." + name + ".bin")
-            err, deepest, stack_line = profile_pcs(luna, rom, sym, bound, script, pcs, floor)
-            if err is not None:
-                print(f"  ERROR {key} [{name}]: {err}", file=sys.stderr)
-                return 2
-            legs += 1
-            if floor is not None and deepest is not None:
-                # S points at the next free byte: the deepest byte written is S+1.
-                stack_margins.append((deepest + 1 - floor, f"{key} [{name}]"))
-                if "UNDER" in stack_line:
-                    stack_under.append(f"{key} [{name}]: {stack_line} (band top ${floor:04X})")
-            for fn in executed_labels(pcs, labels) & public.keys():
-                hits.setdefault(fn, set()).add(key)
+            jobs.append((rom, key, sym, floor, name, bound, script, pcs))
         roms += 1
+    workers = max(1, int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(
+            lambda j: profile_pcs(luna, j[0], j[2], j[5], j[6], j[7], j[3]), jobs))
+    labels_of: dict[Path, dict] = {}
+    for (rom, key, sym, floor, name, _, _, pcs), (err, deepest, stack_line) in zip(jobs, results):
+        if err is not None:
+            print(f"  ERROR {key} [{name}]: {err}", file=sys.stderr)
+            return 2
+        legs += 1
+        if floor is not None and deepest is not None:
+            # S points at the next free byte: the deepest byte written is S+1.
+            stack_margins.append((deepest + 1 - floor, f"{key} [{name}]"))
+            if "UNDER" in stack_line:
+                stack_under.append(f"{key} [{name}]: {stack_line} (band top ${floor:04X})")
+        if sym not in labels_of:
+            labels_of[sym] = load_labels(sym)
+        for fn in executed_labels(pcs, labels_of[sym]) & public.keys():
+            hits.setdefault(fn, set()).add(key)
 
     never = sorted(n for n in public if n not in hits)
     by_header: dict[str, list[str]] = {}
@@ -327,7 +342,7 @@ def main() -> int:
     if args.update:
         # The committed report is the full-coverage capture (firmware present);
         # a check run (CI skips firmware-gated examples) leaves it alone.
-        REPORT.write_text("\n".join(lines) + "\n")
+        REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"ROM coverage: {len(public) - len(never)}/{len(public)} public functions executed "
           f"by {roms} ROMs; {len(never)} never.")
     if stack_margins:
@@ -350,17 +365,17 @@ def main() -> int:
                   f"{', '.join(skipped_fw)}) — the list must be captured with full coverage",
                   file=sys.stderr)
             return 2
-        RATCHET.write_text("\n".join(never) + "\n")
+        RATCHET.write_text("\n".join(never) + "\n", encoding="utf-8")
         fw_only = sorted(n for n, ex in hits.items() if ex and ex <= gated)
-        FIRMWARE_ONLY.write_text("\n".join(fw_only) + "\n")
+        FIRMWARE_ONLY.write_text("\n".join(fw_only) + "\n", encoding="utf-8")
         print(f"wrote {RATCHET.relative_to(REPO_ROOT)} ({len(never)} names), "
               f"{FIRMWARE_ONLY.relative_to(REPO_ROOT)} ({len(fw_only)} names) and "
               f"{REPORT.relative_to(REPO_ROOT)}")
         return 0
-    known = set(RATCHET.read_text().split()) if RATCHET.is_file() else set()
+    known = set(RATCHET.read_text(encoding="utf-8").split()) if RATCHET.is_file() else set()
     new = sorted(set(never) - known)
     if skipped_fw and FIRMWARE_ONLY.is_file():
-        exempt = set(FIRMWARE_ONLY.read_text().split())
+        exempt = set(FIRMWARE_ONLY.read_text(encoding="utf-8").split())
         dropped = [n for n in new if n in exempt]
         new = [n for n in new if n not in exempt]
         print(f"  note: {len(skipped_fw)} firmware-gated example(s) skipped; "

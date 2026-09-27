@@ -1,0 +1,9 @@
+# A mutable struct declared through a typedef after a #line directive lives
+# in RAM, initialised by .data_init — the mktype() UB once set QUALCONST
+# from heap garbage and placed it in ROM (ported from opensnes-emu
+# test_struct_typedef_rodata).
+section state: present \.RAMSECTION
+section state: absent SUPERFREE|\.rodata
+present state:\n\tdsb 6
+# Its initialiser {10, 20, 1} is copied at boot: target, bank, size, bytes.
+present \.dw state\n\t\.db :state\n\t\.dw 6\n\t\.dw 10\n\t\.dw 20\n\t\.db 1

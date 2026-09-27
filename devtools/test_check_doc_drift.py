@@ -5,8 +5,11 @@ soft-wrap multi-line scan), path-existence extraction, category-row parsing,
 and the ROADMAP footer-date anchor."""
 import unittest
 
+import check_doc_drift
+
 from check_doc_drift import (COUNT_PATTERNS, ROADMAP_FOOTER_RE,
-                             deprecated_citations_in_text,
+                             declared_lib_modules, deprecated_citations_in_text,
+                             modules_missing_from_readme,
                              extract_example_paths, parse_category_rows,
                              phantom_names_in_code, retired_tool_lines,
                              sdk_phantoms_in_text,
@@ -152,6 +155,47 @@ class TestRetiredTools(unittest.TestCase):
 
     def test_allows_saying_it_is_retired(self):
         self.assertEqual(retired_tool_lines("Mesen2 was retired on 2026-07-05\n"), [])
+
+
+class TestExampleModules(unittest.TestCase):
+    def test_declared_reads_all_assignment_forms(self):
+        mk = "LIB_MODULES := console dma   # c\nLIB_MODULES += sprite\n"
+        self.assertEqual(declared_lib_modules(mk), ["console", "dma", "sprite"])
+
+    def test_any_format_counts(self):
+        readme = "## Modules Used\n\n| Module | Why |\n|---|---|\n| console | init |\n\nconsole, dma\n## Next\n"
+        self.assertEqual(modules_missing_from_readme(readme, ["console", "dma"]), [])
+
+    def test_missing_module_and_missing_section(self):
+        self.assertEqual(modules_missing_from_readme("## Modules\n`console`\n", ["console", "gameloop"]), ["gameloop"])
+        self.assertIsNone(modules_missing_from_readme("## Build\n", ["console"]))
+
+
+class BuildKnobs(unittest.TestCase):
+    MK = "CSRC ?= main.c\nUSE_HIROM   ?= 0\n# NOTE ?= in a comment\nX := 1\nUSE_HIROM ?= 1\n"
+
+    def test_knobs_in_order_once(self):
+        self.assertEqual(check_doc_drift.makefile_knobs(self.MK), ["CSRC", "USE_HIROM"])
+
+    def test_missing_knob(self):
+        page = "| `CSRC` | main.c |\nUSE_HIROM without backticks"
+        self.assertEqual(check_doc_drift.knobs_missing(["CSRC", "USE_HIROM"], page),
+                         ["USE_HIROM"])
+
+    def test_real_tree_is_clean(self):
+        self.assertEqual(check_doc_drift.check_build_knobs(), [])
+
+class SlashCount(unittest.TestCase):
+    def test_makefile_form(self):
+        text = "# CI-gated on 54/56 examples — the two whose"
+        self.assertTrue(any(int(m.group(1)) == 56 for r in COUNT_PATTERNS
+                            for m in r.finditer(text)))
+
+    def test_ratio_prose_is_not_a_count(self):
+        text = "a 3/4 examples ratio"          # single digits: out of range
+        self.assertFalse(any(10 <= int(m.group(1)) <= 999 for r in COUNT_PATTERNS
+                             for m in r.finditer(text)))
+
 
 if __name__ == "__main__":
     unittest.main()

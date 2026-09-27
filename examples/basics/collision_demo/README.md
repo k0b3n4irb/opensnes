@@ -120,6 +120,10 @@ collision checks (read every frame).
 
 ---
 
+## Modules Used
+
+`console`, `input`, `sprite`, `dma`, `collision`, `background` (`LIB_MODULES` in the Makefile).
+
 ## Files
 
 | File | Purpose |

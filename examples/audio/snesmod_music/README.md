@@ -190,6 +190,10 @@ Then open `music.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `dma`, `input`, `background`, `text` (`LIB_MODULES` in the Makefile).
+
 ## Files
 
 | File | Purpose |

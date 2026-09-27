@@ -20,7 +20,9 @@ opt-in list.
    v0.16.0 — three minor versions stale.
 
 3. **Examples count claims in active docs** (`ROADMAP.md`, `README.md`,
-   `.claude/rules/*.md`) must match `find examples -name 'main.c' | wc -l`.
+   `.claude/rules/*.md`, and since 2026-09-26 the `Makefile`, the
+   workflows and `tools/luna-test/README.md`) must match
+   `find examples -name 'main.c' | wc -l`.
    Caught historically as the pre-v0.16.0 count (one off the current
    total) sticking around in `testing.md` and `nmi_audit.md` after
    v0.16.0 shipped the new `scene_stack` example. `CHANGELOG.md` is
@@ -56,6 +58,27 @@ opt-in list.
    pointer's bank byte. Caught historically as dma.asm's "BANK
    LIMITATION" header contradicting its own per-function stack maps —
    prose the ABI lint (which only reads `lda N,s` annotations) can't see.
+
+9. **Example READMEs name the modules their Makefile links** (since
+   2026-09-26): each `examples/*/*/README.md` has a "Modules" section in
+   which every `LIB_MODULES` name of the Makefile appears (any format).
+   Caught as 33 READMEs without the section and 5 omitting `gameloop`,
+   `math` or `fixed32`.
+
+10. **Docs cite only functions that exist, and deprecated ones as
+    deprecated** (since 2026-09-26): an SDK-shaped call no header declares,
+    or an `OPENSNES_DEPRECATED` name cited without saying so on that line or
+    the one before, fails. Caught as `colorMathSetMaskMain/Sub`,
+    `objRegisterTypes`, `spcLoad/spcPlay`, `mosaicEnable` in API_INDEX.
+
+11. **No retired tool in `.claude/agents`, `skills`, `hooks`** (since
+    2026-09-26): Mesen2, opensnes-emu, `tests/*.sh` — caught as the
+    snes-engine-reviewer agent committed with all three.
+
+12. **Every `?=` variable of `make/common.mk` is on `docs/tools/build.md`**
+    (since 2026-09-26), backticked. Caught as eight knobs named in no page
+    (`USE_FASTROM`, `ROMSIZE`, `SPCSRC`, the three thresholds…) and one,
+    `BPP`, that nothing read.
 
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
