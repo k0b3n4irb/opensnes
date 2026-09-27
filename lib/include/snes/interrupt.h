@@ -122,7 +122,7 @@ void nmiClear(void);
  *   lib DMA helpers (dmaCopyVram etc.) from the main loop while such a
  *   handler is armed — the channel registers are shared state.
  *
- * @param handler Address of the ASM handler (see examples/graphics/effects/
+ * @param handler Address of the ASM handler (see examples/color/
  *                hicolor_1792/irq_stream.asm for the canonical shape)
  */
 void irqSet(void *handler);

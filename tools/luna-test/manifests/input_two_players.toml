@@ -11,18 +11,18 @@ input = "30:0x0800"            # pad 1: UP
 input2 = "30:0x0400"           # pad 2: DOWN
 [checkpoint.values]
 pad_keys = 0x0800
-"00:0043" = 0x0400
+"pad_keys+2" = 0x0400
 [[checkpoint]]
 at_frame = 120
 input = "90:0x0200"            # pad 1: LEFT
 input2 = "90:0x0100"           # pad 2: RIGHT
 [checkpoint.values]
 pad_keys = 0x0200
-"00:0043" = 0x0100
+"pad_keys+2" = 0x0100
 [[checkpoint]]
 at_frame = 180
 input = "150:0"                # pad 1 released
 input2 = "150:0x8000"          # pad 2: B alone
 [checkpoint.values]
 pad_keys = 0x0000
-"00:0043" = 0x8000
+"pad_keys+2" = 0x8000

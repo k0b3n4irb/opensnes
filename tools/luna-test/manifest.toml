@@ -34,7 +34,7 @@ input_dependent = true
 # immediate. Extra points cost one luna run each, only here.
 #
 # Deliberately only these two: the other demo.gif examples (mode7, fading,
-# hdma_helpers, hdma_wave, mosaic) animate on BUTTON PRESS and idle on the
+# hdma_helpers, mosaic) animate on BUTTON PRESS and idle on the
 # same frame at every un-scripted capture point (verified 1M→6M: identical
 # fbhash) — a second point there is cost without coverage. Covering their
 # animations needs scripted input, which is the functional probes' domain.
@@ -52,8 +52,8 @@ frames = [200, 400]
 [examples."sprites/metasprite"]
 frames = [200, 400]
 
-# raw HDMA wave (krom port) scrolls continuously — self-animating.
-[examples."hdma/hdma_wave_table"]
+# the hand-built HDMA wave (krom port) scrolls from boot — self-animating.
+[examples."hdma/hdma_wave"]
 frames = [200, 400]
 
 # 32 sprites bounce continuously with no input — self-animating.

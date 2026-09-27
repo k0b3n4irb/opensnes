@@ -1,0 +1,60 @@
+# metasprite — the UP/DOWN menu that switches OBJSEL between three size
+# combinations, which no other test presses.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness and the fbhash baseline run with no input, so they only ever
+#     see mode 0 (8x8 small / 16x16 large). changeObjSize() — the "fresh
+#     sync" that writes OBJSEL in the same VBlank as the new OAM buffer — is
+#     dead code to them.
+#   * The menu clamps at both ends: UP twice from 0 must stay 0, DOWN three
+#     times from 0 must stop at 2. An unclamped index selects no size branch
+#     in changeObjSize() and leaves OBJSEL on the previous mode.
+#   * ppu.obsel is the register the PPU really latched, not the example's
+#     variable: OBJ_SIZE_TO_REG(size) = size << 5, name base 0, so
+#     8/16 -> $00, 8/32 -> $20, 16/32 -> $60 (sprite.h: 0, 1, 3).
+#   * At the end, in mode 2, the first OAM entry is the 32x32 hero drawn
+#     LARGE at (48, 108) — the size the PPU reads from OBJSEL + the size bit;
+#     OAM holds y - 1 = 107 (sprite.h, the +1 scanline compensation).
+#
+# Measured: `luna state --until-frame N --input <the script below> --peek
+# selectedItem:2 --out -` (+ `ppu.obsel`) at 60/120/200/300 -> 0/$00, 1/$20,
+# 0/$00, 2/$60.
+rom = "../../../examples/sprites/metasprite/metasprite.sfc"
+
+[[checkpoint]]                 # DOWN at 60 lands after this frame: still mode 0
+at_frame = 60
+[checkpoint.values]
+selectedItem = 0
+[checkpoint.ppu]
+obsel = 0x00                   # OBJ_SIZE8_L16
+
+[[checkpoint]]                 # DOWN: mode 1, 8x8 small / 32x32 large
+at_frame = 120
+input = "60:0x0400,64:0"
+[checkpoint.values]
+selectedItem = 1
+[checkpoint.ppu]
+obsel = 0x20                   # OBJ_SIZE8_L32 << 5
+
+[[checkpoint]]                 # UP twice from 1: clamps at 0, not 0xFFFF
+at_frame = 200
+input = "120:0x0800,124:0,130:0x0800,134:0"
+[checkpoint.values]
+selectedItem = 0
+[checkpoint.ppu]
+obsel = 0x00
+
+[[checkpoint]]                 # DOWN three times from 0: clamps at 2, not 3
+at_frame = 300
+input = "200:0x0400,204:0,210:0x0400,214:0,220:0x0400,224:0"
+[checkpoint.values]
+selectedItem = 2
+[checkpoint.ppu]
+obsel = 0x60                   # OBJ_SIZE16_L32 << 5
+
+[asserts.oam]                  # mode 2: hero32 drawn LARGE = one 32x32 entry
+[asserts.oam.sprites.0]
+x = 48
+y = 107                        # OAM holds y - 1: sprite.h compensates the PPU's +1 line
+w = 32
+h = 32

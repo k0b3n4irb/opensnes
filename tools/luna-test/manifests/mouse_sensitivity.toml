@@ -23,18 +23,18 @@ mouse = "30:0,0,0;60:0,0,2;64:0,0,0"
 [checkpoint.values]
 mouse_con = { eq = 1, width = 1 }
 mouseSensitivity = { eq = 1, width = 1 }
-"00:0081" = { eq = 0, width = 1 }    # port 1: untouched
+"mouseButton+1" = { eq = 0, width = 1 }    # port 1: untouched
 
 [[checkpoint]]                       # after the click at frame 90: medium -> high
 at_frame = 110
 mouse = "90:0,0,2;94:0,0,0"
 [checkpoint.values]
 mouseSensitivity = { eq = 2, width = 1 }
-"00:0081" = { eq = 0, width = 1 }
+"mouseButton+1" = { eq = 0, width = 1 }
 
 [[checkpoint]]                       # after the click at frame 120: high wraps to low
 at_frame = 150
 mouse = "120:0,0,2;124:0,0,0"
 [checkpoint.values]
 mouseSensitivity = { eq = 0, width = 1 }
-"00:0081" = { eq = 0, width = 1 }
+"mouseButton+1" = { eq = 0, width = 1 }

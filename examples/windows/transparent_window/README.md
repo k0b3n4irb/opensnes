@@ -103,3 +103,7 @@ menu overlays, and spotlight effects. It costs zero CPU time -- all hardware.
 - **Explore related examples**:
   - `effects/window` -- Triangle-shaped HDMA window (BG masking, not color math)
   - `effects/transparency` -- Color math without windows (full-screen effects)
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `background`, `window`, `colormath`, `hdma` (`LIB_MODULES` in the Makefile).

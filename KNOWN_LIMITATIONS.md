@@ -583,11 +583,13 @@ a const template worked, the load into a RAM buffer wrote nowhere.
 `lib/source/sram.asm` hard-coded `$70:0000`. On HiROM, battery RAM is at
 `$30-$3F:$6000-$7FFF` (fullsnes, "SNES Memory Map / Battery-backed SRAM"), so
 a HiROM game saved into open bus. The module now maps per build; on HiROM it
-addresses the first 8 KB window only. **SA-1 + `USE_SRAM=1` is refused at
-build time**: SA-1 save memory is BW-RAM, writable from the SNES CPU only
-after enabling it, which the library does not do.
-
-**Mitigation (SA-1):** none in the library yet — write BW-RAM from SA-1 code.
+addresses the first 8 KB window only. SA-1 + `USE_SRAM=1` was refused at
+build time until 2026-09-26: its save memory is BW-RAM ($40:0000), writable
+from the SNES CPU only once SBWE (`$2226`, fullsnes) is set. crt0 sets it
+now and the module addresses BW-RAM on SA-1 builds (without SBWE the writes
+are dropped — measured on luna). Pinned by `devtools/libtests_sa1_sram`
+(bytes read back at `$40:0000`). luna does not yet persist SA-1 BW-RAM to
+`.srm` (reported to luna).
 
 ### 🟢 `sramClear()` wrote a byte ramp instead of zeros (fixed 2026-09-15)
 
@@ -682,14 +684,13 @@ mandatory for per-frame paths no longer exists. The breakout, mouse,
 and similar examples continue to use direct `oamMemory[]` writes by
 preference, not necessity.
 
-**Lingering observation (informational, 🟢 severity)**: other multi-arg
-C helpers still carry larger-than-ideal framesizes — `oamSetX` (148),
-`oamDrawMeta` (142), `oamDrawMetaFlip` (200), `collideRectEx` (176),
-`hdmaColorGradient` (162). A 2026-05-13 audit confirmed none of these
-are per-frame hot paths in shipping examples (`oamSetX` has 0 example
-callers; the others have 0–1). If one becomes hot for a future user,
-the same tactic (ASM rewrite) is available, OR the catalogued QBE
-coalescer chantier (`.claude/STRUCTURAL_DEFECTS.md` A4) can be revived.
+**Since 2026-09-27 the compiler shares stack slots between temps whose
+lives never overlap**, and the helpers this paragraph used to list shrank
+with every other function: `oamSetX` 148 → 28 bytes, `oamDrawMeta`
+142 → 64, `oamDrawMetaFlip` 200 → 90, `collideRectEx` 176 → 66,
+`hdmaColorGradient` 162 → 72. Across the examples the median frame went
+from 38 to 16 bytes and no function passes 256 any more (six did, and
+paid for the slower `[tcc__fp],y` addressing).
 
 ---
 

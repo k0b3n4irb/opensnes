@@ -132,3 +132,7 @@ saved to a `.srm` file on disk.
 - **Explore related examples**:
   - `memory/hirom_demo` -- Understand LoROM vs HiROM memory mapping
   - `games/breakout` -- See game state management in a complete game
+
+## Modules Used
+
+`console`, `dma`, `text`, `background`, `sprite`, `input` (`LIB_MODULES` in the Makefile).

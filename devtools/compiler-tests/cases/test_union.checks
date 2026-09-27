@@ -1,0 +1,14 @@
+# Unions are sized by their largest member and every member starts at
+# offset 0; a union inside a struct is aligned as its widest member (ported
+# from opensnes-emu test_union, which only looked for the symbols).
+present ms:\n\tdsb 4\n
+present col:\n\tdsb 2\n
+present var:\n\tdsb 4\n
+# The u32 member: low word 0x5678 at +0, high word 0x1234 at +2.
+in test_union_size: present lda\.w #22136\n\tsta\.w ms\n\tlda\.w #4660\n\tsta\.w ms\+2\n
+# bytes.hi overlays the high byte of color: an 8-bit store at +1.
+in test_color_union: present sta\.w col\n\tsep #\$20\n\tlda #3\n\tsta\.w col\+1\n
+# Variant.value holds a u16, so it sits at offset 2 (after type + pad);
+# small_val and big_val share that offset.
+in test_union_in_struct: present lda #42\n\tsta\.w var\+2\n
+in test_union_in_struct: present lda\.w #1000\n\tsta\.w var\+2\n

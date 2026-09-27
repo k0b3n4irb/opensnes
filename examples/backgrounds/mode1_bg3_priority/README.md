@@ -117,3 +117,7 @@ colors.
 - **Explore related examples**:
   - `scrolling/continuous_scroll` -- Parallax scrolling with multiple BG layers
   - `effects/hdma_wave` -- Per-scanline effects on backgrounds
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `background`, `asset` (`LIB_MODULES` in the Makefile).

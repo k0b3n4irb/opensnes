@@ -180,6 +180,40 @@ fixed lerped = fixLerp(FIX(0), FIX(100), 128);  /* 50.0 — t=128/256=0.5 */
 (returns `a`) to `256` (returns `b`). Linear; the canonical way to
 animate values smoothly between two endpoints.
 
+### Easing curves
+
+`ease_in_quad(t)` and `ease_out_quad(t)` map `t` from 0-255 to a curve
+0-255: the first starts slow and accelerates, the second starts fast and
+settles. They read a 256-byte table in their own module, so add
+`math_ease` to `LIB_MODULES` (without it the link fails, naming the
+table).
+
+```c
+/* start_x < end_x, both u16 */
+u8 t;
+for (t = 0; t < 255; t += 5) {
+    u16 x = start_x + (u16)(((u32)(end_x - start_x) * ease_out_quad(t)) >> 8);
+    oamSetX(0, x);                /* slides in, then settles */
+    WaitForVBlank();
+}
+```
+
+### Random numbers
+
+`rngNext()` returns the next value of a 16-bit linear feedback shift
+register, 1-65535 (never 0). `consoleInit()` seeds it; for a different
+sequence each game, seed it from something the player does:
+
+```c
+if (padPressed(0) & KEY_START) {
+    rngSeed(getFrameCount());     /* the moment START was pressed */
+}
+u16 enemy_x = rngNext() % 256;
+```
+
+A seed of 0 is replaced by a fixed non-zero state (an LFSR stuck at 0
+would stay there).
+
 ## 16.16 when 8.8 runs out of room
 
 `fixed` (8.8) holds ±127.99 in steps of 1/256. That is the right size for a

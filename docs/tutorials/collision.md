@@ -29,6 +29,11 @@ Rect player_box;
 rectInit(&player_box, player_x, player_y, 16, 16);
 ```
 
+When the player moves, `rectSetPos(&player_box, player_x, player_y)`
+moves the box without touching its size, and `rectGetCenter(&box, &cx,
+&cy)` gives its centre — the point to aim at, or to measure a distance
+from.
+
 ## Sprite-to-Sprite Collision
 
 ### Basic Overlap Test

@@ -105,8 +105,15 @@ ifeq ($(SANITIZE),1)
     CPROC_CFLAGS := $(filter-out -O2,$(CPROC_CFLAGS)) -O1 $(SAN_FLAGS)
 endif
 
-$(QBE_DIR)/qbe:
+# FORCE: always hand over to the submodule's own Makefile, which knows its
+# sources. Without it, once qbe / cproc-qbe existed an edit of the fork's
+# sources rebuilt nothing and `make compiler` reinstalled the old binary
+# (found 2026-09-26 on an emit.c change).
+$(QBE_DIR)/qbe: FORCE
 	$(MAKE) -C $(QBE_DIR) CC=clang CFLAGS="$(QBE_CFLAGS)" LDFLAGS="$(STATIC_LDFLAGS)"
+
+.PHONY: FORCE
+FORCE:
 
 # Generate cproc config.h from template (required for non-Linux platforms)
 # Using a template file is more maintainable than multi-line echo commands
@@ -114,7 +121,7 @@ $(CPROC_DIR)/config.h: config.h.in
 	@echo "[CPROC] Generating config.h for w65816 target..."
 	@cp $< $@
 
-$(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h
+$(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h FORCE
 # Only build cproc-qbe (not cproc driver which uses POSIX spawn.h)
 # Use clang for consistent builds across all platforms
 	$(MAKE) -C $(CPROC_DIR) CC="clang -std=c99" CFLAGS="$(CPROC_CFLAGS)" LDFLAGS="$(STATIC_LDFLAGS)" cproc-qbe

@@ -1,0 +1,13 @@
+# The smallest translation unit produces WLA-DX-ready output: WLA
+# directives only (no GNU .byte/.word/.long/.balign, no .dsb without a
+# fill value — the checks of opensnes-emu test_no_dsb_without_data and
+# test_correct_directives), one SUPERFREE section per function in 16-bit
+# mode, and a returned value in A.
+absent (?m)^\s*\.(byte|word|long|balign)\s
+absent (?m)\.dsb\s+\d+\s*$
+present \.SECTION "\.text\.get_value" SUPERFREE\n\.ACCU 16\n\.INDEX 16\nget_value:\n
+in get_value: present lda\.w #42\n\trtl
+in add_one: present lda 4,s\n\tinc a\n\trtl
+# A static in RAM, read-modify-written by address.
+section counter: present \.RAMSECTION
+in increment: present lda\.w counter\n\tinc a\n\tsta \d+,s\n\tsta\.w counter

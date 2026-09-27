@@ -2,6 +2,92 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.46.0] — 2026-09-27
+
+The compiler release. Stack frames are two thirds smaller (temps whose lives
+never overlap share a slot), and two emission-time checks now stop the
+compiler on the bug classes that produced its silent miscompiles. A Super FX
+job can run while the game keeps running. Two library fixes move sprites and
+HDMA to where they belong, every public function is documented, and the test
+suite runs in under four minutes.
+
+### Added
+- feat(lib): **a Super FX job can run while the game keeps running.**
+  `gsuCacheLoad()` puts a GSU program of up to 512 bytes in the GSU's code
+  cache, `gsuStartCached()` starts it and returns at once, `gsuBusy()` /
+  `gsuWait()` follow it. From the cache the GSU does not need the ROM, so
+  the CPU keeps running its game loop (`gsuLaunch()` parks it in WRAM for
+  the whole job). New fixture `devtools/libtests_gsu`: seven game frames
+  during a seven-frame job, no bus violation. Constraints and one open
+  question on luna in the Super FX tutorial.
+
+### Fixed
+- fix(lib): **sprites drawn by the dynamic sprite engine sit on the line
+  you asked for.** `oamSet()` and `oamDrawMeta()` store y − 1 (the PPU
+  draws an OAM Y of N from line N+1); the dynamic engine
+  (`oamDynamic*Draw`, `oamDynamicMetaDraw`) stored y itself, so the same
+  y drew one line lower. Five examples move their sprites up one line:
+  dynamic_sprite, dynamic_metasprite, slope_collision, mapandobjects,
+  likemario.
+- fix(lib): `gsuSetupHdmaBlanking()` no longer switches off every other
+  HDMA channel, nor gets switched off by the next `hdmaEnable()` /
+  `hdmaDisable()`: it arms its channel through the `hdma` module's record
+  of `$420C` (write-only) instead of writing the register. The `superfx`
+  module now depends on `hdma`.
+- fix(luna-test): project tests (`make test`) run on Windows. The harness
+  passed `--out /dev/null` to luna, which `luna.exe` cannot open; the
+  failure was reported as "all assertions pass" next to a FAIL. It now
+  uses the platform's null device and reports luna's own error.
+- fix(build): a zip built from `develop` is named after the tree's
+  version (`snes.h`), not after v0.17.0 (the last tag `git describe`
+  reaches from develop).
+
+### Tests and documentation
+- test: `make tests` runs its luna calls in parallel (3 min 41 on 6 cores,
+  byte-identical reports); corpus liveness takes a second snapshot, so an
+  NMI that dies after boot no longer passes; the harness has its own unit
+  tests; every compiler fixture now asserts its code (41 ported, ratchet at
+  0); six examples' controls are scripted and asserted; the c_features ROM
+  calls functions returning 32-bit values.
+- test: luna v1.28.0 — manifests name array elements as `symbol+N`, an
+  empty controller port is tested one port at a time, and the SA-1 speed of
+  `sa1_starfield` is measured (~8.6 MHz; tutorial updated).
+- docs: the 81 public functions no page mentioned are documented (new
+  interrupts tutorial); `docs/tools/build.md` lists every Makefile knob, and
+  the doc sentinel fails on one it does not name (`BPP`, read by nothing, is
+  gone); `MAINTAINING.md` says what a successor needs; `compiler/ABI.md` no
+  longer says 32-bit values return through the stack.
+
+### Changed
+- perf(compiler): **stack frames are two thirds smaller.** Temps whose lives
+  never overlap now share a stack slot (slot colouring from liveness, qbe
+  `794c6e3`). Over the examples: median frame 38 → 16 bytes, largest 518 →
+  214, none past 256 any more (six functions were, in the slower
+  large-frame addressing), 16 776 → 5 826 bytes in total; the deepest stack
+  of the library fixture leaves 880 bytes above the C variables instead of
+  572. An emission-time check stops the compiler if a temp is read from a
+  slot another temp overwrote. Programs compute the same values: the ROMs
+  render identically, except two whose loops now finish more work per frame
+  (sprite_swarm starts one frame sooner, mode2 misses two frames fewer).
+- refactor(examples): **`hdma/hdma_wave` and `hdma/hdma_wave_table` are one
+  example** (decided 2026-09-05): the hand-built table animated krom-style
+  at boot, pixel-identical to the old `hdma_wave_table` at both capture
+  points, then A hands the ripple to the `hdma` module's `hdmaWaveH` with
+  LEFT/RIGHT for the amplitude. The corpus goes from 85 to 84 examples.
+- fix(compiler): four upstream cproc fixes and one QBE fix are absorbed
+  without a resync: character constants with a hex or octal escape above
+  0x7F (`'\xFF'`), overflow while parsing escapes, overflow in array
+  growth, and QBE's exponential time in `usewidthle()`. Every ROM of the
+  corpus is byte-identical; the forks' own suites pass with no new
+  known-fail.
+- feat(compiler): **the emitter checks the class of bug that produced four
+  silent miscompiles in three months** — a 32-bit value whose high word no
+  instruction wrote. Every high-word read now requires a prior write, or
+  compilation stops with an internal compiler error naming the value and
+  the function (`QBE_KL_CHECK_WARN=1` lists every hit instead). A copy of
+  a 32-bit value now moves both words. 0 hits over the library, every
+  example and the compiler fixtures; ROMs byte-identical.
+
 ## [0.45.0] — 2026-09-26
 
 The state-of-the-project release. Eight audit agents read the SDK aspect by

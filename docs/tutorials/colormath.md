@@ -171,6 +171,10 @@ lib has no function for the clip bits yet.
 | `colorMathSetSource(src)` | `COLORMATH_SRC_SUBSCREEN` or `COLORMATH_SRC_FIXED`. |
 | `colorMathSetFixedColor(r, g, b)` | Set the fixed-colour value (5-bit per channel). Used when source is `_FIXED`. |
 | `colorMathSetCondition(condition)` | Window region where math is allowed: `_ALWAYS` / `_INSIDE` / `_OUTSIDE` / `_NEVER` (CGWSEL bits 5-4). |
+| `colorMathSetChannel(channel, intensity)` | Set one channel of the fixed colour (`COLDATA_RED`, `COLDATA_GREEN`, `COLDATA_BLUE`, OR-able) to 0-31, leaving the others as they are. |
+| `colorMathSetBrightness(level)` | The fixed colour as a grey of 0-31, for fades: with `COLORMATH_ADD` it fades toward white, with `COLORMATH_SUB` toward black. |
+| `colorMathTransparency50(layers)` | One call for a 50 % blend of `layers` with the sub screen (add, halve, sub-screen source). Put the layer to show through on the sub screen with `setSubScreen()`. |
+| `colorMathSetDirectColor(enable)` | 8bpp layers read each pixel byte as a colour instead of a CGRAM index — see `examples/color/direct_color`. |
 
 ## Worked patterns (the two shipped examples)
 

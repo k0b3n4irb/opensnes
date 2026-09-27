@@ -32,22 +32,22 @@ alongside the other `devtools/` linters. See
 
 - **Fixtures**: all 66 `cases/*.c` recovered from the opensnes-emu repo
   (`feat/functional-probes` ref).
-- **Ported so far** (have a `.checks`, all passing): `const_data`,
-  `section_directives`, `tail_call`, `nonleaf_frameless`, `arg_push_order`,
-  `shift_right`, `word_extend`, `multiply`, `return_value`, `static_vars`,
-  plus the C4 batch 1 set (2026-09-15): `test_acache_pha`,
-  `test_cmp_dead_store`, `test_commutative_swap`,
-  `test_dead_store_elimination`, `test_mul_dead_store`, `test_inline_mul`,
-  `test_inline_boundaries`, `test_xba_shift`, `test_signed_division`,
-  `test_stack_adjust`, `test_volatiles`, `test_switch`,
-  `test_static_mutable`, `test_string_init`. The unchecked ratchet
-  (`MAX_UNCHECKED` in `run.py`) tracks the remainder.
-- **TODO**: the remaining fixtures (`run.py --list`). Port each by reading its
-  original check in the opensnes-emu `compiler-tests.mjs`
-  (`gh api repos/k0b3n4irb/opensnes-emu/contents/test/phases/compiler-tests.mjs?ref=feat/functional-probes`)
-  and translating its assertions into a `.checks` file. A few checks are bespoke
-  (ordered sequences, epilogue tax/txa proximity); extend the DSL in `run.py` if a
-  rule doesn't fit `present`/`absent`/`count`/`in`/`section`.
+- **Ported so far**: every fixture (76/76, `MAX_UNCHECKED = 0`). The first
+  ten (`const_data`, `section_directives`, `tail_call`, `nonleaf_frameless`,
+  `arg_push_order`, `shift_right`, `word_extend`, `multiply`,
+  `return_value`, `static_vars`), then C4 batch 1 (2026-09-15, 14
+  fixtures), then C4 batch 2 (2026-09-26, the last 41). Batch 2 translated
+  the opensnes-emu check where one existed and otherwise asserted the
+  property the fixture's comment names; most original checks only looked
+  for a symbol, so the new ones pin values, offsets and control flow.
+  Phi fixtures use regex backreferences so the check is the pairing itself
+  (an update's source slot is the slot its result is written back to), and
+  each file was verified to fail on a hand-made mutation of its property.
+  Where a check pins frame offsets (`test_variable_shift_bug`,
+  `test_forloop_array`), its comment says how to re-derive them.
+- **New fixtures** ship with a `.checks` (the ratchet is at 0). If a rule
+  doesn't fit `present`/`absent`/`count`/`in`/`section`, extend the DSL in
+  `run.py` rather than weakening the check.
 
 ## Runtime fixture ROMs (`runtime/`)
 

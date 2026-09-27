@@ -197,6 +197,10 @@ ASMSRC      := data.asm
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `input`, `background`, `dma` (`LIB_MODULES` in the Makefile).
+
 ## Technical Reference
 
 | Register | Address | Role in this example |

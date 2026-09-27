@@ -177,6 +177,10 @@ Configure the emulator for two controllers.
 
 ---
 
+## Modules Used
+
+`console`, `input`, `sprite`, `dma`, `text` (`LIB_MODULES` in the Makefile).
+
 ## Files
 
 | File | Purpose |

@@ -59,6 +59,11 @@ oamSet(0, 100, 80, 0, 0, 0, 0);  // Sprite 0 at (100, 80), tile 0
 oamSet(1, 120, 80, 0, 1, 0, 0);  // Sprite 1 with palette 1
 ```
 
+To move a sprite that is already set, change only its position:
+`oamSetXY(id, x, y)`, or `oamSetX(id, x)` when only X changes (a
+horizontal shooter's scroll, a sprite sliding along a rail). Tile,
+palette and flags stay as `oamSet()` left them.
+
 ### Updating OAM
 
 ```c

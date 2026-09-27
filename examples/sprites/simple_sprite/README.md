@@ -130,3 +130,7 @@ an offset from this base.
 - **Explore related examples**:
   - `sprites/animated_sprite` -- Add movement and animation frames
   - `sprites/dynamic_sprite` -- Stream sprite tiles to VRAM each frame
+
+## Modules Used
+
+`console`, `dma`, `sprite` (`LIB_MODULES` in the Makefile).

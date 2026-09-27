@@ -1,0 +1,12 @@
+# A shift by a runtime count emits a counted loop; the historical bug
+# dropped it (`1 << idx` became `lda.w #1`). Offsets follow the
+# left-to-right ABI: the count is the last-pushed argument, and `pha` of
+# the value moves it 2 bytes further (ported from opensnes-emu
+# test_variable_shift, strengthened with the loop shape).
+in shift_left_var: present lda 6,s\n\tpha\n\tlda 6,s\n\ttax\n\tpla\n\tcpx #0\n\tbeq \+\n-\tasl a\n\tdex\n\tbne -
+in shift_right_var: present lda 6,s\n\tpha\n\tlda 6,s\n\ttax\n\tpla\n\tcpx #0\n\tbeq \+\n-\tlsr a\n\tdex\n\tbne -
+# 1 << idx: the constant 1 is shifted, the count is the only argument.
+in compute_bitmask: present lda\.w #1\n\tpha\n\tlda 6,s\n\ttax\n\tpla\n\tcpx #0\n\tbeq \+\n-\tasl a
+# (reg >> shift) & mask: reg at 8,s, shift at 6,s (+2 after pha), mask at 4,s.
+in extract_field: present lda 8,s\n\tpha\n\tlda 8,s\n\ttax\n\tpla
+in extract_field: present -\tlsr a\n\tdex\n\tbne -\n\+\n\tand 4,s

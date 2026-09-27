@@ -1,0 +1,18 @@
+# The hdma_wave-shaped function: many conditional updates of u8 globals,
+# then a result that combines them (offsets[state_b] + state_d * 3) or
+# stays 0. Checked: the u8 globals are re-read from memory where they may
+# have changed, the combination uses the right operands, and the result's
+# two incoming values meet in one slot that is returned. No original check
+# existed (opensnes-emu only compiled it).
+# state_d * 3 computed inline into a slot (\1), added to offsets[state_b]
+# read with the indexed long form (const table, #121), both into the
+# result slot (\2) that the function returns; the other arm stores 0 there.
+in complex_loop: present lda\.w state_d\n\trep #\$20\n\tand\.w #\$00FF\n\tsta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\tsta (\d+),s\n\tsep #\$20\n\tlda\.w state_b\n\trep #\$20\n\tand\.w #\$00FF\n[\s\S]*?asl a\n[\s\S]*?tax\n\tlda\.l offsets,x\n\tclc\n\tadc \1,s\n\tsta \d+,s\n\tsta (\d+),s\n@if_false\.\d+:\n\tlda \2,s\n\ttax
+in complex_loop: present bne \+\n\tlda\.w #0\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n[\s\S]*sta \1,s\n@if_false\.\d+:\n\tlda \1,s\n\ttax
+# state_b++ writes the incremented value back as a byte; state_b-- too.
+in complex_loop: present lda \d+,s\n\tinc a\n\tsep #\$20\n\tsta\.w state_b\n
+in complex_loop: present lda \d+,s\n\tdec a\n\tsep #\$20\n\tsta\.w state_b\n
+# state_d + 1, stored, then compared to 112 from the same value.
+in complex_loop: present lda\.w state_d\n\trep #\$20\n\tand\.w #\$00FF\n\tinc a\n\tsta (\d+),s\n\tsep #\$20\n\tsta\.w state_d\n\trep #\$20\n\tlda \1,s\n\tand\.w #\$00FF\n\tsec\n\tsbc\.w #112
+# The masks of `pressed` all test the value read_input returned.
+in complex_loop: present jsl read_input\n\tsta (\d+),s\n\tand\.w #128\n[\s\S]*lda \1,s\n\tand\.w #256\n[\s\S]*lda \1,s\n\tand\.w #512\n[\s\S]*lda \1,s\n\tand\.w #2048\n[\s\S]*lda \1,s\n\tand\.w #1024\n

@@ -1,0 +1,12 @@
+# Adding or subtracting 1 (mod 2^16) is `inc a` / `dec a` instead of
+# clc+adc / sec+sbc; any other constant keeps the add (ported from
+# opensnes-emu test_inc_dec).
+in increment: present lda 4,s\n\tinc a\n\trtl
+in increment: absent clc
+in decrement: present lda 4,s\n\tdec a\n\trtl
+in decrement: absent sec
+# x + 0xFFFF == x - 1, x - 0xFFFF == x + 1.
+in add_ffff: present lda 4,s\n\tdec a\n\trtl
+in sub_ffff: present lda 4,s\n\tinc a\n\trtl
+in add_five: present clc\n\tadc\.w #5
+in add_five: absent \b(inc|dec) a\b

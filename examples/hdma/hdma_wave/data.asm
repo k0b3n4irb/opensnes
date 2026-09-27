@@ -1,30 +1,35 @@
-;==============================================================================
-; HDMA Wave — Pre-computed sine wave tables
-;==============================================================================
-; 7 amplitude levels (0, 4, 8, 12, 16, 20, 24 pixels peak displacement) ×
-; 1006 bytes per table (335 HDMA entries × 3 bytes + 1 end marker) =
-; 7042 bytes total.
+;----------------------------------------------------------------------
+; HDMA Wave — Mode 3 background data (256 colors, 8bpp) + krom's table
 ;
-; Each entry: { 0x81, scroll_lo, scroll_hi }
-;   - 0x81 = repeat flag (bit 7) + 1 scanline count (bits 6-0)
-;   - scroll_lo, scroll_hi: signed 16-bit BG1HOFS offset
-;
-; The raw binary lives in res/hdma_wave_tables.bin. Until v0.20.x this
-; data was inline in main.c as a `static const u8` array (~408 lines);
-; lifting it out lets the linker place it in any bank and brings main.c
-; from 661 → ~250 lines. The C side accesses it via:
-;
-;     extern u8 hdma_tables[];
-;     hdmaSetup(... &hdma_tables[amp_offset]);
-;
-; The 4-byte Kl pointer carries the bank byte (post-A6+A7 ABI), so the
-; hdma helpers can reach the data regardless of placement.
-;==============================================================================
+; Original procedural water-caustics art (res/water.bmp, generated —
+; no krom assets). Tileset >32KB: split across two SUPERFREE sections
+; (LoROM bank limit); post-A6 C pointers carry the bank byte and
+; dmaCopyVram reads it directly.
+;----------------------------------------------------------------------
 
-ASSET_SECTION ".rodata_hdma_wave_tables"
+ASSET_SECTION ".rodata1"
 
-hdma_tables:
-    .incbin "res/hdma_wave_tables.bin"
-hdma_tables_end:
+tiles:      .incbin "res/water.pic" skip 0 read 32768
+tiles_end:
+
+.ends
+
+ASSET_SECTION ".rodata2"
+
+tiles2:     .incbin "res/water.pic" skip 32768
+tiles2_end:
+
+tilemap:    .incbin "res/water.map"
+tilemap_end:
+
+palette:    .incbin "res/water.pal"
+palette_end:
+
+; krom's exact HDMA wave table, extracted verbatim from WaveHDMA.asm
+; (896 entries [1][off16] + terminator; his generator's quasi-period is
+; ~25.8 lines, hence the 672-entry seamless wrap). Data of the original
+; demo's technique, credited — the ART assets remain original.
+wavetable:  .incbin "res/wavetable.bin"
+wavetable_end:
 
 .ends

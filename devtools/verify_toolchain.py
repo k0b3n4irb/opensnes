@@ -77,6 +77,52 @@ def submodule_head(path: Path) -> str | None:
         return None
 
 
+# `### compiler/<name> — N patches since <base> …`: the one count of local
+# patches, checked against git (the audit of 2026-09-26 found three counts
+# in the repo, none equal to git). <base> is the first tag or hex SHA after
+# "since".
+PATCH_HEADING = re.compile(
+    r"^### (compiler/[\w-]+) \u2014 (\d+) patch(?:es)? since\b(.*)$", re.M)
+BASE_TOKEN = re.compile(r"\b(v\d+(?:\.\d+)*|[0-9a-f]{7,40})\b")
+
+
+def check_patch_counts(root: Path, pins_text: str,
+                       pinned: list[str]) -> tuple[list[str], list[str]]:
+    """(errors, notes) for the per-submodule patch counts in PINS.md."""
+    errors, notes = [], []
+    seen = {}
+    for m in PATCH_HEADING.finditer(pins_text):
+        base = BASE_TOKEN.search(m.group(3))
+        if not base:
+            errors.append(f"{m.group(1)}: no base (tag or SHA) after 'since'")
+            continue
+        seen[m.group(1)] = (int(m.group(2)), base.group(1))
+    for path in pinned:
+        if path not in seen:
+            errors.append(f"{path}: no '### {path} <em-dash> N patches since <base>' "
+                          "heading")
+            continue
+        claimed, base = seen[path]
+        sub = root / path
+        shallow = subprocess.run(["git", "-C", str(sub), "rev-parse",
+                                  "--is-shallow-repository"],
+                                 capture_output=True, text=True).stdout.strip()
+        if shallow == "true":
+            notes.append(f"{path}: shallow clone, patch count not checked")
+            continue
+        rev = subprocess.run(["git", "-C", str(sub), "rev-list", "--count",
+                              f"{base}..HEAD"], capture_output=True, text=True)
+        if rev.returncode != 0:
+            errors.append(f"{path}: base {base} not found in the submodule")
+            continue
+        actual = int(rev.stdout.strip())
+        if actual != claimed:
+            errors.append(f"{path}: PINS.md says {claimed} patches since {base}, "
+                          f"git says {actual} (git -C {path} rev-list --count "
+                          f"{base}..HEAD)")
+    return errors, notes
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument(
@@ -131,6 +177,16 @@ def main() -> int:
             "If the drift is intentional: update compiler/PINS.md with the new\n"
             "SHA in the same commit, then re-run this check.\n"
         )
+        return 1
+
+    errors, notes = check_patch_counts(
+        args.root, pins_path.read_text(encoding="utf-8"), [p for p, _, _ in pins])
+    for n in notes:
+        print(f"note: {n}")
+    if errors:
+        sys.stderr.write("PATCH COUNT drift in " + PINS_FILE + ":\n")
+        for e in errors:
+            sys.stderr.write(f"  {e}\n")
         return 1
 
     # ASCII only — Windows cp1252 stdout breaks on non-Latin1 characters.

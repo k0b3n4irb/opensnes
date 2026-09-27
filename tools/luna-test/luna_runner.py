@@ -43,6 +43,7 @@ import shutil
 import subprocess
 import sys
 import tomllib
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -50,7 +51,7 @@ HERE = Path(__file__).resolve().parent
 BASELINE_DIR = HERE / "baselines"
 # Single source of truth for the pin: tools/luna-test/luna.version (what
 # install-luna.sh downloads). Read it here too so a version bump touches one file.
-LUNA_VERSION = (HERE / "luna.version").read_text().strip()
+LUNA_VERSION = (HERE / "luna.version").read_text(encoding="utf-8").strip()
 # Capture points are PPU FRAMES (`luna --until-frame N`), not instruction counts:
 # a codegen change that shifts the instruction count of a frame cannot move the
 # capture onto another animation phase (luna issue #222; before v1.18.0 the
@@ -94,9 +95,10 @@ def find_luna() -> str:
     env = os.environ.get("LUNA_BIN")
     if env and Path(env).is_file():
         return env
-    installed = HERE / "bin" / "luna"  # scripts/install-luna.sh target
-    if installed.is_file():
-        return str(installed)
+    for name in ("luna", "luna.exe"):  # scripts/install-luna.sh target (.exe on Windows)
+        installed = HERE / "bin" / name
+        if installed.is_file():
+            return str(installed)
     on_path = shutil.which("luna")
     if on_path:
         return on_path
@@ -189,10 +191,29 @@ def liveness(state: dict) -> tuple[bool, str]:
         return False, "no NMIs serviced (VBlank handshake dead)"
     # NOTE: frames - nmis is the boot offset (frames before NMI was enabled),
     # which varies by example init (audio drivers load in forced blank; GSU
-    # compute) — it is NOT lag, so we do not gate on the ratio. Catching a
-    # frozen-after-boot ROM would need a two-snapshot delta (nmis advanced
-    # between N1 and N2) — noted as future hardening.
+    # compute) — it is NOT lag, so we do not gate on the ratio. An NMI that
+    # dies after boot is caught by the second snapshot in coverage().
     return True, f"live ({frames}f/{nmis}nmi)"
+
+
+# Second liveness snapshot, SECOND_SNAPSHOT frames after the first: the NMI
+# count must still advance. `nmis_serviced > 0` alone passes a ROM whose NMI
+# died after boot (NMI disabled, or a hang with interrupts masked). Transitory
+# prototype (luna_tooling.md): a `last_nmi_frame` in luna's scheduler state
+# would give the same answer from the first run; requested in
+# .claude/notes/partners/luna/OPEN_luna.md.
+SECOND_SNAPSHOT = 30
+
+
+def nmi_still_alive(first: dict, second: dict) -> tuple[bool, str]:
+    n1 = first.get("scheduler", {}).get("nmis_serviced", 0)
+    n2 = second.get("scheduler", {}).get("nmis_serviced", 0)
+    if second.get("cpu", {}).get("stopped"):
+        return False, "CPU stopped (STP) after the first snapshot"
+    if n2 <= n1:
+        return False, (f"NMI died after boot: {n1} NMIs at the first snapshot, "
+                       f"{n2} {SECOND_SNAPSHOT} frames later")
+    return True, f"+{n2 - n1}nmi/{SECOND_SNAPSHOT}f"
 
 
 def discover_example_roms() -> list[Path]:
@@ -267,22 +288,23 @@ def run(update: bool, only: str | None) -> int:
     manifest = load_manifest()
     BASELINE_DIR.mkdir(parents=True, exist_ok=True)
     manifest_path = BASELINE_DIR / "baselines.json"
-    db = json.loads(manifest_path.read_text()) if manifest_path.is_file() else {}
+    db = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
 
     def _png_for(base_dir: Path, label: str, frame: int, first: bool) -> Path:
         return base_dir / (f"{label}.png" if first else f"{label}@{frame}.png")
 
-    failures, count = 0, 0
-    for rom in discover_example_roms():
+    # One example = one independent set of luna runs: they go through a
+    # pool (LUNA_JOBS, default the CPU count); lines are printed and the
+    # baselines folded in corpus order afterwards.
+    def one(rom: Path) -> tuple[list[str], int, int, tuple | None]:
+        """(lines, counted, failed, (label, db entry) on --update)."""
         key = example_key(rom)
         label = key.replace("/", "_")
         if only and only not in label:
-            continue
+            return [], 0, 0, None
         fw = missing_firmware(key, manifest)
         if fw:
-            print(f"  SKIP  {label} (needs coprocessor firmware '{fw}' — not installed)")
-            continue
-        count += 1
+            return [f"  SKIP  {label} (needs coprocessor firmware '{fw}' — not installed)"], 0, 0, None
         points = capture_frames(key, manifest)
         if update:
             # fbhash of an all-black 256x224 frame — a broken ROM must not
@@ -296,72 +318,82 @@ def run(update: bool, only: str | None) -> int:
                 hashes.append(fbhash)
                 wdm_any = wdm_any or wdm
             if BLACK_FBHASH in hashes and not os.environ.get("ALLOW_BLANK_BASELINE"):
-                print(f"  REFUSED  {label}: capture is an ALL-BLACK frame — broken ROM? "
-                      f"(ALLOW_BLANK_BASELINE=1 to override)")
-                failures += 1
-                continue
+                return [f"  REFUSED  {label}: capture is an ALL-BLACK frame — broken ROM? "
+                        f"(ALLOW_BLANK_BASELINE=1 to override)"], 1, 1, None
             single = len(points) == 1
-            db[label] = {"fbhash": hashes[0] if single else hashes,
-                         "frames": points[0] if single else points,
-                         "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
-            print(f"  BASELINE  {label}  fbhash={','.join(hashes)}"
-                  + ("  ⚠ in-ROM SNES_ASSERT/WDM fired!" if wdm_any else ""))
-        else:
-            ref = db.get(label)
-            if not ref:
-                print(f"  MISS  {label}: no baseline — run --update first")
-                failures += 1
-                continue
-            if "frames" not in ref:
-                print(f"  MISS  {label}: baseline is instruction-count keyed (pre-frame "
-                      f"harness) — run --update first")
-                failures += 1
-                continue
-            ref_points = frame_points(ref["frames"])
-            ref_hashes = ref["fbhash"] if isinstance(ref["fbhash"], list) else [ref["fbhash"]]
-            bad = []
-            wdm_any = False
-            err = None
-            for i, (frame, want) in enumerate(zip(ref_points, ref_hashes)):
-                actual_png = _png_for(Path("/tmp/luna-test-actual"), label, frame, i == 0)
-                try:
-                    fbhash, wdm = render(luna, rom, frame, actual_png, extra=res_args(key, manifest))
-                except RuntimeError as e:
-                    err = str(e)
-                    break
-                wdm_any = wdm_any or wdm
-                if fbhash != want:
-                    bad.append(f"@frame {frame}: {fbhash} != {want} ({actual_png})")
-            if err:
-                print(f"  ERROR {label}: {err}")
-                failures += 1
-            elif wdm_any:
-                print(f"  FAIL  {label}: in-ROM SNES_ASSERT/WDM fired during run")
-                failures += 1
-            elif bad:
-                detail = "; ".join(bad)
-                note = ("" if len(bad) == len(ref_points) else
-                        f" [{len(bad)}/{len(ref_points)} points — phase drift?]")
-                print(f"  FAIL  {label}: {detail}{note}")
-                failures += 1
-            else:
-                print(f"  PASS  {label}" + (f" ({len(ref_points)} points)" if len(ref_points) > 1 else ""))
+            entry = {"fbhash": hashes[0] if single else hashes,
+                     "frames": points[0] if single else points,
+                     "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
+            return [f"  BASELINE  {label}  fbhash={','.join(hashes)}"
+                    + ("  ⚠ in-ROM SNES_ASSERT/WDM fired!" if wdm_any else "")], 1, 0, (label, entry)
+        ref = db.get(label)
+        if not ref:
+            return [f"  MISS  {label}: no baseline — run --update first"], 1, 1, None
+        if "frames" not in ref:
+            return [f"  MISS  {label}: baseline is instruction-count keyed (pre-frame "
+                    f"harness) — run --update first"], 1, 1, None
+        ref_points = frame_points(ref["frames"])
+        ref_hashes = ref["fbhash"] if isinstance(ref["fbhash"], list) else [ref["fbhash"]]
+        bad = []
+        wdm_any = False
+        err = None
+        for i, (frame, want) in enumerate(zip(ref_points, ref_hashes)):
+            actual_png = _png_for(Path("/tmp/luna-test-actual"), label, frame, i == 0)
+            try:
+                fbhash, wdm = render(luna, rom, frame, actual_png, extra=res_args(key, manifest))
+            except RuntimeError as e:
+                err = str(e)
+                break
+            wdm_any = wdm_any or wdm
+            if fbhash != want:
+                bad.append(f"@frame {frame}: {fbhash} != {want} ({actual_png})")
+        if err:
+            return [f"  ERROR {label}: {err}"], 1, 1, None
+        if wdm_any:
+            return [f"  FAIL  {label}: in-ROM SNES_ASSERT/WDM fired during run"], 1, 1, None
+        if bad:
+            detail = "; ".join(bad)
+            note = ("" if len(bad) == len(ref_points) else
+                    f" [{len(bad)}/{len(ref_points)} points — phase drift?]")
+            return [f"  FAIL  {label}: {detail}{note}"], 1, 1, None
+        return [f"  PASS  {label}" + (f" ({len(ref_points)} points)" if len(ref_points) > 1 else "")], 1, 0, None
+
+    failures, count = 0, 0
+    for lines, counted, failed, entry in _pool_map(one, discover_example_roms()):
+        for line in lines:
+            print(line)
+        count += counted
+        failures += failed
+        if entry:
+            db[entry[0]] = entry[1]
 
     if update:
-        manifest_path.write_text(json.dumps(db, indent=2, sort_keys=True) + "\n")
+        manifest_path.write_text(json.dumps(db, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(f"\nWrote {manifest_path.relative_to(REPO_ROOT)} ({count} entries).")
     print(f"\n{'UPDATE' if update else 'COMPARE'}: {count - failures}/{count} ok"
           + (f", {failures} failed" if failures else ""))
     return 1 if failures else 0
 
 
-def render_state(luna: str, rom: Path, frame: int, png: Path,
+def _pool_map(fn, items) -> list:
+    """fn over items through a thread pool (each call waits on a luna
+    subprocess), results in the order of items. LUNA_JOBS sets the width,
+    default the CPU count; LUNA_JOBS=1 is the old serial run."""
+    workers = max(1, int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        return list(pool.map(fn, list(items)))
+
+
+def render_state(luna: str, rom: Path, frame: int, png: Path | None,
                  extra: list[str] | None = None) -> dict:
     """Run `luna state --until-frame` → parsed EmulatorState JSON (+ write a PNG)."""
-    png.parent.mkdir(parents=True, exist_ok=True)
+    shot = []
+    if png is not None:
+        png.parent.mkdir(parents=True, exist_ok=True)
+        shot = ["--screenshot", str(png)]
     proc = subprocess.run(
         [luna, "state", "--until-frame", str(frame), *power_on_args(), *region_args(),
-         *(extra or []), "--out", "-", "--screenshot", str(png), str(rom)],
+         *(extra or []), "--out", "-", *shot, str(rom)],
         capture_output=True, text=True, timeout=300,
     )
     if proc.returncode != 0:
@@ -381,8 +413,8 @@ def coverage(luna: str) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest = load_manifest()
     roms = discover_example_roms()  # canonical N_corpus (via main.c, skips residue)
-    rows, ok, inputdep, dead, fail = [], 0, 0, 0, 0
-    for rom in roms:
+    def one(rom: Path) -> tuple[str, str, str]:
+        """(key, status, detail) for one ROM."""
         key = example_key(rom)
         cfg = manifest["examples"].get(key, {})
         # Liveness wants the LATEST configured point (most frames = most signal).
@@ -391,22 +423,27 @@ def coverage(luna: str) -> int:
         try:
             state = render_state(luna, rom, frame, png, extra=res_args(key, manifest))
         except Exception as e:  # noqa: BLE001 — bench-style panic-safety
-            fail += 1
-            rows.append((key, "FAIL", str(e)[:80]))
-            print(f"  {'FAIL':9} {key}: {str(e)[:80]}")
-            continue
+            return key, "FAIL", str(e)[:80]
         live, why = liveness(state)
+        if live and not POWER_ON:
+            try:
+                later = render_state(luna, rom, frame + SECOND_SNAPSHOT, None,
+                                     extra=res_args(key, manifest))
+                live, why2 = nmi_still_alive(state, later)
+                why = f"{why}, {why2}" if live else why2
+            except Exception as e:  # noqa: BLE001
+                live, why = False, f"second snapshot failed: {str(e)[:60]}"
         if not live:
-            dead += 1
-            status = "DEAD"
-        elif cfg.get("input_dependent"):
-            inputdep += 1
-            status = "INPUT-DEP"
-        else:
-            ok += 1
-            status = "OK"
-        rows.append((key, status, why))
-        print(f"  {status:9} {key}  ({why})")
+            return key, "DEAD", why
+        return key, ("INPUT-DEP" if cfg.get("input_dependent") else "OK"), why
+
+    rows = _pool_map(one, roms)
+    counts = {s: sum(1 for _, st, _ in rows if st == s)
+              for s in ("OK", "INPUT-DEP", "DEAD", "FAIL")}
+    ok, inputdep, dead, fail = (counts["OK"], counts["INPUT-DEP"],
+                                counts["DEAD"], counts["FAIL"])
+    for key, status, why in rows:
+        print(f"  {status:9} {key}" + (f": {why}" if status == "FAIL" else f"  ({why})"))
 
     # The committed report describes the default (zero-fill) pass; a
     # --power-on pass prints its verdict but leaves the file alone.
@@ -418,7 +455,8 @@ def coverage(luna: str) -> int:
         f"{' --power-on ' + POWER_ON if POWER_ON else ''} per ROM · {len(roms)} ROMs · "
         f"**{ok} OK, {inputdep} INPUT-DEP, {dead} DEAD, {fail} FAIL**",
         "",
-        "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted) — not "
+        "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and "
+        f"the NMI count still advancing {SECOND_SNAPSHOT} frames later) — not "
         "a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input "
         "(Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a "
         "clean functional pass. **DEAD** = ran but not live (crash/hang). "
@@ -430,7 +468,7 @@ def coverage(luna: str) -> int:
     ]
     lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
     if not POWER_ON and not REGION:
-        report.write_text("\n".join(lines) + "\n")
+        report.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"\nCoverage{variant_label()}: "
           f"{ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL of {len(roms)}.")
     if not POWER_ON and not REGION:

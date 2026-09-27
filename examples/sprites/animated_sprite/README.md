@@ -126,3 +126,7 @@ the 16-tile-per-row VRAM layout).
 - **Explore related examples**:
   - `sprites/dynamic_sprite` -- Stream frames instead of pre-loading all of them
   - `games/breakout` -- Multiple sprites interacting with game logic
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `input`, `anim` (`LIB_MODULES` in the Makefile).

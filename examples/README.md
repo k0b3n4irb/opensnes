@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 85 examples organized by topic, building
+Learn SNES development step by step. 84 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -12,7 +12,7 @@ from basic concepts to complete games.
 | [basics/](basics/) | 8 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
 | [backgrounds/](backgrounds/) | 8 | BG modes 0/1/2/3/5, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
-| [hdma/](hdma/) | 5 | Per-scanline HDMA effects: gradients, waves, raster |
+| [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 7 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks |
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
 | [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
@@ -59,8 +59,7 @@ deep-dive of a step below.
 |---|---------|---------------------|
 | 13 | [scrolling/continuous_scroll](scrolling/continuous_scroll/) | Streaming background scroll with dynamic tile loading |
 | 14 | [scrolling/mixed_scroll](scrolling/mixed_scroll/) | Multiple BG layers scrolling at different rates |
-| 15 | [hdma/hdma_wave](hdma/hdma_wave/) | HDMA scanline wave distortion |
-| 15b | [hdma/hdma_wave_table](hdma/hdma_wave_table/) | Raw HDMA table built in C, krom-style repoint animation |
+| 15 | [hdma/hdma_wave](hdma/hdma_wave/) | HDMA wave: build the table by hand (krom port), then use the hdma module |
 | 15c | [hdma/hdma_indirect_gradient](hdma/hdma_indirect_gradient/) | Indirect HDMA: pointer table drives a backdrop gradient (krom port) |
 | 15d | [color/hicolor_1792](color/hicolor_1792/) | H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port) |
 | 15e | [mode7/perspective_rotate](mode7/perspective_rotate/) | Full Mode 7 matrix per scanline: rotating perspective (krom port) |

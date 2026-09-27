@@ -370,6 +370,8 @@ sub-waves (like 5a/5b) so each stays digestible; after the last,
 `graphics/` is empty → `rmdir`.
 - **7a `hdma/` (HDMA & raster)** — `gradient_colors`, `hdma_indirect_gradient`,
   `hdma_helpers` move; **MERGE `hdma_wave` + `hdma_wave_table` → one rung 6e.4**
+  (**done 2026-09-26**: `hdma_wave` keeps the name, krom's table and water
+  art at boot, `hdmaWaveH` on A)
   ("build the table, then use the helper" — the canonical hardcoded-then-asset
   progression). The merge is a new op: keep one dir, fold the other's lesson
   into its README/main.c, `git rm` the second, drop its baseline+nav. Optional

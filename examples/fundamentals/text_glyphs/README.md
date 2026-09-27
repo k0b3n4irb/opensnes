@@ -263,6 +263,10 @@ source files via `ASMSRC`.
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `dma`, `background` (`LIB_MODULES` in the Makefile).
+
 ## Technical Reference
 
 | Register | Address | Role in this example |

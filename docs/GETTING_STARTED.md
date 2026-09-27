@@ -45,9 +45,12 @@ sudo dnf install make
 
 ### A2. Get an Emulator
 
-luna (the SDK test/debug backend, installed by `scripts/install-luna.sh`)
-covers headless debugging — see `tutorials/debugging.md`. For playing your
-ROM in a window, pick any GUI emulator:
+**luna** is the SDK's emulator: it plays ROMs, runs the test harness and
+debugs (`tutorials/debugging.md`). `scripts/install-luna.sh` fetches the
+pinned release for Linux, macOS or Windows (MSYS2 / Git Bash) into
+`tools/luna-test/bin/`: `luna` (headless: tests, state, debugging) and
+`luna-gui` (a window you play in). Any other SNES emulator works too, for a second
+opinion:
 
 | Emulator | Best For | Download |
 |----------|----------|----------|
@@ -76,17 +79,12 @@ The SDK comes with pre-built example ROMs:
 ```bash
 cd opensnes/examples/text/print_string
 
-# Open in your emulator
-mesen print_string.sfc        # Linux
-open -a Mesen print_string.sfc  # macOS
-start Mesen.exe print_string.sfc  # Windows
+# Play it in luna's window (install it once from the SDK root: scripts/install-luna.sh)
+../../../tools/luna-test/bin/luna-gui print_string.sfc
 ```
 
-> **Note:** `mesen` must be on your `PATH` for the Linux command above. Install
-> Mesen from [mesen.ca](https://www.mesen.ca/) and either add its directory to
-> `PATH` or alias it (`alias mesen=~/Mesen/Mesen`). No emulator installed? The
-> SDK's own `luna` backend also plays ROMs: `luna print_string.sfc` (install it
-> once with `scripts/install-luna.sh`).
+> Any other SNES emulator opens the `.sfc` as well (Mesen, bsnes, Snes9x —
+> see the table above).
 
 You should see "Hello World!" on screen.
 

@@ -8,11 +8,11 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.45.0
+## Current Status: post-v0.46.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 85
+produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 84
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -143,13 +143,13 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `superfx` | SuperFX (GSU) loader stubs (assembly only — no C compiler) | experimental |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (85)
+### Examples (84)
 - **Text**: print_string, scroll_message · **Fundamentals**: text_glyphs
 - **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode5, mode5_hires
 - **Sprites**: simple_sprite, sprite_sizes, animated_sprite, metasprite, dynamic_sprite, dynamic_metasprite, sprite_swarm
 - **Scrolling**: mixed_scroll, continuous_scroll, parallax_scroll
 - **Mode 7**: rotate_scale, perspective, perspective_rotate, dsp1_ground
-- **HDMA & raster**: gradient_colors, hdma_indirect_gradient, hdma_wave, hdma_wave_table, hdma_helpers
+- **HDMA & raster**: gradient_colors, hdma_indirect_gradient, hdma_wave, hdma_helpers
 - **Colour**: palette_cycle, transparency, shadow_tint, direct_color, gradient_9bit, hicolor_1792, hicolor_blend
 - **Windows**: window, window_multi_hdma, transparent_window · **Transitions**: fading, mosaic
 - **Input**: controller, move_sprite, two_players, mouse, superscope
@@ -193,7 +193,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (85 / 85)
+- [x] Example READMEs with hardware explanations (84 / 84)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
@@ -342,6 +342,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-09-26. Anchored claims (version, examples count, framework
+*Last updated: 2026-09-27. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

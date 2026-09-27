@@ -107,6 +107,10 @@ mechanism, ensuring scroll updates happen safely during VBlank.
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `dma`, `background`, `colormath` (`LIB_MODULES` in the Makefile).
+
 ## Files
 
 | File | Purpose |

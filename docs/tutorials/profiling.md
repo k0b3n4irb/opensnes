@@ -139,6 +139,10 @@ updateEnemies();
 u16 lines = profileScanlineEnd();   /* scanlines consumed */
 ```
 
+`profileGetScanline()` returns the line the PPU is drawing right now
+(0-261 NTSC, 0-311 PAL): print it where a section ends to see where in
+the frame it finished.
+
 **Frame counters** answer "am I dropping frames?":
 
 ```c

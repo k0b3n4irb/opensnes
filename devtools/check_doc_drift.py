@@ -199,6 +199,7 @@ COUNT_PATTERNS = [
     re.compile(r"\bExamples?\s*\((\d{2,3})\)", re.IGNORECASE),  # "### Examples (56)" heading
     re.compile(r"\((\d{2,3})\s*/\s*\d{2,3}\)"),   # "(56 / 56)" completion claim, numerator
     re.compile(r"\(\d{2,3}\s*/\s*(\d{2,3})\)"),   # ...and its denominator
+    re.compile(r"\b\d{2,3}/(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "54/56 examples" (Makefile comment)
     # Targeted phrasings only (NOT a bare "\d examples") so prose like
     # "12 examples were flagged" in bank0_budget.md stays a non-match.
 ]
@@ -220,6 +221,15 @@ def _gather_active_doc_paths() -> list[Path]:
         p = repo_path(rel)
         if p.is_file():
             paths.append(p)
+    # Build, CI and harness files (since 2026-09-26, audit tests 11): their
+    # comments quoted "54/56 examples" long after the corpus moved.
+    for rel in ("Makefile", "tools/luna-test/README.md"):
+        p = repo_path(rel)
+        if p.is_file():
+            paths.append(p)
+    workflows = repo_path(".github/workflows")
+    if workflows.is_dir():
+        paths.extend(sorted(workflows.glob("*.yml")))
     return paths
 
 
@@ -877,6 +887,91 @@ def check_no_retired_tools() -> list[str]:
     return drifts
 
 
+# --------------------------------------------------------------------------
+# Check: every example README names the modules its Makefile links
+# (2026-09-26)
+#
+# `.claude/rules/new_example.md` asks for a "Modules Used" section; the docs
+# audit found 33 READMEs without one and 26 that omitted modules their
+# Makefile declares (gameloop, anim, math…). The check reads LIB_MODULES
+# (`:=`/`?=`/`+=`) and accepts any format in the section — table, list,
+# backticks or not — as long as each declared module name appears in it.
+# --------------------------------------------------------------------------
+
+_MODULES_HEADING_RE = re.compile(r"^(#{2,3}) Modules[^\n]*\n(.*?)(?=^#{1,3} |\Z)", re.M | re.S)
+
+
+def declared_lib_modules(makefile_text: str) -> list[str]:
+    mods: list[str] = []
+    for m in re.finditer(r"^LIB_MODULES\s*[:?+]?=\s*([^#\n]*)", makefile_text, re.M):
+        for tok in m.group(1).split():
+            if tok not in mods:
+                mods.append(tok)
+    return mods
+
+
+def modules_missing_from_readme(readme_text: str, declared: list[str]) -> list[str] | None:
+    """None when the README has no Modules section; else the declared
+    modules the section does not name."""
+    m = _MODULES_HEADING_RE.search(readme_text)
+    if not m:
+        return None
+    words = set(re.findall(r"[a-z0-9_]+", m.group(2)))
+    return [mod for mod in declared if mod not in words]
+
+
+def check_example_modules() -> list[str]:
+    root = repo_path()
+    drifts: list[str] = []
+    for mk in sorted(repo_path("examples").glob("*/*/Makefile")):
+        readme = mk.parent / "README.md"
+        if not readme.is_file():
+            continue
+        declared = declared_lib_modules(mk.read_text(encoding="utf-8"))
+        if not declared:
+            continue
+        rel = readme.relative_to(root).as_posix()
+        missing = modules_missing_from_readme(readme.read_text(encoding="utf-8"), declared)
+        if missing is None:
+            drifts.append(f"{rel}: no 'Modules Used' section (the Makefile links "
+                          f"{', '.join(declared)}) — see .claude/rules/new_example.md")
+        elif missing:
+            drifts.append(f"{rel}: 'Modules Used' omits {', '.join(missing)}, "
+                          f"which the Makefile links")
+    return drifts
+
+
+# Anchor 12: every `?=` variable of make/common.mk is on the knobs page.
+# A knob only the Makefile knows about is one no user can find (audit
+# 2026-09-26: eight of them, USE_FASTROM among them, named in no page).
+_KNOB_RE = re.compile(r"^([A-Z_][A-Z0-9_]*)\s*\?=", re.M)
+BUILD_KNOBS_PAGE = "docs/tools/build.md"
+
+
+def makefile_knobs(mk_text: str) -> list[str]:
+    """The `?=` variables of a Makefile, in order of first appearance."""
+    seen: list[str] = []
+    for name in _KNOB_RE.findall(mk_text):
+        if name not in seen:
+            seen.append(name)
+    return seen
+
+
+def knobs_missing(knobs: list[str], page_text: str) -> list[str]:
+    """Knobs not named as `NAME` (backticked) on the page."""
+    return [k for k in knobs if f"`{k}`" not in page_text]
+
+
+def check_build_knobs() -> list[str]:
+    page = repo_path(BUILD_KNOBS_PAGE)
+    if not page.is_file():
+        return [f"{BUILD_KNOBS_PAGE} is missing (the Makefile knobs reference)"]
+    knobs = makefile_knobs(repo_path("make/common.mk").read_text(encoding="utf-8"))
+    missing = knobs_missing(knobs, page.read_text(encoding="utf-8"))
+    return [f"{BUILD_KNOBS_PAGE}: make/common.mk reads `{k} ?= ...` but the page "
+            f"does not name `{k}`" for k in missing]
+
+
 def run_checks(quiet: bool) -> int:
     canonical_ver, canonical_date = canonical_version()
     canonical_n = canonical_examples_count()
@@ -899,6 +994,8 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_screenshot_basenames())
     all_drifts.extend(check_sdk_names_in_docs())
     all_drifts.extend(check_no_retired_tools())
+    all_drifts.extend(check_example_modules())
+    all_drifts.extend(check_build_knobs())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

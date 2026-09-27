@@ -59,6 +59,8 @@ make
 
 `console`, `dma`, `background`, `sprite`
 
+Also linked: `math` — fixed-point sine / trigonometry.
+
 ## Where you are
 
 ← previous: [dynamic_metasprite](../dynamic_metasprite/) · streaming a multi-tile character

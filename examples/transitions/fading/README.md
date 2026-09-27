@@ -174,6 +174,10 @@ Then open `fading.sfc` in your emulator (Mesen2 recommended).
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `dma`, `input`, `background` (`LIB_MODULES` in the Makefile).
+
 ## Files
 
 | File | Purpose |

@@ -123,3 +123,7 @@ the zones -- each zone is a strict horizontal band.
 - **Explore related examples**:
   - `scrolling/continuous_scroll` -- True multi-layer parallax with player control
   - `effects/hdma_wave` -- Another HDMA technique (per-scanline wave distortion)
+
+## Modules Used
+
+`console`, `dma`, `background`, `sprite`, `hdma`, `input` (`LIB_MODULES` in the Makefile).

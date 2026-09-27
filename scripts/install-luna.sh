@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # install-luna.sh — fetch the pinned luna emulator binary for the test harness.
 #
-# Mirrors scripts/install-mesen2.sh: downloads a pinned release binary, verifies
-# its SHA-256, and installs it locally. luna is consumed as a *pinned binary*,
+# Downloads the pinned luna release for this OS (Linux, macOS, Windows under
+# MSYS2 / Git Bash), verifies its SHA-256, and installs it locally. luna is consumed as a *pinned binary*,
 # not a submodule (see /tmp/luna_migration_FINAL_2026-06-20.md §0bis).
 #
 #   - Version pin:   tools/luna-test/luna.version  (e.g. "v0.3.0")
@@ -35,28 +35,40 @@ if [[ -n "${LUNA_BIN:-}" ]]; then
 fi
 
 # --- Pinned release download ------------------------------------------------
+# Linux, macOS and Windows (MSYS2 / Git Bash): luna publishes all three.
+# Until 2026-09-26 this script only knew Linux, while the release zip ships
+# it on every OS — `make test` in a user project failed to install on macOS
+# and Windows.
 VERSION="$(tr -d '[:space:]' < "$LUNA_DIR/luna.version")"
 case "$(uname -m)" in
-    x86_64)         ARCH=x86_64 ;;
+    x86_64|amd64)   ARCH=x86_64 ;;
     aarch64|arm64)  ARCH=aarch64 ;;
     *) echo "install-luna: unsupported arch $(uname -m)" >&2; exit 1 ;;
 esac
+EXE=""
+case "$(uname -s)" in
+    Linux)                  OS=linux;   EXT=tar.gz ;;
+    Darwin)                 OS=macos;   EXT=tar.gz ;;
+    MINGW*|MSYS*|CYGWIN*)   OS=windows; EXT=zip; EXE=.exe ;;
+    *) echo "install-luna: unsupported OS $(uname -s)" >&2; exit 1 ;;
+esac
 
-TARBALL="luna-${VERSION}-linux-${ARCH}.tar.gz"
+NAME="luna-${VERSION}-${OS}-${ARCH}"
+ARCHIVE="${NAME}.${EXT}"
 BASE="https://github.com/${REPO}/releases/download/${VERSION}"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-echo "install-luna: fetching ${TARBALL} (${VERSION}, ${ARCH})"
+echo "install-luna: fetching ${ARCHIVE} (${VERSION})"
 # luna is a public repo: the release-download URL needs no auth. Prefer curl so
 # a stale/absent GH_TOKEN (locally or in CI) can't break the install with a 401
 # — the old gh-first path did exactly that. gh is a fallback for a private repo.
-if curl -fsSL "$BASE/${TARBALL}"        -o "$TMP/${TARBALL}" \
-   && curl -fsSL "$BASE/${TARBALL}.sha256" -o "$TMP/${TARBALL}.sha256"; then
+if curl -fsSL "$BASE/${ARCHIVE}"        -o "$TMP/${ARCHIVE}" \
+   && curl -fsSL "$BASE/${ARCHIVE}.sha256" -o "$TMP/${ARCHIVE}.sha256"; then
     :
 elif command -v gh >/dev/null 2>&1; then
     gh release download "$VERSION" --repo "$REPO" \
-        --pattern "${TARBALL}" --pattern "${TARBALL}.sha256" \
+        --pattern "${ARCHIVE}" --pattern "${ARCHIVE}.sha256" \
         --dir "$TMP" --clobber
 else
     echo "install-luna: download failed (curl error and no gh available)" >&2
@@ -64,10 +76,22 @@ else
 fi
 
 echo "install-luna: verifying SHA-256"
-( cd "$TMP" && sha256sum -c "${TARBALL}.sha256" )
+if command -v sha256sum >/dev/null 2>&1; then
+    ( cd "$TMP" && sha256sum -c "${ARCHIVE}.sha256" )
+else    # macOS
+    ( cd "$TMP" && shasum -a 256 -c "${ARCHIVE}.sha256" )
+fi
 
-tar xzf "$TMP/${TARBALL}" -C "$TMP"
-install -m755 "$TMP/luna-${VERSION}-linux-${ARCH}/luna" "$BIN"
+if [[ "$EXT" == zip ]]; then
+    ( cd "$TMP" && unzip -q "${ARCHIVE}" )
+else
+    tar xzf "$TMP/${ARCHIVE}" -C "$TMP"
+fi
+install -m755 "$TMP/${NAME}/luna${EXE}" "${BIN}${EXE}"
+# The GUI (`luna-gui <rom.sfc>` opens a window) ships in the same archive.
+if [[ -f "$TMP/${NAME}/luna-gui${EXE}" ]]; then
+    install -m755 "$TMP/${NAME}/luna-gui${EXE}" "$BIN_DIR/luna-gui${EXE}"
+fi
 
-echo "install-luna: installed → $BIN"
-"$BIN" --version
+echo "install-luna: installed → ${BIN}${EXE}"
+"${BIN}${EXE}" --version

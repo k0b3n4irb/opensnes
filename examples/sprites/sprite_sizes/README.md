@@ -137,3 +137,7 @@ A 64x64 sprite is 8 KB of tile data -- far too much for VBlank DMA. Use
   - `sprites/simple_sprite` -- Basic static sprite setup
   - `sprites/animated_sprite` -- Frame-based sprite animation
   - `sprites/dynamic_sprite` -- VRAM streaming for many animation frames
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `text`, `text4bpp`, `input`, `background` (`LIB_MODULES` in the Makefile).

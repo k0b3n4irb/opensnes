@@ -127,3 +127,7 @@ can be rendered as a window.
 - **Explore related examples**:
   - `effects/transparent_window` -- Window + color math for semi-transparent overlays
   - `effects/hdma_wave` -- Another HDMA-driven per-scanline effect
+
+## Modules Used
+
+`console`, `sprite`, `dma`, `input`, `background`, `window`, `hdma` (`LIB_MODULES` in the Makefile).

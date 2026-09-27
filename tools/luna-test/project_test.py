@@ -82,7 +82,7 @@ def run_tests(rom: Path, test_dir: Path, update: bool) -> int:
     luna = find_luna()
     manifest = load_project_manifest(test_dir)
     baseline_path = test_dir / "baselines.json"
-    baselines = (json.loads(baseline_path.read_text())
+    baselines = (json.loads(baseline_path.read_text(encoding="utf-8"))
                  if baseline_path.is_file() else {})
     new_baselines: dict = {}
     failed = 0
@@ -149,7 +149,7 @@ def run_tests(rom: Path, test_dir: Path, update: bool) -> int:
         meta = {"luna_version": LUNA_VERSION, "rom_sha256": sha256_file(rom)}
         baseline_path.write_text(
             json.dumps({"_meta": meta, **new_baselines}, indent=2, sort_keys=True)
-            + "\n")
+            + "\n", encoding="utf-8")
         print(f"wrote {baseline_path}")
         return 0
 

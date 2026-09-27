@@ -316,6 +316,10 @@ said until 2026-09-26.
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `sprite_dynamic`, `sprite_lut`, `dma`, `input`, `background`, `anim` (`LIB_MODULES` in the Makefile).
+
 ## Technical Reference
 
 | Register | Address | Role in this example |

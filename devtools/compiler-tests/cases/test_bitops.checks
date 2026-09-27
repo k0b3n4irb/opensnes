@@ -1,0 +1,18 @@
+# Bitwise ops on known globals fold at compile time; the checks pin the
+# folded VALUES, i.e. that the folding honours C semantics on u8/u16
+# (truncation after ~, logical >> on unsigned). The original opensnes-emu
+# test_bitops only required some and/ora/eor, which today survives in one
+# function only.
+in test_and: present lda #15\n\tsta\.w byte_val\n[\s\S]*lda\.w #255\n\tsta\.w word_val\n
+in test_or: present lda #255\n\tsta\.w byte_val\n[\s\S]*lda\.w #65535\n\tsta\.w word_val\n
+in test_xor: present lda #85\n\tsta\.w byte_val\n[\s\S]*lda\.w #21845\n\tsta\.w word_val\n
+# ~0xAA as a u8 is 0x55 (the int result 0xFF55 truncated).
+in test_not: present lda #85\n\tsta\.w byte_val\n[\s\S]*lda\.w #21845\n\tsta\.w word_val\n
+in test_shift_left: present lda #16\n\tsta\.w byte_val\n[\s\S]*lda\.w #256\n\tsta\.w word_val\n[\s\S]*lda #8\n\tsta\.w byte_val\n
+# 0xFF >> 4 on a u8 is 0x0F; 0x8000 >> 8 on a u16 is 0x80 (logical).
+in test_shift_right: present lda #8\n\tsta\.w byte_val\n[\s\S]*lda\.w #128\n\tsta\.w word_val\n[\s\S]*lda #15\n\tsta\.w byte_val\n
+in test_bit_set_clear: present lda #8\n\tsta\.w byte_val\n\tlda #136\n\tsta\.w byte_val\n\tlda #128\n\tsta\.w byte_val\n\tstz\.w byte_val\n
+# (0xAB & 0x0F) << 4 | (0xAB >> 4) & 0x0F = 0xBA.
+in test_mask_extract: present lda #186\n\tsta\.w byte_val\n
+# The one test that survives to run time: bit 3 of byte_val.
+in test_bit_test: present lda\.w byte_val\n\trep #\$20\n\tand\.w #\$00FF\n\tand\.w #8\n

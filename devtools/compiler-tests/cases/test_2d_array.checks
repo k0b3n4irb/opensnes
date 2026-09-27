@@ -1,0 +1,9 @@
+# Constant 2D indices fold to row*stride + col, per element size (ported
+# from opensnes-emu test_2d_array, which only looked for the symbol).
+present grid:\n\tdsb 32\n
+present wide:\n\tdsb 64\n
+# u8 grid[4][8]: [0][7] = 7, [1][0] = 8, [2][5] = 21, [3][7] = 31.
+in test_2d_access: present lda #2\n\tsta\.w grid\+7\n\tlda #3\n\tsta\.w grid\+8\n\tlda #42\n\tsta\.w grid\+21\n\tlda #99\n\tsta\.w grid\+31\n
+# u16 wide[2][16]: [1][15] = (16 + 15) * 2 = 62, a 16-bit store.
+in test_2d_wide: present lda\.w #43981\n\tsta\.w wide\+62\n
+in main: present sep #\$20\n\tlda\.w grid\+21\n

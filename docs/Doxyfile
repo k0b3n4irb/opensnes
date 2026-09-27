@@ -112,7 +112,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/hdma/hdma_helpers \
                          ../examples/hdma/hdma_indirect_gradient \
                          ../examples/hdma/hdma_wave \
-                         ../examples/hdma/hdma_wave_table \
                          ../examples/color/hicolor_1792 \
                          ../examples/color/hicolor_blend \
                          ../examples/backgrounds/mode5_hires \

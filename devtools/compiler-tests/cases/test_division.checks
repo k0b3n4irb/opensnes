@@ -1,0 +1,18 @@
+# Unsigned division and modulo by a power of two are shifts and masks;
+# other divisors call the runtime (ported from opensnes-emu
+# test_division_ops, which only required some lsr; here per divisor).
+in div_by_2: present lda 4,s\n\tlsr a\n\trtl
+in div_by_4: present lda 4,s\n(\tlsr a\n){2}\trtl
+in div_by_8: present lda 4,s\n(\tlsr a\n){3}\trtl
+in div_by_16: present lda 4,s\n(\tlsr a\n){4}\trtl
+# /256 is the high byte.
+in div_by_256: present lda 4,s\n\txba\n\tand\.w #\$00FF\n\trtl
+in mod_by_2: present lda 4,s\n\tand\.w #1\n\trtl
+in mod_by_8: present lda 4,s\n\tand\.w #7\n\trtl
+# Non-powers of two: dividend in tcc__r0, divisor in tcc__r1, result in A.
+in div_by_3: present sta\.b tcc__r0\n\tlda\.w #3\n\tsta\.b tcc__r1\n\tjsl __div16\n\trtl
+in div_by_7: present lda\.w #7\n\tsta\.b tcc__r1\n\tjsl __div16
+in mod_by_3: present lda\.w #3\n\tsta\.b tcc__r1\n\tjsl __mod16\n\trtl
+# A one-word argument is pushed with pea and popped with a single plx after
+# the call (the cleanup test_plx_cleanup was named for).
+in main: present pea\.w 100\n\tjsl div_by_3\n\tplx\n

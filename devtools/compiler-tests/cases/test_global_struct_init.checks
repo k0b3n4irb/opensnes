@@ -1,0 +1,25 @@
+# Initialised global structs live in RAM and get a .data_init record
+# (target, bank, size, bytes) whose image follows the struct layout,
+# padding included; a zero-initialised one gets none (ported from
+# opensnes-emu test_global_struct_init, which checked the sections, the
+# records' presence and two values; here the whole images).
+section entry1: present \.RAMSECTION
+section player: present \.RAMSECTION
+section default_style: present \.RAMSECTION
+section table: present \.RAMSECTION
+section partial: present \.RAMSECTION
+# Entry {u8 id; u16 value}: pad byte after id.
+present \.dw entry1\n\t\.db :entry1\n\t\.dw 4\n\t\.db 1\n\t\.dsb 1, 0\n\t\.dw 1000\n
+present \.dw entry2\n\t\.db :entry2\n\t\.dw 4\n\t\.db 2\n\t\.dsb 1, 0\n\t\.dw 2000\n
+# Entity {u8, u8, u16, u16, u8}: 7 bytes of fields, padded to 8.
+present \.dw player\n\t\.db :player\n\t\.dw 8\n\t\.db 1\n\t\.db 3\n\t\.dw 128\n\t\.dw 96\n\t\.db 100\n\t\.dsb 1, 0\n
+present \.dw enemy\n\t\.db :enemy\n\t\.dw 8\n\t\.db 2\n\t\.db 1\n\t\.dw 200\n\t\.dw 50\n\t\.db 50\n
+# Nested byte structs: no padding, 7 bytes.
+present \.dw default_style\n\t\.db :default_style\n\t\.dw 7\n(\t\.db 31\n){3}(\t\.db 0\n){4}
+# Array of 4 Entry: 16 bytes, the last element's value is 400.
+present \.dw table\n\t\.db :table\n\t\.dw 16\n[\s\S]*?\t\.db 3\n\t\.dsb 1, 0\n\t\.dw 400\n
+# An all-zero initialiser is still an initialiser (it is not .bss).
+present \.dw partial\n\t\.db :partial\n\t\.dw 8\n
+# No initialiser: .bss, no .data_init record.
+section zeroed: present \.bss
+absent \.dw zeroed

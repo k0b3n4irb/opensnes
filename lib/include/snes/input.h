@@ -236,6 +236,9 @@ u8 mouseInit(u8 port);
 /**
  * @brief Check if mouse is connected on port.
  *
+ * Re-detected by the NMI handler every frame: plugging or unplugging the
+ * mouse is seen on the next frame.
+ *
  * @param port Controller port (0 or 1)
  * @return 1 if connected, 0 if not
  */
@@ -354,6 +357,11 @@ u8 scopeInit(void);
 
 /**
  * @brief Check if Super Scope is connected.
+ *
+ * 1 from a scopeInit() that found the Super Scope on port 2, until the NMI
+ * handler sees its signature disappear (unplugged); then 0 until the next
+ * scopeInit(). Unlike the mouse, a scope plugged in later is not detected
+ * on its own: call scopeInit() again.
  *
  * @return 1 if connected, 0 if not
  */

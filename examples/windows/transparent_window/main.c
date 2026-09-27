@@ -14,7 +14,8 @@
  * even when the window position is constant across the rectangle height.
  *
  * Ported from PVSnesLib "TransparentWindow" example by Digifox.
- * Uses bare-metal register writes to match PVSnesLib behavior exactly.
+ * Uses the colormath and window modules with PVSnesLib's register values,
+ * so the frames match its original.
  *
  * @par SNES Concepts
  * - HDMA repeat mode for per-scanline window boundary updates
@@ -172,20 +173,23 @@ int main(void) {
      *   bits 7-5 = 111: apply to R+G+B
      *   bits 4-0 = 01100: intensity 12
      *--------------------------------------------------------------------*/
-    REG_CGWSEL = 0x10;
-    REG_CGADSUB = 0x82;
-    REG_COLDATA = 0xEC;
+    colorMathInit();
+    colorMathSetCondition(COLORMATH_INSIDE);   /* CGWSEL bits 5-4 = 01 */
+    colorMathSetSource(COLORMATH_SRC_FIXED);   /* CGWSEL bit 1 = 0 */
+    colorMathSetOp(COLORMATH_SUB);             /* CGADSUB bit 7 */
+    colorMathSetLayers(COLORMATH_BG2);         /* CGADSUB bit 1 */
+    colorMathSetFixedColor(12, 12, 12);        /* COLDATA: R = G = B = 12 */
 
     /*--------------------------------------------------------------------
-     * Window: direct register writes matching PVSnesLib exactly
+     * Window: the same register values as PVSnesLib, through the window
+     * module (direct writes until 2026-09-26)
      *
      * W12SEL ($2123) = 0x20: BG2 Window 1 Enable
      * WOBJSEL ($2125) = 0x20: Color Math Window 1 Enable
      * TMW ($212E) = 0x00: no main screen masking
      *--------------------------------------------------------------------*/
-    REG_W12SEL = 0x20;
-    REG_WOBJSEL = 0x20;
-    REG_TMW = 0;
+    windowEnable(WINDOW_1, WINDOW_BG2 | WINDOW_MATH);   /* W12SEL $20, WOBJSEL $20 */
+    windowSetMainMask(0);                               /* TMW $00 */
 
     /*--------------------------------------------------------------------
      * HDMA: drive WH0 and WH1 to define the rectangle

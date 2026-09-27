@@ -160,13 +160,15 @@ Incompatible (do not use without isolation):
 - GPL (for library code — would require relicensing)
 - Proprietary
 
-## examples/hdma/hdma_wave_table
+## examples/hdma/hdma_wave
 
 - `res/water.bmp` — original work: procedurally generated water caustics
   (sum-of-sines field, 256-color indexed), created for this example.
   The HDMA technique it demonstrates is a C port of "SNES Wave HDMA Demo"
   by krom (Peter Lemon), github.com/PeterLemon/SNES — code technique
-  credited, no krom assets used.
+  credited, no krom assets used. `res/wavetable.bin` is krom's HDMA
+  table, extracted verbatim from the demo (data of the technique,
+  credited).
 
 ## examples/audio/pitch_mod
 

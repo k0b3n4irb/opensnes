@@ -36,12 +36,19 @@
 ; SNES CPU may only write after enabling SBWE ($2226), and crt0 does not.
 ; make/common.mk refuses USE_SRAM=1 with USE_SA1=1 instead of building a
 ; module that would silently do nothing.
+.ifdef SA1
+; SA-1: the save memory is BW-RAM, seen by the SNES CPU at $40-$4F:0000-FFFF
+; (fullsnes, SA-1 memory map); crt0 enables SNES-side writes (SBWE, $2226).
+.EQU SRAM_BANK $40
+.EQU SRAM_BASE $0000
+.else
 .ifdef HIROM
 .EQU SRAM_BANK $30
 .EQU SRAM_BASE $6000
 .else
 .EQU SRAM_BANK $70
 .EQU SRAM_BASE $0000
+.endif
 .endif
 .EQU SRAM_LONG (SRAM_BANK << 16) + SRAM_BASE
 

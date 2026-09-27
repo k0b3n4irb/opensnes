@@ -1,0 +1,77 @@
+# continuous_scroll — the D-pad camera: the player walks, and past a
+# threshold the two backgrounds scroll and push the player back. Nothing
+# moves without input, so no other test runs any of it.
+#
+# What this proves that the other pillars cannot (all values follow from
+# main.c's loop; game = s16 player_x, player_y, bg1 x, bg1 y, bg2 x, bg2 y,
+# `game` read at width 2 is player_x):
+#   * RIGHT held from 60: +2 px/frame up to the threshold, 20 -> 140 at
+#     frame 120, with no scroll yet (the test is player_x > 140).
+#   * Past it, each frame adds 2, then scrolls both BGs by 1 and pushes the
+#     player back by 1: a net +1 for both. At 200: player 220, scroll 80.
+#     The register runs one frame behind (bgSetScroll defers the write to
+#     the NMI): BG1HOFS = BG2HOFS = 79. BGnVOFS = 31 is the lib's y - 1
+#     for y = 32.
+#   * The clamps: the player stops at 230, the scroll at MAX_SCROLL_X = 512
+#     (reached at frame 632); still held at 700, nothing more moves.
+#   * LEFT held 800..899: -2 px/frame to x 80 (frame 875), then the left
+#     threshold scrolls back 1/frame with a net -1 for the player: 55 and
+#     487 at 900.
+#   * Released at 900, the camera keeps catching up without input: x < 80
+#     with scroll > 0 scrolls back and pushes forward until x = 80 (frame
+#     925). At 960: x 80, scroll 462, registers 462.
+#
+# Measured: `luna state --until-frame N --input "60:0x0100,800:0x0200,
+# 900:0" --peek game:C --out -` (+ ppu.bgs.N.h_scroll / v_scroll) at
+# 60/120/121/122/200/700/800/900/960.
+rom = "../../../examples/scrolling/continuous_scroll/continuous_scroll.sfc"
+
+[[checkpoint]]                 # RIGHT 60..119: +2/frame, below the threshold
+at_frame = 120
+input = "60:0x0100"
+[checkpoint.values]
+game = { eq = 140, width = 2 }
+[checkpoint.ppu]
+"bgs.0.h_scroll" = 0
+
+[[checkpoint]]                 # past it: net +1 player, +1 scroll per frame
+at_frame = 200
+[checkpoint.values]
+game = { eq = 220, width = 2 }
+[checkpoint.ppu]
+"bgs.0.h_scroll" = 79          # one frame behind the 80 in RAM
+"bgs.1.h_scroll" = 79          # BG2 follows BG1
+"bgs.0.v_scroll" = 31          # y 32 written as y - 1
+
+[[checkpoint]]                 # clamps: player 230, scroll 512
+at_frame = 700
+[checkpoint.values]
+game = { eq = 230, width = 2 }
+[checkpoint.ppu]
+"bgs.0.h_scroll" = 512
+"bgs.1.h_scroll" = 512
+
+[[checkpoint]]                 # still held: nothing moves past the clamps
+at_frame = 800
+input = "800:0x0200"
+[checkpoint.delta]
+game = { dir = "unchanged", width = 2 }
+[checkpoint.ppu]
+"bgs.0.h_scroll" = 512
+
+[[checkpoint]]                 # LEFT 800..899: to 80, then scroll back
+at_frame = 900
+input = "900:0"
+[checkpoint.values]
+game = { eq = 55, width = 2 }
+
+[[checkpoint]]                 # released: the camera catches up to x = 80
+at_frame = 960
+[checkpoint.values]
+game = { eq = 80, width = 2 }
+[checkpoint.ppu]
+"bgs.0.h_scroll" = 462
+"bgs.1.h_scroll" = 462
+
+[asserts.blocks]               # 80, 100, 462, 32, 462, 32
+game = "50006400ce012000ce012000"

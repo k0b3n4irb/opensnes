@@ -1,0 +1,16 @@
+# MetaspriteItem tables built with the SDK macros have the PVSnesLib 8-byte
+# layout {s16 dx, s16 dy, u16 tile, u8 attr, u8 reserved}, the attribute
+# bits land where the PPU expects them, and const tables go to the asset
+# banks. No original check existed (opensnes-emu only compiled it).
+section hero_walk_frame0: present SEMISUPERFREE BANKS ASSET_BANKS
+# Item 1 {16, 0, tile 1, PAL(0)|PRIO(2) = 0x20}, then item 2 {0, 16, 2}.
+present hero_walk_frame0:\n\t\.dw 0\n\t\.dw 0\n\t\.dw 0\n\t\.db 32\n\t\.db 0\n\t\.dw 16\n\t\.dw 0\n\t\.dw 1\n\t\.db 32\n\t\.db 0\n\t\.dw 0\n\t\.dw 16\n\t\.dw 2\n
+# FLIPX adds 0x40: attr 0x60.
+present hero_walk_frame0_flipped:\n\t\.dw 16\n\t\.dw 0\n\t\.dw 0\n\t\.db 96\n
+# METASPR_TERM: dx = -128 in item 4 (offset 32).
+present \t\.dw -128\n
+in test_end_marker: present lda\.l hero_walk_frame0\+32\n\tcmp\.w #65408
+# The array of pointers is itself mutable: RAM, initialised with two 4-byte
+# far pointers.
+section hero_walk_metasprites: present \.RAMSECTION
+present \.dw hero_walk_metasprites\n\t\.db :hero_walk_metasprites\n\t\.dw 8\n\t\.dl hero_walk_frame0\+0\n\t\.dsb 1, 0\n\t\.dl hero_walk_frame0_flipped\+0\n\t\.dsb 1, 0\n

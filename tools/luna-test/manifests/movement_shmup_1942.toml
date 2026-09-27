@@ -16,23 +16,23 @@ rom = "../../../examples/games/shmup_1942/shmup_1942.sfc"
 [[checkpoint]]                 # spawn state, nothing fired
 at_frame = 60
 [checkpoint.values]
-"00:0034" = 112                          # game.player_x
-"00:0036" = 160                          # game.player_y
-"00:0074" = { eq = 0, width = 1 }        # game.bullets[0].active
-"00:0072" = 240                          # game.bullets[0].y == BULLET_HIDE_Y
+"game" = 112                          # game.player_x
+"game+2" = 160                          # game.player_y
+"game+64" = { eq = 0, width = 1 }        # game.bullets[0].active
+"game+62" = 240                          # game.bullets[0].y == BULLET_HIDE_Y
 
 [[checkpoint]]                 # LEFT for 60 frames -> clamped at PLAYER_MIN_X
 at_frame = 120
 input = "60:0x0200,119:0"
 [checkpoint.values]
-"00:0034" = 8                            # PLAYER_MIN_X, not 112 - 120
-"00:0036" = 160                          # vertical axis untouched
-"00:0074" = { eq = 0, width = 1 }        # still nothing fired
+"game" = 8                            # PLAYER_MIN_X, not 112 - 120
+"game+2" = 160                          # vertical axis untouched
+"game+64" = { eq = 0, width = 1 }        # still nothing fired
 
 [[checkpoint]]                 # A -> one bullet, spawned over the ship's nose
 at_frame = 130
 input = "120:0x0080,124:0"
 [checkpoint.values]
-"00:0074" = { eq = 1, width = 1 }        # bullets[0].active
-"00:0070" = 16                           # bullets[0].x == player_x + 8
-"00:0034" = 8                            # the ship did not drift while firing
+"game+64" = { eq = 1, width = 1 }        # bullets[0].active
+"game+60" = 16                           # bullets[0].x == player_x + 8
+"game" = 8                            # the ship did not drift while firing

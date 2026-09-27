@@ -1,0 +1,21 @@
+# Comparisons pick the branch that matches the operand's signedness, and
+# signed right shifts stay arithmetic (ported from opensnes-emu
+# compiler-tests.mjs test_comparisons).
+# u16 compares use the carry (bcc/bcs), never the sign flag: 50000 < 60000
+# is false under a signed branch.
+in test_u16_high_less: present \bbc[cs]\b
+in test_u16_high_less: absent \bb(mi|pl)\b
+in test_u16_vs_constant: present cmp\.w #10000\n\tbc[cs]\b
+in test_u16_vs_constant: absent \bb(mi|pl)\b
+# A compare whose result is also used as a value is materialised as 0/1,
+# not only fused into the branch (GVN + compare/branch fusion regression).
+in test_ternary_value_used: present lda\.w #0\n\tbra \+\+\n\+\tlda\.w #1
+in test_ternary_value_used: present jsl use_val
+# u16 >> 1 is a logical shift.
+in test_u16_shift_right: present lsr a
+# s16 >> 8: xba + sign extension, never a logical shift.
+in test_s16_shift_right: present xba\n\tand\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00
+in test_s16_shift_right: absent lsr
+# s16 >> 1: the sign bit goes into the carry, then ror.
+in test_s16_shift_right_1: present cmp\.w #\$8000\n\tror a
+in test_s16_shift_right_1: absent lsr

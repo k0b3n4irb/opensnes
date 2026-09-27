@@ -57,7 +57,28 @@
   call_add 92→46 (-50%), clamp 111→63 (-43%), compare_and_branch 105→57 (-46%)
 
 ## Build Notes
-- **Build gotcha**: `make compiler` may not recompile changed QBE .c files — use `cd compiler/qbe && make clean && make` then copy binary to bin/
+- **Build gotcha (fixed 2026-09-26)**: `make compiler` did not recompile changed QBE / cproc sources (its rules had no prerequisites); they now always hand over to the submodule Makefile. Do NOT build with a bare `make -C compiler/qbe`: it uses QBE's own flags (no `-static`, no `-O2`) and gives a different binary. And `make` re-syncs submodules to the superproject's recorded pointer — `git add compiler/qbe` after committing in the fork, before any build.
 - **Binary name**: cc65816 script uses `bin/qbe` NOT `bin/qbe-w65816`!
 - **Benchmark tools**: `tools/cyclecount/cyclecount.py`, `tools/benchmark/compare_compilers.sh`, `tests/benchmark/bench_functions.c` (29 functions)
 - **Gotcha**: `git stash` in parent repo does NOT affect submodule working tree!
+
+## Kl multiply by a small constant (2026-09-26, qbe 9a17010)
+
+`(u32)x * k` inlines as the 16-bit shift-add sequence when k is not a power
+of two, `is_inline_mul_const(k)` accepts it, and the product is proven below
+2^16 (mark_high_zero: an 8-bit or 16-bit zero-extension, or a zero-extending
+byte / half load, plus bitlen(k)) — or the destination is addr_only.
+
+Measured by recompiling every C file under lib/source and examples with
+the previous and the new qbe: **39 → 4** `jsl tcc_mul32`. (The commit
+message of e01ffa29 says "28 → 0": that count came from a recursive grep
+whose output the shell condensed. The 39 → 4 figure is from `find … -exec`
+per file, both compilers, same flags.)
+
+The 4 that remain, both expected:
+- `examples/mode7/dsp1_ground` ×3: a byte times 515. The product can reach
+  18 bits, so the real 32-bit multiply is required.
+- `examples/games/rpg` `main` ×1: a byte times 6, which qualifies, but the
+  function has more than `MAX_ALIAS_TEMPS` (256) temporaries and the width
+  analysis only tracks the first 256. Raising the limit would help very
+  large functions; not done (it sizes several per-temp tables).

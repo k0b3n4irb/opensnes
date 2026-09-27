@@ -14,7 +14,7 @@
 ; 64-127 refill, and vice versa. The VBlank callback (main.c) rewinds
 ; the stream each frame.
 ;
-; Contract per interrupt.h: registered with irqSetBank(); this handler
+; Contract per interrupt.h: registered with irqSet(); this handler
 ; owns save/restore, the $4211 acknowledge, and the RTI.
 ;----------------------------------------------------------------------
 

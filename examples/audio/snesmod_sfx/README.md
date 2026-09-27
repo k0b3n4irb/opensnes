@@ -91,6 +91,10 @@ to VRAM.
 
 ---
 
+## Modules Used
+
+`console`, `sprite`, `dma`, `input`, `background`, `text` (`LIB_MODULES` in the Makefile).
+
 ## Files
 
 | File | Purpose |

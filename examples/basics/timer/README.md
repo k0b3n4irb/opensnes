@@ -38,6 +38,8 @@ The SNES PPU triggers an NMI interrupt at the end of every visible frame (scanli
 | `text` | `textInit()`, `textPrintAt()`, `textFlush()` for counter display |
 | `input` | `padPressed()` for single-press reset button |
 
+Also linked: `gameloop` — the `gameLoopRun()` frame loop.
+
 ## Build & Run
 
 ```bash

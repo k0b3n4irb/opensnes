@@ -58,6 +58,8 @@ The ROM lands at `examples/basics/aim_target/aim_target.sfc`.
 `console`, `sprite`, `dma`, `background`, `text`, `input`, `gameloop`,
 `math`.
 
+Also linked: `fixed32` — 32-bit fixed point (`fix32*`).
+
 ## See also
 
 - [`docs/tutorials/math.md`](../../../docs/tutorials/math.md) — the

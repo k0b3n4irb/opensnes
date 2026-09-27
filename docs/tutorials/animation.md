@@ -94,7 +94,7 @@ u8 frame = (getFrameCount() / 8) % 4;
 oamSetTile(0, frame * 2);
 ```
 
-The manual counter is preferred for gameplay animations because you can pause it (stop incrementing when the character is idle) or reset it on state changes.
+The manual counter is preferred for gameplay animations because you can pause it (stop incrementing when the character is idle) or reset it on state changes. `resetFrameCount()` sets the system counter back to 0, which is enough when a single timer drives the whole scene (a title screen's attract loop, say).
 
 ## Sprite Sheet Layout
 
@@ -225,6 +225,10 @@ if (pad0 != 0) {
     monster.gfx_frame = animTick(&monster_anim);
 }
 /* No buttons held: no tick — the sprite freezes on its current frame. */
+/* A hit while the hurt clip is already playing: start it over. animPlay()
+ * would just continue it; animRestart() rewinds the current clip to frame 0. */
+if (hit_again)
+    animRestart(&monster_anim);
 
 u16 flags = monster.flipx ? OBJ_FLIPX : 0;
 oamSet(0, monster.x, monster.y, monster.gfx_frame, 0, 3, flags);

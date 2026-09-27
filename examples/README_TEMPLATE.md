@@ -137,6 +137,13 @@ LIB_MODULES := console sprite dma
 If graphics tools are used (gfx4snes, font2snes, smconv), explain what they do
 and why the flags are set the way they are.
 
+## Modules Used
+
+| Module | Why it's here |
+|--------|---------------|
+| `console` | `consoleInit()`, `WaitForVBlank()` |
+| `…` | one row per name in the Makefile's `LIB_MODULES` (`make lint-docs` checks it) |
+
 ## Technical Reference
 
 | Register | Address | Role in this example |

@@ -198,15 +198,20 @@ u8 audioInit(void);
 
 /**
  * @brief Check if audio system is ready
- * @return Non-zero if ready, 0 if still initializing
+ *
+ * audioInit() blocks until the driver answers, so there is no
+ * "still initialising" state to poll: 0 after audioInit() means the SPC700
+ * driver never answered (and every audio call is then a no-op).
+ *
+ * @return Non-zero if the driver answered audioInit()'s ping, 0 otherwise
  */
 u8 audioIsReady(void);
 
 /**
- * @brief Process audio updates
+ * @brief Kept for source compatibility; does nothing.
  *
- * Call once per frame in your main loop.
- * Handles command queue processing and streaming.
+ * The audio engine is command-driven: every call talks to the SPC700
+ * directly, so there is no queue to pump. Calling it is harmless.
  */
 void audioUpdate(void);
 

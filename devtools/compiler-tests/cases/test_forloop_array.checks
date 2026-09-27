@@ -1,0 +1,19 @@
+# entries[i].field = v in a loop, 48-byte elements: the index is scaled
+# inline (i*48 = ((i<<1) + i) << 4), each field adds its offset to the
+# scaled index, and each address, stored to a slot, is reloaded 2 bytes
+# further up after the value's pha — the bug this fixture was written for
+# gave the first iteration wrong offsets after a push. No original check
+# existed (opensnes-emu only compiled it). Offsets are today's frame layout
+# (moved by the slot colouring of 2026-09-27, which also reuses the loop
+# variable's slot for the scaled index once i is dead in the body):
+# if they move, re-derive "reload = store + 2" before updating.
+in init_with_loop: present sta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tsta 4,s
+in init_with_loop: absent __mul16
+in init_with_loop: present lda 4,s\n\tclc\n\tadc\.w #entries\n\tsta 12,s\n\tlda 10,s\n\tpha\n\tlda 14,s\n\ttax\n\tpla\n\tsta\.l \$0000,x
+in init_with_loop: present adc\.w #entries\+2\n\tsta 10,s\n\tlda\.w #100\n\tpha\n\tlda 12,s\n\ttax
+in init_with_loop: present adc\.w #entries\+4\n\tsta 10,s\n\tlda 8,s\n\tpha\n\tlda 12,s\n\ttax
+in init_with_loop: present adc\.w #entries\+6\n\tsta 10,s\n\tlda\.w #16\n\tpha\n\tlda 12,s\n\ttax
+# x = 64 + i*16.
+in init_with_loop: present lda 8,s\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tclc\n\tadc\.w #64\n
+# The unrolled twin: element k at entries + 48k.
+in init_without_loop: present lda\.w #80\n\tsta\.w entries\+48\n[\s\S]*lda\.w #16\n\tsta\.w entries\+150\n

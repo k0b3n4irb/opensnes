@@ -58,6 +58,8 @@ if ((pad & KEY_L) && (pad & KEY_R)) { /* both shoulders held */ }
 | `text` | `textInit()`, `textPrintAt()`, `textFlush()` for button name display |
 | `input` | `padHeld()`, `padPressed()` for reading controller state |
 
+Also linked: `gameloop` — the `gameLoopRun()` frame loop.
+
 ## Build & Run
 
 ```bash
