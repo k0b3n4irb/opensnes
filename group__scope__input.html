@@ -198,8 +198,8 @@ Usage</h2>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agroup__scope__input_html_ga344f48f7c3fce32fbc23768dff4e0b57"><div class="ttname"><a href="#ga344f48f7c3fce32fbc23768dff4e0b57">SSC_FIRE</a></div><div class="ttdeci">#define SSC_FIRE</div><div class="ttdef"><b>Definition</b> input.h:337</div></div>
-<div class="ttc" id="agroup__scope__input_html_ga5e28e1c68fdfa123dacdb209abdc478e"><div class="ttname"><a href="#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a></div><div class="ttdeci">void scopeCalibrate(void)</div><div class="ttdef"><b>Definition</b> input.h:436</div></div>
+<div class="ttc" id="agroup__scope__input_html_ga344f48f7c3fce32fbc23768dff4e0b57"><div class="ttname"><a href="#ga344f48f7c3fce32fbc23768dff4e0b57">SSC_FIRE</a></div><div class="ttdeci">#define SSC_FIRE</div><div class="ttdef"><b>Definition</b> input.h:340</div></div>
+<div class="ttc" id="agroup__scope__input_html_ga5e28e1c68fdfa123dacdb209abdc478e"><div class="ttname"><a href="#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate</a></div><div class="ttdeci">void scopeCalibrate(void)</div><div class="ttdef"><b>Definition</b> input.h:444</div></div>
 <div class="ttc" id="agroup__scope__input_html_ga81b12c4a14aec097adf26b2e99080ef6"><div class="ttname"><a href="#ga81b12c4a14aec097adf26b2e99080ef6">scopeButtonsPressed</a></div><div class="ttdeci">u16 scopeButtonsPressed(void)</div><div class="ttdoc">Get newly pressed buttons this frame.</div></div>
 <div class="ttc" id="agroup__scope__input_html_gaa7b48b9a04fc0ba5acd4b9e955e0a52c"><div class="ttname"><a href="#gaa7b48b9a04fc0ba5acd4b9e955e0a52c">scopeGetX</a></div><div class="ttdeci">u16 scopeGetX(void)</div><div class="ttdoc">Get calibration-adjusted H position.</div></div>
 <div class="ttc" id="agroup__scope__input_html_gaaf4c02e6cd035506e27613290014ef2d"><div class="ttname"><a href="#gaaf4c02e6cd035506e27613290014ef2d">scopeInit</a></div><div class="ttdeci">u8 scopeInit(void)</div><div class="ttdoc">Detect Super Scope on port 2.</div></div>
@@ -519,6 +519,7 @@ Usage</h2>
 </div><div class="memdoc">
 
 <p>Check if Super Scope is connected. </p>
+<p>1 from a <a class="el" href="#gaaf4c02e6cd035506e27613290014ef2d" title="Detect Super Scope on port 2.">scopeInit()</a> that found the Super Scope on port 2, until the NMI handler sees its signature disappear (unplugged); then 0 until the next <a class="el" href="#gaaf4c02e6cd035506e27613290014ef2d" title="Detect Super Scope on port 2.">scopeInit()</a>. Unlike the mouse, a scope plugged in later is not detected on its own: call <a class="el" href="#gaaf4c02e6cd035506e27613290014ef2d" title="Detect Super Scope on port 2.">scopeInit()</a> again.</p>
 <dl class="section return"><dt>Returns</dt><dd>1 if connected, 0 if not </dd></dl>
 
 </div>

@@ -135,14 +135,14 @@ What you'll learn</h2>
 <li>Scroll writes are <b>buffered</b>: <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span> stores a value and marks it dirty; the NMI handler pushes it to the PPU during VBlank, so the scroll never tears.</li>
 <li>A 32×32 tilemap is exactly one screen wide (256 px), so incrementing the horizontal offset wraps the message around — a continuous marquee for free.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-50"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-49"></a>
 SNES concepts</h2>
 <p>The PPU has hardware scroll registers per background. You never redraw the tilemap to move text — you change where the PPU starts reading it. Increasing BG1's horizontal offset scrolls the view right, so the content appears to travel left. Because the tilemap width equals the screen width, the wrap is seamless and costs nothing per frame beyond a single register update.</p>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-24"></a>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-23"></a>
 How to build</h2>
 <div class="fragment"><div class="line">make -C examples/text/scroll_message</div>
 </div><!-- fragment --><p>Run <span class="tt">scroll_message.sfc</span> in <a href="https://github.com/k0b3n4irb/luna">luna</a>. You should see <b>OPENSNES &ndash; TEXT THAT MOVES!</b> scrolling right-to-left forever.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-44"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-72"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span>, <span class="tt">sprite</span></p>
 <h2 class="doxsection"><a class="anchor" id="ladder-2"></a>

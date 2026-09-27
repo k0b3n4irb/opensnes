@@ -22,6 +22,7 @@ var examples_fundamentals =
           [ "The Makefile", "examples_fundamentals_text_glyphs.html#the-makefile", null ],
           [ "Why These Modules?", "examples_fundamentals_text_glyphs.html#why-these-modules", null ]
         ] ],
+        [ "Modules Used", "examples_fundamentals_text_glyphs.html#modules-used-34", null ],
         [ "Technical Reference", "examples_fundamentals_text_glyphs.html#technical-reference", null ],
         [ "Files", "examples_fundamentals_text_glyphs.html#files-5", null ]
       ] ]

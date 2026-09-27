@@ -192,7 +192,7 @@ How It Works</h2>
 <div class="line"><a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamrefresh = 1;</div>
 <div class="ttc" id="asprites_2dynamic__sprite_2main_8c_html_ae08b048faabcd721ef0a0478c4e7129e"><div class="ttname"><a href="sprites_2dynamic__sprite_2main_8c.html#ae08b048faabcd721ef0a0478c4e7129e">frame0</a></div><div class="ttdeci">static u16 frame0</div><div class="ttdoc">Animation frame index for sprite 0 (0-23, wraps at 24).</div><div class="ttdef"><b>Definition</b> main.c:65</div></div>
 </div><!-- fragment --><p>Every 8 frames, the animation advances. Setting <span class="tt">oamrefresh = 1</span> tells the engine to upload the new frame's tiles to VRAM on the next VBlank.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-45"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-44"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="vram-budget-during-vblank"></a>
 VRAM Budget During VBlank</h3>
@@ -228,10 +228,13 @@ Going Further</h2>
 <li><b>Mix static and dynamic</b>: Use static sprites for simple objects (bullets, UI elements) and dynamic sprites for complex animated characters.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">games/breakout</span> &ndash; Dynamic sprites in a real game context</li>
-<li><span class="tt">games/likemario</span> &ndash; Dynamic sprites with scrolling backgrounds </li>
+<li><span class="tt">games/likemario</span> &ndash; Dynamic sprites with scrolling backgrounds</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-66"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">sprite_dynamic</span>, <span class="tt">sprite_lut</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

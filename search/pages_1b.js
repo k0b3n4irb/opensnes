@@ -5,8 +5,9 @@ var searchData=
   ['qbe_20w65816_20backend_2',['QBE (w65816 backend)',['../third_party.html#qbe-w65816-backend',1,'']]],
   ['questions_3',['Frequently asked questions',['../faq.html',1,'index']]],
   ['questions_20after_20a_20port_4',['Questions after a port',['../migrating_pvsneslib.html#questions-after-a-port',1,'']]],
-  ['quick_20flash_5',['Quick Flash',['../examples_transitions_fading.html#quick-flash',1,'']]],
-  ['quick_20reference_6',['Quick Reference',['../snes_graphics_guide.html#quick-reference',1,'Quick Reference'],['../snes_sound_guide.html#quick-reference-1',1,'Quick Reference'],['../hardware_overview.html#quick-reference-2',1,'Quick Reference']]],
-  ['quick_20start_7',['Quick Start',['../audio_8h.html#quick-start',1,'Quick Start'],['../profile_8h.html#quick-start-1',1,'Quick Start'],['../snesmod_8h.html#quick-start-2',1,'Quick Start']]],
-  ['quirk_8',['Sprite Y +1 Scanline Quirk',['../oam.html#sprite-y-1-scanline-quirk',1,'']]]
+  ['queue_5',['Following the music and managing the queue',['../tutorial_audio.html#following-the-music-and-managing-the-queue',1,'']]],
+  ['quick_20flash_6',['Quick Flash',['../examples_transitions_fading.html#quick-flash',1,'']]],
+  ['quick_20reference_7',['Quick Reference',['../snes_graphics_guide.html#quick-reference',1,'Quick Reference'],['../snes_sound_guide.html#quick-reference-1',1,'Quick Reference'],['../hardware_overview.html#quick-reference-2',1,'Quick Reference']]],
+  ['quick_20start_8',['Quick Start',['../audio_8h.html#quick-start',1,'Quick Start'],['../profile_8h.html#quick-start-1',1,'Quick Start'],['../snesmod_8h.html#quick-start-2',1,'Quick Start']]],
+  ['quirk_9',['Sprite Y +1 Scanline Quirk',['../oam.html#sprite-y-1-scanline-quirk',1,'']]]
 ];

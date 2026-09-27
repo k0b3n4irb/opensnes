@@ -174,7 +174,7 @@ Color Math Configuration</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">COLDATA ($2132)  </td><td class="markdownTableBodyNone"><span class="tt">0xEC</span>  </td><td class="markdownTableBodyNone">Subtract intensity 12 from R+G+B (moderate darkening)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-52"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-51"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="color-math-window-vs-bg-window"></a>
 Color Math Window vs BG Window</h3>
@@ -207,10 +207,13 @@ Going Further</h2>
 <li><b>Rounded corners</b>: Use per-scanline HDMA values that curve inward at the top and bottom of the rectangle, creating a rounded window.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">effects/window</span> &ndash; Triangle-shaped HDMA window (BG masking, not color math)</li>
-<li><span class="tt">effects/transparency</span> &ndash; Color math without windows (full-screen effects) </li>
+<li><span class="tt">effects/transparency</span> &ndash; Color math without windows (full-screen effects)</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-75"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">window</span>, <span class="tt">colormath</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

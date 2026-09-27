@@ -6,7 +6,7 @@ var examples_chips =
         [ "SNES Concepts", "examples_chips_dsp1_cube.html#snes-concepts-16", null ],
         [ "Firmware requirement", "examples_chips_dsp1_cube.html#firmware-requirement", null ],
         [ "How to Build", "examples_chips_dsp1_cube.html#how-to-build-10", null ],
-        [ "Modules Used", "examples_chips_dsp1_cube.html#modules-used-17", null ]
+        [ "Modules Used", "examples_chips_dsp1_cube.html#modules-used-22", null ]
       ] ]
     ] ],
     [ "SA-1 Hello World", "examples_chips_sa1_hello.html", null ],

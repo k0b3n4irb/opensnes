@@ -25,6 +25,7 @@ var examples_games =
           [ "Pre-Converted Assets", "examples_games_breakout.html#pre-converted-assets", null ],
           [ "Why These Modules?", "examples_games_breakout.html#why-these-modules-1", null ]
         ] ],
+        [ "Modules Used", "examples_games_breakout.html#modules-used-35", null ],
         [ "Technical Reference", "examples_games_breakout.html#technical-reference-1", null ],
         [ "Files", "examples_games_breakout.html#files-6", null ],
         [ "Credits", "examples_games_breakout.html#credits-1", null ]

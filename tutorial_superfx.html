@@ -263,6 +263,34 @@ The Exclusive Bus</h2>
 <li>the launch/poll code itself still executes from WRAM, as in every reference project (casfx, DOOM-FX, PeterLemon).</li>
 </ol>
 <p>The NMI is <b>not</b> disabled during a job any more. It used to be, and one VBlank in three was lost in <span class="tt">superfx_3d</span> (game time ran at two thirds of real time); <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch</a></span> also re-enabled NMI with a hardcoded <span class="tt">$81</span>, which silently cancelled an H/V-timer IRQ the game had armed.</p>
+<h2 class="doxsection"><a class="anchor" id="letting-the-game-run-during-a-job-the-code-cache"></a>
+Letting the Game Run During a Job: the Code Cache</h2>
+<p><span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span> waits in WRAM for the whole job, because a GSU running its program from ROM owns the ROM. A program that fits in the GSU's 512-byte code cache does not need the ROM: loaded there by the CPU and started from the cache, the GSU keeps running with RON = 0, and the CPU carries on with its own code in ROM (Nintendo dev manual Book II §6.1.2: a program in the cache "will not stop" when RON is 0, "it becomes possible to access the game
+pak ROM or RAM from the Super NES CPU"; §6.8.4 for loading the cache from the CPU).</p>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_job[], gsu_job_end[];      <span class="comment">/* the .incbin&#39;d .sfx.bin */</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="superfx_8h.html#a943b65ace4311678092e5d4176b014b5">gsuCacheLoad</a>(gsu_job, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(gsu_job_end - gsu_job));</div>
+<div class="line"><a class="code hl_function" href="superfx_8h.html#a8745a42974dfd87a72b1adc719729aa7">gsuStartCached</a>(0);              <span class="comment">/* returns at once */</span></div>
+<div class="line"><span class="keywordflow">while</span> (<a class="code hl_function" href="superfx_8h.html#a3b031469e2704f59a026f0ab6667a959">gsuBusy</a>()) {</div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();            <span class="comment">/* the game&#39;s frame, from ROM */</span></div>
+<div class="line">    update_game();</div>
+<div class="line">}</div>
+<div class="line"><a class="code hl_function" href="superfx_8h.html#a08f145d6e71ff599568073b91a5cabe5">gsuWait</a>();                      <span class="comment">/* gives Game Pak RAM back to the CPU */</span></div>
+<div class="ttc" id="asuperfx_8h_html_a08f145d6e71ff599568073b91a5cabe5"><div class="ttname"><a href="superfx_8h.html#a08f145d6e71ff599568073b91a5cabe5">gsuWait</a></div><div class="ttdeci">void gsuWait(void)</div><div class="ttdoc">Wait for the end of the job, then give the Game Pak back to the CPU.</div></div>
+<div class="ttc" id="asuperfx_8h_html_a3b031469e2704f59a026f0ab6667a959"><div class="ttname"><a href="superfx_8h.html#a3b031469e2704f59a026f0ab6667a959">gsuBusy</a></div><div class="ttdeci">u8 gsuBusy(void)</div><div class="ttdoc">Is the GSU still running? (SFR GO bit).</div></div>
+<div class="ttc" id="asuperfx_8h_html_a8745a42974dfd87a72b1adc719729aa7"><div class="ttname"><a href="superfx_8h.html#a8745a42974dfd87a72b1adc719729aa7">gsuStartCached</a></div><div class="ttdeci">void gsuStartCached(u16 pc)</div><div class="ttdoc">Start the program loaded by gsuCacheLoad() and return at once.</div></div>
+<div class="ttc" id="asuperfx_8h_html_a943b65ace4311678092e5d4176b014b5"><div class="ttname"><a href="superfx_8h.html#a943b65ace4311678092e5d4176b014b5">gsuCacheLoad</a></div><div class="ttdeci">void gsuCacheLoad(const void *code, u16 size)</div><div class="ttdoc">Copy a GSU program into the GSU code cache ($3100-$32FF).</div></div>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="superfx_8h.html#a943b65ace4311678092e5d4176b014b5" title="Copy a GSU program into the GSU code cache ($3100-$32FF).">gsuCacheLoad()</a></span> stops the GSU (which empties the cache), copies the code to <span class="tt">$3100</span> and pads the last 16-byte line with NOP, as krom's cache-injection test does. <span class="tt"><a class="el" href="superfx_8h.html#a8745a42974dfd87a72b1adc719729aa7" title="Start the program loaded by gsuCacheLoad() and return at once.">gsuStartCached()</a></span> writes your <span class="tt"><a class="el" href="superfx_8h.html#a276ddb2df70ac449323c825df9d7f89d" title="CFGR register value ($80=IRQ mask, $A0=IRQ mask + fast multiply).">gsu_cfgr</a></span> / <span class="tt"><a class="el" href="superfx_8h.html#ad840ff367d45008c2505fc2e93c5bf06" title="SCBR screen base ($00=buffer A, $10=buffer B).">gsu_scbr</a></span> / <span class="tt"><a class="el" href="superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995" title="SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON).">gsu_scmr</a></span>, with RON forced to 0, then R15, which starts the GSU.</p>
+<p>What such a program may not do:</p>
+<ul>
+<li>be longer than 512 bytes;</li>
+<li>use <span class="tt">CACHE</span> or <span class="tt">LJMP</span>: both empty the cache and refetch from ROM, which the GSU does not own;</li>
+<li>read ROM data (<span class="tt">GETB</span> and the ROM buffer).</li>
+</ul>
+<p>If <span class="tt"><a class="el" href="superfx_8h.html#af40ac5ed1d6c297cb066a57c4d52c995" title="SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON).">gsu_scmr</a></span> grants the Game Pak RAM to the GSU (RAN, needed for <span class="tt">PLOT</span> and <span class="tt">STW</span>), the CPU must not touch <span class="tt">$70:xxxx</span>, nor its <span class="tt">$6000-$7FFF</span> mirror, until <span class="tt"><a class="el" href="superfx_8h.html#a08f145d6e71ff599568073b91a5cabe5" title="Wait for the end of the job, then give the Game Pak back to the CPU.">gsuWait()</a></span>. <span class="tt">devtools/libtests_gsu</span> runs a job of about seven frames this way; its manifest checks that the game loop counted seven frames during the job and that the CPU never read the ROM the GSU owned (luna's <span class="tt">gsu.bus_violations</span> stays 0, against 149 340 when RON is left at 1).</p>
+<blockquote class="doxtable">
+<p><b>Open on luna (2026-09-27):</b> run from the cache, that job's last Game Pak RAM writes come out incomplete in luna, where the same program run from ROM writes them all. Not settled on hardware; until it is, read back only what the job wrote well before its <span class="tt">STOP</span>, and check the results. </p>
+</blockquote>
 <h2 class="doxsection"><a class="anchor" id="superfx-assembly-rules"></a>
 SuperFX Assembly Rules</h2>
 <p>Four mandatory rules for all GSU programs:</p>
@@ -323,15 +351,22 @@ Column-Major Tile Layout</h3>
 <div class="line">SRAM tile 16 = screen position (col=1, row=0)</div>
 </div><!-- fragment --><p>The SNES PPU tilemap must compensate: </p><div class="fragment"><div class="line">tilemap[row * 32 + col] = col * tiles_per_column + row</div>
 </div><!-- fragment --><p>For 4bpp height=128: <span class="tt"><a class="el" href="backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a>[row*32 + col] = col*16 + row</span></p>
+<p>The library writes that tilemap for you: <span class="tt">gsuSetupBitmapTilemap(vram)</span> fills a 32×32 tilemap at that VRAM word address with the column-major order of a 4bpp, 128-line framebuffer (tile <span class="tt">col * 16 + row</span>), and tile 0 below it.</p>
 <h3 class="doxsection"><a class="anchor" id="sram-to-vram-transfer"></a>
 SRAM to VRAM Transfer</h3>
-<p>After the GSU finishes, DMA the framebuffer during forced blank:</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();</div>
-<div class="line"><span class="comment">/* DMA 16KB from SRAM $70:0000 to VRAM $0000 */</span></div>
-<div class="line"><span class="comment">/* (see gsu_loader.asm dmaBitmapToVRAM function) */</span></div>
-<div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
-<div class="ttc" id="aconsole_8h_html_a5380410c3dc97fbaa3b36b095d631512"><div class="ttname"><a href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a></div><div class="ttdeci">void setScreenOff(void)</div><div class="ttdef"><b>Definition</b> console.h:147</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="example-roms-2"></a>
+<p>A 4bpp 256×128 framebuffer is 16 KB, far more than a VBlank carries. The library's answer, used by <span class="tt">examples/chips/superfx_3d</span>, is to cut the visible picture down and send the frame during the lines that are dark:</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="superfx_8h.html#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a>(0x4000);   <span class="comment">/* once, in force blank */</span></div>
+<div class="line"><span class="comment">/* ... each frame, once the GSU job is done: */</span></div>
+<div class="line"><a class="code hl_function" href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8">gsuDmaFullFrame</a>();               <span class="comment">/* waits for line 184, then DMAs 16 KB */</span></div>
+<div class="line"><span class="comment">/* ... once, after the first frame: */</span></div>
+<div class="line"><a class="code hl_function" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a">gsuSetupHdmaBlanking</a>(40, 40);    <span class="comment">/* 40 black lines at the top and bottom */</span></div>
+<div class="ttc" id="asuperfx_8h_html_a1fd575a6b7ae455fdf3ca7205b221f50"><div class="ttname"><a href="superfx_8h.html#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a></div><div class="ttdeci">void gsuSetupBitmapTilemap(u16 vramAddr)</div><div class="ttdoc">Setup column-major tilemap for SuperFX PLOT framebuffer.</div></div>
+<div class="ttc" id="asuperfx_8h_html_ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><div class="ttname"><a href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8">gsuDmaFullFrame</a></div><div class="ttdeci">void gsuDmaFullFrame(void)</div><div class="ttdoc">Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS).</div></div>
+<div class="ttc" id="asuperfx_8h_html_ae7a88cd0ea3830d8a308cf5c0ca8b00a"><div class="ttname"><a href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a">gsuSetupHdmaBlanking</a></div><div class="ttdeci">void gsuSetupHdmaBlanking(u16 topBlank, u16 bottomBlank)</div><div class="ttdoc">Setup HDMA screen blanking for DMA bandwidth.</div></div>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS).">gsuDmaFullFrame()</a></span> copies 16 KB from Game Pak RAM (<span class="tt">$70</span>, offset <span class="tt"><a class="el" href="superfx_8h.html#a06b7d31abfaac2dacbfe49f26e89c1a9" title="DMA source high byte ($00=buffer A at $70:0000, $40=buffer B at $70:4000).">gsu_dma_src_hi</a></span> × 256) to VRAM <span class="tt">$0000</span> on DMA channel 0, after polling the vertical counter until line 184. <span class="tt">gsuSetupHdmaBlanking(top, bottom)</span> uses HDMA channel 1 to force blank that many lines at the top and the bottom of the screen, the bars that give the transfer its time.</p>
+<p>It uses HDMA channel 1 and arms it like <span class="tt"><a class="el" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539" title="Enable HDMA channel(s).">hdmaEnable()</a></span> does, so it combines with your own HDMA channels; just leave channel 1 to it.</p>
+<p><span class="tt"><a class="el" href="superfx_8h.html#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a></span> returns 1 when crt0 found a GSU at boot; use it to fall back gracefully, as <span class="tt"><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Set the GSU default configuration; returns gsuIsPresent().">gsuInit()</a></span> does, without <span class="tt"><a class="el" href="superfx_8h.html#addfe64b4f0c5ffe4847f2e0d56c5ef10" title="Set the GSU default configuration; returns gsuIsPresent().">gsuInit()</a></span>'s side effects.</p>
+<h2 class="doxsection"><a class="anchor" id="example-roms-2"></a>
 Example ROMs</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

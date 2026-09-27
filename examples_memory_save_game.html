@@ -199,7 +199,7 @@ How It Works</h2>
 <div class="ttc" id="atext_8h_html_a9a7338f84dc102993e17953ceaaf2a8e"><div class="ttname"><a href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e">textInit</a></div><div class="ttdeci">void textInit(u16 tilemap_addr, u16 font_tile, u8 palette)</div><div class="ttdoc">Initialize the text rendering system.</div></div>
 <div class="ttc" id="atext_8h_html_afdb3005611dd240d7b9850474c575548"><div class="ttname"><a href="text_8h.html#afdb3005611dd240d7b9850474c575548">TEXT_DEFAULT_TILEMAP_ADDR</a></div><div class="ttdeci">#define TEXT_DEFAULT_TILEMAP_ADDR</div><div class="ttdoc">Default tilemap WORD address — 32×32 tilemap at VRAM word $3800.</div><div class="ttdef"><b>Definition</b> text.h:46</div></div>
 </div><!-- fragment --><p>After each save/load operation, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></span> updates the on-screen feedback and <span class="tt"><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush()</a></span> sends the updated text buffer to VRAM.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-36"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-35"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="sram-address-space"></a>
 SRAM Address Space</h3>
@@ -230,10 +230,13 @@ Going Further</h2>
 <li><b>Larger save structure</b>: Add fields for health, inventory, level number, and play time. This is how real RPG save systems work.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">memory/hirom_demo</span> &ndash; Understand LoROM vs HiROM memory mapping</li>
-<li><span class="tt">games/breakout</span> &ndash; See game state management in a complete game </li>
+<li><span class="tt">games/breakout</span> &ndash; See game state management in a complete game</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-55"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

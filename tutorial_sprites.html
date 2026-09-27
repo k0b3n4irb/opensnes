@@ -188,7 +188,8 @@ Setting a Sprite</h3>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, 100, 80, 0, 0, 0, 0);  <span class="comment">// Sprite 0 at (100, 80), tile 0</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, 120, 80, 0, 1, 0, 0);  <span class="comment">// Sprite 1 with palette 1</span></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="updating-oam"></a>
+</div><!-- fragment --><p>To move a sprite that is already set, change only its position: <span class="tt">oamSetXY(id, x, y)</span>, or <span class="tt">oamSetX(id, x)</span> when only X changes (a horizontal shooter's scroll, a sprite sliding along a rail). Tile, palette and flags stay as <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> left them.</p>
+<h3 class="doxsection"><a class="anchor" id="updating-oam"></a>
 Updating OAM</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>

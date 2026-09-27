@@ -18,11 +18,11 @@ var examples_hdma =
           [ "Non-Repeat vs Repeat Mode", "examples_hdma_gradient_colors.html#non-repeat-vs-repeat-mode", null ]
         ] ],
         [ "Project Structure", "examples_hdma_gradient_colors.html#project-structure-4", null ],
-        [ "Going Further", "examples_hdma_gradient_colors.html#going-further-1", null ]
+        [ "Going Further", "examples_hdma_gradient_colors.html#going-further-1", null ],
+        [ "Modules Used", "examples_hdma_gradient_colors.html#modules-used-42", null ]
       ] ]
     ] ],
     [ "HDMA Helpers Demo", "examples_hdma_hdma_helpers.html", null ],
     [ "HDMA Indirect Gradient", "examples_hdma_hdma_indirect_gradient.html", null ],
-    [ "HDMA Wave", "examples_hdma_hdma_wave.html", null ],
-    [ "HDMA Wave Table", "examples_hdma_hdma_wave_table.html", null ]
+    [ "HDMA Wave", "examples_hdma_hdma_wave.html", null ]
 ];

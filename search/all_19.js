@@ -36,7 +36,7 @@ var searchData=
   ['nmi_20handler_33',['🟡 HDMA fires before the user callback in the NMI handler',['../tutorial_hdma.html#autotoc_md-hdma-fires-before-the-user-callback-in-the-nmi-handler',1,'']]],
   ['nmi_20status_34',['$4210 - RDNMI (NMI Status)',['../registers.html#autotoc_md4210---rdnmi-nmi-status',1,'']]],
   ['nmiclear_35',['nmiClear',['../interrupt_8h.html#a4a0a4690d2c70b58584eed95377325a1',1,'interrupt.h']]],
-  ['nmiset_36',['nmiSet',['../interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7',1,'interrupt.h']]],
+  ['nmiset_36',['nmiSet',['../interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7',1,'nmiSet():&#160;interrupt.h'],['../tutorial_interrupts.html#running-c-at-every-vblank-nmiset',1,'Running C at every VBlank: &lt;span class=&quot;tt&quot;&gt;nmiSet&lt;/span&gt;']]],
   ['nmiset_20callbacks_37',['🟡 &lt;span class=&quot;tt&quot;&gt;fixMul()&lt;/span&gt; / &lt;span class=&quot;tt&quot;&gt;fixLerp()&lt;/span&gt; are not safe inside nmiSet() callbacks',['../KNOWN_LIMITATIONS.html#autotoc_md-fixmul--fixlerp-are-not-safe-inside-nmiset-callbacks',1,'']]],
   ['nmisetbank_38',['nmiSetBank',['../interrupt_8h.html#af408cb8d09dc9ab56ae7245c18792c2d',1,'interrupt.h']]],
   ['nmitimen_20interrupt_20enable_39',['$4200 - NMITIMEN (Interrupt Enable)',['../registers.html#autotoc_md4200---nmitimen-interrupt-enable',1,'']]],
@@ -66,7 +66,7 @@ var searchData=
   ['not_20a_20vram_20address_63',['The &lt;span class=&quot;tt&quot;&gt;name_base&lt;/span&gt; argument is a page number, not a VRAM address',['../tutorial_sprites.html#the-name_base-argument-is-a-page-number-not-a-vram-address',1,'']]],
   ['not_20a_20write_20protect_64',['🟡 &lt;span class=&quot;tt&quot;&gt;sramClear&lt;/span&gt; is a memset, not a write-protect',['../tutorial_sram.html#autotoc_md-sramclear-is-a-memset-not-a-write-protect',1,'']]],
   ['not_20affect_20obj_20sprites_65',['🟠 Mosaic does not affect OBJ (sprites)',['../tutorial_mosaic.html#autotoc_md-mosaic-does-not-affect-obj-sprites',1,'']]],
-  ['not_20assumed_66',['not assumed',['../examples_hdma_hdma_indirect_gradient.html#fidelity-to-the-original-measured-not-assumed',1,'Fidelity to the original (measured, not assumed)'],['../examples_hdma_hdma_wave_table.html#fidelity-to-the-original-measured-not-assumed-1',1,'Fidelity to the original (measured, not assumed)']]],
+  ['not_20assumed_66',['not assumed',['../examples_hdma_hdma_wave.html#fidelity-to-the-original-hand-mode-measured-not-assumed',1,'Fidelity to the original (hand mode; measured, not assumed)'],['../examples_hdma_hdma_indirect_gradient.html#fidelity-to-the-original-measured-not-assumed',1,'Fidelity to the original (measured, not assumed)']]],
   ['not_20built_67',['Build fails with &quot;Library not built&quot;',['../getting_started.html#build-fails-with-library-not-built',1,'']]],
   ['not_20by_20register_68',['🟡 Repeat vs non-repeat on &lt;span class=&quot;tt&quot;&gt;WH0&lt;/span&gt;/&lt;span class=&quot;tt&quot;&gt;WH1&lt;/span&gt; — pick by data shape, not by register',['../tutorial_window.html#autotoc_md-repeat-vs-non-repeat-on-wh0wh1--pick-by-data-shape-not-by-register',1,'']]],
   ['not_20currently_20updating_69',['Reaching an object you are not currently updating',['../tutorial_object.html#reaching-an-object-you-are-not-currently-updating',1,'']]],
@@ -114,6 +114,6 @@ var searchData=
   ['number_20not_20a_20vram_20address_111',['The &lt;span class=&quot;tt&quot;&gt;name_base&lt;/span&gt; argument is a page number, not a VRAM address',['../tutorial_sprites.html#the-name_base-argument-is-a-page-number-not-a-vram-address',1,'']]],
   ['numbering_112',['VRAM Tile Numbering',['../tutorial_animation.html#vram-tile-numbering',1,'']]],
   ['numbers_113',['Numbers',['../examples_basics_random.html',1,'Random Numbers'],['../examples_sprites_metasprite.html#vram-tile-layout-and-oam-tile-numbers',1,'VRAM Tile Layout and OAM Tile Numbers']]],
-  ['numbers_114',['Printing numbers',['../tutorial_text.html#printing-numbers',1,'']]],
+  ['numbers_114',['numbers',['../tutorial_text.html#printing-numbers',1,'Printing numbers'],['../tutorial_math.html#random-numbers',1,'Random numbers']]],
   ['numbers_20smearing_115',['🟡 Numbers smearing',['../tutorial_text.html#autotoc_md-numbers-smearing',1,'']]]
 ];

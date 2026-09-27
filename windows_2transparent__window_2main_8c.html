@@ -162,7 +162,7 @@ Variables</h2></td></tr>
 <div class="textblock"><p>Semi-transparent darkened rectangle via HDMA windows and color math. </p>
 <p>Combines two SNES hardware features to render a darkened rectangle over a background image. HDMA drives the window position registers WH0 ($2126) and WH1 ($2127) every scanline to define the rectangle boundaries. The color math unit is configured to subtract a fixed color intensity inside the window region only (CGWSEL bit 5-4 = 01), producing a tinted overlay.</p>
 <p>The HDMA tables use repeat mode (bit 7 set in the line count byte) because WH0/WH1 are write-only registers that must be refreshed every scanline, even when the window position is constant across the rectangle height.</p>
-<p>Ported from PVSnesLib "TransparentWindow" example by Digifox. Uses bare-metal register writes to match PVSnesLib behavior exactly.</p>
+<p>Ported from PVSnesLib "TransparentWindow" example by Digifox. Uses the colormath and window modules with PVSnesLib's register values, so the frames match its original.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>HDMA repeat mode for per-scanline window boundary updates</li>
 <li>Window registers WH0/WH1 ($2126/$2127) defining a rectangular region</li>

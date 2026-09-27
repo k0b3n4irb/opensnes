@@ -12,7 +12,7 @@ var examples_by_category =
       [ "Windows", "examples_by_category.html#windows", null ],
       [ "Transitions", "examples_by_category.html#transitions", null ],
       [ "Input &amp; peripherals", "examples_by_category.html#input--peripherals", null ],
-      [ "Audio", "examples_by_category.html#audio", null ],
+      [ "Audio", "examples_by_category.html#audio-1", null ],
       [ "Maps", "examples_by_category.html#maps", null ],
       [ "Game math &amp; mechanics", "examples_by_category.html#game-math--mechanics", null ],
       [ "Memory &amp; mappers", "examples_by_category.html#memory--mappers", null ],
@@ -23,9 +23,9 @@ var examples_by_category =
       ] ],
       [ "Games (capstones)", "examples_by_category.html#games-capstones", [
         [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-36", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-49", null ],
-        [ "How to build", "examples_text_print_string.html#how-to-build-23", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-43", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-48", null ],
+        [ "How to build", "examples_text_print_string.html#how-to-build-22", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-71", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -56,7 +56,6 @@ var examples_by_category =
     [ "Gradient Colors -- HDMA Color Gradients", "examples_hdma_gradient_colors.html", null ],
     [ "HDMA Indirect Gradient", "examples_hdma_hdma_indirect_gradient.html", null ],
     [ "HDMA Wave", "examples_hdma_hdma_wave.html", null ],
-    [ "HDMA Wave Table", "examples_hdma_hdma_wave_table.html", null ],
     [ "HDMA Helpers Demo", "examples_hdma_hdma_helpers.html", null ],
     [ "palette_cycle — animate by rotating CGRAM", "examples_color_palette_cycle.html", null ],
     [ "Color Addition Transparency", "examples_color_transparency.html", null ],

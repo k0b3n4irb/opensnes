@@ -204,7 +204,18 @@ Loading Tiles to VRAM</h2>
 <div class="ttc" id="agroup__ppu__regs_html_gaa8cd1d05c2abc19978d533f927f2e738"><div class="ttname"><a href="group__ppu__regs.html#gaa8cd1d05c2abc19978d533f927f2e738">REG_VMDATAH</a></div><div class="ttdeci">#define REG_VMDATAH</div><div class="ttdoc">VRAM data write high (W).</div><div class="ttdef"><b>Definition</b> registers.h:130</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="setting-up-tilemaps"></a>
+</div><!-- fragment --><p>The <span class="tt">background</span> module does the same with DMA, and points the layer at the tiles in one call. <span class="tt"><a class="el" href="background_8h.html#a1bb367b6ff962b9ef7552e39ef70ca80" title="Load tile graphics only (no palette).">bgInitTileSetData()</a></span> loads tiles only (no palette), for a second tile set or a layer that shares a palette:</p>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hud_tiles[], hud_tiles_end[];</div>
+<div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> extra_tiles[], extra_tiles_end[];</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* DMA the tiles to VRAM $3000 and set BG3&#39;s tile base there */</span></div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a1bb367b6ff962b9ef7552e39ef70ca80">bgInitTileSetData</a>(2, hud_tiles, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(hud_tiles_end - hud_tiles), 0x3000);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* 0xFF as the layer: load the tiles, leave every tile base alone */</span></div>
+<div class="line"><a class="code hl_function" href="background_8h.html#a1bb367b6ff962b9ef7552e39ef70ca80">bgInitTileSetData</a>(0xFF, extra_tiles, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(extra_tiles_end - extra_tiles), 0x5000);</div>
+<div class="ttc" id="abackground_8h_html_a1bb367b6ff962b9ef7552e39ef70ca80"><div class="ttname"><a href="background_8h.html#a1bb367b6ff962b9ef7552e39ef70ca80">bgInitTileSetData</a></div><div class="ttdeci">void bgInitTileSetData(u8 bgNumber, const u8 *tileSource, u16 tileSize, u16 vramAddr)</div><div class="ttdoc">Load tile graphics only (no palette).</div></div>
+</div><!-- fragment --><p>Like any DMA to VRAM, call it during force blank or VBlank. <span class="tt">bgInit(bg)</span> puts a layer's scroll back to (0, 0).</p>
+<h2 class="doxsection"><a class="anchor" id="setting-up-tilemaps"></a>
 Setting Up Tilemaps</h2>
 <p>Tilemaps define which tiles appear where on screen. Each entry is 2 bytes:</p>
 <div class="fragment"><div class="line">Bits: vhopppcc cccccccc</div>

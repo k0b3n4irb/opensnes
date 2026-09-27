@@ -11,12 +11,13 @@ var examples_windows =
           [ "HDMA Rectangle", "examples_windows_transparent_window.html#hdma-rectangle", null ],
           [ "Color Math Configuration", "examples_windows_transparent_window.html#color-math-configuration-1", null ]
         ] ],
-        [ "SNES Concepts", "examples_windows_transparent_window.html#snes-concepts-52", [
+        [ "SNES Concepts", "examples_windows_transparent_window.html#snes-concepts-51", [
           [ "Color Math Window vs BG Window", "examples_windows_transparent_window.html#color-math-window-vs-bg-window", null ],
           [ "Practical Use", "examples_windows_transparent_window.html#practical-use", null ]
         ] ],
         [ "Project Structure", "examples_windows_transparent_window.html#project-structure-22", null ],
-        [ "Going Further", "examples_windows_transparent_window.html#going-further-13", null ]
+        [ "Going Further", "examples_windows_transparent_window.html#going-further-13", null ],
+        [ "Modules Used", "examples_windows_transparent_window.html#modules-used-75", null ]
       ] ]
     ] ],
     [ "Window -- HDMA Triangle Masking", "examples_windows_window.html", null ],

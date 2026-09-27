@@ -123,63 +123,88 @@ $(function(){initNavTree('hdma_2hdma__wave_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>HDMA-driven sinusoidal wave distortion on background.  
+<p>HDMA wave: build the table by hand, then let the hdma module do it.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="console_8h_source.html">snes/console.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="hdma_8h_source.html">snes/hdma.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:aaecfdabcd93ab543a6f69765773602b5" id="r_aaecfdabcd93ab543a6f69765773602b5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aaecfdabcd93ab543a6f69765773602b5">AMP_DEFAULT</a>&#160;&#160;&#160;3</td></tr>
-<tr class="memitem:ac247b6d2f61c4934c01ade8749276784" id="r_ac247b6d2f61c4934c01ade8749276784"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac247b6d2f61c4934c01ade8749276784">AMP_LEVELS</a>&#160;&#160;&#160;7</td></tr>
-<tr class="memitem:a6de815867c28f7b41ede2509206f5ef3" id="r_a6de815867c28f7b41ede2509206f5ef3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6de815867c28f7b41ede2509206f5ef3">SINE_PERIOD</a>&#160;&#160;&#160;112</td></tr>
-<tr class="memitem:abd81848b2e3b5695fb6f0cc2939407e1" id="r_abd81848b2e3b5695fb6f0cc2939407e1"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#abd81848b2e3b5695fb6f0cc2939407e1">TABLE_ENTRIES</a>&#160;&#160;&#160;335</td></tr>
-<tr class="memitem:a032503e76d6f69bc67e99e909c8125da" id="r_a032503e76d6f69bc67e99e909c8125da"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a032503e76d6f69bc67e99e909c8125da">TABLE_SIZE</a>&#160;&#160;&#160;1006</td></tr>
+<tr class="memitem:aaecfdabcd93ab543a6f69765773602b5" id="r_aaecfdabcd93ab543a6f69765773602b5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aaecfdabcd93ab543a6f69765773602b5">AMP_DEFAULT</a>&#160;&#160;&#160;10</td></tr>
+<tr class="memdesc:aaecfdabcd93ab543a6f69765773602b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Module-mode amplitude: default, bounds and step, in pixels.  <br /></td></tr>
+<tr class="memitem:ab2b16fd8be6d8981f7867ca265435403" id="r_ab2b16fd8be6d8981f7867ca265435403"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab2b16fd8be6d8981f7867ca265435403">AMP_MAX</a>&#160;&#160;&#160;24</td></tr>
+<tr class="memitem:a1af9a876b7128f783dceed5588d3f9b2" id="r_a1af9a876b7128f783dceed5588d3f9b2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1af9a876b7128f783dceed5588d3f9b2">AMP_MIN</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memitem:ab49324e29e09809fa4594cf845f0ad9e" id="r_ab49324e29e09809fa4594cf845f0ad9e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab49324e29e09809fa4594cf845f0ad9e">AMP_STEP</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memitem:aac8a07ae7893fb46cd4f26f409f641f1" id="r_aac8a07ae7893fb46cd4f26f409f641f1"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aac8a07ae7893fb46cd4f26f409f641f1">CH_HAND</a>&#160;&#160;&#160;<a class="el" href="hdma_8h.html#a211e9c142386b1b0729265985447e601">HDMA_CHANNEL_0</a></td></tr>
+<tr class="memdesc:aac8a07ae7893fb46cd4f26f409f641f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Channel of the hand-built table (krom's channel 0).  <br /></td></tr>
+<tr class="memitem:a9f93adb560cbcb94bb3cc6f017e39f21" id="r_a9f93adb560cbcb94bb3cc6f017e39f21"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a9f93adb560cbcb94bb3cc6f017e39f21">CH_LIB</a>&#160;&#160;&#160;<a class="el" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></td></tr>
+<tr class="memdesc:a9f93adb560cbcb94bb3cc6f017e39f21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Channel of the hdma module's wave (7 belongs to the OAM DMA).  <br /></td></tr>
+<tr class="memitem:ab4a96af1cf26126286b97851804254cf" id="r_ab4a96af1cf26126286b97851804254cf"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab4a96af1cf26126286b97851804254cf">ENTRY_BYTES</a>&#160;&#160;&#160;3</td></tr>
+<tr class="memdesc:ab4a96af1cf26126286b97851804254cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bytes per HDMA entry in 1REG_2X mode: count + 16-bit value.  <br /></td></tr>
+<tr class="memitem:a66dfb3e79e2ee8c70cdb20e50b48b654" id="r_a66dfb3e79e2ee8c70cdb20e50b48b654"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a66dfb3e79e2ee8c70cdb20e50b48b654">VRAM_BG1_GFX</a>&#160;&#160;&#160;0x0000</td></tr>
+<tr class="memdesc:a66dfb3e79e2ee8c70cdb20e50b48b654"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address of BG1 tile graphics (image start).  <br /></td></tr>
+<tr class="memitem:a5e61fdba74b777914687b6c020985713" id="r_a5e61fdba74b777914687b6c020985713"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5e61fdba74b777914687b6c020985713">VRAM_BG1_GFX2</a>&#160;&#160;&#160;0x4000</td></tr>
+<tr class="memdesc:a5e61fdba74b777914687b6c020985713"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address of the second tile half (bytes 32768+).  <br /></td></tr>
+<tr class="memitem:a062335e0c6d2c2294bf2782b300c7a60" id="r_a062335e0c6d2c2294bf2782b300c7a60"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a062335e0c6d2c2294bf2782b300c7a60">VRAM_BG1_MAP</a>&#160;&#160;&#160;0x7C00</td></tr>
+<tr class="memdesc:a062335e0c6d2c2294bf2782b300c7a60"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address of BG1 tilemap — above the 57 KB of tiles, krom's layout (his BG1SC put the map at VRAM byte $F800).  <br /></td></tr>
+<tr class="memitem:aa15808dca75aef694bf558fd894edc7f" id="r_aa15808dca75aef694bf558fd894edc7f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa15808dca75aef694bf558fd894edc7f">WAVE_FREQ</a>&#160;&#160;&#160;10</td></tr>
+<tr class="memdesc:aa15808dca75aef694bf558fd894edc7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Module-mode frequency: period = 256 / 10 = 25.6 lines.  <br /></td></tr>
+<tr class="memitem:ab3c9143994d748245d6325f03b4f53b4" id="r_ab3c9143994d748245d6325f03b4f53b4"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab3c9143994d748245d6325f03b4f53b4">WAVE_WRAP</a>&#160;&#160;&#160;672</td></tr>
+<tr class="memdesc:ab3c9143994d748245d6325f03b4f53b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrap length of the start-pointer animation, in table entries. krom's exact value: his sine's quasi-period is ~25.8 lines (non- integer), so his seamless wrap needs 672 entries; the table holds 224 more so any start phase has a full screen of valid lines.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a782092c87f0065fde12be7bcef35dbaf" id="r_a782092c87f0065fde12be7bcef35dbaf"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a782092c87f0065fde12be7bcef35dbaf">hand_point</a> (void)</td></tr>
+<tr class="memdesc:a782092c87f0065fde12be7bcef35dbaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Point channel 0 at the hand-built table from the current phase.  <br /></td></tr>
+<tr class="memitem:a61914957bc9797d4759194e2f251a7ad" id="r_a61914957bc9797d4759194e2f251a7ad"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a61914957bc9797d4759194e2f251a7ad">lib_start</a> (void)</td></tr>
+<tr class="memdesc:a61914957bc9797d4759194e2f251a7ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Re)start the module's wave with the current amplitude.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; HDMA-driven sinusoidal wave distortion on background.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point — hand-built HDMA table, then the hdma module.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:abdd3cff453194f6dbcc796e20b76dd08" id="r_abdd3cff453194f6dbcc796e20b76dd08"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#abdd3cff453194f6dbcc796e20b76dd08">amp_offsets</a> [7]</td></tr>
-<tr class="memdesc:abdd3cff453194f6dbcc796e20b76dd08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-computed byte offsets into hdma_tables[] for each amplitude level.  <br /></td></tr>
-<tr class="memitem:ae05a9c41b2bc58d8bf8855428f8ab2bf" id="r_ae05a9c41b2bc58d8bf8855428f8ab2bf"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae05a9c41b2bc58d8bf8855428f8ab2bf">hdma_tables</a> []</td></tr>
-<tr class="memdesc:ae05a9c41b2bc58d8bf8855428f8ab2bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-computed HDMA sine wave tables for 7 amplitude levels.  <br /></td></tr>
-<tr class="memitem:a13912a192faf5a9d70b395935f61472c" id="r_a13912a192faf5a9d70b395935f61472c"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a13912a192faf5a9d70b395935f61472c">tiles</a> []</td></tr>
-<tr class="memdesc:a13912a192faf5a9d70b395935f61472c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimal 4bpp tile data: one empty tile and one solid tile.  <br /></td></tr>
-<tr id="var-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">Wave Effect State</div></td></tr>
-<tr><td colspan="2" class="ititle"><div class="groupText"><p>Runtime state variables for the wave distortion effect.</p>
-<p>These are <span class="tt">static</span> (file-scope) variables, which the compiler places in WRAM via RAMSECTION + .data_init. They persist across frames and are initialized explicitly in <a class="el" href="basics_2timer_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe" title="Entry point — hand off to gameLoopRun().">main()</a> rather than relying on C static init. </p>
-</div></td></tr>
-<tr class="memitem:a4f5bf0d24f1c1e07461c5631f84a2ee6" id="r_a4f5bf0d24f1c1e07461c5631f84a2ee6"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4f5bf0d24f1c1e07461c5631f84a2ee6">amp_idx</a></td></tr>
-<tr class="memitem:aeafbd2df4bb2c4f71ecfb2bae657e2c9" id="r_aeafbd2df4bb2c4f71ecfb2bae657e2c9"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aeafbd2df4bb2c4f71ecfb2bae657e2c9">animating</a></td></tr>
-<tr class="memitem:a69a06c0873c234e1242abb73b84755e1" id="r_a69a06c0873c234e1242abb73b84755e1"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a69a06c0873c234e1242abb73b84755e1">phase</a></td></tr>
-<tr class="memitem:a1217eca99ae6132b71291ce224f6faf8" id="r_a1217eca99ae6132b71291ce224f6faf8"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1217eca99ae6132b71291ce224f6faf8">wave_on</a></td></tr>
+<tr class="memitem:a43a6b3b5ca7ab7763d85bec4ccf9342b" id="r_a43a6b3b5ca7ab7763d85bec4ccf9342b"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a43a6b3b5ca7ab7763d85bec4ccf9342b">amp</a></td></tr>
+<tr class="memdesc:a43a6b3b5ca7ab7763d85bec4ccf9342b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Module-mode amplitude in pixels.  <br /></td></tr>
+<tr class="memitem:aa81235770612a39a2668d11264dc308f" id="r_aa81235770612a39a2668d11264dc308f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa81235770612a39a2668d11264dc308f">palette</a> []</td></tr>
+<tr class="memitem:a3da363538ba291dd89fe3717bcf9b000" id="r_a3da363538ba291dd89fe3717bcf9b000"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3da363538ba291dd89fe3717bcf9b000">palette_end</a> []</td></tr>
+<tr class="memitem:adb9ddd7f438b5617fa5426c0b131ee96" id="r_adb9ddd7f438b5617fa5426c0b131ee96"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a> []</td></tr>
+<tr class="memitem:a3414aa059bff2713d95aa1f8901858a0" id="r_a3414aa059bff2713d95aa1f8901858a0"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3414aa059bff2713d95aa1f8901858a0">tilemap_end</a> []</td></tr>
+<tr class="memitem:adbf45f9654fccf61f3aa31645fd95120" id="r_adbf45f9654fccf61f3aa31645fd95120"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adbf45f9654fccf61f3aa31645fd95120">tiles</a> []</td></tr>
+<tr class="memdesc:adbf45f9654fccf61f3aa31645fd95120"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 3 image data (from data.asm; generated original art).  <br /></td></tr>
+<tr class="memitem:a4e2ff104ea000ee1feab2f58b34bb791" id="r_a4e2ff104ea000ee1feab2f58b34bb791"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4e2ff104ea000ee1feab2f58b34bb791">tiles2</a> []</td></tr>
+<tr class="memitem:a396ccfe1f03bf101dfd6d307510d6dac" id="r_a396ccfe1f03bf101dfd6d307510d6dac"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a396ccfe1f03bf101dfd6d307510d6dac">tiles2_end</a> []</td></tr>
+<tr class="memitem:aedfcc0c9e922a49f431a9b605bd1ffe5" id="r_aedfcc0c9e922a49f431a9b605bd1ffe5"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aedfcc0c9e922a49f431a9b605bd1ffe5">tiles_end</a> []</td></tr>
+<tr class="memitem:affde91a1c5930b082aa520c30f2bdd3a" id="r_affde91a1c5930b082aa520c30f2bdd3a"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#affde91a1c5930b082aa520c30f2bdd3a">use_lib</a></td></tr>
+<tr class="memdesc:affde91a1c5930b082aa520c30f2bdd3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">0 = hand-built table (channel 0), 1 = hdma module (channel 6)  <br /></td></tr>
+<tr class="memitem:ad39ca1a8fe6cd45ad696878bd2621016" id="r_ad39ca1a8fe6cd45ad696878bd2621016"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad39ca1a8fe6cd45ad696878bd2621016">wave_phase</a></td></tr>
+<tr class="memdesc:ad39ca1a8fe6cd45ad696878bd2621016"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current wave phase of the hand-built table, in entries.  <br /></td></tr>
+<tr class="memitem:abf00a26b74624dc6a2f78c58bdb7c8c3" id="r_abf00a26b74624dc6a2f78c58bdb7c8c3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abf00a26b74624dc6a2f78c58bdb7c8c3">wavetable</a> []</td></tr>
+<tr class="memdesc:abf00a26b74624dc6a2f78c58bdb7c8c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">krom's exact HDMA table, in ROM (data.asm).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>HDMA-driven sinusoidal wave distortion on background. </p>
-<p>Creates a wavy horizontal distortion effect by using HDMA to write per-scanline BG1 horizontal scroll offsets (BG1HOFS, $210D). A set of 7 pre-computed sine tables at increasing amplitudes (0 to 24 pixels) are stored in ROM, each containing 335 entries (224 visible scanlines + 111 wrap entries for smooth phase animation). HDMA channel 6 is configured in write-twice mode (1REG_2X) to write both the low and high bytes of BG1HOFS each scanline. When animation is enabled, the table pointer advances by 3 bytes per frame (one HDMA entry), cycling through the wrap portion to create continuous wave motion. The background consists of simple alternating solid/empty tiles to make the distortion clearly visible.</p>
+<div class="textblock"><p>HDMA wave: build the table by hand, then let the hdma module do it. </p>
+<p>One water image, one per-scanline ripple, two ways to make it.</p>
+<p>At boot the ripple comes from an HDMA table written BY HAND and animated the way krom's assembler demo does it: the table is never rewritten; each VBlank the table START POINTER advances one entry, so line L reads entry phase+L and the crests flow up the screen. That is the HDMA table format itself — <span class="tt">[line-count, value...]</span> entries and a terminator — and the cheapest animation there is.</p>
+<p>Press A and the same ripple comes from the <span class="tt">hdma</span> module instead: <a class="el" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241" title="Set up horizontal wave effect (water reflection).">hdmaWaveH()</a> computes the sine table in RAM and <a class="el" href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216" title="Update wave animation.">hdmaWaveUpdate()</a> animates it, with the amplitude now a parameter (LEFT/RIGHT). The defaults (amplitude 10, frequency 10: a 25.6-line period) sit close to krom's table (round(10 * sin), a ~25.8-line quasi-period), so the switch shows the helper reproducing what the hand-built table did. Press A again to go back.</p>
+<p>C port of "SNES Wave HDMA Demo" by krom (Peter Lemon), github.com/PeterLemon/SNES, PPU/HDMA/WaveHDMA — technique reproduced on the <a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">snes/hdma.h</a> API in the original demo configuration (BG Mode 3, full-screen 256-color image). Art is original: procedurally generated water caustics (res/water.bmp), no krom assets.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li>HDMA write-twice mode (1REG_2X) targeting BG1HOFS ($210D)</li>
-<li>Per-scanline horizontal scroll offset for wave distortion</li>
-<li>Repeat-mode HDMA entries (bit 7 set = write every scanline)</li>
-<li>Pre-computed sine tables with wrap region for seamless animation</li>
-<li>Bare-metal VRAM and CGRAM writes (no library DMA helpers)</li>
+<li>HDMA table format: <span class="tt">count</span> byte (1 = apply to one scanline) followed by the register payload (2 bytes for a write-twice register), then a 0x00 terminator byte</li>
+<li>HDMA_MODE_1REG_2X: one register written twice per line — exactly what the 16-bit scroll registers ($210D BG1HOFS low/high) expect</li>
+<li>Animation by START-POINTER repoint (hdmaSetup once per frame with <span class="tt">table + phase*3</span>): the table itself is immutable, so HDMA never observes a partially rewritten entry — no tearing, ~zero CPU cost</li>
+<li>The same effect from the library: hdmaWaveH / hdmaWaveUpdate / hdmaWaveStop, tables computed and double-buffered in RAM</li>
+<li>BG Mode 3 (8bpp, 256 colors) with a full-screen image — the same configuration as the original demo (~57 KB of unique tiles, split across two ROM banks; the tilemap sits above them at VRAM $7C00)</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
-<li>Press A to toggle the wave effect on/off</li>
-<li>Press LEFT/RIGHT to decrease/increase wave amplitude (7 levels)</li>
-<li>Press UP to start wave animation (the wave scrolls vertically)</li>
-<li>Press DOWN to stop animation (wave freezes in place)</li>
+<li>At boot: the water image in tight sine ripples flowing UPWARD at one scanline per frame — krom's exact table (896 entries, verbatim) and cadence (wrap at 672); the white rulers every 64px stay straight</li>
+<li>Press A: the hdma module takes over (channel 6 instead of 0); the ripple looks nearly the same</li>
+<li>LEFT/RIGHT (module mode): amplitude from 2 to 24 pixels, in steps of 2</li>
+<li>Press A again: back to the hand-built table, from where it was</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, dma, sprite, input, hdma</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">hdma.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a>, <a class="el" href="video_8h.html" title="SNES Video / PPU Functions.">video.h</a> </dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, input, hdma</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">hdma.h</a>, examples/hdma/hdma_helpers (the other hdma module effects) </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="aaecfdabcd93ab543a6f69765773602b5" name="aaecfdabcd93ab543a6f69765773602b5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaecfdabcd93ab543a6f69765773602b5">&#9670;&#160;</a></span>AMP_DEFAULT</h2>
@@ -188,75 +213,240 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define AMP_DEFAULT&#160;&#160;&#160;3</td>
+          <td class="memname">#define AMP_DEFAULT&#160;&#160;&#160;10</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Default amplitude index (amplitude level 12 pixels) </p>
+
+<p>Module-mode amplitude: default, bounds and step, in pixels. </p>
 
 </div>
 </div>
-<a id="ac247b6d2f61c4934c01ade8749276784" name="ac247b6d2f61c4934c01ade8749276784"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac247b6d2f61c4934c01ade8749276784">&#9670;&#160;</a></span>AMP_LEVELS</h2>
+<a id="ab2b16fd8be6d8981f7867ca265435403" name="ab2b16fd8be6d8981f7867ca265435403"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2b16fd8be6d8981f7867ca265435403">&#9670;&#160;</a></span>AMP_MAX</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define AMP_LEVELS&#160;&#160;&#160;7</td>
+          <td class="memname">#define AMP_MAX&#160;&#160;&#160;24</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Number of amplitude levels (0, 4, 8, 12, 16, 20, 24 pixels) </p>
 
 </div>
 </div>
-<a id="a6de815867c28f7b41ede2509206f5ef3" name="a6de815867c28f7b41ede2509206f5ef3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6de815867c28f7b41ede2509206f5ef3">&#9670;&#160;</a></span>SINE_PERIOD</h2>
+<a id="a1af9a876b7128f783dceed5588d3f9b2" name="a1af9a876b7128f783dceed5588d3f9b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1af9a876b7128f783dceed5588d3f9b2">&#9670;&#160;</a></span>AMP_MIN</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define SINE_PERIOD&#160;&#160;&#160;112</td>
+          <td class="memname">#define AMP_MIN&#160;&#160;&#160;2</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sine wave period in scanlines (half the visible screen height) </p>
 
 </div>
 </div>
-<a id="abd81848b2e3b5695fb6f0cc2939407e1" name="abd81848b2e3b5695fb6f0cc2939407e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd81848b2e3b5695fb6f0cc2939407e1">&#9670;&#160;</a></span>TABLE_ENTRIES</h2>
+<a id="ab49324e29e09809fa4594cf845f0ad9e" name="ab49324e29e09809fa4594cf845f0ad9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab49324e29e09809fa4594cf845f0ad9e">&#9670;&#160;</a></span>AMP_STEP</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define TABLE_ENTRIES&#160;&#160;&#160;335</td>
+          <td class="memname">#define AMP_STEP&#160;&#160;&#160;2</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Entries per table: 224 visible scanlines + 111 wrap entries for smooth animation </p>
 
 </div>
 </div>
-<a id="a032503e76d6f69bc67e99e909c8125da" name="a032503e76d6f69bc67e99e909c8125da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a032503e76d6f69bc67e99e909c8125da">&#9670;&#160;</a></span>TABLE_SIZE</h2>
+<a id="aac8a07ae7893fb46cd4f26f409f641f1" name="aac8a07ae7893fb46cd4f26f409f641f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac8a07ae7893fb46cd4f26f409f641f1">&#9670;&#160;</a></span>CH_HAND</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define TABLE_SIZE&#160;&#160;&#160;1006</td>
+          <td class="memname">#define CH_HAND&#160;&#160;&#160;<a class="el" href="hdma_8h.html#a211e9c142386b1b0729265985447e601">HDMA_CHANNEL_0</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Bytes per amplitude table: 335 entries x 3 bytes + 1 end marker (0x00) </p>
+
+<p>Channel of the hand-built table (krom's channel 0). </p>
+
+</div>
+</div>
+<a id="a9f93adb560cbcb94bb3cc6f017e39f21" name="a9f93adb560cbcb94bb3cc6f017e39f21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f93adb560cbcb94bb3cc6f017e39f21">&#9670;&#160;</a></span>CH_LIB</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CH_LIB&#160;&#160;&#160;<a class="el" href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Channel of the hdma module's wave (7 belongs to the OAM DMA). </p>
+
+</div>
+</div>
+<a id="ab4a96af1cf26126286b97851804254cf" name="ab4a96af1cf26126286b97851804254cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4a96af1cf26126286b97851804254cf">&#9670;&#160;</a></span>ENTRY_BYTES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ENTRY_BYTES&#160;&#160;&#160;3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bytes per HDMA entry in 1REG_2X mode: count + 16-bit value. </p>
+
+</div>
+</div>
+<a id="a66dfb3e79e2ee8c70cdb20e50b48b654" name="a66dfb3e79e2ee8c70cdb20e50b48b654"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66dfb3e79e2ee8c70cdb20e50b48b654">&#9670;&#160;</a></span>VRAM_BG1_GFX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG1_GFX&#160;&#160;&#160;0x0000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>VRAM word address of BG1 tile graphics (image start). </p>
+
+</div>
+</div>
+<a id="a5e61fdba74b777914687b6c020985713" name="a5e61fdba74b777914687b6c020985713"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e61fdba74b777914687b6c020985713">&#9670;&#160;</a></span>VRAM_BG1_GFX2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG1_GFX2&#160;&#160;&#160;0x4000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>VRAM word address of the second tile half (bytes 32768+). </p>
+
+</div>
+</div>
+<a id="a062335e0c6d2c2294bf2782b300c7a60" name="a062335e0c6d2c2294bf2782b300c7a60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a062335e0c6d2c2294bf2782b300c7a60">&#9670;&#160;</a></span>VRAM_BG1_MAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_BG1_MAP&#160;&#160;&#160;0x7C00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>VRAM word address of BG1 tilemap — above the 57 KB of tiles, krom's layout (his BG1SC put the map at VRAM byte $F800). </p>
+
+</div>
+</div>
+<a id="aa15808dca75aef694bf558fd894edc7f" name="aa15808dca75aef694bf558fd894edc7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa15808dca75aef694bf558fd894edc7f">&#9670;&#160;</a></span>WAVE_FREQ</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define WAVE_FREQ&#160;&#160;&#160;10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Module-mode frequency: period = 256 / 10 = 25.6 lines. </p>
+
+</div>
+</div>
+<a id="ab3c9143994d748245d6325f03b4f53b4" name="ab3c9143994d748245d6325f03b4f53b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3c9143994d748245d6325f03b4f53b4">&#9670;&#160;</a></span>WAVE_WRAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define WAVE_WRAP&#160;&#160;&#160;672</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Wrap length of the start-pointer animation, in table entries. krom's exact value: his sine's quasi-period is ~25.8 lines (non- integer), so his seamless wrap needs 672 entries; the table holds 224 more so any start phase has a full screen of valid lines. </p>
 
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a782092c87f0065fde12be7bcef35dbaf" name="a782092c87f0065fde12be7bcef35dbaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a782092c87f0065fde12be7bcef35dbaf">&#9670;&#160;</a></span>hand_point()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hand_point </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Point channel 0 at the hand-built table from the current phase. </p>
+
+</div>
+</div>
+<a id="a61914957bc9797d4759194e2f251a7ad" name="a61914957bc9797d4759194e2f251a7ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61914957bc9797d4759194e2f251a7ad">&#9670;&#160;</a></span>lib_start()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void lib_start </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>(Re)start the module's wave with the current amplitude. </p>
+
+</div>
+</div>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -272,22 +462,15 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point &ndash; HDMA-driven sinusoidal wave distortion on background. </p>
-<p>Sets up a simple striped background using bare-metal VRAM and CGRAM writes (no library DMA helpers), then configures HDMA channel 6 to apply per-scanline horizontal scroll offsets from pre-computed sine tables.</p>
-<p>Controls:</p><ul>
-<li>A: toggle wave on/off</li>
-<li>LEFT/RIGHT: decrease/increase amplitude</li>
-<li>UP: start animation (wave scrolls vertically)</li>
-<li>DOWN: stop animation (wave freezes)</li>
-</ul>
-<dl class="section return"><dt>Returns</dt><dd>Does not return (infinite loop). </dd></dl>
-<p>&lt; Default amplitude index (amplitude level 12 pixels)</p>
+<p>Entry point — hand-built HDMA table, then the hdma module. </p>
+<p>Init order per the SDK convention: console, VRAM, palette, BG pointers, mode, HDMA, screen on. The main loop repoints the hand-built table once per VBlank, or lets <a class="el" href="hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216" title="Update wave animation.">hdmaWaveUpdate()</a> animate the module's wave.</p>
+<dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop) </dd></dl>
 
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a4f5bf0d24f1c1e07461c5631f84a2ee6" name="a4f5bf0d24f1c1e07461c5631f84a2ee6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f5bf0d24f1c1e07461c5631f84a2ee6">&#9670;&#160;</a></span>amp_idx</h2>
+<a id="a43a6b3b5ca7ab7763d85bec4ccf9342b" name="a43a6b3b5ca7ab7763d85bec4ccf9342b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43a6b3b5ca7ab7763d85bec4ccf9342b">&#9670;&#160;</a></span>amp</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -296,7 +479,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amp_idx</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> amp</td>
         </tr>
       </table>
   </td>
@@ -305,40 +488,13 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Current amplitude index (0-6, selects which table to use) </p>
+
+<p>Module-mode amplitude in pixels. </p>
 
 </div>
 </div>
-<a id="abdd3cff453194f6dbcc796e20b76dd08" name="abdd3cff453194f6dbcc796e20b76dd08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abdd3cff453194f6dbcc796e20b76dd08">&#9670;&#160;</a></span>amp_offsets</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> amp_offsets[7]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                             = {</div>
-<div class="line">    0, 1006, 2012, 3018, 4024, 5030, 6036</div>
-<div class="line">}</div>
-</div><!-- fragment -->
-<p>Pre-computed byte offsets into hdma_tables[] for each amplitude level. </p>
-<p>Since each amplitude table is TABLE_SIZE (1006) bytes, the offset for level N is N * 1006. These are pre-computed to avoid runtime multiplication (the 65816 has no hardware multiply for 16-bit values, so <span class="tt"><a class="el" href="#a4f5bf0d24f1c1e07461c5631f84a2ee6">amp_idx</a> * 1006</span> would require an expensive software multiply routine). </p>
-
-</div>
-</div>
-<a id="aeafbd2df4bb2c4f71ecfb2bae657e2c9" name="aeafbd2df4bb2c4f71ecfb2bae657e2c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeafbd2df4bb2c4f71ecfb2bae657e2c9">&#9670;&#160;</a></span>animating</h2>
+<a id="aa81235770612a39a2668d11264dc308f" name="aa81235770612a39a2668d11264dc308f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa81235770612a39a2668d11264dc308f">&#9670;&#160;</a></span>palette</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -347,30 +503,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> animating</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Animation enabled flag (0=frozen, 1=scrolling) </p>
-
-</div>
-</div>
-<a id="ae05a9c41b2bc58d8bf8855428f8ab2bf" name="ae05a9c41b2bc58d8bf8855428f8ab2bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae05a9c41b2bc58d8bf8855428f8ab2bf">&#9670;&#160;</a></span>hdma_tables</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hdma_tables[]</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette[]</td>
         </tr>
       </table>
   </td>
@@ -380,22 +513,24 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Pre-computed HDMA sine wave tables for 7 amplitude levels. </p>
-<p>7 × 1006 = 7042 bytes, defined in <span class="tt">res/hdma_wave_tables.bin</span> and brought in by <span class="tt">data.asm</span> via <span class="tt">.incbin</span>. Layout per amplitude level (TABLE_SIZE = 1006 bytes):</p><ul>
-<li>335 HDMA entries, each 3 bytes:<ul>
-<li>Byte 0: 0x81 = repeat flag (bit 7) + 1 scanline count (bits 6-0). The repeat flag tells HDMA to re-read data bytes for every scanline in the group (here, just 1 scanline), required for smooth per-line distortion.</li>
-<li>Bytes 1-2: BG1HOFS low + high (signed 16-bit scroll offset). Positive shifts BG right, negative (two's complement, 0xFF 0xFF = -1) shifts left.</li>
-</ul>
-</li>
-<li>1 terminator byte (0x00).</li>
-</ul>
-<p>The 335 entries cover 224 visible scanlines plus 111 wrap entries. By advancing the HDMA start pointer by 3 bytes (one entry) per frame, the wave pattern appears to scroll vertically. After 112 entries (one full sine period), the pattern repeats seamlessly thanks to the wrap region.</p>
-<p>Amplitude levels: 0, 4, 8, 12, 16, 20, 24 pixels peak displacement. </p>
+</div>
+</div>
+<a id="a3da363538ba291dd89fe3717bcf9b000" name="a3da363538ba291dd89fe3717bcf9b000"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3da363538ba291dd89fe3717bcf9b000">&#9670;&#160;</a></span>palette_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette_end[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
-<a id="a69a06c0873c234e1242abb73b84755e1" name="a69a06c0873c234e1242abb73b84755e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69a06c0873c234e1242abb73b84755e1">&#9670;&#160;</a></span>phase</h2>
+<a id="adb9ddd7f438b5617fa5426c0b131ee96" name="adb9ddd7f438b5617fa5426c0b131ee96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb9ddd7f438b5617fa5426c0b131ee96">&#9670;&#160;</a></span>tilemap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -404,21 +539,34 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> phase</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilemap[]</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Current animation phase (0-111, index into sine period) </p>
 
 </div>
 </div>
-<a id="a13912a192faf5a9d70b395935f61472c" name="a13912a192faf5a9d70b395935f61472c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13912a192faf5a9d70b395935f61472c">&#9670;&#160;</a></span>tiles</h2>
+<a id="a3414aa059bff2713d95aa1f8901858a0" name="a3414aa059bff2713d95aa1f8901858a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3414aa059bff2713d95aa1f8901858a0">&#9670;&#160;</a></span>tilemap_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilemap_end[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adbf45f9654fccf61f3aa31645fd95120" name="adbf45f9654fccf61f3aa31645fd95120"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbf45f9654fccf61f3aa31645fd95120">&#9670;&#160;</a></span>tiles</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -427,31 +575,22 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles[]</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles[]</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">                      = {</div>
-<div class="line">    </div>
-<div class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</div>
-<div class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</div>
-<div class="line">    </div>
-<div class="line">    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,</div>
-<div class="line">    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</div>
-<div class="line">}</div>
-</div><!-- fragment -->
-<p>Minimal 4bpp tile data: one empty tile and one solid tile. </p>
-<p>SNES 4bpp tiles are 32 bytes each (8x8 pixels, 4 bitplanes). The first 16 bytes contain interleaved bitplanes 0 and 1, the next 16 contain bitplanes 2 and 3. For a "solid color 1" tile, only bitplane 0 needs to be set (all 0xFF), with all other bitplanes zero. The alternating empty/solid pattern in the tilemap creates vertical stripes that make the wave distortion clearly visible. </p>
+
+<p>Mode 3 image data (from data.asm; generated original art). </p>
 
 </div>
 </div>
-<a id="a1217eca99ae6132b71291ce224f6faf8" name="a1217eca99ae6132b71291ce224f6faf8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1217eca99ae6132b71291ce224f6faf8">&#9670;&#160;</a></span>wave_on</h2>
+<a id="a4e2ff104ea000ee1feab2f58b34bb791" name="a4e2ff104ea000ee1feab2f58b34bb791"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e2ff104ea000ee1feab2f58b34bb791">&#9670;&#160;</a></span>tiles2</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -460,7 +599,57 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> wave_on</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles2[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a396ccfe1f03bf101dfd6d307510d6dac" name="a396ccfe1f03bf101dfd6d307510d6dac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a396ccfe1f03bf101dfd6d307510d6dac">&#9670;&#160;</a></span>tiles2_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles2_end[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aedfcc0c9e922a49f431a9b605bd1ffe5" name="aedfcc0c9e922a49f431a9b605bd1ffe5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aedfcc0c9e922a49f431a9b605bd1ffe5">&#9670;&#160;</a></span>tiles_end</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_end[]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="affde91a1c5930b082aa520c30f2bdd3a" name="affde91a1c5930b082aa520c30f2bdd3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affde91a1c5930b082aa520c30f2bdd3a">&#9670;&#160;</a></span>use_lib</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> use_lib</td>
         </tr>
       </table>
   </td>
@@ -469,7 +658,57 @@ Variables</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Wave effect enabled flag (0=off, 1=on) </p>
+
+<p>0 = hand-built table (channel 0), 1 = hdma module (channel 6) </p>
+
+</div>
+</div>
+<a id="ad39ca1a8fe6cd45ad696878bd2621016" name="ad39ca1a8fe6cd45ad696878bd2621016"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad39ca1a8fe6cd45ad696878bd2621016">&#9670;&#160;</a></span>wave_phase</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> wave_phase</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Current wave phase of the hand-built table, in entries. </p>
+
+</div>
+</div>
+<a id="abf00a26b74624dc6a2f78c58bdb7c8c3" name="abf00a26b74624dc6a2f78c58bdb7c8c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf00a26b74624dc6a2f78c58bdb7c8c3">&#9670;&#160;</a></span>wavetable</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> wavetable[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>krom's exact HDMA table, in ROM (data.asm). </p>
+<p>896 entries of [1][offset16] + terminator, extracted verbatim from the original demo: entry values are round(10*sin) samples with a quasi-period of ~25.8 lines. The table is never written: the animation only moves the start pointer (hdmaSetup reads the bank from the far pointer, so the table can sit in any ROM bank). </p>
 
 </div>
 </div>

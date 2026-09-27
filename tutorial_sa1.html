@@ -122,15 +122,35 @@ $(function(){initNavTree('tutorial_sa1.html','',''); });
   <div class="headertitle"><div class="title">SA-1 Enhancement Chip Tutorial </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This tutorial covers the SA-1 coprocessor — a second 65816 CPU running at 10.74 MHz inside the cartridge, giving your SNES game 3× the processing power.</p>
+<div class="textblock"><p>This tutorial covers the SA-1 coprocessor — a second 65816 CPU clocked at 10.74 MHz inside the cartridge, running in parallel with the main CPU.</p>
 <h2 class="doxsection"><a class="anchor" id="what-is-sa-1"></a>
 What Is SA-1?</h2>
-<p>The SA-1 is a <b>65c816 clone</b> clocked at 10.74 MHz (vs 3.58 MHz for the main CPU). It shares the same instruction set, so you already know how to program it. Games like <em>Kirby Super Star</em>, <em>Super Mario RPG</em>, and <em>Kirby's Dream Land 3</em> used it to handle AI, physics, and decompression that the main CPU couldn't keep up with.</p>
+<p>The SA-1 is a <b>65c816 clone</b> clocked at 10.74 MHz (vs 3.58 MHz for the main CPU). It shares the same instruction set, so you already know how to program it — in assembly: the SDK does not run C on it, because the C runtime lives in work RAM, which the SA-1 cannot see (table below).</p>
+<p><b>How fast it really runs depends on memory, not on the clock.</b> The higan SA-1 speed tests measured (<a href="https://gitlab.com/higan/snes-test-roms">higan test ROMs</a>, "SA-1 Speed Test"):</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Main CPU runs from  </th><th class="markdownTableHeadNone">SA-1 runs from  </th><th class="markdownTableHeadNone">SA-1 effective speed  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">WRAM or ROM  </td><td class="markdownTableBodyNone">I-RAM  </td><td class="markdownTableBodyNone">~10.7 MHz (~3.7 MHz if the main CPU also works in I-RAM)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">WRAM  </td><td class="markdownTableBodyNone">ROM  </td><td class="markdownTableBodyNone">~10 MHz  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">ROM  </td><td class="markdownTableBodyNone">ROM  </td><td class="markdownTableBodyNone">**~5.4 MHz** — the two CPUs share the ROM bus  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">any  </td><td class="markdownTableBodyNone">BW-RAM  </td><td class="markdownTableBodyNone">~5.4 MHz, ~2.7 MHz if both use BW-RAM  </td></tr>
+</table>
+<p>So "3× the main CPU" holds only for SA-1 code that keeps off the ROM while the main CPU is on it. The table gives the rate while both CPUs are in a case; a real program moves between cases, so its effective speed is a mix, and a property of the scene rather than of the cartridge. Measure it:</p>
+<div class="fragment"><div class="line">luna profile examples/chips/sa1_starfield/sa1_starfield.sfc \</div>
+<div class="line">    --from-frame 60 --until-frame 180 --top 0</div>
+<div class="line"># sa1: 4390440 instr, 21441240 clocks (0.0% idle in WAI), 20.2% of busy clocks</div>
+<div class="line">#      lost to bus conflicts (rom 4327500, bwram 0, iram 13140) — ~8.56 MHz while running</div>
+<div class="line"># sa1: accesses 85.9% rom, 14.1% iram, 0.0% bwram, 0.0% other</div>
+</div><!-- fragment --><p><span class="tt">sa1_starfield</span> runs its SA-1 code from ROM: 86 % of its accesses are ROM, but the penalty only applies when the main CPU is on ROM at the same moment, so it loses a fifth of its clocks, not half — about 8.6 MHz, 2.4× the main CPU (luna v1.28.0). Code moved to I-RAM would approach 10.74 MHz. Games like <em>Kirby Super Star</em>, <em>Super Mario RPG</em>, and <em>Kirby's Dream Land 3</em> used it to handle AI, physics, and decompression that the main CPU couldn't keep up with.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Feature  </th><th class="markdownTableHeadNone">Main CPU  </th><th class="markdownTableHeadNone">SA-1  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Clock  </td><td class="markdownTableBodyNone">3.58 MHz  </td><td class="markdownTableBodyNone">10.74 MHz  </td></tr>
+<td class="markdownTableBodyNone">Clock  </td><td class="markdownTableBodyNone">3.58 MHz  </td><td class="markdownTableBodyNone">10.74 MHz (effective speed: see above)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Instruction set  </td><td class="markdownTableBodyNone">65c816  </td><td class="markdownTableBodyNone">65c816 (identical)  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -191,7 +211,7 @@ Getting Started</h2>
 </ul>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-write-your-sa-1-boot-code"></a>
 2. Write Your SA-1 Boot Code</h3>
-<p>Create <span class="tt">sa1_boot.asm</span> <b>in your example directory</b> (not in templates/). This code runs on the SA-1 at 10.74 MHz:</p>
+<p>Create <span class="tt">sa1_boot.asm</span> <b>in your example directory</b> (not in templates/). This code runs on the SA-1:</p>
 <div class="fragment"><div class="line">.ifdef SA1</div>
 <div class="line"> </div>
 <div class="line">.SECTION &quot;.sa1_boot&quot; SUPERFREE</div>

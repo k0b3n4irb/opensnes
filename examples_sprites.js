@@ -13,13 +13,14 @@ var examples_sprites =
           [ "3. Animation timing", "examples_sprites_animated_sprite.html#autotoc_md3-animation-timing", null ],
           [ "4. Tile calculation", "examples_sprites_animated_sprite.html#autotoc_md4-tile-calculation", null ]
         ] ],
-        [ "SNES Concepts", "examples_sprites_animated_sprite.html#snes-concepts-43", [
+        [ "SNES Concepts", "examples_sprites_animated_sprite.html#snes-concepts-42", [
           [ "OBJ_FLIPX &ndash; Hardware Horizontal Mirror", "examples_sprites_animated_sprite.html#obj_flipx----hardware-horizontal-mirror", null ],
           [ "Sprite Sheets in VRAM", "examples_sprites_animated_sprite.html#sprite-sheets-in-vram", null ],
           [ "16x16 Tiles in OAM", "examples_sprites_animated_sprite.html#autotoc_md16x16-tiles-in-oam", null ]
         ] ],
         [ "Project Structure", "examples_sprites_animated_sprite.html#project-structure-16", null ],
-        [ "Going Further", "examples_sprites_animated_sprite.html#going-further-8", null ]
+        [ "Going Further", "examples_sprites_animated_sprite.html#going-further-8", null ],
+        [ "Modules Used", "examples_sprites_animated_sprite.html#modules-used-63", null ]
       ] ]
     ] ],
     [ "Aseprite Pipeline", "examples_sprites_aseprite_pipeline.html", null ],

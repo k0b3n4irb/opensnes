@@ -285,6 +285,14 @@ The lib API</h2>
 <td class="markdownTableBodyNone"><span class="tt">colorMathSetFixedColor(r, g, b)</span>  </td><td class="markdownTableBodyNone">Set the fixed-colour value (5-bit per channel). Used when source is <span class="tt">_FIXED</span>.  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">colorMathSetCondition(condition)</span>  </td><td class="markdownTableBodyNone">Window region where math is allowed: <span class="tt">_ALWAYS</span> / <span class="tt">_INSIDE</span> / <span class="tt">_OUTSIDE</span> / <span class="tt">_NEVER</span> (CGWSEL bits 5-4).  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">colorMathSetChannel(channel, intensity)</span>  </td><td class="markdownTableBodyNone">Set one channel of the fixed colour (<span class="tt"><a class="el" href="colormath_8h.html#a426734a17583c70ee5ce7fe4e83885de" title="Apply fixed color to red channel.">COLDATA_RED</a></span>, <span class="tt"><a class="el" href="colormath_8h.html#aeaff020d783d4964dd678746a1aeba41" title="Apply fixed color to green channel.">COLDATA_GREEN</a></span>, <span class="tt"><a class="el" href="colormath_8h.html#ad898eab3a2acd21505968806ee54ddd3" title="Apply fixed color to blue channel.">COLDATA_BLUE</a></span>, OR-able) to 0-31, leaving the others as they are.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">colorMathSetBrightness(level)</span>  </td><td class="markdownTableBodyNone">The fixed colour as a grey of 0-31, for fades: with <span class="tt"><a class="el" href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3" title="Add colors (brightens).">COLORMATH_ADD</a></span> it fades toward white, with <span class="tt"><a class="el" href="colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea" title="Subtract colors (darkens).">COLORMATH_SUB</a></span> toward black.  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">colorMathTransparency50(layers)</span>  </td><td class="markdownTableBodyNone">One call for a 50 % blend of <span class="tt">layers</span> with the sub screen (add, halve, sub-screen source). Put the layer to show through on the sub screen with <span class="tt"><a class="el" href="video_8h.html#a0bd5181ba6d21fca96ad627fa0ed4abe" title="Enable layers on the sub screen.">setSubScreen()</a></span>.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">colorMathSetDirectColor(enable)</span>  </td><td class="markdownTableBodyNone">8bpp layers read each pixel byte as a colour instead of a CGRAM index — see <span class="tt">examples/color/direct_color</span>.  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="worked-patterns-the-two-shipped-examples"></a>
 Worked patterns (the two shipped examples)</h2>

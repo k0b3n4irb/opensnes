@@ -209,7 +209,7 @@ The 6 Size Modes</h2>
 <td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">32x32  </td><td class="markdownTableBodyNone">64x64  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="sprite_8h.html#a449cd6f7c4fc8ca09a632e0c58cdb365">OBJ_SIZE32_L64</a></span>  </td></tr>
 </table>
 <p>Most SNES games use mode 3 (<span class="tt"><a class="el" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></span>) &ndash; 16x16 for characters and 32x32 for bosses/effects. Mode 0 (<span class="tt"><a class="el" href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf" title="Sprite size indices (for oamInit, oamInitGfxSet).">OBJ_SIZE8_L16</a></span>) is common for simple games with small sprites.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-48"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-47"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="objsel-register-2101"></a>
 OBJSEL Register ($2101)</h3>
@@ -262,10 +262,13 @@ Going Further</h2>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">sprites/simple_sprite</span> &ndash; Basic static sprite setup</li>
 <li><span class="tt">sprites/animated_sprite</span> &ndash; Frame-based sprite animation</li>
-<li><span class="tt">sprites/dynamic_sprite</span> &ndash; VRAM streaming for many animation frames </li>
+<li><span class="tt">sprites/dynamic_sprite</span> &ndash; VRAM streaming for many animation frames</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-69"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">text4bpp</span>, <span class="tt">input</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

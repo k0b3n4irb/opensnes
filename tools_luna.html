@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>luna — command reference (pinned v1.27.0)</title>
+<title>luna — command reference (pinned v1.28.0)</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('tools_luna.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">luna — command reference (pinned v1.27.0) </div></div>
+  <div class="headertitle"><div class="title">luna — command reference (pinned v1.28.0) </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>luna is the cycle-accurate emulator every OpenSNES test runs on (<span class="tt">.claude/rules/testing.md</span>). The SDK pins one release in <span class="tt">tools/luna-test/luna.version</span>; <span class="tt">scripts/install-luna.sh</span> fetches it and <span class="tt">make tests</span> uses nothing else. This page is that release's own <span class="tt">--help</span>, one section per subcommand, so what you read here is what the pinned binary accepts — not a newer or older luna.</p>
@@ -403,6 +403,11 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">          Cap the Super FX instruction trace at this many events (default 200 000)</div>
 <div class="line">          </div>
 <div class="line">          [default: 200000]</div>
+<div class="line"> </div>
+<div class="line">      --superfx-trace-from &lt;SUPERFX_TRACE_FROM&gt;</div>
+<div class="line">          Instruction count at which to begin the Super FX trace, like `--dma-trace-from` (an instruction count, not a frame: for frame N, take `stats.instructions_executed` from `luna state --until-frame N --out -`). The trace is a ring that keeps the most recent events once full, so the run&#39;s end picks the window; this trims its head, giving exactly [from, end] as long as that fits under `--superfx-trace-max`</div>
+<div class="line">          </div>
+<div class="line">          [default: 0]</div>
 <div class="line"> </div>
 <div class="line">      --gsu-bus-trace &lt;GSU_BUS_TRACE&gt;</div>
 <div class="line">          Optional Super FX bus-ownership trace: every CPU read of Game Pak ROM or RAM made while the GSU owned it, as CSV (`seq,frame,line,mclk,pc,addr,kind`). Those reads return the busy vector or open bus — silently, on hardware too — so this names the instruction that did it. `gsu.bus_violations` in `--out -` counts them without the trace</div>

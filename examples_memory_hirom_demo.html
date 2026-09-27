@@ -178,7 +178,7 @@ How It Works</h2>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W).</div><div class="ttdef"><b>Definition</b> registers.h:154</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W).</div><div class="ttdef"><b>Definition</b> registers.h:157</div></div>
 </div><!-- fragment --><p>The color change on A-press confirms that joypad reading works correctly in HiROM mode. CGRAM writes at $2121/$2122 work identically in both modes.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-35"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-34"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="lorom-vs-hirom-1"></a>
 LoROM vs HiROM</h3>
@@ -225,10 +225,13 @@ Going Further</h2>
 <li><b>Large data test</b>: Create a <span class="tt">const</span> array larger than 32 KB and verify it loads correctly in HiROM. In LoROM, this would require bank-crossing logic.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">memory/save_game</span> &ndash; SRAM persistence (works in both LoROM and HiROM)</li>
-<li><span class="tt">games/likemario</span> &ndash; A larger project that benefits from understanding memory layout </li>
+<li><span class="tt">games/likemario</span> &ndash; A larger project that benefits from understanding memory layout</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-54"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

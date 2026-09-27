@@ -135,7 +135,7 @@ Controls (krom's map)</h2>
 <li><b>L / R</b> — rotate the world in 7.5° steps</li>
 <li><b>Y / A</b> — nudge the pivot on X · <b>X / B</b> — nudge it on Y</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-39"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-38"></a>
 SNES Concepts</h2>
 <ul>
 <li>Per-scanline Mode 7 matrix writes (perspective + rotation combined)</li>
@@ -177,10 +177,10 @@ Two integration lessons this port surfaced</h2>
 <li><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures but does <b>not</b> enable — <span class="tt">hdmaEnable(mask)</span> is a separate call (the un-enabled state renders a convincing static 1:1 view that LOOKS like a broken perspective; check <span class="tt">dma.hdmaen</span>).</li>
 <li>Calling <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> from an <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet</a></span> callback did not take effect (registers unchanged) while the same call works from the main loop — under investigation as a potential NMI-context/ABI interaction; the main-loop placement right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> is krom's own pattern and still inside VBlank.</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-21"></a>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-20"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/mode7/perspective_rotate &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-39"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-58"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">hdma</span>, <span class="tt">input</span>, <span class="tt">mode7</span> </p>
 </div></div><!-- contents -->

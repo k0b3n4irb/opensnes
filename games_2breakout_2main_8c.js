@@ -16,6 +16,7 @@ var games_2breakout_2main_8c =
     [ "new_level", "games_2breakout_2main_8c.html#a0eb77c68ccd57e38a2365d1e3290c521", null ],
     [ "remove_brick", "games_2breakout_2main_8c.html#a36e3d90f4ce531ba21948495f1a2356d", null ],
     [ "run_frame", "games_2breakout_2main_8c.html#a63cb35fc84a9e0d4a5a8f24a52e330df", null ],
+    [ "start_game", "games_2breakout_2main_8c.html#a6906719384302ffa8b6c12ad3e0b221f", null ],
     [ "writenum", "games_2breakout_2main_8c.html#aa94bc4cfa95e2b8bf5c8c4ed8994a6b9", null ],
     [ "writestring", "games_2breakout_2main_8c.html#aeaffc0d7f18fb5ca3879eb91a1b5d268", null ],
     [ "a", "games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a", null ],

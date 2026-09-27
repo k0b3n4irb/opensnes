@@ -225,7 +225,7 @@ Tips &amp; Tricks</h2>
 <li><b>OBJSEL macro</b>: Instead of memorizing that <span class="tt">0x62</span> means "16/32 sizes at VRAM $4000", use <span class="tt"><a class="el" href="sprite_8h.html#a7ad237518b773199a39686500d459ced" title="Build OBJSEL register value from size constant + VRAM base address.">OBJSEL(OBJ_SIZE16_L32, 0x4000)</a></span>.</li>
 <li><b>Mesen2 Super Scope setup</b>: In Input settings, assign Super Scope to port 2. Map Fire and Pause to keyboard keys. The scope cursor must be over the emulator window for H/V counters to register.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="under-the-hood-the-build-4"></a>
+<h2 class="doxsection"><a class="anchor" id="under-the-hood-the-build-3"></a>
 Under the Hood: The Build</h2>
 <div class="fragment"><div class="line">TARGET      := superscope.sfc</div>
 <div class="line">USE_LIB     := 1</div>
@@ -247,6 +247,9 @@ Under the Hood: The Build</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span>  </td></tr>
 </table>
+<h2 class="doxsection"><a class="anchor" id="modules-used-48"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-4"></a>
 Technical Reference</h2>
 <table class="markdownTable">

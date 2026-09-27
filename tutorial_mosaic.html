@@ -281,7 +281,7 @@ just the boss layer while the player keeps moving".</p>
 Cycle cost</h2>
 <p>Mosaic costs <b>zero CPU</b> during display — the PPU does the pixel-block sampling in hardware. The configuration writes are a single byte to <span class="tt">$2106</span> per change (~10 cycles total).</p>
 <p>The blocking fade helpers (<span class="tt"><a class="el" href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e" title="Animate mosaic fade in (pixelated -&gt; clear).">mosaicFadeIn</a></span>/<span class="tt"><a class="el" href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d" title="Animate mosaic fade out (clear -&gt; pixelated).">mosaicFadeOut</a></span>) cost the duration of the fade in real time (16 × <span class="tt">speed</span> frames), but that's a gameplay-pacing decision, not a CPU-budget one.</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-9"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-10"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mosaic_8h.html" title="SNES Mosaic Effects.">lib/include/snes/mosaic.h</a></span> — full API reference.</li>

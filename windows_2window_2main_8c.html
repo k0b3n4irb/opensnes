@@ -170,7 +170,7 @@ Variables</h2></td></tr>
 <div class="textblock"><p>HDMA-driven triangle window masking on selectable BG layers. </p>
 <p>Demonstrates the SNES window masking hardware combined with HDMA to create a triangle-shaped cutout that clips background layers. Two backgrounds are loaded (BG1 and BG2), and the user can apply the window mask to either or both layers via button presses.</p>
 <p>HDMA channels 4 and 5 drive WH0 ($2126) and WH1 ($2127) in repeat mode, updating the left and right window boundaries every scanline to form a diamond/triangle shape. The W12SEL register ($2123) controls which BG layers are affected by Window 1, with the invert bit set so pixels outside the triangle are masked (clipped to black).</p>
-<p>Ported from PVSnesLib "Window" example. Uses bare-metal register writes to match PVSnesLib behavior exactly.</p>
+<p>Ported from PVSnesLib "Window" example. Uses the window module (windowEnable / windowSetInvert / windowSetMainMask) with PVSnesLib's register values, so the frames match its original.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Window masking via W12SEL ($2123) and TMW ($212E) registers</li>
 <li>HDMA repeat mode for per-scanline WH0/WH1 updates</li>
@@ -286,7 +286,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Configure HDMA-driven window masking on the specified BG layers. </p>
-<p>Sets up the SNES window hardware and HDMA channels to clip the specified background layers using the triangle-shaped boundary tables. Uses bare-metal PPU register writes to match PVSnesLib's setModeHdmaWindow() behavior exactly.</p>
+<p>Sets up the SNES window hardware and HDMA channels to clip the specified background layers using the triangle-shaped boundary tables, with the same register values as PVSnesLib's setModeHdmaWindow().</p>
 <p>The window "inverts" masking (via the invert bits in W12SEL), so pixels OUTSIDE the triangle shape are clipped to black, while pixels inside remain visible. This is the opposite of the default behavior (which masks inside).</p>
 <p>HDMA channels 4 and 5 are used (not 7, which the NMI handler reserves for OAM DMA). HDMA is disabled before reconfiguration and re-enabled after to avoid partial-table reads during the transition.</p>
 <dl class="params"><dt>Parameters</dt><dd>

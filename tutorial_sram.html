@@ -149,12 +149,12 @@ Memory map</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>HiROM</b>  </td><td class="markdownTableBodyNone"><span class="tt">$30</span>–<span class="tt">$3F</span> (mirror to <span class="tt">$B0</span>–<span class="tt">$BF</span>)  </td><td class="markdownTableBodyNone"><span class="tt">$30:6000–$3F:7FFF</span>  </td><td class="markdownTableBodyNone">8 KB per bank in the lower half, 32 KB max.  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>SA-1</b>  </td><td class="markdownTableBodyNone">Different — see SA-1 chapter  </td><td class="markdownTableBodyNone">—  </td><td class="markdownTableBodyNone">SA-1 cart layouts depend on per-cart configuration.  </td></tr>
+<td class="markdownTableBodyNone"><b>SA-1</b>  </td><td class="markdownTableBodyNone"><span class="tt">$40</span>–<span class="tt">$4F</span> (BW-RAM)  </td><td class="markdownTableBodyNone"><span class="tt">$40:0000–$40:7FFF</span>  </td><td class="markdownTableBodyNone">The cart's battery RAM; the SDK declares 32 KB. The SNES CPU may write it only once SBWE (<span class="tt">$2226</span>) is set, which crt0 does.  </td></tr>
 </table>
-<p>The lib's <span class="tt"><a class="el" href="sram_8h.html#ae59c751326cb355338a21605adb09325" title="Save data to SRAM.">sramSave</a></span>/<span class="tt"><a class="el" href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad</a></span> hide the LoROM / HiROM difference: you pass a pointer and a byte count, and the helper uses <span class="tt">$70:0000</span> on a LoROM build and <span class="tt">$30:6000</span> on a HiROM one. Two limits to know:</p>
+<p>The lib's <span class="tt"><a class="el" href="sram_8h.html#ae59c751326cb355338a21605adb09325" title="Save data to SRAM.">sramSave</a></span>/<span class="tt"><a class="el" href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad</a></span> hide the layout: you pass a pointer and a byte count, and the helper uses <span class="tt">$70:0000</span> on a LoROM build, <span class="tt">$30:6000</span> on a HiROM one and <span class="tt">$40:0000</span> (BW-RAM) on an SA-1 one. Two limits to know:</p>
 <ul>
 <li>on <b>HiROM</b> the helpers address the first 8 KB window only (<span class="tt">offset + size &lt;= 8192</span>, the default <span class="tt">SRAM_SIZE</span>);</li>
-<li>on <b>SA-1</b> they are not available: <span class="tt">USE_SRAM=1</span> with <span class="tt">USE_SA1=1</span> stops the build with an explanation rather than linking a module that would write nowhere.</li>
+<li>on <b>SA-1</b> they work since 2026-09-26 (crt0 sets SBWE); until then the build refused <span class="tt">USE_SRAM=1</span> with <span class="tt">USE_SA1=1</span>, because the writes were dropped. luna does not yet write an SA-1 cart's BW-RAM to its <span class="tt">.srm</span> file, so persistence across runs can only be checked on hardware or in another emulator for now.</li>
 </ul>
 <p>This paragraph claimed the helpers "hide these details" long before they did — until 2026-09-20 they used the LoROM address on every build. The HiROM mapping is pinned by <span class="tt">devtools/libtests_hirom</span>, which reads the bytes back from <span class="tt">$30:6000</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="build-setup"></a>
@@ -380,7 +380,7 @@ Cycle cost</h2>
 </ul>
 <p>A full 8 KB save: ~57 K CPU cycles ≈ 430 K master cycles — slightly <em>more</em> than one full frame (a frame is ~357 K master cycles). SRAM access needs no VBlank window, so nothing corrupts, but the frame that runs the save arrives late. For multi-KB auto-saves during gameplay, split the save across frames (say 2 KB per frame) or accept the one-off hitch.</p>
 <p>There is no DMA path for SRAM — general DMA cannot copy between two A-bus addresses (WRAM and cartridge SRAM both live on the A bus), so MVN is the fastest option available.</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-13"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-14"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="sram_8h.html" title="SNES SRAM (Save RAM) Functions.">lib/include/snes/sram.h</a></span> — full API reference.</li>
@@ -389,7 +389,7 @@ See also</h2>
 <li><a class="el" href="dir_947159ae9cd3221b0e807b63eeb2ccf4.html" title="/home/runner/work/opensnes/opensnes/examples/memory/hirom_demo/README.md"><span class="tt">examples/memory/hirom_demo</span></a> — companion read for the HiROM bank layout that affects SRAM mapping.</li>
 <li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — for the BG/text rendering used to show save state on screen.</li>
 <li><a class="el" href="KNOWN__LIMITATIONS_8md.html" title="/home/runner/work/opensnes/opensnes/KNOWN_LIMITATIONS.md"><span class="tt">KNOWN_LIMITATIONS.md</span></a> — covers the bank-mapping rules and the emulator persistence variance.</li>
-<li><a class="el" href="sa1_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sa1.md">SA-1 tutorial</a> — relevant if your project uses SA-1; SA-1 cart layouts handle SRAM differently per cartridge. </li>
+<li><a class="el" href="sa1_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sa1.md">SA-1 tutorial</a> — the SA-1 side of BW-RAM (the SA-1 CPU has its own write enable, CBWE <span class="tt">$2227</span>). </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

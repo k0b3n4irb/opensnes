@@ -25,15 +25,16 @@ var searchData=
   ['your_20game_22',['Test Your Game',['../getting_started.html#test-your-game',1,'']]],
   ['your_20game_23',['your game',['../examples_backgrounds_mode2.html#why-it-matters-for-your-game',1,'Why it matters for your game'],['../examples_basics_game_skeleton.html#why-it-matters-for-your-game-1',1,'Why it matters for your game'],['../examples_basics_panel_hud.html#why-it-matters-for-your-game-2',1,'Why it matters for your game'],['../examples_color_palette_cycle.html#why-it-matters-for-your-game-3',1,'Why it matters for your game'],['../examples_color_shadow_tint.html#why-it-matters-for-your-game-4',1,'Why it matters for your game'],['../examples_sprites_sprite_swarm.html#why-it-matters-for-your-game-5',1,'Why it matters for your game']]],
   ['your_20genre_24',['Choose a background mode from your genre',['../craft_planning.html#choose-a-background-mode-from-your-genre',1,'']]],
-  ['your_20makefile_25',['Your Makefile',['../tutorial_sa1.html#autotoc_md1-enable-sa-1-in-your-makefile',1,'1. Enable SA-1 in Your Makefile'],['../tutorial_superfx.html#autotoc_md1-enable-superfx-in-your-makefile',1,'1. Enable SuperFX in Your Makefile']]],
+  ['your_20makefile_25',['Your Makefile',['../tutorial_sa1.html#autotoc_md1-enable-sa-1-in-your-makefile',1,'1. Enable SA-1 in Your Makefile'],['../tutorial_superfx.html#autotoc_md1-enable-superfx-in-your-makefile',1,'1. Enable SuperFX in Your Makefile'],['../tools.html#your-makefile',1,'Your Makefile']]],
   ['your_20own_20level_26',['Making Your Own Level',['../examples_maps_tiled.html#making-your-own-level',1,'']]],
   ['your_20own_20project_27',['A5. Create Your Own Project',['../getting_started.html#a5-create-your-own-project',1,'']]],
   ['your_20own_20typeface_28',['Your own typeface',['../tutorial_text.html#your-own-typeface',1,'']]],
   ['your_20path_29',['Choose Your Path',['../getting_started.html#choose-your-path',1,'']]],
   ['your_20pointer_20—_20fixed_202026_2009_2018_30',['🟢 &lt;span class=&quot;tt&quot;&gt;objLoadObjects&lt;/span&gt; ignored the bank byte of your pointer — fixed 2026-09-18',['../tutorial_object.html#autotoc_md-objloadobjects-ignored-the-bank-byte-of-your-pointer--fixed-2026-09-18',1,'']]],
-  ['your_20sa_201_20boot_20code_31',['2. Write Your SA-1 Boot Code',['../tutorial_sa1.html#autotoc_md2-write-your-sa-1-boot-code',1,'']]],
-  ['your_20scroll_20values_32',['The camera &lt;em&gt;is&lt;/em&gt; your scroll values',['../craft_camera.html#the-camera-is-your-scroll-values',1,'']]],
-  ['your_20snes_20game_33',['Planning your SNES game',['../craft_planning.html',1,'craft']]],
-  ['yours_34',['The &lt;span class=&quot;tt&quot;&gt;Panel&lt;/span&gt; struct — the tilemap is yours',['../tutorial_panel.html#the-panel-struct--the-tilemap-is-yours',1,'']]],
-  ['yourself_20with_20setbrightness_200_35',['🔴 &lt;span class=&quot;tt&quot;&gt;panelFlush&lt;/span&gt; uploads under forced blank — do not do it yourself with &lt;span class=&quot;tt&quot;&gt;setBrightness(0)&lt;/span&gt;',['../tutorial_panel.html#autotoc_md-panelflush-uploads-under-forced-blank--do-not-do-it-yourself-with-setbrightness0',1,'']]]
+  ['your_20project_20s_20makefile_31',['Your project&apos;s Makefile',['../tools_build.html',1,'tools']]],
+  ['your_20sa_201_20boot_20code_32',['2. Write Your SA-1 Boot Code',['../tutorial_sa1.html#autotoc_md2-write-your-sa-1-boot-code',1,'']]],
+  ['your_20scroll_20values_33',['The camera &lt;em&gt;is&lt;/em&gt; your scroll values',['../craft_camera.html#the-camera-is-your-scroll-values',1,'']]],
+  ['your_20snes_20game_34',['Planning your SNES game',['../craft_planning.html',1,'craft']]],
+  ['yours_35',['The &lt;span class=&quot;tt&quot;&gt;Panel&lt;/span&gt; struct — the tilemap is yours',['../tutorial_panel.html#the-panel-struct--the-tilemap-is-yours',1,'']]],
+  ['yourself_20with_20setbrightness_200_36',['🔴 &lt;span class=&quot;tt&quot;&gt;panelFlush&lt;/span&gt; uploads under forced blank — do not do it yourself with &lt;span class=&quot;tt&quot;&gt;setBrightness(0)&lt;/span&gt;',['../tutorial_panel.html#autotoc_md-panelflush-uploads-under-forced-blank--do-not-do-it-yourself-with-setbrightness0',1,'']]]
 ];

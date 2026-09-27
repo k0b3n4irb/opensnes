@@ -252,16 +252,16 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../../../games/likemario/">LikeMario</a> &ndash; full platformer with gravity, collision, and tile streaming.</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="under-the-hood-the-build-5"></a>
+<h2 class="doxsection"><a class="anchor" id="under-the-hood-the-build-4"></a>
 Under the Hood: The Build</h2>
-<h3 class="doxsection"><a class="anchor" id="the-makefile-4"></a>
+<h3 class="doxsection"><a class="anchor" id="the-makefile-3"></a>
 The Makefile</h3>
 <div class="fragment"><div class="line">TARGET      := continuous_scroll.sfc</div>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console sprite input background dma</div>
 <div class="line">CSRC        := main.c</div>
 <div class="line">ASMSRC      := data.asm</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="why-these-modules-3"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="why-these-modules-2"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -278,6 +278,9 @@ Why These Modules?</h3>
 <td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span>, <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a></span> for bulk asset transfers, plus OAM DMA in NMI  </td></tr>
 </table>
 <hr  />
+<h2 class="doxsection"><a class="anchor" id="modules-used-60"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">dma</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-5"></a>
 Technical Reference</h2>
 <table class="markdownTable">

@@ -307,6 +307,9 @@ Why These Modules?</h3>
 <p><b>"But there are no sprites in Hello World!"</b> Correct. The dependency chain is: <span class="tt">console</span> → <span class="tt">sprite</span> → <span class="tt">dma</span>. The NMI handler (in console) always DMAs the OAM buffer (in sprite) to the PPU, and that DMA call lives in the dma module. The build system does NOT auto-resolve these dependencies — if you forget <span class="tt">dma</span>, you get a linker error about an undefined <span class="tt"><a class="el" href="dma_8h.html#a50a418c73f494651a1be98404d753c21" title="Copy OAM data (PVSnesLib compatible).">dmaCopyOam</a></span> symbol and no hint about why. </p>
 </blockquote>
 <hr  />
+<h2 class="doxsection"><a class="anchor" id="modules-used-34"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference"></a>
 Technical Reference</h2>
 <table class="markdownTable">

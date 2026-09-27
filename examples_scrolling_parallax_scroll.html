@@ -190,7 +190,7 @@ Animation Loop</h3>
 <div class="line">*(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *)&amp;<a class="code hl_variable" href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a>[7] += 4;  <span class="comment">/* +4 px/frame (fast) */</span></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 </div><!-- fragment --><p>Because the table lives in RAM, the HDMA hardware reads the updated values on the next frame automatically.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-42"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-41"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="bg1hofs-210d----write-twice-register"></a>
 BG1HOFS ($210D) &ndash; Write-Twice Register</h3>
@@ -222,10 +222,13 @@ Going Further</h2>
 <li><b>More zones</b>: Add more entries to the scroll table for 5-6 speed zones. The HDMA table just needs more <span class="tt">[count][lo][hi]</span> entries before the terminator.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">scrolling/continuous_scroll</span> &ndash; True multi-layer parallax with player control</li>
-<li><span class="tt">effects/hdma_wave</span> &ndash; Another HDMA technique (per-scanline wave distortion) </li>
+<li><span class="tt">effects/hdma_wave</span> &ndash; Another HDMA technique (per-scanline wave distortion)</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-62"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">hdma</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

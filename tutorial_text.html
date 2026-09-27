@@ -378,7 +378,7 @@ Mistakes the module will not save you from</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md-assuming-the-tilemap-can-be-64-wide"></a>
 🟡 Assuming the tilemap can be 64 wide</h3>
 <p><span class="tt"><a class="el" href="structTextConfig.html" title="Text rendering configuration.">TextConfig</a></span> has a <span class="tt"><a class="el" href="games_2likemario_2main_8c.html#a569ad8f9a5117f4c707337b7d0141497">map_width</a></span> field documented as 32 or 64, but <span class="tt"><a class="el" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e" title="Initialize the text rendering system.">textInit</a></span> always sets it to 32, the buffer is sized for 32×32, and the NMI flush transfers a fixed 2048 bytes. Treat <span class="tt"><a class="el" href="games_2likemario_2main_8c.html#a569ad8f9a5117f4c707337b7d0141497">map_width</a></span> as read-only; a 64-wide text layer is not something the module supports today.</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-14"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-15"></a>
 See also</h2>
 <ul>
 <li><a class="el" href="text_8h.html" title="text.h">Text API reference</a> — the 14 public functions and <span class="tt"><a class="el" href="structTextConfig.html" title="Text rendering configuration.">TextConfig</a></span>.</li>

@@ -136,7 +136,9 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">A (hold)  </td><td class="markdownTableBodyNone">Move faster  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Start  </td><td class="markdownTableBodyNone">Pause  </td></tr>
+<td class="markdownTableBodyNone">Start  </td><td class="markdownTableBodyNone">Begin; pause during play; after GAME OVER, a new game  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Any button  </td><td class="markdownTableBodyNone">Continue after losing a ball  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="build--run-20"></a>
 Build &amp; Run</h2>
@@ -302,13 +304,13 @@ Walkthrough</h2>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a>();            <span class="comment">// Push OAM buffer to hardware</span></div>
 <div class="line">}</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a3857ebece42afc91e3df0ce596a2e2a0"><div class="ttname"><a href="games_2breakout_2main_8c.html#a3857ebece42afc91e3df0ce596a2e2a0">move_ball</a></div><div class="ttdeci">static void move_ball(void)</div><div class="ttdoc">Update ball position and handle wall collision.</div><div class="ttdef"><b>Definition</b> main.c:574</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a3857ebece42afc91e3df0ce596a2e2a0"><div class="ttname"><a href="games_2breakout_2main_8c.html#a3857ebece42afc91e3df0ce596a2e2a0">move_ball</a></div><div class="ttdeci">static void move_ball(void)</div><div class="ttdoc">Update ball position and handle wall collision.</div><div class="ttdef"><b>Definition</b> main.c:650</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:166</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a63cb35fc84a9e0d4a5a8f24a52e330df"><div class="ttname"><a href="games_2breakout_2main_8c.html#a63cb35fc84a9e0d4a5a8f24a52e330df">run_frame</a></div><div class="ttdeci">static void run_frame(void)</div><div class="ttdoc">Run one frame of gameplay.</div><div class="ttdef"><b>Definition</b> main.c:730</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a717b5d7a72b0be4dee8111dbdeb757ed"><div class="ttname"><a href="games_2breakout_2main_8c.html#a717b5d7a72b0be4dee8111dbdeb757ed">check_bricks</a></div><div class="ttdeci">static void check_bricks(void)</div><div class="ttdoc">Check collision with bricks.</div><div class="ttdef"><b>Definition</b> main.c:703</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a86f0a72efd3f0594182d7d3ffca5fe7e"><div class="ttname"><a href="games_2breakout_2main_8c.html#a86f0a72efd3f0594182d7d3ffca5fe7e">move_paddle</a></div><div class="ttdeci">static void move_paddle(void)</div><div class="ttdoc">Handle paddle movement from joypad input.</div><div class="ttdef"><b>Definition</b> main.c:554</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_ab3fb8acabd08cd49c4d24492477abc52"><div class="ttname"><a href="games_2breakout_2main_8c.html#ab3fb8acabd08cd49c4d24492477abc52">check_paddle</a></div><div class="ttdeci">static void check_paddle(void)</div><div class="ttdoc">Check collision with paddle.</div><div class="ttdef"><b>Definition</b> main.c:612</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_ac642a9b1897de1b5599c80f5582d8a50"><div class="ttname"><a href="games_2breakout_2main_8c.html#ac642a9b1897de1b5599c80f5582d8a50">handle_pause</a></div><div class="ttdeci">static void handle_pause(void)</div><div class="ttdoc">Handle pause functionality.</div><div class="ttdef"><b>Definition</b> main.c:531</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a63cb35fc84a9e0d4a5a8f24a52e330df"><div class="ttname"><a href="games_2breakout_2main_8c.html#a63cb35fc84a9e0d4a5a8f24a52e330df">run_frame</a></div><div class="ttdeci">static void run_frame(void)</div><div class="ttdoc">Run one frame of gameplay.</div><div class="ttdef"><b>Definition</b> main.c:806</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a717b5d7a72b0be4dee8111dbdeb757ed"><div class="ttname"><a href="games_2breakout_2main_8c.html#a717b5d7a72b0be4dee8111dbdeb757ed">check_bricks</a></div><div class="ttdeci">static void check_bricks(void)</div><div class="ttdoc">Check collision with bricks.</div><div class="ttdef"><b>Definition</b> main.c:779</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a86f0a72efd3f0594182d7d3ffca5fe7e"><div class="ttname"><a href="games_2breakout_2main_8c.html#a86f0a72efd3f0594182d7d3ffca5fe7e">move_paddle</a></div><div class="ttdeci">static void move_paddle(void)</div><div class="ttdoc">Handle paddle movement from joypad input.</div><div class="ttdef"><b>Definition</b> main.c:630</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_ab3fb8acabd08cd49c4d24492477abc52"><div class="ttname"><a href="games_2breakout_2main_8c.html#ab3fb8acabd08cd49c4d24492477abc52">check_paddle</a></div><div class="ttdeci">static void check_paddle(void)</div><div class="ttdoc">Check collision with paddle.</div><div class="ttdef"><b>Definition</b> main.c:688</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_ac642a9b1897de1b5599c80f5582d8a50"><div class="ttname"><a href="games_2breakout_2main_8c.html#ac642a9b1897de1b5599c80f5582d8a50">handle_pause</a></div><div class="ttdeci">static void handle_pause(void)</div><div class="ttdoc">Handle pause functionality.</div><div class="ttdef"><b>Definition</b> main.c:607</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ad0fcab62a86a951249be4547707961b2"><div class="ttname"><a href="games_2breakout_2main_8c.html#ad0fcab62a86a951249be4547707961b2">draw_screen</a></div><div class="ttdeci">static void draw_screen(void)</div><div class="ttdoc">Update all sprite positions.</div><div class="ttdef"><b>Definition</b> main.c:294</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ae9c339aae8aff07a48de9f6355e02321"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321">pad_keys</a></div><div class="ttdeci">u16 pad_keys[]</div><div class="ttdoc">Raw joypad state buffer written by the NMI handler every frame.</div></div>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
@@ -382,6 +384,9 @@ Why These Modules?</h3>
 <td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone">Joypad buffers — though Breakout reads <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321" title="Raw joypad state buffer written by the NMI handler every frame.">pad_keys</a>[0]</span> directly  </td></tr>
 </table>
 <hr  />
+<h2 class="doxsection"><a class="anchor" id="modules-used-35"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-1"></a>
 Technical Reference</h2>
 <table class="markdownTable">

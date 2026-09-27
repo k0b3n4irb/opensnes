@@ -58,7 +58,7 @@ var searchData=
   ['sramloadoffset_55',['sramLoadOffset',['../sram_8h.html#a63735ab921a0a3f6e5920dc35985efb8',1,'sram.h']]],
   ['sramsave_56',['sramSave',['../sram_8h.html#ae59c751326cb355338a21605adb09325',1,'sram.h']]],
   ['sramsaveoffset_57',['sramSaveOffset',['../sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d',1,'sram.h']]],
-  ['start_5fgame_58',['start_game',['../basics_2game__skeleton_2main_8c.html#a6906719384302ffa8b6c12ad3e0b221f',1,'main.c']]],
+  ['start_5fgame_58',['start_game',['../basics_2game__skeleton_2main_8c.html#a6906719384302ffa8b6c12ad3e0b221f',1,'start_game(void):&#160;main.c'],['../games_2breakout_2main_8c.html#a6906719384302ffa8b6c12ad3e0b221f',1,'start_game(void):&#160;main.c']]],
   ['start_5fsong_59',['start_song',['../audio_2apu__switch_2main_8c.html#a96dfe2607d23dcee7a764fcb222fdf15',1,'main.c']]],
   ['startgame_60',['startGame',['../games_2tetris_2main_8c.html#ae615335cd0b31c24fe89bec2450a99b6',1,'main.c']]],
   ['stategameover_61',['stateGameOver',['../games_2tetris_2main_8c.html#a59c2cf3a123a19cd0db0ae30e9497069',1,'main.c']]],

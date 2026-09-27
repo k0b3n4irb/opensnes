@@ -15,10 +15,11 @@ var examples_scrolling =
         ] ],
         [ "Tips &amp; Tricks", "examples_scrolling_continuous_scroll.html#tips--tricks-5", null ],
         [ "Go Further", "examples_scrolling_continuous_scroll.html#go-further-4", null ],
-        [ "Under the Hood: The Build", "examples_scrolling_continuous_scroll.html#under-the-hood-the-build-5", [
-          [ "The Makefile", "examples_scrolling_continuous_scroll.html#the-makefile-4", null ],
-          [ "Why These Modules?", "examples_scrolling_continuous_scroll.html#why-these-modules-3", null ]
+        [ "Under the Hood: The Build", "examples_scrolling_continuous_scroll.html#under-the-hood-the-build-4", [
+          [ "The Makefile", "examples_scrolling_continuous_scroll.html#the-makefile-3", null ],
+          [ "Why These Modules?", "examples_scrolling_continuous_scroll.html#why-these-modules-2", null ]
         ] ],
+        [ "Modules Used", "examples_scrolling_continuous_scroll.html#modules-used-60", null ],
         [ "Technical Reference", "examples_scrolling_continuous_scroll.html#technical-reference-5", null ],
         [ "Files", "examples_scrolling_continuous_scroll.html#files-11", null ],
         [ "Credits", "examples_scrolling_continuous_scroll.html#credits-3", null ]

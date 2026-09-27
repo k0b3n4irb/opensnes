@@ -183,7 +183,7 @@ How It Works</h2>
 <div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:76</div></div>
 <div class="ttc" id="amode7_2perspective_2main_8c_html_ad3aafbc6c7613c06add64a85321eb473"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad3aafbc6c7613c06add64a85321eb473">asm_setupHdmaPerspective</a></div><div class="ttdeci">void asm_setupHdmaPerspective(u16 sx, u16 sy)</div><div class="ttdoc">Build and activate the 4-channel HDMA perspective split.</div></div>
 </div><!-- fragment --><p>The scroll values are passed to the assembly helper, which writes them to the Mode 7 scroll registers (M7HOFS/M7VOFS at $210D/$210E) and re-enables the HDMA channels each frame.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-38"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-37"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="mode-switching-mid-frame"></a>
 Mode Switching Mid-Frame</h3>
@@ -217,10 +217,13 @@ Going Further</h2>
 <li><b>Add sprites</b>: Place car or character sprites on top of the ground plane. Sprites render normally in Mode 7 and can be scaled/positioned to match the perspective.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">effects/gradient_colors</span> &ndash; Another HDMA technique (color gradients)</li>
-<li><span class="tt">games/likemario</span> &ndash; Scrolling backgrounds with sprites (different approach) </li>
+<li><span class="tt">games/likemario</span> &ndash; Scrolling backgrounds with sprites (different approach)</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-57"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

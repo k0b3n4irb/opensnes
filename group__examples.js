@@ -50,7 +50,6 @@ var group__examples =
     [ "main.c", "hdma_2hdma__helpers_2main_8c.html", null ],
     [ "main.c", "hdma_2hdma__indirect__gradient_2main_8c.html", null ],
     [ "main.c", "hdma_2hdma__wave_2main_8c.html", null ],
-    [ "main.c", "hdma_2hdma__wave__table_2main_8c.html", null ],
     [ "main.c", "input_2controller_2main_8c.html", null ],
     [ "main.c", "input_2mouse_2main_8c.html", null ],
     [ "main.c", "input_2move__sprite_2main_8c.html", null ],

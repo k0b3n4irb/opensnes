@@ -154,7 +154,7 @@ A1. Install Prerequisites</h3>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="a2-get-an-emulator"></a>
 A2. Get an Emulator</h3>
-<p>luna (the SDK test/debug backend, installed by <span class="tt">scripts/install-luna.sh</span>) covers headless debugging — see <span class="tt"><a class="el" href="debugging_8md.html">tutorials/debugging.md</a></span>. For playing your ROM in a window, pick any GUI emulator:</p>
+<p><b>luna</b> is the SDK's emulator: it plays ROMs, runs the test harness and debugs (<span class="tt"><a class="el" href="debugging_8md.html">tutorials/debugging.md</a></span>). <span class="tt">scripts/install-luna.sh</span> fetches the pinned release for Linux, macOS or Windows (MSYS2 / Git Bash) into <span class="tt">tools/luna-test/bin/</span>: <span class="tt">luna</span> (headless: tests, state, debugging) and <span class="tt">luna-gui</span> (a window you play in). Any other SNES emulator works too, for a second opinion:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Emulator  </th><th class="markdownTableHeadNone">Best For  </th><th class="markdownTableHeadNone">Download  </th></tr>
@@ -186,12 +186,10 @@ A4. Run Your First ROM</h3>
 <p>The SDK comes with pre-built example ROMs:</p>
 <div class="fragment"><div class="line">cd opensnes/examples/text/print_string</div>
 <div class="line"> </div>
-<div class="line"># Open in your emulator</div>
-<div class="line">mesen print_string.sfc        # Linux</div>
-<div class="line">open -a Mesen print_string.sfc  # macOS</div>
-<div class="line">start Mesen.exe print_string.sfc  # Windows</div>
+<div class="line"># Play it in luna&#39;s window (install it once from the SDK root: scripts/install-luna.sh)</div>
+<div class="line">../../../tools/luna-test/bin/luna-gui print_string.sfc</div>
 </div><!-- fragment --><blockquote class="doxtable">
-<p><b>Note:</b> <span class="tt">mesen</span> must be on your <span class="tt">PATH</span> for the Linux command above. Install Mesen from <a href="https://www.mesen.ca/">mesen.ca</a> and either add its directory to <span class="tt">PATH</span> or alias it (<span class="tt">alias mesen=~/Mesen/Mesen</span>). No emulator installed? The SDK's own <span class="tt">luna</span> backend also plays ROMs: <span class="tt">luna print_string.sfc</span> (install it once with <span class="tt">scripts/install-luna.sh</span>). </p>
+<p>Any other SNES emulator opens the <span class="tt">.sfc</span> as well (Mesen, bsnes, Snes9x — see the table above). </p>
 </blockquote>
 <p>You should see "Hello World!" on screen.</p>
 <h3 class="doxsection"><a class="anchor" id="a5-create-your-own-project"></a>

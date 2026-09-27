@@ -195,7 +195,7 @@ How It Works</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
 </div><!-- fragment --><p>After changing the scale, you must call <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> again because the matrix depends on both angle and scale. The scale range is clamped to <span class="tt">0x0010</span>-<span class="tt">0x0F00</span> &ndash; values outside this range produce extreme distortion.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-40"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-39"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="affine-transformation"></a>
 Affine Transformation</h3>
@@ -242,10 +242,13 @@ Going Further</h2>
 <li><b>Add sprites on top</b>: Load sprite tiles and place an OAM sprite over the rotating background. Mode 7 supports full sprite rendering.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">mode7/perspective</span> &ndash; Per-scanline scaling for pseudo-3D (F-Zero style)</li>
-<li><span class="tt">effects/hdma_wave</span> &ndash; HDMA can modify Mode 7 parameters per scanline </li>
+<li><span class="tt">effects/hdma_wave</span> &ndash; HDMA can modify Mode 7 parameters per scanline</li>
 </ul>
 </li>
 </ul>
+<h2 class="doxsection"><a class="anchor" id="modules-used-59"></a>
+Modules Used</h2>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

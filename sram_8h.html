@@ -180,7 +180,7 @@ Memory Layout</h2>
 <ul>
 <li><b>LoROM</b>: bank $70, $0000-$7FFF (32 KB max).</li>
 <li><b>HiROM</b> (<span class="tt">USE_HIROM=1</span>): bank $30, $6000-$7FFF — the hardware exposes battery RAM in 8 KB windows there, and this module addresses the first one only, so <span class="tt">offset + size</span> must stay within 8 KB (the default SRAM_SIZE). Until 2026-09-20 the LoROM address was used on HiROM too.</li>
-<li><b>SA-1</b>: not supported — <span class="tt">USE_SRAM=1</span> with <span class="tt">USE_SA1=1</span> is a build error. SA-1 save memory is BW-RAM, which the SNES CPU may only write after enabling it, and the library does not.</li>
+<li><b>SA-1</b> (<span class="tt">USE_SA1=1</span>, since 2026-09-26): BW-RAM at bank $40, $0000-$7FFF (the header declares 32 KB). crt0 enables SNES-side writes (SBWE); before that the combination was refused because the writes were dropped.</li>
 </ul>
 <p>Source pointers may be in any bank (a <span class="tt">const</span> save template in ROM works); destination pointers are work RAM. Most games use 2 KB-8 KB of SRAM.</p>
 <h2 class="doxsection"><a class="anchor" id="usage-example-3"></a>
