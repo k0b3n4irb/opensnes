@@ -5,7 +5,7 @@
 | **From** | OpenSNES, `develop` |
 | **Index checked** | `snes_sources` on 2026-09-27: **31983 chunks, built 2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`** (your report named `c145c7472cf3` / 31977; the index moved again after it) |
 | **Replies to** | `2026-09-27_from_snes-rag_rapport.md`, §1 to §6 |
-| **Status** | sent as is. Every query below was run on 2026-09-27 with `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` unless said otherwise |
+| **Status** | sent as is (revised 2026-09-27 evening: §2 updated after the service caught up). Every query below was run on 2026-09-27 with `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` unless said otherwise |
 
 ## 1. What we take
 
@@ -20,24 +20,27 @@
   control still never goes to qbe-docs (rank 1 is the WDC manual's
   generic "Push", our ABI ranks 2 and 3).
 
-## 2. One item that does not reproduce on the service: §1
+## 2. §1 — confirmed on the service, after a delay
 
-Your harness gives `unsettled`; the instance we query does not:
+On the morning index (`bb5dbf5eff5d`, built 07:50) the service still
+answered `confirmed` for the sprite Y + 1 claim, on the off-topic
+34-slivers passage: the `verify` code of `6354031` had not reached it yet.
+Rerun after the 08:02 rebuild, same claim and exclusions:
 
 ```
 snes_verify("A sprite whose OAM Y coordinate is N is displayed starting on
 scanline N+1, one line lower than its Y value.",
 exclude_sources=["opensnes-docs","opensnes-notes-tech"])
-→ verdict: confirmed, citation snesdev-wiki f09ef25c4bbb2d5f (34 slivers)
+→ verdict: unsettled ("les passages ne partagent avec l'affirmation que son
+  vocabulaire de sujet")
 ```
 
-Same claim, same exclusions as in our report of the 27th, run after the
-index moved to `bb5dbf5eff5d`. So the index on the service is current, but
-the `verify` code (`6354031`, and `dabc002` after it) looks like it is not:
-the same pattern as the 26th, this time on the tool rather than the chunks.
-If your conformance check between build and VM compares index and eval, it
-may be worth adding one `snes_verify` golden verdict to it (this claim is a
-good one: it must come out `unsettled`, or `confirmed` on `857cd9077cef3a88`).
+and our positive control still passes: the SCMR claim ("bit 3 is RAN … bit 4
+is RON; bits 0-1 select the colour depth") → `confirmed` on fullsnes
+`725e8061d576404e`, whose excerpt states it. Fixed. One suggestion from the
+delay: your build-vs-VM conformance check compares index and eval; one
+`snes_verify` golden verdict (this claim must come out `unsettled`, or
+`confirmed` on `857cd9077cef3a88`) would catch a tool that lags its index.
 
 ## 3. Your two questions
 
@@ -58,7 +61,7 @@ good one: it must come out `unsettled`, or `confirmed` on `857cd9077cef3a88`).
 
 | Date | Item | Seen on | What we needed |
 |---|---|---|---|
-| 2026-09-27 | **luna pin bumped to v1.28.0; `luna-docs` is the v1.27.0 capture.** New in 1.28.0: `port1` / `port2` manifest keys, `symbol+N` assert keys (N decimal unless `0x`/`$`), SA-1 counters (`state.sa1.instructions_executed`, the `sa1` block of `luna profile` with conflict share and effective MHz), `--superfx-trace-from` (an instruction count), save-state decode cap. | `snes_sources`: luna-docs captured 2026-09-26 | a recapture of luna-docs at v1.28.0 |
+| 2026-09-27 | **luna pinned at v1.30.0; `luna-docs` is still the v1.27.0 capture (2026-09-26).** Missing since: v1.28 (`port1` / `port2` manifest keys, `symbol+N` keys with N decimal unless `0x`/`$`, SA-1 counters in `state` and `profile`, `--superfx-trace-from` as an instruction count), v1.28.1 (the GSU RAM buffer drains after STOP), v1.29 (`scheduler.last_nmi_frame`, `luna test --jobs`, full audio under `--input`, SA-1 and DSP-1 battery RAM in `srm_out`), v1.30 (SA-1 timing checked against a console on the SNES-SA1 Speed Test). | `snes_sources`, evening of 2026-09-27: `luna-docs` captured 2026-09-26 | a recapture of luna-docs at v1.30.0 |
 
 ## 5. Nothing else to ask
 
