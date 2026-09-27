@@ -2,6 +2,15 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [Unreleased]
+
+### Changed
+- refactor(examples): **`sa1_starfield` runs its SA-1 code from I-RAM**,
+  copied there at boot: measured on luna, ~10.7 MHz with 0.4 % of clocks
+  lost to bus conflicts, against ~8.6 MHz and 20 % from ROM, the same frames
+  drawn. `make clean && make SA1_CODE_IN=ROM` builds the ROM version; the
+  SA-1 tutorial shows both profiles.
+
 ## [0.46.0] — 2026-09-27
 
 The compiler release. Stack frames are two thirds smaller (temps whose lives

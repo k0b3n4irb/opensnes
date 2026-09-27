@@ -20,13 +20,17 @@ Then open `sa1_starfield.sfc` in luna (or any SNES emulator).
 - Procedural sprite generation (no graphic assets needed)
 - Depth illusion via 4 brightness palettes cycling across sprites
 - Synchronization protocol between SA-1 and main CPU
+- Running SA-1 code from I-RAM: copy it there, keep it position-independent
 
 ## What to Observe
 
 - 128 dots moving in smooth, coordinated flock-like patterns
 - The pattern resembles a murmuration (starling flock)
 - 4 brightness levels create a subtle depth effect
-- All math computed by the SA-1 (clocked at 10.74 MHz; ~5.4 MHz effective here, since both CPUs run from ROM — see the SA-1 tutorial)
+- All math computed by the SA-1, from I-RAM: at boot it copies its loop and
+  sine table there, so it does not share the ROM with the main CPU (~10.7 MHz;
+  ~8.6 MHz when built with `make clean && make SA1_CODE_IN=ROM` — see the
+  SA-1 tutorial for the measurement)
 
 ## Modules Used
 
