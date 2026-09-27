@@ -14,4 +14,4 @@ in signed_shift_right: absent lsr
 # -100 - 50 = -150 = 0xFF6A.
 in use_negative_literal: present lda\.w #65386\n\trtl
 # s8 + u8: the s8 sign-extended, the u8 zero-extended.
-in mixed_ops: present lda 22,s\n\tand\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00\n\+\n\tsta 10,s\n\tlda 20,s\n\tand\.w #\$00FF\n\tclc\n\tadc 10,s
+in mixed_ops: present lda 18,s\n\tand\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00\n\+\n\tsta 10,s\n\tlda 16,s\n\tand\.w #\$00FF\n\tclc\n\tadc 10,s

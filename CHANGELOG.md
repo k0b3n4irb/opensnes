@@ -26,6 +26,16 @@ All notable changes to OpenSNES are documented in this file.
   reaches from develop).
 
 ### Changed
+- perf(compiler): **stack frames are two thirds smaller.** Temps whose lives
+  never overlap now share a stack slot (slot colouring from liveness, qbe
+  `794c6e3`). Over the examples: median frame 38 → 16 bytes, largest 518 →
+  214, none past 256 any more (six functions were, in the slower
+  large-frame addressing), 16 776 → 5 826 bytes in total; the deepest stack
+  of the library fixture leaves 880 bytes above the C variables instead of
+  572. An emission-time check stops the compiler if a temp is read from a
+  slot another temp overwrote. Programs compute the same values: the ROMs
+  render identically, except two whose loops now finish more work per frame
+  (sprite_swarm starts one frame sooner, mode2 misses two frames fewer).
 - refactor(examples): **`hdma/hdma_wave` and `hdma/hdma_wave_table` are one
   example** (decided 2026-09-05): the hand-built table animated krom-style
   at boot, pixel-identical to the old `hdma_wave_table` at both capture

@@ -7,7 +7,7 @@ in test_small_local: present sbc\.w #74\n
 in test_small_local: absent tcc__fp
 in test_small_local: present lda 72,s\n\ttax\n\tpla\n\tsep #\$20\n\tsta\.l \$0000,x
 # 512-byte buffer: the frame pointer is taken right after the frame is made.
-in test_large_local: present sbc\.w #526\n\ttas\n\ttsa\n\tsta\.b tcc__fp\n
+in test_large_local: present sbc\.w #522\n\ttas\n\ttsa\n\tsta\.b tcc__fp\n
 in test_large_local: present ldy\.w #\d{3}\n\tsta \[tcc__fp\],y
 # Slots above 255 never use the 8-bit stack-relative form.
 absent \t[a-z]{3} (\d{4,}|[3-9]\d\d|2[6-9]\d|25[6-9]),s

@@ -684,14 +684,13 @@ mandatory for per-frame paths no longer exists. The breakout, mouse,
 and similar examples continue to use direct `oamMemory[]` writes by
 preference, not necessity.
 
-**Lingering observation (informational, 🟢 severity)**: other multi-arg
-C helpers still carry larger-than-ideal framesizes — `oamSetX` (148),
-`oamDrawMeta` (142), `oamDrawMetaFlip` (200), `collideRectEx` (176),
-`hdmaColorGradient` (162). A 2026-05-13 audit confirmed none of these
-are per-frame hot paths in shipping examples (`oamSetX` has 0 example
-callers; the others have 0–1). If one becomes hot for a future user,
-the same tactic (ASM rewrite) is available, OR the catalogued QBE
-coalescer chantier (`.claude/STRUCTURAL_DEFECTS.md` A4) can be revived.
+**Since 2026-09-27 the compiler shares stack slots between temps whose
+lives never overlap**, and the helpers this paragraph used to list shrank
+with every other function: `oamSetX` 148 → 28 bytes, `oamDrawMeta`
+142 → 64, `oamDrawMetaFlip` 200 → 90, `collideRectEx` 176 → 66,
+`hdmaColorGradient` 162 → 72. Across the examples the median frame went
+from 38 to 16 bytes and no function passes 256 any more (six did, and
+paid for the slower `[tcc__fp],y` addressing).
 
 ---
 

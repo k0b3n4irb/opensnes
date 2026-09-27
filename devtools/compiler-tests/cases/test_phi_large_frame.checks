@@ -24,6 +24,8 @@ in levelF_stress: present and\.w #128\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda
 # false path: b -> outer merge (\2); inner merge (\3) -> outer merge;
 # outer merge -> b on the back edge.
 in levelF_stress: present and\.w #1\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tlda \d+,s\n\tsta \d+,s\n\tjmp @if_false\.\d+\n[\s\S]*?and\.w #256\n[\s\S]*?ora \1,s\n\tsta \d+,s\n\tsta (\d+),s\n[\s\S]*?\tlda \3,s\n\tsta \2,s\n[\s\S]*?\tlda \2,s\n\tsta \1,s\n[\s\S]*?jmp @while_cond
-# The frames stay large but under 256: stack-relative, no tcc__fp.
-in levelE_many_acc: present sbc\.w #106\n
-in levelF_stress: present sbc\.w #134\n
+# Frame sizes: 106 and 134 bytes until the slot colouring of 2026-09-27
+# (temps with disjoint lives share a slot), 62 and 72 since. The pairing
+# checks above are the point of this fixture and hold at either size.
+in levelE_many_acc: present sbc\.w #62\n
+in levelF_stress: present sbc\.w #72\n

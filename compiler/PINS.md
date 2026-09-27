@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 771bdf010d8ac854792b1e369c32c4e84d74a653 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 77998b50d09a766228f806bdd54e488d64b8e46f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 794c6e3370d0726347b1ad0eb1ebc235b726e065 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 9002e3d1bfe56e869440a18c066ab5c466660812 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 3) |
 <!-- END PINS -->
 
@@ -83,7 +83,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 84 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 85 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -95,6 +95,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+794c6e3 w65816: temps whose lives never overlap share a stack slot (slot colouring from liveness), under a slot-ownership check
 77998b5 fix exponential complexity in usewidthle() (upstream b58e2e6, cherry-picked 2026-09-26)
 ceead63 w65816: every Kl read of a high word checks that a producer wrote it (Kl high-half invariant); Ocopy Kl moves both words
 c3c205d w65816: the address of a local carries its bank (lib fixture: collideRect(&a, &b) read a wild bank)

@@ -604,6 +604,12 @@ examples — the priority dropped from 🟠 to 🟢. Future tightening
 (QBE coalescer chantier OR per-function ASM rewrites) is opportunistic,
 not blocking.
 
+**2026-09-27 — the coalescer landed** (qbe `794c6e3`, slot colouring from
+liveness): `oamSetX` 148 → 28 bytes, `oamDrawMeta` 142 → 64,
+`oamDrawMetaFlip` 200 → 90, `collideRectEx` 176 → 66; over the examples the
+median frame 38 → 16 bytes and none past 256. Closed as a class; the
+remaining frames are what the temps simultaneously live need.
+
 The historical description of the original symptom and proposed fix
 is preserved below for context.
 

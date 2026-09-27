@@ -31,11 +31,16 @@ rom = "../../../examples/backgrounds/mode2/mode2.sfc"
 frames = 200
 
 [asserts.values]
-wave_phase = 352                  # +2 per loop iteration, 176 iterations by frame 200
+wave_phase = 356                  # +2 per loop iteration, 178 iterations by frame 200
+# The loop misses frames (lag_frame_counter), so the iteration count at
+# frame 200 follows the code's speed: 176 iterations and 22 missed frames
+# until the compiler's slot colouring of 2026-09-27, 178 and 20 since. The
+# values written are the same sequence either way (a --trace-writes
+# comparison over 300 frames: the old sequence is a prefix of the new one).
 
 [asserts.blocks]
 opt_row0_h_offsets = { space = "vram", offset = "6000", hex = "00000000000000000000000000000000" }
-opt_row1_v_offsets = { space = "vram", offset = "6040", hex = "63205c2054204b20422039202f2027201f2019201420112010201020122016201c2023202b2034203d20462050205820602066206b206e2070206f206d206920" }
+opt_row1_v_offsets = { space = "vram", offset = "6040", hex = "60205820502046203d2034202b2023201c2016201220102010201120142019201f2027202f20392042204b2054205c20632069206d206f2070206e206b206620" }
 # BG1 chr at word $0000: tile N is solid colour N (2 low bitplanes then 2 high).
 bg1_tile3_solid    = { space = "vram", offset = "0060", hex = "ffffffffffffffffffffffffffffffff00000000000000000000000000000000" }
 bg1_tile12_solid   = { space = "vram", offset = "0180", hex = "00000000000000000000000000000000ffffffffffffffffffffffffffffffff" }
