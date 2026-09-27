@@ -1,0 +1,35 @@
+# Super FX, a job run from the GSU code cache while the game keeps running
+# (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait, 2026-09-27).
+#
+# What this proves that the other pillars cannot:
+#   * gsuStartCached() returns at once: gsuBusy() reads 1 right after it.
+#   * The game runs during the job: the fixture's main loop waits for VBlank
+#     from ROM while the GSU adds 7 six hundred thousand times, and counts
+#     7 frames before gsuBusy() drops. gsuLaunch() parks the CPU in WRAM for
+#     the whole job instead.
+#   * The ROM stays the CPU's: bus_violations = 0. Negative control (RON set
+#     back to 1 right after the start, the rest unchanged): 149 340
+#     violations, the loop stuck at 1 frame, 26 NMIs instead of 58.
+#   * The job's result reaches the CPU after gsuWait(): the sum of the loop,
+#     200 x 3000 x 7 mod 65536 = $1640, in Game Pak RAM $70:0000.
+# Not asserted: the $C0DE marker the job stores last reads $00DE after a
+# run from the cache (full from ROM) — reported to luna, OPEN_luna.md
+# 2026-09-27; to add once settled.
+#
+# Measured: `luna state --until-frame 60 --peek <sym>:2 --out -` on
+# devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.0.
+rom = "../../../devtools/libtests_gsu/libtest_gsu.sfc"
+frames = 60
+
+[asserts.values]
+r_present = 1
+r_busy_after_start = 1
+r_frames_during = 7
+r_busy_after_wait = 0
+r_sum = 0x1640
+r_outer = 0
+r_done = 0xD0E5
+
+[asserts.gsu]
+bus_violations = 0
+instructions_executed = { gt = 2000000 }   # 600 000 loop iterations x 4 instructions

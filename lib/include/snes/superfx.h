@@ -159,6 +159,69 @@ void gsuSetProgram(const void *program);
 extern void gsuLaunch(void);
 
 /**
+ * @name Running a GSU job while the game keeps running
+ *
+ * gsuLaunch() parks the CPU in WRAM until the job ends, because a GSU that
+ * runs its program from ROM owns the Game Pak ROM (SCMR RON = 1) and the
+ * CPU cannot read it. A program that fits in the GSU's 512-byte code cache
+ * does not need the ROM: loaded there by the CPU and started from the
+ * cache, it keeps running with RON = 0, and the CPU goes on with its own
+ * code in ROM (Nintendo manual Book II 6.1.2 and 6.8.4; fullsnes, SCMR).
+ *
+ * Constraints on such a program: at most 512 bytes; no CACHE and no LJMP
+ * (both empty the cache and refetch from ROM); no ROM data reads (GETB,
+ * ROM buffer). Game Pak RAM stays the GSU's while the job runs if gsu_scmr
+ * grants it (RAN): the CPU must not touch $70:xxxx until gsuWait().
+ *
+ * @code
+ * gsuCacheLoad(gsu_program, gsu_program_end - gsu_program);
+ * gsuStartCached(0);              // returns at once
+ * while (gsuBusy()) {
+ *     game_logic();               // the CPU runs from ROM meanwhile
+ * }
+ * gsuWait();                      // gives Game Pak RAM back
+ * @endcode
+ * @{
+ */
+
+/**
+ * @brief Copy a GSU program into the GSU code cache ($3100-$32FF)
+ * @param code  The assembled GSU binary (any ROM bank)
+ * @param size  Its size in bytes, 1 to 512
+ *
+ * The GSU must be stopped. Stops it (GO = 0, which sets CBR to 0 and
+ * empties the cache), copies the code, and pads the last 16-byte cache line
+ * with NOP ($01) so every line it uses is written in full, as krom's cache
+ * injection test does. A size above 512 is cut to 512.
+ */
+void gsuCacheLoad(const void *code, u16 size);
+
+/**
+ * @brief Start the program loaded by gsuCacheLoad() and return at once
+ * @param pc  Entry offset in the cache (0 for the first byte)
+ *
+ * Writes gsu_cfgr, the 21 MHz clock, gsu_scbr, then gsu_scmr with RON
+ * forced to 0 (the ROM stays the CPU's), then R15, which starts the GSU.
+ */
+void gsuStartCached(u16 pc);
+
+/**
+ * @brief Is the GSU still running? (SFR GO bit)
+ * @return 1 while the job runs, 0 once it has executed STOP
+ */
+u8 gsuBusy(void);
+
+/**
+ * @brief Wait for the end of the job, then give the Game Pak back to the CPU
+ *
+ * Returns at once if the GSU has already stopped. Clears SCMR, so the CPU
+ * can read the results the program left in Game Pak RAM.
+ */
+void gsuWait(void);
+
+/** @} */
+
+/**
  * @brief Setup column-major tilemap for SuperFX PLOT framebuffer
  * @param vramAddr VRAM word address for tilemap (typically 0x4000)
  */

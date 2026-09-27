@@ -136,7 +136,7 @@ its header.
 | `profile.h` | `profileGetScanline` | [profiling](tutorials/profiling.md) |
 | `snesmod.h` | `snesmodGetPosition`, `snesmodFlush`, `snesmodSetSoundTable`, `snesmodAllocateSoundRegion` | [audio: following the music](tutorials/audio.md) |
 | `sprite.h` | `oamSetX` | [sprites](tutorials/sprites.md) |
-| `superfx.h` | `gsuIsPresent`, `gsuSetupBitmapTilemap`, `gsuDmaFullFrame`, `gsuSetupHdmaBlanking` | [Super FX](tutorials/superfx.md) |
+| `superfx.h` | `gsuIsPresent`, `gsuSetupBitmapTilemap`, `gsuDmaFullFrame`, `gsuSetupHdmaBlanking`, `gsuCacheLoad`, `gsuStartCached`, `gsuBusy`, `gsuWait` | [Super FX](tutorials/superfx.md) |
 
 ## When something silently does nothing
 

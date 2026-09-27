@@ -170,6 +170,53 @@ VBlank in three was lost in `superfx_3d` (game time ran at two thirds of
 real time); `gsuLaunch` also re-enabled NMI with a hardcoded `$81`, which
 silently cancelled an H/V-timer IRQ the game had armed.
 
+## Letting the Game Run During a Job: the Code Cache
+
+`gsuLaunch()` waits in WRAM for the whole job, because a GSU running its
+program from ROM owns the ROM. A program that fits in the GSU's 512-byte
+code cache does not need the ROM: loaded there by the CPU and started from
+the cache, the GSU keeps running with RON = 0, and the CPU carries on with
+its own code in ROM (Nintendo dev manual Book II §6.1.2: a program in the
+cache "will not stop" when RON is 0, "it becomes possible to access the game
+pak ROM or RAM from the Super NES CPU"; §6.8.4 for loading the cache from
+the CPU).
+
+```c
+extern const u8 gsu_job[], gsu_job_end[];      /* the .incbin'd .sfx.bin */
+
+gsuCacheLoad(gsu_job, (u16)(gsu_job_end - gsu_job));
+gsuStartCached(0);              /* returns at once */
+while (gsuBusy()) {
+    WaitForVBlank();            /* the game's frame, from ROM */
+    update_game();
+}
+gsuWait();                      /* gives Game Pak RAM back to the CPU */
+```
+
+`gsuCacheLoad()` stops the GSU (which empties the cache), copies the code to
+`$3100` and pads the last 16-byte line with NOP, as krom's cache-injection
+test does. `gsuStartCached()` writes your `gsu_cfgr` / `gsu_scbr` /
+`gsu_scmr`, with RON forced to 0, then R15, which starts the GSU.
+
+What such a program may not do:
+
+- be longer than 512 bytes;
+- use `CACHE` or `LJMP`: both empty the cache and refetch from ROM, which
+  the GSU does not own;
+- read ROM data (`GETB` and the ROM buffer).
+
+If `gsu_scmr` grants the Game Pak RAM to the GSU (RAN, needed for `PLOT` and
+`STW`), the CPU must not touch `$70:xxxx`, nor its `$6000-$7FFF` mirror,
+until `gsuWait()`. `devtools/libtests_gsu` runs a job of about seven frames
+this way; its manifest checks that the game loop counted seven frames during
+the job and that the CPU never read the ROM the GSU owned (luna's
+`gsu.bus_violations` stays 0, against 149 340 when RON is left at 1).
+
+> **Open on luna (2026-09-27):** run from the cache, that job's last Game Pak
+> RAM writes come out incomplete in luna, where the same program run from
+> ROM writes them all. Not settled on hardware; until it is, read back only
+> what the job wrote well before its `STOP`, and check the results.
+
 ## SuperFX Assembly Rules
 
 Four mandatory rules for all GSU programs:

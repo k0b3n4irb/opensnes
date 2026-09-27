@@ -4,6 +4,16 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(lib): **a Super FX job can run while the game keeps running.**
+  `gsuCacheLoad()` puts a GSU program of up to 512 bytes in the GSU's code
+  cache, `gsuStartCached()` starts it and returns at once, `gsuBusy()` /
+  `gsuWait()` follow it. From the cache the GSU does not need the ROM, so
+  the CPU keeps running its game loop (`gsuLaunch()` parks it in WRAM for
+  the whole job). New fixture `devtools/libtests_gsu`: seven game frames
+  during a seven-frame job, no bus violation. Constraints and one open
+  question on luna in the Super FX tutorial.
+
 ### Fixed
 - fix(lib): **sprites drawn by the dynamic sprite engine sit on the line
   you asked for.** `oamSet()` and `oamDrawMeta()` store y − 1 (the PPU

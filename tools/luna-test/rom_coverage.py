@@ -85,7 +85,9 @@ _RT = REPO_ROOT / "devtools" / "compiler-tests" / "runtime"
 FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120),
             # the second fixture reaches r_done around frame 170 (SNESMOD upload first)
             (REPO_ROOT / "devtools" / "libtests_fx" / "libtest_fx.sfc", "libtest_fx", 240),
-            (REPO_ROOT / "devtools" / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60)] + [
+            (REPO_ROOT / "devtools" / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60),
+            # the cache-resident GSU job (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait)
+            (REPO_ROOT / "devtools" / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
     for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel")
 ]
