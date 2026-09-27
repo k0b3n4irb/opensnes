@@ -209,7 +209,7 @@ tests: test-compiler
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
-	@# APU output hashed for four self-playing audio examples (luna
+	@# APU output hashed for the ten audio examples (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
 	@python3 tools/luna-test/audio_regress.py
@@ -469,6 +469,9 @@ test-manifests:
 		tools/luna-test/stress/bcd/bcd.toml \
 		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
 		tools/luna-test/manifests
+	@# Power-cycle chains write a .srm that the next manifest reads: they run
+	@# serially, in file order, apart from the parallel batch above.
+	@tools/luna-test/bin/luna test tools/luna-test/power_cycle
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on every example, both arches (the old arch-dependent pair was a

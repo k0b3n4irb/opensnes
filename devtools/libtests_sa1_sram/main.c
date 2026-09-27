@@ -21,11 +21,16 @@ u16 r_ok;        /* sramSave(tpl, 12)                                  -> SRAM_O
 u16 r_range;     /* sramSaveOffset(tpl, 12, 0x7FF8): past the 32 KB the header declares -> SRAM_ERR_RANGE (1) */
 u16 r_clear;     /* OR of the first 12 bytes after sramClear(12)       -> 0 */
 u16 r_done;      /*                                                    -> 0xBEEF */
+/* What the battery held at power-on, read before anything is written: zero
+ * on a fresh cart, the previous run's pattern (C1 D2 E3 F4) once a .srm is
+ * loaded — the power-cycle chain in tools/luna-test/power_cycle. */
+u8 r_boot[4];
 
 int main(void) {
     u8 i;
     consoleInit();
 
+    sramLoad(r_boot, 4);
     sramSave(tpl, 12);
     sramLoad(back, 12);
     r_rt = 0;
