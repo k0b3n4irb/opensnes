@@ -29,7 +29,7 @@ Then open `sa1_starfield.sfc` in luna (or any SNES emulator).
 - 4 brightness levels create a subtle depth effect
 - All math computed by the SA-1, from I-RAM: at boot it copies its loop and
   sine table there, so it does not share the ROM with the main CPU (~10.7 MHz;
-  ~8.6 MHz when built with `make clean && make SA1_CODE_IN=ROM` — see the
+  ~8.5 MHz when built with `make clean && make SA1_CODE_IN=ROM` — see the
   SA-1 tutorial for the measurement)
 
 ## Modules Used

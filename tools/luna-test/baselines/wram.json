@@ -112,7 +112,7 @@
     "rom_sha256": "08b5fdb0bd7ebcdd16f2f301062de6866d9829693c0aa391a9c90aab702c2f29"
   },
   "chips_sa1_starfield": {
-    "stream": "fdf5ee89d0fd78a5d140f77440005d7bac9c5610a6fc36aa5868410de7c0270e",
+    "stream": "945056638d33ceaca93b4afa057037c0b46258c3f928d54cfcedffc40cb65376",
     "rom_sha256": "72a9f44a2793d44350b7d3159f9ed6533f7613e6831257d79b1a0caf0f348125"
   },
   "chips_superfx_3d": {
