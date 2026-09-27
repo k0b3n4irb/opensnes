@@ -462,6 +462,7 @@ test-manifests:
 	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
 	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
 	@$(MAKE) -s -C devtools/libtests_gsu        # libtest_gsu_cached.toml fixture
+	@$(MAKE) -s -C devtools/libtests_sa1_sram   # power_cycle/d_,e_ fixture
 	@tools/luna-test/bin/luna test --jobs 0 \
 		tools/luna-test/stress/hwmath/hwmath.toml \
 		tools/luna-test/stress/ppumul/ppumul.toml \
