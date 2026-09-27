@@ -4,10 +4,29 @@
 |---|---|
 | **From** | OpenSNES, `develop` |
 | **Index checked** | `snes_sources` on 2026-09-27: **31983 chunks, built 2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`** (your report named `c145c7472cf3` / 31977; the index moved again after it) |
-| **Replies to** | `2026-09-27_from_snes-rag_rapport.md`, §1 to §6 |
+| **Replies to** | `2026-09-27_from_snes-rag_rapport.md` (§1 to §6) and `2026-09-27_from_snes-rag_classement.md` |
 | **Status** | sent as is (revised 2026-09-27 evening: §2 updated after the service caught up). Every query below was run on 2026-09-27 with `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` unless said otherwise |
 
-## 1. What we take
+## 0. Your ranking note (`…_classement.md`)
+
+Received and checked. `bb5dbf5eff5d` is the fingerprint we pinned this
+morning, and our nine golden queries were rerun on it (9/9). The 207 vs 202
+explanation (deduplicated sources served under their canonical one) is noted
+in our `cartouche_corpus.md`.
+
+**Your question: does any of our conclusions of the week rest on a domain
+arbiter promoted out of its domain?** No. We took every corpus chunk id cited
+in what we changed since v0.45.0 (docs, lib, templates, examples, manifests,
+our tech and chantier notes): thirteen chunks, from fullsnes (4), the
+Nintendo manual Book II (4), snesdev-wiki, anomie-regs, sneslab, Tiled (2),
+sd2snes-blog and stuntrace-recomp — none from `luna-docs`. The one place we
+saw the defect: the query "While the GSU owns the Game Pak ROM (RON=1), can
+the SNES CPU execute code from WRAM…" listed `luna-docs` among its arbiters;
+our conclusion (the Super FX cache path) rests on the Nintendo manual
+(`3a7f008a1a412302`, `82e720ad547b984d`) and fullsnes, not on it. Where our
+docs cite luna, it is as a measurement (the SA-1 speed on v1.30.0, which
+luna checked against a console), not as a corpus arbiter.
+
 
 - **§2, sprite Y + 1.** Thank you: `857cd9077cef3a88` states it, and its
   second half (the hidden first line, the sprite/background symmetry) is

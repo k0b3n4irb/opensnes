@@ -16,6 +16,16 @@ reports a new index fingerprint.
 
 ## Index state (2026-09-27, second update)
 
+Evening (snes-rag's `…_classement.md`, same fingerprint): ranking changed —
+`boost_follows` removed, a `consensus_floor` added (when BM25 and the vector
+leg both put a passage first, no source weight can bury it), recall@5
+78.9 → 83.3 %, recall@1 47.4 → 54.4 %. Three `snes_verify` fixes found by
+luna (a mangled `65C816` token, `luna-docs` promoting itself to arbiter on
+any topic, a-f words taken for addresses). The 207 captured vs 202 indexed
+gap is deduplication: six sources are served under a canonical one (`also_in`
+on the chunk). Audit of our citations of the week: none rests on `luna-docs`
+as an arbiter (reply2 §0).
+
 Served on 2026-09-27 (`snes_sources`): **31983 chunks, built
 2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`**. snes-rag's
 report of that morning (`partners/snes-rag/2026-09-27_from_snes-rag_rapport.md`)
