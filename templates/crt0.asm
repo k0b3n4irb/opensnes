@@ -154,6 +154,7 @@
 ; through to the normal NmiHandler otherwise.
 .RAMSECTION ".gsu_runtime" BANK 0 SLOT 1
     gsu_owns_cart   dsb 1   ; 1 while a GSU job holds the Game Pak bus
+    gsu_stop_irqs   dsb 1   ; +1 per GSU IRQ on STOP acknowledged (wraps at 256)
 .ENDS
 .RAMSECTION ".gsu_nmi_wram" BANK $7E SLOT 2
     gsu_nmi_wram    dsb 160 ; the copied blobs: NMI, IRQ, RTI (gsu_nmi_blob_end - gsu_nmi_blob <= 160)
@@ -833,6 +834,7 @@ _sa1_init_done:
     bne -
     lda #$00
     sta.l gsu_owns_cart     ; the GSU owns nothing until gsuLaunch says so
+    sta.l gsu_stop_irqs     ; no GSU IRQ on STOP seen yet
     rep #$20
     .ACCU 16
 .endif
@@ -2170,34 +2172,49 @@ gsu_nmi_blob:
 
 ; gsu_irq_blob — the IRQ entry, reached from the $010C WRAM stub (2026-09-26;
 ; until then that stub pointed at IrqHandler in ROM, which a job makes
-; unreadable). Flag clear: straight to IrqHandler and the user's handler.
-; Flag set: the handler is ROM code, so acknowledge both possible sources and
-; return — an H/V-timer IRQ ($4211 TIMEUP) and the GSU's IRQ on STOP (reading
-; SFR's high byte resets its IRQ flag, bit 15 — Nintendo dev manual Book II
-; §5.4.2; CFGR bit 7 masks it, fullsnes). Leaving either unacknowledged would
-; re-enter the IRQ forever.
+; unreadable).
+;
+; First, the GSU's own IRQ on STOP (CFGR bit 7 clear): SFR bit 15 says it is
+; the source and reading SFR's high byte resets it (Nintendo dev manual Book
+; II §5.4.2, chunk a938cb6359382bbd; fullsnes SFR/CFGR). It is acknowledged
+; and counted here, never passed on: the user's IRQ handler only knows the
+; H/V timer, and before 2026-09-27 a job started with the IRQ unmasked and
+; the I flag clear re-entered this IRQ forever (it reached IrqHandler, whose
+; $4211 read does not reset the GSU's flag). If the timer fired at the same
+; time, its line is still asserted after the RTI and the IRQ comes straight
+; back, this time for the timer.
+;
+; Then the timer: flag clear, straight to IrqHandler and the user's handler;
+; flag set, the handler is ROM code, so acknowledge ($4211 TIMEUP) and return.
 gsu_irq_blob:
     rep #$30
     .ACCU 16
     .INDEX 16
     pha
-    lda.l gsu_owns_cart
-    and #$00FF
-    bne @irq_gsu_owned
-    pla
-    jml IrqHandler
-@irq_gsu_owned:
-    phb
-    pea $0000
-    plb
-    plb                     ; DB = $00
     sep #$20
     .ACCU 8
-    lda.w $4211             ; TIMEUP: acknowledge an H/V-timer IRQ
-    lda.w $3031             ; SFR high byte: acknowledge a GSU IRQ (bit 15)
+    lda.l $003031           ; SFR high byte: bit 7 = GSU IRQ on STOP (read resets it)
+    bmi @irq_gsu_stop
+    lda.l gsu_owns_cart
+    bne @irq_gsu_owned
     rep #$20
     .ACCU 16
-    plb
+    pla
+    jml IrqHandler
+@irq_gsu_stop:
+    .ACCU 8
+    lda.l gsu_stop_irqs
+    inc a
+    sta.l gsu_stop_irqs
+    rep #$20
+    .ACCU 16
+    pla
+    rti
+@irq_gsu_owned:
+    .ACCU 8
+    lda.l $004211           ; TIMEUP: acknowledge an H/V-timer IRQ
+    rep #$20
+    .ACCU 16
     pla
     rti
 

@@ -18,6 +18,13 @@
 #     second byte (5-6 clocks); luna before v1.28.1 stopped clocking the
 #     buffer at STOP and lost it ($00DE), a console does not (luna's reply
 #     of 2026-09-27, after ares superfx.cpp).
+#   * IRQ on STOP (2026-09-27): the same job again with CFGR bit 7 clear
+#     and the I flag clear (a V-timer IRQ armed, as a game has one).
+#     crt0's WRAM IRQ entry acknowledges the GSU (SFR bit 15) and counts it
+#     in gsu_stop_irqs: the loop waits on that counter, 7 frames, the count
+#     moves by exactly 1, the GSU is stopped when it does. Negative control
+#     (crt0 before the fix, IRQ passed to IrqHandler): the CPU never leaves
+#     its IRQ entry (PC $7E:205D at frame 60), r_done stays 0.
 #
 # Measured: `luna state --until-frame 60 --peek <sym>:2 --out -` on
 # devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.1.
@@ -32,8 +39,12 @@ r_busy_after_wait = 0
 r_sum = 0x1640
 r_outer = 0
 r_marker = 0xC0DE
+r_frames_during_irq = 7
+r_stop_irqs_before = 0
+r_stop_irqs_delta = 1
+r_busy_at_irq = 0
 r_done = 0xD0E5
 
 [asserts.gsu]
 bus_violations = 0
-instructions_executed = { gt = 2000000 }   # 600 000 loop iterations x 4 instructions
+instructions_executed = { gt = 2000000 }   # two jobs of 600 000 loop iterations x 4 instructions

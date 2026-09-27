@@ -67,6 +67,9 @@
 #define SCMR_H160      0x04
 #define SCMR_H192      0x20
 
+#define CFGR_IRQ_MASK  0x80   /**< CFGR bit 7: 1 = no IRQ on STOP (the gsuInit default) */
+#define CFGR_FAST_MUL  0x20   /**< CFGR bit 5: high-speed multiplier */
+
 #define GSU_SRAM_BASE  0x700000
 
 /*============================================================================
@@ -94,6 +97,20 @@ extern u8 gsu_dma_src_hi;
 
 /** @brief SuperFX status from crt0 init (VCR chip version, 0=not detected) */
 extern u8 superfx_status;
+
+/**
+ * @brief GSU IRQs on STOP acknowledged so far (crt0, wraps at 256)
+ *
+ * With gsu_cfgr's CFGR_IRQ_MASK clear, the GSU raises an IRQ when its
+ * program executes STOP. The Super FX IRQ entry (crt0, in WRAM) reads the
+ * GSU status to tell it from an H/V-timer IRQ, acknowledges it and adds one
+ * here; your irqSet() handler never sees it. Compare with a copy taken before
+ * the start: the count moving is the end of the job, without polling the GSU.
+ * The CPU's I flag must be clear (irqEnable() clears it) for the IRQ to be
+ * taken at all. (Since 2026-09-27: before, an unmasked STOP IRQ with the
+ * I flag clear locked the CPU in its IRQ entry.)
+ */
+extern volatile u8 gsu_stop_irqs;
 
 /*============================================================================
  * API Functions
@@ -180,6 +197,18 @@ extern void gsuLaunch(void);
  *     game_logic();               // the CPU runs from ROM meanwhile
  * }
  * gsuWait();                      // gives Game Pak RAM back
+ * @endcode
+ *
+ * Or be told when it ends: clear CFGR_IRQ_MASK and watch gsu_stop_irqs.
+ *
+ * @code
+ * gsu_cfgr = 0x00;                // IRQ on STOP (irqEnable() done earlier)
+ * u8 stops = gsu_stop_irqs;
+ * gsuStartCached(0);
+ * while (gsu_stop_irqs == stops) {
+ *     game_logic();
+ * }
+ * gsuWait();
  * @endcode
  * @{
  */

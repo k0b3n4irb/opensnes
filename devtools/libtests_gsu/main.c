@@ -24,6 +24,13 @@ u16 r_busy_after_start;
 u16 r_frames_during;
 /** @brief gsuBusy() after gsuWait(): 0 */
 u16 r_busy_after_wait;
+/** @brief second job, IRQ on STOP unmasked, I flag clear: frames during it */
+u16 r_frames_during_irq;
+/** @brief gsu_stop_irqs before the second job, and its increase at the end */
+u16 r_stop_irqs_before;
+u16 r_stop_irqs_delta;
+/** @brief gsuBusy() once gsu_stop_irqs moved: 0, the IRQ comes at STOP */
+u16 r_busy_at_irq;
 /** @brief end marker for the test script */
 u16 r_done;
 
@@ -45,6 +52,24 @@ int main(void) {
     gsuWait();
     r_busy_after_wait = gsuBusy();
     gsuJobReadResults();
+
+    /* Second job, the same one, with the GSU's IRQ on STOP unmasked
+     * (CFGR bit 7 = 0) and the CPU's I flag clear, as any game that uses a
+     * timer IRQ has it. */
+    irqSetVTimer(200);
+    irqEnable(IRQ_VTIMER);
+    gsu_cfgr = 0x00;
+    gsuCacheLoad(gsu_job, (u16)(gsu_job_end - gsu_job));
+    r_stop_irqs_before = gsu_stop_irqs;
+    gsuStartCached(0);
+    r_frames_during_irq = 0;
+    while (gsu_stop_irqs == (u8)r_stop_irqs_before) {
+        WaitForVBlank();
+        r_frames_during_irq++;
+    }
+    r_busy_at_irq = gsuBusy();
+    gsuWait();
+    r_stop_irqs_delta = (u8)(gsu_stop_irqs - (u8)r_stop_irqs_before);
     r_done = 0xD0E5;
 
     while (1) {

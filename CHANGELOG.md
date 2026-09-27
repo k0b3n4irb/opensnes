@@ -4,6 +4,17 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- fix(runtime): **a Super FX job started with its IRQ on STOP unmasked no
+  longer locks the CPU.** With CFGR bit 7 clear and the I flag clear (any
+  game that uses a timer IRQ), the GSU's IRQ went to the user's IRQ handler,
+  whose `$4211` read does not reset it, and the CPU re-entered the IRQ
+  forever. crt0's WRAM IRQ entry now reads SFR bit 15 first, acknowledges the
+  GSU's IRQ and counts it in the new `gsu_stop_irqs`: a game can wait for the
+  end of a job on that count instead of polling (`CFGR_IRQ_MASK`,
+  `CFGR_FAST_MUL` added to `superfx.h`). The GSU fixture runs a second job
+  that way.
+
 ### Changed
 - test(luna-test): luna v1.28.1. The Super FX cache-job fixture now checks
   the job's last RAM write too: luna before 1.28.1 dropped it (a stopped

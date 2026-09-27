@@ -212,6 +212,43 @@ this way; its manifest checks that the game loop counted seven frames during
 the job and that the CPU never read the ROM the GSU owned (luna's
 `gsu.bus_violations` stays 0, against 149 340 when RON is left at 1).
 
+### Being told when it ends: the IRQ on STOP
+
+Instead of asking `gsuBusy()`, the game can let the GSU tell it. With
+CFGR bit 7 clear, STOP raises an IRQ on the SNES CPU; bit 15 of the GSU
+status register (SFR) says the GSU was its source, and reading that byte
+resets it (Nintendo dev manual Book II §5.4.2, which describes the IRQ as the
+way to "continue its own processing without having to periodically monitor
+the GSU"; fullsnes, CFGR: "0=Trigger IRQ on STOP opcode, 1=Disable IRQ").
+
+The Super FX IRQ entry in crt0 does that test first. A GSU IRQ is
+acknowledged and counted in `gsu_stop_irqs`, and never reaches your
+`irqSet()` handler, which stays the H/V timer's. When the timer fired too,
+its IRQ comes straight back after the GSU's, for your handler.
+
+```c
+irqEnable(IRQ_VTIMER);          /* or anything that leaves the I flag clear */
+gsu_cfgr = 0x00;                /* CFGR_IRQ_MASK clear: IRQ on STOP */
+u8 stops = gsu_stop_irqs;
+gsuCacheLoad(gsu_job, (u16)(gsu_job_end - gsu_job));
+gsuStartCached(0);
+while (gsu_stop_irqs == stops) {
+    WaitForVBlank();
+    update_game();
+}
+gsuWait();
+```
+
+The CPU takes no IRQ at all while its I flag is set, which is how crt0 boots:
+the count moves only once something has cleared it (`irqEnable()` does). Keep
+`CFGR_IRQ_MASK` set when you poll: whether SFR bit 15 is also set by a STOP
+whose IRQ is masked is an open question in fullsnes ("also set if IRQ
+masked?"), and if it is, the next timer IRQ would count that old STOP.
+`devtools/libtests_gsu` runs its job a second time this way (the count moves
+by exactly one, seven game frames during the job). Before 2026-09-27 this
+combination locked the CPU in its IRQ entry: the GSU's IRQ went to your
+handler, whose `$4211` read does not reset it.
+
 
 ## SuperFX Assembly Rules
 
