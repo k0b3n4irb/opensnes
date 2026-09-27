@@ -14,7 +14,26 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
-## Index state (2026-09-27)
+## Index state (2026-09-27, second update)
+
+Served on 2026-09-27 (`snes_sources`): **31983 chunks, built
+2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`**. snes-rag's
+report of that morning (`partners/snes-rag/2026-09-27_from_snes-rag_rapport.md`)
+announced `c145c7472cf3` (31977, the TMX recapture); the index moved again
+after it (their consensus-floor ranking change). Golden queries rerun on
+`bb5dbf5eff5d`: 9 of 9 green, no. 7 (TMX flip flags) green for the first
+time; the negative control still never answered by qbe-docs.
+
+**`snes_verify` on the service still answers `confirmed` for sprite Y + 1
+on the off-topic 34-slivers passage**, although their report says their
+harness now gives `unsettled` (verify fix `6354031`): the fix is not live
+on the instance we query. Keep reading the citation before the verdict.
+The fact itself is arbitrated: snesdev-wiki `857cd9077cef3a88` ("sprites
+appear 1 line lower than their Y value … the first line of rendering is
+always hidden"), buried at the end of a long OAM chunk, so search does not
+return it (their granularity work, gq30).
+
+## Index state (2026-09-27, first update)
 
 `snes_sources` → 207 sources captured of 234 listed; **31973 chunks, 202
 sources indexed, built 2026-09-27T06:19:02Z, chunker v7, fingerprint
@@ -86,7 +105,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-09-27, index `c416932c0b34`)
+## Golden queries (status 2026-09-27, index `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 
@@ -98,7 +117,7 @@ Run with the exclusion set. "✅" = the intended source is in the top 3.
 | 4 | luna `--power-on zero ones random seed` uninitialised RAM fill | ✅ luna-docs | also states the manifest keys `power_on` / `seed` |
 | 5 | luna test manifest schema; which assert keys exist | ✅ luna-docs | |
 | 6 | How does `luna diff --tolerance` match frame F of ROM A to ROM B | ✅ luna-docs | |
-| 7 | TMX tile flipping flags (`FLIPPED_HORIZONTALLY_FLAG`…) high bits of the gid | ✗ | still ✗ on 2026-09-27: `tiled-tmx-format` answers with `<tileoffset>` and `<data>`; the "Tile flipping" subsection looks uncaptured — asked again |
+| 7 | TMX tile flipping flags (`FLIPPED_HORIZONTALLY_FLAG`…) high bits of the gid | ✅ tiled-tmx-format | green since `bb5dbf5eff5d`: the constants live on the "Global Tile IDs" page, which the corpus now captures (`d07b82b0b0dcebb9`, `8a64c4c6f6f9932f`) |
 | 8 | Aseprite file format: cel chunk layout and palette chunk semantics | ✅ aseprite-file-spec | |
 | 9 | luna profile per-symbol master cycles `--from-frame --top` JSON | ✅ luna-docs | |
 | N | *negative control* — cc65816 calling convention: push order and pointer size (no exclusion) | ≈ opensnes-docs 2nd and 3rd | 2026-09-27: `wdc-65816-manual` "Push" (generic) is first; never qbe-docs, so the control holds, but our ABI is no longer first — reported. The chunk it served carried a stale row of our own ABI.md (fixed the same day) |

@@ -827,7 +827,7 @@ _o32d_no_refresh:
     ror a                           ; X bit 8 into carry
 
     lda.w oambuffer+OAM_OAMY,y        ; Y position
-    dec a                           ; OAM Y = N draws from line N+1: store y - 1 like oamSet (carry = X bit 8 is kept)
+    dec a                           ; OAM Y = N draws from line N+1 (snesdev-wiki, cartouche 857cd9077cef3a88): store y - 1 like oamSet (carry = X bit 8 is kept)
     xba                             ; Swap: now A = Y:X_high_bit_in_carry
     rep #$20
     .ACCU 16

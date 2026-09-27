@@ -2,7 +2,14 @@
 
 All notable changes to OpenSNES are documented in this file.
 
-## [Unreleased]
+## [0.46.0] — 2026-09-27
+
+The compiler release. Stack frames are two thirds smaller (temps whose lives
+never overlap share a slot), and two emission-time checks now stop the
+compiler on the bug classes that produced its silent miscompiles. A Super FX
+job can run while the game keeps running. Two library fixes move sprites and
+HDMA to where they belong, every public function is documented, and the test
+suite runs in under four minutes.
 
 ### Added
 - feat(lib): **a Super FX job can run while the game keeps running.**
@@ -34,6 +41,22 @@ All notable changes to OpenSNES are documented in this file.
 - fix(build): a zip built from `develop` is named after the tree's
   version (`snes.h`), not after v0.17.0 (the last tag `git describe`
   reaches from develop).
+
+### Tests and documentation
+- test: `make tests` runs its luna calls in parallel (3 min 41 on 6 cores,
+  byte-identical reports); corpus liveness takes a second snapshot, so an
+  NMI that dies after boot no longer passes; the harness has its own unit
+  tests; every compiler fixture now asserts its code (41 ported, ratchet at
+  0); six examples' controls are scripted and asserted; the c_features ROM
+  calls functions returning 32-bit values.
+- test: luna v1.28.0 — manifests name array elements as `symbol+N`, an
+  empty controller port is tested one port at a time, and the SA-1 speed of
+  `sa1_starfield` is measured (~8.6 MHz; tutorial updated).
+- docs: the 81 public functions no page mentioned are documented (new
+  interrupts tutorial); `docs/tools/build.md` lists every Makefile knob, and
+  the doc sentinel fails on one it does not name (`BPP`, read by nothing, is
+  gone); `MAINTAINING.md` says what a successor needs; `compiler/ABI.md` no
+  longer says 32-bit values return through the stack.
 
 ### Changed
 - perf(compiler): **stack frames are two thirds smaller.** Temps whose lives
