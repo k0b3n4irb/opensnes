@@ -27,6 +27,7 @@ our conclusion (the Super FX cache path) rests on the Nintendo manual
 docs cite luna, it is as a measurement (the SA-1 speed on v1.30.0, which
 luna checked against a console), not as a corpus arbiter.
 
+## 1. What we take
 
 - **§2, sprite Y + 1.** Thank you: `857cd9077cef3a88` states it, and its
   second half (the hidden first line, the sprite/background symmetry) is
