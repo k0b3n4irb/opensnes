@@ -149,15 +149,13 @@
 
 ; Phase B (2026-09-25): the NMI must survive a GSU job. gsuLaunch sets
 ; gsu_owns_cart while the GSU holds the Game Pak bus; the NMI stub at $0108
-; jumps to gsu_nmi_wram, a copy of gsu_nmi_blob (below) made at boot, which
-; runs the ROM-free part of the VBlank work when the flag is set and falls
-; through to the normal NmiHandler otherwise.
+; jumps to gsu_nmi_blob (below), which lives in the RAM code window (since
+; 2026-09-29; a hand-copied blob before) and runs the ROM-free part of the
+; VBlank work when the flag is set, falling through to the normal NmiHandler
+; otherwise.
 .RAMSECTION ".gsu_runtime" BANK 0 SLOT 1
     gsu_owns_cart   dsb 1   ; 1 while a GSU job holds the Game Pak bus
     gsu_stop_irqs   dsb 1   ; +1 per GSU IRQ on STOP acknowledged (wraps at 256)
-.ENDS
-.RAMSECTION ".gsu_nmi_wram" BANK $7E SLOT 2
-    gsu_nmi_wram    dsb 160 ; the copied blobs: NMI, IRQ, RTI (gsu_nmi_blob_end - gsu_nmi_blob <= 160)
 .ENDS
 .endif
 
@@ -735,6 +733,52 @@ FastStart:
     .ACCU 16
 .endif
 
+.ifdef SUPERFX
+    ;--------------------------------------------------------------------------
+    ; SuperFX (GSU) Initialization
+    ;--------------------------------------------------------------------------
+    ; BEFORE the NMI is enabled (since 2026-09-29): a Super FX cart's native
+    ; NMI vector is $0108, and until the stubs below are written it holds
+    ; nothing. The block used to run after `sta $4200`, leaving a window in
+    ; which a VBlank would have jumped into empty RAM.
+    ;--------------------------------------------------------------------------
+    ; Put GSU in known state: SNES CPU owns all buses, SRAM writable.
+    ; The GSU is NOT started here — user code calls gsuRun() when ready.
+    ;--------------------------------------------------------------------------
+    sep #$20
+    .ACCU 8
+
+    ; SCMR: SNES CPU owns ROM and RAM (GSU dormant)
+    lda #$00
+    sta.l $303A
+
+    ; BRAMR: enable SRAM writes from SNES CPU side
+    lda #$01
+    sta.l $3033
+
+    ; Read GSU version register to confirm hardware present
+    lda.l $303B             ; VCR (Version Code Register)
+    sta.l superfx_status    ; 0 = no GSU, non-zero = chip version
+
+    ; Install the WRAM interrupt vectors (.gsu_vectors above): 16 bytes,
+    ; four `JML handler`, copied from gsu_vector_stubs in hdr_superfx.asm.
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+-   lda.l gsu_vector_stubs,x
+    sta.l gsu_vec_brk,x
+    inx
+    cpx #16
+    bne -
+    ; Their targets (gsu_nmi_blob & co., below) are in the RAM code window,
+    ; copied with the rest of it right after CopyInitData.
+    lda #$00
+    sta.l gsu_owns_cart     ; the GSU owns nothing until gsuLaunch says so
+    sta.l gsu_stop_irqs     ; no GSU IRQ on STOP seen yet
+    rep #$20
+    .ACCU 16
+.endif
+
     ; Enable NMI (VBlank interrupt)
     sep #$20
     .ACCU 8
@@ -814,51 +858,6 @@ _sa1_init_done:
     .ACCU 16
 .endif
 
-.ifdef SUPERFX
-    ;--------------------------------------------------------------------------
-    ; SuperFX (GSU) Initialization
-    ;--------------------------------------------------------------------------
-    ; Put GSU in known state: SNES CPU owns all buses, SRAM writable.
-    ; The GSU is NOT started here — user code calls gsuRun() when ready.
-    ;--------------------------------------------------------------------------
-    sep #$20
-    .ACCU 8
-
-    ; SCMR: SNES CPU owns ROM and RAM (GSU dormant)
-    lda #$00
-    sta.l $303A
-
-    ; BRAMR: enable SRAM writes from SNES CPU side
-    lda #$01
-    sta.l $3033
-
-    ; Read GSU version register to confirm hardware present
-    lda.l $303B             ; VCR (Version Code Register)
-    sta.l superfx_status    ; 0 = no GSU, non-zero = chip version
-
-    ; Install the WRAM interrupt vectors (.gsu_vectors above): 16 bytes,
-    ; four `JML handler`, copied from gsu_vector_stubs in hdr_superfx.asm.
-    rep #$10
-    .INDEX 16
-    ldx #$0000
--   lda.l gsu_vector_stubs,x
-    sta.l gsu_vec_brk,x
-    inx
-    cpx #16
-    bne -
-    ; ...and the WRAM NMI (phase B): gsu_nmi_blob -> $7E:gsu_nmi_wram.
-    ldx #$0000
--   lda.l gsu_nmi_blob,x
-    sta.l gsu_nmi_wram,x
-    inx
-    cpx #(gsu_nmi_blob_end - gsu_nmi_blob)
-    bne -
-    lda #$00
-    sta.l gsu_owns_cart     ; the GSU owns nothing until gsuLaunch says so
-    sta.l gsu_stop_irqs     ; no GSU IRQ on STOP seen yet
-    rep #$20
-    .ACCU 16
-.endif
 
     ; Call main() - use JSL since generated code returns with RTL
     jsl main
@@ -2112,9 +2111,11 @@ tilemapFlush:
 ;==============================================================================
 ; gsu_nmi_blob — the NMI that runs while the GSU owns the Game Pak
 ;==============================================================================
-; Copied to $7E:gsu_nmi_wram at boot and entered from the $0108 WRAM stub
-; (phase A). Position-independent: every internal jump is a relative branch;
-; every data reference is to WRAM or an I/O register, never to the Game Pak.
+; Linked in the RAM code window (RAM_CODE_SIZE; the Super FX build adds the
+; SDK's share, make/common.mk) and entered from the $0108 WRAM stub (phase
+; A). Until 2026-09-29 it was a position-independent blob copied by hand to
+; $7E:gsu_nmi_wram. Every data reference is to WRAM or an I/O register,
+; never to the Game Pak.
 ;
 ; Flag clear (the usual case): pop what it pushed and JML to NmiHandler —
 ; one flag test more per NMI than before, in Super FX builds only.
@@ -2131,7 +2132,7 @@ tilemapFlush:
 ; the job does them. vblank_flag is not touched: the main thread is parked in
 ; gsuLaunch's WRAM loop, not in WaitForVBlank.
 ;==============================================================================
-.SECTION ".gsu_nmi_blob" SEMIFREE BANK 0
+.SECTION "ram_code.gsu_interrupts" BASE $7D APPENDTO ".ram_code"
 gsu_nmi_blob:
     rep #$30
     .ACCU 16
@@ -2243,6 +2244,5 @@ gsu_irq_blob:
 ; handler is a bare RTI, which a job would make unreadable too.
 gsu_rti_blob:
     rti
-gsu_nmi_blob_end:
 .ENDS
 .endif

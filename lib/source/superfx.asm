@@ -15,7 +15,6 @@
 ; Library RAMSECTION — shared state for all SuperFX functions
 ;------------------------------------------------------------------------------
 .RAMSECTION ".gsu_lib_vars" BANK 0 SLOT 1
-gsu_wram_area:   dsb 128    ; execution area for WRAM stub
 gsu_prog_bank:   dsb 1      ; GSU program bank byte (set by gsuSetProgram)
 gsu_prog_addr:   dsb 2      ; GSU program offset (set by gsuSetProgram)
 gsu_cfgr:        dsb 1      ; CFGR value ($80=default, $A0=fast multiply)
@@ -29,7 +28,9 @@ gsu_hdma_table:  dsb 20     ; HDMA table for INIDISP blanking
 ; gsuLaunch — Universal WRAM-stub GSU launcher
 ;==============================================================================
 ; Reads config from WRAM variables: gsu_prog_bank, gsu_prog_addr,
-; gsu_cfgr, gsu_scmr, gsu_scbr. Copies stub to WRAM and executes.
+; gsu_cfgr, gsu_scmr, gsu_scbr. Calls the wait loop in the RAM code window
+; (the Super FX build reserves it, make/common.mk RAM_CODE_SDK). Until
+; 2026-09-29 each call copied a 128-byte stub to bank-0 RAM first.
 ; Returns after GSU stops (SFR GO bit cleared).
 ;==============================================================================
 .SECTION ".gsu_launch" SEMIFREE
@@ -39,27 +40,16 @@ gsu_hdma_table:  dsb 20     ; HDMA table for INIDISP blanking
 
 gsuLaunch:
     php
-
-    ; Copy WRAM stub from ROM to WRAM
-    sep #$20
-    .ACCU 8
-    rep #$10
-    .INDEX 16
-    ldx #$0000
--   lda.l _gsu_wram_stub,x
-    sta.l gsu_wram_area,x
-    inx
-    cpx #(_gsu_wram_stub_end - _gsu_wram_stub)
-    bne -
-
-    ; Execute stub from WRAM
-    jsl gsu_wram_area
-
+    jsl gsu_launch_wait      ; $7E:xxxx, the RAM code window
     plp
     rtl
+.ENDS
 
-;--- WRAM stub (parameterized, executed from WRAM) -------------------------
-_gsu_wram_stub:
+;--- the wait loop, run from WRAM while the GSU owns the ROM -----------------
+.SECTION "ram_code.gsu_launch" BASE $7D APPENDTO ".ram_code"
+.ACCU 16
+.INDEX 16
+gsu_launch_wait:
     sep #$20
     .ACCU 8
 
@@ -120,7 +110,6 @@ _gsu_wram_stub:
     sta.l gsu_owns_cart
 
     rtl
-_gsu_wram_stub_end:
 
 .ENDS
 

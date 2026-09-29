@@ -21,7 +21,31 @@ All notable changes to OpenSNES are documented in this file.
   `symmap.py` no longer counts wlalink's `RAM_USAGE_*` markers as bank-$00
   ROM (a RAM section at the top of `$7E` read as a full bank $00).
 
+### Changed
+- refactor(runtime,lib): **the Super FX interrupt entries and `gsuLaunch`'s
+  wait loop live in the RAM code window** (a Super FX build reserves 256
+  bytes for the SDK on top of `RAM_CODE_SIZE`). They were position-
+  independent blobs copied by hand: 160 bytes at boot for the NMI/IRQ/RTI
+  entries, 128 bytes of bank-0 RAM re-copied at every `gsuLaunch()` call.
+  Now ordinary linked code; `superfx_3d` gains 128 bytes of plain C RAM and
+  loses a copy loop per job. Same frames (`diff_corpus` 84/84).
+
+- test(luna-test): luna v1.28.1. The Super FX cache-job fixture now checks
+  the job's last RAM write too: luna before 1.28.1 dropped it (a stopped
+  GSU no longer clocked its RAM write buffer), a console does not; the
+  tutorial's warning about it is gone.
+- refactor(examples): **`sa1_starfield` runs its SA-1 code from I-RAM**,
+  copied there at boot: measured on luna, ~10.7 MHz with 0.4 % of clocks
+  lost to bus conflicts, against ~8.6 MHz and 20 % from ROM, the same frames
+  drawn. `make clean && make SA1_CODE_IN=ROM` builds the ROM version; the
+  SA-1 tutorial shows both profiles.
+
 ### Fixed
+- fix(runtime): **a Super FX cart could take a VBlank before its WRAM
+  vectors existed.** crt0 enabled the NMI, then installed the `$0100-$010F`
+  stubs the header's vectors point at; a VBlank in between would have
+  jumped into empty RAM. The Super FX init now runs before the NMI is
+  enabled.
 - fix(compiler): **HiROM symbol files list RAM sections in their real bank.**
   wlalink added `.BASE $C0` to the `[ramsections]` block (a `$7E` section
   read `13e:`, bank-0 RAM `c0:`), so `symmap.py`'s far-RAM-band report saw
@@ -37,17 +61,6 @@ All notable changes to OpenSNES are documented in this file.
   end of a job on that count instead of polling (`CFGR_IRQ_MASK`,
   `CFGR_FAST_MUL` added to `superfx.h`). The GSU fixture runs a second job
   that way.
-
-### Changed
-- test(luna-test): luna v1.28.1. The Super FX cache-job fixture now checks
-  the job's last RAM write too: luna before 1.28.1 dropped it (a stopped
-  GSU no longer clocked its RAM write buffer), a console does not; the
-  tutorial's warning about it is gone.
-- refactor(examples): **`sa1_starfield` runs its SA-1 code from I-RAM**,
-  copied there at boot: measured on luna, ~10.7 MHz with 0.4 % of clocks
-  lost to bus conflicts, against ~8.6 MHz and 20 % from ROM, the same frames
-  drawn. `make clean && make SA1_CODE_IN=ROM` builds the ROM version; the
-  SA-1 tutorial shows both profiles.
 
 ## [0.46.0] — 2026-09-27
 

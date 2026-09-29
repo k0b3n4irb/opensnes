@@ -165,6 +165,12 @@ every `USE_SUPERFX=1` build (since 2026-09-24/25):
 4. the launch/poll code itself still executes from WRAM, as in every
    reference project (casfx, DOOM-FX, PeterLemon).
 
+The WRAM handlers and `gsuLaunch`'s wait loop live in the RAM code window
+(below): a Super FX build reserves 256 bytes of it for the SDK on top of
+your own `RAM_CODE_SIZE`. crt0 installs the four stubs before it enables the
+NMI (since 2026-09-29; before, a VBlank in that gap would have jumped into
+empty RAM).
+
 The NMI is **not** disabled during a job any more. It used to be, and one
 VBlank in three was lost in `superfx_3d` (game time ran at two thirds of
 real time); `gsuLaunch` also re-enabled NMI with a hardcoded `$81`, which
@@ -253,9 +259,10 @@ handler, whose `$4211` read does not reset it.
 
 A program too big for the cache, or one that reads ROM data, runs with
 RON = 1, and then the CPU cannot fetch a single instruction from the ROM
-(Nintendo dev manual Book II §5.3). `gsuLaunch()` copes by copying a small
-hand-written stub to WRAM. For your own code, ask the build for a RAM code
-window and write the loop as ordinary assembly:
+(Nintendo dev manual Book II §5.3). `gsuLaunch()` waits from the RAM code
+window, which a Super FX build always has (256 bytes for the SDK). For your
+own code, ask the build for more room and write the loop as ordinary
+assembly:
 
 ```makefile
 RAM_CODE_SIZE := 256        # bytes at the top of WRAM bank $7E

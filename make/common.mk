@@ -194,11 +194,16 @@ endif
 
 # Assembler flags
 ASFLAGS := -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
-ifneq ($(RAM_CODE_SIZE),0)
-ifneq ($(shell [ $(RAM_CODE_SIZE) -ge 1 ] && [ $(RAM_CODE_SIZE) -le 16384 ] && echo ok),ok)
-$(error RAM_CODE_SIZE=$(RAM_CODE_SIZE): must be a byte count from 1 to 16384)
+ifneq ($(shell [ $(RAM_CODE_SIZE) -ge 0 ] && [ $(RAM_CODE_SIZE) -le 16384 ] && echo ok),ok)
+$(error RAM_CODE_SIZE=$(RAM_CODE_SIZE): must be a byte count from 0 to 16384)
 endif
-ASFLAGS += -D RAM_CODE -D RAM_CODE_ORG_VAL=$(shell echo $$(( 65536 - $(RAM_CODE_SIZE) )))
+# The SDK's own share of the window, added to the project's: a Super FX
+# build keeps its interrupt entries and gsuLaunch's wait loop there
+# (crt0 gsu_nmi_blob & co., lib superfx.asm), 2026-09-29.
+RAM_CODE_SDK   := $(if $(filter 1,$(USE_SUPERFX)),256,0)
+RAM_CODE_TOTAL := $(shell echo $$(( $(RAM_CODE_SIZE) + $(RAM_CODE_SDK) )))
+ifneq ($(RAM_CODE_TOTAL),0)
+ASFLAGS += -D RAM_CODE -D RAM_CODE_ORG_VAL=$(shell echo $$(( 65536 - $(RAM_CODE_TOTAL) )))
 RAM_CODE_START_OBJ := ram_code_start.o
 RAM_CODE_END_OBJ   := ram_code_end.o
 endif
