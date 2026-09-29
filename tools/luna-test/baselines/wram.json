@@ -116,12 +116,16 @@
     "rom_sha256": "72a9f44a2793d44350b7d3159f9ed6533f7613e6831257d79b1a0caf0f348125"
   },
   "chips_superfx_3d": {
-    "stream": "c49d5ecab08823a166d01f769b335bff9c0937175d486b760b4cfc698b447d02",
-    "rom_sha256": "b9b7d3c99ae974af65134c7639bfe8c040ff776fcb38aba42143d41113f73208"
+    "stream": "091384f5967c42dc50f75642a61f2378cc2e462a590059847829fc49f0b78227",
+    "rom_sha256": "ae27a236b8cc7d47f9fe77c0b1c74d363b58d05e02d84191002df4a27b5b58a3"
+  },
+  "chips_superfx_game_skeleton": {
+    "stream": "3992a82d5f2817ab42d1e8bea19c76ec11c855b047e64bc2f1e459a46b3d3ec2",
+    "rom_sha256": "693aa6d775df12312ee17a0aa2a5befc2b8f824716fadba81a6d87a10e804fbe"
   },
   "chips_superfx_hello": {
-    "stream": "daa371f5b4a91ba020143dbffbcd01f3973951f6027a786ca9990065b6d26b89",
-    "rom_sha256": "2a944451dbbd09d1511c4a8d5612b3557ebde1cfec1589fb7e2f368d969b34e0"
+    "stream": "71e0068d262cfb7975e7335ddc1e5756b68f388d266a7f1b49ae5a6103af702c",
+    "rom_sha256": "5b1e56fff6cfa02a4e2626d1134d28cbfb643ce4ab010075d9114bd68e621adb"
   },
   "color_direct_color": {
     "stream": "c6ed002402a20c19588dae19470f890e6021197cf80cfa147f19cb0f97a7b6d2",

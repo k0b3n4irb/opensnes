@@ -20,6 +20,7 @@ python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the cha
 python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
 python3 tools/luna-test/audio_regress.py            # APU output hashed for the ten audio examples, three pressed with their manifest scripts (luna --audio-out); baselines/audio.json
 python3 tools/luna-test/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
+python3 tools/luna-test/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
 make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() (weekly pal.yml, not in make tests)
 make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
 make coverage-host                                   # llvm-cov line coverage of QBE + cproc-qbe over the fixtures and the lib build (report, not a gate)

@@ -6,7 +6,8 @@
  * - GSU detection and configuration
  * - WRAM-safe GSU launch (mandatory — CPU can't read ROM during GSU execution)
  * - DMA helpers for SRAM-to-VRAM framebuffer transfer
- * - HDMA screen blanking for 60 FPS DMA bandwidth
+ * - HDMA screen blanking (letterbox) that lengthens the VRAM transfer window
+ * - Double-buffered presentation moved by the NMI (gsuPresent)
  * - Column-major tilemap setup for PLOT rendering
  *
  * The GSU code itself is written in SuperFX assembly (.sfx files).
@@ -123,6 +124,23 @@ extern volatile u8 gsu_stop_irqs;
  * their work — frame_count, OAM upload, IRQ acknowledge — and defer the rest.
  */
 extern u8 gsu_owns_cart;
+
+/**
+ * @brief The value last written to SCMR (write-only), kept by the library
+ *
+ * gsuLaunch(), gsuCall(), gsuStartCached() and gsuWait() keep it. Code of
+ * your own that writes REG_SCMR while gsuPresent() is in use must keep it
+ * too — write it BEFORE giving the GSU the buses, clear it BEFORE taking
+ * them back: the presentation NMI takes Game Pak RAM from the GSU for its
+ * transfer and restores this value after.
+ */
+extern u8 gsu_scmr_live;
+
+/** @brief Frames gsuPresent() has put on screen so far */
+extern u16 gsu_pres_frames;
+
+/** @brief Bytes the last transferring NMI moved (a diagnostic: the window) */
+extern u16 gsu_pres_last;
 
 /*============================================================================
  * API Functions
@@ -264,8 +282,10 @@ void gsuCacheLoad(const void *code, u16 size);
  * @param pc  Entry offset in the cache (0 for the first byte; the build's
  *            `<name>.sfx.h` names every entry point)
  *
- * Writes gsu_cfgr, the 21 MHz clock, gsu_scbr, then gsu_scmr with RON
- * forced to 0 (the ROM stays the CPU's), then R15, which starts the GSU.
+ * Writes gsu_cfgr, the 21 MHz clock, gsu_scbr, R8 = the buffer base
+ * (gsu_scbr x 1024, as gsuLaunch() does; since 2026-09-29), then gsu_scmr
+ * with RON forced to 0 (the ROM stays the CPU's), then R15, which starts
+ * the GSU.
  */
 void gsuStartCached(u16 pc);
 
@@ -286,16 +306,114 @@ void gsuWait(void);
 /** @} */
 
 /**
+ * @name Presenting frames: double buffer, moved by the NMI
+ *
+ * The GSU draws in one Game Pak RAM framebuffer while the NMI moves the
+ * previous one to VRAM, a piece per VBlank, and shows it only once all of
+ * it has landed. The NMI takes Game Pak RAM from the GSU for each piece
+ * (Nintendo manual Book II 5.3: the GSU waits on its next RAM access and
+ * resumes after); nothing polls, the CPU runs the game meanwhile.
+ *
+ * How much lands per VBlank is the blank window: the VBlank alone moves
+ * about 4.7 KB (measured on luna), and a top letterbox from
+ * gsuSetupHdmaBlanking() (with a bottom band of at least one line) adds
+ * about 150 bytes per blanked line: a 16 KB frame lands in two VBlanks
+ * with a 40 + 40 letterbox, in one with 84 + 4.
+ * The NMI measures the window itself (V counter) at every frame.
+ *
+ * @code
+ * gsu_scmr = SCMR_4BPP | SCMR_H128 | SCMR_RAN | SCMR_RON;
+ * gsu_scbr = 0x00;                        // buffer A at $70:0000
+ * gsuSetupBitmapTilemap(0x4000);
+ * gsuPresentInit(0x0000, 0x2000, 0);      // two 16 KB char blocks
+ * while (1) {
+ *     game_logic();
+ *     gsuLaunch();                        // draws in gsu_scbr's buffer
+ *     gsuPresent();                       // queue it, draw the next in the other
+ * }
+ * @endcode
+ *
+ * The NMI callback gets what is left of the VBlank after the transfer:
+ * it must not write VRAM while a frame is in flight.
+ * @{
+ */
+
+/**
+ * @brief Bytes of one framebuffer for gsu_scmr's height and depth
+ * @return 32 columns x H/8 x 8*bpp bytes (16384 at 256x128x4bpp), 0 for OBJ
+ *         mode or the reserved depth
+ */
+u16 gsuFrameBytes(void);
+
+/**
+ * @brief gsuPresentInit flag: move frames on lag frames too
+ *
+ * By default the NMI moves a frame only while the main thread is parked —
+ * in WaitForVBlank, or waiting for a job — the rule the tilemap and OAM
+ * uploads follow, because a main thread in the middle of its own VRAM
+ * access would be corrupted. A game that never touches VRAM, VMAIN, VMADD,
+ * DMA channel 7 or the H/V counter latch outside the NMI while a frame is
+ * in flight can set this flag: the frame then moves at every VBlank, even
+ * one that falls in the game's logic.
+ */
+#define GSU_PRESENT_ON_LAG_FRAMES 0x01
+
+/**
+ * @brief Set up presentation for gsu_scmr's geometry
+ * @param vram_a VRAM word address of the char block shown first
+ * @param vram_b VRAM word address of the other one
+ * @param flags  0, or GSU_PRESENT_ON_LAG_FRAMES
+ * @return 1, or 0 if a block is not a multiple of $1000 words, runs past
+ *         VRAM, or two framebuffers from gsu_scbr on do not fit in the Game
+ *         Pak RAM the header declares
+ *
+ * The two Game Pak RAM framebuffers start at gsu_scbr and right after it.
+ * Sets BG1's char base to `vram_a`: call it with the screen off. The
+ * tilemap (gsuSetupBitmapTilemap) serves both blocks.
+ */
+u8 gsuPresentInit(u16 vram_a, u16 vram_b, u8 flags);
+
+/**
+ * @brief Queue the frame the last job drew; the next job draws in the other
+ *
+ * Waits (WaitForVBlank) while the previous frame is still being moved, then
+ * hands the buffer at gsu_scbr to the NMI and switches gsu_scbr to the other
+ * one. Call it after the job has stopped (gsuLaunch() returned, or
+ * gsuWait()).
+ */
+void gsuPresent(void);
+
+/** @brief 1 while a presented frame is still being moved to VRAM */
+u8 gsuPresentBusy(void);
+
+/** @brief Wait until the last presented frame is on screen */
+void gsuPresentWait(void);
+
+/** @} */
+
+/**
  * @brief Setup column-major tilemap for SuperFX PLOT framebuffer
  * @param vramAddr VRAM word address for tilemap (typically 0x4000)
+ *
+ * 32 columns of H/8 tiles, H from gsu_scmr's height (128, 160 or 192; since
+ * 2026-09-29, 16 rows whatever the height before); the rest of the 32x32 map
+ * points at tile 0. Set gsu_scmr first.
  */
 extern void gsuSetupBitmapTilemap(u16 vramAddr);
 
 /**
- * @brief Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS)
+ * @brief One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox
  *
- * Polls V-counter until scanline 184, then DMAs full framebuffer.
- * Requires gsuSetupHdmaBlanking() for sufficient DMA bandwidth.
+ * Waits for a line from which the whole frame lands before the display
+ * comes back — the bottom band's first line (225 - bottom) up to
+ * 152 + top — and starts the DMA there; called later than that window, it
+ * waits for the next frame's. Needs gsuSetupHdmaBlanking() bands with
+ * top + bottom >= 73 (40 + 40: lines 185-192). The CPU waits the whole
+ * time; gsuPresent() is the variant that does not.
+ *
+ * Until 2026-09-29 it started at any line it read as >= 184, from a V
+ * counter it never re-latched: in superfx_3d a third of the bytes landed on
+ * visible lines and were dropped (luna --dma-trace).
  */
 extern void gsuDmaFullFrame(void);
 
@@ -304,8 +422,12 @@ extern void gsuDmaFullFrame(void);
  * @param topBlank Scanlines of forced blank at top (e.g., 40)
  * @param bottomBlank Scanlines of forced blank at bottom (e.g., 40)
  *
- * Creates black bars like Star Fox. Total blank + VBlank must provide
- * enough bandwidth for the 16KB framebuffer DMA (~6.2ms needed).
+ * Creates black bars like Star Fox, on HDMA channel 1 (INIDISP). HDMA
+ * starts a channel at line 0, so the bands appear from the next frame: the
+ * function returns only once they are on screen (it waits up to a frame)
+ * and then publishes them to gsuDmaFullFrame() and the gsuPresent() NMI,
+ * which use the blanked lines as extra transfer time. Leave the bands on
+ * while either is in use.
  */
 extern void gsuSetupHdmaBlanking(u16 topBlank, u16 bottomBlank);
 

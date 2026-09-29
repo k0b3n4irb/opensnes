@@ -166,7 +166,7 @@ every `USE_SUPERFX=1` build (since 2026-09-24/25):
    reference project (casfx, DOOM-FX, PeterLemon).
 
 The WRAM handlers and `gsuLaunch`'s wait loop live in the RAM code window
-(below): a Super FX build reserves 256 bytes of it for the SDK on top of
+(below): a Super FX build reserves 768 bytes of it for the SDK on top of
 your own `RAM_CODE_SIZE`. crt0 installs the four stubs before it enables the
 NMI (since 2026-09-29; before, a VBlank in that gap would have jumped into
 empty RAM).
@@ -260,7 +260,7 @@ handler, whose `$4211` read does not reset it.
 A program too big for the cache, or one that reads ROM data, runs with
 RON = 1, and then the CPU cannot fetch a single instruction from the ROM
 (Nintendo dev manual Book II §5.3). `gsuLaunch()` waits from the RAM code
-window, which a Super FX build always has (256 bytes for the SDK). For your
+window, which a Super FX build always has (768 bytes for the SDK). For your
 own code, ask the build for more room and write the loop as ordinary
 assembly:
 
@@ -453,9 +453,10 @@ tilemap[row * 32 + col] = col * tiles_per_column + row
 For 4bpp height=128: `tilemap[row*32 + col] = col*16 + row`
 
 The library writes that tilemap for you: `gsuSetupBitmapTilemap(vram)`
-fills a 32×32 tilemap at that VRAM word address with the column-major
-order of a 4bpp, 128-line framebuffer (tile `col * 16 + row`), and tile 0
-below it.
+fills a 32×32 tilemap at that VRAM word address in that column-major
+order, `tiles_per_column` taken from `gsu_scmr`'s height (16, 20 or 24 for
+128, 160 or 192 lines; fullsnes, SCMR), and tile 0 below it. Set
+`gsu_scmr` before calling it.
 
 ### SRAM to VRAM Transfer
 
@@ -466,16 +467,28 @@ visible picture down and send the frame during the lines that are dark:
 ```c
 gsuSetupBitmapTilemap(0x4000);   /* once, in force blank */
 /* ... each frame, once the GSU job is done: */
-gsuDmaFullFrame();               /* waits for line 184, then DMAs 16 KB */
+gsuDmaFullFrame();               /* waits for the bottom band, then DMAs 16 KB */
 /* ... once, after the first frame: */
 gsuSetupHdmaBlanking(40, 40);    /* 40 black lines at the top and bottom */
 ```
 
 `gsuDmaFullFrame()` copies 16 KB from Game Pak RAM (`$70`, offset
-`gsu_dma_src_hi` × 256) to VRAM `$0000` on DMA channel 0, after polling
-the vertical counter until line 184. `gsuSetupHdmaBlanking(top, bottom)`
-uses HDMA channel 1 to force blank that many lines at the top and the
-bottom of the screen, the bars that give the transfer its time.
+`gsu_dma_src_hi` × 256) to VRAM `$0000` on DMA channel 0. It starts only
+on a line from which the whole frame lands before the display comes back:
+from the first line of the bottom band (225 - bottom) to 152 + top, lines
+185 to 192 with 40 + 40; called later, it waits for the next frame's
+window. `gsuSetupHdmaBlanking(top, bottom)` uses HDMA channel 1 to force
+blank that many lines at the top and the bottom of the screen, the bars
+that give the transfer its time; it returns once they are on screen (HDMA
+starts a channel at line 0, so the bands appear a frame later). The two
+bands must add up to 73 lines or more for a 16 KB frame.
+
+Until 2026-09-29 the wait read a V counter it never re-latched (the latch
+is cleared by reading STAT78 `$213F`, snesdev-wiki — a point that page marks
+"not fully confirmed") and started at whatever line that stale value let
+it: luna counted a third of `superfx_3d`'s framebuffer bytes landing on
+visible lines, dropped without a word. `superfx_3d` now presents about 30
+frames per second, all of them whole.
 
 It uses HDMA channel 1 and arms it like `hdmaEnable()` does, so it
 combines with your own HDMA channels; just leave channel 1 to it.
@@ -484,12 +497,105 @@ combines with your own HDMA channels; just leave channel 1 to it.
 back gracefully, as `gsuInit()` does, without `gsuInit()`'s side
 effects.
 
+## Presenting Frames: a Double Buffer the NMI Moves
+
+`gsuDmaFullFrame()` makes every frame a sequence: the job, then a wait for
+bottom band, then a 16 KB DMA that halts the CPU. The GSU is idle while the
+frame moves, and the CPU can do nothing but wait. `gsuPresent()` overlaps
+the three instead:
+
+- two framebuffers in Game Pak RAM (`gsu_scbr` and the one after it), two
+  char blocks in VRAM, one tilemap for both;
+- the job draws in one buffer while the NMI moves the previous frame to the
+  back VRAM block, a piece per VBlank, taking Game Pak RAM from the GSU for
+  each piece: the CPU writes SCMR's RAN to 0, the GSU waits on its next RAM
+  access, and resumes when RAN is back (Nintendo dev manual Book II §5.3);
+- BG1's char base (BG12NBA) swaps to the back block only once the whole
+  frame is in it, so a half-landed frame is never shown.
+
+```c
+gsuSetupBitmapTilemap(0x4000);
+gsu_scbr = 0x00;                        /* buffer A at $70:0000, B at $70:4000 */
+gsuPresentInit(0x0000, 0x2000, 0);      /* two 16 KB char blocks, A shown first */
+/* ... */
+gsuSetupHdmaBlanking(40, 40);
+setScreenOn();
+while (1) {
+    if (!gsuBusy() && !gsuPresentBusy()) {
+        gsuWait();                      /* Game Pak RAM back to the CPU */
+        gsuPresent();                   /* queue this frame, draw the next in the other buffer */
+        prepare_next_frame();
+        gsuCacheLoad(renderer, renderer_size);
+        gsuStartCached(0);
+    }
+    game_logic();                       /* every frame, whatever the GSU does */
+    WaitForVBlank();
+}
+```
+
+`examples/chips/superfx_game_skeleton` is that loop: a crosshair follows the
+D-pad at 60 frames per second while the cube is rendered and presented at
+30. With a blocking `gsuLaunch()` the loop is simpler (`gsuLaunch();
+gsuPresent();`) and the transfer still overlaps the next job, but the game
+waits for each job.
+
+**How fast frames land.** The NMI reads the V counter and moves what the
+rest of the blank window allows, at most 152 bytes per line (DMA is 8
+master cycles a byte, 1324 usable per line: snesdev-wiki, Timing). The
+window is the VBlank, extended into the top band of `gsuSetupHdmaBlanking`
+when the bottom band is at least one line (it keeps force blank across
+line 0). The bottom band gives the NMI nothing: the NMI starts at line
+225. Measured on luna with `superfx_game_skeleton` (a 256×128 4bpp frame,
+16 KB; the game loop at 60 fps in every case):
+
+| Letterbox (top / bottom) | Most bytes moved in one VBlank | Frames presented per second |
+|---|---|---|
+| none | 4 712 | 15 |
+| 40 / 40 | 10 640 | 30 |
+| 76 / 4 | 16 112 | 30 |
+| 84 / 4 | 16 384, the whole frame | 30: the job is now the limit |
+
+Past that point the job decides: while the previous frame moves, the job
+waits for Game Pak RAM, and in the skeleton the worst job took 135 000
+clocks of work plus 137 000 of waiting, about three quarters of a frame.
+
+**What it costs.** The DMA halts the CPU and the GSU waits for Game Pak RAM
+for as long as a piece takes; a RAM-heavy job (clearing a buffer, PLOT)
+loses most of that time. The single-buffer path reaches the same 30 frames
+per second on this scene (`superfx_3d`, which also uses the bottom band),
+but its CPU does nothing else: it waits for the job, then for the band,
+then for the DMA.
+
+**Rules.**
+
+- The NMI moves frames only when the main thread is parked, in
+  `WaitForVBlank()` or waiting for a job, like the tilemap and OAM uploads:
+  a main thread in the middle of its own VRAM access would be corrupted. A
+  game that never touches VRAM, VMAIN, VMADD, DMA channel 7 or the H/V
+  counter latch outside the NMI can pass `GSU_PRESENT_ON_LAG_FRAMES` and
+  have frames move at every VBlank.
+- The NMI callback runs after the transfer: it must not write VRAM while a
+  frame is in flight, the window is gone.
+- Keep the letterbox on while presenting: the NMI trusts the bands
+  `gsuSetupHdmaBlanking` last set.
+- Code of your own that writes SCMR while frames are in flight keeps
+  `gsu_scmr_live` (the library's copy of the write-only register), set
+  before handing the GSU the buses and cleared before taking them back.
+- Two framebuffers must fit in the Game Pak RAM the header declares
+  (`GSU_RAM_KB`, 64 KB by default): `gsuPresentInit()` returns 0 otherwise.
+
+`tools/luna-test/vram_dma_blank.py` checks, with luna's DMA trace, that every
+presented byte lands in blank or force blank, in whole frames into
+alternating blocks, and that no swap shows a block before its frame is
+complete.
+
 ## Example ROMs
 
 | Example | What it demonstrates |
 |---------|---------------------|
 | [superfx_hello](../../../examples/chips/superfx_hello/) | Boot, registers, SRAM read/write |
 | [superfx_3d](../../../examples/chips/superfx_3d/) | Rotating wireframe cube, Bresenham line drawing, 3D projection |
+| [superfx_game_skeleton](../../../examples/chips/superfx_game_skeleton/) | A game loop at 60 fps while the GSU renders from its cache; double-buffered presentation |
 
 ## Further Reading
 

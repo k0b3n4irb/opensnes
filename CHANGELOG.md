@@ -5,6 +5,30 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **Super FX frames presented by the NMI, double-buffered**
+  (superfx runtime chantier, phase D). `gsuPresentInit(vram_a, vram_b,
+  flags)` sets up two framebuffers in Game Pak RAM and two char blocks in
+  VRAM for `gsu_scmr`'s height and depth; `gsuPresent()` queues the frame a
+  job just drew and switches `gsu_scbr` to the other buffer. The NMI moves
+  the queued frame to VRAM with what is left of each VBlank — measured from
+  the V counter, extended into the top letterbox — taking Game Pak RAM from
+  the GSU for each piece (SCMR RAN, Nintendo manual Book II 5.3), and swaps
+  BG1's char base only once the whole frame has landed. A 16 KB frame moves
+  in two VBlanks with a 40 + 40 letterbox, one with 84 + 4.
+  `GSU_PRESENT_ON_LAG_FRAMES` lets a game that never touches VRAM outside
+  the NMI have frames move on lag frames too. `gsuSetupBitmapTilemap()`
+  follows `gsu_scmr`'s height (128, 160, 192 lines), `gsuStartCached()`
+  sets R8 like `gsuLaunch()`, and `gsuCacheLoad()` is asm (the C loop took
+  a third of a frame).
+- feat(examples): **`chips/superfx_game_skeleton`** — a crosshair steered at
+  60 fps while the GSU renders the cube from its code cache at 30, frames
+  presented by `gsuPresent()`. Its manifest proves the game never skips a
+  frame during GSU work.
+- test(luna-test): **`vram_dma_blank.py`** in `make tests`: every example's
+  VRAM DMA lands in blank or force blank (luna's `[asserts.dma]
+  unsafe_writes = 0`, one generated manifest per example; 85/85 clean), and
+  `gsuPresent`'s frames move whole, into alternating blocks, with every
+  BG12NBA swap after a complete frame (luna `--dma-trace`, `--trace-writes`).
 - feat(build,lib): **GSU programs with several entry points.** The build
   writes `<name>.sfx.h` next to each `.sfx.bin`: one `#define` per global
   label, its offset in the binary (`gsu_job.sfx`'s `mul_job` becomes
@@ -47,6 +71,20 @@ All notable changes to OpenSNES are documented in this file.
   SA-1 tutorial shows both profiles.
 
 ### Fixed
+- fix(lib): **`superfx_3d` dropped a third of its framebuffer bytes.**
+  `gsuDmaFullFrame()` polled a V counter it never re-latched (no STAT78
+  read: SLHV latches on the latch's 0 -> 1 transition, snesdev-wiki — "not
+  fully confirmed" there) and started its 16 KB DMA at whatever line the
+  stale value allowed: luna `--dma-trace` counted 481 866 of 1 359 872
+  bytes written on visible lines, silently lost; half the transfers began
+  at lines 6-12. It now reads STAT78 first, starts only in a window from
+  which the frame lands whole (225 - bottom to 152 + top) or waits for the
+  next frame's, and writes the VRAM/DMA registers after the wait (an NMI
+  in it could move VMADD). `gsuSetupHdmaBlanking()` returns only once its
+  bands are on screen: HDMA starts at line 0, and the first DMA after it
+  found no bottom band (3 417 more bytes lost). `superfx_3d` shows about 30
+  whole frames per second instead of 53 partly lost ones; every example
+  now passes luna's `unsafe_writes = 0` (`vram_dma_blank.py`).
 - fix(runtime): **a Super FX cart could take a VBlank before its WRAM
   vectors existed.** crt0 enabled the NMI, then installed the `$0100-$010F`
   stubs the header's vectors point at; a VBlank in between would have

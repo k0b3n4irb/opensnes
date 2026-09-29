@@ -1044,6 +1044,11 @@ FastNmi:
     rep #$20
     .ACCU 16
     inc.w lag_frame_counter
+.ifdef SUPERFX
+    ; ...except a presented Super FX frame, when the game opted in
+    ; (gsuPresentInit's GSU_PRESENT_ON_LAG_FRAMES; lib superfx.asm)
+    jsl gsu_present_step_lag
+.endif
     jmp @nmi_restore
 
 @vblank_work:
@@ -1218,6 +1223,16 @@ FastNmi:
 
     stz.w bg_scroll_dirty   ; Clear all dirty bits
 @scroll_done:
+
+.ifdef SUPERFX
+    ;--------------------------------------------------------------------------
+    ; 3b. Super FX presentation (gsuPresent, lib superfx.asm): moves a queued
+    ; framebuffer from Game Pak RAM to VRAM with what is left of the blank.
+    ; Last of the VBlank-critical steps, since it uses the rest of the window.
+    ; Returns at once when no frame is queued.
+    ;--------------------------------------------------------------------------
+    jsl gsu_present_step
+.endif
 
     ;==========================================================================
     ; NON-CRITICAL SECTION — callback + input reading
@@ -2182,6 +2197,9 @@ gsu_nmi_blob:
     lda.b #$80
     sta.w $420B             ; MDMAEN ch7
 @oam_done:
+    ; the presentation step (gsuPresent): the frame queued before the job
+    ; keeps moving to VRAM while the GSU draws the next one
+    jsl gsu_present_step
     rep #$30
     .ACCU 16
     .INDEX 16

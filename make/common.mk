@@ -200,7 +200,7 @@ endif
 # The SDK's own share of the window, added to the project's: a Super FX
 # build keeps its interrupt entries and gsuLaunch's wait loop there
 # (crt0 gsu_nmi_blob & co., lib superfx.asm), 2026-09-29.
-RAM_CODE_SDK   := $(if $(filter 1,$(USE_SUPERFX)),256,0)
+RAM_CODE_SDK   := $(if $(filter 1,$(USE_SUPERFX)),768,0)
 RAM_CODE_TOTAL := $(shell echo $$(( $(RAM_CODE_SIZE) + $(RAM_CODE_SDK) )))
 ifneq ($(RAM_CODE_TOTAL),0)
 ASFLAGS += -D RAM_CODE -D RAM_CODE_ORG_VAL=$(shell echo $$(( 65536 - $(RAM_CODE_TOTAL) )))
@@ -239,7 +239,7 @@ _DEP_snesmod         := console
 # console's C references clearNmiFlag/unmaskIrq/clearIrqFlag (dma.asm) —
 # surfaced by the first example linking console WITHOUT dma (SPC700 arc)
 _DEP_console         := dma
-_DEP_superfx         := dma hdma
+_DEP_superfx         := dma hdma background console
 _DEP_hdma            := dma math_sqrt
 # math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt
 # only) and the larger trig + arithmetic module (math = sine LUT +

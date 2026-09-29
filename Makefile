@@ -217,6 +217,10 @@ tests: test-compiler
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
 	@python3 tools/luna-test/nmi_budget.py
+	@# No VRAM DMA byte outside blank in any example (luna --dma-trace: the
+	@# PPU drops such a write silently), and gsuPresent's frames whole,
+	@# double-buffered and swapped in blank (2026-09-29).
+	@python3 tools/luna-test/vram_dma_blank.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
