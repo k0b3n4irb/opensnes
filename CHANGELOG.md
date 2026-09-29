@@ -21,9 +21,10 @@ All notable changes to OpenSNES are documented in this file.
   sets R8 like `gsuLaunch()`, and `gsuCacheLoad()` is asm (the C loop took
   a third of a frame).
 - feat(examples): **`chips/superfx_game_skeleton`** — a crosshair steered at
-  60 fps while the GSU renders the cube from its code cache at 30, frames
-  presented by `gsuPresent()`. Its manifest proves the game never skips a
-  frame during GSU work.
+  60 fps, and SNESMOD music, while the GSU renders the cube from its code
+  cache at 30, frames presented by `gsuPresent()`. Its manifest proves the
+  game never skips a frame during GSU work and that the music plays (luna
+  audio RMS); the audio oracle hashes its WAV.
 - test(luna-test): **`vram_dma_blank.py`** in `make tests`: every example's
   VRAM DMA lands in blank or force blank (luna's `[asserts.dma]
   unsafe_writes = 0`, one generated manifest per example; 85/85 clean), and

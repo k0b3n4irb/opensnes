@@ -10,8 +10,9 @@ being unreliable, see .claude/rules/luna_tooling.md): a changed hash means
 changed, go look". The capture is deterministic run to run (same seed of
 nothing: the SPC700/DSP are integer machines).
 
-Examples covered: the seven that play without input (apu_switch, snesmod_music,
-pitch_mod, play_noise, echo, speech_synth, snesmod_music_large) and the three
+Examples covered: the eight that play without input (apu_switch, snesmod_music,
+pitch_mod, play_noise, echo, speech_synth, snesmod_music_large, and
+chips/superfx_game_skeleton — music while the GSU works) and the three
 that need a button (soundboard, snesmod_sfx, sfx_from_wav), each pressed with
 the script of its luna test manifest. The button-driven ones joined on luna
 v1.29.0: before it, `--audio-out` under `--input` kept only 16 384 samples
@@ -49,6 +50,9 @@ EXAMPLES = {
     "audio/echo":          ("audio/echo/echo.sfc", None),
     "audio/speech_synth":  ("audio/speech_synth/speech_synth.sfc", None),
     "audio/snesmod_music_large": ("audio/snesmod_music_large/music_large.sfc", None),
+    # the music fed from ROM while the GSU renders and the NMI moves frames
+    # (gsuPresent): a stutter or a dropped tick changes the hash
+    "chips/superfx_game_skeleton": ("chips/superfx_game_skeleton/superfx_game_skeleton.sfc", None),
     # joypad-1 scripts from their manifests (soundboard.toml,
     # audio_snesmod_sfx_play.toml, audio_sfx_from_wav.toml)
     "audio/soundboard":    ("audio/soundboard/soundboard.sfc", "220:0x0080"),

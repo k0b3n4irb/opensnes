@@ -9,6 +9,10 @@
 #   * The GSU and the presentation run at their own rate: 16 KB frames over
 #     a 40 + 40 letterbox land in two VBlanks each, ~30 per second
 #     (gsu_pres_frames 196 at frame 400, one job per presented frame).
+#   * The music plays through it (2026-09-30): SNESMOD fed every frame from
+#     ROM while the GSU works — the module position moves, and luna hears
+#     it (audio_rms_min, as audio_snesmod_music.toml). WAV hash:
+#     audio_regress.py.
 #   * The ROM stays the CPU's during the cache jobs, and the NMI's RAN
 #     hand-over never lets the CPU touch the cart while the GSU owns it:
 #     bus_violations = 0.
@@ -25,21 +29,25 @@ at_frame = 100
 input = "100:0x0100"            # RIGHT held from frame 100
 [checkpoint.values]
 r_ship_x = 124
-r_game_frames = { ge = 88, le = 94 }
+r_game_frames = { ge = 58, le = 64 }
 
 [[checkpoint]]
 at_frame = 160
 input = "160:0"
 [checkpoint.values]
 r_ship_x = 183
-r_game_frames = { ge = 148, le = 154 }
+r_game_frames = { ge = 118, le = 124 }
 
 [[checkpoint]]
 at_frame = 400
 [checkpoint.values]
 r_ship_x = 184
-r_game_frames = { ge = 388, le = 394 }
-gsu_pres_frames = { ge = 190, le = 200 }
-r_jobs = { ge = 190, le = 201 }
+r_game_frames = { ge = 358, le = 364 }
+gsu_pres_frames = { ge = 176, le = 186 }
+r_jobs = { ge = 176, le = 187 }
+r_music_pos = { ge = 2 }
 [checkpoint.gsu]
 bus_violations = 0
+
+[asserts]
+audio_rms_min = 100.0

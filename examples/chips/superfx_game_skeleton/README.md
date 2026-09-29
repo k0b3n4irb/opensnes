@@ -5,8 +5,8 @@
 
 ![Screenshot](superfx_game_skeleton.png)
 
-A crosshair follows the D-pad at 60 frames per second while the GSU draws
-`superfx_3d`'s rotating cube at 30. Neither waits for the other: the
+A crosshair follows the D-pad at 60 frames per second, and SNESMOD music
+plays, while the GSU draws `superfx_3d`'s rotating cube at 30. Neither waits for the other: the
 renderer runs from the GSU's code cache, so the CPU keeps the ROM and its
 game loop; `gsuPresent()` double-buffers the frames, and the NMI moves each
 one to VRAM a piece per VBlank, showing it only once all of it has landed.
@@ -42,6 +42,7 @@ Then open `superfx_game_skeleton.sfc` in luna (or bsnes). Hold the D-pad.
 every frame (CPU)                   when the GSU is done (CPU)
 ─────────────────                   ──────────────────────────
 pad → crosshair → OAM               gsuWait()      RAM back to the CPU
+snesmodProcess()
 WaitForVBlank()                     gsuPresent()   queue it, flip gsu_scbr
                                     rotate, edges → $70:8000
 NMI (every VBlank)                  gsuCacheLoad() + gsuStartCached()
@@ -79,3 +80,4 @@ whole frame.
 | `background` | BG1 mode, map, scroll, char base |
 | `input` | The D-pad |
 | `superfx` | Cache jobs, presentation, letterbox, bitmap tilemap (added by `USE_SUPERFX`) |
+| `snesmod` | The music (`audio/snesmod_music`'s module; added by `USE_SNESMOD`) |

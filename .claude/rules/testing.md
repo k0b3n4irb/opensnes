@@ -18,7 +18,7 @@ python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over
 python3 tools/luna-test/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
 python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
-python3 tools/luna-test/audio_regress.py            # APU output hashed for the ten audio examples, three pressed with their manifest scripts (luna --audio-out); baselines/audio.json
+python3 tools/luna-test/audio_regress.py            # APU output hashed for eleven examples (ten audio ones, three pressed with their manifest scripts, and the Super FX skeleton) (luna --audio-out); baselines/audio.json
 python3 tools/luna-test/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
 python3 tools/luna-test/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
 make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() (weekly pal.yml, not in make tests)

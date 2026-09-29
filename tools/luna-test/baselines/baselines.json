@@ -192,10 +192,10 @@
     "rom_sha256": "ae27a236b8cc7d47f9fe77c0b1c74d363b58d05e02d84191002df4a27b5b58a3"
   },
   "chips_superfx_game_skeleton": {
-    "fbhash": "7411e6d8af3e6065",
+    "fbhash": "09b2c34541b54d65",
     "frames": 200,
     "luna_version": "v1.30.0",
-    "rom_sha256": "693aa6d775df12312ee17a0aa2a5befc2b8f824716fadba81a6d87a10e804fbe"
+    "rom_sha256": "e05db6a10f7d51f73abe2014a9ea7c12705a052717c3c4e155be81bb212ef315"
   },
   "chips_superfx_hello": {
     "fbhash": "e06b1714dc93b114",
