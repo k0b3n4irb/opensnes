@@ -188,6 +188,28 @@ void gsuSetProgram(const void *program);
 extern void gsuLaunch(void);
 
 /**
+ * @brief Launch the program at one of its entry points and wait (WRAM-safe)
+ * @param entry Offset of the entry point in the program set by
+ *              gsuSetProgram() — the build writes one per global label of
+ *              the `.sfx` into `<name>.sfx.h` (`gsu_job.sfx`'s `mul_job`
+ *              becomes `GSU_JOB_MUL_JOB`)
+ *
+ * gsuLaunch() starts at offset 0; this starts at `entry`, the rest is the
+ * same (interrupts, bus ownership, the wait from the RAM code window). Pass
+ * arguments in the GSU registers before the call — `REG_GSU_R1 = x;` — any
+ * of R0-R7 and R9-R13: the launcher itself writes R8 (buffer base, SCBR ×
+ * 1024) and R15. The program must not cross a 32 KB ROM bank.
+ *
+ * @code
+ * #include "gsu_job.sfx.h"
+ * REG_GSU_R1 = 300;
+ * REG_GSU_R2 = 7;
+ * gsuCall(GSU_JOB_MUL_JOB);
+ * @endcode
+ */
+void gsuCall(u16 entry);
+
+/**
  * @name Running a GSU job while the game keeps running
  *
  * gsuLaunch() parks the CPU in WRAM until the job ends, because a GSU that
@@ -239,7 +261,8 @@ void gsuCacheLoad(const void *code, u16 size);
 
 /**
  * @brief Start the program loaded by gsuCacheLoad() and return at once
- * @param pc  Entry offset in the cache (0 for the first byte)
+ * @param pc  Entry offset in the cache (0 for the first byte; the build's
+ *            `<name>.sfx.h` names every entry point)
  *
  * Writes gsu_cfgr, the 21 MHz clock, gsu_scbr, then gsu_scmr with RON
  * forced to 0 (the ROM stays the CPU's), then R15, which starts the GSU.

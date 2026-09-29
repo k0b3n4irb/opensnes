@@ -5,6 +5,12 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(build,lib): **GSU programs with several entry points.** The build
+  writes `<name>.sfx.h` next to each `.sfx.bin`: one `#define` per global
+  label, its offset in the binary (`gsu_job.sfx`'s `mul_job` becomes
+  `GSU_JOB_MUL_JOB`). `gsuCall(entry)` launches at one of them (from ROM,
+  like `gsuLaunch()`), `gsuStartCached(entry)` from the cache; arguments go
+  in `REG_GSU_Rn`. The GSU fixture runs a multiplication entry both ways.
 - feat(build): **code that runs from RAM.** `RAM_CODE_SIZE := N` in a
   Makefile opens a window of N bytes at the top of WRAM bank `$7E`; assembly
   written in `RAM_CODE_SECTION "name"` is stored in ROM bank 1, linked at its

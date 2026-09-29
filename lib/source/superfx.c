@@ -16,6 +16,15 @@ void gsuSetProgram(const void *program) {
     gsu_prog_bank = (u8)(far_address >> 16);
 }
 
+void gsuCall(u16 entry) {
+    /* the program's own base, as gsuSetProgram() left it */
+    u16 base = gsu_prog_addr;
+
+    gsu_prog_addr = (u16)(base + entry);
+    gsuLaunch();
+    gsu_prog_addr = base;
+}
+
 /* Cache-resident jobs (2026-09-27). GSU I/O is at $3000-$34FF of banks
  * $00-$3F: plain C pointers reach it, bank $00. */
 #define GSU_R15L  (*(volatile u8 *)0x301E)

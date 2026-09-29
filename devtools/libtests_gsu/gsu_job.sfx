@@ -32,3 +32,22 @@ _outer:
     NOP
     STOP
     NOP
+
+; A second entry point (2026-09-29, the <name>.sfx.h bridge): R1 x R2 by
+; repeated addition, the product in SRAM[6..7]. R1 and R2 are the
+; arguments, written by the CPU before the start (gsuCall /
+; gsuStartCached with GSU_JOB_MUL_JOB).
+mul_job:
+    IBT R0, #$70
+    RAMB
+    IWT R0, #0
+    MOVE R12, R2            ; LOOP count
+    MOVE R13, R15           ; loop address = next instruction
+    ADD R1
+    LOOP
+    NOP
+    IBT R3, #$06
+    STW (R3)                ; SRAM[6..7] = R1 * R2
+    NOP
+    STOP
+    NOP

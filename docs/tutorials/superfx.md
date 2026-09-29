@@ -325,6 +325,37 @@ the fixture's fourth job asserts 0, and the same function without `RAM_CODE`
 counts 49 585.
 
 
+## Several Jobs in One Program: Entry Points
+
+The build links every `.sfx` of `GSUSRC` into a binary and writes a header
+next to it: one `#define` per global label, its offset in the binary.
+`gsu_job.sfx` with the labels `gsu_start` and `mul_job` gives
+`gsu_job.sfx.h`:
+
+```c
+#define GSU_JOB_GSU_START 0x0000u
+#define GSU_JOB_MUL_JOB 0x0028u
+```
+
+Labels starting with `_` or `@` are local and left out. Pass an entry point
+to `gsuCall()` (from ROM, like `gsuLaunch()`, which is entry 0) or to
+`gsuStartCached()` (from the cache), and the arguments in the GSU registers
+before the start:
+
+```c
+#include "gsu_job.sfx.h"
+
+REG_GSU_R1 = 300;
+REG_GSU_R2 = 7;
+gsuCall(GSU_JOB_MUL_JOB);       /* R0-R7 and R9-R13 are yours; the launcher writes R8 and R15 */
+```
+
+`devtools/libtests_gsu` runs `mul_job` both ways. The offsets are relative to
+the binary, and the program is assembled at 0: code that only branches
+(relative) runs anywhere, but an absolute jump or an address of a ROM table
+inside the program would need the binary linked at its ROM address, which
+the build does not do yet.
+
 ## SuperFX Assembly Rules
 
 Four mandatory rules for all GSU programs:

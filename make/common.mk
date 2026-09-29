@@ -295,6 +295,7 @@ C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)/lib/include/snes/*.h)
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
+GSU_HEADERS := $(patsubst %.sfx,%.sfx.h,$(GSUSRC))
 SPC_BINS := $(patsubst %.spc700.asm,%.spc700.bin,$(SPCSRC))
 SOUNDBANK_OBJ := $(if $(_HAS_SOUNDBANK),$(SOUNDBANK_OUT).o)
 
@@ -366,13 +367,25 @@ $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 #------------------------------------------------------------------------------
 
 ifneq ($(GSUSRC),)
-%.sfx.bin: %.sfx
-	@echo "[GSU] $< -> $@"
+# The link also writes <name>.sfx.h (2026-09-29): one #define per global
+# label of the GSU program, its offset in the binary — the entry points C
+# passes to gsuCall() / gsuStartCached(). gsu_job.sfx's label `add_job`
+# becomes GSU_JOB_ADD_JOB. Labels starting with _ or @ are local, skipped.
+%.sfx.bin %.sfx.h: %.sfx
+	@echo "[GSU] $< -> $*.sfx.bin, $*.sfx.h"
 	@$(GSU_AS) -I $(TEMPLATES) -o $*.sfx.o $<
 	@echo "[objects]" > $*.sfx.link
 	@echo "$*.sfx.o" >> $*.sfx.link
-	@$(LD) -b $*.sfx.link $@
-	@rm -f $*.sfx.o $*.sfx.link
+	@$(LD) -S -b $*.sfx.link $*.sfx.bin
+	@P=$$(echo '$(notdir $*)' | tr 'a-z' 'A-Z' | tr -c 'A-Z0-9\n' '_'); \
+	{ echo "/* Generated from $< by make/common.mk: GSU program entry points,"; \
+	  echo " * offsets in $*.sfx.bin (gsuCall, gsuStartCached). Do not edit. */"; \
+	  echo "#ifndef $${P}_SFX_H"; echo "#define $${P}_SFX_H"; \
+	  awk -v P="$$P" '/^\[labels\]/{f=1;next} /^\[/{f=0} \
+	    f && NF==2 && $$2 ~ /^[A-Za-z][A-Za-z0-9_]*$$/ { split($$1,a,":"); \
+	    printf "#define %s_%s 0x%su\n", P, toupper($$2), a[2] }' $*.sfx.sym; \
+	  echo "#endif"; } > $*.sfx.h
+	@rm -f $*.sfx.o $*.sfx.link $*.sfx.sym
 endif
 
 # SPC700 (APU) programs: same two-stage shape as the GSU. %.spc700.asm
@@ -427,7 +440,7 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # piece.h, render.h and hud.h, and editing them rebuilt nothing. Every .h
 # next to a C source, rather than exact -MD deps: cheap and never stale.
 LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
-%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config
+%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
@@ -665,5 +678,5 @@ clean:
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
-	@rm -f $(GSU_BINS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link)
+	@rm -f $(GSU_BINS) $(GSU_HEADERS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link) $(GSUSRC:.sfx=.sfx.sym)
 	@rm -f $(SPC_BINS) $(SPCSRC:.spc700.asm=.spc700.o) $(SPCSRC:.spc700.asm=.spc700.link)
