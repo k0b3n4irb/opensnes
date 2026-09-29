@@ -56,8 +56,8 @@
     "rom_sha256": "b70ef40084827c8ecc57b0d14d996e22a3c163c6b590d245246a0937eecb2b45"
   },
   "backgrounds_mode2": {
-    "stream": "5be1e426e85dc73576e3800284bcbb31977635a8298d7687412b4e4beffc23bb",
-    "rom_sha256": "62cd53f8addfa086b088e35b26cd68efc993e567b9b0202ccbd718f794e2723e"
+    "stream": "cc3ccbde6b87bae6fe4cbdac36203f774d8eab616a179f05c9eff469351512a7",
+    "rom_sha256": "6832c54450993373a68b195355be41714cdc789308e8197e3c295beba091c173"
   },
   "backgrounds_mode3": {
     "stream": "1488bd067a576a26143990aa082f6906426ff4ec2e726356775b94569a036fb2",
@@ -84,12 +84,12 @@
     "rom_sha256": "cf8ab9334520697a38b9acb927e1ac51936509bdd2842f0a8d3fd612034d2b48"
   },
   "basics_game_skeleton": {
-    "stream": "b98fbbe67b43b3feb082cbcbec16bdd2da24c5593bfea0e8c0e41e315a5f07d4",
-    "rom_sha256": "2b97ed0a8290e1ccb4725e451866036d8126d96600613e43ff909a7141a07e4e"
+    "stream": "d63ed94825bd133d72b8bbefff7667dea94f4f7e6a5620392f82d778c025f3a5",
+    "rom_sha256": "12446843f023cc791fcdf12e7635fa45c761a3d9bb86cd2d1fec301b7bce2db8"
   },
   "basics_panel_hud": {
-    "stream": "464d369765f721032fab18f979301d11f1fabcc183b4afa190d7998d18f5d16a",
-    "rom_sha256": "9279cc959bb5821ac7dc76964d7f94eb88846376c224c31bc695435ca39dc246"
+    "stream": "a416b5bccbdaf28531b7cef8bfa8a18c33996ed84a5a32a806e9153d4966868e",
+    "rom_sha256": "c04e335984ae6aad0780639cef8be48e0eab96279876161a9b3130c318e68dee"
   },
   "basics_random": {
     "stream": "c09bdaa8fd11ed0757dbde260e6ee8e0e21704bbcd64833b2ad3fcbc94f36c7f",
@@ -308,8 +308,8 @@
     "rom_sha256": "c33823569a32912b60b6fb0181b391219c7c96cda849c4ea618601ac76f19f6c"
   },
   "sprites_sprite_swarm": {
-    "stream": "b4434b871666f5a691a7a434eef9581bf5f8f66a4653623b482ed62ff25cb1cf",
-    "rom_sha256": "58eb08b22b2e3339f981869303cd4218740d15b387ea4125beffcc2a72c897a2"
+    "stream": "edc9b6f9fccead5396ca3e4a67f0125be566fa67cd4083af8cb1eabd19e2c23e",
+    "rom_sha256": "70a9ad0820532089e747b5510dcbb01611adbc410b55859babab6090d2ce7614"
   },
   "text_print_string": {
     "stream": "5e85a8b4dbb5440c9649e3b33f3c4cd445021e0e7831e1abb159df00d3592682",

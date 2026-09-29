@@ -5,6 +5,14 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`tile` module — tiles made at run time.**
+  `tileEncode2bpp()`, `tileEncode4bpp()`, `tileEncode8bpp()` turn 64 colour
+  indices (one byte per pixel, row by row) into the planar tile the PPU
+  reads. Four examples (`mode2`, `game_skeleton`, `panel_hud`,
+  `sprite_swarm`) carried the same 4bpp loop as their own copy; they use the
+  module now, with the same frames. The encoder is asm: ~47 000 master
+  cycles a tile against ~310 000 for the C loop (luna profile). The lib
+  fixture checks the three depths and one hand-derived vector.
 - feat(lib): **Super FX frames presented by the NMI, double-buffered**
   (superfx runtime chantier, phase D). `gsuPresentInit(vram_a, vram_b,
   flags)` sets up two framebuffers in Game Pak RAM and two char blocks in

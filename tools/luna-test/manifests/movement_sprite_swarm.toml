@@ -5,9 +5,10 @@
 #    the game loop kept up. `swarm_frame` counts main-loop iterations, so
 #    if the per-sprite C update ever overran a frame the counter would fall
 #    behind the PPU. Measured on luna, swarm_frame == PPU frame - 7 at
-#    frames 60, 160 and 300 alike (7 = the boot frames before the loop
-#    starts; 8 until the compiler's slot colouring of 2026-09-27 made the
-#    init faster): 293 iterations for 293 displayed frames, zero slip.
+#    frames 60, 160 and 300 alike (6 = the boot frames before the loop
+#    starts; 8 until the compiler's slot colouring of 2026-09-27, 7 until
+#    the tile module's asm encoder of 2026-09-30 made the init faster):
+#    294 iterations for 294 displayed frames, zero slip.
 #
 # 2. "each bounces independently, reversing at the edges." A frozen-velocity
 #    ROM still renders a moving cloud. So each leg pins sprite 0's velocity
@@ -17,47 +18,47 @@
 # Each leg also re-checks the hand-written OAM plumbing the example exists
 # to show: the loop writes bx into oamMemory[0] and by-1 into oamMemory[1]
 # by hand (the PPU's +1 scanline quirk), so oamMemory must equal bx and
-# by-1 exactly, at every leg. Measured (the positions are one iteration
-# further than before 2026-09-27, the boot being one frame shorter; the
-# values written are the same sequence, checked with --trace-writes):
-#   frame  60  bx0=112 by0=120  oam = (112, 119)
-#   frame 160  bx0=184 by0= 96  oam = (184,  95)
-#   frame 300  bx0=112 by0=200  oam = (112, 199)
+# by-1 exactly, at every leg. Measured (each boot shortening moved the
+# positions one iteration further — 2026-09-27, then 2026-09-30 with the
+# asm tile encoder; luna diff shows the same frames one frame earlier):
+#   frame  60  bx0=114 by0=122  oam = (114, 121)
+#   frame 160  bx0=182 by0= 94  oam = (182,  93)
+#   frame 300  bx0=114 by0=198  oam = (114, 197)
 rom = "../../../examples/sprites/sprite_swarm/sprite_swarm.sfc"
 frames = 300
 
 [[checkpoint]]                 # outbound: both velocities positive
 at_frame = 60
 [checkpoint.values]
-swarm_frame  = { eq = 53, width = 2 }        # 60 - 7 boot frames
-bx           = { eq = 112, width = 1 }
-by           = { eq = 120, width = 1 }
+swarm_frame  = { eq = 54, width = 2 }        # 60 - 6 boot frames
+bx           = { eq = 114, width = 1 }
+by           = { eq = 122, width = 1 }
 bvx          = { eq = 2, width = 1 }
 bvy          = { eq = 2, width = 1 }
-oamMemory    = { eq = 112, width = 1 }       # oamMemory[0] == bx[0]
-"oamMemory+1"    = { eq = 119, width = 1 }       # oamMemory[1] == by[0] - 1
+oamMemory    = { eq = 114, width = 1 }       # oamMemory[0] == bx[0]
+"oamMemory+1"    = { eq = 121, width = 1 }       # oamMemory[1] == by[0] - 1
 
 [[checkpoint]]                 # after both edge bounces: both negative
 at_frame = 160
 [checkpoint.values]
-swarm_frame  = { eq = 153, width = 2 }
-bx           = { eq = 184, width = 1 }
-by           = { eq = 96,  width = 1 }
+swarm_frame  = { eq = 154, width = 2 }
+bx           = { eq = 182, width = 1 }
+by           = { eq = 94,  width = 1 }
 bvx          = { eq = 0xFE, width = 1 }      # -2: reversed at XMAX
 bvy          = { eq = 0xFE, width = 1 }      # -2: reversed at YMAX
-oamMemory    = { eq = 184, width = 1 }
-"oamMemory+1"    = { eq = 95,  width = 1 }
+oamMemory    = { eq = 182, width = 1 }
+"oamMemory+1"    = { eq = 93,  width = 1 }
 
 [[checkpoint]]                 # X has bounced back off XMIN, Y still inbound
 at_frame = 300
 [checkpoint.values]
-swarm_frame  = { eq = 293, width = 2 }       # 300 - 7: no frame was ever dropped
-bx           = { eq = 112, width = 1 }
-by           = { eq = 200, width = 1 }
+swarm_frame  = { eq = 294, width = 2 }       # 300 - 6: no frame was ever dropped
+bx           = { eq = 114, width = 1 }
+by           = { eq = 198, width = 1 }
 bvx          = { eq = 2, width = 1 }
 bvy          = { eq = 0xFE, width = 1 }
-oamMemory    = { eq = 112, width = 1 }
-"oamMemory+1"    = { eq = 199, width = 1 }
+oamMemory    = { eq = 114, width = 1 }
+"oamMemory+1"    = { eq = 197, width = 1 }
 
 [asserts.oam]                  # the whole flock really reaches the PPU
 visible = 32

@@ -45,6 +45,7 @@
  */
 
 #include <snes.h>
+#include <snes/tile.h>   /* tileEncode4bpp */
 #include <snes/input.h>
 
 /** @brief Game states — the whole game is a switch over these. */
@@ -78,31 +79,13 @@ static u16 seed_ctr;       /* advances on the title so each run differs */
 static u8 pixbuf[64];
 static u8 tilebuf[32];
 
-/** @brief Pack pixbuf[] (8x8 palette indices) into a 4bpp planar tile. */
-static void encode_4bpp(void) {
-    u8 pair, row, col;
-    u16 o = 0;
-    for (pair = 0; pair < 4; pair += 2) {
-        for (row = 0; row < 8; row++) {
-            u8 lo = 0, hi = 0;
-            for (col = 0; col < 8; col++) {
-                u8 v = pixbuf[row * 8 + col];
-                if (v & (1 << pair))       lo |= (u8)(0x80 >> col);
-                if (v & (1 << (pair + 1))) hi |= (u8)(0x80 >> col);
-            }
-            tilebuf[o++] = lo;
-            tilebuf[o++] = hi;
-        }
-    }
-}
-
 /** @brief Build an 8x8 tile from an 8-row bitmap, using palette index @p idx. */
 static void build_tile(const u8 *rows, u8 idx, u16 tile) {
     u8 r, c;
     for (r = 0; r < 8; r++)
         for (c = 0; c < 8; c++)
             pixbuf[r * 8 + c] = (u8)(((rows[r] >> (7 - c)) & 1) ? idx : 0);
-    encode_4bpp();
+    tileEncode4bpp(pixbuf, tilebuf);
     dmaCopyVram(tilebuf, (u16)(SPR_VRAM + tile * 16), 32);
 }
 

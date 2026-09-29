@@ -53,7 +53,7 @@ make
 
 ## Modules used
 
-`console`, `dma`, `background`, `sprite`, `text`, `input`
+`console`, `dma`, `background`, `sprite`, `text`, `input`, `tile` (`tileEncode4bpp`)
 
 ## Where you are
 

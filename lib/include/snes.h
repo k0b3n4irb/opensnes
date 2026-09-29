@@ -138,6 +138,7 @@
  *   #include <snes/gameloop.h>  // gameloop framework opt-in
  *   #include <snes/asset.h>     // typed BgAsset / GfxAsset bundles
  *   #include <snes/scene.h>     // push/pop scene stack
+ *   #include <snes/tile.h>      // build 2/4/8bpp tiles from pixels at run time
  */
 
 #endif /* OPENSNES_H */

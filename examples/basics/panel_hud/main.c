@@ -50,6 +50,7 @@
  */
 
 #include <snes.h>
+#include <snes/tile.h>   /* tileEncode4bpp */
 #include <snes/panel.h>
 #include <snes/input.h>
 
@@ -110,27 +111,9 @@ static const Panel ui = {
 static u8 px[64];
 static u8 tilebuf[32];
 
-/** @brief Pack px[] (8x8 palette indices) into a 4bpp planar tile. */
-static void encode_4bpp(void) {
-    u8 pair, row, col;
-    u16 o = 0;
-    for (pair = 0; pair < 4; pair += 2) {
-        for (row = 0; row < 8; row++) {
-            u8 lo = 0, hi = 0;
-            for (col = 0; col < 8; col++) {
-                u8 v = px[row * 8 + col];
-                if (v & (1 << pair))       lo |= (u8)(0x80 >> col);
-                if (v & (1 << (pair + 1))) hi |= (u8)(0x80 >> col);
-            }
-            tilebuf[o++] = lo;
-            tilebuf[o++] = hi;
-        }
-    }
-}
-
 /** @brief Upload the just-encoded tile to a tile slot in BG2's char space. */
 static void put_tile(u16 tile) {
-    encode_4bpp();
+    tileEncode4bpp(px, tilebuf);
     dmaCopyVram(tilebuf, (u16)(BG2_CHR + tile * 16), 32);
 }
 
@@ -213,7 +196,7 @@ static void build_scene(void) {
     for (i = 0; i < 16; i++) {
         u8 j;
         for (j = 0; j < 64; j++) px[j] = i;
-        encode_4bpp();
+        tileEncode4bpp(px, tilebuf);
         dmaCopyVram(tilebuf, (u16)(BG1_CHR + i * 16), 32);
     }
     for (row = 0; row < 32; row++) {

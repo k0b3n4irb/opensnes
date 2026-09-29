@@ -11,20 +11,27 @@
 #
 #   frame   50  game_state 0   the title screen ignores the D-pad
 #   frame   70  game_state 1   START taken: px,py = (120,112), time_left 30,
-#                              coin spawned at (41, 36)
-#   frame  130  score 1        LEFT+UP for 40 frames -> (40,32), within the
-#                              8 px box of the coin; it respawns at (22,43)
+#                              coin spawned at (42, 53)
+#   frame  130  score 1        LEFT+UP for 30 frames, LEFT for 10 -> (40,52),
+#                              within the 8 px box of the coin; it respawns
+#                              at (142,147)
 #   frame 1850  time_left 1    the one-second tick ran 29 times
 #   frame 1900  game_state 2   time_left hit 0 -> game over, score preserved
 #   frame 1960  game_state 0   START on the game-over screen loops back
 #
-# The (40, 32) player position is predicted from the script, not observed:
-# PLAYER_SPEED is 2, the diagonal hold is 40 frames, the start is (120,112).
+# The (40, 52) player position is predicted from the script, not observed:
+# PLAYER_SPEED is 2, the diagonal hold is 30 frames and the LEFT hold 10,
+# the start is (120,112).
+#
+# The coin depends on how long the boot took (the seed is the title
+# screen's frame count): (41, 36) until 2026-09-30, when the tile module's
+# asm encoder shortened the boot and moved it to (42, 53) — the old script
+# (LEFT+UP for 40 frames, to (40, 32)) then walked past it.
 # So a movement or collision regression fails here on an arithmetic ground,
 # and a state-machine regression fails on game_state.
 rom = "../../../examples/basics/game_skeleton/game_skeleton.sfc"
-#        START        LEFT+UP for 40 frames              START (on game over)
-input = "60:0x1000,64:0,80:0x0A00,120:0,1900:0x1000,1904:0"
+#        START        LEFT+UP 30, LEFT 10                          START (on game over)
+input = "60:0x1000,64:0,80:0x0A00,110:0x0200,120:0,1900:0x1000,1904:0"
 
 [[checkpoint]]                 # title: nothing has started
 at_frame = 50
@@ -41,17 +48,17 @@ time_left  = { eq = 30,  width = 1 }
 score      = { eq = 0,   width = 2 }
 px         = { eq = 120, width = 1 }
 py         = { eq = 112, width = 1 }
-cx         = { eq = 41,  width = 1 }
-cy         = { eq = 36,  width = 1 }
+cx         = { eq = 42,  width = 1 }
+cy         = { eq = 53,  width = 1 }
 
 [[checkpoint]]                 # walked onto the coin: scored and respawned
 at_frame = 130
 [checkpoint.values]
 score = { eq = 1,  width = 2 }
 px    = { eq = 40, width = 1 }      # 120 - 40 frames * 2 px
-py    = { eq = 32, width = 1 }      # 112 - 40 frames * 2 px
-cx    = { eq = 22, width = 1 }      # the coin moved
-cy    = { eq = 43, width = 1 }
+py    = { eq = 52, width = 1 }      # 112 - 30 frames * 2 px
+cx    = { eq = 142, width = 1 }     # the coin moved
+cy    = { eq = 147, width = 1 }
 
 [[checkpoint]]                 # one second left, still playing
 at_frame = 1850
