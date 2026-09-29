@@ -2,7 +2,7 @@
 
 Opened 2026-09-26. One line per item. Every item is re-checked on the pinned
 luna the day the report goes out (`.claude/rules/partners.md`); the pin is
-v1.30.1 (2026-09-30).
+v1.30.1 (2026-09-29).
 
 | Date | Item | Seen on | What we would run |
 |---|---|---|---|

@@ -23,7 +23,7 @@
  * Link with `LIB_MODULES += tile`. Colour bits above the depth are ignored.
  * Cost: about 47 000 master cycles a tile (an eighth of a frame), measured
  * on luna — build tiles during loading, or a few per frame. Four examples
- * carried a C copy of this loop until 2026-09-30, at ~310 000 a tile.
+ * carried a C copy of this loop until 2026-09-29, at ~310 000 a tile.
  */
 
 #ifndef SNES_TILE_H

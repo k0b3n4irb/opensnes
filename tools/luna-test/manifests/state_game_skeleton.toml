@@ -24,7 +24,7 @@
 # the start is (120,112).
 #
 # The coin depends on how long the boot took (the seed is the title
-# screen's frame count): (41, 36) until 2026-09-30, when the tile module's
+# screen's frame count): (41, 36) until 2026-09-29, when the tile module's
 # asm encoder shortened the boot and moved it to (42, 53) — the old script
 # (LEFT+UP for 40 frames, to (40, 32)) then walked past it.
 # So a movement or collision regression fails here on an arithmetic ground,

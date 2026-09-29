@@ -674,9 +674,9 @@ allocator risks regressions on the 28 patches that already exist.
 
 ---
 
-#### A5. Compiler stack divergence (86 QBE / 32 cproc / 4 wla-dx patches as of 2026-09-30) 🟡
+#### A5. Compiler stack divergence (86 QBE / 32 cproc / 4 wla-dx patches as of 2026-09-29) 🟡
 
-**2026-09-30**: 32 cproc, 86 QBE and 4 wla-dx patches (`compiler/PINS.md`,
+**2026-09-29**: 32 cproc, 86 QBE and 4 wla-dx patches (`compiler/PINS.md`,
 checked by `verify-toolchain` since 2026-09-26). Growth since 09-13: QBE's
 Kl high-half invariant, slot colouring and the `.ram_code` section; cproc's
 four upstream cherry-picks and `__ramcode`; wla-dx's two RAM-bank fixes of
@@ -2453,7 +2453,7 @@ operated on enough PRs to surface its actual signal-to-noise ratio.
 ---
 
 
-#### E3. Super FX runtime: the CPU during GSU jobs — RESOLVED 🟢 (phases A-F, 2026-09-24 → 09-30)
+#### E3. Super FX runtime: the CPU during GSU jobs — RESOLVED 🟢 (phases A-F, 2026-09-24 → 09-29)
 
 **Problem**: while the GSU owns the cartridge (SCMR RON/RAN), a 65816 read
 of Game Pak ROM returns dummy bytes and cart RAM reads open bus. Until
@@ -2567,7 +2567,7 @@ its evidence in the entry's status line and in §7.
 
 ### Remaining addressable effort
 
-A5's per-bump upkeep only (A8 closed 2026-09-26, E3 2026-09-30). The 6–9 person-months
+A5's per-bump upkeep only (A8 closed 2026-09-26, E3 2026-09-29). The 6–9 person-months
 of the 2026-05-08 estimate were spent between 2026-05 and 2026-09, most
 of them on A6/A7 (pointer ABI), B2 (far RAM) and #127.3 (const data
 placement), which between them closed the whole B cluster.

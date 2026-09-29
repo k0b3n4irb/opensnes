@@ -445,7 +445,7 @@ with one DMA to `$2180` (22 ms). See `docs/tutorials/far_ram.md`.
 
 ## Code in RAM: `__ramcode`
 
-`__ramcode` (`RAM_CODE` in `snes/types.h`, 2026-09-30) is a function
+`__ramcode` (`RAM_CODE` in `snes/types.h`, 2026-09-29) is a function
 specifier, like `inline`: on any declaration of a function it puts the
 definition in the RAM code window. cproc emits `section ".ram_code"` on the
 function; the w65816 backend turns it into

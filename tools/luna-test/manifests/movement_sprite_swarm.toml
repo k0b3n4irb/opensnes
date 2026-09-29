@@ -7,7 +7,7 @@
 #    behind the PPU. Measured on luna, swarm_frame == PPU frame - 7 at
 #    frames 60, 160 and 300 alike (6 = the boot frames before the loop
 #    starts; 8 until the compiler's slot colouring of 2026-09-27, 7 until
-#    the tile module's asm encoder of 2026-09-30 made the init faster):
+#    the tile module's asm encoder of 2026-09-29 made the init faster):
 #    294 iterations for 294 displayed frames, zero slip.
 #
 # 2. "each bounces independently, reversing at the edges." A frozen-velocity
@@ -19,7 +19,7 @@
 # to show: the loop writes bx into oamMemory[0] and by-1 into oamMemory[1]
 # by hand (the PPU's +1 scanline quirk), so oamMemory must equal bx and
 # by-1 exactly, at every leg. Measured (each boot shortening moved the
-# positions one iteration further — 2026-09-27, then 2026-09-30 with the
+# positions one iteration further — 2026-09-27, then 2026-09-29 with the
 # asm tile encoder; luna diff shows the same frames one frame earlier):
 #   frame  60  bx0=114 by0=122  oam = (114, 121)
 #   frame 160  bx0=182 by0= 94  oam = (182,  93)

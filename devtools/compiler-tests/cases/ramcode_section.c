@@ -1,4 +1,4 @@
-/* OpenSNES: `__ramcode` (RAM_CODE in snes/types.h, 2026-09-30) puts a
+/* OpenSNES: `__ramcode` (RAM_CODE in snes/types.h, 2026-09-29) puts a
  * function in the RAM code window: QBE emits it as a section appended to
  * ".ram_code" with BASE $7D (stored in ROM bank 1, labels at $7E:xxxx),
  * guarded by an assembler .FAIL when the project has no window

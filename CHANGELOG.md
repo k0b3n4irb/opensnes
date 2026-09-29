@@ -4,6 +4,19 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.47.0] — 2026-09-29
+
+The Super FX release. A game can now run while the GSU works: code runs
+from RAM (`RAM_CODE_SIZE`, `RAM_CODE_SECTION`, C `RAM_CODE`), jobs run from
+the GSU's code cache while the CPU keeps the ROM, a GSU program can have
+several entry points (`<name>.sfx.h`, `gsuCall`), and finished frames are
+double-buffered and moved to VRAM by the NMI (`gsuPresent`). The new
+`chips/superfx_game_skeleton` plays a 60 fps game loop with music while the
+GSU renders at 30. Checking that pipeline with luna found `superfx_3d`
+losing a third of its framebuffer to a silent VRAM failure; every example
+is now held to no VRAM DMA outside blank. Also a `tile` module for tiles
+made at run time, and luna v1.30.1.
+
 ### Added
 - feat(lib): **`tile` module — tiles made at run time.**
   `tileEncode2bpp()`, `tileEncode4bpp()`, `tileEncode8bpp()` turn 64 colour
@@ -51,7 +64,7 @@ All notable changes to OpenSNES are documented in this file.
   keep running while a Super FX job owns the ROM: the GSU fixture waits on a
   ROM-resident job from the window (33 frames, no bus violation; the same
   loop in ROM loses the CPU). Checked on LoROM, HiROM, SA-1 and FastROM.
-  **C functions too** (2026-09-30): `RAM_CODE` (`__ramcode`, a function
+  **C functions too** (2026-09-29): `RAM_CODE` (`__ramcode`, a function
   specifier in cproc; QBE emits the window section, with an assembler
   `.FAIL` naming the function when the project has no window). The GSU
   fixture's fourth job waits in C from RAM, 0 bus violations; the same

@@ -35,7 +35,7 @@ wave_phase = 380                  # +2 per loop iteration, 190 iterations by fra
 # The loop misses frames (lag_frame_counter), so the iteration count at
 # frame 200 follows the code's speed: 176 iterations until the compiler's
 # slot colouring of 2026-09-27, 178 until the tile module's asm encoder of
-# 2026-09-30 (the 16 tiles built at boot took ~14 frames in C, ~2 now),
+# 2026-09-29 (the 16 tiles built at boot took ~14 frames in C, ~2 now),
 # 190 since. The values written are the same sequence either way: the row
 # below is the old one advanced by six entries.
 

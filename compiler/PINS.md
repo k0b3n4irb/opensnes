@@ -139,7 +139,7 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 4 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-30)
+### compiler/wla-dx — 4 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29)
 
 ```
 8077133 wlalink: the [ramsections] listing of the .sym ignores .BASE too
@@ -148,7 +148,7 @@ These commits implement the cycle reductions documented in
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
 
-`8077133` (2026-09-30) is the third place the base leaked: the
+`8077133` (2026-09-29) is the third place the base leaked: the
 `[ramsections]` block of the `.sym`, which listed a HiROM `$7E` section as
 `13e:` and bank-0 RAM as `c0:`. No ROM byte changes (84/84 identical); the
 far-RAM-band check of `symmap.py` now sees HiROM's sections.

@@ -16,7 +16,7 @@
 ; row's bytes go to tile[pair * 16 + row * 2 + {0, 1}] for each plane pair
 ; the depth has. About 47 000 master cycles a tile, whatever the depth (all
 ; eight planes are shifted every time); the C loop it replaces took ~310 000
-; (luna profile on sprite_swarm, 2026-09-30), most of it in `0x80 >> col`.
+; (luna profile on sprite_swarm, 2026-09-29), most of it in `0x80 >> col`.
 ;
 ; Frame (direct page while the call runs):
 ;   $00-$07  plane accumulators

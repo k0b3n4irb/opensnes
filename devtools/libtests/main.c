@@ -379,7 +379,7 @@ u16 r_invb_out;     /* after spinning until the flag clears   -> 0 */
 extern void irqTestHandler(void);   /* data.asm, bank 0 */
 extern void irqTestHandlerFar(void);/* data.asm, banks 7-1 */
 
-/* tile (2026-09-30): the three depths of one pattern that sets every bit
+/* tile (2026-09-29): the three depths of one pattern that sets every bit
  * (pixel i = i * 37 + 11), and one pixel of colour 5 (planes 0 and 2) at the
  * top-left corner of a 4bpp tile: tile[0] = tile[16] = $80, the rest 0. */
 static FAR u8 t_px[64];   /* FAR: the fixture's plain RAM band is nearly full */

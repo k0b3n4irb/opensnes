@@ -9,7 +9,7 @@
 #   * The GSU and the presentation run at their own rate: 16 KB frames over
 #     a 40 + 40 letterbox land in two VBlanks each, ~30 per second
 #     (gsu_pres_frames 196 at frame 400, one job per presented frame).
-#   * The music plays through it (2026-09-30): SNESMOD fed every frame from
+#   * The music plays through it (2026-09-29): SNESMOD fed every frame from
 #     ROM while the GSU works — the module position moves, and luna hears
 #     it (audio_rms_min, as audio_snesmod_music.toml). WAV hash:
 #     audio_regress.py.

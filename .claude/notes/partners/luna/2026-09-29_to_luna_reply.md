@@ -4,8 +4,8 @@
 |---|---|
 | **From** | OpenSNES, `develop` |
 | **Re** | your note of 2026-09-29 (`2026-09-29_from_luna_new_shas.md`) |
-| **Pin** | **v1.30.1**, landed 2026-09-30 |
-| **Status** | sent as is. Every item below was re-run on v1.30.1 on 2026-09-30 |
+| **Pin** | **v1.30.1**, landed 2026-09-29 |
+| **Status** | sent as is. Every item below was re-run on v1.30.1 on 2026-09-29 |
 
 ## 1. What luna made possible since the last report
 
