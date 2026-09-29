@@ -674,7 +674,15 @@ allocator risks regressions on the 28 patches that already exist.
 
 ---
 
-#### A5. Compiler stack divergence (60 QBE / 21 cproc / 2 wla-dx patches as of 2026-09-13) 🟡
+#### A5. Compiler stack divergence (86 QBE / 32 cproc / 4 wla-dx patches as of 2026-09-30) 🟡
+
+**2026-09-30**: 32 cproc, 86 QBE and 4 wla-dx patches (`compiler/PINS.md`,
+checked by `verify-toolchain` since 2026-09-26). Growth since 09-13: QBE's
+Kl high-half invariant, slot colouring and the `.ram_code` section; cproc's
+four upstream cherry-picks and `__ramcode`; wla-dx's two RAM-bank fixes of
+the `.BASE` family. Suites still at their ratchets (QBE 55/55, wla-dx 30/32,
+cproc 64/171 — both counts moved with the upstream picks).
+
 
 **2026-09-13**: 21 cproc, 60 QBE and 2 wla-dx patches (`compiler/PINS.md`);
 QBE's true upstream base is `120f316` (2025-05-30). Since gaps review H1
@@ -2445,7 +2453,7 @@ operated on enough PRs to surface its actual signal-to-noise ratio.
 ---
 
 
-#### E3. Super FX runtime: the CPU during GSU jobs — IN PROGRESS 🟠 (`wip/superfx-runtime`, since 2026-09-24)
+#### E3. Super FX runtime: the CPU during GSU jobs — RESOLVED 🟢 (phases A-F, 2026-09-24 → 09-30)
 
 **Problem**: while the GSU owns the cartridge (SCMR RON/RAN), a 65816 read
 of Game Pak ROM returns dummy bytes and cart RAM reads open bus. Until
@@ -2453,17 +2461,30 @@ of Game Pak ROM returns dummy bytes and cart RAM reads open bus. Until
 disabled NMI for the whole job: one VBlank in three was lost on
 `superfx_3d`, no input, music or sprites during a job.
 
-**Plan and state** (`.claude/notes/chantiers/superfx_runtime.md`): phase A,
-interrupt vectors in WRAM at `$0100-$010F` — done; phase B, the NMI survives
-GSU jobs through a position-independent handler in WRAM — done (597 frames
-of 600, was 400); phase C, non-blocking launch and IRQ on STOP (the IRQ/BRK/
-COP stubs still point into ROM, the next step); D, `gsuPresent` split-frame
-double buffer; E, GSU code in RAM; F, a C ↔ GSU contract. Effort: several
-weeks. Risk: high (crt0, memory model). luna v1.27.0 gives the oracles it
-needs: `[asserts.gsu] bus_violations`, per-job profile.
+**Shipped** (`.claude/notes/chantiers/superfx_runtime.md` has the log):
+A, interrupt vectors in WRAM at `$0100-$010F`; B, the NMI survives GSU
+jobs (597 frames of 600, was 400); C0/C, IRQ/BRK/COP from WRAM, jobs run
+from the GSU code cache while the CPU keeps the ROM (`gsuCacheLoad` /
+`gsuStartCached` / `gsuBusy` / `gsuWait`), IRQ on STOP counted
+(`gsu_stop_irqs`, it used to lock the CPU); E, code in RAM as an SDK
+feature (`RAM_CODE_SIZE`, `RAM_CODE_SECTION`, C `RAM_CODE`), the hand-copied
+blobs migrated into it; F, several entry points per GSU program
+(`<name>.sfx.h`, `gsuCall`); D, `gsuPresent` — double-buffered frames moved
+by the NMI with Game Pak RAM time-sharing, and the `superfx_game_skeleton`
+example (a 60 fps game loop while the GSU renders at 30). On the way D
+found `gsuDmaFullFrame` dropping a third of `superfx_3d`'s framebuffer on a
+stale V counter; fixed, and every example now passes luna's
+`unsafe_writes = 0` (`vram_dma_blank.py`).
+
+**Left open, none blocking**: linking a GSU program at its ROM address
+(absolute jumps and ROM tables inside a program — assembled at 0 today);
+using the bottom letterbox band for `gsuPresent` (needs the lib to own a
+V-timer IRQ); the H/V latch model luna follows is unconfirmed by any
+source (partners' open lists, 2026-09-29).
 
 **Cross-references**: `KNOWN_LIMITATIONS.md` (the NMI entry of 2026-09-25),
-`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`.
+`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`,
+`docs/tutorials/superfx.md`.
 
 ## 4. Interactions matrix
 
@@ -2539,16 +2560,15 @@ is in git history — `git show 19085a13:.claude/STRUCTURAL_DEFECTS.md`.)*
 | Tier | Effort | Items | Risk profile |
 |---|---|---|---|
 | **Ongoing** | per PIN bump | **A5** fork divergence — 21 cproc / 60 QBE / 2 wla-dx patches, gated by the upstream suites; three upstream reports queued | Low per patch. The cost is now measured (suite ratchets) rather than felt. |
-| **Days** | 1 day | **A8** — drop the `cc65816` x3 retry, close the entry and the `KNOWN_LIMITATIONS.md` note; keep the monthly stress monitor | Low. The sanitizer job is the standing detector. |
 | **Not addressable** | N/A | **D3** SuperFX has no C compiler | Documented for record only. |
 
 Resolved and not coming back: A1, A2, A3, A4, A6, A7, A9, B1, B2, B3, B4,
-B5, B6, C1, C2, D1, D2, E1, E2 — 19 of the 22 catalogued items, each with
+B5, B6, C1, C2, D1, D2, E1, E2, E3, A8 — 21 of the 23 catalogued items, each with
 its evidence in the entry's status line and in §7.
 
 ### Remaining addressable effort
 
-About **one day** (A8) plus A5's per-bump upkeep. The 6–9 person-months
+A5's per-bump upkeep only (A8 closed 2026-09-26, E3 2026-09-30). The 6–9 person-months
 of the 2026-05-08 estimate were spent between 2026-05 and 2026-09, most
 of them on A6/A7 (pointer ABI), B2 (far RAM) and #127.3 (const data
 placement), which between them closed the whole B cluster.
