@@ -714,6 +714,27 @@ FastStart:
     ; Initialize static variables (copy init data from ROM to RAM)
     jsr CopyInitData
 
+.ifdef RAM_CODE
+    ; RAM code window (RAM_CODE_SIZE, templates/ram_code_start.asm): copy
+    ; RamCodeStart..RamCodeEnd from its ROM home in bank $01 to the same
+    ; 16-bit address in bank $7E, where its labels were linked. Byte by byte:
+    ; a word copy of an odd-sized window would write $7F:0000.
+    sep #$20
+    .ACCU 8
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+    cpx #(RamCodeEnd - RamCodeStart)
+    beq +
+-   lda.l $010000 + (RamCodeStart & $FFFF),x
+    sta.l RamCodeStart,x
+    inx
+    cpx #(RamCodeEnd - RamCodeStart)
+    bne -
++   rep #$20
+    .ACCU 16
+.endif
+
     ; Enable NMI (VBlank interrupt)
     sep #$20
     .ACCU 8

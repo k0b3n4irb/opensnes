@@ -249,6 +249,44 @@ by exactly one, seven game frames during the job). Before 2026-09-27 this
 combination locked the CPU in its IRQ entry: the GSU's IRQ went to your
 handler, whose `$4211` read does not reset it.
 
+### A ROM job, with the wait loop in RAM
+
+A program too big for the cache, or one that reads ROM data, runs with
+RON = 1, and then the CPU cannot fetch a single instruction from the ROM
+(Nintendo dev manual Book II §5.3). `gsuLaunch()` copes by copying a small
+hand-written stub to WRAM. For your own code, ask the build for a RAM code
+window and write the loop as ordinary assembly:
+
+```makefile
+RAM_CODE_SIZE := 256        # bytes at the top of WRAM bank $7E
+```
+
+```asm
+RAM_CODE_SECTION "rom_job"  ; labels resolve to $7E:xxxx
+ramRunRomJob:
+    ; ... start the GSU with RON = 1 and gsu_owns_cart = 1 ...
+@wait:
+    jsr count_something     ; a call inside the window
+    lda.l $3030
+    and #$20                ; SFR GO
+    bne @wait
+    lda #$00
+    sta.l $303A             ; ROM and RAM back to the CPU
+    sta.l gsu_owns_cart
+    rtl
+.ENDS
+```
+
+The window is stored in the top `RAM_CODE_SIZE` bytes of ROM bank 1 and
+linked at the same 16-bit address in bank `$7E`, so jumps, calls and labels
+inside it are the RAM ones; crt0 copies it at boot. C calls it like any
+function (`ramRunRomJob();` is a `jsl` to `$7E:xxxx`). While the GSU owns the
+ROM, code in the window must not call or read the ROM: no lib function, no
+C code, no const data. The NMI keeps counting frames (`gsu_owns_cart`, see
+above). `devtools/libtests_gsu` runs its job a third time this way: 33 frames
+of a ROM-resident job with the CPU polling from RAM and no bus violation; the
+same loop in a plain ROM section loses the CPU at once.
+
 
 ## SuperFX Assembly Rules
 

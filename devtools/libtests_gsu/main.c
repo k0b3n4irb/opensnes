@@ -14,7 +14,10 @@
 
 extern const u8 gsu_job[], gsu_job_end[];
 extern void gsuJobReadResults(void);
+extern void gsuJobClearResults(void);
 extern u16 r_sum, r_outer, r_marker;
+extern void ramRunRomJob(void);
+extern u16 r_ram_frames, r_ram_polls;
 
 /** @brief gsuInit(): 1 on a Super FX cart */
 u16 r_present;
@@ -70,6 +73,15 @@ int main(void) {
     r_busy_at_irq = gsuBusy();
     gsuWait();
     r_stop_irqs_delta = (u8)(gsu_stop_irqs - (u8)r_stop_irqs_before);
+
+    /* Third job, the same program run from ROM (RON = 1): the wait loop is
+     * in the RAM code window. Game Pak RAM is cleared first, so the ROM run
+     * has to write the results again. */
+    gsu_cfgr = 0x80;
+    gsuJobClearResults();
+    gsuSetProgram(gsu_job);
+    ramRunRomJob();
+    gsuJobReadResults();
     r_done = 0xD0E5;
 
     while (1) {

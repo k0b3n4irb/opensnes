@@ -4,6 +4,17 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(build): **code that runs from RAM.** `RAM_CODE_SIZE := N` in a
+  Makefile opens a window of N bytes at the top of WRAM bank `$7E`; assembly
+  written in `RAM_CODE_SECTION "name"` is stored in ROM bank 1, linked at its
+  `$7E` address and copied there by crt0 at boot. It is what a game needs to
+  keep running while a Super FX job owns the ROM: the GSU fixture waits on a
+  ROM-resident job from the window (33 frames, no bus violation; the same
+  loop in ROM loses the CPU). Checked on LoROM, HiROM, SA-1 and FastROM.
+  `symmap.py` no longer counts wlalink's `RAM_USAGE_*` markers as bank-$00
+  ROM (a RAM section at the top of `$7E` read as a full bank $00).
+
 ### Fixed
 - fix(runtime): **a Super FX job started with its IRQ on STOP unmasked no
   longer locks the CPU.** With CFGR bit 7 clear and the I flag clear (any

@@ -396,7 +396,12 @@ class SymbolTable:
 
         # Calculate bank $00 ROM free space
         bank0_syms = self.banks.get(0x00, [])
-        bank0_rom = [s for s in bank0_syms if s.address >= 0x8000]
+        # RAM_USAGE_* are wlalink's RAM markers, printed with a bank-00
+        # prefix whatever the RAM bank: a slot-2 RAMSECTION at the top of
+        # $7E (the RAM code window, RAM_CODE_SIZE) reads as 00:ffc0-00:ffff
+        # and would look like the end of bank $00 ROM.
+        bank0_rom = [s for s in bank0_syms if s.address >= 0x8000
+                     and not s.name.startswith('RAM_USAGE_')]
         if bank0_rom:
             highest = max(s.address for s in bank0_rom)
             # Check _sizeof_ for the highest symbol to get its actual end

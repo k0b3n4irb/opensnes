@@ -25,11 +25,19 @@
 #     moves by exactly 1, the GSU is stopped when it does. Negative control
 #     (crt0 before the fix, IRQ passed to IrqHandler): the CPU never leaves
 #     its IRQ entry (PC $7E:205D at frame 60), r_done stays 0.
+#   * A job run from ROM (RON = 1) while the CPU keeps working (2026-09-29):
+#     the wait loop is in the RAM code window (RAM_CODE_SIZE = 256,
+#     ram_job.asm, RAM_CODE_SECTION), linked at $7E:FF01 and copied there
+#     by crt0. Game Pak RAM is cleared first, so r_sum / r_marker come from
+#     this third job. 33 frames counted by the NMI during the job, 53 270
+#     polls, bus_violations still 0. Negative control (the same loop in a
+#     plain ROM section): 497 475 violations, the CPU lost at $00:0102, the
+#     NMI dead at frame 100, r_done never written.
 #
-# Measured: `luna state --until-frame 60 --peek <sym>:2 --out -` on
+# Measured: `luna state --until-frame 120 --peek <sym>:2 --out -` on
 # devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.1.
 rom = "../../../devtools/libtests_gsu/libtest_gsu.sfc"
-frames = 60
+frames = 120
 
 [asserts.values]
 r_present = 1
@@ -43,8 +51,10 @@ r_frames_during_irq = 7
 r_stop_irqs_before = 0
 r_stop_irqs_delta = 1
 r_busy_at_irq = 0
+r_ram_frames = { ge = 25, le = 45 }
+r_ram_polls = { gt = 1000 }
 r_done = 0xD0E5
 
 [asserts.gsu]
 bus_violations = 0
-instructions_executed = { gt = 2000000 }   # two jobs of 600 000 loop iterations x 4 instructions
+instructions_executed = { gt = 2000000 }   # three jobs of 600 000 loop iterations x 4 instructions

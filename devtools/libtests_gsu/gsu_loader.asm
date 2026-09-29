@@ -33,5 +33,18 @@ gsuJobReadResults:
     sta.l r_marker
     plp
     rtl
+
+; gsuJobClearResults — zero Game Pak RAM $70:0000-0005, so the next job has
+; to write its results again. The CPU must own the RAM (no job running).
+gsuJobClearResults:
+    php
+    rep #$20
+    .ACCU 16
+    lda #$0000
+    sta.l $700000
+    sta.l $700002
+    sta.l $700004
+    plp
+    rtl
 .ENDS
 .endif

@@ -111,6 +111,9 @@ SOUNDBANK_SRC ?=
 SOUNDBANK_OUT ?= soundbank
 SOUNDBANK_BANK ?= 1
 GSUSRC      ?=
+# Bytes of WRAM, at the top of bank $7E, for code that runs from RAM
+# (RAM_CODE_SECTION, templates/ram_code_start.asm). 0 = no window.
+RAM_CODE_SIZE ?= 0
 # ROM size as a project knob (2026-09-24). ROM_BANKS is the linker's bank
 # count (32 KB banks on LoROM / SA-1 / Super FX, 64 KB on HiROM); the header
 # byte ROMSIZE (1 KB << n) and the asset bank range follow it unless set by
@@ -191,6 +194,14 @@ endif
 
 # Assembler flags
 ASFLAGS := -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ifneq ($(RAM_CODE_SIZE),0)
+ifneq ($(shell [ $(RAM_CODE_SIZE) -ge 1 ] && [ $(RAM_CODE_SIZE) -le 16384 ] && echo ok),ok)
+$(error RAM_CODE_SIZE=$(RAM_CODE_SIZE): must be a byte count from 1 to 16384)
+endif
+ASFLAGS += -D RAM_CODE -D RAM_CODE_ORG_VAL=$(shell echo $$(( 65536 - $(RAM_CODE_SIZE) )))
+RAM_CODE_START_OBJ := ram_code_start.o
+RAM_CODE_END_OBJ   := ram_code_end.o
+endif
 
 
 # Check library is built (skip for 'clean')
@@ -467,6 +478,14 @@ data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP)
 	@echo "[AS] data_init_start"
 	$(call wrap_asm,$<,$@)
 
+# RAM code window markers (RAM_CODE_SIZE > 0)
+ram_code_start.o: $(TEMPLATES)/ram_code_start.asm $(MEMMAP_DEP) .opensnes_config
+	@echo "[AS] ram_code_start"
+	$(call wrap_asm,$<,$@)
+ram_code_end.o: $(TEMPLATES)/ram_code_end.asm $(MEMMAP_DEP) .opensnes_config
+	@echo "[AS] ram_code_end"
+	$(call wrap_asm,$<,$@)
+
 # User ASM sources (explicit rules to avoid matching library objects)
 define ASM_OBJ_RULE
 $(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP) .opensnes_config
@@ -492,11 +511,11 @@ data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP)
 #------------------------------------------------------------------------------
 
 # All objects in link order
-LINK_OBJS := crt0.o $(RUNTIME_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
+LINK_OBJS := crt0.o $(RUNTIME_OBJ) $(RAM_CODE_START_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
 ifeq ($(USE_LIB),1)
 LINK_OBJS += $(LIB_OBJS)
 endif
-LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) data_init_end.o
+LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) $(RAM_CODE_END_OBJ) data_init_end.o
 
 linkfile: $(LINK_OBJS) .opensnes_config
 	@echo "[objects]" > $@
@@ -637,6 +656,7 @@ clean:
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
 	@rm -f data_init_end.o data_init_end.wrap.asm
+	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
