@@ -61,6 +61,10 @@ All notable changes to OpenSNES are documented in this file.
   ROM (a RAM section at the top of `$7E` read as a full bank $00).
 
 ### Changed
+- test(luna-test): **luna v1.30.1.** Its `--jobs` keeps manifests chained by
+  a battery file in order, so the five power-cycle manifests (SRAM, SA-1
+  BW-RAM) are back in `manifests/`, in the one parallel batch; the serial
+  `power_cycle/` pass is gone. No baseline moved.
 - refactor(runtime,lib): **the Super FX interrupt entries and `gsuLaunch`'s
   wait loop live in the RAM code window** (a Super FX build reserves 256
   bytes for the SDK on top of `RAM_CODE_SIZE`). They were position-
@@ -81,12 +85,14 @@ All notable changes to OpenSNES are documented in this file.
 
 ### Fixed
 - fix(lib): **`superfx_3d` dropped a third of its framebuffer bytes.**
-  `gsuDmaFullFrame()` polled a V counter it never re-latched (no STAT78
-  read: SLHV latches on the latch's 0 -> 1 transition, snesdev-wiki — "not
-  fully confirmed" there) and started its 16 KB DMA at whatever line the
-  stale value allowed: luna `--dma-trace` counted 481 866 of 1 359 872
-  bytes written on visible lines, silently lost; half the transfers began
-  at lines 6-12. It now reads STAT78 first, starts only in a window from
+  `gsuDmaFullFrame()` read OPVCT (`$213D`) once per poll iteration and never
+  read STAT78, the only reset of OPVCT's read-twice flip-flop: a poll that
+  ended on an odd count left the next one reading the high byte, whose bits
+  1-7 are PPU2 open bus — the previous exit value, 184 — so the DMA started
+  at once (snesdev-wiki; anomie, fullsnes; luna memory trace: 1 281 reads,
+  then 1 read returning `$B8` at line 8). luna `--dma-trace` counted
+  481 866 of 1 359 872 bytes written on visible lines, silently lost; half
+  the transfers began at lines 6-12. It now reads STAT78 and OPVCT twice, starts only in a window from
   which the frame lands whole (225 - bottom to 152 + top) or waits for the
   next frame's, and writes the VRAM/DMA registers after the wait (an NMI
   in it could move VMADD). `gsuSetupHdmaBlanking()` returns only once its

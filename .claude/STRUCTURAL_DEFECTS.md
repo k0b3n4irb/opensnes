@@ -2472,15 +2472,14 @@ blobs migrated into it; F, several entry points per GSU program
 (`<name>.sfx.h`, `gsuCall`); D, `gsuPresent` — double-buffered frames moved
 by the NMI with Game Pak RAM time-sharing, and the `superfx_game_skeleton`
 example (a 60 fps game loop while the GSU renders at 30). On the way D
-found `gsuDmaFullFrame` dropping a third of `superfx_3d`'s framebuffer on a
-stale V counter; fixed, and every example now passes luna's
+found `gsuDmaFullFrame` dropping a third of `superfx_3d`'s framebuffer
+(OPVCT read once per poll, the read-twice flip-flop never reset); fixed, and every example now passes luna's
 `unsafe_writes = 0` (`vram_dma_blank.py`).
 
 **Left open, none blocking**: linking a GSU program at its ROM address
 (absolute jumps and ROM tables inside a program — assembled at 0 today);
 using the bottom letterbox band for `gsuPresent` (needs the lib to own a
-V-timer IRQ); the H/V latch model luna follows is unconfirmed by any
-source (partners' open lists, 2026-09-29).
+V-timer IRQ).
 
 **Cross-references**: `KNOWN_LIMITATIONS.md` (the NMI entry of 2026-09-25),
 `.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`,

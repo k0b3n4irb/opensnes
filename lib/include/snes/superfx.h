@@ -411,8 +411,9 @@ extern void gsuSetupBitmapTilemap(u16 vramAddr);
  * top + bottom >= 73 (40 + 40: lines 185-192). The CPU waits the whole
  * time; gsuPresent() is the variant that does not.
  *
- * Until 2026-09-29 it started at any line it read as >= 184, from a V
- * counter it never re-latched: in superfx_3d a third of the bytes landed on
+ * Until 2026-09-29 it read OPVCT once per poll without STAT78, so every
+ * other call read the high byte (PPU2 open bus: the previous exit value)
+ * and started at once: in superfx_3d a third of the bytes landed on
  * visible lines and were dropped (luna --dma-trace).
  */
 extern void gsuDmaFullFrame(void);

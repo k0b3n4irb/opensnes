@@ -91,8 +91,9 @@ job, which waits for Game Pak RAM while the previous frame moves (worst
 frames presented in 300. The expectation of 60 fps with an 80-line band
 was wrong for a RAM-bound job.
 
-**Found on the way, the bigger bug:** `gsuDmaFullFrame` polled a V counter
-it never re-latched (no STAT78 read) and started anywhere: 481 866 of
+**Found on the way, the bigger bug:** `gsuDmaFullFrame` read OPVCT once
+per poll and never STAT78, so every other call read the high byte (PPU2
+open bus = the previous exit value) and started at once: 481 866 of
 1 359 872 bytes of `superfx_3d`'s framebuffer landed on visible lines. Its
 "53 fps" were partly lost frames; fixed, it shows ~30 whole ones. The
 corpus-wide `unsafe_writes = 0` check (`vram_dma_blank.py`) now guards the
@@ -152,8 +153,13 @@ half-landed frame shown; `gsu_pres_frames` for the rate; profile
   30 (whole frame in one VBlank; the job, waiting for RAM during the
   transfer, is the limit). luna's `[asserts.dma]` refuses past 1 000 000
   trace events: Super FX examples are checked over 55 frames (to luna).
-  snesdev-wiki marks counter_latch "not fully confirmed": the step reads
-  STAT78 before SLHV, right under both models; gsuDmaFullFrame did not.
+  (Corrected 2026-09-30 before the release: the first write-up blamed the
+  counter latch — "luna does not re-latch without STAT78". A probe showed
+  luna re-latches on every SLHV read; a memory trace showed the real
+  mechanism, OPVCT's read-twice flip-flop left on the high byte, whose
+  bits 1-7 are PPU2 open bus: 1 281 reads in one poll, then 1 read
+  returning the previous exit value `$B8`. The two partner items built on
+  the wrong reading were withdrawn.)
 
 - 2026-09-29 — phase E closed: the hand-copied blobs moved into the window.
   Found on the way: crt0 enabled the NMI before installing the `$0100`

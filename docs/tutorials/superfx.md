@@ -483,11 +483,13 @@ that give the transfer its time; it returns once they are on screen (HDMA
 starts a channel at line 0, so the bands appear a frame later). The two
 bands must add up to 73 lines or more for a 16 KB frame.
 
-Until 2026-09-29 the wait read a V counter it never re-latched (the latch
-is cleared by reading STAT78 `$213F`, snesdev-wiki — a point that page marks
-"not fully confirmed") and started at whatever line that stale value let
-it: luna counted a third of `superfx_3d`'s framebuffer bytes landing on
-visible lines, dropped without a word. `superfx_3d` now presents about 30
+Until 2026-09-29 the wait read OPVCT (`$213D`) once per iteration without
+ever reading STAT78 (`$213F`), the only reset of OPVCT's read-twice
+flip-flop (snesdev-wiki). Every other call then started on the high byte,
+whose bits 1-7 are PPU2 open bus (anomie, fullsnes) — the value the previous
+call had last read, 184 — and started the DMA at once: luna counted a third
+of `superfx_3d`'s framebuffer bytes landing on visible lines, dropped
+without a word. Read `$213F`, `$2137`, then `$213D` twice, every time. `superfx_3d` now presents about 30
 frames per second, all of them whole.
 
 It uses HDMA channel 1 and arms it like `hdmaEnable()` does, so it

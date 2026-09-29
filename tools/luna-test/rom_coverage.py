@@ -74,9 +74,6 @@ RATCHET = HERE / "baselines" / "never_executed.txt"
 FIRMWARE_ONLY = HERE / "baselines" / "executed_only_with_firmware.txt"
 REPORT = HERE / "ROM_COVERAGE.md"
 MANIFESTS = HERE / "manifests"
-# Manifests that depend on each other (a battery .srm written by one, read
-# by the next) run serially from their own directory; coverage reads both.
-POWER_CYCLE = HERE / "power_cycle"
 # Fixture ROMs profiled on top of the examples. The library fixture runs its
 # whole assertion path in ~90 frames (test_libtest.py's 3 M instructions end
 # at frame 90, the rest is WAI); 120 covers it with margin.
@@ -122,7 +119,7 @@ def manifest_runs(rom: Path) -> list[tuple[str, list[str], str | None]]:
     2026-09-26, the joypad-2 / mouse / Super Scope scripts."""
     import tomllib
     runs = []
-    for toml in sorted(MANIFESTS.glob("*.toml")) + sorted(POWER_CYCLE.glob("*.toml")):
+    for toml in sorted(MANIFESTS.glob("*.toml")):
         try:
             m = tomllib.loads(toml.read_text(encoding="utf-8"))
         except tomllib.TOMLDecodeError:

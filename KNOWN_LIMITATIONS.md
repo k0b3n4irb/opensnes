@@ -490,26 +490,32 @@ with luna's `--port1 none --port2 none` (both read 0; both read 1 with pads).
 ### 🟢 Super FX: `gsuDmaFullFrame()` wrote a third of the framebuffer on visible lines (fixed 2026-09-29)
 
 Up to v0.46.0 `gsuDmaFullFrame()` polled the V counter by reading SLHV
-(`$2137`) and OPVCT (`$213D`) without ever reading STAT78 (`$213F`), which
-clears the counter latch; under the latch model snesdev-wiki documents (a
-new latch only on the 0 -> 1 transition — the page marks it "not fully
-confirmed"), the poll read one stale line and started the 16 KB DMA
-wherever that let it. On luna, which follows that model, half of
-`superfx_3d`'s transfers started at lines 6-12 and 481 866 of 1 359 872
-bytes landed on visible lines: the PPU drops such writes silently, so the
-cube was drawn from partly stale frames. Two more slips of the same kind: a
+(`$2137`) and then OPVCT (`$213D`) **once** per iteration, and never read
+STAT78 (`$213F`). OPVCT is read twice — low byte, then high byte — through
+a flip-flop that only STAT78 resets (snesdev-wiki, PPU registers), and the
+high byte carries V's bit 8 with PPU2 open bus in bits 1-7: the last value
+read from PPU2 (anomie's register doc, fullsnes). A poll that ended on an
+odd number of reads left the flip-flop on the high byte, so the next call's
+first read returned the previous exit value (184, or 232) through the open
+bus and the DMA started at once — at lines 6-12 in half of `superfx_3d`'s
+transfers, measured with luna's memory trace (1 281 reads, then 1 read
+returning `$B8`). 481 866 of 1 359 872 framebuffer bytes landed on visible
+lines: the PPU drops such writes silently, so the cube was drawn from
+partly stale frames. Two more slips of the same kind: a
 call made late in the bottom band still started (the end overran into the
 picture), and the first DMA after `gsuSetupHdmaBlanking()` ran before the
 bands existed (HDMA starts a channel at line 0).
 
-Fixed: the poll reads STAT78 first (right under either latch model), starts
+Fixed: every read of the counter starts with STAT78 and reads OPVCT twice,
+starts
 only on a line from which the frame lands whole — 225 - bottom to 152 + top,
 lines 185-192 with the usual 40 + 40 — or waits for the next frame, and
 `gsuSetupHdmaBlanking()` returns once its bands are on screen.
 `superfx_3d` shows about 30 whole frames per second where it showed 53
 partly lost ones. Pinned by `tools/luna-test/vram_dma_blank.py`, which since
 the same day holds every example to luna's `[asserts.dma] unsafe_writes = 0`.
-Code of your own that polls the V counter should read `$213F` before `$2137`.
+Code of your own that polls the V counter should read `$213F`, then `$2137`,
+then `$213D` twice, every time.
 
 ### 🟢 Super FX: VBlanks were lost during every GSU job (fixed 2026-09-25)
 

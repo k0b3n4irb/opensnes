@@ -234,10 +234,12 @@ _tm_col:
 ; the last line that leaves ~110 lines of blank (the rest of this frame +
 ; the next frame's top band: 152 + top; 16 KB at 152 bytes per line is
 ; 108). Bands from gsuSetupHdmaBlanking — 40 + 40 gives lines 185-192. Called later than that, it waits for the next
-; frame's window. Until 2026-09-29 it started at any line >= 184 of a
-; stale V counter (no STAT78 read, snesdev-wiki: SLHV latches on the
-; latch's 0 -> 1 transition only): luna counted 481 866 of 1 359 872
-; bytes written on visible lines in superfx_3d, silently dropped.
+; frame's window. Until 2026-09-29 it read OPVCT once per poll and never
+; STAT78, the only reset of OPVCT's read-twice flip-flop (snesdev-wiki):
+; every other call started on the high byte, PPU2 open bus in bits 1-7
+; (anomie, fullsnes) = the previous exit value, and left at once. luna
+; counted 481 866 of 1 359 872 bytes written on visible lines in
+; superfx_3d, silently dropped.
 ; The VRAM and DMA registers are written after the wait, so an NMI during
 ; it cannot move VMADD under the transfer.
 ; Reads gsu_dma_src_hi for double-buffering support.

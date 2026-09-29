@@ -466,7 +466,7 @@ test-manifests:
 	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
 	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
 	@$(MAKE) -s -C devtools/libtests_gsu        # libtest_gsu_cached.toml fixture
-	@$(MAKE) -s -C devtools/libtests_sa1_sram   # power_cycle/d_,e_ fixture
+	@$(MAKE) -s -C devtools/libtests_sa1_sram   # d_/e_sa1_bwram power-cycle fixture
 	@tools/luna-test/bin/luna test --jobs 0 \
 		tools/luna-test/stress/hwmath/hwmath.toml \
 		tools/luna-test/stress/ppumul/ppumul.toml \
@@ -474,9 +474,10 @@ test-manifests:
 		tools/luna-test/stress/bcd/bcd.toml \
 		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
 		tools/luna-test/manifests
-	@# Power-cycle chains write a .srm that the next manifest reads: they run
-	@# serially, in file order, apart from the parallel batch above.
-	@tools/luna-test/bin/luna test tools/luna-test/power_cycle
+	@# Power-cycle chains (a_/b_ sram, d_/e_ SA-1 BW-RAM) write a .srm the next
+	@# manifest reads: luna >= v1.30.1 runs manifests chained by a battery
+	@# file in order inside the parallel batch (they sat in a serial
+	@# power_cycle/ pass from 2026-09-27 until then).
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on every example, both arches (the old arch-dependent pair was a

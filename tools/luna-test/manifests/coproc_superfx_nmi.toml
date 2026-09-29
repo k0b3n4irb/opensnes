@@ -16,7 +16,7 @@ frame_count = { ge = 590, le = 600, width = 2 }
 # fetches during jobs, 0 bus violations. With the old stub: CPU lost at PC
 # $84, frame_count stuck at 27, 5446 bus violations.
 # 2026-09-29: 294 at frame 600, 1180 vector fetches — gsuDmaFullFrame now
-# starts only in lines 185-192 (a stale V counter used to start it anywhere
+# starts only in lines 185-192 (a read-twice flip-flop left on the high byte used to start it anywhere
 # and drop a third of the framebuffer), the loop runs at ~30 fps instead of
 # ~53, and more of the line-200 IRQs land inside jobs. Lower bound 250.
 irq_ticks = { ge = 250, le = 600, width = 2 }
