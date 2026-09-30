@@ -11,7 +11,8 @@ Two checks:
 1. **Every example** (the corpus, `--frames` frames): luna's own
    `[asserts.dma] unsafe_writes = 0`, one generated manifest per example,
    run by `luna test --jobs 0` — luna counts, this script only writes the
-   question.
+   question. (Until luna v1.30.2 the assert stopped at 1 000 000 trace
+   events and the Super FX examples were run over 55 frames.)
 2. **Presented Super FX frames** (`PRESENT` below, gsuPresent — superfx
    runtime chantier, phase D): the framebuffer moves as whole frames,
    into alternating VRAM blocks, each byte at the same offset it had in Game
@@ -36,11 +37,6 @@ sys.path.insert(0, str(HERE))
 from luna_runner import discover_example_roms, example_key, find_luna  # noqa: E402
 
 FRAMES = 200
-# luna's [asserts.dma] stores at most 1 000 000 events and refuses to count
-# past that ("counts would under-report"). A Super FX example moves 16 KB a
-# frame, so 200 frames overflow: such an example is run again over CAP_FRAMES
-# (55 x 16 KB < 1 000 000), still well past its boot.
-CAP_FRAMES = 55
 
 # Examples that present Super FX frames with gsuPresent: (key, frame bytes,
 # first frame to look at — after boot, when frames flow).
@@ -68,19 +64,6 @@ def outside_blank(rows: list[dict]) -> list[dict]:
 
 
 def check_blank(luna: str, roms: list[Path], frames: int) -> list[str]:
-    """One manifest per example asserting luna's unsafe_writes = 0, run as a
-    batch; returns the FAIL blocks luna printed. An example whose trace hit
-    luna's event cap is run again over CAP_FRAMES."""
-    fails = _blank_batch(luna, roms, frames)
-    capped = [f for f in fails if "event cap" in f]
-    if capped and frames > CAP_FRAMES:
-        keys = {f.split(" — ")[0] for f in capped}
-        again = [r for r in roms if example_key(r) in keys]
-        fails = [f for f in fails if f not in capped] + _blank_batch(luna, again, CAP_FRAMES)
-    return fails
-
-
-def _blank_batch(luna: str, roms: list[Path], frames: int) -> list[str]:
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         for rom in roms:
@@ -190,8 +173,7 @@ def main() -> int:
         print(f"  FAIL  {f}")
     fails = len(blank_fails)
     print(f"VRAM DMA in blank: {len(roms) - fails}/{len(roms)} examples clean over "
-          f"{args.frames} frames, {CAP_FRAMES} for those past luna's trace cap "
-          f"([asserts.dma] unsafe_writes = 0)")
+          f"{args.frames} frames ([asserts.dma] unsafe_writes = 0)")
 
     for key, size, first in PRESENT:
         if args.only and args.only != key:

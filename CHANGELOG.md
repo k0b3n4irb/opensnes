@@ -15,7 +15,7 @@ double-buffered and moved to VRAM by the NMI (`gsuPresent`). The new
 GSU renders at 30. Checking that pipeline with luna found `superfx_3d`
 losing a third of its framebuffer to a silent VRAM failure; every example
 is now held to no VRAM DMA outside blank. Also a `tile` module for tiles
-made at run time, and luna v1.30.1.
+made at run time, and luna v1.30.2.
 
 ### Added
 - feat(lib): **`tile` module — tiles made at run time.**
@@ -74,10 +74,12 @@ made at run time, and luna v1.30.1.
   ROM (a RAM section at the top of `$7E` read as a full bank $00).
 
 ### Changed
-- test(luna-test): **luna v1.30.1.** Its `--jobs` keeps manifests chained by
+- test(luna-test): **luna v1.30.2.** Its `--jobs` keeps manifests chained by
   a battery file in order, so the five power-cycle manifests (SRAM, SA-1
   BW-RAM) are back in `manifests/`, in the one parallel batch; the serial
-  `power_cycle/` pass is gone. No baseline moved.
+  `power_cycle/` pass is gone. `[asserts.dma]` no longer stops at a million
+  trace events, so `vram_dma_blank.py` checks the Super FX examples over
+  the same 200 frames as the rest. No baseline moved.
 - refactor(runtime,lib): **the Super FX interrupt entries and `gsuLaunch`'s
   wait loop live in the RAM code window** (a Super FX build reserves 256
   bytes for the SDK on top of `RAM_CODE_SIZE`). They were position-

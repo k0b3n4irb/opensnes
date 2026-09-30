@@ -151,8 +151,9 @@ half-landed frame shown; `gsu_pres_frames` for the rate; profile
   105 000 mclk (a third of a frame) for 224 bytes → asm. Throughput table
   (skeleton): none 15 fps, 40/40 30, 76/4 30 (16 112 B, 272 short), 84/4
   30 (whole frame in one VBlank; the job, waiting for RAM during the
-  transfer, is the limit). luna's `[asserts.dma]` refuses past 1 000 000
-  trace events: Super FX examples are checked over 55 frames (to luna).
+  transfer, is the limit). luna's `[asserts.dma]` refused past 1 000 000
+  trace events, so Super FX examples were checked over 55 frames; luna
+  v1.30.2 counts without storing the trace, 200 frames again.
   (Corrected later on 2026-09-29, before the release: the first write-up blamed the
   counter latch — "luna does not re-latch without STAT78". A probe showed
   luna re-latches on every SLHV read; a memory trace showed the real
