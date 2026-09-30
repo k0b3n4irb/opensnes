@@ -768,13 +768,21 @@ def print_ram_budget_check(table: SymbolTable, warn_threshold: int = 1024,
     far = [s for s in table.ramsections
            if s.bank == 0x7E and 0x2000 <= s.address < 0x10000]
     if far:
-        far_top = max(s.address + s.size for s in far)
+        # The RAM code window (RAM_CODE_SIZE) is pinned at the top of the
+        # band: the free space is what lies between the other sections and
+        # the window's start, not above the window.
+        window = [s for s in far if s.name == '.ram_code_space']
+        rest = [s for s in far if s.name != '.ram_code_space']
+        ceiling = min((s.address for s in window), default=0x10000)
+        far_top = max((s.address + s.size for s in rest), default=0x2000)
         far_total = sum(s.size for s in far)
         far_c = sum(s.size for s in far if s.name.startswith('.far.'))
+        window_note = (f"; RAM code window {ceiling and 0x10000 - ceiling} "
+                       f"bytes at ${ceiling:04X}" if window else "")
         print(f"{Colors.GREEN}OK: far RAM band $7E:2000-$FFFF: "
-              f"{0x10000 - far_top} bytes free (top at ${far_top:04X}; "
+              f"{ceiling - far_top} bytes free (top at ${far_top:04X}; "
               f"{far_total} bytes in {len(far)} sections, {far_c} bytes "
-              f"of C __far objects){Colors.RESET}")
+              f"of C __far objects{window_note}){Colors.RESET}")
     return 0
 
 

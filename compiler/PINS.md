@@ -31,7 +31,7 @@ reformat without updating the script.
 |------|-----|--------|
 | compiler/cproc | 771bdf010d8ac854792b1e369c32c4e84d74a653 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 794c6e3370d0726347b1ad0eb1ebc235b726e065 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 9002e3d1bfe56e869440a18c066ab5c466660812 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 3) |
+| compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -137,15 +137,21 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 3 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20)
+### compiler/wla-dx — 4 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-30)
 
 ```
+8077133 wlalink: the [ramsections] listing of the .sym ignores .BASE too
 9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
 
-The newest patch completes the first one. `86df331` fixed
+`8077133` (2026-09-30) is the third place the base leaked: the
+`[ramsections]` block of the `.sym`, which listed a HiROM `$7E` section as
+`13e:` and bank-0 RAM as `c0:`. No ROM byte changes (84/84 identical); the
+far-RAM-band check of `symmap.py` now sees HiROM's sections.
+
+`9002e3d` completes the first one. `86df331` fixed
 `get_snes_pc_bank()`; the calculation engine has a second path to a label's
 bank — the `:label` operator, `SI_OP_BANK` / `SI_OP_BANK_BYTE` — which added
 the item's base unconditionally. Under `.BASE $C0` (every HiROM unit)

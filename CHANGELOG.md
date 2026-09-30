@@ -16,6 +16,12 @@ All notable changes to OpenSNES are documented in this file.
   ROM (a RAM section at the top of `$7E` read as a full bank $00).
 
 ### Fixed
+- fix(compiler): **HiROM symbol files list RAM sections in their real bank.**
+  wlalink added `.BASE $C0` to the `[ramsections]` block (a `$7E` section
+  read `13e:`, bank-0 RAM `c0:`), so `symmap.py`'s far-RAM-band report saw
+  none of a HiROM build's sections. wla-dx patch `8077133` (4 local patches
+  now); no ROM byte changes. The far-band report also measures the free
+  space below the RAM code window instead of above it.
 - fix(runtime): **a Super FX job started with its IRQ on STOP unmasked no
   longer locks the CPU.** With CFGR bit 7 clear and the I flag clear (any
   game that uses a timer IRQ), the GSU's IRQ went to the user's IRQ handler,
