@@ -14,6 +14,32 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-09-30)
+
+`snes_sources` on 2026-09-30: **31 943 chunks, 208 sources captured of 234,
+built 2026-09-30T01:35:00Z, chunker v7, fingerprint `55507a6f2907`**
+(snes-rag's `2026-09-30_from_snes-rag_c8-luna.md`). What moved:
+
+- **C8 bounded to hardware** (`audited_scope = "hardware"`): the 0.7
+  handicap on audited sources stays on every hardware question, drops where
+  the `not-toolchain` gate closes. Our negative control (`cc65816 calling
+  convention: push order and pointer size`, k=3, no exclusion) answers our
+  ABI at ranks 1 and 2 again, `wdc-65816-manual` 3rd; never qbe-docs.
+- **`luna-docs` recaptured at v1.30.2** (it had stayed at v1.27.0: luna's
+  history rewrite made snes-rag's `git pull --ff-only` fail silently;
+  their capture clones now fetch + reset).
+- **v0.46.0 in `opensnes-docs`**: the ABI return row we reported is served
+  corrected. A chunk id follows the **position** in its document, not the
+  content: `913a9c160f2433dd` kept its id with new text — quote ids with
+  the date or the fingerprint.
+- **`tools.doctor` checks a witness verdict** (our suggestion): sprite Y+1
+  must come out `unsettled`, SIWP `confirmed` — the fingerprint proves the
+  index, the witness proves the verify code.
+- Eval: recall@5 82.5 %, recall@1 55.3 %, recall@10 89.5 %, MRR 0.664.
+
+Golden queries rerun on `55507a6f2907`: **9 of 9 green**, sources as in the
+table below.
+
 ## Index state (2026-09-27, second update)
 
 Evening (snes-rag's `…_classement.md`, same fingerprint): ranking changed —
@@ -116,7 +142,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-09-27, index `bb5dbf5eff5d`)
+## Golden queries (status 2026-09-30, index `55507a6f2907`; 9/9 also on `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 
