@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 771bdf010d8ac854792b1e369c32c4e84d74a653 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 794c6e3370d0726347b1ad0eb1ebc235b726e065 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 354a845c0bdb534a6eb83437999de3b6d5b27f4f | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | a89fd88b8195f647955c6f7029af360d06f97a18 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 31 patches since upstream merge-base 7051114
+### compiler/cproc — 32 patches since upstream merge-base 7051114
 
 ```
+354a845 OpenSNES: __ramcode, a function specifier for the RAM code window
 771bdf0 expr: typechar.u.basic, not u.arith, in the fork's type layout (adapts 23c57a7)
 c7e96cc util: Check for overflow in array grow (upstream a964406, merged with 0efca54's empty-array rule)
 b9ff678 test: Add some tests for VM declarations and character constant escapes (upstream 057381e)
@@ -83,7 +84,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 85 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 86 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -95,6 +96,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+a89fd88 w65816: a function in section ".ram_code" joins the RAM code window
 794c6e3 w65816: temps whose lives never overlap share a stack slot (slot colouring from liveness), under a slot-ownership check
 77998b5 fix exponential complexity in usewidthle() (upstream b58e2e6, cherry-picked 2026-09-26)
 ceead63 w65816: every Kl read of a high word checks that a producer wrote it (Kl high-half invariant); Ocopy Kl moves both words

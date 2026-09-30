@@ -12,6 +12,12 @@ All notable changes to OpenSNES are documented in this file.
   keep running while a Super FX job owns the ROM: the GSU fixture waits on a
   ROM-resident job from the window (33 frames, no bus violation; the same
   loop in ROM loses the CPU). Checked on LoROM, HiROM, SA-1 and FastROM.
+  **C functions too** (2026-09-30): `RAM_CODE` (`__ramcode`, a function
+  specifier in cproc; QBE emits the window section, with an assembler
+  `.FAIL` naming the function when the project has no window). The GSU
+  fixture's fourth job waits in C from RAM, 0 bus violations; the same
+  function without `RAM_CODE` counts 49 585. `gsu_owns_cart` and `REG_CFGR`
+  are now in `superfx.h`.
   `symmap.py` no longer counts wlalink's `RAM_USAGE_*` markers as bank-$00
   ROM (a RAM section at the top of `$7E` read as a full bank $00).
 

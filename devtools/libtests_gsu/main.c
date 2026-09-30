@@ -18,6 +18,35 @@ extern void gsuJobClearResults(void);
 extern u16 r_sum, r_outer, r_marker;
 extern void ramRunRomJob(void);
 extern u16 r_ram_frames, r_ram_polls;
+extern volatile u16 frame_count;
+
+/** @brief fourth job, the wait loop written in C (RAM_CODE): frames, polls */
+u16 r_c_frames;
+u16 r_c_polls;
+
+/* The same job as ramRunRomJob, in C. Everything here compiles to register
+ * and bank-0 RAM accesses, no call: while RON = 1 a single ROM fetch would
+ * count as a bus violation, and the manifest asserts there are none. */
+RAM_CODE static void ram_c_rom_job(void) {
+    u16 start, polls = 0;
+
+    gsu_owns_cart = 1;
+    REG_CFGR = gsu_cfgr;
+    REG_CLSR = 1;
+    REG_SCBR = gsu_scbr;
+    REG_SCMR = (u8)(gsu_scmr | 0x18);   /* RON + RAN */
+    REG_PBR = gsu_prog_bank;
+    start = frame_count;
+    REG_GSU_R15 = gsu_prog_addr;        /* the GSU starts */
+    while (REG_SFR_L & SFR_GO) {
+        if (polls != 0xFFFF)
+            polls++;
+    }
+    REG_SCMR = 0;
+    gsu_owns_cart = 0;
+    r_c_frames = frame_count - start;
+    r_c_polls = polls;
+}
 
 /** @brief gsuInit(): 1 on a Super FX cart */
 u16 r_present;
@@ -81,6 +110,12 @@ int main(void) {
     gsuJobClearResults();
     gsuSetProgram(gsu_job);
     ramRunRomJob();
+    gsuJobReadResults();
+
+    /* Fourth job: the same, the wait loop in C (RAM_CODE). Results cleared
+     * again; r_sum / r_marker below come from this run. */
+    gsuJobClearResults();
+    ram_c_rom_job();
     gsuJobReadResults();
     r_done = 0xD0E5;
 

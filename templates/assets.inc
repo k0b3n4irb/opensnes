@@ -85,5 +85,8 @@
 ; Call it with jsl; it may not call or read ROM while the ROM is not the
 ; CPU's. BASE $7D: the window is stored in ROM bank 1, and 1 + $7D = $7E.
 .MACRO RAM_CODE_SECTION ARGS name
+.IFNDEF RAM_CODE
+.FAIL "RAM_CODE_SECTION used but the project has no RAM code window: set RAM_CODE_SIZE in the Makefile"
+.ENDIF
 .SECTION "ram_code.\1" BASE $7D APPENDTO ".ram_code"
 .ENDM

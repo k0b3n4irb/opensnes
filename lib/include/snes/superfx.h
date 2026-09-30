@@ -47,6 +47,7 @@
 
 #define REG_BRAMR      (*(volatile u8*)0x3033)
 #define REG_PBR        (*(volatile u8*)0x3034)
+#define REG_CFGR       (*(volatile u8*)0x3037)
 #define REG_ROMBR      (*(volatile u8*)0x3036)
 #define REG_SCBR       (*(volatile u8*)0x3038)
 #define REG_CLSR       (*(volatile u8*)0x3039)
@@ -111,6 +112,17 @@ extern u8 superfx_status;
  * I flag clear locked the CPU in its IRQ entry.)
  */
 extern volatile u8 gsu_stop_irqs;
+
+/**
+ * @brief 1 while a GSU job owns the Game Pak ROM (crt0)
+ *
+ * gsuLaunch() sets it around its job. Code of your own that starts a job
+ * with SCMR RON = 1 (from the RAM code window: RAM_CODE, RAM_CODE_SECTION)
+ * sets it before the start and clears it once SCMR is back to 0: while it
+ * is 1 the NMI and IRQ entries (crt0, in WRAM) do only the ROM-free part of
+ * their work — frame_count, OAM upload, IRQ acknowledge — and defer the rest.
+ */
+extern u8 gsu_owns_cart;
 
 /*============================================================================
  * API Functions

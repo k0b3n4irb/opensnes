@@ -287,6 +287,36 @@ above). `devtools/libtests_gsu` runs its job a third time this way: 33 frames
 of a ROM-resident job with the CPU polling from RAM and no bus violation; the
 same loop in a plain ROM section loses the CPU at once.
 
+The loop can be C. `RAM_CODE` on a function puts it in the same window:
+
+```c
+RAM_CODE static void wait_rom_job(void) {
+    u16 polls = 0;
+    gsu_owns_cart = 1;
+    REG_CFGR = gsu_cfgr;
+    REG_CLSR = 1;
+    REG_SCBR = gsu_scbr;
+    REG_SCMR = (u8)(gsu_scmr | 0x18);   /* RON + RAN */
+    REG_PBR = gsu_prog_bank;
+    REG_GSU_R15 = gsu_prog_addr;        /* the GSU starts */
+    while (REG_SFR_L & SFR_GO) {
+        polls++;
+    }
+    REG_SCMR = 0;
+    gsu_owns_cart = 0;
+}
+```
+
+What the compiler does not check is the same as in assembly: while the GSU
+owns the ROM, nothing in such a function may reach the ROM. In C that
+excludes more than it looks: any call that is not itself `RAM_CODE` (library
+functions, and inline ones the compiler chose not to inline), the runtime
+helpers a multiplication, a division or a 32-bit shift calls, switch tables
+and const data. Register writes, bank-0 variables and `FAR` variables are
+fine. luna's `gsu.bus_violations` tells you at once when one slipped through:
+the fixture's fourth job asserts 0, and the same function without `RAM_CODE`
+counts 49 585.
+
 
 ## SuperFX Assembly Rules
 

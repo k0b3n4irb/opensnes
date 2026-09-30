@@ -11,5 +11,5 @@ GSUSRC      := gsu_job.sfx
 USE_LIB     := 1
 USE_SUPERFX := 1
 LIB_MODULES := console
-RAM_CODE_SIZE := 256
+RAM_CODE_SIZE := 512
 include $(OPENSNES)/make/common.mk
