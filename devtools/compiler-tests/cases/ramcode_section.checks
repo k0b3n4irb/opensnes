@@ -1,0 +1,11 @@
+# the two __ramcode functions join the window, the plain one does not
+present \.SECTION "ram_code\.ram_step" BASE \$7D APPENDTO "\.ram_code"
+present \.SECTION "ram_code\.ram_loop" BASE \$7D APPENDTO "\.ram_code"
+present \.SECTION "\.text\.rom_caller" SUPERFREE
+absent  \.SECTION "\.text\.ram_step"
+absent  \.SECTION "\.text\.ram_loop"
+# each window function is guarded against a project with no window
+count 2 \.IFNDEF RAM_CODE\n\.FAIL "[a-z_]+ is __ramcode but the project has no RAM code window
+# a ROM caller reaches it with an ordinary long call or tail jump (jml:
+# the window function's rtl returns to rom_caller's own caller)
+in rom_caller: present j[sm]l ram_step

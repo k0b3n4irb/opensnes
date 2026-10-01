@@ -113,20 +113,21 @@
 .SECTION ".gsu_vector_stubs" SEMIFREE BANK 0
 gsu_vector_stubs:
     ; BRK / ABORT and COP: a WRAM RTI (their ROM handler is unreadable during
-    ; a job); NMI and IRQ: the WRAM handlers of crt0's gsu_nmi_blob, which
-    ; fall through to NmiHandler / IrqHandler whenever the GSU is idle.
+    ; a job); NMI and IRQ: crt0's WRAM handlers, which fall through to
+    ; NmiHandler / IrqHandler whenever the GSU is idle. All three live in the
+    ; RAM code window, so their labels are already $7E addresses.
     .db $5C
-    .dw gsu_nmi_wram + (gsu_rti_blob - gsu_nmi_blob)
-    .db :gsu_nmi_wram
+    .dw gsu_rti_blob & $FFFF
+    .db :gsu_rti_blob
     .db $5C
-    .dw gsu_nmi_wram + (gsu_rti_blob - gsu_nmi_blob)
-    .db :gsu_nmi_wram
+    .dw gsu_rti_blob & $FFFF
+    .db :gsu_rti_blob
     .db $5C
-    .dw gsu_nmi_wram        ; phase B: the WRAM NMI
-    .db :gsu_nmi_wram
+    .dw gsu_nmi_blob & $FFFF    ; phase B: the WRAM NMI
+    .db :gsu_nmi_blob
     .db $5C
-    .dw gsu_nmi_wram + (gsu_irq_blob - gsu_nmi_blob)
-    .db :gsu_nmi_wram
+    .dw gsu_irq_blob & $FFFF
+    .db :gsu_irq_blob
 .ENDS
 
 ;------------------------------------------------------------------------------

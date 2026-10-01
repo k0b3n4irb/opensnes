@@ -77,7 +77,7 @@ tutorials' Gotchas.
 
 ## luna's reply, 2026-09-20 (`/tmp/luna_report_opensnes_2026-09-20.md`)
 
-All four requests are on luna `develop` (`4808f6e`), untagged; our reply
+All four requests are on luna `develop` (`4808f6e`, `d286614` since luna's history rewrite of 2026-09-29), untagged at the time; our reply
 (`/tmp/opensnes_reply_to_luna_2026-09-21.md`) asks for the tag. Queued behind
 it:
 

@@ -8,7 +8,15 @@
 ; Y = sin[bird*5 + frame+64]/2 + sin[bird*11 + frame*3]/4 + 16
 ;
 ; All memory: sta.l / lda.l (bypass undefined DB register).
-; Sine lookup: lda.l sine_table,x (opcode $BF — full 24-bit, no DB needed).
+; Sine lookup: lda.l SINE,x (opcode $BF — full 24-bit, no DB needed).
+;
+; Where the SA-1 runs (2026-09-27): the loop and the sine table are copied
+; into I-RAM at boot and run from there, so the SA-1 does not share the ROM
+; with the main CPU. Built with SA1_CODE_IN := ROM (see the Makefile), both
+; stay in ROM, as this example did until then: compare the two with
+; `luna profile … --from-frame 60 --until-frame 180` (docs/tutorials/sa1.md).
+; The loop is position-independent: brl instead of jmp, and SINE is the
+; table's address in whichever memory holds it.
 ;==============================================================================
 
 .ifdef SA1
@@ -21,6 +29,14 @@
 ; --- Constants ---
 .EQU NBIRDS      128
 .EQU BUF         $3010
+.EQU IRAM_CODE   $3300          ; the copied loop ($3300-$35FF)
+.EQU IRAM_SINE   $3600          ; the copied sine table ($3600-$36FF)
+
+.ifdef SA1_CODE_IN_ROM
+.DEFINE SINE sine_table
+.else
+.DEFINE SINE $003600
+.endif
 
 ; --- I-RAM layout ---
 ; $3000 = magic byte ($A5 = ready)
@@ -37,6 +53,9 @@
 ; $300B = temp: bird*2 for multiply
 ; $300C-$300F = (unused)
 ; $3010-$320F = bird position buffer (128 * 4 bytes)
+; $3300-$35FF = the main loop, copied from ROM (I-RAM build)
+; $3600-$36FF = the sine table, copied from ROM (I-RAM build)
+; stack grows down from $37FF (a few bytes)
 
 SA1Start:
     sei
@@ -61,9 +80,31 @@ SA1Start:
     sta.l $3002                 ; frame = 0
     sta.l $3001                 ; sync = 0
 
+.ifndef SA1_CODE_IN_ROM
+    ; Copy the loop and the sine table into I-RAM, then run from there
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+-   lda.l _main,x
+    sta.l IRAM_CODE,x
+    inx
+    cpx #(_main_end - _main)
+    bne -
+    ldx #$0000
+-   lda.l sine_table,x
+    sta.l IRAM_SINE,x
+    inx
+    cpx #256
+    bne -
+.endif
+
     ; Signal SNES CPU that SA-1 is alive
     lda #$A5
     sta.l $3000                 ; magic byte
+
+.ifndef SA1_CODE_IN_ROM
+    jml IRAM_CODE
+.endif
 
 ; ======================================================================
 ; Main loop: wait for sync, compute frame, signal ready
@@ -120,7 +161,7 @@ _bird:
     tax
     sep #$20
     .ACCU 8
-    lda.l sine_table,x          ; sin[idx1] — opcode $BF, no DB!
+    lda.l SINE,x                ; sin[idx1] — opcode $BF, no DB!
     lsr a                       ; /2 → range 0-127
     sta.l $3008                 ; partial X
 
@@ -140,7 +181,7 @@ _bird:
     tax
     sep #$20
     .ACCU 8
-    lda.l sine_table,x          ; sin[idx2]
+    lda.l SINE,x                ; sin[idx2]
     lsr a                       ; /2
     lsr a                       ; /4 → range 0-63
     clc
@@ -168,7 +209,7 @@ _bird:
     tax
     sep #$20
     .ACCU 8
-    lda.l sine_table,x          ; sin[idx3] (cosine due to +64)
+    lda.l SINE,x                ; sin[idx3] (cosine due to +64)
     lsr a                       ; /2 → range 0-127
     sta.l $3009                 ; partial Y
 
@@ -191,7 +232,7 @@ _bird:
     tax
     sep #$20
     .ACCU 8
-    lda.l sine_table,x          ; sin[idx4]
+    lda.l SINE,x                ; sin[idx4]
     lsr a                       ; /2
     lsr a                       ; /4 → range 0-63
     clc
@@ -222,20 +263,22 @@ _bird:
     sta.l BUF+3,x              ; unused
 
     ; ------------------------------------------------------------------
-    ; Next bird (loop body > 128 bytes → can't use bne, use beq+jmp)
+    ; Next bird (loop body > 128 bytes → can't use bne, use beq+brl;
+    ; brl, not jmp, so the loop runs wherever it was copied)
     ; ------------------------------------------------------------------
     lda.l $3006
     inc a
     sta.l $3006
     cmp #NBIRDS
     beq +
-    jmp _bird
+    brl _bird
 +
 
     ; Signal SNES CPU that buffer is ready
     lda #$01
     sta.l $3001
-    jmp _main
+    brl _main
+_main_end:
 
 ; ======================================================================
 ; 256-byte sine table: sin[i] = round(128 + 127 * sin(2*pi*i/256))

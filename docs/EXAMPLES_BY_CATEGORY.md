@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 84 examples organized by topic. For a progressive learning path, see
+All 85 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -233,6 +233,7 @@ hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 |---------|-------------|
 | @subpage examples_chips_superfx_hello | Boot + SRAM + FMULT hardware tests |
 | @subpage examples_chips_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |
+| @subpage examples_chips_superfx_game_skeleton | A 60 fps game loop while the GSU renders; double-buffered presentation |
 
 ### DSP-1 Coprocessor
 

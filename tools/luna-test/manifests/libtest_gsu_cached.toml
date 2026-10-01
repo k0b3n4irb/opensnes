@@ -12,14 +12,42 @@
 #     violations, the loop stuck at 1 frame, 26 NMIs instead of 58.
 #   * The job's result reaches the CPU after gsuWait(): the sum of the loop,
 #     200 x 3000 x 7 mod 65536 = $1640, in Game Pak RAM $70:0000.
-# Not asserted: the $C0DE marker the job stores last reads $00DE after a
-# run from the cache (full from ROM) — reported to luna, OPEN_luna.md
-# 2026-09-27; to add once settled.
+#   * The job's last store reaches RAM: the $C0DE marker, written by an
+#     STW followed by a single NOP and STOP. From the cache those take
+#     6, 1, 1 GSU clocks, less than the RAM buffer needs to write the
+#     second byte (5-6 clocks); luna before v1.28.1 stopped clocking the
+#     buffer at STOP and lost it ($00DE), a console does not (luna's reply
+#     of 2026-09-27, after ares superfx.cpp).
+#   * IRQ on STOP (2026-09-27): the same job again with CFGR bit 7 clear
+#     and the I flag clear (a V-timer IRQ armed, as a game has one).
+#     crt0's WRAM IRQ entry acknowledges the GSU (SFR bit 15) and counts it
+#     in gsu_stop_irqs: the loop waits on that counter, 7 frames, the count
+#     moves by exactly 1, the GSU is stopped when it does. Negative control
+#     (crt0 before the fix, IRQ passed to IrqHandler): the CPU never leaves
+#     its IRQ entry (PC $7E:205D at frame 60), r_done stays 0.
+#   * A job run from ROM (RON = 1) while the CPU keeps working (2026-09-29):
+#     the wait loop is in the RAM code window (RAM_CODE_SIZE = 256,
+#     ram_job.asm, RAM_CODE_SECTION), linked at $7E:FF01 and copied there
+#     by crt0. Game Pak RAM is cleared first, so r_sum / r_marker come from
+#     this third job. 33 frames counted by the NMI during the job, 53 270
+#     polls, bus_violations still 0. Negative control (the same loop in a
+#     plain ROM section): 497 475 violations, the CPU lost at $00:0102, the
+#     NMI dead at frame 100, r_done never written.
+#   * The same ROM job a fourth time, the wait loop written in C with
+#     RAM_CODE (main.c ram_c_rom_job; 2026-09-29): no call in its code, so
+#     no ROM fetch while RON = 1. 34 frames, 20 588 polls, results
+#     rewritten. Negative control, the same function without RAM_CODE:
+#     49 585 violations, the CPU lost at $00:0100, r_done never written.
+#   * A second entry point, by name (2026-09-29): the build writes
+#     gsu_job.sfx.h from the GSU link (GSU_JOB_MUL_JOB = 0x28), main.c
+#     passes R1 / R2 and starts mul_job with gsuCall() from ROM (300 x 7)
+#     and gsuStartCached() from the cache (1000 x 9). Game Pak RAM is
+#     cleared before each run.
 #
-# Measured: `luna state --until-frame 60 --peek <sym>:2 --out -` on
-# devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.0.
+# Measured: `luna state --until-frame 150 --peek <sym>:2 --out -` on
+# devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.1.
 rom = "../../../devtools/libtests_gsu/libtest_gsu.sfc"
-frames = 60
+frames = 150
 
 [asserts.values]
 r_present = 1
@@ -28,8 +56,20 @@ r_frames_during = 7
 r_busy_after_wait = 0
 r_sum = 0x1640
 r_outer = 0
+r_marker = 0xC0DE
+r_frames_during_irq = 7
+r_stop_irqs_before = 0
+r_stop_irqs_delta = 1
+r_busy_at_irq = 0
+r_ram_frames = { ge = 25, le = 45 }
+r_ram_polls = { gt = 1000 }
+r_c_frames = { ge = 25, le = 45 }
+r_c_polls = { gt = 1000 }
+r_mul_entry = 0x28
+r_mul_rom = 2100
+r_mul_cache = 9000
 r_done = 0xD0E5
 
 [asserts.gsu]
 bus_violations = 0
-instructions_executed = { gt = 2000000 }   # 600 000 loop iterations x 4 instructions
+instructions_executed = { gt = 2000000 }   # four jobs of 600 000 loop iterations x 4 instructions

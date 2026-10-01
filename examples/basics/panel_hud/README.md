@@ -70,7 +70,7 @@ make
 
 ## Modules used
 
-`console`, `dma`, `background`, `panel`, `input`
+`console`, `dma`, `background`, `panel`, `input`, `tile` (`tileEncode4bpp`)
 
 ## Where you are
 

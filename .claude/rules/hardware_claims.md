@@ -31,14 +31,33 @@ moment of doubt*.
    The exclusion is mandatory for verification queries: our own docs
    are indexed in the corpus, and letting them answer turns the check
    into a confirmation loop (they are the thing being verified).
+   Or confront the exact sentence you are about to write:
+   ```
+   snes_verify(claim, exclude_sources=["opensnes-docs", "opensnes-notes-tech"])
+   ```
+   **Never trust its `verdict`.** `confirmed` means "an arbiter deals
+   with this point", not "this sentence is true": it checks neither
+   **polarity** (0/1, enable/protect, active high/low) nor **value**
+   (address, bit count, cycles) — two opposite claims both come out
+   `confirmed` (snes-rag measured 55 % of false claims `confirmed`,
+   2026-09-30). The claim may be written only if `evidence_state ==
+   "arbiter_states_point"` **and** one of the arbiter `evidence[].sentences`
+   states the polarity or value word for word. The two failure shapes seen
+   on 2026-10-02: a false `arbiter_states_point` whose sentences said
+   nothing about the claim (the multiplier during auto-joypad), and a false
+   `arbiter_covers_topic_only` whose sentences stated it exactly (the empty
+   window, VMADD incrementing on an ignored write) — the sentences decide,
+   both ways.
 2. **When sources conflict** — `contrast=true` lays every source's
    position side by side, ordered by authority, with anchored
    citations. This is the tool for disputed polarities and timings.
 3. **When no arbiter settles it** — write the claim as a *hypothesis*,
    not a fact ("observed; mechanism unconfirmed by references").
-   Precedent: the fixMul/auto-joypad mechanism note in
-   `KNOWN_LIMITATIONS.md`. An honest "unconfirmed" beats a confident
-   guess that calcifies.
+   Precedent: the fixMul/auto-joypad note in `KNOWN_LIMITATIONS.md`,
+   written as "observed, unconfirmed" in 2026-09 — and retired on
+   2026-10-02 when a clean probe on luna did not reproduce it. An honest
+   "unconfirmed" beats a confident guess that calcifies, and it stays easy
+   to retire.
 4. **When debugging an unexplained symptom** that could be hardware
    behaviour: query the corpus BEFORE blaming the toolchain. The
    toolchain is guilty sometimes — but "hardware behaves differently

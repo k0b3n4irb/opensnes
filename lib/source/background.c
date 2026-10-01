@@ -20,7 +20,10 @@
 /* Shadow registers for read-modify-write operations.
  * Zero-initialized by C standard (uninitialized statics are zero).
  */
-static u8 bg12nba_shadow;  /* Shadow for REG_BG12NBA ($210B) */
+/* Shadow for REG_BG12NBA ($210B). Not static since 2026-09-29: the Super FX
+ * presentation step (superfx.asm, gsu_present_step) swaps BG1's nibble in
+ * the NMI and keeps this copy right for the next bgSetGfxPtr(). */
+u8 bg12nba_shadow;
 static u8 bg34nba_shadow;  /* Shadow for REG_BG34NBA ($210C) */
 
 extern u16 bg_scroll_x[4]; /* Defined in crt0.asm .system RAMSECTION */

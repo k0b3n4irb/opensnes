@@ -24,20 +24,40 @@ speed tests measured ([higan test ROMs](https://gitlab.com/higan/snes-test-roms)
 So "3× the main CPU" holds only for SA-1 code that keeps off the ROM while the
 main CPU is on it. The table gives the rate while both CPUs are in a case; a
 real program moves between cases, so its effective speed is a mix, and a
-property of the scene rather than of the cartridge. Measure it:
+property of the scene rather than of the cartridge. Measure it.
+`examples/chips/sa1_starfield` builds both ways: by default its SA-1 copies
+its loop and sine table into I-RAM at boot and runs there; built with
+`make clean && make SA1_CODE_IN=ROM` they stay in ROM.
 
 ```sh
 luna profile examples/chips/sa1_starfield/sa1_starfield.sfc \
     --from-frame 60 --until-frame 180 --top 0
-# sa1: 4390440 instr, 21441240 clocks (0.0% idle in WAI), 20.2% of busy clocks
-#      lost to bus conflicts (rom 4327500, bwram 0, iram 13140) — ~8.56 MHz while running
-# sa1: accesses 85.9% rom, 14.1% iram, 0.0% bwram, 0.0% other
+# I-RAM build (default):
+# sa1: 5454120 instr, 21441240 clocks (0.0% idle in WAI), 0.4% of busy clocks
+#      lost to bus conflicts (rom 0, bwram 0, iram 78240) — ~10.70 MHz while running
+# sa1: accesses 0.0% rom, 100.0% iram, 0.0% bwram, 0.0% other
+# ROM build (SA1_CODE_IN=ROM):
+# sa1: 3951600 instr, 21441240 clocks (0.0% idle in WAI), 20.8% of busy clocks
+#      lost to bus conflicts (rom 4463010, bwram 0, iram 3300) — ~8.50 MHz while running
+# sa1: accesses 86.0% rom, 14.0% iram, 0.0% bwram, 0.0% other
 ```
 
-`sa1_starfield` runs its SA-1 code from ROM: 86 % of its accesses are ROM, but
-the penalty only applies when the main CPU is on ROM at the same moment, so it
-loses a fifth of its clocks, not half — about 8.6 MHz, 2.4× the main CPU
-(luna v1.28.0). Code moved to I-RAM would approach 10.74 MHz. Games like
+From ROM, 86 % of the SA-1's accesses are ROM, but the penalty only applies
+when the main CPU is on ROM at the same moment, so it loses a fifth of its
+clocks, not half: about 8.5 MHz, 2.4× the main CPU. Code in ROM also pays
+one more cycle on every jump, call and return into ROM, so a loop that
+jumps often runs slower than its conflict share alone says (luna v1.30.0,
+from ares, checked against a console on the SNES-SA1 Speed Test). From I-RAM it keeps
+almost all of them: 10.7 MHz, 3×. The remaining 0.4 % is the main CPU
+touching I-RAM too (it reads the positions there and polls the sync flag).
+Both builds draw the same frames; the I-RAM one simply finishes each frame's
+work sooner (luna v1.30.0, whose SA-1 timing matches a console on the
+SNES-SA1 Speed Test; the instruction count includes the SA-1's wait
+for the next frame, so it grows with the spare time).
+
+The I-RAM version costs 289 bytes of code and 256 of table out of the
+2 KB, and a loop written to run anywhere: `brl` instead of `jmp`, and the
+table read at its I-RAM address (`sa1_boot.asm`). Games like
 *Kirby Super Star*, *Super Mario RPG*, and *Kirby's Dream Land 3* used it to handle
 AI, physics, and decompression that the main CPU couldn't keep up with.
 

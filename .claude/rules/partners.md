@@ -50,6 +50,13 @@ the session, and the *answers* to it are project knowledge. The owner
 forwards our `to_` files and drops the partner's replies in as `from_`
 files (or in `/tmp`, from where we copy them in).
 
+**snes-rag's exchange folder** (on this machine):
+`/media/psf/Home/workspaces/SNES/snes-rag/.claude/notes/partners/opensnes/`.
+Their `from_` reports land there, and **ours are always delivered there**
+(owner instruction, 2026-10-02): write the `to_` file in the repo, then copy
+it into that folder. Check which `to_` files they already have first, so an
+outdated report is folded into the current one instead of sent late.
+
 Every `to_` report has the same spine: header (who, which pin / index
 fingerprint, status: sent as is, or still accumulating), what the
 partner made possible since the last report (first — it is the context for

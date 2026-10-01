@@ -95,6 +95,8 @@ soundbank.asm
 soundbank.h
 *.sfx.bin
 *.sfx.link
+*.sfx.h
+*.sfx.sym
 
 # Negations for the remaining broad artifact rules (*.inc under "Tool
 # outputs", *.pic/*.pal/*.map for the golden fixtures):

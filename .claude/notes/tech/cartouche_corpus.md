@@ -14,7 +14,58 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-02)
+
+`snes_sources` on 2026-10-02: **33 436 chunks, 209 sources captured of 235,
+built 2026-10-02T02:57:24Z, chunker v7, index v2, fingerprint
+`31eb1726aa31`** (snes-rag's `2026-09-30_from_snes-rag_bilan-audit.md`,
+which supersedes their three earlier notes of the 30th). New: embedding
+windows under 512 tokens, query-centred excerpts, a reserved place for
+arbiters instead of the ×1.8 multiplier, emulator source code (Mesen2
+`Core/SNES`, ares core, sd2snes `cic/`, stuntrace's GSU-2 model — they
+answer when the question names their identifiers), a
+`mesures-partenaires` source for facts partners measured. Their recall is
+now counted on the answering **passage**: 54.1 % at 5 (the source-level
+80.7 % was mostly the arbiters' prior). Golden queries rerun: **9/9**;
+negative control: our ABI at ranks 1 and 2, never qbe-docs.
+
+## Index state (2026-09-30)
+
+`snes_sources` on 2026-09-30: **31 943 chunks, 208 sources captured of 234,
+built 2026-09-30T01:35:00Z, chunker v7, fingerprint `55507a6f2907`**
+(snes-rag's `2026-09-30_from_snes-rag_c8-luna.md`). What moved:
+
+- **C8 bounded to hardware** (`audited_scope = "hardware"`): the 0.7
+  handicap on audited sources stays on every hardware question, drops where
+  the `not-toolchain` gate closes. Our negative control (`cc65816 calling
+  convention: push order and pointer size`, k=3, no exclusion) answers our
+  ABI at ranks 1 and 2 again, `wdc-65816-manual` 3rd; never qbe-docs.
+- **`luna-docs` recaptured at v1.30.2** (it had stayed at v1.27.0: luna's
+  history rewrite made snes-rag's `git pull --ff-only` fail silently;
+  their capture clones now fetch + reset).
+- **v0.46.0 in `opensnes-docs`**: the ABI return row we reported is served
+  corrected. A chunk id follows the **position** in its document, not the
+  content: `913a9c160f2433dd` kept its id with new text — quote ids with
+  the date or the fingerprint.
+- **`tools.doctor` checks a witness verdict** (our suggestion): sprite Y+1
+  must come out `unsettled`, SIWP `confirmed` — the fingerprint proves the
+  index, the witness proves the verify code.
+- Eval: recall@5 82.5 %, recall@1 55.3 %, recall@10 89.5 %, MRR 0.664.
+
+Golden queries rerun on `55507a6f2907`: **9 of 9 green**, sources as in the
+table below.
+
 ## Index state (2026-09-27, second update)
+
+Evening (snes-rag's `…_classement.md`, same fingerprint): ranking changed —
+`boost_follows` removed, a `consensus_floor` added (when BM25 and the vector
+leg both put a passage first, no source weight can bury it), recall@5
+78.9 → 83.3 %, recall@1 47.4 → 54.4 %. Three `snes_verify` fixes found by
+luna (a mangled `65C816` token, `luna-docs` promoting itself to arbiter on
+any topic, a-f words taken for addresses). The 207 captured vs 202 indexed
+gap is deduplication: six sources are served under a canonical one (`also_in`
+on the chunk). Audit of our citations of the week: none rests on `luna-docs`
+as an arbiter (reply2 §0).
 
 Served on 2026-09-27 (`snes_sources`): **31983 chunks, built
 2026-09-27T07:50:17Z, chunker v7, fingerprint `bb5dbf5eff5d`**. snes-rag's
@@ -24,10 +75,11 @@ after it (their consensus-floor ranking change). Golden queries rerun on
 `bb5dbf5eff5d`: 9 of 9 green, no. 7 (TMX flip flags) green for the first
 time; the negative control still never answered by qbe-docs.
 
-**`snes_verify` on the service still answers `confirmed` for sprite Y + 1
-on the off-topic 34-slivers passage**, although their report says their
-harness now gives `unsettled` (verify fix `6354031`): the fix is not live
-on the instance we query. Keep reading the citation before the verdict.
+**`snes_verify` fixed on the service (checked later on 2026-09-27, index
+rebuilt 08:02, same fingerprint):** sprite Y + 1 now comes out `unsettled`
+on the off-topic 34-slivers passage, and a well-cited claim (SCMR bits,
+fullsnes `725e8061d576404e`) still comes out `confirmed`. Read the
+citation anyway: a `confirmed` must quote the claim.
 The fact itself is arbitrated: snesdev-wiki `857cd9077cef3a88` ("sprites
 appear 1 line lower than their Y value … the first line of rendering is
 always hidden"), buried at the end of a long OAM chunk, so search does not
@@ -93,19 +145,22 @@ Still not captured (2026-09-12): Calypsi / WDC816CC / vbcc 65816 manuals
 - `snes_search(question, exclude_sources=[…], k, authority_min, contrast)` —
   passages with authority labels and documented-error warnings.
   `contrast=true` for disputed points (SIWP-class).
-- `snes_verify(claim, exclude_sources=[…])` — structured verdict:
-  `confirmed` / `contradicted` / `unsettled` / `not_covered`, with the
-  strongest arbiter citation, documented errors and `chunk_id`s. Always
-  compare the claim's wording to the citation: `confirmed` means "an
-  arbiter documents this point", not "your sentence is true" (seen
-  2026-09-12: a `confirmed` on the cc65816 push order cited a generic
-  65c816 stack passage; the real support was `compiler/ABI.md`).
+- `snes_verify(claim, exclude_sources=[…])` — since 2026-09-30 it serves
+  `evidence_state` (`not_covered` · `no_arbiter` ·
+  `arbiter_covers_topic_only` · `arbiter_states_point` ·
+  `documented_error_on_point`), `limits`, and `evidence`: up to five
+  passages with their `sentences`. Our rule (`hardware_claims.md`)
+  requires `arbiter_states_point` **and** a sentence that states the
+  polarity or value; the historical `verdict` is not read. Both
+  directions fail sometimes (2026-10-02: a false `arbiter_states_point` on
+  the multiplier during auto-joypad, false `topic_only` on the empty
+  window and on VMADD incrementing) — the sentences decide.
 
 Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-09-27, index `bb5dbf5eff5d`)
+## Golden queries (status 2026-09-30, index `55507a6f2907`; 9/9 also on `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 

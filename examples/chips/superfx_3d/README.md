@@ -1,6 +1,6 @@
 # SuperFX 3D Cube
 
-> Auto-rotating wireframe cube at 60 FPS — Star Fox style 3D on SNES
+> Auto-rotating wireframe cube — Star Fox style 3D on SNES, about 30 frames per second
 
 ![Screenshot](superfx_3d.png)
 
@@ -26,7 +26,10 @@ Then open `superfx_3d.sfc` in luna (or any SNES emulator).
 - **3D rotation**: Y+X axis rotation using 256-entry sine table (C-side)
 - **Bresenham line drawing**: GSU draws 12 edges via PLOT (all 8 octants)
 - **HDMA screen blanking**: 40 scanlines forced blank top + bottom (like Star Fox)
-- **Scanline-polled DMA**: 16KB framebuffer transferred at 60 FPS
+- **Scanline-polled DMA**: the 16 KB framebuffer sent in the letterbox,
+  started only on a line from which it lands whole (about 30 frames per
+  second, measured on luna; for a game loop that keeps running meanwhile,
+  see `superfx_game_skeleton`)
 - **BG scroll centering**: VOFS=208 centers 128px framebuffer in visible area
 - **Vertex clamping**: projected coords clamped to framebuffer bounds (0-126)
 - **SuperFX library API**: `gsuLaunch()`, `gsuSetupHdmaBlanking()`, `gsuDmaFullFrame()`

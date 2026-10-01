@@ -2,6 +2,150 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [Unreleased]
+
+## [0.47.0] — 2026-10-02
+
+The Super FX release. A game can now run while the GSU works: code runs
+from RAM (`RAM_CODE_SIZE`, `RAM_CODE_SECTION`, C `RAM_CODE`), jobs run from
+the GSU's code cache while the CPU keeps the ROM, a GSU program can have
+several entry points (`<name>.sfx.h`, `gsuCall`), and finished frames are
+double-buffered and moved to VRAM by the NMI (`gsuPresent`). The new
+`chips/superfx_game_skeleton` plays a 60 fps game loop with music while the
+GSU renders at 30. Checking that pipeline with luna found `superfx_3d`
+losing a third of its framebuffer to a silent VRAM failure; every example
+is now held to no VRAM DMA outside blank. Also a `tile` module for tiles
+made at run time, and luna v1.30.2.
+
+### Added
+- feat(lib): **`tile` module — tiles made at run time.**
+  `tileEncode2bpp()`, `tileEncode4bpp()`, `tileEncode8bpp()` turn 64 colour
+  indices (one byte per pixel, row by row) into the planar tile the PPU
+  reads. Four examples (`mode2`, `game_skeleton`, `panel_hud`,
+  `sprite_swarm`) carried the same 4bpp loop as their own copy; they use the
+  module now, with the same frames. The encoder is asm: ~47 000 master
+  cycles a tile against ~310 000 for the C loop (luna profile). The lib
+  fixture checks the three depths and one hand-derived vector.
+- feat(lib): **Super FX frames presented by the NMI, double-buffered**
+  (superfx runtime chantier, phase D). `gsuPresentInit(vram_a, vram_b,
+  flags)` sets up two framebuffers in Game Pak RAM and two char blocks in
+  VRAM for `gsu_scmr`'s height and depth; `gsuPresent()` queues the frame a
+  job just drew and switches `gsu_scbr` to the other buffer. The NMI moves
+  the queued frame to VRAM with what is left of each VBlank — measured from
+  the V counter, extended into the top letterbox — taking Game Pak RAM from
+  the GSU for each piece (SCMR RAN, Nintendo manual Book II 5.3), and swaps
+  BG1's char base only once the whole frame has landed. A 16 KB frame moves
+  in two VBlanks with a 40 + 40 letterbox, one with 84 + 4.
+  `GSU_PRESENT_ON_LAG_FRAMES` lets a game that never touches VRAM outside
+  the NMI have frames move on lag frames too. `gsuSetupBitmapTilemap()`
+  follows `gsu_scmr`'s height (128, 160, 192 lines), `gsuStartCached()`
+  sets R8 like `gsuLaunch()`, and `gsuCacheLoad()` is asm (the C loop took
+  a third of a frame).
+- feat(examples): **`chips/superfx_game_skeleton`** — a crosshair steered at
+  60 fps, and SNESMOD music, while the GSU renders the cube from its code
+  cache at 30, frames presented by `gsuPresent()`. Its manifest proves the
+  game never skips a frame during GSU work and that the music plays (luna
+  audio RMS); the audio oracle hashes its WAV.
+- test(luna-test): **`vram_dma_blank.py`** in `make tests`: every example's
+  VRAM DMA lands in blank or force blank (luna's `[asserts.dma]
+  unsafe_writes = 0`, one generated manifest per example; 85/85 clean), and
+  `gsuPresent`'s frames move whole, into alternating blocks, with every
+  BG12NBA swap after a complete frame (luna `--dma-trace`, `--trace-writes`).
+- feat(build,lib): **GSU programs with several entry points.** The build
+  writes `<name>.sfx.h` next to each `.sfx.bin`: one `#define` per global
+  label, its offset in the binary (`gsu_job.sfx`'s `mul_job` becomes
+  `GSU_JOB_MUL_JOB`). `gsuCall(entry)` launches at one of them (from ROM,
+  like `gsuLaunch()`), `gsuStartCached(entry)` from the cache; arguments go
+  in `REG_GSU_Rn`. The GSU fixture runs a multiplication entry both ways.
+- feat(build): **code that runs from RAM.** `RAM_CODE_SIZE := N` in a
+  Makefile opens a window of N bytes at the top of WRAM bank `$7E`; assembly
+  written in `RAM_CODE_SECTION "name"` is stored in ROM bank 1, linked at its
+  `$7E` address and copied there by crt0 at boot. It is what a game needs to
+  keep running while a Super FX job owns the ROM: the GSU fixture waits on a
+  ROM-resident job from the window (33 frames, no bus violation; the same
+  loop in ROM loses the CPU). Checked on LoROM, HiROM, SA-1 and FastROM.
+  **C functions too** (2026-09-29): `RAM_CODE` (`__ramcode`, a function
+  specifier in cproc; QBE emits the window section, with an assembler
+  `.FAIL` naming the function when the project has no window). The GSU
+  fixture's fourth job waits in C from RAM, 0 bus violations; the same
+  function without `RAM_CODE` counts 49 585. `gsu_owns_cart` and `REG_CFGR`
+  are now in `superfx.h`.
+  `symmap.py` no longer counts wlalink's `RAM_USAGE_*` markers as bank-$00
+  ROM (a RAM section at the top of `$7E` read as a full bank $00).
+
+### Changed
+- test(luna-test): **luna v1.30.2.** Its `--jobs` keeps manifests chained by
+  a battery file in order, so the five power-cycle manifests (SRAM, SA-1
+  BW-RAM) are back in `manifests/`, in the one parallel batch; the serial
+  `power_cycle/` pass is gone. `[asserts.dma]` no longer stops at a million
+  trace events, so `vram_dma_blank.py` checks the Super FX examples over
+  the same 200 frames as the rest. No baseline moved.
+- refactor(runtime,lib): **the Super FX interrupt entries and `gsuLaunch`'s
+  wait loop live in the RAM code window** (a Super FX build reserves 256
+  bytes for the SDK on top of `RAM_CODE_SIZE`). They were position-
+  independent blobs copied by hand: 160 bytes at boot for the NMI/IRQ/RTI
+  entries, 128 bytes of bank-0 RAM re-copied at every `gsuLaunch()` call.
+  Now ordinary linked code; `superfx_3d` gains 128 bytes of plain C RAM and
+  loses a copy loop per job. Same frames (`diff_corpus` 84/84).
+
+- test(luna-test): luna v1.28.1. The Super FX cache-job fixture now checks
+  the job's last RAM write too: luna before 1.28.1 dropped it (a stopped
+  GSU no longer clocked its RAM write buffer), a console does not; the
+  tutorial's warning about it is gone.
+- refactor(examples): **`sa1_starfield` runs its SA-1 code from I-RAM**,
+  copied there at boot: measured on luna, ~10.7 MHz with 0.4 % of clocks
+  lost to bus conflicts, against ~8.6 MHz and 20 % from ROM, the same frames
+  drawn. `make clean && make SA1_CODE_IN=ROM` builds the ROM version; the
+  SA-1 tutorial shows both profiles.
+
+### Fixed
+- docs: **two hardware claims corrected after arbitration.** The
+  `fixMul()` NMI-callback warning no longer says the multiplier returns
+  garbage during the auto-joypad read: no reference states it, and a
+  main-thread probe on luna v1.30.2 reads every product right during the
+  read (19 of 19); the hazard that stands is non-reentrancy. And Mode 5's
+  columns: the sub screen draws the even ones, the main screen the odd ones
+  — `mode5_hires`'s comment and the graphics tutorial had them inverted
+  (snesdev-wiki's Backgrounds page carries the same error). The hardware
+  claims rule now reads `snes_verify`'s evidence sentences, never its
+  verdict.
+- fix(lib): **`superfx_3d` dropped a third of its framebuffer bytes.**
+  `gsuDmaFullFrame()` read OPVCT (`$213D`) once per poll iteration and never
+  read STAT78, the only reset of OPVCT's read-twice flip-flop: a poll that
+  ended on an odd count left the next one reading the high byte, whose bits
+  1-7 are PPU2 open bus — the previous exit value, 184 — so the DMA started
+  at once (snesdev-wiki; anomie, fullsnes; luna memory trace: 1 281 reads,
+  then 1 read returning `$B8` at line 8). luna `--dma-trace` counted
+  481 866 of 1 359 872 bytes written on visible lines, silently lost; half
+  the transfers began at lines 6-12. It now reads STAT78 and OPVCT twice, starts only in a window from
+  which the frame lands whole (225 - bottom to 152 + top) or waits for the
+  next frame's, and writes the VRAM/DMA registers after the wait (an NMI
+  in it could move VMADD). `gsuSetupHdmaBlanking()` returns only once its
+  bands are on screen: HDMA starts at line 0, and the first DMA after it
+  found no bottom band (3 417 more bytes lost). `superfx_3d` shows about 30
+  whole frames per second instead of 53 partly lost ones; every example
+  now passes luna's `unsafe_writes = 0` (`vram_dma_blank.py`).
+- fix(runtime): **a Super FX cart could take a VBlank before its WRAM
+  vectors existed.** crt0 enabled the NMI, then installed the `$0100-$010F`
+  stubs the header's vectors point at; a VBlank in between would have
+  jumped into empty RAM. The Super FX init now runs before the NMI is
+  enabled.
+- fix(compiler): **HiROM symbol files list RAM sections in their real bank.**
+  wlalink added `.BASE $C0` to the `[ramsections]` block (a `$7E` section
+  read `13e:`, bank-0 RAM `c0:`), so `symmap.py`'s far-RAM-band report saw
+  none of a HiROM build's sections. wla-dx patch `8077133` (4 local patches
+  now); no ROM byte changes. The far-band report also measures the free
+  space below the RAM code window instead of above it.
+- fix(runtime): **a Super FX job started with its IRQ on STOP unmasked no
+  longer locks the CPU.** With CFGR bit 7 clear and the I flag clear (any
+  game that uses a timer IRQ), the GSU's IRQ went to the user's IRQ handler,
+  whose `$4211` read does not reset it, and the CPU re-entered the IRQ
+  forever. crt0's WRAM IRQ entry now reads SFR bit 15 first, acknowledges the
+  GSU's IRQ and counts it in the new `gsu_stop_irqs`: a game can wait for the
+  end of a job on that count instead of polling (`CFGR_IRQ_MASK`,
+  `CFGR_FAST_MUL` added to `superfx.h`). The GSU fixture runs a second job
+  that way.
+
 ## [0.46.0] — 2026-09-27
 
 The compiler release. Stack frames are two thirds smaller (temps whose lives

@@ -258,13 +258,17 @@ before committing.
 ### 🟡 `fixMul()` / `fixLerp()` are not safe inside nmiSet() callbacks
 
 They use the hardware multiplier ($4202-$4217) plus shared WRAM
-temporaries. Empirically, reads from the unit inside the NMI-callback
-window return garbage while the auto-joypad read is in progress
-(observed 0x2A/0x00 shift-register-like patterns — the hardware
-references document garbage reads of $4218-$421F during auto-read, but
-no reference confirms a mechanism coupling it to $4214-$4217, so treat
-the coupling as observed-not-explained); independently, the unit is not
-reentrant against an interrupted main-thread multiply. Plain C `*` / `/` / `%` **are** callback-safe —
+temporaries, and the unit is not reentrant: an NMI that lands between a
+main-thread multiply's write to `$4203` and its read of `$4216` and
+multiplies in the callback destroys the main thread's result. NMI is not
+maskable, so no wait fixes that. (Until 2026-10-02 this entry also said
+the unit returns garbage while the auto-joypad read is in progress. No
+reference states it, and a probe on luna v1.30.2 that multiplies from the
+main thread with NMI off does not reproduce it: 19 products read with
+`HVBJOY` bit 0 set, 1981 outside, all correct —
+`.claude/notes/tech/muldiv_autojoypad_probe/`. The original observation,
+in 2026-07, most likely saw the reentrancy above. Not measured on a
+console.) Plain C `*` / `/` / `%` **are** callback-safe —
 the compiler runtime detects the NMI context (`in_nmi_ctx`) and switches
 to software paths. Symptom if ignored: silently wrong fixed-point values,
 only when computed inside the callback. Mitigation: compute fixed-point
@@ -487,6 +491,36 @@ there (anomie's register doc). What an *empty* port returns is stated by no
 reference — luna, ares and Mesen2 return 0 — and has not been measured on
 a console: no example displays it yet, so the protocol has no row for it. Pinned by `devtools/libtests`
 with luna's `--port1 none --port2 none` (both read 0; both read 1 with pads).
+### 🟢 Super FX: `gsuDmaFullFrame()` wrote a third of the framebuffer on visible lines (fixed 2026-09-29)
+
+Up to v0.46.0 `gsuDmaFullFrame()` polled the V counter by reading SLHV
+(`$2137`) and then OPVCT (`$213D`) **once** per iteration, and never read
+STAT78 (`$213F`). OPVCT is read twice — low byte, then high byte — through
+a flip-flop that only STAT78 resets (snesdev-wiki, PPU registers), and the
+high byte carries V's bit 8 with PPU2 open bus in bits 1-7: the last value
+read from PPU2 (anomie's register doc, fullsnes). A poll that ended on an
+odd number of reads left the flip-flop on the high byte, so the next call's
+first read returned the previous exit value (184, or 232) through the open
+bus and the DMA started at once — at lines 6-12 in half of `superfx_3d`'s
+transfers, measured with luna's memory trace (1 281 reads, then 1 read
+returning `$B8`). 481 866 of 1 359 872 framebuffer bytes landed on visible
+lines: the PPU drops such writes silently, so the cube was drawn from
+partly stale frames. Two more slips of the same kind: a
+call made late in the bottom band still started (the end overran into the
+picture), and the first DMA after `gsuSetupHdmaBlanking()` ran before the
+bands existed (HDMA starts a channel at line 0).
+
+Fixed: every read of the counter starts with STAT78 and reads OPVCT twice,
+starts
+only on a line from which the frame lands whole — 225 - bottom to 152 + top,
+lines 185-192 with the usual 40 + 40 — or waits for the next frame, and
+`gsuSetupHdmaBlanking()` returns once its bands are on screen.
+`superfx_3d` shows about 30 whole frames per second where it showed 53
+partly lost ones. Pinned by `tools/luna-test/vram_dma_blank.py`, which since
+the same day holds every example to luna's `[asserts.dma] unsafe_writes = 0`.
+Code of your own that polls the V counter should read `$213F`, then `$2137`,
+then `$213D` twice, every time.
+
 ### 🟢 Super FX: VBlanks were lost during every GSU job (fixed 2026-09-25)
 
 `gsuLaunch()` disabled NMI for the duration of each GSU job (the NMI vector

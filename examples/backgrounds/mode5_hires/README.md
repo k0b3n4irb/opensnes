@@ -22,7 +22,8 @@ to flat gray.
 - BG Mode 5: 512 px, 16×8 tiles stored as 8×8 character pairs (N, N+1)
 - SETINI ($2133) via `videoSetInterlace()` — write-only shadow discipline
 - **The Mode 5 trap**: content displays through main AND sub screen —
-  `setMainScreen(LAYER_BG1); setSubScreen(LAYER_BG1);` or odd columns stay blank
+  `setMainScreen(LAYER_BG1); setSubScreen(LAYER_BG1);` — main-only leaves the
+  even columns (the sub screen's) blank
 - Interlace vertical addressing: tile texel rows map 1:1 to hi-res lines,
   so a full 448-line page needs 56 tile rows → a 32×64 tilemap
 

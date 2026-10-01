@@ -40,6 +40,7 @@
 #include <snes/mosaic.h>
 #include <snes/profile.h>
 #include <snes/registers.h>
+#include <snes/tile.h>
 /* Deprecated names keep their vector while they ship (scopeButtonsDown,
  * mosaicEnable, colorMathEnable, rand, srand). */
 #if defined(__clang__)
@@ -378,6 +379,14 @@ u16 r_invb_out;     /* after spinning until the flag clears   -> 0 */
 extern void irqTestHandler(void);   /* data.asm, bank 0 */
 extern void irqTestHandlerFar(void);/* data.asm, banks 7-1 */
 
+/* tile (2026-09-29): the three depths of one pattern that sets every bit
+ * (pixel i = i * 37 + 11), and one pixel of colour 5 (planes 0 and 2) at the
+ * top-left corner of a 4bpp tile: tile[0] = tile[16] = $80, the rest 0. */
+static FAR u8 t_px[64];   /* FAR: the fixture's plain RAM band is nearly full */
+u8 r_tile2[16];
+u8 r_tile4[32];
+u8 r_tile8[64];
+u8 r_tile4_dot[32];
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
@@ -1015,6 +1024,19 @@ int main(void) {
     windowDisable(WINDOW_2, WINDOW_MATH);              /* wobjsel 02 */
     windowSplit(100);                                  /* W1 0..99, W2 100..255 */
     windowCentered(WINDOW_2, 64);                      /* W2 96..159 */
+
+    {
+        u8 i;
+        for (i = 0; i < 64; i++)
+            t_px[i] = (u8)(i * 37 + 11);
+        tileEncode2bpp(t_px, r_tile2);
+        tileEncode4bpp(t_px, r_tile4);
+        tileEncode8bpp(t_px, r_tile8);
+        for (i = 0; i < 64; i++)
+            t_px[i] = 0;
+        t_px[0] = 5;
+        tileEncode4bpp(t_px, r_tile4_dot);
+    }
 
     r_done      = 0xBEEF;
 

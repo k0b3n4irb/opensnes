@@ -130,6 +130,25 @@ typedef unsigned int u32;
 #define FAR             /* host compilers (the clang syntax lint) have no address spaces */
 #endif
 
+/**
+ * @brief Run a function from WRAM instead of ROM.
+ *
+ * `RAM_CODE void wait_for_job(void) { ... }` — the function is linked in the
+ * RAM code window (`RAM_CODE_SIZE` in the Makefile, at the top of bank
+ * `$7E`), stored in ROM and copied there by crt0 at boot; callers reach it
+ * with an ordinary call. It is for code that must run while the CPU cannot
+ * read the ROM (a Super FX job with RON = 1): then it must not call a ROM
+ * function (library, runtime helpers such as multiplication, other
+ * non-RAM_CODE functions) nor read const data, which lives in ROM. A project
+ * with no window fails to assemble with a message naming the function.
+ * @see docs/tutorials/superfx.md
+ */
+#ifdef __OPENSNES__
+#define RAM_CODE __ramcode
+#else
+#define RAM_CODE        /* host compilers (the clang syntax lint) */
+#endif
+
 typedef volatile u8 vu8;
 typedef volatile u16 vu16;
 typedef volatile u32 vu32;

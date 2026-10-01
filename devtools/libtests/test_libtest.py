@@ -173,8 +173,35 @@ CASES = [
     ("r_pad_oob",   2, 0),      # out of range
     # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
     ("r_invb_in", 2, 1), ("r_invb_out", 2, 0), ("r_true_one", 2, 1), ("r_rng", 2, 0x091A), ("r_rng_names", 2, 1),
+    # tile: an encoder written from the planar layout (_tile_ref below), and
+    # one hand-derived vector that does not go through it
+    ("r_tile2", 16, None), ("r_tile4", 32, None), ("r_tile8", 64, None),
+    ("r_tile4_dot", 32, 0x80 | (0x80 << (8 * 16))),
     ("r_done",     2, 0xBEEF),
 ]
+
+
+def _tile_ref(pairs: int) -> int:
+    """SNES planar tile of the fixture's pattern (pixel i = i*37 + 11):
+    per plane pair, per row, the low plane's byte then the high one's."""
+    px = [(i * 37 + 11) & 0xFF for i in range(64)]
+    out = bytearray()
+    for p in range(pairs):
+        for r in range(8):
+            lo = hi = 0
+            for c in range(8):
+                v = px[r * 8 + c]
+                if (v >> (2 * p)) & 1:
+                    lo |= 0x80 >> c
+                if (v >> (2 * p + 1)) & 1:
+                    hi |= 0x80 >> c
+            out += bytes([lo, hi])
+    return int.from_bytes(out, "little")
+
+
+CASES = [(n, w, {"r_tile2": _tile_ref(1), "r_tile4": _tile_ref(2),
+                 "r_tile8": _tile_ref(4)}.get(n, v) if v is None else v)
+         for n, w, v in CASES]
 
 # Region getters: NTSC by default (the header's country byte), PAL under
 # `--region pal` (luna --force-region). Same ROM, same asserts otherwise.
