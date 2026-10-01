@@ -4,8 +4,8 @@ var examples_scrolling =
       [ "The ladder", "examples_scrolling.html#the-ladder-8", null ],
       [ "The idea in one screen", "examples_scrolling.html#the-idea-in-one-screen-7", [
         [ "Controls", "examples_scrolling_continuous_scroll.html#controls-28", null ],
-        [ "Build &amp; Run", "examples_scrolling_continuous_scroll.html#build--run-37", null ],
-        [ "What You'll Learn", "examples_scrolling_continuous_scroll.html#what-youll-learn-31", null ],
+        [ "Build &amp; Run", "examples_scrolling_continuous_scroll.html#build--run-38", null ],
+        [ "What You'll Learn", "examples_scrolling_continuous_scroll.html#what-youll-learn-32", null ],
         [ "Walkthrough", "examples_scrolling_continuous_scroll.html#walkthrough-6", [
           [ "1. Two Layers, Two Speeds", "examples_scrolling_continuous_scroll.html#autotoc_md1-two-layers-two-speeds", null ],
           [ "2. The Threshold Scroll Pattern", "examples_scrolling_continuous_scroll.html#autotoc_md2-the-threshold-scroll-pattern", null ],
@@ -19,7 +19,7 @@ var examples_scrolling =
           [ "The Makefile", "examples_scrolling_continuous_scroll.html#the-makefile-3", null ],
           [ "Why These Modules?", "examples_scrolling_continuous_scroll.html#why-these-modules-2", null ]
         ] ],
-        [ "Modules Used", "examples_scrolling_continuous_scroll.html#modules-used-60", null ],
+        [ "Modules Used", "examples_scrolling_continuous_scroll.html#modules-used-61", null ],
         [ "Technical Reference", "examples_scrolling_continuous_scroll.html#technical-reference-5", null ],
         [ "Files", "examples_scrolling_continuous_scroll.html#files-11", null ],
         [ "Credits", "examples_scrolling_continuous_scroll.html#credits-3", null ]

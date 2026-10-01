@@ -131,11 +131,14 @@ $(function(){initNavTree('superfx_8h.html','',''); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a5a3917720fd6600f998ba4998696bcd2" id="r_a5a3917720fd6600f998ba4998696bcd2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5a3917720fd6600f998ba4998696bcd2">CFGR_FAST_MUL</a>&#160;&#160;&#160;0x20</td></tr>
+<tr class="memitem:a08c55e75a822afaa8e46662049384572" id="r_a08c55e75a822afaa8e46662049384572"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a08c55e75a822afaa8e46662049384572">CFGR_IRQ_MASK</a>&#160;&#160;&#160;0x80</td></tr>
 <tr class="memitem:a6ec6a4d69c0619929aadf651082b0ae2" id="r_a6ec6a4d69c0619929aadf651082b0ae2"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6ec6a4d69c0619929aadf651082b0ae2">CLSR_10MHZ</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:a7770c27fc7113aad4fbdca5169ac4e1b" id="r_a7770c27fc7113aad4fbdca5169ac4e1b"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7770c27fc7113aad4fbdca5169ac4e1b">CLSR_21MHZ</a>&#160;&#160;&#160;0x01</td></tr>
 <tr class="memitem:a5f2488a9b53dde961d0d3f7e8f2261ea" id="r_a5f2488a9b53dde961d0d3f7e8f2261ea"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5f2488a9b53dde961d0d3f7e8f2261ea">GSU_SRAM_BASE</a>&#160;&#160;&#160;0x700000</td></tr>
 <tr class="memitem:ad96df8d61d64895c4ab1253cc3042355" id="r_ad96df8d61d64895c4ab1253cc3042355"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad96df8d61d64895c4ab1253cc3042355">REG_BRAMR</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x3033)</td></tr>
 <tr class="memitem:a824bb7bd6df7fb009a91aa03323ecadf" id="r_a824bb7bd6df7fb009a91aa03323ecadf"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a824bb7bd6df7fb009a91aa03323ecadf">REG_CBR</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x303E)</td></tr>
+<tr class="memitem:abb18e829d431cb426a9f7ea953da7315" id="r_abb18e829d431cb426a9f7ea953da7315"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#abb18e829d431cb426a9f7ea953da7315">REG_CFGR</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x3037)</td></tr>
 <tr class="memitem:ad863936f3d4e18c2aba61f93483dc4cf" id="r_ad863936f3d4e18c2aba61f93483dc4cf"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad863936f3d4e18c2aba61f93483dc4cf">REG_CLSR</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x3039)</td></tr>
 <tr class="memitem:a60071ff958d1c50f5e43e5809f80e31e" id="r_a60071ff958d1c50f5e43e5809f80e31e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a60071ff958d1c50f5e43e5809f80e31e">REG_GSU_R0</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3000)</td></tr>
 <tr class="memitem:aaae39a6799d57a1de176c8477797438c" id="r_aaae39a6799d57a1de176c8477797438c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aaae39a6799d57a1de176c8477797438c">REG_GSU_R1</a>&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x3002)</td></tr>
@@ -173,8 +176,10 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a040eb7d8b9be9450f11d467d2948268a" id="r_a040eb7d8b9be9450f11d467d2948268a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a040eb7d8b9be9450f11d467d2948268a">gsuCall</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> entry)</td></tr>
+<tr class="memdesc:a040eb7d8b9be9450f11d467d2948268a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Launch the program at one of its entry points and wait (WRAM-safe).  <br /></td></tr>
 <tr class="memitem:ae76c8e0f8bfa078d0bc18b4be1f4f6a8" id="r_ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8">gsuDmaFullFrame</a> (void)</td></tr>
-<tr class="memdesc:ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS).  <br /></td></tr>
+<tr class="memdesc:ae76c8e0f8bfa078d0bc18b4be1f4f6a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox.  <br /></td></tr>
 <tr class="memitem:addfe64b4f0c5ffe4847f2e0d56c5ef10" id="r_addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#addfe64b4f0c5ffe4847f2e0d56c5ef10">gsuInit</a> (void)</td></tr>
 <tr class="memdesc:addfe64b4f0c5ffe4847f2e0d56c5ef10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the GSU default configuration; returns <a class="el" href="#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a>.  <br /></td></tr>
 <tr class="memitem:ad737693bad4b2b768309bfebf6b5ece8" id="r_ad737693bad4b2b768309bfebf6b5ece8"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad737693bad4b2b768309bfebf6b5ece8">gsuIsPresent</a> (void)</td></tr>
@@ -201,6 +206,17 @@ Functions</h2></td></tr>
 <div class="ttc" id="asuperfx_8h_html_a3b031469e2704f59a026f0ab6667a959"><div class="ttname"><a href="#a3b031469e2704f59a026f0ab6667a959">gsuBusy</a></div><div class="ttdeci">u8 gsuBusy(void)</div><div class="ttdoc">Is the GSU still running? (SFR GO bit).</div></div>
 <div class="ttc" id="asuperfx_8h_html_a8745a42974dfd87a72b1adc719729aa7"><div class="ttname"><a href="#a8745a42974dfd87a72b1adc719729aa7">gsuStartCached</a></div><div class="ttdeci">void gsuStartCached(u16 pc)</div><div class="ttdoc">Start the program loaded by gsuCacheLoad() and return at once.</div></div>
 <div class="ttc" id="asuperfx_8h_html_a943b65ace4311678092e5d4176b014b5"><div class="ttname"><a href="#a943b65ace4311678092e5d4176b014b5">gsuCacheLoad</a></div><div class="ttdeci">void gsuCacheLoad(const void *code, u16 size)</div><div class="ttdoc">Copy a GSU program into the GSU code cache ($3100-$32FF).</div></div>
+</div><!-- fragment --><p>Or be told when it ends: clear CFGR_IRQ_MASK and watch gsu_stop_irqs.</p>
+<div class="fragment"><div class="line"><a class="code hl_variable" href="#a276ddb2df70ac449323c825df9d7f89d">gsu_cfgr</a> = 0x00;                <span class="comment">// IRQ on STOP (irqEnable() done earlier)</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> stops = <a class="code hl_variable" href="#ab98ad9f6611bf1f5946647d30e97fb15">gsu_stop_irqs</a>;</div>
+<div class="line"><a class="code hl_function" href="#a8745a42974dfd87a72b1adc719729aa7">gsuStartCached</a>(0);</div>
+<div class="line"><span class="keywordflow">while</span> (<a class="code hl_variable" href="#ab98ad9f6611bf1f5946647d30e97fb15">gsu_stop_irqs</a> == stops) {</div>
+<div class="line">    game_logic();</div>
+<div class="line">}</div>
+<div class="line"><a class="code hl_function" href="#a08f145d6e71ff599568073b91a5cabe5">gsuWait</a>();</div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+<div class="ttc" id="asuperfx_8h_html_a276ddb2df70ac449323c825df9d7f89d"><div class="ttname"><a href="#a276ddb2df70ac449323c825df9d7f89d">gsu_cfgr</a></div><div class="ttdeci">u8 gsu_cfgr</div><div class="ttdoc">CFGR register value ($80=IRQ mask, $A0=IRQ mask + fast multiply).</div></div>
+<div class="ttc" id="asuperfx_8h_html_ab98ad9f6611bf1f5946647d30e97fb15"><div class="ttname"><a href="#ab98ad9f6611bf1f5946647d30e97fb15">gsu_stop_irqs</a></div><div class="ttdeci">volatile u8 gsu_stop_irqs</div><div class="ttdoc">GSU IRQs on STOP acknowledged so far (crt0, wraps at 256).</div></div>
 </div><!-- fragment --> </div></td></tr>
 <tr class="memitem:a3b031469e2704f59a026f0ab6667a959" id="r_a3b031469e2704f59a026f0ab6667a959"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3b031469e2704f59a026f0ab6667a959">gsuBusy</a> (void)</td></tr>
 <tr class="memdesc:a3b031469e2704f59a026f0ab6667a959"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the GSU still running? (SFR GO bit).  <br /></td></tr>
@@ -217,6 +233,12 @@ Variables</h2></td></tr>
 <tr class="memdesc:a276ddb2df70ac449323c825df9d7f89d"><td class="mdescLeft">&#160;</td><td class="mdescRight">CFGR register value ($80=IRQ mask, $A0=IRQ mask + fast multiply).  <br /></td></tr>
 <tr class="memitem:a06b7d31abfaac2dacbfe49f26e89c1a9" id="r_a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a06b7d31abfaac2dacbfe49f26e89c1a9">gsu_dma_src_hi</a></td></tr>
 <tr class="memdesc:a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">DMA source high byte ($00=buffer A at $70:0000, $40=buffer B at $70:4000).  <br /></td></tr>
+<tr class="memitem:a70c2d5bd4c0e5a4872e11634387111c7" id="r_a70c2d5bd4c0e5a4872e11634387111c7"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a70c2d5bd4c0e5a4872e11634387111c7">gsu_owns_cart</a></td></tr>
+<tr class="memdesc:a70c2d5bd4c0e5a4872e11634387111c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 while a GSU job owns the Game Pak ROM (crt0)  <br /></td></tr>
+<tr class="memitem:a4ca4f9e59d99a3ce44f1006f479c4945" id="r_a4ca4f9e59d99a3ce44f1006f479c4945"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4ca4f9e59d99a3ce44f1006f479c4945">gsu_pres_frames</a></td></tr>
+<tr class="memdesc:a4ca4f9e59d99a3ce44f1006f479c4945"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frames <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> has put on screen so far.  <br /></td></tr>
+<tr class="memitem:a1c55343a21276a24a96c2015a3bcb0ef" id="r_a1c55343a21276a24a96c2015a3bcb0ef"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1c55343a21276a24a96c2015a3bcb0ef">gsu_pres_last</a></td></tr>
+<tr class="memdesc:a1c55343a21276a24a96c2015a3bcb0ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bytes the last transferring NMI moved (a diagnostic: the window).  <br /></td></tr>
 <tr class="memitem:aa96dbf2933de566840e56b543630e5d6" id="r_aa96dbf2933de566840e56b543630e5d6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa96dbf2933de566840e56b543630e5d6">gsu_prog_addr</a></td></tr>
 <tr class="memdesc:aa96dbf2933de566840e56b543630e5d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">GSU program 16-bit address (set by gsuSetProgram).  <br /></td></tr>
 <tr class="memitem:a37f6cfe16760b75f19f649ecaaef14da" id="r_a37f6cfe16760b75f19f649ecaaef14da"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a37f6cfe16760b75f19f649ecaaef14da">gsu_prog_bank</a></td></tr>
@@ -225,8 +247,50 @@ Variables</h2></td></tr>
 <tr class="memdesc:ad840ff367d45008c2505fc2e93c5bf06"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCBR screen base ($00=buffer A, $10=buffer B).  <br /></td></tr>
 <tr class="memitem:af40ac5ed1d6c297cb066a57c4d52c995" id="r_af40ac5ed1d6c297cb066a57c4d52c995"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af40ac5ed1d6c297cb066a57c4d52c995">gsu_scmr</a></td></tr>
 <tr class="memdesc:af40ac5ed1d6c297cb066a57c4d52c995"><td class="mdescLeft">&#160;</td><td class="mdescRight">SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON).  <br /></td></tr>
+<tr class="memitem:a20b4afdcc076097e24c44fe840dacc0c" id="r_a20b4afdcc076097e24c44fe840dacc0c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a20b4afdcc076097e24c44fe840dacc0c">gsu_scmr_live</a></td></tr>
+<tr class="memdesc:a20b4afdcc076097e24c44fe840dacc0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value last written to SCMR (write-only), kept by the library.  <br /></td></tr>
+<tr class="memitem:ab98ad9f6611bf1f5946647d30e97fb15" id="r_ab98ad9f6611bf1f5946647d30e97fb15"><td class="memItemLeft">volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab98ad9f6611bf1f5946647d30e97fb15">gsu_stop_irqs</a></td></tr>
+<tr class="memdesc:ab98ad9f6611bf1f5946647d30e97fb15"><td class="mdescLeft">&#160;</td><td class="mdescRight">GSU IRQs on STOP acknowledged so far (crt0, wraps at 256).  <br /></td></tr>
 <tr class="memitem:aebd2eb7f0a4b968b7861b4e8654fb1ee" id="r_aebd2eb7f0a4b968b7861b4e8654fb1ee"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aebd2eb7f0a4b968b7861b4e8654fb1ee">superfx_status</a></td></tr>
 <tr class="memdesc:aebd2eb7f0a4b968b7861b4e8654fb1ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">SuperFX status from crt0 init (VCR chip version, 0=not detected).  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-member-group" class="groupheader"><a id="member-group" name="member-group"></a>
+Presenting frames: double buffer, moved by the NMI</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p>The GSU draws in one Game Pak RAM framebuffer while the NMI moves the previous one to VRAM, a piece per VBlank, and shows it only once all of it has landed. The NMI takes Game Pak RAM from the GSU for each piece (Nintendo manual Book II 5.3: the GSU waits on its next RAM access and resumes after); nothing polls, the CPU runs the game meanwhile.</p>
+<p>How much lands per VBlank is the blank window: the VBlank alone moves about 4.7 KB (measured on luna), and a top letterbox from <a class="el" href="#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a> (with a bottom band of at least one line) adds about 150 bytes per blanked line: a 16 KB frame lands in two VBlanks with a 40 + 40 letterbox, in one with 84 + 4. The NMI measures the window itself (V counter) at every frame.</p>
+<div class="fragment"><div class="line"><a class="code hl_variable" href="#af40ac5ed1d6c297cb066a57c4d52c995">gsu_scmr</a> = <a class="code hl_define" href="#adf222d50864a08f6971d8d3f7c42dbd0">SCMR_4BPP</a> | <a class="code hl_define" href="#ae2b2a9e892c216f6af9da730038274a8">SCMR_H128</a> | <a class="code hl_define" href="#a46d40506dd634f0bb87d8c2cbefa1847">SCMR_RAN</a> | <a class="code hl_define" href="#a0ecf17cccfa7f001006bef43d63042e1">SCMR_RON</a>;</div>
+<div class="line"><a class="code hl_variable" href="#ad840ff367d45008c2505fc2e93c5bf06">gsu_scbr</a> = 0x00;                        <span class="comment">// buffer A at $70:0000</span></div>
+<div class="line"><a class="code hl_function" href="#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a>(0x4000);</div>
+<div class="line"><a class="code hl_function" href="#a5c6d08013690338aaa4dc06074da9d73">gsuPresentInit</a>(0x0000, 0x2000, 0);      <span class="comment">// two 16 KB char blocks</span></div>
+<div class="line"><span class="keywordflow">while</span> (1) {</div>
+<div class="line">    game_logic();</div>
+<div class="line">    <a class="code hl_function" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8">gsuLaunch</a>();                        <span class="comment">// draws in gsu_scbr&#39;s buffer</span></div>
+<div class="line">    <a class="code hl_function" href="#a3765f516c293b584f063a05ac723f75a">gsuPresent</a>();                       <span class="comment">// queue it, draw the next in the other</span></div>
+<div class="line">}</div>
+<div class="ttc" id="asuperfx_8h_html_a0ecf17cccfa7f001006bef43d63042e1"><div class="ttname"><a href="#a0ecf17cccfa7f001006bef43d63042e1">SCMR_RON</a></div><div class="ttdeci">#define SCMR_RON</div><div class="ttdef"><b>Definition</b> superfx.h:67</div></div>
+<div class="ttc" id="asuperfx_8h_html_a1fd575a6b7ae455fdf3ca7205b221f50"><div class="ttname"><a href="#a1fd575a6b7ae455fdf3ca7205b221f50">gsuSetupBitmapTilemap</a></div><div class="ttdeci">void gsuSetupBitmapTilemap(u16 vramAddr)</div><div class="ttdoc">Setup column-major tilemap for SuperFX PLOT framebuffer.</div></div>
+<div class="ttc" id="asuperfx_8h_html_a3765f516c293b584f063a05ac723f75a"><div class="ttname"><a href="#a3765f516c293b584f063a05ac723f75a">gsuPresent</a></div><div class="ttdeci">void gsuPresent(void)</div><div class="ttdoc">Queue the frame the last job drew; the next job draws in the other.</div></div>
+<div class="ttc" id="asuperfx_8h_html_a46d40506dd634f0bb87d8c2cbefa1847"><div class="ttname"><a href="#a46d40506dd634f0bb87d8c2cbefa1847">SCMR_RAN</a></div><div class="ttdeci">#define SCMR_RAN</div><div class="ttdef"><b>Definition</b> superfx.h:66</div></div>
+<div class="ttc" id="asuperfx_8h_html_a5c6d08013690338aaa4dc06074da9d73"><div class="ttname"><a href="#a5c6d08013690338aaa4dc06074da9d73">gsuPresentInit</a></div><div class="ttdeci">u8 gsuPresentInit(u16 vram_a, u16 vram_b, u8 flags)</div><div class="ttdoc">Set up presentation for gsu_scmr&#39;s geometry.</div></div>
+<div class="ttc" id="asuperfx_8h_html_ad840ff367d45008c2505fc2e93c5bf06"><div class="ttname"><a href="#ad840ff367d45008c2505fc2e93c5bf06">gsu_scbr</a></div><div class="ttdeci">u8 gsu_scbr</div><div class="ttdoc">SCBR screen base ($00=buffer A, $10=buffer B).</div></div>
+<div class="ttc" id="asuperfx_8h_html_adf222d50864a08f6971d8d3f7c42dbd0"><div class="ttname"><a href="#adf222d50864a08f6971d8d3f7c42dbd0">SCMR_4BPP</a></div><div class="ttdeci">#define SCMR_4BPP</div><div class="ttdef"><b>Definition</b> superfx.h:64</div></div>
+<div class="ttc" id="asuperfx_8h_html_ae2b2a9e892c216f6af9da730038274a8"><div class="ttname"><a href="#ae2b2a9e892c216f6af9da730038274a8">SCMR_H128</a></div><div class="ttdeci">#define SCMR_H128</div><div class="ttdef"><b>Definition</b> superfx.h:68</div></div>
+<div class="ttc" id="asuperfx_8h_html_af40ac5ed1d6c297cb066a57c4d52c995"><div class="ttname"><a href="#af40ac5ed1d6c297cb066a57c4d52c995">gsu_scmr</a></div><div class="ttdeci">u8 gsu_scmr</div><div class="ttdoc">SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON).</div></div>
+<div class="ttc" id="asuperfx_8h_html_afa2477b5e4a9d17cf5cf4103cc5ca5a8"><div class="ttname"><a href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8">gsuLaunch</a></div><div class="ttdeci">void gsuLaunch(void)</div><div class="ttdoc">Launch GSU program and wait for completion (WRAM-safe).</div></div>
+</div><!-- fragment --><p>The NMI callback gets what is left of the VBlank after the transfer: it must not write VRAM while a frame is in flight. </p>
+</td></tr>
+<tr class="memitem:a59552ad51a34113d1aa30627aa0c3374" id="r_a59552ad51a34113d1aa30627aa0c3374"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a59552ad51a34113d1aa30627aa0c3374">GSU_PRESENT_ON_LAG_FRAMES</a>&#160;&#160;&#160;0x01</td></tr>
+<tr class="memdesc:a59552ad51a34113d1aa30627aa0c3374"><td class="mdescLeft">&#160;</td><td class="mdescRight">gsuPresentInit flag: move frames on lag frames too  <br /></td></tr>
+<tr class="memitem:ae90a0319a2136c010dcb21917e90744c" id="r_ae90a0319a2136c010dcb21917e90744c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae90a0319a2136c010dcb21917e90744c">gsuFrameBytes</a> (void)</td></tr>
+<tr class="memdesc:ae90a0319a2136c010dcb21917e90744c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bytes of one framebuffer for gsu_scmr's height and depth.  <br /></td></tr>
+<tr class="memitem:a3765f516c293b584f063a05ac723f75a" id="r_a3765f516c293b584f063a05ac723f75a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3765f516c293b584f063a05ac723f75a">gsuPresent</a> (void)</td></tr>
+<tr class="memdesc:a3765f516c293b584f063a05ac723f75a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queue the frame the last job drew; the next job draws in the other.  <br /></td></tr>
+<tr class="memitem:a184d51664ef4edc754b9d33b63168f4c" id="r_a184d51664ef4edc754b9d33b63168f4c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a184d51664ef4edc754b9d33b63168f4c">gsuPresentBusy</a> (void)</td></tr>
+<tr class="memdesc:a184d51664ef4edc754b9d33b63168f4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 while a presented frame is still being moved to VRAM  <br /></td></tr>
+<tr class="memitem:a5c6d08013690338aaa4dc06074da9d73" id="r_a5c6d08013690338aaa4dc06074da9d73"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5c6d08013690338aaa4dc06074da9d73">gsuPresentInit</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_a, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_b, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> flags)</td></tr>
+<tr class="memdesc:a5c6d08013690338aaa4dc06074da9d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up presentation for gsu_scmr's geometry.  <br /></td></tr>
+<tr class="memitem:a5eaac970860c08a3d2a40e2662528fe8" id="r_a5eaac970860c08a3d2a40e2662528fe8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5eaac970860c08a3d2a40e2662528fe8">gsuPresentWait</a> (void)</td></tr>
+<tr class="memdesc:a5eaac970860c08a3d2a40e2662528fe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait until the last presented frame is on screen.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SuperFX (GSU) coprocessor library — registers, config, and API. </p>
@@ -234,12 +298,43 @@ Variables</h2></td></tr>
 <li>GSU detection and configuration</li>
 <li>WRAM-safe GSU launch (mandatory — CPU can't read ROM during GSU execution)</li>
 <li>DMA helpers for SRAM-to-VRAM framebuffer transfer</li>
-<li>HDMA screen blanking for 60 FPS DMA bandwidth</li>
+<li>HDMA screen blanking (letterbox) that lengthens the VRAM transfer window</li>
+<li>Double-buffered presentation moved by the NMI (gsuPresent)</li>
 <li>Column-major tilemap setup for PLOT rendering</li>
 </ul>
 <p>The GSU code itself is written in SuperFX assembly (.sfx files). The C API handles all SNES-side boilerplate.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="superfx_8md.html">docs/tutorials/superfx.md</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a5a3917720fd6600f998ba4998696bcd2" name="a5a3917720fd6600f998ba4998696bcd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a3917720fd6600f998ba4998696bcd2">&#9670;&#160;</a></span>CFGR_FAST_MUL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CFGR_FAST_MUL&#160;&#160;&#160;0x20</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>CFGR bit 5: high-speed multiplier </p>
+
+</div>
+</div>
+<a id="a08c55e75a822afaa8e46662049384572" name="a08c55e75a822afaa8e46662049384572"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08c55e75a822afaa8e46662049384572">&#9670;&#160;</a></span>CFGR_IRQ_MASK</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CFGR_IRQ_MASK&#160;&#160;&#160;0x80</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>CFGR bit 7: 1 = no IRQ on STOP (the gsuInit default) </p>
+
+</div>
+</div>
 <a id="a6ec6a4d69c0619929aadf651082b0ae2" name="a6ec6a4d69c0619929aadf651082b0ae2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6ec6a4d69c0619929aadf651082b0ae2">&#9670;&#160;</a></span>CLSR_10MHZ</h2>
 
@@ -265,6 +360,23 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a59552ad51a34113d1aa30627aa0c3374" name="a59552ad51a34113d1aa30627aa0c3374"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59552ad51a34113d1aa30627aa0c3374">&#9670;&#160;</a></span>GSU_PRESENT_ON_LAG_FRAMES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define GSU_PRESENT_ON_LAG_FRAMES&#160;&#160;&#160;0x01</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>gsuPresentInit flag: move frames on lag frames too </p>
+<p>By default the NMI moves a frame only while the main thread is parked — in WaitForVBlank, or waiting for a job — the rule the tilemap and OAM uploads follow, because a main thread in the middle of its own VRAM access would be corrupted. A game that never touches VRAM, VMAIN, VMADD, DMA channel 7 or the H/V counter latch outside the NMI while a frame is in flight can set this flag: the frame then moves at every VBlank, even one that falls in the game's logic. </p>
 
 </div>
 </div>
@@ -304,6 +416,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define REG_CBR&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>*)0x303E)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abb18e829d431cb426a9f7ea953da7315" name="abb18e829d431cb426a9f7ea953da7315"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb18e829d431cb426a9f7ea953da7315">&#9670;&#160;</a></span>REG_CFGR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define REG_CFGR&#160;&#160;&#160;(*(volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>*)0x3037)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -838,6 +964,39 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a040eb7d8b9be9450f11d467d2948268a" name="a040eb7d8b9be9450f11d467d2948268a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a040eb7d8b9be9450f11d467d2948268a">&#9670;&#160;</a></span>gsuCall()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gsuCall </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>entry</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Launch the program at one of its entry points and wait (WRAM-safe). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entry</td><td>Offset of the entry point in the program set by <a class="el" href="#a54c1329e34940920937be4e71bce9d99" title="Tell the library where the GSU program lives.">gsuSetProgram()</a> — the build writes one per global label of the <span class="tt">.sfx</span> into <span class="tt">&lt;name&gt;.sfx.h</span> (<span class="tt">gsu_job.sfx</span>'s <span class="tt">mul_job</span> becomes <span class="tt">GSU_JOB_MUL_JOB</span>)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p><a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a> starts at offset 0; this starts at <span class="tt">entry</span>, the rest is the same (interrupts, bus ownership, the wait from the RAM code window). Pass arguments in the GSU registers before the call — <span class="tt"><a class="el" href="#aaae39a6799d57a1de176c8477797438c">REG_GSU_R1</a> = x;</span> — any of R0-R7 and R9-R13: the launcher itself writes R8 (buffer base, SCBR × 1024) and R15. The program must not cross a 32 KB ROM bank.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;gsu_job.sfx.h&quot;</span></div>
+<div class="line"><a class="code hl_define" href="#aaae39a6799d57a1de176c8477797438c">REG_GSU_R1</a> = 300;</div>
+<div class="line"><a class="code hl_define" href="#a50f6c320765504bcc8678f0b9c4453e5">REG_GSU_R2</a> = 7;</div>
+<div class="line"><a class="code hl_function" href="#a040eb7d8b9be9450f11d467d2948268a">gsuCall</a>(GSU_JOB_MUL_JOB);</div>
+<div class="ttc" id="asuperfx_8h_html_a040eb7d8b9be9450f11d467d2948268a"><div class="ttname"><a href="#a040eb7d8b9be9450f11d467d2948268a">gsuCall</a></div><div class="ttdeci">void gsuCall(u16 entry)</div><div class="ttdoc">Launch the program at one of its entry points and wait (WRAM-safe).</div></div>
+<div class="ttc" id="asuperfx_8h_html_a50f6c320765504bcc8678f0b9c4453e5"><div class="ttname"><a href="#a50f6c320765504bcc8678f0b9c4453e5">REG_GSU_R2</a></div><div class="ttdeci">#define REG_GSU_R2</div><div class="ttdef"><b>Definition</b> superfx.h:30</div></div>
+<div class="ttc" id="asuperfx_8h_html_aaae39a6799d57a1de176c8477797438c"><div class="ttname"><a href="#aaae39a6799d57a1de176c8477797438c">REG_GSU_R1</a></div><div class="ttdeci">#define REG_GSU_R1</div><div class="ttdef"><b>Definition</b> superfx.h:29</div></div>
+</div><!-- fragment --> 
+</div>
+</div>
 <a id="ae76c8e0f8bfa078d0bc18b4be1f4f6a8" name="ae76c8e0f8bfa078d0bc18b4be1f4f6a8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8">&#9670;&#160;</a></span>gsuDmaFullFrame()</h2>
 
@@ -861,8 +1020,29 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS). </p>
-<p>Polls V-counter until scanline 184, then DMAs full framebuffer. Requires <a class="el" href="#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a> for sufficient DMA bandwidth. </p>
+<p>One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox. </p>
+<p>Waits for a line from which the whole frame lands before the display comes back — the bottom band's first line (225 - bottom) up to 152 + top — and starts the DMA there; called later than that window, it waits for the next frame's. Needs <a class="el" href="#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a> bands with top + bottom &gt;= 73 (40 + 40: lines 185-192). The CPU waits the whole time; <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> is the variant that does not.</p>
+<p>Until 2026-09-29 it read OPVCT once per poll without STAT78, so every other call read the high byte (PPU2 open bus: the previous exit value) and started at once: in superfx_3d a third of the bytes landed on visible lines and were dropped (luna &ndash;dma-trace). </p>
+
+</div>
+</div>
+<a id="ae90a0319a2136c010dcb21917e90744c" name="ae90a0319a2136c010dcb21917e90744c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae90a0319a2136c010dcb21917e90744c">&#9670;&#160;</a></span>gsuFrameBytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> gsuFrameBytes </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bytes of one framebuffer for gsu_scmr's height and depth. </p>
+<dl class="section return"><dt>Returns</dt><dd>32 columns x H/8 x 8*bpp bytes (16384 at 256x128x4bpp), 0 for OBJ mode or the reserved depth </dd></dl>
 
 </div>
 </div>
@@ -952,6 +1132,102 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a3765f516c293b584f063a05ac723f75a" name="a3765f516c293b584f063a05ac723f75a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3765f516c293b584f063a05ac723f75a">&#9670;&#160;</a></span>gsuPresent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gsuPresent </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Queue the frame the last job drew; the next job draws in the other. </p>
+<p>Waits (WaitForVBlank) while the previous frame is still being moved, then hands the buffer at gsu_scbr to the NMI and switches gsu_scbr to the other one. Call it after the job has stopped (<a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a> returned, or <a class="el" href="#a08f145d6e71ff599568073b91a5cabe5" title="Wait for the end of the job, then give the Game Pak back to the CPU.">gsuWait()</a>). </p>
+
+</div>
+</div>
+<a id="a184d51664ef4edc754b9d33b63168f4c" name="a184d51664ef4edc754b9d33b63168f4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a184d51664ef4edc754b9d33b63168f4c">&#9670;&#160;</a></span>gsuPresentBusy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsuPresentBusy </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>1 while a presented frame is still being moved to VRAM </p>
+
+</div>
+</div>
+<a id="a5c6d08013690338aaa4dc06074da9d73" name="a5c6d08013690338aaa4dc06074da9d73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c6d08013690338aaa4dc06074da9d73">&#9670;&#160;</a></span>gsuPresentInit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsuPresentInit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vram_a</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vram_b</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>flags</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set up presentation for gsu_scmr's geometry. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vram_a</td><td>VRAM word address of the char block shown first </td></tr>
+    <tr><td class="paramname">vram_b</td><td>VRAM word address of the other one </td></tr>
+    <tr><td class="paramname">flags</td><td>0, or GSU_PRESENT_ON_LAG_FRAMES </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>1, or 0 if a block is not a multiple of $1000 words, runs past VRAM, or two framebuffers from gsu_scbr on do not fit in the Game Pak RAM the header declares</dd></dl>
+<p>The two Game Pak RAM framebuffers start at gsu_scbr and right after it. Sets BG1's char base to <span class="tt">vram_a</span>: call it with the screen off. The tilemap (gsuSetupBitmapTilemap) serves both blocks. </p>
+
+</div>
+</div>
+<a id="a5eaac970860c08a3d2a40e2662528fe8" name="a5eaac970860c08a3d2a40e2662528fe8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5eaac970860c08a3d2a40e2662528fe8">&#9670;&#160;</a></span>gsuPresentWait()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void gsuPresentWait </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Wait until the last presented frame is on screen. </p>
+
+</div>
+</div>
 <a id="a54c1329e34940920937be4e71bce9d99" name="a54c1329e34940920937be4e71bce9d99"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a54c1329e34940920937be4e71bce9d99">&#9670;&#160;</a></span>gsuSetProgram()</h2>
 
@@ -977,7 +1253,6 @@ Variables</h2></td></tr>
 <p>Sets gsu_prog_bank and gsu_prog_addr, which <a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a> reads. Call it once before the first <a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a>, and again only to switch programs. (Until 2026-09-26 this header asked for it but only the superfx_3d example defined it, in asm.)</p>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="chips_2superfx__3d_2main_8c.html#a2861225d7574bbcdac86c81668b650c3">gsu_program</a>[];   <span class="comment">// label before the .incbin in your .asm</span></div>
 <div class="line"><a class="code hl_function" href="#a54c1329e34940920937be4e71bce9d99">gsuSetProgram</a>(<a class="code hl_variable" href="chips_2superfx__3d_2main_8c.html#a2861225d7574bbcdac86c81668b650c3">gsu_program</a>);</div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="asuperfx_8h_html_a54c1329e34940920937be4e71bce9d99"><div class="ttname"><a href="#a54c1329e34940920937be4e71bce9d99">gsuSetProgram</a></div><div class="ttdeci">void gsuSetProgram(const void *program)</div><div class="ttdoc">Tell the library where the GSU program lives.</div></div>
 </div><!-- fragment --> 
 </div>
@@ -1008,10 +1283,11 @@ Variables</h2></td></tr>
 <p>Setup column-major tilemap for SuperFX PLOT framebuffer. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">vramAddr</td><td>VRAM word address for tilemap (typically 0x4000) </td></tr>
+    <tr><td class="paramname">vramAddr</td><td>VRAM word address for tilemap (typically 0x4000)</td></tr>
   </table>
   </dd>
 </dl>
+<p>32 columns of H/8 tiles, H from gsu_scmr's height (128, 160 or 192; since 2026-09-29, 16 rows whatever the height before); the rest of the 32x32 map points at tile 0. Set gsu_scmr first. </p>
 
 </div>
 </div>
@@ -1050,7 +1326,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Creates black bars like Star Fox. Total blank + VBlank must provide enough bandwidth for the 16KB framebuffer DMA (~6.2ms needed). </p>
+<p>Creates black bars like Star Fox, on HDMA channel 1 (INIDISP). HDMA starts a channel at line 0, so the bands appear from the next frame: the function returns only once they are on screen (it waits up to a frame) and then publishes them to <a class="el" href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox.">gsuDmaFullFrame()</a> and the <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> NMI, which use the blanked lines as extra transfer time. Leave the bands on while either is in use. </p>
 
 </div>
 </div>
@@ -1072,11 +1348,11 @@ Variables</h2></td></tr>
 <p>Start the program loaded by <a class="el" href="#a943b65ace4311678092e5d4176b014b5" title="Copy a GSU program into the GSU code cache ($3100-$32FF).">gsuCacheLoad()</a> and return at once. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pc</td><td>Entry offset in the cache (0 for the first byte)</td></tr>
+    <tr><td class="paramname">pc</td><td>Entry offset in the cache (0 for the first byte; the build's <span class="tt">&lt;name&gt;.sfx.h</span> names every entry point)</td></tr>
   </table>
   </dd>
 </dl>
-<p>Writes gsu_cfgr, the 21 MHz clock, gsu_scbr, then gsu_scmr with RON forced to 0 (the ROM stays the CPU's), then R15, which starts the GSU. </p>
+<p>Writes gsu_cfgr, the 21 MHz clock, gsu_scbr, R8 = the buffer base (gsu_scbr x 1024, as <a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a> does; since 2026-09-29), then gsu_scmr with RON forced to 0 (the ROM stays the CPU's), then R15, which starts the GSU. </p>
 
 </div>
 </div>
@@ -1146,6 +1422,79 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>DMA source high byte ($00=buffer A at $70:0000, $40=buffer B at $70:4000). </p>
+
+</div>
+</div>
+<a id="a70c2d5bd4c0e5a4872e11634387111c7" name="a70c2d5bd4c0e5a4872e11634387111c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70c2d5bd4c0e5a4872e11634387111c7">&#9670;&#160;</a></span>gsu_owns_cart</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_owns_cart</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>1 while a GSU job owns the Game Pak ROM (crt0) </p>
+<p><a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a> sets it around its job. Code of your own that starts a job with SCMR RON = 1 (from the RAM code window: RAM_CODE, RAM_CODE_SECTION) sets it before the start and clears it once SCMR is back to 0: while it is 1 the NMI and IRQ entries (crt0, in WRAM) do only the ROM-free part of their work — frame_count, OAM upload, IRQ acknowledge — and defer the rest. </p>
+
+</div>
+</div>
+<a id="a4ca4f9e59d99a3ce44f1006f479c4945" name="a4ca4f9e59d99a3ce44f1006f479c4945"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ca4f9e59d99a3ce44f1006f479c4945">&#9670;&#160;</a></span>gsu_pres_frames</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> gsu_pres_frames</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Frames <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> has put on screen so far. </p>
+
+</div>
+</div>
+<a id="a1c55343a21276a24a96c2015a3bcb0ef" name="a1c55343a21276a24a96c2015a3bcb0ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c55343a21276a24a96c2015a3bcb0ef">&#9670;&#160;</a></span>gsu_pres_last</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> gsu_pres_last</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Bytes the last transferring NMI moved (a diagnostic: the window). </p>
 
 </div>
 </div>
@@ -1242,6 +1591,56 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON). </p>
+
+</div>
+</div>
+<a id="a20b4afdcc076097e24c44fe840dacc0c" name="a20b4afdcc076097e24c44fe840dacc0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20b4afdcc076097e24c44fe840dacc0c">&#9670;&#160;</a></span>gsu_scmr_live</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_scmr_live</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The value last written to SCMR (write-only), kept by the library. </p>
+<p><a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a>, <a class="el" href="#a040eb7d8b9be9450f11d467d2948268a" title="Launch the program at one of its entry points and wait (WRAM-safe).">gsuCall()</a>, <a class="el" href="#a8745a42974dfd87a72b1adc719729aa7" title="Start the program loaded by gsuCacheLoad() and return at once.">gsuStartCached()</a> and <a class="el" href="#a08f145d6e71ff599568073b91a5cabe5" title="Wait for the end of the job, then give the Game Pak back to the CPU.">gsuWait()</a> keep it. Code of your own that writes REG_SCMR while <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> is in use must keep it too — write it BEFORE giving the GSU the buses, clear it BEFORE taking them back: the presentation NMI takes Game Pak RAM from the GSU for its transfer and restores this value after. </p>
+
+</div>
+</div>
+<a id="ab98ad9f6611bf1f5946647d30e97fb15" name="ab98ad9f6611bf1f5946647d30e97fb15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab98ad9f6611bf1f5946647d30e97fb15">&#9670;&#160;</a></span>gsu_stop_irqs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">volatile <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> gsu_stop_irqs</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>GSU IRQs on STOP acknowledged so far (crt0, wraps at 256). </p>
+<p>With gsu_cfgr's CFGR_IRQ_MASK clear, the GSU raises an IRQ when its program executes STOP. The Super FX IRQ entry (crt0, in WRAM) reads the GSU status to tell it from an H/V-timer IRQ, acknowledges it and adds one here; your <a class="el" href="interrupt_8h.html#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> handler never sees it. Compare with a copy taken before the start: the count moving is the end of the job, without polling the GSU. The CPU's I flag must be clear (<a class="el" href="interrupt_8h.html#ada4c1ec4449e797d007bd17766156e9f" title="Enable H/V timer IRQs and unmask interrupts (CLI).">irqEnable()</a> clears it) for the IRQ to be taken at all. (Since 2026-09-27: before, an unmasked STOP IRQ with the I flag clear locked the CPU in its IRQ entry.) </p>
 
 </div>
 </div>

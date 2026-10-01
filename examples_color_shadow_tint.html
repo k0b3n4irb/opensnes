@@ -130,7 +130,7 @@ Why it matters for your game</h2>
 <img src="shadow_tint.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-16"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-17"></a>
 What you'll learn</h2>
 <p>The single new idea: <b>colour math against a <em>fixed</em> colour.</b> The PPU takes the finished main-screen image and adds or subtracts a constant colour per layer — <span class="tt"><a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow()</a></span> subtracts a grey (darken), <span class="tt"><a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint()</a></span> adds a colour (cast). This rests on the layers, tiles and palette you already know; the effect sits <em>on top</em> of them and touches no VRAM, CGRAM or OAM.</p>
 <p>Because both effects share the one fixed-colour register and the single add/subtract bit, <b>only one is active at a time</b> — which is exactly why the demo cycles through them rather than combining them. The scene is a 4×4 chart of sixteen game-world colours, built procedurally (zero assets), so you can watch the transform land on every hue together.</p>
@@ -144,11 +144,11 @@ What to observe / if it breaks</h2>
 <li><b>Shadow goes fully black / tint blows out white:</b> the fixed-colour intensity is too high — <span class="tt"><a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow</a></span> subtracts, <span class="tt"><a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint</a></span> adds, both clamp at the channel limits.</li>
 </ul>
 <p>Probe oracle: <span class="tt"><a class="el" href="color_2shadow__tint_2main_8c.html#adf08111f5aa78a7eb0efff8c23f8d70a" title="Probe oracle: current effect (0 none, 1 shadow, 2 underwater, 3 sunset).">fx_state</a></span> (0 none, 1 shadow, 2 underwater, 3 sunset) advances on each A press; the effect matches CGADSUB (add/subtract) and COLDATA (the fixed colour).</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-17"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-18"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../tools/luna-test/bin/luna run -n 3000000 shadow_tint.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-32"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-33"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span>, <span class="tt">input</span></p>
 <h2 class="doxsection"><a class="anchor" id="where-you-are-4"></a>

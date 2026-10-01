@@ -130,6 +130,8 @@ $(function(){initNavTree('group__volatile__types.html','',''); });
 Macros</h2></td></tr>
 <tr class="memitem:gaef060b3456fdcc093a7210a762d5f2ed" id="r_gaef060b3456fdcc093a7210a762d5f2ed"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a>&#160;&#160;&#160;/* host compilers (the clang syntax lint) have no <a class="el" href="lzss_8h.html#a0d8377683457522d19db68ed2bf36aeb">address</a> spaces */</td></tr>
 <tr class="memdesc:gaef060b3456fdcc093a7210a762d5f2ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.  <br /></td></tr>
+<tr class="memitem:ga2b7f5fd96b29a2a70327ee4bae8bb232" id="r_ga2b7f5fd96b29a2a70327ee4bae8bb232"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ga2b7f5fd96b29a2a70327ee4bae8bb232">RAM_CODE</a>&#160;&#160;&#160;/* host compilers (the clang syntax lint) */</td></tr>
+<tr class="memdesc:ga2b7f5fd96b29a2a70327ee4bae8bb232"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run a function from WRAM instead of ROM.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -158,6 +160,23 @@ Typedefs</h2></td></tr>
 
 <p>Place a global in bank $7E WRAM, outside the 8 KB bank-0 band. </p>
 <p><span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a> <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> buffer[4096];</span> — the object lives in <span class="tt">$7E:2000-$FFFF</span> and every access to it (direct, <span class="tt">buffer[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span>, or through a <span class="tt"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> <a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a> *</span> pointer) is compiled with bank-honouring addressing. Use it for bulk state that does not fit the 8 KB band: HDMA tables, tilemaps built in RAM, entity pools. Restrictions: static storage only (the stack is bank 0) and not <span class="tt">const</span> (ROM is already reachable from any bank). Initialisers work (the boot data-init copy carries the bank); everything else is zero at boot. Handing a <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> pointer to code expecting a plain pointer is a compile error, as with <span class="tt">const</span>; a plain pointer converts to <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> silently and just takes the far path. A <span class="tt">T <a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a> *</span> converts to <span class="tt">const T *</span> without a cast — a read through a const pointee is already a far read — so the DMA/HDMA/asset helpers take <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> buffers as they are. Cost: <span class="tt">arr[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span> on a <span class="tt"><a class="el" href="#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> array is one absolute-long-indexed instruction (cheaper than bank 0); a pointer walk is within 4 % of the bank-0 path. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="far__ram_8md.html">docs/tutorials/far_ram.md</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga2b7f5fd96b29a2a70327ee4bae8bb232" name="ga2b7f5fd96b29a2a70327ee4bae8bb232"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2b7f5fd96b29a2a70327ee4bae8bb232">&#9670;&#160;</a></span>RAM_CODE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAM_CODE&#160;&#160;&#160;/* host compilers (the clang syntax lint) */</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Run a function from WRAM instead of ROM. </p>
+<p><span class="tt"><a class="el" href="#ga2b7f5fd96b29a2a70327ee4bae8bb232" title="Run a function from WRAM instead of ROM.">RAM_CODE</a> void wait_for_job(void) { ... }</span> — the function is linked in the RAM code window (<span class="tt">RAM_CODE_SIZE</span> in the Makefile, at the top of bank <span class="tt">$7E</span>), stored in ROM and copied there by crt0 at boot; callers reach it with an ordinary call. It is for code that must run while the CPU cannot read the ROM (a Super FX job with RON = 1): then it must not call a ROM function (library, runtime helpers such as multiplication, other non-RAM_CODE functions) nor read const data, which lives in ROM. A project with no window fails to assemble with a message naming the function. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="superfx_8md.html">docs/tutorials/superfx.md</a> </dd></dl>
 
 </div>
 </div>

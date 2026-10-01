@@ -28,7 +28,6 @@ var basics_2panel__hud_2main_8c =
     [ "build_scene", "basics_2panel__hud_2main_8c.html#a92c22c08010413b9be79cf7ce7328666", null ],
     [ "build_sheet", "basics_2panel__hud_2main_8c.html#a69334ea563f1df1f83c69ed6e64ad1ed", null ],
     [ "draw_hearts", "basics_2panel__hud_2main_8c.html#a9c98027c74745cfe6000b749f4dcd692", null ],
-    [ "encode_4bpp", "basics_2panel__hud_2main_8c.html#a79a0dafe371179f4a760c94a0160572f", null ],
     [ "flush_hud_row", "basics_2panel__hud_2main_8c.html#acdd93236bca869d95e6723353e313772", null ],
     [ "main", "basics_2panel__hud_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "put_tile", "basics_2panel__hud_2main_8c.html#a4485932d05cb6f6162b011a9c83ec592", null ],

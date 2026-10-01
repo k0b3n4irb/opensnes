@@ -16,7 +16,7 @@ var searchData=
   ['windowsplit_13',['windowSplit',['../window_8h.html#a977a0f5193aa0688fef854dce181d2de',1,'window.h']]],
   ['write_5ftile_14',['write_tile',['../memory_2hirom__demo_2main_8c.html#a7e612617242d479ac289ab6632a5116e',1,'main.c']]],
   ['write_5fvram_5fcolumn_15',['write_vram_column',['../games_2likemario_2main_8c.html#a08f0ca6d6bd43a513eb762fdbfb5f64d',1,'main.c']]],
-  ['writeedgestosram_16',['writeEdgesToSRAM',['../chips_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'main.c']]],
+  ['writeedgestosram_16',['writeEdgesToSRAM',['../chips_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'writeEdgesToSRAM(void):&#160;main.c'],['../chips_2superfx__game__skeleton_2main_8c.html#a17000e52c641974ad31ef2386e695fe1',1,'writeEdgesToSRAM(void):&#160;main.c']]],
   ['writenum_17',['writenum',['../games_2breakout_2main_8c.html#aa94bc4cfa95e2b8bf5c8c4ed8994a6b9',1,'main.c']]],
   ['writenum_5fbg2_18',['writenum_bg2',['../hud_8c.html#af56014df16479f3e62ea17d3f35bfed5',1,'hud.c']]],
   ['writestring_19',['writestring',['../games_2breakout_2main_8c.html#aeaffc0d7f18fb5ca3879eb91a1b5d268',1,'main.c']]],

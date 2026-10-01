@@ -29,6 +29,7 @@ var group__examples =
     [ "main.c", "chips_2sa1__hello_2main_8c.html", null ],
     [ "main.c", "chips_2sa1__starfield_2main_8c.html", null ],
     [ "main.c", "chips_2superfx__3d_2main_8c.html", null ],
+    [ "main.c", "chips_2superfx__game__skeleton_2main_8c.html", null ],
     [ "main.c", "chips_2superfx__hello_2main_8c.html", null ],
     [ "main.c", "color_2direct__color_2main_8c.html", null ],
     [ "main.c", "color_2gradient__9bit_2main_8c.html", null ],

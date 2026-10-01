@@ -5,5 +5,6 @@ var searchData=
   ['goomba_5fxveloc_2',['GOOMBA_XVELOC',['../goomba_8c.html#ad0fa238c54b681068b605e205abf963a',1,'goomba.c']]],
   ['gravity_3',['GRAVITY',['../games_2likemario_2main_8c.html#a6801baa546c6112d19eb095111d24720',1,'main.c']]],
   ['ground_5fmax_4',['GROUND_MAX',['../mode7_2dsp1__ground_2main_8c.html#a4c4aad939d02eb3cfd1dc491c36d38c8',1,'main.c']]],
-  ['gsu_5fsram_5fbase_5',['GSU_SRAM_BASE',['../superfx_8h.html#a5f2488a9b53dde961d0d3f7e8f2261ea',1,'superfx.h']]]
+  ['gsu_5fpresent_5fon_5flag_5fframes_5',['GSU_PRESENT_ON_LAG_FRAMES',['../superfx_8h.html#a59552ad51a34113d1aa30627aa0c3374',1,'superfx.h']]],
+  ['gsu_5fsram_5fbase_6',['GSU_SRAM_BASE',['../superfx_8h.html#a5f2488a9b53dde961d0d3f7e8f2261ea',1,'superfx.h']]]
 ];

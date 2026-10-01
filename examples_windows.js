@@ -4,7 +4,7 @@ var examples_windows =
       [ "The ladder", "examples_windows.html#the-ladder-11", null ],
       [ "The idea in one screen", "examples_windows.html#the-idea-in-one-screen-9", [
         [ "Controls", "examples_windows_transparent_window.html#controls-38", null ],
-        [ "Build &amp; Run", "examples_windows_transparent_window.html#build--run-49", null ],
+        [ "Build &amp; Run", "examples_windows_transparent_window.html#build--run-50", null ],
         [ "How It Works", "examples_windows_transparent_window.html#how-it-works-21", [
           [ "The Technique", "examples_windows_transparent_window.html#the-technique", null ],
           [ "Window for Color Math (Not for BG Masking)", "examples_windows_transparent_window.html#window-for-color-math-not-for-bg-masking", null ],
@@ -17,7 +17,7 @@ var examples_windows =
         ] ],
         [ "Project Structure", "examples_windows_transparent_window.html#project-structure-22", null ],
         [ "Going Further", "examples_windows_transparent_window.html#going-further-13", null ],
-        [ "Modules Used", "examples_windows_transparent_window.html#modules-used-75", null ]
+        [ "Modules Used", "examples_windows_transparent_window.html#modules-used-76", null ]
       ] ]
     ] ],
     [ "Window -- HDMA Triangle Masking", "examples_windows_window.html", null ],

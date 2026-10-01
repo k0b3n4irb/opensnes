@@ -139,6 +139,7 @@ What You'll Learn</h2>
 <li>Procedural sprite generation (no graphic assets needed)</li>
 <li>Depth illusion via 4 brightness palettes cycling across sprites</li>
 <li>Synchronization protocol between SA-1 and main CPU</li>
+<li>Running SA-1 code from I-RAM: copy it there, keep it position-independent</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="what-to-observe-2"></a>
 What to Observe</h2>
@@ -146,7 +147,7 @@ What to Observe</h2>
 <li>128 dots moving in smooth, coordinated flock-like patterns</li>
 <li>The pattern resembles a murmuration (starling flock)</li>
 <li>4 brightness levels create a subtle depth effect</li>
-<li>All math computed by the SA-1 (clocked at 10.74 MHz; ~5.4 MHz effective here, since both CPUs run from ROM — see the SA-1 tutorial)</li>
+<li>All math computed by the SA-1, from I-RAM: at boot it copies its loop and sine table there, so it does not share the ROM with the main CPU (~10.7 MHz; ~8.5 MHz when built with <span class="tt">make clean &amp;&amp; make SA1_CODE_IN=ROM</span> — see the SA-1 tutorial for the measurement)</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="modules-used-24"></a>
 Modules Used</h2>

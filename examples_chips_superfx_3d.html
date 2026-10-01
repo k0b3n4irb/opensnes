@@ -123,7 +123,7 @@ $(function(){initNavTree('examples_chips_superfx_3d.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><blockquote class="doxtable">
-<p>Auto-rotating wireframe cube at 60 FPS — Star Fox style 3D on SNES </p>
+<p>Auto-rotating wireframe cube — Star Fox style 3D on SNES, about 30 frames per second </p>
 </blockquote>
 <p><img src="superfx_3d.png" alt="" class="inline" title="Screenshot"/>    </p>
 <h2 class="doxsection"><a class="anchor" id="emulator-compatibility-1"></a>
@@ -149,10 +149,10 @@ What You'll Learn</h2>
 <li><b>3D rotation</b>: Y+X axis rotation using 256-entry sine table (C-side)</li>
 <li><b>Bresenham line drawing</b>: GSU draws 12 edges via PLOT (all 8 octants)</li>
 <li><b>HDMA screen blanking</b>: 40 scanlines forced blank top + bottom (like Star Fox)</li>
-<li><b>Scanline-polled DMA</b>: 16KB framebuffer transferred at 60 FPS</li>
+<li><b>Scanline-polled DMA</b>: the 16 KB framebuffer sent in the letterbox, started only on a line from which it lands whole (about 30 frames per second, measured on luna; for a game loop that keeps running meanwhile, see <span class="tt">superfx_game_skeleton</span>)</li>
 <li><b>BG scroll centering</b>: VOFS=208 centers 128px framebuffer in visible area</li>
 <li><b>Vertex clamping</b>: projected coords clamped to framebuffer bounds (0-126)</li>
-<li><b>SuperFX library API</b>: <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="Scanline-polled 16KB DMA from SRAM to VRAM (60 FPS).">gsuDmaFullFrame()</a></span></li>
+<li><b>SuperFX library API</b>: <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox.">gsuDmaFullFrame()</a></span></li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="architecture-3"></a>
 Architecture</h2>

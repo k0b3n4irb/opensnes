@@ -6,7 +6,7 @@ var examples_sprites =
         [ "What This Example Shows", "examples_sprites_animated_sprite.html#what-this-example-shows-7", null ],
         [ "Prerequisites", "examples_sprites_animated_sprite.html#prerequisites-8", null ],
         [ "Controls", "examples_sprites_animated_sprite.html#controls-31", null ],
-        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#build--run-40", null ],
+        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#build--run-41", null ],
         [ "How It Works", "examples_sprites_animated_sprite.html#how-it-works-15", [
           [ "1. Sprite sheet layout", "examples_sprites_animated_sprite.html#autotoc_md1-sprite-sheet-layout", null ],
           [ "2. State machine", "examples_sprites_animated_sprite.html#autotoc_md2-state-machine", null ],
@@ -20,7 +20,7 @@ var examples_sprites =
         ] ],
         [ "Project Structure", "examples_sprites_animated_sprite.html#project-structure-16", null ],
         [ "Going Further", "examples_sprites_animated_sprite.html#going-further-8", null ],
-        [ "Modules Used", "examples_sprites_animated_sprite.html#modules-used-63", null ]
+        [ "Modules Used", "examples_sprites_animated_sprite.html#modules-used-64", null ]
       ] ]
     ] ],
     [ "Aseprite Pipeline", "examples_sprites_aseprite_pipeline.html", null ],

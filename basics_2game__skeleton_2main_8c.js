@@ -17,7 +17,6 @@ var basics_2game__skeleton_2main_8c =
     [ "draw_score", "basics_2game__skeleton_2main_8c.html#a77fdee493f1ec1254d85c465807847d6", null ],
     [ "draw_sprites", "basics_2game__skeleton_2main_8c.html#aac91fc9f5a5f9a3d7e0d3bc2fc4e78b8", null ],
     [ "draw_time", "basics_2game__skeleton_2main_8c.html#a8806cf862d9f668bb91ebf2ba41e031b", null ],
-    [ "encode_4bpp", "basics_2game__skeleton_2main_8c.html#a79a0dafe371179f4a760c94a0160572f", null ],
     [ "main", "basics_2game__skeleton_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "show_over", "basics_2game__skeleton_2main_8c.html#ae9145c36419bc364f1b78ff480121fa6", null ],
     [ "show_title", "basics_2game__skeleton_2main_8c.html#abf2018aab7d55d56b0a45cdecd7f4fd2", null ],

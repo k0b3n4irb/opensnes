@@ -22,10 +22,10 @@ var examples_by_category =
         [ "DSP-1 Coprocessor", "examples_by_category.html#dsp-1-coprocessor", null ]
       ] ],
       [ "Games (capstones)", "examples_by_category.html#games-capstones", [
-        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-36", null ],
+        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-37", null ],
         [ "SNES concepts", "examples_text_print_string.html#snes-concepts-48", null ],
         [ "How to build", "examples_text_print_string.html#how-to-build-22", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-71", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-72", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -102,6 +102,7 @@ var examples_by_category =
     [ "SA-1 Starfield (Murmuration)", "examples_chips_sa1_starfield.html", null ],
     [ "SuperFX Hello", "examples_chips_superfx_hello.html", null ],
     [ "SuperFX 3D Cube", "examples_chips_superfx_3d.html", null ],
+    [ "Super FX Game Skeleton", "examples_chips_superfx_game_skeleton.html", null ],
     [ "DSP-1 Cube", "examples_chips_dsp1_cube.html", null ],
     [ "Breakout", "examples_games_breakout.html", null ],
     [ "Tetris", "examples_games_tetris.html", null ],

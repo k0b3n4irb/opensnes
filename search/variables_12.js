@@ -26,7 +26,7 @@ var searchData=
   ['shake_5fdx_23',['shake_dx',['../games_2tetris_2main_8c.html#a92203f3a1cb3cacc4738e3ac55a59d19',1,'main.c']]],
   ['shake_5fdy_24',['shake_dy',['../games_2tetris_2main_8c.html#a65238ede9ae1e26e14a79b521895e703',1,'main.c']]],
   ['shape_5ftiles_25',['shape_tiles',['../games_2mode7__flying_2main_8c.html#a38aefd46976ba858c7007b4fa548c536',1,'main.c']]],
-  ['sin_5ftab_26',['sin_tab',['../chips_2superfx__3d_2main_8c.html#a74ca0597b23b1a8087c84123159f022f',1,'main.c']]],
+  ['sin_5ftab_26',['sin_tab',['../chips_2superfx__3d_2main_8c.html#a74ca0597b23b1a8087c84123159f022f',1,'sin_tab:&#160;main.c'],['../chips_2superfx__game__skeleton_2main_8c.html#a74ca0597b23b1a8087c84123159f022f',1,'sin_tab:&#160;main.c']]],
   ['sine_5ftable_27',['sine_table',['../math_8h.html#aa20b21cd7b12f72a2bfc0cbbf5fcabab',1,'math.h']]],
   ['size_28',['size',['../structAudioSample.html#a63b54dd64735b12287d21087574b9f93',1,'AudioSample']]],
   ['sizemode_29',['sizeMode',['../structOamDynamicConfig.html#a685a2cdb77aea757e5d652619c3dcd86',1,'OamDynamicConfig']]],

@@ -13,6 +13,7 @@ var types_8h =
     [ "MIN", "group__macros.html#ga3acffbd305ee72dcd4593c0d8af64a4f", null ],
     [ "NULL", "group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4", null ],
     [ "OPENSNES_DEPRECATED", "types_8h.html#a7e4a0ea7cc4892fdf814a6e0a7f841f0", null ],
+    [ "RAM_CODE", "group__volatile__types.html#ga2b7f5fd96b29a2a70327ee4bae8bb232", null ],
     [ "TRUE", "group__bool__type.html#gaa8cecfc5c5c054d2875c03e77b7be15d", null ],
     [ "true", "group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7", null ],
     [ "bool", "group__bool__type.html#ga97a80ca1602ebf2303258971a2c938e2", null ],

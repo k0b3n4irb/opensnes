@@ -30,7 +30,7 @@ var searchData=
   ['build_5fsheet_27',['build_sheet',['../basics_2panel__hud_2main_8c.html#a69334ea563f1df1f83c69ed6e64ad1ed',1,'main.c']]],
   ['build_5fsolid_5ftile_28',['build_solid_tile',['../color_2direct__color_2main_8c.html#a460156209b333c99c10a754e3b076326',1,'build_solid_tile(u8 v):&#160;main.c'],['../color_2palette__cycle_2main_8c.html#a460156209b333c99c10a754e3b076326',1,'build_solid_tile(u8 v):&#160;main.c'],['../color_2shadow__tint_2main_8c.html#a460156209b333c99c10a754e3b076326',1,'build_solid_tile(u8 v):&#160;main.c']]],
   ['build_5ftile_29',['build_tile',['../basics_2game__skeleton_2main_8c.html#a38608ebb4397534683147c1a152a7819',1,'main.c']]],
-  ['buildedges_30',['buildEdges',['../chips_2superfx__3d_2main_8c.html#a9ab89667514f31b155bfd2bd2ada0b00',1,'main.c']]],
+  ['buildedges_30',['buildEdges',['../chips_2superfx__3d_2main_8c.html#a9ab89667514f31b155bfd2bd2ada0b00',1,'buildEdges(void):&#160;main.c'],['../chips_2superfx__game__skeleton_2main_8c.html#a9ab89667514f31b155bfd2bd2ada0b00',1,'buildEdges(void):&#160;main.c']]],
   ['buildtilemap_31',['buildTilemap',['../color_2hicolor__1792_2main_8c.html#a0fe0fc52c8cfb28a22393505a74c8669',1,'main.c']]],
   ['bullet_5ffire_32',['bullet_fire',['../games_2shmup__1942_2main_8c.html#a9a56b8c79dce3512a930237c147e27d2',1,'main.c']]],
   ['bullet_5fhide_33',['bullet_hide',['../games_2shmup__1942_2main_8c.html#ae77ccc6c7f44ffa926b7ca3ff0bb1888',1,'main.c']]],

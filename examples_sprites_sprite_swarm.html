@@ -130,7 +130,7 @@ Why it matters for your game</h2>
 <img src="sprite_swarm.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-35"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-36"></a>
 What you'll learn</h2>
 <p>The single idea: <b>the per-sprite update budget.</b> The SNES has 128 hardware sprites and moves them with one OAM DMA per frame — cheap. But computing and writing each sprite's position in C is not free: the OAM buffer lives in bank $7E (every write is a slow long address) and cc65816 spills registers in a busy loop. Measured on luna, the smooth-60 fps ceiling for per-sprite C motion is **~32 sprites**; 40 already drops to 30.</p>
 <p>So this swarm runs 32 dots at a rock-steady 60 fps, each bouncing independently. The motion is deliberately trivial (integer add + edge bounce — no multiply, no trig) so what you're seeing is the cost of the <em>OAM update itself</em>, not the maths. Positions are written straight into <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span>; a single <span class="tt"><a class="el" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494" title="OAM DMA trigger flag.">oam_update_flag</a></span> lets the NMI's DMA push them all.</p>
@@ -144,13 +144,13 @@ What to observe / if it breaks</h2>
 <li><b>Nothing visible:</b> sprites need <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(LAYER_OBJ)</a></span> and colour 1 of an OBJ palette (CGRAM 128+) set to something non-black.</li>
 </ul>
 <p>Probe oracle: <span class="tt"><a class="el" href="sprites_2sprite__swarm_2main_8c.html#aefd40df56c53cc83d5999610fa9bd9ad" title="Probe oracle: frames elapsed (advances while the flock animates).">swarm_frame</a></span> advances once per displayed frame.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-46"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-47"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../tools/luna-test/bin/luna run -n 3000000 sprite_swarm.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-70"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-71"></a>
 Modules used</h2>
-<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span></p>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">tile</span> (<span class="tt"><a class="el" href="tile_8h.html#a6c06d0d08039a4c900c3a8ab0eeadb0a" title="64 colour indices (0-15) to one 4bpp tile">tileEncode4bpp</a></span>)</p>
 <p>Also linked: <span class="tt">math</span> — fixed-point sine / trigonometry.</p>
 <h2 class="doxsection"><a class="anchor" id="where-you-are-5"></a>
 Where you are</h2>

@@ -137,11 +137,11 @@ Controls</h2>
 <td class="markdownTableBodyNone">D-Pad Left/Right  </td><td class="markdownTableBodyNone">Module mode: amplitude 2 to 24 pixels, in steps of 2  </td></tr>
 </table>
 <p>The ripple runs from boot, with no input.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-24"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-25"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">make -C examples/hdma/hdma_wave</div>
 </div><!-- fragment --><p>Then open <span class="tt">hdma_wave.sfc</span> in luna (<span class="tt">luna-gui hdma_wave.sfc</span>) or any SNES emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-22"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-23"></a>
 What You'll Learn</h2>
 <ul>
 <li>What HDMA does that DMA cannot: a different register value on every scanline</li>
@@ -168,7 +168,7 @@ Walkthrough</h2>
 <div class="line">    <a class="code hl_variable" href="backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016">wave_phase</a> = 0;</div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a>(<a class="code hl_define" href="hdma_2hdma__wave_2main_8c.html#aac8a07ae7893fb46cd4f26f409f641f1">CH_HAND</a>, <a class="code hl_define" href="hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc">HDMA_MODE_1REG_2X</a>, <a class="code hl_define" href="hdma_8h.html#a49a74d7c1aad97f692a29b11865b700e">HDMA_DEST_BG1HOFS</a>,</div>
 <div class="line">          <a class="code hl_variable" href="hdma_2hdma__wave_2main_8c.html#abf00a26b74624dc6a2f78c58bdb7c8c3">wavetable</a> + <a class="code hl_variable" href="backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016">wave_phase</a> * <a class="code hl_define" href="hdma_2hdma__wave_2main_8c.html#ab4a96af1cf26126286b97851804254cf">ENTRY_BYTES</a>);</div>
-<div class="ttc" id="abackgrounds_2mode2_2main_8c_html_ad39ca1a8fe6cd45ad696878bd2621016"><div class="ttname"><a href="backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016">wave_phase</a></div><div class="ttdeci">u16 wave_phase</div><div class="ttdoc">Probe oracle: wave phase, advances each frame.</div><div class="ttdef"><b>Definition</b> main.c:49</div></div>
+<div class="ttc" id="abackgrounds_2mode2_2main_8c_html_ad39ca1a8fe6cd45ad696878bd2621016"><div class="ttname"><a href="backgrounds_2mode2_2main_8c.html#ad39ca1a8fe6cd45ad696878bd2621016">wave_phase</a></div><div class="ttdeci">u16 wave_phase</div><div class="ttdoc">Probe oracle: wave phase, advances each frame.</div><div class="ttdef"><b>Definition</b> main.c:50</div></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_aac8a07ae7893fb46cd4f26f409f641f1"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#aac8a07ae7893fb46cd4f26f409f641f1">CH_HAND</a></div><div class="ttdeci">#define CH_HAND</div><div class="ttdoc">Channel of the hand-built table (krom&#39;s channel 0).</div><div class="ttdef"><b>Definition</b> main.c:72</div></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_ab3c9143994d748245d6325f03b4f53b4"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#ab3c9143994d748245d6325f03b4f53b4">WAVE_WRAP</a></div><div class="ttdeci">#define WAVE_WRAP</div><div class="ttdoc">Wrap length of the start-pointer animation, in table entries. krom&#39;s exact value: his sine&#39;s quasi-pe...</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_ab4a96af1cf26126286b97851804254cf"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#ab4a96af1cf26126286b97851804254cf">ENTRY_BYTES</a></div><div class="ttdeci">#define ENTRY_BYTES</div><div class="ttdoc">Bytes per HDMA entry in 1REG_2X mode: count + 16-bit value.</div><div class="ttdef"><b>Definition</b> main.c:69</div></div>
@@ -247,7 +247,7 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../hdma_helpers/">HDMA Helpers</a> — the module's other effects (brightness and colour gradients, iris wipe, water ripple).</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-44"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-45"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <table class="markdownTable">

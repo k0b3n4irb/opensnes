@@ -7,7 +7,6 @@ var sprites_2sprite__swarm_2main_8c =
     [ "YMAX", "sprites_2sprite__swarm_2main_8c.html#a610d6ad95b18966b70b6845de2a9c56b", null ],
     [ "YMIN", "sprites_2sprite__swarm_2main_8c.html#aa025181dff552575490c5148a493ff65", null ],
     [ "build_dot", "sprites_2sprite__swarm_2main_8c.html#af20bbdf6602b10ca244aa4ba7fa6c19f", null ],
-    [ "encode_4bpp", "sprites_2sprite__swarm_2main_8c.html#a79a0dafe371179f4a760c94a0160572f", null ],
     [ "main", "sprites_2sprite__swarm_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "bvx", "sprites_2sprite__swarm_2main_8c.html#a1a35ab52cc193d203b87b761eed98bfe", null ],
     [ "bvy", "sprites_2sprite__swarm_2main_8c.html#a9d76100ae82dabe7163548aee5f1a1e2", null ],

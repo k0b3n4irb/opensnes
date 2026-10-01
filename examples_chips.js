@@ -12,5 +12,6 @@ var examples_chips =
     [ "SA-1 Hello World", "examples_chips_sa1_hello.html", null ],
     [ "SA-1 Starfield (Murmuration)", "examples_chips_sa1_starfield.html", null ],
     [ "SuperFX 3D Cube", "examples_chips_superfx_3d.html", null ],
+    [ "Super FX Game Skeleton", "examples_chips_superfx_game_skeleton.html", null ],
     [ "SuperFX Hello", "examples_chips_superfx_hello.html", null ]
 ];

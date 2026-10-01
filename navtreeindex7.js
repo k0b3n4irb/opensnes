@@ -1,5 +1,10 @@
 var NAVTREEINDEX7 =
 {
+"object_8h.html#a6a0d13021b69bdb55f9239d5577ae490":[9,0,3,0,0,21,11],
+"object_8h.html#a7cbfce19a3d4ed39620f93a7562ba2e3":[9,0,3,0,0,21,10],
+"object_8h.html#a828cd84eb41cd28c18ba0625cad1fd2a":[9,0,3,0,0,21,8],
+"object_8h.html#a8e4ece797bd4a68b80223e346bd84538":[9,0,3,0,0,21,12],
+"object_8h.html#a9e81915d1e68d22798a93bb27eb74188":[9,0,3,0,0,21,23],
 "object_8h.html#aa02a167f5798147f70c15c69282b97d2":[9,0,3,0,0,21,5],
 "object_8h.html#aa14cd55e5ffb19f7030a32f47e84f2a5":[9,0,3,0,0,21,17],
 "object_8h.html#aa938dfd9f79aa4f392525e37dfc097ac":[9,0,3,0,0,21,1],
@@ -204,15 +209,15 @@ var NAVTREEINDEX7 =
 "sa1_8h.html#afbde8860c749cfb87af677fb5cacc2f0":[9,0,3,0,0,25,0],
 "sa1_8h_source.html":[9,0,3,0,0,25],
 "scene_8h.html":[7,13,2],
-"scrolling_2continuous__scroll_2main_8c.html":[7,11,65],
-"scrolling_2mixed__scroll_2main_8c.html":[7,11,66],
+"scrolling_2continuous__scroll_2main_8c.html":[7,11,66],
+"scrolling_2mixed__scroll_2main_8c.html":[7,11,67],
 "scrolling_2mixed__scroll_2vram__map_8h.html":[9,0,1,12,1,1],
 "scrolling_2mixed__scroll_2vram__map_8h.html#a062335e0c6d2c2294bf2782b300c7a60":[9,0,1,12,1,1,0],
 "scrolling_2mixed__scroll_2vram__map_8h.html#a75ec3171efbfd345d2b96dcede29ded2":[9,0,1,12,1,1,1],
 "scrolling_2mixed__scroll_2vram__map_8h.html#a887794f9b169e435e406eed5ff0a9c3b":[9,0,1,12,1,1,2],
 "scrolling_2mixed__scroll_2vram__map_8h.html#ab202e5cd47fa03ebeb38e0a3b0c8940b":[9,0,1,12,1,1,3],
 "scrolling_2mixed__scroll_2vram__map_8h_source.html":[9,0,1,12,1,1],
-"scrolling_2parallax__scroll_2main_8c.html":[7,11,67],
+"scrolling_2parallax__scroll_2main_8c.html":[7,11,68],
 "snes_8h.html":[9,0,3,0,1],
 "snes_8h.html#a409c167562806a982baffc275742c677":[9,0,3,0,1,3],
 "snes_8h.html#a52dcd00f96e302db0233afedf45d42d3":[9,0,3,0,1,0],
@@ -244,10 +249,5 @@ var NAVTREEINDEX7 =
 "sprite_8h.html#a3ffc1c6494c1ac6cfec29f637278758f":[9,0,3,0,0,28,27],
 "sprite_8h.html#a444d9918d61d2001e411081d0f0bc616":[9,0,3,0,0,28,38],
 "sprite_8h.html#a449cd6f7c4fc8ca09a632e0c58cdb365":[9,0,3,0,0,28,34],
-"sprite_8h.html#a4741ad3cd0b065681e2a8f481525d16b":[9,0,3,0,0,28,40],
-"sprite_8h.html#a4ce5bbeefa16a91cd8e7db8fb7aa0e6c":[9,0,3,0,0,28,41],
-"sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4":[9,0,3,0,0,28,36],
-"sprite_8h.html#a512c524d16be34e3aa0fec1b2952e1bb":[9,0,3,0,0,28,73],
-"sprite_8h.html#a51c770c211be49217be7014b858a003c":[9,0,3,0,0,28,47],
-"sprite_8h.html#a52fbb2ea1761f60d6a026f6b711efa28":[9,0,3,0,0,28,15]
+"sprite_8h.html#a4741ad3cd0b065681e2a8f481525d16b":[9,0,3,0,0,28,40]
 };

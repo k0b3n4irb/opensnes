@@ -8,7 +8,7 @@ var examples_memory =
         [ "What This Example Shows", "examples_memory_hirom_demo.html#what-this-example-shows-2", null ],
         [ "Prerequisites", "examples_memory_hirom_demo.html#prerequisites-4", null ],
         [ "Controls", "examples_memory_hirom_demo.html#controls-23", null ],
-        [ "Build &amp; Run", "examples_memory_hirom_demo.html#build--run-33", null ],
+        [ "Build &amp; Run", "examples_memory_hirom_demo.html#build--run-34", null ],
         [ "How It Works", "examples_memory_hirom_demo.html#how-it-works-8", [
           [ "1. Enable HiROM in the Makefile", "examples_memory_hirom_demo.html#autotoc_md1-enable-hirom-in-the-makefile", null ],
           [ "2. The code is identical to LoROM", "examples_memory_hirom_demo.html#autotoc_md2-the-code-is-identical-to-lorom", null ],
@@ -22,7 +22,7 @@ var examples_memory =
         ] ],
         [ "Project Structure", "examples_memory_hirom_demo.html#project-structure-9", null ],
         [ "Going Further", "examples_memory_hirom_demo.html#going-further-2", null ],
-        [ "Modules Used", "examples_memory_hirom_demo.html#modules-used-54", null ]
+        [ "Modules Used", "examples_memory_hirom_demo.html#modules-used-55", null ]
       ] ]
     ] ],
     [ "Save Game -- SRAM Persistence", "examples_memory_save_game.html", null ]

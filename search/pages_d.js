@@ -205,7 +205,7 @@ var searchData=
   ['command_20not_20found_202',['command not found',['../troubleshooting.html#clang-command-not-found-or-cc-command-not-found',1,'&quot;clang: command not found&quot; or &quot;cc: command not found&quot;'],['../troubleshooting.html#wla-65816-command-not-found',1,'&quot;wla-65816: command not found&quot;']]],
   ['command_20not_20found_20or_20cc_3a_20command_20not_20found_203',['&quot;clang: command not found&quot; or &quot;cc: command not found&quot;',['../troubleshooting.html#clang-command-not-found-or-cc-command-not-found',1,'']]],
   ['command_20not_20found_3a_20make_204',['&quot;command not found: make&quot;',['../getting_started.html#command-not-found-make',1,'']]],
-  ['command_20reference_20pinned_20v1_2028_200_205',['luna — command reference (pinned v1.28.0)',['../tools_luna.html',1,'tools']]],
+  ['command_20reference_20pinned_20v1_2030_202_205',['luna — command reference (pinned v1.30.2)',['../tools_luna.html',1,'tools']]],
   ['commands_206',['Diagnostic Commands',['../troubleshooting.html#diagnostic-commands',1,'']]],
   ['commands_207',['Distance and Range: the game-logic commands',['../tutorial_dsp1.html#distance-and-range-the-game-logic-commands',1,'']]],
   ['commercial_20games_208',['Window Shapes in Commercial Games',['../examples_windows_window.html#window-shapes-in-commercial-games',1,'']]],

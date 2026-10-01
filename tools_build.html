@@ -178,6 +178,8 @@ Cartridge</h2>
 <td class="markdownTableBodyNone"><span class="tt">USE_SRAM</span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span>  </td><td class="markdownTableBodyNone"><span class="tt">1</span> declares battery-backed save RAM and links the <span class="tt">sram</span> module  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">SRAM_SIZE</span>  </td><td class="markdownTableBodyNone"><span class="tt">3</span>  </td><td class="markdownTableBodyNone">Save RAM size as the header byte <span class="tt">$FFD8</span>: 1 KB &lt;&lt; n, n = 1..7 (3 = 8 KB)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">RAM_CODE_SIZE</span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span>  </td><td class="markdownTableBodyNone">Bytes (1 to 16384) of a code window at the top of WRAM bank <span class="tt">$7E</span>, for code that runs from RAM (<span class="tt">RAM_CODE_SECTION</span>): stored in the top of ROM bank 1, copied by crt0 at boot. <span class="tt">0</span> = no window. A Super FX build adds 768 bytes for the SDK's own interrupt entries, <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch</a></span> wait loop and presentation step. The window shares ROM bank 1 with SNESMOD's default soundbank bank: a soundbank that fills bank 1 fails the link with "No room for section .ram_code" — move it with <span class="tt">SOUNDBANK_BANK := 2</span>. See the Super FX tutorial  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="coprocessors"></a>
 Coprocessors</h2>

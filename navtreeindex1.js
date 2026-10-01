@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"dir_48f67b58b9a0ad2b678b571ac65899f4.html":[9,0,1,3,5],
 "dir_499e1b33f49991c7bf9314bb42ef47a2.html":[9,0,1,3,3],
 "dir_4a33f256780b3d83d2a399a144270042.html":[9,0,1,1,7],
 "dir_4c43594cb340b9b81082e85d495f7dea.html":[9,0,1,13,0],
@@ -84,6 +85,7 @@ var NAVTREEINDEX1 =
 "dir_eb82fd0ca2c6442cd6fb356cf8d35f4f.html":[9,0,1,9,3],
 "dir_ee85cce8a1522c491f7abe58a9f5d459.html":[9,0,1,7,3],
 "dir_f2a6921f9122a16fa3f4679297d27c45.html":[9,0,1,6,4],
+"dir_f7964e505ad279637d476b78d41368ea.html":[9,0,1,3,4],
 "dir_fd5082750b92adad098a614dbe58c5c6.html":[9,0,1,11,0],
 "dma_8h.html":[9,0,3,0,0,9],
 "dma_8h.html#a40e788e1f17c83a2b199df7f5bae0d62":[9,0,3,0,0,9,0],
@@ -237,7 +239,7 @@ var NAVTREEINDEX1 =
 "examples_chips.html":[0,52,3],
 "examples_chips.html#the-ladder-2":[0],
 "examples_chips.html#the-two-chips-in-one-screen":[1],
-"examples_chips_dsp1_cube.html":[0,14,74],
+"examples_chips_dsp1_cube.html":[0,14,75],
 "examples_chips_dsp1_cube.html":[0,52,3,0],
 "examples_chips_dsp1_cube.html#firmware-requirement":[1,1],
 "examples_chips_dsp1_cube.html#how-to-build-10":[1,2],
@@ -247,7 +249,5 @@ var NAVTREEINDEX1 =
 "examples_chips_sa1_hello.html":[0,14,70],
 "examples_chips_sa1_hello.html":[0,52,3,1],
 "examples_chips_sa1_starfield.html":[0,13,47],
-"examples_chips_sa1_starfield.html":[0,14,71],
-"examples_chips_sa1_starfield.html":[0,52,3,2],
-"examples_chips_superfx_3d.html":[0,13,49]
+"examples_chips_sa1_starfield.html":[0,14,71]
 };

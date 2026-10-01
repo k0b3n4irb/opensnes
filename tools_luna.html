@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>luna — command reference (pinned v1.28.0)</title>
+<title>luna — command reference (pinned v1.30.2)</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('tools_luna.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">luna — command reference (pinned v1.28.0) </div></div>
+  <div class="headertitle"><div class="title">luna — command reference (pinned v1.30.2) </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>luna is the cycle-accurate emulator every OpenSNES test runs on (<span class="tt">.claude/rules/testing.md</span>). The SDK pins one release in <span class="tt">tools/luna-test/luna.version</span>; <span class="tt">scripts/install-luna.sh</span> fetches it and <span class="tt">make tests</span> uses nothing else. This page is that release's own <span class="tt">--help</span>, one section per subcommand, so what you read here is what the pinned binary accepts — not a newer or older luna.</p>
@@ -217,6 +217,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">      --update           Rewrite each manifest&#39;s `asserts.fbhash` with the measured value (regenerate goldens after an intended render change). Formatting and comments are preserved</div>
 <div class="line">      --only &lt;ONLY&gt;      Only run manifests whose path contains this substring</div>
 <div class="line">      --report &lt;REPORT&gt;  Also print a machine-readable JSON report to stdout [possible values: json]</div>
+<div class="line">      --jobs &lt;JOBS&gt;      Run up to N manifests at once (0 = one per CPU). Each manifest gets its own emulator; the report is the same lines in the same order, and the same exit code, as a serial run. Manifests chained through a battery file (one&#39;s `srm_out` is another&#39;s `srm_in`) still run one after another, in path order; there is no other ordering between manifests [default: 1]</div>
 <div class="line">  -h, --help             Print help</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-mcp"></a>
 <span class="tt">luna mcp</span></h2>
@@ -470,7 +471,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">          Hex offset range `LO:HI` (inclusive) to filter the memory trace on, e.g. `2100:21FF` to capture only PPU/CPU MMIO across all banks without the bank filter&#39;s code-fetch flood. Composes with `--mem-trace-bank` (both must match)</div>
 <div class="line"> </div>
 <div class="line">      --trace-writes &lt;TRACE_WRITES&gt;</div>
-<div class="line">          The &quot;who wrote this register&quot; hunt (issue #226): record only WRITES to these hex offsets (any bank), e.g. `2121,2122,420C`. Each row&#39;s `origin` column says who — `cpu`, `dma&lt;n&gt;` or `hdma&lt;n&gt;` — with the frame / line / PC. Composes with `--mem-trace-bank`; needs `--mem-trace &lt;PATH&gt;`</div>
+<div class="line">          The &quot;who wrote this register&quot; hunt (issue #226): record only WRITES to these hex offsets (any bank), e.g. `2121,2122,420C`. Each row&#39;s `origin` column says who — `cpu`, `dma&lt;n&gt;` or `hdma&lt;n&gt;` — with the frame / line / PC. The interrupt markers stay in the CSV to place the writes in time: `kind` `N` (NMI, at `$4210`) and `I` (IRQ, at `$4211`) — filter on `kind` `W` to count writes. Composes with `--mem-trace-bank`; needs `--mem-trace &lt;PATH&gt;`</div>
 <div class="line"> </div>
 <div class="line">      --dma-trace &lt;DMA_TRACE&gt;</div>
 <div class="line">          Optional DMA→VRAM transfer-time trace. Captures every byte an MDMA writes to `$2118/$2119` as CSV (`seq,frame,line,blank,force_blank,src,vram_word,reg,value`) — `blank` = V-blank period, `force_blank` = INIDISP (`$2100`) bit 7 at the write (a write is safe iff `blank||force_blank`), `src` the 24-bit A-bus source, `vram_word` the VMADD word the byte lands at, `reg` $18/$19. The byte is captured AS READ during the transfer, so a coprocessor (Super FX) overwriting its source buffer afterwards can&#39;t confound the source→VRAM comparison. Gated by `--dma-trace-from`/`--dma-trace-max`</div>

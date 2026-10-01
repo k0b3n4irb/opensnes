@@ -61,9 +61,10 @@ var searchData=
   ['start_5fgame_58',['start_game',['../basics_2game__skeleton_2main_8c.html#a6906719384302ffa8b6c12ad3e0b221f',1,'start_game(void):&#160;main.c'],['../games_2breakout_2main_8c.html#a6906719384302ffa8b6c12ad3e0b221f',1,'start_game(void):&#160;main.c']]],
   ['start_5fsong_59',['start_song',['../audio_2apu__switch_2main_8c.html#a96dfe2607d23dcee7a764fcb222fdf15',1,'main.c']]],
   ['startgame_60',['startGame',['../games_2tetris_2main_8c.html#ae615335cd0b31c24fe89bec2450a99b6',1,'main.c']]],
-  ['stategameover_61',['stateGameOver',['../games_2tetris_2main_8c.html#a59c2cf3a123a19cd0db0ae30e9497069',1,'main.c']]],
-  ['statelineclear_62',['stateLineClear',['../games_2tetris_2main_8c.html#a545edbcd3af64c435f12083bb135d254',1,'main.c']]],
-  ['stateplaying_63',['statePlaying',['../games_2tetris_2main_8c.html#aedc342cc3777dac516ecfd0311f029a2',1,'main.c']]],
-  ['statetitle_64',['stateTitle',['../games_2tetris_2main_8c.html#ad8a61053de03cf7f9efbc95d349ba66e',1,'main.c']]],
-  ['stopcurrenteffect_65',['stopCurrentEffect',['../hdma_2hdma__helpers_2main_8c.html#aef73a6de8d29b941fea581d69a7aea47',1,'main.c']]]
+  ['startjob_61',['startJob',['../chips_2superfx__game__skeleton_2main_8c.html#a3beeea441dea58ea89877ccf39801bb4',1,'main.c']]],
+  ['stategameover_62',['stateGameOver',['../games_2tetris_2main_8c.html#a59c2cf3a123a19cd0db0ae30e9497069',1,'main.c']]],
+  ['statelineclear_63',['stateLineClear',['../games_2tetris_2main_8c.html#a545edbcd3af64c435f12083bb135d254',1,'main.c']]],
+  ['stateplaying_64',['statePlaying',['../games_2tetris_2main_8c.html#aedc342cc3777dac516ecfd0311f029a2',1,'main.c']]],
+  ['statetitle_65',['stateTitle',['../games_2tetris_2main_8c.html#ad8a61053de03cf7f9efbc95d349ba66e',1,'main.c']]],
+  ['stopcurrenteffect_66',['stopCurrentEffect',['../hdma_2hdma__helpers_2main_8c.html#aef73a6de8d29b941fea581d69a7aea47',1,'main.c']]]
 ];

@@ -280,7 +280,7 @@ What reloads the workspace</h3>
 <div class="line">    <span class="comment">/* Returning here is safe: the write-back goes to the player&#39;s slot,</span></div>
 <div class="line"><span class="comment">       which it already matches. The enemy keeps its own record. */</span></div>
 <div class="line">}</div>
-<div class="ttc" id="abackgrounds_2mode2_2main_8c_html_a74098e4602b8556df3349bc817680573"><div class="ttname"><a href="backgrounds_2mode2_2main_8c.html#a74098e4602b8556df3349bc817680573">px</a></div><div class="ttdeci">static u8 px[64]</div><div class="ttdef"><b>Definition</b> main.c:51</div></div>
+<div class="ttc" id="abackgrounds_2mode2_2main_8c_html_a74098e4602b8556df3349bc817680573"><div class="ttname"><a href="backgrounds_2mode2_2main_8c.html#a74098e4602b8556df3349bc817680573">px</a></div><div class="ttdeci">static u8 px[64]</div><div class="ttdef"><b>Definition</b> main.c:52</div></div>
 </div><!-- fragment --><p>What is still yours to manage: after the peek, <span class="tt"><a class="el" href="object_8h.html#aff685114554f887d186a87bacbe786b9" title="Object workspace (Bank $00).">objWorkspace</a></span> <b>is</b> the player. Writing to it edits the player, and the collision routines you call next with the enemy's <span class="tt">idx</span> reload the enemy first. If you want to keep editing your own object, call <span class="tt">objGetPointer(my_own_handle)</span> to come back.</p>
 <h3 class="doxsection"><a class="anchor" id="positions-are-24-bit-fixed-point"></a>
 Positions are 24-bit fixed point</h3>

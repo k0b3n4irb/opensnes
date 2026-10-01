@@ -7,7 +7,7 @@ var examples_mode7 =
         [ "Controls", "examples_mode7_dsp1_ground.html#controls-25", null ],
         [ "SNES Concepts", "examples_mode7_dsp1_ground.html#snes-concepts-36", null ],
         [ "How to Build", "examples_mode7_dsp1_ground.html#how-to-build-19", null ],
-        [ "Modules Used", "examples_mode7_dsp1_ground.html#modules-used-56", null ],
+        [ "Modules Used", "examples_mode7_dsp1_ground.html#modules-used-57", null ],
         [ "Project Structure", "examples_mode7_dsp1_ground.html#project-structure-11", null ],
         [ "Going Further", "examples_mode7_dsp1_ground.html#going-further-4", null ]
       ] ]
