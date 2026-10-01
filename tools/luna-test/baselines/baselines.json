@@ -186,16 +186,22 @@
     "rom_sha256": "d27e76f3cf58eb14d0379bd549a9e0a5c82dc96548fea10a2a84288cabce24af"
   },
   "chips_superfx_3d": {
-    "fbhash": "e883e51d6d0c8725",
+    "fbhash": "eb10aa2e8450e805",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "e43ca8a484dfb2edd338b4edfbd9087a984c930c17b225ee4f373e4124db594f"
+    "luna_version": "v1.30.0",
+    "rom_sha256": "ae27a236b8cc7d47f9fe77c0b1c74d363b58d05e02d84191002df4a27b5b58a3"
+  },
+  "chips_superfx_game_skeleton": {
+    "fbhash": "09b2c34541b54d65",
+    "frames": 200,
+    "luna_version": "v1.30.0",
+    "rom_sha256": "e05db6a10f7d51f73abe2014a9ea7c12705a052717c3c4e155be81bb212ef315"
   },
   "chips_superfx_hello": {
     "fbhash": "e06b1714dc93b114",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "84e32a52365c10381d4a43379cec4764abd6c1ea0abec46de19bab5f4b04d95b"
+    "luna_version": "v1.30.0",
+    "rom_sha256": "5b1e56fff6cfa02a4e2626d1134d28cbfb643ce4ab010075d9114bd68e621adb"
   },
   "color_direct_color": {
     "fbhash": "3607ecf1978ea925",
@@ -499,15 +505,15 @@
   },
   "sprites_sprite_swarm": {
     "fbhash": [
-      "05d5682b072274a5",
-      "c3434d537ed1b6a5"
+      "e2f5ea03f168fa65",
+      "d62da6dcdf014f79"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.28.0",
-    "rom_sha256": "58eb08b22b2e3339f981869303cd4218740d15b387ea4125beffcc2a72c897a2"
+    "luna_version": "v1.30.0",
+    "rom_sha256": "70a9ad0820532089e747b5510dcbb01611adbc410b55859babab6090d2ce7614"
   },
   "text_print_string": {
     "fbhash": "937464355ee6168e",

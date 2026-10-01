@@ -111,6 +111,9 @@ SOUNDBANK_SRC ?=
 SOUNDBANK_OUT ?= soundbank
 SOUNDBANK_BANK ?= 1
 GSUSRC      ?=
+# Bytes of WRAM, at the top of bank $7E, for code that runs from RAM
+# (RAM_CODE_SECTION, templates/ram_code_start.asm). 0 = no window.
+RAM_CODE_SIZE ?= 0
 # ROM size as a project knob (2026-09-24). ROM_BANKS is the linker's bank
 # count (32 KB banks on LoROM / SA-1 / Super FX, 64 KB on HiROM); the header
 # byte ROMSIZE (1 KB << n) and the asset bank range follow it unless set by
@@ -191,6 +194,19 @@ endif
 
 # Assembler flags
 ASFLAGS := -D ROM_BANKS_VAL=$(ROM_BANKS) -D 'ASSET_BANKS_VAL="$(ASSET_BANKS_RANGE)"' $(if $(filter 1,$(USE_HIROM)),-D HIROM) $(if $(filter 1,$(USE_SA1)),-D SA1) $(if $(filter 1,$(USE_SUPERFX)),-D SUPERFX) $(if $(filter 1,$(USE_DSP1)),-D DSP1) $(if $(filter 1,$(USE_FASTROM)),-D FASTROM)
+ifneq ($(shell [ $(RAM_CODE_SIZE) -ge 0 ] && [ $(RAM_CODE_SIZE) -le 16384 ] && echo ok),ok)
+$(error RAM_CODE_SIZE=$(RAM_CODE_SIZE): must be a byte count from 0 to 16384)
+endif
+# The SDK's own share of the window, added to the project's: a Super FX
+# build keeps its interrupt entries and gsuLaunch's wait loop there
+# (crt0 gsu_nmi_blob & co., lib superfx.asm), 2026-09-29.
+RAM_CODE_SDK   := $(if $(filter 1,$(USE_SUPERFX)),768,0)
+RAM_CODE_TOTAL := $(shell echo $$(( $(RAM_CODE_SIZE) + $(RAM_CODE_SDK) )))
+ifneq ($(RAM_CODE_TOTAL),0)
+ASFLAGS += -D RAM_CODE -D RAM_CODE_ORG_VAL=$(shell echo $$(( 65536 - $(RAM_CODE_TOTAL) )))
+RAM_CODE_START_OBJ := ram_code_start.o
+RAM_CODE_END_OBJ   := ram_code_end.o
+endif
 
 
 # Check library is built (skip for 'clean')
@@ -223,7 +239,7 @@ _DEP_snesmod         := console
 # console's C references clearNmiFlag/unmaskIrq/clearIrqFlag (dma.asm) —
 # surfaced by the first example linking console WITHOUT dma (SPC700 arc)
 _DEP_console         := dma
-_DEP_superfx         := dma hdma
+_DEP_superfx         := dma hdma background console
 _DEP_hdma            := dma math_sqrt
 # math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt
 # only) and the larger trig + arithmetic module (math = sine LUT +
@@ -235,6 +251,7 @@ _DEP_hdma            := dma math_sqrt
 _DEP_math            := math_sqrt
 _DEP_asset           := dma background
 _DEP_panel           := dma console
+_DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
 _DEP_audio           := apu audio_blob
@@ -279,6 +296,7 @@ C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)/lib/include/snes/*.h)
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
+GSU_HEADERS := $(patsubst %.sfx,%.sfx.h,$(GSUSRC))
 SPC_BINS := $(patsubst %.spc700.asm,%.spc700.bin,$(SPCSRC))
 SOUNDBANK_OBJ := $(if $(_HAS_SOUNDBANK),$(SOUNDBANK_OUT).o)
 
@@ -350,13 +368,25 @@ $(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
 #------------------------------------------------------------------------------
 
 ifneq ($(GSUSRC),)
-%.sfx.bin: %.sfx
-	@echo "[GSU] $< -> $@"
+# The link also writes <name>.sfx.h (2026-09-29): one #define per global
+# label of the GSU program, its offset in the binary — the entry points C
+# passes to gsuCall() / gsuStartCached(). gsu_job.sfx's label `add_job`
+# becomes GSU_JOB_ADD_JOB. Labels starting with _ or @ are local, skipped.
+%.sfx.bin %.sfx.h: %.sfx
+	@echo "[GSU] $< -> $*.sfx.bin, $*.sfx.h"
 	@$(GSU_AS) -I $(TEMPLATES) -o $*.sfx.o $<
 	@echo "[objects]" > $*.sfx.link
 	@echo "$*.sfx.o" >> $*.sfx.link
-	@$(LD) -b $*.sfx.link $@
-	@rm -f $*.sfx.o $*.sfx.link
+	@$(LD) -S -b $*.sfx.link $*.sfx.bin
+	@P=$$(echo '$(notdir $*)' | tr 'a-z' 'A-Z' | tr -c 'A-Z0-9\n' '_'); \
+	{ echo "/* Generated from $< by make/common.mk: GSU program entry points,"; \
+	  echo " * offsets in $*.sfx.bin (gsuCall, gsuStartCached). Do not edit. */"; \
+	  echo "#ifndef $${P}_SFX_H"; echo "#define $${P}_SFX_H"; \
+	  awk -v P="$$P" '/^\[labels\]/{f=1;next} /^\[/{f=0} \
+	    f && NF==2 && $$2 ~ /^[A-Za-z][A-Za-z0-9_]*$$/ { split($$1,a,":"); \
+	    printf "#define %s_%s 0x%su\n", P, toupper($$2), a[2] }' $*.sfx.sym; \
+	  echo "#endif"; } > $*.sfx.h
+	@rm -f $*.sfx.o $*.sfx.link $*.sfx.sym
 endif
 
 # SPC700 (APU) programs: same two-stage shape as the GSU. %.spc700.asm
@@ -411,7 +441,7 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # piece.h, render.h and hud.h, and editing them rebuilt nothing. Every .h
 # next to a C source, rather than exact -MD deps: cheap and never stale.
 LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
-%.c.o: %.c $(GFX_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config
+%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
@@ -467,6 +497,14 @@ data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP)
 	@echo "[AS] data_init_start"
 	$(call wrap_asm,$<,$@)
 
+# RAM code window markers (RAM_CODE_SIZE > 0)
+ram_code_start.o: $(TEMPLATES)/ram_code_start.asm $(MEMMAP_DEP) .opensnes_config
+	@echo "[AS] ram_code_start"
+	$(call wrap_asm,$<,$@)
+ram_code_end.o: $(TEMPLATES)/ram_code_end.asm $(MEMMAP_DEP) .opensnes_config
+	@echo "[AS] ram_code_end"
+	$(call wrap_asm,$<,$@)
+
 # User ASM sources (explicit rules to avoid matching library objects)
 define ASM_OBJ_RULE
 $(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP) .opensnes_config
@@ -492,11 +530,11 @@ data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP)
 #------------------------------------------------------------------------------
 
 # All objects in link order
-LINK_OBJS := crt0.o $(RUNTIME_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
+LINK_OBJS := crt0.o $(RUNTIME_OBJ) $(RAM_CODE_START_OBJ) data_init_start.o $(ASM_OBJS) $(C_OBJS)
 ifeq ($(USE_LIB),1)
 LINK_OBJS += $(LIB_OBJS)
 endif
-LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) data_init_end.o
+LINK_OBJS += $(MUL32_OBJ) $(DIV32_OBJ) $(SOUNDBANK_OBJ) $(RAM_CODE_END_OBJ) data_init_end.o
 
 linkfile: $(LINK_OBJS) .opensnes_config
 	@echo "[objects]" > $@
@@ -637,8 +675,9 @@ clean:
 	@rm -f $(ASM_OBJS) $(ASM_OBJS:.o=.wrap.asm)
 	@rm -f $(CSRC:.c=.c.asm) $(CSRC:.c=.c.wrap.asm) $(CSRC:.c=.c.o)
 	@rm -f data_init_end.o data_init_end.wrap.asm
+	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
-	@rm -f $(GSU_BINS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link)
+	@rm -f $(GSU_BINS) $(GSU_HEADERS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link) $(GSUSRC:.sfx=.sfx.sym)
 	@rm -f $(SPC_BINS) $(SPCSRC:.spc700.asm=.spc700.o) $(SPCSRC:.spc700.asm=.spc700.link)

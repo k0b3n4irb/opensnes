@@ -3,7 +3,7 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET   := mode2.sfc
 ROM_NAME := MODE 2 OPT
 USE_LIB  := 1
-LIB_MODULES := console dma background math
+LIB_MODULES := console dma background math tile
 
 CSRC := main.c
 

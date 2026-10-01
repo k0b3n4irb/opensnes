@@ -209,7 +209,7 @@ tests: test-compiler
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
-	@# APU output hashed for four self-playing audio examples (luna
+	@# APU output hashed for the ten audio examples (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
 	@python3 tools/luna-test/audio_regress.py
@@ -217,6 +217,10 @@ tests: test-compiler
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
 	@python3 tools/luna-test/nmi_budget.py
+	@# No VRAM DMA byte outside blank in any example (luna --dma-trace: the
+	@# PPU drops such a write silently), and gsuPresent's frames whole,
+	@# double-buffered and swapped in blank (2026-09-29).
+	@python3 tools/luna-test/vram_dma_blank.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
@@ -462,13 +466,18 @@ test-manifests:
 	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
 	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
 	@$(MAKE) -s -C devtools/libtests_gsu        # libtest_gsu_cached.toml fixture
-	@tools/luna-test/bin/luna test \
+	@$(MAKE) -s -C devtools/libtests_sa1_sram   # d_/e_sa1_bwram power-cycle fixture
+	@tools/luna-test/bin/luna test --jobs 0 \
 		tools/luna-test/stress/hwmath/hwmath.toml \
 		tools/luna-test/stress/ppumul/ppumul.toml \
 		tools/luna-test/stress/openbus/openbus.toml \
 		tools/luna-test/stress/bcd/bcd.toml \
 		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
 		tools/luna-test/manifests
+	@# Power-cycle chains (a_/b_ sram, d_/e_ SA-1 BW-RAM) write a .srm the next
+	@# manifest reads: luna >= v1.30.1 runs manifests chained by a battery
+	@# file in order inside the parallel batch (they sat in a serial
+	@# power_cycle/ pass from 2026-09-27 until then).
 
 # WRAM-state regression ("did my change alter invisible runtime state?").
 # CI-gated on every example, both arches (the old arch-dependent pair was a

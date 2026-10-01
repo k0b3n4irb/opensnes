@@ -57,7 +57,7 @@ make
 
 ## Modules used
 
-`console`, `dma`, `background`, `sprite`
+`console`, `dma`, `background`, `sprite`, `tile` (`tileEncode4bpp`)
 
 Also linked: `math` — fixed-point sine / trigonometry.
 

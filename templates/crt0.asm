@@ -149,14 +149,13 @@
 
 ; Phase B (2026-09-25): the NMI must survive a GSU job. gsuLaunch sets
 ; gsu_owns_cart while the GSU holds the Game Pak bus; the NMI stub at $0108
-; jumps to gsu_nmi_wram, a copy of gsu_nmi_blob (below) made at boot, which
-; runs the ROM-free part of the VBlank work when the flag is set and falls
-; through to the normal NmiHandler otherwise.
+; jumps to gsu_nmi_blob (below), which lives in the RAM code window (since
+; 2026-09-29; a hand-copied blob before) and runs the ROM-free part of the
+; VBlank work when the flag is set, falling through to the normal NmiHandler
+; otherwise.
 .RAMSECTION ".gsu_runtime" BANK 0 SLOT 1
     gsu_owns_cart   dsb 1   ; 1 while a GSU job holds the Game Pak bus
-.ENDS
-.RAMSECTION ".gsu_nmi_wram" BANK $7E SLOT 2
-    gsu_nmi_wram    dsb 160 ; the copied blobs: NMI, IRQ, RTI (gsu_nmi_blob_end - gsu_nmi_blob <= 160)
+    gsu_stop_irqs   dsb 1   ; +1 per GSU IRQ on STOP acknowledged (wraps at 256)
 .ENDS
 .endif
 
@@ -713,6 +712,73 @@ FastStart:
     ; Initialize static variables (copy init data from ROM to RAM)
     jsr CopyInitData
 
+.ifdef RAM_CODE
+    ; RAM code window (RAM_CODE_SIZE, templates/ram_code_start.asm): copy
+    ; RamCodeStart..RamCodeEnd from its ROM home in bank $01 to the same
+    ; 16-bit address in bank $7E, where its labels were linked. Byte by byte:
+    ; a word copy of an odd-sized window would write $7F:0000.
+    sep #$20
+    .ACCU 8
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+    cpx #(RamCodeEnd - RamCodeStart)
+    beq +
+-   lda.l $010000 + (RamCodeStart & $FFFF),x
+    sta.l RamCodeStart,x
+    inx
+    cpx #(RamCodeEnd - RamCodeStart)
+    bne -
++   rep #$20
+    .ACCU 16
+.endif
+
+.ifdef SUPERFX
+    ;--------------------------------------------------------------------------
+    ; SuperFX (GSU) Initialization
+    ;--------------------------------------------------------------------------
+    ; BEFORE the NMI is enabled (since 2026-09-29): a Super FX cart's native
+    ; NMI vector is $0108, and until the stubs below are written it holds
+    ; nothing. The block used to run after `sta $4200`, leaving a window in
+    ; which a VBlank would have jumped into empty RAM.
+    ;--------------------------------------------------------------------------
+    ; Put GSU in known state: SNES CPU owns all buses, SRAM writable.
+    ; The GSU is NOT started here — user code calls gsuRun() when ready.
+    ;--------------------------------------------------------------------------
+    sep #$20
+    .ACCU 8
+
+    ; SCMR: SNES CPU owns ROM and RAM (GSU dormant)
+    lda #$00
+    sta.l $303A
+
+    ; BRAMR: enable SRAM writes from SNES CPU side
+    lda #$01
+    sta.l $3033
+
+    ; Read GSU version register to confirm hardware present
+    lda.l $303B             ; VCR (Version Code Register)
+    sta.l superfx_status    ; 0 = no GSU, non-zero = chip version
+
+    ; Install the WRAM interrupt vectors (.gsu_vectors above): 16 bytes,
+    ; four `JML handler`, copied from gsu_vector_stubs in hdr_superfx.asm.
+    rep #$10
+    .INDEX 16
+    ldx #$0000
+-   lda.l gsu_vector_stubs,x
+    sta.l gsu_vec_brk,x
+    inx
+    cpx #16
+    bne -
+    ; Their targets (gsu_nmi_blob & co., below) are in the RAM code window,
+    ; copied with the rest of it right after CopyInitData.
+    lda #$00
+    sta.l gsu_owns_cart     ; the GSU owns nothing until gsuLaunch says so
+    sta.l gsu_stop_irqs     ; no GSU IRQ on STOP seen yet
+    rep #$20
+    .ACCU 16
+.endif
+
     ; Enable NMI (VBlank interrupt)
     sep #$20
     .ACCU 8
@@ -792,50 +858,6 @@ _sa1_init_done:
     .ACCU 16
 .endif
 
-.ifdef SUPERFX
-    ;--------------------------------------------------------------------------
-    ; SuperFX (GSU) Initialization
-    ;--------------------------------------------------------------------------
-    ; Put GSU in known state: SNES CPU owns all buses, SRAM writable.
-    ; The GSU is NOT started here — user code calls gsuRun() when ready.
-    ;--------------------------------------------------------------------------
-    sep #$20
-    .ACCU 8
-
-    ; SCMR: SNES CPU owns ROM and RAM (GSU dormant)
-    lda #$00
-    sta.l $303A
-
-    ; BRAMR: enable SRAM writes from SNES CPU side
-    lda #$01
-    sta.l $3033
-
-    ; Read GSU version register to confirm hardware present
-    lda.l $303B             ; VCR (Version Code Register)
-    sta.l superfx_status    ; 0 = no GSU, non-zero = chip version
-
-    ; Install the WRAM interrupt vectors (.gsu_vectors above): 16 bytes,
-    ; four `JML handler`, copied from gsu_vector_stubs in hdr_superfx.asm.
-    rep #$10
-    .INDEX 16
-    ldx #$0000
--   lda.l gsu_vector_stubs,x
-    sta.l gsu_vec_brk,x
-    inx
-    cpx #16
-    bne -
-    ; ...and the WRAM NMI (phase B): gsu_nmi_blob -> $7E:gsu_nmi_wram.
-    ldx #$0000
--   lda.l gsu_nmi_blob,x
-    sta.l gsu_nmi_wram,x
-    inx
-    cpx #(gsu_nmi_blob_end - gsu_nmi_blob)
-    bne -
-    lda #$00
-    sta.l gsu_owns_cart     ; the GSU owns nothing until gsuLaunch says so
-    rep #$20
-    .ACCU 16
-.endif
 
     ; Call main() - use JSL since generated code returns with RTL
     jsl main
@@ -1022,6 +1044,11 @@ FastNmi:
     rep #$20
     .ACCU 16
     inc.w lag_frame_counter
+.ifdef SUPERFX
+    ; ...except a presented Super FX frame, when the game opted in
+    ; (gsuPresentInit's GSU_PRESENT_ON_LAG_FRAMES; lib superfx.asm)
+    jsl gsu_present_step_lag
+.endif
     jmp @nmi_restore
 
 @vblank_work:
@@ -1196,6 +1223,16 @@ FastNmi:
 
     stz.w bg_scroll_dirty   ; Clear all dirty bits
 @scroll_done:
+
+.ifdef SUPERFX
+    ;--------------------------------------------------------------------------
+    ; 3b. Super FX presentation (gsuPresent, lib superfx.asm): moves a queued
+    ; framebuffer from Game Pak RAM to VRAM with what is left of the blank.
+    ; Last of the VBlank-critical steps, since it uses the rest of the window.
+    ; Returns at once when no frame is queued.
+    ;--------------------------------------------------------------------------
+    jsl gsu_present_step
+.endif
 
     ;==========================================================================
     ; NON-CRITICAL SECTION — callback + input reading
@@ -2089,9 +2126,11 @@ tilemapFlush:
 ;==============================================================================
 ; gsu_nmi_blob — the NMI that runs while the GSU owns the Game Pak
 ;==============================================================================
-; Copied to $7E:gsu_nmi_wram at boot and entered from the $0108 WRAM stub
-; (phase A). Position-independent: every internal jump is a relative branch;
-; every data reference is to WRAM or an I/O register, never to the Game Pak.
+; Linked in the RAM code window (RAM_CODE_SIZE; the Super FX build adds the
+; SDK's share, make/common.mk) and entered from the $0108 WRAM stub (phase
+; A). Until 2026-09-29 it was a position-independent blob copied by hand to
+; $7E:gsu_nmi_wram. Every data reference is to WRAM or an I/O register,
+; never to the Game Pak.
 ;
 ; Flag clear (the usual case): pop what it pushed and JML to NmiHandler —
 ; one flag test more per NMI than before, in Super FX builds only.
@@ -2108,7 +2147,7 @@ tilemapFlush:
 ; the job does them. vblank_flag is not touched: the main thread is parked in
 ; gsuLaunch's WRAM loop, not in WaitForVBlank.
 ;==============================================================================
-.SECTION ".gsu_nmi_blob" SEMIFREE BANK 0
+.SECTION "ram_code.gsu_interrupts" BASE $7D APPENDTO ".ram_code"
 gsu_nmi_blob:
     rep #$30
     .ACCU 16
@@ -2158,6 +2197,9 @@ gsu_nmi_blob:
     lda.b #$80
     sta.w $420B             ; MDMAEN ch7
 @oam_done:
+    ; the presentation step (gsuPresent): the frame queued before the job
+    ; keeps moving to VRAM while the GSU draws the next one
+    jsl gsu_present_step
     rep #$30
     .ACCU 16
     .INDEX 16
@@ -2170,34 +2212,49 @@ gsu_nmi_blob:
 
 ; gsu_irq_blob — the IRQ entry, reached from the $010C WRAM stub (2026-09-26;
 ; until then that stub pointed at IrqHandler in ROM, which a job makes
-; unreadable). Flag clear: straight to IrqHandler and the user's handler.
-; Flag set: the handler is ROM code, so acknowledge both possible sources and
-; return — an H/V-timer IRQ ($4211 TIMEUP) and the GSU's IRQ on STOP (reading
-; SFR's high byte resets its IRQ flag, bit 15 — Nintendo dev manual Book II
-; §5.4.2; CFGR bit 7 masks it, fullsnes). Leaving either unacknowledged would
-; re-enter the IRQ forever.
+; unreadable).
+;
+; First, the GSU's own IRQ on STOP (CFGR bit 7 clear): SFR bit 15 says it is
+; the source and reading SFR's high byte resets it (Nintendo dev manual Book
+; II §5.4.2, chunk a938cb6359382bbd; fullsnes SFR/CFGR). It is acknowledged
+; and counted here, never passed on: the user's IRQ handler only knows the
+; H/V timer, and before 2026-09-27 a job started with the IRQ unmasked and
+; the I flag clear re-entered this IRQ forever (it reached IrqHandler, whose
+; $4211 read does not reset the GSU's flag). If the timer fired at the same
+; time, its line is still asserted after the RTI and the IRQ comes straight
+; back, this time for the timer.
+;
+; Then the timer: flag clear, straight to IrqHandler and the user's handler;
+; flag set, the handler is ROM code, so acknowledge ($4211 TIMEUP) and return.
 gsu_irq_blob:
     rep #$30
     .ACCU 16
     .INDEX 16
     pha
-    lda.l gsu_owns_cart
-    and #$00FF
-    bne @irq_gsu_owned
-    pla
-    jml IrqHandler
-@irq_gsu_owned:
-    phb
-    pea $0000
-    plb
-    plb                     ; DB = $00
     sep #$20
     .ACCU 8
-    lda.w $4211             ; TIMEUP: acknowledge an H/V-timer IRQ
-    lda.w $3031             ; SFR high byte: acknowledge a GSU IRQ (bit 15)
+    lda.l $003031           ; SFR high byte: bit 7 = GSU IRQ on STOP (read resets it)
+    bmi @irq_gsu_stop
+    lda.l gsu_owns_cart
+    bne @irq_gsu_owned
     rep #$20
     .ACCU 16
-    plb
+    pla
+    jml IrqHandler
+@irq_gsu_stop:
+    .ACCU 8
+    lda.l gsu_stop_irqs
+    inc a
+    sta.l gsu_stop_irqs
+    rep #$20
+    .ACCU 16
+    pla
+    rti
+@irq_gsu_owned:
+    .ACCU 8
+    lda.l $004211           ; TIMEUP: acknowledge an H/V-timer IRQ
+    rep #$20
+    .ACCU 16
     pla
     rti
 
@@ -2205,6 +2262,5 @@ gsu_irq_blob:
 ; handler is a bare RTI, which a job would make unreadable too.
 gsu_rti_blob:
     rti
-gsu_nmi_blob_end:
 .ENDS
 .endif

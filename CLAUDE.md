@@ -69,7 +69,7 @@ The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE's w65816 bac
 
 ### Enhancement Chip Support
 
-- **SA-1** (`USE_SA1=1`): Same 65816 ISA, clocked at 10.74 MHz (effective speed depends on memory: ~5.4 MHz ROM against ROM). Assembly only on the SA-1 side. Shares I-RAM ($3000-$37FF) with main CPU. Per-example `sa1_boot.asm` for custom coprocessor code. See `docs/tutorials/sa1.md`.
+- **SA-1** (`USE_SA1=1`): Same 65816 ISA, clocked at 10.74 MHz (effective speed depends on memory and scene: `sa1_starfield` measures ~10.7 MHz from I-RAM, ~8.5 from ROM). Assembly only on the SA-1 side. Shares I-RAM ($3000-$37FF) with main CPU. Per-example `sa1_boot.asm` for custom coprocessor code. See `docs/tutorials/sa1.md`.
 - **SuperFX** (`USE_SUPERFX=1`): Custom RISC ISA (GSU). Two-stage build: `.sfx` → `wla-superfx` → `wlalink -b` → `.sfx.bin` → `.incbin`. GSU code is assembly-only (no C compiler). **Validated by luna**, which detects and executes the GSU natively in the headless test harness (the old snes9x-WASM harness could not detect the GSU — "GSU: NOT DETECTED" — and needed a Mesen2 side channel; both are gone since the luna migration).
 
 ### Example Makefile Pattern

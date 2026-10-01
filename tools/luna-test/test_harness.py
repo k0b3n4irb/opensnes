@@ -25,14 +25,16 @@ import nmi_budget  # noqa: E402
 import rom_coverage  # noqa: E402
 
 
-def state(frames=200, nmis=198, stopped=False):
-    return {"scheduler": {"frame_count": frames, "nmis_serviced": nmis},
-            "cpu": {"stopped": stopped}}
+def state(frames=200, nmis=198, stopped=False, last_nmi=None):
+    sch = {"frame_count": frames, "nmis_serviced": nmis}
+    if last_nmi is not None:
+        sch["last_nmi_frame"] = last_nmi
+    return {"scheduler": sch, "cpu": {"stopped": stopped}}
 
 
 class Liveness(unittest.TestCase):
     def test_running_rom_is_live(self):
-        live, why = luna_runner.liveness(state())
+        live, why = luna_runner.liveness(state(last_nmi=200))
         self.assertTrue(live)
         self.assertIn("200f/198nmi", why)
 
@@ -47,22 +49,22 @@ class Liveness(unittest.TestCase):
         self.assertFalse(live)
         self.assertIn("NMI", why)
 
-    def test_nmi_advancing_between_snapshots(self):
-        live, why = luna_runner.nmi_still_alive(state(200, 198), state(230, 228))
-        self.assertTrue(live)
-        self.assertIn("+30nmi", why)
+    def test_latest_nmi_this_frame_is_live(self):
+        st = state(200, 198)
+        st["scheduler"]["last_nmi_frame"] = 200
+        self.assertTrue(luna_runner.liveness(st)[0])
 
     def test_nmi_dead_after_boot(self):
         # The negative control of 2026-09-26: print_string with $4200 = 0
-        # after 100 frames — live on the one-snapshot gate.
-        self.assertTrue(luna_runner.liveness(state(200, 102))[0])
-        live, why = luna_runner.nmi_still_alive(state(200, 102), state(230, 102))
+        # after 100 frames — 102 NMIs, the last one long ago.
+        st = state(200, 102)
+        st["scheduler"]["last_nmi_frame"] = 101
+        live, why = luna_runner.liveness(st)
         self.assertFalse(live)
         self.assertIn("NMI died after boot", why)
 
-    def test_stp_between_snapshots(self):
-        self.assertFalse(luna_runner.nmi_still_alive(
-            state(200, 198), state(230, 205, stopped=True))[0])
+    def test_no_nmi_frame_reported_is_dead(self):
+        self.assertFalse(luna_runner.liveness(state(200, 198))[0])
 
 
 class FramePoints(unittest.TestCase):

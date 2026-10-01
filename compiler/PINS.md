@@ -29,9 +29,9 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 771bdf010d8ac854792b1e369c32c4e84d74a653 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 794c6e3370d0726347b1ad0eb1ebc235b726e065 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 9002e3d1bfe56e869440a18c066ab5c466660812 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 3) |
+| compiler/cproc | 354a845c0bdb534a6eb83437999de3b6d5b27f4f | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | a89fd88b8195f647955c6f7029af360d06f97a18 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 31 patches since upstream merge-base 7051114
+### compiler/cproc — 32 patches since upstream merge-base 7051114
 
 ```
+354a845 OpenSNES: __ramcode, a function specifier for the RAM code window
 771bdf0 expr: typechar.u.basic, not u.arith, in the fork's type layout (adapts 23c57a7)
 c7e96cc util: Check for overflow in array grow (upstream a964406, merged with 0efca54's empty-array rule)
 b9ff678 test: Add some tests for VM declarations and character constant escapes (upstream 057381e)
@@ -83,7 +84,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 85 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 86 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -95,6 +96,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+a89fd88 w65816: a function in section ".ram_code" joins the RAM code window
 794c6e3 w65816: temps whose lives never overlap share a stack slot (slot colouring from liveness), under a slot-ownership check
 77998b5 fix exponential complexity in usewidthle() (upstream b58e2e6, cherry-picked 2026-09-26)
 ceead63 w65816: every Kl read of a high word checks that a producer wrote it (Kl high-half invariant); Ocopy Kl moves both words
@@ -137,15 +139,21 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 3 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20)
+### compiler/wla-dx — 4 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29)
 
 ```
+8077133 wlalink: the [ramsections] listing of the .sym ignores .BASE too
 9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
 
-The newest patch completes the first one. `86df331` fixed
+`8077133` (2026-09-29) is the third place the base leaked: the
+`[ramsections]` block of the `.sym`, which listed a HiROM `$7E` section as
+`13e:` and bank-0 RAM as `c0:`. No ROM byte changes (84/84 identical); the
+far-RAM-band check of `symmap.py` now sees HiROM's sections.
+
+`9002e3d` completes the first one. `86df331` fixed
 `get_snes_pc_bank()`; the calculation engine has a second path to a label's
 bank — the `:label` operator, `SI_OP_BANK` / `SI_OP_BANK_BYTE` — which added
 the item's base unconditionally. Under `.BASE $C0` (every HiROM unit)

@@ -443,6 +443,30 @@ Boot: the data-init record is `{addr16, bank8, size16, bytes}` and
 `CopyInitData` writes through `[tcc__r2],y`; crt0 zero-fills the far band
 with one DMA to `$2180` (22 ms). See `docs/tutorials/far_ram.md`.
 
+## Code in RAM: `__ramcode`
+
+`__ramcode` (`RAM_CODE` in `snes/types.h`, 2026-09-29) is a function
+specifier, like `inline`: on any declaration of a function it puts the
+definition in the RAM code window. cproc emits `section ".ram_code"` on the
+function; the w65816 backend turns it into
+
+```asm
+.IFNDEF RAM_CODE
+.FAIL "f is __ramcode but the project has no RAM code window: set RAM_CODE_SIZE in the Makefile"
+.ENDIF
+.SECTION "ram_code.f" BASE $7D APPENDTO ".ram_code"
+```
+
+instead of `.SECTION ".text.f" SUPERFREE`. `.ram_code` is stored at the top
+of ROM bank 1 and `BASE $7D` makes every label `$7E:xxxx`
+(`templates/ram_code_start.asm`); crt0 copies it after the data init. The
+calling convention does not change: callers `jsl`/`jml` to the `$7E`
+address, the function returns with `rtl`, and a pointer to it carries bank
+`$7E`. The code generator does nothing special inside: a call to another
+function, a runtime helper (`__mul16`, `__div16`, …) or a const read stays a
+ROM access, which is what the tutorial's constraint is about. On an object
+the keyword is an error.
+
 ---
 
 ## What the backend does NOT support

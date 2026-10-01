@@ -73,3 +73,20 @@
 .MACRO ASSET_SECTION ARGS name
 .SECTION "asset.\1" SEMISUPERFREE BANKS ASSET_BANKS
 .ENDM
+
+; Code run from WRAM (since 2026-09-29, RAM_CODE_SIZE > 0 in the Makefile):
+;
+;   RAM_CODE_SECTION "my_loop"
+;   my_loop:  ...          ; labels resolve to $7E:xxxx
+;       rtl
+;   .ENDS
+;
+; Stored in ROM, copied to WRAM by crt0 at boot (templates/ram_code_start.asm).
+; Call it with jsl; it may not call or read ROM while the ROM is not the
+; CPU's. BASE $7D: the window is stored in ROM bank 1, and 1 + $7D = $7E.
+.MACRO RAM_CODE_SECTION ARGS name
+.IFNDEF RAM_CODE
+.FAIL "RAM_CODE_SECTION used but the project has no RAM code window: set RAM_CODE_SIZE in the Makefile"
+.ENDIF
+.SECTION "ram_code.\1" BASE $7D APPENDTO ".ram_code"
+.ENDM

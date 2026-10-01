@@ -55,7 +55,7 @@ make
 
 ## Modules used
 
-`console`, `dma`, `background`, `math`
+`console`, `dma`, `background`, `math`, `tile` (the run-time tile encoder, `tileEncode4bpp`)
 
 ## Where you are
 

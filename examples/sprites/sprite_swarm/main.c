@@ -46,6 +46,7 @@
  */
 
 #include <snes.h>
+#include <snes/tile.h>   /* tileEncode4bpp */
 
 /** @brief Sprite count — the smooth-60fps ceiling for per-sprite C motion. */
 #define NBIRDS 32
@@ -71,24 +72,6 @@ static s8 bvy[NBIRDS];  /**< Y velocity */
 /** @brief Scratch 8x8 tile as pixel indices, packed to 4bpp. */
 static u8 px[64];
 static u8 tilebuf[32];
-
-/** @brief Pack px[] (8x8 palette indices) into a 4bpp planar tile. */
-static void encode_4bpp(void) {
-    u8 pair, row, col;
-    u16 o = 0;
-    for (pair = 0; pair < 4; pair += 2) {
-        for (row = 0; row < 8; row++) {
-            u8 lo = 0, hi = 0;
-            for (col = 0; col < 8; col++) {
-                u8 v = px[row * 8 + col];
-                if (v & (1 << pair))       lo |= (u8)(0x80 >> col);
-                if (v & (1 << (pair + 1))) hi |= (u8)(0x80 >> col);
-            }
-            tilebuf[o++] = lo;
-            tilebuf[o++] = hi;
-        }
-    }
-}
 
 /** @brief Build the 8x8 dot (a filled ball), pixel index 1, rest transparent. */
 static void build_dot(void) {
@@ -117,7 +100,7 @@ int main(void) {
     dmaCopyCGram((u8 *)pal, OBJ_CGRAM_BASE, 128);
 
     build_dot();
-    encode_4bpp();
+    tileEncode4bpp(px, tilebuf);
     dmaCopyVram(tilebuf, SPR_VRAM, 32);
 
     oamInit(OBJ_SIZE8_L16, SPR_VRAM >> 13);

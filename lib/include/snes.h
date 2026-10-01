@@ -55,13 +55,13 @@
 #define OPENSNES_VERSION_MAJOR 0
 
 /** @brief OpenSNES minor version */
-#define OPENSNES_VERSION_MINOR 46
+#define OPENSNES_VERSION_MINOR 47
 
 /** @brief OpenSNES patch version */
 #define OPENSNES_VERSION_PATCH 0
 
 /** @brief OpenSNES version string */
-#define OPENSNES_VERSION_STRING "0.46.0"
+#define OPENSNES_VERSION_STRING "0.47.0"
 
 /*============================================================================
  * Core Headers
@@ -138,6 +138,7 @@
  *   #include <snes/gameloop.h>  // gameloop framework opt-in
  *   #include <snes/asset.h>     // typed BgAsset / GfxAsset bundles
  *   #include <snes/scene.h>     // push/pop scene stack
+ *   #include <snes/tile.h>      // build 2/4/8bpp tiles from pixels at run time
  */
 
 #endif /* OPENSNES_H */

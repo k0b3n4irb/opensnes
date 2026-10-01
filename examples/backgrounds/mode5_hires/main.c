@@ -60,7 +60,10 @@ int main(void) {
     bgSetScroll(0, 0, 0);
 
     /* THE Mode 5 trap: hi-res content renders through both screens.
-     * Main-only shows the even pixel columns; sub fills the odd ones. */
+     * The sub screen draws the even pixel columns, the main screen the
+     * odd ones (snesdev-wiki, Uncommon graphics mode games — its
+     * Backgrounds page has it inverted); main-only leaves the even ones
+     * blank. */
     setMainScreen(LAYER_BG1);
     setSubScreen(LAYER_BG1);
 
