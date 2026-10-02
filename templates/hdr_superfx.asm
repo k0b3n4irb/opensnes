@@ -84,7 +84,7 @@
     CARTRIDGETYPE CARTRIDGETYPE  ; $13=ROM+GSU (Star Fox compatible)
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
     SRAMSIZE $00            ; $00 here: Game Pak RAM is declared at $FFBD (see above)
-    COUNTRY $01             ; North America (NTSC)
+    COUNTRY COUNTRY_VAL     ; $FFD9: $01 USA/NTSC (default), $02 Europe/PAL, $00 Japan (make ROM_REGION=)
     LICENSEECODE $33        ; $33 = "extended header present" (not a licensee)
     VERSION $00             ; Version 1.0
 .ENDSNES

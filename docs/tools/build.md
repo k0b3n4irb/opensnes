@@ -49,6 +49,7 @@ looping ones).
 | `ROM_BANKS` | `8` | Number of linker banks: 256 KB LoROM, 512 KB HiROM by default. The header's ROM size byte and the asset bank range follow it |
 | `ROMSIZE` | from `ROM_BANKS` | The header's ROM size byte (`$FFD7`, 1 KB << n, rounded up to a power of two). Leave it computed |
 | `ASSET_BANKS_RANGE` | `ROM_BANKS - 1` down to 1 | Banks the linker may use for `ASSET_SECTION` data and C const data, highest first. Leave it computed |
+| `ROM_REGION` | `ntsc` | The region the header declares (`$FFD9`): `ntsc` = `$01` USA, `pal` = `$02` Europe, `jp` = `$00` Japan. A console runs at its own standard whatever the byte says (`getRegion()` reads the console); emulators, luna included, choose 50 or 60 Hz from it |
 | `USE_SRAM` | `0` | `1` declares battery-backed save RAM and links the `sram` module |
 | `SRAM_SIZE` | `3` | Save RAM size as the header byte `$FFD8`: 1 KB << n, n = 1..7 (3 = 8 KB) |
 | `RAM_CODE_SIZE` | `0` | Bytes (1 to 16384) of a code window at the top of WRAM bank `$7E`, for code that runs from RAM (`RAM_CODE_SECTION`): stored in the top of ROM bank 1, copied by crt0 at boot. `0` = no window. A Super FX build adds 768 bytes for the SDK's own interrupt entries, `gsuLaunch` wait loop and presentation step. The window shares ROM bank 1 with SNESMOD's default soundbank bank: a soundbank that fills bank 1 fails the link with "No room for section .ram_code" — move it with `SOUNDBANK_BANK := 2`. See the Super FX tutorial |

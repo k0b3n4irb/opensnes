@@ -5,6 +5,15 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(build): **`ROM_REGION`** (`ntsc` default, `pal`, `jp`) — the header's
+  country byte (`$FFD9`: `$01`, `$02`, `$00`; fullsnes, snesdev-wiki). It
+  was `$01` on every ROM, so a European game had no way to declare itself
+  PAL. Default builds are byte-identical (89/89 ROMs compared).
+- test(luna-test): **a PAL pass on the games** — `make test-pal` builds
+  tetris, breakout, likemario, shmup_1942 and rpg as PAL cartridges, checks
+  luna sees them as PAL, and replays their six scripted manifests at 50 Hz:
+  6/6 pass. The manifests are derived from the NTSC ones at run time. Last
+  item of action 39.
 - feat(examples): **`backgrounds/mode6`** — a hi-res 4bpp layer with
   offset-per-tile: Mode 6 reads the table like Mode 2 (an H row, a V row),
   with 16-half-pixel columns; A moves the wave from the vertical row to the

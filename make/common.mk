@@ -128,6 +128,17 @@ ASSET_BANKS_RANGE ?= $(shell echo $$(( $(ROM_BANKS) - 1 )))-1
 # Super FX Game Pak RAM declared in the extended header ($FFBD, 1 KB << n).
 GSU_RAM_KB  ?= 64
 GSU_RAM_SIZE_VAL := $(shell python3 -c "import math; print('$$%02X' % int(math.log2($(GSU_RAM_KB))))")
+# Region the cartridge declares in its header, $FFD9 (2026-10-02; it was
+# $01, North America, on every ROM). fullsnes "Country (also implies
+# PAL/NTSC)" and snesdev-wiki ROM header: $00 Japan and $01 USA are NTSC,
+# $02 Europe is PAL. A console runs at its own standard whatever the byte
+# says (STAT78 bit 4 is PPU2 pin 30, fullsnes f355d4389d653957; getRegion()
+# reads it), but emulators, luna included, pick 50 or 60 Hz from the byte.
+ROM_REGION  ?= ntsc
+COUNTRY_VAL := $(if $(filter ntsc,$(ROM_REGION)),$$01,$(if $(filter pal,$(ROM_REGION)),$$02,$(if $(filter jp,$(ROM_REGION)),$$00,)))
+ifeq ($(COUNTRY_VAL),)
+$(error ROM_REGION=$(ROM_REGION) is not one of ntsc, pal, jp (the header byte $$FFD9: $$01 USA/NTSC, $$02 Europe/PAL, $$00 Japan/NTSC))
+endif
 
 # Derived configuration (one-liners using $(if))
 LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_SUPERFX)),superfx,$(if $(filter 1,$(USE_HIROM)),hirom,lorom)))
@@ -461,7 +472,7 @@ endif
 # ignored, and the old header shipped. The stamp holds every knob that
 # reaches the header, the assembler flags or the link; it is rewritten only
 # when that text changes, so a rebuild with the same knobs stays a no-op.
-_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) \
+_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) \
   [$(ROM_NAME)] [$(ASFLAGS)] [$(CFLAGS)] [$(LIB_MODULES)] [$(LIBDIR)] \
   [$(USE_SNESMOD) $(SOUNDBANK_BANK)]
 .opensnes_config: FORCE
@@ -476,6 +487,7 @@ project_config.inc: .opensnes_config
 	@echo '.DEFINE ROMSIZE_VAL $(ROMSIZE)' >> $@
 	@echo '.DEFINE SRAMSIZE_VAL $(SRAMSIZE)' >> $@
 	@echo '.DEFINE GSU_RAM_SIZE_VAL $(GSU_RAM_SIZE_VAL)' >> $@
+	@echo '.DEFINE COUNTRY_VAL $(COUNTRY_VAL)' >> $@
 
 # Project header (ROM_NAME padded to 21 chars with spaces, then sed into template)
 project_hdr.asm: $(HDR_TEMPLATE) project_config.inc .opensnes_config

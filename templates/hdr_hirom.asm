@@ -62,7 +62,7 @@
     CARTRIDGETYPE CARTRIDGETYPE  ; $21=ROM, $23=ROM+SRAM
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
     SRAMSIZE SRAMSIZE_VAL   ; $00=None, $03=8KB
-    COUNTRY $01             ; North America (NTSC)
+    COUNTRY COUNTRY_VAL     ; $FFD9: $01 USA/NTSC (default), $02 Europe/PAL, $00 Japan (make ROM_REGION=)
     LICENSEECODE $00        ; Unlicensed
     VERSION $00             ; Version 1.0
 .ENDSNES
