@@ -221,3 +221,13 @@ half-landed frame shown; `gsu_pres_frames` for the rate; profile
   logic during a job need the main thread to run while the GSU owns the
   cartridge — phase C (non-blocking launch) plus phase E (code in RAM), or
   a GSU program that runs from its cache with RON = 0.
+
+## Open: a save for Super FX games (2026-10-02)
+
+`USE_SRAM=1` with `USE_SUPERFX=1` is refused by the build (`412b15e3`): the
+`sram` module writes bank $70, which on a Super FX cart is the GSU's Game Pak
+RAM. A save needs its own design: header `$FFD6 = $15` (ROM+GSU+RAM+Battery,
+fullsnes `b27db0e0b51e670e`), the save is the whole GSU RAM sized by `$FFBD`,
+and the 65816 can only touch it while RAN is 0. luna v1.30.3 saves it
+(`srm_out` / `srm_in`), so the power-cycle manifests are the test when this
+opens. Source: luna's `2026-10-02_from_luna_v0.47.0-et-v1.30.4.md` §2.
