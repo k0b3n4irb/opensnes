@@ -5,6 +5,14 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(examples): **`backgrounds/mode4`** — a 256-colour layer with
+  offset-per-tile: Mode 4's single row of words, each vertical (bit 15) or
+  horizontal; A switches the wave from one to the other. 8bpp tiles built
+  at run time. Its manifest pins the words in VRAM and BG3VOFS.
+- test(luna-test): **an animated example must animate** — `luna_runner.py`
+  refuses a capture, and fails a baseline, whose capture points
+  (`frames = [a, b]`) are all the same frame; captures are staged, so a
+  refused one no longer overwrites the baseline PNGs.
 - feat(lib): **`mode7SetExtBg(on)`** — Mode 7 EXTBG (SETINI bit 6): BG2
   shows the same plane with bit 7 of each pixel as its priority, a second
   layer around the sprites. Composed through the SETINI shadow the
@@ -19,6 +27,17 @@ All notable changes to OpenSNES are documented in this file.
   anomie; checked in luna's native output). Press A to toggle; tiles built
   at run time, no asset. Its manifest pins SETINI, the screen designations
   and the scroll.
+
+### Fixed
+- fix(runtime,lib): **offset-per-tile was off since 2026-09-12** — the NMI
+  wrote BG3's VOFS as `y - 1` like any displayed layer, but in Modes 2, 4
+  and 6 BG3 is the offset table and VOFS selects its rows (snesdev-wiki,
+  *Offset-per-tile*): `bgSetScroll(2, 0, 0)` read rows 31 and 0, all
+  zeros, and `backgrounds/mode2`'s bands went flat. `setMode` now records
+  whether the mode uses offset-per-tile (`bg3_opt`, a crt0 sysvar) and
+  re-syncs BG3's scroll; the NMI writes BG3's VOFS raw in those modes. The
+  flat picture had been re-captured as `mode2`'s baseline at both of its
+  capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
 - **BREAKING** fix(lib): **`mode7SetScale(0x0100)` is now 1:1**, as its

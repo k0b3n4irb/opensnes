@@ -1,0 +1,40 @@
+# backgrounds/mode4 — offset-per-tile with Mode 4's single row.
+#
+# Mode 4 reads ONE row of BG3 as the offset table (Mode 2 reads two): each
+# word is either a vertical offset (bit 15 set) or a horizontal one (bit 15
+# clear), bit 13 = apply to BG1, and the low 3 bits of a horizontal value are
+# ignored (snesdev-wiki, Offset-per-tile). BG3's map is at word $3000, so the
+# row is VRAM byte $6000.
+#   * checkpoint 100: the words are vertical — high bytes $A0 (bit 15 + bit
+#     13) — and BG3VOFS is 0, so the PPU reads that row (the y - 1 the lib
+#     writes for a displayed layer would select row 31; see the mode2
+#     manifest for the history);
+#   * frame 130, after A at 110: the same wave as horizontal words — high
+#     bytes $20, low 3 bits clear.
+# Measured on luna v1.30.2 (`luna state --until-frame N --input … --dump-vram`).
+rom = "../../../examples/backgrounds/mode4/mode4.sfc"
+frames = 130
+input = "110:0x0080,112:0"        # A: vertical -> horizontal
+
+[[checkpoint]]
+at_frame = 100
+[checkpoint.values]
+opt_vertical = { eq = 1, width = 1 }
+[checkpoint.delta]
+wave_phase = "increased"
+[checkpoint.ppu]
+bgmode = 4
+"bgs.2.v_scroll" = 0
+
+[asserts.values]
+opt_vertical = { eq = 0, width = 1 }
+
+[asserts.ppu]
+bgmode = 4
+"bgs.2.v_scroll" = 0
+
+[asserts.blocks]
+opt_row_h_words = { space = "vram", offset = "6000", hex = "0820082010201020" }
+
+[asserts.dma]
+unsafe_writes = 0

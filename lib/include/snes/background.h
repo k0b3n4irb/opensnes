@@ -64,7 +64,9 @@
  *          picture line. The lib writes y - 1 to BGnVOFS because the PPU
  *          never outputs scanline 0 (see KNOWN_LIMITATIONS, "Vertical scroll
  *          is off by one"); code that writes BGnVOFS itself (HDMA tables)
- *          must apply the -1 on its own.
+ *          must apply the -1 on its own. Exception: BG3 (bg = 2) in Modes
+ *          2, 4 and 6 is the offset-per-tile table, and its y is written
+ *          raw — y / 8 is the table row the PPU reads first.
  *
  * @code
  * // Scroll BG1 right by 10 pixels

@@ -237,13 +237,28 @@ void srand(u16 seed) {
  * Video Mode
  *============================================================================*/
 
+extern volatile u8 bg3_opt;         /* crt0 sysvar: BG3 is an OPT table */
+extern volatile u8 bg_scroll_dirty; /* crt0 sysvar: BG1-4 scroll dirty bits */
+
 void setMode(u8 mode, u8 flags) {
+    u8 opt;
+
     /* BGMODE register format: 4321pmmm
      * 4,3,2,1 = BG tile size (0=8x8, 1=16x16)
      * p = BG3 priority in Mode 1 (0=normal, 1=high)
      * mmm = Mode (0-7)
      */
     REG_BGMODE = (flags & 0xF8) | (mode & 0x07);
+
+    /* Modes 2, 4 and 6 turn BG3 into the offset-per-tile table, whose
+     * rows BG3VOFS selects directly: the NMI must then write BG3's VOFS
+     * raw, not y - 1. Re-sync BG3's scroll whenever that changes. */
+    mode &= 0x07;
+    opt = (u8)(mode == 2 || mode == 4 || mode == 6);
+    if (opt != bg3_opt) {
+        bg3_opt = opt;
+        bg_scroll_dirty |= 0x04;
+    }
 }
 
 /*============================================================================

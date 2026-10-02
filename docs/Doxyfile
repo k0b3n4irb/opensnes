@@ -122,6 +122,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/chips/superfx_game_skeleton \
                          ../examples/color/pseudo_hires \
                          ../examples/mode7/extbg \
+                         ../examples/backgrounds/mode4 \
                          ../examples/color/transparency \
                          ../examples/windows/transparent_window \
                          ../examples/windows/window \

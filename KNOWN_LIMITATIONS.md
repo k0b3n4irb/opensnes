@@ -124,6 +124,15 @@ porting, do not subtract 1 yourself. The one path the lib cannot cover is
 data you hand to the hardware directly, such as an HDMA table on
 `BGnVOFS`: apply the -1 in the table.
 
+**Except BG3 in Modes 2, 4 and 6 (since 2026-10-02).** There BG3 is not
+displayed: it is the offset-per-tile table, and BG3VOFS selects which of its
+rows the PPU reads (row VOFS / 8 for the horizontal offsets, the next for the
+vertical ones; the screen line plays no part — snesdev-wiki,
+*Offset-per-tile*). `setMode` records the mode, and in those three the NMI
+writes BG3's VOFS raw, so `bgSetScroll(2, 0, 0)` reads rows 0 and 1. From
+2026-09-12 to 2026-10-02 the -1 applied there too: the PPU read rows 31 and
+0, and `backgrounds/mode2` showed flat bands while every check passed.
+
 ### 🟡 A CGRAM write during the picture lands on the wrong entry
 CGRAM is reachable from the CPU only during V-blank, H-blank or forced
 blank; a write to CGDATA while the PPU is drawing "will write the data to

@@ -298,15 +298,31 @@ def run(update: bool, only: str | None) -> int:
             # be able to self-certify (fix32_orbit shipped a black baseline
             # for weeks, #115). Refuse it unless explicitly allowed.
             BLACK_FBHASH = "aacf80a995eb8c67"
-            hashes, wdm_any = [], False
+            # Render into a staging dir; the PNGs replace the baselines only
+            # once the capture is accepted (a refused capture used to
+            # overwrite them before the refusal).
+            stage = Path("/tmp/luna-test-staging") / label
+            stage.mkdir(parents=True, exist_ok=True)
+            hashes, wdm_any, staged = [], False, []
             for i, frame in enumerate(points):
-                png = _png_for(BASELINE_DIR, label, frame, i == 0)
+                png = _png_for(stage, label, frame, i == 0)
                 fbhash, wdm = render(luna, rom, frame, png, extra=res_args(key, manifest))
                 hashes.append(fbhash)
+                staged.append((png, _png_for(BASELINE_DIR, label, frame, i == 0)))
                 wdm_any = wdm_any or wdm
             if BLACK_FBHASH in hashes and not os.environ.get("ALLOW_BLANK_BASELINE"):
                 return [f"  REFUSED  {label}: capture is an ALL-BLACK frame — broken ROM? "
                         f"(ALLOW_BLANK_BASELINE=1 to override)"], 1, 1, None
+            # An example opts into several capture points because it animates;
+            # the same picture at every point means the animation stopped.
+            # backgrounds/mode2's offset-per-tile ripple went flat on
+            # 2026-09-12 and was re-captured flat at [200, 400] — this refuses
+            # that capture.
+            if len(points) > 1 and len(set(hashes)) == 1:
+                return [f"  REFUSED  {label}: the same frame at every capture point "
+                        f"{points} — an animated example that stopped animating?"], 1, 1, None
+            for src, dst in staged:
+                shutil.move(src, dst)
             single = len(points) == 1
             entry = {"fbhash": hashes[0] if single else hashes,
                      "frames": points[0] if single else points,
@@ -338,6 +354,9 @@ def run(update: bool, only: str | None) -> int:
             return [f"  ERROR {label}: {err}"], 1, 1, None
         if wdm_any:
             return [f"  FAIL  {label}: in-ROM SNES_ASSERT/WDM fired during run"], 1, 1, None
+        if not bad and len(ref_hashes) > 1 and len(set(ref_hashes)) == 1:
+            return [f"  FAIL  {label}: the baseline holds the same frame at every "
+                    f"capture point {ref_points} — re-capture it with --update"], 1, 1, None
         if bad:
             detail = "; ".join(bad)
             note = ("" if len(bad) == len(ref_points) else

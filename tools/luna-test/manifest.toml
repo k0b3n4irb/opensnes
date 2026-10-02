@@ -64,6 +64,9 @@ frames = [200, 400]
 [examples."backgrounds/mode2"]
 frames = [200, 400]
 
+[examples."backgrounds/mode4"]
+frames = [200, 400]          # the offset-per-tile wave travels
+
 # DSP-1 cube: the coprocessor rotates 8 corners every frame (self-animating,
 # two capture points). Firmware-gated — luna LLE-emulates the DSP-1 and needs
 # Sony's dsp1b.rom (copyright, not shipped); CI without it SKIPs the visual +
