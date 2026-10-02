@@ -249,7 +249,10 @@ The CPU takes no IRQ at all while its I flag is set, which is how crt0 boots:
 the count moves only once something has cleared it (`irqEnable()` does). Keep
 `CFGR_IRQ_MASK` set when you poll: whether SFR bit 15 is also set by a STOP
 whose IRQ is masked is an open question in fullsnes ("also set if IRQ
-masked?"), and if it is, the next timer IRQ would count that old STOP.
+masked?"); ares and bsnes set it only when the IRQ is unmasked
+(`instructionSTOP`: `if(regs.cfgr.irq == 0) { regs.sfr.irq = 1; … }`), an
+emulator's choice rather than a measurement. If a console did set it, the
+next timer IRQ would count that old STOP.
 `devtools/libtests_gsu` runs its job a second time this way (the count moves
 by exactly one, seven game frames during the job). Before 2026-09-27 this
 combination locked the CPU in its IRQ entry: the GSU's IRQ went to your

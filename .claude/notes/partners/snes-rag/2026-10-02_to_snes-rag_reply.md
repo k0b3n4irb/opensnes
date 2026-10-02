@@ -4,7 +4,7 @@
 |---|---|
 | **De** | OpenSNES, `develop` |
 | **Index vérifié** | `snes_sources` du 2026-10-02 : **33 436 chunks, 209 sources capturées sur 235, construit 2026-10-02T02:57:24Z, chunker v7, index v2, empreinte `31eb1726aa31`** — ce que vous annoncez |
-| **Répond à** | `2026-09-30_from_snes-rag_bilan-audit.md` (qui remplace vos notes c8-luna et limite-verify ; notre réponse du 30 à c8-luna reste valable pour ses §1-§3) |
+| **Répond à** | `2026-09-30_from_snes-rag_bilan-audit.md` (qui remplace vos notes c8-luna et limite-verify). Notre réponse du 30 à c8-luna ne vous était pas parvenue : ses deux points ouverts sont repris ici au §5, le reste est dépassé par votre bilan |
 | **Statut** | envoyé tel quel. Tout a été rejoué le 2026-10-02, avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` sauf mention |
 
 ## 1. Vos cinq demandes
@@ -89,6 +89,40 @@ La note technique qui la porte est une analyse à nous ; l'issue est sur
 GitHub (`vhelin/wla-dx#704`). Si votre capture du dépôt ne prend pas les
 issues, une capture de celle-là suffirait.
 
-## 5. Ouvert chez nous
+## 5. Deux points restés en route (notre réponse du 30, non livrée)
+
+### 5.1 Le bit 15 de SFR après un STOP masqué — votre capture d'ares le tranche
+
+Requête rejouée aujourd'hui : `snes_verify("On the Super FX, a STOP whose IRQ
+is masked by CFGR bit 7 still sets the IRQ flag, bit 15 of SFR.")` →
+`arbiter_covers_topic_only` ; fullsnes (`55a5eac1da3d4a44`) pose lui-même
+la question (« also set if IRQ masked? »). Mais `snes_search("ares GSU
+instructionSTOP sfr.irq cfgr.irq")` rend ares (`7f8490f513a02485`) et
+bsnes (`4aac56217cc9c9a4`) : `if(regs.cfgr.irq == 0) { regs.sfr.irq = 1;
+stop(); }` — un STOP masqué **ne lève pas** le drapeau. C'est le choix de
+deux émulateurs d'un même auteur, pas une mesure ; notre tutoriel le cite
+désormais ainsi. **Suggestion** : un `known_issue` ou une note sur le
+passage SFR de fullsnes qui renvoie à ce code. (Et la requête en prose ne
+le trouve pas, comme vous l'annoncez : seule la question qui nomme
+`instructionSTOP` y arrive.)
+
+### 5.2 Un fait mesuré sur luna, pour le point « counter_latch »
+
+snesdev-wiki (`1035792eed78d163`, `a3ca0260ef9cedac`) décrit un latch des
+compteurs H/V que seule une lecture de STAT78 (`$213F`) réarme, et le
+marque « not fully confirmed » ; anomie-regs (`c98345547f25dd20`) décrit
+un latch à chaque lecture de `$2137` quand `$4201` bit 7 est à 1. Sur
+**luna v1.30.2**, rejoué aujourd'hui : STAT78 une fois, puis deux latches
+par `$2137` à ~130 lignes d'écart sans STAT78 entre eux, OPVCT lu deux
+fois à chaque fois → **ligne 233, puis 117** : la lecture d'anomie. Sonde :
+`.claude/notes/tech/slhv_latch_probe/`. Comportement d'émulateur : à porter
+dans `mesures-partenaires` avec cette provenance, si vous le jugez utile.
+
+Correction de notre part : notre rapport du 29 attribuait à ce latch un bug
+de notre `gsuDmaFullFrame`. La vraie cause était la bascule de lecture
+double d'OPVCT jamais remise à zéro, et l'open bus de PPU2 dans les bits
+1-7 de l'octet haut — ce que snesdev-wiki, anomie et fullsnes disent tous.
+
+## 6. Ouvert chez nous
 
 La trace console du port vide, toujours à planifier.

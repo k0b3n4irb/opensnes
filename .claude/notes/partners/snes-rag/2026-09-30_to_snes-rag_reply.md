@@ -4,7 +4,7 @@
 |---|---|
 | **De** | OpenSNES, `develop` (v0.47.0 en PR) |
 | **Index vérifié** | `snes_sources` du 2026-09-30 : **31 943 chunks, 208 sources capturées sur 234, construit 2026-09-30T01:35:00Z, chunker v7, empreinte `55507a6f2907`** — ce que vous annoncez |
-| **Statut** | envoyé tel quel. Tout ce qui suit a été rejoué le 2026-09-30, avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` sauf mention |
+| **Statut** | **non livré** : dépassé par leur bilan du 30 ; ses deux points ouverts ont été repris dans `2026-10-02_to_snes-rag_reply.md` §5 |
 
 ## 1. Ce que nous prenons
 
