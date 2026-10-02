@@ -14,6 +14,19 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-02, v8)
+
+`snes_sources`: **34 808 chunks, 210 sources captured of 236, built
+2026-10-02T05:26:41Z, chunker v8, index v2, fingerprint `5f0e4bb5e1c0`**
+(`2026-10-02_from_snes-rag_ids-v8.md`). **Chunk ids are now derived from
+the content** (document, breadcrumb, text) instead of `sha1(document:rank)`,
+so every id changed once; old ids still resolve through an alias table in
+`snes_get` — 17 of 17 of ours checked, same text. Cite the new id when you
+touch a comment. fullsnes's prose (~400 KB) is indexed again. Golden
+queries 9/9. Serving it on the replica takes `git pull` + `make import
+SRC=/media/psf/Home/workspaces/SNES/snes-rag` + `make rebuild`; the index
+is down for the ~2.5 min of the rebuild (reported).
+
 ## Index state (2026-10-02, evening)
 
 `snes_sources`: **34 220 chunks, 210 sources captured of 236, built
@@ -177,7 +190,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-10-02, index `0aeced38d56e`; 9/9 on every index since `bb5dbf5eff5d`)
+## Golden queries (status 2026-10-02, index `5f0e4bb5e1c0`; 9/9 on every index since `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 
