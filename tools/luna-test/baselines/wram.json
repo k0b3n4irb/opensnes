@@ -75,6 +75,10 @@
     "stream": "e3ac0073201d5d63c6c8f1f695695f8a158f6d8d45d503c2a765f6fd044e338d",
     "rom_sha256": "55170915a7da4c2f13cf1f247ce52fb3a6d076cc0367e4b88609ac8e64de7b13"
   },
+  "backgrounds_mode6": {
+    "stream": "eec04c1274c298bb2e946b69ca7ed27a3dc41a81f6eec1f0d330c6437c70556a",
+    "rom_sha256": "d26622e6da0b6bf1d8a692969764818ddf17b21a812eb4adc8790c33c9732f88"
+  },
   "basics_aim_target": {
     "stream": "d6b7e77ea845152cbd35ef793724a8abce70434c73f7299585c3dbb05f719555",
     "rom_sha256": "ce8b57e52a076c6805433b68399f18f7a92c46446b2db078c8c67ea66e2f31aa"

@@ -125,6 +125,18 @@
     "luna_version": "v1.24.0",
     "rom_sha256": "249e0957028c602db069209b0937e016e38b7c2415f086db089f1921378b1d56"
   },
+  "backgrounds_mode6": {
+    "fbhash": [
+      "4667d18ccb9bec65",
+      "9ebf16f8d8cdb4e5"
+    ],
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.30.3",
+    "rom_sha256": "d26622e6da0b6bf1d8a692969764818ddf17b21a812eb4adc8790c33c9732f88"
+  },
   "basics_aim_target": {
     "fbhash": "423f1a183086a6cd",
     "frames": 200,

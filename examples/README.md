@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 88 examples organized by topic, building
+Learn SNES development step by step. 89 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -10,7 +10,7 @@ from basic concepts to complete games.
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 8 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
-| [backgrounds/](backgrounds/) | 9 | BG modes 0/1/2/3/4/5, priority, LZ77, hi-res, offset-per-tile |
+| [backgrounds/](backgrounds/) | 10 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 8 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks, pseudo-hires blend |
@@ -69,6 +69,8 @@ deep-dive of a step below.
 | 15j | [color/hicolor_blend](color/hicolor_blend/) | RGB channel-split color-math blend: 3840 colors (krom port) |
 | 15k | [color/direct_color](color/direct_color/) | Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed |
 | 15l | [color/pseudo_hires](color/pseudo_hires/) | Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3) |
+| 15m | [backgrounds/mode4](backgrounds/mode4/) | Mode 4: offset-per-tile on a 256-colour layer, one row of H-or-V words |
+| 15n | [backgrounds/mode6](backgrounds/mode6/) | Mode 6: offset-per-tile on a hi-res layer, 16-half-pixel columns |
 | 16 | [hdma/gradient_colors](hdma/gradient_colors/) | HDMA + CGRAM color gradients |
 | 17 | [scrolling/parallax_scroll](scrolling/parallax_scroll/) | HDMA parallax scrolling |
 | 18 | [color/transparency](color/transparency/) | Color math (add/subtract blending) |

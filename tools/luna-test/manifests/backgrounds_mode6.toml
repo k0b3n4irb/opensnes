@@ -1,0 +1,44 @@
+# backgrounds/mode6 — hi-res BG1 with Mode 6's offset-per-tile table.
+#
+# Mode 6 reads the offset table like Mode 2: BG3 row 0 holds horizontal
+# words, row 1 vertical words, bit 13 = apply to BG1; its columns are 16
+# half-pixels wide, BG3 included (anomie-regs, Backgrounds / Mode 6,
+# 901f5410d289d058). BG3's map is at word $3000: row 0 is VRAM byte $6000,
+# row 1 byte $6040. BG1 is on the main AND the sub screen (hi-res: the sub
+# screen draws the even half-pixel columns).
+#   * checkpoint 100: the wave is vertical, BG3VOFS is 0 so the PPU reads
+#     rows 0 and 1;
+#   * frame 140, after A at 110: the wave is in the horizontal row and the
+#     vertical row is back to zero.
+# Measured on luna v1.30.3 (`luna state --until-frame N --input … --dump-vram`).
+rom = "../../../examples/backgrounds/mode6/mode6.sfc"
+frames = 140
+input = "110:0x0080,112:0"        # A: vertical -> horizontal
+
+[[checkpoint]]
+at_frame = 100
+[checkpoint.values]
+opt_vertical = { eq = 1, width = 1 }
+[checkpoint.delta]
+wave_phase = "increased"
+[checkpoint.ppu]
+bgmode = 6
+tm = 1
+ts = 1
+"bgs.2.v_scroll" = 0
+
+[asserts.values]
+opt_vertical = { eq = 0, width = 1 }
+
+[asserts.ppu]
+bgmode = 6
+tm = 1
+ts = 1
+"bgs.2.v_scroll" = 0
+
+[asserts.blocks]
+opt_row_h_words = { space = "vram", offset = "6000", hex = "222026202b202f20" }
+opt_row_v_zero = { space = "vram", offset = "6040", hex = "0000000000000000" }
+
+[asserts.dma]
+unsafe_writes = 0

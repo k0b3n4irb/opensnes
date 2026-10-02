@@ -5,6 +5,11 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(examples): **`backgrounds/mode6`** — a hi-res 4bpp layer with
+  offset-per-tile: Mode 6 reads the table like Mode 2 (an H row, a V row),
+  with 16-half-pixel columns; A moves the wave from the vertical row to the
+  horizontal one. One-half-pixel stripes built at run time. Its manifest pins
+  both rows in VRAM, both screens and BG3VOFS. Last mode gap of action 39.
 - feat(examples): **`backgrounds/mode4`** — a 256-colour layer with
   offset-per-tile: Mode 4's single row of words, each vertical (bit 15) or
   horizontal; A switches the wave from one to the other. 8bpp tiles built

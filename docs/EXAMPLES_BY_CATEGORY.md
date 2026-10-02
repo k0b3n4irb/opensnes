@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 88 examples organized by topic. For a progressive learning path, see
+All 89 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -40,6 +40,7 @@ The PPU's background modes — colour vs layers vs resolution.
 | @subpage examples_backgrounds_mode5 | Mode 5: hi-res 512×256 (16-color) |
 | @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
 | @subpage examples_backgrounds_mode4 | Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words |
+| @subpage examples_backgrounds_mode6 | Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns |
 | @subpage examples_backgrounds_mode5_hires | Mode 5 + interlace hi-res text (512×448) (krom port) |
 
 ---
