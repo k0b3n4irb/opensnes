@@ -4,6 +4,14 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(examples): **`color/pseudo_hires`** — a 50 % blend of two layers
+  without colour math: SETINI bit 3 puts the sub screen on the even columns
+  of a 512-pixel line and the main screen on the odd ones (snesdev-wiki,
+  anomie; checked in luna's native output). Press A to toggle; tiles built
+  at run time, no asset. Its manifest pins SETINI, the screen designations
+  and the scroll.
+
 ## [0.47.0] — 2026-10-02
 
 The Super FX release. A game can now run while the GSU works: code runs

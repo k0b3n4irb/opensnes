@@ -147,6 +147,10 @@
     "stream": "e90086c167f8063b7fd83abb48d4a88ba46c848b19300daa7794c11ba488e4dc",
     "rom_sha256": "0cb684f970d6e8b62868fae0a6ee83d0d07109d93162f33e38d8c96908f5a04a"
   },
+  "color_pseudo_hires": {
+    "stream": "13c54b40983c0c3c660181da83ecd5b19cc3f559a04061edcd76e87d8d635c7c",
+    "rom_sha256": "674acab7f8fc32876785ba75b06540e82bf48aaa7c2186f3f8c665b425db0bc6"
+  },
   "color_shadow_tint": {
     "stream": "dd66dfb173baa8c153288f510657d6ce23917240cc30f65ad3793413681ef520",
     "rom_sha256": "485e3304e1f787b3e083f6c69d211f60fe46f5f8cd98fc0ff4a0358e9cbc9a25"

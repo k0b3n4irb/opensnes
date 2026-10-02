@@ -120,6 +120,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/scrolling/parallax_scroll \
                          ../examples/chips/superfx_3d \
                          ../examples/chips/superfx_game_skeleton \
+                         ../examples/color/pseudo_hires \
                          ../examples/color/transparency \
                          ../examples/windows/transparent_window \
                          ../examples/windows/window \

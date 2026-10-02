@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 85 examples organized by topic. For a progressive learning path, see
+All 86 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -110,6 +110,7 @@ Colour math, palette bypass, and beating the 256-colour limit.
 | @subpage examples_color_gradient_9bit | Brightness-dithered "9-bit" gradient backdrop (krom port) |
 | @subpage examples_color_hicolor_1792 | 1792 colors from a 4bpp background via per-tile-row HDMA (krom port) |
 | @subpage examples_color_hicolor_blend | 3840 colors via RGB channel-split blend (krom port) |
+| @subpage examples_color_pseudo_hires | 50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math |
 
 ---
 

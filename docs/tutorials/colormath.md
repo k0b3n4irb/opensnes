@@ -298,6 +298,10 @@ SNES. The discipline is configuring it correctly, not avoiding it.
   the `CGWSEL` bit-1 polarity fix.
 - [`examples/color/transparency`](../../examples/color/transparency/README.md) — additive cloud overlay.
 - [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window-gated spotlight blend.
+- [`examples/color/pseudo_hires`](../../examples/color/pseudo_hires/README.md) — a 50 % blend
+  with no colour math at all: pseudo-hires (SETINI bit 3) puts the sub screen on the even
+  columns of a 512-pixel line and the main screen on the odd ones, and the display blends each
+  pair. It leaves colour math free for another effect, at the cost of horizontal detail.
 - [Window tutorial](window.md) — the pair tutorial; covers
   `WINDOW_MATH` and the window-area gate that the math source mask
   references.

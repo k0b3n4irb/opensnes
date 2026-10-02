@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 85 examples organized by topic, building
+Learn SNES development step by step. 86 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -13,7 +13,7 @@ from basic concepts to complete games.
 | [backgrounds/](backgrounds/) | 8 | BG modes 0/1/2/3/5, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
-| [color/](color/) | 7 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks |
+| [color/](color/) | 8 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks, pseudo-hires blend |
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
 | [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
@@ -68,6 +68,7 @@ deep-dive of a step below.
 | 15h | [color/gradient_9bit](color/gradient_9bit/) | Brightness-dithered backdrop: the 9-bit color trick (krom port) |
 | 15j | [color/hicolor_blend](color/hicolor_blend/) | RGB channel-split color-math blend: 3840 colors (krom port) |
 | 15k | [color/direct_color](color/direct_color/) | Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed |
+| 15l | [color/pseudo_hires](color/pseudo_hires/) | Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3) |
 | 16 | [hdma/gradient_colors](hdma/gradient_colors/) | HDMA + CGRAM color gradients |
 | 17 | [scrolling/parallax_scroll](scrolling/parallax_scroll/) | HDMA parallax scrolling |
 | 18 | [color/transparency](color/transparency/) | Color math (add/subtract blending) |

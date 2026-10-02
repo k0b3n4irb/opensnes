@@ -239,6 +239,12 @@
     "luna_version": "v1.21.0",
     "rom_sha256": "a2ef17966820773603b5f65ede7a55aafc62a6d1568e498c163acdc149a2edc3"
   },
+  "color_pseudo_hires": {
+    "fbhash": "6653b4f1be7ec325",
+    "frames": 200,
+    "luna_version": "v1.30.2",
+    "rom_sha256": "674acab7f8fc32876785ba75b06540e82bf48aaa7c2186f3f8c665b425db0bc6"
+  },
   "color_shadow_tint": {
     "fbhash": "3e382b3e3e0f0325",
     "frames": 200,
