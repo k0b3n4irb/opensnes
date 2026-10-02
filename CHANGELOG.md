@@ -4,7 +4,7 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
-## [0.47.0] — 2026-09-29
+## [0.47.0] — 2026-10-02
 
 The Super FX release. A game can now run while the GSU works: code runs
 from RAM (`RAM_CODE_SIZE`, `RAM_CODE_SECTION`, C `RAM_CODE`), jobs run from
@@ -99,6 +99,16 @@ made at run time, and luna v1.30.2.
   SA-1 tutorial shows both profiles.
 
 ### Fixed
+- docs: **two hardware claims corrected after arbitration.** The
+  `fixMul()` NMI-callback warning no longer says the multiplier returns
+  garbage during the auto-joypad read: no reference states it, and a
+  main-thread probe on luna v1.30.2 reads every product right during the
+  read (19 of 19); the hazard that stands is non-reentrancy. And Mode 5's
+  columns: the sub screen draws the even ones, the main screen the odd ones
+  — `mode5_hires`'s comment and the graphics tutorial had them inverted
+  (snesdev-wiki's Backgrounds page carries the same error). The hardware
+  claims rule now reads `snes_verify`'s evidence sentences, never its
+  verdict.
 - fix(lib): **`superfx_3d` dropped a third of its framebuffer bytes.**
   `gsuDmaFullFrame()` read OPVCT (`$213D`) once per poll iteration and never
   read STAT78, the only reset of OPVCT's read-twice flip-flop: a poll that
