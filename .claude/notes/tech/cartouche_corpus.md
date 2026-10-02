@@ -59,6 +59,25 @@ now counted on the answering **passage**: 54.1 % at 5 (the source-level
 80.7 % was mostly the arbiters' prior). Golden queries rerun: **9/9**;
 negative control: our ABI at ranks 1 and 2, never qbe-docs.
 
+## Index state (2026-10-02, evening)
+
+`snes_sources`: **34 819 chunks, built 2026-10-02T11:54:22Z, chunker v8,
+fingerprint `b363c473e7ec`** (snes-rag's `…_reponse-ids-v8.md`; served after
+pull + import + rebuild). What moved:
+
+- **`contradicted` only on a documented false form** (`forme_fausse`): the
+  hires columns, CGWSEL bits, SIWP polarity. A true claim is no longer
+  refuted (their 60 pairs: 13 → 0 %); a passage from a page carrying a
+  documented error is marked `documented_error` in `evidence`.
+- **`make rebuild` is atomic** (`cartouche.db.part`, then rename): the
+  service answered during our rebuild.
+- **Attestation reads the whole passage** and accepts common terms, so more
+  `states_point: true` — including two false ones we reported
+  (`…_reponse-ids-v8_reply.md` §2: multiplier at `$4216` + "product";
+  fullsnes mouse bits on a Mode 4 claim). The rule (state AND sentence)
+  matters more, not less.
+- Golden queries 9/9; negative control: our ABI at ranks 1 and 2 again.
+
 ## luna pin v1.30.3 (2026-10-02)
 
 Golden queries 4, 5, 6 and 9 (the `luna-docs` ones) rerun on `5f0e4bb5e1c0`:
@@ -196,7 +215,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-10-02, index `5f0e4bb5e1c0`; 9/9 on every index since `bb5dbf5eff5d`)
+## Golden queries (status 2026-10-02, index `b363c473e7ec`; 9/9 on every index since `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 
