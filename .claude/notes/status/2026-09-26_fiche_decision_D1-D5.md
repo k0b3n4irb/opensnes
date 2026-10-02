@@ -79,7 +79,10 @@ C'est la seule rangée **non aliasable** : on ne peut pas renommer une variable 
    garder leurs images ; un projet utilisateur qui passait `0x0200` voit son
    plan dézoomé. **Recommandation : b avant le gel** — c'est le contrat que
    la doc promettait, et `mode7Init` + `mode7SetAngle(0)` deviennent
-   cohérents.
+   cohérents. **Décidé b le 2026-10-02** (« oui on est parti ») : le code
+   double l'échelle dans `mode7SetAngle`, `rotate_scale`, `mode7_racing`,
+   `mode7_flying` et `extbg` passent des échelles moitié, images
+   identiques (`diff_corpus`).
 
 ## Critères de gel proposés
 

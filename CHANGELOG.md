@@ -20,14 +20,18 @@ All notable changes to OpenSNES are documented in this file.
   at run time, no asset. Its manifest pins SETINI, the screen designations
   and the scroll.
 
-### Fixed
-- docs(lib): **the Mode 7 scale contract** — `mode7.h`, the Mode 7
-  tutorial and `rotate_scale` said `mode7SetScale(0x0100)` is 1:1; the
-  code has always written a matrix of half the scale, so `0x0200` is 1:1
-  and `0x0100` magnifies twice (`mode7Transform` percentages likewise).
-  `mode7Init`'s doc now says it leaves the view on plane row `$180`. The
-  docs say what the code does; whether to change the code before 1.0 is on
-  the API decision sheet.
+### Changed
+- **BREAKING** fix(lib): **`mode7SetScale(0x0100)` is now 1:1**, as its
+  documentation always said. `mode7SetAngle()` wrote a matrix of half the
+  scale, so `0x0200` was 1:1 and `0x0100` magnified twice, and
+  `mode7Init()` + `mode7SetAngle(0)` turned the identity into ×2. The scale
+  is doubled before the multiply now (valid up to `0x3FFF`);
+  `mode7Transform(deg, 100)` is 1:1 too. **Migration**: halve the scales
+  you pass (`0x0200` → `0x0100`); code that relied on the default scale
+  after `mode7Init()` and wants the old ×2 view sets `mode7SetScale(0x0080,
+  0x0080)`. The four examples that use it were migrated, pixel-identical
+  (`diff_corpus`). `mode7Init`'s doc now also says it leaves the view on
+  plane row `$180`.
 
 ## [0.47.0] — 2026-10-02
 

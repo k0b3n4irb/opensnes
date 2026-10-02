@@ -131,7 +131,7 @@ int main(void) {
 
     setMode(BG_MODE7, 0);
     mode7Init();
-    mode7SetScale(0x0200, 0x0200);   /* 1:1: the lib's matrix is scale / 2 */
+    mode7SetScale(0x0100, 0x0100);   /* 1:1 */
     mode7SetAngle(0);
     mode7SetScroll(0, 0);            /* texel row 0 on the first line (mode7Init centres the view) */
 

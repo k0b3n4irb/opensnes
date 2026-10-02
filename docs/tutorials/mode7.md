@@ -155,10 +155,8 @@ The default after `mode7Init()`:
   `$180`, not row 0. Call `mode7SetScroll(0, 0)` to put row 0 on the first
   line (the lib writes `y - 1`, like `bgSetScroll`).
 
-Note that `mode7Init()` also sets the *scale* the angle helpers use to
-`0x0100`, which `mode7SetAngle()` turns into a matrix of `$7F` — twice
-magnified, not identity. Set `mode7SetScale(0x0200, 0x0200)` before the
-first `mode7SetAngle()` to stay 1:1 (see the scale paragraph below).
+`mode7Init()` also sets the *scale* the angle helpers use to `0x0100`,
+1:1, so a first `mode7SetAngle(0)` keeps the identity.
 
 To **rotate around the screen centre**, set both centre and scroll so
 that the rotation pivot lines up with the visible region's middle. The
@@ -166,15 +164,13 @@ helper `mode7SetPivot(x, y)` does this in screen coordinates: pass the
 screen pixel you want to be the rotation centre, and the lib sets `cx`,
 `cy`, `sx`, `sy` appropriately.
 
-The lib's scale is **twice the matrix**: `mode7SetAngle()` multiplies the
-scale by a cosine of amplitude 127 and keeps the high byte, so
-`mode7SetScale(0x0200, 0x0200)` gives A = D = `$00FE`, about 1:1.
-`0x0100` magnifies twice, `0x0400` shrinks twice (you see four times the
-area). Smaller is closer, counter-intuitive at first, but the formula
-tells you why: a larger `A`/`D` means each screen pixel steps over more
-plane pixels. (Until 2026-10-02 this tutorial said `0x0100` = 1.0; the code
-has always halved it. Whether to change the code to match is an open API
-decision before 1.0.)
+The scale is in texels per screen pixel, 8.8 fixed point:
+`mode7SetScale(0x0100, 0x0100)` gives A = D = `$00FE`, 1:1 (the sine table
+peaks at 127/128). `0x0080` magnifies twice, `0x0200` shrinks twice (you
+see four times the area). Smaller is closer, counter-intuitive at first,
+but the formula tells you why: a larger `A`/`D` means each screen pixel
+steps over more plane pixels. (Before 0.48.0 the helpers wrote half the
+scale, so `0x0200` was 1:1; code written then halves its scales.)
 
 ## Out-of-bounds behaviour
 
@@ -196,14 +192,14 @@ say), `TRANSPARENT` or `TILE0` keeps the world bounded.
 
 | Function | Purpose |
 |---|---|
-| `mode7Init()` | Identity matrix, centre (128, 128), M7HOFS 0 / M7VOFS `$17F`; helper scale `0x0100`. **Does not** set `BG_MODE7`. |
-| `mode7SetScale(sx, sy)` | Set the helpers' X/Y scale; the matrix is scale / 2 (`0x0200` = 1:1, `0x0100` = magnified twice). Stored; applied on next `mode7SetAngle`. |
+| `mode7Init()` | Identity matrix, centre (128, 128), M7HOFS 0 / M7VOFS `$17F`; helper scale `0x0100` (1:1). **Does not** set `BG_MODE7`. |
+| `mode7SetScale(sx, sy)` | Set the helpers' X/Y scale, 8.8 texels per pixel (`0x0100` = 1:1, `0x0080` = magnified twice), up to `0x3FFF`. Stored; applied on next `mode7SetAngle`. |
 | `mode7SetAngle(angle)` | 0–255 angle (full circle wraps at 256). Looks up sin/cos from a table, multiplies by current scale via the hardware multiplier, writes M7A–M7D. |
 | `mode7SetCenter(x, y)` | Set the rotation centre `(cx, cy)` in tilemap coordinates (signed 13-bit). |
 | `mode7SetScroll(x, y)` | Set the scroll offsets `(sx, sy)` in tilemap coordinates (signed 13-bit). |
 | `mode7SetPivot(x, y)` | High-level: set the rotation centre by *screen* coordinates (0–255). The lib computes `cx`/`cy`/`sx`/`sy`. |
 | `mode7Rotate(degrees)` | Convenience: take 0–359 degrees and convert to the 0–255 internal angle. |
-| `mode7Transform(degrees, scalePercent)` | Combined rotate + scale, scale = percent × 2.5 in `mode7SetScale` units: `200` ≈ 1:1, `100` magnified twice, `400` shrunk twice. |
+| `mode7Transform(degrees, scalePercent)` | Combined rotate + scale: `100` = 1:1, `50` magnified twice, `200` shrunk twice (percent × 2.5, so 100 is `0x00FA`). |
 | `mode7SetExtBg(on)` | EXTBG (SETINI bit 6): BG2 shows the same plane, bit 7 of each pixel as its priority — a second layer around the sprites. See below. |
 | `mode7SetMatrix(a, b, c, d)` | Direct matrix control. Bypasses the angle/scale system. For shears, non-uniform scales, or arbitrary affine effects. |
 | `mode7SetSettings(M7SEL_value)` | Flip + out-of-bounds behaviour (the constants above). |

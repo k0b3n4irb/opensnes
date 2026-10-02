@@ -52,7 +52,7 @@ extern u8 mode7_pal[], mode7_pal_end[];
 int main(void) {
     u16 pad0;                          /**< Current joypad button state */
     u8 angle = 0;                      /**< Rotation angle (0-255 maps to 0-360 degrees) */
-    u16 zscale = 0x0200;               /**< Zoom level in 8.8 fixed-point (2.0 = default, higher = more zoomed out) */
+    u16 zscale = 0x0100;               /**< Zoom level in 8.8 fixed-point (1.0 = 1:1, higher = more zoomed out) */
 
     consoleInit();
 
@@ -70,11 +70,11 @@ int main(void) {
 
     /* Set Mode 7 and initialize the affine transformation matrix.
      * mode7Init() sets the center (M7X/M7Y) and the scroll (M7HOFS/M7VOFS).
-     * mode7SetScale(0x0200) is 1:1 (the lib's matrix is half the scale),
+     * mode7SetScale(0x0100) is 1:1,
      * and mode7SetAngle() writes the unrotated matrix (angle 0). */
     setMode(BG_MODE7, 0);
     mode7Init();
-    mode7SetScale(0x0200, 0x0200);
+    mode7SetScale(0x0100, 0x0100);
     mode7SetAngle(0);
 
     /* Turn on display with BG1 -- Mode 7 only supports a single BG layer
@@ -98,25 +98,25 @@ int main(void) {
         }
 
         /* Zoom out with UP (increase scale = shows more of the plane).
-         * Scale is 8.8 fixed-point, and the lib's matrix is half of it:
-         * 0x0200 = 1:1, 0x0400 = shrunk twice.
-         * Higher values shrink the image (show more area). Clamped
-         * to 0x0F00 (15x) to prevent extreme distortion.
+         * Scale is 8.8 fixed-point texels per pixel: 0x0100 = 1:1,
+         * 0x0200 = shrunk twice. Higher values shrink the image (show
+         * more area). Clamped to 0x0780 (7.5x) to prevent extreme
+         * distortion.
          * mode7SetAngle() must be called after mode7SetScale() because
          * the scale factors are incorporated into the rotation matrix. */
         if (pad0 & KEY_UP) {
-            if (zscale < 0x0F00)
-                zscale += 16;
+            if (zscale < 0x0780)
+                zscale += 8;
             mode7SetScale(zscale, zscale);
             mode7SetAngle(angle);
         }
 
         /* Zoom in with DOWN (decrease scale = magnifies).
-         * Lower scale values enlarge the image. Clamped to 0x0010 to
+         * Lower scale values enlarge the image. Clamped to 0x0008 to
          * prevent division-by-zero-like artifacts in the matrix. */
         if (pad0 & KEY_DOWN) {
-            if (zscale > 0x0010)
-                zscale -= 16;
+            if (zscale > 0x0008)
+                zscale -= 8;
             mode7SetScale(zscale, zscale);
             mode7SetAngle(angle);
         }

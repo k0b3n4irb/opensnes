@@ -51,13 +51,12 @@ DMAs with different VMAIN settings), then `dmaCopyCGram()` for the palette.
 ```c
 setMode(BG_MODE7, 0);
 mode7Init();
-mode7SetScale(0x0200, 0x0200);
+mode7SetScale(0x0100, 0x0100);
 mode7SetAngle(0);
 ```
 
 `mode7Init()` sets the rotation center to the screen center (128, 128).
-Scale `0x0200` is 1:1 (one texel per pixel): the lib's matrix is half the
-scale, so `0x0100` would magnify twice.
+Scale `0x0100` is 1:1 (one texel per pixel).
 
 ### 3. Update the matrix every frame
 
@@ -76,14 +75,14 @@ at $211B-$211E) using the current angle and scale. The angle is 0-255, mapping t
 
 ```c
 if (pad0 & KEY_UP) {
-    if (zscale < 0x0F00) zscale += 16;
+    if (zscale < 0x0780) zscale += 8;
     mode7SetScale(zscale, zscale);
     mode7SetAngle(angle);
 }
 ```
 
 After changing the scale, you must call `mode7SetAngle()` again because the matrix
-depends on both angle and scale. The scale range is clamped to `0x0010`-`0x0F00` --
+depends on both angle and scale. The scale range is clamped to `0x0008`-`0x0780` --
 values outside this range produce extreme distortion.
 
 ## SNES Concepts
@@ -112,9 +111,9 @@ per palette. This gives richer visuals but limits you to 256 unique tiles total.
 
 ### 8.8 Fixed-Point Scale
 
-The lib's matrix is half the scale: `0x0200` = 1:1, `0x0400` = shrunk twice
-(shows more area), `0x0100` = magnified twice. The integer part is the high
-byte, the fractional part is the low byte.
+`0x0100` = 1:1, `0x0200` = shrunk twice (shows more area), `0x0080` =
+magnified twice. The integer part is the high byte, the fractional part is
+the low byte.
 
 ## Project Structure
 

@@ -133,8 +133,12 @@ void mode7SetAngle(u8 angle) {
 
     /* locals on purpose: the byte-pair store fusion needs the two
      * M7A writes to split the SAME temp, and globals reload per use */
-    sx = m7_scale_x;
-    sy = m7_scale_y;
+    /* x2: the table's cosine peaks at 127, the product's high byte is
+     * kept, so scale * 2 makes 0x0100 the 1:1 matrix ($00FE). Before
+     * 2026-10-02 the scale went in as is and 0x0100 gave $7F (magnified
+     * twice). Scales up to 0x3FFF stay in the multiplicand's range. */
+    sx = (u16)(m7_scale_x << 1);
+    sy = (u16)(m7_scale_y << 1);
 
     PPU_MUL(b, sx, (s8)-sn);
     PPU_MUL(c, sy, sn);

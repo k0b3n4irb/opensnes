@@ -14,8 +14,8 @@
  * // Initialize Mode 7
  * mode7Init();
  *
- * // Set scale (0x0200 = 1:1, 0x0100 = magnified twice; see mode7SetScale)
- * mode7SetScale(0x0200, 0x0200);
+ * // Set scale (0x0100 = 1:1, 0x0080 = magnified twice, 0x0200 = shrunk twice)
+ * mode7SetScale(0x0100, 0x0100);
  *
  * // Set rotation angle (0-255, where 256 = 360 degrees)
  * mode7SetAngle(angle);
@@ -52,11 +52,9 @@
  * Writes the identity matrix (A = D = $0100, 1:1), the center point
  * (128,128), M7HOFS = 0 and M7VOFS = $17F (texel row $180 on the first
  * line: the view starts in the middle of the 1024-texel plane, not at its
- * top — call mode7SetScroll(0, 0) to see row 0 first). It also sets the
- * scale mode7SetAngle() uses to 0x0100, which that function turns into a
- * matrix of $7F (magnified twice, see mode7SetScale): call
- * mode7SetScale(0x0200, 0x0200) before the first mode7SetAngle() to keep
- * 1:1. Call this before using other Mode 7 functions.
+ * top — call mode7SetScroll(0, 0) to see row 0 first), and the scale
+ * mode7SetAngle() uses to 0x0100 (1:1). Call this before using other
+ * Mode 7 functions.
  *
  * @note This does NOT set BGMODE to Mode 7. You must do that separately:
  * @code
@@ -70,15 +68,16 @@ void mode7Init(void);
 /**
  * @brief Set Mode 7 scale factors
  *
- * Sets the X and Y scale for Mode 7 transformation. The matrix
- * mode7SetAngle() writes is **scale / 2** (it multiplies by a cosine of
- * amplitude 127 and keeps the high byte), so:
- * - 0x0200 = 1:1 (one texel per pixel; matrix A = D = $00FE)
- * - 0x0100 = magnified twice (the plane looks larger)
- * - 0x0400 = shrunk twice (the plane looks smaller)
+ * Sets the X and Y scale for Mode 7 transformation, 8.8 fixed point
+ * (texels per screen pixel):
+ * - 0x0100 = 1:1 (matrix A = D = $00FE: the sine table peaks at 127/128)
+ * - 0x0080 = magnified twice (the plane looks larger)
+ * - 0x0200 = shrunk twice (the plane looks smaller)
+ * Valid up to 0x3FFF.
  *
- * (Until 2026-10-02 this said 0x0100 = 1.0, which is not what the code
- * does; whether to change the code instead is an open API decision.)
+ * @warning Changed in 0.48.0: before, mode7SetAngle() wrote a matrix of
+ * half the scale, so 0x0200 was 1:1 and 0x0100 magnified twice. Code
+ * written for that halves its scales: 0x0200 becomes 0x0100.
  *
  * @param scale_x Horizontal scale (8.8 fixed point)
  * @param scale_y Vertical scale (8.8 fixed point)
@@ -147,14 +146,14 @@ void mode7Rotate(u16 degrees);
  * Combined transformation with rotation in degrees and percentage-based scaling.
  *
  * @param degrees Rotation angle in degrees (0-359)
- * @param scalePercent Scale as a percentage of mode7SetScale's units
- *        (percent x 2.5), so 200 is about 1:1, 100 magnifies twice, 400
- *        shrinks twice (see mode7SetScale)
+ * @param scalePercent Scale as a percentage (100 = 1:1, 50 = magnified
+ *        twice, 200 = shrunk twice; computed as percent x 2.5, so 100 is
+ *        0x00FA, within 3 % of 0x0100)
  *
  * @code
- * mode7Transform(45, 200);   // 45 degree rotation, about 1:1
- * mode7Transform(0, 100);    // no rotation, magnified twice
- * mode7Transform(90, 400);   // 90 degrees, shrunk twice
+ * mode7Transform(45, 100);   // 45 degree rotation, 1:1
+ * mode7Transform(0, 50);     // no rotation, magnified twice
+ * mode7Transform(90, 200);   // 90 degrees, shrunk twice
  * @endcode
  */
 void mode7Transform(u16 degrees, u16 scalePercent);

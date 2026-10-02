@@ -176,12 +176,12 @@
     "rom_sha256": "7eb15edf20566ae95d90e483f6fdeae77c98f944dc8371e2821b5edd8893ddbc"
   },
   "games_mode7_flying": {
-    "stream": "1b553046ece9b2afb6c2c15f9f5abd88e6b7cdef7f678395109b8a3bbacec832",
-    "rom_sha256": "2835b293a358c7bf0c7c5701f3be2b5500005bc103a0f40e78f56f6783c175b7"
+    "stream": "7f72e756bc04ae7faf0c6275aff428b49320cfa5a514ab7e9602c677ea271b15",
+    "rom_sha256": "212c2fc2526ee055646ece9bd713ae337af5a029fdcd224606d16a77b16b41fa"
   },
   "games_mode7_racing": {
-    "stream": "b6fd4a38cccbf17513440884845327c298a9de410e192def14da8249c8ccbf71",
-    "rom_sha256": "e0880da1987c47fab68a9bdc73ef3658556f344560d325e612da03ebb1583a94"
+    "stream": "22f595d67caff83e9a8f00ef25b4a730e393b0013971008e9ecb86e93768162a",
+    "rom_sha256": "ffa2859f6f2fc73d9fc12a5649fe4ef1c53245ec00d00d6ebbecaa04f493dd7b"
   },
   "games_rpg": {
     "stream": "9a5f56b78d39eb58c0f4b3d6575596432fa10dc002e8d0ea56bfbef12269f8ae",
@@ -260,8 +260,8 @@
     "rom_sha256": "6290c35ec8ca090b8ee51ac552d056453f5fac5e5c7006865dbccabe067f4bfc"
   },
   "mode7_extbg": {
-    "stream": "467777a406ec765b8713089fe9ef9e37453815e8566947f36cbae0baffea0d23",
-    "rom_sha256": "a37c1b07739d1bd5696dbefaa64fd4744dfc8671f3f6efbe1da42f0e4a36a25a"
+    "stream": "1c845b11b7c5056ce32d282751dc55fb6cfe5b36b0c6816c033ef68abe49c9f7",
+    "rom_sha256": "af58329c6858e471bb1a13b31c31343d46ffaddd760088878e8d022dcc49b7b9"
   },
   "mode7_perspective": {
     "stream": "70be8a7c241a02602c02cfc3afbd118be731b96d4a2015097ddf49d0f908c1f4",
@@ -272,8 +272,8 @@
     "rom_sha256": "512f291e9a6bd99409f8abd979408e4245f79e673eca3b45cff7b8b709865a30"
   },
   "mode7_rotate_scale": {
-    "stream": "99301cc93ac6cb40d38773ca277fb82d6a4b7b41615f314088373cde05156a08",
-    "rom_sha256": "cd5851a1114d95a9b7245cbc80fb1f1acdc71766f45f792e6fc6d155b1e8d43f"
+    "stream": "dc676299cca9370c1cabd39ade99ccda1838bdf5867ea41a33201156d4ae36c0",
+    "rom_sha256": "188e66c3f27ffa6d5a36f0324796c3b18ca2552f3d417bf9f7d337c1bdb03e43"
   },
   "scrolling_continuous_scroll": {
     "stream": "3dee3b33298619dc98b8eb0306b9b034db9a0a567c31c5a4dee88390a271d87d",

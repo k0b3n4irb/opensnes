@@ -24,7 +24,7 @@ ROM mode: LoROM (project default).
 
 ## SNES Concepts
 
-- Altitude as Mode 7 scale: `mode7SetScale(0x0100 + alt)` then
+- Altitude as Mode 7 scale: `mode7SetScale(0x0080 + alt / 2)` then
   `SetAngle` (the scale feeds the matrix at SetAngle time)
 - The shadow depth cue: the same procedural sprite shape with a dark
   palette, screen offset proportional to altitude
