@@ -14,6 +14,23 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-02, evening)
+
+`snes_sources`: **34 220 chunks, 210 sources captured of 236, built
+2026-10-02T03:47:47Z, chunker v7, index v2, fingerprint `0aeced38d56e`**
+(`2026-10-02_from_snes-rag_reponse.md`, answering our audit). New: an
+address alone no longer attests a point, and a passage listing more than 8
+addresses (a register map) attests nothing by its register names — our
+multiplier claim now comes out `arbiter_covers_topic_only`, with their
+negative-measure note (`mesures-partenaires`) first; `sentences` now also
+keep a sentence sharing three terms with the claim (the empty window,
+VMADD and Mode 5 sentences are served, state still `topic_only` by design:
+the sentence decides); `wladx-issue-704` captured; `mesures-partenaires`
+carries our two measures (latch H/V, multiplier non-reproduced); a
+`gsu-stop.md` fiche distils ares/bsnes `instructionSTOP`; nesdev forum
+threads re-captured whole (~620 → 1 172 chunks). Golden queries: **9/9**;
+negative control: our ABI ranks 1-2, never qbe-docs.
+
 ## Index state (2026-10-02)
 
 `snes_sources` on 2026-10-02: **33 436 chunks, 209 sources captured of 235,
@@ -160,7 +177,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-09-30, index `55507a6f2907`; 9/9 also on `bb5dbf5eff5d`)
+## Golden queries (status 2026-10-02, index `0aeced38d56e`; 9/9 on every index since `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 
