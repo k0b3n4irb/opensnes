@@ -197,10 +197,11 @@
                             ; nmiSet/irqEnable don't clobber each other's bits.
     in_nmi_ctx      dsb 1   ; 1 while the user NMI callback runs. tcc_mul16 /
                             ; tcc_div16 test it and take their software path:
-                            ; the hardware mul/div unit ($4202-$4217) reads
-                            ; garbage during the auto-joypad window the
-                            ; callback runs in, and is not reentrant against
-                            ; a main-thread multiply the NMI interrupted.
+                            ; the hardware mul/div unit ($4202-$4217) is not
+                            ; reentrant against a main-thread multiply the
+                            ; NMI interrupted (#113). (A second reason once
+                            ; given here — wrong results during auto-joypad —
+                            ; was retired 2026-10-02: a luna probe found none.)
     setini_shadow   dsb 1   ; Software copy of SETINI $2133 (write-only).
                             ; videoSetInterlace/ObjInterlace/Overscan/
                             ; PseudoHires compose their bits through it
@@ -1281,7 +1282,7 @@ FastNmi:
 
 @do_callback:
     ; Flag the NMI context so the mul/div runtime avoids the hardware
-    ; unit (auto-joypad window + non-reentrancy — see in_nmi_ctx decl).
+    ; unit (non-reentrancy — see in_nmi_ctx decl).
     sep #$20
     .ACCU 8
     lda #1
