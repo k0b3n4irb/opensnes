@@ -258,13 +258,17 @@ before committing.
 ### 🟡 `fixMul()` / `fixLerp()` are not safe inside nmiSet() callbacks
 
 They use the hardware multiplier ($4202-$4217) plus shared WRAM
-temporaries. Empirically, reads from the unit inside the NMI-callback
-window return garbage while the auto-joypad read is in progress
-(observed 0x2A/0x00 shift-register-like patterns — the hardware
-references document garbage reads of $4218-$421F during auto-read, but
-no reference confirms a mechanism coupling it to $4214-$4217, so treat
-the coupling as observed-not-explained); independently, the unit is not
-reentrant against an interrupted main-thread multiply. Plain C `*` / `/` / `%` **are** callback-safe —
+temporaries, and the unit is not reentrant: an NMI that lands between a
+main-thread multiply's write to `$4203` and its read of `$4216` and
+multiplies in the callback destroys the main thread's result. NMI is not
+maskable, so no wait fixes that. (Until 2026-10-02 this entry also said
+the unit returns garbage while the auto-joypad read is in progress. No
+reference states it, and a probe on luna v1.30.2 that multiplies from the
+main thread with NMI off does not reproduce it: 19 products read with
+`HVBJOY` bit 0 set, 1981 outside, all correct —
+`.claude/notes/tech/muldiv_autojoypad_probe/`. The original observation,
+in 2026-07, most likely saw the reentrancy above. Not measured on a
+console.) Plain C `*` / `/` / `%` **are** callback-safe —
 the compiler runtime detects the NMI context (`in_nmi_ctx`) and switches
 to software paths. Symptom if ignored: silently wrong fixed-point values,
 only when computed inside the callback. Mitigation: compute fixed-point

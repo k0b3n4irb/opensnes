@@ -292,7 +292,10 @@ SETINI bit 0 through the lib's write-only shadow) doubles vertical to
 `examples/backgrounds/mode5_hires`:
 
 1. Hi-res content displays through BOTH screens: `setMainScreen(LAYER_BG1)`
-   AND `setSubScreen(LAYER_BG1)`, or odd columns stay blank.
+   AND `setSubScreen(LAYER_BG1)`. The sub screen draws the even pixel
+   columns and the main screen the odd ones (snesdev-wiki, Uncommon
+   graphics mode games; its Backgrounds page has it inverted, a documented
+   error in the corpus), so main-only leaves the even columns blank.
 2. In interlace, tile texel rows map 1:1 to hi-res lines — a full-height
    page needs 56 tile rows (a 32x64 tilemap), not 28.
 3. On a modern LCD the alternating columns show as fringing; a period CRT

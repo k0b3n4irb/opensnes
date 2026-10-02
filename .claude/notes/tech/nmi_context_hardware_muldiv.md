@@ -12,7 +12,15 @@ offset was always 0 and the writes were real but constant).
 `tcc_mul16` / `tcc_div16` (the compiler runtime behind C's `*`, `/`,
 `%`) use the **hardware mul/div unit** ($4202-$4217):
 
-1. **Auto-joypad window**: while HVBJOY bit 0 is set (V≈225-227, ~4K
+1. **Auto-joypad window — NOT REPRODUCED (2026-10-02).** A main-thread
+   probe with NMI off on luna v1.30.2 multiplies 2000 times across the
+   frame: 19 products read with HVBJOY bit 0 set, all correct, 1981
+   outside, all correct (`muldiv_autojoypad_probe/`; negative control: a
+   wrong expected value flags all 2000). No reference states the
+   coupling either (snes-rag found it only in our docs, 2026-09-30).
+   Hazard 2 explains the 2026-07 observation. Kept below as written then,
+   for the record:
+   while HVBJOY bit 0 is set (V≈225-227, ~4K
    master clocks into VBlank) reads from the unit return garbage.
    (Mechanism caveat, 2026-09-02: hardware references document garbage
    reads of $4218-$421F during auto-read, but none confirms a coupling

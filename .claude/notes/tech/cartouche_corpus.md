@@ -14,6 +14,21 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-02)
+
+`snes_sources` on 2026-10-02: **33 436 chunks, 209 sources captured of 235,
+built 2026-10-02T02:57:24Z, chunker v7, index v2, fingerprint
+`31eb1726aa31`** (snes-rag's `2026-09-30_from_snes-rag_bilan-audit.md`,
+which supersedes their three earlier notes of the 30th). New: embedding
+windows under 512 tokens, query-centred excerpts, a reserved place for
+arbiters instead of the ×1.8 multiplier, emulator source code (Mesen2
+`Core/SNES`, ares core, sd2snes `cic/`, stuntrace's GSU-2 model — they
+answer when the question names their identifiers), a
+`mesures-partenaires` source for facts partners measured. Their recall is
+now counted on the answering **passage**: 54.1 % at 5 (the source-level
+80.7 % was mostly the arbiters' prior). Golden queries rerun: **9/9**;
+negative control: our ABI at ranks 1 and 2, never qbe-docs.
+
 ## Index state (2026-09-30)
 
 `snes_sources` on 2026-09-30: **31 943 chunks, 208 sources captured of 234,
@@ -130,13 +145,16 @@ Still not captured (2026-09-12): Calypsi / WDC816CC / vbcc 65816 manuals
 - `snes_search(question, exclude_sources=[…], k, authority_min, contrast)` —
   passages with authority labels and documented-error warnings.
   `contrast=true` for disputed points (SIWP-class).
-- `snes_verify(claim, exclude_sources=[…])` — structured verdict:
-  `confirmed` / `contradicted` / `unsettled` / `not_covered`, with the
-  strongest arbiter citation, documented errors and `chunk_id`s. Always
-  compare the claim's wording to the citation: `confirmed` means "an
-  arbiter documents this point", not "your sentence is true" (seen
-  2026-09-12: a `confirmed` on the cc65816 push order cited a generic
-  65c816 stack passage; the real support was `compiler/ABI.md`).
+- `snes_verify(claim, exclude_sources=[…])` — since 2026-09-30 it serves
+  `evidence_state` (`not_covered` · `no_arbiter` ·
+  `arbiter_covers_topic_only` · `arbiter_states_point` ·
+  `documented_error_on_point`), `limits`, and `evidence`: up to five
+  passages with their `sentences`. Our rule (`hardware_claims.md`)
+  requires `arbiter_states_point` **and** a sentence that states the
+  polarity or value; the historical `verdict` is not read. Both
+  directions fail sometimes (2026-10-02: a false `arbiter_states_point` on
+  the multiplier during auto-joypad, false `topic_only` on the empty
+  window and on VMADD incrementing) — the sentences decide.
 
 Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
