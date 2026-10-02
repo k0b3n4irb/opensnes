@@ -59,6 +59,12 @@ now counted on the answering **passage**: 54.1 % at 5 (the source-level
 80.7 % was mostly the arbiters' prior). Golden queries rerun: **9/9**;
 negative control: our ABI at ranks 1 and 2, never qbe-docs.
 
+## luna pin v1.30.3 (2026-10-02)
+
+Golden queries 4, 5, 6 and 9 (the `luna-docs` ones) rerun on `5f0e4bb5e1c0`:
+green. `luna-docs` stops at 1.30.2 (the 1.30.3 Super FX battery entry is not
+served); reported in `2026-10-02_to_snes-rag_ids-v8_reply.md` §5.
+
 ## Index state (2026-09-30)
 
 `snes_sources` on 2026-09-30: **31 943 chunks, 208 sources captured of 234,

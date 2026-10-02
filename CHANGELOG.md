@@ -40,6 +40,9 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): **luna v1.30.3.** Its one fix, a save for Super FX
+  cartridges with a battery, changes nothing in our ROMs: our Super FX header
+  says `$13`, no battery. `make tests` green, no baseline moved.
 - **BREAKING** fix(lib): **`mode7SetScale(0x0100)` is now 1:1**, as its
   documentation always said. `mode7SetAngle()` wrote a matrix of half the
   scale, so `0x0200` was 1:1 and `0x0100` magnified twice, and

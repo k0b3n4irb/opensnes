@@ -4,7 +4,7 @@
 |---|---|
 | **De** | OpenSNES, `develop` (post-v0.47.0) |
 | **Index vérifié** | `snes_sources` : **34 808 chunks, 210 sources sur 236, construit 2026-10-02T05:26:41Z, chunker v8, empreinte `5f0e4bb5e1c0`** |
-| **Statut** | envoyé tel quel ; deux observations, aucune demande bloquante. **Mis à jour le même jour** (§4) : deux lectures de `snes_verify` de plus, rejouées sur l'index reconstruit à 10:53:05Z (même empreinte `5f0e4bb5e1c0`) |
+| **Statut** | envoyé tel quel ; deux observations, aucune demande bloquante. **Mis à jour le même jour** (§4) : deux lectures de `snes_verify` de plus, rejouées sur l'index reconstruit à 10:53:05Z (même empreinte `5f0e4bb5e1c0`) ; §5 : `luna-docs` en retard d'une version (luna v1.30.3) |
 
 ## 1. Ce que v8 nous a apporté (vérifié)
 
@@ -143,3 +143,26 @@ trancher sur cette formulation.
 |---|---|---|---|
 | 4.1 | `arbiter_covers_topic_only` alors que les phrases énoncent le point (mode 4) | justesse de l'état de preuve | moyenne (même défaut que le cas déjà signalé) |
 | 4.2 | les phrases qui énoncent le point sortent d'`evidence` selon la formulation | rappel des phrases | moyenne (c'est sur elles que repose notre règle) |
+
+## 5. Ajout du même jour : `luna-docs` en retard sur luna v1.30.3
+
+Nous avons monté notre pin à luna **v1.30.3** (publiée le 2026-10-01 à
+18:23Z, une seule correction : les cartouches Super FX à pile ont une
+sauvegarde, la RAM de travail du GSU entière, 32 ou 64 Ko). Sur
+`5f0e4bb5e1c0`, `luna-docs` s'arrête à 1.30.2 :
+
+```
+snes_search("luna Super FX battery save srm_out GSU work RAM has_battery",
+k=3, exclude_sources=["opensnes-docs","opensnes-notes-tech"])
+```
+
+ne rend que les entrées 1.29.0 (`293f2a2cbb000c41`, SA-1 et DSP-1) et
+1.30.1 (`6816c33f108b9e57`) ; l'entrée `## [1.30.3]` du CHANGELOG de luna
+n'est pas servie. Une recapture de `luna-docs` suffit. Rien ne presse chez
+nous : nos cartouches Super FX ont l'octet `$FFD6 = $13`, sans pile, donc
+v1.30.3 ne change rien à nos ROM (`make tests` vert, aucune référence
+bougée).
+
+Les quatre golden queries qui visent `luna-docs` (`--power-on`, schéma des
+manifests, `luna diff --tolerance`, `luna profile` par symbole) restent
+vertes sur le même index.
