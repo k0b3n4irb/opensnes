@@ -65,6 +65,22 @@ C'est la seule rangée **non aliasable** : on ne peut pas renommer une variable 
 2. **API morte.** Déprécier `audioUpdate` (no-op), `consoleInitEx` (ignore son argument), `snesmodSetSoundTable` et `snesmodAllocateSoundRegion` (aucun chemin de streaming) ; renommer `padRaw` qui renvoie la valeur filtrée.
 3. **La release cassante est-elle la 1.0 ?** Proposition : oui. La 1.0 retire tous les alias dépréciés (N2–N6, D1–D5, les cinq `*Bank`, la signature de `dmaTransfer`), et rien ne casse ensuite avant 2.0.
 
+4. **L'échelle de Mode 7 (ajouté le 2026-10-02).** `mode7.h` documentait
+   `mode7SetScale(0x0100)` comme l'échelle 1.0 ; le code la divise par deux
+   (`mode7SetAngle` multiplie par un cosinus d'amplitude 127 et décale de 8,
+   donc A = $7F) : `0x0100` grossit deux fois, `0x0200` est le 1:1, et
+   `mode7Transform(deg, 100)` grossit deux fois aussi. Et `mode7Init()`
+   écrit une matrice identité ($0100) que le premier `mode7SetAngle(0)`
+   transforme en ×2. La doc est corrigée pour dire ce que fait le code (pas
+   de changement de rendu). **Option a** : garder ce contrat (`0x0200` =
+   1:1), documenté. **Option b** : corriger le code pour que `0x0100` = 1:1
+   (décaler de 7) et diviser par deux les constantes de `rotate_scale`,
+   `mode7_racing` (qui garde l'échelle par défaut) et `mode7_flying` pour
+   garder leurs images ; un projet utilisateur qui passait `0x0200` voit son
+   plan dézoomé. **Recommandation : b avant le gel** — c'est le contrat que
+   la doc promettait, et `mode7Init` + `mode7SetAngle(0)` deviennent
+   cohérents.
+
 ## Critères de gel proposés
 
 La 1.0 part quand toutes ces lignes sont vraies, chacune prouvée dans le dépôt :

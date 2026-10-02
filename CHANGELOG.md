@@ -5,12 +5,29 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`mode7SetExtBg(on)`** — Mode 7 EXTBG (SETINI bit 6): BG2
+  shows the same plane with bit 7 of each pixel as its priority, a second
+  layer around the sprites. Composed through the SETINI shadow the
+  `videoSet*` setters share.
+- feat(examples): **`mode7/extbg`** — a sprite rolls over a floor and
+  behind pillars drawn in one Mode 7 plane, split by bit 7; A toggles
+  EXTBG. Plane built at run time in a `FAR` buffer. Manifest pins SETINI,
+  TM, the 1:1 matrix and the scroll.
 - feat(examples): **`color/pseudo_hires`** — a 50 % blend of two layers
   without colour math: SETINI bit 3 puts the sub screen on the even columns
   of a 512-pixel line and the main screen on the odd ones (snesdev-wiki,
   anomie; checked in luna's native output). Press A to toggle; tiles built
   at run time, no asset. Its manifest pins SETINI, the screen designations
   and the scroll.
+
+### Fixed
+- docs(lib): **the Mode 7 scale contract** — `mode7.h`, the Mode 7
+  tutorial and `rotate_scale` said `mode7SetScale(0x0100)` is 1:1; the
+  code has always written a matrix of half the scale, so `0x0200` is 1:1
+  and `0x0100` magnifies twice (`mode7Transform` percentages likewise).
+  `mode7Init`'s doc now says it leaves the view on plane row `$180`. The
+  docs say what the code does; whether to change the code before 1.0 is on
+  the API decision sheet.
 
 ## [0.47.0] — 2026-10-02
 

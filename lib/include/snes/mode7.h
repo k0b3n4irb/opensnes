@@ -14,8 +14,8 @@
  * // Initialize Mode 7
  * mode7Init();
  *
- * // Set scale (0x0100 = 1.0, 0x0080 = 0.5, 0x0200 = 2.0)
- * mode7SetScale(0x0100, 0x0100);
+ * // Set scale (0x0200 = 1:1, 0x0100 = magnified twice; see mode7SetScale)
+ * mode7SetScale(0x0200, 0x0200);
  *
  * // Set rotation angle (0-255, where 256 = 360 degrees)
  * mode7SetAngle(angle);
@@ -49,8 +49,14 @@
 /**
  * @brief Initialize Mode 7
  *
- * Sets up default scale (1.0), identity matrix, center point (128,128),
- * and scroll position. Call this before using other Mode 7 functions.
+ * Writes the identity matrix (A = D = $0100, 1:1), the center point
+ * (128,128), M7HOFS = 0 and M7VOFS = $17F (texel row $180 on the first
+ * line: the view starts in the middle of the 1024-texel plane, not at its
+ * top — call mode7SetScroll(0, 0) to see row 0 first). It also sets the
+ * scale mode7SetAngle() uses to 0x0100, which that function turns into a
+ * matrix of $7F (magnified twice, see mode7SetScale): call
+ * mode7SetScale(0x0200, 0x0200) before the first mode7SetAngle() to keep
+ * 1:1. Call this before using other Mode 7 functions.
  *
  * @note This does NOT set BGMODE to Mode 7. You must do that separately:
  * @code
@@ -64,11 +70,15 @@ void mode7Init(void);
 /**
  * @brief Set Mode 7 scale factors
  *
- * Sets the X and Y scale for Mode 7 transformation.
- * Scale is in 8.8 fixed point format:
- * - 0x0100 = 1.0 (normal size)
- * - 0x0080 = 0.5 (zoomed in / larger)
- * - 0x0200 = 2.0 (zoomed out / smaller)
+ * Sets the X and Y scale for Mode 7 transformation. The matrix
+ * mode7SetAngle() writes is **scale / 2** (it multiplies by a cosine of
+ * amplitude 127 and keeps the high byte), so:
+ * - 0x0200 = 1:1 (one texel per pixel; matrix A = D = $00FE)
+ * - 0x0100 = magnified twice (the plane looks larger)
+ * - 0x0400 = shrunk twice (the plane looks smaller)
+ *
+ * (Until 2026-10-02 this said 0x0100 = 1.0, which is not what the code
+ * does; whether to change the code instead is an open API decision.)
  *
  * @param scale_x Horizontal scale (8.8 fixed point)
  * @param scale_y Vertical scale (8.8 fixed point)
@@ -137,12 +147,14 @@ void mode7Rotate(u16 degrees);
  * Combined transformation with rotation in degrees and percentage-based scaling.
  *
  * @param degrees Rotation angle in degrees (0-359)
- * @param scalePercent Scale as percentage (100 = normal, 50 = half, 200 = double)
+ * @param scalePercent Scale as a percentage of mode7SetScale's units
+ *        (percent x 2.5), so 200 is about 1:1, 100 magnifies twice, 400
+ *        shrinks twice (see mode7SetScale)
  *
  * @code
- * mode7Transform(45, 100);   // 45 degree rotation, normal scale
- * mode7Transform(0, 50);     // No rotation, 2x zoom in
- * mode7Transform(90, 200);   // 90 degrees, 0.5x zoom out
+ * mode7Transform(45, 200);   // 45 degree rotation, about 1:1
+ * mode7Transform(0, 100);    // no rotation, magnified twice
+ * mode7Transform(90, 400);   // 90 degrees, shrunk twice
  * @endcode
  */
 void mode7Transform(u16 degrees, u16 scalePercent);
@@ -191,6 +203,34 @@ void mode7SetMatrix(s16 a, s16 b, s16 c, s16 d);
  *   Bits 7-6: Out of bounds behavior (0=wrap, 0x80=transparent, 0xC0=tile 0)
  */
 void mode7SetSettings(u8 settings);
+
+/**
+ * @brief Enable/disable Mode 7 EXTBG (SETINI bit 6): a second, split layer
+ * @param on 1 to enable, 0 to disable
+ *
+ * With EXTBG on, BG2 shows the same Mode 7 plane as BG1 (same tilemap, same
+ * pixels, same transform), but reads each pixel's bit 7 as a priority bit
+ * and bits 0-6 as its colour (128 colours). Front to back, Mode 7 EXTBG
+ * draws: sprites of priority 3, sprites 2, BG2 pixels with bit 7 set,
+ * sprites 1, BG1, sprites 0, BG2 pixels with bit 7 clear (anomie's register
+ * doc, Mode 7; snesdev-wiki, Backgrounds). So a sprite of priority 1 passes
+ * in front of the bit-7-clear pixels and behind the bit-7-set ones: put
+ * BG2, not BG1, on the screen (BG1 would cover the low pixels), e.g.
+ * `setMainScreen(LAYER_BG2 | LAYER_OBJ)`. BG1 still reads all 8 bits, so a
+ * pixel 0x83 is colour 3 on BG2 and colour 131 on BG1. Direct colour does
+ * not apply to BG2.
+ *
+ * SETINI is write-only: this goes through the same software copy as
+ * videoSetInterlace(), videoSetOverscan() and videoSetPseudoHires(), so it
+ * does not clear their bits.
+ *
+ * @code
+ * setMode(BG_MODE7, 0);
+ * mode7SetExtBg(1);
+ * setMainScreen(LAYER_BG2 | LAYER_OBJ);
+ * @endcode
+ */
+void mode7SetExtBg(u8 on);
 
 /*============================================================================
  * Mode 7 Settings Constants

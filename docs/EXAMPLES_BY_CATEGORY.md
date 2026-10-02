@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 86 examples organized by topic. For a progressive learning path, see
+All 87 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -81,6 +81,7 @@ The rotate/scale plane — the SNES's signature trick.
 | @subpage examples_mode7_perspective | Pseudo-3D perspective (F-Zero style) |
 | @subpage examples_mode7_perspective_rotate | Full Mode 7 matrix rotation per scanline (krom port) |
 | @subpage examples_mode7_dsp1_ground | Super Mario Kart floor: DSP-1 Raster streams the per-scanline matrices |
+| @subpage examples_mode7_extbg | EXTBG: one plane split in two layers by bit 7, a sprite between them |
 
 ---
 

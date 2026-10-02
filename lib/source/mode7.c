@@ -36,6 +36,7 @@
 #define REG_MPYH   (*(volatile u8 *)0x2136)
 /* MPYM+MPYH as one 16-bit read — exactly the ASM's `lda.l $2135` */
 #define REG_MPY16  (*(volatile u16 *)0x2135)
+#define REG_SETINI (*(volatile u8 *)0x2133)
 
 /* Module state (WRAM) — mirrors the ASM's .mode7vars */
 static u16 m7_scale_x;
@@ -184,4 +185,18 @@ void mode7SetMatrix(s16 a, s16 b, s16 c, s16 d) {
 
 void mode7SetSettings(u8 settings) {
     REG_M7SEL = settings;
+}
+
+/* EXTBG (SETINI bit 6), 2026-10-02. SETINI is write-only: the bit goes
+ * through crt0's setini_shadow, the copy video.h's setters (interlace,
+ * overscan, pseudo-hires) also compose through, so none of them clears
+ * another's bit. */
+extern volatile u8 setini_shadow;
+
+void mode7SetExtBg(u8 on) {
+    if (on)
+        setini_shadow |= 0x40;
+    else
+        setini_shadow &= (u8)~0x40;
+    REG_SETINI = setini_shadow;
 }

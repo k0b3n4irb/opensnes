@@ -259,6 +259,10 @@
     "stream": "11602f7d0f61036555a264426b3a29d35b6e6620ef257f94a661f0396798e83d",
     "rom_sha256": "6290c35ec8ca090b8ee51ac552d056453f5fac5e5c7006865dbccabe067f4bfc"
   },
+  "mode7_extbg": {
+    "stream": "467777a406ec765b8713089fe9ef9e37453815e8566947f36cbae0baffea0d23",
+    "rom_sha256": "a37c1b07739d1bd5696dbefaa64fd4744dfc8671f3f6efbe1da42f0e4a36a25a"
+  },
   "mode7_perspective": {
     "stream": "70be8a7c241a02602c02cfc3afbd118be731b96d4a2015097ddf49d0f908c1f4",
     "rom_sha256": "8d31de886a0c5ce9faa096844800f89cd74b49a9776d99acb77f5ed2ac122ee8"

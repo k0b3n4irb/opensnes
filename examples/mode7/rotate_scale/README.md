@@ -56,8 +56,8 @@ mode7SetAngle(0);
 ```
 
 `mode7Init()` sets the rotation center to the screen center (128, 128).
-Scale `0x0200` = 2.0 in 8.8 fixed-point -- this shows the map at a comfortable
-zoom level. Scale `0x0100` would be 1.0 (one texel per pixel).
+Scale `0x0200` is 1:1 (one texel per pixel): the lib's matrix is half the
+scale, so `0x0100` would magnify twice.
 
 ### 3. Update the matrix every frame
 
@@ -112,9 +112,9 @@ per palette. This gives richer visuals but limits you to 256 unique tiles total.
 
 ### 8.8 Fixed-Point Scale
 
-`0x0100` = 1.0x (normal), `0x0200` = 2.0x (zoomed out, shows more area),
-`0x0080` = 0.5x (zoomed in, magnifies). The integer part is the high byte, the
-fractional part is the low byte.
+The lib's matrix is half the scale: `0x0200` = 1:1, `0x0400` = shrunk twice
+(shows more area), `0x0100` = magnified twice. The integer part is the high
+byte, the fractional part is the low byte.
 
 ## Project Structure
 

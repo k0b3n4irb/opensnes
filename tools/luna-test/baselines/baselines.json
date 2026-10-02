@@ -419,6 +419,12 @@
     "luna_version": "v1.21.0",
     "rom_sha256": "808124f6bb2eb0941797fd129334be88eb6e52d3cb266c017ffc6edb009ae386"
   },
+  "mode7_extbg": {
+    "fbhash": "27a2a9545cef0ebd",
+    "frames": 200,
+    "luna_version": "v1.30.2",
+    "rom_sha256": "a37c1b07739d1bd5696dbefaa64fd4744dfc8671f3f6efbe1da42f0e4a36a25a"
+  },
   "mode7_perspective": {
     "fbhash": "b6d491935f26c865",
     "frames": 200,

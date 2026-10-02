@@ -69,10 +69,9 @@ int main(void) {
     dmaCopyCGram(mode7_pal, 0, (u16)(mode7_pal_end - mode7_pal));
 
     /* Set Mode 7 and initialize the affine transformation matrix.
-     * mode7Init() zeros the scroll center and offset registers (M7HOFS/M7VOFS,
-     * M7X/M7Y). mode7SetScale() sets the initial zoom to 2.0x (showing the
-     * 128x128 tile plane at half magnification), and mode7SetAngle() writes
-     * the identity rotation (angle 0 = no rotation). */
+     * mode7Init() sets the center (M7X/M7Y) and the scroll (M7HOFS/M7VOFS).
+     * mode7SetScale(0x0200) is 1:1 (the lib's matrix is half the scale),
+     * and mode7SetAngle() writes the unrotated matrix (angle 0). */
     setMode(BG_MODE7, 0);
     mode7Init();
     mode7SetScale(0x0200, 0x0200);
@@ -99,7 +98,8 @@ int main(void) {
         }
 
         /* Zoom out with UP (increase scale = shows more of the plane).
-         * Scale is 8.8 fixed-point: 0x0100 = 1.0x, 0x0200 = 2.0x.
+         * Scale is 8.8 fixed-point, and the lib's matrix is half of it:
+         * 0x0200 = 1:1, 0x0400 = shrunk twice.
          * Higher values shrink the image (show more area). Clamped
          * to 0x0F00 (15x) to prevent extreme distortion.
          * mode7SetAngle() must be called after mode7SetScale() because
