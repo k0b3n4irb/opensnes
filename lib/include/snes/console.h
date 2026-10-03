@@ -216,6 +216,9 @@ u8 getBrightness(void);
  *
  * Call once per frame in your main loop.
  *
+ * The capital W is deliberate: the name is PVSnesLib's, kept so a port needs
+ * no edit. It is the only function of the library not in camelCase.
+ *
  * @code
  * while (1) {
  *     // Update game logic (can happen during active display)

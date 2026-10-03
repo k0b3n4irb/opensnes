@@ -40,6 +40,11 @@ not a change in vocabulary. We deliberately keep names compatible
 (`oamSet`, `bgSetMapPtr`, `WaitForVBlank`) to ease migration in either
 direction.
 
+`WaitForVBlank()` is the one function of the library that starts with a
+capital, and it stays that way on purpose: it is the name every PVSnesLib
+port arrives with and the most called function of any game. Every other
+function is camelCase with its module's prefix.
+
 ---
 
 ## The five principles

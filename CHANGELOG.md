@@ -101,6 +101,10 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- docs: **`WaitForVBlank()` keeps its name** (API decision D2). The one
+  function of the library with a capital first letter stays as it is — it
+  is the name every PVSnesLib port arrives with — and `PHILOSOPHY.md`, the
+  migration guide and `console.h` now say it is the deliberate exception.
 - refactor(lib,examples,docs): **`hdmaEnableMask()` / `hdmaDisableMask()`
   replace `hdmaEnable()` / `hdmaDisable()`** (API decision D1, first of two
   steps). The pair took a bit mask in a header where every other function

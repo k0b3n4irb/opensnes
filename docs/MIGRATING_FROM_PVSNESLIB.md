@@ -17,6 +17,9 @@ model, the same VRAM layout decisions and the same `.pic` / `.pal` / `.map`
 asset trio produced by a gfx4snes-shaped converter. A simple sprite demo often
 ports by changing the Makefile and nothing else.
 
+`WaitForVBlank` keeps its capital W for that reason: it is the only function
+of the library not written in camelCase, and it will not be renamed.
+
 ## What is different, in one table
 
 | Area | PVSnesLib | OpenSNES | Where it bites |
