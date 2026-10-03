@@ -7,6 +7,7 @@ the SPC driver that I think has been there since the first commit.
 
 In driver/spc/sm_spc.asm, ResetSound does this:
 
+```
 	SETDSP( DSP_KOF, 0FFh );
 	SETDSP( DSP_FLG, FLG_ECEN );
 	SETDSP( DSP_PMON, 0 );
@@ -17,6 +18,7 @@ In driver/spc/sm_spc.asm, ResetSound does this:
 
 	mov	sfx_mask, #0
 	ret
+```
 
 SETDSP is two "mov dp,#imm", 5 cycles each, so KOF goes back to 0 exactly 60
 SPC cycles after it was set to $FF. The S-DSP only looks at KON and KOFF every
@@ -25,14 +27,16 @@ those 60 cycles, the DSP never sees the $FF and the voices are not keyed off.
 
 anomie's S-DSP doc gives this very sequence as an example:
 
-    These registers seem to be polled only at 16000 Hz, when every other
-    sample is due to be output. Thus, if you write two values in close
-    succession, usually but not always only the second value will have an
-    effect:
-      [...]
-      mov $f2, #$5c  ; KOFF = $ff then KOFF = 0
-      mov $f3, #$ff
-      mov $f3, #$00  ; -> *usually* all voices remain playing
+```
+These registers seem to be polled only at 16000 Hz, when every other
+sample is due to be output. Thus, if you write two values in close
+succession, usually but not always only the second value will have an
+effect:
+  [...]
+  mov $f2, #$5c  ; KOFF = $ff then KOFF = 0
+  mov $f3, #$ff
+  mov $f3, #$00  ; -> *usually* all voices remain playing
+```
 
 and the SNESdev wiki lists it under the KOFF errata: "Clearing KOFF too early
 can cause the voice to not key-off."
@@ -52,21 +56,22 @@ the same as in your smconv/smconv/sm_spc.bin, at offset $6D.)
 What fixed it for me is moving the "mov sfx_mask, #0" between the last two
 writes:
 
+```
 	SETDSP( DSP_NON, 00h );
 	mov	sfx_mask, #0
 	SETDSP( DSP_KOF, 000h );
 	ret
+```
 
 That adds 5 cycles, the gap becomes 65, and a poll always falls inside it. The
 code size does not change. With this I get 0 failures out of 161, for stop and
 for pause.
 
-In the binary it is the 9 bytes at offset $91:
+In sm_spc.bin it is the 9 bytes at offset $91, nothing else moves:
 
-    8F 5C F2 8F 00 F3 8F 00 C1   before
-    8F 00 C1 8F 5C F2 8F 00 F3   after
-
-I can send a PR if you like. I do not have TASM, so I would change the source
-and patch sm_spc.bin by hand, unless you prefer to rebuild it yourself.
+```
+8F 5C F2 8F 00 F3 8F 00 C1   before
+8F 00 C1 8F 5C F2 8F 00 F3   after
+```
 
 Thanks for SNESMOD, by the way.

@@ -10,13 +10,16 @@ S91 (SCommand_SoundControl) sets CF_SURROUND on the channel, and the right
 volume is then negated where the panning is applied. Command_SetPanning (Xxx)
 clears the flag again:
 
+```
 	mov	a, ch_flags+x
 	and	a, #~CF_SURROUND
 	mov	ch_flags+x, a
+```
 
 but vcmd_pan, the panning from the volume column (128-192), only stores
 ch_panning:
 
+```
 vcmd_pan:
 	cmp	mod_tick, #0		; set panning
 	bne	exit_vcmd		;
@@ -26,12 +29,15 @@ vcmd_pan:
 	mov	ch_panning+x, a		;
 	pop	a			;
 	ret				;
+```
 
 So after an S91, a pan set in the volume column leaves the channel in
 surround, while the same pan set with Xxx does not.
 
-The PVSnesLib version adds the same three instructions after the store:
+The PVSnesLib version (pvsneslib/snesmod/sm_spc.as7) adds the same three
+instructions after the store:
 
+```
 	mov	ch_panning+x, a		;
 
 	mov	a, ch_flags+x		; Bugfix by KungFuFurby 12/20/15
@@ -40,6 +46,7 @@ The PVSnesLib version adds the same three instructions after the store:
 
 	pop	a			;
 	ret				;
+```
 
 To be clear, I read this in the two sources, I did not measure it on a module.
 The build I ship comes from PVSnesLib, so it already has the fix.

@@ -3,7 +3,8 @@
 Not a partner in the sense of `.claude/rules/partners.md`: the author of the
 SNESMOD driver and of smconv, which PVSnesLib and OpenSNES both ship. What we
 find in his code goes to him as issues, one per correction, written plainly
-(ASCII only, first person, no emoji). Nothing is posted without the owner
+(ASCII only, first person, no emoji). Issues only, no PR offered (owner,
+2026-10-03): each issue carries what is needed to reproduce and fix. Nothing is posted without the owner
 reading the final text.
 
 Plan: `~/.claude/plans/federated-forging-flask.md` (2026-10-03).
