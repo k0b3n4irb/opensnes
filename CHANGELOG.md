@@ -190,6 +190,12 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs: `fix32Sin()` / `fix32Cos()` carry the NMI warning of `fix32Mul()`:
+  they write the same result scratch, so a call from an `nmiSet()` callback
+  corrupts a main-thread multiply in flight (library audit).- docs: `fix32Lerp()`'s caveat said the multiply "may lose precision" near
+  the range limit; the real failure is `b - a` wrapping when a and b have
+  opposite signs and the span reaches 32768.0, and the note now says so
+  with the two-multiply form to use instead (library audit).
 - test(compiler): the cproc upstream-suite ratchet lists the three expected
   outputs the library audit's front-end fixes changed (`struct-copy.c`,
   `local-init.c`, `builtin-va-copy+aarch64.c`: 4-byte copies and zeroing
