@@ -301,23 +301,32 @@ test-pal:
 	@# pal.yml job never got past this line until 2026-09-26.
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py --region pal
-	@# The games built as PAL cartridges (ROM_REGION=pal, header $$FFD9 =
-	@# $$02) play their own scripted manifests at 50 Hz (2026-10-02). The
-	@# manifests are the NTSC ones with the ROM renamed, generated here so
-	@# the two sets cannot drift; the NTSC ROMs are rebuilt afterwards.
+	@# The games play their own scripted manifests on a PAL console
+	@# (2026-10-03): the NTSC-built ROMs with `force_region = "pal"` in the
+	@# manifest (a key `luna test` has always had; an import cartridge on a
+	@# PAL machine), and `stat78 = $$13` asserted so a manifest that ran at
+	@# 60 Hz fails. The manifests are the NTSC ones, generated here so the two
+	@# sets cannot drift. No rebuild.
 	@rm -rf tools/luna-test/manifests_pal && mkdir -p tools/luna-test/manifests_pal
 	@set -e; for m in $(PAL_GAME_MANIFESTS); do \
-	    g=$$(sed -nE 's#^rom = "\.\./\.\./\.\./examples/games/([a-z0-9_]+)/[a-z0-9_]+\.sfc"#\1#p' tools/luna-test/manifests/$$m.toml); \
+	    sed -E '/^rom = /a force_region = "pal"' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/$$m.toml; \
+	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> tools/luna-test/manifests_pal/$$m.toml; \
+	    grep -q '^force_region = "pal"' tools/luna-test/manifests_pal/$$m.toml || { echo "test-pal: $$m has no rom line to anchor force_region"; exit 1; }; \
+	done
+	@tools/luna-test/bin/luna test --jobs $$(nproc) tools/luna-test/manifests_pal/*.toml
+	@# ROM_REGION itself (header $$FFD9 = $$02): one game built as a PAL
+	@# cartridge must be PAL for luna with nothing forced, and play its
+	@# manifest. The NTSC build is restored afterwards.
+	@set -e; g=tetris; m=state_tetris; \
 	    $(MAKE) -s -C examples/games/$$g ROM_REGION=pal TARGET=$${g}_pal.sfc >/dev/null; \
 	    tools/luna-test/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
 	        | grep -q '"region": "Pal"' || { echo "test-pal: $${g}_pal.sfc is not a PAL cartridge for luna"; exit 1; }; \
-	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/$$m.toml; \
-	done
-	@tools/luna-test/bin/luna test --jobs $$(nproc) tools/luna-test/manifests_pal/*.toml
-	@for g in $$(ls tools/luna-test/manifests_pal/*.toml | xargs sed -nE 's#^rom = "\.\./\.\./\.\./examples/games/([a-z0-9_]+)/.*#\1#p' | sort -u); do \
+	    mkdir -p tools/luna-test/manifests_pal/header; \
+	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#; s#"\.\./\.\./\.\./#"../../../../#' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/header/$$m.toml; \
+	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> tools/luna-test/manifests_pal/header/$$m.toml; \
+	    tools/luna-test/bin/luna test tools/luna-test/manifests_pal/header/$$m.toml; \
 	    rm -f examples/games/$$g/$${g}_pal.sfc examples/games/$$g/$${g}_pal.sym; \
-	    $(MAKE) -s -C examples/games/$$g >/dev/null; \
-	done
+	    $(MAKE) -s -C examples/games/$$g >/dev/null
 
 # User-project test story (init → build → test-update → test → FAIL path),
 # exactly as a user runs it. Was CI-only until 2026-09-11, when a harness

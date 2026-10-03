@@ -19,11 +19,14 @@ All notable changes to OpenSNES are documented in this file.
   country byte (`$FFD9`: `$01`, `$02`, `$00`; fullsnes, snesdev-wiki). It
   was `$01` on every ROM, so a European game had no way to declare itself
   PAL. Default builds are byte-identical (89/89 ROMs compared).
-- test(luna-test): **a PAL pass on the games** — `make test-pal` builds
-  tetris, breakout, likemario, shmup_1942 and rpg as PAL cartridges, checks
-  luna sees them as PAL, and replays their six scripted manifests at 50 Hz:
-  6/6 pass. The manifests are derived from the NTSC ones at run time. Last
-  item of action 39.
+- test(luna-test): **a PAL pass on the games** — `make test-pal` replays the
+  six scripted manifests of tetris, breakout, likemario, shmup_1942 and rpg
+  at 50 Hz on the NTSC-built ROMs, with `force_region = "pal"` in the
+  manifest (an import cartridge on a PAL console) and `stat78 = $13`
+  asserted so a 60 Hz run fails: 6/6. The manifests are derived from the
+  NTSC ones at run time. `ROM_REGION=pal` itself is checked on one game:
+  tetris built as a PAL cartridge is PAL for luna with nothing forced and
+  passes its manifest. Last item of action 39.
 - feat(examples,docs): **`backgrounds/mode6` test card (B)** for a question no
   reference answers: does bit 3 of a hi-res horizontal offset (8 half-pixels,
   inside a 16-wide tile) move the column? luna and ares say half a tile,
