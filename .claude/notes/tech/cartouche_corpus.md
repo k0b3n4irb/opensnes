@@ -78,6 +78,23 @@ pull + import + rebuild). What moved:
   matters more, not less.
 - Golden queries 9/9; negative control: our ABI at ranks 1 and 2 again.
 
+## luna pin v1.31.0 (2026-10-03)
+
+Replica at snes-rag's `7c9411654112` (34 878 chunks, their figure), MCP
+server restarted by the owner. Golden queries 4, 5, 6, 9 rerun with the
+exclusion set: green, same chunks. `luna-docs` serves 1.30.3, not 1.30.4
+nor 1.31.0 (published 2026-10-03T11:27Z): recapture asked.
+
+The six `snes_verify` reference cases of snes-rag's coverage rule, replayed:
+multiplier at `$4216` and over `$4202-$4217` both `unsettled /
+arbiter_covers_topic_only`; Mode 4 `confirmed` on `d594aeedde1b87c2`;
+pseudo-hires true form `confirmed`, inverted form `contradicted /
+documented_error_on_point`; the half-pixel wording `confirmed`. One thing
+to know when reading that last one: its headline `citation` is the
+snesdev-wiki *Backgrounds* passage (`50a28313076782ce`) that carries the
+documented inversion, with `states_point: true` — read the sentences of
+anomie-regs (`19acadfe6457f2ae`), not the headline.
+
 ## Index state (2026-10-03, afternoon)
 
 Replica updated to snes-rag's `8a7fa1ea9a56` (34 864 chunks, their figures).
@@ -237,7 +254,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-10-02, index `b363c473e7ec`; 9/9 on every index since `bb5dbf5eff5d`)
+## Golden queries (status 2026-10-03, index `7c9411654112`; 9/9 on every index since `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 

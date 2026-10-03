@@ -21,7 +21,7 @@ All notable changes to OpenSNES are documented in this file.
   PAL. Default builds are byte-identical (89/89 ROMs compared).
 - test(luna-test): **a PAL pass on the games** — `make test-pal` replays the
   six scripted manifests of tetris, breakout, likemario, shmup_1942 and rpg
-  at 50 Hz on the NTSC-built ROMs, with `force_region = "pal"` in the
+  at 50 Hz on the NTSC-built ROMs, with `region = "pal"` in the
   manifest (an import cartridge on a PAL console) and `stat78 = $13`
   asserted so a 60 Hz run fails: 6/6. The manifests are derived from the
   NTSC ones at run time. `ROM_REGION=pal` itself is checked on one game:
@@ -96,6 +96,10 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): **luna v1.31.0.** `luna test` manifests take
+  `region = "pal"` (the documented name of `force_region`, still accepted)
+  and `--report json` echoes it. `make test-pal` uses `region`. `make tests`
+  and `make test-pal` green, no baseline moved.
 - test(luna-test): **luna v1.30.4.** Only its MCP server changes (the
   fields Claude Code 2.1.287 sends); emulation is v1.30.3's. `make tests`
   green, no baseline moved.

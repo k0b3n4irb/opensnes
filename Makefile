@@ -303,16 +303,16 @@ test-pal:
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py --region pal
 	@# The games play their own scripted manifests on a PAL console
-	@# (2026-10-03): the NTSC-built ROMs with `force_region = "pal"` in the
-	@# manifest (a key `luna test` has always had; an import cartridge on a
-	@# PAL machine), and `stat78 = $$13` asserted so a manifest that ran at
+	@# (2026-10-03): the NTSC-built ROMs with `region = "pal"` in the
+	@# manifest (luna v1.31.0; `force_region` before it; an import cartridge
+	@# on a PAL machine), and `stat78 = $$13` asserted so a manifest that ran at
 	@# 60 Hz fails. The manifests are the NTSC ones, generated here so the two
 	@# sets cannot drift. No rebuild.
 	@rm -rf tools/luna-test/manifests_pal && mkdir -p tools/luna-test/manifests_pal
 	@set -e; for m in $(PAL_GAME_MANIFESTS); do \
-	    sed -E '/^rom = /a force_region = "pal"' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/$$m.toml; \
+	    sed -E '/^rom = /a region = "pal"' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/$$m.toml; \
 	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> tools/luna-test/manifests_pal/$$m.toml; \
-	    grep -q '^force_region = "pal"' tools/luna-test/manifests_pal/$$m.toml || { echo "test-pal: $$m has no rom line to anchor force_region"; exit 1; }; \
+	    grep -q '^region = "pal"' tools/luna-test/manifests_pal/$$m.toml || { echo "test-pal: $$m has no rom line to anchor region"; exit 1; }; \
 	done
 	@tools/luna-test/bin/luna test --jobs $$(nproc) tools/luna-test/manifests_pal/*.toml
 	@# ROM_REGION itself (header $$FFD9 = $$02): one game built as a PAL
