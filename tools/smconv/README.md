@@ -84,6 +84,7 @@ spcPlaySound(1);     // Play effect from second .it file
 ## Input Format
 
 - Impulse Tracker (.it) files
+- Samples: 8-bit or 16-bit, raw or compressed (IT 2.14 and IT 2.15 compression are decoded)
 - Sample rate: auto-converted to SPC700 BRR format (32000 Hz max)
 - Channels: up to 8 (SPC700 limit)
 - Effects: most standard IT effects supported (volume, panning, portamento, vibrato)

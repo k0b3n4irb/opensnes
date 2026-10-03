@@ -5,6 +5,16 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(tools): **smconv reads compressed Impulse Tracker samples.** IT 2.14
+  and IT 2.15 compression, 8-bit and 16-bit, are decoded (bit 2 of the
+  sample's `Cvt` selects IT 2.15, as OpenMPT and Schism Tracker read it), so
+  a module saved with "compress samples" no longer has to be re-saved. The
+  decoder is a port of modlib's (Mukunda Johnson, MIT — `ATTRIBUTION.md`).
+  The golden test converts a real IT 2.14 file (`reflection.it`, whose
+  decoded PCM matches modlib's reference byte for byte) and compressed
+  twins of `pollen8.it` made by a test-only encoder, which must give the
+  committed soundbank; IT 2.15, 16-bit and multi-block samples are covered
+  by those round trips only.
 - feat(build): **`ROM_REGION`** (`ntsc` default, `pal`, `jp`) — the header's
   country byte (`$FFD9`: `$01`, `$02`, `$00`; fullsnes, snesdev-wiki). It
   was `$01` on every ROM, so a European game had no way to declare itself
@@ -50,6 +60,13 @@ All notable changes to OpenSNES are documented in this file.
   and the scroll.
 
 ### Fixed
+- fix(tools): **smconv crashed on a module with a compressed sample.** It
+  printed "unsupported compressed samples", kept a NULL buffer with the
+  declared length and segfaulted in the BRR encoder (exit 139). Compressed
+  samples are decoded now, and a corrupt stream (block past the end of the
+  file, a bit width the format does not have, a length the file cannot
+  hold) ends in `sample '<name>': corrupt compressed data (block N)`, exit
+  1 and no output file.
 - fix(runtime,lib): **offset-per-tile was off since 2026-09-12** — the NMI
   wrote BG3's VOFS as `y - 1` like any displayed layer, but in Modes 2, 4
   and 6 BG3 is the offset table and VOFS selects its rows (snesdev-wiki,
