@@ -7,7 +7,7 @@ This guide will get you from zero to running your first SNES ROM in about 10 min
 | | **I want to make SNES games** | **I want to contribute to the SDK** |
 |---|---|---|
 | **What** | Download the pre-built SDK, write C code, build ROMs | Clone the repo, modify compiler/library/tools |
-| **Prerequisites** | `make` + text editor | clang, cmake, git, python3 |
+| **Prerequisites** | `make`, `python3` + text editor | clang, cmake, git, python3 |
 | **Time to start** | ~5 minutes | ~15 minutes |
 | **Go to** | [Path A: Game Developer](#path-a-game-developer) | [Path B: SDK Developer](#path-b-sdk-developer) |
 
@@ -20,8 +20,9 @@ to download it, write code, and run `make`.
 
 ### A1. Install Prerequisites
 
-You only need `make` (the build tool) and an emulator. No compiler installation
-required — the SDK ships with its own cross-compiler.
+You need `make` (the build tool), `python3` (the build's post-link checks —
+ROM size, bank budgets — are Python scripts) and an emulator. No compiler
+installation required — the SDK ships with its own cross-compiler.
 
 **macOS:**
 ```bash
@@ -30,7 +31,7 @@ xcode-select --install
 
 **Linux (Ubuntu/Debian):**
 ```bash
-sudo apt install make
+sudo apt install make python3
 ```
 
 **Linux (Fedora):**
@@ -41,7 +42,7 @@ sudo dnf install make
 **Windows:**
 1. Install [MSYS2](https://www.msys2.org/)
 2. Open **MSYS2 UCRT64** terminal
-3. Run: `pacman -S make`
+3. Run: `pacman -S make python`
 
 ### A2. Get an Emulator
 
@@ -86,7 +87,7 @@ cd opensnes/examples/text/print_string
 > Any other SNES emulator opens the `.sfc` as well (Mesen, bsnes, Snes9x —
 > see the table above).
 
-You should see "Hello World!" on screen.
+You should see "TEXT MODULE TEST" in white on a dark blue screen.
 
 ### A5. Create Your Own Project
 

@@ -17,6 +17,7 @@ map for people reading the repository on GitHub.
 | [Troubleshooting](TROUBLESHOOTING.md) | Symptoms and their causes |
 | [Migrating from PVSnesLib](MIGRATING_FROM_PVSNESLIB.md) | Porting an existing project, and the five traps that bite |
 | [Upgrading to 1.0](UPGRADING.md) | The names 0.x deprecates and 1.0 removes, and the two calls that change meaning |
+| [What 1.0 freezes](STABILITY.md) | The promise behind the version number: what stays, what may move, how a change reaches you |
 
 ## Guides
 
@@ -145,8 +146,9 @@ naming most of the API.
 | `dma.h` | [DMA](tutorials/dma.md) | ✅ |
 | `dsp1.h` | [DSP-1](tutorials/dsp1.md) | ✅ |
 | `hdma.h` | [HDMA](tutorials/hdma.md) | ✅ |
-| `input.h` | [Input](tutorials/input.md) | 🟡 partial — button masks only; the pad, mouse, Super Scope and multitap functions are undocumented |
-| `interrupt.h` | [HDMA](tutorials/hdma.md) | 🟡 partial — the raw IRQ path only, via the H-timer effects |
+| `input.h` | [Input](tutorials/input.md) | ✅ pads, mouse, Super Scope, multitap |
+| `interrupt.h` | [Interrupts](tutorials/interrupts.md) | ✅ |
+| `tile.h` | [Graphics](tutorials/graphics.md) | ✅ |
 | `map.h` | [Maps](tutorials/map.md) | ✅ |
 | `math.h` | [Fixed-Point Math](tutorials/math.md) | ✅ |
 | `mode7.h` | [Mode 7](tutorials/mode7.md) | ✅ |

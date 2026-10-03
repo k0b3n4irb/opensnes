@@ -190,6 +190,15 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs: **`GETTING_STARTED.md` names Python** — every link runs Python
+  post-link checks, and the page said `make` was enough — and the first
+  thing to see on screen is "TEXT MODULE TEST", not "Hello World!";
+  `opensnes doctor` checks for `python3`; **`opensnes run` finds the luna
+  GUI** that `install-luna.sh` puts in the SDK tree (it only searched the
+  PATH). `hdmaEnableMask()`'s doc said the channel starts on the next
+  frame; it runs from the next HBlank, `hdmaSetup()` having initialised
+  what the hardware only initialises at the start of a frame (anomie-regs)
+  (documentation audit).
 - fix(templates,examples): **the SA-1 program section is pinned to ROM
   bank 0.** The SA-1's reset vector is 16-bit, so the program must sit in
   bank 0; `.sa1_boot` was `SUPERFREE`, and a program too big for bank 0's

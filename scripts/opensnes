@@ -114,6 +114,16 @@ find_emulator() {
         die "Emulator not found: $preferred"
     fi
 
+    # The luna GUI that scripts/install-luna.sh puts beside the CLI, in the
+    # SDK tree and not on the PATH (2026-10-03: `opensnes run` did not find
+    # the emulator GETTING_STARTED had just installed).
+    local sdk
+    sdk="$(find_sdk_root 2>/dev/null)" || true
+    if [ -n "$sdk" ] && [ -x "$sdk/tools/luna-test/bin/luna-gui" ]; then
+        echo "$sdk/tools/luna-test/bin/luna-gui"
+        return
+    fi
+
     local cmd
     for cmd in luna-gui mesen Mesen Mesen2 bsnes bsnes-hd snes9x snes9x-gtk; do
         if command -v "$cmd" >/dev/null 2>&1; then
@@ -403,7 +413,7 @@ cmd_run() {
     local emu
     emu="$(find_emulator "$emulator")" || {
         info "Built: $(basename "$rom")"
-        info "No emulator found. Install Mesen, bsnes, or snes9x."
+        info "No emulator found. Run scripts/install-luna.sh (luna-gui), or install Mesen, bsnes or snes9x."
         info "Open manually: $rom"
         return
     }
@@ -433,6 +443,14 @@ cmd_doctor() {
         ok "host cc ($(cc --version 2>/dev/null | head -1))"
     else
         fail "host cc — not found; cc65816 needs it for the preprocessing stage"
+    fi
+
+    # Every link runs Python post-link checks (make/common.mk): no python3,
+    # no ROM — GETTING_STARTED's path A said "make only" until 2026-10-03.
+    if command -v python3 >/dev/null 2>&1; then
+        ok "python3 ($(python3 --version 2>/dev/null))"
+    else
+        fail "python3 not found — the build's post-link checks (ROM size, bank budgets) need it"
     fi
 
     # Toolchain binaries

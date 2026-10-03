@@ -6,7 +6,7 @@ measured side of that promise, and `docs/BENCHMARK.md` the compiler side.
 
 **Unit: master cycles (mclk) per frame.** An NTSC frame is about
 **357,370 mclk** (21.477 MHz / 60.1 Hz); the VBlank, where VRAM may be
-written, about 51,800 of them. 1 % of a frame is about 3,570 mclk.
+written, about 49,000 of them (48,988: 37 lines of 1324 available master clocks, snesdev-wiki "Timing"). 1 % of a frame is about 3,570 mclk.
 
 ## The scenes
 

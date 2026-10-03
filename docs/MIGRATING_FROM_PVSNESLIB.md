@@ -144,6 +144,10 @@ need output to the host rather than the screen.
 | `spcBoot`, `spcLoad`, `spcPlay` | `snesmodInit`, `snesmodLoadModule`, `snesmodPlay` | Module `snesmod`; the driver is the same SNESMOD |
 | `spcProcess()` | `snesmodProcess()` | Call once per frame |
 | `padsCurrent(pad)` | `padHeld(pad)` | Also `padPressed`, `padReleased` |
+| `rand()`, `srand(s)` | `rngNext()`, `rngSeed(s)` | Not libc's: 1-65535, a 16-bit LFSR. The libc names are deprecated and go at 1.0 |
+| `LzssDecodeVram(s, a)` | `lzssDecodeVram(s, a)` | Lower-case `l`; the old spelling is deprecated |
+| `hdmaEnable(1 << ch)` | `hdmaEnableMask(1 << ch)` | The name says it takes a mask. At 1.0 `hdmaEnable(ch)` takes a channel number, like the other `hdma*` calls — see @ref upgrading |
+| `oamDrawMeta(id, x, y, m, tile, pal, size)` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | `tile`, `pal`, `size` are fields of a `static const MetaspriteStyle` |
 | `pvsneslibfont` | `textLoadFont()` with your own font | No implicit font |
 
 When a name is not in this table, search @ref api_index — it is organised by

@@ -43,6 +43,20 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-03 | `consoleInit` read OPHCT/OPVCT without latching them: the H/V part of the RNG seed was 0, the same sequence every boot | library audit; luna: `rand_seed` identical under three power-on states | `81ce2912` |
 | 2026-10-03 | `fixLerp` computed `b - a` on 16 bits and took bit 15 as the sign: two values 128.0 or more apart interpolated the wrong way | library audit, arithmetic | `b44b6b45` |
 | 2026-10-03 | `gsuSetupHdmaBlanking(0, n)`: a top band of 0 wrote a count of 0 as the table's first entry, which ends the table; the whole frame was then DMAed on visible lines | chips audit, luna `--dma-trace`: 1 844 726 of 2 326 528 VRAM bytes outside blank | `b855ab08` |
+| 2026-10-03 | build: `ROM_BANKS` had no upper bound — LoROM 127 put a string literal in WRAM (`$7E:8000`), SA-1 65 put `.rodata` in BW-RAM, the build and `check_bank_reads` stayed green and the text vanished; `GSU_RAM_KB=48` declared 32 KB | build audit, reproduced (luna screenshots) | `c06f4579` |
+| 2026-10-03 | build: a changed `GSU_BANK` kept the old GSU program (`.sfx.bin` did not depend on the configuration stamp); `make USE_HIROM=1` after a LoROM build gave a LoROM ROM | build audit, reproduced (`cmp -l`) | `c06f4579` |
+| 2026-10-03 | cc65816: the host preprocessor's macros and `<stdint.h>` — `int32_t` 2 bytes, `int64_t` 4, and a ROM that depends on the build machine | build audit, reproduced (`.dw` of `sizeof`) | `70943ae3` |
+| 2026-10-03 | `sa1_patch` left every SA-1 ROM's header checksum off by +3 | build audit, reproduced (checker) | `f02958f1` |
+| 2026-10-03 | `smconv` wrote a truncated soundbank with exit code 0 on a module with more than 8 channels or too big for SPC RAM | build audit, reproduced (12-channel IT) | `f02958f1` |
+| 2026-10-03 | dynamic sprite engine: the VRAM upload queue (128 entries) had no bound; the 129th pending refresh overwrote `.dynamic_sprite_state` | library audit, code | `ee50fbc8` |
+| 2026-10-03 | `hdmaIrisWipe` / `hdmaBrightnessGradient` / `hdmaColorGradient` re-called while running restarted the table at the next HBlank: one frame with the top of the table on the bottom of the screen | library audit, luna (`hdma_helpers` f150) | `e92a46c8` |
+| 2026-10-03 | `audioSetVoiceVolume` passed 128-255 through to a signed DSP volume: inverted phase | library audit, code | `d853d63f` |
+| 2026-10-03 | `apuWaitBoot` waited for ever when the IPL was not running; `audioInit` promised `AUDIO_ERR_TIMEOUT` | library audit, code; libtest `r_apu_boot_again` | `d853d63f` |
+| 2026-10-03 | `setMode(mode | flags, 0)` dropped the flag bits of `mode` (BG3 priority) | library audit, code | `65368590` |
+| 2026-10-03 | `colorMathInit` wrote COLDATA = 0, which selects no plane: the fixed colour stayed | library audit, code | `65368590` |
+| 2026-10-03 | `windowCentered(w, 1)` gave an empty window, odd widths lost a pixel; `windowSplit(0)` left a one-pixel window | library audit, code | `65368590` |
+| 2026-10-03 | `apuUpload(…, 0)` uploaded 65 536 bytes; a 17th `snesmodLoadEffect` returned 16, played as effect 0 | library audit, code | `d853d63f`, `b101ead2` |
+| 2026-10-03 | SA-1: `.sa1_boot` was `SUPERFREE`; a big program landed in bank 1 and the 16-bit reset vector could not reach it — the SA-1 never booted, no error | chips audit, reproduced (variant of `sa1_hello`) | `208694a7` |
 
 ## The hunting campaign
 

@@ -289,8 +289,8 @@ This stretch focused on closing process gaps surfaced by an internal audit
       path is documented in `KNOWN_LIMITATIONS.md` as untestable until
       luna exposes a multitap.
 - [ ] **Streaming audio support**
-- [ ] **Hardware verification documentation**
-- [ ] **Original-game release**
+- [x] **Hardware verification documentation** — protocol and kit written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`, `make hardware-preflight`); the first console session is the open part (see the v1.0 table)
+- [ ] **Original-game release** — in progress outside this repository (see the v1.0 table)
 - [ ] **Video tutorial series**
 
 ---
@@ -315,9 +315,9 @@ still applies to multi-day chantiers; the four `wip/*` branches that
 existed on 2026-09-14 were all superseded by commits already on
 `develop` (three CI hygiene branches of 2026-09-07, one test-harness
 branch of 2026-06-22) and were deleted that day. The luna side of the
-plan lives with the luna team: their queue and ours are in
-`~/opensnes_reports/` (owner-side), the pinned release in
-`tools/luna-test/luna.version`.
+plan lives with the luna team: the exchanges are in
+`.claude/notes/partners/luna/` (and the owner's exchange folder), the
+pinned release in `tools/luna-test/luna.version`.
 
 ## Known limitations
 

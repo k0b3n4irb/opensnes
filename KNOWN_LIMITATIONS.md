@@ -36,7 +36,7 @@ large transfers.
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame
 VBlank lasts 37 scanlines on NTSC with the standard 224-line display —
-about 50,500 master cycles (~30,000 with overscan). DMA costs 8 master
+about 49,000 master cycles (48,988: 37 lines of 1324 available clocks, snesdev-wiki "Timing"; 29,128 with overscan). DMA costs 8 master
 cycles per byte, so the raw ceiling is ~6 KB; after the NMI handler's
 own work (OAM DMA, scroll sync, joypad, callback) the practical budget
 is about **4 KB total** per VBlank for tilemap + audio + scroll.
@@ -203,7 +203,7 @@ debugging.
 
 ## Build-time / linker traps
 
-### 🟢 `data_init_end.o` MUST be linked last (enforced)
+### 🟢 `data_init_end.o` MUST be linked last (by the build order of `make/common.mk`; no separate check)
 The data-init copy loop scans from `data_init_start.o` until the sentinel in
 `data_init_end.o`. If the latter isn't last, init walks past valid data and
 copies garbage into WRAM at boot.
