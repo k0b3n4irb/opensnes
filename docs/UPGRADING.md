@@ -106,6 +106,8 @@ meaning:
 grep -rnE 'hdma(Enable|Disable)\(|mode7SetScale\(|mode7Transform\(' src/
 ```
 
-A `make check-upgrade SRC=<folder>` target that lists every removed name
-with its replacement, and every `hdmaEnable` / `hdmaDisable` call, is
-planned before 1.0.
+`make check-upgrade SRC=<folder>` lists every removed name with its
+replacement, and every `hdmaEnable` / `hdmaDisable` / `mode7SetScale` /
+`mode7Transform` call, one line per hit (`devtools/check_upgrade.py`; the
+list of names is read from the SDK headers, so it cannot lag them). Exit 0
+when nothing is found.

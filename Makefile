@@ -61,7 +61,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -658,6 +658,12 @@ hardware-preflight:
 	@scripts/install-luna.sh
 	@python3 tools/luna-test/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
 
+# A project's sources against the names 1.0 removes and the two calls that
+# change meaning (docs/UPGRADING.md): make check-upgrade SRC=<folder>
+check-upgrade:
+	@test -n "$(SRC)" || { echo "usage: make check-upgrade SRC=<folder-or-file>"; exit 2; }
+	@python3 devtools/check_upgrade.py $(SRC)
+
 help:
 	@echo "OpenSNES SDK Build System"
 	@echo ""
@@ -672,6 +678,7 @@ help:
 	@echo "  release   - Create SDK release package (zip)"
 	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
+	@echo "  check-upgrade SRC=<dir> - List the names 1.0 removes, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"

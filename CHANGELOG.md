@@ -5,6 +5,12 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(devtools): **`make check-upgrade SRC=<folder>`** lists, in a
+  project's sources, every name 1.0 removes with its replacement and
+  every `hdmaEnable` / `hdmaDisable` / `mode7SetScale` / `mode7Transform`
+  call (the ones that keep their name and change meaning). The list of
+  names is read from the SDK headers, so it cannot lag them. On
+  `examples/hdma/hdma_wave` as of v0.47.0: four hits; on today's: none.
 - test(luna-test): **`make hardware-preflight`** replays the 23 ROMs of the
   real-console protocol (`docs/HARDWARE_VERIFICATION.md`) on luna from
   pseudo-random RAM (three seeds) and under PAL, and checks every VRAM DMA
