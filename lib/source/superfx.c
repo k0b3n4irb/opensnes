@@ -118,6 +118,11 @@ u8 gsuPresentInit(u16 vram_a, u16 vram_b, u8 flags) {
     need_kb = (u16)(gsu_scbr + ((size >> 10) << 1));
     if (need_kb > ram_kb)
         return 0;
+    /* The presentation DMA reads the buffers at $70:0000 + 1 KB x SCBR
+     * with a 16-bit source: both must lie in the first 64 KB of Game Pak
+     * RAM even on a 128 KB board (chips audit, 2026-10-03). */
+    if (need_kb > 64)
+        return 0;
 
     gsu_pres_scbr_a = gsu_scbr;
     gsu_pres_scbr_b = (u8)(gsu_scbr + (size >> 10));

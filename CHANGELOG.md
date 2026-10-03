@@ -190,6 +190,12 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`UNFIX_ROUND()` overflowed from 127.5**: `x + 128` was a
+  16-bit sum; it is taken on 32 bits (library audit, row 27).
+  **`gsuPresentInit()` refuses buffers past the first 64 KB of Game Pak
+  RAM**: its DMA reads them at `$70:0000` with a 16-bit source, so on a
+  128 KB board a buffer above 64 KB was read from the wrong place (chips
+  audit, S4).
 - fix(lib): **`hdmaWaveStop()` hands the layer back to its scroll.** The
   wave table writes absolute offsets over `bgSetScroll()`'s value, and the
   stop wrote 0: a scrolled layer was left at 0. It marks the layer's scroll

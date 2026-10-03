@@ -106,7 +106,7 @@ typedef s16 fixed;
  * s16 screen_pos = UNFIX_ROUND(pos);  // 51
  * @endcode
  */
-#define UNFIX_ROUND(x) ((s16)(((x) + 128) >> 8))
+#define UNFIX_ROUND(x) ((s16)(((s32)(x) + 128) >> 8))   /* 32-bit sum: x + 128 overflowed s16 from 127.5 (until 2026-10-03) */
 
 /**
  * @brief Get fractional part of fixed-point
