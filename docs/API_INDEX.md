@@ -24,7 +24,7 @@ nothing you do not list is linked.
 | draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
 | hide a sprite that left the screen | `oamHide` | `sprite` | [games/rpg](../examples/games/rpg/) |
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
-| draw one character out of many tiles | `oamDrawMeta`, `MetaspriteItem` | `sprite` | [sprites/metasprite](../examples/sprites/metasprite/) |
+| draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/metasprite](../examples/sprites/metasprite/) |
 | make a tile while the game runs (procedural art) | `tileEncode2bpp`, `tileEncode4bpp`, `tileEncode8bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
 
 ## Moving around a world

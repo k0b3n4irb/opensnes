@@ -21,7 +21,7 @@ aseprite2snes is the animation half of a two-tool sprite step, paired with
 `gfx4snes -P`:
 
 ```
-              ┌─ gfx4snes -P    ──► tiles + metasprite pointer table  (oamDrawMeta)
+              ┌─ gfx4snes -P    ──► tiles + metasprite pointer table  (oamDrawMetasprite)
   hero.ase ──►┤
               └─ aseprite2snes  ──► AnimClip tables, one per tag       (animPlay / animTick)
 ```
@@ -84,7 +84,8 @@ Drive it by state, indexing the pointer table:
 AnimPlayer p = ANIM_PLAYER_INIT;
 animPlay(&p, hero_anims[HERO_ANIM_WALK]);
 u16 frame = animTick(&p);                  /* metasprite-table index this tick */
-oamDrawMeta(0, x, y, hero_metasprites[frame], BASE_TILE, 0, OBJ_LARGE);
+oamDrawMetasprite(0, x, y, hero_metasprites[frame], &hero_style, 0);
+/* hero_style: a MetaspriteStyle, e.g. { .baseTile = BASE_TILE, .size = OBJ_LARGE } */
 ```
 
 ## Mapping rules

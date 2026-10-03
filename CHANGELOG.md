@@ -5,6 +5,24 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`oamDrawMetasprite(id, x, y, frame, &style, flip)`** replaces
+  `oamDrawMeta()` (7 arguments) and `oamDrawMetaFlip()` (11) (API decision
+  on principle 4, shape chosen by the owner). A `MetaspriteStyle`, usually
+  `static const`, holds what does not change between frames — base tile,
+  palette, OBJ size, and for a mirrored draw the piece size and the box —
+  while the frame (what `animTickMeta()` returns), the position and
+  `OBJ_FLIPX` / `OBJ_FLIPY` are given at each call. The two old names are
+  deprecated until 1.0. **It also fixes the mirrored draw of 32-pixel
+  pieces:** `oamDrawMetaFlip()` assumes a piece is 16 pixels when large and
+  8 when small whatever the OBJSEL mode; the style carries `pieceSize`
+  (fixture: a 32-pixel piece in a 64-wide box lands at x + 32, the old
+  form puts it at x + 48). Cost measured and written in `docs/PERF.md`:
+  about 2,000 master cycles per call, 0.6 % of a frame. `metasprite` and
+  `aseprite_pipeline` are migrated with identical images. Twelve WRAM
+  streams are re-captured: `sprite.c` grew by `$341` bytes and what moved
+  in RAM is ROM addresses (checked byte by byte on `basics/random` — the
+  compiler's scratch register `tcc__r9` at one frame — and on `likemario` —
+  the dynamic engine's `dynamic_flush_hook` pointer).
 - feat(lib): **`dsp1SetCamera(const Dsp1Camera *)`** replaces
   `dsp1Parameter()` and its seven positional arguments (API decision on
   principle 4, more than five arguments). `Dsp1Camera` holds the command's

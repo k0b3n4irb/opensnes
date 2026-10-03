@@ -9,7 +9,7 @@ This example demonstrates how to compose large characters from multiple hardware
 - How metasprites combine multiple hardware sprites into one logical character
 - How the SNES OBJ size register ($2101) selects two active sprite sizes per frame
 - How `MetaspriteItem` structures define relative positions and tile offsets
-- How `oamDrawMeta()` places a list of hardware sprites from a single function call
+- How `oamDrawMetasprite()` places a list of hardware sprites from a single function call
 - How VRAM tile layout relates to OAM tile numbering
 
 ## SNES Concepts
@@ -87,14 +87,15 @@ static void changeObjSize(void) {
 }
 ```
 
-**3. Draw metasprites** -- `oamDrawMeta()` iterates the `MetaspriteItem` array, placing hardware sprites at the origin plus each item's (dx, dy) offset. The `baseTile` parameter offsets all tile indices so that different sprite sheets can share the same VRAM region. It returns the next available OAM ID, enabling sequential placement of multiple metasprites:
+**3. Draw metasprites** -- `oamDrawMetasprite()` iterates the `MetaspriteItem` array, placing hardware sprites at the origin plus each item's (dx, dy) offset. A `MetaspriteStyle` holds what does not change from frame to frame: its `baseTile` offsets all tile indices so that different sprite sheets can share the same VRAM region. It returns the next available OAM ID, enabling sequential placement of multiple metasprites:
 
 ```c
 /* Mode 0: hero16 (LARGE=16x16) + hero8 (SMALL=8x8) */
-nextId = oamDrawMeta(0, 64, 140, hero16_frame0,
-                     BASE_TILE_16, 0, OBJ_LARGE);
-oamDrawMeta(nextId, 160, 148, hero8_frame0,
-            BASE_TILE_8, 0, OBJ_SMALL);
+static const MetaspriteStyle style16_large = { .baseTile = BASE_TILE_16, .size = OBJ_LARGE };
+static const MetaspriteStyle style8_small  = { .baseTile = BASE_TILE_8,  .size = OBJ_SMALL };
+
+nextId = oamDrawMetasprite(0, 64, 140, hero16_frame0, &style16_large, 0);
+oamDrawMetasprite(nextId, 160, 148, hero8_frame0, &style8_small, 0);
 ```
 
 **4. Text menu** -- A text overlay on BG1 (Mode 1, 4bpp font) shows the current selection and the two active sprite sizes, updated whenever the user presses Up or Down.

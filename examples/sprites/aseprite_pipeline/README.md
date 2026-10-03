@@ -16,7 +16,7 @@ hero.aseprite ─┬─ gfx4snes -P    → hero.pic/.pal + res/hero_meta.inc
 `gfx4snes` owns the pixels and the metasprite geometry; `aseprite2snes` owns the
 timeline (tags, per-frame durations, direction). They meet at the frame value: a
 clip's frame *i* selects `hero_metasprites[i]`, resolved inline by
-`animTickMeta()` and drawn with `oamDrawMeta()`.
+`animTickMeta()` and drawn with `oamDrawMetasprite()`.
 
 The artist authored two tags in Aseprite — **walk** (forward loop) and **wave**
 (ping-pong) — with per-frame millisecond durations. `aseprite2snes` converted
@@ -25,7 +25,7 @@ toggle between the two generated clips.
 
 ## SNES Concepts
 
-- Metasprite composition from multiple OAM entries (`oamDrawMeta`)
+- Metasprite composition from multiple OAM entries (`oamDrawMetasprite`)
 - The `anim.h` player driving a metasprite via `animTickMeta()`
 - Machine-generated metasprite table (`gfx4snes -P`) + animation clips (`aseprite2snes`)
 - OBJSEL size mode and OBJ VRAM base for 16×16 hardware sprites

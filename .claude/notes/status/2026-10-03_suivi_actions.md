@@ -30,7 +30,7 @@ day (summarised at the end of this note).
 | 15 | Stale example comments, `port-example/SKILL.md` | 🟠 | done | `38c4b7ed` |
 | 16 | Governance cleanup | 🟡 | done | `e9ecf489`, `cdba4544` |
 | 17 | Replace Nintendo / PVSnesLib assets, `docs/ASSET_PROVENANCE.md` | 🔴 | **owner** | deferred by the owner on 2026-09-26 (`06930df8`); 66 files in 23 examples; v1.0 must-have |
-| 18 | D1-D5, freeze criteria, ROADMAP v1.0 table | 🟠 | **decided and applied 2026-10-03** except the struct variants (associated 1), which wait for the owner's choice of shape | all rows as recommended (table at the top of the sheet); application: one row per commit, D4 first |
+| 18 | D1-D5, freeze criteria, ROADMAP v1.0 table | 🟠 | **decided and applied 2026-10-03**, struct variants included (`dsp1SetCamera`, `oamDrawMetasprite`); what is left is for 1.0: remove the aliases, bring `hdmaEnable(channel)` back | all rows as recommended (table at the top of the sheet); application: one row per commit, D4 first |
 | 19 | `check_doc_drift.py` extended (a-e) | 🟠 | done | `2c2d6905`, `8ed23df4`, `fbbacace`, `295d16f7` |
 | 20 | Compiler invariant on Kl defs | 🟠 | done | `6ecb255a` |
 | 21 | Constant multiply inlined | 🟠 | done | `e01ffa29`, `6d62c443` |
@@ -38,7 +38,7 @@ day (summarised at the end of this note).
 | 23 | WRAM oracle excludes the stack band | 🟠 | done | `b106ad43` |
 | 24 | `install-luna.sh` multi-OS, a CI leg that runs ROMs | 🟠 | done | `7dbdaea7`, `b8e2be4f`, `c22be86a` |
 | 25 | SA-1 BW-RAM saves; `sa1.h` and the speed claim | 🟠 | done | `621cd9f9`, `f51786d1`, `d2b4bd51`, `b2a08f27` |
-| 26 | Lib: structs for >= 4-argument functions, dead API deprecated, hot setters, `sram.asm` | 🟠 | unblocked | decided 2026-10-03: native functions with 5+ arguments get a struct variant (list to show the owner first); dead API deprecated, `padRaw` renamed |
+| 26 | Lib: structs for >= 4-argument functions, dead API deprecated, hot setters, `sram.asm` | 🟠 | partly | done 2026-10-03: dead API deprecated (`a775e7e9`), struct forms for the two native functions past five per-call arguments (`dsp1SetCamera`, `oamDrawMetasprite`). Left: hot setters, `sram.asm` |
 | 27 | Window and `hdma_wave` examples on the lib | 🟠 | done | `007c92ce`, `855bf2c7` |
 | 28 | Per-API frame costs in `docs/PERF.md`, cited in headers | 🟠 | done | `52e807d6`; the ten measured functions cite the page and the page is in the generated docs since 2026-10-03 |
 | 29 | Header dependencies for lib and examples | 🟠 | done | `d2718a43`, `412b15e3`, `3db1a9fb` |
@@ -71,7 +71,7 @@ day (summarised at the end of this note).
 
 | # | Criterion | State on 2026-10-03 |
 |---|---|---|
-| 1 | D1-D5 and associated decisions landed | decided 2026-10-03; landing is engineering work, one row per commit |
+| 1 | D1-D5 and associated decisions landed | **landed 2026-10-03** (`05e86951` to the metasprite commit); alias removal and `hdmaEnable(channel)` are the 1.0 release itself |
 | 2 | No open red except the PVSnesLib assets | held |
 | 3 | Release zip built and tested by CI | done |
 | 4 | Drift sentinel covers function names cited in docs | done |

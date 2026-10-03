@@ -539,10 +539,24 @@ u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */
 u16 r_oam_id256;     /* oamSetX(256, ..) then oamSetY(257, ..): refused, sprites 0/1 keep 0x21 / 0x42
                       * (u8 ids wrapped to 0 and 1 and overwrote them) -> 0x4221 */
 u16 r_meta_n;        /* oamDrawMetaFlip(10, ...), two items: next free id -> 12 */
+u16 r_meta_style;    /* oamDrawMetasprite(20, ..., 0): next free id -> 22, pieces at x 100 / 108 -> 0x6C64 in r_meta_plain */
+u16 r_meta_plain;
+u16 r_meta_flipx;    /* ... OBJ_FLIPX in a 16-wide box of 8-pixel pieces: x 108 / 100 -> 0x646C */
+u16 r_meta_flipattr; /* ... and each piece's own H-flip bit toggled -> 0x40 */
+u16 r_meta_piece32;  /* a 32-pixel piece in a 64-wide box, flipped: x 10 + 32 -> 42 (the 11-argument form assumed 16: 58) */
 static const MetaspriteItem lotc_meta[] = {
     METASPR_ITEM(0, 0, 0, 0),
     METASPR_ITEM(8, 0, 1, 0),
     METASPR_TERM,
+};
+
+static const MetaspriteStyle lotc_style = {
+    .baseTile = 0, .basePalette = 0, .size = OBJ_SMALL,
+    .pieceSize = 8, .width = 16, .height = 8,
+};
+static const MetaspriteStyle lotc_style32 = {
+    .baseTile = 0, .basePalette = 0, .size = OBJ_LARGE,
+    .pieceSize = 32, .width = 64, .height = 32,
 };
 
 static void coverage_lot_c(void) {
@@ -590,6 +604,13 @@ static void coverage_lot_c(void) {
         r_oam_id256 = (u16)oamMemory[0] | ((u16)oamMemory[5] << 8);
     }
     r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
+    r_meta_style = oamDrawMetasprite(20, 100, 50, lotc_meta, &lotc_style, 0);
+    r_meta_plain = (u16)oamMemory[80] | ((u16)oamMemory[84] << 8);
+    oamDrawMetasprite(20, 100, 50, lotc_meta, &lotc_style, OBJ_FLIPX);
+    r_meta_flipx = (u16)oamMemory[80] | ((u16)oamMemory[84] << 8);
+    r_meta_flipattr = oamMemory[83] & 0xC0;
+    oamDrawMetasprite(24, 10, 50, lotc_meta, &lotc_style32, OBJ_FLIPX);
+    r_meta_piece32 = oamMemory[96];
     oamDynamicSetSize(0, 16);
     WaitForVBlank();
     /* bank-byte chantier: an OAM table in ROM. Right after WaitForVBlank we
