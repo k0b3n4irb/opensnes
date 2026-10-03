@@ -125,6 +125,64 @@ All notable changes to OpenSNES are documented in this file.
   at run time, no asset. Its manifest pins SETINI, the screen designations
   and the scroll.
 
+### Deprecated
+
+- **The 47 names below build and warn in this release and are removed at
+  1.0** (`hdmaEnable` / `hdmaDisable` come back at 1.0 taking a channel
+  number). The clang pre-pass reports each use; a build without clang
+  reports nothing, so compare against this list before upgrading. Every
+  replacement exists in this release.
+
+  | Deprecated | Header | Use instead |
+  |---|---|---|
+  | `audioUpdate` | `audio.h` | it does nothing |
+  | `colorMathEnable` | `colormath.h` | `colorMathSetLayers` |
+  | `COLORMATH_BG1` | `colormath.h` | `LAYER_BG1` |
+  | `COLORMATH_BG2` | `colormath.h` | `LAYER_BG2` |
+  | `COLORMATH_BG3` | `colormath.h` | `LAYER_BG3` |
+  | `COLORMATH_BG4` | `colormath.h` | `LAYER_BG4` |
+  | `COLORMATH_OBJ` | `colormath.h` | `LAYER_OBJ` |
+  | `consoleInitEx` | `console.h` | `consoleInit` |
+  | `getRegion` | `console.h` | `isPAL` |
+  | `rand` | `console.h` | `rngNext` |
+  | `srand` | `console.h` | `rngSeed` |
+  | `dmaCopyVramBank` | `dma.h` | dmaCopyVram() takes the bank from the source pointer |
+  | `dmaCopyCGramBank` | `dma.h` | dmaCopyCGram() takes the bank from the source pointer |
+  | `dsp1Parameter` | `dsp1.h` | `dsp1SetCamera` |
+  | `dsp1Present` | `dsp1.h` | `dsp1IsPresent` |
+  | `hdmaSetupBank` | `hdma.h` | hdmaSetup() takes the bank from the table pointer |
+  | `hdmaEnable` | `hdma.h` | `hdmaEnableMask` |
+  | `hdmaDisable` | `hdma.h` | `hdmaDisableMask` |
+  | `padRaw` | `input.h` | `padHeld` |
+  | `nmiSetBank` | `interrupt.h` | nmiSet() takes the bank from the function pointer |
+  | `irqSetBank` | `interrupt.h` | irqSet() takes the bank from the handler pointer |
+  | `LzssDecodeVram` | `lzss.h` | `lzssDecodeVram` |
+  | `ease_in_quad` | `math.h` | `easeInQuad` |
+  | `ease_out_quad` | `math.h` | `easeOutQuad` |
+  | `mode7SetPivot` | `mode7.h` | `mode7SetCenter` |
+  | `mosaicEnable` | `mosaic.h` | `mosaicSetLayers` |
+  | `MOSAIC_BG1` | `mosaic.h` | `LAYER_BG1` |
+  | `MOSAIC_BG2` | `mosaic.h` | `LAYER_BG2` |
+  | `MOSAIC_BG3` | `mosaic.h` | `LAYER_BG3` |
+  | `MOSAIC_BG4` | `mosaic.h` | `LAYER_BG4` |
+  | `profileGetFrameCount` | `profile.h` | `getFrameCount` |
+  | `BGMODE_MODE0` | `registers.h` | `BG_MODE0` |
+  | `BGMODE_MODE1` | `registers.h` | `BG_MODE1` |
+  | `BGMODE_MODE2` | `registers.h` | `BG_MODE2` |
+  | `BGMODE_MODE3` | `registers.h` | `BG_MODE3` |
+  | `BGMODE_MODE7` | `registers.h` | `BG_MODE7` |
+  | `sa1Init` | `sa1.h` | `sa1IsReady` |
+  | `snesmodSetSoundTable` | `snesmod.h` | no SDK call starts a stream |
+  | `snesmodAllocateSoundRegion` | `snesmod.h` | no SDK call starts a stream |
+  | `oamDrawMeta` | `sprite.h` | `oamDrawMetasprite` |
+  | `oamDrawMetaFlip` | `sprite.h` | `oamDrawMetasprite` |
+  | `NAME` | `types.h` | use ... |
+  | `WINDOW_BG1` | `window.h` | `LAYER_BG1` |
+  | `WINDOW_BG2` | `window.h` | `LAYER_BG2` |
+  | `WINDOW_BG3` | `window.h` | `LAYER_BG3` |
+  | `WINDOW_BG4` | `window.h` | `LAYER_BG4` |
+  | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
+
 ### Fixed
 - fix(lib): **`snesmodInit()` leaves NMITIMEN as it found it.** It ended on
   `$81`, so an H or V timer IRQ enabled before the audio driver was loaded

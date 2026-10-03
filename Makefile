@@ -614,6 +614,11 @@ release: all docs
 	@cp ATTRIBUTION.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@# Apache-2.0 §4: the binaries built with cmdparser ship with its licence.
 	@cp tools/common/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
+	@# GPL-2.0 §3: the wla-dx binaries (a patched fork) ship with the licence
+	@# text and a pointer to their exact source (compiler/PINS.md: fork URL and
+	@# commit of every toolchain submodule).
+	@cp compiler/wla-dx/LICENSE $(RELEASE_DIR)/opensnes/LICENSE-wla-dx
+	@cp compiler/PINS.md $(RELEASE_DIR)/opensnes/TOOLCHAIN-SOURCES.md
 	@# zip -r updates an existing archive in place; start from nothing so no
 	@# entry of an earlier build survives.
 	@rm -f $(RELEASE_DIR)/$(RELEASE_NAME).zip

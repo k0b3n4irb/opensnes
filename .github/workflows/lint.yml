@@ -26,10 +26,12 @@ on:
     branches:
       - "main"
       - "develop"
+      - "maint/**"
   push:
     branches:
       - "main"
       - "develop"
+      - "maint/**"
 
 # Dedup the push+PR double-fire (see opensnes_build.yml for the rationale):
 # push and PR of the same branch head share a group, newer cancels older.

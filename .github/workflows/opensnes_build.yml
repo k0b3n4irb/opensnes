@@ -9,12 +9,14 @@ on:
     branches:
       - "main"
       - "develop"
+      - "maint/**"
     tags-ignore:
       - "v*"  # Release tags are handled by release.yml
   pull_request:
     branches:
       - "main"
       - "develop"
+      - "maint/**"
 
 # One run per branch head. `head_ref` (PR source) and `ref_name` (push) both
 # resolve to the same branch name, so the push-to-develop run and the
