@@ -190,6 +190,11 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- test(compiler): the cproc upstream-suite ratchet lists the three expected
+  outputs the library audit's front-end fixes changed (`struct-copy.c`,
+  `local-init.c`, `builtin-va-copy+aarch64.c`: 4-byte copies and zeroing
+  emitted as `l`, the fork's 32-bit long). The sanitizer CI job had been
+  red on them since `c3952a1e`; `make test-toolchain-suites` is green.
 - fix(examples): **`games/tetris` no longer writes VRAM outside VBlank.**
   `renderFlush()` scanned 28 per-row dirty flags to coalesce the BG1 rows;
   the scan cost about 48 scanlines between two DMAs, so on every locked
