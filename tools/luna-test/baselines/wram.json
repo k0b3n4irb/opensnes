@@ -112,8 +112,8 @@
     "rom_sha256": "2058091c1473e807272da16d6e7f942444f8e59b4764bf22774e81d9e3d9d04e"
   },
   "chips_dsp1_cube": {
-    "stream": "c41e873983de74db8757749ed869a1d5881ae15250f67bdd8178af8e368b6a93",
-    "rom_sha256": "82d9177d90593abfafdb66694b7406dbb62a85f5d685891c81aff64e2feedfff"
+    "stream": "e6c9ed24263e90c482b43702aca837710c96dbbda8dc369bb33fe1075df9389a",
+    "rom_sha256": "7de923ae7e6739cf8dd18c7167e35ec4576a5fecd3ecb8daaa56288af1b78185"
   },
   "chips_sa1_hello": {
     "stream": "f939c14c5b69c0fb2e0faf3a3d1b3c1be6c57f016f8ee7a08a090c721c63f08d",
@@ -264,8 +264,8 @@
     "rom_sha256": "37631e0cb69429cdeab5c4ccc2fd3c6418688a002a2008983217fdb4483f2c9c"
   },
   "mode7_dsp1_ground": {
-    "stream": "d31d29207b28338c33e3d386f029f48539e32b0361bd8d6fa36f64e6e2b69f44",
-    "rom_sha256": "1c693a85515b7b0d4d7009590d30af7e12a39411e4f1cd5b9f95238b8ecec851"
+    "stream": "4454d28ca8bab1cb51cf45316d954369bb8f6c52e271e03c7e8a9ee7d3ed6ac1",
+    "rom_sha256": "50cbc67979bbb263b4c7b944eeb045f91adcd541c68a29850757405b0c5038cd"
   },
   "mode7_extbg": {
     "stream": "c6cacdcb403aedc0cb53b988e9babcf0cf6069e8492819a7e4bd0772af64e716",

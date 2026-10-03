@@ -6,7 +6,7 @@
  * Each frame the DSP-1 builds a rotation matrix (dsp1Attitude), transforms
  * the cube's 8 corners through it (dsp1Objective), and projects each corner
  * onto the screen with true hardware perspective (dsp1Project, set up once
- * by dsp1Parameter). The corners are drawn as 8 sprites — all the 3D math,
+ * by dsp1SetCamera). The corners are drawn as 8 sprites — all the 3D math,
  * including the perspective divide, runs on the NEC uPD77C25, not the 65816.
  *
  * @par SNES Concepts
@@ -56,7 +56,7 @@ static const s16 cube[8][3] = {
  *  of the eye. */
 #define CUBE_DIST 400
 
-/** @brief dsp1Parameter FOV knobs, tuned empirically on luna. The effective
+/** @brief dsp1SetCamera FOV knobs, tuned empirically on luna. The effective
  *  focal length is close to VIEW_LFE + VIEW_LES (projected offset ≈
  *  (lfe+les)·x/y): 96+256 spreads the corners ±~92 px at CUBE_DIST 400 —
  *  filling the 224-line screen without clipping at the nearest swing. */
@@ -66,6 +66,13 @@ static const s16 cube[8][3] = {
  *  the depth axis. The all-zero setup is degenerate (every point projects
  *  to the origin) — this angle is what makes the projection live. */
 #define VIEW_AZS 0x4000
+
+/** @brief The fixed camera: at the origin, looking along +Y. */
+static const Dsp1Camera view = {
+    .x = 0, .y = 0, .z = 0,
+    .lfe = VIEW_LFE, .les = VIEW_LES,
+    .aas = 0, .azs = VIEW_AZS,
+};
 
 int main(void) {
     u16 az = 0, ay = 0;
@@ -89,7 +96,7 @@ int main(void) {
         /* Camera at the origin looking along +Y (VIEW_AZS). Cx/Cy raster
          * coefficients land in dsp1_o0/o1; we recentre manually below so
          * they are not needed here. */
-        dsp1Parameter(0, 0, 0, VIEW_LFE, VIEW_LES, 0, VIEW_AZS);
+        dsp1SetCamera(&view);
     }
 
     while (1) {

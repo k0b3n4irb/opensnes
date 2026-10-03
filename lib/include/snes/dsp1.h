@@ -60,7 +60,7 @@
 extern volatile s16 dsp1_o0;
 extern volatile s16 dsp1_o1;  /**< @see dsp1_o0 */
 extern volatile s16 dsp1_o2;  /**< @see dsp1_o0 */
-extern volatile s16 dsp1_o3;  /**< @see dsp1_o0 (4th word — dsp1Parameter only) */
+extern volatile s16 dsp1_o3;  /**< @see dsp1_o0 (4th word — dsp1SetCamera only) */
 
 /**
  * @name Bridges to the SDK fixed-point types
@@ -148,14 +148,25 @@ void dsp1Attitude(u16 scale, u16 az, u16 ay, u16 ax);
 void dsp1Objective(s16 x, s16 y, s16 z);
 
 /**
+ * @brief The camera of the projection: the seven inputs of DSP-1 command
+ *        $02, "Parameter", under their names in the manual.
+ *
+ * Keep one in RAM and change the fields that move (position, heading), or
+ * make it `static const` for a fixed view.
+ */
+typedef struct {
+    s16 x;      /**< projection-base X (Fx, I) */
+    s16 y;      /**< projection-base Y (Fy, I) */
+    s16 z;      /**< projection-base Z (Fz, I) — the camera's height over a ground plane */
+    s16 lfe;    /**< distance eye → screen plane (I) — smaller = wider FOV */
+    s16 les;    /**< distance screen plane → ground reference (I) */
+    u16 aas;    /**< screen-plane azimuth angle (A) — the heading */
+    u16 azs;    /**< screen-plane zenith angle (A) — the tilt */
+} Dsp1Camera;
+
+/**
  * @brief Set up the projection plane (DSP-1 command $02, "Parameter").
- * @param fx projection-base X (I)
- * @param fy projection-base Y (I)
- * @param fz projection-base Z (I)
- * @param lfe distance eye → screen plane (I) — smaller = wider FOV
- * @param les distance screen plane → ground reference (I)
- * @param aas screen-plane azimuth angle (A)
- * @param azs screen-plane zenith angle (A)
+ * @param cam the seven inputs (see Dsp1Camera); read during the call, not kept
  *
  * Writes four words (order per the official manual §5.4.1, verified on luna):
  * - @ref dsp1_o0 = **Vof**, the raster number of the "imaginary centre";
@@ -172,6 +183,15 @@ void dsp1Objective(s16 x, s16 y, s16 z);
  * ground. `lfe`/`les` are best tuned empirically — see the values used by
  * examples/chips/dsp1_cube; `les` is also the vertical focal length.
  */
+void dsp1SetCamera(const Dsp1Camera *cam);
+
+/**
+ * @brief dsp1SetCamera() with its seven inputs as arguments
+ *
+ * The same command and the same outputs. (fx, fy, fz, lfe, les, aas, azs)
+ * are the fields of Dsp1Camera in order.
+ */
+OPENSNES_DEPRECATED("use dsp1SetCamera() — seven positional arguments, now the fields of Dsp1Camera")
 void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs);
 
 /**
@@ -182,7 +202,7 @@ void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs);
  *
  * Writes @ref dsp1_o0 = H (screen X), @ref dsp1_o1 = V (screen Y),
  * @ref dsp1_o2 = M (scale/depth — use it to size sprites with distance).
- * Requires a prior dsp1Parameter. Takes ~627 DSP cycles (~83 µs); the driver
+ * Requires a prior dsp1SetCamera. Takes ~627 DSP cycles (~83 µs); the driver
  * polls, so timing is handled for you.
  */
 void dsp1Project(s16 x, s16 y, s16 z);
@@ -195,8 +215,8 @@ void dsp1Project(s16 x, s16 y, s16 z);
  * The inverse of dsp1Project for the ground plane: which ground (x, y) is
  * under a cursor, a crosshair, a missile scope. Writes @ref dsp1_o0 = ground
  * X and @ref dsp1_o1 = ground Y, in the same convention as Cx/Cy —
- * dsp1Target(0, 0) returns exactly the Cx/Cy pair of the last dsp1Parameter.
- * Requires a prior dsp1Parameter.
+ * dsp1Target(0, 0) returns exactly the Cx/Cy pair of the last dsp1SetCamera.
+ * Requires a prior dsp1SetCamera.
  */
 void dsp1Target(s16 h, s16 v);
 
@@ -206,12 +226,12 @@ void dsp1Target(s16 h, s16 v);
  * @param ab    destination for A,B: 4 bytes per raster (A lo, A hi, B lo, B hi)
  * @param cd    destination for C,D: 4 bytes per raster (C lo, C hi, D lo, D hi)
  * @param vs    first raster number (relative to the imaginary centre; use
- *              `Vva + 2` from dsp1Parameter for the first ground line)
+ *              `Vva + 2` from dsp1SetCamera for the first ground line)
  * @param count number of rasters to stream (at most 127 per HDMA repeat block)
  *
  * This is the Super Mario Kart / Pilotwings ground: the chip computes, for
  * each raster, the Mode 7 matrix that projects the ground plane under the
- * camera set by dsp1Parameter — perspective, and rotation when `aas` is
+ * camera set by dsp1SetCamera — perspective, and rotation when `aas` is
  * non-zero. The two buffers are laid out as the payload of an
  * `HDMA_MODE_2REG_2X` repeat block (M7A/M7B on one channel, M7C/M7D on the
  * other); point the block's header at them and put the block on screen line

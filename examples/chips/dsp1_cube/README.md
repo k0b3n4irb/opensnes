@@ -7,7 +7,7 @@ perspective projection computed by the **DSP-1 coprocessor** (NEC µPD77C25),
 not the 65816. Each frame the CPU hands the DSP-1 a rotation matrix and 8
 model-space points; the DSP-1 rotates them (`dsp1Objective`), projects them
 to the screen with a true perspective divide (`dsp1Project`, configured once
-by `dsp1Parameter`), and the CPU just places 8 sprites at the returned H/V.
+by `dsp1SetCamera`), and the CPU just places 8 sprites at the returned H/V.
 
 This is the SDK's first DSP-1 example, and the third leg of the
 enhancement-chip family alongside SA-1 and Super FX.
@@ -18,7 +18,7 @@ enhancement-chip family alongside SA-1 and Super FX.
   registers (data + status) with an RQM handshake; see `snes/dsp1.h`
 - **Offloaded 3D math** — `dsp1Attitude()` builds a rotation matrix on the DSP,
   `dsp1Objective()` transforms each vertex through it, per frame
-- **Hardware perspective** — `dsp1Parameter()` defines the projection plane
+- **Hardware perspective** — `dsp1SetCamera()` defines the projection plane
   (with `azs = 0x4000` the camera looks along +Y — X across, Z up), then
   `dsp1Project()` returns screen H/V and a depth scale M per point; corners
   swinging toward the camera visibly spread apart. The DSP-1 does no

@@ -5,6 +5,18 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`dsp1SetCamera(const Dsp1Camera *)`** replaces
+  `dsp1Parameter()` and its seven positional arguments (API decision on
+  principle 4, more than five arguments). `Dsp1Camera` holds the command's
+  seven inputs under the manual's names (`x`, `y`, `z`, `lfe`, `les`,
+  `aas`, `azs`): a fixed view is one `static const`, a moving camera is one
+  struct whose position and heading the game changes. The struct is the
+  command's 14 bytes in order, so the assembly sends it as it lies.
+  `dsp1Parameter()` is deprecated and stays until 1.0; the DSP-1 fixture
+  checks the two give the same four output words (18/18). `dsp1_cube` and
+  `dsp1_ground` are migrated with identical images; their two WRAM streams
+  are re-captured (the camera variables of `dsp1_ground` are now one struct,
+  and the call parks a pointer in the direct page).
 - feat(tools): **smconv reads compressed Impulse Tracker samples.** IT 2.14
   and IT 2.15 compression, 8-bit and 16-bit, are decoded (bit 2 of the
   sample's `Cvt` selects IT 2.15, as OpenMPT and Schism Tracker read it), so

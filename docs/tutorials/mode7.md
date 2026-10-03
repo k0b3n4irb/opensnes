@@ -255,7 +255,7 @@ moves in true perspective. The M7A/M7B pair rides one
 `HDMA_MODE_2REG_2X` channel and M7C/M7D the other, double-buffered and
 swapped with `hdmaSetTable` in VBlank. The geometry that pins the
 matrices to the screen — horizon raster, Mode 7 centre and scroll —
-comes from `dsp1Parameter`; see the [DSP-1 tutorial](dsp1.md#the-ground-what-dsp1_ground-does).
+comes from `dsp1SetCamera`; see the [DSP-1 tutorial](dsp1.md#the-ground-what-dsp1_ground-does).
 
 ## EXTBG: one plane, two layers
 
