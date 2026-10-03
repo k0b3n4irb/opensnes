@@ -164,6 +164,7 @@ CASES = [
     ("r_lerp_t256", 2, 9472), ("r_lerp_t300", 2, 9472), ("r_oam_id256", 2, 0x4221),
     ("r_lerp_wide", 2, 0),       # 2026-10-03: b - a over 17 bits (was 0x8000, -128.0)
     ("r_hide_x", 2, 1),          # 2026-10-03: hidden at X = 257, not 256
+    ("r_rng_boot", 2, 0x8C03),   # 2026-10-03: the latched H/V seed on luna (was the $8001 of unlatched counters)
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),

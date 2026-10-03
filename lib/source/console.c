@@ -74,6 +74,7 @@ void consoleInit(void) {
      * leaves both pointers mid-sequence, silently corrupting every later
      * latch read (H-IRQ handlers, profileScanline). The STAT78 read that
      * follows resets both pointers — it must stay AFTER the counter reads. */
+    (void)REG_SLHV;                 /* latch H/V: read unlatched, both counters are 0 (until 2026-10-03) */
     rand_seed = REG_OPHCT | (REG_OPVCT << 8);
     rand_seed ^= REG_STAT78;
     if (rand_seed == 0) rand_seed = 0xACE1;

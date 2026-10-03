@@ -391,6 +391,9 @@ u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
 u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
+u16 r_rng_boot;     /* first rngNext() after consoleInit: the seed is the latched H/V
+                     * counters ^ STAT78 (deterministic on luna). With the counters read
+                     * unlatched (until 2026-10-03) the seed was $8001 whatever the boot */
 u16 r_lerp_wide;    /* fixLerp(FIX(-64), FIX(64), 128): the 17-bit difference -> 0 (was -128.0) */
 u16 r_hide_x;       /* oamHide(5): X low byte 1 (X = 257 = -255), not 0 (X = 256 counts as 0) -> 1 */
 u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
@@ -1001,6 +1004,7 @@ static void part_objects_irq(void) {
     r_ispal  = isPAL();
     /* N6: rngNext/rngSeed, and the deprecated rand/srand names run the same
      * generator: same seed, same first value, never 0. */
+    r_rng_boot = rngNext();          /* before any reseed: the boot seed's first step */
     rngSeed(0x1234); r_rng = rngNext();
     srand(0x1234);
     r_rng_names = (rand() == r_rng && r_rng != 0) ? 1 : 0;
