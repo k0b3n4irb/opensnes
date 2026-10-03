@@ -866,8 +866,11 @@ _mapvbend:
     sta.l REG_BG1HOFS
     rep #$20
     .ACCU 16
-    lda.l dispyofs_L1
-    dec a                   ; VOFS = y - 1 (scanline 0 is never output; see crt0)
+    lda.l dispyofs_L1       ; already y - 1: the map keeps its offset one
+                            ; short (PVSnesLib's `clc / sbc`, `dec a` above),
+                            ; which is the VOFS convention. A second `dec a`
+                            ; here (2026-09-12 to 2026-10-03) put the map one
+                            ; line too low against the sprites.
     sep #$20
     .ACCU 8
     sta.l REG_BG1VOFS
@@ -882,8 +885,7 @@ _mapvbbg2:
     sta.l REG_BG2HOFS
     rep #$20
     .ACCU 16
-    lda.l dispyofs_L1
-    dec a                   ; VOFS = y - 1 (scanline 0 is never output; see crt0)
+    lda.l dispyofs_L1       ; already y - 1 (see above)
     sep #$20
     .ACCU 8
     sta.l REG_BG2VOFS

@@ -306,10 +306,10 @@
     "rom_sha256": "ebb0b1e5a19ecebacd879cfcb4be19124d41c5b3d8e15d057697b4b8f50befdc"
   },
   "games_mapandobjects": {
-    "fbhash": "7f269da1647d3df8",
+    "fbhash": "b86f8b943bcda440",
     "frames": 200,
-    "luna_version": "v1.27.0",
-    "rom_sha256": "7eb15edf20566ae95d90e483f6fdeae77c98f944dc8371e2821b5edd8893ddbc"
+    "luna_version": "v1.31.0",
+    "rom_sha256": "187f77fab506b6393b6bf0f990764d6fc45a5ad3600f658edcd268ff8cb4cdb1"
   },
   "games_mode7_flying": {
     "fbhash": "3cc0063b1aa5ba27",
@@ -408,22 +408,22 @@
     "rom_sha256": "1e070b43fa1033439354bf8709f2c93d226f6eb63d9e28254699c11a23623ef2"
   },
   "maps_map_scroll": {
-    "fbhash": "2ba3f18a1ff83069",
+    "fbhash": "9366b1d301b2daf5",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "651c3073c4853b5d5cb29c0ac076a6ee31bc0c67198577641740377ece460258"
+    "luna_version": "v1.31.0",
+    "rom_sha256": "c67673e13443710e9977a647c33a77454e9200a0a3443e01263e6885206d99f1"
   },
   "maps_slope_collision": {
-    "fbhash": "570e14171228cc8e",
+    "fbhash": "bb153e2b57f12bd6",
     "frames": 200,
-    "luna_version": "v1.27.0",
-    "rom_sha256": "41d6f1bb61f1fc22e8c6f1a00ec5a83c6d9eb732e428691693aa83c77c7b0c2d"
+    "luna_version": "v1.31.0",
+    "rom_sha256": "234411279d6d592abd01113120558f335371c289151355de7d8fd6f024332893"
   },
   "maps_tiled": {
-    "fbhash": "fa945dbcf13d540b",
+    "fbhash": "3cbd379137f4450b",
     "frames": 200,
-    "luna_version": "v1.21.0",
-    "rom_sha256": "60381e54224198313d2f8a45e9e8f79936fdb48ec4c6b86c8e3d9798a983eaff"
+    "luna_version": "v1.31.0",
+    "rom_sha256": "14725557dba98c1d808dea252e5e15325b6e287c20bc4fa82d0bfbacec773d57"
   },
   "memory_hirom_demo": {
     "fbhash": "b194bdb8baf889bd",
