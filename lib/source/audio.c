@@ -303,9 +303,20 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
         }
     }
 
-    /* Epilogue: park the input latch at 0; the driver mirrors it and
-     * returns to command mode (unambiguous even if the last index
-     * byte was already 0 — both sides converge on 0/0). */
+    /* Epilogue. The driver says the stream is over with $FF — a value
+     * distinct from the last index echo — then we park the input latch at
+     * 0 and it mirrors it. (Until 2026-10-03 we parked at once and waited
+     * for the mirror; when the last index byte was 0 — size 513, 2817… —
+     * its echo passed for the mirror, the next command went out while the
+     * driver still waited for the 0, and both sides hung.) */
+    for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
+        if (APU_IO0 == 0xFF) {
+            break;
+        }
+    }
+    if (spin == ACK_SPIN_MAX) {
+        return AUDIO_ERR_TIMEOUT;
+    }
     APU_IO0 = 0;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
         if (APU_IO0 == 0) {

@@ -4,8 +4,8 @@
     "rom_sha256": "e6344bf1cc238e8bede4a1f1375042fa3ae8fb78d71efd295747837ca48ce95a"
   },
   "audio_echo": {
-    "stream": "c4d8d7a8d19ef877e903e68f2a3addc2b5df36dedfc602a3ab69497496cd230a",
-    "rom_sha256": "fe0c56d31c691718019098a7437f2ed03165fe8352beb1297d1d0b902c44e36b"
+    "stream": "4e3e31e6f4eb00a926c92b6cf52927590b81f736c6be182306d9afa7934e176c",
+    "rom_sha256": "90c6eecd04626c375964fc8a62360e5d8aff2f6d2db07313a91728a610fec73b"
   },
   "audio_pitch_mod": {
     "stream": "caa4b6151c3ed299915c58e5679974f0cf796c180246ede6ec78ef6551a524aa",
@@ -16,8 +16,8 @@
     "rom_sha256": "f9fd99c96b3bd1ec8f2fde00d2d385229b2b3935685513282a858f87adce2dcf"
   },
   "audio_sfx_from_wav": {
-    "stream": "bb1f6ece699d72884a2f42a662be73dfcc73a1c0d7c4d815db0d45bc425209f4",
-    "rom_sha256": "f6dc175574be526807de7c9c917b020ad61ebb8accb1659f078dd4ff3a6e6148"
+    "stream": "467ad88add2825739a18fdef02c7cfa5255c3b30aaa6bdea80ce3f2be9b4edf7",
+    "rom_sha256": "7571ba74072cb94b227e3110857f43892ba4cc47001d66fa4d9c3ff8879406b0"
   },
   "audio_snesmod_music": {
     "stream": "a700c000b7590663d9dac37d1ff03e6a1712ed4a5a8aec88d740ccfbdcc17a70",
@@ -32,8 +32,8 @@
     "rom_sha256": "be9765f4b88d4f700f1066b988aa61cbf6375f3ea85804ea481f207c60f5a40c"
   },
   "audio_soundboard": {
-    "stream": "60429331d52b85f47817121933e67108fd2ffa0d0e33251b594e0fc23bd1dca9",
-    "rom_sha256": "19740a978d2ee34eb8caa3911d147941192c6dfe87e7d79d7489b4b31624f6e6"
+    "stream": "600509af8ddcc9bdfee8a4bd7376250d95acf3f70660c1bf5905e05b7c0f57ab",
+    "rom_sha256": "0b0ac754d2a9c19d3cfe5f7d20320e90829217725a298594bc4503732dff5c91"
   },
   "audio_speech_synth": {
     "stream": "f6df9d744918fa79fc7d551399d879a9f2ab014788ad79effe29e6906f367152",
@@ -104,8 +104,8 @@
     "rom_sha256": "687fe2e757af2374cc14002948079de483d31dd840a95ef4d3ef614f677eabf6"
   },
   "basics_scene_stack": {
-    "stream": "be0ed3ef194bd0af8c80b7fbf2b8990a054f5fb7c8deb5a5041a1e403411c844",
-    "rom_sha256": "455ce818a8c0bdfebb11ab086ab9d62a214242189fb92844c5f8c6e74e253208"
+    "stream": "ac8596db98be840a399ebc3ccac5c8ad3c01866fee8a49ca48436c64bbd6fd96",
+    "rom_sha256": "4c6f42104a12c527313e5f76ae1da6154e5a03f22bc8518d6bfe057b2d93e631"
   },
   "basics_timer": {
     "stream": "643b931bc0375ff4895b06762b4e42d467dc38c72aeef74417274f114a742da3",

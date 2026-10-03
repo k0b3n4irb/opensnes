@@ -190,6 +190,14 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`audioLoadSample()` of a sample whose size is 1 modulo 256
+  (513, 2817, …) hung the driver.** The end-of-stream handshake parked the
+  port at 0 and waited for the driver to mirror it; when the last index
+  byte was 0 its echo passed for the mirror, the next command went out
+  while the driver still waited for the 0, and both sides hung
+  (`AUDIO_ERR_TIMEOUT`, sample never registered). The driver now says
+  "stream over" with `$FF` first. libtest loads a 513-byte sample
+  (library audit, row 28).
 - docs: **`GETTING_STARTED.md` names Python** — every link runs Python
   post-link checks, and the page said `make` was enough — and the first
   thing to see on screen is "TEXT MODULE TEST", not "Hello World!";

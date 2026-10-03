@@ -177,7 +177,11 @@ u16 r_audio_vol;    /* audioGetVolume() after SetVolume(100) -> 100 */
  * (data.asm) is streamed into ARAM via LOAD_SIZE/LOAD/DIR_SET, then
  * keyed on. ARAM/DSP side asserted by probes/audio_v2.py. */
 extern u8 beep_brr[];
+static const u8 big_brr[513] = { 0 };   /* 57 silent BRR blocks: a load whose last index byte is 0 */
 u16 r_audio_load;   /* audioLoadSample(0, beep, 9, 0) -> AUDIO_OK (0)  */
+u16 r_audio_load513; /* audioLoadSample(1, 513 bytes, 513, 0): the last index byte is 0
+                      * (513 = 2 x 256 + 1) — the end-of-stream race (until 2026-10-03:
+                      * AUDIO_ERR_TIMEOUT and a hung driver) -> AUDIO_OK (0) */
 u16 r_audio_free;   /* audioGetFreeMemory() -> 0xC000-0x0B00-9 = 0xB4F7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
 u16 r_audio_voice;  /* audioPlaySampleEx(...) -> voice 0 (round-robin)  */
@@ -1065,6 +1069,8 @@ int main(void) {
      * (round-robin starts there). Probe asserts the ARAM bytes, the
      * directory entry, and the playing voice's DSP state. */
     r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
+    r_audio_load513 = audioLoadSample(1, big_brr, 513, 0);
+    audioUnloadSample(1);              /* give the 513 bytes back: the memory vectors below count them */
     r_audio_free = audioGetFreeMemory();
     {
         AudioSample s;
