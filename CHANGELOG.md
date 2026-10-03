@@ -434,6 +434,11 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- build: `scripts/install-luna.sh` explains a missing binary. luna keeps the
+  binaries of its five newest releases only (its rule since 2026-10-03), so
+  a tag of this SDK older than v0.47.0 can no longer download the luna it
+  pins; on a 404 the script now says so and gives the command to build luna
+  from its tag, instead of a bare download error.
 - chore(runtime): the SA-1 boot stub also sets CBWE (`$2227`, the SA-1's
   own BW-RAM write enable), as the Nintendo manual asks. Not a fix: the
   protection holds only while SBWE and CBWE are both clear (ares
