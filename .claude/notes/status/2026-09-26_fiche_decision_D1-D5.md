@@ -41,7 +41,22 @@ de la recommandation de la fiche.
   `PHILOSOPHY.md` dira « plus de 5 » au lieu de « plus de 4 ». Héritées de
   PVSnesLib, inchangées : `bgInitTileSet` (8), `oamSet` (7), `oamInitGfxSet` (7).
 
-**Avancement.** D4 module carte : fait le 2026-10-03 (`mapGetCameraX()` / `mapGetCameraY()`, `map_cam_x` / `map_cam_y`). Module objet : fait le 2026-10-03 (`objGetCurrentId()`, `objKillCurrent()`, `objGetPointer()` pour `objptr`). Restent pour D4 : text, colormath, mosaic, et la sortie des internes vers un en-tête interne.
+- *Les variables qu'une fonction `inline` d'en-tête utilise* (constaté en
+  appliquant D4 : 16 des variables à sortir sont lues par des corps `inline`
+  publics, donc doivent rester visibles tant que l'inline existe). Décision :
+  **supprimer l'inline** — `textSetPos`, `colorMathInit`,
+  `colorMathSetLayers`, `colorMathDisable`, `mosaicInit`, `setScreenOn`,
+  `setScreenOff`, `getBrightness`, `hdmaWaveSetSpeed`, `scopeCalibrate`,
+  `scopeSetHoldDelay`, `fixSin`, `fixCos` et les deux `ease*` deviennent de
+  vraies fonctions de la lib ; leurs variables quittent les en-têtes et
+  prennent le préfixe de leur module (un global non préfixé de la lib
+  entrerait en collision à l'édition de liens avec un global homonyme du
+  jeu, en-tête ou pas). Coût accepté : un appel de fonction par usage ; à
+  mesurer et à écrire dans `docs/PERF.md` (`fixSin` est appelée par trame).
+  Les 17 variables qu'aucun inline n'utilise (`lkup*`, sept `gsu_*`) sortent
+  des en-têtes comme prévu.
+
+**Avancement.** D4 module carte : fait le 2026-10-03 (`mapGetCameraX()` / `mapGetCameraY()`, `map_cam_x` / `map_cam_y`). Module objet : fait le 2026-10-03 (`objGetCurrentId()`, `objKillCurrent()`, `objGetPointer()` pour `objptr`). Suppression de l'inline et préfixes (text, colormath, mosaic, console, hdma, scope, math) : faits le 2026-10-03, avec D3 (`easeInQuad` / `easeOutQuad`). Coût mesuré : `fixSin` en C compilé +23 % sur `mode2`, donc `fixSin` / `fixCos` écrites en assembleur, +4,9 %. Reste pour D4 : les 17 variables qu'aucun inline n'utilisait (`lkup*`, sept `gsu_*`), toutes déjà préfixées et documentées dans leurs en-têtes — à sortir dans un commit à part.
 
 Ordre d'application : D4, puis D3, D5, associée 2, D1 (les petites d'abord
 après D4), D2 (doc), associée 1 (après validation de la liste). Une rangée

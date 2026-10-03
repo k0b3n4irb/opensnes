@@ -38,16 +38,15 @@ extern void clearIrqFlag(void);        /* ASM helper: read $4211 to drop a pendi
 
 /** Current screen brightness (0-15), defaults to full brightness.
  *  Initialized here so setScreenOn() works without consoleInit().
- *  External linkage so the `inline getBrightness()` in console.h
- *  can access it from any TU. */
-u8 current_brightness = 15;
+ *  Prefixed and out of console.h since 2026-10-03 (API decision D4;
+ *  it was `current_brightness`). */
+u8 console_brightness = 15;
 
 /** Force blank state shadow (REG_INIDISP is write-only, can't read back).
  *  1 = force blanked (screen off), 0 = screen on.
  *  Starts at 1 because consoleInit() sets force blank first. */
-/* External linkage so the `inline setScreenOff()` in console.h can
- * access it from any TU. */
-u8 force_blanked = 1;
+/* Prefixed and out of console.h since 2026-10-03 (was `force_blanked`). */
+u8 console_force_blanked = 1;
 
 /** PAL/NTSC flag */
 static u8 is_pal_system;
@@ -67,7 +66,7 @@ void consoleInit(void) {
     is_pal_system = (REG_STAT78 & 0x10) ? 1 : 0;
 
     /* Set default brightness (screen still blanked) */
-    current_brightness = 15;
+    console_brightness = 15;
 
     /* Initialize random seed from hardware.
      * OPHCT/OPVCT are 2-read registers (low byte then high bit) with an
@@ -125,22 +124,22 @@ void consoleInitEx(u16 options) {
  * Screen Control
  *============================================================================*/
 
-/* setScreenOn() is `inline` in console.h. Force-emit canonical here. */
-void (*const __opensnes_force_emit_setScreenOn)(void) = setScreenOn;
+void setScreenOn(void) {
+    console_force_blanked = 0;
+    REG_INIDISP = console_brightness & 0x0F;
+}
 
-/* Force standalone emission of the inline setScreenOff in this TU.
- * Taking the function's address creates a data-section indirect
- * reference; the QBE inline pass counts it and suppresses the
- * "header-only inclusion" suppress rule, ensuring this TU emits the
- * canonical fallback body for non-inlining callers and fn-ptr users. */
-void (*const __opensnes_force_emit_setScreenOff)(void) = setScreenOff;
+void setScreenOff(void) {
+    console_force_blanked = 1;
+    REG_INIDISP = INIDISP_FORCE_BLANK;
+}
 
 void setBrightness(u8 brightness) {
-    current_brightness = brightness & 0x0F;
+    console_brightness = brightness & 0x0F;
     /* Only update hardware if screen is on (not force blanked).
      * REG_INIDISP ($2100) is write-only — use shadow variable. */
-    if (!force_blanked) {
-        REG_INIDISP = current_brightness;
+    if (!console_force_blanked) {
+        REG_INIDISP = console_brightness;
     }
 }
 
@@ -168,9 +167,9 @@ void fadeIn(u8 speed) {
     }
 }
 
-/* getBrightness() is `inline` in console.h. Force-emit the standalone
- * in this TU via address-taking, mirror of setScreenOff's pattern. */
-u8 (*const __opensnes_force_emit_getBrightness)(void) = getBrightness;
+u8 getBrightness(void) {
+    return console_brightness;
+}
 
 /*============================================================================
  * VBlank Synchronization

@@ -23,8 +23,8 @@ rom = "../../../examples/color/hicolor_blend/hicolor_blend.sfc"
 steps = 3000000
 
 [asserts.values]
-cgwsel = { eq = 0x02, width = 1 }        # krom CGWSEL $02
-cgadsub = { eq = 0x21, width = 1 }       # krom CGADSUB $21
+colormath_cgwsel = { eq = 0x02, width = 1 }        # krom CGWSEL $02
+colormath_cgadsub = { eq = 0x21, width = 1 }       # krom CGADSUB $21
 
 [asserts.blocks]
 red_ramp = { space = "cgram", offset = "0000", hex = "000002000400060008000a000c000e00100012001400160018001a001c001f00" }

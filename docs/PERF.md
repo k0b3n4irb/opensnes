@@ -66,6 +66,31 @@ engine's `map_prepare_column`, SNESMOD's SPC transfer routines) are not
 added to it, and code the compiler inlined into the caller is counted in
 the caller.
 
+## What a call costs where there used to be none
+
+Until 2026-10-03 a handful of small functions were `inline` in their headers
+(`fixSin`, `fixCos`, `textSetPos`, `setScreenOn`, `setScreenOff`,
+`getBrightness`, `colorMathInit`, `colorMathSetLayers`, `colorMathDisable`,
+`mosaicInit`, `hdmaWaveSetSpeed`, `scopeCalibrate`, `scopeSetHoldDelay` and
+the two ease functions). An inline body needs its variables in the public
+header, and those were names a game would collide with (`sine_table`,
+`cursor_x`, `force_blanked`). They are ordinary lib functions now.
+
+The one that runs per frame is `fixSin` / `fixCos`. Measured on
+`examples/backgrounds/mode2`, which calls `fixSin` 32 times a frame
+(`luna profile`, frames 60 to 300):
+
+| | busy master cycles per frame | share of the frame |
+|---|---|---|
+| inlined (before) | 62,896 | 17.60 % |
+| compiled C function | 77,415 | 21.66 % |
+| assembly function (what ships) | 65,959 | 18.46 % |
+
+So a call costs about 96 master cycles more than the inlined lookup did, and
+the first, compiled version cost about 450: `fixSin` and `fixCos` are written
+in assembly for that reason. The other functions run at setup or once per
+frame, where a call is not measurable.
+
 ## Reproduce
 
 ```sh

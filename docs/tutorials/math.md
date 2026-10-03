@@ -31,7 +31,9 @@ Cost comparison (rough):
 
 - `float` multiply: ~500 cycles.
 - `fixMul` 8.8 × 8.8 → 8.8: ~30 cycles.
-- `fixSin(angle)`: ~20 cycles (LUT lookup).
+- `fixSin(angle)`: a table read in assembly, about 260 master cycles (34 CPU
+  cycles) plus the call. It was inlined in the header until 2026-10-03; a call
+  now costs about 96 master cycles more than the inlined lookup did.
 - `mul16(a, b)` (16 × 16 → low 16): ~10 cycles (hardware).
 
 Order-of-magnitude: fixed-point is 10–25× faster than software floats.
@@ -182,7 +184,7 @@ animate values smoothly between two endpoints.
 
 ### Easing curves
 
-`ease_in_quad(t)` and `ease_out_quad(t)` map `t` from 0-255 to a curve
+`easeInQuad(t)` and `easeOutQuad(t)` map `t` from 0-255 to a curve
 0-255: the first starts slow and accelerates, the second starts fast and
 settles. They read a 256-byte table in their own module, so add
 `math_ease` to `LIB_MODULES` (without it the link fails, naming the
@@ -192,7 +194,7 @@ table).
 /* start_x < end_x, both u16 */
 u8 t;
 for (t = 0; t < 255; t += 5) {
-    u16 x = start_x + (u16)(((u32)(end_x - start_x) * ease_out_quad(t)) >> 8);
+    u16 x = start_x + (u16)(((u32)(end_x - start_x) * easeOutQuad(t)) >> 8);
     oamSetX(0, x);                /* slides in, then settles */
     WaitForVBlank();
 }

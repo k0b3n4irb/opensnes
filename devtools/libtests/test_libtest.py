@@ -11,7 +11,7 @@ Vectors covered (see main.c):
   - math: div16/mod16 (incl. divisor-0 contract and the 65535/1 worst
     case of the old O(quotient) loop), mul16, sqrt16, fixMul/fixDiv/fixLerp
     and fix32Mul/fix32Div (L2b)
-  - text: cursor_y wrap — the tilemapBuffer overflow guard
+  - text: cursor row wrap — the tilemapBuffer overflow guard
   - L2c (2026-09-15): collision (rect/point/tile), sram round trip in bank
     $70, the raw IRQ path (V/H timer counts), console region + vblank
     getters, and the window module asserted on luna's PPU register view
@@ -116,6 +116,11 @@ CASES = [
     ("r_obj_fr_x",   2, 0x0200),  # objInitFriction1D(0x100): xvel decelerates
     ("r_obj_fr_y",   2, 0),       # ...and a small yvel clamps at zero, no sign flip
     ("r_obj_pool",   2, 80),      # objKillAll returns the WHOLE pool (was 79: a slot leaked)
+    ("r_ease",         2, 0xC040),  # easeInQuad(128) = 64, easeOutQuad(128) = 192
+    ("r_ease_names",   2, 1),       # the deprecated ease_in_quad / ease_out_quad agree
+    ("r_bright_get",   2, 7),       # getBrightness() reads what setBrightness() set
+    ("r_mosaic_init",  2, 0),       # mosaicInit() clears the size
+    ("r_scope_hold",   2, 30),      # scopeSetHoldDelay() writes the crt0 word
     ("r_obj_curid",    2, 1),     # D4: objGetCurrentId() is objNew()'s handle
     ("r_obj_selfkill", 2, 0),     # D4: objKillCurrent() in its update -> stale handle
     # coverage lot B (2026-09-19): the public functions nothing executed

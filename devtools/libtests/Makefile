@@ -13,7 +13,7 @@ USE_SRAM := 1
 # successive vectors without anything being wrong. The ratchet exists for
 # content FORCED into bank $00; with none, it could only fail at random.
 BANK0_FAIL_THRESHOLD := 0
-LIB_MODULES := console sprite dma background text math anim map audio fixed32 collision window input object colormath mosaic profile scene tile
+LIB_MODULES := console sprite dma background text math anim map audio fixed32 collision window input object colormath mosaic profile scene tile math_ease
 
 CSRC   := main.c
 ASMSRC := data.asm

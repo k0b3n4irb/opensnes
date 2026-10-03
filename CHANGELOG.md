@@ -101,6 +101,25 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- **BREAKING** refactor(lib): **no lib variable with an unprefixed name is
+  exported any more, and the header functions that needed them are no longer
+  `inline`** (API decision D4). `cursor_x` / `cursor_y`, `cgwsel` / `cgadsub`,
+  `force_blanked` / `current_brightness`, `sine_table`, `ease_quad_table`,
+  `hdma_wave_speed`, `mosaic_size` / `mosaic_bg_mask` and the raw `scope_*`
+  words leave the public headers (and take their module's prefix where they
+  had none: a game defining `sine_table` or `cursor_x` collided with the lib
+  at link time, as `sa1_starfield` nearly did). `fixSin`, `fixCos`,
+  `textSetPos`, `setScreenOn`, `setScreenOff`, `getBrightness`,
+  `colorMathInit`, `colorMathSetLayers`, `colorMathDisable`, `mosaicInit`,
+  `hdmaWaveSetSpeed`, `scopeCalibrate`, `scopeSetHoldDelay` are ordinary
+  functions. Cost: `fixSin` / `fixCos`, the only ones called per frame, are in
+  assembly and a call costs about 96 master cycles more than the inlined
+  lookup did (`backgrounds/mode2`, 32 calls a frame: 17.60 % to 18.46 % of the
+  frame; `docs/PERF.md`). Read state through the getters (`textGetX()`,
+  `getBrightness()`, `mosaicGetSize()`...).
+- refactor(lib): **`easeInQuad()` / `easeOutQuad()`** (API decision D3) replace
+  `ease_in_quad()` / `ease_out_quad()`, which stay as deprecated aliases until
+  1.0. `sqrt16`, `atan2_8` and `mul16` keep their names.
 - **BREAKING** refactor(lib): **the object engine's exported globals are
   gone** (API decision D4). `objgetid` becomes `objGetCurrentId()`,
   `objtokill = 1;` becomes `objKillCurrent();`, and `objptr` was already the

@@ -109,22 +109,13 @@ void consoleInitEx(u16 options);
  * the fade example below relies on. (Documented as "full brightness" until
  * 2026-09-20.)
  *
- * Inlined for zero-call-overhead access (saves ~28 cycles per call).
- * Shares the same `force_blanked` and `current_brightness` shadows as
- * setScreenOff(); both are declared extern below.
- *
  * @code
  * consoleInit();
  * // ... load graphics ...
  * setScreenOn();  // Display is now visible
  * @endcode
  */
-inline void setScreenOn(void) {
-    extern u8 force_blanked;
-    extern u8 current_brightness;
-    force_blanked = 0;
-    REG_INIDISP = current_brightness & 0x0F;
-}
+void setScreenOn(void);
 
 /**
  * @brief Disable screen display (blank)
@@ -132,22 +123,13 @@ inline void setScreenOn(void) {
  * Turns off the display. Use during major VRAM updates that
  * can't complete during VBlank.
  *
- * Inlined for zero-call-overhead access (saves ~28 cycles per call).
- * The standalone definition in console.c is still emitted (via the
- * `extern inline` declaration there) for ABI compatibility — direct
- * call sites collapse to two stores.
- *
  * @code
  * setScreenOff();
  * // ... massive VRAM update ...
  * setScreenOn();
  * @endcode
  */
-extern u8 force_blanked;
-inline void setScreenOff(void) {
-    force_blanked = 1;
-    REG_INIDISP = INIDISP_FORCE_BLANK;
-}
+void setScreenOff(void);
 
 /**
  * @brief Set screen brightness
@@ -219,15 +201,9 @@ void fadeIn(u8 speed);
 /**
  * @brief Get current brightness
  *
- * Inlined for zero-call-overhead access. The standalone definition is
- * still available (force-emitted in console.c) for fn-pointer callers.
- *
  * @return Current brightness level (0-15)
  */
-extern u8 current_brightness;
-inline u8 getBrightness(void) {
-    return current_brightness;
-}
+u8 getBrightness(void);
 
 /*============================================================================
  * VBlank Synchronization

@@ -42,6 +42,8 @@ u16 r_nmi_calls;     /* nmiSet callback invocations over 5 frames       -> 5 */
 u16 r_nmi_after;     /* ... 3 more frames after nmiClear                -> 5 */
 u16 r_mod_pos;       /* snesmodGetPosition() as a u16: high byte clean  -> lt 0x100 */
 u16 r_mod_flush;     /* spc_fread == spc_fwrite after snesmodFlush      -> 1 */
+u16 r_hdma_speed;    /* hdma_wave_speed after hdmaWaveSetSpeed(3)       -> 3 */
+extern u8 hdma_wave_speed;   /* the wave module's speed byte: internal, no public header declares it */
 u16 r_done;          /* reached the end                                 -> 0xBEEF */
 
 extern u8 spc_fread, spc_fwrite;
@@ -127,6 +129,9 @@ int main(void) {
 
     setScreenOn();
     WaitForVBlank();
+    hdmaWaveSetSpeed(3);
+    r_hdma_speed = hdma_wave_speed;
+
     r_done = 0xBEEF;
     while (1) { WaitForVBlank(); snesmodProcess(); }
     return 0;

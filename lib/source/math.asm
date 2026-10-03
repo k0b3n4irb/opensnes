@@ -271,6 +271,44 @@ fixLerp:
 .ENDS
 
 ;------------------------------------------------------------------------------
+; fixed fixSin(u8 angle);
+; fixed fixCos(u8 angle);
+;------------------------------------------------------------------------------
+; One read of math_sine_table (math.c, 256 s16 entries, 8.8 fixed).
+; cos(x) = sin(x + 64). These were `inline` in math.h until 2026-10-03 (API
+; decision D4: the table had to be exported for the inline body).
+;
+; Stack: 5-6,s = angle (u8 in a 16-bit slot), after PHP + JSL return.
+;------------------------------------------------------------------------------
+.SECTION ".math_fixsin" SUPERFREE
+
+fixCos:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 5,s                     ; angle
+    clc
+    adc #64
+    bra _fixsin_lookup
+
+fixSin:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 5,s                     ; angle
+_fixsin_lookup:
+    and #$00FF
+    asl a
+    tax
+    lda.l math_sine_table,x
+    plp
+    rtl
+
+.ENDS
+
+;------------------------------------------------------------------------------
 ; Scratch RAM for fixed-point math
 ;------------------------------------------------------------------------------
 .RAMSECTION ".math_fixmul_ram" BANK 0 SLOT 1

@@ -134,25 +134,12 @@
  * Core Color Math Functions
  *============================================================================*/
 
-/* Internal state, exposed for the inline init/disable bodies below.
- * cgwsel + cgadsub shadow the corresponding hardware registers (which
- * are write-only). User code should manipulate via the colorMath* API,
- * not direct writes. */
-extern u8 cgwsel;
-extern u8 cgadsub;
-
 /**
  * @brief Initialize color math to defaults
  *
- * Disables all color math effects. Inlined for zero-call-overhead.
+ * Disables all color math effects.
  */
-inline void colorMathInit(void) {
-    cgwsel = 0;
-    cgadsub = 0;
-    REG_CGWSEL = 0;
-    REG_CGADSUB = 0;
-    REG_COLDATA = 0;
-}
+void colorMathInit(void);
 
 /**
  * @brief Set the layers colour math applies to — REPLACES the previous set
@@ -161,15 +148,10 @@ inline void colorMathInit(void) {
  * leaves only BG1 blended. This is the function colorMathEnable() was until
  * 2026-09-22; it is renamed because "Enable" reads as additive — windowEnable()
  * IS additive — and the old name silently undid the previous call.
- * Inlined for zero-call-overhead access.
  *
  * @param layers Layer mask (COLORMATH_BG1, COLORMATH_BG2, ...; 0 disables)
  */
-inline void colorMathSetLayers(u8 layers) {
-    /* Set layer enable bits (bits 0-5 of CGADSUB) */
-    cgadsub = (cgadsub & 0xC0) | (layers & 0x3F);
-    REG_CGADSUB = cgadsub;
-}
+void colorMathSetLayers(u8 layers);
 
 /** @brief The pre-2026-09-22 name of colorMathSetLayers(). Same behaviour:
  *         it REPLACES the layer set. */
@@ -178,13 +160,8 @@ void colorMathEnable(u8 layers);
 
 /**
  * @brief Disable all color math
- *
- * Inlined for zero-call-overhead access.
  */
-inline void colorMathDisable(void) {
-    cgadsub &= 0xC0;  /* Clear layer bits */
-    REG_CGADSUB = cgadsub;
-}
+void colorMathDisable(void);
 
 /**
  * @brief Set color math operation (add or subtract)

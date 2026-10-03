@@ -287,9 +287,9 @@ void hdmaWaveStop(void) {
     *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
 }
 
-/* hdmaWaveSetSpeed() is `inline` in hdma.h. Force-emit the standalone
- * here via address-taking for fn-pointer fallback. */
-void (*const __opensnes_force_emit_hdmaWaveSetSpeed)(u8) = hdmaWaveSetSpeed;
+void hdmaWaveSetSpeed(u8 speed) {
+    hdma_wave_speed = speed;
+}
 
 /*============================================================================
  * HDMA Effect Helpers

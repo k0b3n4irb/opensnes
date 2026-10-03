@@ -8,7 +8,7 @@
  * Current coverage:
  *   - math: div16/mod16 (bounded long division), mul16, sqrt16,
  *     fixMul/fixDiv/fixLerp (8.8) and fix32Mul/fix32Div (16.16) — L2b
- *   - text: cursor_y wrap — printing past row 31 must wrap to row 0
+ *   - text: cursor row wrap — printing past row 31 must wrap to row 0
  *     instead of writing past tilemapBuffer[2048] into the RAM sections
  *     that follow it (text_config is the first casualty pre-fix)
  *   - anim: tick sequencing (loop wrap, once-hold + finished flag,
@@ -266,6 +266,15 @@ u16 r_obj_alive;    /* set after objUpdateAll returns     -> 0xA11E       */
 static u16 obj_peeker, obj_other;
 static u16 obj_calls;
 
+/* 2026-10-03: functions that were `inline` in their headers and are lib
+ * functions now (API decision D4), plus the D3 rename of the ease pair. */
+u16 r_ease;         /* easeInQuad(128) | easeOutQuad(128) << 8      -> 0xC040 (64, 192) */
+u16 r_ease_names;   /* ease_in_quad / ease_out_quad (deprecated) agree -> 1 */
+u16 r_bright_get;   /* getBrightness() after setBrightness(7)       -> 7 */
+u16 r_mosaic_init;  /* mosaicGetSize() after mosaicSetSize(9), mosaicInit() -> 0 */
+u16 r_scope_hold;   /* scope_holddelay after scopeSetHoldDelay(30)  -> 30 */
+extern u16 scope_holddelay;
+
 /* D4 (2026-10-03): objGetCurrentId() and objKillCurrent() replace the
  * exported globals objgetid and objtokill. */
 u16 r_obj_curid;    /* objGetCurrentId() == objNew()'s return      -> 1 */
@@ -343,6 +352,7 @@ u16 r_prof_scan;    /* profileGetScanline() < 262                -> 1 */
 u16 r_prof_lines;   /* profileScanlineEnd after a 200-iteration spin -> ge 1 */
 u16 r_prof_lag;     /* profileGetLagFrames: reads the counter (value measured) */
 u16 r_cm_layers;    /* colorMathSetLayers(BG1) after (BG2): BG1 only -> 1 */
+extern u8 colormath_cgadsub;   /* the lib's CGADSUB shadow: internal, no public header declares it */
 u16 r_mosaic;       /* mosaicSetSize(20) clamps: mosaicGetSize   -> 15 */
 static const u8 lotb_vram[32] = {
     0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
@@ -708,7 +718,7 @@ static void coverage_lot_b(void) {
     mosaicSetLayers(MOSAIC_BG1);
     colorMathEnable(COLORMATH_BG2);
     colorMathSetLayers(COLORMATH_BG1);
-    r_cm_layers = cgadsub & 0x3F;
+    r_cm_layers = colormath_cgadsub & 0x3F;
     videoSetObjInterlace(1);
     videoSetOverscan(1);
     videoSetPseudoHires(1);
@@ -934,6 +944,19 @@ static void part_objects_irq(void) {
         r_obj_kept = objGetPointer(kept);
         objKillAll();
     }
+
+    /* --- the de-inlined functions and the ease rename --- */
+    r_ease = (u16)easeInQuad(128) | ((u16)easeOutQuad(128) << 8);
+    r_ease_names = (ease_in_quad(128) == easeInQuad(128)
+                    && ease_out_quad(77) == easeOutQuad(77)) ? 1 : 0;
+    setBrightness(7);
+    r_bright_get = getBrightness();
+    setBrightness(15);
+    mosaicSetSize(9);
+    mosaicInit();
+    r_mosaic_init = mosaicGetSize();
+    scopeSetHoldDelay(30);
+    r_scope_hold = scope_holddelay;
 
     /* --- fixed32: the asm sine against the C expression it replaced --- */
     r_f32sin_asm = (u32)fix32Sin(sin_angle);

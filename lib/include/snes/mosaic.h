@@ -49,15 +49,8 @@
  * @brief Initialize mosaic system
  *
  * Disables all mosaic effects. Call this once during setup.
- * Inlined for zero-call-overhead access.
  */
-extern u8 mosaic_size;
-extern u8 mosaic_bg_mask;
-inline void mosaicInit(void) {
-    mosaic_size = 0;
-    mosaic_bg_mask = 0;
-    REG_MOSAIC = 0;
-}
+void mosaicInit(void);
 
 /**
  * @brief Set the backgrounds the mosaic applies to — REPLACES the previous set
