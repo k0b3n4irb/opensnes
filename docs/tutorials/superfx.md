@@ -630,6 +630,40 @@ presented byte lands in blank or force blank, in whole frames into
 alternating blocks, and that no swap shows a block before its frame is
 complete.
 
+## Saving
+
+A Super FX cartridge has no separate save chip: when it has a battery, the
+battery keeps the GSU's Game Pak RAM. `USE_SRAM := 1` beside
+`USE_SUPERFX := 1` declares it (cartridge type `$15`), and the `sram`
+module then reads and writes that RAM:
+
+```c
+#include <snes/sram.h>
+
+#define SAVE_AT 0xE000          /* past the two 16 KB framebuffers */
+
+sramSaveOffset((u8 *)&save, sizeof(save), SAVE_AT);
+sramLoadOffset((u8 *)&save, sizeof(save), SAVE_AT);
+```
+
+Two things differ from an ordinary cartridge:
+
+- **You choose where the save lives.** Offsets count from `$70:0000`, where
+  the first framebuffer is, so `sramSave()` and `sramClear()` (offset 0)
+  would write over it. Use the Offset functions and a region your SCBR
+  settings leave alone; the whole RAM (`GSU_RAM_KB`, 64 KB by default) is
+  what the battery keeps, framebuffers included.
+- **The RAM is shared with the GSU.** While a job runs with RAN = 1 the CPU
+  cannot touch it. The module clears RAN for the transfer, the GSU waits on
+  its next RAM access, and SCMR is put back afterwards, through the same
+  `gsu_scmr_live` the presentation NMI uses. A save in the middle of a job
+  therefore works, and costs the job the time of the copy: keep it small,
+  or save between jobs.
+
+`devtools/libtests_gsu` saves while a job runs, and two luna manifests
+(`f_gsu_save_write.toml`, `g_gsu_save_read.toml`) power the cartridge off
+and on between the save and the read.
+
 ## Example ROMs
 
 | Example | What it demonstrates |

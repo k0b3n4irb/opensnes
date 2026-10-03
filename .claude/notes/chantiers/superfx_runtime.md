@@ -3,8 +3,8 @@
 **Status:** DONE, phases A to F (2026-09-24 to 2026-09-29; header corrected
 2026-10-03, it still said "phases C-F open"). Phase F's last part, linking
 the GSU program at its real ROM address, shipped 2026-10-03 (`GSU_BANK`,
-fixed placement at `$n:8000`). One thing is left open, written below and
-not on a branch: a save for Super FX games (the last section). **Catalogue entry:** `.claude/STRUCTURAL_DEFECTS.md` §E3.
+fixed placement at `$n:8000`), and the save for Super FX games the same day
+(last section). Nothing is left open on this chantier. **Catalogue entry:** `.claude/STRUCTURAL_DEFECTS.md` §E3.
 **Origin:** `.claude/notes/reviews/2026-09-24_superfx_game_gaps.md` (G1,
 G2, G3). **Risk:** High (crt0, memory model). **Effort:** several weeks.
 
@@ -224,7 +224,18 @@ half-landed frame shown; `gsu_pres_frames` for the rate; profile
   cartridge — phase C (non-blocking launch) plus phase E (code in RAM), or
   a GSU program that runs from its cache with RON = 0.
 
-## Open: a save for Super FX games (2026-10-02)
+## A save for Super FX games (asked 2026-10-02, done 2026-10-03)
+
+**Done.** `USE_SRAM=1` with `USE_SUPERFX=1` builds: header `$15`, and the
+`sram` module's Super FX flavour takes the capacity from `$FFBD` and the
+battery from `$FFD6`, and drops RAN around each transfer through
+`gsu_scmr_live` (`SRAM_GSU_TAKE` / `SRAM_GSU_GIVE` in `sram.asm`). The game
+picks the offset (the framebuffers are in the same RAM). Fixture: save and
+read back with the GSU idle, then during a cached job (job still running,
+its results right); negative control without the RAN hand-over: read-back
+wrong and 8 GSU bus violations. Power cycle: `f_gsu_save_write.toml` /
+`g_gsu_save_read.toml` (65 536-byte `.srm`). What follows is the note as
+written when the question came in.
 
 `USE_SRAM=1` with `USE_SUPERFX=1` is refused by the build (`412b15e3`): the
 `sram` module writes bank $70, which on a Super FX cart is the GSU's Game Pak

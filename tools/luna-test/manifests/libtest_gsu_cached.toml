@@ -70,6 +70,15 @@ r_mul_rom = 2100
 r_mul_cache = 9000
 r_prog_addr = 0x8000      # GSU_BANK := 1: the program is at $01:8000 ...
 r_prog_bank = 1
+r_boot_save = 0           # no .srm given: the save region powers on empty
+r_save_idle = 0           # SRAM_OK
+r_save_rt = 1
+r_save_busy = 1           # a cached job is running, RAN = 1 ...
+r_save_busy_rc = 0
+r_save_busy_rt = 1        # ... and the save still lands and reads back
+r_save_still = 1          # ... without ending the job
+r_save_job = 1            # ... which finishes with its results ($C0DE, $1640)
+r_save_range = 1          # SRAM_ERR_RANGE: 0xFFF8 + 16 wraps past 64 KB
 r_rom_table = 0x3CA5      # ... so its table and its absolute jump are where it was assembled for
 r_done = 0xD0E5
 

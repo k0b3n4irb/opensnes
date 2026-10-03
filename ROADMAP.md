@@ -301,7 +301,8 @@ None on a branch. The Super FX runtime work is merged, phases A to F
 (2026-09-24 to 2026-09-29): interrupt vectors in WRAM, an NMI that survives
 GSU jobs, non-blocking launch, `gsuPresent`, code in RAM, the C to GSU
 contract, and since 2026-10-03 a GSU program linked at its real ROM address
-(`GSU_BANK`). One thing remains open there: a save for Super FX games
+(`GSU_BANK`) and a save for Super FX games (`USE_SRAM` with `USE_SUPERFX`).
+Nothing remains open there
 (`.claude/notes/chantiers/superfx_runtime.md`).
 The 2026-09-26 état des lieux (`.claude/notes/reviews/`) sets the order of
 the work before v1.0. The 2026-09-11 gaps-review backlog is closed (43 of

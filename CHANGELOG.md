@@ -5,6 +5,20 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib,build): **a Super FX game can save.** `USE_SRAM := 1` with
+  `USE_SUPERFX := 1` was refused by the build; it now declares a battery
+  (cartridge type `$15`) and the `sram` module reads and writes the GSU's
+  Game Pak RAM, which is what such a cartridge keeps (there is no separate
+  save chip). The capacity comes from `$FFBD` (`GSU_RAM_KB`), offsets count
+  from `$70:0000`, and the game chooses a region its framebuffers do not
+  use (`sramSaveOffset` / `sramLoadOffset`). The RAM is shared with the
+  GSU: the module clears RAN for the transfer and puts SCMR back through
+  `gsu_scmr_live`, so a save in the middle of a job works. Tested on the GSU
+  fixture — save and read back idle, then during a cached job that still
+  ends with its results; without the hand-over the read-back is wrong and
+  luna counts 8 GSU bus violations — and across a power cycle
+  (`f_gsu_save_write.toml`, `g_gsu_save_read.toml`). This answers luna's
+  question of 2026-10-02 and closes the Super FX runtime chantier.
 - feat(build): **`GSU_BANK` links the Super FX program at its real ROM
   address.** Until now a `.sfx` was assembled at 0 and placed by the linker
   where it fitted, so only position-independent GSU code was right: an

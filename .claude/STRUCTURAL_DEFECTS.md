@@ -2477,7 +2477,8 @@ found `gsuDmaFullFrame` dropping a third of `superfx_3d`'s framebuffer
 `unsafe_writes = 0` (`vram_dma_blank.py`).
 
 Linking a GSU program at its ROM address shipped 2026-10-03 (`GSU_BANK`).
-**Left open, none blocking**: a save for Super FX games; using the bottom
+A save for Super FX games shipped the same day (`USE_SRAM` + `USE_SUPERFX`).
+**Left open, none blocking**: using the bottom
 letterbox band for `gsuPresent` (needs the lib to own a
 V-timer IRQ).
 

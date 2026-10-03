@@ -156,7 +156,7 @@ MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE
 # = coprocessor ($0x DSP, $1x GSU, $3x SA-1), low nibble = what sits beside
 # it ($x0 ROM, $x2 ROM+RAM+battery; with a coprocessor $x3, $x5 +RAM+battery).
 # DSP-1 + SRAM is $05 (it was $03, "no RAM", with the sram module linked).
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_DSP1)),$(if $(filter 1,$(USE_SRAM)),$$05,$$03),$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$(if $(filter 1,$(USE_SRAM)),$$15,$$13),$(if $(filter 1,$(USE_DSP1)),$(if $(filter 1,$(USE_SRAM)),$$05,$$03),$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
 SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
@@ -188,9 +188,6 @@ endif
 ifneq ($(words $(GSUSRC)),1)
 $(error GSU_BANK needs exactly one file in GSUSRC (got: $(GSUSRC)): one program is linked at $$$(GSU_BANK):8000 — .include the others from it)
 endif
-endif
-ifeq ($(USE_SRAM)$(USE_SUPERFX),11)
-$(error USE_SRAM=1 with USE_SUPERFX=1 is not supported: the sram module writes bank $$70, which on a Super FX cart is the GSU's own Game Pak RAM (GSU_RAM_KB). Save data there needs a design that no module has yet)
 endif
 ifeq ($(USE_SRAM),1)
 ifeq ($(filter 1 2 3 4 5 6 7,$(SRAM_SIZE)),)

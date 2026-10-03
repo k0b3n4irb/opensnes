@@ -13,6 +13,9 @@ GSUSRC      := gsu_job.sfx
 GSU_BANK    := 1
 USE_LIB     := 1
 USE_SUPERFX := 1
+# A Super FX save: the battery keeps Game Pak RAM (header $15), and the sram
+# module reaches it while a job runs (2026-10-03).
+USE_SRAM    := 1
 LIB_MODULES := console
 RAM_CODE_SIZE := 512
 include $(OPENSNES)/make/common.mk
