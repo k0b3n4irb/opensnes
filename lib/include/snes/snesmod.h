@@ -328,10 +328,12 @@ void snesmodFlush(void);
 /**
  * @brief Set the streaming sound table
  *
- * Points to a table of streaming sound descriptors.
+ * Points to a table of streaming sound descriptors. Nothing in the SDK
+ * starts a stream, so the table is stored and never read.
  *
  * @param table Pointer to sound table data
  */
+OPENSNES_DEPRECATED("no SDK call starts a stream — the table is never read")
 void snesmodSetSoundTable(const u8 *table);
 
 /**
@@ -344,8 +346,12 @@ void snesmodSetSoundTable(const u8 *table);
  *          stops playing (measured on the libtest_fx fixture: five active
  *          voices when allocated before the load, none when after).
  *
+ * Nothing in the SDK starts a stream, so the region is reserved for nothing
+ * and only takes the memory away from the module.
+ *
  * @param size Buffer size (in units specific to driver)
  */
+OPENSNES_DEPRECATED("no SDK call starts a stream — the region is never used")
 void snesmodAllocateSoundRegion(u8 size);
 
 /** @} */

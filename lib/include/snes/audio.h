@@ -213,6 +213,7 @@ u8 audioIsReady(void);
  * The audio engine is command-driven: every call talks to the SPC700
  * directly, so there is no queue to pump. Calling it is harmless.
  */
+OPENSNES_DEPRECATED("it does nothing — remove the call")
 void audioUpdate(void);
 
 /** @} */

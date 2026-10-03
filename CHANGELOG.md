@@ -101,6 +101,15 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- refactor(lib,docs): **the dead API is deprecated** (API decision on dead
+  API). `audioUpdate()` (does nothing), `consoleInitEx()` (ignores its
+  argument, is `consoleInit()`), `snesmodSetSoundTable()` and
+  `snesmodAllocateSoundRegion()` (prepare a stream that no SDK call can
+  start) build and warn, and go at 1.0. `padRaw()` is deprecated in favour
+  of `padHeld()` rather than renamed: the NMI handler replaces any word that
+  is not a joypad's by 0 before either reads it, so the two return the same
+  value and a new name would have been a third spelling of it.
+  `MIGRATING_FROM_PVSNESLIB.md` no longer offers it as the raw read.
 - refactor(lib,examples,docs): **the duplicate names are deprecated** (API
   decision D5). `getRegion()` gives way to `isPAL()` (the same value since
   v0.44), `profileGetFrameCount()` to `getFrameCount()` (the same counter),

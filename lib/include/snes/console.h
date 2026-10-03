@@ -86,14 +86,11 @@
 void consoleInit(void);
 
 /**
- * @brief Initialize console with options
+ * @brief The same as consoleInit()
  *
- * Advanced initialization with configuration options.
- *
- * @param options Initialization flags (reserved for future use)
- *
- * @note For most games, use consoleInit() instead.
+ * @param options Ignored: no option was ever defined.
  */
+OPENSNES_DEPRECATED("use consoleInit() — the argument is ignored")
 void consoleInitEx(u16 options);
 
 /*============================================================================

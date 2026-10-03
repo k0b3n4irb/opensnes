@@ -254,11 +254,11 @@ scanlines (about 2 % of a frame) before leaving the rest to the next frame.
 A command sent while the queue is full is dropped, so a burst of dozens of
 effects in one frame loses the last ones rather than corrupting the queue.
 
-`snesmodSetSoundTable(table)` and `snesmodAllocateSoundRegion(size)` set
-up the driver's streamed-sample path; the allocation must come before
-`snesmodLoadModule()`, since it reorganises the SPC700's memory and stops
-a module already loaded. No SDK call starts a stream yet, so today they
-only prepare it.
+Deprecated: `snesmodSetSoundTable(table)` and `snesmodAllocateSoundRegion(size)`.
+They prepare the driver's streamed-sample path, and no SDK call starts a
+stream. The allocation reorganises the SPC700's memory and stops a
+module already loaded, so a call left in old code must stay before
+`snesmodLoadModule()`.
 
 ## Example: Music + SFX
 
@@ -428,8 +428,9 @@ a scene starts, not every frame.
 | `audioGetFreeMemory()` | bytes left for samples in the SPC700's RAM |
 | `audioGetVoiceState(voice, &state)` | whether the voice's envelope is still sounding, and the sample, volume, pan and pitch last sent to it |
 
-`audioUpdate()` does nothing: the engine sends each command as you call
-it. It is kept so code written for the older engine still builds.
+`audioUpdate()` is deprecated and does nothing: the engine sends each
+command as you call it. It is kept until 1.0 so code written for the older
+engine still builds.
 
 Choosing a path: **snesmod** for tracker music (IT modules),
 **audio** for C-driven samples and DSP effects, **apu** (below) for

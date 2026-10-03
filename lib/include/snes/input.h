@@ -143,14 +143,17 @@ u16 padHeld(u8 pad);
 u16 padReleased(u8 pad);
 
 /**
- * @brief Get raw button state
+ * @brief The same value as padHeld()
  *
- * Returns the raw hardware state without edge detection.
+ * Never was the raw register: the NMI handler has already replaced a word
+ * that is not a joypad's (low four bits set) by 0 before this reads it, so
+ * it returns what padHeld() returns.
  *
  * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
  *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
- * @return Raw button state
+ * @return Button mask of held buttons
  */
+OPENSNES_DEPRECATED("use padHeld() — this never returned the raw register")
 u16 padRaw(u8 pad);
 
 /**

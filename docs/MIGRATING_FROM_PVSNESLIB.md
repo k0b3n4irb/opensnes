@@ -140,7 +140,7 @@ need output to the host rather than the screen.
 | `bgSetScroll(bg, x, y)` | `bgSetScroll(bg, x, y)` | The -1 is applied for you (trap 4) |
 | `spcBoot`, `spcLoad`, `spcPlay` | `snesmodInit`, `snesmodLoadModule`, `snesmodPlay` | Module `snesmod`; the driver is the same SNESMOD |
 | `spcProcess()` | `snesmodProcess()` | Call once per frame |
-| `padsCurrent(pad)` | `padHeld(pad)` | Also `padPressed`, `padReleased`, `padRaw` |
+| `padsCurrent(pad)` | `padHeld(pad)` | Also `padPressed`, `padReleased` |
 | `pvsneslibfont` | `textLoadFont()` with your own font | No implicit font |
 
 When a name is not in this table, search @ref api_index — it is organised by
