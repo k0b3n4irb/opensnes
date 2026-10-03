@@ -184,6 +184,13 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(compiler): **the preprocessor runs with `-undef -nostdinc`.** The
+  host's predefined macros (`__x86_64__`, `__aarch64__`, `__linux__`) made
+  the same source give a different ROM on each build machine, and the
+  host's `<stdint.h>` was read with cproc's sizes: `int32_t` came out 2
+  bytes, `int64_t` 4, without a word (build audit, S2). A `#include
+  <stdint.h>` now fails at the preprocessor; the fixed-width types are
+  `snes/types.h`'s.
 - fix(build): **`ROM_BANKS` is bounded per mapping** (LoROM 8-126, HiROM,
   SA-1 and Super FX 8-64, DSP-1 8-32). Past those the linker placed data
   in memory the cartridge does not map as ROM — a string at `$7E:8000`
