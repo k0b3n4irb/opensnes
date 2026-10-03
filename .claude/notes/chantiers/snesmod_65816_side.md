@@ -1,6 +1,7 @@
 # Chantier — SNESMOD, the 65816 side: what `snesmod.asm` does to the rest of the machine
 
-Status: OPEN, not started (2026-10-03). Class B (`lib/source/snesmod.asm`).
+Status: points 1, 2, 3, 4, 5, 6 FIXED on 2026-10-03 (same day), Class B
+(`lib/source/snesmod.asm`); two items left open at the end of this note.
 Opened by snes-rag's reading of the upstream driver
 (`partners/snes-rag/2026-10-03_from_snes-rag_snesmod-api.md`); each point was
 then checked in our copy, which descends from PVSnesLib's port.
@@ -38,7 +39,53 @@ byte with bit 0 cleared) are equal, so nothing is counted. As soon as the
 line is odd every turn sees a change and `PROCESS_TIME` (5, "process for 5
 scanlines") runs out in four turns: about two lines instead of five.
 
-## Fix, to design
+## What was done (2026-10-03)
+
+- **1, 2, 3**: the wait counts rising edges of the H-blank flag (`$4212`
+  bit 6: set at H=274, cleared at H=1, on every line, V-blank and forced
+  blank included; anomie-timing `08a81c8c93552908`, fullsnes
+  `ec4585ecbad65257`). No `$2137`, no OPVCT. A waiting turn is about 170
+  master cycles against a 268-cycle flag, so no edge is missed; a turn that
+  sends a message is longer and may hide one (the budget then runs slightly
+  long, never short). Both copies of the loop (`spcProcessMessages`,
+  `xspcProcessMessages`).
+- **4**: the `cli` is gone from `QueueMessage` and from `snesmodInit`; the
+  `plp` restores the caller's flag.
+- **5**: `QueueMessage` drops a message when 253 bytes or more are in use.
+  The measurement that decided it: 100 sends with no process left a depth of
+  44 and the driver never answered again (the indexes were out of step, it
+  received the middle of a message as a command).
+- **6**: `snesmodGetPosition` reads until two reads agree.
+
+Fixture `devtools/libtests_snesmod` + `manifests/libtest_snesmod.toml`:
+
+| | before | after |
+|---|---|---|
+| STAT78 bit 6 after a waiting `snesmodProcess` | `$40` | 0 |
+| lines spent waiting | 3 | 6 |
+| frames to send 4 queued messages | 4 | 2 |
+| queue depth after 100 sends | 44 (wrapped) | 255 |
+| the full queue drains | never (1484 frames and counting) | 40 frames |
+
+Audio hashes of `snesmod_music` and `snesmod_music_large` moved: commands
+reach the driver a fraction of a millisecond apart from before. Old and new
+captures (300 frames) compared: energy per half second within 1 %
+(5448/5448, 4426/4427, 1218/1210, 227/225), onset +0 and +8 samples, no
+offset makes them bit-identical (the driver's tick phase differs). fbhash
+89/89 unchanged.
+
+## Still open
+
+- **Super Scope + SNESMOD** was never reproduced as a false shot: no example
+  links both. The cause is removed (no latch any more); a probe would only
+  document the past.
+- **`snesmodInit` writes `$81` to NMITIMEN** on its way out, whatever the
+  caller had there (an H/V IRQ enable is lost). Not touched.
+- Upstream has all of these; whether they go to Mukunda as issues is the
+  owner's call (`partners/snesmod-upstream/README.md`).
+
+## Fix, as first sketched (kept for the record)
+
 
 - 1 and 2: read OPVCT twice per turn (`lda REG_OPVCT` then `bit REG_OPVCT`),
   which keeps the pointer where it was found. That restores the real

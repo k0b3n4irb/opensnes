@@ -248,6 +248,12 @@ drains a little each frame. `snesmodFlush()` blocks until the queue is
 empty, for the rare moment you need every command applied now, such as
 before loading another module.
 
+The queue holds 85 commands and the SPC700 takes about two per frame. With
+several queued, `snesmodProcess()` waits on the audio CPU for up to five
+scanlines (about 2 % of a frame) before leaving the rest to the next frame.
+A command sent while the queue is full is dropped, so a burst of dozens of
+effects in one frame loses the last ones rather than corrupting the queue.
+
 `snesmodSetSoundTable(table)` and `snesmodAllocateSoundRegion(size)` set
 up the driver's streamed-sample path; the allocation must come before
 `snesmodLoadModule()`, since it reorganises the SPC700's memory and stops

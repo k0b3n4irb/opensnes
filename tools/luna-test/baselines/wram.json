@@ -20,16 +20,16 @@
     "rom_sha256": "c30d089c66dbfffe6c42f4cb8ab71aff9d0c3f971e917c5960655a4d618021e7"
   },
   "audio_snesmod_music": {
-    "stream": "a3346d616d3de463b1ba211363ce951f9c789a9f064a007531a00900b51a1ed2",
-    "rom_sha256": "da849e3361aaaa8264d873b4fd81348026b5883edb5200c1e415386adf97c561"
+    "stream": "be4fc210a9154f453bef6dd5566fdbd8b4c987c863cca649388318e936a8d861",
+    "rom_sha256": "e71f3ded85b3ca8bc6376e335b2e0ff22686f3b4d86bc1f5ad24f5041fe04b9b"
   },
   "audio_snesmod_music_large": {
-    "stream": "6c4941954bfdf794176072b8edff69a4121e47e93357bc63e47b9643e2ada95c",
-    "rom_sha256": "73ecbe2cc53d3a679551a33d68140fe403d9ce55b02a6f60ca33f6046f932863"
+    "stream": "c21a2bb15f7e73e8462c37444763adb0288c4d5dff2c98c98d87a8cdb958dbab",
+    "rom_sha256": "6ab447b5bf37f3833eff636eeed8a24ff4dcebc685f6823d48078513c18d35b7"
   },
   "audio_snesmod_sfx": {
-    "stream": "c11723cb4c7355d38f342a344b82e7735b71476e3b22d17bc2ded29d428e7073",
-    "rom_sha256": "2b4579bcec290e43476014a4138072fd8cc2affbf1b78a739ee4b82666057d6d"
+    "stream": "2a2b6ae6812ae0ebb38d6819739076b29a9fa56f07b6e1744c9fd1b3f923f4cd",
+    "rom_sha256": "39ec6d2f353fae89903d4fb951ba0c6aed71d4ada0fe6502cb538b788879d161"
   },
   "audio_soundboard": {
     "stream": "fb6340f369559cff8b92b8698b3573dc5bc0bbb74a81fdde0cb05d0691441f0d",
@@ -128,8 +128,8 @@
     "rom_sha256": "f12a3b11399367362f5b8d1a0b7f73fbd29a514bee73cc4242709a002dba158d"
   },
   "chips_superfx_game_skeleton": {
-    "stream": "1dab2e7f5faa5ba0ffafb368f4abb1a19a31aed762c63bac9b67bff5c7d4f4df",
-    "rom_sha256": "6abcc169f779f6e7efc936e7285b33a75f84eb82f1b579380a96cb81f78fd609"
+    "stream": "d623b37a924e60a00f15e8ba9d85582c7ef8904556856d600616f38911889fd8",
+    "rom_sha256": "db04d3a68750e230473bf4279c178ac0a63ac6d5d86336f411ccd32e03be6396"
   },
   "chips_superfx_hello": {
     "stream": "cfdf09451d4774199c38e35878b2f4cdcb2eb5688edf9a815f012b02cc7e686b",
@@ -176,8 +176,8 @@
     "rom_sha256": "63620a2e20a2dab05b26b3b9d10acd2712b0327fbbc5e729947fb58972164b4d"
   },
   "games_likemario": {
-    "stream": "0198b2b3548a60b461f956f9f38cb9a025ae1ddffd7f8ec0b1cf894a1139e89f",
-    "rom_sha256": "d49841b5045c4ade8020464169a2d58c9aebe0aa0b8070aab6807f885772079f"
+    "stream": "a032797aa0f6d30fcf313decc375597bb455271c09eddbb52924646e3517ac9a",
+    "rom_sha256": "bec17ba5b743bea31df06a0b4bcfd5acb905e864d55cc3bf220f8d3b97724e53"
   },
   "games_mapandobjects": {
     "stream": "9f1b6e596151a9d282d0436bccbe3e0df1a22fc473fc195720f19d97760f83a2",

@@ -63,6 +63,21 @@ All notable changes to OpenSNES are documented in this file.
   and the scroll.
 
 ### Fixed
+- fix(lib): **`snesmodProcess()` no longer latches the H/V counters, waits
+  its real five scanlines, and the SNESMOD command queue cannot wrap.** With
+  several commands queued the wait loop read OPVCT once per turn (a
+  read-twice register): the budget ran out in two or three lines, OPVCT's
+  read pointer stayed shifted for the next reader, and the latch flag was
+  left set, which `crt0` takes for a Super Scope shot. An 86th queued command
+  wrapped the 256-byte queue and the driver stopped answering. The wait now
+  counts H-blank edges (`$4212` bit 6), a command that does not fit is
+  dropped, the stray `cli` in `QueueMessage` / `snesmodInit` is gone and
+  `snesmodGetPosition()` reads until two reads agree; commands with no
+  parameter queue 0 in their unused bytes instead of what a scratch variable
+  held. Found by snes-rag
+  reading the upstream driver; measured and pinned by `libtest_snesmod`
+  (before: latch flag `$40`, 3 lines, depth 44 after 100 sends, never
+  drained; after: 0, 6, 255, drained in 40 frames).
 - fix(tools): **smconv crashed on a module with a compressed sample.** It
   printed "unsupported compressed samples", kept a NULL buffer with the
   declared length and segfaulted in the BRR encoder (exit 139). Compressed

@@ -76,8 +76,7 @@
 .equ REG_APUIO1         $2141   ; SPC I/O port 1
 .define REG_APUIO2      $2142   ; SPC I/O port 2
 .define REG_APUIO3      $2143   ; SPC I/O port 3
-.define REG_SLHV        $2137   ; Software latch for H/V counter
-.define REG_OPVCT       $213D   ; Y scanline location
+.define REG_HVBJOY      $4212   ; bit 6 = H-blank flag
 
 .equ REG_NMI_TIMEN      $4200
 
@@ -102,7 +101,22 @@
 ; Constants
 ;==============================================================================
 
-.define PROCESS_TIME    5       ; Process for 5 scanlines
+; snesmodProcess sends queued messages for at most PROCESS_TIME scanlines,
+; then leaves the rest for the next call. A scanline is counted as a rising
+; edge of the H-blank flag ($4212 bit 6: set at H=274, cleared at H=1, on
+; every line, in V-blank and forced blank too; anomie-timing
+; 08a81c8c93552908, fullsnes ec4585ecbad65257). A turn of the wait loop is
+; about 170 master cycles and the flag stays up 268, so no edge is missed
+; while waiting; a turn that sends a message is longer and may hide one.
+;
+; Until 2026-10-03 the loop latched the counters ($2137) and read OPVCT once
+; per turn, as upstream SNESMOD does. OPVCT is a read-twice register: every
+; other read returned its high byte, the five lines ran out in about two
+; (measured on luna: E6 E6 .. E7 E6 E7 E6 E8), the read pointer was left
+; shifted for the next reader (profileGetScanline, the Super Scope code, an
+; H-IRQ handler), and the latch raised STAT78 bit 6, which crt0 takes for a
+; Super Scope shot.
+.define PROCESS_TIME    5
 .define INIT_DATACOPY   13
 .define SPC_BOOT        $0400   ; SPC entry/load address
 
@@ -296,8 +310,7 @@ snesmodInit:
     sta REG_NMI_TIMEN
 
     plb
-    cli
-    plp
+    plp                         ; the caller's I flag, not a blanket cli
     rtl
 
 ;------------------------------------------------------------------------------
@@ -636,7 +649,21 @@ snesmodLoadEffect:
 ; A = id, spc1 = params
 ;------------------------------------------------------------------------------
 QueueMessage:
-    sei                         ; Disable IRQ
+    sei                         ; snesmodProcess may run in an IRQ handler
+
+    ; The queue is 256 bytes with 8-bit indexes and 3-byte messages: 85
+    ; messages are 255 bytes, and an 86th would wrap onto the first and
+    ; leave the indexes out of step (the driver then receives the middle of
+    ; a message as a command and stops answering; measured 2026-10-03, 100
+    ; sends without a snesmodProcess). A message that does not fit is
+    ; dropped: the newest, not the 85 already accepted.
+    pha
+    lda spc_fwrite
+    sec
+    sbc spc_fread
+    cmp #253
+    pla
+    bcs @full
 
     sep #$10
     .INDEX 8
@@ -653,8 +680,9 @@ QueueMessage:
     rep #$10
     .INDEX 16
 
-    cli
-
+@full:
+    ; No cli: the plp gives the caller its own I flag back. Upstream's cli
+    ; let an IRQ through for a caller that had masked them.
     plb
     plp
     rtl
@@ -715,6 +743,9 @@ xspcProcessMessages:
     beq @exit2
 
     ldy #PROCESS_TIME
+    lda REG_HVBJOY              ; the flag as it is now, so that the first
+    and #$40                    ; edge counted is a real one
+    sta spc1
 
 @process_again:
     lda spc_v
@@ -747,11 +778,14 @@ xspcProcessMessages:
     beq @exit2
 
 @next:
-    lda REG_SLHV
-    lda REG_OPVCT
+    ; One scanline = one rising edge of the H-blank flag (see PROCESS_TIME).
+    lda REG_HVBJOY
+    and #$40
     cmp spc1
     beq @process_again
     sta spc1
+    cmp #$00
+    beq @process_again          ; falling edge: same line
     dey
     bne @process_again
 
@@ -786,6 +820,9 @@ spcProcessMessages:
     beq @exit2
 
     ldy #PROCESS_TIME
+    lda REG_HVBJOY              ; the flag as it is now, so that the first
+    and #$40                    ; edge counted is a real one
+    sta spc1
 
 @process_again:
     lda spc_v
@@ -818,11 +855,14 @@ spcProcessMessages:
     beq @exit2
 
 @next:
-    lda REG_SLHV
-    lda REG_OPVCT
+    ; One scanline = one rising edge of the H-blank flag (see PROCESS_TIME).
+    lda REG_HVBJOY
+    and #$40
     cmp spc1
     beq @process_again
     sta spc1
+    cmp #$00
+    beq @process_again          ; falling edge: same line
     dey
     bne @process_again
 
@@ -849,6 +889,7 @@ snesmodPlay:
 
     lda 6,s                     ; startPos
     sta spc1+1
+    stz spc1                    ; unused byte: 0
     lda #CMD_PLAY
     jmp QueueMessage
 
@@ -866,6 +907,8 @@ snesmodStop:
     pha
     plb
 
+    stz spc1                    ; no parameter: send 0, not what was left there
+    stz spc1+1
     lda #CMD_STOP
     jmp QueueMessage
 
@@ -883,6 +926,8 @@ snesmodPause:
     pha
     plb
 
+    stz spc1                    ; no parameter: send 0, not what was left there
+    stz spc1+1
     lda #CMD_PAUSE
     jmp QueueMessage
 
@@ -900,6 +945,8 @@ snesmodResume:
     pha
     plb
 
+    stz spc1                    ; no parameter: send 0, not what was left there
+    stz spc1+1
     lda #CMD_RESUME
     jmp QueueMessage
 
@@ -919,6 +966,7 @@ snesmodSetModuleVolume:
 
     lda 6,s                     ; volume
     sta spc1+1
+    stz spc1                    ; unused byte: 0
     lda #CMD_MVOL
     jmp QueueMessage
 
@@ -1021,7 +1069,10 @@ snesmodGetPosition:
     sep #$20
     .ACCU 8
     stz tcc__r0
-    lda.l REG_APUIO3
+    ; The SPC writes this port while we read it: take a value seen twice.
+-:  lda.l REG_APUIO3
+    cmp.l REG_APUIO3
+    bne -
     sta tcc__r0
     rep #$20
     .ACCU 16

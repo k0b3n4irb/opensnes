@@ -25,7 +25,9 @@
 # spc_fwrite:1 --peek spc_fread:1 --peek spc_pr:1 --out -` at
 # 140/200/260/320/380/440/500 -> 3/3/$03, 6/6/$0A, 9/9/$03, 12/12/$0A,
 # 15/15/$0B, 18/18/$04, 18/18/$04; `--peek spc_fifo:12` at 500 ->
-# 0314000a14000314000a14000b1400041400; `apu.dsp_regs[v*16+8]` for ENVX.
+# 0300000a00000300000a00000b0000040000; `apu.dsp_regs[v*16+8]` for ENVX.
+# (Until 2026-10-03 the second byte of each command was $14: commands with
+# no parameter queued whatever spc1 held. They queue 0 now.)
 rom = "../../../examples/audio/snesmod_music_large/music_large.sfc"
 
 [[checkpoint]]                 # boot: the module's PLAY was queued and sent
@@ -78,7 +80,7 @@ at_frame = 500
 spc_fwrite = { dir = "unchanged", width = 1 }
 
 [asserts.blocks]               # the whole FIFO, in order
-spc_fifo = "0314000a14000314000a14000b1400041400"
+spc_fifo = "0300000a00000300000a00000b0000040000"
 
 [asserts.dsp]                  # stopped: every envelope at 0
 V0_ENVX = 0

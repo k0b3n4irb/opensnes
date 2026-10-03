@@ -473,6 +473,43 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 
 ---
 
+### 🟢 `snesmodProcess()` latched the H/V counters and cut its own wait short; the command queue wrapped (fixed 2026-10-03)
+
+Three defects of the 65816 side of SNESMOD (`lib/source/snesmod.asm`),
+inherited from upstream through PVSnesLib's port and found by reading the
+upstream driver (snes-rag) then measuring ours on luna:
+
+- With more than one command queued, `snesmodProcess()` waited for the SPC700
+  "for 5 scanlines" by latching the counters (`$2137`) and reading OPVCT
+  **once** per turn. OPVCT is a read-twice register, so every other read was
+  its high byte: the five lines ran out in about two or three (values read on
+  one frame: `E6 E6 … E7 E6 E7 E6 E8`). The same read left OPVCT's read
+  pointer shifted for the next reader (`profileGetScanline`, an H-IRQ
+  handler), and the latch raised STAT78 bit 6 (fullsnes: "in all three cases
+  the latch flag in 213Fh.Bit6 is set"), which `crt0` takes for a Super Scope
+  shot. No example links the Super Scope with SNESMOD, so that last effect was
+  read in the code, not observed.
+- The queue is 256 bytes of 3-byte commands with 8-bit indexes and had no
+  overflow check: an 86th command before a `snesmodProcess()` wrapped onto
+  the first and left the indexes out of step. The driver then received the
+  middle of a command as a command and stopped answering — measured: 100
+  sends in a row, the queue never drained again.
+- `QueueMessage` and `snesmodInit` ended with `cli` before restoring the
+  caller's flags, so an IRQ the caller had masked could be taken in that
+  window. `snesmodGetPosition()` read its port once, while the SPC700 may be
+  writing it.
+
+**Fix:** the wait counts rising edges of the H-blank flag (`$4212` bit 6, set
+at H=274 and cleared at H=1 on every line; anomie-timing, fullsnes): no
+latch, no counter read, and a real five-line budget. A command that does not
+fit is dropped (the newest). The `cli` is gone; the position is read until
+two reads agree. Pinned by `devtools/libtests_snesmod` and
+`tools/luna-test/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
+queue depth 255 after 100 sends, queue drained). Visible change: with
+several commands queued `snesmodProcess()` now really waits up to five
+scanlines, and commands reach the driver sooner (four commands in two frames
+instead of four).
+
 ### 🟢 SNESMOD stop and pause sometimes left a voice sounding (fixed 2026-09-26)
 
 The SNESMOD SPC700 driver (mukunda's, shared with PVSnesLib) silences the

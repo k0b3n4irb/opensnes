@@ -282,6 +282,20 @@ void snesmodFadeVolume(u8 targetVolume, u8 speed);
  * corrupts the command. (This line offered "or NMI handler" until
  * 2026-09-20.)
  *
+ * Cost: with nothing queued it returns at once. With one message queued it
+ * sends it and returns. With more, it sends what the SPC700 accepts for at
+ * most five scanlines (about 2 % of a frame), then leaves the rest for the
+ * next call; the audio driver takes about two messages per frame.
+ *
+ * The queue holds 85 commands. A command sent while it is full is dropped
+ * (the newest one; until 2026-10-03 it wrapped onto the oldest and the
+ * driver stopped answering). Reaching 85 means snesmodProcess() is not
+ * being called, or dozens of commands are sent per frame.
+ *
+ * It reads no H/V counter and leaves the counter latch alone (it used to
+ * latch `$2137` and read OPVCT, which raised the Super Scope latch flag and
+ * shifted OPVCT's read pointer for whoever read it next).
+ *
  * @code
  * while (1) {
  *     WaitForVBlank();
