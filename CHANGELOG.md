@@ -184,6 +184,21 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`apuUpload()` with a size of 0 sends nothing.** It sent one
+  byte before testing the end, so 0 meant 65 536 bytes (library audit,
+  row 18).
+- fix(lib): **`audioSetVoiceVolume()` clamps to 0-127.** The DSP's voice
+  volumes are signed: 128 and above inverted the phase (library audit,
+  row 19).
+- fix(lib): **`apuWaitBoot()` is bounded and `audioInit()` returns
+  `AUDIO_ERR_TIMEOUT` as its header promised.** Called when the IPL is no
+  longer running (a driver already is), the wait for `$AA` / `$BB` never
+  ended and the CPU hung. It gives up after about seven frames and returns
+  1; `audioInit()` returns the timeout. libtest vector `r_apu_boot_again`
+  (library audit, row 17). Five audio hashes re-captured: the poll loop
+  costs a few cycles per iteration before the IPL answers, so the upload
+  starts a few samples later; `luna diff --audio` before/after: `MATCH`,
+  0.00 to 0.19 % per window, first sample within 2.
 - fix(lib): **`hdmaIrisWipe()`, `hdmaBrightnessGradient()` and
   `hdmaColorGradient()` called again while they run** only move the
   channel's table pointer, read at the next frame. They set the channel up

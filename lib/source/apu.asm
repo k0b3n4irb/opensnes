@@ -20,11 +20,15 @@
 .SECTION ".apu_asm" SUPERFREE
 
 ;------------------------------------------------------------------------------
-; void apuWaitBoot(void)
+; u8 apuWaitBoot(void)
 ;------------------------------------------------------------------------------
-; Blocks until the IPL ROM signals readiness ($AA on IO0, $BB on IO1).
+; Waits until the IPL ROM signals readiness ($AA on IO0, $BB on IO1).
 ; Call once after reset (consoleInit does NOT do this), and again after
-; re-running the boot ROM.
+; re-running the boot ROM. Returns 0 when the IPL answered, 1 when it did
+; not within about 65 536 polls (some 400 000 master cycles, seven frames):
+; the IPL is not running — a driver already is, or the SPC700 is dead —
+; and the old unbounded loop (until 2026-10-03) hung the CPU for ever,
+; while audioInit() promised AUDIO_ERR_TIMEOUT.
 ;------------------------------------------------------------------------------
 apuWaitBoot:
     php
@@ -32,19 +36,36 @@ apuWaitBoot:
     pea $0000
     plb
     plb                     ; DBR = $00 for $21xx access
+    rep #$10
+    .INDEX 16
+    ldx #$0000              ; poll counter: 65 536 tries per byte
     sep #$20
     .ACCU 8
 
     lda #$AA
 @wait_aa:
     cmp.w $2140             ; IPL ready signal on IO0
+    beq @got_aa
+    dex
     bne @wait_aa
+    bra @timeout
+@got_aa:
     sta.w $2140             ; clear a possible stale $CC
     lda #$BB
 @wait_bb:
     cmp.w $2141             ; second ready byte on IO1
+    beq @got_bb
+    dex
     bne @wait_bb
-
+@timeout:
+    lda #$01
+    bra @done
+@got_bb:
+    lda #$00
+@done:
+    rep #$20
+    .ACCU 16
+    and #$00FF
     plb
     plp
     rtl
@@ -89,6 +110,9 @@ apuUpload:
     rep #$20
     .ACCU 16
     lda 6,s                 ; size
+    beq @nothing            ; size 0: nothing to send (the first byte went
+                            ; out before the end test until 2026-10-03, so
+                            ; 0 meant 65 536 bytes)
     sta.b tcc__r1           ; loop bound (cpy has no stack-relative mode)
     lda 8,s                 ; spcAddr
     sta.w $2142             ; IO2/IO3 = target APU address (16-bit)
@@ -120,6 +144,7 @@ apuUpload:
     cpy.b tcc__r1           ; all bytes sent?
     bne @byte_loop
 
+@nothing:
     plb
     plp
     rtl

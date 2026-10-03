@@ -157,6 +157,7 @@ CASES = [
     ("r_bank_irq_bk",  2, 1),      # premise: the handler really is outside bank $00
     ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
     # audio error returns (API audit 3.5, 2026-09-21): they used to be swallowed
+    ("r_apu_boot_again", 2, 1),  # 2026-10-03: apuWaitBoot is bounded; 1 = no IPL
     ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2),
     ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
     ("r_aud_on", 2, 6), ("r_aud_on_bad", 2, 0xFF), ("r_aud_on_rr", 2, 1),   # audioPlaySampleOn: the caller picks the voice
@@ -164,7 +165,7 @@ CASES = [
     ("r_lerp_t256", 2, 9472), ("r_lerp_t300", 2, 9472), ("r_oam_id256", 2, 0x4221),
     ("r_lerp_wide", 2, 0),       # 2026-10-03: b - a over 17 bits (was 0x8000, -128.0)
     ("r_hide_x", 2, 1),          # 2026-10-03: hidden at X = 257, not 256
-    ("r_rng_boot", 2, 0x8C03),   # 2026-10-03: the latched H/V seed on luna (was the $8001 of unlatched counters)
+    ("r_rng_boot_moved", 2, 1),  # 2026-10-03: the boot seed is latched H/V, not the $8001 of unlatched counters
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),

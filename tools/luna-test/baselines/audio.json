@@ -1,9 +1,9 @@
 {
-  "luna": "v1.31.0",
+  "luna": "v1.32.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "eecbce38476c4f5764e3b2f7c6a75c0941a8d224e5db8f4fda765be4cd14258a",
+      "sha256": "6200feca6ccf9c9534cfe113369762d941e6d9ee524cc82d577443d52bfac3de",
       "samples": 159936,
       "peak": 21204
     },
@@ -13,22 +13,22 @@
       "peak": 20924
     },
     "audio/pitch_mod": {
-      "sha256": "5465f1baf9ee980a8ba2c26bf09cc492c9eb904da9e216d7e3a2662d9e00b455",
+      "sha256": "16256bddd6bbcaa9396912b1b07092bb6e7e779ede74b1be2d1cb59a1dbd8559",
       "samples": 159936,
       "peak": 22617
     },
     "audio/play_noise": {
-      "sha256": "29f045073c8c8c70e7b61468314adbb336cbe469786d2f8d399490d2764f18e9",
+      "sha256": "d5f472b2f5665ae1e435080aac1bc2dedd23072f9e305a6ef0b6a395d99d23b8",
       "samples": 159936,
       "peak": 21204
     },
     "audio/echo": {
-      "sha256": "9bbdbcf8b5326cb37b4a55b83257d5984de39b2bfd790b5e9e540578b2caddd3",
+      "sha256": "8ba507823c217ddd6cb52a5d69baafec62dc3168dd0dc05829f0128239645af3",
       "samples": 159936,
       "peak": 11434
     },
     "audio/speech_synth": {
-      "sha256": "5f16a065cd199a7464671dcf95a1e0f1b29f6118291c03e388b67b4e98c7e72b",
+      "sha256": "91bdbf005ac0892a5ffaedcba39e4cf49e0c7d9032b6b7a63a271a7df68174a3",
       "samples": 159936,
       "peak": 23143
     },
@@ -38,9 +38,9 @@
       "peak": 17191
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "3081b28324c7708b2c361bcb59d654a4691536316e3ab76d6ef59679c6efad29",
+      "sha256": "90c9f5527deaa9c43bd1e3e7d478d3591d196f7cdc8d9b4c1d30f36a24db7523",
       "samples": 160007,
-      "peak": 20923
+      "peak": 20922
     },
     "audio/soundboard": {
       "sha256": "544ad99e8876166e5e6a00873f534bebaf71a4704c5caa0840c44e2638b9bdf3",

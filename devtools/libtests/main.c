@@ -41,6 +41,7 @@
 #include <snes/profile.h>
 #include <snes/registers.h>
 #include <snes/tile.h>
+#include <snes/apu.h>
 /* Deprecated names keep their vector while they ship (scopeButtonsDown,
  * mosaicEnable, colorMathEnable, rand, srand). */
 #if defined(__clang__)
@@ -391,9 +392,11 @@ u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
 u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
-u16 r_rng_boot;     /* first rngNext() after consoleInit: the seed is the latched H/V
-                     * counters ^ STAT78 (deterministic on luna). With the counters read
-                     * unlatched (until 2026-10-03) the seed was $8001 whatever the boot */
+u16 r_rng_boot;     /* first rngNext() after consoleInit, kept for the record: the seed is
+                     * the latched H/V counters ^ STAT78 and moves with the instant of the
+                     * latch, so it is not pinned */
+u16 r_rng_boot_moved; /* that first value differs from the one the unlatched seed ($8001,
+                       * until 2026-10-03) gives -> 1 */
 u16 r_lerp_wide;    /* fixLerp(FIX(-64), FIX(64), 128): the 17-bit difference -> 0 (was -128.0) */
 u16 r_hide_x;       /* oamHide(5): X low byte 1 (X = 257 = -255), not 0 (X = 256 counts as 0) -> 1 */
 u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
@@ -525,6 +528,8 @@ static void coverage_bank_bytes(void) {
  * consoleInitEx. Runs last: it silences the voice the audio block left
  * playing (audio_v2.toml asserts DSP registers, not liveness). */
 u16 r_aud_init;      /* audioInit()                                     -> AUDIO_OK (0) */
+u16 r_apu_boot_again; /* apuWaitBoot() once the driver runs (no IPL any more): returns 1
+                       * within about seven frames instead of waiting for ever -> 1 */
 u16 r_aud_badvoice;  /* audioSetVoiceVolume(9, ...): voice out of range -> AUDIO_ERR_INVALID_ID (2) */
 u16 r_aud_badstop;   /* audioStopVoice(8)                               -> 2 */
 u16 r_aud_setvol;    /* audioSetVolume(100): the command was accepted   -> 0 */
@@ -1005,6 +1010,8 @@ static void part_objects_irq(void) {
     /* N6: rngNext/rngSeed, and the deprecated rand/srand names run the same
      * generator: same seed, same first value, never 0. */
     r_rng_boot = rngNext();          /* before any reseed: the boot seed's first step */
+    rngSeed(0x8001);                  /* the seed the unlatched counters gave */
+    r_rng_boot_moved = (rngNext() != r_rng_boot) ? 1 : 0;
     rngSeed(0x1234); r_rng = rngNext();
     srand(0x1234);
     r_rng_names = (rand() == r_rng && r_rng != 0) ? 1 : 0;
@@ -1045,6 +1052,7 @@ int main(void) {
      * test_libtest.py). Known DSP vectors for the spc-dump probe:
      * ADSR(15,7,7,8) packs to $FF/$E8 (the pitch_mod bow-stroke pair). */
     r_aud_init = audioInit();              /* AUDIO_OK: the handshake answered */
+    r_apu_boot_again = apuWaitBoot();      /* the IPL is gone: 1, bounded (2026-10-03) */
     r_audio_ready = audioIsReady();
     audioSetVolume(100);
     r_audio_vol = audioGetVolume();

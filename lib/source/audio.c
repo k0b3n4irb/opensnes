@@ -142,7 +142,9 @@ u8 audioInit(void) {
         sample_mirror[i].flags = 0;
     }
 
-    apuWaitBoot();
+    if (apuWaitBoot() != 0) {
+        return AUDIO_ERR_TIMEOUT;   /* the IPL is not running: nothing to upload to */
+    }
     apuUpload(audio_driver_blob, SPC_DRIVER_BASE,
               /* two labels of one asm section, not two objects */
               /* cppcheck-suppress comparePointers */
@@ -206,6 +208,11 @@ u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
     if (voice >= AUDIO_MAX_VOICES) {
         return AUDIO_ERR_INVALID_ID;
     }
+    /* VxVOLL / VxVOLR are signed: a value of 128 or more is a negative
+     * volume, which inverts the phase (anomie-sdsp). Clamp to the 0-127 the
+     * header promises (until 2026-10-03 the byte went through as given). */
+    if (volumeL > 127) volumeL = 127;
+    if (volumeR > 127) volumeR = 127;
     err = cmd_send(OP_VVOL, voice, (u16)((u16)volumeR << 8 | volumeL));
     if (err == AUDIO_OK) {
         /* mirror keeps the max of both for state reporting */
