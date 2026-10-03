@@ -90,3 +90,24 @@
 .ENDIF
 .SECTION "ram_code.\1" BASE $7D APPENDTO ".ram_code"
 .ENDM
+
+; The Super FX program (since 2026-10-03):
+;
+;   GSU_SECTION "program"
+;   gsu_program:      .incbin "game.sfx.bin"
+;   gsu_program_end:
+;   .ENDS
+;
+; Without GSU_BANK in the Makefile it is an ASSET_SECTION: the linker places
+; the binary where it fits and the program must be position-independent.
+; With GSU_BANK = n it is forced to the start of ROM bank n ($n:8000), the
+; address the .sfx was assembled for (templates/memmap_gsu.inc), so the
+; program's absolute jumps and its tables in ROM are right. One program per
+; ROM in that case; the link fails if something else is forced there.
+.MACRO GSU_SECTION ARGS name
+.IFDEF GSU_BANK_VAL
+.SECTION "gsu.\1" BANK GSU_BANK_VAL SLOT 0 ORGA $8000 FORCE
+.ELSE
+.SECTION "asset.\1" SEMISUPERFREE BANKS ASSET_BANKS
+.ENDIF
+.ENDM

@@ -62,6 +62,7 @@ A cartridge carries one coprocessor: setting two of these is refused.
 |---|---|---|
 | `USE_SA1` | `0` | `1` builds an SA-1 cartridge (its own memory map; not with `USE_HIROM`) |
 | `USE_SUPERFX` | `0` | `1` builds a Super FX cartridge (LoROM-mapped; not with `USE_HIROM` or `USE_SRAM`) |
+| `GSU_BANK` | (none) | ROM bank (1 to `ROM_BANKS` − 1) the Super FX program is linked in, at `$8000`: its labels become real addresses, so absolute jumps and tables in ROM work (`GSU_SECTION` in the loader, one `.sfx` in `GSUSRC`). Unset = assembled at 0, placed where it fits, position-independent code only |
 | `GSU_RAM_KB` | `64` | Super FX Game Pak RAM declared in the extended header (`$FFBD`) |
 | `USE_DSP1` | `0` | `1` declares a DSP-1 cartridge and links the `dsp1` module (LoROM board; not with `USE_HIROM`) |
 

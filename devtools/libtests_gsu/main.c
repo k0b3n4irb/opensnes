@@ -17,7 +17,8 @@ extern const u8 gsu_job[], gsu_job_end[];
 extern void gsuJobReadResults(void);
 extern void gsuJobClearResults(void);
 extern void gsuMulReadResult(void);
-extern u16 r_sum, r_outer, r_marker, r_mul;
+extern void gsuRomReadResult(void);
+extern u16 r_sum, r_outer, r_marker, r_mul, r_rom;
 extern void ramRunRomJob(void);
 extern u16 r_ram_frames, r_ram_polls;
 extern volatile u16 frame_count;
@@ -70,6 +71,11 @@ u16 r_busy_at_irq;
 u16 r_mul_entry;
 u16 r_mul_rom;
 u16 r_mul_cache;
+/** @brief where the link put the program: $01:8000, as GSU_BANK asks */
+u16 r_prog_addr;
+u16 r_prog_bank;
+/** @brief rom_job: the program's own table, read at its absolute address */
+u16 r_rom_table;
 /** @brief end marker for the test script */
 u16 r_done;
 
@@ -141,6 +147,17 @@ int main(void) {
     gsuWait();
     gsuMulReadResult();
     r_mul_cache = r_mul;
+
+    /* The third entry point: a table of the program read through ROMB /
+     * GETB and an absolute jump. Right only because the program is linked
+     * at the address the ROM gives it (GSU_BANK in the Makefile). */
+    r_prog_addr = (u16)(u32)(void *)gsu_job;
+    r_prog_bank = (u16)((u32)(void *)gsu_job >> 16);
+    gsuJobClearResults();
+    gsuSetProgram(gsu_job);
+    gsuCall(GSU_JOB_ROM_JOB);
+    gsuRomReadResult();
+    r_rom_table = r_rom;
     r_done = 0xD0E5;
 
     while (1) {

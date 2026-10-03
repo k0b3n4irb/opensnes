@@ -96,8 +96,9 @@ library's.
 
 ```asm
 .ifdef SUPERFX
-; The GSU binary, in any ROM bank (the library reads the bank from the pointer)
-ASSET_SECTION ".gsu_code"
+; The GSU binary. Placed where it fits, in any ROM bank (the library reads
+; the bank from the pointer) — or at $n:8000 when the Makefile sets GSU_BANK
+GSU_SECTION ".gsu_code"
 gsu_program:
     .incbin "gsu_code.sfx.bin"
 gsu_program_end:
@@ -354,10 +355,45 @@ gsuCall(GSU_JOB_MUL_JOB);       /* R0-R7 and R9-R13 are yours; the launcher writ
 ```
 
 `devtools/libtests_gsu` runs `mul_job` both ways. The offsets are relative to
-the binary, and the program is assembled at 0: code that only branches
-(relative) runs anywhere, but an absolute jump or an address of a ROM table
-inside the program would need the binary linked at its ROM address, which
-the build does not do yet.
+the binary. By default the program is assembled at 0 and placed by the
+linker where it fits, so only position-independent code is right: relative
+branches, `LOOP` through `MOVE R13, R15`.
+
+### Absolute jumps and tables in ROM: `GSU_BANK`
+
+A program that jumps to an absolute address or reads a table of its own
+needs its labels to be the addresses the GSU sees. One line in the Makefile
+does it:
+
+```makefile
+GSU_BANK := 1        # the program is linked at $01:8000
+```
+
+The `.sfx` is then assembled at `$8000` and `GSU_SECTION` forces the binary
+to the start of ROM bank 1, which the GSU reads at the same address (it
+sees banks `$00-$3F` as LoROM, ROM at `$8000-$FFFF`). `GSU_BANK` is also
+defined inside the `.sfx`:
+
+```asm
+rom_job:
+    IBT R0, #GSU_BANK
+    ROMB                    ; ROM bank for GETB = the program's bank
+    IWT R14, #_table        ; R14 = ROM address: the ROM buffer loads
+    GETB                    ; R0 = table[0]
+    IWT R15, #_far          ; absolute jump (delay slot follows)
+    NOP
+_table:
+    .db $A5, $3C
+_far:
+    ...
+```
+
+The generated `.sfx.h` still holds offsets, so `gsuCall()` and
+`gsuStartCached()` are called the same way. One `.sfx` per ROM in this mode
+(`.include` the others from it); bank 1's top is the RAM code window, so a
+program longer than what is left below it fails at link rather than at
+run. `devtools/libtests_gsu` is built this way: its `rom_job` returns the
+two table bytes, and returns 0 when the same binary is placed elsewhere.
 
 ## SuperFX Assembly Rules
 

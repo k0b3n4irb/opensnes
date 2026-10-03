@@ -179,6 +179,16 @@ endif
 ifeq ($(USE_HIROM)$(USE_DSP1),11)
 $(error USE_HIROM=1 with USE_DSP1=1 is not supported: the dsp1 module drives the LoROM board ($$30:8000 data, $$30:C000 status); the HiROM DSP-1 board maps it elsewhere)
 endif
+# GSU_BANK: link the GSU program at $$n:8000 (see the .sfx rule below).
+GSU_BANK ?=
+ifneq ($(GSU_BANK),)
+ifneq ($(USE_SUPERFX),1)
+$(error GSU_BANK is set without USE_SUPERFX=1: it places a Super FX program)
+endif
+ifneq ($(words $(GSUSRC)),1)
+$(error GSU_BANK needs exactly one file in GSUSRC (got: $(GSUSRC)): one program is linked at $$$(GSU_BANK):8000 — .include the others from it)
+endif
+endif
 ifeq ($(USE_SRAM)$(USE_SUPERFX),11)
 $(error USE_SRAM=1 with USE_SUPERFX=1 is not supported: the sram module writes bank $$70, which on a Super FX cart is the GSU's own Game Pak RAM (GSU_RAM_KB). Save data there needs a design that no module has yet)
 endif
@@ -211,6 +221,9 @@ endif
 # The SDK's own share of the window, added to the project's: a Super FX
 # build keeps its interrupt entries and gsuLaunch's wait loop there
 # (crt0 gsu_nmi_blob & co., lib superfx.asm), 2026-09-29.
+ifneq ($(GSU_BANK),)
+ASFLAGS += -D GSU_BANK_VAL=$(GSU_BANK)
+endif
 RAM_CODE_SDK   := $(if $(filter 1,$(USE_SUPERFX)),768,0)
 RAM_CODE_TOTAL := $(shell echo $$(( $(RAM_CODE_SIZE) + $(RAM_CODE_SDK) )))
 ifneq ($(RAM_CODE_TOTAL),0)
@@ -383,9 +396,15 @@ ifneq ($(GSUSRC),)
 # label of the GSU program, its offset in the binary — the entry points C
 # passes to gsuCall() / gsuStartCached(). gsu_job.sfx's label `add_job`
 # becomes GSU_JOB_ADD_JOB. Labels starting with _ or @ are local, skipped.
+#
+# GSU_BANK = n (2026-10-03) links the program at its real address: it is
+# assembled at $$8000 (memmap_gsu.inc) and GSU_SECTION (assets.inc) puts it
+# at the start of ROM bank n, so its labels are addresses the GSU can jump
+# to and read from. The .sfx.h keeps OFFSETS either way (label - $$8000):
+# gsuCall() and gsuStartCached() add them to the program's address.
 %.sfx.bin %.sfx.h: %.sfx
-	@echo "[GSU] $< -> $*.sfx.bin, $*.sfx.h"
-	@$(GSU_AS) -I $(TEMPLATES) -o $*.sfx.o $<
+	@echo "[GSU] $< -> $*.sfx.bin, $*.sfx.h$(if $(GSU_BANK), (linked at bank $(GSU_BANK), \$$8000))"
+	@$(GSU_AS) $(if $(GSU_BANK),-D GSU_BANK=$(GSU_BANK)) -I $(TEMPLATES) -o $*.sfx.o $<
 	@echo "[objects]" > $*.sfx.link
 	@echo "$*.sfx.o" >> $*.sfx.link
 	@$(LD) -S -b $*.sfx.link $*.sfx.bin
@@ -394,8 +413,10 @@ ifneq ($(GSUSRC),)
 	  echo " * offsets in $*.sfx.bin (gsuCall, gsuStartCached). Do not edit. */"; \
 	  echo "#ifndef $${P}_SFX_H"; echo "#define $${P}_SFX_H"; \
 	  awk -v P="$$P" '/^\[labels\]/{f=1;next} /^\[/{f=0} \
-	    f && NF==2 && $$2 ~ /^[A-Za-z][A-Za-z0-9_]*$$/ { split($$1,a,":"); \
-	    printf "#define %s_%s 0x%su\n", P, toupper($$2), a[2] }' $*.sfx.sym; \
+	    f && NF==2 && $$2 ~ /^[A-Za-z][A-Za-z0-9_]*$$/ { split($$1,a,":"); o=a[2]; \
+	    d=index("89abcdef", tolower(substr(o,1,1))); \
+	    if (d) o=(d-1) substr(o,2); \
+	    printf "#define %s_%s 0x%su\n", P, toupper($$2), o }' $*.sfx.sym; \
 	  echo "#endif"; } > $*.sfx.h
 	@rm -f $*.sfx.o $*.sfx.link $*.sfx.sym
 endif

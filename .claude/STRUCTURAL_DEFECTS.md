@@ -2476,9 +2476,9 @@ found `gsuDmaFullFrame` dropping a third of `superfx_3d`'s framebuffer
 (OPVCT read once per poll, the read-twice flip-flop never reset); fixed, and every example now passes luna's
 `unsafe_writes = 0` (`vram_dma_blank.py`).
 
-**Left open, none blocking**: linking a GSU program at its ROM address
-(absolute jumps and ROM tables inside a program — assembled at 0 today);
-using the bottom letterbox band for `gsuPresent` (needs the lib to own a
+Linking a GSU program at its ROM address shipped 2026-10-03 (`GSU_BANK`).
+**Left open, none blocking**: a save for Super FX games; using the bottom
+letterbox band for `gsuPresent` (needs the lib to own a
 V-timer IRQ).
 
 **Cross-references**: `KNOWN_LIMITATIONS.md` (the NMI entry of 2026-09-25),

@@ -68,6 +68,9 @@ r_c_polls = { gt = 1000 }
 r_mul_entry = 0x28
 r_mul_rom = 2100
 r_mul_cache = 9000
+r_prog_addr = 0x8000      # GSU_BANK := 1: the program is at $01:8000 ...
+r_prog_bank = 1
+r_rom_table = 0x3CA5      # ... so its table and its absolute jump are where it was assembled for
 r_done = 0xD0E5
 
 [asserts.gsu]

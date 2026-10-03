@@ -5,6 +5,18 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(build): **`GSU_BANK` links the Super FX program at its real ROM
+  address.** Until now a `.sfx` was assembled at 0 and placed by the linker
+  where it fitted, so only position-independent GSU code was right: an
+  absolute jump or a table of the program read through `ROMB` / `GETB`
+  pointed elsewhere. `GSU_BANK := n` in the Makefile assembles the program
+  at `$8000` and `GSU_SECTION` (new macro, `templates/assets.inc`; an
+  `ASSET_SECTION` when `GSU_BANK` is unset) forces it to `$n:8000`, where
+  the GSU reads it. The generated `.sfx.h` keeps offsets, so `gsuCall()`
+  and `gsuStartCached()` do not change. One `.sfx` per ROM in that mode.
+  The GSU fixture is built this way and gains `rom_job` (table read and
+  absolute jump): `$3CA5`; the same binary placed elsewhere returns 0.
+  This closes the last part of the Super FX runtime's phase F.
 - feat(lib): **`oamDrawMetasprite(id, x, y, frame, &style, flip)`** replaces
   `oamDrawMeta()` (7 arguments) and `oamDrawMetaFlip()` (11) (API decision
   on principle 4, shape chosen by the owner). A `MetaspriteStyle`, usually

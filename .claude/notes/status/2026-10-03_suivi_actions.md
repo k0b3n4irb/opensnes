@@ -46,7 +46,7 @@ day (summarised at the end of this note).
 | 31 | Compile-only fixtures checked, runtime `u32 f(void)` | 🟡 | done | `5aa7868c`, `01bb42cf`, `f143c6c7`, `e428d940` |
 | 32 | Two-snapshot liveness, scripted pads, audio covered | 🟡 | done | `18ed12f4`, `a6fabb57`, `b12a752a`, `d2b4bd51`, `114993e3` |
 | 33 | First console session | 🟠 | not started | **owner** (hardware). `docs/HARDWARE_VERIFICATION.md`: "No session recorded yet"; row 23 added (`841385db`) |
-| 34 | Super FX phases C, E, D, F | 🟠 | partly | phases A-F merged (catalogue E3 resolved). Left: GSU program linked at its real ROM address; a save for Super FX games |
+| 34 | Super FX phases C, E, D, F | 🟠 | partly | phases A-F merged (catalogue E3 resolved). GSU program linked at its real ROM address: done 2026-10-03 (`GSU_BANK`). Left: a save for Super FX games |
 | 35 | Showcase game: version it or drop the line | 🟠 | **owner** | ROADMAP says it moved to its own repository (`06930df8`) |
 | 36 | Stack pressure: slot coalescing, no frame over 256 bytes | 🟠 | partly | `c1631377` (518 -> 214). Left: the `sta/lda N,s` pair removal, compare-to-branch fusion |
 | 37 | Fork resync plan and upstreaming | 🟡 | partly | counts tracked (`f143c6c7`, `f1df92ba`); nothing upstreamed (catalogue A5) |

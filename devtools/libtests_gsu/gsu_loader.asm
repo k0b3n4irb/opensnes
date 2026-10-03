@@ -2,7 +2,7 @@
 ; The GSU job binary and the Game Pak RAM readback for main.c
 ;==============================================================================
 .ifdef SUPERFX
-ASSET_SECTION ".gsu_job"
+GSU_SECTION ".gsu_job"
 gsu_job:
     .incbin "gsu_job.sfx.bin"
 gsu_job_end:
@@ -15,6 +15,7 @@ r_sum:    dsb 2
 r_outer:  dsb 2
 r_marker: dsb 2
 r_mul:    dsb 2             ; SRAM[6..7], mul_job's product
+r_rom:    dsb 2             ; SRAM[8..9], rom_job's two table bytes
 .ENDS
 
 .SECTION ".gsu_readback" SEMIFREE
@@ -57,6 +58,17 @@ gsuJobClearResults:
     sta.l $700002
     sta.l $700004
     sta.l $700006
+    sta.l $700008
+    plp
+    rtl
+
+; gsuRomReadResult — Game Pak RAM $70:0008 (rom_job's table bytes) -> r_rom.
+gsuRomReadResult:
+    php
+    rep #$20
+    .ACCU 16
+    lda.l $700008
+    sta.l r_rom
     plp
     rtl
 .ENDS
