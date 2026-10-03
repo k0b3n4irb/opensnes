@@ -184,6 +184,11 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **the dynamic sprite engine's VRAM queue is bounded.** It holds
+  128 entries and the NMI drains seven a frame; the index advanced without
+  a bound, so more than 128 pending refreshes overwrote the engine's own
+  state, index included. A full queue now leaves the sprite's refresh flag
+  set and tries again next frame (library audit, row 6).
 - fix(tools): **`sa1_patch` keeps the header checksum right.** Patching
   the map mode byte to `$23` added 3 to the ROM's byte sum; every SA-1 ROM
   shipped with a checksum off by 3 (luna and most emulators check only
