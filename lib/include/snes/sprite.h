@@ -115,50 +115,6 @@
 #define MAXSPRTRF   (7 * 6)
 
 /*============================================================================
- * Sprite Lookup Tables (for dynamic sprite management)
- *============================================================================*/
-
-/**
- * VRAM addressing lookup tables for dynamic sprite engines.
- * These tables convert sprite frame indices to VRAM addresses.
- *
- * Usage:
- *   u16 vramOffset = lkup16oamS[frameId];  // VRAM source offset
- *   u16 tileId = lkup16idT[spriteSlot];    // OAM tile number
- *   u16 vramDest = lkup16idB[spriteSlot];  // VRAM destination
- */
-
-/** @brief VRAM source offsets for 16x16 sprites (64 entries) */
-extern u16 lkup16oamS[];
-
-/** @brief OAM tile IDs for 16x16 sprites - small size mode (64 entries) */
-extern u16 lkup16idT[];
-
-/** @brief OAM tile IDs for 16x16 sprites - large size mode (64 entries) */
-extern u16 lkup16idT0[];
-
-/** @brief VRAM destination addresses for 16x16 sprites (64 entries) */
-extern u16 lkup16idB[];
-
-/** @brief VRAM source offsets for 32x32 sprites (16 entries) */
-extern u16 lkup32oamS[];
-
-/** @brief OAM tile IDs for 32x32 sprites (16 entries) */
-extern u16 lkup32idT[];
-
-/** @brief VRAM destination addresses for 32x32 sprites (16 entries) */
-extern u16 lkup32idB[];
-
-/** @brief VRAM source offsets for 8x8 sprites (128 entries) */
-extern u16 lkup8oamS[];
-
-/** @brief OAM tile IDs for 8x8 sprites (128 entries) */
-extern u16 lkup8idT[];
-
-/** @brief VRAM destination addresses for 8x8 sprites (128 entries) */
-extern u16 lkup8idB[];
-
-/*============================================================================
  * Dynamic Sprite Structure
  *============================================================================*/
 

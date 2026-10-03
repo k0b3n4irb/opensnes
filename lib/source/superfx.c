@@ -77,6 +77,7 @@ extern u8 gsu_pres_busy, gsu_pres_flags, gsu_pres_nba_back, gsu_pres_nba_front;
 extern u8 gsu_pres_scbr_a, gsu_pres_scbr_b;
 extern u16 gsu_pres_src, gsu_pres_off, gsu_pres_size;
 extern u16 gsu_pres_vram_back, gsu_pres_vram_front, gsu_pres_vtotal;
+extern u16 gsu_pres_frames, gsu_pres_last;   /* diagnostics: no public header declares them */
 extern u8 bg12nba_shadow;   /* background.c */
 
 u16 gsuFrameBytes(void) {

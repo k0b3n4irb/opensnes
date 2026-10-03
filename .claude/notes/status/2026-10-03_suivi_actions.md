@@ -30,7 +30,7 @@ day (summarised at the end of this note).
 | 15 | Stale example comments, `port-example/SKILL.md` | 🟠 | done | `38c4b7ed` |
 | 16 | Governance cleanup | 🟡 | done | `e9ecf489`, `cdba4544` |
 | 17 | Replace Nintendo / PVSnesLib assets, `docs/ASSET_PROVENANCE.md` | 🔴 | **owner** | deferred by the owner on 2026-09-26 (`06930df8`); 66 files in 23 examples; v1.0 must-have |
-| 18 | D1-D5, freeze criteria, ROADMAP v1.0 table | 🟠 | **decided 2026-10-03**, not applied | all rows as recommended (table at the top of the sheet); application: one row per commit, D4 first |
+| 18 | D1-D5, freeze criteria, ROADMAP v1.0 table | 🟠 | **decided and applied 2026-10-03** except the struct variants (associated 1), which wait for the owner's choice of shape | all rows as recommended (table at the top of the sheet); application: one row per commit, D4 first |
 | 19 | `check_doc_drift.py` extended (a-e) | 🟠 | done | `2c2d6905`, `8ed23df4`, `fbbacace`, `295d16f7` |
 | 20 | Compiler invariant on Kl defs | 🟠 | done | `6ecb255a` |
 | 21 | Constant multiply inlined | 🟠 | done | `e01ffa29`, `6d62c443` |

@@ -125,8 +125,11 @@ static const OamDynamicConfig cfg = {
 oamDynamicInit(&cfg);
 ```
 
-**Implication:** any new public function with more than three arguments
-gets a struct. Sentinel values (`OBJ_HIDE_Y = 240`, `OAM_Y_OFFSCREEN = 224`)
+**Implication:** any new public function with more than five arguments
+gets a struct (the threshold was three until 2026-10-03: at four and five,
+a struct filled on every call costs more than the positional form it
+replaces, and the functions inherited from PVSnesLib keep their signature
+whatever their length). Sentinel values (`OBJ_HIDE_Y = 240`, `OAM_Y_OFFSCREEN = 224`)
 get named macros. Magic numbers in tutorials are replaced by the
 matching constant.
 

@@ -136,11 +136,6 @@ extern u8 gsu_owns_cart;
  */
 extern u8 gsu_scmr_live;
 
-/** @brief Frames gsuPresent() has put on screen so far */
-extern u16 gsu_pres_frames;
-
-/** @brief Bytes the last transferring NMI moved (a diagnostic: the window) */
-extern u16 gsu_pres_last;
 
 /*============================================================================
  * API Functions

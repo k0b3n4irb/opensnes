@@ -101,6 +101,18 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- **BREAKING** refactor(lib): **twelve internal variables leave the public
+  headers** (API decision D4, last part): the ten `lkup*` VRAM lookup
+  tables of the dynamic sprite engine (`sprite.h`; only the engine's
+  assembly reads them) and the `gsuPresent()` diagnostics `gsu_pres_frames`
+  / `gsu_pres_last` (`superfx.h`). No example and no page used them; a
+  project that did declares them `extern` itself. Five Super FX variables
+  that the same list would have removed **stay public**: `gsu_stop_irqs`,
+  `gsu_owns_cart`, `gsu_prog_bank`, `gsu_prog_addr` and `gsu_scmr_live` are
+  the documented contract for code that starts a GSU job by itself
+  (`docs/tutorials/superfx.md`).
+- docs: `PHILOSOPHY.md`, principle 4 — a struct is asked of a new function
+  with more than **five** arguments, not three (API decision).
 - docs: **`WaitForVBlank()` keeps its name** (API decision D2). The one
   function of the library with a capital first letter stays as it is — it
   is the name every PVSnesLib port arrives with — and `PHILOSOPHY.md`, the
