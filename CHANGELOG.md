@@ -184,6 +184,11 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(templates,examples): **the SA-1 program section is pinned to ROM
+  bank 0.** The SA-1's reset vector is 16-bit, so the program must sit in
+  bank 0; `.sa1_boot` was `SUPERFREE`, and a program too big for bank 0's
+  free space landed at `$01:8000` with no error — the SA-1 never booted
+  and only `sa1IsReady()` said so (chips audit, S3).
 - fix(lib): **a 17th `snesmodLoadEffect()` returns `0xFF`** and loads
   nothing: it returned 16, which `snesmodPlayEffect()` masks to four bits
   and played as effect 0 (library audit, row 29).

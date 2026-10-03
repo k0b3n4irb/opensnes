@@ -21,7 +21,7 @@
 
 .ifdef SA1
 
-.SECTION ".sa1_boot" SUPERFREE
+.SECTION ".sa1_boot" BANK 0 SLOT 0 SEMIFREE   ; the SA-1 reset vector is 16-bit: the program must sit in ROM bank 0 (2026-10-03; SUPERFREE let a big program drift to bank 1 and the SA-1 never booted)
 
 .ACCU 16
 .INDEX 16
