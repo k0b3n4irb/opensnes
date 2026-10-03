@@ -79,3 +79,15 @@ Aucun défaut silencieux trouvé dans : la sauvegarde Super FX (`SRAM_GSU_TAKE/G
 ## Verdict
 
 Le Super FX a rattrapé l'écart du 26/09 (vrai runtime testé avec contrôles négatifs et `bus_violations = 0`), le DSP-1 est complet et typé, et le SA-1 démarre et sauvegarde, avec une vitesse mesurée, mais reste en 1.0 un « boot + I-RAM + BW-RAM » sans API coprocesseur, à annoncer comme tel. La chasse a trouvé trois défauts silencieux réels — MS0 forcé à 21 MHz contre l'arbitre, une table HDMA de letterbox fausse pour `top = 0` (1,8 million d'octets VRAM perdus, mesuré) et `SA1Start` hors bank $00 accepté au link (reproduit) — plus un gate CI cassé par `dsp1SetCamera`, chacun corrigeable en moins d'un jour. Avant le gel, il faut les corriger, les inscrire dans `silent_defects_log.md` et confier au protocole console ce que luna ne peut pas trancher (S1, S5, les sauvegardes sur FXPak).
+
+## Suivi (2026-10-03)
+
+- **S6 retiré.** CBWE (`$2227`) n'était pas écrit par le stub SA-1, mais la
+  protection BW-RAM ne joue que si SBWE et CBWE sont tous deux à 0 (ares,
+  `sa1/bwram.cpp`, chunk `c25ad9d888253bd9`, cas Kirby's Dream Land 3), et
+  crt0 met SBWE à 1 depuis le 2026-09-26 : les écritures du SA-1 passaient.
+  Vérifié sur luna : la fixture `libtests_sa1_sram` lit `$5A` à `$40:0100`
+  écrit par le SA-1 avec ou sans CBWE. Le stub écrit désormais CBWE par
+  conformité au manuel (4.1.23) ; aucune ligne au journal.
+- **S4 corrigé** (`1b4ede5a`) : `gsuPresentInit` refuse les tampons au-delà
+  des 64 premiers Ko.

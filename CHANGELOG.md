@@ -414,6 +414,13 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- chore(runtime): the SA-1 boot stub also sets CBWE (`$2227`, the SA-1's
+  own BW-RAM write enable), as the Nintendo manual asks. Not a fix: the
+  protection holds only while SBWE and CBWE are both clear (ares
+  `bwram.cpp`, from Kirby's Dream Land 3) and crt0 sets SBWE, so the SA-1's
+  writes already went through — the chips audit's S6 is withdrawn. The SA-1
+  SRAM fixture now proves the coprocessor's write to the save memory
+  (`r_sa1_bw`).
 - test(luna-test): **luna pinned at v1.32.0** (`luna diff --audio`, the two
   clearer `region` messages). `docs/tools/luna.md` regenerated. The three
   audio-comparison runs of our request were replayed on the published

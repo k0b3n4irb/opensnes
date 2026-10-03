@@ -14,7 +14,10 @@
  * Memory accessible by SA-1:
  *   - ROM ($00-$3F:$8000-$FFFF via Super MMC)
  *   - I-RAM ($3000-$37FF, 2KB, shared with main CPU)
- *   - BW-RAM ($40-$5F, 256KB, battery-backed)
+ *   - BW-RAM (banks $40-$4F on both CPUs, up to 256 KB, mirrors from $44;
+ *     the SA-1 also sees it as a 2/4-bit pixel buffer at $60-$6F — fullsnes,
+ *     "Memory Map". This SDK's header declares 32 KB, and both write
+ *     enables, SBWE by crt0 and CBWE by the boot stub, are set at reset)
  *
  * Memory NOT accessible by SA-1:
  *   - Main WRAM ($7E-$7F)

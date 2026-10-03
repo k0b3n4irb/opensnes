@@ -10,6 +10,7 @@
 ;   $3001+: Available for application use
 ;==============================================================================
 
+; libtest_sa1_sram: the SDK boot stub plus one BW-RAM write (see below).
 .ifdef SA1
 
 .SECTION ".sa1_boot" BANK 0 SLOT 0 SEMIFREE   ; the SA-1 reset vector is 16-bit: the program must sit in ROM bank 0 (2026-10-03; SUPERFREE let a big program drift to bank 1 and the SA-1 never booted)
@@ -42,6 +43,13 @@ SA1Start:
     ; fix: SA-1 writes to BW-RAM already went through.
     lda #$80
     sta.l $002227               ; CBWE = write enabled
+
+    ; Fixture only: the SA-1 writes BW-RAM and the SNES side reads the byte
+    ; back with sramLoadOffset(., 1, $100) (r_sa1_bw). No negative control
+    ; is possible here: the protection holds only when SBWE and CBWE are
+    ; both clear, and crt0 sets SBWE (ares bwram.cpp; luna agrees).
+    lda #$5A
+    sta.l $400100
 
     ; Signal ready
     lda #$A5

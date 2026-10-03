@@ -75,6 +75,14 @@ SA1Start:
     lda #$FF
     sta.l $00222A               ; CIWP = $FF
 
+    ; Enable SA-1 BW-RAM writes too: CBWE ($2227) bit 7, 1 = write enabled
+    ; (fullsnes; Nintendo manual 4.1.23). crt0 sets the SNES side (SBWE) and
+    ; the protection only holds while BOTH are clear (ares bwram.cpp, from
+    ; Kirby's Dream Land 3), so this is the form the manual asks for, not a
+    ; fix: SA-1 writes to BW-RAM already went through.
+    lda #$80
+    sta.l $002227               ; CBWE = write enabled
+
     ; Clear state
     lda #$00
     sta.l $3002                 ; frame = 0
