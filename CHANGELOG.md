@@ -190,6 +190,12 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(examples): **`basics/scene_stack` redraws its title when the counter
+  pops back to it.** `init` runs once per push and not on resume (the
+  scene contract), so the title stayed hidden behind the counter's last
+  screen while the README promised the return to the title (examples
+  audit). The counter sets a flag before popping; the title redraws on its
+  first update, and the manifest counts the redraw.
 - fix(lib): **`UNFIX_ROUND()` overflowed from 127.5**: `x + 128` was a
   16-bit sum; it is taken on 32 bits (library audit, row 27).
   **`gsuPresentInit()` refuses buffers past the first 64 KB of Game Pak

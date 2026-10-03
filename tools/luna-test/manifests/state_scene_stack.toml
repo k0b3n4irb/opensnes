@@ -13,3 +13,5 @@ at_frame = 180
 input = "120:0x1000,124:0"
 [checkpoint.delta]
 scene_top = { dir = "decreased", width = 1 }
+[checkpoint.values]
+title_redraws = { eq = 1, width = 2 }   # the resumed title redrew itself (2026-10-03: it stayed hidden behind the counter)
