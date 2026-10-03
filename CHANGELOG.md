@@ -101,6 +101,13 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- **BREAKING** refactor(lib): **the map camera is read with
+  `mapGetCameraX()` / `mapGetCameraY()`; the exported globals `x_pos` and
+  `y_pos` are gone** (API decision D4, the one row no alias could fix after
+  the freeze: a public header must not claim names a game wants for itself).
+  Replace `x_pos` by `mapGetCameraX()` and `y_pos` by `mapGetCameraY()`;
+  assembly reads `map_cam_x` / `map_cam_y`. Five examples, two manifests and
+  the map and object tutorials migrated.
 - test(luna-test): **luna v1.31.0.** `luna test` manifests take
   `region = "pal"` (the documented name of `force_region`, still accepted)
   and `--report json` echoes it. `make test-pal` uses `region`. `make tests`

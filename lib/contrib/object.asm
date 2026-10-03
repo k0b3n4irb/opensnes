@@ -945,7 +945,7 @@ _oiual3:
 
     lda objbuffers.1.xpos+1,x
     sec
-    sbc.l x_pos
+    sbc.l map_cam_x
 
     cmp.w #OB_SCR_XRR_CHK
     bcc _oiual3y
@@ -955,7 +955,7 @@ _oiual3:
 _oiual3y:
     lda objbuffers.1.ypos+1,x
     sec
-    sbc.l y_pos
+    sbc.l map_cam_y
 
     cmp.w #OB_SCR_YRR_CHK
     bcc _oiual32
@@ -968,7 +968,7 @@ _oiual3y1:
 _oiual32:
     lda objbuffers.1.xpos+1,x
     sec
-    sbc.l x_pos
+    sbc.l map_cam_x
     cmp.w #OB_SCR_XRI_CHK
     bcc _oiual3sy
     cmp.w #OB_SCR_XLE_CHK
@@ -977,7 +977,7 @@ _oiual32:
 _oiual3sy:
     lda objbuffers.1.ypos+1,x
     sec
-    sbc.l y_pos
+    sbc.l map_cam_y
 
     cmp.w #OB_SCR_YRI_CHK
     bcc _oiuals32

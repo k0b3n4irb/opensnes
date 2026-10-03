@@ -31,7 +31,7 @@
 ;   it before returning. C callers arrive with DB=$00 — reading the
 ;   $7E symbols with an absolute,X and the caller's DB is the #103
 ;   open-bus bug class; use `.l` long addressing or set DB.
-; - x_pos/y_pos live in the BANK 0 section (C-accessible on purpose);
+; - map_cam_x/map_cam_y live in the BANK 0 section (C-accessible on purpose);
 ;   everything else is bank $7E — do not move symbols between the two
 ;   sections without auditing every access mode.
 ; - mapVblank runs INSIDE the NMI handler: VBlank budget applies
@@ -103,8 +103,8 @@ bgvvramloc_L1           DW                  ; VRAM word address to store vertica
 bgleftvramlocl_L1       DW                  ; VRAM word address for horizontal buffer (left tilemap)
 bgrightvramlocr_L1      DW                  ; VRAM word address for horizontal buffer (right tilemap)
 
-x_pos                   DW                  ; x Position of the screen (C-accessible)
-y_pos                   DW                  ; y Position of the screen (C-accessible)
+map_cam_x                   DW                  ; x Position of the screen (C-accessible)
+map_cam_y                   DW                  ; y Position of the screen (C-accessible)
 
 .ENDS
 
@@ -121,8 +121,8 @@ metatilesprop           DSW MAP_MAXMTILES*2 ; tiles properties (block, spike, fi
 mapwidth                DW                  ; Width of the map in pixels
 mapheight               DW                  ; Height of the map in pixels
 
-maxx_pos                DW                  ; Maximum value of x_pos
-maxy_pos                DW                  ; Maximum value of y_pos
+maxx_pos                DW                  ; Maximum value of map_cam_x
+maxy_pos                DW                  ; Maximum value of map_cam_y
 
 maptile_L1b             DB                  ; map layer 1 tiles bank address
 maptile_L1d             DW                  ; map layer 1 tiles data address
@@ -184,7 +184,7 @@ mapUpdateCamera:
     .ACCU 16
     lda 8,s                                 ; xpos (param 1)
     sec
-    sbc.l x_pos
+    sbc.l map_cam_x
     cmp #(256-MAP_SCRLR_SCRL)
     bmi _muc2
 
@@ -195,7 +195,7 @@ mapUpdateCamera:
     bcc _muc1
     lda.l maxx_pos
 _muc1:
-    sta.l x_pos
+    sta.l map_cam_x
     brl _muc4
 
 _muc2:
@@ -216,12 +216,12 @@ _muc2:
     lda #$0
 
 _muc22:
-    sta.l x_pos
+    sta.l map_cam_x
 
 _muc4:
     lda 6,s                                 ; ypos (param 2)
     sec
-    sbc.l   y_pos
+    sbc.l   map_cam_y
     cmp #(224-MAP_SCRUP_SCRL)
     bmi _muc6
 
@@ -232,7 +232,7 @@ _muc4:
     bcc _muc5
     lda.l maxy_pos
 _muc5:
-    sta.l y_pos
+    sta.l map_cam_y
     brl _mucend
 
 _muc6:
@@ -245,7 +245,7 @@ _muc6:
     lda #$0
 
 _muc62:
-    sta.l y_pos
+    sta.l map_cam_y
 
 _mucend:
     plb
@@ -294,8 +294,8 @@ mapLoad:
     sta.l mapheight
 
     lda #0
-    sta.l x_pos
-    sta.l y_pos
+    sta.l map_cam_x
+    sta.l map_cam_y
 
     lda 18,s                                ; layer1map low 16 again
     clc
@@ -374,7 +374,7 @@ mapLoad:
 
     ; Clamp like the height below (2026-09-20): a map narrower than the
     ; screen gave maxx_pos = $FFxx, and mapUpdateCamera's unsigned compare
-    ; then let x_pos run off the right edge of the map.
+    ; then let map_cam_x run off the right edge of the map.
     lda.l mapwidth
     cmp.w #256
     bcs _mini0
@@ -504,13 +504,13 @@ _mapRefreshAll1:
     rep #$30
     .ACCU 16
     .INDEX 16
-    lda.l y_pos
+    lda.l map_cam_y
     lsr
     lsr
     and #$FFFE
     tax
 
-    lda.l x_pos
+    lda.l map_cam_x
     lsr
     lsr
     and #$FFFE
@@ -582,21 +582,21 @@ _mapDAS1:
     brl _mapDAS
 
 _mapDAS2:
-    lda.l x_pos
+    lda.l map_cam_x
     and.w #$FFFF - (MAP_MTSIZE - 1)
     sta.l mapdisplaydeltax
     sta.l mapvisibletopleftxpos
 
-    lda.l y_pos
+    lda.l map_cam_y
     and.w #$FFFF - (MAP_MTSIZE - 1)
     sta.l mapdisplaydeltay
     sta.l mapvisibletopleftypos
 
-    lda.l x_pos
+    lda.l map_cam_x
     and.w #(MAP_MTSIZE - 1)
     sta.l dispxofs_L1
 
-	lda.l y_pos
+	lda.l map_cam_y
 	and.w #(MAP_MTSIZE - 1)
 	dec a
 	sta.l dispyofs_L1
@@ -929,7 +929,7 @@ _maupd1:
     rep #$30
     .ACCU 16
     .INDEX 16
-    lda.l x_pos
+    lda.l map_cam_x
     sec
     sbc.w mapvisibletopleftxpos
     bcc _mappud2
@@ -1028,12 +1028,12 @@ _mapupd51:
     rep #$20
     .ACCU 16
 _mapupd3:
-    lda.l x_pos
+    lda.l map_cam_x
     sec
     sbc mapdisplaydeltax
     sta.l dispxofs_L1
 
-    lda.l y_pos
+    lda.l map_cam_y
     sec
     sbc mapvisibletopleftypos
     bcc _mapupd6
@@ -1130,7 +1130,7 @@ _mapupda:
     .ACCU 16
 
 _mapupd9:
-	lda.l y_pos
+	lda.l map_cam_y
 	clc
 	sbc.l mapdisplaydeltay
 	sta.l dispyofs_L1
@@ -1298,6 +1298,38 @@ mapSetMapOptions:
     sta mapoptions
 
     plb
+    plp
+    rtl
+
+.ENDS
+
+;==============================================================================
+; CODE SECTION 4 - Camera accessors
+;==============================================================================
+
+.SECTION ".maps4_text" SUPERFREE
+
+;------------------------------------------------------------------------------
+; u16 mapGetCameraX(void);
+; u16 mapGetCameraY(void);
+;------------------------------------------------------------------------------
+; The camera position mapUpdateCamera() computed, in pixels. The variables
+; were the exported globals x_pos / y_pos until 2026-10-03 (decision D4): a
+; public header must not claim names a game will want for itself.
+;------------------------------------------------------------------------------
+mapGetCameraX:
+    php
+    rep #$20
+    .ACCU 16
+    lda.l map_cam_x
+    plp
+    rtl
+
+mapGetCameraY:
+    php
+    rep #$20
+    .ACCU 16
+    lda.l map_cam_y
     plp
     rtl
 

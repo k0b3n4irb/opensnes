@@ -89,7 +89,7 @@ int main(void) {
 The three-call rhythm each frame is the whole contract:
 
 - **`mapUpdateCamera(x, y)`** — set the camera's world position. The module
-  exposes the live scroll in the globals `x_pos` / `y_pos`.
+  gives the live scroll through `mapGetCameraX()` / `mapGetCameraY()`.
 - **`mapUpdate()`** — compute which column/row just came into view and stage
   it. Cheap; runs in the active frame.
 - **`mapVblank()`** — do the actual VRAM DMA of the staged strip. Must run

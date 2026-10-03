@@ -47,7 +47,7 @@ _DEP_object := map sprite sprite_dynamic
 ```
 
 Those are not optional extras. The engine reads the map module's camera
-(`x_pos` / `y_pos`) to decide which objects are near enough to update, it
+(`mapGetCameraX()` / `mapGetCameraY()`) to decide which objects are near enough to update, it
 reads the map's metatile property table to resolve collision, and it pokes
 the dynamic sprite engine's `oambuffer` refresh flags when an object crosses
 the screen edge. A Makefile that lists `object` without them will not link.
@@ -354,7 +354,7 @@ A second, tighter test (`-32` to `256` X, `-32` to `224` Y) maintains the
 
 Two consequences worth internalising:
 
-- The camera used is the `map` module's `x_pos` / `y_pos`. Without the map
+- The camera used is the `map` module's (`mapGetCameraX()` / `mapGetCameraY()`). Without the map
   module scrolling, they stay at the origin and the window is fixed there.
 - Iteration order is type 0 first, then type 1, and so on; within a type, the
   most recently created object is visited first, because `objNew` pushes onto

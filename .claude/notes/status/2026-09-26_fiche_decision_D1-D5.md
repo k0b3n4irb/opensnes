@@ -21,6 +21,8 @@ de la recommandation de la fiche.
 | **Associée 3** numéro | **la release cassante est la 1.0** | les 0.x déprécient avec alias ; la 1.0 retire tous les alias (N2-N6, D1-D5, les cinq `*Bank`, `dmaTransfer`) et réintroduit `hdmaEnable(channel)` ; rien ne casse ensuite avant 2.0 |
 | **Associée 4** échelle Mode 7 | b, décidé le 2026-10-02 | livré (`93ff5e2d`) |
 
+**Avancement.** D4 module carte : fait le 2026-10-03 (`mapGetCameraX()` / `mapGetCameraY()`, `map_cam_x` / `map_cam_y`). Restent pour D4 : object, text, colormath, mosaic, et la liste « même famille » à valider.
+
 Ordre d'application : D4, puis D3, D5, associée 2, D1 (les petites d'abord
 après D4), D2 (doc), associée 1 (après validation de la liste). Une rangée
 par commit, alias `OPENSNES_DEPRECATED` partout où c'est possible,

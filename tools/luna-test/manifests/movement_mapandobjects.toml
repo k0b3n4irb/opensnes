@@ -1,6 +1,6 @@
 # The map+object engine drives mario through objCollidMap / objUpdateXY;
 # mario.c mirrors the workspace position back into mariox/marioy every
-# frame, and the lib's camera is x_pos/y_pos.
+# frame, and the lib's camera is map_cam_x/map_cam_y.
 #
 # Leg 2 is the idle negative: 60 more frames with the pad released must
 # leave mariox, marioy AND the camera exactly where they were — gravity
@@ -17,7 +17,7 @@ at_frame = 60
 [checkpoint.values]
 mariox = 15
 marioy = 192
-x_pos = 0                                # camera has not scrolled
+map_cam_x = 0                                # camera has not scrolled
 marioflp = { eq = 0, width = 1 }         # facing right
 
 [[checkpoint]]                 # no input -> nothing moves
@@ -25,7 +25,7 @@ at_frame = 120
 [checkpoint.delta]
 mariox = "unchanged"
 marioy = "unchanged"
-x_pos = "unchanged"
+map_cam_x = "unchanged"
 
 [[checkpoint]]                 # RIGHT for 59 frames: accelerates east
 at_frame = 180

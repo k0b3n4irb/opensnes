@@ -101,8 +101,8 @@ static void koopatroopa_animate(u16 idx) {
 static void koopatroopa_draw(void) {
     u16 n = koopatroopanum;
 
-    koopatroopay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - y_pos;
-    koopatroopax = koopatroopax - x_pos;
+    koopatroopay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - mapGetCameraY();
+    koopatroopax = koopatroopax - mapGetCameraX();
 
     oambuffer[n].oamx = koopatroopax;
     oambuffer[n].oamy = koopatroopay - 16;

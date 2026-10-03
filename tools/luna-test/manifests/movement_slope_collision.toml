@@ -17,7 +17,7 @@
 #                          this is the wall case, distinct from the slope
 #
 # The camera leg is the map engine's half: mapUpdateCamera followed Mario,
-# so x_pos is 81 at frame 216 while it was 0 at frame 120 (he had not yet
+# so map_cam_x is 81 at frame 216 while it was 0 at frame 120 (he had not yet
 # left the first screen).
 #
 # The jump leg then checks the vertical half of the same collision routine:
@@ -46,14 +46,14 @@ at_frame = 60
 [checkpoint.values]
 mariox = { eq = 32, width = 2 }
 marioy = { eq = 96, width = 2 }
-x_pos  = { eq = 0,  width = 2 }
+map_cam_x  = { eq = 0,  width = 2 }
 
 [[checkpoint]]                 # walking the flat: Y must not move
 at_frame = 120
 [checkpoint.values]
 mariox = { ge = 98, le = 99, width = 2 }   # frame 119 or 120
 marioy = { eq = 96, width = 2 }
-x_pos  = { eq = 0,  width = 2 }
+map_cam_x  = { eq = 0,  width = 2 }
 
 [[checkpoint]]                 # on the slope: pushed UP, not stopped
 at_frame = 144
@@ -69,7 +69,7 @@ at_frame = 216
 [checkpoint.values]
 mariox = { eq = 209, width = 2 }
 marioy = { eq = 96,  width = 2 }
-x_pos  = { eq = 81,  width = 2 }
+map_cam_x  = { eq = 81,  width = 2 }
 
 [[checkpoint]]                 # a wall: RIGHT still held, X stops dead
 at_frame = 300

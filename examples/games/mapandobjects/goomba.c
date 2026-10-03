@@ -78,8 +78,8 @@ void goombaupdate(u16 idx) {
     }
 
     /* Update sprite screen position */
-    goombay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - y_pos;
-    goombax = goombax - x_pos;
+    goombay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - mapGetCameraY();
+    goombax = goombax - mapGetCameraX();
     oambuffer[goombanum].oamx = goombax;
     oambuffer[goombanum].oamy = goombay;
     oamDynamicDraw(goombanum);
