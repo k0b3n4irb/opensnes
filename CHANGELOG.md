@@ -54,6 +54,9 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): **luna v1.30.4.** Only its MCP server changes (the
+  fields Claude Code 2.1.287 sends); emulation is v1.30.3's. `make tests`
+  green, no baseline moved.
 - test(luna-test): **luna v1.30.3.** Its one fix, a save for Super FX
   cartridges with a battery, changes nothing in our ROMs: our Super FX header
   says `$13`, no battery. `make tests` green, no baseline moved.

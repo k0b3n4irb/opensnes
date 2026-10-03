@@ -78,6 +78,18 @@ pull + import + rebuild). What moved:
   matters more, not less.
 - Golden queries 9/9; negative control: our ABI at ranks 1 and 2 again.
 
+## luna pin v1.30.4 (2026-10-03)
+
+Index served: **34 829 chunks, 210 sources captured of 236, built
+2026-10-02T12:15:33Z, chunker v8, fingerprint `7d9495170d2f`** (a rebuild
+after `b363c473e7ec`; it adds the `cartouche-fiches` note on Mode 6
+offset-per-tile bit 3 in hi-res, `61be8d9e9e954b38`). Golden queries 4, 5, 6
+and 9 rerun with the exclusion set: green, same chunks. `luna-docs` is still
+the 2026-09-30 capture: no 1.30.3 or 1.30.4 changelog entry is served (query
+"luna changelog v1.30.4 MCP ttlMs cacheScope; v1.30.3 Super FX battery
+save" returns only the `luna mcp` usage page). Two versions behind; added to
+`OPEN_snes-rag.md`.
+
 ## luna pin v1.30.3 (2026-10-02)
 
 Golden queries 4, 5, 6 and 9 (the `luna-docs` ones) rerun on `5f0e4bb5e1c0`:
