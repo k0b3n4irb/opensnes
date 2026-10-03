@@ -54,10 +54,9 @@ Whether modlib's IT 2.15 detection (`Cmwt >= 0x215`, rejecting Cvt bit 2)
 deserves a note to him - our port follows OpenMPT and Schism (Cvt bit 2),
 read through a summariser, to re-read in the raw sources first.
 
-Posting needs a classic token: a fine-grained one cannot create an issue in a
-repository the owner does not own (403 "Resource not accessible by personal
-access token"). `.env` now holds `GH_PAT_TOKEN` (fine-grained: push, luna)
-and `GH_GHP_TOKEN` (classic).
+Posting or answering there needs the classic token (`GH_GHP_TOKEN`); reading
+works with either. Which token does what, and the caution about the classic
+one: `.claude/notes/conventions/gh_auth_via_dotenv.md`.
 
 ## Evidence for A, re-run on 2026-10-03 (luna v1.30.4)
 
