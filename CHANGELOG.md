@@ -101,6 +101,14 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- refactor(lib,docs): **`mode7SetPivot()` is deprecated in favour of
+  `mode7SetCenter()`** (owner decision, completing D5). It writes the same
+  two registers from two `u8`; the tutorial said it took screen coordinates
+  and computed centre and scroll, which the code never did. `mode7.md` now
+  gives the rule instead: the centre shows on screen at (centre − scroll),
+  so a rotation around the middle of the screen wants
+  `mode7SetCenter(scrollX + 128, scrollY + 112)` (formula: anomie-regs,
+  M7X; snesdev-wiki, Mode 7 transform, chunk `bf5cb2a48a63c1aa`).
 - **BREAKING** refactor(lib): **twelve internal variables leave the public
   headers** (API decision D4, last part): the ten `lkup*` VRAM lookup
   tables of the dynamic sprite engine (`sprite.h`; only the engine's

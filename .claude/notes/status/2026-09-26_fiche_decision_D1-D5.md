@@ -60,6 +60,8 @@ de la recommandation de la fiche.
 
 **Reste : associée 1 (variantes à structure), en attente d'un choix de forme.** En l'appliquant, deux constats : (1) `oamDrawMeta` reçoit à chaque trame un pointeur de trame différent (`animTickMeta(...)`), donc une structure « métasprite » contenant ce pointeur devrait être modifiée à chaque trame ; la coupe naturelle est une structure de *style* constante (tuile de base, palette, taille, largeur, hauteur) et les arguments par appel (id, x, y, trame, retournement), soit 6 arguments au lieu de 7 et 11. (2) `dsp1Parameter` : `dsp1_ground` garde `cam_x`, `cam_y`, `cam_aas` comme variables que son manifeste vérifie par symbole ; une `Dsp1Camera` les regroupe proprement mais oblige à réécrire le manifeste par adresses. Formes proposées au propriétaire avant d'écrire le code.
 
+**Décisions du 2026-10-03, seconde séance.** Métasprites : structure de *style* constante, `oamDrawMetasprite(id, x, y, trame, &style, flip)`. DSP-1 : `Dsp1Camera` et `dsp1SetCamera(&cam)`. `mode7SetPivot` : dépréciée au profit de `mode7SetCenter` (faite le jour même). Les cinq variables Super FX restent publiques (écart confirmé).
+
 Ordre d'application : D4, puis D3, D5, associée 2, D1 (les petites d'abord
 après D4), D2 (doc), associée 1 (après validation de la liste). Une rangée
 par commit, alias `OPENSNES_DEPRECATED` partout où c'est possible,

@@ -158,11 +158,12 @@ The default after `mode7Init()`:
 `mode7Init()` also sets the *scale* the angle helpers use to `0x0100`,
 1:1, so a first `mode7SetAngle(0)` keeps the identity.
 
-To **rotate around the screen centre**, set both centre and scroll so
-that the rotation pivot lines up with the visible region's middle. The
-helper `mode7SetPivot(x, y)` does this in screen coordinates: pass the
-screen pixel you want to be the rotation centre, and the lib sets `cx`,
-`cy`, `sx`, `sy` appropriately.
+The centre is a point of the *plane*, and it shows on screen at
+(centre − scroll): the PPU computes `plane = M × (screen + scroll − centre)
++ centre`, so the screen pixel where `screen + scroll = centre` is the one
+that does not move. To **rotate around the screen centre**, keep the two
+128 × 112 apart: `mode7SetCenter(sx + 128, sy + 112)` for a scroll of
+`(sx, sy)`.
 
 The scale is in texels per screen pixel, 8.8 fixed point:
 `mode7SetScale(0x0100, 0x0100)` gives A = D = `$00FE`, 1:1 (the sine table
@@ -197,7 +198,6 @@ say), `TRANSPARENT` or `TILE0` keeps the world bounded.
 | `mode7SetAngle(angle)` | 0–255 angle (full circle wraps at 256). Looks up sin/cos from a table, multiplies by current scale via the hardware multiplier, writes M7A–M7D. |
 | `mode7SetCenter(x, y)` | Set the rotation centre `(cx, cy)` in tilemap coordinates (signed 13-bit). |
 | `mode7SetScroll(x, y)` | Set the scroll offsets `(sx, sy)` in tilemap coordinates (signed 13-bit). |
-| `mode7SetPivot(x, y)` | High-level: set the rotation centre by *screen* coordinates (0–255). The lib computes `cx`/`cy`/`sx`/`sy`. |
 | `mode7Rotate(degrees)` | Convenience: take 0–359 degrees and convert to the 0–255 internal angle. |
 | `mode7Transform(degrees, scalePercent)` | Combined rotate + scale: `100` = 1:1, `50` magnified twice, `200` shrunk twice (percent × 2.5, so 100 is `0x00FA`). |
 | `mode7SetExtBg(on)` | EXTBG (SETINI bit 6): BG2 shows the same plane, bit 7 of each pixel as its priority — a second layer around the sprites. See below. |
@@ -366,15 +366,15 @@ order writes the matrix using stale scale values for one frame; the
 *next* `mode7SetAngle` call corrects it. Cosmetic, but visible as a
 one-frame "blip" when you change scale and angle in the same frame.
 
-### 🟡 Centre default is the tilemap centre, not the screen centre
+### 🟡 The default centre is not the screen centre
 
-`mode7Init` sets `cx = cy = 128`, which is the centre of the 128 × 128
-*tilemap*, not the centre of the 256 × 224 *screen*. To rotate around
-the screen centre, use `mode7SetPivot(128, 112)` (which positions the
-visible region's centre at the rotation pivot).
+`mode7Init` sets the centre to (128, 128); the middle of the 256 × 224
+screen is (128, 112) when the scroll is (0, 0). To rotate around the screen
+centre, call `mode7SetCenter(sx + 128, sy + 112)` for a scroll of
+`(sx, sy)`.
 
 This trips people up: "my plane rotates correctly but isn't centred on
-screen". The pivot helper is the fix.
+screen".
 
 ### 🟡 Out-of-bounds with `MODE7_TRANSPARENT` shows the backdrop, not a layer
 

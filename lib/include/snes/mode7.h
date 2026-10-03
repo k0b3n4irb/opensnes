@@ -104,8 +104,10 @@ void mode7SetAngle(u8 angle);
 /**
  * @brief Set Mode 7 center point
  *
- * Sets the center of rotation/scaling. Default is (128, 128).
- * mode7SetPivot() writes the same registers from two u8.
+ * Sets the center of rotation/scaling, a point of the plane. Default is
+ * (128, 128). It shows on screen at (center - scroll): for a rotation
+ * around the middle of the screen, the center is (scrollX + 128,
+ * scrollY + 112).
  *
  * @param x Center X coordinate (13-bit signed, -4096 to 4095)
  * @param y Center Y coordinate (13-bit signed, -4096 to 4095)
@@ -160,21 +162,12 @@ void mode7Rotate(u16 degrees);
 void mode7Transform(u16 degrees, u16 scalePercent);
 
 /**
- * @brief Set the center point from two 8-bit values
+ * @brief mode7SetCenter() restricted to 0-255
  *
- * Writes the same two registers as mode7SetCenter() (M7X, M7Y), with the
- * range of a u8: it is mode7SetCenter() for a center that lies within the
- * first 256 pixels of the plane, which is the screen as long as the scroll
- * is (0, 0). Past that, use mode7SetCenter().
- *
- * @param x Center X coordinate (0-255)
- * @param y Center Y coordinate (0-255)
- *
- * @code
- * mode7SetPivot(128, 112);  // Center of screen
- * mode7SetPivot(0, 0);      // Top-left corner
- * @endcode
+ * Writes the same two registers (M7X, M7Y) from two u8. It was documented
+ * as taking screen coordinates and never did.
  */
+OPENSNES_DEPRECATED("use mode7SetCenter() — the same registers, without the 0-255 limit")
 void mode7SetPivot(u8 x, u8 y);
 
 /**
