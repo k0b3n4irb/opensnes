@@ -47,7 +47,7 @@ void gsuCall(u16 entry) {
  * of a frame, for the 224 bytes of a small renderer. */
 
 void gsuStartCached(u16 pc) {
-    GSU_CFGR = gsu_cfgr;
+    GSU_CFGR = (u8)(gsu_cfgr & 0xDF);   /* MS0 must be 0 at 21 MHz (fullsnes, CFGR) */
     GSU_CLSR = 1;                                   /* 21.47 MHz */
     GSU_SCBR = gsu_scbr;
     GSU_R8 = (u16)((u16)gsu_scbr << 10);            /* buffer base, as gsuLaunch() */

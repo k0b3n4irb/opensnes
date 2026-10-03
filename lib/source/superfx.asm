@@ -89,6 +89,8 @@ gsu_launch_wait:
 
     ; Configure GSU from WRAM variables
     lda.l gsu_cfgr
+    and #$DF                 ; MS0 (bit 5) must be zero at 21 MHz (fullsnes,
+                             ; CFGR); the clock below is 21 MHz
     sta.l $3037              ; CFGR
 
     lda #$01

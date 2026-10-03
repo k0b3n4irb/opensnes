@@ -175,6 +175,8 @@ int main(void) {
     gsuCacheLoad(gsu_job, (u16)(gsu_job_end - gsu_job));
     REG_GSU_R1 = 1000;
     REG_GSU_R2 = 9;
+    gsu_cfgr = 0xA0;     /* fast multiply asked: the launcher must drop MS0 at 21 MHz
+                          * (fullsnes, CFGR) — the manifest reads cfgr = $80 back */
     gsuStartCached(GSU_JOB_MUL_JOB);
     gsuWait();
     gsuMulReadResult();

@@ -83,5 +83,6 @@ r_rom_table = 0x3CA5      # ... so its table and its absolute jump are where it 
 r_done = 0xD0E5
 
 [asserts.gsu]
+cfgr = 0x80               # the last job asked $A0 (MS0): dropped at 21 MHz
 bus_violations = 0
 instructions_executed = { gt = 2000000 }   # four jobs of 600 000 loop iterations x 4 instructions
