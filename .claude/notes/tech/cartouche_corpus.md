@@ -78,6 +78,19 @@ pull + import + rebuild). What moved:
   matters more, not less.
 - Golden queries 9/9; negative control: our ABI at ranks 1 and 2 again.
 
+## Index state (2026-10-03, evening)
+
+Replica at snes-rag's commit `9aaa3f3`, their fingerprint `8bae78f3a746`
+(34 880 chunks, their figures), MCP server restarted. `luna-docs` serves
+v1.31.0 (`0606861003a2ba40`, the `region` key). `snes_verify` no longer
+takes its headline `citation` from a page with a documented error when
+another passage exists: the pseudo-hires parity case cites fullsnes
+`61c70037e21beeb4` (which does not state the parity; anomie-regs
+`19acadfe6457f2ae` does, in `evidence`). Golden queries 4, 5, 6, 9 green:
+`e70dda0db5cb59ad`, `2fb69fc62f489c12`, `192d1bade86dc0dc`,
+`495ab2a1f6b73c83`. A reconnect alone does not serve a new index: the
+replica needs `git pull`, `make import SRC=…`, `make rebuild`.
+
 ## luna pin v1.31.0 (2026-10-03)
 
 Replica at snes-rag's `7c9411654112` (34 878 chunks, their figure), MCP
