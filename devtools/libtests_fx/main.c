@@ -34,7 +34,8 @@ u16 r_hdma_init;     /* hdmaGetEnabled() after hdmaWaveInit            -> 0 */
 u16 r_hdma_wave;     /* ... after hdmaWaveH(6, 0, 8, 4)                -> 0x40 */
 u16 r_hdma_setup;    /* ... after hdmaGradient(5) + hdmaWindowShape(4): setup
                       * does not enable                                 -> 0x40 */
-u16 r_hdma_both;     /* ... after hdmaEnable(ch 5 | ch 4)              -> 0x70 */
+u16 r_hdma_both;     /* ... after hdmaEnableMask(ch 5 | ch 4)              -> 0x70 */
+u16 r_hdma_names;    /* hdmaDisable / hdmaEnable (deprecated) still take a mask -> 1 */
 u16 r_m7_rot_sin;    /* m7_sin after mode7Rotate(90): table[64]         -> 127 */
 u16 r_chips;         /* plain LoROM: sa1IsReady | sa1Init<<1 | gsuIsPresent<<2, all 0; bit 4 = the
                       * deprecated sa1Init agrees with sa1IsReady                     -> 0x10 */
@@ -106,8 +107,13 @@ int main(void) {
     hdmaGradient(5, grad_table);
     hdmaWindowShape(4, win_table);
     r_hdma_setup = hdmaGetEnabled();
-    hdmaEnable((1 << 5) | (1 << 4));
+    hdmaEnableMask((1 << 5) | (1 << 4));
     r_hdma_both = hdmaGetEnabled();
+    /* D1: the old names are the same entry points until 1.0 */
+    hdmaDisable(1 << 4);
+    r_hdma_names = (hdmaGetEnabled() == 0x60) ? 1 : 0;
+    hdmaEnable(1 << 4);
+    if (hdmaGetEnabled() != 0x70) r_hdma_names = 0;
     /* hdmaColorGradient on colour 37 (not 0): the index was written as
      * [index, 0] to a register written twice, so every gradient landed on
      * colour 0. Red at the top, blue at the bottom; the last chunk leaves

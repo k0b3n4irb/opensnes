@@ -101,6 +101,15 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- refactor(lib,examples,docs): **`hdmaEnableMask()` / `hdmaDisableMask()`
+  replace `hdmaEnable()` / `hdmaDisable()`** (API decision D1, first of two
+  steps). The pair took a bit mask in a header where every other function
+  takes a channel number, and the repository called it in fourteen
+  spellings. The new names say what the argument is; the old ones are the
+  same entry points, deprecated, and every call in the examples, the docs
+  and the fixtures is migrated. **At 1.0 `hdmaEnable(channel)` comes back
+  taking a channel number**: a call left as `hdmaEnable(0x40)` will then
+  mean something else, which is what the warning is for.
 - refactor(lib,docs): **the dead API is deprecated** (API decision on dead
   API). `audioUpdate()` (does nothing), `consoleInitEx()` (ignores its
   argument, is `consoleInit()`), `snesmodSetSoundTable()` and

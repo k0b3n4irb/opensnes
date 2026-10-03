@@ -103,7 +103,7 @@ int main(void) {
      * hdmaParallax() sets up a 2-register HDMA that writes scroll_lo to $210D
      * and scroll_hi to $210E at each zone boundary during HBlank. */
     hdmaParallax(HDMA_CHANNEL_6, 0, scroll_table);
-    hdmaEnable(1 << HDMA_CHANNEL_6);
+    hdmaEnableMask(1 << HDMA_CHANNEL_6);
 
     while (1) {
         /* Each frame, advance each zone's scroll offset by a different amount.

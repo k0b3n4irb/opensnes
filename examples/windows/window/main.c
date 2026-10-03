@@ -149,7 +149,7 @@ u8 tablerighttriangle[] = {
  */
 static void setup_window(u8 layers, u8 w12sel_val) {
     /* Disable HDMA first to prevent partial table reads during reconfiguration */
-    hdmaDisable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
+    hdmaDisableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
     /* Window 1, inverted (pixels OUTSIDE the triangle are clipped), on the
      * BGs W12SEL names — and, as PVSnesLib's setModeHdmaWindow does, the same
@@ -173,7 +173,7 @@ static void setup_window(u8 layers, u8 w12sel_val) {
               tablelefttriangle);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1,
               tablerighttriangle);
-    hdmaEnable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
+    hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 }
 
 /*============================================================================

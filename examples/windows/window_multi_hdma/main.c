@@ -99,7 +99,7 @@ int main(void) {
 
     /* One channel, 4 registers per line: WH0-WH3 = both windows' edges */
     hdmaSetup(HDMA_CHANNEL_0, HDMA_MODE_4REG, HDMA_DEST_WH0, window_table);
-    hdmaEnable(1 << HDMA_CHANNEL_0);
+    hdmaEnableMask(1 << HDMA_CHANNEL_0);
 
     setMainScreen(LAYER_BG1);
     setScreenOn();

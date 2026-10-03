@@ -27,7 +27,7 @@ original (9 prefab tiles composed into a 128×128 Mode 7 world).
 ## SNES Concepts
 
 - Per-scanline Mode 7 matrix writes (perspective + rotation combined)
-- 4-channel HDMA coordination (`hdmaSetup` ×4 + `hdmaEnable(0x0F)`)
+- 4-channel HDMA coordination (`hdmaSetup` ×4 + `hdmaEnableMask(0x0F)`)
 - HDMA table repointing as a zero-copy animation primitive
 - Mode 7 interleaved VRAM (`dmaCopyVramMode7`); out-of-map backdrop (M7SEL=$80)
 - VBlank-window discipline: repoint right after `WaitForVBlank()` — re-arming
@@ -41,7 +41,7 @@ original (9 prefab tiles composed into a 128×128 Mode 7 world).
 | M7SEL | `$80` | same (`mode7SetSettings`) |
 | DMAP0-3 / BBAD0-3 | `%010` / $1B,$1C,$1D,$1E | same (`hdmaSetup` ch 0-3) |
 | A1B0-3 | banks 1,2,3,1 | from the far pointers (SUPERFREE sections) |
-| HDMAEN | `%00001111` | same (`hdmaEnable(0x0F)`) |
+| HDMAEN | `%00001111` | same (`hdmaEnableMask(0x0F)`) |
 | BG1HOFS/VOFS, M7X/M7Y | 384/768, 512/1152 | same pose, same per-frame sync order |
 | Table repoint | A1Tx rewrite after WaitNMI | `hdmaSetup` ×4 after `WaitForVBlank()` |
 
@@ -60,7 +60,7 @@ original (9 prefab tiles composed into a 128×128 Mode 7 world).
 
 ## Two integration lessons this port surfaced
 
-1. `hdmaSetup()` configures but does **not** enable — `hdmaEnable(mask)`
+1. `hdmaSetup()` configures but does **not** enable — `hdmaEnableMask(mask)`
    is a separate call (the un-enabled state renders a convincing static
    1:1 view that LOOKS like a broken perspective; check `dma.hdmaen`).
 2. Calling `hdmaSetup` from an `nmiSet` callback did not take effect

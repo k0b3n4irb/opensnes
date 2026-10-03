@@ -48,7 +48,7 @@ int main(void) {
     hdmaSetup(HDMA_CHANNEL_0, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, color_table);
     /* ch1: master brightness per line — the "extra bits" */
     hdmaSetup(HDMA_CHANNEL_1, HDMA_MODE_1REG, HDMA_DEST_INIDISP, brightness_table);
-    hdmaEnable((1 << HDMA_CHANNEL_0) | (1 << HDMA_CHANNEL_1));
+    hdmaEnableMask((1 << HDMA_CHANNEL_0) | (1 << HDMA_CHANNEL_1));
 
     /* Deliberately NO setScreenOn(): INIDISP is owned by channel 1 —
      * the HDMA writes are the screen-on. */

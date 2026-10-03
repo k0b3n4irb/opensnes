@@ -30,7 +30,7 @@ Register-level — krom's writes vs this ROM's generated code:
 | `$4302-3` A1T0 | table address (static) | `itable` far pointer, set once |
 | `$4304` A1B0 | `$00` | table pointer's bank byte ($00 WRAM) |
 | `$4307` DASB0 | `$00` | `dataBank` param = `(u8)((u32)(void*)band_data >> 16)` |
-| `$420C` HDMAEN | `%1` once | `hdmaEnable(1 << HDMA_CHANNEL_0)` once |
+| `$420C` HDMAEN | `%1` once | `hdmaEnableMask(1 << HDMA_CHANNEL_0)` once |
 | `$212C` TM | `0` (backdrop only) | `setMainScreen(0)` |
 
 Behavioral — central-column color profile of both ROMs in luna:

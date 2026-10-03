@@ -495,7 +495,7 @@ of `superfx_3d`'s framebuffer bytes landing on visible lines, dropped
 without a word. Read `$213F`, `$2137`, then `$213D` twice, every time. `superfx_3d` now presents about 30
 frames per second, all of them whole.
 
-It uses HDMA channel 1 and arms it like `hdmaEnable()` does, so it
+It uses HDMA channel 1 and arms it like `hdmaEnableMask()` does, so it
 combines with your own HDMA channels; just leave channel 1 to it.
 
 `gsuIsPresent()` returns 1 when crt0 found a GSU at boot; use it to fall

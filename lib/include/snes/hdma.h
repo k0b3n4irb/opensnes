@@ -57,7 +57,7 @@
  *
  * // Set up HDMA channel 6 to write to fixed color register
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, 0x32, gradient_table);
- * hdmaEnable(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
  *
  * // In main loop, HDMA runs automatically each frame
  * @endcode
@@ -253,7 +253,7 @@
  * @brief Set up an HDMA channel
  *
  * Configures an HDMA channel with the specified parameters. The channel
- * is NOT enabled automatically - call hdmaEnable() to start it.
+ * is NOT enabled automatically - call hdmaEnableMask() to start it.
  *
  * @param channel HDMA channel (0-7, use HDMA_CHANNEL_6 or lower — 7 belongs to the NMI OAM DMA)
  * @param mode Transfer mode (HDMA_MODE_*)
@@ -262,7 +262,7 @@
  *
  * @code
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, HDMA_DEST_COLDATA, my_table);
- * hdmaEnable(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
  * @endcode
  */
 void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
@@ -313,26 +313,41 @@ void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table,
                        u8 dataBank);
 
 /**
- * @brief Enable HDMA channel(s)
+ * @brief Enable HDMA channel(s), given as a bit mask
  *
  * Enables the specified HDMA channel(s). HDMA will start on the next frame.
+ * The one pair of this header that takes a mask where every other function
+ * takes a channel number: the name says so.
  *
  * @param channelMask Bitmask of channels to enable (1 << channel)
  *
  * @code
- * hdmaEnable(1 << HDMA_CHANNEL_6);              // Enable channel 6
- * hdmaEnable((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_5)); // Enable 6 and 5
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);              // Enable channel 6
+ * hdmaEnableMask((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_5)); // Enable 6 and 5
  * @endcode
  */
-void hdmaEnable(u8 channelMask);
+void hdmaEnableMask(u8 channelMask);
 
 /**
- * @brief Disable HDMA channel(s)
+ * @brief Disable HDMA channel(s), given as a bit mask
  *
  * Disables the specified HDMA channel(s).
  *
- * @param channelMask Bitmask of channels to disable
+ * @param channelMask Bitmask of channels to disable (1 << channel)
  */
+void hdmaDisableMask(u8 channelMask);
+
+/**
+ * @brief The pre-2026-10-03 name of hdmaEnableMask(). Takes a MASK.
+ *
+ * Deprecated so that the name can come back at 1.0 taking a channel number,
+ * like the rest of this header. Until then it is the same function.
+ */
+OPENSNES_DEPRECATED("use hdmaEnableMask() — at 1.0 hdmaEnable() will take a channel number")
+void hdmaEnable(u8 channelMask);
+
+/** @brief The pre-2026-10-03 name of hdmaDisableMask(). Takes a MASK. */
+OPENSNES_DEPRECATED("use hdmaDisableMask() — at 1.0 hdmaDisable() will take a channel number")
 void hdmaDisable(u8 channelMask);
 
 /**
@@ -437,7 +452,7 @@ void hdmaWaveInit(void);
  * @code
  * hdmaWaveInit();
  * hdmaWaveH(HDMA_CHANNEL_6, 0, 4, 4);  // Gentle water reflection on BG1
- * hdmaEnable(1 << HDMA_CHANNEL_6);
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);
  *
  * while (1) {
  *     WaitForVBlank();

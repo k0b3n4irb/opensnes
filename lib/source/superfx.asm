@@ -428,7 +428,7 @@ _hdma_config:
 
     ; Enable HDMA channel 1 through the hdma module's shadow of HDMAEN
     ; ($420C is write-only): a bare `sta $420C` switched every other
-    ; channel off, and the next hdmaEnable/hdmaDisable, which rewrites
+    ; channel off, and the next hdmaEnableMask/hdmaDisableMask, which rewrites
     ; $420C from the shadow, switched this one off (2026-09-26).
     lda #$02
     ora.l hdma_enabled_state

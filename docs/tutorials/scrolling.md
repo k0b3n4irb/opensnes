@@ -191,7 +191,7 @@ int main(void) {
 
     /* Start HDMA on channel 6, targeting BG1 horizontal scroll */
     hdmaParallax(HDMA_CHANNEL_6, 0, scroll_table);
-    hdmaEnable(1 << HDMA_CHANNEL_6);
+    hdmaEnableMask(1 << HDMA_CHANNEL_6);
 
     while (1) {
         /* Each zone scrolls at a different speed */

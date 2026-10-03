@@ -16,7 +16,7 @@
 /*============================================================================
  * HDMA Effect Helpers
  *
- * These call the assembly core functions (hdmaSetup, hdmaEnable)
+ * These call the assembly core functions (hdmaSetup, hdmaEnableMask)
  *============================================================================*/
 
 void hdmaParallax(u8 channel, u8 bg, const void *scrollTable) {
@@ -238,7 +238,7 @@ void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
     hdma_wave_enabled = 1;
 
     hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
-    hdmaEnable(channel_mask(channel));
+    hdmaEnableMask(channel_mask(channel));
 }
 
 void hdmaWaveUpdate(void) {
@@ -278,7 +278,7 @@ void hdmaWaveStop(void) {
     if (!hdma_wave_enabled) return;
 
     /* Disable HDMA channel */
-    hdmaDisable(channel_mask(hdma_wave_channel));
+    hdmaDisableMask(channel_mask(hdma_wave_channel));
     hdma_wave_enabled = 0;
 
     /* Reset BG scroll offset to 0 so the wave doesn't leave the
@@ -324,11 +324,11 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
     *p = 0x00;  /* End marker */
 
     hdmaSetup(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table);
-    hdmaEnable(channel_mask(channel));
+    hdmaEnableMask(channel_mask(channel));
 }
 
 void hdmaBrightnessGradientStop(u8 channel) {
-    hdmaDisable(channel_mask(channel));
+    hdmaDisableMask(channel_mask(channel));
     /* Restore full brightness */
     REG_INIDISP = 0x0F;
 }
@@ -374,11 +374,11 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
     *p = 0x00;  /* End marker */
 
     hdmaSetup(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table);
-    hdmaEnable(channel_mask(channel));
+    hdmaEnableMask(channel_mask(channel));
 }
 
 void hdmaColorGradientStop(u8 channel) {
-    hdmaDisable(channel_mask(channel));
+    hdmaDisableMask(channel_mask(channel));
     /* Note: CGRAM retains per-scanline gradient values after HDMA stops.
      * Caller must restore the original palette if needed — the library
      * cannot know what the original colors were. */
@@ -456,7 +456,7 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
     /* Setup and enable HDMA to drive WH0/WH1 per scanline.
      * Use bank $00 explicitly — tables are in bank $00 RAMSECTION. */
     hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
-    hdmaEnable(channel_mask(channel));
+    hdmaEnableMask(channel_mask(channel));
 
     /* Wait for HDMA to initialize (happens at start of VBlank).
      * Only THEN enable window masking — ensures WH0/WH1 are being
@@ -473,7 +473,7 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
 }
 
 void hdmaIrisWipeStop(u8 channel) {
-    hdmaDisable(channel_mask(channel));
+    hdmaDisableMask(channel_mask(channel));
 
     /* Restore all window registers to fully open */
     REG_W12SEL  = 0x00;
@@ -539,5 +539,5 @@ void hdmaWaterRipple(u8 channel, u8 bg, u8 amplitude, u8 speed) {
     hdma_wave_enabled = 1;
 
     hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
-    hdmaEnable(channel_mask(channel));
+    hdmaEnableMask(channel_mask(channel));
 }

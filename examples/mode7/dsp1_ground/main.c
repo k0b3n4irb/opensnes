@@ -197,7 +197,7 @@ int main(void) {
     hdmaSetup(CH_TM,   HDMA_MODE_1REG,    HDMA_DEST_TM,     tab_tm);
     hdmaSetup(CH_AB,   HDMA_MODE_2REG_2X, HDMA_DEST_M7A,    tab_ab[0]);
     hdmaSetup(CH_CD,   HDMA_MODE_2REG_2X, HDMA_DEST_M7C,    tab_cd[0]);
-    hdmaEnable((1 << CH_MODE) | (1 << CH_TM) | (1 << CH_AB) | (1 << CH_CD));
+    hdmaEnableMask((1 << CH_MODE) | (1 << CH_TM) | (1 << CH_AB) | (1 << CH_CD));
 
     /* Pin the ground point under the imaginary centre to the screen middle:
      * M7X/M7Y = Cx/Cy, and the scroll puts screen (128, 112+Vof) on it. The

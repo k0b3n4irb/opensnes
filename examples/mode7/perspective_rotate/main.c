@@ -104,7 +104,7 @@ int main(void) {
     repointTables();
     /* hdmaSetup configures but does NOT enable — arm all four channels
      * (krom: HDMAEN = %00001111) */
-    hdmaEnable(0x0F);
+    hdmaEnableMask(0x0F);
     setScreenOn();
 
     while (1) {
