@@ -105,6 +105,11 @@ u16 profileGetScanline(void);
 
 /**
  * @brief Start a scanline-based timing measurement
+ *
+ * @note Reads SLHV ($2137) to latch the H/V counters, which also sets
+ *       STAT78 bit 6 — the flag the Super Scope module reads as "the gun
+ *       fired this frame". Do not profile scanlines in a frame whose
+ *       scope input matters.
  */
 void profileScanlineStart(void);
 

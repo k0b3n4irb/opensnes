@@ -582,8 +582,12 @@ u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
  * and easier to evolve without breaking existing callers.
  */
 typedef struct {
-    u16 vramLarge;      /**< VRAM base for large-size tile pool (was gfxsp0adr) */
-    u16 vramSmall;      /**< VRAM base for small-size tile pool (was gfxsp1adr) */
+    u16 vramLarge;      /**< VRAM base for large-size tile pool (was gfxsp0adr).
+                         *   Only 0x0000 is honoured today: OBJSEL's name base is
+                         *   written as 0 and the tile-number tables are fixed, so
+                         *   another value sends the tiles one way and OAM the other */
+    u16 vramSmall;      /**< VRAM base for small-size tile pool (was gfxsp1adr).
+                         *   Only 0x1000 is honoured today, for the same reason */
     u16 slotLargeInit;  /**< Initial OAM slot for large sprites (was oamsp0init) */
     u16 slotSmallInit;  /**< Initial OAM slot for small sprites (was oamsp1init) */
     u8  sizeMode;       /**< OBJ_SIZE_* — defines the small/large pixel sizes */

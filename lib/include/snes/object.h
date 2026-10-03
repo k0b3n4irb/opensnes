@@ -274,6 +274,11 @@ void objKillCurrent(void);
 /**
  * @brief Kill an object
  *
+ * @warning From an update callback, kill only the current object
+ *          (objKillCurrent()): objUpdateAll() has already read the next
+ *          object's link, so killing THAT object from here makes the loop
+ *          continue into the free list.
+ *
  * @param objhandle Object handle
  */
 void objKill(u16 objhandle);

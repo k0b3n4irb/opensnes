@@ -190,6 +190,20 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs: `OamDynamicConfig` says only `vramLarge = 0x0000` / `vramSmall =
+  0x1000` are honoured (OBJSEL's name base and the tile tables are fixed);
+  `objKill()` says not to kill another object from an update callback
+  (the loop has read its link); `hdmaWaveStop()` says the wave's offsets
+  are absolute (library audit, rows 4, 11, 9).
+- docs: `mode7SetAngle()` / `mode7Rotate()` / `mode7Transform()` warn that
+  the PPU multiplier they use is M7A/M7B, to be used in VBlank (snesdev-wiki,
+  "Multiplication"); `profileScanlineStart()` says its SLHV latch sets the
+  flag the Super Scope reads as a shot; `animPlay()` says an `ANIM_ONCE`
+  clip called every frame replays when it ends; `hdmaIrisWipe()` says it
+  owns the window registers while it runs; `collideTile()`'s comment named
+  a function that does not exist; the iris's "HDMA init at the start of
+  VBlank" comment is corrected to the start of the frame (library audit,
+  rows 12, 23, 25, 16, 26; documentation audit).
 - fix(examples): **`basics/scene_stack` redraws its title when the counter
   pops back to it.** `init` runs once per push and not on resume (the
   scene contract), so the title stayed hidden behind the counter's last

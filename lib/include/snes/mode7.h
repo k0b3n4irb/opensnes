@@ -98,6 +98,14 @@ void mode7SetScale(u16 scale_x, u16 scale_y);
  * 1. Looks up sin/cos from table
  * 2. Multiplies by current scale using hardware multiplier
  * 3. Writes the 4 matrix values (M7A, M7B, M7C, M7D) to PPU
+ *
+ * @warning Call it during VBlank (right after WaitForVBlank()), as the
+ *          examples do: the PPU multiplier it uses is M7A/M7B, which the
+ *          Mode 7 renderer reads during active display, and the M7A write
+ *          latch is shared with BG1HOFS/M7HOFS — an HDMA or interrupt
+ *          write to those between the two M7A bytes corrupts the product
+ *          (snesdev-wiki, "Multiplication"). The same holds for
+ *          mode7Rotate() and mode7Transform(), which call it.
  */
 void mode7SetAngle(u8 angle);
 

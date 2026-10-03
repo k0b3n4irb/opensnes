@@ -129,8 +129,9 @@ u8 collideTile(s16 px, s16 py, const u8 *tilemap, u16 mapWidth) {
 
     /* Note: bottom-edge (py) cannot be bounded here — the function does not
      * know the map's height. Callers must guarantee py is within the map
-     * vertically, or use collideRectTile/collideRectMap which include
-     * their own bounds. */
+     * vertically; a py past the last row reads whatever follows the
+     * tilemap in ROM. (This comment named a collideRectMap() that does not
+     * exist, until 2026-10-03.) */
 
     /* Calculate offset in tilemap and return tile value */
     offset = tileY * mapWidth + tileX;

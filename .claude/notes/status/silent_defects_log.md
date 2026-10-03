@@ -57,6 +57,10 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-03 | `windowCentered(w, 1)` gave an empty window, odd widths lost a pixel; `windowSplit(0)` left a one-pixel window | library audit, code | `65368590` |
 | 2026-10-03 | `apuUpload(…, 0)` uploaded 65 536 bytes; a 17th `snesmodLoadEffect` returned 16, played as effect 0 | library audit, code | `d853d63f`, `b101ead2` |
 | 2026-10-03 | SA-1: `.sa1_boot` was `SUPERFREE`; a big program landed in bank 1 and the 16-bit reset vector could not reach it — the SA-1 never booted, no error | chips audit, reproduced (variant of `sa1_hello`) | `208694a7` |
+| 2026-10-03 | `audioLoadSample` with size ≡ 1 (mod 256): the end-of-stream handshake raced on an index echo of 0 — timeout and a hung driver | library audit, code; libtest `r_audio_load513` | `8eeda9ce` |
+| 2026-10-03 | `hdmaWaveStop` wrote HOFS = 0 over the layer's real scroll | library audit, code | `752742bf` |
+| 2026-10-03 | `UNFIX_ROUND(x)` overflowed its 16-bit sum from 127.5 | library audit, arithmetic | `1b4ede5a` |
+| 2026-10-03 | `gsuPresentInit` accepted buffers past the first 64 KB of a 128 KB board, which its 16-bit DMA source cannot reach | chips audit, code | `1b4ede5a` |
 
 ## The hunting campaign
 

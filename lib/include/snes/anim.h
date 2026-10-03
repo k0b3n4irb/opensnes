@@ -105,7 +105,10 @@ typedef struct {
  *
  * Safe to call unconditionally every frame from a state machine:
  * - same clip, still playing: no-op (the animation continues);
- * - same clip, finished (ANIM_ONCE): restarts from frame 0 (re-trigger);
+ * - same clip, finished (ANIM_ONCE): restarts from frame 0 (re-trigger) —
+ *   so calling animPlay() EVERY frame with an ANIM_ONCE clip replays it
+ *   as soon as it ends; call it on the event instead, or test
+ *   ANIM_F_FINISHED first;
  * - different clip: switches immediately — frame 0, ticks reloaded,
  *   flags cleared;
  * - NULL clip (or len == 0): equivalent to animStop().
