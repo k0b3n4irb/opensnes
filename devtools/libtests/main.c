@@ -392,6 +392,7 @@ u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
 u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
 u16 r_lerp_wide;    /* fixLerp(FIX(-64), FIX(64), 128): the 17-bit difference -> 0 (was -128.0) */
+u16 r_hide_x;       /* oamHide(5): X low byte 1 (X = 257 = -255), not 0 (X = 256 counts as 0) -> 1 */
 u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
 u16 r_true_one;     /* isPAL() == getRegion() on this region, and TRUE == 1 -> 1 */
 u16 r_ispal;        /* isPAL()     -> 0 (1 under pal, the same value as getRegion) */
@@ -604,6 +605,9 @@ static void coverage_lot_c(void) {
         oamSetX(wide, 0x99);
         oamSetY(wide + 1, 0x77);
         r_oam_id256 = (u16)oamMemory[0] | ((u16)oamMemory[5] << 8);
+        oamHide(5);
+        WaitForVBlank();
+        r_hide_x = oamMemory[20];
     }
     r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
     r_meta_style = oamDrawMetasprite(20, 100, 50, lotc_meta, &lotc_style, 0);

@@ -134,10 +134,14 @@ void oamSetTile(u16 id, u16 tile) {
 
 void oamHide(u16 id) {
     if (id >= MAX_SPRITES) return;
-    /* Y=240 + X=256 (high bit set) to hide off-screen.
-     * Y=240 alone wraps for sprites > 16px tall.
+    /* Y=240 + X=257 (high bit set, low byte 1 = X -255) to hide off-screen.
+     * Y=240 alone wraps for sprites > 16px tall, and X=256 exactly is
+     * counted as X=0 by the PPU's range and time tests (anomie-regs,
+     * "Drawing the Sprites"): a hidden 32- or 64-pixel sprite then still
+     * spent a slot and tiles on lines 0-47 (until 2026-10-03). The dynamic
+     * engine always hid at 257.
      */
-    oam_buffer[(id << 2) + 0] = 0;          /* X low = 0 */
+    oam_buffer[(id << 2) + 0] = 1;          /* X low = 1 -> X = -255 */
     oam_buffer[(id << 2) + 1] = OBJ_HIDE_Y; /* Y = 240 */
 
     /* Set X high bit in extension table */
@@ -207,7 +211,7 @@ void oamClear(void) {
      */
     for (i = 0; i < MAX_SPRITES; i++) {
         u16 offset = i << 2;
-        oam_buffer[offset + 0] = 0;
+        oam_buffer[offset + 0] = 1;         /* X = 257 = -255, see oamHide */
         oam_buffer[offset + 1] = OBJ_HIDE_Y;
         oam_buffer[offset + 2] = 0;
         oam_buffer[offset + 3] = 0;
