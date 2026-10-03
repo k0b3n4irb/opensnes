@@ -23,8 +23,18 @@ extern u16 bg3_msgrow[];   /* BG3: single message row (32 entries) */
 /* Dirty flags — BG2/BG3 use simple flags, BG1 uses per-row tracking */
 u8 bg2_dirty, bg3_dirty;
 
-/* Per-row dirty tracking for BG1 (one byte per tilemap row, 0-27 visible) */
-static u8 bg1_dirty_row[32];
+/* Dirty span for BG1: the lowest and highest tilemap row touched since the
+ * last flush (lo > hi = nothing). Until 2026-10-03 this was one flag per row
+ * and renderFlush() scanned the 28 flags to coalesce them — the scan cost
+ * about 48 scanlines between two DMAs, so the BG1 transfer of a locked piece
+ * left VBlank (luna --dma-trace; state_tetris.toml asserts unsafe_writes = 0).
+ * The span is known at marking time and costs nothing at flush time. */
+static u8 bg1_dirty_lo = 0xFF, bg1_dirty_hi = 0;
+
+static void bg1MarkRow(u8 row) {
+    if (row < bg1_dirty_lo) bg1_dirty_lo = row;
+    if (row > bg1_dirty_hi) bg1_dirty_hi = row;
+}
 
 /* Tile indices */
 #define TILE_EMPTY     0
@@ -264,10 +274,8 @@ void renderInit(void) {
     }
 
     /* Mark all visible rows dirty for initial force-blank flush */
-    {
-        u8 r;
-        for (r = 0; r < 28; r++) bg1_dirty_row[r] = 1;
-    }
+    bg1_dirty_lo = 0;
+    bg1_dirty_hi = 27;
     bg2_dirty = 1;
     bg3_dirty = 0;
     WaitForVBlank();
@@ -285,7 +293,7 @@ void renderBoard(void) {
             cell = boardGetCell(r, c);
             tilemap_bg1[idx] = cell ? (u16)cell : TILE_EMPTY;
         }
-        bg1_dirty_row[r - 1] = 1;
+        bg1MarkRow(r - 1);
     }
 }
 
@@ -299,7 +307,7 @@ void renderPiece(u8 type, u8 rot, s8 row, s8 col) {
 
         if (r >= VISIBLE_TOP && r < BOARD_ROWS && c >= 0 && c < BOARD_W) {
             tilemap_bg1[BOARD_TO_MAP(r, c)] = (u16)type;
-            bg1_dirty_row[r - 1] = 1;
+            bg1MarkRow(r - 1);
         }
     }
 }
@@ -317,7 +325,7 @@ void renderErasePiece(u8 type, u8 rot, s8 row, s8 col) {
             /* Restore board state (locked blocks or empty) */
             cell = boardGetCell(r, c);
             tilemap_bg1[BOARD_TO_MAP(r, c)] = cell ? (u16)cell : TILE_EMPTY;
-            bg1_dirty_row[r - 1] = 1;
+            bg1MarkRow(r - 1);
         }
     }
 }
@@ -358,7 +366,7 @@ void renderLineClearFlash(LineClearResult *result, u8 frame) {
         for (c = 0; c < BOARD_W; c++) {
             tilemap_bg1[BOARD_TO_MAP(r, c)] = tile;
         }
-        bg1_dirty_row[r - 1] = 1;
+        bg1MarkRow(r - 1);
     }
 }
 
@@ -380,7 +388,6 @@ void renderShake(s8 dx, s8 dy) {
 }
 
 void renderFlush(void) {
-    u8 r, start, count;
 
     /* BG3 + CGRAM first — tiny, critical for messages */
     if (bg3_dirty) {
@@ -400,22 +407,14 @@ void renderFlush(void) {
         bg2_dirty = 0;
     }
 
-    /* BG1: row-granular DMA — coalesce contiguous dirty rows */
-    r = 0;
-    while (r < 28) {
-        if (bg1_dirty_row[r]) {
-            start = r;
-            count = 0;
-            while (r < 28 && bg1_dirty_row[r]) {
-                bg1_dirty_row[r] = 0;
-                count++;
-                r++;
-            }
-            dmaCopyVram((u8 *)&tilemap_bg1[(u16)start * 32],
-                        VRAM_BG1_MAP + (u16)start * 32,
-                        (u16)count * 64);
-        } else {
-            r++;
-        }
+    /* BG1: one DMA of the dirty span (see bg1_dirty_lo). Worst case, a
+     * piece locked at the bottom while the next spawns at the top: 28 rows,
+     * 1792 bytes — with BG2's 2 KB still inside the VBlank DMA budget. */
+    if (bg1_dirty_lo <= bg1_dirty_hi) {
+        dmaCopyVram((u8 *)&tilemap_bg1[(u16)bg1_dirty_lo * 32],
+                    VRAM_BG1_MAP + (u16)bg1_dirty_lo * 32,
+                    (u16)(bg1_dirty_hi - bg1_dirty_lo + 1) * 64);
+        bg1_dirty_lo = 0xFF;
+        bg1_dirty_hi = 0;
     }
 }

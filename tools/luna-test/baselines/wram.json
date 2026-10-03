@@ -120,8 +120,8 @@
     "rom_sha256": "7ca93ca630be5c10f77a647e634c7a2b1903a14b4f47cc4f1a31edc5870bacc0"
   },
   "chips_sa1_starfield": {
-    "stream": "7d3f0d88e6d9cd6726bacb76df386abf36b75ec6fca8f0b1c14e9d453f71b706",
-    "rom_sha256": "84506fac248b428beb58a0bbf2ac43772deca6657b7844b86d1a9399b81915a1"
+    "stream": "15922ab1862d34ba40a1c67545e0c68fcbbcaa0e09582847153aba16b1d2b3e3",
+    "rom_sha256": "7e6fb0560302a04e41049f58e0994f7f23f0f8baf174331376a6664f8d9a909a"
   },
   "chips_superfx_3d": {
     "stream": "db302f291135a79fc25cceca48e9fddbc56f7b1b290a9a9177992846b0371012",
@@ -200,8 +200,8 @@
     "rom_sha256": "21ad949d16ca35256cefbd1a3df3121e1d838730fa43f7483141530f3f3882ff"
   },
   "games_tetris": {
-    "stream": "9a3dc5704c2d9d39da64bfa6d164fcfc7ec172cdba9fb76425e8234619275fd4",
-    "rom_sha256": "c7e52f341bebe883ad0d0c818a0c588ad925ec08c03be3e42aa1860f69e50fda"
+    "stream": "19283ae564c2eb5f993251eaa8d198aad66a315141530dbfa38643433ad5c966",
+    "rom_sha256": "4137a184a8e3966203a3ea6f9c9ee43c29a2bc9e335cc2f7bbefe409da001ad7"
   },
   "hdma_gradient_colors": {
     "stream": "342a0cbbb54ce617404d148c67c05e19e3b8b57592706e82db4f7789ee4f9c89",

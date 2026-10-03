@@ -35,3 +35,17 @@ input = "240:0x0280,244:0x0200,259:0"
 cur_rot = { eq = 1, width = 1 }
 cur_col = { eq = 0, width = 1 }
 score = 0
+
+[[checkpoint]]                 # DOWN held: the piece soft-drops to the floor and locks
+at_frame = 420                 # (~3 frames per row, 20 rows), a new one spawns; DOWN
+input = "262:0x0400,335:0"     # released at 335. The lock redraws BG1 rows.
+[checkpoint.values]
+game_state = { eq = 1, width = 1 }
+total_lines = 0
+
+# Every VRAM DMA of the run in blank: until 2026-10-03 the BG1 transfer of a
+# locked piece left VBlank (renderFlush scanned the 28 dirty-row flags between
+# the BG2 DMA and the BG1 one). The ROM built before the fix fails this
+# checkpoint sequence here (negative control, luna 1.32.0).
+[asserts.dma]
+unsafe_writes = 0

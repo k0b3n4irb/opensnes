@@ -190,6 +190,14 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(examples): **`games/tetris` no longer writes VRAM outside VBlank.**
+  `renderFlush()` scanned 28 per-row dirty flags to coalesce the BG1 rows;
+  the scan cost about 48 scanlines between two DMAs, so on every locked
+  piece the BG1 transfer (1 280 bytes) left VBlank and landed on lines
+  16-24 — unseen because the bytes were the same (examples audit, luna
+  `--dma-trace`). The dirty rows are now a span kept at marking time and
+  flushed in one DMA; `state_tetris.toml` soft-drops a piece to its lock
+  and asserts `unsafe_writes = 0` (the ROM before the fix fails it).
 - docs: `OamDynamicConfig` says only `vramLarge = 0x0000` / `vramSmall =
   0x1000` are honoured (OBJSEL's name base and the tile tables are fixed);
   `objKill()` says not to kill another object from an update callback
