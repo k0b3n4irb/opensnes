@@ -73,6 +73,7 @@ behaviour, and the note under the table says which.
 | 20 | `games/rpg` | walk, talk to a villager with A, open the chest | The full game path: map, dialogue, chest state. |
 | 21 | `input/mouse` | move the mouse, click both buttons, right-click cycles sensitivity | Optional (needs a SNES Mouse, port 1). The cursor tracks the hand at each of the three sensitivities. |
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
+| 23 | `backgrounds/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `examples/backgrounds/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
 
 **What a failure in each row points at.** Rows 1 and 2 failing means nothing
 else is worth running: the boot path or the joypad read is wrong. Row 3 is
@@ -87,6 +88,10 @@ persistence the project has. Rows 16 to 18 depend on the cart as much as on
 the SDK; a failure needs the firmware version and, if possible, a second cart
 before it is filed against the SDK. Rows 19 and 20 are the integration rows:
 they fail last and tell you least, but they are what a user will run first.
+Row 23 asks the console a question no reference answers and emulators answer
+differently (bit 3 of a hi-res offset-per-tile offset, see the example's
+README); whichever way it comes out, the photo goes to the luna and snes-rag
+reports.
 
 ## The grid
 
@@ -123,6 +128,7 @@ Peripherals:   pads / mouse / scope
 20  games/rpg
 21  input/mouse                 n/a
 22  input/superscope            n/a
+23  backgrounds/mode6
 ```
 
 ## What to do with a KO

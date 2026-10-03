@@ -16,6 +16,12 @@
  * vertical row makes the columns ripple; press A and the wave moves to the
  * horizontal row, and the columns slide sideways instead.
  *
+ * B shows a still test card: every odd column gets the horizontal offset 8
+ * and nothing else, the one bit (bit 3) that falls inside a 16-half-pixel
+ * tile. Emulators disagree on it — ares, bsnes and luna shift the column by
+ * half a tile, Mesen2 drops the bit — and no reference covers the case in
+ * hi-res, so the card is there to be photographed on a console (README).
+ *
  * @par SNES Concepts
  * - Mode 6: `setMode(BG_MODE6, 0)`, BG1 4bpp in hi-res, BG3 = offset map
  * - Hi-res: the sub screen draws the even half-pixel columns and the main
@@ -29,6 +35,7 @@
  * - Diagonal colour bands with fine vertical stripes ripple up and down as a
  *   travelling wave; the leftmost column stays put.
  * - Press A: the columns slide sideways instead. A again: back.
+ * - Press B: the still test card (odd columns offset by 8). B again: back.
  *
  * @par Modules Used
  * console, dma, background, input, math, tile
@@ -52,9 +59,11 @@
 /** @brief Number of colour bands, one 16x8 tile each */
 #define BANDS 8
 
-/** @brief Probe oracles: wave phase, 1 while the wave is vertical */
+/** @brief Probe oracles: wave phase, 1 while the wave is vertical,
+ *  1 while the test card is shown */
 u16 wave_phase;
 u8 opt_vertical;
+u8 opt_card;
 
 /** @brief One 4bpp character's pixels and its encoding */
 static u8 px[64];
@@ -63,6 +72,8 @@ static u8 tilebuf[32];
 static u16 owords[32];
 /** @brief A row of zero words, for the row that does not */
 static u16 zwords[32];
+/** @brief The test card's horizontal row: 8 on odd columns, 0 on even */
+static u16 cardwords[32];
 /** @brief One tilemap row being built */
 static u16 maprow[32];
 
@@ -110,31 +121,47 @@ int main(void) {
     setMainScreen(LAYER_BG1);
     setSubScreen(LAYER_BG1);
 
-    for (i = 0; i < 32; i++)
+    for (i = 0; i < 32; i++) {
         zwords[i] = 0;
+        cardwords[i] = (u16)(OPT_BG1 | ((i & 1) ? 8 : 0));
+    }
     dmaCopyVram((u8 *)zwords, BG3_MAP, 64);          /* row 0: H, none */
 
     opt_vertical = 1;
+    opt_card = 0;
     wave_phase = 0;
     setScreenOn();
 
     while (1) {
+        u16 pressed;
+
         /* Build next frame's words during active display, so the upload
          * fits at the very start of VBlank (see backgrounds/mode2). */
-        for (i = 0; i < 32; i++) {
-            u8 ang = (u8)(i * 8 + wave_phase);
-            s16 off = (s16)(32 + ((fixSin(ang) * 24) >> 8));    /* 8..56 */
-            owords[i] = (u16)(OPT_BG1 | ((u16)off & 0x3FF));
+        if (!opt_card) {
+            for (i = 0; i < 32; i++) {
+                u8 ang = (u8)(i * 8 + wave_phase);
+                s16 off = (s16)(32 + ((fixSin(ang) * 24) >> 8));  /* 8..56 */
+                owords[i] = (u16)(OPT_BG1 | ((u16)off & 0x3FF));
+            }
+            wave_phase = (u16)(wave_phase + 2);
         }
-        wave_phase = (u16)(wave_phase + 2);
 
         WaitForVBlank();
-        if (opt_vertical) {
-            dmaCopyVram((u8 *)owords, (u16)(BG3_MAP + 32), 64);  /* row 1: V */
-        } else {
-            dmaCopyVram((u8 *)owords, BG3_MAP, 64);              /* row 0: H */
+        if (!opt_card) {
+            if (opt_vertical) {
+                dmaCopyVram((u8 *)owords, (u16)(BG3_MAP + 32), 64);  /* row 1: V */
+            } else {
+                dmaCopyVram((u8 *)owords, BG3_MAP, 64);              /* row 0: H */
+            }
         }
-        if (padPressed(0) & KEY_A) {
+        pressed = padPressed(0);
+        if (pressed & KEY_B) {
+            opt_card ^= 1;
+            /* the card owns row 0 and zeroes row 1; leaving it zeroes
+             * both, and the wave refills its own row next frame */
+            dmaCopyVram(opt_card ? (u8 *)cardwords : (u8 *)zwords, BG3_MAP, 64);
+            dmaCopyVram((u8 *)zwords, (u16)(BG3_MAP + 32), 64);
+        } else if (!opt_card && (pressed & KEY_A)) {
             opt_vertical ^= 1;
             /* the row the wave leaves goes back to zero next frame */
             dmaCopyVram((u8 *)zwords,

@@ -14,6 +14,13 @@ All notable changes to OpenSNES are documented in this file.
   luna sees them as PAL, and replays their six scripted manifests at 50 Hz:
   6/6 pass. The manifests are derived from the NTSC ones at run time. Last
   item of action 39.
+- feat(examples,docs): **`backgrounds/mode6` test card (B)** for a question no
+  reference answers: does bit 3 of a hi-res horizontal offset (8 half-pixels,
+  inside a 16-wide tile) move the column? luna and ares say half a tile,
+  Mesen2 drops it (luna's report of 2026-10-02). The card puts 8 on every odd
+  column and nothing else; `backgrounds_mode6_card.toml` pins the table, the
+  README explains the divergence, and the hardware protocol gains row 23
+  (a photo of the card on a console).
 - feat(examples): **`backgrounds/mode6`** — a hi-res 4bpp layer with
   offset-per-tile: Mode 6 reads the table like Mode 2 (an H row, a V row),
   with 16-half-pixel columns; A moves the wave from the vertical row to the
