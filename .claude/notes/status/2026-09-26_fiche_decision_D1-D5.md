@@ -157,4 +157,4 @@ La 1.0 part quand toutes ces lignes sont vraies, chacune prouvée dans le dépô
 4. Le sentinel de dérive couvre les noms de fonctions cités en doc.
 5. Une session console a rempli au moins les rangées 1 à 7 du protocole matériel.
 6. Le chantier Super FX est soit terminé (phases C–F), soit borné et documenté comme expérimental, avec des signatures `gsu*` qui ne gèleront pas un pipeline de démo.
-7. Deux semaines sans nouvelle entrée 🟠 dans `KNOWN_LIMITATIONS.md`.
+7. Deux semaines sans **découvrir** de défaut silencieux dans la bibliothèque, le runtime ou le compilateur, corrigé ou non (reformulé le 2026-10-03 : la première rédaction, « sans nouvelle entrée 🟠 dans `KNOWN_LIMITATIONS.md` », ne comptait que les défauts laissés ouverts). Journal et date d'ouverture de la fenêtre : `status/silent_defects_log.md` ; la fenêtre s'ouvre à la fin de la campagne de chasse.

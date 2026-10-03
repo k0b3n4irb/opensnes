@@ -77,7 +77,7 @@ day (summarised at the end of this note).
 | 4 | Drift sentinel covers function names cited in docs | done |
 | 5 | A console session filled rows 1 to 7 | open (owner, hardware) |
 | 6 | Super FX finished or bounded as experimental | **finished 2026-10-03**: `GSU_BANK` (`26856d8a`) and the save |
-| 7 | Two weeks with no new orange entry | the clock restarts on 2026-10-03 (SNESMOD defects) |
+| 7 | Two weeks without discovering a silent defect (reworded 2026-10-03) | hunting campaign open; the fortnight starts when it closes — `status/silent_defects_log.md` |
 
 ## Order of work agreed on 2026-10-03
 
