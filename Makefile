@@ -207,7 +207,7 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests_hirom
 	@$(MAKE) -s -C devtools/libtests_gsu
 	@$(MAKE) -s -C devtools/libtests_snesmod
-	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
+	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
 	@# APU output hashed for the ten audio examples (luna
@@ -250,6 +250,9 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram clean
 	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram
 	@python3 devtools/compiler-tests/runtime/b2_far_ram/test_b2_far_ram.py
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/d_quals clean
+	@$(MAKE) -s -C devtools/compiler-tests/runtime/d_quals
+	@python3 devtools/compiler-tests/runtime/d_quals/test_d_quals.py
 	@$(MAKE) -s -C devtools/libtests clean
 	@$(MAKE) -s -C devtools/libtests
 	@python3 devtools/libtests/test_libtest.py
@@ -355,7 +358,7 @@ rom-coverage:
 	@$(MAKE) -s -C devtools/libtests_hirom
 	@$(MAKE) -s -C devtools/libtests_gsu
 	@$(MAKE) -s -C devtools/libtests_snesmod
-	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel; do \
+	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
 	@python3 tools/luna-test/rom_coverage.py
 

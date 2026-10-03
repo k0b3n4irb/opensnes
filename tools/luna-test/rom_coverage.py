@@ -89,7 +89,7 @@ FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120
             # the cache-resident GSU job (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait)
             (REPO_ROOT / "devtools" / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
-    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel")
+    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals")
 ]
 
 

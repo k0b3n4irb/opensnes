@@ -184,6 +184,26 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(compiler): **four silent miscompilations in cproc, all on common
+  idioms**, found by the pre-1.0 hunting campaign and reproduced on luna
+  (`.claude/notes/reviews/2026-10-03_audit/A_compiler.md`). `++` / `--` on
+  a `FAR` object read bank $7E and wrote bank $00 (`fcount = 10;
+  fcount++; ++fcount;` gave 10, and a byte landed in `$00:2000-$7FFF`, the
+  hardware registers); the same store dropped `volat` on a volatile. A
+  whole-struct copy with a 4-aligned member copied two of its four bytes,
+  and `= {0}` on a `u32` array or a struct with an `s32` left the upper
+  halves unwritten: both used upstream's chunk table, where a QBE word is
+  4 bytes (here it is 2). A bit-field of a `FAR` object, or of const data
+  read through a pointer, was read in bank $00. None of the four occurs in
+  the examples, the library or the fixtures (IR scan). **Struct assignment
+  (`a = b;`) now works** for bank-$00 and ROM objects — it was refused by
+  accident (halfword ops the backend has no lowering for) — and is refused
+  on purpose for a `FAR` object on either side; **struct returns by value
+  are refused on purpose** (they compiled to a copy of zeros once the
+  accident was gone). New runtime fixture `devtools/compiler-tests/runtime/
+  d_quals` (16 cells on luna); `struct_assign` moves from the refusal pins
+  to a positive check. Every example matches its previous build frame for
+  frame (`diff_corpus` 89/89).
 - fix(lib): **`snesmodInit()` leaves NMITIMEN as it found it.** It ended on
   `$81`, so an H or V timer IRQ enabled before the audio driver was loaded
   stopped firing, silently. It now restores the lib's software copy of the

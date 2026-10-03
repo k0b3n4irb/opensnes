@@ -716,9 +716,14 @@ fixed in the same chantier and the ROM gates `make tests` at 64/64:
 If you carry an older toolchain: avoid bit-field reads, variable 32-bit
 shift counts, signed `long` comparisons and `if` on a `long`.
 
-### 🟡 Struct parameters, struct returns and struct assignment by value are refused
+### 🟡 Struct parameters and struct returns by value are refused; a FAR struct is copied field by field
 cc65816 has no lowering for a struct passed or returned by value (QBE
-`parc` / `argc`) nor for a whole-struct copy (`blit`). The build stops with
+`parc` / `argc`). Whole-struct assignment (`a = b;`) works since 2026-10-03
+for objects in bank $00 or in ROM read through a pointer (it was refused by
+accident for 2-aligned structs and copied two bytes of every four for
+4-aligned ones: the front end's chunk table was upstream's, where a word is
+4 bytes); a copy from or to a `FAR` struct or array is refused — "copy
+field by field". The build stops with
 `cc65816/qbe: unhandled IR op N (parc) … struct parameters and struct
 returns by value are not supported on w65816; pass a pointer` — it never
 emits code for them (a whole-struct assignment *was* silently dropped until
