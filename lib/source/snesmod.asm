@@ -599,7 +599,20 @@ snesmodLoadEffect:
     rep #$30
     .ACCU 16
     .INDEX 16
-    lda 6,s                     ; id
+    ; 16 effect slots: snesmodPlayEffect keeps four bits of the id, so a
+    ; 17th load returned 16, which played as effect 0 (until 2026-10-03).
+    ; Full: return $FF and load nothing.
+    lda spc_sfx_next
+    and #$00FF
+    cmp #16
+    bcc +
+    lda #$00FF
+    sta tcc__r0
+    stz tcc__r0+1
+    plb
+    plp
+    rtl
++   lda 6,s                     ; id
     tax
     sep #$20
     .ACCU 8

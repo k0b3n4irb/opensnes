@@ -184,6 +184,9 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **a 17th `snesmodLoadEffect()` returns `0xFF`** and loads
+  nothing: it returned 16, which `snesmodPlayEffect()` masks to four bits
+  and played as effect 0 (library audit, row 29).
 - fix(lib): **`setMode()` keeps the flag bits of its `mode` argument.** The
   header allows `setMode(BG_MODE1 | BG3_MODE1_PRIORITY_HIGH, 0)`; the
   priority bit was masked off with the mode (library audit, row 13).

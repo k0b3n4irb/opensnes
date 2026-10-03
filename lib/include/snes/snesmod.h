@@ -182,7 +182,9 @@ u8 snesmodGetPosition(void);
  * Loads a single source/sample for use as a sound effect.
  *
  * @param sfxIndex Source index in the soundbank
- * @return Effect slot ID for use with snesmodPlayEffect
+ * @return Effect slot ID for use with snesmodPlayEffect, 0-15; 0xFF when
+ *         the 16 slots are taken (nothing is loaded — until 2026-10-03 a
+ *         17th load returned 16, which snesmodPlayEffect played as 0)
  */
 u8 snesmodLoadEffect(u16 sfxIndex);
 
