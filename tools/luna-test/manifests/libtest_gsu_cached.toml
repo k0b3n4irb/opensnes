@@ -82,6 +82,9 @@ r_save_range = 1          # SRAM_ERR_RANGE: 0xFFF8 + 16 wraps past 64 KB
 r_rom_table = 0x3CA5      # ... so its table and its absolute jump are where it was assembled for
 r_done = 0xD0E5
 
+[asserts.blocks]
+gsu_hdma_table = "7F0F110F508000"   # gsuSetupHdmaBlanking(0, 80): [127 show][17 show][80 blank] end — no empty top entry
+
 [asserts.gsu]
 cfgr = 0x80               # the last job asked $A0 (MS0): dropped at 21 MHz
 bus_violations = 0

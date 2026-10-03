@@ -193,6 +193,11 @@ int main(void) {
     gsuRomReadResult();
     r_rom_table = r_rom;
 
+    /* Letterbox with no top band: a band of 0 lines has no entry (a count
+     * of 0 ends an HDMA table), 144 visible lines take two entries, then
+     * the 80-line bottom band — the manifest reads the table. */
+    gsuSetupHdmaBlanking(0, 80);
+
     /* The save: Game Pak RAM, battery-backed (USE_SRAM with USE_SUPERFX). */
     r_save_idle = sramSaveOffset(save_a, 8, SAVE_AT);
     sramLoadOffset(save_buf, 8, SAVE_AT);

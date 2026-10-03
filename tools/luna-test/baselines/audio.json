@@ -38,9 +38,9 @@
       "peak": 17191
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "ec4e240b731fa698f4db4f6dd1d3dc9704e1ef95660c6853583499a8116c4c4e",
+      "sha256": "3081b28324c7708b2c361bcb59d654a4691536316e3ab76d6ef59679c6efad29",
       "samples": 160007,
-      "peak": 20893
+      "peak": 20923
     },
     "audio/soundboard": {
       "sha256": "544ad99e8876166e5e6a00873f534bebaf71a4704c5caa0840c44e2638b9bdf3",

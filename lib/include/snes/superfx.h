@@ -424,6 +424,13 @@ extern void gsuDmaFullFrame(void);
  * and then publishes them to gsuDmaFullFrame() and the gsuPresent() NMI,
  * which use the blanked lines as extra transfer time. Leave the bands on
  * while either is in use.
+ *
+ * A band may be 0 (no band) to 224 lines; a band of 128 lines or more
+ * takes two HDMA entries. top + bottom above 224 leaves no visible lines.
+ * (Until 2026-10-03 a top band of 0 ended the table before it began, and
+ * the whole frame was then transferred on visible lines.) The visible
+ * lines are written with INIDISP = $0F, full brightness: setBrightness()
+ * and the fades do not apply while the bands are on.
  */
 extern void gsuSetupHdmaBlanking(u16 topBlank, u16 bottomBlank);
 
