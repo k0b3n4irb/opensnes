@@ -27,6 +27,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage craft -- Design decisions: budgeting, choosing a mode, composing layers
 
+@subpage perf -- What the library functions cost per frame, measured in five real scenes
+
 ## Tools {#mainpage_tools}
 
 @subpage tools -- The asset pipeline: turn images, maps, fonts and audio into SNES data

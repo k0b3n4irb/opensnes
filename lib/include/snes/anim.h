@@ -112,6 +112,7 @@ typedef struct {
  *
  * @param p    Player (caller-owned)
  * @param clip ROM clip to play
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void animPlay(AnimPlayer *p, const AnimClip *clip);
 
@@ -128,6 +129,7 @@ void animRestart(AnimPlayer *p);
  *
  * @return The current frame value; ANIM_NONE if the player is stopped.
  *         A finished ANIM_ONCE player keeps returning its last frame.
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 u16 animTick(AnimPlayer *p);
 

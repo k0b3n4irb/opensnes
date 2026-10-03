@@ -68,6 +68,20 @@ SUBSET = [
     ("sprites/dynamic_sprite", 7676, "the dynamic-sprite VRAM queue flush"),
     ("maps/map_scroll",       7668, "the map module's scroll DMA"),
     ("audio/snesmod_music",   5650, "the audio driver's per-frame work"),
+    # Super FX builds (2026-10-03): the handler is reached through the WRAM
+    # vector blob, and its cost is the same order as everywhere else.
+    ("chips/superfx_3d",      8272, "a Super FX build: the handler behind the WRAM vectors"),
+    ("chips/superfx_game_skeleton", 8224, "the handler while gsuPresent runs"),
+]
+
+# Symbols other than NmiHandler that run in the vertical interrupt, with their
+# own reference and NO absolute ceiling: only growth is gated. gsuPresent's
+# step uploads half the framebuffer per interrupt and is meant to outlast
+# VBlank — it runs inside the 40 + 40 line letterbox blank, and that every
+# byte lands in blank is vram_dma_blank.py's check, not this one's.
+EXTRA = [
+    ("chips/superfx_game_skeleton", "gsu_present_step", 91956,
+     "gsuPresent's half-frame upload, in the letterbox blank"),
 ]
 
 BUDGET_RE = re.compile(r"budget: (\S+) max (\d+) mclk \(frame (\d+)\)")
@@ -80,14 +94,14 @@ def rom_for(key: str) -> Path:
     return roms[0]
 
 
-def folded_sym(rom: Path, out_dir: Path) -> Path:
-    """The ROM's .sym with the NMI handler's child labels removed."""
+def folded_sym(rom: Path, out_dir: Path, symbol: str = "NmiHandler") -> Path:
+    """The ROM's .sym with the child labels of `symbol` removed."""
     src = rom.with_suffix(".sym")
     if not src.is_file():
         sys.exit(f"nmi-budget: {src.relative_to(REPO_ROOT)} missing")
-    dst = out_dir / src.name
+    dst = out_dir / f"{symbol}.{src.name}"
     dst.write_text("".join(l for l in src.read_text(encoding="utf-8").splitlines(keepends=True)
-                           if "NmiHandler@" not in l))
+                           if f"{symbol}@" not in l))
     return dst
 
 
@@ -99,16 +113,18 @@ def main() -> int:
     luna = find_luna()
     over = 0
     with tempfile.TemporaryDirectory() as td:
-        for key, ref, why in SUBSET:
+        rows = [(key, "NmiHandler", ref, CEILING, why) for key, ref, why in SUBSET]
+        rows += [(key, symbol, ref, None, why) for key, symbol, ref, why in EXTRA]
+        for key, symbol, ref, limit, why in rows:
             rom = rom_for(key)
-            sym = folded_sym(rom, Path(td))
+            sym = folded_sym(rom, Path(td), symbol)
             # --report still asks for a budget, with a ceiling nothing reaches:
             # luna then prints its `budget:` line (worst frame and its number)
             # and never gates. Reading the `--top` table instead broke the day
             # WaitForVBlank outranked the handler (2026-09-26 audit).
-            ceiling = 10**9 if args.report else CEILING
+            ceiling = 10**9 if (args.report or limit is None) else limit
             cmd = [luna, "profile", str(rom), "--until-frame", str(FRAMES),
-                   "--sym", str(sym), "--top", "0", "--budget", f"NmiHandler={ceiling}"]
+                   "--sym", str(sym), "--top", "0", "--budget", f"{symbol}={ceiling}"]
             proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             if proc.returncode == 2:
                 sys.exit(f"nmi-budget: luna rejected the symbol on {key}: "
@@ -118,14 +134,17 @@ def main() -> int:
                 sys.exit(f"nmi-budget: luna printed no budget line for {key}: "
                          f"{(proc.stdout + proc.stderr).strip()[-200:]}")
             worst, frame = int(m.group(2)), m.group(3)
-            pct = 100.0 * worst / CEILING
             grew = worst > ref * (1 + DRIFT)
             verdict = "OVER" if proc.returncode == 1 else ("GREW" if grew else "ok")
             if proc.returncode == 1 or (grew and not args.report):
                 over += 1
-            print(f"  {verdict:4}  {key:24} {worst:6} mclk  ({pct:4.0f}% of {CEILING}, "
+            share = (f"{100.0 * worst / limit:4.0f}% of {limit}" if limit
+                     else "no ceiling, growth only")
+            name = key if symbol == "NmiHandler" else f"{key} [{symbol}]"
+            print(f"  {verdict:4}  {name:24} {worst:6} mclk  ({share}, "
                   f"reference {ref}, worst frame {frame})  — {why}")
-    print(f"\nNMI VBlank budget: {len(SUBSET) - over}/{len(SUBSET)} within "
+    total = len(SUBSET) + len(EXTRA)
+    print(f"\nNMI VBlank budget: {total - over}/{total} within "
           f"{CEILING} master cycles and {int(DRIFT * 100)} % of their reference"
           + (f", {over} OVER or GREW" if over else ""))
     return 1 if over else 0

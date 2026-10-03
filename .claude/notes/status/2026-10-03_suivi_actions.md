@@ -3,7 +3,7 @@
 The review (`reviews/2026-09-26_etat_des_lieux.md`) ended with 42 numbered
 actions and no tracking table; this note is that table, built on 2026-10-03
 by matching each action against `git log --since=2026-09-26`, the CHANGELOG
-and the notes. **26 done, 11 partly, 2 not started, 3 wait on the owner.**
+and the notes. **26 done, 11 partly, 2 not started, 3 wait on the owner** on the day of the inventory; rows 9, 12 and 28 were closed the same day (29 done, 8 partly).
 Update the row when an action moves; do not rebuild the inventory.
 
 The global picture and the order of work are in the plan approved the same
@@ -21,10 +21,10 @@ day (summarised at the end of this note).
 | 6 | IRQ/BRK/COP stubs in WRAM + manifest | 🟠 | done | `7e7fa817`, `20638bc3` |
 | 7 | `test-pal` builds its fixture; scheduled workflows on develop | 🟠 | done | `f7367cdf` |
 | 8 | Build guards (NMI lint, config stamp, headers, `LIB_MODULES`, smconv IMPM) | 🟠 | done | `412b15e3`, `3db1a9fb` |
-| 9 | `BENCHMARK.md` regenerated, ROADMAP and `ABI.md` fixed | 🟠 | partly | `2c2d6905`. Left: anchor the benchmark total in `check_doc_drift.py` |
+| 9 | `BENCHMARK.md` regenerated, ROADMAP and `ABI.md` fixed | 🟠 | done | `2c2d6905`; the table is anchored in `check_doc_drift.py` since 2026-10-03 (anchor 13) |
 | 10 | `padIsConnected` validity flag | 🟠 | done | `2caa6894` |
 | 11 | `gsuSetProgram` in the lib; Mesen2 out of chip sources | 🟠 | done | `7e7fa817` |
-| 12 | `nmi_budget.py --report`, per-example baseline | 🟡 | partly | `f7367cdf`, `6fcb10e1`. Left: `superfx_3d` in `SUBSET` |
+| 12 | `nmi_budget.py --report`, per-example baseline | 🟡 | done | `f7367cdf`, `6fcb10e1`; `superfx_3d`, the skeleton and `gsu_present_step` added 2026-10-03 (9 rows) |
 | 13 | `OPEN_luna.md`, `OPEN_snes-rag.md`, corpus note | 🟠 | done | `b55494ee`, `012c11d6`; both lists empty on 2026-10-03 |
 | 14 | `ATTRIBUTION.md`: cmdparser, stb_image, cute_tiled, LodePNG | 🟠 | done | `f984cfe4` |
 | 15 | Stale example comments, `port-example/SKILL.md` | 🟠 | done | `38c4b7ed` |
@@ -40,7 +40,7 @@ day (summarised at the end of this note).
 | 25 | SA-1 BW-RAM saves; `sa1.h` and the speed claim | 🟠 | done | `621cd9f9`, `f51786d1`, `d2b4bd51`, `b2a08f27` |
 | 26 | Lib: structs for >= 4-argument functions, dead API deprecated, hot setters, `sram.asm` | 🟠 | not started | tied to 18 (associated decisions 1 and 2) |
 | 27 | Window and `hdma_wave` examples on the lib | 🟠 | done | `007c92ce`, `855bf2c7` |
-| 28 | Per-API frame costs in `docs/PERF.md`, cited in headers | 🟠 | partly | `52e807d6`. Left: no header cites `PERF.md` |
+| 28 | Per-API frame costs in `docs/PERF.md`, cited in headers | 🟠 | done | `52e807d6`; the ten measured functions cite the page and the page is in the generated docs since 2026-10-03 |
 | 29 | Header dependencies for lib and examples | 🟠 | done | `d2718a43`, `412b15e3`, `3db1a9fb` |
 | 30 | Richer GSU manifests, `libtests_gsu` | 🟡 | partly | `f7367cdf`, fixture and manifest exist. Left: `scmr_ron`, `--gsu-pc-set`, sha cache |
 | 31 | Compile-only fixtures checked, runtime `u32 f(void)` | 🟡 | done | `5aa7868c`, `01bb42cf`, `f143c6c7`, `e428d940` |

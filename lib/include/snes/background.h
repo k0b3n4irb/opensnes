@@ -72,6 +72,7 @@
  * // Scroll BG1 right by 10 pixels
  * bgSetScroll(0, scrollX, 0);
  * @endcode
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void bgSetScroll(u8 bg, u16 x, u16 y);
 

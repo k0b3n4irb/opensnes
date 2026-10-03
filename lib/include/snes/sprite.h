@@ -369,6 +369,7 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * fixed — `examples/input/move_sprite` uses plain `u16` and its manifest pins
  * the motion to the pixel. Prefer `s16` when a sprite can leave the screen by
  * the left or the top, so the off-screen test is a signed compare.
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 
@@ -438,6 +439,7 @@ void oamSetTile(u16 id, u16 tile);
  * @param id Sprite ID (0-127)
  *
  * @see examples/games/rpg — culls its villagers this way
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamHide(u16 id);
 
@@ -446,6 +448,7 @@ void oamHide(u16 id);
  *
  * @param id Sprite ID (0-127)
  * @param large TRUE for large size, FALSE for small
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamSetSize(u16 id, u16 large);
 
@@ -660,6 +663,7 @@ void oamDynamicSetSize(u16 id, u8 size);
  * resolve to 64x64 are silently skipped.
  *
  * @param id Index into oambuffer array (0-127)
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamDynamicDraw(u16 id);
 

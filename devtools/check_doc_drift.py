@@ -972,6 +972,68 @@ def check_build_knobs() -> list[str]:
             f"does not name `{k}`" for k in missing]
 
 
+# --- anchor 13: the benchmark table of docs/BENCHMARK.md --------------------
+# The page prints, for each benchmark function, PVSnesLib's two figures and
+# ours, a TOTAL row and a percentage that the summary table repeats. Ours come
+# from devtools/cyclecount/bench_baseline.json (the file `make bench` gates
+# on). Caught as the page saying -32.2 % for four months after far pointers
+# had made it -20.4 % (review of 2026-09-26, action 9).
+BENCH_PAGE = "docs/BENCHMARK.md"
+BENCH_BASELINE = "devtools/cyclecount/bench_baseline.json"
+BENCH_ROW_RE = re.compile(
+    r"^\s+([a-z_0-9]+|TOTAL)\s+(\d+)\s+(\d+)\s+(\d+)\s+([+-]\d+\.\d)%\s*$", re.M)
+BENCH_SUMMARY_RE = re.compile(
+    r"\*\*[−-](\d+\.\d)\s*%\*\*\s+vs PVSnesLib \+ 816-opt \((\d+) vs (\d+) cycles\)")
+
+
+def bench_table_drifts(page: str, baseline: dict[str, int]) -> list[str]:
+    """Drifts between the page's table and the measured baseline."""
+    rows = BENCH_ROW_RE.findall(page)
+    if not rows:
+        return [f"{BENCH_PAGE}: no benchmark table found (the row format changed?)"]
+    out: list[str] = []
+    ours_sum = opt_sum = 0
+    total = None
+    for name, _plain, opt, ours, pct in rows:
+        if name == "TOTAL":
+            total = (int(opt), int(ours), pct)
+            continue
+        ours_sum += int(ours)
+        opt_sum += int(opt)
+        if name not in baseline:
+            out.append(f"{BENCH_PAGE}: row `{name}` is not in {BENCH_BASELINE}")
+        elif baseline[name] != int(ours):
+            out.append(f"{BENCH_PAGE}: `{name}` says {ours} cycles, "
+                       f"{BENCH_BASELINE} measures {baseline[name]}")
+    if total is None:
+        return out + [f"{BENCH_PAGE}: the table has no TOTAL row"]
+    opt_total, ours_total, pct = total
+    if (opt_total, ours_total) != (opt_sum, ours_sum):
+        out.append(f"{BENCH_PAGE}: TOTAL says {opt_total} / {ours_total}, "
+                   f"its rows add up to {opt_sum} / {ours_sum}")
+    want = f"{100.0 * (ours_sum - opt_sum) / opt_sum:+.1f}"
+    if pct != want:
+        out.append(f"{BENCH_PAGE}: TOTAL says {pct}%, the rows give {want}%")
+    m = BENCH_SUMMARY_RE.search(page)
+    if not m:
+        out.append(f"{BENCH_PAGE}: the summary line (\"**−N %** vs PVSnesLib + "
+                   f"816-opt (A vs B cycles)\") was not found")
+    elif (m.group(1), int(m.group(2)), int(m.group(3))) != (want.lstrip("+-"), ours_sum, opt_sum):
+        out.append(f"{BENCH_PAGE}: the summary says −{m.group(1)} % "
+                   f"({m.group(2)} vs {m.group(3)}), the table gives "
+                   f"{want}% ({ours_sum} vs {opt_sum})")
+    return out
+
+
+def check_benchmark_table() -> list[str]:
+    import json
+    page, base = repo_path(BENCH_PAGE), repo_path(BENCH_BASELINE)
+    if not page.is_file() or not base.is_file():
+        return [f"{BENCH_PAGE} or {BENCH_BASELINE} is missing"]
+    return bench_table_drifts(page.read_text(encoding="utf-8"),
+                              json.loads(base.read_text(encoding="utf-8")))
+
+
 def run_checks(quiet: bool) -> int:
     canonical_ver, canonical_date = canonical_version()
     canonical_n = canonical_examples_count()
@@ -996,6 +1058,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_no_retired_tools())
     all_drifts.extend(check_example_modules())
     all_drifts.extend(check_build_knobs())
+    all_drifts.extend(check_benchmark_table())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

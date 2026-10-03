@@ -88,6 +88,7 @@
  *       may live in ANY bank — a SUPERFREE section, a bank you pinned
  *       yourself. dmaCopyVramBank() exists for the case where the
  *       address and the bank are held separately.
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size);
 

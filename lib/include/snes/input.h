@@ -109,6 +109,7 @@
  *     // A was just pressed
  * }
  * @endcode
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 u16 padPressed(u8 pad);
 
@@ -126,6 +127,7 @@ u16 padPressed(u8 pad);
  *     player_x++;
  * }
  * @endcode
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 u16 padHeld(u8 pad);
 

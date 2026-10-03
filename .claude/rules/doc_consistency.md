@@ -80,6 +80,14 @@ opt-in list.
     (`USE_FASTROM`, `ROMSIZE`, `SPCSRC`, the three thresholds…) and one,
     `BPP`, that nothing read.
 
+13. **The benchmark table of `docs/BENCHMARK.md`** (since 2026-10-03): each
+    row's OpenSNES figure must equal `devtools/cyclecount/bench_baseline.json`,
+    the TOTAL row must be the sum of its rows, and the percentage and the
+    summary line must follow. Caught as the page saying −32.2 % for four
+    months after far pointers had made it −20.4 %. After an intentional
+    codegen change: `make bench` to see the new figures, update the baseline
+    and the page in the same commit.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the
