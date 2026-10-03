@@ -33,4 +33,4 @@ boundary and rounding down was right.
 I am not sure which way you would prefer to fix it: pad the front as before,
 or take the aligned loop start back from the codec.
 
-(This is case 4 of the small test in my issue about the loop end.)
+(This is case 4 of the small test in #8.)

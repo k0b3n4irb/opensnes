@@ -31,6 +31,6 @@ the TuningFactor that createSource returns for it.
 
 Returning resampleFactor instead of iResampleFactor fixes it here.
 
-(This is case 3 of the small test in my issue about the loop end. The lengths
+(This is case 3 of the small test in #8. The lengths
 are different there because of that other problem, but the direction of the
 factor is the same.)

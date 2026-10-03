@@ -9,15 +9,27 @@ reading the final text.
 
 Plan: `~/.claude/plans/federated-forging-flask.md` (2026-10-03).
 
-| Draft | Subject | State |
-|---|---|---|
-| `2026-10-03_to_mukunda_issue-A_koff.md` | driver: ResetSound clears KOF 60 cycles after setting it, under the 64-cycle KON/KOFF poll | ready for the owner to read; not posted |
-| `..._issue-B_smconv-loop-end.md` | smconv (Go): data after the loop end is kept; ping-pong unroll appended after it; resample sees the forward half only (one fix) | checked with a Go test on ramps (below); ready for the owner to read |
-| `..._issue-C_surround.md` | driver: volume-column pan does not clear surround (KungFuFurby's fix of 2015, in PVSnesLib) | read in both sources, not measured, and the draft says so; ready to read |
-| `..._issue-D_smconv-tuning.md` | smconv (Go): `resampleLoop` returns old/new where the C++ returned new/old | checked (pitch base -14 vs +5 on `pollen8.it` sample 17); ready to read |
-| `..._issue-E_smconv-loop-start.md` | smconv (Go): `Loop = loopStart / 16 * 9` rounds down, the codec aligns the loop start up | checked with the Go test; ready to read |
+Posted on 2026-10-03 from the owner's account (`k0b3n4irb`), on his go. The
+text online equals the draft files (checked by reading each issue back).
 
-Order when the owner says go: A first, then C, then B, D, E. One at a time.
+| Issue | Draft | Subject |
+|---|---|---|
+| [#6](https://github.com/mukunda-/snesmod/issues/6) | `..._issue-A_koff.md` | driver: ResetSound clears KOF 60 cycles after setting it, under the 64-cycle KON/KOFF poll |
+| [#7](https://github.com/mukunda-/snesmod/issues/7) | `..._issue-C_surround.md` | driver: volume-column pan does not clear surround (KungFuFurby's fix of 2015, in PVSnesLib); read in both sources, not measured, and the issue says so |
+| [#8](https://github.com/mukunda-/snesmod/issues/8) | `..._issue-B_smconv-loop-end.md` | smconv (Go): data after the loop end is kept; ping-pong unroll appended after it; resample sees the forward half only. Carries the Go test and its output |
+| [#9](https://github.com/mukunda-/snesmod/issues/9) | `..._issue-D_smconv-tuning.md` | smconv (Go): `resampleLoop` returns old/new where the C++ returned new/old |
+| [#10](https://github.com/mukunda-/snesmod/issues/10) | `..._issue-E_smconv-loop-start.md` | smconv (Go): `Loop = loopStart / 16 * 9` rounds down, the codec aligns the loop start up |
+
+His answers, when they come, are recorded here. Still open on our side: tell
+PVSnesLib about #6 (same sequence in `sm_spc_wla.asm:545`), on the owner's go;
+whether modlib's IT 2.15 detection (`Cmwt >= 0x215`, rejecting Cvt bit 2)
+deserves a note to him - our port follows OpenMPT and Schism (Cvt bit 2),
+read through a summariser, to re-read in the raw sources first.
+
+Posting needs a classic token: a fine-grained one cannot create an issue in a
+repository the owner does not own (403 "Resource not accessible by personal
+access token"). `.env` now holds `GH_PAT_TOKEN` (fine-grained: push, luna)
+and `GH_GHP_TOKEN` (classic).
 
 ## Evidence for A, re-run on 2026-10-03 (luna v1.30.4)
 
