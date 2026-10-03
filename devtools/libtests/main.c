@@ -391,6 +391,7 @@ u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
 u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
+u16 r_lerp_wide;    /* fixLerp(FIX(-64), FIX(64), 128): the 17-bit difference -> 0 (was -128.0) */
 u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
 u16 r_true_one;     /* isPAL() == getRegion() on this region, and TRUE == 1 -> 1 */
 u16 r_ispal;        /* isPAL()     -> 0 (1 under pal, the same value as getRegion) */
@@ -597,6 +598,7 @@ static void coverage_lot_c(void) {
                                              * truncation of a variable is silent */
         r_lerp_t256 = (u16)fixLerp(FIX(10), FIX(37), wide);
         r_lerp_t300 = (u16)fixLerp(FIX(10), FIX(37), wide + 44);
+        r_lerp_wide = (u16)fixLerp(FIX(-64), FIX(64), (u16)(wide >> 1));   /* t = 128 */
         oamSetX(0, 0x21);
         oamSetY(1, 0x43);                   /* stored as y - 1 = 0x42 */
         oamSetX(wide, 0x99);

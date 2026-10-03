@@ -203,18 +203,30 @@ fixLerp:
         rtl
 @lerp_frac:
 
-    ; diff = b - a
+    ; diff = b - a, which needs 17 bits: two fixed values 128.0 or more
+    ; apart overflow a 16-bit difference. On overflow (V set) the raw word
+    ; is already |diff| (b - a lies in 0..65535 or -65535..0 and the wrap
+    ; lands on the magnitude) and the true sign is the OPPOSITE of bit 15.
+    ; Until 2026-10-03 bit 15 alone was the sign: fixLerp(FIX(-64),
+    ; FIX(64), 128) gave -128.0 instead of 0.
     lda 7,s                     ; b
     sec
     sbc 9,s                     ; a
-    sta.w fmul_a               ; diff (signed 16-bit)
+    sta.w fmul_a               ; diff (signed 16-bit, or |diff| on overflow)
+    bvs @diff_ovf
 
-    ; Track sign of diff
+    ; No overflow: bit 15 is the sign
     sta.w fmul_sign
     bpl @diff_pos
         eor #$FFFF
         inc a
         sta.w fmul_a           ; |diff|
+    bra @diff_pos
+
+@diff_ovf:
+    ; Overflow: the word is |diff|; the sign is the inverse of its bit 15
+    eor #$8000
+    sta.w fmul_sign
 @diff_pos:
 
     ; t < 256 here: its low byte is the whole value
