@@ -271,6 +271,15 @@ int main(int argc, char **argv)
     char ident[256];
     ident_from_path(out, ident, sizeof(ident));
 
+    /* The DSP plays a BRR stream at 32 kHz whatever the WAV said. A source
+     * above that is not resampled here: it comes out LOWER and SLOWER, by
+     * the ratio of the rates (a 44.1 kHz file plays at 0.73 x). Said
+     * whether or not -v (until 2026-10-03 only -v said it, and said
+     * "higher-pitched"). */
+    if (rate > 32000)
+        fprintf(stderr, "wav2brr: warning: %s is %d Hz; the DSP plays it at 32 kHz, so it "
+                "comes out lower and slower (x%.2f) — resample it to 32000 Hz first\n",
+                in, rate, 32000.0 / rate);
     if (verbose) {
         printf("wav2brr: %s -> %s\n", in, out);
         printf("  input : %d Hz, %s, %d-bit, %d samples (%.2f s)\n",
@@ -281,9 +290,6 @@ int main(int argc, char **argv)
         else printf("no loop\n");
         if (tuning != 1.0)
             printf("  tuning: %.4f (loop was resampled; adjust playback pitch)\n", tuning);
-        if (rate > 32000)
-            printf("  note  : %d Hz exceeds the ~32 kHz DSP rate; it will play "
-                   "back higher-pitched unless resampled\n", rate);
         printf("  load  : extern u8 %s_brr[], %s_brr_end[];\n", ident, ident);
         printf("          audioLoadSample(id, %s_brr, %s_brr_end - %s_brr, %d);\n",
                ident, ident, ident, brr_loop);

@@ -184,6 +184,17 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(tools): **`sa1_patch` keeps the header checksum right.** Patching
+  the map mode byte to `$23` added 3 to the ROM's byte sum; every SA-1 ROM
+  shipped with a checksum off by 3 (luna and most emulators check only
+  that the two fields are complements, a console or a strict tool sees
+  it). The pair is corrected by the difference (build audit, S6).
+- fix(tools): **`smconv` fails on a module with more than 8 channels or
+  too big for SPC RAM** (it printed "error" and exited 0 with a truncated
+  soundbank); **`wav2brr` warns, with or without `-v`, about a source
+  above 32 kHz**, and says what happens: the DSP plays it at 32 kHz, so it
+  comes out lower and slower (the old `-v`-only note said
+  "higher-pitched") (build audit, S9, S10).
 - fix(compiler): **the preprocessor runs with `-undef -nostdinc`.** The
   host's predefined macros (`__x86_64__`, `__aarch64__`, `__linux__`) made
   the same source give a different ROM on each build machine, and the
