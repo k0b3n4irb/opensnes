@@ -48,11 +48,29 @@ but is not told yet. Order decided by the owner: first Mukunda answers and he
 and we agree on the fix; only then PVSnesLib is notified, pointing at his
 issue. Do not open anything on `alekmaul/pvsneslib` before that.
 
-## Still to settle on our side
+## IT 2.15 detection: settled against the raw sources (2026-10-03)
 
-Whether modlib's IT 2.15 detection (`Cmwt >= 0x215`, rejecting Cvt bit 2)
-deserves a note to him - our port follows OpenMPT and Schism (Cvt bit 2),
-read through a summariser, to re-read in the raw sources first.
+Our smconv port selects IT 2.15 by bit 2 of the sample's `Cvt`. Read in the
+raw files, not through a summariser:
+
+- OpenMPT `soundlib/ITTools.cpp` l.604-607 (`master`): `if(flags &
+  ITSample::sampleCompressed) { sampleIO |= (cvt & ITSample::cvtDelta) ?
+  SampleIO::IT215 : SampleIO::IT214; }`, with `cvtDelta = 0x04`
+  (`ITTools.h` l.236).
+- Schism Tracker `fmt/its.c` l.240-242: `if (its.flags & 8) { flags |=
+  (its.cvt & 4) ? SF_IT215 : SF_IT214; }`.
+
+modlib (`itmod/itmod.go` l.315, l.409) takes `it215 = header.Cmwt >= 0x215`
+and rejects a sample whose Convert has the delta bit. So a file written by
+OpenMPT with IT 2.15 compression is refused by modlib, and a 2.14-compressed
+sample in a file stamped 2.15 would be decoded with the wrong integrator.
+Not reported to him: owner's call, and it concerns `mukunda-/modlib`, not
+`snesmod`.
+
+A gap of ours seen while reading: both players treat `Cvt` bit 2 on an
+**uncompressed** sample as delta PCM (OpenMPT l.621, Schism l.250); our
+loader reads it as plain PCM. Rare (ITTECH calls the flag safe to ignore);
+logged in the tracking note.
 
 Posting or answering there needs the classic token (`GH_GHP_TOKEN`); reading
 works with either. Which token does what, and the caution about the classic

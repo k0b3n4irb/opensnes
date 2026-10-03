@@ -16,11 +16,15 @@
 # and a message that does not fit (85 messages = 255 bytes) is dropped.
 # r_vline is profileGetScanline() right after a waiting snesmodProcess: a sane
 # line number, so the OPVCT read pointer was not left shifted.
+# r_irq: a V-timer IRQ armed before snesmodInit() still fires after it, ten
+# times in ten frames. Until 2026-10-03 snesmodInit ended on NMITIMEN = $81
+# whatever the caller had, and the same ROM gave 0.
 rom = "../../../devtools/libtests_snesmod/libtest_snesmod.sfc"
 frames = 400
 
 [asserts.values]
 r_done = { eq = 0xBEEF, width = 2 }
+r_irq = { eq = 10, width = 2 }
 r_latch = { eq = 0, width = 2 }
 r_lines = { ge = 5, le = 7, width = 2 }
 r_vline = { ge = 225, le = 261, width = 2 }

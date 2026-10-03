@@ -63,6 +63,11 @@ All notable changes to OpenSNES are documented in this file.
   and the scroll.
 
 ### Fixed
+- fix(lib): **`snesmodInit()` leaves NMITIMEN as it found it.** It ended on
+  `$81`, so an H or V timer IRQ enabled before the audio driver was loaded
+  stopped firing, silently. It now restores the lib's software copy of the
+  register. `libtest_snesmod`: 0 IRQs in the 10 frames after the call
+  before, 10 after.
 - fix(lib): **`snesmodProcess()` no longer latches the H/V counters, waits
   its real five scanlines, and the SNESMOD command queue cannot wrap.** With
   several commands queued the wait loop read OPVCT once per turn (a

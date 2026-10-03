@@ -60,9 +60,9 @@ day (summarised at the end of this note).
 
 | Item | Where |
 |---|---|
-| `snesmodInit` writes `$81` to NMITIMEN whatever the caller had | `chantiers/snesmod_65816_side.md` |
-| IT 2.15 detection in our smconv port follows OpenMPT / Schism as read through a summariser: re-read the raw sources | `partners/snesmod-upstream/README.md` |
-| `fixSqrt` is still capped at 4 fractional bits; the compiler gap that justified it closed in v0.21.2 | `lib/source/math_sqrt.c:62`, `docs/tutorials/math.md` |
+| ~~`snesmodInit` writes `$81` to NMITIMEN~~ fixed 2026-10-03 (restores `nmitimen_shadow`; `r_irq` 0 -> 10) | `chantiers/snesmod_65816_side.md` |
+| ~~IT 2.15 detection to re-read~~ settled 2026-10-03 on the raw OpenMPT and Schism sources: ours is right, modlib differs (owner's call whether to tell Mukunda). New small gap: uncompressed delta PCM (`Cvt` bit 2 without compression) is read as plain PCM | `partners/snesmod-upstream/README.md` |
+| `fixSqrt` stays at 4 fractional bits by choice (one 16-bit root, ~80 cycles; 8 bits need a 32-bit root). Comment and tutorial say so since 2026-10-03; widen only if a user needs it | `lib/source/math_sqrt.c` |
 | "The C RAM budget does not know the stack"; `check_lib_rodata.py` "looks stale" (owner call) | `status/api_audit_findings.md` |
 | Five issues at `mukunda-/snesmod` (#6-#10), weekly check, PVSnesLib after his answer | `partners/snesmod-upstream/README.md`, next check 2026-10-10 |
 | Console photos owed to luna and snes-rag: empty port trace, Mode 6 bit 3 card | `docs/HARDWARE_VERIFICATION.md` rows 14 and 23 |

@@ -498,12 +498,15 @@ upstream driver (snes-rag) then measuring ours on luna:
   caller's flags, so an IRQ the caller had masked could be taken in that
   window. `snesmodGetPosition()` read its port once, while the SPC700 may be
   writing it.
+- `snesmodInit()` ended by writing `$81` to NMITIMEN whatever the caller had
+  there: an H or V timer IRQ enabled before it was switched off without a
+  word (measured: 0 IRQs in the 10 frames after it, 10 once fixed).
 
 **Fix:** the wait counts rising edges of the H-blank flag (`$4212` bit 6, set
 at H=274 and cleared at H=1 on every line; anomie-timing, fullsnes): no
 latch, no counter read, and a real five-line budget. A command that does not
 fit is dropped (the newest). The `cli` is gone; the position is read until
-two reads agree. Pinned by `devtools/libtests_snesmod` and
+two reads agree; `snesmodInit()` restores NMITIMEN from the lib's copy. Pinned by `devtools/libtests_snesmod` and
 `tools/luna-test/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
 queue depth 255 after 100 sends, queue drained). Visible change: with
 several commands queued `snesmodProcess()` now really waits up to five

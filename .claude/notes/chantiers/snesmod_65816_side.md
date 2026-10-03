@@ -1,7 +1,7 @@
 # Chantier — SNESMOD, the 65816 side: what `snesmod.asm` does to the rest of the machine
 
 Status: points 1, 2, 3, 4, 5, 6 FIXED on 2026-10-03 (same day), Class B
-(`lib/source/snesmod.asm`); two items left open at the end of this note.
+(`lib/source/snesmod.asm`); NMITIMEN fixed the same day. One item left open at the end of this note, plus the owner's call on upstream.
 Opened by snes-rag's reading of the upstream driver
 (`partners/snes-rag/2026-10-03_from_snes-rag_snesmod-api.md`); each point was
 then checked in our copy, which descends from PVSnesLib's port.
@@ -79,8 +79,10 @@ offset makes them bit-identical (the driver's tick phase differs). fbhash
 - **Super Scope + SNESMOD** was never reproduced as a false shot: no example
   links both. The cause is removed (no latch any more); a probe would only
   document the past.
-- **`snesmodInit` writes `$81` to NMITIMEN** on its way out, whatever the
-  caller had there (an H/V IRQ enable is lost). Not touched.
+- ~~`snesmodInit` writes `$81` to NMITIMEN~~ fixed 2026-10-03: it restores
+  the lib's `nmitimen_shadow`. Fixture: a V-timer IRQ armed before
+  `snesmodInit()` fired 0 times in the 10 frames after it, 10 now
+  (`r_irq` in `libtest_snesmod.toml`).
 - Upstream has all of these; whether they go to Mukunda as issues is the
   owner's call (`partners/snesmod-upstream/README.md`).
 

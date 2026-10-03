@@ -305,8 +305,11 @@ snesmodInit:
     rep #$10            ; Restore 16-bit index
     .INDEX 16
 
-    ; Re-enable NMI (VBlank interrupt) - critical for WaitForVBlank to work!
-    lda #$81                    ; NMI enable + auto joypad read
+    ; Give NMITIMEN back as the caller had it. $4200 is write-only, so the
+    ; value comes from the lib's software copy (crt0 / console.c keep it in
+    ; step with every write). Until 2026-10-03 this wrote $81: an H or V
+    ; timer IRQ enabled before snesmodInit() was silently switched off.
+    lda.l nmitimen_shadow
     sta REG_NMI_TIMEN
 
     plb

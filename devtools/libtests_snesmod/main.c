@@ -8,6 +8,7 @@
 #include <snes.h>
 #include <snes/snesmod.h>
 #include <snes/profile.h>
+#include <snes/interrupt.h>
 
 /* the driver's queue indexes (lib/source/snesmod.asm) */
 extern u8 spc_fwrite;
@@ -21,7 +22,13 @@ u16 r_drain_full; /* frames to send what the full queue kept */
 u16 r_vline;      /* profileGetScanline() right after a waiting snesmodProcess:
                    * a sane line number (the OPVCT read pointer was not left
                    * shifted)                                                   -> < 262 */
+u16 r_irq;        /* V-timer IRQs in the 10 frames after snesmodInit(), the
+                   * IRQ having been enabled before it: snesmodInit must
+                   * leave NMITIMEN as it found it                              -> 10 */
 u16 r_done;       /*                                                           -> 0xBEEF */
+
+volatile u16 irq_count;
+extern void irqTestHandler(void);
 
 static u16 depth(void) {
     return (u8)(spc_fwrite - spc_fread);
@@ -32,8 +39,20 @@ int main(void) {
     u16 before;
 
     consoleInit();
+
+    /* a V-timer IRQ armed BEFORE the driver is loaded */
+    irqSet((void *)irqTestHandler);
+    irqSetVTimer(100);
+    WaitForVBlank();
+    irqEnable(IRQ_VTIMER);
+
     snesmodInit();
     setScreenOn();
+    irq_count = 0;
+    for (i = 0; i < 10; i++)
+        WaitForVBlank();
+    r_irq = irq_count;
+    irqDisable();
     WaitForVBlank();
 
     /* four messages, then one snesmodProcess: it sends the first and waits

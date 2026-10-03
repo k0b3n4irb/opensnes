@@ -8,6 +8,7 @@ USE_SNESMOD := 1
 # No soundbank: the fixture only talks to the driver's command queue.
 LIB_MODULES := console profile
 
-CSRC := main.c
+CSRC   := main.c
+ASMSRC := data.asm
 
 include $(OPENSNES)/make/common.mk
