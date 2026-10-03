@@ -540,7 +540,7 @@ now takes the bank the caller pushed, so the table can live anywhere.
 Same family, one week later. `objCollidMap`, `objCollidMapWithSlopes` and
 `objCollidMap1D` set the data bank to a hardcoded `$00` at their thirteen
 tile reads, while `mapLoad` had been storing the map's real bank since
-chantier B1. The day the examples' maps moved to the asset banks, Mario sank
+far pointers landed (v0.19.0). The day the examples' maps moved to the asset banks, Mario sank
 into the ground in `slope_collision`. The reads now use the bank `mapLoad`
 stored; the library fixture pins it with a map in bank `$02`. See
 `KNOWN_LIMITATIONS.md`.

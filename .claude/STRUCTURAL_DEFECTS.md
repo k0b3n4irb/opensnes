@@ -2527,7 +2527,7 @@ Legend:
 
 > *(2026-09-13: the matrix and this summary are the baseline record. Every
 > cluster below has since collapsed — A6 shipped and absorbed B1–B4, C1/C2
-> and D1/D2 are closed; only A5, A8 and D3 remain, and none of them
+> and D1/D2 are closed; only A5 and D3 remain (A8 closed 2026-09-26), and none of them
 > interacts with another open item.)*
 
 - **Compiler cluster**: A1 (shipped partial) / A3 / A4 / A6 are
@@ -2595,8 +2595,7 @@ passed every previous gate.
 
 What this catalogue still owns:
 
-1. **A8** — retire the retry (one day), the next time the Windows leg is
-   touched.
+1. ~~A8 — retire the retry~~ done 2026-09-26 (entry closed above).
 2. **A5** — send the three queued upstream reports when the owner opens
    that window; add the fork's base commit and the suite verdicts to each
    PIN bump's commit message (the H1 runner prints them).
@@ -2622,7 +2621,7 @@ originally set and the evidence that met it, or what is still owed.)*
 | A5 | 🟡 ongoing | PIN bump gated by `make test-toolchain-suites` (H1, 2026-09-13) — met; "≥ half of patches accepted upstream" — replaced by "generic fixes reported upstream", three queued |
 | A6 | 🟢 v0.19.0 | `sizeof(void *) == 4`, bank byte read at every lib boundary → A6 matrix 14/14, ASM ABI lint |
 | A7 | 🟢 v0.21.2 | `Kl` pair lowering → A7 runtime ROM 19/19 |
-| A8 | 🟡 due | zero retry firings for 2–3 months → met since 2026-09-04; owed: drop the retry, close the entry |
+| A8 | 🟢 2026-09-26 | zero retry firings for 2–3 months → met since 2026-09-04; the cc65816 retry is retired and the entry closed |
 | A9 | 🟢 2026-09-06 | access flag no longer pins loads → lib −4.25 % instructions, corpus byte-identical where expected |
 | B1 | 🟢 subsumed | closed by A6 + #122 + #127 — no `*Bank` API variants needed |
 | B2 | 🟢 2026-09-06 | C objects above `$2000` via `FAR` → B2 runtime ROM 25/25, `symmap --check-ram-budget` |

@@ -1,8 +1,10 @@
 # Chantier superfx-runtime — a CPU that keeps running while the GSU draws
 
-**Status:** IN PROGRESS (opened 2026-09-24). Phases A, B and C0
-squash-merged into develop on 2026-09-26 (`wip/superfx-runtime` deleted);
-phases C-F open — the next one starts a new `wip/*` branch. **Catalogue entry:** `.claude/STRUCTURAL_DEFECTS.md` §E3.
+**Status:** DONE, phases A to F (2026-09-24 to 2026-09-29; header corrected
+2026-10-03, it still said "phases C-F open"). Two things are left open, both
+written below and neither on a branch: linking the GSU program at its real
+ROM address (phase F's last part), and a save for Super FX games (the last
+section). **Catalogue entry:** `.claude/STRUCTURAL_DEFECTS.md` §E3.
 **Origin:** `.claude/notes/reviews/2026-09-24_superfx_game_gaps.md` (G1,
 G2, G3). **Risk:** High (crt0, memory model). **Effort:** several weeks.
 

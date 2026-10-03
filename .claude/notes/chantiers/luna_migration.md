@@ -144,7 +144,12 @@ follow-up. Flagged in `abi_lint.md` and `docs/BENCHMARK.md`.
 
 - ✅ **Test hardening batch 2 (2026-06-21):** **H8** (`probes/vram_aram.py` — VRAM/ARAM content: tiles/SPC-driver actually uploaded) + **H9** (`probes/oam_struct.py` — decoded sprite structure via `assets-dump` oam.json). Probes 10/10. **H1/H3** (VRAM-outside-VBlank, NMI WRAM-port detectors) are **blocked on luna L14** (address-range `--mem-trace` filter — bank-00 trace floods with ROM code fetches); filed. H4 dropped (redundant with dma_cgram).
 
-## Open / next
+## Open / next (as written in June; all superseded, 2026-10-03)
+
+The migration is complete (`ROADMAP.md`; `tools/opensnes-emu`, the WASM core
+and Mesen2 are gone). The list below is kept as history: baselines are
+`fbhash` values, not PNGs, which answers the cross-arch
+question (CI runs the corpus on x86_64 and arm64, `release.yml`).
 
 - ⚠️ **Cross-arch byte-stability of PNG baselines is UNVERIFIED** (baselines
   generated on aarch64). The #1 thing the double-run period must confirm. If

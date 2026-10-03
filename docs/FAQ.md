@@ -45,7 +45,7 @@ Not in the core library, by design. Print to the screen with `textPrint`,
 developing.
 
 **Does `volatile` work?**
-Yes, since chantier A2: a volatile load or store survives the optimiser and is
+Yes, since 2026-05-09: a volatile load or store survives the optimiser and is
 not coalesced. The library still uses plain globals for its NMI handshakes, for
 cycle-cost reasons, but your MMIO patterns can rely on `volatile`.
 

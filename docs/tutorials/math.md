@@ -353,7 +353,7 @@ table byte.
 
 ## Gotchas
 
-### 🟢 `int` and `long` sizes are correct on this target (since chantier A1)
+### 🟢 `int` and `long` sizes are correct on this target (since v0.20.0)
 
 `sizeof(int) == 2`, `sizeof(long) == 4`. Bare `int` is the native 16-bit
 word; `long` is 32 bits. C convention says `int` is the natural word size
@@ -432,7 +432,7 @@ early and you get partial results.
 This is the right shape for game code, but if you're translating
 from a different engine, watch the signedness boundary.
 
-### `atan2` and `sqrt` ship in the lib (chantier B6, 2026-05-09)
+### `atan2` and `sqrt` ship in the lib (since 2026-05-09)
 
 The full inverse-trig and square-root surface arrived together so
 the canonical "where is the target relative to me, and how far?"
@@ -469,11 +469,10 @@ or sprite rotation in any 256-pixel-wide playfield.
 result is bounded to 255 (since `sqrt(65535) ≈ 255.99`), so it
 fits in `u8` for tile-grid distances. For the 8.8 fractional
 variant use `fixSqrt`. Note that `fixSqrt`'s precision is
-intentionally capped at 4 fractional bits — the 32-bit shift
-needed for full 8 bits of fraction would currently truncate
-under the QBE 32-bit codegen gap (catalogue chantier A7); we
-chose deterministic 4-bit precision over deceptive 8-bit
-output that's only correct for small inputs.
+capped at 4 fractional bits. It was written when the compiler
+truncated the 32-bit shift that 8 bits of fraction need; that
+was fixed in v0.21.2 and `fixSqrt` has not been widened since,
+so the 4-bit precision is what it returns today.
 
 ### What's still missing: `pow`, `exp`, `log`
 
@@ -523,4 +522,4 @@ binding.
   module uses integer math, but advanced collision (circle, swept,
   ray-cast) goes through fixed-point.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — covers the
-  historical `int = 32 bits` trap (closed by chantier A1 on 2026-05-08).
+  historical `int = 32 bits` trap (closed in v0.20.0, 2026-05-08).

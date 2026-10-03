@@ -297,9 +297,11 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ## Work in flight
 
-None on a branch. The Super FX runtime chantier merged its phases A
-(interrupt vectors in WRAM), B (the NMI survives GSU jobs) and C0 (IRQ,
-BRK and COP too) on 2026-09-26; phases C-F are open
+None on a branch. The Super FX runtime work is merged, phases A to F
+(2026-09-24 to 2026-09-29): interrupt vectors in WRAM, an NMI that survives
+GSU jobs, non-blocking launch, `gsuPresent`, code in RAM, the C to GSU
+contract. Two things remain open there: linking a GSU program at its real
+ROM address, and a save for Super FX games
 (`.claude/notes/chantiers/superfx_runtime.md`).
 The 2026-09-26 état des lieux (`.claude/notes/reviews/`) sets the order of
 the work before v1.0. The 2026-09-11 gaps-review backlog is closed (43 of
@@ -342,6 +344,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-02. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-03. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*
