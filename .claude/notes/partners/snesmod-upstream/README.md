@@ -20,9 +20,37 @@ text online equals the draft files (checked by reading each issue back).
 | [#9](https://github.com/mukunda-/snesmod/issues/9) | `..._issue-D_smconv-tuning.md` | smconv (Go): `resampleLoop` returns old/new where the C++ returned new/old |
 | [#10](https://github.com/mukunda-/snesmod/issues/10) | `..._issue-E_smconv-loop-start.md` | smconv (Go): `Loop = loopStart / 16 * 9` rounds down, the codec aligns the loop start up |
 
-His answers, when they come, are recorded here. Still open on our side: tell
-PVSnesLib about #6 (same sequence in `sm_spc_wla.asm:545`), on the owner's go;
-whether modlib's IT 2.15 detection (`Cmwt >= 0x215`, rejecting Cvt bit 2)
+## Weekly check (owner instruction, 2026-10-03)
+
+Once a week, look for an answer from Mukunda on the five issues and add a row
+to the log below, even when nothing moved:
+
+```
+for n in 6 7 8 9 10; do gh api repos/mukunda-/snesmod/issues/$n \
+  --jq '"#\(.number) \(.state) comments=\(.comments) updated=\(.updated_at)"'; done
+gh api "repos/mukunda-/snesmod/commits?per_page=3" --jq '.[]|"\(.commit.author.date[0:10]) \(.commit.message|split("\n")[0])"'
+```
+
+Reading works with either token. When he answers: record what he says here,
+tell the owner the same day, and answer him only with the owner's go and in
+the same plain style as the issues.
+
+| Date | #6 | #7 | #8 | #9 | #10 | Repo activity | Note |
+|---|---|---|---|---|---|---|---|
+| 2026-10-03 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | posted today |
+
+Next check due: 2026-10-10.
+
+## PVSnesLib: waits for Mukunda (owner decision, 2026-10-03)
+
+PVSnesLib has the same KOF sequence (`pvsneslib/snesmod/sm_spc_wla.asm:545`)
+but is not told yet. Order decided by the owner: first Mukunda answers and he
+and we agree on the fix; only then PVSnesLib is notified, pointing at his
+issue. Do not open anything on `alekmaul/pvsneslib` before that.
+
+## Still to settle on our side
+
+Whether modlib's IT 2.15 detection (`Cmwt >= 0x215`, rejecting Cvt bit 2)
 deserves a note to him - our port follows OpenMPT and Schism (Cvt bit 2),
 read through a summariser, to re-read in the raw sources first.
 
