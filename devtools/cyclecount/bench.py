@@ -34,12 +34,15 @@ BASELINE = HERE / "bench_baseline.json"
 def measure() -> dict[str, int]:
     with tempfile.NamedTemporaryFile(suffix=".asm", delete=False) as tf:
         asm = Path(tf.name)
-    r = subprocess.run([str(CC), str(SRC), "-o", str(asm)],
-                       capture_output=True, text=True, timeout=60)
-    if not asm.is_file() or asm.stat().st_size == 0:
-        sys.exit(f"compile failed: {(r.stderr or r.stdout).strip()[:300]}")
-    j = subprocess.run([sys.executable, str(HERE / "cyclecount.py"), "--json", str(asm)],
-                       capture_output=True, text=True)
+    try:
+        r = subprocess.run([str(CC), str(SRC), "-o", str(asm)],
+                           capture_output=True, text=True, timeout=60)
+        if not asm.is_file() or asm.stat().st_size == 0:
+            sys.exit(f"compile failed: {(r.stderr or r.stdout).strip()[:300]}")
+        j = subprocess.run([sys.executable, str(HERE / "cyclecount.py"), "--json", str(asm)],
+                           capture_output=True, text=True)
+    finally:
+        asm.unlink(missing_ok=True)
     fns = json.loads(j.stdout)["functions"]
     return {k: v["cycles"] for k, v in fns.items()}
 
