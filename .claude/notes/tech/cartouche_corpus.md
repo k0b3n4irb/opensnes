@@ -78,6 +78,16 @@ pull + import + rebuild). What moved:
   matters more, not less.
 - Golden queries 9/9; negative control: our ABI at ranks 1 and 2 again.
 
+## Index state (2026-10-03, afternoon)
+
+Replica updated to snes-rag's `8a7fa1ea9a56` (34 864 chunks, their figures).
+New: the 65816 side of SNESMOD as code (`snesmod` source, e.g.
+`6a7dcbf85c93ca2d`, `23669e7ecb9d204a`), two `cartouche-fiches-jeux` notes on
+SNESMOD's API and on smconv, a KOF banner on the source. `luna-docs` serves
+1.30.3 (`b0c25f779e82f2bd`), not 1.30.4: asked. The new `snes_verify`
+coverage rule needs the MCP server restarted; not verified in the session
+that rebuilt (`partners/snes-rag/OPEN_snes-rag.md`).
+
 ## luna pin v1.30.4 (2026-10-03)
 
 Index served: **34 829 chunks, 210 sources captured of 236, built
