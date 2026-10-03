@@ -143,11 +143,12 @@ u16 padHeld(u8 pad);
 u16 padReleased(u8 pad);
 
 /**
- * @brief The same value as padHeld()
+ * @brief The same value as padHeld() for a connected pad
  *
  * Never was the raw register: the NMI handler has already replaced a word
  * that is not a joypad's (low four bits set) by 0 before this reads it, so
- * it returns what padHeld() returns.
+ * it returns what padHeld() returns. The one difference: padHeld() answers
+ * 0 for a word of $FFFF (an unplugged port), this returns the $FFFF.
  *
  * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
  *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)

@@ -754,8 +754,9 @@ def check_abi_signatures() -> list[str]:
 
 _SDK_DOC_GLOBS = ["docs/**/*.md", "KNOWN_LIMITATIONS.md", "README.md",
                   "examples/README.md"]
-# Pages whose job is to name other APIs (PVSnesLib's) — exempt.
-_SDK_DOC_EXEMPT = {"docs/MIGRATING_FROM_PVSNESLIB.md"}
+# Pages whose job is to name other APIs (PVSnesLib's) or the names 1.0
+# removes (UPGRADING.md) — exempt.
+_SDK_DOC_EXEMPT = {"docs/MIGRATING_FROM_PVSNESLIB.md", "docs/UPGRADING.md"}
 # Prefixes no current API uses but that a PVSnesLib habit brings back.
 _RETIRED_PREFIXES = {"spc"}
 # Module prefixes too generic to mean "SDK call" (a user writes setFoo too).

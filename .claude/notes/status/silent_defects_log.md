@@ -29,6 +29,20 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-03 | `snesmodProcess` latched the H/V counters and read OPVCT once per turn; its wait was not five lines; a full queue was overwritten | CPU trace on luna while reading the 65816 side | `0ff69aad` |
 | 2026-10-03 | `snesmodInit` ended on `lda #$81 / sta $4200`: an armed H/V timer IRQ was dropped | same reading | `74b9aeab` |
 | 2026-10-03 | `oamDrawMetaFlip` assumed 16-pixel pieces when large, 8 when small, whatever the OBJSEL mode: a flipped metasprite of 32-pixel pieces was drawn 16 pixels off | writing its replacement | `79c5ec73` (the new `oamDrawMetasprite` takes the piece size; the old function ships unchanged until 1.0) |
+| 2026-09-26 | the dynamic sprite engine drew its sprites one line lower than `oamSet` (no `y - 1`) | reading after the VOFS change | `2981fe0b` (added 2026-10-03 from the testing audit) |
+| 2026-09-27 | a Super FX job started with its IRQ on STOP unmasked and the I flag clear locked the CPU in its IRQ entry | the GSU fixture | `20638bc3` (added 2026-10-03) |
+| 2026-09-27 | `gsuSetupHdmaBlanking` wrote HDMAEN bare: every other channel off, and the next `hdmaEnable` switched it off | reading | `73a5644e` (added 2026-10-03) |
+| 2026-10-02 | `mode7SetScale(0x0100)` magnified twice: the helpers divided the scale by two | reading the header against the code | `93ff5e2d` (added 2026-10-03) |
+| 2026-10-03 | cproc: `++` / `--` on a `FAR` object read bank $7E and wrote bank $00 (the store took the expression's empty qualifier); `reg++` on a volatile stored without `volat` | compiler audit of the campaign, reproduced on luna | `b2967ad2` (fixture `d_quals`) |
+| 2026-10-03 | cproc: a whole-struct copy with a 4-aligned member copied two bytes of every four (upstream chunk table: `w` = 4 bytes) | same | `b2967ad2` |
+| 2026-10-03 | cproc: `= {0}` on a `u32` array or a struct with an `s32` left the upper halves unwritten | same | `b2967ad2` |
+| 2026-10-03 | cproc: a bit-field of a `FAR` object, or of const data read through a pointer, was read in bank $00 | same | `b2967ad2` |
+| 2026-10-03 | map module: `mapVblank` wrote `y - 2` to BG1/BG2 VOFS (PVSnesLib's `dispyofs` is already `y - 1`, and 2026-09-12 added a second `dec a`): the map one line too low against the sprites since then | library audit; luna `state`: BG1 `v_scroll` 1022 where BG2-4 read 1023 | `a3190b13` |
+| 2026-10-03 | `oamHide` / `oamClear` parked sprites at X = 256, which the PPU counts as X = 0 for its range and time tests (anomie-regs `2304edd2bf6755b9`): a hidden 32- or 64-pixel sprite still spent a slot and tiles on lines 0-47 | library audit + arbiter | `a73e0dbd` |
+| 2026-10-03 | `gsuLaunch` / `gsuStartCached` wrote CFGR with MS0 (fast multiply) set while selecting 21 MHz; fullsnes `1adef8e33ff3c4e9`: "MS0 must be zero in 21MHz mode" (`superfx_hello` passes `$A0`) | chips audit + arbiter | `85483738` |
+| 2026-10-03 | `consoleInit` read OPHCT/OPVCT without latching them: the H/V part of the RNG seed was 0, the same sequence every boot | library audit; luna: `rand_seed` identical under three power-on states | `81ce2912` |
+| 2026-10-03 | `fixLerp` computed `b - a` on 16 bits and took bit 15 as the sign: two values 128.0 or more apart interpolated the wrong way | library audit, arithmetic | `b44b6b45` |
+| 2026-10-03 | `gsuSetupHdmaBlanking(0, n)`: a top band of 0 wrote a count of 0 as the table's first entry, which ends the table; the whole frame was then DMAed on visible lines | chips audit, luna `--dma-trace`: 1 844 726 of 2 326 528 VRAM bytes outside blank | `b855ab08` |
 
 ## The hunting campaign
 
@@ -36,8 +50,8 @@ Opened 2026-10-03. The fortnight starts the day it closes.
 
 | Step | State |
 |---|---|
-| The eight audit agents, report in `reviews/` compared with the 2026-09-26 one | to do |
+| The eight audit agents, reports in `reviews/2026-10-03_audit/` | done 2026-10-03 (examples report pending at the time of writing) |
 | Header-by-header reading, promise of the header against the body of the function | to do |
-| Existing tools pushed further: several `--power-on random` seeds, `make test-pal`, `make luna-bench`, `make test-sanitizers`, `make fuzz` | to do |
+| Existing tools pushed further | done 2026-10-03: seeds 7, 42, 1337 (and the testing auditor's 2, 42, 31337, `ones`): 89/89 alive, images 89/89; `make test-pal` 89/89 + 241 vectors; `make luna-bench` 34 ok, 0 bug, 55 suspect (static screens). Nothing found by them; `make test-sanitizers` and `make fuzz` not rerun (CI runs them) |
 
 **Campaign closed:** not yet. **Fortnight ends:** not started.

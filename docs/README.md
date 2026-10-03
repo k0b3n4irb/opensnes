@@ -16,6 +16,7 @@ map for people reading the repository on GitHub.
 | [Hardware verification](HARDWARE_VERIFICATION.md) | The real-console session: 23 ROMs, one check each, and the grid to fill in |
 | [Troubleshooting](TROUBLESHOOTING.md) | Symptoms and their causes |
 | [Migrating from PVSnesLib](MIGRATING_FROM_PVSNESLIB.md) | Porting an existing project, and the five traps that bite |
+| [Upgrading to 1.0](UPGRADING.md) | The names 0.x deprecates and 1.0 removes, and the two calls that change meaning |
 
 ## Guides
 

@@ -184,6 +184,40 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **the map was drawn one line too low since 2026-09-12.** The
+  VOFS change of that day added a `y - 1` in `mapVblank`, but the map
+  module's offset already carried one (PVSnesLib's `clc / sbc`, `dec a`):
+  BG1 received `y - 2`. luna read BG1's vertical scroll at 1022 where BG2
+  to BG4 read 1023. Four images re-captured (`map_scroll`, `tiled`,
+  `slope_collision`, `mapandobjects`): each new image is the old one moved
+  up one line (99.8 to 100 % of the pixels).
+- fix(lib): **`oamHide()` and `oamClear()` park sprites at X = 257, not
+  256.** The PPU counts an OBJ at X = 256 as X = 0 for its per-line range
+  and time tests (anomie-regs, "Drawing the Sprites"): a hidden 32- or
+  64-pixel sprite still took one of the 32 slots and its tiles on lines
+  0-47, which could starve the real sprites there. The dynamic engine
+  always hid at 257. Nothing changes on screen; every WRAM stream moves
+  (the OAM shadow byte).
+- fix(lib): **`gsuLaunch()` and `gsuStartCached()` drop CFGR's MS0 (fast
+  multiply) bit**, which fullsnes says must be zero in 21 MHz mode — the
+  mode both select. `gsu_cfgr = $A0` is still accepted; the bit is masked
+  (the GSU fixture asks `$A0` and luna reads `$80` back).
+- fix(lib): **`gsuSetupHdmaBlanking()` with a band of 0 lines.** A top band
+  of 0 wrote a count of 0 as the table's first entry, which ends an HDMA
+  table: the channel did nothing and `gsuDmaFullFrame()` transferred the
+  whole frame on visible lines (luna `--dma-trace`: 1 844 726 of
+  2 326 528 VRAM bytes outside blank with `(0, 80)`). A band of 0 has no
+  entry now, a band of 128 or more takes two, counts are clamped at 224.
+  The GSU fixture reads the table for `(0, 80)`.
+- fix(lib): **`consoleInit()` latches the H/V counters before seeding the
+  RNG.** Read unlatched, OPHCT and OPVCT were 0 and the seed was STAT78
+  alone: the same `rngNext()` sequence at every boot. `basics/random`'s
+  image re-captured (a different layout from a different seed).
+- fix(lib): **`fixLerp()` over a difference of 128.0 or more.** `b - a` was
+  taken on 16 bits with bit 15 as its sign: `fixLerp(FIX(-64), FIX(64),
+  128)` gave -128.0 instead of 0. The difference is read over 17 bits
+  (overflow flag). `fix32Lerp()` (inline, `fixed32.h`) has the same shape
+  on 33 bits and is not changed here.
 - fix(compiler): **four silent miscompilations in cproc, all on common
   idioms**, found by the pre-1.0 hunting campaign and reproduced on luna
   (`.claude/notes/reviews/2026-10-03_audit/A_compiler.md`). `++` / `--` on
