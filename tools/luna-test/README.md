@@ -60,6 +60,14 @@ default zero-fill (the class of the v0.40.0 / v0.41.1 reset-vector fixes,
 which luna could not see before). `make tests` runs the liveness pass
 that way in addition to the default one.
 
+`hardware_preflight.py` (`make hardware-preflight`, 2026-10-03) is the
+same idea aimed at a console session: the ROMs of
+`docs/HARDWARE_VERIFICATION.md` — read from the protocol's table, like
+`scripts/hardware-kit.sh` — each replayed from three random seeds and
+under `--force-region pal`, plus the VRAM-DMA-in-blank check of
+`vram_dma_blank.py`. It reports ready / FAIL per row and exits 1 on any
+failure; `--rows 1-7` restricts it to the gate rows.
+
 `diff_corpus.py --ref <dir>` is the Class A proof for a compiler or
 library change: for every example it runs `luna diff <ref rom> <new rom>
 --frames <manifest frames> --tolerance N` and prints MATCH (with the

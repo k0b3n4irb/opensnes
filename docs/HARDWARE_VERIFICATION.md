@@ -26,6 +26,12 @@ for the rows that need no enhancement chip.
 Record the tag or commit the ROMs were built from. The grid is meaningless
 without it.
 
+Before the session, `make hardware-preflight` replays the same ROMs on luna
+from pseudo-random RAM (three seeds) and under PAL, and checks that every
+VRAM DMA byte lands in blank: the two cheapest ways a ROM green on luna's
+defaults fails on a console. A row that fails there is fixed before it is
+carried to the hardware; `ROWS=1-7` restricts the run to the gate rows.
+
 ## How to run a row
 
 1. Boot the ROM. Wait for the picture to settle (two seconds is plenty).

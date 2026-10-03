@@ -61,7 +61,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -643,6 +643,13 @@ clean-release:
 hardware-kit:
 	@sh scripts/hardware-kit.sh
 
+# Before a console session: every protocol ROM alive from pseudo-random RAM
+# (three seeds) and under PAL, every VRAM DMA byte in blank. Reads the same
+# table as hardware-kit. ROWS=1-7 restricts it to the gate rows.
+hardware-preflight:
+	@scripts/install-luna.sh
+	@python3 tools/luna-test/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
+
 help:
 	@echo "OpenSNES SDK Build System"
 	@echo ""
@@ -656,6 +663,7 @@ help:
 	@echo "  docs      - Generate API documentation (requires doxygen)"
 	@echo "  release   - Create SDK release package (zip)"
 	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
+	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"

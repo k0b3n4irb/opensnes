@@ -21,6 +21,7 @@ python3 tools/luna-test/rom_coverage.py              # measured lib API coverage
 python3 tools/luna-test/audio_regress.py            # APU output hashed for eleven examples (ten audio ones, three pressed with their manifest scripts, and the Super FX skeleton) (luna --audio-out); baselines/audio.json
 python3 tools/luna-test/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
 python3 tools/luna-test/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
+make hardware-preflight                              # before a console session: the 23 protocol ROMs (docs/HARDWARE_VERIFICATION.md) alive from random RAM (3 seeds) and under PAL, VRAM DMA in blank (hardware_preflight.py; ROWS=1-7 for the gate rows; not in make tests)
 make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() + the games playing their manifests under `region = "pal"`, and tetris built ROM_REGION=pal (weekly pal.yml, not in make tests)
 make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
 make coverage-host                                   # llvm-cov line coverage of QBE + cproc-qbe over the fixtures and the lib build (report, not a gate)

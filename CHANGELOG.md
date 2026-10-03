@@ -5,6 +5,13 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- test(luna-test): **`make hardware-preflight`** replays the 23 ROMs of the
+  real-console protocol (`docs/HARDWARE_VERIFICATION.md`) on luna from
+  pseudo-random RAM (three seeds) and under PAL, and checks every VRAM DMA
+  byte lands in blank — the two cheapest ways a ROM green on luna's
+  defaults fails on a console. It reads the protocol's table like
+  `make hardware-kit`, so the kit and the preflight cannot drift apart.
+  First run: 23 of 23 rows ready (`ROWS=1-7` for the gate rows).
 - feat(lib,build): **a Super FX game can save.** `USE_SRAM := 1` with
   `USE_SUPERFX := 1` was refused by the build; it now declares a battery
   (cartridge type `$15`) and the `sram` module reads and writes the GSU's
