@@ -315,9 +315,13 @@ void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table,
 /**
  * @brief Enable HDMA channel(s), given as a bit mask
  *
- * Enables the specified HDMA channel(s). HDMA will start on the next frame.
- * The one pair of this header that takes a mask where every other function
- * takes a channel number: the name says so.
+ * Enables the specified HDMA channel(s). The channel runs from the next
+ * HBlank: hdmaSetup() has initialised its table address and line counter
+ * by hand, which the hardware only does by itself at the start of a frame
+ * (anomie-regs, "DMA and HDMA"). snesdev-wiki advises writing HDMAEN during
+ * VBlank while the screen is on; an effect enabled mid-frame shows from
+ * the next line. The one pair of this header that takes a mask where every
+ * other function takes a channel number: the name says so.
  *
  * @param channelMask Bitmask of channels to enable (1 << channel)
  *
@@ -506,6 +510,12 @@ void hdmaWaveSetSpeed(u8 speed);
  * @code
  * hdmaBrightnessGradient(HDMA_CHANNEL_5, 15, 0);  // Fade to black
  * @endcode
+ *
+ * Called again while the effect runs, it only moves the channel's table
+ * pointer, which HDMA reads at the next frame: the change lands whole.
+ * (Until 2026-10-03 the channel was set up again, which restarted the table
+ * at the next HBlank — one frame with the top of the table on the bottom of
+ * the screen.)
  */
 void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness);
 
@@ -540,6 +550,12 @@ void hdmaBrightnessGradientStop(u8 channel);
  *                   RGB(4, 8, 28),    // Deep blue
  *                   RGB(28, 16, 4));   // Orange
  * @endcode
+ *
+ * Called again while the effect runs, it only moves the channel's table
+ * pointer, which HDMA reads at the next frame: the change lands whole.
+ * (Until 2026-10-03 the channel was set up again, which restarted the table
+ * at the next HBlank — one frame with the top of the table on the bottom of
+ * the screen.)
  */
 void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor);
 
@@ -582,6 +598,12 @@ void hdmaColorGradientStop(u8 channel);
  *     WaitForVBlank();
  * }
  * @endcode
+ *
+ * Called again while the effect runs, it only moves the channel's table
+ * pointer, which HDMA reads at the next frame: the change lands whole.
+ * (Until 2026-10-03 the channel was set up again, which restarted the table
+ * at the next HBlank — one frame with the top of the table on the bottom of
+ * the screen.)
  */
 void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius);
 

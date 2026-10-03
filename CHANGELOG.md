@@ -184,6 +184,13 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`hdmaIrisWipe()`, `hdmaBrightnessGradient()` and
+  `hdmaColorGradient()` called again while they run** only move the
+  channel's table pointer, read at the next frame. They set the channel up
+  again, which resets its address and line counter and restarts the table
+  at the next HBlank: for the rest of that frame the bottom of the screen
+  showed the top of the table (luna, `hdma_helpers` frame 150; library
+  audit, row 2).
 - fix(lib): **the dynamic sprite engine's VRAM queue is bounded.** It holds
   128 entries and the NMI drains seven a frame; the index advanced without
   a bound, so more than 128 pending refreshes overwrote the engine's own

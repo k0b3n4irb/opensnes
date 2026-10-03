@@ -323,8 +323,17 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
     }
     *p = 0x00;  /* End marker */
 
+    /* Re-called while the channel runs (an animated effect): only move the
+     * table pointer (A1T, read at the next frame's init). hdmaSetup() also
+     * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
+     * for the rest of that frame the bottom of the screen showed the top
+     * of the table (luna, hdma_helpers f150, until 2026-10-03). */
+    if (hdmaGetEnabled() & channel_mask(channel)) {
+        hdmaSetTable(channel, hdma_brightness_table);
+    } else {
     hdmaSetup(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table);
-    hdmaEnableMask(channel_mask(channel));
+        hdmaEnableMask(channel_mask(channel));
+    }
 }
 
 void hdmaBrightnessGradientStop(u8 channel) {
@@ -373,8 +382,17 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
     }
     *p = 0x00;  /* End marker */
 
+    /* Re-called while the channel runs (an animated effect): only move the
+     * table pointer (A1T, read at the next frame's init). hdmaSetup() also
+     * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
+     * for the rest of that frame the bottom of the screen showed the top
+     * of the table (luna, hdma_helpers f150, until 2026-10-03). */
+    if (hdmaGetEnabled() & channel_mask(channel)) {
+        hdmaSetTable(channel, hdma_color_table);
+    } else {
     hdmaSetup(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table);
-    hdmaEnableMask(channel_mask(channel));
+        hdmaEnableMask(channel_mask(channel));
+    }
 }
 
 void hdmaColorGradientStop(u8 channel) {
@@ -455,8 +473,17 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
 
     /* Setup and enable HDMA to drive WH0/WH1 per scanline.
      * Use bank $00 explicitly — tables are in bank $00 RAMSECTION. */
+    /* Re-called while the channel runs (an animated effect): only move the
+     * table pointer (A1T, read at the next frame's init). hdmaSetup() also
+     * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
+     * for the rest of that frame the bottom of the screen showed the top
+     * of the table (luna, hdma_helpers f150, until 2026-10-03). */
+    if (hdmaGetEnabled() & channel_mask(channel)) {
+        hdmaSetTable(channel, build_table);
+    } else {
     hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
-    hdmaEnableMask(channel_mask(channel));
+        hdmaEnableMask(channel_mask(channel));
+    }
 
     /* Wait for HDMA to initialize (happens at start of VBlank).
      * Only THEN enable window masking — ensures WH0/WH1 are being
