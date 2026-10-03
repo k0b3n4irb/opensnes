@@ -197,6 +197,22 @@ endif
 ifeq ($(shell [ "$(ROM_BANKS)" -gt 0 ] 2>/dev/null && echo ok),)
 $(error ROM_BANKS=$(ROM_BANKS) must be a positive number of banks)
 endif
+# Upper bounds per mapping (2026-10-03): past them the linker still places
+# data, in memory the cartridge does not map as ROM, and the build stays
+# green — a string at $7E:8000 is WRAM, .rodata at $40:0000 is SA-1 BW-RAM,
+# a HiROM label past bank $7F has no 24-bit address. The DSP-1 board the
+# dsp1 module drives is the 1 MB LoROM one (fullsnes, DSP-1 LoROM: data and
+# status in $30-$3F:8000-$FFFF). Lower bound 8: the prebuilt library pins
+# its asset sections to banks 7-1.
+ROM_BANKS_MAX := $(if $(filter 1,$(USE_HIROM)),64,$(if $(filter 1,$(USE_SA1)),64,$(if $(filter 1,$(USE_SUPERFX)),64,$(if $(filter 1,$(USE_DSP1)),32,126))))
+ifeq ($(shell [ "$(ROM_BANKS)" -ge 8 ] && [ "$(ROM_BANKS)" -le "$(ROM_BANKS_MAX)" ] 2>/dev/null && echo ok),)
+$(error ROM_BANKS=$(ROM_BANKS) is out of range for this mapping: 8 to $(ROM_BANKS_MAX) (LoROM 126 banks of 32 KB before WRAM at $$7E; HiROM, SA-1 and Super FX 64; DSP-1 32, the 1 MB board))
+endif
+ifeq ($(filter 1,$(USE_SUPERFX)),1)
+ifeq ($(filter 32 64 128,$(GSU_RAM_KB)),)
+$(error GSU_RAM_KB=$(GSU_RAM_KB) must be 32, 64 or 128: the header byte $$FFBD is 1 KB << n and the GSU boards carry 32, 64 or 128 KB)
+endif
+endif
 ifeq ($(USE_SRAM),1)
 LIB_MODULES += sram
 endif
@@ -399,7 +415,7 @@ ifneq ($(GSUSRC),)
 # at the start of ROM bank n, so its labels are addresses the GSU can jump
 # to and read from. The .sfx.h keeps OFFSETS either way (label - $$8000):
 # gsuCall() and gsuStartCached() add them to the program's address.
-%.sfx.bin %.sfx.h: %.sfx
+%.sfx.bin %.sfx.h: %.sfx $(TEMPLATES)/memmap_gsu.inc .opensnes_config
 	@echo "[GSU] $< -> $*.sfx.bin, $*.sfx.h$(if $(GSU_BANK), (linked at bank $(GSU_BANK), \$$8000))"
 	@$(GSU_AS) $(if $(GSU_BANK),-D GSU_BANK=$(GSU_BANK)) -I $(TEMPLATES) -o $*.sfx.o $<
 	@echo "[objects]" > $*.sfx.link
@@ -524,7 +540,7 @@ crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boo
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
 
 # Initialized data start marker
-data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP)
+data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP) .opensnes_config
 	@echo "[AS] data_init_start"
 	$(call wrap_asm,$<,$@)
 
@@ -546,13 +562,13 @@ $(foreach src,$(ASMSRC),$(eval $(call ASM_OBJ_RULE,$(src))))
 
 # Soundbank object
 ifneq ($(_HAS_SOUNDBANK),)
-$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(MEMMAP_DEP)
+$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(MEMMAP_DEP) .opensnes_config
 	@echo "[AS] $(SOUNDBANK_OUT)"
 	$(call wrap_asm,$<,$@)
 endif
 
 # End marker (must be linked LAST)
-data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP)
+data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP) .opensnes_config
 	@echo "[AS] data_init_end"
 	$(call wrap_asm,$<,$@)
 

@@ -184,6 +184,19 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(build): **`ROM_BANKS` is bounded per mapping** (LoROM 8-126, HiROM,
+  SA-1 and Super FX 8-64, DSP-1 8-32). Past those the linker placed data
+  in memory the cartridge does not map as ROM — a string at `$7E:8000`
+  (WRAM) on a 127-bank LoROM, `.rodata` at `$40:0000` (BW-RAM) on a 65-bank
+  SA-1, a HiROM label past bank `$7F` — and the build stayed green, the
+  text just vanished (build audit, S1). `GSU_RAM_KB` must be 32, 64 or 128
+  (`48` declared 32 KB, a typo gave a Python traceback and `$FFBD = 0`).
+- fix(build): **a changed `GSU_BANK` reassembles the GSU program**, and
+  the data-init objects and the soundbank object rebuild when the project
+  configuration changes: `make GSU_BANK=2` on a tree built with 1 moved
+  the section but kept a program that set `ROMB` to 1, and `make
+  USE_HIROM=1` after a LoROM build gave a 256 KB LoROM ROM (build audit,
+  S3, S4).
 - fix(lib): **the map was drawn one line too low since 2026-09-12.** The
   VOFS change of that day added a `y - 1` in `mapVblank`, but the map
   module's offset already carried one (PVSnesLib's `clc / sbc`, `dec a`):
