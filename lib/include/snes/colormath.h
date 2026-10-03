@@ -29,7 +29,7 @@
  * REG_TM = TM_BG1 | TM_BG2;   // Both on main screen
  * REG_TS = TM_BG2;            // BG2 also on sub screen
  *
- * colorMathSetLayers(COLORMATH_BG2);  // Apply math to BG2
+ * colorMathSetLayers(LAYER_BG2);  // Apply math to BG2
  * colorMathSetOp(COLORMATH_ADD);   // Add mode
  * colorMathSetHalf(1);              // Divide by 2 = 50%
  * colorMathSetSource(COLORMATH_SRC_SUBSCREEN);  // Blend with sub screen
@@ -57,26 +57,31 @@
  * Layer Masks (for colorMathSetLayers)
  *============================================================================*/
 
-/** @brief Apply color math to BG1 */
-#define COLORMATH_BG1       BIT(0)
+/* The layers are named by LAYER_BG1..LAYER_BG4 and LAYER_OBJ (video.h), the
+ * same bits everywhere a call takes a set of layers. The backdrop is the one
+ * bit only color math has. */
 
-/** @brief Apply color math to BG2 */
-#define COLORMATH_BG2       BIT(1)
-
-/** @brief Apply color math to BG3 */
-#define COLORMATH_BG3       BIT(2)
-
-/** @brief Apply color math to BG4 */
-#define COLORMATH_BG4       BIT(3)
-
-/** @brief Apply color math to sprites (OBJ) */
-#define COLORMATH_OBJ       BIT(4)
-
-/** @brief Apply color math to backdrop (color 0) */
+/** @brief Apply color math to backdrop (color 0) — color math's own bit */
 #define COLORMATH_BACKDROP  BIT(5)
 
-/** @brief Apply color math to all layers */
+/** @brief Apply color math to all layers and the backdrop */
 #define COLORMATH_ALL       0x3F
+
+/** @name Deprecated layer names (use LAYER_*)
+ * @{ */
+#define COLORMATH_BG1       BIT(0)  /**< @deprecated use LAYER_BG1 */
+#define COLORMATH_BG2       BIT(1)  /**< @deprecated use LAYER_BG2 */
+#define COLORMATH_BG3       BIT(2)  /**< @deprecated use LAYER_BG3 */
+#define COLORMATH_BG4       BIT(3)  /**< @deprecated use LAYER_BG4 */
+#define COLORMATH_OBJ       BIT(4)  /**< @deprecated use LAYER_OBJ */
+/** @} */
+#ifdef __clang__
+#pragma clang deprecated(COLORMATH_BG1, "use LAYER_BG1")
+#pragma clang deprecated(COLORMATH_BG2, "use LAYER_BG2")
+#pragma clang deprecated(COLORMATH_BG3, "use LAYER_BG3")
+#pragma clang deprecated(COLORMATH_BG4, "use LAYER_BG4")
+#pragma clang deprecated(COLORMATH_OBJ, "use LAYER_OBJ")
+#endif
 
 /*============================================================================
  * Color Math Operations
@@ -144,12 +149,12 @@ void colorMathInit(void);
 /**
  * @brief Set the layers colour math applies to — REPLACES the previous set
  *
- * `colorMathSetLayers(COLORMATH_BG1)` after `colorMathSetLayers(COLORMATH_BG2)`
+ * `colorMathSetLayers(LAYER_BG1)` after `colorMathSetLayers(LAYER_BG2)`
  * leaves only BG1 blended. This is the function colorMathEnable() was until
  * 2026-09-22; it is renamed because "Enable" reads as additive — windowEnable()
  * IS additive — and the old name silently undid the previous call.
  *
- * @param layers Layer mask (COLORMATH_BG1, COLORMATH_BG2, ...; 0 disables)
+ * @param layers Layer mask (LAYER_BG1, LAYER_BG2, ...; 0 disables)
  */
 void colorMathSetLayers(u8 layers);
 

@@ -437,7 +437,8 @@ endef
 # specific objects ignore — the ABI requires them).
 CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
-	-Wno-unused-parameter -Wno-error=deprecated-declarations
+	-Wno-unused-parameter -Wno-error=deprecated-declarations \
+	-Wno-error=deprecated-pragma
 
 # C sources → objects
 # Step 1: clang syntax check (cproc has no built-in -W flags so a sibling

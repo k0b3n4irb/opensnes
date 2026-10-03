@@ -121,8 +121,12 @@ u16 profileScanlineEnd(void);
  *============================================================================*/
 
 /**
- * @brief Get total frame count since boot (wraps at 65535)
+ * @brief The same counter as getFrameCount() (wraps at 65535)
+ *
+ * It reads the frame counter the NMI handler keeps, not a counter of the
+ * profiler; getFrameCount() (console.h) is the name kept.
  */
+OPENSNES_DEPRECATED("use getFrameCount() — it reads the same counter")
 u16 profileGetFrameCount(void);
 
 /**

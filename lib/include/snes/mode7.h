@@ -58,7 +58,7 @@
  *
  * @note This does NOT set BGMODE to Mode 7. You must do that separately:
  * @code
- * REG_BGMODE = BGMODE_MODE7;
+ * REG_BGMODE = BG_MODE7;
  * REG_M7SEL = 0x00;  // No flip, wrap around
  * REG_TM = TM_BG1;   // Enable BG1
  * @endcode
@@ -105,6 +105,7 @@ void mode7SetAngle(u8 angle);
  * @brief Set Mode 7 center point
  *
  * Sets the center of rotation/scaling. Default is (128, 128).
+ * mode7SetPivot() writes the same registers from two u8.
  *
  * @param x Center X coordinate (13-bit signed, -4096 to 4095)
  * @param y Center Y coordinate (13-bit signed, -4096 to 4095)
@@ -159,13 +160,15 @@ void mode7Rotate(u16 degrees);
 void mode7Transform(u16 degrees, u16 scalePercent);
 
 /**
- * @brief Set pivot point (screen coordinates)
+ * @brief Set the center point from two 8-bit values
  *
- * Sets the rotation center using screen coordinates (0-255).
- * The pivot point is where the Mode 7 plane appears to rotate around.
+ * Writes the same two registers as mode7SetCenter() (M7X, M7Y), with the
+ * range of a u8: it is mode7SetCenter() for a center that lies within the
+ * first 256 pixels of the plane, which is the screen as long as the scroll
+ * is (0, 0). Past that, use mode7SetCenter().
  *
- * @param x Screen X coordinate (0-255)
- * @param y Screen Y coordinate (0-223)
+ * @param x Center X coordinate (0-255)
+ * @param y Center Y coordinate (0-255)
  *
  * @code
  * mode7SetPivot(128, 112);  // Center of screen

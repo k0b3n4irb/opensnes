@@ -33,8 +33,8 @@ it into 16 KB of tiles).
 |---|---|---|
 | BGMODE | `$0B` (Mode 3, priority) | same (`setMode(BG_MODE3, 0x08)`) |
 | W12SEL | `$0F` (W1+W2 on BG1, inverted) | same (windowEnable+windowSetInvert ×2) |
-| WBGLOG | `$01` (BG1 = AND) | same (`windowSetLogic(WINDOW_BG1, WINDOW_LOGIC_AND)`) |
-| TMW | `$01` | same (`windowSetMainMask(WINDOW_BG1)`) |
+| WBGLOG | `$01` (BG1 = AND) | same (`windowSetLogic(LAYER_BG1, WINDOW_LOGIC_AND)`) |
+| TMW | `$01` | same (`windowSetMainMask(LAYER_BG1)`) |
 | DMAP0/BBAD0 | `%100` / `$26` | same (`hdmaSetup(ch0, HDMA_MODE_4REG, HDMA_DEST_WH0, …)`) |
 | HDMA table | 14 bands of 16 lines | krom's exact bytes (see main.c) |
 | Backdrop | green (CGRAM 0) | same (`setColor(0, RGB(0,31,0))`) |

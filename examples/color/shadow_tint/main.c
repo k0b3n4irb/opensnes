@@ -102,9 +102,9 @@ static void build_solid_tile(u8 v) {
 /** @brief Apply the effect for the current fx_state (call after VBlank) */
 static void apply_effect(void) {
     switch (fx_state) {
-        case 1: colorMathShadow(COLORMATH_BG1, 14);       break; /* darken   */
-        case 2: colorMathTint(COLORMATH_BG1, 0, 4, 18);   break; /* underwater */
-        case 3: colorMathTint(COLORMATH_BG1, 20, 8, 0);   break; /* sunset   */
+        case 1: colorMathShadow(LAYER_BG1, 14);       break; /* darken   */
+        case 2: colorMathTint(LAYER_BG1, 0, 4, 18);   break; /* underwater */
+        case 3: colorMathTint(LAYER_BG1, 20, 8, 0);   break; /* sunset   */
         default: colorMathDisable();                      break; /* none     */
     }
 }

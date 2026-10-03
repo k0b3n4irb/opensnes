@@ -714,16 +714,16 @@ static void coverage_lot_b(void) {
     r_mosaic = mosaicGetSize();
     /* N3: the "SetLayers" pair REPLACES the set — the deprecated name is the
      * first call so it stays executed while it ships. MOSAIC ends 0xF1. */
-    mosaicEnable(MOSAIC_BG2);
-    mosaicSetLayers(MOSAIC_BG1);
-    colorMathEnable(COLORMATH_BG2);
-    colorMathSetLayers(COLORMATH_BG1);
+    mosaicEnable(LAYER_BG2);
+    mosaicSetLayers(LAYER_BG1);
+    colorMathEnable(LAYER_BG2);
+    colorMathSetLayers(LAYER_BG1);
     r_cm_layers = colormath_cgadsub & 0x3F;
     videoSetObjInterlace(1);
     videoSetOverscan(1);
     videoSetPseudoHires(1);
     videoSetPseudoHires(0);
-    colorMathTransparency50(COLORMATH_BG1);
+    colorMathTransparency50(LAYER_BG1);
     colorMathSetCondition(COLORMATH_INSIDE);
     colorMathSetBrightness(10);
     colorMathSetChannel(COLDATA_BLUE, 20);
@@ -1064,13 +1064,13 @@ int main(void) {
     windowDisableAll();
     windowSetPos(WINDOW_1, 40, 200);
     windowSetPos(WINDOW_2, 8, 16);
-    windowEnable(WINDOW_1, WINDOW_BG1 | WINDOW_OBJ);   /* w12sel 02, wobjsel 02 */
-    windowEnable(WINDOW_2, WINDOW_BG3 | WINDOW_MATH);  /* w34sel 08, wobjsel 82 */
-    windowSetInvert(WINDOW_1, WINDOW_BG1, 1);          /* w12sel 03 */
-    windowSetLogic(WINDOW_BG2, WINDOW_LOGIC_XOR);      /* wbglog 08 */
-    windowSetLogic(WINDOW_OBJ, WINDOW_LOGIC_AND);      /* wobjlog 01 */
-    windowSetMainMask(WINDOW_BG1 | WINDOW_OBJ);        /* tmw 11 */
-    windowSetSubMask(WINDOW_BG3);                      /* tsw 04 */
+    windowEnable(WINDOW_1, LAYER_BG1 | LAYER_OBJ);   /* w12sel 02, wobjsel 02 */
+    windowEnable(WINDOW_2, LAYER_BG3 | WINDOW_MATH);  /* w34sel 08, wobjsel 82 */
+    windowSetInvert(WINDOW_1, LAYER_BG1, 1);          /* w12sel 03 */
+    windowSetLogic(LAYER_BG2, WINDOW_LOGIC_XOR);      /* wbglog 08 */
+    windowSetLogic(LAYER_OBJ, WINDOW_LOGIC_AND);      /* wobjlog 01 */
+    windowSetMainMask(LAYER_BG1 | LAYER_OBJ);        /* tmw 11 */
+    windowSetSubMask(LAYER_BG3);                      /* tsw 04 */
     windowDisable(WINDOW_2, WINDOW_MATH);              /* wobjsel 02 */
     windowSplit(100);                                  /* W1 0..99, W2 100..255 */
     windowCentered(WINDOW_2, 64);                      /* W2 96..159 */

@@ -177,7 +177,7 @@ int main(void) {
     colorMathSetCondition(COLORMATH_INSIDE);   /* CGWSEL bits 5-4 = 01 */
     colorMathSetSource(COLORMATH_SRC_FIXED);   /* CGWSEL bit 1 = 0 */
     colorMathSetOp(COLORMATH_SUB);             /* CGADSUB bit 7 */
-    colorMathSetLayers(COLORMATH_BG2);         /* CGADSUB bit 1 */
+    colorMathSetLayers(LAYER_BG2);         /* CGADSUB bit 1 */
     colorMathSetFixedColor(12, 12, 12);        /* COLDATA: R = G = B = 12 */
 
     /*--------------------------------------------------------------------
@@ -188,7 +188,7 @@ int main(void) {
      * WOBJSEL ($2125) = 0x20: Color Math Window 1 Enable
      * TMW ($212E) = 0x00: no main screen masking
      *--------------------------------------------------------------------*/
-    windowEnable(WINDOW_1, WINDOW_BG2 | WINDOW_MATH);   /* W12SEL $20, WOBJSEL $20 */
+    windowEnable(WINDOW_1, LAYER_BG2 | WINDOW_MATH);   /* W12SEL $20, WOBJSEL $20 */
     windowSetMainMask(0);                               /* TMW $00 */
 
     /*--------------------------------------------------------------------

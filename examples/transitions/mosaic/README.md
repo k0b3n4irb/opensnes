@@ -53,7 +53,7 @@ smooth ~0.5 second transition.
 
 ```c
 void doMosaicOut(void) {
-    mosaicSetLayers(MOSAIC_BG1);
+    mosaicSetLayers(LAYER_BG1);
     mosaicFadeOut(3);
 }
 ```

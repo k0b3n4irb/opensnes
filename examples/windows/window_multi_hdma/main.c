@@ -90,12 +90,12 @@ int main(void) {
 
     /* krom's window algebra: both windows on BG1, both inverted,
      * combined with AND, mask applied on the main screen. */
-    windowEnable(WINDOW_1, WINDOW_BG1);
-    windowEnable(WINDOW_2, WINDOW_BG1);
-    windowSetInvert(WINDOW_1, WINDOW_BG1, 1);
-    windowSetInvert(WINDOW_2, WINDOW_BG1, 1);
-    windowSetLogic(WINDOW_BG1, WINDOW_LOGIC_AND);
-    windowSetMainMask(WINDOW_BG1);
+    windowEnable(WINDOW_1, LAYER_BG1);
+    windowEnable(WINDOW_2, LAYER_BG1);
+    windowSetInvert(WINDOW_1, LAYER_BG1, 1);
+    windowSetInvert(WINDOW_2, LAYER_BG1, 1);
+    windowSetLogic(LAYER_BG1, WINDOW_LOGIC_AND);
+    windowSetMainMask(LAYER_BG1);
 
     /* One channel, 4 registers per line: WH0-WH3 = both windows' edges */
     hdmaSetup(HDMA_CHANNEL_0, HDMA_MODE_4REG, HDMA_DEST_WH0, window_table);

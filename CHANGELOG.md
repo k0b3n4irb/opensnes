@@ -101,6 +101,25 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- refactor(lib,examples,docs): **the duplicate names are deprecated** (API
+  decision D5). `getRegion()` gives way to `isPAL()` (the same value since
+  v0.44), `profileGetFrameCount()` to `getFrameCount()` (the same counter),
+  `BGMODE_MODE0/1/2/3/7` to `BG_MODE0`-`BG_MODE7`, and the layer bits
+  `WINDOW_BG1`-`WINDOW_OBJ`, `COLORMATH_BG1`-`COLORMATH_OBJ`,
+  `MOSAIC_BG1`-`MOSAIC_BG4` to `LAYER_BG1`-`LAYER_OBJ`: one set of layer
+  names for `setMainScreen`, `windowEnable`, `colorMathSetLayers` and
+  `mosaicSetLayers`. What only one module has keeps its name
+  (`WINDOW_MATH`, `WINDOW_ALL`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`,
+  `MOSAIC_BG_ALL`), and `TM_*` stays as the register's bit names. Old names
+  build and warn; they go at 1.0. A deprecated constant is a macro, so the
+  warning comes from `#pragma clang deprecated` in the header, read by the
+  clang pre-pass (`-Wno-error=deprecated-pragma` in `make/common.mk`); the
+  library itself is linted without that allowance, so it cannot use one.
+  Three doc fixes ride along: `mode7SetPivot()` was described as taking
+  screen coordinates when it writes the same two registers as
+  `mode7SetCenter()` from two `u8`; `docs/tutorials/graphics.md` called
+  `setMode()` with one argument; `VBlankCallback` and `VoidFn` now say they
+  are the same type.
 - **BREAKING** refactor(lib): **no lib variable with an unprefixed name is
   exported any more, and the header functions that needed them are no longer
   `inline`** (API decision D4). `cursor_x` / `cursor_y`, `cgwsel` / `cgadsub`,

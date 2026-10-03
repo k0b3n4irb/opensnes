@@ -158,12 +158,12 @@ static void setup_window(u8 layers, u8 w12sel_val) {
      * and TMW by hand); luna diff shows the same frames. */
     {
         u8 w1 = 0;
-        if (w12sel_val & 0x02) w1 |= WINDOW_BG1 | WINDOW_OBJ;
-        if (w12sel_val & 0x20) w1 |= WINDOW_BG2 | WINDOW_MATH;
+        if (w12sel_val & 0x02) w1 |= LAYER_BG1 | LAYER_OBJ;
+        if (w12sel_val & 0x20) w1 |= LAYER_BG2 | WINDOW_MATH;
         windowDisableAll();
         windowEnable(WINDOW_1, w1);
         windowSetInvert(WINDOW_1, w1, 1);
-        windowSetMainMask(layers | WINDOW_OBJ);
+        windowSetMainMask(layers | LAYER_OBJ);
     }
 
     /* Configure HDMA: channel 4 drives WH0 (left boundary),

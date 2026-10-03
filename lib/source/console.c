@@ -79,7 +79,7 @@ void consoleInit(void) {
     if (rand_seed == 0) rand_seed = 0xACE1;
 
     /* Set up Mode 1 as default */
-    REG_BGMODE = BGMODE_MODE1;
+    REG_BGMODE = BG_MODE1;
 
     /* Set default BG memory layout.
      * Without this, crt0 leaves $2107-$210C at zero, which puts both

@@ -62,7 +62,7 @@ void WaitForKey(void) {
  * This effect is commonly used in RPG battle transitions (e.g., Final Fantasy).
  */
 void doMosaicOut(void) {
-    mosaicSetLayers(MOSAIC_BG1);
+    mosaicSetLayers(LAYER_BG1);
     mosaicFadeOut(3);
 }
 

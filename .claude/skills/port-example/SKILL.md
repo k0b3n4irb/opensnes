@@ -178,7 +178,7 @@ PVSnesLib's `setColorEffect(CM_SUBBGOBJ_ENABLE, CM_MSCR_BACK | CM_MSCR_BG1)` bec
 colorMathInit();
 colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
 colorMathSetOp(COLORMATH_ADD);
-colorMathEnable(COLORMATH_BG1 | COLORMATH_BACKDROP);
+colorMathEnable(LAYER_BG1 | COLORMATH_BACKDROP);
 ```
 
 #### BG Register Setup (when not using bgInitTileSet)

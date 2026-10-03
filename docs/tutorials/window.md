@@ -73,8 +73,8 @@ int main(void) {
 
     windowInit();                                       /* default state */
     windowSetPos(WINDOW_1, 80, 176);                    /* 96-pixel slab in the middle */
-    windowEnable(WINDOW_1, WINDOW_BG1);                 /* … applied to BG1 */
-    windowSetMainMask(WINDOW_BG1);                      /* … on the main screen */
+    windowEnable(WINDOW_1, LAYER_BG1);                 /* … applied to BG1 */
+    windowSetMainMask(LAYER_BG1);                      /* … on the main screen */
 
     setScreenOn();
     while (1) WaitForVBlank();
@@ -90,7 +90,7 @@ slab from x=80 to x=176 *covers* BG1, and pixels outside are kept.
 That's usually what you want for "spotlight" effects. To flip:
 
 ```c
-windowSetInvert(WINDOW_1, WINDOW_BG1, 1);   /* show outside, hide inside */
+windowSetInvert(WINDOW_1, LAYER_BG1, 1);   /* show outside, hide inside */
 ```
 
 ## Static shapes vs animated shapes
@@ -136,8 +136,8 @@ spans the whole screen with `left = 0, right = 255`.
 
 ## The window logic op trap
 
-When you call `windowEnable(WINDOW_1, WINDOW_BG1)` and
-`windowEnable(WINDOW_2, WINDOW_BG1)`, both windows now affect BG1 —
+When you call `windowEnable(WINDOW_1, LAYER_BG1)` and
+`windowEnable(WINDOW_2, LAYER_BG1)`, both windows now affect BG1 —
 and the PPU consults the **logic op** for BG1 to decide. The default
 logic is `OR`.
 
@@ -152,7 +152,7 @@ is fine but spelled-out logic is easier for the next reader.
 |---|---|
 | `windowInit()` | Reset all window registers to "no windowing". Call before configuring a new scene. |
 | `windowSetPos(window, left, right)` | Set the boundaries for `WINDOW_1` or `WINDOW_2` (0–255 inclusive). |
-| `windowEnable(window, layers)` | Make the given layers (`WINDOW_BG1`, `WINDOW_BG2`, …, `WINDOW_OBJ`, `WINDOW_MATH`) consult this window. |
+| `windowEnable(window, layers)` | Make the given layers (`LAYER_BG1`, `LAYER_BG2`, …, `LAYER_OBJ`, `WINDOW_MATH`) consult this window. |
 | `windowDisable(window, layers)` | Stop those layers from consulting this window. |
 | `windowDisableAll()` | Cleanly tear down: all layers ignore both windows. |
 | `windowSetInvert(window, layers, invert)` | Flip "inside is masked" → "outside is masked" per layer. |
@@ -238,8 +238,8 @@ final gate is `windowSetMainMask(layers)` (or
 `windowSetSubMask(layers)`), which writes `TMW` (`$212E`) for the
 main screen.
 
-A scene that calls `windowEnable(WINDOW_1, WINDOW_BG1)` but forgets
-`windowSetMainMask(WINDOW_BG1)` shows BG1 normally — the window is
+A scene that calls `windowEnable(WINDOW_1, LAYER_BG1)` but forgets
+`windowSetMainMask(LAYER_BG1)` shows BG1 normally — the window is
 configured but ignored. The `windowInit()` default leaves both masks
 empty, so this is the common newcomer trap.
 

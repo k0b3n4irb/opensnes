@@ -290,8 +290,8 @@ void resetFrameCount(void);
 /**
  * @brief Check if PAL system
  *
- * @return 1 if PAL (50Hz), 0 if NTSC (60Hz) — the same value as getRegion()
- *         since 2026-09-22 (it returned 0xFF for PAL before)
+ * @return 1 if PAL (50Hz), 0 if NTSC (60Hz) (it returned 0xFF for PAL
+ *         before 2026-09-22)
  *
  * @code
  * if (isPAL()) {
@@ -302,10 +302,11 @@ void resetFrameCount(void);
 u8 isPAL(void);
 
 /**
- * @brief Get system region
+ * @brief The same value as isPAL(): 0 = NTSC, 1 = PAL
  *
- * @return 0 = NTSC, 1 = PAL
+ * Two names for one answer since 2026-09-22; isPAL() is the one kept.
  */
+OPENSNES_DEPRECATED("use isPAL() — it returns the same value")
 u8 getRegion(void);
 
 /*============================================================================

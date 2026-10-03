@@ -126,7 +126,7 @@ int main(void) {
     colorMathInit();
     colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
     colorMathSetOp(COLORMATH_ADD);
-    colorMathSetLayers(COLORMATH_BG1 | COLORMATH_BACKDROP);
+    colorMathSetLayers(LAYER_BG1 | COLORMATH_BACKDROP);
 
     setScreenOn();
 

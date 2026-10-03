@@ -50,7 +50,7 @@ int main(void) {
     setMainScreen(LAYER_BG1);
 
     mosaicInit();                          /* default state */
-    mosaicSetLayers(MOSAIC_BG1);               /* mosaic affects BG1 */
+    mosaicSetLayers(LAYER_BG1);               /* mosaic affects BG1 */
     mosaicSetSize(8);                       /* 9 × 9 pixel blocks */
 
     setScreenOn();
@@ -104,7 +104,7 @@ for (u8 size = 0; size <= 15; size++) {
 | Function | Purpose |
 |---|---|
 | `mosaicInit()` | Reset all mosaic state — disable, size 0. Call before configuring a new scene. |
-| `mosaicSetLayers(bgMask)` | Enable mosaic on the layers in the bitmask (`MOSAIC_BG1`, …, `MOSAIC_BG_ALL`). |
+| `mosaicSetLayers(bgMask)` | Enable mosaic on the layers in the bitmask (`LAYER_BG1`, …, `MOSAIC_BG_ALL`). |
 | `mosaicDisable()` | Disable mosaic on all layers. |
 | `mosaicSetSize(size)` | Set the block size, 0–15 (`MOSAIC_MIN` to `MOSAIC_MAX`). |
 | `mosaicGetSize()` | Read the current block size. |
@@ -153,7 +153,7 @@ To hide sprites during a transition, either:
 
 ### 🟠 Mosaic + Mode 7 = unusual
 
-In Mode 7, the only BG is BG1. Setting `MOSAIC_BG1` on a Mode 7 plane
+In Mode 7, the only BG is BG1. Setting `LAYER_BG1` on a Mode 7 plane
 applies the pixel-block filter to the affine-transformed image —
 you get pixelated rotation/scaling. Visually distinctive, but the
 pattern is rarely used outside specific stylistic effects.
