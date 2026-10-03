@@ -143,15 +143,12 @@ _Static_assert(__builtin_offsetof(t_objs, onscreen) == 56, "onscreen offset mism
  */
 extern t_objs objWorkspace;
 
-/** @brief Slot index + 1 of the last objGetPointer(), 0 if its handle was stale.
- *  Prefer the return value of objGetPointer(); this global predates it. */
-extern u16 objptr;
-
-/** @brief Set to 1 inside a callback to kill the current object */
-extern u8 objtokill;
-
-/** @brief Handle of the last object created by objNew() */
-extern u16 objgetid;
+/* Three more variables were exported here until 2026-10-03 (API decision D4:
+ * a public header must not claim unprefixed names):
+ *   objgetid  -> objGetCurrentId()
+ *   objtokill -> objKillCurrent()            (was `objtokill = 1;`)
+ *   objptr    -> the return value of objGetPointer()
+ * Assembly reads obj_current_id, obj_kill_flag and obj_ptr. */
 
 /* --- Bank $7E SLOT 2 (NOT C-accessible, ASM-only) --- */
 /* The actual object buffer array lives in Bank $7E:
@@ -227,7 +224,7 @@ void objInitFunctions(u8 objtype, ObjInitFn initfct, ObjUpdateFn updfct, ObjUpda
  * @param objtype Object type (0-63)
  * @param x Initial X position in map pixels
  * @param y Initial Y position in map pixels
- * @return Object handle (0 if no space available). Also stored in objgetid.
+ * @return Object handle (0 if no space available). Also returned by objGetCurrentId().
  *
  * @note After objNew, the new object data is copied to objWorkspace.
  *       Set width, height, and other fields on objWorkspace before returning
@@ -240,15 +237,39 @@ u16 objNew(u8 objtype, u16 x, u16 y);
  *
  * Validates the handle and populates objWorkspace with the object's data.
  *
- * @param objhandle Object handle (from objNew/objgetid)
+ * @param objhandle Object handle (from objNew() or objGetCurrentId())
  * @return The slot index + 1 if the handle is live, 0 if it is stale (the
  *         object was killed, or the slot reused) — in which case the
- *         workspace is left alone. The same value is stored in `objptr`,
- *         which was the only way to learn it until 2026-09-20 (the function
- *         returned void); `objptr` was also documented as a "buffer offset",
- *         which it is not.
+ *         workspace is left alone.
  */
 u16 objGetPointer(u16 objhandle);
+
+/**
+ * @brief Handle of the last object objNew() created
+ *
+ * Inside an init callback this is the object being created: objNew() has
+ * not returned yet, so its return value is not available there.
+ *
+ * @code
+ * void marioInit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
+ *     objGetPointer(objGetCurrentId());   // load the new object
+ *     mario_id = objGetCurrentId();
+ * }
+ * @endcode
+ *
+ * @return The handle (0 after objInitEngine(), before any objNew())
+ */
+u16 objGetCurrentId(void);
+
+/**
+ * @brief Kill the object being updated
+ *
+ * Call it inside an update callback. objUpdateAll() removes the object once
+ * the callback returns and its workspace has been written back, the only
+ * safe moment. It does nothing in a refresh callback until the next update
+ * pass.
+ */
+void objKillCurrent(void);
 
 /**
  * @brief Kill an object

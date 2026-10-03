@@ -63,7 +63,7 @@ That is the line both shipped examples use.
 
 | Where | Bytes | Contents |
 |---|---:|---|
-| Bank `$00` (the 8 KB C band) | 69 | `objWorkspace` (64) + `objgetid`, `objptr`, `objtokill` |
+| Bank `$00` (the 8 KB C band) | 69 | `objWorkspace` (64) + the engine's current id, slot and kill flag |
 | Bank `$7E` (the far band) | 6842 | 80 × 64-byte records, the per-type active-list heads, the three 256-byte callback tables, the object-loading scratch buffer |
 
 Measured on `examples/maps/slope_collision`: the `.obj_bank7e` RAMSECTION is
@@ -137,7 +137,7 @@ objLoadObjects((u8 *)&objmario);
 index. The handle packs the slot's rolling unique id in the high byte and the
 slot index in the low byte, so that a stale handle to a recycled slot can be
 detected. It returns 0 when the pool is full, and also stores the handle in
-the global `objgetid`.
+`objGetCurrentId()`.
 
 The canonical init callback looks like this (from
 `examples/maps/slope_collision/mario.c`):
@@ -149,8 +149,8 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
 
     /* objNew already copied the new record into objWorkspace;
        objGetPointer re-selects it and validates the handle. */
-    objGetPointer(objgetid);
-    marioid = objgetid;
+    objGetPointer(objGetCurrentId());
+    marioid = objGetCurrentId();
 
     /* Width 14 + xofs 1 is critical for slope collision (width 16 bugs) */
     objWorkspace.width  = 14;
@@ -229,12 +229,11 @@ values you see afterwards are the ones the routine computed.
 ### Reaching an object you are not currently updating
 
 `objGetPointer(handle)` validates a handle and loads that object into the
-workspace. It sets the global `objptr` to the slot index **plus one**, or to
-0 when the handle is stale — that is the validity test:
+workspace. It returns the slot index **plus one**, or 0 when the handle is
+stale — that is the validity test:
 
 ```c
-objGetPointer(some_handle);
-if (objptr == 0) {
+if (objGetPointer(some_handle) == 0) {
     /* that object is dead; the workspace holds whatever was there before */
     return;
 }
@@ -476,15 +475,15 @@ of a 16-pixel sprite.
 Three ways, in order of how often you want them:
 
 ```c
-objtokill = 1;          /* inside an update callback: kill the current object */
+objKillCurrent();        /* inside an update callback: kill the current object */
 objKill(handle);        /* from anywhere: kill by handle */
 objKillAll();           /* wipe the pool, e.g. on level change */
 ```
 
-`objtokill` is the one to reach for. `objUpdateAll` clears it before each
-update callback and checks it after; setting it kills the object the engine is
+`objKillCurrent()` is the one to reach for. `objUpdateAll` clears its flag before
+each update callback and checks it after; calling it kills the object the engine is
 currently updating, after the workspace has been written back, which is the
-only safe moment. It is **not** checked around the refresh callback — setting
+only safe moment. It is **not** checked around the refresh callback — calling
 it there does nothing until the next update pass.
 
 `objKill(handle)` takes a handle, unlike almost everything else in this API.
@@ -618,13 +617,13 @@ every dynamic sprite's tiles that frame. It is correct, but it is a cost
 spike that lands exactly when a scrolling camera is busiest — worth knowing
 when you are chasing a dropped frame (see @ref tutorial_profiling).
 
-### 🟡 `objNew` leaves `objgetid` stale when the pool is full
+### 🟡 `objNew` leaves `objGetCurrentId()` stale when the pool is full
 
-On failure `objNew` returns 0 but does not clear `objgetid`, which still holds
+On failure `objNew` returns 0 but does not clear the current id, which still holds
 the previous successful handle. This used to let `objLoadObjects` write the
 workspace into the previously created object; since the owner-tracked
 workspace (2026-09-19) the workspace has no owner at that point and nothing is
-written. `objgetid` itself is still stale, so keep guarding with the return
+written. `objGetCurrentId()` itself is still stale, so keep guarding with the return
 value, as the examples do: `if (objNew(type, xp, yp) == 0) return;`.
 
 ### 🟢 `objKillAll` leaked slots — fixed 2026-09-19

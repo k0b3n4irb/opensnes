@@ -21,7 +21,27 @@ de la recommandation de la fiche.
 | **Associée 3** numéro | **la release cassante est la 1.0** | les 0.x déprécient avec alias ; la 1.0 retire tous les alias (N2-N6, D1-D5, les cinq `*Bank`, `dmaTransfer`) et réintroduit `hdmaEnable(channel)` ; rien ne casse ensuite avant 2.0 |
 | **Associée 4** échelle Mode 7 | b, décidé le 2026-10-02 | livré (`93ff5e2d`) |
 
-**Avancement.** D4 module carte : fait le 2026-10-03 (`mapGetCameraX()` / `mapGetCameraY()`, `map_cam_x` / `map_cam_y`). Restent pour D4 : object, text, colormath, mosaic, et la liste « même famille » à valider.
+**Compléments décidés le même jour, sur listes présentées.**
+
+- *Les 46 autres variables exportées* : celles qu'un exemple utilise restent
+  publiques sans renommage (`oamMemory`, `oam_update_flag`, `oambuffer`,
+  `objWorkspace`, `frame_count`, `vblank_flag`, `text_config`, `dsp1_o0-2`,
+  `gsu_cfgr`, `gsu_scmr`, `gsu_scbr`, `gsu_dma_src_hi`, `superfx_status`) ;
+  celles qu'aucun exemple n'utilise sortent des en-têtes publics vers un
+  en-tête interne, sans renommage (`force_blanked`, `current_brightness`,
+  `hdma_wave_speed`, les `scope_*` bruts, les dix `lkup*`, `gsu_prog_bank`,
+  `gsu_prog_addr`, `gsu_stop_irqs`, `gsu_owns_cart`, `gsu_scmr_live`,
+  `gsu_pres_frames`, `gsu_pres_last`, `sine_table`, `ease_quad_table`).
+- *Associée 1 précisée* : variante struct pour les natives à **6 arguments et
+  plus** seulement — `oamDrawMetaFlip` (11), `oamDrawMeta` (7),
+  `dsp1Parameter` (7), `oamMetaDrawDyn` (6) ; `dmaTransfer` (6) suit son plan
+  1.0. Les dix natives à 5 arguments restent (`rectInit`, `panelDraw`,
+  `panelClear`, `hdmaSetupIndirect`, `hdmaSetupBank`, `hdmaIrisWipe`,
+  `collideTileEx`, `bgLoad`, `audioSetADSR`, `audioPlaySampleOn`), et
+  `PHILOSOPHY.md` dira « plus de 5 » au lieu de « plus de 4 ». Héritées de
+  PVSnesLib, inchangées : `bgInitTileSet` (8), `oamSet` (7), `oamInitGfxSet` (7).
+
+**Avancement.** D4 module carte : fait le 2026-10-03 (`mapGetCameraX()` / `mapGetCameraY()`, `map_cam_x` / `map_cam_y`). Module objet : fait le 2026-10-03 (`objGetCurrentId()`, `objKillCurrent()`, `objGetPointer()` pour `objptr`). Restent pour D4 : text, colormath, mosaic, et la sortie des internes vers un en-tête interne.
 
 Ordre d'application : D4, puis D3, D5, associée 2, D1 (les petites d'abord
 après D4), D2 (doc), associée 1 (après validation de la liste). Une rangée

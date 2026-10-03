@@ -116,6 +116,8 @@ CASES = [
     ("r_obj_fr_x",   2, 0x0200),  # objInitFriction1D(0x100): xvel decelerates
     ("r_obj_fr_y",   2, 0),       # ...and a small yvel clamps at zero, no sign flip
     ("r_obj_pool",   2, 80),      # objKillAll returns the WHOLE pool (was 79: a slot leaked)
+    ("r_obj_curid",    2, 1),     # D4: objGetCurrentId() is objNew()'s handle
+    ("r_obj_selfkill", 2, 0),     # D4: objKillCurrent() in its update -> stale handle
     # coverage lot B (2026-09-19): the public functions nothing executed
     ("r_fix_abs_n",    2, 0x0300), ("r_fix_abs_p",    2, 0x0200),
     ("r_fix_clamp_lo", 2, 0xFF00), ("r_fix_clamp_hi", 2, 0x0100), ("r_fix_clamp_in", 2, 0x0080),

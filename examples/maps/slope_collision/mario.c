@@ -61,8 +61,8 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
         return;
 
     /* objNew copies the new object to objWorkspace */
-    objGetPointer(objgetid);
-    marioid = objgetid;
+    objGetPointer(objGetCurrentId());
+    marioid = objGetCurrentId();
 
     /* Width 14 + xofs 1 is critical for slope collision (width 16 bugs) */
     objWorkspace.width = 14;

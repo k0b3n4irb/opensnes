@@ -101,6 +101,11 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- **BREAKING** refactor(lib): **the object engine's exported globals are
+  gone** (API decision D4). `objgetid` becomes `objGetCurrentId()`,
+  `objtokill = 1;` becomes `objKillCurrent();`, and `objptr` was already the
+  return value of `objGetPointer()`. Assembly reads `obj_current_id`,
+  `obj_kill_flag`, `obj_ptr`.
 - **BREAKING** refactor(lib): **the map camera is read with
   `mapGetCameraX()` / `mapGetCameraY()`; the exported globals `x_pos` and
   `y_pos` are gone** (API decision D4, the one row no alias could fix after

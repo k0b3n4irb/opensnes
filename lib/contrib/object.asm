@@ -130,9 +130,9 @@ objnotused      DSB 7
 .RAMSECTION ".obj_bank00" BANK 0 SLOT 1
 
 objWorkspace    INSTANCEOF t_objs           ; 64-byte workspace for C callbacks
-objgetid        DW                          ; return value of objNew
-objptr          DW                          ; current object offset
-objtokill       DB                          ; set to 1 to kill current object
+obj_current_id        DW                          ; return value of objNew
+obj_ptr          DW                          ; current object offset
+obj_kill_flag       DB                          ; set to 1 to kill current object
 
 .ENDS
 
@@ -355,7 +355,7 @@ _oieR3:
     sta objactives,x
 
     stz.w objnewid
-    stz.w objgetid
+    stz.w obj_current_id
 
     sep #$20
     lda #$1
@@ -579,7 +579,7 @@ _oiN3:
     clc
     adc objnewid
     sta tcc__r0
-    sta.l objgetid
+    sta.l obj_current_id
 
     ; Copy new object to workspace for init callback access
     SYNC_TO_WORKSPACE
@@ -630,7 +630,7 @@ objGetPointer:
     xba
     and #$00ff
 
-    sta.l objptr
+    sta.l obj_ptr
     lda 10,s
     and #$00ff
     tax
@@ -647,13 +647,13 @@ objGetPointer:
     rep #$20
     and #$00ff
     clc
-    cmp.l objptr
+    cmp.l obj_ptr
     beq _oigp1
 
     ldx #0
 _oigp1:
     txa
-    sta.l objptr
+    sta.l obj_ptr
 
     ; If valid, copy to workspace
     beq _oigp2
@@ -662,7 +662,7 @@ _oigp1:
     SYNC_TO_WORKSPACE
 
 _oigp2:
-    lda.l objptr                            ; return value (u16): slot + 1, or 0
+    lda.l obj_ptr                            ; return value (u16): slot + 1, or 0
     ply
     plx
     plb
@@ -690,7 +690,7 @@ objKill:
     jsl objGetPointer
     pla
 
-    lda.l objptr
+    lda.l obj_ptr
     bne _oik1
     brl _oikend
 
@@ -703,7 +703,7 @@ _oik1:
     asl a
     asl a
     tax
-    sta.l objptr
+    sta.l obj_ptr
 
     lda objbuffers.1.prev,x
 
@@ -750,7 +750,7 @@ _oik2:
     cmp #OB_NULL
     beq _oik3
 
-    ldx.w objptr
+    ldx.w obj_ptr
     lda objbuffers.1.prev,x
     tay
     lda objbuffers.1.next,x
@@ -765,7 +765,7 @@ _oik2:
     sta objbuffers.1.prev,x
 
 _oik3:
-    ldx.w objptr
+    ldx.w obj_ptr
     lda objunused
     sta objbuffers.1.next,x
     lda 10,s
@@ -851,7 +851,7 @@ _oikal3:
     bne _oikal1
 
     stz.w objnewid
-    stz.w objgetid
+    stz.w obj_current_id
     ; objunused is NOT reset here (fixed 2026-09-19). objKill pushes every
     ; slot it frees onto the free list, so after the loop the list is already
     ; complete and objunused is its head. The old `stz objunused` forced the
@@ -1032,7 +1032,7 @@ _oiual321:
     ora objfctcall
     bne _oiual_call
     sep #$20
-    stz.w objtokill
+    stz.w obj_kill_flag
     rep #$20
     bra _oiual_nocall
 _oiual_call:
@@ -1041,7 +1041,7 @@ _oiual_call:
     pha
 
     sep #$20
-    stz.w objtokill
+    stz.w obj_kill_flag
     jsl jslcallfct
     rep #$20
     pla
@@ -1059,7 +1059,7 @@ _oiual_nocall:
     SYNC_FROM_WORKSPACE
 
     sep #$20
-    lda.l objtokill
+    lda.l obj_kill_flag
     beq _oial4
 
 _oial41:
@@ -2432,13 +2432,13 @@ _oilo1_go:
     sta objfctcallh
 
     ; An object table naming a type with no init callback: skip the entry
-    ; instead of jumping to $00:0000. objgetid is cleared so the sync below
+    ; instead of jumping to $00:0000. obj_current_id is cleared so the sync below
     ; does not act on the previous entry's object.
     and #$00ff
     ora objfctcall
     bne _oilo_call
     lda #0
-    sta.l objgetid
+    sta.l obj_current_id
     bra _oilo_nocall
 _oilo_call:
 
@@ -2449,7 +2449,7 @@ _oilo_nocall:
     ; objNew already copied to workspace, init may have modified it.
     ; Need to copy workspace back to objbuffers for the new object.
     rep #$20
-    lda.l objgetid
+    lda.l obj_current_id
     beq _oilo_skip_sync                     ; if objNew returned 0, no object created
     and #$00ff                              ; extract index
     asl a
@@ -3386,6 +3386,44 @@ _oicmsend:
     ply
     plx
     plb
+    plp
+    rtl
+
+.ENDS
+
+;==============================================================================
+; Accessors for what used to be exported globals (decision D4, 2026-10-03)
+;==============================================================================
+
+.SECTION ".objects_access_text" SUPERFREE
+
+;------------------------------------------------------------------------------
+; u16 objGetCurrentId(void);
+;------------------------------------------------------------------------------
+; Handle of the last object objNew() created. Inside an init callback it is
+; the object being created (objNew has not returned yet). Was the global
+; objgetid.
+;------------------------------------------------------------------------------
+objGetCurrentId:
+    php
+    rep #$20
+    .ACCU 16
+    lda.l obj_current_id
+    plp
+    rtl
+
+;------------------------------------------------------------------------------
+; void objKillCurrent(void);
+;------------------------------------------------------------------------------
+; Inside an update callback: kill the object being updated, once the callback
+; returns. Was "objtokill = 1".
+;------------------------------------------------------------------------------
+objKillCurrent:
+    php
+    sep #$20
+    .ACCU 8
+    lda #$01
+    sta.l obj_kill_flag
     plp
     rtl
 

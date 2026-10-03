@@ -58,8 +58,8 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
         return;
 
     /* objNew copies the new object to objWorkspace — set fields here */
-    objGetPointer(objgetid);
-    marioid = objgetid;
+    objGetPointer(objGetCurrentId());
+    marioid = objGetCurrentId();
     objWorkspace.width = 16;
     objWorkspace.height = 16;
 

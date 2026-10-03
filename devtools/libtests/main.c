@@ -266,6 +266,17 @@ u16 r_obj_alive;    /* set after objUpdateAll returns     -> 0xA11E       */
 static u16 obj_peeker, obj_other;
 static u16 obj_calls;
 
+/* D4 (2026-10-03): objGetCurrentId() and objKillCurrent() replace the
+ * exported globals objgetid and objtokill. */
+u16 r_obj_curid;    /* objGetCurrentId() == objNew()'s return      -> 1 */
+u16 r_obj_selfkill; /* objGetPointer(h) after its update called
+                     * objKillCurrent()                            -> 0 (stale) */
+u16 r_obj_kept;     /* a second object, same pass, no kill         -> non-zero */
+static void objSuicideUpdate(u16 idx) {
+    (void)idx;
+    objKillCurrent();
+}
+
 static void objPeekUpdate(u16 idx) {
     obj_calls++;
     objWorkspace.yvel = 0x1234;        /* an edit made BEFORE the peek */
@@ -907,6 +918,22 @@ static void part_objects_irq(void) {
     objKillAll();
     r_obj_pool = 0;
     while (objNew(1, 16, 16) != 0) r_obj_pool++;
+
+    /* --- D4: the accessors that replaced objgetid / objtokill. Type 2
+     * kills itself in its update; type 0 here has no callback and stays. --- */
+    {
+        u16 doomed, kept;
+        objInitEngine();
+        objInitFunctions(2, 0, objSuicideUpdate, 0);
+        objInitFunctions(0, 0, 0, 0);
+        doomed = objNew(2, 16, 16);
+        r_obj_curid = (objGetCurrentId() == doomed && doomed != 0) ? 1 : 0;
+        kept = objNew(0, 32, 16);
+        objUpdateAll();
+        r_obj_selfkill = objGetPointer(doomed);
+        r_obj_kept = objGetPointer(kept);
+        objKillAll();
+    }
 
     /* --- fixed32: the asm sine against the C expression it replaced --- */
     r_f32sin_asm = (u32)fix32Sin(sin_angle);

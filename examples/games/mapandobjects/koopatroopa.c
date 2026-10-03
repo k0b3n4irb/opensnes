@@ -44,7 +44,7 @@ void koopatroopainit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     if (objNew(type, xp, yp) == 0)
         return;
 
-    objGetPointer(objgetid);
+    objGetPointer(objGetCurrentId());
     objWorkspace.width = 16;
     objWorkspace.height = 16;
     objWorkspace.sprframe = 0;
