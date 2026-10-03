@@ -4,6 +4,28 @@ Pour chaque rangée : ce qui est en jeu, les options, le coût mesuré ce jour d
 
 **Pourquoi maintenant** : aujourd'hui un alias coûte zéro pour l'utilisateur (un warning). Après le gel 1.0, chaque rangée devient soit une rupture majeure, soit une incohérence permanente.
 
+## Décisions du propriétaire — 2026-10-03
+
+Séance de questions fermées, une réponse par rangée. Toutes vont dans le sens
+de la recommandation de la fiche.
+
+| Rangée | Décision | Ce que ça engage |
+|---|---|---|
+| **D4** globales sans préfixe | **a** : accesseurs + préfixes, les internes sortent des en-têtes publics | à faire en premier ; un commit par module (map, object, text, colormath, mosaic), 9 exemples, `object.md`, `map.md`. La liste triée « public assumé / interne » de la même famille (`oamMemory`, `frame_count`…) est à fournir dans le même passage |
+| **D1** `hdmaEnable` | **b, en deux temps** | maintenant : `hdmaEnableMask` / `hdmaDisableMask` ajoutées, `hdmaEnable` / `hdmaDisable` dépréciées, les 31 appels migrés. À la 1.0 : `hdmaEnable(channel)` réintroduite avec le sens canal |
+| **D2** `WaitForVBlank` | **a** : gardée, exception documentée | une ligne dans `PHILOSOPHY.md` et dans le guide de migration |
+| **D3** maths | **mixte** : `sqrt16`, `atan2_8`, `mul16` gardées ; `ease_in_quad` / `ease_out_quad` deviennent `easeInQuad` / `easeOutQuad` avec alias | un commit, 6 sites |
+| **D5** doublons | **appliquer le tableau ; `TM_*` reste** dans `registers.h` comme noms de registre | `getRegion`, `profileGetFrameCount`, `BGMODE_MODEn`, `WINDOW_*`, `COLORMATH_*`, `MOSAIC_*` (masques de couches) dépréciés ; une ligne de doc pour `VBlankCallback` / `VoidFn`, `mode7SetCenter` / `mode7SetPivot`, `gameLoopRun` / `sceneRun` |
+| **Associée 1** principe 4 | **natives à 5 arguments ou plus** reçoivent une variante struct, l'ancienne forme est dépréciée ; `oamSet` et les signatures héritées de PVSnesLib restent | la liste triée « native / héritée » est à présenter au propriétaire **avant** d'y toucher |
+| **Associée 2** API morte | **déprécier** `audioUpdate`, `consoleInitEx`, `snesmodSetSoundTable`, `snesmodAllocateSoundRegion` ; **renommer `padRaw`** avec alias | un commit |
+| **Associée 3** numéro | **la release cassante est la 1.0** | les 0.x déprécient avec alias ; la 1.0 retire tous les alias (N2-N6, D1-D5, les cinq `*Bank`, `dmaTransfer`) et réintroduit `hdmaEnable(channel)` ; rien ne casse ensuite avant 2.0 |
+| **Associée 4** échelle Mode 7 | b, décidé le 2026-10-02 | livré (`93ff5e2d`) |
+
+Ordre d'application : D4, puis D3, D5, associée 2, D1 (les petites d'abord
+après D4), D2 (doc), associée 1 (après validation de la liste). Une rangée
+par commit, alias `OPENSNES_DEPRECATED` partout où c'est possible,
+`make tests` et `make lint` à chaque fois.
+
 ## D1 — `hdmaEnable(mask)` contre toutes les autres fonctions hdma qui prennent un canal
 
 - **Constat.** 21 fonctions de `hdma.h` prennent `u8 channel` (0–7). `hdmaEnable` et `hdmaDisable` prennent un masque de bits. Le dépôt l'appelle sous 14 formes différentes : `1 << HDMA_CHANNEL_6` (6), `channel_mask(channel)` (5), `1 << HDMA_CHANNEL_0` (5), `1 << 6` (2), `0x0F` (2), `0xFF` (2), `0x40` (1)… La skill de port classe ce point comme piège n° 1.

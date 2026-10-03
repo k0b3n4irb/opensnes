@@ -30,7 +30,7 @@ day (summarised at the end of this note).
 | 15 | Stale example comments, `port-example/SKILL.md` | 🟠 | done | `38c4b7ed` |
 | 16 | Governance cleanup | 🟡 | done | `e9ecf489`, `cdba4544` |
 | 17 | Replace Nintendo / PVSnesLib assets, `docs/ASSET_PROVENANCE.md` | 🔴 | **owner** | deferred by the owner on 2026-09-26 (`06930df8`); 66 files in 23 examples; v1.0 must-have |
-| 18 | D1-D5, freeze criteria, ROADMAP v1.0 table | 🟠 | **owner** | sheet and ROADMAP done (`06930df8`); only the Mode 7 scale decided (`93ff5e2d`); D1-D5 and associated decisions 1-3 open |
+| 18 | D1-D5, freeze criteria, ROADMAP v1.0 table | 🟠 | **decided 2026-10-03**, not applied | all rows as recommended (table at the top of the sheet); application: one row per commit, D4 first |
 | 19 | `check_doc_drift.py` extended (a-e) | 🟠 | done | `2c2d6905`, `8ed23df4`, `fbbacace`, `295d16f7` |
 | 20 | Compiler invariant on Kl defs | 🟠 | done | `6ecb255a` |
 | 21 | Constant multiply inlined | 🟠 | done | `e01ffa29`, `6d62c443` |
@@ -38,7 +38,7 @@ day (summarised at the end of this note).
 | 23 | WRAM oracle excludes the stack band | 🟠 | done | `b106ad43` |
 | 24 | `install-luna.sh` multi-OS, a CI leg that runs ROMs | 🟠 | done | `7dbdaea7`, `b8e2be4f`, `c22be86a` |
 | 25 | SA-1 BW-RAM saves; `sa1.h` and the speed claim | 🟠 | done | `621cd9f9`, `f51786d1`, `d2b4bd51`, `b2a08f27` |
-| 26 | Lib: structs for >= 4-argument functions, dead API deprecated, hot setters, `sram.asm` | 🟠 | not started | tied to 18 (associated decisions 1 and 2) |
+| 26 | Lib: structs for >= 4-argument functions, dead API deprecated, hot setters, `sram.asm` | 🟠 | unblocked | decided 2026-10-03: native functions with 5+ arguments get a struct variant (list to show the owner first); dead API deprecated, `padRaw` renamed |
 | 27 | Window and `hdma_wave` examples on the lib | 🟠 | done | `007c92ce`, `855bf2c7` |
 | 28 | Per-API frame costs in `docs/PERF.md`, cited in headers | 🟠 | done | `52e807d6`; the ten measured functions cite the page and the page is in the generated docs since 2026-10-03 |
 | 29 | Header dependencies for lib and examples | 🟠 | done | `d2718a43`, `412b15e3`, `3db1a9fb` |
@@ -71,7 +71,7 @@ day (summarised at the end of this note).
 
 | # | Criterion | State on 2026-10-03 |
 |---|---|---|
-| 1 | D1-D5 and associated decisions landed | open (owner, then engineering) |
+| 1 | D1-D5 and associated decisions landed | decided 2026-10-03; landing is engineering work, one row per commit |
 | 2 | No open red except the PVSnesLib assets | held |
 | 3 | Release zip built and tested by CI | done |
 | 4 | Drift sentinel covers function names cited in docs | done |
