@@ -256,14 +256,27 @@ void windowCentered(u8 window, u8 width) {
 
     half = width >> 1;
     left = SCREEN_CENTER_X - half;
-    right = SCREEN_CENTER_X + half - 1;
+    /* right from left and the width, not from the centre: an odd width
+     * kept its full span, and a width of 1 gave right < left, an empty
+     * window (until 2026-10-03). width 0 is an empty window on purpose. */
+    if (width == 0) {
+        windowSetPos(window, 1, 0);
+        return;
+    }
+    right = (u8)(left + width - 1);
 
     windowSetPos(window, left, right);
 }
 
 void windowSplit(u8 splitX) {
-    /* Window 1: left side (0 to splitX-1) */
-    windowSetPos(WINDOW_1, 0, splitX > 0 ? splitX - 1 : 0);
+    /* Window 1: left side (0 to splitX-1); splitX = 0 means no left part,
+     * and an empty window is left > right (0..0 was one pixel wide, until
+     * 2026-10-03) */
+    if (splitX == 0) {
+        windowSetPos(WINDOW_1, 1, 0);
+    } else {
+        windowSetPos(WINDOW_1, 0, splitX - 1);
+    }
 
     /* Window 2: right side (splitX to 255) */
     windowSetPos(WINDOW_2, splitX, 255);

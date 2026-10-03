@@ -248,7 +248,10 @@ void setMode(u8 mode, u8 flags) {
      * p = BG3 priority in Mode 1 (0=normal, 1=high)
      * mmm = Mode (0-7)
      */
-    REG_BGMODE = (flags & 0xF8) | (mode & 0x07);
+    /* The header allows the priority / tile-size flags on either argument
+     * (setMode(BG_MODE1 | BG3_MODE1_PRIORITY_HIGH, 0)): the high bits of
+     * `mode` count too (until 2026-10-03 they were masked off). */
+    REG_BGMODE = ((flags | mode) & 0xF8) | (mode & 0x07);
 
     /* Modes 2, 4 and 6 turn BG3 into the offset-per-tile table, whose
      * rows BG3VOFS selects directly: the NMI must then write BG3's VOFS

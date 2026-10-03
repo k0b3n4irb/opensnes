@@ -47,7 +47,9 @@ void colorMathInit(void) {
     colormath_cgadsub = 0;
     REG_CGWSEL = 0;
     REG_CGADSUB = 0;
-    REG_COLDATA = 0;
+    REG_COLDATA = 0xE0;     /* all three planes selected, value 0: a bare 0
+                             * selects no plane and leaves the fixed colour
+                             * as it was (until 2026-10-03) */
 }
 
 void colorMathSetLayers(u8 layers) {

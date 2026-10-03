@@ -184,6 +184,16 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`setMode()` keeps the flag bits of its `mode` argument.** The
+  header allows `setMode(BG_MODE1 | BG3_MODE1_PRIORITY_HIGH, 0)`; the
+  priority bit was masked off with the mode (library audit, row 13).
+- fix(lib): **`colorMathInit()` clears the fixed colour.** It wrote 0 to
+  COLDATA, which selects no plane and changes nothing; it writes `$E0`
+  (all planes, value 0) (library audit, row 14).
+- fix(lib): **`windowCentered()` and `windowSplit()` at the edges.** A width
+  of 1 gave right < left (an empty window) and an odd width lost a pixel;
+  `windowSplit(0)` left a one-pixel window 1. A width of 0 and a split at
+  0 now give an empty window on purpose (library audit, row 15).
 - fix(lib): **`apuUpload()` with a size of 0 sends nothing.** It sent one
   byte before testing the end, so 0 meant 65 536 bytes (library audit,
   row 18).
