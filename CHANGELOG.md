@@ -190,6 +190,15 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs(lib,examples): **the SNESMOD module volume is 0-255, not 0-127.**
+  `snesmodSetModuleVolume()` passes the byte to the driver as is, which
+  starts a module at 255; measured on luna (`luna diff --audio`,
+  `snesmod_music`): 127 halves the level, 255 leaves it unchanged, 63 leaves
+  a quarter. `snesmod.h`, `docs/tutorials/audio.md` and the `snesmod_music`
+  README said 0-127, and the example's volume variable started at 127 so the
+  first L press jumped from 255 to 117 (snes-rag, reading the SNESMOD
+  source; library audit D12). The effect volume stays 0-127: our wrapper
+  reduces it to the driver's nibble.
 - docs: `fix32Sin()` / `fix32Cos()` carry the NMI warning of `fix32Mul()`:
   they write the same result scratch, so a call from an `nmiSet()` callback
   corrupts a main-thread multiply in flight (library audit).- docs: `fix32Lerp()`'s caveat said the multiply "may lose precision" near

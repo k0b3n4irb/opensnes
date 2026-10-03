@@ -236,7 +236,9 @@ u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch);
  *
  * Sets the playback volume for the current module.
  *
- * @param volume Volume level (0-127)
+ * @param volume Volume level, 0-255; the driver starts a module at 255 (its
+ *        own scale — 127 halves the level, measured on luna 2026-10-04; this
+ *        line said 0-127 until then)
  */
 void snesmodSetModuleVolume(u8 volume);
 
@@ -245,7 +247,7 @@ void snesmodSetModuleVolume(u8 volume);
  *
  * Gradually fades the module volume to a target level.
  *
- * @param targetVolume Target volume (0-127)
+ * @param targetVolume Target volume, 0-255 (the module-volume scale above)
  * @param speed Fade speed (higher = faster)
  *
  * @code

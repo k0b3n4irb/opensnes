@@ -172,8 +172,8 @@ See @ref audio_samples in the API reference for the full sample API
 ### Volume Control
 
 ```c
-// Set master volume (0-127)
-snesmodSetModuleVolume(127);
+// Set module volume (0-255; a module starts at 255 — 127 is half)
+snesmodSetModuleVolume(255);
 
 // Fade out over time
 snesmodFadeVolume(0, 4);  // target=0, speed=4
