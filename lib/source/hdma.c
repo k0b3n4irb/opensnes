@@ -127,6 +127,7 @@ static s16 hdmaSin(u8 angle) {
 }
 
 /* External symbols from hdma.asm */
+extern volatile u8 bg_scroll_dirty;   /* crt0: bit n = BGn+1 scroll to rewrite at the next VBlank */
 extern u8 hdma_table_a[673];
 extern u8 hdma_table_b[673];
 extern u8 hdma_brightness_table[113];
@@ -281,10 +282,17 @@ void hdmaWaveStop(void) {
     hdmaDisableMask(channel_mask(hdma_wave_channel));
     hdma_wave_enabled = 0;
 
-    /* Reset BG scroll offset to 0 so the wave doesn't leave the
-     * background shifted after stopping. Write both low and high bytes. */
-    *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
-    *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
+    /* The table wrote ABSOLUTE offsets into BGnHOFS, over whatever
+     * bgSetScroll() had set. Rather than write 0 (which left the layer at 0
+     * when the game had scrolled it, until 2026-10-03), mark the layer's
+     * scroll dirty: the NMI rewrites its real HOFS/VOFS from the shadows
+     * at the next VBlank. BG1HOFS..BG4HOFS are $0D, $0F, $11, $13. */
+    if (hdma_wave_dest_reg >= 0x0D && hdma_wave_dest_reg <= 0x13) {
+        bg_scroll_dirty |= (u8)(1 << ((hdma_wave_dest_reg - 0x0D) >> 1));
+    } else {
+        *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
+        *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
+    }
 }
 
 void hdmaWaveSetSpeed(u8 speed) {
@@ -481,11 +489,12 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
     if (hdmaGetEnabled() & channel_mask(channel)) {
         hdmaSetTable(channel, build_table);
     } else {
-    hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
+        hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
         hdmaEnableMask(channel_mask(channel));
     }
 
-    /* Wait for HDMA to initialize (happens at start of VBlank).
+    /* Wait for the HDMA init (at the start of the frame, around V=0 —
+     * anomie-timing; the comment said "start of VBlank" until 2026-10-03).
      * Only THEN enable window masking — ensures WH0/WH1 are being
      * driven by HDMA before the PPU uses them for clipping. */
     WaitForVBlank();

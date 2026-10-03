@@ -479,6 +479,11 @@ void hdmaWaveUpdate(void);
 /**
  * @brief Stop wave effect and disable HDMA channel
  *
+ * The wave table writes ABSOLUTE offsets into the layer's HOFS, over the
+ * value bgSetScroll() set; while it runs, the layer's own scroll is not
+ * applied. Stopping marks the layer's scroll dirty so the NMI rewrites it
+ * from the shadows at the next VBlank (until 2026-10-03 it wrote 0).
+ *
  * Disables the wave effect and frees the HDMA channel.
  */
 void hdmaWaveStop(void);
@@ -604,6 +609,11 @@ void hdmaColorGradientStop(u8 channel);
  * (Until 2026-10-03 the channel was set up again, which restarted the table
  * at the next HBlank — one frame with the top of the table on the bottom of
  * the screen.)
+ *
+ * While it runs the effect owns W12SEL, W34SEL, WOBJSEL and TMW and writes
+ * them directly: the window module's own shadows do not see those writes,
+ * so do not call windowEnable() / windowSetMainMask() for the same layers
+ * until hdmaIrisWipeStop().
  */
 void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius);
 

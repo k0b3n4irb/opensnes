@@ -190,6 +190,11 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`hdmaWaveStop()` hands the layer back to its scroll.** The
+  wave table writes absolute offsets over `bgSetScroll()`'s value, and the
+  stop wrote 0: a scrolled layer was left at 0. It marks the layer's scroll
+  dirty, so the NMI rewrites it from the shadows at the next VBlank
+  (library audit, row 9).
 - fix(lib): **`audioLoadSample()` of a sample whose size is 1 modulo 256
   (513, 2817, …) hung the driver.** The end-of-stream handshake parked the
   port at 0 and waited for the driver to mirror it; when the last index
