@@ -78,6 +78,19 @@ pull + import + rebuild). What moved:
   matters more, not less.
 - Golden queries 9/9; negative control: our ABI at ranks 1 and 2 again.
 
+## Index state (2026-10-03, night)
+
+Replica at snes-rag's fingerprint `ab7b05594e17` (34 946 chunks, chunker
+v10, 215 sources: `furryrpg`, `georgjz-snes-assembly-adventure`,
+`nova-the-squirrel-2`, `skipp-and-friends`, `space-rescue-squad` new).
+`luna-docs` serves v1.32.0: "how do I tell whether two builds sound the
+same when their audio hashes differ" gives the `[1.32.0]` changelog
+(`2153025ed4d5bb41`) then the `luna diff --audio` section
+(`35c15ed5c76a63bd`). Breadcrumbs no longer take a `# …` line of a code
+block for a title (their fix after our observation): golden query 6 now
+returns `47a5d8b1bad020d3` with the real path *luna CLI / … / luna diff*;
+the old id `192d1bade86dc0dc` answers by alias.
+
 ## Index state (2026-10-03, evening)
 
 Replica at snes-rag's commit `9aaa3f3`, their fingerprint `8bae78f3a746`

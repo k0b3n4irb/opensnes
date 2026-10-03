@@ -276,6 +276,13 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): **luna pinned at v1.32.0** (`luna diff --audio`, the two
+  clearer `region` messages). `docs/tools/luna.md` regenerated. The three
+  audio-comparison runs of our request were replayed on the published
+  binary: half-volume module `DIFF` at 75.93 %, same ROM `MATCH`, scripted
+  `snesmod_sfx` `MATCH`. `.claude/rules/testing.md` now asks every commit
+  that re-captures `baselines/audio.json` to quote `luna diff --audio`
+  between the build before and the one after.
 - refactor(lib,docs): **`mode7SetPivot()` is deprecated in favour of
   `mode7SetCenter()`** (owner decision, completing D5). It writes the same
   two registers from two `u8`; the tutorial said it took screen coordinates
