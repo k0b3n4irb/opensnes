@@ -10,6 +10,7 @@ var object_8h =
     [ "objCollidMap1D", "object_8h.html#a4ceea4ba8ad22e6ac49e9392f1671545", null ],
     [ "objCollidMapWithSlopes", "object_8h.html#a828cd84eb41cd28c18ba0625cad1fd2a", null ],
     [ "objCollidObj", "object_8h.html#aefe003a2fb685e0f08d4b5f35ef0257c", null ],
+    [ "objGetCurrentId", "object_8h.html#a7388d74673cb5bbb66d66cb6503e1736", null ],
     [ "objGetPointer", "object_8h.html#a7cbfce19a3d4ed39620f93a7562ba2e3", null ],
     [ "objInitEngine", "object_8h.html#a6a0d13021b69bdb55f9239d5577ae490", null ],
     [ "objInitFriction1D", "object_8h.html#a8e4ece797bd4a68b80223e346bd84538", null ],
@@ -17,13 +18,11 @@ var object_8h =
     [ "objInitGravity", "object_8h.html#ad308f742d023cc15efdb73ec4ed362aa", null ],
     [ "objKill", "object_8h.html#a4ad7c03653fa3b7fdc7c36b3e82a9565", null ],
     [ "objKillAll", "object_8h.html#a2269ecc9324f6e78a7007e2ac9f3aa0e", null ],
+    [ "objKillCurrent", "object_8h.html#a74be31bd35df1fd784c5f24bb7fabd59", null ],
     [ "objLoadObjects", "object_8h.html#aa14cd55e5ffb19f7030a32f47e84f2a5", null ],
     [ "objNew", "object_8h.html#a5f3dd63b163cced3299b0d1d48d2b17a", null ],
     [ "objRefreshAll", "object_8h.html#aede8c571a7e8bdb8129b5df55b45225b", null ],
     [ "objUpdateAll", "object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83", null ],
     [ "objUpdateXY", "object_8h.html#af27124be823e35daf579362d3820738d", null ],
-    [ "objgetid", "object_8h.html#ad4b2cf3a008d2011baf65b7ed74eaf65", null ],
-    [ "objptr", "object_8h.html#a9e81915d1e68d22798a93bb27eb74188", null ],
-    [ "objtokill", "object_8h.html#adbc29a5fc1d8493c4a23d739727aaef3", null ],
     [ "objWorkspace", "object_8h.html#aff685114554f887d186a87bacbe786b9", null ]
 ];

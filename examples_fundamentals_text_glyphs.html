@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_fundamentals_text_glyphs.html','',''); });
 <p>The under-the-hood companion to the Text family. Nine tiles, two colours, one message — hand-coded 2bpp bitplanes written straight into VRAM, no <span class="tt">text</span> module. Read <a href="../../text/print_string/"><span class="tt">text/print_string</span></a> for the easy way; read this to see what that module hides. </p>
 </blockquote>
 <p><img src="text_glyphs.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="build--run-20"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-23"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/fundamentals/text_glyphs</div>
@@ -252,9 +252,9 @@ after I write the high byte." So you write low, write high, and the address move
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W).</div><div class="ttdef"><b>Definition</b> registers.h:187</div></div>
-<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:445</div></div>
+<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:455</div></div>
 </div><!-- fragment --><p><span class="tt">TM</span> (screen designation) controls which layers are visible. We enable BG1 only. <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> sets brightness to maximum. The infinite loop with <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> keeps the program alive and synced to 60fps — without it, the CPU would spin wildly and cause timing issues.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="tips--tricks"></a>
@@ -307,7 +307,7 @@ Why These Modules?</h3>
 <p><b>"But there are no sprites in Hello World!"</b> Correct. The dependency chain is: <span class="tt">console</span> → <span class="tt">sprite</span> → <span class="tt">dma</span>. The NMI handler (in console) always DMAs the OAM buffer (in sprite) to the PPU, and that DMA call lives in the dma module. The build system does NOT auto-resolve these dependencies — if you forget <span class="tt">dma</span>, you get a linker error about an undefined <span class="tt"><a class="el" href="dma_8h.html#a50a418c73f494651a1be98404d753c21" title="Copy OAM data (PVSnesLib compatible).">dmaCopyOam</a></span> symbol and no hint about why. </p>
 </blockquote>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-35"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-38"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference"></a>

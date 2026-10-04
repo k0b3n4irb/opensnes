@@ -166,13 +166,10 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a440e70483678702d9edb9695ad0bd075" id="r_a440e70483678702d9edb9695ad0bd075"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a440e70483678702d9edb9695ad0bd075">back</a></td></tr>
 <tr class="memdesc:a440e70483678702d9edb9695ad0bd075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Table set being filled this frame (the other one is on screen).  <br /></td></tr>
-<tr class="memitem:a320661e3a0fabfc5415d5c171f37210b" id="r_a320661e3a0fabfc5415d5c171f37210b"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a320661e3a0fabfc5415d5c171f37210b">cam_aas</a></td></tr>
-<tr class="memdesc:a320661e3a0fabfc5415d5c171f37210b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Heading: 0 looks up the map (-Y), 0x4000 looks to +X.  <br /></td></tr>
-<tr class="memitem:af3ac942bcc4b5319617d1265d27d0f5b" id="r_af3ac942bcc4b5319617d1265d27d0f5b"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af3ac942bcc4b5319617d1265d27d0f5b">cam_x</a></td></tr>
-<tr class="memdesc:af3ac942bcc4b5319617d1265d27d0f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Camera position on the ground plane (wraps with the 1024-unit texture).  <br /></td></tr>
-<tr class="memitem:ad8796f8224c2283ea9888abc8ed40d37" id="r_ad8796f8224c2283ea9888abc8ed40d37"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad8796f8224c2283ea9888abc8ed40d37">cam_y</a></td></tr>
+<tr class="memitem:a3e1556ecea76ea0630efc9c16d61ad57" id="r_a3e1556ecea76ea0630efc9c16d61ad57"><td class="memItemLeft">static <a class="el" href="structDsp1Camera.html">Dsp1Camera</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3e1556ecea76ea0630efc9c16d61ad57">cam</a></td></tr>
+<tr class="memdesc:a3e1556ecea76ea0630efc9c16d61ad57"><td class="mdescLeft">&#160;</td><td class="mdescRight">The camera: position on the ground plane (x, y wrap with the 1024-unit texture), height, lens, heading (aas: 0 looks up the map, -Y; 0x4000 looks to +X) and tilt. The luna manifest reads x, y and aas.  <br /></td></tr>
 <tr class="memitem:a5b9d66cf95a6941f1833f707e0a52150" id="r_a5b9d66cf95a6941f1833f707e0a52150"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5b9d66cf95a6941f1833f707e0a52150">cx</a></td></tr>
-<tr class="memdesc:a5b9d66cf95a6941f1833f707e0a52150"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ground point under the imaginary centre (last dsp1Parameter).  <br /></td></tr>
+<tr class="memdesc:a5b9d66cf95a6941f1833f707e0a52150"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ground point under the imaginary centre (last dsp1SetCamera).  <br /></td></tr>
 <tr class="memitem:a4650e5b7cc6da46f244b5d66793e69dd" id="r_a4650e5b7cc6da46f244b5d66793e69dd"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4650e5b7cc6da46f244b5d66793e69dd">cy</a></td></tr>
 <tr class="memitem:a12daf4f2dbff3923ffb1c93fdbdb13ab" id="r_a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a12daf4f2dbff3923ffb1c93fdbdb13ab">dsp1_ok</a> = 0</td></tr>
 <tr class="memdesc:a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 when the DSP-1 answered the known-answer probe (luna manifest asserts it).  <br /></td></tr>
@@ -190,7 +187,7 @@ Variables</h2></td></tr>
 <tr class="memitem:a7f2971ead73282ca27f21a125f22cda3" id="r_a7f2971ead73282ca27f21a125f22cda3"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7f2971ead73282ca27f21a125f22cda3">tab_tm</a> [5]</td></tr>
 <tr class="memdesc:a7f2971ead73282ca27f21a125f22cda3"><td class="mdescLeft">&#160;</td><td class="mdescRight">TM table: BG2 (sky) for the sky lines, then BG1 (ground).  <br /></td></tr>
 <tr class="memitem:ad484e4dd4663b8e2f5bb4878e08d408c" id="r_ad484e4dd4663b8e2f5bb4878e08d408c"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad484e4dd4663b8e2f5bb4878e08d408c">vof</a></td></tr>
-<tr class="memdesc:ad484e4dd4663b8e2f5bb4878e08d408c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Geometry from the last dsp1Parameter: imaginary-centre raster, horizon raster.  <br /></td></tr>
+<tr class="memdesc:ad484e4dd4663b8e2f5bb4878e08d408c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Geometry from the last dsp1SetCamera: imaginary-centre raster, horizon raster.  <br /></td></tr>
 <tr class="memitem:a7c5dd6b6daea44eb646a7ed0f61b674c" id="r_a7c5dd6b6daea44eb646a7ed0f61b674c"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7c5dd6b6daea44eb646a7ed0f61b674c">vva</a></td></tr>
 <tr id="var-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">Assets (data.asm, ASSET_SECTION — any bank, DMA reads the far pointer)</div></td></tr>
 <tr class="memitem:a7ef644f4cbca08b8c4830f66c08330d7" id="r_a7ef644f4cbca08b8c4830f66c08330d7"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7ef644f4cbca08b8c4830f66c08330d7">ground_map</a> []</td></tr>
@@ -206,8 +203,8 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>DSP-1 ground: the Super Mario Kart floor — per-scanline Mode 7 matrices streamed by the coprocessor's Raster command. </p>
-<p>mode7/perspective fakes a receding floor with a precomputed M7A/M7D table; this example asks the DSP-1 for the real thing. Each frame the CPU sends the camera (position, height, heading, tilt) with dsp1Parameter, then dsp1Raster streams one 2x2 matrix per screen line — A, B, C and D, so the floor rotates with the heading for free — straight into two HDMA payloads. The HDMA channels replay them next frame while the CPU already computes the frame after (double buffering). Above the horizon the same HDMA split as mode7/perspective shows a Mode 3 sky.</p>
-<p>The three numbers dsp1Parameter hands back beside the matrices are the whole geometry: Vva says on which raster the horizon sits, Cx/Cy say which ground point is under the screen centre (they go to M7X/M7Y), and the Mode 7 scroll registers just pin that centre to the middle of the screen.</p>
+<p>mode7/perspective fakes a receding floor with a precomputed M7A/M7D table; this example asks the DSP-1 for the real thing. Each frame the CPU sends the camera (position, height, heading, tilt) with dsp1SetCamera, then dsp1Raster streams one 2x2 matrix per screen line — A, B, C and D, so the floor rotates with the heading for free — straight into two HDMA payloads. The HDMA channels replay them next frame while the CPU already computes the frame after (double buffering). Above the horizon the same HDMA split as mode7/perspective shows a Mode 3 sky.</p>
+<p>The three numbers dsp1SetCamera hands back beside the matrices are the whole geometry: Vva says on which raster the horizon sits, Cx/Cy say which ground point is under the screen centre (they go to M7X/M7Y), and the Mode 7 scroll registers just pin that centre to the middle of the screen.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>DSP-1 Raster: open-ended command streaming Mode 7 matrices per raster</li>
 <li>Parameter outputs (Vof, Vva, Cx, Cy) driving M7X/M7Y and the HDMA split</li>
@@ -548,8 +545,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a320661e3a0fabfc5415d5c171f37210b" name="a320661e3a0fabfc5415d5c171f37210b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a320661e3a0fabfc5415d5c171f37210b">&#9670;&#160;</a></span>cam_aas</h2>
+<a id="a3e1556ecea76ea0630efc9c16d61ad57" name="a3e1556ecea76ea0630efc9c16d61ad57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e1556ecea76ea0630efc9c16d61ad57">&#9670;&#160;</a></span>cam</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -558,7 +555,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> cam_aas</td>
+          <td class="memname"><a class="el" href="structDsp1Camera.html">Dsp1Camera</a> cam</td>
         </tr>
       </table>
   </td>
@@ -568,53 +565,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Heading: 0 looks up the map (-Y), 0x4000 looks to +X. </p>
-
-</div>
-</div>
-<a id="af3ac942bcc4b5319617d1265d27d0f5b" name="af3ac942bcc4b5319617d1265d27d0f5b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3ac942bcc4b5319617d1265d27d0f5b">&#9670;&#160;</a></span>cam_x</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> cam_x</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Camera position on the ground plane (wraps with the 1024-unit texture). </p>
-
-</div>
-</div>
-<a id="ad8796f8224c2283ea9888abc8ed40d37" name="ad8796f8224c2283ea9888abc8ed40d37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8796f8224c2283ea9888abc8ed40d37">&#9670;&#160;</a></span>cam_y</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> cam_y</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>The camera: position on the ground plane (x, y wrap with the 1024-unit texture), height, lens, heading (aas: 0 looks up the map, -Y; 0x4000 looks to +X) and tilt. The luna manifest reads x, y and aas. </p>
 
 </div>
 </div>
@@ -638,7 +589,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Ground point under the imaginary centre (last dsp1Parameter). </p>
+<p>Ground point under the imaginary centre (last dsp1SetCamera). </p>
 
 </div>
 </div>
@@ -1038,7 +989,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Geometry from the last dsp1Parameter: imaginary-centre raster, horizon raster. </p>
+<p>Geometry from the last dsp1SetCamera: imaginary-centre raster, horizon raster. </p>
 
 </div>
 </div>

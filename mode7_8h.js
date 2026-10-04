@@ -9,6 +9,7 @@ var mode7_8h =
     [ "mode7Rotate", "mode7_8h.html#a7faf52e08e105b3ad83b5c79c01603ef", null ],
     [ "mode7SetAngle", "mode7_8h.html#aa09e1447cada89498932411fc81452fe", null ],
     [ "mode7SetCenter", "mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0", null ],
+    [ "mode7SetExtBg", "mode7_8h.html#a0e44ac5fc77a39c643b06d55b00b768f", null ],
     [ "mode7SetMatrix", "mode7_8h.html#a86be6a317594dfefb05d0786baecf98c", null ],
     [ "mode7SetPivot", "mode7_8h.html#a37acc01b1081f2d4da881f270149cf66", null ],
     [ "mode7SetScale", "mode7_8h.html#a606b68a9ff05a4c930d30640277a4668", null ],

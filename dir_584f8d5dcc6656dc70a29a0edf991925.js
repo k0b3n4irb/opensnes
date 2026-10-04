@@ -6,6 +6,8 @@ var dir_584f8d5dcc6656dc70a29a0edf991925 =
     [ "mode1_lz77", "dir_b7ef45f584a8dd2ffda2ddb37d834574.html", "dir_b7ef45f584a8dd2ffda2ddb37d834574" ],
     [ "mode2", "dir_267d387ea08e427049032bac7d31a82f.html", "dir_267d387ea08e427049032bac7d31a82f" ],
     [ "mode3", "dir_93753d0f727556d1f96d84dd6642ab14.html", "dir_93753d0f727556d1f96d84dd6642ab14" ],
+    [ "mode4", "dir_d6034bfafb13cb7ab8a0c777619c5747.html", "dir_d6034bfafb13cb7ab8a0c777619c5747" ],
     [ "mode5", "dir_cd2a70d413b1dbb505fe45fe4ee62a1d.html", "dir_cd2a70d413b1dbb505fe45fe4ee62a1d" ],
-    [ "mode5_hires", "dir_4a33f256780b3d83d2a399a144270042.html", "dir_4a33f256780b3d83d2a399a144270042" ]
+    [ "mode5_hires", "dir_4a33f256780b3d83d2a399a144270042.html", "dir_4a33f256780b3d83d2a399a144270042" ],
+    [ "mode6", "dir_f55cda19c5440453bec46339c9ca7262.html", "dir_f55cda19c5440453bec46339c9ca7262" ]
 ];

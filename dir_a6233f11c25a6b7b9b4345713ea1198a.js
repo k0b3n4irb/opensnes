@@ -5,6 +5,7 @@ var dir_a6233f11c25a6b7b9b4345713ea1198a =
     [ "hicolor_1792", "dir_c57569957dba930fc76ff1f615d18799.html", "dir_c57569957dba930fc76ff1f615d18799" ],
     [ "hicolor_blend", "dir_d6ab9f19ffaa640beabe8e92254ba665.html", "dir_d6ab9f19ffaa640beabe8e92254ba665" ],
     [ "palette_cycle", "dir_4d4fe9d7f3e2d3c3526968b9ca288d36.html", "dir_4d4fe9d7f3e2d3c3526968b9ca288d36" ],
+    [ "pseudo_hires", "dir_d5d3988192afaa97a633d3c10255ed88.html", "dir_d5d3988192afaa97a633d3c10255ed88" ],
     [ "shadow_tint", "dir_8f40be655fdb0a941c781377483b84b4.html", "dir_8f40be655fdb0a941c781377483b84b4" ],
     [ "transparency", "dir_b535caf38cf74252936932e59da65221.html", "dir_b535caf38cf74252936932e59da65221" ]
 ];

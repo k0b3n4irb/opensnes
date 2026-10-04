@@ -136,7 +136,7 @@ The pipeline</h2>
 <div class="line">sound.wav ─► wav2brr   ──► .brr sample     (audioLoadSample)</div>
 <div class="line">music.it ──► smconv    ──► SNESMOD bank    (snesmodLoadModule / snesmodPlay)</div>
 <div class="line"> </div>
-<div class="line">hero.ase ─┬► gfx4snes -P    ──► tiles + metasprite table   (oamDrawMeta)</div>
+<div class="line">hero.ase ─┬► gfx4snes -P    ──► tiles + metasprite table   (oamDrawMetasprite)</div>
 <div class="line">          └► aseprite2snes  ──► AnimClip tables            (animPlay / animTick)</div>
 </div><!-- fragment --><p>Each tool does exactly one conversion; the Makefile chains them. It is the Unix-pipe idea applied to asset building — small, composable, individually testable steps rather than one opaque converter.</p>
 <h2 class="doxsection"><a class="anchor" id="the-tools-at-a-glance"></a>
@@ -157,7 +157,7 @@ The tools at a glance</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="tools_smconv.html" title="smconv — tracker modules to SNESMOD soundbanks">smconv — tracker modules to SNESMOD soundbanks</a>  </td><td class="markdownTableBodyNone">an Impulse Tracker <span class="tt">.it</span>  </td><td class="markdownTableBodyNone">a SNESMOD soundbank  </td><td class="markdownTableBodyNone">auto (<span class="tt">USE_SNESMOD</span>)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="tools_palplan.html" title="palplan — project shared-palette planner">palplan — project shared-palette planner</a>  </td><td class="markdownTableBodyNone">a manifest of <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span> files  </td><td class="markdownTableBodyNone">a CGRAM layout + C header  </td><td class="markdownTableBodyNone">manual, project-level  </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="tools_palplan.html" title="palplan — project shared-palette planner">palplan — project shared-palette planner</a>  </td><td class="markdownTableBodyNone">a manifest of <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> files  </td><td class="markdownTableBodyNone">a CGRAM layout + C header  </td><td class="markdownTableBodyNone">manual, project-level  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="tools_aseprite2snes.html" title="aseprite2snes — Aseprite animations → AnimClip tables">aseprite2snes — Aseprite animations → AnimClip tables</a>  </td><td class="markdownTableBodyNone">an Aseprite animation export  </td><td class="markdownTableBodyNone"><a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a> tables (one per tag)  </td><td class="markdownTableBodyNone">one line per sprite  </td></tr>
 </table>
@@ -175,7 +175,7 @@ Your Makefile</h2>
 <p>The build itself has knobs — cartridge mapping, save RAM, coprocessor, ROM size, the link-time checks. <a class="el" href="tools_build.html" title="Your project&#39;s Makefile">Your project's Makefile</a> lists every one with its default.</p>
 <h2 class="doxsection"><a class="anchor" id="the-emulator-luna"></a>
 The emulator: luna</h2>
-<p>Testing is not a converter, but it is the other tool you will run every day. luna is the cycle-accurate emulator behind <span class="tt">make tests</span>, <span class="tt">luna mcp</span> is the debugger, and <a class="el" href="tools_luna.html" title="luna — command reference (pinned v1.30.2)">luna — command reference (pinned v1.30.2)</a> is the pinned release's own <span class="tt">--help</span>, one section per subcommand — generated from the binary, so it cannot drift from <span class="tt">tools/luna-test/luna.version</span>.</p>
+<p>Testing is not a converter, but it is the other tool you will run every day. luna is the cycle-accurate emulator behind <span class="tt">make tests</span>, <span class="tt">luna mcp</span> is the debugger, and <a class="el" href="tools_luna.html" title="luna — command reference (pinned v1.32.0)">luna — command reference (pinned v1.32.0)</a> is the pinned release's own <span class="tt">--help</span>, one section per subcommand — generated from the binary, so it cannot drift from <span class="tt">tools/luna-test/luna.version</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="where-they-fit-with-the-rest-of-the-docs"></a>
 Where they fit with the rest of the docs</h2>
 <ul>

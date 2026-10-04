@@ -135,11 +135,11 @@ Controls (krom's map)</h2>
 <li><b>L / R</b> — rotate the world in 7.5° steps</li>
 <li><b>Y / A</b> — nudge the pivot on X · <b>X / B</b> — nudge it on Y</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-38"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-42"></a>
 SNES Concepts</h2>
 <ul>
 <li>Per-scanline Mode 7 matrix writes (perspective + rotation combined)</li>
-<li>4-channel HDMA coordination (<span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> ×4 + <span class="tt">hdmaEnable(0x0F)</span>)</li>
+<li>4-channel HDMA coordination (<span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> ×4 + <span class="tt">hdmaEnableMask(0x0F)</span>)</li>
 <li>HDMA table repointing as a zero-copy animation primitive</li>
 <li>Mode 7 interleaved VRAM (<span class="tt"><a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7</a></span>); out-of-map backdrop (M7SEL=$80)</li>
 <li>VBlank-window discipline: repoint right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> — re-arming an HDMA channel mid-frame restarts its table walk</li>
@@ -158,7 +158,7 @@ Register fidelity vs the original</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">A1B0-3  </td><td class="markdownTableBodyNone">banks 1,2,3,1  </td><td class="markdownTableBodyNone">from the far pointers (SUPERFREE sections)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">HDMAEN  </td><td class="markdownTableBodyNone"><span class="tt">%00001111</span>  </td><td class="markdownTableBodyNone">same (<span class="tt">hdmaEnable(0x0F)</span>)  </td></tr>
+<td class="markdownTableBodyNone">HDMAEN  </td><td class="markdownTableBodyNone"><span class="tt">%00001111</span>  </td><td class="markdownTableBodyNone">same (<span class="tt">hdmaEnableMask(0x0F)</span>)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">BG1HOFS/VOFS, M7X/M7Y  </td><td class="markdownTableBodyNone">384/768, 512/1152  </td><td class="markdownTableBodyNone">same pose, same per-frame sync order  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -174,13 +174,13 @@ Measured parity (luna v1.9.0)</h2>
 <h2 class="doxsection"><a class="anchor" id="two-integration-lessons-this-port-surfaced"></a>
 Two integration lessons this port surfaced</h2>
 <ol type="1">
-<li><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures but does <b>not</b> enable — <span class="tt">hdmaEnable(mask)</span> is a separate call (the un-enabled state renders a convincing static 1:1 view that LOOKS like a broken perspective; check <span class="tt">dma.hdmaen</span>).</li>
+<li><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures but does <b>not</b> enable — <span class="tt">hdmaEnableMask(mask)</span> is a separate call (the un-enabled state renders a convincing static 1:1 view that LOOKS like a broken perspective; check <span class="tt">dma.hdmaen</span>).</li>
 <li>Calling <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> from an <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet</a></span> callback did not take effect (registers unchanged) while the same call works from the main loop — under investigation as a potential NMI-context/ABI interaction; the main-loop placement right after <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> is krom's own pattern and still inside VBlank.</li>
 </ol>
 <h2 class="doxsection"><a class="anchor" id="how-to-build-20"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/mode7/perspective_rotate &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-59"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-63"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">hdma</span>, <span class="tt">input</span>, <span class="tt">mode7</span> </p>
 </div></div><!-- contents -->

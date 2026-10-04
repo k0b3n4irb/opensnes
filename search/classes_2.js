@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['effectstate_0',['EffectState',['../structEffectState.html',1,'']]],
-  ['entity_1',['Entity',['../structEntity.html',1,'']]]
+  ['dsp1camera_0',['Dsp1Camera',['../structDsp1Camera.html',1,'']]]
 ];

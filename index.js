@@ -23,6 +23,7 @@ var index =
     [ "Frequently asked questions", "faq.html", null ],
     [ "Migrating from PVSnesLib", "migrating_pvsneslib.html", null ],
     [ "Game-Craft Guides", "craft.html", "craft" ],
+    [ "Measured frame costs of the library", "perf.html", null ],
     [ "The OpenSNES toolbox", "tools.html", "tools" ],
     [ "Graphics &amp; Backgrounds Tutorial", "tutorial_graphics.html", null ],
     [ "Sprites &amp; Animation Tutorial", "tutorial_sprites.html", null ],

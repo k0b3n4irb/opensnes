@@ -195,7 +195,7 @@ Keep PRs small</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>&gt; 400</b>  </td><td class="markdownTableBodyNone">Too large. Split it or explain why it can't be split.  </td></tr>
 </table>
-<p>Asset files (<span class="tt">.pic</span>, <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span>, <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span>) and generated assembly don't count toward these limits — only human-written code.</p>
+<p>Asset files (<span class="tt">.pic</span>, <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span>, <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span>) and generated assembly don't count toward these limits — only human-written code.</p>
 <p><b>A 1000-line PR with no explanation will not be reviewed.</b> It's not that we don't want your contribution — it's that we can't verify it's correct.</p>
 <h4 class="doxsection"><a class="anchor" id="commit-messages"></a>
 Commit messages</h4>
@@ -205,9 +205,10 @@ Commit messages</h4>
 <div class="line">[optional body]</div>
 <div class="line"> </div>
 <div class="line">[optional footer]</div>
-</div><!-- fragment --><p><b>Types</b>: <span class="tt">feat</span>, <span class="tt">fix</span>, <span class="tt">perf</span>, <span class="tt">refactor</span>, <span class="tt">test</span>, <span class="tt">docs</span>, <span class="tt">chore</span>, <span class="tt">build</span></p>
-<p><b>Scopes</b>: <span class="tt">lib</span>, <span class="tt">compiler</span>, <span class="tt">runtime</span>, <span class="tt">tools</span>, <span class="tt"><a class="el" href="group__examples.html" title="Every OpenSNES example program, with annotated source code.">Examples</a></span>, <span class="tt">build</span></p>
-<h4 class="doxsection"><a class="anchor" id="testing-1"></a>
+</div><!-- fragment --><p><b>Types</b>: <span class="tt">feat</span>, <span class="tt">fix</span>, <span class="tt">perf</span>, <span class="tt">refactor</span>, <span class="tt">test</span>, <span class="tt">docs</span>, <span class="tt">chore</span>, <span class="tt">build</span>, <span class="tt">style</span>, <span class="tt">ci</span>, <span class="tt">revert</span></p>
+<p><b>Scopes</b>: <span class="tt">lib</span>, <span class="tt">compiler</span>, <span class="tt">runtime</span>, <span class="tt">tools</span>, <span class="tt"><a class="el" href="group__examples.html" title="Every OpenSNES example program, with annotated source code.">Examples</a></span>, <span class="tt">build</span>, plus the directory names listed in <span class="tt">devtools/lint_commits.py</span> (<span class="tt">ALLOWED_SCOPES</span>). <span class="tt">tools</span> is a scope, not a type: <span class="tt">build(tools): …</span>, never <span class="tt">tools(build): …</span>.</p>
+<p>CI lints every pushed commit with <span class="tt">devtools/lint_commits.py</span>. Run <span class="tt">make hooks</span> once after cloning: it installs a <span class="tt">commit-msg</span> hook that refuses a non-conforming message before the commit exists, and a <span class="tt">pre-push</span> hook that lints the pushed range. Without them the first place the lint runs is CI, after the push, and a bad subject on a shared branch can only be repaired by a force-push.</p>
+<h4 class="doxsection"><a class="anchor" id="testing-5"></a>
 Testing</h4>
 <p>Before submitting:</p>
 <ol type="1">

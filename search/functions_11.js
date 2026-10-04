@@ -21,7 +21,8 @@ var searchData=
   ['tileencode2bpp_18',['tileEncode2bpp',['../tile_8h.html#a6e39973c09828171e1ae29697dee107f',1,'tile.h']]],
   ['tileencode4bpp_19',['tileEncode4bpp',['../tile_8h.html#a6c06d0d08039a4c900c3a8ab0eeadb0a',1,'tile.h']]],
   ['tileencode8bpp_20',['tileEncode8bpp',['../tile_8h.html#a96935756d4d5aaeaa40b7732c3cf5888',1,'tile.h']]],
-  ['title_5finit_21',['title_init',['../basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845',1,'main.c']]],
-  ['title_5fupdate_22',['title_update',['../basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2',1,'main.c']]],
-  ['track_5fclass_5fat_23',['track_class_at',['../games_2mode7__racing_2main_8c.html#aac3b2597ae4d9977d6dc44bbcbf754a1',1,'main.c']]]
+  ['title_5fdraw_21',['title_draw',['../basics_2scene__stack_2main_8c.html#ae025e4d879d35c5de20fa352e4b64b31',1,'main.c']]],
+  ['title_5finit_22',['title_init',['../basics_2scene__stack_2main_8c.html#a2c550c4e8527adc3ce18a8828012b845',1,'main.c']]],
+  ['title_5fupdate_23',['title_update',['../basics_2scene__stack_2main_8c.html#a63dece4b1b47311852fc485049f7b6d2',1,'main.c']]],
+  ['track_5fclass_5fat_24',['track_class_at',['../games_2mode7__racing_2main_8c.html#aac3b2597ae4d9977d6dc44bbcbf754a1',1,'main.c']]]
 ];

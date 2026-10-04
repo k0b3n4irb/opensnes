@@ -7,9 +7,9 @@ var searchData=
   ['hdmabrightnessgradientstop_4',['hdmaBrightnessGradientStop',['../hdma_8h.html#ad669b33978f84ff190f1bb6050483ccd',1,'hdma.h']]],
   ['hdmacolorgradient_5',['hdmaColorGradient',['../hdma_8h.html#a72729443b1db1842e795d733563d5c90',1,'hdma.h']]],
   ['hdmacolorgradientstop_6',['hdmaColorGradientStop',['../hdma_8h.html#ab4a0a92619e221e36d2650874c0fabd5',1,'hdma.h']]],
-  ['hdmadisable_7',['hdmaDisable',['../hdma_8h.html#aafb1226c87da6fe510dc0ea0ae121a6c',1,'hdma.h']]],
-  ['hdmadisableall_8',['hdmaDisableAll',['../hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f',1,'hdma.h']]],
-  ['hdmaenable_9',['hdmaEnable',['../hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539',1,'hdma.h']]],
+  ['hdmadisableall_7',['hdmaDisableAll',['../hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f',1,'hdma.h']]],
+  ['hdmadisablemask_8',['hdmaDisableMask',['../hdma_8h.html#ad8470df7667a8f028edea11e40f63e67',1,'hdma.h']]],
+  ['hdmaenablemask_9',['hdmaEnableMask',['../hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794',1,'hdma.h']]],
   ['hdmagetenabled_10',['hdmaGetEnabled',['../hdma_8h.html#a61f8ea3d04917cd5272ac7c73b5af4b0',1,'hdma.h']]],
   ['hdmagradient_11',['hdmaGradient',['../hdma_8h.html#a3ef990bb74e3837ca73837c0619f6043',1,'hdma.h']]],
   ['hdmairiswipe_12',['hdmaIrisWipe',['../hdma_8h.html#ad53b403f29a83339eb6d772bf3096379',1,'hdma.h']]],
@@ -39,5 +39,6 @@ var searchData=
   ['hudshowmessage_36',['hudShowMessage',['../hud_8c.html#a8673634c556f2d5f695756ec8d7e8d9c',1,'hudShowMessage(const char *str):&#160;hud.c'],['../hud_8h.html#a8673634c556f2d5f695756ec8d7e8d9c',1,'hudShowMessage(const char *str):&#160;hud.c']]],
   ['hudupdatelevel_37',['hudUpdateLevel',['../hud_8c.html#ab007827502c470f795bcbb00ba332eb2',1,'hudUpdateLevel(u16 level):&#160;hud.c'],['../hud_8h.html#ab007827502c470f795bcbb00ba332eb2',1,'hudUpdateLevel(u16 level):&#160;hud.c']]],
   ['hudupdatelines_38',['hudUpdateLines',['../hud_8c.html#a3f3dd139b992cd9b6193cb0dfa4c3351',1,'hudUpdateLines(u16 lines):&#160;hud.c'],['../hud_8h.html#a3f3dd139b992cd9b6193cb0dfa4c3351',1,'hudUpdateLines(u16 lines):&#160;hud.c']]],
-  ['hudupdatescore_39',['hudUpdateScore',['../hud_8c.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c'],['../hud_8h.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c']]]
+  ['hudupdatescore_39',['hudUpdateScore',['../hud_8c.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c'],['../hud_8h.html#a7259c10a755ca12584e1eb24b069ba86',1,'hudUpdateScore(u16 score):&#160;hud.c']]],
+  ['hue_40',['hue',['../backgrounds_2mode4_2main_8c.html#a764488dc9ab2dc5e5bfdce9071fc1498',1,'main.c']]]
 ];

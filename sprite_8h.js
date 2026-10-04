@@ -1,6 +1,7 @@
 var sprite_8h =
 [
     [ "MetaspriteItem", "structMetaspriteItem.html", "structMetaspriteItem" ],
+    [ "MetaspriteStyle", "structMetaspriteStyle.html", "structMetaspriteStyle" ],
     [ "OamDynamicConfig", "structOamDynamicConfig.html", "structOamDynamicConfig" ],
     [ "t_sprites", "structt__sprites.html", "structt__sprites" ],
     [ "MAX_SPRITES", "sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4", null ],
@@ -49,6 +50,7 @@ var sprite_8h =
     [ "oamClear", "sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8", null ],
     [ "oamDrawMeta", "sprite_8h.html#a51c770c211be49217be7014b858a003c", null ],
     [ "oamDrawMetaFlip", "sprite_8h.html#a36a4547bfc96bf252dfda694a60cdede", null ],
+    [ "oamDrawMetasprite", "sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e", null ],
     [ "oamDynamicDrainQueue", "sprite_8h.html#aca7db2b4a23c0c7a4aaa392b77bc4410", null ],
     [ "oamDynamicDraw", "sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c", null ],
     [ "oamDynamicInit", "sprite_8h.html#a333ce995f2762b9da596948ab43c5d54", null ],
@@ -64,15 +66,5 @@ var sprite_8h =
     [ "oamSetXY", "sprite_8h.html#a7797ff0c3210fcbd0cbbe0e55d23a83c", null ],
     [ "oamSetY", "sprite_8h.html#a1e502976736192dfc725c51f471a24d6", null ],
     [ "oamUpdate", "sprite_8h.html#a880416b4272104d4e9b83ea5331b6260", null ],
-    [ "lkup16idB", "sprite_8h.html#a79aecfbe70f47d2e9f3f72e62139bc0e", null ],
-    [ "lkup16idT", "sprite_8h.html#a09e0cfe326fed5be272d928b64e609b4", null ],
-    [ "lkup16idT0", "sprite_8h.html#a65d11cf31c7b509fc25b15af524d6d6d", null ],
-    [ "lkup16oamS", "sprite_8h.html#a334dff82dcd162697f7ab48e1722bd8f", null ],
-    [ "lkup32idB", "sprite_8h.html#af660f585ad1752b1004dba4df84324a3", null ],
-    [ "lkup32idT", "sprite_8h.html#ad3fab3f2677e9bc4bbdc5f9ffa735231", null ],
-    [ "lkup32oamS", "sprite_8h.html#a3340e166e6f1b9fe91af53b99581bb06", null ],
-    [ "lkup8idB", "sprite_8h.html#ad0557057357143581e9e6612d26ef575", null ],
-    [ "lkup8idT", "sprite_8h.html#ae95313a08b1257ec7327a71c76e8f1a0", null ],
-    [ "lkup8oamS", "sprite_8h.html#a512c524d16be34e3aa0fec1b2952e1bb", null ],
     [ "oambuffer", "sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f", null ]
 ];

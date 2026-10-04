@@ -8,5 +8,6 @@ var chips_2dsp1__cube_2main_8c =
     [ "cube", "chips_2dsp1__cube_2main_8c.html#a1b49ba06ad8a5160ef98bd665f58077c", null ],
     [ "dot_pal", "chips_2dsp1__cube_2main_8c.html#aff27dda3b84eb86334ca0c3452432f5a", null ],
     [ "dot_tile", "chips_2dsp1__cube_2main_8c.html#a038c1b5d9597eb67562da8969f062b51", null ],
-    [ "dsp1_ok", "chips_2dsp1__cube_2main_8c.html#a12daf4f2dbff3923ffb1c93fdbdb13ab", null ]
+    [ "dsp1_ok", "chips_2dsp1__cube_2main_8c.html#a12daf4f2dbff3923ffb1c93fdbdb13ab", null ],
+    [ "view", "chips_2dsp1__cube_2main_8c.html#a1e2702696b56952aa9ee01315e174100", null ]
 ];

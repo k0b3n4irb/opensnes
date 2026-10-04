@@ -17,7 +17,5 @@ var console_8h =
     [ "setBrightness", "console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f", null ],
     [ "setScreenOff", "console_8h.html#a5380410c3dc97fbaa3b36b095d631512", null ],
     [ "setScreenOn", "console_8h.html#af8cb701c5b08484903555e77347f460a", null ],
-    [ "WaitForVBlank", "console_8h.html#abd33830487e4764e5ec22ec98b749f4b", null ],
-    [ "current_brightness", "console_8h.html#a70e5d6b33bccb97aec6b0d706fb1a6d7", null ],
-    [ "force_blanked", "console_8h.html#a8ba3fc43e69c483b4fcd603363de1f09", null ]
+    [ "WaitForVBlank", "console_8h.html#abd33830487e4764e5ec22ec98b749f4b", null ]
 ];

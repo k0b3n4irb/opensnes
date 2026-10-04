@@ -122,7 +122,7 @@ $(function(){initNavTree('examples_by_category.html','',''); });
   <div class="headertitle"><div class="title">Browse Examples by Category </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>All 85 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
+<div class="textblock"><p>All 89 examples organized by topic. For a progressive learning path, see <a class="el" href="learning_path.html" title="Learn SNES Development">Learn SNES Development</a>.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="text"></a>
 Text</h2>
@@ -166,6 +166,10 @@ Backgrounds</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode5.html" title="Mode 5 — Hi-Res 512×256 Background">Mode 5 — Hi-Res 512×256 Background</a>  </td><td class="markdownTableBodyNone">Mode 5: hi-res 512×256 (16-color)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a>  </td><td class="markdownTableBodyNone">Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode4.html" title="mode4 — a 256-colour layer with offset-per-tile">mode4 — a 256-colour layer with offset-per-tile</a>  </td><td class="markdownTableBodyNone">Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode6.html" title="mode6 — one hi-res layer with offset-per-tile">mode6 — one hi-res layer with offset-per-tile</a>  </td><td class="markdownTableBodyNone">Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode5_hires.html" title="Hi-res text — BG Mode 5 + interlace (512 × 448)">Hi-res text — BG Mode 5 + interlace (512 × 448)</a>  </td><td class="markdownTableBodyNone">Mode 5 + interlace hi-res text (512×448) (krom port)  </td></tr>
 </table>
@@ -220,6 +224,8 @@ Mode 7</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_mode7_perspective_rotate.html" title="Mode 7 rotating perspective — the full matrix, per scanline">Mode 7 rotating perspective — the full matrix, per scanline</a>  </td><td class="markdownTableBodyNone">Full Mode 7 matrix rotation per scanline (krom port)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="examples_mode7_dsp1_ground.html" title="DSP-1 Ground — the Super Mario Kart floor">DSP-1 Ground — the Super Mario Kart floor</a>  </td><td class="markdownTableBodyNone">Super Mario Kart floor: DSP-1 Raster streams the per-scanline matrices  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a class="el" href="examples_mode7_extbg.html" title="Mode 7 EXTBG">Mode 7 EXTBG</a>  </td><td class="markdownTableBodyNone">EXTBG: one plane split in two layers by bit 7, a sprite between them  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="hdma--raster"></a>
@@ -258,6 +264,8 @@ Colour</h2>
 <td class="markdownTableBodyNone"><a class="el" href="examples_color_hicolor_1792.html" title="HiColor — 1792 colors from a 4bpp background">HiColor — 1792 colors from a 4bpp background</a>  </td><td class="markdownTableBodyNone">1792 colors from a 4bpp background via per-tile-row HDMA (krom port)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="examples_color_hicolor_blend.html" title="&quot;3840 colors&quot; — RGB channel-split blend">"3840 colors" — RGB channel-split blend</a>  </td><td class="markdownTableBodyNone">3840 colors via RGB channel-split blend (krom port)  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a class="el" href="examples_color_pseudo_hires.html" title="Pseudo-Hires Blend">Pseudo-Hires Blend</a>  </td><td class="markdownTableBodyNone">50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math  </td></tr>
 </table>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="windows"></a>

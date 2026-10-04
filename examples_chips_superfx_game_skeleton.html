@@ -127,7 +127,7 @@ $(function(){initNavTree('examples_chips_superfx_game_skeleton.html','',''); });
 </blockquote>
 <p><img src="superfx_game_skeleton.png" alt="" class="inline" title="Screenshot"/>    </p>
 <p>A crosshair follows the D-pad at 60 frames per second, and SNESMOD music plays, while the GSU draws <span class="tt">superfx_3d</span>'s rotating cube at 30. Neither waits for the other: the renderer runs from the GSU's code cache, so the CPU keeps the ROM and its game loop; <span class="tt"><a class="el" href="superfx_8h.html#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a></span> double-buffers the frames, and the NMI moves each one to VRAM a piece per VBlank, showing it only once all of it has landed.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-15"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-17"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/chips/superfx_game_skeleton</div>
@@ -167,10 +167,10 @@ Per-Example Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">gsu_loader.asm</span>  </td><td class="markdownTableBodyNone"><span class="tt">.incbin</span> of the renderer, edge upload to Game Pak RAM  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="testing"></a>
+<h2 class="doxsection"><a class="anchor" id="testing-2"></a>
 Testing</h2>
 <p><span class="tt">tools/luna-test/manifests/superfx_game_skeleton.toml</span> holds RIGHT for 60 frames and checks the crosshair moved 60 pixels (the game never skipped a frame), about 30 presented frames per second and no bus violation. <span class="tt">tools/luna-test/vram_dma_blank.py</span> checks every framebuffer byte lands in blank, as whole frames into alternating blocks, with every swap after a whole frame.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-26"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-28"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

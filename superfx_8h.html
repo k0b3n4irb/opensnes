@@ -235,10 +235,6 @@ Variables</h2></td></tr>
 <tr class="memdesc:a06b7d31abfaac2dacbfe49f26e89c1a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">DMA source high byte ($00=buffer A at $70:0000, $40=buffer B at $70:4000).  <br /></td></tr>
 <tr class="memitem:a70c2d5bd4c0e5a4872e11634387111c7" id="r_a70c2d5bd4c0e5a4872e11634387111c7"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a70c2d5bd4c0e5a4872e11634387111c7">gsu_owns_cart</a></td></tr>
 <tr class="memdesc:a70c2d5bd4c0e5a4872e11634387111c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 while a GSU job owns the Game Pak ROM (crt0)  <br /></td></tr>
-<tr class="memitem:a4ca4f9e59d99a3ce44f1006f479c4945" id="r_a4ca4f9e59d99a3ce44f1006f479c4945"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4ca4f9e59d99a3ce44f1006f479c4945">gsu_pres_frames</a></td></tr>
-<tr class="memdesc:a4ca4f9e59d99a3ce44f1006f479c4945"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frames <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> has put on screen so far.  <br /></td></tr>
-<tr class="memitem:a1c55343a21276a24a96c2015a3bcb0ef" id="r_a1c55343a21276a24a96c2015a3bcb0ef"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1c55343a21276a24a96c2015a3bcb0ef">gsu_pres_last</a></td></tr>
-<tr class="memdesc:a1c55343a21276a24a96c2015a3bcb0ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bytes the last transferring NMI moved (a diagnostic: the window).  <br /></td></tr>
 <tr class="memitem:aa96dbf2933de566840e56b543630e5d6" id="r_aa96dbf2933de566840e56b543630e5d6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa96dbf2933de566840e56b543630e5d6">gsu_prog_addr</a></td></tr>
 <tr class="memdesc:aa96dbf2933de566840e56b543630e5d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">GSU program 16-bit address (set by gsuSetProgram).  <br /></td></tr>
 <tr class="memitem:a37f6cfe16760b75f19f649ecaaef14da" id="r_a37f6cfe16760b75f19f649ecaaef14da"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a37f6cfe16760b75f19f649ecaaef14da">gsu_prog_bank</a></td></tr>
@@ -1128,7 +1124,7 @@ Presenting frames: double buffer, moved by the NMI</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Launch GSU program and wait for completion (WRAM-safe). </p>
-<p>Call <a class="el" href="#a54c1329e34940920937be4e71bce9d99" title="Tell the library where the GSU program lives.">gsuSetProgram()</a> first to set the GSU binary address. Reads gsu_cfgr, gsu_scmr, gsu_scbr for configuration. The CPU waits in WRAM while the GSU owns the Game Pak. Interrupts keep working (since 2026-09-25/26): the vectors point into WRAM, the NMI counts the frame and uploads OAM, an H/V-timer or GSU IRQ is acknowledged; the ROM-side work (your NMI callback, your IRQ handler) waits for the end of the job. </p>
+<p>Call <a class="el" href="#a54c1329e34940920937be4e71bce9d99" title="Tell the library where the GSU program lives.">gsuSetProgram()</a> first to set the GSU binary address. Reads gsu_cfgr, gsu_scmr, gsu_scbr for configuration. The CPU waits in WRAM while the GSU owns the Game Pak. Interrupts keep working (since 2026-09-25/26): the vectors point into WRAM, the NMI counts the frame and uploads OAM, an H/V-timer or GSU IRQ is acknowledged. The ROM-side work is not run during the job: your NMI callback, the pads and the dirty flags are picked up by the first ROM NMI after it (one call, not one per missed frame), and an H/V-timer IRQ raised during the job is acknowledged and DROPPED — your IRQ handler never sees it (crt0 gsu_irq_blob; until 2026-10-04 this line said it "waits"). </p>
 
 </div>
 </div>
@@ -1326,7 +1322,8 @@ Presenting frames: double buffer, moved by the NMI</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Creates black bars like Star Fox, on HDMA channel 1 (INIDISP). HDMA starts a channel at line 0, so the bands appear from the next frame: the function returns only once they are on screen (it waits up to a frame) and then publishes them to <a class="el" href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox.">gsuDmaFullFrame()</a> and the <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> NMI, which use the blanked lines as extra transfer time. Leave the bands on while either is in use. </p>
+<p>Creates black bars like Star Fox, on HDMA channel 1 (INIDISP). HDMA starts a channel at line 0, so the bands appear from the next frame: the function returns only once they are on screen (it waits up to a frame) and then publishes them to <a class="el" href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox.">gsuDmaFullFrame()</a> and the <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> NMI, which use the blanked lines as extra transfer time. Leave the bands on while either is in use.</p>
+<p>A band may be 0 (no band) to 224 lines; a band of 128 lines or more takes two HDMA entries. top + bottom above 224 leaves no visible lines. (Until 2026-10-03 a top band of 0 ended the table before it began, and the whole frame was then transferred on visible lines.) The visible lines are written with INIDISP = $0F, full brightness: <a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a> and the fades do not apply while the bands are on. </p>
 
 </div>
 </div>
@@ -1447,54 +1444,6 @@ Presenting frames: double buffer, moved by the NMI</h2></td></tr>
 
 <p>1 while a GSU job owns the Game Pak ROM (crt0) </p>
 <p><a class="el" href="#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a> sets it around its job. Code of your own that starts a job with SCMR RON = 1 (from the RAM code window: RAM_CODE, RAM_CODE_SECTION) sets it before the start and clears it once SCMR is back to 0: while it is 1 the NMI and IRQ entries (crt0, in WRAM) do only the ROM-free part of their work — frame_count, OAM upload, IRQ acknowledge — and defer the rest. </p>
-
-</div>
-</div>
-<a id="a4ca4f9e59d99a3ce44f1006f479c4945" name="a4ca4f9e59d99a3ce44f1006f479c4945"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ca4f9e59d99a3ce44f1006f479c4945">&#9670;&#160;</a></span>gsu_pres_frames</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> gsu_pres_frames</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Frames <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> has put on screen so far. </p>
-
-</div>
-</div>
-<a id="a1c55343a21276a24a96c2015a3bcb0ef" name="a1c55343a21276a24a96c2015a3bcb0ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c55343a21276a24a96c2015a3bcb0ef">&#9670;&#160;</a></span>gsu_pres_last</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> gsu_pres_last</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Bytes the last transferring NMI moved (a diagnostic: the window). </p>
 
 </div>
 </div>

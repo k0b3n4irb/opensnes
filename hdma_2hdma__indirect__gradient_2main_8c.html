@@ -215,7 +215,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Entry point — static 32-band red gradient, zero per-frame CPU. </p>
-<p>Faithful to krom's register sequence: DMAP0=%01000011 (indirect | 2REG_2X), BBAD0=$21, A1T0=table, A1B0=$00, DASB0=$00, HDMAEN=ch0, TM=0, screen on. After <a class="el" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539" title="Enable HDMA channel(s).">hdmaEnable()</a> the CPU idles — the PPU rebuilds the gradient from the pointer table on every frame by itself.</p>
+<p>Faithful to krom's register sequence: DMAP0=%01000011 (indirect | 2REG_2X), BBAD0=$21, A1T0=table, A1B0=$00, DASB0=$00, HDMAEN=ch0, TM=0, screen on. After <a class="el" href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794" title="Enable HDMA channel(s), given as a bit mask.">hdmaEnableMask()</a> the CPU idles — the PPU rebuilds the gradient from the pointer table on every frame by itself.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop) </dd></dl>
 
 </div>

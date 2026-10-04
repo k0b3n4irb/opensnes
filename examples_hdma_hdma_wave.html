@@ -137,7 +137,7 @@ Controls</h2>
 <td class="markdownTableBodyNone">D-Pad Left/Right  </td><td class="markdownTableBodyNone">Module mode: amplitude 2 to 24 pixels, in steps of 2  </td></tr>
 </table>
 <p>The ripple runs from boot, with no input.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-25"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-28"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">make -C examples/hdma/hdma_wave</div>
 </div><!-- fragment --><p>Then open <span class="tt">hdma_wave.sfc</span> in luna (<span class="tt">luna-gui hdma_wave.sfc</span>) or any SNES emulator.</p>
@@ -173,15 +173,15 @@ Walkthrough</h2>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_ab3c9143994d748245d6325f03b4f53b4"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#ab3c9143994d748245d6325f03b4f53b4">WAVE_WRAP</a></div><div class="ttdeci">#define WAVE_WRAP</div><div class="ttdoc">Wrap length of the start-pointer animation, in table entries. krom&#39;s exact value: his sine&#39;s quasi-pe...</div><div class="ttdef"><b>Definition</b> main.c:67</div></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_ab4a96af1cf26126286b97851804254cf"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#ab4a96af1cf26126286b97851804254cf">ENTRY_BYTES</a></div><div class="ttdeci">#define ENTRY_BYTES</div><div class="ttdoc">Bytes per HDMA entry in 1REG_2X mode: count + 16-bit value.</div><div class="ttdef"><b>Definition</b> main.c:69</div></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_abf00a26b74624dc6a2f78c58bdb7c8c3"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#abf00a26b74624dc6a2f78c58bdb7c8c3">wavetable</a></div><div class="ttdeci">u8 wavetable[]</div><div class="ttdoc">krom&#39;s exact HDMA table, in ROM (data.asm).</div></div>
-<div class="ttc" id="ahdma_8h_html_a49a74d7c1aad97f692a29b11865b700e"><div class="ttname"><a href="hdma_8h.html#a49a74d7c1aad97f692a29b11865b700e">HDMA_DEST_BG1HOFS</a></div><div class="ttdeci">#define HDMA_DEST_BG1HOFS</div><div class="ttdoc">Destination: BG1 H scroll ($210D).</div><div class="ttdef"><b>Definition</b> hdma.h:201</div></div>
-<div class="ttc" id="ahdma_8h_html_a6f1d39135eb520f43cadad7c6a2931bc"><div class="ttname"><a href="hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc">HDMA_MODE_1REG_2X</a></div><div class="ttdeci">#define HDMA_MODE_1REG_2X</div><div class="ttdoc">HDMA mode: 1 register, 2 bytes written twice.</div><div class="ttdef"><b>Definition</b> hdma.h:158</div></div>
+<div class="ttc" id="ahdma_8h_html_a49a74d7c1aad97f692a29b11865b700e"><div class="ttname"><a href="hdma_8h.html#a49a74d7c1aad97f692a29b11865b700e">HDMA_DEST_BG1HOFS</a></div><div class="ttdeci">#define HDMA_DEST_BG1HOFS</div><div class="ttdoc">Destination: BG1 H scroll ($210D).</div><div class="ttdef"><b>Definition</b> hdma.h:204</div></div>
+<div class="ttc" id="ahdma_8h_html_a6f1d39135eb520f43cadad7c6a2931bc"><div class="ttname"><a href="hdma_8h.html#a6f1d39135eb520f43cadad7c6a2931bc">HDMA_MODE_1REG_2X</a></div><div class="ttdeci">#define HDMA_MODE_1REG_2X</div><div class="ttdoc">HDMA mode: 1 register, 2 bytes written twice.</div><div class="ttdef"><b>Definition</b> hdma.h:161</div></div>
 <div class="ttc" id="ahdma_8h_html_accfc69511911e1c0fdc59823c43c7a23"><div class="ttname"><a href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23">hdmaSetup</a></div><div class="ttdeci">void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table)</div><div class="ttdoc">Set up an HDMA channel.</div></div>
 </div><!-- fragment --><p>Line L reads entry <span class="tt">phase + L</span>, so the crests flow up the screen one line per frame. The table holds 672 + 224 entries so that every start phase still has a full screen of valid lines. Nothing is ever written to it, so HDMA can never read a half-updated entry, and the per-frame cost is one <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> call. HDMA reloads its table address at the start of every frame, so repointing during VBlank is safe.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-the-same-ripple-from-the-hdma-module"></a>
 3. The same ripple from the <span class="tt">hdma</span> module</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="hdma_8h.html#a2658bf1d97761d3e7a940b29ac560438">hdmaWaveInit</a>();                          <span class="comment">/* switches every channel off */</span></div>
 <div class="line"><a class="code hl_function" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a>(<a class="code hl_define" href="hdma_2hdma__wave_2main_8c.html#a9f93adb560cbcb94bb3cc6f017e39f21">CH_LIB</a>, 0, <a class="code hl_variable" href="hdma_2hdma__wave_2main_8c.html#a43a6b3b5ca7ab7763d85bec4ccf9342b">amp</a>, <a class="code hl_define" href="hdma_2hdma__wave_2main_8c.html#aa15808dca75aef694bf558fd894edc7f">WAVE_FREQ</a>);    <span class="comment">/* BG1, amplitude, frequency */</span></div>
-<div class="line"><a class="code hl_function" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_2hdma__wave_2main_8c.html#a9f93adb560cbcb94bb3cc6f017e39f21">CH_LIB</a>);</div>
+<div class="line"><a class="code hl_function" href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794">hdmaEnableMask</a>(1 &lt;&lt; <a class="code hl_define" href="hdma_2hdma__wave_2main_8c.html#a9f93adb560cbcb94bb3cc6f017e39f21">CH_LIB</a>);</div>
 <div class="line">...</div>
 <div class="line">hdmaWaveUpdate();                        <span class="comment">/* once per frame */</span></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_a43a6b3b5ca7ab7763d85bec4ccf9342b"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#a43a6b3b5ca7ab7763d85bec4ccf9342b">amp</a></div><div class="ttdeci">static u8 amp</div><div class="ttdoc">Module-mode amplitude in pixels.</div><div class="ttdef"><b>Definition</b> main.c:114</div></div>
@@ -189,7 +189,7 @@ Walkthrough</h2>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_aa15808dca75aef694bf558fd894edc7f"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#aa15808dca75aef694bf558fd894edc7f">WAVE_FREQ</a></div><div class="ttdeci">#define WAVE_FREQ</div><div class="ttdoc">Module-mode frequency: period = 256 / 10 = 25.6 lines.</div><div class="ttdef"><b>Definition</b> main.c:82</div></div>
 <div class="ttc" id="ahdma_8h_html_a2658bf1d97761d3e7a940b29ac560438"><div class="ttname"><a href="hdma_8h.html#a2658bf1d97761d3e7a940b29ac560438">hdmaWaveInit</a></div><div class="ttdeci">void hdmaWaveInit(void)</div><div class="ttdoc">Initialize HDMA wave effect system.</div></div>
 <div class="ttc" id="ahdma_8h_html_a2ef7d5f50fba237731cac30b5a3af241"><div class="ttname"><a href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a></div><div class="ttdeci">void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency)</div><div class="ttdoc">Set up horizontal wave effect (water reflection).</div></div>
-<div class="ttc" id="ahdma_8h_html_a3e5e5442e66c1afe81d797d25f393539"><div class="ttname"><a href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539">hdmaEnable</a></div><div class="ttdeci">void hdmaEnable(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s).</div></div>
+<div class="ttc" id="ahdma_8h_html_a4d4a4c331c20e8e81927d0cd5c195794"><div class="ttname"><a href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794">hdmaEnableMask</a></div><div class="ttdeci">void hdmaEnableMask(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s), given as a bit mask.</div></div>
 </div><!-- fragment --><p>The module computes the sine table in RAM, double-buffers it and advances it each frame. Amplitude 10 at frequency 10 (a 25.6-line period) is close to krom's table (<span class="tt">round(10 * sin)</span>, a ~25.8-line quasi-period), so the ripple barely changes when you switch. What you gain is the parameter: LEFT/RIGHT call <span class="tt"><a class="el" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241" title="Set up horizontal wave effect (water reflection).">hdmaWaveH</a></span> again with a new amplitude.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md4-handing-the-channel-over-and-back"></a>
 4. Handing the channel over and back</h3>
@@ -210,7 +210,7 @@ Fidelity to the original (hand mode; measured, not assumed)</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">$4304</span> A1B0  </td><td class="markdownTableBodyNone"><span class="tt">$00</span>  </td><td class="markdownTableBodyNone">the far pointer's bank byte (the table's ROM bank)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">$420C</span> HDMAEN  </td><td class="markdownTableBodyNone"><span class="tt">%1</span> once  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539" title="Enable HDMA channel(s).">hdmaEnable</a>(1 &lt;&lt; <a class="el" href="hdma_2hdma__wave_2main_8c.html#aac8a07ae7893fb46cd4f26f409f641f1" title="Channel of the hand-built table (krom&#39;s channel 0).">CH_HAND</a>)</span> at boot (and on the way back from module mode)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">$420C</span> HDMAEN  </td><td class="markdownTableBodyNone"><span class="tt">%1</span> once  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794" title="Enable HDMA channel(s), given as a bit mask.">hdmaEnableMask</a>(1 &lt;&lt; <a class="el" href="hdma_2hdma__wave_2main_8c.html#aac8a07ae7893fb46cd4f26f409f641f1" title="Channel of the hand-built table (krom&#39;s channel 0).">CH_HAND</a>)</span> at boot (and on the way back from module mode)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">$2105</span> BGMODE  </td><td class="markdownTableBodyNone"><span class="tt">$0B</span> (mode 3 + BG3-prio bit, no-op in mode 3)  </td><td class="markdownTableBodyNone"><span class="tt">setMode(BG_MODE3, 0)</span> → mode 3  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -235,7 +235,7 @@ Fidelity to the original (hand mode; measured, not assumed)</h2>
 <h2 class="doxsection"><a class="anchor" id="tips--tricks-3"></a>
 Tips &amp; Tricks</h2>
 <ul>
-<li><b>Nothing moves?</b> An HDMA channel that is set up but not enabled does nothing: <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures, <span class="tt"><a class="el" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539" title="Enable HDMA channel(s).">hdmaEnable()</a></span> arms. luna's <span class="tt">dma.hdmaen</span> in <span class="tt">luna state --out -</span> shows which channels are on.</li>
+<li><b>Nothing moves?</b> An HDMA channel that is set up but not enabled does nothing: <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures, <span class="tt"><a class="el" href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794" title="Enable HDMA channel(s), given as a bit mask.">hdmaEnableMask()</a></span> arms. luna's <span class="tt">dma.hdmaen</span> in <span class="tt">luna state --out -</span> shows which channels are on.</li>
 <li><b>Channel 7 is taken</b> by the NMI handler's OAM DMA; do not put HDMA on it.</li>
 <li><b>A flat colour hides the effect.</b> The wave only shifts pixels horizontally: it needs an image with vertical detail to be seen.</li>
 </ul>
@@ -247,7 +247,7 @@ Go Further</h2>
 <li><b>Next example:</b> <a href="../hdma_helpers/">HDMA Helpers</a> — the module's other effects (brightness and colour gradients, iris wipe, water ripple).</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-45"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-48"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <table class="markdownTable">
@@ -262,7 +262,7 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> for A and LEFT/RIGHT  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">hdma</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> / <span class="tt"><a class="el" href="hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539" title="Enable HDMA channel(s).">hdmaEnable</a></span> for the hand-built table, <span class="tt"><a class="el" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241" title="Set up horizontal wave effect (water reflection).">hdmaWaveH</a></span> and friends for the module's wave  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">hdma</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup</a></span> / <span class="tt"><a class="el" href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794" title="Enable HDMA channel(s), given as a bit mask.">hdmaEnableMask</a></span> for the hand-built table, <span class="tt"><a class="el" href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241" title="Set up horizontal wave effect (water reflection).">hdmaWaveH</a></span> and friends for the module's wave  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-3"></a>
 Technical Reference</h2>

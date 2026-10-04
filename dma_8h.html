@@ -165,7 +165,7 @@ DMA Overview</h2>
 VBlank Timing Requirement</h2>
 <dl class="section warning"><dt>Warning</dt><dd><b>CRITICAL</b>: VRAM, CGRAM, and OAM can only be safely accessed during VBlank (vertical blanking period) or when the screen is in force blank mode (INIDISP bit 7 set). Accessing these memories during active display causes visual corruption and undefined behavior.</dd>
 <dd>
-<b>VBlank Budget</b>: You have approximately 2,200 CPU cycles during VBlank for DMA transfers. This translates to roughly <b>4KB of data</b> that can be safely transferred per frame. While the theoretical maximum is higher, 4KB is a safe practical limit that accounts for NMI handler overhead.</dd></dl>
+<b>VBlank Budget</b>: VBlank lasts about 49 000 master clocks (37 lines of 1 324 on NTSC) and a DMA moves one byte per 8, so the whole blank would carry ~6 KB; the NMI handler takes its share first, which leaves roughly <b>4KB of data</b> per frame as the safe practical limit. (Until 2026-10-04 this note said "2,200 CPU cycles", which is neither the blank nor the budget.)</dd></dl>
 <h2 class="doxsection"><a class="anchor" id="banks"></a>
 Banks</h2>
 <dl class="section note"><dt>Note</dt><dd>Every dmaCopy* function takes a <b>far pointer</b> and uses its bank byte, so the source may live in any bank — a SUPERFREE section, a bank you pinned yourself, anywhere. This has been true since the A6 chantier made pointer arguments 4 bytes; the *Bank variants remain for the case where an address and its bank are held separately.</dd></dl>
@@ -233,7 +233,7 @@ Banks</h2>
 <div class="ttc" id="abackgrounds_2mode1__lz77_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
-</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or forced blank — <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a>, INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching and the write is rejected.</dd></dl>
+</div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or forced blank — <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a>, INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching and the write is rejected.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The bank comes from <code class="param">source's</code> own bank byte: a palette may live in any bank. <a class="el" href="#afbe87d891e0c97c09ecc7caf7c9aca4c" title="Copy palette data to CGRAM with explicit source bank byte.">dmaCopyCGramBank()</a> exists for the case where the address and the bank are held separately. </dd></dl>
 
 </div>
@@ -279,7 +279,7 @@ Banks</h2>
   </dd>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or force blank!</dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated</a></b></dt><dd>Since 2026-09-20: use <a class="el" href="#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a>, which reads the bank of <code class="param">source</code>. Removed at the next major version. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000007">Deprecated</a></b></dt><dd>Since 2026-09-20: use <a class="el" href="#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a>, which reads the bank of <code class="param">source</code>. Removed at the next major version. </dd></dl>
 
 </div>
 </div>
@@ -357,9 +357,10 @@ Banks</h2>
 <div class="ttc" id="agames_2mapandobjects_2main_8c_html_ad82028c95075b062fde3c871e9dabdbd"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a></div><div class="ttdeci">u8 tileset</div><div class="ttdoc">BG1 tileset tile data (4bpp) – start label.</div></div>
 <div class="ttc" id="amaps_2map__scroll_2main_8c_html_a2ea3f462c860f7f0c35ae2204a43d598"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a2ea3f462c860f7f0c35ae2204a43d598">tileset_end</a></div><div class="ttdeci">u8 tileset_end[]</div><div class="ttdef"><b>Definition</b> main.c:44</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or forced blank. During active display the PPU rejects VRAM writes and the transfer is silently lost.</dd></dl>
-<p>Forced blank means <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> — INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching, so it does NOT open the write window.</p>
-<dl class="section warning"><dt>Warning</dt><dd><b>VBlank fits roughly 4 KB.</b> A larger transfer has its tail dropped during active display, and the failure is partial: the first few KB land, so the screen is half right. Anything bigger than a few KB belongs between <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff()</a> and <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>, not in VBlank.</dd></dl>
+<p>Forced blank means <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a> — INIDISP bit 7. setBrightness(0) blacks the screen but leaves the PPU fetching, so it does NOT open the write window.</p>
+<dl class="section warning"><dt>Warning</dt><dd><b>VBlank fits roughly 4 KB.</b> A larger transfer has its tail dropped during active display, and the failure is partial: the first few KB land, so the screen is half right. Anything bigger than a few KB belongs between <a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a> and <a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a>, not in VBlank.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>The bank is taken from <code class="param">source's</code> own bank byte, so the data may live in ANY bank — a SUPERFREE section, a bank you pinned yourself. <a class="el" href="#a8c812453a507900f68899520ac4f61b9" title="Copy data to VRAM with explicit source bank byte.">dmaCopyVramBank()</a> exists for the case where the address and the bank are held separately. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>
@@ -404,7 +405,7 @@ Banks</h2>
   </dd>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>Must be called during VBlank or force blank!</dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated</a></b></dt><dd>Since 2026-09-20: a C pointer is a far pointer and <a class="el" href="#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> reads its bank. This variant IGNORES the bank of <code class="param">source</code> and uses <code class="param">bank</code>. Removed at the next major version. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000006">Deprecated</a></b></dt><dd>Since 2026-09-20: a C pointer is a far pointer and <a class="el" href="#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> reads its bank. This variant IGNORES the bank of <code class="param">source</code> and uses <code class="param">bank</code>. Removed at the next major version. </dd></dl>
 
 </div>
 </div>

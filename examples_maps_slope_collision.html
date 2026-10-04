@@ -136,7 +136,7 @@ What You'll Learn</h2>
 <li>How dynamic sprites handle animation frames with state machines</li>
 <li>How to register object type callbacks from assembly (for correct bank bytes)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-32"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-35"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="the-map-engine"></a>
 The Map Engine</h3>
@@ -196,7 +196,7 @@ How It Works</h2>
 <div class="ttc" id="aobject_8h_html_aa14cd55e5ffb19f7030a32f47e84f2a5"><div class="ttname"><a href="object_8h.html#aa14cd55e5ffb19f7030a32f47e84f2a5">objLoadObjects</a></div><div class="ttdeci">void objLoadObjects(const u8 *sourceO)</div><div class="ttdoc">Load objects from a data table.</div></div>
 <div class="ttc" id="asprite_8h_html_a333ce995f2762b9da596948ab43c5d54"><div class="ttname"><a href="sprite_8h.html#a333ce995f2762b9da596948ab43c5d54">oamDynamicInit</a></div><div class="ttdeci">void oamDynamicInit(const OamDynamicConfig *cfg)</div><div class="ttdoc">Initialize the dynamic sprite engine from a config struct.</div></div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInit, oamInitGfxSet).</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
-<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:605</div></div>
+<div class="ttc" id="astructOamDynamicConfig_html"><div class="ttname"><a href="structOamDynamicConfig.html">OamDynamicConfig</a></div><div class="ttdoc">Configuration for the dynamic sprite engine.</div><div class="ttdef"><b>Definition</b> sprite.h:584</div></div>
 </div><!-- fragment --><p><b>2. Mario init callback</b> &ndash; When the object is created, it sets collision dimensions (width 14, height 16, xofs 1) and loads the sprite graphics and palette:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="games_2mapandobjects_2mario_8c.html#a191696d4ffec32218b18997e25ae606e">marioinit</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> xp, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> yp, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> type, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> minx, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> maxx) {</div>
 <div class="line">    <a class="code hl_variable" href="object_8h.html#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.width = 14;</div>
@@ -214,7 +214,7 @@ How It Works</h2>
 <div class="ttc" id="amaps_2slope__collision_2mario_8c_html_a53716e2abcc85b968842b92a4705dd50"><div class="ttname"><a href="maps_2slope__collision_2mario_8c.html#a53716e2abcc85b968842b92a4705dd50">mariogfx</a></div><div class="ttdeci">u8 mariogfx</div></div>
 <div class="ttc" id="amaps_2slope__collision_2mario_8c_html_a9c404b92f0c1acebd3283646550fc797"><div class="ttname"><a href="maps_2slope__collision_2mario_8c.html#a9c404b92f0c1acebd3283646550fc797">mariopal</a></div><div class="ttdeci">u8 mariopal</div></div>
 <div class="ttc" id="aobject_8h_html_aff685114554f887d186a87bacbe786b9"><div class="ttname"><a href="object_8h.html#aff685114554f887d186a87bacbe786b9">objWorkspace</a></div><div class="ttdeci">t_objs objWorkspace</div><div class="ttdoc">Object workspace (Bank $00).</div></div>
-<div class="ttc" id="asprite_8h_html_a1c1735026f1119e7fd947aa6eed9a2ec"><div class="ttname"><a href="sprite_8h.html#a1c1735026f1119e7fd947aa6eed9a2ec">OAM_SET_GFX</a></div><div class="ttdeci">#define OAM_SET_GFX(id, gfx)</div><div class="ttdoc">Set sprite graphics address — any bank.</div><div class="ttdef"><b>Definition</b> sprite.h:223</div></div>
+<div class="ttc" id="asprite_8h_html_a1c1735026f1119e7fd947aa6eed9a2ec"><div class="ttname"><a href="sprite_8h.html#a1c1735026f1119e7fd947aa6eed9a2ec">OAM_SET_GFX</a></div><div class="ttdeci">#define OAM_SET_GFX(id, gfx)</div><div class="ttdoc">Set sprite graphics address — any bank.</div><div class="ttdef"><b>Definition</b> sprite.h:179</div></div>
 <div class="ttc" id="asprite_8h_html_a26ae9bbf7a98025a5d9b529bbe403a7f"><div class="ttname"><a href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a></div><div class="ttdeci">t_sprites oambuffer[128]</div><div class="ttdoc">Dynamic sprite buffer (128 entries, 2048 bytes).</div></div>
 </div><!-- fragment --><p><b>3. Mario update callback</b> &ndash; Each frame: read input, apply acceleration, run slope collision, advance the animation state machine, and update the camera:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code hl_function" href="games_2mapandobjects_2mario_8c.html#a20b89bc2758ce8e0058a5d8a227793a7">marioupdate</a>(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx) {</div>
@@ -223,8 +223,8 @@ How It Works</h2>
 <div class="line">    <a class="code hl_function" href="object_8h.html#a828cd84eb41cd28c18ba0625cad1fd2a">objCollidMapWithSlopes</a>(idx);  <span class="comment">/* slope-aware collision */</span></div>
 <div class="line">    <span class="comment">/* Animation state machine: STAND / WALK / JUMP / FALL */</span></div>
 <div class="line">    <a class="code hl_function" href="object_8h.html#af27124be823e35daf579362d3820738d">objUpdateXY</a>(idx);</div>
-<div class="line">    <a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamx = <a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2">mariox</a> - <a class="code hl_variable" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a>;</div>
-<div class="line">    <a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamy = <a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1">marioy</a> - <a class="code hl_variable" href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a>;</div>
+<div class="line">    <a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamx = <a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2">mariox</a> - <a class="code hl_function" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe">mapGetCameraX</a>();</div>
+<div class="line">    <a class="code hl_variable" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f">oambuffer</a>[0].oamy = <a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1">marioy</a> - <a class="code hl_function" href="map_8h.html#a6611ce4f68f92827cc67361e07c2c63b">mapGetCameraY</a>();</div>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c">oamDynamicDraw</a>(0);</div>
 <div class="line">    <a class="code hl_function" href="map_8h.html#a310e106b68443357988f941a95a27266">mapUpdateCamera</a>(<a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2">mariox</a>, <a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1">marioy</a>);</div>
 <div class="line">}</div>
@@ -234,8 +234,8 @@ How It Works</h2>
 <div class="ttc" id="agames_2mapandobjects_2mario_8c_html_ad21b0092689f2ffa549ecaabf2bcada1"><div class="ttname"><a href="games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1">marioy</a></div><div class="ttdeci">u16 marioy</div><div class="ttdef"><b>Definition</b> mario.c:21</div></div>
 <div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
 <div class="ttc" id="amap_8h_html_a310e106b68443357988f941a95a27266"><div class="ttname"><a href="map_8h.html#a310e106b68443357988f941a95a27266">mapUpdateCamera</a></div><div class="ttdeci">void mapUpdateCamera(u16 xpos, u16 ypos)</div><div class="ttdoc">Update camera position to follow an object.</div></div>
-<div class="ttc" id="amap_8h_html_a52d9f95007fdae0115aa0d5b21317257"><div class="ttname"><a href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a></div><div class="ttdeci">u16 x_pos</div><div class="ttdoc">Current camera X position in pixels.</div></div>
-<div class="ttc" id="amap_8h_html_a79f8bb14ed9f0ee9d7031db7f02733be"><div class="ttname"><a href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a></div><div class="ttdeci">u16 y_pos</div><div class="ttdoc">Current camera Y position in pixels.</div></div>
+<div class="ttc" id="amap_8h_html_a6611ce4f68f92827cc67361e07c2c63b"><div class="ttname"><a href="map_8h.html#a6611ce4f68f92827cc67361e07c2c63b">mapGetCameraY</a></div><div class="ttdeci">u16 mapGetCameraY(void)</div><div class="ttdoc">Camera Y position in pixels.</div></div>
+<div class="ttc" id="amap_8h_html_a6b6efef7218d3ace881a6c4acce4aafe"><div class="ttname"><a href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe">mapGetCameraX</a></div><div class="ttdeci">u16 mapGetCameraX(void)</div><div class="ttdoc">Camera X position in pixels.</div></div>
 <div class="ttc" id="aobject_8h_html_a828cd84eb41cd28c18ba0625cad1fd2a"><div class="ttname"><a href="object_8h.html#a828cd84eb41cd28c18ba0625cad1fd2a">objCollidMapWithSlopes</a></div><div class="ttdeci">void objCollidMapWithSlopes(u16 objindex)</div><div class="ttdoc">Check object collision with map tiles including slopes.</div></div>
 <div class="ttc" id="aobject_8h_html_af27124be823e35daf579362d3820738d"><div class="ttname"><a href="object_8h.html#af27124be823e35daf579362d3820738d">objUpdateXY</a></div><div class="ttdeci">void objUpdateXY(u16 objindex)</div><div class="ttdoc">Update object position from velocity.</div></div>
 <div class="ttc" id="asprite_8h_html_a6160a02efb71cd4b2bac8c1553f9f57c"><div class="ttname"><a href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c">oamDynamicDraw</a></div><div class="ttdeci">void oamDynamicDraw(u16 id)</div><div class="ttdoc">Draw a dynamic sprite — engine picks the size routine.</div></div>
@@ -265,12 +265,12 @@ Project Structure</h2>
 <div class="line">    ├── map_1_1.o16      — Object placement data (Mario spawn point)</div>
 <div class="line">    ├── map_1_1.t16      — Tile type definitions (solid, slope, empty)</div>
 <div class="line">    └── map_1_1.b16      — Tile behavior/attribute data</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build--run-32"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build--run-35"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/slope_collision</div>
 </div><!-- fragment --><p>Then open <span class="tt">slope_collision.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-53"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-56"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">sprite_dynamic</span>, <span class="tt">sprite_lut</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span>, <span class="tt">object</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

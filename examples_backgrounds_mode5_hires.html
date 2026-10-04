@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_backgrounds_mode5_hires.html','',''); });
 Screenshot</div></div>
     <p>Port of krom (Peter Lemon)'s <b>InterlaceFont</b> demo (<a href="https://github.com/PeterLemon/SNES">PeterLemon/SNES</a>, <span class="tt">PPU/Interlace/InterlaceFont</span>). BG Mode 5 renders <b>512 horizontal pixels</b> with 16×8 tiles; SETINI bit 0 adds screen interlace for <b>448 visible lines</b>. This example lands the SDK's SETINI surface (<span class="tt">videoSetInterlace/ObjInterlace/Overscan/PseudoHires</span>, all composing through a write-only-register shadow) with a text page as the canonical hi-res payload — every glyph is 8 px wide, unrepresentable at 256.</p>
 <p>The page is original art (<span class="tt">gen_assets.py</span> renders it and converts to Mode 5's paired-tile format; outputs committed so builds don't need Pillow). The 1-pixel stripe/checker bands are the acid test: at true 512 px they alternate every column — a 256-wide mode would alias them to flat gray.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-9"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-10"></a>
 SNES Concepts</h2>
 <ul>
 <li>BG Mode 5: 512 px, 16×8 tiles stored as 8×8 character pairs (N, N+1)</li>
@@ -169,7 +169,7 @@ How to Build</h2>
 <div class="fragment"><div class="line">cd examples/backgrounds/mode5_hires &amp;&amp; make</div>
 <div class="line"># regenerate the page (needs Pillow + numpy):</div>
 <div class="line">python3 gen_assets.py &amp;&amp; make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-13"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-14"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span> </p>
 </div></div><!-- contents -->

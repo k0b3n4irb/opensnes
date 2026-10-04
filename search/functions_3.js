@@ -50,6 +50,7 @@ var searchData=
   ['dsp1range_47',['dsp1Range',['../dsp1_8h.html#a152f59d6d62b0d9f544e08db046de212',1,'dsp1.h']]],
   ['dsp1raster_48',['dsp1Raster',['../dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9',1,'dsp1.h']]],
   ['dsp1rotate_49',['dsp1Rotate',['../dsp1_8h.html#adb861416d471a3218480f16d3331f55f',1,'dsp1.h']]],
-  ['dsp1target_50',['dsp1Target',['../dsp1_8h.html#a6b150c56e8f97f8932da84b2d2a6f106',1,'dsp1.h']]],
-  ['dsp1triangle_51',['dsp1Triangle',['../dsp1_8h.html#a30bcc07948d43ad0fca8fb3ccc210208',1,'dsp1.h']]]
+  ['dsp1setcamera_50',['dsp1SetCamera',['../dsp1_8h.html#af14660034a8e2f3a7a33516e48f1ba16',1,'dsp1.h']]],
+  ['dsp1target_51',['dsp1Target',['../dsp1_8h.html#a6b150c56e8f97f8932da84b2d2a6f106',1,'dsp1.h']]],
+  ['dsp1triangle_52',['dsp1Triangle',['../dsp1_8h.html#a30bcc07948d43ad0fca8fb3ccc210208',1,'dsp1.h']]]
 ];

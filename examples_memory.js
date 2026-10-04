@@ -8,21 +8,21 @@ var examples_memory =
         [ "What This Example Shows", "examples_memory_hirom_demo.html#what-this-example-shows-2", null ],
         [ "Prerequisites", "examples_memory_hirom_demo.html#prerequisites-4", null ],
         [ "Controls", "examples_memory_hirom_demo.html#controls-23", null ],
-        [ "Build &amp; Run", "examples_memory_hirom_demo.html#build--run-34", null ],
+        [ "Build &amp; Run", "examples_memory_hirom_demo.html#build--run-37", null ],
         [ "How It Works", "examples_memory_hirom_demo.html#how-it-works-8", [
           [ "1. Enable HiROM in the Makefile", "examples_memory_hirom_demo.html#autotoc_md1-enable-hirom-in-the-makefile", null ],
           [ "2. The code is identical to LoROM", "examples_memory_hirom_demo.html#autotoc_md2-the-code-is-identical-to-lorom", null ],
           [ "3. Embedded font (no external assets)", "examples_memory_hirom_demo.html#autotoc_md3-embedded-font-no-external-assets", null ],
           [ "4. Interactive feedback", "examples_memory_hirom_demo.html#autotoc_md4-interactive-feedback", null ]
         ] ],
-        [ "SNES Concepts", "examples_memory_hirom_demo.html#snes-concepts-34", [
+        [ "SNES Concepts", "examples_memory_hirom_demo.html#snes-concepts-37", [
           [ "LoROM vs HiROM", "examples_memory_hirom_demo.html#lorom-vs-hirom-1", null ],
           [ "When to Use HiROM", "examples_memory_hirom_demo.html#when-to-use-hirom", null ],
           [ "Address Translation", "examples_memory_hirom_demo.html#address-translation", null ]
         ] ],
         [ "Project Structure", "examples_memory_hirom_demo.html#project-structure-9", null ],
         [ "Going Further", "examples_memory_hirom_demo.html#going-further-2", null ],
-        [ "Modules Used", "examples_memory_hirom_demo.html#modules-used-55", null ]
+        [ "Modules Used", "examples_memory_hirom_demo.html#modules-used-58", null ]
       ] ]
     ] ],
     [ "Save Game -- SRAM Persistence", "examples_memory_save_game.html", null ]

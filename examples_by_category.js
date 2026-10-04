@@ -23,9 +23,9 @@ var examples_by_category =
       ] ],
       [ "Games (capstones)", "examples_by_category.html#games-capstones", [
         [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-37", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-48", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-52", null ],
         [ "How to build", "examples_text_print_string.html#how-to-build-22", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-72", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-76", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -38,6 +38,8 @@ var examples_by_category =
     [ "Mode 3 — 256-Color Background", "examples_backgrounds_mode3.html", null ],
     [ "Mode 5 — Hi-Res 512×256 Background", "examples_backgrounds_mode5.html", null ],
     [ "mode2 — offset-per-tile: per-column scroll from BG3", "examples_backgrounds_mode2.html", null ],
+    [ "mode4 — a 256-colour layer with offset-per-tile", "examples_backgrounds_mode4.html", null ],
+    [ "mode6 — one hi-res layer with offset-per-tile", "examples_backgrounds_mode6.html", null ],
     [ "Hi-res text — BG Mode 5 + interlace (512 × 448)", "examples_backgrounds_mode5_hires.html", null ],
     [ "Simple Sprite -- Your First OAM Sprite", "examples_sprites_simple_sprite.html", null ],
     [ "Object Size -- All 6 SNES Sprite Size Modes", "examples_sprites_sprite_sizes.html", null ],
@@ -53,6 +55,7 @@ var examples_by_category =
     [ "Mode 7 Perspective -- Pseudo-3D Ground Effect", "examples_mode7_perspective.html", null ],
     [ "Mode 7 rotating perspective — the full matrix, per scanline", "examples_mode7_perspective_rotate.html", null ],
     [ "DSP-1 Ground — the Super Mario Kart floor", "examples_mode7_dsp1_ground.html", null ],
+    [ "Mode 7 EXTBG", "examples_mode7_extbg.html", null ],
     [ "Gradient Colors -- HDMA Color Gradients", "examples_hdma_gradient_colors.html", null ],
     [ "HDMA Indirect Gradient", "examples_hdma_hdma_indirect_gradient.html", null ],
     [ "HDMA Wave", "examples_hdma_hdma_wave.html", null ],
@@ -64,6 +67,7 @@ var examples_by_category =
     [ "\"9-bit\" gradient — brightness-dithered backdrop", "examples_color_gradient_9bit.html", null ],
     [ "HiColor — 1792 colors from a 4bpp background", "examples_color_hicolor_1792.html", null ],
     [ "\"3840 colors\" — RGB channel-split blend", "examples_color_hicolor_blend.html", null ],
+    [ "Pseudo-Hires Blend", "examples_color_pseudo_hires.html", null ],
     [ "Window -- HDMA Triangle Masking", "examples_windows_window.html", null ],
     [ "Multi-window HDMA — both windows animated per scanline", "examples_windows_window_multi_hdma.html", null ],
     [ "Transparent Window -- Color Math + HDMA", "examples_windows_transparent_window.html", null ],

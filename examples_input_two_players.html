@@ -207,7 +207,7 @@ Reading Both Controllers</h3>
 Player State</h2>
 <h3 class="doxsection"><a class="anchor" id="struct-pattern-required"></a>
 Struct Pattern (Required)</h3>
-<p>Using a struct with <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span> coordinates is required for reliable movement. Separate <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> variables cause horizontal movement issues due to a compiler quirk.</p>
+<p>The two coordinates live in one struct of <span class="tt"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1" title="16-bit signed integer (-32768 to 32767)">s16</a></span>, so a player is one value to pass around. (This line used to blame the compiler for horizontal movement issues with separate <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> variables; nothing of the kind is known today — signed 16-bit arithmetic is pinned by the compiler checks — and the struct is kept for clarity.)</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, y;</div>
 <div class="line">} <a class="code hl_struct" href="structPlayer.html">Player</a>;</div>
@@ -279,13 +279,13 @@ Controller Types</h3>
 <li>Multitap (4+ players)</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-29"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-32"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/two_players</div>
 </div><!-- fragment --><p>Then open <span class="tt">two_players.sfc</span> in your emulator (Mesen2 recommended). Configure the emulator for two controllers.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-50"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-53"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="files-10"></a>

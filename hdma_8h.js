@@ -36,9 +36,9 @@ var hdma_8h =
     [ "hdmaBrightnessGradientStop", "hdma_8h.html#ad669b33978f84ff190f1bb6050483ccd", null ],
     [ "hdmaColorGradient", "hdma_8h.html#a72729443b1db1842e795d733563d5c90", null ],
     [ "hdmaColorGradientStop", "hdma_8h.html#ab4a0a92619e221e36d2650874c0fabd5", null ],
-    [ "hdmaDisable", "hdma_8h.html#aafb1226c87da6fe510dc0ea0ae121a6c", null ],
     [ "hdmaDisableAll", "hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f", null ],
-    [ "hdmaEnable", "hdma_8h.html#a3e5e5442e66c1afe81d797d25f393539", null ],
+    [ "hdmaDisableMask", "hdma_8h.html#ad8470df7667a8f028edea11e40f63e67", null ],
+    [ "hdmaEnableMask", "hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794", null ],
     [ "hdmaGetEnabled", "hdma_8h.html#a61f8ea3d04917cd5272ac7c73b5af4b0", null ],
     [ "hdmaGradient", "hdma_8h.html#a3ef990bb74e3837ca73837c0619f6043", null ],
     [ "hdmaIrisWipe", "hdma_8h.html#ad53b403f29a83339eb6d772bf3096379", null ],
@@ -55,5 +55,6 @@ var hdma_8h =
     [ "hdmaWaveStop", "hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1", null ],
     [ "hdmaWaveUpdate", "hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216", null ],
     [ "hdmaWindowShape", "hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6", null ],
-    [ "hdma_wave_speed", "hdma_8h.html#a7a4b4b53d0c65b8ca3f485409f38bc90", null ]
+    [ "OPENSNES_DEPRECATED", "hdma_8h.html#a92b0ca833b15dc97e5193fe9ef7cf231", null ],
+    [ "OPENSNES_DEPRECATED", "hdma_8h.html#a8162f10d0746ad55ee1410c796155bac", null ]
 ];

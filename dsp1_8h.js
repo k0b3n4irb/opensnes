@@ -1,5 +1,6 @@
 var dsp1_8h =
 [
+    [ "Dsp1Camera", "structDsp1Camera.html", "structDsp1Camera" ],
     [ "DSP1_A_FROM_FIX8", "dsp1_8h.html#ad82a852b0a2b20a5aad1004a05b61a3b", null ],
     [ "DSP1_FIX_FROM_T", "dsp1_8h.html#a139bcf3d0975fbfdb803d62084eaab5e", null ],
     [ "DSP1_T_FROM_FIX", "dsp1_8h.html#adfbfa0a8d0b8c1dc29d8971396b07cfb", null ],
@@ -15,6 +16,7 @@ var dsp1_8h =
     [ "dsp1Range", "dsp1_8h.html#a152f59d6d62b0d9f544e08db046de212", null ],
     [ "dsp1Raster", "dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9", null ],
     [ "dsp1Rotate", "dsp1_8h.html#adb861416d471a3218480f16d3331f55f", null ],
+    [ "dsp1SetCamera", "dsp1_8h.html#af14660034a8e2f3a7a33516e48f1ba16", null ],
     [ "dsp1Target", "dsp1_8h.html#a6b150c56e8f97f8932da84b2d2a6f106", null ],
     [ "dsp1Triangle", "dsp1_8h.html#a30bcc07948d43ad0fca8fb3ccc210208", null ],
     [ "dsp1_o0", "dsp1_8h.html#a50d2a07715de61e5e3c706de54b856b4", null ],

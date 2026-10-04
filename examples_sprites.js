@@ -6,21 +6,21 @@ var examples_sprites =
         [ "What This Example Shows", "examples_sprites_animated_sprite.html#what-this-example-shows-7", null ],
         [ "Prerequisites", "examples_sprites_animated_sprite.html#prerequisites-8", null ],
         [ "Controls", "examples_sprites_animated_sprite.html#controls-31", null ],
-        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#build--run-41", null ],
+        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#build--run-45", null ],
         [ "How It Works", "examples_sprites_animated_sprite.html#how-it-works-15", [
           [ "1. Sprite sheet layout", "examples_sprites_animated_sprite.html#autotoc_md1-sprite-sheet-layout", null ],
           [ "2. State machine", "examples_sprites_animated_sprite.html#autotoc_md2-state-machine", null ],
           [ "3. Animation timing", "examples_sprites_animated_sprite.html#autotoc_md3-animation-timing", null ],
           [ "4. Tile calculation", "examples_sprites_animated_sprite.html#autotoc_md4-tile-calculation", null ]
         ] ],
-        [ "SNES Concepts", "examples_sprites_animated_sprite.html#snes-concepts-42", [
+        [ "SNES Concepts", "examples_sprites_animated_sprite.html#snes-concepts-46", [
           [ "OBJ_FLIPX &ndash; Hardware Horizontal Mirror", "examples_sprites_animated_sprite.html#obj_flipx----hardware-horizontal-mirror", null ],
           [ "Sprite Sheets in VRAM", "examples_sprites_animated_sprite.html#sprite-sheets-in-vram", null ],
           [ "16x16 Tiles in OAM", "examples_sprites_animated_sprite.html#autotoc_md16x16-tiles-in-oam", null ]
         ] ],
         [ "Project Structure", "examples_sprites_animated_sprite.html#project-structure-16", null ],
         [ "Going Further", "examples_sprites_animated_sprite.html#going-further-8", null ],
-        [ "Modules Used", "examples_sprites_animated_sprite.html#modules-used-64", null ]
+        [ "Modules Used", "examples_sprites_animated_sprite.html#modules-used-68", null ]
       ] ]
     ] ],
     [ "Aseprite Pipeline", "examples_sprites_aseprite_pipeline.html", null ],

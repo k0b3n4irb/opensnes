@@ -8,9 +8,9 @@ var examples_text =
         [ "VRAM Layout for Text", "examples_text.html#vram-layout-for-text", null ],
         [ "Mode 0 Palette", "examples_text.html#mode-0-palette", null ],
         [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-37", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-48", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-52", null ],
         [ "How to build", "examples_text_print_string.html#how-to-build-22", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-72", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-76", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],

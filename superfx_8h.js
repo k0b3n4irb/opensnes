@@ -63,8 +63,6 @@ var superfx_8h =
     [ "gsu_cfgr", "superfx_8h.html#a276ddb2df70ac449323c825df9d7f89d", null ],
     [ "gsu_dma_src_hi", "superfx_8h.html#a06b7d31abfaac2dacbfe49f26e89c1a9", null ],
     [ "gsu_owns_cart", "superfx_8h.html#a70c2d5bd4c0e5a4872e11634387111c7", null ],
-    [ "gsu_pres_frames", "superfx_8h.html#a4ca4f9e59d99a3ce44f1006f479c4945", null ],
-    [ "gsu_pres_last", "superfx_8h.html#a1c55343a21276a24a96c2015a3bcb0ef", null ],
     [ "gsu_prog_addr", "superfx_8h.html#aa96dbf2933de566840e56b543630e5d6", null ],
     [ "gsu_prog_bank", "superfx_8h.html#a37f6cfe16760b75f19f649ecaaef14da", null ],
     [ "gsu_scbr", "superfx_8h.html#ad840ff367d45008c2505fc2e93c5bf06", null ],

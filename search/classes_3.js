@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['gamestate_0',['GameState',['../structGameState.html',1,'']]],
-  ['gfxasset_1',['GfxAsset',['../structGfxAsset.html',1,'']]]
+  ['effectstate_0',['EffectState',['../structEffectState.html',1,'']]],
+  ['entity_1',['Entity',['../structEntity.html',1,'']]]
 ];

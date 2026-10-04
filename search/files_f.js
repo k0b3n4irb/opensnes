@@ -13,7 +13,8 @@ var searchData=
   ['sprites_2emd_10',['sprites.md',['../sprites_8md.html',1,'']]],
   ['sram_2eh_11',['sram.h',['../sram_8h.html',1,'']]],
   ['sram_2emd_12',['sram.md',['../sram_8md.html',1,'']]],
-  ['superfx_2eh_13',['superfx.h',['../superfx_8h.html',1,'']]],
-  ['superfx_2emd_14',['superfx.md',['../superfx_8md.html',1,'']]],
-  ['system_2eh_15',['system.h',['../system_8h.html',1,'']]]
+  ['stability_2emd_13',['STABILITY.md',['../STABILITY_8md.html',1,'']]],
+  ['superfx_2eh_14',['superfx.h',['../superfx_8h.html',1,'']]],
+  ['superfx_2emd_15',['superfx.md',['../superfx_8md.html',1,'']]],
+  ['system_2eh_16',['system.h',['../system_8h.html',1,'']]]
 ];

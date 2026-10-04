@@ -130,7 +130,7 @@ $(function(){initNavTree('examples_color_transparency.html','',''); });
 <img src="transparency.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="build--run-19"></a>
+    <h2 class="doxsection"><a class="anchor" id="build--run-22"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/color/transparency</div>
@@ -148,7 +148,7 @@ What You'll Learn</h2>
 <li>Using an assembly DMA loader for SUPERFREE graphics data with correct bank bytes</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-20"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-23"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="color-math-main-screen--sub-screen"></a>
 Color Math: Main Screen + Sub Screen</h3>
@@ -170,16 +170,16 @@ Color Math Configuration</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="colormath_8h.html#aeb012e74893e9b0761ee5dd2f18bd1ef">colorMathInit</a>();</div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a>(<a class="code hl_define" href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a>);  <span class="comment">/* Blend source = sub screen */</span></div>
 <div class="line"><a class="code hl_function" href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a>(<a class="code hl_define" href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a>);                <span class="comment">/* Addition (brightens) */</span></div>
-<div class="line"><a class="code hl_function" href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a>(<a class="code hl_define" href="colormath_8h.html#ab6a733f0b0c44bd3b5df36d28bf8c482">COLORMATH_BG1</a> | <a class="code hl_define" href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4">COLORMATH_BACKDROP</a>);  <span class="comment">/* What gets blended */</span></div>
-<div class="ttc" id="acolormath_8h_html_a0fc0a3fbd2a3a1bf383ced27a723c66b"><div class="ttname"><a href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a></div><div class="ttdeci">#define COLORMATH_SRC_SUBSCREEN</div><div class="ttdoc">Use sub screen as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:96</div></div>
-<div class="ttc" id="acolormath_8h_html_a52af0c2b959577461874ccd72f3b0ec3"><div class="ttname"><a href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a></div><div class="ttdeci">#define COLORMATH_ADD</div><div class="ttdoc">Add colors (brightens).</div><div class="ttdef"><b>Definition</b> colormath.h:86</div></div>
-<div class="ttc" id="acolormath_8h_html_a68e6232f50f8471623e03b1351662cf4"><div class="ttname"><a href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4">COLORMATH_BACKDROP</a></div><div class="ttdeci">#define COLORMATH_BACKDROP</div><div class="ttdoc">Apply color math to backdrop (color 0).</div><div class="ttdef"><b>Definition</b> colormath.h:76</div></div>
-<div class="ttc" id="acolormath_8h_html_ab6a733f0b0c44bd3b5df36d28bf8c482"><div class="ttname"><a href="colormath_8h.html#ab6a733f0b0c44bd3b5df36d28bf8c482">COLORMATH_BG1</a></div><div class="ttdeci">#define COLORMATH_BG1</div><div class="ttdoc">Apply color math to BG1.</div><div class="ttdef"><b>Definition</b> colormath.h:61</div></div>
+<div class="line"><a class="code hl_function" href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a>(<a class="code hl_define" href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a> | <a class="code hl_define" href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4">COLORMATH_BACKDROP</a>);  <span class="comment">/* What gets blended */</span></div>
+<div class="ttc" id="acolormath_8h_html_a0fc0a3fbd2a3a1bf383ced27a723c66b"><div class="ttname"><a href="colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b">COLORMATH_SRC_SUBSCREEN</a></div><div class="ttdeci">#define COLORMATH_SRC_SUBSCREEN</div><div class="ttdoc">Use sub screen as color source.</div><div class="ttdef"><b>Definition</b> colormath.h:104</div></div>
+<div class="ttc" id="acolormath_8h_html_a52af0c2b959577461874ccd72f3b0ec3"><div class="ttname"><a href="colormath_8h.html#a52af0c2b959577461874ccd72f3b0ec3">COLORMATH_ADD</a></div><div class="ttdeci">#define COLORMATH_ADD</div><div class="ttdoc">Add colors (brightens).</div><div class="ttdef"><b>Definition</b> colormath.h:94</div></div>
+<div class="ttc" id="acolormath_8h_html_a68e6232f50f8471623e03b1351662cf4"><div class="ttname"><a href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4">COLORMATH_BACKDROP</a></div><div class="ttdeci">#define COLORMATH_BACKDROP</div><div class="ttdoc">Apply color math to backdrop (color 0) — color math&#39;s own bit.</div><div class="ttdef"><b>Definition</b> colormath.h:68</div></div>
 <div class="ttc" id="acolormath_8h_html_ac014d3ff6d4d18a0b5e597560636d38f"><div class="ttname"><a href="colormath_8h.html#ac014d3ff6d4d18a0b5e597560636d38f">colorMathSetOp</a></div><div class="ttdeci">void colorMathSetOp(u8 op)</div><div class="ttdoc">Set color math operation (add or subtract).</div></div>
-<div class="ttc" id="acolormath_8h_html_aeb012e74893e9b0761ee5dd2f18bd1ef"><div class="ttname"><a href="colormath_8h.html#aeb012e74893e9b0761ee5dd2f18bd1ef">colorMathInit</a></div><div class="ttdeci">void colorMathInit(void)</div><div class="ttdoc">Initialize color math to defaults.</div><div class="ttdef"><b>Definition</b> colormath.h:149</div></div>
-<div class="ttc" id="acolormath_8h_html_aeed6fe5024742ca88a85202fb516ffc8"><div class="ttname"><a href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a></div><div class="ttdeci">void colorMathSetLayers(u8 layers)</div><div class="ttdoc">Set the layers colour math applies to — REPLACES the previous set.</div><div class="ttdef"><b>Definition</b> colormath.h:168</div></div>
+<div class="ttc" id="acolormath_8h_html_aeb012e74893e9b0761ee5dd2f18bd1ef"><div class="ttname"><a href="colormath_8h.html#aeb012e74893e9b0761ee5dd2f18bd1ef">colorMathInit</a></div><div class="ttdeci">void colorMathInit(void)</div><div class="ttdoc">Initialize color math to defaults.</div></div>
+<div class="ttc" id="acolormath_8h_html_aeed6fe5024742ca88a85202fb516ffc8"><div class="ttname"><a href="colormath_8h.html#aeed6fe5024742ca88a85202fb516ffc8">colorMathSetLayers</a></div><div class="ttdeci">void colorMathSetLayers(u8 layers)</div><div class="ttdoc">Set the layers colour math applies to — REPLACES the previous set.</div></div>
 <div class="ttc" id="acolormath_8h_html_aef8378fb9997edbbb3fd8281bc42c084"><div class="ttname"><a href="colormath_8h.html#aef8378fb9997edbbb3fd8281bc42c084">colorMathSetSource</a></div><div class="ttdeci">void colorMathSetSource(u8 source)</div><div class="ttdoc">Set color math source.</div></div>
-</div><!-- fragment --><p>The <span class="tt"><a class="el" href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4" title="Apply color math to backdrop (color 0).">COLORMATH_BACKDROP</a></span> flag ensures clouds also blend over empty areas (CGRAM entry 0).</p>
+<div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
+</div><!-- fragment --><p>The <span class="tt"><a class="el" href="colormath_8h.html#a68e6232f50f8471623e03b1351662cf4" title="Apply color math to backdrop (color 0) — color math&#39;s own bit.">COLORMATH_BACKDROP</a></span> flag ensures clouds also blend over empty areas (CGRAM entry 0).</p>
 <h3 class="doxsection"><a class="anchor" id="assembly-dma-loader"></a>
 Assembly DMA Loader</h3>
 <p>The tile data, tilemaps, and palettes live in SUPERFREE ROM sections that may land in any bank. C code cannot reliably specify bank bytes for cross-bank data, so <span class="tt">data.asm</span> provides a <span class="tt">loadGraphics()</span> routine that uses the <span class="tt">:label</span> syntax to get linker-resolved bank bytes at link time. All graphics are loaded during forced blank (screen off) since the total data exceeds the ~4KB VBlank DMA budget.</p>
@@ -210,7 +210,7 @@ Main Loop</h3>
 <div class="ttc" id="ascrolling_2mixed__scroll_2main_8c_html_af9529d671c3b039626d154728894df1b"><div class="ttname"><a href="scrolling_2mixed__scroll_2main_8c.html#af9529d671c3b039626d154728894df1b">scrX</a></div><div class="ttdeci">s16 scrX</div><div class="ttdoc">BG1 horizontal scroll offset (auto-incremented each frame).</div><div class="ttdef"><b>Definition</b> main.c:50</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span> defers the actual PPU register write to the NMI handler via a dirty-flag mechanism, ensuring scroll updates happen safely during VBlank.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-34"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-37"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="files-4"></a>

@@ -156,7 +156,7 @@ the screen". Fix in code: despawn at <span class="tt">y &lt; -12</span>, just af
 Open chantier — S6 HUD on BG3</h2>
 <p>I attempted a BG3 + <span class="tt">text</span> module HUD (score / lives) and it produced two symptoms I couldn't resolve in one session:</p>
 <ol type="1">
-<li><b>Bank $00 ROM is razor-tight.</b> The <span class="tt">text</span> module + a couple of string-literal labels (<span class="tt">"S"</span> / <span class="tt">"L"</span>) bring bank-0 down to 12 bytes free, below the 16-byte fail threshold. Even tiny strings spill to bank 1 = garbage when read. Workaround: use <span class="tt"><a class="el" href="text_8h.html#acd3f984c3d3308883e2729a50db16413" title="Print a single character at cursor position.">textPutChar</a>('S')</span> with char literals (no string in ROM).</li>
+<li><b>Bank $00 ROM was razor-tight</b> when this was written: the <span class="tt">text</span> module plus two string literals brought bank 0 to 12 bytes free, under the fail threshold, and at the time a string in bank 1 was read as garbage. Neither holds since v0.41.0: C const data, strings included, goes to the asset banks and every read of it is a far read (see <span class="tt"><a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a></span>, "Bank $00 ROM is code only"). The <span class="tt"><a class="el" href="text_8h.html#acd3f984c3d3308883e2729a50db16413" title="Print a single character at cursor position.">textPutChar</a>('S')</span> form stayed for brevity, not out of need.</li>
 <li><b>BG3 enable hides BG1.</b> As soon as <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen</a></span> includes <span class="tt"><a class="el" href="group__reg__const.html#ga4bb07912d1f93dcb1ab7d52ba2c7d758">TM_BG3</a></span>, the procedural terrain disappears and the screen turns solid backdrop colour, regardless of:<ul>
 <li>BG3 priority bit (<span class="tt"><a class="el" href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a></span> on/off)</li>
 <li>BG3 tile priority in tilemap entries (<span class="tt">text_config.priority = 0</span> or <span class="tt">1</span>)</li>
@@ -195,7 +195,7 @@ Re-generating assets</h2>
 <div class="fragment"><div class="line">python3 res/extract_sprites.py   # re-extract player + enemy + draw bullet</div>
 <div class="line">python3 res/compose_scene.py     # redraw the terrain (bump SEED)</div>
 <div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-42"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-45"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">asset</span>, <span class="tt">sprite</span>, <span class="tt">input</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="licence"></a>

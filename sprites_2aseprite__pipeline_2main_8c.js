@@ -9,6 +9,7 @@ var sprites_2aseprite__pipeline_2main_8c =
     [ "main", "sprites_2aseprite__pipeline_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "hero_pal", "sprites_2aseprite__pipeline_2main_8c.html#a9b21e29063c8d2b1be8b05654463d6c0", null ],
     [ "hero_player", "sprites_2aseprite__pipeline_2main_8c.html#a1cc80d0f5af8f145ae056c1a6b391d12", null ],
+    [ "hero_style", "sprites_2aseprite__pipeline_2main_8c.html#ae5399d474914cf86e2e3470bca1cb5b9", null ],
     [ "hero_til", "sprites_2aseprite__pipeline_2main_8c.html#a0a0019f7b9660e89fc49bf8b5b62a33b", null ],
     [ "hero_tilend", "sprites_2aseprite__pipeline_2main_8c.html#ae0ac1ff1ba90f41a3aa189a241f0695f", null ]
 ];

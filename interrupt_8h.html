@@ -216,7 +216,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>VBlank callback function pointer type. </p>
-<p>Functions of this type can be registered with <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> to be called automatically during every VBlank interrupt. </p>
+<p>Functions of this type can be registered with <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> to be called automatically during every VBlank interrupt.</p>
+<p>The same type as <a class="el" href="group__func__ptr.html#ga5fe554ddab29fbcd75e14e38ee89724f" title="Void function taking no arguments (the generic name; a header that wants to say what the function is ...">VoidFn</a> (<a class="el" href="types_8h.html" title="OpenSNES Standard Types.">types.h</a>): this name says what the function is for, <a class="el" href="group__func__ptr.html#ga5fe554ddab29fbcd75e14e38ee89724f" title="Void function taking no arguments (the generic name; a header that wants to say what the function is ...">VoidFn</a> is the generic one, and either can be passed where the other is expected. </p>
 
 </div>
 </div>
@@ -348,7 +349,7 @@ A handler that fires general DMA owns that channel: don't call lib DMA helpers (
   </table>
   </dd>
 </dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000005">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> reads the bank from the handler pointer. Removed at the next major version. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000010">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> reads the bank from the handler pointer. Removed at the next major version. </dd></dl>
 
 </div>
 </div>
@@ -488,7 +489,7 @@ The callback may live in any ROM bank: the bank is taken from the function point
   </table>
   </dd>
 </dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> reads the bank from the function pointer. Removed at the next major version. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000009">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> reads the bank from the function pointer. Removed at the next major version. </dd></dl>
 
 </div>
 </div>

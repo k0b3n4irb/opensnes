@@ -21,13 +21,13 @@ var map_8h =
     [ "T_SLOPEUU2", "map_8h.html#a6c3b4ebcd473f6900208f5ee9eb3f465", null ],
     [ "T_SOLID", "map_8h.html#af873aaa17834669d0f263af08c2912c3", null ],
     [ "T_SPIKE", "map_8h.html#a87a89f657f33f4eab646bb7f6ad21fa3", null ],
+    [ "mapGetCameraX", "map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe", null ],
+    [ "mapGetCameraY", "map_8h.html#a6611ce4f68f92827cc67361e07c2c63b", null ],
     [ "mapGetMetaTile", "map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3", null ],
     [ "mapGetMetaTilesProp", "map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7", null ],
     [ "mapLoad", "map_8h.html#a4895959148c67700bc9d52dab9501136", null ],
     [ "mapSetMapOptions", "map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13", null ],
     [ "mapUpdate", "map_8h.html#ac833e2572ce808bac75d10df2817df03", null ],
     [ "mapUpdateCamera", "map_8h.html#a310e106b68443357988f941a95a27266", null ],
-    [ "mapVblank", "map_8h.html#aa36598a0b40be791f4845574e0c5db1f", null ],
-    [ "x_pos", "map_8h.html#a52d9f95007fdae0115aa0d5b21317257", null ],
-    [ "y_pos", "map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be", null ]
+    [ "mapVblank", "map_8h.html#aa36598a0b40be791f4845574e0c5db1f", null ]
 ];

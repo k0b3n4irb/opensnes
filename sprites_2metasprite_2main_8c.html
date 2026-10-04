@@ -136,7 +136,7 @@ $(function(){initNavTree('sprites_2metasprite_2main_8c.html','',''); });
 Macros</h2></td></tr>
 <tr class="memitem:acac94c2679c53549cb9dacfcfb08be1a" id="r_acac94c2679c53549cb9dacfcfb08be1a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#acac94c2679c53549cb9dacfcfb08be1a">BASE_TILE_16</a>&#160;&#160;&#160;(<a class="el" href="#a59b5a14aa33d14442649fd18da5b16c9">HERO32_TILES</a>)</td></tr>
 <tr class="memitem:a185b25d8300b5a4e465ed3f581b633d3" id="r_a185b25d8300b5a4e465ed3f581b633d3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a185b25d8300b5a4e465ed3f581b633d3">BASE_TILE_32</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:a185b25d8300b5a4e465ed3f581b633d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base tile numbers for <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>.  <br /></td></tr>
+<tr class="memdesc:a185b25d8300b5a4e465ed3f581b633d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base tile numbers for the styles below.  <br /></td></tr>
 <tr class="memitem:a9071483b8a3b1fc7e806c58f5a4f08cb" id="r_a9071483b8a3b1fc7e806c58f5a4f08cb"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a9071483b8a3b1fc7e806c58f5a4f08cb">BASE_TILE_8</a>&#160;&#160;&#160;(<a class="el" href="#a59b5a14aa33d14442649fd18da5b16c9">HERO32_TILES</a> + <a class="el" href="#a6bfff52a25b42cefaa6314f09d416da6">HERO16_TILES</a>)</td></tr>
 <tr class="memitem:a6bfff52a25b42cefaa6314f09d416da6" id="r_a6bfff52a25b42cefaa6314f09d416da6"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6bfff52a25b42cefaa6314f09d416da6">HERO16_TILES</a>&#160;&#160;&#160;96</td></tr>
 <tr class="memdesc:a6bfff52a25b42cefaa6314f09d416da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of tiles in the 16x16 hero sprite sheet.  <br /></td></tr>
@@ -162,7 +162,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a2dda27b37416157c96a876cd65710e7f" id="r_a2dda27b37416157c96a876cd65710e7f"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a2dda27b37416157c96a876cd65710e7f">drawMenu</a> (void)</td></tr>
 <tr class="memdesc:a2dda27b37416157c96a876cd65710e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redraw the on-screen menu showing all three OBJ size modes.  <br /></td></tr>
 <tr class="memitem:ad6eba0f1fac53c1e89b6ad3f444b3f09" id="r_ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad6eba0f1fac53c1e89b6ad3f444b3f09">drawSprites</a> (void)</td></tr>
-<tr class="memdesc:ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render metasprites using <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode.  <br /></td></tr>
+<tr class="memdesc:ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render metasprites using <a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> for the current size mode.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point: metasprite demo with switchable OBJ size modes.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -182,10 +182,15 @@ Variables</h2></td></tr>
 <tr class="memdesc:a4a7f6eee3d43e9509a60fe80f1738130"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for the 32x32 hero sprite (defined in data.asm)  <br /></td></tr>
 <tr class="memitem:a159bd91dc35ea86a3a0c8a842231a938" id="r_a159bd91dc35ea86a3a0c8a842231a938"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a159bd91dc35ea86a3a0c8a842231a938">spritehero8_til</a> []</td></tr>
 <tr class="memdesc:a159bd91dc35ea86a3a0c8a842231a938"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for the 8x8 hero sprite  <br /></td></tr>
+<tr class="memitem:aea22f3b94eeddeade9de6bddf34da52e" id="r_aea22f3b94eeddeade9de6bddf34da52e"><td class="memItemLeft">static const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a>&#160;</td><td class="memItemRight"><a class="el" href="#aea22f3b94eeddeade9de6bddf34da52e">style16_large</a> = { .baseTile = ( 192 ) , .size = <a class="el" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a> }</td></tr>
+<tr class="memitem:abbb21f906dafff6352aa5e2036a4290d" id="r_abbb21f906dafff6352aa5e2036a4290d"><td class="memItemLeft">static const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a>&#160;</td><td class="memItemRight"><a class="el" href="#abbb21f906dafff6352aa5e2036a4290d">style16_small</a> = { .baseTile = ( 192 ) , .size = <a class="el" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a> }</td></tr>
+<tr class="memitem:a6f71460d838186091cd6d8be2254b978" id="r_a6f71460d838186091cd6d8be2254b978"><td class="memItemLeft">static const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6f71460d838186091cd6d8be2254b978">style32_large</a> = { .baseTile = 0 , .size = <a class="el" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a> }</td></tr>
+<tr class="memdesc:a6f71460d838186091cd6d8be2254b978"><td class="mdescLeft">&#160;</td><td class="mdescRight">One style per (sheet, OBJ size) pair the three modes use.  <br /></td></tr>
+<tr class="memitem:a6981664d98ec7549f0ea89dfbb639754" id="r_a6981664d98ec7549f0ea89dfbb639754"><td class="memItemLeft">static const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6981664d98ec7549f0ea89dfbb639754">style8_small</a> = { .baseTile = ( 192 + 96 ) , .size = <a class="el" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a> }</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Metasprite composition with switchable OBJ size modes. </p>
-<p>Demonstrates metasprites: large characters built from multiple hardware OAM entries using <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>. The SNES OBJSEL register ($2101) provides two sprite sizes (small and large) that all 128 OAM entries share. This example lets the user switch between three size combinations to see how the same character is composed from differently-sized pieces.</p>
+<p>Demonstrates metasprites: large characters built from multiple hardware OAM entries using <a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a>. The SNES OBJSEL register ($2101) provides two sprite sizes (small and large) that all 128 OAM entries share. This example lets the user switch between three size combinations to see how the same character is composed from differently-sized pieces.</p>
 <p>Three sprite sheets (8x8, 16x16, 32x32) are pre-loaded to contiguous VRAM. The gfx4snes -T flag transposes the sprite sheet tiles into SNES OBJ VRAM layout, and the -P flag generates metasprite frame definitions (tile offsets + positions) included as C arrays.</p>
 <p>When the OBJ size mode changes, OBJSEL and OAM must be updated atomically within the same VBlank to avoid one frame of garbled sprites.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
@@ -232,8 +237,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Base tile numbers for <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>. </p>
-<p><a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> adds the baseTile offset to each metasprite entry's relative tile number to compute the final OAM tile index. Since all three sprite sheets are loaded contiguously in VRAM, each sheet's base tile is the cumulative tile count of all preceding sheets. First tile of 32x32 sheet </p>
+<p>Base tile numbers for the styles below. </p>
+<p><a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> adds the style's baseTile to each metasprite entry's relative tile number to compute the final OAM tile index. Since all three sprite sheets are loaded contiguously in VRAM, each sheet's base tile is the cumulative tile count of all preceding sheets. First tile of 32x32 sheet </p>
 
 </div>
 </div>
@@ -493,15 +498,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Render metasprites using <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> for the current size mode. </p>
-<p><a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads metasprite frame data (tile offsets + positions) and populates multiple OAM entries to compose a large character from smaller hardware sprite pieces. It returns the next available OAM ID, allowing multiple metasprites to be drawn without ID conflicts.</p>
+<p>Render metasprites using <a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> for the current size mode. </p>
+<p><a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> reads metasprite frame data (tile offsets + positions) and populates multiple OAM entries to compose a large character from smaller hardware sprite pieces. It returns the next available OAM ID, allowing multiple metasprites to be drawn without ID conflicts.</p>
 <p>Each size mode uses a different combination of LARGE and SMALL sprites to render two characters: one larger (left) and one smaller (right). </p>
-<p>&lt; First tile of 16x16 sheet (192)</p>
-<p>&lt; First tile of 8x8 sheet (288)</p>
-<p>&lt; First tile of 32x32 sheet</p>
-<p>&lt; First tile of 8x8 sheet (288)</p>
-<p>&lt; First tile of 32x32 sheet</p>
-<p>&lt; First tile of 16x16 sheet (192)</p>
 
 </div>
 </div>
@@ -576,7 +575,7 @@ Variables</h2></td></tr>
 <div class="ttc" id="asprites_2dynamic__metasprite_2main_8c_html_ae2ffd37454763f04bc54b520f8e8c323"><div class="ttname"><a href="sprites_2dynamic__metasprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323">hero16_frame0</a></div><div class="ttdeci">static const MetaspriteItem hero16_frame0[]</div><div class="ttdoc">16x16 metasprite: 32x48 character (2x3 grid of 16x16)</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
 </div><!-- fragment -->
 <p>Metasprite frame definitions generated by gfx4snes -P. </p>
-<p>Each .inc file defines arrays (e.g., hero8_frame0[]) that describe how to compose a character from multiple OAM entries. Each entry in the array contains the relative X/Y offset and tile number for one hardware sprite. <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a> reads these arrays to populate OAM.</p>
+<p>Each .inc file defines arrays (e.g., hero8_frame0[]) that describe how to compose a character from multiple OAM entries. Each entry in the array contains the relative X/Y offset and tile number for one hardware sprite. <a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> reads these arrays to populate OAM.</p>
 <p>Frame-pointer table the clip's <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> frame values index into </p>
 
 </div>
@@ -690,6 +689,97 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>4bpp tile data for the 8x8 hero sprite </p>
+
+</div>
+</div>
+<a id="aea22f3b94eeddeade9de6bddf34da52e" name="aea22f3b94eeddeade9de6bddf34da52e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea22f3b94eeddeade9de6bddf34da52e">&#9670;&#160;</a></span>style16_large</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a> style16_large = { .baseTile = ( 192 ) , .size = <a class="el" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a> }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abbb21f906dafff6352aa5e2036a4290d" name="abbb21f906dafff6352aa5e2036a4290d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbb21f906dafff6352aa5e2036a4290d">&#9670;&#160;</a></span>style16_small</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a> style16_small = { .baseTile = ( 192 ) , .size = <a class="el" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a> }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6f71460d838186091cd6d8be2254b978" name="a6f71460d838186091cd6d8be2254b978"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f71460d838186091cd6d8be2254b978">&#9670;&#160;</a></span>style32_large</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a> style32_large = { .baseTile = 0 , .size = <a class="el" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a> }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>One style per (sheet, OBJ size) pair the three modes use. </p>
+<p>What <a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> needs beside the frame and the position: the sheet's base tile and which half of the OBJSEL size pair its pieces are. Nothing is flipped here, so pieceSize / width / height stay 0. </p>
+
+</div>
+</div>
+<a id="a6981664d98ec7549f0ea89dfbb639754" name="a6981664d98ec7549f0ea89dfbb639754"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6981664d98ec7549f0ea89dfbb639754">&#9670;&#160;</a></span>style8_small</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMetaspriteStyle.html">MetaspriteStyle</a> style8_small = { .baseTile = ( 192 + 96 ) , .size = <a class="el" href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a> }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>

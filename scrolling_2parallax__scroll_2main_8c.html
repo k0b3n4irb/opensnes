@@ -137,7 +137,7 @@ Variables</h2></td></tr>
 <tr class="memitem:aa81235770612a39a2668d11264dc308f" id="r_aa81235770612a39a2668d11264dc308f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa81235770612a39a2668d11264dc308f">palette</a> []</td></tr>
 <tr class="memdesc:aa81235770612a39a2668d11264dc308f"><td class="mdescLeft">&#160;</td><td class="mdescRight">16-color palette for the background  <br /></td></tr>
 <tr class="memitem:aba022e1ff2be864bac42428679aea901" id="r_aba022e1ff2be864bac42428679aea901"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aba022e1ff2be864bac42428679aea901">scroll_table</a> [10]</td></tr>
-<tr class="memdesc:aba022e1ff2be864bac42428679aea901"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA scroll table in RAM (must be in bank $00 WRAM, &lt; $2000).  <br /></td></tr>
+<tr class="memdesc:aba022e1ff2be864bac42428679aea901"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA scroll table in RAM — a plain C global, so it sits in $00:0000-$1FFF like every non-FAR variable; <a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a> reads the bank from the pointer and would take a const table too.  <br /></td></tr>
 <tr class="memitem:adb9ddd7f438b5617fa5426c0b131ee96" id="r_adb9ddd7f438b5617fa5426c0b131ee96"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a> []</td></tr>
 <tr class="memdesc:adb9ddd7f438b5617fa5426c0b131ee96"><td class="mdescLeft">&#160;</td><td class="mdescRight">64x32 tilemap data for the parallax background  <br /></td></tr>
 <tr class="memitem:adbf45f9654fccf61f3aa31645fd95120" id="r_adbf45f9654fccf61f3aa31645fd95120"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adbf45f9654fccf61f3aa31645fd95120">tiles</a> []</td></tr>
@@ -234,7 +234,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>HDMA scroll table in RAM (must be in bank $00 WRAM, &lt; $2000). </p>
+<p>HDMA scroll table in RAM — a plain C global, so it sits in $00:0000-$1FFF like every non-FAR variable; <a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a> reads the bank from the pointer and would take a const table too. </p>
 <p>This table defines three horizontal screen zones, each with an independent scroll offset. HDMA channel 6 reads this table during HBlank to override the BG1 horizontal scroll register (BG1HOFS, $210D) at zone boundaries.</p>
 <p>Table format (mode: 2-register write to $210D/$210E): [line_count] [scroll_lo] [scroll_hi] &ndash; zone entry (3 bytes) ...repeated for each zone... [0x00] &ndash; end-of-table marker</p>
 <p>The table lives in RAM (not ROM) because scroll values are updated every frame by the main loop. HDMA re-reads the table each frame automatically.</p>

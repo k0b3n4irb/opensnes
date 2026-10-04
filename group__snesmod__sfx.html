@@ -155,7 +155,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Effect slot ID for use with snesmodPlayEffect </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Effect slot ID for use with snesmodPlayEffect, 0-15; 0xFF when the 16 slots are taken (nothing is loaded — until 2026-10-03 a 17th load returned 16, which snesmodPlayEffect played as 0) </dd></dl>
 
 </div>
 </div>
@@ -205,8 +205,8 @@ Functions</h2></td></tr>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Play with higher pitch</span></div>
 <div class="line"><a class="code hl_function" href="#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(SFX_JUMP, 127, 128, <a class="code hl_define" href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a>);</div>
-<div class="ttc" id="agroup__snesmod__pitch_html_ga6ade25aca1fe55755fcaa90121865cd7"><div class="ttname"><a href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a></div><div class="ttdeci">#define SNESMOD_PITCH_NORMAL</div><div class="ttdef"><b>Definition</b> snesmod.h:350</div></div>
-<div class="ttc" id="agroup__snesmod__pitch_html_ga6c0d9b3dc886455d4fd763734f70c1fa"><div class="ttname"><a href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a></div><div class="ttdeci">#define SNESMOD_PITCH_HIGH</div><div class="ttdef"><b>Definition</b> snesmod.h:351</div></div>
+<div class="ttc" id="agroup__snesmod__pitch_html_ga6ade25aca1fe55755fcaa90121865cd7"><div class="ttname"><a href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a></div><div class="ttdeci">#define SNESMOD_PITCH_NORMAL</div><div class="ttdef"><b>Definition</b> snesmod.h:374</div></div>
+<div class="ttc" id="agroup__snesmod__pitch_html_ga6c0d9b3dc886455d4fd763734f70c1fa"><div class="ttname"><a href="group__snesmod__pitch.html#ga6c0d9b3dc886455d4fd763734f70c1fa">SNESMOD_PITCH_HIGH</a></div><div class="ttdeci">#define SNESMOD_PITCH_HIGH</div><div class="ttdef"><b>Definition</b> snesmod.h:375</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
 </div><!-- fragment --> 
 </div>

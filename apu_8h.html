@@ -137,8 +137,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab391987f295100930d62f078c5a6ffce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hot-swap: return a cooperating APU program to the IPL ROM.  <br /></td></tr>
 <tr class="memitem:a0c853aaed1d9bf7118baafcda2ce8b71" id="r_a0c853aaed1d9bf7118baafcda2ce8b71"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0c853aaed1d9bf7118baafcda2ce8b71">apuUpload</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *src, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> spcAddr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> size)</td></tr>
 <tr class="memdesc:a0c853aaed1d9bf7118baafcda2ce8b71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Upload a memory block into APU RAM via the IPL protocol.  <br /></td></tr>
-<tr class="memitem:ae0fc8c8351fdc849ebbb6c74e68645b4" id="r_ae0fc8c8351fdc849ebbb6c74e68645b4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae0fc8c8351fdc849ebbb6c74e68645b4">apuWaitBoot</a> (void)</td></tr>
-<tr class="memdesc:ae0fc8c8351fdc849ebbb6c74e68645b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block until the IPL ROM signals readiness ($AA/$BB).  <br /></td></tr>
+<tr class="memitem:a583209637a750256b2205d3505564a29" id="r_a583209637a750256b2205d3505564a29"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a583209637a750256b2205d3505564a29">apuWaitBoot</a> (void)</td></tr>
+<tr class="memdesc:a583209637a750256b2205d3505564a29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block until the IPL ROM signals readiness ($AA/$BB).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Raw APU (SPC700) access — IPL upload and execution. </p>
@@ -146,12 +146,12 @@ Functions</h2></td></tr>
 <p>Build side: list your APU program in the example Makefile's <span class="tt">SPCSRC</span> (e.g. <span class="tt">SPCSRC := player.spc700.asm</span>); common.mk assembles it with wla-spc700 against templates/memmap_spc700.inc into a flat <span class="tt">player.spc700.bin</span> you <span class="tt">.incbin</span> and upload.</p>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="audio_2pitch__mod_2main_8c.html#a826858a5f187837639cbac80446de290">spc_image</a>[], <a class="code hl_variable" href="audio_2pitch__mod_2main_8c.html#a68c6bd9a6b7a4a4c060f3394036226bd">spc_image_end</a>[];</div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_function" href="#ae0fc8c8351fdc849ebbb6c74e68645b4">apuWaitBoot</a>();</div>
+<div class="line"><a class="code hl_function" href="#a583209637a750256b2205d3505564a29">apuWaitBoot</a>();</div>
 <div class="line"><a class="code hl_function" href="#a0c853aaed1d9bf7118baafcda2ce8b71">apuUpload</a>(<a class="code hl_variable" href="audio_2pitch__mod_2main_8c.html#a826858a5f187837639cbac80446de290">spc_image</a>, 0x0200, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(<a class="code hl_variable" href="audio_2pitch__mod_2main_8c.html#a68c6bd9a6b7a4a4c060f3394036226bd">spc_image_end</a> - <a class="code hl_variable" href="audio_2pitch__mod_2main_8c.html#a826858a5f187837639cbac80446de290">spc_image</a>));</div>
 <div class="line"><a class="code hl_function" href="#a102578fd6e5cbef30f1ea10b72451a2f">apuExecute</a>(0x0200);</div>
 <div class="ttc" id="aapu_8h_html_a0c853aaed1d9bf7118baafcda2ce8b71"><div class="ttname"><a href="#a0c853aaed1d9bf7118baafcda2ce8b71">apuUpload</a></div><div class="ttdeci">void apuUpload(const u8 *src, u16 spcAddr, u16 size)</div><div class="ttdoc">Upload a memory block into APU RAM via the IPL protocol.</div></div>
 <div class="ttc" id="aapu_8h_html_a102578fd6e5cbef30f1ea10b72451a2f"><div class="ttname"><a href="#a102578fd6e5cbef30f1ea10b72451a2f">apuExecute</a></div><div class="ttdeci">void apuExecute(u16 spcAddr)</div><div class="ttdoc">End the upload session and start APU execution.</div></div>
-<div class="ttc" id="aapu_8h_html_ae0fc8c8351fdc849ebbb6c74e68645b4"><div class="ttname"><a href="#ae0fc8c8351fdc849ebbb6c74e68645b4">apuWaitBoot</a></div><div class="ttdeci">void apuWaitBoot(void)</div><div class="ttdoc">Block until the IPL ROM signals readiness ($AA/$BB).</div></div>
+<div class="ttc" id="aapu_8h_html_a583209637a750256b2205d3505564a29"><div class="ttname"><a href="#a583209637a750256b2205d3505564a29">apuWaitBoot</a></div><div class="ttdeci">u8 apuWaitBoot(void)</div><div class="ttdoc">Block until the IPL ROM signals readiness ($AA/$BB).</div></div>
 <div class="ttc" id="aaudio_2pitch__mod_2main_8c_html_a68c6bd9a6b7a4a4c060f3394036226bd"><div class="ttname"><a href="audio_2pitch__mod_2main_8c.html#a68c6bd9a6b7a4a4c060f3394036226bd">spc_image_end</a></div><div class="ttdeci">u8 spc_image_end[]</div><div class="ttdef"><b>Definition</b> main.c:38</div></div>
 <div class="ttc" id="aaudio_2pitch__mod_2main_8c_html_a826858a5f187837639cbac80446de290"><div class="ttname"><a href="audio_2pitch__mod_2main_8c.html#a826858a5f187837639cbac80446de290">spc_image</a></div><div class="ttdeci">u8 spc_image[]</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
@@ -202,7 +202,7 @@ Functions</h2></td></tr>
 
 <p>Hot-swap: return a cooperating APU program to the IPL ROM. </p>
 <p>Writes APU_RESET_MAGIC ($FE) to I/O port 0 and blocks until the IPL boot ROM signals ready again. The running APU program must cooperate by polling for the magic and running the APU_CHECK_RESET idiom from templates/memmap_spc700.inc (silence the DSP, ack on its output ports, jump back to the IPL at $FFC0).</p>
-<p>On return, upload the next program with <a class="el" href="#a0c853aaed1d9bf7118baafcda2ce8b71" title="Upload a memory block into APU RAM via the IPL protocol.">apuUpload()</a>/apuExecute() — do NOT call <a class="el" href="#ae0fc8c8351fdc849ebbb6c74e68645b4" title="Block until the IPL ROM signals readiness ($AA/$BB).">apuWaitBoot()</a> again (<a class="el" href="#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> already consumed the ready handshake).</p>
+<p>On return, upload the next program with <a class="el" href="#a0c853aaed1d9bf7118baafcda2ce8b71" title="Upload a memory block into APU RAM via the IPL protocol.">apuUpload()</a>/apuExecute() — do NOT call <a class="el" href="#a583209637a750256b2205d3505564a29" title="Block until the IPL ROM signals readiness ($AA/$BB).">apuWaitBoot()</a> again (<a class="el" href="#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> already consumed the ready handshake).</p>
 <dl class="section warning"><dt>Warning</dt><dd>Blocks forever if the APU program never polls for the magic. Only call it on programs built with APU_CHECK_RESET in their wait loops (see examples/audio/apu_switch). </dd></dl>
 
 </div>
@@ -243,14 +243,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae0fc8c8351fdc849ebbb6c74e68645b4" name="ae0fc8c8351fdc849ebbb6c74e68645b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0fc8c8351fdc849ebbb6c74e68645b4">&#9670;&#160;</a></span>apuWaitBoot()</h2>
+<a id="a583209637a750256b2205d3505564a29" name="a583209637a750256b2205d3505564a29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a583209637a750256b2205d3505564a29">&#9670;&#160;</a></span>apuWaitBoot()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void apuWaitBoot </td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> apuWaitBoot </td>
           <td>(</td>
           <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>

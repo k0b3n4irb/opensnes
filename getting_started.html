@@ -131,7 +131,7 @@ Choose Your Path</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>What</b>  </td><td class="markdownTableBodyNone">Download the pre-built SDK, write C code, build ROMs  </td><td class="markdownTableBodyNone">Clone the repo, modify compiler/library/tools  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>Prerequisites</b>  </td><td class="markdownTableBodyNone"><span class="tt">make</span> + text editor  </td><td class="markdownTableBodyNone">clang, cmake, git, python3  </td></tr>
+<td class="markdownTableBodyNone"><b>Prerequisites</b>  </td><td class="markdownTableBodyNone"><span class="tt">make</span>, <span class="tt">python3</span> + text editor  </td><td class="markdownTableBodyNone">clang, cmake, git, python3  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>Time to start</b>  </td><td class="markdownTableBodyNone">~5 minutes  </td><td class="markdownTableBodyNone">~15 minutes  </td></tr>
 <tr class="markdownTableRowEven">
@@ -143,14 +143,14 @@ Path A: Game Developer</h2>
 <p>You want to write SNES games in C. The SDK is already compiled — you just need to download it, write code, and run <span class="tt">make</span>.</p>
 <h3 class="doxsection"><a class="anchor" id="a1-install-prerequisites"></a>
 A1. Install Prerequisites</h3>
-<p>You only need <span class="tt">make</span> (the build tool) and an emulator. No compiler installation required — the SDK ships with its own cross-compiler.</p>
+<p>You need <span class="tt">make</span> (the build tool), <span class="tt">python3</span> (the build's post-link checks — ROM size, bank budgets — are Python scripts) and an emulator. No compiler installation required — the SDK ships with its own cross-compiler.</p>
 <p><b>macOS:</b> </p><div class="fragment"><div class="line">xcode-select --install</div>
-</div><!-- fragment --><p><b>Linux (Ubuntu/Debian):</b> </p><div class="fragment"><div class="line">sudo apt install make</div>
+</div><!-- fragment --><p><b>Linux (Ubuntu/Debian):</b> </p><div class="fragment"><div class="line">sudo apt install make python3</div>
 </div><!-- fragment --><p><b>Linux (Fedora):</b> </p><div class="fragment"><div class="line">sudo dnf install make</div>
 </div><!-- fragment --><p><b>Windows:</b></p><ol type="1">
 <li>Install <a href="https://www.msys2.org/">MSYS2</a></li>
 <li>Open <b>MSYS2 UCRT64</b> terminal</li>
-<li>Run: <span class="tt">pacman -S make</span></li>
+<li>Run: <span class="tt">pacman -S make python</span></li>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="a2-get-an-emulator"></a>
 A2. Get an Emulator</h3>
@@ -191,7 +191,7 @@ A4. Run Your First ROM</h3>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>Any other SNES emulator opens the <span class="tt">.sfc</span> as well (Mesen, bsnes, Snes9x — see the table above). </p>
 </blockquote>
-<p>You should see "Hello World!" on screen.</p>
+<p>You should see "TEXT MODULE TEST" in white on a dark blue screen.</p>
 <h3 class="doxsection"><a class="anchor" id="a5-create-your-own-project"></a>
 A5. Create Your Own Project</h3>
 <p>The SDK ships an <b><span class="tt">opensnes</span> CLI</b> (in the extracted <span class="tt">bin/</span> directory) that scaffolds, builds, and runs a project for you. Put it on your <span class="tt">PATH</span> once — from the extracted SDK directory:</p>
@@ -242,7 +242,7 @@ Manual setup (the long way)</h4>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div><div class="ttdef"><b>Definition</b> console.h:122</div></div>
+<div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 <div class="ttc" id="atext_8h_html_a3e1f9117d2dceb9fbc3f44875d92b259"><div class="ttname"><a href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259">textModeInit</a></div><div class="ttdeci">void textModeInit(void)</div><div class="ttdoc">Initialize text display mode — one-call setup for text-based examples.</div></div>
 <div class="ttc" id="atext_8h_html_a57d1c6fb6592214ea0fdd6e548dd7efc"><div class="ttname"><a href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc">textPrintAt</a></div><div class="ttdeci">void textPrintAt(u8 x, u8 y, const char *str)</div><div class="ttdoc">Print a string at specific position.</div></div>

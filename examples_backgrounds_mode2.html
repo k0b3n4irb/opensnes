@@ -137,7 +137,7 @@ What you'll learn</h2>
 <li>Per screen column <em>N ≥ 1</em> (column 0 can't be offset), the PPU reads BG3 <b>tile-row 0</b> for the horizontal offset word and <b>tile-row 1</b> for the vertical offset word.</li>
 <li><b>Offset word:</b> bit <span class="tt">0x2000</span> = apply to BG1 (<span class="tt">0x4000</span> = BG2); the V value is bits 0–9, the H value bits 3–9 (8-pixel-granular).</li>
 </ul>
-<p>This example puts a stack of horizontal colour bands on BG1 and writes a sine into BG3's V-offset row, so each column samples the bands at a different height — the bands ripple. The phase advances each frame. <b>Modes 4 and 6 reuse this exact data path</b> (mode 4 packs H/V into one word with a select bit), so this one example teaches the whole OPT family.</p>
+<p>This example puts a stack of horizontal colour bands on BG1 and writes a sine into BG3's V-offset row, so each column samples the bands at a different height — the bands ripple. The phase advances each frame. <b>Modes 4 and 6 reuse this exact data path</b> (mode 4 packs H/V into one word with a select bit — see <a class="el" href="dir_d6034bfafb13cb7ab8a0c777619c5747.html" title="/home/runner/work/opensnes/opensnes/examples/backgrounds/mode4/README.md"><span class="tt">mode4</span></a>), so this one example teaches the whole OPT family.</p>
 <h2 class="doxsection"><a class="anchor" id="what-to-observe--if-it-breaks"></a>
 What to observe / if it breaks</h2>
 <ul>

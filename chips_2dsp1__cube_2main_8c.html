@@ -136,7 +136,7 @@ Macros</h2></td></tr>
 <tr class="memdesc:ad8b1f2c453b375f89a5548ebb38938dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen-plane zenith angle: 0x4000 (90°) = horizontal view, +Y is the depth axis. The all-zero setup is degenerate (every point projects to the origin) — this angle is what makes the projection live.  <br /></td></tr>
 <tr class="memitem:a6a18e17c7c8d487a40a2e72c56413c02" id="r_a6a18e17c7c8d487a40a2e72c56413c02"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6a18e17c7c8d487a40a2e72c56413c02">VIEW_LES</a>&#160;&#160;&#160;256</td></tr>
 <tr class="memitem:aae7d9a9e9ddc87a7c5718ce1d5dc8a9f" id="r_aae7d9a9e9ddc87a7c5718ce1d5dc8a9f"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aae7d9a9e9ddc87a7c5718ce1d5dc8a9f">VIEW_LFE</a>&#160;&#160;&#160;96</td></tr>
-<tr class="memdesc:aae7d9a9e9ddc87a7c5718ce1d5dc8a9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">dsp1Parameter FOV knobs, tuned empirically on luna. The effective focal length is close to VIEW_LFE + VIEW_LES (projected offset ≈ (lfe+les)·x/y): 96+256 spreads the corners ±~92 px at CUBE_DIST 400 — filling the 224-line screen without clipping at the nearest swing.  <br /></td></tr>
+<tr class="memdesc:aae7d9a9e9ddc87a7c5718ce1d5dc8a9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">dsp1SetCamera FOV knobs, tuned empirically on luna. The effective focal length is close to VIEW_LFE + VIEW_LES (projected offset ≈ (lfe+les)·x/y): 96+256 spreads the corners ±~92 px at CUBE_DIST 400 — filling the 224-line screen without clipping at the nearest swing.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -149,10 +149,12 @@ Variables</h2></td></tr>
 <tr class="memitem:a038c1b5d9597eb67562da8969f062b51" id="r_a038c1b5d9597eb67562da8969f062b51"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a038c1b5d9597eb67562da8969f062b51">dot_tile</a> [32]</td></tr>
 <tr class="memitem:a12daf4f2dbff3923ffb1c93fdbdb13ab" id="r_a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="memItemLeft">volatile <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a12daf4f2dbff3923ffb1c93fdbdb13ab">dsp1_ok</a> = 0</td></tr>
 <tr class="memdesc:a12daf4f2dbff3923ffb1c93fdbdb13ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">1 when the DSP-1 answered the known-answer probe — parked in WRAM so the luna test manifest can assert it (<span class="tt">coproc_dsp1.toml</span>).  <br /></td></tr>
+<tr class="memitem:a1e2702696b56952aa9ee01315e174100" id="r_a1e2702696b56952aa9ee01315e174100"><td class="memItemLeft">static const <a class="el" href="structDsp1Camera.html">Dsp1Camera</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1e2702696b56952aa9ee01315e174100">view</a></td></tr>
+<tr class="memdesc:a1e2702696b56952aa9ee01315e174100"><td class="mdescLeft">&#160;</td><td class="mdescRight">The fixed camera: at the origin, looking along +Y.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>DSP-1 pseudo-3D: a cube tumbling in 3D, rotated by the coprocessor. </p>
-<p>Each frame the DSP-1 builds a rotation matrix (dsp1Attitude), transforms the cube's 8 corners through it (dsp1Objective), and projects each corner onto the screen with true hardware perspective (dsp1Project, set up once by dsp1Parameter). The corners are drawn as 8 sprites — all the 3D math, including the perspective divide, runs on the NEC uPD77C25, not the 65816.</p>
+<p>Each frame the DSP-1 builds a rotation matrix (dsp1Attitude), transforms the cube's 8 corners through it (dsp1Objective), and projects each corner onto the screen with true hardware perspective (dsp1Project, set up once by dsp1SetCamera). The corners are drawn as 8 sprites — all the 3D math, including the perspective divide, runs on the NEC uPD77C25, not the 65816.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>DSP-1 coprocessor command interface (matrix + vector transform)</li>
 <li>Fixed-point 3D rotation offloaded from the CPU</li>
@@ -227,7 +229,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>dsp1Parameter FOV knobs, tuned empirically on luna. The effective focal length is close to VIEW_LFE + VIEW_LES (projected offset ≈ (lfe+les)·x/y): 96+256 spreads the corners ±~92 px at CUBE_DIST 400 — filling the 224-line screen without clipping at the nearest swing. </p>
+<p>dsp1SetCamera FOV knobs, tuned empirically on luna. The effective focal length is close to VIEW_LFE + VIEW_LES (projected offset ≈ (lfe+les)·x/y): 96+256 spreads the corners ±~92 px at CUBE_DIST 400 — filling the 224-line screen without clipping at the nearest swing. </p>
 
 </div>
 </div>
@@ -341,6 +343,35 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>1 when the DSP-1 answered the known-answer probe — parked in WRAM so the luna test manifest can assert it (<span class="tt">coproc_dsp1.toml</span>). </p>
+
+</div>
+</div>
+<a id="a1e2702696b56952aa9ee01315e174100" name="a1e2702696b56952aa9ee01315e174100"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e2702696b56952aa9ee01315e174100">&#9670;&#160;</a></span>view</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structDsp1Camera.html">Dsp1Camera</a> view</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                             = {</div>
+<div class="line">    .x = 0, .y = 0, .z = 0,</div>
+<div class="line">    .lfe = 96 , .les = 256 ,</div>
+<div class="line">    .aas = 0, .azs = 0x4000 ,</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>The fixed camera: at the origin, looking along +Y. </p>
 
 </div>
 </div>

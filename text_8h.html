@@ -176,12 +176,10 @@ Functions</h2></td></tr>
 <tr class="memitem:acd3f984c3d3308883e2729a50db16413" id="r_acd3f984c3d3308883e2729a50db16413"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acd3f984c3d3308883e2729a50db16413">textPutChar</a> (char <a class="el" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a>)</td></tr>
 <tr class="memdesc:acd3f984c3d3308883e2729a50db16413"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a single character at cursor position.  <br /></td></tr>
 <tr class="memitem:aa4df5148cb4a677b1d1e58b2535b73b0" id="r_aa4df5148cb4a677b1d1e58b2535b73b0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa4df5148cb4a677b1d1e58b2535b73b0">textSetPos</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> x, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y)</td></tr>
+<tr class="memdesc:aa4df5148cb4a677b1d1e58b2535b73b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set cursor position.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a2f3631c011b3a55707c8f8a7e8494b0b" id="r_a2f3631c011b3a55707c8f8a7e8494b0b"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2f3631c011b3a55707c8f8a7e8494b0b">cursor_x</a></td></tr>
-<tr class="memdesc:a2f3631c011b3a55707c8f8a7e8494b0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set cursor position.  <br /></td></tr>
-<tr class="memitem:a09f5b2e804373ebc11c190b2b824786d" id="r_a09f5b2e804373ebc11c190b2b824786d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a09f5b2e804373ebc11c190b2b824786d">cursor_y</a></td></tr>
 <tr class="memitem:a4c8b919fa5577be029b9a19817496c2a" id="r_a4c8b919fa5577be029b9a19817496c2a"><td class="memItemLeft"><a class="el" href="structTextConfig.html">TextConfig</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4c8b919fa5577be029b9a19817496c2a">text_config</a></td></tr>
 <tr class="memdesc:a4c8b919fa5577be029b9a19817496c2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default text configuration.  <br /></td></tr>
 </table>
@@ -664,9 +662,6 @@ Variables</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void textSetPos </td>
@@ -679,69 +674,21 @@ Variables</h2></td></tr>
           <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>y</em></span>&#160;)</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a2f3631c011b3a55707c8f8a7e8494b0b" name="a2f3631c011b3a55707c8f8a7e8494b0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f3631c011b3a55707c8f8a7e8494b0b">&#9670;&#160;</a></span>cursor_x</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> cursor_x</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Set cursor position. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>Column (0-31; masked to the 32-column buffer) </td></tr>
-    <tr><td class="paramname">y</td><td>Row (0-31; masked to TEXT_MAP_ROWS) Inlined for zero-call-overhead access (wave 4 retrofit; uses the relaxed CC_INLINE_MAX_INSTR=16 default). </td></tr>
+    <tr><td class="paramname">y</td><td>Row (0-31; masked to TEXT_MAP_ROWS)</td></tr>
   </table>
   </dd>
 </dl>
+<p>A lib function since 2026-10-03 (it was <span class="tt">inline</span> in this header, which forced the cursor variables to be exported; API decision D4). </p>
 
 </div>
 </div>
-<a id="a09f5b2e804373ebc11c190b2b824786d" name="a09f5b2e804373ebc11c190b2b824786d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09f5b2e804373ebc11c190b2b824786d">&#9670;&#160;</a></span>cursor_y</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> cursor_y</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
 <a id="a4c8b919fa5577be029b9a19817496c2a" name="a4c8b919fa5577be029b9a19817496c2a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4c8b919fa5577be029b9a19817496c2a">&#9670;&#160;</a></span>text_config</h2>
 

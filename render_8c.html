@@ -155,6 +155,7 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:ae0457afb754642b0f70288f9aa9fefae" id="r_ae0457afb754642b0f70288f9aa9fefae"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae0457afb754642b0f70288f9aa9fefae">bg1MarkRow</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> row)</td></tr>
 <tr class="memitem:a8e917ac032ad726f2d02056f97c77341" id="r_a8e917ac032ad726f2d02056f97c77341"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8e917ac032ad726f2d02056f97c77341">clearMsgRow</a> (void)</td></tr>
 <tr class="memitem:ae058dbea423cc561bcc849d8b78f7e50" id="r_ae058dbea423cc561bcc849d8b78f7e50"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ae058dbea423cc561bcc849d8b78f7e50">clearTilemapBG1</a> (void)</td></tr>
 <tr class="memitem:a0eee119074606fb8aaf4c6e0552635ad" id="r_a0eee119074606fb8aaf4c6e0552635ad"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a0eee119074606fb8aaf4c6e0552635ad">clearTilemapBG2</a> (void)</td></tr>
@@ -173,7 +174,8 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a7ff6a7e2d9d09c20e2a8c9077960a07e" id="r_a7ff6a7e2d9d09c20e2a8c9077960a07e"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7ff6a7e2d9d09c20e2a8c9077960a07e">bg1_dirty_row</a> [32]</td></tr>
+<tr class="memitem:a6fbcdf2d718b2227fc3c49c59753e85f" id="r_a6fbcdf2d718b2227fc3c49c59753e85f"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6fbcdf2d718b2227fc3c49c59753e85f">bg1_dirty_hi</a> = 0</td></tr>
+<tr class="memitem:a434b20d465212c2a434f05c8e10a4286" id="r_a434b20d465212c2a434f05c8e10a4286"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a434b20d465212c2a434f05c8e10a4286">bg1_dirty_lo</a> = 0xFF</td></tr>
 <tr class="memitem:a03d16369ba7df9ffd43c56f7d505109c" id="r_a03d16369ba7df9ffd43c56f7d505109c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a03d16369ba7df9ffd43c56f7d505109c">bg2_dirty</a></td></tr>
 <tr class="memitem:a7561d921d0066a56685792d9ac5182b9" id="r_a7561d921d0066a56685792d9ac5182b9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7561d921d0066a56685792d9ac5182b9">bg3_dirty</a></td></tr>
 <tr class="memitem:a8d6aaaeef9536d537538355ca5ea05bf" id="r_a8d6aaaeef9536d537538355ca5ea05bf"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8d6aaaeef9536d537538355ca5ea05bf">bg3_msgrow</a> []</td></tr>
@@ -560,6 +562,31 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="ae0457afb754642b0f70288f9aa9fefae" name="ae0457afb754642b0f70288f9aa9fefae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0457afb754642b0f70288f9aa9fefae">&#9670;&#160;</a></span>bg1MarkRow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void bg1MarkRow </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>row</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a8e917ac032ad726f2d02056f97c77341" name="a8e917ac032ad726f2d02056f97c77341"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8e917ac032ad726f2d02056f97c77341">&#9670;&#160;</a></span>clearMsgRow()</h2>
 
@@ -884,8 +911,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a7ff6a7e2d9d09c20e2a8c9077960a07e" name="a7ff6a7e2d9d09c20e2a8c9077960a07e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ff6a7e2d9d09c20e2a8c9077960a07e">&#9670;&#160;</a></span>bg1_dirty_row</h2>
+<a id="a6fbcdf2d718b2227fc3c49c59753e85f" name="a6fbcdf2d718b2227fc3c49c59753e85f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fbcdf2d718b2227fc3c49c59753e85f">&#9670;&#160;</a></span>bg1_dirty_hi</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -894,7 +921,29 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_dirty_row[32]</td>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_dirty_hi = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a434b20d465212c2a434f05c8e10a4286" name="a434b20d465212c2a434f05c8e10a4286"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a434b20d465212c2a434f05c8e10a4286">&#9670;&#160;</a></span>bg1_dirty_lo</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_dirty_lo = 0xFF</td>
         </tr>
       </table>
   </td>

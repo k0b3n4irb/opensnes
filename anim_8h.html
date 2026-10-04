@@ -350,9 +350,9 @@ as garbage; use non-const RAM clips" — described the pre-#121 compiler; follow
 <div class="ttc" id="aanim_8h_html_a7a416dc50a4020c4810d7b205bb0304b"><div class="ttname"><a href="#a7a416dc50a4020c4810d7b205bb0304b">animTick</a></div><div class="ttdeci">u16 animTick(AnimPlayer *p)</div><div class="ttdoc">Advance one tick; return the current frame value.</div></div>
 </div><!-- fragment -->
 <p>Tick + resolve against a gfx4snes metasprite pointer table. </p>
-<p>Feeds <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="Draw a metasprite (PVSnesLib compatible).">oamDrawMeta()</a>/oamMetaDrawDyn() directly: </p><div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a51c770c211be49217be7014b858a003c">oamDrawMeta</a>(0, x, y, <a class="code hl_define" href="#ab970a01564cd5be48c73a8a6897e1f57">animTickMeta</a>(&amp;hero, hero_metasprites), 0, 0, sz);</div>
-<div class="ttc" id="aanim_8h_html_ab970a01564cd5be48c73a8a6897e1f57"><div class="ttname"><a href="#ab970a01564cd5be48c73a8a6897e1f57">animTickMeta</a></div><div class="ttdeci">#define animTickMeta(_p, _tbl)</div><div class="ttdoc">Tick + resolve against a gfx4snes metasprite pointer table.</div><div class="ttdef"><b>Definition</b> anim.h:175</div></div>
-<div class="ttc" id="asprite_8h_html_a51c770c211be49217be7014b858a003c"><div class="ttname"><a href="sprite_8h.html#a51c770c211be49217be7014b858a003c">oamDrawMeta</a></div><div class="ttdeci">u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta, u16 baseTile, u8 basePalette, u8 size)</div><div class="ttdoc">Draw a metasprite (PVSnesLib compatible).</div></div>
+<p>Feeds <a class="el" href="sprite_8h.html#a51c770c211be49217be7014b858a003c" title="oamDrawMetasprite() without flip, its style given as three arguments">oamDrawMeta()</a>/oamMetaDrawDyn() directly: </p><div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a51c770c211be49217be7014b858a003c">oamDrawMeta</a>(0, x, y, <a class="code hl_define" href="#ab970a01564cd5be48c73a8a6897e1f57">animTickMeta</a>(&amp;hero, hero_metasprites), 0, 0, sz);</div>
+<div class="ttc" id="aanim_8h_html_ab970a01564cd5be48c73a8a6897e1f57"><div class="ttname"><a href="#ab970a01564cd5be48c73a8a6897e1f57">animTickMeta</a></div><div class="ttdeci">#define animTickMeta(_p, _tbl)</div><div class="ttdoc">Tick + resolve against a gfx4snes metasprite pointer table.</div><div class="ttdef"><b>Definition</b> anim.h:180</div></div>
+<div class="ttc" id="asprite_8h_html_a51c770c211be49217be7014b858a003c"><div class="ttname"><a href="sprite_8h.html#a51c770c211be49217be7014b858a003c">oamDrawMeta</a></div><div class="ttdeci">u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta, u16 baseTile, u8 basePalette, u8 size)</div><div class="ttdoc">oamDrawMetasprite() without flip, its style given as three arguments</div></div>
 </div><!-- fragment --><dl class="section warning"><dt>Warning</dt><dd>The player must be running (frame values index _tbl); a stopped player would index with ANIM_NONE. Guard with <span class="tt"><a class="el" href="#abc3e816720673a92012cafe18ddad90d" title="Current frame value WITHOUT advancing (ANIM_NONE if stopped).">animFrame(p)</a> != <a class="el" href="#afc6d314e5df07a5fce2d77091e49f704" title="animTick()/animFrame() result when the player has no clip.">ANIM_NONE</a></span> if the clip can be absent — the hot path stays branch-free by contract. </dd></dl>
 
 </div>
@@ -434,10 +434,10 @@ as garbage; use non-const RAM clips" — described the pre-#121 compiler; follow
 <p>Declare a static const <a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a> with uniform frame duration. </p>
 <div class="fragment"><div class="line"><a class="code hl_define" href="#a35cf99090ec3c39a40eb25db6f87b05d">DECLARE_ANIM_CLIP</a>(mario_walk, <a class="code hl_define" href="#ac2f8f711a52b203de5a6469e086c963f">ANIM_LOOP</a>, 4, <a class="code hl_define" href="games_2likemario_2main_8c.html#ad43823ee9b7b60480d1b5e24572ff6a7">FRAME_WALK0</a>, <a class="code hl_define" href="games_2likemario_2main_8c.html#aeb271d5d238c925a18a210f49fbd3a9a">FRAME_WALK1</a>);</div>
 <div class="line"><a class="code hl_function" href="#a82791dbe279dc728e3946f838f8e2cf1">animPlay</a>(&amp;<a class="code hl_variable" href="games_2likemario_2main_8c.html#aa76ec2900485bf1fadac5ac5b141958e">mario_anim</a>, &amp;mario_walk);</div>
-<div class="ttc" id="aanim_8h_html_a35cf99090ec3c39a40eb25db6f87b05d"><div class="ttname"><a href="#a35cf99090ec3c39a40eb25db6f87b05d">DECLARE_ANIM_CLIP</a></div><div class="ttdeci">#define DECLARE_ANIM_CLIP(name, mode_, speed_,...)</div><div class="ttdoc">Declare a static const AnimClip with uniform frame duration.</div><div class="ttdef"><b>Definition</b> anim.h:188</div></div>
+<div class="ttc" id="aanim_8h_html_a35cf99090ec3c39a40eb25db6f87b05d"><div class="ttname"><a href="#a35cf99090ec3c39a40eb25db6f87b05d">DECLARE_ANIM_CLIP</a></div><div class="ttdeci">#define DECLARE_ANIM_CLIP(name, mode_, speed_,...)</div><div class="ttdoc">Declare a static const AnimClip with uniform frame duration.</div><div class="ttdef"><b>Definition</b> anim.h:193</div></div>
 <div class="ttc" id="aanim_8h_html_a82791dbe279dc728e3946f838f8e2cf1"><div class="ttname"><a href="#a82791dbe279dc728e3946f838f8e2cf1">animPlay</a></div><div class="ttdeci">void animPlay(AnimPlayer *p, const AnimClip *clip)</div><div class="ttdoc">Start (or keep) a clip — continue-if-same semantics.</div></div>
 <div class="ttc" id="aanim_8h_html_ac2f8f711a52b203de5a6469e086c963f"><div class="ttname"><a href="#ac2f8f711a52b203de5a6469e086c963f">ANIM_LOOP</a></div><div class="ttdeci">#define ANIM_LOOP</div><div class="ttdoc">Loop mode: wrap to frame 0 after the last frame.</div><div class="ttdef"><b>Definition</b> anim.h:54</div></div>
-<div class="ttc" id="agames_2likemario_2main_8c_html_aa76ec2900485bf1fadac5ac5b141958e"><div class="ttname"><a href="games_2likemario_2main_8c.html#aa76ec2900485bf1fadac5ac5b141958e">mario_anim</a></div><div class="ttdeci">static AnimPlayer mario_anim</div><div class="ttdef"><b>Definition</b> main.c:166</div></div>
+<div class="ttc" id="agames_2likemario_2main_8c_html_aa76ec2900485bf1fadac5ac5b141958e"><div class="ttname"><a href="games_2likemario_2main_8c.html#aa76ec2900485bf1fadac5ac5b141958e">mario_anim</a></div><div class="ttdeci">static AnimPlayer mario_anim</div><div class="ttdef"><b>Definition</b> main.c:167</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_ad43823ee9b7b60480d1b5e24572ff6a7"><div class="ttname"><a href="games_2likemario_2main_8c.html#ad43823ee9b7b60480d1b5e24572ff6a7">FRAME_WALK0</a></div><div class="ttdeci">#define FRAME_WALK0</div><div class="ttdoc">Dynamic sprite frame index: walk animation frame 0.</div><div class="ttdef"><b>Definition</b> main.c:115</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_aeb271d5d238c925a18a210f49fbd3a9a"><div class="ttname"><a href="games_2likemario_2main_8c.html#aeb271d5d238c925a18a210f49fbd3a9a">FRAME_WALK1</a></div><div class="ttdeci">#define FRAME_WALK1</div><div class="ttdoc">Dynamic sprite frame index: walk animation frame 1.</div><div class="ttdef"><b>Definition</b> main.c:117</div></div>
 </div><!-- fragment --><p>Per-frame durations can't be expressed variadically — declare those clips as raw structs (see the <a class="el" href="structAnimClip.html" title="An animation clip — ROM-resident, 12 bytes.">AnimClip</a> example above). </p>
@@ -467,7 +467,7 @@ as garbage; use non-const RAM clips" — described the pre-#121 compiler; follow
 <p>Start (or keep) a clip — continue-if-same semantics. </p>
 <p>Safe to call unconditionally every frame from a state machine:</p><ul>
 <li>same clip, still playing: no-op (the animation continues);</li>
-<li>same clip, finished (ANIM_ONCE): restarts from frame 0 (re-trigger);</li>
+<li>same clip, finished (ANIM_ONCE): restarts from frame 0 (re-trigger) — so calling <a class="el" href="#a82791dbe279dc728e3946f838f8e2cf1" title="Start (or keep) a clip — continue-if-same semantics.">animPlay()</a> EVERY frame with an ANIM_ONCE clip replays it as soon as it ends; call it on the event instead, or test ANIM_F_FINISHED first;</li>
 <li>different clip: switches immediately — frame 0, ticks reloaded, flags cleared;</li>
 <li>NULL clip (or len == 0): equivalent to <a class="el" href="#a5aade032e76fa23c37fe77fe3342f1a5" title="Stop: detach the clip, clear flags. Next animPlay starts fresh.">animStop()</a>.</li>
 </ul>
@@ -478,6 +478,7 @@ as garbage; use non-const RAM clips" — described the pre-#121 compiler; follow
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>
@@ -518,6 +519,7 @@ as garbage; use non-const RAM clips" — described the pre-#121 compiler; follow
 <p>Advance one tick; return the current frame value. </p>
 <p>Call once per game-loop iteration per active player (after <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>, like the rest of the frame logic).</p>
 <dl class="section return"><dt>Returns</dt><dd>The current frame value; ANIM_NONE if the player is stopped. A finished ANIM_ONCE player keeps returning its last frame. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
 
 </div>
 </div>

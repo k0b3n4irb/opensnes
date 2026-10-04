@@ -213,10 +213,10 @@ Profiling from inside: <span class="tt">&lt;snes/profile.h&gt;</span></h2>
 <div class="ttc" id="aprofile_8h_html_ac059c33b80ae59cf02b491ddb89b014a"><div class="ttname"><a href="profile_8h.html#ac059c33b80ae59cf02b491ddb89b014a">profileScanlineEnd</a></div><div class="ttdeci">u16 profileScanlineEnd(void)</div><div class="ttdoc">End a scanline-based timing measurement.</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="profile_8h.html#a30c81ab840017529f70ad63238c8a79f" title="Get the current scanline number (0-261 NTSC, 0-311 PAL).">profileGetScanline()</a></span> returns the line the PPU is drawing right now (0-261 NTSC, 0-311 PAL): print it where a section ends to see where in the frame it finished.</p>
 <p><b>Frame counters</b> answer "am I dropping frames?":</p>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> frames = <a class="code hl_function" href="profile_8h.html#a3f567bb59e4729e6cec85b827b3f97e0">profileGetFrameCount</a>();   <span class="comment">/* frames since boot, wraps at 65535 */</span></div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> frames = <a class="code hl_function" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>();          <span class="comment">/* frames since boot, wraps at 65535 */</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> lag    = <a class="code hl_function" href="profile_8h.html#a071021ac9abd338ac63cf48b2d10f8c7">profileGetLagFrames</a>();    <span class="comment">/* frames that missed their VBlank */</span></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:274</div></div>
 <div class="ttc" id="aprofile_8h_html_a071021ac9abd338ac63cf48b2d10f8c7"><div class="ttname"><a href="profile_8h.html#a071021ac9abd338ac63cf48b2d10f8c7">profileGetLagFrames</a></div><div class="ttdeci">u16 profileGetLagFrames(void)</div><div class="ttdoc">Get lag frame count since boot.</div></div>
-<div class="ttc" id="aprofile_8h_html_a3f567bb59e4729e6cec85b827b3f97e0"><div class="ttname"><a href="profile_8h.html#a3f567bb59e4729e6cec85b827b3f97e0">profileGetFrameCount</a></div><div class="ttdeci">u16 profileGetFrameCount(void)</div><div class="ttdoc">Get total frame count since boot (wraps at 65535).</div></div>
 </div><!-- fragment --><p>A rising lag count is the symptom; <span class="tt">luna profile</span> tells you which symbol caused it.</p>
 <dl class="section note"><dt>Note</dt><dd>No example links the profile module today, so its code path is exercised by nothing in the corpus. Treat it as a debugging aid you switch on while working, not as shipped code.</dd></dl>
 <h2 class="doxsection"><a class="anchor" id="choosing-between-them"></a>
@@ -251,7 +251,7 @@ See also</h2>
 <ul>
 <li><a class="el" href="craft_frame_budget.html" title="The frame budget">The frame budget</a> — what fits in a frame, and the ~4 KB VBlank DMA ceiling</li>
 <li><a class="el" href="tutorial_debugging.html" title="Interactive Debugging with luna">Interactive Debugging with luna</a> — stepping, breakpoints and memory inspection with luna</li>
-<li><a class="el" href="tools_luna.html" title="luna — command reference (pinned v1.30.2)">luna — command reference (pinned v1.30.2)</a> — every luna subcommand and flag, generated from the pinned binary</li>
+<li><a class="el" href="tools_luna.html" title="luna — command reference (pinned v1.32.0)">luna — command reference (pinned v1.32.0)</a> — every luna subcommand and flag, generated from the pinned binary</li>
 <li><span class="tt">.claude/rules/testing.md</span> — where the profile and coverage passes sit in the suite </li>
 </ul>
 </div></div><!-- contents -->

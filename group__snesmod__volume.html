@@ -155,7 +155,7 @@ Functions</h2></td></tr>
 <p>Gradually fades the module volume to a target level.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">targetVolume</td><td>Target volume (0-127) </td></tr>
+    <tr><td class="paramname">targetVolume</td><td>Target volume, 0-255 (the module-volume scale above) </td></tr>
     <tr><td class="paramname">speed</td><td>Fade speed (higher = faster)</td></tr>
   </table>
   </dd>
@@ -185,7 +185,7 @@ Functions</h2></td></tr>
 <p>Sets the playback volume for the current module.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">volume</td><td>Volume level (0-127) </td></tr>
+    <tr><td class="paramname">volume</td><td>Volume level, 0-255; the driver starts a module at 255 (its own scale — 127 halves the level, measured on luna 2026-10-04; this line said 0-127 until then) </td></tr>
   </table>
   </dd>
 </dl>

@@ -3,10 +3,10 @@ var examples_basics =
     [ "aim_target", "examples_basics_aim_target.html", [
       [ "Example ROMs", "examples_basics.html#example-roms-3", null ],
       [ "Key Concepts", "examples_basics.html#key-concepts-1", [
-        [ "SNES Concepts", "examples_basics_aim_target.html#snes-concepts-10", null ],
+        [ "SNES Concepts", "examples_basics_aim_target.html#snes-concepts-12", null ],
         [ "What to Observe", "examples_basics_aim_target.html#what-to-observe", null ],
         [ "How to Build", "examples_basics_aim_target.html#how-to-build-7", null ],
-        [ "Modules Used", "examples_basics_aim_target.html#modules-used-14", null ],
+        [ "Modules Used", "examples_basics_aim_target.html#modules-used-16", null ],
         [ "See also", "examples_basics_aim_target.html#see-also-18", null ]
       ] ]
     ] ],

@@ -134,7 +134,7 @@ What You'll Learn</h2>
 <li>How camera-follow works: sprite position drives the viewport</li>
 <li>How to combine a scrolling background with an animated sprite</li>
 <li>The two-phase update pattern: <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span> (CPU) → <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> (DMA)</li>
-<li>Sprite screen positioning relative to camera (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257" title="Current camera X position in pixels.">x_pos</a></span>)</li>
+<li>Sprite screen positioning relative to camera (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span>)</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="controls-20"></a>
 Controls</h2>
@@ -146,7 +146,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">RIGHT  </td><td class="markdownTableBodyNone">Move Mario right  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-31"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-34"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="map-engine-two-phase-update"></a>
 Map Engine Two-Phase Update</h3>
@@ -157,10 +157,10 @@ Map Engine Two-Phase Update</h3>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="camera-relative-sprite-positioning"></a>
 Camera-Relative Sprite Positioning</h3>
-<p>The sprite's position in the map (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a></span>) is not its screen position. The screen position is <span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257" title="Current camera X position in pixels.">x_pos</a></span>, where <span class="tt"><a class="el" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257" title="Current camera X position in pixels.">x_pos</a></span> is the camera's current offset exported by the map engine.</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a> - <a class="code hl_variable" href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a>, <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a> - <a class="code hl_variable" href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a>, <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, 0, 3, flags);</div>
-<div class="ttc" id="amap_8h_html_a52d9f95007fdae0115aa0d5b21317257"><div class="ttname"><a href="map_8h.html#a52d9f95007fdae0115aa0d5b21317257">x_pos</a></div><div class="ttdeci">u16 x_pos</div><div class="ttdoc">Current camera X position in pixels.</div></div>
-<div class="ttc" id="amap_8h_html_a79f8bb14ed9f0ee9d7031db7f02733be"><div class="ttname"><a href="map_8h.html#a79f8bb14ed9f0ee9d7031db7f02733be">y_pos</a></div><div class="ttdeci">u16 y_pos</div><div class="ttdoc">Current camera Y position in pixels.</div></div>
+<p>The sprite's position in the map (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a></span>) is not its screen position. The screen position is <span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8" title="Mario X position in map pixels.">xloc</a> - <a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span>, where <span class="tt"><a class="el" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe" title="Camera X position in pixels.">mapGetCameraX()</a></span> is the camera's current offset exported by the map engine.</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a> - <a class="code hl_function" href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe">mapGetCameraX</a>(), <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a> - <a class="code hl_function" href="map_8h.html#a6611ce4f68f92827cc67361e07c2c63b">mapGetCameraY</a>(), <a class="code hl_variable" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a>, 0, 3, flags);</div>
+<div class="ttc" id="amap_8h_html_a6611ce4f68f92827cc67361e07c2c63b"><div class="ttname"><a href="map_8h.html#a6611ce4f68f92827cc67361e07c2c63b">mapGetCameraY</a></div><div class="ttdeci">u16 mapGetCameraY(void)</div><div class="ttdoc">Camera Y position in pixels.</div></div>
+<div class="ttc" id="amap_8h_html_a6b6efef7218d3ace881a6c4acce4aafe"><div class="ttname"><a href="map_8h.html#a6b6efef7218d3ace881a6c4acce4aafe">mapGetCameraX</a></div><div class="ttdeci">u16 mapGetCameraX(void)</div><div class="ttdoc">Camera X position in pixels.</div></div>
 <div class="ttc" id="amaps_2map__scroll_2main_8c_html_a046e42fc978f81375d5b89664d72d1f4"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4">frame</a></div><div class="ttdeci">u16 frame</div><div class="ttdoc">Current sprite tile number.</div><div class="ttdef"><b>Definition</b> main.c:81</div></div>
 <div class="ttc" id="amaps_2map__scroll_2main_8c_html_a4bf69d14b43306f29f9a67bbb2d70ca8"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a4bf69d14b43306f29f9a67bbb2d70ca8">xloc</a></div><div class="ttdeci">u16 xloc</div><div class="ttdoc">Mario X position in map pixels.</div><div class="ttdef"><b>Definition</b> main.c:72</div></div>
 <div class="ttc" id="amaps_2map__scroll_2main_8c_html_a65f23786744bb3a1567af452246db6d1"><div class="ttname"><a href="maps_2map__scroll_2main_8c.html#a65f23786744bb3a1567af452246db6d1">yloc</a></div><div class="ttdeci">u16 yloc</div><div class="ttdoc">Mario Y position in map pixels.</div><div class="ttdef"><b>Definition</b> main.c:75</div></div>
@@ -168,7 +168,7 @@ Camera-Relative Sprite Positioning</h3>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="walk-animation"></a>
 Walk Animation</h3>
 <p>The sprite cycles through 4 frames (tiles 0, 2, 4, 6). Each 16x16 sprite uses 2 VRAM tiles (top-left + top-right), so frames are spaced by 2. Animation advances every other input frame for natural pacing.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-52"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-55"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -186,7 +186,7 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span>, <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span>, <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> — the streaming map engine  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-31"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-34"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/map_scroll</div>

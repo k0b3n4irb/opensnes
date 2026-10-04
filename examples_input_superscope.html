@@ -139,7 +139,7 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Cursor  </td><td class="markdownTableBodyNone">Advance to ready state  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-28"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-31"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/superscope</div>
@@ -207,13 +207,13 @@ Walkthrough</h2>
 <div class="line"><a class="code hl_variable" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a> = 1;</div>
 <div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300).</div></div>
 <div class="ttc" id="asystem_8h_html_aebb6082d6353b65122e8009f24a5e494"><div class="ttname"><a href="system_8h.html#aebb6082d6353b65122e8009f24a5e494">oam_update_flag</a></div><div class="ttdeci">volatile u8 oam_update_flag</div><div class="ttdoc">OAM DMA trigger flag.</div></div>
-</div><!-- fragment --><p>Writing directly to <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> avoids the overhead of <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> (framesize=158). For a single sprite updated occasionally, this is clean and fast.</p>
+</div><!-- fragment --><p>Writing directly to <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> avoids the call and argument pushes of <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>. For a single sprite updated occasionally, this is clean and fast.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md6-state-machine"></a>
 6. State Machine</h3>
 <p>The example uses three states:</p>
 <ul>
 <li><b>DETECT</b>: Calls <span class="tt"><a class="el" href="group__scope__input.html#gaaf4c02e6cd035506e27613290014ef2d" title="Detect Super Scope on port 2.">scopeInit()</a></span> each frame until <span class="tt"><a class="el" href="group__scope__input.html#ga865c2249dcdf9265bca5c70991ab348a" title="Check if Super Scope is connected.">scopeIsConnected()</a></span> returns true</li>
-<li><b>CALIBRATE</b>: Waits for a fire event, then calls <span class="tt"><a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e">scopeCalibrate()</a></span> to set the aim offset</li>
+<li><b>CALIBRATE</b>: Waits for a fire event, then calls <span class="tt"><a class="el" href="group__scope__input.html#ga5e28e1c68fdfa123dacdb209abdc478e" title="Calibrate aim from a center-screen shot.">scopeCalibrate()</a></span> to set the aim offset</li>
 <li><b>READY</b>: Reads <span class="tt"><a class="el" href="group__scope__input.html#gaa7b48b9a04fc0ba5acd4b9e955e0a52c" title="Get calibration-adjusted H position.">scopeGetX()</a></span>/<span class="tt"><a class="el" href="group__scope__input.html#gada83c7dddf8f6d0e76518fb7f9f0fcf1" title="Get calibration-adjusted V position.">scopeGetY()</a></span> on fire events and moves the red dot</li>
 </ul>
 <p>The <span class="tt">fire_armed</span> flag prevents the calibration fire from immediately re-triggering in the next state (debouncing).</p>
@@ -247,7 +247,7 @@ Under the Hood: The Build</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="modules-used-49"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-52"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-4"></a>

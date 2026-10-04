@@ -23,5 +23,5 @@ var tools =
     [ "palplan — project shared-palette planner", "tools_palplan.html", null ],
     [ "aseprite2snes — Aseprite animations → AnimClip tables", "tools_aseprite2snes.html", null ],
     [ "Your project's Makefile", "tools_build.html", null ],
-    [ "luna — command reference (pinned v1.30.2)", "tools_luna.html", null ]
+    [ "luna — command reference (pinned v1.32.0)", "tools_luna.html", null ]
 ];

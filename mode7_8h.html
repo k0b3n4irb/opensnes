@@ -152,10 +152,12 @@ Functions</h2></td></tr>
 <tr class="memdesc:aa09e1447cada89498932411fc81452fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Mode 7 rotation angle.  <br /></td></tr>
 <tr class="memitem:a2ebd44e45d6c3a6c754115fc750aa3f0" id="r_a2ebd44e45d6c3a6c754115fc750aa3f0"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ebd44e45d6c3a6c754115fc750aa3f0">mode7SetCenter</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y)</td></tr>
 <tr class="memdesc:a2ebd44e45d6c3a6c754115fc750aa3f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Mode 7 center point.  <br /></td></tr>
+<tr class="memitem:a0e44ac5fc77a39c643b06d55b00b768f" id="r_a0e44ac5fc77a39c643b06d55b00b768f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a0e44ac5fc77a39c643b06d55b00b768f">mode7SetExtBg</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> on)</td></tr>
+<tr class="memdesc:a0e44ac5fc77a39c643b06d55b00b768f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable/disable Mode 7 EXTBG (SETINI bit 6): a second, split layer.  <br /></td></tr>
 <tr class="memitem:a86be6a317594dfefb05d0786baecf98c" id="r_a86be6a317594dfefb05d0786baecf98c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a86be6a317594dfefb05d0786baecf98c">mode7SetMatrix</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="games_2breakout_2main_8c.html#afff0ae4fe505f5b27afed49e21dea41d">c</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> d)</td></tr>
 <tr class="memdesc:a86be6a317594dfefb05d0786baecf98c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Mode 7 matrix directly.  <br /></td></tr>
 <tr class="memitem:a37acc01b1081f2d4da881f270149cf66" id="r_a37acc01b1081f2d4da881f270149cf66"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a37acc01b1081f2d4da881f270149cf66">mode7SetPivot</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> x, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y)</td></tr>
-<tr class="memdesc:a37acc01b1081f2d4da881f270149cf66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pivot point (screen coordinates).  <br /></td></tr>
+<tr class="memdesc:a37acc01b1081f2d4da881f270149cf66"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter()</a> restricted to 0-255  <br /></td></tr>
 <tr class="memitem:a606b68a9ff05a4c930d30640277a4668" id="r_a606b68a9ff05a4c930d30640277a4668"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scale_x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> scale_y)</td></tr>
 <tr class="memdesc:a606b68a9ff05a4c930d30640277a4668"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Mode 7 scale factors.  <br /></td></tr>
 <tr class="memitem:a43ff7fa2834e9151b5c1d1bc3837c310" id="r_a43ff7fa2834e9151b5c1d1bc3837c310"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a43ff7fa2834e9151b5c1d1bc3837c310">mode7SetScroll</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y)</td></tr>
@@ -175,7 +177,7 @@ Usage</h2>
 <div class="line"><span class="comment">// Initialize Mode 7</span></div>
 <div class="line"><a class="code hl_function" href="#ab0ab87a9cdbf57823ba802fb068c5cbc">mode7Init</a>();</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Set scale (0x0100 = 1.0, 0x0080 = 0.5, 0x0200 = 2.0)</span></div>
+<div class="line"><span class="comment">// Set scale (0x0100 = 1:1, 0x0080 = magnified twice, 0x0200 = shrunk twice)</span></div>
 <div class="line"><a class="code hl_function" href="#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a>(0x0100, 0x0100);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Set rotation angle (0-255, where 256 = 360 degrees)</span></div>
@@ -300,15 +302,15 @@ Mode 7 VRAM Layout</h2>
 </div><div class="memdoc">
 
 <p>Initialize Mode 7. </p>
-<p>Sets up default scale (1.0), identity matrix, center point (128,128), and scroll position. Call this before using other Mode 7 functions.</p>
-<dl class="section note"><dt>Note</dt><dd>This does NOT set BGMODE to Mode 7. You must do that separately: <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0">REG_BGMODE</a> = <a class="code hl_define" href="group__reg__const.html#ga89d4f64610e55992ddf37d38f65614ab">BGMODE_MODE7</a>;</div>
+<p>Writes the identity matrix (A = D = $0100, 1:1), the center point (128,128), M7HOFS = 0 and M7VOFS = $17F (texel row $180 on the first line: the view starts in the middle of the 1024-texel plane, not at its top — call mode7SetScroll(0, 0) to see row 0 first), and the scale <a class="el" href="#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a> uses to 0x0100 (1:1). Call this before using other Mode 7 functions.</p>
+<dl class="section note"><dt>Note</dt><dd>This does NOT set BGMODE to Mode 7. You must do that separately: <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0">REG_BGMODE</a> = <a class="code hl_define" href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a>;</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga68fd672e1ea4124fbb5a895c2bc551e7">REG_M7SEL</a> = 0x00;  <span class="comment">// No flip, wrap around</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a>;   <span class="comment">// Enable BG1</span></div>
+<div class="ttc" id="agroup__bg__modes_html_gac2995da5a6139bd6ca1091ae3358d4f3"><div class="ttname"><a href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a></div><div class="ttdeci">#define BG_MODE7</div><div class="ttdef"><b>Definition</b> video.h:41</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga52a05d4fdd66feb5ae0d8bb0a8b291e0"><div class="ttname"><a href="group__ppu__regs.html#ga52a05d4fdd66feb5ae0d8bb0a8b291e0">REG_BGMODE</a></div><div class="ttdeci">#define REG_BGMODE</div><div class="ttdoc">BG mode and tile size (W).</div><div class="ttdef"><b>Definition</b> registers.h:64</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga68fd672e1ea4124fbb5a895c2bc551e7"><div class="ttname"><a href="group__ppu__regs.html#ga68fd672e1ea4124fbb5a895c2bc551e7">REG_M7SEL</a></div><div class="ttdeci">#define REG_M7SEL</div><div class="ttdoc">Mode 7 settings (W).</div><div class="ttdef"><b>Definition</b> registers.h:133</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W).</div><div class="ttdef"><b>Definition</b> registers.h:187</div></div>
-<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:445</div></div>
-<div class="ttc" id="agroup__reg__const_html_ga89d4f64610e55992ddf37d38f65614ab"><div class="ttname"><a href="group__reg__const.html#ga89d4f64610e55992ddf37d38f65614ab">BGMODE_MODE7</a></div><div class="ttdeci">#define BGMODE_MODE7</div><div class="ttdef"><b>Definition</b> registers.h:438</div></div>
+<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:455</div></div>
 </div><!-- fragment --> </dd></dl>
 
 </div>
@@ -368,8 +370,9 @@ Mode 7 VRAM Layout</h2>
 <p>This function:</p><ol type="1">
 <li>Looks up sin/cos from table</li>
 <li>Multiplies by current scale using hardware multiplier</li>
-<li>Writes the 4 matrix values (M7A, M7B, M7C, M7D) to PPU </li>
+<li>Writes the 4 matrix values (M7A, M7B, M7C, M7D) to PPU</li>
 </ol>
+<dl class="section warning"><dt>Warning</dt><dd>Call it during VBlank (right after <a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a>), as the examples do: the PPU multiplier it uses is M7A/M7B, which the Mode 7 renderer reads during active display, and the M7A write latch is shared with BG1HOFS/M7HOFS — an HDMA or interrupt write to those between the two M7A bytes corrupts the product (snesdev-wiki, "Multiplication"). The same holds for <a class="el" href="#a7faf52e08e105b3ad83b5c79c01603ef" title="Set rotation in degrees (0-359).">mode7Rotate()</a> and <a class="el" href="#a6063eb2e9a238110cd87ee75221fb9b4" title="Set rotation and scale together.">mode7Transform()</a>, which call it. </dd></dl>
 
 </div>
 </div>
@@ -393,7 +396,7 @@ Mode 7 VRAM Layout</h2>
 </div><div class="memdoc">
 
 <p>Set Mode 7 center point. </p>
-<p>Sets the center of rotation/scaling. Default is (128, 128).</p>
+<p>Sets the center of rotation/scaling, a point of the plane. Default is (128, 128). It shows on screen at (center - scroll): for a rotation around the middle of the screen, the center is (scrollX + 128, scrollY + 112).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>Center X coordinate (13-bit signed, -4096 to 4095) </td></tr>
@@ -402,6 +405,41 @@ Mode 7 VRAM Layout</h2>
   </dd>
 </dl>
 
+</div>
+</div>
+<a id="a0e44ac5fc77a39c643b06d55b00b768f" name="a0e44ac5fc77a39c643b06d55b00b768f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e44ac5fc77a39c643b06d55b00b768f">&#9670;&#160;</a></span>mode7SetExtBg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mode7SetExtBg </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>on</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable/disable Mode 7 EXTBG (SETINI bit 6): a second, split layer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">on</td><td>1 to enable, 0 to disable</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>With EXTBG on, BG2 shows the same Mode 7 plane as BG1 (same tilemap, same pixels, same transform), but reads each pixel's bit 7 as a priority bit and bits 0-6 as its colour (128 colours). Front to back, Mode 7 EXTBG draws: sprites of priority 3, sprites 2, BG2 pixels with bit 7 set, sprites 1, BG1, sprites 0, BG2 pixels with bit 7 clear (anomie's register doc, Mode 7; snesdev-wiki, Backgrounds). So a sprite of priority 1 passes in front of the bit-7-clear pixels and behind the bit-7-set ones: put BG2, not BG1, on the screen (BG1 would cover the low pixels), e.g. <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen</a>(<a class="el" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a> | <a class="el" href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a>)</span>. BG1 still reads all 8 bits, so a pixel 0x83 is colour 3 on BG2 and colour 131 on BG1. Direct colour does not apply to BG2.</p>
+<p>SETINI is write-only: this goes through the same software copy as <a class="el" href="video_8h.html#a12143ed10506b5feef9fc9fb5da18a3c" title="Enable/disable screen interlace (SETINI bit 0).">videoSetInterlace()</a>, <a class="el" href="video_8h.html#a8f0c88465ed48927d9f21656e404a96f" title="Enable/disable overscan (SETINI bit 2).">videoSetOverscan()</a> and <a class="el" href="video_8h.html#abe59765794ebd50fc54c7d2d6a9c4d73" title="Enable/disable pseudo-hires (SETINI bit 3).">videoSetPseudoHires()</a>, so it does not clear their bits.</p>
+<div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a>, 0);</div>
+<div class="line"><a class="code hl_function" href="#a0e44ac5fc77a39c643b06d55b00b768f">mode7SetExtBg</a>(1);</div>
+<div class="line"><a class="code hl_define" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a>(<a class="code hl_define" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a> | <a class="code hl_define" href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a>);</div>
+<div class="ttc" id="agroup__layer__enable_html_ga4491b560e6f9decf7efa9c0b23906ec2"><div class="ttname"><a href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a></div><div class="ttdeci">#define LAYER_BG2</div><div class="ttdef"><b>Definition</b> video.h:109</div></div>
+<div class="ttc" id="agroup__layer__enable_html_ga900967011f520c45c1cba018d929baa0"><div class="ttname"><a href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a></div><div class="ttdeci">#define LAYER_OBJ</div><div class="ttdef"><b>Definition</b> video.h:112</div></div>
+<div class="ttc" id="amode7_8h_html_a0e44ac5fc77a39c643b06d55b00b768f"><div class="ttname"><a href="#a0e44ac5fc77a39c643b06d55b00b768f">mode7SetExtBg</a></div><div class="ttdeci">void mode7SetExtBg(u8 on)</div><div class="ttdoc">Enable/disable Mode 7 EXTBG (SETINI bit 6): a second, split layer.</div></div>
+<div class="ttc" id="avideo_8h_html_a1f4198496c1cb892dbd9eb108bd6845d"><div class="ttname"><a href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d">setMainScreen</a></div><div class="ttdeci">#define setMainScreen(layers)</div><div class="ttdoc">Enable layers on the main screen.</div><div class="ttdef"><b>Definition</b> video.h:133</div></div>
+<div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 <a id="a86be6a317594dfefb05d0786baecf98c" name="a86be6a317594dfefb05d0786baecf98c"></a>
@@ -467,19 +505,9 @@ Mode 7 VRAM Layout</h2>
       </table>
 </div><div class="memdoc">
 
-<p>Set pivot point (screen coordinates). </p>
-<p>Sets the rotation center using screen coordinates (0-255). The pivot point is where the Mode 7 plane appears to rotate around.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>Screen X coordinate (0-255) </td></tr>
-    <tr><td class="paramname">y</td><td>Screen Y coordinate (0-223)</td></tr>
-  </table>
-  </dd>
-</dl>
-<div class="fragment"><div class="line"><a class="code hl_function" href="#a37acc01b1081f2d4da881f270149cf66">mode7SetPivot</a>(128, 112);  <span class="comment">// Center of screen</span></div>
-<div class="line"><a class="code hl_function" href="#a37acc01b1081f2d4da881f270149cf66">mode7SetPivot</a>(0, 0);      <span class="comment">// Top-left corner</span></div>
-<div class="ttc" id="amode7_8h_html_a37acc01b1081f2d4da881f270149cf66"><div class="ttname"><a href="#a37acc01b1081f2d4da881f270149cf66">mode7SetPivot</a></div><div class="ttdeci">void mode7SetPivot(u8 x, u8 y)</div><div class="ttdoc">Set pivot point (screen coordinates).</div></div>
-</div><!-- fragment --> 
+<p><a class="el" href="#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter()</a> restricted to 0-255 </p>
+<p>Writes the same two registers (M7X, M7Y) from two <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>. It was documented as taking screen coordinates and never did. </p>
+
 </div>
 </div>
 <a id="a606b68a9ff05a4c930d30640277a4668" name="a606b68a9ff05a4c930d30640277a4668"></a>
@@ -502,11 +530,12 @@ Mode 7 VRAM Layout</h2>
 </div><div class="memdoc">
 
 <p>Set Mode 7 scale factors. </p>
-<p>Sets the X and Y scale for Mode 7 transformation. Scale is in 8.8 fixed point format:</p><ul>
-<li>0x0100 = 1.0 (normal size)</li>
-<li>0x0080 = 0.5 (zoomed in / larger)</li>
-<li>0x0200 = 2.0 (zoomed out / smaller)</li>
+<p>Sets the X and Y scale for Mode 7 transformation, 8.8 fixed point (texels per screen pixel):</p><ul>
+<li>0x0100 = 1:1 (matrix A = D = $00FE: the sine table peaks at 127/128)</li>
+<li>0x0080 = magnified twice (the plane looks larger)</li>
+<li>0x0200 = shrunk twice (the plane looks smaller) Valid up to 0x3FFF.</li>
 </ul>
+<dl class="section warning"><dt>Warning</dt><dd>Changed in 0.48.0: before, <a class="el" href="#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a> wrote a matrix of half the scale, so 0x0200 was 1:1 and 0x0100 magnified twice. Code written for that halves its scales: 0x0200 becomes 0x0100.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">scale_x</td><td>Horizontal scale (8.8 fixed point) </td></tr>
@@ -599,13 +628,13 @@ Mode 7 VRAM Layout</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">degrees</td><td>Rotation angle in degrees (0-359) </td></tr>
-    <tr><td class="paramname">scalePercent</td><td>Scale as percentage (100 = normal, 50 = half, 200 = double)</td></tr>
+    <tr><td class="paramname">scalePercent</td><td>Scale as a percentage (100 = 1:1, 50 = magnified twice, 200 = shrunk twice; computed as percent x 2.5, so 100 is 0x00FA, within 3 % of 0x0100)</td></tr>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><a class="code hl_function" href="#a6063eb2e9a238110cd87ee75221fb9b4">mode7Transform</a>(45, 100);   <span class="comment">// 45 degree rotation, normal scale</span></div>
-<div class="line"><a class="code hl_function" href="#a6063eb2e9a238110cd87ee75221fb9b4">mode7Transform</a>(0, 50);     <span class="comment">// No rotation, 2x zoom in</span></div>
-<div class="line"><a class="code hl_function" href="#a6063eb2e9a238110cd87ee75221fb9b4">mode7Transform</a>(90, 200);   <span class="comment">// 90 degrees, 0.5x zoom out</span></div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="#a6063eb2e9a238110cd87ee75221fb9b4">mode7Transform</a>(45, 100);   <span class="comment">// 45 degree rotation, 1:1</span></div>
+<div class="line"><a class="code hl_function" href="#a6063eb2e9a238110cd87ee75221fb9b4">mode7Transform</a>(0, 50);     <span class="comment">// no rotation, magnified twice</span></div>
+<div class="line"><a class="code hl_function" href="#a6063eb2e9a238110cd87ee75221fb9b4">mode7Transform</a>(90, 200);   <span class="comment">// 90 degrees, shrunk twice</span></div>
 <div class="ttc" id="amode7_8h_html_a6063eb2e9a238110cd87ee75221fb9b4"><div class="ttname"><a href="#a6063eb2e9a238110cd87ee75221fb9b4">mode7Transform</a></div><div class="ttdeci">void mode7Transform(u16 degrees, u16 scalePercent)</div><div class="ttdoc">Set rotation and scale together.</div></div>
 </div><!-- fragment --> 
 </div>

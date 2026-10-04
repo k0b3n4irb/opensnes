@@ -150,7 +150,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Down  </td><td class="markdownTableBodyNone">Zoom in (magnify)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-37"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-41"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/rotate_scale</div>
@@ -168,14 +168,14 @@ How It Works</h2>
 2. Initialize the transformation</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a>, 0);</div>
 <div class="line"><a class="code hl_function" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc">mode7Init</a>();</div>
-<div class="line"><a class="code hl_function" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a>(0x0200, 0x0200);</div>
+<div class="line"><a class="code hl_function" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a>(0x0100, 0x0100);</div>
 <div class="line"><a class="code hl_function" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(0);</div>
 <div class="ttc" id="agroup__bg__modes_html_gac2995da5a6139bd6ca1091ae3358d4f3"><div class="ttname"><a href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a></div><div class="ttdeci">#define BG_MODE7</div><div class="ttdef"><b>Definition</b> video.h:41</div></div>
 <div class="ttc" id="amode7_8h_html_a606b68a9ff05a4c930d30640277a4668"><div class="ttname"><a href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a></div><div class="ttdeci">void mode7SetScale(u16 scale_x, u16 scale_y)</div><div class="ttdoc">Set Mode 7 scale factors.</div></div>
 <div class="ttc" id="amode7_8h_html_aa09e1447cada89498932411fc81452fe"><div class="ttname"><a href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a></div><div class="ttdeci">void mode7SetAngle(u8 angle)</div><div class="ttdoc">Set Mode 7 rotation angle.</div></div>
 <div class="ttc" id="amode7_8h_html_ab0ab87a9cdbf57823ba802fb068c5cbc"><div class="ttname"><a href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc">mode7Init</a></div><div class="ttdeci">void mode7Init(void)</div><div class="ttdoc">Initialize Mode 7.</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc" title="Initialize Mode 7.">mode7Init()</a></span> sets the rotation center to the screen center (128, 128). Scale <span class="tt">0x0200</span> = 2.0 in 8.8 fixed-point &ndash; this shows the map at a comfortable zoom level. Scale <span class="tt">0x0100</span> would be 1.0 (one texel per pixel).</p>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#ab0ab87a9cdbf57823ba802fb068c5cbc" title="Initialize Mode 7.">mode7Init()</a></span> sets the rotation center to the screen center (128, 128). Scale <span class="tt">0x0100</span> is 1:1 (one texel per pixel).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-update-the-matrix-every-frame"></a>
 3. Update the matrix every frame</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
@@ -189,13 +189,13 @@ How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md4-zoom-control"></a>
 4. Zoom control</h3>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
-<div class="line">    <span class="keywordflow">if</span> (zscale &lt; 0x0F00) zscale += 16;</div>
+<div class="line">    <span class="keywordflow">if</span> (zscale &lt; 0x0780) zscale += 8;</div>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a>(zscale, zscale);</div>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
-</div><!-- fragment --><p>After changing the scale, you must call <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> again because the matrix depends on both angle and scale. The scale range is clamped to <span class="tt">0x0010</span>-<span class="tt">0x0F00</span> &ndash; values outside this range produce extreme distortion.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-39"></a>
+</div><!-- fragment --><p>After changing the scale, you must call <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> again because the matrix depends on both angle and scale. The scale range is clamped to <span class="tt">0x0008</span>-<span class="tt">0x0780</span> &ndash; values outside this range produce extreme distortion.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-43"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="affine-transformation"></a>
 Affine Transformation</h3>
@@ -220,7 +220,7 @@ One Layer Only</h3>
 <p>Each Mode 7 tile uses 256 colors (8bpp), unlike Modes 0-3 which use 2/4/8 colors per palette. This gives richer visuals but limits you to 256 unique tiles total.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md88-fixed-point-scale"></a>
 8.8 Fixed-Point Scale</h3>
-<p><span class="tt">0x0100</span> = 1.0x (normal), <span class="tt">0x0200</span> = 2.0x (zoomed out, shows more area), <span class="tt">0x0080</span> = 0.5x (zoomed in, magnifies). The integer part is the high byte, the fractional part is the low byte.</p>
+<p><span class="tt">0x0100</span> = 1:1, <span class="tt">0x0200</span> = shrunk twice (shows more area), <span class="tt">0x0080</span> = magnified twice. The integer part is the high byte, the fractional part is the low byte.</p>
 <h2 class="doxsection"><a class="anchor" id="project-structure-13"></a>
 Project Structure</h2>
 <table class="markdownTable">
@@ -246,7 +246,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-60"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-64"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

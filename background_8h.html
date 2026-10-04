@@ -220,7 +220,7 @@ Overview</h2>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Fill with a specific tile entry (palette 2, tile 5)</span></div>
 <div class="line"><a class="code hl_define" href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a>(0x0400, 0x1005, 2048);</div>
-<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:223</div></div>
+<div class="ttc" id="abackground_8h_html_a3e0cf515ae8b6a6f7ce1895c6d12b9f4"><div class="ttname"><a href="#a3e0cf515ae8b6a6f7ce1895c6d12b9f4">bgClearTilemap</a></div><div class="ttdeci">#define bgClearTilemap(vramAddr, fillTile, sizeBytes)</div><div class="ttdoc">Fill a tilemap region in VRAM with a single tile entry.</div><div class="ttdef"><b>Definition</b> background.h:228</div></div>
 </div><!-- fragment --> 
 </div>
 </div>
@@ -484,7 +484,7 @@ Overview</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></td><td>Background number (0-3) </td></tr>
-    <tr><td class="paramname">vramAddr</td><td>VRAM word address (must be 1KB aligned, i.e., multiple of 0x400) </td></tr>
+    <tr><td class="paramname">vramAddr</td><td>VRAM word address, a multiple of 0x400 words (2 KB of VRAM): BGnSC holds the base in those units (until 2026-10-04 this line said "1KB aligned") </td></tr>
     <tr><td class="paramname">mapSize</td><td>Map size (BG_MAP_32x32, BG_MAP_64x32, BG_MAP_32x64, or BG_MAP_64x64)</td></tr>
   </table>
   </dd>
@@ -530,14 +530,15 @@ Overview</h2>
     <tr><td class="paramname"><a class="el" href="backgrounds_2mode1_2main_8c.html#aae76bd7ac29e708b5b93705779724dc0">bg</a></td><td>Background number (0-3 for BG1-BG4) </td></tr>
     <tr><td class="paramname">x</td><td>Horizontal scroll (0-1023) </td></tr>
     <tr><td class="paramname">y</td><td>Vertical scroll (0-1023): the tilemap pixel row shown on the first picture line. The lib writes y - 1 to BGnVOFS because the PPU never outputs scanline 0 (see KNOWN_LIMITATIONS, "Vertical scroll
-         is off by one"); code that writes BGnVOFS itself (HDMA tables) must apply the -1 on its own.</td></tr>
+         is off by one"); code that writes BGnVOFS itself (HDMA tables) must apply the -1 on its own. Exception: BG3 (bg = 2) in Modes 2, 4 and 6 is the offset-per-tile table, and its y is written raw — y / 8 is the table row the PPU reads first.</td></tr>
   </table>
   </dd>
 </dl>
 <div class="fragment"><div class="line"><span class="comment">// Scroll BG1 right by 10 pixels</span></div>
 <div class="line"><a class="code hl_function" href="#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, scrollX, 0);</div>
 <div class="ttc" id="abackground_8h_html_a9bf45b3dbc30dec36aeb592b58b120f4"><div class="ttname"><a href="#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a></div><div class="ttdeci">void bgSetScroll(u8 bg, u16 x, u16 y)</div><div class="ttdoc">Set background scroll position.</div></div>
-</div><!-- fragment --> 
+</div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
+
 </div>
 </div>
 <a id="a255b7012c710513afe464505ec420d3c" name="a255b7012c710513afe464505ec420d3c"></a>

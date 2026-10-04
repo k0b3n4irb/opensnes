@@ -366,7 +366,8 @@ Usage Example</h2>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>1 if any corner touches solid tile, 0 otherwise</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if any corner touches solid tile, 0 otherwise. A corner off the map to the left, the top or the right counts as solid (<a class="el" href="#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a>).</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The function does not know the map's height, so a rectangle whose bottom row lies past the last map row reads whatever follows the tilemap in ROM — usually a non-zero byte, so it reads as a wall, but nothing guarantees it. Keep <span class="tt">r-&gt;y + r-&gt;height - 1</span> inside the map, or add a solid last row to the collision map.</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRect.html">Rect</a> playerBox = { <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>, 16, 16 };</div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#ab6cf997e9029e9da5313a23059aecc6e">collideRectTile</a>(&amp;playerBox, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a302ff1b83f64306177e701ff28e81c89">collision_map</a>, 32)) {</div>
 <div class="line">    <span class="comment">// Player hit solid tiles</span></div>
@@ -416,7 +417,7 @@ Usage Example</h2>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Tile value at position (0 if empty/out of bounds)</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Tile value at position; 0 if empty. Off the map to the left, the top or the right (<span class="tt"><a class="el" href="backgrounds_2mode2_2main_8c.html#a74098e4602b8556df3349bc817680573">px</a> &lt; 0</span>, <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#ad2d4e104bf5a92d475b47d12bf7e4453">py</a> &lt; 0</span>, <span class="tt"><a class="el" href="backgrounds_2mode2_2main_8c.html#a74098e4602b8556df3349bc817680573">px</a> &gt;= mapWidth * 8</span>) the function returns 1, "off the map is a wall" (since the v1 fix that let sprites slip past the left wall; this line said 0 until 2026-10-04). The bottom edge is not bounded: it does not know the map's height, so keep <span class="tt"><a class="el" href="basics_2game__skeleton_2main_8c.html#ad2d4e104bf5a92d475b47d12bf7e4453">py</a></span> inside the map.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd><span class="tt"><a class="el" href="backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a></span> is <span class="tt">const</span> ON PURPOSE: const-qualified loads compile to bank-honouring far reads (#121), so the collision map may live in ANY bank — typically a multi-KB <span class="tt">.incbin</span> in a SUPERFREE section. With a non-const pointer the dereference is bank-$00-hardcoded and a map outside bank $00 reads garbage SILENTLY, which forced callers to waste RAM on their map.</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Check if player would hit ground</span></div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#a3d1308f57854050bc7d9b288aefcdc04">collideTile</a>(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> + 8, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> + 16, <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#a302ff1b83f64306177e701ff28e81c89">collision_map</a>, 32)) {</div>
@@ -468,11 +469,11 @@ Usage Example</h2>
     <tr><td class="paramname"><a class="el" href="basics_2game__skeleton_2main_8c.html#ad2d4e104bf5a92d475b47d12bf7e4453">py</a></td><td>Pixel Y coordinate </td></tr>
     <tr><td class="paramname"><a class="el" href="backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a></td><td>Pointer to collision tilemap </td></tr>
     <tr><td class="paramname">mapWidth</td><td>Width of tilemap in tiles </td></tr>
-    <tr><td class="paramname">tileSize</td><td>Size of tiles in pixels (must be power of 2: 8, 16, 32) </td></tr>
+    <tr><td class="paramname">tileSize</td><td>Size of tiles in pixels (must be power of 2: 8, 16, 32; anything else is treated as 8) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Tile value at position (0 if empty/out of bounds) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Tile value at position; 0 if empty. Off the map to the left, the top or the right the function returns 1, like <a class="el" href="#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a> (this line said 0 until 2026-10-05; the code has said 1 since the v1 fix). The bottom edge is not bounded. </dd></dl>
 
 </div>
 </div>

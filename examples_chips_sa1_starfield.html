@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_chips_sa1_starfield.html','',''); });
 <p>128 dots in Lissajous sine patterns computed by the SA-1 coprocessor </p>
 </blockquote>
 <p><img src="sa1_starfield.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="build--run-13"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-15"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/chips/sa1_starfield</div>
@@ -149,7 +149,7 @@ What to Observe</h2>
 <li>4 brightness levels create a subtle depth effect</li>
 <li>All math computed by the SA-1, from I-RAM: at boot it copies its loop and sine table there, so it does not share the ROM with the main CPU (~10.7 MHz; ~8.5 MHz when built with <span class="tt">make clean &amp;&amp; make SA1_CODE_IN=ROM</span> — see the SA-1 tutorial for the measurement)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-24"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-26"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

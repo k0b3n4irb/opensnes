@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>luna — command reference (pinned v1.30.2)</title>
+<title>luna — command reference (pinned v1.32.0)</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,7 +119,7 @@ $(function(){initNavTree('tools_luna.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">luna — command reference (pinned v1.30.2) </div></div>
+  <div class="headertitle"><div class="title">luna — command reference (pinned v1.32.0) </div></div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>luna is the cycle-accurate emulator every OpenSNES test runs on (<span class="tt">.claude/rules/testing.md</span>). The SDK pins one release in <span class="tt">tools/luna-test/luna.version</span>; <span class="tt">scripts/install-luna.sh</span> fetches it and <span class="tt">make tests</span> uses nothing else. This page is that release's own <span class="tt">--help</span>, one section per subcommand, so what you read here is what the pinned binary accepts — not a newer or older luna.</p>
@@ -133,7 +133,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line"> </div>
 <div class="line">Commands:</div>
 <div class="line">  run          Load a ROM, step the CPU N instructions, optionally dump a screenshot of the resulting PPU state</div>
-<div class="line">  test         Run manifest-driven homebrew tests (issue #181): one TOML per test (rom, input, run bound, asserts), executed in-process through `luna-api`. Exit 0 = all pass, 1 = assert failures, 2 = manifest/usage errors — the CI contract</div>
+<div class="line">  test         Run manifest-driven homebrew tests (issue #181): one TOML per test (rom, input, run bound, asserts), executed in-process through `luna-api`. Exit 0 = all pass, 1 = assert failures, 2 = manifest/usage errors — the CI contract. The machine is set per manifest, not by flags: `region = &quot;pal&quot;` (or `&quot;ntsc&quot;`) forces the video standard as `--force-region` does, `force_mapper` the mapper, `power_on` / `seed` the RAM the ROM boots on</div>
 <div class="line">  mcp          Serve the Luna MCP server on stdio</div>
 <div class="line">  state        Run the emulator through `luna-api` and emit a JSON state snapshot — the same data the MCP `state` tool returns</div>
 <div class="line">  frames       Capture a sequence of EXACTLY-consecutive PPU frames as PNGs in one run, via the same `luna-api` render path the GUI uses. Use this to diagnose *temporal* artefacts (flicker / double-buffer page-flip desync) that a single `state --screenshot` cannot show — it samples one frame, so a frame-to-frame &quot;blink&quot; is invisible to it. Each frame&#39;s PNG is tagged with its frame number and the INIDISP forced-blank flag, so you can see exactly what the GUI would (and would not) display</div>
@@ -206,7 +206,7 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-test"></a>
 <span class="tt">luna test</span></h2>
-<div class="fragment"><div class="line">Run manifest-driven homebrew tests (issue #181): one TOML per test (rom, input, run bound, asserts), executed in-process through `luna-api`. Exit 0 = all pass, 1 = assert failures, 2 = manifest/usage errors — the CI contract</div>
+<div class="fragment"><div class="line">Run manifest-driven homebrew tests (issue #181): one TOML per test (rom, input, run bound, asserts), executed in-process through `luna-api`. Exit 0 = all pass, 1 = assert failures, 2 = manifest/usage errors — the CI contract. The machine is set per manifest, not by flags: `region = &quot;pal&quot;` (or `&quot;ntsc&quot;`) forces the video standard as `--force-region` does, `force_mapper` the mapper, `power_on` / `seed` the RAM the ROM boots on</div>
 <div class="line"> </div>
 <div class="line">Usage: luna test [OPTIONS] [PATHS]...</div>
 <div class="line"> </div>
@@ -509,37 +509,69 @@ wram-trace</span> behind the WRAM oracle. The MCP server (<span class="tt">luna 
 <div class="line">  -h, --help                         Print help</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-diff"></a>
 <span class="tt">luna diff</span></h2>
-<div class="fragment"><div class="line">Compare two ROMs frame by frame (issue #225): run both in one process, hash the displayed frame at every PPU frame, and print MATCH / DIFF for each requested frame — MATCH when A&#39;s frame `F` equals B&#39;s frame at some `F ± tolerance` (the boot-length offset a codegen change can introduce). The &quot;compare at equal frame&quot; protocol that validates a compiler / library change. Exit 0 = all match, 1 = any DIFF, 2 = usage error</div>
+<div class="fragment"><div class="line">Compare two ROMs frame by frame (issue #225): run both in one process, hash the displayed frame at every PPU frame, and print MATCH / DIFF for each requested frame — MATCH when A&#39;s frame `F` equals B&#39;s frame at some `F ± tolerance` (the boot-length offset a codegen change can introduce). The &quot;compare at equal frame&quot; protocol that validates a compiler / library change. Exit 0 = all match, 1 = any DIFF, 2 = usage error.</div>
 <div class="line"> </div>
-<div class="line">Usage: luna diff [OPTIONS] --frames &lt;FRAMES&gt; &lt;ROM_A&gt; &lt;ROM_B&gt;</div>
+<div class="line">With `--audio`, the two ROMs&#39; sound is compared instead: both run to `--until-frame`, the output is cut into windows and each window&#39;s RMS level compared. MATCH when every window is within `--tolerance-pct` — the comparison that survives the same sound arriving a few samples earlier or later, which an audio hash does not.</div>
+<div class="line"> </div>
+<div class="line">Usage: luna diff [OPTIONS] &lt;ROM_A&gt; &lt;ROM_B&gt;</div>
 <div class="line"> </div>
 <div class="line">Arguments:</div>
-<div class="line">  &lt;ROM_A&gt;  The reference build</div>
-<div class="line">  &lt;ROM_B&gt;  The build under test</div>
+<div class="line">  &lt;ROM_A&gt;</div>
+<div class="line">          The reference build</div>
+<div class="line"> </div>
+<div class="line">  &lt;ROM_B&gt;</div>
+<div class="line">          The build under test</div>
 <div class="line"> </div>
 <div class="line">Options:</div>
 <div class="line">      --frames &lt;FRAMES&gt;</div>
 <div class="line">          PPU frames to compare, comma-separated (e.g. `200,400`)</div>
+<div class="line"> </div>
 <div class="line">      --tolerance &lt;TOLERANCE&gt;</div>
-<div class="line">          Accept a match up to this many frames away (`b = a ± n`) [default: 0]</div>
+<div class="line">          Accept a match up to this many frames away (`b = a ± n`)</div>
+<div class="line">          </div>
+<div class="line">          [default: 0]</div>
+<div class="line"> </div>
+<div class="line">      --audio</div>
+<div class="line">          Compare the audio output instead of the displayed frames</div>
+<div class="line"> </div>
+<div class="line">      --until-frame &lt;UNTIL_FRAME&gt;</div>
+<div class="line">          `--audio`: run both ROMs to this PPU frame</div>
+<div class="line"> </div>
+<div class="line">      --window-ms &lt;WINDOW_MS&gt;</div>
+<div class="line">          `--audio`: window length, in milliseconds of output [default: 500]</div>
+<div class="line"> </div>
+<div class="line">      --tolerance-pct &lt;TOLERANCE_PCT&gt;</div>
+<div class="line">          `--audio`: largest RMS difference a window may show, in percent of the louder of the two [default: 2]</div>
+<div class="line"> </div>
+<div class="line">      --silence &lt;SILENCE&gt;</div>
+<div class="line">          `--audio`: sample level counted as silence (0-32767). It is the threshold of the reported onset, and the floor a window&#39;s difference is measured against [default: 64]</div>
+<div class="line"> </div>
 <div class="line">      --input &lt;INPUT&gt;</div>
 <div class="line">          Scripted joypad-1 input applied to BOTH machines (`state --input` grammar)</div>
+<div class="line"> </div>
 <div class="line">      --screenshot-dir &lt;SCREENSHOT_DIR&gt;</div>
 <div class="line">          Write `frame_&lt;F&gt;_a.png` / `frame_&lt;F&gt;_b.png` here for every DIFF frame</div>
+<div class="line"> </div>
 <div class="line">      --out &lt;OUT&gt;</div>
 <div class="line">          Also write a JSON report (`-` = stdout after the text lines)</div>
+<div class="line"> </div>
 <div class="line">      --force-display</div>
 <div class="line">          Hash the frame with INIDISP forced-blank bypassed (as `run --force-display`)</div>
+<div class="line"> </div>
 <div class="line">      --native-res</div>
 <div class="line">          Hash the native 512×448 frame (issue #115)</div>
+<div class="line"> </div>
 <div class="line">      --force-mapper &lt;FORCE_MAPPER&gt;</div>
 <div class="line">          Force a cartridge mapper for both ROMs (lorom, hirom, exhirom, sa1, superfx)</div>
+<div class="line"> </div>
 <div class="line">      --force-region &lt;FORCE_REGION&gt;</div>
 <div class="line">          Force the video standard for both ROMs (ntsc, pal)</div>
+<div class="line"> </div>
 <div class="line">      --power-on &lt;POWER_ON&gt;</div>
 <div class="line">          Power-on RAM state for both machines (`zero`, `ones`, `random[=&lt;seed&gt;]` — issue #224)</div>
+<div class="line"> </div>
 <div class="line">  -h, --help</div>
-<div class="line">          Print help</div>
+<div class="line">          Print help (see a summary with &#39;-h&#39;)</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="luna-profile"></a>
 <span class="tt">luna profile</span></h2>
 <div class="fragment"><div class="line">Real master cycles per symbol (issue #227): every step credits its cycles — bus + internal cycles plus the DMA / HDMA / refresh stalls charged during it — to the instruction&#39;s address; the report folds those onto the nearest `.sym` label (or a 256-byte page without one), heaviest first. Replaces static instruction weights with what the machine paid</div>

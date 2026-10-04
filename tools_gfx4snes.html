@@ -133,7 +133,7 @@ What goes in, what comes out</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">.pic</span>  </td><td class="markdownTableBodyNone">tile graphics (2/4/8bpp bitplanes)  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / <span class="tt"><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span>  </td><td class="markdownTableBodyNone">palette, BGR555, 2 bytes/colour  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span>  </td><td class="markdownTableBodyNone">palette, BGR555, 2 bytes/colour  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span>  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span>  </td><td class="markdownTableBodyNone">16-bit tilemap entries (tile + flip + palette + priority)  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / the map engine  </td></tr>
 <tr class="markdownTableRowEven">
@@ -167,9 +167,9 @@ The flags you will actually use</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">-u N</span>  </td><td class="markdownTableBodyNone">colours per tile → bit depth (4 / 16 / 256)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-o N</span>  </td><td class="markdownTableBodyNone">how many colours to write to <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span> (e.g. <span class="tt">-o 16</span>)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">-o N</span>  </td><td class="markdownTableBodyNone">how many colours to write to <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> (e.g. <span class="tt">-o 16</span>)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-p</span>  </td><td class="markdownTableBodyNone">emit the palette <span class="tt">.<a class="el" href="chips_2sa1__starfield_2main_8c.html#a59527e9325cf39fb54f0fa5bc4f7d0bd">pal</a></span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">-p</span>  </td><td class="markdownTableBodyNone">emit the palette <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">-m</span>  </td><td class="markdownTableBodyNone">emit the tilemap <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> (backgrounds; <b>omit for sprites</b>)  </td></tr>
 <tr class="markdownTableRowOdd">

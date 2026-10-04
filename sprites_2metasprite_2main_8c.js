@@ -21,5 +21,9 @@ var sprites_2metasprite_2main_8c =
     [ "spritehero16_til", "sprites_2metasprite_2main_8c.html#a31447f39fe58257bd10616a4fe45f35d", null ],
     [ "spritehero32_pal", "sprites_2metasprite_2main_8c.html#aeaf8c79ab42cf83a6b899f58c55ac559", null ],
     [ "spritehero32_til", "sprites_2metasprite_2main_8c.html#a4a7f6eee3d43e9509a60fe80f1738130", null ],
-    [ "spritehero8_til", "sprites_2metasprite_2main_8c.html#a159bd91dc35ea86a3a0c8a842231a938", null ]
+    [ "spritehero8_til", "sprites_2metasprite_2main_8c.html#a159bd91dc35ea86a3a0c8a842231a938", null ],
+    [ "style16_large", "sprites_2metasprite_2main_8c.html#aea22f3b94eeddeade9de6bddf34da52e", null ],
+    [ "style16_small", "sprites_2metasprite_2main_8c.html#abbb21f906dafff6352aa5e2036a4290d", null ],
+    [ "style32_large", "sprites_2metasprite_2main_8c.html#a6f71460d838186091cd6d8be2254b978", null ],
+    [ "style8_small", "sprites_2metasprite_2main_8c.html#a6981664d98ec7549f0ea89dfbb639754", null ]
 ];

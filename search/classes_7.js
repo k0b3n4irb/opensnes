@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['oamdynamicconfig_0',['OamDynamicConfig',['../structOamDynamicConfig.html',1,'']]]
+  ['npc_0',['Npc',['../structNpc.html',1,'']]]
 ];

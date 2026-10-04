@@ -183,7 +183,7 @@ Variables</h2></td></tr>
 </ul>
 <p>ROM mode: LoROM (project default).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li>Altitude as Mode 7 scale: mode7SetScale(0x0100 + alt) then SetAngle (the scale feeds the matrix at SetAngle time)</li>
+<li>Altitude as Mode 7 scale: mode7SetScale(0x0080 + alt / 2) then SetAngle (the scale feeds the matrix at SetAngle time)</li>
 <li>The shadow depth cue: same sprite shape, dark palette, screen offset proportional to altitude</li>
 <li>Surface classes read through a banked-data ASM accessor (B2 — same pattern as mode7_racing)</li>
 <li>Fixed-point flight model: heading/speed/altitude in 8.8, the math module's shared 0-255 angle unit</li>
