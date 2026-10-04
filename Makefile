@@ -144,6 +144,7 @@ lint-cppcheck:
 # See devtools/check_asm_abi.py for the matching rules.
 lint-asm-abi:
 	@python3 devtools/check_asm_abi.py --quiet
+	@python3 devtools/check_asm_abi.py --quiet --source lib/contrib
 
 # VRAM base-alignment linter. BG/sprite VRAM bases are programmed through
 # registers that hold only the high address bits, so a misaligned base is

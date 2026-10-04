@@ -475,6 +475,9 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- build: `make lint-asm-abi` also checks `lib/contrib` (the object engine's
+  18 public functions were outside the ASM/C stack-offset gate; library
+  audit PF6). Green on first run.
 - build: `scripts/install-luna.sh` explains a missing binary. luna keeps the
   binaries of its five newest releases only (its rule since 2026-10-03), so
   a tag of this SDK older than v0.47.0 can no longer download the luna it
