@@ -513,6 +513,14 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): the fourteen self-animating examples that had a single
+  image capture point (`backgrounds/mode0`, `basics/fix32_orbit`,
+  `basics/timer`, the three Super FX and SA-1 demos, `color/pseudo_hires`,
+  `games/shmup_1942`, `games/tetris`, `mode7/extbg`,
+  `scrolling/mixed_scroll`, `sprites/aseprite_pipeline`,
+  `sprites/dynamic_sprite`, `text/scroll_message`) are captured at frames
+  200 and 400, so an animation that freezes after boot no longer passes
+  (testing audit T6).
 - build: `GSU_BANK=0` is refused (bank 0 holds the code and the header);
   `ROM_NAME` is checked — 21 printable ASCII characters at most, no `/`,
   `&` or `\` (a longer name was cut, UTF-8 went into the header, the sed

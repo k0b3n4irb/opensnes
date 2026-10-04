@@ -91,3 +91,48 @@ firmware = "dsp1b.rom"
 # subpixel column cannot blend away.
 [examples."backgrounds/mode5_hires"]
 native_res = true
+
+# Self-animating examples measured with a single capture point (testing
+# audit 2026-10-03, T6: fbhash differs at frames 200, 400 and 1200): a second
+# point so an animation that freezes after boot no longer passes (2026-10-04).
+[examples."backgrounds/mode0"]
+frames = [200, 400]
+
+[examples."basics/fix32_orbit"]
+frames = [200, 400]
+
+[examples."basics/timer"]
+frames = [200, 400]
+
+[examples."chips/superfx_3d"]
+frames = [200, 400]
+
+[examples."chips/sa1_starfield"]
+frames = [200, 400]
+
+[examples."chips/superfx_game_skeleton"]
+frames = [200, 400]
+
+[examples."color/pseudo_hires"]
+frames = [200, 400]
+
+[examples."games/shmup_1942"]
+frames = [200, 400]
+
+[examples."games/tetris"]
+frames = [200, 400]
+
+[examples."mode7/extbg"]
+frames = [200, 400]
+
+[examples."scrolling/mixed_scroll"]
+frames = [200, 400]
+
+[examples."sprites/aseprite_pipeline"]
+frames = [200, 400]
+
+[examples."sprites/dynamic_sprite"]
+frames = [200, 400]
+
+[examples."text/scroll_message"]
+frames = [200, 400]
