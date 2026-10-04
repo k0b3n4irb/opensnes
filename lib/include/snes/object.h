@@ -224,7 +224,9 @@ void objInitFunctions(u8 objtype, ObjInitFn initfct, ObjUpdateFn updfct, ObjUpda
  * @param objtype Object type (0-63)
  * @param x Initial X position in map pixels
  * @param y Initial Y position in map pixels
- * @return Object handle (0 if no space available). Also returned by objGetCurrentId().
+ * @return Object handle; 0 if no slot is free or if `type` is 64 or more
+ *         (`OB_TYPE_MAX`; such a type read past the type tables until
+ *         2026-10-04). Also returned by objGetCurrentId().
  *
  * @note After objNew, the new object data is copied to objWorkspace.
  *       Set width, height, and other fields on objWorkspace before returning

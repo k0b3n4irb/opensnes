@@ -190,6 +190,9 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`objNew()` refuses a type of 64 or more** (`OB_TYPE_MAX`) and
+  returns 0; such a type indexed past the type tables and called whatever
+  followed them. libtest `r_obj_type64` (library audit, row 24).
 - fix(lib): **`sramSave()` from a source in ROM bank $00.** The fast path
   took every bank-$00 pointer for the WRAM mirror and copied `$7E:xxxx`
   instead; a source at or above `$2000` (a const in the code bank, the

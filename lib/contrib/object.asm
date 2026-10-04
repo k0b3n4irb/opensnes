@@ -505,6 +505,8 @@ objNew:
 
     rep #$20
     and #$00ff
+    cmp #OB_TYPE_MAX                        ; 64 types: a larger id indexed past objtypes (until 2026-10-04)
+    bcs _oiN0
     asl a
     tay
 
