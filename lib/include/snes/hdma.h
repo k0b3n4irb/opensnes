@@ -65,6 +65,9 @@
  * @warning **Do NOT use HDMA_CHANNEL_7** — the NMI handler uses DMA channel 7
  *          for OAM transfers every frame, which destroys any HDMA setup on that
  *          channel. Safe HDMA channels: 1-6 (channel 0 is used by dmaCopyVram).
+ *          On a Super FX build, gsuSetupHdmaBlanking() takes **channel 1**
+ *          for its INIDISP letterbox while the bands are on (superfx.h);
+ *          pick 2-6 there.
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
  * ## Bank byte
@@ -614,6 +617,13 @@ void hdmaColorGradientStop(u8 channel);
  * them directly: the window module's own shadows do not see those writes,
  * so do not call windowEnable() / windowSetMainMask() for the same layers
  * until hdmaIrisWipeStop().
+ *
+ * @note Not cheap: the table is rebuilt from the circle on every call —
+ *       about 2.15 million master clocks for a radius of 80 (measured on
+ *       luna, library audit 2026-10-03), roughly six frames of CPU — and
+ *       the FIRST call also waits one VBlank before enabling the window
+ *       masking. Animate it every few frames, not every frame, and do not
+ *       call it from an NMI callback.
  */
 void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius);
 

@@ -190,6 +190,10 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs(lib): `hdma.h` says that `gsuSetupHdmaBlanking()` takes HDMA channel
+  1 on a Super FX build, and what `hdmaIrisWipe()` costs (about 2.15 M
+  master clocks for a radius of 80, plus one VBlank wait on the first
+  call) — library audit rows 31 and PF5.
 - docs(lib): header claims corrected after the library audit (D2, D3, D9,
   D11, D13). The colour-math 50 % example put BG2 on both screens and
   enabled math on BG2 (math applies to main-screen layers: BG1 main, BG2
