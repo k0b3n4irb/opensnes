@@ -306,7 +306,7 @@ a `BgAsset` yourself when the symbols do not follow the convention, or when
 the pointers are computed rather than linked.
 
 > `ASSET_SECTION` (`templates/assets.inc`, included in every assembled file)
-> is the way to declare asset data: `SEMISUPERFREE BANKS 7-1`, so bank $00
+> is the way to declare asset data: `SEMISUPERFREE BANKS` from the last bank down to 1 (`ASSET_BANKS`, `ROM_BANKS - 1` to 1 since 2026-09-24), so bank $00
 > is never a candidate. A bare `superfree` section lets the linker pick the
 > first bank that fits — bank $00 — which is how 14 examples ended up within
 > 28 bytes of a full code bank before the corpus moved over on 2026-09-23.

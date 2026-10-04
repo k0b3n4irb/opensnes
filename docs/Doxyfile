@@ -23,6 +23,8 @@ CREATE_SUBDIRS         = NO
 
 # Library headers (API reference) + guides + examples
 INPUT                  = mainpage.md \
+                         ../PHILOSOPHY.md \
+                         BENCHMARK.md \
                          ../lib/include/snes \
                          ../lib/include/snes.h \
                          tutorials/ \

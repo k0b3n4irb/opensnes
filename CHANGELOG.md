@@ -506,6 +506,13 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- docs: `PHILOSOPHY.md` and `docs/BENCHMARK.md` join the Doxygen site
+  (`ROADMAP.md` does not: its section labels and links to `compiler/*.md`
+  collide with Doxygen); two tutorials no longer quote `BANKS 7-1` for the
+  asset range (`ROM_BANKS - 1` down to 1 since 2026-09-24); CLAUDE.md
+  names the two validation pillars as `testing.md` does; the reviewer
+  agent no longer says `audio.asm` is skip-marked (documentation and
+  governance audits).
 - test(devtools): the Super FX fixture runs a fifth job through
   `gsuLaunch()` (the CPU parked in WRAM, 34 frames counted by the NMI blob)
   and presents the buffer with `gsuPresentInit()` / `gsuPresent()` /

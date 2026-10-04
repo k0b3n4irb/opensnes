@@ -75,7 +75,7 @@ ask. Precedents: `partners/luna/2026-09-20_to_luna_report.md`,
    need) — one line is enough: date, what was asked, what came back, what
    was needed. A sent report is renamed to its date. **Nobody validates
    it for us** — the owner has said so (2026-09-22: "je ne valide rien,
-   j'attends à ce que vous parliez entre vous"). Twenty engineers across
+   j'attends à ce que vous parliez entre vous"). The engineers of
    the three projects read these reports as engineers: every claim in one
    must have been re-checked the day it is sent, with the exact query,
    command or chunk id that lets them reproduce it, and a claim we cannot

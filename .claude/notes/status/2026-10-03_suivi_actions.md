@@ -72,7 +72,7 @@ day (summarised at the end of this note).
 | # | Criterion | State on 2026-10-03 |
 |---|---|---|
 | 1 | D1-D5 and associated decisions landed | **landed 2026-10-03** (`05e86951` to the metasprite commit); alias removal and `hdmaEnable(channel)` are the 1.0 release itself |
-| 2 | No open red except the PVSnesLib assets | held |
+| 2 | No open red except the PVSnesLib assets | **not held** (re-read 2026-10-04): the 09-26 reds are closed, but the 2026-10-03 audit opened new ones that only the owner can close — the Nintendo assets without attribution (F PF1), the three undated 1.0 gates (H PF14), a bus factor of 1 (H PF19); the one about deprecations without clang is closed (`6a583912`) |
 | 3 | Release zip built and tested by CI | done |
 | 4 | Drift sentinel covers function names cited in docs | done |
 | 5 | A console session filled rows 1 to 7 | open (owner, hardware) |
@@ -86,8 +86,9 @@ day (summarised at the end of this note).
 2. Owner session on D1-D5 and the three associated decisions, D4 first (the
    only row no alias can fix after the freeze); then one row per commit,
    and action 26.
-3. Release v0.48.0 on the owner's go: 17 entries on develop, one BREAKING,
-   two fixes of silent failures.
+3. Release v0.48.0 on the owner's go: everything under `CHANGELOG.md`
+   `[Unreleased]` (the count moves daily; the silent-defect fixes are in
+   `status/silent_defects_log.md`).
 4. Criterion 6: finish or bound the Super FX (action 34).
 5. Console session when the hardware is at hand.
 6. Then one large chantier, not several: the OpenSNES music engine
@@ -99,5 +100,7 @@ backlog (`chantiers/examples_reorg_by_usecase.md`, 15 examples), the
 compiler forks' upstreaming (catalogue A5: 86 QBE / 32 cproc / 4 wla-dx
 patches), streaming audio.
 
-CI on 2026-10-03: develop green at `75599363` (build, lint); weekly PAL,
-fuzz, nightly luna bench and the monthly MSYS2 diagnostic green.
+CI: develop green at `c7d58b8a` on 2026-10-04 (build, lint, sanitizers);
+the sanitizer job had been red from `c3952a1e` to `e1db1ab2` on the cproc
+suite ratchet. Weekly PAL, fuzz, nightly luna bench and the monthly MSYS2
+diagnostic green on 2026-10-03.

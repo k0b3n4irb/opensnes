@@ -113,7 +113,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 ## Auto-Loaded Rules
 
 The `.claude/rules/` directory contains mandatory rules automatically loaded by context:
-- `testing.md` — 3-pillar test workflow, change classification (A/B/C/D)
+- `testing.md` — 2-pillar validation (luna + full rebuild), change classification (A/B/C/D)
 - `commits.md` — Never add Co-Authored-By trailers
 - `compiler.md` — Compiler architecture, build, constraints
 - `templates.md` — Templates & build system, memory layout, linker order

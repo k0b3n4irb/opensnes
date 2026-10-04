@@ -530,7 +530,7 @@ depends on every type having one.
 The routine block-copied the table into its scratch buffer with the source
 bank forced to `$00`. The examples got away with it because their `.o16` data
 sat in a `SUPERFREE` section the linker happened to place in bank `$00` — an
-`ASSET_SECTION` table (banks 7-1 by design, see
+`ASSET_SECTION` table (the asset banks, `ROM_BANKS - 1` down to 1, by design, see
 `.claude/rules/bank0_budget.md`) would have loaded garbage instead. The DMA
 now takes the bank the caller pushed, so the table can live anywhere.
 
