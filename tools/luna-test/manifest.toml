@@ -16,8 +16,9 @@ default_frames = 200   # PPU frame of the capture (`luna --until-frame N`, ≈ 3
 # --- Examples that idle in a device-detect state under the VISUAL pillar's
 # plain-pad boot (no scripted device input at capture time), so their capture
 # is boot-screen-only. Their real functionality IS exercised by the functional
-# probes (probes/mouse.py, probes/superscope.py) since luna v1.1.0 models both
-# devices; input_dependent only annotates the coverage/visual pillars.
+# probes (manifests/mouse.toml, mouse_sensitivity.toml, superscope.toml, run by
+# `make test-manifests`) since luna models both devices; input_dependent only
+# annotates the coverage/visual pillars.
 [examples."input/mouse"]
 input_dependent = true
 

@@ -495,6 +495,12 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- ci: a push to `develop` keeps its CI verdict — `cancel-in-progress` now
+  applies to PR and branch runs only (37 of 78 develop runs between
+  09-27 and 10-03 were cancelled by the next push; testing audit PF2).
+  `wram_regress.py` says why a stream was skipped (no coprocessor firmware
+  vs cross-arch-fragile); `manifest.toml` points at the probe manifests
+  that exist (`mouse.toml`, `mouse_sensitivity.toml`, `superscope.toml`).
 - build: `make lint-asm-abi` also checks `lib/contrib` (the object engine's
   18 public functions were outside the ASM/C stack-offset gate; library
   audit PF6). Green on first run.

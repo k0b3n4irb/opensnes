@@ -176,7 +176,7 @@ def main() -> int:
         return 1
 
     manifest = load_manifest()
-    fails = updated = count = skipped = 0
+    fails = updated = count = skipped = skipped_fw = 0
     roms = discover_example_roms()
 
     # The wram-trace runs are independent: computed up front through the
@@ -201,7 +201,7 @@ def main() -> int:
         # is inert and the WRAM stream differs, so skip rather than mis-fail.
         fw = missing_firmware(key, manifest)
         if fw:
-            skipped += 1
+            skipped_fw += 1
             print(f"  SKIP  {label} (needs coprocessor firmware '{fw}')")
             continue
         # --update always refreshes the full set (incl. the fragile pair, so a
@@ -255,7 +255,8 @@ def main() -> int:
         print(f"\nwrote {BASELINE.relative_to(HERE.parent.parent)} ({updated} entries)")
     print(f"\nWRAM regression: {count - fails}/{count} ok"
           + (f", {fails} drift/err" if fails else "")
-          + (f", {skipped} skipped (cross-arch)" if skipped else ""))
+          + (f", {skipped_fw} skipped (no coprocessor firmware)" if skipped_fw else "")
+          + (f", {skipped} skipped (cross-arch-fragile)" if skipped else ""))
     return 1 if fails else 0
 
 
