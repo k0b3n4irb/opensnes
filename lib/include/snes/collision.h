@@ -151,7 +151,12 @@ u8 collideRectEx(const Rect *a, const Rect *b, s16 *overlapX, s16 *overlapY);
  * @param py Pixel Y coordinate
  * @param tilemap Pointer to collision tilemap (1 byte per tile, 0=empty, nonzero=solid)
  * @param mapWidth Width of tilemap in tiles
- * @return Tile value at position (0 if empty/out of bounds)
+ * @return Tile value at position; 0 if empty. Off the map to the left, the
+ *         top or the right (`px < 0`, `py < 0`, `px >= mapWidth * 8`) the
+ *         function returns 1, "off the map is a wall" (since the v1 fix that
+ *         let sprites slip past the left wall; this line said 0 until
+ *         2026-10-04). The bottom edge is not bounded: it does not know the
+ *         map's height, so keep `py` inside the map.
  *
  * @note `tilemap` is `const` ON PURPOSE: const-qualified loads compile
  *       to bank-honouring far reads (#121), so the collision map may

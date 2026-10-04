@@ -190,6 +190,10 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs(lib): `collideTile()` / `collideTileEx()` say that off the map to the
+  left, the top or the right they return 1, "off the map is a wall" (the
+  code since the v1 fix; the header said 0), and that the bottom edge is not
+  bounded (library audit D7, row 26).
 - fix(examples): **`games/mode7_flying` and `games/mode7_racing` showed
   wrong Mode 7 tiles.** Their 1024×1024 maps had 379 and 406 distinct 8×8
   tiles for a map that addresses 256, and gfx4snes wrapped the index modulo

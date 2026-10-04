@@ -61,6 +61,11 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-03 | `hdmaWaveStop` wrote HOFS = 0 over the layer's real scroll | library audit, code | `752742bf` |
 | 2026-10-03 | `UNFIX_ROUND(x)` overflowed its 16-bit sum from 127.5 | library audit, arithmetic | `1b4ede5a` |
 | 2026-10-03 | `gsuPresentInit` accepted buffers past the first 64 KB of a 128 KB board, which its 16-bit DMA source cannot reach | chips audit, code | `1b4ede5a` |
+| 2026-10-04 | `AUDIO_PAN_CENTER` (8) gave L = 7/15, R = 8/15 of the volume: the centre was not centred | library audit row 20, arithmetic | `a93a9301` |
+| 2026-10-04 | `sramSave` with a source in ROM bank $00 at or above `$2000` copied WRAM `$7E:xxxx` instead (fast path took every bank-0 pointer for the mirror) | library audit row 22, code; libtest `r_sram_rom0` (negative control: 0x00 before) | `fe43b4f7` |
+| 2026-10-04 | `objNew(type >= 64)` indexed past the type tables and returned a live handle | library audit row 24, code; libtest `r_obj_type64` (negative control: handle 0x0102 before) | `9a36bf8c` |
+| 2026-10-04 | gfx4snes: more than 1024 BG tiles carried into the palette bits; more than 256 Mode 7 tiles truncated to a byte; a sprite/font tile (no map) mixing two palette banks drew its odd pixels with the wrong colour — all converted without a word | build-tools audit S7/S8/S12, code; three refused fixtures (exit 0 before) | `a0d26613` |
+| 2026-10-04 | `mode7_flying` (379 distinct tiles, 123 entries wrapped) and `mode7_racing` (406, 150) for 256-tile Mode 7 maps: wrong tiles on screen since the examples' creation | found by the gfx4snes refusal at the corpus rebuild | `edd54f0f` |
 
 ## The hunting campaign
 
