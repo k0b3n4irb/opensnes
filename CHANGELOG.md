@@ -190,6 +190,11 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`sramSave()` from a source in ROM bank $00.** The fast path
+  took every bank-$00 pointer for the WRAM mirror and copied `$7E:xxxx`
+  instead; a source at or above `$2000` (a const in the code bank, the
+  header) is now read with its real bank. libtest `r_sram_rom0` saves four
+  bytes of the header's title (library audit, row 22).
 - fix(lib): **`AUDIO_PAN_CENTER` is an exact centre.** The crossfade weighed
   pan by `pan / 15` and `(15 - pan) / 15`, so position 8 gave L = 7/15 and
   R = 8/15 of the volume (59 / 67 for 127); the right weight now skips the

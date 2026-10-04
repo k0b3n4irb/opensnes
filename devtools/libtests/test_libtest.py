@@ -102,6 +102,8 @@ CASES = [
     # L2c: sram — bank $70 round trip, offsets, XOR checksum, clear
     ("r_sram_rt", 2, 16), ("r_sram_off", 2, 22), ("r_sram_off0", 2, 1),
     ("r_sram_ck", 2, 32), ("r_sram_ck0", 2, 0), ("r_sram_clear", 2, 0),
+    ("r_sram_rom0", 2, 0x4C),   # source in ROM bank $00 (header title) saved byte for byte
+    ("r_obj_type64", 2, 0),     # objNew refuses a type past OB_TYPE_MAX
     # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
     # the default handler after irqClear() acknowledges without counting
     ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),

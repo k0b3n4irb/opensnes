@@ -234,6 +234,7 @@ u8 load_buf2[8];
 u16 r_sram_rt;      /* bytes equal after sramSave/sramLoad(16)     -> 16 */
 u16 r_sram_off;     /* sramSaveOffset/LoadOffset(8 @ 0x100): [7]  -> 22 */
 u16 r_sram_off0;    /*                                       [0]  -> 1 */
+u16 r_sram_rom0;    /* sramSaveOffset from ROM bank $00 ($00:FFC0, the header title "LIB RUNTIME TEST"), read back: [0] -> 0x4C 'L' (the bank-0 fast path copied WRAM $7E:FFC0 until 2026-10-04) */
 u16 r_sram_ck;      /* sramChecksum(save_buf,16) = XOR(1,4,..,46) -> 32 */
 u16 r_sram_ck0;     /* sramChecksum(save_buf,0)                   -> 0 */
 u16 r_sram_clear;   /* OR of 16 bytes reloaded after sramClear(16) -> 0
@@ -283,6 +284,7 @@ extern u16 scope_holddelay;
 /* D4 (2026-10-03): objGetCurrentId() and objKillCurrent() replace the
  * exported globals objgetid and objtokill. */
 u16 r_obj_curid;    /* objGetCurrentId() == objNew()'s return      -> 1 */
+u16 r_obj_type64;   /* objNew(64, ..): type past OB_TYPE_MAX        -> 0 (a handle, indexing past the tables, until 2026-10-04) */
 u16 r_obj_selfkill; /* objGetPointer(h) after its update called
                      * objKillCurrent()                            -> 0 (stale) */
 u16 r_obj_kept;     /* a second object, same pass, no kill         -> non-zero */
@@ -914,6 +916,9 @@ static void part_collision_sram(void) {
         sramLoadOffset(load_buf2, 8, 0x100);
         r_sram_off  = load_buf2[7];
         r_sram_off0 = load_buf2[0];
+        sramSaveOffset((const u8 *)0xFFC0, 4, 0x300);   /* ROM bank $00: the header's title */
+        sramLoadOffset(load_buf2, 4, 0x300);
+        r_sram_rom0 = load_buf2[0];
         r_sram_ck  = sramChecksum(save_buf, 16);
         r_sram_ck0 = sramChecksum(save_buf, 0);
         sramClear(16);
@@ -977,6 +982,7 @@ static void part_objects_irq(void) {
         objInitFunctions(0, 0, 0, 0);
         doomed = objNew(2, 16, 16);
         r_obj_curid = (objGetCurrentId() == doomed && doomed != 0) ? 1 : 0;
+        r_obj_type64 = objNew(64, 0, 0);
         kept = objNew(0, 32, 16);
         objUpdateAll();
         r_obj_selfkill = objGetPointer(doomed);

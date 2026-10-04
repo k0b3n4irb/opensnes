@@ -126,9 +126,10 @@
     sep #$20
     .ACCU 8
     lda \1,s                    ; bank byte of the source pointer
-    beq @ssb_fast\@
+    beq @ssb_bank0\@
     cmp #$7E
     beq @ssb_fast\@
+@ssb_slow\@:
     sta.b DP_SRC+2              ; [DP_SRC] = 24-bit source
     rep #$20
     .ACCU 16
@@ -146,6 +147,14 @@
     cpy.b DP_SIZE
     bne @ssb_loop\@
     bra @ssb_done\@
+@ssb_bank0\@:
+    ; Bank $00 is the WRAM mirror only below $2000; above it the source is
+    ; ROM (a const in the code bank, the header) or MMIO, and `mvn $7E`
+    ; would have copied WRAM instead (library audit row 22, until
+    ; 2026-10-04). A = 0 is the right bank for the long-read path.
+    cpx #$2000
+    bcc @ssb_fast\@
+    bra @ssb_slow\@
 @ssb_fast\@:
     rep #$20
     .ACCU 16
