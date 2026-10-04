@@ -159,3 +159,27 @@ Le deuxième rapport de la passe math / puces / audio vient d'arriver. Il ajoute
 - Total : 31 écarts de code au lieu de 27, dont 13 orange au lieu de 12, en comptant l'orange probable de la ligne 28.
 - La ligne 3 de cette passe (`gsuSetupHdmaBlanking` avec `top = 0`) confirme la ligne 7 du tableau. Le second rapport ajoute que le pas de présentation est protégé (`superfx.asm:598-600`) et que seul `gsuDmaFullFrame` est exposé.
 - Ajouter une action 15 au tableau des améliorations : reproduire la course de `audioLoadSample` sur luna avec un échantillon de 513 octets, puis corriger. Le driver doit réarmer avant d'accuser réception, ou le CPU doit attendre un accusé distinct de l'écho. Sévérité 🟠, effort S.
+
+## Suivi 2026-10-05 (session)
+
+- **Ligne 24 (objets, bornes)** : `objNew(type ≥ 64)` était refusé depuis
+  le 10-04 ; les cinq fonctions qui prennent un index de slot
+  (`objCollidObj`, `objCollidMap`, `objCollidMap1D`,
+  `objCollidMapWithSlopes`, `objUpdateXY`) refusent maintenant un index
+  ≥ `OB_MAX` (80). Avant, l'index ×64 adressait l'état du moteur lui-même :
+  le `xvel` du slot 106 est `objunused` (tête de la liste libre),
+  `objCollidMap1D(106)` sous friction le mettait à zéro et le `objNew`
+  suivant redonnait le slot 0. Vecteur `r_obj_oob_idx` (rouge sur
+  l'ancien `object.asm`, 249/250). Le retour de `nID` de 255 à 1 est
+  inhérent à l'octet d'identifiant : documenté dans `object.h` (poignée
+  gardée plus de 255 créations à re-chercher).
+- **Ligne 26 (`collideRectTile`, borne basse)** : pas de borne ajoutée (la
+  fonction ne connaît pas la hauteur et l'API est gelée) ; l'en-tête le
+  dit maintenant, avec la parade (dernière rangée pleine). Au passage,
+  `collideTileEx` annonçait 0 hors carte alors que le code rend 1 depuis
+  le correctif v1 : l'en-tête corrigé.
+- **PF10 / rec 13 (écarts PVSnesLib)** : section « What does not exist »
+  dans `MIGRATING_FROM_PVSNESLIB.md`, à partir d'une comparaison nom par
+  nom des en-têtes PVSnesLib (`~/workspace/pvsneslib`) contre les nôtres :
+  renommages, refus assumés (`printf`, scores, pixels, `WaitNVBlank`,
+  compteur FPS), manques assumés (couleur unique de palette, `oamGetX/Y`).

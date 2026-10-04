@@ -104,6 +104,8 @@ CASES = [
     ("r_sram_ck", 2, 32), ("r_sram_ck0", 2, 0), ("r_sram_clear", 2, 0),
     ("r_sram_rom0", 2, 0x4C),   # source in ROM bank $00 (header title) saved byte for byte
     ("r_obj_type64", 2, 0),     # objNew refuses a type past OB_TYPE_MAX
+    ("r_obj_oob_cobj", 2, 0),   # a slot index past the pool: objCollidObj says no contact
+    ("r_obj_oob_idx", 2, 1),    # ...and objCollidMap1D/objUpdateXY on it left the free list alone
     # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
     # the default handler after irqClear() acknowledges without counting
     ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),

@@ -196,6 +196,21 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): the object engine's five slot-taking functions (`objCollidObj`,
+  `objCollidMap`, `objCollidMap1D`, `objCollidMapWithSlopes`, `objUpdateXY`)
+  return at once on a slot index of 80 or more (`OB_MAX`). Before, the
+  index was scaled by 64 and the routine worked on whatever lies past the
+  pool — the engine's own state: slot 106's `xvel` is the free-list head,
+  and `objCollidMap1D(106)` under friction zeroed it, after which `objNew`
+  handed out slot 0 again (library audit B l.24; libtest `r_obj_oob_idx`,
+  red on the previous code).
+- docs(lib): `collideTileEx()` documented a 0 return off the map while the
+  code has returned 1 (a wall) since the v1 fix, like `collideTile()`;
+  `collideRectTile()` now says its bottom edge is unbounded and what to do
+  about it; `object.h` says what an out-of-range index does and that the
+  handle's id byte wraps after 255 creations; `map.h` says that `mapLoad` copies 4096 bytes of
+  metatile definitions whatever the file holds (the tail of the buffer is
+  the ROM that follows a 126-byte `.t16`).
 - docs: `PHILOSOPHY.md` no longer puts a code span inside a quoted phrase
   (the doc-render job failed on it from the moment the page joined the
   Doxygen input, 2026-10-04); `make lint-cppcheck` skips the QBE backend

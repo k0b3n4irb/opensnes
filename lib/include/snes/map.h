@@ -141,7 +141,12 @@
  * before setScreenOn().
  *
  * @param layer1map  Address of map data (format: u16 width, u16 height, u16 pad, then tile indices)
- * @param layertiles Address of metatile definitions (4 tiles per metatile, max 512 metatiles)
+ * @param layertiles Address of metatile definitions (4 tiles per metatile, max 512 metatiles).
+ *                   The engine copies the full 4096 bytes (512 × 8) from this
+ *                   address whatever the file's size — a 126-byte `.t16` is
+ *                   followed in RAM by the ROM bytes that follow it. Entries
+ *                   past the last defined metatile are therefore garbage; a
+ *                   map must not reference them (tmx2snes never does).
  * @param tilesprop  Address of tile property data (collision types)
  *
  * @note Must be called during forced blank (screen off). The function

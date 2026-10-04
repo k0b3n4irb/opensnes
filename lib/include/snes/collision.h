@@ -184,8 +184,12 @@ u8 collideTile(s16 px, s16 py, const u8 *tilemap, u16 mapWidth);
  * @param py Pixel Y coordinate
  * @param tilemap Pointer to collision tilemap
  * @param mapWidth Width of tilemap in tiles
- * @param tileSize Size of tiles in pixels (must be power of 2: 8, 16, 32)
- * @return Tile value at position (0 if empty/out of bounds)
+ * @param tileSize Size of tiles in pixels (must be power of 2: 8, 16, 32;
+ *                 anything else is treated as 8)
+ * @return Tile value at position; 0 if empty. Off the map to the left, the
+ *         top or the right the function returns 1, like collideTile()
+ *         (this line said 0 until 2026-10-05; the code has said 1 since
+ *         the v1 fix). The bottom edge is not bounded.
  */
 u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize);
 
@@ -198,7 +202,15 @@ u8 collideTileEx(s16 px, s16 py, const u8 *tilemap, u16 mapWidth, u8 tileSize);
  * @param r Rectangle to test
  * @param tilemap Pointer to collision tilemap
  * @param mapWidth Width of tilemap in tiles
- * @return 1 if any corner touches solid tile, 0 otherwise
+ * @return 1 if any corner touches solid tile, 0 otherwise. A corner off
+ *         the map to the left, the top or the right counts as solid
+ *         (collideTile()).
+ *
+ * @note The function does not know the map's height, so a rectangle whose
+ *       bottom row lies past the last map row reads whatever follows the
+ *       tilemap in ROM — usually a non-zero byte, so it reads as a wall,
+ *       but nothing guarantees it. Keep `r->y + r->height - 1` inside the
+ *       map, or add a solid last row to the collision map.
  *
  * @code
  * Rect playerBox = { player_x, player_y, 16, 16 };

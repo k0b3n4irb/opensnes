@@ -362,7 +362,13 @@ void objCollidMap1D(u16 objindex);
  * objUpdateXY() work on a live slot and use the index only. Since 2026-09-21
  * they mask the id byte themselves, so a callback's @c idx and a handle both
  * work. Before that a handle's id byte was shifted into the buffer offset and
- * the routine silently worked on memory past the pool.
+ * the routine silently worked on memory past the pool. Since 2026-10-05 an
+ * index of 80 or more (`OB_MAX` slots) returns at once — 0 here, no change
+ * elsewhere; before, it addressed the engine's own state past the pool.
+ *
+ * The id byte counts 1..255 and wraps (0 is never used): a handle kept
+ * across 255 or more objNew() calls can match a reused slot and pass as
+ * live. Re-fetch handles you keep for long, or check the object's type.
  *
  * @param idx1 First object: slot index or handle
  * @param idx2 Second object: slot index or handle

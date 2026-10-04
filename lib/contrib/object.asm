@@ -1259,6 +1259,10 @@ objCollidMap:
     rep #$20
     lda 10,s                                ; get index (5+1+2+2)
     and #$00FF                              ; a handle works too: drop its id byte
+    cmp #OB_MAX                             ; 80 slots: a larger index addressed past the pool (until 2026-10-05)
+    bcc _oicmIn
+    jmp _oicmOut
+_oicmIn:
 
     ; --- Sync workspace → objbuffers before collision ---
     asl a
@@ -1780,6 +1784,7 @@ _oicmend:
     ldx objtmp2
     SYNC_TO_WORKSPACE
 
+_oicmOut:
     ply
     plx
     plb
@@ -1816,6 +1821,10 @@ objCollidMap1D:
     rep #$20
     lda 10,s                                ; get index (5+1+2+2)
     and #$00FF                              ; a handle works too: drop its id byte
+    cmp #OB_MAX                             ; 80 slots: a larger index addressed past the pool (until 2026-10-05)
+    bcc _oicm1dIn
+    jmp _oicm1dOut
+_oicm1dIn:
 
     ; --- Sync workspace → objbuffers ---
     asl a
@@ -2331,6 +2340,7 @@ _oicm1dfrdone:
     ldx objtmp2
     SYNC_TO_WORKSPACE
 
+_oicm1dOut:
     ply
     plx
     plb
@@ -2519,6 +2529,10 @@ objCollidObj:
     ; cproc L-to-R: idx2 (p2) SP+10, idx1 (p1) SP+12 — slot indexes (a handle is masked down to one)
     lda 10,s                                ; idx2 (param 2, closest)
     and #$00FF                              ; a handle works too: drop its id byte
+    cmp #OB_MAX                             ; 80 slots: a larger index addressed past the pool (until 2026-10-05)
+    bcc _oicoIn2
+    jmp _oicoend
+_oicoIn2:
     asl a
     asl a
     asl a
@@ -2534,6 +2548,10 @@ objCollidObj:
 
     lda 12,s                                ; idx1 (param 1, farthest)
     and #$00FF                              ; a handle works too: drop its id byte
+    cmp #OB_MAX                             ; 80 slots: a larger index addressed past the pool (until 2026-10-05)
+    bcc _oicoIn1
+    jmp _oicoend
+_oicoIn1:
     asl a
     asl a
     asl a
@@ -2637,6 +2655,10 @@ objUpdateXY:
     rep #$20
     lda 8,s                                 ; get index (5+1+2)
     and #$00FF                              ; a handle works too: drop its id byte
+    cmp #OB_MAX                             ; 80 slots: a larger index addressed past the pool (until 2026-10-05)
+    bcc _oicuxyIn
+    jmp _oicuxyOut
+_oicuxyIn:
 
     ; --- Sync workspace → objbuffers ---
     asl a
@@ -2697,6 +2719,7 @@ _oicuxyend:
     plx                                     ; restore byte offset
     SYNC_TO_WORKSPACE
 
+_oicuxyOut:
     plx
     plb
     plp
@@ -2935,6 +2958,10 @@ objCollidMapWithSlopes:
     ; --- Sync workspace → objbuffers ---
     lda 10,s                                ; get index
     and #$00FF                              ; a handle works too: drop its id byte
+    cmp #OB_MAX                             ; 80 slots: a larger index addressed past the pool (until 2026-10-05)
+    bcc _oicmsIn
+    jmp _oicmsOut
+_oicmsIn:
     asl a
     asl a
     asl a
@@ -3385,6 +3412,7 @@ _oicmsend:
     ldx objtmp2
     SYNC_TO_WORKSPACE
 
+_oicmsOut:
     ply
     plx
     plb

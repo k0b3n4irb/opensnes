@@ -285,6 +285,10 @@ extern u16 scope_holddelay;
  * exported globals objgetid and objtokill. */
 u16 r_obj_curid;    /* objGetCurrentId() == objNew()'s return      -> 1 */
 u16 r_obj_type64;   /* objNew(64, ..): type past OB_TYPE_MAX        -> 0 (a handle, indexing past the tables, until 2026-10-04) */
+u16 r_obj_oob_cobj; /* objCollidObj(106, 0): index past the pool    -> 0 */
+u16 r_obj_oob_idx;  /* objNew after objCollidMap1D(106)/objUpdateXY(106): the free list
+                       survived -> index 1 (slot 106's xvel IS objunused, the
+                       free-list head: friction zeroed it until 2026-10-05) */
 u16 r_obj_selfkill; /* objGetPointer(h) after its update called
                      * objKillCurrent()                            -> 0 (stale) */
 u16 r_obj_kept;     /* a second object, same pass, no kill         -> non-zero */
@@ -972,6 +976,23 @@ static void part_objects_irq(void) {
     objKillAll();
     r_obj_pool = 0;
     while (objNew(1, 16, 16) != 0) r_obj_pool++;
+
+    /* --- An index past the 80 slots (2026-10-05): the five slot-taking
+     * functions scaled it by 64 and worked on whatever lies past
+     * objbuffers. Slot 106 lands on the engine's own state: its xvel field
+     * is objunused (the free-list head) and its tilestand is objnextid, so
+     * objCollidMap1D(106) with friction wrote 0 over the free list and the
+     * next objNew handed out slot 0 again. Now the call returns at once. --- */
+    objInitEngine();
+    objInitFriction1D(0x0100);
+    objNew(0, 16, 16);
+    objCollidMap1D(106);
+    objUpdateXY(106);
+    objCollidMap(106);
+    objCollidMapWithSlopes(106);
+    r_obj_oob_cobj = objCollidObj(106, 0);
+    r_obj_oob_idx = objNew(0, 48, 16) & 0xFF;
+    objKillAll();
 
     /* --- D4: the accessors that replaced objgetid / objtokill. Type 2
      * kills itself in its update; type 0 here has no callback and stays. --- */
