@@ -119,7 +119,7 @@ u8 mosaicGetSize(void);
  * Example:
  * @code
  * mosaicSetSize(MOSAIC_MAX);
- * mosaicEnable(MOSAIC_BG_ALL);
+ * mosaicSetLayers(LAYER_BG1 | LAYER_BG2 | LAYER_BG3 | LAYER_BG4);
  * mosaicFadeIn(2);  // Reveal screen over ~30 frames
  * @endcode
  */
@@ -135,7 +135,7 @@ void mosaicFadeIn(u8 speed);
  *
  * Example:
  * @code
- * mosaicEnable(MOSAIC_BG_ALL);
+ * mosaicSetLayers(LAYER_BG1 | LAYER_BG2 | LAYER_BG3 | LAYER_BG4);
  * mosaicFadeOut(2);  // Pixelate screen over ~30 frames
  * loadNewLevel();
  * mosaicFadeIn(2);   // Reveal new content

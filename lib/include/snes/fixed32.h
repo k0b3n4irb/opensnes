@@ -261,7 +261,8 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
  * Lifted from the existing 8.8 `fixSin` LUT by shifting left 8 bits to
  * fill the upper half of the 16-bit fractional field. The lower 8 bits
  * are always zero (no precision gained beyond what the 8.8 LUT provides).
- * Costs: one LUT lookup + sign-extend + shift — about 30 cycles total.
+ * Cost: one LUT lookup, a sign-extend and a shift (the measured figure is
+ * in docs/PERF.md; "about 30 cycles" stood here until 2026-10-04).
  *
  * Precision: each LUT step is 1/256 ≈ 0.0039, so for fine animation
  * (sub-pixel motion over many frames) this is adequate. For high-

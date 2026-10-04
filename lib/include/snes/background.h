@@ -119,7 +119,9 @@ u16 bgGetScrollY(u8 bg);
  * and the map size (number of screens).
  *
  * @param bg Background number (0-3)
- * @param vramAddr VRAM word address (must be 1KB aligned, i.e., multiple of 0x400)
+ * @param vramAddr VRAM word address, a multiple of 0x400 words (2 KB of
+ *        VRAM): BGnSC holds the base in those units (until 2026-10-04 this
+ *        line said "1KB aligned")
  * @param mapSize Map size (BG_MAP_32x32, BG_MAP_64x32, BG_MAP_32x64, or BG_MAP_64x64)
  *
  * @code

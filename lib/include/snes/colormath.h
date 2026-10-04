@@ -25,11 +25,14 @@
  * ## Usage Example
  *
  * @code
- * // 50% transparent BG2 over BG1
- * REG_TM = TM_BG1 | TM_BG2;   // Both on main screen
- * REG_TS = TM_BG2;            // BG2 also on sub screen
+ * // 50% blend of BG2 over BG1: BG1 on the main screen, BG2 on the sub
+ * // screen, math enabled on the MAIN-screen layer (CGADSUB bits 0-5 name
+ * // main-screen layers — fullsnes; until 2026-10-04 this example put BG2
+ * // on both screens and enabled math on BG2, which blends BG2 with itself)
+ * REG_TM = TM_BG1;
+ * REG_TS = TM_BG2;
  *
- * colorMathSetLayers(LAYER_BG2);  // Apply math to BG2
+ * colorMathSetLayers(LAYER_BG1);  // Apply math where BG1 is drawn
  * colorMathSetOp(COLORMATH_ADD);   // Add mode
  * colorMathSetHalf(1);              // Divide by 2 = 50%
  * colorMathSetSource(COLORMATH_SRC_SUBSCREEN);  // Blend with sub screen
@@ -178,7 +181,11 @@ void colorMathSetOp(u8 op);
 /**
  * @brief Enable or disable half mode
  *
- * When enabled, the color math result is divided by 2.
+ * When enabled, the color math result is divided by 2 — except where the
+ * sub-screen pixel is transparent (the fixed colour stands in as the sub
+ * backdrop, without division) and when the main screen is forced black
+ * (CGWSEL): fullsnes, CGADSUB bit 6. A 50 % blend therefore shows full
+ * brightness wherever the sub screen has nothing to blend with.
  * This creates 50% transparency/blending.
  *
  * @param enable 1 = divide by 2, 0 = full result

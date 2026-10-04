@@ -730,9 +730,11 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
  * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.
  * These write directly to oamMemory[] without function call overhead.
  *
- * oamSet() has framesize=158 per call due to SSA temporaries. With >2-3
- * sprites/frame in the main loop, the stack manipulation causes visible
- * jitter. These macros eliminate that overhead entirely.
+ * oamSet() is a call with seven arguments pushed and a stack frame; for a
+ * handful of sprites updated every frame the macros below write the four
+ * OAM bytes in place. (A byte count of an earlier oamSet's frame and a
+ * "visible jitter" claim stood here until 2026-10-04; the cost is in
+ * docs/PERF.md, measured, not here.)
  *
  * Note: cc65816 does not truly inline 'static inline' functions — they
  * become separate SUPERFREE sections with global labels that conflict

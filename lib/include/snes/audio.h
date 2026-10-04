@@ -100,9 +100,13 @@
 #define AUDIO_PITCH_DEFAULT 0x1000
 
 /** @brief Common pitch values */
-#define AUDIO_PITCH_C3      0x085F  /**< Middle C (261.63 Hz) */
-#define AUDIO_PITCH_C4      0x10BE  /**< C4 (523.25 Hz) */
-#define AUDIO_PITCH_C5      0x217C  /**< C5 (1046.5 Hz) */
+/* Pitch is a ratio to the sample's own rate (0x1000 = 1.0); these three
+ * double per octave and assume a sample that plays just under middle C at
+ * 0x1000 (~250 Hz). Until 2026-10-04 the comments were one octave off
+ * their names (C3 called "Middle C"). */
+#define AUDIO_PITCH_C3      0x085F  /**< C3 (~130.8 Hz with such a sample) */
+#define AUDIO_PITCH_C4      0x10BE  /**< C4, middle C (~261.6 Hz) */
+#define AUDIO_PITCH_C5      0x217C  /**< C5 (~523.3 Hz) */
 
 /** @brief ADSR attack rates (0=4.1s, 15=instant) */
 #define AUDIO_ATTACK_INSTANT    15

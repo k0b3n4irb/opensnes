@@ -190,6 +190,19 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs(lib): header claims corrected after the library audit (D2, D3, D9,
+  D11, D13). The colour-math 50 % example put BG2 on both screens and
+  enabled math on BG2 (math applies to main-screen layers: BG1 main, BG2
+  sub, math on BG1); `colorMathSetHalf()` says where the halving is not
+  applied (transparent sub pixel, forced-black main — fullsnes CGADSUB);
+  `bgSetMapPtr()`'s base is a multiple of 0x400 **words** (2 KB), not
+  "1KB"; the scene `init` hook runs on every push, not once; the DMA
+  budget note replaces "2,200 CPU cycles" by the VBlank's ~49 000 master
+  clocks at 8 per byte; the mosaic examples use `mosaicSetLayers()`
+  instead of the deprecated call; the stale `oamSet` cost figure and the
+  fix32Sin cycle count give way to `docs/PERF.md`; the `AUDIO_PITCH_C3/4/5`
+  comments were one octave off their names; `DSP1_FIX_FROM_T` floors
+  rather than truncates.
 - docs(examples): six comments and README lines taught bugs that are fixed
   or never existed — the pre-A6 "hdmaSetup assumes bank $00" (window,
   parallax_scroll), "strings spill to bank 1 = garbage" (shmup_1942, ended

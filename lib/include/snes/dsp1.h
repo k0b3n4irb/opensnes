@@ -72,7 +72,9 @@ extern volatile s16 dsp1_o3;  /**< @see dsp1_o0 (4th word — dsp1SetCamera only
  */
 /** @brief SDK 8.8 `fixed` → DSP-1 T (1.15). Valid for −1.0 ≤ f < 1.0. */
 #define DSP1_T_FROM_FIX(f)   ((s16)((s16)(f) << 7))
-/** @brief DSP-1 T (1.15) → SDK 8.8 `fixed` (truncating). */
+/** @brief DSP-1 T (1.15) → SDK 8.8 `fixed`: an arithmetic shift, so it
+ *  rounds toward minus infinity (floor), not toward zero (the word
+ *  "truncating" stood here until 2026-10-04). */
 #define DSP1_FIX_FROM_T(t)   ((s16)((s16)(t) >> 7))
 /** @brief SDK 8-bit angle (256 = full turn) → DSP-1 A (2^16 = full turn). */
 #define DSP1_A_FROM_FIX8(a)  ((u16)((u16)(u8)(a) << 8))
