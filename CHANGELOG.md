@@ -190,6 +190,10 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs: `scrolling.md` no longer claims a scroll write "takes effect from
+  the next scanline" — the references hold no such sentence; it says what
+  HDMA relies on, a value written in HBlank is in force for the next line
+  (documentation audit PF11).
 - test(luna-test): the `backgrounds_mode4` and `backgrounds_mode6`
   manifests take their first delta from the booted scene (an empty
   checkpoint at frame 60), not from power-on RAM (testing audit T9).
