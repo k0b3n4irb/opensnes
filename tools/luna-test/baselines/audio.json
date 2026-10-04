@@ -23,9 +23,9 @@
       "peak": 21204
     },
     "audio/echo": {
-      "sha256": "04a9a11f3886f660b5875939dce377983c13bbb03de920063e99f84c454c4919",
+      "sha256": "354f56deb581f27d54135d69139a7da09337e1631c591fc0c3b2712ec2656769",
       "samples": 159936,
-      "peak": 11434
+      "peak": 10922
     },
     "audio/speech_synth": {
       "sha256": "91bdbf005ac0892a5ffaedcba39e4cf49e0c7d9032b6b7a63a271a7df68174a3",
@@ -43,9 +43,9 @@
       "peak": 20922
     },
     "audio/soundboard": {
-      "sha256": "544ad99e8876166e5e6a00873f534bebaf71a4704c5caa0840c44e2638b9bdf3",
+      "sha256": "f066c221bc4266c02a1b8ebb8d1f2da300ee69585f1b8cedec362c53daf6e867",
       "samples": 159936,
-      "peak": 9761
+      "peak": 9323
     },
     "audio/snesmod_sfx": {
       "sha256": "1943a1492c77668833a6037cae9ad12ca0296e4619fc1f9af08bb33f69ac39e2",
@@ -53,9 +53,9 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "d2d9aaa02d99ed7f1860b3c8a14b061ecb6ccb1381234e2f995a72711e033d39",
+      "sha256": "d3c78004404c528cfe2531657932962b7720aa636314863160627108bdb0b423",
       "samples": 159936,
-      "peak": 12764
+      "peak": 12192
     }
   }
 }

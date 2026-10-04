@@ -379,13 +379,19 @@ u16 audioGetFreeMemory(void) {
  * Playback
  *============================================================================*/
 
-/* pan 0..15 -> L/R 7-bit volumes, linear crossfade scaled by vol */
+/* pan 0..15 -> L/R 7-bit volumes, linear crossfade scaled by vol.
+ * 16 positions have no exact middle, so the right weight skips the 8/16
+ * step: pan 8 (AUDIO_PAN_CENTER) gives L = R = vol/2, 0 is hard left, 15
+ * hard right. Until 2026-10-04 the weights were pan/15 and (15-pan)/15,
+ * which put the centre at L = 7/15, R = 8/15 (59 / 67 for vol 127). */
 static void pan_to_lr(u8 vol, u8 pan, u8 *l, u8 *r) {
+    u16 w;
     if (pan > AUDIO_PAN_RIGHT) {
         pan = AUDIO_PAN_RIGHT;
     }
-    *l = (u8)(((u16)vol * (u16)(AUDIO_PAN_RIGHT - pan)) / AUDIO_PAN_RIGHT);
-    *r = (u8)(((u16)vol * (u16)pan) / AUDIO_PAN_RIGHT);
+    w = (pan <= AUDIO_PAN_CENTER) ? pan : (u16)pan + 1;   /* 0..16, 8 at centre */
+    *r = (u8)(((u16)vol * w) >> 4);
+    *l = (u8)(vol - *r);
 }
 
 u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {

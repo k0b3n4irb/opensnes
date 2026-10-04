@@ -190,6 +190,11 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(lib): **`AUDIO_PAN_CENTER` is an exact centre.** The crossfade weighed
+  pan by `pan / 15` and `(15 - pan) / 15`, so position 8 gave L = 7/15 and
+  R = 8/15 of the volume (59 / 67 for 127); the right weight now skips the
+  middle step of 16 (0 hard left, 8 half and half, 15 hard right), the
+  constants do not change (library audit, row 20).
 - docs(lib,examples): **the SNESMOD module volume is 0-255, not 0-127.**
   `snesmodSetModuleVolume()` passes the byte to the driver as is, which
   starts a module at 255; measured on luna (`luna diff --audio`,

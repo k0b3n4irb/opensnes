@@ -91,7 +91,7 @@
 #define AUDIO_VOL_MAX       127
 #define AUDIO_VOL_MIN       0
 
-/** @brief Pan positions (0-15 scale) */
+/** @brief Pan positions (0-15 scale; 8 is an exact centre, L = R = vol/2) */
 #define AUDIO_PAN_LEFT      0
 #define AUDIO_PAN_CENTER    8
 #define AUDIO_PAN_RIGHT     15
