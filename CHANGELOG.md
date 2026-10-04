@@ -538,6 +538,14 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(devtools): the fx fixture now arms a V-timer IRQ **before**
+  `snesmodInit` and counts it through ten frames of `snesmodProcess` (one
+  per frame, `r_irq_mod`), reads STAT78 right after the driver's call (the
+  counter-latch flag the Super Scope code takes for a shot stays clear,
+  `r_mod_latch`), and asserts NMITIMEN and VTIME on luna's view — the
+  irq + SNESMOD combination the testing audit found untested (T5). The
+  10-03 defects (`snesmodInit` dropping an armed timer, the driver's
+  `$2137` latch) would fail it.
 - test(luna-test): `luna_runner.py --coverage` fails an example whose ROM
   header does not cover the file (the `$FFD7` size byte below the ROM
   length) or whose checksum complement does not match, from the `rom`

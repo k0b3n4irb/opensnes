@@ -76,6 +76,7 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-04 | `objNew(type >= 64)` indexed past the type tables and returned a live handle | library audit row 24, code; libtest `r_obj_type64` (negative control: handle 0x0102 before) | `9a36bf8c` |
 | 2026-10-04 | gfx4snes: more than 1024 BG tiles carried into the palette bits; more than 256 Mode 7 tiles truncated to a byte; a sprite/font tile (no map) mixing two palette banks drew its odd pixels with the wrong colour — all converted without a word | build-tools audit S7/S8/S12, code; three refused fixtures (exit 0 before) | `a0d26613` |
 | 2026-10-04 | `mode7_flying` (379 distinct tiles, 123 entries wrapped) and `mode7_racing` (406, 150) for 256-tile Mode 7 maps: wrong tiles on screen since the examples' creation | found by the gfx4snes refusal at the corpus rebuild | `edd54f0f` |
+| 2026-10-05 | Object engine: a slot index of 80 or more (`OB_MAX`) given to `objCollidObj`, `objCollidMap`, `objCollidMap1D`, `objCollidMapWithSlopes` or `objUpdateXY` was scaled by 64 and addressed the engine's own state past the pool — slot 106's `xvel` is `objunused`, the free-list head, so `objCollidMap1D(106)` under friction zeroed it and the next `objNew` handed out slot 0 again | reading `object.asm` against the library audit (B l.24); pinned by the libtest vector `r_obj_oob_idx`, red on the previous `object.asm` | `47f40f7f` |
 
 ## The hunting campaign
 

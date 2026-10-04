@@ -11,6 +11,9 @@
  *   snesmod snesmodSetSoundTable, snesmodAllocateSoundRegion, snesmodFlush,
  *           snesmodGetPosition
  *   console consoleInitEx, nmiSet
+ *   combo   irq + SNESMOD: a V-timer IRQ armed before snesmodInit keeps
+ *           firing once per frame while snesmodProcess runs, and the
+ *           driver leaves STAT78's latch flag clear (testing audit T5)
  *
  * nmiSet takes the bank from the far pointer it is given, so the callback
  * may live in any bank (the header's "must be in bank 0" note is stale; the
@@ -45,6 +48,10 @@ u16 r_mod_pos;       /* snesmodGetPosition() as a u16: high byte clean  -> lt 0x
 u16 r_mod_flush;     /* spc_fread == spc_fwrite after snesmodFlush      -> 1 */
 u16 r_hdma_speed;    /* hdma_wave_speed after hdmaWaveSetSpeed(3)       -> 3 */
 extern u8 hdma_wave_speed;   /* the wave module's speed byte: internal, no public header declares it */
+u16 r_irq_mod;       /* V-timer IRQs over 10 frames of snesmodProcess   -> 10 */
+u16 r_mod_latch;     /* STAT78 & 0x40 right after snesmodProcess        -> 0 */
+volatile u16 irq_count;              /* counted by irqProbeHandler (irq.asm) */
+extern void irqProbeHandler(void);   /* irq.asm, bank 0 */
 u16 r_done;          /* reached the end                                 -> 0xBEEF */
 
 extern u8 spc_fread, spc_fwrite;
@@ -64,6 +71,16 @@ int main(void) {
 
     consoleInitEx(0);            /* the documented alias of consoleInit */
 
+    /* IRQ + SNESMOD (testing audit 2026-10-03, T5): the timer IRQ is armed
+     * BEFORE the driver boots. snesmodInit used to end on `lda #$81 / sta
+     * $4200` and drop an armed H/V timer (fixed 2026-10-03); the count below
+     * is taken once the module plays, so a dropped IRQ reads 0, not 10. */
+    irq_count = 0;
+    irqSet((void *)irqProbeHandler);
+    irqSetVTimer(120);
+    WaitForVBlank();
+    irqEnable(IRQ_VTIMER);
+
     /* SNESMOD first: boot the driver and start the module so the position
      * and the command queue mean something. */
     snesmodInit();
@@ -81,6 +98,18 @@ int main(void) {
     r_mod_flush = (spc_fread == spc_fwrite) ? 1 : 0;
     for (i = 0; i < 30; i++) { WaitForVBlank(); snesmodProcess(); }
     r_mod_pos = (u16)snesmodGetPosition();
+    /* Ten frames of the driver's per-frame work with the V-timer at line
+     * 120: one IRQ per frame, none lost to the driver's `$4200` writes or
+     * its scanline wait. Then the latch flag: until 2026-10-03 the wait
+     * latched the counters ($2137), which raised STAT78 bit 6 — the flag
+     * the Super Scope code takes for a shot (anomie-timing 626b31bd887c2581:
+     * set when latched, cleared on read; snesdev-wiki 6001605c7d4b1daf).
+     * The read here is the first since the previous frame's NMI. */
+    irq_count = 0;
+    for (i = 0; i < 10; i++) { WaitForVBlank(); snesmodProcess(); }
+    r_irq_mod = irq_count;
+    snesmodProcess();
+    r_mod_latch = REG_STAT78 & 0x40;
 
     /* nmiSet: five frames of callbacks, none after nmiClear */
     nmi_calls = 0;
