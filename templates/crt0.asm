@@ -2161,7 +2161,7 @@ tilemapFlush:
 ; the job does them. vblank_flag is not touched: the main thread is parked in
 ; gsuLaunch's WRAM loop, not in WaitForVBlank.
 ;==============================================================================
-.SECTION "ram_code.gsu_interrupts" BASE $7D APPENDTO ".ram_code"
+.SECTION "ram_code.gsu_interrupts" SLOT "ROM" BASE $7D APPENDTO ".ram_code"   ; the slot by name: the default slot 0 drew WLA's "SLOT number 0 / SLOT with starting address 0" warning (2026-10-04)
 gsu_nmi_blob:
     rep #$30
     .ACCU 16

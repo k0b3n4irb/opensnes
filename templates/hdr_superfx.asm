@@ -30,7 +30,7 @@
 .MEMORYMAP
     SLOTSIZE $8000          ; 32KB per slot (LoROM)
     DEFAULTSLOT 0
-    SLOT 0 $8000 $8000      ; ROM mapped at $8000-$FFFF (32KB)
+    SLOT 0 START $8000 SIZE $8000 NAME "ROM"   ; ROM mapped at $8000-$FFFF (32KB)
     SLOT 1 $0000 $2000      ; Work RAM at $0000-$1FFF (8KB for DP/Stack)
     SLOT 2 $2000 $E000      ; Work RAM at $2000-$FFFF (56KB)
     SLOT 3 $0000 $10000     ; Bank $7E full RAM (64KB)
@@ -55,7 +55,7 @@
 ; Star Fox has all $FF in the extended header area (= no extended header).
 ; snes9x may misdetect if this area contains non-$FF values.
 ;------------------------------------------------------------------------------
-.BANK 0 SLOT 0
+.BANK 0 SLOT "ROM"          ; by name: a bare 0 drew WLA's "SLOT number 0 / SLOT with starting address 0" warning on every Super FX link (2026-10-04)
 ; Extended header ($FFB0-$FFBF), recognised when the licensee code at $FFDA
 ; is $33 (snesdev-wiki "ROM header / Expanded cartridge header"; fullsnes
 ; "Extended Header"). A Super FX cart declares its Game Pak RAM HERE, at

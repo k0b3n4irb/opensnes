@@ -195,6 +195,21 @@ endif
 ifneq ($(words $(GSUSRC)),1)
 $(error GSU_BANK needs exactly one file in GSUSRC (got: $(GSUSRC)): one program is linked at $$$(GSU_BANK):8000 — .include the others from it)
 endif
+ifeq ($(GSU_BANK),0)
+$(error GSU_BANK=0 is not a program bank: bank 0 holds the code and the header; use 1..$(shell expr $(ROM_BANKS) - 1) (docs/tools/build.md))
+endif
+endif
+# ROM_NAME goes into the header as 21 ASCII bytes ($20-$7E) through sed:
+# a longer name was cut without a word, a non-ASCII one wrote UTF-8 into
+# the header, and `/` or `&` broke the sed (build-tools audit, 2026-10-04).
+ifneq ($(shell printf '%s' '$(ROM_NAME)' | LC_ALL=C grep -c '[^ -~]'),0)
+$(error ROM_NAME "$(ROM_NAME)" has a character outside printable ASCII ($$20-$$7E): the header holds 21 such bytes)
+endif
+ifneq ($(findstring /,$(ROM_NAME))$(findstring &,$(ROM_NAME))$(findstring \,$(ROM_NAME)),)
+$(error ROM_NAME "$(ROM_NAME)" contains / & or \, which the header substitution cannot carry)
+endif
+ifneq ($(shell n=$$(printf '%s' '$(ROM_NAME)' | LC_ALL=C wc -c); [ "$$n" -gt 21 ] && echo long),)
+$(error ROM_NAME "$(ROM_NAME)" is longer than the 21 characters of the header title)
 endif
 ifeq ($(USE_SRAM),1)
 ifeq ($(filter 1 2 3 4 5 6 7,$(SRAM_SIZE)),)
@@ -376,7 +391,12 @@ all: $(TARGET)
 #------------------------------------------------------------------------------
 
 ifneq ($(_HAS_SOUNDBANK),)
-$(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
+# One recipe, one target: with both .asm and .h as targets of one rule, a
+# parallel make ran smconv twice and the second run truncated the .bnk the
+# first assembly was reading (2026-10-04, libtests_fx under make tests).
+$(SOUNDBANK_OUT).h: $(SOUNDBANK_OUT).asm
+	@test -f $@ || { echo "soundbank: $@ missing after smconv" >&2; exit 1; }
+$(SOUNDBANK_OUT).asm: $(SOUNDBANK_SRC) .opensnes_config
 	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
 	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
 ifeq ($(USE_HIROM),1)
@@ -390,7 +410,7 @@ endif
 #------------------------------------------------------------------------------
 
 define GFX_RULE
-$(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1)
+$(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1) .opensnes_config
 	@echo "[GFX] $$< -> $$(notdir $$(basename $$<)).pic/.pal"
 	@$$(GFX4SNES) -s $$(SPRITE_SIZE) -p -i $$<
 endef
@@ -517,7 +537,7 @@ endif
 # ignored, and the old header shipped. The stamp holds every knob that
 # reaches the header, the assembler flags or the link; it is rewritten only
 # when that text changes, so a rebuild with the same knobs stays a no-op.
-_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) \
+_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) $(SPRITE_SIZE) \
   [$(ROM_NAME)] [$(ASFLAGS)] [$(CFLAGS)] [$(LIB_MODULES)] [$(LIBDIR)] \
   [$(USE_SNESMOD) $(SOUNDBANK_BANK)]
 .opensnes_config: FORCE

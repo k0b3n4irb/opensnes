@@ -506,6 +506,17 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- build: `GSU_BANK=0` is refused (bank 0 holds the code and the header);
+  `ROM_NAME` is checked — 21 printable ASCII characters at most, no `/`,
+  `&` or `\` (a longer name was cut, UTF-8 went into the header, the sed
+  broke); the graphics and soundbank conversions depend on the config
+  stamp, so a change of `SPRITE_SIZE` or `SOUNDBANK_BANK` regenerates
+  them; slot 0 of the LoROM memory map is named "ROM" and `GSU_SECTION`
+  uses the name — the WLA warning "SLOT number 0, but also a SLOT with
+  starting address 0" on every Super FX link is gone (build-tools audit
+  PF8, PF9, S14). The soundbank conversion has one target: with the `.asm`
+  and `.h` as two targets of one rule, a parallel make ran `smconv` twice
+  and the second run emptied the `.bnk` the first assembly was reading.
 - docs: `PHILOSOPHY.md` and `docs/BENCHMARK.md` join the Doxygen site
   (`ROADMAP.md` does not: its section labels and links to `compiler/*.md`
   collide with Doxygen); two tutorials no longer quote `BANKS 7-1` for the
