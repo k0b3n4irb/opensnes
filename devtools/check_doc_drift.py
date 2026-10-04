@@ -193,6 +193,7 @@ COUNT_PATTERNS = [
                re.IGNORECASE),
     re.compile(r"\bthrough\s+(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "path through N examples"
     re.compile(r"\b(\d{2,3})\s+example\s+ROMs?\b", re.IGNORECASE),
+    re.compile(r"\b(\d{2,3})\s+ROMs\s+organized\b", re.IGNORECASE),  # CLAUDE.md "89 ROMs organized by category"
     re.compile(r"\*\*(\d{2,3})\s+examples?\*\*", re.IGNORECASE),  # README bold table cell
     re.compile(r"\bAll\s+(\d{2,3})\s+examples?\b", re.IGNORECASE),
     re.compile(r"\ball\s+(\d{2,3})\s+examples\s+compile\s+cleanly\b", re.IGNORECASE),
@@ -210,6 +211,9 @@ COUNT_STALE_OK_GLOBS = ["CHANGELOG.md"]
 
 def _gather_active_doc_paths() -> list[Path]:
     paths: list[Path] = [repo_path("ROADMAP.md"), repo_path("README.md")]
+    # CLAUDE.md is what the agents read first (docs audit 2026-10-03, rec 8).
+    if repo_path("CLAUDE.md").is_file():
+        paths.append(repo_path("CLAUDE.md"))
     rules = repo_path(".claude/rules")
     if rules.is_dir():
         paths.extend(sorted(rules.glob("*.md")))
@@ -1070,6 +1074,49 @@ def bench_table_drifts(page: str, baseline: dict[str, int]) -> list[str]:
     return out
 
 
+# --------------------------------------------------------------------------
+# Check 15: the header -> tutorial map of docs/README.md (added 2026-10-05,
+# docs audit rec 8). The page said the table was "generated"; nothing checked
+# it. Every public header must have a row, every header a row names must
+# exist, and every tutorial a row links must exist.
+# --------------------------------------------------------------------------
+
+HEADER_MAP_DOC = "docs/README.md"
+HEADER_MAP_HEADING = "## Header → tutorial map"
+
+
+def check_header_map() -> list[str]:
+    drifts: list[str] = []
+    doc = repo_path(HEADER_MAP_DOC)
+    inc = repo_path("lib/include/snes")
+    if not doc.is_file() or not inc.is_dir():
+        return drifts
+    text = doc.read_text(encoding="utf-8")
+    if HEADER_MAP_HEADING not in text:
+        return [f"{HEADER_MAP_DOC}: the '{HEADER_MAP_HEADING}' section is gone — "
+                f"the sentinel (anchor 15) checks it; restore it or retire the check"]
+    section = text[text.index(HEADER_MAP_HEADING):]
+    rows = [l for l in section.splitlines() if l.startswith("| `")]
+    named: set[str] = set()
+    for line in rows:
+        lineno = text.count("\n", 0, text.index(line)) + 1
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        for h in re.findall(r"`([a-z0-9_]+\.h)`", cells[0]):
+            named.add(h)
+            if not (inc / h).is_file():
+                drifts.append(f"{HEADER_MAP_DOC}:{lineno}: the header map names "
+                              f"`{h}`, which is not in lib/include/snes/")
+        for link in re.findall(r"\]\(([^)#]+)\)", cells[1] if len(cells) > 1 else ""):
+            if not (doc.parent / link).is_file():
+                drifts.append(f"{HEADER_MAP_DOC}:{lineno}: the header map links "
+                              f"`{link}`, which does not exist")
+    for h in sorted(p.name for p in inc.glob("*.h")):
+        if h not in named:
+            drifts.append(f"{HEADER_MAP_DOC}: public header `{h}` has no row in the "
+                          f"header → tutorial map")
+    return drifts
+
+
 def check_benchmark_table() -> list[str]:
     import json
     page, base = repo_path(BENCH_PAGE), repo_path(BENCH_BASELINE)
@@ -1105,6 +1152,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_example_modules())
     all_drifts.extend(check_build_knobs())
     all_drifts.extend(check_benchmark_table())
+    all_drifts.extend(check_header_map())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

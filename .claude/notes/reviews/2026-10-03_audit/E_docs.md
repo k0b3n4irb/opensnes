@@ -111,3 +111,15 @@ Le compte exact est donc 45 noms retirés et 2 noms redéfinis (`hdmaEnable`, `h
 ## Verdict
 
 La documentation est exacte sur ce qu'elle vérifie, et elle en vérifie beaucoup (13 points d'ancrage, couverture d'API à 99 %, README complets, Doxygen strict vert). L'écart avec une 1.0 est l'accueil et la migration. Le parcours A promet « seulement make » alors qu'il faut Python, son premier contrôle échoue et `opensnes run` ne trouve pas luna. Le retrait des 45 noms et le changement de sens de `hdmaEnable` n'ont encore ni guide public ni signal pour qui compile sans clang. C'est l'essentiel du travail à faire avant la 1.0 : environ une semaine, pas un chantier de fond.
+
+## Suivi 2026-10-05 (session)
+
+- **Rec 8** : `check_header_map` (ancre 15) dans `check_doc_drift.py` —
+  chaque en-tête public a sa ligne, chaque en-tête et chaque tutoriel
+  nommés existent ; contrôle négatif (`animx.h` / `animatio.md`) → 3
+  dérives. La table était déjà cohérente ; sa phrase « generated » a été
+  remplacée par ce que le sentinel vérifie. `CLAUDE.md` entre dans les
+  fichiers du compte d'exemples (motif « N ROMs organized »).
+- **Jaune 8** (Doxygen) : `PHILOSOPHY.md` et `BENCHMARK.md` étaient entrés
+  le 10-04 ; `PHILOSOPHY.md` a tenu le job doc-render au rouge jusqu'au
+  10-05 (code dans une citation), corrigé.

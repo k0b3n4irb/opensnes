@@ -153,6 +153,52 @@ need output to the host rather than the screen.
 When a name is not in this table, search @ref api_index — it is organised by
 what you are trying to do rather than by module.
 
+### What does not exist
+
+Every PVSnesLib header was compared name by name against `lib/include/snes/`
+on 2026-10-05. Most absent names are renamings covered above or by the
+module tables below; the rest are listed here so that a port knows what it
+has to write itself, and whether that is a decision or a gap.
+
+| PVSnesLib | OpenSNES | Status |
+|---|---|---|
+| `consoleDrawText(x, y, "%d", v)`, `sprintf` | `textPrintAt`, `textPrintU16`, `textPrintHex` | **Decided.** No `printf` family in the library (PHILOSOPHY, non-goals); formatted output is three small printers |
+| `scoreAdd`, `scoreClear`, `scoreCmp`, `scoreCpy` (BCD score strings) | — | **Decided.** Game-side code; `examples/games/tetris` keeps its score in plain integers and prints it with `textPrintU16` |
+| `pixSetMode`, `pixSetPixel` (pixel plotting on a BG) | — | **Not provided.** No framebuffer on the 65816 side; the Super FX module draws bitmaps (`gsuPresent`) |
+| `WaitNVBlank(n)` | a loop over `WaitForVBlank()` | **Decided.** One primitive |
+| `getFPScounter`, `showFPScounter` | `profileGetLagFrames`, `getFrameCount` | **Decided.** The library counts, the game displays |
+| `consoleCopySram*`, `consoleLoadSram*` | `sramSave`, `sramLoad`, `*Offset`, `sramChecksum` | Renamed, module `sram` |
+| `consoleRegionIsOK` | `getRegion()`, `isPAL()` | Renamed; `make test-pal` runs the corpus under PAL |
+| `consoleUpdate` | `textFlush()` | Renamed: the text module uploads on request, the NMI does not scan |
+| `bgInitMapSet` | `bgSetMapPtr` + `dmaCopyVram` of the map | Split: VRAM address and upload are two steps |
+| `bgInitTileSetLz` | `lzssDecodeVram` + `bgSetGfxPtr` | Split |
+| `bgInitMapTileSet7`, `setMode7*`, `dmaCopyVram7` | module `mode7`: `mode7Init`, `mode7Rotate`, `mode7SetScale`, `mode7Transform`, `mode7SetScroll` | Renamed, own module |
+| `bgSetEnable`, `bgSetDisable`, `*Sub` | `setMainScreen(mask)`, `setSubScreen(mask)` | One call per screen instead of one per layer |
+| `bgSetWindowsRegions`, `COLWIN_*`, `MSWIN_*` | module `window` | Own module |
+| `setModeHdma*` (gradient, shading, waves, window) | module `hdma`: `hdmaGradient`, `hdmaColorGradient`, `hdmaBrightnessGradient`, `hdmaWaveH`, `hdmaWindowShape`, `hdmaIrisWipe` | Own module; each helper takes a channel |
+| `setParallaxScrolling` | `hdmaParallax` | Renamed |
+| `setFadeEffect`, `setFadeEffectEx` | `fadeIn`, `fadeOut`, `setBrightness` | Renamed |
+| `setColorEffect`, `setColorIntensity` | module `colormath`: `colorMathInit`, `colorMathTint`, `colorMathShadow`, `colorMathSetFixedColor` | Own module |
+| `setMosaicEffect` | module `mosaic`: `mosaicSetSize`, `mosaicFadeIn`, `mosaicFadeOut` | Own module |
+| `setPalette`, `setPaletteColor`, `getPalette*` | `dmaCopyCGram` for a block; a single colour is two writes to `REG_CGADD` / `REG_CGDATA` in VBlank | **Gap, assumed.** No single-colour helper |
+| `dmaClearVram`, `dmaFillVram8/16` | `dmaClearVRAM`, `dmaFillVRAM` | Renamed |
+| `dmaCopyOAram` | `oamUpdate()` (the NMI uploads the shadow) | The OAM upload is the sprite module's, not a DMA call |
+| `dmaCopySpr16Vram`, `dmaCopySpr32Vram` | `oamInitGfxSet` | One call for the sprite sheet |
+| `oamMetaDraw8/16/32`, `oamFix8/16/32Draw` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | One call; the size is a field of the `MetaspriteStyle` |
+| `oamMetaDrawDyn8/16/32`, `oamDynamicMetaDraw`, `oamInitDynamicSprite*` | module `sprite_dynamic`: `oamDynamicInit`, `oamDynamicDraw`, `oamMetaDrawDyn`, `oamDynamicSetSize` | Own module |
+| `oamSetEx`, `oamSetAttr`, `oamFlip`, `oamSetGfxOffset` | `oamSetSize`, `oamHide`, `oamSetTile`, `oamSetXY`, the `flags` argument of `oamSet` | Split by concern |
+| `oamGetX`, `oamGetY` | — | **Gap, assumed.** Keep your own coordinates; the OAM shadow is write-only from C |
+| `padsCurrent/Down/Up/Clear` | `padHeld`, `padPressed`, `padReleased` | Renamed |
+| `detectMouse`, `initMouse`, `mouseCycleSensitivity*` | `mouseInit`, `mouseIsConnected`, `mouseSetSensitivity` | Renamed |
+| `detectSuperScope` | `scopeInit`, `scopeIsConnected` | Renamed |
+| `detectMPlay5` | `padIsConnected(2..4)` | Renamed |
+| `spcPlaySound`, `spcPlaySoundV`, `spcLoadEffect`, `spcEffect`, `spcSetSound*` | `snesmodLoadEffect`, `snesmodPlayEffect` | Renamed; the sound table API is `snesmodSetSoundTable` |
+| `spcGetMusicPosition`, `spcFadeModuleVolume`, `spcPauseMusic`, `spcResumeMusic`, `spcStop`, `spcSetModuleVolume`, `spcSetBank` | the `snesmod*` names of the same words (`snesmodGetPosition`, `snesmodFadeVolume`, `snesmodPause`, `snesmodResume`, `snesmodStop`, `snesmodSetModuleVolume`, `snesmodSetSoundbank`) | Renamed |
+| `REG_*` aliases (`REG_A1B0`, `REG_APU00`, `REG_VMADDLH`, ...) | `snes/registers.h`: one name per register, the official mnemonics | Renamed |
+
+"Decided" means the library will not grow the function; "assumed" means it
+could, nobody asked yet — open an issue with the game that needs it.
+
 ## Step 5 — assets
 
 The converters take the same shapes of input and, for graphics, the same flags

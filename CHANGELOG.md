@@ -538,6 +538,16 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- docs: `MIGRATING_FROM_PVSNESLIB.md` gains "What does not exist": every
+  PVSnesLib header compared name by name against ours, the absent names
+  sorted into renamed, decided against (`printf`, scores, pixel plotting,
+  `WaitNVBlank`, the FPS counter) and assumed gaps (a single-colour palette
+  write, `oamGetX/Y`) (library audit rec 13).
+- docs(devtools): the doc sentinel checks the header → tutorial map of
+  `docs/README.md` (anchor 15: every public header has a row, every header
+  and tutorial named exists; the page called the table "generated" while
+  nothing produced it) and reads `CLAUDE.md` for the examples count
+  (docs audit rec 8).
 - test(luna-test): `make test-manifests` replays the SNESMOD stop, pause
   and fade manifests at sixteen press phases (`phase_sweep.py`, every input
   checkpoint and the asserted frame shifted by 0..15 frames). The key-off
