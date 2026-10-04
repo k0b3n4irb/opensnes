@@ -129,3 +129,20 @@ Le système de build a fermé en une semaine presque tout ce que l'audit du 26/0
   `docs/tools/build.md` ; `SRAM_SIZE` ne s'applique pas au SA-1, la page le
   dit.
 
+
+## Suivi 2026-10-05 (session)
+
+- **Rec 5 (test d'en-tête)** : la passe `luna_runner.py --coverage` échoue
+  un exemple dont l'octet de taille `$FFD7` ne couvre pas le fichier ou
+  dont le complément de somme ne correspond pas, à partir du bloc `rom`
+  que `luna state` renvoie déjà (zéro coût : pas de lecture
+  supplémentaire). Contrôles : un dict forgé (128 Ko / 262 144 octets) et
+  une copie de `print_string.sfc` avec `$FFD7 = $07` sont refusés ; le
+  corpus (89 + les fixtures) passe. La somme elle-même n'est pas
+  recalculée : c'est à luna (`checksum_valid` ne compare que
+  somme ⊕ complément — mesuré, un octet inversé en `$0100` reste
+  « valide »), ligne ajoutée à `OPEN_luna.md` avec la commande. « Aucun
+  symbole dans une banque non-ROM » reste à faire dans `symmap.py`.
+- **Rec 8 (lignes partenaires)** : luna, `checksum_valid` ci-dessus ;
+  snes-rag, la carte mémoire SA-1 était déjà dans `OPEN_snes-rag.md`
+  depuis le 10-04.

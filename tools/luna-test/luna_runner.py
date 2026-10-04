@@ -203,6 +203,27 @@ def liveness(state: dict) -> tuple[bool, str]:
     return True, f"live ({frames}f/{nmis}nmi)"
 
 
+def header_problem(state: dict) -> str:
+    """The ROM header as luna read it: the size byte must cover the file and
+    the checksum complement must match (build audit 2026-10-03, rec 5).
+
+    A size byte below the file makes a flash cart or an emulator map only
+    part of the ROM; wlalink derives both from `.ROMBANKS`, so a mismatch
+    means the memory map and the header disagree. luna's `checksum_valid`
+    only checks checksum XOR complement == 0xFFFF, not the sum of the bytes
+    (measured 2026-10-05: a flipped byte at $0100 stays `true`), so this is
+    a consistency check, not proof the sum is right — OPEN_luna.md."""
+    rom = state.get("rom") or {}
+    size_kb = rom.get("header_rom_size_kb")
+    nbytes = rom.get("rom_bytes")
+    if size_kb is not None and nbytes is not None and size_kb * 1024 < nbytes:
+        return f"header: ROM size byte says {size_kb} KB, the file is {nbytes} bytes"
+    if rom.get("checksum_valid") is False:
+        return (f"header: checksum {rom.get('checksum'):#06x} and complement "
+                f"{rom.get('checksum_complement'):#06x} do not match")
+    return ""
+
+
 def discover_example_roms() -> list[Path]:
     """Canonical corpus = one ROM per example *that has a main.c* (N_corpus=56).
 
@@ -430,6 +451,9 @@ def coverage(luna: str) -> int:
             state = render_state(luna, rom, frame, png, extra=res_args(key, manifest))
         except Exception as e:  # noqa: BLE001 — bench-style panic-safety
             return key, "FAIL", str(e)[:80]
+        bad = header_problem(state)
+        if bad:
+            return key, "FAIL", bad
         live, why = liveness(state)
         if not live:
             return key, "DEAD", why
@@ -458,7 +482,8 @@ def coverage(luna: str) -> int:
         "a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input "
         "(Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a "
         "clean functional pass. **DEAD** = ran but not live (crash/hang). "
-        "**FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM "
+        "**FAIL** = luna errored, or the ROM header's size byte does not cover "
+        "the file or its checksum complement does not match. PNGs: `/tmp/luna-test-corpus/`. (In-ROM "
         "`SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)",
         "",
         "| Example | Status | Detail |",

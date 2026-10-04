@@ -538,6 +538,12 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): `luna_runner.py --coverage` fails an example whose ROM
+  header does not cover the file (the `$FFD7` size byte below the ROM
+  length) or whose checksum complement does not match, from the `rom`
+  block luna already returns (build audit rec 5). luna's `checksum_valid`
+  does not re-sum the ROM (a flipped byte stays valid — `OPEN_luna.md`,
+  2026-10-05), so the sum itself is not yet proven.
 - tools: `opensnes doctor` checks every binary the examples may call
   (`wla-superfx`, `wla-spc700`, `sa1_patch`, `wav2brr`, `font2snes`,
   `tmx2snes` joined the list) and says whether clang is there for the
