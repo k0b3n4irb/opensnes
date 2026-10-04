@@ -61,7 +61,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain hooks lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -108,6 +108,14 @@ RANGE ?= origin/develop..HEAD
 lint-commits:
 	@python3 devtools/lint_commits.py $(RANGE)
 
+# Git hooks that run the commit lint before a commit exists and before a
+# push leaves (scripts/githooks/). Opt-in: a clone has no hooks until this
+# runs once. Two non-conforming subjects reached develop in two days
+# (756da353, 0d30ec65) with the lint only in CI, after the push.
+hooks:
+	@git config core.hooksPath scripts/githooks
+	@echo "hooks: core.hooksPath = scripts/githooks (commit-msg, pre-push)"
+
 # Doc-drift sentinel — version macros, ROADMAP status line, examples count
 # across active rules. See devtools/check_doc_drift.py and
 # .claude/rules/doc_consistency.md. Wired in CI under .github/workflows/lint.yml.
@@ -134,7 +142,7 @@ lint-cppcheck:
 			-Itools/smconv/src -Itools/common tools/*/src tools/common \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
-		&& { cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \
+		&& { [ ! -d compiler/qbe/w65816 ] || cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \
 		&& echo "lint-cppcheck: OK"; \
 	fi
 
@@ -686,6 +694,7 @@ help:
 	@echo "  lint-commits - Validate commit messages in origin/develop..HEAD (RANGE=... overrides)"
 	@echo "  lint-docs - Check anchored doc claims (version macros, ROADMAP status, examples count)"
 	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + lint-commits)"
+	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"

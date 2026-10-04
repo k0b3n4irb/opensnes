@@ -99,7 +99,7 @@ A project that doesn't use the dynamic sprite engine pays only ~25
 cycles per VBlank for the (no-op) NMI hook indirection.
 
 **Implication:** when adding a feature, the question is *"can this be
-its own module?"* before *"where does this live in `text` or `sprite`?"*.
+its own module?"* before *"where does this live in the text or sprite module?"*.
 A module is a clean cut between linkage and complexity; a function added
 to an existing module forces every consumer of that module to ship the
 new code whether they want it or not.

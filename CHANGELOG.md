@@ -5,6 +5,12 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- chore(devtools): **`make hooks`** installs the `commit-msg` and `pre-push`
+  git hooks of `scripts/githooks/`: the first refuses a message that
+  `devtools/lint_commits.py` would fail (new `--message-file` mode), the
+  second lints the pushed range as the Lint workflow does. Two subjects
+  with the type and scope swapped (`tools(build): …`) reached `develop` in
+  two days with the lint running only in CI, after the push (2026-10-05).
 - feat(devtools): **`make check-upgrade SRC=<folder>`** lists, in a
   project's sources, every name 1.0 removes with its replacement and
   every `hdmaEnable` / `hdmaDisable` / `mode7SetScale` / `mode7Transform`
@@ -190,6 +196,10 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs: `PHILOSOPHY.md` no longer puts a code span inside a quoted phrase
+  (the doc-render job failed on it from the moment the page joined the
+  Doxygen input, 2026-10-04); `make lint-cppcheck` skips the QBE backend
+  scan when the submodule is not checked out instead of printing an error.
 - docs: `scrolling.md` no longer claims a scroll write "takes effect from
   the next scanline" — the references hold no such sentence; it says what
   HDMA relies on, a value written in HBlank is in force for the next line
