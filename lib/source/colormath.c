@@ -32,21 +32,31 @@
  *   Bits 4-0: Intensity (0-31)
  *============================================================================*/
 
-/* Internal state. External linkage so the `inline colorMathInit()` and
- * `inline colorMathDisable()` in colormath.h can access them. */
-u8 cgwsel;
-u8 cgadsub;
+/* Shadows of the write-only CGWSEL / CGADSUB. Prefixed and out of
+ * colormath.h since 2026-10-03 (API decision D4; they were `cgwsel` and
+ * `cgadsub`). */
+u8 colormath_cgwsel;
+u8 colormath_cgadsub;
 
 /*============================================================================
  * Core Color Math Functions
  *============================================================================*/
 
-/* colorMathInit() is `inline` in colormath.h. Force-emit the standalone
- * here via address-taking so fn-pointer / fallback callers can link. */
-void (*const __opensnes_force_emit_colorMathInit)(void) = colorMathInit;
+void colorMathInit(void) {
+    colormath_cgwsel = 0;
+    colormath_cgadsub = 0;
+    REG_CGWSEL = 0;
+    REG_CGADSUB = 0;
+    REG_COLDATA = 0xE0;     /* all three planes selected, value 0: a bare 0
+                             * selects no plane and leaves the fixed colour
+                             * as it was (until 2026-10-03) */
+}
 
-/* colorMathSetLayers() is `inline` in colormath.h. Force-emit canonical here. */
-void (*const __opensnes_force_emit_colorMathSetLayers)(u8) = colorMathSetLayers;
+void colorMathSetLayers(u8 layers) {
+    /* Set layer enable bits (bits 0-5 of CGADSUB) */
+    colormath_cgadsub = (colormath_cgadsub & 0xC0) | (layers & 0x3F);
+    REG_CGADSUB = colormath_cgadsub;
+}
 
 /* The deprecated name, out of line: a use of a deprecated symbol is an error
  * in this strict build, a definition is not. Removed at the next major. */
@@ -54,50 +64,52 @@ void colorMathEnable(u8 layers) {
     colorMathSetLayers(layers);
 }
 
-/* colorMathDisable() is `inline` in colormath.h. Same force-emit pattern. */
-void (*const __opensnes_force_emit_colorMathDisable)(void) = colorMathDisable;
+void colorMathDisable(void) {
+    colormath_cgadsub &= 0xC0;  /* Clear layer bits */
+    REG_CGADSUB = colormath_cgadsub;
+}
 
 void colorMathSetOp(u8 op) {
     if (op == COLORMATH_SUB) {
-        cgadsub |= 0x80;  /* Subtract mode */
+        colormath_cgadsub |= 0x80;  /* Subtract mode */
     } else {
-        cgadsub &= ~0x80; /* Add mode */
+        colormath_cgadsub &= ~0x80; /* Add mode */
     }
-    REG_CGADSUB = cgadsub;
+    REG_CGADSUB = colormath_cgadsub;
 }
 
 void colorMathSetHalf(u8 enable) {
     if (enable) {
-        cgadsub |= 0x40;  /* Half mode on */
+        colormath_cgadsub |= 0x40;  /* Half mode on */
     } else {
-        cgadsub &= ~0x40; /* Half mode off */
+        colormath_cgadsub &= ~0x40; /* Half mode off */
     }
-    REG_CGADSUB = cgadsub;
+    REG_CGADSUB = colormath_cgadsub;
 }
 
 void colorMathSetSource(u8 source) {
     if (source == COLORMATH_SRC_FIXED) {
-        cgwsel &= ~0x02; /* Fixed color: bit 1 = 0 */
+        colormath_cgwsel &= ~0x02; /* Fixed color: bit 1 = 0 */
     } else {
-        cgwsel |= 0x02;  /* Sub screen: bit 1 = 1 */
+        colormath_cgwsel |= 0x02;  /* Sub screen: bit 1 = 1 */
     }
-    REG_CGWSEL = cgwsel;
+    REG_CGWSEL = colormath_cgwsel;
 }
 
 void colorMathSetCondition(u8 condition) {
     /* Bits 5-4 control when color math is enabled */
-    cgwsel = (cgwsel & 0xCF) | ((condition & 0x03) << 4);
-    REG_CGWSEL = cgwsel;
+    colormath_cgwsel = (colormath_cgwsel & 0xCF) | ((condition & 0x03) << 4);
+    REG_CGWSEL = colormath_cgwsel;
 }
 
 void colorMathSetDirectColor(u8 enable) {
     /* Bit 0: 8bpp BG pixels bypass CGRAM and are read as BBGGGRRR */
     if (enable) {
-        cgwsel |= 0x01;
+        colormath_cgwsel |= 0x01;
     } else {
-        cgwsel &= ~0x01;
+        colormath_cgwsel &= ~0x01;
     }
-    REG_CGWSEL = cgwsel;
+    REG_CGWSEL = colormath_cgwsel;
 }
 
 void colorMathSetFixedColor(u8 r, u8 g, u8 b) {

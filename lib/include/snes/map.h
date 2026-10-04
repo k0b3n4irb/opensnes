@@ -112,13 +112,11 @@
  * Exported Variables
  *============================================================================*/
 
-/* --- Bank $00 SLOT 1 (C-accessible, < $2000) --- */
-
-/** @brief Current camera X position in pixels */
-extern u16 x_pos;
-
-/** @brief Current camera Y position in pixels */
-extern u16 y_pos;
+/* The camera position is read with mapGetCameraX() / mapGetCameraY() (below).
+ * Until 2026-10-03 it was two exported globals, `x_pos` and `y_pos`: names a
+ * game is likely to want for itself, and that no alias could have moved
+ * later. Replace `x_pos` by `mapGetCameraX()` and `y_pos` by
+ * `mapGetCameraY()`; assembly code reads `map_cam_x` / `map_cam_y`. */
 
 /* --- Bank $7E SLOT 2 (NOT C-accessible, ASM-only) --- */
 /* The map engine's bulk data lives in Bank $7E:
@@ -143,7 +141,12 @@ extern u16 y_pos;
  * before setScreenOn().
  *
  * @param layer1map  Address of map data (format: u16 width, u16 height, u16 pad, then tile indices)
- * @param layertiles Address of metatile definitions (4 tiles per metatile, max 512 metatiles)
+ * @param layertiles Address of metatile definitions (4 tiles per metatile, max 512 metatiles).
+ *                   The engine copies the full 4096 bytes (512 × 8) from this
+ *                   address whatever the file's size — a 126-byte `.t16` is
+ *                   followed in RAM by the ROM bytes that follow it. Entries
+ *                   past the last defined metatile are therefore garbage; a
+ *                   map must not reference them (tmx2snes never does).
  * @param tilesprop  Address of tile property data (collision types)
  *
  * @note Must be called during forced blank (screen off). The function
@@ -195,6 +198,27 @@ void mapVblank(void);
 void mapUpdateCamera(u16 xpos, u16 ypos);
 
 /**
+ * @brief Camera X position in pixels
+ *
+ * The left edge of the visible map, as mapUpdateCamera() last computed it.
+ * Subtract it from a world X to get a screen X.
+ *
+ * @code
+ * oamSet(0, player_x - mapGetCameraX(), player_y - mapGetCameraY(), ...);
+ * @endcode
+ *
+ * @return Camera X, 0 to the map width minus 256
+ */
+u16 mapGetCameraX(void);
+
+/**
+ * @brief Camera Y position in pixels
+ * @return Camera Y, 0 to the map height minus 224
+ * @see mapGetCameraX
+ */
+u16 mapGetCameraY(void);
+
+/**
  * @brief Get metatile index at map coordinates
  *
  * @param xpos X coordinate in map pixels
@@ -216,7 +240,7 @@ u16 mapGetMetaTilesProp(u16 xpos, u16 ypos);
  * @brief Set map engine options
  *
  * @warning Call it AFTER mapLoad(): mapLoad() clears the options (and zeroes
- *          the camera, x_pos / y_pos), so options set before it are lost
+ *          the camera), so options set before it are lost
  *          without a trace.
  *
  * @param optmap Options bitmask (MAP_OPT_1WAY, MAP_OPT_BG2)

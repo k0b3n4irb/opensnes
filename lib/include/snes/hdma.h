@@ -57,7 +57,7 @@
  *
  * // Set up HDMA channel 6 to write to fixed color register
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, 0x32, gradient_table);
- * hdmaEnable(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
  *
  * // In main loop, HDMA runs automatically each frame
  * @endcode
@@ -65,6 +65,9 @@
  * @warning **Do NOT use HDMA_CHANNEL_7** — the NMI handler uses DMA channel 7
  *          for OAM transfers every frame, which destroys any HDMA setup on that
  *          channel. Safe HDMA channels: 1-6 (channel 0 is used by dmaCopyVram).
+ *          On a Super FX build, gsuSetupHdmaBlanking() takes **channel 1**
+ *          for its INIDISP letterbox while the bands are on (superfx.h);
+ *          pick 2-6 there.
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
  * ## Bank byte
@@ -253,7 +256,7 @@
  * @brief Set up an HDMA channel
  *
  * Configures an HDMA channel with the specified parameters. The channel
- * is NOT enabled automatically - call hdmaEnable() to start it.
+ * is NOT enabled automatically - call hdmaEnableMask() to start it.
  *
  * @param channel HDMA channel (0-7, use HDMA_CHANNEL_6 or lower — 7 belongs to the NMI OAM DMA)
  * @param mode Transfer mode (HDMA_MODE_*)
@@ -262,7 +265,7 @@
  *
  * @code
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, HDMA_DEST_COLDATA, my_table);
- * hdmaEnable(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
  * @endcode
  */
 void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
@@ -313,26 +316,45 @@ void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table,
                        u8 dataBank);
 
 /**
- * @brief Enable HDMA channel(s)
+ * @brief Enable HDMA channel(s), given as a bit mask
  *
- * Enables the specified HDMA channel(s). HDMA will start on the next frame.
+ * Enables the specified HDMA channel(s). The channel runs from the next
+ * HBlank: hdmaSetup() has initialised its table address and line counter
+ * by hand, which the hardware only does by itself at the start of a frame
+ * (anomie-regs, "DMA and HDMA"). snesdev-wiki advises writing HDMAEN during
+ * VBlank while the screen is on; an effect enabled mid-frame shows from
+ * the next line. The one pair of this header that takes a mask where every
+ * other function takes a channel number: the name says so.
  *
  * @param channelMask Bitmask of channels to enable (1 << channel)
  *
  * @code
- * hdmaEnable(1 << HDMA_CHANNEL_6);              // Enable channel 6
- * hdmaEnable((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_5)); // Enable 6 and 5
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);              // Enable channel 6
+ * hdmaEnableMask((1 << HDMA_CHANNEL_6) | (1 << HDMA_CHANNEL_5)); // Enable 6 and 5
  * @endcode
  */
-void hdmaEnable(u8 channelMask);
+void hdmaEnableMask(u8 channelMask);
 
 /**
- * @brief Disable HDMA channel(s)
+ * @brief Disable HDMA channel(s), given as a bit mask
  *
  * Disables the specified HDMA channel(s).
  *
- * @param channelMask Bitmask of channels to disable
+ * @param channelMask Bitmask of channels to disable (1 << channel)
  */
+void hdmaDisableMask(u8 channelMask);
+
+/**
+ * @brief The pre-2026-10-03 name of hdmaEnableMask(). Takes a MASK.
+ *
+ * Deprecated so that the name can come back at 1.0 taking a channel number,
+ * like the rest of this header. Until then it is the same function.
+ */
+OPENSNES_DEPRECATED("use hdmaEnableMask() — at 1.0 hdmaEnable() will take a channel number")
+void hdmaEnable(u8 channelMask);
+
+/** @brief The pre-2026-10-03 name of hdmaDisableMask(). Takes a MASK. */
+OPENSNES_DEPRECATED("use hdmaDisableMask() — at 1.0 hdmaDisable() will take a channel number")
 void hdmaDisable(u8 channelMask);
 
 /**
@@ -437,7 +459,7 @@ void hdmaWaveInit(void);
  * @code
  * hdmaWaveInit();
  * hdmaWaveH(HDMA_CHANNEL_6, 0, 4, 4);  // Gentle water reflection on BG1
- * hdmaEnable(1 << HDMA_CHANNEL_6);
+ * hdmaEnableMask(1 << HDMA_CHANNEL_6);
  *
  * while (1) {
  *     WaitForVBlank();
@@ -460,6 +482,11 @@ void hdmaWaveUpdate(void);
 /**
  * @brief Stop wave effect and disable HDMA channel
  *
+ * The wave table writes ABSOLUTE offsets into the layer's HOFS, over the
+ * value bgSetScroll() set; while it runs, the layer's own scroll is not
+ * applied. Stopping marks the layer's scroll dirty so the NMI rewrites it
+ * from the shadows at the next VBlank (until 2026-10-03 it wrote 0).
+ *
  * Disables the wave effect and frees the HDMA channel.
  */
 void hdmaWaveStop(void);
@@ -468,12 +495,8 @@ void hdmaWaveStop(void);
  * @brief Set wave speed
  *
  * @param speed Animation speed (1=slow, 4=fast, default=2)
- * Inlined for zero-call-overhead access.
  */
-extern u8 hdma_wave_speed;
-inline void hdmaWaveSetSpeed(u8 speed) {
-    hdma_wave_speed = speed;
-}
+void hdmaWaveSetSpeed(u8 speed);
 
 /*============================================================================
  * HDMA Brightness Gradient
@@ -495,6 +518,12 @@ inline void hdmaWaveSetSpeed(u8 speed) {
  * @code
  * hdmaBrightnessGradient(HDMA_CHANNEL_5, 15, 0);  // Fade to black
  * @endcode
+ *
+ * Called again while the effect runs, it only moves the channel's table
+ * pointer, which HDMA reads at the next frame: the change lands whole.
+ * (Until 2026-10-03 the channel was set up again, which restarted the table
+ * at the next HBlank — one frame with the top of the table on the bottom of
+ * the screen.)
  */
 void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness);
 
@@ -529,6 +558,12 @@ void hdmaBrightnessGradientStop(u8 channel);
  *                   RGB(4, 8, 28),    // Deep blue
  *                   RGB(28, 16, 4));   // Orange
  * @endcode
+ *
+ * Called again while the effect runs, it only moves the channel's table
+ * pointer, which HDMA reads at the next frame: the change lands whole.
+ * (Until 2026-10-03 the channel was set up again, which restarted the table
+ * at the next HBlank — one frame with the top of the table on the bottom of
+ * the screen.)
  */
 void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor);
 
@@ -571,6 +606,24 @@ void hdmaColorGradientStop(u8 channel);
  *     WaitForVBlank();
  * }
  * @endcode
+ *
+ * Called again while the effect runs, it only moves the channel's table
+ * pointer, which HDMA reads at the next frame: the change lands whole.
+ * (Until 2026-10-03 the channel was set up again, which restarted the table
+ * at the next HBlank — one frame with the top of the table on the bottom of
+ * the screen.)
+ *
+ * While it runs the effect owns W12SEL, W34SEL, WOBJSEL and TMW and writes
+ * them directly: the window module's own shadows do not see those writes,
+ * so do not call windowEnable() / windowSetMainMask() for the same layers
+ * until hdmaIrisWipeStop().
+ *
+ * @note Not cheap: the table is rebuilt from the circle on every call —
+ *       about 2.15 million master clocks for a radius of 80 (measured on
+ *       luna, library audit 2026-10-03), roughly six frames of CPU — and
+ *       the FIRST call also waits one VBlank before enabling the window
+ *       masking. Animate it every few frames, not every frame, and do not
+ *       call it from an NMI callback.
  */
 void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius);
 

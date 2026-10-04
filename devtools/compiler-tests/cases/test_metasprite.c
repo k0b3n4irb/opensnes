@@ -74,7 +74,8 @@ int main(void) {
     test_end_marker();
 
     /* Draw metasprite at position (100, 80) */
-    oamDrawMeta(0, 100, 80, hero_walk_frame0, 0, 0, OBJ_LARGE);
+    static const MetaspriteStyle style = { .baseTile = 0, .size = OBJ_LARGE };
+    oamDrawMetasprite(0, 100, 80, hero_walk_frame0, &style, 0);
 
     return 0;
 }

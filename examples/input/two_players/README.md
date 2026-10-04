@@ -83,8 +83,11 @@ pad2 = padHeld(1);
 
 ### Struct Pattern (Required)
 
-Using a struct with `s16` coordinates is required for reliable movement.
-Separate `u16` variables cause horizontal movement issues due to a compiler quirk.
+The two coordinates live in one struct of `s16`, so a player is one value
+to pass around. (This line used to blame the compiler for horizontal
+movement issues with separate `u16` variables; nothing of the kind is known
+today — signed 16-bit arithmetic is pinned by the compiler checks — and the
+struct is kept for clarity.)
 
 ```c
 typedef struct {

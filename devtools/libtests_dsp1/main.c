@@ -27,12 +27,18 @@ u16 r_range_on;  /* dsp1Range(3000, 4000, 0, 5000): on the surface      -> 0 */
 u16 r_range_sm;  /* dsp1Range(30, 40, 0, 5): far outside, small units   -> 0 */
 u16 r_rot_x;     /* dsp1Rotate(0x4000, 100, 0)                          -> 0 */
 u16 r_rot_y;     /* ... sin 90 deg is 0x7FFF, not 1.0                   -> -99 */
-u16 r_tgt_x;     /* dsp1Target(0, 0) == Cx of the last dsp1Parameter    -> 1 */
+u16 r_cam_names; /* dsp1Parameter (deprecated) gives dsp1SetCamera's four words -> 1 */
+u16 r_tgt_x;     /* dsp1Target(0, 0) == Cx of the last dsp1SetCamera    -> 1 */
 u16 r_tgt_y;     /* ... and Cy                                          -> 1 */
 u16 r_done;      /*                                                     -> 0xBEEF */
 
+/* the dsp1_ground camera, lower and more tilted */
+static const Dsp1Camera ground_cam = {
+    .x = 512, .y = 512, .z = 96, .lfe = 192, .les = 256, .aas = 0, .azs = 0x1800,
+};
+
 int main(void) {
-    s16 cx, cy;
+    s16 cx, cy, vof, vva;
 
     consoleInit();
     dsp1Init();
@@ -54,9 +60,14 @@ int main(void) {
     r_rot_y = (u16)dsp1_o1;
 
     /* the dsp1_ground camera: Target(0,0) must give back its Cx / Cy */
-    dsp1Parameter(512, 512, 96, 192, 256, 0, 0x1800);
+    dsp1SetCamera(&ground_cam);
     cx = dsp1_o2;
     cy = dsp1_o3;
+    /* the deprecated positional form is the same command: same four words */
+    vof = dsp1_o0;
+    vva = dsp1_o1;
+    dsp1Parameter(512, 512, 96, 192, 256, 0, 0x1800);
+    r_cam_names = (dsp1_o0 == vof && dsp1_o1 == vva && dsp1_o2 == cx && dsp1_o3 == cy) ? 1 : 0;
     dsp1Target(0, 0);
     r_tgt_x = (dsp1_o0 == cx) ? 1 : 0;
     r_tgt_y = (dsp1_o1 == cy) ? 1 : 0;

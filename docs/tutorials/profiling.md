@@ -146,7 +146,7 @@ the frame it finished.
 **Frame counters** answer "am I dropping frames?":
 
 ```c
-u16 frames = profileGetFrameCount();   /* frames since boot, wraps at 65535 */
+u16 frames = getFrameCount();          /* frames since boot, wraps at 65535 */
 u16 lag    = profileGetLagFrames();    /* frames that missed their VBlank */
 ```
 

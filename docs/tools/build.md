@@ -49,6 +49,7 @@ looping ones).
 | `ROM_BANKS` | `8` | Number of linker banks: 256 KB LoROM, 512 KB HiROM by default. The header's ROM size byte and the asset bank range follow it |
 | `ROMSIZE` | from `ROM_BANKS` | The header's ROM size byte (`$FFD7`, 1 KB << n, rounded up to a power of two). Leave it computed |
 | `ASSET_BANKS_RANGE` | `ROM_BANKS - 1` down to 1 | Banks the linker may use for `ASSET_SECTION` data and C const data, highest first. Leave it computed |
+| `ROM_REGION` | `ntsc` | The region the header declares (`$FFD9`): `ntsc` = `$01` USA, `pal` = `$02` Europe, `jp` = `$00` Japan. A console runs at its own standard whatever the byte says (`isPAL()` reads the console); emulators, luna included, choose 50 or 60 Hz from it |
 | `USE_SRAM` | `0` | `1` declares battery-backed save RAM and links the `sram` module |
 | `SRAM_SIZE` | `3` | Save RAM size as the header byte `$FFD8`: 1 KB << n, n = 1..7 (3 = 8 KB) |
 | `RAM_CODE_SIZE` | `0` | Bytes (1 to 16384) of a code window at the top of WRAM bank `$7E`, for code that runs from RAM (`RAM_CODE_SECTION`): stored in the top of ROM bank 1, copied by crt0 at boot. `0` = no window. A Super FX build adds 768 bytes for the SDK's own interrupt entries, `gsuLaunch` wait loop and presentation step. The window shares ROM bank 1 with SNESMOD's default soundbank bank: a soundbank that fills bank 1 fails the link with "No room for section .ram_code" — move it with `SOUNDBANK_BANK := 2`. See the Super FX tutorial |
@@ -59,8 +60,10 @@ A cartridge carries one coprocessor: setting two of these is refused.
 
 | Variable | Default | What it does |
 |---|---|---|
-| `USE_SA1` | `0` | `1` builds an SA-1 cartridge (its own memory map; not with `USE_HIROM`) |
-| `USE_SUPERFX` | `0` | `1` builds a Super FX cartridge (LoROM-mapped; not with `USE_HIROM` or `USE_SRAM`) |
+| `USE_SA1` | `0` | `1` builds an SA-1 cartridge (its own memory map; not with `USE_HIROM`). The header declares SA-1 + RAM (`$34`), or + battery (`$35`) with `USE_SRAM := 1`; the BW-RAM size comes from `SA1_BWRAM_SIZE` |
+| `SA1_BWRAM_SIZE` | `5` | BW-RAM of an SA-1 cartridge as the header byte `$FFD8`: 1 KB << n (5 = 32 KB). It is the cartridge's work RAM whether or not the game saves; `SRAM_SIZE` does not apply to SA-1 |
+| `USE_SUPERFX` | `0` | `1` builds a Super FX cartridge (LoROM-mapped; not with `USE_HIROM`). With `USE_SRAM := 1` the header declares a battery (`$15`) and the save is the Game Pak RAM itself |
+| `GSU_BANK` | (none) | ROM bank (1 to `ROM_BANKS` − 1) the Super FX program is linked in, at `$8000`: its labels become real addresses, so absolute jumps and tables in ROM work (`GSU_SECTION` in the loader, one `.sfx` in `GSUSRC`). Unset = assembled at 0, placed where it fits, position-independent code only |
 | `GSU_RAM_KB` | `64` | Super FX Game Pak RAM declared in the extended header (`$FFBD`) |
 | `USE_DSP1` | `0` | `1` declares a DSP-1 cartridge and links the `dsp1` module (LoROM board; not with `USE_HIROM`) |
 

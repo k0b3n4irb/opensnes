@@ -122,7 +122,7 @@ static void hand_point(void) {
 /** @brief (Re)start the module's wave with the current amplitude. */
 static void lib_start(void) {
     hdmaWaveH(CH_LIB, 0, amp, WAVE_FREQ);
-    hdmaEnable(1 << CH_LIB);
+    hdmaEnableMask(1 << CH_LIB);
 }
 
 /**
@@ -155,7 +155,7 @@ int main(void) {
     use_lib = 0;
     amp = AMP_DEFAULT;
     hand_point();
-    hdmaEnable(1 << CH_HAND);
+    hdmaEnableMask(1 << CH_HAND);
 
     setMainScreen(TM_BG1);
     setScreenOn();
@@ -170,7 +170,7 @@ int main(void) {
                 hdmaWaveStop();
                 use_lib = 0;
                 hand_point();
-                hdmaEnable(1 << CH_HAND);
+                hdmaEnableMask(1 << CH_HAND);
             } else {
                 /* hdmaWaveInit() switches every channel off, channel 0
                  * included — call it before arming the module's own. */

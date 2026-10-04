@@ -1,0 +1,126 @@
+# G — Audit des puces d'extension (SA-1, Super FX, DSP-1) — 2026-10-03
+
+Auditeur : agent `audit-chips`. `develop` @ `73fbdddb` (origin/develop @ `5cdf1aa0`, +1 commit de test), v0.47.0, luna v1.31.0 (`tools/luna-test/luna.version`, binaire « luna 1.31.0 »), corpus cartouche index `8bae78f3a746`. Lecture seule ; toutes les constructions de variantes ont été faites dans le scratchpad de la session, jamais dans l'arbre.
+
+## Défauts silencieux candidats
+
+| # | Où | Promesse | Code | Preuve | Sévérité |
+|---|---|---|---|---|---|
+| S1 | `lib/source/superfx.asm:94-95` (`gsuLaunch` force CLSR=1), `superfx.c` `gsuStartCached` (`GSU_CLSR = 1`) ; `superfx.h:73,88` ; `examples/chips/superfx_hello/main.c:70` | `superfx.h:88` : « `$A0`=IRQ mask + fast multiply » est une valeur valide de `gsu_cfgr` ; `CFGR_FAST_MUL` est exporté | Les deux lanceurs écrivent toujours CLSR=1 (21,4 MHz), puis CFGR tel que donné : `$A0` donne MS0=1 **et** CLS=1 | fullsnes `1adef8e33ff3c4e9` (arbitre, `evidence_state=arbiter_states_point`) : « MS0 <must> be zero in 21MHz mode (ie. only CFGR.Bit5 or CLSR.Bit0 may be set) » ; bsnes `77555cca0a440790` / ares `06c6d2324e3c6d01` : « multiplication results *may* sometimes be invalid when both CLSR and MS0 are set ». L'exemple `superfx_hello` fait exactement la combinaison interdite. luna ne le signale pas (vert). | 🟠 produits FMULT/LMULT faux sur console, invisible sur luna |
+| S2 | `lib/source/superfx.asm:347-455` (`gsuSetupHdmaBlanking`) + `:252-312` (`gsuDmaFullFrame`) | `superfx.h:405-406` : « Needs gsuSetupHdmaBlanking() bands with top + bottom >= 73 » | `topBlank` est écrit tel quel comme compteur de la 1ʳᵉ entrée HDMA (`sta.l gsu_hdma_table`) : `top = 0` = octet de fin de table (pas de bande du tout), `top` ou `bottom` ≥ 128 = bit « repeat » ; mais `gsu_pres_top/bottom` sont publiés quand même et `gsuDmaFullFrame` démarre à la ligne `225 - bottom` en croyant le bas noirci | Variante de `superfx_3d` construite dans le scratchpad avec `gsuSetupHdmaBlanking(0, 80)` (top+bottom = 80 ≥ 73, contrat respecté), `luna state --until-frame 300 --dma-trace` : **1 844 726 octets VRAM sur 2 326 528 écrits hors blank** (perdus), contre 0 pour l'exemple livré `(40, 40)`. Aucune erreur, aucun avertissement. | 🟠 |
+| S3 | `templates/sa1_boot.asm:15` (`.SECTION ".sa1_boot" SUPERFREE`), `templates/crt0.asm` (`lda #<SA1Start / sta $2203 ; lda #>SA1Start / sta $2204`) | `sa1.h` / tutoriel : « Override this file by placing your own sa1_boot.asm » (le code SA-1 de l'utilisateur va dans cette section, cf. `sa1_starfield/sa1_boot.asm:24`) | CRV est 16 bits, le SA-1 démarre en bank $00 (ares `40963ceb7763ebbb` : « PC bank and data bank set to 0x00 » ; sfc-dev-wiki `e5a179772c621ff7` « in bank $00 ») ; rien n'empêche le linker de mettre `SA1Start` en bank $01+ | Variante de `sa1_hello` dont `sa1_boot.asm` = gabarit + `.dsb 31000` : build **vert**, `.sym` `01:8000 SA1Start`, `sa1_status` = `00` au lieu de `a5`, fbhash `4c699f3fb20c4f85` ≠ `7aee1820d6cdfed5`. Le SA-1 exécute le code de la bank 0 à `$8000`. Seul `sa1IsReady()` le révèle, si l'utilisateur le teste. | 🟠 latent : un vrai programme SA-1 de quelques Ko suffit |
+| S4 | `lib/source/superfx.c` `gsuPresentInit`/`gsuPresent` ; `make/common.mk:129-130` | `superfx.h:361-363` : refuse « if two framebuffers from gsu_scbr on do not fit in the Game Pak RAM the header declares » | `GSU_RAM_KB` n'est pas borné (128 → `$FFBD=$07` accepté, valeur non puissance de 2 tronquée en silence par `int(log2)`) ; `gsuPresentInit` accepte alors un tampon au-delà de 64 Ko, mais `gsu_pres_src = (u16)(gsu_scbr << 10)` tronque à 16 bits et le DMA du NMI lit toujours la bank `$70` | Lecture du code ; fullsnes `d5eab561b2ef770e` : « Existing cartridges have only 32Kbyte or 64Kbyte RAM, so RAMBR should be always zero » ; `26298960d6353127` : `[FFBDh]=05h..06h`. Avec `GSU_RAM_KB=128`, `gsu_scbr=0x30`, 4bpp/128 : buffer B à SCBR `$40` → DMA depuis `$70:0000` (le buffer A). Non exécuté. | 🟡 (configuration qu'aucune cartouche réelle n'a ; un garde de build suffit) |
+| S5 | `make/common.mk` (aucun garde `ROM_BANKS` × `USE_DSP1`) ; `lib/source/dsp1.asm:4` | `dsp1.h:12-14` : « The DSP-1 registers live at $30:8000 / $30:C000 on the LoROM board this SDK targets » | `ROM_BANKS=64` (2 Mo) + `USE_DSP1=1` construit sans erreur. Or le seul PCB DSP-1 LoROM 2 Mo (SHVC-2B3B-01, avec 8 Ko de RAM) mappe DR/SR en `$60-$6F:0000/4000` | fullsnes `f8cfa059b665dc1c` (table « DSP Mapping ») ; sneslab `c9d2c095cd82beaa`. Mesuré : `libtests_dsp1` reconstruit avec `ROM_BANKS=64` dans le scratchpad passe **identique** sur luna (`r_mul=0x2000`, `r_dist=12`, `r_range_out=732`) — luna répond en `$30` pour une LoROM DSP-1 de 2 Mo, contrairement à la table. Vert sur luna, mort sur un mappeur qui suit le PCB. | 🟡 (à remonter à luna ; garde de build côté SDK) |
+| S6 | `templates/sa1_boot.asm` (pas de `$2227`) ; `sa1.h:15-17` ; `docs/tutorials/sa1.md:73-76` | « Memory accessible by SA-1: … BW-RAM ($40-$5F, 256KB, battery-backed) » ; « read/write I-RAM and BW-RAM » | Le stub n'active pas CBWE (`$2227`, écrit par le SA-1). fullsnes `60538c9a03678a32` (SBWE/CBWE « 0=Protect, 1=Write Enable ») et `12243a8187ab996e` (BWPA protège une zone à partir de `$40:0000` « It isn't possible to set the size to none ») | **Hypothèse non mesurée** : la valeur de reset de BWPA n'est donnée que par sfc-dev-wiki (`#$FF`, complément) ; si elle couvre toute la BW-RAM, une écriture SA-1 sans CBWE est perdue en silence. `sa1.md` ne nomme pas CBWE (seul `sram.md:402` le fait). Par ailleurs « $40-$5F, 256KB » est incohérent (`$40-$43` = 256 Ko) et le header déclare 32 Ko (`$FFD8=$05`). | 🟡 à mesurer sur luna (un `sta.l $400000` côté SA-1 relu côté S-CPU) |
+
+Aucun défaut silencieux trouvé dans : la sauvegarde Super FX (`SRAM_GSU_TAKE/GIVE`, `lib/source/sram.asm`), le partage `gsu_scmr_live` entre `gsuLaunch`, `gsuStartCached`, `gsuWait`, l'étape de présentation NMI et la sauvegarde (ordre « shadow avant registre » vérifié sur les cinq écrivains, entrelacements NMI examinés un à un), les en-têtes `$FFD6/$FFD8/$FFBD` (ci-dessous), le démarrage sur RAM aléatoire (ci-dessous). S2 et S3 sont reproduits ; S1 est arbitré mot pour mot mais non mesurable sur luna ; S4-S6 sont des lectures de code.
+
+## Périmètre couvert
+
+- Lu : `lib/include/snes/{superfx,sa1,dsp1}.h` (en entier), `lib/source/{superfx.asm,superfx.c,sa1.c,sram.asm (blocs SA1/SUPERFX)}`, `dsp1.asm` (`dsp1SetCamera`, mapping), `templates/{hdr_superfx.asm,hdr_sa1.asm,memmap_sa1.inc,sa1_boot.asm}`, blocs SA-1/Super FX de `crt0.asm` (vecteurs WRAM, `gsu_nmi_blob`, `gsu_irq_blob`), `make/common.mk` (types de cartouche, gardes), diffs `c937bb0b` et `26856d8a`, fixture `devtools/libtests_gsu/main.c` et son manifest, `KNOWN_LIMITATIONS.md`, `ROADMAP.md`, `docs/HARDWARE_VERIFICATION.md`, `docs/tutorials/{sa1,superfx}.md` (extraits), annexe G du 2026-09-26.
+- Lancé : `luna state --until-frame 300 --power-on {zero,ones,random=1,2,3,99,12345} --print-fbhash` sur les 9 ROM puces (63 runs) ; `rom_coverage.py` avec un `XDG_CONFIG_HOME` sans `dsp1b.rom` (simulation CI) ; trois variantes construites hors arbre (superfx_3d `(0,80)`, sa1_hello avec un gros `sa1_boot`, libtests_dsp1 `ROM_BANKS=64`) avec `--dma-trace` / `--peek`.
+- Corpus (exclusion `opensnes-docs`, `opensnes-notes-tech`) : 3 `snes_verify` (en-têtes GSU, `$FFD6`, CRV) + 1 sur MS0/CLSR ; 8 `snes_search` (CRV, RAN/WAIT, FXPak/sd2snes-changelog, Star Fox/ultrastarfox, SCBR/RAMBR, mapping DSP-1, BWPA, firmwares DSP sur sd2snes).
+- Non couvert : SA-1 côté DMA/char-conversion/arith (aucun code SDK) ; `wla-superfx` (→ aspect compilateur) ; CI distante (`gh` : 401).
+
+## Points forts
+
+1. **Le chantier Super FX est réellement clos, et testé avec contrôles négatifs.** `libtest_gsu_cached.toml` asserte 27 valeurs et `[asserts.gsu] bus_violations = 0`, `instructions_executed > 2 000 000` ; chaque mécanisme a son contrôle négatif écrit (RON remis à 1 : 149 340 violations ; boucle hors RAM code : 497 475 violations, CPU perdu en `$00:0102` ; IRQ sur STOP avant correctif : CPU bloqué en `$7E:205D`). Les trois chemins de lancement (cache RON=0, ROM via fenêtre RAM en asm, ROM via `RAM_CODE` en C), deux points d'entrée nommés (`GSU_JOB_MUL_JOB = 0x28`), `GSU_BANK` (`r_prog_bank = 1`, table lue en absolu `0x3CA5`) et la sauvegarde pendant un job sont tous exercés.
+2. **Le partage de la RAM du GSU est conçu sur l'arbitre.** fullsnes `7ef98ee6dd6ca2eb` : « RON/RAN can be temporarily cleared during GSU operation, this causes the GSU to enter WAIT status … and continues when RON/RAN are changed back to 1 » — exactement ce que font l'étape de présentation (`superfx.asm:650-689`) et `SRAM_GSU_TAKE/GIVE` (`sram.asm`), tous deux via `gsu_scmr_live`. La fixture le prouve : `r_save_busy=1, r_save_busy_rt=1, r_save_still=1, r_save_job=1`, et le contrôle négatif du commit `c937bb0b` (lib sans la passation de RAN : relecture fausse, 8 violations).
+3. **Les en-têtes ROM sont conformes aux deux arbitres.** Super FX : `$FFD8=$00`, `$FFBD = 1 Ko << n`, `$FFDA=$33` (`hdr_superfx.asm`) = fullsnes `26298960d6353127` (« [FFD8h]=00h … always use the Expansion entry ; [FFBDh]=05h..06h ») et snesdev-wiki `853c4bb39ccabfe1` ; `$FFD6=$13/$15` = fullsnes `b27db0e0b51e670e` (`x5h ROM+Co-processor+RAM+Battery`, `1xh … GSU`). SA-1 : `$FFD6=$35`, taille en `$FFD8`, pas de `$FFBD` = snesdev-wiki `853c4bb39ccabfe1` (« For the SA-1 … this byte should be set to $00 and the RAM size set in $FFD8 »). DSP-1 `$03/$05` = snesdev-wiki `ae5489473fb4ca37`. (Les deux `snes_verify` sortent `arbiter_covers_topic_only` ; les `sentences` citées énoncent pourtant les valeurs mot pour mot — ce sont elles qui tranchent.)
+4. **Démarrage sur RAM aléatoire : rien ne bouge.** 9 ROM (`dsp1_cube`, `sa1_hello`, `sa1_starfield`, `superfx_3d`, `superfx_game_skeleton`, `superfx_hello`, `dsp1_ground`, `libtest_gsu`, `libtest_sa1_sram`) × 7 états initiaux : fbhash et PC identiques à la frame 300 pour chaque ROM. L'ordre de crt0 (vecteurs WRAM `$0100-$010F` installés avant `sta $4200`, commentaire « BEFORE the NMI is enabled (since 2026-09-29) ») tient.
+5. **Les reproches de l'annexe G du 26/09 ont été traités** : stub IRQ WRAM (`gsu_irq_blob`, IRQ sur STOP compté dans `gsu_stop_irqs`), BW-RAM activée (`$2226 = $80`, crt0) et `USE_SRAM` SA-1 accepté avec manifests `d_/e_sa1_bwram_*`, vitesse SA-1 désormais **mesurée** sur luna (`docs/tutorials/sa1.md:37-51` : ~10,70 MHz en I-RAM, ~8,50 MHz depuis la ROM, conflits de bus comptés) et `sa1.h:5-12` corrigé (« the SDK runs assembly on it, not C »), §E3 créé dans `STRUCTURAL_DEFECTS.md:2456`, `OPEN_luna.md` et `OPEN_snes-rag.md` existent, fait FXPak écrit dans `HARDWARE_VERIFICATION.md:20` avec sa source.
+6. **Le design d'interruptions est celui de Star Fox, et le corpus le confirme.** `cartouche-fiches-jeux` `2f45c49658f3c056` (source `ultrastarfox`, `SF/ASM/NMI.ASM:21-72`) : Star Fox copie son stub en WRAM à `$0101`, entrées `$0108` NMI / `$010C` IRQ ; fullsnes `0e33706aca83f408` (cité par la fiche) pour les vecteurs factices. `mesures-partenaires` `69870c63146501ab` : 452 fetchs de vecteur `$010C` pendant les jobs de Star Fox = le mécanisme, pas une faute.
+7. **DSP-1 : API typée et mesurée.** `dsp1SetCamera(const Dsp1Camera *)` (`dsp1.h:157-186`) remplace sept positionnels ; Range `>>15` arbitré (manuel Book II §5.2.2 cité) ; Distance « one low » mesuré et dit comme tel.
+
+## Points faibles
+
+1. 🟠 **S1 — MS0 + 21 MHz** (tableau ci-dessus). Conséquence : un utilisateur qui suit `superfx.h:88` ou copie `superfx_hello` obtient des multiplications GSU potentiellement fausses sur console, avec luna vert. Effort S.
+2. 🟠 **S2 — `gsuSetupHdmaBlanking` produit une table fausse pour `top = 0` ou une bande ≥ 128**, et publie des bandes qui n'existent pas ; 79 % des octets d'une frame perdus dans la variante mesurée. La fonction ne valide pas non plus `top + bottom ≤ 224`. Effort S (borner, découper > 127 comme la zone visible l'est déjà, ou refuser).
+3. 🟠 **S3 — `SA1Start` peut quitter la bank $00 sans erreur de link.** Effort S : `.SECTION ".sa1_boot" SEMIFREE BANK 0` ou un `.IF :SA1Start != 0 .FAIL` dans crt0.
+4. 🟠 **`make tests` sans firmware DSP-1 échoue depuis `1d922c39` (03/10).** `rom_coverage.py` lancé avec un dossier luna sans `dsp1b.rom` : « NEW never-executed public function: dsp1SetCamera (dsp1.h) … ROM coverage ratchet: 1 new never-executed function(s) », exit 1. `tools/luna-test/baselines/executed_only_with_firmware.txt` (dernière mise à jour `6e27ee52`, 22/09) liste `dsp1Parameter` mais pas `dsp1SetCamera`. La CI n'a pas le firmware (`opensnes_build.yml:413-424` lance `make tests`) : le job doit être rouge sur `develop` (non vérifié à distance, `gh` 401). Ce n'est pas silencieux, mais c'est une régression du gate livrée sans le run qui l'aurait montrée. Effort S : `rom_coverage.py --update` sur une machine avec firmware.
+5. 🟡 **Chemins non exercés par aucune ROM.** Le `@code` d'en-tête de `gsuPresent` (`superfx.h:319-329` : `gsuLaunch()` + `gsuPresent()`, donc l'étape de présentation appelée depuis `gsu_nmi_blob` pendant un job RON=1) — seul `superfx_game_skeleton` (cache, RON=0) utilise `gsuPresent` ; `GSU_PRESENT_ON_LAG_FRAMES` (0 utilisateur) ; hauteurs 160/192 (`SCMR_H160/H192` : 0 utilisateur) ; `gsuFrameBytes` en direct ; présentation sous PAL (`gsu_pres_vtotal = 312`) — `make test-pal` ne fait que de la vivacité ; sauvegarde pendant une présentation en vol. `grep -rlw` sur `examples devtools`. Effort S par chemin (une variante de fixture + manifest).
+6. 🟡 **Une IRQ H/V tombée pendant un job `gsuLaunch` est perdue, pas différée.** `gsu_irq_blob` (`crt0.asm`, `@irq_gsu_owned`) : `lda $4211 ; rti`, aucun drapeau. `superfx.h:197-199` dit « the ROM-side work (your NMI callback, your IRQ handler) waits for the end of the job » ; `superfx.md:162-164` et `KNOWN_LIMITATIONS.md:589-590` disent plus justement « runs again after the job ». Un effet raster par IRQ saute donc chaque frame où un job ROM est en cours. Effort S (corriger la phrase de l'en-tête ; un compteur `gsu_lost_irqs` si on veut l'exposer).
+7. 🟡 **DSP-1 : la note Distance n'a pas bougé depuis l'annexe G (#9).** `dsp1.h:263-265` : « without saying what the bug was » — le corpus le dit (bannière sur `d789432d05d502eb`/`0ce4ab00dbe53383`, `bsnes-coprocessors` l.418-420). Effort S.
+8. 🟡 **Doc périmée ou incohérente.**
+   - `lib/source/sram.asm:35-38` : « SA-1 is not supported here … make/common.mk refuses USE_SRAM=1 with USE_SA1=1 », immédiatement contredit par les lignes 39-43 et par crt0.
+   - `templates/hdr_superfx.asm:52-56` : « Star Fox has all $FF in the extended header … snes9x may misdetect » au-dessus d'un bloc qui fait l'inverse.
+   - `ROADMAP.md:143` : `superfx` = « loader stubs … experimental », alors que le module a présentation, cache, sauvegarde ; le module `dsp1` est absent du tableau des modules.
+   - `dsp1.h:12` : « sets the ROM header cartridge type to $03 » (`$05` avec `USE_SRAM`).
+
+   Effort S.
+9. 🟡 **Le SA-1 déclare toujours une batterie et 32 Ko**, avec ou sans `USE_SRAM` (`common.mk:159-160` : `$35`, `$05`), et ignore `SRAM_SIZE` en silence. Conséquence : luna écrit un `.srm` pour toute ROM SA-1 (`examples/chips/sa1_starfield/sa1_starfield.srm` existe alors que l'exemple ne sauvegarde rien), et un `SRAM_SIZE=6` SA-1 donne 32 Ko, refusés au-delà par `SRAM_ERR_RANGE`. Effort S.
+10. 🟡 **Validation matérielle : les nouveautés n'ont pas de ligne.** `HARDWARE_VERIFICATION.md` couvre `dsp1_cube`, `sa1_starfield`, `superfx_3d` (rows 16-18) mais ni la sauvegarde SA-1 (BW-RAM), ni la sauvegarde Super FX (RAM du GSU), ni `gsuPresent`/le cache (`superfx_game_skeleton`), ni S1 (le seul défaut que seule une console verra). Row 16 ne dit pas que le FXPak exige le dump `dsp1b.bin` sur la carte SD, à côté d'un `dsp1.bin` (sd2snes-blog `0f24744ff001c043`, « solid ») — et la lib cible 1B, dont Distance diffère. Effort S.
+
+## Risques
+
+- **luna ne randomise pas la RAM de cartouche.** `luna state --help` : `--power-on` « Fills WRAM, VRAM, CGRAM, OAM and APU RAM ». La RAM du GSU (framebuffers, zone de sauvegarde), la BW-RAM et l'I-RAM démarrent toujours propres : le point fort 4 ne couvre donc pas une lecture de framebuffer ou d'I-RAM non initialisée. À demander à luna (`OPEN_luna.md`).
+- **luna valide des mappages que le matériel refuserait** (S5) et ne connaît pas l'interdit MS0 + CLS (S1) : deux cas où « vert sur luna » n'est pas « vrai sur console ». À remonter avec les chunk ids.
+- **Le FXPak Pro choisit lui-même son firmware DSP** (`dsp1.bin` ou `dsp1b.bin`) : un écart Distance en session console serait inexplicable sans noter lequel. Le corpus ne dit pas comment il choisit pour une ROM homebrew (`sd2snes-changelog` n'est pas remonté sur la question ; seule source : le blog). → `OPEN_snes-rag.md`.
+- **`sd2snes-changelog` (arbitre-domaine) n'a toujours pas de ligne « SuperFX support »** retrouvable : sur deux requêtes ciblées, seuls `v1.10.0` (`99d8550526ffa29f`, S-DD1) et `v1.11.0` (`026fafbf6a107378`) remontent ; le fait FXPak de `HARDWARE_VERIFICATION.md:20` repose sur le blog (`c94f64959972104e`). Exact, mais pas sur l'arbitre déclaré.
+- **La sauvegarde Super FX partage la RAM avec les framebuffers** : `sramSave/Load/Clear` sans offset écrivent à partir de `$70:0000`, dans le premier tampon (`sram.h`, documenté). Un jeu qui appelle `sramClear()` par habitude efface l'écran en cours ; pas un défaut, un piège.
+- **SA-1 : rien n'est livré au-delà du boot et de la sauvegarde** (pas de vecteurs NMI/IRQ SA-1 `CNV/CIV`, pas de DMA ni de char-conversion, pas d'arithmétique, pas de C) : un jeu SA-1 écrit tout en asm côté coprocesseur, sans fixture ni bloc `sa1` dans les assertions luna.
+
+## Améliorations recommandées
+
+| # | Action | Sévérité traitée | Effort | Premier pas concret |
+|---|---|---|---|---|
+| 1 | Interdire MS0 à 21 MHz : `gsuLaunch`/`gsuStartCached` masquent le bit 5 de CFGR quand CLS=1 (ou exposent `gsu_clsr` et choisissent), `superfx.h:88` et `superfx_hello` corrigés, citation fullsnes `1adef8e33ff3c4e9` | 🟠 S1 | S | `and #$DF` avant `sta.l $3037` dans `superfx.asm:91-92` ; idem dans `superfx.c` |
+| 2 | Valider `gsuSetupHdmaBlanking` : `top`/`bottom` découpés en entrées ≤ 127, `top = 0` sans entrée vide, `top + bottom ≤ 224`, sinon refus | 🟠 S2 | S | manifest qui rejoue `(0, 80)` avec le check `vram_dma_blank.py` : 0 octet hors blank |
+| 3 | Garder `SA1Start` en bank $00 (section `BANK 0` ou `.FAIL` d'assemblage) | 🟠 S3 | S | la variante `.dsb 31000` doit échouer au link |
+| 4 | Ré-enregistrer `executed_only_with_firmware.txt` (`dsp1SetCamera`) et ajouter au ratchet un contrôle « toute fonction de `dsp1.h` est soit dans la liste, soit exécutée sans firmware » | 🟠 (4) | S | `python3 tools/luna-test/rom_coverage.py --update` sur la machine du propriétaire |
+| 5 | Gardes de build : `GSU_RAM_KB ∈ {32, 64}` (puissance de 2, ≤ 64), `ROM_BANKS ≤ 32` avec `USE_DSP1` (ou mapping `$60` pour 2 Mo) | 🟡 S4, S5 | S | deux `$(error)` dans `make/common.mk` près de la ligne 180 |
+| 6 | Mesurer S6 sur luna (écriture SA-1 en `$40:0000` sans puis avec CBWE) ; selon le résultat, CBWE dans le stub par défaut ou une phrase dans `sa1.md`, et corriger « $40-$5F, 256KB » | 🟡 S6 | S | une variante de `libtests_sa1_sram` avec un `sa1_boot.asm` qui écrit `$400010` |
+| 7 | Fixtures pour les chemins non exercés : `gsuLaunch` + `gsuPresent` (étape NMI en WRAM pendant RON=1), `GSU_PRESENT_ON_LAG_FRAMES`, H160/H192, `gsuPresent` sous `region = "pal"` | 🟡 (5) | M | ajouter un 5ᵉ job à `libtests_gsu` : `gsuLaunch` + `gsuPresent`, asserter `gsu_pres_frames` et `bus_violations = 0` |
+| 8 | Nettoyage doc : `superfx.h:197-199` (IRQ perdue, pas différée), `dsp1.h:12` et `:263-265`, `sram.asm:35-38`, `hdr_superfx.asm:52-56`, `ROADMAP.md:143` + ligne `dsp1` | 🟡 (6-8) | S | un commit `docs(lib)` ; `make lint-docs` |
+| 9 | SA-1 : `$FFD6`/`$FFD8` suivent `USE_SRAM`/`SRAM_SIZE` (`$34`/`$33` sans batterie, cf. fullsnes `b27db0e0b51e670e`) | 🟡 (9) | S | `common.mk:159-160` ; vérifier que luna n'écrit plus de `.srm` pour `sa1_starfield` |
+| 10 | Protocole matériel : lignes « sauvegarde SA-1 », « sauvegarde Super FX », `superfx_game_skeleton`, `superfx_hello` (S1 : résultat FMULT attendu), et « `dsp1b.bin` sur la SD, noter le firmware DSP chargé » | 🟡 (10) | S | quatre lignes dans le tableau de `HARDWARE_VERIFICATION.md` (le preflight `5cdf1aa0` les lira) |
+| 11 | Partenaires : à luna, (a) `--power-on` sur la RAM de cartouche, (b) mapping DSP-1 2 Mo (fullsnes `f8cfa059b665dc1c`), (c) avertissement MS0 + CLS ; à snes-rag, la ligne Super FX absente de `sd2snes-changelog` et le choix `dsp1.bin`/`dsp1b.bin` du FXPak | Risques | S | trois lignes dans `OPEN_luna.md`, deux dans `OPEN_snes-rag.md` |
+
+## Verdict
+
+Le Super FX a rattrapé l'écart du 26/09 (vrai runtime testé avec contrôles négatifs et `bus_violations = 0`), le DSP-1 est complet et typé, et le SA-1 démarre et sauvegarde, avec une vitesse mesurée, mais reste en 1.0 un « boot + I-RAM + BW-RAM » sans API coprocesseur, à annoncer comme tel. La chasse a trouvé trois défauts silencieux réels — MS0 forcé à 21 MHz contre l'arbitre, une table HDMA de letterbox fausse pour `top = 0` (1,8 million d'octets VRAM perdus, mesuré) et `SA1Start` hors bank $00 accepté au link (reproduit) — plus un gate CI cassé par `dsp1SetCamera`, chacun corrigeable en moins d'un jour. Avant le gel, il faut les corriger, les inscrire dans `silent_defects_log.md` et confier au protocole console ce que luna ne peut pas trancher (S1, S5, les sauvegardes sur FXPak).
+
+## Suivi (2026-10-03)
+
+- **S6 retiré.** CBWE (`$2227`) n'était pas écrit par le stub SA-1, mais la
+  protection BW-RAM ne joue que si SBWE et CBWE sont tous deux à 0 (ares,
+  `sa1/bwram.cpp`, chunk `c25ad9d888253bd9`, cas Kirby's Dream Land 3), et
+  crt0 met SBWE à 1 depuis le 2026-09-26 : les écritures du SA-1 passaient.
+  Vérifié sur luna : la fixture `libtests_sa1_sram` lit `$5A` à `$40:0100`
+  écrit par le SA-1 avec ou sans CBWE. Le stub écrit désormais CBWE par
+  conformité au manuel (4.1.23) ; aucune ligne au journal.
+- **S4 corrigé** (`1b4ede5a`) : `gsuPresentInit` refuse les tampons au-delà
+  des 64 premiers Ko.
+- **PF9 corrigé** (commit `fix(build)` du 2026-10-04) : `$FFD6` vaut `$34`
+  (SA-1 + RAM) et `$35` seulement avec `USE_SRAM := 1` ; `$FFD8` vient du
+  nouveau bouton `SA1_BWRAM_SIZE` (5 = 32 Ko par défaut, inchangé). Arbitre :
+  snesdev-wiki `ae5489473fb4ca37` (`$x4` / `$x5`), sneslab `beeff67049415071`.
+- **PF5 en partie couvert** (commit `test(devtools)` du 2026-10-04) :
+  `libtests_gsu` enchaîne `gsuLaunch()` puis `gsuPresentInit` /
+  `gsuPresent` / `gsuPresentWait` (buffer A → VRAM, `gsu_scbr` basculé,
+  octets vérifiés en VRAM). Restent non exercés : `GSU_PRESENT_ON_LAG_FRAMES`,
+  `SCMR_H160/H192`, la présentation sous PAL, la sauvegarde pendant une
+  présentation.
+
+
+## Suivi 2026-10-05 (session)
+
+- **PF7** : `dsp1.h` décrit le bug DSP1/1A de `Distance` (interpolation
+  inversée aux positions impaires, lu dans bsnes `dsp1emu.cpp` l. 418-420
+  par la fiche corpus `647e4ef6ebffdf00` ; fullsnes `919f1a3794274d16`
+  nomme le bug et la commande `$2F` donne la version). La troncature
+  mesurée n'est pas le bug.
+- **PF8** : les quatre textes corrigés — `sram.asm:35-38` (bannière « refusé »
+  retirée), `hdr_superfx.asm:52-56` (bannière « $FF comme Star Fox »
+  remplacée), `ROADMAP.md:143` (`superfx` décrit tel quel, ligne `dsp1`
+  ajoutée), `dsp1.h:12` (`$03`, `$05` avec `USE_SRAM`).
+- **PF10** : rangée 24 `superfx_game_skeleton` (présentation + cache +
+  SNESMOD) ; note FXPak / `dsp1b.bin` sur la rangée 16 (sd2snes
+  `0f24744ff001c043`, source solide, fait de cartouche flash) ; les deux
+  chemins de sauvegarde (SA-1, Super FX) déclarés non couverts — il faut
+  un exemple à résultat visible pour chacun avant la session. S1 (borne
+  haute de `ROM_BANKS`) est corrigé dans `common.mk` (`ROM_BANKS_MAX`),
+  pas une rangée console.
+- **PF5 (reste)** : `GSU_PRESENT_ON_LAG_FRAMES`, `SCMR_H160/H192`, PAL,
+  sauvegarde pendant une présentation — toujours sans ROM qui les exerce.
+- **Rec 11** : non traité (cinq lignes partenaires à rejouer avant écriture).

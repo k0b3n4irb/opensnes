@@ -79,7 +79,7 @@ int main(void) {
     colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
     colorMathSetOp(COLORMATH_ADD);
     colorMathSetHalf(1);
-    colorMathSetLayers(COLORMATH_BG1);   /* math applies on BG1 pixels */
+    colorMathSetLayers(LAYER_BG1);   /* math applies on BG1 pixels */
 
     setScreenOn();
     while (1) WaitForVBlank();
@@ -131,13 +131,13 @@ the [Window tutorial](window.md) and this one:
 windowInit();
 windowSetPos(WINDOW_1, 64, 192);
 windowEnable(WINDOW_1, WINDOW_MATH);          /* gate on the math area */
-windowSetMainMask(WINDOW_BG1 | WINDOW_BG2);   /* layers windowed too */
+windowSetMainMask(LAYER_BG1 | LAYER_BG2);   /* layers windowed too */
 
 colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
 colorMathSetOp(COLORMATH_ADD);
 colorMathSetHalf(1);
 colorMathSetCondition(COLORMATH_INSIDE);      /* math inside window only */
-colorMathSetLayers(COLORMATH_BG1);
+colorMathSetLayers(LAYER_BG1);
 ```
 
 `colorMathSetCondition(condition)` writes CGWSEL bits 5-4, the region where
@@ -164,7 +164,7 @@ lib has no function for the clip bits yet.
 | Function | Purpose |
 |---|---|
 | `colorMathInit()` | Reset all colour-math registers to "off". Call before configuring a new scene. |
-| `colorMathSetLayers(layers)` | Bitmask of which layers' pixels can be modified by math (`COLORMATH_BG1`, …, `COLORMATH_OBJ`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`). |
+| `colorMathSetLayers(layers)` | Bitmask of which layers' pixels can be modified by math (`LAYER_BG1`, …, `LAYER_OBJ`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`). |
 | `colorMathDisable(layers)` | Take layers out of the per-pixel math gate. |
 | `colorMathSetOp(op)` | `COLORMATH_ADD` or `COLORMATH_SUB`. |
 | `colorMathSetHalf(half)` | 0 = don't divide result, 1 = divide by 2 (true 50 % blend). |
@@ -266,7 +266,7 @@ example, a vignetting effect): use the window-gated math area
 
 ### 🟡 OBJ math depends on palette
 
-When `COLORMATH_OBJ` is enabled, colour math applies *only* to sprite
+When `LAYER_OBJ` is enabled, colour math applies *only* to sprite
 pixels that use OBJ palettes 4–7 (the upper half). Sprites in OBJ
 palettes 0–3 always render opaque, regardless of the math
 configuration. A common "why doesn't my sprite blend?" cause.
@@ -298,6 +298,10 @@ SNES. The discipline is configuring it correctly, not avoiding it.
   the `CGWSEL` bit-1 polarity fix.
 - [`examples/color/transparency`](../../examples/color/transparency/README.md) — additive cloud overlay.
 - [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window-gated spotlight blend.
+- [`examples/color/pseudo_hires`](../../examples/color/pseudo_hires/README.md) — a 50 % blend
+  with no colour math at all: pseudo-hires (SETINI bit 3) puts the sub screen on the even
+  columns of a 512-pixel line and the main screen on the odd ones, and the display blends each
+  pair. It leaves colour math free for another effect, at the cost of horizontal detail.
 - [Window tutorial](window.md) — the pair tutorial; covers
   `WINDOW_MATH` and the window-area gate that the math source mask
   references.

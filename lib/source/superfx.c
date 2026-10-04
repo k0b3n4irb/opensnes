@@ -47,7 +47,7 @@ void gsuCall(u16 entry) {
  * of a frame, for the 224 bytes of a small renderer. */
 
 void gsuStartCached(u16 pc) {
-    GSU_CFGR = gsu_cfgr;
+    GSU_CFGR = (u8)(gsu_cfgr & 0xDF);   /* MS0 must be 0 at 21 MHz (fullsnes, CFGR) */
     GSU_CLSR = 1;                                   /* 21.47 MHz */
     GSU_SCBR = gsu_scbr;
     GSU_R8 = (u16)((u16)gsu_scbr << 10);            /* buffer base, as gsuLaunch() */
@@ -77,6 +77,7 @@ extern u8 gsu_pres_busy, gsu_pres_flags, gsu_pres_nba_back, gsu_pres_nba_front;
 extern u8 gsu_pres_scbr_a, gsu_pres_scbr_b;
 extern u16 gsu_pres_src, gsu_pres_off, gsu_pres_size;
 extern u16 gsu_pres_vram_back, gsu_pres_vram_front, gsu_pres_vtotal;
+extern u16 gsu_pres_frames, gsu_pres_last;   /* diagnostics: no public header declares them */
 extern u8 bg12nba_shadow;   /* background.c */
 
 u16 gsuFrameBytes(void) {
@@ -116,6 +117,11 @@ u8 gsuPresentInit(u16 vram_a, u16 vram_b, u8 flags) {
     ram_kb = (u16)(1u << *(const u8 *)0xFFBD);
     need_kb = (u16)(gsu_scbr + ((size >> 10) << 1));
     if (need_kb > ram_kb)
+        return 0;
+    /* The presentation DMA reads the buffers at $70:0000 + 1 KB x SCBR
+     * with a 16-bit source: both must lie in the first 64 KB of Game Pak
+     * RAM even on a 128 KB board (chips audit, 2026-10-03). */
+    if (need_kb > 64)
         return 0;
 
     gsu_pres_scbr_a = gsu_scbr;

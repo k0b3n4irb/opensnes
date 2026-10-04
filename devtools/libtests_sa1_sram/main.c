@@ -25,6 +25,8 @@ u16 r_done;      /*                                                    -> 0xBEEF
  * on a fresh cart, the previous run's pattern (C1 D2 E3 F4) once a .srm is
  * loaded — the power-cycle chain in tools/luna-test/power_cycle. */
 u8 r_boot[4];
+u16 r_sa1_bw;    /* byte the SA-1 wrote to $40:0100 from its boot stub (sa1_boot.asm here) -> 0x5A */
+u8 back_bw[1];
 
 int main(void) {
     u8 i;
@@ -46,6 +48,13 @@ int main(void) {
     sramLoad(back, 12);
     r_clear = 0;
     for (i = 0; i < 12; i++) r_clear |= back[i];
+
+    /* The SA-1 writes $5A at BW-RAM offset $100 from its boot stub (this
+     * directory's sa1_boot.asm) and then signals ready at I-RAM $3000: the
+     * coprocessor's own writes to the save memory reach it. */
+    while (*(volatile u8 *)0x3000 != 0xA5) { }
+    sramLoadOffset(back_bw, 1, 0x100);
+    r_sa1_bw = back_bw[0];
 
     r_range = sramSaveOffset(tpl, 12, 0x7FF8);
     r_ok = sramSave(tpl, 12);   /* leave the pattern in BW-RAM for the peeks */

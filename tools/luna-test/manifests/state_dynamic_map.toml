@@ -1,14 +1,31 @@
 # Migrated from probes/state_machine.py (dynamic_map: A toggles is_map32x32).
 rom = "../../../examples/maps/dynamic_map/dynamic_map.sfc"
+frames = 180
 [[checkpoint]]
 at_frame = 60
+[checkpoint.values]
+is_map32x32 = { eq = 1, width = 1 }
 [[checkpoint]]                 # pulse A -> toggles
 at_frame = 120
 input = "60:0x0080,64:0"
 [checkpoint.delta]
 is_map32x32 = "changed"
+[checkpoint.values]
+is_map32x32 = { eq = 0, width = 1 }
 [[checkpoint]]                 # pulse A -> toggles back
 at_frame = 180
 input = "120:0x0080,124:0"
 [checkpoint.delta]
 is_map32x32 = "changed"
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[checkpoint.values]
+is_map32x32 = { eq = 1, width = 1 }
+[asserts.dma]
+unsafe_writes = 0
+# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
+# the flag toggles 1 -> 0 -> 1, and the image at 180 is the boot image again.
+[asserts]
+fbhash = "a7c2094ed5fae536"

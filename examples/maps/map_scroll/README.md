@@ -10,7 +10,7 @@ A large Tiled map scrolls as a Mario sprite moves left and right. The map engine
 - How camera-follow works: sprite position drives the viewport
 - How to combine a scrolling background with an animated sprite
 - The two-phase update pattern: `mapUpdate()` (CPU) → `mapVblank()` (DMA)
-- Sprite screen positioning relative to camera (`xloc - x_pos`)
+- Sprite screen positioning relative to camera (`xloc - mapGetCameraX()`)
 
 ## Controls
 
@@ -30,10 +30,10 @@ The map is too large to fit in VRAM. The map engine solves this:
 
 ### Camera-Relative Sprite Positioning
 
-The sprite's position in the map (`xloc`) is not its screen position. The screen position is `xloc - x_pos`, where `x_pos` is the camera's current offset exported by the map engine.
+The sprite's position in the map (`xloc`) is not its screen position. The screen position is `xloc - mapGetCameraX()`, where `mapGetCameraX()` is the camera's current offset exported by the map engine.
 
 ```c
-oamSet(0, xloc - x_pos, yloc - y_pos, frame, 0, 3, flags);
+oamSet(0, xloc - mapGetCameraX(), yloc - mapGetCameraY(), frame, 0, 3, flags);
 ```
 
 ### Walk Animation

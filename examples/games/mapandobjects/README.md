@@ -120,10 +120,10 @@ while (1) {
 
 Each Goomba patrols between `xmin` and `xmax` boundaries. A frame counter
 triggers animation and direction changes every 10 ticks. Screen position is
-computed by subtracting the camera scroll (`x_pos`, `y_pos`):
+computed by subtracting the camera scroll (`mapGetCameraX()`, `mapGetCameraY()`):
 
 ```c
-goombax = goombax - x_pos;
+goombax = goombax - mapGetCameraX();
 oambuffer[goombanum].oamx = goombax;
 oamDynamicDraw(goombanum);
 ```

@@ -182,7 +182,9 @@ u8 snesmodGetPosition(void);
  * Loads a single source/sample for use as a sound effect.
  *
  * @param sfxIndex Source index in the soundbank
- * @return Effect slot ID for use with snesmodPlayEffect
+ * @return Effect slot ID for use with snesmodPlayEffect, 0-15; 0xFF when
+ *         the 16 slots are taken (nothing is loaded — until 2026-10-03 a
+ *         17th load returned 16, which snesmodPlayEffect played as 0)
  */
 u8 snesmodLoadEffect(u16 sfxIndex);
 
@@ -234,7 +236,9 @@ u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch);
  *
  * Sets the playback volume for the current module.
  *
- * @param volume Volume level (0-127)
+ * @param volume Volume level, 0-255; the driver starts a module at 255 (its
+ *        own scale — 127 halves the level, measured on luna 2026-10-04; this
+ *        line said 0-127 until then)
  */
 void snesmodSetModuleVolume(u8 volume);
 
@@ -243,7 +247,7 @@ void snesmodSetModuleVolume(u8 volume);
  *
  * Gradually fades the module volume to a target level.
  *
- * @param targetVolume Target volume (0-127)
+ * @param targetVolume Target volume, 0-255 (the module-volume scale above)
  * @param speed Fade speed (higher = faster)
  *
  * @code
@@ -282,6 +286,20 @@ void snesmodFadeVolume(u8 targetVolume, u8 speed);
  * corrupts the command. (This line offered "or NMI handler" until
  * 2026-09-20.)
  *
+ * Cost: with nothing queued it returns at once. With one message queued it
+ * sends it and returns. With more, it sends what the SPC700 accepts for at
+ * most five scanlines (about 2 % of a frame), then leaves the rest for the
+ * next call; the audio driver takes about two messages per frame.
+ *
+ * The queue holds 85 commands. A command sent while it is full is dropped
+ * (the newest one; until 2026-10-03 it wrapped onto the oldest and the
+ * driver stopped answering). Reaching 85 means snesmodProcess() is not
+ * being called, or dozens of commands are sent per frame.
+ *
+ * It reads no H/V counter and leaves the counter latch alone (it used to
+ * latch `$2137` and read OPVCT, which raised the Super Scope latch flag and
+ * shifted OPVCT's read pointer for whoever read it next).
+ *
  * @code
  * while (1) {
  *     WaitForVBlank();
@@ -314,10 +332,12 @@ void snesmodFlush(void);
 /**
  * @brief Set the streaming sound table
  *
- * Points to a table of streaming sound descriptors.
+ * Points to a table of streaming sound descriptors. Nothing in the SDK
+ * starts a stream, so the table is stored and never read.
  *
  * @param table Pointer to sound table data
  */
+OPENSNES_DEPRECATED("no SDK call starts a stream — the table is never read")
 void snesmodSetSoundTable(const u8 *table);
 
 /**
@@ -330,8 +350,12 @@ void snesmodSetSoundTable(const u8 *table);
  *          stops playing (measured on the libtest_fx fixture: five active
  *          voices when allocated before the load, none when after).
  *
+ * Nothing in the SDK starts a stream, so the region is reserved for nothing
+ * and only takes the memory away from the module.
+ *
  * @param size Buffer size (in units specific to driver)
  */
+OPENSNES_DEPRECATED("no SDK call starts a stream — the region is never used")
 void snesmodAllocateSoundRegion(u8 size);
 
 /** @} */

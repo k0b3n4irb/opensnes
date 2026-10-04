@@ -762,6 +762,16 @@ oamDynamic32Draw:
     .ACCU 8
     lda.w oambuffer+OAM_REFRESH,y
     beq _o32d_no_refresh
+    ; Queue full (128 entries, 768 bytes)? Leave the refresh flag set and try
+    ; again next frame. Until 2026-10-03 the index advanced without a bound
+    ; and the 129th entry overwrote .dynamic_sprite_state, index included.
+    rep #$20
+    .ACCU 16
+    lda.l oamqueuenumber
+    cmp #768
+    sep #$20
+    .ACCU 8
+    bcs _o32d_no_refresh
     lda #$00
     sta.w oambuffer+OAM_REFRESH,y     ; Clear refresh flag
 
@@ -945,6 +955,16 @@ oamDynamic16Draw:
     ; Check if graphics need refresh
     lda.w oambuffer+OAM_REFRESH,y
     beq _o16d_no_refresh
+    ; Queue full (128 entries, 768 bytes)? Leave the refresh flag set and try
+    ; again next frame. Until 2026-10-03 the index advanced without a bound
+    ; and the 129th entry overwrote .dynamic_sprite_state, index included.
+    rep #$20
+    .ACCU 16
+    lda.l oamqueuenumber
+    cmp #768
+    sep #$20
+    .ACCU 8
+    bcs _o16d_no_refresh
     lda #$00
     sta.w oambuffer+OAM_REFRESH,y
 
@@ -1163,6 +1183,16 @@ oamDynamic8Draw:
     ; Check refresh
     lda.w oambuffer+OAM_REFRESH,y
     beq _o8d_no_refresh
+    ; Queue full (128 entries, 768 bytes)? Leave the refresh flag set and try
+    ; again next frame. Until 2026-10-03 the index advanced without a bound
+    ; and the 129th entry overwrote .dynamic_sprite_state, index included.
+    rep #$20
+    .ACCU 16
+    lda.l oamqueuenumber
+    cmp #768
+    sep #$20
+    .ACCU 8
+    bcs _o8d_no_refresh
     lda #$00
     sta.w oambuffer+OAM_REFRESH,y
 

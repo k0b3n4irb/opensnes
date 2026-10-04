@@ -131,7 +131,7 @@ hdmaSetup:
     ; (zero at reset -> it reads a "table" at $00:0000, the tcc__r* scratch
     ; bytes, and writes that residue to the destination register). Presetting
     ; A2A to the table and the line counter to 1 makes the next HBlank load
-    ; the real first entry instead: a mid-frame hdmaEnable() starts the table
+    ; the real first entry instead: a mid-frame hdmaEnableMask() starts the table
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
     ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
@@ -227,7 +227,7 @@ hdmaSetupBank:
     ; (zero at reset -> it reads a "table" at $00:0000, the tcc__r* scratch
     ; bytes, and writes that residue to the destination register). Presetting
     ; A2A to the table and the line counter to 1 makes the next HBlank load
-    ; the real first entry instead: a mid-frame hdmaEnable() starts the table
+    ; the real first entry instead: a mid-frame hdmaEnableMask() starts the table
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
     ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
@@ -321,7 +321,7 @@ hdmaSetupIndirect:
     ; (zero at reset -> it reads a "table" at $00:0000, the tcc__r* scratch
     ; bytes, and writes that residue to the destination register). Presetting
     ; A2A to the table and the line counter to 1 makes the next HBlank load
-    ; the real first entry instead: a mid-frame hdmaEnable() starts the table
+    ; the real first entry instead: a mid-frame hdmaEnableMask() starts the table
     ; one line late and clean, whatever the boot timing or DP residue.
     ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
     ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
@@ -347,14 +347,15 @@ hdmaSetupIndirect:
     rtl
 
 ;------------------------------------------------------------------------------
-; void hdmaEnable(u8 channelMask)
+; void hdmaEnableMask(u8 channelMask)
 ;
 ; Enables specified HDMA channels.
 ;
 ; Stack layout (after PHP):
 ;   5,s = channelMask (8-bit)
 ;------------------------------------------------------------------------------
-hdmaEnable:
+hdmaEnable:                 ; deprecated name, same entry point (until 1.0)
+hdmaEnableMask:
     php
     sep #$20
     .ACCU 8
@@ -370,11 +371,12 @@ hdmaEnable:
     rtl
 
 ;------------------------------------------------------------------------------
-; void hdmaDisable(u8 channelMask)
+; void hdmaDisableMask(u8 channelMask)
 ;
 ; Disables specified HDMA channels.
 ;------------------------------------------------------------------------------
-hdmaDisable:
+hdmaDisable:                ; deprecated name, same entry point (until 1.0)
+hdmaDisableMask:
     php
     sep #$20
     .ACCU 8

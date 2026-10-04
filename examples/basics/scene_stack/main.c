@@ -76,15 +76,33 @@ static u16 counter_value;
  * Title scene
  *============================================================================*/
 
-static void title_init(void) {
-    textModeInit();
+/** @brief Set by the counter before it pops: the title is resumed, not
+ *  re-initialised (scene.h: `init` runs once per push), so it redraws
+ *  itself here. The luna manifest counts the redraws. */
+static u8 title_resume_pending;
+u16 title_redraws;
+
+static void title_draw(void) {
+    textClear();
     textPrintAt(11, 12, "SCENE STACK");
     textPrintAt(11, 14, "PRESS START");
+}
+
+static void title_init(void) {
+    textModeInit();
+    title_draw();
     WaitForVBlank();
     setScreenOn();
 }
 
 static void title_update(void) {
+    if (title_resume_pending) {
+        /* Back from the counter: its screen is still on the layer (until
+         * 2026-10-03 the title stayed hidden behind it). */
+        title_resume_pending = 0;
+        title_redraws++;
+        title_draw();
+    }
     if (padPressed(0) & KEY_START)
         scenePush(&counter_scene);
 }
@@ -108,6 +126,7 @@ static void counter_update(void) {
         return;
     }
     if (pad & KEY_START) {
+        title_resume_pending = 1;   /* the title redraws on its first update */
         scenePop();        /* back to title; next push restarts at 0 */
         return;
     }

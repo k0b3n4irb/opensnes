@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 85 examples organized by topic. For a progressive learning path, see
+All 89 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -39,6 +39,8 @@ The PPU's background modes — colour vs layers vs resolution.
 | @subpage examples_backgrounds_mode3 | Mode 3: 256-color (8bpp) single layer |
 | @subpage examples_backgrounds_mode5 | Mode 5: hi-res 512×256 (16-color) |
 | @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
+| @subpage examples_backgrounds_mode4 | Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words |
+| @subpage examples_backgrounds_mode6 | Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns |
 | @subpage examples_backgrounds_mode5_hires | Mode 5 + interlace hi-res text (512×448) (krom port) |
 
 ---
@@ -81,6 +83,7 @@ The rotate/scale plane — the SNES's signature trick.
 | @subpage examples_mode7_perspective | Pseudo-3D perspective (F-Zero style) |
 | @subpage examples_mode7_perspective_rotate | Full Mode 7 matrix rotation per scanline (krom port) |
 | @subpage examples_mode7_dsp1_ground | Super Mario Kart floor: DSP-1 Raster streams the per-scanline matrices |
+| @subpage examples_mode7_extbg | EXTBG: one plane split in two layers by bit 7, a sprite between them |
 
 ---
 
@@ -110,6 +113,7 @@ Colour math, palette bypass, and beating the 256-colour limit.
 | @subpage examples_color_gradient_9bit | Brightness-dithered "9-bit" gradient backdrop (krom port) |
 | @subpage examples_color_hicolor_1792 | 1792 colors from a 4bpp background via per-tile-row HDMA (krom port) |
 | @subpage examples_color_hicolor_blend | 3840 colors via RGB channel-split blend (krom port) |
+| @subpage examples_color_pseudo_hires | 50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math |
 
 ---
 

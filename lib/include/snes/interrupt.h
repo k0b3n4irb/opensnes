@@ -22,6 +22,10 @@
  *
  * Functions of this type can be registered with nmiSet() to be called
  * automatically during every VBlank interrupt.
+ *
+ * The same type as VoidFn (types.h): this name says what the function is
+ * for, VoidFn is the generic one, and either can be passed where the other
+ * is expected.
  */
 typedef void (*VBlankCallback)(void);
 

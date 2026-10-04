@@ -151,12 +151,13 @@ static u8  mario_action;      /**< Current action state (MARIO_ACT_STAND/WALK/JU
  * animPlay() is called unconditionally each frame — continue-if-same
  * keeps the walk cycle running instead of restarting it.
  *
- * The clips are initialized RAM statics, NOT DECLARE_ANIM_CLIP (which
- * emits ROM const): this ROM's bank $00 is within a few bytes of full,
- * so const clips spill to bank $01+ and the 16-bit C deref reads garbage
- * — the KNOWN_LIMITATIONS bank $00 class, now caught at link time by the
- * symmap ratchet. RAM-backed clips are the documented mitigation
- * (44 bytes of WRAM); the layout and the API are identical. */
+ * The clips are initialized RAM statics rather than DECLARE_ANIM_CLIP
+ * (ROM const). That was a workaround when this ROM's bank $00 was within
+ * a few bytes of full and a const read past it was wrong; since v0.41.0
+ * const data lives in the asset banks and every C read of it is far, so
+ * DECLARE_ANIM_CLIP would work here too. The 44 bytes of WRAM stay for
+ * now; the layout and the API are identical. (Comment corrected
+ * 2026-10-04; it described the pre-#127.3 world.) */
 static u16 clip_walk_frames[]  = { FRAME_WALK0, FRAME_WALK1 };
 static u16 clip_jump_frames[]  = { FRAME_JUMP };
 static u16 clip_stand_frames[] = { FRAME_STAND };
@@ -469,12 +470,13 @@ static void mario_handle_input(void) {
 /**
  * @brief Arithmetic right shift by 8 bits (extract integer part of 8.8 fixed-point).
  *
- * The 65816 has no native arithmetic shift right instruction, and the
- * compiler's LSR (logical shift) would zero-fill the sign bit, turning
- * negative values positive. This function works around it:
- * - Positive values: simple unsigned shift (LSR is correct)
+ * The 65816 has no arithmetic shift right instruction, but cc65816's `>>`
+ * on a signed value IS arithmetic (compiler check test_signed_ops.c), so
+ * `val >> 8` would do; this helper spells the sign handling out:
+ * - Positive values: simple unsigned shift
  * - Negative values: bitwise NOT, unsigned shift, NOT back -- preserves
  *   the sign bit through the inversion trick.
+ * (Until 2026-10-04 this comment claimed the compiler shifted logically.)
  *
  * @param val 8.8 fixed-point signed value
  * @return Integer part (effectively val / 256 with sign preservation)

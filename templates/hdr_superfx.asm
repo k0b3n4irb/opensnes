@@ -30,7 +30,7 @@
 .MEMORYMAP
     SLOTSIZE $8000          ; 32KB per slot (LoROM)
     DEFAULTSLOT 0
-    SLOT 0 $8000 $8000      ; ROM mapped at $8000-$FFFF (32KB)
+    SLOT 0 START $8000 SIZE $8000 NAME "ROM"   ; ROM mapped at $8000-$FFFF (32KB)
     SLOT 1 $0000 $2000      ; Work RAM at $0000-$1FFF (8KB for DP/Stack)
     SLOT 2 $2000 $E000      ; Work RAM at $2000-$FFFF (56KB)
     SLOT 3 $0000 $10000     ; Bank $7E full RAM (64KB)
@@ -50,12 +50,13 @@
 .include "project_config.inc"
 
 ;------------------------------------------------------------------------------
-; Extended Header ($FFB0-$FFBF) — fill with $FF like Star Fox
+; Extended Header ($FFB0-$FFBF) — declared, with the Game Pak RAM size
 ;------------------------------------------------------------------------------
-; Star Fox has all $FF in the extended header area (= no extended header).
-; snes9x may misdetect if this area contains non-$FF values.
+; (Until 2026-10-05 this banner still said "fill with $FF like Star Fox" above
+; the block that does the opposite: the header was extended on 2026-09-24
+; so that an emulator or a cartridge can read the RAM size at $FFBD.)
 ;------------------------------------------------------------------------------
-.BANK 0 SLOT 0
+.BANK 0 SLOT "ROM"          ; by name: a bare 0 drew WLA's "SLOT number 0 / SLOT with starting address 0" warning on every Super FX link (2026-10-04)
 ; Extended header ($FFB0-$FFBF), recognised when the licensee code at $FFDA
 ; is $33 (snesdev-wiki "ROM header / Expanded cartridge header"; fullsnes
 ; "Extended Header"). A Super FX cart declares its Game Pak RAM HERE, at
@@ -84,7 +85,7 @@
     CARTRIDGETYPE CARTRIDGETYPE  ; $13=ROM+GSU (Star Fox compatible)
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
     SRAMSIZE $00            ; $00 here: Game Pak RAM is declared at $FFBD (see above)
-    COUNTRY $01             ; North America (NTSC)
+    COUNTRY COUNTRY_VAL     ; $FFD9: $01 USA/NTSC (default), $02 Europe/PAL, $00 Japan (make ROM_REGION=)
     LICENSEECODE $33        ; $33 = "extended header present" (not a licensee)
     VERSION $00             ; Version 1.0
 .ENDSNES

@@ -41,14 +41,14 @@ static cmdp_command_st gfx4snes_command = {
 			{'b', "til-blank", "add blank tile management (for multiple bgs)", CMDP_TYPE_BOOL, &gfx4snes_args.tileblank},
 			{'s', "til-size", "size of image blocks in pixels {[8],16,32,64}", CMDP_TYPE_INT4, &gfx4snes_args.tilesize},
 			{'k', "til-pack", "output in packed pixel format", CMDP_TYPE_BOOL, &gfx4snes_args.tilepacked},
-			{'z', "til-lzpack", "add blank tile management (for multiple bgs)", CMDP_TYPE_BOOL, &gfx4snes_args.tilelzpacked},
+			{'z', "til-lzpack", "LZ77-compress the tile output (.pic)", CMDP_TYPE_BOOL, &gfx4snes_args.tilelzpacked},
 			{'W', "tile-width", "width of image block in pixels", CMDP_TYPE_INT4, &gfx4snes_args.tilewidth},
 			{'H', "tile-height", "height of image block in pixels", CMDP_TYPE_INT4, &gfx4snes_args.tileheight},
 			{'S', "sprite-map", "print sprite tile number map for sheet", CMDP_TYPE_BOOL, &gfx4snes_args.spritemap},
             {0, 0, "Metasprites options:\n", CMDP_TYPE_NONE, NULL,NULL},
 			{'T', "metasprite", "Include metasprite definition for output (-s is mandatory for this)", CMDP_TYPE_BOOL, &gfx4snes_args.metasprite},
 			{'X', "meta-width","Width of the metasprite {0..128}",CMDP_TYPE_INT4, &gfx4snes_args.metawidth},
-			{'Y', "meta-width","Height of the metasprite {0..128}",CMDP_TYPE_INT4, &gfx4snes_args.metaheight},
+			{'Y', "meta-height","Height of the metasprite {0..128}",CMDP_TYPE_INT4, &gfx4snes_args.metaheight},
 			{'P', "meta-priority","priority of the metasprite {0..3}",CMDP_TYPE_INT4, &gfx4snes_args.metapriority},
             {0, 0, "Maps options:\n", CMDP_TYPE_NONE, NULL,NULL},
 			{'f', "map-offset", "generate the whole picture with an offset for tile number {0..2047}", CMDP_TYPE_INT4, &gfx4snes_args.tileoffset},
@@ -251,6 +251,8 @@ int main(int argc, const char **argv)
 	}
 	else
 	{
+		if (!gfx4snes_args.mapoutput)
+			tiles_checkbanks (tiles_snes, nbtiles, gfx4snes_args.palettecolors);
 		tiles_save (gfx4snes_args.filebase, tiles_snes,nbtiles, gfx4snes_args.palettecolors, gfx4snes_args.tileblank, gfx4snes_args.tilelzpacked,gfx4snes_args.quietmode);
 	}
 

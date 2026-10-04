@@ -23,7 +23,7 @@ void goombainit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
         return;
 
     /* objNew copies the new object to objWorkspace — set fields here */
-    objGetPointer(objgetid);
+    objGetPointer(objGetCurrentId());
     objWorkspace.width = 16;
     objWorkspace.height = 16;
     objWorkspace.sprframe = 0;
@@ -78,8 +78,8 @@ void goombaupdate(u16 idx) {
     }
 
     /* Update sprite screen position */
-    goombay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - y_pos;
-    goombax = goombax - x_pos;
+    goombay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - mapGetCameraY();
+    goombax = goombax - mapGetCameraX();
     oambuffer[goombanum].oamx = goombax;
     oambuffer[goombanum].oamy = goombay;
     oamDynamicDraw(goombanum);

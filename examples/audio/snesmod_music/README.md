@@ -127,7 +127,7 @@ snesmodResume();     /* Resume from pause */
 ### Volume Control
 
 ```c
-snesmodSetModuleVolume(127);    /* 0-127 */
+snesmodSetModuleVolume(255);    /* 0-255, 255 at load */
 snesmodFadeVolume(0, 4);        /* Target volume, speed */
 ```
 

@@ -20,7 +20,7 @@
 # these effects share a screen:
 #   * mosaic_size stays 0 through both brightness fades — fadeOut() must not
 #     reach $2106.
-#   * current_brightness stays 15 through both mosaic ramps — mosaicFade*()
+#   * console_brightness stays 15 through both mosaic ramps — mosaicFade*()
 #     must not reach $2100. A mosaic that dimmed as it pixelated would look
 #     entirely reasonable on screen.
 # The fade legs also pin speed=2 independently: 10 frames in, brightness is
@@ -30,7 +30,7 @@ rom = "../../../examples/transitions/mosaic/mosaic.sfc"
 [[checkpoint]]                 # idle: full bright, mosaic off
 at_frame = 60
 [checkpoint.values]
-current_brightness = { eq = 15, width = 1 }
+console_brightness = { eq = 15, width = 1 }
 mosaic_size = { eq = 0, width = 1 }
 mosaic_bg_mask = { eq = 0, width = 1 }
 
@@ -38,26 +38,26 @@ mosaic_bg_mask = { eq = 0, width = 1 }
 at_frame = 70
 input = "60:0x0080,64:0"
 [checkpoint.values]
-current_brightness = { eq = 11, width = 1 }
+console_brightness = { eq = 11, width = 1 }
 mosaic_size = { eq = 0, width = 1 }        # the fade must not touch $2106
 
 [[checkpoint]]                 # fadeOut(2) complete
 at_frame = 95
 [checkpoint.values]
-current_brightness = { eq = 0, width = 1 }
+console_brightness = { eq = 0, width = 1 }
 mosaic_size = { eq = 0, width = 1 }
 
 [[checkpoint]]                 # fadeIn(2), 10 frames in
 at_frame = 120
 input = "110:0x0080,114:0"
 [checkpoint.values]
-current_brightness = { eq = 4, width = 1 }
+console_brightness = { eq = 4, width = 1 }
 mosaic_size = { eq = 0, width = 1 }
 
 [[checkpoint]]                 # fadeIn(2) complete
 at_frame = 145
 [checkpoint.values]
-current_brightness = { eq = 15, width = 1 }
+console_brightness = { eq = 15, width = 1 }
 mosaic_bg_mask = { eq = 0, width = 1 }
 
 [[checkpoint]]                 # mosaicSetLayers(BG1) + mosaicFadeOut(3), 15 frames in
@@ -66,7 +66,7 @@ input = "160:0x0080,164:0"
 [checkpoint.values]
 mosaic_bg_mask = { eq = 1, width = 1 }     # MOSAIC_BG1
 mosaic_size = { eq = 5, width = 1 }
-current_brightness = { eq = 15, width = 1 }   # the mosaic must not touch $2100
+console_brightness = { eq = 15, width = 1 }   # the mosaic must not touch $2100
 
 [[checkpoint]]                 # 30 frames in: 10 blocks, linear in speed
 at_frame = 190
@@ -80,7 +80,7 @@ at_frame = 210
 [checkpoint.values]
 mosaic_size = { eq = 15, width = 1 }
 mosaic_bg_mask = { eq = 1, width = 1 }
-current_brightness = { eq = 15, width = 1 }
+console_brightness = { eq = 15, width = 1 }
 
 [[checkpoint]]                 # mosaicFadeIn(3) unwinding
 at_frame = 245
@@ -102,4 +102,4 @@ at_frame = 285
 [checkpoint.values]
 mosaic_size = { eq = 0, width = 1 }
 mosaic_bg_mask = { eq = 0, width = 1 }
-current_brightness = { eq = 15, width = 1 }
+console_brightness = { eq = 15, width = 1 }

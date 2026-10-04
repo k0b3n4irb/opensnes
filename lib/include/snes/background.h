@@ -64,12 +64,15 @@
  *          picture line. The lib writes y - 1 to BGnVOFS because the PPU
  *          never outputs scanline 0 (see KNOWN_LIMITATIONS, "Vertical scroll
  *          is off by one"); code that writes BGnVOFS itself (HDMA tables)
- *          must apply the -1 on its own.
+ *          must apply the -1 on its own. Exception: BG3 (bg = 2) in Modes
+ *          2, 4 and 6 is the offset-per-tile table, and its y is written
+ *          raw — y / 8 is the table row the PPU reads first.
  *
  * @code
  * // Scroll BG1 right by 10 pixels
  * bgSetScroll(0, scrollX, 0);
  * @endcode
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void bgSetScroll(u8 bg, u16 x, u16 y);
 
@@ -116,7 +119,9 @@ u16 bgGetScrollY(u8 bg);
  * and the map size (number of screens).
  *
  * @param bg Background number (0-3)
- * @param vramAddr VRAM word address (must be 1KB aligned, i.e., multiple of 0x400)
+ * @param vramAddr VRAM word address, a multiple of 0x400 words (2 KB of
+ *        VRAM): BGnSC holds the base in those units (until 2026-10-04 this
+ *        line said "1KB aligned")
  * @param mapSize Map size (BG_MAP_32x32, BG_MAP_64x32, BG_MAP_32x64, or BG_MAP_64x64)
  *
  * @code

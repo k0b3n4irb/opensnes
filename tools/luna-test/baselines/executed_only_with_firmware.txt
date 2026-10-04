@@ -10,5 +10,6 @@ dsp1Project
 dsp1Range
 dsp1Raster
 dsp1Rotate
+dsp1SetCamera
 dsp1Target
 dsp1Triangle

@@ -481,11 +481,14 @@ the keyword is an error.
 - **Inline assembly** (`asm volatile (...)`): not supported. Write the
   routine in a separate `.asm` file and call it via the convention
   documented above.
-- **Structs by value**: assigning a struct (`a = b;`), passing a struct as
-  an argument, or returning one. The compiler refuses with an error naming
-  the feature ("refusing to emit silently-wrong code") rather than emit a
-  wrong copy. Pass a pointer, or copy field by field. Pinned by
-  `devtools/compiler-tests/cases/negative/struct_*`.
+- **Structs by value**: passing a struct as an argument or returning one.
+  The compiler refuses with an error naming the feature ("refusing to emit
+  silently-wrong code"). Pass a pointer. Pinned by
+  `devtools/compiler-tests/cases/negative/struct_param` and `struct_return`.
+  Assigning a struct (`a = b;`) works since 2026-10-03 (bytes, words and
+  longs per the member alignment; `devtools/compiler-tests/runtime/d_quals`
+  checks every byte lands), except from or to a `FAR` object, which is
+  refused: copy field by field.
 
 ---
 

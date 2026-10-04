@@ -1,0 +1,47 @@
+# mode7/extbg: SETINI bit 6 (mode7SetExtBg) splits the Mode 7 plane into a
+# BG2 whose pixels with bit 7 set sit above priority-1 sprites and whose
+# others sit below every sprite (anomie-regs 075e172a9b1473aa).
+# What this pins:
+#   * SETINI = $40 at boot, $00 after A, $40 after A again, and the screen
+#     designation that goes with it: TM = BG2|OBJ ($12) on, BG1|OBJ ($11)
+#     off;
+#   * the plane is 1:1 and scrolled to row 0: matrix A = D = $00FE
+#     (mode7SetScale(0x0200) — the lib's matrix is scale / 2), M7VOFS -1
+#     (row 0 on the first line; mode7Init alone leaves $17F);
+#   * the ball keeps moving.
+# The occlusion itself (ball hidden by the bit-7 pixels with EXTBG on,
+# drawn over them off) is what the visual baselines capture.
+# Measured on luna v1.30.2.
+rom = "../../../examples/mode7/extbg/extbg.sfc"
+
+[[checkpoint]]
+at_frame = 100
+[checkpoint.values]
+extbg_on = { eq = 1, width = 1 }
+ball_x = { eq = 38, width = 2 }
+[checkpoint.ppu]
+setini = 0x40
+tm = 0x12
+m7a = 0xFE
+m7d = 0xFE
+m7_vofs = -1
+
+[[checkpoint]]
+at_frame = 130
+input = "110:0x0080,112:0"        # A: EXTBG off
+[checkpoint.values]
+extbg_on = { eq = 0, width = 1 }
+[checkpoint.ppu]
+setini = 0
+tm = 0x11
+
+[[checkpoint]]
+at_frame = 160
+input = "140:0x0080,142:0"        # A: EXTBG on again
+[checkpoint.values]
+extbg_on = { eq = 1, width = 1 }
+[checkpoint.delta]
+ball_x = "increased"
+[checkpoint.ppu]
+setini = 0x40
+tm = 0x12

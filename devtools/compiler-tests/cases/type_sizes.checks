@@ -1,0 +1,3 @@
+# The _Static_asserts above are the test: a wrong size fails the compile.
+# The function body folds to the constant 2 + 4 + 4 = 10.
+in sizes_pinned: present lda\.w #10

@@ -109,6 +109,7 @@
  *     // A was just pressed
  * }
  * @endcode
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 u16 padPressed(u8 pad);
 
@@ -126,6 +127,7 @@ u16 padPressed(u8 pad);
  *     player_x++;
  * }
  * @endcode
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 u16 padHeld(u8 pad);
 
@@ -141,14 +143,18 @@ u16 padHeld(u8 pad);
 u16 padReleased(u8 pad);
 
 /**
- * @brief Get raw button state
+ * @brief The same value as padHeld() for a connected pad
  *
- * Returns the raw hardware state without edge detection.
+ * Never was the raw register: the NMI handler has already replaced a word
+ * that is not a joypad's (low four bits set) by 0 before this reads it, so
+ * it returns what padHeld() returns. The one difference: padHeld() answers
+ * 0 for a word of $FFFF (an unplugged port), this returns the $FFFF.
  *
  * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
  *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
- * @return Raw button state
+ * @return Button mask of held buttons
  */
+OPENSNES_DEPRECATED("use padHeld() — this never returned the raw register")
 u16 padRaw(u8 pad);
 
 /**
@@ -437,25 +443,15 @@ u16 scopeButtonsDown(void);
  * Computes calibration offsets: centerh = 128 - rawX, centerv = 112 - rawY.
  * The NMI handler applies these offsets to all subsequent readings.
  *
- * Inlined for zero-call-overhead access.
  */
-extern u16 scope_shothraw, scope_shotvraw;
-extern u16 scope_centerh, scope_centerv;
-inline void scopeCalibrate(void) {
-    scope_centerh = 0x80 - scope_shothraw;
-    scope_centerv = 0x70 - scope_shotvraw;
-}
+void scopeCalibrate(void);
 
 /**
  * @brief Set hold delay (frames before hold triggers).
  *
  * @param frames Number of frames (default: 60 = 1 second at 60Hz)
- * Inlined for zero-call-overhead access.
  */
-extern u16 scope_holddelay;
-inline void scopeSetHoldDelay(u16 frames) {
-    scope_holddelay = frames;
-}
+void scopeSetHoldDelay(u16 frames);
 
 /**
  * @brief Set repeat delay (frames between repeat fires after hold).

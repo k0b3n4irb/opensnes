@@ -21,7 +21,7 @@
 
 .ifdef SA1
 
-.SECTION ".sa1_boot" SUPERFREE
+.SECTION ".sa1_boot" BANK 0 SLOT "ROM" SEMIFREE   ; the SA-1 reset vector is 16-bit: the program must sit in ROM bank 0 (2026-10-03; SUPERFREE let a big program drift to bank 1 and the SA-1 never booted)
 
 .ACCU 16
 .INDEX 16
@@ -74,6 +74,14 @@ SA1Start:
     ; Enable SA-1 I-RAM writes (bit=1 = WRITABLE)
     lda #$FF
     sta.l $00222A               ; CIWP = $FF
+
+    ; Enable SA-1 BW-RAM writes too: CBWE ($2227) bit 7, 1 = write enabled
+    ; (fullsnes; Nintendo manual 4.1.23). crt0 sets the SNES side (SBWE) and
+    ; the protection only holds while BOTH are clear (ares bwram.cpp, from
+    ; Kirby's Dream Land 3), so this is the form the manual asks for, not a
+    ; fix: SA-1 writes to BW-RAM already went through.
+    lda #$80
+    sta.l $002227               ; CBWE = write enabled
 
     ; Clear state
     lda #$00

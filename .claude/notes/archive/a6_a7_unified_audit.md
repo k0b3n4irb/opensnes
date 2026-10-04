@@ -343,8 +343,8 @@ failure. Plan a fix per failure. Target: 0 failures after A6 ships.
 
 - A6 catalogue entry: `.claude/STRUCTURAL_DEFECTS.md:611-830`
 - A7 catalogue entry: `.claude/STRUCTURAL_DEFECTS.md:832-1050`
-- Phase 0 handoff: `.claude/notes/chantiers/a7_phase0_handoff.md`
-- Phase 1.a redesign log: `.claude/notes/chantiers/a7_phase1_design.md`
+- Phase 0 handoff: `.claude/notes/archive/a7_phase0_handoff.md`
+- Phase 1.a redesign log: `.claude/notes/archive/a7_phase1_design.md`
 - C.5 padding patch: qbe `5fe27f0`
 - A1 (already shipped): `.claude/STRUCTURAL_DEFECTS.md:184-277`
 

@@ -468,6 +468,7 @@ void WriteEntityHeader(void)
 void WriteMap(void)
 {
     int tileattr, tilesnes, i;
+    unsigned gid;
     char *lastpostslash;
 
     // We use directory and replace file name with layer name
@@ -508,7 +509,29 @@ void WriteMap(void)
         tileattr = data[i];
         if (tileattr)
         {
-            tilesnes = (tileattr - 1) & 0x03FF; // keep on the low 16bits of tile number
+            // The gid is the id without Tiled's three flip flags (and the
+            // hexagonal-rotation flag, bit 28). Until 2026-10-05 the mask
+            // `& 0x03FF` silently wrapped an id past 1024 onto another tile
+            // and a diagonal flip (a 90-degree rotation in Tiled) was
+            // dropped: the map converted and showed the wrong tile.
+            gid = tileattr & 0x0FFFFFFF;
+            if (tileattr & CUTE_TILED_FLIPPED_DIAGONALLY_FLAG)
+            {
+                printf("tmx2snes: error 'tile %d of layer [%s] is rotated (diagonal flip): "
+                       "the SNES tilemap has no rotation, only horizontal and vertical flips'\n",
+                       i, layer->name.ptr ? layer->name.ptr : "?");
+                fclose(fpo);
+                exit(1);
+            }
+            if (gid > N_METATILES)
+            {
+                printf("tmx2snes: error 'tile %d of layer [%s] uses id %d: the SNES tilemap "
+                       "holds %d tiles (ids 1..%d)'\n",
+                       i, layer->name.ptr ? layer->name.ptr : "?", gid, N_METATILES, N_METATILES);
+                fclose(fpo);
+                exit(1);
+            }
+            tilesnes = gid - 1;
 
             if (tileattr & CUTE_TILED_FLIPPED_HORIZONTALLY_FLAG) // Flipx attribute
                 tilesnes |= (1 << 14);
@@ -856,6 +879,16 @@ int main(int argc, char **argv)
         }
 
         map = cute_tiled_load_map_from_memory(json, (int)w, 0);
+        // One tileset per map: the .b16 is written from the first one only
+        // and a gid from a second would have been converted as if it
+        // belonged to the first (2026-10-05).
+        if (map && map->tilesets && map->tilesets->next)
+        {
+            printf("tmx2snes: error 'the map uses %s tilesets: tmx2snes converts one tileset per map "
+                   "(the first, [%s]); merge them in Tiled or split the layers'\n",
+                   "two or more", map->tilesets->name.ptr ? map->tilesets->name.ptr : "?");
+            exit(1);
+        }
         if (map == NULL)
         {
             printf("tmx2snes: error 'Cannot load map [%s]'\n", filebase);

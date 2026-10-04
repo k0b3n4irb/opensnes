@@ -24,7 +24,7 @@ nothing you do not list is linked.
 | draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
 | hide a sprite that left the screen | `oamHide` | `sprite` | [games/rpg](../examples/games/rpg/) |
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
-| draw one character out of many tiles | `oamDrawMeta`, `MetaspriteItem` | `sprite` | [sprites/metasprite](../examples/sprites/metasprite/) |
+| draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/metasprite](../examples/sprites/metasprite/) |
 | make a tile while the game runs (procedural art) | `tileEncode2bpp`, `tileEncode4bpp`, `tileEncode8bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
 
 ## Moving around a world
@@ -70,7 +70,7 @@ nothing you do not list is linked.
 | fade in or out | `fadeIn`, `fadeOut` | `console` | [transitions/fading](../examples/transitions/fading/) |
 | blend two layers | `colormath*` | `colormath` | [color/transparency](../examples/color/transparency/) |
 | mask part of the screen | `windowSet*` | `window` | [windows/window](../examples/windows/window/) |
-| change a register mid-frame | `hdmaEnable`, `hdmaGradient` | `hdma` | [windows/window_multi_hdma](../examples/windows/window_multi_hdma/) |
+| change a register mid-frame | `hdmaEnableMask`, `hdmaGradient` | `hdma` | [windows/window_multi_hdma](../examples/windows/window_multi_hdma/) |
 | rotate or scale a background | `mode7*` | `mode7` | [games/mode7_racing](../examples/games/mode7_racing/) |
 | pixelate | `mosaicSetLayers`, `mosaicFadeIn` | `mosaic` | [transitions/mosaic](../examples/transitions/mosaic/) |
 
@@ -93,7 +93,7 @@ nothing you do not list is linked.
 
 | I want to… | Use | Module | Notes |
 |---|---|---|---|
-| rotate + project points in 3D | `dsp1Attitude`, `dsp1Objective`, `dsp1Project` (setup: `dsp1Parameter`) | `dsp1` | [chips/dsp1_cube](../examples/chips/dsp1_cube/) — needs `USE_DSP1 := 1` |
+| rotate + project points in 3D | `dsp1Attitude`, `dsp1Objective`, `dsp1Project` (setup: `dsp1SetCamera`) | `dsp1` | [chips/dsp1_cube](../examples/chips/dsp1_cube/) — needs `USE_DSP1 := 1` |
 | true 3D distance / sphere test | `dsp1Distance`, `dsp1Range` | `dsp1` | hardware sqrt — collision, LOD, homing |
 | sin/cos scaled by a radius | `dsp1Triangle` | `dsp1` | 16-bit angles (full turn = 2^16) |
 | check the chip is there | `dsp1IsPresent` | `dsp1` | known-answer probe, never hangs |
@@ -119,23 +119,23 @@ its header.
 | `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch` | [audio: volume and pitch](tutorials/audio.md) |
 | `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio.md) |
 | `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho` | [audio: echo](tutorials/audio.md) |
-| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState`, `audioUpdate` (does nothing, kept for old code) | [audio: asking the engine](tutorials/audio.md) |
+| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState`, `audioUpdate` (deprecated: does nothing) | [audio: asking the engine](tutorials/audio.md) |
 | `background.h` | `bgInitTileSetData`, `bgInit` | [graphics](tutorials/graphics.md) |
 | `collision.h` | `rectSetPos`, `rectGetCenter` | [collision](tutorials/collision.md) |
 | `colormath.h` | `colorMathSetChannel`, `colorMathSetBrightness`, `colorMathTransparency50`, `colorMathSetDirectColor` | [colour math](tutorials/colormath.md) |
 | `console.h` | `rngNext`, `rngSeed` | [math: random numbers](tutorials/math.md) |
 | `console.h` | `resetFrameCount` | [animation](tutorials/animation.md) |
 | `console.h` | `isInVBlank` | [DMA](tutorials/dma.md) |
-| `console.h` | `consoleInitEx` — the same as `consoleInit()`; its argument is reserved | — |
+| `console.h` | `consoleInitEx` — deprecated: the same as `consoleInit()`, its argument is ignored | — |
 | `debug.h` | `consoleMesenBreakpoint`, `consoleNocashMessage` (behind `SNES_BREAK`, `SNES_NOCASH`) | [debugging](tutorials/debugging.md) |
 | `hdma.h` | `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaBrightnessGradientStop`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWindowShape`, `hdmaGetEnabled`, `hdmaDisableAll` | [HDMA: ready-made effects](tutorials/hdma.md) |
 | `input.h` | `padIsConnected` | [input: is a pad plugged in?](tutorials/input.md) |
 | `input.h` | `mouseInit`, `mouseIsConnected`, `mouseGetX`, `mouseGetY`, `mouseButtonsHeld`, `mouseButtonsPressed`, `mouseSetSensitivity`, `mouseGetSensitivity` | [input: the mouse](tutorials/input.md) |
 | `input.h` | `scopeInit`, `scopeIsConnected`, `scopeGetX`, `scopeGetY`, `scopeGetRawX`, `scopeGetRawY`, `scopeButtonsHeld`, `scopeButtonsPressed`, `scopeButtonsRepeat`, `scopeSetHoldDelay`, `scopeSetRepeatDelay`, `scopeSinceShot` | [input: the Super Scope](tutorials/input.md) |
 | `interrupt.h` | `nmiSet`, `nmiClear`, `irqSet`, `irqClear`, `irqSetHTimer`, `irqSetVTimer`, `irqEnable`, `irqDisable` | [interrupts](tutorials/interrupts.md) |
-| `math.h` | `ease_in_quad`, `ease_out_quad` (module `math_ease`) | [math: easing curves](tutorials/math.md) |
+| `math.h` | `easeInQuad`, `easeOutQuad` (module `math_ease`) | [math: easing curves](tutorials/math.md) |
 | `profile.h` | `profileGetScanline` | [profiling](tutorials/profiling.md) |
-| `snesmod.h` | `snesmodGetPosition`, `snesmodFlush`, `snesmodSetSoundTable`, `snesmodAllocateSoundRegion` | [audio: following the music](tutorials/audio.md) |
+| `snesmod.h` | `snesmodGetPosition`, `snesmodFlush`; deprecated, no stream can be started: `snesmodSetSoundTable`, `snesmodAllocateSoundRegion` | [audio: following the music](tutorials/audio.md) |
 | `sprite.h` | `oamSetX` | [sprites](tutorials/sprites.md) |
 | `superfx.h` | `gsuIsPresent`, `gsuSetupBitmapTilemap`, `gsuDmaFullFrame`, `gsuSetupHdmaBlanking`, `gsuCacheLoad`, `gsuStartCached`, `gsuBusy`, `gsuWait` | [Super FX](tutorials/superfx.md) |
 

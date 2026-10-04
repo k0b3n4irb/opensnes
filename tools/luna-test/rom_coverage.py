@@ -89,7 +89,7 @@ FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120
             # the cache-resident GSU job (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait)
             (REPO_ROOT / "devtools" / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
-    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel")
+    for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals")
 ]
 
 
@@ -374,6 +374,20 @@ def main() -> int:
         return 0
     known = set(RATCHET.read_text(encoding="utf-8").split()) if RATCHET.is_file() else set()
     new = sorted(set(never) - known)
+    if not skipped_fw:
+        # Full coverage here: a function that only the firmware-gated ROMs
+        # execute must be on the exemption list, or CI (no firmware) reports
+        # it as newly never-executed — develop went red for five pushes on
+        # dsp1SetCamera this way (2026-10-03; D_testing.md rec 7).
+        exempt = set(FIRMWARE_ONLY.read_text(encoding="utf-8").split()) if FIRMWARE_ONLY.is_file() else set()
+        fw_now = sorted(n for n, ex in hits.items() if ex and ex <= gated)
+        unlisted = [n for n in fw_now if n not in exempt]
+        for n in unlisted:
+            print(f"  ERROR: {n} ({public[n]}) is executed only by firmware-gated ROMs and is not in "
+                  f"{FIRMWARE_ONLY.relative_to(REPO_ROOT)} — CI has no firmware and will call it "
+                  f"never-executed; run rom_coverage.py --update", file=sys.stderr)
+        if unlisted:
+            return 1
     if skipped_fw and FIRMWARE_ONLY.is_file():
         exempt = set(FIRMWARE_ONLY.read_text(encoding="utf-8").split())
         dropped = [n for n in new if n in exempt]

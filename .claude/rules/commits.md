@@ -29,6 +29,20 @@
   buying anything real. Both `feat(lib): add foo` and
   `feat(lib): OAM buffer fix` are accepted.
 
+## Run the lint before the push, not after (since 2026-10-05)
+
+`make hooks` sets `core.hooksPath` to `scripts/githooks/`, whose
+`commit-msg` hook runs `lint_commits.py --message-file` on every message
+and whose `pre-push` hook lints the pushed range exactly as the Lint
+workflow will. Install it in every clone and every worktree you commit
+from. Two subjects with the type and scope swapped (`tools(build): …`,
+`756da353` and `0d30ec65`) reached `develop` on 2026-10-03 and 2026-10-04
+because the lint ran only in CI, after the push; a red Lint job on a
+shared branch cannot be fixed without a force-push, which the owner
+alone decides. A commit script that prints the lint result and pushes
+anyway is the same failure in another form: it must stop on a non-zero
+exit.
+
 ## Merge commits are exempt from the format check
 
 GitHub-generated merge commits (`Merge pull request #N from owner/branch`,

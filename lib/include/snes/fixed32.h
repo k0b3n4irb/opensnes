@@ -189,8 +189,9 @@ inline fixed32 fix32Max(fixed32 a, fixed32 b) {
  *
  * @warning NOT safe inside an nmiSet() callback, like fixMul(): it drives the
  *          hardware multiplier ($4202/$4203) and uses static scratch, so an
- *          NMI-context call corrupts a main-thread call in flight. fix32Div()
- *          and fix32Lerp() share the scratch and the restriction.
+ *          NMI-context call corrupts a main-thread call in flight. fix32Div(),
+ *          fix32Lerp(), fix32Sin() and fix32Cos() share the scratch and the
+ *          restriction (the sine and cosine write the same result words).
  */
 fixed32 fix32Mul(fixed32 a, fixed32 b);
 
@@ -232,11 +233,12 @@ fixed32 fix32Div(fixed32 a, fixed32 b);
  * extends before a. The caller is responsible for clamping if a
  * strict interpolation is needed.
  *
- * Precision caveat: when (b - a) approaches the fix32 range limit
- * (close to ±32768), the intermediate multiply may lose precision
- * at the bottom of the fractional part. For tight cases, prefer
- * direct `a*(1-t) + b*t` formulation (one extra mul, no subtraction
- * round-trip).
+ * Range caveat: `b - a` is a 32-bit difference. When a and b have
+ * opposite signs and |b - a| reaches 32768.0 (say a = FIX32(-20000),
+ * b = FIX32(20000)) it wraps and the result is wrong, not imprecise —
+ * nothing in the multiply can recover it. For such spans use
+ * `fix32Mul(a, FIX32(1) - t) + fix32Mul(b, t)` (one extra mul, no
+ * difference). (Until 2026-10-04 this note spoke of lost precision.)
  *
  * @code
  * fixed32 midpoint = fix32Lerp(p0, p1, FIX32(1) >> 1);  // (p0 + p1) / 2
@@ -259,7 +261,8 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
  * Lifted from the existing 8.8 `fixSin` LUT by shifting left 8 bits to
  * fill the upper half of the 16-bit fractional field. The lower 8 bits
  * are always zero (no precision gained beyond what the 8.8 LUT provides).
- * Costs: one LUT lookup + sign-extend + shift — about 30 cycles total.
+ * Cost: one LUT lookup, a sign-extend and a shift (the measured figure is
+ * in docs/PERF.md; "about 30 cycles" stood here until 2026-10-04).
  *
  * Precision: each LUT step is 1/256 ≈ 0.0039, so for fine animation
  * (sub-pixel motion over many frames) this is adequate. For high-
@@ -283,6 +286,12 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
  * (r_f32sin_c / r_f32sin_asm), and `c_features` pins the widen-then-shift
  * case on its own (r_widen_shl). The asm stays because there is no reason
  * to churn a working routine, not because C cannot express it. */
+/**
+ * @warning NOT safe inside an nmiSet() callback: both write the result
+ *          scratch of fix32Mul() (`f32_res_lo/hi`), so a call from the NMI
+ *          corrupts a main-thread fix32Mul() / fix32Div() in flight — the
+ *          warning on fix32Mul() applies to them (library audit, 2026-10-04).
+ */
 fixed32 fix32Sin(u8 angle);
 fixed32 fix32Cos(u8 angle);
 

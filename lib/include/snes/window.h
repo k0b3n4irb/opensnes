@@ -25,9 +25,9 @@
  * @code
  * // Create a spotlight effect - show BG1 only inside the window
  * windowSetPos(WINDOW_1, 80, 176);          // Window from x=80 to x=176
- * windowEnable(WINDOW_1, WINDOW_BG1);       // Window 1 applies to BG1
- * windowSetInvert(WINDOW_1, WINDOW_BG1, 1); // mask OUTSIDE it = show inside
- * windowSetMainMask(WINDOW_BG1);            // ...and let it mask the main screen
+ * windowEnable(WINDOW_1, LAYER_BG1);       // Window 1 applies to BG1
+ * windowSetInvert(WINDOW_1, LAYER_BG1, 1); // mask OUTSIDE it = show inside
+ * windowSetMainMask(LAYER_BG1);            // ...and let it mask the main screen
  * @endcode
  *
  * The last call is the one that makes anything happen: windowEnable() only
@@ -58,29 +58,34 @@
  * Layer Masks (for windowEnable/windowDisable)
  *============================================================================*/
 
-/** @brief BG1 layer */
-#define WINDOW_BG1      BIT(0)
+/* The layers are named by LAYER_BG1..LAYER_BG4 and LAYER_OBJ (video.h), the
+ * same bits everywhere a call takes a set of layers. WINDOW_MATH is the one
+ * bit only the window has. */
 
-/** @brief BG2 layer */
-#define WINDOW_BG2      BIT(1)
-
-/** @brief BG3 layer */
-#define WINDOW_BG3      BIT(2)
-
-/** @brief BG4 layer */
-#define WINDOW_BG4      BIT(3)
-
-/** @brief Sprites (OBJ) layer */
-#define WINDOW_OBJ      BIT(4)
-
-/** @brief Color math (affects color blending) */
+/** @brief Color math (affects color blending) — the window's own bit */
 #define WINDOW_MATH     BIT(5)
 
 /** @brief All background layers */
-#define WINDOW_ALL_BG   (WINDOW_BG1 | WINDOW_BG2 | WINDOW_BG3 | WINDOW_BG4)
+#define WINDOW_ALL_BG   0x0F
 
 /** @brief All layers including sprites */
-#define WINDOW_ALL      (WINDOW_ALL_BG | WINDOW_OBJ)
+#define WINDOW_ALL      0x1F
+
+/** @name Deprecated layer names (use LAYER_*)
+ * @{ */
+#define WINDOW_BG1      BIT(0)  /**< @deprecated use LAYER_BG1 */
+#define WINDOW_BG2      BIT(1)  /**< @deprecated use LAYER_BG2 */
+#define WINDOW_BG3      BIT(2)  /**< @deprecated use LAYER_BG3 */
+#define WINDOW_BG4      BIT(3)  /**< @deprecated use LAYER_BG4 */
+#define WINDOW_OBJ      BIT(4)  /**< @deprecated use LAYER_OBJ */
+/** @} */
+#ifdef __clang__
+#pragma clang deprecated(WINDOW_BG1, "use LAYER_BG1")
+#pragma clang deprecated(WINDOW_BG2, "use LAYER_BG2")
+#pragma clang deprecated(WINDOW_BG3, "use LAYER_BG3")
+#pragma clang deprecated(WINDOW_BG4, "use LAYER_BG4")
+#pragma clang deprecated(WINDOW_OBJ, "use LAYER_OBJ")
+#endif
 
 /*============================================================================
  * Window Logic Operations
@@ -157,10 +162,10 @@ void windowSetPos(u8 window, u8 left, u8 right);
  * behavior depends on the invert setting (see windowSetInvert).
  *
  * @param window Window number (WINDOW_1 or WINDOW_2)
- * @param layers Layer mask (WINDOW_BG1, WINDOW_BG2, etc.)
+ * @param layers Layer mask (LAYER_BG1, LAYER_BG2, etc.)
  *
  * @code
- * windowEnable(WINDOW_1, WINDOW_BG1 | WINDOW_OBJ);  // Affect BG1 and sprites
+ * windowEnable(WINDOW_1, LAYER_BG1 | LAYER_OBJ);  // Affect BG1 and sprites
  * @endcode
  */
 void windowEnable(u8 window, u8 layers);
@@ -199,7 +204,7 @@ void windowSetInvert(u8 window, u8 layers, u8 invert);
  *
  * When both windows affect a layer, this sets how they combine.
  *
- * @param layer Single layer (WINDOW_BG1, WINDOW_BG2, etc.)
+ * @param layer Single layer (LAYER_BG1, LAYER_BG2, etc.)
  * @param logic Logic operation (WINDOW_LOGIC_*)
  */
 void windowSetLogic(u8 layer, u8 logic);

@@ -107,6 +107,10 @@ USE_SUPERFX ?= 0
 USE_DSP1    ?= 0
 USE_SNESMOD ?= 0
 SRAM_SIZE   ?= 3
+# SA-1 BW-RAM declared in the header ($FFD8, 1 KB << n): 5 = 32 KB, the size
+# every SA-1 example and the sram fixture assume; it is the work RAM of the
+# cartridge whether or not the game saves (USE_SRAM adds the battery).
+SA1_BWRAM_SIZE ?= 5
 SOUNDBANK_SRC ?=
 SOUNDBANK_OUT ?= soundbank
 SOUNDBANK_BANK ?= 1
@@ -128,6 +132,17 @@ ASSET_BANKS_RANGE ?= $(shell echo $$(( $(ROM_BANKS) - 1 )))-1
 # Super FX Game Pak RAM declared in the extended header ($FFBD, 1 KB << n).
 GSU_RAM_KB  ?= 64
 GSU_RAM_SIZE_VAL := $(shell python3 -c "import math; print('$$%02X' % int(math.log2($(GSU_RAM_KB))))")
+# Region the cartridge declares in its header, $FFD9 (2026-10-02; it was
+# $01, North America, on every ROM). fullsnes "Country (also implies
+# PAL/NTSC)" and snesdev-wiki ROM header: $00 Japan and $01 USA are NTSC,
+# $02 Europe is PAL. A console runs at its own standard whatever the byte
+# says (STAT78 bit 4 is PPU2 pin 30, fullsnes f355d4389d653957; getRegion()
+# reads it), but emulators, luna included, pick 50 or 60 Hz from the byte.
+ROM_REGION  ?= ntsc
+COUNTRY_VAL := $(if $(filter ntsc,$(ROM_REGION)),$$01,$(if $(filter pal,$(ROM_REGION)),$$02,$(if $(filter jp,$(ROM_REGION)),$$00,)))
+ifeq ($(COUNTRY_VAL),)
+$(error ROM_REGION=$(ROM_REGION) is not one of ntsc, pal, jp (the header byte $$FFD9: $$01 USA/NTSC, $$02 Europe/PAL, $$00 Japan/NTSC))
+endif
 
 # Derived configuration (one-liners using $(if))
 LIBDIR       := $(OPENSNES)/lib/build/$(if $(filter 1,$(USE_SA1)),sa1,$(if $(filter 1,$(USE_SUPERFX)),superfx,$(if $(filter 1,$(USE_HIROM)),hirom,lorom)))
@@ -145,8 +160,11 @@ MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE
 # = coprocessor ($0x DSP, $1x GSU, $3x SA-1), low nibble = what sits beside
 # it ($x0 ROM, $x2 ROM+RAM+battery; with a coprocessor $x3, $x5 +RAM+battery).
 # DSP-1 + SRAM is $05 (it was $03, "no RAM", with the sram module linked).
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$$13,$(if $(filter 1,$(USE_DSP1)),$(if $(filter 1,$(USE_SRAM)),$$05,$$03),$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
-SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
+# SA-1: $34 = SA-1 + RAM (BW-RAM, always on the board), $35 = + battery when
+# the game saves (snesdev-wiki ROM header, $x4 / $x5; until 2026-10-04 every
+# SA-1 ROM declared a battery and luna wrote a .srm for it).
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$(if $(filter 1,$(USE_SRAM)),$$35,$$34),$(if $(filter 1,$(USE_SUPERFX)),$(if $(filter 1,$(USE_SRAM)),$$15,$$13),$(if $(filter 1,$(USE_DSP1)),$(if $(filter 1,$(USE_SRAM)),$$05,$$03),$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
+SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$0$(SA1_BWRAM_SIZE),$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
 # SRAM/SNESMOD/SuperFX auto-add modules (duplicates are harmless — the
@@ -168,8 +186,30 @@ endif
 ifeq ($(USE_HIROM)$(USE_DSP1),11)
 $(error USE_HIROM=1 with USE_DSP1=1 is not supported: the dsp1 module drives the LoROM board ($$30:8000 data, $$30:C000 status); the HiROM DSP-1 board maps it elsewhere)
 endif
-ifeq ($(USE_SRAM)$(USE_SUPERFX),11)
-$(error USE_SRAM=1 with USE_SUPERFX=1 is not supported: the sram module writes bank $$70, which on a Super FX cart is the GSU's own Game Pak RAM (GSU_RAM_KB). Save data there needs a design that no module has yet)
+# GSU_BANK: link the GSU program at $$n:8000 (see the .sfx rule below).
+GSU_BANK ?=
+ifneq ($(GSU_BANK),)
+ifneq ($(USE_SUPERFX),1)
+$(error GSU_BANK is set without USE_SUPERFX=1: it places a Super FX program)
+endif
+ifneq ($(words $(GSUSRC)),1)
+$(error GSU_BANK needs exactly one file in GSUSRC (got: $(GSUSRC)): one program is linked at $$$(GSU_BANK):8000 — .include the others from it)
+endif
+ifeq ($(GSU_BANK),0)
+$(error GSU_BANK=0 is not a program bank: bank 0 holds the code and the header; use 1..$(shell expr $(ROM_BANKS) - 1) (docs/tools/build.md))
+endif
+endif
+# ROM_NAME goes into the header as 21 ASCII bytes ($20-$7E) through sed:
+# a longer name was cut without a word, a non-ASCII one wrote UTF-8 into
+# the header, and `/` or `&` broke the sed (build-tools audit, 2026-10-04).
+ifneq ($(shell printf '%s' '$(ROM_NAME)' | LC_ALL=C grep -c '[^ -~]'),0)
+$(error ROM_NAME "$(ROM_NAME)" has a character outside printable ASCII ($$20-$$7E): the header holds 21 such bytes)
+endif
+ifneq ($(findstring /,$(ROM_NAME))$(findstring &,$(ROM_NAME))$(findstring \,$(ROM_NAME)),)
+$(error ROM_NAME "$(ROM_NAME)" contains / & or \, which the header substitution cannot carry)
+endif
+ifneq ($(shell n=$$(printf '%s' '$(ROM_NAME)' | LC_ALL=C wc -c); [ "$$n" -gt 21 ] && echo long),)
+$(error ROM_NAME "$(ROM_NAME)" is longer than the 21 characters of the header title)
 endif
 ifeq ($(USE_SRAM),1)
 ifeq ($(filter 1 2 3 4 5 6 7,$(SRAM_SIZE)),)
@@ -178,6 +218,22 @@ endif
 endif
 ifeq ($(shell [ "$(ROM_BANKS)" -gt 0 ] 2>/dev/null && echo ok),)
 $(error ROM_BANKS=$(ROM_BANKS) must be a positive number of banks)
+endif
+# Upper bounds per mapping (2026-10-03): past them the linker still places
+# data, in memory the cartridge does not map as ROM, and the build stays
+# green — a string at $7E:8000 is WRAM, .rodata at $40:0000 is SA-1 BW-RAM,
+# a HiROM label past bank $7F has no 24-bit address. The DSP-1 board the
+# dsp1 module drives is the 1 MB LoROM one (fullsnes, DSP-1 LoROM: data and
+# status in $30-$3F:8000-$FFFF). Lower bound 8: the prebuilt library pins
+# its asset sections to banks 7-1.
+ROM_BANKS_MAX := $(if $(filter 1,$(USE_HIROM)),64,$(if $(filter 1,$(USE_SA1)),64,$(if $(filter 1,$(USE_SUPERFX)),64,$(if $(filter 1,$(USE_DSP1)),32,126))))
+ifeq ($(shell [ "$(ROM_BANKS)" -ge 8 ] && [ "$(ROM_BANKS)" -le "$(ROM_BANKS_MAX)" ] 2>/dev/null && echo ok),)
+$(error ROM_BANKS=$(ROM_BANKS) is out of range for this mapping: 8 to $(ROM_BANKS_MAX) (LoROM 126 banks of 32 KB before WRAM at $$7E; HiROM, SA-1 and Super FX 64; DSP-1 32, the 1 MB board))
+endif
+ifeq ($(filter 1,$(USE_SUPERFX)),1)
+ifeq ($(filter 32 64 128,$(GSU_RAM_KB)),)
+$(error GSU_RAM_KB=$(GSU_RAM_KB) must be 32, 64 or 128: the header byte $$FFBD is 1 KB << n and the GSU boards carry 32, 64 or 128 KB)
+endif
 endif
 ifeq ($(USE_SRAM),1)
 LIB_MODULES += sram
@@ -200,6 +256,9 @@ endif
 # The SDK's own share of the window, added to the project's: a Super FX
 # build keeps its interrupt entries and gsuLaunch's wait loop there
 # (crt0 gsu_nmi_blob & co., lib superfx.asm), 2026-09-29.
+ifneq ($(GSU_BANK),)
+ASFLAGS += -D GSU_BANK_VAL=$(GSU_BANK)
+endif
 RAM_CODE_SDK   := $(if $(filter 1,$(USE_SUPERFX)),768,0)
 RAM_CODE_TOTAL := $(shell echo $$(( $(RAM_CODE_SIZE) + $(RAM_CODE_SDK) )))
 ifneq ($(RAM_CODE_TOTAL),0)
@@ -332,7 +391,12 @@ all: $(TARGET)
 #------------------------------------------------------------------------------
 
 ifneq ($(_HAS_SOUNDBANK),)
-$(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h: $(SOUNDBANK_SRC)
+# One recipe, one target: with both .asm and .h as targets of one rule, a
+# parallel make ran smconv twice and the second run truncated the .bnk the
+# first assembly was reading (2026-10-04, libtests_fx under make tests).
+$(SOUNDBANK_OUT).h: $(SOUNDBANK_OUT).asm
+	@test -f $@ || { echo "soundbank: $@ missing after smconv" >&2; exit 1; }
+$(SOUNDBANK_OUT).asm: $(SOUNDBANK_SRC) .opensnes_config
 	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
 	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
 ifeq ($(USE_HIROM),1)
@@ -346,7 +410,7 @@ endif
 #------------------------------------------------------------------------------
 
 define GFX_RULE
-$(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1)
+$(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1) .opensnes_config
 	@echo "[GFX] $$< -> $$(notdir $$(basename $$<)).pic/.pal"
 	@$$(GFX4SNES) -s $$(SPRITE_SIZE) -p -i $$<
 endef
@@ -372,9 +436,15 @@ ifneq ($(GSUSRC),)
 # label of the GSU program, its offset in the binary — the entry points C
 # passes to gsuCall() / gsuStartCached(). gsu_job.sfx's label `add_job`
 # becomes GSU_JOB_ADD_JOB. Labels starting with _ or @ are local, skipped.
-%.sfx.bin %.sfx.h: %.sfx
-	@echo "[GSU] $< -> $*.sfx.bin, $*.sfx.h"
-	@$(GSU_AS) -I $(TEMPLATES) -o $*.sfx.o $<
+#
+# GSU_BANK = n (2026-10-03) links the program at its real address: it is
+# assembled at $$8000 (memmap_gsu.inc) and GSU_SECTION (assets.inc) puts it
+# at the start of ROM bank n, so its labels are addresses the GSU can jump
+# to and read from. The .sfx.h keeps OFFSETS either way (label - $$8000):
+# gsuCall() and gsuStartCached() add them to the program's address.
+%.sfx.bin %.sfx.h: %.sfx $(TEMPLATES)/memmap_gsu.inc .opensnes_config
+	@echo "[GSU] $< -> $*.sfx.bin, $*.sfx.h$(if $(GSU_BANK), (linked at bank $(GSU_BANK), \$$8000))"
+	@$(GSU_AS) $(if $(GSU_BANK),-D GSU_BANK=$(GSU_BANK)) -I $(TEMPLATES) -o $*.sfx.o $<
 	@echo "[objects]" > $*.sfx.link
 	@echo "$*.sfx.o" >> $*.sfx.link
 	@$(LD) -S -b $*.sfx.link $*.sfx.bin
@@ -383,8 +453,10 @@ ifneq ($(GSUSRC),)
 	  echo " * offsets in $*.sfx.bin (gsuCall, gsuStartCached). Do not edit. */"; \
 	  echo "#ifndef $${P}_SFX_H"; echo "#define $${P}_SFX_H"; \
 	  awk -v P="$$P" '/^\[labels\]/{f=1;next} /^\[/{f=0} \
-	    f && NF==2 && $$2 ~ /^[A-Za-z][A-Za-z0-9_]*$$/ { split($$1,a,":"); \
-	    printf "#define %s_%s 0x%su\n", P, toupper($$2), a[2] }' $*.sfx.sym; \
+	    f && NF==2 && $$2 ~ /^[A-Za-z][A-Za-z0-9_]*$$/ { split($$1,a,":"); o=a[2]; \
+	    d=index("89abcdef", tolower(substr(o,1,1))); \
+	    if (d) o=(d-1) substr(o,2); \
+	    printf "#define %s_%s 0x%su\n", P, toupper($$2), o }' $*.sfx.sym; \
 	  echo "#endif"; } > $*.sfx.h
 	@rm -f $*.sfx.o $*.sfx.link $*.sfx.sym
 endif
@@ -426,7 +498,8 @@ endef
 # specific objects ignore — the ABI requires them).
 CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
-	-Wno-unused-parameter -Wno-error=deprecated-declarations
+	-Wno-unused-parameter -Wno-error=deprecated-declarations \
+	-Wno-error=deprecated-pragma
 
 # C sources → objects
 # Step 1: clang syntax check (cproc has no built-in -W flags so a sibling
@@ -446,6 +519,9 @@ ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
 			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
+	else \
+		python3 $(OPENSNES)/devtools/check_upgrade.py -q $< || \
+			echo "  (deprecated names above: removed at 1.0 — docs/UPGRADING.md; the clang pre-pass is absent on this machine)"; \
 	fi
 endif
 	@echo "[CC] $<"
@@ -461,7 +537,7 @@ endif
 # ignored, and the old header shipped. The stamp holds every knob that
 # reaches the header, the assembler flags or the link; it is rewritten only
 # when that text changes, so a rebuild with the same knobs stays a no-op.
-_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) \
+_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) $(SPRITE_SIZE) \
   [$(ROM_NAME)] [$(ASFLAGS)] [$(CFLAGS)] [$(LIB_MODULES)] [$(LIBDIR)] \
   [$(USE_SNESMOD) $(SOUNDBANK_BANK)]
 .opensnes_config: FORCE
@@ -476,6 +552,7 @@ project_config.inc: .opensnes_config
 	@echo '.DEFINE ROMSIZE_VAL $(ROMSIZE)' >> $@
 	@echo '.DEFINE SRAMSIZE_VAL $(SRAMSIZE)' >> $@
 	@echo '.DEFINE GSU_RAM_SIZE_VAL $(GSU_RAM_SIZE_VAL)' >> $@
+	@echo '.DEFINE COUNTRY_VAL $(COUNTRY_VAL)' >> $@
 
 # Project header (ROM_NAME padded to 21 chars with spaces, then sed into template)
 project_hdr.asm: $(HDR_TEMPLATE) project_config.inc .opensnes_config
@@ -493,7 +570,7 @@ crt0.o: $(TEMPLATES)/crt0.asm project_hdr.asm project_config.inc project_sa1_boo
 	@$(AS) $(ASFLAGS) -I $(TEMPLATES) -o $@ $<
 
 # Initialized data start marker
-data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP)
+data_init_start.o: $(TEMPLATES)/data_init_start.asm $(MEMMAP_DEP) .opensnes_config
 	@echo "[AS] data_init_start"
 	$(call wrap_asm,$<,$@)
 
@@ -515,13 +592,13 @@ $(foreach src,$(ASMSRC),$(eval $(call ASM_OBJ_RULE,$(src))))
 
 # Soundbank object
 ifneq ($(_HAS_SOUNDBANK),)
-$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(MEMMAP_DEP)
+$(SOUNDBANK_OUT).o: $(SOUNDBANK_OUT).asm $(MEMMAP_DEP) .opensnes_config
 	@echo "[AS] $(SOUNDBANK_OUT)"
 	$(call wrap_asm,$<,$@)
 endif
 
 # End marker (must be linked LAST)
-data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP)
+data_init_end.o: $(TEMPLATES)/data_init_end.asm $(MEMMAP_DEP) .opensnes_config
 	@echo "[AS] data_init_end"
 	$(call wrap_asm,$<,$@)
 
@@ -598,6 +675,14 @@ ifneq ($(SKIP_RAM_CHECK),1)
 		fi; \
 	fi
 endif
+	@# data_init_end.o must be the last object (the DMA copy loop stops at its
+	@# terminator): an object linked after it has globals that boot
+	@# uninitialised, silently. Read off the .sym: DataInitEnd must close the
+	@# .data_init section (2026-10-05; KNOWN_LIMITATIONS "no separate check").
+	@SYM=$(TARGET:.sfc=.sym); \
+	if [ -f "$$SYM" ]; then \
+		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-data-init "$$SYM" | grep -v '^Loaded' || exit 1; \
+	fi
 	@# PPU asset budget — a per-build instrument (VRAM/CGRAM weight of the
 	@# converted graphics on disk), the build-time twin of `make budget`
 	@# (runtime footprint via luna). Report-only, NEVER a gate: an inventory

@@ -40,6 +40,11 @@ not a change in vocabulary. We deliberately keep names compatible
 (`oamSet`, `bgSetMapPtr`, `WaitForVBlank`) to ease migration in either
 direction.
 
+`WaitForVBlank()` is the one function of the library that starts with a
+capital, and it stays that way on purpose: it is the name every PVSnesLib
+port arrives with and the most called function of any game. Every other
+function is camelCase with its module's prefix.
+
 ---
 
 ## The five principles
@@ -94,7 +99,7 @@ A project that doesn't use the dynamic sprite engine pays only ~25
 cycles per VBlank for the (no-op) NMI hook indirection.
 
 **Implication:** when adding a feature, the question is *"can this be
-its own module?"* before *"where does this live in `text` or `sprite`?"*.
+its own module?"* before *"where does this live in the text or sprite module?"*.
 A module is a clean cut between linkage and complexity; a function added
 to an existing module forces every consumer of that module to ship the
 new code whether they want it or not.
@@ -120,8 +125,14 @@ static const OamDynamicConfig cfg = {
 oamDynamicInit(&cfg);
 ```
 
-**Implication:** any new public function with more than three arguments
-gets a struct. Sentinel values (`OBJ_HIDE_Y = 240`, `OAM_Y_OFFSCREEN = 224`)
+**Implication:** a new public function does not take more than five
+arguments that change from call to call; what stays the same between calls
+goes in a struct (`MetaspriteStyle`, `Dsp1Camera`). The threshold was three
+arguments of any kind until 2026-10-03: at four and five, a struct filled
+on every call costs more than the positional form it replaces, and putting
+per-call values in a struct means writing it before each call. The
+functions inherited from PVSnesLib keep their signature whatever their
+length. Sentinel values (`OBJ_HIDE_Y = 240`, `OAM_Y_OFFSCREEN = 224`)
 get named macros. Magic numbers in tutorials are replaced by the
 matching constant.
 

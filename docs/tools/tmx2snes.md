@@ -85,3 +85,9 @@ Objects (spawns, doors, triggers) go in an **objectgroup** layer named
 
 Upstream of this: @ref tools_gfx4snes makes the tileset and the `.map` table
 tmx2snes needs.
+
+## Refused maps
+
+A rotated tile (Tiled's diagonal flip), a tile id above 1024 and a map
+with more than one tileset are refused with a message naming the tile:
+each converted silently to a wrong map until 2026-10-05.

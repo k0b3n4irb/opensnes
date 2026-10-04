@@ -1,8 +1,8 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.30.2 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.32.0 · `luna state --until-frame <N>` per ROM · 89 ROMs · **87 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
-> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and the latest NMI within one frame of the capture) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
+> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and the latest NMI within one frame of the capture) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored, or the ROM header's size byte does not cover the file or its checksum complement does not match. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
 | Example | Status | Detail |
 |---|---|---|
@@ -16,33 +16,36 @@ luna v1.30.2 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `audio/snesmod_sfx` | OK | live (200f/190nmi) |
 | `audio/soundboard` | OK | live (200f/198nmi) |
 | `audio/speech_synth` | OK | live (200f/198nmi) |
-| `backgrounds/mode0` | OK | live (200f/198nmi) |
+| `backgrounds/mode0` | OK | live (400f/398nmi) |
 | `backgrounds/mode1` | OK | live (200f/198nmi) |
 | `backgrounds/mode1_bg3_priority` | OK | live (200f/198nmi) |
 | `backgrounds/mode1_lz77` | OK | live (200f/198nmi) |
 | `backgrounds/mode2` | OK | live (400f/398nmi) |
 | `backgrounds/mode3` | OK | live (200f/198nmi) |
+| `backgrounds/mode4` | OK | live (400f/398nmi) |
 | `backgrounds/mode5` | OK | live (200f/198nmi) |
 | `backgrounds/mode5_hires` | OK | live (200f/198nmi) |
+| `backgrounds/mode6` | OK | live (400f/398nmi) |
 | `basics/aim_target` | OK | live (200f/198nmi) |
 | `basics/collision_demo` | OK | live (200f/198nmi) |
-| `basics/fix32_orbit` | OK | live (200f/198nmi) |
+| `basics/fix32_orbit` | OK | live (400f/398nmi) |
 | `basics/game_skeleton` | OK | live (200f/198nmi) |
 | `basics/panel_hud` | OK | live (200f/198nmi) |
 | `basics/random` | OK | live (200f/198nmi) |
 | `basics/scene_stack` | OK | live (200f/198nmi) |
-| `basics/timer` | OK | live (200f/198nmi) |
+| `basics/timer` | OK | live (400f/398nmi) |
 | `chips/dsp1_cube` | OK | live (400f/398nmi) |
 | `chips/sa1_hello` | OK | live (200f/198nmi) |
-| `chips/sa1_starfield` | OK | live (200f/198nmi) |
-| `chips/superfx_3d` | OK | live (200f/197nmi) |
-| `chips/superfx_game_skeleton` | OK | live (200f/189nmi) |
+| `chips/sa1_starfield` | OK | live (400f/398nmi) |
+| `chips/superfx_3d` | OK | live (400f/397nmi) |
+| `chips/superfx_game_skeleton` | OK | live (400f/389nmi) |
 | `chips/superfx_hello` | OK | live (200f/197nmi) |
 | `color/direct_color` | OK | live (200f/198nmi) |
 | `color/gradient_9bit` | OK | live (200f/198nmi) |
 | `color/hicolor_1792` | OK | live (200f/198nmi) |
 | `color/hicolor_blend` | OK | live (200f/198nmi) |
 | `color/palette_cycle` | OK | live (400f/398nmi) |
+| `color/pseudo_hires` | OK | live (400f/398nmi) |
 | `color/shadow_tint` | OK | live (200f/198nmi) |
 | `color/transparency` | OK | live (400f/398nmi) |
 | `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
@@ -52,8 +55,8 @@ luna v1.30.2 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `games/mode7_flying` | OK | live (200f/198nmi) |
 | `games/mode7_racing` | OK | live (200f/198nmi) |
 | `games/rpg` | OK | live (200f/198nmi) |
-| `games/shmup_1942` | OK | live (200f/198nmi) |
-| `games/tetris` | OK | live (200f/190nmi) |
+| `games/shmup_1942` | OK | live (400f/398nmi) |
+| `games/tetris` | OK | live (400f/390nmi) |
 | `hdma/gradient_colors` | OK | live (200f/198nmi) |
 | `hdma/hdma_helpers` | OK | live (200f/198nmi) |
 | `hdma/hdma_indirect_gradient` | OK | live (200f/198nmi) |
@@ -70,22 +73,23 @@ luna v1.30.2 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `memory/hirom_demo` | OK | live (200f/198nmi) |
 | `memory/save_game` | OK | live (200f/198nmi) |
 | `mode7/dsp1_ground` | OK | live (200f/198nmi) |
+| `mode7/extbg` | OK | live (400f/398nmi) |
 | `mode7/perspective` | OK | live (200f/198nmi) |
 | `mode7/perspective_rotate` | OK | live (200f/198nmi) |
 | `mode7/rotate_scale` | OK | live (200f/198nmi) |
 | `scrolling/continuous_scroll` | OK | live (200f/198nmi) |
-| `scrolling/mixed_scroll` | OK | live (200f/198nmi) |
+| `scrolling/mixed_scroll` | OK | live (400f/398nmi) |
 | `scrolling/parallax_scroll` | OK | live (400f/398nmi) |
 | `sprites/animated_sprite` | OK | live (200f/198nmi) |
-| `sprites/aseprite_pipeline` | OK | live (200f/198nmi) |
+| `sprites/aseprite_pipeline` | OK | live (400f/398nmi) |
 | `sprites/dynamic_metasprite` | OK | live (200f/198nmi) |
-| `sprites/dynamic_sprite` | OK | live (200f/198nmi) |
+| `sprites/dynamic_sprite` | OK | live (400f/398nmi) |
 | `sprites/metasprite` | OK | live (400f/398nmi) |
 | `sprites/simple_sprite` | OK | live (200f/198nmi) |
 | `sprites/sprite_sizes` | OK | live (200f/198nmi) |
 | `sprites/sprite_swarm` | OK | live (400f/398nmi) |
 | `text/print_string` | OK | live (200f/198nmi) |
-| `text/scroll_message` | OK | live (200f/198nmi) |
+| `text/scroll_message` | OK | live (400f/398nmi) |
 | `transitions/fading` | OK | live (200f/198nmi) |
 | `transitions/mosaic` | OK | live (200f/198nmi) |
 | `windows/transparent_window` | OK | live (200f/198nmi) |

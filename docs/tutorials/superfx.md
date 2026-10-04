@@ -96,8 +96,9 @@ library's.
 
 ```asm
 .ifdef SUPERFX
-; The GSU binary, in any ROM bank (the library reads the bank from the pointer)
-ASSET_SECTION ".gsu_code"
+; The GSU binary. Placed where it fits, in any ROM bank (the library reads
+; the bank from the pointer) — or at $n:8000 when the Makefile sets GSU_BANK
+GSU_SECTION ".gsu_code"
 gsu_program:
     .incbin "gsu_code.sfx.bin"
 gsu_program_end:
@@ -354,10 +355,45 @@ gsuCall(GSU_JOB_MUL_JOB);       /* R0-R7 and R9-R13 are yours; the launcher writ
 ```
 
 `devtools/libtests_gsu` runs `mul_job` both ways. The offsets are relative to
-the binary, and the program is assembled at 0: code that only branches
-(relative) runs anywhere, but an absolute jump or an address of a ROM table
-inside the program would need the binary linked at its ROM address, which
-the build does not do yet.
+the binary. By default the program is assembled at 0 and placed by the
+linker where it fits, so only position-independent code is right: relative
+branches, `LOOP` through `MOVE R13, R15`.
+
+### Absolute jumps and tables in ROM: `GSU_BANK`
+
+A program that jumps to an absolute address or reads a table of its own
+needs its labels to be the addresses the GSU sees. One line in the Makefile
+does it:
+
+```makefile
+GSU_BANK := 1        # the program is linked at $01:8000
+```
+
+The `.sfx` is then assembled at `$8000` and `GSU_SECTION` forces the binary
+to the start of ROM bank 1, which the GSU reads at the same address (it
+sees banks `$00-$3F` as LoROM, ROM at `$8000-$FFFF`). `GSU_BANK` is also
+defined inside the `.sfx`:
+
+```asm
+rom_job:
+    IBT R0, #GSU_BANK
+    ROMB                    ; ROM bank for GETB = the program's bank
+    IWT R14, #_table        ; R14 = ROM address: the ROM buffer loads
+    GETB                    ; R0 = table[0]
+    IWT R15, #_far          ; absolute jump (delay slot follows)
+    NOP
+_table:
+    .db $A5, $3C
+_far:
+    ...
+```
+
+The generated `.sfx.h` still holds offsets, so `gsuCall()` and
+`gsuStartCached()` are called the same way. One `.sfx` per ROM in this mode
+(`.include` the others from it); bank 1's top is the RAM code window, so a
+program longer than what is left below it fails at link rather than at
+run. `devtools/libtests_gsu` is built this way: its `rom_job` returns the
+two table bytes, and returns 0 when the same binary is placed elsewhere.
 
 ## SuperFX Assembly Rules
 
@@ -495,7 +531,7 @@ of `superfx_3d`'s framebuffer bytes landing on visible lines, dropped
 without a word. Read `$213F`, `$2137`, then `$213D` twice, every time. `superfx_3d` now presents about 30
 frames per second, all of them whole.
 
-It uses HDMA channel 1 and arms it like `hdmaEnable()` does, so it
+It uses HDMA channel 1 and arms it like `hdmaEnableMask()` does, so it
 combines with your own HDMA channels; just leave channel 1 to it.
 
 `gsuIsPresent()` returns 1 when crt0 found a GSU at boot; use it to fall
@@ -593,6 +629,40 @@ then for the DMA.
 presented byte lands in blank or force blank, in whole frames into
 alternating blocks, and that no swap shows a block before its frame is
 complete.
+
+## Saving
+
+A Super FX cartridge has no separate save chip: when it has a battery, the
+battery keeps the GSU's Game Pak RAM. `USE_SRAM := 1` beside
+`USE_SUPERFX := 1` declares it (cartridge type `$15`), and the `sram`
+module then reads and writes that RAM:
+
+```c
+#include <snes/sram.h>
+
+#define SAVE_AT 0xE000          /* past the two 16 KB framebuffers */
+
+sramSaveOffset((u8 *)&save, sizeof(save), SAVE_AT);
+sramLoadOffset((u8 *)&save, sizeof(save), SAVE_AT);
+```
+
+Two things differ from an ordinary cartridge:
+
+- **You choose where the save lives.** Offsets count from `$70:0000`, where
+  the first framebuffer is, so `sramSave()` and `sramClear()` (offset 0)
+  would write over it. Use the Offset functions and a region your SCBR
+  settings leave alone; the whole RAM (`GSU_RAM_KB`, 64 KB by default) is
+  what the battery keeps, framebuffers included.
+- **The RAM is shared with the GSU.** While a job runs with RAN = 1 the CPU
+  cannot touch it. The module clears RAN for the transfer, the GSU waits on
+  its next RAM access, and SCMR is put back afterwards, through the same
+  `gsu_scmr_live` the presentation NMI uses. A save in the middle of a job
+  therefore works, and costs the job the time of the copy: keep it small,
+  or save between jobs.
+
+`devtools/libtests_gsu` saves while a job runs, and two luna manifests
+(`f_gsu_save_write.toml`, `g_gsu_save_read.toml`) power the cartridge off
+and on between the save and the read.
 
 ## Example ROMs
 

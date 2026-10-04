@@ -14,6 +14,66 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-05, later: `f8f11bcced91`)
+
+`snes_sources`: **34 955 chunks, 215 of 237 sources, built 2026-10-05T00:41:07Z,
+chunker v10, fingerprint `f8f11bcced91`** — the rebuild after the owner's
+"rag mis à jour"; six chunks more than `15fc202da6dc`. Golden queries **9/9**,
+negative control `opensnes-docs` at ranks 1 and 2. With the MCP server
+restarted, the guard-rails hold: a mistyped `exclude_sources` is refused by
+`snes_search` and gives `invalid_request` in `snes_verify`, `k=500` returns
+20 passages, `snes_get` prints the alias line.
+
+## Index state (2026-10-05, chunker v10 — "fin du ménage")
+
+`snes_sources`: **34 949 chunks, 215 sources captured of 237, built
+2026-10-05T00:01:28Z, chunker v10, index v2, fingerprint `15fc202da6dc`**
+(`2026-10-04_from_snes-rag_fin-du-menage.md`, after `…_volume-de-module-tranche.md`
+at `2dd271353e84` and `…_garde-fous-mcp.md`). What changed for us: domain
+arbiters are matched on whole words (no more `luna-docs` promoted by "Lunar
+Magic"), `reference` is a rank between arbitre-domaine and solid and
+`authority_min="reference"` is accepted, addresses are matched under one
+form (`0x2130` = `$2130` = `2130h`, four-digit only — two-digit bank ranges
+such as fullsnes's `40h-4Fh` are still not matched, the SA-1 case of
+`OPEN_snes-rag.md`), the `mesures-partenaires` fiches are in English with
+new chunk ids (old ones resolve by alias), a mistyped `exclude_sources` id
+is refused instead of ignored and `k` is bounded to 1..20. Golden queries
+**9/9**; negative control: `opensnes-docs` at ranks 1 and 2, no toolchain
+source above it. Caveat measured on 2026-10-05: a session whose MCP server
+process predates the `git pull` serves the new index with the old code —
+the refusal and the `k` bound were not active here (`exclude_sources=
+["opensnes-docz"]` ran, `k=500` returned 62) until the server is restarted.
+
+## Index state (2026-10-02, v8)
+
+`snes_sources`: **34 808 chunks, 210 sources captured of 236, built
+2026-10-02T05:26:41Z, chunker v8, index v2, fingerprint `5f0e4bb5e1c0`**
+(`2026-10-02_from_snes-rag_ids-v8.md`). **Chunk ids are now derived from
+the content** (document, breadcrumb, text) instead of `sha1(document:rank)`,
+so every id changed once; old ids still resolve through an alias table in
+`snes_get` — 17 of 17 of ours checked, same text. Cite the new id when you
+touch a comment. fullsnes's prose (~400 KB) is indexed again. Golden
+queries 9/9. Serving it on the replica takes `git pull` + `make import
+SRC=/media/psf/Home/workspaces/SNES/snes-rag` + `make rebuild`; the index
+is down for the ~2.5 min of the rebuild (reported).
+
+## Index state (2026-10-02, evening)
+
+`snes_sources`: **34 220 chunks, 210 sources captured of 236, built
+2026-10-02T03:47:47Z, chunker v7, index v2, fingerprint `0aeced38d56e`**
+(`2026-10-02_from_snes-rag_reponse.md`, answering our audit). New: an
+address alone no longer attests a point, and a passage listing more than 8
+addresses (a register map) attests nothing by its register names — our
+multiplier claim now comes out `arbiter_covers_topic_only`, with their
+negative-measure note (`mesures-partenaires`) first; `sentences` now also
+keep a sentence sharing three terms with the claim (the empty window,
+VMADD and Mode 5 sentences are served, state still `topic_only` by design:
+the sentence decides); `wladx-issue-704` captured; `mesures-partenaires`
+carries our two measures (latch H/V, multiplier non-reproduced); a
+`gsu-stop.md` fiche distils ares/bsnes `instructionSTOP`; nesdev forum
+threads re-captured whole (~620 → 1 172 chunks). Golden queries: **9/9**;
+negative control: our ABI ranks 1-2, never qbe-docs.
+
 ## Index state (2026-10-02)
 
 `snes_sources` on 2026-10-02: **33 436 chunks, 209 sources captured of 235,
@@ -28,6 +88,96 @@ answer when the question names their identifiers), a
 now counted on the answering **passage**: 54.1 % at 5 (the source-level
 80.7 % was mostly the arbiters' prior). Golden queries rerun: **9/9**;
 negative control: our ABI at ranks 1 and 2, never qbe-docs.
+
+## Index state (2026-10-02, evening)
+
+`snes_sources`: **34 819 chunks, built 2026-10-02T11:54:22Z, chunker v8,
+fingerprint `b363c473e7ec`** (snes-rag's `…_reponse-ids-v8.md`; served after
+pull + import + rebuild). What moved:
+
+- **`contradicted` only on a documented false form** (`forme_fausse`): the
+  hires columns, CGWSEL bits, SIWP polarity. A true claim is no longer
+  refuted (their 60 pairs: 13 → 0 %); a passage from a page carrying a
+  documented error is marked `documented_error` in `evidence`.
+- **`make rebuild` is atomic** (`cartouche.db.part`, then rename): the
+  service answered during our rebuild.
+- **Attestation reads the whole passage** and accepts common terms, so more
+  `states_point: true` — including two false ones we reported
+  (`…_reponse-ids-v8_reply.md` §2: multiplier at `$4216` + "product";
+  fullsnes mouse bits on a Mode 4 claim). The rule (state AND sentence)
+  matters more, not less.
+- Golden queries 9/9; negative control: our ABI at ranks 1 and 2 again.
+
+## Index state (2026-10-03, night)
+
+Replica at snes-rag's fingerprint `ab7b05594e17` (34 946 chunks, chunker
+v10, 215 sources: `furryrpg`, `georgjz-snes-assembly-adventure`,
+`nova-the-squirrel-2`, `skipp-and-friends`, `space-rescue-squad` new).
+`luna-docs` serves v1.32.0: "how do I tell whether two builds sound the
+same when their audio hashes differ" gives the `[1.32.0]` changelog
+(`2153025ed4d5bb41`) then the `luna diff --audio` section
+(`35c15ed5c76a63bd`). Breadcrumbs no longer take a `# …` line of a code
+block for a title (their fix after our observation): golden query 6 now
+returns `47a5d8b1bad020d3` with the real path *luna CLI / … / luna diff*;
+the old id `192d1bade86dc0dc` answers by alias.
+
+## Index state (2026-10-03, evening)
+
+Replica at snes-rag's commit `9aaa3f3`, their fingerprint `8bae78f3a746`
+(34 880 chunks, their figures), MCP server restarted. `luna-docs` serves
+v1.31.0 (`0606861003a2ba40`, the `region` key). `snes_verify` no longer
+takes its headline `citation` from a page with a documented error when
+another passage exists: the pseudo-hires parity case cites fullsnes
+`61c70037e21beeb4` (which does not state the parity; anomie-regs
+`19acadfe6457f2ae` does, in `evidence`). Golden queries 4, 5, 6, 9 green:
+`e70dda0db5cb59ad`, `2fb69fc62f489c12`, `192d1bade86dc0dc`,
+`495ab2a1f6b73c83`. A reconnect alone does not serve a new index: the
+replica needs `git pull`, `make import SRC=…`, `make rebuild`.
+
+## luna pin v1.31.0 (2026-10-03)
+
+Replica at snes-rag's `7c9411654112` (34 878 chunks, their figure), MCP
+server restarted by the owner. Golden queries 4, 5, 6, 9 rerun with the
+exclusion set: green, same chunks. `luna-docs` serves 1.30.3, not 1.30.4
+nor 1.31.0 (published 2026-10-03T11:27Z): recapture asked.
+
+The six `snes_verify` reference cases of snes-rag's coverage rule, replayed:
+multiplier at `$4216` and over `$4202-$4217` both `unsettled /
+arbiter_covers_topic_only`; Mode 4 `confirmed` on `d594aeedde1b87c2`;
+pseudo-hires true form `confirmed`, inverted form `contradicted /
+documented_error_on_point`; the half-pixel wording `confirmed`. One thing
+to know when reading that last one: its headline `citation` is the
+snesdev-wiki *Backgrounds* passage (`50a28313076782ce`) that carries the
+documented inversion, with `states_point: true` — read the sentences of
+anomie-regs (`19acadfe6457f2ae`), not the headline.
+
+## Index state (2026-10-03, afternoon)
+
+Replica updated to snes-rag's `8a7fa1ea9a56` (34 864 chunks, their figures).
+New: the 65816 side of SNESMOD as code (`snesmod` source, e.g.
+`6a7dcbf85c93ca2d`, `23669e7ecb9d204a`), two `cartouche-fiches-jeux` notes on
+SNESMOD's API and on smconv, a KOF banner on the source. `luna-docs` serves
+1.30.3 (`b0c25f779e82f2bd`), not 1.30.4: asked. The new `snes_verify`
+coverage rule needs the MCP server restarted; not verified in the session
+that rebuilt (`partners/snes-rag/OPEN_snes-rag.md`).
+
+## luna pin v1.30.4 (2026-10-03)
+
+Index served: **34 829 chunks, 210 sources captured of 236, built
+2026-10-02T12:15:33Z, chunker v8, fingerprint `7d9495170d2f`** (a rebuild
+after `b363c473e7ec`; it adds the `cartouche-fiches` note on Mode 6
+offset-per-tile bit 3 in hi-res, `61be8d9e9e954b38`). Golden queries 4, 5, 6
+and 9 rerun with the exclusion set: green, same chunks. `luna-docs` is still
+the 2026-09-30 capture: no 1.30.3 or 1.30.4 changelog entry is served (query
+"luna changelog v1.30.4 MCP ttlMs cacheScope; v1.30.3 Super FX battery
+save" returns only the `luna mcp` usage page). Two versions behind; added to
+`OPEN_snes-rag.md`.
+
+## luna pin v1.30.3 (2026-10-02)
+
+Golden queries 4, 5, 6 and 9 (the `luna-docs` ones) rerun on `5f0e4bb5e1c0`:
+green. `luna-docs` stops at 1.30.2 (the 1.30.3 Super FX battery entry is not
+served); reported in `2026-10-02_to_snes-rag_ids-v8_reply.md` §5.
 
 ## Index state (2026-09-30)
 
@@ -160,7 +310,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-09-30, index `55507a6f2907`; 9/9 also on `bb5dbf5eff5d`)
+## Golden queries (status 2026-10-05, index `f8f11bcced91`; 9/9 on every index since `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 
@@ -175,7 +325,7 @@ Run with the exclusion set. "✅" = the intended source is in the top 3.
 | 7 | TMX tile flipping flags (`FLIPPED_HORIZONTALLY_FLAG`…) high bits of the gid | ✅ tiled-tmx-format | green since `bb5dbf5eff5d`: the constants live on the "Global Tile IDs" page, which the corpus now captures (`d07b82b0b0dcebb9`, `8a64c4c6f6f9932f`) |
 | 8 | Aseprite file format: cel chunk layout and palette chunk semantics | ✅ aseprite-file-spec | |
 | 9 | luna profile per-symbol master cycles `--from-frame --top` JSON | ✅ luna-docs | |
-| N | *negative control* — cc65816 calling convention: push order and pointer size (no exclusion) | ≈ opensnes-docs 2nd and 3rd | 2026-09-27: `wdc-65816-manual` "Push" (generic) is first; never qbe-docs, so the control holds, but our ABI is no longer first — reported. The chunk it served carried a stale row of our own ABI.md (fixed the same day) |
+| N | *negative control* — cc65816 calling convention: push order and pointer size (no exclusion) | ≈ opensnes-docs 1st and 2nd (2026-10-05; 2nd and 3rd before) | 2026-09-27: `wdc-65816-manual` "Push" (generic) is first; never qbe-docs, so the control holds, but our ABI is no longer first — reported. The chunk it served carried a stale row of our own ABI.md (fixed the same day) |
 
 Lesson from the first run: phrase toolchain queries with the tool's own
 vocabulary (`type :name`, `phi`, `--power-on`, `cel chunk`), not with

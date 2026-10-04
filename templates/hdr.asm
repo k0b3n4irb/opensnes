@@ -23,7 +23,7 @@
 .MEMORYMAP
     SLOTSIZE $8000          ; 32KB per slot (default)
     DEFAULTSLOT 0
-    SLOT 0 $8000 $8000      ; ROM mapped at $8000-$FFFF (32KB)
+    SLOT 0 START $8000 SIZE $8000 NAME "ROM"   ; ROM mapped at $8000-$FFFF (32KB); named like memmap.inc's slot 0
     SLOT 1 $0000 $2000      ; Work RAM at $0000-$1FFF (8KB for DP/Stack)
     SLOT 2 $2000 $E000      ; Work RAM at $2000-$FFFF (56KB)
     SLOT 3 $0000 $10000     ; Bank $7E full RAM (64KB)
@@ -54,7 +54,7 @@
     CARTRIDGETYPE CARTRIDGETYPE  ; $00=ROM, $02=ROM+SRAM
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
     SRAMSIZE SRAMSIZE_VAL   ; $00=None, $03=8KB
-    COUNTRY $01             ; North America (NTSC)
+    COUNTRY COUNTRY_VAL     ; $FFD9: $01 USA/NTSC (default), $02 Europe/PAL, $00 Japan (make ROM_REGION=)
     LICENSEECODE $00        ; Unlicensed
     VERSION $00             ; Version 1.0
 .ENDSNES

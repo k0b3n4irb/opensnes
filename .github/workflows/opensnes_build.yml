@@ -9,12 +9,14 @@ on:
     branches:
       - "main"
       - "develop"
+      - "maint/**"
     tags-ignore:
       - "v*"  # Release tags are handled by release.yml
   pull_request:
     branches:
       - "main"
       - "develop"
+      - "maint/**"
 
 # One run per branch head. `head_ref` (PR source) and `ref_name` (push) both
 # resolve to the same branch name, so the push-to-develop run and the
@@ -24,7 +26,10 @@ on:
 # required checks. Release tags are handled by release.yml (unique per tag).
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  # A push to develop keeps its verdict: 37 of 78 runs between 09-27 and 10-03
+  # were cancelled by the next push (testing audit, D_testing.md PF2). PR and
+  # branch runs still yield to the newer commit.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/develop' }}
 
 # ------------------------------------ #
 # Set O.S matrix                       #

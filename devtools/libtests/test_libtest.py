@@ -11,7 +11,7 @@ Vectors covered (see main.c):
   - math: div16/mod16 (incl. divisor-0 contract and the 65535/1 worst
     case of the old O(quotient) loop), mul16, sqrt16, fixMul/fixDiv/fixLerp
     and fix32Mul/fix32Div (L2b)
-  - text: cursor_y wrap — the tilemapBuffer overflow guard
+  - text: cursor row wrap — the tilemapBuffer overflow guard
   - L2c (2026-09-15): collision (rect/point/tile), sram round trip in bank
     $70, the raw IRQ path (V/H timer counts), console region + vblank
     getters, and the window module asserted on luna's PPU register view
@@ -82,6 +82,7 @@ CASES = [
     ("r_audio_vol",   2, 100),
     # phase 2: sample pipeline. load=AUDIO_OK; free = 0xC000-0x0B00-9;
     # slot-0 address = sample base; play returns round-robin voice 0.
+    ("r_audio_load513", 2, 0),   # 2026-10-03: the end-of-stream handshake no longer races on a 0 index
     ("r_audio_load",  2, 0),
     ("r_audio_free",  2, 0xB4F7),
     ("r_audio_addr",  2, 0x0B00),
@@ -101,6 +102,10 @@ CASES = [
     # L2c: sram — bank $70 round trip, offsets, XOR checksum, clear
     ("r_sram_rt", 2, 16), ("r_sram_off", 2, 22), ("r_sram_off0", 2, 1),
     ("r_sram_ck", 2, 32), ("r_sram_ck0", 2, 0), ("r_sram_clear", 2, 0),
+    ("r_sram_rom0", 2, 0x4C),   # source in ROM bank $00 (header title) saved byte for byte
+    ("r_obj_type64", 2, 0),     # objNew refuses a type past OB_TYPE_MAX
+    ("r_obj_oob_cobj", 2, 0),   # a slot index past the pool: objCollidObj says no contact
+    ("r_obj_oob_idx", 2, 1),    # ...and objCollidMap1D/objUpdateXY on it left the free list alone
     # L2c: IRQ path — one V-timer IRQ per waited frame, none while disabled,
     # the default handler after irqClear() acknowledges without counting
     ("r_irq_a", 2, 10), ("r_irq_b", 2, 10), ("r_irq_c", 2, 12), ("r_irq_d", 2, 12),
@@ -116,6 +121,13 @@ CASES = [
     ("r_obj_fr_x",   2, 0x0200),  # objInitFriction1D(0x100): xvel decelerates
     ("r_obj_fr_y",   2, 0),       # ...and a small yvel clamps at zero, no sign flip
     ("r_obj_pool",   2, 80),      # objKillAll returns the WHOLE pool (was 79: a slot leaked)
+    ("r_ease",         2, 0xC040),  # easeInQuad(128) = 64, easeOutQuad(128) = 192
+    ("r_ease_names",   2, 1),       # the deprecated ease_in_quad / ease_out_quad agree
+    ("r_bright_get",   2, 7),       # getBrightness() reads what setBrightness() set
+    ("r_mosaic_init",  2, 0),       # mosaicInit() clears the size
+    ("r_scope_hold",   2, 30),      # scopeSetHoldDelay() writes the crt0 word
+    ("r_obj_curid",    2, 1),     # D4: objGetCurrentId() is objNew()'s handle
+    ("r_obj_selfkill", 2, 0),     # D4: objKillCurrent() in its update -> stale handle
     # coverage lot B (2026-09-19): the public functions nothing executed
     ("r_fix_abs_n",    2, 0x0300), ("r_fix_abs_p",    2, 0x0200),
     ("r_fix_clamp_lo", 2, 0xFF00), ("r_fix_clamp_hi", 2, 0x0100), ("r_fix_clamp_in", 2, 0x0080),
@@ -150,15 +162,22 @@ CASES = [
     ("r_bank_irq_bk",  2, 1),      # premise: the handler really is outside bank $00
     ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
     # audio error returns (API audit 3.5, 2026-09-21): they used to be swallowed
+    ("r_apu_boot_again", 2, 1),  # 2026-10-03: apuWaitBoot is bounded; 1 = no IPL
     ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2),
     ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
     ("r_aud_on", 2, 6), ("r_aud_on_bad", 2, 0xFF), ("r_aud_on_rr", 2, 1),   # audioPlaySampleOn: the caller picks the voice
     # types: fixLerp's t is a u16 so 1.0 is reachable; sprite ids are u16 so the range check sees 256
     ("r_lerp_t256", 2, 9472), ("r_lerp_t300", 2, 9472), ("r_oam_id256", 2, 0x4221),
+    ("r_lerp_wide", 2, 0),       # 2026-10-03: b - a over 17 bits (was 0x8000, -128.0)
+    ("r_hide_x", 2, 1),          # 2026-10-03: hidden at X = 257, not 256
+    ("r_rng_boot_moved", 2, 1),  # 2026-10-03: the boot seed is latched H/V, not the $8001 of unlatched counters
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),
     ("r_aud_unload",   2, 3),      ("r_aud_unfree",   2, 0xB500),
+    ("r_meta_style",   2, 22),     ("r_meta_plain",   2, 0x6C64),
+    ("r_meta_flipx",   2, 0x646C), ("r_meta_flipattr", 2, 0x40),
+    ("r_meta_piece32", 2, 42),     # the piece size comes from the style, not from "large = 16"
     ("r_meta_n",       2, 12),     ("oam_dyn_sprite_size", 1, 16),
     # fixed32: the asm sine and the C expression the header says is miscompiled
     ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16

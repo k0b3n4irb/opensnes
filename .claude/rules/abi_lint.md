@@ -140,6 +140,13 @@ ZERO skipped via marker (the 22 legacy `audio.asm` functions are gone
 with the file), internal helpers with no public signature unchecked
 by design.
 
+## `lib/contrib` is in the gate too (since 2026-10-04)
+
+`make lint-asm-abi` runs the script twice: on `lib/source` and on
+`lib/contrib` (the object engine, `object.asm`: 18 public functions, 25
+annotated stack reads). The library audit found the second tree outside
+the gate (B_library.md PF6); it passed on first run, and stays checked.
+
 ## When this rule does NOT apply
 
 - `combined.asm` and `*.c.asm` — those are compiler output, not

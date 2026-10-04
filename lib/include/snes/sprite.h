@@ -115,50 +115,6 @@
 #define MAXSPRTRF   (7 * 6)
 
 /*============================================================================
- * Sprite Lookup Tables (for dynamic sprite management)
- *============================================================================*/
-
-/**
- * VRAM addressing lookup tables for dynamic sprite engines.
- * These tables convert sprite frame indices to VRAM addresses.
- *
- * Usage:
- *   u16 vramOffset = lkup16oamS[frameId];  // VRAM source offset
- *   u16 tileId = lkup16idT[spriteSlot];    // OAM tile number
- *   u16 vramDest = lkup16idB[spriteSlot];  // VRAM destination
- */
-
-/** @brief VRAM source offsets for 16x16 sprites (64 entries) */
-extern u16 lkup16oamS[];
-
-/** @brief OAM tile IDs for 16x16 sprites - small size mode (64 entries) */
-extern u16 lkup16idT[];
-
-/** @brief OAM tile IDs for 16x16 sprites - large size mode (64 entries) */
-extern u16 lkup16idT0[];
-
-/** @brief VRAM destination addresses for 16x16 sprites (64 entries) */
-extern u16 lkup16idB[];
-
-/** @brief VRAM source offsets for 32x32 sprites (16 entries) */
-extern u16 lkup32oamS[];
-
-/** @brief OAM tile IDs for 32x32 sprites (16 entries) */
-extern u16 lkup32idT[];
-
-/** @brief VRAM destination addresses for 32x32 sprites (16 entries) */
-extern u16 lkup32idB[];
-
-/** @brief VRAM source offsets for 8x8 sprites (128 entries) */
-extern u16 lkup8oamS[];
-
-/** @brief OAM tile IDs for 8x8 sprites (128 entries) */
-extern u16 lkup8idT[];
-
-/** @brief VRAM destination addresses for 8x8 sprites (128 entries) */
-extern u16 lkup8idB[];
-
-/*============================================================================
  * Dynamic Sprite Structure
  *============================================================================*/
 
@@ -369,6 +325,7 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * fixed — `examples/input/move_sprite` uses plain `u16` and its manifest pins
  * the motion to the pixel. Prefer `s16` when a sprite can leave the screen by
  * the left or the top, so the off-screen test is a signed compare.
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags);
 
@@ -438,6 +395,7 @@ void oamSetTile(u16 id, u16 tile);
  * @param id Sprite ID (0-127)
  *
  * @see examples/games/rpg — culls its villagers this way
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamHide(u16 id);
 
@@ -446,6 +404,7 @@ void oamHide(u16 id);
  *
  * @param id Sprite ID (0-127)
  * @param large TRUE for large size, FALSE for small
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamSetSize(u16 id, u16 large);
 
@@ -527,29 +486,48 @@ typedef MetaspriteItem t_metasprite;
 #define OBJ_NAMETABLE_HIGH  0x01
 
 /**
- * @brief Draw a metasprite (PVSnesLib compatible)
+ * @brief What stays the same from one frame of a metasprite to the next
  *
- * Draws a multi-tile sprite composed of multiple hardware sprites.
- * The metasprite data is an array of MetaspriteItem structures
- * terminated by METASPR_TERM.
+ * Declare one per character, usually `static const`; the frame, the
+ * position and the flip are given at each call.
+ */
+typedef struct {
+    u16 baseTile;     /**< Tile number added to each item's tile offset */
+    u8  basePalette;  /**< Palette (0-7) for the items that name none */
+    u8  size;         /**< OBJ_SMALL or OBJ_LARGE, for every piece */
+    u8  pieceSize;    /**< Pixels of one piece (8, 16, 32 or 64): the size
+                       *   `size` selects in your OBJSEL mode. Read only
+                       *   when flipping */
+    u8  width;        /**< Width of the whole metasprite in pixels. Read
+                       *   only when flipping */
+    u8  height;       /**< Height of the whole metasprite in pixels. Read
+                       *   only when flipping */
+} MetaspriteStyle;
+
+/**
+ * @brief Draw one frame of a metasprite
+ *
+ * Draws a multi-tile sprite composed of multiple hardware sprites. The
+ * frame is an array of MetaspriteItem terminated by METASPR_TERM — what
+ * animTickMeta() returns, or a table of your own.
  *
  * @param startId First sprite ID to use (0-127)
- * @param x X position of metasprite origin
- * @param y Y position of metasprite origin
- * @param meta Pointer to metasprite data array (MetaspriteItem[])
- * @param baseTile Base tile number to add to each item's tile offset
- * @param basePalette Base palette (0-7) when item doesn't specify one
- * @param size Size selection for all sprites (OBJ_SMALL or OBJ_LARGE)
+ * @param x X position of the metasprite origin
+ * @param y Y position of the metasprite origin
+ * @param frame The frame to draw (MetaspriteItem[])
+ * @param style Base tile, palette, size and extent (see MetaspriteStyle)
+ * @param flip 0, or OBJ_FLIPX and / or OBJ_FLIPY to mirror the whole
+ *             metasprite inside its `width` x `height` box. Each piece is
+ *             moved to the mirrored place and its own flip bit toggled.
  *
  * @return The next free sprite id (startId + the number of sprites drawn) —
  *         chain calls with it, as examples/sprites/metasprite does. Items
  *         that fall off screen are skipped WITHOUT consuming an id, so the
  *         count varies per frame: hide the ids you used last frame and no
- *         longer use. (Documented as "number of sprites used" until
- *         2026-09-20; the code never did that.)
+ *         longer use.
  *
  * @code
- * // Define a 32x32 metasprite using 4 16x16 sprites
+ * // A 32x32 character made of four 16x16 sprites
  * const MetaspriteItem hero_frame0[] = {
  *     METASPR_ITEM(0,  0,  0, OBJ_PRIO(2)),   // Top-left
  *     METASPR_ITEM(16, 0,  1, OBJ_PRIO(2)),   // Top-right
@@ -557,36 +535,37 @@ typedef MetaspriteItem t_metasprite;
  *     METASPR_ITEM(16, 16, 3, OBJ_PRIO(2)),   // Bottom-right
  *     METASPR_TERM
  * };
+ * static const MetaspriteStyle hero_style = {
+ *     .baseTile = 0, .basePalette = 0, .size = OBJ_LARGE,
+ *     .pieceSize = 16, .width = 32, .height = 32,
+ * };
  *
- * // Draw at position (100, 80)
- * oamDrawMeta(0, 100, 80, hero_frame0, 0, 0, OBJ_LARGE);
+ * oamDrawMetasprite(0, 100, 80, hero_frame0, &hero_style, 0);          // facing right
+ * oamDrawMetasprite(0, 100, 80, hero_frame0, &hero_style, OBJ_FLIPX);  // facing left
  * @endcode
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
+u16 oamDrawMetasprite(u16 startId, s16 x, s16 y, const MetaspriteItem *frame,
+                      const MetaspriteStyle *style, u8 flip);
+
+/**
+ * @brief oamDrawMetasprite() without flip, its style given as three arguments
+ *
+ * (startId, x, y, meta) as oamDrawMetasprite(); baseTile, basePalette and
+ * size are the fields of MetaspriteStyle. Same return value.
+ */
+OPENSNES_DEPRECATED("use oamDrawMetasprite() — baseTile, basePalette and size are now a MetaspriteStyle")
 u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                u16 baseTile, u8 basePalette, u8 size);
 
 /**
- * @brief Draw a metasprite with flip support
+ * @brief oamDrawMetasprite() with its style and flip given as seven arguments
  *
- * Like oamDrawMeta but supports horizontal and vertical flipping
- * of the entire metasprite.
- *
- * @param startId First sprite ID to use
- * @param x X position
- * @param y Y position
- * @param meta Metasprite data
- * @param baseTile Base tile number
- * @param basePalette Base palette
- * @param size Size selection (OBJ_SMALL or OBJ_LARGE)
- * @param flipX Flip horizontally if non-zero
- * @param flipY Flip vertically if non-zero
- * @param width Metasprite width for flip calculations
- * @param height Metasprite height for flip calculations
- *
- * @return The next free sprite id (startId + the number of sprites drawn),
- *         like oamDrawMeta() — chain calls with it. (The header said "number
- *         of hardware sprites used" until 2026-09-20; the code never did.)
+ * It assumes a piece is 16 pixels when `size` is OBJ_LARGE and 8 when
+ * OBJ_SMALL, whatever the OBJSEL mode: a flipped metasprite of 32x32 pieces
+ * comes out wrong. oamDrawMetasprite() takes the piece size.
  */
+OPENSNES_DEPRECATED("use oamDrawMetasprite() — eleven positional arguments, and it assumes 8 / 16 pixel pieces")
 u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                    u16 baseTile, u8 basePalette, u8 size,
                    u8 flipX, u8 flipY, u8 width, u8 height);
@@ -603,8 +582,12 @@ u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
  * and easier to evolve without breaking existing callers.
  */
 typedef struct {
-    u16 vramLarge;      /**< VRAM base for large-size tile pool (was gfxsp0adr) */
-    u16 vramSmall;      /**< VRAM base for small-size tile pool (was gfxsp1adr) */
+    u16 vramLarge;      /**< VRAM base for large-size tile pool (was gfxsp0adr).
+                         *   Only 0x0000 is honoured today: OBJSEL's name base is
+                         *   written as 0 and the tile-number tables are fixed, so
+                         *   another value sends the tiles one way and OAM the other */
+    u16 vramSmall;      /**< VRAM base for small-size tile pool (was gfxsp1adr).
+                         *   Only 0x1000 is honoured today, for the same reason */
     u16 slotLargeInit;  /**< Initial OAM slot for large sprites (was oamsp0init) */
     u16 slotSmallInit;  /**< Initial OAM slot for small sprites (was oamsp1init) */
     u8  sizeMode;       /**< OBJ_SIZE_* — defines the small/large pixel sizes */
@@ -660,6 +643,7 @@ void oamDynamicSetSize(u16 id, u8 size);
  * resolve to 64x64 are silently skipped.
  *
  * @param id Index into oambuffer array (0-127)
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamDynamicDraw(u16 id);
 
@@ -746,9 +730,11 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
  * Zero-overhead alternatives to oamSet/oamSetXY for performance-critical code.
  * These write directly to oamMemory[] without function call overhead.
  *
- * oamSet() has framesize=158 per call due to SSA temporaries. With >2-3
- * sprites/frame in the main loop, the stack manipulation causes visible
- * jitter. These macros eliminate that overhead entirely.
+ * oamSet() is a call with seven arguments pushed and a stack frame; for a
+ * handful of sprites updated every frame the macros below write the four
+ * OAM bytes in place. (A byte count of an earlier oamSet's frame and a
+ * "visible jitter" claim stood here until 2026-10-04; the cost is in
+ * docs/PERF.md, measured, not here.)
  *
  * Note: cc65816 does not truly inline 'static inline' functions — they
  * become separate SUPERFREE sections with global labels that conflict

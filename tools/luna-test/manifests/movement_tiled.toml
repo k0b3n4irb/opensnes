@@ -1,14 +1,31 @@
 # Migrated from probes/movement.py.
 rom = "../../../examples/maps/tiled/tiled.sfc"
+frames = 180
 [[checkpoint]]
 at_frame = 60
+[checkpoint.values]
+focusx = { eq = 128, width = 2 }
 [[checkpoint]]                 # RIGHT -> focusx up
 at_frame = 120
 input = "60:0x0100,119:0"
 [checkpoint.delta]
 focusx = "increased"
+[checkpoint.values]
+focusx = { eq = 187, width = 2 }
 [[checkpoint]]                 # LEFT -> focusx down
 at_frame = 180
 input = "120:0x0200,179:0"
 [checkpoint.delta]
 focusx = "decreased"
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[checkpoint.values]
+focusx = { eq = 128, width = 2 }
+[asserts.dma]
+unsafe_writes = 0
+# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
+# focusx 128 -> 187 (59 frames of RIGHT, one pixel each) -> 128 (same of LEFT).
+[asserts]
+fbhash = "c9a7b804a12a47d0"

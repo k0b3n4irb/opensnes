@@ -63,15 +63,33 @@ echo "install-luna: fetching ${ARCHIVE} (${VERSION})"
 # luna is a public repo: the release-download URL needs no auth. Prefer curl so
 # a stale/absent GH_TOKEN (locally or in CI) can't break the install with a 401
 # — the old gh-first path did exactly that. gh is a fallback for a private repo.
+# luna keeps binaries for its five newest releases only (rule since 2026-10-03);
+# an older pinned version has its tag but no asset. Say so instead of leaving a
+# bare download error.
+no_asset_hint() {
+    code="$(curl -sIL -o /dev/null -w '%{http_code}' "$BASE/${ARCHIVE}" 2>/dev/null || echo 000)"
+    if [ "$code" = "404" ]; then
+        cat >&2 <<EOM
+install-luna: no binary for ${VERSION} at ${BASE}
+  luna publishes binaries for its five newest releases only; older versions
+  keep their git tag. Either pin a newer version in tools/luna-test/luna.version
+  or build this one from its tag:
+    git clone https://github.com/${REPO} && cd luna && git checkout ${VERSION} && cargo build --release -p luna-cli
+  then copy target/release/luna to tools/luna-test/bin/.
+EOM
+    fi
+}
 if curl -fsSL "$BASE/${ARCHIVE}"        -o "$TMP/${ARCHIVE}" \
    && curl -fsSL "$BASE/${ARCHIVE}.sha256" -o "$TMP/${ARCHIVE}.sha256"; then
     :
-elif command -v gh >/dev/null 2>&1; then
-    gh release download "$VERSION" --repo "$REPO" \
+elif command -v gh >/dev/null 2>&1 \
+     && gh release download "$VERSION" --repo "$REPO" \
         --pattern "${ARCHIVE}" --pattern "${ARCHIVE}.sha256" \
-        --dir "$TMP" --clobber
+        --dir "$TMP" --clobber; then
+    :
 else
-    echo "install-luna: download failed (curl error and no gh available)" >&2
+    no_asset_hint
+    echo "install-luna: download of ${ARCHIVE} (${VERSION}) failed" >&2
     exit 1
 fi
 

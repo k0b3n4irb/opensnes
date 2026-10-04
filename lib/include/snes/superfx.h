@@ -136,11 +136,6 @@ extern u8 gsu_owns_cart;
  */
 extern u8 gsu_scmr_live;
 
-/** @brief Frames gsuPresent() has put on screen so far */
-extern u16 gsu_pres_frames;
-
-/** @brief Bytes the last transferring NMI moved (a diagnostic: the window) */
-extern u16 gsu_pres_last;
 
 /*============================================================================
  * API Functions
@@ -199,9 +194,12 @@ void gsuSetProgram(const void *program);
  * Reads gsu_cfgr, gsu_scmr, gsu_scbr for configuration.
  * The CPU waits in WRAM while the GSU owns the Game Pak. Interrupts keep
  * working (since 2026-09-25/26): the vectors point into WRAM, the NMI
- * counts the frame and uploads OAM, an H/V-timer or GSU IRQ is acknowledged;
- * the ROM-side work (your NMI callback, your IRQ handler) waits for the end
- * of the job.
+ * counts the frame and uploads OAM, an H/V-timer or GSU IRQ is acknowledged.
+ * The ROM-side work is not run during the job: your NMI callback, the pads
+ * and the dirty flags are picked up by the first ROM NMI after it (one
+ * call, not one per missed frame), and an H/V-timer IRQ raised during the
+ * job is acknowledged and DROPPED — your IRQ handler never sees it (crt0
+ * gsu_irq_blob; until 2026-10-04 this line said it "waits").
  */
 extern void gsuLaunch(void);
 
@@ -429,6 +427,13 @@ extern void gsuDmaFullFrame(void);
  * and then publishes them to gsuDmaFullFrame() and the gsuPresent() NMI,
  * which use the blanked lines as extra transfer time. Leave the bands on
  * while either is in use.
+ *
+ * A band may be 0 (no band) to 224 lines; a band of 128 lines or more
+ * takes two HDMA entries. top + bottom above 224 leaves no visible lines.
+ * (Until 2026-10-03 a top band of 0 ended the table before it began, and
+ * the whole frame was then transferred on visible lines.) The visible
+ * lines are written with INIDISP = $0F, full brightness: setBrightness()
+ * and the fades do not apply while the bands are on.
  */
 extern void gsuSetupHdmaBlanking(u16 topBlank, u16 bottomBlank);
 

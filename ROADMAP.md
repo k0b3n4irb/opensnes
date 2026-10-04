@@ -8,11 +8,11 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.47.0
+## Current Status: post-v0.48.0
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 85
+produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 89
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -110,7 +110,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
       markers were stale. CI no longer passes `--allow-known-bugs`.
 - [x] **A-cache through `pha`** — shipped; chantier C.6's audit confirmed
       the optimisation already worked, the `acache_pha` test was stale.
-      Hard-fails any regression as of chantier A3 (2026-05-09).
+      Hard-fails any regression since 2026-05-09.
 
 ### Library modules
 | Module | Description | Status |
@@ -140,17 +140,18 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `debug` | Nocash messages, Mesen breakpoints | core |
 | `video` | Video mode and display control | core |
 | `sa1` | SA-1 enhancement-chip helpers | experimental |
-| `superfx` | SuperFX (GSU) loader stubs (assembly only — no C compiler) | experimental |
+| `superfx` | Super FX (GSU): job launch, cached code, double-buffered frame presentation (`gsuLaunch`, `gsuStartCached`, `gsuPresent`); GSU code is assembly only (no C compiler) | core (luna-validated; the 1.0 freeze criterion) |
+| `dsp1` | DSP-1 commands (multiply, trig, rotation, projection, distance) over the two-register port | core (runs the real firmware on luna) |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (85)
+### Examples (89)
 - **Text**: print_string, scroll_message · **Fundamentals**: text_glyphs
-- **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode5, mode5_hires
+- **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode4, mode5, mode5_hires, mode6
 - **Sprites**: simple_sprite, sprite_sizes, animated_sprite, metasprite, dynamic_sprite, dynamic_metasprite, sprite_swarm
 - **Scrolling**: mixed_scroll, continuous_scroll, parallax_scroll
-- **Mode 7**: rotate_scale, perspective, perspective_rotate, dsp1_ground
+- **Mode 7**: rotate_scale, perspective, perspective_rotate, dsp1_ground, extbg
 - **HDMA & raster**: gradient_colors, hdma_indirect_gradient, hdma_wave, hdma_helpers
-- **Colour**: palette_cycle, transparency, shadow_tint, direct_color, gradient_9bit, hicolor_1792, hicolor_blend
+- **Colour**: palette_cycle, transparency, shadow_tint, direct_color, gradient_9bit, hicolor_1792, hicolor_blend, pseudo_hires
 - **Windows**: window, window_multi_hdma, transparent_window · **Transitions**: fading, mosaic
 - **Input**: controller, move_sprite, two_players, mouse, superscope
 - **Audio**: snesmod_music, snesmod_music_large, snesmod_sfx, soundboard, apu_switch, play_noise, pitch_mod, speech_synth, echo
@@ -193,7 +194,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (85 / 85)
+- [x] Example READMEs with hardware explanations (89 / 89)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
@@ -289,17 +290,20 @@ This stretch focused on closing process gaps surfaced by an internal audit
       path is documented in `KNOWN_LIMITATIONS.md` as untestable until
       luna exposes a multitap.
 - [ ] **Streaming audio support**
-- [ ] **Hardware verification documentation**
-- [ ] **Original-game release**
+- [x] **Hardware verification documentation** — protocol and kit written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`, `make hardware-preflight`); the first console session is the open part (see the v1.0 table)
+- [ ] **Original-game release** — in progress outside this repository (see the v1.0 table)
 - [ ] **Video tutorial series**
 
 ---
 
 ## Work in flight
 
-None on a branch. The Super FX runtime chantier merged its phases A
-(interrupt vectors in WRAM), B (the NMI survives GSU jobs) and C0 (IRQ,
-BRK and COP too) on 2026-09-26; phases C-F are open
+None on a branch. The Super FX runtime work is merged, phases A to F
+(2026-09-24 to 2026-09-29): interrupt vectors in WRAM, an NMI that survives
+GSU jobs, non-blocking launch, `gsuPresent`, code in RAM, the C to GSU
+contract, and since 2026-10-03 a GSU program linked at its real ROM address
+(`GSU_BANK`) and a save for Super FX games (`USE_SRAM` with `USE_SUPERFX`).
+Nothing remains open there
 (`.claude/notes/chantiers/superfx_runtime.md`).
 The 2026-09-26 état des lieux (`.claude/notes/reviews/`) sets the order of
 the work before v1.0. The 2026-09-11 gaps-review backlog is closed (43 of
@@ -312,9 +316,9 @@ still applies to multi-day chantiers; the four `wip/*` branches that
 existed on 2026-09-14 were all superseded by commits already on
 `develop` (three CI hygiene branches of 2026-09-07, one test-harness
 branch of 2026-06-22) and were deleted that day. The luna side of the
-plan lives with the luna team: their queue and ours are in
-`~/opensnes_reports/` (owner-side), the pinned release in
-`tools/luna-test/luna.version`.
+plan lives with the luna team: the exchanges are in
+`.claude/notes/partners/luna/` (and the owner's exchange folder), the
+pinned release in `tools/luna-test/luna.version`.
 
 ## Known limitations
 
@@ -322,12 +326,12 @@ The full catalog with severity tags lives in
 [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md). Headlines:
 
 - **No floating-point** — use fixed-point math (`<snes/math.h>`)
-- **`int` is 2 bytes, `long` is 4 bytes** on this target (since chantier
-  A1, 2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
+- **`int` is 2 bytes, `long` is 4 bytes** on this target (since
+  2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
   `u32` from `<snes/types.h>` remain preferred for portability
 - **~4 KB VBlank DMA budget** per frame
 - **Plain C RAM must sit below $2000** (compiler emits `sta.l $0000,x`);
-  bulk buffers go above it with `FAR` (chantier B2, v0.39.0) — see
+  bulk buffers go above it with `FAR` (v0.39.0) — see
   [`docs/tutorials/far_ram.md`](docs/tutorials/far_ram.md)
 - **C const data lives in the asset banks by default** (#127.3, v0.41.0);
   bank $00 keeps the code
@@ -342,6 +346,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-02. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-05. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

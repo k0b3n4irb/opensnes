@@ -180,3 +180,15 @@ res/BG1.m16 res/level.t16 res/level.b16: res/level.tmj res/tileset.map
 ## Attribution
 
 Based on tmx2snes by Alekmaul (PVSnesLib). Uses cute_tiled.h by Randy Gaul for JSON parsing. License: zlib.
+
+## What the tool refuses
+
+Three Tiled maps convert to a wrong SNES map and are refused instead
+(since 2026-10-05; before, they converted silently):
+
+- a **rotated tile** (Tiled's diagonal flip): the SNES tilemap has horizontal
+  and vertical flips only;
+- a **tile id above 1024**: the tilemap word holds 10 bits of tile number,
+  so ids 1..1024 (the id used to be masked onto another tile);
+- **more than one tileset**: the `.b16` and the ids are written from the
+  first tileset only. Merge the tilesets in Tiled or split the layers.

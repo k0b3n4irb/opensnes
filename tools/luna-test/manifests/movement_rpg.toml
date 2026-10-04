@@ -50,3 +50,9 @@ hero_y = 312                             # 272 + 5*8
 hero_facing = { eq = 0, width = 1 }      # FACE_DOWN
 gold = 0
 chest_opened = { eq = 0, width = 1 }
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

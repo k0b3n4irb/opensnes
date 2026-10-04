@@ -16,7 +16,7 @@
 /*============================================================================
  * HDMA Effect Helpers
  *
- * These call the assembly core functions (hdmaSetup, hdmaEnable)
+ * These call the assembly core functions (hdmaSetup, hdmaEnableMask)
  *============================================================================*/
 
 void hdmaParallax(u8 channel, u8 bg, const void *scrollTable) {
@@ -127,6 +127,7 @@ static s16 hdmaSin(u8 angle) {
 }
 
 /* External symbols from hdma.asm */
+extern volatile u8 bg_scroll_dirty;   /* crt0: bit n = BGn+1 scroll to rewrite at the next VBlank */
 extern u8 hdma_table_a[673];
 extern u8 hdma_table_b[673];
 extern u8 hdma_brightness_table[113];
@@ -238,7 +239,7 @@ void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency) {
     hdma_wave_enabled = 1;
 
     hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
-    hdmaEnable(channel_mask(channel));
+    hdmaEnableMask(channel_mask(channel));
 }
 
 void hdmaWaveUpdate(void) {
@@ -278,18 +279,25 @@ void hdmaWaveStop(void) {
     if (!hdma_wave_enabled) return;
 
     /* Disable HDMA channel */
-    hdmaDisable(channel_mask(hdma_wave_channel));
+    hdmaDisableMask(channel_mask(hdma_wave_channel));
     hdma_wave_enabled = 0;
 
-    /* Reset BG scroll offset to 0 so the wave doesn't leave the
-     * background shifted after stopping. Write both low and high bytes. */
-    *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
-    *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
+    /* The table wrote ABSOLUTE offsets into BGnHOFS, over whatever
+     * bgSetScroll() had set. Rather than write 0 (which left the layer at 0
+     * when the game had scrolled it, until 2026-10-03), mark the layer's
+     * scroll dirty: the NMI rewrites its real HOFS/VOFS from the shadows
+     * at the next VBlank. BG1HOFS..BG4HOFS are $0D, $0F, $11, $13. */
+    if (hdma_wave_dest_reg >= 0x0D && hdma_wave_dest_reg <= 0x13) {
+        bg_scroll_dirty |= (u8)(1 << ((hdma_wave_dest_reg - 0x0D) >> 1));
+    } else {
+        *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
+        *(vu8*)(PPU_BASE_ADDR + hdma_wave_dest_reg) = 0x00;
+    }
 }
 
-/* hdmaWaveSetSpeed() is `inline` in hdma.h. Force-emit the standalone
- * here via address-taking for fn-pointer fallback. */
-void (*const __opensnes_force_emit_hdmaWaveSetSpeed)(u8) = hdmaWaveSetSpeed;
+void hdmaWaveSetSpeed(u8 speed) {
+    hdma_wave_speed = speed;
+}
 
 /*============================================================================
  * HDMA Effect Helpers
@@ -323,12 +331,21 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
     }
     *p = 0x00;  /* End marker */
 
+    /* Re-called while the channel runs (an animated effect): only move the
+     * table pointer (A1T, read at the next frame's init). hdmaSetup() also
+     * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
+     * for the rest of that frame the bottom of the screen showed the top
+     * of the table (luna, hdma_helpers f150, until 2026-10-03). */
+    if (hdmaGetEnabled() & channel_mask(channel)) {
+        hdmaSetTable(channel, hdma_brightness_table);
+    } else {
     hdmaSetup(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table);
-    hdmaEnable(channel_mask(channel));
+        hdmaEnableMask(channel_mask(channel));
+    }
 }
 
 void hdmaBrightnessGradientStop(u8 channel) {
-    hdmaDisable(channel_mask(channel));
+    hdmaDisableMask(channel_mask(channel));
     /* Restore full brightness */
     REG_INIDISP = 0x0F;
 }
@@ -373,12 +390,21 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
     }
     *p = 0x00;  /* End marker */
 
+    /* Re-called while the channel runs (an animated effect): only move the
+     * table pointer (A1T, read at the next frame's init). hdmaSetup() also
+     * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
+     * for the rest of that frame the bottom of the screen showed the top
+     * of the table (luna, hdma_helpers f150, until 2026-10-03). */
+    if (hdmaGetEnabled() & channel_mask(channel)) {
+        hdmaSetTable(channel, hdma_color_table);
+    } else {
     hdmaSetup(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table);
-    hdmaEnable(channel_mask(channel));
+        hdmaEnableMask(channel_mask(channel));
+    }
 }
 
 void hdmaColorGradientStop(u8 channel) {
-    hdmaDisable(channel_mask(channel));
+    hdmaDisableMask(channel_mask(channel));
     /* Note: CGRAM retains per-scanline gradient values after HDMA stops.
      * Caller must restore the original palette if needed — the library
      * cannot know what the original colors were. */
@@ -455,10 +481,20 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
 
     /* Setup and enable HDMA to drive WH0/WH1 per scanline.
      * Use bank $00 explicitly — tables are in bank $00 RAMSECTION. */
-    hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
-    hdmaEnable(channel_mask(channel));
+    /* Re-called while the channel runs (an animated effect): only move the
+     * table pointer (A1T, read at the next frame's init). hdmaSetup() also
+     * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
+     * for the rest of that frame the bottom of the screen showed the top
+     * of the table (luna, hdma_helpers f150, until 2026-10-03). */
+    if (hdmaGetEnabled() & channel_mask(channel)) {
+        hdmaSetTable(channel, build_table);
+    } else {
+        hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
+        hdmaEnableMask(channel_mask(channel));
+    }
 
-    /* Wait for HDMA to initialize (happens at start of VBlank).
+    /* Wait for the HDMA init (at the start of the frame, around V=0 —
+     * anomie-timing; the comment said "start of VBlank" until 2026-10-03).
      * Only THEN enable window masking — ensures WH0/WH1 are being
      * driven by HDMA before the PPU uses them for clipping. */
     WaitForVBlank();
@@ -473,7 +509,7 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
 }
 
 void hdmaIrisWipeStop(u8 channel) {
-    hdmaDisable(channel_mask(channel));
+    hdmaDisableMask(channel_mask(channel));
 
     /* Restore all window registers to fully open */
     REG_W12SEL  = 0x00;
@@ -539,5 +575,5 @@ void hdmaWaterRipple(u8 channel, u8 bg, u8 amplitude, u8 speed) {
     hdma_wave_enabled = 1;
 
     hdmaSetup(channel, HDMA_MODE_1REG_2X, destReg, hdma_table_a);
-    hdmaEnable(channel_mask(channel));
+    hdmaEnableMask(channel_mask(channel));
 }

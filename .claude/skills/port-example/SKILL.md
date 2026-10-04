@@ -169,7 +169,7 @@ read; `devtools/check_bank_reads.py` fails the link on a bank-blind one.
 | `oamSet(...)` | `oamSet(...)` | Same, 7 arguments (see Pitfall 2) |
 | `oamSetEx(...)`, `oamSetVisible(...)` | `oamSetSize()`, `oamHide()`, `oamSetXY()` | Split by concern |
 | `hdmaSetup(ch, ...)` | `hdmaSetup(ch, ...)` | Same |
-| `hdmaEnable(ch)` | `hdmaEnable(1 << ch)` | **BITMASK not channel number!** |
+| `hdmaEnable(ch)` | `hdmaEnableMask(1 << ch)` | **BITMASK not channel number!** |
 
 #### Color Math Mapping
 
@@ -178,7 +178,7 @@ PVSnesLib's `setColorEffect(CM_SUBBGOBJ_ENABLE, CM_MSCR_BACK | CM_MSCR_BG1)` bec
 colorMathInit();
 colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
 colorMathSetOp(COLORMATH_ADD);
-colorMathEnable(COLORMATH_BG1 | COLORMATH_BACKDROP);
+colorMathEnable(LAYER_BG1 | COLORMATH_BACKDROP);
 ```
 
 #### BG Register Setup (when not using bgInitTileSet)
@@ -256,10 +256,10 @@ clean-example:
 
 ## Critical Pitfalls (from hard experience)
 
-### 1. hdmaEnable takes a BITMASK, not a channel number
+### 1. hdmaEnableMask takes a BITMASK, not a channel number
 ```c
-hdmaEnable(1 << 3);   // CORRECT: enable channel 3
-hdmaEnable(3);         // WRONG: enables channels 0+1 !
+hdmaEnableMask(1 << 3);   // CORRECT: enable channel 3
+hdmaEnableMask(3);         // WRONG: enables channels 0+1 !
 ```
 
 ### 2. oamSet() is cheap — do not bypass it
@@ -333,7 +333,7 @@ PVSnesLib's audio calls map to the `snesmod` module (same SNESMOD driver):
 - [ ] gfx4snes flags match PVSnesLib exactly
 - [ ] Assets in `ASSET_SECTION`, loaded from C with the DMA helpers (Phase 3)
 - [ ] Palette loaded at correct CGRAM offset (check `-e` flag)
-- [ ] `hdmaEnable(1 << ch)` not `hdmaEnable(ch)`
+- [ ] `hdmaEnableMask(1 << ch)` not `hdmaEnableMask(ch)`
 - [ ] Sprites through `oamSet()` / `oamSetFast()` (no hand-written `oamMemory[]`)
 - [ ] `make clean && make` passes
 - [ ] `luna_runner.py --coverage --only <example>` and `make tests` pass

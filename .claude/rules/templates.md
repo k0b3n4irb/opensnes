@@ -32,7 +32,10 @@ Initialized C data flows: `.data_init` sections in ROM → DMA copied to WRAM at
 
 ROM format: `[target_addr:2][size:2][data:N]...` with sentinel `target_addr = 0`.
 
-CRITICAL: `data_init_end.o` MUST be linked last — it provides the sentinel.
+CRITICAL: `data_init_end.o` provides the data-init terminator; `common.mk` lists it
+last, wlalink's sort (priority, then size descending) is what places the 5-byte
+terminator after every record, and `symmap.py --check-data-init` fails the link
+when `DataInitEnd` does not close `.data_init` (2026-10-05; KNOWN_LIMITATIONS.md).
 
 ## Linker Object Order
 

@@ -316,8 +316,8 @@ dsp1Project:
 ;------------------------------------------------------------------------------
 ; void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs)
 ;   (command $02) — projection-plane setup. In 7 words, out 4 words:
-;   dsp1_o0 = Cx, dsp1_o1 = Cy (raster coefficients), dsp1_o2/o3 = reserved
-;   words whose meaning is unconfirmed (see dsp1_reference.md, marker <>).
+;   dsp1_o0 = Vof, dsp1_o1 = Vva, dsp1_o2 = Cx, dsp1_o3 = Cy (see dsp1.h).
+;   Deprecated in favour of dsp1SetCamera; kept until 1.0.
 ;------------------------------------------------------------------------------
 dsp1Parameter:
     php
@@ -368,32 +368,66 @@ dsp1Parameter:
     jsr dsp1_rqm
     lda 6,s                 ; azs
     sta.l $308000
+_dsp1_param_out:            ; shared with dsp1SetCamera: 8-bit A, PHP on the stack
     jsr dsp1_rqm
-    lda.l $308000           ; Cx lo
+    lda.l $308000           ; Vof lo
     sta.l dsp1_o0
     jsr dsp1_rqm
-    lda.l $308000           ; Cx hi
+    lda.l $308000           ; Vof hi
     sta.l dsp1_o0+1
     jsr dsp1_rqm
-    lda.l $308000           ; Cy lo
+    lda.l $308000           ; Vva lo
     sta.l dsp1_o1
     jsr dsp1_rqm
-    lda.l $308000           ; Cy hi
+    lda.l $308000           ; Vva hi
     sta.l dsp1_o1+1
     jsr dsp1_rqm
-    lda.l $308000           ; out word 3 lo
+    lda.l $308000           ; Cx lo
     sta.l dsp1_o2
     jsr dsp1_rqm
-    lda.l $308000           ; out word 3 hi
+    lda.l $308000           ; Cx hi
     sta.l dsp1_o2+1
     jsr dsp1_rqm
-    lda.l $308000           ; out word 4 lo
+    lda.l $308000           ; Cy lo
     sta.l dsp1_o3
     jsr dsp1_rqm
-    lda.l $308000           ; out word 4 hi
+    lda.l $308000           ; Cy hi
     sta.l dsp1_o3+1
     plp
     rtl
+
+;------------------------------------------------------------------------------
+; void dsp1SetCamera(const Dsp1Camera *cam)
+;   Command $02 with its seven input words read from a struct. The struct is
+;   the command's 14 bytes in the order the chip takes them (x, y, z, lfe,
+;   les, aas, azs; low byte first), so it is sent as it lies. Outputs as
+;   dsp1Parameter.
+;
+;   Stack after PHP: 5-6,s = cam low 16, 7,s = cam bank, 8,s = pad.
+;------------------------------------------------------------------------------
+dsp1SetCamera:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 5,s                 ; cam (low 16)
+    sta.l tcc__r0
+    lda 7,s                 ; cam (bank byte, high byte = pad)
+    sta.l tcc__r0+2
+    ldy #0
+    sep #$20
+    .ACCU 8
+    jsr dsp1_rqm
+    lda #$02                ; command $02 = Parameter
+    sta.l $308000
+@in:
+    jsr dsp1_rqm
+    lda [tcc__r0],y
+    sta.l $308000
+    iny
+    cpy #14
+    bne @in
+    jmp _dsp1_param_out
 
 ;------------------------------------------------------------------------------
 ; u16 dsp1Distance(s16 x, s16 y, s16 z)  ->  A   (command $28, sqrt(x²+y²+z²))

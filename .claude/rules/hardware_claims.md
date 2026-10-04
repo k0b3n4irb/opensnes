@@ -35,6 +35,11 @@ moment of doubt*.
    ```
    snes_verify(claim, exclude_sources=["opensnes-docs", "opensnes-notes-tech"])
    ```
+   A mistyped id in `exclude_sources` is refused since 2026-10-04
+   (`snes_search` answers "exclude_sources inconnu(s)… Rien n'a été
+   cherché", `snes_verify` returns `verdict: invalid_request`); before, it
+   was ignored in silence and our own docs could answer. Read the first
+   line of a result before reading the rest.
    **Never trust its `verdict`.** `confirmed` means "an arbiter deals
    with this point", not "this sentence is true": it checks neither
    **polarity** (0/1, enable/protect, active high/low) nor **value**

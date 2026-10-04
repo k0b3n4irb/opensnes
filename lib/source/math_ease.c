@@ -17,16 +17,16 @@
  * Easing LUTs (B6 final, 2026-05-22; own module since 2026-07-20)
  *============================================================================*/
 
-/* ease_quad_table[i] = floor(i² / 255).
+/* math_ease_quad_table[i] = floor(i² / 255).
  *
  * The "ease-in-quadratic" curve normalised so f(0)=0, f(255)=255, with
- * the t² shape in between. Used as the basis of both ease_in_quad
- * (direct lookup) and ease_out_quad (mirrored: 255 - table[255-t]).
+ * the t² shape in between. Used as the basis of both easeInQuad
+ * (direct lookup) and easeOutQuad (mirrored: 255 - table[255-t]).
  *
  * Live computation cost: ~12 cycles (`x*x` then `/255`). LUT lookup:
  * ~5 cycles. 256 bytes of ROM buys ~7 cycles per call — worth it for
  * animation curves called every frame across many sprites. */
-const u8 ease_quad_table[256] = {
+const u8 math_ease_quad_table[256] = {
       0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
       1,   1,   1,   1,   1,   1,   1,   2,   2,   2,   2,   2,   3,   3,   3,   3,
       4,   4,   4,   4,   5,   5,   5,   5,   6,   6,   6,   7,   7,   7,   8,   8,
@@ -45,7 +45,22 @@ const u8 ease_quad_table[256] = {
     225, 227, 229, 231, 233, 235, 237, 239, 241, 243, 245, 247, 249, 251, 253, 255,
 };
 
-/* Force-emit anchors for ease_in_quad / ease_out_quad (inline in math.h). */
-u8 (*const __opensnes_force_emit_ease_in_quad)(u8)  = ease_in_quad;
-u8 (*const __opensnes_force_emit_ease_out_quad)(u8) = ease_out_quad;
+u8 easeInQuad(u8 t) {
+    return math_ease_quad_table[t];
+}
+
+u8 easeOutQuad(u8 t) {
+    return 255 - math_ease_quad_table[255 - t];
+}
+
+/* The pre-2026-10-03 names (API decision D3), out of line: a use of a
+ * deprecated symbol is an error in this strict build, a definition is not.
+ * Removed at 1.0. */
+u8 ease_in_quad(u8 t) {
+    return math_ease_quad_table[t];
+}
+
+u8 ease_out_quad(u8 t) {
+    return 255 - math_ease_quad_table[255 - t];
+}
 

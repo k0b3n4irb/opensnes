@@ -26,6 +26,12 @@ for the rows that need no enhancement chip.
 Record the tag or commit the ROMs were built from. The grid is meaningless
 without it.
 
+Before the session, `make hardware-preflight` replays the same ROMs on luna
+from pseudo-random RAM (three seeds) and under PAL, and checks that every
+VRAM DMA byte lands in blank: the two cheapest ways a ROM green on luna's
+defaults fails on a console. A row that fails there is fixed before it is
+carried to the hardware; `ROWS=1-7` restricts the run to the gate rows.
+
 ## How to run a row
 
 1. Boot the ROM. Wait for the picture to settle (two seconds is plenty).
@@ -66,13 +72,15 @@ behaviour, and the note under the table says which.
 | 13 | `memory/save_game` | A writes slot 1, power-cycle, B reads slot 1 | The values read back are the ones written before the power cycle. Then X writes slot 2, power-cycle, Y reads it. On a flash cart this also checks that the cart writes the save file back; consult its manual if slot 1 reads blank. |
 | 14 | `input/two_players` | move both pads | Each pad drives its own object; releasing pad 2 does not affect pad 1. |
 | 15 | `memory/hirom_demo` | hold A | "HIROM MODE" is shown and the background turns light blue while A is held. |
-| 16 | `chips/dsp1_cube` | nothing | A wireframe cube tumbles with correct perspective. Firmware-dependent: the DSP-1 is emulated by the cart. |
+| 16 | `chips/dsp1_cube` | nothing | A wireframe cube tumbles with correct perspective. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
 | 17 | `chips/sa1_starfield` | nothing | 128 dots trace smooth Lissajous figures at full frame rate. Firmware-dependent. |
 | 18 | `chips/superfx_3d` | nothing | A wireframe cube rotates at full frame rate with no missing edges. Firmware-dependent. |
 | 19 | `games/likemario` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
 | 20 | `games/rpg` | walk, talk to a villager with A, open the chest | The full game path: map, dialogue, chest state. |
 | 21 | `input/mouse` | move the mouse, click both buttons, right-click cycles sensitivity | Optional (needs a SNES Mouse, port 1). The cursor tracks the hand at each of the three sensitivities. |
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
+| 23 | `backgrounds/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `examples/backgrounds/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
+| 24 | `chips/superfx_game_skeleton` | hold the D-pad, listen | The crosshair follows the pad at full frame rate while the GSU's cube turns at half rate and the music plays: no torn or half-drawn cube (`gsuPresent` double-buffers and the NMI swaps in blank), no pause in the music while the GSU runs from its cache. Firmware-dependent, like rows 16-18. |
 
 **What a failure in each row points at.** Rows 1 and 2 failing means nothing
 else is worth running: the boot path or the joypad read is wrong. Row 3 is
@@ -83,10 +91,23 @@ the lib (HDMA table shape, IRQ position, DMA length) that luna and the console
 disagree on — query the corpus before touching code
 (`.claude/rules/hardware_claims.md`). Rows 11 and 12 are the APU path,
 including the cold-boot upload. Row 13 is the only test of battery-backed
-persistence the project has. Rows 16 to 18 depend on the cart as much as on
+persistence the project has. Rows 16 to 18 and 24 depend on the cart as much as on
 the SDK; a failure needs the firmware version and, if possible, a second cart
 before it is filed against the SDK. Rows 19 and 20 are the integration rows:
 they fail last and tell you least, but they are what a user will run first.
+Row 23 asks the console a question no reference answers and emulators answer
+differently (bit 3 of a hi-res offset-per-tile offset, see the example's
+README); whichever way it comes out, the photo goes to the luna and snes-rag
+reports.
+Row 24 is the Super FX presentation path (`gsuPresent`, the code cache) with
+SNESMOD running at the same time; a torn cube is a blanking claim of the
+presenter, a music pause is the GSU holding the ROM bus.
+
+**Not covered by a row yet:** the SA-1 and Super FX save paths (BW-RAM and
+Game Pak RAM through `sramSave`/`sramLoad`) have no example with a visible
+result — they are exercised on luna only, by the `libtests_sa1_sram` and
+`libtests_gsu` fixtures. A console row needs an example that shows a value
+surviving a power cycle on each chip (to write before the session).
 
 ## The grid
 
@@ -123,6 +144,8 @@ Peripherals:   pads / mouse / scope
 20  games/rpg
 21  input/mouse                 n/a
 22  input/superscope            n/a
+23  backgrounds/mode6
+24  chips/superfx_game_skeleton
 ```
 
 ## What to do with a KO

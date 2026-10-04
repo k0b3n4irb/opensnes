@@ -58,6 +58,33 @@ CASES = [
 ]
 
 
+# Inputs the tool must REFUSE (exit != 0, stderr naming the limit). Each one
+# was converted silently before 2026-10-04: the BG tile field is 10 bits, the
+# Mode 7 map one byte per tile, and a 2bpp/4bpp tile takes its palette bank
+# from its first pixel (build-tools audit S7, S8, S12). The fixtures are
+# generated: toomany_bg.png holds 1056 distinct 8x8 tiles, toomany_m7.png
+# 272, index5_2bpp.png a bank-0 tile with one pixel of colour 5 (bank 1).
+REFUSED = [
+    ("toomany_bg.png", ["-s", "8", "-u", "16", "-m"], "1024 at most"),
+    ("toomany_m7.png", ["-s", "8", "-u", "256", "-m", "-M", "7"], "exceeds 255"),
+    ("index5_2bpp.png", ["-s", "8", "-u", "4"], "one 4-colour palette per tile"),
+]
+
+
+def run_refused(fixture: str, flags: list[str], needle: str) -> list[str]:
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        shutil.copy(HERE / "fixtures" / fixture, work / fixture)
+        proc = subprocess.run([str(TOOL), *flags, "-i", fixture],
+                              cwd=work, capture_output=True, text=True, timeout=60)
+        if proc.returncode == 0:
+            return ["accepted (exit 0) — must be refused"]
+        text = (proc.stderr or "") + (proc.stdout or "")
+        if needle not in text:
+            return [f"refused, but without '{needle}': {text.strip()[:160]}"]
+    return []
+
+
 def run_case(fixture: str, flags: list[str], outputs: list[str]) -> list[str]:
     errs = []
     with tempfile.TemporaryDirectory() as td:
@@ -90,7 +117,16 @@ def main() -> int:
             fails += 1
         else:
             print(f"  PASS {name} ({len(outputs)} outputs match)")
-    print(f"\ngfx4snes golden: {len(CASES) - fails}/{len(CASES)} ok")
+    for fixture, flags, needle in REFUSED:
+        errs = run_refused(fixture, flags, needle)
+        name = f"{fixture} [{' '.join(flags)}] refused"
+        if errs:
+            print(f"  FAIL {name}: " + "; ".join(errs))
+            fails += 1
+        else:
+            print(f"  PASS {name}")
+    total = len(CASES) + len(REFUSED)
+    print(f"\ngfx4snes golden: {total - fails}/{total} ok")
     return 1 if fails else 0
 
 

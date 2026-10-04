@@ -41,10 +41,11 @@ extern u16 tilemap_src_addr;
 /* Global text configuration */
 TextConfig text_config;
 
-/* Current cursor position. External linkage so the `inline textSetPos()`
- * in text.h reads/writes these from any TU (wave 4 retrofit). */
-u8 cursor_x = 0;
-u8 cursor_y = 0;
+/* Current cursor position. Prefixed and out of text.h since 2026-10-03
+ * (API decision D4): the names were `cursor_x` / `cursor_y`, which a game
+ * would collide with at link time. Read them with textGetX() / textGetY(). */
+u8 text_cursor_x = 0;
+u8 text_cursor_y = 0;
 
 /**
  * @brief Build tilemap entry for a character
@@ -93,8 +94,8 @@ void textInit(u16 tilemap_addr, u16 font_tile, u8 palette) {
     tilemap_vram_addr = tilemap_addr;
     tilemap_src_addr  = (u16)tilemapBuffer;
 
-    cursor_x = 0;
-    cursor_y = 0;
+    text_cursor_x = 0;
+    text_cursor_y = 0;
 
     /* Fill buffer with spaces and DMA to VRAM (clears garbage tiles). */
     textClear();
@@ -111,41 +112,43 @@ void textLoadFont(u16 vram_addr) {
     asm_textDMAFont();
 }
 
-/* textSetPos() is `inline` in text.h. Force-emit canonical here. */
-void (*const __opensnes_force_emit_textSetPos)(u8, u8) = textSetPos;
+void textSetPos(u8 x, u8 y) {
+    text_cursor_x = x & 31;
+    text_cursor_y = y & (TEXT_MAP_ROWS - 1);
+}
 
 u8 textGetX(void) {
-    return cursor_x;
+    return text_cursor_x;
 }
 
 u8 textGetY(void) {
-    return cursor_y;
+    return text_cursor_y;
 }
 
 void textPutChar(char c) {
     /* Handle newline */
     if (c == '\n') {
-        cursor_x = 0;
-        cursor_y++;
-        if (cursor_y >= TEXT_MAP_ROWS) cursor_y = 0;   /* wrap: buffer is 32 rows */
+        text_cursor_x = 0;
+        text_cursor_y++;
+        if (text_cursor_y >= TEXT_MAP_ROWS) text_cursor_y = 0;   /* wrap: buffer is 32 rows */
         return;
     }
 
     /* Handle carriage return */
     if (c == '\r') {
-        cursor_x = 0;
+        text_cursor_x = 0;
         return;
     }
 
     /* Write tile entry to RAM buffer */
-    buffer_write_entry(cursor_x, cursor_y, build_tile_entry(c));
+    buffer_write_entry(text_cursor_x, text_cursor_y, build_tile_entry(c));
 
     /* Advance cursor */
-    cursor_x++;
-    if (cursor_x >= text_config.map_width) {
-        cursor_x = 0;
-        cursor_y++;
-        if (cursor_y >= TEXT_MAP_ROWS) cursor_y = 0;   /* wrap: buffer is 32 rows */
+    text_cursor_x++;
+    if (text_cursor_x >= text_config.map_width) {
+        text_cursor_x = 0;
+        text_cursor_y++;
+        if (text_cursor_y >= TEXT_MAP_ROWS) text_cursor_y = 0;   /* wrap: buffer is 32 rows */
     }
 
     /* Auto-flush: NMI handler will DMA the tilemap during the next

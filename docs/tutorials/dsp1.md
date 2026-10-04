@@ -63,7 +63,7 @@ that can exceed ±1.0.
 | `dsp1Rotate(a,x,y)` | `$0C` | 3 → 2 | 2D rotate |
 | `dsp1Attitude(s,az,ay,ax)` | `$01` | 4 → 0 | build the rotation matrix |
 | `dsp1Objective(x,y,z)` | `$0D` | 3 → 3 | transform a point by the matrix |
-| `dsp1Parameter(…)` | `$02` | 7 → 4 | set up the projection plane |
+| `dsp1SetCamera(&cam)` | `$02` | 7 → 4 | set up the projection plane (the seven inputs are the fields of `Dsp1Camera`) |
 | `dsp1Project(x,y,z)` | `$06` | 3 → 3 | world point → screen H, V + scale M |
 | `dsp1Target(h,v)` | `$0E` | 2 → 2 | screen point → ground plane (pick / aim) |
 | `dsp1Raster(ab,cd,vs,n)` | `$0A` | 1 → 4·n (stream) | per-scanline Mode 7 matrices into HDMA payloads |
@@ -80,7 +80,10 @@ dsp1Init();
 if (dsp1IsPresent()) {
     /* once: camera at the origin looking along +Y (azs = 0x4000).
      * Effective focal length ≈ lfe + les. */
-    dsp1Parameter(0, 0, 0, 96, 256, 0, 0x4000);
+    static const Dsp1Camera view = {
+        .x = 0, .y = 0, .z = 0, .lfe = 96, .les = 256, .aas = 0, .azs = 0x4000,
+    };
+    dsp1SetCamera(&view);
 }
 
 /* per frame */
@@ -109,7 +112,7 @@ treat them as measured behaviour, not gospel:
 - `dsp1Project` also returns **M** (`dsp1_o2`), a depth scale — the
   natural driver for sizing sprites with distance.
 
-Copy those two `dsp1Parameter` values as your starting point and tune
+Copy those two lens values (`lfe`, `les`) as your starting point and tune
 from there. Its four output words are **Vof, Vva, Cx, Cy** (official
 manual §5.4.1, verified on luna): the raster of the "imaginary centre",
 the horizon raster relative to it, and the ground point under that
@@ -124,7 +127,10 @@ B, C and D — as an open-ended stream the CPU stops with a sentinel. The
 lib wraps the whole transaction:
 
 ```c
-dsp1Parameter(x, y, height, 96, 256, heading, tilt);
+static Dsp1Camera cam = { .z = height, .lfe = 96, .les = 256, .azs = tilt };
+
+cam.x = x;  cam.y = y;  cam.aas = heading;   /* what moves */
+dsp1SetCamera(&cam);
 vof = dsp1_o0;  vva = dsp1_o1;  cx = dsp1_o2;  cy = dsp1_o3;
 
 /* ground = rasters Vva+2 .. (Vva+1 is the singular horizon line),

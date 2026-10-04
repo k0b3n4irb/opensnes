@@ -132,7 +132,148 @@ void itl_instrument_destroy(itl_instrument_t *inst)
  * Sample
  *==========================================================================*/
 
-static void itl_sample_load_data(itl_sample_t *s, io_file_t *f)
+/*--------------------------------------------------------------------------
+ * IT 2.14 / 2.15 sample decompression
+ *
+ * Ported from modlib, itmod/itsamplecodec.go and itmod/bitstream.go
+ * (github.com/mukunda-/modlib), Copyright 2025 Mukunda Johnson
+ * (mukunda.com), MIT licence — permission text in ATTRIBUTION.md. That
+ * code is itself a port of OpenMPT's ITCompression.cpp and GreaseMonkey's
+ * munch.py. Decoder only.
+ *
+ * A compressed sample is a sequence of blocks: a u16 byte length, then
+ * that many bytes read as a bit stream, LSB first. A block yields at most
+ * 0x8000 samples (8-bit) or 0x4000 (16-bit); the bit width and the two
+ * integrators start afresh at each block.
+ *--------------------------------------------------------------------------*/
+
+typedef struct {
+    const u8 *data;
+    u32 size;
+    u32 pos;
+    u32 buffer;     /* at most 24 bits held: width <= 17, refilled by bytes */
+    int buffered;
+} itl_bits_t;
+
+/* Read `width` bits (1..17). false when the block has no more bits. */
+static bool itl_bits_read(itl_bits_t *b, int width, u32 *out)
+{
+    while (b->buffered < width) {
+        if (b->pos >= b->size)
+            return false;
+        b->buffer |= (u32)b->data[b->pos++] << b->buffered;
+        b->buffered += 8;
+    }
+    *out = b->buffer & ((1u << width) - 1);
+    b->buffer >>= width;
+    b->buffered -= width;
+    return true;
+}
+
+/* Decode `count` samples of one block into out8 or out16. false when the
+ * stream ends early or asks for a width above the default one. */
+static bool itl_decode_block(itl_bits_t *b, bool bits16, bool it215,
+                             s8 *out8, s16 *out16, u32 count)
+{
+    const int def_width = bits16 ? 17 : 9;
+    int width = def_width;
+    /* unsigned on purpose: the integrators wrap, and only their low 8 or
+     * 16 bits are kept */
+    u32 mem1 = 0, mem2 = 0;
+
+    for (u32 i = 0; i < count; ) {
+        u32 v;
+        if (!itl_bits_read(b, width, &v))
+            return false;
+        u32 top = 1u << (width - 1);
+        u32 next = 0;   /* new width, 0 = v is a sample */
+
+        if (width <= 6) {
+            /* 1 to 6 bits: the lone top bit announces a width, read next */
+            if (v == top) {
+                if (!itl_bits_read(b, bits16 ? 4 : 3, &next))
+                    return false;
+                next++;
+                if (next >= (u32)width)
+                    next++;
+            }
+        } else if (width < def_width) {
+            /* 7 bits to default-1: a band around the top bit is a width */
+            u32 lowest = top - (bits16 ? 8 : 4);
+            if (v >= lowest && v <= lowest + (bits16 ? 15 : 7)) {
+                next = v - lowest + 1;
+                if (next >= (u32)width)
+                    next++;
+            }
+        } else if (v & top) {
+            /* default width: top bit set, the rest is the width itself */
+            next = (v & ~top) + 1;
+        }
+
+        if (next) {
+            if (next > (u32)def_width)
+                return false;
+            width = (int)next;
+            continue;
+        }
+
+        if (v & top)
+            v -= top << 1;   /* sign-extend from `width` bits */
+        mem1 += v;
+        mem2 += mem1;
+        u32 smp = it215 ? mem2 : mem1;
+        if (bits16)
+            out16[i] = (s16)(u16)smp;
+        else
+            out8[i] = (s8)(u8)smp;
+        i++;
+    }
+    return true;
+}
+
+/* Decode a whole compressed sample at the file position. The data is
+ * signed already (`convert & 1` does not apply); bit 2 of `convert` selects
+ * IT 2.15 (second integrator), as OpenMPT and Schism Tracker read it.
+ * Returns 0, or the 1-based number of the block that could not be decoded. */
+static int itl_sample_decompress(itl_sample_t *s, io_file_t *f)
+{
+    const bool bits16 = s->data.bits16;
+    const bool it215 = !!(s->convert & 4);
+    const u32 block_max = bits16 ? 0x4000 : 0x8000;
+    u8 *block = malloc(0x10000);
+    u32 length = (u32)s->data.length;
+    int failed = 0;
+
+    for (u32 done = 0, n = 1; done < length && !failed; n++) {
+        /* every block is checked against what is left of the file before
+         * a byte of it is read */
+        itl_bits_t bits = {block, 0, 0, 0, 0};
+        if (io_remaining(f) < 2) {
+            failed = (int)n;
+            break;
+        }
+        bits.size = io_read16(f);
+        if (bits.size > io_remaining(f)) {
+            failed = (int)n;
+            break;
+        }
+        for (u32 i = 0; i < bits.size; i++)
+            block[i] = io_read8(f);
+
+        u32 count = length - done < block_max ? length - done : block_max;
+        if (!itl_decode_block(&bits, bits16, it215,
+                              bits16 ? NULL : s->data.data8 + done,
+                              bits16 ? s->data.data16 + done : NULL, count))
+            failed = (int)n;
+        done += count;
+    }
+    free(block);
+    return failed;
+}
+
+/* false when the sample data could not be loaded: the sample is then empty
+ * (NULL data, length 0). */
+static bool itl_sample_load_data(itl_sample_t *s, io_file_t *f)
 {
     if (!s->compressed) {
         int offset = (s->convert & 1) ? 0 : (s->data.bits16 ? -32768 : -128);
@@ -157,8 +298,33 @@ static void itl_sample_load_data(itl_sample_t *s, io_file_t *f)
                 s->data.data8[i] = io_read8(f) + offset;
         }
     } else {
-        printf("%s: " ERRORRED("error") ": unsupported compressed samples\n", ERRORBRIGHT("smconv"));
+        /* Same rule again, in bits: a sample costs at least one bit, so the
+         * file cannot hold more than 8 frames per byte left. Past that the
+         * stream is corrupt whatever it contains; the clamp only keeps the
+         * allocation honest, the decoder then fails on the block that runs
+         * out. */
+        u32 avail = io_remaining(f) > 0x7FFFFFFFu / 8 ? 0x7FFFFFFFu : io_remaining(f) * 8;
+        if ((u32)s->data.length > avail)
+            s->data.length = (int)avail;
+        size_t frames = s->data.length ? (size_t)s->data.length : 1;
+        if (s->data.bits16)
+            s->data.data16 = malloc(frames * sizeof(s16));
+        else
+            s->data.data8 = malloc(frames * sizeof(s8));
+        int block = itl_sample_decompress(s, f);
+        if (block) {
+            printf("%s: " ERRORRED("error") ": sample '%s': corrupt compressed data (block %d)\n",
+                   ERRORBRIGHT("smconv"), s->name, block);
+            if (s->data.bits16)
+                free(s->data.data16);
+            else
+                free(s->data.data8);
+            s->data.data8 = NULL;   /* the union: clears data16 too */
+            s->data.length = 0;
+            return false;
+        }
     }
+    return true;
 }
 
 itl_sample_t *itl_sample_create(io_file_t *f)
@@ -205,7 +371,8 @@ itl_sample_t *itl_sample_create(io_file_t *f)
     s->vibrato_form = io_read8(f);
 
     io_seek(f, sample_pointer);
-    itl_sample_load_data(s, f);
+    if (!itl_sample_load_data(s, f))
+        s->invalid = 1;
     return s;
 }
 
@@ -421,6 +588,10 @@ itl_module_t *itl_module_create(const char *filename)
     for (int i = 0; i < m->sample_count; i++) {
         io_seek(&f, sample_table[i]);
         m->samples[i] = itl_sample_create(&f);
+        /* a sample whose compressed data is corrupt fails the module, like
+         * a bad signature: no soundbank from a half-loaded file */
+        if (m->samples[i]->invalid)
+            m->invalid = 1;
     }
 
     for (int i = 0; i < m->pattern_count; i++) {

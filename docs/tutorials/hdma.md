@@ -60,9 +60,9 @@ The lib hides those four register writes behind two helpers:
 
 …and a separate enable/disable pair:
 
-- **`hdmaEnable(channelMask)`** — set bits in `$420C` for the channels you
+- **`hdmaEnableMask(channelMask)`** — set bits in `$420C` for the channels you
   want to run.
-- **`hdmaDisable(channelMask)`** — clear those bits.
+- **`hdmaDisableMask(channelMask)`** — clear those bits.
 
 ## Transfer modes
 
@@ -158,7 +158,7 @@ int main(void) {
     hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, 0x32, my_table);
 
     /* Enable channel 6 — HDMA starts firing on the next active display */
-    hdmaEnable(1 << HDMA_CHANNEL_6);
+    hdmaEnableMask(1 << HDMA_CHANNEL_6);
 
     setScreenOn();
 
@@ -215,7 +215,7 @@ table can live in const ROM.
 ### Helpers showcase — `examples/hdma/hdma_helpers`
 
 Walks through the lib's HDMA helpers (`hdmaSetup`,
-`hdmaEnable`, `hdmaDisable`, the brightness-gradient builder) on a
+`hdmaEnableMask`, `hdmaDisableMask`, the brightness-gradient builder) on a
 single screen, with on-screen text labelling each. The example to skim
 when you want to remember the API surface.
 
@@ -250,7 +250,7 @@ blocks goes in `$43x7` — pass it with the bank-extraction idiom
 Four channels, one per matrix register (M7A/B/C/D ← `HDMA_DEST_M7A..D`),
 each in `HDMA_MODE_1REG_2X`. See the Mode 7 tutorial for the technique;
 the HDMA lesson here is arming: **`hdmaSetup()` configures but does NOT
-enable** — without `hdmaEnable(0x0F)` you get a static 1:1 view that can
+enable** — without `hdmaEnableMask(0x0F)` you get a static 1:1 view that can
 look convincingly like a broken perspective. Check `dma.hdmaen` in luna's
 typed state when an HDMA effect "does nothing".
 
@@ -312,7 +312,7 @@ call it before setting up your own channels, not after. The ripple and
 
 `hdmaWindowShape(channel, table)` points a channel at your own table of
 window edges (a line count, then left and right, written to `WH0`/`WH1`).
-It only configures the channel: enable it with `hdmaEnable()` and choose
+It only configures the channel: enable it with `hdmaEnableMask()` and choose
 which layers the window masks with the `window` module, as
 `examples/windows/transparent_window` does.
 
@@ -396,15 +396,15 @@ HDMA each frame (e.g. to swap tables), do it in main-thread code before
 
 ### 🟡 Don't enable channels you haven't configured
 
-`hdmaEnable(0xFF)` enables every HDMA channel, including channels that
+`hdmaEnableMask(0xFF)` enables every HDMA channel, including channels that
 hold leftover register values from a previous configuration (or boot
 defaults). Always enable only the channels you've configured this frame:
 
 ```c
 hdmaSetup(HDMA_CHANNEL_6, …);
-hdmaEnable(1 << HDMA_CHANNEL_6);   /* good */
+hdmaEnableMask(1 << HDMA_CHANNEL_6);   /* good */
 
-hdmaEnable(0xFF);                  /* bad — channels 0-5, 7 are random */
+hdmaEnableMask(0xFF);                  /* bad — channels 0-5, 7 are random */
 ```
 
 ## Cycle cost

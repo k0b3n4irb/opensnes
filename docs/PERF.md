@@ -6,7 +6,7 @@ measured side of that promise, and `docs/BENCHMARK.md` the compiler side.
 
 **Unit: master cycles (mclk) per frame.** An NTSC frame is about
 **357,370 mclk** (21.477 MHz / 60.1 Hz); the VBlank, where VRAM may be
-written, about 51,800 of them. 1 % of a frame is about 3,570 mclk.
+written, about 49,000 of them (48,988: 37 lines of 1324 available master clocks, snesdev-wiki "Timing"). 1 % of a frame is about 3,570 mclk.
 
 ## The scenes
 
@@ -65,6 +65,52 @@ labels. Asm routines a function calls under their own names (the map
 engine's `map_prepare_column`, SNESMOD's SPC transfer routines) are not
 added to it, and code the compiler inlined into the caller is counted in
 the caller.
+
+## What a call costs where there used to be none
+
+Until 2026-10-03 a handful of small functions were `inline` in their headers
+(`fixSin`, `fixCos`, `textSetPos`, `setScreenOn`, `setScreenOff`,
+`getBrightness`, `colorMathInit`, `colorMathSetLayers`, `colorMathDisable`,
+`mosaicInit`, `hdmaWaveSetSpeed`, `scopeCalibrate`, `scopeSetHoldDelay` and
+the two ease functions). An inline body needs its variables in the public
+header, and those were names a game would collide with (`sine_table`,
+`cursor_x`, `force_blanked`). They are ordinary lib functions now.
+
+The one that runs per frame is `fixSin` / `fixCos`. Measured on
+`examples/backgrounds/mode2`, which calls `fixSin` 32 times a frame
+(`luna profile`, frames 60 to 300):
+
+| | busy master cycles per frame | share of the frame |
+|---|---|---|
+| inlined (before) | 62,896 | 17.60 % |
+| compiled C function | 77,415 | 21.66 % |
+| assembly function (what ships) | 65,959 | 18.46 % |
+
+So a call costs about 96 master cycles more than the inlined lookup did, and
+the first, compiled version cost about 450: `fixSin` and `fixCos` are written
+in assembly for that reason. The other functions run at setup or once per
+frame, where a call is not measurable.
+
+## What a style struct costs
+
+`oamDrawMetasprite()` (2026-10-03) takes the base tile, palette and size
+from a `MetaspriteStyle` instead of three arguments. Measured on
+`examples/sprites/metasprite`, two metasprites a frame (`luna profile`,
+frames 60 to 300):
+
+| | master cycles per frame in the draw | share of the frame |
+|---|---|---|
+| the deprecated `oamDrawMeta` (before) | 51,992 | 14.55 % |
+| one function, flip tested per piece | 58,190 | 16.28 % |
+| one function, two loops | 61,252 | 17.14 % |
+| reads the style, then runs the old loop (what ships) | 56,057 | 15.69 % |
+
+About 2,000 master cycles per call, 0.6 % of a frame per metasprite drawn:
+three reads through the style pointer and one more call. The two attempts
+above it were slower although they add no call: with the mirrored loop in
+the same function, the compiler's copies between the two loops fell on
+every piece. The mirrored draw is therefore a function of its own, and the
+unflipped one still runs the loop of the deprecated `oamDrawMeta`.
 
 ## Reproduce
 

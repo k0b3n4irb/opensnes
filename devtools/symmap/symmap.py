@@ -574,6 +574,35 @@ def _is_asset_payload(name: str) -> bool:
     return any(low.startswith(p) for p in _ASSET_PREFIXES)
 
 
+def print_data_init_check(table: SymbolTable) -> int:
+    """The data-init sentinel closes the `.data_init` section (added 2026-10-05).
+
+    crt0 copies initialised C data from DataInitStart until the terminator
+    record that data_init_end.o appends to `.data_init` (APPENDTO). An object
+    linked AFTER data_init_end.o appends its records past the terminator: its
+    globals boot uninitialised, silently. KNOWN_LIMITATIONS.md said "no
+    separate check" for this; the .sym has what is needed — the section's
+    start and size, and the DataInitEnd label, which must sit exactly at the
+    section's end. Exit 1 when it does not, 0 otherwise.
+    """
+    sec = next((s for s in table.sections if s.name == '.data_init'), None)
+    end = table.symbols.get('DataInitEnd')
+    if sec is None or end is None:
+        print("data-init: no .data_init section or no DataInitEnd label — nothing to check")
+        return 0
+    expected = sec.address + sec.size
+    if end.address != expected:
+        past = expected - end.address
+        print(f"{Colors.RED}ERROR: data-init sentinel is not last: DataInitEnd at "
+              f"${end.address:04X}, .data_init ends at ${expected:04X} — {past} byte(s) of "
+              f"init records sit past the terminator and are never copied at boot "
+              f"(an object is linked after data_init_end.o){Colors.RESET}")
+        return 1
+    print(f"OK: data-init sentinel closes .data_init (${sec.address:04X}+${sec.size:X} = "
+          f"DataInitEnd ${end.address:04X})")
+    return 0
+
+
 def report_bank0_asset_payload(table: SymbolTable, min_report: int = 1024) -> None:
     """Print how much bulk read-only data ended up in bank $00.
 
@@ -882,6 +911,8 @@ Examples:
     parser.add_argument('--ram-fail-threshold', type=int, default=0, metavar='N',
                         help='Fail when C RAM band free space drops below N bytes '
                              '(default: 0 = disabled)')
+    parser.add_argument('--check-data-init', action='store_true',
+                        help='Check that DataInitEnd closes the .data_init section (data_init_end.o linked last)')
     parser.add_argument('--check-bank0-overflow', action='store_true',
                         help='Check for C-generated data that spilled from bank $00')
     parser.add_argument('--warn-threshold', type=int, default=2048, metavar='N',
@@ -926,6 +957,9 @@ Examples:
 
     if args.check_overlap:
         return print_overlap_check(table)
+
+    if args.check_data_init:
+        return print_data_init_check(table)
 
     if args.check_ram_budget:
         return print_ram_budget_check(table,

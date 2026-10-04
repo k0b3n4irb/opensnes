@@ -6,14 +6,14 @@
  *
  * mode7/perspective fakes a receding floor with a precomputed M7A/M7D table;
  * this example asks the DSP-1 for the real thing. Each frame the CPU sends
- * the camera (position, height, heading, tilt) with dsp1Parameter, then
+ * the camera (position, height, heading, tilt) with dsp1SetCamera, then
  * dsp1Raster streams one 2x2 matrix per screen line — A, B, C and D, so the
  * floor rotates with the heading for free — straight into two HDMA payloads.
  * The HDMA channels replay them next frame while the CPU already computes
  * the frame after (double buffering). Above the horizon the same HDMA split
  * as mode7/perspective shows a Mode 3 sky.
  *
- * The three numbers dsp1Parameter hands back beside the matrices are the
+ * The three numbers dsp1SetCamera hands back beside the matrices are the
  * whole geometry: Vva says on which raster the horizon sits, Cx/Cy say which
  * ground point is under the screen centre (they go to M7X/M7Y), and the
  * Mode 7 scroll registers just pin that centre to the middle of the screen.
@@ -92,13 +92,13 @@ static u8 tab_mode[5];
 /** @brief TM table: BG2 (sky) for the sky lines, then BG1 (ground). */
 static u8 tab_tm[5];
 
-/** @brief Camera position on the ground plane (wraps with the 1024-unit texture). */
-static s16 cam_x, cam_y;
-/** @brief Heading: 0 looks up the map (-Y), 0x4000 looks to +X. */
-static u16 cam_aas;
-/** @brief Geometry from the last dsp1Parameter: imaginary-centre raster, horizon raster. */
+/** @brief The camera: position on the ground plane (x, y wrap with the
+ *  1024-unit texture), height, lens, heading (aas: 0 looks up the map, -Y;
+ *  0x4000 looks to +X) and tilt. The luna manifest reads x, y and aas. */
+static Dsp1Camera cam;
+/** @brief Geometry from the last dsp1SetCamera: imaginary-centre raster, horizon raster. */
 static s16 vof, vva;
-/** @brief Ground point under the imaginary centre (last dsp1Parameter). */
+/** @brief Ground point under the imaginary centre (last dsp1SetCamera). */
 static s16 cx, cy;
 /** @brief Screen line of the first ground raster and the block length. */
 static u8 sky_lines, ground_lines;
@@ -131,7 +131,7 @@ static void tableInit(u8 FAR *t, u8 sky, u8 lines, u16 diag) {
  *        rest of the frame needs (horizon raster, ground centre).
  */
 static void cameraUpdate(void) {
-    dsp1Parameter(cam_x, cam_y, CAM_HEIGHT, CAM_LFE, CAM_LES, cam_aas, (u16)CAM_AZS);
+    dsp1SetCamera(&cam);
     vof = dsp1_o0;
     vva = dsp1_o1;
     cx  = dsp1_o2;
@@ -161,7 +161,9 @@ int main(void) {
 
     dsp1Init();
     dsp1_ok = dsp1IsPresent();
-    cam_x = 512; cam_y = 512; cam_aas = 0;
+    cam.x = 512; cam.y = 512; cam.z = CAM_HEIGHT;
+    cam.lfe = CAM_LFE; cam.les = CAM_LES;
+    cam.aas = 0; cam.azs = (u16)CAM_AZS;
     cameraUpdate();
 
     /* The tilt is fixed, so the horizon raster is too: split the screen once.
@@ -197,7 +199,7 @@ int main(void) {
     hdmaSetup(CH_TM,   HDMA_MODE_1REG,    HDMA_DEST_TM,     tab_tm);
     hdmaSetup(CH_AB,   HDMA_MODE_2REG_2X, HDMA_DEST_M7A,    tab_ab[0]);
     hdmaSetup(CH_CD,   HDMA_MODE_2REG_2X, HDMA_DEST_M7C,    tab_cd[0]);
-    hdmaEnable((1 << CH_MODE) | (1 << CH_TM) | (1 << CH_AB) | (1 << CH_CD));
+    hdmaEnableMask((1 << CH_MODE) | (1 << CH_TM) | (1 << CH_AB) | (1 << CH_CD));
 
     /* Pin the ground point under the imaginary centre to the screen middle:
      * M7X/M7Y = Cx/Cy, and the scroll puts screen (128, 112+Vof) on it. The
@@ -209,15 +211,15 @@ int main(void) {
 
     while (1) {
         pad = padHeld(0);
-        if (pad & KEY_LEFT)  cam_aas -= TURN_STEP;
-        if (pad & KEY_RIGHT) cam_aas += TURN_STEP;
+        if (pad & KEY_LEFT)  cam.aas -= TURN_STEP;
+        if (pad & KEY_RIGHT) cam.aas += TURN_STEP;
         if (pad & (KEY_UP | KEY_DOWN)) {
             /* forward = (sin, -cos) of the heading on the ground plane */
-            dsp1Triangle(cam_aas, MOVE_STEP);
-            if (pad & KEY_UP)  { cam_x += dsp1_o0; cam_y -= dsp1_o1; }
-            else               { cam_x -= dsp1_o0; cam_y += dsp1_o1; }
-            cam_x &= 1023;   /* the texture repeats every 1024 units */
-            cam_y &= 1023;
+            dsp1Triangle(cam.aas, MOVE_STEP);
+            if (pad & KEY_UP)  { cam.x += dsp1_o0; cam.y -= dsp1_o1; }
+            else               { cam.x -= dsp1_o0; cam.y += dsp1_o1; }
+            cam.x &= 1023;   /* the texture repeats every 1024 units */
+            cam.y &= 1023;
         }
 
         /* Active display: the DSP-1 streams next frame's floor into the
@@ -236,7 +238,7 @@ int main(void) {
         mode7SetCenter(cx, cy);
         mode7SetScroll(cx - 128, cy - (112 + vof));
         /* The sky pans with the heading: 2^16 angle units over the 512-px map. */
-        bgSetScroll(1, cam_aas >> 7, 0);
+        bgSetScroll(1, cam.aas >> 7, 0);
         back ^= 1;
     }
     return 0;

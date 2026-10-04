@@ -21,8 +21,8 @@
  * Note: Size is shared across all enabled backgrounds.
  *============================================================================*/
 
-/* Shadow register to track current state. External linkage so the
- * `inline mosaicInit()` in mosaic.h can access it from any TU. */
+/* Shadows of the write-only MOSAIC register. Out of mosaic.h since
+ * 2026-10-03 (API decision D4). */
 u8 mosaic_size;
 u8 mosaic_bg_mask;
 
@@ -41,9 +41,11 @@ static inline void mosaic_update_register(void) {
  * Public Functions
  *============================================================================*/
 
-/* mosaicInit() is `inline` in mosaic.h. Force-emit the standalone here
- * via address-taking so non-inlining callers (fn-ptr, etc.) link. */
-void (*const __opensnes_force_emit_mosaicInit)(void) = mosaicInit;
+void mosaicInit(void) {
+    mosaic_size = 0;
+    mosaic_bg_mask = 0;
+    REG_MOSAIC = 0;
+}
 
 void mosaicSetLayers(u8 bgMask) {
     mosaic_bg_mask = bgMask & 0x0F;

@@ -26,7 +26,7 @@ void hero_animate(void) {
 A frame value is an **opaque u16** — the player sequences it without interpreting it. Three consumption patterns:
 
 - `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`, `examples/sprites/animated_sprite`);
-- `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMeta()` directly (`examples/sprites/metasprite`);
+- `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMetasprite()` directly (`examples/sprites/metasprite`);
 - `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything).
 
 `ANIM_ONCE` clips hold their last frame and raise `animDone(&p)`; pausing is simply not ticking. Per-frame durations use a raw `AnimClip` struct with a `durations` array — see `<snes/anim.h>` for the full API, the layout contract, and the bank $00 note for nearly-full ROMs.

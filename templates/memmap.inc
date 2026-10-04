@@ -4,7 +4,7 @@
 .MEMORYMAP
     SLOTSIZE $8000          ; 32KB per slot (default)
     DEFAULTSLOT 0
-    SLOT 0 $8000 $8000      ; ROM mapped at $8000-$FFFF (32KB)
+    SLOT 0 START $8000 SIZE $8000 NAME "ROM"   ; ROM mapped at $8000-$FFFF (32KB); named so GSU_SECTION can say SLOT "ROM" (a bare 0 drew a WLA warning: slot 1 also starts at 0)
     SLOT 1 $0000 $2000      ; Work RAM at $0000-$1FFF (8KB for DP/Stack)
     SLOT 2 $2000 $E000      ; Work RAM at $2000-$FFFF (56KB)
     SLOT 3 $0000 $10000     ; Bank $7E full RAM (64KB) — also the window for Game Pak RAM:

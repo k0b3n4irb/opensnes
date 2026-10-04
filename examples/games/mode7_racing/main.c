@@ -157,6 +157,7 @@ int main(void) {
 
     setMode(BG_MODE7, 0);
     mode7Init();
+    mode7SetScale(0x0080, 0x0080);   /* the camera: the track magnified twice */
     oamInit(OBJ_SIZE8_L16, 3);
     oamSet(0, CAR_SCREEN_X, CAR_SCREEN_Y, 0, 0, 3, 0);
     oamSetSize(0, OBJ_LARGE);

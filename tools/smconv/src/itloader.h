@@ -103,6 +103,9 @@ typedef struct {
     bool has_sample;
     bool stereo;
     bool compressed;
+    /* set when the compressed data could not be decoded: the sample is
+     * empty and the module it belongs to is invalid */
+    int invalid;
     u8  default_volume;
     u8  default_panning;
     u8  convert;

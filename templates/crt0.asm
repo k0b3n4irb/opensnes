@@ -197,15 +197,21 @@
                             ; nmiSet/irqEnable don't clobber each other's bits.
     in_nmi_ctx      dsb 1   ; 1 while the user NMI callback runs. tcc_mul16 /
                             ; tcc_div16 test it and take their software path:
-                            ; the hardware mul/div unit ($4202-$4217) reads
-                            ; garbage during the auto-joypad window the
-                            ; callback runs in, and is not reentrant against
-                            ; a main-thread multiply the NMI interrupted.
+                            ; the hardware mul/div unit ($4202-$4217) is not
+                            ; reentrant against a main-thread multiply the
+                            ; NMI interrupted (#113). (A second reason once
+                            ; given here — wrong results during auto-joypad —
+                            ; was retired 2026-10-02: a luna probe found none.)
     setini_shadow   dsb 1   ; Software copy of SETINI $2133 (write-only).
                             ; videoSetInterlace/ObjInterlace/Overscan/
                             ; PseudoHires compose their bits through it
                             ; (same pattern as nmitimen_shadow). Zeroed
                             ; by the WRAM clear at boot = reset state.
+    bg3_opt         dsb 1   ; 1 while BGMODE is 2, 4 or 6 (set by setMode):
+                            ; BG3 is then the offset-per-tile table, whose
+                            ; rows BG3VOFS selects directly (snesdev-wiki,
+                            ; Offset-per-tile), so the NMI writes its VOFS
+                            ; raw instead of y - 1.
 .ENDS
 
 ;------------------------------------------------------------------------------
@@ -1192,10 +1198,18 @@ FastNmi:
     sta $2111
     lda.w bg_scroll_x+5    ; BG3 H high
     sta $2111
-    rep #$20
+    lda.w bg3_opt          ; Z: 0 = BG3 displayed, 1 = offset table
+    rep #$20               ; (rep leaves Z alone)
     .ACCU 16
+    bne @bg3_raw
     lda.w bg_scroll_y+4    ; BG3 V: hardware wants y - 1 (scanline 0 is
     dec a                  ; never output; anomie-regs "BG Scrolling")
+    bra @bg3_vofs
+@bg3_raw:
+    .ACCU 16
+    lda.w bg_scroll_y+4    ; offset-per-tile: VOFS picks the table's rows
+@bg3_vofs:                 ; (H row = VOFS / 8, V row = the next), raw
+    .ACCU 16
     sep #$20
     .ACCU 8
     sta $2112
@@ -1268,7 +1282,7 @@ FastNmi:
 
 @do_callback:
     ; Flag the NMI context so the mul/div runtime avoids the hardware
-    ; unit (auto-joypad window + non-reentrancy — see in_nmi_ctx decl).
+    ; unit (non-reentrancy — see in_nmi_ctx decl).
     sep #$20
     .ACCU 8
     lda #1
@@ -2147,7 +2161,7 @@ tilemapFlush:
 ; the job does them. vblank_flag is not touched: the main thread is parked in
 ; gsuLaunch's WRAM loop, not in WaitForVBlank.
 ;==============================================================================
-.SECTION "ram_code.gsu_interrupts" BASE $7D APPENDTO ".ram_code"
+.SECTION "ram_code.gsu_interrupts" SLOT "ROM" BASE $7D APPENDTO ".ram_code"   ; the slot by name: the default slot 0 drew WLA's "SLOT number 0 / SLOT with starting address 0" warning (2026-10-04)
 gsu_nmi_blob:
     rep #$30
     .ACCU 16

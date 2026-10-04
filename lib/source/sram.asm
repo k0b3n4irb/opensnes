@@ -32,10 +32,10 @@
 ; offset + size must stay within $2000 (the default SRAM_SIZE, 8 KB). Larger
 ; HiROM saves would have to step through banks $31-$3F; not implemented.
 ;
-; SA-1 is not supported here: its save memory is BW-RAM ($40-$4F), which the
-; SNES CPU may only write after enabling SBWE ($2226), and crt0 does not.
-; make/common.mk refuses USE_SRAM=1 with USE_SA1=1 instead of building a
-; module that would silently do nothing.
+; SA-1 (since 2026-09-26; refused before): the save memory is BW-RAM, and the
+; SNES CPU may only write it after crt0 enables SBWE ($2226), which it does.
+; Until 2026-10-05 the paragraph above this one still said the build refused
+; USE_SRAM=1 with USE_SA1=1 — the lines below are what the module does.
 .ifdef SA1
 ; SA-1: the save memory is BW-RAM, seen by the SNES CPU at $40-$4F:0000-FFFF
 ; (fullsnes, SA-1 memory map); crt0 enables SNES-side writes (SBWE, $2226).
@@ -51,6 +51,50 @@
 .endif
 .endif
 .EQU SRAM_LONG (SRAM_BANK << 16) + SRAM_BASE
+
+; Super FX (since 2026-10-03): the cartridge has no separate save chip. The
+; battery keeps the GSU's own Game Pak RAM, which the CPU sees at
+; $70:0000-$FFFF — the LoROM values above — and shares with the GSU: while a
+; job runs with RAN = 1 the CPU cannot read or write it. SRAM_GSU_TAKE drops
+; RAN for the transfer (the GSU waits on its next RAM access, Nintendo manual
+; Book II 5.3) and SRAM_GSU_GIVE puts SCMR back; both go through
+; gsu_scmr_live, the copy the presentation NMI restores SCMR from, so an NMI
+; in the middle of a transfer does not hand the RAM back early.
+.ifdef SUPERFX
+.RAMSECTION ".sram_gsu_state" BANK 0 SLOT 1
+    sram_gsu_scmr   dsb 1       ; SCMR as it was before the transfer
+.ENDS
+.endif
+
+; In: 16-bit A (trashed). Out: 16-bit A.
+.MACRO SRAM_GSU_TAKE
+.ifdef SUPERFX
+    sep #$20
+    .ACCU 8
+    lda.l gsu_scmr_live
+    sta.l sram_gsu_scmr
+    and #$F7                    ; RAN = 0
+    sta.l gsu_scmr_live
+    sta.l $00303A               ; SCMR
+    rep #$20
+    .ACCU 16
+.endif
+.ENDM
+
+; In: 16-bit A and X; A is kept (the return code), X trashed.
+.MACRO SRAM_GSU_GIVE
+.ifdef SUPERFX
+    tax
+    sep #$20
+    .ACCU 8
+    lda.l sram_gsu_scmr
+    sta.l gsu_scmr_live
+    sta.l $00303A               ; SCMR
+    rep #$20
+    .ACCU 16
+    txa
+.endif
+.ENDM
 
 ; Direct page temporaries
 .EQU DP_SIZE   $00      ; 2 bytes - transfer size
@@ -82,9 +126,10 @@
     sep #$20
     .ACCU 8
     lda \1,s                    ; bank byte of the source pointer
-    beq @ssb_fast\@
+    beq @ssb_bank0\@
     cmp #$7E
     beq @ssb_fast\@
+@ssb_slow\@:
     sta.b DP_SRC+2              ; [DP_SRC] = 24-bit source
     rep #$20
     .ACCU 16
@@ -102,6 +147,14 @@
     cpy.b DP_SIZE
     bne @ssb_loop\@
     bra @ssb_done\@
+@ssb_bank0\@:
+    ; Bank $00 is the WRAM mirror only below $2000; above it the source is
+    ; ROM (a const in the code bank, the header) or MMIO, and `mvn $7E`
+    ; would have copied WRAM instead (library audit row 22, until
+    ; 2026-10-04). A = 0 is the right bank for the long-read path.
+    cpx #$2000
+    bcc @ssb_fast\@
+    bra @ssb_slow\@
 @ssb_fast\@:
     rep #$20
     .ACCU 16
@@ -181,9 +234,30 @@ sram_bounds:
     adc.b DP_TEMP               ; end = offset + size
     bcs @range                  ; wrapped past 64 KB
     sta.b DP_TEMP
+.ifdef SUPERFX
+    ; The save is the Game Pak RAM: battery from the cartridge type ($FFD6,
+    ; $15 GSU-1 or $1A GSU-2 with battery), capacity from the extended
+    ; header ($FFBD, 1 KB << n). 64 KB is the whole bank: any end that did
+    ; not wrap fits.
+    lda.l $00FFD6
+    and #$00FF
+    cmp #$0015
+    beq +
+    cmp #$001A
+    bne @none
++:  lda.l $00FFBD
+    and #$00FF
+    beq @none
+    cmp #$0006
+    bcc ++
+    clc
+    rts
+++:
+.else
     lda.l $00FFD8               ; SRAMSIZE (low byte)
     and #$00FF
     beq @none
+.endif
     cmp #SRAM_MAX_N+1
     bcc +
     lda #SRAM_MAX_N
@@ -225,6 +299,7 @@ sramSave:
     rep #$30                    ; 16-bit A, X, Y
     .ACCU 16
     .INDEX 16
+    SRAM_GSU_TAKE
 
     lda 6,s                     ; size
     beq @ok                     ; nothing to copy
@@ -249,6 +324,7 @@ sramSave:
     .INDEX 16
     lda #SRAM_OK
 @done:
+    SRAM_GSU_GIVE
     plb
     plp
     rtl
@@ -269,6 +345,7 @@ sramLoad:
     rep #$30                    ; 16-bit A, X, Y
     .ACCU 16
     .INDEX 16
+    SRAM_GSU_TAKE
 
     lda 6,s                     ; size
     beq @ok                     ; nothing to copy
@@ -293,6 +370,7 @@ sramLoad:
     .INDEX 16
     lda #SRAM_OK
 @done:
+    SRAM_GSU_GIVE
     plb
     plp
     rtl
@@ -314,6 +392,7 @@ sramSaveOffset:
     rep #$30
     .ACCU 16
     .INDEX 16
+    SRAM_GSU_TAKE
 
     lda 8,s                     ; size
     beq @ok                     ; nothing to copy
@@ -339,6 +418,7 @@ sramSaveOffset:
     .INDEX 16
     lda #SRAM_OK
 @done:
+    SRAM_GSU_GIVE
     plb
     plp
     rtl
@@ -360,6 +440,7 @@ sramLoadOffset:
     rep #$30
     .ACCU 16
     .INDEX 16
+    SRAM_GSU_TAKE
 
     lda 8,s                     ; size
     beq @ok                     ; nothing to copy
@@ -385,6 +466,7 @@ sramLoadOffset:
     .INDEX 16
     lda #SRAM_OK
 @done:
+    SRAM_GSU_GIVE
     plb
     plp
     rtl
@@ -404,6 +486,7 @@ sramClear:
     rep #$30
     .ACCU 16
     .INDEX 16
+    SRAM_GSU_TAKE
 
     lda 6,s                     ; size
     beq @ok                     ; nothing to copy
@@ -441,6 +524,7 @@ sramClear:
     .INDEX 16
     lda #SRAM_OK
 @done:
+    SRAM_GSU_GIVE
     plb
     plp
     rtl

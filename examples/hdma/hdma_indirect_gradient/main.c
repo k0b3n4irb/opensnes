@@ -67,7 +67,7 @@ static u8 itable[NBANDS * 3 + 1];
  *
  * Faithful to krom's register sequence: DMAP0=%01000011 (indirect |
  * 2REG_2X), BBAD0=$21, A1T0=table, A1B0=$00, DASB0=$00, HDMAEN=ch0,
- * TM=0, screen on. After hdmaEnable() the CPU idles — the PPU rebuilds
+ * TM=0, screen on. After hdmaEnableMask() the CPU idles — the PPU rebuilds
  * the gradient from the pointer table on every frame by itself.
  *
  * @return Never returns (infinite loop)
@@ -98,7 +98,7 @@ int main(void) {
     hdmaSetupIndirect(HDMA_CHANNEL_0, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
                       itable,
                       (u8)((u32)(void *)band_data >> 16));
-    hdmaEnable(1 << HDMA_CHANNEL_0);
+    hdmaEnableMask(1 << HDMA_CHANNEL_0);
 
     /* krom: TM = 0 — no layers; the backdrop is the whole picture */
     setMainScreen(0);

@@ -58,8 +58,8 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
         return;
 
     /* objNew copies the new object to objWorkspace — set fields here */
-    objGetPointer(objgetid);
-    marioid = objgetid;
+    objGetPointer(objGetCurrentId());
+    marioid = objGetCurrentId();
     objWorkspace.width = 16;
     objWorkspace.height = 16;
 
@@ -125,8 +125,8 @@ void marioupdate(u16 idx) {
     mariox = objWorkspace.xpos[1] | (objWorkspace.xpos[2] << 8);
     marioy = objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8);
 
-    oambuffer[0].oamx = mariox - x_pos;
-    oambuffer[0].oamy = marioy - y_pos;
+    oambuffer[0].oamx = mariox - mapGetCameraX();
+    oambuffer[0].oamy = marioy - mapGetCameraY();
     oamDynamicDraw(0);
     mapUpdateCamera(mariox, marioy);
 }

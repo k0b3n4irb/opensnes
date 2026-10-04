@@ -36,6 +36,7 @@
 #define REG_MPYH   (*(volatile u8 *)0x2136)
 /* MPYM+MPYH as one 16-bit read — exactly the ASM's `lda.l $2135` */
 #define REG_MPY16  (*(volatile u16 *)0x2135)
+#define REG_SETINI (*(volatile u8 *)0x2133)
 
 /* Module state (WRAM) — mirrors the ASM's .mode7vars */
 static u16 m7_scale_x;
@@ -132,8 +133,12 @@ void mode7SetAngle(u8 angle) {
 
     /* locals on purpose: the byte-pair store fusion needs the two
      * M7A writes to split the SAME temp, and globals reload per use */
-    sx = m7_scale_x;
-    sy = m7_scale_y;
+    /* x2: the table's cosine peaks at 127, the product's high byte is
+     * kept, so scale * 2 makes 0x0100 the 1:1 matrix ($00FE). Before
+     * 2026-10-02 the scale went in as is and 0x0100 gave $7F (magnified
+     * twice). Scales up to 0x3FFF stay in the multiplicand's range. */
+    sx = (u16)(m7_scale_x << 1);
+    sy = (u16)(m7_scale_y << 1);
 
     PPU_MUL(b, sx, (s8)-sn);
     PPU_MUL(c, sy, sn);
@@ -184,4 +189,18 @@ void mode7SetMatrix(s16 a, s16 b, s16 c, s16 d) {
 
 void mode7SetSettings(u8 settings) {
     REG_M7SEL = settings;
+}
+
+/* EXTBG (SETINI bit 6), 2026-10-02. SETINI is write-only: the bit goes
+ * through crt0's setini_shadow, the copy video.h's setters (interlace,
+ * overscan, pseudo-hires) also compose through, so none of them clears
+ * another's bit. */
+extern volatile u8 setini_shadow;
+
+void mode7SetExtBg(u8 on) {
+    if (on)
+        setini_shadow |= 0x40;
+    else
+        setini_shadow &= (u8)~0x40;
+    REG_SETINI = setini_shadow;
 }

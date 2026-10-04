@@ -106,7 +106,7 @@ typedef s16 fixed;
  * s16 screen_pos = UNFIX_ROUND(pos);  // 51
  * @endcode
  */
-#define UNFIX_ROUND(x) ((s16)(((x) + 128) >> 8))
+#define UNFIX_ROUND(x) ((s16)(((s32)(x) + 128) >> 8))   /* 32-bit sum: x + 128 overflowed s16 from 127.5 (until 2026-10-03) */
 
 /**
  * @brief Get fractional part of fixed-point
@@ -145,7 +145,12 @@ typedef s16 fixed;
  * fixed result = fixMul(speed, scale);  // 1.0
  * @endcode
  *
- * @note Uses 32-bit intermediate for accuracy
+ * @note The 32-bit product is shifted back to 8.8 and the RESULT is 16 bits:
+ *   a product outside -128.0..127.996 wraps without a sign — `fixMul(FIX(20),
+ *   FIX(20))` is 400.0, which does not fit, and reads as -112.0. Keep
+ *   |a × b| under 128, or use the 16.16 `fix32Mul()` (`snes/fixed32.h`).
+ *   (This line said "32-bit intermediate for accuracy" and nothing about the
+ *   16-bit result until 2026-10-05.)
  *
  * @warning NOT safe inside an nmiSet() callback: uses the hardware
  *   multiplier, which is not reentrant (a callback multiply destroys a
@@ -188,13 +193,11 @@ fixed fixDiv(fixed a, fixed b);
  * fixed sin_val = fixSin(angle);  // 256 = 1.0
  * @endcode
  *
- * @note Table-based lookup, very fast
+ * @note Table-based lookup. A lib function since 2026-10-03 (it was
+ *       `inline` in this header, which exported the table as `sine_table`;
+ *       API decision D4).
  */
-extern const s16 sine_table[256];
-
-inline fixed fixSin(u8 angle) {
-    return sine_table[angle];
-}
+fixed fixSin(u8 angle);
 
 /**
  * @brief Get cosine value for angle
@@ -206,12 +209,8 @@ inline fixed fixSin(u8 angle) {
  * u8 angle = 0;  // 0 degrees
  * fixed cos_val = fixCos(angle);  // 256 = 1.0
  * @endcode
- * Inlined for zero-call-overhead access (wave 4 retrofit).
  */
-inline fixed fixCos(u8 angle) {
-    /* cos(x) = sin(x + 90°) = sin(x + 64) */
-    return sine_table[(u8)(angle + 64)];
-}
+fixed fixCos(u8 angle);
 
 /*============================================================================
  * Integer Math (Safe Alternatives)
@@ -400,23 +399,9 @@ u8 atan2_8(s16 dy, s16 dx);
  *============================================================================*/
 
 /**
- * @brief 256-byte quadratic easing LUT — i² normalised to [0, 255]
- *
- * `ease_quad_table[i] = floor(i² / 255)`. Underlies `ease_in_quad`
- * and `ease_out_quad`. Lives in the opt-in `math_ease` module
- * (`LIB_MODULES += math_ease`) so math users who don't ease don't pay
- * its 256 bank-$00 bytes. Exposed as `extern` so user code can index it
- * directly for custom curve compositions.
- *
- * Cost: ~5 cycles per lookup vs ~12 for `(x * x) / 255` live.
- * ROM cost: 256 bytes (placed in a SUPERFREE section by the linker).
- */
-extern const u8 ease_quad_table[256];
-
-/**
  * @brief Ease-in quadratic: t² curve, output [0, 255]
  * @param t Input in [0, 255]
- * @return `ease_quad_table[t]` — starts slow, accelerates toward 255
+ * @return floor(t² / 255) — starts slow, accelerates toward 255
  *
  * Canonical animation curve. Use to drive a value from 0 to its
  * final state over N frames where the motion feels "wound up" at
@@ -424,25 +409,33 @@ extern const u8 ease_quad_table[256];
  *
  * @code
  * for (u8 t = 0; t < 255; t++) {
- *     u8 alpha = ease_in_quad(t);
+ *     u8 alpha = easeInQuad(t);
  *     // ... draw with alpha ...
  * }
  * @endcode
+ *
+ * Table-based (256 bytes), in the opt-in `math_ease` module
+ * (`LIB_MODULES += math_ease`) so math users who do not ease do not pay
+ * for the table.
  */
-inline u8 ease_in_quad(u8 t) {
-    return ease_quad_table[t];
-}
+u8 easeInQuad(u8 t);
 
 /**
  * @brief Ease-out quadratic: 1 - (1-t)² curve, output [0, 255]
  * @param t Input in [0, 255]
- * @return `255 - ease_quad_table[255 - t]` — starts fast, settles toward 255
+ * @return Starts fast, settles toward 255
  *
- * Mirror of `ease_in_quad`. Use when the motion should "decelerate"
+ * Mirror of easeInQuad(). Use when the motion should "decelerate"
  * into its final state (e.g., a sprite sliding into position).
  */
-inline u8 ease_out_quad(u8 t) {
-    return 255 - ease_quad_table[255 - t];
-}
+u8 easeOutQuad(u8 t);
+
+/** @brief The pre-2026-10-03 name of easeInQuad(). Same value. */
+OPENSNES_DEPRECATED("use easeInQuad()")
+u8 ease_in_quad(u8 t);
+
+/** @brief The pre-2026-10-03 name of easeOutQuad(). Same value. */
+OPENSNES_DEPRECATED("use easeOutQuad()")
+u8 ease_out_quad(u8 t);
 
 #endif /* OPENSNES_MATH_H */
