@@ -15,6 +15,9 @@ rom = "../../../examples/backgrounds/mode6/mode6.sfc"
 frames = 140
 input = "110:0x0080,112:0"        # A: vertical -> horizontal
 
+[[checkpoint]]                 # the reference for the delta below: the booted scene, not power-on RAM (2026-10-04)
+at_frame = 60
+
 [[checkpoint]]
 at_frame = 100
 [checkpoint.values]

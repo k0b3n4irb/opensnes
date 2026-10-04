@@ -190,6 +190,9 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- test(luna-test): the `backgrounds_mode4` and `backgrounds_mode6`
+  manifests take their first delta from the booted scene (an empty
+  checkpoint at frame 60), not from power-on RAM (testing audit T9).
 - fix(build): **an SA-1 cartridge declares a battery only when it saves.**
   Every SA-1 ROM carried `$FFD6 = $35` (SA-1 + RAM + battery) and a fixed
   `$FFD8 = $05`, whatever `USE_SRAM` said, so emulators kept a `.srm` for
