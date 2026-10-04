@@ -190,6 +190,14 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(examples): **`games/mode7_flying` and `games/mode7_racing` showed
+  wrong Mode 7 tiles.** Their 1024×1024 maps had 379 and 406 distinct 8×8
+  tiles for a map that addresses 256, and gfx4snes wrapped the index modulo
+  256 without a word (caught by the new refusal above): 123 and 150 map
+  entries pointed at the wrong tile since the examples were written. The
+  generators now paint on the tile grid (the flying terrain's river and
+  pads; the whole track, from the same centre path): 33 and 15 distinct
+  tiles, the same scenes, and the class maps follow.
 - fix(tools): **gfx4snes refuses what it used to truncate silently**: more
   than 1024 distinct BG tiles (the 10-bit tile field carried into the
   palette bits), more than 256 Mode 7 tiles (one byte per map entry), and —

@@ -70,69 +70,94 @@ def center_path(t):
 
 ROAD_HALF = 40                  # road half-width in pixels
 
+# Everything below is painted per 8x8 TILE, not per pixel: a Mode 7 map
+# addresses 256 tiles, and the per-pixel discs, anti-aliased edges and
+# checker line made 406 distinct ones — gfx4snes wrapped the index modulo
+# 256 without a word until 2026-10-04, so 150 map entries showed the wrong
+# tile. The road mask is still computed at full resolution from the same
+# centre path; each tile then gets one of a few patterns (solid road, grass,
+# wall, an edge band on the sides facing grass, the checker line).
+GREENS = [(34, 110, 34), (30, 102, 30), (38, 118, 38)]
+ROAD = (90, 90, 96)
+EDGE = (200, 200, 210)
+WALL = (120, 30, 30)
+N = W // TILE                   # 128 tiles a side
+
+
 def main():
     random.seed(7)
-    img = Image.new("RGB", (W, H))
-    px = img.load()
 
-    # grass base with mild texture (few distinct colors — kind to the
-    # 256-color quantization AND to tile dedup)
-    greens = [(34, 110, 34), (30, 102, 30), (38, 118, 38)]
-    for y in range(H):
-        for x in range(W):
-            px[x, y] = greens[(x // 8 + y // 8 + ((x ^ y) >> 6)) % 3]
-
-    draw = ImageDraw.Draw(img)
-
-    # road: stamp discs along the center path
-    road = (90, 90, 96)
-    edge = (200, 200, 210)
+    # full-resolution road mask: stamp discs along the centre path
+    mask = Image.new("L", (W, H), 0)
+    mdraw = ImageDraw.Draw(mask)
     steps = 4000
     pts = [center_path(i / steps) for i in range(steps)]
     for (x, y) in pts:
-        draw.ellipse([x - ROAD_HALF, y - ROAD_HALF,
-                      x + ROAD_HALF, y + ROAD_HALF], fill=road)
-    # edge lines: thinner white band re-stamped then road again inside
-    for (x, y) in pts:
-        draw.ellipse([x - ROAD_HALF, y - ROAD_HALF,
-                      x + ROAD_HALF, y + ROAD_HALF],
-                     outline=edge, width=3)
-    for (x, y) in pts:
-        draw.ellipse([x - (ROAD_HALF - 4), y - (ROAD_HALF - 4),
-                      x + (ROAD_HALF - 4), y + (ROAD_HALF - 4)], fill=road)
+        mdraw.ellipse([x - ROAD_HALF, y - ROAD_HALF,
+                       x + ROAD_HALF, y + ROAD_HALF], fill=255)
+    mpx = mask.load()
 
-    # start/finish checker line across the road at t=0 (top straight)
+    # tile classes: 0 = road, 1 = grass, 2 = wall (2-tile ring at the border)
+    cls = [[1] * N for _ in range(N)]
+    for ty in range(N):
+        for tx in range(N):
+            if ty < 2 or ty >= N - 2 or tx < 2 or tx >= N - 2:
+                cls[ty][tx] = 2
+                continue
+            road_px = sum(1 for y in range(TILE) for x in range(TILE)
+                          if mpx[tx * TILE + x, ty * TILE + y])
+            cls[ty][tx] = 0 if road_px * 2 >= TILE * TILE else 1
+
+    # start/finish: the tile column of the path's origin, over the road tiles
     sx, sy = center_path(0.0)
-    for oy in range(-ROAD_HALF + 4, ROAD_HALF - 3):
-        for ox in range(-6, 6):
-            c = (240, 240, 240) if ((ox // 6) + (oy // 6)) % 2 == 0 else (16, 16, 16)
-            px[int(sx + ox), int(sy + oy)] = c
+    start_tx = int(sx) // TILE
+    checker = set()
+    for ty in range(N):
+        if cls[ty][start_tx] == 0 and abs(ty * TILE + 4 - sy) <= ROAD_HALF:
+            checker.add((start_tx, ty))
 
-    # wall ring at the border (2 tiles thick, dark red)
-    wall = (120, 30, 30)
-    draw.rectangle([0, 0, W - 1, 15], fill=wall)
-    draw.rectangle([0, H - 16, W - 1, H - 1], fill=wall)
-    draw.rectangle([0, 0, 15, H - 1], fill=wall)
-    draw.rectangle([W - 16, 0, W - 1, H - 1], fill=wall)
+    img = Image.new("RGB", (W, H))
+    px = img.load()
+    draw = ImageDraw.Draw(img)
 
-    # gfx4snes needs an INDEXED png; the track uses ~10 colors anyway
+    def is_grass(tx, ty):
+        return 0 <= tx < N and 0 <= ty < N and cls[ty][tx] == 1
+
+    for ty in range(N):
+        for tx in range(N):
+            x0, y0 = tx * TILE, ty * TILE
+            c = cls[ty][tx]
+            if c == 2:
+                draw.rectangle([x0, y0, x0 + 7, y0 + 7], fill=WALL)
+            elif c == 1:
+                g = GREENS[(tx + ty + ((x0 ^ y0) >> 6)) % 3]
+                draw.rectangle([x0, y0, x0 + 7, y0 + 7], fill=g)
+            else:
+                draw.rectangle([x0, y0, x0 + 7, y0 + 7], fill=ROAD)
+                if (tx, ty) in checker:
+                    for y in range(TILE):
+                        for x in range(TILE):
+                            on = ((x // 4) + (y // 4) + ty) % 2 == 0
+                            px[x0 + x, y0 + y] = (240, 240, 240) if on else (16, 16, 16)
+                    continue
+                # a 3-pixel edge band on each side that faces grass
+                if is_grass(tx, ty - 1):
+                    draw.rectangle([x0, y0, x0 + 7, y0 + 2], fill=EDGE)
+                if is_grass(tx, ty + 1):
+                    draw.rectangle([x0, y0 + 5, x0 + 7, y0 + 7], fill=EDGE)
+                if is_grass(tx - 1, ty):
+                    draw.rectangle([x0, y0, x0 + 2, y0 + 7], fill=EDGE)
+                if is_grass(tx + 1, ty):
+                    draw.rectangle([x0 + 5, y0, x0 + 7, y0 + 7], fill=EDGE)
+
+    # gfx4snes needs an INDEXED png; the track uses ~8 colors
     img.convert("P", palette=Image.ADAPTIVE, colors=64).save(RES / "track.png")
 
-    # class map: sample the tile center -> road/grass/wall byte
-    classes = bytearray()
-    for ty in range(128):
-        for tx in range(128):
-            r, g, b = px[tx * TILE + 4, ty * TILE + 4]
-            if r > 100 and g < 60:
-                classes.append(2)               # wall
-            elif abs(r - g) < 30 and r > 60:
-                classes.append(0)               # road / line / edge
-            else:
-                classes.append(1)               # grass
+    # class map straight from the tile classes (the game reads one byte per tile)
+    classes = bytearray(cls[ty][tx] for ty in range(N) for tx in range(N))
     (RES / "track_class.bin").write_bytes(bytes(classes))
-    road_n = classes.count(0)
     print(f"track.png 1024x1024 + track_class.bin "
-          f"(road {road_n}, grass {classes.count(1)}, wall {classes.count(2)})")
+          f"(road {classes.count(0)}, grass {classes.count(1)}, wall {classes.count(2)})")
 
 
 if __name__ == "__main__":

@@ -46,22 +46,29 @@ def main():
         draw.line([(v, 0), (v, H - 1)], fill=hedge, width=2)
         draw.line([(0, v), (W - 1, v)], fill=hedge, width=2)
 
-    # river: a sine sweep top-to-bottom, widening into a lake
+    # river: a sine sweep top-to-bottom, widening into a lake. Drawn per
+    # 8-pixel band with its edges on the tile grid: a Mode 7 map addresses
+    # 256 tiles and per-pixel edges made 379 distinct ones (gfx4snes wrapped
+    # the index modulo 256 without a word until 2026-10-04, so 123 map
+    # entries showed the wrong tile).
     water = (36, 76, 160)
-    for y in range(H):
+    for y in range(0, H, TILE):
         cx = 620 + int(140 * math.sin(y / 170.0))
         hw = 26 + (40 if 380 < y < 560 else 0)   # lake bulge
-        draw.line([(cx - hw, y), (cx + hw, y)], fill=water, width=1)
+        x0 = (cx - hw) // TILE * TILE
+        x1 = (cx + hw) // TILE * TILE - 1
+        draw.rectangle([x0, y, x1, y + TILE - 1], fill=water)
 
     # landing pads: dark slab, white border, stripe chevrons
     for (cx, cy) in PADS:
         x0, y0 = cx - PAD_W // 2, cy - PAD_H // 2
         x1, y1 = cx + PAD_W // 2, cy + PAD_H // 2
-        draw.rectangle([x0, y0, x1, y1], fill=(70, 70, 76))
-        draw.rectangle([x0, y0, x1, y1], outline=(230, 230, 235), width=4)
-        for sx in range(x0 + 16, x1 - 12, 24):
-            draw.line([(sx, y0 + 8), (sx + 10, y1 - 8)],
-                      fill=(230, 230, 235), width=4)
+        # slab, border and stripes all on the tile grid (see the river note)
+        draw.rectangle([x0, y0, x1 - 1, y1 - 1], fill=(70, 70, 76))
+        draw.rectangle([x0, y0, x1 - 1, y1 - 1], outline=(230, 230, 235), width=TILE)
+        for sx in range(x0 + 2 * TILE, x1 - 2 * TILE, 3 * TILE):
+            draw.rectangle([sx, y0 + TILE, sx + TILE - 1, y1 - TILE - 1],
+                           fill=(230, 230, 235))
 
     img.convert("P", palette=Image.ADAPTIVE, colors=64).save(RES / "terrain.png")
 
