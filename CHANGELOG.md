@@ -190,6 +190,15 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs(lib,examples): three claims corrected. `AUDIO_RELEASE_*` are the
+  ADSR2 **sustain rate**, not a release: the S-DSP's release is fixed on
+  key-off (fullsnes, snesdev-wiki Errata; library audit D1).
+  `gsuLaunch()` said the ROM-side work "waits" for the end of a job: the NMI
+  callback is picked up once by the first ROM NMI after it, and an H/V-timer
+  IRQ raised during the job is acknowledged and dropped (crt0; chips audit).
+  `games/likemario` claimed the compiler's `>>` is a logical shift: cc65816
+  shifts signed values arithmetically (pinned by `test_signed_ops.c`), and
+  `asr8()` is a readability helper, not a workaround (examples audit).
 - docs(lib): `collideTile()` / `collideTileEx()` say that off the map to the
   left, the top or the right they return 1, "off the map is a wall" (the
   code since the v1 fix; the header said 0), and that the bottom edge is not

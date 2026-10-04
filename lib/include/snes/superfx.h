@@ -194,9 +194,12 @@ void gsuSetProgram(const void *program);
  * Reads gsu_cfgr, gsu_scmr, gsu_scbr for configuration.
  * The CPU waits in WRAM while the GSU owns the Game Pak. Interrupts keep
  * working (since 2026-09-25/26): the vectors point into WRAM, the NMI
- * counts the frame and uploads OAM, an H/V-timer or GSU IRQ is acknowledged;
- * the ROM-side work (your NMI callback, your IRQ handler) waits for the end
- * of the job.
+ * counts the frame and uploads OAM, an H/V-timer or GSU IRQ is acknowledged.
+ * The ROM-side work is not run during the job: your NMI callback, the pads
+ * and the dirty flags are picked up by the first ROM NMI after it (one
+ * call, not one per missed frame), and an H/V-timer IRQ raised during the
+ * job is acknowledged and DROPPED — your IRQ handler never sees it (crt0
+ * gsu_irq_blob; until 2026-10-04 this line said it "waits").
  */
 extern void gsuLaunch(void);
 

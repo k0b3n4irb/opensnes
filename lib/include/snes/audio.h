@@ -121,7 +121,14 @@
 #define AUDIO_SUSTAIN_HALF      3
 #define AUDIO_SUSTAIN_QUARTER   1
 
-/** @brief ADSR release rates (0=infinite, 31=instant) */
+/** @brief ADSR sustain RATE (ADSR2 bits 0-4): how fast the envelope keeps
+ *  falling from the sustain level while the key is held. 0 holds the level
+ *  for ever, 31 falls fastest. The S-DSP has no programmable release: on
+ *  key-off the level drops at a fixed rate (fullsnes "Rate=31, Step=-8";
+ *  snesdev-wiki Errata). These names kept the "release" word of the API;
+ *  AUDIO_RELEASE_INSTANT makes a held note die away quickly, it does not
+ *  cut it. (Until 2026-10-04 this comment called the field the release
+ *  rate — library audit D1.) */
 #define AUDIO_RELEASE_INSTANT   31
 #define AUDIO_RELEASE_FAST      24
 #define AUDIO_RELEASE_MEDIUM    16
