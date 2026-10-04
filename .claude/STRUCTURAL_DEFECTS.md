@@ -929,7 +929,7 @@ representation in the toolchain.
   ratchet-guarded.
 - **2026-06-25 (A6 closed for now; Tier 1 shipped, Tier 2 scoped)** —
   Re-scoped A6 into three tiers (see
-  `.claude/notes/chantiers/32bit_pointers_a7_a6_b1_b2.md` §8 for the full
+  `.claude/notes/archive/32bit_pointers_a7_a6_b1_b2.md` §8 for the full
   cold-start plan). **Tier 1 (lib-led practical relief) SHIPPED**: verified the
   ASM DMA path (`dmaCopyVram` & friends) already reads the pointer's bank byte, so
   assets in banks >$00 already load; corrected `KNOWN_LIMITATIONS.md` +
@@ -1018,7 +1018,7 @@ representation in the toolchain.
 #### A7. QBE w65816 32-bit (`Kl` class) codegen — RESOLVED 🟢 (2026-06-22, ships v0.21.2)
 
 > **Resolution (chantier A7, Phases 0–1 — see
-> `.claude/notes/chantiers/32bit_pointers_a7_a6_b1_b2.md`):** the catalogue's
+> `.claude/notes/archive/32bit_pointers_a7_a6_b1_b2.md`):** the catalogue's
 > "never extended past 16-bit" premise was stale — the `Kl` class was already
 > implemented broadly (prior chantiers + fix32 v0.21.0: return convention,
 > `__mul32`, long divide, pair lowering). Phase 0 built a luna runtime-correctness
