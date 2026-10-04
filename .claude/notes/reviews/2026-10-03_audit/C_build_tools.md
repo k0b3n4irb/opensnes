@@ -84,3 +84,44 @@ Tous construits avec `rc=0`, sans message d'erreur, sauf mention contraire.
 ## Verdict
 
 Le système de build a fermé en une semaine presque tout ce que l'audit du 26/09 relevait : zip testé sur 4 OS, tampon de configuration, combinaisons refusées, en-tête arbitré, lib et en-têtes locaux suivis. Mais la chasse aux silences montre que la discipline « refuser proprement » s'arrête aux combinaisons déjà rencontrées : `ROM_BANKS` hors de 8..64, `<stdint.h>`, une bascule incrémentale, `GSU_RAM_KB=0` et quatre convertisseurs produisent des ROM ou des assets faux avec un build vert, et deux de ces défauts (S1, S2) touchent un utilisateur dès sa première ROM ambitieuse. Rien de cela n'est profond (chaque correctif est d'effort S), mais tant qu'aucun test d'en-tête et aucun golden négatif n'existent, ce périmètre n'est pas au niveau d'un gel 1.0.
+
+## Suivi (2026-10-04)
+
+- **S7, S8, S12 corrigés** (commit `fix(tools): gfx4snes refuses…` de ce
+  jour) : plus de 1024 tuiles BG, plus de 256 tuiles Mode 7, et — pour les
+  planches sans carte (sprites, fontes) — une tuile 2bpp/4bpp dont les
+  pixels viennent de deux banques de palette sont refusés avec le numéro
+  de tuile, d'entrée ou de pixel. Trois fixtures générées (`toomany_bg.png`,
+  `toomany_m7.png`, `index5_2bpp.png`) les épinglent dans `run_golden.py`
+  (table `REFUSED`). Le refus a attrapé un défaut du corpus :
+  `games/mode7_flying` avait 379 tuiles distinctes pour une carte Mode 7
+  (123 entrées repliées modulo 256 depuis la création de l'exemple), corrigé
+  dans le générateur.
+- **Avec carte, la banque est un choix** : l'entrée de carte porte la
+  palette (celle du premier pixel de la tuile, `maps.c:222`) et les plans
+  gardent les bits bas ; `color/transparency`, `scrolling/mixed_scroll` et
+  `hdma/hdma_wave` utilisent plusieurs palettes de 16 couleurs ainsi. Une
+  première version du refus, appliquée à tout pixel ≥ 2^bpp, les a arrêtés :
+  la vérification reste sur le chemin sans carte.
+- **Question ouverte sur `-a` (`--pal-rearrange`), non mesurée** :
+  `gfx4snes.c:172` copie l'image dans `tiles_snes` (`tiles_convertsnes`
+  rend un tampon `malloc`), puis `:177` `palette_rearrange_snes` réécrit
+  les indices de `snesimage.buffer` (`palettes.c:180,348`), et `:181`
+  `map_convertsnes` consomme `tiles_snes`, copié *avant*. Si la lecture est
+  juste, la réorganisation des indices n'atteint jamais les tuiles écrites
+  (seule la palette `.pal` serait réordonnée). `transparency` (`-a -u 16`,
+  19 couleurs) a une image plausible, ce qui ne tranche pas (PVSnesLib a le
+  même ordre). À vérifier avec une image dont le réarrangement changerait
+  visiblement les indices, avant d'en faire un défaut.
+- **Question ouverte sur la palette d'une tuile de carte, non mesurée** :
+  `maps.c:222` prend la banque de palette du **premier** pixel de la tuile
+  (`imgbuf[currenttile * sizetile] >> 4`). L'indice 0 est la couleur
+  transparente de toutes les banques : une tuile de banque 2 qui commence
+  par un pixel transparent recevrait la palette 0 dans l'entrée de carte, et
+  ses pixels (bits bas conservés) s'afficheraient avec les couleurs de la
+  palette 0. Le refus des planches sans carte a dû apprendre ce cas (la
+  banque est celle du premier pixel *opaque*, sinon un sprite de banque 2 à
+  coin transparent était refusé) ; la carte a le même angle mort, hérité de
+  PVSnesLib. À mesurer avec une image dont une tuile de banque ≠ 0 commence
+  par la couleur 0, avant d'en faire un défaut.
+

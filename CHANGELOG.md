@@ -190,6 +190,13 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(tools): **gfx4snes refuses what it used to truncate silently**: more
+  than 1024 distinct BG tiles (the 10-bit tile field carried into the
+  palette bits), more than 256 Mode 7 tiles (one byte per map entry), and —
+  for sprite and font sheets, converted without a map — a 2bpp/4bpp tile
+  whose pixels come from two palette banks (the planes keep the low bits
+  only: index 4 under 2bpp drew colour 0). Three generated fixtures pin the
+  refusals in the golden run (build-tools audit S7, S8, S12).
 - fix(lib): **`objNew()` refuses a type of 64 or more** (`OB_TYPE_MAX`) and
   returns 0; such a type indexed past the type tables and called whatever
   followed them. libtest `r_obj_type64` (library audit, row 24).

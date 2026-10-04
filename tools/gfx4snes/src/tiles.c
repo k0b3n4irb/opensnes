@@ -127,6 +127,36 @@ unsigned char *tiles_convertsnes (unsigned char *imgbuf, int imgwidth, int imghe
 // addblank = 1 if we need to add a blank tile
 // lzcompress = 1 if we want lz77 compression
 // isquiet = 0 if we want some messages in console
+// Sprite and font sheets (no map): in 2bpp and 4bpp the planes keep only
+// the low bits of each pixel, and the palette is the OAM's, one per sprite.
+// A pixel from another 4- or 16-colour bank than the rest of its tile lost
+// its high bits and drew with the wrong colour, silently (index 4 in a 2bpp
+// tile drew colour 0 — build-tools audit S12, until 2026-10-04). Refuse
+// it, naming the tile and the pixel. Maps are not checked here: there the
+// bank is the design (the map entry carries it, from the tile's first
+// pixel) and -a rearranges the palettes.
+void tiles_checkbanks (unsigned char *tiles, int nbtiles, int nbcolors)
+{
+    int bitplanes, i, bank0 = -1;
+
+    bitplanes = 8;
+    if (nbcolors == 4) bitplanes = 2;
+    else if (nbcolors == 16) bitplanes = 4;
+    else if (nbcolors <= 128) bitplanes = 4;
+    if (bitplanes == 8) return;
+
+    // index 0 is the transparent colour of every bank: it says nothing
+    // about the tile's palette, so the bank is the first OPAQUE pixel's.
+    for (i = 0; i < nbtiles * 64; i++)
+    {
+        if ((i & 63) == 0) bank0 = -1;
+        if (tiles[i] == 0) continue;
+        if (bank0 < 0) bank0 = tiles[i] >> bitplanes;
+        if ((tiles[i] >> bitplanes) != bank0)
+            fatal("tile %d, pixel %d: colour index %d is in palette bank %d but the tile uses bank %d - one %d-colour palette per tile", i / 64, i % 64, tiles[i], tiles[i] >> bitplanes, bank0, 1 << bitplanes);
+    }
+}
+
 void tiles_save (const char *filename, unsigned char *tiles,int nbtiles, int nbcolors, bool addblank, bool lzcompress,bool isquiet)
 {
 	char *outputname;

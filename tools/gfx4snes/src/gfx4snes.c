@@ -251,6 +251,8 @@ int main(int argc, const char **argv)
 	}
 	else
 	{
+		if (!gfx4snes_args.mapoutput)
+			tiles_checkbanks (tiles_snes, nbtiles, gfx4snes_args.palettecolors);
 		tiles_save (gfx4snes_args.filebase, tiles_snes,nbtiles, gfx4snes_args.palettecolors, gfx4snes_args.tileblank, gfx4snes_args.tilelzpacked,gfx4snes_args.quietmode);
 	}
 

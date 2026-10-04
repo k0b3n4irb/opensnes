@@ -550,6 +550,12 @@ unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksiz
         if (!isnoreduction) info("%d tiles (ratio %.0f%%) processed",newnbtiles,100.0-(100.0*newnbtiles/(*nbtiles)));
         else info("%d tiles processed",newnbtiles);
     }
+    // The tile field of a BG map entry is 10 bits: a 1025th distinct tile
+    // carried into the palette bits and the map silently showed tile 0..
+    // with the wrong palette (build-tools audit S7, until 2026-10-04).
+    // Mode 7 is checked at save time (one byte per tile).
+    if (graphicmode != 9 && newnbtiles + blanktileabsent > 1024)
+        fatal("%d distinct tiles (+%d blank): a BG map addresses 1024 at most - reduce the image or deduplicate with -F", newnbtiles, blanktileabsent);
     *nbtiles = ((graphicmode==5) || (graphicmode==6)) ? newnbtiles<<1 : newnbtiles;
 
     // free hash tables
@@ -616,10 +622,16 @@ void map_save (const char *filename, unsigned short *map,int snesmode, int nbtil
 	{
 		if(snesmode==7)
 		{
+			// the value still carries the palette bits (bit 10+) that Mode 7
+			// has no use for; only the 10-bit tile index must fit the byte
+			if ((map[i] & 0x03FF) + tileoffset > 255)
+				fatal("Mode 7 map entry %d: tile %d + offset %d exceeds 255 (one byte per tile; until 2026-10-04 the index was truncated)", i, map[i] & 0x03FF, tileoffset);
 			WRITEFILEBYTE(map[i]+tileoffset,fp);
 		}
 		else
 		{
+			if ((map[i] & 0x03FF) + tileoffset > 0x03FF)
+				fatal("map entry %d: tile %d + offset %d exceeds 1023 (10-bit tile field; until 2026-10-04 the carry landed in the palette bits)", i, map[i] & 0x03FF, tileoffset);
 			WRITEFILEWORD(map[i]+tileoffset+(priority<<PRIORITY_OFS),fp);
 		}
 	}
