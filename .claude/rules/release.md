@@ -105,6 +105,10 @@ Internal multi-day chantiers ship via short-lived `wip/<name>` branches:
    most commits without a verdict — 37 of 78 runs between 09-27 and 10-03
    were cancelled that way, and a red develop went unnoticed for five
    pushes. Finish the batch, run the suite, push.
+7. **One session per working tree** (2026-10-04): two sessions editing the
+   same checkout race on the build outputs and the baselines; a second
+   chantier in parallel gets its own `git worktree add ../opensnes-<name>
+   wip/<name>` and its own `make` (governance audit, rec 16).
 
 The squash-merge keeps develop history scannable (one chantier = one
 commit). WIP commits' details remain accessible via `git reflog` and

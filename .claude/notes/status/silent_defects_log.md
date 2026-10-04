@@ -14,6 +14,16 @@ criterion is met fourteen days after the last line, **counted from the day
 the hunting campaign ends** (below): a quiet fortnight proves nothing if
 nobody was looking.
 
+**Effort during the window (2026-10-04, governance audit rec 5).** The
+fortnight counts only if someone keeps looking. The minimum, named here so
+it can be checked: every week of the window, (a) `make tests` on a clean
+tree plus `luna_runner.py --coverage --power-on random=N` with a new seed,
+`make test-pal` and `make luna-bench`; (b) one public header read against
+its code, chosen by the oldest "last read" date in the table at the end of
+this file; (c) the partner reports of the week answered. Each week's effort
+is logged below the table with its date; a week without a line restarts the
+count.
+
 **What goes in.** Wrong output, wrong state or lost data in `lib/`,
 `templates/`, `compiler/` or `make/`, found by any means. **What does not:**
 a wrong sentence in a doc with correct code, a missing feature, a tool
@@ -78,3 +88,50 @@ Opened 2026-10-03. The fortnight starts the day it closes.
 | Existing tools pushed further | done 2026-10-03: seeds 7, 42, 1337 (and the testing auditor's 2, 42, 31337, `ones`): 89/89 alive, images 89/89; `make test-pal` 89/89 + 241 vectors; `make luna-bench` 34 ok, 0 bug, 55 suspect (static screens). Nothing found by them; `make test-sanitizers` and `make fuzz` not rerun (CI runs them) |
 
 **Campaign closed:** not yet. **Fortnight ends:** not started.
+
+## Headers read against their code
+
+The "doc against code" read of criterion 7's window (one header a week,
+oldest first). The library audit of 2026-10-03 read them all; later reads
+replace the date.
+
+| header | last read |
+|---|---|
+| `anim.h` | 2026-10-03 (library audit) |
+| `apu.h` | 2026-10-03 (library audit) |
+| `asset.h` | 2026-10-03 (library audit) |
+| `audio.h` | 2026-10-03 (library audit) |
+| `background.h` | 2026-10-03 (library audit) |
+| `collision.h` | 2026-10-03 (library audit) |
+| `colormath.h` | 2026-10-03 (library audit) |
+| `console.h` | 2026-10-03 (library audit) |
+| `debug.h` | 2026-10-03 (library audit) |
+| `dma.h` | 2026-10-03 (library audit) |
+| `dsp1.h` | 2026-10-03 (library audit) |
+| `fixed32.h` | 2026-10-03 (library audit) |
+| `gameloop.h` | 2026-10-03 (library audit) |
+| `hdma.h` | 2026-10-03 (library audit) |
+| `input.h` | 2026-10-03 (library audit) |
+| `interrupt.h` | 2026-10-03 (library audit) |
+| `lzss.h` | 2026-10-03 (library audit) |
+| `map.h` | 2026-10-03 (library audit) |
+| `math.h` | 2026-10-03 (library audit) |
+| `mode7.h` | 2026-10-03 (library audit) |
+| `mosaic.h` | 2026-10-03 (library audit) |
+| `object.h` | 2026-10-03 (library audit) |
+| `panel.h` | 2026-10-03 (library audit) |
+| `profile.h` | 2026-10-03 (library audit) |
+| `registers.h` | 2026-10-03 (library audit) |
+| `sa1.h` | 2026-10-03 (library audit) |
+| `scene.h` | 2026-10-03 (library audit) |
+| `snesmod.h` | 2026-10-03 (library audit) |
+| `sprite.h` | 2026-10-03 (library audit) |
+| `sram.h` | 2026-10-03 (library audit) |
+| `superfx.h` | 2026-10-03 (library audit) |
+| `system.h` | 2026-10-03 (library audit) |
+| `text.h` | 2026-10-03 (library audit) |
+| `tile.h` | 2026-10-03 (library audit) |
+| `types.h` | 2026-10-03 (library audit) |
+| `video.h` | 2026-10-03 (library audit) |
+| `window.h` | 2026-10-03 (library audit) |
+
