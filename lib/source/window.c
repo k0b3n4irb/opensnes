@@ -102,27 +102,27 @@ void windowEnable(u8 window, u8 layers) {
     mask = 0x02 << shift;  /* Enable bit (not invert) */
 
     /* BG1 */
-    if (layers & WINDOW_BG1) {
+    if (layers & LAYER_BG1) {
         w12sel |= mask;
     }
 
     /* BG2 */
-    if (layers & WINDOW_BG2) {
+    if (layers & LAYER_BG2) {
         w12sel |= (mask << 4);
     }
 
     /* BG3 */
-    if (layers & WINDOW_BG3) {
+    if (layers & LAYER_BG3) {
         w34sel |= mask;
     }
 
     /* BG4 */
-    if (layers & WINDOW_BG4) {
+    if (layers & LAYER_BG4) {
         w34sel |= (mask << 4);
     }
 
     /* OBJ */
-    if (layers & WINDOW_OBJ) {
+    if (layers & LAYER_OBJ) {
         wobjsel |= mask;
     }
 
@@ -144,19 +144,19 @@ void windowDisable(u8 window, u8 layers) {
     shift = (window == WINDOW_1) ? 0 : 2;
     mask = 0x03 << shift;  /* Both enable and invert bits */
 
-    if (layers & WINDOW_BG1) {
+    if (layers & LAYER_BG1) {
         w12sel &= ~mask;
     }
-    if (layers & WINDOW_BG2) {
+    if (layers & LAYER_BG2) {
         w12sel &= ~(mask << 4);
     }
-    if (layers & WINDOW_BG3) {
+    if (layers & LAYER_BG3) {
         w34sel &= ~mask;
     }
-    if (layers & WINDOW_BG4) {
+    if (layers & LAYER_BG4) {
         w34sel &= ~(mask << 4);
     }
-    if (layers & WINDOW_OBJ) {
+    if (layers & LAYER_OBJ) {
         wobjsel &= ~mask;
     }
     if (layers & WINDOW_MATH) {
@@ -187,19 +187,19 @@ void windowSetInvert(u8 window, u8 layers, u8 invert) {
     shift = (window == WINDOW_1) ? 0 : 2;
     invertBit = invert ? (0x01 << shift) : 0;
 
-    if (layers & WINDOW_BG1) {
+    if (layers & LAYER_BG1) {
         w12sel = (w12sel & ~(0x01 << shift)) | invertBit;
     }
-    if (layers & WINDOW_BG2) {
+    if (layers & LAYER_BG2) {
         w12sel = (w12sel & ~(0x10 << shift)) | (invertBit << 4);
     }
-    if (layers & WINDOW_BG3) {
+    if (layers & LAYER_BG3) {
         w34sel = (w34sel & ~(0x01 << shift)) | invertBit;
     }
-    if (layers & WINDOW_BG4) {
+    if (layers & LAYER_BG4) {
         w34sel = (w34sel & ~(0x10 << shift)) | (invertBit << 4);
     }
-    if (layers & WINDOW_OBJ) {
+    if (layers & LAYER_OBJ) {
         wobjsel = (wobjsel & ~(0x01 << shift)) | invertBit;
     }
     if (layers & WINDOW_MATH) {
@@ -213,19 +213,19 @@ void windowSetInvert(u8 window, u8 layers, u8 invert) {
 
 void windowSetLogic(u8 layer, u8 logic) {
     switch (layer) {
-        case WINDOW_BG1:
+        case LAYER_BG1:
             wbglog = (wbglog & 0xFC) | (logic & 0x03);
             break;
-        case WINDOW_BG2:
+        case LAYER_BG2:
             wbglog = (wbglog & 0xF3) | ((logic & 0x03) << 2);
             break;
-        case WINDOW_BG3:
+        case LAYER_BG3:
             wbglog = (wbglog & 0xCF) | ((logic & 0x03) << 4);
             break;
-        case WINDOW_BG4:
+        case LAYER_BG4:
             wbglog = (wbglog & 0x3F) | ((logic & 0x03) << 6);
             break;
-        case WINDOW_OBJ:
+        case LAYER_OBJ:
             wobjlog = (wobjlog & 0xFC) | (logic & 0x03);
             break;
         case WINDOW_MATH:
@@ -256,14 +256,27 @@ void windowCentered(u8 window, u8 width) {
 
     half = width >> 1;
     left = SCREEN_CENTER_X - half;
-    right = SCREEN_CENTER_X + half - 1;
+    /* right from left and the width, not from the centre: an odd width
+     * kept its full span, and a width of 1 gave right < left, an empty
+     * window (until 2026-10-03). width 0 is an empty window on purpose. */
+    if (width == 0) {
+        windowSetPos(window, 1, 0);
+        return;
+    }
+    right = (u8)(left + width - 1);
 
     windowSetPos(window, left, right);
 }
 
 void windowSplit(u8 splitX) {
-    /* Window 1: left side (0 to splitX-1) */
-    windowSetPos(WINDOW_1, 0, splitX > 0 ? splitX - 1 : 0);
+    /* Window 1: left side (0 to splitX-1); splitX = 0 means no left part,
+     * and an empty window is left > right (0..0 was one pixel wide, until
+     * 2026-10-03) */
+    if (splitX == 0) {
+        windowSetPos(WINDOW_1, 1, 0);
+    } else {
+        windowSetPos(WINDOW_1, 0, splitX - 1);
+    }
 
     /* Window 2: right side (splitX to 255) */
     windowSetPos(WINDOW_2, splitX, 255);

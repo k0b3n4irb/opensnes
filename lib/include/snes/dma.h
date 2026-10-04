@@ -21,10 +21,12 @@
  * mode (INIDISP bit 7 set). Accessing these memories during active display
  * causes visual corruption and undefined behavior.
  *
- * @warning **VBlank Budget**: You have approximately 2,200 CPU cycles during
- * VBlank for DMA transfers. This translates to roughly **4KB of data** that
- * can be safely transferred per frame. While the theoretical maximum is higher,
- * 4KB is a safe practical limit that accounts for NMI handler overhead.
+ * @warning **VBlank Budget**: VBlank lasts about 49 000 master clocks
+ * (37 lines of 1 324 on NTSC) and a DMA moves one byte per 8, so the whole
+ * blank would carry ~6 KB; the NMI handler takes its share first, which
+ * leaves roughly **4KB of data** per frame as the safe practical limit.
+ * (Until 2026-10-04 this note said "2,200 CPU cycles", which is neither
+ * the blank nor the budget.)
  *
  * ## Banks
  *
@@ -88,6 +90,7 @@
  *       may live in ANY bank — a SUPERFREE section, a bank you pinned
  *       yourself. dmaCopyVramBank() exists for the case where the
  *       address and the bank are held separately.
+ * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size);
 

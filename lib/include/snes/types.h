@@ -293,7 +293,9 @@ typedef unsigned char bool;
  * @{
  */
 
-/** @brief Void function taking no arguments */
+/** @brief Void function taking no arguments (the generic name; a header
+ *  that wants to say what the function is for declares its own, like
+ *  VBlankCallback in interrupt.h — the same type) */
 typedef void (*VoidFn)(void);
 
 /** @} */
@@ -309,6 +311,11 @@ typedef void (*VoidFn)(void);
  * file goes through (make/common.mk) reports each use as a WARNING — the
  * build system passes -Wno-error=deprecated-declarations, so deprecated code
  * keeps building. Deprecated functions are removed at the next major version.
+ *
+ * A deprecated CONSTANT is a macro, which no attribute can mark: its header
+ * names it in a `#pragma clang deprecated(NAME, "use ...")` under
+ * `#ifdef __clang__`. The same pre-pass reports each use
+ * (-Wno-error=deprecated-pragma), and cproc never sees the pragma.
  */
 #define OPENSNES_DEPRECATED(msg) __attribute__((deprecated(msg)))
 

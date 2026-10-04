@@ -133,7 +133,7 @@ include $(OPENSNES)/make/common.mk
 ```
 
 `USE_SA1 := 1` does three things:
-- Selects the SA-1 ROM header (cartridge type $35)
+- Selects the SA-1 ROM header (cartridge type `$34`, SA-1 + RAM; `$35` with a battery when `USE_SRAM := 1`; BW-RAM size from `SA1_BWRAM_SIZE`, 32 KB by default)
 - Links the SA-1 library variant
 - Includes your SA-1 boot stub in the ROM
 

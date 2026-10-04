@@ -36,7 +36,7 @@ large transfers.
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame
 VBlank lasts 37 scanlines on NTSC with the standard 224-line display —
-about 50,500 master cycles (~30,000 with overscan). DMA costs 8 master
+about 49,000 master cycles (48,988: 37 lines of 1324 available clocks, snesdev-wiki "Timing"; 29,128 with overscan). DMA costs 8 master
 cycles per byte, so the raw ceiling is ~6 KB; after the NMI handler's
 own work (OAM DMA, scroll sync, joypad, callback) the practical budget
 is about **4 KB total** per VBlank for tilemap + audio + scroll.
@@ -52,7 +52,7 @@ address with `$2181-$2183`. If NMI fires mid-sequence and any code in the NMI
 path touches those ports, the address pointer is silently corrupted and the
 main thread resumes writing garbage to a wrong location.
 
-**Mitigation (active since chantier E1, 2026-05-09):** `make/common.mk`
+**Mitigation (active since 2026-05-09):** `make/common.mk`
 runs `devtools/check_nmi_wram_race.py` after every link. The lint walks
 the call graph from every NMI callback root (NmiHandler + functions
 registered via `nmiSet`) and **fails the build** if any
@@ -119,10 +119,23 @@ arbitrated 2026-09-12; found by `luna --power-on random` on
 **Mitigation (lib, since 2026-09-12):** every vertical scroll the lib writes
 is `y - 1` — the NMI shadow sync (`bgSetScroll`/`bgSetScrollY`), the map
 module, `mode7SetScroll`, and the reset default — so `y = 0` means "tilemap
-row 0 on the first picture line". PVSnesLib writes the raw value; when
+row 0 on the first picture line". **Test:** the lib fixture reads
+`bgs.1.v_scroll == 76` after `bgSetScrollY(1, 77)` on luna's PPU view
+(`devtools/libtests/test_libtest.py`), and the `backgrounds_mode6*.toml`
+manifests pin the one exception (BG3 as the offset-per-tile table, written
+raw). PVSnesLib writes the raw value; when
 porting, do not subtract 1 yourself. The one path the lib cannot cover is
 data you hand to the hardware directly, such as an HDMA table on
 `BGnVOFS`: apply the -1 in the table.
+
+**Except BG3 in Modes 2, 4 and 6 (since 2026-10-02).** There BG3 is not
+displayed: it is the offset-per-tile table, and BG3VOFS selects which of its
+rows the PPU reads (row VOFS / 8 for the horizontal offsets, the next for the
+vertical ones; the screen line plays no part — snesdev-wiki,
+*Offset-per-tile*). `setMode` records the mode, and in those three the NMI
+writes BG3's VOFS raw, so `bgSetScroll(2, 0, 0)` reads rows 0 and 1. From
+2026-09-12 to 2026-10-02 the -1 applied there too: the PPU read rows 31 and
+0, and `backgrounds/mode2` showed flat bands while every check passed.
 
 ### 🟡 A CGRAM write during the picture lands on the wrong entry
 CGRAM is reachable from the CPU only during V-blank, H-blank or forced
@@ -168,7 +181,7 @@ must sit in the 8 KB band `$00:0000-$1FFF` (shared with the stack and the
 direct page). A hand-placed RAM section above $2000 reached through a
 plain pointer reads bank $00 instead — silent corruption.
 
-**Escape hatch (since chantier B2, 2026-09):** declare the object `FAR`
+**Escape hatch (since v0.39.0, 2026-09):** declare the object `FAR`
 (`FAR u8 buf[4096];`, header `snes/types.h`). It is placed in
 `$7E:2000-$FFFF` (56 KB) and every access — direct, `buf[i]`, or through a
 `u8 FAR *` — is compiled bank-honouring; initialisers work and the band is
@@ -194,14 +207,24 @@ debugging.
 
 ## Build-time / linker traps
 
-### 🟢 `data_init_end.o` MUST be linked last (enforced)
-The data-init copy loop scans from `data_init_start.o` until the sentinel in
-`data_init_end.o`. If the latter isn't last, init walks past valid data and
-copies garbage into WRAM at boot.
+### 🟢 The data-init terminator must close `.data_init` (checked after every link since 2026-10-05)
+The data-init copy loop scans from `DataInitStart` until the 5-byte
+terminator record that `data_init_end.o` appends to the `.data_init`
+section (`APPENDTO`). A record landing past the terminator would leave its
+initialised globals with whatever WRAM held at boot, silently.
 
-**Mitigation:** `make/common.mk` builds the link list in fixed order with
-`data_init_end.o` always at the end (`LINK_OBJS := ... data_init_end.o`).
-Don't override `LINK_OBJS` from your example Makefile.
+What keeps the terminator last is **not** the linkfile order, which this
+page claimed until 2026-10-05 (the entry was titled "data_init_end.o MUST be linked last"):
+wlalink sorts appended sections by priority, then by size, largest first
+(`wlalink/analyze.c`, `_compare_sections`), and every record is at least
+6 bytes (5 of header plus the data itself), so the 5-byte terminator sorts
+after them whatever the object order — measured: `print_string` relinked
+with `data_init_end.o` first, in the middle and last puts `DataInitEnd` at
+the section's end each time. `make/common.mk` still lists it last.
+**Test:** every link runs `symmap.py --check-data-init`, which fails when
+the `DataInitEnd` label does not close the `.data_init` section (a forged
+`.sym` with the label 8 bytes early fails; the 89 examples pass). A wlalink
+bump that changed the sort would stop here, not in a game.
 
 ### 🟠 cc65816 pushes function args **LEFT-TO-RIGHT**
 PVSnesLib (tcc816) pushes args right-to-left, the C convention. cc65816 pushes
@@ -214,7 +237,7 @@ of 6,s. The function compiles, links, and corrupts the stack at runtime.
 When porting an ASM function from PVSnesLib, walk through the offsets explicitly.
 Function pointers called from C follow the same convention.
 
-### 🟢 `volatile` is preserved through QBE (since chantier A2, 2026-05-09)
+### 🟢 `volatile` is preserved through QBE (since 2026-05-09)
 The C `volatile` qualifier on a load or store now survives the cproc → QBE
 pipeline. cproc tags the instruction with a `volat` keyword in the
 intermediate IR; QBE's `loadopt` (load forwarding), `promote` (alloca-to-
@@ -282,7 +305,10 @@ register `$002229` (twice: early init ~`:519-526`, and the SA-1 boot block
 ~`:636-642`). This polarity was long presented here as "disputed" because the
 [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers) says
 bit=1 *protects* a page. **Resolved 2026-09-02: the wiki page is wrong** and
-`$FF` (bit=1 = write-enable) is correct, on four independent grounds:
+`$FF` (bit=1 = write-enable) is correct, on four independent grounds
+(**test:** the SA-1 fixture `devtools/libtests_sa1_sram` reads back a byte the
+SA-1 wrote to BW-RAM from its boot stub, `r_sa1_bw == 0x5A`, and
+`sa1_hello` / `sa1_starfield` run in every coverage pass):
 
 - fullsnes ([SA-1 memory control](https://problemkaputt.de/fullsnes.htm#snescartsa1memorycontrol)):
   SIWP bits are write **enable** flags for eight 256-byte chunks
@@ -312,7 +338,10 @@ emulator that detects and executes **SA-1, Super FX (GSU) and DSP-1** directly
 (verified: `superfx_hello` → "ALL TESTS PASSED", `superfx_3d` → GSU-rendered 3D
 cube, `sa1_hello`/`sa1_starfield` → `sa1_status=$A5`). The chip-ROM side channel
 and the whole snes9x-WASM + Mesen2 + xvfb stack are gone. See
-`.claude/notes/chantiers/luna_migration.md`.
+`.claude/notes/chantiers/luna_migration.md`. **Test:** the chip examples are
+in every `luna_runner.py --coverage` pass, and the `libtests_gsu`,
+`libtests_dsp1` and `libtests_sa1_sram` fixtures assert chip-side effects
+(a GSU job's result, a DSP-1 multiply, a BW-RAM byte).
 
 ### 🟡 SuperFX C support is intentionally absent
 The GSU has its own RISC ISA with no C compiler. All SuperFX code must be
@@ -354,7 +383,7 @@ against the file and fail on drift.
 
 ## Compiler optimisation gaps
 
-**None as of chantier A3 (2026-05-09).** The compiler-test phase runs
+**None as of 2026-05-09.** The compiler-test phase runs
 clean without the `--allow-known-bugs` escape that used to gate tail
 call optimisation on wrappers, A-cache-through-`pha`, lazy `rep #$20`
 emission, and the `leaf_opt=1` marker on non-leaf functions.
@@ -393,12 +422,15 @@ culprit files 100x monthly and fails on any segfault. Full investigation log:
 
 ### 🟢 `int` and `long` sizes AND semantics match the w65816 target
 
-**Sizes** (since chantier A1, 2026-05-08):
+**Sizes** (since 2026-05-08):
 `sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
 `sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
 canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
+**Test:** `devtools/compiler-tests/cases/type_sizes.c` pins every size with a
+`_Static_assert` (since 2026-10-05); the `long` semantics are the
+`test_long_*` cases of the same suite.
 
-**Semantics** (since chantier A1-followup, 2026-05-16):
+**Semantics** (since 2026-05-16):
 `long` arithmetic flows through the QBE w65816 backend's Kl-class handlers,
 not the silently-truncating Kw path. Every operator — add/sub with carry,
 shifts with cross-half rol, multiply via `__mul32`, divide via
@@ -421,13 +453,17 @@ preferred types for **portability** (they make the code intent explicit
 and work identically across compilers), but using bare `int` / `long`
 is correct on this target.
 
-### 🟢 Pointer IR size is 4 bytes (chantier A6+A7, 2026-05-15)
+### 🟢 Pointer IR size is 4 bytes (since 2026-05-15)
 
 Pointers are now QBE class Kl: 24-bit address (low 16 + bank byte) + 1 byte
 alignment, 4 bytes total. The indirect-call emit pass reads the bank byte
 from the pointer's high half — `jml [tcc__r9]` after `sta.b tcc__r9` (low
 16) + `sta.b tcc__r9+2` (bank byte) — so function pointers in any bank
 work without a `*Bank` API variant. Shipped in v0.19.0 (2026-05-15).
+**Test:** `sizeof(void *) == 4` and `sizeof(int (*)(void)) == 4` in
+`devtools/compiler-tests/cases/type_sizes.c`; the ABI lint
+(`make lint-asm-abi`) holds every hand-written ASM function to the 4-byte
+pointer slot; `farptr_field_copy` and `test_function_ptr` pin the codegen.
 
 Historical note: pre-A6, function pointers were 8 bytes (low + high + 4
 bytes padding) and indirect calls hardcoded `lda #$00` for the bank byte.
@@ -438,7 +474,7 @@ That trap is gone.
 
 ### 🟢 C function returning `long` propagates the high half (fixed 2026-05-21)
 
-Surfaced during the A1-followup chantier (2026-05-16): a function returning
+Surfaced on 2026-05-16, with the `long` semantics work: a function returning
 `long` / `u32` / `s32` / `fixed32` carried only its low 16 bits across the
 call. Fixed on 2026-05-21 (qbe `3e79c8c`): the callee returns the low half in
 `A` and the high half in the direct-page global `tcc__retval_hi`, and the
@@ -463,6 +499,46 @@ defined in `lib/include/snes/sprite.h`. The naming convention separates BG
 (`PAL_n`) from OBJ (`OBJ_PAL_n`) palettes.
 
 ---
+
+### 🟢 `snesmodProcess()` latched the H/V counters and cut its own wait short; the command queue wrapped (fixed 2026-10-03)
+
+Three defects of the 65816 side of SNESMOD (`lib/source/snesmod.asm`),
+inherited from upstream through PVSnesLib's port and found by reading the
+upstream driver (snes-rag) then measuring ours on luna:
+
+- With more than one command queued, `snesmodProcess()` waited for the SPC700
+  "for 5 scanlines" by latching the counters (`$2137`) and reading OPVCT
+  **once** per turn. OPVCT is a read-twice register, so every other read was
+  its high byte: the five lines ran out in about two or three (values read on
+  one frame: `E6 E6 … E7 E6 E7 E6 E8`). The same read left OPVCT's read
+  pointer shifted for the next reader (`profileGetScanline`, an H-IRQ
+  handler), and the latch raised STAT78 bit 6 (fullsnes: "in all three cases
+  the latch flag in 213Fh.Bit6 is set"), which `crt0` takes for a Super Scope
+  shot. No example links the Super Scope with SNESMOD, so that last effect was
+  read in the code, not observed.
+- The queue is 256 bytes of 3-byte commands with 8-bit indexes and had no
+  overflow check: an 86th command before a `snesmodProcess()` wrapped onto
+  the first and left the indexes out of step. The driver then received the
+  middle of a command as a command and stopped answering — measured: 100
+  sends in a row, the queue never drained again.
+- `QueueMessage` and `snesmodInit` ended with `cli` before restoring the
+  caller's flags, so an IRQ the caller had masked could be taken in that
+  window. `snesmodGetPosition()` read its port once, while the SPC700 may be
+  writing it.
+- `snesmodInit()` ended by writing `$81` to NMITIMEN whatever the caller had
+  there: an H or V timer IRQ enabled before it was switched off without a
+  word (measured: 0 IRQs in the 10 frames after it, 10 once fixed).
+
+**Fix:** the wait counts rising edges of the H-blank flag (`$4212` bit 6, set
+at H=274 and cleared at H=1 on every line; anomie-timing, fullsnes): no
+latch, no counter read, and a real five-line budget. A command that does not
+fit is dropped (the newest). The `cli` is gone; the position is read until
+two reads agree; `snesmodInit()` restores NMITIMEN from the lib's copy. Pinned by `devtools/libtests_snesmod` and
+`tools/luna-test/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
+queue depth 255 after 100 sends, queue drained). Visible change: with
+several commands queued `snesmodProcess()` now really waits up to five
+scanlines, and commands reach the driver sooner (four commands in two frames
+instead of four).
 
 ### 🟢 SNESMOD stop and pause sometimes left a voice sounding (fixed 2026-09-26)
 
@@ -553,6 +629,10 @@ knob (`ROM_BANKS`, default 8): a Super FX or a large game sets
 range follow. wlalink takes the largest bank count among the objects, so
 the prebuilt library needs no rebuild. Found while sizing what a Super FX
 game needs (`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`).
+**Test:** since 2026-10-05 `luna_runner.py --coverage` fails any ROM whose
+header size byte covers less than the file (and, with luna's
+`checksum_computed`, whose header sum differs from the bytes); the HiROM
+fixture `devtools/libtests_hirom` is a 512 KB ROM in that pass.
 
 In the same change the Super FX header gained the extended header it never
 had: sixteen `$FF` bytes and a zero licensee code meant no emulator or
@@ -667,9 +747,14 @@ fixed in the same chantier and the ROM gates `make tests` at 64/64:
 If you carry an older toolchain: avoid bit-field reads, variable 32-bit
 shift counts, signed `long` comparisons and `if` on a `long`.
 
-### 🟡 Struct parameters, struct returns and struct assignment by value are refused
+### 🟡 Struct parameters and struct returns by value are refused; a FAR struct is copied field by field
 cc65816 has no lowering for a struct passed or returned by value (QBE
-`parc` / `argc`) nor for a whole-struct copy (`blit`). The build stops with
+`parc` / `argc`). Whole-struct assignment (`a = b;`) works since 2026-10-03
+for objects in bank $00 or in ROM read through a pointer (it was refused by
+accident for 2-aligned structs and copied two bytes of every four for
+4-aligned ones: the front end's chunk table was upstream's, where a word is
+4 bytes); a copy from or to a `FAR` struct or array is refused — "copy
+field by field". The build stops with
 `cc65816/qbe: unhandled IR op N (parc) … struct parameters and struct
 returns by value are not supported on w65816; pass a pointer` — it never
 emits code for them (a whole-struct assignment *was* silently dropped until
@@ -720,8 +805,8 @@ preference, not necessity.
 
 **Since 2026-09-27 the compiler shares stack slots between temps whose
 lives never overlap**, and the helpers this paragraph used to list shrank
-with every other function: `oamSetX` 148 → 28 bytes, `oamDrawMeta`
-142 → 64, `oamDrawMetaFlip` 200 → 90, `collideRectEx` 176 → 66,
+with every other function: `oamSetX` 148 → 28 bytes, the now deprecated `oamDrawMeta`
+142 → 64 and (deprecated too) `oamDrawMetaFlip` 200 → 90, `collideRectEx` 176 → 66,
 `hdmaColorGradient` 162 → 72. Across the examples the median frame went
 from 38 to 16 bytes and no function passes 256 any more (six did, and
 paid for the slower `[tcc__fp],y` addressing).

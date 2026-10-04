@@ -5,7 +5,7 @@
 `mode7/perspective` fakes a receding floor with a precomputed M7A/M7D table.
 This example asks the DSP-1 for the real thing: every frame the coprocessor's
 **Raster** command streams one Mode 7 matrix per scanline — A, B, C *and* D —
-for the camera you describe with `dsp1Parameter`, and two HDMA channels replay
+for the camera you describe with `dsp1SetCamera`, and two HDMA channels replay
 them the next frame. Turn with the D-pad and the whole floor rotates in true
 perspective, because the rotation is inside the matrices the chip computed.
 
@@ -14,7 +14,7 @@ reason the DSP-1 was on the cartridge at all.
 
 ## How it works
 
-1. `dsp1Parameter(x, y, height, lfe, les, heading, tilt)` describes the
+1. `dsp1SetCamera(&cam)` describes the
    camera and hands back four numbers: **Vof** (raster of the "imaginary
    centre"), **Vva** (horizon raster, relative to Vof), and **Cx/Cy** — the
    ground point under that centre, which goes straight to M7X/M7Y.

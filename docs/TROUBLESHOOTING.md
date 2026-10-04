@@ -152,8 +152,9 @@ oamSet(0, x, y, 0, 0, 3, 0);
 // 4. Visibility is the Y position itself: a valid on-screen Y (set by
 //    oamSet above) shows the sprite; oamHide() parks it at Y=240.
 
-// 5. Update OAM (usually done in VBlank by the library)
-// The NMI handler calls oamUpdate() automatically
+// 5. Update OAM (done in VBlank by the library)
+// The NMI handler uploads the OAM shadow when a sprite call changed it
+// (oam_update_flag); a direct write into oamMemory[] is not seen
 ```
 
 ### Controller input not working

@@ -23,16 +23,16 @@ rom = "../../../examples/color/transparency/transparency.sfc"
 [[checkpoint]]
 at_frame = 60
 [checkpoint.values]
-cgwsel = { eq = 0x02, width = 1 }
-cgadsub = { eq = 0x21, width = 1 }
+colormath_cgwsel = { eq = 0x02, width = 1 }
+colormath_cgadsub = { eq = 0x21, width = 1 }
 "bg_scroll_x+4" = { eq = 58, width = 2 }        # BG3 h-scroll shadow, 1 px/frame
 "bg_scroll_x" = { eq = 0, width = 2 }         # BG1 must not move
 
 [[checkpoint]]
 at_frame = 120
 [checkpoint.values]
-cgwsel = { eq = 0x02, width = 1 }
-cgadsub = { eq = 0x21, width = 1 }
+colormath_cgwsel = { eq = 0x02, width = 1 }
+colormath_cgadsub = { eq = 0x21, width = 1 }
 "bg_scroll_x+4" = { eq = 118, width = 2 }       # +60 in 60 frames
 "bg_scroll_x" = { eq = 0, width = 2 }
 [checkpoint.delta]

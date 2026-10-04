@@ -49,6 +49,17 @@ bg1_tile12_solid   = { space = "vram", offset = "0180", hex = "00000000000000000
 bg1_map_row3       = { space = "vram", offset = "40C0", hex = "03000300030003000300030003000300" }
 bg1_map_row12      = { space = "vram", offset = "4300", hex = "0c000c000c000c000c000c000c000c00" }
 
+# The table above can be perfect and still never be read: BG3VOFS selects
+# which rows of BG3 the PPU takes as the H and V rows (VOFS / 8 and the next;
+# snesdev-wiki, Offset-per-tile). From 2026-09-12 to 2026-10-02 the NMI wrote
+# BG3's VOFS as y - 1 like a displayed layer, $3FF: the PPU read row 31 (all
+# zeros) for H and row 0 (all zeros) for V, the bands stopped rippling, and
+# every assert in this file still passed — the visual baselines were re-captured
+# flat. In an OPT mode the lib now writes BG3's VOFS raw.
+[asserts.ppu]
+bgmode = 2
+"bgs.2.v_scroll" = 0              # row 0 = H offsets, row 1 = V offsets
+
 # The only per-frame transfer in this example is the 64-byte offset row, and it
 # must happen inside VBlank. Measured: 64 screen-on VRAM bytes per frame. The
 # ceiling is set just above it so a transfer that grew (a whole-map upload

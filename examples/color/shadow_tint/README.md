@@ -36,7 +36,7 @@ assets), so you can watch the transform land on every hue together.
   → none`. Every swatch shifts together each press.
 - **Nothing changes when you press A:** colour math applies only to layers
   you enabled *and* that are on the main screen — check
-  `setMainScreen(LAYER_BG1)` and that the effect targets `COLORMATH_BG1`.
+  `setMainScreen(LAYER_BG1)` and that the effect targets `LAYER_BG1`.
 - **Only part of the screen is affected:** the colour-math *condition* is
   windowed. This example leaves it at `COLORMATH_ALWAYS`; a stray
   `colorMathSetCondition()` would clip it to a window region.

@@ -133,41 +133,45 @@ int main(void) {
 
 Three things to remember:
 
-1. **`mode7Init()` does NOT set `BG_MODE7`.** It only zeroes the affine
+1. **`mode7Init()` does NOT set `BG_MODE7`.** It only sets the affine
    registers and the centre / scroll offsets. The `setMode(BG_MODE7, 0)`
-   call is your responsibility — `mode7.h:54-59` says so explicitly.
+   call is your responsibility — `mode7.h` says so explicitly.
 2. **Set scale before angle**, not after. `mode7SetAngle()` reads the
    current scale and combines it with `sin`/`cos` to compute the matrix.
    Calling them in the wrong order writes a stale matrix that gets
    overwritten on the next angle change anyway, but produces a
    one-frame visual glitch.
-3. **`setMainScreen(TM_BG1)`**, never any other layer. Mode 7 disables
-   BG2/3/4 in hardware; enabling them via TM has no effect.
+3. **`setMainScreen(TM_BG1)`**. Mode 7 has no BG3/BG4, and BG2 exists
+   only with EXTBG on (see "EXTBG: one plane, two layers" below).
 
 ## Coordinate system
 
 The default after `mode7Init()`:
 
-- **Scale** = 1.0 (each screen pixel maps to one tilemap pixel).
-- **Centre** = (128, 128) (the centre of the 128 × 128 tilemap is the
-  rotation pivot).
-- **Scroll** = (0, 0) (the tilemap origin is at the screen origin).
+- **Matrix** = identity (A = D = `$0100`: each screen pixel maps to one
+  plane pixel).
+- **Centre** = (128, 128).
+- **Scroll** = M7HOFS 0, M7VOFS `$17F`: the first line shows plane row
+  `$180`, not row 0. Call `mode7SetScroll(0, 0)` to put row 0 on the first
+  line (the lib writes `y - 1`, like `bgSetScroll`).
 
-In this state, screen `(0, 0)` shows tilemap pixel `(0, 0)`, screen
-`(128, 112)` shows tilemap pixel `(128, 112)`, and so on. Pure
-identity.
+`mode7Init()` also sets the *scale* the angle helpers use to `0x0100`,
+1:1, so a first `mode7SetAngle(0)` keeps the identity.
 
-To **rotate around the screen centre**, set both centre and scroll so
-that the rotation pivot lines up with the visible region's middle. The
-helper `mode7SetPivot(x, y)` does this in screen coordinates: pass the
-screen pixel you want to be the rotation centre, and the lib sets `cx`,
-`cy`, `sx`, `sy` appropriately.
+The centre is a point of the *plane*, and it shows on screen at
+(centre − scroll): the PPU computes `plane = M × (screen + scroll − centre)
++ centre`, so the screen pixel where `screen + scroll = centre` is the one
+that does not move. To **rotate around the screen centre**, keep the two
+128 × 112 apart: `mode7SetCenter(sx + 128, sy + 112)` for a scroll of
+`(sx, sy)`.
 
-To **zoom in**, decrease the scale below 1.0 (`0x0080` for 0.5 = 2× zoom
-in). To **zoom out**, increase scale above 1.0 (`0x0200` = 0.5×, the
-tilemap looks half-size and you see twice as much). Counter-intuitive at
-first, but the formula tells you why: a smaller `A`/`D` means each
-screen pixel covers more tilemap pixels.
+The scale is in texels per screen pixel, 8.8 fixed point:
+`mode7SetScale(0x0100, 0x0100)` gives A = D = `$00FE`, 1:1 (the sine table
+peaks at 127/128). `0x0080` magnifies twice, `0x0200` shrinks twice (you
+see four times the area). Smaller is closer, counter-intuitive at first,
+but the formula tells you why: a larger `A`/`D` means each screen pixel
+steps over more plane pixels. (Before 0.48.0 the helpers wrote half the
+scale, so `0x0200` was 1:1; code written then halves its scales.)
 
 ## Out-of-bounds behaviour
 
@@ -189,14 +193,14 @@ say), `TRANSPARENT` or `TILE0` keeps the world bounded.
 
 | Function | Purpose |
 |---|---|
-| `mode7Init()` | Zero affine registers, centre (128, 128), identity matrix. **Does not** set `BG_MODE7`. |
-| `mode7SetScale(sx, sy)` | Set X/Y scale in 8.8 fixed-point (`0x0100` = 1.0). Stored; applied on next `mode7SetAngle`. |
+| `mode7Init()` | Identity matrix, centre (128, 128), M7HOFS 0 / M7VOFS `$17F`; helper scale `0x0100` (1:1). **Does not** set `BG_MODE7`. |
+| `mode7SetScale(sx, sy)` | Set the helpers' X/Y scale, 8.8 texels per pixel (`0x0100` = 1:1, `0x0080` = magnified twice), up to `0x3FFF`. Stored; applied on next `mode7SetAngle`. |
 | `mode7SetAngle(angle)` | 0–255 angle (full circle wraps at 256). Looks up sin/cos from a table, multiplies by current scale via the hardware multiplier, writes M7A–M7D. |
 | `mode7SetCenter(x, y)` | Set the rotation centre `(cx, cy)` in tilemap coordinates (signed 13-bit). |
 | `mode7SetScroll(x, y)` | Set the scroll offsets `(sx, sy)` in tilemap coordinates (signed 13-bit). |
-| `mode7SetPivot(x, y)` | High-level: set the rotation centre by *screen* coordinates (0–255). The lib computes `cx`/`cy`/`sx`/`sy`. |
 | `mode7Rotate(degrees)` | Convenience: take 0–359 degrees and convert to the 0–255 internal angle. |
-| `mode7Transform(degrees, scalePercent)` | Combined rotate + scale: `100` = 1.0, `50` = 2× zoom in, `200` = 0.5× zoom out. |
+| `mode7Transform(degrees, scalePercent)` | Combined rotate + scale: `100` = 1:1, `50` magnified twice, `200` shrunk twice (percent × 2.5, so 100 is `0x00FA`). |
+| `mode7SetExtBg(on)` | EXTBG (SETINI bit 6): BG2 shows the same plane, bit 7 of each pixel as its priority — a second layer around the sprites. See below. |
 | `mode7SetMatrix(a, b, c, d)` | Direct matrix control. Bypasses the angle/scale system. For shears, non-uniform scales, or arbitrary affine effects. |
 | `mode7SetSettings(M7SEL_value)` | Flip + out-of-bounds behaviour (the constants above). |
 
@@ -251,7 +255,37 @@ moves in true perspective. The M7A/M7B pair rides one
 `HDMA_MODE_2REG_2X` channel and M7C/M7D the other, double-buffered and
 swapped with `hdmaSetTable` in VBlank. The geometry that pins the
 matrices to the screen — horizon raster, Mode 7 centre and scroll —
-comes from `dsp1Parameter`; see the [DSP-1 tutorial](dsp1.md#the-ground-what-dsp1_ground-does).
+comes from `dsp1SetCamera`; see the [DSP-1 tutorial](dsp1.md#the-ground-what-dsp1_ground-does).
+
+## EXTBG: one plane, two layers
+
+Mode 7 draws one layer — unless SETINI bit 6 (EXTBG) is set,
+`mode7SetExtBg(1)`. Then BG2 shows **the same plane** as BG1 (same
+tilemap, same pixels, same transform), but reads bit 7 of each pixel as a
+priority bit and bits 0-6 as its colour, 128 colours. Front to back, Mode
+7 EXTBG draws (anomie's register doc, *Mode 7*):
+
+| | |
+|---|---|
+| 1 | sprites, priority 3 |
+| 2 | sprites, priority 2 |
+| 3 | BG2 pixels with bit 7 set |
+| 4 | sprites, priority 1 |
+| 5 | BG1 |
+| 6 | sprites, priority 0 |
+| 7 | BG2 pixels with bit 7 clear |
+
+So a priority-1 sprite passes in front of the bit-7-clear pixels and
+behind the bit-7-set ones — a ball rolling over a floor and under a bridge
+drawn in the same plane. Put **BG2, not BG1**, on the main screen
+(`setMainScreen(LAYER_BG2 | LAYER_OBJ)`): BG1 sits above BG2's low pixels
+and would cover them. The two layers are not transformed or scrolled
+independently, and BG2 does not take direct colour (snesdev-wiki,
+*Backgrounds*). Colour your pixels knowing that BG1 reads all eight bits:
+`0x83` is colour 3 on BG2 and colour 131 on BG1.
+
+[`examples/mode7/extbg`](../../examples/mode7/extbg/README.md) runs a
+sprite under a row of pillars and toggles EXTBG with A.
 
 ## Gotchas
 
@@ -332,15 +366,15 @@ order writes the matrix using stale scale values for one frame; the
 *next* `mode7SetAngle` call corrects it. Cosmetic, but visible as a
 one-frame "blip" when you change scale and angle in the same frame.
 
-### 🟡 Centre default is the tilemap centre, not the screen centre
+### 🟡 The default centre is not the screen centre
 
-`mode7Init` sets `cx = cy = 128`, which is the centre of the 128 × 128
-*tilemap*, not the centre of the 256 × 224 *screen*. To rotate around
-the screen centre, use `mode7SetPivot(128, 112)` (which positions the
-visible region's centre at the rotation pivot).
+`mode7Init` sets the centre to (128, 128); the middle of the 256 × 224
+screen is (128, 112) when the scroll is (0, 0). To rotate around the screen
+centre, call `mode7SetCenter(sx + 128, sy + 112)` for a scroll of
+`(sx, sy)`.
 
 This trips people up: "my plane rotates correctly but isn't centred on
-screen". The pivot helper is the fix.
+screen".
 
 ### 🟡 Out-of-bounds with `MODE7_TRANSPARENT` shows the backdrop, not a layer
 

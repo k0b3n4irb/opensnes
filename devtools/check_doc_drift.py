@@ -193,6 +193,7 @@ COUNT_PATTERNS = [
                re.IGNORECASE),
     re.compile(r"\bthrough\s+(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "path through N examples"
     re.compile(r"\b(\d{2,3})\s+example\s+ROMs?\b", re.IGNORECASE),
+    re.compile(r"\b(\d{2,3})\s+ROMs\s+organized\b", re.IGNORECASE),  # CLAUDE.md "89 ROMs organized by category"
     re.compile(r"\*\*(\d{2,3})\s+examples?\*\*", re.IGNORECASE),  # README bold table cell
     re.compile(r"\bAll\s+(\d{2,3})\s+examples?\b", re.IGNORECASE),
     re.compile(r"\ball\s+(\d{2,3})\s+examples\s+compile\s+cleanly\b", re.IGNORECASE),
@@ -210,6 +211,9 @@ COUNT_STALE_OK_GLOBS = ["CHANGELOG.md"]
 
 def _gather_active_doc_paths() -> list[Path]:
     paths: list[Path] = [repo_path("ROADMAP.md"), repo_path("README.md")]
+    # CLAUDE.md is what the agents read first (docs audit 2026-10-03, rec 8).
+    if repo_path("CLAUDE.md").is_file():
+        paths.append(repo_path("CLAUDE.md"))
     rules = repo_path(".claude/rules")
     if rules.is_dir():
         paths.extend(sorted(rules.glob("*.md")))
@@ -502,6 +506,50 @@ def check_asm_bank_comments() -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# Check: no example teaches a bug that is fixed or never existed
+#
+# The examples audit of 2026-10-03 (F_examples.md PF4) found six comments
+# and README lines still teaching the pre-A6 bank-$00 constraint, a
+# "logical shift" the compiler never did, a string spill that #127.3 ended
+# and a stale cost figure. Prose like this outlives the fix by months
+# because no gate reads it; these motifs are the ones found, kept short so
+# an explanation of the history ("said hdmaSetup needed them in the code
+# bank") does not trip them.
+# --------------------------------------------------------------------------
+_STALE_EXAMPLE_CLAIMS = [
+    (re.compile(r"framesize\s*=\s*158|158-byte framesize"), "a cost figure of an earlier oamSet"),
+    (re.compile(r"uses logical shift|logical shift \(LSR\)"), "cc65816 shifts signed values arithmetically"),
+    (re.compile(r"assumes? bank \$00", re.IGNORECASE), "pre-A6: the bank is read from the far pointer"),
+    (re.compile(r"spills? to bank 1|spill to bank \$01", re.IGNORECASE), "since #127.3 const data lives in the asset banks and is read far"),
+    (re.compile(r"must be in bank \$00 WRAM", re.IGNORECASE), "a plain global sits below $2000 by the compiler's rule; the lib reads the pointer's bank"),
+    (re.compile(r"due to a compiler quirk", re.IGNORECASE), "name the bug or drop the claim"),
+]
+
+
+def check_example_stale_claims() -> list[str]:
+    drifts: list[str] = []
+    root = repo_path("examples")
+    if not root.is_dir():
+        return []
+    for path in sorted(p for p in root.rglob("*") if p.suffix in (".c", ".h", ".md") and p.is_file()):
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        # a claim may wrap onto the next line of a comment ("assumes\n * bank $00"):
+        # match each line joined with the next, comment leaders stripped
+        for i, line in enumerate(lines):
+            nxt = lines[i + 1].strip().lstrip("*/ ").strip() if i + 1 < len(lines) else ""
+            probe = line.strip().lstrip("*/ ") + " " + nxt
+            for rx, why in _STALE_EXAMPLE_CLAIMS:
+                m = rx.search(probe)
+                if m and (rx.search(line) or not rx.search(nxt)):
+                    drifts.append(
+                        f"{path.relative_to(repo_path())}:{i + 1}: teaches a stale claim "
+                        f"('{m.group(0)}') — {why}"
+                    )
+                    break
+    return drifts
+
+
+# --------------------------------------------------------------------------
 # Check: example screenshot basenames must be unique across READMEs
 #
 # Doxygen flattens every markdown-referenced image into the single html/
@@ -754,8 +802,9 @@ def check_abi_signatures() -> list[str]:
 
 _SDK_DOC_GLOBS = ["docs/**/*.md", "KNOWN_LIMITATIONS.md", "README.md",
                   "examples/README.md"]
-# Pages whose job is to name other APIs (PVSnesLib's) — exempt.
-_SDK_DOC_EXEMPT = {"docs/MIGRATING_FROM_PVSNESLIB.md"}
+# Pages whose job is to name other APIs (PVSnesLib's) or the names 1.0
+# removes (UPGRADING.md) — exempt.
+_SDK_DOC_EXEMPT = {"docs/MIGRATING_FROM_PVSNESLIB.md", "docs/UPGRADING.md"}
 # Prefixes no current API uses but that a PVSnesLib habit brings back.
 _RETIRED_PREFIXES = {"spc"}
 # Module prefixes too generic to mean "SDK call" (a user writes setFoo too).
@@ -972,6 +1021,111 @@ def check_build_knobs() -> list[str]:
             f"does not name `{k}`" for k in missing]
 
 
+# --- anchor 13: the benchmark table of docs/BENCHMARK.md --------------------
+# The page prints, for each benchmark function, PVSnesLib's two figures and
+# ours, a TOTAL row and a percentage that the summary table repeats. Ours come
+# from devtools/cyclecount/bench_baseline.json (the file `make bench` gates
+# on). Caught as the page saying -32.2 % for four months after far pointers
+# had made it -20.4 % (review of 2026-09-26, action 9).
+BENCH_PAGE = "docs/BENCHMARK.md"
+BENCH_BASELINE = "devtools/cyclecount/bench_baseline.json"
+BENCH_ROW_RE = re.compile(
+    r"^\s+([a-z_0-9]+|TOTAL)\s+(\d+)\s+(\d+)\s+(\d+)\s+([+-]\d+\.\d)%\s*$", re.M)
+BENCH_SUMMARY_RE = re.compile(
+    r"\*\*[−-](\d+\.\d)\s*%\*\*\s+vs PVSnesLib \+ 816-opt \((\d+) vs (\d+) cycles\)")
+
+
+def bench_table_drifts(page: str, baseline: dict[str, int]) -> list[str]:
+    """Drifts between the page's table and the measured baseline."""
+    rows = BENCH_ROW_RE.findall(page)
+    if not rows:
+        return [f"{BENCH_PAGE}: no benchmark table found (the row format changed?)"]
+    out: list[str] = []
+    ours_sum = opt_sum = 0
+    total = None
+    for name, _plain, opt, ours, pct in rows:
+        if name == "TOTAL":
+            total = (int(opt), int(ours), pct)
+            continue
+        ours_sum += int(ours)
+        opt_sum += int(opt)
+        if name not in baseline:
+            out.append(f"{BENCH_PAGE}: row `{name}` is not in {BENCH_BASELINE}")
+        elif baseline[name] != int(ours):
+            out.append(f"{BENCH_PAGE}: `{name}` says {ours} cycles, "
+                       f"{BENCH_BASELINE} measures {baseline[name]}")
+    if total is None:
+        return out + [f"{BENCH_PAGE}: the table has no TOTAL row"]
+    opt_total, ours_total, pct = total
+    if (opt_total, ours_total) != (opt_sum, ours_sum):
+        out.append(f"{BENCH_PAGE}: TOTAL says {opt_total} / {ours_total}, "
+                   f"its rows add up to {opt_sum} / {ours_sum}")
+    want = f"{100.0 * (ours_sum - opt_sum) / opt_sum:+.1f}"
+    if pct != want:
+        out.append(f"{BENCH_PAGE}: TOTAL says {pct}%, the rows give {want}%")
+    m = BENCH_SUMMARY_RE.search(page)
+    if not m:
+        out.append(f"{BENCH_PAGE}: the summary line (\"**−N %** vs PVSnesLib + "
+                   f"816-opt (A vs B cycles)\") was not found")
+    elif (m.group(1), int(m.group(2)), int(m.group(3))) != (want.lstrip("+-"), ours_sum, opt_sum):
+        out.append(f"{BENCH_PAGE}: the summary says −{m.group(1)} % "
+                   f"({m.group(2)} vs {m.group(3)}), the table gives "
+                   f"{want}% ({ours_sum} vs {opt_sum})")
+    return out
+
+
+# --------------------------------------------------------------------------
+# Check 15: the header -> tutorial map of docs/README.md (added 2026-10-05,
+# docs audit rec 8). The page said the table was "generated"; nothing checked
+# it. Every public header must have a row, every header a row names must
+# exist, and every tutorial a row links must exist.
+# --------------------------------------------------------------------------
+
+HEADER_MAP_DOC = "docs/README.md"
+HEADER_MAP_HEADING = "## Header → tutorial map"
+
+
+def check_header_map() -> list[str]:
+    drifts: list[str] = []
+    doc = repo_path(HEADER_MAP_DOC)
+    inc = repo_path("lib/include/snes")
+    if not doc.is_file() or not inc.is_dir():
+        return drifts
+    text = doc.read_text(encoding="utf-8")
+    if HEADER_MAP_HEADING not in text:
+        return [f"{HEADER_MAP_DOC}: the '{HEADER_MAP_HEADING}' section is gone — "
+                f"the sentinel (anchor 15) checks it; restore it or retire the check"]
+    section = text[text.index(HEADER_MAP_HEADING):]
+    rows = [l for l in section.splitlines() if l.startswith("| `")]
+    named: set[str] = set()
+    for line in rows:
+        lineno = text.count("\n", 0, text.index(line)) + 1
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        for h in re.findall(r"`([a-z0-9_]+\.h)`", cells[0]):
+            named.add(h)
+            if not (inc / h).is_file():
+                drifts.append(f"{HEADER_MAP_DOC}:{lineno}: the header map names "
+                              f"`{h}`, which is not in lib/include/snes/")
+        for link in re.findall(r"\]\(([^)#]+)\)", cells[1] if len(cells) > 1 else ""):
+            if not (doc.parent / link).is_file():
+                drifts.append(f"{HEADER_MAP_DOC}:{lineno}: the header map links "
+                              f"`{link}`, which does not exist")
+    for h in sorted(p.name for p in inc.glob("*.h")):
+        if h not in named:
+            drifts.append(f"{HEADER_MAP_DOC}: public header `{h}` has no row in the "
+                          f"header → tutorial map")
+    return drifts
+
+
+def check_benchmark_table() -> list[str]:
+    import json
+    page, base = repo_path(BENCH_PAGE), repo_path(BENCH_BASELINE)
+    if not page.is_file() or not base.is_file():
+        return [f"{BENCH_PAGE} or {BENCH_BASELINE} is missing"]
+    return bench_table_drifts(page.read_text(encoding="utf-8"),
+                              json.loads(base.read_text(encoding="utf-8")))
+
+
 def run_checks(quiet: bool) -> int:
     canonical_ver, canonical_date = canonical_version()
     canonical_n = canonical_examples_count()
@@ -991,11 +1145,14 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_category_sums(canonical_n))
     all_drifts.extend(check_roadmap_footer_date(canonical_date))
     all_drifts.extend(check_asm_bank_comments())
+    all_drifts.extend(check_example_stale_claims())
     all_drifts.extend(check_screenshot_basenames())
     all_drifts.extend(check_sdk_names_in_docs())
     all_drifts.extend(check_no_retired_tools())
     all_drifts.extend(check_example_modules())
     all_drifts.extend(check_build_knobs())
+    all_drifts.extend(check_benchmark_table())
+    all_drifts.extend(check_header_map())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

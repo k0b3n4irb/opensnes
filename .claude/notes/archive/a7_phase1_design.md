@@ -452,7 +452,7 @@ split is designed for granular bisection.
 ## Cross-references
 
 - A7 catalogue entry: `.claude/STRUCTURAL_DEFECTS.md:832-1050`
-- Phase 0 handoff: `.claude/notes/chantiers/a7_phase0_handoff.md`
+- Phase 0 handoff: `.claude/notes/archive/a7_phase0_handoff.md`
 - Repro source: `/tmp/a7_repro/main.c` (recreatable from handoff)
 - BENCHMARK doc: `docs/BENCHMARK.md` (post-`ccaf9c7` re-baseline)
 - Cycle gate policy: `docs/BENCHMARK.md:131-180` (E2 hard gate, override

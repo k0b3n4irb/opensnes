@@ -83,7 +83,7 @@ oamMemory[512] = 0x00;   /* Small (16x16), X high = 0 */
 oam_update_flag = 1;
 ```
 
-Writing directly to `oamMemory[]` avoids the overhead of `oamSet()` (framesize=158). For a single sprite updated occasionally, this is clean and fast.
+Writing directly to `oamMemory[]` avoids the call and argument pushes of `oamSet()`. For a single sprite updated occasionally, this is clean and fast.
 
 ### 6. State Machine
 

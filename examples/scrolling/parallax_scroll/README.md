@@ -61,7 +61,7 @@ Byte 9: 0x00        End marker
 
 ```c
 hdmaParallax(HDMA_CHANNEL_6, 0, scroll_table);
-hdmaEnable(1 << HDMA_CHANNEL_6);
+hdmaEnableMask(1 << HDMA_CHANNEL_6);
 ```
 
 The `hdmaParallax()` function configures HDMA mode `1REG_2X` on the specified

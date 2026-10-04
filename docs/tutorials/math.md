@@ -31,7 +31,9 @@ Cost comparison (rough):
 
 - `float` multiply: ~500 cycles.
 - `fixMul` 8.8 × 8.8 → 8.8: ~30 cycles.
-- `fixSin(angle)`: ~20 cycles (LUT lookup).
+- `fixSin(angle)`: a table read in assembly, about 260 master cycles (34 CPU
+  cycles) plus the call. It was inlined in the header until 2026-10-03; a call
+  now costs about 96 master cycles more than the inlined lookup did.
 - `mul16(a, b)` (16 × 16 → low 16): ~10 cycles (hardware).
 
 Order-of-magnitude: fixed-point is 10–25× faster than software floats.
@@ -182,7 +184,7 @@ animate values smoothly between two endpoints.
 
 ### Easing curves
 
-`ease_in_quad(t)` and `ease_out_quad(t)` map `t` from 0-255 to a curve
+`easeInQuad(t)` and `easeOutQuad(t)` map `t` from 0-255 to a curve
 0-255: the first starts slow and accelerates, the second starts fast and
 settles. They read a 256-byte table in their own module, so add
 `math_ease` to `LIB_MODULES` (without it the link fails, naming the
@@ -192,7 +194,7 @@ table).
 /* start_x < end_x, both u16 */
 u8 t;
 for (t = 0; t < 255; t += 5) {
-    u16 x = start_x + (u16)(((u32)(end_x - start_x) * ease_out_quad(t)) >> 8);
+    u16 x = start_x + (u16)(((u32)(end_x - start_x) * easeOutQuad(t)) >> 8);
     oamSetX(0, x);                /* slides in, then settles */
     WaitForVBlank();
 }
@@ -353,7 +355,7 @@ table byte.
 
 ## Gotchas
 
-### 🟢 `int` and `long` sizes are correct on this target (since chantier A1)
+### 🟢 `int` and `long` sizes are correct on this target (since v0.20.0)
 
 `sizeof(int) == 2`, `sizeof(long) == 4`. Bare `int` is the native 16-bit
 word; `long` is 32 bits. C convention says `int` is the natural word size
@@ -432,7 +434,7 @@ early and you get partial results.
 This is the right shape for game code, but if you're translating
 from a different engine, watch the signedness boundary.
 
-### `atan2` and `sqrt` ship in the lib (chantier B6, 2026-05-09)
+### `atan2` and `sqrt` ship in the lib (since 2026-05-09)
 
 The full inverse-trig and square-root surface arrived together so
 the canonical "where is the target relative to me, and how far?"
@@ -469,11 +471,11 @@ or sprite rotation in any 256-pixel-wide playfield.
 result is bounded to 255 (since `sqrt(65535) ≈ 255.99`), so it
 fits in `u8` for tile-grid distances. For the 8.8 fractional
 variant use `fixSqrt`. Note that `fixSqrt`'s precision is
-intentionally capped at 4 fractional bits — the 32-bit shift
-needed for full 8 bits of fraction would currently truncate
-under the QBE 32-bit codegen gap (catalogue chantier A7); we
-chose deterministic 4-bit precision over deceptive 8-bit
-output that's only correct for small inputs.
+capped at 4 fractional bits: it is one 16-bit root shifted, which
+is what keeps it at about 80 cycles. The full 8 bits would need
+the root of a 24-bit value, a 32-bit loop. (When it was written
+the compiler also truncated that shift; it no longer does, since
+v0.21.2, so the cap is now a speed choice.)
 
 ### What's still missing: `pow`, `exp`, `log`
 
@@ -523,4 +525,4 @@ binding.
   module uses integer math, but advanced collision (circle, swept,
   ray-cast) goes through fixed-point.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — covers the
-  historical `int = 32 bits` trap (closed by chantier A1 on 2026-05-08).
+  historical `int = 32 bits` trap (closed in v0.20.0, 2026-05-08).

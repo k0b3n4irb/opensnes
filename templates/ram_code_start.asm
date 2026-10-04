@@ -23,7 +23,7 @@
     ram_code_space dsb (65536 - RAM_CODE_ORG_VAL)
 .ENDS
 
-.SECTION ".ram_code" BANK 1 SLOT 0 ORGA RAM_CODE_ORG_VAL BASE $7D FORCE
+.SECTION ".ram_code" BANK 1 SLOT "ROM" ORGA RAM_CODE_ORG_VAL BASE $7D FORCE   ; the slot by name: a bare 0 drew WLA's "SLOT number 0 / SLOT with starting address 0" warning (2026-10-04)
 RamCodeStart:
     .db 0   ; placeholder: wla-dx drops an empty section, and APPENDTO needs it (as data_init_start)
 .ENDS

@@ -164,7 +164,7 @@ garbage, which is the confusing kind.
 void textPutChar(char c);
 void textPrint(const char *str);
 void textPrintAt(u8 x, u8 y, const char *str);
-inline void textSetPos(u8 x, u8 y);     /* in text.h, inlined */
+void textSetPos(u8 x, u8 y);
 u8   textGetX(void);
 u8   textGetY(void);
 ```

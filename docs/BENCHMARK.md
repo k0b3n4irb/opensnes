@@ -7,7 +7,7 @@ columns are frozen at their 2026-05-13 measurement: re-running them needs a
 tcc816 toolchain, and PVSnesLib's code for these functions has not changed.*
 
 **What changed since the May figure (−32.2 %).** On 2026-05-15 pointers and
-`u32` became 4-byte values (chantier A6: far pointers, so data can live in any
+`u32` became 4-byte values (far pointers, v0.19.0, so data can live in any
 bank). Every access through a pointer now computes a 32-bit address, and
 without a register allocator that address lives in stack slots. The three
 pointer-heavy functions — `array_read`, `array_write`, `struct_sum` — went
@@ -116,7 +116,7 @@ The `pea_constant_args` regression is a trade-off: `pea.w` is smaller in code si
 larger. Both approaches are valid.
 
 The previous `call_chain` regression (+31.9%) was resolved by the 2026-05-12
-function-inlining chantier (qbe commits `13d9b14`, `29b0941`, `77d07a0`). With
+function-inlining work (qbe commits `13d9b14`, `29b0941`, `77d07a0`). With
 `helper` marked `static inline`, the qbe inline pass collapses `helper(helper(x))`
 to inlined arithmetic, dropping the function from 62 cycles to 19 (-59.6 % vs
 PVSnesLib+opt's 47).
@@ -134,7 +134,7 @@ ROM-size (≈ 6 bytes per such helper).
 The pre-inlining historical note is preserved for context: TCO had landed
 in qbe `ed840fb` and lowered TOTAL from 1420 (pre-TCO) to 1341 (post-TCO),
 trading +14 cycles on `call_chain` for wins elsewhere. The function-inlining
-chantier took TOTAL from 1341 to 1298 by recovering the `call_chain`
+work took TOTAL from 1341 to 1298 by recovering the `call_chain`
 regression entirely (and going further: -28 cycles below PVSnesLib+opt rather
 than +14 above the pre-TCO baseline). The deferred-emit follow-up dropped
 TOTAL another 16 cycles to 1282 via the `helper` dead-code elimination.
@@ -255,7 +255,7 @@ obvious base ref to compare against). The gate runs on
 
 - 2026-05-08: shipped soft / comment-only (commit `98d5014`) as the
   audit response to §14 of the external review.
-- 2026-05-09: promoted to hard gate (chantier E2). Catalogue entry in
+- 2026-05-09: promoted to hard gate. Catalogue entry in
   `.claude/STRUCTURAL_DEFECTS.md`. Decision rationale: the soft gate
   had operated long enough to confirm the threshold design is workable;
   the override mechanism gives a clean path for deliberate trade-offs.

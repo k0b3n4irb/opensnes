@@ -65,7 +65,7 @@ The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE's w65816 bac
 - **templates/** — ROM bootstrap: `crt0.asm` (startup + NMI handler), `hdr*.asm` (ROM headers), `runtime.asm` (math routines, now in lib/source/), `memmap*.inc` (memory maps). These are the single source of truth — examples don't duplicate them.
 - **make/common.mk** — Universal build rules included by every example. Handles graphics conversion, multi-file C compilation, SNESMOD audio, SA-1/SuperFX/HiROM mode selection, module linking.
 - **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), `luna-test/` (luna-driven test harness: runner, manifest, baselines, probes)
-- **examples/** — 54 ROMs organized by category (text, graphics, input, audio, maps, memory, games)
+- **examples/** — 89 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
 
 ### Enhancement Chip Support
 
@@ -104,16 +104,16 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 - **Bank $00 ROM is code only** (since #127.3, v0.41.0): C const data (`static const` arrays, string literals, const structs) is placed in the asset banks by default and every C read of it is a far read. The one bank-blind path left is casting `const` away and reading through a plain pointer; `devtools/check_bank_reads.py` fails the link on it. The bank $00 free-space ratchet (`BANK0_FAIL_THRESHOLD`) still guards the code bank.
 - **Plain C RAM lives below $2000; `FAR` is the way above it** (since chantier B2, v0.39.0): `sta.l $0000,x` reads bank $00, so a plain global must sit in `$00:0000-$1FFF`. Declare bulk buffers `FAR` (`snes/types.h`) to place them in `$7E:2000-$FFFF` with bank-honouring codegen; `symmap.py --check-ram-budget` fails the link on a plain-band overflow. Tutorial: `docs/tutorials/far_ram.md`.
 - **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
-- **`data_init_end.o` MUST be linked last** — it's the sentinel for the DMA copy loop
+- **`data_init_end.o` provides the data-init terminator** — `make/common.mk` lists it last; wlalink's size-descending sort of appended sections is what keeps the 5-byte terminator after every record, and `symmap.py --check-data-init` verifies it after every link (since 2026-10-05)
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
 - **`volatile` is honoured by QBE** (since chantier A2, 2026-05-09) — each load/store carrying `volatile` survives the IR pipeline and is not coalesced. The lib still favours plain globals for NMI handshakes (`vblank_flag`, `oam_update_flag`) for cycle-cost equivalence and contract clarity, but user code can use `volatile` freely for MMIO patterns.
-- **Vertical scroll is off by one on hardware** (the PPU never outputs scanline 0): the lib writes `y - 1` to `BGnVOFS`/`M7VOFS` for you (`bgSetScroll`, map module, `mode7SetScroll`, reset default, since 2026-09-12), so `y = 0` shows tilemap row 0 on the first line. Data that reaches the register without the lib — HDMA tables on `BGnVOFS` — must carry the -1 itself. PVSnesLib writes the raw value.
+- **Vertical scroll is off by one on hardware** (the PPU never outputs scanline 0): the lib writes `y - 1` to `BGnVOFS`/`M7VOFS` for you (`bgSetScroll`, map module, `mode7SetScroll`, reset default, since 2026-09-12), so `y = 0` shows tilemap row 0 on the first line. Data that reaches the register without the lib — HDMA tables on `BGnVOFS` — must carry the -1 itself. Exception: BG3 in Modes 2/4/6 is the offset-per-tile table and its VOFS is written raw (`setMode` tells the NMI, since 2026-10-02). PVSnesLib writes the raw value.
 - **WLA-DX loses .ACCU/.INDEX tracking after branch merges** — always add explicit `.ACCU 8`/`.ACCU 16` after every `rep`/`sep` in hand-written ASM
 
 ## Auto-Loaded Rules
 
 The `.claude/rules/` directory contains mandatory rules automatically loaded by context:
-- `testing.md` — 3-pillar test workflow, change classification (A/B/C/D)
+- `testing.md` — 2-pillar validation (luna + full rebuild), change classification (A/B/C/D)
 - `commits.md` — Never add Co-Authored-By trailers
 - `compiler.md` — Compiler architecture, build, constraints
 - `templates.md` — Templates & build system, memory layout, linker order

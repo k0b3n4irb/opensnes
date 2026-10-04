@@ -40,7 +40,7 @@
  * Call once after reset before any upload. consoleInit() does not touch
  * the APU.
  */
-void apuWaitBoot(void);
+u8 apuWaitBoot(void);   /* 0 = the IPL answered; 1 = no answer in ~7 frames (since 2026-10-03: it waited for ever) */
 
 /**
  * @brief Upload a memory block into APU RAM via the IPL protocol

@@ -28,11 +28,20 @@
  * Background Mask Constants
  *============================================================================*/
 
-#define MOSAIC_BG1    0x01    /**< Enable mosaic for BG1 */
-#define MOSAIC_BG2    0x02    /**< Enable mosaic for BG2 */
-#define MOSAIC_BG3    0x04    /**< Enable mosaic for BG3 */
-#define MOSAIC_BG4    0x08    /**< Enable mosaic for BG4 */
+/* The backgrounds are named by LAYER_BG1..LAYER_BG4 (video.h), the same
+ * bits everywhere a call takes a set of layers. */
 #define MOSAIC_BG_ALL 0x0F    /**< Enable mosaic for all backgrounds */
+
+#define MOSAIC_BG1    0x01    /**< @deprecated use LAYER_BG1 */
+#define MOSAIC_BG2    0x02    /**< @deprecated use LAYER_BG2 */
+#define MOSAIC_BG3    0x04    /**< @deprecated use LAYER_BG3 */
+#define MOSAIC_BG4    0x08    /**< @deprecated use LAYER_BG4 */
+#ifdef __clang__
+#pragma clang deprecated(MOSAIC_BG1, "use LAYER_BG1")
+#pragma clang deprecated(MOSAIC_BG2, "use LAYER_BG2")
+#pragma clang deprecated(MOSAIC_BG3, "use LAYER_BG3")
+#pragma clang deprecated(MOSAIC_BG4, "use LAYER_BG4")
+#endif
 
 /*============================================================================
  * Mosaic Size Constants
@@ -49,30 +58,23 @@
  * @brief Initialize mosaic system
  *
  * Disables all mosaic effects. Call this once during setup.
- * Inlined for zero-call-overhead access.
  */
-extern u8 mosaic_size;
-extern u8 mosaic_bg_mask;
-inline void mosaicInit(void) {
-    mosaic_size = 0;
-    mosaic_bg_mask = 0;
-    REG_MOSAIC = 0;
-}
+void mosaicInit(void);
 
 /**
  * @brief Set the backgrounds the mosaic applies to — REPLACES the previous set
  *
- * `mosaicSetLayers(MOSAIC_BG1)` after `mosaicSetLayers(MOSAIC_BG2)` leaves
+ * `mosaicSetLayers(LAYER_BG1)` after `mosaicSetLayers(LAYER_BG2)` leaves
  * only BG1 pixelated. This is the function mosaicEnable() was until
  * 2026-09-22, renamed because "Enable" reads as additive — windowEnable() IS
  * additive — and the old name silently undid the previous call.
  *
- * @param bgMask Bitmask of backgrounds (MOSAIC_BG1 | MOSAIC_BG2 | ...; 0
+ * @param bgMask Bitmask of backgrounds (LAYER_BG1 | LAYER_BG2 | ...; 0
  *               disables, like mosaicDisable())
  *
  * Example:
  * @code
- * mosaicSetLayers(MOSAIC_BG1 | MOSAIC_BG2);  // BG1 and BG2, nothing else
+ * mosaicSetLayers(LAYER_BG1 | LAYER_BG2);  // BG1 and BG2, nothing else
  * mosaicSetLayers(MOSAIC_BG_ALL);            // every background
  * @endcode
  */
@@ -117,7 +119,7 @@ u8 mosaicGetSize(void);
  * Example:
  * @code
  * mosaicSetSize(MOSAIC_MAX);
- * mosaicEnable(MOSAIC_BG_ALL);
+ * mosaicSetLayers(LAYER_BG1 | LAYER_BG2 | LAYER_BG3 | LAYER_BG4);
  * mosaicFadeIn(2);  // Reveal screen over ~30 frames
  * @endcode
  */
@@ -133,7 +135,7 @@ void mosaicFadeIn(u8 speed);
  *
  * Example:
  * @code
- * mosaicEnable(MOSAIC_BG_ALL);
+ * mosaicSetLayers(LAYER_BG1 | LAYER_BG2 | LAYER_BG3 | LAYER_BG4);
  * mosaicFadeOut(2);  // Pixelate screen over ~30 frames
  * loadNewLevel();
  * mosaicFadeIn(2);   // Reveal new content

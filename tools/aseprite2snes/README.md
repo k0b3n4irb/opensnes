@@ -72,7 +72,8 @@ Drive it with the `anim.h` player, indexing by state:
 AnimPlayer p = ANIM_PLAYER_INIT;
 animPlay(&p, hero_anims[HERO_ANIM_WALK]);
 u16 frame = animTick(&p);   /* metasprite-table index this tick */
-oamDrawMeta(0, x, y, hero_metasprites[frame], BASE_TILE, 0, OBJ_LARGE);
+oamDrawMetasprite(0, x, y, hero_metasprites[frame], &hero_style, 0);
+/* hero_style: a MetaspriteStyle, e.g. { .baseTile = BASE_TILE, .size = OBJ_LARGE } */
 ```
 
 ## Mapping rules

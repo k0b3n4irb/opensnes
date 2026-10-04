@@ -46,6 +46,10 @@ Compare actual instruction bytes with expected. This catches:
 - **`assets-dump`** to compare VRAM tile sheets/tilemaps with PVSnesLib output
 - **`oam.json` / `ppu.oam_full`** to check OAM entries (tile numbers, sizes, positions)
 
+A figure read over the MCP depends on what the session did before (the
+emulator stays alive between questions); a number meant for a manifest, a
+baseline or a note is taken again at the CLI, from power-on (luna, 2026-10-03).
+
 ### 5. Cross-check ASM/C constant definitions
 After ANY change to shared constants:
 ```bash

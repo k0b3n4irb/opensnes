@@ -29,6 +29,13 @@ Usage:
 `HEAD~5..HEAD`, a single SHA, etc. CI passes the PR's commit range; locally
 a contributor can run `make lint-commits` (defaults to `origin/develop..HEAD`).
 
+    python3 devtools/lint_commits.py --message-file .git/COMMIT_EDITMSG
+
+lints one message before it becomes a commit. `make hooks` installs the
+`commit-msg` and `pre-push` hooks of `scripts/githooks/`, which run these two
+forms: two non-conforming subjects reached `develop` in two days (`756da353`,
+`0d30ec65`) because the lint ran after the push, where only CI reads it.
+
 Exit codes:
     0 — every commit in the range passes
     1 — at least one violation
@@ -38,6 +45,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import pathlib
 import re
 import subprocess
 import sys
@@ -165,12 +173,29 @@ def main() -> int:
         description=__doc__.split("\n\n")[0],
     )
     parser.add_argument(
-        "rev_range",
+        "rev_range", nargs="?",
         help="git log range, e.g. `origin/develop..HEAD` or `HEAD~5..HEAD`",
     )
+    parser.add_argument(
+        "--message-file", metavar="PATH",
+        help="lint one commit message read from PATH instead of a range "
+             "(the `commit-msg` git hook in scripts/githooks passes "
+             "$GIT_DIR/COMMIT_EDITMSG)",
+    )
     args = parser.parse_args()
+    if (args.rev_range is None) == (args.message_file is None):
+        parser.error("give a rev range or --message-file, not both")
 
-    commits = get_commits(args.rev_range)
+    if args.message_file:
+        # Strip the lines git treats as comments, as git itself does
+        # (commit.cleanup=strip, the default for an edited message).
+        text = pathlib.Path(args.message_file).read_text(encoding="utf-8")
+        kept = [l for l in text.splitlines() if not l.startswith("#")]
+        while kept and not kept[0].strip():
+            kept.pop(0)
+        commits = [("(message)", "\n".join(kept) + "\n")]
+    else:
+        commits = get_commits(args.rev_range)
     if not commits:
         print(f"OK: no commits in range {args.rev_range}")
         return 0

@@ -191,7 +191,7 @@ int main(void) {
 
     /* Start HDMA on channel 6, targeting BG1 horizontal scroll */
     hdmaParallax(HDMA_CHANNEL_6, 0, scroll_table);
-    hdmaEnable(1 << HDMA_CHANNEL_6);
+    hdmaEnableMask(1 << HDMA_CHANNEL_6);
 
     while (1) {
         /* Each zone scrolls at a different speed */
@@ -259,7 +259,7 @@ See `examples/scrolling/continuous_scroll/` for the full implementation includin
 
 ## VBlank Timing
 
-Scroll register writes (`BG1HOFS`, `BG1VOFS`, etc.) take effect from the next scanline — that is exactly what makes the HDMA parallax pattern above work. But an *unsynchronised* CPU write lands partway down the picture: the top of the frame shows the old scroll, the bottom the new one, visible as a one-frame tear.
+The PPU reads the scroll registers (`BG1HOFS`, `BG1VOFS`, etc.) as it renders, so a value written during HBlank is in force for the next line — that is what the HDMA parallax pattern above relies on (the references we hold do not pin the exact point inside a scanline where a write starts to count). An *unsynchronised* CPU write lands partway down the picture: the top of the frame shows the old scroll, the bottom the new one, visible as a one-frame tear.
 
 OpenSNES handles this automatically: `bgSetScroll()` writes to shadow variables and sets a dirty flag. The NMI handler checks the dirty flag during VBlank and commits only the changed values to hardware. You do not need to manually time your scroll writes.
 

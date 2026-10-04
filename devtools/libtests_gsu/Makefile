@@ -8,8 +8,14 @@ ROM_NAME    := LIB RUNTIME TEST GSU
 CSRC        := main.c
 ASMSRC      := gsu_loader.asm ram_job.asm
 GSUSRC      := gsu_job.sfx
+# The program is linked at its ROM address: rom_job jumps to an absolute
+# label and reads a table of the program (GSU_BANK, make/common.mk).
+GSU_BANK    := 1
 USE_LIB     := 1
 USE_SUPERFX := 1
+# A Super FX save: the battery keeps Game Pak RAM (header $15), and the sram
+# module reaches it while a job runs (2026-10-03).
+USE_SRAM    := 1
 LIB_MODULES := console
 RAM_CODE_SIZE := 512
 include $(OPENSNES)/make/common.mk

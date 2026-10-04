@@ -203,18 +203,30 @@ fixLerp:
         rtl
 @lerp_frac:
 
-    ; diff = b - a
+    ; diff = b - a, which needs 17 bits: two fixed values 128.0 or more
+    ; apart overflow a 16-bit difference. On overflow (V set) the raw word
+    ; is already |diff| (b - a lies in 0..65535 or -65535..0 and the wrap
+    ; lands on the magnitude) and the true sign is the OPPOSITE of bit 15.
+    ; Until 2026-10-03 bit 15 alone was the sign: fixLerp(FIX(-64),
+    ; FIX(64), 128) gave -128.0 instead of 0.
     lda 7,s                     ; b
     sec
     sbc 9,s                     ; a
-    sta.w fmul_a               ; diff (signed 16-bit)
+    sta.w fmul_a               ; diff (signed 16-bit, or |diff| on overflow)
+    bvs @diff_ovf
 
-    ; Track sign of diff
+    ; No overflow: bit 15 is the sign
     sta.w fmul_sign
     bpl @diff_pos
         eor #$FFFF
         inc a
         sta.w fmul_a           ; |diff|
+    bra @diff_pos
+
+@diff_ovf:
+    ; Overflow: the word is |diff|; the sign is the inverse of its bit 15
+    eor #$8000
+    sta.w fmul_sign
 @diff_pos:
 
     ; t < 256 here: its low byte is the whole value
@@ -265,6 +277,44 @@ fixLerp:
     ; result = a + scaled_diff
     clc
     adc 9,s                     ; + a
+    plp
+    rtl
+
+.ENDS
+
+;------------------------------------------------------------------------------
+; fixed fixSin(u8 angle);
+; fixed fixCos(u8 angle);
+;------------------------------------------------------------------------------
+; One read of math_sine_table (math.c, 256 s16 entries, 8.8 fixed).
+; cos(x) = sin(x + 64). These were `inline` in math.h until 2026-10-03 (API
+; decision D4: the table had to be exported for the inline body).
+;
+; Stack: 5-6,s = angle (u8 in a 16-bit slot), after PHP + JSL return.
+;------------------------------------------------------------------------------
+.SECTION ".math_fixsin" SUPERFREE
+
+fixCos:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 5,s                     ; angle
+    clc
+    adc #64
+    bra _fixsin_lookup
+
+fixSin:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 5,s                     ; angle
+_fixsin_lookup:
+    and #$00FF
+    asl a
+    tax
+    lda.l math_sine_table,x
     plp
     rtl
 

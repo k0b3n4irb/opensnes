@@ -30,6 +30,8 @@ PEEKS = [
     ("r_clear:2",    "0000"),   # sramClear zeroed what sramLoad then read
     ("r_ok:2",       "0000"),   # SRAM_OK
     ("r_range:2",    "0100"),   # SRAM_ERR_RANGE: past the 32 KB the header declares
+    ("r_sa1_bw:2",   "5a00"),   # byte the SA-1 itself wrote to BW-RAM $40:0100 from its boot stub (2026-10-03)
+    ("40:0100:1",    "5a"),
     # where the HARDWARE puts it: SA-1 BW-RAM is $40:0000 + offset
     ("40:0000:C",    "c1d2e3f415263748596a7b8c"),
     ("40:0123:4",    "15263748"),

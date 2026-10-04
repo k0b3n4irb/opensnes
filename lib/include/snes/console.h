@@ -86,14 +86,11 @@
 void consoleInit(void);
 
 /**
- * @brief Initialize console with options
+ * @brief The same as consoleInit()
  *
- * Advanced initialization with configuration options.
- *
- * @param options Initialization flags (reserved for future use)
- *
- * @note For most games, use consoleInit() instead.
+ * @param options Ignored: no option was ever defined.
  */
+OPENSNES_DEPRECATED("use consoleInit() — the argument is ignored")
 void consoleInitEx(u16 options);
 
 /*============================================================================
@@ -109,22 +106,13 @@ void consoleInitEx(u16 options);
  * the fade example below relies on. (Documented as "full brightness" until
  * 2026-09-20.)
  *
- * Inlined for zero-call-overhead access (saves ~28 cycles per call).
- * Shares the same `force_blanked` and `current_brightness` shadows as
- * setScreenOff(); both are declared extern below.
- *
  * @code
  * consoleInit();
  * // ... load graphics ...
  * setScreenOn();  // Display is now visible
  * @endcode
  */
-inline void setScreenOn(void) {
-    extern u8 force_blanked;
-    extern u8 current_brightness;
-    force_blanked = 0;
-    REG_INIDISP = current_brightness & 0x0F;
-}
+void setScreenOn(void);
 
 /**
  * @brief Disable screen display (blank)
@@ -132,22 +120,13 @@ inline void setScreenOn(void) {
  * Turns off the display. Use during major VRAM updates that
  * can't complete during VBlank.
  *
- * Inlined for zero-call-overhead access (saves ~28 cycles per call).
- * The standalone definition in console.c is still emitted (via the
- * `extern inline` declaration there) for ABI compatibility — direct
- * call sites collapse to two stores.
- *
  * @code
  * setScreenOff();
  * // ... massive VRAM update ...
  * setScreenOn();
  * @endcode
  */
-extern u8 force_blanked;
-inline void setScreenOff(void) {
-    force_blanked = 1;
-    REG_INIDISP = INIDISP_FORCE_BLANK;
-}
+void setScreenOff(void);
 
 /**
  * @brief Set screen brightness
@@ -219,15 +198,9 @@ void fadeIn(u8 speed);
 /**
  * @brief Get current brightness
  *
- * Inlined for zero-call-overhead access. The standalone definition is
- * still available (force-emitted in console.c) for fn-pointer callers.
- *
  * @return Current brightness level (0-15)
  */
-extern u8 current_brightness;
-inline u8 getBrightness(void) {
-    return current_brightness;
-}
+u8 getBrightness(void);
 
 /*============================================================================
  * VBlank Synchronization
@@ -242,6 +215,9 @@ inline u8 getBrightness(void) {
  * - Consistent game timing
  *
  * Call once per frame in your main loop.
+ *
+ * The capital W is deliberate: the name is PVSnesLib's, kept so a port needs
+ * no edit. It is the only function of the library not in camelCase.
  *
  * @code
  * while (1) {
@@ -314,8 +290,8 @@ void resetFrameCount(void);
 /**
  * @brief Check if PAL system
  *
- * @return 1 if PAL (50Hz), 0 if NTSC (60Hz) — the same value as getRegion()
- *         since 2026-09-22 (it returned 0xFF for PAL before)
+ * @return 1 if PAL (50Hz), 0 if NTSC (60Hz) (it returned 0xFF for PAL
+ *         before 2026-09-22)
  *
  * @code
  * if (isPAL()) {
@@ -326,10 +302,11 @@ void resetFrameCount(void);
 u8 isPAL(void);
 
 /**
- * @brief Get system region
+ * @brief The same value as isPAL(): 0 = NTSC, 1 = PAL
  *
- * @return 0 = NTSC, 1 = PAL
+ * Two names for one answer since 2026-09-22; isPAL() is the one kept.
  */
+OPENSNES_DEPRECATED("use isPAL() — it returns the same value")
 u8 getRegion(void);
 
 /*============================================================================

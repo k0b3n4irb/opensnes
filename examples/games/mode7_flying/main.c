@@ -18,7 +18,7 @@
  * ROM mode: LoROM (project default).
  *
  * @par SNES Concepts
- * - Altitude as Mode 7 scale: mode7SetScale(0x0100 + alt) then
+ * - Altitude as Mode 7 scale: mode7SetScale(0x0080 + alt / 2) then
  *   SetAngle (the scale feeds the matrix at SetAngle time)
  * - The shadow depth cue: same sprite shape, dark palette, screen
  *   offset proportional to altitude
@@ -243,8 +243,9 @@ int main(void) {
             }
         }
 
-        /* altitude -> scale (0x0100 + alt), then the matrix */
-        scale = (u16)(0x0100 + plane_alt);
+        /* altitude -> scale: magnified twice on the ground (0x0080), the
+         * view widening as the plane climbs; then the matrix */
+        scale = (u16)(0x0080 + (plane_alt >> 1));
         mode7SetScale(scale, scale);
         mode7SetAngle(plane_heading);
         mode7SetCenter((s16)(plane_x >> 4), (s16)(plane_y >> 4));

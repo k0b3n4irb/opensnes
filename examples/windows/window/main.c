@@ -57,12 +57,13 @@ extern u8 tilemap_bg2[], tilemap_bg2_end[];
 extern u8 palette_bg2[];
 
 /*============================================================================
- * HDMA Triangle Tables (in RAM — NOT const)
+ * HDMA Triangle Tables (in RAM)
  *
- * These tables must be mutable (not const) because hdmaSetup() assumes
- * bank $00 for ROM addresses, but the linker may place SUPERFREE const data
- * in bank $01+. Mutable data always resides in bank $00 WRAM ($7E:0000),
- * which hdmaSetup handles correctly.
+ * Plain globals: hdmaSetup() takes a far pointer and reads the bank from
+ * it (since the A6 chantier), so a const table in the asset banks would
+ * work just as well; these stay in RAM because nothing here needs them in
+ * ROM. (Until 2026-10-04 this comment claimed hdmaSetup needed them in
+ * the code bank, a pre-A6 constraint.)
  *
  * Format: [count | 0x80] [data per scanline...]
  *   - 0x80 bit = repeat mode (HDMA reads one new byte per scanline)
@@ -149,7 +150,7 @@ u8 tablerighttriangle[] = {
  */
 static void setup_window(u8 layers, u8 w12sel_val) {
     /* Disable HDMA first to prevent partial table reads during reconfiguration */
-    hdmaDisable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
+    hdmaDisableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
     /* Window 1, inverted (pixels OUTSIDE the triangle are clipped), on the
      * BGs W12SEL names — and, as PVSnesLib's setModeHdmaWindow does, the same
@@ -158,12 +159,12 @@ static void setup_window(u8 layers, u8 w12sel_val) {
      * and TMW by hand); luna diff shows the same frames. */
     {
         u8 w1 = 0;
-        if (w12sel_val & 0x02) w1 |= WINDOW_BG1 | WINDOW_OBJ;
-        if (w12sel_val & 0x20) w1 |= WINDOW_BG2 | WINDOW_MATH;
+        if (w12sel_val & 0x02) w1 |= LAYER_BG1 | LAYER_OBJ;
+        if (w12sel_val & 0x20) w1 |= LAYER_BG2 | WINDOW_MATH;
         windowDisableAll();
         windowEnable(WINDOW_1, w1);
         windowSetInvert(WINDOW_1, w1, 1);
-        windowSetMainMask(layers | WINDOW_OBJ);
+        windowSetMainMask(layers | LAYER_OBJ);
     }
 
     /* Configure HDMA: channel 4 drives WH0 (left boundary),
@@ -173,7 +174,7 @@ static void setup_window(u8 layers, u8 w12sel_val) {
               tablelefttriangle);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1,
               tablerighttriangle);
-    hdmaEnable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
+    hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 }
 
 /*============================================================================

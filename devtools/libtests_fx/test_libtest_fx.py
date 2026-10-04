@@ -33,6 +33,8 @@ CASES = [
     ("hdma_wave_amplitude", 1, 60),   # hdmaWaveH(…, 200, …): clamped, as the header always said
     ("r_hdma_setup", 2, 0x0040),
     ("r_hdma_both",  2, 0x0070),
+    ("r_hdma_names", 2, 1),      # D1: hdmaEnable / hdmaDisable (deprecated) = the Mask pair
+    ("r_hdma_speed", 2, 3),      # hdmaWaveSetSpeed: a lib function since 2026-10-03 (was inline)
     # nmiSet: one callback per frame, none after nmiClear
     ("r_nmi_calls",  2, 5),
     ("r_chips",      2, 0x10),   # no SA-1, no GSU on this LoROM; old and new names agree
@@ -42,6 +44,8 @@ CASES = [
     # snesmod: the 24-bit table pointer (bank byte included), a clean u16
     # position, an emptied queue whose last command was the volume (0x5A)
     ("r_mod_flush",  2, 1),
+    ("r_irq_mod",    2, 10),     # T5: one V-timer IRQ per frame while snesmodProcess runs (armed before snesmodInit)
+    ("r_mod_latch",  2, 0),      # ...and the driver leaves STAT78's counter-latch flag clear (the Super Scope's trigger)
     # last command sent after the flush: CMD_FADE (6), 0, speed 3, target 45.
     # Asymmetric on purpose — the target used to be read from the wrong byte.
     ("spc_pr",       4, 0x2D030006),
@@ -50,6 +54,8 @@ CASES = [
 
 # luna's view of the machine. Dotted keys step into the state JSON.
 STATE_CASES = [
+    ("cpu_regs.nmitimen", 0xA1),     # NMI + V-timer IRQ + auto-joypad: the IRQ stays armed through the driver's $4200 writes
+    ("cpu_regs.vtime", 120),         # irqSetVTimer(120), untouched by SNESMOD
     ("ppu.m7a", 256), ("ppu.m7b", 32), ("ppu.m7c", -32), ("ppu.m7d", 128),   # mode7SetMatrix
     ("ppu.m7x", 64), ("ppu.m7y", 48),                                         # mode7SetPivot
     # hdmaColorGradient(3, 37, red, blue): the index is honoured. CGRAM[37]

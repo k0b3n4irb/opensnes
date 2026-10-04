@@ -1,0 +1,16 @@
+# Super FX save, power-cycle chain 1/2 (2026-10-03): the GSU fixture built
+# with USE_SRAM=1 (header $15, battery) saves eight bytes at $70:E000 with
+# sramSaveOffset; luna keeps the whole Game Pak RAM as the .srm (v1.30.3).
+# Runs before g_gsu_save_read.toml, which boots the same ROM from that file.
+rom = "../../../devtools/libtests_gsu/libtest_gsu.sfc"
+frames = 150
+srm_out = "gsu_save.srm"
+
+[asserts.values]
+r_boot_save = 0           # first boot: nothing saved yet
+r_save_idle = 0
+r_save_rt = 1
+r_done = 0xD0E5
+
+[asserts.blocks]
+"70:E000" = "5341564512345678"

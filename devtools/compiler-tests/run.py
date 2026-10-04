@@ -58,11 +58,14 @@ def compile_result(src: Path) -> tuple[bool, str]:
     """(compiled?, stderr+stdout) — for the negative fixtures."""
     with tempfile.NamedTemporaryFile(suffix=".asm", delete=False) as tf:
         out = Path(tf.name)
-    proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
-                           str(src), "-o", str(out)],
-                          capture_output=True, text=True, timeout=60)
-    ok = out.is_file() and out.stat().st_size > 0 and proc.returncode == 0
-    return ok, (proc.stderr or "") + (proc.stdout or "")
+    try:
+        proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
+                               str(src), "-o", str(out)],
+                              capture_output=True, text=True, timeout=60)
+        ok = out.is_file() and out.stat().st_size > 0 and proc.returncode == 0
+        return ok, (proc.stderr or "") + (proc.stdout or "")
+    finally:
+        out.unlink(missing_ok=True)
 
 
 def run_negative(only: str | None) -> tuple[int, int]:
@@ -90,13 +93,16 @@ def run_negative(only: str | None) -> tuple[int, int]:
 def compile_asm(src: Path) -> str:
     with tempfile.NamedTemporaryFile(suffix=".asm", delete=False) as tf:
         out = Path(tf.name)
-    # SDK include path: fixtures may use <snes/*.h> (e.g. test_metasprite).
-    proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
-                           str(src), "-o", str(out)],
-                          capture_output=True, text=True, timeout=60)
-    if not out.is_file() or out.stat().st_size == 0:
-        raise RuntimeError(f"compile failed: {(proc.stderr or proc.stdout).strip()[:300]}")
-    return out.read_text()
+    try:
+        # SDK include path: fixtures may use <snes/*.h> (e.g. test_metasprite).
+        proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
+                               str(src), "-o", str(out)],
+                              capture_output=True, text=True, timeout=60)
+        if not out.is_file() or out.stat().st_size == 0:
+            raise RuntimeError(f"compile failed: {(proc.stderr or proc.stdout).strip()[:300]}")
+        return out.read_text()
+    finally:
+        out.unlink(missing_ok=True)
 
 
 def func_body(asm: str, name: str) -> str:

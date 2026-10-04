@@ -1,6 +1,8 @@
 # Chantier — Full 32-bit codegen + 24-bit pointers (A7 → A6 → B1/B2)
 
-**Status:** A7 SCOPED (2026-06-22) — immediate scope is **A7 only** (Phases 0–1,
+**Status (2026-10-03):** CLOSED. Everything this note planned has shipped: A7 (v0.21.2), A6 (v0.19.0), B1 (subsumed by A6), B2 (2026-09-06) — see `.claude/STRUCTURAL_DEFECTS.md` §7. The text below is the plan as written in June and is kept as history; its "deferred" and "not landed" lines describe that date.
+
+**Status at the time:** A7 SCOPED (2026-06-22) — immediate scope is **A7 only** (Phases 0–1,
 ships as a patch); A6/B1/B2 (Phases 2–4) deferred to a follow-up chantier. See §7.
 · **Owner:** TBD · **Risk:** High (A7 alone: Medium) · **Effort:** A7 ≈ 2 weeks; full thread ~6–10
 **Catalogue entries:** `.claude/STRUCTURAL_DEFECTS.md` A7, A6, B1, B2 (per-item

@@ -25,32 +25,32 @@ frames = 240
 at_frame = 60
 [checkpoint.values]
 fx_state = { eq = 0, width = 1 }
-cgadsub = { eq = 0x00, width = 1 }
-cgwsel = { eq = 0x00, width = 1 }
+colormath_cgadsub = { eq = 0x00, width = 1 }
+colormath_cgwsel = { eq = 0x00, width = 1 }
 
 [[checkpoint]]                 # A -> shadow: SUBTRACT (bit 7) grey from BG1 (bit 0)
 at_frame = 120
 input = "60:0x0080,65:0"
 [checkpoint.values]
 fx_state = { eq = 1, width = 1 }
-cgadsub = { eq = 0x81, width = 1 }       # $80 subtract | $01 BG1, half off
-cgwsel = { eq = 0x00, width = 1 }        # bit 1 clear: fixed colour, not sub-screen
+colormath_cgadsub = { eq = 0x81, width = 1 }       # $80 subtract | $01 BG1, half off
+colormath_cgwsel = { eq = 0x00, width = 1 }        # bit 1 clear: fixed colour, not sub-screen
 
 [[checkpoint]]                 # A -> underwater tint: ADD, subtract bit must be gone
 at_frame = 180
 input = "120:0x0080,125:0"
 [checkpoint.values]
 fx_state = { eq = 2, width = 1 }
-cgadsub = { eq = 0x01, width = 1 }
-cgwsel = { eq = 0x00, width = 1 }
+colormath_cgadsub = { eq = 0x01, width = 1 }
+colormath_cgwsel = { eq = 0x00, width = 1 }
 
 [[checkpoint]]                 # A -> sunset tint: same register pair, different COLDATA
 at_frame = 240
 input = "180:0x0080,185:0"
 [checkpoint.values]
 fx_state = { eq = 3, width = 1 }
-cgadsub = { eq = 0x01, width = 1 }
-cgwsel = { eq = 0x00, width = 1 }
+colormath_cgadsub = { eq = 0x01, width = 1 }
+colormath_cgwsel = { eq = 0x00, width = 1 }
 
 [asserts]
 fbhash = "8a07068c08f8b325"      # the sunset cast on all 16 swatches

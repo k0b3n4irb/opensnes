@@ -397,7 +397,14 @@ load_byte:
     jmp !load_byte
 
 load_done:
-    ; epilogue handshake: CPU parks the input latch at 0, we mirror it
+    ; epilogue handshake. First say the stream is over with a value no
+    ; index echo can be mistaken for at this point ($FF: the last echo was
+    ; (size-1) & $FF, and when that was 0 the CPU, waiting for our 0,
+    ; read the echo instead, sent its next command, and we waited here for
+    ; a 0 that never came — a 513-byte sample hung both sides until
+    ; 2026-10-03). Then the CPU parks the input latch at 0, we mirror it.
+    mov a, #$FF
+    mov $F4, a          ; "stream done, park the latch"
 -   mov a, $F4
     bne -
     mov a, #$00

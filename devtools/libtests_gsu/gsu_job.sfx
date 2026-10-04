@@ -51,3 +51,30 @@ mul_job:
     NOP
     STOP
     NOP
+
+; A third entry point (2026-10-03, GSU_BANK): what only a program linked at
+; its real address can do. It reads two bytes of a table that is part of the
+; program (ROMB = the program's bank, R14 = the table's address), reaches
+; its second half by an absolute jump, and leaves table[0] | table[1] << 8
+; in SRAM[8..9]. Assembled at 0 and placed elsewhere, the GETB reads another
+; part of the ROM and the jump leaves the program.
+rom_job:
+    IBT R0, #$70
+    RAMB
+    IBT R0, #GSU_BANK
+    ROMB                    ; ROM bank for GETB = the program's bank
+    IWT R14, #_rom_table    ; R14 = ROM address: the ROM buffer loads
+    GETB                    ; R0 = table[0]
+    MOVE R5, R0
+    IWT R15, #_rom_far      ; absolute jump
+    NOP
+_rom_table:
+    .db $A5, $3C
+_rom_far:
+    INC R14
+    GETBH                   ; R0 = (table[1] << 8) | low byte of R5
+    IBT R3, #$08
+    STW (R3)                ; SRAM[8..9] = $3CA5
+    NOP
+    STOP
+    NOP

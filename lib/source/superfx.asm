@@ -89,6 +89,8 @@ gsu_launch_wait:
 
     ; Configure GSU from WRAM variables
     lda.l gsu_cfgr
+    and #$DF                 ; MS0 (bit 5) must be zero at 21 MHz (fullsnes,
+                             ; CFGR); the clock below is 21 MHz
     sta.l $3037              ; CFGR
 
     lda #$01
@@ -357,58 +359,71 @@ gsuSetupHdmaBlanking:
     sta.l gsu_pres_bottom
     sta.l gsu_pres_top
 
-    ; Read parameters
-    lda 7,s                  ; topBlank
-    sta.l gsu_hdma_table     ; entry 0: count = top
-    lda #$80
-    sta.l gsu_hdma_table+1   ; entry 0: value = forced blank
+    ; Build the table: [top band] [visible] [bottom band] terminator.
+    ; Each band is one entry when it is 1-127 lines, two when 128-224,
+    ; none when 0 — a count of 0 ENDS an HDMA table (snesdev-wiki, HDMA
+    ; table format), so writing `top` as the first count with top = 0
+    ; left the channel idle and the whole frame was DMAed on visible lines
+    ; (until 2026-10-03). X walks the table. Counts above 224 are clamped.
+    ldx #gsu_hdma_table
 
-    ; Compute visible = 224 - top - bottom
-    ; HDMA count max = 127 (bit 7 = repeat flag). Split if > 127.
+    lda 7,s                  ; topBlank
+    jsr _gsu_hdma_band_blank
+
+    ; visible = 224 - top - bottom
     lda #224
     sec
-    sbc 7,s                  ; topBlank: 224 - top
-    sbc 5,s                  ; bottomBlank: 224 - top - bottom = visible
+    sbc 7,s                  ; - top
+    bcc _vis_none
+    sbc 5,s                  ; - bottom
+    bcc _vis_none
+    jsr _gsu_hdma_band_show
+_vis_none:
 
-    ; Split visible into two entries if > 127
-    cmp #128
-    bcc _vis_single
-
-    ; Two entries: 127 + remainder
-    pha                      ; save visible
-    lda #127
-    sta.l gsu_hdma_table+2
-    lda #$0F
-    sta.l gsu_hdma_table+3
-    pla
-    sec
-    sbc #127                 ; remainder
-    sta.l gsu_hdma_table+4
-    lda #$0F
-    sta.l gsu_hdma_table+5
-
-    ; Bottom blank
     lda 5,s                  ; bottomBlank
-    sta.l gsu_hdma_table+6
-    lda #$80
-    sta.l gsu_hdma_table+7
+    jsr _gsu_hdma_band_blank
+
     lda #$00
-    sta.l gsu_hdma_table+8   ; terminator
+    sta.l $000000,x            ; terminator
     bra _hdma_config
 
-_vis_single:
-    ; Single entry (visible <= 127)
-    sta.l gsu_hdma_table+2
-    lda #$0F
-    sta.l gsu_hdma_table+3
+; A = lines of forced blank (INIDISP = $80); X = table cursor (bank $00
+; WRAM, written with absolute long so DB does not matter). Clobbers Y.
+_gsu_hdma_band_blank:
+    ldy #$0080
+    bra _gsu_hdma_band
 
-    ; Bottom blank
-    lda 5,s                  ; bottomBlank
-    sta.l gsu_hdma_table+4
-    lda #$80
-    sta.l gsu_hdma_table+5
-    lda #$00
-    sta.l gsu_hdma_table+6   ; terminator
+; A = lines of display (INIDISP = $0F); X = table cursor. Clobbers Y.
+_gsu_hdma_band_show:
+    ldy #$000F
+_gsu_hdma_band:
+    .ACCU 8
+    .INDEX 16
+    cmp #0
+    beq _band_done           ; a band of 0 lines has no entry
+    cmp #128
+    bcc _band_one
+    pha
+    lda #127
+    sta.l $000000,x
+    tya
+    sta.l $000001,x
+    inx
+    inx
+    pla
+    sec
+    sbc #127
+    cmp #128
+    bcc _band_one            ; remainder (1..97) — a band is 224 at most
+    lda #127                 ; clamp a count above 254
+_band_one:
+    sta.l $000000,x
+    tya
+    sta.l $000001,x
+    inx
+    inx
+_band_done:
+    rts
 
 _hdma_config:
 
@@ -428,7 +443,7 @@ _hdma_config:
 
     ; Enable HDMA channel 1 through the hdma module's shadow of HDMAEN
     ; ($420C is write-only): a bare `sta $420C` switched every other
-    ; channel off, and the next hdmaEnable/hdmaDisable, which rewrites
+    ; channel off, and the next hdmaEnableMask/hdmaDisableMask, which rewrites
     ; $420C from the shadow, switched this one off (2026-09-26).
     lda #$02
     ora.l hdma_enabled_state

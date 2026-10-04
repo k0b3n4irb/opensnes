@@ -60,8 +60,10 @@ fixed fixSqrt(fixed x) {
      * sqrt(x) is sqrt(raw) * 16 (because 8.8 = real * 256 and
      * sqrt(real) = sqrt(raw) / 16, so sqrt(real) * 256 = sqrt(raw) * 16).
      * The shift-by-4 caps fractional precision at 4 bits — adequate
-     * for distance / hypot calculations, will be raised once the
-     * QBE 32-bit codegen (catalogue A7) lands and we can do
-     * `sqrt16(x << 8) >> 4` without truncation. */
+     * for distance / hypot calculations. It is a speed choice now: the
+     * full 8 bits need the root of a 24-bit value (`x << 8`), a 32-bit
+     * loop where this is one 16-bit one. The compiler could not do that
+     * shift when this was written; it can since v0.21.2, and nothing has
+     * asked for the slower, finer root yet. */
     return (fixed)((s16)(sqrt16((u16)x) << 4));
 }

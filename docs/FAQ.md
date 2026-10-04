@@ -45,7 +45,7 @@ Not in the core library, by design. Print to the screen with `textPrint`,
 developing.
 
 **Does `volatile` work?**
-Yes, since chantier A2: a volatile load or store survives the optimiser and is
+Yes, since 2026-05-09: a volatile load or store survives the optimiser and is
 not coalesced. The library still uses plain globals for its NMI handshakes, for
 cycle-cost reasons, but your MMIO patterns can rely on `volatile`.
 
@@ -98,8 +98,7 @@ own.
 
 **Does my game run on a PAL console?**
 It should, and the weekly PAL pass boots the whole example corpus at 312 lines
-and 50 Hz to keep it that way. Read the region at runtime with `getRegion()` or
-`isPAL()` when timing matters.
+and 50 Hz to keep it that way. Read the region at runtime with `isPAL()` when timing matters.
 
 **Can I run this on real hardware?**
 Yes. The ROMs are plain `.sfc` files; a flash cart runs them. The library's

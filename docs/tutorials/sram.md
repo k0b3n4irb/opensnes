@@ -58,9 +58,11 @@ HiROM one and `$40:0000` (BW-RAM) on an SA-1 one. Two limits to know:
   (`offset + size <= 8192`, the default `SRAM_SIZE`);
 - on **SA-1** they work since 2026-09-26 (crt0 sets SBWE); until then the
   build refused `USE_SRAM=1` with `USE_SA1=1`, because the writes were
-  dropped. luna does not yet write an SA-1 cart's BW-RAM to its `.srm`
-  file, so persistence across runs can only be checked on hardware or in
-  another emulator for now.
+  dropped. Two luna manifests (`d_sa1_bwram_write.toml`,
+  `e_sa1_bwram_read.toml`) power the cartridge off and on between the save
+  and the read.
+- **Super FX** — the save is the GSU's own Game Pak RAM, shared with the
+  framebuffers: see [Super FX: Saving](superfx.md#saving).
 
 This paragraph claimed the helpers "hide these details" long before they
 did — until 2026-09-20 they used the LoROM address on every build. The HiROM

@@ -75,7 +75,7 @@ ask. Precedents: `partners/luna/2026-09-20_to_luna_report.md`,
    need) — one line is enough: date, what was asked, what came back, what
    was needed. A sent report is renamed to its date. **Nobody validates
    it for us** — the owner has said so (2026-09-22: "je ne valide rien,
-   j'attends à ce que vous parliez entre vous"). Twenty engineers across
+   j'attends à ce que vous parliez entre vous"). The engineers of
    the three projects read these reports as engineers: every claim in one
    must have been re-checked the day it is sent, with the exact query,
    command or chunk id that lets them reproduce it, and a claim we cannot
@@ -88,6 +88,12 @@ ask. Precedents: `partners/luna/2026-09-20_to_luna_report.md`,
 4. **At every luna pin bump**: re-run the corpus golden queries
    (`.claude/notes/tech/cartouche_corpus.md`) and tell snes-rag if
    `luna-docs` lags the tag.
+
+5. **Once a week**: check whether Mukunda Johnson answered the five SNESMOD
+   issues we filed on 2026-10-03 (`mukunda-/snesmod` #6 to #10) and log the
+   check in `.claude/notes/partners/snesmod-upstream/README.md`, which has
+   the command and the date the next check is due. PVSnesLib is told about
+   the KOF bug only after he and we agree (owner decision).
 
 ## When this rule does NOT apply
 

@@ -221,6 +221,9 @@ void videoSetObjInterlace(u8 on);
  */
 void videoSetOverscan(u8 on);
 
+/* SETINI bit 6, Mode 7 EXTBG, has its setter in mode7.h (mode7SetExtBg),
+ * composed through the same software copy. */
+
 /**
  * @brief Enable/disable pseudo-hires (SETINI bit 3)
  *

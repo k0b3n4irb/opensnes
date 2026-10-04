@@ -1,6 +1,6 @@
 # hdma_helpers is the fixture for the HDMA effect helpers. Its committed
 # manifest (dma_hdma_helpers.toml) asserts DMA safety on the idle path, and
-# the idle path only calls hdmaSetup/hdmaEnable: every helper this example
+# the idle path only calls hdmaSetup/hdmaEnableMask: every helper this example
 # exists to show — the brightness and colour gradients, the iris wipe, the
 # water ripple and their Stop counterparts — sits behind a button, and the
 # ROM-coverage ratchet listed all nine as never executed (2026-09-19).

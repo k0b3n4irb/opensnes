@@ -11,6 +11,9 @@
  *   snesmod snesmodSetSoundTable, snesmodAllocateSoundRegion, snesmodFlush,
  *           snesmodGetPosition
  *   console consoleInitEx, nmiSet
+ *   combo   irq + SNESMOD: a V-timer IRQ armed before snesmodInit keeps
+ *           firing once per frame while snesmodProcess runs, and the
+ *           driver leaves STAT78's latch flag clear (testing audit T5)
  *
  * nmiSet takes the bank from the far pointer it is given, so the callback
  * may live in any bank (the header's "must be in bank 0" note is stale; the
@@ -34,7 +37,8 @@ u16 r_hdma_init;     /* hdmaGetEnabled() after hdmaWaveInit            -> 0 */
 u16 r_hdma_wave;     /* ... after hdmaWaveH(6, 0, 8, 4)                -> 0x40 */
 u16 r_hdma_setup;    /* ... after hdmaGradient(5) + hdmaWindowShape(4): setup
                       * does not enable                                 -> 0x40 */
-u16 r_hdma_both;     /* ... after hdmaEnable(ch 5 | ch 4)              -> 0x70 */
+u16 r_hdma_both;     /* ... after hdmaEnableMask(ch 5 | ch 4)              -> 0x70 */
+u16 r_hdma_names;    /* hdmaDisable / hdmaEnable (deprecated) still take a mask -> 1 */
 u16 r_m7_rot_sin;    /* m7_sin after mode7Rotate(90): table[64]         -> 127 */
 u16 r_chips;         /* plain LoROM: sa1IsReady | sa1Init<<1 | gsuIsPresent<<2, all 0; bit 4 = the
                       * deprecated sa1Init agrees with sa1IsReady                     -> 0x10 */
@@ -42,6 +46,12 @@ u16 r_nmi_calls;     /* nmiSet callback invocations over 5 frames       -> 5 */
 u16 r_nmi_after;     /* ... 3 more frames after nmiClear                -> 5 */
 u16 r_mod_pos;       /* snesmodGetPosition() as a u16: high byte clean  -> lt 0x100 */
 u16 r_mod_flush;     /* spc_fread == spc_fwrite after snesmodFlush      -> 1 */
+u16 r_hdma_speed;    /* hdma_wave_speed after hdmaWaveSetSpeed(3)       -> 3 */
+extern u8 hdma_wave_speed;   /* the wave module's speed byte: internal, no public header declares it */
+u16 r_irq_mod;       /* V-timer IRQs over 10 frames of snesmodProcess   -> 10 */
+u16 r_mod_latch;     /* STAT78 & 0x40 right after snesmodProcess        -> 0 */
+volatile u16 irq_count;              /* counted by irqProbeHandler (irq.asm) */
+extern void irqProbeHandler(void);   /* irq.asm, bank 0 */
 u16 r_done;          /* reached the end                                 -> 0xBEEF */
 
 extern u8 spc_fread, spc_fwrite;
@@ -61,6 +71,16 @@ int main(void) {
 
     consoleInitEx(0);            /* the documented alias of consoleInit */
 
+    /* IRQ + SNESMOD (testing audit 2026-10-03, T5): the timer IRQ is armed
+     * BEFORE the driver boots. snesmodInit used to end on `lda #$81 / sta
+     * $4200` and drop an armed H/V timer (fixed 2026-10-03); the count below
+     * is taken once the module plays, so a dropped IRQ reads 0, not 10. */
+    irq_count = 0;
+    irqSet((void *)irqProbeHandler);
+    irqSetVTimer(120);
+    WaitForVBlank();
+    irqEnable(IRQ_VTIMER);
+
     /* SNESMOD first: boot the driver and start the module so the position
      * and the command queue mean something. */
     snesmodInit();
@@ -78,6 +98,18 @@ int main(void) {
     r_mod_flush = (spc_fread == spc_fwrite) ? 1 : 0;
     for (i = 0; i < 30; i++) { WaitForVBlank(); snesmodProcess(); }
     r_mod_pos = (u16)snesmodGetPosition();
+    /* Ten frames of the driver's per-frame work with the V-timer at line
+     * 120: one IRQ per frame, none lost to the driver's `$4200` writes or
+     * its scanline wait. Then the latch flag: until 2026-10-03 the wait
+     * latched the counters ($2137), which raised STAT78 bit 6 — the flag
+     * the Super Scope code takes for a shot (anomie-timing 626b31bd887c2581:
+     * set when latched, cleared on read; snesdev-wiki 6001605c7d4b1daf).
+     * The read here is the first since the previous frame's NMI. */
+    irq_count = 0;
+    for (i = 0; i < 10; i++) { WaitForVBlank(); snesmodProcess(); }
+    r_irq_mod = irq_count;
+    snesmodProcess();
+    r_mod_latch = REG_STAT78 & 0x40;
 
     /* nmiSet: five frames of callbacks, none after nmiClear */
     nmi_calls = 0;
@@ -104,8 +136,13 @@ int main(void) {
     hdmaGradient(5, grad_table);
     hdmaWindowShape(4, win_table);
     r_hdma_setup = hdmaGetEnabled();
-    hdmaEnable((1 << 5) | (1 << 4));
+    hdmaEnableMask((1 << 5) | (1 << 4));
     r_hdma_both = hdmaGetEnabled();
+    /* D1: the old names are the same entry points until 1.0 */
+    hdmaDisable(1 << 4);
+    r_hdma_names = (hdmaGetEnabled() == 0x60) ? 1 : 0;
+    hdmaEnable(1 << 4);
+    if (hdmaGetEnabled() != 0x70) r_hdma_names = 0;
     /* hdmaColorGradient on colour 37 (not 0): the index was written as
      * [index, 0] to a register written twice, so every gradient landed on
      * colour 0. Red at the top, blue at the bottom; the last chunk leaves
@@ -127,6 +164,9 @@ int main(void) {
 
     setScreenOn();
     WaitForVBlank();
+    hdmaWaveSetSpeed(3);
+    r_hdma_speed = hdma_wave_speed;
+
     r_done = 0xBEEF;
     while (1) { WaitForVBlank(); snesmodProcess(); }
     return 0;

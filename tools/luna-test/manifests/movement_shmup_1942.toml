@@ -36,3 +36,9 @@ input = "120:0x0080,124:0"
 "game+64" = { eq = 1, width = 1 }        # bullets[0].active
 "game+60" = 16                           # bullets[0].x == player_x + 8
 "game" = 8                            # the ship did not drift while firing
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

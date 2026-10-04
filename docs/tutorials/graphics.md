@@ -24,7 +24,7 @@ int main(void) {
     consoleInit();
 
     // Set video mode 1 (most common for games)
-    setMode(BGMODE_MODE1);
+    setMode(BG_MODE1, 0);
 
     // Enable BG1 on main screen
     REG_TM = TM_BG1;

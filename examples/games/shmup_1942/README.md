@@ -36,11 +36,13 @@ visible ball exits the top of the playfield.
 I attempted a BG3 + `text` module HUD (score / lives) and it produced
 two symptoms I couldn't resolve in one session:
 
-1. **Bank $00 ROM is razor-tight.** The `text` module + a couple of
-   string-literal labels (`"S"` / `"L"`) bring bank-0 down to 12 bytes
-   free, below the 16-byte fail threshold. Even tiny strings spill to
-   bank 1 = garbage when read. Workaround: use `textPutChar('S')`
-   with char literals (no string in ROM).
+1. **Bank $00 ROM was razor-tight** when this was written: the `text`
+   module plus two string literals brought bank 0 to 12 bytes free, under
+   the fail threshold, and at the time a string in bank 1 was read as
+   garbage. Neither holds since v0.41.0: C const data, strings included,
+   goes to the asset banks and every read of it is a far read (see
+   `KNOWN_LIMITATIONS.md`, "Bank $00 ROM is code only"). The
+   `textPutChar('S')` form stayed for brevity, not out of need.
 2. **BG3 enable hides BG1.** As soon as `setMainScreen` includes
    `TM_BG3`, the procedural terrain disappears and the screen turns
    solid backdrop colour, regardless of:

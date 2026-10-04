@@ -4,7 +4,7 @@
  * @ingroup examples
  *
  * Demonstrates metasprites: large characters built from multiple hardware
- * OAM entries using oamDrawMeta(). The SNES OBJSEL register ($2101)
+ * OAM entries using oamDrawMetasprite(). The SNES OBJSEL register ($2101)
  * provides two sprite sizes (small and large) that all 128 OAM entries
  * share. This example lets the user switch between three size combinations
  * to see how the same character is composed from differently-sized pieces.
@@ -53,7 +53,7 @@ extern u8 spritehero8_til[];
  * Each .inc file defines arrays (e.g., hero8_frame0[]) that describe how
  * to compose a character from multiple OAM entries. Each entry in the array
  * contains the relative X/Y offset and tile number for one hardware sprite.
- * oamDrawMeta() reads these arrays to populate OAM.
+ * oamDrawMetasprite() reads these arrays to populate OAM.
  */
 #include "res/hero8_meta.inc"
 #include "res/hero16_meta.inc"
@@ -112,9 +112,9 @@ static AnimPlayer hero16_anim = ANIM_PLAYER_INIT;
 #define TILE_BYTES    32
 
 /**
- * @brief Base tile numbers for oamDrawMeta().
+ * @brief Base tile numbers for the styles below.
  *
- * oamDrawMeta() adds the baseTile offset to each metasprite entry's relative
+ * oamDrawMetasprite() adds the style's baseTile to each metasprite entry's relative
  * tile number to compute the final OAM tile index. Since all three sprite
  * sheets are loaded contiguously in VRAM, each sheet's base tile is the
  * cumulative tile count of all preceding sheets.
@@ -122,6 +122,18 @@ static AnimPlayer hero16_anim = ANIM_PLAYER_INIT;
 #define BASE_TILE_32  0                                  /**< First tile of 32x32 sheet */
 #define BASE_TILE_16  (HERO32_TILES)                     /**< First tile of 16x16 sheet (192) */
 #define BASE_TILE_8   (HERO32_TILES + HERO16_TILES)      /**< First tile of 8x8 sheet (288) */
+
+/**
+ * @brief One style per (sheet, OBJ size) pair the three modes use.
+ *
+ * What oamDrawMetasprite() needs beside the frame and the position: the
+ * sheet's base tile and which half of the OBJSEL size pair its pieces are.
+ * Nothing is flipped here, so pieceSize / width / height stay 0.
+ */
+static const MetaspriteStyle style32_large = { .baseTile = BASE_TILE_32, .size = OBJ_LARGE };
+static const MetaspriteStyle style16_large = { .baseTile = BASE_TILE_16, .size = OBJ_LARGE };
+static const MetaspriteStyle style16_small = { .baseTile = BASE_TILE_16, .size = OBJ_SMALL };
+static const MetaspriteStyle style8_small  = { .baseTile = BASE_TILE_8,  .size = OBJ_SMALL };
 
 /** @brief Currently selected OBJ size mode index (0-2), controlled by UP/DOWN */
 u16 selectedItem;
@@ -189,9 +201,9 @@ static void changeObjSize(void) {
 }
 
 /**
- * @brief Render metasprites using oamDrawMeta() for the current size mode.
+ * @brief Render metasprites using oamDrawMetasprite() for the current size mode.
  *
- * oamDrawMeta() reads metasprite frame data (tile offsets + positions) and
+ * oamDrawMetasprite() reads metasprite frame data (tile offsets + positions) and
  * populates multiple OAM entries to compose a large character from smaller
  * hardware sprite pieces. It returns the next available OAM ID, allowing
  * multiple metasprites to be drawn without ID conflicts.
@@ -204,24 +216,20 @@ static void drawSprites(void) {
 
     if (selectedItem == 0) {
         /* Mode 0: hero16 as LARGE (16x16) + hero8 as SMALL (8x8) */
-        nextId = oamDrawMeta(0, 64, 140,
-                             animTickMeta(&hero16_anim, hero16_walk_table),
-                             BASE_TILE_16, 0, OBJ_LARGE);
-        oamDrawMeta(nextId, 160, 148, hero8_frame0,
-                    BASE_TILE_8, 0, OBJ_SMALL);
+        nextId = oamDrawMetasprite(0, 64, 140,
+                                   animTickMeta(&hero16_anim, hero16_walk_table),
+                                   &style16_large, 0);
+        oamDrawMetasprite(nextId, 160, 148, hero8_frame0, &style8_small, 0);
     } else if (selectedItem == 1) {
         /* Mode 1: hero32 as LARGE (32x32) + hero8 as SMALL (8x8) */
-        nextId = oamDrawMeta(0, 48, 108, hero32_frame0,
-                             BASE_TILE_32, 0, OBJ_LARGE);
-        oamDrawMeta(nextId, 160, 148, hero8_frame0,
-                    BASE_TILE_8, 0, OBJ_SMALL);
+        nextId = oamDrawMetasprite(0, 48, 108, hero32_frame0, &style32_large, 0);
+        oamDrawMetasprite(nextId, 160, 148, hero8_frame0, &style8_small, 0);
     } else {
         /* Mode 2: hero32 as LARGE (32x32) + hero16 as SMALL (16x16) */
-        nextId = oamDrawMeta(0, 48, 108, hero32_frame0,
-                             BASE_TILE_32, 0, OBJ_LARGE);
-        oamDrawMeta(nextId, 160, 124,
-                    animTickMeta(&hero16_anim, hero16_walk_table),
-                    BASE_TILE_16, 0, OBJ_SMALL);
+        nextId = oamDrawMetasprite(0, 48, 108, hero32_frame0, &style32_large, 0);
+        oamDrawMetasprite(nextId, 160, 124,
+                          animTickMeta(&hero16_anim, hero16_walk_table),
+                          &style16_small, 0);
     }
 }
 

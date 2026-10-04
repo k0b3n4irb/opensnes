@@ -83,8 +83,8 @@ void marioupdate(u16 idx) {
     objCollidMapWithSlopes(idx);  /* slope-aware collision */
     /* Animation state machine: STAND / WALK / JUMP / FALL */
     objUpdateXY(idx);
-    oambuffer[0].oamx = mariox - x_pos;
-    oambuffer[0].oamy = marioy - y_pos;
+    oambuffer[0].oamx = mariox - mapGetCameraX();
+    oambuffer[0].oamy = marioy - mapGetCameraY();
     oamDynamicDraw(0);
     mapUpdateCamera(mariox, marioy);
 }

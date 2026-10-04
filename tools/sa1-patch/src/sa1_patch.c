@@ -27,6 +27,8 @@
 
 #define MAP_MODE_OFFSET   0x7FD5
 #define SA1_MAP_MODE_BITS 0x03   /* bits 0-1: SA-1 = $23 vs LoROM = $20 */
+#define COMPLEMENT_OFFSET 0x7FDC /* checksum complement, then the checksum at $7FDE */
+#define CHECKSUM_OFFSET   0x7FDE
 
 static void
 usage(const char *argv0)
@@ -76,6 +78,32 @@ main(int argc, char **argv)
         perror("fputc");
         fclose(fp);
         return 1;
+    }
+    /* The header checksum ($7FDE, little-endian) is the 16-bit sum of every
+     * ROM byte and its complement sits at $7FDC; the linker computed them
+     * for the byte we just changed. Add the difference, so the pair stays
+     * right (every SA-1 ROM was off by the +3 of the mode bits until
+     * 2026-10-03; luna and most emulators check only that the two fields
+     * are complements, a console or a strict tool sees the mismatch). */
+    {
+        int delta = (byte | SA1_MAP_MODE_BITS) - byte;
+        unsigned sum;
+        int lo, hi;
+        if (fseek(fp, CHECKSUM_OFFSET, SEEK_SET) != 0 || (lo = fgetc(fp)) == EOF
+            || (hi = fgetc(fp)) == EOF) {
+            fprintf(stderr, "%s: short read at $%X\n", path, CHECKSUM_OFFSET);
+            fclose(fp);
+            return 1;
+        }
+        sum = ((unsigned)hi << 8 | (unsigned)lo) + (unsigned)delta;
+        sum &= 0xFFFF;
+        if (fseek(fp, COMPLEMENT_OFFSET, SEEK_SET) != 0
+            || fputc((sum ^ 0xFFFF) & 0xFF, fp) == EOF || fputc(((sum ^ 0xFFFF) >> 8) & 0xFF, fp) == EOF
+            || fputc(sum & 0xFF, fp) == EOF || fputc((sum >> 8) & 0xFF, fp) == EOF) {
+            perror("fputc");
+            fclose(fp);
+            return 1;
+        }
     }
 
     if (fclose(fp) != 0) {

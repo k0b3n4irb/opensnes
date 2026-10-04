@@ -1,0 +1,6 @@
+# b = a copies both 16-bit members: the second one is read from a+2 and
+# written to b+2 (the first may be folded from the constant just stored).
+in main: present sta\.w b\n
+in main: present lda\.w a\+2\n\tsta\.w b\+2
+# no halfword ops, no blit: the copy is plain loads and stores
+absent blit

@@ -105,6 +105,11 @@ u16 profileGetScanline(void);
 
 /**
  * @brief Start a scanline-based timing measurement
+ *
+ * @note Reads SLHV ($2137) to latch the H/V counters, which also sets
+ *       STAT78 bit 6 — the flag the Super Scope module reads as "the gun
+ *       fired this frame". Do not profile scanlines in a frame whose
+ *       scope input matters.
  */
 void profileScanlineStart(void);
 
@@ -121,8 +126,12 @@ u16 profileScanlineEnd(void);
  *============================================================================*/
 
 /**
- * @brief Get total frame count since boot (wraps at 65535)
+ * @brief The same counter as getFrameCount() (wraps at 65535)
+ *
+ * It reads the frame counter the NMI handler keeps, not a counter of the
+ * profiler; getFrameCount() (console.h) is the name kept.
  */
+OPENSNES_DEPRECATED("use getFrameCount() — it reads the same counter")
 u16 profileGetFrameCount(void);
 
 /**

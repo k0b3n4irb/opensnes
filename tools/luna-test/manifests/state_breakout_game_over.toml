@@ -21,3 +21,9 @@ score = { eq = 0, width = 2 }
 at_frame = 2200                  # playing again: the idle paddle loses a ball
 [checkpoint.values]
 lives = { eq = 3, width = 2 }
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

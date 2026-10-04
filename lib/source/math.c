@@ -18,10 +18,10 @@
  * Sine values range from -256 to 256 (-1.0 to 1.0 in 8.8).
  *============================================================================*/
 
-/* External linkage so the `inline fixSin/fixCos` in math.h can index
- * into the table from any TU (wave 4 retrofit). One copy of the table
- * lives here; every caller links to the same symbol. */
-const s16 sine_table[256] = {
+/* Prefixed and out of math.h since 2026-10-03 (API decision D4): it was
+ * `sine_table`, a name an example already used for a table of its own.
+ * fixed32.asm reads it too. */
+const s16 math_sine_table[256] = {
     /* 0-15 (0° to 21°) */
        0,    6,   13,   19,   25,   31,   37,   44,
       50,   56,   62,   68,   74,   80,   86,   92,
@@ -76,10 +76,9 @@ const s16 sine_table[256] = {
  * Trigonometry Functions
  *============================================================================*/
 
-/* fixSin / fixCos are `inline` in math.h. Force-emit canonical bodies
- * here for fn-pointer / fallback callers (wave 4 retrofit). */
-fixed (*const __opensnes_force_emit_fixSin)(u8) = fixSin;
-fixed (*const __opensnes_force_emit_fixCos)(u8) = fixCos;
+/* fixSin / fixCos live in math.asm: a table read, written by hand because
+ * the compiled C body cost about 620 master cycles a call once it stopped
+ * being inline (measured 2026-10-03 on backgrounds/mode2, 32 calls a frame). */
 
 /* fix32Sin / fix32Cos are still implemented in lib/source/fixed32.asm.
  *

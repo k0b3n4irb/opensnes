@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# commit-msg hook: refuse a message that `devtools/lint_commits.py` would
+# fail in CI (type/scope allow-lists, no trailing period, no Co-Authored-By).
+# Installed by `make hooks` (git config core.hooksPath scripts/githooks).
+exec python3 "$(git rev-parse --show-toplevel)/devtools/lint_commits.py" --message-file "$1"

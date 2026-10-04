@@ -97,9 +97,19 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 [optional footer]
 ```
 
-**Types**: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `chore`, `build`
+**Types**: `feat`, `fix`, `perf`, `refactor`, `test`, `docs`, `chore`,
+`build`, `style`, `ci`, `revert`
 
-**Scopes**: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`
+**Scopes**: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`, plus
+the directory names listed in `devtools/lint_commits.py` (`ALLOWED_SCOPES`).
+`tools` is a scope, not a type: `build(tools): …`, never `tools(build): …`.
+
+CI lints every pushed commit with `devtools/lint_commits.py`. Run
+`make hooks` once after cloning: it installs a `commit-msg` hook that
+refuses a non-conforming message before the commit exists, and a
+`pre-push` hook that lints the pushed range. Without them the first
+place the lint runs is CI, after the push, and a bad subject on a shared
+branch can only be repaired by a force-push.
 
 #### Testing
 

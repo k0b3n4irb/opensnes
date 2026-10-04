@@ -197,5 +197,32 @@ class SlashCount(unittest.TestCase):
                              for m in r.finditer(text)))
 
 
+class BenchmarkTable(unittest.TestCase):
+    PAGE = (
+        "| **Total cycle reduction** | **−20.0 %** vs PVSnesLib + 816-opt (40 vs 50 cycles) |\n"
+        "```\n"
+        "  add_u16                     30        20        15    -25.0%\n"
+        "  sub_u16                     40        30        25    -16.7%\n"
+        "  TOTAL                       70        50        40    -20.0%\n"
+        "```\n")
+    BASE = {"add_u16": 15, "sub_u16": 25, "extra": 9}
+
+    def test_clean(self):
+        self.assertEqual(check_doc_drift.bench_table_drifts(self.PAGE, self.BASE), [])
+
+    def test_stale_row(self):
+        out = check_doc_drift.bench_table_drifts(self.PAGE, dict(self.BASE, add_u16=14))
+        self.assertEqual(len(out), 1)
+        self.assertIn("add_u16", out[0])
+
+    def test_wrong_total_and_summary(self):
+        page = self.PAGE.replace("50        40    -20.0%", "50        41    -20.0%")
+        out = check_doc_drift.bench_table_drifts(page, self.BASE)
+        self.assertTrue(any("add up to" in d for d in out))
+        page = self.PAGE.replace("−20.0 %", "−32.2 %")
+        out = check_doc_drift.bench_table_drifts(page, self.BASE)
+        self.assertTrue(any("summary" in d for d in out))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -20,6 +20,16 @@
  *   (the header declares 32 KB). crt0 enables SNES-side writes (SBWE); before
  *   that the combination was refused because the writes were dropped.
  *
+ * - **Super FX** (`USE_SUPERFX=1`, since 2026-10-03): there is no separate
+ *   save chip. The battery keeps the GSU's Game Pak RAM ($70:0000-$FFFF,
+ *   sized by `GSU_RAM_KB`), and "offset" is an offset into it. That RAM is
+ *   also where the GSU draws: use the Offset functions and pick a region your
+ *   framebuffers do not cover (two 16 KB buffers end at $8000; the tests use
+ *   $E000). sramSave(), sramLoad() and sramClear() work from offset 0, the
+ *   first framebuffer. While a job runs the module takes the RAM for the
+ *   transfer and gives it back; the GSU waits meanwhile, so keep a save
+ *   small or do it between jobs.
+ *
  * Source pointers may be in any bank (a `const` save template in ROM works);
  * destination pointers are work RAM. Most games use 2 KB-8 KB of SRAM.
  *

@@ -335,7 +335,7 @@ spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
             if (channel > 7) {
                 printf("%s: " ERRORRED("error") ": More than 8 channels. Found channel %i\n", ERRORBRIGHT("smconv"), channel + 1);
                 free(row_buf);
-                return p;
+                exit(1);    /* until 2026-10-03: returned the truncated pattern and exit code 0 */
             }
 
             u8 maskvar;
@@ -641,8 +641,10 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
                     m->totalsize, bytesfree);
             }
 
-            if (m->totalsize > spc_ram_size_g)
+            if (m->totalsize > spc_ram_size_g) {
                 printf("%s: " ERRORRED("error") ": Module is too big. Maximum is %i bytes\n", ERRORBRIGHT("smconv"), spc_ram_size_g);
+                exit(1);    /* until 2026-10-03: printed, then wrote the soundbank with exit code 0 */
+            }
         }
 
         if (totalsizem1 == 0)

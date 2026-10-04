@@ -26,7 +26,7 @@ You MUST adhere to the project's CLAUDE.md and `.claude/rules/`. In particular:
    - WRAM data port \$2180-\$2183 is NOT NMI-safe.
    - `volatile` is honoured by QBE since chantier A2; lib still prefers plain globals for NMI handshakes for cycle-cost equivalence.
    - WLA-DX loses `.ACCU`/`.INDEX` tracking after branch merges — require explicit `.ACCU 8`/`.ACCU 16` after every `rep`/`sep` in hand-written ASM.
-4. **ABI lint awareness** (`.claude/rules/abi_lint.md`): for any public ASM function, verify stack offsets against the C signature (2-byte slots for u8/s8/u16/s16/bool, 4-byte slots for u32/s32/pointer post-A6), accounting for prologue pushes (php base=5, phb +1, phd +2, phx/phy +2 assuming 16-bit X/Y). Flag mismatches; only `audio.asm` is legitimately skip-marked.
+4. **ABI lint awareness** (`.claude/rules/abi_lint.md`): for any public ASM function, verify stack offsets against the C signature (2-byte slots for u8/s8/u16/s16/bool, 4-byte slots for u32/s32/pointer post-A6), accounting for prologue pushes (php base=5, phb +1, phd +2, phx/phy +2 assuming 16-bit X/Y). Flag mismatches; no file is skip-marked today (the legacy `audio.asm` that was is gone since the audio v2 chantier), and `lib/contrib` is in the gate too.
 5. **Single source of truth for constants.** Any shared constant must match between `lib/source/*.asm` (`.EQU`) and `lib/include/snes/*.h` (`#define`). OpenSNES uses index values, NOT PVSnesLib's pre-shifted register values. Grep both files (case-insensitive, `grep -i`) when in doubt.
 
 ## Design philosophy as acceptance criteria

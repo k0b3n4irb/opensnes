@@ -142,7 +142,9 @@ u8 audioInit(void) {
         sample_mirror[i].flags = 0;
     }
 
-    apuWaitBoot();
+    if (apuWaitBoot() != 0) {
+        return AUDIO_ERR_TIMEOUT;   /* the IPL is not running: nothing to upload to */
+    }
     apuUpload(audio_driver_blob, SPC_DRIVER_BASE,
               /* two labels of one asm section, not two objects */
               /* cppcheck-suppress comparePointers */
@@ -206,6 +208,11 @@ u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
     if (voice >= AUDIO_MAX_VOICES) {
         return AUDIO_ERR_INVALID_ID;
     }
+    /* VxVOLL / VxVOLR are signed: a value of 128 or more is a negative
+     * volume, which inverts the phase (anomie-sdsp). Clamp to the 0-127 the
+     * header promises (until 2026-10-03 the byte went through as given). */
+    if (volumeL > 127) volumeL = 127;
+    if (volumeR > 127) volumeR = 127;
     err = cmd_send(OP_VVOL, voice, (u16)((u16)volumeR << 8 | volumeL));
     if (err == AUDIO_OK) {
         /* mirror keeps the max of both for state reporting */
@@ -296,9 +303,20 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
         }
     }
 
-    /* Epilogue: park the input latch at 0; the driver mirrors it and
-     * returns to command mode (unambiguous even if the last index
-     * byte was already 0 — both sides converge on 0/0). */
+    /* Epilogue. The driver says the stream is over with $FF — a value
+     * distinct from the last index echo — then we park the input latch at
+     * 0 and it mirrors it. (Until 2026-10-03 we parked at once and waited
+     * for the mirror; when the last index byte was 0 — size 513, 2817… —
+     * its echo passed for the mirror, the next command went out while the
+     * driver still waited for the 0, and both sides hung.) */
+    for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
+        if (APU_IO0 == 0xFF) {
+            break;
+        }
+    }
+    if (spin == ACK_SPIN_MAX) {
+        return AUDIO_ERR_TIMEOUT;
+    }
     APU_IO0 = 0;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
         if (APU_IO0 == 0) {
@@ -361,13 +379,19 @@ u16 audioGetFreeMemory(void) {
  * Playback
  *============================================================================*/
 
-/* pan 0..15 -> L/R 7-bit volumes, linear crossfade scaled by vol */
+/* pan 0..15 -> L/R 7-bit volumes, linear crossfade scaled by vol.
+ * 16 positions have no exact middle, so the right weight skips the 8/16
+ * step: pan 8 (AUDIO_PAN_CENTER) gives L = R = vol/2, 0 is hard left, 15
+ * hard right. Until 2026-10-04 the weights were pan/15 and (15-pan)/15,
+ * which put the centre at L = 7/15, R = 8/15 (59 / 67 for vol 127). */
 static void pan_to_lr(u8 vol, u8 pan, u8 *l, u8 *r) {
+    u16 w;
     if (pan > AUDIO_PAN_RIGHT) {
         pan = AUDIO_PAN_RIGHT;
     }
-    *l = (u8)(((u16)vol * (u16)(AUDIO_PAN_RIGHT - pan)) / AUDIO_PAN_RIGHT);
-    *r = (u8)(((u16)vol * (u16)pan) / AUDIO_PAN_RIGHT);
+    w = (pan <= AUDIO_PAN_CENTER) ? pan : (u16)pan + 1;   /* 0..16, 8 at centre */
+    *r = (u8)(((u16)vol * w) >> 4);
+    *l = (u8)(vol - *r);
 }
 
 u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {

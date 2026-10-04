@@ -177,7 +177,7 @@ int main(void) {
     colorMathSetCondition(COLORMATH_INSIDE);   /* CGWSEL bits 5-4 = 01 */
     colorMathSetSource(COLORMATH_SRC_FIXED);   /* CGWSEL bit 1 = 0 */
     colorMathSetOp(COLORMATH_SUB);             /* CGADSUB bit 7 */
-    colorMathSetLayers(COLORMATH_BG2);         /* CGADSUB bit 1 */
+    colorMathSetLayers(LAYER_BG2);         /* CGADSUB bit 1 */
     colorMathSetFixedColor(12, 12, 12);        /* COLDATA: R = G = B = 12 */
 
     /*--------------------------------------------------------------------
@@ -188,7 +188,7 @@ int main(void) {
      * WOBJSEL ($2125) = 0x20: Color Math Window 1 Enable
      * TMW ($212E) = 0x00: no main screen masking
      *--------------------------------------------------------------------*/
-    windowEnable(WINDOW_1, WINDOW_BG2 | WINDOW_MATH);   /* W12SEL $20, WOBJSEL $20 */
+    windowEnable(WINDOW_1, LAYER_BG2 | WINDOW_MATH);   /* W12SEL $20, WOBJSEL $20 */
     windowSetMainMask(0);                               /* TMW $00 */
 
     /*--------------------------------------------------------------------
@@ -197,7 +197,7 @@ int main(void) {
     /* NMI uses DMA channel 7 for OAM — use channels 4+5 for HDMA */
     hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0, hdma_left);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1, hdma_right);
-    hdmaEnable((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
+    hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
     /* Turn on screen */
     setScreenOn();

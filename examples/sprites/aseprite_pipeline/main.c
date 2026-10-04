@@ -24,7 +24,7 @@
  * A to toggle between the two generated clips.
  *
  * @par SNES Concepts
- * - Metasprite composition from multiple OAM entries (oamDrawMeta)
+ * - Metasprite composition from multiple OAM entries (oamDrawMetasprite)
  * - The anim.h player driving a metasprite via animTickMeta()
  * - OBJSEL size mode + OBJ VRAM base for 16×16 hardware sprites
  * - Sprite palette at CGRAM 128 (OBJ_CGRAM_BASE)
@@ -59,6 +59,10 @@
  * the HERO_ANIM_* index enum. Frame values index hero_metasprites[] above.
  */
 #include "res/hero_anim.h"
+
+/** @brief The hero's sheet starts at tile 0 and its pieces are the small
+ *  OBJ size; the frame comes from the animation at each call. */
+static const MetaspriteStyle hero_style = { .baseTile = 0, .size = OBJ_SMALL };
 
 /** @brief 4bpp hero tiles (res/hero.pic, incbin'd in data.asm) */
 extern u8 hero_til[], hero_tilend[];
@@ -133,8 +137,8 @@ int main(void) {
     drawLabel(current);
 
     /* First frame drawn during force blank, then screen on. */
-    oamDrawMeta(0, HERO_X, HERO_Y,
-                animTickMeta(&hero_player, hero_metasprites), 0, 0, OBJ_SMALL);
+    oamDrawMetasprite(0, HERO_X, HERO_Y,
+                      animTickMeta(&hero_player, hero_metasprites), &hero_style, 0);
     WaitForVBlank();
     setScreenOn();
 
@@ -148,9 +152,9 @@ int main(void) {
         }
 
         /* animTickMeta advances the player one tick and yields this frame's
-         * MetaspriteItem*, which oamDrawMeta expands into 6 OAM entries. */
-        oamDrawMeta(0, HERO_X, HERO_Y,
-                    animTickMeta(&hero_player, hero_metasprites), 0, 0, OBJ_SMALL);
+         * MetaspriteItem*, which oamDrawMetasprite expands into 6 OAM entries. */
+        oamDrawMetasprite(0, HERO_X, HERO_Y,
+                          animTickMeta(&hero_player, hero_metasprites), &hero_style, 0);
         WaitForVBlank();
     }
 

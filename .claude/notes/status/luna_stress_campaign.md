@@ -1,5 +1,10 @@
 # luna stress-test campaign — running log
 
+> **Status 2026-10-03: CLOSED.** The campaign stopped with the 2026-08-08
+> wave; what it found went to luna and was shipped or answered (luna is at
+> v1.31.0, our open list for luna is empty). A new campaign starts a new
+> note. Kept as a log.
+>
 > **Status 2026-09-26:** dormant since the 2026-08-08 wave. The method below
 > dates from then: the pin is now v1.27.0 (not v1.13.0), Mesen2 is retired
 > (luna is the only emulator; a second opinion comes from the Cartouche

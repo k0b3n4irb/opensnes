@@ -31,7 +31,7 @@
     ; accessible via the bank $00 mirror ($00:8000-FFFF -> $40:8000-FFFF).
     SLOTSIZE $10000         ; 64KB per slot (full HiROM bank)
     DEFAULTSLOT 0
-    SLOT 0 $0000 $10000     ; ROM at $0000-$FFFF (64KB per bank)
+    SLOT 0 START $0000 SIZE $10000 NAME "ROM"   ; ROM at $0000-$FFFF (64KB per bank); named like memmap_hirom.inc's slot 0
     SLOT 1 $0000 $2000      ; Work RAM at $0000-$1FFF (8KB for DP/Stack)
     SLOT 2 $2000 $E000      ; Work RAM at $2000-$FFFF (56KB)
     SLOT 3 $0000 $10000     ; Bank $7E full RAM (64KB)
@@ -59,10 +59,10 @@
     SLOWROM                 ; 2.68MHz ROM access
 .endif
     HIROM                   ; HiROM memory mapping
-    CARTRIDGETYPE CARTRIDGETYPE  ; $21=ROM, $23=ROM+SRAM
+    CARTRIDGETYPE CARTRIDGETYPE  ; from make: $00=ROM, $02=ROM+RAM+battery (the HiROM bit lives in $FFD5, not here)
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
     SRAMSIZE SRAMSIZE_VAL   ; $00=None, $03=8KB
-    COUNTRY $01             ; North America (NTSC)
+    COUNTRY COUNTRY_VAL     ; $FFD9: $01 USA/NTSC (default), $02 Europe/PAL, $00 Japan (make ROM_REGION=)
     LICENSEECODE $00        ; Unlicensed
     VERSION $00             ; Version 1.0
 .ENDSNES

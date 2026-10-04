@@ -62,3 +62,9 @@ oamMemory    = { eq = 114, width = 1 }
 
 [asserts.oam]                  # the whole flock really reaches the PPU
 visible = 32
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

@@ -19,7 +19,7 @@
  * - Camera-follow: sprite position drives the viewport
  * - Sprite animation: 4-frame walk cycle with horizontal flip
  * - oamSet for simple single-sprite rendering
- * - x_pos / y_pos camera exports for screen-relative sprite positioning
+ * - mapGetCameraX() / mapGetCameraY() for screen-relative sprite positioning
  *
  * @par What to Observe
  * - Press LEFT/RIGHT to move Mario through the level
@@ -156,7 +156,7 @@ int main(void) {
         /* Draw Mario relative to camera position
          * oamSet(id, x, y, tile, palette, priority, flags)
          * flags bit 6 = horizontal flip */
-        oamSet(0, xloc - x_pos, yloc - y_pos, frame, 0, 3,
+        oamSet(0, xloc - mapGetCameraX(), yloc - mapGetCameraY(), frame, 0, 3,
                flipx ? OBJ_FLIPX : 0);
 
         /* Update map engine */

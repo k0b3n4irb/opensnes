@@ -58,3 +58,9 @@ at_frame = 291
 g_angle8 = { eq = 0x20, width = 1 }
 g_sx     = { eq = 170, width = 2 }
 g_sy     = { eq = 138, width = 2 }
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

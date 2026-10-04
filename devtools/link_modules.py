@@ -68,7 +68,7 @@ int main(void) {
 
 MAKEFILE = """OPENSNES := {root}
 TARGET   := {name}.sfc
-ROM_NAME := LINK {upper}
+ROM_NAME := {rom_name}
 USE_LIB  := 1
 LIB_MODULES := {modules}
 CSRC := main.c
@@ -92,7 +92,10 @@ def build(name: str, modules: list[str], flags: list[str]) -> tuple[bool, str, s
     shutil.rmtree(d, ignore_errors=True)
     d.mkdir(parents=True)
     (d / "main.c").write_text(MAIN_C)
-    (d / "Makefile").write_text(MAKEFILE.format(
+    # the header title holds 21 ASCII bytes and common.mk now refuses more
+    # (2026-10-04); "LINK ONLY_<module>" overflowed for the long module names
+    rom_name = ("LINK " + name.upper().replace("_", " "))[:21]
+    (d / "Makefile").write_text(MAKEFILE.format(rom_name=rom_name, 
         root=ROOT, name=name, upper=name.upper()[:20], modules=" ".join(modules),
         flags="\n".join(f"{f.split('=')[0]} := {f.split('=')[1]}" for f in flags)))
     proc = subprocess.run(["make", "-s"], cwd=d, capture_output=True, text=True, timeout=600)

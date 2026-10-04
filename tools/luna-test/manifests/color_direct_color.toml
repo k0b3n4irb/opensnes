@@ -21,22 +21,22 @@ rom = "../../../examples/color/direct_color/direct_color.sfc"
 at_frame = 100
 [checkpoint.values]
 direct_on = { eq = 1, width = 1 }
-cgwsel = { eq = 0x01, width = 1 }        # bit 0 set: pixel byte IS the colour
+colormath_cgwsel = { eq = 0x01, width = 1 }        # bit 0 set: pixel byte IS the colour
 
 [[checkpoint]]                 # A -> direct colour OFF, pixels go through CGRAM
 at_frame = 160
 input = "100:0x0080,105:0"
 [checkpoint.values]
 direct_on = { eq = 0, width = 1 }
-cgwsel = { eq = 0x00, width = 1 }
-cgadsub = { eq = 0x00, width = 1 }       # the toggle must not touch colour math
+colormath_cgwsel = { eq = 0x00, width = 1 }
+colormath_cgadsub = { eq = 0x00, width = 1 }       # the toggle must not touch colour math
 
 [[checkpoint]]                 # A again -> back to direct colour
 at_frame = 220
 input = "160:0x0080,165:0"
 [checkpoint.values]
 direct_on = { eq = 1, width = 1 }
-cgwsel = { eq = 0x01, width = 1 }
+colormath_cgwsel = { eq = 0x01, width = 1 }
 
 [asserts.blocks]
 gray_ramp = { space = "cgram", offset = "00F0", hex = "ef3def3def3def3def3def3def3def3d10421042104210421042104210421042" }

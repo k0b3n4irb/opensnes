@@ -115,15 +115,11 @@ void textLoadFont4bpp(u16 vram_addr);
  *
  * @param x Column (0-31; masked to the 32-column buffer)
  * @param y Row (0-31; masked to TEXT_MAP_ROWS)
- * Inlined for zero-call-overhead access (wave 4 retrofit; uses the
- * relaxed CC_INLINE_MAX_INSTR=16 default).
+ *
+ * A lib function since 2026-10-03 (it was `inline` in this header, which
+ * forced the cursor variables to be exported; API decision D4).
  */
-extern u8 cursor_x;
-extern u8 cursor_y;
-inline void textSetPos(u8 x, u8 y) {
-    cursor_x = x & 31;
-    cursor_y = y & (TEXT_MAP_ROWS - 1);
-}
+void textSetPos(u8 x, u8 y);
 
 /**
  * @brief Get current cursor X position

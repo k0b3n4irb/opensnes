@@ -12,6 +12,7 @@ scripts/install-luna.sh                              # fetch pinned luna (tools/
 python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state; luna's last_nmi_frame catches an NMI that dies after boot)
 python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `frames = [a, b]`)
 make test-manifests                                  # functional probes: `luna test` on tools/luna-test/manifests/*.toml (scripted input → WRAM asserts)
+# ...and phase_sweep.py: the SNESMOD stop/pause/fade manifests replayed at sixteen press phases (a press/SPC700 race shows on some frames only)
 # luna_runner.py, rom_coverage.py and wram_regress.py run their luna calls in parallel
 # (LUNA_JOBS, default the CPU count; LUNA_JOBS=1 = serial, same output)
 python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
@@ -21,7 +22,8 @@ python3 tools/luna-test/rom_coverage.py              # measured lib API coverage
 python3 tools/luna-test/audio_regress.py            # APU output hashed for eleven examples (ten audio ones, three pressed with their manifest scripts, and the Super FX skeleton) (luna --audio-out); baselines/audio.json
 python3 tools/luna-test/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
 python3 tools/luna-test/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
-make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() (weekly pal.yml, not in make tests)
+make hardware-preflight                              # before a console session: the 24 protocol ROMs (docs/HARDWARE_VERIFICATION.md) alive from random RAM (3 seeds) and under PAL, VRAM DMA in blank (hardware_preflight.py; ROWS=1-7 for the gate rows; not in make tests)
+make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() + the games playing their manifests under `region = "pal"`, and tetris built ROM_REGION=pal (weekly pal.yml, not in make tests)
 make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
 make coverage-host                                   # llvm-cov line coverage of QBE + cproc-qbe over the fixtures and the lib build (report, not a gate)
 make docs-strict                                     # Doxygen with warnings as errors (the doc-render job); plain `make docs` stays non-fatal so a doc warning cannot block a release build
@@ -47,6 +49,17 @@ all-together groups; a module that needs a symbol from a module it does
 not declare fails here instead of in a user's project. Runs in
 `make tests`. A new module or a new cross-module reference must come
 with its `_DEP_` line.
+
+The audio oracle is a hash of the WAV, so it flips on a shift of a few CPU
+cycles in the code that talks to the SPC700 (the phase, not the sound).
+**A commit that re-captures `baselines/audio.json` quotes the output of
+`luna diff --audio <before>.sfc <after>.sfc --until-frame 300`** (luna
+v1.32.0: RMS per 500 ms window, first non-silent sample, MATCH / DIFF at
+2 %) for the ROM built before the change against the one after; the hash
+stays the guard, the comparison says by how much it moved. A half-volume
+module gives 75 % and DIFF; two silent captures give MATCH with
+`a=none b=none` on the onset line — read that line for an example meant
+to play.
 
 The WRAM oracle hashes every WRAM page at each vblank **except the pages of
 the plain C band that lie wholly above the ROM's last C variable** — the

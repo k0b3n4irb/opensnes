@@ -29,7 +29,8 @@ This example puts a stack of horizontal colour bands on BG1 and writes a sine
 into BG3's V-offset row, so each column samples the bands at a different
 height — the bands ripple. The phase advances each frame. **Modes 4 and 6
 reuse this exact data path** (mode 4 packs H/V into one word with a select
-bit), so this one example teaches the whole OPT family.
+bit — see [`mode4`](../mode4/README.md)), so this one example teaches the
+whole OPT family.
 
 ## What to observe / if it breaks
 

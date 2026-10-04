@@ -1,0 +1,120 @@
+# SNESMOD upstream (Mukunda Johnson, github.com/mukunda-/snesmod)
+
+Not a partner in the sense of `.claude/rules/partners.md`: the author of the
+SNESMOD driver and of smconv, which PVSnesLib and OpenSNES both ship. What we
+find in his code goes to him as issues, one per correction, written plainly
+(ASCII only, first person, no emoji). Issues only, no PR offered (owner,
+2026-10-03): each issue carries what is needed to reproduce and fix. Nothing is posted without the owner
+reading the final text.
+
+Plan: `~/.claude/plans/federated-forging-flask.md` (2026-10-03).
+
+Posted on 2026-10-03 from the owner's account (`k0b3n4irb`), on his go. The
+text online equals the draft files (checked by reading each issue back).
+
+| Issue | Draft | Subject |
+|---|---|---|
+| [#6](https://github.com/mukunda-/snesmod/issues/6) | `..._issue-A_koff.md` | driver: ResetSound clears KOF 60 cycles after setting it, under the 64-cycle KON/KOFF poll |
+| [#7](https://github.com/mukunda-/snesmod/issues/7) | `..._issue-C_surround.md` | driver: volume-column pan does not clear surround (KungFuFurby's fix of 2015, in PVSnesLib); read in both sources, not measured, and the issue says so |
+| [#8](https://github.com/mukunda-/snesmod/issues/8) | `..._issue-B_smconv-loop-end.md` | smconv (Go): data after the loop end is kept; ping-pong unroll appended after it; resample sees the forward half only. Carries the Go test and its output |
+| [#9](https://github.com/mukunda-/snesmod/issues/9) | `..._issue-D_smconv-tuning.md` | smconv (Go): `resampleLoop` returns old/new where the C++ returned new/old |
+| [#10](https://github.com/mukunda-/snesmod/issues/10) | `..._issue-E_smconv-loop-start.md` | smconv (Go): `Loop = loopStart / 16 * 9` rounds down, the codec aligns the loop start up |
+
+## Weekly check (owner instruction, 2026-10-03)
+
+Once a week, look for an answer from Mukunda on the five issues and add a row
+to the log below, even when nothing moved:
+
+```
+for n in 6 7 8 9 10; do gh api repos/mukunda-/snesmod/issues/$n \
+  --jq '"#\(.number) \(.state) comments=\(.comments) updated=\(.updated_at)"'; done
+gh api "repos/mukunda-/snesmod/commits?per_page=3" --jq '.[]|"\(.commit.author.date[0:10]) \(.commit.message|split("\n")[0])"'
+```
+
+Reading works with either token. When he answers: record what he says here,
+tell the owner the same day, and answer him only with the owner's go and in
+the same plain style as the issues.
+
+| Date | #6 | #7 | #8 | #9 | #10 | Repo activity | Note |
+|---|---|---|---|---|---|---|---|
+| 2026-10-03 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | posted today |
+
+Next check due: 2026-10-10.
+
+## PVSnesLib: waits for Mukunda (owner decision, 2026-10-03)
+
+PVSnesLib has the same KOF sequence (`pvsneslib/snesmod/sm_spc_wla.asm:545`)
+but is not told yet. Order decided by the owner: first Mukunda answers and he
+and we agree on the fix; only then PVSnesLib is notified, pointing at his
+issue. Do not open anything on `alekmaul/pvsneslib` before that.
+
+## IT 2.15 detection: settled against the raw sources (2026-10-03)
+
+Our smconv port selects IT 2.15 by bit 2 of the sample's `Cvt`. Read in the
+raw files, not through a summariser:
+
+- OpenMPT `soundlib/ITTools.cpp` l.604-607 (`master`): `if(flags &
+  ITSample::sampleCompressed) { sampleIO |= (cvt & ITSample::cvtDelta) ?
+  SampleIO::IT215 : SampleIO::IT214; }`, with `cvtDelta = 0x04`
+  (`ITTools.h` l.236).
+- Schism Tracker `fmt/its.c` l.240-242: `if (its.flags & 8) { flags |=
+  (its.cvt & 4) ? SF_IT215 : SF_IT214; }`.
+
+modlib (`itmod/itmod.go` l.315, l.409) takes `it215 = header.Cmwt >= 0x215`
+and rejects a sample whose Convert has the delta bit. So a file written by
+OpenMPT with IT 2.15 compression is refused by modlib, and a 2.14-compressed
+sample in a file stamped 2.15 would be decoded with the wrong integrator.
+Not reported to him: owner's call, and it concerns `mukunda-/modlib`, not
+`snesmod`.
+
+A gap of ours seen while reading: both players treat `Cvt` bit 2 on an
+**uncompressed** sample as delta PCM (OpenMPT l.621, Schism l.250); our
+loader reads it as plain PCM. Rare (ITTECH calls the flag safe to ignore);
+logged in the tracking note.
+
+Posting or answering there needs the classic token (`GH_GHP_TOKEN`); reading
+works with either. Which token does what, and the caution about the classic
+one: `.claude/notes/conventions/gh_auth_via_dotenv.md`.
+
+## Evidence for A, re-run on 2026-10-03 (luna v1.30.4)
+
+`examples/audio/snesmod_music/music.sfc`, stop (B, `0x8000`) or pause (X,
+`0x0040`) pressed on frame F for F = 40..200, `[asserts.dsp]` V0..V7 ENVX = 0
+at F+140 (stop) or F+240 (pause), `luna test --jobs`:
+
+| Driver | stop | pause |
+|---|---|---|
+| ours (fixed, `8d83859f`) | 161 / 161 pass | 161 / 161 pass |
+| same ROM with the 9 bytes put back (`8F 5C F2 8F 00 F3 8F 00 C1`) | 8 fail: F = 112, 122, 129, 146, 153, 162, 181, 198 | 8 fail |
+
+Earlier counts: 8 on luna v1.24.0, 10 on v1.27.0 (commit `8d83859f`).
+Mukunda's `smconv/smconv/sm_spc.bin` (commit 3e4990a): KOF = $FF at `$6D`,
+the final KOF write at `$91`, one occurrence.
+
+## What his repository has that we do not (compared 2026-10-03)
+
+- SPC driver: nothing; PVSnesLib's copy (ours) is ahead (KungFuFurby's
+  surround fix, PAUSE/RESUME).
+- 65816 side: nothing.
+- smconv: IT compressed samples (through `modlib`, MIT). Ported to our C
+  smconv on `wip/smconv-it-compressed`.
+
+## Evidence for B, D, E (2026-10-03, his `main` at 3e4990a, Go 1.27.1 in the scratchpad)
+
+`2026-10-03_issue-B_loops_test.go.txt` dropped into `smconv/smconv/` as
+`zz_loops_test.go`, `go test ./smconv -run TestLoopShapes -v`. Input is a
+ramp (sample i = i*8); the BRR is decoded with his codec.
+
+| Case | Output |
+|---|---|
+| 400 samples, forward loop 96-256 | 400 samples out, tail 256..399 kept |
+| 400 samples, ping-pong 96-176 | 480 samples: 0..399 then 175..96 |
+| 1878 samples, ping-pong 317-969 | tuning 0.98788 (= 652/660), 2976 samples |
+| 256 samples, forward loop 100-256 | 736 samples (112 + 4 x 156), Loop field 54 (block 6) |
+| 256 samples, forward loop 96-256 (control) | 256 samples, Loop 54: correct |
+
+His C++ (`convert/source/brr.cpp`) copies only `length` samples, pads the
+front to align the loop start and returns `1.0/factor`; our C smconv is a
+port of it and gives, on `pollen8.it` sample 17, a 1312-sample loop where the
+forward and the backward pass are both found (correlation 0.94 / 0.96 against
+the source PCM, BRR decoded with the 15-bit clip of anomie's S-DSP doc).

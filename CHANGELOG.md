@@ -4,6 +4,831 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.48.0] — 2026-10-05
+
+The last 0.x before 1.0. Every name that 1.0 renames or removes still
+compiles here, with a deprecation warning that says the replacement (the
+`### Deprecated` list below; `docs/UPGRADING.md` has the full table and
+`make check-upgrade SRC=<folder>` lists what a project must change,
+including every `hdmaEnable` / `hdmaDisable` call, whose argument becomes
+a channel number at 1.0). The silent-defect campaign of the 1.0 freeze
+(`.claude/notes/status/silent_defects_log.md`) landed its fixes here:
+SNESMOD's key-off, queue and init, the offset-per-tile scroll, the object
+engine's bounds and free list, SRAM saves from ROM bank 0, the audio pan
+at centre, gfx4snes's tile-count silences, tmx2snes's wrong maps, and the
+Mode 7 example maps they had let through. Every link now checks the ROM
+header and the data-init terminator; every coverage pass checks the
+header against luna's view. luna v1.32.0.
+
+### Added
+- chore(devtools): **`make hooks`** installs the `commit-msg` and `pre-push`
+  git hooks of `scripts/githooks/`: the first refuses a message that
+  `devtools/lint_commits.py` would fail (new `--message-file` mode), the
+  second lints the pushed range as the Lint workflow does. Two subjects
+  with the type and scope swapped (`tools(build): …`) reached `develop` in
+  two days with the lint running only in CI, after the push (2026-10-05).
+- feat(devtools): **`make check-upgrade SRC=<folder>`** lists, in a
+  project's sources, every name 1.0 removes with its replacement and
+  every `hdmaEnable` / `hdmaDisable` / `mode7SetScale` / `mode7Transform`
+  call (the ones that keep their name and change meaning). The list of
+  names is read from the SDK headers, so it cannot lag them. On
+  `examples/hdma/hdma_wave` as of v0.47.0: four hits; on today's: none.
+- test(luna-test): **`make hardware-preflight`** replays the 23 ROMs of the
+  real-console protocol (`docs/HARDWARE_VERIFICATION.md`) on luna from
+  pseudo-random RAM (three seeds) and under PAL, and checks every VRAM DMA
+  byte lands in blank — the two cheapest ways a ROM green on luna's
+  defaults fails on a console. It reads the protocol's table like
+  `make hardware-kit`, so the kit and the preflight cannot drift apart.
+  First run: 23 of 23 rows ready (`ROWS=1-7` for the gate rows).
+- feat(lib,build): **a Super FX game can save.** `USE_SRAM := 1` with
+  `USE_SUPERFX := 1` was refused by the build; it now declares a battery
+  (cartridge type `$15`) and the `sram` module reads and writes the GSU's
+  Game Pak RAM, which is what such a cartridge keeps (there is no separate
+  save chip). The capacity comes from `$FFBD` (`GSU_RAM_KB`), offsets count
+  from `$70:0000`, and the game chooses a region its framebuffers do not
+  use (`sramSaveOffset` / `sramLoadOffset`). The RAM is shared with the
+  GSU: the module clears RAN for the transfer and puts SCMR back through
+  `gsu_scmr_live`, so a save in the middle of a job works. Tested on the GSU
+  fixture — save and read back idle, then during a cached job that still
+  ends with its results; without the hand-over the read-back is wrong and
+  luna counts 8 GSU bus violations — and across a power cycle
+  (`f_gsu_save_write.toml`, `g_gsu_save_read.toml`). This answers luna's
+  question of 2026-10-02 and closes the Super FX runtime chantier.
+- feat(build): **`GSU_BANK` links the Super FX program at its real ROM
+  address.** Until now a `.sfx` was assembled at 0 and placed by the linker
+  where it fitted, so only position-independent GSU code was right: an
+  absolute jump or a table of the program read through `ROMB` / `GETB`
+  pointed elsewhere. `GSU_BANK := n` in the Makefile assembles the program
+  at `$8000` and `GSU_SECTION` (new macro, `templates/assets.inc`; an
+  `ASSET_SECTION` when `GSU_BANK` is unset) forces it to `$n:8000`, where
+  the GSU reads it. The generated `.sfx.h` keeps offsets, so `gsuCall()`
+  and `gsuStartCached()` do not change. One `.sfx` per ROM in that mode.
+  The GSU fixture is built this way and gains `rom_job` (table read and
+  absolute jump): `$3CA5`; the same binary placed elsewhere returns 0.
+  This closes the last part of the Super FX runtime's phase F.
+- feat(lib): **`oamDrawMetasprite(id, x, y, frame, &style, flip)`** replaces
+  `oamDrawMeta()` (7 arguments) and `oamDrawMetaFlip()` (11) (API decision
+  on principle 4, shape chosen by the owner). A `MetaspriteStyle`, usually
+  `static const`, holds what does not change between frames — base tile,
+  palette, OBJ size, and for a mirrored draw the piece size and the box —
+  while the frame (what `animTickMeta()` returns), the position and
+  `OBJ_FLIPX` / `OBJ_FLIPY` are given at each call. The two old names are
+  deprecated until 1.0. **It also fixes the mirrored draw of 32-pixel
+  pieces:** `oamDrawMetaFlip()` assumes a piece is 16 pixels when large and
+  8 when small whatever the OBJSEL mode; the style carries `pieceSize`
+  (fixture: a 32-pixel piece in a 64-wide box lands at x + 32, the old
+  form puts it at x + 48). Cost measured and written in `docs/PERF.md`:
+  about 2,000 master cycles per call, 0.6 % of a frame. `metasprite` and
+  `aseprite_pipeline` are migrated with identical images. Twelve WRAM
+  streams are re-captured: `sprite.c` grew by `$341` bytes and what moved
+  in RAM is ROM addresses (checked byte by byte on `basics/random` — the
+  compiler's scratch register `tcc__r9` at one frame — and on `likemario` —
+  the dynamic engine's `dynamic_flush_hook` pointer).
+- feat(lib): **`dsp1SetCamera(const Dsp1Camera *)`** replaces
+  `dsp1Parameter()` and its seven positional arguments (API decision on
+  principle 4, more than five arguments). `Dsp1Camera` holds the command's
+  seven inputs under the manual's names (`x`, `y`, `z`, `lfe`, `les`,
+  `aas`, `azs`): a fixed view is one `static const`, a moving camera is one
+  struct whose position and heading the game changes. The struct is the
+  command's 14 bytes in order, so the assembly sends it as it lies.
+  `dsp1Parameter()` is deprecated and stays until 1.0; the DSP-1 fixture
+  checks the two give the same four output words (18/18). `dsp1_cube` and
+  `dsp1_ground` are migrated with identical images; their two WRAM streams
+  are re-captured (the camera variables of `dsp1_ground` are now one struct,
+  and the call parks a pointer in the direct page).
+- feat(tools): **smconv reads compressed Impulse Tracker samples.** IT 2.14
+  and IT 2.15 compression, 8-bit and 16-bit, are decoded (bit 2 of the
+  sample's `Cvt` selects IT 2.15, as OpenMPT and Schism Tracker read it), so
+  a module saved with "compress samples" no longer has to be re-saved. The
+  decoder is a port of modlib's (Mukunda Johnson, MIT — `ATTRIBUTION.md`).
+  The golden test converts a real IT 2.14 file (`reflection.it`, whose
+  decoded PCM matches modlib's reference byte for byte) and compressed
+  twins of `pollen8.it` made by a test-only encoder, which must give the
+  committed soundbank; IT 2.15, 16-bit and multi-block samples are covered
+  by those round trips only.
+- feat(build): **`ROM_REGION`** (`ntsc` default, `pal`, `jp`) — the header's
+  country byte (`$FFD9`: `$01`, `$02`, `$00`; fullsnes, snesdev-wiki). It
+  was `$01` on every ROM, so a European game had no way to declare itself
+  PAL. Default builds are byte-identical (89/89 ROMs compared).
+- test(luna-test): **a PAL pass on the games** — `make test-pal` replays the
+  six scripted manifests of tetris, breakout, likemario, shmup_1942 and rpg
+  at 50 Hz on the NTSC-built ROMs, with `region = "pal"` in the
+  manifest (an import cartridge on a PAL console) and `stat78 = $13`
+  asserted so a 60 Hz run fails: 6/6. The manifests are derived from the
+  NTSC ones at run time. `ROM_REGION=pal` itself is checked on one game:
+  tetris built as a PAL cartridge is PAL for luna with nothing forced and
+  passes its manifest. Last item of action 39.
+- feat(examples,docs): **`backgrounds/mode6` test card (B)** for a question no
+  reference answers: does bit 3 of a hi-res horizontal offset (8 half-pixels,
+  inside a 16-wide tile) move the column? luna and ares say half a tile,
+  Mesen2 drops it (luna's report of 2026-10-02). The card puts 8 on every odd
+  column and nothing else; `backgrounds_mode6_card.toml` pins the table, the
+  README explains the divergence, and the hardware protocol gains row 23
+  (a photo of the card on a console).
+- feat(examples): **`backgrounds/mode6`** — a hi-res 4bpp layer with
+  offset-per-tile: Mode 6 reads the table like Mode 2 (an H row, a V row),
+  with 16-half-pixel columns; A moves the wave from the vertical row to the
+  horizontal one. One-half-pixel stripes built at run time. Its manifest pins
+  both rows in VRAM, both screens and BG3VOFS. Last mode gap of action 39.
+- feat(examples): **`backgrounds/mode4`** — a 256-colour layer with
+  offset-per-tile: Mode 4's single row of words, each vertical (bit 15) or
+  horizontal; A switches the wave from one to the other. 8bpp tiles built
+  at run time. Its manifest pins the words in VRAM and BG3VOFS.
+- test(luna-test): **an animated example must animate** — `luna_runner.py`
+  refuses a capture, and fails a baseline, whose capture points
+  (`frames = [a, b]`) are all the same frame; captures are staged, so a
+  refused one no longer overwrites the baseline PNGs.
+- feat(lib): **`mode7SetExtBg(on)`** — Mode 7 EXTBG (SETINI bit 6): BG2
+  shows the same plane with bit 7 of each pixel as its priority, a second
+  layer around the sprites. Composed through the SETINI shadow the
+  `videoSet*` setters share.
+- feat(examples): **`mode7/extbg`** — a sprite rolls over a floor and
+  behind pillars drawn in one Mode 7 plane, split by bit 7; A toggles
+  EXTBG. Plane built at run time in a `FAR` buffer. Manifest pins SETINI,
+  TM, the 1:1 matrix and the scroll.
+- feat(examples): **`color/pseudo_hires`** — a 50 % blend of two layers
+  without colour math: SETINI bit 3 puts the sub screen on the even columns
+  of a 512-pixel line and the main screen on the odd ones (snesdev-wiki,
+  anomie; checked in luna's native output). Press A to toggle; tiles built
+  at run time, no asset. Its manifest pins SETINI, the screen designations
+  and the scroll.
+
+### Deprecated
+
+- **The 47 names below build and warn in this release and are removed at
+  1.0** (`hdmaEnable` / `hdmaDisable` come back at 1.0 taking a channel
+  number). The clang pre-pass reports each use; a build without clang
+  reports nothing, so compare against this list before upgrading. Every
+  replacement exists in this release.
+
+  | Deprecated | Header | Use instead |
+  |---|---|---|
+  | `audioUpdate` | `audio.h` | it does nothing |
+  | `colorMathEnable` | `colormath.h` | `colorMathSetLayers` |
+  | `COLORMATH_BG1` | `colormath.h` | `LAYER_BG1` |
+  | `COLORMATH_BG2` | `colormath.h` | `LAYER_BG2` |
+  | `COLORMATH_BG3` | `colormath.h` | `LAYER_BG3` |
+  | `COLORMATH_BG4` | `colormath.h` | `LAYER_BG4` |
+  | `COLORMATH_OBJ` | `colormath.h` | `LAYER_OBJ` |
+  | `consoleInitEx` | `console.h` | `consoleInit` |
+  | `getRegion` | `console.h` | `isPAL` |
+  | `rand` | `console.h` | `rngNext` |
+  | `srand` | `console.h` | `rngSeed` |
+  | `dmaCopyVramBank` | `dma.h` | dmaCopyVram() takes the bank from the source pointer |
+  | `dmaCopyCGramBank` | `dma.h` | dmaCopyCGram() takes the bank from the source pointer |
+  | `dsp1Parameter` | `dsp1.h` | `dsp1SetCamera` |
+  | `dsp1Present` | `dsp1.h` | `dsp1IsPresent` |
+  | `hdmaSetupBank` | `hdma.h` | hdmaSetup() takes the bank from the table pointer |
+  | `hdmaEnable` | `hdma.h` | `hdmaEnableMask` |
+  | `hdmaDisable` | `hdma.h` | `hdmaDisableMask` |
+  | `padRaw` | `input.h` | `padHeld` |
+  | `nmiSetBank` | `interrupt.h` | nmiSet() takes the bank from the function pointer |
+  | `irqSetBank` | `interrupt.h` | irqSet() takes the bank from the handler pointer |
+  | `LzssDecodeVram` | `lzss.h` | `lzssDecodeVram` |
+  | `ease_in_quad` | `math.h` | `easeInQuad` |
+  | `ease_out_quad` | `math.h` | `easeOutQuad` |
+  | `mode7SetPivot` | `mode7.h` | `mode7SetCenter` |
+  | `mosaicEnable` | `mosaic.h` | `mosaicSetLayers` |
+  | `MOSAIC_BG1` | `mosaic.h` | `LAYER_BG1` |
+  | `MOSAIC_BG2` | `mosaic.h` | `LAYER_BG2` |
+  | `MOSAIC_BG3` | `mosaic.h` | `LAYER_BG3` |
+  | `MOSAIC_BG4` | `mosaic.h` | `LAYER_BG4` |
+  | `profileGetFrameCount` | `profile.h` | `getFrameCount` |
+  | `BGMODE_MODE0` | `registers.h` | `BG_MODE0` |
+  | `BGMODE_MODE1` | `registers.h` | `BG_MODE1` |
+  | `BGMODE_MODE2` | `registers.h` | `BG_MODE2` |
+  | `BGMODE_MODE3` | `registers.h` | `BG_MODE3` |
+  | `BGMODE_MODE7` | `registers.h` | `BG_MODE7` |
+  | `sa1Init` | `sa1.h` | `sa1IsReady` |
+  | `snesmodSetSoundTable` | `snesmod.h` | no SDK call starts a stream |
+  | `snesmodAllocateSoundRegion` | `snesmod.h` | no SDK call starts a stream |
+  | `oamDrawMeta` | `sprite.h` | `oamDrawMetasprite` |
+  | `oamDrawMetaFlip` | `sprite.h` | `oamDrawMetasprite` |
+  | `NAME` | `types.h` | use ... |
+  | `WINDOW_BG1` | `window.h` | `LAYER_BG1` |
+  | `WINDOW_BG2` | `window.h` | `LAYER_BG2` |
+  | `WINDOW_BG3` | `window.h` | `LAYER_BG3` |
+  | `WINDOW_BG4` | `window.h` | `LAYER_BG4` |
+  | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
+
+### Fixed
+- fix(tools): tmx2snes refuses a rotated tile (Tiled's diagonal flip,
+  dropped until now), a tile id above 1024 (masked onto another tile with
+  `& 0x03FF`) and a map with more than one tileset (the `.b16` and the ids
+  came from the first only) — three maps that converted silently to a
+  wrong one (build audit S15). Three refusal cases in the golden suite.
+- fix(lib): the object engine's five slot-taking functions (`objCollidObj`,
+  `objCollidMap`, `objCollidMap1D`, `objCollidMapWithSlopes`, `objUpdateXY`)
+  return at once on a slot index of 80 or more (`OB_MAX`). Before, the
+  index was scaled by 64 and the routine worked on whatever lies past the
+  pool — the engine's own state: slot 106's `xvel` is the free-list head,
+  and `objCollidMap1D(106)` under friction zeroed it, after which `objNew`
+  handed out slot 0 again (library audit B l.24; libtest `r_obj_oob_idx`,
+  red on the previous code).
+- docs(lib): `collideTileEx()` documented a 0 return off the map while the
+  code has returned 1 (a wall) since the v1 fix, like `collideTile()`;
+  `collideRectTile()` now says its bottom edge is unbounded and what to do
+  about it; `object.h` says what an out-of-range index does and that the
+  handle's id byte wraps after 255 creations; `map.h` says that `mapLoad` copies 4096 bytes of
+  metatile definitions whatever the file holds (the tail of the buffer is
+  the ROM that follows a 126-byte `.t16`).
+- docs: `PHILOSOPHY.md` no longer puts a code span inside a quoted phrase
+  (the doc-render job failed on it from the moment the page joined the
+  Doxygen input, 2026-10-04); `make lint-cppcheck` skips the QBE backend
+  scan when the submodule is not checked out instead of printing an error.
+- docs: `scrolling.md` no longer claims a scroll write "takes effect from
+  the next scanline" — the references hold no such sentence; it says what
+  HDMA relies on, a value written in HBlank is in force for the next line
+  (documentation audit PF11).
+- test(luna-test): the `backgrounds_mode4` and `backgrounds_mode6`
+  manifests take their first delta from the booted scene (an empty
+  checkpoint at frame 60), not from power-on RAM (testing audit T9).
+- fix(build): **an SA-1 cartridge declares a battery only when it saves.**
+  Every SA-1 ROM carried `$FFD6 = $35` (SA-1 + RAM + battery) and a fixed
+  `$FFD8 = $05`, whatever `USE_SRAM` said, so emulators kept a `.srm` for
+  games that never save. The type is `$34` (SA-1 + RAM) and `$35` only with
+  `USE_SRAM := 1` (snesdev-wiki ROM header, `$x4` / `$x5`); the BW-RAM size
+  is the new knob `SA1_BWRAM_SIZE` (default 5 = 32 KB, unchanged) on
+  `docs/tools/build.md` (build-tools audit S13, chips audit PF9).
+- docs(lib): `hdma.h` says that `gsuSetupHdmaBlanking()` takes HDMA channel
+  1 on a Super FX build, and what `hdmaIrisWipe()` costs (about 2.15 M
+  master clocks for a radius of 80, plus one VBlank wait on the first
+  call) — library audit rows 31 and PF5.
+- docs(lib): header claims corrected after the library audit (D2, D3, D9,
+  D11, D13). The colour-math 50 % example put BG2 on both screens and
+  enabled math on BG2 (math applies to main-screen layers: BG1 main, BG2
+  sub, math on BG1); `colorMathSetHalf()` says where the halving is not
+  applied (transparent sub pixel, forced-black main — fullsnes CGADSUB);
+  `bgSetMapPtr()`'s base is a multiple of 0x400 **words** (2 KB), not
+  "1KB"; the scene `init` hook runs on every push, not once; the DMA
+  budget note replaces "2,200 CPU cycles" by the VBlank's ~49 000 master
+  clocks at 8 per byte; the mosaic examples use `mosaicSetLayers()`
+  instead of the deprecated call; the stale `oamSet` cost figure and the
+  fix32Sin cycle count give way to `docs/PERF.md`; the `AUDIO_PITCH_C3/4/5`
+  comments were one octave off their names; `DSP1_FIX_FROM_T` floors
+  rather than truncates.
+- docs(examples): six comments and README lines taught bugs that are fixed
+  or never existed — the pre-A6 "hdmaSetup assumes bank $00" (window,
+  parallax_scroll), "strings spill to bank 1 = garbage" (shmup_1942, ended
+  by #127.3), a "compiler quirk" with separate `u16` coordinates
+  (two_players), and a cost figure of an earlier `oamSet` (shmup_1942,
+  superscope). `make lint-docs` now refuses those motifs in `examples/`
+  (anchor 14; examples audit PF4).
+- docs(lib,examples): three claims corrected. `AUDIO_RELEASE_*` are the
+  ADSR2 **sustain rate**, not a release: the S-DSP's release is fixed on
+  key-off (fullsnes, snesdev-wiki Errata; library audit D1).
+  `gsuLaunch()` said the ROM-side work "waits" for the end of a job: the NMI
+  callback is picked up once by the first ROM NMI after it, and an H/V-timer
+  IRQ raised during the job is acknowledged and dropped (crt0; chips audit).
+  `games/likemario` claimed the compiler's `>>` is a logical shift: cc65816
+  shifts signed values arithmetically (pinned by `test_signed_ops.c`), and
+  `asr8()` is a readability helper, not a workaround (examples audit).
+- docs(lib): `collideTile()` / `collideTileEx()` say that off the map to the
+  left, the top or the right they return 1, "off the map is a wall" (the
+  code since the v1 fix; the header said 0), and that the bottom edge is not
+  bounded (library audit D7, row 26).
+- fix(examples): **`games/mode7_flying` and `games/mode7_racing` showed
+  wrong Mode 7 tiles.** Their 1024×1024 maps had 379 and 406 distinct 8×8
+  tiles for a map that addresses 256, and gfx4snes wrapped the index modulo
+  256 without a word (caught by the new refusal above): 123 and 150 map
+  entries pointed at the wrong tile since the examples were written. The
+  generators now paint on the tile grid (the flying terrain's river and
+  pads; the whole track, from the same centre path): 33 and 15 distinct
+  tiles, the same scenes, and the class maps follow.
+- fix(tools): **gfx4snes refuses what it used to truncate silently**: more
+  than 1024 distinct BG tiles (the 10-bit tile field carried into the
+  palette bits), more than 256 Mode 7 tiles (one byte per map entry), and —
+  for sprite and font sheets, converted without a map — a 2bpp/4bpp tile
+  whose pixels come from two palette banks (the planes keep the low bits
+  only: index 4 under 2bpp drew colour 0). Three generated fixtures pin the
+  refusals in the golden run (build-tools audit S7, S8, S12).
+- fix(lib): **`objNew()` refuses a type of 64 or more** (`OB_TYPE_MAX`) and
+  returns 0; such a type indexed past the type tables and called whatever
+  followed them. libtest `r_obj_type64` (library audit, row 24).
+- fix(lib): **`sramSave()` from a source in ROM bank $00.** The fast path
+  took every bank-$00 pointer for the WRAM mirror and copied `$7E:xxxx`
+  instead; a source at or above `$2000` (a const in the code bank, the
+  header) is now read with its real bank. libtest `r_sram_rom0` saves four
+  bytes of the header's title (library audit, row 22).
+- fix(lib): **`AUDIO_PAN_CENTER` is an exact centre.** The crossfade weighed
+  pan by `pan / 15` and `(15 - pan) / 15`, so position 8 gave L = 7/15 and
+  R = 8/15 of the volume (59 / 67 for 127); the right weight now skips the
+  middle step of 16 (0 hard left, 8 half and half, 15 hard right), the
+  constants do not change (library audit, row 20).
+- docs(lib,examples): **the SNESMOD module volume is 0-255, not 0-127.**
+  `snesmodSetModuleVolume()` passes the byte to the driver as is, which
+  starts a module at 255; measured on luna (`luna diff --audio`,
+  `snesmod_music`): 127 halves the level, 255 leaves it unchanged, 63 leaves
+  a quarter. `snesmod.h`, `docs/tutorials/audio.md` and the `snesmod_music`
+  README said 0-127, and the example's volume variable started at 127 so the
+  first L press jumped from 255 to 117 (snes-rag, reading the SNESMOD
+  source; library audit D12). The effect volume stays 0-127: our wrapper
+  reduces it to the driver's nibble.
+- docs: `fix32Sin()` / `fix32Cos()` carry the NMI warning of `fix32Mul()`:
+  they write the same result scratch, so a call from an `nmiSet()` callback
+  corrupts a main-thread multiply in flight (library audit).- docs: `fix32Lerp()`'s caveat said the multiply "may lose precision" near
+  the range limit; the real failure is `b - a` wrapping when a and b have
+  opposite signs and the span reaches 32768.0, and the note now says so
+  with the two-multiply form to use instead (library audit).
+- test(compiler): the cproc upstream-suite ratchet lists the three expected
+  outputs the library audit's front-end fixes changed (`struct-copy.c`,
+  `local-init.c`, `builtin-va-copy+aarch64.c`: 4-byte copies and zeroing
+  emitted as `l`, the fork's 32-bit long). The sanitizer CI job had been
+  red on them since `c3952a1e`; `make test-toolchain-suites` is green.
+- fix(examples): **`games/tetris` no longer writes VRAM outside VBlank.**
+  `renderFlush()` scanned 28 per-row dirty flags to coalesce the BG1 rows;
+  the scan cost about 48 scanlines between two DMAs, so on every locked
+  piece the BG1 transfer (1 280 bytes) left VBlank and landed on lines
+  16-24 — unseen because the bytes were the same (examples audit, luna
+  `--dma-trace`). The dirty rows are now a span kept at marking time and
+  flushed in one DMA; `state_tetris.toml` soft-drops a piece to its lock
+  and asserts `unsafe_writes = 0` (the ROM before the fix fails it).
+- docs: `OamDynamicConfig` says only `vramLarge = 0x0000` / `vramSmall =
+  0x1000` are honoured (OBJSEL's name base and the tile tables are fixed);
+  `objKill()` says not to kill another object from an update callback
+  (the loop has read its link); `hdmaWaveStop()` says the wave's offsets
+  are absolute (library audit, rows 4, 11, 9).
+- docs: `mode7SetAngle()` / `mode7Rotate()` / `mode7Transform()` warn that
+  the PPU multiplier they use is M7A/M7B, to be used in VBlank (snesdev-wiki,
+  "Multiplication"); `profileScanlineStart()` says its SLHV latch sets the
+  flag the Super Scope reads as a shot; `animPlay()` says an `ANIM_ONCE`
+  clip called every frame replays when it ends; `hdmaIrisWipe()` says it
+  owns the window registers while it runs; `collideTile()`'s comment named
+  a function that does not exist; the iris's "HDMA init at the start of
+  VBlank" comment is corrected to the start of the frame (library audit,
+  rows 12, 23, 25, 16, 26; documentation audit).
+- fix(examples): **`basics/scene_stack` redraws its title when the counter
+  pops back to it.** `init` runs once per push and not on resume (the
+  scene contract), so the title stayed hidden behind the counter's last
+  screen while the README promised the return to the title (examples
+  audit). The counter sets a flag before popping; the title redraws on its
+  first update, and the manifest counts the redraw.
+- fix(lib): **`UNFIX_ROUND()` overflowed from 127.5**: `x + 128` was a
+  16-bit sum; it is taken on 32 bits (library audit, row 27).
+  **`gsuPresentInit()` refuses buffers past the first 64 KB of Game Pak
+  RAM**: its DMA reads them at `$70:0000` with a 16-bit source, so on a
+  128 KB board a buffer above 64 KB was read from the wrong place (chips
+  audit, S4).
+- fix(lib): **`hdmaWaveStop()` hands the layer back to its scroll.** The
+  wave table writes absolute offsets over `bgSetScroll()`'s value, and the
+  stop wrote 0: a scrolled layer was left at 0. It marks the layer's scroll
+  dirty, so the NMI rewrites it from the shadows at the next VBlank
+  (library audit, row 9).
+- fix(lib): **`audioLoadSample()` of a sample whose size is 1 modulo 256
+  (513, 2817, …) hung the driver.** The end-of-stream handshake parked the
+  port at 0 and waited for the driver to mirror it; when the last index
+  byte was 0 its echo passed for the mirror, the next command went out
+  while the driver still waited for the 0, and both sides hung
+  (`AUDIO_ERR_TIMEOUT`, sample never registered). The driver now says
+  "stream over" with `$FF` first. libtest loads a 513-byte sample
+  (library audit, row 28).
+- docs: **`GETTING_STARTED.md` names Python** — every link runs Python
+  post-link checks, and the page said `make` was enough — and the first
+  thing to see on screen is "TEXT MODULE TEST", not "Hello World!";
+  `opensnes doctor` checks for `python3`; **`opensnes run` finds the luna
+  GUI** that `install-luna.sh` puts in the SDK tree (it only searched the
+  PATH). `hdmaEnableMask()`'s doc said the channel starts on the next
+  frame; it runs from the next HBlank, `hdmaSetup()` having initialised
+  what the hardware only initialises at the start of a frame (anomie-regs)
+  (documentation audit).
+- fix(templates,examples): **the SA-1 program section is pinned to ROM
+  bank 0.** The SA-1's reset vector is 16-bit, so the program must sit in
+  bank 0; `.sa1_boot` was `SUPERFREE`, and a program too big for bank 0's
+  free space landed at `$01:8000` with no error — the SA-1 never booted
+  and only `sa1IsReady()` said so (chips audit, S3).
+- fix(lib): **a 17th `snesmodLoadEffect()` returns `0xFF`** and loads
+  nothing: it returned 16, which `snesmodPlayEffect()` masks to four bits
+  and played as effect 0 (library audit, row 29).
+- fix(lib): **`setMode()` keeps the flag bits of its `mode` argument.** The
+  header allows `setMode(BG_MODE1 | BG3_MODE1_PRIORITY_HIGH, 0)`; the
+  priority bit was masked off with the mode (library audit, row 13).
+- fix(lib): **`colorMathInit()` clears the fixed colour.** It wrote 0 to
+  COLDATA, which selects no plane and changes nothing; it writes `$E0`
+  (all planes, value 0) (library audit, row 14).
+- fix(lib): **`windowCentered()` and `windowSplit()` at the edges.** A width
+  of 1 gave right < left (an empty window) and an odd width lost a pixel;
+  `windowSplit(0)` left a one-pixel window 1. A width of 0 and a split at
+  0 now give an empty window on purpose (library audit, row 15).
+- fix(lib): **`apuUpload()` with a size of 0 sends nothing.** It sent one
+  byte before testing the end, so 0 meant 65 536 bytes (library audit,
+  row 18).
+- fix(lib): **`audioSetVoiceVolume()` clamps to 0-127.** The DSP's voice
+  volumes are signed: 128 and above inverted the phase (library audit,
+  row 19).
+- fix(lib): **`apuWaitBoot()` is bounded and `audioInit()` returns
+  `AUDIO_ERR_TIMEOUT` as its header promised.** Called when the IPL is no
+  longer running (a driver already is), the wait for `$AA` / `$BB` never
+  ended and the CPU hung. It gives up after about seven frames and returns
+  1; `audioInit()` returns the timeout. libtest vector `r_apu_boot_again`
+  (library audit, row 17). Five audio hashes re-captured: the poll loop
+  costs a few cycles per iteration before the IPL answers, so the upload
+  starts a few samples later; `luna diff --audio` before/after: `MATCH`,
+  0.00 to 0.19 % per window, first sample within 2.
+- fix(lib): **`hdmaIrisWipe()`, `hdmaBrightnessGradient()` and
+  `hdmaColorGradient()` called again while they run** only move the
+  channel's table pointer, read at the next frame. They set the channel up
+  again, which resets its address and line counter and restarts the table
+  at the next HBlank: for the rest of that frame the bottom of the screen
+  showed the top of the table (luna, `hdma_helpers` frame 150; library
+  audit, row 2).
+- fix(lib): **the dynamic sprite engine's VRAM queue is bounded.** It holds
+  128 entries and the NMI drains seven a frame; the index advanced without
+  a bound, so more than 128 pending refreshes overwrote the engine's own
+  state, index included. A full queue now leaves the sprite's refresh flag
+  set and tries again next frame (library audit, row 6).
+- fix(tools): **`sa1_patch` keeps the header checksum right.** Patching
+  the map mode byte to `$23` added 3 to the ROM's byte sum; every SA-1 ROM
+  shipped with a checksum off by 3 (luna and most emulators check only
+  that the two fields are complements, a console or a strict tool sees
+  it). The pair is corrected by the difference (build audit, S6).
+- fix(tools): **`smconv` fails on a module with more than 8 channels or
+  too big for SPC RAM** (it printed "error" and exited 0 with a truncated
+  soundbank); **`wav2brr` warns, with or without `-v`, about a source
+  above 32 kHz**, and says what happens: the DSP plays it at 32 kHz, so it
+  comes out lower and slower (the old `-v`-only note said
+  "higher-pitched") (build audit, S9, S10).
+- fix(compiler): **the preprocessor runs with `-undef -nostdinc`.** The
+  host's predefined macros (`__x86_64__`, `__aarch64__`, `__linux__`) made
+  the same source give a different ROM on each build machine, and the
+  host's `<stdint.h>` was read with cproc's sizes: `int32_t` came out 2
+  bytes, `int64_t` 4, without a word (build audit, S2). A `#include
+  <stdint.h>` now fails at the preprocessor; the fixed-width types are
+  `snes/types.h`'s.
+- fix(build): **`ROM_BANKS` is bounded per mapping** (LoROM 8-126, HiROM,
+  SA-1 and Super FX 8-64, DSP-1 8-32). Past those the linker placed data
+  in memory the cartridge does not map as ROM — a string at `$7E:8000`
+  (WRAM) on a 127-bank LoROM, `.rodata` at `$40:0000` (BW-RAM) on a 65-bank
+  SA-1, a HiROM label past bank `$7F` — and the build stayed green, the
+  text just vanished (build audit, S1). `GSU_RAM_KB` must be 32, 64 or 128
+  (`48` declared 32 KB, a typo gave a Python traceback and `$FFBD = 0`).
+- fix(build): **a changed `GSU_BANK` reassembles the GSU program**, and
+  the data-init objects and the soundbank object rebuild when the project
+  configuration changes: `make GSU_BANK=2` on a tree built with 1 moved
+  the section but kept a program that set `ROMB` to 1, and `make
+  USE_HIROM=1` after a LoROM build gave a 256 KB LoROM ROM (build audit,
+  S3, S4).
+- fix(lib): **the map was drawn one line too low since 2026-09-12.** The
+  VOFS change of that day added a `y - 1` in `mapVblank`, but the map
+  module's offset already carried one (PVSnesLib's `clc / sbc`, `dec a`):
+  BG1 received `y - 2`. luna read BG1's vertical scroll at 1022 where BG2
+  to BG4 read 1023. Four images re-captured (`map_scroll`, `tiled`,
+  `slope_collision`, `mapandobjects`): each new image is the old one moved
+  up one line (99.8 to 100 % of the pixels).
+- fix(lib): **`oamHide()` and `oamClear()` park sprites at X = 257, not
+  256.** The PPU counts an OBJ at X = 256 as X = 0 for its per-line range
+  and time tests (anomie-regs, "Drawing the Sprites"): a hidden 32- or
+  64-pixel sprite still took one of the 32 slots and its tiles on lines
+  0-47, which could starve the real sprites there. The dynamic engine
+  always hid at 257. Nothing changes on screen; every WRAM stream moves
+  (the OAM shadow byte).
+- fix(lib): **`gsuLaunch()` and `gsuStartCached()` drop CFGR's MS0 (fast
+  multiply) bit**, which fullsnes says must be zero in 21 MHz mode — the
+  mode both select. `gsu_cfgr = $A0` is still accepted; the bit is masked
+  (the GSU fixture asks `$A0` and luna reads `$80` back).
+- fix(lib): **`gsuSetupHdmaBlanking()` with a band of 0 lines.** A top band
+  of 0 wrote a count of 0 as the table's first entry, which ends an HDMA
+  table: the channel did nothing and `gsuDmaFullFrame()` transferred the
+  whole frame on visible lines (luna `--dma-trace`: 1 844 726 of
+  2 326 528 VRAM bytes outside blank with `(0, 80)`). A band of 0 has no
+  entry now, a band of 128 or more takes two, counts are clamped at 224.
+  The GSU fixture reads the table for `(0, 80)`.
+- fix(lib): **`consoleInit()` latches the H/V counters before seeding the
+  RNG.** Read unlatched, OPHCT and OPVCT were 0 and the seed was STAT78
+  alone: the same `rngNext()` sequence at every boot. `basics/random`'s
+  image re-captured (a different layout from a different seed).
+- fix(lib): **`fixLerp()` over a difference of 128.0 or more.** `b - a` was
+  taken on 16 bits with bit 15 as its sign: `fixLerp(FIX(-64), FIX(64),
+  128)` gave -128.0 instead of 0. The difference is read over 17 bits
+  (overflow flag). `fix32Lerp()` (inline, `fixed32.h`) has the same shape
+  on 33 bits and is not changed here.
+- fix(compiler): **four silent miscompilations in cproc, all on common
+  idioms**, found by the pre-1.0 hunting campaign and reproduced on luna
+  (`.claude/notes/reviews/2026-10-03_audit/A_compiler.md`). `++` / `--` on
+  a `FAR` object read bank $7E and wrote bank $00 (`fcount = 10;
+  fcount++; ++fcount;` gave 10, and a byte landed in `$00:2000-$7FFF`, the
+  hardware registers); the same store dropped `volat` on a volatile. A
+  whole-struct copy with a 4-aligned member copied two of its four bytes,
+  and `= {0}` on a `u32` array or a struct with an `s32` left the upper
+  halves unwritten: both used upstream's chunk table, where a QBE word is
+  4 bytes (here it is 2). A bit-field of a `FAR` object, or of const data
+  read through a pointer, was read in bank $00. None of the four occurs in
+  the examples, the library or the fixtures (IR scan). **Struct assignment
+  (`a = b;`) now works** for bank-$00 and ROM objects — it was refused by
+  accident (halfword ops the backend has no lowering for) — and is refused
+  on purpose for a `FAR` object on either side; **struct returns by value
+  are refused on purpose** (they compiled to a copy of zeros once the
+  accident was gone). New runtime fixture `devtools/compiler-tests/runtime/
+  d_quals` (16 cells on luna); `struct_assign` moves from the refusal pins
+  to a positive check. Every example matches its previous build frame for
+  frame (`diff_corpus` 89/89).
+- fix(lib): **`snesmodInit()` leaves NMITIMEN as it found it.** It ended on
+  `$81`, so an H or V timer IRQ enabled before the audio driver was loaded
+  stopped firing, silently. It now restores the lib's software copy of the
+  register. `libtest_snesmod`: 0 IRQs in the 10 frames after the call
+  before, 10 after.
+- fix(lib): **`snesmodProcess()` no longer latches the H/V counters, waits
+  its real five scanlines, and the SNESMOD command queue cannot wrap.** With
+  several commands queued the wait loop read OPVCT once per turn (a
+  read-twice register): the budget ran out in two or three lines, OPVCT's
+  read pointer stayed shifted for the next reader, and the latch flag was
+  left set, which `crt0` takes for a Super Scope shot. An 86th queued command
+  wrapped the 256-byte queue and the driver stopped answering. The wait now
+  counts H-blank edges (`$4212` bit 6), a command that does not fit is
+  dropped, the stray `cli` in `QueueMessage` / `snesmodInit` is gone and
+  `snesmodGetPosition()` reads until two reads agree; commands with no
+  parameter queue 0 in their unused bytes instead of what a scratch variable
+  held. Found by snes-rag
+  reading the upstream driver; measured and pinned by `libtest_snesmod`
+  (before: latch flag `$40`, 3 lines, depth 44 after 100 sends, never
+  drained; after: 0, 6, 255, drained in 40 frames).
+- fix(tools): **smconv crashed on a module with a compressed sample.** It
+  printed "unsupported compressed samples", kept a NULL buffer with the
+  declared length and segfaulted in the BRR encoder (exit 139). Compressed
+  samples are decoded now, and a corrupt stream (block past the end of the
+  file, a bit width the format does not have, a length the file cannot
+  hold) ends in `sample '<name>': corrupt compressed data (block N)`, exit
+  1 and no output file.
+- fix(runtime,lib): **offset-per-tile was off since 2026-09-12** — the NMI
+  wrote BG3's VOFS as `y - 1` like any displayed layer, but in Modes 2, 4
+  and 6 BG3 is the offset table and VOFS selects its rows (snesdev-wiki,
+  *Offset-per-tile*): `bgSetScroll(2, 0, 0)` read rows 31 and 0, all
+  zeros, and `backgrounds/mode2`'s bands went flat. `setMode` now records
+  whether the mode uses offset-per-tile (`bg3_opt`, a crt0 sysvar) and
+  re-syncs BG3's scroll; the NMI writes BG3's VOFS raw in those modes. The
+  flat picture had been re-captured as `mode2`'s baseline at both of its
+  capture points; `diff_corpus`: `mode2` is the only example that changes.
+
+### Changed
+- docs(lib): `math.h` says that `fixMul` returns 16 bits and wraps past
+  ±128 (`fixMul(FIX(20), FIX(20))` reads −112.0), pointing to `fix32Mul`;
+  `dsp1.h` describes the DSP1/DSP1A `Distance` bug the DSP1B fixed
+  (inverted interpolation at odd table positions, read from bsnes by the
+  corpus) instead of saying nobody says what it was, and gives the two
+  cartridge types `USE_DSP1` sets; `sram.asm` and `hdr_superfx.asm` lose
+  two banners that contradicted the code under them (SA-1 saves refused,
+  extended header filled with $FF); `ROADMAP.md` describes the `superfx`
+  module as it is and lists `dsp1` (chips audit PF7, PF8; library audit
+  l.30).
+- docs: `HARDWARE_VERIFICATION.md` gains row 24, `chips/superfx_game_skeleton`
+  (presentation, code cache and SNESMOD together on the cart), says that
+  the FXPak runs the DSP-1 only with the DSP ROM dumps in its system
+  folder, and names the two save paths no row covers yet (SA-1 BW-RAM,
+  Super FX Game Pak RAM) (chips audit PF10). `make hardware-kit` collects
+  24 ROMs.
+- build(devtools): every link runs `symmap.py --check-data-init`: the
+  `DataInitEnd` label must close the `.data_init` section, or initialised
+  globals past the terminator would boot with whatever WRAM held. Reading
+  wlalink (`_compare_sections`) and relinking `print_string` with
+  `data_init_end.o` first, in the middle and last showed that the object
+  order never decided this — appended sections are sorted by size, largest
+  first, and the 5-byte terminator is smaller than any record; the
+  limitations page said "MUST be linked last, no separate check" (E PF9).
+- docs: seven green entries of `KNOWN_LIMITATIONS.md` now name the test
+  that pins them (vertical scroll -1, data-init terminator, SA-1 SIWP
+  polarity, chips under luna, `int`/`long` sizes, 4-byte pointers, the
+  HiROM header size), and `devtools/compiler-tests/cases/type_sizes.c`
+  pins every type size with a `_Static_assert` (docs audit PF9).
+- test(luna-test): `baselines.json` re-captured under the pinned luna
+  (v1.32.0): the 89 frame hashes are unchanged, the `luna_version` and
+  `rom_sha256` fields no longer say v1.21.0 for 58 entries (testing audit
+  PF10, rec 12).
+- test(luna-test): the eight input manifests that only asserted a
+  direction (`increased` / `changed`) now also assert the measured value
+  at every checkpoint and the image at the end of the script (`fbhash`):
+  map_scroll, collision_demo, aim_target, tiled, likemario, perspective,
+  dynamic_map, random (testing audit T7 and T10).
+- docs: `MIGRATING_FROM_PVSNESLIB.md` gains "What does not exist": every
+  PVSnesLib header compared name by name against ours, the absent names
+  sorted into renamed, decided against (`printf`, scores, pixel plotting,
+  `WaitNVBlank`, the FPS counter) and assumed gaps (a single-colour palette
+  write, `oamGetX/Y`) (library audit rec 13).
+- docs(devtools): the doc sentinel checks the header → tutorial map of
+  `docs/README.md` (anchor 15: every public header has a row, every header
+  and tutorial named exists; the page called the table "generated" while
+  nothing produced it) and reads `CLAUDE.md` for the examples count
+  (docs audit rec 8).
+- test(luna-test): `make test-manifests` replays the SNESMOD stop, pause
+  and fade manifests at sixteen press phases (`phase_sweep.py`, every input
+  checkpoint and the asserted frame shifted by 0..15 frames). The key-off
+  defect of 2026-09-26 failed 8 to 10 of 161 press frames swept by hand;
+  the sweep did not stay in the suite (testing audit T4).
+- test(devtools): the fx fixture now arms a V-timer IRQ **before**
+  `snesmodInit` and counts it through ten frames of `snesmodProcess` (one
+  per frame, `r_irq_mod`), reads STAT78 right after the driver's call (the
+  counter-latch flag the Super Scope code takes for a shot stays clear,
+  `r_mod_latch`), and asserts NMITIMEN and VTIME on luna's view — the
+  irq + SNESMOD combination the testing audit found untested (T5). The
+  10-03 defects (`snesmodInit` dropping an armed timer, the driver's
+  `$2137` latch) would fail it.
+- test(luna-test): `luna_runner.py --coverage` fails an example whose ROM
+  header does not cover the file (the `$FFD7` size byte below the ROM
+  length) or whose checksum complement does not match, from the `rom`
+  block luna already returns (build audit rec 5). luna's `checksum_valid`
+  did not re-sum the ROM (a changed byte stayed valid — `OPEN_luna.md`,
+  2026-10-05); luna's develop added `rom.checksum_computed` the same day
+  and the pass compares the header to it when the field is present.
+- tools: `opensnes doctor` checks every binary the examples may call
+  (`wla-superfx`, `wla-spc700`, `sa1_patch`, `wav2brr`, `font2snes`,
+  `tmx2snes` joined the list) and says whether clang is there for the
+  deprecation pre-pass; gfx4snes's help described `-z` with `-b`'s text and
+  gave `-Y` the long name `--meta-width` (now `--meta-height`); the HiROM
+  header's cartridge-type comment and the wav2brr README's section example
+  (`ASSET_SECTION`, not a `superfree` section) are current (build-tools
+  audit PF10).- docs: the public limitations page and the roadmap date their entries
+  instead of naming internal chantier codes (documentation audit PF7).
+- test(luna-test): the fourteen self-animating examples that had a single
+  image capture point (`backgrounds/mode0`, `basics/fix32_orbit`,
+  `basics/timer`, the three Super FX and SA-1 demos, `color/pseudo_hires`,
+  `games/shmup_1942`, `games/tetris`, `mode7/extbg`,
+  `scrolling/mixed_scroll`, `sprites/aseprite_pipeline`,
+  `sprites/dynamic_sprite`, `text/scroll_message`) are captured at frames
+  200 and 400, so an animation that freezes after boot no longer passes
+  (testing audit T6).
+- build: `GSU_BANK=0` is refused (bank 0 holds the code and the header);
+  `ROM_NAME` is checked — 21 printable ASCII characters at most, no `/`,
+  `&` or `\` (a longer name was cut, UTF-8 went into the header, the sed
+  broke); the graphics and soundbank conversions depend on the config
+  stamp, so a change of `SPRITE_SIZE` or `SOUNDBANK_BANK` regenerates
+  them; slot 0 of the LoROM memory map is named "ROM" and `GSU_SECTION`
+  uses the name — the WLA warning "SLOT number 0, but also a SLOT with
+  starting address 0" on every Super FX link is gone (build-tools audit
+  PF8, PF9, S14). The soundbank conversion has one target: with the `.asm`
+  and `.h` as two targets of one rule, a parallel make ran `smconv` twice
+  and the second run emptied the `.bnk` the first assembly was reading.
+- docs: `PHILOSOPHY.md` and `docs/BENCHMARK.md` join the Doxygen site
+  (`ROADMAP.md` does not: its section labels and links to `compiler/*.md`
+  collide with Doxygen); two tutorials no longer quote `BANKS 7-1` for the
+  asset range (`ROM_BANKS - 1` down to 1 since 2026-09-24); CLAUDE.md
+  names the two validation pillars as `testing.md` does; the reviewer
+  agent no longer says `audio.asm` is skip-marked (documentation and
+  governance audits).
+- test(devtools): the Super FX fixture runs a fifth job through
+  `gsuLaunch()` (the CPU parked in WRAM, 34 frames counted by the NMI blob)
+  and presents the buffer with `gsuPresentInit()` / `gsuPresent()` /
+  `gsuPresentWait()`: the manifest asserts the flags, the flipped
+  `gsu_scbr` and the six result bytes landed in VRAM. No ROM exercised
+  that path under the harness before (chips audit PF5).
+- test(luna-test): `rom_coverage.py` fails locally when a public function is
+  executed only by the firmware-gated ROMs and is missing from
+  `executed_only_with_firmware.txt` — CI has no firmware and would call it
+  never-executed (develop went red that way for five pushes on
+  `dsp1SetCamera`; testing audit rec 7).
+- build: a build without clang no longer hides the deprecations. When the
+  clang pre-pass is absent, `make/common.mk` runs `check_upgrade.py -q` on
+  each source it compiles and prints the deprecated names it finds
+  (documentation audit, the one red item left after `UPGRADING.md` and
+  `make check-upgrade`). `check_upgrade.py` gains `-q` (hits only).
+- test(luna-test): the nineteen input-driven manifests (`movement_*`,
+  `state_*`) assert that every VRAM DMA of their run lands in blank
+  (`[asserts.dma] unsafe_writes = 0`): `vram_dma_blank.py` only sees the
+  boot path, so what a button press triggers was ungated (testing audit T8,
+  examples audit PF2); all nineteen pass. `nmi_budget.py` gates the VBlank
+  work the handler hands to hooks — `tilemapFlush` (17 652 master clocks, a
+  full tilemap redraw), `oamDynamicNmiFlush` and `oamVramQueueUpdate` —
+  from their own measured references, and a row can name the manifest
+  whose input drives the measurement (library audit PF2).
+- ci: a push to `develop` keeps its CI verdict — `cancel-in-progress` now
+  applies to PR and branch runs only (37 of 78 develop runs between
+  09-27 and 10-03 were cancelled by the next push; testing audit PF2).
+  `wram_regress.py` says why a stream was skipped (no coprocessor firmware
+  vs cross-arch-fragile); `manifest.toml` points at the probe manifests
+  that exist (`mouse.toml`, `mouse_sensitivity.toml`, `superscope.toml`).
+- build: `make lint-asm-abi` also checks `lib/contrib` (the object engine's
+  18 public functions were outside the ASM/C stack-offset gate; library
+  audit PF6). Green on first run.
+- build: `scripts/install-luna.sh` explains a missing binary. luna keeps the
+  binaries of its five newest releases only (its rule since 2026-10-03), so
+  a tag of this SDK older than v0.47.0 can no longer download the luna it
+  pins; on a 404 the script now says so and gives the command to build luna
+  from its tag, instead of a bare download error.
+- chore(runtime): the SA-1 boot stub also sets CBWE (`$2227`, the SA-1's
+  own BW-RAM write enable), as the Nintendo manual asks. Not a fix: the
+  protection holds only while SBWE and CBWE are both clear (ares
+  `bwram.cpp`, from Kirby's Dream Land 3) and crt0 sets SBWE, so the SA-1's
+  writes already went through — the chips audit's S6 is withdrawn. The SA-1
+  SRAM fixture now proves the coprocessor's write to the save memory
+  (`r_sa1_bw`).
+- test(luna-test): **luna pinned at v1.32.0** (`luna diff --audio`, the two
+  clearer `region` messages). `docs/tools/luna.md` regenerated. The three
+  audio-comparison runs of our request were replayed on the published
+  binary: half-volume module `DIFF` at 75.93 %, same ROM `MATCH`, scripted
+  `snesmod_sfx` `MATCH`. `.claude/rules/testing.md` now asks every commit
+  that re-captures `baselines/audio.json` to quote `luna diff --audio`
+  between the build before and the one after.
+- refactor(lib,docs): **`mode7SetPivot()` is deprecated in favour of
+  `mode7SetCenter()`** (owner decision, completing D5). It writes the same
+  two registers from two `u8`; the tutorial said it took screen coordinates
+  and computed centre and scroll, which the code never did. `mode7.md` now
+  gives the rule instead: the centre shows on screen at (centre − scroll),
+  so a rotation around the middle of the screen wants
+  `mode7SetCenter(scrollX + 128, scrollY + 112)` (formula: anomie-regs,
+  M7X; snesdev-wiki, Mode 7 transform, chunk `bf5cb2a48a63c1aa`).
+- **BREAKING** refactor(lib): **twelve internal variables leave the public
+  headers** (API decision D4, last part): the ten `lkup*` VRAM lookup
+  tables of the dynamic sprite engine (`sprite.h`; only the engine's
+  assembly reads them) and the `gsuPresent()` diagnostics `gsu_pres_frames`
+  / `gsu_pres_last` (`superfx.h`). No example and no page used them; a
+  project that did declares them `extern` itself. Five Super FX variables
+  that the same list would have removed **stay public**: `gsu_stop_irqs`,
+  `gsu_owns_cart`, `gsu_prog_bank`, `gsu_prog_addr` and `gsu_scmr_live` are
+  the documented contract for code that starts a GSU job by itself
+  (`docs/tutorials/superfx.md`).
+- docs: `PHILOSOPHY.md`, principle 4 — a struct is asked of a new function
+  with more than **five** arguments, not three (API decision).
+- docs: **`WaitForVBlank()` keeps its name** (API decision D2). The one
+  function of the library with a capital first letter stays as it is — it
+  is the name every PVSnesLib port arrives with — and `PHILOSOPHY.md`, the
+  migration guide and `console.h` now say it is the deliberate exception.
+- refactor(lib,examples,docs): **`hdmaEnableMask()` / `hdmaDisableMask()`
+  replace `hdmaEnable()` / `hdmaDisable()`** (API decision D1, first of two
+  steps). The pair took a bit mask in a header where every other function
+  takes a channel number, and the repository called it in fourteen
+  spellings. The new names say what the argument is; the old ones are the
+  same entry points, deprecated, and every call in the examples, the docs
+  and the fixtures is migrated. **At 1.0 `hdmaEnable(channel)` comes back
+  taking a channel number**: a call left as `hdmaEnable(0x40)` will then
+  mean something else, which is what the warning is for.
+- refactor(lib,docs): **the dead API is deprecated** (API decision on dead
+  API). `audioUpdate()` (does nothing), `consoleInitEx()` (ignores its
+  argument, is `consoleInit()`), `snesmodSetSoundTable()` and
+  `snesmodAllocateSoundRegion()` (prepare a stream that no SDK call can
+  start) build and warn, and go at 1.0. `padRaw()` is deprecated in favour
+  of `padHeld()` rather than renamed: the NMI handler replaces any word that
+  is not a joypad's by 0 before either reads it, so the two return the same
+  value and a new name would have been a third spelling of it.
+  `MIGRATING_FROM_PVSNESLIB.md` no longer offers it as the raw read.
+- refactor(lib,examples,docs): **the duplicate names are deprecated** (API
+  decision D5). `getRegion()` gives way to `isPAL()` (the same value since
+  v0.44), `profileGetFrameCount()` to `getFrameCount()` (the same counter),
+  `BGMODE_MODE0/1/2/3/7` to `BG_MODE0`-`BG_MODE7`, and the layer bits
+  `WINDOW_BG1`-`WINDOW_OBJ`, `COLORMATH_BG1`-`COLORMATH_OBJ`,
+  `MOSAIC_BG1`-`MOSAIC_BG4` to `LAYER_BG1`-`LAYER_OBJ`: one set of layer
+  names for `setMainScreen`, `windowEnable`, `colorMathSetLayers` and
+  `mosaicSetLayers`. What only one module has keeps its name
+  (`WINDOW_MATH`, `WINDOW_ALL`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`,
+  `MOSAIC_BG_ALL`), and `TM_*` stays as the register's bit names. Old names
+  build and warn; they go at 1.0. A deprecated constant is a macro, so the
+  warning comes from `#pragma clang deprecated` in the header, read by the
+  clang pre-pass (`-Wno-error=deprecated-pragma` in `make/common.mk`); the
+  library itself is linted without that allowance, so it cannot use one.
+  Three doc fixes ride along: `mode7SetPivot()` was described as taking
+  screen coordinates when it writes the same two registers as
+  `mode7SetCenter()` from two `u8`; `docs/tutorials/graphics.md` called
+  `setMode()` with one argument; `VBlankCallback` and `VoidFn` now say they
+  are the same type.
+- **BREAKING** refactor(lib): **no lib variable with an unprefixed name is
+  exported any more, and the header functions that needed them are no longer
+  `inline`** (API decision D4). `cursor_x` / `cursor_y`, `cgwsel` / `cgadsub`,
+  `force_blanked` / `current_brightness`, `sine_table`, `ease_quad_table`,
+  `hdma_wave_speed`, `mosaic_size` / `mosaic_bg_mask` and the raw `scope_*`
+  words leave the public headers (and take their module's prefix where they
+  had none: a game defining `sine_table` or `cursor_x` collided with the lib
+  at link time, as `sa1_starfield` nearly did). `fixSin`, `fixCos`,
+  `textSetPos`, `setScreenOn`, `setScreenOff`, `getBrightness`,
+  `colorMathInit`, `colorMathSetLayers`, `colorMathDisable`, `mosaicInit`,
+  `hdmaWaveSetSpeed`, `scopeCalibrate`, `scopeSetHoldDelay` are ordinary
+  functions. Cost: `fixSin` / `fixCos`, the only ones called per frame, are in
+  assembly and a call costs about 96 master cycles more than the inlined
+  lookup did (`backgrounds/mode2`, 32 calls a frame: 17.60 % to 18.46 % of the
+  frame; `docs/PERF.md`). Read state through the getters (`textGetX()`,
+  `getBrightness()`, `mosaicGetSize()`...).
+- refactor(lib): **`easeInQuad()` / `easeOutQuad()`** (API decision D3) replace
+  `ease_in_quad()` / `ease_out_quad()`, which stay as deprecated aliases until
+  1.0. `sqrt16`, `atan2_8` and `mul16` keep their names.
+- **BREAKING** refactor(lib): **the object engine's exported globals are
+  gone** (API decision D4). `objgetid` becomes `objGetCurrentId()`,
+  `objtokill = 1;` becomes `objKillCurrent();`, and `objptr` was already the
+  return value of `objGetPointer()`. Assembly reads `obj_current_id`,
+  `obj_kill_flag`, `obj_ptr`.
+- **BREAKING** refactor(lib): **the map camera is read with
+  `mapGetCameraX()` / `mapGetCameraY()`; the exported globals `x_pos` and
+  `y_pos` are gone** (API decision D4, the one row no alias could fix after
+  the freeze: a public header must not claim names a game wants for itself).
+  Replace `x_pos` by `mapGetCameraX()` and `y_pos` by `mapGetCameraY()`;
+  assembly reads `map_cam_x` / `map_cam_y`. Five examples, two manifests and
+  the map and object tutorials migrated.
+- test(luna-test): **luna v1.31.0.** `luna test` manifests take
+  `region = "pal"` (the documented name of `force_region`, still accepted)
+  and `--report json` echoes it. `make test-pal` uses `region`. `make tests`
+  and `make test-pal` green, no baseline moved.
+- test(luna-test): **luna v1.30.4.** Only its MCP server changes (the
+  fields Claude Code 2.1.287 sends); emulation is v1.30.3's. `make tests`
+  green, no baseline moved.
+- test(luna-test): **luna v1.30.3.** Its one fix, a save for Super FX
+  cartridges with a battery, changes nothing in our ROMs: our Super FX header
+  says `$13`, no battery. `make tests` green, no baseline moved.
+- **BREAKING** fix(lib): **`mode7SetScale(0x0100)` is now 1:1**, as its
+  documentation always said. `mode7SetAngle()` wrote a matrix of half the
+  scale, so `0x0200` was 1:1 and `0x0100` magnified twice, and
+  `mode7Init()` + `mode7SetAngle(0)` turned the identity into ×2. The scale
+  is doubled before the multiply now (valid up to `0x3FFF`);
+  `mode7Transform(deg, 100)` is 1:1 too. **Migration**: halve the scales
+  you pass (`0x0200` → `0x0100`); code that relied on the default scale
+  after `mode7Init()` and wants the old ×2 view sets `mode7SetScale(0x0080,
+  0x0080)`. The four examples that use it were migrated, pixel-identical
+  (`diff_corpus`). `mode7Init`'s doc now also says it leaves the view on
+  plane row `$180`.
+
 ## [0.47.0] — 2026-10-02
 
 The Super FX release. A game can now run while the GSU works: code runs

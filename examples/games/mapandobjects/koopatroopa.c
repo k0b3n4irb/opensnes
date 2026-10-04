@@ -44,7 +44,7 @@ void koopatroopainit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     if (objNew(type, xp, yp) == 0)
         return;
 
-    objGetPointer(objgetid);
+    objGetPointer(objGetCurrentId());
     objWorkspace.width = 16;
     objWorkspace.height = 16;
     objWorkspace.sprframe = 0;
@@ -101,8 +101,8 @@ static void koopatroopa_animate(u16 idx) {
 static void koopatroopa_draw(void) {
     u16 n = koopatroopanum;
 
-    koopatroopay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - y_pos;
-    koopatroopax = koopatroopax - x_pos;
+    koopatroopay = (objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8)) - mapGetCameraY();
+    koopatroopax = koopatroopax - mapGetCameraX();
 
     oambuffer[n].oamx = koopatroopax;
     oambuffer[n].oamy = koopatroopay - 16;

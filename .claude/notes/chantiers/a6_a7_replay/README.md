@@ -125,8 +125,8 @@ context drift via `git apply`'s 3-way merge.
 - `.claude/notes/archive/a6_a7_unified_audit.md` — full chantier
   history (5 sessions, 3 audit-implement cycles, ~700+ lines of
   diagnostic notes).
-- `.claude/notes/chantiers/a7_phase0_handoff.md` — Phase 0 repro source.
-- `.claude/notes/chantiers/a7_phase1_design.md` — original site mapping.
+- `.claude/notes/archive/a7_phase0_handoff.md` — Phase 0 repro source.
+- `.claude/notes/archive/a7_phase1_design.md` — original site mapping.
 - Commit `4aa4989` — A6.8 large-frame addressing (shipped, baseline).
 - Commit `e2ba69c` — audit doc with 7-site plan (pre-implementation).
 - Commit `c7b0d06` — 2026-05-11 attempt findings (rolled back).

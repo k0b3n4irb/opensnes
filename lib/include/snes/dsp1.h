@@ -9,8 +9,8 @@
  * interface as ordinary C calls.
  *
  * @par Cartridge requirement
- * Build with `USE_DSP1 := 1` (sets the ROM header cartridge type to $03 and
- * maps the DSP registers). The DSP-1 registers live at $30:8000 (data) /
+ * Build with `USE_DSP1 := 1` (sets the ROM header cartridge type to $03, or
+ * $05 with `USE_SRAM := 1`, and maps the DSP registers). The DSP-1 registers live at $30:8000 (data) /
  * $30:C000 (status) on the LoROM board this SDK targets.
  *
  * @par Fixed-point
@@ -60,7 +60,7 @@
 extern volatile s16 dsp1_o0;
 extern volatile s16 dsp1_o1;  /**< @see dsp1_o0 */
 extern volatile s16 dsp1_o2;  /**< @see dsp1_o0 */
-extern volatile s16 dsp1_o3;  /**< @see dsp1_o0 (4th word — dsp1Parameter only) */
+extern volatile s16 dsp1_o3;  /**< @see dsp1_o0 (4th word — dsp1SetCamera only) */
 
 /**
  * @name Bridges to the SDK fixed-point types
@@ -72,7 +72,9 @@ extern volatile s16 dsp1_o3;  /**< @see dsp1_o0 (4th word — dsp1Parameter only
  */
 /** @brief SDK 8.8 `fixed` → DSP-1 T (1.15). Valid for −1.0 ≤ f < 1.0. */
 #define DSP1_T_FROM_FIX(f)   ((s16)((s16)(f) << 7))
-/** @brief DSP-1 T (1.15) → SDK 8.8 `fixed` (truncating). */
+/** @brief DSP-1 T (1.15) → SDK 8.8 `fixed`: an arithmetic shift, so it
+ *  rounds toward minus infinity (floor), not toward zero (the word
+ *  "truncating" stood here until 2026-10-04). */
 #define DSP1_FIX_FROM_T(t)   ((s16)((s16)(t) >> 7))
 /** @brief SDK 8-bit angle (256 = full turn) → DSP-1 A (2^16 = full turn). */
 #define DSP1_A_FROM_FIX8(a)  ((u16)((u16)(u8)(a) << 8))
@@ -148,14 +150,25 @@ void dsp1Attitude(u16 scale, u16 az, u16 ay, u16 ax);
 void dsp1Objective(s16 x, s16 y, s16 z);
 
 /**
+ * @brief The camera of the projection: the seven inputs of DSP-1 command
+ *        $02, "Parameter", under their names in the manual.
+ *
+ * Keep one in RAM and change the fields that move (position, heading), or
+ * make it `static const` for a fixed view.
+ */
+typedef struct {
+    s16 x;      /**< projection-base X (Fx, I) */
+    s16 y;      /**< projection-base Y (Fy, I) */
+    s16 z;      /**< projection-base Z (Fz, I) — the camera's height over a ground plane */
+    s16 lfe;    /**< distance eye → screen plane (I) — smaller = wider FOV */
+    s16 les;    /**< distance screen plane → ground reference (I) */
+    u16 aas;    /**< screen-plane azimuth angle (A) — the heading */
+    u16 azs;    /**< screen-plane zenith angle (A) — the tilt */
+} Dsp1Camera;
+
+/**
  * @brief Set up the projection plane (DSP-1 command $02, "Parameter").
- * @param fx projection-base X (I)
- * @param fy projection-base Y (I)
- * @param fz projection-base Z (I)
- * @param lfe distance eye → screen plane (I) — smaller = wider FOV
- * @param les distance screen plane → ground reference (I)
- * @param aas screen-plane azimuth angle (A)
- * @param azs screen-plane zenith angle (A)
+ * @param cam the seven inputs (see Dsp1Camera); read during the call, not kept
  *
  * Writes four words (order per the official manual §5.4.1, verified on luna):
  * - @ref dsp1_o0 = **Vof**, the raster number of the "imaginary centre";
@@ -172,6 +185,15 @@ void dsp1Objective(s16 x, s16 y, s16 z);
  * ground. `lfe`/`les` are best tuned empirically — see the values used by
  * examples/chips/dsp1_cube; `les` is also the vertical focal length.
  */
+void dsp1SetCamera(const Dsp1Camera *cam);
+
+/**
+ * @brief dsp1SetCamera() with its seven inputs as arguments
+ *
+ * The same command and the same outputs. (fx, fy, fz, lfe, les, aas, azs)
+ * are the fields of Dsp1Camera in order.
+ */
+OPENSNES_DEPRECATED("use dsp1SetCamera() — seven positional arguments, now the fields of Dsp1Camera")
 void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs);
 
 /**
@@ -182,7 +204,7 @@ void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs);
  *
  * Writes @ref dsp1_o0 = H (screen X), @ref dsp1_o1 = V (screen Y),
  * @ref dsp1_o2 = M (scale/depth — use it to size sprites with distance).
- * Requires a prior dsp1Parameter. Takes ~627 DSP cycles (~83 µs); the driver
+ * Requires a prior dsp1SetCamera. Takes ~627 DSP cycles (~83 µs); the driver
  * polls, so timing is handled for you.
  */
 void dsp1Project(s16 x, s16 y, s16 z);
@@ -195,8 +217,8 @@ void dsp1Project(s16 x, s16 y, s16 z);
  * The inverse of dsp1Project for the ground plane: which ground (x, y) is
  * under a cursor, a crosshair, a missile scope. Writes @ref dsp1_o0 = ground
  * X and @ref dsp1_o1 = ground Y, in the same convention as Cx/Cy —
- * dsp1Target(0, 0) returns exactly the Cx/Cy pair of the last dsp1Parameter.
- * Requires a prior dsp1Parameter.
+ * dsp1Target(0, 0) returns exactly the Cx/Cy pair of the last dsp1SetCamera.
+ * Requires a prior dsp1SetCamera.
  */
 void dsp1Target(s16 h, s16 v);
 
@@ -206,12 +228,12 @@ void dsp1Target(s16 h, s16 v);
  * @param ab    destination for A,B: 4 bytes per raster (A lo, A hi, B lo, B hi)
  * @param cd    destination for C,D: 4 bytes per raster (C lo, C hi, D lo, D hi)
  * @param vs    first raster number (relative to the imaginary centre; use
- *              `Vva + 2` from dsp1Parameter for the first ground line)
+ *              `Vva + 2` from dsp1SetCamera for the first ground line)
  * @param count number of rasters to stream (at most 127 per HDMA repeat block)
  *
  * This is the Super Mario Kart / Pilotwings ground: the chip computes, for
  * each raster, the Mode 7 matrix that projects the ground plane under the
- * camera set by dsp1Parameter — perspective, and rotation when `aas` is
+ * camera set by dsp1SetCamera — perspective, and rotation when `aas` is
  * non-zero. The two buffers are laid out as the payload of an
  * `HDMA_MODE_2REG_2X` repeat block (M7A/M7B on one channel, M7C/M7D on the
  * other); point the block's header at them and put the block on screen line
@@ -240,9 +262,15 @@ void dsp1Raster(u8 FAR *ab, u8 FAR *cd, s16 vs, u16 count);
  *         (3,4,12) -> 12, (300,400,0) -> 499, (0,0,10000) -> 9999. Treat the
  *         result as exact to within 1, and compare with `>=` / `<`, never
  *         `==`. Measured on the DSP-1B firmware; the official manual (Book II
- *         §5.2.3, code 28H) states no rounding, and sneslab notes the
- *         command "bugged in DSP1/DSP1A, fixed in DSP1B" without saying
- *         what the bug was — so on the 1/1A revisions the result may differ.
+ *         §5.2.3, code 28H) states no rounding. The truncation is the
+ *         algorithm (bsnes `dsp1emu.cpp`: `Distance >>= (E >> 1)`), not the
+ *         DSP1/DSP1A bug that fullsnes names for this command (fixed in
+ *         DSP1B, chunk `919f1a3794274d16`): on the 1/1A revisions the
+ *         interpolation table is read inverted at odd positions (bsnes
+ *         `dsp1emu.cpp` l. 418-420, read by the corpus fiche
+ *         `647e4ef6ebffdf00`; sneslab names the bug without describing it).
+ *         Command $2F returns the ROM version ($0100 = DSP1/1A, $0101 =
+ *         DSP1B) if a game needs to know which one it runs on.
  *
  * Hardware square root — handy for homing missiles, audio attenuation,
  * anything that needs a true distance rather than a compare.

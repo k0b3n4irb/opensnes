@@ -15,10 +15,16 @@
 #     it from this list (the fork got closer to upstream);
 #   - listed and failing                 → expected.
 # One name per line, as printed by cproc's `runtests` (test/<name>.c).
+# 2026-10-04: three more IL diffs of the same facet after the cproc fixes of the
+# library audit (funccopy copies 4-byte units as `l`, zero() stores `l` with
+# align 4, since `long` = 4 on this target): builtin-va-copy+aarch64.c,
+# local-init.c, struct-copy.c. Caught by the sanitizer job, not locally —
+# run `make test-toolchain-suites` after any change under compiler/.
+
 add-int-pointer.c
 alignas-0.c
-alignas-local.c
 alignas-local-strict.c
+alignas-local.c
 alignas-member.c
 alignas-type.c
 alignas-vla-strict.c
@@ -29,8 +35,8 @@ binary-constant.c
 bitfield-assignment-sign-extend.c
 bitfield-compound-assign.c
 bitfield-initializer-overflow.c
-bitfield-integer-promotion.c
 bitfield-integer-promotion-long.c
+bitfield-integer-promotion.c
 bitfield-load-signed.c
 bitfield-load-unsigned.c
 bitfield-non-adjacent.c
@@ -42,8 +48,9 @@ builtin-constant-p.c
 builtin-expect.c
 builtin-offsetof.c
 builtin-types-compatible-p.c
-builtin-vaarg-vm.c
+builtin-va-copy+aarch64.c
 builtin-va-copy+x86_64-sysv.c
+builtin-vaarg-vm.c
 cast-vm.c
 char-sign+aarch64.c
 char-sign+riscv64.c
@@ -52,8 +59,8 @@ compatible-enum-types.c
 compatible-vla-types.c
 compound-assignment.c
 compound-literal-static.c
-conditional.c
 conditional-compound-literal.c
+conditional.c
 const-array.c
 const-expr-cast.c
 const-expr-div.c
@@ -73,8 +80,8 @@ generic.c
 hello.c
 initializer-address-subtract.c
 initializer-cast-float-int.c
-initializer-empty.c
 initializer-empty-struct.c
+initializer-empty.c
 initializer-member-static.c
 initializer-nested-array-address.c
 initializer-pointer-int-cast.c
@@ -82,6 +89,7 @@ initializer-replace-local-string-wide.c
 initializer-replace-static-string-wide.c
 initializer-string-wide.c
 inline-definition.c
+local-init.c
 logical-and.c
 logical-or.c
 lvalue-conversion.c
@@ -93,32 +101,33 @@ sizeof-string-literal.c
 sizeof-vla.c
 string-concat.c
 string-octal.c
+struct-copy.c
 struct-flexible-array.c
 struct-packed.c
-struct-passing.c
 struct-passing-call.c
+struct-passing.c
 struct-return-1.c
 struct-return-2.c
 subtract-pointer.c
 tentative.c
 thread-local.c
-typedef.c
 typedef-name.c
 typedef-qual.c
+typedef.c
 typeof-array.c
+typeof-vm.c
 typeof.c
 typeof_unqual.c
-typeof-vm.c
-union.c
 union-passing.c
 union-struct-flexible-array.c
+union.c
 unreachable.c
 varargs+aarch64.c
 varargs+riscv64.c
 varargs+x86_64-sysv.c
-vla.c
 vla-deref.c
 vla-nested.c
+vla.c
 wchar-sign+aarch64.c
 wchar-sign+riscv64.c
 wchar-sign+x86_64-sysv.c

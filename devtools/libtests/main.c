@@ -8,7 +8,7 @@
  * Current coverage:
  *   - math: div16/mod16 (bounded long division), mul16, sqrt16,
  *     fixMul/fixDiv/fixLerp (8.8) and fix32Mul/fix32Div (16.16) — L2b
- *   - text: cursor_y wrap — printing past row 31 must wrap to row 0
+ *   - text: cursor row wrap — printing past row 31 must wrap to row 0
  *     instead of writing past tilemapBuffer[2048] into the RAM sections
  *     that follow it (text_config is the first casualty pre-fix)
  *   - anim: tick sequencing (loop wrap, once-hold + finished flag,
@@ -41,6 +41,7 @@
 #include <snes/profile.h>
 #include <snes/registers.h>
 #include <snes/tile.h>
+#include <snes/apu.h>
 /* Deprecated names keep their vector while they ship (scopeButtonsDown,
  * mosaicEnable, colorMathEnable, rand, srand). */
 #if defined(__clang__)
@@ -176,7 +177,11 @@ u16 r_audio_vol;    /* audioGetVolume() after SetVolume(100) -> 100 */
  * (data.asm) is streamed into ARAM via LOAD_SIZE/LOAD/DIR_SET, then
  * keyed on. ARAM/DSP side asserted by probes/audio_v2.py. */
 extern u8 beep_brr[];
+static const u8 big_brr[513] = { 0 };   /* 57 silent BRR blocks: a load whose last index byte is 0 */
 u16 r_audio_load;   /* audioLoadSample(0, beep, 9, 0) -> AUDIO_OK (0)  */
+u16 r_audio_load513; /* audioLoadSample(1, 513 bytes, 513, 0): the last index byte is 0
+                      * (513 = 2 x 256 + 1) — the end-of-stream race (until 2026-10-03:
+                      * AUDIO_ERR_TIMEOUT and a hung driver) -> AUDIO_OK (0) */
 u16 r_audio_free;   /* audioGetFreeMemory() -> 0xC000-0x0B00-9 = 0xB4F7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
 u16 r_audio_voice;  /* audioPlaySampleEx(...) -> voice 0 (round-robin)  */
@@ -229,6 +234,7 @@ u8 load_buf2[8];
 u16 r_sram_rt;      /* bytes equal after sramSave/sramLoad(16)     -> 16 */
 u16 r_sram_off;     /* sramSaveOffset/LoadOffset(8 @ 0x100): [7]  -> 22 */
 u16 r_sram_off0;    /*                                       [0]  -> 1 */
+u16 r_sram_rom0;    /* sramSaveOffset from ROM bank $00 ($00:FFC0, the header title "LIB RUNTIME TEST"), read back: [0] -> 0x4C 'L' (the bank-0 fast path copied WRAM $7E:FFC0 until 2026-10-04) */
 u16 r_sram_ck;      /* sramChecksum(save_buf,16) = XOR(1,4,..,46) -> 32 */
 u16 r_sram_ck0;     /* sramChecksum(save_buf,0)                   -> 0 */
 u16 r_sram_clear;   /* OR of 16 bytes reloaded after sramClear(16) -> 0
@@ -265,6 +271,31 @@ u16 r_obj_calls;    /* update callback invocations        -> 1            */
 u16 r_obj_alive;    /* set after objUpdateAll returns     -> 0xA11E       */
 static u16 obj_peeker, obj_other;
 static u16 obj_calls;
+
+/* 2026-10-03: functions that were `inline` in their headers and are lib
+ * functions now (API decision D4), plus the D3 rename of the ease pair. */
+u16 r_ease;         /* easeInQuad(128) | easeOutQuad(128) << 8      -> 0xC040 (64, 192) */
+u16 r_ease_names;   /* ease_in_quad / ease_out_quad (deprecated) agree -> 1 */
+u16 r_bright_get;   /* getBrightness() after setBrightness(7)       -> 7 */
+u16 r_mosaic_init;  /* mosaicGetSize() after mosaicSetSize(9), mosaicInit() -> 0 */
+u16 r_scope_hold;   /* scope_holddelay after scopeSetHoldDelay(30)  -> 30 */
+extern u16 scope_holddelay;
+
+/* D4 (2026-10-03): objGetCurrentId() and objKillCurrent() replace the
+ * exported globals objgetid and objtokill. */
+u16 r_obj_curid;    /* objGetCurrentId() == objNew()'s return      -> 1 */
+u16 r_obj_type64;   /* objNew(64, ..): type past OB_TYPE_MAX        -> 0 (a handle, indexing past the tables, until 2026-10-04) */
+u16 r_obj_oob_cobj; /* objCollidObj(106, 0): index past the pool    -> 0 */
+u16 r_obj_oob_idx;  /* objNew after objCollidMap1D(106)/objUpdateXY(106): the free list
+                       survived -> index 1 (slot 106's xvel IS objunused, the
+                       free-list head: friction zeroed it until 2026-10-05) */
+u16 r_obj_selfkill; /* objGetPointer(h) after its update called
+                     * objKillCurrent()                            -> 0 (stale) */
+u16 r_obj_kept;     /* a second object, same pass, no kill         -> non-zero */
+static void objSuicideUpdate(u16 idx) {
+    (void)idx;
+    objKillCurrent();
+}
 
 static void objPeekUpdate(u16 idx) {
     obj_calls++;
@@ -332,6 +363,7 @@ u16 r_prof_scan;    /* profileGetScanline() < 262                -> 1 */
 u16 r_prof_lines;   /* profileScanlineEnd after a 200-iteration spin -> ge 1 */
 u16 r_prof_lag;     /* profileGetLagFrames: reads the counter (value measured) */
 u16 r_cm_layers;    /* colorMathSetLayers(BG1) after (BG2): BG1 only -> 1 */
+extern u8 colormath_cgadsub;   /* the lib's CGADSUB shadow: internal, no public header declares it */
 u16 r_mosaic;       /* mosaicSetSize(20) clamps: mosaicGetSize   -> 15 */
 static const u8 lotb_vram[32] = {
     0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,
@@ -370,6 +402,13 @@ u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 /* console: region + vblank flag */
 u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
 u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
+u16 r_rng_boot;     /* first rngNext() after consoleInit, kept for the record: the seed is
+                     * the latched H/V counters ^ STAT78 and moves with the instant of the
+                     * latch, so it is not pinned */
+u16 r_rng_boot_moved; /* that first value differs from the one the unlatched seed ($8001,
+                       * until 2026-10-03) gives -> 1 */
+u16 r_lerp_wide;    /* fixLerp(FIX(-64), FIX(64), 128): the 17-bit difference -> 0 (was -128.0) */
+u16 r_hide_x;       /* oamHide(5): X low byte 1 (X = 257 = -255), not 0 (X = 256 counts as 0) -> 1 */
 u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
 u16 r_true_one;     /* isPAL() == getRegion() on this region, and TRUE == 1 -> 1 */
 u16 r_ispal;        /* isPAL()     -> 0 (1 under pal, the same value as getRegion) */
@@ -499,6 +538,8 @@ static void coverage_bank_bytes(void) {
  * consoleInitEx. Runs last: it silences the voice the audio block left
  * playing (audio_v2.toml asserts DSP registers, not liveness). */
 u16 r_aud_init;      /* audioInit()                                     -> AUDIO_OK (0) */
+u16 r_apu_boot_again; /* apuWaitBoot() once the driver runs (no IPL any more): returns 1
+                       * within about seven frames instead of waiting for ever -> 1 */
 u16 r_aud_badvoice;  /* audioSetVoiceVolume(9, ...): voice out of range -> AUDIO_ERR_INVALID_ID (2) */
 u16 r_aud_badstop;   /* audioStopVoice(8)                               -> 2 */
 u16 r_aud_setvol;    /* audioSetVolume(100): the command was accepted   -> 0 */
@@ -518,10 +559,24 @@ u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */
 u16 r_oam_id256;     /* oamSetX(256, ..) then oamSetY(257, ..): refused, sprites 0/1 keep 0x21 / 0x42
                       * (u8 ids wrapped to 0 and 1 and overwrote them) -> 0x4221 */
 u16 r_meta_n;        /* oamDrawMetaFlip(10, ...), two items: next free id -> 12 */
+u16 r_meta_style;    /* oamDrawMetasprite(20, ..., 0): next free id -> 22, pieces at x 100 / 108 -> 0x6C64 in r_meta_plain */
+u16 r_meta_plain;
+u16 r_meta_flipx;    /* ... OBJ_FLIPX in a 16-wide box of 8-pixel pieces: x 108 / 100 -> 0x646C */
+u16 r_meta_flipattr; /* ... and each piece's own H-flip bit toggled -> 0x40 */
+u16 r_meta_piece32;  /* a 32-pixel piece in a 64-wide box, flipped: x 10 + 32 -> 42 (the 11-argument form assumed 16: 58) */
 static const MetaspriteItem lotc_meta[] = {
     METASPR_ITEM(0, 0, 0, 0),
     METASPR_ITEM(8, 0, 1, 0),
     METASPR_TERM,
+};
+
+static const MetaspriteStyle lotc_style = {
+    .baseTile = 0, .basePalette = 0, .size = OBJ_SMALL,
+    .pieceSize = 8, .width = 16, .height = 8,
+};
+static const MetaspriteStyle lotc_style32 = {
+    .baseTile = 0, .basePalette = 0, .size = OBJ_LARGE,
+    .pieceSize = 32, .width = 64, .height = 32,
 };
 
 static void coverage_lot_c(void) {
@@ -562,13 +617,24 @@ static void coverage_lot_c(void) {
                                              * truncation of a variable is silent */
         r_lerp_t256 = (u16)fixLerp(FIX(10), FIX(37), wide);
         r_lerp_t300 = (u16)fixLerp(FIX(10), FIX(37), wide + 44);
+        r_lerp_wide = (u16)fixLerp(FIX(-64), FIX(64), (u16)(wide >> 1));   /* t = 128 */
         oamSetX(0, 0x21);
         oamSetY(1, 0x43);                   /* stored as y - 1 = 0x42 */
         oamSetX(wide, 0x99);
         oamSetY(wide + 1, 0x77);
         r_oam_id256 = (u16)oamMemory[0] | ((u16)oamMemory[5] << 8);
+        oamHide(5);
+        WaitForVBlank();
+        r_hide_x = oamMemory[20];
     }
     r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
+    r_meta_style = oamDrawMetasprite(20, 100, 50, lotc_meta, &lotc_style, 0);
+    r_meta_plain = (u16)oamMemory[80] | ((u16)oamMemory[84] << 8);
+    oamDrawMetasprite(20, 100, 50, lotc_meta, &lotc_style, OBJ_FLIPX);
+    r_meta_flipx = (u16)oamMemory[80] | ((u16)oamMemory[84] << 8);
+    r_meta_flipattr = oamMemory[83] & 0xC0;
+    oamDrawMetasprite(24, 10, 50, lotc_meta, &lotc_style32, OBJ_FLIPX);
+    r_meta_piece32 = oamMemory[96];
     oamDynamicSetSize(0, 16);
     WaitForVBlank();
     /* bank-byte chantier: an OAM table in ROM. Right after WaitForVBlank we
@@ -693,16 +759,16 @@ static void coverage_lot_b(void) {
     r_mosaic = mosaicGetSize();
     /* N3: the "SetLayers" pair REPLACES the set — the deprecated name is the
      * first call so it stays executed while it ships. MOSAIC ends 0xF1. */
-    mosaicEnable(MOSAIC_BG2);
-    mosaicSetLayers(MOSAIC_BG1);
-    colorMathEnable(COLORMATH_BG2);
-    colorMathSetLayers(COLORMATH_BG1);
-    r_cm_layers = cgadsub & 0x3F;
+    mosaicEnable(LAYER_BG2);
+    mosaicSetLayers(LAYER_BG1);
+    colorMathEnable(LAYER_BG2);
+    colorMathSetLayers(LAYER_BG1);
+    r_cm_layers = colormath_cgadsub & 0x3F;
     videoSetObjInterlace(1);
     videoSetOverscan(1);
     videoSetPseudoHires(1);
     videoSetPseudoHires(0);
-    colorMathTransparency50(COLORMATH_BG1);
+    colorMathTransparency50(LAYER_BG1);
     colorMathSetCondition(COLORMATH_INSIDE);
     colorMathSetBrightness(10);
     colorMathSetChannel(COLDATA_BLUE, 20);
@@ -854,6 +920,9 @@ static void part_collision_sram(void) {
         sramLoadOffset(load_buf2, 8, 0x100);
         r_sram_off  = load_buf2[7];
         r_sram_off0 = load_buf2[0];
+        sramSaveOffset((const u8 *)0xFFC0, 4, 0x300);   /* ROM bank $00: the header's title */
+        sramLoadOffset(load_buf2, 4, 0x300);
+        r_sram_rom0 = load_buf2[0];
         r_sram_ck  = sramChecksum(save_buf, 16);
         r_sram_ck0 = sramChecksum(save_buf, 0);
         sramClear(16);
@@ -908,6 +977,53 @@ static void part_objects_irq(void) {
     r_obj_pool = 0;
     while (objNew(1, 16, 16) != 0) r_obj_pool++;
 
+    /* --- An index past the 80 slots (2026-10-05): the five slot-taking
+     * functions scaled it by 64 and worked on whatever lies past
+     * objbuffers. Slot 106 lands on the engine's own state: its xvel field
+     * is objunused (the free-list head) and its tilestand is objnextid, so
+     * objCollidMap1D(106) with friction wrote 0 over the free list and the
+     * next objNew handed out slot 0 again. Now the call returns at once. --- */
+    objInitEngine();
+    objInitFriction1D(0x0100);
+    objNew(0, 16, 16);
+    objCollidMap1D(106);
+    objUpdateXY(106);
+    objCollidMap(106);
+    objCollidMapWithSlopes(106);
+    r_obj_oob_cobj = objCollidObj(106, 0);
+    r_obj_oob_idx = objNew(0, 48, 16) & 0xFF;
+    objKillAll();
+
+    /* --- D4: the accessors that replaced objgetid / objtokill. Type 2
+     * kills itself in its update; type 0 here has no callback and stays. --- */
+    {
+        u16 doomed, kept;
+        objInitEngine();
+        objInitFunctions(2, 0, objSuicideUpdate, 0);
+        objInitFunctions(0, 0, 0, 0);
+        doomed = objNew(2, 16, 16);
+        r_obj_curid = (objGetCurrentId() == doomed && doomed != 0) ? 1 : 0;
+        r_obj_type64 = objNew(64, 0, 0);
+        kept = objNew(0, 32, 16);
+        objUpdateAll();
+        r_obj_selfkill = objGetPointer(doomed);
+        r_obj_kept = objGetPointer(kept);
+        objKillAll();
+    }
+
+    /* --- the de-inlined functions and the ease rename --- */
+    r_ease = (u16)easeInQuad(128) | ((u16)easeOutQuad(128) << 8);
+    r_ease_names = (ease_in_quad(128) == easeInQuad(128)
+                    && ease_out_quad(77) == easeOutQuad(77)) ? 1 : 0;
+    setBrightness(7);
+    r_bright_get = getBrightness();
+    setBrightness(15);
+    mosaicSetSize(9);
+    mosaicInit();
+    r_mosaic_init = mosaicGetSize();
+    scopeSetHoldDelay(30);
+    r_scope_hold = scope_holddelay;
+
     /* --- fixed32: the asm sine against the C expression it replaced --- */
     r_f32sin_asm = (u32)fix32Sin(sin_angle);
     r_f32sin_c   = (u32)((u32)(s32)fixSin(sin_angle) << 8);
@@ -924,6 +1040,9 @@ static void part_objects_irq(void) {
     r_ispal  = isPAL();
     /* N6: rngNext/rngSeed, and the deprecated rand/srand names run the same
      * generator: same seed, same first value, never 0. */
+    r_rng_boot = rngNext();          /* before any reseed: the boot seed's first step */
+    rngSeed(0x8001);                  /* the seed the unlatched counters gave */
+    r_rng_boot_moved = (rngNext() != r_rng_boot) ? 1 : 0;
     rngSeed(0x1234); r_rng = rngNext();
     srand(0x1234);
     r_rng_names = (rand() == r_rng && r_rng != 0) ? 1 : 0;
@@ -964,6 +1083,7 @@ int main(void) {
      * test_libtest.py). Known DSP vectors for the spc-dump probe:
      * ADSR(15,7,7,8) packs to $FF/$E8 (the pitch_mod bow-stroke pair). */
     r_aud_init = audioInit();              /* AUDIO_OK: the handshake answered */
+    r_apu_boot_again = apuWaitBoot();      /* the IPL is gone: 1, bounded (2026-10-03) */
     r_audio_ready = audioIsReady();
     audioSetVolume(100);
     r_audio_vol = audioGetVolume();
@@ -976,6 +1096,8 @@ int main(void) {
      * (round-robin starts there). Probe asserts the ARAM bytes, the
      * directory entry, and the playing voice's DSP state. */
     r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
+    r_audio_load513 = audioLoadSample(1, big_brr, 513, 0);
+    audioUnloadSample(1);              /* give the 513 bytes back: the memory vectors below count them */
     r_audio_free = audioGetFreeMemory();
     {
         AudioSample s;
@@ -1014,13 +1136,13 @@ int main(void) {
     windowDisableAll();
     windowSetPos(WINDOW_1, 40, 200);
     windowSetPos(WINDOW_2, 8, 16);
-    windowEnable(WINDOW_1, WINDOW_BG1 | WINDOW_OBJ);   /* w12sel 02, wobjsel 02 */
-    windowEnable(WINDOW_2, WINDOW_BG3 | WINDOW_MATH);  /* w34sel 08, wobjsel 82 */
-    windowSetInvert(WINDOW_1, WINDOW_BG1, 1);          /* w12sel 03 */
-    windowSetLogic(WINDOW_BG2, WINDOW_LOGIC_XOR);      /* wbglog 08 */
-    windowSetLogic(WINDOW_OBJ, WINDOW_LOGIC_AND);      /* wobjlog 01 */
-    windowSetMainMask(WINDOW_BG1 | WINDOW_OBJ);        /* tmw 11 */
-    windowSetSubMask(WINDOW_BG3);                      /* tsw 04 */
+    windowEnable(WINDOW_1, LAYER_BG1 | LAYER_OBJ);   /* w12sel 02, wobjsel 02 */
+    windowEnable(WINDOW_2, LAYER_BG3 | WINDOW_MATH);  /* w34sel 08, wobjsel 82 */
+    windowSetInvert(WINDOW_1, LAYER_BG1, 1);          /* w12sel 03 */
+    windowSetLogic(LAYER_BG2, WINDOW_LOGIC_XOR);      /* wbglog 08 */
+    windowSetLogic(LAYER_OBJ, WINDOW_LOGIC_AND);      /* wobjlog 01 */
+    windowSetMainMask(LAYER_BG1 | LAYER_OBJ);        /* tmw 11 */
+    windowSetSubMask(LAYER_BG3);                      /* tsw 04 */
     windowDisable(WINDOW_2, WINDOW_MATH);              /* wobjsel 02 */
     windowSplit(100);                                  /* W1 0..99, W2 100..255 */
     windowCentered(WINDOW_2, 64);                      /* W2 96..159 */

@@ -91,7 +91,7 @@
 #define AUDIO_VOL_MAX       127
 #define AUDIO_VOL_MIN       0
 
-/** @brief Pan positions (0-15 scale) */
+/** @brief Pan positions (0-15 scale; 8 is an exact centre, L = R = vol/2) */
 #define AUDIO_PAN_LEFT      0
 #define AUDIO_PAN_CENTER    8
 #define AUDIO_PAN_RIGHT     15
@@ -100,9 +100,13 @@
 #define AUDIO_PITCH_DEFAULT 0x1000
 
 /** @brief Common pitch values */
-#define AUDIO_PITCH_C3      0x085F  /**< Middle C (261.63 Hz) */
-#define AUDIO_PITCH_C4      0x10BE  /**< C4 (523.25 Hz) */
-#define AUDIO_PITCH_C5      0x217C  /**< C5 (1046.5 Hz) */
+/* Pitch is a ratio to the sample's own rate (0x1000 = 1.0); these three
+ * double per octave and assume a sample that plays just under middle C at
+ * 0x1000 (~250 Hz). Until 2026-10-04 the comments were one octave off
+ * their names (C3 called "Middle C"). */
+#define AUDIO_PITCH_C3      0x085F  /**< C3 (~130.8 Hz with such a sample) */
+#define AUDIO_PITCH_C4      0x10BE  /**< C4, middle C (~261.6 Hz) */
+#define AUDIO_PITCH_C5      0x217C  /**< C5 (~523.3 Hz) */
 
 /** @brief ADSR attack rates (0=4.1s, 15=instant) */
 #define AUDIO_ATTACK_INSTANT    15
@@ -121,7 +125,14 @@
 #define AUDIO_SUSTAIN_HALF      3
 #define AUDIO_SUSTAIN_QUARTER   1
 
-/** @brief ADSR release rates (0=infinite, 31=instant) */
+/** @brief ADSR sustain RATE (ADSR2 bits 0-4): how fast the envelope keeps
+ *  falling from the sustain level while the key is held. 0 holds the level
+ *  for ever, 31 falls fastest. The S-DSP has no programmable release: on
+ *  key-off the level drops at a fixed rate (fullsnes "Rate=31, Step=-8";
+ *  snesdev-wiki Errata). These names kept the "release" word of the API;
+ *  AUDIO_RELEASE_INSTANT makes a held note die away quickly, it does not
+ *  cut it. (Until 2026-10-04 this comment called the field the release
+ *  rate — library audit D1.) */
 #define AUDIO_RELEASE_INSTANT   31
 #define AUDIO_RELEASE_FAST      24
 #define AUDIO_RELEASE_MEDIUM    16
@@ -213,6 +224,7 @@ u8 audioIsReady(void);
  * The audio engine is command-driven: every call talks to the SPC700
  * directly, so there is no queue to pump. Calling it is harmless.
  */
+OPENSNES_DEPRECATED("it does nothing — remove the call")
 void audioUpdate(void);
 
 /** @} */

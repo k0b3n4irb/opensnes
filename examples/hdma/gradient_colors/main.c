@@ -76,7 +76,7 @@ u16 pad0;   /**< Current joypad button state */
  */
 void enableGradient(void) {
     hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdmaGradientList);
-    hdmaEnable(1 << HDMA_CHANNEL_6);
+    hdmaEnableMask(1 << HDMA_CHANNEL_6);
 }
 
 /**

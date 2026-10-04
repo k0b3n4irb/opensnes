@@ -71,11 +71,10 @@ tcc_mul16:
     sep #$20            ; 8-bit A
     .ACCU 8
 
-    ; NMI-callback context: the hardware unit reads garbage during the
-    ; auto-joypad window the callback runs in, and firing it here would
-    ; also corrupt a main-thread multiply the NMI interrupted (found as
-    ; #113 — mul silently returned 0 from nmiSet callbacks). Take the
-    ; software path instead. Long addressing: DBR is $7E in callbacks.
+    ; NMI-callback context: firing the hardware unit here would corrupt a
+    ; main-thread multiply the NMI interrupted (found as #113 — mul
+    ; silently returned 0 from nmiSet callbacks). Take the software path
+    ; instead. Long addressing: DBR is $7E in callbacks.
     lda.l in_nmi_ctx
     bne @soft_mul
 
@@ -196,7 +195,7 @@ tcc_div16:
     beq @div_zero
 
     ; NMI-callback context: hardware divider unusable (same rationale as
-    ; tcc_mul16's @soft_mul — auto-joypad window + non-reentrancy, #113).
+    ; tcc_mul16's @soft_mul — non-reentrancy, #113).
     ; The existing software path handles any divisor.
     sep #$20
     .ACCU 8

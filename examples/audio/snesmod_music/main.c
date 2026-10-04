@@ -63,7 +63,7 @@ int main(void) {
     setScreenOn();
 
     /* State */
-    volume = 127;
+    volume = 255;   /* the driver's own start value: 0-255 (until 2026-10-04 this was 127, so the first L press jumped from 255 to 117) */
     paused = 0;
 
     /* Main loop */
@@ -88,7 +88,7 @@ int main(void) {
             if (volume > 10) { volume -= 10; snesmodSetModuleVolume(volume); }
         }
         if (pad & KEY_R) {
-            if (volume < 117) { volume += 10; snesmodSetModuleVolume(volume); }
+            if (volume < 245) { volume += 10; snesmodSetModuleVolume(volume); }
         }
         if (pad & KEY_START) {
             snesmodFadeVolume(0, 4);

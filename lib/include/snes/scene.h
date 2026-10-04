@@ -147,7 +147,8 @@
  */
 typedef struct {
     /**
-     * @brief Called once when the scene is first pushed onto the stack.
+     * @brief Called each time the scene is pushed onto the stack (not only
+     *        the first; see the Behaviour section).
      *
      * NOT called again when the scene is resumed after a pop. May be
      * NULL to skip. A common shape is to load tilesets / palettes /

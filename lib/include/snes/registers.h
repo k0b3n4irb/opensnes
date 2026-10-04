@@ -430,18 +430,28 @@
 #define INIDISP_FORCE_BLANK  0x80  /**< Force screen blank */
 #define INIDISP_BRIGHTNESS(n) ((n) & 0x0F)  /**< Set brightness (0-15) */
 
-/* BGMODE values */
+/* BGMODE values — deprecated: BG_MODE0..BG_MODE7 (video.h) are the same
+ * numbers, all eight of them, and the names setMode() documents. */
 #define BGMODE_MODE0  0  /**< 4 BG layers, 4 colors each */
 #define BGMODE_MODE1  1  /**< 2 BG 16-color, 1 BG 4-color (most common) */
 #define BGMODE_MODE2  2  /**< 2 BG 16-color with offset-per-tile */
 #define BGMODE_MODE3  3  /**< 1 BG 256-color, 1 BG 16-color */
 #define BGMODE_MODE7  7  /**< Mode 7 (rotation/scaling) */
+#ifdef __clang__
+#pragma clang deprecated(BGMODE_MODE0, "use BG_MODE0")
+#pragma clang deprecated(BGMODE_MODE1, "use BG_MODE1")
+#pragma clang deprecated(BGMODE_MODE2, "use BG_MODE2")
+#pragma clang deprecated(BGMODE_MODE3, "use BG_MODE3")
+#pragma clang deprecated(BGMODE_MODE7, "use BG_MODE7")
+#endif
 
 /* NMITIMEN values */
 #define NMITIMEN_NMI_ENABLE   0x80  /**< Enable NMI on VBlank */
 #define NMITIMEN_JOY_ENABLE   0x01  /**< Enable auto joypad read */
 
-/* TM/TS values (main/sub screen enable) */
+/* TM/TS values (main/sub screen enable): the register's own bit names, for
+ * code that writes REG_TM / REG_TS itself. Library calls take LAYER_*
+ * (video.h), which are the same bits. */
 #define TM_BG1  BIT(0)  /**< Enable BG1 on main screen */
 #define TM_BG2  BIT(1)  /**< Enable BG2 on main screen */
 #define TM_BG3  BIT(2)  /**< Enable BG3 on main screen */

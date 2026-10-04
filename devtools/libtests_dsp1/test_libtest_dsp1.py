@@ -28,6 +28,7 @@ CASES = [
     ("r_range_out", 2, 732),    ("r_range_in",  2, 0xFFE1), ("r_range_on", 2, 0), ("r_range_sm", 2, 0),
     ("r_rot_x",     2, 0),      ("r_rot_y",     2, 0xFF9D),   # -99: sin 90 deg = 0x7FFF
     ("r_tgt_x",     2, 1),      ("r_tgt_y",     2, 1),
+    ("r_cam_names", 2, 1),      # dsp1Parameter (deprecated) == dsp1SetCamera, word for word
 ]
 
 

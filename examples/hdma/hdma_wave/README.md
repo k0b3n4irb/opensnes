@@ -77,7 +77,7 @@ frame, so repointing during VBlank is safe.
 ```c
 hdmaWaveInit();                          /* switches every channel off */
 hdmaWaveH(CH_LIB, 0, amp, WAVE_FREQ);    /* BG1, amplitude, frequency */
-hdmaEnable(1 << CH_LIB);
+hdmaEnableMask(1 << CH_LIB);
 ...
 hdmaWaveUpdate();                        /* once per frame */
 ```
@@ -108,7 +108,7 @@ Register-level — krom's writes vs what this ROM's generated code does:
 | `$4301` BBAD0 | `$0D` (BG1HOFS) | `HDMA_DEST_BG1HOFS` (0x0D) |
 | `$4302-3` A1T0 | table start, **+3 bytes/frame** | `hdmaSetup(…, wavetable + wave_phase*3)` per VBlank (hand mode) |
 | `$4304` A1B0 | `$00` | the far pointer's bank byte (the table's ROM bank) |
-| `$420C` HDMAEN | `%1` once | `hdmaEnable(1 << CH_HAND)` at boot (and on the way back from module mode) |
+| `$420C` HDMAEN | `%1` once | `hdmaEnableMask(1 << CH_HAND)` at boot (and on the way back from module mode) |
 | `$2105` BGMODE | `$0B` (mode 3 + BG3-prio bit, no-op in mode 3) | `setMode(BG_MODE3, 0)` → mode 3 |
 | `$2107` BG1SC | `$FC` (word $FC00 → mirrors $7C00) | `bgSetMapPtr(0, 0x7C00, SC_32x32)` |
 
@@ -129,7 +129,7 @@ analysis on `luna frames` sequences of both ROMs):
 ## Tips & Tricks
 
 - **Nothing moves?** An HDMA channel that is set up but not enabled does
-  nothing: `hdmaSetup()` configures, `hdmaEnable()` arms. luna's
+  nothing: `hdmaSetup()` configures, `hdmaEnableMask()` arms. luna's
   `dma.hdmaen` in `luna state --out -` shows which channels are on.
 - **Channel 7 is taken** by the NMI handler's OAM DMA; do not put HDMA on it.
 - **A flat colour hides the effect.** The wave only shifts pixels
@@ -156,7 +156,7 @@ analysis on `luna frames` sequences of both ROMs):
 | `dma` | `dmaCopyVram` / `dmaCopyCGram` for the image and its palette |
 | `background` | `bgSetGfxPtr`, `bgSetMapPtr` |
 | `input` | `padPressed()` for A and LEFT/RIGHT |
-| `hdma` | `hdmaSetup` / `hdmaEnable` for the hand-built table, `hdmaWaveH` and friends for the module's wave |
+| `hdma` | `hdmaSetup` / `hdmaEnableMask` for the hand-built table, `hdmaWaveH` and friends for the module's wave |
 
 ## Technical Reference
 

@@ -1,0 +1,59 @@
+package smconv
+
+import (
+	"fmt"
+	"testing"
+
+	"go.mukunda.com/modlib/common"
+	"go.mukunda.com/snesbrr/v2/brr"
+)
+
+// ramp: sample i has value i*8, so a decoded value tells which input sample it came from.
+func ramp(n int) []int16 {
+	d := make([]int16, n)
+	for i := range d {
+		d[i] = int16(i * 8)
+	}
+	return d
+}
+
+func decode(data []byte) []int16 {
+	c := brr.NewCodec()
+	c.BrrData = data
+	c.Decode()
+	return c.PcmData
+}
+
+func show(t *testing.T, name string, s common.Sample) {
+	src, err := createSource(s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pcm := decode(src.Data)
+	idx := func(i int) int { return int(pcm[i]+4) / 8 }
+	ls := src.Loop / 9 * 16
+	fmt.Printf("%s\n  input: %d samples, loop %d-%d pingpong=%v\n", name, len(s.Data.Data[0].([]int16)), s.LoopStart, s.LoopEnd, s.PingPong)
+	fmt.Printf("  output: %d BRR bytes = %d samples, Loop field %d (sample %d), tuning %.5f\n", len(src.Data), len(pcm), src.Loop, ls, src.TuningFactor)
+	n := len(pcm)
+	fmt.Printf("  source index of decoded samples: [0]=%d [%d]=%d ... last four: %d %d %d %d\n", idx(0), ls, idx(ls), idx(n-4), idx(n-3), idx(n-2), idx(n-1))
+	if n > 300 {
+		fmt.Printf("  around 250..262: ")
+		for i := 250; i < 262; i++ {
+			fmt.Printf("%d ", idx(i))
+		}
+		fmt.Println()
+	}
+}
+
+func mk(n, ls, le int, pp bool) common.Sample {
+	return common.Sample{Loop: true, PingPong: pp, LoopStart: ls, LoopEnd: le, C5: 8363,
+		Data: common.SampleData{Channels: 1, Bits: 16, Data: []any{ramp(n)}}}
+}
+
+func TestLoopShapes(t *testing.T) {
+	show(t, "1. forward loop ending before the data end (400 samples, loop 96-256)", mk(400, 96, 256, false))
+	show(t, "2. ping-pong loop, short (400 samples, loop 96-176)", mk(400, 96, 176, true))
+	show(t, "3. ping-pong loop that needs resampling (1878 samples, loop 317-969)", mk(1878, 317, 969, true))
+	show(t, "4. forward loop to the end, start not on a block (256 samples, loop 100-256)", mk(256, 100, 256, false))
+	show(t, "5. control: forward loop to the end, aligned (256 samples, loop 96-256)", mk(256, 96, 256, false))
+}

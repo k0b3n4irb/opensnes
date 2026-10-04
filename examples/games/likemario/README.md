@@ -120,11 +120,12 @@ At 60fps, a velocity of `0x0140` (= 1.25 pixels/frame) moves Mario at 75 pixels 
 second. The fractional accumulator means Mario can move at speeds finer than 1 pixel
 per frame — essential for smooth deceleration.
 
-> **What's `asr8()`?** Arithmetic shift right by 8 — effectively dividing by 256 while
-> preserving the sign. The compiler's `>>` operator uses logical shift (LSR), which
-> fills the top bit with 0 instead of the sign bit. For negative velocities (moving left),
-> this gives the wrong answer. `asr8()` is a workaround that inverts, shifts, and inverts
-> back.
+> **What's `asr8()`?** Arithmetic shift right by 8 — dividing by 256 while
+> preserving the sign, written out with an unsigned shift and two inversions so
+> the intent is visible. cc65816's `>>` on a signed value IS arithmetic (the
+> compiler checks pin it: `devtools/compiler-tests/cases/test_signed_ops.c`), so
+> `val >> 8` would do the same; the helper is readability, not a workaround.
+> (Until 2026-10-04 this box claimed the compiler shifted logically.)
 
 ### 5. Gravity in Two Lines
 

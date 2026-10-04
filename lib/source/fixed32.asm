@@ -666,7 +666,7 @@ fix32Div:
 ;------------------------------------------------------------------------------
 ; fixed32 fix32Sin(u8 angle)
 ;
-; Lifts the existing 8.8 sine_table[256] to 16.16 by shifting left 8.
+; Lifts the existing 8.8 math_sine_table[256] to 16.16 by shifting left 8.
 ; Implemented in asm because cc65816 has two open codegen bugs that
 ; make the one-line C body produce wrong results — see math.c for
 ; full notes. Stack: 5,6,s = angle (u8 in 2-byte slot).
@@ -681,7 +681,7 @@ fix32Sin:
     and #$00FF
     asl a
     tax
-    lda.l sine_table,x          ; V = sine_table[angle]
+    lda.l math_sine_table,x          ; V = math_sine_table[angle]
 
     sta.w f32_res_lo
     and #$00FF
@@ -692,7 +692,7 @@ fix32Sin:
     and #$00FF
     asl a
     tax
-    lda.l sine_table,x
+    lda.l math_sine_table,x
 
     bpl @v_pos
         xba
@@ -725,7 +725,7 @@ fix32Cos:
     and #$00FF
     asl a
     tax
-    lda.l sine_table,x
+    lda.l math_sine_table,x
 
     sta.w f32_res_lo
     and #$00FF
@@ -739,7 +739,7 @@ fix32Cos:
     and #$00FF
     asl a
     tax
-    lda.l sine_table,x
+    lda.l math_sine_table,x
 
     bpl @cv_pos
         xba

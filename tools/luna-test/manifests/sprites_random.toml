@@ -1,10 +1,19 @@
 # Migrated from probes/sprites_random.py (random half): pulsing A advances the
 # PRNG output current_value. (simple_sprite OAM half is sprite_oam.toml.)
 rom = "../../../examples/basics/random/random.sfc"
+frames = 120
 [[checkpoint]]
 at_frame = 60
+[checkpoint.values]
+current_value = { eq = 20822, width = 2 }
 [[checkpoint]]
 at_frame = 120
 input = "60:0x0080,64:0"
 [checkpoint.delta]
 current_value = "changed"
+[checkpoint.values]
+current_value = { eq = 43179, width = 2 }
+# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
+# the LFSR is seeded the same way at every boot, so the drawn value is reproducible: 0x5156 then 0xA8AB after one A.
+[asserts]
+fbhash = "0dd5b704c2204c54"
