@@ -513,7 +513,14 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
-- docs: the public limitations page and the roadmap date their entries
+- tools: `opensnes doctor` checks every binary the examples may call
+  (`wla-superfx`, `wla-spc700`, `sa1_patch`, `wav2brr`, `font2snes`,
+  `tmx2snes` joined the list) and says whether clang is there for the
+  deprecation pre-pass; gfx4snes's help described `-z` with `-b`'s text and
+  gave `-Y` the long name `--meta-width` (now `--meta-height`); the HiROM
+  header's cartridge-type comment and the wav2brr README's section example
+  (`ASSET_SECTION`, not a `superfree` section) are current (build-tools
+  audit PF10).- docs: the public limitations page and the roadmap date their entries
   instead of naming internal chantier codes (documentation audit PF7).
 - test(luna-test): the fourteen self-animating examples that had a single
   image capture point (`backgrounds/mode0`, `basics/fix32_orbit`,

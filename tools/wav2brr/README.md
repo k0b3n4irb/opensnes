@@ -27,10 +27,10 @@ With no output path, `input.wav` is written alongside as `input.brr`.
 Bake the `.brr` into the ROM with `.incbin`, then load and trigger it:
 
 ```asm
-.section ".samples" superfree
+ASSET_SECTION "samples"          ; the asset banks, never bank $00 (templates/assets.inc)
 brr_jump:     .incbin "res/jump.brr"
 brr_jump_end:
-.ends
+.ENDS
 ```
 
 ```c

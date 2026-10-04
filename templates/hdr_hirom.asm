@@ -59,7 +59,7 @@
     SLOWROM                 ; 2.68MHz ROM access
 .endif
     HIROM                   ; HiROM memory mapping
-    CARTRIDGETYPE CARTRIDGETYPE  ; $21=ROM, $23=ROM+SRAM
+    CARTRIDGETYPE CARTRIDGETYPE  ; from make: $00=ROM, $02=ROM+RAM+battery (the HiROM bit lives in $FFD5, not here)
     ROMSIZE ROMSIZE_VAL     ; ROM size (1024 << N bytes)
     SRAMSIZE SRAMSIZE_VAL   ; $00=None, $03=8KB
     COUNTRY COUNTRY_VAL     ; $FFD9: $01 USA/NTSC (default), $02 Europe/PAL, $00 Japan (make ROM_REGION=)
