@@ -499,6 +499,11 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): `rom_coverage.py` fails locally when a public function is
+  executed only by the firmware-gated ROMs and is missing from
+  `executed_only_with_firmware.txt` — CI has no firmware and would call it
+  never-executed (develop went red that way for five pushes on
+  `dsp1SetCamera`; testing audit rec 7).
 - build: a build without clang no longer hides the deprecations. When the
   clang pre-pass is absent, `make/common.mk` runs `check_upgrade.py -q` on
   each source it compiles and prints the deprecated names it finds
