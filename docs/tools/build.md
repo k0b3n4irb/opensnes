@@ -60,7 +60,8 @@ A cartridge carries one coprocessor: setting two of these is refused.
 
 | Variable | Default | What it does |
 |---|---|---|
-| `USE_SA1` | `0` | `1` builds an SA-1 cartridge (its own memory map; not with `USE_HIROM`) |
+| `USE_SA1` | `0` | `1` builds an SA-1 cartridge (its own memory map; not with `USE_HIROM`). The header declares SA-1 + RAM (`$34`), or + battery (`$35`) with `USE_SRAM := 1`; the BW-RAM size comes from `SA1_BWRAM_SIZE` |
+| `SA1_BWRAM_SIZE` | `5` | BW-RAM of an SA-1 cartridge as the header byte `$FFD8`: 1 KB << n (5 = 32 KB). It is the cartridge's work RAM whether or not the game saves; `SRAM_SIZE` does not apply to SA-1 |
 | `USE_SUPERFX` | `0` | `1` builds a Super FX cartridge (LoROM-mapped; not with `USE_HIROM`). With `USE_SRAM := 1` the header declares a battery (`$15`) and the save is the Game Pak RAM itself |
 | `GSU_BANK` | (none) | ROM bank (1 to `ROM_BANKS` − 1) the Super FX program is linked in, at `$8000`: its labels become real addresses, so absolute jumps and tables in ROM work (`GSU_SECTION` in the loader, one `.sfx` in `GSUSRC`). Unset = assembled at 0, placed where it fits, position-independent code only |
 | `GSU_RAM_KB` | `64` | Super FX Game Pak RAM declared in the extended header (`$FFBD`) |

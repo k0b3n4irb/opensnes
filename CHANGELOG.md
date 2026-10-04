@@ -190,6 +190,13 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(build): **an SA-1 cartridge declares a battery only when it saves.**
+  Every SA-1 ROM carried `$FFD6 = $35` (SA-1 + RAM + battery) and a fixed
+  `$FFD8 = $05`, whatever `USE_SRAM` said, so emulators kept a `.srm` for
+  games that never save. The type is `$34` (SA-1 + RAM) and `$35` only with
+  `USE_SRAM := 1` (snesdev-wiki ROM header, `$x4` / `$x5`); the BW-RAM size
+  is the new knob `SA1_BWRAM_SIZE` (default 5 = 32 KB, unchanged) on
+  `docs/tools/build.md` (build-tools audit S13, chips audit PF9).
 - docs(lib): `hdma.h` says that `gsuSetupHdmaBlanking()` takes HDMA channel
   1 on a Super FX build, and what `hdmaIrisWipe()` costs (about 2.15 M
   master clocks for a radius of 80, plus one VBlank wait on the first

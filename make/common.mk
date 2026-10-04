@@ -107,6 +107,10 @@ USE_SUPERFX ?= 0
 USE_DSP1    ?= 0
 USE_SNESMOD ?= 0
 SRAM_SIZE   ?= 3
+# SA-1 BW-RAM declared in the header ($FFD8, 1 KB << n): 5 = 32 KB, the size
+# every SA-1 example and the sram fixture assume; it is the work RAM of the
+# cartridge whether or not the game saves (USE_SRAM adds the battery).
+SA1_BWRAM_SIZE ?= 5
 SOUNDBANK_SRC ?=
 SOUNDBANK_OUT ?= soundbank
 SOUNDBANK_BANK ?= 1
@@ -156,8 +160,11 @@ MEMMAP_INC   := $(if $(filter 1,$(USE_SA1)),memmap_sa1.inc,$(if $(filter 1,$(USE
 # = coprocessor ($0x DSP, $1x GSU, $3x SA-1), low nibble = what sits beside
 # it ($x0 ROM, $x2 ROM+RAM+battery; with a coprocessor $x3, $x5 +RAM+battery).
 # DSP-1 + SRAM is $05 (it was $03, "no RAM", with the sram module linked).
-CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$$35,$(if $(filter 1,$(USE_SUPERFX)),$(if $(filter 1,$(USE_SRAM)),$$15,$$13),$(if $(filter 1,$(USE_DSP1)),$(if $(filter 1,$(USE_SRAM)),$$05,$$03),$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
-SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$05,$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
+# SA-1: $34 = SA-1 + RAM (BW-RAM, always on the board), $35 = + battery when
+# the game saves (snesdev-wiki ROM header, $x4 / $x5; until 2026-10-04 every
+# SA-1 ROM declared a battery and luna wrote a .srm for it).
+CARTRIDGETYPE := $(if $(filter 1,$(USE_SA1)),$(if $(filter 1,$(USE_SRAM)),$$35,$$34),$(if $(filter 1,$(USE_SUPERFX)),$(if $(filter 1,$(USE_SRAM)),$$15,$$13),$(if $(filter 1,$(USE_DSP1)),$(if $(filter 1,$(USE_SRAM)),$$05,$$03),$(if $(filter 1,$(USE_SRAM)),$$02,$$00))))
+SRAMSIZE     := $(if $(filter 1,$(USE_SA1)),$$0$(SA1_BWRAM_SIZE),$(if $(filter 1,$(USE_SUPERFX)),$$00,$(if $(filter 1,$(USE_SRAM)),$$0$(SRAM_SIZE),$$00)))
 _HAS_SOUNDBANK := $(and $(filter 1,$(USE_SNESMOD)),$(SOUNDBANK_SRC))
 
 # SRAM/SNESMOD/SuperFX auto-add modules (duplicates are harmless — the

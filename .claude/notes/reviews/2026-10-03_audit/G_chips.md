@@ -91,3 +91,8 @@ Le Super FX a rattrapé l'écart du 26/09 (vrai runtime testé avec contrôles n
   conformité au manuel (4.1.23) ; aucune ligne au journal.
 - **S4 corrigé** (`1b4ede5a`) : `gsuPresentInit` refuse les tampons au-delà
   des 64 premiers Ko.
+- **PF9 corrigé** (commit `fix(build)` du 2026-10-04) : `$FFD6` vaut `$34`
+  (SA-1 + RAM) et `$35` seulement avec `USE_SRAM := 1` ; `$FFD8` vient du
+  nouveau bouton `SA1_BWRAM_SIZE` (5 = 32 Ko par défaut, inchangé). Arbitre :
+  snesdev-wiki `ae5489473fb4ca37` (`$x4` / `$x5`), sneslab `beeff67049415071`.
+

@@ -124,4 +124,8 @@ Le système de build a fermé en une semaine presque tout ce que l'audit du 26/0
   coin transparent était refusé) ; la carte a le même angle mort, hérité de
   PVSnesLib. À mesurer avec une image dont une tuile de banque ≠ 0 commence
   par la couleur 0, avant d'en faire un défaut.
+- **S13 corrigé** (même commit que G PF9) : l'en-tête SA-1 suit `USE_SRAM`
+  (`$34` / `$35`) et `SA1_BWRAM_SIZE` (`$FFD8`), documenté sur
+  `docs/tools/build.md` ; `SRAM_SIZE` ne s'applique pas au SA-1, la page le
+  dit.
 
