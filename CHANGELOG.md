@@ -499,6 +499,15 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): the nineteen input-driven manifests (`movement_*`,
+  `state_*`) assert that every VRAM DMA of their run lands in blank
+  (`[asserts.dma] unsafe_writes = 0`): `vram_dma_blank.py` only sees the
+  boot path, so what a button press triggers was ungated (testing audit T8,
+  examples audit PF2); all nineteen pass. `nmi_budget.py` gates the VBlank
+  work the handler hands to hooks — `tilemapFlush` (17 652 master clocks, a
+  full tilemap redraw), `oamDynamicNmiFlush` and `oamVramQueueUpdate` —
+  from their own measured references, and a row can name the manifest
+  whose input drives the measurement (library audit PF2).
 - ci: a push to `develop` keeps its CI verdict — `cancel-in-progress` now
   applies to PR and branch runs only (37 of 78 develop runs between
   09-27 and 10-03 were cancelled by the next push; testing audit PF2).

@@ -82,6 +82,19 @@ SUBSET = [
 EXTRA = [
     ("chips/superfx_game_skeleton", "gsu_present_step", 91956,
      "gsuPresent's half-frame upload, in the letterbox blank"),
+    # The NmiHandler rows measure the handler's own time: the work it hands
+    # to a hook (tilemapFlush, the dynamic-sprite queue) runs in VBlank too
+    # and was invisible to the gate (library audit 2026-10-03, PF2). Each is
+    # gated on growth from its own measured reference (2026-10-04).
+    # A fifth field names a `luna test` manifest whose input script drives the
+    # run (merged as rom_coverage does): without a button press these hooks
+    # barely run — breakout's tilemapFlush never does in 150 idle frames.
+    ("basics/scene_stack", "tilemapFlush", 17652,
+     "the text module's full-map DMA from the NMI hook (a title redraw)", "state_scene_stack"),
+    ("sprites/dynamic_sprite", "oamDynamicNmiFlush", 296,
+     "the dynamic-sprite engine's NMI step under the sprite manifest", "oam_dynamic_sprite"),
+    ("sprites/dynamic_sprite", "oamVramQueueUpdate", 312,
+     "the dynamic-sprite VRAM queue flush it calls", "oam_dynamic_sprite"),
 ]
 
 BUDGET_RE = re.compile(r"budget: (\S+) max (\d+) mclk \(frame (\d+)\)")
@@ -113,19 +126,32 @@ def main() -> int:
     luna = find_luna()
     over = 0
     with tempfile.TemporaryDirectory() as td:
-        rows = [(key, "NmiHandler", ref, CEILING, why) for key, ref, why in SUBSET]
-        rows += [(key, symbol, ref, None, why) for key, symbol, ref, why in EXTRA]
-        for key, symbol, ref, limit, why in rows:
+        rows = [(key, "NmiHandler", ref, CEILING, why, None) for key, ref, why in SUBSET]
+        rows = [r for r in rows if len(r) == 6] + \
+               [(e[0], e[1], e[2], None, e[3], e[4] if len(e) > 4 else None) for e in EXTRA]
+        for key, symbol, ref, limit, why, manifest in rows:
             rom = rom_for(key)
             sym = folded_sym(rom, Path(td), symbol)
+            bound = ["--until-frame", str(FRAMES)]
+            if manifest:
+                from rom_coverage import manifest_runs
+                found = [r for r in manifest_runs(rom) if r[0] == manifest]
+                if not found:
+                    sys.exit(f"nmi-budget: no manifest {manifest} drives examples/{key}")
+                _, bound, script = found[0]
+                if script:
+                    bound = bound + ["--input", script]
             # --report still asks for a budget, with a ceiling nothing reaches:
             # luna then prints its `budget:` line (worst frame and its number)
             # and never gates. Reading the `--top` table instead broke the day
             # WaitForVBlank outranked the handler (2026-09-26 audit).
             ceiling = 10**9 if (args.report or limit is None) else limit
-            cmd = [luna, "profile", str(rom), "--until-frame", str(FRAMES),
+            cmd = [luna, "profile", str(rom), *bound,
                    "--sym", str(sym), "--top", "0", "--budget", f"{symbol}={ceiling}"]
             proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            if f"budget: {symbol} never ran in a completed frame" in proc.stdout:
+                sys.exit(f"nmi-budget: {symbol} never ran in the measured frames of {key} — "
+                         f"a row must name an example (and a manifest) that exercises its symbol")
             if proc.returncode == 2:
                 sys.exit(f"nmi-budget: luna rejected the symbol on {key}: "
                          f"{proc.stdout.strip()[-200:]}")

@@ -12,3 +12,9 @@ at_frame = 180
 input = "120:0x0400,179:0"
 [checkpoint.delta]
 sy = "increased"
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

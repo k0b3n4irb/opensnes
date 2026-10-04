@@ -7,3 +7,9 @@ at_frame = 120
 input = "60:0x0100,119:0"
 [checkpoint.delta]
 mario_x = "increased"
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

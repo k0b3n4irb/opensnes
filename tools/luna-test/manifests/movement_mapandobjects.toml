@@ -42,3 +42,9 @@ input = "180:0x0200,210:0"
 mariox = 46
 marioy = 192
 marioflp = { eq = 1, width = 1 }         # facing left
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

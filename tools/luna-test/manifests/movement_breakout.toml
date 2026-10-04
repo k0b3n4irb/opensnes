@@ -29,3 +29,9 @@ score = 0
 lives = 4
 [checkpoint.delta]
 pos_y = "increased"            # the ball is in flight now, falling toward the paddle
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

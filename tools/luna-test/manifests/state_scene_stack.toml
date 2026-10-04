@@ -15,3 +15,9 @@ input = "120:0x1000,124:0"
 scene_top = { dir = "decreased", width = 1 }
 [checkpoint.values]
 title_redraws = { eq = 1, width = 2 }   # the resumed title redrew itself (2026-10-03: it stayed hidden behind the counter)
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0
