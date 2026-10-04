@@ -110,7 +110,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
       markers were stale. CI no longer passes `--allow-known-bugs`.
 - [x] **A-cache through `pha`** — shipped; chantier C.6's audit confirmed
       the optimisation already worked, the `acache_pha` test was stale.
-      Hard-fails any regression as of chantier A3 (2026-05-09).
+      Hard-fails any regression since 2026-05-09.
 
 ### Library modules
 | Module | Description | Status |
@@ -325,12 +325,12 @@ The full catalog with severity tags lives in
 [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md). Headlines:
 
 - **No floating-point** — use fixed-point math (`<snes/math.h>`)
-- **`int` is 2 bytes, `long` is 4 bytes** on this target (since chantier
-  A1, 2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
+- **`int` is 2 bytes, `long` is 4 bytes** on this target (since
+  2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
   `u32` from `<snes/types.h>` remain preferred for portability
 - **~4 KB VBlank DMA budget** per frame
 - **Plain C RAM must sit below $2000** (compiler emits `sta.l $0000,x`);
-  bulk buffers go above it with `FAR` (chantier B2, v0.39.0) — see
+  bulk buffers go above it with `FAR` (v0.39.0) — see
   [`docs/tutorials/far_ram.md`](docs/tutorials/far_ram.md)
 - **C const data lives in the asset banks by default** (#127.3, v0.41.0);
   bank $00 keeps the code

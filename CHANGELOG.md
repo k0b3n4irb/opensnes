@@ -513,6 +513,8 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- docs: the public limitations page and the roadmap date their entries
+  instead of naming internal chantier codes (documentation audit PF7).
 - test(luna-test): the fourteen self-animating examples that had a single
   image capture point (`backgrounds/mode0`, `basics/fix32_orbit`,
   `basics/timer`, the three Super FX and SA-1 demos, `color/pseudo_hires`,

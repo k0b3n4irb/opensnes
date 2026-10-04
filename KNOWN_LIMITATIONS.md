@@ -52,7 +52,7 @@ address with `$2181-$2183`. If NMI fires mid-sequence and any code in the NMI
 path touches those ports, the address pointer is silently corrupted and the
 main thread resumes writing garbage to a wrong location.
 
-**Mitigation (active since chantier E1, 2026-05-09):** `make/common.mk`
+**Mitigation (active since 2026-05-09):** `make/common.mk`
 runs `devtools/check_nmi_wram_race.py` after every link. The lint walks
 the call graph from every NMI callback root (NmiHandler + functions
 registered via `nmiSet`) and **fails the build** if any
@@ -177,7 +177,7 @@ must sit in the 8 KB band `$00:0000-$1FFF` (shared with the stack and the
 direct page). A hand-placed RAM section above $2000 reached through a
 plain pointer reads bank $00 instead — silent corruption.
 
-**Escape hatch (since chantier B2, 2026-09):** declare the object `FAR`
+**Escape hatch (since v0.39.0, 2026-09):** declare the object `FAR`
 (`FAR u8 buf[4096];`, header `snes/types.h`). It is placed in
 `$7E:2000-$FFFF` (56 KB) and every access — direct, `buf[i]`, or through a
 `u8 FAR *` — is compiled bank-honouring; initialisers work and the band is
@@ -223,7 +223,7 @@ of 6,s. The function compiles, links, and corrupts the stack at runtime.
 When porting an ASM function from PVSnesLib, walk through the offsets explicitly.
 Function pointers called from C follow the same convention.
 
-### 🟢 `volatile` is preserved through QBE (since chantier A2, 2026-05-09)
+### 🟢 `volatile` is preserved through QBE (since 2026-05-09)
 The C `volatile` qualifier on a load or store now survives the cproc → QBE
 pipeline. cproc tags the instruction with a `volat` keyword in the
 intermediate IR; QBE's `loadopt` (load forwarding), `promote` (alloca-to-
@@ -363,7 +363,7 @@ against the file and fail on drift.
 
 ## Compiler optimisation gaps
 
-**None as of chantier A3 (2026-05-09).** The compiler-test phase runs
+**None as of 2026-05-09.** The compiler-test phase runs
 clean without the `--allow-known-bugs` escape that used to gate tail
 call optimisation on wrappers, A-cache-through-`pha`, lazy `rep #$20`
 emission, and the `leaf_opt=1` marker on non-leaf functions.
@@ -402,12 +402,12 @@ culprit files 100x monthly and fails on any segfault. Full investigation log:
 
 ### 🟢 `int` and `long` sizes AND semantics match the w65816 target
 
-**Sizes** (since chantier A1, 2026-05-08):
+**Sizes** (since 2026-05-08):
 `sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
 `sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
 canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
 
-**Semantics** (since chantier A1-followup, 2026-05-16):
+**Semantics** (since 2026-05-16):
 `long` arithmetic flows through the QBE w65816 backend's Kl-class handlers,
 not the silently-truncating Kw path. Every operator — add/sub with carry,
 shifts with cross-half rol, multiply via `__mul32`, divide via
@@ -430,7 +430,7 @@ preferred types for **portability** (they make the code intent explicit
 and work identically across compilers), but using bare `int` / `long`
 is correct on this target.
 
-### 🟢 Pointer IR size is 4 bytes (chantier A6+A7, 2026-05-15)
+### 🟢 Pointer IR size is 4 bytes (since 2026-05-15)
 
 Pointers are now QBE class Kl: 24-bit address (low 16 + bank byte) + 1 byte
 alignment, 4 bytes total. The indirect-call emit pass reads the bank byte
@@ -447,7 +447,7 @@ That trap is gone.
 
 ### 🟢 C function returning `long` propagates the high half (fixed 2026-05-21)
 
-Surfaced during the A1-followup chantier (2026-05-16): a function returning
+Surfaced on 2026-05-16, with the `long` semantics work: a function returning
 `long` / `u32` / `s32` / `fixed32` carried only its low 16 bits across the
 call. Fixed on 2026-05-21 (qbe `3e79c8c`): the callee returns the low half in
 `A` and the high half in the direct-page global `tcc__retval_hi`, and the
