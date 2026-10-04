@@ -538,6 +538,11 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): `make test-manifests` replays the SNESMOD stop, pause
+  and fade manifests at sixteen press phases (`phase_sweep.py`, every input
+  checkpoint and the asserted frame shifted by 0..15 frames). The key-off
+  defect of 2026-09-26 failed 8 to 10 of 161 press frames swept by hand;
+  the sweep did not stay in the suite (testing audit T4).
 - test(devtools): the fx fixture now arms a V-timer IRQ **before**
   `snesmodInit` and counts it through ten frames of `snesmodProcess` (one
   per frame, `r_irq_mod`), reads STAT78 right after the driver's call (the

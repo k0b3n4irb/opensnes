@@ -116,3 +116,15 @@ Aucun rapport n'est à zéro constat ouvert.
 - **H PF11** (🟠, branche de maintenance) — `756da353` ajoute `maint/**` aux workflows build et lint ; le garde `release.yml:27` (ancêtre de `origin/main`) est laissé « a decision for the owner ». Différé explicitement avec raison, mais une 0.48.1 ne serait toujours pas publiable.
 - **H PF2** (🟠, rythme de poussée) — règle « Push once per batch » dans `release.md` (`c3952a1e`) ; la rec 9 ne demandait que cela, mais la rec 6 de D (désactiver `cancel-in-progress` sur develop) reste ouverte (listée ci-dessus).
 - **E orange 3** (MIGRATING ignore les renommages) — 4 lignes ajoutées (`c3952a1e`) ; je n'ai pas vérifié que les cinq noms du rapport (`rngNext`, `lzssDecodeVram`, `isPAL`, `oamDrawMetasprite`, `hdmaEnableMask`) y figurent tous (le commit en nomme quatre : `rand`, `LzssDecodeVram`, `hdmaEnable`, `oamDrawMeta`).
+
+## Suivi 2026-10-05 (session)
+
+- **B l.24** fermé : borne d'index de slot dans les cinq fonctions du moteur d'objets, `nID` documenté (voir `B_library.md`, suivi du 10-05).
+- **B l.26** fermé par documentation : `collideRectTile` dit sa borne basse absente et la parade ; `collideTileEx` ne ment plus sur son retour hors carte.
+- **C rec 5** partiel : octet de taille et complément de somme vérifiés sur chaque ROM par la passe de couverture ; la somme elle-même attend luna (`OPEN_luna.md`) ; « aucun symbole dans une banque non-ROM » reste à faire.
+- **C rec 8** : ligne luna écrite (`checksum_valid`), ligne snes-rag déjà présente depuis le 10-04.
+- Hors audit, même jour : hooks git `commit-msg` / `pre-push` (`make hooks`) après le second sujet `tools(build):` poussé sur `develop` ; fuite de rendu `PHILOSOPHY.md` qui tenait le job doc-render au rouge depuis `0075b9ab`.
+- **D T5** fermé : combinaison irq + SNESMOD dans `libtests_fx` (IRQ armé avant `snesmodInit`, compté sous `snesmodProcess`, drapeau de latch STAT78 nul) ; voir `D_testing.md`, suivi du 10-05.
+- **D T4** fermé : balayage de seize phases d'appui des trois manifestes SNESMOD (`phase_sweep.py`) dans `make test-manifests`.
+- **E rec 8** fermé : ancre 15 du sentinel (carte en-tête → tutoriel) et `CLAUDE.md` dans le compte d'exemples.
+- **B PF10** fermé : section « What does not exist » du guide de migration.

@@ -162,3 +162,27 @@ Trois des dix défauts de la période avaient donc une référence dorée qui **
 ## Verdict
 
 Comme filet contre la régression, l'appareil de test est au niveau d'un SDK 1.0 : 7 oracles en 11 min en CI sur deux architectures, des ROMs exécutées sur les quatre OS, luna à jour à quelques heures près, et des résultats qui tiennent sous cinq états de RAM. Comme détecteur de ce qui n'a jamais marché, il ne l'est pas : aucun des six défauts de la semaine n'a été vu par la suite existante, trois références dorées de la période protégeaient leur bug, et un tiers de l'API publique n'est « couvert » qu'au sens où un PC y est passé. Avant de compter les quatorze jours du critère 7, il faut des asserts tirés de la spec sur la sortie, des balayages de phase et une fixture de combinaisons (actions 1 à 5), sans quoi la quinzaine mesurera le silence de la suite et non l'absence de défauts.
+
+## Suivi 2026-10-05 (session)
+
+- **T5 (irq + snesmod, scope + snesmod)** : la fixture `libtests_fx` arme
+  un IRQ V-timer avant `snesmodInit`, compte dix frames de
+  `snesmodProcess` (`r_irq_mod` = 10), lit STAT78 juste après l'appel du
+  pilote (`r_mod_latch` = 0 : le drapeau de latch que le code Super Scope
+  prend pour un tir, cf. anomie-timing `626b31bd887c2581`), et vérifie
+  `cpu_regs.nmitimen` = 0xA1 et `cpu_regs.vtime` = 120 dans la vue luna.
+  Les deux défauts du 10-03 l'auraient fait échouer. Le périphérique Super
+  Scope lui-même n'est pas piloté (luna ne modélise pas l'entrée) : la
+  combinaison est couverte par son point de contact, le drapeau de latch.
+- **Rec 5 (en-tête de ROM)** : voir `C_build_tools.md`, suivi du 10-05.
+- **PF7 (oracle WRAM, coût)** : la re-capture du jour (deux exemples objet)
+  a une cause documentée : `mapLoad` copie 4096 octets de définitions de
+  métatuiles quel que soit le fichier (126 octets), donc la queue de
+  `metatiles` est une copie de la ROM qui suit, et elle bouge avec le code
+  (ici un pointeur `getFrameCount` d'une table const). Noté dans `map.h` ;
+  l'oracle ne peut pas l'exclure sans connaître la taille du fichier.
+- **T4 (une seule phase)** : `phase_sweep.py` rejoue les manifestes stop,
+  pause et fade de `snesmod_music` à seize phases d'appui (0..15 frames,
+  points d'entrée et frame d'assertion décalés ensemble), dans
+  `make test-manifests`. Contrôle négatif : une copie sans appui qui attend
+  le silence échoue aux seize phases.

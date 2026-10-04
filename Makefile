@@ -519,6 +519,10 @@ test-manifests:
 		tools/luna-test/stress/bcd/bcd.toml \
 		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
 		tools/luna-test/manifests
+	@# The three SNESMOD transitions at sixteen press phases: a press/SPC700
+	@# race shows on some frames only (8 of 161 for the 2026-09-26 key-off
+	@# defect), so one press frame per manifest sees it by luck.
+	@python3 tools/luna-test/phase_sweep.py
 	@# Power-cycle chains (a_/b_ sram, d_/e_ SA-1 BW-RAM, f_/g_ Super FX) write a .srm the next
 	@# manifest reads: luna >= v1.30.1 runs manifests chained by a battery
 	@# file in order inside the parallel batch (they sat in a serial
