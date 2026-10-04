@@ -506,6 +506,12 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(devtools): the Super FX fixture runs a fifth job through
+  `gsuLaunch()` (the CPU parked in WRAM, 34 frames counted by the NMI blob)
+  and presents the buffer with `gsuPresentInit()` / `gsuPresent()` /
+  `gsuPresentWait()`: the manifest asserts the flags, the flipped
+  `gsu_scbr` and the six result bytes landed in VRAM. No ROM exercised
+  that path under the harness before (chips audit PF5).
 - test(luna-test): `rom_coverage.py` fails locally when a public function is
   executed only by the firmware-gated ROMs and is missing from
   `executed_only_with_firmware.txt` — CI has no firmware and would call it

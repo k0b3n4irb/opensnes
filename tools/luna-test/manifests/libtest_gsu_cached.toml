@@ -80,10 +80,19 @@ r_save_still = 1          # ... without ending the job
 r_save_job = 1            # ... which finishes with its results ($C0DE, $1640)
 r_save_range = 1          # SRAM_ERR_RANGE: 0xFFF8 + 16 wraps past 64 KB
 r_rom_table = 0x3CA5      # ... so its table and its absolute jump are where it was assembled for
+r_launch_frames = { ge = 25, le = 45 }   # fifth job: gsuLaunch() parks the CPU in WRAM, the NMI blob keeps counting (34 measured, the ROM-run pace)
+r_launch_job = 1          # ... and the job ends with its results
+r_present_init = 1        # gsuPresentInit(0x0000, 0x2000, 0) accepted (2bpp x 128 lines: 8 KB buffers)
+r_present_busy = 1        # a frame in flight right after gsuPresent()
+r_present_done = 1        # landed after gsuPresentWait()
+r_present_scbr = 8        # gsu_scbr flipped to buffer B: 8 KB = 8 x 1 KB
 r_done = 0xD0E5
 
 [asserts.blocks]
 gsu_hdma_table = "7F0F110F508000"   # gsuSetupHdmaBlanking(0, 80): [127 show][17 show][80 blank] end — no empty top entry
+# the presented buffer A (its first six bytes are the job's results: sum, outer, marker) lands
+# in the BACK char block, vram_b = word 0x2000 = byte 0x4000; BG12NBA then flips to it
+presented_frame = { space = "vram", offset = "4000", hex = "40160000DEC0" }
 
 [asserts.gsu]
 cfgr = 0x80               # the last job asked $A0 (MS0): dropped at 21 MHz

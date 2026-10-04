@@ -92,6 +92,17 @@ u16 r_save_still;
 u16 r_save_job;
 /** @brief an offset + size past 64 KB is refused: SRAM_ERR_RANGE */
 u16 r_save_range;
+/** @brief fifth job: gsuLaunch() parks the CPU in WRAM while the same program
+ *  runs from ROM; the NMI blob keeps counting frames (chips audit PF5) */
+u16 r_launch_frames;
+u16 r_launch_job;
+/** @brief then gsuPresent() moves buffer A ($70:0000, where the job left its
+ *  results) to VRAM over the next VBlanks: init accepted, busy right after,
+ *  idle after the wait, gsu_scbr flipped to buffer B (16 KB = 0x10 KB units) */
+u16 r_present_init;
+u16 r_present_busy;
+u16 r_present_done;
+u16 r_present_scbr;
 /** @brief end marker for the test script */
 u16 r_done;
 
@@ -216,6 +227,31 @@ int main(void) {
     gsuJobReadResults();
     r_save_job = (r_marker == 0xC0DE && r_sum == 0x1640) ? 1 : 0;
     r_save_range = sramSaveOffset(save_a, 16, 0xFFF8);
+
+    /* Fifth job: the ROM-run program through gsuLaunch(), which parks the CPU
+     * in WRAM until STOP (the earlier ROM runs used the fixture's own wait
+     * loops); then the presentation path: gsuPresentInit() + gsuPresent()
+     * copy buffer A, 16 KB from $70:0000 — the job's results are its first
+     * six bytes — to VRAM char block 0, moved by the NMI; gsuPresentWait()
+     * returns once it has landed and gsu_scbr points at buffer B. No ROM
+     * exercised gsuLaunch() + gsuPresent() before 2026-10-04 (G_chips PF5). */
+    gsu_cfgr = 0x80;
+    gsu_scbr = 0x00;
+    gsuJobClearResults();
+    gsuSetProgram(gsu_job);
+    {
+        u16 before = frame_count;
+        gsuLaunch();
+        r_launch_frames = (u16)(frame_count - before);
+    }
+    gsuJobReadResults();
+    r_launch_job = (r_marker == 0xC0DE && r_sum == 0x1640) ? 1 : 0;
+    r_present_init = gsuPresentInit(0x0000, 0x2000, 0);
+    gsuPresent();
+    r_present_busy = gsuPresentBusy();
+    gsuPresentWait();
+    r_present_done = gsuPresentBusy() ? 0 : 1;
+    r_present_scbr = gsu_scbr;
     r_done = 0xD0E5;
 
     while (1) {

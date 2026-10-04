@@ -95,4 +95,10 @@ Le Super FX a rattrapé l'écart du 26/09 (vrai runtime testé avec contrôles n
   (SA-1 + RAM) et `$35` seulement avec `USE_SRAM := 1` ; `$FFD8` vient du
   nouveau bouton `SA1_BWRAM_SIZE` (5 = 32 Ko par défaut, inchangé). Arbitre :
   snesdev-wiki `ae5489473fb4ca37` (`$x4` / `$x5`), sneslab `beeff67049415071`.
+- **PF5 en partie couvert** (commit `test(devtools)` du 2026-10-04) :
+  `libtests_gsu` enchaîne `gsuLaunch()` puis `gsuPresentInit` /
+  `gsuPresent` / `gsuPresentWait` (buffer A → VRAM, `gsu_scbr` basculé,
+  octets vérifiés en VRAM). Restent non exercés : `GSU_PRESENT_ON_LAG_FRAMES`,
+  `SCMR_H160/H192`, la présentation sous PAL, la sauvegarde pendant une
+  présentation.
 
