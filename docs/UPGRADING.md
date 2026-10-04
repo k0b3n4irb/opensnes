@@ -1,9 +1,10 @@
 # Upgrading to OpenSNES 1.0 {#upgrading}
 
 The 0.x releases deprecate; 1.0 removes. Every name below builds with a
-warning in 0.48 and later 0.x releases (the clang pre-pass reports each use
-— a build without clang reports nothing, so read this page) and is gone at
-1.0. Nothing else of the public API changes at 1.0, and nothing changes
+warning in 0.48 and later 0.x releases (the clang pre-pass reports each use;
+without clang the build runs the same scan in Python on each source it
+compiles, and `make check-upgrade SRC=<folder>` reads a whole project) and
+is gone at 1.0. Nothing else of the public API changes at 1.0, and nothing changes
 again before 2.0.
 
 Two things on this page are not removals but **changes of meaning**: read

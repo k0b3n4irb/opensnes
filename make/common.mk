@@ -492,6 +492,9 @@ ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
 			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
+	else \
+		python3 $(OPENSNES)/devtools/check_upgrade.py -q $< || \
+			echo "  (deprecated names above: removed at 1.0 — docs/UPGRADING.md; the clang pre-pass is absent on this machine)"; \
 	fi
 endif
 	@echo "[CC] $<"

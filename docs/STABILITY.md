@@ -51,8 +51,9 @@ version. A new module costs nothing to a project that does not link it.
 - A name that has to go is **deprecated first**: it keeps working, the
   clang pre-pass of every build prints a warning naming its replacement,
   and `docs/UPGRADING.md` lists it. It is removed at the next major
-  version only. A build without clang prints nothing: `make check-upgrade
-  SRC=<folder>` reads your sources against the list.
+  version only. A build without clang runs the same scan in Python on each
+  source it compiles and prints the names it finds (since 2026-10-04);
+  `make check-upgrade SRC=<folder>` reads a whole project against the list.
 - A **change of meaning** (the same name, a different effect) happens only
   at a major version, is announced one minor version ahead, and gets an
   entry in `docs/UPGRADING.md` and a check in `check-upgrade`. The 1.0

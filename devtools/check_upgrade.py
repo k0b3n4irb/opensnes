@@ -64,9 +64,12 @@ def sources(paths: list[str]):
 
 
 def main(argv: list[str]) -> int:
+    quiet = "-q" in argv or "--quiet" in argv
+    argv = [a for a in argv if a not in ("-q", "--quiet")]
     if not argv:
         print(__doc__.strip().splitlines()[0])
-        print("usage: check_upgrade.py <folder-or-file>...")
+        print("usage: check_upgrade.py [-q] <folder-or-file>...   (-q: hits only, no summary —"
+              " the form make/common.mk runs per source when clang is absent)")
         return 2
     names = removed_names()
     word = re.compile(r"\b(" + "|".join(map(re.escape, list(names) + list(MEANING))) + r")\b")
@@ -82,8 +85,9 @@ def main(argv: list[str]) -> int:
                 kind = "removed at 1.0" if name in names else "changes meaning"
                 print(f"{f}:{n}: {name} — {kind}: {what}")
                 hits += 1
-    print(f"\ncheck-upgrade: {hits} hit(s) in {len(list(sources(argv)))} file(s); "
-          f"{len(names)} removed names known from the headers")
+    if not quiet:
+        print(f"\ncheck-upgrade: {hits} hit(s) in {len(list(sources(argv)))} file(s); "
+              f"{len(names)} removed names known from the headers")
     return 1 if hits else 0
 
 

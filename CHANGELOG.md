@@ -499,6 +499,11 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- build: a build without clang no longer hides the deprecations. When the
+  clang pre-pass is absent, `make/common.mk` runs `check_upgrade.py -q` on
+  each source it compiles and prints the deprecated names it finds
+  (documentation audit, the one red item left after `UPGRADING.md` and
+  `make check-upgrade`). `check_upgrade.py` gains `-q` (hits only).
 - test(luna-test): the nineteen input-driven manifests (`movement_*`,
   `state_*`) assert that every VRAM DMA of their run lands in blank
   (`[asserts.dma] unsafe_writes = 0`): `vram_dma_blank.py` only sees the
