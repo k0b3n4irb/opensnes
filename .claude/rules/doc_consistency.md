@@ -88,6 +88,15 @@ opt-in list.
     codegen change: `make bench` to see the new figures, update the baseline
     and the page in the same commit.
 
+14. **No example teaches a fixed or imaginary bug** (since 2026-10-04): a
+    short motif list over `examples/**/*.{c,h,md}` — `framesize=158`, "uses
+    logical shift", "assumes bank $00", "spill to bank 1", "must be in bank
+    $00 WRAM", "due to a compiler quirk". Caught as six comments and README lines
+    (shmup_1942, superscope, window, parallax_scroll, two_players) still
+    teaching the pre-A6 bank constraint, a logical shift the compiler never
+    did, a string spill that #127.3 ended, and a stale cost figure
+    (examples audit, F_examples.md PF4). Explain history in other words.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the

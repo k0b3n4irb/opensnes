@@ -41,7 +41,9 @@ extern u8 tilemap[];
 extern u8 palette[];
 
 /**
- * @brief HDMA scroll table in RAM (must be in bank $00 WRAM, < $2000).
+ * @brief HDMA scroll table in RAM — a plain C global, so it sits in
+ *        $00:0000-$1FFF like every non-FAR variable; hdmaSetup() reads the
+ *        bank from the pointer and would take a const table too.
  *
  * This table defines three horizontal screen zones, each with an independent
  * scroll offset. HDMA channel 6 reads this table during HBlank to override

@@ -57,12 +57,13 @@ extern u8 tilemap_bg2[], tilemap_bg2_end[];
 extern u8 palette_bg2[];
 
 /*============================================================================
- * HDMA Triangle Tables (in RAM — NOT const)
+ * HDMA Triangle Tables (in RAM)
  *
- * These tables must be mutable (not const) because hdmaSetup() assumes
- * bank $00 for ROM addresses, but the linker may place SUPERFREE const data
- * in bank $01+. Mutable data always resides in bank $00 WRAM ($7E:0000),
- * which hdmaSetup handles correctly.
+ * Plain globals: hdmaSetup() takes a far pointer and reads the bank from
+ * it (since the A6 chantier), so a const table in the asset banks would
+ * work just as well; these stay in RAM because nothing here needs them in
+ * ROM. (Until 2026-10-04 this comment claimed hdmaSetup needed them in
+ * the code bank, a pre-A6 constraint.)
  *
  * Format: [count | 0x80] [data per scanline...]
  *   - 0x80 bit = repeat mode (HDMA reads one new byte per scanline)

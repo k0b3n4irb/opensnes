@@ -502,6 +502,50 @@ def check_asm_bank_comments() -> list[str]:
 
 
 # --------------------------------------------------------------------------
+# Check: no example teaches a bug that is fixed or never existed
+#
+# The examples audit of 2026-10-03 (F_examples.md PF4) found six comments
+# and README lines still teaching the pre-A6 bank-$00 constraint, a
+# "logical shift" the compiler never did, a string spill that #127.3 ended
+# and a stale cost figure. Prose like this outlives the fix by months
+# because no gate reads it; these motifs are the ones found, kept short so
+# an explanation of the history ("said hdmaSetup needed them in the code
+# bank") does not trip them.
+# --------------------------------------------------------------------------
+_STALE_EXAMPLE_CLAIMS = [
+    (re.compile(r"framesize\s*=\s*158|158-byte framesize"), "a cost figure of an earlier oamSet"),
+    (re.compile(r"uses logical shift|logical shift \(LSR\)"), "cc65816 shifts signed values arithmetically"),
+    (re.compile(r"assumes? bank \$00", re.IGNORECASE), "pre-A6: the bank is read from the far pointer"),
+    (re.compile(r"spills? to bank 1|spill to bank \$01", re.IGNORECASE), "since #127.3 const data lives in the asset banks and is read far"),
+    (re.compile(r"must be in bank \$00 WRAM", re.IGNORECASE), "a plain global sits below $2000 by the compiler's rule; the lib reads the pointer's bank"),
+    (re.compile(r"due to a compiler quirk", re.IGNORECASE), "name the bug or drop the claim"),
+]
+
+
+def check_example_stale_claims() -> list[str]:
+    drifts: list[str] = []
+    root = repo_path("examples")
+    if not root.is_dir():
+        return []
+    for path in sorted(p for p in root.rglob("*") if p.suffix in (".c", ".h", ".md") and p.is_file()):
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+        # a claim may wrap onto the next line of a comment ("assumes\n * bank $00"):
+        # match each line joined with the next, comment leaders stripped
+        for i, line in enumerate(lines):
+            nxt = lines[i + 1].strip().lstrip("*/ ").strip() if i + 1 < len(lines) else ""
+            probe = line.strip().lstrip("*/ ") + " " + nxt
+            for rx, why in _STALE_EXAMPLE_CLAIMS:
+                m = rx.search(probe)
+                if m and (rx.search(line) or not rx.search(nxt)):
+                    drifts.append(
+                        f"{path.relative_to(repo_path())}:{i + 1}: teaches a stale claim "
+                        f"('{m.group(0)}') — {why}"
+                    )
+                    break
+    return drifts
+
+
+# --------------------------------------------------------------------------
 # Check: example screenshot basenames must be unique across READMEs
 #
 # Doxygen flattens every markdown-referenced image into the single html/
@@ -1054,6 +1098,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_category_sums(canonical_n))
     all_drifts.extend(check_roadmap_footer_date(canonical_date))
     all_drifts.extend(check_asm_bank_comments())
+    all_drifts.extend(check_example_stale_claims())
     all_drifts.extend(check_screenshot_basenames())
     all_drifts.extend(check_sdk_names_in_docs())
     all_drifts.extend(check_no_retired_tools())

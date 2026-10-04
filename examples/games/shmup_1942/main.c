@@ -376,8 +376,10 @@ int main(void) {
         bullets_update();
         collisions_resolve();
 
-        /* Player: direct OAM write — saves oamSet's 158-byte framesize
-         * per frame compared to the function form. */
+        /* Player: direct OAM write — no call and no argument pushes,
+         * where oamSet() would do the same four stores through a frame.
+         * (A byte count of an earlier oamSet's frame stood here until
+         * 2026-10-04.) */
         oamMemory[0] = (u8)game.player_x;
         oamMemory[1] = (u8)(game.player_y - 1);
         oamMemory[2] = 0;

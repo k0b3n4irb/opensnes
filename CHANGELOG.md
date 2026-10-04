@@ -190,6 +190,13 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- docs(examples): six comments and README lines taught bugs that are fixed
+  or never existed — the pre-A6 "hdmaSetup assumes bank $00" (window,
+  parallax_scroll), "strings spill to bank 1 = garbage" (shmup_1942, ended
+  by #127.3), a "compiler quirk" with separate `u16` coordinates
+  (two_players), and a cost figure of an earlier `oamSet` (shmup_1942,
+  superscope). `make lint-docs` now refuses those motifs in `examples/`
+  (anchor 14; examples audit PF4).
 - docs(lib,examples): three claims corrected. `AUDIO_RELEASE_*` are the
   ADSR2 **sustain rate**, not a release: the S-DSP's release is fixed on
   key-off (fullsnes, snesdev-wiki Errata; library audit D1).
