@@ -178,7 +178,7 @@ PVSnesLib's `setColorEffect(CM_SUBBGOBJ_ENABLE, CM_MSCR_BACK | CM_MSCR_BG1)` bec
 colorMathInit();
 colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
 colorMathSetOp(COLORMATH_ADD);
-colorMathEnable(LAYER_BG1 | COLORMATH_BACKDROP);
+colorMathSetLayers(LAYER_BG1 | COLORMATH_BACKDROP);
 ```
 
 #### BG Register Setup (when not using bgInitTileSet)
@@ -276,7 +276,7 @@ PVSnesLib ASM functions ported verbatim have SWAPPED stack offsets.
 ### 4. HDMA tables may live in any bank
 `hdmaSetup()` reads the bank from the table pointer (chantier A6); a `const`
 table works wherever the linker puts it. (This pitfall used to say it
-hardcoded bank $00; `hdmaSetupBank()` is deprecated since 2026-09-20.)
+hardcoded bank $00; `hdmaSetupBank()` was removed on 2026-10-05.)
 Tables on `BGnVOFS` carry the vertical-scroll -1 themselves (KNOWN_LIMITATIONS).
 
 ### 5. Tilemap padding for 256×224 images

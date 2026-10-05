@@ -24,6 +24,9 @@
 #include <snes/types.h>
 #include <snes/registers.h>  /* REG_MOSAIC for the inline mosaicInit body */
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): mosaicEnable.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Background Mask Constants
  *============================================================================*/
@@ -57,8 +60,8 @@ void mosaicInit(void);
  * @brief Set the backgrounds the mosaic applies to — REPLACES the previous set
  *
  * `mosaicSetLayers(LAYER_BG1)` after `mosaicSetLayers(LAYER_BG2)` leaves
- * only BG1 pixelated. This is the function mosaicEnable() was until
- * 2026-09-22, renamed because "Enable" reads as additive — windowEnable() IS
+ * only BG1 pixelated. This is the function the removed mosaicEnable() was
+ * (renamed 2026-09-22, removed 2026-10-05) because "Enable" reads as additive — windowEnable() IS
  * additive — and the old name silently undid the previous call.
  *
  * @param bgMask Bitmask of backgrounds (LAYER_BG1 | LAYER_BG2 | ...; 0
@@ -71,11 +74,6 @@ void mosaicInit(void);
  * @endcode
  */
 void mosaicSetLayers(u8 bgMask);
-
-/** @brief The pre-2026-09-22 name of mosaicSetLayers(). Same behaviour: it
- *         REPLACES the background set. */
-OPENSNES_DEPRECATED("use mosaicSetLayers() — this call replaces the background set, it does not add to it")
-void mosaicEnable(u8 bgMask);
 
 /**
  * @brief Disable mosaic effect for all backgrounds

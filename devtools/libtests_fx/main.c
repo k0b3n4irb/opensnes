@@ -7,10 +7,10 @@
  *
  *   hdma    hdmaWaveInit, hdmaWaveH, hdmaGetEnabled, hdmaGradient,
  *           hdmaWindowShape
- *   mode7   mode7SetMatrix, mode7SetPivot, mode7Rotate, mode7Transform
- *   snesmod snesmodSetSoundTable, snesmodAllocateSoundRegion, snesmodFlush,
+ *   mode7   mode7SetMatrix, mode7SetCenter, mode7Rotate, mode7Transform
+ *   snesmod snesmodFlush,
  *           snesmodGetPosition
- *   console consoleInitEx, nmiSet
+ *   console consoleInit, nmiSet
  *   combo   irq + SNESMOD: a V-timer IRQ armed before snesmodInit keeps
  *           firing once per frame while snesmodProcess runs, and the
  *           driver leaves STAT78's latch flag clear (testing audit T5)
@@ -19,7 +19,9 @@
  * may live in any bank (the header's "must be in bank 0" note is stale; the
  * function that does drop the bank is irqSet — API audit 2026-09-20, B2).
  */
-/* hdmaSetupBank is deprecated; while it ships it keeps its vector. */
+
+/* hdmaEnable / hdmaDisable keep their mask vector until lot E (1.0 plan)
+ * gives them a channel; their deprecation warning is the only one left. */
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
@@ -40,8 +42,7 @@ u16 r_hdma_setup;    /* ... after hdmaGradient(5) + hdmaWindowShape(4): setup
 u16 r_hdma_both;     /* ... after hdmaEnableMask(ch 5 | ch 4)              -> 0x70 */
 u16 r_hdma_names;    /* hdmaDisable / hdmaEnable (deprecated) still take a mask -> 1 */
 u16 r_m7_rot_sin;    /* m7_sin after mode7Rotate(90): table[64]         -> 127 */
-u16 r_chips;         /* plain LoROM: sa1IsReady | sa1Init<<1 | gsuIsPresent<<2, all 0; bit 4 = the
-                      * deprecated sa1Init agrees with sa1IsReady                     -> 0x10 */
+u16 r_chips;         /* plain LoROM: sa1IsReady | gsuIsPresent<<2, both 0           -> 0 */
 u16 r_nmi_calls;     /* nmiSet callback invocations over 5 frames       -> 5 */
 u16 r_nmi_after;     /* ... 3 more frames after nmiClear                -> 5 */
 u16 r_mod_pos;       /* snesmodGetPosition() as a u16: high byte clean  -> lt 0x100 */
@@ -60,8 +61,6 @@ extern u8 spc_fread, spc_fwrite;
 static const u8 grad_table[] = { 80, 0x20 | 4, 80, 0x40 | 8, 64, 0x80 | 12, 0 };
 /* window shape: left/right pairs */
 static const u8 win_table[] = { 100, 40, 200, 124, 60, 180, 0 };
-/* a streaming sound table: only its address matters to the vector */
-static const u8 sound_table[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
 static volatile u16 nmi_calls;
 static void nmiProbe(void) { nmi_calls++; }
@@ -69,7 +68,7 @@ static void nmiProbe(void) { nmi_calls++; }
 int main(void) {
     u8 i;
 
-    consoleInitEx(0);            /* the documented alias of consoleInit */
+    consoleInit();
 
     /* IRQ + SNESMOD (testing audit 2026-10-03, T5): the timer IRQ is armed
      * BEFORE the driver boots. snesmodInit used to end on `lda #$81 / sta
@@ -85,8 +84,6 @@ int main(void) {
      * and the command queue mean something. */
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
-    snesmodSetSoundTable(sound_table);      /* SoundTable asserted by symbol */
-    snesmodAllocateSoundRegion(8);          /* before the module: it resizes SPC RAM */
     snesmodLoadModule(MOD_POLLEN8);
     snesmodPlay(0);
     snesmodSetModuleVolume(90);
@@ -118,11 +115,9 @@ int main(void) {
     nmiClear();
     r_nmi_calls = nmi_calls;
     /* N4: the chip presence getters on a cartridge with no chip (crt0 left
-     * sa1_status / superfx_status at 0); the deprecated sa1Init keeps its
-     * vector while it ships. gsuInit is not callable here — its GSU state
+     * sa1_status / superfx_status at 0). gsuInit is not callable here — its GSU state
      * lives in superfx.asm, a SuperFX-only object — superfx_hello runs it. */
-    r_chips = (u16)sa1IsReady() | ((u16)sa1Init() << 1) | ((u16)gsuIsPresent() << 2)
-            | ((sa1IsReady() == sa1Init()) ? 0x10 : 0);
+    r_chips = (u16)sa1IsReady() | ((u16)gsuIsPresent() << 2);
     nmiSet(0);      /* documented as "disable": used to install a jump to $00:0000 */
     for (i = 0; i < 3; i++) { WaitForVBlank(); snesmodProcess(); }
     r_nmi_after = nmi_calls;
@@ -148,10 +143,9 @@ int main(void) {
      * colour 0. Red at the top, blue at the bottom; the last chunk leaves
      * CGRAM[37] near-blue and CGRAM[0] untouched. */
     hdmaColorGradient(3, 37, 0x001F, 0x7C00);
-    /* The deprecated explicit-bank form: channel 2, the gradient table, with
-     * the bank passed by hand. Asserted on luna's DMA view, bank included. */
-    hdmaSetupBank(2, HDMA_MODE_1REG, HDMA_DEST_COLDATA, grad_table,
-                  (u8)((u32)(const void *)grad_table >> 16));
+    /* A second gradient table on channel 2: the far pointer carries the bank,
+     * asserted on luna's DMA view (a_bank is an asset bank, not 0). */
+    hdmaSetup(2, HDMA_MODE_1REG, HDMA_DEST_COLDATA, grad_table);
 
     /* mode 7: Transform and Rotate go through the PPU multiplier and leave
      * the matrix behind; SetMatrix and SetPivot then write known values the
@@ -160,7 +154,7 @@ int main(void) {
     mode7Transform(90, 100);
     mode7Rotate(90);
     mode7SetMatrix(0x0100, 0x0020, (s16)-0x0020, 0x0080);
-    mode7SetPivot(64, 48);
+    mode7SetCenter(64, 48);
 
     setScreenOn();
     WaitForVBlank();

@@ -56,6 +56,9 @@
 #include <snes/types.h>
 #include <snes/registers.h>  /* REG_CGWSEL / REG_CGADSUB / REG_COLDATA */
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): colorMathEnable.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Layer Masks (for colorMathSetLayers)
  *============================================================================*/
@@ -140,18 +143,13 @@ void colorMathInit(void);
  * @brief Set the layers colour math applies to — REPLACES the previous set
  *
  * `colorMathSetLayers(LAYER_BG1)` after `colorMathSetLayers(LAYER_BG2)`
- * leaves only BG1 blended. This is the function colorMathEnable() was until
- * 2026-09-22; it is renamed because "Enable" reads as additive — windowEnable()
+ * leaves only BG1 blended. This is the function the removed colorMathEnable()
+ * was (renamed 2026-09-22, removed 2026-10-05) because "Enable" reads as additive — windowEnable()
  * IS additive — and the old name silently undid the previous call.
  *
  * @param layers Layer mask (LAYER_BG1, LAYER_BG2, ...; 0 disables)
  */
 void colorMathSetLayers(u8 layers);
-
-/** @brief The pre-2026-09-22 name of colorMathSetLayers(). Same behaviour:
- *         it REPLACES the layer set. */
-OPENSNES_DEPRECATED("use colorMathSetLayers() — this call replaces the layer set, it does not add to it")
-void colorMathEnable(u8 layers);
 
 /**
  * @brief Disable all color math

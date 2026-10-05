@@ -20,7 +20,7 @@ from luna_runner import firmware_dir  # noqa: E402
 STEPS = 2_000_000
 
 CASES = [
-    ("r_done",      2, 0xBEEF), ("dsp1_ok",     2, 1), ("dsp1_ok_old", 2, 1),
+    ("r_done",      2, 0xBEEF), ("dsp1_ok",     2, 1),
     ("r_mul",       2, 0x2000), ("r_mul_neg",   2, 0xE000), ("r_mul_sign", 2, 1),
     # Distance reads one low on exact lengths (measured, see dsp1.h)
     ("r_dist",      2, 12),     ("r_dist_mid",  2, 499),    ("r_dist_big", 2, 9999),
@@ -28,7 +28,6 @@ CASES = [
     ("r_range_out", 2, 732),    ("r_range_in",  2, 0xFFE1), ("r_range_on", 2, 0), ("r_range_sm", 2, 0),
     ("r_rot_x",     2, 0),      ("r_rot_y",     2, 0xFF9D),   # -99: sin 90 deg = 0x7FFF
     ("r_tgt_x",     2, 1),      ("r_tgt_y",     2, 1),
-    ("r_cam_names", 2, 1),      # dsp1Parameter (deprecated) == dsp1SetCamera, word for word
 ]
 
 

@@ -879,7 +879,7 @@ def deprecated_citations_in_text(text: str, deprecated: set[str]) -> list[tuple[
 def check_sdk_names_in_docs() -> list[str]:
     api = _public_api_names()
     prefixes = sdk_prefixes(api)
-    deprecated = deprecated_api_names() - {"rand", "srand"}  # libc names: too common in prose
+    deprecated = deprecated_api_names()
     root = repo_path()
     drifts: list[str] = []
     for path in _sdk_doc_paths():

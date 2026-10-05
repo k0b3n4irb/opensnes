@@ -53,14 +53,3 @@ u8 easeOutQuad(u8 t) {
     return 255 - math_ease_quad_table[255 - t];
 }
 
-/* The pre-2026-10-03 names (API decision D3), out of line: a use of a
- * deprecated symbol is an error in this strict build, a definition is not.
- * Removed at 1.0. */
-u8 ease_in_quad(u8 t) {
-    return math_ease_quad_table[t];
-}
-
-u8 ease_out_quad(u8 t) {
-    return 255 - math_ease_quad_table[255 - t];
-}
-

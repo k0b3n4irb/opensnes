@@ -28,7 +28,7 @@
  * @par Modules Used
  * console, sprite, dma, background, text, input, gameloop
  *
- * @see console.h (rand, srand)
+ * @see console.h (rngNext, rngSeed)
  */
 
 #include <snes.h>

@@ -40,6 +40,17 @@ All notable changes to OpenSNES are documented in this file.
   illustration).
 
 ### Removed
+- The twenty-six renamed functions (lot C of the 1.0 plan), with their
+  bodies and fixture vectors: `audioUpdate`, `colorMathEnable`,
+  `consoleInitEx`, `getRegion`, `rand`, `srand`, `dmaCopyVramBank`,
+  `dmaCopyCGramBank`, `dsp1Parameter`, `dsp1Present`, `hdmaSetupBank`,
+  `padRaw`, `scopeButtonsDown`, `nmiSetBank`, `irqSetBank`, `LzssDecodeVram`, `ease_in_quad`,
+  `ease_out_quad`, `mode7SetPivot`, `mosaicEnable`, `profileGetFrameCount`,
+  `sa1Init`, `snesmodSetSoundTable`, `snesmodAllocateSoundRegion`,
+  `oamDrawMeta`, `oamDrawMetaFlip`. Each replacement is in
+  `docs/UPGRADING.md` and `devtools/removed_api.txt`; `oamDrawMeta`'s loop
+  stays as the internal body of `oamDrawMetasprite()` (lot D). Only
+  `hdmaEnable` / `hdmaDisable` keep their warning until their own lot.
 - The twenty deprecated constants and the `OAM_SET_GFX_BANK` macro (lot B of
   the 1.0 plan): `WINDOW_BG1`..`WINDOW_OBJ`, `COLORMATH_BG1`..`COLORMATH_OBJ`,
   `MOSAIC_BG1`..`MOSAIC_BG4` (all `LAYER_*` of `video.h`, same values),

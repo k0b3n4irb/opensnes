@@ -46,6 +46,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): mode7SetPivot.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /**
  * @brief Initialize Mode 7
  *
@@ -168,15 +171,6 @@ void mode7Rotate(u16 degrees);
  * @endcode
  */
 void mode7Transform(u16 degrees, u16 scalePercent);
-
-/**
- * @brief mode7SetCenter() restricted to 0-255
- *
- * Writes the same two registers (M7X, M7Y) from two u8. It was documented
- * as taking screen coordinates and never did.
- */
-OPENSNES_DEPRECATED("use mode7SetCenter() — the same registers, without the 0-255 limit")
-void mode7SetPivot(u8 x, u8 y);
 
 /**
  * @brief Set Mode 7 matrix directly

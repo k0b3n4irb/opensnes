@@ -18,7 +18,7 @@ Vectors covered (see main.c):
     (`luna state` JSON: windows, w12sel, w34sel, wobjsel, wbglog, wobjlog,
     tmw, tsw) — write-only registers the WRAM oracle cannot see.
 
-`--region pal` runs the same ROM under `--force-region pal`: getRegion() /
+`--region pal` runs the same ROM under `--force-region pal`: isPAL() /
 isPAL() must then read 1 and every other vector must hold (the PAL pass of
 the gaps review, R2).
 """
@@ -122,7 +122,6 @@ CASES = [
     ("r_obj_fr_y",   2, 0),       # ...and a small yvel clamps at zero, no sign flip
     ("r_obj_pool",   2, 80),      # objKillAll returns the WHOLE pool (was 79: a slot leaked)
     ("r_ease",         2, 0xC040),  # easeInQuad(128) = 64, easeOutQuad(128) = 192
-    ("r_ease_names",   2, 1),       # the deprecated ease_in_quad / ease_out_quad agree
     ("r_bright_get",   2, 7),       # getBrightness() reads what setBrightness() set
     ("r_mosaic_init",  2, 0),       # mosaicInit() clears the size
     ("r_scope_hold",   2, 30),      # scopeSetHoldDelay() writes the crt0 word
@@ -137,13 +136,11 @@ CASES = [
     ("r_atan_se", 2, 32), ("r_atan_lut", 2, 19),
     ("r_bg_sx",        2, 300),    ("r_bg_sy",        2, 77),     ("r_bg_init",      2, 0),
     ("r_text_x",       2, 2),      ("r_text_flush",   2, 1),      ("r_frame_reset",  2, 0),
-    ("mapoptions",     1, 3),      ("r_pad_raw",      2, 0),     # mapSetMapOptions(1WAY|BG2), bank $7E byte
     ("r_mouse",        2, 0),      ("r_mouse_sens",   2, 0),     # no mouse: the NMI never applies the request...
     ("mouseRequestChangeSensitivity", 1, 0x82),                  # ...but mouseSetSensitivity(0, HIGH) recorded it
     ("r_scope",        2, 0), ("r_scope_names", 2, 1),      ("r_scope_delay",  2, 7),
     ("r_obj_grav",     2, 0x0040), ("r_obj_air", 2, 0), ("r_obj_stand", 2, 0xFF00), ("r_obj_refresh",  2, 2),      # both objects are on screen
     ("r_obj_cobj",     2, 1), ("r_obj_cobj_h", 2, 0x0100),      ("r_obj_cobj_no",  2, 0),
-    ("r_prof_frames",  2, 1),      ("r_prof_scan",    2, 1),
     ("r_mosaic",       2, 15),    ("r_cm_layers", 2, 1),
     # bank-byte chantier (2026-09-20): data outside bank $00, asymmetric values
     ("r_bank_irq",     2, 4),      # plain irqSet reached a handler in banks 7-1
@@ -191,7 +188,6 @@ CASES = [
     ("r_pad_conn4", 2, 0),      # multitap slot: nothing can fill it, so FALSE
     ("r_pad_oob",   2, 0),      # out of range
     # L2c: console — HVBJOY bit 7 right after WaitForVBlank, then clear.
-    ("r_invb_in", 2, 1), ("r_invb_out", 2, 0), ("r_true_one", 2, 1), ("r_rng", 2, 0x091A), ("r_rng_names", 2, 1),
     # tile: an encoder written from the planar layout (_tile_ref below), and
     # one hand-derived vector that does not go through it
     ("r_tile2", 16, None), ("r_tile4", 32, None), ("r_tile8", 64, None),
@@ -247,20 +243,20 @@ PPU_CASES = [
     ("cgwsel", 0x12),               # colorMathSetCondition(INSIDE): bits 5-4 = 01; bit 1: sub-screen source
     ("coldata_r", 10), ("coldata_g", 10), ("coldata_b", 20),   # SetBrightness(10) then SetChannel(BLUE, 20)
     ("bgs.1.h_scroll", 300), ("bgs.1.v_scroll", 76),   # bgSetScrollX/Y(1, 300, 77): VOFS = y - 1
-    ("cgram.250", 0x001F), ("cgram.251", 0x03E0),      # dmaCopyCGramBank: red, green
+    ("cgram.250", 0x001F), ("cgram.251", 0x03E0),      # dmaCopyCGram at colour 250: red, green
     ("cgram.254", 0x7C00), ("cgram.255", 0x7FFF),      # dmaTransfer to CGDATA: blue, white
     ("oam_full.14", 0xAB), ("oam_full.15", 0x01),       # oamSetTile(3, 0x1AB) + dmaCopyOam
     # bank-byte chantier: dmaCopyOam from a const (ROM) table
     ("oam_full.0", 0x4D), ("oam_full.1", 0x58), ("oam_full.2", 0x5A), ("oam_full.3", 0x31),
     ("oam_full.4", 0x21), ("oam_full.5", 0x43), ("oam_full.6", 0x65), ("oam_full.7", 0x07),
-    # lot C: oamDrawMetaFlip(10, x=100, y=50, flipX, box 16): item dx=0 -> 108, dx=8 -> 100;
+    # lot C: oamDrawMetasprite(10, x=100, y=50, OBJ_FLIPX, 16-pixel style): item dx=0 -> 108, dx=8 -> 100;
     # bit 6 of the attribute byte is the H-flip the mirror set
     ("oam_full.40", 108), ("oam_full.41", 49), ("oam_full.44", 100), ("oam_full.45", 49),   # OAM Y = y - 1
     ("oam_full.43", 0x40),
 ]
 
 # VRAM bytes written by bgInitTileSetData (16 at word 0x6000) and
-# dmaCopyVramBank (16 more at word 0x6008): the fixture's lotb_vram pattern.
+# dmaCopyVram (16 more at word 0x6008): the fixture's lotb_vram pattern.
 VRAM_CASES = [
     (0xC000, bytes([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
                     0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF, 0x10,

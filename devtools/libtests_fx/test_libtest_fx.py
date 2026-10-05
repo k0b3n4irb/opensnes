@@ -37,7 +37,7 @@ CASES = [
     ("r_hdma_speed", 2, 3),      # hdmaWaveSetSpeed: a lib function since 2026-10-03 (was inline)
     # nmiSet: one callback per frame, none after nmiClear
     ("r_nmi_calls",  2, 5),
-    ("r_chips",      2, 0x10),   # no SA-1, no GSU on this LoROM; old and new names agree
+    ("r_chips",      2, 0),      # no SA-1, no GSU on this LoROM
     ("r_nmi_after",  2, 5),
     # mode7Rotate(90) -> angle 63 -> sine table entry 126
     ("m7_sin",       1, 126),
@@ -57,13 +57,13 @@ STATE_CASES = [
     ("cpu_regs.nmitimen", 0xA1),     # NMI + V-timer IRQ + auto-joypad: the IRQ stays armed through the driver's $4200 writes
     ("cpu_regs.vtime", 120),         # irqSetVTimer(120), untouched by SNESMOD
     ("ppu.m7a", 256), ("ppu.m7b", 32), ("ppu.m7c", -32), ("ppu.m7d", 128),   # mode7SetMatrix
-    ("ppu.m7x", 64), ("ppu.m7y", 48),                                         # mode7SetPivot
+    ("ppu.m7x", 64), ("ppu.m7y", 48),                                         # mode7SetCenter
     # hdmaColorGradient(3, 37, red, blue): the index is honoured. CGRAM[37]
     # holds whichever band the beam last crossed when luna samples, so the
     # exact colour depends on the sampling phase — "not black" is the claim.
     ("ppu.cgram.37", ("ne", 0)),
     ("ppu.cgram.0", 0x0000),         # ...and colour 0, where every gradient used to land, is untouched
-    ("dma.channels.2.bbad", 0x32),   # hdmaSetupBank (deprecated): COLDATA, and...
+    ("dma.channels.2.bbad", 0x32),   # hdmaSetup on channel 2: COLDATA, and...
     ("dma.channels.2.a_bank", ("ne", 0)),   # ...the hand-passed bank of a const table (an asset bank)
     ("dma.channels.4.bbad", 0x26),   # hdmaWindowShape -> WH0, two registers
     ("dma.channels.4.params", 0x01),
@@ -95,7 +95,7 @@ def main() -> int:
         print(f"  {'PASS' if ok else 'FAIL'}  {name} == 0x{want:0{width * 2}X}" + ("" if ok else f"  [{detail}]"))
         fails += 0 if ok else 1
     proc = subprocess.run([luna, "state", "-n", str(STEPS), "--out", "-",
-                           "--peek", "SoundTable:3", "--peek", "sound_table:1", str(ROM)],
+                           str(ROM)],
                           capture_output=True, text=True, timeout=300, check=True)
     state = json.loads(proc.stdout)
     for path, want in STATE_CASES:
@@ -106,17 +106,7 @@ def main() -> int:
             ok = got == want
         print(f"  {'PASS' if ok else 'FAIL'}  {path} == {want}" + ("" if ok else f"  [luna reports {got}]"))
         fails += 0 if ok else 1
-    # snesmodSetSoundTable stored the far pointer it was given: the symbol's
-    # own 24-bit address, read back from the .sym rather than hard-coded.
-    peeks = {p["spec"]: p for p in state.get("peeks", [])}
-    stored = bytes.fromhex(peeks["SoundTable:3"]["bytes_hex"])
-    addr = peeks["sound_table:1"]["addr"]
-    want = bytes([addr & 0xFF, (addr >> 8) & 0xFF, (addr >> 16) & 0xFF])
-    ok = stored == want
-    print(f"  {'PASS' if ok else 'FAIL'}  SoundTable == &sound_table ({want.hex()})" + ("" if ok else f"  [got {stored.hex()}]"))
-    fails += 0 if ok else 1
-    # the module must still be playing: snesmodAllocateSoundRegion before the
-    # load is the supported order (after it, the driver drops the module)
+    # the module must still be playing
     active = walk(state, "apu.active_voices")
     ok = isinstance(active, int) and active > 0
     print(f"  {'PASS' if ok else 'FAIL'}  apu.active_voices > 0" + ("" if ok else f"  [luna reports {active}]"))

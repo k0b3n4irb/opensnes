@@ -175,11 +175,6 @@ void mode7Transform(u16 degrees, u16 scalePercent) {
     mode7Rotate(degrees);
 }
 
-void mode7SetPivot(u8 x, u8 y) {
-    W16(REG_M7X, x);
-    W16(REG_M7Y, y);
-}
-
 void mode7SetMatrix(s16 a, s16 b, s16 c, s16 d) {
     W16(REG_M7A, (u16)a);
     W16(REG_M7B, (u16)b);

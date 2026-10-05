@@ -60,7 +60,7 @@ The lib hides those four register writes behind two helpers:
 
 - **`hdmaSetup(channel, mode, destReg, table)`** — for any table, RAM or
   const, in any bank: the bank is read from the table pointer.
-- `hdmaSetupBank(…, table, bank)` is deprecated — it predates far pointers.
+- `hdmaSetupBank`, the explicit-bank form, was removed on 2026-10-05 — it predated far pointers.
 
 …and a separate enable/disable pair:
 
@@ -357,11 +357,11 @@ This is enforced by convention, not by code. The lib's documentation
 
 `hdmaSetup` used to hardcode bank `$00` for its table, so a `static const`
 table that the linker placed elsewhere was read from the wrong bank, and
-`hdmaSetupBank(…, bank)` existed to pass the right one by hand. Since
+`hdmaSetupBank` existed to pass the right one by hand (removed 2026-10-05). Since
 pointers became far pointers (A6) `hdmaSetup` reads the bank byte of the
 table pointer itself: a const table works from any bank — which is where
 const data lives by default since v0.41.0 — and so does a RAM table, on
-LoROM and on HiROM. `hdmaSetupBank` is **deprecated** (2026-09-20): it
+LoROM and on HiROM. `hdmaSetupBank` is **removed** (2026-10-05, deprecated since 2026-09-20): it
 carries two banks and the explicit one wins. Use `hdmaSetup`.
 
 ### 🟡 Repeat-mode discipline matters

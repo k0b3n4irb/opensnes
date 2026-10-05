@@ -188,3 +188,19 @@ dessiner, ou un portage par outil. Ce n'est pas une porte de la 1.0 (le
 critère 2 les exempte). **La 1.0 attendra** le temps qu'il faut ; le lot B
 du plan (retrait des constantes dépréciées) commence sur `develop`.
 
+**Lots B, C et D faits, 2026-10-05 (soir).** Lot B : les vingt constantes
+dépréciées et `OAM_SET_GFX_BANK` retirées (`959a8e9c`), ROM identiques
+octet pour octet. Lot C : les vingt-six fonctions renommées sans changement
+de sens retirées avec leurs corps et leurs vecteurs de fixture ; seuls
+`hdmaEnable()` / `hdmaDisable()` gardent leur avertissement pour le lot E.
+Lot D plié dans le même commit : la boucle de `oamDrawMeta` est devenue la
+fonction `static` interne de `oamDrawMetasprite()`, plus de pragma ; le code
+engendré est identique ligne pour ligne (260 lignes d'assembleur, diff
+vide), donc les chiffres de `docs/PERF.md` tiennent sans remesure. Preuves :
+`diff_corpus` 91/91 MATCH, onze flux WRAM recapturés après lecture octet
+par octet (adresses de code en RAM : `dynamic_flush_hook`, `nmi_callback`,
+`irq_callback`, tables de l'object engine, un registre de travail
+`tcc__r9`), `check-upgrade` nomme les sept noms d'un fichier témoin.
+Restent E (`hdmaEnable(channel)`), F (`dmaTransfer`) et I (macros 1.0.0,
+après la session console) ; G et H sont livrés avec B et C.
+

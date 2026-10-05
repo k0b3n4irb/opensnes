@@ -51,6 +51,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): dsp1Parameter, dsp1Present.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /**
  * @brief Multi-word DSP-1 result registers (written by multi-output commands).
  *
@@ -188,15 +191,6 @@ typedef struct {
 void dsp1SetCamera(const Dsp1Camera *cam);
 
 /**
- * @brief dsp1SetCamera() with its seven inputs as arguments
- *
- * The same command and the same outputs. (fx, fy, fz, lfe, les, aas, azs)
- * are the fields of Dsp1Camera in order.
- */
-OPENSNES_DEPRECATED("use dsp1SetCamera() — seven positional arguments, now the fields of Dsp1Camera")
-void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs);
-
-/**
  * @brief Project a world point to the screen (DSP-1 command $06, "Project").
  * @param x world X (I)
  * @param y world Y (I)
@@ -310,12 +304,8 @@ s16 dsp1Range(s16 x, s16 y, s16 z, u16 r);
  * Unlike the other calls this one cannot hang on a missing chip (bounded
  * poll). Use it at boot the way sa1IsReady() / gsuIsPresent() are used —
  * e.g. to fall back to software math when running on the wrong board or on
- * an emulator without the firmware. (Named dsp1Present() until 2026-09-22.)
+ * an emulator without the firmware. (Named dsp1Present() until 2026-09-22; that name was removed on 2026-10-05.)
  */
 u8 dsp1IsPresent(void);
-
-/** @brief The pre-2026-09-22 name of dsp1IsPresent(). Same routine. */
-OPENSNES_DEPRECATED("use dsp1IsPresent()")
-u16 dsp1Present(void);
 
 #endif /* SNES_DSP1_H */

@@ -19,7 +19,7 @@
 #     then the 16x16 hero's six pieces SMALL (entries 4-9, tiles 256+ =
 #     name table 1 at $1000, first at x 192). Y is deliberately not pinned:
 #     this engine writes the caller's y as is (140) where oamSet() and
-#     oamDrawMeta() write y - 1 — an open inconsistency, reported
+#     oamDrawMetasprite() write y - 1 — an open inconsistency, reported
 #     2026-09-26, that a manifest must not freeze.
 #
 # Measured: `luna state --until-frame N --input <the script below> --peek

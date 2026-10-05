@@ -47,6 +47,9 @@
 #include <snes/types.h>
 #include <snes/registers.h>  /* REG_INIDISP for inline setScreenOn/Off bodies */
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): consoleInitEx, getRegion, rand, srand.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Initialization
  *============================================================================*/
@@ -84,14 +87,6 @@
  * @endcode
  */
 void consoleInit(void);
-
-/**
- * @brief The same as consoleInit()
- *
- * @param options Ignored: no option was ever defined.
- */
-OPENSNES_DEPRECATED("use consoleInit() — the argument is ignored")
-void consoleInitEx(u16 options);
 
 /*============================================================================
  * Screen Control
@@ -301,14 +296,6 @@ void resetFrameCount(void);
  */
 u8 isPAL(void);
 
-/**
- * @brief The same value as isPAL(): 0 = NTSC, 1 = PAL
- *
- * Two names for one answer since 2026-09-22; isPAL() is the one kept.
- */
-OPENSNES_DEPRECATED("use isPAL() — it returns the same value")
-u8 getRegion(void);
-
 /*============================================================================
  * Random Number Generation
  *============================================================================*/
@@ -317,7 +304,7 @@ u8 getRegion(void);
  * @brief Next pseudo-random 16-bit number
  *
  * A 16-bit linear feedback shift register (x^16 + x^14 + x^13 + x^11 + 1).
- * Named rand() until 2026-09-22 — a libc name for a function that is not the
+ * Named rand() until 2026-09-22 (that name was removed on 2026-10-05) — a libc name for a function that is not the
  * libc one (no RAND_MAX, 1-65535, a u16), which collides the day any C
  * library code is linked.
  *
@@ -331,7 +318,7 @@ u8 getRegion(void);
 u16 rngNext(void);
 
 /**
- * @brief Seed the generator (named srand() until 2026-09-22)
+ * @brief Seed the generator (the srand() of 0.x, removed 2026-10-05)
  *
  * consoleInit() seeds it from the H/V counters; reseed from a player action
  * (`rngSeed(getFrameCount())` on START) for a different game each run.
@@ -339,13 +326,5 @@ u16 rngNext(void);
  * @param seed Initial seed value; 0 is replaced by a fixed non-zero state
  */
 void rngSeed(u16 seed);
-
-/** @brief The pre-2026-09-22 name of rngNext(). Same generator. */
-OPENSNES_DEPRECATED("use rngNext() — this is not libc's rand()")
-u16 rand(void);
-
-/** @brief The pre-2026-09-22 name of rngSeed(). */
-OPENSNES_DEPRECATED("use rngSeed() — this is not libc's srand()")
-void srand(u16 seed);
 
 #endif /* OPENSNES_CONSOLE_H */

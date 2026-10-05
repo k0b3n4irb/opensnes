@@ -56,7 +56,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
         attr_or = 0;
     }
 
-    /* Bounded like oamDrawMeta (2026-09-20): a metasprite that runs past
+    /* Bounded like the oamDrawMetasprite loop (2026-09-20): a metasprite that runs past
      * sprite 127 used to write beyond the 128-entry oambuffer. */
     while (meta->dx != metasprite_end && id < MAX_SPRITES) {
         oambuffer[id].oamx = x + meta->dx;

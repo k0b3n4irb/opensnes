@@ -42,8 +42,8 @@
 #include <snes/registers.h>
 #include <snes/tile.h>
 #include <snes/apu.h>
-/* Deprecated names keep their vector while they ship (scopeButtonsDown,
- * mosaicEnable, colorMathEnable, rand, srand). */
+/* hdmaEnable / hdmaDisable keep their mask vector until lot E (1.0 plan)
+ * gives them a channel; their deprecation warning is the only one left. */
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
@@ -244,7 +244,7 @@ u16 r_sram_clear;   /* OR of 16 bytes reloaded after sramClear(16) -> 0
 volatile u16 irq_count;
 u16 r_irq_a;        /* irqSet + VTIMER 100, 10 frames        -> 10 */
 u16 r_irq_b;        /* irqDisable, 3 more frames             -> 10 */
-u16 r_irq_c;        /* irqSetBank + H|V timer, 2 frames      -> 12 */
+u16 r_irq_c;        /* irqSet (far handler) + H|V timer, 2 frames -> 12 */
 u16 r_irq_d;        /* irqClear (default handler), 2 frames  -> 12 */
 
 /* object engine: the two behaviours fixed on 2026-09-18.
@@ -275,7 +275,6 @@ static u16 obj_calls;
 /* 2026-10-03: functions that were `inline` in their headers and are lib
  * functions now (API decision D4), plus the D3 rename of the ease pair. */
 u16 r_ease;         /* easeInQuad(128) | easeOutQuad(128) << 8      -> 0xC040 (64, 192) */
-u16 r_ease_names;   /* ease_in_quad / ease_out_quad (deprecated) agree -> 1 */
 u16 r_bright_get;   /* getBrightness() after setBrightness(7)       -> 7 */
 u16 r_mosaic_init;  /* mosaicGetSize() after mosaicSetSize(9), mosaicInit() -> 0 */
 u16 r_scope_hold;   /* scope_holddelay after scopeSetHoldDelay(30)  -> 30 */
@@ -331,7 +330,6 @@ u16 r_bg_init;      /* bgInit(2) after bgSetScrollX(2, 5)       -> 0 */
 u16 r_text_x;       /* textGetX after "AB" on a fresh line       -> 2 */
 u16 r_text_flush;   /* tilemap_update_flag right after textFlush -> 1 */
 u16 r_frame_reset;  /* frame_count right after resetFrameCount   -> 0 */
-u16 r_pad_raw;      /* padRaw(0) idle | padRaw(7) out of range   -> 0 */
 u16 r_mouse;        /* no mouse: connected|x|y|held|pressed      -> 0 */
 u16 r_mouse_sens;   /* mouseSetSensitivity(0, HIGH) is deferred to the NMI, which
                      * only talks to a mouse that is there: the getter stays 0 and
@@ -358,7 +356,6 @@ u16 r_obj_cobj_no;  /* objCollidObj, 40 px apart                 -> 0
                      * (slot INDEXES, not handles: the routine shifts its
                      * arguments by 64 with no mask, so a handle's id byte
                      * lands in the offset — header fixed 2026-09-20) */
-u16 r_prof_frames;  /* profileGetFrameCount == frame_count       -> 1 */
 u16 r_prof_scan;    /* profileGetScanline() < 262                -> 1 */
 u16 r_prof_lines;   /* profileScanlineEnd after a 200-iteration spin -> ge 1 */
 u16 r_prof_lag;     /* profileGetLagFrames: reads the counter (value measured) */
@@ -400,7 +397,7 @@ u16 r_pad_conn4;    /* padIsConnected(4) — multitap slot, never read -> 0 */
 u16 r_pad_oob;      /* padIsConnected(9) — out of range -> 0 */
 
 /* console: region + vblank flag */
-u16 r_region;       /* getRegion() -> 0 NTSC (1 under --force-region pal) */
+u16 r_region;       /* isPAL() -> 0 NTSC (1 under --force-region pal) */
 u16 r_rng;          /* rngNext() after rngSeed(0x1234): first LFSR step        -> 0x091A */
 u16 r_rng_boot;     /* first rngNext() after consoleInit, kept for the record: the seed is
                      * the latched H/V counters ^ STAT78 and moves with the instant of the
@@ -409,9 +406,8 @@ u16 r_rng_boot_moved; /* that first value differs from the one the unlatched see
                        * until 2026-10-03) gives -> 1 */
 u16 r_lerp_wide;    /* fixLerp(FIX(-64), FIX(64), 128): the 17-bit difference -> 0 (was -128.0) */
 u16 r_hide_x;       /* oamHide(5): X low byte 1 (X = 257 = -255), not 0 (X = 256 counts as 0) -> 1 */
-u16 r_rng_names;    /* srand/rand (deprecated) give the same value, non-zero   -> 1 */
-u16 r_true_one;     /* isPAL() == getRegion() on this region, and TRUE == 1 -> 1 */
-u16 r_ispal;        /* isPAL()     -> 0 (1 under pal, the same value as getRegion) */
+u16 r_true_one;     /* isPAL() is 0 or 1 here, and TRUE == 1             -> 1 */
+u16 r_ispal;        /* isPAL()     -> 0 (1 under pal) */
 u16 r_invb_in;      /* isInVBlank() right after WaitForVBlank -> 1 */
 u16 r_invb_out;     /* after spinning until the flag clears   -> 0 */
 
@@ -558,7 +554,7 @@ u16 r_lerp_t256;     /* fixLerp(FIX(10), FIX(37), 256): t = 1.0 -> b = 9472 (a u
 u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */
 u16 r_oam_id256;     /* oamSetX(256, ..) then oamSetY(257, ..): refused, sprites 0/1 keep 0x21 / 0x42
                       * (u8 ids wrapped to 0 and 1 and overwrote them) -> 0x4221 */
-u16 r_meta_n;        /* oamDrawMetaFlip(10, ...), two items: next free id -> 12 */
+u16 r_meta_n;        /* oamDrawMetasprite(10, ..., OBJ_FLIPX), two items: next free id -> 12 */
 u16 r_meta_style;    /* oamDrawMetasprite(20, ..., 0): next free id -> 22, pieces at x 100 / 108 -> 0x6C64 in r_meta_plain */
 u16 r_meta_plain;
 u16 r_meta_flipx;    /* ... OBJ_FLIPX in a 16-wide box of 8-pixel pieces: x 108 / 100 -> 0x646C */
@@ -584,7 +580,6 @@ static void coverage_lot_c(void) {
     AudioSample smp;
     u8 i;
 
-    audioUpdate();                          /* v2 no-op, kept for source compatibility */
     r_aud_badvoice = audioSetVoiceVolume(9, 60, 30);
     r_aud_badstop  = audioStopVoice(8);
     r_aud_setvol   = audioSetVolume(100);  /* 100: audio_v2.toml pins MVOL to it */
@@ -627,7 +622,10 @@ static void coverage_lot_c(void) {
         WaitForVBlank();
         r_hide_x = oamMemory[20];
     }
-    r_meta_n = oamDrawMetaFlip(10, 100, 50, lotc_meta, 0, 0, 0, 1, 0, 16, 8);
+    {
+        static const MetaspriteStyle lotc_style = { 0, 0, OBJ_SMALL, 8, 16, 8 };   /* 8-pixel pieces, a 16x8 metasprite: the mirror is 8 */
+        r_meta_n = oamDrawMetasprite(10, 100, 50, lotc_meta, &lotc_style, OBJ_FLIPX);
+    }
     r_meta_style = oamDrawMetasprite(20, 100, 50, lotc_meta, &lotc_style, 0);
     r_meta_plain = (u16)oamMemory[80] | ((u16)oamMemory[84] << 8);
     oamDrawMetasprite(20, 100, 50, lotc_meta, &lotc_style, OBJ_FLIPX);
@@ -676,8 +674,8 @@ static void coverage_lot_b(void) {
      * and in CGRAM 250-251; dmaTransfer, the raw one, in CGRAM 254-255. */
     bgInitTileSetData(0xFF, lotb_vram, 16, 0x6000);
     dmaFillVRAM(0x1234, 0x6100, 8);         /* a WORD fill: 34 12 34 12 ... (was 34 34) */
-    dmaCopyVramBank(lotb_vram + 16, (u8)((u32)(const void *)lotb_vram >> 16), 0x6008, 16);
-    dmaCopyCGramBank(lotb_pal, (u8)((u32)(const void *)lotb_pal >> 16), 250, 4);
+    dmaCopyVram(lotb_vram + 16, 0x6008, 16);
+    dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;
     dmaTransfer(1, 0x00, (u8)((u32)(const void *)lotb_pal2 >> 16), (u16)(u32)(const void *)lotb_pal2, 0x22, 4);
@@ -693,7 +691,6 @@ static void coverage_lot_b(void) {
     resetFrameCount();
     r_frame_reset = frame_count;
     mapSetMapOptions(MAP_OPT_1WAY | MAP_OPT_BG2);   /* mapoptions ($7E) asserted by symbol */
-    r_pad_raw = padRaw(0) | padRaw(7);
     r_mouse = mouseIsConnected(0) | (u16)mouseGetX(0) | (u16)mouseGetY(0)
             | mouseButtonsHeld(0) | mouseButtonsPressed(0);
     mouseSetSensitivity(0, MOUSE_SENS_HIGH);
@@ -701,8 +698,7 @@ static void coverage_lot_b(void) {
     /* N2: which name reads which crt0 word. No scope is plugged, so the NMI
      * leaves these words alone and the fixture can plant them. */
     scope_down = 0x0011; scope_held = 0x0022;
-    r_scope_names = (scopeButtonsHeld() == 0x0011 && scopeButtonsRepeat() == 0x0022
-                     && scopeButtonsDown() == 0x0011) ? 1 : 0;
+    r_scope_names = (scopeButtonsHeld() == 0x0011 && scopeButtonsRepeat() == 0x0022) ? 1 : 0;
     scope_down = 0; scope_held = 0;
     r_scope = scopeButtonsHeld() | scopeButtonsRepeat() | scopeButtonsPressed()
             | scopeGetX() | scopeGetY() | scopeGetRawX() | scopeGetRawY();
@@ -742,7 +738,6 @@ static void coverage_lot_b(void) {
 
     /* profile: the frame counter it reads is crt0's; a scanline is < 262 */
     profileInit();
-    r_prof_frames = (profileGetFrameCount() == frame_count) ? 1 : 0;
     r_prof_scan   = (profileGetScanline() < 262) ? 1 : 0;
     r_prof_lag    = profileGetLagFrames();
     profileColorStart(2);
@@ -759,9 +754,9 @@ static void coverage_lot_b(void) {
     r_mosaic = mosaicGetSize();
     /* N3: the "SetLayers" pair REPLACES the set — the deprecated name is the
      * first call so it stays executed while it ships. MOSAIC ends 0xF1. */
-    mosaicEnable(LAYER_BG2);
+    mosaicSetLayers(LAYER_BG2);
     mosaicSetLayers(LAYER_BG1);
-    colorMathEnable(LAYER_BG2);
+    colorMathSetLayers(LAYER_BG2);
     colorMathSetLayers(LAYER_BG1);
     r_cm_layers = colormath_cgadsub & 0x3F;
     videoSetObjInterlace(1);
@@ -864,7 +859,7 @@ static void part_math_anim(void) {
 
     /* NMI-context math (#113): compute once inside the callback, then
      * wait until it ran before declaring the fixture done. */
-    nmiSetBank(nmiMathProbe, (u8)((u32)(void *)nmiMathProbe >> 16));
+    nmiSet(nmiMathProbe);
     while (!nmi_math_done) {
         WaitForVBlank();
     }
@@ -1013,8 +1008,6 @@ static void part_objects_irq(void) {
 
     /* --- the de-inlined functions and the ease rename --- */
     r_ease = (u16)easeInQuad(128) | ((u16)easeOutQuad(128) << 8);
-    r_ease_names = (ease_in_quad(128) == easeInQuad(128)
-                    && ease_out_quad(77) == easeOutQuad(77)) ? 1 : 0;
     setBrightness(7);
     r_bright_get = getBrightness();
     setBrightness(15);
@@ -1036,17 +1029,14 @@ static void part_objects_irq(void) {
     r_pad_oob   = padIsConnected(9);
 
     /* --- L2c: console region + vblank flag --- */
-    r_region = getRegion();
+    r_region = isPAL();
     r_ispal  = isPAL();
-    /* N6: rngNext/rngSeed, and the deprecated rand/srand names run the same
-     * generator: same seed, same first value, never 0. */
+    /* N6: rngNext/rngSeed: same seed, same first value, never 0. */
     r_rng_boot = rngNext();          /* before any reseed: the boot seed's first step */
     rngSeed(0x8001);                  /* the seed the unlatched counters gave */
     r_rng_boot_moved = (rngNext() != r_rng_boot) ? 1 : 0;
     rngSeed(0x1234); r_rng = rngNext();
-    srand(0x1234);
-    r_rng_names = (rand() == r_rng && r_rng != 0) ? 1 : 0;
-    r_true_one = (isPAL() == getRegion() && TRUE == 1) ? 1 : 0;   /* N1: one truth value */
+    r_true_one = ((isPAL() == 0 || isPAL() == 1) && TRUE == 1) ? 1 : 0;   /* N1: one truth value */
     WaitForVBlank();
     r_invb_in = isInVBlank();
     while (isInVBlank()) { }
@@ -1064,7 +1054,7 @@ static void part_objects_irq(void) {
     irqDisable();
     for (i = 0; i < 3; i++) WaitForVBlank();
     r_irq_b = irq_count;
-    irqSetBank((void *)irqTestHandler, (u8)((u32)(void *)irqTestHandler >> 16));
+    irqSet((void *)irqTestHandler);
     irqSetHTimer(64);
     WaitForVBlank();
     irqEnable(IRQ_HTIMER | IRQ_VTIMER);    /* once per frame at (64, 100) */

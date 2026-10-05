@@ -265,7 +265,7 @@ dsp1Objective:
 ;------------------------------------------------------------------------------
 ; void dsp1Project(s16 x, s16 y, s16 z)   (command $06, world -> screen)
 ;   dsp1_o0 = H (screen X), dsp1_o1 = V (screen Y), dsp1_o2 = M (scale/depth)
-;   Requires a prior dsp1Parameter to define the projection plane.
+;   Requires a prior dsp1SetCamera to define the projection plane.
 ;------------------------------------------------------------------------------
 dsp1Project:
     php
@@ -314,61 +314,39 @@ dsp1Project:
     rtl
 
 ;------------------------------------------------------------------------------
-; void dsp1Parameter(s16 fx, s16 fy, s16 fz, s16 lfe, s16 les, u16 aas, u16 azs)
-;   (command $02) — projection-plane setup. In 7 words, out 4 words:
+; void dsp1SetCamera(const Dsp1Camera *cam)
+;   Command $02 with its seven input words read from a struct. The struct is
+;   the command's 14 bytes in the order the chip takes them (x, y, z, lfe,
+;   les, aas, azs; low byte first), so it is sent as it lies. Outputs:
 ;   dsp1_o0 = Vof, dsp1_o1 = Vva, dsp1_o2 = Cx, dsp1_o3 = Cy (see dsp1.h).
-;   Deprecated in favour of dsp1SetCamera; kept until 1.0.
+;
+;   Stack after PHP: 5-6,s = cam low 16, 7,s = cam bank, 8,s = pad.
 ;------------------------------------------------------------------------------
-dsp1Parameter:
+dsp1SetCamera:
     php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 5,s                 ; cam (low 16)
+    sta.b tcc__r0
+    lda 7,s                 ; cam (bank byte, high byte = pad)
+    sta.b tcc__r0+2
+    ldy #0
     sep #$20
     .ACCU 8
     jsr dsp1_rqm
     lda #$02                ; command $02 = Parameter
     sta.l $308000
+@in:
     jsr dsp1_rqm
-    lda 17,s                ; fx
+    lda [tcc__r0],y
     sta.l $308000
-    jsr dsp1_rqm
-    lda 18,s                ; fx
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 15,s                ; fy
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 16,s                ; fy
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 13,s                ; fz
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 14,s                ; fz
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 11,s                ; lfe
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 12,s                ; lfe
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 9,s                 ; les
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 10,s                ; les
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 7,s                 ; aas
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 8,s                 ; aas
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 5,s                 ; azs
-    sta.l $308000
-    jsr dsp1_rqm
-    lda 6,s                 ; azs
-    sta.l $308000
-_dsp1_param_out:            ; shared with dsp1SetCamera: 8-bit A, PHP on the stack
+    iny
+    cpy #14
+    bne @in
+    jmp _dsp1_camera_out
+
+_dsp1_camera_out:           ; the camera command's read-back: 8-bit A, PHP on the stack
     jsr dsp1_rqm
     lda.l $308000           ; Vof lo
     sta.l dsp1_o0
@@ -395,39 +373,6 @@ _dsp1_param_out:            ; shared with dsp1SetCamera: 8-bit A, PHP on the sta
     sta.l dsp1_o3+1
     plp
     rtl
-
-;------------------------------------------------------------------------------
-; void dsp1SetCamera(const Dsp1Camera *cam)
-;   Command $02 with its seven input words read from a struct. The struct is
-;   the command's 14 bytes in the order the chip takes them (x, y, z, lfe,
-;   les, aas, azs; low byte first), so it is sent as it lies. Outputs as
-;   dsp1Parameter.
-;
-;   Stack after PHP: 5-6,s = cam low 16, 7,s = cam bank, 8,s = pad.
-;------------------------------------------------------------------------------
-dsp1SetCamera:
-    php
-    rep #$30
-    .ACCU 16
-    .INDEX 16
-    lda 5,s                 ; cam (low 16)
-    sta.b tcc__r0
-    lda 7,s                 ; cam (bank byte, high byte = pad)
-    sta.b tcc__r0+2
-    ldy #0
-    sep #$20
-    .ACCU 8
-    jsr dsp1_rqm
-    lda #$02                ; command $02 = Parameter
-    sta.l $308000
-@in:
-    jsr dsp1_rqm
-    lda [tcc__r0],y
-    sta.l $308000
-    iny
-    cpy #14
-    bne @in
-    jmp _dsp1_param_out
 
 ;------------------------------------------------------------------------------
 ; u16 dsp1Distance(s16 x, s16 y, s16 z)  ->  A   (command $28, sqrt(x²+y²+z²))
@@ -520,7 +465,7 @@ dsp1Range:
 ; void dsp1Target(s16 h, s16 v)   (command $0E, screen -> ground plane)
 ;   dsp1_o0 = ground X, dsp1_o1 = ground Y (same convention as Cx/Cy).
 ;   (h, v) are raster-style screen coordinates relative to the imaginary
-;   centre (v down-positive). Requires a prior dsp1Parameter.
+;   centre (v down-positive). Requires a prior dsp1SetCamera.
 ;------------------------------------------------------------------------------
 dsp1Target:
     php
@@ -655,7 +600,7 @@ dsp1Raster_done:
     rtl
 
 ;------------------------------------------------------------------------------
-; u8 dsp1IsPresent(void) / u16 dsp1Present(void)  ->  A   (1 = DSP-1 responding, 0 = absent/inert)
+; u8 dsp1IsPresent(void)  ->  A   (1 = DSP-1 responding, 0 = absent/inert)
 ;   Known-answer test: Multiply $4000 x $4000 must return $2000 (0.5*0.5=0.25
 ;   in 1.15). On a board without the chip (or an emulator without firmware)
 ;   the open-bus/inert reads cannot produce the exact product.
@@ -663,7 +608,6 @@ dsp1Raster_done:
 ;   chip returns 0 instead of hanging.
 ;------------------------------------------------------------------------------
 dsp1IsPresent:                          ; the name since 2026-09-22
-dsp1Present:                            ; deprecated alias: same address, same routine
     php
     sep #$20
     .ACCU 8
@@ -674,7 +618,7 @@ dsp1Present:                            ; deprecated alias: same address, same r
     bmi +
     dey
     bne -
-    bra dsp1Present_fail    ; RQM never came up: no chip
+    bra dsp1IsPresent_fail    ; RQM never came up: no chip
 +   lda #$00                ; command $00 = Multiply
     sta.l $308000
     jsr dsp1_rqm
@@ -692,17 +636,17 @@ dsp1Present:                            ; deprecated alias: same address, same r
     jsr dsp1_rqm
     lda.l $308000           ; product lo — expect $00
     cmp #$00
-    bne dsp1Present_fail
+    bne dsp1IsPresent_fail
     jsr dsp1_rqm
     lda.l $308000           ; product hi — expect $20
     cmp #$20
-    bne dsp1Present_fail
+    bne dsp1IsPresent_fail
     plp
     rep #$20
     .ACCU 16
     lda #1
     rtl
-dsp1Present_fail:
+dsp1IsPresent_fail:
     plp
     rep #$20
     .ACCU 16

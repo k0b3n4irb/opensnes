@@ -13,6 +13,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): nmiSetBank, irqSetBank.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * VBlank Callback
  *============================================================================*/
@@ -89,21 +92,6 @@ typedef void (*VBlankCallback)(void);
 void nmiSet(VBlankCallback callback);
 
 /**
- * @brief Register a VBlank callback with explicit bank
- *
- * Not needed from C — nmiSet() reads the bank from the pointer. Kept for
- * callers that only have a 16-bit address (assembly).
- *
- * @param callback Function to call during VBlank
- * @param bank ROM bank where the callback is located (0-255)
- *
- * @deprecated Since 2026-09-20: nmiSet() reads the bank from the function
- *             pointer. Removed at the next major version.
- */
-OPENSNES_DEPRECATED("nmiSet() takes the bank from the function pointer")
-void nmiSetBank(VBlankCallback callback, u8 bank);
-
-/**
  * @brief Clear the VBlank callback
  *
  * Equivalent to nmiSet(NULL).
@@ -146,17 +134,6 @@ void nmiClear(void);
  *                hicolor_1792/irq_stream.asm for the canonical shape)
  */
 void irqSet(void *handler);
-
-/**
- * @brief irqSet() with an explicit ROM bank for the handler
- * @param handler Address of the ASM handler
- * @param bank ROM bank containing the handler
- *
- * @deprecated Since 2026-09-20: irqSet() reads the bank from the handler
- *             pointer. Removed at the next major version.
- */
-OPENSNES_DEPRECATED("irqSet() takes the bank from the handler pointer")
-void irqSetBank(void *handler, u8 bank);
 
 /**
  * @brief Restore the default IRQ handler (acknowledge + return)

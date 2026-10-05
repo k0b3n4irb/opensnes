@@ -52,12 +52,6 @@ void mosaicSetLayers(u8 bgMask) {
     mosaic_update_register();
 }
 
-/* The deprecated name, out of line (a definition of a deprecated symbol does
- * not warn; a use would, and the lib build is strict). */
-void mosaicEnable(u8 bgMask) {
-    mosaicSetLayers(bgMask);
-}
-
 void mosaicDisable(void) {
     mosaic_bg_mask = 0;
     mosaic_update_register();

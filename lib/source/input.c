@@ -69,11 +69,6 @@ u16 padReleased(u8 pad) {
     return previous & ~current;
 }
 
-u16 padRaw(u8 pad) {
-    if (pad >= 5) return 0;
-    return pad_keys[pad];
-}
-
 u8 padIsConnected(u8 pad) {
     /* crt0's NMI handler reads one serial bit past the 16 of auto-read on
      * each port whose device signature is a pad's (0000): a joypad returns
@@ -243,10 +238,6 @@ u16 scopeGetRawY(void) {
 
 u16 scopeButtonsHeld(void) {
     return scope_down;
-}
-
-u16 scopeButtonsDown(void) {
-    return scope_down;          /* deprecated name of scopeButtonsHeld() */
 }
 
 u16 scopeButtonsPressed(void) {

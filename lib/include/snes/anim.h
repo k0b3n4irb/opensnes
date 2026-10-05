@@ -167,9 +167,9 @@ u16 animTick(AnimPlayer *p);
 /**
  * @brief Tick + resolve against a gfx4snes metasprite pointer table.
  *
- * Feeds oamDrawMeta()/oamMetaDrawDyn() directly:
+ * Feeds oamDrawMetasprite()/oamMetaDrawDyn() directly:
  * @code
- * oamDrawMeta(0, x, y, animTickMeta(&hero, hero_metasprites), 0, 0, sz);
+ * oamDrawMetasprite(0, x, y, animTickMeta(&hero, hero_metasprites), &hero_style, 0);
  * @endcode
  *
  * @warning The player must be running (frame values index _tbl); a

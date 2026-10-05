@@ -163,11 +163,6 @@ u8 audioIsReady(void) {
     return audio_ready;
 }
 
-void audioUpdate(void) {
-    /* v2 is command-driven — nothing to pump. Kept as a no-op for
-     * source compatibility with the historical API. */
-}
-
 /*============================================================================
  * Master volume
  *============================================================================*/

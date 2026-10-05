@@ -6,7 +6,7 @@
 #
 # This plays one complete round, start to loop-back, and pins each stage.
 # Values measured on luna with this exact script (the coin spawn is
-# rand()-driven but seeded from seed_ctr, the title-screen frame count, so
+# rngNext()-driven but seeded from seed_ctr, the title-screen frame count, so
 # a fixed script gives a fixed level):
 #
 #   frame   50  game_state 0   the title screen ignores the D-pad

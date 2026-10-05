@@ -2022,7 +2022,7 @@ ReadScope:
 ; $4211 TIMEUP acknowledge read, and the final RTI. P is auto-restored by
 ; RTI (pushed at interrupt entry); A/X/Y/DP/DBR are NOT.
 ;
-; Register a handler from C with irqSet()/irqSetBank() — ASM handlers
+; Register a handler from C with irqSet() — ASM handlers
 ; only, see lib/include/snes/interrupt.h for the full contract.
 ;------------------------------------------------------------------------------
 IrqHandler:

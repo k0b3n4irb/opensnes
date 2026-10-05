@@ -38,6 +38,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): oamDrawMeta, oamDrawMetaFlip.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Constants
  *============================================================================*/
@@ -532,28 +535,6 @@ typedef struct {
  */
 u16 oamDrawMetasprite(u16 startId, s16 x, s16 y, const MetaspriteItem *frame,
                       const MetaspriteStyle *style, u8 flip);
-
-/**
- * @brief oamDrawMetasprite() without flip, its style given as three arguments
- *
- * (startId, x, y, meta) as oamDrawMetasprite(); baseTile, basePalette and
- * size are the fields of MetaspriteStyle. Same return value.
- */
-OPENSNES_DEPRECATED("use oamDrawMetasprite() — baseTile, basePalette and size are now a MetaspriteStyle")
-u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
-               u16 baseTile, u8 basePalette, u8 size);
-
-/**
- * @brief oamDrawMetasprite() with its style and flip given as seven arguments
- *
- * It assumes a piece is 16 pixels when `size` is OBJ_LARGE and 8 when
- * OBJ_SMALL, whatever the OBJSEL mode: a flipped metasprite of 32x32 pieces
- * comes out wrong. oamDrawMetasprite() takes the piece size.
- */
-OPENSNES_DEPRECATED("use oamDrawMetasprite() — eleven positional arguments, and it assumes 8 / 16 pixel pieces")
-u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
-                   u16 baseTile, u8 basePalette, u8 size,
-                   u8 flipX, u8 flipY, u8 width, u8 height);
 
 /*============================================================================
  * Dynamic Sprite Engine

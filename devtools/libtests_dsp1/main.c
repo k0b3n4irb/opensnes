@@ -6,13 +6,11 @@
  */
 #include <snes.h>
 #include <snes/dsp1.h>
-/* dsp1Present is the deprecated name of dsp1IsPresent; it keeps its vector. */
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 volatile u16 dsp1_ok;   /* dsp1IsPresent()                              -> 1 */
-volatile u16 dsp1_ok_old; /* dsp1Present(), the deprecated alias        -> 1 */
 u16 r_mul;       /* dsp1Multiply(0x4000, 0x4000): 0.5 x 0.5 in 1.15     -> 0x2000 */
 u16 r_mul_sign;  /* the product is an s16: (-0.5 x 0.5) < 0                -> 1 (always 0 while it was u16) */
 u16 r_mul_neg;   /* dsp1Multiply(0xC000, 0x4000): -0.5 x 0.5            -> 0xE000 */
@@ -27,7 +25,6 @@ u16 r_range_on;  /* dsp1Range(3000, 4000, 0, 5000): on the surface      -> 0 */
 u16 r_range_sm;  /* dsp1Range(30, 40, 0, 5): far outside, small units   -> 0 */
 u16 r_rot_x;     /* dsp1Rotate(0x4000, 100, 0)                          -> 0 */
 u16 r_rot_y;     /* ... sin 90 deg is 0x7FFF, not 1.0                   -> -99 */
-u16 r_cam_names; /* dsp1Parameter (deprecated) gives dsp1SetCamera's four words -> 1 */
 u16 r_tgt_x;     /* dsp1Target(0, 0) == Cx of the last dsp1SetCamera    -> 1 */
 u16 r_tgt_y;     /* ... and Cy                                          -> 1 */
 u16 r_done;      /*                                                     -> 0xBEEF */
@@ -38,12 +35,11 @@ static const Dsp1Camera ground_cam = {
 };
 
 int main(void) {
-    s16 cx, cy, vof, vva;
+    s16 cx, cy;
 
     consoleInit();
     dsp1Init();
     dsp1_ok = dsp1IsPresent();
-    dsp1_ok_old = dsp1Present();       /* the deprecated name: same routine, same answer */
 
     r_mul       = (u16)dsp1Multiply(0x4000, 0x4000);
     r_mul_neg   = (u16)dsp1Multiply(-0x4000, 0x4000);
@@ -63,11 +59,6 @@ int main(void) {
     dsp1SetCamera(&ground_cam);
     cx = dsp1_o2;
     cy = dsp1_o3;
-    /* the deprecated positional form is the same command: same four words */
-    vof = dsp1_o0;
-    vva = dsp1_o1;
-    dsp1Parameter(512, 512, 96, 192, 256, 0, 0x1800);
-    r_cam_names = (dsp1_o0 == vof && dsp1_o1 == vva && dsp1_o2 == cx && dsp1_o3 == cy) ? 1 : 0;
     dsp1Target(0, 0);
     r_tgt_x = (dsp1_o0 == cx) ? 1 : 0;
     r_tgt_y = (dsp1_o1 == cy) ? 1 : 0;

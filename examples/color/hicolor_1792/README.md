@@ -37,7 +37,7 @@ land on screen — any static 4bpp screen caps at 128.
 | HTIME | 190 | **128** (`irqSetHTimer(128)`) | our handler saves registers and latches the V counter before the DMA, which krom's does not; with 190 the DMA spills past H-blank into the next line (a CGRAM write during the picture lands on the wrong entry). Measured clean window on luna v1.23.0: 80..175 |
 | NMITIMEN | `%10010000` | `%10010001` | we keep auto-joypad (SDK default) |
 | IRQ handler | HTIMERIRQ verbatim | + save/restore, `$213F` reset | ours interrupts arbitrary C |
-| VBlank rewind | VBLANKIRQ verbatim | C callback via `nmiSetBank` | CGADD=0, 128 B, source reset |
+| VBlank rewind | VBLANKIRQ verbatim | C callback via `nmiSet` | CGADD=0, 128 B, source reset |
 
 ## Measured parity (luna v1.9.0 + Mesen2 cross-check)
 
@@ -59,7 +59,7 @@ land on screen — any static 4bpp screen caps at 128.
    leaving the latch read pointers mid-sequence for the whole session —
    every later latched V read returned hi/lo-swapped garbage. Fixed in
    `lib/source/console.c` (STAT78 read after seeding resets the pointers).
-2. `nmiSetBank()` restored NMITIMEN from a literal, which would have
+2. The former `nmiSetBank()` (removed 2026-10-05) restored NMITIMEN from a literal, which would have
    clobbered IRQ enable bits — replaced by the `nmitimen_shadow` scheme
    (all $4200 writes compose through the shadow).
 

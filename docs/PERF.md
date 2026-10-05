@@ -100,7 +100,7 @@ frames 60 to 300):
 
 | | master cycles per frame in the draw | share of the frame |
 |---|---|---|
-| the deprecated `oamDrawMeta` (before) | 51,992 | 14.55 % |
+| the former public `oamDrawMeta` (before; removed from the API 2026-10-05) | 51,992 | 14.55 % |
 | one function, flip tested per piece | 58,190 | 16.28 % |
 | one function, two loops | 61,252 | 17.14 % |
 | reads the style, then runs the old loop (what ships) | 56,057 | 15.69 % |
@@ -110,7 +110,7 @@ three reads through the style pointer and one more call. The two attempts
 above it were slower although they add no call: with the mirrored loop in
 the same function, the compiler's copies between the two loops fell on
 every piece. The mirrored draw is therefore a function of its own, and the
-unflipped one still runs the loop of the deprecated `oamDrawMeta`.
+unflipped one still runs the same loop, now the internal (removed from the API) `oamDrawMeta`.
 
 ## Reproduce
 

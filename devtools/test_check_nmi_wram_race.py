@@ -132,25 +132,6 @@ main:
         assert rc == 0, f"unreachable port write should NOT fail, got rc={rc}\n{out}"
 
 
-def test_nmiSetBank_callback() -> None:
-    """nmiSetBank takes (callback, bank) — same first-arg pattern."""
-    main_asm = """
-my_nmi_cb:
-    sta $2183
-    rtl
-main:
-    pea.w my_nmi_cb
-    pea.w 1
-    jsl nmiSetBank
-    rtl
-"""
-    with tempfile.TemporaryDirectory() as td:
-        td_path = Path(td)
-        write_fixture(td_path, COMBINED_BASE, main_asm)
-        rc, out = run_lint(td_path)
-        assert rc == 1, f"nmiSetBank callback should be analysed too, got rc={rc}\n{out}"
-
-
 def test_indirect_jump_not_followed() -> None:
     """`jml [<addr>]` is indirect; target unknown statically. The
     target is added as a root via the nmiSet detection, not by
@@ -208,7 +189,6 @@ TESTS = [
     test_direct_port_write,
     test_transitive_port_write,
     test_unreachable_port_write,
-    test_nmiSetBank_callback,
     test_indirect_jump_not_followed,
 ]
 

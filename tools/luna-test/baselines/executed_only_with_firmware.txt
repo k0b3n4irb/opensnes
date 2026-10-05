@@ -4,8 +4,6 @@ dsp1Init
 dsp1IsPresent
 dsp1Multiply
 dsp1Objective
-dsp1Parameter
-dsp1Present
 dsp1Project
 dsp1Range
 dsp1Raster

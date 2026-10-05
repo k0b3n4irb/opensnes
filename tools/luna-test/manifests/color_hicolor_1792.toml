@@ -16,7 +16,7 @@
 #
 # What the two blocks prove, and they are the two halves of the trick:
 #   0000  CGRAM 0-31 == sunset_pal[0:64] — the VBlank rewind ran. If
-#         nmiSetBank()'s callback stopped firing, the even-row bank would
+#         nmiSet()'s callback stopped firing, the even-row bank would
 #         hold some other row's colours and the picture would tear.
 #   00C0  CGRAM 96-127 == sunset_pal[3520:3584], the LAST 32 colours of the
 #         3584-byte table (row 27, the bottom tile row). The DMA source

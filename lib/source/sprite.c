@@ -233,9 +233,9 @@ void oamClear(void) {
  * Metasprite Functions
  *============================================================================*/
 
-/* The two positional forms below are deprecated as public names
- * (2026-10-03) and kept as they were until 1.0. */
-u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
+/* The unflipped loop of oamDrawMetasprite(): the public positional draw of
+ * 0.x, internal since 2026-10-05 (1.0 plan, lot D). */
+static u16 drawMetaUnflipped(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                u16 baseTile, u8 basePalette, u8 size) {
     u16 id = startId;
 
@@ -327,75 +327,18 @@ static u16 meta_draw_flipped(u16 id, s16 x, s16 y, const MetaspriteItem *frame,
     return id;
 }
 
-/* oamDrawMeta() is the unflipped loop, and stays the one copy of it: it is
+/* drawMetaUnflipped() is the unflipped loop, and stays the one copy of it: it is
  * deprecated as a public name, not as code (at 1.0 it becomes static). */
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 u16 oamDrawMetasprite(u16 startId, s16 x, s16 y, const MetaspriteItem *frame,
                       const MetaspriteStyle *style, u8 flip) {
     if (flip == 0) {
-        return oamDrawMeta(startId, x, y, frame, style->baseTile,
+        return drawMetaUnflipped(startId, x, y, frame, style->baseTile,
                            style->basePalette, style->size);
     }
     return meta_draw_flipped(startId, x, y, frame, style, flip);
 }
 #if defined(__clang__)
-#pragma clang diagnostic pop
 #endif
-
-u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
-                   u16 baseTile, u8 basePalette, u8 size,
-                   u8 flipX, u8 flipY, u8 width, u8 height) {
-    u16 id = startId;
-
-    /* Sprite size for offset calculations (depends on size mode) */
-    /* For now, assume 16x16 when large, 8x8 when small */
-    u8 spriteSize = size ? 16 : 8;
-
-    while (meta->dx != metasprite_end && id < MAX_SPRITES) {
-        s16 dx = meta->dx;
-        s16 dy = meta->dy;
-        u8 flags = meta->attr & 0xC0;
-
-        /* Apply horizontal flip */
-        if (flipX) {
-            dx = width - dx - spriteSize;
-            flags ^= OBJ_FLIPX;
-        }
-
-        /* Apply vertical flip */
-        if (flipY) {
-            dy = height - dy - spriteSize;
-            flags ^= OBJ_FLIPY;
-        }
-
-        /* Calculate final position */
-        s16 sx = x + dx;
-        s16 sy = y + dy;
-
-        /* Skip sprites that are completely off-screen */
-        if (sx > -64 && sx < 256 && sy > -64 && sy < 240) {
-            u16 tile = baseTile + meta->tile;
-
-            u8 attr = meta->attr;
-            u8 palette = (attr >> 1) & 0x07;
-            u8 priority = (attr >> 4) & 0x03;
-
-            if (palette == 0) {
-                palette = basePalette;
-            }
-
-            oamSet(id, (u16)sx, (u8)sy, tile, palette, priority, flags);
-            oamSetSize(id, size);
-
-            id++;
-        }
-
-        meta++;
-    }
-
-    return id;
-}
 
