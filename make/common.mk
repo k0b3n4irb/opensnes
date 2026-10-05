@@ -633,106 +633,25 @@ ifeq ($(USE_SA1),1)
 	@# inline Python one-liner that used to live here).
 	@$(OPENSNES)/bin/sa1_patch $@ && echo "[SA1] Patched $$FFD5 map mode to SA-1"
 endif
-	@# Bank $$00 ROM overflow check — fails the build if string literals spill to
-	@# bank $$01+, OR if bank $$00 free space drops below BANK0_FAIL_THRESHOLD.
-	@# The compiler emits 16-bit addresses that always read bank $$00, so spilled
-	@# string.N symbols return GARBAGE silently in production. The fail-threshold
-	@# is a ratchet: catches "one-const-literal-away-from-spill" regressions
-	@# before they ship. The default lives at the BANK0_FAIL_THRESHOLD
-	@# definition near the top of this file (single source of truth) and is
-	@# always set just below the current example minimum; bumping it tighter
-	@# is a deliberate audit step — see .claude/rules/bank0_budget.md.
-	@# exit 1 from symmap = critical spill OR imminent overflow (hard fail).
-	@# exit 2 = soft warning (low free space) — printed but build continues.
-	@# Set SKIP_BANK0_CHECK=1 to disable; BANK0_FAIL_THRESHOLD=N to retune.
-ifneq ($(SKIP_BANK0_CHECK),1)
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-bank0-overflow \
-			--fail-threshold $(BANK0_FAIL_THRESHOLD) "$$SYM"; \
-		rc=$$?; \
-		if [ "$$rc" -eq 1 ]; then \
-			echo "ERROR: bank \$$00 ROM overflow / imminent overflow — see symmap output above"; \
-			echo "       reduce const data, split arrays, or set SKIP_BANK0_CHECK=1 to bypass."; \
-			exit 1; \
-		fi; \
-	fi
-endif
-	@# C RAM band budget check — the RAM twin of the ROM ratchet above
-	@# (defect B2: C RAM must sit below $$2000; higher is silently
-	@# wrong-banked). Prints the free-space number at every link so
-	@# approaching the 8 KB ceiling is visible long before it corrupts.
-	@# Set SKIP_RAM_CHECK=1 to disable; RAM_{FAIL,WARN}_THRESHOLD=N to retune.
-ifneq ($(SKIP_RAM_CHECK),1)
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-ram-budget \
-			--ram-fail-threshold $(RAM_FAIL_THRESHOLD) \
-			--ram-warn-threshold $(RAM_WARN_THRESHOLD) "$$SYM"; \
-		rc=$$?; \
-		if [ "$$rc" -eq 1 ]; then \
-			echo "ERROR: C RAM band overflow / imminent overflow — see symmap output above"; \
-			echo "       shrink RAM usage below \$$2000, or set SKIP_RAM_CHECK=1 to bypass."; \
-			exit 1; \
-		fi; \
-	fi
-endif
-	@# data_init_end.o must be the last object (the DMA copy loop stops at its
-	@# terminator): an object linked after it has globals that boot
-	@# uninitialised, silently. Read off the .sym: DataInitEnd must close the
-	@# .data_init section (2026-10-05; KNOWN_LIMITATIONS "no separate check").
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-data-init "$$SYM" | grep -v '^Loaded' || exit 1; \
-	fi
-	@# PPU asset budget — a per-build instrument (VRAM/CGRAM weight of the
-	@# converted graphics on disk), the build-time twin of `make budget`
-	@# (runtime footprint via luna). Report-only, NEVER a gate: an inventory
-	@# over 100% is legitimate (streaming, per-scene/per-scanline palette
-	@# swaps), so it only prints the number, no alarm. Silent for asset-less
-	@# examples. `|| true` keeps a tool hiccup from ever failing a build.
-	@# Set SKIP_ASSET_BUDGET=1 to disable; see docs/craft/craft_planning.
-ifneq ($(SKIP_ASSET_BUDGET),1)
-	@python3 $(OPENSNES)/devtools/asset_budget.py --oneline "$(CURDIR)" || true
-endif
-	@# Bank-blind C reads of bank $$01+ data (issue #104): the read-side
-	@# symmetric of the spill ratchet. A symbol deref'd from C without a
-	@# bank reference must be linked in bank $$00 — otherwise the 16-bit
-	@# deref reads garbage. SKIP_BANKREAD_CHECK=1 to bypass.
-ifneq ($(SKIP_BANKREAD_CHECK),1)
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/check_bank_reads.py "$$SYM" . ; \
-		rc=$$?; \
-		if [ "$$rc" -ne 0 ]; then \
-			echo "ERROR: bank-blind C read of bank \$$01+ data — see above."; \
-			exit 1; \
-		fi; \
-	fi
-endif
-	@# NMI / WRAM data port race lint — silent-failure 🔴 in
-	@# KNOWN_LIMITATIONS.md (chantier E1, 2026-05-09). Walks the
-	@# call graph from every NMI callback root (NmiHandler +
-	@# functions registered via nmiSet/nmiSetBank) and fails the
-	@# build if any reachable function writes to $$2180-$$2183.
-	@# Lib + crt0 are NOT followed (audited via
-	@# .claude/rules/nmi_audit.md); the lint only walks user code
-	@# in this example's .c.asm intermediates.
-	@# Set SKIP_NMI_RACE_CHECK=1 to disable for a build.
-ifneq ($(SKIP_NMI_RACE_CHECK),1)
-	@# Unconditional since 2026-09-26: it used to run only if combined.asm
-	@# existed, a file the build stopped producing (112cfc23), so the lint
-	@# had not run on a fresh tree or a user project since.
-	@python3 $(OPENSNES)/devtools/check_nmi_wram_race.py --rom-dir . --quiet; \
-	rc=$$?; \
-	if [ "$$rc" -ne 0 ]; then \
-		echo "ERROR: NMI / WRAM port race — see report above."; \
-		echo "       Functions reachable from an NMI callback must"; \
-		echo "       NOT touch \$$2180-\$$2183 (silent corruption)."; \
-		echo "       Set SKIP_NMI_RACE_CHECK=1 to bypass for this build."; \
-		exit 1; \
-	fi
-endif
+	@# Post-link checks (2026-10-05, .claude/rules/two_audiences.md): one compiled
+	@# tool, opensnes-rom check, runs what five Python scripts used to run here —
+	@# the bank $$00 ROM ratchet (BANK0_FAIL_THRESHOLD; .claude/rules/bank0_budget.md),
+	@# the C RAM band budget (RAM_FAIL_THRESHOLD / RAM_WARN_THRESHOLD; FAR is the
+	@# way above $$2000), the data-init sentinel (an object linked after
+	@# data_init_end.o boots uninitialised), the bank-blind read guard (issue
+	@# #104: a 16-bit read of bank $$01+ data returns garbage), the NMI / WRAM-port
+	@# race lint (KNOWN_LIMITATIONS red) and the asset inventory line. Exit 1
+	@# fails the link; warnings do not. The knobs keep their names:
+	@# SKIP_BANK0_CHECK=1 and SKIP_RAM_CHECK=1 set the ratchet to 0 (a RAM
+	@# section past $$2000 still fails: it is always a bug), SKIP_BANKREAD_CHECK,
+	@# SKIP_NMI_RACE_CHECK and SKIP_ASSET_BUDGET=1 skip their check. A game
+	@# developer's make needs no interpreter from here (docs/tools/opensnes-rom.md).
+	@$(OPENSNES)/bin/opensnes-rom check "$(TARGET)" \
+		--bank0-fail $(if $(filter 1,$(SKIP_BANK0_CHECK)),0,$(BANK0_FAIL_THRESHOLD)) \
+		--ram-fail $(if $(filter 1,$(SKIP_RAM_CHECK)),0,$(RAM_FAIL_THRESHOLD)) --ram-warn $(RAM_WARN_THRESHOLD) \
+		$(if $(filter 1,$(SKIP_BANKREAD_CHECK)),--no-bank-reads,) \
+		$(if $(filter 1,$(SKIP_NMI_RACE_CHECK)),--no-nmi-race,) \
+		$(if $(filter 1,$(SKIP_ASSET_BUDGET)),--no-assets,)
 
 #------------------------------------------------------------------------------
 # Project tests — opt-in by presence of test/manifest.toml (no flag needed).

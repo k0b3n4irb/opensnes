@@ -16,10 +16,13 @@ OpenSNES has two populations, and they do not want the same thing.
 1. **Nothing a user project's build executes is an interpreted script.**
    Every step `make/common.mk` runs on a user's `make` is a binary from
    `bin/` (or luna). A Python script on that path is a defect, not a
-   convenience. State on 2026-10-05: ten `python3` calls in `common.mk`
-   (§11.1 of the report lists each one and its replacement); the count
-   must only go down. When it reaches zero, add the anchor to
-   `check_doc_drift.py` so it stays there.
+   convenience. State at the end of 2026-10-05: of the ten `python3`
+   calls `common.mk` had that morning, two remain — the 0.x-name hint on
+   a compile error (behind `command -v python3`) and `project_test.py`
+   under a project's `make test` (to become `luna test` natively); the
+   post-link checks are `opensnes-rom check`. The count must only go
+   down; when it reaches zero, add the anchor to `check_doc_drift.py` so
+   it stays there.
 2. **Tools for the game developer are compiled, one per function, under one
    prefix**: `opensnes` (the project), `opensnes-sprite`, `-tileset`,
    `-level`, `-text`, `-palette`, `-image`, `-sample`, `-music`, `-rom`,

@@ -695,6 +695,13 @@ suite est le §10.5 (conventions, `opensnes-sample`, `opensnes-rom check`).
 | `opensnes-music` | `5e624ed9` | `bank`, `spc`, `inspect` sur le convertisseur de smconv (itloader, it2spc, brr) ; mêmes octets que `smconv -s -n -p` (suite golden comparée aux goldens de smconv, 7 cas) ; `inspect` donne les 57 957 octets qu'un module peut prendre, le chiffre de `smconv -V` ; page `docs/tools/opensnes-music.md`. Reste à faire : les diagnostics propres de la bibliothèque smconv parlent encore avec son nom ; une sortie de messages par callback les ramènerait à la forme de la famille |
 | cppcheck sur `tmx2snes/src` | `c26a6b59`, `d231fbc6` | deux `%d` d'unsigned, deux boucles qui lisaient l'octet avant de tester l'indice — des remarques que le lint ne voyait pas tant que le fichier était hors de `src/` |
 
+| `opensnes-rom check` | *(ce lot)* | les cinq vérifications post-link en C : lecteur de `.sym` (labels avec repli de banque, définitions, sections, ramsections), ratchet banque $00, bande RAM C et bande FAR, sentinelle data-init, lectures sans banque dans les `.c.asm`, graphe d'appels NMI, inventaire d'assets ; comparé aux scripts Python sur les 99 ROM construites : mêmes verdicts, mêmes chiffres ; `common.mk` l'appelle à la place des cinq ; il reste dans `common.mk` deux `python3` : l'aide 0.x derrière `command -v`, et `project_test.py` sous `make test` d'un projet |
+
+Trouvé en chemin : `asset_budget.py --oneline .` avec un chemin relatif
+mesurait le dépôt entier (il préfixait le chemin par la racine du dépôt) ;
+`common.mk` lui passait `$(CURDIR)` absolu, donc la build n'était pas
+touchée. Le C ne reproduit pas ce comportement.
+
 Ce que le premier outil a appris pour les suivants : le fichier de réglages
 se lit **par entrée** (une `cli_ctx` par asset), un `--out` doit créer son
 dossier, le JSON d'un échec doit nommer l'entrée et le code, et la suite

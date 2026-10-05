@@ -6,12 +6,12 @@ needs `ortools` (its README says how; the lint that gates the committed
 output is stdlib). The game developer never sees this directory
 (`.claude/rules/two_audiences.md`).
 
-Transitional exception: `make/common.mk` still runs five of these scripts
-on a user's `make` (`symmap.py`, `check_bank_reads.py`,
-`check_nmi_wram_race.py`, `asset_budget.py`, `check_upgrade.py`), so the
-`Makefile` copies them into the zip (`RELEASE_DEVTOOLS`). They are to be
-replaced by `opensnes-rom check`, in C; until then the list may only
-shrink.
+Transitional exception: `make/common.mk` still runs `check_upgrade.py`
+when a compile fails and clang is absent (behind `command -v python3`), so
+the `Makefile` copies it into the zip (`RELEASE_DEVTOOLS`). The five
+post-link checks it used to run are `opensnes-rom check` since
+2026-10-05 (same verdicts on the 99 built ROMs); the Python originals stay
+here for the contributor gates that use them.
 
 Every file here is named by a `make` target, a workflow, or an example
 README; a script that none of them names is an orphan and is deleted
