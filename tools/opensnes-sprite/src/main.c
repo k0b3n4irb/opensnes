@@ -29,7 +29,7 @@
 #include "tiles.h"
 #include "maps.h"
 #include "metasprites.h"
-#include "incgener.h"
+#include "incfile.h"
 #include "anim.h"
 
 extern cli_ctx *sprite_ctx;      /* diag.c */
@@ -132,8 +132,13 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     else { tiles_checkbanks(tiles, nbtiles, ncolors); tiles_save(outbase, tiles, nbtiles, ncolors, blank, lz, true); }
     int savepal = !cli_has(ctx, "no-palette");
     if (savepal) palette_save(outbase, palette_snes, colors, true);
-    inc_save(outbase, true, false, savepal, meta, pack, true);
     free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
+    /* the glue: <stem>.inc (DECLARE_GFX_ASSET) and <stem>_data.as, in asset.h's naming */
+    char ident[256], generator[64], err[160];
+    cli_ident(in, ident, sizeof ident);
+    snprintf(generator, sizeof generator, "%s %s", ctx->tool->name, ctx->tool->version);
+    incfile_spec spec = { generator, bpp, savepal, 0, meta, pack, 0, 0 };
+    if (incfile_write(outbase, ident, &spec, err, sizeof err) != 0) { cli_error(ctx, in, "%s", err); return CLI_IO; }
 
     if (cli_has(ctx, "save") && (rc = cli_save_settings(ctx, in)) != CLI_OK) return rc;
 

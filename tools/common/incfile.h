@@ -1,0 +1,19 @@
+/* incfile.h — the .inc header and the _data.as .incbin fragment of a
+ * converted graphic, in the lib's asset.h naming (see incfile.c). */
+#ifndef OPENSNES_INCFILE_H
+#define OPENSNES_INCFILE_H
+
+#include <stddef.h>
+
+typedef struct {
+    const char *generator;     /* "opensnes-tileset 1.0.0" */
+    int bpp;                   /* 2, 4 or 8 */
+    int has_pal, has_map, has_meta, mode7;
+    int map_blocks_x, map_blocks_y;   /* the tilemap's size in entries, when has_map */
+} incfile_spec;
+
+/* Writes <outbase>.inc and <outbase>_data.as for the asset named `name`
+ * (a C identifier). Returns 0, or -1 with the reason in err[]. */
+int incfile_write(const char *outbase, const char *name, const incfile_spec *spec, char *err, size_t errlen);
+
+#endif

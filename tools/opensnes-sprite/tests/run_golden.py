@@ -23,10 +23,12 @@ GFX = g.here.parents[1] / "gfx4snes" / "tests" / "golden"
 ASE = g.here.parents[1] / "aseprite2snes" / "tests" / "golden"
 META = ["--colors", "16", "--metasprite", "32", "16", "--priority", "2"]
 
-g.expect_outputs("sheet spr.png --size 16 == gfx4snes -s 16 -p", ["sheet", "-q", "--size", "16", "spr.png"],
-                 copy=["spr.png"], outputs=["spr.pic", "spr.pal", "spr.inc", "spr_data.as"], want_dir=GFX)
-g.expect_outputs("sheet flip.png --metasprite 32 16 --flip == gfx4snes -T -F", ["sheet", "-q", "--size", "16", *META, "--flip", "flip.png"],
-                 copy=["flip.png"], outputs=["flip.pic", "flip.pal", "flip.inc", "flip_data.as", "flip_meta.inc"], want_dir=GFX)
+g.expect_outputs("sheet spr.png --size 16 == gfx4snes -s 16 -p (the data)", ["sheet", "-q", "--size", "16", "spr.png"],
+                 copy=["spr.png"], outputs=["spr.pic", "spr.pal"], want_dir=GFX)
+g.expect_outputs("sheet spr.png: the glue in asset.h's naming (.inc, _data.as)", ["sheet", "-q", "--size", "16", "spr.png"],
+                 copy=["spr.png"], outputs=["spr.inc", "spr_data.as"])
+g.expect_outputs("sheet flip.png --metasprite 32 16 --flip == gfx4snes -T -F (the data)", ["sheet", "-q", "--size", "16", *META, "--flip", "flip.png"],
+                 copy=["flip.png"], outputs=["flip.pic", "flip.pal", "flip_meta.inc"], want_dir=GFX)
 g.expect_outputs("sheet two.png (char names, not block indices) == gfx4snes", ["sheet", "-q", "--size", "16", *META, "two.png"],
                  copy=["two.png"], outputs=["two_meta.inc"], want_dir=GFX)
 g.expect_outputs("sheet three.png --flip (mirror drift) == gfx4snes", ["sheet", "-q", "--size", "16", "--colors", "16", "--metasprite", "48", "16", "--priority", "2", "--flip", "three.png"],

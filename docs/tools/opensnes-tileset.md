@@ -24,7 +24,7 @@ folds mirrored blocks, the map carrying the flip bits.
 | `town.pic` | the unique tiles, `--bpp` deep (2, 4 or 8); `--lz` compresses; `--pack` writes packed pixels (`--mode 7` implies it, as `.pc7`) |
 | `town.map` | one 16-bit entry per block: tile number (+ `--offset`), palette bank, `--priority` bit, flips; `--pages` lays it out in 32x32 pages; Modes 5 and 6 halve the width; Mode 7 writes one byte per tile (`.mp7`) |
 | `town.pal` | the palette (`--colors` entries, 256 by default); `--no-palette` skips it |
-| `town.inc`, `town_data.as` | the externs and the `.incbin` lines the build assembles |
+| `town.inc`, `town_data.as` | the glue, in the lib's `asset.h` naming: `town.inc` declares `town_tiles`, `town_map`, `town_pal` (each with `_end`) and a ready `BgAsset town` (`DECLARE_BG_ASSET`, when the map is 32x32, 64x32, 32x64 or 64x64) so `bgLoad(0, &town, slot, tiles_vram, map_vram)` is the whole load; `town_data.as` is the `.incbin` fragment the build gathers into `assets_gen.asm` |
 
 **Palette banks.** At 4 bpp a map entry names one of eight 16-colour banks,
 so every opaque pixel of a tile must sit in one bank of the palette. A tile

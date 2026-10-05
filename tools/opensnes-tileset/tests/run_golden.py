@@ -23,8 +23,10 @@ from golden import Golden  # noqa: E402
 g = Golden("opensnes-tileset", __file__)
 GFX = g.here.parents[1] / "gfx4snes" / "tests" / "golden"
 
-g.expect_outputs("convert bg.png --colors 16 == gfx4snes -s 8 -o 16 -u 16 -p -m", ["convert", "-q", "--colors", "16", "bg.png"],
-                 copy=["bg.png"], outputs=["bg.pic", "bg.pal", "bg.map", "bg.inc", "bg_data.as"], want_dir=GFX)
+g.expect_outputs("convert bg.png --colors 16 == gfx4snes -s 8 -o 16 -u 16 -p -m (the data)", ["convert", "-q", "--colors", "16", "bg.png"],
+                 copy=["bg.png"], outputs=["bg.pic", "bg.pal", "bg.map"], want_dir=GFX)
+g.expect_outputs("convert bg.png: the glue in asset.h's naming (.inc with DECLARE_BG_ASSET, _data.as)", ["convert", "-q", "--colors", "16", "bg.png"],
+                 copy=["bg.png"], outputs=["bg.inc", "bg_data.as"])
 
 
 def _read_pixels(path: Path):

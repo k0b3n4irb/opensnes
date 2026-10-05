@@ -64,7 +64,7 @@ the **game loop** — labelled in the file. To go further:
 
 - **Add graphics** — drop a `.png` in `res/` with a `.png.toml` beside it
   (copy `player.png.toml`); the build converts it and links the tiles, and
-  `res/<name>.inc` names the symbols (`<name>_til`, `<name>_pal`).
+  `res/<name>.inc` declares the symbols (`<name>_tiles`, `<name>_pal`) and a ready `GfxAsset`.
 - **Add sound** — drop a `.wav` in `res/` and `.incbin` its `.brr`; it converts
   automatically (see the SDK's audio tutorial).
 - **Add layers, text, scrolling, more** — the SDK ships **82 examples** and a

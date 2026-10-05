@@ -24,7 +24,7 @@ warning: the last row or column is padded with pixels that are not there.
 |---|---|
 | `hero.pic` | the 8x8 tiles in OBJ VRAM order (128-px raster rows), `--bpp` deep (4 by default); `--lz` compresses, `--pack` writes packed pixels |
 | `hero.pal` | the palette, `--colors` entries (256 by default; 16 for one OBJ palette); `--no-palette` skips it |
-| `hero.inc`, `hero_data.as` | the externs (`hero_til`, `hero_pal`…) and the `.incbin` lines the build assembles |
+| `hero.inc`, `hero_data.as` | the glue, in the lib's `asset.h` naming: `hero.inc` declares `hero_tiles`, `hero_tiles_end`, `hero_pal`, `hero_pal_end` and a ready `GfxAsset hero` (`DECLARE_GFX_ASSET`); `hero_data.as` is the `.incbin` fragment the build gathers into `assets_gen.asm` |
 | `hero_meta.inc` | with `--metasprite W H`: one `t_metasprite` table per W x H cell of the sheet, `METASPR_ITEM(x, y, tile, OBJ_PAL(n) \| OBJ_PRIO(p))` entries for `oamDrawMetasprite`; `--flip` dedups mirrored blocks and sets `OBJ_FLIPX` / `OBJ_FLIPY` |
 
 `--palette FILE` imposes a raw `.pal`: the indices stay stable when the

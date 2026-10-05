@@ -26,7 +26,7 @@
 #include "palettes.h"
 #include "tiles.h"
 #include "maps.h"
-#include "incgener.h"
+#include "incfile.h"
 
 extern cli_ctx *tileset_ctx;      /* diag.c */
 extern const char *tileset_file;
@@ -121,8 +121,13 @@ static int convert_one(cli_ctx *ctx, const char *in)
     else tiles_save(outbase, tiles, nbtiles, ncolors, blank, lz, true);
     int savepal = !cli_has(ctx, "no-palette");
     if (savepal) palette_save(outbase, palette_snes, colors, true);
-    inc_save(outbase, true, true, savepal, false, mode == 7, true);
     free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
+    /* the glue: <stem>.inc (DECLARE_BG_ASSET when the map is a standard size) and <stem>_data.as */
+    char ident[256], generator[64], err[160];
+    cli_ident(in, ident, sizeof ident);
+    snprintf(generator, sizeof generator, "%s %s", ctx->tool->name, ctx->tool->version);
+    incfile_spec spec = { generator, bpp, savepal, 1, 0, mode == 7, map_blksx, blksy };
+    if (incfile_write(outbase, ident, &spec, err, sizeof err) != 0) { cli_error(ctx, in, "%s", err); return CLI_IO; }
 
     if (cli_has(ctx, "save") && (rc = cli_save_settings(ctx, in)) != CLI_OK) return rc;
 
