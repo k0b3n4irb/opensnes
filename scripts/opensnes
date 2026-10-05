@@ -241,14 +241,14 @@ default_steps = 3_000_000
 # Boot test: visual baseline (fbhash) + WRAM asserts by symbol name.
 # Assert values are little-endian hex bytes (s16 120 -> "7800").
 [tests.boot]
-assert = ["player_x = 7800", "player_y = 6400"]
+assert = ["player_x.main = 7800", "player_y.main = 6400"]   # file-scope statics read name.<file> in the .sym
 
 # Input-driven example: hold RIGHT for 60 frames (frames 30-89), then
 # check the player moved. Input format is "frame:buttons_hex" (RIGHT is
 # 0x100). Uncomment and adjust the expected bytes for your game logic.
 # [tests.walk_right]
 # input = "30:0x100,90:0"
-# assert = ["player_x = b400"]   # 120 + 60 = 180 = 0x00B4
+# assert = ["player_x.main = b400"]   # 120 + 60 = 180 = 0x00B4
 MANIFEST
 }
 

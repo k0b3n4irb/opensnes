@@ -341,7 +341,7 @@ test-project:
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test-update >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test
-	@python3 -c "import pathlib; p = pathlib.Path('$(TEST_PROJECT_DIR)/test/manifest.toml'); p.write_text(p.read_text().replace('player_x = 7800', 'player_x = 9999'))"
+	@python3 -c "import pathlib; p = pathlib.Path('$(TEST_PROJECT_DIR)/test/manifest.toml'); p.write_text(p.read_text().replace('player_x.main = 7800', 'player_x.main = 9999'))"
 	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test >/dev/null 2>&1; then \
 		echo "ERROR: broken assert did not fail 'make test'"; exit 1; fi
 	@echo "user-project test story: OK (incl. the FAIL path)"

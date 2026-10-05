@@ -206,13 +206,13 @@ default_steps = 3_000_000
 # Visual baseline (fbhash) + WRAM asserts by symbol name.
 # Assert values are little-endian hex bytes (an s16 of 120 -> "7800").
 [tests.boot]
-assert = ["player_x = 7800"]
+assert = ["player_x.main = 7800"]
 
 # Input-driven: hold RIGHT for 60 frames, then check the game state.
 # Input format is "frame:buttons_hex" (RIGHT = 0x100).
 [tests.walk_right]
 input = "30:0x100,90:0"
-assert = ["player_x = b400"]
+assert = ["player_x.main = b400"]
 ```
 
 Workflow:
@@ -228,7 +228,10 @@ make test                 # from now on: exit 0 = green, 1 = regression
 Three oracles run per test:
 
 - **WRAM asserts** — `symbol = hexbytes` entries are checked by luna
-  directly, with symbol names resolved from your ROM's `.sym` file;
+  directly, with symbol names resolved from your ROM's `.sym` file. A
+  file-scope `static` carries the name of its source file as a suffix
+  (`player_x.main` for one defined in `main.c`), so two sources may define
+  the same static; a plain global keeps its bare name;
 - **Visual baselines** — tests *without* an `input` script compare a
   framebuffer hash per capture point (`steps` can be a list for
   multi-point capture); failures leave the actual PNG in `test/actual/`
