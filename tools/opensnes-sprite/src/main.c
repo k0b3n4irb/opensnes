@@ -103,8 +103,9 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     /* the converter (gfx4snes's block path: no map) */
     image_load(inbase, type, &snesimage, true);
     palette_convert_snes((t_RGB_color *)&snesimage.palette, palette_snes, cli_has(ctx, "round"), true);
+    char palpath[1100];
     if (cli_has(ctx, "palette"))
-        palette_impose(cli_str(ctx, "palette", NULL), &snesimage, palette_snes, ncolors, true);
+        palette_impose(cli_path(ctx, "palette", palpath, sizeof palpath), &snesimage, palette_snes, ncolors, true);
 
     int w = (int)snesimage.header.width, h = (int)snesimage.header.height;
     int blksx = w / size + (w % size ? 1 : 0), blksy = h / size + (h % size ? 1 : 0);

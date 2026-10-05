@@ -134,6 +134,23 @@ static const char *value_of(const cli_ctx *ctx, const char *name, const char **s
     return NULL;
 }
 
+/* A path-valued option (value_name FILE): as given on the command line; from the
+ * settings file, relative to that file's directory (docs/tools/CONVENTIONS.md:
+ * "paths relative to the file"), so `palette = "town.pal"` beside the picture
+ * works from any working directory. */
+const char *cli_path(const cli_ctx *ctx, const char *name, char *buf, size_t n)
+{
+    int i = opt_index(ctx->cmd, name);
+    if (i < 0) return NULL;
+    if (ctx->given[i]) return ctx->given[i];
+    const char *v = value_of(ctx, name, NULL);
+    if (!v || v[0] == '/' || !ctx->settings_path[0]) return v;
+    const char *slash = strrchr(ctx->settings_path, '/');
+    if (!slash) return v;
+    snprintf(buf, n, "%.*s/%s", (int)(slash - ctx->settings_path), ctx->settings_path, v);
+    return buf;
+}
+
 int cli_has(const cli_ctx *ctx, const char *name)
 {
     return value_of(ctx, name, NULL) != NULL;
@@ -440,7 +457,16 @@ int cli_save_settings_path(const cli_ctx *ctx, const char *path, const char *ass
         case CLI_FLAG: fprintf(f, "%s = true\n", op->name); break;
         case CLI_INT:  fprintf(f, "%s = %s\n", op->name, v); break;
         case CLI_INT2: fprintf(f, "%s = [%s, %s]\n", op->name, v, second ? second : "0"); break;
-        case CLI_STR:  fprintf(f, "%s = \"%s\"\n", op->name, v); break;
+        case CLI_STR:
+            if (op->value_name && strcmp(op->value_name, "FILE") == 0) {
+                /* a path: written relative to the settings file's directory, the way
+                 * cli_path reads it back (docs/tools/CONVENTIONS.md) */
+                const char *slash = strrchr(path, '/');
+                size_t dl = slash ? (size_t)(slash - path) + 1 : 0;
+                if (dl && strncmp(v, path, dl) == 0) v += dl;
+            }
+            fprintf(f, "%s = \"%s\"\n", op->name, v);
+            break;
         case CLI_LIST: {
             fprintf(f, "%s = [", op->name);
             int first = 1;

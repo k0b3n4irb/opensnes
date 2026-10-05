@@ -95,7 +95,9 @@ table, a project palette, the ROM header — is not made from one source, so
 its settings file is named after **what it produces** and lists its
 sources: `music/soundbank.toml` with `tool = "opensnes-music"` and
 `inputs = ["theme.it", "jingle.it"]` under `[bank]`, paths relative to the
-file. `opensnes-music bank music/soundbank.toml` then builds it beside the
+file. Every path in a settings file is relative to the file — `palette =
+"town.pal"` beside the picture it constrains — and `--save` writes them that
+way. `opensnes-music bank music/soundbank.toml` then builds it beside the
 file, and `--save` on a command-line run writes that file for you. One
 rule, two spellings: an asset with one source is named after its source
 (`hero.png.toml`), an asset with several is named after its product

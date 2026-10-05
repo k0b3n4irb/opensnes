@@ -95,6 +95,8 @@ typedef struct cli_ctx {
 int cli_main(const cli_tool *tool, int argc, char **argv);
 
 /* Reading options (command line, then the loaded settings file). */
+/* A path option (value_name FILE): from the settings file it is relative to that file's directory; buf holds the joined path. */
+const char *cli_path(const cli_ctx *ctx, const char *name, char *buf, size_t n);
 int         cli_has (const cli_ctx *ctx, const char *name);
 const char *cli_str (const cli_ctx *ctx, const char *name, const char *deflt);
 int         cli_int (const cli_ctx *ctx, const char *name, int deflt);
