@@ -196,13 +196,13 @@ manifestes et leurs citations sous les yeux :
 | `sa1_hello` → `sa1_starfield` | chaque puce a sa trilogie « ça démarre / la vitrine / la sauvegarde », et le manifeste de `sa1_hello` est la preuve de démarrage (statut SA-1, trace) que lit le tutoriel | **retirée** |
 | `perspective` → `rotate_scale` | marches 21 et 22 de l'échelle, quatre pages citent `perspective` ; c'est la leçon canonique de l'écran coupé par HDMA | **retirée** |
 | `mapandobjects` → `slope_collision` | mêmes appels de la lib, mais `tutorials/object.md` est écrit sur son code (cinq passages) | **reportée** : se fait avec la réécriture du tutoriel, pas avant |
-| `snesmod_music_large` → `snesmod_music` | un second module dans la banque, le franchissement de banque devient visible dans le même exemple ; ses deux manifestes se portent | **à faire** |
-| `echo` → `soundboard` | `soundboard` annonce l'écho dans ses concepts ; un bouton sec / mouillé et ses deux manifestes se portent ; la baseline audio de `soundboard` ne bouge pas si l'état par défaut ne change pas | **à faire** |
+| `snesmod_music_large` → `snesmod_music` | son manifeste d'entrée (84 lignes) mesure le FIFO du pilote **sur le téléversement de 56 Ko au démarrage** (la pression doit venir après la trame 85) ; fusionné, soit cette propriété disparaît (petit module au boot), soit les six manifestes et la baseline audio de `snesmod_music` changent. Un dossier de moins ne vaut pas un test mesuré de moins | **retirée** |
+| `echo` → `soundboard` | deux manifestes sec / mouillé qui épinglent les registres d'écho du DSP (`EDL`, `EFB`, `EVOL`, `FIR0`) à des trames précises, et `audioDisableEcho` n'a pas d'autre exécutant ; le portage dans `soundboard` les remesure tous pour un dossier | **retirée** |
 
 ### Bilan honnête
 
-Sept retraits ou fusions au total sur vingt-cinq proposés : **91 → 84, soit
-8 %**, pas 30 %. Le corpus se ressemble plus qu'il ne se répète : des
+Cinq retraits au total sur vingt-cinq proposés : **91 → 86, soit 5 %**, pas
+30 %. Le corpus se ressemble plus qu'il ne se répète : des
 exemples voisins exercent des fonctions différentes de la lib, portent des
 manifestes différents, et occupent des marches différentes de l'échelle que
 les débutants lisent. Ce que l'intuition du propriétaire a bien vu, et qui
