@@ -757,3 +757,9 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   n'ai regardé que « Lint » pendant quatre pushes. Règle : après un push, lire
   les trois workflows, et pour « Build & Release » les trois OS — un outil C
   nouveau se compile ici sous gcc 16 et là-bas sous clang et mingw.
+- **Même soir, deux pushes partis sans vérification** : `make release-smoke
+  2>&1 | tail -1 && git commit && git push` — le code de sortie est celui de
+  `tail`, et la chaîne a continué sur un échec. Règle : `set -o pipefail`, ou
+  séparer la vérification du commit ; et `make release-smoke` juge le zip
+  *existant* — reconstruire le zip (`make release`) après tout changement
+  de `common.mk` ou du `Makefile`, sur un `release/` vide.
