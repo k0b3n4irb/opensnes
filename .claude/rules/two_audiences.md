@@ -20,7 +20,7 @@ OpenSNES has two populations, and they do not want the same thing.
    `common.mk` had on the morning of 2026-10-05, the post-link checks
    became `opensnes-rom check`, a project's `make test` became `luna test`
    on the project's own manifests, and the 0.x-name hint on a compile
-   error became `opensnes upgrade` (shell and awk). The zip ships no
+   error became `opensnes upgrade` (the compiled CLI). The zip ships no
    Python at all, and `check_doc_drift.py` anchor 17 fails the lint if a
    call comes back.
 2. **Tools for the game developer are compiled, one per function, under one
@@ -40,9 +40,10 @@ OpenSNES has two populations, and they do not want the same thing.
    `devtools/release_smoke.py` — and, once the Python is gone, it runs in
    a container without `python3`.
 5. **Bash is tolerated, Python is not.** `make` on Windows means MSYS2,
-   which has bash; `bin/cc65816`, `bin/opensnes` and `install-luna.sh`
-   may stay shell for now. Turning `cc65816` into a real binary is
-   wanted, as its own lot.
+   which has bash; `bin/cc65816` and `install-luna.sh` may stay shell for
+   now. `bin/opensnes` is a compiled program since 2026-10-06
+   (`tools/opensnes`). Turning `cc65816` into a real binary is wanted, as
+   its own lot.
 
 ## When writing a change, ask
 

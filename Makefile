@@ -95,14 +95,12 @@ install: compiler tools lib cli
 	$(MAKE) -C $(COMPILER_PATH) install
 	$(MAKE) -C $(TOOLS_PATH) install
 
-# Install the `opensnes` project CLI (init/build/run/doctor) into bin/ so it
-# ships in the dev tree and, via the release target's `cp -r bin/*`, in the
-# release zip. The CLI resolves the SDK root from its own bin/ location.
-cli:
-	@mkdir -p bin
-	@cp scripts/opensnes bin/opensnes
-	@chmod +x bin/opensnes
-	@echo "Installed CLI: bin/opensnes  (run 'bin/opensnes doctor')"
+# The `opensnes` project CLI (init / build / run / test / doctor / upgrade) is
+# a compiled tool since 2026-10-06 (tools/opensnes; it was scripts/opensnes):
+# `make tools` builds and installs it in bin/ with the others. The target
+# stays as an alias for the habit and for `all`.
+cli: tools
+	@echo "CLI: bin/opensnes  (run 'bin/opensnes doctor')"
 
 #------------------------------------------------------------------------------
 # Components
@@ -334,7 +332,7 @@ test-pal:
 TEST_PROJECT_DIR ?= /tmp/opensnes_test_project
 test-project:
 	@rm -rf $(TEST_PROJECT_DIR)
-	@OPENSNES_HOME=$(CURDIR) scripts/opensnes init $(TEST_PROJECT_DIR) --template game >/dev/null
+	@OPENSNES_HOME=$(CURDIR) bin/opensnes init $(TEST_PROJECT_DIR) --template game >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test-update >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test
@@ -382,6 +380,7 @@ test-tools:
 	@python3 tools/opensnes-palette/tests/run_golden.py
 	@python3 tools/opensnes-image/tests/run_golden.py
 	@python3 tools/opensnes-save/tests/run_golden.py
+	@python3 tools/opensnes/tests/run_golden.py
 
 # Host-side sanitizer pass (gaps review H3, 2026-09-12). Rebuilds cproc-qbe,
 # QBE, wla-dx and the asset tools from clean with ASan + UBSan (SANITIZE=1:
@@ -661,7 +660,7 @@ hardware-preflight:
 # change meaning (docs/UPGRADING.md): make check-upgrade SRC=<folder>
 check-upgrade:
 	@test -n "$(SRC)" || { echo "usage: make check-upgrade SRC=<folder-or-file>"; exit 2; }
-	@scripts/opensnes upgrade $(SRC)
+	@bin/opensnes upgrade $(SRC)
 
 help:
 	@echo "OpenSNES SDK Build System"

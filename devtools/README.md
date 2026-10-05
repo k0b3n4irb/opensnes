@@ -11,7 +11,7 @@ No script of this directory is run by a user build or copied into the zip
 post-link checks `make/common.mk` used to run from here are `opensnes-rom
 check` since 2026-10-05 (same verdicts on the 99 built ROMs) — the Python
 originals stay for the contributor gates that use them — and the 0.x-name
-hint is `opensnes upgrade` (shell, `scripts/opensnes`).
+hint is `opensnes upgrade` (the compiled CLI, `tools/opensnes`).
 
 Every file here is named by a `make` target, a workflow, or an example
 README; a script that none of them names is an orphan and is deleted

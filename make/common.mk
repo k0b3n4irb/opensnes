@@ -555,7 +555,7 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # next to a C source, rather than exact -MD deps: cheap and never stale.
 # When a source fails to compile, say which of its names OpenSNES 1.0 removed
 # and what to use instead (`opensnes upgrade`, make/removed_api.txt): the
-# compiler can only call them undeclared. Shell and awk, no interpreter: the
+# compiler can only call them undeclared. A binary of bin/ like the rest: the
 # last interpreted step of a user build left this file on 2026-10-06
 # (.claude/rules/two_audiences.md; check_doc_drift.py anchor 17 keeps it so).
 upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes upgrade -q --removed-only $(1); then \

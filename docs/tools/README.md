@@ -84,7 +84,8 @@ background artist's (tilesets, tilemaps, palette banks); @subpage tools_opensnes
 converts a typeface; @subpage tools_opensnes_palette plans a project's palettes into
 CGRAM and quantizes RGB art; @subpage tools_opensnes_image makes HiColor screens and
 the Mode 7 perspective tables; @subpage tools_opensnes_save creates, reads and patches
-battery save files.
+battery save files; and @subpage tools_opensnes is the project's own command (`init`,
+`build`, `run`, `test`, `doctor`).
 
 ## Your Makefile
 

@@ -130,8 +130,8 @@ grep -rnE 'hdma(Enable|Disable)\(|mode7SetScale\(|mode7Transform\(' src/
 `opensnes upgrade <folder>` lists every removed name with its
 replacement, and every `hdmaEnable` / `hdmaDisable` / `dmaTransfer` /
 `mode7SetScale` / `mode7Transform` call, one line per hit (the names are
-`make/removed_api.txt` and `make/changed_api.txt` in the SDK; no Python
-needed — in the repository, `make check-upgrade SRC=<folder>` is the same
+`make/removed_api.txt` and `make/changed_api.txt` in the SDK; nothing to
+install — in the repository, `make check-upgrade SRC=<folder>` is the same
 command). Exit 0 when nothing is found. A source that fails to compile
 gets the removed names it uses, with their replacements, right under the
 compiler's error.

@@ -115,7 +115,7 @@ opt-in list.
     `node` or `uv run`, and the `release` recipe of the `Makefile` copies
     nothing from `devtools/` and no `.py`. `common.mk` had ten `python3`
     calls on the morning of 2026-10-05; the last one (the 0.x-name hint)
-    became `opensnes upgrade`, shell and awk, the next day
+    became `opensnes upgrade`, in the CLI (compiled the same day), the next day
     (`.claude/rules/two_audiences.md`, rule 1). Comments may tell the
     history; a call may not come back.
 

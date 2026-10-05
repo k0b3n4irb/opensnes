@@ -14,7 +14,7 @@ its function went.
 
 | Tool | Function |
 |------|----------|
-| `opensnes` | the project: `init`, `build`, `run`, `test`, `doctor`, `budget`, `release` |
+| `opensnes` | the project: `init`, `build`, `clean`, `run`, `test`, `doctor`, `upgrade` (`budget` and `release`: later) |
 | `opensnes-sprite` | sprite sheet or Aseprite export → tiles, palette, metasprite table, animation clips |
 | `opensnes-tileset` | PNG → tileset and tilemap, deduplicated, with per-tile palettes and flips |
 | `opensnes-level` | Tiled (later LDtk) → map, objects, collision |

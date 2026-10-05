@@ -825,3 +825,19 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   vérifiera ensuite.
 - Reste : le vrai programme `opensnes` (bash aujourd'hui, toléré), la table
   de chaînes d'`opensnes-text`, le format de sauvegarde côté lib.
+- **`opensnes` devient un programme compilé** (11/11 noms de la famille
+  existent ; `budget` et `release` restent à écrire dedans). Portage du
+  script `scripts/opensnes` (655 lignes de bash) vers `tools/opensnes` sur le
+  socle `cli.c`. Méthode : capturer d'abord les sorties du script (trois
+  `init`, `upgrade` sur le projet de contrôle), puis exiger du C les mêmes
+  octets — `diff -r` vide sur les arbres d'`init`, `cmp` sur `upgrade`.
+  Défauts du script trouvés et corrigés au passage : `doctor` exigeait encore
+  `python3` et vérifiait `font2snes` mais aucun outil 1.x ; il rendait 0
+  même sans compilateur ; la racine du SDK passait pour un projet (un
+  `grep common.mk` sur le Makefile) ; `init "my game"` créait un projet que
+  make ne peut pas construire ; `run` ouvrait le premier `.sfc` trouvé.
+  Risque assumé : Windows n'est vérifié que par la CI (pas de compilateur
+  croisé ici). Le point délicat est le make de MSYS2, pour qui `C:/x` dans une
+  règle est une cible nommée `C` : le binaire écrit `/c/x` quand `MSYSTEM`
+  est défini. `release-smoke` passe désormais par le CLI, sans
+  `OPENSNES_HOME`, donc les trois OS exercent l'auto-localisation.

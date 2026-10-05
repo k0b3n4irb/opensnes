@@ -90,23 +90,26 @@ def main() -> int:
         if not (starter / "game.sfc").is_file():
             sys.exit("release-smoke: FAIL: the starter build produced no game.sfc")
 
-        # `bin/opensnes` is a bash script: through bash, since Windows'
-        # CreateProcess cannot start a script (WinError 193, 2026-09-26 CI).
-        bash = shutil.which("bash") or "bash"
-        run("scaffold a project", [bash, str(sdk / "bin" / "opensnes"), "init", "smoke-game",
-                                   "--template", "game"], work, env)
+        # `bin/opensnes` is a compiled program since 2026-10-06 (a bash
+        # script before, which Windows' CreateProcess could not start).
+        cli = sdk / "bin" / ("opensnes.exe" if os.name == "nt" else "opensnes")
+        run("scaffold a project", [str(cli), "init", "smoke-game", "--template", "game"], work, env)
         project = work / "smoke-game"
-        penv = dict(env, OPENSNES_HOME=str(sdk))
-        run("build the scaffolded project", ["make"], project, penv)
+        # Through the CLI, and with no OPENSNES_HOME: the binary finds the SDK
+        # from its own place (<sdk>/bin), as it does for whoever unzips it.
+        penv = dict(env)
+        run("opensnes build", [str(cli), "build"], project, penv)
+        if not (project / "smoke-game.sfc").is_file():
+            sys.exit("release-smoke: FAIL: `opensnes build` produced no smoke-game.sfc")
 
         luna = find_luna()
         if luna:
             penv["LUNA_BIN"] = luna
-            run("record the project test baseline", ["make", "test-update"], project, penv)
-            run("run the project test", ["make", "test"], project, penv)
-            tested = "built and tested in luna"
+            run("record the project test baseline: opensnes test --update", [str(cli), "test", "--update"], project, penv)
+            run("run the project test: opensnes test", [str(cli), "test"], project, penv)
+            tested = "built and tested in luna through the opensnes CLI"
         else:
-            tested = "built (no luna binary here: project test skipped)"
+            tested = "built through the opensnes CLI (no luna binary here: project test skipped)"
         print(f"release-smoke: OK — {zip_path.name}: starter and a scaffolded project {tested}")
         return 0
     finally:

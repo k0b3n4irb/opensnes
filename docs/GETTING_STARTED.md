@@ -120,9 +120,9 @@ template:
 - **`--template game`** — a white sprite you move with the D-pad, a starting
   point for an action game.
 
-Other commands: `opensnes build`, `opensnes clean`, and `opensnes doctor` (checks
+Other commands (@ref tools_opensnes): `opensnes build`, `opensnes clean`, and `opensnes doctor` (checks
 your toolchain, library, and emulator and tells you what is missing). Run
-`opensnes help` for the full list.
+`opensnes --help` for the full list.
 
 #### Manual setup (the long way)
 

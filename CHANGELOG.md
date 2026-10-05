@@ -17,6 +17,22 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`opensnes` is a compiled program** (tools): the project CLI — `init`,
+  `build`, `clean`, `run`, `test`, `doctor`, `upgrade` — was the shell
+  script `scripts/opensnes`; it is `tools/opensnes`, built and installed
+  with the other tools, on the family's command line (`--help` per
+  subcommand, `--json` for `doctor` and `init`, the four exit codes).
+  `init` writes byte for byte the files the script wrote and `upgrade`
+  prints the same lines; the release zip now holds no script a user runs
+  except `install-luna.sh` and the `cc65816` wrapper. What changes for a
+  user: `doctor` exits 1 when something a build needs is missing, checks
+  `make` and the 1.x tools, and no longer asks for `python3`; `init`
+  refuses a name make cannot hold (a space); `run` opens the `TARGET` of
+  the Makefile rather than the first `.sfc` found; `build` and `test` no
+  longer print make's "Entering directory"; the short options `-t`, `-c`,
+  `-e`, `-u` are gone (long options only, as everywhere in the family).
+  `make release-smoke` now builds and tests its scaffolded project through
+  the CLI, with no `OPENSNES_HOME`, on the three OSes.
 - **`opensnes-save`** (tools): battery save files, the tenth tool of the
   1.x family. `new` writes the blank `.srm` a ROM expects — the size its
   header declares at `$FFD8`, or the expansion RAM of `$FFBD` on a Super FX
@@ -139,8 +155,8 @@ freeze criterion that waits for hardware.
 ### Changed
 - **A user build runs no Python at all** (build, tools): the last call of
   `make/common.mk` — the 0.x-name scan, `devtools/check_upgrade.py` — is
-  `opensnes upgrade [-q] [--removed-only] <folder-or-file>...`, shell and
-  awk in the `opensnes` CLI, same hits on a project using all 46 removed
+  `opensnes upgrade [-q] [--removed-only] <folder-or-file>...` in the
+  `opensnes` CLI (see Added: compiled the same day), same hits on a project using all 46 removed
   names. The build runs it only when a source fails to compile (after the
   clang pre-pass or after `cc65816`), so a current project sees nothing,
   where the Python scan nagged every `hdmaEnable()` call on a machine
