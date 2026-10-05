@@ -4,6 +4,22 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.48.0] — 2026-10-05
+
+The last 0.x before 1.0. Every name that 1.0 renames or removes still
+compiles here, with a deprecation warning that says the replacement (the
+`### Deprecated` list below; `docs/UPGRADING.md` has the full table and
+`make check-upgrade SRC=<folder>` lists what a project must change,
+including every `hdmaEnable` / `hdmaDisable` call, whose argument becomes
+a channel number at 1.0). The silent-defect campaign of the 1.0 freeze
+(`.claude/notes/status/silent_defects_log.md`) landed its fixes here:
+SNESMOD's key-off, queue and init, the offset-per-tile scroll, the object
+engine's bounds and free list, SRAM saves from ROM bank 0, the audio pan
+at centre, gfx4snes's tile-count silences, tmx2snes's wrong maps, and the
+Mode 7 example maps they had let through. Every link now checks the ROM
+header and the data-init terminator; every coverage pass checks the
+header against luna's view. luna v1.32.0.
+
 ### Added
 - chore(devtools): **`make hooks`** installs the `commit-msg` and `pre-push`
   git hooks of `scripts/githooks/`: the first refuses a message that
