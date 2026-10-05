@@ -173,6 +173,7 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Fixed
+- fix(compiler): two C sources of one project may define the same file-scope `static` (object or function): the symbol is emitted as `name.<source>` (`itable.main`), where it used to be a bare label that the linker refused as defined twice. The generated `res/<asset>.inc`, included from every file that draws the asset, needed it. Manifests that name such a static use the suffixed form.
 - fix(tools): two gfx4snes map defects measured with a pixel oracle (decode
   `.pic` + `.pal` + `.map` and compare every pixel with the source). (1)
   A map entry took its palette bank from the tile's **first** pixel; index

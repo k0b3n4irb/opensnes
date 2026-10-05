@@ -18,6 +18,9 @@ absent  <regex>                  ASM does not contain regex
 count   <N> <regex>              exactly N matches
 in <func>: present|absent <re>   regex (a)present within that function's body
 section <sym>: present|absent <re>   the .SECTION/.RAMSECTION line of <sym> matches
+raw <directive>                  the same directive on the unstripped ASM: a file-scope
+                                 static is emitted `name.<case>` and the runner strips
+                                 that suffix before the other checks run
 # lines and blank lines are ignored
 ```
 

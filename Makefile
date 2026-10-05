@@ -54,7 +54,7 @@ RELEASE_DEVTOOLS := $(sort $(shell grep 'python3' make/common.mk | grep -oE 'dev
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
 # spelled them out in three places and each list was a different subset.
 FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram
-FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals
+FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals static_dup
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
 FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
                      $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \

@@ -34,6 +34,7 @@ Runtime proofs of the compiler chantiers; the pattern checks in
 | `c_features/` | switch forms, function pointers, struct members, the C features a game uses |
 | `debug_channel/` | the debug channel to luna (nocash / WDM) |
 | `d_quals/` | `volatile`, `const` and the qualifiers' codegen |
+| `static_dup/` | two sources each defining `static u16 k` and `static u16 tag()`: the link succeeds and each reads its own (statics are emitted `name.<source>`) |
 
 Each is rebuilt from clean before its test: a stale `.sfc` built with an
 experimental toolchain once produced misleading XPASSes (a6_farptr,

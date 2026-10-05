@@ -131,8 +131,15 @@ def section_of(asm: str, sym: str) -> str:
     return ""
 
 
-def apply_check(asm: str, line: str) -> str | None:
-    """Return an error string if the directive fails, else None."""
+def apply_check(asm: str, line: str, raw: str | None = None) -> str | None:
+    """Return an error string if the directive fails, else None.
+
+    `asm` has the per-TU suffix of file-scope statics stripped (`counter.test_x`
+    reads `counter`, the way the checks were written); a `raw ...` directive
+    runs on the unstripped text.
+    """
+    if raw is not None and line.startswith("raw "):
+        return apply_check(raw, line[4:].strip())
     m = re.match(r"in\s+(\S+):\s*(present|absent)\s+(.+)", line)
     if m:
         fn, mode, pat = m.group(1), m.group(2), m.group(3)
@@ -185,7 +192,10 @@ def run(only: str | None) -> int:
         if only and only not in name:
             continue
         try:
-            asm = compile_asm(src)
+            raw_asm = compile_asm(src)
+            # file-scope statics are emitted `name.<source stem>` (cproc, 2026-10-05);
+            # the checks name them bare, so strip the suffix of this case
+            asm = re.sub(rf"\.{re.escape(src.stem)}\b", "", raw_asm)
         except RuntimeError as e:
             print(f"  FAIL {name}: {e}")
             failed += 1
@@ -200,7 +210,7 @@ def run(only: str | None) -> int:
             line = raw.strip()
             if not line or line.startswith("#"):
                 continue
-            e = apply_check(asm, line)
+            e = apply_check(asm, line, raw=raw_asm)
             if e:
                 errs.append(e)
         if errs:

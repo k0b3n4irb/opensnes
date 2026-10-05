@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | a1474c4a3a4e5e756819090d668d53fcba7c77ed | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/cproc | 11db8079ec38c70f0c2a2acbf8ce91fc21782eef | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | a89fd88b8195f647955c6f7029af360d06f97a18 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 33 patches since upstream merge-base 7051114
+### compiler/cproc — 34 patches since upstream merge-base 7051114
 
 ```
+11db807 qbe: file-scope statics are emitted name.<TU> so two sources may share a static (2026-10-05)
 a1474c4 qbe, expr: qualifiers and widths the w65816 target dropped — four silent miscompilations (2026-10-03 campaign)
 354a845 OpenSNES: __ramcode, a function specifier for the RAM code window
 771bdf0 expr: typechar.u.basic, not u.arith, in the fork's type layout (adapts 23c57a7)
