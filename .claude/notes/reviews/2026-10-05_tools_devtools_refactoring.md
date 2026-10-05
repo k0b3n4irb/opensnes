@@ -695,7 +695,17 @@ suite est le §10.5 (conventions, `opensnes-sample`, `opensnes-rom check`).
 | `opensnes-music` | `5e624ed9` | `bank`, `spc`, `inspect` sur le convertisseur de smconv (itloader, it2spc, brr) ; mêmes octets que `smconv -s -n -p` (suite golden comparée aux goldens de smconv, 7 cas) ; `inspect` donne les 57 957 octets qu'un module peut prendre, le chiffre de `smconv -V` ; page `docs/tools/opensnes-music.md`. Reste à faire : les diagnostics propres de la bibliothèque smconv parlent encore avec son nom ; une sortie de messages par callback les ramènerait à la forme de la famille |
 | cppcheck sur `tmx2snes/src` | `c26a6b59`, `d231fbc6` | deux `%d` d'unsigned, deux boucles qui lisaient l'octet avant de tester l'indice — des remarques que le lint ne voyait pas tant que le fichier était hors de `src/` |
 
-| `opensnes-rom check` | *(ce lot)* | les cinq vérifications post-link en C : lecteur de `.sym` (labels avec repli de banque, définitions, sections, ramsections), ratchet banque $00, bande RAM C et bande FAR, sentinelle data-init, lectures sans banque dans les `.c.asm`, graphe d'appels NMI, inventaire d'assets ; comparé aux scripts Python sur les 99 ROM construites : mêmes verdicts, mêmes chiffres ; `common.mk` l'appelle à la place des cinq ; il reste dans `common.mk` deux `python3` : l'aide 0.x derrière `command -v`, et `project_test.py` sous `make test` d'un projet |
+| `opensnes-rom check` | `b24ccda6`, `12894c64`, `99d1fd76` | les cinq vérifications post-link en C : lecteur de `.sym` (labels avec repli de banque, définitions, sections, ramsections), ratchet banque $00, bande RAM C et bande FAR, sentinelle data-init, lectures sans banque dans les `.c.asm`, graphe d'appels NMI, inventaire d'assets ; comparé aux scripts Python sur les 99 ROM construites : mêmes verdicts, mêmes chiffres ; `common.mk` l'appelle à la place des cinq ; il reste dans `common.mk` deux `python3` : l'aide 0.x derrière `command -v`, et `project_test.py` sous `make test` d'un projet |
+
+Deux fautes de ma main dans cette séance, à retenir : un enchaînement
+`&&` interrompu par une commande qui échouait a fait sauter en silence les
+éditions qui suivaient (le câblage d'`opensnes-rom` dans `tools/Makefile`,
+le Makefile racine et le `.gitignore`), et le binaire de l'outil est entré
+dans le commit `b24ccda6` faute de cette ligne d'ignore — comme `tmx2snes`
+au lot 7a. Les deux binaires restent dans l'historique (pas de force-push)
+et sont ignorés depuis. Règle pour la suite : la ligne `.gitignore` d'un
+nouvel outil se commite **avant** son premier `make`, et les éditions de
+câblage se vérifient par `git status` avant le commit, pas après le push.
 
 Trouvé en chemin : `asset_budget.py --oneline .` avec un chemin relatif
 mesurait le dépôt entier (il préfixait le chemin par la racine du dépôt) ;
