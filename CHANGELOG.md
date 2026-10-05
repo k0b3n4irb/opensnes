@@ -26,6 +26,12 @@ freeze criterion that waits for hardware.
   reproduces; `wav2brr` stays shipped one more release. The command line,
   messages and settings code is `tools/common/cli.c`, shared by the family;
   the contract is `docs/tools/CONVENTIONS.md`.
+- **`opensnes-music`** (tools): Impulse Tracker modules → SNESMOD soundbank
+  with `bank` (`NAME.asm`, `NAME.h`, `NAME.bnk`, same bytes as
+  `smconv -s -n -p NAME`, whose golden it reproduces), `spc` (a standalone
+  `.spc` per module) and `inspect` (patterns, instruments, samples, and the
+  SPC RAM each module takes against the 57 957 bytes a module may use).
+  `smconv` stays shipped one more release.
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
   counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
   RAM: each power-on reads the saved value, adds one, saves and prints both.

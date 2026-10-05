@@ -682,3 +682,20 @@ retirer les sept derniers appels Python.
 Trouvé en chemin et retiré : `testing/stress/roms/` (huit ROM malformées
 non suivies, aucun lecteur dans le dépôt). Le plan du §7 est fait ; la
 suite est le §10.5 (conventions, `opensnes-sample`, `opensnes-rom check`).
+
+### Ouverture de la famille (même séance, suite)
+
+| Quoi | Commit | Détail |
+|---|---|---|
+| Conventions | `e862dafa` | `docs/tools/CONVENTIONS.md` : la famille (onze outils plus luna), l'invocation (sous-commandes, options longues, `--help`, `--json`, quatre codes de sortie), la forme des messages, le fichier de réglages TOML à côté de l'asset (`<asset>.toml`, première clé `tool`), les sorties déterministes avec en-tête généré, les règles d'implémentation |
+| Correctifs CI du lot 7 | `c772e55b`, `217de1ae`, `c26a6b59`, `6a77e6d1` | cppcheck lisait désormais `third_party/` et `tmx2snes/src/` : macros `TOOL_*` fournies, `cute_tiled.h` supprimé comme les autres décodeurs vendus, deux `%d` d'unsigned corrigés dans tmx2snes ; le corpus de fuzz `tiled` lisait ses fixtures via la variable qui nomme désormais `third_party/` ; le binaire `tmx2snes` était entré dans git avec la disparition de son `.gitignore` local (reste dans l'historique de `89ebbbaa`, ignoré depuis) |
+| `tools/common/cli.c` | `7117a55c` | l'implémentation des conventions, partagée : parsing (sous-commandes, options longues et courtes, `--`), aide générée, messages, chemins de sortie (`--out` crée son dossier), lecture et écriture du fichier de réglages (chaînes, entiers, booléens, `[a, b]`, clé inconnue refusée, outil différent refusé), écrivain JSON |
+| `opensnes-sample` | `7117a55c` | `encode` et `inspect` ; mêmes octets que `wav2brr` (suite golden comparée aux goldens de wav2brr, 13 cas) ; `wav.c` fuzzé ; page `docs/tools/opensnes-sample.md` ; `wav2brr` reste livré une version |
+
+Ce que le premier outil a appris pour les suivants : le fichier de réglages
+se lit **par entrée** (une `cli_ctx` par asset), un `--out` doit créer son
+dossier, le JSON d'un échec doit nommer l'entrée et le code, et la suite
+golden d'un outil fusionné pointe sur les goldens de l'outil absorbé plutôt
+que d'en copier les octets. Suivants dans l'ordre du §10.5 :
+`opensnes-music` (smconv, avec `inspect` des samples et du poids APU), puis
+`opensnes-rom check` qui retire les sept derniers appels Python de la build.

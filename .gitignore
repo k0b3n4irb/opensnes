@@ -23,6 +23,7 @@ tools/smconv/smconv
 tools/wav2brr/wav2brr
 tools/tmx2snes/tmx2snes
 tools/opensnes-sample/opensnes-sample
+tools/opensnes-music/opensnes-music
 
 # Generated documentation
 doc/
