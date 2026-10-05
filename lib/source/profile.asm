@@ -92,10 +92,10 @@ profileColorStart:
     lda #$0006                  ; as a colour (fixed 2026-09-20)
 +
     ; Multiply by 3 (table entry size)
-    sta.l tcc__r9               ; temp
+    sta.b tcc__r9               ; temp (direct page: callback-safe, .l clobbered the main thread's r9 until 2026-10-05)
     asl a                       ; *2
     clc
-    adc.l tcc__r9               ; *3
+    adc.b tcc__r9               ; *3
     tax                         ; X = table offset
 
     sep #$20                    ; 8-bit A for register writes

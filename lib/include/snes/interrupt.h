@@ -69,6 +69,22 @@ typedef void (*VBlankCallback)(void);
  * @note The callback may live in any ROM bank: the bank is taken from the
  *       function pointer. (This note said "must be in bank 0" until
  *       2026-09-20; that was only ever true of irqSet, fixed the same day.)
+ *
+ * @par What the callback may call
+ * The callback runs with the direct page on its own copy of the compiler's
+ * scratch registers (`tcc__r0`..`tcc__r10`), so C code and every library
+ * routine that reaches them direct-page-relative, as the compiler does,
+ * are isolated from the interrupted main thread; plain `*`, `/` and `%`
+ * take a software path there (`in_nmi_ctx`). What is NOT callback-safe,
+ * and says so in its own header: the hardware-multiplier users
+ * `fixMul()`, `fixLerp()`, `fix32Mul()`, `fix32Sin()`/`fix32Cos()`; every
+ * DSP-1 call (a port protocol); `textLoadFont()`/`textLoadFont4bpp()` (DMA
+ * registers written with the callback's data bank); the WRAM data port
+ * (`$2180`). Until 2026-10-05 `objCollidObj()`, `mapGetMetaTile()`,
+ * `mapGetMetaTilesProp()`, `profileColorStart()`, `dsp1SetCamera()` and
+ * `dsp1Raster()` reached the scratch registers with absolute or long
+ * addressing, which wrote the main thread's copy through the `$7E`
+ * mirror; they are direct-page-relative now (library audit l.21).
  */
 void nmiSet(VBlankCallback callback);
 

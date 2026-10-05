@@ -411,9 +411,9 @@ dsp1SetCamera:
     .ACCU 16
     .INDEX 16
     lda 5,s                 ; cam (low 16)
-    sta.l tcc__r0
+    sta.b tcc__r0
     lda 7,s                 ; cam (bank byte, high byte = pad)
-    sta.l tcc__r0+2
+    sta.b tcc__r0+2
     ldy #0
     sep #$20
     .ACCU 8
@@ -580,15 +580,15 @@ dsp1Raster:
     .ACCU 16
     .INDEX 16
     lda 13,s                ; ab (low 16)
-    sta.l tcc__r0
+    sta.b tcc__r0
     lda 15,s                ; ab (bank byte, high byte = pad)
-    sta.l tcc__r0+2
+    sta.b tcc__r0+2
     lda 9,s                 ; cd (low 16)
-    sta.l tcc__r1
+    sta.b tcc__r1
     lda 11,s                ; cd (bank byte, high byte = pad)
-    sta.l tcc__r1+2
+    sta.b tcc__r1+2
     lda 5,s                 ; count
-    sta.l tcc__r2
+    sta.b tcc__r2
     bne +                   ; count == 0: nothing to stream
     brl dsp1Raster_done
 +

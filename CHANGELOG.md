@@ -23,6 +23,16 @@ All notable changes to OpenSNES are documented in this file.
   illustration).
 
 ### Fixed
+- fix(lib): `objCollidObj`, `mapGetMetaTile`, `mapGetMetaTilesProp`,
+  `profileColorStart`, `dsp1SetCamera` and `dsp1Raster` reach the
+  compiler's scratch registers direct-page-relative, as compiled C does.
+  They used absolute or long addressing, which from an `nmiSet()` callback
+  — where the direct page points at the NMI's own register copy — wrote
+  the main thread's `tcc__r0` / `tcc__r9` through the `$7E` mirror: a
+  collision test or a profiler bar in a callback could corrupt the value
+  the interrupted code was computing (library audit l.21). `nmiSet()`'s
+  header now says what a callback may call; `textLoadFont*` warn that
+  their absolute DMA writes land in WRAM under the callback's data bank.
 - ci(devtools): the commit lint exempts the release merge titled
   `release: vX.Y.Z`, the title the release workflow prescribes; the Lint
   run on `main` was red after the v0.47.0 and v0.48.0 merges for that

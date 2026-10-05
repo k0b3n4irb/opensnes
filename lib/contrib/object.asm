@@ -2518,7 +2518,9 @@ objCollidObj:
     plb
 
     rep #$20
-    stz.w tcc__r0
+    stz.b tcc__r0                           ; direct page, like the compiler: an nmiSet() callback
+                                            ; runs with D on its own register area (.w hit the main
+                                            ; thread's through the $7E mirror until 2026-10-05)
 
     ; The workspace may hold an edit of one of the two objects (a callback
     ; that moved itself, then tests the contact): flush it first, as the map
@@ -2610,14 +2612,14 @@ _oicor5:
     bmi _oicoend
 
     lda #$0001
-    sta.w tcc__r0
+    sta.b tcc__r0
 
 _oicoend:
     ; The value is returned in A (cc65816), not in tcc__r0: every "no
     ; contact" exit used to return whatever A held — x + width, a y
     ; coordinate — and only the contact path returned 1 by accident
     ; (fixed 2026-09-20; libtest vector r_obj_cobj_no read 0x18).
-    lda.w tcc__r0
+    lda.b tcc__r0
     ply
     plx
     plb
