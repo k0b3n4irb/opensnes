@@ -182,7 +182,6 @@ TARGET      := continuous_scroll.sfc
 USE_LIB     := 1
 LIB_MODULES := console sprite input background dma
 CSRC        := main.c
-ASMSRC      := data.asm
 ```
 
 ### Why These Modules?
@@ -218,7 +217,7 @@ ASMSRC      := data.asm
 | File | What's in it |
 |------|-------------|
 | `main.c` | Game loop, scrolling logic, input handling (~265 lines) |
-| `data.asm` | BG1/BG2 tiles, palettes, tilemaps, character sprite |
+| `res/*.png.toml` | the import settings of the three layers and the character sheet (`opensnes-tileset`, `opensnes-sprite`); the build converts and links them, `res/<name>.inc` declares the symbols |
 | `Makefile` | `LIB_MODULES := console sprite input background dma` |
 
 ## Credits

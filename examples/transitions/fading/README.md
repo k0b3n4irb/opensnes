@@ -183,7 +183,7 @@ Then open `fading.sfc` in your emulator (Mesen2 recommended).
 | File | Purpose |
 |------|---------|
 | `main.c` | Fade logic and demo sequence |
-| `data.asm` | Background graphics |
+| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it, `res/opensnes.inc` declares the symbols |
 | `Makefile` | Build configuration (`LIB_MODULES := console sprite dma input background`) |
 
 ---

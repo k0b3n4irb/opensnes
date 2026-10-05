@@ -67,13 +67,15 @@ colorMathSetLayers(LAYER_BG1 | COLORMATH_BACKDROP);  /* What gets blended */
 
 The `COLORMATH_BACKDROP` flag ensures clouds also blend over empty areas (CGRAM entry 0).
 
-### Assembly DMA Loader
+### Loading the graphics
 
-The tile data, tilemaps, and palettes live in SUPERFREE ROM sections that may land in
-any bank. C code cannot reliably specify bank bytes for cross-bank data, so `data.asm`
-provides a `loadGraphics()` routine that uses the `:label` syntax to get linker-resolved
-bank bytes at link time. All graphics are loaded during forced blank (screen off) since
-the total data exceeds the ~4KB VBlank DMA budget.
+The tiles, tilemaps and palettes come out of the two settings files beside the
+pictures (`res/backgrounds.bmp.toml`, `res/clouds.bmp.toml`): the build converts
+them with `opensnes-tileset` and links the result in the asset banks, and the
+generated `res/*.inc` declare the symbols with their bank carried in the far
+pointer, so `dmaCopyVram()` / `dmaCopyCGram()` read them from any bank. All
+graphics are loaded during forced blank (screen off) since the total data
+exceeds the ~4KB VBlank DMA budget.
 
 ---
 
@@ -116,8 +118,8 @@ mechanism, ensuring scroll updates happen safely during VBlank.
 | File | Purpose |
 |------|---------|
 | `main.c` | PPU setup, color math configuration, scroll loop |
-| `data.asm` | Assembly DMA loader + SUPERFREE graphics data |
-| `Makefile` | Build config, gfx4snes conversion rules |
+| `res/*.bmp.toml` | the import settings of the landscape (`opensnes-tileset`, palette rearranged into banks, bank 1) and the clouds (2bpp); the build converts and links them |
+| `Makefile` | Build config (no conversion rule: the settings files drive it) |
 | `res/backgrounds.bmp` | 4bpp landscape source image |
 | `res/clouds.bmp` | 2bpp cloud overlay source image |
 

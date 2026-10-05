@@ -216,12 +216,12 @@
     "rom_sha256": "5b2cfb893012e729b37e4cc4e9276bc2bd93ef2c4eed273ddfec821d247315f5"
   },
   "input_mouse": {
-    "stream": "b15cbab966c95c7ca3038750c6c3bbaba8a3d6f10c5e4300e7ea0db7d5137cb8",
-    "rom_sha256": "0569a1e730bb5377e658b88fb0f02dcd3ed46e78dde557388444d457c8a16060"
+    "stream": "6c28f85b7be1734cd8df0bfa14bd909b496c43c940e743f1a7069fadcc04bde4",
+    "rom_sha256": "b022490a8d76ffea5849f3d98d28fa2e4c6028b55b18741c510524d74befb853"
   },
   "input_superscope": {
-    "stream": "beb094cabbde4f6ee3b430ff26bcefa19cfc3ce46a65ee89716555513d4d8d56",
-    "rom_sha256": "3834ee47b75d6599573e18aa42acba3ddd1c1e20cebae3057c3d6466e122fab3"
+    "stream": "f38e04bec4ab028ce6415d0b0d142c0c5e5442cedd90a867d464d63a74c84329",
+    "rom_sha256": "aac1213507b3c0f333922ec15ae887d13e2545bf1f2fa4e85dbacc3a60372a59"
   },
   "input_two_players": {
     "stream": "d323442db7943ac5982d98c79d03a9321b2ad207b05b601323faec469ed968cf",

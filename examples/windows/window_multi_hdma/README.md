@@ -16,7 +16,7 @@ both inverted, combined with AND — masked where (outside W1) AND
 (outside W2) = visible inside either window.
 
 The table is krom's exact 14-band data (in `main.c`); the artwork is
-original (procedural radial color wheel, tiled 2×2 so gfx4snes dedups
+original (procedural radial color wheel, tiled 2×2 so the converter dedups
 it into 16 KB of tiles).
 
 ## SNES Concepts

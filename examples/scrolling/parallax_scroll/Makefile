@@ -9,18 +9,5 @@ USE_LIB     := 1
 LIB_MODULES := console dma background sprite hdma input
 
 CSRC   := main.c
-ASMSRC := data.asm
 
 include $(OPENSNES)/make/common.mk
-
-# Custom gfx conversion: need -m (tilemap) and -o 32 -u 16 (tile offset/unique)
-# gfx4snes outputs to the same directory as the input file
-res/back.pic res/back.map res/back.pal: res/back.png
-	@echo "[GFX] $< -> res/back.pic/.map/.pal"
-	@$(GFX4SNES) -s 8 -o 32 -u 16 -p -m -i $<
-
-# Extended clean
-clean: clean-parallax_scroll
-.PHONY: clean-parallax_scroll
-clean-parallax_scroll:
-	@rm -f res/back.pic res/back.pal res/back.map res/back.inc res/back_data.as

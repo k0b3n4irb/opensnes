@@ -97,7 +97,8 @@ writes every scanline.
 | File | Purpose |
 |------|---------|
 | `main.c` | Gradient setup, enable/disable, input handling |
-| `data.asm` | Background tiles/tilemap/palette, HDMA gradient table |
+| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it |
+| `data.asm` | the HDMA gradient table (`hdmaGradientList`), hand-written |
 | `res/opensnes.png` | Source background image |
 | `Makefile` | `LIB_MODULES := console dma background sprite hdma input math` |
 

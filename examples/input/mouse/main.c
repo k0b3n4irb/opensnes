@@ -38,9 +38,8 @@
 #include <snes/dma.h>
 
 /** @brief Cursor sprite tile data (16x16, 4bpp) defined in data.asm */
-extern u8 cursor_tiles[], cursor_tiles_end[];
+#include "res/cursor.inc"   /* generated: cursor_tiles[], cursor_tiles_end[], cursor_pal[], cursor_pal_end[] */
 /** @brief Cursor sprite palette (SNES BGR555 format) defined in data.asm */
-extern u8 cursor_pal[], cursor_pal_end[];
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 

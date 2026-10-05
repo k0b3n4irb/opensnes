@@ -14,18 +14,6 @@ LIB_MODULES := console sprite dma background window colormath hdma
 
 # Source files
 CSRC       := main.c
-ASMSRC     := data.asm
 
 # Include common build rules
 include $(OPENSNES)/make/common.mk
-
-# Custom gfx conversion
-res/background.pic res/background.map res/background.pal: res/background.png
-	@echo "[GFX] $< -> res/background.pic/.map/.pal"
-	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
-
-# Extended clean
-clean: clean-transparent_window
-.PHONY: clean-transparent_window
-clean-transparent_window:
-	@rm -f res/background.pic res/background.pal res/background.map res/background.inc res/background_data.as

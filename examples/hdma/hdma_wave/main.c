@@ -90,10 +90,7 @@
 #define VRAM_BG1_MAP  0x7C00
 
 /** @brief Mode 3 image data (from data.asm; generated original art) */
-extern u8 tiles[], tiles_end[];
-extern u8 tiles2[], tiles2_end[];
-extern u8 tilemap[], tilemap_end[];
-extern u8 palette[], palette_end[];
+#include "res/water.inc"   /* generated: water_tiles[] + water_tiles_1[] (two bank-sized parts), water_map[], water_pal[] */
 
 /**
  * @brief krom's exact HDMA table, in ROM (data.asm).
@@ -142,10 +139,10 @@ int main(void) {
     /* Load the full-screen 8bpp image: two tile halves (>32KB tileset),
      * tilemap above them, 256-color palette — krom's Mode 3 setup on
      * the SDK API. All transfers run during the boot force blank. */
-    dmaCopyVram(tiles,   VRAM_BG1_GFX,  (u16)(tiles_end - tiles));
-    dmaCopyVram(tiles2,  VRAM_BG1_GFX2, (u16)(tiles2_end - tiles2));
-    dmaCopyVram(tilemap, VRAM_BG1_MAP,  (u16)(tilemap_end - tilemap));
-    dmaCopyCGram(palette, 0, (u16)(palette_end - palette));
+    dmaCopyVram(water_tiles,   VRAM_BG1_GFX,  (u16)(water_tiles_end - water_tiles));
+    dmaCopyVram(water_tiles_1,  VRAM_BG1_GFX2, (u16)(water_tiles_1_end - water_tiles_1));
+    dmaCopyVram(water_map, VRAM_BG1_MAP,  (u16)(water_map_end - water_map));
+    dmaCopyCGram(water_pal, 0, (u16)(water_pal_end - water_pal));
 
     bgSetGfxPtr(0, VRAM_BG1_GFX);
     bgSetMapPtr(0, VRAM_BG1_MAP, SC_32x32);

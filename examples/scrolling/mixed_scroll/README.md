@@ -44,7 +44,7 @@ data in the upper region ($4000+), leaving a safe gap between them.
 CGRAM holds 256 colors organized as 16 slots of 16 colors each for 4bpp modes.
 Each tilemap entry includes a 3-bit palette number that selects which 16-color
 slot to use. In this example, BG2 uses palette slot 0 (colors 0-15) and BG1 uses
-palette slot 1 (colors 16-31). The `-e 1` flag in gfx4snes tells the tool to
+palette slot 1 (colors 16-31). `palette-entry = 1` in `res/shader.png.toml` tells the converter to
 encode palette slot 1 into BG1's tilemap entries.
 
 ### Independent Background Scrolling
@@ -124,8 +124,9 @@ while (1) {
 ```
 mixed_scroll/
 ├── main.c        — Initialization, tileset loading, scroll loop
-├── data.asm      — ROM data: tiles, tilemaps, and palettes for both layers
-├── Makefile      — Build configuration (gfx4snes rules for both PNGs)
+├── res/*.png.toml — import settings of the two pictures (opensnes-tileset); the build
+│                  converts and links them, res/<name>.inc declares the symbols
+├── Makefile      — Build configuration (no conversion rule: the settings files drive it)
 └── res/
     ├── shader.png    — Repeating pattern for BG1 (palette slot 1)
     └── pvsneslib.png — Logo image for BG2 (palette slot 0)

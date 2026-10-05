@@ -264,42 +264,33 @@ Prefer the explicit form in new code; it survives being moved into a scene's
 declarations plus a `static const BgAsset name` initialised from them. It
 requires the symbol naming convention `<name>_tiles`, `<name>_pal`,
 `<name>_map`, each with an `_end` sibling. `DECLARE_GFX_ASSET(name,
-color_mode)` is the same without the map pair. You choose the prefix once, in
-your `data.asm`.
+color_mode)` is the same without the map pair.
 
-The blobs themselves come out of gfx4snes. `make/common.mk` has a generic
-`.png` → `.pic` + `.pal` rule, and an example that also wants a tilemap
-overrides it — `backgrounds/mode1` asks for `-m` (emit the map) and `-o 16`
-(16 colours):
+You do not write those symbols yourself. The blobs come out of
+`opensnes-tileset`, driven by a settings file beside the picture —
+`backgrounds/mode1` has `res/opensnes.png.toml`:
 
-```makefile
-res/opensnes.pic res/opensnes.pal res/opensnes.map: res/opensnes.png
-	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
+```toml
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
 ```
 
-The three outputs are then given labels in `data.asm`, which is the entire
-contract between the converter and the macro:
-
-```asm
-ASSET_SECTION "rodata1"          ; templates/assets.inc: any bank but $00
-
-bg_tiles: .incbin "res/opensnes.pic"
-bg_tiles_end:
-
-bg_map:   .incbin "res/opensnes.map"
-bg_map_end:
-
-bg_pal:   .incbin "res/opensnes.pal"
-bg_pal_end:
-
-.ends
-```
-
-and on the C side:
+`make/common.mk` runs the converter before the first C object and links the
+`res/opensnes_data.as` it writes (one `ASSET_SECTION` per blob — tiles, map,
+palette — so nothing lands in bank $00). The generated `res/opensnes.inc` is
+the entire contract between the converter and the macro: the six `extern`
+declarations in that naming, and the `DECLARE_BG_ASSET` itself, so the C side
+is one line:
 
 ```c
-DECLARE_BG_ASSET(bg, BG_16COLORS, SC_32x32);
+#include "res/opensnes.inc"   /* DECLARE_BG_ASSET(opensnes, BG_16COLORS, SC_32x32) */
 ```
+
+A picture converted with `lz = true`, or one whose tileset is cut in 32 KB
+parts, gets the plain `extern` declarations instead of a bundle, with a
+comment saying why (`bgLoad()` would copy compressed or partial bytes).
 
 The macro is sugar; the struct is the contract. Nothing stops you from filling
 a `BgAsset` yourself when the symbols do not follow the convention, or when
