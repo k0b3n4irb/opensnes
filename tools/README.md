@@ -54,7 +54,7 @@ of the tool it absorbs before the old one is retired.
 
 The luna-backed test harness moved to [`testing/`](../testing/) on
 2026-10-05 (lot 5 of the review) so that `tools/` means "shipped" again;
-only the files a user project's `make test` imports (`project_test.py`, `luna_runner.py`, `lib/`, `luna.version`) leave `testing/`
+only `luna.version` leaves `testing/` (a user project's `make test` is `luna test` on the project's own manifests, no runner)
 for the zip, and that path moves to native `luna test` under the
 two-audiences rule.
 

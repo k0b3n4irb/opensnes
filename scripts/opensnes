@@ -181,6 +181,7 @@ MAIN_C
 
 write_template_game() {
     local dir="$1"
+    local leaf; leaf="$(basename "$dir")"   # the ROM is <leaf>.sfc (write_makefile)
 
     cat > "$dir/main.c" << 'MAIN_C'
 #include <snes.h>
@@ -229,26 +230,40 @@ int main(void) {
 }
 MAIN_C
 
-    # Test scaffold: one declared boot test. Seed the baselines with
+    # Test scaffold: two luna manifests. Seed the visual baseline with
     # `make test-update` (or `opensnes test --update`), then `make test`.
     mkdir -p "$dir/test"
-    cat > "$dir/test/manifest.toml" << 'MANIFEST'
-# Project tests — run with `make test`, rebaseline with `make test-update`.
+    cat > "$dir/test/boot.toml" << MANIFEST
+# A project test: \`make test\` runs every test/*.toml in luna (\`luna test\`),
+# \`make test-update\` rewrites the visual baselines (asserts.fbhash).
 # Docs: OpenSNES GETTING_STARTED.md, section "Test your game".
 
-default_steps = 3_000_000
+rom = "../${leaf}.sfc"
+frames = 180                      # run until PPU frame 180, then judge
 
-# Boot test: visual baseline (fbhash) + WRAM asserts by symbol name.
-# Assert values are little-endian hex bytes (s16 120 -> "7800").
-[tests.boot]
-assert = ["player_x.main = 7800", "player_y.main = 6400"]   # file-scope statics read name.<file> in the .sym
+[asserts]
+fbhash = ""                       # the frame's hash; \`make test-update\` fills it
 
-# Input-driven example: hold RIGHT for 60 frames (frames 30-89), then
-# check the player moved. Input format is "frame:buttons_hex" (RIGHT is
-# 0x100). Uncomment and adjust the expected bytes for your game logic.
-# [tests.walk_right]
-# input = "30:0x100,90:0"
-# assert = ["player_x.main = b400"]   # 120 + 60 = 180 = 0x00B4
+# WRAM values at the end, by symbol name from the ROM's .sym. A file-scope
+# static reads name.<file>: player_x of main.c is "player_x.main".
+[[checkpoint]]
+at_frame = 180
+[checkpoint.values]
+"player_x.main" = 120
+"player_y.main" = 100
+MANIFEST
+    cat > "$dir/test/walk_right.toml" << MANIFEST
+# Input-driven: hold RIGHT from frame 30 to 89 (0x100 is RIGHT), then check
+# the player moved 60 pixels. No fbhash: the values are the oracle.
+rom = "../${leaf}.sfc"
+frames = 150
+input = "30:0x100,90:0"
+
+[[checkpoint]]
+at_frame = 150
+[checkpoint.values]
+"player_x.main" = 180             # 120 + 60
+"player_y.main" = 100
 MANIFEST
 }
 

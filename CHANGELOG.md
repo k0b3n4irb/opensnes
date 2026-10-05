@@ -103,6 +103,15 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **A project's `make test` is `luna test`** (build): the tests of a user
+  project are luna's own manifests, one `test/<name>.toml` each (`rom`,
+  `frames`, `input`, `[[checkpoint]]` values by symbol name,
+  `asserts.fbhash`), run by the pinned luna (`LUNA ?=`); `make test-update`
+  rewrites the visual baselines in place. The game template ships
+  `test/boot.toml` and `test/walk_right.toml`. `testing/project_test.py`,
+  its `default_steps` / `steps` format and the `test/baselines.json` are
+  gone, and the release zip ships nothing of `testing/` but
+  `luna.version`.
 - refactor(examples): 28 of the 50 hand-written `data.asm` are gone and 13
   more hold only what no tool converts (tmx2snes levels, HDMA and sine
   tables, assembly helpers, binary fonts, RAM sections): 43 examples convert

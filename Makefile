@@ -330,7 +330,7 @@ test-pal:
 
 # User-project test story (init → build → test-update → test → FAIL path),
 # exactly as a user runs it. Was CI-only until 2026-09-11, when a harness
-# rename broke project_test.py and `make tests` stayed green — the gate a
+# rename broke the project test runner and `make tests` stayed green — the gate a
 # contributor runs must include everything CI runs. The deliberately wrong
 # assert must make `make test` exit non-zero. The sed is done in Python so
 # the target behaves the same on macOS (BSD sed) and Linux.
@@ -341,7 +341,7 @@ test-project:
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test-update >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test
-	@python3 -c "import pathlib; p = pathlib.Path('$(TEST_PROJECT_DIR)/test/manifest.toml'); p.write_text(p.read_text().replace('player_x.main = 7800', 'player_x.main = 9999'))"
+	@sed -i 's/^"player_x.main" = 120$$/"player_x.main" = 9999/' $(TEST_PROJECT_DIR)/test/boot.toml
 	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test >/dev/null 2>&1; then \
 		echo "ERROR: broken assert did not fail 'make test'"; exit 1; fi
 	@echo "user-project test story: OK (incl. the FAIL path)"
@@ -580,13 +580,10 @@ release: all
 	@# objects, so the user's first `make` linked nothing.
 	@git ls-files starter | tar -cf - -T - | tar -xf - -C $(RELEASE_DIR)/opensnes
 	@# Project test harness (`make test` in user projects) + the pinned-luna
-	@# installer. Only the pieces project_test.py imports — not the SDK's
+	@# installer. Only luna.version — a project's `make test` is `luna test` — not the SDK's
 	@# corpus manifest/baselines.
-	@mkdir -p $(RELEASE_DIR)/opensnes/testing/lib
-	@mkdir -p $(RELEASE_DIR)/opensnes/scripts
-	@cp testing/project_test.py testing/luna_runner.py \
-		testing/luna.version $(RELEASE_DIR)/opensnes/testing/
-	@cp testing/lib/*.py $(RELEASE_DIR)/opensnes/testing/lib/
+	@mkdir -p $(RELEASE_DIR)/opensnes/testing
+	@cp testing/luna.version $(RELEASE_DIR)/opensnes/testing/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
 	@# Every devtools script make/common.mk runs on a user build (post-link
 	@# ratchets and lints). The list is read from common.mk itself: until

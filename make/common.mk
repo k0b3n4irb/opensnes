@@ -691,21 +691,27 @@ endif
 		$(if $(filter 1,$(SKIP_ASSET_BUDGET)),--no-assets,)
 
 #------------------------------------------------------------------------------
-# Project tests — opt-in by presence of test/manifest.toml (no flag needed).
-# `make test` runs the project's declared tests against the built ROM with
-# the pinned luna; `make test-update` (re)writes the project-local baselines.
-# See docs/GETTING_STARTED.md ("Test your game") for the manifest format.
+# Project tests — opt-in by presence of test/*.toml (no flag needed): luna's
+# own manifests (`luna test`), one per test. `make test` runs them against
+# the built ROM with the pinned luna; `make test-update` rewrites their
+# visual baselines (asserts.fbhash). Nothing interpreted runs here (the
+# two-audiences rule). See docs/GETTING_STARTED.md ("Test your game").
 #------------------------------------------------------------------------------
 
+LUNA ?= $(OPENSNES)/testing/bin/luna
+
 test test-update: $(TARGET)
-	@if [ ! -f test/manifest.toml ]; then \
-		echo "No test manifest: this project declares no tests."; \
-		echo "Create test/manifest.toml — see docs/GETTING_STARTED.md,"; \
-		echo "section 'Test your game' (manifest format + baselines)."; \
+	@if ! ls test/*.toml >/dev/null 2>&1; then \
+		echo "No tests: this project declares none."; \
+		echo "Create test/<name>.toml — see docs/GETTING_STARTED.md,"; \
+		echo "section 'Test your game' (a luna manifest per test)."; \
 		exit 1; \
 	fi
-	@python3 $(OPENSNES)/testing/project_test.py \
-		--rom $(TARGET) $(if $(filter test-update,$@),--update)
+	@if [ ! -x "$(LUNA)" ]; then \
+		echo "luna not found at $(LUNA): run $(OPENSNES)/scripts/install-luna.sh (or set LUNA=/path/to/luna)."; \
+		exit 1; \
+	fi
+	@$(LUNA) test --jobs 0 $(if $(filter test-update,$@),--update) test/
 
 #------------------------------------------------------------------------------
 # Cleanup

@@ -170,7 +170,7 @@ never could. **These checks now live as native luna manifests under
 Python probes that pioneered them were deleted after the migration —
 `lib/probes.py` is the `luna state --assert` / `--peek`
 helper every runtime ROM checker imports (`from lib import assert_mem`) (`testing/fixtures/compiler/*`,
-`testing/fixtures/libtests`, `project_test.py`); the `run_all.py` runner that globbed
+`testing/fixtures/libtests`; `project_test.py` too, until a project's `make test` became `luna test` on 2026-10-05); the `run_all.py` runner that globbed
 the emptied directory was deleted on 2026-09-14. Same coverage, declarative form:
 
 - **Coprocessor execution** (`manifests/coproc_*.toml`) — SA-1, Super FX

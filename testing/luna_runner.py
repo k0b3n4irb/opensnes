@@ -209,10 +209,8 @@ def render(luna: str, rom: Path, frame: int, out_png: Path, *,
     """Render `rom` at PPU frame `frame`; return (fbhash, wdm_fired).
 
     `steps=N` bounds the run at N instructions (`-n N`) instead and ignores
-    `frame`. User-project tests (project_test.py) still key on instruction
-    counts: their manifests document `steps`, and their input-driven tests
-    cannot move to `--until-frame` until luna applies `--input` under it
-    (open observation, status/luna_stress_campaign.md).
+    `frame` (no caller in the harness since user-project tests became luna
+    manifests, 2026-10-05; kept for an ad-hoc render).
 
     fbhash = luna's `--print-fbhash` (a hash of the pre-PNG pixels luna documents
     as cross-architecture-stable) — the regression key, immune to PNG-encoder
