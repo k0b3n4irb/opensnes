@@ -1,0 +1,15 @@
+# The sprite-palette plan. The OBJ palettes are the axis that grows as the
+# game gains NPCs, enemies and items — where a planner earns its keep: each
+# gets a collision-free sprite slot, and palettes.inc names the CGRAM index
+# and the OAM palette number, so main.c never hard-codes a 128 or a 144.
+# Add a villager here and the slots stay correct for free.
+#
+# (The BG palettes are managed differently — the two scenes SWAP the same
+#  slot 0 at runtime and the text layer owns slot 1 via setColor(), a
+#  dynamic layout a static plan deliberately does not model.)
+# hero.pal is written by the conversion of hero.png; the build runs the plan
+# after the pictures' conversions.
+tool = "opensnes-palette"
+
+[plan]
+sprite = ["hero.pal", "npc.pal"]

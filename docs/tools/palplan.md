@@ -1,5 +1,8 @@
 # palplan — project shared-palette planner {#tools_palplan}
 
+> **1.x:** the same planner is `opensnes-palette plan` (@ref tools_opensnes_palette), with a
+> settings file beside the asset; this tool stays shipped for one more version.
+
 The SNES gives you exactly **8 background palettes and 8 sprite palettes** of 16
 colours each — 256 CGRAM entries, no more. Every `.pal` your game loads has to
 land in one of those slots, at a CGRAM colour index you pass to `dmaCopyCGram`.

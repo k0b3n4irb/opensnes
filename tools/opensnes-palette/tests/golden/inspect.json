@@ -1,0 +1,1 @@
+{"tool": "opensnes-palette", "version": "1.0.0", "palettes": [{"input": "hud.pal", "colors": 4, "distinct": 4, "black": 1, "slots": 1, "bytes": 8}, {"input": "hero.pal", "colors": 16, "distinct": 16, "black": 1, "slots": 1, "bytes": 32}]}

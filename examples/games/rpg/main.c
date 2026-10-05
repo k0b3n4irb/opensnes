@@ -72,7 +72,7 @@
 #include <snes/panel.h>
 
 #include "res/entities.inc"     /* SPAWN/CHEST/NPC_TABLE from the .tmj */
-#include "res/palplan.h"        /* PAL_HERO_* / PAL_NPC_* — sprite-slot plan */
+#include "res/palettes.inc"     /* PAL_HERO_* / PAL_NPC_* — the sprite-slot plan (opensnes-palette) */
 
 /** @brief A villager: where it stands and what it says. The struct
  * shape and the rows both come from the Entities layer of town.tmj, so
@@ -376,7 +376,7 @@ int main(void) {
     build_panel();
 
     /* OBJ: hero and villager share the tiles, one palette slot each.
-     * The CGRAM offsets come from res/palplan.h — palplan assigned the
+     * The CGRAM offsets come from res/palettes.inc — the plan assigned the
      * slots, so these never collide even as more sprite palettes appear. */
     dmaCopyVram(hero_tiles, VRAM_HERO, (u16)(hero_tiles_end - hero_tiles));
     dmaCopyCGram(hero_pal, PAL_HERO_CGRAM, 32);   /* OBJ slot PAL_HERO_SLOT */

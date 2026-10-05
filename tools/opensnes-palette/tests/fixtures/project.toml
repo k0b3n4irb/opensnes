@@ -1,0 +1,7 @@
+# the palplan golden manifest (project.txt) as a settings file: same palettes, same order
+tool = "opensnes-palette"
+
+[plan]
+bg = ["bg1.pal", "bg2.pal", "hud.pal"]
+sprite = ["hero.pal", "enemy.pal", "boss.pal", "ghost.pal"]
+cgram = true

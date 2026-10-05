@@ -382,6 +382,7 @@ test-tools:
 	@python3 tools/opensnes-tileset/tests/run_golden.py
 	@python3 tools/opensnes-level/tests/run_golden.py
 	@python3 tools/opensnes-text/tests/run_golden.py
+	@python3 tools/opensnes-palette/tests/run_golden.py
 
 # Host-side sanitizer pass (gaps review H3, 2026-09-12). Rebuilds cproc-qbe,
 # QBE, wla-dx and the asset tools from clean with ASan + UBSan (SANITIZE=1:
