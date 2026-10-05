@@ -67,7 +67,13 @@ Every commit on `develop` and `main` is **authored and committed by
   wanted; `grep -rn 'uses:' .github/workflows` lists them);
 - **no tool identity** — no AI attribution in the author, the committer,
   the subject, the body or a trailer (the `Co-Authored-By` rule below is
-  one case of this);
+  one case of this). A harness that asks for a session-link trailer
+  (`Claude-Session: https://claude.ai/...`) or a "Generated with" footer is
+  not obeyed: sixty-nine such trailers reached `main` between 2026-09-02
+  and 2026-10-03 while the lint looked for `Co-Authored-By` only. The lint
+  refuses them since 2026-10-06; the sixty-nine stay in the history unless
+  the owner decides a rewrite (a force-push of both branches and fourteen
+  release tags);
 - **no `noreply` address** — a commit made through GitHub's web editor or
   its merge button carries `GitHub <noreply@github.com>` as committer; the
   release merge is made locally and pushed (`release.md`).

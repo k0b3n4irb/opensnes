@@ -18,8 +18,10 @@ Implements the rules documented in .claude/rules/commits.md:
      anything real. Style consistency across the history isn't worth the
      external-contributor friction.
 
-  2. Body must NOT contain a `Co-Authored-By:` (or `Co-authored-by:`) trailer.
-     The project does not want AI attribution in git history — see commits.md.
+  2. Body must NOT contain a `Co-Authored-By:` (or `Co-authored-by:`) trailer,
+     nor any other signature of a tool: a `Claude-Session:` trailer, a
+     claude.ai link, a "Generated with ..." footer. The project does not
+     want AI attribution in git history — see commits.md.
 
   3. Author and committer are the maintainer, `k0b3n4irb <k0b3n4irb@gmail.com>`
      (AUTHOR_NAME / AUTHOR_EMAILS below). No bot (`dependabot[bot]`,
@@ -108,6 +110,14 @@ SUBJECT_RE = re.compile(
     r"^(?P<type>[a-z]+)(?:\((?P<scope>[a-z0-9_/, -]+)\))?(?P<bang>!)?: (?P<desc>.+)$"
 )
 COAUTHOR_RE = re.compile(r"^\s*co-authored-by\s*:", re.IGNORECASE | re.MULTILINE)
+# Any other line by which a tool signs a message: a session link trailer, a
+# "Generated with" footer. Sixty-nine `Claude-Session:` trailers reached main
+# between 2026-09-02 and 2026-10-03 because the lint looked for one spelling
+# of attribution only (commits.md, "One author").
+TOOL_TRAILER_RE = re.compile(
+    r"^\s*(claude-session\s*:|generated (with|by) \[?(claude|chatgpt|copilot|cursor|gemini)|"
+    r".*https?://claude\.ai/|.*\bnoreply@anthropic\.com)",
+    re.IGNORECASE | re.MULTILINE)
 RELEASE_MERGE_RE = re.compile(r"^release: v\d+\.\d+\.\d+$")
 
 
@@ -218,6 +228,12 @@ def check_body(body: str) -> list[str]:
         errors.append(
             "body contains a `Co-Authored-By:` trailer "
             "(forbidden by .claude/rules/commits.md)"
+        )
+    m = TOOL_TRAILER_RE.search(body)
+    if m:
+        errors.append(
+            f"body carries a tool's signature ({m.group(0).strip()[:60]!r}) — no session link, "
+            "no 'Generated with' line, no tool attribution of any kind (.claude/rules/commits.md, One author)"
         )
     return errors
 
