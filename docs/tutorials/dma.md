@@ -226,7 +226,7 @@ setScreenOn();
 | `dmaCopyCGramBank` | **Removed** (2026-10-05). Use `dmaCopyCGram`. |
 | `dmaCopyOam(src, size)` | One-shot OAM transfer, write `$2104`. Mostly used at init — the NMI handler does the per-frame OAM DMA automatically. |
 | `dmaCopyVramMode7(tilemap, mapSize, tiles, tilesSize)` | Two-pass interleaved DMA for Mode 7's split low-byte/high-byte VRAM layout. See the [Mode 7 tutorial](mode7.md). |
-| `dmaTransfer(channel, mode, srcBank, srcAddr, destReg, size)` | Generic DMA — pick your own channel, mode, destination register. Use when the named helpers don't fit (e.g., transfers to `$2180` WRAM data port, or experimental modes). |
+| `dmaTransfer(channel, mode, src, destReg, size)` | Generic DMA — pick your own channel, mode, destination register; the bank comes from `src`. Use when the named helpers don't fit (e.g., transfers to `$2180` WRAM data port, or experimental modes). Until 0.48 it took the bank and the address as two arguments. |
 
 ## Gotchas
 

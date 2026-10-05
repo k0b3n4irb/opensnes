@@ -192,18 +192,24 @@ void dmaCopyOam(const u8 *source, u16 size);
 /**
  * @brief Perform generic DMA transfer
  *
- * @param channel DMA channel (0-7)
- * @note The source is passed as a separate bank and 16-bit address — a shape
- *       that predates far pointers. It is slated to become a single
- *       `const u8 *src` at the next major version (API audit 2026-09-20, §3.1);
- *       the split form stays until then.
+ * Programs one channel and starts it at once: use it when no named helper
+ * fits (the WRAM data port, an experimental mode). The source's bank comes
+ * from the far pointer, like every other `dmaCopy*` call — until 0.48 this
+ * function took the bank and the 16-bit address as two arguments (the 1.0
+ * API since 2026-10-05; a six-argument call no longer compiles, see
+ * docs/UPGRADING.md). A channel above 7 is refused.
  *
- * @param mode DMA mode byte
- * @param srcBank Source bank
- * @param srcAddr Source address
- * @param destReg Destination B-bus register
- * @param size Transfer size
+ * @param channel DMA channel (0-7)
+ * @param mode DMA mode byte (DMAP: transfer pattern, direction, fixed source)
+ * @param src Source, in any bank (ROM, bank $7E RAM, FAR data)
+ * @param destReg Destination B-bus register (the low byte of $21xx)
+ * @param size Transfer size in bytes (0 = 65536)
+ *
+ * @code
+ * REG_CGADD = 254;
+ * dmaTransfer(1, 0x00, two_colours, 0x22, 4);   // 2 colours to CGDATA
+ * @endcode
  */
-void dmaTransfer(u8 channel, u8 mode, u8 srcBank, u16 srcAddr, u8 destReg, u16 size);
+void dmaTransfer(u8 channel, u8 mode, const u8 *src, u8 destReg, u16 size);
 
 #endif /* OPENSNES_DMA_H */

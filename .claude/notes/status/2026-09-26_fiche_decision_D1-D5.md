@@ -215,3 +215,10 @@ les en-têtes (seule la macro reste dans `types.h`) ; les pragmas des trois
 fixtures sont partis avec. `check-upgrade` continue de lister chaque appel.
 Restent F (`dmaTransfer`) et I (macros 1.0.0, après la session console).
 
+**Lot F fait, 2026-10-05 (soir).** `dmaTransfer(channel, mode, const u8 *src,
+destReg, size)` : la banque vient du pointeur lointain, comme chaque
+`dmaCopy*` ; la forme à six arguments ne compile plus (rien de silencieux).
+Un seul appel dans le dépôt (la fixture, vecteur CGRAM 254-255 inchangé).
+`compiler/ABI.md` ne citait pas le prototype. Reste I (macros 1.0.0, après
+la session console).
+

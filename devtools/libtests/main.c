@@ -673,7 +673,7 @@ static void coverage_lot_b(void) {
     dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;
-    dmaTransfer(1, 0x00, (u8)((u32)(const void *)lotb_pal2 >> 16), (u16)(u32)(const void *)lotb_pal2, 0x22, 4);
+    dmaTransfer(1, 0x00, lotb_pal2, 0x22, 4);   /* far pointer: the bank travels with it */
     oamSetTile(3, 0x1AB);                   /* OAM byte 14 = 0xAB, byte 15 bit 0 = 1 */
     WaitForVBlank();
     dmaCopyOam(oamMemory, 544);             /* what the NMI does, done by hand */

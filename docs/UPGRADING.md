@@ -7,12 +7,13 @@ compiles, and `make check-upgrade SRC=<folder>` reads a whole project) and
 is gone at 1.0. Nothing else of the public API changes at 1.0, and nothing changes
 again before 2.0.
 
-**Where `develop` stands (2026-10-05, lots B, C and E of the plan):** the
+**Where `develop` stands (2026-10-05, lots B, C, E and F of the plan):** the
 constants of section 3, the `OAM_SET_GFX_BANK` macro and the twenty-six
 renamed functions of section 2 are gone from the headers — a project that
 names one no longer compiles, and `make check-upgrade` reports each use from
 `devtools/removed_api.txt`. `hdmaEnable()` / `hdmaDisable()` already take a
-channel number (section 1); no `OPENSNES_DEPRECATED` declaration is left.
+channel number and `dmaTransfer()` takes a far pointer (section 1); no
+`OPENSNES_DEPRECATED` declaration is left.
 
 Two things on this page are not removals but **changes of meaning**: read
 them first. Everything else is a rename where the old and new name do the
@@ -35,6 +36,18 @@ enabled), so `0x40`, `0x0F`, `0xFF` and `1 << 6` fail visibly, but the masks
 hdmaEnable(1 << HDMA_CHANNEL_6);      /* 0.x: mask. 1.0: refused (64 > 7) */
 hdmaEnableMask(1 << HDMA_CHANNEL_6);  /* 0.48+: the mask, by its name     */
 hdmaEnable(HDMA_CHANNEL_6);           /* 1.0: the channel                 */
+```
+
+### `dmaTransfer()` takes the source as one far pointer at 1.0
+
+Until 0.48 the generic transfer took the bank and the 16-bit address as
+two arguments; since 1.0 the source is a `const u8 *`, whose bank byte the
+function reads, like every `dmaCopy*` helper. A six-argument call no longer
+compiles (one argument too many), so nothing changes silently.
+
+```c
+dmaTransfer(1, 0x00, bank, addr, 0x22, 4);   /* 0.x */
+dmaTransfer(1, 0x00, table, 0x22, 4);        /* 1.0: the far pointer */
 ```
 
 ### `mode7SetScale(0x0100)` is 1:1 since 0.47

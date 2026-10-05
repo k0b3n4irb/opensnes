@@ -14,6 +14,11 @@ All notable changes to OpenSNES are documented in this file.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **`dmaTransfer(channel, mode, src, destReg, size)` takes the source as
+  one far pointer** (lot F of the 1.0 plan): the bank comes from the
+  pointer, like every `dmaCopy*` helper; the six-argument form of 0.x no
+  longer compiles. The fixture's CGRAM vector keeps it covered;
+  `check-upgrade` names the call.
 - **`hdmaEnable(channel)` / `hdmaDisable(channel)` take a channel number**
   (lot E of the 1.0 plan, API decision D1 second step): 0-7 like the other
   twenty functions of `hdma.h`; a value above 7 is refused and changes

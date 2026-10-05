@@ -98,10 +98,10 @@ If bank $00 still runs out (code plus hand-written asm payload):
   instead of a bank-$00 `.SECTION` — it takes the same asset banks the
   compiler uses.
 - Payload handed to the lib needs no bank of its own: every `dmaCopy*`
-  helper reads the bank from the far pointer. For a bank computed at
-  runtime, `dmaTransfer(channel, mode, srcBank, srcAddr, destReg, size)`
-  takes it as a parameter. (Deprecated since 2026-09-20:
-  `dmaCopyVramBank` / `dmaCopyCGramBank`, both removed on 2026-10-05.)
+  helper and `dmaTransfer()` read the bank from the far pointer. The 0.x
+  forms `dmaCopyVramBank` / `dmaCopyCGramBank` were removed on 2026-10-05,
+  with the six-argument `dmaTransfer`; a bank computed at runtime is a
+  pointer built from it, `(const u8 *)((u32)bank << 16 | addr)`.
 - Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
   bank-$00 sections.
 
