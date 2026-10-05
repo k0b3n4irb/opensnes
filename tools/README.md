@@ -1,63 +1,58 @@
-# tools/ — Public Tools (Distributed)
+# tools/ — the compiled asset tools (shipped) and the SDK's test harness (not shipped)
 
-These are the **end-user-facing tools** of the OpenSNES SDK, built by
-`make tools` and shipped in the per-OS release archives. Every example
-Makefile in `examples/` calls into them through `make/common.mk`.
+Two families live here today; the review of 2026-10-05
+(`.claude/notes/reviews/2026-10-05_tools_devtools_refactoring.md`) and the
+rule `.claude/rules/two_audiences.md` set the direction: what the **game
+developer** gets is compiled, one tool per function, with no Python; what
+the **contributor** uses stays in the repository and never enters the zip.
 
-For maintainer-only Python scripts (linters, symbol-map analysis,
-benchmark, BRR↔IT conversion), see `devtools/`.
+## Shipped: the asset tools
 
-## Available tools
+Built by `make tools`, installed in `bin/`, copied into every release zip.
+`make/common.mk` calls them on a user's `make`; each one prints `--help`,
+has a page under `docs/tools/`, and a golden-output suite under `tests/`
+(`make test-tools` runs the eight suites; `tools/fuzz/` fuzzes their
+parsers).
 
-| Path | Role | Used by |
-|------|------|---------|
-| [`gfx4snes/`](gfx4snes/) | PNG/BMP → SNES tiles, palettes, tilemaps (2bpp / 4bpp / 8bpp; LZ77; tile dedup) | every example with graphics, via `GFXSRC` in `make/common.mk` |
-| [`font2snes/`](font2snes/) | PNG → 2bpp / 4bpp font tiles (compiled C version) | text-rendering pipeline |
-| [`smconv/`](smconv/) | Impulse Tracker (`.it`) → SNESMOD soundbank for SPC700 | every audio example, via `USE_SNESMOD` |
-| [`wav2brr/`](wav2brr/) | PCM `.wav` → SNES `.brr` sample (one-shot / looping SFX, voice) | `.brr` `.incbin`'d + loaded via `audioLoadSample`, e.g. `examples/audio/soundboard` |
-| [`img2snes/`](img2snes/) | RGB / RGBA PNG → indexed PNG (quantize, BGR555 round, scale) | upstream of `gfx4snes` for assets authored in RGB. No example currently calls it from a Makefile — it is a manual artist-pipeline step run before committing PNGs. |
-| [`tmx2snes/`](tmx2snes/) | Tiled (`.tmx`) → SNES tilemap | `examples/maps/tiled` |
-| [`sa1-patch/`](sa1-patch/) | Patch SA-1 ROM header byte | post-link step in `make/common.mk` for SA-1 examples |
-| [`luna-test/`](luna-test/) | luna-driven test harness (runner, manifest, baselines, probes) | `make tests` — the project's main validation gate |
+| Path | Role | Version | In your build | Doc |
+|------|------|---------|---------------|-----|
+| [`gfx4snes/`](gfx4snes/) | indexed PNG/BMP → tiles, palettes, tilemaps, metasprite tables (2/4/8 bpp, LZ77, dedup) | 2.0.0 | automatic via `GFXSRC` | `docs/tools/gfx4snes.md` |
+| [`smconv/`](smconv/) | Impulse Tracker `.it` → SNESMOD soundbank for the SPC700 | 2.1.0 | automatic via `USE_SNESMOD` | `docs/tools/smconv.md` |
+| [`wav2brr/`](wav2brr/) | PCM `.wav` → `.brr` sample (one-shot or looping) | 1.0.0 | automatic for `res/*.wav` | `docs/tools/wav2brr.md` |
+| [`tmx2snes/`](tmx2snes/) | Tiled `.tmj` map → tilemap, collision, objects | 1.0.1 | one line in the project Makefile | `docs/tools/tmx2snes.md` |
+| [`aseprite2snes/`](aseprite2snes/) | Aseprite JSON export → `AnimClip` tables, one per tag | 1.0.0 | one line per sprite | `docs/tools/aseprite2snes.md` |
+| [`font2snes/`](font2snes/) | 96-glyph font PNG → 2/4 bpp text tiles | 1.0.0 | by hand, once | `docs/tools/font2snes.md` |
+| [`img2snes/`](img2snes/) | RGB/RGBA PNG → indexed PNG (quantize, BGR555 rounding, scale) | 1.0.0 | by hand, before committing art | `docs/tools/img2snes.md` |
+| [`palplan/`](palplan/) | plans a project's `.pal` files into the 8 + 8 CGRAM slots, emits a C header | 1.0.0 | by hand, project-level | `docs/tools/palplan.md` |
+| [`sa1-patch/`](sa1-patch/) | post-link: sets the SA-1 map-mode bits in the ROM header | 1.0.0 | automatic for `USE_SA1=1` | [`sa1-patch/README.md`](sa1-patch/README.md) |
 
-## Naming notes
+Shared code: [`common/`](common/) holds `lodepng` and `cmdparser` (inherited
+from PVSnesLib, licences inside); `font2snes/src/stb_image.h` and
+`tmx2snes/cute_tiled.h` are the other vendored parsers (`ATTRIBUTION.md`).
 
-### `font2snes` is in two places
+These are the 0.x tools. In 1.x they are superseded by the `opensnes-*`
+family (one tool per function, common conventions, TOML settings beside
+each asset — see the rule); each new tool must reproduce the golden suite
+of the tool it absorbs before the old one is retired.
 
-- `tools/font2snes/` — **the production C tool**, distributed in releases.
-  This is what `make/common.mk` invokes.
-- `devtools/font2snes/` — a Python **reference implementation**, used to
-  cross-check the C version's bitplane packing during development. Its
-  README labels it as such.
+## Not shipped: the SDK's test harness
 
-If you are an end user, you want the C version. The Python reference
-exists for SDK maintainers debugging conversion edge cases.
+| Path | Role | Run by |
+|------|------|--------|
+| [`luna-test/`](luna-test/) | the luna-backed harness: corpus runner, WRAM / audio / VRAM-DMA / NMI-budget oracles, 138 `luna test` manifests, baselines, five stress ROMs | `make tests`, CI |
+| [`fuzz/`](fuzz/) | libFuzzer harnesses for the asset tools' parsers | `make fuzz`, `make fuzz-replay`, `fuzz.yml` |
+| `valgrind-static.supp` | suppressions for valgrind on the static binaries (not wired anywhere) | by hand |
 
-## Maintenance artefacts (not distributed, not built)
-
-### `valgrind-static.supp`
-
-A Valgrind suppression file for statically-linked binaries. The file's
-header explains what it suppresses and why (false positives from glibc's
-static-link tcache initialisation). It is **not wired into any Makefile
-or CI workflow** — it is a hand-invoked artefact for maintainers
-debugging memory issues in the static C tools (smconv, cproc-qbe). Use:
-
-```bash
-valgrind --suppressions=tools/valgrind-static.supp ./bin/smconv ...
-```
-
-It lives at `tools/` rather than `devtools/` because the binaries it
-suppresses are tools binaries, but it is otherwise maintainer-only.
-Removing it would lose the institutional memory of what false positives
-to expect from the static-link path.
+Only four files of `luna-test/` reach the zip, because a user project's
+`make test` imports them (`project_test.py`, `luna_runner.py`,
+`probes/lib.py`, `luna.version`); that path moves to native `luna test`
+under the two-audiences rule. The harness itself is planned to move out of
+`tools/` (lot 5 of the review) so that `tools/` means "shipped" again.
 
 ## See also
 
-- [`devtools/README.md`](../devtools/README.md) — maintainer-only Python
-  tooling (symmap, cyclecount, check_mvn, brr2it, font2snes Python ref,
-  gen_hud_bar, benchmark, lint_asm, lint_commits,
-  verify_toolchain, check_doc_drift).
-- [`make/common.mk`](../make/common.mk) — how the per-example Makefiles
-  reach into `tools/` for the asset pipeline.
-- [`README.md`](../README.md) — top-level project overview.
+- [`devtools/README.md`](../devtools/README.md) — the contributor-only
+  scripts: sentinels, lints, fixtures, benches.
+- [`make/common.mk`](../make/common.mk) — how a project Makefile reaches
+  the tools.
+- `docs/tools/README.md` — the user-facing guide to the pipeline.
