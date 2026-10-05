@@ -19,6 +19,38 @@
 #include "cli.h"
 #include "itloader.h"
 #include "it2spc.h"
+#include "report.h"
+
+/* The converter's diagnostics, in the family's shape: errors and warnings
+ * on stderr with the tool's name, the verbose report only under -v, and
+ * every warning kept for the --json "warnings" array. */
+static cli_ctx *g_ctx;
+static char g_warnings[16][256];
+static int g_nwarnings;
+
+static void music_report(smc_level level, const char *file, const char *msg, void *user)
+{
+    (void)user;
+    switch (level) {
+    case SMC_INFO:
+        cli_note(g_ctx, "%s", msg);
+        break;
+    case SMC_NOTE: case SMC_WARNING:
+        cli_warn(g_ctx, file, "%s", msg);
+        if (g_nwarnings < 16) snprintf(g_warnings[g_nwarnings++], sizeof g_warnings[0], "%s", msg);
+        break;
+    case SMC_ERROR: case SMC_FATAL:
+        cli_error(g_ctx, file, "%s", msg);
+        break;
+    }
+}
+
+static void json_warnings(cli_ctx *ctx)
+{
+    cli_json_array(ctx, "warnings");
+    for (int i = 0; i < g_nwarnings; i++) cli_json_str(ctx, NULL, g_warnings[i]);
+    cli_json_close(ctx);
+}
 
 /* Bytes a module may take: 64 KB minus the driver and its module base
  * ($18CA), minus the two 616-byte headers it2spc.c subtracts when it
@@ -30,13 +62,8 @@ static itl_bank_t *load_modules(cli_ctx *ctx, const char **files, int n, int *rc
     itl_bank_t *bank = itl_bank_create(files, n);
     *rc = CLI_OK;
     if (!bank) { cli_error(ctx, files[0], "cannot load the modules"); *rc = CLI_IO; return NULL; }
-    for (int i = 0; i < bank->module_count; i++) {
-        if (bank->modules[i]->invalid) {
-            cli_error(ctx, bank->modules[i]->filename,
-                      "not a readable Impulse Tracker module — export it from the tracker as .it (IMPM), uncompressed or IT 2.14");
-            *rc = CLI_REFUSED;
-        }
-    }
+    for (int i = 0; i < bank->module_count; i++)
+        if (bank->modules[i]->invalid) *rc = CLI_REFUSED;   /* the converter has said why, in the family's shape */
     if (*rc != CLI_OK) { itl_bank_destroy(bank); return NULL; }
     return bank;
 }
@@ -66,32 +93,67 @@ static void json_modules(cli_ctx *ctx, const itl_bank_t *bank, const spc_bank_t 
 
 /* ------------------------------------------------------------------ bank */
 
+static int ends_with(const char *s, const char *suffix)
+{
+    size_t ls = strlen(s), lx = strlen(suffix);
+    return ls > lx && strcmp(s + ls - lx, suffix) == 0;
+}
+
 static const cli_opt bank_opts[] = {
+    { "inputs", 0, CLI_LIST, "FILES", "the modules of a composed soundbank, in NAME.toml (`bank NAME.toml`); relative to that file", NULL },
     { "name", 0, CLI_STR, "NAME", "base name of the outputs and prefix of the symbols", "the first module's name, or soundbank for several" },
     { "bank", 0, CLI_INT, "N", "ROM bank the soundbank data is linked in", "1" },
     { "same-size", 0, CLI_FLAG, NULL, "check every module's SPC RAM size against the first one's (a sound-effect bank)", NULL },
     CLI_OPT_OUT,
+    CLI_OPT_SAVE,
 };
 
 static int run_bank(cli_ctx *ctx)
 {
     int rc;
-    itl_bank_t *bank = load_modules(ctx, ctx->args, ctx->nargs, &rc);
+    g_ctx = ctx;
+    /* A composed asset: `bank soundbank.toml` — the file names the modules
+     * (inputs = [...], relative to it) and carries the settings; the outputs
+     * take its name and sit beside it. */
+    const char *files[CLI_MAX_ARGS];
+    int nfiles = ctx->nargs;
+    char listbuf[2048], resolved[CLI_MAX_ARGS][1024], name[256];
+    const char *anchor = ctx->args[0];
+    int composed = ctx->nargs == 1 && ends_with(ctx->args[0], ".toml");
+    if (composed) {
+        rc = cli_load_settings_path(ctx, ctx->args[0]);
+        if (rc != CLI_OK) return rc;
+        const char *words[CLI_MAX_ARGS];
+        nfiles = cli_list(ctx, "inputs", listbuf, sizeof listbuf, words, CLI_MAX_ARGS);
+        if (nfiles == 0) { cli_error(ctx, ctx->args[0], "no `inputs = [\"a.it\", ...]` under [bank] — nothing to convert"); return CLI_REFUSED; }
+        const char *slash = strrchr(ctx->args[0], '/');
+        int dirlen = slash ? (int)(slash - ctx->args[0] + 1) : 0;
+        for (int i = 0; i < nfiles; i++) {
+            if (words[i][0] == '/') snprintf(resolved[i], sizeof resolved[i], "%s", words[i]);
+            else snprintf(resolved[i], sizeof resolved[i], "%.*s%s", dirlen, ctx->args[0], words[i]);
+            files[i] = resolved[i];
+        }
+        cli_stem(ctx->args[0], name, sizeof name);
+    } else {
+        for (int i = 0; i < nfiles; i++) files[i] = ctx->args[i];
+    }
+    itl_bank_t *bank = load_modules(ctx, files, nfiles, &rc);
     if (!bank) return rc;
 
-    char name[256];
-    if (cli_has(ctx, "name")) snprintf(name, sizeof name, "%s", cli_str(ctx, "name", "soundbank"));
-    else if (ctx->nargs == 1) cli_stem(ctx->args[0], name, sizeof name);
-    else snprintf(name, sizeof name, "soundbank");
+    if (!composed) {
+        if (cli_has(ctx, "name")) snprintf(name, sizeof name, "%s", cli_str(ctx, "name", "soundbank"));
+        else if (nfiles == 1) cli_stem(files[0], name, sizeof name);
+        else snprintf(name, sizeof name, "soundbank");
+    }
     int banknum = cli_int(ctx, "bank", 1);
     if (banknum < 1 || banknum > 255) {
-        cli_error(ctx, ctx->args[0], "--bank %d is not a ROM bank the data can live in (1 to 255; bank 0 holds the code)", banknum);
+        cli_error(ctx, anchor, "--bank %d is not a ROM bank the data can live in (1 to 255; bank 0 holds the code)", banknum);
         itl_bank_destroy(bank);
         return CLI_REFUSED;
     }
     char base[1024], probe[1024];
-    /* the base path: cli_output_path on a fake "<name>.x" beside the first input or in --out */
-    snprintf(probe, sizeof probe, "%s", ctx->args[0]);
+    /* the base path: cli_output_path on a fake "<name>.x" beside the anchor (first input or the .toml) or in --out */
+    snprintf(probe, sizeof probe, "%s", anchor);
     char *slash = strrchr(probe, '/');
     if (slash) snprintf(slash + 1, sizeof probe - (size_t)(slash + 1 - probe), "%s.it", name);
     else snprintf(probe, sizeof probe, "%s.it", name);
@@ -104,6 +166,22 @@ static int run_bank(cli_ctx *ctx)
             cli_warn(ctx, bank->modules[i]->filename, "needs %u bytes of SPC RAM, more than the %d a module may take — drop samples or patterns",
                      out->modules[i]->totalsize, SPC_RAM_FOR_MUSIC);
     spc_bank_export(out, base, true, name, banknum);
+
+    if (cli_has(ctx, "save") && !composed) {
+        /* the composed form of this run: NAME.toml beside the outputs, listing the modules */
+        char toml[1100], list[2048] = "";
+        snprintf(toml, sizeof toml, "%s.toml", base);
+        for (int i = 0; i < nfiles; i++) {
+            const char *bn = strrchr(files[i], '/') ? strrchr(files[i], '/') + 1 : files[i];
+            size_t l = strlen(list);
+            snprintf(list + l, sizeof list - l, "%s%s", l ? " " : "", bn);
+        }
+        int idx = -1;
+        for (int i = 0; i < ctx->cmd->nopts; i++) if (strcmp(ctx->cmd->opts[i].name, "inputs") == 0) idx = i;
+        if (idx >= 0) ctx->given[idx] = list;
+        rc = cli_save_settings_path(ctx, toml, name);
+        if (rc != CLI_OK) { spc_bank_destroy(out); itl_bank_destroy(bank); return rc; }
+    }
 
     if (ctx->json) {
         cli_json_begin(ctx);
@@ -118,6 +196,7 @@ static int run_bank(cli_ctx *ctx)
         }
         cli_json_close(ctx);
         json_modules(ctx, bank, out);
+        json_warnings(ctx);
         cli_json_end(ctx);
     } else if (!ctx->quiet) {
         printf("%s: %s.asm, %s.h, %s.bnk (%d module%s, %d BRR source%s, bank %d)\n", ctx->tool->name,
@@ -136,6 +215,7 @@ static const cli_opt spc_opts[] = { CLI_OPT_OUT };
 static int run_spc(cli_ctx *ctx)
 {
     int worst = CLI_OK;
+    g_ctx = ctx;
     if (ctx->json) { cli_json_begin(ctx); cli_json_array(ctx, "files"); }
     for (int i = 0; i < ctx->nargs; i++) {
         int rc;
@@ -164,12 +244,14 @@ static int run_spc(cli_ctx *ctx)
 static int run_inspect(cli_ctx *ctx)
 {
     int rc;
+    g_ctx = ctx;
     itl_bank_t *bank = load_modules(ctx, ctx->args, ctx->nargs, &rc);
     if (!bank) return rc;
     spc_bank_t *out = spc_bank_create(bank, false, false);
     if (ctx->json) {
         cli_json_begin(ctx);
         json_modules(ctx, bank, out);
+        json_warnings(ctx);
         cli_json_end(ctx);
     } else {
         for (int i = 0; i < bank->module_count; i++) {
@@ -194,7 +276,7 @@ static int run_inspect(cli_ctx *ctx)
 
 static const cli_cmd cmds[] = {
     { "bank", "Impulse Tracker modules -> NAME.asm + NAME.h + NAME.bnk, the soundbank the SNESMOD driver plays",
-      bank_opts, CLI_N(bank_opts), "bank music/theme.it music/jingle.it --name soundbank --bank 1", 1, run_bank },
+      bank_opts, CLI_N(bank_opts), "bank music/theme.it music/jingle.it --name soundbank --save   (then: bank music/soundbank.toml)", 1, run_bank },
     { "spc", "one standalone .spc per module, for an SPC player", spc_opts, CLI_N(spc_opts),
       "spc music/theme.it --out build/", 1, run_spc },
     { "inspect", "what each module holds and costs in SPC RAM", NULL, 0, "inspect music/*.it --json", 1, run_inspect },
@@ -206,5 +288,6 @@ int main(int argc, char **argv)
         "opensnes-music", TOOL_VERSION,
         "Impulse Tracker (.it) -> SNESMOD soundbank for the SPC700", cmds, CLI_N(cmds),
     };
+    smconv_set_reporter(music_report, NULL);
     return cli_main(&tool, argc, argv);
 }

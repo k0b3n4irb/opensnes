@@ -33,7 +33,8 @@
 enum { CLI_OK = 0, CLI_REFUSED = 1, CLI_USAGE = 2, CLI_IO = 3 };
 
 /* How an option takes its value. */
-typedef enum { CLI_FLAG, CLI_STR, CLI_INT, CLI_INT2 } cli_kind;
+typedef enum { CLI_FLAG, CLI_STR, CLI_INT, CLI_INT2, CLI_LIST } cli_kind;
+/* CLI_LIST: a space-separated list; `["a", "b"]` in the settings file. */
 
 typedef struct {
     const char *name;        /* long name, without the dashes */
@@ -118,6 +119,12 @@ unsigned char *cli_read_file(const cli_ctx *ctx, const char *path, size_t *len);
  * the effective values of the subcommand's options. */
 int cli_load_settings(cli_ctx *ctx, const char *input);
 int cli_save_settings(const cli_ctx *ctx, const char *input);
+/* The same for a composed asset, whose settings file is named after what
+ * it produces (soundbank.toml) and lists its sources under a CLI_LIST key. */
+int cli_load_settings_path(cli_ctx *ctx, const char *path);
+int cli_save_settings_path(const cli_ctx *ctx, const char *path, const char *asset_name);
+/* Split a CLI_LIST value into words (returns the count, at most max). */
+int cli_list(const cli_ctx *ctx, const char *name, char *buf, size_t n, const char **words, int max);
 
 /* --json: one object on stdout. Keys are written in call order. */
 void cli_json_begin(cli_ctx *ctx);                 /* the top-level object, with "tool" and "version" */

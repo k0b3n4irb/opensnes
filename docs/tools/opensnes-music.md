@@ -26,6 +26,21 @@ defaults to the module's name for one input and to `soundbank` for
 several. A module that needs more SPC RAM than a module may take is named
 with its size.
 
+**The bank as an asset.** A soundbank has several sources, so its settings
+live in a file named after it (@ref tools_conventions):
+
+```toml
+tool = "opensnes-music"
+
+[bank]
+inputs = ["theme.it", "jingle.it"]
+bank = 1
+```
+
+`opensnes-music bank music/soundbank.toml` builds `soundbank.asm`, `.h`
+and `.bnk` beside the file; `opensnes-music bank music/*.it --name
+soundbank --save` writes that file from a command-line run.
+
 Today the build calls `smconv` through `USE_SNESMOD` and `SOUNDBANK_SRC`;
 `opensnes-music bank` produces the same files, and the build switches to it
 with the family's generic rule.
@@ -59,8 +74,9 @@ game.
 0 done; 1 the input was refused (a file that is not an IT module, a bank
 number outside 1..255); 2 usage; 3 the file system. `--json` puts the
 outputs, the modules and their SPC RAM figures on stdout as one object.
-The converter's own diagnostics (prefixed `smconv`) may follow the tool's
-message for a corrupt module; they say which sample or block.
+The converter's diagnostics come out in the same shape (`opensnes-music:
+file: message`), on stderr; under `--json` the warnings are listed in a
+`warnings` array.
 
 ## From smconv
 

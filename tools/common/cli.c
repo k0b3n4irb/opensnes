@@ -151,6 +151,22 @@ int cli_int(const cli_ctx *ctx, const char *name, int deflt)
     return v ? atoi(v) : deflt;
 }
 
+int cli_list(const cli_ctx *ctx, const char *name, char *buf, size_t n, const char **words, int max)
+{
+    const char *v = value_of(ctx, name, NULL);
+    if (!v) return 0;
+    snprintf(buf, n, "%s", v);
+    int count = 0;
+    for (char *p = buf; *p && count < max;) {
+        while (*p == ' ') p++;
+        if (!*p) break;
+        words[count++] = p;
+        while (*p && *p != ' ') p++;
+        if (*p) *p++ = '\0';
+    }
+    return count;
+}
+
 int cli_int2(const cli_ctx *ctx, const char *name, int *a, int *b)
 {
     const char *second = NULL;
@@ -292,10 +308,12 @@ static int toml_value(const char *v, char *out, size_t n)
     if (strcmp(v, "false") == 0) { snprintf(out, n, "0"); return 1; }
     if (len >= 2 && v[0] == '[' && v[len - 1] == ']') {
         size_t j = 0;
+        int in_str = 0;
         for (size_t i = 1; i + 1 < len; i++) {
             char c = v[i];
-            if (c == ',') c = ' ';
-            if (isspace((unsigned char)c) && (j == 0 || out[j - 1] == ' ')) continue;
+            if (c == '"') { in_str = !in_str; continue; }   /* ["a", "b"] → a b */
+            if (!in_str && c == ',') c = ' ';
+            if (!in_str && isspace((unsigned char)c) && (j == 0 || out[j - 1] == ' ')) continue;
             if (j + 1 >= n) return 0;
             out[j++] = c;
         }
@@ -314,8 +332,15 @@ static int toml_value(const char *v, char *out, size_t n)
 
 int cli_load_settings(cli_ctx *ctx, const char *input)
 {
+    char path[1024];
+    snprintf(path, sizeof path, "%s.toml", input);
+    return cli_load_settings_path(ctx, path);
+}
+
+int cli_load_settings_path(cli_ctx *ctx, const char *path)
+{
     ctx->nset = 0;
-    snprintf(ctx->settings_path, sizeof ctx->settings_path, "%s.toml", input);
+    snprintf(ctx->settings_path, sizeof ctx->settings_path, "%s", path);
     FILE *f = fopen(ctx->settings_path, "r");
     if (!f) return CLI_OK;                     /* no settings: nothing to do */
     cli_note(ctx, "settings: %s", ctx->settings_path);
@@ -395,10 +420,15 @@ int cli_save_settings(const cli_ctx *ctx, const char *input)
 {
     char path[1024];
     snprintf(path, sizeof path, "%s.toml", input);
+    return cli_save_settings_path(ctx, path, basename_of(input));
+}
+
+int cli_save_settings_path(const cli_ctx *ctx, const char *path, const char *asset_name)
+{
     FILE *f = fopen(path, "w");
     if (!f) { cli_error(ctx, path, "cannot write the settings"); return CLI_IO; }
     fprintf(f, "# import settings of %s, written by %s --save; the build reads `tool`\n",
-            basename_of(input), ctx->tool->name);
+            asset_name, ctx->tool->name);
     fprintf(f, "tool = \"%s\"\n\n[%s]\n", ctx->tool->name, ctx->cmd->name);
     for (int i = 0; i < ctx->cmd->nopts; i++) {
         const cli_opt *op = &ctx->cmd->opts[i];
@@ -411,6 +441,21 @@ int cli_save_settings(const cli_ctx *ctx, const char *input)
         case CLI_INT:  fprintf(f, "%s = %s\n", op->name, v); break;
         case CLI_INT2: fprintf(f, "%s = [%s, %s]\n", op->name, v, second ? second : "0"); break;
         case CLI_STR:  fprintf(f, "%s = \"%s\"\n", op->name, v); break;
+        case CLI_LIST: {
+            fprintf(f, "%s = [", op->name);
+            int first = 1;
+            for (const char *p = v; *p;) {
+                while (*p == ' ') p++;
+                if (!*p) break;
+                const char *e = strchr(p, ' ');
+                size_t wl = e ? (size_t)(e - p) : strlen(p);
+                fprintf(f, "%s\"%.*s\"", first ? "" : ", ", (int)wl, p);
+                first = 0;
+                p += wl;
+            }
+            fprintf(f, "]\n");
+            break;
+        }
         }
     }
     fclose(f);
@@ -558,7 +603,7 @@ int cli_main(const cli_tool *tool, int argc, char **argv)
         case CLI_FLAG:
             ctx.given[idx] = "1";
             break;
-        case CLI_STR: case CLI_INT:
+        case CLI_STR: case CLI_INT: case CLI_LIST:
             if (i + 1 >= argc) return usage_error(&ctx, "--%s needs %s", op->name, op->value_name ? op->value_name : "a value");
             ctx.given[idx] = argv[++i];
             if (op->kind == CLI_INT) {

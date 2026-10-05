@@ -24,6 +24,13 @@ BANK = ["bank", "-q", "--name", "soundbank", "--bank", "1", "pollen8.it"]
 
 g.expect_outputs("bank pollen8.it --name soundbank --bank 1 == smconv's soundbank.{asm,h,bnk}", BANK,
                  copy=["pollen8.it"], outputs=["soundbank.asm", "soundbank.h", "soundbank.bnk"], want_dir=SMCONV)
+g.expect_outputs("bank soundbank.toml (composed asset: inputs from the file) == smconv's goldens", ["bank", "-q", "soundbank.toml"],
+                 copy=["pollen8.it"], write={"soundbank.toml": 'tool = "opensnes-music"\n[bank]\ninputs = ["pollen8.it"]\nbank = 1\n'},
+                 outputs=["soundbank.asm", "soundbank.h", "soundbank.bnk"], want_dir=SMCONV)
+g.expect_outputs("bank --save writes soundbank.toml", ["bank", "-q", "--name", "soundbank", "--save", "pollen8.it"],
+                 copy=["pollen8.it"], outputs=["soundbank.toml"])
+g.expect_refused("bank empty.toml (no inputs)", ["bank", "empty.toml"], write={"empty.toml": 'tool = "opensnes-music"\n[bank]\nbank = 1\n'},
+                 needles=["no `inputs"], nothing_written=["empty.asm"])
 g.expect_stdout("bank --json (name from the module)", ["bank", "--json", "pollen8.it"], golden="bank.json", copy=["pollen8.it"])
 g.expect_stdout("inspect --json", ["inspect", "--json", "pollen8.it"], golden="inspect.json", copy=["pollen8.it"])
 
@@ -45,7 +52,7 @@ def spc_written():
 
 g.check("spc pollen8.it: a 66048-byte SPC file", "SPC700 header, 64 KB RAM + registers", spc_written)
 g.expect_refused("bank junk.it (not an IT module)", ["bank", "junk.it"], write={"junk.it": b"junk" * 16},
-                 needles=["not a readable Impulse Tracker module"], nothing_written=["junk.asm", "junk.h", "junk.bnk"])
+                 needles=["opensnes-music: junk.it: 'junk.it' is not an Impulse Tracker module"], nothing_written=["junk.asm", "junk.h", "junk.bnk"])
 g.expect_refused("bank --bank 0", ["bank", "--bank", "0", "pollen8.it"], copy=["pollen8.it"],
                  needles=["bank 0 holds the code"], nothing_written=["pollen8.asm"])
 g.expect_refused("bank --bank x (usage)", ["bank", "--bank", "x", "pollen8.it"], copy=["pollen8.it"], needles=["needs a number"])

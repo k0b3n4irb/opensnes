@@ -1,1 +1,1 @@
-{"tool": "opensnes-music", "version": "1.0.0", "modules": [{"input": "pollen8.it", "title": "pollen resurrection", "patterns": 18, "instruments": 17, "samples": 17, "orders": 21, "spc_ram_bytes": 44137, "spc_ram_free": 13820, "sources": 17}], "brr_sources": 17}
+{"tool": "opensnes-music", "version": "1.0.0", "modules": [{"input": "pollen8.it", "title": "pollen resurrection", "patterns": 18, "instruments": 17, "samples": 17, "orders": 21, "spc_ram_bytes": 44137, "spc_ram_free": 13820, "sources": 17}], "brr_sources": 17, "warnings": []}

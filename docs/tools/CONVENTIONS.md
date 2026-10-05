@@ -90,6 +90,17 @@ palette = "shared" # a .pal, a palette name from opensnes-palette, or "own"
 clips = "tags"     # Aseprite tags become animation clips
 ```
 
+**A composed asset** — a soundbank made of several modules, a string
+table, a project palette, the ROM header — is not made from one source, so
+its settings file is named after **what it produces** and lists its
+sources: `music/soundbank.toml` with `tool = "opensnes-music"` and
+`inputs = ["theme.it", "jingle.it"]` under `[bank]`, paths relative to the
+file. `opensnes-music bank music/soundbank.toml` then builds it beside the
+file, and `--save` on a command-line run writes that file for you. One
+rule, two spellings: an asset with one source is named after its source
+(`hero.png.toml`), an asset with several is named after its product
+(`soundbank.toml`).
+
 The first key is always `tool`: the build system's one generic rule reads
 it to know which tool converts the file. The rest is one table named after
 the subcommand, keys spelled exactly as the long options (`--size` is
