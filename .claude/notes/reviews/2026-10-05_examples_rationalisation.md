@@ -180,3 +180,33 @@ renumérotée que des suppressions.
   `movement_move_sprite.toml`, baselines fbhash et WRAM, les six pages et
   le compte (`91` → `90` dans huit fichiers, le sentinel en a trouvé trois
   de plus dans `ROADMAP.md`).
+
+## 7. Second tour du défi : les fusions de code
+
+Les cinq retraits sans code sont faits (`move_sprite`, `hicolor_blend`,
+`gradient_9bit`, `mode5`, `random` : 91 → 86). Avant d'écrire du code pour
+les huit fusions restantes, chacune relue avec les deux programmes, leurs
+manifestes et leurs citations sous les yeux :
+
+| Fusion | Ce que la lecture a montré | Décision |
+|---|---|---|
+| `mode1_bg3_priority` → `mode1` | pas « un drapeau » : trois couches, trois banques de palette, le bit de priorité ; un manifeste qui épingle neuf destinations VRAM / CGRAM ; deux pages d'artisanat ; la marche 6 de l'échelle. `mode1` est la marche 5, le fond le plus simple, avec son propre manifeste (le `bgLoad` en trois transferts) | **retirée** |
+| `mode4` → `mode2` | la trilogie offset-per-tile (2/4/6) est une échelle voulue (« after mode2 », « after mode2 and mode4 ») ; les trois modes diffèrent par la profondeur et le nombre de couches, un studio choisit le sien | **retirée** |
+| `fix32_orbit` → `aim_target` | c'est la démo du module `fixed32`, citée par `tutorials/math.md` — le même critère qui a gardé `timer` pour `gameloop` | **retirée** |
+| `sa1_hello` → `sa1_starfield` | chaque puce a sa trilogie « ça démarre / la vitrine / la sauvegarde », et le manifeste de `sa1_hello` est la preuve de démarrage (statut SA-1, trace) que lit le tutoriel | **retirée** |
+| `perspective` → `rotate_scale` | marches 21 et 22 de l'échelle, quatre pages citent `perspective` ; c'est la leçon canonique de l'écran coupé par HDMA | **retirée** |
+| `mapandobjects` → `slope_collision` | mêmes appels de la lib, mais `tutorials/object.md` est écrit sur son code (cinq passages) | **reportée** : se fait avec la réécriture du tutoriel, pas avant |
+| `snesmod_music_large` → `snesmod_music` | un second module dans la banque, le franchissement de banque devient visible dans le même exemple ; ses deux manifestes se portent | **à faire** |
+| `echo` → `soundboard` | `soundboard` annonce l'écho dans ses concepts ; un bouton sec / mouillé et ses deux manifestes se portent ; la baseline audio de `soundboard` ne bouge pas si l'état par défaut ne change pas | **à faire** |
+
+### Bilan honnête
+
+Sept retraits ou fusions au total sur vingt-cinq proposés : **91 → 84, soit
+8 %**, pas 30 %. Le corpus se ressemble plus qu'il ne se répète : des
+exemples voisins exercent des fonctions différentes de la lib, portent des
+manifestes différents, et occupent des marches différentes de l'échelle que
+les débutants lisent. Ce que l'intuition du propriétaire a bien vu, et qui
+reste à faire, est la **forme** : treize README sans leçon, une échelle
+numérotée par accrétion (`15c…15n`, `22b`, `42c…42g`), des catégories dont
+la table ne dit plus ce qu'on apprend. Le gain de lisibilité est là, et dans
+la migration vers les fichiers de réglages qui retire 54 `data.asm`.
