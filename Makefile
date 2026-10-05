@@ -158,6 +158,7 @@ lint-cppcheck:
 		cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			--suppress='*:tools/third_party/lodepng.c' \
 			--suppress='*:tools/third_party/stb_image.h' \
+			--suppress='*:tools/third_party/cute_tiled.h' \
 			-DTOOL_VERSION='"x"' -DTOOL_BUILD_DATE='"x"' \
 			-Itools/smconv/src -Itools/third_party tools/*/src tools/third_party \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
