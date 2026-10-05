@@ -21,7 +21,7 @@ Compile-time cc65816 checks live in `devtools/compiler-tests/`.
   `tools/luna-test/luna.version` (the single source of truth; this README
   deliberately does not repeat the number). Resolution order: `$LUNA_BIN` → `luna` on `PATH` →
   `tools/luna-test/vendor/luna-<version>-linux-<arch>/luna`. Install with
-  `scripts/install-luna.sh` (downloads the pinned tag + verifies its `.sha256`).
+  `scripts/install-luna.sh` (downloads the pinned tag's zip and checks it against `luna.sha256`, the sums pinned here).
 - Python 3 (stdlib only — consistent with `devtools/*.py`). **No Node, no
   Emscripten, no WASM, no Mesen2, no xvfb.**
 

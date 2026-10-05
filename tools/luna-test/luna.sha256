@@ -1,0 +1,10 @@
+# SHA-256 of luna's release archives for the version pinned in luna.version.
+# scripts/install-luna.sh refuses an archive whose sum is not here. After a
+# pin bump, regenerate the four lines (the sums are not published by luna):
+#   V=$(cat tools/luna-test/luna.version); for p in linux_x86_64 linux_arm64 darwin_arm64 windows_x86_64; do
+#     curl -sL -o /tmp/l.zip https://github.com/k0b3n4irb/luna/releases/download/$V/luna_${V}_${p}.zip
+#     echo "$(sha256sum /tmp/l.zip | cut -d' ' -f1)  luna_${V}_${p}.zip"; done
+9dc5aa1c46ec2a36eb439c6765fc1855eb050806d2e6a0375c9865d9db0699c7  luna_v1.32.0_linux_x86_64.zip
+aa3552fafed3dd67b1cc2596c0348005b5659cd83882b3f9b026eca2c25f8476  luna_v1.32.0_linux_arm64.zip
+e21ff9bb65a97cf157eda09ef5560fcad0a3f25d6ddac3e1b33ba1fa616e8f8f  luna_v1.32.0_darwin_arm64.zip
+edc1ca0e6be16bff6d72688014dbb3ed4bdad8a6f1da7865d30959fdc3a948f4  luna_v1.32.0_windows_x86_64.zip
