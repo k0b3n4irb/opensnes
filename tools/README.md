@@ -26,9 +26,12 @@ parsers).
 | [`img2snes/`](img2snes/) | RGB/RGBA PNG → indexed PNG (quantize, BGR555 rounding, scale) | 1.0.0 | by hand, before committing art | `docs/tools/img2snes.md` |
 | [`palplan/`](palplan/) | plans a project's `.pal` files into the 8 + 8 CGRAM slots, emits a C header | 1.0.0 | by hand, project-level | `docs/tools/palplan.md` |
 | [`sa1-patch/`](sa1-patch/) | post-link: sets the SA-1 map-mode bits in the ROM header | 1.0.0 | automatic for `USE_SA1=1` | [`sa1-patch/README.md`](sa1-patch/README.md) |
+| [`opensnes-sample/`](opensnes-sample/) | **the first of the 1.x family** (`docs/tools/CONVENTIONS.md`): WAV → BRR with `encode` and `inspect`, settings beside the asset, `--json`; same bytes as wav2brr, whose golden suite it reproduces | 1.0.0 | by hand today; the build's generic rule comes with the family | `docs/tools/opensnes-sample.md` |
 
 Every tool's Makefile is a few variables over [`tool.mk`](tool.mk) (one
-build recipe, one version macro `TOOL_VERSION`); the vendored parsers
+build recipe, one version macro `TOOL_VERSION`); the 1.x tools share
+[`common/cli.c`](common/cli.c) (subcommands, long options, `--help`,
+`--json`, messages, exit codes, the TOML settings file); the vendored parsers
 (lodepng, cmdparser, stb_image, cute_tiled) live in
 [`third_party/`](third_party/) with their licences (`ATTRIBUTION.md`).
 

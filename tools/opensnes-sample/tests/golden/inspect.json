@@ -1,0 +1,1 @@
+{"tool": "opensnes-sample", "version": "1.0.0", "files": [{"input": "tone.wav", "kind": "wav", "rate": 16000, "bits": 8, "channels": 1, "samples": 220, "brr_blocks": 14, "aram_bytes": 126, "above_dsp_rate": false}, {"input": "tone.brr", "kind": "brr", "bytes": 117, "blocks": 13, "samples": 208, "loops": true, "end_flag": true, "aram_bytes": 117}]}

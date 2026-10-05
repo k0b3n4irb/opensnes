@@ -17,6 +17,15 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`opensnes-sample`, the first tool of the 1.x family** (tools): WAV → BRR
+  with `encode` (the `.brr` and a `.h` of its sizes and loop offset) and
+  `inspect` (what a `.wav` or `.brr` holds and costs in ARAM), long options,
+  `--help` that says everything, `--json`, four exit codes, a TOML settings
+  file beside the asset (`<input>.toml`, written by `--save`, read on every
+  run). Same encoder and same bytes as `wav2brr`, whose golden suite its own
+  reproduces; `wav2brr` stays shipped one more release. The command line,
+  messages and settings code is `tools/common/cli.c`, shared by the family;
+  the contract is `docs/tools/CONVENTIONS.md`.
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
   counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
   RAM: each power-on reads the saved value, adds one, saves and prints both.

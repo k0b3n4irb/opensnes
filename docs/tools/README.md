@@ -73,7 +73,7 @@ All binaries live in `bin/` and are built by `make tools`. Every tool prints
 1.x replaces these converters with the `opensnes-*` family — one tool per
 function, the same conventions everywhere, settings beside each asset.
 @subpage tools_conventions is the contract; the 0.x tools stay one more
-release.
+release. The first of them is @subpage tools_opensnes_sample (WAV → BRR).
 
 ## Your Makefile
 
