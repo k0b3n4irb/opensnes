@@ -21,6 +21,8 @@ tools/palplan/palplan
 tools/sa1-patch/sa1_patch
 tools/smconv/smconv
 tools/wav2brr/wav2brr
+tools/tmx2snes/tmx2snes
+tools/opensnes-sample/opensnes-sample
 
 # Generated documentation
 doc/
@@ -128,3 +130,4 @@ lib/source/audio_driver.spc700.bin
 testing/manifests_pal/
 *_pal.sfc
 *_pal.sym
+tools/fuzz/fuzz_wav
