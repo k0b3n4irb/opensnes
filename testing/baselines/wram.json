@@ -16,8 +16,8 @@
     "rom_sha256": "befb5553a7d708aeab35ef56fe05255713560ad1da2d45e9bf96a86c708f47fd"
   },
   "audio_sfx_from_wav": {
-    "stream": "467ad88add2825739a18fdef02c7cfa5255c3b30aaa6bdea80ce3f2be9b4edf7",
-    "rom_sha256": "9eef2a00b482bdc65f93e13f6144fe994e32b80d17f32e279abc09aa33cef605"
+    "stream": "3460b10fb4505cd8487c57097a7d9d17904898a9f9110dd87a9ee2a6e1f24ca9",
+    "rom_sha256": "6f950737b5e087c8a69c6b48c3c43a722e4933e9978c418787354268487c4666"
   },
   "audio_snesmod_music": {
     "stream": "a700c000b7590663d9dac37d1ff03e6a1712ed4a5a8aec88d740ccfbdcc17a70",
@@ -228,20 +228,20 @@
     "rom_sha256": "77e5b5b9993b75b69f72f8b6eb6c8db062953f1318ab82d99be801d993571157"
   },
   "maps_dynamic_map": {
-    "stream": "023c8ca73af02aa66ec82c0fb3e2035e100df1a6179db9841d9c4e6c48f007e0",
-    "rom_sha256": "ec98e6d6cf2c2db423a731174b5d9c0650fa738539486a23ac3a7067e225d92b"
+    "stream": "afb8cd162b04ff831aef1cdcb459a987c786d9b491528dbb5caa88af03ef1781",
+    "rom_sha256": "d344b94b53e25b7608babd9b6bd4958906f7cfec83b9532c6addbe87cd005736"
   },
   "maps_map_scroll": {
-    "stream": "8c9a490f32efd07b6b688ef1c0426a0d0ebed7b75317154dc05672d9d0b56f6b",
-    "rom_sha256": "4154c282fc2c6f6b5d2b2a72a852525606c94194e64947d8792e1c013dc36a34"
+    "stream": "9bcfad02b805324aa179642e6d8d62b8eb8b09e02fa6f93aae6d3b205d8f693a",
+    "rom_sha256": "e55f2c158266687c4d3cd9defb7e3db43fd969b71bfdd6f4c67a74f2160334aa"
   },
   "maps_slope_collision": {
-    "stream": "7c5458e88adf4804c9fd09c0863a9f745c55dd3712e5ed0a941041c4c31f03ab",
-    "rom_sha256": "621be099a18809c1f74c20b4d8277572b46779958af1a0011fe39c15c761bb2b"
+    "stream": "be9bb13dbb2c57601f1d9c104ce52bfd96c948e6607800d4ae9ce188a9f8e1a5",
+    "rom_sha256": "241d11ded99bd320cc81229d49e220e2f0daf11d9a3f06c8b4654e8a3bc2528e"
   },
   "maps_tiled": {
-    "stream": "e899ebd7defa8011bb21b5e7b605a12a79e9053dd8c6f7fd7a41cb1709a6e768",
-    "rom_sha256": "c55ff46188f880057f6f4aa0d904c3f7815cc439c8c310d9d6337a9336dc677c"
+    "stream": "700f958bf6643cf0a7cecb9fed9e7ef159b327a97bf9b2c698d57c6afb34851a",
+    "rom_sha256": "48d6865f2074a8dc76f9ab82242c7b30a2892fd225e2705f5c12936418ce0e08"
   },
   "memory_hirom_demo": {
     "stream": "e4e058402e49a10427c75f2e03bbd72bc2222f651bf7ad9a08280e0a1956c4c0",

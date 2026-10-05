@@ -3,18 +3,6 @@
 ;==============================================================================
 
 ;--- Tileset graphics and palette ---
-ASSET_SECTION ".rodata1"
-
-tileset:
-.incbin "res/tilesMario.pic"
-tileset_end:
-
-tilesetpal:
-.incbin "res/tilesMario.pal"
-tilesetpal_end:
-
-.ends
-
 ;--- Map data (from tmx2snes) ---
 ; B1 proof: pinned to bank 2 (out of bank $00). mapLoad + the scroll
 ; runtime now honour the pointer's bank byte, so the 25 KB map no longer
@@ -38,14 +26,3 @@ tilesetdef:
 .ends
 
 ;--- Sprite graphics ---
-ASSET_SECTION ".rodata3"
-
-gfxsprite:
-.incbin "res/mario.pic"
-gfxsprite_end:
-
-palsprite:
-.incbin "res/mario.pal"
-palsprite_end:
-
-.ends

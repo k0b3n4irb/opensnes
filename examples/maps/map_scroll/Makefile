@@ -14,16 +14,12 @@ TMX2SNES := $(OPENSNES)/bin/tmx2snes
 include $(OPENSNES)/make/common.mk
 
 # BG tileset (flags from PVSnesLib Makefile exactly)
-res/tilesMario.pic res/tilesMario.pal res/tilesMario.map: res/tilesMario.png
-	@echo "[GFX] $< -> tileset"
-	@$(GFX4SNES) -s 8 -o 48 -u 16 -p -m -i $<
 
 # Sprite (16x16, 4 frames)
-res/mario.pic res/mario.pal: res/mario.png
-	@echo "[GFX] $< -> sprite"
-	@$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
 
 # Tiled map conversion
+# the .map comes from res/tilesMario.png.toml (opensnes-tileset); tmx2snes (not yet in the family) reads it
+res/tilesMario.map: | res/tilesMario.png.toml.done
 res/BG1.m16 res/tiledMario.t16 res/tiledMario.b16: res/tiledMario.tmj res/tilesMario.map
 	@echo "[TMX] $< -> map binaries"
 	@cd res && $(TMX2SNES) tiledMario.tmj tilesMario.map

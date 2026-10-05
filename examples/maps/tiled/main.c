@@ -13,7 +13,7 @@
  * 1. Design your level in Tiled (paint tiles, set collision properties)
  * 2. Export as .tmj (JSON) or .tmx (XML)
  * 3. Convert with tmxconv to .m16 (tilemap) + .t16 (tile defs) + .b16 (attributes)
- * 4. Convert tileset PNG with gfx4snes to .pic + .pal
+ * 4. Convert tileslevel1_tiles PNG with gfx4snes to .pic + .pal
  * 5. Include all binaries in data.asm
  *
  * This example uses pre-converted binaries. The original Tiled source
@@ -33,7 +33,7 @@
  * - Press LEFT/RIGHT on D-pad to scroll through the level
  * - The background scrolls smoothly at 1 pixel per frame
  * - Notice the level is much wider than the screen (1792px vs 256px)
- * - The tileset uses platformer-style tiles (platforms, ladders, walls)
+ * - The tileslevel1_tiles uses platformer-style tiles (platforms, ladders, walls)
  *
  * @par Modules Used
  * console, sprite, dma, input, background, map
@@ -48,11 +48,10 @@
  * External Assets (defined in data.asm)
  *============================================================================*/
 
-/** @brief 4bpp tileset graphics (converted from tileslevel1.png) */
-extern u8 tileset[], tileset_end[];
+/** @brief 4bpp tileslevel1_tiles graphics (converted from tileslevel1.png) */
+#include "res/tileslevel1.inc"   /* generated: tileslevel1_tiles[], tileslevel1_pal[], tileslevel1_map[], each with _end */
 
 /** @brief Tileset palette (3 palette banks x 16 colors = 96 bytes) */
-extern u8 tilesetpal[], tilesetpal_end[];
 
 /** @brief Full level tilemap — 224x30 tiles, 16-bit entries (from BG1.m16) */
 extern u8 mapdata[];
@@ -81,7 +80,7 @@ int main(void) {
     u16 pad;
 
     /*
-     * Step 1: Load tileset to VRAM
+     * Step 1: Load tileslevel1_tiles to VRAM
      *
      * bgInitTileSet loads tile graphics to VRAM $2000 and palette to CGRAM.
      * The palette size (16*2*3 = 96 bytes) covers 3 palette banks of 16 colors,
@@ -90,9 +89,9 @@ int main(void) {
      * The tilemap address $6800 with SC_64x32 is required by the map engine —
      * it uses this specific VRAM region for streaming.
      */
-    bgInitTileSet(0, tileset, tilesetpal, 0,
-                  tileset_end - tileset,
-                  tilesetpal_end - tilesetpal,
+    bgInitTileSet(0, tileslevel1_tiles, tileslevel1_pal, 0,
+                  tileslevel1_tiles_end - tileslevel1_tiles,
+                  tileslevel1_pal_end - tileslevel1_pal,
                   BG_16COLORS, 0x2000);
     bgSetMapPtr(0, 0x6800, SC_64x32);
 

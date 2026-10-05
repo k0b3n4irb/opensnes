@@ -5,24 +5,6 @@
 ; Single object type (Mario) with slope collision.
 ;==============================================================================
 
-ASSET_SECTION ".rodata1"
-
-tileset:
-.incbin "res/tiles.pic"
-tilesetend:
-
-tilepal:
-.incbin "res/tiles.pal"
-
-mariogfx:
-.incbin "res/mario_sprite.pic"
-mariogfx_end:
-
-mariopal:
-.incbin "res/mario_sprite.pal"
-
-.ends
-
 ASSET_SECTION ".rodata2"
 
 mapmario:

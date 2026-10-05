@@ -5,18 +5,6 @@
 ;------------------------------------------------------------------------------
 ; Tileset graphics and palette (from gfx4snes)
 ;------------------------------------------------------------------------------
-ASSET_SECTION ".rodata1"
-
-tileset:
-.incbin "res/tileslevel1.pic"
-tileset_end:
-
-tilesetpal:
-.incbin "res/tileslevel1.pal"
-tilesetpal_end:
-
-.ends
-
 ;------------------------------------------------------------------------------
 ; Map data (from tmxconv / Tiled editor)
 ;

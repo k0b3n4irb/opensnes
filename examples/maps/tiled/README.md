@@ -14,7 +14,7 @@ This example shows how to use maps created in the [Tiled](https://www.mapeditor.
 ## The Tiled Workflow
 
 ```
-  Tiled Editor              gfx4snes              tmx2snes
+  Tiled Editor           opensnes-tileset         tmx2snes
 ┌──────────────┐        ┌──────────────┐      ┌──────────────┐
 │ Paint tiles  │        │ tileset.png  │      │ level.tmj    │
 │ Set props    │        │      ↓       │      │ + tileset.map│
@@ -28,10 +28,15 @@ This example shows how to use maps created in the [Tiled](https://www.mapeditor.
 
 **Step 2.** Export as `.tmj` (JSON format).
 
-**Step 3.** Convert the tileset image with gfx4snes:
-```bash
-gfx4snes -s 8 -o 48 -u 16 -p -m -i tileslevel1.png
-# Outputs: .pic (tiles), .pal (palette), .map (tile optimization table)
+**Step 3.** Convert the tileset image with `opensnes-tileset`. The settings live
+beside the picture in `res/tileslevel1.png.toml`, and the build runs the
+conversion before compiling:
+```toml
+tool = "opensnes-tileset"
+
+[convert]
+colors = 48
+# Outputs: .pic (tiles), .pal (palette), .map (tile optimization table), .inc (the C declarations)
 ```
 
 **Step 4.** Convert the Tiled map with tmx2snes:
@@ -40,7 +45,8 @@ tmx2snes maplevel01.tmj tileslevel1.map
 # Outputs: BG1.m16 (tilemap), maplevel01.t16 (tile defs), maplevel01.b16 (attributes)
 ```
 
-**Step 5.** Include all binaries in `data.asm` and call `mapLoad()` in your game.
+**Step 5.** The build links the converted graphics (`res/tileslevel1.inc` declares
+them); include the map binaries in `data.asm` and call `mapLoad()` in your game.
 
 ## SNES Concepts
 
@@ -79,8 +85,9 @@ These are stored in `.b16` (attributes) and `.t16` (palette+priority) files by t
 ```
 tiled/
 ├── main.c          — Initialize map engine, scroll with D-pad
-├── data.asm        — ROM data includes (.pic, .pal, .m16, .t16, .b16)
-├── Makefile        — Build rules with gfx4snes + tmx2snes conversion
+├── res/tileslevel1.png.toml — import settings of the tileset (opensnes-tileset)
+├── data.asm        — ROM data includes of the map (.m16, .t16, .b16)
+├── Makefile        — the tmx2snes conversion rule (the tileset's is the settings file)
 └── res/
     ├── tileslevel1.png     — Tileset sprite sheet (source)
     ├── maplevel01.tmj      — Tiled map (JSON, source)

@@ -42,11 +42,10 @@
 #include "mario.h"
 
 /** @brief BG1 tileset tile data (4bpp) -- start label */
-extern u8 tileset;
+#include "res/tiles.inc"          /* generated: tiles_tiles[], tiles_tiles_end[], tiles_pal[], tiles_map[] */
+#include "res/mario_sprite.inc"   /* generated: mario_sprite_tiles[], mario_sprite_pal[] */
 /** @brief BG1 tileset tile data -- end label (for size calculation) */
-extern u8 tilesetend;
 /** @brief BG1 tileset palette (BGR555, 16 colors) */
-extern u8 tilepal;
 /** @brief Tile definition table (maps tile index to visual properties) */
 extern u8 tilesetdef;
 /** @brief Tile attribute table (encodes slope angles and collision flags per tile) */
@@ -76,8 +75,8 @@ extern u8 objmario;
  */
 int main(void) {
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
-    bgInitTileSet(0, &tileset, &tilepal, 0,
-                  (&tilesetend - &tileset), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
+    bgInitTileSet(0, tiles_tiles, tiles_pal, 0,
+                  (tiles_tiles_end - tiles_tiles), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
     bgSetMapPtr(0, 0x6800, SC_64x32);
 
     /* Mode 1, enable BG1 + sprites */

@@ -40,11 +40,11 @@
  * External Assets (defined in data.asm)
  *============================================================================*/
 
-/** @brief 4bpp tileset graphics */
-extern u8 tileset[], tileset_end[];
+/** @brief 4bpp tilesMario_tiles graphics */
+#include "res/tilesMario.inc"   /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
+#include "res/mario.inc"        /* generated: mario_tiles[], mario_pal[], each with _end */
 
 /** @brief Tileset palette (3 banks x 16 colors) */
-extern u8 tilesetpal[], tilesetpal_end[];
 
 /** @brief Full level tilemap from tmx2snes */
 extern u8 mapdata[];
@@ -56,10 +56,8 @@ extern u8 tilesetdef[];
 extern u8 tilesetatt[];
 
 /** @brief 16x16 Mario sprite tiles (4 animation frames) */
-extern u8 gfxsprite[], gfxsprite_end[];
 
 /** @brief Mario sprite palette */
-extern u8 palsprite[], palsprite_end[];
 
 /*============================================================================
  * Game State
@@ -93,10 +91,10 @@ u16 flip;
 int main(void) {
     u16 pad;
 
-    /* Load tileset to VRAM $2000, palette to CGRAM */
-    bgInitTileSet(0, tileset, tilesetpal, 0,
-                  tileset_end - tileset,
-                  tilesetpal_end - tilesetpal,
+    /* Load tilesMario_tiles to VRAM $2000, palette to CGRAM */
+    bgInitTileSet(0, tilesMario_tiles, tilesMario_pal, 0,
+                  tilesMario_tiles_end - tilesMario_tiles,
+                  tilesMario_pal_end - tilesMario_pal,
                   BG_16COLORS, 0x2000);
 
     /* Map engine requires tilemap at $6800, SC_64x32 */
@@ -107,8 +105,8 @@ int main(void) {
     setMainScreen(LAYER_BG1 | LAYER_OBJ);
 
     /* Load sprite tiles to VRAM $0000, palette to CGRAM 128 */
-    oamInitGfxSet(gfxsprite, gfxsprite_end - gfxsprite,
-                  palsprite, palsprite_end - palsprite,
+    oamInitGfxSet(mario_tiles, mario_tiles_end - mario_tiles,
+                  mario_pal, mario_pal_end - mario_pal,
                   0, 0x0000, OBJ_SIZE16_L32);
 
     /* Load map (screen still off — no garbage) */
