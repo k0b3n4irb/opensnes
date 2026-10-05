@@ -80,10 +80,10 @@ static int encode_one(cli_ctx *ctx, const char *input)
         cli_output_path(ctx, input, ".h", h_path, sizeof h_path) != CLI_OK ||
         cli_output_path(ctx, input, "_data.as", as_path, sizeof as_path) != CLI_OK) { free(brr); return CLI_IO; }
     cli_ident(input, ident, sizeof ident);
-    /* the .incbin fragment the build's generic rule gathers into assets_gen.asm
-     * (inside an ASSET_SECTION), the shape gfx4snes gives its _data.as */
+    /* the .incbin fragment assets_gen.asm includes: its own ASSET_SECTION,
+     * the shape every family tool gives its _data.as */
     char frag[1400];
-    int fn = snprintf(frag, sizeof frag, "%s_brr:\n.incbin \"%s\"\n%s_brr_end:\n\n", ident, brr_path, ident);
+    int fn = snprintf(frag, sizeof frag, "ASSET_SECTION \"%s_brr\"\n%s_brr:\n.incbin \"%s\"\n%s_brr_end:\n.ENDS\n", ident, ident, brr_path, ident);
 
     char header[1024];
     int hn = snprintf(header, sizeof header,
