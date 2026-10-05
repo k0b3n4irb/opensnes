@@ -668,3 +668,17 @@ Restent du §7 : lots 5 (`testing/lib/`), 6 (`testing/fixtures/`), 7
 (outils C : `tool.mk`, `third_party/`, runner golden commun) ; puis la
 famille du §10 dans l'ordre du §10.5, `opensnes-rom check` en tête pour
 retirer les sept derniers appels Python.
+
+### Suite de la séance (lots 5 à 7)
+
+| Lot | Commit | Ce qui a changé |
+|---|---|---|
+| 5a. `testing/` | `75d0d942` | `tools/luna-test` → `testing/` ; 384 fichiers suivent (Makefile, common.mk, workflows, `install-luna.sh`, CLI, sentinel, règles, skills, agents, docs, README d'exemples) ; les 137 manifestes et les Makefiles des ROM de stress perdent un niveau de `../` ; scope de commit `testing` ajouté |
+| 5b. `testing/lib/` | `d9632561` | `lib/luna.py` (`find_luna`, `LUNA_VERSION`, `REPO_ROOT`, `firmware_dir`), `lib/corpus.py`, `lib/probes.py` (ex `probes/lib.py`) ; chaque importeur fait un seul `sys.path.insert` de `testing/` puis `from lib import …` ; le zip copie `testing/lib/`. **Retrait** : les trois lecteurs de `.sym` restent : `SymbolTable` avale aussi les 218 lignes `[definitions]` d'un `.sym`, ce que `rom_coverage.load_labels` ne doit pas faire ; `check_bank_reads` est livré et doit rester autonome (il passe en C de toute façon) ; `release_smoke.find_luna` cherche dans l'arbre extrait du zip, pas dans le dépôt, ce n'est pas un doublon |
+| 6. `testing/fixtures/` | `41bedec5` | les 20 projets ROM sous une racine (`libtests*`, `compiler/<a6_farptr…>`, `stress/<hwmath…>`, `benchrom`) ; `FIXTURES_LIB` / `FIXTURES_COMPILER` / `FIXTURES_STRESS` et `make fixtures` dans le Makefile, `test-lib` en boucle sur `FIXTURE_TESTS` ; `testing/fixtures/README.md` dit ce que chaque fixture épingle ; `rom_coverage` 325/325 inchangé |
+| 7a. `tool.mk` | `89ebbbaa` | les neuf Makefiles d'outils deviennent cinq à huit lignes sur `tools/tool.mk` ; une macro `TOOL_VERSION` / `TOOL_BUILD_DATE` dans les sources (quatre outils lisaient `VERSION`, cinq `__BUILD_VERSION`) ; `tools/third_party/` (lodepng, cmdparser, stb_image, cute_tiled) ; `tmx2snes/src/` ; gfx4snes et img2snes gardent deux classes `-Wextra` héritées tues ; 8/8 suites golden sur les nouveaux binaires |
+| 7b. `tools/tests/golden.py` | *(ce commit)* | le runner golden unique ; les huit `run_golden.py` sont des tables de cas (`expect_outputs`, `expect_refused`, `expect_stdout`, `check`), 520 lignes au lieu de 900, mêmes verdicts |
+
+Trouvé en chemin et retiré : `testing/stress/roms/` (huit ROM malformées
+non suivies, aucun lecteur dans le dépôt). Le plan du §7 est fait ; la
+suite est le §10.5 (conventions, `opensnes-sample`, `opensnes-rom check`).
