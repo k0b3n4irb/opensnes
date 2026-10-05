@@ -692,10 +692,13 @@ suite est le §10.5 (conventions, `opensnes-sample`, `opensnes-rom check`).
 | `tools/common/cli.c` | `7117a55c` | l'implémentation des conventions, partagée : parsing (sous-commandes, options longues et courtes, `--`), aide générée, messages, chemins de sortie (`--out` crée son dossier), lecture et écriture du fichier de réglages (chaînes, entiers, booléens, `[a, b]`, clé inconnue refusée, outil différent refusé), écrivain JSON |
 | `opensnes-sample` | `7117a55c` | `encode` et `inspect` ; mêmes octets que `wav2brr` (suite golden comparée aux goldens de wav2brr, 13 cas) ; `wav.c` fuzzé ; page `docs/tools/opensnes-sample.md` ; `wav2brr` reste livré une version |
 
+| `opensnes-music` | `5e624ed9` | `bank`, `spc`, `inspect` sur le convertisseur de smconv (itloader, it2spc, brr) ; mêmes octets que `smconv -s -n -p` (suite golden comparée aux goldens de smconv, 7 cas) ; `inspect` donne les 57 957 octets qu'un module peut prendre, le chiffre de `smconv -V` ; page `docs/tools/opensnes-music.md`. Reste à faire : les diagnostics propres de la bibliothèque smconv parlent encore avec son nom ; une sortie de messages par callback les ramènerait à la forme de la famille |
+| cppcheck sur `tmx2snes/src` | `c26a6b59`, `d231fbc6` | deux `%d` d'unsigned, deux boucles qui lisaient l'octet avant de tester l'indice — des remarques que le lint ne voyait pas tant que le fichier était hors de `src/` |
+
 Ce que le premier outil a appris pour les suivants : le fichier de réglages
 se lit **par entrée** (une `cli_ctx` par asset), un `--out` doit créer son
 dossier, le JSON d'un échec doit nommer l'entrée et le code, et la suite
 golden d'un outil fusionné pointe sur les goldens de l'outil absorbé plutôt
-que d'en copier les octets. Suivants dans l'ordre du §10.5 :
-`opensnes-music` (smconv, avec `inspect` des samples et du poids APU), puis
-`opensnes-rom check` qui retire les sept derniers appels Python de la build.
+que d'en copier les octets. Suivant dans l'ordre du §10.5 : `opensnes-rom check`, qui retire les
+sept derniers appels Python de la build d'un utilisateur ; puis
+`opensnes-sprite` (gfx4snes -P + aseprite2snes), le plus gros.
