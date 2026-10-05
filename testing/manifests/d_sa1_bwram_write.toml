@@ -3,7 +3,7 @@
 # fixture finds zeros at power-on (r_boot), then leaves C1 D2 E3 F4 ... in
 # BW-RAM, which luna saves as the battery file e_ reads back. This leg is
 # also e_'s negative control: without a loaded .srm, r_boot is zero.
-rom = "../../devtools/libtests_sa1_sram/libtest_sa1_sram.sfc"
+rom = "../fixtures/libtests_sa1_sram/libtest_sa1_sram.sfc"
 steps = 1500000
 srm_out = "sa1_bwram.srm"
 [asserts.values]

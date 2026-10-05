@@ -2,7 +2,7 @@
 # with USE_SRAM=1 (header $15, battery) saves eight bytes at $70:E000 with
 # sramSaveOffset; luna keeps the whole Game Pak RAM as the .srm (v1.30.3).
 # Runs before g_gsu_save_read.toml, which boots the same ROM from that file.
-rom = "../../devtools/libtests_gsu/libtest_gsu.sfc"
+rom = "../fixtures/libtests_gsu/libtest_gsu.sfc"
 frames = 400   # the fixture grew (geometry, lag-frame and PAL paths, 2026-10-05): r_done lands past frame 150
 srm_out = "gsu_save.srm"
 

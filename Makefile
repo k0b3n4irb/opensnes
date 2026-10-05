@@ -49,6 +49,20 @@ RELEASE_DIR := release
 # devtools scripts that make/common.mk executes on every user build — the
 # release zip must ship each of them (see the `release` recipe).
 RELEASE_DEVTOOLS := $(sort $(shell grep 'python3' make/common.mk | grep -oE 'devtools/[A-Za-z0-9_/]+\.py'))
+
+# The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
+# rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
+# spelled them out in three places and each list was a different subset.
+FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram
+FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals
+FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
+FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
+                     $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
+                     $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS))
+# The fixtures that carry their own runtime assertions (a test_*.py beside
+# the ROM); the others are asserted by luna manifests (testing/manifests/).
+FIXTURE_TESTS     := $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
+                     $(addprefix testing/fixtures/,libtests libtests_fx libtests_dsp1 libtests_hirom libtests_sa1_sram)
 # The version of the tree, not the nearest tag: release tags sit on main's
 # merge commits, which develop never contains, so `git describe` on develop
 # named its zips after v0.17.0. snes.h is held equal to CHANGELOG by
@@ -225,16 +239,9 @@ tests: test-compiler
 	@# a public function no example executes must already be in
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
 	@# (gaps review item R5). The library fixture is one of the ROMs it
-	@# profiles, so it is built first (rebuilt clean for its own asserts below),
-	@# and so are the compiler's runtime ROMs.
-	@$(MAKE) -s -C devtools/libtests
-	@$(MAKE) -s -C devtools/libtests_fx
-	@$(MAKE) -s -C devtools/libtests_dsp1
-	@$(MAKE) -s -C devtools/libtests_hirom
-	@$(MAKE) -s -C devtools/libtests_gsu
-	@$(MAKE) -s -C devtools/libtests_snesmod
-	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
-		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
+	@# profiles, so the fixtures are built first (rebuilt clean for their own
+	@# asserts below).
+	@$(MAKE) -s fixtures
 	@python3 testing/rom_coverage.py
 	@# APU output hashed for the ten audio examples (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
@@ -261,47 +268,9 @@ tests: test-compiler
 	@# clean and the build are SEPARATE invocations — this Makefile exports
 	@# -j, and `clean all` in one command runs both goals concurrently
 	@# (clean deleted crt0.o mid-link on the first parallel run).
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit
-	@python3 devtools/compiler-tests/runtime/a7_32bit/test_a7_32bit.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/c_features clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/c_features
-	@python3 devtools/compiler-tests/runtime/c_features/test_c_features.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel
-	@python3 devtools/compiler-tests/runtime/debug_channel/test_debug_channel.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr
-	@python3 devtools/compiler-tests/runtime/a6_farptr/test_a6_farptr.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram
-	@python3 devtools/compiler-tests/runtime/b2_far_ram/test_b2_far_ram.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/d_quals clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/d_quals
-	@python3 devtools/compiler-tests/runtime/d_quals/test_d_quals.py
-	@$(MAKE) -s -C devtools/libtests clean
-	@$(MAKE) -s -C devtools/libtests
-	@python3 devtools/libtests/test_libtest.py
-	@# Second fixture: hdma, mode7, SNESMOD, nmiSet (the first has no RAM
-	@# for the first two and boots the other audio driver).
-	@$(MAKE) -s -C devtools/libtests_fx clean
-	@$(MAKE) -s -C devtools/libtests_fx
-	@python3 devtools/libtests_fx/test_libtest_fx.py
-	@# Third fixture: the DSP-1 commands no example calls. SKIPs without
-	@# the user-supplied dsp1b.rom (CI), like the firmware-gated manifests.
-	@$(MAKE) -s -C devtools/libtests_dsp1 clean
-	@$(MAKE) -s -C devtools/libtests_dsp1
-	@python3 devtools/libtests_dsp1/test_libtest_dsp1.py
-	@# Fourth fixture: HiROM. The sram module's HiROM mapping, and the bank
-	@# byte of a pointer to RAM under .BASE $$C0 (a wlalink fix, 2026-09-20).
-	@$(MAKE) -s -C devtools/libtests_hirom clean
-	@$(MAKE) -s -C devtools/libtests_hirom
-	@python3 devtools/libtests_hirom/test_libtest_hirom.py
-	@# Fifth fixture: the sram module on SA-1 — BW-RAM at $$40:0000, writable
-	@# once crt0 sets SBWE (2026-09-26; USE_SRAM with USE_SA1 was refused).
-	@$(MAKE) -s -C devtools/libtests_sa1_sram clean
-	@$(MAKE) -s -C devtools/libtests_sa1_sram
-	@python3 devtools/libtests_sa1_sram/test_libtest_sa1_sram.py
+	@# What each fixture pins is written in testing/fixtures/README.md.
+	@for d in $(FIXTURE_TESTS); do \
+		$(MAKE) -s -C $$d clean && $(MAKE) -s -C $$d && python3 $$d/test_*.py || exit 1; done
 	@python3 devtools/link_modules.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
@@ -329,8 +298,8 @@ test-pal:
 	@python3 testing/luna_runner.py --coverage --region pal
 	@# The fixture is not built by `make` (only by `make tests`): the weekly
 	@# pal.yml job never got past this line until 2026-09-26.
-	@$(MAKE) -s -C devtools/libtests
-	@python3 devtools/libtests/test_libtest.py --region pal
+	@$(MAKE) -s -C testing/fixtures/libtests
+	@python3 testing/fixtures/libtests/test_libtest.py --region pal
 	@# The games play their own scripted manifests on a PAL console
 	@# (2026-10-03): the NTSC-built ROMs with `region = "pal"` in the
 	@# manifest (luna v1.31.0; `force_region` before it; an import cartridge
@@ -377,16 +346,12 @@ test-project:
 	@echo "user-project test story: OK (incl. the FAIL path)"
 
 # Measured lib API coverage on its own (the `tests` target runs the check).
-rom-coverage:
-	@$(MAKE) -s -C devtools/libtests
-	@$(MAKE) -s -C devtools/libtests_fx
-	@$(MAKE) -s -C devtools/libtests_dsp1
-	@$(MAKE) -s -C devtools/libtests_hirom
-	@$(MAKE) -s -C devtools/libtests_gsu
-	@$(MAKE) -s -C devtools/libtests_snesmod
-	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
-		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
+rom-coverage: fixtures
 	@python3 testing/rom_coverage.py
+
+# Build every ROM fixture (no clean: test-lib rebuilds the asserted ones clean).
+fixtures:
+	@for d in $(FIXTURE_DIRS); do $(MAKE) -s -C $$d || exit 1; done
 
 # Clean example build artifacts only — keeps the toolchain binaries in bin/
 # (a full `make clean` wipes bin/ and forces a compiler rebuild).
@@ -519,22 +484,9 @@ fuzz-replay:
 # Native `luna test` manifests (issue #181) — probes migrated off the Python
 # harness onto luna's own manifest runner (the luna-first direction). Builds
 # the stress ROMs, then runs the manifests through `luna test` (exit 0/1/2).
-test-manifests:
-	@$(MAKE) -s -C testing/stress/hwmath
-	@$(MAKE) -s -C testing/stress/ppumul
-	@$(MAKE) -s -C testing/stress/openbus
-	@$(MAKE) -s -C testing/stress/bcd
-	@$(MAKE) -s -C testing/stress/sprite_overflow
-	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
-	@$(MAKE) -s -C devtools/libtests_gsu        # libtest_gsu_cached.toml fixture
-	@$(MAKE) -s -C devtools/libtests_snesmod    # libtest_snesmod.toml fixture
-	@$(MAKE) -s -C devtools/libtests_sa1_sram   # d_/e_sa1_bwram power-cycle fixture
+test-manifests: fixtures
 	@testing/bin/luna test --jobs 0 \
-		testing/stress/hwmath/hwmath.toml \
-		testing/stress/ppumul/ppumul.toml \
-		testing/stress/openbus/openbus.toml \
-		testing/stress/bcd/bcd.toml \
-		testing/stress/sprite_overflow/sprite_overflow.toml \
+		$(foreach s,$(FIXTURES_STRESS),testing/fixtures/stress/$(s)/$(s).toml) \
 		testing/manifests
 	@# The three SNESMOD transitions at sixteen press phases: a press/SPC700
 	@# race shows on some frames only (8 of 161 for the 2026-09-26 key-off
@@ -719,6 +671,7 @@ help:
 	@echo "  lib       - Build OpenSNES library"
 	@echo "  examples  - Build all example ROMs"
 	@echo "  tests     - Build test ROMs"
+	@echo "  fixtures  - Build every ROM fixture of testing/fixtures/ (lib, compiler, stress)"
 	@echo "  docs      - Generate API documentation (requires doxygen)"
 	@echo "  release   - Create the SDK release zip (toolchain, tools, lib, make, templates, starter; no examples, no HTML)"
 	@echo "  release-examples - Create the examples archive (sources, assets, built ROMs), one per version"

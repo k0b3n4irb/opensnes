@@ -185,7 +185,7 @@ Two wraps, and both are guards rather than errors:
   row. There is no word wrapping — a long string simply continues one row down.
 - **End of the last row.** Past row 31 the cursor returns to **row 0**. This is
   the bound that keeps output inside the 2048-byte buffer, and it is pinned by
-  the library fixture: `devtools/libtests/main.c` prints 40 rows of an
+  the library fixture: `testing/fixtures/libtests/main.c` prints 40 rows of an
   eight-glyph string plus a newline each, then `test_libtest.py` asserts
   `textGetY() == 8` (40 wrapping to 40 − 32) and `text_config.map_width == 32`.
   The second assert is the real point — before the wrap existed, row 32 wrote

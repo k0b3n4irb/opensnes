@@ -45,8 +45,8 @@
 #     cleared before each run.
 #
 # Measured: `luna state --until-frame 150 --peek <sym>:2 --out -` on
-# devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.1.
-rom = "../../devtools/libtests_gsu/libtest_gsu.sfc"
+# testing/fixtures/libtests_gsu/libtest_gsu.sfc, luna v1.28.1.
+rom = "../fixtures/libtests_gsu/libtest_gsu.sfc"
 frames = 400
 
 [asserts.values]

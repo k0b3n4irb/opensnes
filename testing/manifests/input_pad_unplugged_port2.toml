@@ -4,8 +4,8 @@
 # bit, 1 on a pad and 0 on an empty port (anomie-regs 5d9adb34c2fab21f for
 # the plugged half). One port at a time, so the answer is per port.
 # r_pad_conn = padIsConnected(0), r_pad_conn1 = padIsConnected(1).
-# Moved from devtools/libtests/test_libtest.py (UNPLUGGED, both ports none).
-rom = "../../devtools/libtests/libtest.sfc"
+# Moved from testing/fixtures/libtests/test_libtest.py (UNPLUGGED, both ports none).
+rom = "../fixtures/libtests/libtest.sfc"
 steps = 3000000
 port2 = "none"
 

@@ -67,7 +67,7 @@ u16 animTick(AnimPlayer *p) {
      * `p->ticks--; if (p->ticks == 0)` form is now correct too — the
      * cc65816 miscompile that motivated this (post-store re-read through an
      * address reloaded in 8-bit accumulator mode) was fixed in qbe w65816
-     * (opensnes#99, pinned by the r_rmw_u8 vector in devtools/libtests and
+     * (opensnes#99, pinned by the r_rmw_u8 vector in testing/fixtures/libtests and
      * the test_rmw_ptr_reread codegen check). This form is kept as-is to
      * avoid rebuilding every anim-linked ROM for a no-op; it is equally
      * correct and one load/store cheaper. */

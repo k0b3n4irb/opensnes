@@ -160,7 +160,7 @@ since qbe `3e79c8c`, 2026-05-21): the callee returns the **low 16 bits in
 After the `jsl`, the caller stores `A` to the low half of the destination
 and `lda.b tcc__retval_hi` to its high half. Hand-written asm that returns a
 32-bit value must follow this (`lib/source/fixed32.asm`, `fix32Sin`, is the
-reference; `devtools/libtests` asserts its full 32 bits at run time). The
+reference; `testing/fixtures/libtests` asserts its full 32 bits at run time). The
 direct page must be `$0000` at the `sta.b`, as it is for all C code.
 
 **Runtime helpers (`__mul32`, `__[s]divmod32`)**: low 16 returned in `A`,
@@ -486,7 +486,7 @@ the keyword is an error.
   silently-wrong code"). Pass a pointer. Pinned by
   `devtools/compiler-tests/cases/negative/struct_param` and `struct_return`.
   Assigning a struct (`a = b;`) works since 2026-10-03 (bytes, words and
-  longs per the member alignment; `devtools/compiler-tests/runtime/d_quals`
+  longs per the member alignment; `testing/fixtures/compiler/d_quals`
   checks every byte lands), except from or to a `FAR` object, which is
   refused: copy field by field.
 

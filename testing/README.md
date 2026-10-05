@@ -85,8 +85,8 @@ profiled once input-free to its first capture frame and once per `luna
 test` manifest that names it, replaying the manifest's joypad-1 script (the
 checkpoints merged into one timeline, as `luna test` does) to its last
 checkpoint or `frames` / `steps` bound; the library fixture
-(`devtools/libtests/libtest.sfc`), its sibling for the modules it has no
-RAM for (`devtools/libtests_fx/`: hdma, mode7, SNESMOD) and the compiler's
+(`testing/fixtures/libtests/libtest.sfc`), its sibling for the modules it has no
+RAM for (`testing/fixtures/libtests_fx/`: hdma, mode7, SNESMOD) and the compiler's
 five runtime ROMs are profiled as well. The public
 functions of `lib/include/snes/*.h` that nothing executes are written to
 `baselines/never_executed.txt`; `make tests` fails if that set gains a
@@ -169,8 +169,8 @@ never could. **These checks now live as native luna manifests under
 `manifests/*.toml`** (run by `luna test` via `make test-manifests`); the
 Python probes that pioneered them were deleted after the migration —
 `lib/probes.py` is the `luna state --assert` / `--peek`
-helper every runtime ROM checker imports (`from lib import assert_mem`) (`devtools/compiler-tests/runtime/*`,
-`devtools/libtests`, `project_test.py`); the `run_all.py` runner that globbed
+helper every runtime ROM checker imports (`from lib import assert_mem`) (`testing/fixtures/compiler/*`,
+`testing/fixtures/libtests`, `project_test.py`); the `run_all.py` runner that globbed
 the emptied directory was deleted on 2026-09-14. Same coverage, declarative form:
 
 - **Coprocessor execution** (`manifests/coproc_*.toml`) — SA-1, Super FX

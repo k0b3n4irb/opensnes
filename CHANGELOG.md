@@ -49,6 +49,14 @@ freeze criterion that waits for hardware.
   the harness locally, as `lint.yml` does; the orphaned generators
   (`gen_hud_bar`, `brr2it`, the Python `font2snes`, `hicolor64hires`) and
   the one-shot MCP prototypes are gone.
+- **The test harness is `testing/`, with its fixtures** (testing): the
+  luna harness left `tools/luna-test` so that `tools/` means "shipped";
+  `testing/lib` is the one module the harness scripts and the fixture
+  tests import (luna resolver, pin, corpus, probes); the twenty ROM
+  fixtures (`libtests*`, the compiler runtime ROMs, the stress ROMs,
+  `benchrom`) gathered under `testing/fixtures/` with one list in the
+  `Makefile` (`make fixtures`) where three targets each spelled out a
+  different subset. The zip's `make test` path follows (`testing/`).
 - **`dmaTransfer(channel, mode, src, destReg, size)` takes the source as
   one far pointer** (lot F of the 1.0 plan): the bank comes from the
   pointer, like every `dmaCopy*` helper; the six-argument form of 0.x no

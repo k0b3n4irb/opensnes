@@ -44,27 +44,13 @@ Their unit tests: `test_check_doc_drift.py`, `test_check_nmi_wram_race.py`,
 `test_check_vram_layout.py`, `test_asset_budget.py`, `symmap/test_symmap.py`
 (`devtools-tests` job of `lint.yml`; `make test-devtools`).
 
-## Fixtures: ROMs that assert on the library and the compiler
+## Fixtures: moved to `testing/fixtures/`
 
-Single-purpose ROM projects (a `main.c`, a `Makefile` over `common.mk`)
-rebuilt clean by `make tests`; each asserts result globals by symbol in
-luna, through `testing/lib` (`from lib import find_luna, assert_mem`).
-
-| Directory | Covers | Asserted by |
-|-----------|--------|-------------|
-| `libtests/` | console, sprite, dma, background, text, math, anim, map, audio, fixed32, collision, window, input, object, colormath, mosaic, profile, scene, tile, math_ease | `test_libtest.py` |
-| `libtests_fx/` | hdma, mode7, SNESMOD, nmiSet, an IRQ armed before the driver | `test_libtest_fx.py` |
-| `libtests_dsp1/` | the DSP-1 commands no example calls, on luna's real firmware | `test_libtest_dsp1.py` |
-| `libtests_hirom/` | the HiROM map | `test_libtest_hirom.py` |
-| `libtests_sa1_sram/` | SA-1 BW-RAM across a power cycle | `test_libtest_sa1_sram.py` |
-| `libtests_gsu/` | the Super FX job path | `testing/manifests/libtest_gsu*.toml` |
-| `libtests_snesmod/` | the SNESMOD stop / pause / fade queue | `testing/manifests/libtest_snesmod.toml` |
-| `compiler-tests/runtime/*` | a6_farptr, a7_32bit, b2_far_ram, c_features, debug_channel, d_quals — runtime proofs of compiler chantiers | each one's `test_*.py` (`test-lib`) |
-| `compiler-tests/cases/` | C → ASM pattern checks, no emulator (`run.py`, `*.checks`) | `test-compiler` |
-| `benchrom/`, `benchrom/b2_deref/` | cycles per call of the lib's ASM paths (C1 audit instrument, `lib/ARCHITECTURE.md`) and the far-deref cost (B2) | `bench.py` in each, by hand |
-
-The fixtures are planned to gather under one root with a single list
-(review, lot 6); today the `Makefile` lists them in three targets.
+The twenty ROM projects that assert on the library, the compiler and luna
+(`libtests*`, the compiler runtime ROMs, the stress ROMs, `benchrom`) live
+under [`testing/fixtures/`](../testing/fixtures/README.md) since 2026-10-05,
+with one list in the root `Makefile`. `compiler-tests/` keeps the
+compile-time pattern checks (`cases/`, `run.py`).
 
 ## Benches and reports
 

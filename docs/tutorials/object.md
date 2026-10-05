@@ -499,7 +499,7 @@ modules have. The following are verified against `lib/contrib/object.asm` and
 the shipped ROMs. Every public function is now executed by a test, but seven
 of the sixteen (`objCollidMap1D`, `objCollidObj`, `objInitFriction1D`,
 `objInitGravity`, `objKill`, `objKillAll`, `objRefreshAll`) only by the
-library fixture (`devtools/libtests`), not by any example — they have
+library fixture (`testing/fixtures/libtests`), not by any example — they have
 assertions, not mileage.
 
 ### 🟢 `objInitFunctions` stored garbage — fixed 2026-09-18

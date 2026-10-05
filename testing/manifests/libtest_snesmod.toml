@@ -1,5 +1,5 @@
 # libtest_snesmod — what snesmodProcess and the SNESMOD command queue do to
-# the rest of the machine (devtools/libtests_snesmod/main.c). No soundbank:
+# the rest of the machine (testing/fixtures/libtests_snesmod/main.c). No soundbank:
 # the messages are module-volume commands, one queue entry each.
 #
 # Before the fix of 2026-10-03 the same ROM gave, on luna v1.30.4:
@@ -19,7 +19,7 @@
 # r_irq: a V-timer IRQ armed before snesmodInit() still fires after it, ten
 # times in ten frames. Until 2026-10-03 snesmodInit ended on NMITIMEN = $81
 # whatever the caller had, and the same ROM gave 0.
-rom = "../../devtools/libtests_snesmod/libtest_snesmod.sfc"
+rom = "../fixtures/libtests_snesmod/libtest_snesmod.sfc"
 frames = 400
 
 [asserts.values]

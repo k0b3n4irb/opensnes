@@ -12,7 +12,7 @@
  *   low byte then high byte through volatile stores (honoured by QBE
  *   since chantier A2 — the two writes cannot be coalesced).
  *
- * Benchmarked against the ASM original with devtools/benchrom under
+ * Benchmarked against the ASM original with testing/fixtures/benchrom under
  * the C1 audit's ±10 % rule; numbers in
  * .claude/notes/chantiers/c1_asm_audit.md.
  *

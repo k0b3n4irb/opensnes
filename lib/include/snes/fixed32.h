@@ -281,7 +281,7 @@ inline fixed32 fix32Lerp(fixed32 a, fixed32 b, fixed32 t) {
  * widening, which produced 0x00FF0000 instead of 0xFFFF0000 for
  * sin(270°) = -1.
  *
- * BOTH ARE GONE (re-measured 2026-09-18). `devtools/libtests` now computes
+ * BOTH ARE GONE (re-measured 2026-09-18). `testing/fixtures/libtests` now computes
  * that exact C expression alongside this function and asserts they agree
  * (r_f32sin_c / r_f32sin_asm), and `c_features` pins the widen-then-shift
  * case on its own (r_widen_shl). The asm stays because there is no reason

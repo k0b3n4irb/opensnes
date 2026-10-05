@@ -162,7 +162,7 @@ the item's base unconditionally. Under `.BASE $C0` (every HiROM unit)
 **every C pointer to RAM carried a ROM bank on HiROM**, and any routine that
 honours the bank byte of its pointer read or wrote `$C0:xxxx` instead of work
 RAM. Found by an SRAM round trip on the HiROM fixture
-(`devtools/libtests_hirom`). Not behaviour-neutral: HiROM and FastROM ROMs
+(`testing/fixtures/libtests_hirom`). Not behaviour-neutral: HiROM and FastROM ROMs
 change (the bank byte pushed for RAM pointers goes from `$C0` / `$80` to
 `$00`); LoROM SlowROM ROMs are byte-identical.
 

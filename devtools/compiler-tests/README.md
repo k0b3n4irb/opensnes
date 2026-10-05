@@ -49,7 +49,7 @@ alongside the other `devtools/` linters. See
   doesn't fit `present`/`absent`/`count`/`in`/`section`, extend the DSL in
   `run.py` rather than weakening the check.
 
-## Runtime fixture ROMs (`runtime/`)
+## Runtime fixture ROMs (`testing/fixtures/compiler/`, since 2026-10-05)
 
 Pattern checks prove shapes; these ROMs prove results. Each directory is a
 one-TU ROM whose globals the sibling `test_*.py` asserts through

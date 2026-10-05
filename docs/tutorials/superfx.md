@@ -214,7 +214,7 @@ What such a program may not do:
 
 If `gsu_scmr` grants the Game Pak RAM to the GSU (RAN, needed for `PLOT` and
 `STW`), the CPU must not touch `$70:xxxx`, nor its `$6000-$7FFF` mirror,
-until `gsuWait()`. `devtools/libtests_gsu` runs a job of about seven frames
+until `gsuWait()`. `testing/fixtures/libtests_gsu` runs a job of about seven frames
 this way; its manifest checks that the game loop counted seven frames during
 the job and that the CPU never read the ROM the GSU owned (luna's
 `gsu.bus_violations` stays 0, against 149 340 when RON is left at 1).
@@ -254,7 +254,7 @@ masked?"); ares and bsnes set it only when the IRQ is unmasked
 (`instructionSTOP`: `if(regs.cfgr.irq == 0) { regs.sfr.irq = 1; … }`), an
 emulator's choice rather than a measurement. If a console did set it, the
 next timer IRQ would count that old STOP.
-`devtools/libtests_gsu` runs its job a second time this way (the count moves
+`testing/fixtures/libtests_gsu` runs its job a second time this way (the count moves
 by exactly one, seven game frames during the job). Before 2026-09-27 this
 combination locked the CPU in its IRQ entry: the GSU's IRQ went to your
 handler, whose `$4211` read does not reset it.
@@ -294,7 +294,7 @@ inside it are the RAM ones; crt0 copies it at boot. C calls it like any
 function (`ramRunRomJob();` is a `jsl` to `$7E:xxxx`). While the GSU owns the
 ROM, code in the window must not call or read the ROM: no lib function, no
 C code, no const data. The NMI keeps counting frames (`gsu_owns_cart`, see
-above). `devtools/libtests_gsu` runs its job a third time this way: 33 frames
+above). `testing/fixtures/libtests_gsu` runs its job a third time this way: 33 frames
 of a ROM-resident job with the CPU polling from RAM and no bus violation; the
 same loop in a plain ROM section loses the CPU at once.
 
@@ -354,7 +354,7 @@ REG_GSU_R2 = 7;
 gsuCall(GSU_JOB_MUL_JOB);       /* R0-R7 and R9-R13 are yours; the launcher writes R8 and R15 */
 ```
 
-`devtools/libtests_gsu` runs `mul_job` both ways. The offsets are relative to
+`testing/fixtures/libtests_gsu` runs `mul_job` both ways. The offsets are relative to
 the binary. By default the program is assembled at 0 and placed by the
 linker where it fits, so only position-independent code is right: relative
 branches, `LOOP` through `MOVE R13, R15`.
@@ -392,7 +392,7 @@ The generated `.sfx.h` still holds offsets, so `gsuCall()` and
 `gsuStartCached()` are called the same way. One `.sfx` per ROM in this mode
 (`.include` the others from it); bank 1's top is the RAM code window, so a
 program longer than what is left below it fails at link rather than at
-run. `devtools/libtests_gsu` is built this way: its `rom_job` returns the
+run. `testing/fixtures/libtests_gsu` is built this way: its `rom_job` returns the
 two table bytes, and returns 0 when the same binary is placed elsewhere.
 
 ## SuperFX Assembly Rules
@@ -660,7 +660,7 @@ Two things differ from an ordinary cartridge:
   therefore works, and costs the job the time of the copy: keep it small,
   or save between jobs.
 
-`devtools/libtests_gsu` saves while a job runs, and two luna manifests
+`testing/fixtures/libtests_gsu` saves while a job runs, and two luna manifests
 (`f_gsu_save_write.toml`, `g_gsu_save_read.toml`) power the cartridge off
 and on between the save and the read.
 

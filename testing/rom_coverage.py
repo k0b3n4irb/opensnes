@@ -17,7 +17,7 @@ and once per `luna test` manifest that names its ROM, replaying the
 manifest's joypad-1 script to its last checkpoint (since 2026-09-19 —
 before that, input-driven code was under-counted: 167 "never" of which 53
 were only ever reached by a button). The library fixture
-(`devtools/libtests/libtest.sfc`) counts too: a function it asserts on is
+(`testing/fixtures/libtests/libtest.sfc`) counts too: a function it asserts on is
 tested, and a ratchet that said otherwise was asking for an example nobody
 needs. Since luna v1.26.0 `luna profile` takes the peripherals too, so a
 manifest's mouse (port 1), Super Scope (port 2) and joypad-2 scripts are
@@ -79,14 +79,15 @@ MANIFESTS = HERE / "manifests"
 # The compiler's runtime ROMs count too: debug_channel is the only executor
 # of the WDM / nocash channel (consoleNocashMessage, consoleMesenBreakpoint)
 # and asserts on it; the others run in ~1 M instructions (their tests' STEPS).
-DSP1_FIXTURE = (REPO_ROOT / "devtools" / "libtests_dsp1" / "libtest_dsp1.sfc", "libtest_dsp1", 60)
-_RT = REPO_ROOT / "devtools" / "compiler-tests" / "runtime"
-FIXTURES = [(REPO_ROOT / "devtools" / "libtests" / "libtest.sfc", "libtest", 120),
+FIXTURES_DIR = REPO_ROOT / "testing" / "fixtures"
+DSP1_FIXTURE = (FIXTURES_DIR / "libtests_dsp1" / "libtest_dsp1.sfc", "libtest_dsp1", 60)
+_RT = FIXTURES_DIR / "compiler"
+FIXTURES = [(FIXTURES_DIR / "libtests" / "libtest.sfc", "libtest", 120),
             # the second fixture reaches r_done around frame 170 (SNESMOD upload first)
-            (REPO_ROOT / "devtools" / "libtests_fx" / "libtest_fx.sfc", "libtest_fx", 240),
-            (REPO_ROOT / "devtools" / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60),
+            (FIXTURES_DIR / "libtests_fx" / "libtest_fx.sfc", "libtest_fx", 240),
+            (FIXTURES_DIR / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60),
             # the cache-resident GSU job (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait)
-            (REPO_ROOT / "devtools" / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60)] + [
+            (FIXTURES_DIR / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
     for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals")
 ]

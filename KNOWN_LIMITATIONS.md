@@ -121,7 +121,7 @@ is `y - 1` — the NMI shadow sync (`bgSetScroll`/`bgSetScrollY`), the map
 module, `mode7SetScroll`, and the reset default — so `y = 0` means "tilemap
 row 0 on the first picture line". **Test:** the lib fixture reads
 `bgs.1.v_scroll == 76` after `bgSetScrollY(1, 77)` on luna's PPU view
-(`devtools/libtests/test_libtest.py`), and the `backgrounds_mode6*.toml`
+(`testing/fixtures/libtests/test_libtest.py`), and the `backgrounds_mode6*.toml`
 manifests pin the one exception (BG3 as the offset-per-tile table, written
 raw). PVSnesLib writes the raw value; when
 porting, do not subtract 1 yourself. The one path the lib cannot cover is
@@ -306,7 +306,7 @@ register `$002229` (twice: early init ~`:519-526`, and the SA-1 boot block
 [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers) says
 bit=1 *protects* a page. **Resolved 2026-09-02: the wiki page is wrong** and
 `$FF` (bit=1 = write-enable) is correct, on four independent grounds
-(**test:** the SA-1 fixture `devtools/libtests_sa1_sram` reads back a byte the
+(**test:** the SA-1 fixture `testing/fixtures/libtests_sa1_sram` reads back a byte the
 SA-1 wrote to BW-RAM from its boot stub, `r_sa1_bw == 0x5A`, and
 `sa1_hello` / `sa1_starfield` run in every coverage pass):
 
@@ -482,7 +482,7 @@ caller reads both back. `compiler/ABI.md` ("32-bit values") documents the
 convention for hand-written asm. This entry said "not fixed" until
 2026-09-26, four months after the fix.
 
-**Pinned by:** `devtools/libtests` asserts all 32 bits of `fix32Sin`, an asm
+**Pinned by:** `testing/fixtures/libtests` asserts all 32 bits of `fix32Sin`, an asm
 callee using the convention. No runtime fixture yet calls a *C* function
 returning `u32` and consumes the full value (tracked in the 2026-09-26
 état des lieux).
@@ -533,7 +533,7 @@ upstream driver (snes-rag) then measuring ours on luna:
 at H=274 and cleared at H=1 on every line; anomie-timing, fullsnes): no
 latch, no counter read, and a real five-line budget. A command that does not
 fit is dropped (the newest). The `cli` is gone; the position is read until
-two reads agree; `snesmodInit()` restores NMITIMEN from the lib's copy. Pinned by `devtools/libtests_snesmod` and
+two reads agree; `snesmodInit()` restores NMITIMEN from the lib's copy. Pinned by `testing/fixtures/libtests_snesmod` and
 `testing/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
 queue depth 255 after 100 sends, queue drained). Visible change: with
 several commands queued `snesmodProcess()` now really waits up to five
@@ -565,7 +565,7 @@ not tell them apart. The NMI handler now reads one serial bit past the 16 of
 auto-read on each port whose signature is a pad's: a joypad returns 1s
 there (anomie's register doc). What an *empty* port returns is stated by no
 reference — luna, ares and Mesen2 return 0 — and has not been measured on
-a console: no example displays it yet, so the protocol has no row for it. Pinned by `devtools/libtests`
+a console: no example displays it yet, so the protocol has no row for it. Pinned by `testing/fixtures/libtests`
 with luna's `--port1 none --port2 none` (both read 0; both read 1 with pads).
 ### 🟢 Super FX: `gsuDmaFullFrame()` wrote a third of the framebuffer on visible lines (fixed 2026-09-29)
 
@@ -632,7 +632,7 @@ game needs (`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`).
 **Test:** since 2026-10-05 `luna_runner.py --coverage` fails any ROM whose
 header size byte covers less than the file (and, with luna's
 `checksum_computed`, whose header sum differs from the bytes); the HiROM
-fixture `devtools/libtests_hirom` is a 512 KB ROM in that pass.
+fixture `testing/fixtures/libtests_hirom` is a 512 KB ROM in that pass.
 
 In the same change the Super FX header gained the extended header it never
 had: sixteen `$FF` bytes and a zero licensee code meant no emulator or
@@ -689,7 +689,7 @@ work RAM when handed a RAM buffer on a HiROM build. LoROM was unaffected
 (`$80:xxxx`, the FastROM case, still mirrors work RAM below `$2000`).
 
 Fixed in the wlalink fork (`compiler/PINS.md`, third local patch). Found by
-the first HiROM library fixture, `devtools/libtests_hirom`: an SRAM save from
+the first HiROM library fixture, `testing/fixtures/libtests_hirom`: an SRAM save from
 a const template worked, the load into a RAM buffer wrote nowhere.
 
 ### 🟢 SRAM used the LoROM address on every build (fixed 2026-09-20)
@@ -701,7 +701,7 @@ addresses the first 8 KB window only. SA-1 + `USE_SRAM=1` was refused at
 build time until 2026-09-26: its save memory is BW-RAM ($40:0000), writable
 from the SNES CPU only once SBWE (`$2226`, fullsnes) is set. crt0 sets it
 now and the module addresses BW-RAM on SA-1 builds (without SBWE the writes
-are dropped — measured on luna). Pinned by `devtools/libtests_sa1_sram`
+are dropped — measured on luna). Pinned by `testing/fixtures/libtests_sa1_sram`
 (bytes read back at `$40:0000`). luna does not yet persist SA-1 BW-RAM to
 `.srm` (reported to luna).
 
@@ -712,12 +712,12 @@ accumulator (`tya / cmp`) and never reloaded the `#$00` it was storing, so
 byte 0 was cleared and bytes 1..n-1 received their own offset (0, 1, 2,
 3, …). `sramSave`/`sramLoad` were right, and no example called
 `sramClear`, so the "delete save" path in the SRAM tutorial shipped
-broken until the lib fixture (`devtools/libtests`, gaps review L2c) did a
+broken until the lib fixture (`testing/fixtures/libtests`, gaps review L2c) did a
 save / clear / load round trip. The loop now compares Y directly
 (`cpy DP_SIZE`) and the fixture asserts the reloaded bytes are all zero.
 
 ### 🟢 Five silent miscompilations found and fixed by the C-feature runtime ROM (2026-09-13)
-`devtools/compiler-tests/runtime/c_features` (gaps review C2) asserts the
+`testing/fixtures/compiler/c_features` (gaps review C2) asserts the
 result of every C feature that had no runtime check before. Its first run
 found five ways cc65816 produced wrong code with no diagnostic; all are
 fixed in the same chantier and the ROM gates `make tests` at 64/64:

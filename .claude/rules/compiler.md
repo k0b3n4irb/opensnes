@@ -57,5 +57,5 @@ This is a Class A change — requires `make clean && make` + full test suite (lu
 4, pointer 4): `funccopy`'s chunk table, `zero()`, the bit-field
 extraction and the cast scaling were each found by a consumer, one at a
 time (compiler audit 2026-10-03, PF3). A new site is reviewed, then added
-with `--update`; `devtools/compiler-tests/runtime/d_quals` is where its
+with `--update`; `testing/fixtures/compiler/d_quals` is where its
 runtime effect gets a cell.
