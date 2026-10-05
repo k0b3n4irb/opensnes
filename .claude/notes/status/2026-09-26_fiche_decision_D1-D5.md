@@ -204,3 +204,14 @@ par octet (adresses de code en RAM : `dynamic_flush_hook`, `nmi_callback`,
 Restent E (`hdmaEnable(channel)`), F (`dmaTransfer`) et I (macros 1.0.0,
 après la session console) ; G et H sont livrés avec B et C.
 
+**Lot E fait, 2026-10-05 (soir).** D1, second temps : `hdmaEnable(u8
+channel)` / `hdmaDisable(u8 channel)` prennent un canal 0-7 ; au-dessus de 7
+l'appel est refusé et HDMAEN ne bouge pas (un masque 0.x laissé en place
+échoue visiblement). `hdmaEnableMask` / `hdmaDisableMask` restent. Vecteur
+de fixture : `hdmaDisable(4)` → $60, `hdmaEnable(4)` → $70, puis 8, $40, $10
+et $FF refusés, HDMAEN toujours à $70 ; sous l'ancien sens le même vecteur
+donnerait $70 puis $74. Plus aucune déclaration `OPENSNES_DEPRECATED` dans
+les en-têtes (seule la macro reste dans `types.h`) ; les pragmas des trois
+fixtures sont partis avec. `check-upgrade` continue de lister chaque appel.
+Restent F (`dmaTransfer`) et I (macros 1.0.0, après la session console).
+

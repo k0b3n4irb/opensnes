@@ -57,8 +57,8 @@ version. A new module costs nothing to a project that does not link it.
 - A **change of meaning** (the same name, a different effect) happens only
   at a major version, is announced one minor version ahead, and gets an
   entry in `docs/UPGRADING.md` and a check in `check-upgrade`. The 1.0
-  release carries one: the deprecated `hdmaEnable()` / `hdmaDisable()`
-  (mask-taking today) come back taking a channel number.
+  release carries one: `hdmaEnable()` / `hdmaDisable()`, mask-taking and
+  deprecated in 0.48, take a channel number (and refuse a value above 7).
 - A **bug fix that changes behaviour** (the hardware did not do what the
   function promised, or the function did not do what its header said) is
   not a break: the header is the contract, and the fix makes the code

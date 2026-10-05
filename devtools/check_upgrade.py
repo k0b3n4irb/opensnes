@@ -10,8 +10,8 @@ constant named in a `#pragma clang deprecated(NAME, "...")`, the names that
 still compile with a warning — and devtools/removed_api.txt, the names
 already gone from the headers (since 2026-10-05), which the compiler can only
 report as unknown identifiers. Two calls are reported even
-though they keep their name: hdmaEnable() / hdmaDisable(), which take a
-mask until 1.0 and a channel number from 1.0, and mode7SetScale() /
+though they keep their name: hdmaEnable() / hdmaDisable(), which took a
+mask until 0.48 and a channel number from 1.0, and mode7SetScale() /
 mode7Transform(), whose 1:1 value changed in 0.47. Exit 0 when nothing is
 found, 1 otherwise; a line per hit: file:line, the name, what to use.
 """
@@ -32,9 +32,9 @@ DEPRECATED_MACRO = re.compile(r'^\s*#pragma clang deprecated\(([A-Z0-9_]+), "([^
 
 # The calls that keep their name and change what they mean.
 MEANING = {
-    "hdmaEnable": "takes a bit mask until 1.0 and a channel number from 1.0 — "
-                  "use hdmaEnableMask() now, hdmaEnable(channel) at 1.0",
-    "hdmaDisable": "same as hdmaEnable: hdmaDisableMask() now",
+    "hdmaEnable": "takes a channel number 0-7 since 1.0 (a bit mask until 0.48; "
+                  "above 7 it is refused) — 1 << n becomes n, or hdmaEnableMask(1 << n)",
+    "hdmaDisable": "same as hdmaEnable: n, or hdmaDisableMask(1 << n)",
     "mode7SetScale": "0x0100 is 1:1 since 0.47 (it was 0x0200): check the value",
     "mode7Transform": "100 is 1:1 since 0.47: check the percentage",
 }

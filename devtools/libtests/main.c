@@ -42,11 +42,6 @@
 #include <snes/registers.h>
 #include <snes/tile.h>
 #include <snes/apu.h>
-/* hdmaEnable / hdmaDisable keep their mask vector until lot E (1.0 plan)
- * gives them a channel; their deprecation warning is the only one left. */
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */

@@ -7,12 +7,12 @@ compiles, and `make check-upgrade SRC=<folder>` reads a whole project) and
 is gone at 1.0. Nothing else of the public API changes at 1.0, and nothing changes
 again before 2.0.
 
-**Where `develop` stands (2026-10-05, lots B and C of the plan):** the
+**Where `develop` stands (2026-10-05, lots B, C and E of the plan):** the
 constants of section 3, the `OAM_SET_GFX_BANK` macro and the twenty-six
 renamed functions of section 2 are gone from the headers — a project that
 names one no longer compiles, and `make check-upgrade` reports each use from
-`devtools/removed_api.txt`. Only `hdmaEnable()` / `hdmaDisable()` still build
-with their warning: they change meaning in their own lot (section 1).
+`devtools/removed_api.txt`. `hdmaEnable()` / `hdmaDisable()` already take a
+channel number (section 1); no `OPENSNES_DEPRECATED` declaration is left.
 
 Two things on this page are not removals but **changes of meaning**: read
 them first. Everything else is a rename where the old and new name do the
@@ -22,14 +22,14 @@ same thing.
 
 ### `hdmaEnable(x)` and `hdmaDisable(x)` take a channel number at 1.0
 
-Until 1.0 they take a **bit mask** (`1 << channel`), like nothing else in
+Until 0.48 they took a **bit mask** (`1 << channel`), like nothing else in
 `hdma.h`. Since 0.48 that meaning has its own names, `hdmaEnableMask()` and
-`hdmaDisableMask()`, and the two short names warn. At 1.0 they come back
-taking a **channel number** 0-7, like the other twenty functions of the
-header. A call left as `hdmaEnable(0x40)` compiles at 1.0 and means
-something else; values above 7 are refused (nothing is enabled), so
-`0x40`, `0x0F`, `0xFF` and `1 << 6` fail visibly, but the masks 1, 2 and 4
-silently become channels 1, 2 and 4 instead of 0, 1 and 2.
+`hdmaDisableMask()`, and in 0.48 the two short names warn. At 1.0 (on
+`develop` since 2026-10-05) they take a **channel number** 0-7, like the
+other twenty functions of the header. A call left as `hdmaEnable(0x40)`
+compiles and means something else; values above 7 are refused (nothing is
+enabled), so `0x40`, `0x0F`, `0xFF` and `1 << 6` fail visibly, but the masks
+1, 2 and 4 silently become channels 1, 2 and 4 instead of 0, 1 and 2.
 
 ```c
 hdmaEnable(1 << HDMA_CHANNEL_6);      /* 0.x: mask. 1.0: refused (64 > 7) */

@@ -20,12 +20,6 @@
  * function that does drop the bank is irqSet — API audit 2026-09-20, B2).
  */
 
-/* hdmaEnable / hdmaDisable keep their mask vector until lot E (1.0 plan)
- * gives them a channel; their deprecation warning is the only one left. */
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 #include <snes.h>
 #include <snes/hdma.h>
 #include <snes/mode7.h>
@@ -40,7 +34,8 @@ u16 r_hdma_wave;     /* ... after hdmaWaveH(6, 0, 8, 4)                -> 0x40 *
 u16 r_hdma_setup;    /* ... after hdmaGradient(5) + hdmaWindowShape(4): setup
                       * does not enable                                 -> 0x40 */
 u16 r_hdma_both;     /* ... after hdmaEnableMask(ch 5 | ch 4)              -> 0x70 */
-u16 r_hdma_names;    /* hdmaDisable / hdmaEnable (deprecated) still take a mask -> 1 */
+u16 r_hdma_chan;     /* hdmaDisable(4) / hdmaEnable(4) take a channel; 8, 0x10 and
+                      * 0x40 (0.x masks) are refused and change nothing       -> 1 */
 u16 r_m7_rot_sin;    /* m7_sin after mode7Rotate(90): table[64]         -> 127 */
 u16 r_chips;         /* plain LoROM: sa1IsReady | gsuIsPresent<<2, both 0           -> 0 */
 u16 r_nmi_calls;     /* nmiSet callback invocations over 5 frames       -> 5 */
@@ -133,11 +128,17 @@ int main(void) {
     r_hdma_setup = hdmaGetEnabled();
     hdmaEnableMask((1 << 5) | (1 << 4));
     r_hdma_both = hdmaGetEnabled();
-    /* D1: the old names are the same entry points until 1.0 */
-    hdmaDisable(1 << 4);
-    r_hdma_names = (hdmaGetEnabled() == 0x60) ? 1 : 0;
-    hdmaEnable(1 << 4);
-    if (hdmaGetEnabled() != 0x70) r_hdma_names = 0;
+    /* D1 at 1.0: the short names take a channel number; a 0.x mask (any
+     * value above 7) is refused and leaves HDMAEN alone */
+    hdmaDisable(4);
+    r_hdma_chan = (hdmaGetEnabled() == 0x60) ? 1 : 0;
+    hdmaEnable(4);
+    if (hdmaGetEnabled() != 0x70) r_hdma_chan = 0;
+    hdmaEnable(8);                  /* the first refused value */
+    hdmaEnable(0x40);               /* 1 << HDMA_CHANNEL_6 left as a mask */
+    hdmaDisable(0x10);              /* 1 << HDMA_CHANNEL_4 left as a mask */
+    hdmaDisable(0xFF);
+    if (hdmaGetEnabled() != 0x70) r_hdma_chan = 0;
     /* hdmaColorGradient on colour 37 (not 0): the index was written as
      * [index, 0] to a register written twice, so every gradient landed on
      * colour 0. Red at the top, blue at the bottom; the last chunk leaves

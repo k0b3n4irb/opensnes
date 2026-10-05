@@ -6,9 +6,6 @@
  */
 #include <snes.h>
 #include <snes/dsp1.h>
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
 
 volatile u16 dsp1_ok;   /* dsp1IsPresent()                              -> 1 */
 u16 r_mul;       /* dsp1Multiply(0x4000, 0x4000): 0.5 x 0.5 in 1.15     -> 0x2000 */

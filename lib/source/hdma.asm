@@ -258,7 +258,6 @@ hdmaSetupIndirect:
 ; Stack layout (after PHP):
 ;   5,s = channelMask (8-bit)
 ;------------------------------------------------------------------------------
-hdmaEnable:                 ; deprecated name, same entry point (until 1.0)
 hdmaEnableMask:
     php
     sep #$20
@@ -279,7 +278,6 @@ hdmaEnableMask:
 ;
 ; Disables specified HDMA channels.
 ;------------------------------------------------------------------------------
-hdmaDisable:                ; deprecated name, same entry point (until 1.0)
 hdmaDisableMask:
     php
     sep #$20

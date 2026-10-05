@@ -14,6 +14,14 @@ All notable changes to OpenSNES are documented in this file.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **`hdmaEnable(channel)` / `hdmaDisable(channel)` take a channel number**
+  (lot E of the 1.0 plan, API decision D1 second step): 0-7 like the other
+  twenty functions of `hdma.h`; a value above 7 is refused and changes
+  nothing, so a 0.x mask left behind (`0x40`, `0x0F`, `1 << 6`) fails
+  visibly. `hdmaEnableMask` / `hdmaDisableMask` stay for several channels at
+  once. The fixture asserts both forms and four refused values;
+  `check-upgrade` still lists every call. No `OPENSNES_DEPRECATED`
+  declaration is left in the headers.
 - test(devtools): the GSU fixture runs the presentation paths no ROM
   exercised (chips audit PF5): `gsuFrameBytes()` for every height and
   depth (`SCMR_H160`, `SCMR_H192`, 2/4/8 bpp, OBJ mode), the refusal of

@@ -169,7 +169,7 @@ read; `devtools/check_bank_reads.py` fails the link on a bank-blind one.
 | `oamSet(...)` | `oamSet(...)` | Same, 7 arguments (see Pitfall 2) |
 | `oamSetEx(...)`, `oamSetVisible(...)` | `oamSetSize()`, `oamHide()`, `oamSetXY()` | Split by concern |
 | `hdmaSetup(ch, ...)` | `hdmaSetup(ch, ...)` | Same |
-| `hdmaEnable(ch)` | `hdmaEnableMask(1 << ch)` | **BITMASK not channel number!** |
+| `hdmaEnable(1 << ch)` | `hdmaEnable(ch)` | **Channel number since 1.0** (mask: `hdmaEnableMask(1 << ch)`) |
 
 #### Color Math Mapping
 
@@ -256,10 +256,12 @@ clean-example:
 
 ## Critical Pitfalls (from hard experience)
 
-### 1. hdmaEnableMask takes a BITMASK, not a channel number
+### 1. hdmaEnable takes a channel, hdmaEnableMask a BITMASK
 ```c
-hdmaEnableMask(1 << 3);   // CORRECT: enable channel 3
+hdmaEnable(3);             // CORRECT: enable channel 3
+hdmaEnableMask(1 << 3);   // CORRECT: the same, as a mask
 hdmaEnableMask(3);         // WRONG: enables channels 0+1 !
+hdmaEnable(1 << 3);        // REFUSED (8 > 7): a PVSnesLib mask left behind
 ```
 
 ### 2. oamSet() is cheap — do not bypass it
@@ -333,7 +335,7 @@ PVSnesLib's audio calls map to the `snesmod` module (same SNESMOD driver):
 - [ ] gfx4snes flags match PVSnesLib exactly
 - [ ] Assets in `ASSET_SECTION`, loaded from C with the DMA helpers (Phase 3)
 - [ ] Palette loaded at correct CGRAM offset (check `-e` flag)
-- [ ] `hdmaEnableMask(1 << ch)` not `hdmaEnableMask(ch)`
+- [ ] `hdmaEnable(ch)` or `hdmaEnableMask(1 << ch)`, never `hdmaEnableMask(ch)` or `hdmaEnable(1 << ch)`
 - [ ] Sprites through `oamSet()` / `oamSetFast()` (no hand-written `oamMemory[]`)
 - [ ] `make clean && make` passes
 - [ ] `luna_runner.py --coverage --only <example>` and `make tests` pass

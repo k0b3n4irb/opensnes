@@ -62,11 +62,14 @@ The lib hides those four register writes behind two helpers:
   const, in any bank: the bank is read from the table pointer.
 - `hdmaSetupBank`, the explicit-bank form, was removed on 2026-10-05 — it predated far pointers.
 
-…and a separate enable/disable pair:
+…and the enable/disable calls:
 
-- **`hdmaEnableMask(channelMask)`** — set bits in `$420C` for the channels you
-  want to run.
-- **`hdmaDisableMask(channelMask)`** — clear those bits.
+- **`hdmaEnable(channel)`** / **`hdmaDisable(channel)`** — one channel by
+  number, 0-7, like every other call of the header. A value above 7 is
+  refused: it is a 0.x bit mask left behind (until 0.48 these two names took
+  the mask).
+- **`hdmaEnableMask(channelMask)`** / **`hdmaDisableMask(channelMask)`** —
+  several channels at once: set or clear their bits in `$420C`.
 
 ## Transfer modes
 

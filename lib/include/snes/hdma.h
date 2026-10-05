@@ -57,7 +57,7 @@
  *
  * // Set up HDMA channel 6 to write to fixed color register
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, 0x32, gradient_table);
- * hdmaEnableMask(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
+ * hdmaEnable(HDMA_CHANNEL_6);            // one channel; hdmaEnableMask() takes a mask
  *
  * // In main loop, HDMA runs automatically each frame
  * @endcode
@@ -306,7 +306,8 @@ void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table,
  * (anomie-regs, "DMA and HDMA"). snesdev-wiki advises writing HDMAEN during
  * VBlank while the screen is on; an effect enabled mid-frame shows from
  * the next line. The one pair of this header that takes a mask where every
- * other function takes a channel number: the name says so.
+ * other function takes a channel number: the name says so. For a single
+ * channel, hdmaEnable(channel) is the same write.
  *
  * @param channelMask Bitmask of channels to enable (1 << channel)
  *
@@ -327,17 +328,34 @@ void hdmaEnableMask(u8 channelMask);
 void hdmaDisableMask(u8 channelMask);
 
 /**
- * @brief The pre-2026-10-03 name of hdmaEnableMask(). Takes a MASK.
+ * @brief Enable one HDMA channel, given by number
  *
- * Deprecated so that the name can come back at 1.0 taking a channel number,
- * like the rest of this header. Until then it is the same function.
+ * The same as hdmaEnableMask(1 << channel): the channel runs from the next
+ * HBlank, the others are left as they are. A value above 7 is refused and
+ * nothing changes — the 0.x form of this call took a bit mask, so a call
+ * left as hdmaEnable(1 << HDMA_CHANNEL_6) fails visibly instead of
+ * enabling channel 64. (Since 2026-10-05, the 1.0 API; a mask of 1, 2 or 4
+ * left behind is the one case this check cannot see — `make check-upgrade`
+ * lists every call to re-read.)
+ *
+ * @param channel HDMA channel 0-7 (HDMA_CHANNEL_0 … HDMA_CHANNEL_7)
+ *
+ * @code
+ * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, HDMA_DEST_COLDATA, gradient_table);
+ * hdmaEnable(HDMA_CHANNEL_6);
+ * @endcode
  */
-OPENSNES_DEPRECATED("use hdmaEnableMask() — at 1.0 hdmaEnable() will take a channel number")
-void hdmaEnable(u8 channelMask);
+void hdmaEnable(u8 channel);
 
-/** @brief The pre-2026-10-03 name of hdmaDisableMask(). Takes a MASK. */
-OPENSNES_DEPRECATED("use hdmaDisableMask() — at 1.0 hdmaDisable() will take a channel number")
-void hdmaDisable(u8 channelMask);
+/**
+ * @brief Disable one HDMA channel, given by number
+ *
+ * The same as hdmaDisableMask(1 << channel). A value above 7 is refused and
+ * nothing changes (see hdmaEnable()).
+ *
+ * @param channel HDMA channel 0-7
+ */
+void hdmaDisable(u8 channel);
 
 /**
  * @brief Disable all HDMA channels
