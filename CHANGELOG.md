@@ -4,6 +4,15 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
+  counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
+  RAM: each power-on reads the saved value, adds one, saves and prints both.
+  The two chip save paths had no example with a visible result; they are
+  rows 25 and 26 of the console protocol, and on luna the power-cycle
+  chains `h_`/`i_sa1_save_boot*.toml` and `j_`/`k_gsu_save_boot*.toml`
+  assert 1 then 2 across a battery file. 91 examples.
+
 ### Changed
 - test(devtools): the GSU fixture runs the presentation paths no ROM
   exercised (chips audit PF5): `gsuFrameBytes()` for every height and

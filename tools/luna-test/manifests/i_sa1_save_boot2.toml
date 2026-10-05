@@ -1,0 +1,11 @@
+# chips/sa1_save, second power-on from the battery file h_ wrote: the magic
+# word is found, the counter read is 1 and the one written is 2 — the save
+# path a console session checks by eye (docs/HARDWARE_VERIFICATION.md row 25).
+rom = "../../../examples/chips/sa1_save/sa1_save.sfc"
+frames = 120
+srm_in = "sa1_save.srm"
+[asserts.values]
+had_save = 1
+"found+2" = 1
+"now+2" = 2
+sa1_ready = 1

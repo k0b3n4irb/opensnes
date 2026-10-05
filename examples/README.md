@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 89 examples organized by topic, building
+Learn SNES development step by step. 91 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -22,7 +22,7 @@ from basic concepts to complete games.
 | [audio/](audio/) | 10 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
-| [chips/](chips/) | 6 | Enhancement chips: SA-1 and SuperFX/GSU coprocessors |
+| [chips/](chips/) | 8 | Enhancement chips: SA-1 and SuperFX/GSU coprocessors |
 | [games/](games/) | 8 | Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
 
 ## Learning Path

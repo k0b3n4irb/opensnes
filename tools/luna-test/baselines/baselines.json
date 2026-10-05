@@ -221,6 +221,12 @@
     "luna_version": "v1.32.0",
     "rom_sha256": "388fa4256cceb5e6f911df9a2201e9b5013b2c26b647f480e158e1abde0b9818"
   },
+  "chips_sa1_save": {
+    "fbhash": "573dcb99d19dce8c",
+    "frames": 200,
+    "luna_version": "v1.32.0",
+    "rom_sha256": "06128f9b4a5bf7c7609ae91e496cacd4cfce693e472142d5028c700536d31e2c"
+  },
   "chips_sa1_starfield": {
     "fbhash": [
       "84b073e05d705cca",
@@ -262,6 +268,12 @@
     "frames": 200,
     "luna_version": "v1.32.0",
     "rom_sha256": "31b276658a7c21033001aae841bcd265036aad38c37baca187b8c67902a426b5"
+  },
+  "chips_superfx_save": {
+    "fbhash": "104ffe49d7f3637c",
+    "frames": 200,
+    "luna_version": "v1.32.0",
+    "rom_sha256": "053c13806e74403b3d6b546977667876d357cb8adb3a0b773aa6c7fb9f7f9959"
   },
   "color_direct_color": {
     "fbhash": "3607ecf1978ea925",

@@ -12,7 +12,7 @@ and **what is next**.
 
 A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 89
+produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 91
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -144,7 +144,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `dsp1` | DSP-1 commands (multiply, trig, rotation, projection, distance) over the two-register port | core (runs the real firmware on luna) |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (89)
+### Examples (91)
 - **Text**: print_string, scroll_message · **Fundamentals**: text_glyphs
 - **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode4, mode5, mode5_hires, mode6
 - **Sprites**: simple_sprite, sprite_sizes, animated_sprite, metasprite, dynamic_sprite, dynamic_metasprite, sprite_swarm
@@ -157,7 +157,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - **Audio**: snesmod_music, snesmod_music_large, snesmod_sfx, soundboard, apu_switch, play_noise, pitch_mod, speech_synth, echo
 - **Maps**: map_scroll, tiled, dynamic_map, slope_collision
 - **Game math**: collision_demo, aim_target, fix32_orbit, random, timer, scene_stack, panel_hud, game_skeleton
-- **Memory**: hirom_demo, save_game · **Enhancement chips**: sa1_hello, sa1_starfield, superfx_hello, superfx_3d, superfx_game_skeleton
+- **Memory**: hirom_demo, save_game · **Enhancement chips**: sa1_hello, sa1_starfield, sa1_save, superfx_hello, superfx_3d, superfx_game_skeleton, superfx_save
 - **Games**: breakout, tetris, likemario, mapandobjects, shmup_1942, mode7_racing, mode7_flying, rpg
 
 ### Build system
@@ -194,7 +194,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (89 / 89)
+- [x] Example READMEs with hardware explanations (91 / 91)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
