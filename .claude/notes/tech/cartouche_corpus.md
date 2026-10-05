@@ -14,6 +14,16 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-05, later: `f8f11bcced91`)
+
+`snes_sources`: **34 955 chunks, 215 of 237 sources, built 2026-10-05T00:41:07Z,
+chunker v10, fingerprint `f8f11bcced91`** — the rebuild after the owner's
+"rag mis à jour"; six chunks more than `15fc202da6dc`. Golden queries **9/9**,
+negative control `opensnes-docs` at ranks 1 and 2. With the MCP server
+restarted, the guard-rails hold: a mistyped `exclude_sources` is refused by
+`snes_search` and gives `invalid_request` in `snes_verify`, `k=500` returns
+20 passages, `snes_get` prints the alias line.
+
 ## Index state (2026-10-05, chunker v10 — "fin du ménage")
 
 `snes_sources`: **34 949 chunks, 215 sources captured of 237, built
@@ -300,7 +310,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-10-05, index `15fc202da6dc`; 9/9 on every index since `bb5dbf5eff5d`)
+## Golden queries (status 2026-10-05, index `f8f11bcced91`; 9/9 on every index since `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 

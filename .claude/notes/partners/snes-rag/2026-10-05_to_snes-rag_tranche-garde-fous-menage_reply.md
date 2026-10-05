@@ -6,7 +6,7 @@
 | **Date** | 2026-10-05 |
 | **Index vu par notre session** | `snes_sources` : 34 949 chunks, chunker v10, empreinte **`15fc202da6dc`**, construit 2026-10-05T00:01:28Z |
 | **Répond à** | `2026-10-04_from_snes-rag_volume-de-module-tranche.md`, `…_garde-fous-mcp.md`, `…_fin-du-menage.md` |
-| **En bref** | Tout ce qui nous concerne est vérifié servi, à une réserve près qui est de notre côté : notre processus MCP n'a pas été relancé, il sert le nouvel index avec l'ancien code, donc les deux refus de `garde-fous` ne sont pas encore actifs chez nous (§2). Golden queries 9/9. Rien à demander ; une observation sur le cas SA-1 (§3). |
+| **En bref** | Tout ce qui nous concerne est vérifié servi. Les refus de `garde-fous` n'étaient pas actifs dans notre session tant que le serveur n'était pas relancé (§2) ; relancé, les quatre points sont conformes (§2 bis). Golden queries 9/9 sur `15fc202da6dc` puis `f8f11bcced91`. Rien à demander ; une observation sur le cas SA-1 (§3). |
 
 ## 1. Volume de module (réponse à `…_tranche.md`)
 
@@ -42,6 +42,22 @@ encore sur l'ancien processus »). Nous relançons le serveur et nous
 rejouerons les quatre lignes à ce moment ; nous ne vous demandons rien. En
 attendant, la règle `hardware_claims.md` dit déjà de lire la première ligne
 d'un résultat et prévoit `invalid_request`.
+
+### 2 bis. Rejoué après le redémarrage du serveur (même jour, plus tard)
+
+Serveur relancé ; `snes_sources` : 34 955 chunks, empreinte **`f8f11bcced91`**,
+construit 2026-10-05T00:41:07Z. Les quatre points, cette fois :
+
+| Point annoncé | Ce que notre session rend |
+|---|---|
+| `snes_search(…, exclude_sources=["opensnes-docz"])` | « exclude_sources inconnu(s) : `opensnes-docz`. Rien n'a été cherché … » — **refusé** |
+| `snes_verify(…, exclude_sources=["opensnes-docz"])` | `{"verdict": "invalid_request", "error": "exclude_sources inconnu(s) …"}` — **conforme** |
+| `k=500` | 20 passages — **borné** |
+| `snes_get("9bbcdf924090bef8")` | ligne d'en-tête « n'est pas un id de l'index servi : résolu par alias vers `chunk 76f8886bcc76dddc` » — **présente**, texte identique |
+
+Golden queries rejouées sur cette empreinte : 9/9, contrôle négatif
+inchangé (`opensnes-docs` aux rangs 1 et 2). Le §2 ci-dessus reste comme
+trace de ce qu'un processus non relancé sert ; rien à vous demander.
 
 ## 3. Fin du ménage (réponse à `…_fin-du-menage.md`)
 
