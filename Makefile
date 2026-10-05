@@ -582,7 +582,7 @@ release: all
 	@# Project test harness (`make test` in user projects) + the pinned-luna
 	@# installer. Only luna.version — a project's `make test` is `luna test` — not the SDK's
 	@# corpus manifest/baselines.
-	@mkdir -p $(RELEASE_DIR)/opensnes/testing
+	@mkdir -p $(RELEASE_DIR)/opensnes/testing $(RELEASE_DIR)/opensnes/scripts
 	@cp testing/luna.version $(RELEASE_DIR)/opensnes/testing/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
 	@# Every devtools script make/common.mk runs on a user build (post-link
