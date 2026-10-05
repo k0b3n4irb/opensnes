@@ -26,6 +26,7 @@ tools/opensnes-sample/opensnes-sample
 tools/opensnes-music/opensnes-music
 tools/opensnes-rom/opensnes-rom
 tools/opensnes-sprite/opensnes-sprite
+tools/opensnes-tileset/opensnes-tileset
 
 # Generated documentation
 doc/

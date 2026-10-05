@@ -51,6 +51,16 @@ freeze criterion that waits for hardware.
   anim header differs by its generator line only). Both 0.x tools stay
   shipped one more release; aseprite2snes's converter became `anim.c`,
   which the 0.x tool itself now calls.
+- **`opensnes-tileset`** (tools): the background artist's tool. `convert`
+  cuts a picture into tiles, deduplicates them (and their mirrors with
+  `--flip`), writes the tileset, the tilemap (Modes 1, 5, 6, 7; `--pages`
+  for 32x32 pages; `--offset`, `--priority`) and the palette, with
+  `--rearrange` and `--palette` for the palette banks; `inspect` gives the
+  bound before deduplication, the map size and the banks touched. gfx4snes's
+  map path linked as a library: its golden and its pixel oracle (every pixel
+  decodes to the source's colour, with and without `--rearrange`) are the
+  suite. The hardware limits (1024 tiles, 256 in Mode 7, one palette bank per
+  tile) are refused with the position named.
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
   counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
   RAM: each power-on reads the saved value, adds one, saves and prints both.
