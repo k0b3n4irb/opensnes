@@ -168,12 +168,12 @@
     "rom_sha256": "410e1156ead93d0b8e58ddb62161d7a6c5deec83d6f56dda760ad605eea38e01"
   },
   "games_likemario": {
-    "stream": "716bfc143eb8fef736a5c8c1f5c14ec3954b36aacb6b14bf4ef26677088f43ca",
-    "rom_sha256": "3f128fe47e5bd24071fbaa36931726b977595471ddc50d3111fcf5d17df385a4"
+    "stream": "46225597f4bd2daab2ed51b003e2f6b27ec2775fc3dbb752e7782eb41f6c28da",
+    "rom_sha256": "140ac05cb81f7be484cf8890e7714bda5a26107d81648b4235a0aae2d3dbf389"
   },
   "games_mapandobjects": {
-    "stream": "e29235738d92de5e7d67e1d5ac4d285ee593b7694a286443055d166aa4ec7906",
-    "rom_sha256": "f24d61ffdeb346d06ad46324b936455cc01ee5fba235757d92ffd429e95d1891"
+    "stream": "1c23d31a8e81f445dd9e8d36de77089ad0ac9d541e9e9f739d76184fae5f6520",
+    "rom_sha256": "34224c52c97ced2496e14b8378488ad4e7e2aa0ac7749bb75f7c8aa57c1229af"
   },
   "games_mode7_flying": {
     "stream": "fa4275875d3064aab298ee7d1cfc017d54773c369c1f5958b0b5083ce802393e",
@@ -184,16 +184,16 @@
     "rom_sha256": "192336835519948bb8b2781720610daa937445a968472c4798e951189a8971d4"
   },
   "games_rpg": {
-    "stream": "423224da19835d983018244d5f77727e654deb52107948d459ce504e16aafc5e",
-    "rom_sha256": "4f66b9760b3d75e0dfc940a264fd772a835a18dac270460fdee1951aebf51c6b"
+    "stream": "ccb5ac42bf46629503c9a2f919391e827caec3e9294115773664b66fab81f40f",
+    "rom_sha256": "b1c99191f5d7391e64e0faef1a53789bbfbed9b43dc0a7804cdb5c525d8c881b"
   },
   "games_shmup_1942": {
     "stream": "8be0a224fd6d4681a06802210ed3468af1a7f6d68efa40a2ccfec9e4ebdc4af6",
     "rom_sha256": "8487e13e24e4ec078afa7eb30b4f9dd07f420d1f3b47300bb16d7bda38ff4d8b"
   },
   "games_tetris": {
-    "stream": "19283ae564c2eb5f993251eaa8d198aad66a315141530dbfa38643433ad5c966",
-    "rom_sha256": "d7499bb9ac207fdad4c9416cf88dfea4769dfdff2ddc4dbf56971dd8c49778af"
+    "stream": "7d611c6c8fb2cfd5634ed957cbfda0c5c8537cfb41e38aa53545833f2cdb2a57",
+    "rom_sha256": "2644f3e2b20983c179b86a0f6db1a8d97ea0752fecb0b93750a68895296a99ca"
   },
   "hdma_gradient_colors": {
     "stream": "342a0cbbb54ce617404d148c67c05e19e3b8b57592706e82db4f7789ee4f9c89",

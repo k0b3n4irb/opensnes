@@ -34,14 +34,6 @@
 ; ROM assets — DMA sources and const-read strings, asset banks (2026-09-23)
 ;------------------------------------------------------------------------------
 ASSET_SECTION ".rodata1"
-tiles_gfx:
-.incbin "res/tiles.pic"
-tiles_gfx_end:
-
-tiles_pal:
-.incbin "res/tiles.pal"
-tiles_pal_end:
-
 font2bpp_gfx:
 .incbin "res/font2bpp.bin"
 font2bpp_gfx_end:

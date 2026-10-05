@@ -43,9 +43,7 @@
 #include <snes/math.h>
 #include <snes/input.h>
 
-extern u8 terrain_til[], terrain_til_end[];
-extern u8 terrain_map[], terrain_map_end[];
-extern u8 terrain_pal[], terrain_pal_end[];
+#include "res/terrain.inc"   /* generated: terrain_tiles[], terrain_map[], terrain_pal[] (Mode 7 .pc7 / .mp7), each with _end */
 
 /** @brief Banked-data accessor (data.asm) for the class map */
 extern u8 terrain_class_at(u16 idx);
@@ -130,7 +128,7 @@ int main(void) {
     consoleInit();
 
     dmaCopyVramMode7(terrain_map, (u16)(terrain_map_end - terrain_map),
-                     terrain_til, (u16)(terrain_til_end - terrain_til));
+                     terrain_tiles, (u16)(terrain_tiles_end - terrain_tiles));
     dmaCopyCGram(terrain_pal, 0, (u16)(terrain_pal_end - terrain_pal));
 
     /* plane tiles 0,1/16,17 at OBJ base 3; the SAME shape with the

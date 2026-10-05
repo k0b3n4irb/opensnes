@@ -1,0 +1,5 @@
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+palette = "town_fixed.pal"
