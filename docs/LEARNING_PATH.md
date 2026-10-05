@@ -129,8 +129,6 @@ every game needs.
 
 @subpage examples_basics_fix32_orbit
 
-@subpage examples_basics_random
-
 ## Stage 6 — "Can I finish and ship?"
 
 *Confidence: a complete cartridge.* Persist progress, choose a mapper, reach

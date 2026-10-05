@@ -289,7 +289,7 @@ jobs:
           | **Linux** | \`opensnes_${TAG}_linux_arm64.zip\` | arm64 (aarch64) |
           | **macOS** | \`opensnes_${TAG}_darwin_arm64.zip\` | arm64 (Apple Silicon) |
           | **Windows** | \`opensnes_${TAG}_windows_x86_64.zip\` | x86_64 (MSYS2 UCRT64) |
-          | **Examples** | \`opensnes-examples_${TAG}.zip\` | all platforms: the 90 examples' sources, assets and built ROMs |
+          | **Examples** | \`opensnes-examples_${TAG}.zip\` | all platforms: the 86 examples' sources, assets and built ROMs |
 
           The SDK zip holds what a project build needs (toolchain, asset tools,
           library, build system, starter). The documentation is online at

@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 90 examples organized by topic. For a progressive learning path, see
+All 86 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -37,7 +37,6 @@ The PPU's background modes — colour vs layers vs resolution.
 | @subpage examples_backgrounds_mode1_lz77 | LZ77-compressed background data |
 | @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
 | @subpage examples_backgrounds_mode3 | Mode 3: 256-color (8bpp) single layer |
-| @subpage examples_backgrounds_mode5 | Mode 5: hi-res 512×256 (16-color) |
 | @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
 | @subpage examples_backgrounds_mode4 | Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words |
 | @subpage examples_backgrounds_mode6 | Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns |
@@ -110,9 +109,7 @@ Colour math, palette bypass, and beating the 256-colour limit.
 | @subpage examples_color_transparency | Color math (add/subtract blending) |
 | @subpage examples_color_shadow_tint | Shadow & tint: darken or colour-cast a whole scene via fixed-colour math |
 | @subpage examples_color_direct_color | Direct color mode: the 8bpp pixel byte IS the RGB color |
-| @subpage examples_color_gradient_9bit | Brightness-dithered "9-bit" gradient backdrop (krom port) |
 | @subpage examples_color_hicolor_1792 | 1792 colors from a 4bpp background via per-tile-row HDMA (krom port) |
-| @subpage examples_color_hicolor_blend | 3840 colors via RGB channel-split blend (krom port) |
 | @subpage examples_color_pseudo_hires | 50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math |
 
 ---
@@ -194,7 +191,6 @@ The reusable logic toolbox.
 | @subpage examples_basics_collision_demo | Bounding-box sprite collision detection |
 | @subpage examples_basics_aim_target | Aim a cursor at moving targets — sprites + input |
 | @subpage examples_basics_fix32_orbit | 16.16 fixed-point API: a sprite orbits the screen centre |
-| @subpage examples_basics_random | LCG pseudo-random number generation |
 | @subpage examples_basics_timer | Frame-accurate timers with VBlank counters |
 | @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
 | @subpage examples_basics_panel_hud | 9-slice HUD + dialog box on one layer (the `panel` module) |

@@ -261,9 +261,10 @@ enable** — without `hdmaEnableMask(0x0F)` you get a static 1:1 view that can
 look convincingly like a broken perspective. Check `dma.hdmaen` in luna's
 typed state when an HDMA effect "does nothing".
 
-### Two channels, one visual — `examples/color/gradient_9bit`
+### Two channels, one visual — the "9-bit" backdrop
 
-Channel 0 rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
+krom's RedSpace9BitHDMA trick, described in `examples/hdma/gradient_colors`'s
+README: channel 0 rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
 CGADD: `[addr16][data16]`), channel 1 rewrites INIDISP brightness per
 line. Colour x brightness plus per-line jitter dithers the gradient into
 more perceptual steps than the PPU's 5 bits — and INIDISP is owned by the

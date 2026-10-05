@@ -78,3 +78,14 @@ python3 ../../../../devtools/hicolor64.py res/sunset.png res/sunset
 ## Modules Used
 
 `console`, `dma`, `background`
+
+## Further: 3840 colours by splitting the channels
+
+A second HiColor technique, krom's HiColor3840, was the `hicolor_blend`
+example until 2026-10-05. It keeps CGRAM still and splits the image's RGB
+channels across two layers blended by colour math (`colorMathSetSource`,
+`colorMathSetHalf`, one layer on the main screen, the other on the sub
+screen): each pixel's colour is the sum of two 15-bit colours, which reaches
+3840 distinct values. The blend costs the two layers and the sub screen;
+the H-IRQ stream above costs CPU time per scanline instead. The colour math
+calls are those of `color/transparency`.

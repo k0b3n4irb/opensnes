@@ -24,8 +24,8 @@ LIB_MODULES := console dma background asset gameloop
 `make/common.mk`). `gameloop` has no `_DEP_` line at all — it pulls nothing
 beyond the runtime that every ROM already links.
 
-The corpus votes with its feet: four examples call `gameLoopRun`
-(`basics/timer`, `basics/random`, `basics/aim_target`, `input/controller`);
+The corpus votes with its feet: three examples call `gameLoopRun`
+(`basics/timer`, `basics/aim_target`, `input/controller`);
 three use the asset bundles (`backgrounds/mode1`,
 `backgrounds/mode1_bg3_priority`, `games/shmup_1942`). Everything else writes
 the loop and the loads by hand, and nothing about those examples is

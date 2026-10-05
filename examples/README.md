@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 90 examples organized by topic, building
+Learn SNES development step by step. 86 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -9,11 +9,11 @@ from basic concepts to complete games.
 |----------|----------|----------------|
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
-| [basics/](basics/) | 8 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
-| [backgrounds/](backgrounds/) | 10 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
+| [basics/](basics/) | 7 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
+| [backgrounds/](backgrounds/) | 9 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
-| [color/](color/) | 8 | Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks, pseudo-hires blend |
+| [color/](color/) | 6 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
 | [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
@@ -65,8 +65,6 @@ deep-dive of a step below.
 | 15e | [mode7/perspective_rotate](mode7/perspective_rotate/) | Full Mode 7 matrix per scanline: rotating perspective (krom port) |
 | 15f | [backgrounds/mode5_hires](backgrounds/mode5_hires/) | BG Mode 5 + interlace: 512x448 hi-res text (krom port) |
 | 15g | [windows/window_multi_hdma](windows/window_multi_hdma/) | Both windows shaped per scanline: HDMA porthole grid (krom port) |
-| 15h | [color/gradient_9bit](color/gradient_9bit/) | Brightness-dithered backdrop: the 9-bit color trick (krom port) |
-| 15j | [color/hicolor_blend](color/hicolor_blend/) | RGB channel-split color-math blend: 3840 colors (krom port) |
 | 15k | [color/direct_color](color/direct_color/) | Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed |
 | 15l | [color/pseudo_hires](color/pseudo_hires/) | Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3) |
 | 15m | [backgrounds/mode4](backgrounds/mode4/) | Mode 4: offset-per-tile on a 256-colour layer, one row of H-or-V words |

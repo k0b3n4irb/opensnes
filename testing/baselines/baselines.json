@@ -119,12 +119,6 @@
     "luna_version": "v1.32.0",
     "rom_sha256": "23fd5a44d2c371be9ce3ad9d7a6f1212a5005066b916db0cd4ce6540165144f2"
   },
-  "backgrounds_mode5": {
-    "fbhash": "736a88aa96af22ed",
-    "frames": 200,
-    "luna_version": "v1.32.0",
-    "rom_sha256": "166c10cd11588067fd023f47fcb56831a4d64607ebb2d2cd959411be7a5c1d22"
-  },
   "backgrounds_mode5_hires": {
     "fbhash": "aaf77640375cfea4",
     "frames": 200,
@@ -178,12 +172,6 @@
     "frames": 200,
     "luna_version": "v1.32.0",
     "rom_sha256": "7bb8bf5718bd74c28b03a97273eff4de844ef09b286a3f04cad57d3c47d70fe2"
-  },
-  "basics_random": {
-    "fbhash": "21c7687c613d371c",
-    "frames": 200,
-    "luna_version": "v1.32.0",
-    "rom_sha256": "687fe2e757af2374cc14002948079de483d31dd840a95ef4d3ef614f677eabf6"
   },
   "basics_scene_stack": {
     "fbhash": "094c06534a796b35",
@@ -281,23 +269,11 @@
     "luna_version": "v1.32.0",
     "rom_sha256": "ae6512ee3b7cf453f54f54220213e27d8a0e77b5186885ff7e1fdc0b4789bbc5"
   },
-  "color_gradient_9bit": {
-    "fbhash": "6e661e6caaea3725",
-    "frames": 200,
-    "luna_version": "v1.32.0",
-    "rom_sha256": "01e86af22382754e17a295893cae4b66051ce9442426ab716f411d2a66453190"
-  },
   "color_hicolor_1792": {
     "fbhash": "6e58ca710dc2c028",
     "frames": 200,
     "luna_version": "v1.32.0",
     "rom_sha256": "9eafe5cdab84135c30fb54087a5f1db11aa45885654b9d23e7d362fad7dda79b"
-  },
-  "color_hicolor_blend": {
-    "fbhash": "254ff3b17ba7c46d",
-    "frames": 200,
-    "luna_version": "v1.32.0",
-    "rom_sha256": "c7528dbec4f17fd4a870fe5b758db21f6cd5cf909b579f5b9d67a7d8b3bd2c21"
   },
   "color_palette_cycle": {
     "fbhash": [
