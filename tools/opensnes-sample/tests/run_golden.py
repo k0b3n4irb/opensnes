@@ -50,8 +50,8 @@ g.check("encode tone.wav --loop 40 200 == wav2brr tone_loop.brr", "same bytes", 
 g.check("encode tone.wav with tone.wav.toml (loop from the settings)", "same bytes as --loop",
         loop_matches(["encode", "-q", "tone.wav"], write={"tone.wav.toml": SETTINGS}))
 # this tool's own outputs
-g.expect_outputs("encode --loop: the generated header", ["encode", "-q", *LOOP, "tone.wav"],
-                 copy=["tone.wav"], outputs=["tone.h"])
+g.expect_outputs("encode --loop: the generated header and the .incbin fragment", ["encode", "-q", *LOOP, "tone.wav"],
+                 copy=["tone.wav"], outputs=["tone.h", "tone_data.as"])
 g.expect_outputs("encode --save writes the settings beside the input", ["encode", "-q", *LOOP, "--save", "tone.wav"],
                  copy=["tone.wav"], outputs=["tone.wav.toml"])
 g.expect_stdout("encode --json", ["encode", "--json", *LOOP, "tone.wav"], golden="encode.json", copy=["tone.wav"])

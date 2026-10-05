@@ -2,6 +2,9 @@
 #ifndef OPENSNES_SAMPLE_tone_H
 #define OPENSNES_SAMPLE_tone_H
 
+#include <snes.h>
+
+extern u8 tone_brr[], tone_brr_end[];   /* the .incbin in assets_gen.asm (or your data.asm) */
 #define tone_brr_size 117   /* bytes: 13 BRR blocks of 16 samples */
 #define tone_brr_loop 27   /* byte offset of the loop point; 0 with no loop */
 #define tone_brr_loops 1   /* 1 = the sample loops */
