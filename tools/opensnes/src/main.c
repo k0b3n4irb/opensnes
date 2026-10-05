@@ -658,8 +658,14 @@ static int nfiles, capfiles;
 
 static void add_file(const char *p)
 {
-    if (nfiles == capfiles) { capfiles = capfiles ? capfiles * 2 : 256; files = realloc(files, (size_t)capfiles * sizeof *files); }
-    if (files) { files[nfiles] = malloc(strlen(p) + 1); if (files[nfiles]) strcpy(files[nfiles++], p); }
+    if (nfiles == capfiles) {
+        int cap = capfiles ? capfiles * 2 : 256;
+        char **grown = realloc(files, (size_t)cap * sizeof *files);
+        if (!grown) return;                 /* out of memory: the list stays as it is */
+        files = grown; capfiles = cap;
+    }
+    files[nfiles] = malloc(strlen(p) + 1);
+    if (files[nfiles]) strcpy(files[nfiles++], p);
 }
 
 static int source_suffix(const char *name)
