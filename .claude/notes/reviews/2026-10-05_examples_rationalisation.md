@@ -117,9 +117,11 @@ même grille :
    doit donner **la même image et le même flux WRAM** qu'avant (la section
    change de nom, pas le contenu) ; une différence de fbhash est à expliquer
    avant toute recapture.
-5. **Les treize README nus** sont écrits au passage, avec les trois
-   sections que `new_example.md` impose (ce qu'on apprend, les concepts,
-   les modules).
+5. **Les treize README qui commencent par la commande de build** sont
+   remis dans l'ordre de `new_example.md` au passage (ce qu'on apprend
+   d'abord, la commande ensuite) : relecture faite, ils ont tous une section
+   « What You'll Learn », placée après `Build & Run` — c'est l'ordre qui
+   était en cause, pas l'absence de leçon.
 
 Ordre proposé : `text`, `input`, `basics`, `sprites`, `backgrounds`,
 `scrolling`, `hdma`, `color`, `windows`, `transitions`, `mode7`, `maps`,
@@ -167,7 +169,7 @@ cinq fusions ne tiennent pas**, et une change d'absorbant.
 `move_sprite` → le `starter/` · `perspective` → `rotate_scale`.
 
 C'est 14 %, pas 30 %. L'intuition du propriétaire visait juste sur la
-*forme* (treize README sans leçon, dix portages krom posés côte à côte,
+*forme* (treize README qui ouvrent sur la commande de build, dix portages krom posés côte à côte,
 des catégories qui ont poussé par accrétion) ; la mesure dit que le
 *contenu* se recoupe moins qu'il n'y paraît, parce que les exemples qui se
 ressemblent exercent souvent des fonctions différentes de la lib. Le vrai
@@ -206,7 +208,21 @@ Cinq retraits au total sur vingt-cinq proposés : **91 → 86, soit 5 %**, pas
 exemples voisins exercent des fonctions différentes de la lib, portent des
 manifestes différents, et occupent des marches différentes de l'échelle que
 les débutants lisent. Ce que l'intuition du propriétaire a bien vu, et qui
-reste à faire, est la **forme** : treize README sans leçon, une échelle
+reste à faire, est la **forme** : treize README qui ouvrent sur la commande de build, une échelle
 numérotée par accrétion (`15c…15n`, `22b`, `42c…42g`), des catégories dont
 la table ne dit plus ce qu'on apprend. Le gain de lisibilité est là, et dans
 la migration vers les fichiers de réglages qui retire 54 `data.asm`.
+
+### Journal (suite)
+
+- L'échelle d'`examples/README.md` est renumérotée en séquence (1 à 55) : les
+  marches `15c…15n`, `22b`, `22c`, `23b`, `42c…42g` étaient l'historique des
+  ajouts, pas un ordre.
+- Correction d'une erreur de lecture du §1 : les treize README « nus »
+  ont tous une section « What You'll Learn » — après `Build & Run`. Le
+  défaut est l'ordre, pas l'absence.
+- La CI a refusé le premier push des retraits : `docs/Doxyfile` listait les
+  cinq dossiers un par un, et localement leurs répertoires survivaient
+  comme sorties de build non suivies, donc `docs-strict` passait ici et pas
+  là-bas. Corrigé ; `make clean` d'un dossier retiré avant son `git rm` est
+  la bonne séquence.

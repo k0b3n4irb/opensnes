@@ -60,56 +60,56 @@ deep-dive of a step below.
 | 13 | [scrolling/continuous_scroll](scrolling/continuous_scroll/) | Streaming background scroll with dynamic tile loading |
 | 14 | [scrolling/mixed_scroll](scrolling/mixed_scroll/) | Multiple BG layers scrolling at different rates |
 | 15 | [hdma/hdma_wave](hdma/hdma_wave/) | HDMA wave: build the table by hand (krom port), then use the hdma module |
-| 15c | [hdma/hdma_indirect_gradient](hdma/hdma_indirect_gradient/) | Indirect HDMA: pointer table drives a backdrop gradient (krom port) |
-| 15d | [color/hicolor_1792](color/hicolor_1792/) | H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port) |
-| 15e | [mode7/perspective_rotate](mode7/perspective_rotate/) | Full Mode 7 matrix per scanline: rotating perspective (krom port) |
-| 15f | [backgrounds/mode5_hires](backgrounds/mode5_hires/) | BG Mode 5 + interlace: 512x448 hi-res text (krom port) |
-| 15g | [windows/window_multi_hdma](windows/window_multi_hdma/) | Both windows shaped per scanline: HDMA porthole grid (krom port) |
-| 15k | [color/direct_color](color/direct_color/) | Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed |
-| 15l | [color/pseudo_hires](color/pseudo_hires/) | Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3) |
-| 15m | [backgrounds/mode4](backgrounds/mode4/) | Mode 4: offset-per-tile on a 256-colour layer, one row of H-or-V words |
-| 15n | [backgrounds/mode6](backgrounds/mode6/) | Mode 6: offset-per-tile on a hi-res layer, 16-half-pixel columns |
-| 16 | [hdma/gradient_colors](hdma/gradient_colors/) | HDMA + CGRAM color gradients |
-| 17 | [scrolling/parallax_scroll](scrolling/parallax_scroll/) | HDMA parallax scrolling |
-| 18 | [color/transparency](color/transparency/) | Color math (add/subtract blending) |
-| 19 | [windows/window](windows/window/) | Hardware window masking |
-| 20 | [windows/transparent_window](windows/transparent_window/) | Color math + HDMA windowed transparency |
+| 16 | [hdma/hdma_indirect_gradient](hdma/hdma_indirect_gradient/) | Indirect HDMA: pointer table drives a backdrop gradient (krom port) |
+| 17 | [color/hicolor_1792](color/hicolor_1792/) | H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port) |
+| 18 | [mode7/perspective_rotate](mode7/perspective_rotate/) | Full Mode 7 matrix per scanline: rotating perspective (krom port) |
+| 19 | [backgrounds/mode5_hires](backgrounds/mode5_hires/) | BG Mode 5 + interlace: 512x448 hi-res text (krom port) |
+| 20 | [windows/window_multi_hdma](windows/window_multi_hdma/) | Both windows shaped per scanline: HDMA porthole grid (krom port) |
+| 21 | [color/direct_color](color/direct_color/) | Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed |
+| 22 | [color/pseudo_hires](color/pseudo_hires/) | Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3) |
+| 23 | [backgrounds/mode4](backgrounds/mode4/) | Mode 4: offset-per-tile on a 256-colour layer, one row of H-or-V words |
+| 24 | [backgrounds/mode6](backgrounds/mode6/) | Mode 6: offset-per-tile on a hi-res layer, 16-half-pixel columns |
+| 25 | [hdma/gradient_colors](hdma/gradient_colors/) | HDMA + CGRAM color gradients |
+| 26 | [scrolling/parallax_scroll](scrolling/parallax_scroll/) | HDMA parallax scrolling |
+| 27 | [color/transparency](color/transparency/) | Color math (add/subtract blending) |
+| 28 | [windows/window](windows/window/) | Hardware window masking |
+| 29 | [windows/transparent_window](windows/transparent_window/) | Color math + HDMA windowed transparency |
 
 ### Level 4 -- Advanced Topics
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 21 | [mode7/rotate_scale](mode7/rotate_scale/) | Mode 7 rotation and scaling |
-| 22 | [mode7/perspective](mode7/perspective/) | Pseudo-3D perspective (F-Zero style) |
-| 22b | [mode7/dsp1_ground](mode7/dsp1_ground/) | Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices |
-| 22c | [mode7/extbg](mode7/extbg/) | Mode 7 EXTBG: one plane, two layers split by bit 7, a sprite between them |
-| 23 | [sprites/metasprite](sprites/metasprite/) | Multi-tile composite sprites |
-| 23b | [sprites/aseprite_pipeline](sprites/aseprite_pipeline/) | Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite |
-| 24 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
-| 25 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
-| 26 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
-| 27 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
-| 28 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback via SNESMOD |
-| 29 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects via SNESMOD |
-| 42c | [audio/speech_synth](audio/speech_synth/) | Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port) |
-| 42d | [audio/play_noise](audio/play_noise/) | Drum kit from the DSP noise generator — zero samples (krom port) |
-| 42e | [audio/pitch_mod](audio/pitch_mod/) | Hardware vibrato: PMON pitch modulation + LFO voice (krom port) |
-| 42f | [audio/apu_switch](audio/apu_switch/) | Hot-swap APU programs at runtime: apuReset() + IPL re-entry |
-| 42g | [audio/soundboard](audio/soundboard/) | The audio v2 engine from pure C: dynamic samples, pan/pitch, echo |
+| 30 | [mode7/rotate_scale](mode7/rotate_scale/) | Mode 7 rotation and scaling |
+| 31 | [mode7/perspective](mode7/perspective/) | Pseudo-3D perspective (F-Zero style) |
+| 32 | [mode7/dsp1_ground](mode7/dsp1_ground/) | Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices |
+| 33 | [mode7/extbg](mode7/extbg/) | Mode 7 EXTBG: one plane, two layers split by bit 7, a sprite between them |
+| 34 | [sprites/metasprite](sprites/metasprite/) | Multi-tile composite sprites |
+| 35 | [sprites/aseprite_pipeline](sprites/aseprite_pipeline/) | Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite |
+| 36 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
+| 37 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
+| 38 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
+| 39 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
+| 40 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback via SNESMOD |
+| 41 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects via SNESMOD |
+| 42 | [audio/speech_synth](audio/speech_synth/) | Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port) |
+| 43 | [audio/play_noise](audio/play_noise/) | Drum kit from the DSP noise generator — zero samples (krom port) |
+| 44 | [audio/pitch_mod](audio/pitch_mod/) | Hardware vibrato: PMON pitch modulation + LFO voice (krom port) |
+| 45 | [audio/apu_switch](audio/apu_switch/) | Hot-swap APU programs at runtime: apuReset() + IPL re-entry |
+| 46 | [audio/soundboard](audio/soundboard/) | The audio v2 engine from pure C: dynamic samples, pan/pitch, echo |
 
 ### Level 5 -- Maps and Complete Projects
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 30 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
-| 31 | [maps/slope_collision](maps/slope_collision/) | Slopes and tile-based collision |
-| 32 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
-| 33 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
-| 34 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
-| 35 | [games/mapandobjects](games/mapandobjects/) | Maps with interactive objects |
-| 36 | [games/mode7_racing](games/mode7_racing/) | F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data |
-| 37 | [games/mode7_flying](games/mode7_flying/) | Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings |
-| 38 | [games/rpg](games/rpg/) | RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box |
+| 47 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
+| 48 | [maps/slope_collision](maps/slope_collision/) | Slopes and tile-based collision |
+| 49 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
+| 50 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
+| 51 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
+| 52 | [games/mapandobjects](games/mapandobjects/) | Maps with interactive objects |
+| 53 | [games/mode7_racing](games/mode7_racing/) | F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data |
+| 54 | [games/mode7_flying](games/mode7_flying/) | Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings |
+| 55 | [games/rpg](games/rpg/) | RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box |
 
 ## Building
 
