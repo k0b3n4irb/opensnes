@@ -2,7 +2,7 @@
 # OpenSNES Tools - Makefile
 #==============================================================================
 
-SUBDIRS := aseprite2snes font2snes gfx4snes img2snes palplan sa1-patch smconv tmx2snes wav2brr opensnes-sample opensnes-music opensnes-rom opensnes-sprite opensnes-tileset opensnes-level
+SUBDIRS := aseprite2snes font2snes gfx4snes img2snes palplan sa1-patch smconv tmx2snes wav2brr opensnes-sample opensnes-music opensnes-rom opensnes-sprite opensnes-tileset opensnes-level opensnes-text
 
 .PHONY: all clean install $(SUBDIRS)
 

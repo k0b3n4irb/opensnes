@@ -28,6 +28,7 @@ tools/opensnes-rom/opensnes-rom
 tools/opensnes-sprite/opensnes-sprite
 tools/opensnes-tileset/opensnes-tileset
 tools/opensnes-level/opensnes-level
+tools/opensnes-text/opensnes-text
 
 # Generated documentation
 doc/

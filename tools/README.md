@@ -12,7 +12,7 @@ Built by `make tools`, installed in `bin/`, copied into every release zip.
 `make/common.mk` calls them on a user's `make`; each one prints `--help`,
 has a page under `docs/tools/`, and a golden-output suite under `tests/`
 written as a table of cases over [`tests/golden.py`](tests/golden.py)
-(`make test-tools` runs the eight suites; `tools/fuzz/` fuzzes their
+(`make test-tools` runs every suite; `tools/fuzz/` fuzzes their
 parsers).
 
 | Path | Role | Version | In your build | Doc |
@@ -32,6 +32,7 @@ parsers).
 | [`opensnes-sprite/`](opensnes-sprite/) | 1.x family: `sheet` (sprite sheet → tiles in OBJ order, palette, metasprite table), `anim` (Aseprite export → AnimClip header), `inspect`; gfx4snes's and aseprite2snes's converters linked as libraries, their goldens reproduced | 1.0.0 | by hand today | `docs/tools/opensnes-sprite.md` |
 | [`opensnes-tileset/`](opensnes-tileset/) | 1.x family: `convert` (picture → tileset, tilemap, palette; Modes 1/5/6/7, pages, flips, palette rearrangement) and `inspect`; gfx4snes's map path linked as a library, its golden and pixel oracle reproduced | 1.0.0 | by hand today | `docs/tools/opensnes-tileset.md` |
 | [`opensnes-level/`](opensnes-level/) | 1.x family: `convert` (Tiled JSON level + the tileset's `.map` → `<layer>.m16`, `.b16`, `.t16`, `.o16`, optional `.q16`, `.c16`, entities header, and the `.inc` / `_data.as` glue), `inspect`; tmx2snes's converter linked as a library (`tools/tmx2snes/src/level.c`) | `tests/run_golden.py` (data byte-identical to tmx2snes's goldens) |
+| [`opensnes-text/`](opensnes-text/) | 1.x family: `font` (a 96-glyph picture → tiles in glyph order, a grey palette, the `.inc` / `_data.as` glue; indexed, grey or RGB sources), `inspect`; font2snes's tile packer linked as a library, its tiles reproduced byte for byte | 1.0.0 | by the build's generic rule | `docs/tools/opensnes-text.md` |
 
 Every tool's Makefile is a few variables over [`tool.mk`](tool.mk) (one
 build recipe, one version macro `TOOL_VERSION`); the 1.x tools share

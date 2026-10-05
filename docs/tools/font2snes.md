@@ -1,5 +1,8 @@
 # font2snes — font images to text tiles {#tools_font2snes}
 
+> **1.x:** the same tile packer is `opensnes-text font` (@ref tools_opensnes_text), with a
+> settings file beside the asset; this tool stays shipped for one more version.
+
 The text module ships with a built-in font, so you may never need this tool. But
 when you want your *own* typeface — a chunky title font, a themed UI face —
 `font2snes` converts a font image into the SNES text tiles the text routines
