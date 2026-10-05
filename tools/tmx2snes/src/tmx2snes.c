@@ -316,7 +316,7 @@ void WriteCellCollision(void)
 static void upcase_ident(const char *in, char *out, int outsz)
 {
     int i;
-    for (i = 0; in[i] != '\0' && i < outsz - 1; i++)
+    for (i = 0; i < outsz - 1 && in[i] != '\0'; i++)
     {
         char c = in[i];
         if (c >= 'a' && c <= 'z')
@@ -385,7 +385,7 @@ void WriteEntityHeader(void)
             cute_tiled_property_t *pr = o->properties + i;
             char lower[64];
             int k;
-            for (k = 0; pr->name.ptr[k] != '\0' && k < 63; k++)
+            for (k = 0; k < 63 && pr->name.ptr[k] != '\0'; k++)
             {
                 char ch = pr->name.ptr[k];
                 if (ch >= 'A' && ch <= 'Z')
