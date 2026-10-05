@@ -30,6 +30,7 @@ tools/opensnes-tileset/opensnes-tileset
 tools/opensnes-level/opensnes-level
 tools/opensnes-text/opensnes-text
 tools/opensnes-palette/opensnes-palette
+tools/opensnes-image/opensnes-image
 
 # Generated documentation
 doc/
@@ -51,6 +52,7 @@ examples/audio/sfx_from_wav/res/*.brr
 *.srm
 *.inc
 *_data.as
+*.hdma
 
 # WLA-DX
 linkfile

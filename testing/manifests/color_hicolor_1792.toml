@@ -10,7 +10,8 @@
 # lands on whatever entry CGADD happens to hold, so CGRAM mid-frame is not
 # a stable oracle. The snapshot point here is the frame boundary, i.e. in
 # VBlank AFTER hicolorVblank() has rewound CGADD to 0 and DMA'd 128 bytes
-# from the top of sunset_pal. Measured bit-identical at frames 120, 121,
+# from the top of sunset_pal (the bytes below are sunset.pal[0:64] and
+# [3520:3584] as opensnes-image hicolor writes them). Measured bit-identical at frames 120, 121,
 # 122, 180 and 240 (same md5 over all 512 CGRAM bytes), so this is the one
 # phase of the frame where the streamed palette stands still.
 #
@@ -29,5 +30,5 @@ rom = "../../examples/color/hicolor_1792/hicolor_1792.sfc"
 frames = 180
 
 [asserts.blocks]
-even_bank_row0   = { space = "cgram", offset = "0000", hex = "00002324232423242324232422242224222422242224222022242220222022200000232423242324232423242324222422242224222422242220222022202220" }
-odd_bank_row27   = { space = "cgram", offset = "00C0", hex = "00000a1dca18aa14a91489108910881088106910881088106710670c680c470c0000891088106910680c690c680c670c490c480c480c480c480c470c470c2708" }
+even_bank_row0   = { space = "cgram", offset = "0000", hex = "00002220222423242224232422202224222423242220222022242220232422200000222022242224232422202324232422242324222022242220222423242324" }
+odd_bank_row27   = { space = "cgram", offset = "00C0", hex = "0000470c8810a914680cc9148910ea18670c88108910aa14670c2a1d8810cb1400002708480c6810470c680c490c8810480c6910690c8910680c470c480c680c" }

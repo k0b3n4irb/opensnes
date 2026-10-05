@@ -431,4 +431,5 @@ angle tables (entry = `trig(2*pi*a/48) * 20480 / scanline`, 8.8 fixed:
 the hyperbolic perspective divide). Four HDMA channels, one per register,
 repointed per frame with `hdmaSetup(ch, HDMA_MODE_1REG_2X,
 HDMA_DEST_M7A..D, table + angle * 673)`. The tables are machine-verified
-against the math by `devtools/m7ptables.py verify`.
+by `opensnes-image perspective`, which regenerates them from that formula
+(`res/perspective.toml`; its golden suite holds krom's bytes).

@@ -60,15 +60,6 @@ compile-time pattern checks (`cases/`, `run.py`).
 | `asset_budget.py` | static VRAM / CGRAM weight of an example's converted assets | `asset-budget`, `common.mk` (one line per link) |
 | `vram_layout/` | `vram.spec` → `vram_map.h` by CP-SAT (ortools, opt-in; six examples use it) | by hand, gated by `lint-vram` |
 
-## Asset generators kept for provenance
-
-| Script | Produces | Named by |
-|--------|----------|----------|
-| `hicolor64.py` | per-tile-row palettes for the HiColor technique (`examples/color/hicolor_1792`) | the example's README |
-| `m7ptables.py` | extracts and verifies the Mode 7 perspective tables (`examples/mode7/perspective_rotate`) | the example's README |
-
-Studio needs in disguise: in 1.x they become `opensnes-image`.
-
 ## Data files
 
 `removed_api.txt` (the 47 names 1.0 removed, read by `check_upgrade.py` and

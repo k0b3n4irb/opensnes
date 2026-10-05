@@ -270,10 +270,10 @@
     "rom_sha256": "ae6512ee3b7cf453f54f54220213e27d8a0e77b5186885ff7e1fdc0b4789bbc5"
   },
   "color_hicolor_1792": {
-    "fbhash": "6e58ca710dc2c028",
+    "fbhash": "0da598dc13068037",
     "frames": 200,
     "luna_version": "v1.32.0",
-    "rom_sha256": "9eafe5cdab84135c30fb54087a5f1db11aa45885654b9d23e7d362fad7dda79b"
+    "rom_sha256": "4592800eb01e99efb3dda7c46d6b093e6badb54f8e0d953b293826b105097022"
   },
   "color_palette_cycle": {
     "fbhash": [

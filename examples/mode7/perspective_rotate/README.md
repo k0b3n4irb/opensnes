@@ -12,11 +12,12 @@ by `20480/y`, an 80× zoom-out at the horizon shrinking hyperbolically to
 `mode7/perspective` drives only the diagonal terms
 (no rotation); this one exercises the full affine matrix.
 
-The tables are krom's exact bytes (`res/m7{cos,sin,nsin}.bin`, extracted
-verbatim), their math reverse-engineered and verified:
-`entry(a,y) = trig(2πa/48)·20480/y` in 8.8 fixed point — 32256/32256
-entries proven by `devtools/m7ptables.py verify`. The track art is
-original (9 prefab tiles composed into a 128×128 Mode 7 world).
+The tables are generated at build time by `opensnes-image perspective`
+from `res/perspective.toml` (48 angles, 224 lines, zoom 80):
+`entry(a,y) = trig(2πa/48)·20480/y` in 8.8 fixed point, rounded to the
+nearest — which is krom's exact bytes, all 32256 entries (the tool's golden
+suite keeps his tables as the reference). The track art is original (9
+prefab tiles composed into a 128×128 Mode 7 world).
 
 ## Controls (krom's map)
 

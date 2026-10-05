@@ -12,9 +12,10 @@ palette slots** from a mode that nominally allows 128. HDMA cannot do this:
 its widest mode moves 4 bytes per scanline; the technique needs 16.
 
 The sunset art is original (procedural, `res/sunset.png` — 15,885 source
-colors); `devtools/hicolor64.py` reimplements krom's converter contract
-(64×8-pixel segments quantized to 15 colors + black). 357 distinct colors
-land on screen — any static 4bpp screen caps at 128.
+colors); `opensnes-image hicolor` converts it at build time to krom's asset
+contract (64×8-pixel segments quantized to 15 colors + black, settings in
+`res/sunset.png.toml`). 377 distinct colors land on screen — any static 4bpp
+screen caps at 128.
 
 ## SNES Concepts
 
@@ -69,11 +70,8 @@ land on screen — any static 4bpp screen caps at 128.
 cd examples/color/hicolor_1792 && make
 ```
 
-To regenerate the assets from different art (requires Pillow):
-
-```bash
-python3 ../../../../devtools/hicolor64.py res/sunset.png res/sunset
-```
+The build converts `res/sunset.png` itself (`opensnes-image hicolor`, from
+`res/sunset.png.toml`); replace the picture with any 256×224 art and `make`.
 
 ## Modules Used
 
