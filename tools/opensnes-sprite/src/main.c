@@ -16,6 +16,7 @@
  * JSON Aseprite writes with --data --list-tags into <stem>_anim.h, one
  * AnimClip per tag. `inspect` says what a sheet will cost.
  */
+#include <stdbool.h>   /* gfx4snes's headers take bool; C before C23 needs this first */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
