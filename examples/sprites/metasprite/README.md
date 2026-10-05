@@ -44,7 +44,7 @@ static const MetaspriteItem hero16_frame0[] = {
 
 ### VRAM Tile Layout and OAM Tile Numbers
 
-OAM tile numbers reference 8x8 tiles in VRAM, regardless of the hardware sprite size. A 16x16 sprite uses 4 consecutive 8x8 tiles (2 across x 2 down in the VRAM character grid, which is 16 tiles wide). A 32x32 sprite uses 16 tiles. The `-T` flag in gfx4snes transposes the sprite sheet to match the SNES OBJ VRAM grid layout, so tile indices in the metasprite data correspond directly to positions in the converted `.pic` file.
+OAM tile numbers reference 8x8 tiles in VRAM, regardless of the hardware sprite size. A 16x16 sprite uses 4 consecutive 8x8 tiles (2 across x 2 down in the VRAM character grid, which is 16 tiles wide). A 32x32 sprite uses 16 tiles. `opensnes-sprite sheet` lays the sheet out in the SNES OBJ VRAM grid order (the `metasprite` setting), so tile indices in the metasprite data correspond directly to positions in the converted `.pic` file.
 
 This example packs all three sprite sheets into contiguous VRAM starting at $0000:
 
@@ -105,8 +105,9 @@ oamDrawMetasprite(nextId, 160, 148, hero8_frame0, &style8_small, 0);
 ```
 metasprite/
 ├── main.c              — OBJ mode switching, metasprite drawing, text menu
-├── data.asm            — ROM data: three sprite tile sets and palettes
-├── Makefile            — Build configuration with gfx4snes -T (transpose) rules
+├── res/spritehero*.png.toml — import settings of the three sheets (opensnes-sprite,
+│                         `metasprite = [W, H]`, priority 2); the build converts and links them
+├── Makefile            — Build configuration (no conversion rule: the settings files drive it)
 └── res/
     ├── spritehero32.png    — 64x64 hero sprite sheet (32x32 tiles, 4bpp)
     ├── spritehero16.png    — 32x48 hero sprite sheet (16x16 tiles, 4bpp)

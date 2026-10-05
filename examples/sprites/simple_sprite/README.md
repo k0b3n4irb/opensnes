@@ -115,7 +115,7 @@ an offset from this base.
 | File | Purpose |
 |------|---------|
 | `main.c` | Sprite loading, OAM setup, display configuration |
-| `data.asm` | Sprite tile data and palette via `.INCBIN` |
+| `res/sprite32.png.toml` | the import settings of the sprite sheet (`opensnes-sprite`: 32-pixel blocks, 16 colours); the build converts the PNG and links the result, `res/sprite32.inc` declares the symbols |
 | `res/sprite32.png` | Source 32x32 sprite image |
 | `Makefile` | `LIB_MODULES := console dma sprite` |
 

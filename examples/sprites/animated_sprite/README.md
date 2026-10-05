@@ -111,7 +111,7 @@ the 16-tile-per-row VRAM layout).
 | File | Purpose |
 |------|---------|
 | `main.c` | Input handling, state machine, animation logic |
-| `data.asm` | Sprite tile data and palette via `.INCBIN` |
+| `res/sprites.png.toml` | the import settings of the sprite sheet (`opensnes-sprite`: 16-pixel blocks, 16 colours); the build converts the PNG and links the result, `res/sprites.inc` declares the symbols |
 | `res/sprites.png` | Source sprite sheet (9 frames, 16x16 each) |
 | `Makefile` | `LIB_MODULES := console sprite dma input` |
 
