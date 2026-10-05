@@ -14,6 +14,26 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-05, chunker v10 — "fin du ménage")
+
+`snes_sources`: **34 949 chunks, 215 sources captured of 237, built
+2026-10-05T00:01:28Z, chunker v10, index v2, fingerprint `15fc202da6dc`**
+(`2026-10-04_from_snes-rag_fin-du-menage.md`, after `…_volume-de-module-tranche.md`
+at `2dd271353e84` and `…_garde-fous-mcp.md`). What changed for us: domain
+arbiters are matched on whole words (no more `luna-docs` promoted by "Lunar
+Magic"), `reference` is a rank between arbitre-domaine and solid and
+`authority_min="reference"` is accepted, addresses are matched under one
+form (`0x2130` = `$2130` = `2130h`, four-digit only — two-digit bank ranges
+such as fullsnes's `40h-4Fh` are still not matched, the SA-1 case of
+`OPEN_snes-rag.md`), the `mesures-partenaires` fiches are in English with
+new chunk ids (old ones resolve by alias), a mistyped `exclude_sources` id
+is refused instead of ignored and `k` is bounded to 1..20. Golden queries
+**9/9**; negative control: `opensnes-docs` at ranks 1 and 2, no toolchain
+source above it. Caveat measured on 2026-10-05: a session whose MCP server
+process predates the `git pull` serves the new index with the old code —
+the refusal and the `k` bound were not active here (`exclude_sources=
+["opensnes-docz"]` ran, `k=500` returned 62) until the server is restarted.
+
 ## Index state (2026-10-02, v8)
 
 `snes_sources`: **34 808 chunks, 210 sources captured of 236, built
@@ -280,7 +300,7 @@ Documented error worth knowing: `qbe-docs` `abi.txt` describes the upstream
 targets' ABI (amd64/arm64/rv64); for anything cc65816 / w65816 the arbiter
 is `compiler/ABI.md`. The corpus flags this on ABI queries.
 
-## Golden queries (status 2026-10-03, index `7c9411654112`; 9/9 on every index since `bb5dbf5eff5d`)
+## Golden queries (status 2026-10-05, index `15fc202da6dc`; 9/9 on every index since `bb5dbf5eff5d`)
 
 Run with the exclusion set. "✅" = the intended source is in the top 3.
 
@@ -295,7 +315,7 @@ Run with the exclusion set. "✅" = the intended source is in the top 3.
 | 7 | TMX tile flipping flags (`FLIPPED_HORIZONTALLY_FLAG`…) high bits of the gid | ✅ tiled-tmx-format | green since `bb5dbf5eff5d`: the constants live on the "Global Tile IDs" page, which the corpus now captures (`d07b82b0b0dcebb9`, `8a64c4c6f6f9932f`) |
 | 8 | Aseprite file format: cel chunk layout and palette chunk semantics | ✅ aseprite-file-spec | |
 | 9 | luna profile per-symbol master cycles `--from-frame --top` JSON | ✅ luna-docs | |
-| N | *negative control* — cc65816 calling convention: push order and pointer size (no exclusion) | ≈ opensnes-docs 2nd and 3rd | 2026-09-27: `wdc-65816-manual` "Push" (generic) is first; never qbe-docs, so the control holds, but our ABI is no longer first — reported. The chunk it served carried a stale row of our own ABI.md (fixed the same day) |
+| N | *negative control* — cc65816 calling convention: push order and pointer size (no exclusion) | ≈ opensnes-docs 1st and 2nd (2026-10-05; 2nd and 3rd before) | 2026-09-27: `wdc-65816-manual` "Push" (generic) is first; never qbe-docs, so the control holds, but our ABI is no longer first — reported. The chunk it served carried a stale row of our own ABI.md (fixed the same day) |
 
 Lesson from the first run: phrase toolchain queries with the tool's own
 vocabulary (`type :name`, `phi`, `--power-on`, `cel chunk`), not with
