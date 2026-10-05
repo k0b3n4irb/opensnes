@@ -183,3 +183,10 @@ Le deuxième rapport de la passe math / puces / audio vient d'arriver. Il ajoute
   nom des en-têtes PVSnesLib (`~/workspace/pvsneslib`) contre les nôtres :
   renommages, refus assumés (`printf`, scores, pixels, `WaitNVBlank`,
   compteur FPS), manques assumés (couleur unique de palette, `oamGetX/Y`).
+- **Ligne 30 (`fixMul` tronqué)** : `math.h` dit le résultat 16 bits et le
+  repli sans signe au-delà de ±128, avec l'exemple du rapport (−112.0) et
+  le renvoi à `fix32Mul`.
+- **Lignes 20, 22, 31** : déjà fermées le 10-04 (`pan_to_lr` symétrique au
+  centre ; `SRAM_SAVE_BLOCK` traite la banque 0 ≥ `$2000` comme ROM, vecteur
+  `r_sram_rom0` ; `hdma.h` nomme le canal 1 du GSU) — la liste du 10-04 les
+  disait encore ouvertes.

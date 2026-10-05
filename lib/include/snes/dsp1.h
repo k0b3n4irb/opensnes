@@ -9,8 +9,8 @@
  * interface as ordinary C calls.
  *
  * @par Cartridge requirement
- * Build with `USE_DSP1 := 1` (sets the ROM header cartridge type to $03 and
- * maps the DSP registers). The DSP-1 registers live at $30:8000 (data) /
+ * Build with `USE_DSP1 := 1` (sets the ROM header cartridge type to $03, or
+ * $05 with `USE_SRAM := 1`, and maps the DSP registers). The DSP-1 registers live at $30:8000 (data) /
  * $30:C000 (status) on the LoROM board this SDK targets.
  *
  * @par Fixed-point
@@ -262,9 +262,15 @@ void dsp1Raster(u8 FAR *ab, u8 FAR *cd, s16 vs, u16 count);
  *         (3,4,12) -> 12, (300,400,0) -> 499, (0,0,10000) -> 9999. Treat the
  *         result as exact to within 1, and compare with `>=` / `<`, never
  *         `==`. Measured on the DSP-1B firmware; the official manual (Book II
- *         §5.2.3, code 28H) states no rounding, and sneslab notes the
- *         command "bugged in DSP1/DSP1A, fixed in DSP1B" without saying
- *         what the bug was — so on the 1/1A revisions the result may differ.
+ *         §5.2.3, code 28H) states no rounding. The truncation is the
+ *         algorithm (bsnes `dsp1emu.cpp`: `Distance >>= (E >> 1)`), not the
+ *         DSP1/DSP1A bug that fullsnes names for this command (fixed in
+ *         DSP1B, chunk `919f1a3794274d16`): on the 1/1A revisions the
+ *         interpolation table is read inverted at odd positions (bsnes
+ *         `dsp1emu.cpp` l. 418-420, read by the corpus fiche
+ *         `647e4ef6ebffdf00`; sneslab names the bug without describing it).
+ *         Command $2F returns the ROM version ($0100 = DSP1/1A, $0101 =
+ *         DSP1B) if a game needs to know which one it runs on.
  *
  * Hardware square root — handy for homing missiles, audio attenuation,
  * anything that needs a true distance rather than a compare.

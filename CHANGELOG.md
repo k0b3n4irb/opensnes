@@ -543,6 +543,16 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- docs(lib): `math.h` says that `fixMul` returns 16 bits and wraps past
+  ±128 (`fixMul(FIX(20), FIX(20))` reads −112.0), pointing to `fix32Mul`;
+  `dsp1.h` describes the DSP1/DSP1A `Distance` bug the DSP1B fixed
+  (inverted interpolation at odd table positions, read from bsnes by the
+  corpus) instead of saying nobody says what it was, and gives the two
+  cartridge types `USE_DSP1` sets; `sram.asm` and `hdr_superfx.asm` lose
+  two banners that contradicted the code under them (SA-1 saves refused,
+  extended header filled with $FF); `ROADMAP.md` describes the `superfx`
+  module as it is and lists `dsp1` (chips audit PF7, PF8; library audit
+  l.30).
 - build(devtools): every link runs `symmap.py --check-data-init`: the
   `DataInitEnd` label must close the `.data_init` section, or initialised
   globals past the terminator would boot with whatever WRAM held. Reading

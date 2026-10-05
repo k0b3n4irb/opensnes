@@ -32,10 +32,10 @@
 ; offset + size must stay within $2000 (the default SRAM_SIZE, 8 KB). Larger
 ; HiROM saves would have to step through banks $31-$3F; not implemented.
 ;
-; SA-1 is not supported here: its save memory is BW-RAM ($40-$4F), which the
-; SNES CPU may only write after enabling SBWE ($2226), and crt0 does not.
-; make/common.mk refuses USE_SRAM=1 with USE_SA1=1 instead of building a
-; module that would silently do nothing.
+; SA-1 (since 2026-09-26; refused before): the save memory is BW-RAM, and the
+; SNES CPU may only write it after crt0 enables SBWE ($2226), which it does.
+; Until 2026-10-05 the paragraph above this one still said the build refused
+; USE_SRAM=1 with USE_SA1=1 — the lines below are what the module does.
 .ifdef SA1
 ; SA-1: the save memory is BW-RAM, seen by the SNES CPU at $40-$4F:0000-FFFF
 ; (fullsnes, SA-1 memory map); crt0 enables SNES-side writes (SBWE, $2226).

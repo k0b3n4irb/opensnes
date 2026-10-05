@@ -102,3 +102,25 @@ Le Super FX a rattrapé l'écart du 26/09 (vrai runtime testé avec contrôles n
   `SCMR_H160/H192`, la présentation sous PAL, la sauvegarde pendant une
   présentation.
 
+
+## Suivi 2026-10-05 (session)
+
+- **PF7** : `dsp1.h` décrit le bug DSP1/1A de `Distance` (interpolation
+  inversée aux positions impaires, lu dans bsnes `dsp1emu.cpp` l. 418-420
+  par la fiche corpus `647e4ef6ebffdf00` ; fullsnes `919f1a3794274d16`
+  nomme le bug et la commande `$2F` donne la version). La troncature
+  mesurée n'est pas le bug.
+- **PF8** : les quatre textes corrigés — `sram.asm:35-38` (bannière « refusé »
+  retirée), `hdr_superfx.asm:52-56` (bannière « $FF comme Star Fox »
+  remplacée), `ROADMAP.md:143` (`superfx` décrit tel quel, ligne `dsp1`
+  ajoutée), `dsp1.h:12` (`$03`, `$05` avec `USE_SRAM`).
+- **PF10** : rangée 24 `superfx_game_skeleton` (présentation + cache +
+  SNESMOD) ; note FXPak / `dsp1b.bin` sur la rangée 16 (sd2snes
+  `0f24744ff001c043`, source solide, fait de cartouche flash) ; les deux
+  chemins de sauvegarde (SA-1, Super FX) déclarés non couverts — il faut
+  un exemple à résultat visible pour chacun avant la session. S1 (borne
+  haute de `ROM_BANKS`) est corrigé dans `common.mk` (`ROM_BANKS_MAX`),
+  pas une rangée console.
+- **PF5 (reste)** : `GSU_PRESENT_ON_LAG_FRAMES`, `SCMR_H160/H192`, PAL,
+  sauvegarde pendant une présentation — toujours sans ROM qui les exerce.
+- **Rec 11** : non traité (cinq lignes partenaires à rejouer avant écriture).

@@ -145,7 +145,12 @@ typedef s16 fixed;
  * fixed result = fixMul(speed, scale);  // 1.0
  * @endcode
  *
- * @note Uses 32-bit intermediate for accuracy
+ * @note The 32-bit product is shifted back to 8.8 and the RESULT is 16 bits:
+ *   a product outside -128.0..127.996 wraps without a sign — `fixMul(FIX(20),
+ *   FIX(20))` is 400.0, which does not fit, and reads as -112.0. Keep
+ *   |a × b| under 128, or use the 16.16 `fix32Mul()` (`snes/fixed32.h`).
+ *   (This line said "32-bit intermediate for accuracy" and nothing about the
+ *   16-bit result until 2026-10-05.)
  *
  * @warning NOT safe inside an nmiSet() callback: uses the hardware
  *   multiplier, which is not reentrant (a callback multiply destroys a

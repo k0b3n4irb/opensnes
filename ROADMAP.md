@@ -140,7 +140,8 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `debug` | Nocash messages, Mesen breakpoints | core |
 | `video` | Video mode and display control | core |
 | `sa1` | SA-1 enhancement-chip helpers | experimental |
-| `superfx` | SuperFX (GSU) loader stubs (assembly only — no C compiler) | experimental |
+| `superfx` | Super FX (GSU): job launch, cached code, double-buffered frame presentation (`gsuLaunch`, `gsuStartCached`, `gsuPresent`); GSU code is assembly only (no C compiler) | core (luna-validated; the 1.0 freeze criterion) |
+| `dsp1` | DSP-1 commands (multiply, trig, rotation, projection, distance) over the two-register port | core (runs the real firmware on luna) |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
 ### Examples (89)

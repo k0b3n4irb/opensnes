@@ -50,10 +50,11 @@
 .include "project_config.inc"
 
 ;------------------------------------------------------------------------------
-; Extended Header ($FFB0-$FFBF) — fill with $FF like Star Fox
+; Extended Header ($FFB0-$FFBF) — declared, with the Game Pak RAM size
 ;------------------------------------------------------------------------------
-; Star Fox has all $FF in the extended header area (= no extended header).
-; snes9x may misdetect if this area contains non-$FF values.
+; (Until 2026-10-05 this banner still said "fill with $FF like Star Fox" above
+; the block that does the opposite: the header was extended on 2026-09-24
+; so that an emulator or a cartridge can read the RAM size at $FFBD.)
 ;------------------------------------------------------------------------------
 .BANK 0 SLOT "ROM"          ; by name: a bare 0 drew WLA's "SLOT number 0 / SLOT with starting address 0" warning on every Super FX link (2026-10-04)
 ; Extended header ($FFB0-$FFBF), recognised when the licensee code at $FFDA
