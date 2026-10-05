@@ -167,10 +167,20 @@ lint-asm-abi:
 lint-vram:
 	@python3 devtools/check_vram_layout.py
 
+# Unit tests of the sentinels and of the luna harness. Until 2026-10-05 only
+# the harness's ran locally and the five others only in CI (lint.yml); the
+# gate a contributor runs must be the gate CI runs (testing.md).
+test-devtools:
+	@cd devtools && python3 -m unittest -q test_check_doc_drift test_check_vram_layout
+	@python3 devtools/test_check_nmi_wram_race.py
+	@python3 devtools/symmap/test_symmap.py
+	@python3 devtools/test_asset_budget.py
+	@cd tools/luna-test && python3 -m unittest -q test_harness
+
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
-	@cd tools/luna-test && python3 -m unittest -q test_harness
+	@$(MAKE) -s test-devtools
 	@python3 devtools/check_bank_reads.py --selftest
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
@@ -704,7 +714,8 @@ help:
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"
 	@echo "  lint-commits - Validate commit messages in origin/develop..HEAD (RANGE=... overrides)"
 	@echo "  lint-docs - Check anchored doc claims (version macros, ROADMAP status, examples count)"
-	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + lint-commits)"
+	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + test-devtools + lint-commits)"
+	@echo "  test-devtools - Unit tests of the sentinels (devtools/test_*.py) and of the luna harness"
 	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
