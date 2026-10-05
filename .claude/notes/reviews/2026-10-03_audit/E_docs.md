@@ -123,3 +123,10 @@ La documentation est exacte sur ce qu'elle vérifie, et elle en vérifie beaucou
 - **Jaune 8** (Doxygen) : `PHILOSOPHY.md` et `BENCHMARK.md` étaient entrés
   le 10-04 ; `PHILOSOPHY.md` a tenu le job doc-render au rouge jusqu'au
   10-05 (code dans une citation), corrigé.
+- **PF9 (entrées vertes sans test ni date)** : les sept entrées (108, 206,
+  288, 314, 403, 433, 595) nomment leur test ; l'entrée `data_init_end`
+  est réécrite d'après les faits : l'ordre d'édition de liens ne décide
+  pas de la place du terminateur (tri de wlalink par taille), et un
+  contrôle `symmap.py --check-data-init` existe désormais après chaque
+  édition de liens (contrôle négatif sur un `.sym` forgé). La ligne 751
+  n'est pas une entrée (paragraphe de la section ABI) : rien à dater.

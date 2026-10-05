@@ -119,7 +119,11 @@ arbitrated 2026-09-12; found by `luna --power-on random` on
 **Mitigation (lib, since 2026-09-12):** every vertical scroll the lib writes
 is `y - 1` — the NMI shadow sync (`bgSetScroll`/`bgSetScrollY`), the map
 module, `mode7SetScroll`, and the reset default — so `y = 0` means "tilemap
-row 0 on the first picture line". PVSnesLib writes the raw value; when
+row 0 on the first picture line". **Test:** the lib fixture reads
+`bgs.1.v_scroll == 76` after `bgSetScrollY(1, 77)` on luna's PPU view
+(`devtools/libtests/test_libtest.py`), and the `backgrounds_mode6*.toml`
+manifests pin the one exception (BG3 as the offset-per-tile table, written
+raw). PVSnesLib writes the raw value; when
 porting, do not subtract 1 yourself. The one path the lib cannot cover is
 data you hand to the hardware directly, such as an HDMA table on
 `BGnVOFS`: apply the -1 in the table.
@@ -203,14 +207,24 @@ debugging.
 
 ## Build-time / linker traps
 
-### 🟢 `data_init_end.o` MUST be linked last (by the build order of `make/common.mk`; no separate check)
-The data-init copy loop scans from `data_init_start.o` until the sentinel in
-`data_init_end.o`. If the latter isn't last, init walks past valid data and
-copies garbage into WRAM at boot.
+### 🟢 The data-init terminator must close `.data_init` (checked after every link since 2026-10-05)
+The data-init copy loop scans from `DataInitStart` until the 5-byte
+terminator record that `data_init_end.o` appends to the `.data_init`
+section (`APPENDTO`). A record landing past the terminator would leave its
+initialised globals with whatever WRAM held at boot, silently.
 
-**Mitigation:** `make/common.mk` builds the link list in fixed order with
-`data_init_end.o` always at the end (`LINK_OBJS := ... data_init_end.o`).
-Don't override `LINK_OBJS` from your example Makefile.
+What keeps the terminator last is **not** the linkfile order, which this
+page claimed until 2026-10-05 ("`data_init_end.o` MUST be linked last"):
+wlalink sorts appended sections by priority, then by size, largest first
+(`wlalink/analyze.c`, `_compare_sections`), and every record is at least
+6 bytes (5 of header plus the data itself), so the 5-byte terminator sorts
+after them whatever the object order — measured: `print_string` relinked
+with `data_init_end.o` first, in the middle and last puts `DataInitEnd` at
+the section's end each time. `make/common.mk` still lists it last.
+**Test:** every link runs `symmap.py --check-data-init`, which fails when
+the `DataInitEnd` label does not close the `.data_init` section (a forged
+`.sym` with the label 8 bytes early fails; the 89 examples pass). A wlalink
+bump that changed the sort would stop here, not in a game.
 
 ### 🟠 cc65816 pushes function args **LEFT-TO-RIGHT**
 PVSnesLib (tcc816) pushes args right-to-left, the C convention. cc65816 pushes
@@ -291,7 +305,10 @@ register `$002229` (twice: early init ~`:519-526`, and the SA-1 boot block
 ~`:636-642`). This polarity was long presented here as "disputed" because the
 [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers) says
 bit=1 *protects* a page. **Resolved 2026-09-02: the wiki page is wrong** and
-`$FF` (bit=1 = write-enable) is correct, on four independent grounds:
+`$FF` (bit=1 = write-enable) is correct, on four independent grounds
+(**test:** the SA-1 fixture `devtools/libtests_sa1_sram` reads back a byte the
+SA-1 wrote to BW-RAM from its boot stub, `r_sa1_bw == 0x5A`, and
+`sa1_hello` / `sa1_starfield` run in every coverage pass):
 
 - fullsnes ([SA-1 memory control](https://problemkaputt.de/fullsnes.htm#snescartsa1memorycontrol)):
   SIWP bits are write **enable** flags for eight 256-byte chunks
@@ -321,7 +338,10 @@ emulator that detects and executes **SA-1, Super FX (GSU) and DSP-1** directly
 (verified: `superfx_hello` → "ALL TESTS PASSED", `superfx_3d` → GSU-rendered 3D
 cube, `sa1_hello`/`sa1_starfield` → `sa1_status=$A5`). The chip-ROM side channel
 and the whole snes9x-WASM + Mesen2 + xvfb stack are gone. See
-`.claude/notes/chantiers/luna_migration.md`.
+`.claude/notes/chantiers/luna_migration.md`. **Test:** the chip examples are
+in every `luna_runner.py --coverage` pass, and the `libtests_gsu`,
+`libtests_dsp1` and `libtests_sa1_sram` fixtures assert chip-side effects
+(a GSU job's result, a DSP-1 multiply, a BW-RAM byte).
 
 ### 🟡 SuperFX C support is intentionally absent
 The GSU has its own RISC ISA with no C compiler. All SuperFX code must be
@@ -406,6 +426,9 @@ culprit files 100x monthly and fails on any segfault. Full investigation log:
 `sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
 `sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
 canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
+**Test:** `devtools/compiler-tests/cases/type_sizes.c` pins every size with a
+`_Static_assert` (since 2026-10-05); the `long` semantics are the
+`test_long_*` cases of the same suite.
 
 **Semantics** (since 2026-05-16):
 `long` arithmetic flows through the QBE w65816 backend's Kl-class handlers,
@@ -437,6 +460,10 @@ alignment, 4 bytes total. The indirect-call emit pass reads the bank byte
 from the pointer's high half — `jml [tcc__r9]` after `sta.b tcc__r9` (low
 16) + `sta.b tcc__r9+2` (bank byte) — so function pointers in any bank
 work without a `*Bank` API variant. Shipped in v0.19.0 (2026-05-15).
+**Test:** `sizeof(void *) == 4` and `sizeof(int (*)(void)) == 4` in
+`devtools/compiler-tests/cases/type_sizes.c`; the ABI lint
+(`make lint-asm-abi`) holds every hand-written ASM function to the 4-byte
+pointer slot; `farptr_field_copy` and `test_function_ptr` pin the codegen.
 
 Historical note: pre-A6, function pointers were 8 bytes (low + high + 4
 bytes padding) and indirect calls hardcoded `lda #$00` for the bank byte.
@@ -602,6 +629,10 @@ knob (`ROM_BANKS`, default 8): a Super FX or a large game sets
 range follow. wlalink takes the largest bank count among the objects, so
 the prebuilt library needs no rebuild. Found while sizing what a Super FX
 game needs (`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`).
+**Test:** since 2026-10-05 `luna_runner.py --coverage` fails any ROM whose
+header size byte covers less than the file (and, with luna's
+`checksum_computed`, whose header sum differs from the bytes); the HiROM
+fixture `devtools/libtests_hirom` is a 512 KB ROM in that pass.
 
 In the same change the Super FX header gained the extended header it never
 had: sixteen `$FF` bytes and a zero licensee code meant no emulator or
