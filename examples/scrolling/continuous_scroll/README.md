@@ -11,15 +11,6 @@
 |--------|--------|
 | D-Pad | Move the character |
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/scrolling/continuous_scroll
-```
-
-Then open `continuous_scroll.sfc` in your emulator (Mesen2 recommended).
-
 ## What You'll Learn
 
 - How SNES background scrolling actually works (it's not moving tiles -- it's moving the camera)
@@ -28,6 +19,15 @@ Then open `continuous_scroll.sfc` in your emulator (Mesen2 recommended).
 - Why scroll register updates must happen during VBlank (and how bgSetScroll's dirty-flag mechanism guarantees it)
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/scrolling/continuous_scroll
+```
+
+Then open `continuous_scroll.sfc` in your emulator (Mesen2 recommended).
 
 ## Walkthrough
 

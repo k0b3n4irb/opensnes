@@ -7,16 +7,6 @@
 
 ![Screenshot](text_glyphs.png)
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/fundamentals/text_glyphs
-```
-
-Then open `text_glyphs.sfc` in [luna](https://github.com/k0b3n4irb/luna) (or
-any SNES emulator).
-
 ## Controls
 
 No interactive controls. The text is displayed statically.
@@ -29,6 +19,16 @@ No interactive controls. The text is displayed statically.
 - The difference between VRAM (video memory) and regular RAM
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/fundamentals/text_glyphs
+```
+
+Then open `text_glyphs.sfc` in [luna](https://github.com/k0b3n4irb/luna) (or
+any SNES emulator).
 
 ## Walkthrough
 

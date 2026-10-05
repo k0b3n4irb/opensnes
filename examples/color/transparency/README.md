@@ -7,15 +7,6 @@
 
 ![Screenshot](transparency.png)
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/color/transparency
-```
-
-Then open `transparency.sfc` in your emulator (Mesen2 recommended).
-
 ## Controls
 
 No interactive controls. The clouds scroll automatically.
@@ -29,6 +20,15 @@ No interactive controls. The clouds scroll automatically.
 - Using an assembly DMA loader for SUPERFREE graphics data with correct bank bytes
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/color/transparency
+```
+
+Then open `transparency.sfc` in your emulator (Mesen2 recommended).
 
 ## SNES Concepts
 

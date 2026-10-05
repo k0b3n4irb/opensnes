@@ -12,15 +12,6 @@
 | D-Pad Left/Right | Walk |
 | A | Jump (hold Up + A for higher jump) |
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/games/likemario
-```
-
-Then open `likemario.sfc` in your emulator (Mesen2 recommended).
-
 ## What You'll Learn
 
 - How tile streaming works — loading new map columns into VRAM as the camera scrolls
@@ -30,6 +21,15 @@ Then open `likemario.sfc` in your emulator (Mesen2 recommended).
 - Why the camera position and the scroll register are two different things
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/games/likemario
+```
+
+Then open `likemario.sfc` in your emulator (Mesen2 recommended).
 
 ## Walkthrough
 
