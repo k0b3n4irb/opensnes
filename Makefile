@@ -156,10 +156,10 @@ lint-cppcheck:
 		echo "lint-cppcheck: cppcheck not installed, skipped (CI runs it)"; \
 	else \
 		cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
-			--suppress='*:tools/common/lodepng.c' \
-			--suppress='*:tools/font2snes/src/stb_image.h' \
+			--suppress='*:tools/third_party/lodepng.c' \
+			--suppress='*:tools/third_party/stb_image.h' \
 			-DGFX4SNESVERSION='"x"' -DGFX4SNESDATE='"x"' -D__BUILD_DATE='"x"' -D__BUILD_VERSION='"x"' -DVERSION='"x"' \
-			-Itools/smconv/src -Itools/common tools/*/src tools/common \
+			-Itools/smconv/src -Itools/third_party tools/*/src tools/third_party \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
 		&& { [ ! -d compiler/qbe/w65816 ] || cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \
@@ -599,7 +599,7 @@ release: all
 	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp ATTRIBUTION.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@# Apache-2.0 §4: the binaries built with cmdparser ship with its licence.
-	@cp tools/common/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
+	@cp tools/third_party/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
 	@# GPL-2.0 §3: the wla-dx binaries (a patched fork) ship with the licence
 	@# text and a pointer to their exact source (compiler/PINS.md: fork URL and
 	@# commit of every toolchain submodule).

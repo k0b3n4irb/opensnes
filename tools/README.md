@@ -26,9 +26,10 @@ parsers).
 | [`palplan/`](palplan/) | plans a project's `.pal` files into the 8 + 8 CGRAM slots, emits a C header | 1.0.0 | by hand, project-level | `docs/tools/palplan.md` |
 | [`sa1-patch/`](sa1-patch/) | post-link: sets the SA-1 map-mode bits in the ROM header | 1.0.0 | automatic for `USE_SA1=1` | [`sa1-patch/README.md`](sa1-patch/README.md) |
 
-Shared code: [`common/`](common/) holds `lodepng` and `cmdparser` (inherited
-from PVSnesLib, licences inside); `font2snes/src/stb_image.h` and
-`tmx2snes/cute_tiled.h` are the other vendored parsers (`ATTRIBUTION.md`).
+Every tool's Makefile is a few variables over [`tool.mk`](tool.mk) (one
+build recipe, one version macro `TOOL_VERSION`); the vendored parsers
+(lodepng, cmdparser, stb_image, cute_tiled) live in
+[`third_party/`](third_party/) with their licences (`ATTRIBUTION.md`).
 
 These are the 0.x tools. In 1.x they are superseded by the `opensnes-*`
 family (one tool per function, common conventions, TOML settings beside

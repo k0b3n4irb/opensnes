@@ -18,11 +18,11 @@
 CLANG        ?= clang
 FUZZ_SECONDS ?= 60
 FUZZ_CFLAGS  := -g -O1 -fsanitize=fuzzer,address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined
-COMMON       := ../common
+COMMON       := ../third_party
 SMC          := ../smconv/src
-TMX          := ../tmx2snes
+TMX          := ../third_party
 ASE          := ../aseprite2snes/src
-FNT          := ../font2snes/src
+FNT          := ../third_party
 
 FUZZERS := lodepng itloader tiled json stbimage
 TARGETS := $(addprefix fuzz_,$(FUZZERS))

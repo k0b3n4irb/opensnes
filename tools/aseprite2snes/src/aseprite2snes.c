@@ -42,7 +42,7 @@
 #include <stdarg.h>
 
 #ifndef VERSION
-#define VERSION "1.0.0"
+#define VERSION TOOL_VERSION   /* from tools/tool.mk */
 #endif
 
 #define MAX_FRAMES 512          /* Aseprite sheets rarely exceed a few dozen */

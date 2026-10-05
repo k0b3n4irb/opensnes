@@ -31,7 +31,7 @@
 #include "tiles.h"
 #include "output.h"
 
-#define VERSION "1.0.0"
+#define VERSION TOOL_VERSION   /* from tools/tool.mk */
 
 /* Character dimensions */
 #define CHAR_SIZE    8     /* 8x8 pixels per character */

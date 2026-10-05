@@ -43,8 +43,8 @@ static void tmx2snes_map_crash(void)
 #define CUTE_TILED_IMPLEMENTATION
 #include "cute_tiled.h"
 
-#define TMX2SNESVERSION __BUILD_VERSION
-#define TMX2SNESDATE __BUILD_DATE
+#define TMX2SNESVERSION TOOL_VERSION
+#define TMX2SNESDATE TOOL_BUILD_DATE
 
 #define HI_BYTE(n) (((int)n >> 8) & 0x00ff) // extracts the hi-byte of a word
 #define LOW_BYTE(n) ((int)n & 0x00ff)       // extracts the low-byte of a word

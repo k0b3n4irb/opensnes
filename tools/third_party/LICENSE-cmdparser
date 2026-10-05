@@ -1,7 +1,7 @@
 cmdparser.{c,h} — Copyright 2022 github.com/XUJINKAI/cmdparser.
 Licensed under the Apache License, Version 2.0 (text below). Used by
 gfx4snes and img2snes; OpenSNES ships it unmodified apart from the
-move into tools/common/.
+move into tools/third_party/.
 
 
                                  Apache License
