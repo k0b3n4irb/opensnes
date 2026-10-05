@@ -83,7 +83,8 @@ Tiled level into map, tile tables and entities; @subpage tools_opensnes_tileset 
 background artist's (tilesets, tilemaps, palette banks); @subpage tools_opensnes_text
 converts a typeface; @subpage tools_opensnes_palette plans a project's palettes into
 CGRAM and quantizes RGB art; @subpage tools_opensnes_image makes HiColor screens and
-the Mode 7 perspective tables.
+the Mode 7 perspective tables; @subpage tools_opensnes_save creates, reads and patches
+battery save files.
 
 ## Your Makefile
 

@@ -24,7 +24,7 @@ its function went.
 | `opensnes-sample` | WAV → BRR |
 | `opensnes-music` | Impulse Tracker → soundbank, with the samples it shares |
 | `opensnes-rom` | finalize and check a ROM: header, size, mapper, checksum, the post-link checks, the credits |
-| `opensnes-save` | read, write and verify a save file |
+| `opensnes-save` | battery save files (`.srm`): create, read, patch, compare (verifying a save format: when the SDK defines one) |
 
 luna is not in the family: it is the emulator, debugger and test runner
 the family calls (`opensnes run`, `opensnes test`), documented on its own

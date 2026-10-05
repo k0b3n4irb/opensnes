@@ -1,0 +1,1 @@
+{"tool": "opensnes-save", "version": "1.0.0", "rom": {"title": "FIXTURE LOROM SAVE", "mapping": "LoROM", "map_mode": 32, "cartridge_type": 2, "sram_bytes": 8192, "expansion_ram_bytes": 0, "save_bytes": 8192}, "saves": [{"input": "slot1.srm", "bytes": 8192, "blank": 0, "written_bytes": 6, "first_written": 0, "last_written": 7, "matches_rom": true}]}

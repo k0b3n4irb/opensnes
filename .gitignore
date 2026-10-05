@@ -31,6 +31,7 @@ tools/opensnes-level/opensnes-level
 tools/opensnes-text/opensnes-text
 tools/opensnes-palette/opensnes-palette
 tools/opensnes-image/opensnes-image
+tools/opensnes-save/opensnes-save
 
 # Generated documentation
 doc/

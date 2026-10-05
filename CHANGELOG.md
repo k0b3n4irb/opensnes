@@ -17,6 +17,18 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`opensnes-save`** (tools): battery save files, the tenth tool of the
+  1.x family. `new` writes the blank `.srm` a ROM expects — the size its
+  header declares at `$FFD8`, or the expansion RAM of `$FFBD` on a Super FX
+  cartridge (8 KB, 32 KB and 64 KB on the SDK's LoROM / HiROM, SA-1 and
+  Super FX ROMs, the sizes of the files luna writes); `inspect` says how
+  much is written and where, and with `--rom` refuses a save of another
+  size; `get` and `set` read and patch bytes at the offsets the game gives
+  `sramLoadOffset()` / `sramSaveOffset()`; `diff` lists the ranges in which
+  two saves differ. A save made with `new` + `set` is byte for byte the one
+  luna's `srm_out` wrote for `memory/save_game`, so a test manifest can
+  start from a prepared `srm_in`. No checksum or version check: the SDK
+  defines no save format yet.
 - **`opensnes-text`, `opensnes-palette`, `opensnes-image`** (tools): three
   more tools of the 1.x family (9 of 11). `opensnes-text font` turns a
   picture of the 96 glyphs into the text module's tiles (indexed, grey or

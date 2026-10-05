@@ -801,3 +801,27 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   supprimés : plus aucun exemple ne dépend d'un script Python pour ses assets.
 - Reste de la famille : `opensnes-save` et le vrai programme `opensnes` ; la
   table de chaînes de `-text` ; le dernier `python3` de `common.mk`.
+
+### Journal (suite, 2026-10-06)
+
+- **Auteur des commits** : Dependabot retiré (`develop` et `main`), sa PR #163
+  fermée et son bump appliqué à la main ; le lint vérifie auteur et committer
+  et refuse toute signature d'outil dans un message. Constat écrit dans
+  `commits.md` : 69 commits de `main` portent une ligne de lien de session
+  (2026-09-02 → 2026-10-03) ; réécriture non décidée par le propriétaire.
+- **Zéro Python dans une build utilisateur** : le dernier appel
+  (`check_upgrade.py`) est `opensnes upgrade`, shell + awk dans le CLI, mêmes
+  55 résultats sur un projet de contrôle ; la build ne le lance plus que sur
+  un échec de compilation, avec `--removed-only` (le script Python signalait
+  chaque `hdmaEnable()` d'un projet 1.0 correct sur une machine sans clang).
+  Listes dans `make/` (livré), `RELEASE_DEVTOOLS` supprimé, zip sans `.py`,
+  ancre 17 de la sentinelle.
+- `opensnes-save` (10/11) : `new` / `inspect` / `get` / `set` / `diff` sur les
+  `.srm`. **Choix assumé** : pas de `verify`. Le besoin B22 (somme de contrôle,
+  version, migration) suppose un format de sauvegarde que la bibliothèque ne
+  définit pas (`sram` copie des octets) ; un outil qui inventerait le sien
+  serait une deuxième source de vérité. Le format est un lot de bibliothèque
+  (module opt-in, API additive), à décider par le propriétaire ; l'outil le
+  vérifiera ensuite.
+- Reste : le vrai programme `opensnes` (bash aujourd'hui, toléré), la table
+  de chaînes d'`opensnes-text`, le format de sauvegarde côté lib.
