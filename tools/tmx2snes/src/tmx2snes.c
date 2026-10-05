@@ -525,7 +525,7 @@ void WriteMap(void)
             }
             if (gid > N_METATILES)
             {
-                printf("tmx2snes: error 'tile %d of layer [%s] uses id %d: the SNES tilemap "
+                printf("tmx2snes: error 'tile %d of layer [%s] uses id %u: the SNES tilemap "
                        "holds %d tiles (ids 1..%d)'\n",
                        i, layer->name.ptr ? layer->name.ptr : "?", gid, N_METATILES, N_METATILES);
                 fclose(fpo);
@@ -921,7 +921,7 @@ int main(int argc, char **argv)
 
     if (filesize > N_METATILES * 2) // no more than nb metatiles in words
     {
-        printf("\ntmx2snes: error 'tileset map file is too big [%d bytes]'", filesize);
+        printf("\ntmx2snes: error 'tileset map file is too big [%u bytes]'", filesize);
         fclose(fpi);
         exit(1);
     }
