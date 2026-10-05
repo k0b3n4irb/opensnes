@@ -232,16 +232,16 @@
     "rom_sha256": "d344b94b53e25b7608babd9b6bd4958906f7cfec83b9532c6addbe87cd005736"
   },
   "maps_map_scroll": {
-    "stream": "9bcfad02b805324aa179642e6d8d62b8eb8b09e02fa6f93aae6d3b205d8f693a",
-    "rom_sha256": "e55f2c158266687c4d3cd9defb7e3db43fd969b71bfdd6f4c67a74f2160334aa"
+    "stream": "84c1980b0d473e97bca95073abc9caee47e4e41f0d8e01d5201f17a779160673",
+    "rom_sha256": "18ec63b53c638e39dd6669a7c2d659a154402ed52e38497431b6883855ff47b6"
   },
   "maps_slope_collision": {
     "stream": "be9bb13dbb2c57601f1d9c104ce52bfd96c948e6607800d4ae9ce188a9f8e1a5",
     "rom_sha256": "241d11ded99bd320cc81229d49e220e2f0daf11d9a3f06c8b4654e8a3bc2528e"
   },
   "maps_tiled": {
-    "stream": "700f958bf6643cf0a7cecb9fed9e7ef159b327a97bf9b2c698d57c6afb34851a",
-    "rom_sha256": "48d6865f2074a8dc76f9ab82242c7b30a2892fd225e2705f5c12936418ce0e08"
+    "stream": "6c3448bea8e65da2a2722a7d0729095dc1b4886775c16bb41e507649d2211ecd",
+    "rom_sha256": "8298c5b031b792178d4149c0278b4a43a8369f325a602bfee4205c60d166bb23"
   },
   "memory_hirom_demo": {
     "stream": "e4e058402e49a10427c75f2e03bbd72bc2222f651bf7ad9a08280e0a1956c4c0",
