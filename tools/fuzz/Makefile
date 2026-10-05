@@ -50,7 +50,7 @@ corpus/lodepng:
 corpus/itloader:
 	@mkdir -p $@ && cp ../smconv/tests/fixtures/*.it $@/
 corpus/tiled:
-	@mkdir -p $@ && cp $(TMX)/tests/fixtures/*.tmj $@/
+	@mkdir -p $@ && cp ../tmx2snes/tests/fixtures/*.tmj $@/
 corpus/json:
 	@mkdir -p $@ && cp ../aseprite2snes/tests/fixtures/*.json $@/
 corpus/stbimage:

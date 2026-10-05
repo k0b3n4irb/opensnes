@@ -145,8 +145,8 @@ lint-docs:
 # Static analysis of the host C (gaps review H4): the asset tools' own
 # sources and the lib's C. cppcheck needs no compile database, so it
 # gates on a recursive-make tree as is. Vendored decoders are suppressed
-# (lodepng, stb_image: upstream code with its own noise), gfx4snes's
-# version macros are supplied. The w65816 backend is checked advisory
+# (lodepng, stb_image: upstream code with its own noise), the tools'
+# version macros (TOOL_VERSION, TOOL_BUILD_DATE, tools/tool.mk) are supplied. The w65816 backend is checked advisory
 # only (upstream QBE idioms). First run found a dangling context pointer
 # in cmdparser (both copies), an uninitialised read in aseprite2snes and
 # the free-then-fatal paths cppcheck could not see were fatal (noreturn).
@@ -158,7 +158,7 @@ lint-cppcheck:
 		cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			--suppress='*:tools/third_party/lodepng.c' \
 			--suppress='*:tools/third_party/stb_image.h' \
-			-DGFX4SNESVERSION='"x"' -DGFX4SNESDATE='"x"' -D__BUILD_DATE='"x"' -D__BUILD_VERSION='"x"' -DVERSION='"x"' \
+			-DTOOL_VERSION='"x"' -DTOOL_BUILD_DATE='"x"' \
 			-Itools/smconv/src -Itools/third_party tools/*/src tools/third_party \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
