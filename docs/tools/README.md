@@ -76,7 +76,8 @@ function, the same conventions everywhere, settings beside each asset.
 release. The first two are @subpage tools_opensnes_sample (WAV → BRR) and
 @subpage tools_opensnes_music (Impulse Tracker → soundbank); @subpage tools_opensnes_rom
 runs the post-link checks of every build; @subpage tools_opensnes_sprite is the sprite
-artist's tool (sheets, metasprites, Aseprite clips); @subpage tools_opensnes_tileset the
+artist's tool (sheets, metasprites, Aseprite clips); @subpage tools_opensnes_level turns a
+Tiled level into map, tile tables and entities; @subpage tools_opensnes_tileset the
 background artist's (tilesets, tilemaps, palette banks).
 
 ## Your Makefile

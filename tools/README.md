@@ -31,6 +31,7 @@ parsers).
 | [`opensnes-rom/`](opensnes-rom/) | 1.x family: `check` runs the post-link checks of a user build (bank $00 ratchet, C RAM band, data-init sentinel, bank-blind reads, NMI / WRAM-port race, asset inventory) — the compiled successor of five Python scripts, same verdicts on the 99 built ROMs | 1.0.0 | `make/common.mk` after every link | `docs/tools/opensnes-rom.md` |
 | [`opensnes-sprite/`](opensnes-sprite/) | 1.x family: `sheet` (sprite sheet → tiles in OBJ order, palette, metasprite table), `anim` (Aseprite export → AnimClip header), `inspect`; gfx4snes's and aseprite2snes's converters linked as libraries, their goldens reproduced | 1.0.0 | by hand today | `docs/tools/opensnes-sprite.md` |
 | [`opensnes-tileset/`](opensnes-tileset/) | 1.x family: `convert` (picture → tileset, tilemap, palette; Modes 1/5/6/7, pages, flips, palette rearrangement) and `inspect`; gfx4snes's map path linked as a library, its golden and pixel oracle reproduced | 1.0.0 | by hand today | `docs/tools/opensnes-tileset.md` |
+| [`opensnes-level/`](opensnes-level/) | 1.x family: `convert` (Tiled JSON level + the tileset's `.map` → `<layer>.m16`, `.b16`, `.t16`, `.o16`, optional `.q16`, `.c16`, entities header, and the `.inc` / `_data.as` glue), `inspect`; tmx2snes's converter linked as a library (`tools/tmx2snes/src/level.c`) | `tests/run_golden.py` (data byte-identical to tmx2snes's goldens) |
 
 Every tool's Makefile is a few variables over [`tool.mk`](tool.mk) (one
 build recipe, one version macro `TOOL_VERSION`); the 1.x tools share

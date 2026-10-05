@@ -744,3 +744,10 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   helpers asm, polices binaires, sections RAM) et 9 n'avaient rien à
   convertir (images SPC700, `.brr` sans source, `.dat`, `.pic` sans PNG).
   `opensnes-level` est la prochaine marche.
+- `opensnes-level` livré (6/11 outils de la famille) : le convertisseur de
+  tmx2snes extrait en `tools/tmx2snes/src/level.c` (erreurs en buffer par
+  `longjmp`, progression par callback), la colle `.inc` / `_data.as`, un
+  `inspect` sans écriture, les goldens de tmx2snes repris octet pour octet.
+  La règle générique convertit un niveau après les autres assets (il lit le
+  `.map` du tileset). `map_scroll` et `tiled` perdent leur dernier
+  `data.asm` ; `mapandobjects`, sans source Tiled, garde ses binaires.

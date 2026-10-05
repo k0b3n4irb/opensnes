@@ -42,6 +42,11 @@ static int parts_of(const char *path)
 /* One blob: its own ASSET_SECTION, or one per 32 KB part (<label>, <label>_1, ...). */
 static void write_blob(FILE *f, const char *name, const char *what, const char *path)
 {
+    incfile_write_blob(f, name, what, path);
+}
+
+void incfile_write_blob(FILE *f, const char *name, const char *what, const char *path)
+{
     int parts = parts_of(path);
     for (int i = 0; i < parts; i++) {
         char label[300];

@@ -17,6 +17,19 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`opensnes-level`** (tools): the level tool of the 1.x family. `convert`
+  takes a Tiled JSON map and the `.map` its tileset's conversion wrote
+  (`--tileset`, `tileset = "tiles.map"` in `res/<level>.tmj.toml`) and writes
+  `<layer>.m16`, `.b16`, `.t16`, `.o16`, with `--entities`, `--quadrant`,
+  `--collision` for the entities header, the quadrant map and the per-cell
+  collision grid, plus the `.inc` / `_data.as` glue (`mapLoad(town_BG1_map,
+  town_tiledef, town_tileattr)`); `inspect` reads a level without writing.
+  The converter is tmx2snes's, extracted to `tools/tmx2snes/src/level.c`
+  with a buffered error path; tmx2snes's goldens are the family's (byte
+  for byte). The build converts a level after the other assets, so the
+  tileset's `.map` is fresh. `maps/map_scroll` and `maps/tiled` convert
+  their levels this way and lose their last `data.asm` (`games/mapandobjects`
+  has no Tiled source for its level and keeps the binaries).
 - **`opensnes-sample`, the first tool of the 1.x family** (tools): WAV → BRR
   with `encode` (the `.brr` and a `.h` of its sizes and loop offset) and
   `inspect` (what a `.wav` or `.brr` holds and costs in ARAM), long options,

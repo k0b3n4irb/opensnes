@@ -4,6 +4,7 @@
 #define OPENSNES_INCFILE_H
 
 #include <stddef.h>
+#include <stdio.h>
 
 typedef struct {
     const char *generator;     /* "opensnes-tileset 1.0.0" */
@@ -16,5 +17,9 @@ typedef struct {
 /* Writes <outbase>.inc and <outbase>_data.as for the asset named `name`
  * (a C identifier). Returns 0, or -1 with the reason in err[]. */
 int incfile_write(const char *outbase, const char *name, const incfile_spec *spec, char *err, size_t errlen);
+
+/* One blob of a _data.as: its own ASSET_SECTION named <name>_<what>, or one per 32 KB part
+ * (<name>_<what>_1, ...); each with a <label>_end. For tools whose outputs are not pictures. */
+void incfile_write_blob(FILE *f, const char *name, const char *what, const char *path);
 
 #endif
