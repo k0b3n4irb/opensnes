@@ -158,3 +158,16 @@ La 1.0 part quand toutes ces lignes sont vraies, chacune prouvée dans le dépô
 5. Une session console a rempli au moins les rangées 1 à 7 du protocole matériel.
 6. Le chantier Super FX est soit terminé (phases C–F), soit borné et documenté comme expérimental, avec des signatures `gsu*` qui ne gèleront pas un pipeline de démo.
 7. Deux semaines sans **découvrir** de défaut silencieux dans la bibliothèque, le runtime ou le compilateur, corrigé ou non (reformulé le 2026-10-03 : la première rédaction, « sans nouvelle entrée 🟠 dans `KNOWN_LIMITATIONS.md` », ne comptait que les défauts laissés ouverts). Journal et date d'ouverture de la fenêtre : `status/silent_defects_log.md` ; la fenêtre s'ouvre à la fin de la campagne de chasse.
+
+**Avancement, 2026-10-05.** Étape 0 du plan du 10-03 faite : **v0.48.0**
+publiée (PR #162 `develop → main`, fusion `de7cde72`, étiquette sur `main`,
+`release.yml` vert : quatre zips, passe luna sur les deux Linux). C'est la
+version « anciens noms + avertissements » ; les lots B à I (retrait des
+alias, `hdmaEnable(channel)`, `dmaTransfer`, garde-fou `removed_api.txt`,
+macros 1.0.0) peuvent commencer sur `develop`. Le job Lint de la PR était
+rouge sur les seuls sujets de `0d30ec65` et `756da353` (déjà sur
+`develop`, laissés tels quels par décision) ; le job de poussée sur la
+pointe de `develop` était vert, ce que le critère 2 de `release.md`
+demande. Critères de gel : 1, 3, 4, 6 tenus ; 2 en attente de votre mot
+sur le « bus factor » ; 5 (console) et 7 (fenêtre après la campagne)
+ouverts.
