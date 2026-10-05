@@ -139,15 +139,21 @@ the source at or below **32 kHz**; that is the DSP's ceiling, and a higher rate
 just plays back sharp. Pass `-v` to see the block count, loop offset, and a
 ready-to-paste `audioLoadSample()` line.
 
-**2. Bake the `.brr` into the ROM.** Put it in a `data.asm` with a label and an
-end label, exactly as the example does:
+**2. Bake the `.brr` into the ROM.** Put a settings file beside the WAV and
+the build does the rest, exactly as `audio/sfx_from_wav` does:
 
-```asm
-ASSET_SECTION "samples"          ; templates/assets.inc: any bank but $00
-brr_jump:     .incbin "res/jump.brr"
-brr_jump_end:
-.ends
+```toml
+# res/jump.wav.toml
+tool = "opensnes-sample"
+
+[encode]
 ```
+
+`opensnes-sample encode` runs before the first C object; it writes
+`res/jump.brr`, a `res/jump_data.as` the build links (its own
+`ASSET_SECTION`, so any bank but $00), and a `res/jump.h` that declares
+`jump_brr[]`, `jump_brr_end[]` and the size. A looping sample adds
+`loop = [start, end]` to the table.
 
 **3. Load it once, play it on demand.** The label becomes a C symbol; the size
 is the two labels subtracted, and the loop point is the byte offset `wav2brr`
