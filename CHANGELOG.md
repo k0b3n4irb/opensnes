@@ -39,6 +39,17 @@ All notable changes to OpenSNES are documented in this file.
   the example's own README image (docs audit rec 10 — no tutorial had an
   illustration).
 
+### Removed
+- The twenty deprecated constants and the `OAM_SET_GFX_BANK` macro (lot B of
+  the 1.0 plan): `WINDOW_BG1`..`WINDOW_OBJ`, `COLORMATH_BG1`..`COLORMATH_OBJ`,
+  `MOSAIC_BG1`..`MOSAIC_BG4` (all `LAYER_*` of `video.h`, same values),
+  `BGMODE_MODE0/1/2/3/7` (`BG_MODE0`..`BG_MODE7`) and `OAM_SET_GFX_BANK`
+  (`OAM_SET_GFX` reads the bank from its pointer). `docs/UPGRADING.md` keeps
+  the table; `devtools/removed_api.txt` lists them for `make check-upgrade`,
+  which now reports a removed name as well as a still-deprecated one; the
+  doc sentinel (anchor 16) fails any page, example or template that teaches
+  one. No example used them; every ROM is byte-identical.
+
 ### Fixed
 - fix(tools): two gfx4snes map defects measured with a pixel oracle (decode
   `.pic` + `.pal` + `.map` and compare every pixel with the source). (1)

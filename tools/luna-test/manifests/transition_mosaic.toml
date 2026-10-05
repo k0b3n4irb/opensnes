@@ -64,7 +64,7 @@ mosaic_bg_mask = { eq = 0, width = 1 }
 at_frame = 175
 input = "160:0x0080,164:0"
 [checkpoint.values]
-mosaic_bg_mask = { eq = 1, width = 1 }     # MOSAIC_BG1
+mosaic_bg_mask = { eq = 1, width = 1 }     # LAYER_BG1
 mosaic_size = { eq = 5, width = 1 }
 console_brightness = { eq = 15, width = 1 }   # the mosaic must not touch $2100
 

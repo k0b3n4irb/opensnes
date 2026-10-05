@@ -4,10 +4,12 @@ the two calls that change meaning (docs/UPGRADING.md).
 
     python3 devtools/check_upgrade.py <folder-or-file>...   # or: make check-upgrade SRC=<folder>
 
-The list of removed names is read from the SDK headers themselves — every
+The list of names comes from two places: the SDK headers themselves — every
 function or variable declared with OPENSNES_DEPRECATED("...") and every
-constant named in a `#pragma clang deprecated(NAME, "...")` — so it cannot
-drift from what the compiler warns about. Two calls are reported even
+constant named in a `#pragma clang deprecated(NAME, "...")`, the names that
+still compile with a warning — and devtools/removed_api.txt, the names
+already gone from the headers (since 2026-10-05), which the compiler can only
+report as unknown identifiers. Two calls are reported even
 though they keep their name: hdmaEnable() / hdmaDisable(), which take a
 mask until 1.0 and a channel number from 1.0, and mode7SetScale() /
 mode7Transform(), whose 1:1 value changed in 0.47. Exit 0 when nothing is
@@ -38,6 +40,21 @@ MEANING = {
 }
 
 SOURCE_SUFFIXES = {".c", ".h", ".asm", ".s", ".inc"}
+
+
+REMOVED_LIST = HERE / "removed_api.txt"
+
+
+def gone_names() -> dict[str, str]:
+    """Names already removed from the headers: removed_api.txt."""
+    names: dict[str, str] = {}
+    if REMOVED_LIST.is_file():
+        for line in REMOVED_LIST.read_text(encoding="utf-8").splitlines():
+            if not line or line.startswith("#"):
+                continue
+            name, what, header = (line.split("\t") + ["", ""])[:3]
+            names[name] = f"use {what} (removed from {header})"
+    return names
 
 
 def removed_names() -> dict[str, str]:
@@ -72,6 +89,8 @@ def main(argv: list[str]) -> int:
               " the form make/common.mk runs per source when clang is absent)")
         return 2
     names = removed_names()
+    gone = gone_names()
+    names.update(gone)
     word = re.compile(r"\b(" + "|".join(map(re.escape, list(names) + list(MEANING))) + r")\b")
     hits = 0
     for f in sources(argv):
@@ -82,12 +101,14 @@ def main(argv: list[str]) -> int:
             for m in word.finditer(code):
                 name = m.group(1)
                 what = names.get(name) or MEANING[name]
-                kind = "removed at 1.0" if name in names else "changes meaning"
+                kind = ("removed" if name in gone else
+                        "removed at 1.0" if name in names else "changes meaning")
                 print(f"{f}:{n}: {name} — {kind}: {what}")
                 hits += 1
     if not quiet:
         print(f"\ncheck-upgrade: {hits} hit(s) in {len(list(sources(argv)))} file(s); "
-              f"{len(names)} removed names known from the headers")
+              f"{len(names) - len(gone)} deprecated names from the headers, "
+              f"{len(gone)} removed ones from removed_api.txt")
     return 1 if hits else 0
 
 

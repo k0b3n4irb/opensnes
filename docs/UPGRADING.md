@@ -7,6 +7,12 @@ compiles, and `make check-upgrade SRC=<folder>` reads a whole project) and
 is gone at 1.0. Nothing else of the public API changes at 1.0, and nothing changes
 again before 2.0.
 
+**Where `develop` stands (2026-10-05, lot B of the plan):** the constants of
+section 3 and the `OAM_SET_GFX_BANK` macro are already gone from the headers
+— a project that names one no longer compiles, and `make check-upgrade`
+reports each use from `devtools/removed_api.txt`. The functions of section 2
+still build with their warning until their own lot lands.
+
 Two things on this page are not removals but **changes of meaning**: read
 them first. Everything else is a rename where the old and new name do the
 same thing.

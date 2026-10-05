@@ -32,16 +32,8 @@
  * bits everywhere a call takes a set of layers. */
 #define MOSAIC_BG_ALL 0x0F    /**< Enable mosaic for all backgrounds */
 
-#define MOSAIC_BG1    0x01    /**< @deprecated use LAYER_BG1 */
-#define MOSAIC_BG2    0x02    /**< @deprecated use LAYER_BG2 */
-#define MOSAIC_BG3    0x04    /**< @deprecated use LAYER_BG3 */
-#define MOSAIC_BG4    0x08    /**< @deprecated use LAYER_BG4 */
-#ifdef __clang__
-#pragma clang deprecated(MOSAIC_BG1, "use LAYER_BG1")
-#pragma clang deprecated(MOSAIC_BG2, "use LAYER_BG2")
-#pragma clang deprecated(MOSAIC_BG3, "use LAYER_BG3")
-#pragma clang deprecated(MOSAIC_BG4, "use LAYER_BG4")
-#endif
+/* MOSAIC_BG1..MOSAIC_BG4 were removed on 2026-10-05: use LAYER_BG1..LAYER_BG4
+ * (video.h), the same values (docs/UPGRADING.md). */
 
 /*============================================================================
  * Mosaic Size Constants

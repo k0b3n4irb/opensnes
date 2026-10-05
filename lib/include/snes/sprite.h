@@ -181,23 +181,8 @@ _Static_assert(__builtin_offsetof(t_sprites, oamgfxbank) == 10, "oamgfxbank offs
     oambuffer[id].oamgfxbank = (u8)((u32)(const void *)(gfx) >> 16); \
 } while(0)
 
-/**
- * @brief Set sprite graphics address with explicit bank byte
- *
- * Only needed when @p gfx is a bare 16-bit address rather than a pointer.
- * With a pointer, OAM_SET_GFX() already takes the bank from it.
- *
- * @param id Sprite index (0-127)
- * @param gfx Pointer to graphics data
- * @param bank ROM bank where graphics data is located (0-255)
- *
- * @deprecated Since 2026-09-20: OAM_SET_GFX() reads the bank from the
- *             pointer. Removed at the next major version.
- */
-#define OAM_SET_GFX_BANK(id, gfx, bank) do { \
-    oambuffer[id].oamgfxaddr = (u16)(gfx); \
-    oambuffer[id].oamgfxbank = (u8)(bank); \
-} while(0)
+/* OAM_SET_GFX_BANK(id, gfx, bank) was removed on 2026-10-05: OAM_SET_GFX() reads
+ * the bank from its pointer (docs/UPGRADING.md). */
 
 /* --- Bank $00 SLOT 1 (C-accessible, < $2000) --- */
 

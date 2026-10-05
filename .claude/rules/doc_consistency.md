@@ -103,6 +103,13 @@ opt-in list.
     while nothing produced or checked it (docs audit, E_docs.md rec 8).
     `CLAUDE.md` joined the files whose example count is checked (anchor 3).
 
+16. **No removed name is taught** (since 2026-10-05, lots B/G of the 1.0
+    plan): every name of `devtools/removed_api.txt` is absent from `docs/`,
+    the examples, the templates, the headers and the manifests, unless the
+    line says it is removed; `UPGRADING.md` and the PVSnesLib migration
+    guide are exempt. The list grows with each removal lot and is also what
+    `make check-upgrade` reports to a project written against 0.x.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the

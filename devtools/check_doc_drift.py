@@ -1085,6 +1085,58 @@ HEADER_MAP_DOC = "docs/README.md"
 HEADER_MAP_HEADING = "## Header → tutorial map"
 
 
+# --------------------------------------------------------------------------
+# Check 16: no page, example or template cites a name removed from the SDK
+# (added 2026-10-05, lot B/G of the 1.0 plan). The list is
+# devtools/removed_api.txt; docs/UPGRADING.md and MIGRATING_FROM_PVSNESLIB.md
+# exist to name them and are exempt, CHANGELOG.md is history.
+# --------------------------------------------------------------------------
+
+_REMOVED_SCAN_GLOBS = ["docs/**/*.md", "examples/**/*.c", "examples/**/*.h",
+                       "examples/**/*.asm", "examples/**/*.md", "templates/*",
+                       "lib/include/snes/*.h", "lib/source/*", "KNOWN_LIMITATIONS.md",
+                       "README.md", "tools/luna-test/manifests/*.toml"]
+_REMOVED_EXEMPT = {"docs/UPGRADING.md", "docs/MIGRATING_FROM_PVSNESLIB.md"}
+
+
+def removed_api_names() -> dict[str, str]:
+    path = repo_path("devtools/removed_api.txt")
+    names: dict[str, str] = {}
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line and not line.startswith("#"):
+                parts = line.split("\t")
+                names[parts[0]] = parts[1] if len(parts) > 1 else ""
+    return names
+
+
+def check_removed_api_names() -> list[str]:
+    names = removed_api_names()
+    if not names:
+        return []
+    rx = re.compile(r"\b(" + "|".join(re.escape(n) for n in names) + r")\b")
+    drifts: list[str] = []
+    seen: set[Path] = set()
+    for g in _REMOVED_SCAN_GLOBS:
+        for path in sorted(repo_path().glob(g)):
+            if not path.is_file() or path in seen:
+                continue
+            seen.add(path)
+            rel = path.relative_to(repo_path()).as_posix()
+            if rel in _REMOVED_EXEMPT or "/build/" in rel:
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for lineno, line in enumerate(text.splitlines(), 1):
+                for m in rx.finditer(line):
+                    low = line.lower()
+                    if "removed" in low or "retir" in low:
+                        continue        # the line says it is gone
+                    drifts.append(f"{rel}:{lineno}: `{m.group(1)}` was removed from the SDK "
+                                  f"(devtools/removed_api.txt: use {names[m.group(1)]}); "
+                                  f"a page or example must not teach it")
+    return drifts
+
+
 def check_header_map() -> list[str]:
     drifts: list[str] = []
     doc = repo_path(HEADER_MAP_DOC)
@@ -1153,6 +1205,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_build_knobs())
     all_drifts.extend(check_benchmark_table())
     all_drifts.extend(check_header_map())
+    all_drifts.extend(check_removed_api_names())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)
