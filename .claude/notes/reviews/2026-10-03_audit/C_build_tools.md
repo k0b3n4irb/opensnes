@@ -153,3 +153,8 @@ Le système de build a fermé en une semaine presque tout ce que l'audit du 26/0
   de `print_string.sfc` est refusée (`0xAF40` ≠ `0xB01F`), l'originale
   passe, le corpus passe. La somme est donc couverte à la prochaine
   épingle ; reste « aucun symbole dans une banque non-ROM ».
+- **S15 (tmx2snes)** : trois refus — tuile tournée (flip diagonal),
+  id > 1024 (le masque `& 0x03FF` repliait sur une autre tuile), second
+  tileset (le `.b16` et les ids venaient du premier seul) — avec un cas
+  refusé chacun dans `run_golden.py` (patch de `town.tmj`) ; les deux
+  goldens historiques inchangés. Documenté dans le README et la page outil.

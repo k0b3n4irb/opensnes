@@ -50,6 +50,45 @@ CASES = [
     ("town.tmj", [], ["BG1.m16", "town.b16", "town.o16"]),
 ]
 
+# Maps the tool must refuse (2026-10-05, build audit S15), each a patch of
+# town.tmj: a rotated tile (Tiled's diagonal flip, bit 29), a tile id past
+# the 1024 the SNES tilemap addresses, a second tileset. Until then the id
+# was masked onto another tile, the rotation dropped, the second tileset
+# read as the first — three silent wrong maps. (patch, expected message)
+def _rotated(m):
+    m["layers"][0]["data"][0] |= 0x20000000
+def _big_gid(m):
+    m["layers"][0]["data"][0] = 1100
+def _two_tilesets(m):
+    m["tilesets"].append({"firstgid": 17, "name": "second", "image": "second.png",
+                          "imagewidth": 64, "imageheight": 8, "tilewidth": 8,
+                          "tileheight": 8, "tilecount": 8, "columns": 8,
+                          "margin": 0, "spacing": 0})
+    m["layers"][0]["data"][0] = 17
+REFUSED = [
+    ("rotated tile", _rotated, "is rotated"),
+    ("tile id past 1024", _big_gid, "uses id 1100"),
+    ("second tileset", _two_tilesets, "one tileset per map"),
+]
+
+
+def run_refused(name, patch, expect: str) -> list[str]:
+    import json
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        m = json.loads((HERE / "fixtures" / "town.tmj").read_text(encoding="utf-8"))
+        patch(m)
+        (work / "bad.tmj").write_text(json.dumps(m), encoding="utf-8")
+        shutil.copy(HERE / "fixtures" / "tileset.map", work / "tileset.map")
+        proc = subprocess.run([str(TOOL), "bad.tmj", "tileset.map"],
+                              cwd=work, capture_output=True, text=True, timeout=60)
+        out = proc.stdout + proc.stderr
+        if proc.returncode == 0:
+            return [f"{name}: converted (exit 0) instead of refusing"]
+        if expect not in out:
+            return [f"{name}: refused but without '{expect}': {out.strip()[-160:]}"]
+    return []
+
 
 def run_case(fixture: str, flags: list[str], outputs: list[str]) -> list[str]:
     errs: list[str] = []
@@ -84,7 +123,14 @@ def main() -> int:
             fails += 1
         else:
             print(f"  PASS {name} ({len(outputs)} outputs match)")
-    total = len(CASES)
+    for name, patch, expect in REFUSED:
+        errs = run_refused(name, patch, expect)
+        if errs:
+            print(f"  FAIL refused: {name}: " + "; ".join(errs))
+            fails += 1
+        else:
+            print(f"  PASS refused: {name}")
+    total = len(CASES) + len(REFUSED)
     print(f"\ntmx2snes golden: {total - fails}/{total} ok")
     return 1 if fails else 0
 

@@ -128,3 +128,5 @@ Aucun rapport n'est à zéro constat ouvert.
 - **D T4** fermé : balayage de seize phases d'appui des trois manifestes SNESMOD (`phase_sweep.py`) dans `make test-manifests`.
 - **E rec 8** fermé : ancre 15 du sentinel (carte en-tête → tutoriel) et `CLAUDE.md` dans le compte d'exemples.
 - **B PF10** fermé : section « What does not exist » du guide de migration.
+- **D T7 / T10** fermés : valeurs mesurées et image de fin de script dans les huit manifestes « delta ».
+- **C S15** fermé : trois refus dans tmx2snes avec contrôles négatifs.

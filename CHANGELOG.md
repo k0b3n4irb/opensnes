@@ -196,6 +196,11 @@ All notable changes to OpenSNES are documented in this file.
   | `WINDOW_OBJ` | `window.h` | `LAYER_OBJ` |
 
 ### Fixed
+- fix(tools): tmx2snes refuses a rotated tile (Tiled's diagonal flip,
+  dropped until now), a tile id above 1024 (masked onto another tile with
+  `& 0x03FF`) and a map with more than one tileset (the `.b16` and the ids
+  came from the first only) — three maps that converted silently to a
+  wrong one (build audit S15). Three refusal cases in the golden suite.
 - fix(lib): the object engine's five slot-taking functions (`objCollidObj`,
   `objCollidMap`, `objCollidMap1D`, `objCollidMapWithSlopes`, `objUpdateXY`)
   return at once on a slot index of 80 or more (`OB_MAX`). Before, the
