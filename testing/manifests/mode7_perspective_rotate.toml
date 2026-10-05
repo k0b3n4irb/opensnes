@@ -31,34 +31,34 @@ rom = "../../examples/mode7/perspective_rotate/perspective_rotate.sfc"
 [[checkpoint]]                 # krom's start pose, all four channels armed
 at_frame = 60
 [checkpoint.values]
-angle = 0
-scr_x = 384
-scr_y = 768
-pos_x = 512
-pos_y = 1152
+"angle.main" = 0
+"scr_x.main" = 384
+"scr_y.main" = 768
+"pos_x.main" = 512
+"pos_y.main" = 1152
 hdma_enabled_state = { eq = 0x0F, width = 1 }   # M7A, M7B, M7C, M7D
 
 [[checkpoint]]                 # L held: the angle selector advances, mod 48
 at_frame = 120
 input = "60:0x0020,119:0"
 [checkpoint.values]
-angle = 11                                      # 59 steps wrapped at ANGLES=48
-scr_x = 384                                     # rotating must not move the
-scr_y = 768                                     # camera or the pivot
-pos_x = 512
-pos_y = 1152
+"angle.main" = 11                                      # 59 steps wrapped at ANGLES=48
+"scr_x.main" = 384                                     # rotating must not move the
+"scr_y.main" = 768                                     # camera or the pivot
+"pos_x.main" = 512
+"pos_y.main" = 1152
 hdma_enabled_state = { eq = 0x0F, width = 1 }   # re-arming kept all four
 
 [[checkpoint]]                 # RIGHT held: scroll and pivot move together
 at_frame = 180
 input = "120:0x0100,179:0"
 [checkpoint.values]
-scr_x = 443                                     # 384 + 59
-pos_x = 571                                     # 512 + 59, the same 59
-scr_y = 768                                     # and only on the X axis
-pos_y = 1152
-angle = 11                                      # panning must not rotate
+"scr_x.main" = 443                                     # 384 + 59
+"pos_x.main" = 571                                     # 512 + 59, the same 59
+"scr_y.main" = 768                                     # and only on the X axis
+"pos_y.main" = 1152
+"angle.main" = 11                                      # panning must not rotate
 hdma_enabled_state = { eq = 0x0F, width = 1 }
 [checkpoint.delta]
-scr_x = "increased"
-pos_x = "increased"
+"scr_x.main" = "increased"
+"pos_x.main" = "increased"

@@ -25,12 +25,12 @@ at_frame = 50
 [checkpoint.values]
 hero_hp      = { eq = 3, width = 1 }
 dialog_shown = { eq = 0, width = 1 }
-"panel_map+132" = { eq = 0x240A, width = 2 }   # heart 0 filled
-"panel_map+134" = { eq = 0x240A, width = 2 }
-"panel_map+136" = { eq = 0x240A, width = 2 }
-"panel_map+138" = { eq = 0x240B, width = 2 }   # heart 3 empty
-"panel_map+140" = { eq = 0x240B, width = 2 }
-"panel_map+1288" = { eq = 0x0000, width = 2 }   # dialog area is blank tile 0
+"panel_map.main+132" = { eq = 0x240A, width = 2 }   # heart 0 filled
+"panel_map.main+134" = { eq = 0x240A, width = 2 }
+"panel_map.main+136" = { eq = 0x240A, width = 2 }
+"panel_map.main+138" = { eq = 0x240B, width = 2 }   # heart 3 empty
+"panel_map.main+140" = { eq = 0x240B, width = 2 }
+"panel_map.main+1288" = { eq = 0x0000, width = 2 }   # dialog area is blank tile 0
 
 [[checkpoint]]                 # one B tap
 at_frame = 80
@@ -41,40 +41,40 @@ hero_hp = { eq = 2, width = 1 }
 at_frame = 120
 [checkpoint.values]
 hero_hp   = { eq = 1, width = 1 }
-"panel_map+132" = { eq = 0x240A, width = 2 }
-"panel_map+134" = { eq = 0x240B, width = 2 }
-"panel_map+136" = { eq = 0x240B, width = 2 }
+"panel_map.main+132" = { eq = 0x240A, width = 2 }
+"panel_map.main+134" = { eq = 0x240B, width = 2 }
+"panel_map.main+136" = { eq = 0x240B, width = 2 }
 
 [[checkpoint]]                 # THE POINT: panelFlush for the dialog leaves
 at_frame = 180                 # the HUD row byte-identical
 [checkpoint.values]
 dialog_shown = { eq = 1, width = 1 }
 hero_hp      = { eq = 1, width = 1 }
-"panel_map+1288"    = { eq = 0x2401, width = 2 }   # 9-slice top-left corner stamped
+"panel_map.main+1288"    = { eq = 0x2401, width = 2 }   # 9-slice top-left corner stamped
 [checkpoint.delta]
-"panel_map+132" = "unchanged"
-"panel_map+134" = "unchanged"
-"panel_map+136" = "unchanged"
-"panel_map+138" = "unchanged"
-"panel_map+140" = "unchanged"
+"panel_map.main+132" = "unchanged"
+"panel_map.main+134" = "unchanged"
+"panel_map.main+136" = "unchanged"
+"panel_map.main+138" = "unchanged"
+"panel_map.main+140" = "unchanged"
 
 [[checkpoint]]                 # A with the dialog still open: heart comes back
 at_frame = 220
 [checkpoint.values]
 hero_hp      = { eq = 2, width = 1 }
 dialog_shown = { eq = 1, width = 1 }
-"panel_map+134"    = { eq = 0x240A, width = 2 }
+"panel_map.main+134"    = { eq = 0x240A, width = 2 }
 
 [[checkpoint]]                 # START again: panelClear wipes the dialog only
 at_frame = 280
 [checkpoint.values]
 dialog_shown = { eq = 0, width = 1 }
 hero_hp      = { eq = 2, width = 1 }
-"panel_map+1288"    = { eq = 0x0000, width = 2 }
+"panel_map.main+1288"    = { eq = 0x0000, width = 2 }
 [checkpoint.delta]
-"panel_map+132" = "unchanged"
-"panel_map+134" = "unchanged"
-"panel_map+136" = "unchanged"
+"panel_map.main+132" = "unchanged"
+"panel_map.main+134" = "unchanged"
+"panel_map.main+136" = "unchanged"
 
 # The HUD row as the PPU actually holds it. panel_map is only RAM; the
 # example's flush_hud_row() pushes just this 64-byte row with an ordinary

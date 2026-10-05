@@ -46,19 +46,19 @@ at_frame = 70
 game_state = { eq = 1,   width = 1 }
 time_left  = { eq = 30,  width = 1 }
 score      = { eq = 0,   width = 2 }
-px         = { eq = 120, width = 1 }
-py         = { eq = 112, width = 1 }
-cx         = { eq = 42,  width = 1 }
-cy         = { eq = 53,  width = 1 }
+"px.main"         = { eq = 120, width = 1 }
+"py.main"         = { eq = 112, width = 1 }
+"cx.main"         = { eq = 42,  width = 1 }
+"cy.main"         = { eq = 53,  width = 1 }
 
 [[checkpoint]]                 # walked onto the coin: scored and respawned
 at_frame = 130
 [checkpoint.values]
 score = { eq = 1,  width = 2 }
-px    = { eq = 40, width = 1 }      # 120 - 40 frames * 2 px
-py    = { eq = 52, width = 1 }      # 112 - 30 frames * 2 px
-cx    = { eq = 142, width = 1 }     # the coin moved
-cy    = { eq = 147, width = 1 }
+"px.main"    = { eq = 40, width = 1 }      # 120 - 40 frames * 2 px
+"py.main"    = { eq = 52, width = 1 }      # 112 - 30 frames * 2 px
+"cx.main"    = { eq = 142, width = 1 }     # the coin moved
+"cy.main"    = { eq = 147, width = 1 }
 
 [[checkpoint]]                 # one second left, still playing
 at_frame = 1850

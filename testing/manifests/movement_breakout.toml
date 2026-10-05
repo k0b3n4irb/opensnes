@@ -14,21 +14,21 @@ rom = "../../examples/games/breakout/breakout.sfc"
 [[checkpoint]]                 # title screen: nothing moves before START
 at_frame = 60
 [checkpoint.values]
-px = 80
-pos_x = 94
-pos_y = 109
-score = 0
-lives = 4
+"px.main" = 80
+"pos_x.main" = 94
+"pos_y.main" = 109
+"score.main" = 0
+"lives.main" = 4
 
 [[checkpoint]]                 # START, then LEFT for 20 frames -> px = 80 - 40
 at_frame = 150
 input = "60:0x1000,64:0,80:0x0200,100:0"
 [checkpoint.values]
-px = 40
-score = 0
-lives = 4
+"px.main" = 40
+"score.main" = 0
+"lives.main" = 4
 [checkpoint.delta]
-pos_y = "increased"            # the ball is in flight now, falling toward the paddle
+"pos_y.main" = "increased"            # the ball is in flight now, falling toward the paddle
 
 # Every VRAM DMA of this input-driven run lands in blank or forced blank
 # (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for

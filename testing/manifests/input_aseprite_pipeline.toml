@@ -28,30 +28,30 @@ rom = "../../examples/sprites/aseprite_pipeline/aseprite_pipeline.sfc"
 [[checkpoint]]                 # boot: a clip is playing (not a NULL player)
 at_frame = 90
 [checkpoint.values]
-hero_player = { ne = 0, width = 2 }
+"hero_player.main" = { ne = 0, width = 2 }
 
 [[checkpoint]]                 # A at 90: walk -> wave
 at_frame = 150
 input = "90:0x0080,94:0"
 [checkpoint.delta]
-hero_player = { dir = "changed", width = 2 }
+"hero_player.main" = { dir = "changed", width = 2 }
 
 [[checkpoint]]                 # A pressed at 150 (and held): wave -> walk
 at_frame = 200
 input = "150:0x0080"
 [checkpoint.delta]
-hero_player = { dir = "changed", width = 2 }
+"hero_player.main" = { dir = "changed", width = 2 }
 
 [[checkpoint]]                 # A still held: an edge, so no second toggle
 at_frame = 250
 input = "250:0"
 [checkpoint.delta]
-hero_player = { dir = "unchanged", width = 2 }
+"hero_player.main" = { dir = "unchanged", width = 2 }
 
 [[checkpoint]]                 # released
 at_frame = 300
 [checkpoint.delta]
-hero_player = { dir = "unchanged", width = 2 }
+"hero_player.main" = { dir = "unchanged", width = 2 }
 
 [asserts.blocks]               # label after two toggles: "WALK"
 label = { space = "vram", offset = "D0D0", hex = "370021002c002b00" }

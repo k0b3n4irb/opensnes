@@ -33,10 +33,10 @@ rom = "../../examples/mode7/rotate_scale/rotate_scale.sfc"
 [[checkpoint]]                 # boot pose: angle 0, scale 1:1
 at_frame = 60
 [checkpoint.values]
-m7_scale_x = 256                                # 0x0100 = 1:1 in 8.8 (0x0200 before 0.48.0)
-m7_scale_y = 256
-m7_sin = { eq = 0, width = 1 }                  # sin(0)
-m7_cos = { eq = 127, width = 1 }                # cos(0) = +1.0 as s8
+"m7_scale_x.mode7" = 256                                # 0x0100 = 1:1 in 8.8 (0x0200 before 0.48.0)
+"m7_scale_y.mode7" = 256
+"m7_sin.mode7" = { eq = 0, width = 1 }                  # sin(0)
+"m7_cos.mode7" = { eq = 127, width = 1 }                # cos(0) = +1.0 as s8
 [checkpoint.ppu]
 m7a = 254                                       # 1:1 with no rotation (127/128 of $0100)
 m7d = 254
@@ -50,10 +50,10 @@ bgmode = 7
 at_frame = 120
 input = "60:0x0080,119:0"
 [checkpoint.values]
-m7_sin = { eq = 126, width = 1 }                # angle 60/256 ~ 84.4 deg
-m7_cos = { eq = 15, width = 1 }
-m7_scale_x = 256                                # rotation must not zoom
-m7_scale_y = 256
+"m7_sin.mode7" = { eq = 126, width = 1 }                # angle 60/256 ~ 84.4 deg
+"m7_cos.mode7" = { eq = 15, width = 1 }
+"m7_scale_x.mode7" = 256                                # rotation must not zoom
+"m7_scale_y.mode7" = 256
 [checkpoint.ppu]
 m7a = 30                                        # the matrix really turned
 m7d = 30
@@ -66,10 +66,10 @@ m7y = 128
 at_frame = 180
 input = "120:0x0800,179:0"
 [checkpoint.values]
-m7_scale_x = 728                                # 256 + 59 * 8
-m7_scale_y = 728
-m7_sin = { eq = 126, width = 1 }                # zoom must not rotate
-m7_cos = { eq = 15, width = 1 }
+"m7_scale_x.mode7" = 728                                # 256 + 59 * 8
+"m7_scale_y.mode7" = 728
+"m7_sin.mode7" = { eq = 126, width = 1 }                # zoom must not rotate
+"m7_cos.mode7" = { eq = 15, width = 1 }
 [checkpoint.ppu]
 m7a = 85                                        # zoomed: every term grew
 m7d = 85
@@ -78,5 +78,5 @@ m7c = 716
 m7x = 128
 m7y = 128
 [checkpoint.delta]
-m7_scale_x = "increased"
-m7_scale_y = "increased"
+"m7_scale_x.mode7" = "increased"
+"m7_scale_y.mode7" = "increased"

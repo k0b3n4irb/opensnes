@@ -16,22 +16,22 @@ firmware = "dsp1b.rom"
 [[checkpoint]]                  # spawn
 at_frame = 60
 [checkpoint.values]
-"cam+0" = { eq = 0x0200, width = 2 }
-"cam+2" = { eq = 0x0200, width = 2 }
-"cam+10" = { eq = 0, width = 2 }
+"cam.main+0" = { eq = 0x0200, width = 2 }
+"cam.main+2" = { eq = 0x0200, width = 2 }
+"cam.main+10" = { eq = 0, width = 2 }
 dsp1_ok = { eq = 1, width = 2 }
 
 [[checkpoint]]                  # UP held: forward along heading 0
 at_frame = 200
 input = "60:0x0800"
 [checkpoint.delta]
-"cam+2" = "decreased"
-"cam+0" = "unchanged"
-"cam+10" = "unchanged"
+"cam.main+2" = "decreased"
+"cam.main+0" = "unchanged"
+"cam.main+10" = "unchanged"
 
 [[checkpoint]]                  # LEFT held: turning, not moving
 at_frame = 260
 input = "200:0x0200"
 [checkpoint.delta]
-"cam+10" = "changed"
-"cam+2" = "unchanged"
+"cam.main+10" = "changed"
+"cam.main+2" = "unchanged"

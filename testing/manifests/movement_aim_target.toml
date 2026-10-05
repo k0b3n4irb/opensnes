@@ -4,28 +4,28 @@ frames = 180
 [[checkpoint]]
 at_frame = 60
 [checkpoint.values]
-target_x = { eq = 200, width = 2 }
-target_y = { eq = 60, width = 2 }
+"target_x.main" = { eq = 200, width = 2 }
+"target_y.main" = { eq = 60, width = 2 }
 [[checkpoint]]                 # RIGHT -> target_x up
 at_frame = 120
 input = "60:0x0100,119:0"
 [checkpoint.delta]
-target_x = "increased"
+"target_x.main" = "increased"
 [checkpoint.values]
-target_x = { eq = 220, width = 2 }
-target_y = { eq = 60, width = 2 }
+"target_x.main" = { eq = 220, width = 2 }
+"target_y.main" = { eq = 60, width = 2 }
 [[checkpoint]]                 # UP -> target_y down
 at_frame = 180
 input = "120:0x0800,179:0"
 [checkpoint.delta]
-target_y = "decreased"
+"target_y.main" = "decreased"
 
 # Every VRAM DMA of this input-driven run lands in blank or forced blank
 # (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
 # what a button press triggers is here, one manifest at a time).
 [checkpoint.values]
-target_x = { eq = 220, width = 2 }
-target_y = { eq = 40, width = 2 }
+"target_x.main" = { eq = 220, width = 2 }
+"target_y.main" = { eq = 40, width = 2 }
 [asserts.dma]
 unsafe_writes = 0
 # Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):

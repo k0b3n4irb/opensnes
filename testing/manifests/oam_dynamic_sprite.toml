@@ -23,34 +23,34 @@ frames = 252
 [[checkpoint]]                 # animation step 6
 at_frame = 60
 [checkpoint.values]
-frame0 = { eq = 6, width = 2 }
-frame1 = { eq = 6, width = 2 }
-frame2 = { eq = 6, width = 2 }
-frame3 = { eq = 6, width = 2 }
+"frame0.main" = { eq = 6, width = 2 }
+"frame1.main" = { eq = 6, width = 2 }
+"frame2.main" = { eq = 6, width = 2 }
+"frame3.main" = { eq = 6, width = 2 }
 
 [[checkpoint]]                 # +8 frames -> step 7, OAM untouched
 at_frame = 68
 [checkpoint.values]
-frame0 = { eq = 7, width = 2 }
-frame3 = { eq = 7, width = 2 }
+"frame0.main" = { eq = 7, width = 2 }
+"frame3.main" = { eq = 7, width = 2 }
 [checkpoint.delta]
 oamMemory = { dir = "unchanged", width = 4 }   # x, y, tile, attr of sprite 0
 
 [[checkpoint]]                 # +8 more -> step 8, OAM still untouched
 at_frame = 76
 [checkpoint.values]
-frame0 = { eq = 8, width = 2 }
-frame3 = { eq = 8, width = 2 }
+"frame0.main" = { eq = 8, width = 2 }
+"frame3.main" = { eq = 8, width = 2 }
 [checkpoint.delta]
 oamMemory = { dir = "unchanged", width = 4 }
 
 [[checkpoint]]                 # 192 frames after the first leg: cycle closed
 at_frame = 252
 [checkpoint.values]
-frame0 = { eq = 6, width = 2 }
-frame1 = { eq = 6, width = 2 }
-frame2 = { eq = 6, width = 2 }
-frame3 = { eq = 6, width = 2 }
+"frame0.main" = { eq = 6, width = 2 }
+"frame1.main" = { eq = 6, width = 2 }
+"frame2.main" = { eq = 6, width = 2 }
+"frame3.main" = { eq = 6, width = 2 }
 [checkpoint.delta]
 oamMemory = { dir = "unchanged", width = 4 }
 

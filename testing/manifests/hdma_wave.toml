@@ -22,67 +22,67 @@ rom = "../../examples/hdma/hdma_wave/hdma_wave.sfc"
 [[checkpoint]]                 # armed at boot, the hand-built table on ch0
 at_frame = 60
 [checkpoint.values]
-wave_phase = 56
-use_lib = { eq = 0, width = 1 }
+"wave_phase.main" = 56
+"use_lib.main" = { eq = 0, width = 1 }
 hdma_enabled_state = { eq = 0x01, width = 1 }
 
 [[checkpoint]]                 # exactly +1 entry per frame over 60 frames
 at_frame = 120
 [checkpoint.values]
-wave_phase = 116
+"wave_phase.main" = 116
 [checkpoint.delta]
-wave_phase = "increased"
+"wave_phase.main" = "increased"
 
 [[checkpoint]]                 # just short of WAVE_WRAP (672)
 at_frame = 672
 [checkpoint.values]
-wave_phase = 668
+"wave_phase.main" = 668
 
 [[checkpoint]]                 # wrapped: 696 mod 672 — the seam krom needs
 at_frame = 700
 [checkpoint.values]
-wave_phase = 24
+"wave_phase.main" = 24
 hdma_enabled_state = { eq = 0x01, width = 1 }   # the wrap must not disarm it
 [checkpoint.delta]
-wave_phase = "decreased"
+"wave_phase.main" = "decreased"
 
 [[checkpoint]]                 # and the cadence is unchanged after the seam
 at_frame = 740
 [checkpoint.values]
-wave_phase = 64
+"wave_phase.main" = 64
 
 [[checkpoint]]                 # A: the hdma module takes over on ch6
 at_frame = 800
 input = "760:0x0080,764:0"
 [checkpoint.values]
-use_lib = { eq = 1, width = 1 }
+"use_lib.main" = { eq = 1, width = 1 }
 hdma_enabled_state = { eq = 0x40, width = 1 }   # ch0 off, ch6 on
-amp = { eq = 10, width = 1 }
+"amp.main" = { eq = 10, width = 1 }
 hdma_wave_amplitude = { eq = 10, width = 1 }
-wave_phase = 84                                 # frozen where A found it
+"wave_phase.main" = 84                                 # frozen where A found it
 
 [[checkpoint]]                 # 8 x RIGHT from 10: clamps at 24, not 26
 at_frame = 900
 input = "800:0x0100,804:0,810:0x0100,814:0,820:0x0100,824:0,830:0x0100,834:0,840:0x0100,844:0,850:0x0100,854:0,860:0x0100,864:0,870:0x0100,874:0"
 [checkpoint.values]
-amp = { eq = 24, width = 1 }
+"amp.main" = { eq = 24, width = 1 }
 hdma_wave_amplitude = { eq = 24, width = 1 }
-wave_phase = 84                                 # still frozen
+"wave_phase.main" = 84                                 # still frozen
 
 [[checkpoint]]                 # 12 x LEFT from 24: clamps at 2, not 0
 at_frame = 1040
 input = "900:0x0200,904:0,910:0x0200,914:0,920:0x0200,924:0,930:0x0200,934:0,940:0x0200,944:0,950:0x0200,954:0,960:0x0200,964:0,970:0x0200,974:0,980:0x0200,984:0,990:0x0200,994:0,1000:0x0200,1004:0,1010:0x0200,1014:0"
 [checkpoint.values]
-amp = { eq = 2, width = 1 }
+"amp.main" = { eq = 2, width = 1 }
 hdma_wave_amplitude = { eq = 2, width = 1 }
-use_lib = { eq = 1, width = 1 }
+"use_lib.main" = { eq = 1, width = 1 }
 
 [[checkpoint]]                 # A again: back on ch0, from the frozen phase
 at_frame = 1100
 input = "1040:0x0080,1044:0"
 [checkpoint.values]
-use_lib = { eq = 0, width = 1 }
+"use_lib.main" = { eq = 0, width = 1 }
 hdma_enabled_state = { eq = 0x01, width = 1 }
-amp = { eq = 2, width = 1 }                     # the amplitude survives
+"amp.main" = { eq = 2, width = 1 }                     # the amplitude survives
 [checkpoint.delta]
-wave_phase = "increased"
+"wave_phase.main" = "increased"

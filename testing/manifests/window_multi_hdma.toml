@@ -30,11 +30,11 @@ rom = "../../examples/windows/window_multi_hdma/window_multi_hdma.sfc"
 [[checkpoint]]                 # krom's window algebra, as programmed
 at_frame = 60
 [checkpoint.values]
-w12sel = { eq = 0x0F, width = 1 }
-w34sel = { eq = 0x00, width = 1 }
-wobjsel = { eq = 0x00, width = 1 }
-wbglog = { eq = 0x01, width = 1 }               # WINDOW_LOGIC_AND on BG1
-wobjlog = { eq = 0x00, width = 1 }
+"w12sel.window" = { eq = 0x0F, width = 1 }
+"w34sel.window" = { eq = 0x00, width = 1 }
+"wobjsel.window" = { eq = 0x00, width = 1 }
+"wbglog.window" = { eq = 0x01, width = 1 }               # WINDOW_LOGIC_AND on BG1
+"wobjlog.window" = { eq = 0x00, width = 1 }
 hdma_enabled_state = { eq = 0x01, width = 1 }   # one channel, four registers
 bg_scroll_x = 0
 bg_scroll_y = 0
@@ -45,8 +45,8 @@ input = "60:0x0100,119:0"
 [checkpoint.values]
 bg_scroll_x = 59
 bg_scroll_y = 0
-w12sel = { eq = 0x0F, width = 1 }
-wbglog = { eq = 0x01, width = 1 }
+"w12sel.window" = { eq = 0x0F, width = 1 }
+"wbglog.window" = { eq = 0x01, width = 1 }
 hdma_enabled_state = { eq = 0x01, width = 1 }
 
 [[checkpoint]]                 # UP: u16 scroll underflows cleanly to -59
@@ -55,9 +55,9 @@ input = "120:0x0800,179:0"
 [checkpoint.values]
 bg_scroll_y = 65477                             # 0xFFC5 = -59
 bg_scroll_x = 59                                # UP must not scroll sideways
-w12sel = { eq = 0x0F, width = 1 }
-w34sel = { eq = 0x00, width = 1 }
-wobjsel = { eq = 0x00, width = 1 }
-wbglog = { eq = 0x01, width = 1 }
-wobjlog = { eq = 0x00, width = 1 }
+"w12sel.window" = { eq = 0x0F, width = 1 }
+"w34sel.window" = { eq = 0x00, width = 1 }
+"wobjsel.window" = { eq = 0x00, width = 1 }
+"wbglog.window" = { eq = 0x01, width = 1 }
+"wobjlog.window" = { eq = 0x00, width = 1 }
 hdma_enabled_state = { eq = 0x01, width = 1 }

@@ -9,18 +9,18 @@ input = "60:0x1000,64:0,200:0x8000,204:0,300:0x8000,304:0,400:0x8000,404:0,500:0
 [[checkpoint]]
 at_frame = 1950                  # GAME OVER on screen, waiting for START
 [checkpoint.values]
-lives = { eq = 0, width = 2 }
+"lives.main" = { eq = 0, width = 2 }
 
 [[checkpoint]]
 at_frame = 2030                  # new game set up, waiting for START
 [checkpoint.values]
-lives = { eq = 4, width = 2 }
-score = { eq = 0, width = 2 }
+"lives.main" = { eq = 4, width = 2 }
+"score.main" = { eq = 0, width = 2 }
 
 [[checkpoint]]
 at_frame = 2200                  # playing again: the idle paddle loses a ball
 [checkpoint.values]
-lives = { eq = 3, width = 2 }
+"lives.main" = { eq = 3, width = 2 }
 
 # Every VRAM DMA of this input-driven run lands in blank or forced blank
 # (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
