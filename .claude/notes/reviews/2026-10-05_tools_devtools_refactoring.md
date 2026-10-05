@@ -642,3 +642,29 @@ quand elles seront vraies : `grep -c python3 make/common.mk` rend 0 (hors
 la branche `command -v`) ; `release_smoke.py` construit le starter et un
 projet scaffoldé dans un conteneur **sans** `python3` ; `opensnes doctor`
 ne nomme plus Python.
+
+## 12. Fait le 2026-10-05 (même séance)
+
+| Lot | Commit | Ce qui a changé |
+|---|---|---|
+| Décisions et règle | `2ff2090a` | ce rapport, `.claude/rules/two_audiences.md` |
+| 2. Élaguer | `85bae8bd` | `gen_hud_bar/`, `brr2it/`, `devtools/font2snes/`, `pyproject.toml`, `stress/mcp_probe.py`, `stress/mcp_sweep.py` supprimés ; branche `vendor/` retirée de `find_luna` ; `stress/README.md` réécrit sans second émulateur ; `ROADMAP.md` ne coche plus `check_mvn` ni `benchmark`. **Retrait du plan** : `benchrom/` et `b2_deref/` restent, `lib/ARCHITECTURE.md` les désigne comme l'instrument de mesure à relancer par module |
+| 1. Dire la vérité | `5590d8bd` | `tools/README.md`, `devtools/README.md` réécrits depuis l'inventaire ; README pour `sa1-patch/` et `fuzz/` ; `hicolor64hires.py` supprimé (son exemple est archivé, plus rien ne le nommait) |
+| 3. Porte locale = CI | `1cb2e3a9` | `make test-devtools` (six tests unitaires), dans `make lint` et appelé tel quel par `lint.yml` |
+| `ROMSIZE` en shell | `98a1fcdb` | `ROMSIZE` et `GSU_RAM_SIZE_VAL` en arithmétique shell ; `check_upgrade` derrière `command -v python3` ; 91 ROM identiques octet pour octet. Reste **sept** appels `python3` sur le `make` d'un utilisateur, tous post-link (`symmap` ×3, `asset_budget`, `check_bank_reads`, `check_nmi_wram_race`, `project_test`) |
+| 8. Release légère | `20a02de4` | le zip SDK ne contient plus ni exemples ni HTML ; `make release-examples` produit `opensnes-examples_<v>.zip` (4 Mo, une fois par version, attaché par `release.yml` depuis la jambe linux x86_64) ; `GETTING_STARTED.md` et les notes de release renvoient à l'archive et au site ; `release-smoke` vert sur le zip |
+
+Correction d'une estimation du §9.1 : en **compressé**, exemples et HTML
+pesaient 14 Mo d'un zip de 40 Mo (v0.46.0 arm64), pas les deux tiers ;
+ce qui reste, 23 Mo, ce sont les **17 binaires statiques** de `bin/`
+(1,5 à 2 Mo chacun compressés : quatre wla, cproc, qbe, neuf outils,
+`opensnes`). Le prochain levier sur la taille n'est donc pas le contenu
+mais le nombre de binaires — ce que la fusion en `opensnes-*` (douze
+outils dont plusieurs fusionnent gfx4snes, img2snes, palplan,
+aseprite2snes, font2snes) réduit mécaniquement, et la question de la
+liaison statique (chaque outil embarque sa libc) à poser pour 1.x.
+
+Restent du §7 : lots 5 (`testing/lib/`), 6 (`testing/fixtures/`), 7
+(outils C : `tool.mk`, `third_party/`, runner golden commun) ; puis la
+famille du §10 dans l'ordre du §10.5, `opensnes-rom check` en tête pour
+retirer les sept derniers appels Python.
