@@ -90,7 +90,7 @@ class TestExamplePaths(unittest.TestCase):
 
     def test_non_category_prefix_ignored(self):
         self.assertEqual(
-            extract_example_paths("`tools/luna-test/bin` and [x](docs/foo.md)",
+            extract_example_paths("`testing/bin` and [x](docs/foo.md)",
                                   self.CATS), [])
 
 

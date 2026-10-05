@@ -449,7 +449,7 @@ upper halves of a 2×1 slope in each direction (`T_SLOPELU2`, `T_SLOPELD2`,
 `T_SLOPEUU2`, `T_SLOPEUD2`). You assign them per tile in the map's attribute
 layer.
 
-The functional test `tools/luna-test/manifests/movement_slope_collision.toml`
+The functional test `testing/manifests/movement_slope_collision.toml`
 pins exactly the distinction that matters, measured on luna with RIGHT held:
 
 | Frame | Position | What it proves |

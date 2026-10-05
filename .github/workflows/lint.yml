@@ -99,7 +99,7 @@ jobs:
 
       - name: make test-devtools
         # The six unit tests of the sentinels and of the luna harness
-        # (devtools/test_*.py, symmap/test_symmap.py, luna-test/test_harness.py),
+        # (devtools/test_*.py, symmap/test_symmap.py, testing/test_harness.py),
         # through the same target `make lint` runs locally, so the two
         # cannot drift (2026-10-05).
         run: make test-devtools

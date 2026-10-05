@@ -748,7 +748,7 @@ test test-update: $(TARGET)
 		echo "section 'Test your game' (manifest format + baselines)."; \
 		exit 1; \
 	fi
-	@python3 $(OPENSNES)/tools/luna-test/project_test.py \
+	@python3 $(OPENSNES)/testing/project_test.py \
 		--rom $(TARGET) $(if $(filter test-update,$@),--update)
 
 #------------------------------------------------------------------------------

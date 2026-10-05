@@ -70,8 +70,9 @@ ALLOWED_SCOPES = {
     #   `rules`     -> .claude/rules/
     #   `bench`     -> devtools/cyclecount/ (cycle-count benchmark fixtures)
     "chantiers", "rules", "bench",
-    # luna test-harness migration (2026-06-21): real path tools/luna-test/
+    # luna test-harness migration (2026-06-21): real path testing/
     "luna-test",
+    "testing",
     # conventions notes (2026-06-23): real path .claude/notes/conventions/
     # (sibling of `chantiers`/`rules` above).
     "conventions",

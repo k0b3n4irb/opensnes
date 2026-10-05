@@ -207,7 +207,7 @@ index, tilemap to VRAM at `map_vram`, plus `BGnSC` (map address + size) and
 `BGnNBA` (tile address).
 
 That fan-out is pinned by a functional test rather than by prose.
-`tools/luna-test/manifests/dma_mode1_bgasset.toml` runs
+`testing/manifests/dma_mode1_bgasset.toml` runs
 `examples/backgrounds/mode1` — whose entire body is
 `bgLoad(0, &bg, 0, 0x4000, 0x0000)` — and asserts all three destinations
 independently: bytes in CGRAM at colour 0, bytes in VRAM under the tilemap at

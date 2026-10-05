@@ -8,20 +8,20 @@ The test harness runs on **luna** (cycle-accurate native emulator, pinned
 binary — no Node/WASM/Mesen2). One-shot via `make tests`, or step by step:
 
 ```bash
-scripts/install-luna.sh                              # fetch pinned luna (tools/luna-test/luna.version)
-python3 tools/luna-test/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state; luna's last_nmi_frame catches an NMI that dies after boot)
-python3 tools/luna-test/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `frames = [a, b]`)
-make test-manifests                                  # functional probes: `luna test` on tools/luna-test/manifests/*.toml (scripted input → WRAM asserts)
+scripts/install-luna.sh                              # fetch pinned luna (testing/luna.version)
+python3 testing/luna_runner.py --coverage    # corpus liveness (NMI/VBlank + CPU state; luna's last_nmi_frame catches an NMI that dies after boot)
+python3 testing/luna_runner.py --compare     # visual regression (luna fbhash vs baselines; self-animating examples opt into multiple capture points via manifest.toml `frames = [a, b]`)
+make test-manifests                                  # functional probes: `luna test` on testing/manifests/*.toml (scripted input → WRAM asserts)
 # ...and phase_sweep.py: the SNESMOD stop/pause/fade manifests replayed at sixteen press phases (a press/SPC700 race shows on some frames only)
 # luna_runner.py, rom_coverage.py and wram_regress.py run their luna calls in parallel
 # (LUNA_JOBS, default the CPU count; LUNA_JOBS=1 = serial, same output)
-python3 tools/luna-test/wram_regress.py             # per-frame WRAM oracle over the corpus
-python3 tools/luna-test/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
-python3 tools/luna-test/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
-python3 tools/luna-test/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
-python3 tools/luna-test/audio_regress.py            # APU output hashed for eleven examples (ten audio ones, three pressed with their manifest scripts, and the Super FX skeleton) (luna --audio-out); baselines/audio.json
-python3 tools/luna-test/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
-python3 tools/luna-test/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
+python3 testing/wram_regress.py             # per-frame WRAM oracle over the corpus
+python3 testing/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
+python3 testing/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
+python3 testing/rom_coverage.py              # measured lib API coverage (luna profile --pc-set); never-executed ratchet in baselines/never_executed.txt
+python3 testing/audio_regress.py            # APU output hashed for eleven examples (ten audio ones, three pressed with their manifest scripts, and the Super FX skeleton) (luna --audio-out); baselines/audio.json
+python3 testing/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
+python3 testing/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
 make hardware-preflight                              # before a console session: the 26 protocol ROMs (docs/HARDWARE_VERIFICATION.md) alive from random RAM (3 seeds) and under PAL, VRAM DMA in blank (hardware_preflight.py; ROWS=1-7 for the gate rows; not in make tests)
 make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() + the games playing their manifests under `region = "pal"`, and tetris built ROM_REGION=pal (weekly pal.yml, not in make tests)
 make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
@@ -82,7 +82,7 @@ side channel. Migration off snes9x-WASM: `.claude/notes/chantiers/luna_migration
 
 | Class | What changed | Required validation |
 |-------|-------------|-------------------|
-| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full `make tests` (luna) on ALL affected examples, **plus** the A/B proof: keep the ROMs built before the change (`rsync -a --include '*/' --include '*.sfc' --exclude '*' examples/ /tmp/examples_before/`) and run `python3 tools/luna-test/diff_corpus.py --ref /tmp/examples_before [--tolerance N]` — every example must MATCH at its manifest frames (a boot-length offset is reported, a DIFF is a rendering change to explain before any re-baseline) |
+| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full `make tests` (luna) on ALL affected examples, **plus** the A/B proof: keep the ROMs built before the change (`rsync -a --include '*/' --include '*.sfc' --exclude '*' examples/ /tmp/examples_before/`) and run `python3 testing/diff_corpus.py --ref /tmp/examples_before [--tolerance N]` — every example must MATCH at its manifest frames (a boot-length offset is reported, a DIFF is a rendering change to explain before any re-baseline) |
 | **B** | Library module (lib/source/) | `make lib` + `make tests` covering examples using that module |
 | **C** | Single example or new example | Build that example + `make tests` (`luna_runner.py --only <ex>`) |
 | **D** | Docs, Makefile, tools only | `make tests` only |

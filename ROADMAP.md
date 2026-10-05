@@ -22,7 +22,7 @@ working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
 regression + functional probes; SA-1/Super FX/DSP-1 run natively). Run
-`make tests`, or `python3 tools/luna-test/luna_runner.py --list` for the corpus —
+`make tests`, or `python3 testing/luna_runner.py --list` for the corpus —
 the suite grows
 with new chantiers and a single hard-coded number rots fast.
 
@@ -67,7 +67,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
   and vice versa).
 - `KNOWN_LIMITATIONS.md`: 14-entry severity-tagged catalog of silent
   failures inherited from the 65816 / SNES architecture and the toolchain.
-- `tools/luna-test/`: luna-driven test harness — visual baselines keyed on
+- `testing/`: luna-driven test harness — visual baselines keyed on
   luna's cross-arch-stable `--print-fbhash`, regenerated with
   `luna_runner.py --update`.
 
@@ -319,7 +319,7 @@ existed on 2026-09-14 were all superseded by commits already on
 branch of 2026-06-22) and were deleted that day. The luna side of the
 plan lives with the luna team: the exchanges are in
 `.claude/notes/partners/luna/` (and the owner's exchange folder), the
-pinned release in `tools/luna-test/luna.version`.
+pinned release in `testing/luna.version`.
 
 ## Known limitations
 

@@ -171,7 +171,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           scripts/install-luna.sh
-          python3 tools/luna-test/luna_runner.py --coverage
+          python3 testing/luna_runner.py --coverage
 
       - name: Execute the corpus on luna (Windows)
         if: matrix.name == 'windows'
@@ -181,7 +181,7 @@ jobs:
           PYTHONUTF8: '1'   # the reports carry non-ASCII; cp1252 crashed the first run
         run: |
           scripts/install-luna.sh
-          python3 tools/luna-test/luna_runner.py --coverage
+          python3 testing/luna_runner.py --coverage
 
       # Consume the zip just built the way a user does: extract it, build
       # the starter and a scaffolded project (devtools/release_smoke.py).
@@ -439,6 +439,6 @@ jobs:
         with:
           name: luna-test artifacts
           path: |
-            tools/luna-test/baselines/
+            testing/baselines/
             /tmp/luna-test-actual/
             /tmp/luna-test-corpus/

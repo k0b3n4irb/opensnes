@@ -1,0 +1,62 @@
+# animated_sprite — the D-pad walk: movement, the three walk clips, the
+# left-facing mirror and the top clamp, none of which runs without input.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness and the fbhash baseline see the monster standing at
+#     (100, 100) on tile 0: padHeld() is never non-zero, so movement, clip
+#     selection, animTick() and the H-flip are dead code to them.
+#   * One pixel per frame held: RIGHT from frame 60 to 119 moves x from 100
+#     to 160 (60 frames).
+#   * The top clamp is `if (y >= SCREEN_TOP) y--` with SCREEN_TOP = -16, so
+#     140 frames of UP stop at y = -17, one past the constant (117 steps
+#     from 100). An edge worth pinning: a `>` would stop at -16, a missing
+#     clamp would wrap y. UP must not move x.
+#   * The clips advance every ANIM_DELAY = 6 ticks and only while a
+#     direction is held: after 140 UP ticks walk_up (6, 8, 10) is on frame
+#     floor(139 / 6) mod 3 = 2 -> tile 10; LEFT then restarts walk_side
+#     (12, 14, 32) and 30 ticks later it is on frame floor(29 / 6) mod 3 = 1
+#     -> tile 14. Releasing the pad (frame 290) freezes everything.
+#   * LEFT reuses the right-facing tiles with flipx = 1, which reaches OAM
+#     as the H-flip bit of entry 0 (OAM y is y - 1 = -18 -> $EE, sprite.h).
+#
+# Measured: `luna state --until-frame N --input "60:0x0100,120:0x0800,
+# 260:0x0200,290:0" --peek monster:8 --out -` at 120/260/290/320 ->
+# x,y,gfx_frame,state,flipx = 160,100,12,2,0 / 160,-17,10,1,0 /
+# 130,-17,14,2,1 / 130,-17,14,2,1 (struct Monster: s16 x, s16 y,
+# u16 gfx_frame, u8 state, u8 flipx; `monster` read at width 2 is x).
+rom = "../../examples/sprites/animated_sprite/animated_sprite.sfc"
+
+[[checkpoint]]                 # RIGHT held 60..119: x 100 -> 160
+at_frame = 120
+input = "60:0x0100"
+[checkpoint.values]
+monster = { eq = 160, width = 2 }
+
+[[checkpoint]]                 # UP held 120..259: y clamps at -17, x untouched
+at_frame = 260
+input = "120:0x0800"
+[checkpoint.values]
+monster = { eq = 160, width = 2 }
+[checkpoint.delta]
+monster = { dir = "unchanged", width = 2 }
+
+[[checkpoint]]                 # LEFT held 260..289: x 160 -> 130
+at_frame = 290
+input = "260:0x0200,290:0"
+[checkpoint.values]
+monster = { eq = 130, width = 2 }
+[checkpoint.delta]
+monster = { dir = "decreased", width = 2 }
+
+[[checkpoint]]                 # released: nothing moves, the frame stays
+at_frame = 320
+[checkpoint.delta]
+monster = { dir = "unchanged", width = 2 }
+
+[asserts.blocks]               # the whole struct at the end: x 130, y -17,
+monster = "8200efff0e000201"   # tile 14, state 2 (side), flipx 1
+
+[asserts.oam.sprites.0]        # what the PPU gets: tile 14 mirrored
+x = 130
+tile = 14
+hflip = true

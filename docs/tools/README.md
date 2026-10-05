@@ -80,7 +80,7 @@ Testing is not a converter, but it is the other tool you will run every
 day. luna is the cycle-accurate emulator behind `make tests`, `luna mcp`
 is the debugger, and @subpage tools_luna is the pinned release's own
 `--help`, one section per subcommand — generated from the binary, so it
-cannot drift from `tools/luna-test/luna.version`.
+cannot drift from `testing/luna.version`.
 
 ## Where they fit with the rest of the docs
 

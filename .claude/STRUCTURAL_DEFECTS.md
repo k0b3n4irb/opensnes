@@ -29,7 +29,7 @@ load-bearing for cross-session continuity).
 >   runner + Mesen2) was **removed**. Every reference to `tools/opensnes-emu/...`,
 >   `*.mjs`, `run-all-tests.mjs`, `run-benchmark.mjs`, or Mesen2 below is
 >   **historical** — the live equivalents are `make tests` (luna),
->   `tools/luna-test/`, `devtools/compiler-tests/`, and `devtools/cyclecount/`.
+>   `testing/`, `devtools/compiler-tests/`, and `devtools/cyclecount/`.
 > These older entries are kept as investigation logs (they froze a past state on
 > purpose); only the headline status lines are updated.
 

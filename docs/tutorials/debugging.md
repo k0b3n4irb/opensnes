@@ -16,7 +16,7 @@ disassembly, save/load states and CPU/memory traces.
 The pinned binary is installed by the SDK:
 
 ```bash
-scripts/install-luna.sh            # → tools/luna-test/bin/luna
+scripts/install-luna.sh            # → testing/bin/luna
 ```
 
 Two ways to drive it:
@@ -25,7 +25,7 @@ Two ways to drive it:
 - **MCP** — a live debugging session for Claude Code or any MCP client:
 
 ```bash
-claude mcp add luna -- tools/luna-test/bin/luna mcp
+claude mcp add luna -- testing/bin/luna mcp
 ```
 
 The MCP session exposes the full debugger surface: run control
@@ -51,7 +51,7 @@ one-liner: `grep -i ' monster_x$' game.sym`.)
 ## Recipe 1 — Inspect the machine at a point in time
 
 ```bash
-tools/luna-test/bin/luna state -n 3000000 --screenshot /tmp/shot.png game.sfc
+testing/bin/luna state -n 3000000 --screenshot /tmp/shot.png game.sfc
 ```
 
 The JSON snapshot contains the full CPU registers, PPU state (scroll, mode,
@@ -85,7 +85,7 @@ The SDK keeps a shadow OAM (`oambuffer`) that the NMI handler DMAs to the
 PPU. When a sprite misbehaves, compare the two sides:
 
 ```bash
-tools/luna-test/bin/luna assets-dump -n 3000000 --out /tmp/dump game.sfc
+testing/bin/luna assets-dump -n 3000000 --out /tmp/dump game.sfc
 ```
 
 This writes `oam.json` (the hardware side, parsed), the sprite sheet, the
@@ -109,7 +109,7 @@ being flushed).
 A single screenshot can't show a frame-to-frame blink:
 
 ```bash
-tools/luna-test/bin/luna frames -n 3000000 --count 8 --out /tmp/frames game.sfc
+testing/bin/luna frames -n 3000000 --count 8 --out /tmp/frames game.sfc
 ```
 
 captures strictly consecutive PPU frames, each tagged with its frame number

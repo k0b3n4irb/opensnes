@@ -26,7 +26,7 @@ asserts 1 then 2 across a battery file.
 
 ```bash
 make -C examples/chips/superfx_save
-tools/luna-test/bin/luna run examples/chips/superfx_save/superfx_save.sfc --until-frame 120 --screenshot out.png
+testing/bin/luna run examples/chips/superfx_save/superfx_save.sfc --until-frame 120 --screenshot out.png
 ```
 
 ## Modules

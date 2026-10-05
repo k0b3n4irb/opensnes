@@ -23,7 +23,7 @@ u16 r_clear;     /* OR of the first 12 bytes after sramClear(12)       -> 0 */
 u16 r_done;      /*                                                    -> 0xBEEF */
 /* What the battery held at power-on, read before anything is written: zero
  * on a fresh cart, the previous run's pattern (C1 D2 E3 F4) once a .srm is
- * loaded — the power-cycle chain in tools/luna-test/power_cycle. */
+ * loaded — the power-cycle chain in testing/power_cycle. */
 u8 r_boot[4];
 u16 r_sa1_bw;    /* byte the SA-1 wrote to $40:0100 from its boot stub (sa1_boot.asm here) -> 0x5A */
 u8 back_bw[1];

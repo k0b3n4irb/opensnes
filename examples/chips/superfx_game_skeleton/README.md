@@ -63,10 +63,10 @@ OAM, then gsu_present_step:         GSU (from its cache)
 
 ## Testing
 
-`tools/luna-test/manifests/superfx_game_skeleton.toml` holds RIGHT for 60
+`testing/manifests/superfx_game_skeleton.toml` holds RIGHT for 60
 frames and checks the crosshair moved 60 pixels (the game never skipped a
 frame), about 30 presented frames per second and no bus violation.
-`tools/luna-test/vram_dma_blank.py` checks every framebuffer byte lands in
+`testing/vram_dma_blank.py` checks every framebuffer byte lands in
 blank, as whole frames into alternating blocks, with every swap after a
 whole frame.
 

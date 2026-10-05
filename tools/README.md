@@ -35,19 +35,18 @@ family (one tool per function, common conventions, TOML settings beside
 each asset — see the rule); each new tool must reproduce the golden suite
 of the tool it absorbs before the old one is retired.
 
-## Not shipped: the SDK's test harness
+## Not shipped: what else lives here
 
 | Path | Role | Run by |
 |------|------|--------|
-| [`luna-test/`](luna-test/) | the luna-backed harness: corpus runner, WRAM / audio / VRAM-DMA / NMI-budget oracles, 138 `luna test` manifests, baselines, five stress ROMs | `make tests`, CI |
 | [`fuzz/`](fuzz/) | libFuzzer harnesses for the asset tools' parsers | `make fuzz`, `make fuzz-replay`, `fuzz.yml` |
 | `valgrind-static.supp` | suppressions for valgrind on the static binaries (not wired anywhere) | by hand |
 
-Only four files of `luna-test/` reach the zip, because a user project's
-`make test` imports them (`project_test.py`, `luna_runner.py`,
-`probes/lib.py`, `luna.version`); that path moves to native `luna test`
-under the two-audiences rule. The harness itself is planned to move out of
-`tools/` (lot 5 of the review) so that `tools/` means "shipped" again.
+The luna-backed test harness moved to [`testing/`](../testing/) on
+2026-10-05 (lot 5 of the review) so that `tools/` means "shipped" again;
+only the four files a user project's `make test` imports leave `testing/`
+for the zip, and that path moves to native `luna test` under the
+two-audiences rule.
 
 ## See also
 

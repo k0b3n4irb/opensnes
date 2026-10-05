@@ -203,7 +203,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           scripts/install-luna.sh
-          python3 tools/luna-test/luna_runner.py --coverage
+          python3 testing/luna_runner.py --coverage
 
       # The zip users download must build and test a project on its own
       # (devtools/release_smoke.py). On Linux luna is installed by the step
@@ -211,7 +211,7 @@ jobs:
       - name: Smoke-test the release zip (Linux/macOS)
         if: matrix.name != 'windows'
         env:
-          LUNA_BIN: ${{ github.workspace }}/tools/luna-test/bin/luna
+          LUNA_BIN: ${{ github.workspace }}/testing/bin/luna
         run: make release-smoke VERSION=${{ steps.version.outputs.tag }}
 
       - name: Smoke-test the release zip (Windows)

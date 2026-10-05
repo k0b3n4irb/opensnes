@@ -534,7 +534,7 @@ at H=274 and cleared at H=1 on every line; anomie-timing, fullsnes): no
 latch, no counter read, and a real five-line budget. A command that does not
 fit is dropped (the newest). The `cli` is gone; the position is read until
 two reads agree; `snesmodInit()` restores NMITIMEN from the lib's copy. Pinned by `devtools/libtests_snesmod` and
-`tools/luna-test/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
+`testing/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
 queue depth 255 after 100 sends, queue drained). Visible change: with
 several commands queued `snesmodProcess()` now really waits up to five
 scanlines, and commands reach the driver sooner (four commands in two frames
@@ -556,7 +556,7 @@ frames onto a manifest's.
 **Fix:** the instruction that followed the second write now sits between
 the two (same bytes, same size; the gap is 65 cycles, over one poll).
 0 stuck voices in 161 × 2 × 2 runs (pause and stop, both luna versions).
-Pinned by `tools/luna-test/manifests/audio_snesmod_music_{pause,stop}.toml`.
+Pinned by `testing/manifests/audio_snesmod_music_{pause,stop}.toml`.
 
 ### 🟢 `padIsConnected()` answered 1 for an empty port (fixed 2026-09-26)
 
@@ -592,7 +592,7 @@ only on a line from which the frame lands whole — 225 - bottom to 152 + top,
 lines 185-192 with the usual 40 + 40 — or waits for the next frame, and
 `gsuSetupHdmaBlanking()` returns once its bands are on screen.
 `superfx_3d` shows about 30 whole frames per second where it showed 53
-partly lost ones. Pinned by `tools/luna-test/vram_dma_blank.py`, which since
+partly lost ones. Pinned by `testing/vram_dma_blank.py`, which since
 the same day holds every example to luna's `[asserts.dma] unsafe_writes = 0`.
 Code of your own that polls the V counter should read `$213F`, then `$2137`,
 then `$213D` twice, every time.
@@ -616,7 +616,7 @@ touches `$4200`. Since 2026-09-26 the IRQ vector takes the same route: its
 during a job ran garbage (measured with the old stub: CPU lost, 5446 GSU bus
 violations); now a WRAM handler acknowledges it (and a GSU IRQ) during the
 job, and the game's handler runs again after it. BRK and COP land on a WRAM
-`rti`. Pinned by `tools/luna-test/manifests/coproc_superfx_nmi.toml`
+`rti`. Pinned by `testing/manifests/coproc_superfx_nmi.toml`
 (frame count, IRQs counted by superfx_3d, `bus_violations = 0`).
 
 ### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)

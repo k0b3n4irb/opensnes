@@ -5,14 +5,14 @@
 
 luna is the cycle-accurate emulator every OpenSNES test runs on
 (`.claude/rules/testing.md`). The SDK pins one release in
-`tools/luna-test/luna.version`; `scripts/install-luna.sh` fetches it and
+`testing/luna.version`; `scripts/install-luna.sh` fetches it and
 `make tests` uses nothing else. This page is that release's own `--help`,
 one section per subcommand, so what you read here is what the pinned
 binary accepts — not a newer or older luna.
 
 How the SDK uses it: `luna run` for corpus liveness and visual hashes,
 `luna state --assert` for the runtime ROMs and probes, `luna test` for
-the `tools/luna-test/manifests/*.toml`, `luna diff` for the Class A A/B,
+the `testing/manifests/*.toml`, `luna diff` for the Class A A/B,
 `luna profile` for measured coverage and the cycle budget, `luna
 wram-trace` behind the WRAM oracle. The MCP server (`luna mcp`) is the
 interactive debugger (`docs/tutorials/debugging.md`).

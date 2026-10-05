@@ -1,0 +1,11 @@
+# Super FX save, power-cycle chain 2/2: the same ROM powered on with the
+# .srm that f_gsu_save_write.toml left. The fixture reads the save region
+# before it writes anything: "SA", the first two bytes of the previous run.
+# Control: libtest_gsu_cached.toml boots without a .srm and reads 0.
+rom = "../../devtools/libtests_gsu/libtest_gsu.sfc"
+frames = 400   # the fixture grew (geometry, lag-frame and PAL paths, 2026-10-05): r_done lands past frame 150
+srm_in = "gsu_save.srm"
+
+[asserts.values]
+r_boot_save = 0x4153
+r_done = 0xD0E5

@@ -50,7 +50,7 @@ frozen after a START toggle); `cycling` is the on/off flag.
 
 ```bash
 make
-../../../tools/luna-test/bin/luna run -n 3000000 palette_cycle.sfc
+../../../testing/bin/luna run -n 3000000 palette_cycle.sfc
 ```
 
 ## Modules used

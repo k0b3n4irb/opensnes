@@ -38,7 +38,7 @@ That produces `game.sfc`. Run it in any SNES emulator, or with the SDK's
 bundled emulator:
 
 ```sh
-/path/to/opensnes/tools/luna-test/bin/luna run game.sfc
+/path/to/opensnes/testing/bin/luna run game.sfc
 ```
 
 > If you copied this directory *while it was still inside the SDK repo*, the

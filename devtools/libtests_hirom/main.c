@@ -2,7 +2,7 @@
  * libtest_hirom — the sram module on a HiROM cartridge.
  *
  * Asymmetric, non-zero data on purpose. The manifest
- * (tools/luna-test/manifests/sram_hirom.toml) additionally asserts the bytes
+ * (testing/manifests/sram_hirom.toml) additionally asserts the bytes
  * where the HARDWARE puts them, $30:6000 + offset, and in the .srm luna
  * writes — the C-side round trip alone would pass with any self-consistent
  * wrong bank.

@@ -15,7 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROM = HERE / "libtest_sa1_sram.sfc"
-sys.path.insert(0, str(HERE.parents[1] / "tools" / "luna-test" / "probes"))
+sys.path.insert(0, str(HERE.parents[1] / "testing" / "probes"))
 from lib import find_luna  # noqa: E402
 
 STEPS = 1_500_000

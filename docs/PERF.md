@@ -48,7 +48,7 @@ above 300 mclk per frame.
   is 544 bytes of DMA, at 8 mclk per byte (anomie's timing doc: "DMA takes
   8 master cycles per byte transferred") about 4,350 of those. It
   includes the 17th-bit pad read added on 2026-09-26 (+378 mclk). The
-  per-example gate is `tools/luna-test/nmi_budget.py`.
+  per-example gate is `testing/nmi_budget.py`.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about
   13,600 mclk per frame (3.8 %) for its handful of characters and HUD
   sprites. `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
@@ -115,7 +115,7 @@ unflipped one still runs the same loop, now the internal (removed from the API) 
 ## Reproduce
 
 ```sh
-tools/luna-test/bin/luna profile examples/games/rpg/rpg.sfc \
+testing/bin/luna profile examples/games/rpg/rpg.sfc \
     --from-frame 120 --until-frame 420 \
     --input "130:0x0100,250:0,260:0x0400,400:0" --out - --top 0
 ```

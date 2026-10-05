@@ -51,7 +51,7 @@ Probe oracle: `wave_phase` advances every frame.
 
 ```bash
 make
-../../../tools/luna-test/bin/luna run -n 3000000 mode2.sfc
+../../../testing/bin/luna run -n 3000000 mode2.sfc
 ```
 
 ## Modules used

@@ -16,7 +16,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO / "tools" / "luna-test" / "probes"))
+sys.path.insert(0, str(REPO / "testing" / "probes"))
 from lib import find_luna  # noqa: E402
 import lib as probelib  # noqa: E402
 

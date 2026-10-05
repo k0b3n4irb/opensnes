@@ -175,7 +175,7 @@ test-devtools:
 	@python3 devtools/test_check_nmi_wram_race.py
 	@python3 devtools/symmap/test_symmap.py
 	@python3 devtools/test_asset_budget.py
-	@cd tools/luna-test && python3 -m unittest -q test_harness
+	@cd testing && python3 -m unittest -q test_harness
 
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
@@ -209,18 +209,18 @@ tests: test-compiler
 	@# rejected by CI. Refuse to test a corpus older than the lib outputs.
 	@python3 devtools/check_corpus_fresh.py
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/luna_runner.py --coverage
+	@python3 testing/luna_runner.py --coverage
 	@# Same liveness pass from pseudo-random RAM (fixed seed): a ROM that
 	@# reads memory it never initialised passes on luna's zero-fill and
 	@# fails here (gaps review item R1; the v0.40.0/v0.41.1 reset-vector
 	@# fix class). Report file untouched — the committed one is the
 	@# zero-fill pass.
-	@python3 tools/luna-test/luna_runner.py --coverage --power-on random=1
-	@python3 tools/luna-test/luna_runner.py --compare
+	@python3 testing/luna_runner.py --coverage --power-on random=1
+	@python3 testing/luna_runner.py --compare
 	@# The same visual baselines must hold from pseudo-random RAM: since
 	@# 2026-09-12 every example does (six audio examples cleared VRAM, the
 	@# vertical-scroll -1 landed in the lib), so this is a gate, not a report.
-	@python3 tools/luna-test/luna_runner.py --compare --power-on random=1
+	@python3 testing/luna_runner.py --compare --power-on random=1
 	@# Measured ROM coverage of the public lib API (luna profile --pc-set):
 	@# a public function no example executes must already be in
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
@@ -235,26 +235,26 @@ tests: test-compiler
 	@$(MAKE) -s -C devtools/libtests_snesmod
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
-	@python3 tools/luna-test/rom_coverage.py
+	@python3 testing/rom_coverage.py
 	@# APU output hashed for the ten audio examples (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
-	@python3 tools/luna-test/audio_regress.py
+	@python3 testing/audio_regress.py
 	@# The NMI handler must fit in VBlank (~51 800 master cycles), measured
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
-	@python3 tools/luna-test/nmi_budget.py
+	@python3 testing/nmi_budget.py
 	@# No VRAM DMA byte outside blank in any example (luna --dma-trace: the
 	@# PPU drops such a write silently), and gsuPresent's frames whole,
 	@# double-buffered and swapped in blank (2026-09-29).
-	@python3 tools/luna-test/vram_dma_blank.py
+	@python3 testing/vram_dma_blank.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
 	@# change that CI then rejected on all five platforms — which is
 	@# exactly what happened on 2026-07-22. The gate a contributor is told
 	@# to run must be the gate CI runs.
-	@python3 tools/luna-test/wram_regress.py
+	@python3 testing/wram_regress.py
 	@# Runtime fixture ROMs are rebuilt from clean: a stale .sfc built with an
 	@# experimental toolchain once produced misleading XPASSes (a6_farptr trap,
 	@# 2026-07-04). Each is a single-TU ROM; the clean rebuild costs seconds.
@@ -313,7 +313,7 @@ tests: test-compiler
 # numbers without failing.
 test-nmi-budget:
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/nmi_budget.py
+	@python3 testing/nmi_budget.py
 
 # PAL pass (gaps review R2): the whole corpus booted at 312 lines / 50 Hz
 # (luna --force-region pal), the lib fixture asserting getRegion() /
@@ -326,7 +326,7 @@ PAL_GAME_MANIFESTS := state_tetris movement_breakout state_breakout_game_over \
 
 test-pal:
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/luna_runner.py --coverage --region pal
+	@python3 testing/luna_runner.py --coverage --region pal
 	@# The fixture is not built by `make` (only by `make tests`): the weekly
 	@# pal.yml job never got past this line until 2026-09-26.
 	@$(MAKE) -s -C devtools/libtests
@@ -337,24 +337,24 @@ test-pal:
 	@# on a PAL machine), and `stat78 = $$13` asserted so a manifest that ran at
 	@# 60 Hz fails. The manifests are the NTSC ones, generated here so the two
 	@# sets cannot drift. No rebuild.
-	@rm -rf tools/luna-test/manifests_pal && mkdir -p tools/luna-test/manifests_pal
+	@rm -rf testing/manifests_pal && mkdir -p testing/manifests_pal
 	@set -e; for m in $(PAL_GAME_MANIFESTS); do \
-	    sed -E '/^rom = /a region = "pal"' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/$$m.toml; \
-	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> tools/luna-test/manifests_pal/$$m.toml; \
-	    grep -q '^region = "pal"' tools/luna-test/manifests_pal/$$m.toml || { echo "test-pal: $$m has no rom line to anchor region"; exit 1; }; \
+	    sed -E '/^rom = /a region = "pal"' testing/manifests/$$m.toml > testing/manifests_pal/$$m.toml; \
+	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> testing/manifests_pal/$$m.toml; \
+	    grep -q '^region = "pal"' testing/manifests_pal/$$m.toml || { echo "test-pal: $$m has no rom line to anchor region"; exit 1; }; \
 	done
-	@tools/luna-test/bin/luna test --jobs $$(nproc) tools/luna-test/manifests_pal/*.toml
+	@testing/bin/luna test --jobs $$(nproc) testing/manifests_pal/*.toml
 	@# ROM_REGION itself (header $$FFD9 = $$02): one game built as a PAL
 	@# cartridge must be PAL for luna with nothing forced, and play its
 	@# manifest. The NTSC build is restored afterwards.
 	@set -e; g=tetris; m=state_tetris; \
 	    $(MAKE) -s -C examples/games/$$g ROM_REGION=pal TARGET=$${g}_pal.sfc >/dev/null; \
-	    tools/luna-test/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
+	    testing/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
 	        | grep -q '"region": "Pal"' || { echo "test-pal: $${g}_pal.sfc is not a PAL cartridge for luna"; exit 1; }; \
-	    mkdir -p tools/luna-test/manifests_pal/header; \
-	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#; s#"\.\./\.\./\.\./#"../../../../#' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/header/$$m.toml; \
-	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> tools/luna-test/manifests_pal/header/$$m.toml; \
-	    tools/luna-test/bin/luna test tools/luna-test/manifests_pal/header/$$m.toml; \
+	    mkdir -p testing/manifests_pal/header; \
+	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#; s#"\.\./\.\./\.\./#"../../../../#' testing/manifests/$$m.toml > testing/manifests_pal/header/$$m.toml; \
+	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> testing/manifests_pal/header/$$m.toml; \
+	    testing/bin/luna test testing/manifests_pal/header/$$m.toml; \
 	    rm -f examples/games/$$g/$${g}_pal.sfc examples/games/$$g/$${g}_pal.sym; \
 	    $(MAKE) -s -C examples/games/$$g >/dev/null
 
@@ -386,7 +386,7 @@ rom-coverage:
 	@$(MAKE) -s -C devtools/libtests_snesmod
 	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
 		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
-	@python3 tools/luna-test/rom_coverage.py
+	@python3 testing/rom_coverage.py
 
 # Clean example build artifacts only — keeps the toolchain binaries in bin/
 # (a full `make clean` wipes bin/ and forces a compiler rebuild).
@@ -481,7 +481,7 @@ luna-bench:
 	@for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
 		for r in $$d/*.sfc; do [ -f "$$r" ] && cp "$$r" "$(BENCH_ROMS)/$$(echo $$d | sed 's|examples/||; s|/|_|g').sfc"; done; done; \
 		echo "luna-bench: $$(ls $(BENCH_ROMS) | wc -l) ROMs"
-	tools/luna-test/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
+	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
 	@ls $(BENCH_OUT); n=$$(ls $(BENCH_OUT)/*.md 2>/dev/null | grep -vc "report.md\|README"); \
 		echo "luna-bench: $$n bug file(s) under $(BENCH_OUT)"; [ "$$n" -eq 0 ]
 
@@ -520,26 +520,26 @@ fuzz-replay:
 # harness onto luna's own manifest runner (the luna-first direction). Builds
 # the stress ROMs, then runs the manifests through `luna test` (exit 0/1/2).
 test-manifests:
-	@$(MAKE) -s -C tools/luna-test/stress/hwmath
-	@$(MAKE) -s -C tools/luna-test/stress/ppumul
-	@$(MAKE) -s -C tools/luna-test/stress/openbus
-	@$(MAKE) -s -C tools/luna-test/stress/bcd
-	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
+	@$(MAKE) -s -C testing/stress/hwmath
+	@$(MAKE) -s -C testing/stress/ppumul
+	@$(MAKE) -s -C testing/stress/openbus
+	@$(MAKE) -s -C testing/stress/bcd
+	@$(MAKE) -s -C testing/stress/sprite_overflow
 	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
 	@$(MAKE) -s -C devtools/libtests_gsu        # libtest_gsu_cached.toml fixture
 	@$(MAKE) -s -C devtools/libtests_snesmod    # libtest_snesmod.toml fixture
 	@$(MAKE) -s -C devtools/libtests_sa1_sram   # d_/e_sa1_bwram power-cycle fixture
-	@tools/luna-test/bin/luna test --jobs 0 \
-		tools/luna-test/stress/hwmath/hwmath.toml \
-		tools/luna-test/stress/ppumul/ppumul.toml \
-		tools/luna-test/stress/openbus/openbus.toml \
-		tools/luna-test/stress/bcd/bcd.toml \
-		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
-		tools/luna-test/manifests
+	@testing/bin/luna test --jobs 0 \
+		testing/stress/hwmath/hwmath.toml \
+		testing/stress/ppumul/ppumul.toml \
+		testing/stress/openbus/openbus.toml \
+		testing/stress/bcd/bcd.toml \
+		testing/stress/sprite_overflow/sprite_overflow.toml \
+		testing/manifests
 	@# The three SNESMOD transitions at sixteen press phases: a press/SPC700
 	@# race shows on some frames only (8 of 161 for the 2026-09-26 key-off
 	@# defect), so one press frame per manifest sees it by luck.
-	@python3 tools/luna-test/phase_sweep.py
+	@python3 testing/phase_sweep.py
 	@# Power-cycle chains (a_/b_ sram, d_/e_ SA-1 BW-RAM, f_/g_ Super FX) write a .srm the next
 	@# manifest reads: luna >= v1.30.1 runs manifests chained by a battery
 	@# file in order inside the parallel batch (they sat in a serial
@@ -549,15 +549,15 @@ test-manifests:
 # CI-gated on every example, both arches (the old arch-dependent pair was a
 # stale-luna artefact, re-verified 2026-08-09); the stack's pages are left
 # out. Re-baseline after an intentional change with
-# `python3 tools/luna-test/wram_regress.py --update` (same commit).
+# `python3 testing/wram_regress.py --update` (same commit).
 test-wram:
-	@python3 tools/luna-test/wram_regress.py
+	@python3 testing/wram_regress.py
 
 # PPU resource-budget report (VRAM/CGRAM/OAM footprint per example, via luna).
 # The PPU-side twin of symmap's bank $00 / C-RAM checks. Report-only; pairs
 # with docs/craft/planning.md. `make budget ARGS="--only mode2"` to focus.
 budget:
-	@python3 tools/luna-test/budget.py $(ARGS)
+	@python3 testing/budget.py $(ARGS)
 
 # Static asset-budget report (VRAM/CGRAM weight of the converted graphics on
 # disk, no ROM run). The build-time twin of `make budget`: that measures the
@@ -623,11 +623,11 @@ release: all
 	@# Project test harness (`make test` in user projects) + the pinned-luna
 	@# installer. Only the pieces project_test.py imports — not the SDK's
 	@# corpus manifest/baselines.
-	@mkdir -p $(RELEASE_DIR)/opensnes/tools/luna-test/probes
+	@mkdir -p $(RELEASE_DIR)/opensnes/testing/probes
 	@mkdir -p $(RELEASE_DIR)/opensnes/scripts
-	@cp tools/luna-test/project_test.py tools/luna-test/luna_runner.py \
-		tools/luna-test/luna.version $(RELEASE_DIR)/opensnes/tools/luna-test/
-	@cp tools/luna-test/probes/lib.py $(RELEASE_DIR)/opensnes/tools/luna-test/probes/
+	@cp testing/project_test.py testing/luna_runner.py \
+		testing/luna.version $(RELEASE_DIR)/opensnes/testing/
+	@cp testing/probes/lib.py $(RELEASE_DIR)/opensnes/testing/probes/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
 	@# Every devtools script make/common.mk runs on a user build (post-link
 	@# ratchets and lints). The list is read from common.mk itself: until
@@ -701,7 +701,7 @@ hardware-kit:
 # table as hardware-kit. ROWS=1-7 restricts it to the gate rows.
 hardware-preflight:
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
+	@python3 testing/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
 
 # A project's sources against the names 1.0 removes and the two calls that
 # change meaning (docs/UPGRADING.md): make check-upgrade SRC=<folder>

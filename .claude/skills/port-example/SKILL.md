@@ -246,9 +246,9 @@ clean-example:
 ### Phase 6 — Build and Verify
 
 1. Full rebuild: `make clean && make`
-2. The example alone: `python3 tools/luna-test/luna_runner.py --coverage --only <category>/<name>`
+2. The example alone: `python3 testing/luna_runner.py --coverage --only <category>/<name>`
    then `--compare --only …` once a baseline exists (`--update` for a new example)
-3. A `luna test` manifest under `tools/luna-test/manifests/` if the example
+3. A `luna test` manifest under `testing/manifests/` if the example
    takes input (scripted input → WRAM asserts), then `make tests`
 4. **STOP** — Ask user to validate interactively (luna GUI / `luna mcp`;
    Category C protocol)

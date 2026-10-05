@@ -1,6 +1,6 @@
 /*
  * libtest_snesmod — what snesmodProcess and the command queue do to the rest
- * of the machine (tools/luna-test/manifests/libtest_snesmod.toml).
+ * of the machine (testing/manifests/libtest_snesmod.toml).
  *
  * The messages are module-volume commands: harmless with no module loaded,
  * and one queue entry each. No soundbank is needed.

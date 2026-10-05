@@ -1,0 +1,538 @@
+#!/usr/bin/env python3
+"""Luna-backed visual-regression runner.
+
+Successor to the snes9x-WASM + Mesen2 harness (migration history:
+.claude/notes/chantiers/luna_migration.md).
+
+What it does
+------------
+For each discovered example it drives the headless `luna` CLI to render a
+deterministic framebuffer, then:
+  * `--update`  : writes the baseline (fbhash + provenance) to
+                  testing/baselines/ (+ the PNG for human diffing).
+  * default     : re-renders and compares luna's `--print-fbhash` against the
+                  stored baseline → pass/fail.
+
+The regression key is luna's `--print-fbhash` — a hash of the *pre-PNG* pixels
+that luna documents as cross-architecture-stable. That makes aarch64-captured
+baselines match on an x86_64 CI runner (immune to PNG-encoder drift), so the
+visual step is a hard gate. The PNG is still written alongside for human diffing
+(decision #1: "both" — fbhash gate + PNG debug). For direct WRAM/VRAM/ARAM
+assertions, luna v0.3.0 offers `--assert` (used by the probes in probes/).
+
+luna binary resolution order: $LUNA_BIN, then `luna` on PATH, then the
+vendored extract under testing/vendor/.
+
+Usage
+-----
+    python3 testing/luna_runner.py --update          # (re)baseline all
+    python3 testing/luna_runner.py                   # compare all
+    python3 testing/luna_runner.py --only map_scroll  # one label substring
+    python3 testing/luna_runner.py --list            # show the manifest
+
+Exit code: 0 = all pass, 1 = at least one mismatch / error.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tomllib
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+HERE = Path(__file__).resolve().parent
+BASELINE_DIR = HERE / "baselines"
+# Single source of truth for the pin: testing/luna.version (what
+# install-luna.sh downloads). Read it here too so a version bump touches one file.
+LUNA_VERSION = (HERE / "luna.version").read_text(encoding="utf-8").strip()
+# Capture points are PPU FRAMES (`luna --until-frame N`), not instruction counts:
+# a codegen change that shifts the instruction count of a frame cannot move the
+# capture onto another animation phase (luna issue #222; before v1.18.0 the
+# harness captured at `-n 3_000_000` instructions ≈ 73-183 frames depending on
+# how much of each frame the ROM spends in `wai`). 200 frames ≈ 3.3 s NTSC —
+# past every example's boot/setup, at or beyond the old instruction-count points.
+DEFAULT_FRAMES = 200
+# Power-on RAM state handed to every luna run (`--power-on zero|ones|random[=seed]`).
+# None = luna's default (zero). `--power-on random=1` boots each ROM from
+# pseudo-random WRAM/VRAM/CGRAM/OAM/ARAM with a FIXED seed, so a ROM that reads
+# memory it never initialised fails deterministically instead of passing on
+# luna's zero-fill (the v0.40.0 / v0.41.1 boot-fix class). Set from --power-on.
+POWER_ON: str | None = None
+
+
+def power_on_args() -> list[str]:
+    return ["--power-on", POWER_ON] if POWER_ON else []
+
+# Video standard forced on every luna run (`--force-region ntsc|pal`). None =
+# the ROM header's country byte (NTSC for the whole corpus). `--region pal`
+# is the PAL liveness pass (gaps review R2): 312 lines, 50 Hz — an example
+# that only works at 262 lines (a V-timer past line 261, a frame budget
+# tuned to 60 Hz) fails here. Report file untouched, like --power-on.
+REGION: str | None = None
+
+
+def region_args() -> list[str]:
+    return ["--force-region", REGION] if REGION else []
+
+
+def variant_label() -> str:
+    """Suffix naming the non-default pass, for the coverage verdict lines."""
+    parts = []
+    if POWER_ON:
+        parts.append("--power-on " + POWER_ON)
+    if REGION:
+        parts.append("--region " + REGION)
+    return f" ({' '.join(parts)})" if parts else ""
+
+def find_luna() -> str:
+    env = os.environ.get("LUNA_BIN")
+    if env and Path(env).is_file():
+        return env
+    for name in ("luna", "luna.exe"):  # scripts/install-luna.sh target (.exe on Windows)
+        installed = HERE / "bin" / name
+        if installed.is_file():
+            return str(installed)
+    on_path = shutil.which("luna")
+    if on_path:
+        return on_path
+    sys.exit(
+        "ERROR: luna binary not found. Run scripts/install-luna.sh, set $LUNA_BIN, "
+        f"or put `luna` on PATH. Expected luna {LUNA_VERSION}."
+    )
+
+
+def firmware_dir() -> Path:
+    """luna's coprocessor-firmware folder (where dsp1b.rom lives)."""
+    base = os.environ.get("XDG_CONFIG_HOME")
+    root = Path(base) if base else Path.home() / ".config"
+    return root / "luna" / "firmware"
+
+
+def missing_firmware(key: str, manifest: dict) -> str | None:
+    """The firmware filename an example needs but that is NOT installed, else
+    None. Lets CI (which can't ship copyrighted coprocessor firmware like
+    dsp1b.rom) SKIP firmware-gated examples in the visual/WRAM pillars instead
+    of failing on them; a dev/CI that has the firmware still gets full coverage.
+    Marked per-example via a `firmware = "<file>"` key in manifest.toml."""
+    fw = manifest.get("examples", {}).get(key, {}).get("firmware")
+    if not fw:
+        return None
+    return None if (firmware_dir() / fw).is_file() else fw
+
+
+def load_manifest() -> dict:
+    """Per-example overrides from manifest.toml (default_frames + [examples.*])."""
+    path = HERE / "manifest.toml"
+    if not path.is_file():
+        return {"default_frames": DEFAULT_FRAMES, "examples": {}}
+    with path.open("rb") as f:
+        m = tomllib.load(f)
+    m.setdefault("default_frames", DEFAULT_FRAMES)
+    m.setdefault("examples", {})
+    return m
+
+
+def frame_points(frames) -> list[int]:
+    """Normalize a manifest `frames` value (scalar or multi-point list) to a list.
+
+    Every consumer of manifest capture points MUST go through this — the
+    multi-frame opt-in means `frames` can be a list, and passing that raw to a
+    single-shot luna invocation is an error (caught in CI the first time: coverage
+    passed a two-point list to a single `luna state`)."""
+    return list(frames) if isinstance(frames, list) else [frames]
+
+
+def capture_frames(key: str, manifest: dict) -> list[int]:
+    """The PPU frame(s) at which `key` is captured (manifest override or default)."""
+    return frame_points(manifest["examples"].get(key, {}).get("frames", manifest["default_frames"]))
+
+
+def res_args(key: str, manifest: dict) -> list[str]:
+    """`--native-res` for examples whose manifest entry sets `native_res = true`
+    (gaps review R8): hi-res modes 5/6 and interlace keep their 512×448
+    subpixels/fields in the screenshot and the fbhash instead of the averaged
+    256×224 view — a broken second subpixel column would otherwise blend away."""
+    return ["--native-res"] if manifest["examples"].get(key, {}).get("native_res") else []
+
+
+def example_key(rom: Path) -> str:
+    """Example path relative to examples/ (the dir holding main.c)."""
+    return str(rom.parent.relative_to(REPO_ROOT / "examples"))
+
+
+def liveness(state: dict) -> tuple[bool, str]:
+    """Is the machine actually *running* (not just rendering)?
+
+    'renders' != 'works': a big PNG can be a crashed/hung/forced-blank frame.
+    The robust running signal is the NMI/VBlank handshake advancing and the CPU
+    not halted. Catches crashes, hangs and dead-NMI; does NOT catch a ROM that
+    runs but waits on an unmodelled device (e.g. Mouse/Super Scope DETECT) —
+    that's handled by the manifest's input_dependent flag, not here.
+    """
+    sch = state.get("scheduler", {})
+    cpu = state.get("cpu", {})
+    frames = sch.get("frame_count", 0)
+    nmis = sch.get("nmis_serviced", 0)
+    if cpu.get("stopped"):
+        return False, "CPU stopped (STP)"
+    if frames <= 0:
+        return False, "no PPU frames advanced"
+    if nmis <= 0:
+        return False, "no NMIs serviced (VBlank handshake dead)"
+    # NOTE: frames - nmis is the boot offset (frames before NMI was enabled),
+    # which varies by example init (audio drivers load in forced blank; GSU
+    # compute) — it is NOT lag, so we do not gate on the ratio.
+    # An NMI that died after boot: luna's scheduler.last_nmi_frame (v1.29.0)
+    # is the frame of the latest NMI; a live handshake keeps it within one
+    # frame of frame_count. (2026-09-26 to 27 this took a second luna run,
+    # 30 frames later — the prototype this field replaced.)
+    last = sch.get("last_nmi_frame")
+    if last is None or frames - last > 1:
+        return False, (f"NMI died after boot: last NMI at frame {last}, "
+                       f"now frame {frames}")
+    return True, f"live ({frames}f/{nmis}nmi)"
+
+
+def header_problem(state: dict) -> str:
+    """The ROM header as luna read it: the size byte must cover the file,
+    the checksum complement must match, and — when luna gives it — the
+    header's sum must equal the sum of the bytes (build audit 2026-10-03,
+    rec 5).
+
+    A size byte below the file makes a flash cart or an emulator map only
+    part of the ROM; wlalink derives both from `.ROMBANKS`, so a mismatch
+    means the memory map and the header disagree. luna's `checksum_valid`
+    only says checksum XOR complement == 0xFFFF (a changed byte at $0100
+    keeps it true, measured 2026-10-05); luna's develop (39359de, after
+    v1.32.0) adds `checksum_computed`, the 16-bit sum of the image with the
+    usual mirroring of a non-power-of-two tail. Absent on v1.32.0: skipped."""
+    rom = state.get("rom") or {}
+    size_kb = rom.get("header_rom_size_kb")
+    nbytes = rom.get("rom_bytes")
+    if size_kb is not None and nbytes is not None and size_kb * 1024 < nbytes:
+        return f"header: ROM size byte says {size_kb} KB, the file is {nbytes} bytes"
+    if rom.get("checksum_valid") is False:
+        return (f"header: checksum {rom.get('checksum'):#06x} and complement "
+                f"{rom.get('checksum_complement'):#06x} do not match")
+    computed = rom.get("checksum_computed")
+    if computed is not None and rom.get("checksum") != computed:
+        return (f"header: checksum {rom.get('checksum'):#06x} but the ROM's bytes "
+                f"sum to {computed:#06x}")
+    return ""
+
+
+def discover_example_roms() -> list[Path]:
+    """Canonical corpus = one ROM per example *that has a main.c* (N_corpus=56).
+
+    Discovering via main.c (not a loose `*.sfc` glob) excludes stale build
+    residue like the source-less examples/graphics/effects/hdma_gradient/ that
+    inflated an earlier `.sfc` count to 57. One .sfc is expected per example dir.
+    """
+    roms: list[Path] = []
+    for main_c in sorted(REPO_ROOT.glob("examples/**/main.c")):
+        sfcs = sorted(main_c.parent.glob("*.sfc"))
+        if sfcs:
+            roms.append(sfcs[0])
+    return roms
+
+
+def sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    h.update(path.read_bytes())
+    return h.hexdigest()
+
+
+def render(luna: str, rom: Path, frame: int, out_png: Path, *,
+           steps: int | None = None, extra: list[str] | None = None) -> tuple[str, bool]:
+    """Render `rom` at PPU frame `frame`; return (fbhash, wdm_fired).
+
+    `steps=N` bounds the run at N instructions (`-n N`) instead and ignores
+    `frame`. User-project tests (project_test.py) still key on instruction
+    counts: their manifests document `steps`, and their input-driven tests
+    cannot move to `--until-frame` until luna applies `--input` under it
+    (open observation, status/luna_stress_campaign.md).
+
+    fbhash = luna's `--print-fbhash` (a hash of the pre-PNG pixels luna documents
+    as cross-architecture-stable) — the regression key, immune to PNG-encoder
+    drift. wdm_fired = whether the SDK's in-ROM `SNES_ASSERT`/WDM channel tripped
+    during the run (`--wdm-out` non-empty, feature L3) — a free assertion oracle.
+    The PNG is written for human diffing."""
+    out_png.parent.mkdir(parents=True, exist_ok=True)
+    wdm = out_png.with_suffix(".wdm.txt")
+    proc = subprocess.run(
+        [luna, "run", *(["-n", str(steps)] if steps is not None
+                        else ["--until-frame", str(frame)]),
+         *power_on_args(), *region_args(), *(extra or []),
+         "--print-fbhash", "--screenshot", str(out_png), "--wdm-out", str(wdm), str(rom)],
+        capture_output=True, text=True, timeout=300,
+    )
+    if proc.returncode != 0 or not out_png.is_file():
+        raise RuntimeError(f"luna run failed for {rom.name}: {proc.stderr.strip()[:400]}")
+    m = re.search(r"fbhash=([0-9a-fA-F]+)", proc.stdout)
+    if not m:
+        raise RuntimeError(f"no fbhash from luna for {rom.name}: {proc.stdout.strip()[:200]}")
+    return m.group(1), (wdm.is_file() and wdm.stat().st_size > 0)
+
+
+def run(update: bool, only: str | None) -> int:
+    """Visual-regression over the whole corpus (auto-discovered via main.c).
+
+    Key = luna's `--print-fbhash` (a cross-arch-stable hash of the rendered
+    framebuffer pixels; the PNG is saved alongside for human diffing).
+    Baselines: baselines/<label>.png + baselines.json (label = example path with
+    '/'→'_'). Capture frames come from manifest.toml (per-example override or
+    default) and are PPU frame indices (`luna run --until-frame N`).
+
+    Multi-frame opt-in: a manifest entry may set `frames = [a, b, ...]` (animated
+    examples) — each point is captured and compared independently, so a
+    phase/timing shift breaks some-but-not-all points (diagnostic: drift) while a
+    real visual regression breaks them all. Point 1 keeps `<label>.png`; extra
+    points write `<label>@<frame>.png`. Single-point entries keep the scalar schema.
+    """
+    luna = find_luna()
+    manifest = load_manifest()
+    BASELINE_DIR.mkdir(parents=True, exist_ok=True)
+    manifest_path = BASELINE_DIR / "baselines.json"
+    db = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
+
+    def _png_for(base_dir: Path, label: str, frame: int, first: bool) -> Path:
+        return base_dir / (f"{label}.png" if first else f"{label}@{frame}.png")
+
+    # One example = one independent set of luna runs: they go through a
+    # pool (LUNA_JOBS, default the CPU count); lines are printed and the
+    # baselines folded in corpus order afterwards.
+    def one(rom: Path) -> tuple[list[str], int, int, tuple | None]:
+        """(lines, counted, failed, (label, db entry) on --update)."""
+        key = example_key(rom)
+        label = key.replace("/", "_")
+        if only and only not in label:
+            return [], 0, 0, None
+        fw = missing_firmware(key, manifest)
+        if fw:
+            return [f"  SKIP  {label} (needs coprocessor firmware '{fw}' — not installed)"], 0, 0, None
+        points = capture_frames(key, manifest)
+        if update:
+            # fbhash of an all-black 256x224 frame — a broken ROM must not
+            # be able to self-certify (fix32_orbit shipped a black baseline
+            # for weeks, #115). Refuse it unless explicitly allowed.
+            BLACK_FBHASH = "aacf80a995eb8c67"
+            # Render into a staging dir; the PNGs replace the baselines only
+            # once the capture is accepted (a refused capture used to
+            # overwrite them before the refusal).
+            stage = Path("/tmp/luna-test-staging") / label
+            stage.mkdir(parents=True, exist_ok=True)
+            hashes, wdm_any, staged = [], False, []
+            for i, frame in enumerate(points):
+                png = _png_for(stage, label, frame, i == 0)
+                fbhash, wdm = render(luna, rom, frame, png, extra=res_args(key, manifest))
+                hashes.append(fbhash)
+                staged.append((png, _png_for(BASELINE_DIR, label, frame, i == 0)))
+                wdm_any = wdm_any or wdm
+            if BLACK_FBHASH in hashes and not os.environ.get("ALLOW_BLANK_BASELINE"):
+                return [f"  REFUSED  {label}: capture is an ALL-BLACK frame — broken ROM? "
+                        f"(ALLOW_BLANK_BASELINE=1 to override)"], 1, 1, None
+            # An example opts into several capture points because it animates;
+            # the same picture at every point means the animation stopped.
+            # backgrounds/mode2's offset-per-tile ripple went flat on
+            # 2026-09-12 and was re-captured flat at [200, 400] — this refuses
+            # that capture.
+            if len(points) > 1 and len(set(hashes)) == 1:
+                return [f"  REFUSED  {label}: the same frame at every capture point "
+                        f"{points} — an animated example that stopped animating?"], 1, 1, None
+            for src, dst in staged:
+                shutil.move(src, dst)
+            single = len(points) == 1
+            entry = {"fbhash": hashes[0] if single else hashes,
+                     "frames": points[0] if single else points,
+                     "rom_sha256": sha256_file(rom), "luna_version": LUNA_VERSION}
+            return [f"  BASELINE  {label}  fbhash={','.join(hashes)}"
+                    + ("  ⚠ in-ROM SNES_ASSERT/WDM fired!" if wdm_any else "")], 1, 0, (label, entry)
+        ref = db.get(label)
+        if not ref:
+            return [f"  MISS  {label}: no baseline — run --update first"], 1, 1, None
+        if "frames" not in ref:
+            return [f"  MISS  {label}: baseline is instruction-count keyed (pre-frame "
+                    f"harness) — run --update first"], 1, 1, None
+        ref_points = frame_points(ref["frames"])
+        ref_hashes = ref["fbhash"] if isinstance(ref["fbhash"], list) else [ref["fbhash"]]
+        bad = []
+        wdm_any = False
+        err = None
+        for i, (frame, want) in enumerate(zip(ref_points, ref_hashes)):
+            actual_png = _png_for(Path("/tmp/luna-test-actual"), label, frame, i == 0)
+            try:
+                fbhash, wdm = render(luna, rom, frame, actual_png, extra=res_args(key, manifest))
+            except RuntimeError as e:
+                err = str(e)
+                break
+            wdm_any = wdm_any or wdm
+            if fbhash != want:
+                bad.append(f"@frame {frame}: {fbhash} != {want} ({actual_png})")
+        if err:
+            return [f"  ERROR {label}: {err}"], 1, 1, None
+        if wdm_any:
+            return [f"  FAIL  {label}: in-ROM SNES_ASSERT/WDM fired during run"], 1, 1, None
+        if not bad and len(ref_hashes) > 1 and len(set(ref_hashes)) == 1:
+            return [f"  FAIL  {label}: the baseline holds the same frame at every "
+                    f"capture point {ref_points} — re-capture it with --update"], 1, 1, None
+        if bad:
+            detail = "; ".join(bad)
+            note = ("" if len(bad) == len(ref_points) else
+                    f" [{len(bad)}/{len(ref_points)} points — phase drift?]")
+            return [f"  FAIL  {label}: {detail}{note}"], 1, 1, None
+        return [f"  PASS  {label}" + (f" ({len(ref_points)} points)" if len(ref_points) > 1 else "")], 1, 0, None
+
+    failures, count = 0, 0
+    for lines, counted, failed, entry in _pool_map(one, discover_example_roms()):
+        for line in lines:
+            print(line)
+        count += counted
+        failures += failed
+        if entry:
+            db[entry[0]] = entry[1]
+
+    if update:
+        manifest_path.write_text(json.dumps(db, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        print(f"\nWrote {manifest_path.relative_to(REPO_ROOT)} ({count} entries).")
+    print(f"\n{'UPDATE' if update else 'COMPARE'}: {count - failures}/{count} ok"
+          + (f", {failures} failed" if failures else ""))
+    return 1 if failures else 0
+
+
+def _pool_map(fn, items) -> list:
+    """fn over items through a thread pool (each call waits on a luna
+    subprocess), results in the order of items. LUNA_JOBS sets the width,
+    default the CPU count; LUNA_JOBS=1 is the old serial run."""
+    workers = max(1, int(os.environ.get("LUNA_JOBS", os.cpu_count() or 1)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        return list(pool.map(fn, list(items)))
+
+
+def render_state(luna: str, rom: Path, frame: int, png: Path | None,
+                 extra: list[str] | None = None) -> dict:
+    """Run `luna state --until-frame` → parsed EmulatorState JSON (+ write a PNG)."""
+    shot = []
+    if png is not None:
+        png.parent.mkdir(parents=True, exist_ok=True)
+        shot = ["--screenshot", str(png)]
+    proc = subprocess.run(
+        [luna, "state", "--until-frame", str(frame), *power_on_args(), *region_args(),
+         *(extra or []), "--out", "-", *shot, str(rom)],
+        capture_output=True, text=True, timeout=300,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"luna state failed: {proc.stderr.strip()[:300]}")
+    return json.loads(proc.stdout)
+
+
+def coverage(luna: str) -> int:
+    """Whole-corpus headless pass: does luna *run* every OpenSNES example?
+
+    Upgrade over the old PNG-size heuristic ('renders' != 'works'): each ROM is
+    checked for real LIVENESS from `luna state` (NMI/VBlank handshake advancing,
+    CPU not halted). Examples whose device input luna can't drive (manifest
+    input_dependent, gap G4) are reported as boot+visual only, not a clean pass.
+    """
+    out_dir = Path("/tmp/luna-test-corpus")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    manifest = load_manifest()
+    roms = discover_example_roms()  # canonical N_corpus (via main.c, skips residue)
+    def one(rom: Path) -> tuple[str, str, str]:
+        """(key, status, detail) for one ROM."""
+        key = example_key(rom)
+        cfg = manifest["examples"].get(key, {})
+        # Liveness wants the LATEST configured point (most frames = most signal).
+        frame = max(capture_frames(key, manifest))
+        png = out_dir / f"{key.replace('/', '_')}.png"
+        try:
+            state = render_state(luna, rom, frame, png, extra=res_args(key, manifest))
+        except Exception as e:  # noqa: BLE001 — bench-style panic-safety
+            return key, "FAIL", str(e)[:80]
+        bad = header_problem(state)
+        if bad:
+            return key, "FAIL", bad
+        live, why = liveness(state)
+        if not live:
+            return key, "DEAD", why
+        return key, ("INPUT-DEP" if cfg.get("input_dependent") else "OK"), why
+
+    rows = _pool_map(one, roms)
+    counts = {s: sum(1 for _, st, _ in rows if st == s)
+              for s in ("OK", "INPUT-DEP", "DEAD", "FAIL")}
+    ok, inputdep, dead, fail = (counts["OK"], counts["INPUT-DEP"],
+                                counts["DEAD"], counts["FAIL"])
+    for key, status, why in rows:
+        print(f"  {status:9} {key}" + (f": {why}" if status == "FAIL" else f"  ({why})"))
+
+    # The committed report describes the default (zero-fill) pass; a
+    # --power-on pass prints its verdict but leaves the file alone.
+    report = HERE / "CORPUS_COVERAGE.md"
+    lines = [
+        "# Luna corpus coverage (whole-suite headless liveness pass)",
+        "",
+        f"luna {LUNA_VERSION} · `luna state --until-frame <N>`"
+        f"{' --power-on ' + POWER_ON if POWER_ON else ''} per ROM · {len(roms)} ROMs · "
+        f"**{ok} OK, {inputdep} INPUT-DEP, {dead} DEAD, {fail} FAIL**",
+        "",
+        "> Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and "
+        "the latest NMI within one frame of the capture) — not "
+        "a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input "
+        "(Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a "
+        "clean functional pass. **DEAD** = ran but not live (crash/hang). "
+        "**FAIL** = luna errored, or the ROM header's size byte does not cover "
+        "the file or its checksum complement does not match. PNGs: `/tmp/luna-test-corpus/`. (In-ROM "
+        "`SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)",
+        "",
+        "| Example | Status | Detail |",
+        "|---|---|---|",
+    ]
+    lines += [f"| `{l}` | {s} | {d} |" for l, s, d in rows]
+    if not POWER_ON and not REGION:
+        report.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"\nCoverage{variant_label()}: "
+          f"{ok} OK / {inputdep} INPUT-DEP / {dead} DEAD / {fail} FAIL of {len(roms)}.")
+    if not POWER_ON and not REGION:
+        print(f"Report: {report.relative_to(REPO_ROOT)}")
+    return 1 if (dead or fail) else 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Luna-driven test harness for OpenSNES")
+    ap.add_argument("--update", action="store_true", help="(re)write baselines instead of comparing")
+    ap.add_argument("--compare", action="store_true",
+                    help="visual regression vs baselines (the default action; explicit alias)")
+    ap.add_argument("--only", metavar="SUBSTR", help="restrict to labels containing SUBSTR")
+    ap.add_argument("--list", action="store_true", help="print the manifest and exit")
+    ap.add_argument("--coverage", action="store_true",
+                    help="run EVERY built example ROM and write a compatibility report")
+    ap.add_argument("--power-on", metavar="MODE",
+                    help="luna power-on RAM state for every run: zero (default), ones, "
+                         "random[=seed]. `random=1` is the reproducible garbage-RAM pass")
+    ap.add_argument("--region", metavar="STD", choices=("ntsc", "pal"),
+                    help="luna --force-region for every run: the PAL liveness pass is "
+                         "`--coverage --region pal` (R2)")
+    args = ap.parse_args()
+    global POWER_ON, REGION
+    POWER_ON = args.power_on
+    REGION = args.region
+    if args.list:
+        manifest = load_manifest()
+        for rom in discover_example_roms():
+            key = example_key(rom)
+            frames = capture_frames(key, manifest)
+            print(f"  {key:40} --until-frame {','.join(map(str, frames))}")
+        return 0
+    if args.coverage:
+        return coverage(find_luna())
+    return run(args.update, args.only)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

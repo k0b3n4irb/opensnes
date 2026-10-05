@@ -1,0 +1,24 @@
+# Migrated from probes/movement.py.
+rom = "../../examples/games/likemario/likemario.sfc"
+frames = 120
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+mario_x = { eq = 48, width = 2 }
+[[checkpoint]]                 # RIGHT -> mario_x up
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.delta]
+mario_x = "increased"
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[checkpoint.values]
+mario_x = { eq = 119, width = 2 }
+[asserts.dma]
+unsafe_writes = 0
+# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
+# mario_x 48 -> 119 over 59 frames of RIGHT: acceleration, then the run speed.
+[asserts]
+fbhash = "7e26ae1fd04f5b10"

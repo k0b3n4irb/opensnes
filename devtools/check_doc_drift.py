@@ -227,7 +227,7 @@ def _gather_active_doc_paths() -> list[Path]:
             paths.append(p)
     # Build, CI and harness files (since 2026-09-26, audit tests 11): their
     # comments quoted "54/56 examples" long after the corpus moved.
-    for rel in ("Makefile", "tools/luna-test/README.md"):
+    for rel in ("Makefile", "testing/README.md"):
         p = repo_path(rel)
         if p.is_file():
             paths.append(p)
@@ -1095,7 +1095,7 @@ HEADER_MAP_HEADING = "## Header → tutorial map"
 _REMOVED_SCAN_GLOBS = ["docs/**/*.md", "examples/**/*.c", "examples/**/*.h",
                        "examples/**/*.asm", "examples/**/*.md", "templates/*",
                        "lib/include/snes/*.h", "lib/source/*", "KNOWN_LIMITATIONS.md",
-                       "README.md", "tools/luna-test/manifests/*.toml"]
+                       "README.md", "testing/manifests/*.toml"]
 _REMOVED_EXEMPT = {"docs/UPGRADING.md", "docs/MIGRATING_FROM_PVSNESLIB.md"}
 
 

@@ -236,4 +236,4 @@ unauthorised submodule pointer can never produce a release artifact.
 
 - `docs/doxygen-awesome-css` — cosmetic, third-party, low-risk; not pinned.
 - **luna** (test backend) — not a submodule; pinned as a downloaded binary via
-  `tools/luna-test/luna.version` + `scripts/install-luna.sh` (SHA-256 verified).
+  `testing/luna.version` + `scripts/install-luna.sh` (SHA-256 verified).

@@ -36,9 +36,9 @@ cd examples/text/print_string && make
 All testing goes through **luna** (cycle-accurate native emulator, pinned
 binary — no Node/WASM/Mesen2):
 ```bash
-scripts/install-luna.sh                                  # fetch pinned luna (tools/luna-test/luna.version)
-python3 tools/luna-test/luna_runner.py --coverage        # corpus liveness
-python3 tools/luna-test/luna_runner.py --compare         # visual regression (fbhash; multi-point for animated examples)
+scripts/install-luna.sh                                  # fetch pinned luna (testing/luna.version)
+python3 testing/luna_runner.py --coverage        # corpus liveness
+python3 testing/luna_runner.py --compare         # visual regression (fbhash; multi-point for animated examples)
 make test-manifests                                      # functional probes: luna test manifests (input→WRAM asserts)
 make tests                                               # all of the above
 ```
@@ -64,7 +64,7 @@ The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE's w65816 bac
 - **lib/** — Hardware library. C sources in `lib/source/*.c`, ASM in `lib/source/*.asm`, headers in `lib/include/snes/`. Built as separate LoROM, HiROM, SA-1, and SuperFX object sets.
 - **templates/** — ROM bootstrap: `crt0.asm` (startup + NMI handler), `hdr*.asm` (ROM headers), `runtime.asm` (math routines, now in lib/source/), `memmap*.inc` (memory maps). These are the single source of truth — examples don't duplicate them.
 - **make/common.mk** — Universal build rules included by every example. Handles graphics conversion, multi-file C compilation, SNESMOD audio, SA-1/SuperFX/HiROM mode selection, module linking.
-- **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), `luna-test/` (luna-driven test harness: runner, manifest, baselines, probes)
+- **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), and the other asset converters (shipped)
 - **examples/** — 91 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
 
 ### Enhancement Chip Support

@@ -119,8 +119,8 @@ find_emulator() {
     # the emulator GETTING_STARTED had just installed).
     local sdk
     sdk="$(find_sdk_root 2>/dev/null)" || true
-    if [ -n "$sdk" ] && [ -x "$sdk/tools/luna-test/bin/luna-gui" ]; then
-        echo "$sdk/tools/luna-test/bin/luna-gui"
+    if [ -n "$sdk" ] && [ -x "$sdk/testing/bin/luna-gui" ]; then
+        echo "$sdk/testing/bin/luna-gui"
         return
     fi
 
@@ -136,7 +136,7 @@ find_emulator() {
 }
 
 # The luna CLI (headless: tests, MCP debugger) — distinct from the run
-# emulators above. Resolution mirrors tools/luna-test/luna_runner.py:
+# emulators above. Resolution mirrors testing/luna_runner.py:
 # $LUNA_BIN, then the pinned harness binary, then PATH.
 find_luna_cli() {
     if [ -n "${LUNA_BIN:-}" ] && [ -x "$LUNA_BIN" ]; then
@@ -144,8 +144,8 @@ find_luna_cli() {
     fi
     local sdk
     sdk="$(find_sdk_root 2>/dev/null)" || true
-    if [ -n "$sdk" ] && [ -x "$sdk/tools/luna-test/bin/luna" ]; then
-        echo "$sdk/tools/luna-test/bin/luna"; return
+    if [ -n "$sdk" ] && [ -x "$sdk/testing/bin/luna" ]; then
+        echo "$sdk/testing/bin/luna"; return
     fi
     command -v luna 2>/dev/null && return
     return 1

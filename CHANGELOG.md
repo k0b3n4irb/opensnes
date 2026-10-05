@@ -2689,7 +2689,7 @@ from v0.21.2. This release captures the luna v1.0.0 migration on `main`.
 
 ### Changed
 - **Test backend**: pinned luna bumped `v0.3.2` → `v1.0.0`
-  (`tools/luna-test/luna.version`). The v0.3.x releases were removed upstream,
+  (`testing/luna.version`). The v0.3.x releases were removed upstream,
   which broke CI; v1.0.0 is CLI-compatible and produces no rendering drift
   (visual regression 56/56). Affects the dev/CI test harness only.
 
@@ -2741,7 +2741,7 @@ or runtime changes — existing ROMs build byte-for-byte the same.
 
 ### Changed
 - Bump the pinned luna binary **v0.3.0 → v0.3.2** (no rendering drift; visual
-  baselines byte-identical). `LUNA_VERSION` now reads `tools/luna-test/luna.version`
+  baselines byte-identical). `LUNA_VERSION` now reads `testing/luna.version`
   (single source of truth with `install-luna.sh`).
 - Commit-scope lint accepts comma-separated scopes (`feat(compiler,lib): …`).
 
@@ -2776,7 +2776,7 @@ procedurally-generated shoot-'em-up example.
   shoot-'em-up (cellular-automata archipelago + autotile resolver, vertical
   auto-scroll, 8-enemy spawn pool, AABB collision, BG3 HUD).
 - `fadeOut` / `fadeIn` promoted into `snes/console.h`.
-- **luna test harness** (`tools/luna-test/`, Python): `make tests` runs corpus
+- **luna test harness** (`testing/`, Python): `make tests` runs corpus
   liveness coverage + full-corpus visual regression (56 examples, keyed on luna's
   cross-arch-stable `--print-fbhash`) + functional probes (scripted input → WRAM
   via `--assert`) + audio checks (`--audio-out` + SPC voices) + WRAM-state

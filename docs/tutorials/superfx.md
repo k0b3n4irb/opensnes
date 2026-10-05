@@ -625,7 +625,7 @@ then for the DMA.
 - Two framebuffers must fit in the Game Pak RAM the header declares
   (`GSU_RAM_KB`, 64 KB by default): `gsuPresentInit()` returns 0 otherwise.
 
-`tools/luna-test/vram_dma_blank.py` checks, with luna's DMA trace, that every
+`testing/vram_dma_blank.py` checks, with luna's DMA trace, that every
 presented byte lands in blank or force blank, in whole frames into
 alternating blocks, and that no swap shows a block before its frame is
 complete.

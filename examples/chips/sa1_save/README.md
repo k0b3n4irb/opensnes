@@ -26,7 +26,7 @@ row 25); on luna the power-cycle chain `h_sa1_save_boot1.toml` →
 
 ```bash
 make -C examples/chips/sa1_save
-tools/luna-test/bin/luna run examples/chips/sa1_save/sa1_save.sfc --until-frame 120 --screenshot out.png
+testing/bin/luna run examples/chips/sa1_save/sa1_save.sfc --until-frame 120 --screenshot out.png
 ```
 
 ## Modules

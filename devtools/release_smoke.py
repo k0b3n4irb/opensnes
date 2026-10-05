@@ -15,7 +15,7 @@ user does:
   4. scaffold a project with the zip's `bin/opensnes init --template game`
      and build it;
   5. when a luna binary is available (LUNA_BIN, or the SDK tree's
-     tools/luna-test/bin/luna), run the project's `make test-update` then
+     testing/bin/luna), run the project's `make test-update` then
      `make test` — the "test your game" story of GETTING_STARTED.
 
 Usage: python3 devtools/release_smoke.py release/<name>.zip
@@ -59,7 +59,7 @@ def find_luna() -> str | None:
     if env and Path(env).is_file():
         return env
     for name in ("luna", "luna.exe"):   # .exe on Windows
-        tree = SDK_TREE / "tools" / "luna-test" / "bin" / name
+        tree = SDK_TREE / "testing" / "bin" / name
         if tree.is_file():
             return str(tree)
     return None

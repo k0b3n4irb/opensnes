@@ -47,7 +47,7 @@ Open `pseudo_hires.sfc` in luna (or any SNES emulator) and press A.
 
 ## Testing
 
-`tools/luna-test/manifests/color_pseudo_hires.toml` presses A twice and
+`testing/manifests/color_pseudo_hires.toml` presses A twice and
 checks SETINI ($08, $00, $08), the screen designations and that BG2 keeps
 scrolling.
 

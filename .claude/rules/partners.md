@@ -6,7 +6,7 @@ helps the other two, and each one owes the other two its feedback.
 
 | Partner | What it is | What it gives us | What we give it |
 |---|---|---|---|
-| **luna** | the cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `tools/luna-test/luna.version`) | the one source of truth for running, inspecting and judging ROMs (`.claude/rules/luna_tooling.md`) | capability requests specified by a working prototype, bug reports with a ROM and a command line, and the answer to every note it sends us |
+| **luna** | the cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `testing/luna.version`) | the one source of truth for running, inspecting and judging ROMs (`.claude/rules/luna_tooling.md`) | capability requests specified by a working prototype, bug reports with a ROM and a command line, and the answer to every note it sends us |
 | **snes-rag** (the Cartouche corpus, MCP `cartouche`) | the arbitrated SNES reference corpus: hardware, chips, SPC700, formats, toolchain docs, luna's own docs | the arbiter for every hardware claim and every "is this the hardware or the toolchain?" question (`.claude/rules/hardware_claims.md`) | every query that came back empty, wrong or unsettled; every source it is missing; every fact we established that no source states |
 
 This rule is the contract between the three. The two rules it cites say

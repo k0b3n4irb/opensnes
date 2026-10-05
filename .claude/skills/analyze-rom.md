@@ -55,9 +55,9 @@ grep -E "^[0-9A-F]+:" <rom>.sym | wc -l
 ### Debug in luna
 ```bash
 # State snapshot (CPU, PPU, chips) after N frames
-tools/luna-test/bin/luna state <rom>.sfc --until-frame 300 --out -
+testing/bin/luna state <rom>.sfc --until-frame 300 --out -
 # Interactive: luna's MCP server (run_until_pc, run_until_mem_write, peek_memory)
-tools/luna-test/bin/luna mcp
+testing/bin/luna mcp
 ```
 See `docs/tutorials/debugging.md`.
 

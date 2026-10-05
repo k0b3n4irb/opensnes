@@ -35,8 +35,8 @@ version. A new module costs nothing to a project that does not link it.
 - **Performance figures** (`docs/PERF.md`, `docs/BENCHMARK.md`) are
   measurements, not contracts; a release may make a call cheaper or, with
   a stated reason, slightly dearer.
-- **The emulator pin** (`tools/luna-test/luna.version`) and the test
-  harness under `tools/luna-test/` are the SDK's own test infrastructure;
+- **The emulator pin** (`testing/luna.version`) and the test
+  harness under `testing/` are the SDK's own test infrastructure;
   they move with luna.
 - **The examples** are teaching material and may be rewritten, merged or
   removed; `docs/HARDWARE_VERIFICATION.md` names the ones a release is

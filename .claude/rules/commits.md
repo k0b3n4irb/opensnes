@@ -11,8 +11,8 @@
   `contributing`, `release`, `submodule`, `deps`, `readme`,
   `changelog`, `test`, `tests`) plus emerged categories matching real
   paths (`chantiers` → `.claude/notes/chantiers/`, `rules` →
-  `.claude/rules/`, `bench` → bench fixtures, `luna-test` →
-  `tools/luna-test/`, `conventions` → `.claude/notes/conventions/`,
+  `.claude/rules/`, `bench` → bench fixtures, `luna-test` and `testing` →
+  `testing/`, `conventions` → `.claude/notes/conventions/`,
   `tech` → `.claude/notes/tech/`, `status` → `.claude/notes/status/`,
   `craft` → `docs/craft/`).
   The canonical

@@ -28,7 +28,7 @@ forks: a compiler fix is a commit on the fork's branch named in
   procedure is at the bottom of that file. Every bump runs
   `make test-toolchain-suites` (the forks' own upstream suites, against
   known-fail ratchets) and the Class A proof of `.claude/rules/testing.md`.
-- **luna**: `tools/luna-test/luna.version`. `scripts/install-luna.sh`
+- **luna**: `testing/luna.version`. `scripts/install-luna.sh`
   downloads that release for Linux, macOS or Windows and checks its
   SHA-256 (no token needed: the repository is public). A bump re-runs
   `make tests`, and any baseline it moves is explained in the commit.

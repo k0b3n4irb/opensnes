@@ -49,7 +49,7 @@ sudo dnf install make
 **luna** is the SDK's emulator: it plays ROMs, runs the test harness and
 debugs (`tutorials/debugging.md`). `scripts/install-luna.sh` fetches the
 pinned release for Linux, macOS or Windows (MSYS2 / Git Bash) into
-`tools/luna-test/bin/`: `luna` (headless: tests, state, debugging) and
+`testing/bin/`: `luna` (headless: tests, state, debugging) and
 `luna-gui` (a window you play in). Any other SNES emulator works too, for a second
 opinion:
 
@@ -87,7 +87,7 @@ Extract the examples archive next to the SDK and pick a ROM:
 cd opensnes-examples_<version>/examples/text/print_string
 
 # Play it in luna's window (install it once from the SDK root: scripts/install-luna.sh)
-~/opensnes/tools/luna-test/bin/luna-gui print_string.sfc
+~/opensnes/testing/bin/luna-gui print_string.sfc
 ```
 
 > Any other SNES emulator opens the `.sfc` as well (Mesen, bsnes, Snes9x —

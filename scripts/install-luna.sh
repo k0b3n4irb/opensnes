@@ -2,13 +2,13 @@
 # install-luna.sh — fetch the pinned luna emulator binary for the test harness.
 #
 # Downloads the pinned luna release for this OS (Linux, macOS, Windows under
-# MSYS2 / Git Bash), verifies its SHA-256 against tools/luna-test/luna.sha256,
+# MSYS2 / Git Bash), verifies its SHA-256 against testing/luna.sha256,
 # and installs it locally. luna is consumed as a *pinned binary*,
 # not a submodule (see /tmp/luna_migration_FINAL_2026-06-20.md §0bis).
 #
-#   - Version pin:   tools/luna-test/luna.version  (e.g. "v1.32.0")
-#   - Archive sums:  tools/luna-test/luna.sha256   (the four zips of that version)
-#   - Install path:  tools/luna-test/bin/luna      (gitignored)
+#   - Version pin:   testing/luna.version  (e.g. "v1.32.0")
+#   - Archive sums:  testing/luna.sha256   (the four zips of that version)
+#   - Install path:  testing/bin/luna      (gitignored)
 #   - Dev override:  $LUNA_BIN  → if set to an existing file, skip the download
 #                    and use that binary (local luna build for co-development).
 #
@@ -17,7 +17,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LUNA_DIR="$REPO_ROOT/tools/luna-test"
+LUNA_DIR="$REPO_ROOT/testing"
 BIN_DIR="$LUNA_DIR/bin"
 BIN="$BIN_DIR/luna"
 REPO="k0b3n4irb/luna"
@@ -30,7 +30,7 @@ if [[ -n "${LUNA_BIN:-}" ]]; then
         echo "install-luna: \$LUNA_BIN set but not executable: $LUNA_BIN" >&2
         exit 1
     fi
-    # The override may name the install path itself (LUNA_BIN=tools/luna-test/bin/luna
+    # The override may name the install path itself (LUNA_BIN=testing/bin/luna
     # to reuse what is there): then there is nothing to link.
     if [[ "$(realpath "$LUNA_BIN")" != "$(realpath -m "$BIN")" ]]; then
         ln -sf "$LUNA_BIN" "$BIN"
@@ -45,7 +45,7 @@ fi
 # with a top-level directory of the same name (layout since the release
 # cleanup of 2026-10-04: before, Linux and macOS got a tar.gz named
 # luna-<version>-<os>-<aarch64|x86_64> with a .sha256 sidecar). The archive's
-# SHA-256 is pinned in tools/luna-test/luna.sha256, next to the version pin:
+# SHA-256 is pinned in testing/luna.sha256, next to the version pin:
 # a release re-published with other bytes fails here instead of installing.
 # Linux, macOS and Windows (MSYS2 / Git Bash) are all published.
 VERSION="$(tr -d '[:space:]' < "$LUNA_DIR/luna.version")"
@@ -99,10 +99,10 @@ no_asset_hint() {
         cat >&2 <<EOM
 install-luna: no binary for ${VERSION} at ${BASE}
   luna publishes binaries for its five newest releases only; older versions
-  keep their git tag. Either pin a newer version in tools/luna-test/luna.version
+  keep their git tag. Either pin a newer version in testing/luna.version
   or build this one from its tag:
     git clone https://github.com/${REPO} && cd luna && git checkout ${VERSION} && cargo build --release -p luna-cli
-  then copy target/release/luna to tools/luna-test/bin/.
+  then copy target/release/luna to testing/bin/.
 EOM
     fi
 }

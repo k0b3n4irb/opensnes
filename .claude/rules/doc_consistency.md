@@ -21,7 +21,7 @@ opt-in list.
 
 3. **Examples count claims in active docs** (`ROADMAP.md`, `README.md`,
    `.claude/rules/*.md`, and since 2026-09-26 the `Makefile`, the
-   workflows and `tools/luna-test/README.md`) must match
+   workflows and `testing/README.md`) must match
    `find examples -name 'main.c' | wc -l`.
    Caught historically as the pre-v0.16.0 count (one off the current
    total) sticking around in `testing.md` and `nmi_audit.md` after
@@ -169,7 +169,7 @@ solve a class of drift twice — solve it in the sentinel.
 ## What NOT to add to the sentinel
 
 - Anything inherently dynamic (test counts that move every chantier; the
-  full corpus is covered by `tools/luna-test/luna_runner.py --coverage`).
+  full corpus is covered by `testing/luna_runner.py --coverage`).
 - Pure prose (commit messages, README narrative). The lint should catch
   drift in *anchored claims*, not in writing.
 - Anything CHANGELOG-frozen by design.

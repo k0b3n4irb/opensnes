@@ -33,7 +33,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(REPO / "tools" / "luna-test" / "probes"))
+sys.path.insert(0, str(REPO / "testing" / "probes"))
 from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 
 ROM = HERE / "libtest.sfc"
