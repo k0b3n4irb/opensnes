@@ -127,11 +127,13 @@ ROM_BANKS   ?= 8
 ROM_BANK_KB := $(if $(filter 1,$(USE_HIROM)),64,32)
 # Rounded UP to the next power of two: snesdev-wiki, ROM header ($FFD7,
 # "rounded up"); int(log2) declared 256 KB for a 384 KB ROM until 2026-09-26.
-ROMSIZE     ?= $(shell python3 -c "import math; print('$$%02X' % math.ceil(math.log2($(ROM_BANKS) * $(ROM_BANK_KB))))")
+# Shell arithmetic, not Python: a user build must not need an interpreter
+# (.claude/rules/two_audiences.md, 2026-10-05).
+ROMSIZE     ?= $(shell n=0; s=$$(( $(ROM_BANKS) * $(ROM_BANK_KB) )); while [ $$(( 1 << n )) -lt $$s ]; do n=$$(( n + 1 )); done; printf '$$%02X' $$n)
 ASSET_BANKS_RANGE ?= $(shell echo $$(( $(ROM_BANKS) - 1 )))-1
 # Super FX Game Pak RAM declared in the extended header ($FFBD, 1 KB << n).
 GSU_RAM_KB  ?= 64
-GSU_RAM_SIZE_VAL := $(shell python3 -c "import math; print('$$%02X' % int(math.log2($(GSU_RAM_KB))))")
+GSU_RAM_SIZE_VAL := $(shell n=0; while [ $$(( 1 << (n + 1) )) -le $(GSU_RAM_KB) ]; do n=$$(( n + 1 )); done; printf '$$%02X' $$n)
 # Region the cartridge declares in its header, $FFD9 (2026-10-02; it was
 # $01, North America, on every ROM). fullsnes "Country (also implies
 # PAL/NTSC)" and snesdev-wiki ROM header: $00 Japan and $01 USA are NTSC,
@@ -519,7 +521,7 @@ ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
 			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
-	else \
+	elif command -v python3 >/dev/null 2>&1; then \
 		python3 $(OPENSNES)/devtools/check_upgrade.py -q $< || \
 			echo "  (deprecated names above: removed at 1.0 — docs/UPGRADING.md; the clang pre-pass is absent on this machine)"; \
 	fi

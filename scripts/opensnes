@@ -450,7 +450,7 @@ cmd_doctor() {
     if command -v python3 >/dev/null 2>&1; then
         ok "python3 ($(python3 --version 2>/dev/null))"
     else
-        fail "python3 not found — the build's post-link checks (ROM size, bank budgets) need it"
+        fail "python3 not found — the build's post-link checks (bank budgets, bank-blind reads) still need it"
     fi
 
     # Toolchain binaries
