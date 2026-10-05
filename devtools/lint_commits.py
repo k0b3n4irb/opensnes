@@ -92,6 +92,7 @@ SUBJECT_RE = re.compile(
     r"^(?P<type>[a-z]+)(?:\((?P<scope>[a-z0-9_/, -]+)\))?(?P<bang>!)?: (?P<desc>.+)$"
 )
 COAUTHOR_RE = re.compile(r"^\s*co-authored-by\s*:", re.IGNORECASE | re.MULTILINE)
+RELEASE_MERGE_RE = re.compile(r"^release: v\d+\.\d+\.\d+$")
 
 
 def get_commits(rev_range: str) -> list[tuple[str, str]]:
@@ -220,9 +221,14 @@ def main() -> int:
         # Co-Authored-By check via check_body() above to catch the
         # `Co-Authored-By:` trailer that GitHub never inserts but a
         # contributor amend might.
+        # The release merge is titled `release: vX.Y.Z` by .claude/rules/release.md
+        # (step 1) — a merge wrapper too, not a contributor commit; without this
+        # exemption every Lint run on main after a release was red (v0.48.0,
+        # 2026-10-05).
         if subject.startswith("Merge pull request ") \
            or subject.startswith("Merge branch ") \
-           or subject.startswith("Merge remote-tracking branch "):
+           or subject.startswith("Merge remote-tracking branch ") \
+           or RELEASE_MERGE_RE.match(subject):
             skipped_merges += 1
             errors = check_body(body)
         else:

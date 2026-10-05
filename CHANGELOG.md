@@ -4,6 +4,13 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- ci(devtools): the commit lint exempts the release merge titled
+  `release: vX.Y.Z`, the title the release workflow prescribes; the Lint
+  run on `main` was red after the v0.47.0 and v0.48.0 merges for that
+  subject alone (plus, on 2026-10-05, two earlier subjects already on
+  `develop`).
+
 ## [0.48.0] — 2026-10-05
 
 The last 0.x before 1.0. Every name that 1.0 renames or removes still
