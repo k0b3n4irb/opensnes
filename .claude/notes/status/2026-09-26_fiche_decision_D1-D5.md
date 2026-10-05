@@ -182,3 +182,9 @@ nouvelle ligne au journal remet le compteur à zéro). Lots B à I du plan
 (retrait des alias, `hdmaEnable(channel)`, `dmaTransfer`, garde-fou
 `removed_api.txt`, macros 1.0.0) : à commencer sur `develop`.
 
+**Décision du propriétaire, 2026-10-05.** Les assets PVSnesLib restent de
+côté : pas de compétence graphique en interne ; deux voies, un ami qui sait
+dessiner, ou un portage par outil. Ce n'est pas une porte de la 1.0 (le
+critère 2 les exempte). **La 1.0 attendra** le temps qu'il faut ; le lot B
+du plan (retrait des constantes dépréciées) commence sur `develop`.
+

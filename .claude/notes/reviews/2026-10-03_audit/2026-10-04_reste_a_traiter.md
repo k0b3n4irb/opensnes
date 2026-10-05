@@ -153,3 +153,4 @@ arguments : exempter ou refondre), les assets PVSnesLib (F PF1), les portes
 1.0 datées (H PF14), le bus factor (H PF19, critère 2), les patches A5 et le
 blob SNESMOD (H PF16/17), le ménage des releases luna, et la session console
 (critère 5). La campagne est close ; la fenêtre du critère 7 s'ouvre.
+- **F PF1 (assets PVSnesLib)** : décision du propriétaire le 10-05 — mis de côté, pas une porte de la 1.0 ; voies possibles : un graphiste ami, ou un portage par outil (ROADMAP mis à jour).
