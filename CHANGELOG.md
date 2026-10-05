@@ -543,6 +543,19 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- build(devtools): every link runs `symmap.py --check-data-init`: the
+  `DataInitEnd` label must close the `.data_init` section, or initialised
+  globals past the terminator would boot with whatever WRAM held. Reading
+  wlalink (`_compare_sections`) and relinking `print_string` with
+  `data_init_end.o` first, in the middle and last showed that the object
+  order never decided this — appended sections are sorted by size, largest
+  first, and the 5-byte terminator is smaller than any record; the
+  limitations page said "MUST be linked last, no separate check" (E PF9).
+- docs: seven green entries of `KNOWN_LIMITATIONS.md` now name the test
+  that pins them (vertical scroll -1, data-init terminator, SA-1 SIWP
+  polarity, chips under luna, `int`/`long` sizes, 4-byte pointers, the
+  HiROM header size), and `devtools/compiler-tests/cases/type_sizes.c`
+  pins every type size with a `_Static_assert` (docs audit PF9).
 - test(luna-test): `baselines.json` re-captured under the pinned luna
   (v1.32.0): the 89 frame hashes are unchanged, the `luna_version` and
   `rom_sha256` fields no longer say v1.21.0 for 58 entries (testing audit
