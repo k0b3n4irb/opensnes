@@ -61,6 +61,17 @@ freeze criterion that waits for hardware.
   decodes to the source's colour, with and without `--rearrange`) are the
   suite. The hardware limits (1024 tiles, 256 in Mode 7, one palette bank per
   tile) are refused with the position named.
+- **The build converts assets from their settings files** (build): every
+  `<asset>.toml` that names an `opensnes-*` tool is converted before the
+  first object (`ASSET_TOML`, one `.done` stamp per file), and the
+  `<stem>_data.as` fragments the tools write are gathered into
+  `assets_gen.asm` — one `ASSET_SECTION` of `.incbin` lines. The
+  `starter/` and `examples/sprites/aseprite_pipeline` are built this way:
+  no `data.asm`, no conversion rule in the Makefile, the symbols
+  (`player_til`, `hero_til`…) come from the generated `.inc`.
+  `opensnes-sample encode` writes its `_data.as` fragment too, and its
+  `.h` declares the `extern` symbols. A hand-written `data.asm` and the
+  `GFXSRC` rule keep working.
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
   counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
   RAM: each power-on reads the saved value, adds one, saves and prints both.

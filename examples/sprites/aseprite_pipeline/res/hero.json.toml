@@ -1,0 +1,6 @@
+# import settings of hero.json (Aseprite --data --list-tags): one AnimClip per
+# tag, in res/hero_anim.h, with the `hero` prefix the metasprite table uses.
+tool = "opensnes-sprite"
+
+[anim]
+prefix = "hero"

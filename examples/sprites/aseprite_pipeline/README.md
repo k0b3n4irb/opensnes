@@ -7,19 +7,19 @@ single Aseprite project** — no hand-written frame tables, no hand-typed
 animation clips. This is the working reference for the two-tool sprite pipeline:
 
 ```
-hero.aseprite ─┬─ gfx4snes -P    → hero.pic/.pal + res/hero_meta.inc
-               │                   (tiles, palette, metasprite pointer table)
-               └─ aseprite2snes  → res/hero_anim.h
-                                   (one AnimClip per Aseprite tag)
+hero.aseprite ─┬─ res/hero.png  + hero.png.toml  → opensnes-sprite sheet → hero.pic/.pal + hero_meta.inc
+               │                                    (tiles, palette, metasprite pointer table)
+               └─ res/hero.json + hero.json.toml → opensnes-sprite anim  → hero_anim.h
+                                                    (one AnimClip per Aseprite tag)
 ```
 
-`gfx4snes` owns the pixels and the metasprite geometry; `aseprite2snes` owns the
+`sheet` owns the pixels and the metasprite geometry; `anim` owns the
 timeline (tags, per-frame durations, direction). They meet at the frame value: a
 clip's frame *i* selects `hero_metasprites[i]`, resolved inline by
 `animTickMeta()` and drawn with `oamDrawMetasprite()`.
 
 The artist authored two tags in Aseprite — **walk** (forward loop) and **wave**
-(ping-pong) — with per-frame millisecond durations. `aseprite2snes` converted
+(ping-pong) — with per-frame millisecond durations. `opensnes-sprite anim` converted
 those to ticks and folded the ping-pong into the frame order. Press **A** to
 toggle between the two generated clips.
 
@@ -27,7 +27,7 @@ toggle between the two generated clips.
 
 - Metasprite composition from multiple OAM entries (`oamDrawMetasprite`)
 - The `anim.h` player driving a metasprite via `animTickMeta()`
-- Machine-generated metasprite table (`gfx4snes -P`) + animation clips (`aseprite2snes`)
+- Machine-generated metasprite table (`opensnes-sprite sheet --metasprite`) + animation clips (`opensnes-sprite anim`)
 - OBJSEL size mode and OBJ VRAM base for 16×16 hardware sprites
 - Sprite palette at CGRAM 128 (`OBJ_CGRAM_BASE`)
 
@@ -37,9 +37,11 @@ toggle between the two generated clips.
 cd examples/sprites/aseprite_pipeline && make
 ```
 
-The build runs the full pipeline automatically: `gfx4snes -P` on `res/hero.png`
-and `aseprite2snes` on `res/hero.json`, then compiles `main.c` (which `#include`s
-both generated files).
+The build runs the full pipeline from the two settings files beside the
+assets (`res/hero.png.toml`, `res/hero.json.toml`): `opensnes-sprite sheet`
+and `opensnes-sprite anim`, then the generated `assets_gen.asm` links the
+tiles, then `main.c` compiles (it `#include`s both generated headers). No
+`data.asm`, no conversion rule in the Makefile (`docs/tools/CONVENTIONS.md`).
 
 ## Modules Used
 
@@ -47,7 +49,6 @@ both generated files).
 
 ## See Also
 
-- `tools/aseprite2snes` — the animation-clip generator (`docs/tools/aseprite2snes.md`)
-- `tools/gfx4snes` — the tile/palette/metasprite generator (`-P`)
+- `tools/opensnes-sprite` — sheets, metasprites and Aseprite clips (`docs/tools/opensnes-sprite.md`)
 - `examples/sprites/metasprite` — hand-authored metasprite composition
 - `examples/sprites/animated_sprite` — single-sprite frame animation

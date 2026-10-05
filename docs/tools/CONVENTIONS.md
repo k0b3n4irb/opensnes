@@ -102,7 +102,14 @@ rule, two spellings: an asset with one source is named after its source
 (`soundbank.toml`).
 
 The first key is always `tool`: the build system's one generic rule reads
-it to know which tool converts the file. The rest is one table named after
+it to know which tool converts the file. **That rule exists** (`make/common.mk`,
+`ASSET_TOML`): every `*.toml` and `res/*.toml` that names an `opensnes-*`
+tool is converted before the first C or ASM object (the tool's subcommand
+is the file's one table), and every `<stem>_data.as` the tools write is
+gathered into `assets_gen.asm`, one `ASSET_SECTION` of `.incbin` lines
+assembled with the project. A project with settings files has no
+hand-written `data.asm` and no conversion rule in its Makefile: the
+`starter/` is built this way. The rest is one table named after
 the subcommand, keys spelled exactly as the long options (`--size` is
 `size`). Unknown keys are refused (exit 1) so a typo cannot silently fall
 back to a default.
