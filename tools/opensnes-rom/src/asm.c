@@ -9,18 +9,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>   /* strncasecmp: POSIX, not <string.h> on macOS */
 
 /* ---------------------------------------------------------- string sets */
 
-typedef struct { char **v; size_t n, cap; } strset;
+typedef struct { char **v; size_t n, cap; } str_set;
 
-static int set_has(const strset *s, const char *x)
+static int set_has(const str_set *s, const char *x)
 {
     for (size_t i = 0; i < s->n; i++) if (strcmp(s->v[i], x) == 0) return 1;
     return 0;
 }
 
-static void set_add(strset *s, const char *x)
+static void set_add(str_set *s, const char *x)
 {
     if (set_has(s, x)) return;
     if (s->n == s->cap) {
@@ -35,7 +36,7 @@ static void set_add(strset *s, const char *x)
     s->n++;
 }
 
-static void set_free(strset *s)
+static void set_free(str_set *s)
 {
     for (size_t i = 0; i < s->n; i++) free(s->v[i]);
     free(s->v);
@@ -45,16 +46,16 @@ static void set_free(strset *s)
 static int cmp_str(const void *a, const void *b) { return strcmp(*(char *const *)a, *(char *const *)b); }
 
 /* The .c.asm files of a directory, sorted, plus combined.asm first when it exists. */
-static strset asm_files(const char *dir, int with_combined)
+static str_set asm_files(const char *dir, int with_combined)
 {
-    strset out = { 0, 0, 0 };
+    str_set out = { 0, 0, 0 };
     char path[2048];
     if (with_combined) {
         snprintf(path, sizeof path, "%s/combined.asm", dir);
         FILE *f = fopen(path, "r");
         if (f) { fclose(f); set_add(&out, path); }
     }
-    strset casm = { 0, 0, 0 };
+    str_set casm = { 0, 0, 0 };
     DIR *d = opendir(dir);
     if (d) {
         struct dirent *e;
@@ -96,7 +97,7 @@ static const char *const MEM_MNEMONICS[] = {
 
 /* Classify one line: ".w sym" memory read (never exempt), "#sym" address
  * (exempt when the TU also takes "#:sym"), "pea.w sym" / "pea.w :sym". */
-static void scan_bank_line(const char *line, strset *mem, strset *imm, strset *banked)
+static void scan_bank_line(const char *line, str_set *mem, str_set *imm, str_set *banked)
 {
     const char *p = line;
     while (isspace((unsigned char)*p)) p++;
@@ -131,17 +132,17 @@ static void scan_bank_line(const char *line, strset *mem, strset *imm, strset *b
 
 int check_bank_reads(cli_ctx *ctx, const sym_file *s, const char *dir)
 {
-    strset files = asm_files(dir, 0);
+    str_set files = asm_files(dir, 0);
     int bad = 0;
     for (size_t fi = 0; fi < files.n; fi++) {
         FILE *f = fopen(files.v[fi], "r");
         if (!f) continue;
-        strset mem = { 0, 0, 0 }, imm = { 0, 0, 0 }, banked = { 0, 0, 0 };
+        str_set mem = { 0, 0, 0 }, imm = { 0, 0, 0 }, banked = { 0, 0, 0 };
         char line[2048];
         while (fgets(line, sizeof line, f)) scan_bank_line(line, &mem, &imm, &banked);
         fclose(f);
         /* blind = (imm - banked) ∪ mem, sorted for a stable report */
-        strset blind = { 0, 0, 0 };
+        str_set blind = { 0, 0, 0 };
         for (size_t i = 0; i < imm.n; i++) if (!set_has(&banked, imm.v[i])) set_add(&blind, imm.v[i]);
         for (size_t i = 0; i < mem.n; i++) set_add(&blind, mem.v[i]);
         if (blind.n) qsort(blind.v, blind.n, sizeof *blind.v, cmp_str);
@@ -168,8 +169,8 @@ typedef struct {
     char   name[128];
     char   file[512];
     int    start_line;
-    strset callees;
-    strset writes;          /* "line N: text" */
+    str_set callees;
+    str_set writes;          /* "line N: text" */
     int    seen;
 } func_t;
 
@@ -272,14 +273,14 @@ static void chomp(char *s) { size_t l = strlen(s); while (l && (s[l - 1] == '\n'
 
 int check_nmi_race(cli_ctx *ctx, const char *dir)
 {
-    strset files = asm_files(dir, 1);
+    str_set files = asm_files(dir, 1);
     if (files.n == 0) {
         cli_error(ctx, dir, "no .c.asm intermediates — build the project first");
         set_free(&files);
         return 1;
     }
     funcs_t fs = { 0, 0, 0 };
-    strset callbacks = { 0, 0, 0 };
+    str_set callbacks = { 0, 0, 0 };
     char recent[12][128];      /* the last symbolic pea labels, for nmiSet's first argument */
     for (size_t fi = 0; fi < files.n; fi++) {
         FILE *f = fopen(files.v[fi], "r");
@@ -320,7 +321,7 @@ int check_nmi_race(cli_ctx *ctx, const char *dir)
         fclose(f);
     }
     /* the closure from the roots; functions not defined here (the lib) are not followed */
-    strset stack = { 0, 0, 0 };
+    str_set stack = { 0, 0, 0 };
     set_add(&stack, "NmiHandler"); set_add(&stack, "DefaultNmiCallback");
     for (size_t i = 0; i < callbacks.n; i++) set_add(&stack, callbacks.v[i]);
     for (size_t i = 0; i < stack.n; i++) {

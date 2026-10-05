@@ -751,3 +751,9 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   La règle générique convertit un niveau après les autres assets (il lit le
   `.map` du tileset). `map_scroll` et `tiled` perdent leur dernier
   `data.asm` ; `mapandobjects`, sans source Tiled, garde ses binaires.
+- **Erreur de méthode, 2026-10-05 soir** : le workflow « Build & Release » était
+  rouge sur macOS et Windows depuis l'arrivée d'`opensnes-rom` (`strset`
+  heurte la libc de mingw ; `strncasecmp` sans `<strings.h>` sur macOS), et je
+  n'ai regardé que « Lint » pendant quatre pushes. Règle : après un push, lire
+  les trois workflows, et pour « Build & Release » les trois OS — un outil C
+  nouveau se compile ici sous gcc 16 et là-bas sous clang et mingw.
