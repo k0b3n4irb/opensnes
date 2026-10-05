@@ -1,0 +1,10 @@
+[labels]
+00:8000 main
+00:a200 DataInitEnd
+[definitions]
+00000010 _sizeof_main
+[sections]
+00000000 00:0000 8000 00000010 .text.main
+00002190 00:2190 a190 00000020 .data_init
+[ramsections]
+00:0300 0300 00000002 .bss.counter

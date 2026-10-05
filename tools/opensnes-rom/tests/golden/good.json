@@ -1,0 +1,1 @@
+{"tool": "opensnes-rom", "version": "1.0.0", "input": "good.sym", "ok": true, "bank0": {"free": 24152, "verdict": 0}, "ram": {"free": 5120, "top": 3072, "used": 2050, "sections": 2, "verdict": 0}, "far_ram": {"free": 53248, "top": 12288, "sections": 1}, "data_init": 0, "bank_reads": 0, "nmi_race": 0, "assets": {"vram_bytes": 0, "colours": 0, "files": 0}}

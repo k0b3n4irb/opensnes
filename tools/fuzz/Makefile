@@ -33,7 +33,7 @@ all: $(TARGETS)
 fuzz_lodepng: fuzz_lodepng.c $(COMMON)/lodepng.c
 	$(CLANG) $(FUZZ_CFLAGS) -I$(COMMON) -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_DISK $^ -o $@
 
-fuzz_itloader: fuzz_itloader.c $(SMC)/itloader.c $(SMC)/io.c
+fuzz_itloader: fuzz_itloader.c $(SMC)/itloader.c $(SMC)/io.c $(SMC)/report.c
 	$(CLANG) $(FUZZ_CFLAGS) -I$(SMC) $^ -o $@
 
 fuzz_tiled: fuzz_tiled.c $(TMX)/cute_tiled.h
