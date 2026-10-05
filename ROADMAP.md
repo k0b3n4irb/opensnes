@@ -213,13 +213,9 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] **verify_toolchain.py** — Compiler-submodule pin enforcement
 - [x] **lint_commits.py** — Conventional-Commits + no-`Co-Authored-By` lint
 - [x] **cyclecount.py** — CPU cycle estimation
-- [x] **check_mvn.py** — MVN/MVP operand linter
 - [x] **Interactive debugging via luna** (CLI + MCP) — replaced the retired
       Mesen2-bound snesdbg Lua library (see `docs/tutorials/debugging.md`;
       breakpoints/symbols tracked upstream as luna#63)
-- [x] **brr2it** — BRR → Impulse Tracker conversion
-- [x] **benchmark** — Compiler-performance comparison tool
-- [x] **gen_hud_bar** — HUD bar generator
 - [x] **font2snes** — Font → SNES-tile converter
 
 ---

@@ -102,9 +102,6 @@ def find_luna() -> str:
     on_path = shutil.which("luna")
     if on_path:
         return on_path
-    vendored = HERE / "vendor" / f"luna-{LUNA_VERSION}-linux-{os.uname().machine}" / "luna"
-    if vendored.is_file():
-        return str(vendored)
     sys.exit(
         "ERROR: luna binary not found. Run scripts/install-luna.sh, set $LUNA_BIN, "
         f"or put `luna` on PATH. Expected luna {LUNA_VERSION}."
