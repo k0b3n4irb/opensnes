@@ -68,6 +68,13 @@ right one:
 All binaries live in `bin/` and are built by `make tools`. Every tool prints
 `--help`; the pages here are the guided version.
 
+## Where the tools are going
+
+1.x replaces these converters with the `opensnes-*` family — one tool per
+function, the same conventions everywhere, settings beside each asset.
+@subpage tools_conventions is the contract; the 0.x tools stay one more
+release.
+
 ## Your Makefile
 
 The build itself has knobs — cartridge mapping, save RAM, coprocessor,
