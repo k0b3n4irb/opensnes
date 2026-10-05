@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[3] / "testing" / "probes"))
+sys.path.insert(0, str(HERE.parents[3] / "testing"))
 from lib import find_luna, assert_mem  # noqa: E402
 
 ROM = HERE / "a6_farptr.sfc"

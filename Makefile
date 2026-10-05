@@ -623,11 +623,11 @@ release: all
 	@# Project test harness (`make test` in user projects) + the pinned-luna
 	@# installer. Only the pieces project_test.py imports — not the SDK's
 	@# corpus manifest/baselines.
-	@mkdir -p $(RELEASE_DIR)/opensnes/testing/probes
+	@mkdir -p $(RELEASE_DIR)/opensnes/testing/lib
 	@mkdir -p $(RELEASE_DIR)/opensnes/scripts
 	@cp testing/project_test.py testing/luna_runner.py \
 		testing/luna.version $(RELEASE_DIR)/opensnes/testing/
-	@cp testing/probes/lib.py $(RELEASE_DIR)/opensnes/testing/probes/
+	@cp testing/lib/*.py $(RELEASE_DIR)/opensnes/testing/lib/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
 	@# Every devtools script make/common.mk runs on a user build (post-link
 	@# ratchets and lints). The list is read from common.mk itself: until

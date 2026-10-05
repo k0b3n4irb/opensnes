@@ -48,7 +48,7 @@ Their unit tests: `test_check_doc_drift.py`, `test_check_nmi_wram_race.py`,
 
 Single-purpose ROM projects (a `main.c`, a `Makefile` over `common.mk`)
 rebuilt clean by `make tests`; each asserts result globals by symbol in
-luna, through `testing/probes/lib.py`.
+luna, through `testing/lib` (`from lib import find_luna, assert_mem`).
 
 | Directory | Covers | Asserted by |
 |-----------|--------|-------------|

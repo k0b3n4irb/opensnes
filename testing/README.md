@@ -168,8 +168,8 @@ Beyond visual/coverage, the harness exercises axes the old snes9x harness
 never could. **These checks now live as native luna manifests under
 `manifests/*.toml`** (run by `luna test` via `make test-manifests`); the
 Python probes that pioneered them were deleted after the migration —
-`probes/` retains only `lib.py`, the `luna state --assert` / `--peek`
-helper every runtime ROM checker imports (`devtools/compiler-tests/runtime/*`,
+`lib/probes.py` is the `luna state --assert` / `--peek`
+helper every runtime ROM checker imports (`from lib import assert_mem`) (`devtools/compiler-tests/runtime/*`,
 `devtools/libtests`, `project_test.py`); the `run_all.py` runner that globbed
 the emptied directory was deleted on 2026-09-14. Same coverage, declarative form:
 

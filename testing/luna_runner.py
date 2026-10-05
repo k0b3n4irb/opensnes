@@ -18,7 +18,7 @@ that luna documents as cross-architecture-stable. That makes aarch64-captured
 baselines match on an x86_64 CI runner (immune to PNG-encoder drift), so the
 visual step is a hard gate. The PNG is still written alongside for human diffing
 (decision #1: "both" — fbhash gate + PNG debug). For direct WRAM/VRAM/ARAM
-assertions, luna v0.3.0 offers `--assert` (used by the probes in probes/).
+assertions, luna v0.3.0 offers `--assert` (used by lib/probes.py).
 
 luna binary resolution order: $LUNA_BIN, then `luna` on PATH, then the
 vendored extract under testing/vendor/.
@@ -46,12 +46,11 @@ import tomllib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from lib import LUNA_VERSION, REPO_ROOT, discover_example_roms, example_key, find_luna, firmware_dir  # noqa: E402,F401  (testing/lib: the one place that knows where luna and the corpus are)
+
 BASELINE_DIR = HERE / "baselines"
-# Single source of truth for the pin: testing/luna.version (what
-# install-luna.sh downloads). Read it here too so a version bump touches one file.
-LUNA_VERSION = (HERE / "luna.version").read_text(encoding="utf-8").strip()
 # Capture points are PPU FRAMES (`luna --until-frame N`), not instruction counts:
 # a codegen change that shifts the instruction count of a frame cannot move the
 # capture onto another animation phase (luna issue #222; before v1.18.0 the
@@ -90,30 +89,6 @@ def variant_label() -> str:
     if REGION:
         parts.append("--region " + REGION)
     return f" ({' '.join(parts)})" if parts else ""
-
-def find_luna() -> str:
-    env = os.environ.get("LUNA_BIN")
-    if env and Path(env).is_file():
-        return env
-    for name in ("luna", "luna.exe"):  # scripts/install-luna.sh target (.exe on Windows)
-        installed = HERE / "bin" / name
-        if installed.is_file():
-            return str(installed)
-    on_path = shutil.which("luna")
-    if on_path:
-        return on_path
-    sys.exit(
-        "ERROR: luna binary not found. Run scripts/install-luna.sh, set $LUNA_BIN, "
-        f"or put `luna` on PATH. Expected luna {LUNA_VERSION}."
-    )
-
-
-def firmware_dir() -> Path:
-    """luna's coprocessor-firmware folder (where dsp1b.rom lives)."""
-    base = os.environ.get("XDG_CONFIG_HOME")
-    root = Path(base) if base else Path.home() / ".config"
-    return root / "luna" / "firmware"
-
 
 def missing_firmware(key: str, manifest: dict) -> str | None:
     """The firmware filename an example needs but that is NOT installed, else
@@ -160,11 +135,6 @@ def res_args(key: str, manifest: dict) -> list[str]:
     subpixels/fields in the screenshot and the fbhash instead of the averaged
     256×224 view — a broken second subpixel column would otherwise blend away."""
     return ["--native-res"] if manifest["examples"].get(key, {}).get("native_res") else []
-
-
-def example_key(rom: Path) -> str:
-    """Example path relative to examples/ (the dir holding main.c)."""
-    return str(rom.parent.relative_to(REPO_ROOT / "examples"))
 
 
 def liveness(state: dict) -> tuple[bool, str]:
@@ -226,21 +196,6 @@ def header_problem(state: dict) -> str:
         return (f"header: checksum {rom.get('checksum'):#06x} but the ROM's bytes "
                 f"sum to {computed:#06x}")
     return ""
-
-
-def discover_example_roms() -> list[Path]:
-    """Canonical corpus = one ROM per example *that has a main.c* (N_corpus=56).
-
-    Discovering via main.c (not a loose `*.sfc` glob) excludes stale build
-    residue like the source-less examples/graphics/effects/hdma_gradient/ that
-    inflated an earlier `.sfc` count to 57. One .sfc is expected per example dir.
-    """
-    roms: list[Path] = []
-    for main_c in sorted(REPO_ROOT.glob("examples/**/main.c")):
-        sfcs = sorted(main_c.parent.glob("*.sfc"))
-        if sfcs:
-            roms.append(sfcs[0])
-    return roms
 
 
 def sha256_file(path: Path) -> str:

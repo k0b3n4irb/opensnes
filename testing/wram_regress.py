@@ -52,10 +52,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from luna_runner import (  # noqa: E402
-    _pool_map, find_luna, discover_example_roms, example_key, load_manifest,
-    missing_firmware,
-)
+from lib import find_luna, discover_example_roms, example_key  # noqa: E402
+from luna_runner import _pool_map, load_manifest, missing_firmware  # noqa: E402
 
 BASELINE = HERE / "baselines" / "wram.json"
 FRAMES = 90   # consecutive vblank-aligned frames to hash

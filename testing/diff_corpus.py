@@ -33,10 +33,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from luna_runner import (  # noqa: E402
-    REPO_ROOT, capture_frames, discover_example_roms, example_key, find_luna,
-    load_manifest, missing_firmware,
-)
+from lib import REPO_ROOT, discover_example_roms, example_key, find_luna  # noqa: E402
+from luna_runner import capture_frames, load_manifest, missing_firmware  # noqa: E402
 
 
 def main() -> int:

@@ -31,13 +31,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from luna_runner import (  # noqa: E402  (reuse the harness's helpers)
-    find_luna,
-    discover_example_roms,
-    example_key,
-    load_manifest,
-    capture_frames,
-)
+from lib import find_luna, discover_example_roms, example_key  # noqa: E402
+from luna_runner import load_manifest, capture_frames  # noqa: E402
 
 VRAM_MAX = 65536   # bytes
 CGRAM_MAX = 256    # colours

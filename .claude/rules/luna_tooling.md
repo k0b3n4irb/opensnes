@@ -40,7 +40,7 @@ working reference, not a hunch.
   hand-rolled state differ.
 - **Not transitory (the thin orchestration layer):** the harness that merely
   *drives* luna and asserts on its outputs — `luna_runner.py`, `wram_regress.py`,
-  `budget.py`, `probes/*`. These call luna; they do not reimplement it. They are
+  `budget.py`, `lib/probes.py`. These call luna; they do not reimplement it. They are
   the pragmatic exception, and still shrink as luna exposes more. When in doubt:
   *am I asking luna and checking its answer (keep), or computing the answer luna
   should give (transitory)?*

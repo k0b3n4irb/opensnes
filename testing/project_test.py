@@ -45,11 +45,10 @@ from pathlib import Path
 # The SDK harness lives next to this file — reuse its luna resolution and
 # manifest helpers instead of duplicating them.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from luna_runner import LUNA_VERSION, find_luna, render, sha256_file  # noqa: E402
+from lib import LUNA_VERSION, assert_mem, find_luna  # noqa: E402
+from luna_runner import render, sha256_file  # noqa: E402
 from luna_runner import frame_points as steps_points  # noqa: E402  (same scalar-or-list normaliser)
 
-sys.path.insert(0, str(Path(__file__).resolve().parent / "probes"))
-from lib import assert_mem  # noqa: E402
 
 
 def load_project_manifest(test_dir: Path) -> dict:

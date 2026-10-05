@@ -40,7 +40,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from luna_runner import REPO_ROOT, find_luna  # noqa: E402
+from lib import REPO_ROOT, find_luna  # noqa: E402
 
 # Master cycles the handler may spend in its worst frame. NTSC VBlank is
 # ~51 800 mclk; the corpus worst measured 2026-09-17 is 8112 (games/breakout),

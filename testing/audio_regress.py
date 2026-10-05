@@ -36,7 +36,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from luna_runner import REPO_ROOT, LUNA_VERSION, find_luna  # noqa: E402
+from lib import REPO_ROOT, LUNA_VERSION, find_luna  # noqa: E402
 
 BASELINE = HERE / "baselines" / "audio.json"
 FRAMES = 300  # 5 s NTSC — past every driver's boot + sample upload

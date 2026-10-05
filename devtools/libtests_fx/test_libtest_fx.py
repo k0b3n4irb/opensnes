@@ -17,7 +17,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROM = HERE / "libtest_fx.sfc"
-sys.path.insert(0, str(HERE.parents[1] / "testing" / "probes"))
+sys.path.insert(0, str(HERE.parents[1] / "testing"))
 from lib import find_luna, assert_mem  # noqa: E402
 
 # snesmodInit uploads the driver and the module before anything else runs;

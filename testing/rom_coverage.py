@@ -59,11 +59,10 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "devtools" / "symmap"))
-from luna_runner import (  # noqa: E402
-    HERE, REPO_ROOT, LUNA_VERSION, capture_frames, discover_example_roms, example_key,
-    find_luna, firmware_dir, load_manifest, missing_firmware,
-)
+from lib import REPO_ROOT, LUNA_VERSION, discover_example_roms, example_key, find_luna, firmware_dir  # noqa: E402
+from luna_runner import capture_frames, load_manifest, missing_firmware  # noqa: E402
+from luna_runner import HERE  # noqa: E402
+sys.path.insert(0, str(REPO_ROOT / "devtools" / "symmap"))
 from symmap import SymbolTable, rom_bank  # noqa: E402  (mirror folding, one source of truth)
 
 HEADERS = REPO_ROOT / "lib" / "include" / "snes"

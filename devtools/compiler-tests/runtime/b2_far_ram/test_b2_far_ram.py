@@ -12,7 +12,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
-sys.path.insert(0, str(REPO / "testing" / "probes"))
+sys.path.insert(0, str(REPO / "testing"))
 from lib import find_luna, assert_mem  # noqa: E402
 
 ROM = HERE / "b2_far_ram.sfc"

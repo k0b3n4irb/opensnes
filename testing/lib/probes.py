@@ -18,14 +18,10 @@ import json
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 from typing import Union
 
-HERE = Path(__file__).resolve().parent
-REPO_ROOT = HERE.parent.parent
-sys.path.insert(0, str(HERE.parent))
-from luna_runner import find_luna  # noqa: E402  (reuse the binary resolver)
+from .luna import REPO_ROOT, find_luna  # noqa: F401  (re-exported for the probes' callers)
 
 # JOY1 button masks (matches luna --input / SNES joypad register).
 B, Y, SELECT, START = 0x8000, 0x4000, 0x2000, 0x1000

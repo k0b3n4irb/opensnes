@@ -12,7 +12,6 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROM = HERE / "libtest_dsp1.sfc"
-sys.path.insert(0, str(HERE.parents[1] / "testing" / "probes"))
 sys.path.insert(0, str(HERE.parents[1] / "testing"))
 from lib import find_luna, assert_mem  # noqa: E402
 from luna_runner import firmware_dir  # noqa: E402

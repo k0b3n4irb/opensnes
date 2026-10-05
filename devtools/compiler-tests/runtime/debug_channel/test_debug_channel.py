@@ -13,7 +13,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[3] / "testing" / "probes"))
+sys.path.insert(0, str(HERE.parents[3] / "testing"))
 from lib import find_luna  # noqa: E402
 
 ROM = HERE / "debug_channel.sfc"

@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
-sys.path.insert(0, str(REPO / "testing" / "probes"))
+sys.path.insert(0, str(REPO / "testing"))
 from lib import find_luna  # noqa: E402
 import lib as probelib  # noqa: E402
 ROM = HERE / "b2_deref.sfc"

@@ -34,7 +34,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from luna_runner import discover_example_roms, example_key, find_luna  # noqa: E402
+from lib import discover_example_roms, example_key, find_luna  # noqa: E402
 
 FRAMES = 200
 

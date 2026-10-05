@@ -27,7 +27,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from luna_runner import find_luna  # noqa: E402
+from lib import find_luna  # noqa: E402
 
 MANIFESTS = HERE / "manifests"
 # The three SNESMOD transitions whose race the 2026-09-26 sweep exposed.
