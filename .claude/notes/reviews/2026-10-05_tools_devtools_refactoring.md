@@ -725,3 +725,22 @@ golden d'un outil fusionné pointe sur les goldens de l'outil absorbé plutôt
 que d'en copier les octets. Suivant dans l'ordre du §10.5 : `opensnes-rom check`, qui retire les
 sept derniers appels Python de la build d'un utilisateur ; puis
 `opensnes-sprite` (gfx4snes -P + aseprite2snes), le plus gros.
+
+### Journal (suite, 2026-10-05, migration des exemples)
+
+- `tools/common/incfile.c` : les deux outils graphiques écrivent la colle
+  dans la langue d'`asset.h` (`<nom>_tiles/_pal/_map` + `DECLARE_*_ASSET`),
+  un fragment `_data.as` autoporteur (une `ASSET_SECTION` par bloc, parts de
+  32 Ko au-dessus d'une banque), `extern` nus pour LZ77 et les blocs coupés.
+  `assets_gen.asm` n'est plus qu'une liste d'`.include`.
+- `cli_path()` : une option `FILE` lue dans un fichier de réglages est
+  relative à ce fichier (le `palette = "town_fixed.pal"` du RPG), et
+  `--save` l'écrit ainsi. La convention était écrite, pas appliquée.
+- Un défaut de compilateur révélé par la colle incluse depuis deux fichiers
+  (statiques de portée fichier en labels globaux) : corrigé dans cproc,
+  voir le journal de la note sur les exemples.
+- Des 50 `data.asm` des exemples, 28 ont disparu, 13 ne portent plus que ce
+  qu'aucun outil ne convertit (cartes tmx2snes, tables HDMA et de sinus,
+  helpers asm, polices binaires, sections RAM) et 9 n'avaient rien à
+  convertir (images SPC700, `.brr` sans source, `.dat`, `.pic` sans PNG).
+  `opensnes-level` est la prochaine marche.

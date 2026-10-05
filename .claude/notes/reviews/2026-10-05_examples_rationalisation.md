@@ -226,3 +226,42 @@ la migration vers les fichiers de réglages qui retire 54 `data.asm`.
   comme sorties de build non suivies, donc `docs-strict` passait ici et pas
   là-bas. Corrigé ; `make clean` d'un dossier retiré avant son `git rm` est
   la bonne séquence.
+
+### Journal — la migration vers les fichiers de réglages (2026-10-05)
+
+- **Les `.inc` générés parlent la langue d'`asset.h`** : `opensnes-sprite`
+  et `opensnes-tileset` écrivent `<nom>_tiles` / `_pal` / `_map` (chacun
+  avec `_end`) et un `DECLARE_GFX_ASSET` / `DECLARE_BG_ASSET` prêt, donc
+  `#include "res/town.inc"` puis `bgLoad(0, &town, …)` est tout le
+  chargement. Un fragment `_data.as` porte une `ASSET_SECTION` par bloc,
+  et un bloc au-dessus de 32 Ko est découpé en parts (`_tiles`, `_tiles_1`),
+  ce que `mode3` et `hdma_wave` faisaient à la main. Un tileset LZ77 ou
+  découpé reçoit des `extern` nus, pas de bundle.
+- **Ordre tenu** : sprites (6), backgrounds (5), six catégories (14), mode7
+  (4), maps (4) + `sfx_from_wav`, games (7). Par exemple : la sortie
+  régénérée comparée octet à octet à celle de gfx4snes (`cmp` sur l'arbre
+  précédent), les pixels (fbhash), les manifestes, et pour chaque baseline
+  WRAM recapturée le diff octet par octet des deux ROM sur 300 trames
+  (`luna wram-trace`, toutes les pages que l'oracle hache, nommées par le
+  `.sym`) : à chaque fois des copies d'adresses d'assets déplacés
+  (`tcc__r9`, `oambuffer[].gfx`, `oamQueueEntry`, `sprit_val2`, le pointeur
+  de tileset du module map en bande FAR à $3809). Rien d'autre.
+- **Un défaut du compilateur trouvé par la migration** : deux fichiers C
+  d'un même projet ne pouvaient pas définir le même `static` de portée
+  fichier (label WLA global, « defined more than once ») ; `slope_collision`
+  l'a révélé en incluant `mario_sprite.inc` depuis deux fichiers. Corrigé
+  dans cproc (`name.<source>`), prouvé par 85 ROM identiques octet à octet,
+  une fixture liée (`static_dup`) et un cas de `test-compiler`.
+- **Deux erreurs de méthode corrigées en route** : la première version du
+  script de diff WRAM ignorait les pages au-dessus de la pile (il ne voyait
+  pas la bande FAR), et la justification écrite dans un message de commit
+  (« zéro trame diffère ») était fausse pour `aseprite_pipeline` : amendé
+  avant le push, et le script refait pour couvrir exactement ce que
+  l'oracle hache.
+- **Restent en `data.asm`, par nature** : tables HDMA et helpers asm
+  (`gradient_colors`, `perspective`, `hdma_wave`, les deux jeux Mode 7),
+  tables de sinus, cartes `.m16/.t16/.b16/.o16` (tmx2snes n'est pas encore
+  de la famille : `opensnes-level`), images SPC700 (`*.spc700.bin`), `.brr`
+  sans `.wav` source, `.dat` de breakout, polices binaires, sections RAM
+  de tetris, et les trois exemples sans source de conversion
+  (`mode5_hires`, `hicolor_1792`, `echo`).
