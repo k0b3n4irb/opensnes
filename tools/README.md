@@ -11,6 +11,7 @@ the **contributor** uses stays in the repository and never enters the zip.
 Built by `make tools`, installed in `bin/`, copied into every release zip.
 `make/common.mk` calls them on a user's `make`; each one prints `--help`,
 has a page under `docs/tools/`, and a golden-output suite under `tests/`
+written as a table of cases over [`tests/golden.py`](tests/golden.py)
 (`make test-tools` runs the eight suites; `tools/fuzz/` fuzzes their
 parsers).
 

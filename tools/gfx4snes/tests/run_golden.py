@@ -18,16 +18,15 @@ Run:  python3 tools/gfx4snes/tests/run_golden.py
 """
 from __future__ import annotations
 
-import filecmp
-import shutil
-import subprocess
+import struct
 import sys
 import tempfile
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
-TOOL = REPO / "bin" / "gfx4snes"
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
+from golden import Golden  # noqa: E402
+
+g = Golden("gfx4snes", __file__)
 
 # (fixture, flags, expected outputs — all byte-compared against golden/)
 CASES = [
@@ -89,15 +88,12 @@ def _read_pixels(path: Path):
 
 
 def run_roundtrip(fixture: str, flags: list[str], pixels: str) -> list[str]:
-    import struct
-    pal, rows = _read_pixels(HERE / "fixtures" / pixels)
+    pal, rows = _read_pixels(g.fixtures / pixels)
     with tempfile.TemporaryDirectory() as td:
         work = Path(td)
-        shutil.copy(HERE / "fixtures" / fixture, work / fixture)
-        proc = subprocess.run([str(TOOL), *flags, "-i", fixture], cwd=work,
-                              capture_output=True, text=True, timeout=60)
-        if proc.returncode != 0:
-            return [f"exit {proc.returncode}: {(proc.stderr or proc.stdout).strip()[:200]}"]
+        proc = g.run([*flags, "-i", fixture], work, copy=[fixture])
+        if g.failure(proc):
+            return [g.failure(proc)]
         base = fixture.rsplit(".", 1)[0]
         pic = (work / f"{base}.pic").read_bytes()
         palb = (work / f"{base}.pal").read_bytes()
@@ -146,72 +142,14 @@ REFUSED = [
 ]
 
 
-def run_refused(fixture: str, flags: list[str], needle: str) -> list[str]:
-    with tempfile.TemporaryDirectory() as td:
-        work = Path(td)
-        shutil.copy(HERE / "fixtures" / fixture, work / fixture)
-        proc = subprocess.run([str(TOOL), *flags, "-i", fixture],
-                              cwd=work, capture_output=True, text=True, timeout=60)
-        if proc.returncode == 0:
-            return ["accepted (exit 0) — must be refused"]
-        text = (proc.stderr or "") + (proc.stdout or "")
-        if needle not in text:
-            return [f"refused, but without '{needle}': {text.strip()[:160]}"]
-    return []
 
-
-def run_case(fixture: str, flags: list[str], outputs: list[str]) -> list[str]:
-    errs = []
-    with tempfile.TemporaryDirectory() as td:
-        work = Path(td)
-        shutil.copy(HERE / "fixtures" / fixture, work / fixture)
-        proc = subprocess.run([str(TOOL), *flags, "-i", fixture],
-                              cwd=work, capture_output=True, text=True, timeout=60)
-        if proc.returncode != 0:
-            return [f"exit {proc.returncode}: {(proc.stderr or proc.stdout).strip()[:200]}"]
-        for out in outputs:
-            got = work / out
-            want = HERE / "golden" / out
-            if not got.is_file():
-                errs.append(f"{out}: not produced")
-            elif not filecmp.cmp(got, want, shallow=False):
-                errs.append(f"{out}: differs from golden ({got.stat().st_size} vs "
-                            f"{want.stat().st_size} bytes)")
-    return errs
-
-
-def main() -> int:
-    if not TOOL.is_file():
-        sys.exit(f"ERROR: {TOOL} not found — run `make tools` first")
-    fails = 0
-    for fixture, flags, outputs in CASES:
-        errs = run_case(fixture, flags, outputs)
-        name = f"{fixture} [{' '.join(flags)}]"
-        if errs:
-            print(f"  FAIL {name}: " + "; ".join(errs))
-            fails += 1
-        else:
-            print(f"  PASS {name} ({len(outputs)} outputs match)")
-    for fixture, flags, needle in REFUSED:
-        errs = run_refused(fixture, flags, needle)
-        name = f"{fixture} [{' '.join(flags)}] refused"
-        if errs:
-            print(f"  FAIL {name}: " + "; ".join(errs))
-            fails += 1
-        else:
-            print(f"  PASS {name}")
-    for fixture, flags, pixels in ROUNDTRIP:
-        errs = run_roundtrip(fixture, flags, pixels)
-        name = f"roundtrip {fixture} [{' '.join(flags)}]"
-        if errs:
-            print(f"  FAIL {name}: " + "; ".join(errs))
-            fails += 1
-        else:
-            print(f"  PASS {name} (every pixel decodes to its source colour)")
-    total = len(CASES) + len(REFUSED) + len(ROUNDTRIP)
-    print(f"\ngfx4snes golden: {total - fails}/{total} ok")
-    return 1 if fails else 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+for fixture, flags, outputs in CASES:
+    g.expect_outputs(f"{fixture} [{' '.join(flags)}]", [*flags, "-i", fixture],
+                     copy=[fixture], outputs=outputs)
+for fixture, flags, needle in REFUSED:
+    g.expect_refused(f"{fixture} [{' '.join(flags)}] refused", [*flags, "-i", fixture],
+                     copy=[fixture], needles=[needle])
+for fixture, flags, pixels in ROUNDTRIP:
+    g.check(f"roundtrip {fixture} [{' '.join(flags)}]", "every pixel decodes to its source colour",
+            lambda fixture=fixture, flags=flags, pixels=pixels: run_roundtrip(fixture, flags, pixels))
+sys.exit(g.report())
