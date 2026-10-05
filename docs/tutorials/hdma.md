@@ -1,5 +1,9 @@
 # HDMA Tutorial {#tutorial_hdma}
 
+![hdma example](gradient_colors.png)
+
+*`examples/hdma/gradient_colors`: a COLDATA gradient written by HDMA, one colour step per scanline band.*
+
 This tutorial covers SNES HDMA (Horizontal-blanking DMA): what it is, when
 to reach for it, the four registers per channel, the eight transfer modes,
 and the per-scanline patterns the six shipped examples exercise. It

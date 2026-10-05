@@ -4,6 +4,12 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- docs: the five visual tutorials (Mode 7, colour math, window, mosaic,
+  HDMA) open on a screenshot of the example they teach from, taken from
+  the example's own README image (docs audit rec 10 — no tutorial had an
+  illustration).
+
 ### Fixed
 - ci(devtools): the commit lint exempts the release merge titled
   `release: vX.Y.Z`, the title the release workflow prescribes; the Lint

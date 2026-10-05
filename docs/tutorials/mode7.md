@@ -1,5 +1,9 @@
 # Mode 7 Tutorial {#tutorial_mode7}
 
+![mode7 example](perspective.png)
+
+*`examples/mode7/perspective`: the Mode 7 plane receding to a horizon, one HDMA-fed matrix per scanline.*
+
 This tutorial covers SNES Mode 7: what the affine background mode actually
 is, why its VRAM format is interleaved, the matrix maths the lib hides
 behind `mode7SetAngle`/`mode7SetScale`, and how the F-Zero / Pilotwings

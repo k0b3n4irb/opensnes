@@ -1,5 +1,9 @@
 # Mosaic Tutorial {#tutorial_mosaic}
 
+![mosaic example](mosaic.png)
+
+*`examples/transitions/mosaic`: the pixel-block effect mid-transition.*
+
 This tutorial covers the SNES PPU's mosaic effect: a hardware pixel-block
 filter that progressively enlarges the pixels of selected BG layers.
 Used canonically for **RPG battle transitions** (Final Fantasy IV–VI),

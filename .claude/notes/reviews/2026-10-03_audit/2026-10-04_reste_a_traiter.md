@@ -135,3 +135,5 @@ Aucun rapport n'est à zéro constat ouvert.
 - **B l.20, l.22, l.31** : fermés le 10-04 (ligne de la liste périmée) ; **B l.30** fermé (doc `fixMul`).
 - **D rec 12** fermé : les deux autres textes (`wram_regress.py`, `manifest.toml`) étaient déjà corrigés.
 - **G PF7, PF8** fermés ; **G PF10** partiel (rangée 24, note `dsp1b.bin`, chemins de sauvegarde déclarés non couverts).
+- **E PF6 / rec 10** fermé : une capture en tête des cinq tutoriels visuels.
+- **C rec 5** fermé : le troisième point est tenu par `ROM_BANKS_MAX` (voir `C_build_tools.md`).

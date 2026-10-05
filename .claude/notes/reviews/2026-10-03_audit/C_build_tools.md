@@ -158,3 +158,11 @@ Le système de build a fermé en une semaine presque tout ce que l'audit du 26/0
   tileset (le `.b16` et les ids venaient du premier seul) — avec un cas
   refusé chacun dans `run_golden.py` (patch de `town.tmj`) ; les deux
   goldens historiques inchangés. Documenté dans le README et la page outil.
+- **Rec 5, troisième point (« aucun symbole dans une banque non-ROM »)** :
+  tenu en amont plutôt que dans `symmap.py` — `ROM_BANKS_MAX` (`common.mk`,
+  correction de S1) borne le nombre de banques du lieur à ce que la carte
+  mappe en ROM (LoROM 126, HiROM / SA-1 / Super FX 64, DSP-1 32), donc
+  wlalink n'a aucune banque hors ROM à offrir à une section. Vérifié sur les
+  cinq types : les sections des ROM du dépôt sont toutes en banques 0..7
+  (repliées), plus la section de code en RAM `$7E` des Super FX, voulue.
+  Un contrôle `symmap` ferait doublon avec la borne ; rec 5 est fermée.
