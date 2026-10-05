@@ -697,6 +697,8 @@ suite est le §10.5 (conventions, `opensnes-sample`, `opensnes-rom check`).
 
 | `opensnes-rom check` | `b24ccda6`, `12894c64`, `99d1fd76` | les cinq vérifications post-link en C : lecteur de `.sym` (labels avec repli de banque, définitions, sections, ramsections), ratchet banque $00, bande RAM C et bande FAR, sentinelle data-init, lectures sans banque dans les `.c.asm`, graphe d'appels NMI, inventaire d'assets ; comparé aux scripts Python sur les 99 ROM construites : mêmes verdicts, mêmes chiffres ; `common.mk` l'appelle à la place des cinq ; il reste dans `common.mk` deux `python3` : l'aide 0.x derrière `command -v`, et `project_test.py` sous `make test` d'un projet |
 
+| `opensnes-sprite` | `aa21d513` | le gros morceau : `sheet` (feuille → tuiles en ordre VRAM OBJ, palette, `.inc`/`_data.as`, table `_meta.inc` avec `--metasprite W H`, `--flip`), `anim` (export Aseprite → `_anim.h`), `inspect`. Les modules de gfx4snes sont liés comme bibliothèque derrière un `diag.c` qui parle dans la forme de la famille ; le convertisseur d'aseprite2snes est devenu `anim.c` (chemin d'erreur par `longjmp`, crochet d'avertissement), que l'outil 0.x appelle lui-même — son golden est inchangé. Suite : chaque sortie `sheet` comparée aux goldens de gfx4snes octet pour octet, l'en-tête `anim` à celui d'aseprite2snes à partir de sa deuxième ligne (la première nomme le générateur), 13 cas. Hors périmètre, pour `opensnes-tileset` : le chemin « carte » de gfx4snes (`-m`, modes 1/5/6/7, `-a`, `-y`) |
+
 Deux fautes de ma main dans cette séance, à retenir : un enchaînement
 `&&` interrompu par une commande qui échouait a fait sauter en silence les
 éditions qui suivaient (le câblage d'`opensnes-rom` dans `tools/Makefile`,
