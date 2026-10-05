@@ -171,3 +171,14 @@ pointe de `develop` était vert, ce que le critère 2 de `release.md`
 demande. Critères de gel : 1, 3, 4, 6 tenus ; 2 en attente de votre mot
 sur le « bus factor » ; 5 (console) et 7 (fenêtre après la campagne)
 ouverts.
+
+**Avancement, 2026-10-05 (soir).** Campagne de chasse close : les constats
+d'audit qui ne dépendent pas du propriétaire sont traités (liste du 10-04,
+suivis datés dans chaque rapport), deux exemples à résultat visible pour
+les sauvegardes SA-1 et Super FX ajoutés (rangées 25 et 26 du protocole,
+pré-vol vert). **Critère 7 : fenêtre ouverte le 2026-10-05, fermeture au
+plus tôt le 2026-10-19** (quatre défauts trouvés et corrigés le 10-05 ; une
+nouvelle ligne au journal remet le compteur à zéro). Lots B à I du plan
+(retrait des alias, `hdmaEnable(channel)`, `dmaTransfer`, garde-fou
+`removed_api.txt`, macros 1.0.0) : à commencer sur `develop`.
+

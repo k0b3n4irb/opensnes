@@ -81,6 +81,20 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-05 | gfx4snes `-m`: the map entry's palette bank came from the tile's first pixel, and index 0 is transparent in every bank — a bank-2 tile starting transparent was drawn in bank 0's colours (63 of 64 pixels) | the build-tools audit's open question, measured with a pixel oracle on a four-tile image (`banks.png`); fixture `ROUNDTRIP` in the golden suite | `7a282da7` |
 | 2026-10-05 | gfx4snes `-a`: the palette rearrangement ran on the row-major image while the tiles had been converted before — `.pal` reordered, `.pic` on the old indices; `color/transparency`, the one user, decoded 51 056 of 52 509 opaque pixels to the wrong colour since the port (PVSnesLib's tool has the same order) | same oracle, 191 of 256 pixels on the fixture; the example decoded against its own `.bmp` | `7a282da7` |
 
+## Campaign closed — 2026-10-05
+
+The hunting campaign the plan of 2026-10-03 required before the window
+(the eight audit reports of 2026-10-03, the header-by-header reading, the
+tools pushed further) ends today: every owner-independent finding of
+`.claude/notes/reviews/2026-10-03_audit/2026-10-04_reste_a_traiter.md` is
+closed or handed to its owner (bus factor, assets, the five-argument
+functions, the console session). The table above holds the defects it
+found; the last four are dated today. **The fourteen-day window of
+criterion 7 opens today and closes no earlier than 2026-10-19**, and it
+restarts at every new row. The weekly effort it requires is the paragraph
+at the top of this file; the first weekly line is due by 2026-10-12.
+
+
 ## The hunting campaign
 
 Opened 2026-10-03. The fortnight starts the day it closes.

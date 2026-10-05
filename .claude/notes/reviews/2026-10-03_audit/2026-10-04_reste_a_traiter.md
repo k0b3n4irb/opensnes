@@ -142,3 +142,14 @@ Aucun rapport n'est à zéro constat ouvert.
 - **A PF3** fermé : ratchet `check_cproc_widths.py` dans `make lint` (la matrice de propriétés reste `d_quals`).
 - **C questions `-a` et palette du premier pixel** fermées : deux défauts mesurés et corrigés (oracle pixel dans les goldens).
 - **G PF5** fermé : géométries, drapeau de retard, sauvegarde en vol et PAL dans `libtests_gsu`.
+
+## Clôture — 2026-10-05
+
+Tout ce qui ne dépendait pas du propriétaire est traité (suivis datés dans
+`A_compiler.md` à `H_governance.md`) ; deux exemples de sauvegarde
+(`chips/sa1_save`, `chips/superfx_save`) couvrent le dernier trou matériel
+de G PF10. Restent au propriétaire : B PF9 (fonctions à plus de cinq
+arguments : exempter ou refondre), les assets PVSnesLib (F PF1), les portes
+1.0 datées (H PF14), le bus factor (H PF19, critère 2), les patches A5 et le
+blob SNESMOD (H PF16/17), le ménage des releases luna, et la session console
+(critère 5). La campagne est close ; la fenêtre du critère 7 s'ouvre.
