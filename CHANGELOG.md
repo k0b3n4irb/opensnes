@@ -125,6 +125,13 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **One author for every commit** (ci, devtools): Dependabot is gone
+  (`.github/dependabot.yml` removed, its PR #163 closed, the
+  `msys2/setup-msys2` bump it proposed applied by hand) and
+  `lint_commits.py` now checks the author and the committer of every
+  commit in a push range, and of the commit being made through the
+  `commit-msg` hook: the maintainer's identity only — no bot, no tool, no
+  `noreply` committer (`.claude/rules/commits.md`, "One author").
 - **The quantizer sorts deterministically** (tools): img2snes's median cut
   broke sort ties by whatever the C library's `qsort` did, so the same art
   quantized to different bytes on different OSes; the comparators now break

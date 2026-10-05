@@ -33,7 +33,8 @@
 
 `make hooks` sets `core.hooksPath` to `scripts/githooks/`, whose
 `commit-msg` hook runs `lint_commits.py --message-file` on every message
-and whose `pre-push` hook lints the pushed range exactly as the Lint
+(and on the author and committer identity of the commit being made) and
+whose `pre-push` hook lints the pushed range exactly as the Lint
 workflow will. Install it in every clone and every worktree you commit
 from. Two subjects with the type and scope swapped (`tools(build): …`,
 `756da353` and `0d30ec65`) reached `develop` on 2026-10-03 and 2026-10-04
@@ -53,6 +54,38 @@ on `main` was red after every release merge until then) — those subjects
 are wrappers around the contributor commits that are already in the same
 range and get linted individually. The body's `Co-Authored-By:` check still runs on them. This
 applies on every push including release-PR merges into `main`.
+
+## One author: the maintainer, in person (since 2026-10-06)
+
+Every commit on `develop` and `main` is **authored and committed by
+`k0b3n4irb <k0b3n4irb@gmail.com>`**. Nothing else writes to this history:
+
+- **no bot** — Dependabot, `github-actions[bot]`, any app. A change a bot
+  proposes is worth reading, not merging: the maintainer applies it by
+  hand and commits it as their own (the action pins of the workflows are
+  bumped this way, SHA and version comment together, when a bump is
+  wanted; `grep -rn 'uses:' .github/workflows` lists them);
+- **no tool identity** — no AI attribution in the author, the committer,
+  the subject, the body or a trailer (the `Co-Authored-By` rule below is
+  one case of this);
+- **no `noreply` address** — a commit made through GitHub's web editor or
+  its merge button carries `GitHub <noreply@github.com>` as committer; the
+  release merge is made locally and pushed (`release.md`).
+
+`devtools/lint_commits.py` checks the author and the committer of every
+commit in the pushed range (and, through the `commit-msg` hook, of the
+commit being made, from `git var GIT_AUTHOR_IDENT`); a bot, a noreply
+address or any other identity fails the Lint job. History before this
+date keeps two older spellings of the same person (`K0b3 <K0b3@nowhere.zz>`,
+`k0b3n4irb@nowhere.zz`); the lint reads a push range, never that history.
+
+Why, and when: Dependabot was switched on for the workflows' action pins on
+2026-09-15 (gaps review P6) without this rule being written, and opened six
+PRs under its own name — five against `main` by mistake, closed and
+re-applied by hand, then #163 against `develop` on 2026-10-05, which the
+owner found. `.github/dependabot.yml` is gone, #163 is closed and its bump
+applied by hand. A bot in the author column is the same breach as an AI
+trailer in the body: the project's history has one author.
 
 ## NEVER add Co-Authored-By trailers
 

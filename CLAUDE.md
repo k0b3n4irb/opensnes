@@ -92,6 +92,7 @@ include $(OPENSNES)/make/common.mk
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/) — `feat(scope):`, `fix(scope):`, `perf(scope):`, etc.
 - Scopes: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`
 - IMPORTANT: Do NOT add `Co-Authored-By` trailers for AI tools in commit messages.
+- IMPORTANT: every commit is authored and committed by the maintainer, `k0b3n4irb <k0b3n4irb@gmail.com>` — no bot (no Dependabot), no tool identity, no `noreply` committer. A bot's proposal is applied by hand (`.claude/rules/commits.md`, "One author").
 
 ## Critical Constraints
 
@@ -114,7 +115,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 
 The `.claude/rules/` directory contains mandatory rules automatically loaded by context:
 - `testing.md` — 2-pillar validation (luna + full rebuild), change classification (A/B/C/D)
-- `commits.md` — Never add Co-Authored-By trailers
+- `commits.md` — One author for every commit (the maintainer, no bot, no tool); never add Co-Authored-By trailers
 - `compiler.md` — Compiler architecture, build, constraints
 - `templates.md` — Templates & build system, memory layout, linker order
 - `new_example.md` — Example checklist: init order, Doxygen docs, README + screenshot mandatory

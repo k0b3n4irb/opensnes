@@ -21,6 +21,14 @@ Implements the rules documented in .claude/rules/commits.md:
   2. Body must NOT contain a `Co-Authored-By:` (or `Co-authored-by:`) trailer.
      The project does not want AI attribution in git history — see commits.md.
 
+  3. Author and committer are the maintainer, `k0b3n4irb <k0b3n4irb@gmail.com>`
+     (AUTHOR_NAME / AUTHOR_EMAILS below). No bot (`dependabot[bot]`,
+     `github-actions[bot]`), no `noreply` address, no tool: a change a bot
+     proposes is applied by hand and committed as the maintainer's own. In
+     --message-file mode the identity comes from `git var GIT_AUTHOR_IDENT`,
+     so the commit-msg hook refuses the commit before it exists
+     (2026-10-06, after Dependabot's PR #163 — see commits.md).
+
 Usage:
 
     python3 devtools/lint_commits.py <range>
@@ -89,11 +97,55 @@ ALLOWED_SCOPES = {
     "craft",
 }
 
+# The one identity every commit on develop and main carries (commits.md,
+# "One author"). History before 2026-10-06 holds two older spellings of the
+# same person (`K0b3 <K0b3@nowhere.zz>`, `k0b3n4irb@nowhere.zz`); the lint
+# runs on a push range, never on that history.
+AUTHOR_NAME = "k0b3n4irb"
+AUTHOR_EMAILS = {"k0b3n4irb@gmail.com"}
+
 SUBJECT_RE = re.compile(
     r"^(?P<type>[a-z]+)(?:\((?P<scope>[a-z0-9_/, -]+)\))?(?P<bang>!)?: (?P<desc>.+)$"
 )
 COAUTHOR_RE = re.compile(r"^\s*co-authored-by\s*:", re.IGNORECASE | re.MULTILINE)
 RELEASE_MERGE_RE = re.compile(r"^release: v\d+\.\d+\.\d+$")
+
+
+def check_identity(role: str, name: str, email: str) -> list[str]:
+    """The author or committer identity against the one the project allows."""
+    errors: list[str] = []
+    if name != AUTHOR_NAME or email not in AUTHOR_EMAILS:
+        who = f"{name} <{email}>"
+        why = "a bot" if "[bot]" in name else "a noreply address" if "noreply" in email else "not the maintainer's identity"
+        errors.append(
+            f"{role} is {who!r}: {why} — every commit is authored and committed by "
+            f"{AUTHOR_NAME} <{sorted(AUTHOR_EMAILS)[0]}> (.claude/rules/commits.md, One author)"
+        )
+    return errors
+
+
+def identities(sha: str) -> list[str]:
+    """Violations of the author's and committer's identity of one commit."""
+    out = subprocess.run(
+        ["git", "log", "-1", "--format=%an%x00%ae%x00%cn%x00%ce", sha],
+        check=True, capture_output=True, text=True,
+    ).stdout.strip("\n").split("\0")
+    if len(out) != 4:
+        return [f"cannot read the identities of {sha}"]
+    return check_identity("author", out[0], out[1]) + check_identity("committer", out[2], out[3])
+
+
+def pending_identity() -> list[str]:
+    """The identity of the commit being made (the commit-msg hook): `git var`."""
+    errors: list[str] = []
+    for role, var in (("author", "GIT_AUTHOR_IDENT"), ("committer", "GIT_COMMITTER_IDENT")):
+        ident = subprocess.run(["git", "var", var], capture_output=True, text=True).stdout.strip()
+        m = re.match(r"^(.*?) <([^>]*)> \d+ [+-]\d{4}$", ident)
+        if not m:
+            errors.append(f"cannot read the {role} identity (`git var {var}` said {ident!r})")
+            continue
+        errors += check_identity(role, m.group(1), m.group(2))
+    return errors
 
 
 def get_commits(rev_range: str) -> list[tuple[str, str]]:
@@ -234,6 +286,11 @@ def main() -> int:
             errors = check_body(body)
         else:
             errors = check_subject(subject) + check_body(body)
+        # Who made it: the maintainer, in person — a bot's PR is closed and its
+        # change re-applied by hand (commits.md, One author). The merge commits
+        # are held to it too: GitHub's web merge button would commit as
+        # `GitHub <noreply@github.com>`.
+        errors += pending_identity() if sha == "(message)" else identities(sha)
         if errors:
             failed += 1
             print(f"\n--- {sha[:12]}  {subject!r} ---")

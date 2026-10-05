@@ -17,7 +17,7 @@ Questions auxquelles tu dois répondre avec des chiffres :
 - **Dette de gouvernance** : règles contradictoires ou périmées entre `CLAUDE.md`, `.claude/rules/*`, `CONTRIBUTING.md`, l'agent `snes-engine-reviewer.md` (relève ses affirmations fausses : tailles d'entiers, Mesen2, harnais Node) ; notes de statut périmées (`.claude/notes/status/*` : dates, « pending » jamais fermés) ; entrées du catalogue sans mise à jour.
 - **Partenariat** (`.claude/rules/partners.md`, `.claude/notes/partners/`) : le cycle demande→réponse fonctionne-t-il (dates, délais, demandes servies vs ouvertes) ; ce qui est dû aujourd'hui (réponse luna du 25 sans réponse, pin 1.24→1.27 non fait, réponse snes-rag).
 - **Trajectoire v1.0** : le tableau de `ROADMAP.md` — pour chaque ligne, l'état réel (preuve) ; ce qui bloque encore ; une estimation honnête de la distance à 1.0 et des critères de gel d'API (D1-D5 en attente).
-- **Sécurité et conformité** : actions épinglées par SHA, dependabot, token dans `.env` (jamais committé ? `git log --all -- .env`, `.gitignore`), licences des sources vendues (`tools/common`, lodepng, stb, cute_tiled).
+- **Sécurité et conformité** : actions épinglées par SHA (bumps à la main : aucun bot n'écrit dans l'historique, `commits.md` « One author »), token dans `.env` (jamais committé ? `git log --all -- .env`, `.gitignore`), licences des sources vendues (`tools/common`, lodepng, stb, cute_tiled).
 
 
 ## Règles communes à tous les agents d'audit (non négociables)
