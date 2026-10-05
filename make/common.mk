@@ -698,7 +698,8 @@ endif
 # two-audiences rule). See docs/GETTING_STARTED.md ("Test your game").
 #------------------------------------------------------------------------------
 
-LUNA ?= $(OPENSNES)/testing/bin/luna
+# LUNA_BIN (the env override scripts/install-luna.sh honours) wins; the pinned install path otherwise
+LUNA ?= $(if $(LUNA_BIN),$(LUNA_BIN),$(OPENSNES)/testing/bin/luna)
 
 test test-update: $(TARGET)
 	@if ! ls test/*.toml >/dev/null 2>&1; then \

@@ -26,7 +26,7 @@ Every variable can also be set on the command line for one build:
 | `ASMSRC` | (none) | Extra 65816 assembly sources (data sections, hand-written routines) |
 | `GFXSRC` | (none) | PNG files converted by `gfx4snes` into `.pic` / `.pal` (+ a C header) at build time |
 | `SPRITE_SIZE` | `8` | Tile size passed to `gfx4snes -s` for the `GFXSRC` files |
-| `LUNA` | `$(OPENSNES)/testing/bin/luna` | The luna binary `make test` / `make test-update` run the project's `test/*.toml` with (`scripts/install-luna.sh` puts it there) |
+| `LUNA` | `$(OPENSNES)/testing/bin/luna` | The luna binary `make test` / `make test-update` run the project's `test/*.toml` with (`scripts/install-luna.sh` puts it there); a `LUNA_BIN` in the environment, the installer's own override, takes precedence |
 | `SPCSRC` | (none) | SPC700 assembly (`*.spc700.asm`), assembled with `wla-spc700` into a `.spc700.bin` your 65816 code `.incbin`s |
 | `GSUSRC` | (none) | Super FX assembly (`*.sfx`), assembled with `wla-superfx` into a `.sfx.bin` (needs `USE_SUPERFX := 1`) |
 
