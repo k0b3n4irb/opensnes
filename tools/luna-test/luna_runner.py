@@ -204,15 +204,18 @@ def liveness(state: dict) -> tuple[bool, str]:
 
 
 def header_problem(state: dict) -> str:
-    """The ROM header as luna read it: the size byte must cover the file and
-    the checksum complement must match (build audit 2026-10-03, rec 5).
+    """The ROM header as luna read it: the size byte must cover the file,
+    the checksum complement must match, and — when luna gives it — the
+    header's sum must equal the sum of the bytes (build audit 2026-10-03,
+    rec 5).
 
     A size byte below the file makes a flash cart or an emulator map only
     part of the ROM; wlalink derives both from `.ROMBANKS`, so a mismatch
     means the memory map and the header disagree. luna's `checksum_valid`
-    only checks checksum XOR complement == 0xFFFF, not the sum of the bytes
-    (measured 2026-10-05: a flipped byte at $0100 stays `true`), so this is
-    a consistency check, not proof the sum is right — OPEN_luna.md."""
+    only says checksum XOR complement == 0xFFFF (a changed byte at $0100
+    keeps it true, measured 2026-10-05); luna's develop (39359de, after
+    v1.32.0) adds `checksum_computed`, the 16-bit sum of the image with the
+    usual mirroring of a non-power-of-two tail. Absent on v1.32.0: skipped."""
     rom = state.get("rom") or {}
     size_kb = rom.get("header_rom_size_kb")
     nbytes = rom.get("rom_bytes")
@@ -221,6 +224,10 @@ def header_problem(state: dict) -> str:
     if rom.get("checksum_valid") is False:
         return (f"header: checksum {rom.get('checksum'):#06x} and complement "
                 f"{rom.get('checksum_complement'):#06x} do not match")
+    computed = rom.get("checksum_computed")
+    if computed is not None and rom.get("checksum") != computed:
+        return (f"header: checksum {rom.get('checksum'):#06x} but the ROM's bytes "
+                f"sum to {computed:#06x}")
     return ""
 
 

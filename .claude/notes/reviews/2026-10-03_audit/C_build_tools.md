@@ -146,3 +146,10 @@ Le système de build a fermé en une semaine presque tout ce que l'audit du 26/0
 - **Rec 8 (lignes partenaires)** : luna, `checksum_valid` ci-dessus ;
   snes-rag, la carte mémoire SA-1 était déjà dans `OPEN_snes-rag.md`
   depuis le 10-04.
+- **Rec 5, suite (même jour)** : luna a ajouté `rom.checksum_computed` sur
+  son `develop` (`39359de`) le jour même de la demande ; `header_problem`
+  compare l'en-tête à cette somme dès que le champ existe (absent sur la
+  v1.32.0 épinglée : ignoré). Contrôle sur leur binaire : la copie altérée
+  de `print_string.sfc` est refusée (`0xAF40` ≠ `0xB01F`), l'originale
+  passe, le corpus passe. La somme est donc couverte à la prochaine
+  épingle ; reste « aucun symbole dans une banque non-ROM ».
