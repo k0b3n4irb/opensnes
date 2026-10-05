@@ -40,9 +40,10 @@
  * expands to extern decls for <name>_tiles / <name>_pal / <name>_map
  * (with their _end siblings) plus a static const BgAsset value. The
  * data symbols themselves live in data.asm. */
-DECLARE_BG_ASSET(bg1, BG_16COLORS, SC_32x32);
-DECLARE_BG_ASSET(bg2, BG_16COLORS, SC_32x32);
-DECLARE_BG_ASSET(bg3, BG_16COLORS, SC_32x32);
+#include "res/BG1.inc"
+#include "res/BG2.inc"
+#include "res/BG3.inc"
+/* generated: DECLARE_BG_ASSET(BG1 / BG2 / BG3, BG_16COLORS, SC_32x32) and the arrays behind them */
 
 /**
  * @brief Entry point -- load 3 BG layers and display with BG3 high priority
@@ -66,13 +67,13 @@ int main(void) {
     WaitForVBlank();
 
     /* BG1: tiles at $2000, map at $0000, palette slot 2 */
-    bgLoad(0, &bg1, 2, 0x2000, 0x0000);
+    bgLoad(0, &BG1, 2, 0x2000, 0x0000);
 
     /* BG2: tiles at $3000, map at $0400, palette slot 4 */
-    bgLoad(1, &bg2, 4, 0x3000, 0x0400);
+    bgLoad(1, &BG2, 4, 0x3000, 0x0400);
 
     /* BG3: tiles at $4000, map at $0800, palette slot 0 (HUD overlay) */
-    bgLoad(2, &bg3, 0, 0x4000, 0x0800);
+    bgLoad(2, &BG3, 0, 0x4000, 0x0800);
 
     /* Mode 1 with BG3 high priority — BG3 renders on top of BG1+BG2 */
     setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);

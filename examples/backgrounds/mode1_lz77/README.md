@@ -24,8 +24,8 @@ LZ77 is a dictionary-based compression algorithm that replaces repeated byte
 sequences with back-references (offset + length pairs). The LZSS variant used
 here stores a header with the uncompressed size, followed by flag bytes that
 indicate whether the next chunk is a literal byte or a back-reference. The
-`gfx4snes` tool generates LZ77-compressed tile data when invoked with the `-z`
-flag. The OpenSNES library provides `lzssDecodeVram()` which decompresses
+`opensnes-tileset` converter writes LZ77-compressed tile data when the settings
+file says `lz = true`. The OpenSNES library provides `lzssDecodeVram()` which decompresses
 directly into VRAM via the PPU data port ($2118/$2119), avoiding the need for a
 large RAM buffer.
 
@@ -110,8 +110,9 @@ while (1) {
 ```
 mode1_lz77/
 ├── main.c        — Decompression, VRAM setup, display
-├── data.asm      — ROM data: compressed tiles (.pic), tilemap (.map), palette (.pal)
-├── Makefile      — Build configuration (gfx4snes with -z flag for LZ77)
+├── res/opensnes.png.toml — import settings (opensnes-tileset, `lz = true`): the build converts
+│                       the picture to compressed tiles, tilemap and palette, and links them
+├── Makefile      — Build configuration (no conversion rule: the settings file drives it)
 └── res/
     └── pvsneslib.png — Source image (converted to LZ77-compressed 4bpp tiles)
 ```

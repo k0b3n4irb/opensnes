@@ -41,7 +41,7 @@
  * in data.asm.
  *============================================================================*/
 
-DECLARE_BG_ASSET(bg, BG_16COLORS, SC_32x32);
+#include "res/opensnes.inc"   /* generated: DECLARE_BG_ASSET(opensnes, BG_16COLORS, SC_32x32) and the arrays behind it */
 
 /**
  * @brief Entry point -- load a 4bpp tileset and display a static Mode 1 image
@@ -66,7 +66,7 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     /* BG1: tiles at $4000, tilemap at $0000, palette at slot 0 */
-    bgLoad(0, &bg, 0, 0x4000, 0x0000);
+    bgLoad(0, &opensnes, 0, 0x4000, 0x0000);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode
