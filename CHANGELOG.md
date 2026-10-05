@@ -64,14 +64,23 @@ freeze criterion that waits for hardware.
 - **The build converts assets from their settings files** (build): every
   `<asset>.toml` that names an `opensnes-*` tool is converted before the
   first object (`ASSET_TOML`, one `.done` stamp per file), and the
-  `<stem>_data.as` fragments the tools write are gathered into
-  `assets_gen.asm` — one `ASSET_SECTION` of `.incbin` lines. The
+  `<stem>_data.as` fragments the tools write are included by
+  `assets_gen.asm`. The
   `starter/` and `examples/sprites/aseprite_pipeline` are built this way:
   no `data.asm`, no conversion rule in the Makefile, the symbols
-  (`player_til`, `hero_til`…) come from the generated `.inc`.
+  (`player_tiles`, `hero_tiles`…) come from the generated `.inc`.
   `opensnes-sample encode` writes its `_data.as` fragment too, and its
   `.h` declares the `extern` symbols. A hand-written `data.asm` and the
   `GFXSRC` rule keep working.
+  The glue speaks `asset.h`: `res/<name>.inc` declares
+  `<name>_tiles` / `<name>_pal` / `<name>_map` (each with `_end`) and a
+  ready `DECLARE_GFX_ASSET` / `DECLARE_BG_ASSET`, so `#include
+  "res/town.inc"` then `bgLoad(0, &town, …)` is the whole load; every
+  `<name>_data.as` carries one `ASSET_SECTION` per blob, a blob above 32 KB
+  is cut in bank-sized parts (`<name>_tiles`, `<name>_tiles_1`), and an
+  LZ77 or cut tileset gets plain `extern`s instead of a bundle. A `FILE`
+  option read from a settings file (`palette = "town.pal"`) is relative to
+  that file, and `--save` writes it that way.
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
   counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
   RAM: each power-on reads the saved value, adds one, saves and prints both.
@@ -81,6 +90,19 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- refactor(examples): 28 of the 50 hand-written `data.asm` are gone and 13
+  more hold only what no tool converts (tmx2snes levels, HDMA and sine
+  tables, assembly helpers, binary fonts, RAM sections): 43 examples convert
+  their pictures, sheets and samples from a `res/<asset>.toml` beside each
+  source (`opensnes-tileset`, `opensnes-sprite`, `opensnes-sample`) and
+  include the generated `.inc`. Every regenerated output is byte-identical
+  to the old tool's and every ROM draws the same pixels; the WRAM baselines
+  that moved did so by the copies of relocated asset addresses, checked byte
+  by byte (`luna wram-trace`).
+- docs(examples): the learning ladder of `examples/README.md` is numbered
+  1 to 55 in reading order (the lettered rungs `15c…15n`, `22b`, `42c…42g`
+  were the order of the additions); thirteen READMEs put the lesson before
+  the build command.
 - **The SDK zip holds only what a project build needs** (build): no built
   examples and no generated HTML inside it any more. Compressed, they were
   14 MB of a 40 MB archive (v0.46.0, linux arm64), re-shipped for every
@@ -151,6 +173,12 @@ freeze criterion that waits for hardware.
   illustration).
 
 ### Removed
+- Five examples whose lesson another one already taught (examples
+  rationalisation, `.claude/notes/reviews/2026-10-05_examples_rationalisation.md`):
+  `input/move_sprite` (two_players), `color/hicolor_blend` (hicolor_1792),
+  `color/gradient_9bit` (hdma/gradient_colors), `backgrounds/mode5`
+  (mode5_hires), `basics/random` (the lib's `rand`); each absorber's README
+  carries what the retired folder said. 91 → 86 examples.
 - The twenty-six renamed functions (lot C of the 1.0 plan), with their
   bodies and fixture vectors: `audioUpdate`, `colorMathEnable`,
   `consoleInitEx`, `getRegion`, `rand`, `srand`, `dmaCopyVramBank`,
