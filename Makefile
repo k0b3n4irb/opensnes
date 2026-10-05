@@ -600,7 +600,7 @@ docs-strict: docs
 # Release packaging
 #------------------------------------------------------------------------------
 
-release: all docs
+release: all
 	@echo ""
 	@echo "=========================================="
 	@echo "Creating OpenSNES SDK release package..."
@@ -610,7 +610,6 @@ release: all docs
 	@mkdir -p $(RELEASE_DIR)/opensnes/lib
 	@mkdir -p $(RELEASE_DIR)/opensnes/make
 	@mkdir -p $(RELEASE_DIR)/opensnes/templates
-	@mkdir -p $(RELEASE_DIR)/opensnes/docs
 	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
 	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
@@ -637,10 +636,12 @@ release: all docs
 	@for f in $(RELEASE_DEVTOOLS); do \
 		mkdir -p $(RELEASE_DIR)/opensnes/$$(dirname $$f) && cp $$f $(RELEASE_DIR)/opensnes/$$f || exit 1; \
 	done
-	@cp -r examples $(RELEASE_DIR)/opensnes/examples/
-	@mkdir -p $(RELEASE_DIR)/opensnes/examples/bin
-	@find $(RELEASE_DIR)/opensnes/examples -path "*/bin" -prune -o -name "*.sfc" -exec cp {} $(RELEASE_DIR)/opensnes/examples/bin/ \;
-	@cp -r docs/build/html $(RELEASE_DIR)/opensnes/docs/ 2>/dev/null || true
+	@# No examples and no generated HTML in the SDK zip (2026-10-05, the
+	@# two-audiences rule): the examples ship once, for every OS, as
+	@# opensnes-examples_<version>.zip (`make release-examples`), and the
+	@# documentation is published online from `main` (deploy_docs.yml).
+	@# Compressed, they were 14 MB of a 40 MB zip (v0.46.0 arm64), re-shipped
+	@# four times; the 17 static binaries of bin/ are the 23 MB that remain.
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
@@ -661,6 +662,20 @@ release: all docs
 	@echo "=========================================="
 	@echo "Release created: $(RELEASE_DIR)/$(RELEASE_NAME).zip"
 	@echo "=========================================="
+
+# The examples archive: the tracked sources and assets of every example,
+# plus the ROMs built in this tree under examples/bin/. One archive per
+# version, not per OS — nothing in it is platform-specific.
+EXAMPLES_NAME := opensnes-examples_$(VERSION)
+release-examples: examples
+	@rm -rf $(RELEASE_DIR)/$(EXAMPLES_NAME) $(RELEASE_DIR)/$(EXAMPLES_NAME).zip
+	@mkdir -p $(RELEASE_DIR)/$(EXAMPLES_NAME)/examples/bin
+	@git ls-files examples | tar -cf - -T - | tar -xf - -C $(RELEASE_DIR)/$(EXAMPLES_NAME)
+	@find examples -path "*/bin" -prune -o -name "*.sfc" -exec cp {} $(RELEASE_DIR)/$(EXAMPLES_NAME)/examples/bin/ \;
+	@cp README.md LICENSE ATTRIBUTION.md $(RELEASE_DIR)/$(EXAMPLES_NAME)/
+	@cd $(RELEASE_DIR) && zip -q -r $(EXAMPLES_NAME).zip $(EXAMPLES_NAME)
+	@rm -rf $(RELEASE_DIR)/$(EXAMPLES_NAME)
+	@echo "Examples archive: $(RELEASE_DIR)/$(EXAMPLES_NAME).zip ($$(ls examples/*/*/*.sfc examples/*/*/*/*.sfc 2>/dev/null | wc -l) ROMs)"
 
 # Consume the release zip the way a user does: extract it, build the
 # starter and a scaffolded project, run the project test when luna is here.
@@ -705,7 +720,8 @@ help:
 	@echo "  examples  - Build all example ROMs"
 	@echo "  tests     - Build test ROMs"
 	@echo "  docs      - Generate API documentation (requires doxygen)"
-	@echo "  release   - Create SDK release package (zip)"
+	@echo "  release   - Create the SDK release zip (toolchain, tools, lib, make, templates, starter; no examples, no HTML)"
+	@echo "  release-examples - Create the examples archive (sources, assets, built ROMs), one per version"
 	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  check-upgrade SRC=<dir> - List the names 1.0 removes, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"

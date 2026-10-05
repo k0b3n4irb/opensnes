@@ -26,6 +26,29 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **The SDK zip holds only what a project build needs** (build): no built
+  examples and no generated HTML inside it any more. Compressed, they were
+  14 MB of a 40 MB archive (v0.46.0, linux arm64), re-shipped for every
+  OS; the examples now ship once per version as
+  `opensnes-examples_<version>.zip` (`make release-examples`: sources,
+  assets, every ROM built, 4 MB) and the documentation is the online site.
+  What remains is the seventeen static binaries of `bin/` (23 MB
+  compressed) and the library; `release_smoke.py` still proves the zip
+  builds the starter and a scaffolded project.
+- **A user build no longer runs Python for the ROM-size header bytes**
+  (build): `ROMSIZE` and the Super FX RAM size are shell arithmetic in
+  `make/common.mk`, and the 0.x-name hint on a compile error is skipped
+  when `python3` is absent. Eight `python3` calls remain on a user's
+  `make` (the post-link checks); they are to be replaced by a compiled
+  `opensnes-rom check` under the two-audiences rule
+  (`.claude/rules/two_audiences.md`): the game developer gets compiled
+  tools and no interpreter, the contributor keeps the Python.
+- **Contributor tooling tidied** (devtools, luna-test): `tools/README.md`
+  and `devtools/README.md` describe the files that exist and who runs
+  them; `make test-devtools` runs the six unit tests of the sentinels and
+  the harness locally, as `lint.yml` does; the orphaned generators
+  (`gen_hud_bar`, `brr2it`, the Python `font2snes`, `hicolor64hires`) and
+  the one-shot MCP prototypes are gone.
 - **`dmaTransfer(channel, mode, src, destReg, size)` takes the source as
   one far pointer** (lot F of the 1.0 plan): the bank comes from the
   pointer, like every `dmaCopy*` helper; the six-argument form of 0.x no

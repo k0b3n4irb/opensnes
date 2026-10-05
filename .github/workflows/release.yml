@@ -228,6 +228,19 @@ jobs:
           name: opensnes-${{ steps.version.outputs.tag }}-${{ matrix.name }}-${{ matrix.arch }}
           path: release/opensnes_${{ steps.version.outputs.tag }}_${{ matrix.name }}_${{ matrix.arch }}.zip
 
+      # The examples archive is platform-independent (sources, assets, the
+      # ROMs this leg built): one leg produces it, once per version.
+      - name: Build the examples archive (Linux x86_64)
+        if: matrix.name == 'linux' && matrix.arch == 'x86_64'
+        run: make release-examples VERSION=${{ steps.version.outputs.tag }}
+
+      - name: Upload the examples archive (Linux x86_64)
+        if: matrix.name == 'linux' && matrix.arch == 'x86_64'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: opensnes-examples-${{ steps.version.outputs.tag }}
+          path: release/opensnes-examples_${{ steps.version.outputs.tag }}.zip
+
   # ------------------------------------ #
   # Create GitHub Release                #
   # ------------------------------------ #
@@ -276,6 +289,11 @@ jobs:
           | **Linux** | \`opensnes_${TAG}_linux_arm64.zip\` | arm64 (aarch64) |
           | **macOS** | \`opensnes_${TAG}_darwin_arm64.zip\` | arm64 (Apple Silicon) |
           | **Windows** | \`opensnes_${TAG}_windows_x86_64.zip\` | x86_64 (MSYS2 UCRT64) |
+          | **Examples** | \`opensnes-examples_${TAG}.zip\` | all platforms: the 91 examples' sources, assets and built ROMs |
+
+          The SDK zip holds what a project build needs (toolchain, asset tools,
+          library, build system, starter). The documentation is online at
+          https://k0b3n4irb.github.io/opensnes/ — it is no longer inside the zip.
 
           ### Quick start
 
@@ -299,3 +317,4 @@ jobs:
             artifacts/opensnes-${{ steps.tag.outputs.version }}-linux-arm64/opensnes_${{ steps.tag.outputs.version }}_linux_arm64.zip
             artifacts/opensnes-${{ steps.tag.outputs.version }}-darwin-arm64/opensnes_${{ steps.tag.outputs.version }}_darwin_arm64.zip
             artifacts/opensnes-${{ steps.tag.outputs.version }}-windows-x86_64/opensnes_${{ steps.tag.outputs.version }}_windows_x86_64.zip
+            artifacts/opensnes-examples-${{ steps.tag.outputs.version }}/opensnes-examples_${{ steps.tag.outputs.version }}.zip

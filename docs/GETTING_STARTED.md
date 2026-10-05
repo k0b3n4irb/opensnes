@@ -72,16 +72,22 @@ Download the latest release for your platform from the
 | Windows x86_64 | `opensnes_<version>_windows_x86_64.zip` |
 
 Extract the archive somewhere permanent (e.g., `~/opensnes` or `C:\opensnes`).
+It holds what a project build needs: the toolchain and asset tools in `bin/`,
+the library, the build system, the starter project. The documentation you
+are reading is online at https://k0b3n4irb.github.io/opensnes/ and the
+examples come as a separate, platform-independent archive on the same
+releases page: `opensnes-examples_<version>.zip` (sources, assets, and
+every ROM already built under `examples/bin/`).
 
 ### A4. Run Your First ROM
 
-The SDK comes with pre-built example ROMs:
+Extract the examples archive next to the SDK and pick a ROM:
 
 ```bash
-cd opensnes/examples/text/print_string
+cd opensnes-examples_<version>/examples/text/print_string
 
 # Play it in luna's window (install it once from the SDK root: scripts/install-luna.sh)
-../../../tools/luna-test/bin/luna-gui print_string.sfc
+~/opensnes/tools/luna-test/bin/luna-gui print_string.sfc
 ```
 
 > Any other SNES emulator opens the `.sfc` as well (Mesen, bsnes, Snes9x —
