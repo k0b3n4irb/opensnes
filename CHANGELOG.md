@@ -543,11 +543,10 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
-- docs: seven green entries of `KNOWN_LIMITATIONS.md` now name the test
-  that pins them (vertical scroll -1, data-init terminator, SA-1 SIWP
-  polarity, chips under luna, `int`/`long` sizes, 4-byte pointers, the
-  HiROM header size), and `devtools/compiler-tests/cases/type_sizes.c`
-  pins every type size with a `_Static_assert` (docs audit PF9).
+- test(luna-test): `baselines.json` re-captured under the pinned luna
+  (v1.32.0): the 89 frame hashes are unchanged, the `luna_version` and
+  `rom_sha256` fields no longer say v1.21.0 for 58 entries (testing audit
+  PF10, rec 12).
 - test(luna-test): the eight input manifests that only asserted a
   direction (`increased` / `changed`) now also assert the measured value
   at every checkpoint and the image at the end of the script (`fbhash`):

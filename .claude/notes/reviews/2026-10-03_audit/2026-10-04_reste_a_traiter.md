@@ -130,3 +130,5 @@ Aucun rapport n'est à zéro constat ouvert.
 - **B PF10** fermé : section « What does not exist » du guide de migration.
 - **D T7 / T10** fermés : valeurs mesurées et image de fin de script dans les huit manifestes « delta ».
 - **C S15** fermé : trois refus dans tmx2snes avec contrôles négatifs.
+- **E PF9** fermé : test nommé dans les sept entrées vertes ; entrée `data_init_end` corrigée et gardée par `--check-data-init`.
+- **D PF10** fermé : baselines recapturées sous la v1.32.0 (hachages inchangés).

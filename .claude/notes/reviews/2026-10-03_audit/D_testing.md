@@ -192,3 +192,7 @@ Comme filet contre la régression, l'appareil de test est au niveau d'un SDK 1.0
   --input … --peek`) en plus de la direction, et l'image de fin de script
   (`[asserts] fbhash`, mesurée avec `--print-fbhash` à la même frame) ; 8/8
   verts. `state_scene_stack` était déjà sur une assertion de valeur.
+- **PF10 / rec 12 (`luna_version` à v1.21.0)** : `luna_runner.py --update`
+  rejoué sous la v1.32.0 épinglée : 89 hachages identiques, champs
+  `luna_version` et `rom_sha256` à jour. Les deux autres textes de la rec 12
+  (`wram_regress.py:258`, `manifest.toml:19`) restent à relire.
