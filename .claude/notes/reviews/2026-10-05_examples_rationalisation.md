@@ -137,3 +137,46 @@ jeux en dernier parce que leurs assets sont les plus nombreux.
   l'échelle numérotée avec ses marches `15c…15n`, `22b`, `42c…42g`) :
   l'échelle est à renuméroter d'un bloc une fois les fusions faites, pas
   marche par marche.
+
+## 6. Le défi (même jour) : ce que les données ont contredit
+
+Le propriétaire a validé la proposition en me demandant de la remettre en
+cause. Je l'ai fait avec des mesures : pour chaque fusion, les appels de la
+lib que le candidat fait et que l'absorbant ne fait pas, ses manifestes et
+ce qu'ils affirment, les pages qui le citent. Verdict : **huit des vingt-
+cinq fusions ne tiennent pas**, et une change d'absorbant.
+
+| Fusion proposée | Ce que les données disent | Décision |
+|---|---|---|
+| `speech_synth`, `play_noise`, `pitch_mod` → `soundboard` | ils tournent sur le chemin APU **brut** (`apuUpload` / `apuExecute`, un programme SPC700 à eux) ; `soundboard` est le moteur audio v2 en C pur. Trois fonctions du S-DSP différentes, pas une répétition | **retirée** ; ils sont du niveau « sous le capot » et pourraient rejoindre `fundamentals/` un jour, c'est une autre question |
+| `echo` → `soundboard` | `echo` est bien sur le moteur v2 (`audioPlaySample`) et `soundboard` annonce déjà l'écho dans ses concepts | **gardée** |
+| `timer` → `game_skeleton` | `timer` est la démo du module `gameloop` (`gameLoopRun`), cité par `tutorials/framework.md` et `API_INDEX.md` ; `game_skeleton` ne l'utilise pas | **retirée** |
+| `mapandobjects` → `likemario` | `likemario` n'utilise pas le moteur de carte ; mais `maps/slope_collision` fait exactement les mêmes appels de la lib (ensemble identique) et ajoute les pentes | **gardée, absorbant corrigé** : `slope_collision` ; `tutorials/object.md` à réécrire vers lui |
+| `map_scroll` → `tiled` | sept pages citent `map_scroll` (le tutoriel `map`, `camera`, `tiles-to-levels`, l'index d'API) ; sept citent `tiled` | **retirée** : deux leçons canoniques, la fusion coûterait quatorze réécritures pour un gain d'un dossier |
+| `mixed_scroll` → `parallax_scroll` | `mixed_scroll` est le défilement à deux couches par `bgSetScroll`, `parallax_scroll` le fait par HDMA : deux mécanismes, et cinq pages citent le premier | **retirée** |
+| `dynamic_metasprite` → `dynamic_sprite` | seule démo de `oamMetaDrawDyn` / `oamDynamicDrainQueue` ; deux manifestes épinglent OBSEL et INIDISP | **retirée** ; son README nu est à écrire |
+| second niveau : `sprite_sizes`, `mosaic`, `superfx_hello`, `hdma_indirect_gradient`, `scroll_message` | chacun a une API ou un manifeste que personne d'autre ne porte, ou une place dans l'échelle lue par les débutants | **retirées**, toutes les six (`dynamic_map` incluse) |
+
+### La liste révisée (13 fusions, 91 → 78)
+
+`snesmod_music_large` → `snesmod_music` · `echo` → `soundboard` ·
+`mode1_bg3_priority` → `mode1` · `mode5` → `mode5_hires` · `mode4` →
+`mode2` · `random` → `game_skeleton` · `fix32_orbit` → `aim_target` ·
+`sa1_hello` → `sa1_starfield` · `hicolor_blend` → `hicolor_1792` ·
+`gradient_9bit` → `gradient_colors` · `mapandobjects` → `slope_collision` ·
+`move_sprite` → le `starter/` · `perspective` → `rotate_scale`.
+
+C'est 14 %, pas 30 %. L'intuition du propriétaire visait juste sur la
+*forme* (treize README sans leçon, dix portages krom posés côte à côte,
+des catégories qui ont poussé par accrétion) ; la mesure dit que le
+*contenu* se recoupe moins qu'il n'y paraît, parce que les exemples qui se
+ressemblent exercent souvent des fonctions différentes de la lib. Le vrai
+gain de lisibilité viendra autant des README écrits et de l'échelle
+renumérotée que des suppressions.
+
+### Journal
+
+- `move_sprite` retiré (le `starter/` est ce programme) : dossier, manifeste
+  `movement_move_sprite.toml`, baselines fbhash et WRAM, les six pages et
+  le compte (`91` → `90` dans huit fichiers, le sentinel en a trouvé trois
+  de plus dans `ROADMAP.md`).
