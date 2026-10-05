@@ -137,3 +137,11 @@ Le Super FX a rattrapé l'écart du 26/09 (vrai runtime testé avec contrôles n
   de `sd2snes-changelog` — rejoué ce jour, seul `99d8550526ffa29f` remonte —,
   choix `dsp1.bin`/`dsp1b.bin` du FXPak, `snes_verify` sur MS0), chacune
   avec sa commande ou sa requête.
+- **PF5 (reste), fermé** : `libtests_gsu` exerce `gsuFrameBytes()` sur
+  toutes les géométries (H128/H160/H192 × 2/4/8 bpp, OBJ → 0), le refus de
+  deux frames de 48 Ko dans 64 Ko, une vraie présentation H160 (marqueurs
+  au dernier octet et à l'octet suivant, lus en VRAM à `$E7FF`/`$E800`),
+  `GSU_PRESENT_ON_LAG_FRAMES` (fil principal qui ne se gare jamais pendant
+  30 frames : la frame reste en vol sans le drapeau, atterrit avec), une
+  sauvegarde pendant une présentation, et le manifeste rejoué sous
+  `region = "pal"` (seuls les comptes de frames du job passent de 7 à 6).

@@ -5,6 +5,14 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Changed
+- test(devtools): the GSU fixture runs the presentation paths no ROM
+  exercised (chips audit PF5): `gsuFrameBytes()` for every height and
+  depth (`SCMR_H160`, `SCMR_H192`, 2/4/8 bpp, OBJ mode), the refusal of
+  two 48 KB frames in 64 KB, a real 160-line frame checked at its last
+  byte in VRAM, `GSU_PRESENT_ON_LAG_FRAMES` (the frame stays in flight
+  across 30 frames of a main thread that never parks without the flag,
+  lands with it), a save while a frame moves, and the whole fixture again
+  under `region = "pal"` (`libtest_gsu_cached_pal.toml`, the 312-line path).
 - build(devtools): `make lint` ratchets the hard-coded width classes of
   cproc's QBE emitter (`check_cproc_widths.py`, 19 known sites outside
   `qbetype()`): a new `'w'` / `'l'` / `ILOADW` / `ISTOREW` literal fails

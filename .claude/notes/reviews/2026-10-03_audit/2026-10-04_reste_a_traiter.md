@@ -141,3 +141,4 @@ Aucun rapport n'est à zéro constat ouvert.
 - **B l.21** fermé : six routines en page directe, contrat du callback écrit sur `nmiSet()`.
 - **A PF3** fermé : ratchet `check_cproc_widths.py` dans `make lint` (la matrice de propriétés reste `d_quals`).
 - **C questions `-a` et palette du premier pixel** fermées : deux défauts mesurés et corrigés (oracle pixel dans les goldens).
+- **G PF5** fermé : géométries, drapeau de retard, sauvegarde en vol et PAL dans `libtests_gsu`.

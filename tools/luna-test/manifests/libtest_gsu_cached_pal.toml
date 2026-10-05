@@ -1,3 +1,6 @@
+# The same fixture under PAL (312 lines, 50 Hz): gsu_pres_vtotal = 312 is the
+# path isPAL() selects in gsuPresentInit, and every frame still lands (chips
+# audit PF5, 2026-10-05). The job-duration counts below are in PAL frames.
 # Super FX, a job run from the GSU code cache while the game keeps running
 # (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait, 2026-09-27).
 #
@@ -48,16 +51,17 @@
 # devtools/libtests_gsu/libtest_gsu.sfc, luna v1.28.1.
 rom = "../../../devtools/libtests_gsu/libtest_gsu.sfc"
 frames = 400
+region = "pal"
 
 [asserts.values]
 r_present = 1
 r_busy_after_start = 1
-r_frames_during = 7
+r_frames_during = 6         # PAL: the same job spans 6 of its longer frames (7 under NTSC)
 r_busy_after_wait = 0
 r_sum = 0x1640
 r_outer = 0
 r_marker = 0xC0DE
-r_frames_during_irq = 7
+r_frames_during_irq = 6     # idem
 r_stop_irqs_before = 0
 r_stop_irqs_delta = 1
 r_busy_at_irq = 0

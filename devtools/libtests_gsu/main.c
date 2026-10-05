@@ -103,6 +103,24 @@ u16 r_present_init;
 u16 r_present_busy;
 u16 r_present_done;
 u16 r_present_scbr;
+/** @brief the presentation geometry (chips audit PF5, 2026-10-05): gsuFrameBytes()
+ *  for the HT/MD pairs, the fit refusal, OBJ mode, then a real H160 frame and
+ *  the lag-frame flag */
+u16 r_fb_h128_2bpp;   /* 16 rows x 16 bytes x 32 columns -> 8192 */
+u16 r_fb_h160_2bpp;   /* 20 rows                          -> 10240 */
+u16 r_fb_h192_2bpp;   /* 24 rows                          -> 12288 */
+u16 r_fb_h192_4bpp;   /* 24 x 32 x 32                     -> 24576 */
+u16 r_fb_h192_8bpp;   /* 24 x 64 x 32                     -> 49152 */
+u16 r_fb_obj;         /* HT0 + HT1 = OBJ mode             -> 0 */
+u16 r_init_too_big;   /* two 48 KB frames in 64 KB of Game Pak RAM -> 0 (refused) */
+u16 r_init_h160;      /* gsuPresentInit at H160 2bpp accepted     -> 1 */
+u16 r_h160_scbr;      /* gsu_scbr after the H160 present: 8 + 10 KB -> 18 */
+u16 r_nolag_busy;     /* flags 0, main thread spinning 30 frames: still in flight -> 1 */
+u16 r_lag_done;       /* GSU_PRESENT_ON_LAG_FRAMES, same spin: landed          -> 1 */
+u16 r_save_pres_busy; /* a frame in flight when the save starts                -> 1 */
+u16 r_save_pres_rc;   /* sramSaveOffset while a frame moves                    -> 0 (ok) */
+u16 r_save_pres_rt;   /* ...and it reads back                                  -> 1 */
+u8 marker;
 /** @brief end marker for the test script */
 u16 r_done;
 
@@ -252,6 +270,61 @@ int main(void) {
     gsuPresentWait();
     r_present_done = gsuPresentBusy() ? 0 : 1;
     r_present_scbr = gsu_scbr;
+
+    /* The geometry paths no ROM ran (chips audit PF5): every HT/MD pair of
+     * gsuFrameBytes(), the fit refusal (two 48 KB frames do not fit 64 KB),
+     * OBJ mode, then a real 160-line frame: markers at its last byte and the
+     * byte after, moved to VRAM char block $6000 (byte $C000) — the manifest
+     * reads $E7FF = A5 and $E800 = 00. */
+    gsu_scmr = 0x18;               r_fb_h128_2bpp = gsuFrameBytes();
+    gsu_scmr = 0x18 | SCMR_H160;   r_fb_h160_2bpp = gsuFrameBytes();
+    gsu_scmr = 0x18 | SCMR_H192;   r_fb_h192_2bpp = gsuFrameBytes();
+    gsu_scmr = 0x19 | SCMR_H192;   r_fb_h192_4bpp = gsuFrameBytes();
+    gsu_scmr = 0x1B | SCMR_H192;   r_fb_h192_8bpp = gsuFrameBytes();
+    gsu_scbr = 0;
+    r_init_too_big = gsuPresentInit(0x0000, 0x0000, 0);
+    gsu_scmr = 0x18 | SCMR_H160 | SCMR_H192;  r_fb_obj = gsuFrameBytes();
+    gsu_scmr = 0x18 | SCMR_H160;
+    gsu_scbr = 8;                                   /* buffer at $70:2000 */
+    marker = 0xA5; sramSaveOffset(&marker, 1, 0x2000 + 10239);
+    marker = 0x5A; sramSaveOffset(&marker, 1, 0x2000 + 10240);
+    r_init_h160 = gsuPresentInit(0x4000, 0x6000, 0);
+    gsuPresent();
+    gsuPresentWait();
+    r_h160_scbr = gsu_scbr;
+
+    /* GSU_PRESENT_ON_LAG_FRAMES: a main thread that never parks. Without the
+     * flag the frame stays in flight across 30 lag frames; with it the NMI
+     * moves it anyway. */
+    gsu_scbr = 8;
+    gsuPresentInit(0x4000, 0x6000, 0);
+    gsuPresent();
+    {
+        u16 start = *(volatile u16 *)&frame_count;
+        while ((u16)(*(volatile u16 *)&frame_count - start) < 30) { }
+    }
+    r_nolag_busy = gsuPresentBusy();
+    gsuPresentWait();
+    gsu_scbr = 8;
+    gsuPresentInit(0x4000, 0x6000, GSU_PRESENT_ON_LAG_FRAMES);
+    gsuPresent();
+    {
+        u16 start = *(volatile u16 *)&frame_count;
+        while ((u16)(*(volatile u16 *)&frame_count - start) < 30) { }
+    }
+    r_lag_done = gsuPresentBusy() ? 0 : 1;
+    gsuPresentWait();
+
+    /* A save while a frame is in flight: the NMI's DMA reads Game Pak RAM
+     * while the CPU writes another part of it. */
+    gsu_scbr = 8;
+    gsuPresentInit(0x4000, 0x6000, 0);
+    gsuPresent();
+    r_save_pres_busy = gsuPresentBusy();
+    r_save_pres_rc = sramSaveOffset(save_b, 8, SAVE_AT + 16);
+    sramLoadOffset(save_buf, 8, SAVE_AT + 16);
+    r_save_pres_rt = save_matches(save_b);
+    gsuPresentWait();
     r_done = 0xD0E5;
 
     while (1) {
