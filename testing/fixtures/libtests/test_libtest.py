@@ -175,7 +175,7 @@ CASES = [
     ("r_meta_style",   2, 22),     ("r_meta_plain",   2, 0x6C64),
     ("r_meta_flipx",   2, 0x646C), ("r_meta_flipattr", 2, 0x40),
     ("r_meta_piece32", 2, 42),     # the piece size comes from the style, not from "large = 16"
-    ("r_meta_n",       2, 12),     ("oam_dyn_sprite_size", 1, 16),
+    ("r_meta_n",       2, 12),     ("oam_dyn_sprite_size.sprite_dynamic_dispatch", 1, 16),
     # fixed32: the asm sine and the C expression the header says is miscompiled
     ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
     ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C
