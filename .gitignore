@@ -24,6 +24,7 @@ tools/wav2brr/wav2brr
 tools/tmx2snes/tmx2snes
 tools/opensnes-sample/opensnes-sample
 tools/opensnes-music/opensnes-music
+tools/opensnes-rom/opensnes-rom
 
 # Generated documentation
 doc/

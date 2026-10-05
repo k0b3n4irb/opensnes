@@ -32,6 +32,13 @@ freeze criterion that waits for hardware.
   `.spc` per module) and `inspect` (patterns, instruments, samples, and the
   SPC RAM each module takes against the 57 957 bytes a module may use).
   `smconv` stays shipped one more release.
+- **`opensnes-rom check`** (tools): the post-link checks of a user build in
+  one compiled tool — the bank $00 ROM ratchet, the C RAM band budget and
+  the far band figure, the data-init sentinel, the bank-blind read guard,
+  the NMI / WRAM-port race lint, the asset inventory line. Same verdicts and
+  same figures as the five Python scripts on the 99 built ROMs of the
+  repository; `make/common.mk` calls it instead of them, so a game
+  developer's `make` no longer needs Python (two-audiences rule).
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
   counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
   RAM: each power-on reads the saved value, adds one, saves and prints both.
