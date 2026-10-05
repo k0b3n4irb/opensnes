@@ -63,7 +63,9 @@ right one:
    Looping `wav2brr` samples are also hand-built (the loop points are yours).
    `palplan` sits a level up from the per-asset tools: it plans your *whole
    project's* palettes into the SNES's 8 BG + 8 sprite slots at once, so you run
-   it when your palette count grows, not per asset.
+   it when your palette count grows, not per asset. (In the 1.x family these
+   three are `opensnes-palette quantize`, `opensnes-text font` and
+   `opensnes-palette plan`, and the font and the plan run from the build.)
 
 All binaries live in `bin/` and are built by `make tools`. Every tool prints
 `--help`; the pages here are the guided version.
@@ -78,7 +80,10 @@ release. The first two are @subpage tools_opensnes_sample (WAV → BRR) and
 runs the post-link checks of every build; @subpage tools_opensnes_sprite is the sprite
 artist's tool (sheets, metasprites, Aseprite clips); @subpage tools_opensnes_level turns a
 Tiled level into map, tile tables and entities; @subpage tools_opensnes_tileset the
-background artist's (tilesets, tilemaps, palette banks).
+background artist's (tilesets, tilemaps, palette banks); @subpage tools_opensnes_text
+converts a typeface; @subpage tools_opensnes_palette plans a project's palettes into
+CGRAM and quantizes RGB art; @subpage tools_opensnes_image makes HiColor screens and
+the Mode 7 perspective tables.
 
 ## Your Makefile
 

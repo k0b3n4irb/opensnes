@@ -763,3 +763,41 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   séparer la vérification du commit ; et `make release-smoke` juge le zip
   *existant* — reconstruire le zip (`make release`) après tout changement
   de `common.mk` ou du `Makefile`, sur un `release/` vide.
+
+### Journal (suite, 2026-10-05, nuit : `opensnes-text`, `-palette`, `-image`)
+
+- Trois outils de plus (9/11). `opensnes-text font` : une image des 96
+  glyphes → tuiles en ordre de glyphe + rampe de gris + colle ; source
+  indexée (l'index tel quel), grise ou RVB (rang de luminosité). Les tuiles
+  et palettes de font2snes reproduites octet pour octet, à 2 et 4 bpp, par
+  les deux chemins (gris et indexé) ; l'en-tête C de `-c` n'a pas de
+  successeur (la famille livre de l'`.incbin`). La table de chaînes reste à
+  écrire : question au propriétaire toujours ouverte (1.x ou plus tard).
+- `opensnes-palette plan` : asset composé (`palettes.toml`, `bg = [...]`,
+  `sprite = [...]`), mêmes macros `PAL_<NOM>_CGRAM/_SLOT/_COLORS` et même image
+  CGRAM que palplan (le nom = la racine du fichier `.pal`, ce qui était déjà
+  le cas de tous les manifestes) ; `quantize` = img2snes (`--palette` accepte
+  un `.pal`, pas seulement une PNG) ; `inspect` sur les `.pal`. La règle
+  générique convertit un plan après les images (`LATE_STAMPS`, qui absorbe
+  `LEVEL_STAMPS`).
+- **Trouvé en chemin** : le tri du quantificateur (img2snes) départageait les
+  ex æquo selon le `qsort` de la libc — glibc 2.43 n'est pas stable — donc une
+  même image donnait des octets différents selon l'OS, alors que les goldens
+  ne tournent que sous Linux. Départage par l'index désormais ; les deux
+  goldens d'img2snes re-enregistrés (erreur RMS contre la source : 21,48 →
+  21,56 à 16 couleurs, 48,25 → 48,25 à 4). Première correction d'un outil 0.x
+  entraînée par le contrat « mêmes octets partout » de la famille.
+- `opensnes-image` : `hicolor` (le contrat de krom : 896 tuiles séquentielles,
+  une palette par segment 64×8, coupe médiane + 3 passes de k-means — RMS
+  contre la source 2,46 pour 2,44 au script Pillow, 377 couleurs à l'écran
+  pour 357) et `perspective` (tables HDMA cos / sin / −sin). **La note
+  d'archive disait l'arrondi de krom « non épinglé »** : faux, les 32 256
+  entrées sont `round(trig·20480/ligne)` et l'entrée la plus proche d'une
+  frontière d'arrondi en est à 0,0005 — aucune libm ne peut en basculer une.
+  Les tables de krom deviennent le golden de l'outil et l'exemple les
+  regénère à la build : ROM identique à l'octet près. `hicolor_1792` est
+  requantifié (baseline visuelle et blocs CGRAM du manifeste re-épinglés, flux
+  WRAM inchangé) ; `rpg` ROM identique. `hicolor64.py` et `m7ptables.py`
+  supprimés : plus aucun exemple ne dépend d'un script Python pour ses assets.
+- Reste de la famille : `opensnes-save` et le vrai programme `opensnes` ; la
+  table de chaînes de `-text` ; le dernier `python3` de `common.mk`.

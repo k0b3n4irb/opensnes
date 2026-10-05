@@ -17,6 +17,28 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`opensnes-text`, `opensnes-palette`, `opensnes-image`** (tools): three
+  more tools of the 1.x family (9 of 11). `opensnes-text font` turns a
+  picture of the 96 glyphs into the text module's tiles (indexed, grey or
+  RGB source; `--bpp 2|4`) with the `.inc` / `_data.as` glue — font2snes's
+  tiles byte for byte. `opensnes-palette plan` is the project's palette
+  plan as a composed asset (`res/palettes.toml`: `bg = [...]`,
+  `sprite = [...]`, `cgram = true`) → `PAL_<NAME>_CGRAM` / `_SLOT` /
+  `_COLORS` and an optional 512-byte CGRAM image, run by the build after
+  the pictures' conversions; `quantize` makes an indexed PNG of RGB art
+  (`--colors`, `--round`, `--palette FILE.pal|.png`, `--scale`, `--align`);
+  `inspect` reads `.pal` files — palplan's plan and img2snes's PNGs byte for
+  byte. `opensnes-image hicolor` converts a 256x224 picture to the HiColor
+  contract (896 sequential 4 bpp tiles, one 16-colour palette per 64x8
+  segment, median cut + k-means per segment) and `perspective` writes the
+  Mode 7 perspective-rotation HDMA tables from `res/perspective.toml`
+  (`angles`, `lines`, `zoom`) — krom's tables byte for byte, which the
+  golden suite keeps as the reference; the two maintainer scripts they
+  replace (`devtools/hicolor64.py`, `m7ptables.py`) are gone, and so is the
+  last Python an example's assets needed. `games/rpg` plans its sprite
+  palettes from `res/palettes.toml`, `color/hicolor_1792` converts its
+  sunset and `mode7/perspective_rotate` regenerates its tables from a
+  settings file; all three lose their `data.asm`.
 - **`opensnes-level`** (tools): the level tool of the 1.x family. `convert`
   takes a Tiled JSON map and the `.map` its tileset's conversion wrote
   (`--tileset`, `tileset = "tiles.map"` in `res/<level>.tmj.toml`) and writes
@@ -103,6 +125,15 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **The quantizer sorts deterministically** (tools): img2snes's median cut
+  broke sort ties by whatever the C library's `qsort` did, so the same art
+  quantized to different bytes on different OSes; the comparators now break
+  ties by index and the two goldens are re-recorded (error against the
+  source within 0.4 % of before). `opensnes-palette quantize` shares the code.
+- **`make/common.mk`**: the late conversion tier (after the pictures) is now
+  any level and any palette plan (`LATE_STAMPS`); the `PALPLAN` variable is
+  gone with the rpg's hand-written rule; `clean` removes the perspective
+  tables.
 - **A project's `make test` is `luna test`** (build): the tests of a user
   project are luna's own manifests, one `test/<name>.toml` each (`rom`,
   `frames`, `input`, `[[checkpoint]]` values by symbol name,

@@ -18,9 +18,9 @@ its function went.
 | `opensnes-sprite` | sprite sheet or Aseprite export → tiles, palette, metasprite table, animation clips |
 | `opensnes-tileset` | PNG → tileset and tilemap, deduplicated, with per-tile palettes and flips |
 | `opensnes-level` | Tiled (later LDtk) → map, objects, collision |
-| `opensnes-text` | bitmap font → text tiles; string tables, per language |
+| `opensnes-text` | bitmap font → text tiles (string tables, per language: later) |
 | `opensnes-palette` | plan a project's palettes into CGRAM; quantize RGB art; preview |
-| `opensnes-image` | full-screen images: Mode 7, HiColor, pseudo-hires |
+| `opensnes-image` | full-screen pictures: HiColor; the Mode 7 perspective tables (Mode 7 pictures are `opensnes-tileset --mode 7`) |
 | `opensnes-sample` | WAV → BRR |
 | `opensnes-music` | Impulse Tracker → soundbank, with the samples it shares |
 | `opensnes-rom` | finalize and check a ROM: header, size, mapper, checksum, the post-link checks, the credits |
