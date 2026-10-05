@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 91 examples organized by topic, building
+Learn SNES development step by step. 90 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -18,7 +18,7 @@ from basic concepts to complete games.
 | [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
 | [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG |
-| [input/](input/) | 5 | Joypads, drive a sprite, mouse, Super Scope, multi-player |
+| [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 10 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |

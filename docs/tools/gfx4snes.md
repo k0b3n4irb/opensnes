@@ -86,7 +86,7 @@ Add `-m`, `-c`, and friends when you outgrow the default.
 - @ref examples_backgrounds_mode0 — 2bpp, four cheap layers.
 - @ref examples_backgrounds_mode3 — 8bpp, and why one screen costs ~40 KB.
 - @ref examples_games_rpg — fixed-palette backgrounds *and* `-s 16` sprites.
-- @ref examples_input_move_sprite — the simplest sprite-tile case.
+- @ref examples_sprites_simple_sprite — the simplest sprite-tile case.
 
 Next in the pipeline: feed the `.map` this produces into @ref tools_tmx2snes to
 turn a Tiled level into ready-to-load map binaries.

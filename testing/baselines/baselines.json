@@ -449,12 +449,6 @@
     "luna_version": "v1.32.0",
     "rom_sha256": "7785250a52b61e7fa837f1379e98d761d0986ab57bf129a1a84486361d1bcc1b"
   },
-  "input_move_sprite": {
-    "fbhash": "ef4eff6c3e4e8914",
-    "frames": 200,
-    "luna_version": "v1.32.0",
-    "rom_sha256": "7411f72f766868be6fe673636db8ba3e199e85f1dc6bfb9eab008a16f0cd2f5b"
-  },
   "input_superscope": {
     "fbhash": "947b9ddb0e2d17b0",
     "frames": 200,

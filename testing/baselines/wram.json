@@ -235,10 +235,6 @@
     "stream": "b15cbab966c95c7ca3038750c6c3bbaba8a3d6f10c5e4300e7ea0db7d5137cb8",
     "rom_sha256": "0569a1e730bb5377e658b88fb0f02dcd3ed46e78dde557388444d457c8a16060"
   },
-  "input_move_sprite": {
-    "stream": "dbd6019cc6a6e81c1a2ce59441b4838c444d7121445e4b7a3531cdc8a664e158",
-    "rom_sha256": "0b02e06b8354ce3ab31bec0130158369eac656f7505f53a7f119a29fd4cd81d5"
-  },
   "input_superscope": {
     "stream": "beb094cabbde4f6ee3b430ff26bcefa19cfc3ce46a65ee89716555513d4d8d56",
     "rom_sha256": "3834ee47b75d6599573e18aa42acba3ddd1c1e20cebae3057c3d6466e122fab3"
