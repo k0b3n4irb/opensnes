@@ -10,6 +10,7 @@ typedef struct {
     int bpp;                   /* 2, 4 or 8 */
     int has_pal, has_map, has_meta, mode7;
     int map_blocks_x, map_blocks_y;   /* the tilemap's size in entries, when has_map */
+    int lz;                    /* the tiles are LZ77-compressed: no bundle, lzssDecodeVram at runtime */
 } incfile_spec;
 
 /* Writes <outbase>.inc and <outbase>_data.as for the asset named `name`

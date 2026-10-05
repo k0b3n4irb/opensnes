@@ -137,7 +137,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     char ident[256], generator[64], err[160];
     cli_ident(in, ident, sizeof ident);
     snprintf(generator, sizeof generator, "%s %s", ctx->tool->name, ctx->tool->version);
-    incfile_spec spec = { generator, bpp, savepal, 0, meta, pack, 0, 0 };
+    incfile_spec spec = { generator, bpp, savepal, 0, meta, pack, 0, 0, cli_has(ctx, "lz") };
     if (incfile_write(outbase, ident, &spec, err, sizeof err) != 0) { cli_error(ctx, in, "%s", err); return CLI_IO; }
 
     if (cli_has(ctx, "save") && (rc = cli_save_settings(ctx, in)) != CLI_OK) return rc;

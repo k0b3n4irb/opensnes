@@ -101,6 +101,11 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
         for (int i = 0; spec->has_map && i < map_parts; i++)
             i == 0 ? fprintf(f, "extern const u8 %s_map[], %s_map_end[];\n", name, name)
                    : fprintf(f, "extern const u8 %s_map_%d[], %s_map_%d_end[];\n", name, i, name, i);
+    } else if (spec->lz) {
+        fprintf(f, "/* LZ77-compressed tiles: lzssDecodeVram(%s_tiles, vram_addr); no asset bundle, bgLoad() would copy the compressed bytes */\n", name);
+        fprintf(f, "extern const u8 %s_tiles[], %s_tiles_end[];\n", name, name);
+        if (spec->has_pal) fprintf(f, "extern const u8 %s_pal[], %s_pal_end[];\n", name, name);
+        if (spec->has_map) fprintf(f, "extern const u8 %s_map[], %s_map_end[];\n", name, name);
     } else if (spec->has_map && spec->has_pal && !spec->mode7 && ms) {
         fprintf(f, "/* tileset + palette + %dx%d tilemap: bgLoad(bg, &%s, palette_slot, tiles_vram, map_vram) */\n"
                    "DECLARE_BG_ASSET(%s, %s, %s);\n", spec->map_blocks_x, spec->map_blocks_y, name, name, color_mode(spec->bpp), ms);
