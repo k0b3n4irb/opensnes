@@ -675,6 +675,14 @@ ifneq ($(SKIP_RAM_CHECK),1)
 		fi; \
 	fi
 endif
+	@# data_init_end.o must be the last object (the DMA copy loop stops at its
+	@# terminator): an object linked after it has globals that boot
+	@# uninitialised, silently. Read off the .sym: DataInitEnd must close the
+	@# .data_init section (2026-10-05; KNOWN_LIMITATIONS "no separate check").
+	@SYM=$(TARGET:.sfc=.sym); \
+	if [ -f "$$SYM" ]; then \
+		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-data-init "$$SYM" | grep -v '^Loaded' || exit 1; \
+	fi
 	@# PPU asset budget — a per-build instrument (VRAM/CGRAM weight of the
 	@# converted graphics on disk), the build-time twin of `make budget`
 	@# (runtime footprint via luna). Report-only, NEVER a gate: an inventory
