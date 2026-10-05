@@ -8,9 +8,14 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.48.0
+## Current Status: post-v1.0.0
 
-A modern, well-tested SNES SDK ready for serious hobby development, game jams,
+Version 1.0.0 is cut on `develop` (2026-10-05): the public API is frozen,
+the 0.x aliases are gone, and nothing in `lib/include/snes/*.h` changes
+again before 2.0 (`docs/STABILITY.md`, `docs/UPGRADING.md`). The `v1.0.0`
+tag on `main` follows the first console session of the hardware protocol
+(`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7): the one freeze criterion
+that needs hardware. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
 produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 91
 working examples cover every major subsystem, with cross-platform CI on Linux,
@@ -219,7 +224,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 ---
 
-## Planned: v1.0
+## The v1.0 gate
 
 ### Must-have
 

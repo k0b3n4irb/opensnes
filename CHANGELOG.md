@@ -2,7 +2,19 @@
 
 All notable changes to OpenSNES are documented in this file.
 
-## [Unreleased]
+## [1.0.0] — 2026-10-05
+
+The first stable release of the public API: what `lib/include/snes/*.h`
+declares at this version stays, and changes again only at 2.0
+(`docs/STABILITY.md`). Against 0.48, the forty-seven names deprecated
+through the 0.x releases are gone (twenty constants, `OAM_SET_GFX_BANK`,
+twenty-six renamed functions), `hdmaEnable()` / `hdmaDisable()` take a
+channel number and `dmaTransfer()` a far pointer; `docs/UPGRADING.md`
+gives each replacement and `make check-upgrade SRC=<folder>` reads a 0.x
+project against the list. Version cut on `develop` on 2026-10-05 with the
+lots below; the `v1.0.0` tag on `main` follows the console session of the
+hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
+freeze criterion that waits for hardware.
 
 ### Added
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot

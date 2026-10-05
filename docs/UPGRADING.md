@@ -1,18 +1,18 @@
 # Upgrading to OpenSNES 1.0 {#upgrading}
 
-The 0.x releases deprecate; 1.0 removes. Every name below builds with a
-warning in 0.48 and later 0.x releases (the clang pre-pass reports each use;
-without clang the build runs the same scan in Python on each source it
-compiles, and `make check-upgrade SRC=<folder>` reads a whole project) and
-is gone at 1.0. Nothing else of the public API changes at 1.0, and nothing changes
-again before 2.0.
+The 0.x releases deprecate; 1.0 removes. Every name below built with a
+warning in 0.48 (the clang pre-pass reported each use; without clang the
+build ran the same scan in Python on each source it compiled) and is gone
+at 1.0: a project that names one no longer compiles, and
+`make check-upgrade SRC=<folder>` reads a whole project against the list
+and says what to use. Nothing else of the public API changes at 1.0, and
+nothing changes again before 2.0.
 
-**Where `develop` stands (2026-10-05, lots B, C, E and F of the plan):** the
-constants of section 3, the `OAM_SET_GFX_BANK` macro and the twenty-six
-renamed functions of section 2 are gone from the headers — a project that
-names one no longer compiles, and `make check-upgrade` reports each use from
-`devtools/removed_api.txt`. `hdmaEnable()` / `hdmaDisable()` already take a
-channel number and `dmaTransfer()` takes a far pointer (section 1); no
+**State at 1.0.0 (cut on `develop` on 2026-10-05):** the constants of
+section 3, the `OAM_SET_GFX_BANK` macro and the twenty-six renamed
+functions of section 2 are gone from the headers, `check-upgrade` reports
+each use from `devtools/removed_api.txt`, `hdmaEnable()` / `hdmaDisable()`
+take a channel number and `dmaTransfer()` a far pointer (section 1). No
 `OPENSNES_DEPRECATED` declaration is left.
 
 Two things on this page are not removals but **changes of meaning**: read

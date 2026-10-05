@@ -222,3 +222,13 @@ Un seul appel dans le dépôt (la fixture, vecteur CGRAM 254-255 inchangé).
 `compiler/ABI.md` ne citait pas le prototype. Reste I (macros 1.0.0, après
 la session console).
 
+**Lot I fait, 2026-10-05 (nuit), sur demande du propriétaire.** Version
+coupée sur `develop` : macros `1.0.0`, `CHANGELOG.md` `## [1.0.0] —
+2026-10-05` avec un chapeau (API gelée, 47 noms retirés, deux changements
+de sens, le tag `main` après la session console), `ROADMAP.md` « post-v1.0.0
+» avec la même réserve et la table « Planned: v1.0 » devenue « The v1.0
+gate », `UPGRADING.md` au présent de la 1.0. `PHILOSOPHY.md` ne mentionnait
+déjà plus d'alias. Les macros ne sont lues par aucun code : ROM identiques
+octet pour octet. Le tag `v1.0.0` reste la porte 5 (console, rangées 1 à 7)
+et la porte 7 (fenêtre ouverte le 10-05, fermeture au plus tôt le 10-19).
+
