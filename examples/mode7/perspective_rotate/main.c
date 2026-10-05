@@ -37,9 +37,7 @@
 #include <snes.h>
 
 /** @brief Mode 7 ground: 9-tile prefab track (original art) */
-extern u8 ground_pc7[], ground_pc7_end[];
-extern u8 ground_mp7[], ground_mp7_end[];
-extern u8 ground_pal[], ground_pal_end[];
+#include "res/ground.inc"   /* generated: ground_tiles[], ground_map[], ground_pal[] (Mode 7 .pc7 / .mp7), each with _end */
 
 /** @brief krom's tables, verbatim: 48 x [1][val16]x224 + terminator */
 extern u8 m7cos[], m7sin[], m7nsin[];
@@ -86,8 +84,8 @@ int main(void) {
     REG_CGADD = 0;
     REG_CGDATA = 0x00;
     REG_CGDATA = 0x00;
-    dmaCopyVramMode7(ground_mp7, (u16)(ground_mp7_end - ground_mp7),
-                     ground_pc7, (u16)(ground_pc7_end - ground_pc7));
+    dmaCopyVramMode7(ground_map, (u16)(ground_map_end - ground_map),
+                     ground_tiles, (u16)(ground_tiles_end - ground_tiles));
 
     setMode(BG_MODE7, 0);
     mode7Init();

@@ -10,7 +10,3 @@ CSRC   := main.c
 ASMSRC := data.asm
 
 include $(OPENSNES)/make/common.mk
-
-res/ground.pc7 res/ground.mp7 res/ground.pal: res/ground.png
-	@echo "[GFX] $< -> Mode 7 assets"
-	@$(GFX4SNES) -p -m -M 7 -i $<
