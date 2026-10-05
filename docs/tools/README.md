@@ -75,7 +75,8 @@ function, the same conventions everywhere, settings beside each asset.
 @subpage tools_conventions is the contract; the 0.x tools stay one more
 release. The first two are @subpage tools_opensnes_sample (WAV → BRR) and
 @subpage tools_opensnes_music (Impulse Tracker → soundbank); @subpage tools_opensnes_rom
-runs the post-link checks of every build.
+runs the post-link checks of every build; @subpage tools_opensnes_sprite is the sprite
+artist's tool (sheets, metasprites, Aseprite clips).
 
 ## Your Makefile
 

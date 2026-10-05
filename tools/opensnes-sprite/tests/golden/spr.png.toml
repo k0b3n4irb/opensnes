@@ -1,0 +1,6 @@
+# import settings of spr.png, written by opensnes-sprite --save; the build reads `tool`
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16

@@ -86,6 +86,8 @@ class Golden:
             got, want = work / out, want_dir / out
             if not got.is_file():
                 errs.append(f"{out}: not produced")
+            elif not want.is_file():
+                errs.append(f"{out}: no golden at {want} — review the output and commit it")
             elif not filecmp.cmp(got, want, shallow=False):
                 errs.append(f"{out}: differs from golden ({got.stat().st_size} vs "
                             f"{want.stat().st_size} bytes)")

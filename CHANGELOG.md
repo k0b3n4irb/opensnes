@@ -39,6 +39,18 @@ freeze criterion that waits for hardware.
   same figures as the five Python scripts on the 99 built ROMs of the
   repository; `make/common.mk` calls it instead of them, so a game
   developer's `make` no longer needs Python (two-audiences rule).
+- **`opensnes-sprite`** (tools): the sprite artist's tool. `sheet` cuts an
+  indexed PNG or BMP into 8/16/32/64 blocks and writes the tiles in OBJ
+  VRAM order, the palette, the `.inc`/`_data.as` and, with
+  `--metasprite W H`, the `_meta.inc` table (`--flip` dedups mirrored
+  blocks into OBJ_FLIPX/Y entries); `anim` turns Aseprite's
+  `--data --list-tags` export into `<stem>_anim.h`, one AnimClip per tag;
+  `inspect` gives blocks, tiles, VRAM bytes and colours. gfx4snes's and
+  aseprite2snes's converters are linked as libraries: the golden suite
+  compares the outputs with both tools' own goldens, byte for byte (the
+  anim header differs by its generator line only). Both 0.x tools stay
+  shipped one more release; aseprite2snes's converter became `anim.c`,
+  which the 0.x tool itself now calls.
 - feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
   counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
   RAM: each power-on reads the saved value, adds one, saves and prints both.
