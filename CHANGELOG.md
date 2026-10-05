@@ -5,6 +5,12 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Changed
+- docs(lib): `superfx.h` no longer offers `$A0` as "IRQ mask + fast
+  multiply": the launchers run the GSU at 21 MHz and clear MS0 before
+  writing CFGR ("MS0 must be zero in 21MHz mode", fullsnes), so the value
+  reaches the register as `$80`; `superfx_hello` asks `$80` instead of a
+  fast multiply it never got; the GSU fixture's own C launch masks the bit
+  too (chips audit S1, doc side; the mask itself landed on 2026-10-04).
 - docs: the five visual tutorials (Mode 7, colour math, window, mosaic,
   HDMA) open on a screenshot of the example they teach from, taken from
   the example's own README image (docs audit rec 10 — no tutorial had an

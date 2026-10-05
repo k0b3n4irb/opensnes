@@ -17,7 +17,7 @@
 .RAMSECTION ".gsu_lib_vars" BANK 0 SLOT 1
 gsu_prog_bank:   dsb 1      ; GSU program bank byte (set by gsuSetProgram)
 gsu_prog_addr:   dsb 2      ; GSU program offset (set by gsuSetProgram)
-gsu_cfgr:        dsb 1      ; CFGR value ($80=default, $A0=fast multiply)
+gsu_cfgr:        dsb 1      ; CFGR value ($80=default; bit 5 MS0 is masked off by the 21 MHz launchers)
 gsu_scmr:        dsb 1      ; SCMR value ($18=RAN+RON, $19=4bpp+RAN+RON)
 gsu_scbr:        dsb 1      ; SCBR value ($00=bufA, $10=bufB)
 gsu_dma_src_hi:  dsb 1      ; DMA source high byte ($00=bufA, $40=bufB)

@@ -85,7 +85,13 @@ extern u8 gsu_prog_bank;
 /** @brief GSU program 16-bit address (set by gsuSetProgram) */
 extern u16 gsu_prog_addr;
 
-/** @brief CFGR register value ($80=IRQ mask, $A0=IRQ mask + fast multiply) */
+/** @brief CFGR register value written by the launchers ($80 = IRQ mask).
+ *  CFGR_FAST_MUL (bit 5, MS0) is cleared by gsuLaunch() and gsuStartCached()
+ *  before the write: both run the GSU at 21 MHz, and "MS0 must be zero in
+ *  21MHz mode" (fullsnes, CFGR, `1adef8e33ff3c4e9`; ares: products "may be
+ *  invalid" with both set). A value of $A0 therefore reaches the register
+ *  as $80 — this line said "$A0 = IRQ mask + fast multiply" until 2026-10-05.
+ *  Code that starts the GSU at 10.7 MHz by itself may set MS0. */
 extern u8 gsu_cfgr;
 
 /** @brief SCMR register value ($18=RAN+RON, $19=4bpp+RAN+RON) */

@@ -137,3 +137,4 @@ Aucun rapport n'est à zéro constat ouvert.
 - **G PF7, PF8** fermés ; **G PF10** partiel (rangée 24, note `dsp1b.bin`, chemins de sauvegarde déclarés non couverts).
 - **E PF6 / rec 10** fermé : une capture en tête des cinq tutoriels visuels.
 - **C rec 5** fermé : le troisième point est tenu par `ROM_BANKS_MAX` (voir `C_build_tools.md`).
+- **G rec 11** fermé : six lignes partenaires écrites avec reproduction ; **G S1** côté doc fermé (`superfx.h`, `superfx_hello`).

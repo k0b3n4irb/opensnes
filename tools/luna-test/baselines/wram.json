@@ -132,8 +132,8 @@
     "rom_sha256": "b635c52b1b414d359b0d96695bc90b37eb23a9285369b9601ce4c7420d357359"
   },
   "chips_superfx_hello": {
-    "stream": "0dc2d8a038d99d4d5ee53d07aa369bb0da40b6a94145eb5bf26b83e1077514da",
-    "rom_sha256": "a879143fcb8d24cabf3b3c32e17567932df79dc3276ff02f415002645058ab38"
+    "stream": "407f38fbe761b6c10c911ab0d8adc6b38aaa808e4dfa2b546eade7e0c491c8e8",
+    "rom_sha256": "be485a62409576c7fd88763d063680b408367ddd2af8fd162de94593917df9c2"
   },
   "color_direct_color": {
     "stream": "1efe8ace258e0e012ed741872309cc05805ade436d88c3428f323a139e1ebac3",

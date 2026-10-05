@@ -35,7 +35,7 @@ RAM_CODE static void ram_c_rom_job(void) {
     u16 start, polls = 0;
 
     gsu_owns_cart = 1;
-    REG_CFGR = gsu_cfgr;
+    REG_CFGR = (u8)(gsu_cfgr & 0xDF);   /* MS0 must be 0 at 21 MHz (fullsnes, CFGR), as the lib's launchers do */
     REG_CLSR = 1;
     REG_SCBR = gsu_scbr;
     REG_SCMR = (u8)(gsu_scmr | 0x18);   /* RON + RAN */
