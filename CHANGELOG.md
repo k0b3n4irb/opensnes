@@ -5,6 +5,12 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Changed
+- build(devtools): `make lint` ratchets the hard-coded width classes of
+  cproc's QBE emitter (`check_cproc_widths.py`, 19 known sites outside
+  `qbetype()`): a new `'w'` / `'l'` / `ILOADW` / `ISTOREW` literal fails
+  until it is reviewed against this target's sizes — the class of the
+  `funccopy`, `zero()` and bit-field miscompiles found one consumer at a
+  time (compiler audit PF3).
 - docs(lib): `superfx.h` no longer offers `$A0` as "IRQ mask + fast
   multiply": the launchers run the GSU at 21 MHz and clear MS0 before
   writing CFGR ("MS0 must be zero in 21MHz mode", fullsnes), so the value

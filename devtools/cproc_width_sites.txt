@@ -1,0 +1,19 @@
+(file scope): static const int ptrclass = 'l';
+convert: class = 'w';
+convert: case 1: op = ICNEW, l = funcinst(f, IEXTUB, 'w', l, NULL); break;
+convert: case 2: op = ICNEW, l = funcinst(f, IEXTUH, 'w', l, NULL); break;
+convert: class = 'l';
+calcvla: t->u.array.size = funcinst(f, IMUL, 'l', length, basesize);
+cmpnarrow: return qbetype(t).base == 'w';
+funcbits: bits += ((class == 'w' ? 2 : 4) - t->size) << 3;
+funccopy: class = 'w';
+funccopy: case 2: load = ILOADW, store = ISTOREW; break;
+funccopy: default: load = ILOADL, store = ISTOREL, align = 4, class = 'l'; break;
+funcexpr: b[1]->phi.class = 'w';
+funcexpr: if (rescls == 'l') {
+funcexpr: if (qbetype(lt).base == 'w')
+funcexpr: if (qbetype(rt).base == 'w')
+zero: [2] = ISTOREW,
+zero: [4] = ISTOREL,
+casesearch: res = funcinst(f, class == 'w' ? ICEQW : ICEQL, 'w', v, key);
+casesearch: res = funcinst(f, class == 'w' ? ICULTW : ICULTL, 'w', v, key);

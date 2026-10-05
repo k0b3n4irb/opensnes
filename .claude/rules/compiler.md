@@ -46,3 +46,16 @@ This is a Class A change — requires `make clean && make` + full test suite (lu
    pass is the reference; interactive spot-check via `luna mcp` / luna GUI
    if needed — see docs/tutorials/debugging.md)
 4. Check for regressions in code generation with compiler test patterns
+
+## Width literals in cproc are ratcheted (since 2026-10-05)
+
+`make lint-cproc-widths` (in `make lint`) lists every `'w'` / `'l'` /
+`ILOADW` / `ISTOREW` / `ILOADL` / `ISTOREL` outside `qbetype()` in
+`compiler/cproc/qbe.c` and fails on one that is not in
+`devtools/cproc_width_sites.txt`. Those sites are where upstream's model
+(`l` = 8 bytes) survives unless re-read for this target (`int` 2, `long`
+4, pointer 4): `funccopy`'s chunk table, `zero()`, the bit-field
+extraction and the cast scaling were each found by a consumer, one at a
+time (compiler audit 2026-10-03, PF3). A new site is reviewed, then added
+with `--update`; `devtools/compiler-tests/runtime/d_quals` is where its
+runtime effect gets a cell.

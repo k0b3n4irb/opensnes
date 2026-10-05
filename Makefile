@@ -61,7 +61,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain hooks lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -107,6 +107,12 @@ verify-toolchain:
 RANGE ?= origin/develop..HEAD
 lint-commits:
 	@python3 devtools/lint_commits.py $(RANGE)
+
+# Hard-coded width classes in cproc's QBE emitter, outside qbetype(): a new
+# one fails until reviewed against this target (int 2, long 4, pointer 4
+# bytes) and added to devtools/cproc_width_sites.txt (compiler audit PF3).
+lint-cproc-widths:
+	@python3 devtools/check_cproc_widths.py
 
 # Git hooks that run the commit lint before a commit exists and before a
 # push leaves (scripts/githooks/). Opt-in: a clone has no hooks until this
@@ -170,6 +176,7 @@ lint: lint-docs
 	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-vram
 	@$(MAKE) lint-cppcheck
+	@$(MAKE) lint-cproc-widths
 	@$(MAKE) lint-commits
 
 compiler: submodules verify-toolchain
