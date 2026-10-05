@@ -1,12 +1,19 @@
 # Migrated from probes/movement.py.
 rom = "../../../examples/basics/aim_target/aim_target.sfc"
+frames = 180
 [[checkpoint]]
 at_frame = 60
+[checkpoint.values]
+target_x = { eq = 200, width = 2 }
+target_y = { eq = 60, width = 2 }
 [[checkpoint]]                 # RIGHT -> target_x up
 at_frame = 120
 input = "60:0x0100,119:0"
 [checkpoint.delta]
 target_x = "increased"
+[checkpoint.values]
+target_x = { eq = 220, width = 2 }
+target_y = { eq = 60, width = 2 }
 [[checkpoint]]                 # UP -> target_y down
 at_frame = 180
 input = "120:0x0800,179:0"
@@ -16,5 +23,12 @@ target_y = "decreased"
 # Every VRAM DMA of this input-driven run lands in blank or forced blank
 # (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
 # what a button press triggers is here, one manifest at a time).
+[checkpoint.values]
+target_x = { eq = 220, width = 2 }
+target_y = { eq = 40, width = 2 }
 [asserts.dma]
 unsafe_writes = 0
+# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
+# the target moves 20 pixels per held direction then stops at its bound: x 200 -> 220, y 60 -> 40.
+[asserts]
+fbhash = "d5dcd3f4dfc51b74"

@@ -1,12 +1,19 @@
 # Migrated from probes/movement.py.
 rom = "../../../examples/mode7/perspective/perspective.sfc"
+frames = 180
 [[checkpoint]]
 at_frame = 60
+[checkpoint.values]
+sx = { eq = 0, width = 2 }
+sy = { eq = 0, width = 2 }
 [[checkpoint]]                 # RIGHT -> sx up
 at_frame = 120
 input = "60:0x0100,119:0"
 [checkpoint.delta]
 sx = "increased"
+[checkpoint.values]
+sx = { eq = 59, width = 2 }
+sy = { eq = 0, width = 2 }
 [[checkpoint]]                 # DOWN -> sy up
 at_frame = 180
 input = "120:0x0400,179:0"
@@ -16,5 +23,12 @@ sy = "increased"
 # Every VRAM DMA of this input-driven run lands in blank or forced blank
 # (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
 # what a button press triggers is here, one manifest at a time).
+[checkpoint.values]
+sx = { eq = 59, width = 2 }
+sy = { eq = 59, width = 2 }
 [asserts.dma]
 unsafe_writes = 0
+# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
+# the camera moves one unit per frame: 59 frames of RIGHT then of DOWN give 59 and 59.
+[asserts]
+fbhash = "d958b1005690540b"

@@ -186,3 +186,9 @@ Comme filet contre la régression, l'appareil de test est au niveau d'un SDK 1.0
   points d'entrée et frame d'assertion décalés ensemble), dans
   `make test-manifests`. Contrôle négatif : une copie sans appui qui attend
   le silence échoue aux seize phases.
+- **T7 / T10 (assertions « delta » seules, images avant l'entrée)** : les
+  huit manifestes concernés assertent maintenant la valeur mesurée à chaque
+  point (`[checkpoint.values]`, mesurée avec `luna state --until-frame F
+  --input … --peek`) en plus de la direction, et l'image de fin de script
+  (`[asserts] fbhash`, mesurée avec `--print-fbhash` à la même frame) ; 8/8
+  verts. `state_scene_stack` était déjà sur une assertion de valeur.

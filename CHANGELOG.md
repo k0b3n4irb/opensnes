@@ -538,6 +538,11 @@ All notable changes to OpenSNES are documented in this file.
   capture points; `diff_corpus`: `mode2` is the only example that changes.
 
 ### Changed
+- test(luna-test): the eight input manifests that only asserted a
+  direction (`increased` / `changed`) now also assert the measured value
+  at every checkpoint and the image at the end of the script (`fbhash`):
+  map_scroll, collision_demo, aim_target, tiled, likemario, perspective,
+  dynamic_map, random (testing audit T7 and T10).
 - docs: `MIGRATING_FROM_PVSNESLIB.md` gains "What does not exist": every
   PVSnesLib header compared name by name against ours, the absent names
   sorted into renamed, decided against (`printf`, scores, pixel plotting,
