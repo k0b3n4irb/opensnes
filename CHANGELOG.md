@@ -125,6 +125,17 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **A user build runs no Python at all** (build, tools): the last call of
+  `make/common.mk` — the 0.x-name scan, `devtools/check_upgrade.py` — is
+  `opensnes upgrade [-q] [--removed-only] <folder-or-file>...`, shell and
+  awk in the `opensnes` CLI, same hits on a project using all 46 removed
+  names. The build runs it only when a source fails to compile (after the
+  clang pre-pass or after `cc65816`), so a current project sees nothing,
+  where the Python scan nagged every `hdmaEnable()` call on a machine
+  without clang. The lists are `make/removed_api.txt` (moved from
+  `devtools/`) and `make/changed_api.txt`, shipped with `make/`; the
+  release recipe copies nothing from `devtools/` any more, and the doc
+  sentinel's new anchor 17 fails if an interpreter comes back.
 - **One author for every commit** (ci, devtools): Dependabot is gone
   (`.github/dependabot.yml` removed, its PR #163 closed, the
   `msys2/setup-msys2` bump it proposed applied by hand) and

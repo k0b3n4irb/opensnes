@@ -4,14 +4,14 @@ The 0.x releases deprecate; 1.0 removes. Every name below built with a
 warning in 0.48 (the clang pre-pass reported each use; without clang the
 build ran the same scan in Python on each source it compiled) and is gone
 at 1.0: a project that names one no longer compiles, and
-`make check-upgrade SRC=<folder>` reads a whole project against the list
+`opensnes upgrade <folder>` reads a whole project against the list
 and says what to use. Nothing else of the public API changes at 1.0, and
 nothing changes again before 2.0.
 
 **State at 1.0.0 (cut on `develop` on 2026-10-05):** the constants of
 section 3, the `OAM_SET_GFX_BANK` macro and the twenty-six renamed
-functions of section 2 are gone from the headers, `check-upgrade` reports
-each use from `devtools/removed_api.txt`, `hdmaEnable()` / `hdmaDisable()`
+functions of section 2 are gone from the headers, `opensnes upgrade` reports
+each use from `make/removed_api.txt`, `hdmaEnable()` / `hdmaDisable()`
 take a channel number and `dmaTransfer()` a far pointer (section 1). No
 `OPENSNES_DEPRECATED` declaration is left.
 
@@ -127,8 +127,11 @@ meaning:
 grep -rnE 'hdma(Enable|Disable)\(|mode7SetScale\(|mode7Transform\(' src/
 ```
 
-`make check-upgrade SRC=<folder>` lists every removed name with its
-replacement, and every `hdmaEnable` / `hdmaDisable` / `mode7SetScale` /
-`mode7Transform` call, one line per hit (`devtools/check_upgrade.py`; the
-list of names is read from the SDK headers, so it cannot lag them). Exit 0
-when nothing is found.
+`opensnes upgrade <folder>` lists every removed name with its
+replacement, and every `hdmaEnable` / `hdmaDisable` / `dmaTransfer` /
+`mode7SetScale` / `mode7Transform` call, one line per hit (the names are
+`make/removed_api.txt` and `make/changed_api.txt` in the SDK; no Python
+needed — in the repository, `make check-upgrade SRC=<folder>` is the same
+command). Exit 0 when nothing is found. A source that fails to compile
+gets the removed names it uses, with their replacements, right under the
+compiler's error.

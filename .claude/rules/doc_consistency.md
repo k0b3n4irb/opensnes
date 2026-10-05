@@ -104,11 +104,20 @@ opt-in list.
     `CLAUDE.md` joined the files whose example count is checked (anchor 3).
 
 16. **No removed name is taught** (since 2026-10-05, lots B/G of the 1.0
-    plan): every name of `devtools/removed_api.txt` is absent from `docs/`,
+    plan): every name of `make/removed_api.txt` is absent from `docs/`,
     the examples, the templates, the headers and the manifests, unless the
     line says it is removed; `UPGRADING.md` and the PVSnesLib migration
     guide are exempt. The list grows with each removal lot and is also what
-    `make check-upgrade` reports to a project written against 0.x.
+    `opensnes upgrade` reports to a project written against 0.x.
+
+17. **No interpreter in a user build** (since 2026-10-06): no recipe or
+    variable line of `make/common.mk` names `python`, `perl`, `ruby`,
+    `node` or `uv run`, and the `release` recipe of the `Makefile` copies
+    nothing from `devtools/` and no `.py`. `common.mk` had ten `python3`
+    calls on the morning of 2026-10-05; the last one (the 0.x-name hint)
+    became `opensnes upgrade`, shell and awk, the next day
+    (`.claude/rules/two_audiences.md`, rule 1). Comments may tell the
+    history; a call may not come back.
 
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —

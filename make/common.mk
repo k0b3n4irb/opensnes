@@ -553,19 +553,23 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # Local headers count too (2026-09-26): tetris's main.c includes board.h,
 # piece.h, render.h and hud.h, and editing them rebuilt nothing. Every .h
 # next to a C source, rather than exact -MD deps: cheap and never stale.
+# When a source fails to compile, say which of its names OpenSNES 1.0 removed
+# and what to use instead (`opensnes upgrade`, make/removed_api.txt): the
+# compiler can only call them undeclared. Shell and awk, no interpreter: the
+# last interpreted step of a user build left this file on 2026-10-06
+# (.claude/rules/two_audiences.md; check_doc_drift.py anchor 17 keeps it so).
+upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes upgrade -q --removed-only $(1); then \
+	echo "  (the names above were removed at OpenSNES 1.0 — docs/UPGRADING.md)"; fi
 LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
 %.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
-			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
-	elif command -v python3 >/dev/null 2>&1; then \
-		python3 $(OPENSNES)/devtools/check_upgrade.py -q $< || \
-			echo "  (deprecated names above: removed at 1.0 — docs/UPGRADING.md; the clang pre-pass is absent on this machine)"; \
+			{ $(call upgrade_hint,$<); echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1; }; \
 	fi
 endif
 	@echo "[CC] $<"
-	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm
+	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm || { $(call upgrade_hint,$<); exit 1; }
 	$(call wrap_asm,$*.c.asm,$@)
 
 #------------------------------------------------------------------------------

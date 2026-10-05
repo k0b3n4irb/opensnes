@@ -6,12 +6,12 @@ needs `ortools` (its README says how; the lint that gates the committed
 output is stdlib). The game developer never sees this directory
 (`.claude/rules/two_audiences.md`).
 
-Transitional exception: `make/common.mk` still runs `check_upgrade.py`
-when a compile fails and clang is absent (behind `command -v python3`), so
-the `Makefile` copies it into the zip (`RELEASE_DEVTOOLS`). The five
-post-link checks it used to run are `opensnes-rom check` since
-2026-10-05 (same verdicts on the 99 built ROMs); the Python originals stay
-here for the contributor gates that use them.
+No script of this directory is run by a user build or copied into the zip
+(since 2026-10-06; `check_doc_drift.py` anchor 17 keeps it so). The five
+post-link checks `make/common.mk` used to run from here are `opensnes-rom
+check` since 2026-10-05 (same verdicts on the 99 built ROMs) — the Python
+originals stay for the contributor gates that use them — and the 0.x-name
+hint is `opensnes upgrade` (shell, `scripts/opensnes`).
 
 Every file here is named by a `make` target, a workflow, or an example
 README; a script that none of them names is an orphan and is deleted
@@ -33,7 +33,6 @@ README; a script that none of them names is an orphan and is deleted
 | `check_nmi_wram_race.py` | the WRAM port (`$2180`) reached from an NMI callback (silent failure) — also on every user link | `common.mk` |
 | `symmap/symmap.py` | WRAM overlaps, bank $00 overflow, RAM-band budget, the data-init terminator — on every user link and on the release ROMs | `common.mk`, the build workflows |
 | `verify_toolchain.py` | a submodule HEAD that is not the one `compiler/PINS.md` pins | `verify-toolchain`, `compiler` |
-| `check_upgrade.py` | in a project's sources, the names 1.0 removed and the calls whose meaning changed (`removed_api.txt`) | `check-upgrade`, `common.mk` on a compile error |
 | `link_modules.py` | a lib module that needs a symbol from a module it does not declare | `test-link-modules` |
 | `toolchain_suites.py` | a regression or an XPASS in the upstream cproc / QBE / wla-dx suites (`toolchain-suites/*.txt` ratchets) | `test-toolchain-suites` |
 | `gen_luna_doc.py` | `docs/tools/luna.md` that is not the pinned luna's own `--help` (`--check`) | `tests` |
@@ -62,9 +61,10 @@ compile-time pattern checks (`cases/`, `run.py`).
 
 ## Data files
 
-`removed_api.txt` (the 47 names 1.0 removed, read by `check_upgrade.py` and
-the sentinel's anchor 16), `cproc_width_sites.txt`, `toolchain-suites/*_known_fail.txt`,
-`cyclecount/bench_baseline.json`.
+`cproc_width_sites.txt`, `toolchain-suites/*_known_fail.txt`,
+`cyclecount/bench_baseline.json`. The names 1.0 removed live in
+`make/removed_api.txt` (shipped: `opensnes upgrade` reads it, and so does the
+sentinel's anchor 16).
 
 ## See also
 

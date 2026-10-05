@@ -51,12 +51,12 @@ version. A new module costs nothing to a project that does not link it.
 - A name that has to go is **deprecated first**: it keeps working, the
   clang pre-pass of every build prints a warning naming its replacement,
   and `docs/UPGRADING.md` lists it. It is removed at the next major
-  version only. A build without clang runs the same scan in Python on each
-  source it compiles and prints the names it finds (since 2026-10-04);
-  `make check-upgrade SRC=<folder>` reads a whole project against the list.
+  version only. Once it is removed, a source that names it fails to
+  compile and the build prints its replacement under the error;
+  `opensnes upgrade <folder>` reads a whole project against the list.
 - A **change of meaning** (the same name, a different effect) happens only
   at a major version, is announced one minor version ahead, and gets an
-  entry in `docs/UPGRADING.md` and a check in `check-upgrade`. The 1.0
+  entry in `docs/UPGRADING.md` and a check in `opensnes upgrade`. The 1.0
   release carries one: `hdmaEnable()` / `hdmaDisable()`, mask-taking and
   deprecated in 0.48, take a channel number (and refuse a value above 7).
 - A **bug fix that changes behaviour** (the hardware did not do what the

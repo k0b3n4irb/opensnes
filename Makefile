@@ -46,9 +46,6 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
-# devtools scripts that make/common.mk executes on every user build — the
-# release zip must ship each of them (see the `release` recipe).
-RELEASE_DEVTOOLS := $(sort $(shell grep 'python3' make/common.mk | grep -oE 'devtools/[A-Za-z0-9_/]+\.py'))
 
 # The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
@@ -588,13 +585,10 @@ release: all
 	@mkdir -p $(RELEASE_DIR)/opensnes/testing $(RELEASE_DIR)/opensnes/scripts
 	@cp testing/luna.version $(RELEASE_DIR)/opensnes/testing/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
-	@# Every devtools script make/common.mk runs on a user build (post-link
-	@# ratchets and lints). The list is read from common.mk itself: until
-	@# 2026-09-26 it was two hand-written cp lines, check_bank_reads.py was
-	@# missing, and every zip from July to v0.44.0 failed at the first link.
-	@for f in $(RELEASE_DEVTOOLS); do \
-		mkdir -p $(RELEASE_DIR)/opensnes/$$(dirname $$f) && cp $$f $(RELEASE_DIR)/opensnes/$$f || exit 1; \
-	done
+	@# No devtools script in the zip (2026-10-06): a user build runs binaries
+	@# of bin/ and the shell CLI only, and check_doc_drift.py (anchor 17)
+	@# fails if make/common.mk calls an interpreter again. Its name lists
+	@# (make/removed_api.txt, changed_api.txt) ship with make/.
 	@# No examples and no generated HTML in the SDK zip (2026-10-05, the
 	@# two-audiences rule): the examples ship once, for every OS, as
 	@# opensnes-examples_<version>.zip (`make release-examples`), and the
@@ -666,7 +660,7 @@ hardware-preflight:
 # change meaning (docs/UPGRADING.md): make check-upgrade SRC=<folder>
 check-upgrade:
 	@test -n "$(SRC)" || { echo "usage: make check-upgrade SRC=<folder-or-file>"; exit 2; }
-	@python3 devtools/check_upgrade.py $(SRC)
+	@scripts/opensnes upgrade $(SRC)
 
 help:
 	@echo "OpenSNES SDK Build System"

@@ -1,0 +1,9 @@
+# Calls that keep their name across 1.0 and change what they mean
+# (docs/UPGRADING.md). One per line: NAME<TAB>what changed. Read by
+# `opensnes upgrade`, which reports every call so it gets re-read; NOT by
+# the doc sentinel (these names are current API). Append, never delete.
+hdmaEnable	takes a channel number 0-7 since 1.0 (a bit mask until 0.48; above 7 it is refused) — 1 << n becomes n, or hdmaEnableMask(1 << n)
+hdmaDisable	same as hdmaEnable: n, or hdmaDisableMask(1 << n)
+dmaTransfer	takes the source as one far pointer since 1.0 (bank + address until 0.48): dmaTransfer(ch, mode, src, destReg, size)
+mode7SetScale	0x0100 is 1:1 since 0.47 (it was 0x0200): check the value
+mode7Transform	100 is 1:1 since 0.47: check the percentage

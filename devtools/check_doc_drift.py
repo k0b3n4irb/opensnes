@@ -1088,7 +1088,7 @@ HEADER_MAP_HEADING = "## Header → tutorial map"
 # --------------------------------------------------------------------------
 # Check 16: no page, example or template cites a name removed from the SDK
 # (added 2026-10-05, lot B/G of the 1.0 plan). The list is
-# devtools/removed_api.txt; docs/UPGRADING.md and MIGRATING_FROM_PVSNESLIB.md
+# make/removed_api.txt; docs/UPGRADING.md and MIGRATING_FROM_PVSNESLIB.md
 # exist to name them and are exempt, CHANGELOG.md is history.
 # --------------------------------------------------------------------------
 
@@ -1100,7 +1100,7 @@ _REMOVED_EXEMPT = {"docs/UPGRADING.md", "docs/MIGRATING_FROM_PVSNESLIB.md"}
 
 
 def removed_api_names() -> dict[str, str]:
-    path = repo_path("devtools/removed_api.txt")
+    path = repo_path("make/removed_api.txt")
     names: dict[str, str] = {}
     if path.is_file():
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -1108,6 +1108,38 @@ def removed_api_names() -> dict[str, str]:
                 parts = line.split("\t")
                 names[parts[0]] = parts[1] if len(parts) > 1 else ""
     return names
+
+
+# Anchor 17 (2026-10-06): nothing a user project's build executes is an
+# interpreted script (.claude/rules/two_audiences.md, rule 1). make/common.mk
+# had ten python3 calls on 2026-10-05; the last one left the next day. A
+# recipe or variable line that names an interpreter fails here; comments may
+# tell the history. The release recipe must not copy a devtools script
+# either: the zip is what the game developer gets.
+INTERPRETER_RE = re.compile(r"\b(python3?|perl|ruby|node|uv run)\b")
+
+
+def check_user_build_has_no_interpreter() -> list[str]:
+    drifts: list[str] = []
+    for n, line in enumerate(repo_path("make/common.mk").read_text(encoding="utf-8").splitlines(), 1):
+        stripped = line.strip()
+        if stripped.startswith("#") or stripped.startswith("@#"):
+            continue
+        m = INTERPRETER_RE.search(line)
+        if m:
+            drifts.append(f"make/common.mk:{n}: a user build calls `{m.group(1)}` — every step is a binary "
+                          f"of bin/ or the shell CLI (.claude/rules/two_audiences.md, rule 1)")
+    makefile = repo_path("Makefile").read_text(encoding="utf-8")
+    start = makefile.find("\nrelease:")
+    end = makefile.find("\nrelease-", start + 1)
+    recipe = makefile[start:end if end > start else len(makefile)]
+    for n, line in enumerate(recipe.splitlines()):
+        if line.strip().startswith("@#"):
+            continue
+        if re.search(r"devtools/|\.py\b", line):
+            drifts.append(f"Makefile, release recipe: `{line.strip()[:80]}` puts a contributor script in the zip "
+                          f"(.claude/rules/two_audiences.md, rule 3)")
+    return drifts
 
 
 def check_removed_api_names() -> list[str]:
@@ -1132,7 +1164,7 @@ def check_removed_api_names() -> list[str]:
                     if "removed" in low or "retir" in low:
                         continue        # the line says it is gone
                     drifts.append(f"{rel}:{lineno}: `{m.group(1)}` was removed from the SDK "
-                                  f"(devtools/removed_api.txt: use {names[m.group(1)]}); "
+                                  f"(make/removed_api.txt: use {names[m.group(1)]}); "
                                   f"a page or example must not teach it")
     return drifts
 
@@ -1206,6 +1238,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_benchmark_table())
     all_drifts.extend(check_header_map())
     all_drifts.extend(check_removed_api_names())
+    all_drifts.extend(check_user_build_has_no_interpreter())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

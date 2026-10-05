@@ -16,14 +16,13 @@ OpenSNES has two populations, and they do not want the same thing.
 1. **Nothing a user project's build executes is an interpreted script.**
    Every step `make/common.mk` runs on a user's `make` is a binary from
    `bin/` (or luna). A Python script on that path is a defect, not a
-   convenience. State at the end of 2026-10-05: of the ten `python3`
-   calls `common.mk` had that morning, one remains — the 0.x-name hint on
-   a compile error (behind `command -v python3`); the post-link checks
-   are `opensnes-rom check` and a project's `make test` is `luna test` on
-   the project's own manifests (`project_test.py` is gone, the zip ships
-   no Python of `testing/`). The count must only go
-   down; when it reaches zero, add the anchor to `check_doc_drift.py` so
-   it stays there.
+   convenience. **Zero since 2026-10-06**: of the ten `python3` calls
+   `common.mk` had on the morning of 2026-10-05, the post-link checks
+   became `opensnes-rom check`, a project's `make test` became `luna test`
+   on the project's own manifests, and the 0.x-name hint on a compile
+   error became `opensnes upgrade` (shell and awk). The zip ships no
+   Python at all, and `check_doc_drift.py` anchor 17 fails the lint if a
+   call comes back.
 2. **Tools for the game developer are compiled, one per function, under one
    prefix**: `opensnes` (the project), `opensnes-sprite`, `-tileset`,
    `-level`, `-text`, `-palette`, `-image`, `-sample`, `-music`, `-rom`,
@@ -34,8 +33,8 @@ OpenSNES has two populations, and they do not want the same thing.
    golden suite byte for byte before the old one goes.
 3. **`devtools/` is contributor-only and never shipped.** Scripts that the
    user build still needs live there only until their compiled replacement
-   proves the same verdict on the corpus (`RELEASE_DEVTOOLS` in the
-   `Makefile` is the transitional list, not a design).
+   proves the same verdict on the corpus. None is left on that path since
+   2026-10-06, and the release recipe copies nothing from `devtools/`.
 4. **The release zip is light**: no built examples, no Doxygen HTML; those
    ship as a separate examples archive and as the online docs. The judge is
    `devtools/release_smoke.py` — and, once the Python is gone, it runs in

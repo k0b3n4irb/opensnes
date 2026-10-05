@@ -1,9 +1,11 @@
 # Names removed from lib/include/snes/ (lot B of the 1.0 plan, 2026-10-05).
 # One per line: NAME<TAB>what to use<TAB>header it lived in. Read by
-# devtools/check_upgrade.py (a user's sources) and by check_doc_drift.py
-# (anchor 16: no page or example cites a removed name, UPGRADING.md and
-# MIGRATING_FROM_PVSNESLIB.md excepted). Append, never delete: a name once
-# public stays here so a project written against 0.x keeps getting the hint.
+# `opensnes upgrade` (a user's sources; this file ships in the zip with
+# make/) and by devtools/check_doc_drift.py (anchor 16: no page or example
+# cites a removed name, UPGRADING.md and MIGRATING_FROM_PVSNESLIB.md
+# excepted). Append, never delete: a name once public stays here so a
+# project written against 0.x keeps getting the hint. The calls that keep
+# their name and change meaning are in changed_api.txt, beside this file.
 WINDOW_BG1	LAYER_BG1 (video.h)	window.h
 WINDOW_BG2	LAYER_BG2 (video.h)	window.h
 WINDOW_BG3	LAYER_BG3 (video.h)	window.h

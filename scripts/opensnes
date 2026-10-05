@@ -7,6 +7,7 @@
 #     opensnes run [--emulator EMULATOR]
 #     opensnes clean
 #     opensnes doctor
+#     opensnes upgrade [-q] [--removed-only] <folder-or-file>...
 
 set -e
 set -o pipefail
@@ -381,6 +382,89 @@ cmd_clean() {
     OPENSNES_HOME="$sdk" make -C "$proj" clean
 }
 
+# In a project's sources, the names OpenSNES 1.0 removed (make/removed_api.txt)
+# and the calls that kept their name and changed meaning (make/changed_api.txt):
+# one line per hit — file:line, the name, what to use. Exit 0 when nothing is
+# found, 1 otherwise. -q prints the hits only; --removed-only leaves out the
+# calls that changed meaning (current API): `-q --removed-only` is what
+# make/common.mk runs on a source that failed to compile. Shell and awk, no interpreter to
+# install (.claude/rules/two_audiences.md); until 2026-10-06 this was
+# devtools/check_upgrade.py, the last Python a user build could run.
+cmd_upgrade() {
+    local quiet=0 changed_too=1
+    local -a paths=()
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -q|--quiet) quiet=1; shift ;;
+            --removed-only) changed_too=0; shift ;;   # not the calls that changed meaning: they are current API
+            -*)         die "Unknown option: $1" ;;
+            *)          paths+=("$1"); shift ;;
+        esac
+    done
+    [ ${#paths[@]} -eq 0 ] && die "Usage: opensnes upgrade [-q] <folder-or-file>...   (docs/UPGRADING.md)"
+
+    local sdk
+    sdk="$(require_sdk)"
+    local removed="$sdk/make/removed_api.txt" changed="$sdk/make/changed_api.txt"
+    [ -f "$removed" ] && [ -f "$changed" ] || die "the name lists are missing from $sdk/make (removed_api.txt, changed_api.txt)"
+    local headers="$sdk/lib/include/snes"
+
+    # the files: a file as given, a folder for its C and assembly sources
+    local -a files=()
+    local p f d
+    for p in "${paths[@]}"; do
+        if [ -f "$p" ]; then
+            files+=("$p")
+        elif [ -d "$p" ]; then
+            while IFS= read -r f; do files+=("$f"); done < <(
+                find "$p" -type f \( -name '*.c' -o -name '*.h' -o -name '*.asm' -o -name '*.s' -o -name '*.inc' \) | LC_ALL=C sort)
+        else
+            die "no such file or folder: $p"
+        fi
+    done
+    # the SDK's own headers name the removed names on purpose
+    local -a scan=()
+    for f in "${files[@]}"; do
+        d="$(cd "$(dirname "$f")" 2>/dev/null && pwd -P)" || continue
+        case "$d/" in "$headers"/*) continue ;; esac
+        scan+=("$f")
+    done
+
+    local hits=0
+    if [ ${#scan[@]} -gt 0 ]; then
+        local out
+        out=$(awk -v removed="$removed" -v changed="$changed" -v changed_too="$changed_too" '
+            BEGIN {
+                while ((getline line < removed) > 0) {
+                    if (line == "" || line ~ /^#/) continue
+                    split(line, c, "\t"); gone[c[1]] = "removed: use " c[2] " (removed from " c[3] ")"
+                }
+                while (changed_too && (getline line < changed) > 0) {
+                    if (line == "" || line ~ /^#/) continue
+                    split(line, c, "\t"); gone[c[1]] = "changes meaning: " c[2]
+                }
+            }
+            {
+                code = $0
+                k = index(code, "//"); if (k) code = substr(code, 1, k - 1)
+                while (match(code, /[A-Za-z0-9_]+/)) {
+                    word = substr(code, RSTART, RLENGTH)
+                    code = substr(code, RSTART + RLENGTH)
+                    if (word in gone) printf "%s:%d: %s — %s\n", FILENAME, FNR, word, gone[word]
+                }
+            }
+        ' "${scan[@]}")
+        if [ -n "$out" ]; then
+            printf '%s\n' "$out"
+            hits=$(printf '%s\n' "$out" | wc -l | tr -d ' ')
+        fi
+    fi
+    if [ "$quiet" -eq 0 ]; then
+        printf '\nopensnes upgrade: %s hit(s) in %s file(s) (the names of make/removed_api.txt and make/changed_api.txt; docs/UPGRADING.md)\n' "$hits" "${#scan[@]}"
+    fi
+    [ "$hits" -eq 0 ]
+}
+
 cmd_test() {
     local update=0
 
@@ -480,12 +564,11 @@ cmd_doctor() {
             fail "$b — not found in $bin_dir"
         fi
     done
-    # optional: the clang pre-pass names deprecated calls at build time;
-    # without it make/common.mk runs the Python scan instead
+    # optional: the clang pre-pass catches C mistakes before cc65816 does
     if command -v clang >/dev/null 2>&1; then
-        ok "clang (deprecation warnings at build time)"
+        ok "clang (C lint pre-pass at build time)"
     else
-        warn "clang not found — deprecated calls are reported by devtools/check_upgrade.py instead (slower, same names)"
+        warn "clang not found — no C lint pre-pass (a source that fails to compile still gets the 0.x-name hint)"
     fi
 
     # Library
@@ -544,6 +627,8 @@ Commands:
     run           Build and run in emulator (--emulator NAME)
     test          Run the project's tests in luna (--update to rebaseline)
     doctor        Check SDK installation
+    upgrade       List, in your sources, the names 1.0 removed and the calls
+                  whose meaning changed (opensnes upgrade src/)
 
 Examples:
     opensnes init my-game --template game
@@ -564,6 +649,7 @@ case "$1" in
     run)     shift; cmd_run "$@" ;;
     test)    shift; cmd_test "$@" ;;
     doctor)  shift; cmd_doctor "$@" ;;
+    upgrade) shift; cmd_upgrade "$@" ;;
     -h|--help|help) usage ;;
     *)       die "Unknown command: $1. Run 'opensnes help' for usage." ;;
 esac
