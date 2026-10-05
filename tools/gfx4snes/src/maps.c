@@ -218,8 +218,34 @@ unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksiz
     {
         for (x = 0; x < nbblockx; x++)
         {
-            // get the palette number (0-7 for both 4 & 16 color mode)
-            paletteno = (nbcolors != 4) ? (imgbuf[currenttile * sizetile] >> 4) & 0x07 : (imgbuf[currenttile * sizetile] >> 2) & 0x07;
+            // get the palette number (0-7 for both 4 & 16 color mode) from the
+            // tile's first OPAQUE pixel: index 0 is the transparent colour of
+            // every bank, so a bank-2 tile starting with it took palette 0 and
+            // showed with bank 0's colours (first-pixel rule until 2026-10-05,
+            // inherited from PVSnesLib; 63 of a tile's 64 pixels wrong). A tile
+            // whose opaque pixels span two banks cannot be drawn by one map
+            // entry: refused, as the no-map path has done since 2026-10-04.
+            if ((nbcolors == 4 || nbcolors == 16) && graphicmode != 7)
+            {
+                unsigned int px, bank, first = 0, seen = 0;
+                int shift = (nbcolors == 16) ? 4 : 2;
+                for (px = 0; px < sizetile; px++) {
+                    unsigned int v = imgbuf[currenttile * sizetile + px];
+                    if (v == 0) continue;
+                    bank = (v >> shift) & 0x07;
+                    if (!seen) { first = bank; seen = 1; }
+                    else if (bank != first)
+                        fatal("tile %d (block x=%d y=%d) uses colours of palette banks %d and %d: one map entry carries one palette (%d colours); keep each tile's opaque pixels in one bank",
+                              currenttile, x, y, first, bank, nbcolors);
+                }
+                paletteno = first;
+            }
+            else
+            {
+                // 8bpp (Mode 3/4 256 colours, Mode 7): no palette banks; the
+                // entry's palette bits are unused, kept as the old expression gave them
+                paletteno = (nbcolors != 4) ? (imgbuf[currenttile * sizetile] >> 4) & 0x07 : (imgbuf[currenttile * sizetile] >> 2) & 0x07;
+            }
             tilevalue = ((paletteno + offsetpal) << PALETTE_OFS);
             if ((tilevalue>>10)>=8) warning ("out of bounds palette %d for tile %d",currenttile,paletteno);
             

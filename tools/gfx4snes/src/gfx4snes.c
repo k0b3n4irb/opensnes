@@ -171,10 +171,18 @@ int main(int argc, const char **argv)
 		// convert tiles to a snes format (8x8)
 		tiles_snes=tiles_convertsnes (snesimage.buffer, snesimage.header.width, snesimage.header.height, gfx4snes_args.tilewidth, gfx4snes_args.tileheight, &nbtilesx, &nbtiles, 8, gfx4snes_args.quietmode);
 
-		// if we want to make palettes before, just do it !
+		// Rearrange the palette on the TILE buffer: palette_rearrange_snes reads
+		// 64-byte tiles (tile * 64 + i) and rewrites the pixel indices it moves,
+		// and tiles_snes is what map_convertsnes consumes below. Until
+		// 2026-10-05 it was given snesimage.buffer, the row-major image: the
+		// analysis grouped image rows as "tiles" and the rewritten indices never
+		// reached the tiles written out, so `-a` reordered the .pal and left the
+		// .pic on the old indices — wrong colours on every moved entry (measured:
+		// 191 of 256 pixels on a four-tile, three-bank image). PVSnesLib's
+		// gfx4snes has the same order.
 		if (gfx4snes_args.paletterearrange) 
 		{
-			palette_rearrange_snes(snesimage.buffer, (int *)&palette_snes, nbtiles, gfx4snes_args.palettecolors, gfx4snes_args.quietmode);
+			palette_rearrange_snes(tiles_snes, (int *)&palette_snes, nbtiles, gfx4snes_args.palettecolors, gfx4snes_args.quietmode);
 		}
 
 		// convert map to a snes format if needed and /!\ optimize tiles in tiles_snes

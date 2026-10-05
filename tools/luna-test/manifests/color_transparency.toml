@@ -40,4 +40,8 @@ colormath_cgadsub = { eq = 0x21, width = 1 }
 
 [asserts.blocks]
 cloud_pal = { space = "cgram", offset = "0000", hex = "0000a438" }
-land_pal  = { space = "cgram", offset = "0020", hex = "0000347f957ff87fdd7f492dad2dc524200300025322183fd329783e4e191d53" }
+# land_pal: the landscape's 16 colours as gfx4snes -a now lays them out. Until
+# 2026-10-05 the tool reordered the .pal without rewriting the tiles, and this
+# line pinned that wrong order (0000 347f 957f ... 0002 ...): the picture was
+# brown and mauve. The colour 0x08c9 is back; 0x0002 was a casualty of the bug.
+land_pal  = { space = "cgram", offset = "0020", hex = "0000183f5322ad2d492dc524c9084e19d329783e1d53dd7ff87f957f347f2003" }

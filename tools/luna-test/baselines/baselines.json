@@ -319,15 +319,15 @@
   },
   "color_transparency": {
     "fbhash": [
-      "e5b2af519575c394",
-      "1c491871cd0bee4d"
+      "c26f0c091c5aa296",
+      "334e7d415180afd3"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.32.0",
-    "rom_sha256": "94d47d7fbdd6538fb75326ea6690d489e8b0a0370458c70b3cd52fa4f11b84d5"
+    "rom_sha256": "805ddebfce1583bb8248e0934718991f02ffa48f1deb5a48563efb83a33e90cc"
   },
   "fundamentals_text_glyphs": {
     "fbhash": "38021905139d9d7e",

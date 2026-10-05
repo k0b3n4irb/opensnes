@@ -23,6 +23,22 @@ All notable changes to OpenSNES are documented in this file.
   illustration).
 
 ### Fixed
+- fix(tools): two gfx4snes map defects measured with a pixel oracle (decode
+  `.pic` + `.pal` + `.map` and compare every pixel with the source). (1)
+  A map entry took its palette bank from the tile's **first** pixel; index
+  0 is the transparent colour of every bank, so a bank-2 tile that starts
+  transparent was drawn with bank 0's colours (63 of its 64 pixels wrong).
+  The bank now comes from the first opaque pixel, and a tile whose opaque
+  pixels span two banks is refused. (2) `-a` (`--pal-rearrange`) rearranged
+  the palette on the row-major image buffer while the tiles written out
+  were converted before: the `.pal` moved, the `.pic` kept the old indices
+  (191 of 256 pixels wrong on a three-bank image). The rearrangement now
+  runs on the tile buffer. `examples/color/transparency` is the one `-a`
+  user: its landscape decoded to the wrong colour on 51 056 of 52 509
+  opaque pixels and to transparent on 4 835 more since the port — the
+  picture looked like a landscape, in the wrong palette; image and WRAM
+  baselines and its README screenshot are re-captured. PVSnesLib's
+  gfx4snes has both defects (build-tools audit C, the two open questions).
 - fix(lib): `objCollidObj`, `mapGetMetaTile`, `mapGetMetaTilesProp`,
   `profileColorStart`, `dsp1SetCamera` and `dsp1Raster` reach the
   compiler's scratch registers direct-page-relative, as compiled C does.

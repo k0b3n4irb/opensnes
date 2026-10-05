@@ -140,3 +140,4 @@ Aucun rapport n'est à zéro constat ouvert.
 - **G rec 11** fermé : six lignes partenaires écrites avec reproduction ; **G S1** côté doc fermé (`superfx.h`, `superfx_hello`).
 - **B l.21** fermé : six routines en page directe, contrat du callback écrit sur `nmiSet()`.
 - **A PF3** fermé : ratchet `check_cproc_widths.py` dans `make lint` (la matrice de propriétés reste `d_quals`).
+- **C questions `-a` et palette du premier pixel** fermées : deux défauts mesurés et corrigés (oracle pixel dans les goldens).

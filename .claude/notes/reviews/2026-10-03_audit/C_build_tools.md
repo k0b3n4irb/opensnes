@@ -166,3 +166,14 @@ Le système de build a fermé en une semaine presque tout ce que l'audit du 26/0
   cinq types : les sections des ROM du dépôt sont toutes en banques 0..7
   (repliées), plus la section de code en RAM `$7E` des Super FX, voulue.
   Un contrôle `symmap` ferait doublon avec la borne ; rec 5 est fermée.
+- **Les deux questions ouvertes, mesurées (2026-10-05)** : oracle pixel
+  (décodage `.pic`/`.pal`/`.map`, comparaison à la source) sur une image de
+  quatre tuiles sur trois banques. (1) Palette du premier pixel : la tuile
+  de banque 2 qui commence par l'indice 0 recevait la palette 0, 63 pixels
+  faux → premier pixel opaque, et refus d'une tuile dont les pixels opaques
+  couvrent deux banques (fixture `mixed_map.png`). (2) `-a` : 191 pixels sur
+  256 faux — `palette_rearrange_snes` lisait l'image en lignes et
+  réécrivait un tampon que personne ne relisait ; il travaille maintenant
+  sur `tiles_snes`. `color/transparency`, seul utilisateur de `-a`, avait
+  97 % de ses pixels opaques dans la mauvaise couleur depuis le port
+  (PVSnesLib : même ordre, même rendu) ; recapturé. Deux lignes au journal.
