@@ -553,6 +553,12 @@ All notable changes to OpenSNES are documented in this file.
   extended header filled with $FF); `ROADMAP.md` describes the `superfx`
   module as it is and lists `dsp1` (chips audit PF7, PF8; library audit
   l.30).
+- docs: `HARDWARE_VERIFICATION.md` gains row 24, `chips/superfx_game_skeleton`
+  (presentation, code cache and SNESMOD together on the cart), says that
+  the FXPak runs the DSP-1 only with the DSP ROM dumps in its system
+  folder, and names the two save paths no row covers yet (SA-1 BW-RAM,
+  Super FX Game Pak RAM) (chips audit PF10). `make hardware-kit` collects
+  24 ROMs.
 - build(devtools): every link runs `symmap.py --check-data-init`: the
   `DataInitEnd` label must close the `.data_init` section, or initialised
   globals past the terminator would boot with whatever WRAM held. Reading

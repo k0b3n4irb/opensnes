@@ -214,7 +214,7 @@ section (`APPENDTO`). A record landing past the terminator would leave its
 initialised globals with whatever WRAM held at boot, silently.
 
 What keeps the terminator last is **not** the linkfile order, which this
-page claimed until 2026-10-05 ("`data_init_end.o` MUST be linked last"):
+page claimed until 2026-10-05 (the entry was titled "data_init_end.o MUST be linked last"):
 wlalink sorts appended sections by priority, then by size, largest first
 (`wlalink/analyze.c`, `_compare_sections`), and every record is at least
 6 bytes (5 of header plus the data itself), so the 5-byte terminator sorts

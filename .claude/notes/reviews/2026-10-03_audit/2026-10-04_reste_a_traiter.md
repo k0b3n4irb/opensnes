@@ -132,3 +132,6 @@ Aucun rapport n'est à zéro constat ouvert.
 - **C S15** fermé : trois refus dans tmx2snes avec contrôles négatifs.
 - **E PF9** fermé : test nommé dans les sept entrées vertes ; entrée `data_init_end` corrigée et gardée par `--check-data-init`.
 - **D PF10** fermé : baselines recapturées sous la v1.32.0 (hachages inchangés).
+- **B l.20, l.22, l.31** : fermés le 10-04 (ligne de la liste périmée) ; **B l.30** fermé (doc `fixMul`).
+- **D rec 12** fermé : les deux autres textes (`wram_regress.py`, `manifest.toml`) étaient déjà corrigés.
+- **G PF7, PF8** fermés ; **G PF10** partiel (rangée 24, note `dsp1b.bin`, chemins de sauvegarde déclarés non couverts).
