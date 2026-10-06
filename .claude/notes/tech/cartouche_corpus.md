@@ -113,6 +113,7 @@ pull + import + rebuild). What moved:
 Replica at snes-rag's fingerprint `ab7b05594e17` (34 946 chunks, chunker
 v10, 215 sources: `furryrpg`, `georgjz-snes-assembly-adventure`,
 `nova-the-squirrel-2`, `skipp-and-friends`, `space-rescue-squad` new).
+(2026-10-06, pin v1.33.1: `luna-docs` serves the `[1.33.0]` changelog — "luna state rom.checksum_computed" gives chunk `6c16d06712970f52`; 1.33.1 changes the Windows GUI only. No lag to report.)
 `luna-docs` serves v1.32.0: "how do I tell whether two builds sound the
 same when their audio hashes differ" gives the `[1.32.0]` changelog
 (`2153025ed4d5bb41`) then the `luna diff --audio` section

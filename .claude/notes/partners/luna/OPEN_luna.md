@@ -2,14 +2,27 @@
 
 Opened 2026-09-26. One line per item. Every item is re-checked on the pinned
 luna the day the report goes out (`.claude/rules/partners.md`); the pin is
-v1.31.0 (2026-10-03).
+v1.33.1 (2026-10-06).
+
+Re-checked on v1.33.1 on 2026-10-06: the bare static name still answers
+« not a loaded symbol and not BANK:OFFSET » (`player_x` for `player_x.main`
+on the `opensnes init --template game` ROM); `--power-on` still lists WRAM,
+VRAM, CGRAM, OAM and APU RAM only (`luna state --help`); the v1.33.1 release
+has four zips and no `.sha256` (we pin the sums in `testing/luna.sha256`).
+The MS0 / 21 MHz and DSP-1 2 MB items were not re-run (no change named in the
+1.33.0 and 1.33.1 notes).
+
+What v1.33.0 made us find: its mosaic fix (the grid one line lower) moved
+none of our baselines — no oracle of ours hashed a frame with mosaic on.
+`testing/manifests/transition_mosaic_picture.toml` now does (v1.33.1
+`9980548a31063b25`, v1.32.0 `b40b834549507f25`).
 
 | Date | Item | Seen on | What we would run |
 |---|---|---|---|
 | - | (empty: the audio comparison request went out on 2026-10-03 in `2026-10-03_to_luna_messages-region_reply.md`, §2) | - | - |
 | - | (done 2026-10-03 at the v1.32.0 pin: the three runs of the diff-audio reply replayed on the pinned binary, rule written in `testing.md`) | | |
-| 2026-10-03 | `luna state --dsp-trace` writes `spc_cycles = 0` on every line (seen on `games/likemario`, 80 589 lines, and `audio/echo`, 92 lines) — so the order of a voice's KON against its volume, pitch and ADSR writes cannot be timed; the examples auditor could not settle whether SNESMOD sets voice 7 up after KON | v1.31.0 | `luna state examples/audio/snesmod_sfx/sfx.sfc --until-frame 800 --dsp-trace sfx.csv --input "100:0x80,104:0,200:0x8000,…"` with a non-zero `spc_cycles` per row | **Réglé sur luna `develop` `33116ad`** (vérifié le 2026-10-05 sur leur binaire : 92 lignes, `spc_cycles` croissants, 95632, 95642, …) ; à fermer à l'épinglage de la version qui le porte |
-| 2026-10-05 | `rom.checksum_valid` in `luna state` is true as soon as checksum XOR complement == 0xFFFF; it does not sum the ROM. A copy of `print_string.sfc` with byte $0100 flipped (true sum 0xB01F, header 0xAF40) still reports `checksum_valid: true`, `checksum: 44864`. Needed: `checksum_valid` = header sum equals the computed sum (with the usual mirroring of a non-power-of-two tail), or a separate `checksum_computed` field. Our corpus gate (`luna_runner.py --coverage`, `header_problem`) reads this field and can only catch an inconsistent pair until then | v1.32.0 | `cp print_string.sfc bad.sfc; printf '\xff' \| dd of=bad.sfc bs=1 seek=256 conv=notrunc; luna state bad.sfc --until-frame 0 --out - \| jq .rom` | **Réglé sur luna `develop` `39359de`** : champ `rom.checksum_computed` à côté (`checksum_valid` garde son sens, la détection de mapper s'en sert) ; vérifié le 2026-10-05 sur leur binaire : `print_string.sfc` 0xAF40 = 0xAF40, copie altérée 0xAF40 ≠ 0xB01F. `luna_runner.py` compare les deux dès que le champ existe ; à fermer à l'épinglage |
+| - | (closed by v1.33.0: `--dsp-trace` timestamps; re-run 2026-10-06 on v1.33.1, `examples/audio/echo` to frame 300: 92 rows, none at 0, first row `95632,$6C,FLG,$20`) | | |
+| - | (closed by v1.33.0: `rom.checksum_computed`; re-run 2026-10-06 on v1.33.1, `print_string.sfc` with byte $0100 set to $5A: `checksum` 41211, `checksum_computed` 41285 — the figure `opensnes-rom inspect` gives, $A145. `luna_runner.py` compares the two fields on every ROM since the pin) | | |
 | 2026-10-05 | `--power-on random` fills « WRAM, VRAM, CGRAM, OAM and APU RAM » (`luna state --help`, v1.32.0) and not the cartridge's RAM: the Super FX Game Pak RAM (framebuffers, save area), the SA-1 BW-RAM and I-RAM start clean, so a read of an uninitialised framebuffer or I-RAM byte cannot show on luna (chips audit G, 2026-10-03). Needed: the same fill on cartridge RAM (or a `--power-on-cart` switch), with the same seed | v1.32.0 | `luna state examples/chips/superfx_3d/superfx_3d.sfc --until-frame 60 --power-on random=1 --peek 70:0000:20` — bytes read `00` |
 | 2026-10-05 | No diagnostic when CFGR bit 5 (MS0, fast multiply) and CLSR bit 0 (21 MHz) are both set: « MS0 must be zero in 21MHz mode » (fullsnes `1adef8e33ff3c4e9`; ares `06c6d2324e3c6d01`: products « may sometimes be invalid » in that mode). Our launchers mask the bit, but a program writing CFGR itself runs green on luna and may multiply wrong on a console. Needed: a counter or a note in `state.gsu` (like `bus_violations`) when a MUL/FMULT executes with both bits set | v1.32.0 | a ROM writing `$A0` to `$3037` then `$01` to `$3039` and running `fmult`; `luna state … --out - \| jq .gsu` shows `cfgr: 160, clsr: true` and nothing else |
 | 2026-10-05 | A DSP-1 LoROM of 2 MB (`ROM_BANKS=64`, `USE_DSP1=1`, before our build refused it) loads and runs on luna while the only 2 MB DSP-1 LoROM board (SHVC-2B3B-01) maps the DSP registers elsewhere (chips audit S5). Low priority: `make` refuses the combination since 2026-10-04 (`ROM_BANKS_MAX` 32 for DSP-1); an emulator warning on header-vs-board inconsistencies would still be a service | v1.32.0 | build with `ROM_BANKS=64 USE_DSP1=1` on a tree before `a8113dd8`, `luna state` boots it without a word |

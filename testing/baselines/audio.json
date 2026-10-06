@@ -1,5 +1,5 @@
 {
-  "luna": "v1.32.0",
+  "luna": "v1.33.1",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {

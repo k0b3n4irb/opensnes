@@ -4,7 +4,7 @@
 #   V=$(cat testing/luna.version); for p in linux_x86_64 linux_arm64 darwin_arm64 windows_x86_64; do
 #     curl -sL -o /tmp/l.zip https://github.com/k0b3n4irb/luna/releases/download/$V/luna_${V}_${p}.zip
 #     echo "$(sha256sum /tmp/l.zip | cut -d' ' -f1)  luna_${V}_${p}.zip"; done
-9dc5aa1c46ec2a36eb439c6765fc1855eb050806d2e6a0375c9865d9db0699c7  luna_v1.32.0_linux_x86_64.zip
-aa3552fafed3dd67b1cc2596c0348005b5659cd83882b3f9b026eca2c25f8476  luna_v1.32.0_linux_arm64.zip
-e21ff9bb65a97cf157eda09ef5560fcad0a3f25d6ddac3e1b33ba1fa616e8f8f  luna_v1.32.0_darwin_arm64.zip
-edc1ca0e6be16bff6d72688014dbb3ed4bdad8a6f1da7865d30959fdc3a948f4  luna_v1.32.0_windows_x86_64.zip
+aac5bba6eeb95176deb817f53db1de59a83a85c52c324dbdad298089ff5b39af  luna_v1.33.1_linux_x86_64.zip
+eba331a8dfb8a6bdf3d42d50780acb329eb04cd366936632d8e43d237c605ea3  luna_v1.33.1_linux_arm64.zip
+863d6493884c38ad5fcd1422f4e4cf979d945152cb5bcd020057d053804cd028  luna_v1.33.1_darwin_arm64.zip
+753fa41149620eacaf474dd3b73a03196e53179ae691abcb090a5cba3f3e49ee  luna_v1.33.1_windows_x86_64.zip

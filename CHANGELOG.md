@@ -166,6 +166,14 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **luna pinned at v1.33.1** (testing): from v1.32.0. The whole suite is
+  green and no frame, audio or WRAM baseline moves; `baselines.json` and
+  `audio.json` are re-stamped, `docs/tools/luna.md` regenerated from the
+  new `--help`. The harness now compares `rom.checksum` with luna's new
+  `rom.checksum_computed` on every ROM. v1.33.0 fixed how mosaic blocks
+  are drawn and nothing of ours noticed: a new manifest,
+  `transition_mosaic_picture.toml`, hashes a frame with the mosaic on
+  (it fails on v1.32.0).
 - **`cc65816` is a compiled program** (compiler, build): the driver that
   runs the host preprocessor, `cproc-qbe` and `qbe` was a bash script
   (`compiler/scripts/cc65816`); it is `compiler/cc65816/cc65816.c`, built
