@@ -212,8 +212,8 @@ fbhash = ""                       # the frame's hash; `make test-update` fills i
 [[checkpoint]]
 at_frame = 180
 [checkpoint.values]
-"player_x.main" = 120             # by symbol name, from the ROM's .sym
-"player_y.main" = 100
+player_x = 120                    # by the variable's name in your C
+player_y = 100
 ```
 
 ```toml
@@ -225,7 +225,7 @@ input = "30:0x100,90:0"           # "frame:buttons_hex" (RIGHT = 0x100), until f
 [[checkpoint]]
 at_frame = 150
 [checkpoint.values]
-"player_x.main" = 180             # 120 + 60
+player_x = 180                    # 120 + 60
 ```
 
 Workflow:
@@ -241,11 +241,12 @@ make test                 # from now on: exit 0 = green, 1 = regression
 What a manifest can judge:
 
 - **WRAM values** — `[checkpoint.values]` entries are read by luna at
-  `at_frame`, with symbol names resolved from your ROM's `.sym` file. A
-  file-scope `static` carries the name of its source file as a suffix
-  (`"player_x.main"` for one defined in `main.c`, quoted because of the
-  dot), so two sources may define the same static; a plain global keeps
-  its bare name. A value is a number, or `{ eq = 0x10, width = 1 }` to
+  `at_frame`, with symbol names resolved from your ROM's `.sym` file:
+  write the name the variable has in your C. Two sources may define a
+  `static` of the same name; luna then refuses the bare name and lists
+  the candidates, each with its source file as a suffix
+  (`"player_x.main"` for the one of `main.c`, quoted because of the
+  dot). A value is a number, or `{ eq = 0x10, width = 1 }` to
   set the width; `[checkpoint.delta]` says `"increased"` / `"unchanged"`
   between two checkpoints;
 - **Visual baselines** — `asserts.fbhash` is the hash of the frame at

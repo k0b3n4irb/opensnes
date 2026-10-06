@@ -47,9 +47,11 @@ variable and function names directly: `peek_memory` on `monster_x`,
 `bp_add` on a function label. `resolve_symbol` answers one-off lookups,
 and `disasm_cpu` output is symbol-annotated. (The manual fallback stays a
 one-liner: `grep -i ' monster_x$' game.sym`.) A file-scope `static` carries
-the name of its source file as a suffix, `monster_x.main` for one defined in
-`main.c`, so two sources may define the same static; block-scope statics and
-string literals read `.Lmain_name.N`.
+the name of its source file as a suffix in the `.sym`, `monster_x.main` for
+one defined in `main.c`, so two sources may define the same static; luna
+resolves the bare name `monster_x` when only one source defines it and
+lists the candidates otherwise. Block-scope statics and string literals
+read `.Lmain_name.N`.
 
 ## Recipe 1 — Inspect the machine at a point in time
 

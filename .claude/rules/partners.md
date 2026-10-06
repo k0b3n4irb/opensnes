@@ -57,6 +57,15 @@ Their `from_` reports land there, and **ours are always delivered there**
 it into that folder. Check which `to_` files they already have first, so an
 outdated report is folded into the current one instead of sent late.
 
+**luna's exchange folder** (on this machine, since 2026-10-06):
+`~/workspace/partner-reports/opensnes/`, named
+`AAAA-MM-JJ_<émetteur>-vers-<destinataire>_<sujet>.md` (its `INDEX.md` is
+one level up). Read it at every exchange: four notes of 2026-10-05 sat
+there unanswered because we only looked at what the owner pasted. Copy
+each `luna-vers-opensnes` file into the repo as `from_luna_…`, and deliver
+each `to_luna_…` there as `opensnes-vers-luna_…` (the owner may already
+have).
+
 Every `to_` report has the same spine: header (who, which pin / index
 fingerprint, status: sent as is, or still accumulating), what the
 partner made possible since the last report (first — it is the context for

@@ -166,14 +166,22 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
-- **luna pinned at v1.33.1** (testing): from v1.32.0. The whole suite is
-  green and no frame, audio or WRAM baseline moves; `baselines.json` and
-  `audio.json` are re-stamped, `docs/tools/luna.md` regenerated from the
-  new `--help`. The harness now compares `rom.checksum` with luna's new
-  `rom.checksum_computed` on every ROM. v1.33.0 fixed how mosaic blocks
-  are drawn and nothing of ours noticed: a new manifest,
-  `transition_mosaic_picture.toml`, hashes a frame with the mosaic on
-  (it fails on v1.32.0).
+- **luna pinned at v1.34.0** (testing): from v1.32.0, through v1.33.1.
+  The whole suite is green and no frame, audio or WRAM baseline moves;
+  `baselines.json` and `audio.json` are re-stamped, `docs/tools/luna.md`
+  regenerated from the new `--help`. The harness now compares
+  `rom.checksum` with luna's `rom.checksum_computed` on every ROM. v1.33.0
+  fixed how mosaic blocks are drawn and nothing of ours noticed: a new
+  manifest, `transition_mosaic_picture.toml`, hashes a frame with the
+  mosaic on (it fails on v1.32.0). v1.34.0 answers two requests of ours:
+  `--power-on random` also fills the cartridge RAM no battery keeps (Super
+  FX Game Pak RAM, SA-1 BW-RAM and I-RAM), and a bare name resolves to its
+  only `name.<source>` static.
+- **A project test names a variable as the C does** (tools, docs): the
+  manifests `opensnes init --template game` writes, and the guide, say
+  `player_x = 120` where they said `"player_x.main" = 120`; luna v1.34.0
+  resolves the bare name of a file-scope `static` and asks which one when
+  two sources define it.
 - **`cc65816` is a compiled program** (compiler, build): the driver that
   runs the host preprocessor, `cproc-qbe` and `qbe` was a bash script
   (`compiler/scripts/cc65816`); it is `compiler/cc65816/cc65816.c`, built

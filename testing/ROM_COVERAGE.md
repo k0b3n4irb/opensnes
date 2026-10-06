@@ -1,6 +1,6 @@
 # Measured ROM coverage of the public lib API
 
-luna v1.33.1 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 97 ROMs (examples + the library fixture), 226 legs · **325 of 325 public functions executed, 0 never**
+luna v1.34.0 · `luna profile --pc-set` per ROM: the input-free idle path to the first capture frame, plus every `luna test` manifest's joypad-1 script to its last checkpoint · 97 ROMs (examples + the library fixture), 227 legs · **325 of 325 public functions executed, 0 never**
 
 > Executed = at least one PC inside the function's `.sym` label range on at least one leg. Joypad-2, mouse (port 1) and Super Scope (port 2) scripts are replayed like joypad 1. The never-executed list is the ratchet in `baselines/never_executed.txt`.
 

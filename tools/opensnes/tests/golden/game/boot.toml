@@ -8,10 +8,11 @@ frames = 180                      # run until PPU frame 180, then judge
 [asserts]
 fbhash = ""                       # the frame's hash; `make test-update` fills it
 
-# WRAM values at the end, by symbol name from the ROM's .sym. A file-scope
-# static reads name.<file>: player_x of main.c is "player_x.main".
+# WRAM values at the end, by the name the variable has in your C. If two
+# sources define a static of the same name, luna asks which one:
+# "player_x.main" is player_x of main.c.
 [[checkpoint]]
 at_frame = 180
 [checkpoint.values]
-"player_x.main" = 120
-"player_y.main" = 100
+player_x = 120
+player_y = 100

@@ -2,12 +2,14 @@
 
 Opened 2026-09-26. One line per item. Every item is re-checked on the pinned
 luna the day the report goes out (`.claude/rules/partners.md`); the pin is
-v1.33.1 (2026-10-06).
+v1.34.0 (2026-10-06).
 
-Sent on 2026-10-06 in `2026-10-06_to_luna_rapport-v1.33.1.md`: the bare
-static name (D1), the archive sums (D2), the cartridge RAM of `--power-on
-random` (D3), with the two items v1.33.0 closed. The two below were held
-back: not re-run that day, they go out with a reproduction ROM or not at all.
+Sent on 2026-10-06 in `2026-10-06_to_luna_rapport-v1.33.1.md`; answered
+the same day (`2026-10-06_from_luna_reponse-rapport-v1.33.1.md`) and closed by
+v1.34.0, pinned that day: the bare static name (D1), the cartridge RAM of
+`--power-on random` (D3); the archive sums (D2) are GitHub's `digest` field,
+which our pin recipe now reads (`testing/luna.sha256`). The two below were
+held back: not re-run, they go out with a reproduction ROM or not at all.
 
 | Date | Item | Seen on | What we would run |
 |---|---|---|---|

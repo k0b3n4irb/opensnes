@@ -336,13 +336,13 @@ test-project:
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test-update >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test
-	@sed -i 's/^"player_x.main" = 120$$/"player_x.main" = 9999/' $(TEST_PROJECT_DIR)/test/boot.toml
+	@sed -i 's/^player_x = 120$$/player_x = 9999/' $(TEST_PROJECT_DIR)/test/boot.toml
 	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test >/dev/null 2>&1; then \
 		echo "ERROR: broken assert did not fail 'make test'"; exit 1; fi
 	@if (cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes release -q) >/dev/null 2>&1; then \
 		echo "ERROR: 'opensnes release' shipped a ROM whose test fails"; exit 1; fi
 	@test ! -e $(TEST_PROJECT_DIR)/release || { echo "ERROR: a refused release wrote release/"; exit 1; }
-	@sed -i 's/^"player_x.main" = 9999$$/"player_x.main" = 120/' $(TEST_PROJECT_DIR)/test/boot.toml
+	@sed -i 's/^player_x = 9999$$/player_x = 120/' $(TEST_PROJECT_DIR)/test/boot.toml
 	@(cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes release -q --tag v1.0) >/dev/null 2>&1 \
 		|| { echo "ERROR: 'opensnes release' failed on a healthy project"; exit 1; }
 	@cmp -s $(TEST_PROJECT_DIR)/release/opensnes_test_project-v1.0.sfc $(TEST_PROJECT_DIR)/opensnes_test_project.sfc \

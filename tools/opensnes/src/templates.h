@@ -82,13 +82,14 @@ static const char TEMPLATE_GAME_BOOT[] =
     "[asserts]\n"
     "fbhash = \"\"                       # the frame's hash; `make test-update` fills it\n"
     "\n"
-    "# WRAM values at the end, by symbol name from the ROM's .sym. A file-scope\n"
-    "# static reads name.<file>: player_x of main.c is \"player_x.main\".\n"
+    "# WRAM values at the end, by the name the variable has in your C. If two\n"
+    "# sources define a static of the same name, luna asks which one:\n"
+    "# \"player_x.main\" is player_x of main.c.\n"
     "[[checkpoint]]\n"
     "at_frame = 180\n"
     "[checkpoint.values]\n"
-    "\"player_x.main\" = 120\n"
-    "\"player_y.main\" = 100\n"
+    "player_x = 120\n"
+    "player_y = 100\n"
     ;
 
 static const char TEMPLATE_GAME_WALK[] =
@@ -101,8 +102,8 @@ static const char TEMPLATE_GAME_WALK[] =
     "[[checkpoint]]\n"
     "at_frame = 150\n"
     "[checkpoint.values]\n"
-    "\"player_x.main\" = 180             # 120 + 60\n"
-    "\"player_y.main\" = 100\n"
+    "player_x = 180                    # 120 + 60\n"
+    "player_y = 100\n"
     ;
 
 #endif
