@@ -72,7 +72,7 @@ conversion from it and links `font_data.as`, like every settings file
 
 The same tiles, byte for byte (font2snes's golden suite is the family's).
 String tables — the strings of a game by language — are the other half of
-this tool's name and are not written yet; the text module draws C strings.
+this tool's name and come after 1.0; the text module draws C strings.
 
 ## See also
 

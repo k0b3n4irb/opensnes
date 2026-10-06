@@ -243,6 +243,8 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Tiled map editor integration | **Shipped**: `tools/tmx2snes`, `examples/maps/tiled`, `examples/games/rpg` (maps, collision, entities and dialogue in `.tmj`) | Workflow convenience for level designers |
 | Video tutorials | Not started | Wider audience reach |
 | Project scaffolding (`opensnes init`) | **Shipped (v0.25.0)** — `opensnes` CLI: init/build/run/doctor | Reduce friction for new users |
+| Save format in the library (checksum, version, slots), then `opensnes-save verify` | **After 1.0** (owner decision, 2026-10-06: 1.1) — a new public API is not frozen with 1.0 | A save that survives a corrupted byte and a new version of the game |
+| String tables in `opensnes-text` (the strings of a game, by language) | **After 1.0** (owner decision, 2026-10-06) — no example needs them yet | Localisation without editing C sources |
 
 ### Next steps (audit-driven, prioritised)
 
@@ -347,6 +349,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-05. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-06. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

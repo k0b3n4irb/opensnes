@@ -73,8 +73,8 @@ old file and `set` on a new one is the migration, in a script.
 
 It does not know your save's layout: no checksum, no version field, no
 slot table. Those belong to a save format, which the SDK does not define
-yet — the `sram` module copies bytes. When it does, this tool will verify
-and migrate it.
+in 1.0 — the `sram` module copies bytes. It is planned for 1.1, and this
+tool will then verify and migrate it.
 
 ## See also
 

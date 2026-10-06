@@ -877,3 +877,9 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   taille des données SPC700 (un link ne les connaît pas ; luna mesure le
   premier). Choix assumé : `release` n'a pas de `--version` propre au projet
   (le Makefile n'en porte pas), `--tag` nomme le fichier.
+
+- **2026-10-06, deux décisions du propriétaire** : les tables de chaînes
+  d'`opensnes-text` sont reportées après la 1.0 ; le format de sauvegarde
+  côté bibliothèque (et `opensnes-save verify`) attend la 1.1. Inscrits au
+  `ROADMAP.md` (« Nice-to-have ») et dans les pages des deux outils. La
+  famille des onze outils est donc close pour la 1.0.
