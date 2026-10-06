@@ -1,10 +1,10 @@
 # opensnes-rom — is the ROM good? {#tools_opensnes_rom}
 
-The tool that speaks last in a build (@ref tools_conventions). Today it
-runs the **post-link checks** every OpenSNES project gets after `wlalink`;
-the header, checksum and region work (`finalize`, `inspect`) joins it in a
-later release. It is what lets a game developer build without Python: the
-five scripts these checks lived in stayed with the contributors.
+The tool that speaks last in a build (@ref tools_conventions). It runs
+the **post-link checks** every OpenSNES project gets after `wlalink`,
+reads a ROM's **cartridge header and checksum**, and prints the game's
+**budget**. It is what lets a game developer build without Python: the
+five scripts the checks lived in stayed with the contributors.
 
 ## Check
 
@@ -38,6 +38,64 @@ section or the function, and what to do); 3 no `.sym` beside the ROM.
 asset weight. `--no-bank-reads`, `--no-nmi-race`, `--no-assets` skip a
 check; `make/common.mk` maps `SKIP_BANKREAD_CHECK=1` and the others onto
 them.
+
+## Inspect
+
+```sh
+opensnes-rom inspect game.sfc
+# game.sfc: "MY GAME" — LoROM, 256 KB, 8 KB battery RAM, NTSC (country $01), version 1.0
+#   checksum $82CA ok · crc32 25fea782 · sha1 0beaf360885c696872e052ec80fc341d5ba93800
+```
+
+What the cartridge header says, read back from the ROM as built: the
+title, the mapping (LoROM, HiROM, ExHiROM, FastROM), the coprocessor, the
+image size against the size the header declares, the save RAM and whether
+a battery keeps it, the country code and the region it implies, the
+version. Then the **checksum**: the 16-bit sum of the image, recomputed
+and compared with the one in the header and its complement; an image that
+is not a power of two is summed as its largest power-of-two part plus the
+rest repeated. The header layout and the checksum rule are those of the
+[SNESdev wiki](https://snes.nesdev.org/wiki/ROM_header) and of fullsnes.
+The CRC32 and the SHA-1 are what a tester, a flash-cart database or a
+publisher identifies a build by.
+
+Exit 1 when the file has no header or its checksum is wrong: `wlalink`
+writes the checksum at link time, so a wrong one means something edited
+the ROM afterwards. A 512-byte copier header in front of the image is
+skipped and said. `--json` gives every field for each ROM.
+
+## Budget
+
+```sh
+opensnes-rom budget game.sfc          # reads game.sym beside it
+```
+
+```
+game.sfc — "RPG TEMPLATE", LoROM, 256 KB in 8 banks of 32 KB
+ROM
+  bank $00 (code)              22604 / 32768   bytes    69%   10164 free
+  bank $07                     24781 / 32768   bytes    76%   7987 free
+  6 empty banks
+  whole ROM                    47385 / 262144  bytes    18%   214759 free
+RAM
+  C variables $0000-$1FFF       5408 / 8192    bytes    66%   2784 free
+  FAR $7E:2000-$FFFF               0 / 57344   bytes     0%   57344 free
+Video (the assets of the project, if all were loaded at once)
+  VRAM                         20768 / 65536   bytes    32%   44768 free
+  CGRAM                          128 / 256     colours  50%   128 free
+```
+
+One report where the build prints several lines: what the linker placed
+in each ROM bank, the two RAM bands C can use (@ref tutorial_far_ram), the
+cartridge's save RAM, and the weight of the project's converted assets
+against VRAM and CGRAM (an upper bound: a game seldom loads every asset at
+once). It never fails on a figure — the thresholds are `check`'s — and
+`--json` gives the same numbers per bank. `opensnes budget` builds the
+project and runs it (@ref tools_opensnes).
+
+Not in the report yet, because a link cannot know them: the time the NMI
+handler takes in VBlank and the size of the SPC700 sound data; luna
+measures the first (`luna profile`, @ref tools_luna).
 
 ## Where the checks came from
 

@@ -17,6 +17,19 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`opensnes budget` and `opensnes release`** (tools): the two commands
+  the project tool still lacked. `budget` builds and prints one report of
+  what the game uses of the console — ROM bank by bank, the C variables'
+  8 KB and the FAR band, the save RAM, the VRAM and CGRAM of the assets.
+  `release [--tag TAG] [--out DIR] [--no-test]` makes the ROM to hand
+  over: a build from nothing, the project's tests in luna, the header and
+  checksum read back, then `release/<name>[-TAG].sfc` with its CRC32 and
+  SHA-1; a failing build, test or checksum releases nothing.
+- **`opensnes-rom inspect` and `opensnes-rom budget`** (tools): `inspect`
+  reads a ROM's cartridge header (title, mapping, coprocessor, sizes,
+  save RAM, region, version), recomputes the checksum against the header
+  (exit 1 when it is wrong) and gives the CRC32 and SHA-1; `budget` is
+  the report behind `opensnes budget`, with `--json` per bank.
 - **`opensnes` is a compiled program** (tools): the project CLI — `init`,
   `build`, `clean`, `run`, `test`, `doctor`, `upgrade` — was the shell
   script `scripts/opensnes`; it is `tools/opensnes`, built and installed

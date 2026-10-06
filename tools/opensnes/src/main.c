@@ -257,7 +257,9 @@ static int run_make(cli_ctx *ctx, const char *sdk, const char *proj, const char 
     char cmd[PATHN * 2], dir[PATHN];
     set_home(sdk);
     make_path(proj, dir, sizeof dir);
-    snprintf(cmd, sizeof cmd, "make --no-print-directory -C \"%s\"%s%s", dir, target ? " " : "", target ? target : "");
+    /* --json: our object is the only thing on stdout, make talks on stderr */
+    snprintf(cmd, sizeof cmd, "make --no-print-directory -C \"%s\"%s%s%s", dir, target ? " " : "", target ? target : "",
+             ctx->json ? " 1>&2" : "");
     fflush(stdout);
     int rc = system(cmd);
     if (rc == -1) { cli_error(ctx, NULL, "cannot run make — is it installed and on the PATH?"); return CLI_IO; }
@@ -486,6 +488,135 @@ static int run_run(cli_ctx *ctx)
     }
 #endif
     return CLI_OK;
+}
+
+/* ======================================================= budget, release */
+
+/* <sdk>/bin/<tool> <args> "<file>"; the tool's exit code as one of ours. */
+static int run_tool(cli_ctx *ctx, const char *sdk, const char *tool, const char *args, const char *file, int to_stderr)
+{
+    char exe[PATHN], found[PATHN], cmd[PATHN * 3];
+    snprintf(exe, sizeof exe, "%s/bin/%s", sdk, tool);
+    if (!is_exe(exe, found, sizeof found)) { cli_error(ctx, exe, "not found — the SDK is not built (`opensnes doctor`)"); return CLI_IO; }
+    /* cmd.exe drops the first and the last quote of a line that has more than two */
+#ifdef _WIN32
+    snprintf(cmd, sizeof cmd, "\"\"%s\" %s \"%s\"%s\"", found, args, file, to_stderr ? " 1>&2" : "");
+#else
+    snprintf(cmd, sizeof cmd, "\"%s\" %s \"%s\"%s", found, args, file, to_stderr ? " 1>&2" : "");
+#endif
+    fflush(stdout);
+    int rc = system(cmd);
+    if (rc == -1) { cli_error(ctx, found, "cannot start"); return CLI_IO; }
+    return rc == 0 ? CLI_OK : CLI_REFUSED;
+}
+
+/* A path under the current folder, said without it: reports stay readable. */
+static const char *shown(const char *path)
+{
+    static char cwd[PATHN];
+    if (!os_getcwd(cwd, sizeof cwd)) return path;
+    slashes(cwd);
+    size_t l = strlen(cwd);
+    return (l && strncmp(path, cwd, l) == 0 && path[l] == '/' && path[l + 1]) ? path + l + 1 : path;
+}
+
+static int run_budget(cli_ctx *ctx)
+{
+    char sdk[PATHN], proj[PATHN], rom[PATHN];
+    if (!require_sdk(ctx, sdk, sizeof sdk) || !require_project(ctx, proj, sizeof proj)) return CLI_REFUSED;
+    /* the build talks on stderr: stdout is the report alone */
+    cli_ctx quiet = *ctx;
+    quiet.json = 1;
+    int rc = run_make(&quiet, sdk, proj, NULL);
+    if (rc != CLI_OK) return rc;
+    if (!project_rom(proj, rom, sizeof rom)) { cli_error(ctx, proj, "no ROM after the build — TARGET of the Makefile names a .sfc that is not there"); return CLI_REFUSED; }
+    return run_tool(ctx, sdk, "opensnes-rom", ctx->json ? "budget --json" : "budget", shown(rom), 0);
+}
+
+/* Does the project declare tests (test/<name>.toml)? */
+static int has_tests(const char *proj)
+{
+    char p[PATHN];
+    int found = 0;
+#ifdef _WIN32
+    struct _finddata_t fd;
+    snprintf(p, sizeof p, "%s/test/*.toml", proj);
+    intptr_t h = _findfirst(p, &fd);
+    if (h != -1) { found = 1; _findclose(h); }
+#else
+    snprintf(p, sizeof p, "%s/test", proj);
+    DIR *d = opendir(p);
+    if (!d) return 0;
+    for (struct dirent *e; !found && (e = readdir(d));) {
+        size_t l = strlen(e->d_name);
+        found = l > 5 && strcmp(e->d_name + l - 5, ".toml") == 0;
+    }
+    closedir(d);
+#endif
+    return found;
+}
+
+static const cli_opt release_opts[] = {
+    { "out", 'o', CLI_STR, "DIR", "write the ROM in DIR", "release/ in the project" },
+    { "tag", 0, CLI_STR, "TAG", "name the file <rom>-TAG.sfc (a version, a date, a build number)", NULL },
+    { "no-test", 0, CLI_FLAG, NULL, "do not run the project's tests", NULL },
+};
+
+static int run_release(cli_ctx *ctx)
+{
+    char sdk[PATHN], proj[PATHN], rom[PATHN], out_dir[PATHN], out[PATHN * 2 + 64], stem[256];
+    if (!require_sdk(ctx, sdk, sizeof sdk) || !require_project(ctx, proj, sizeof proj)) return CLI_REFUSED;
+    const char *tag = cli_has(ctx, "tag") ? cli_str(ctx, "tag", "") : NULL;
+    if (tag)
+        for (const char *c = tag; *c; c++)
+            if (!isalnum((unsigned char)*c) && *c != '.' && *c != '-' && *c != '_') {
+                cli_error(ctx, NULL, "'%c' in --tag — letters, digits, . - _ only (it goes in a file name)", *c);
+                return CLI_USAGE;
+            }
+
+    /* from nothing: a release is never an incremental build */
+    cli_ctx quiet = *ctx;
+    quiet.json = 1;
+    int rc = run_make(&quiet, sdk, proj, "clean");
+    if (rc == CLI_OK) rc = run_make(&quiet, sdk, proj, NULL);
+    if (rc != CLI_OK) { cli_error(ctx, proj, "the build failed — nothing released"); return rc; }
+    if (!project_rom(proj, rom, sizeof rom)) { cli_error(ctx, proj, "no ROM after the build — TARGET of the Makefile names a .sfc that is not there"); return CLI_REFUSED; }
+
+    const char *tests;
+    if (cli_has(ctx, "no-test")) tests = "skipped";
+    else if (!has_tests(proj)) {
+        tests = "none";
+        cli_warn(ctx, proj, "no test/*.toml: this ROM is released without having run (docs/GETTING_STARTED.md, 'Test your game')");
+    } else {
+        if (run_make(&quiet, sdk, proj, "test") != CLI_OK) { cli_error(ctx, proj, "the tests failed — nothing released"); return CLI_REFUSED; }
+        tests = "passed";
+    }
+
+    /* the header and the checksum, on the ROM as built */
+    if ((rc = run_tool(ctx, sdk, "opensnes-rom", "inspect -q", rom, 1)) != CLI_OK) {
+        cli_error(ctx, rom, "refused by opensnes-rom inspect — nothing released");
+        return rc;
+    }
+
+    if (cli_has(ctx, "out")) snprintf(out_dir, sizeof out_dir, "%s", cli_str(ctx, "out", ""));
+    else snprintf(out_dir, sizeof out_dir, "%s/release", proj);
+    if (!make_dirs(out_dir)) { cli_error(ctx, out_dir, "cannot create the folder"); return CLI_IO; }
+    cli_stem(rom, stem, sizeof stem);
+    snprintf(out, sizeof out, "%s/%s%s%s.sfc", out_dir, stem, tag ? "-" : "", tag ? tag : "");
+    size_t len;
+    unsigned char *data = cli_read_file(ctx, rom, &len);
+    if (!data) return CLI_IO;
+    rc = cli_write_file(ctx, out, data, len);
+    free(data);
+    if (rc != CLI_OK) return rc;
+
+    if (ctx->json) {
+        cli_json_begin(ctx); cli_json_str(ctx, "rom", shown(out)); cli_json_int(ctx, "bytes", (long)len);
+        cli_json_str(ctx, "tests", tests); cli_json_end(ctx);
+        return CLI_OK;
+    }
+    if (!ctx->quiet) printf("Released: %s (tests: %s)\n", shown(out), tests);
+    return ctx->quiet ? CLI_OK : run_tool(ctx, sdk, "opensnes-rom", "inspect", shown(out), 0);
 }
 
 /* ================================================================ doctor */
@@ -755,6 +886,10 @@ static const cli_cmd cmds[] = {
     { "clean", "remove what the build made", NULL, 0, "clean", 0, run_clean },
     { "run", "build, then open the ROM in an emulator", run_opts, CLI_N(run_opts), "run --emulator mesen", 0, run_run },
     { "test", "run the project's tests (test/*.toml) in luna", test_opts, CLI_N(test_opts), "test --update", 0, run_test },
+    { "budget", "build, then what the game uses of the console: ROM bank by bank, RAM, the VRAM and CGRAM of its assets", NULL, 0,
+      "budget", 0, run_budget },
+    { "release", "a clean build, the project's tests, the header and checksum, then the ROM in release/ with its CRC32 and SHA-1",
+      release_opts, CLI_N(release_opts), "release --tag v1.0", 0, run_release },
     { "doctor", "check the installation: SDK, host compiler, make, the binaries, the library, luna, an emulator (exit 1 on a failure)", NULL, 0,
       "doctor", 0, run_doctor },
     { "upgrade", "in your sources, the names OpenSNES 1.0 removed and the calls whose meaning changed, with what to use (exit 1 on a hit)",
@@ -764,7 +899,7 @@ static const cli_cmd cmds[] = {
 int main(int argc, char **argv)
 {
     static const cli_tool tool = {
-        "opensnes", TOOL_VERSION, "the project tool of the OpenSNES SDK: create, build, run and test a game", cmds, CLI_N(cmds),
+        "opensnes", TOOL_VERSION, "the project tool of the OpenSNES SDK: create, build, run, test, measure and release a game", cmds, CLI_N(cmds),
     };
     g_argv0 = argc ? argv[0] : NULL;
     return cli_main(&tool, argc, argv);

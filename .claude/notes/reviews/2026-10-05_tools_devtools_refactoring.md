@@ -857,3 +857,23 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   `opensnes` : Windows n'est vérifié que par la CI. Il ne reste aucun script
   dans `bin/` ; le préprocesseur de l'hôte reste la seule dépendance
   extérieure de la compilation (l'intégrer à cproc serait un autre lot).
+
+- **2026-10-06, `opensnes budget` et `opensnes release`** (B13 et le
+  « dernier mot » du §17). Le travail est dans `opensnes-rom`, le CLI ne
+  fait qu'enchaîner : `opensnes-rom inspect` (en-tête, somme de contrôle
+  recalculée, CRC32, SHA-1 ; sortie 1 si la somme est fausse) et
+  `opensnes-rom budget` (ROM par banque depuis les sections du `.sym`, les
+  deux bandes de RAM, la RAM de sauvegarde, VRAM et CGRAM des assets).
+  `release` = build depuis zéro, tests luna du projet, `inspect`, copie dans
+  `release/<nom>[-TAG].sfc` ; rien n'est écrit si une étape échoue. Preuves :
+  les 86 ROM du corpus ont une somme juste selon `inspect` ; CRC32 et SHA-1
+  comparés à `zlib` et `sha1sum` ; fixtures synthétiques dont la somme est
+  calculée par le script qui les a faites (dont une image de 96 Ko, pas une
+  puissance de deux) ; `make test-project` et `release-smoke` jouent les deux
+  commandes (le zip les joue sur les trois OS : c'est le seul endroit où un
+  chemin cité traverse `cmd.exe`). En-tête et règle de somme arbitrés par
+  snes-rag (snesdev-wiki `d4220903ea0b00c4`, `726edb3e9c251ff5` ; fullsnes
+  `6ae28ab5da901c53`). Hors rapport pour l'instant : le temps de VBlank et la
+  taille des données SPC700 (un link ne les connaît pas ; luna mesure le
+  premier). Choix assumé : `release` n'a pas de `--version` propre au projet
+  (le Makefile n'en porte pas), `--tag` nomme le fichier.

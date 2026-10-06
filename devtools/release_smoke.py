@@ -16,7 +16,8 @@ user does:
      and build it;
   5. when a luna binary is available (LUNA_BIN, or the SDK tree's
      testing/bin/luna), run the project's `make test-update` then
-     `make test` — the "test your game" story of GETTING_STARTED.
+     `make test` — the "test your game" story of GETTING_STARTED;
+  6. `opensnes budget` and `opensnes release` on that project.
 
 Usage: python3 devtools/release_smoke.py release/<name>.zip
 Exit 0 on success, 1 on the first failing step (its output is printed).
@@ -107,9 +108,17 @@ def main() -> int:
             penv["LUNA_BIN"] = luna
             run("record the project test baseline: opensnes test --update", [str(cli), "test", "--update"], project, penv)
             run("run the project test: opensnes test", [str(cli), "test"], project, penv)
-            tested = "built and tested in luna through the opensnes CLI"
+            tested = "built, tested in luna and released through the opensnes CLI"
+            release = [str(cli), "release", "--tag", "smoke"]
         else:
-            tested = "built through the opensnes CLI (no luna binary here: project test skipped)"
+            tested = "built and released through the opensnes CLI (no luna binary here: project test skipped)"
+            release = [str(cli), "release", "--tag", "smoke", "--no-test"]
+        # budget and release start opensnes-rom from the CLI: the one place a
+        # quoted path goes through the platform's shell (cmd.exe on Windows).
+        run("opensnes budget", [str(cli), "budget"], project, penv)
+        run("opensnes release", release, project, penv)
+        if not (project / "release" / "smoke-game-smoke.sfc").is_file():
+            sys.exit("release-smoke: FAIL: `opensnes release` wrote no release/smoke-game-smoke.sfc")
         print(f"release-smoke: OK — {zip_path.name}: starter and a scaffolded project {tested}")
         return 0
     finally:

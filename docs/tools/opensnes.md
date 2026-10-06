@@ -1,8 +1,8 @@
 # opensnes — the project tool {#tools_opensnes}
 
 The one command of the SDK that is about your *project* rather than about
-an asset: it creates a project, builds it, runs it, tests it, and checks
-your installation. It is a compiled program like the rest of the family
+an asset: it creates a project, builds it, runs it, tests it, measures it,
+releases it, and checks your installation. It is a compiled program like the rest of the family
 (@ref tools_conventions) — nothing to install beside the zip, on Linux,
 macOS or Windows.
 
@@ -20,6 +20,8 @@ opensnes build                          # make, in the project's folder (or any 
 opensnes run                            # build, then open the ROM in an emulator
 opensnes test --update                  # first time: record the visual baselines
 opensnes test                           # run test/*.toml in luna
+opensnes budget                         # how much of the console the game uses
+opensnes release --tag v1.0             # the ROM you hand over, in release/
 opensnes clean
 opensnes doctor                         # is everything there?
 ```
@@ -31,10 +33,12 @@ opensnes doctor                         # is everything there?
 | `clean` | removes what the build made |
 | `run [--emulator NAME]` | builds, then opens the ROM (the `TARGET` of your Makefile) in the luna GUI that `scripts/install-luna.sh` installed, or the first of Mesen, bsnes, snes9x on your `PATH`; `--emulator` names another |
 | `test [--update]` | `luna test` on the project's `test/*.toml`; `--update` rewrites the `asserts.fbhash` baselines |
-| `doctor [--json]` | checks the SDK, the host C compiler (`cc`, which the compiler's preprocessing stage uses), `make`, the compiler and the tools of `bin/`, the built library, luna and an emulator. Exit 1 if something a build needs is missing, so a script can gate on it. |
+| `budget [--json]` | builds, then one report of what the game uses of what the console has: ROM bank by bank, the C variables' 8 KB and the FAR band, the cartridge's save RAM, and the VRAM and CGRAM the project's assets weigh (@ref tools_opensnes_rom). The build talks on stderr; the report is all there is on stdout. |
+| `release [--out DIR] [--tag TAG] [--no-test]` | the ROM you send to a tester, a flash cart or a publisher: a build **from nothing**, the project's tests in luna, the header and the checksum read back, then a copy in `release/` (`<name>.sfc`, or `<name>-TAG.sfc`) with its CRC32 and SHA-1. A failing build, a failing test or a wrong checksum releases nothing. A project with no `test/*.toml` is released with a warning; `--no-test` skips the tests on purpose. |
+| `doctor [--json]` | checks the SDK, the host C compiler (`cc`, `clang` or `gcc`, which the compiler's preprocessing stage uses), `make`, the compiler and the tools of `bin/`, the built library, luna and an emulator. Exit 1 if something a build needs is missing, so a script can gate on it. |
 | `upgrade [-q] [--removed-only] <folder-or-file>...` | lists, in your sources, the names OpenSNES 1.0 removed, with what to use instead, and the calls that kept their name and changed meaning (@ref upgrading). Exit 1 on a hit. The build runs it for you on a source that fails to compile. |
 
-`build`, `clean`, `run` and `test` work from any folder of the project: the
+`build`, `clean`, `run`, `test`, `budget` and `release` work from any folder of the project: the
 project is the nearest folder above whose `Makefile` includes
 `make/common.mk`.
 
