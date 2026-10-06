@@ -235,6 +235,66 @@ def run(only: str | None) -> int:
     return 1 if failed else 0
 
 
+def run_driver() -> int:
+    """The driver itself (compiler/cc65816/cc65816.c): its options, its exit
+    codes, and the temporary files it must not leave behind."""
+    import os
+    failed = total = 0
+
+    def check(name: str, ok: bool, detail: str = "") -> None:
+        nonlocal failed, total
+        total += 1
+        if not ok:
+            failed += 1
+            print(f"FAIL driver: {name} {detail}".rstrip())
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        scratch = tmp / "scratch"
+        scratch.mkdir()
+        env = dict(os.environ, TMPDIR=str(scratch))
+        src = tmp / "my unit.c"   # a space in the path, and in the label prefix
+        src.write_text('#ifndef WANT\n#error no WANT\n#endif\n'
+                       'const char *f(void) { return "hi" WANT; }\n')
+        out = tmp / "out.asm"
+
+        def cc(*a: str) -> subprocess.CompletedProcess:
+            return subprocess.run([str(CC), *a], capture_output=True, text=True, env=env)
+
+        r = cc(str(src), "-D", 'WANT="x"', "-o", str(out))
+        check("-D NAME, -o", r.returncode == 0 and out.is_file() and "f:" in out.read_text(), r.stderr)
+        check("says what it wrote", r.stdout == f"Generated: {out}\n", r.stdout)
+        check("anonymous labels carry the unit's stem", out.is_file() and "my_unit_string" in out.read_text())
+        r2 = cc(str(src), '-DWANT="x"')
+        check("assembly on stdout without -o", r2.returncode == 0 and out.is_file() and r2.stdout == out.read_text())
+        r = cc(str(src))
+        check("a preprocessor error fails", r.returncode != 0 and "no WANT" in r.stderr, r.stderr)
+        r = cc()
+        check("no input: usage, exit 1", r.returncode == 1 and "No input file" in r.stderr and "Usage:" in r.stdout)
+        r = cc(str(tmp / "absent.c"))
+        check("absent input: exit 1", r.returncode == 1 and "Input file not found" in r.stderr)
+        r = cc("-x", str(src))
+        check("unknown option: exit 1", r.returncode == 1 and "Unknown option: -x" in r.stderr)
+        r = cc(str(src), str(src))
+        check("two inputs: exit 1", r.returncode == 1 and "Multiple input files" in r.stderr)
+        bad = tmp / "bad.c"
+        bad.write_text("int g(void) { return nope; }\n")
+        r = cc(str(bad), "-o", str(tmp / "bad.asm"))
+        check("a cproc error fails with its message", r.returncode == 1 and "undeclared identifier" in r.stderr, r.stderr)
+        r = subprocess.run([str(CC), str(src), '-DWANT="x"', "-o", str(out)], capture_output=True, text=True,
+                           env=dict(env, CC65816_CPP="no-such-preprocessor"))
+        check("an absent CC65816_CPP is named", r.returncode == 1 and "no host C preprocessor" in r.stderr, r.stderr)
+        ir = tmp / "ir"
+        r = subprocess.run([str(CC), str(src), '-DWANT="x"', "-o", str(out)], capture_output=True, text=True,
+                           env=dict(env, CC65816_KEEP_IR=str(ir)))
+        check("CC65816_KEEP_IR keeps the unit's IR", r.returncode == 0 and len(list(ir.glob("*my__unit.ssa"))) == 1)
+        left = sorted(p.name for p in scratch.iterdir())
+        check("no temporary file left", not left, str(left))
+    if not failed:
+        print(f"driver: {total} checks pass")
+    return failed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="cc65816 C→ASM pattern checks")
     ap.add_argument("--only", metavar="SUBSTR")
@@ -251,6 +311,8 @@ def main() -> int:
         return 0
     if not CC.is_file():
         sys.exit(f"ERROR: {CC} not found — build the toolchain (make compiler) first")
+    if args.only is None and run_driver():
+        return 1
     return run(args.only)
 
 

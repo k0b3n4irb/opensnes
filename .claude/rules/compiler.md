@@ -13,7 +13,7 @@ Three git submodules:
 - `qbe/` — Code generator with custom 65816 backend, emits .asm
 - `wla-dx/` — WLA-DX assembler (wla-65816) and linker (wlalink)
 
-The `bin/cc65816` wrapper orchestrates the pipeline:
+The `bin/cc65816` driver (a compiled program since 2026-10-06, `compiler/cc65816/cc65816.c`; a bash script before) orchestrates the pipeline:
 ```
 .c → cc -E → cproc → QBE IR → qbe w65816 → .asm → wla-65816 → .obj
 ```

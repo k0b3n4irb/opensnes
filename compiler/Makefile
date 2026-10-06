@@ -15,6 +15,12 @@ else
     CMAKE_TYPE = Unix Makefiles
 endif
 
+ifeq ($(OS),Windows_NT)
+    EXE_EXT := .exe
+else
+    EXE_EXT :=
+endif
+
 # Parallel builds
 UNAME := $(shell uname -s)
 ifeq ($(OS),Windows_NT)
@@ -63,8 +69,14 @@ else
 	@cp $(QBE_DIR)/qbe $(BIN_DIR)/qbe
 	@cp $(CPROC_DIR)/cproc-qbe $(BIN_DIR)/cproc-qbe
 endif
-	@cp scripts/cc65816 $(BIN_DIR)/cc65816
-	@chmod +x $(BIN_DIR)/cc65816
+	@$(MAKE) --no-print-directory $(BIN_DIR)/cc65816$(EXE_EXT)
+
+# The driver: preprocess, cproc-qbe, qbe. One C file, compiled like the two
+# programs it runs (a bash script until 2026-10-06).
+$(BIN_DIR)/cc65816$(EXE_EXT): cc65816/cc65816.c
+	@echo "[CC65816] Building the driver..."
+	@mkdir -p $(BIN_DIR)
+	clang $(DRIVER_CFLAGS) -o $@ $< $(STATIC_LDFLAGS)
 
 # Host-side warning policy for the toolchain (gaps review item H2, 2026-09-12).
 # QBE's own Makefile already builds with -Wall -Wextra -Wpedantic; we keep that
@@ -78,9 +90,11 @@ QBE_CFLAGS   := -std=c99 -O2 -g -Wall -Wextra -Wpedantic -Wno-missing-field-init
 CPROC_CFLAGS := -O2 -g -Wall -Wextra -Wno-sign-compare -Wno-bitwise-op-parentheses \
                 -Wno-missing-field-initializers -Wno-unused-parameter \
                 -Wno-sometimes-uninitialized
+DRIVER_CFLAGS := -std=c11 -O2 -g -Wall -Wextra -Wpedantic -D_XOPEN_SOURCE=700 -D_DARWIN_C_SOURCE
 ifeq ($(TOOLCHAIN_WERROR),1)
     QBE_CFLAGS   += -Werror
     CPROC_CFLAGS += -Werror
+    DRIVER_CFLAGS += -Werror
 endif
 # SANITIZE=1: ASan + UBSan build of cproc-qbe, QBE and wla-dx (the host-side
 # sanitizer job, `make test-sanitizers`). Sanitizer runtimes do not link
@@ -92,6 +106,7 @@ endif
 # where LLVM_PROFILE_FILE points; llvm-profdata/llvm-cov read them back.
 # Same caveats as SANITIZE: not static, rebuild from clean afterwards.
 ifeq ($(COVERAGE),1)
+    DRIVER_CFLAGS += -fprofile-instr-generate -fcoverage-mapping
     COV_FLAGS := -fprofile-instr-generate -fcoverage-mapping
     STATIC_LDFLAGS := $(COV_FLAGS)
     QBE_CFLAGS   := $(filter-out -O2,$(QBE_CFLAGS)) -O0 $(COV_FLAGS)
@@ -99,6 +114,7 @@ ifeq ($(COVERAGE),1)
 endif
 ifeq ($(SANITIZE),1)
     SAN_FLAGS := -fsanitize=address,undefined -fno-omit-frame-pointer
+    DRIVER_CFLAGS += $(SAN_FLAGS)
     STATIC_LDFLAGS := $(SAN_FLAGS)
     CMAKE_STATIC_FLAGS := -DCMAKE_C_FLAGS="$(SAN_FLAGS) -O1 -g" -DCMAKE_EXE_LINKER_FLAGS="$(SAN_FLAGS)"
     QBE_CFLAGS   := $(filter-out -O2,$(QBE_CFLAGS)) -O1 $(SAN_FLAGS)
@@ -129,7 +145,7 @@ $(CPROC_DIR)/cproc-qbe: $(CPROC_DIR)/config.h FORCE
 cc65816-clean:
 	$(MAKE) -C $(QBE_DIR) clean
 	$(MAKE) -C $(CPROC_DIR) clean
-	-rm -f $(BIN_DIR)/qbe $(BIN_DIR)/cproc-qbe $(BIN_DIR)/cc65816
+	-rm -f $(BIN_DIR)/qbe $(BIN_DIR)/cproc-qbe $(BIN_DIR)/cc65816 $(BIN_DIR)/cc65816.exe
 	-rm -f $(CPROC_DIR)/config.h
 
 cc65816-install: cc65816

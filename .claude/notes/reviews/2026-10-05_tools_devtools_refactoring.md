@@ -841,3 +841,19 @@ sept derniers appels Python de la build d'un utilisateur ; puis
   règle est une cible nommée `C` : le binaire écrit `/c/x` quand `MSYSTEM`
   est défini. `release-smoke` passe désormais par le CLI, sans
   `OPENSNES_HOME`, donc les trois OS exercent l'auto-localisation.
+
+- **2026-10-06, `cc65816` compilé** (décision du propriétaire : « tu décides
+  et assumes »). Le pilote bash (`compiler/scripts/cc65816`) devient
+  `compiler/cc65816/cc65816.c`, construit par `compiler/Makefile` avec les
+  drapeaux d'avertissement de la chaîne. Preuve : après `make clean && make`,
+  les 86 ROM et les 205 `.c.asm` de la bibliothèque et des exemples sont
+  identiques à l'octet à ceux du script ; `make tests` vert. Choix : plus de
+  redirection de shell (`cc -o`, `cproc-qbe -o`, `qbe -o`), `posix_spawnp`
+  sous POSIX et `_spawnvp` avec citation des arguments sous Windows ; le
+  préprocesseur est `cc`, puis `clang`, puis `gcc`, ou `CC65816_CPP`
+  (`opensnes doctor` accepte les trois). Treize contrôles du pilote dans
+  `devtools/compiler-tests/run.py` (options, codes de sortie, espace dans le
+  chemin, aucun fichier temporaire laissé). Risque assumé, le même que pour
+  `opensnes` : Windows n'est vérifié que par la CI. Il ne reste aucun script
+  dans `bin/` ; le préprocesseur de l'hôte reste la seule dépendance
+  extérieure de la compilation (l'intégrer à cproc serait un autre lot).

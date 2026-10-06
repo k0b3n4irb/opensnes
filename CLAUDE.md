@@ -54,7 +54,7 @@ Changes are classified A/B/C/D by impact scope.
 main.c → cproc (C11 frontend) → QBE w65816 (codegen) → wla-65816 (assembler) → wlalink (linker) → game.sfc
 ```
 
-The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE's w65816 backend emits WLA-DX syntax directly (`.db`, `.dw`, `.SECTION`) — no post-transform.
+The `bin/cc65816` driver (compiled, `compiler/cc65816/`) orchestrates cproc→QBE→wla-65816. QBE's w65816 backend emits WLA-DX syntax directly (`.db`, `.dw`, `.SECTION`) — no post-transform.
 
 ## Architecture
 

@@ -153,6 +153,14 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **`cc65816` is a compiled program** (compiler, build): the driver that
+  runs the host preprocessor, `cproc-qbe` and `qbe` was a bash script
+  (`compiler/scripts/cc65816`); it is `compiler/cc65816/cc65816.c`, built
+  with the toolchain. Same options, same messages, same exit codes, and the
+  same assembly for every translation unit of the library and the examples.
+  The preprocessor is `cc`, then `clang`, then `gcc`, or whatever
+  `CC65816_CPP` names; `opensnes doctor` accepts the same three. Nothing in
+  `bin/` is a script any more.
 - **A user build runs no Python at all** (build, tools): the last call of
   `make/common.mk` — the 0.x-name scan, `devtools/check_upgrade.py` — is
   `opensnes upgrade [-q] [--removed-only] <folder-or-file>...` in the

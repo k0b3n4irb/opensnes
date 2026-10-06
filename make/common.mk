@@ -83,7 +83,7 @@ RAM_WARN_THRESHOLD ?= 1024
 
 # Check toolchain exists (skip for 'clean' target)
 ifneq ($(MAKECMDGOALS),clean)
-ifeq ($(wildcard $(CC)),)
+ifeq ($(wildcard $(CC) $(CC).exe),)
 $(error Compiler not built. Run: cd $(OPENSNES) && make compiler)
 endif
 endif

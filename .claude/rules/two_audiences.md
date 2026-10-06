@@ -40,10 +40,9 @@ OpenSNES has two populations, and they do not want the same thing.
    `devtools/release_smoke.py` — and, once the Python is gone, it runs in
    a container without `python3`.
 5. **Bash is tolerated, Python is not.** `make` on Windows means MSYS2,
-   which has bash; `bin/cc65816` and `install-luna.sh` may stay shell for
-   now. `bin/opensnes` is a compiled program since 2026-10-06
-   (`tools/opensnes`). Turning `cc65816` into a real binary is wanted, as
-   its own lot.
+   which has bash; `install-luna.sh` may stay shell for now. `bin/opensnes`
+   (`tools/opensnes`) and `bin/cc65816` (`compiler/cc65816`) are compiled
+   programs since 2026-10-06: nothing in `bin/` is a script any more.
 
 ## When writing a change, ask
 

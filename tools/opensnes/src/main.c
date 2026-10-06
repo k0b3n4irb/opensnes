@@ -546,9 +546,11 @@ static int run_doctor(cli_ctx *ctx)
         report(&d, "fail", "SDK", "not found: set OPENSNES_HOME, or run the opensnes of the SDK's bin/");
     } else {
         report(&d, "ok", "SDK", sdk);
-        /* cc65816 preprocesses with the host's `cc -E` before cproc */
+        /* cc65816 preprocesses with the host's cc (or clang, or gcc) before cproc */
         if (which("cc", found, sizeof found)) { first_line("cc --version", line, sizeof line); report(&d, "ok", "host cc", line); }
-        else report(&d, "fail", "host cc", "not found; cc65816 needs it for the preprocessing stage");
+        else if (which("clang", found, sizeof found)) { first_line("clang --version", line, sizeof line); report(&d, "ok", "host cc", line); }
+        else if (which("gcc", found, sizeof found)) { first_line("gcc --version", line, sizeof line); report(&d, "ok", "host cc", line); }
+        else report(&d, "fail", "host cc", "no cc, clang or gcc on the PATH; cc65816 needs one for the preprocessing stage");
         if (which("make", found, sizeof found)) report(&d, "ok", "make", found);
         else report(&d, "fail", "make", "not found on the PATH; the build is make/common.mk");
         int missing = 0;
