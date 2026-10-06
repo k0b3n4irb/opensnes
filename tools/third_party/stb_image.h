@@ -5225,6 +5225,14 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
             if (z->idata == NULL) return stbi__err("no IDAT","Corrupt PNG");
             // initial guess for decoded data size to avoid unnecessary reallocs
             bpl = (s->img_x * z->depth + 7) / 8; // bytes per line, per component
+            // OpenSNES: this product is 32-bit and is handed to the zlib
+            // decoder as an int. 45 x 7929880 at 16 bits wrapped to a
+            // negative size and stb asked malloc for 16 EB (fuzzer finding,
+            // 2026-10-06). Refuse a raw size that does not fit an int.
+            {
+               unsigned long long raw64 = (unsigned long long) bpl * s->img_y * s->img_n + s->img_y;
+               if (raw64 > 0x7fffffffULL) return stbi__err("too large", "Corrupt PNG");
+            }
             raw_len = bpl * s->img_y * s->img_n /* pixels */ + s->img_y /* filter mode per row */;
             z->expanded = (stbi_uc *) stbi_zlib_decode_malloc_guesssize_headerflag((char *) z->idata, ioff, raw_len, (int *) &raw_len, !is_iphone);
             if (z->expanded == NULL) return 0; // zlib should set error
