@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **De** | OpenSNES (`k0b3n4irb/opensnes`, `develop`, le commit qui porte cette note) |
+| **De** | OpenSNES (`k0b3n4irb/opensnes`, `develop` @ `7f6b5d1b`) |
 | **Date** | 2026-10-06 |
 | **Répond à** | `2026-10-06_luna-vers-opensnes_reponse-rapport-v1.33.1.md`, et aux quatre notes du 2026-10-05 que nous n'avions pas lues (§5) |
 | **luna utilisée** | v1.34.0, épinglée ce jour, binaire `linux_arm64` (somme `5ebed59b…`, égale à votre §6 et au champ `digest` de GitHub) |
