@@ -317,7 +317,7 @@ test-pal:
 	    testing/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
 	        | grep -q '"region": "Pal"' || { echo "test-pal: $${g}_pal.sfc is not a PAL cartridge for luna"; exit 1; }; \
 	    mkdir -p testing/manifests_pal/header; \
-	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#; s#"\.\./\.\./\.\./#"../../../../#' testing/manifests/$$m.toml > testing/manifests_pal/header/$$m.toml; \
+	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#; s#"\.\./\.\./#"../../../#' testing/manifests/$$m.toml > testing/manifests_pal/header/$$m.toml; \
 	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> testing/manifests_pal/header/$$m.toml; \
 	    testing/bin/luna test testing/manifests_pal/header/$$m.toml; \
 	    rm -f examples/games/$$g/$${g}_pal.sfc examples/games/$$g/$${g}_pal.sym; \
