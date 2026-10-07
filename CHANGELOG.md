@@ -337,6 +337,15 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Fixed
+- **`DECLARE_ANIM_CLIP` refuses more than 255 frames** (lib): the frame
+  count went into the `u8` `AnimClip.len` through a cast, so a 256-frame
+  clip had a length of 0 and `animPlay()` stopped the player, and a
+  300-frame one played 44 frames — with no error. The macro now carries a
+  `_Static_assert`; the refusal is pinned by a compile-must-fail fixture.
+  The cost paragraph of `anim.h` gave 60-90 CPU cycles for `animTick()`,
+  an estimate; measured on luna it is about 3,300 master cycles on a tick
+  that does not advance (0.9 % of a frame) and about 7,000 on one that
+  does.
 - **`font2snes` refuses a PNG whose raw size overflows** (tools): stb_image
   computed the decoded size of a PNG in 32 bits and passed it on as an
   `int`; a 79-byte file declaring 45 x 7929880 pixels made it negative and

@@ -11,3 +11,7 @@ feature landed: move the fixture to `cases/` with real `.checks`.
 
 Run with the rest: `python3 devtools/compiler-tests/run.py` (gaps review C1/C2,
 2026-09-13).
+
+`anim_clip_256` is of another kind: a refusal the **library** makes (a
+`_Static_assert` in `DECLARE_ANIM_CLIP`, `snes/anim.h`), pinned here because
+this is where a compile that must fail is checked. It stays for good.

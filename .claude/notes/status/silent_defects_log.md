@@ -80,6 +80,7 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-05 | `objCollidObj`, `mapGetMetaTile`, `mapGetMetaTilesProp`, `profileColorStart`, `dsp1SetCamera`, `dsp1Raster` wrote `tcc__r0` / `tcc__r9` with absolute or long addressing: called from an `nmiSet()` callback (whose direct page is the NMI's own register copy) they clobbered the interrupted main thread's scratch through the `$7E` mirror — a wrong intermediate in whatever C expression the NMI cut | reading the ASM against the library audit's l.21 (which named `profileColorStart` and `dsp1`); addressing-mode scan of every `tcc__r` write in `lib/` | `36b5c03f` |
 | 2026-10-05 | gfx4snes `-m`: the map entry's palette bank came from the tile's first pixel, and index 0 is transparent in every bank — a bank-2 tile starting transparent was drawn in bank 0's colours (63 of 64 pixels) | the build-tools audit's open question, measured with a pixel oracle on a four-tile image (`banks.png`); fixture `ROUNDTRIP` in the golden suite | `7a282da7` |
 | 2026-10-05 | gfx4snes `-a`: the palette rearrangement ran on the row-major image while the tiles had been converted before — `.pal` reordered, `.pic` on the old indices; `color/transparency`, the one user, decoded 51 056 of 52 509 opaque pixels to the wrong colour since the port (PVSnesLib's tool has the same order) | same oracle, 191 of 256 pixels on the fixture; the example decoded against its own `.bmp` | `7a282da7` |
+| 2026-10-07 | `DECLARE_ANIM_CLIP` with 256 frames or more: the count was cast to the `u8` `len` — 256 gave 0 and `animPlay()` stopped the player, 300 gave a 44-frame clip; no error | weekly header read (`anim.h`); refusal fixture `negative/anim_clip_256` (compiled with exit 0 before) | this commit (`_Static_assert` in the macro) |
 
 ## Campaign closed — 2026-10-05
 
@@ -93,6 +94,15 @@ found; the last four are dated today. **The fourteen-day window of
 criterion 7 opens today and closes no earlier than 2026-10-19**, and it
 restarts at every new row. The weekly effort it requires is the paragraph
 at the top of this file; the first weekly line is due by 2026-10-12.
+
+**Restarted 2026-10-07** by the `DECLARE_ANIM_CLIP` row: the window now
+closes no earlier than **2026-10-21**.
+
+### Weekly effort
+
+| Week | Date | (a) suites | (b) header read | (c) partners |
+|---|---|---|---|---|
+| 1 | 2026-10-07 | `make clean && make`, `make tests` green; `--coverage --power-on random=2026`: 84 OK / 2 INPUT-DEP / 0 dead of 86; `make luna-bench`: 0 bug; `make hardware-preflight`: 26 of 26 rows; `make test-pal` **failed** at its last step (the PAL-header manifest path still assumed the harness three levels deep, wrong since the move of 2026-10-05, `75d0d942`) — a loud recipe fault, fixed, then green (84 OK / 2 INPUT-DEP, 6 + 1 manifests) | `anim.h`: one defect (row above), one cost figure five to seven times too low, re-measured | luna's reply to the v1.33.1 report answered 2026-10-06, pin v1.34.0; nothing new from snes-rag |
 
 
 ## The hunting campaign
@@ -115,7 +125,7 @@ replace the date.
 
 | header | last read |
 |---|---|
-| `anim.h` | 2026-10-03 (library audit) |
+| `anim.h` | 2026-10-07 (weekly read: one defect, one wrong cost figure) |
 | `apu.h` | 2026-10-03 (library audit) |
 | `asset.h` | 2026-10-03 (library audit) |
 | `audio.h` | 2026-10-03 (library audit) |

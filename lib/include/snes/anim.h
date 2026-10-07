@@ -26,9 +26,13 @@
  *
  * @par Cost (per PHILOSOPHY.md P5)
  * animTick() on the non-advancing path is a NULL check, a finished
- * check, a decrement/compare and one indexed u16 load — on the order of
- * 60–90 cycles per player per frame including call overhead. RAM cost is
- * 8 bytes per player; ROM cost 12 bytes per clip + 2 bytes per frame
+ * check, a decrement/compare and one indexed u16 load through two far
+ * pointers: about 3,300 master cycles per player per frame, call
+ * included (0.9 % of an NTSC frame), and about 7,000 on the tick where
+ * the frame advances. Measured on luna on 2026-10-07 (`luna profile` on
+ * examples/sprites/metasprite, speed 8); the figure of 60-90 CPU cycles
+ * that stood here was an estimate, five to seven times too low. RAM cost
+ * is 8 bytes per player; ROM cost 12 bytes per clip + 2 bytes per frame
  * (+1/frame if per-frame durations are used). Nothing runs in NMI; VRAM
  * upload only happens when a frame actually changes (the dynamic
  * engine's existing budget).
@@ -189,9 +193,14 @@ u16 animTick(AnimPlayer *p);
  *
  * Per-frame durations can't be expressed variadically — declare those
  * clips as raw structs (see the AnimClip example above).
+ *
+ * A clip holds at most 255 frames (AnimClip.len is a u8); a longer list
+ * is refused at compile time.
  */
 #define DECLARE_ANIM_CLIP(name, mode_, speed_, ...) \
     static const u16 name##_frames[] = { __VA_ARGS__ }; \
+    _Static_assert(sizeof(name##_frames) / sizeof(u16) <= 255, \
+                   "DECLARE_ANIM_CLIP: a clip holds at most 255 frames"); \
     static const AnimClip name = { \
         name##_frames, \
         0, \
