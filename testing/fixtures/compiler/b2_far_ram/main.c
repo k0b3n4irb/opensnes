@@ -53,6 +53,8 @@ u32 r_pfld32;
 u8  c0_dir8, c0_idx8, c0_ptr8;
 u16 c0_dir16;
 u16 r_hi;                     /* bank half of &far_u8 as the C side sees it */
+u16 r_neg16, r_negw, r_negp;  /* a NEGATIVE runtime index off a far address */
+volatile s16 vneg = -1;
 
 /* non-static -> not inlined -> the pointer arrives through a param (RSlot).
  * The store is verified by a DIRECT symbol read in main (store-to-load
@@ -68,6 +70,13 @@ u32  get_rec_l(far_rec FAR *r)             { return r->l; }
 /* pointer walk (base + runtime index form) */
 void fill_walk(u8 FAR *p, u8 n) { u8 k; for (k = 0; k < n; k++) p[k] = (u8)(k * 3); }
 u16  sum_walk(u8 FAR *p, u8 n)  { u8 k; u16 s = 0; for (k = 0; k < n; k++) s += p[k]; return s; }
+
+/* Negative index: `sym+off,x` and `[tcc__r9],y` add an UNSIGNED 16-bit
+ * offset to a 24-bit base, so they are only right for an index >= 0.
+ * Until 2026-10-08 (far_arr16 + 4)[-1] read and wrote bank $7F. */
+u16  rd_neg(s16 j)             { return (far_arr16 + 4)[j]; }
+void wr_neg(s16 j, u16 v)      { (far_arr16 + 4)[j] = v; }
+u16  rd_negp(u16 FAR *p, s16 j) { return p[j]; }
 
 int main(void) {
     u8 i;
@@ -122,6 +131,13 @@ int main(void) {
     { volatile u8 *np = &near_arr8[5]; *np = 0x77;    c0_ptr8 = *np; }
 
     r_hi = (u16)(((u32)(u8 *)&far_u8) >> 16);
+
+    /* negative index: after everything above, so no earlier cell moves */
+    far_arr16[3] = 0x3C3C;
+    r_neg16 = rd_neg(vneg);                 /* far_arr16[3] */
+    wr_neg((s16)(vneg - 1), 0x5E5E);        /* far_arr16[2] */
+    r_negw = far_arr16[2];
+    r_negp = rd_negp(far_arr16 + 5, (s16)(vneg - 1));   /* far_arr16[3] */
 
     consoleInit();
     setScreenOn();

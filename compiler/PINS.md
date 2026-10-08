@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | dbc4f9f2fce6f0e7f2ce734164e2805f0524b7f8 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | b2a7a26be67f86ac029860ca8ac46ca8f2308658 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | cc3b9e00080144a48e431cc4ee04c2967add7e2a | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -88,7 +88,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 93 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 94 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -100,6 +100,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+cc3b9e0 w65816: a far access keeps its short form only for an index known >= 0 — `(far_arr + 8)[-1]` read and wrote the next bank (2026-10-08)
 b2a7a26 w65816: a 32-bit compare does not take its first operand from A — an internal error on `cnel` of a 16-bit temp (difftest_stmt seed 19645, 2026-10-08)
 f25d973 cfg, copy, w65816: a condition branches where it is decided — jump threading, compare scheduled last, sign and 32-bit equality tests fused; gvn's phi inference on a dead edge fixed (2026-10-08)
 f832c8e gcm: the sunk copy takes the sunk operands, and what sink leaves unused is removed (2026-10-08; upstream candidate)

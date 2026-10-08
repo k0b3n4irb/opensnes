@@ -389,6 +389,15 @@ freeze criterion that waits for hardware.
   the start of that line and the NMI. A faster compiler moved
   `superfx_3d`'s boot from 17 to 38 frames without changing a byte of this
   code. With the screen off it now starts at once (frame 8).
+- **A negative index off a `FAR` address read and wrote the next bank**
+  (compiler): `(far_arr + 8)[j]` with `j = -1` was compiled to
+  `lda.l far_arr+16,x`, which adds the low word of the index as an
+  unsigned offset — bank $7F instead of $7E, for the read and for the
+  write. Wrong since `FAR` exists (v0.39.0). The short forms are now kept
+  only for an index known to be non-negative (an unsigned index, or a
+  symbol with no offset, where a negative index is outside the object);
+  the others add in 24 bits. No ROM of the corpus changes by a byte; three
+  cells of the `b2_far_ram` fixture pin it.
 - **An internal compiler error on a boolean compared again as a 32-bit
   value** (compiler): a 32-bit compare reads the high half of its first
   operand before the low one, but the backend counted it among the

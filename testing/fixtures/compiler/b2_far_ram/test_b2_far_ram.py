@@ -31,6 +31,7 @@ CASES = [
     ("r_init",  2, 0x4444),      ("r_init8", 2, 0x00A7),
     ("r_zero",  2, 0x0100),
     ("r_hi",    2, 0x007E),
+    ("r_neg16", 2, 0x3C3C),      ("r_negw",  2, 0x5E5E),   ("r_negp",  2, 0x3C3C),
     ("c0_dir8", 1, 0x5A),        ("c0_dir16", 2, 0xBEEF),  ("c0_idx8", 1, 0xC3),
     ("c0_ptr8", 1, 0x77),
 ]
