@@ -27,5 +27,7 @@ in levelF_stress: present and\.w #1\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (
 # Frame sizes: 106 and 134 bytes until the slot colouring of 2026-09-27
 # (temps with disjoint lives share a slot), 62 and 72 since. The pairing
 # checks above are the point of this fixture and hold at either size.
-in levelE_many_acc: present sbc\.w #62\n
-in levelF_stress: present sbc\.w #72\n
+# 36 and 44 since 2026-10-08: the locals the optimizer promoted to temps
+# no longer keep their words of frame.
+in levelE_many_acc: present sbc\.w #36\n
+in levelF_stress: present sbc\.w #44\n

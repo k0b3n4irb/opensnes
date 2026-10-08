@@ -406,6 +406,15 @@ freeze criterion that waits for hardware.
   `entities` −54 %, `copy` −51 %, `physics` −47 %; the static table of
   34 functions from 1637 to 1593 cycles (−17.4 % to −19.6 %), `struct_sum`
   now ahead of PVSnesLib.
+- **Frames are smaller** (compiler): a local or a parameter that the
+  optimizer turns into temporaries kept the bytes the front end had
+  reserved for it, in every frame of every call — 2 to 4 bytes per
+  variable. They are no longer reserved. Measured on luna: the deepest
+  stack of the eighteen workloads is 6 to 34 bytes shallower (`calls`
+  265 -> 231, `strings` 90 -> 76, `collide` 104 -> 82), and one, `long`, is
+  now shallower than PVSnesLib's. No cycle and no byte of code changes
+  beyond the frame-size constants: the 86 examples render the same frames
+  at the same frame numbers.
 - **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
   (compiler): a consequence of the shift-width fix below; 71 example ROMs
   change by it and render the same frames.

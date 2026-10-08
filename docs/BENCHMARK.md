@@ -292,27 +292,27 @@ while it runs (bytes below the initial stack pointer).
 <!-- sdkbench:begin -->
 | Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `sieve` | sieve of 1024 in a byte array | 4,199,010 | 2,228,804 | -46.9 % | 296 | 179 | -39.5 % | 31 | 45 |
-| `sort` | insertion sort of 64 words | 2,620,372 | 1,658,922 | -36.7 % | 507 | 362 | -28.6 % | 43 | 57 |
-| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 5,321,470 | -47.0 % | 1174 | 696 | -40.7 % | 60 | 84 |
-| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 10,098,572 | -26.9 % | 983 | 695 | -29.3 % | 74 | 104 |
-| `mul` | 2304 multiplies of two variables | 6,389,830 | 5,049,682 | -21.0 % | 188 | 121 | -35.6 % | 34 | 49 |
-| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,899,026 | -67.8 % | 154 | 131 | -14.9 % | 34 | 43 |
-| `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,813,428 | -52.7 % | 594 | 334 | -43.8 % | 76 | 77 |
-| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 5,367,584 | -31.7 % | 605 | 428 | -29.3 % | 41 | 61 |
-| `calls` | recursive `fib(17)` | 5,041,934 | 3,568,224 | -29.2 % | 105 | 96 | -8.6 % | 159 | 265 |
-| `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 1,857,692 | -31.1 % | 523 | 520 | -0.6 % | 34 | 51 |
-| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,948,312 | -29.2 % | 233 | 163 | -30.0 % | 34 | 43 |
-| `list` | a 64-node linked list walked 40 times | 2,858,640 | 2,291,098 | -19.9 % | 402 | 373 | -7.2 % | 37 | 53 |
-| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 1,633,268 | -44.0 % | 397 | 286 | -28.0 % | 33 | 53 |
-| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 2,578,056 | -51.0 % | 694 | 554 | -20.2 % | 39 | 92 |
-| `entities` | the 32 entities again, through a pointer | 8,851,406 | 4,096,256 | -53.7 % | 1098 | 640 | -41.7 % | 62 | 80 |
-| `copy` | word and byte copies as index loops | 4,485,144 | 2,200,126 | -50.9 % | 709 | 470 | -33.7 % | 31 | 45 |
-| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,430,126 | -21.2 % | 1156 | 1010 | -12.6 % | 48 | 90 |
-| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,349,338 | -26.3 % | 392 | 388 | -1.0 % | 42 | 51 |
+| `sieve` | sieve of 1024 in a byte array | 4,199,010 | 2,228,804 | -46.9 % | 296 | 179 | -39.5 % | 31 | 39 |
+| `sort` | insertion sort of 64 words | 2,620,372 | 1,658,922 | -36.7 % | 507 | 362 | -28.6 % | 43 | 49 |
+| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 5,321,470 | -47.0 % | 1174 | 696 | -40.7 % | 60 | 76 |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 10,098,572 | -26.9 % | 983 | 695 | -29.3 % | 74 | 82 |
+| `mul` | 2304 multiplies of two variables | 6,389,830 | 5,049,682 | -21.0 % | 188 | 121 | -35.6 % | 34 | 43 |
+| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,899,026 | -67.8 % | 154 | 131 | -14.9 % | 34 | 37 |
+| `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,813,428 | -52.7 % | 594 | 334 | -43.8 % | 76 | 67 |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 5,367,584 | -31.7 % | 605 | 428 | -29.3 % | 41 | 47 |
+| `calls` | recursive `fib(17)` | 5,041,934 | 3,568,224 | -29.2 % | 105 | 96 | -8.6 % | 159 | 231 |
+| `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 1,857,692 | -31.1 % | 523 | 520 | -0.6 % | 34 | 41 |
+| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,948,312 | -29.2 % | 233 | 163 | -30.0 % | 34 | 35 |
+| `list` | a 64-node linked list walked 40 times | 2,858,640 | 2,291,098 | -19.9 % | 402 | 373 | -7.2 % | 37 | 43 |
+| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 1,633,268 | -44.0 % | 397 | 286 | -28.0 % | 33 | 45 |
+| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 2,578,056 | -51.0 % | 694 | 554 | -20.2 % | 39 | 86 |
+| `entities` | the 32 entities again, through a pointer | 8,851,406 | 4,096,256 | -53.7 % | 1098 | 640 | -41.7 % | 62 | 70 |
+| `copy` | word and byte copies as index loops | 4,485,144 | 2,200,126 | -50.9 % | 709 | 470 | -33.7 % | 31 | 39 |
+| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,430,126 | -21.2 % | 1156 | 1010 | -12.6 % | 48 | 76 |
+| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,349,338 | -26.3 % | 392 | 388 | -1.0 % | 42 | 45 |
 | **Total** | | **99,641,418** | **59,389,984** | **-40.4 %** | **10210** | **7446** | **-27.1 %** | | |
 
-Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 0**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 1**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to
@@ -343,10 +343,13 @@ either SDK's boot or per-frame handler in it.
   `arr[i]` is `lda.l arr,x` with the index in X, `p->field` is
   `lda.l N,x` with the pointer in X. `&nodes[k]` with a 6-byte element no
   longer calls the 32-bit multiply either.
-- **The stack is deeper on every workload** (by 1 to 106 bytes): each
-  temporary of the compiler owns a stack slot, where PVSnesLib keeps its
-  temporaries in direct-page pseudo-registers and gives a function a frame
-  only for its C locals. This is the one column still to win.
+- **The stack is deeper on 17 workloads of 18** (by 1 to 72 bytes; `long`
+  is 9 bytes shallower): each temporary of the compiler owns a stack slot,
+  where PVSnesLib keeps its temporaries in direct-page pseudo-registers
+  and gives a function a frame only for its C locals. This is the one
+  column still to win. (By 1 to 106 bytes on all 18 until 2026-10-08, when
+  locals the optimizer had turned into temporaries stopped keeping their
+  bytes of frame as well.)
 
 What is left has named causes — a stack frame for temporaries, X reloaded
 after every instruction that is not an access, a 32-bit read through a

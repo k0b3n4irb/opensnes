@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | dbc4f9f2fce6f0e7f2ce734164e2805f0524b7f8 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 2f0991675c36612e9043c4d34c524d3c71f0e4f2 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | e24db8530306182f5dc35b1a87ab4e5bee8e4fa3 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -88,7 +88,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 97 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 98 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -100,6 +100,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+e24db85 w65816: a promoted local no longer keeps its words of frame (2026-10-08)
 2f09916 copy: shift widths are computed at the target's word size — `(v >> 15) & 1` lost its mask, a silent miscompilation since the fork's first commit (difftest_stmt seed 54084, 2026-10-08)
 c566d99 w65816: every near access through a temp is X-indexed (`p->field` as `lda.l N,x`), and X is remembered between accesses (2026-10-08)
 f6e5aea w65816: near sym[index] uses indexed-long addressing; a 16-bit value times a small constant gives its 32-bit product inline (2026-10-08)

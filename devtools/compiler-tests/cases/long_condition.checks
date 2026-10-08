@@ -5,4 +5,5 @@ in wide: absent lda\.w #1\n\+\+
 in narrowed: absent ora
 in narrowed: present lda 2,s\n\tbeq \+
 # a long right of &&: compared in 32 bits (the high half is read)
-in right_of_and: present lda 6,s\n\tcmp\.w #0
+# (offsets moved on 2026-10-08: promoted locals no longer take frame space)
+in right_of_and: present lda 4,s\n\tcmp\.w #0
