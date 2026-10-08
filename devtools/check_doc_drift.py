@@ -923,7 +923,9 @@ def retired_tool_lines(text: str) -> list[int]:
 def check_no_retired_tools() -> list[str]:
     root = repo_path()
     drifts: list[str] = []
-    for sub in (".claude/agents", ".claude/skills", ".claude/hooks"):
+    # .github joined on 2026-10-08: the PR template still asked for a Mesen2
+    # test and the bug report form suggested it, a year after the migration.
+    for sub in (".claude/agents", ".claude/skills", ".claude/hooks", ".github"):
         base = repo_path(sub)
         if not base.is_dir():
             continue

@@ -72,8 +72,10 @@ opt-in list.
     `objRegisterTypes`, `spcLoad/spcPlay`, `mosaicEnable` in API_INDEX.
 
 11. **No retired tool in `.claude/agents`, `skills`, `hooks`** (since
-    2026-09-26): Mesen2, opensnes-emu, `tests/*.sh` — caught as the
-    snes-engine-reviewer agent committed with all three.
+    2026-09-26), **nor in `.github`** (since 2026-10-08): Mesen2,
+    opensnes-emu, `tests/*.sh` — caught as the snes-engine-reviewer agent
+    committed with all three, then as the PR template and the bug report
+    form still asking for a Mesen2 test.
 
 12. **Every `?=` variable of `make/common.mk` is on `docs/tools/build.md`**
     (since 2026-09-26), backticked. Caught as eight knobs named in no page

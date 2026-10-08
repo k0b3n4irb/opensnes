@@ -11,9 +11,11 @@ name: MSYS2 cproc Segfault Diagnostic
 #
 # This workflow therefore runs a monthly stress (100x per historical culprit
 # file) and FAILS if any segfault occurs — a red run means the class has
-# resurfaced. Per-build retry telemetry lives in opensnes_build.yml
-# ("Report cproc segfault-retry count"). Retirement plan for the retry
-# scaffolding: KNOWN_LIMITATIONS.md (MSYS2 note).
+# resurfaced. The retry layers that used to hide it are gone (make-level
+# 2026-07-04, cc65816-level 2026-09-26, zero firings measured), so a
+# segfault now also fails the ordinary Windows build; this job stays as the
+# one place that looks for it on purpose. Green every month since 2026-08.
+# History: KNOWN_LIMITATIONS.md (MSYS2 note).
 
 on:
   workflow_dispatch:
@@ -69,7 +71,7 @@ jobs:
       # Step 2: Stress the historical culprit files 100x each.
       # THE GATE: any segfault fails the workflow (the class resurfaced).
       # Fixtures live in devtools/compiler-tests/cases/ (the old
-      # tests/compiler/ path died with the opensnes-emu submodule).
+      # tests/compiler/ path was removed with the opensnes-emu submodule).
       # --------------------------------------------------------
       - name: "Stress test: historical culprit files (100x, gating)"
         shell: msys2 {0}

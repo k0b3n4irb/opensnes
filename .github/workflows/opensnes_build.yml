@@ -337,10 +337,9 @@ jobs:
   # ====================================================================== #
   # Functional tests via luna (cycle-accurate native emulator)             #
   #                                                                        #
-  # Replaces the snes9x-WASM + Mesen2 harness with ONE pinned native luna  #
-  # binary — no emsdk / WASM build / Node / Mesen2 / xvfb / ubuntu-22.04   #
-  # pin. luna runs SA-1 / SuperFX natively, so there is no chip-ROM side   #
-  # channel. Runs: corpus liveness, visual regression, functional probes.  #
+  # One pinned native luna binary: no WASM build, no Node, no display, no  #
+  # distribution pin. luna runs SA-1 / SuperFX / DSP-1 natively, so there  #
+  # is no chip-ROM side channel. Runs the whole of `make tests`.           #
   # ====================================================================== #
   functional-tests:
     name: Functional Tests (luna, ${{ matrix.arch }})
