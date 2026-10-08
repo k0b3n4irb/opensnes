@@ -290,4 +290,7 @@ estimation.
   it. History is not rewritten; this line is the correction.
 - `54f2bab3` (S5 step 3) says recursive `fib(17)` used 265 bytes of stack
   "two days ago". It was the day before, the morning of 2026-10-08.
+- `477259cd` (S5 step 4) counts "180 000 programs clean on new seeds".
+  The first 120 000 had one failure, seed 124152 — the gvn defect the same
+  commit fixes; the 60 000 run after the fix were clean, and so is that seed.
 
