@@ -20,4 +20,11 @@ Sent on 2026-10-08 in `2026-10-08_to_luna_rapport-v1.34.0.md` (four
 requests: `assets-dump --until-frame`, the actual bytes of a failing block,
 `diff --audio --align-onset`, `diff --sequence` with its prototype
 `testing/frame_sequence.py`; reproduction ROMs in the exchange folder,
-`2026-10-08_roms/`). Not answered yet. The two rows above stay held.
+`2026-10-08_roms/`). Answered the same day
+(`2026-10-08_from_luna_reponse-rapport-v1.34.0.md`): all four are done on
+luna `develop`, to ship as v1.35.0. Our reply
+(`2026-10-08_to_luna_reponse-rapport-v1.34.0_reply.md`) accepts their three
+choices and lists what we replay at the pin: then `frame_sequence.py` and
+its row in `luna_tooling.md` are deleted, `diff_corpus.py` gains a
+`--sequence` pass, and the audio re-capture rule of `testing.md` cites
+`--align-onset`. The two rows above stay held.
