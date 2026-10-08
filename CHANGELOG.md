@@ -353,6 +353,20 @@ freeze criterion that waits for hardware.
   doc sentinel (anchor 16) fails any page, example or template that teaches
   one. No example used them; every ROM is byte-identical.
 
+### Performance
+- **The compiler no longer emits what it computed for nothing** (compiler):
+  QBE moves the address of `arr[j - 1]` to the top of a loop and copies it
+  back beside each use; the originals and half of the copies were left
+  without a use, and a backend with no register allocator emitted them
+  all. In an insertion sort's inner loop 258 of 496 cycles were 32-bit
+  index and address values stored and never read. Fixed in the pass itself
+  (target-independent, a candidate for upstream QBE). Measured on luna
+  against PVSnesLib: `sort` from +63 % to −7 %, `collide` from +13 % to
+  −4 %, `physics` from −4 % to −20 %; the code of those functions is 10 to
+  20 % smaller. Twenty-eight example ROMs change and render the same
+  frames. A read whose result is never used is now removed (a `volatile`
+  read is not).
+
 ### Fixed
 - **Thirteen silent miscompilations, a compiler hang and an internal error,
   found by a new differential test** (compiler): `testing/difftest.py` compiles random

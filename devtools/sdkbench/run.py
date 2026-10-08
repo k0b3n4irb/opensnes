@@ -232,6 +232,48 @@ def run_sdk(sdk: str, ks: list, pvs, luna: str, jobs: int) -> dict:
     return out
 
 
+DOC = REPO / "docs" / "BENCHMARK.md"
+DESCRIPTION = {
+    "sieve": "sieve of 1024 in a byte array", "sort": "insertion sort of 64 words",
+    "physics": "32 entities bouncing, 60 steps, by index", "collide": "496 box pairs tested, 8 rounds",
+    "mul": "2304 multiplies of two variables", "decimal": "200 numbers to decimal digits (`/ 10`, `% 10`)",
+    "long": "300 steps of a 32-bit generator and hash", "bytes": "512-byte fill, copy and compare, 4 passes",
+    "calls": "recursive `fib(17)`", "switch": "1280 operations of a `switch` interpreter",
+    "crc": "CRC-16 of 256 bytes, bit by bit", "list": "a 64-node linked list walked 40 times",
+    "tilemap": "a 32×16 tilemap written, then 1200 lookups",
+    "grid": "a 16×32 byte grid, four neighbours of each cell",
+    "entities": "the 32 entities again, through a pointer", "copy": "word and byte copies as index loops",
+    "strings": "`strlen`, `strcmp`, `strcpy` written by hand",
+    "state": "600 steps of a `switch` state machine and a table of functions"}
+
+
+def write_doc() -> None:
+    """Rewrite the table of docs/BENCHMARK.md between its two markers from
+    the committed JSON files, so the page cannot drift from them."""
+    b = json.loads(BASELINE.read_text())["workloads"]
+    t = json.loads(REFERENCE.read_text())["workloads"]
+    pct = lambda o, p: f"{100 * (o - p) / p:+.1f} %"
+    out = ["| Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |",
+           "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for n, o in b.items():
+        p = t[n]
+        out.append(f"| `{n}` | {DESCRIPTION[n]} | {p['cycles']:,} | {o['cycles']:,} | {pct(o['cycles'], p['cycles'])} "
+                   f"| {p['size']} | {o['size']} | {pct(o['size'], p['size'])} | {p['stack']} | {o['stack']} |")
+    tot = lambda d, k: sum(v[k] for v in d.values())
+    out.append(f"| **Total** | | **{tot(t, 'cycles'):,}** | **{tot(b, 'cycles'):,}** | "
+               f"**{pct(tot(b, 'cycles'), tot(t, 'cycles'))}** | **{tot(t, 'size')}** | **{tot(b, 'size')}** | "
+               f"**{pct(tot(b, 'size'), tot(t, 'size'))}** | | |")
+    out.append("")
+    out.append(f"Of the {len(b)} workloads OpenSNES is **faster on {sum(b[n]['cycles'] < t[n]['cycles'] for n in b)}**, "
+               f"**no larger on {sum(b[n]['size'] <= t[n]['size'] for n in b)}**, and **no deeper in stack on "
+               f"{sum(b[n]['stack'] <= t[n]['stack'] for n in b)}**. Both ROMs leave the same checksum for every "
+               "workload, so they computed the same thing.")
+    text = DOC.read_text()
+    a, z = "<!-- sdkbench:begin -->", "<!-- sdkbench:end -->"
+    i, j = text.index(a) + len(a), text.index(z)
+    DOC.write_text(text[:i] + "\n" + "\n".join(out) + "\n" + text[j:])
+
+
 def git_head(path: Path) -> str:
     r = subprocess.run(["git", "-C", str(path), "log", "-1", "--format=%h %cs"], capture_output=True, text=True)
     return r.stdout.strip()
@@ -262,7 +304,8 @@ def main() -> int:
         origin = f"PVSnesLib from pvsneslib_reference.json ({ref['pvsneslib']})"
     if args.update and not args.only:
         BASELINE.write_text(json.dumps({"frames": FRAMES, "workloads": ours}, indent=2) + "\n")
-        print(f"sdkbench: {BASELINE.name} rewritten")
+        write_doc()
+        print(f"sdkbench: {BASELINE.name} and the table of docs/BENCHMARK.md rewritten")
 
     problems = []
     if args.check:

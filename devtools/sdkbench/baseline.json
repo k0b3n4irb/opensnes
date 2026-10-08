@@ -8,21 +8,21 @@
       "res": 172
     },
     "sort": {
-      "cycles": 4277782,
-      "size": 591,
-      "stack": 65,
+      "cycles": 2422596,
+      "size": 459,
+      "stack": 55,
       "res": 12563
     },
     "physics": {
-      "cycles": 9587046,
-      "size": 1094,
+      "cycles": 8016942,
+      "size": 933,
       "stack": 84,
       "res": 12530
     },
     "collide": {
-      "cycles": 15664232,
-      "size": 1074,
-      "stack": 100,
+      "cycles": 13199750,
+      "size": 887,
+      "stack": 104,
       "res": 162
     },
     "mul": {
@@ -86,8 +86,8 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 6203562,
-      "size": 900,
+      "cycles": 6191032,
+      "size": 848,
       "stack": 80,
       "res": 12530
     },
@@ -98,8 +98,8 @@
       "res": 20921
     },
     "strings": {
-      "cycles": 2714450,
-      "size": 1079,
+      "cycles": 2605268,
+      "size": 1059,
       "stack": 90,
       "res": 65535
     },

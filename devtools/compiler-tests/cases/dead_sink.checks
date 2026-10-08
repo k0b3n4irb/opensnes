@@ -1,0 +1,7 @@
+# no high word of an index is computed (it was: xba / and #$00FF / lsr x7)
+in sort_step: absent xba
+# no bank byte of the array is added to anything
+in sort_step: absent adc\.w #:arr
+# the loop still reads and writes the array
+in sort_step: present lda\.l \$0000,x
+in sort_step: present sta\.l \$0000,x

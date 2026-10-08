@@ -41,6 +41,7 @@ This is a Class A change — requires `make clean && make` + full test suite (lu
 - **Phi moves are a parallel copy** (since 2026-10-08): `emitphimoves` orders the moves of an edge and breaks a cycle through `tcc__r10`. Emitted in list order they miscompiled `prev = cur; cur += d;` in any loop. `QBE_DBG_PHI=1` lists them. The two ways out of a conditional branch do not share the A-cache: `branch_fork()` before the branch, `branch_join()` at the `+` label.
 - **A submodule commit is staged in the superproject before any `make`**: the `submodules` target runs `git submodule update`, which puts a committed-but-unstaged submodule back on the old pin (detached HEAD) and the build then uses the old compiler. Uncommitted edits survive; commits do not until `git add compiler/<name>`.
 - **A function has at most 2048 temporaries** (since 2026-10-08; 256 before, unchecked): `MAX_ALLOC_TEMPS` sizes every per-temp table of the backend, and `w65816_check_temps` stops the build beyond it. A guard of the form `if (idx < MAX)` that silently skips is a miscompilation in waiting: refuse instead.
+- **No register allocator means no dead-code sweep for free** (since 2026-10-08): upstream QBE lets spill/rega drop a definition nobody uses, and this target skips both (`T.skiprega`). `gcm.c` therefore sweeps after `sink()` (`sweepdead`). A new middle-end transformation that can leave a definition without a use must be followed by that sweep, or the emitter will emit it — it has no "result unused" rule of its own.
 
 ## After Any Compiler Change
 
