@@ -1,27 +1,35 @@
 # Compiler Benchmark — OpenSNES vs PVSnesLib
 
-*Last updated: 2026-09-26. OpenSNES column measured on that day by
-`python3 devtools/cyclecount/bench.py` (the same code the CI cycle gate
-compares against `devtools/cyclecount/bench_baseline.json`). The PVSnesLib
-columns are frozen at their 2026-05-13 measurement: re-running them needs a
-tcc816 toolchain, and PVSnesLib's code for these functions has not changed.*
+*Last updated: 2026-10-08. Both compilers were run that day on the same
+machine: `python3 devtools/cyclecount/bench.py` for OpenSNES (the code the
+CI cycle gate compares against `devtools/cyclecount/bench_baseline.json`),
+and PVSnesLib's `816-tcc` + `816-opt` from a local PVSnesLib tree for the
+other two columns. The PVSnesLib figures had been frozen since 2026-05-13;
+the re-run gives the same numbers, to the cycle.*
+
+This page has two benchmarks. The first, below, is a **static estimate** on
+34 isolated functions: the cost of the instructions each compiler emits,
+added up. The second, @ref measured "measured on luna", runs the same C
+program built by both SDKs and counts the master cycles the machine
+really spent.
 
 **What changed since the May figure (−32.2 %).** On 2026-05-15 pointers and
 `u32` became 4-byte values (far pointers, v0.19.0, so data can live in any
 bank). Every access through a pointer now computes a 32-bit address, and
-without a register allocator that address lives in stack slots. The three
-pointer-heavy functions — `array_read`, `array_write`, `struct_sum` — went
-from wins to losses; the rest held. The May text claimed "32 % faster"; the
-honest figure today is **about 20 %**, on 33 isolated functions.
+without a register allocator that address lives in stack slots. The
+pointer-heavy functions — `array_read`, `array_write`, `array2d_read`,
+`struct_sum` — are losses; the rest held. The May text claimed "32 % faster";
+the honest figure today is **about 17 %** on these 34 functions, and about
+18 % measured on whole workloads.
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| **Total cycle reduction** | **−20.4 %** vs PVSnesLib + 816-opt (1487 vs 1869 cycles) |
-| Functions compared | 33 (the May `helper` row has no standalone body any more: it is inlined into `call_chain`) |
+| **Total cycle reduction** | **−17.4 %** vs PVSnesLib + 816-opt (1637 vs 1981 cycles) |
+| Functions compared | 34 (the May `helper` row has no standalone body any more: it is inlined into `call_chain`; `array2d_read` joined on 2026-10-08, it was in the gate's baseline but not on this page) |
 | OpenSNES wins | 28 |
-| PVSnesLib+opt wins | 5 (`array_read`, `array_write`, `struct_sum`, `pea_constant_args`, `mod_const_10`) |
+| PVSnesLib+opt wins | 6 (`array_read`, `array_write`, `array2d_read`, `struct_sum`, `pea_constant_args`, `mod_const_10`) |
 | Ties | 0 |
 
 OpenSNES's cc65816 compiler (cproc + QBE w65816 backend) wins on arithmetic,
@@ -80,8 +88,9 @@ no page-crossing penalties).
   mul_const_20                45        42        32    -23.8%
   mul_const_40                45        42        34    -19.0%
   mul_const_96                45        42        36    -14.3%
+  array2d_read               131       112       150    +33.9%
   ────────────────────  ────────  ────────  ────────  ────────
-  TOTAL                     2153      1869      1487    -20.4%
+  TOTAL                     2284      1981      1637    -17.4%
 ```
 
 ## Analysis
@@ -102,6 +111,7 @@ no page-crossing penalties).
 |----------|-------|-----|
 | `array_read` | +68.3% | 4-byte pointer (A6): the address `arr + idx*2` is computed in 32 bits, in stack slots (28-byte frame) |
 | `array_write` | +70.8% | same cause as `array_read` |
+| `array2d_read` | +33.9% | same cause, twice: the row address then the column |
 | `struct_sum` | +9.3% | same cause, amortised over two field reads |
 | `pea_constant_args` | +12.1% | `pea.w` constant push vs PVSnesLib's direct load |
 | `mod_const_10` | +3.1% | Both use runtime `__mod16`; slight overhead difference |
@@ -259,3 +269,62 @@ obvious base ref to compare against). The gate runs on
   `.claude/STRUCTURAL_DEFECTS.md`. Decision rationale: the soft gate
   had operated long enough to confirm the threshold design is workable;
   the override mechanism gives a clean path for deliberate trade-offs.
+
+## Measured on luna {#measured}
+
+*Measured 2026-10-08 with `python3 devtools/sdkbench/run.py` — luna v1.34.0,
+PVSnesLib at `fa758c9b` (2025-12-28), both ROMs LoROM SlowROM.*
+
+The same C file, `devtools/sdkbench/workloads.c`, is built unchanged by
+both SDKs and run on luna, which is cycle-accurate. It holds twelve small
+workloads of the kind a game runs every frame. The unit is the **master
+cycle**; an NTSC frame is about 357,370 of them.
+
+| Workload | What it does | PVSnesLib | OpenSNES | OpenSNES vs PVSnesLib |
+|---|---|---:|---:|---:|
+| `sieve` | sieve of 1024 in a byte array | 4,198,848 | 3,048,850 | -27.4 % |
+| `sort` | insertion sort of 64 words | 2,620,492 | 4,277,776 | +63.2 % |
+| `physics` | 32 entities bouncing, 60 steps | 10,031,700 | 9,587,042 | -4.4 % |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,972 | 15,664,236 | +13.3 % |
+| `mul` | 2304 multiplies of two variables | 6,389,744 | 5,049,680 | -21.0 % |
+| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,098 | 2,899,030 | -67.8 % |
+| `long` | 300 steps of a 32-bit generator and hash | 5,943,926 | 2,813,468 | -52.7 % |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,642 | 6,174,984 | -21.5 % |
+| `calls` | recursive `fib(17)` | 5,041,896 | 3,568,226 | -29.2 % |
+| `switch` | 1280 operations of a `switch` interpreter | 2,697,214 | 2,029,708 | -24.7 % |
+| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,124 | 1,948,312 | -29.2 % |
+| `list` | a 64-node linked list walked 40 times | 2,858,598 | 3,050,050 | +6.7 % |
+| **Total** | | **73,212,254** | **60,111,362** | **-17.9 %** |
+
+OpenSNES is faster on 9 of the 12 workloads and 17.9 % faster on
+their sum. Both ROMs leave the same checksum for every workload, so they
+computed the same thing.
+
+**How a workload is timed.** `luna profile` credits every master cycle to
+the symbol being executed. For each SDK the runner builds one ROM per
+workload and one that runs none, and runs each for the same 900 frames. The
+two differ only by the workload: its symbols gain cycles, the idle loop
+loses exactly as many (checked: the two sums are equal), and the NMI
+handler stays the same. The figure is the sum of the gains — the function,
+everything it calls, the runtime's multiply and divide — with nothing of
+either SDK's boot or per-frame handler in it.
+
+**Reading it.**
+
+- **Divide, modulo and 32-bit arithmetic are where OpenSNES wins most**
+  (`decimal` −68 %, `long` −53 %): the runtime routines are shorter, and
+  `long` is a native 32-bit pair here.
+- **Calls, branches, byte loops and bit work are 20 to 30 % faster**
+  (`calls`, `switch`, `crc`, `sieve`, `bytes`, `mul`).
+- **Three workloads are slower, and they have one cause**: `sort` (+63 %),
+  `collide` (+13 %) and `list` (+7 %) spend their time indexing arrays and
+  following pointers. A pointer is 4 bytes in OpenSNES, so that data can
+  live in any bank; PVSnesLib's is 2 and reaches bank $7E only. Each
+  `arr[j - 1]` computes a 32-bit address in stack slots. This is the same
+  loss as `array_read` in the static table, seen at the scale of a loop.
+- **The static estimate and the measurement agree** on the whole (−17.4 %
+  and −17.9 %) although they share no code: one adds instruction
+  costs, the other counts the machine's cycles.
+
+What this does not measure: the libraries (sprite, background, audio
+engines), a whole game, or code size.

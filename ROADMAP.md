@@ -17,7 +17,7 @@ tag on `main` follows the first console session of the hardware protocol
 (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7): the one freeze criterion
 that needs hardware. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 86
+produces code about 18 % faster than PVSnesLib + 816-opt, estimated on 34 functions and measured on luna on twelve workloads (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 86
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -204,7 +204,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
 - [x] Developer guides (CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE)
-- [x] Published benchmark: about 20 % faster than PVSnesLib + 816-opt overall, slower on pointer-heavy functions (re-measured 2026-09-26)
+- [x] Published benchmark: about 18 % faster than PVSnesLib + 816-opt overall, slower on pointer-heavy functions (both compilers re-run and the same C measured on luna, 2026-10-08)
 - [x] CHANGELOG, CONTRIBUTING (with branching policy), GitHub templates
 
 ### Developer tooling
@@ -349,6 +349,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-06. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-08. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

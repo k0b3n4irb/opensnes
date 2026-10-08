@@ -55,7 +55,8 @@ compile-time pattern checks (`cases/`, `run.py`).
 
 | Script | Measures | Target |
 |--------|----------|--------|
-| `cyclecount/cyclecount.py`, `cyclecount/bench.py` | static 65816 cycle counts of the compiler's output for 33 functions against `bench_baseline.json`; `docs/BENCHMARK.md` is anchored to it | `bench`, `functional-tests` job |
+| `cyclecount/cyclecount.py`, `cyclecount/bench.py` | static 65816 cycle counts of the compiler's output for 34 functions against `bench_baseline.json`; `docs/BENCHMARK.md` is anchored to it | `bench`, `functional-tests` job |
+| `sdkbench/run.py`, `sdkbench/workloads.c` | the same C built by OpenSNES and by PVSnesLib and timed on luna (master cycles per workload); the measured table of `docs/BENCHMARK.md`. Needs `PVSNESLIB_HOME`, so no gate runs it | `bench-sdk` |
 | `asset_budget.py` | static VRAM / CGRAM weight of an example's converted assets | `asset-budget`, `common.mk` (one line per link) |
 | `vram_layout/` | `vram.spec` → `vram_map.h` by CP-SAT (ortools, opt-in; six examples use it) | by hand, gated by `lint-vram` |
 
