@@ -415,6 +415,12 @@ extern void gsuSetupBitmapTilemap(u16 vramAddr);
  * top + bottom >= 73 (40 + 40: lines 185-192). The CPU waits the whole
  * time; gsuPresent() is the variant that does not.
  *
+ * With the screen off (setScreenOff()) there is nothing to wait for and
+ * the DMA starts at once, bands or not: that is the way to load a first
+ * frame before gsuSetupHdmaBlanking(). (Until 2026-10-08 such a call
+ * waited for line 225 exactly, the line the NMI starts on, and returned
+ * after a number of frames that depended on the caller's timing.)
+ *
  * Until 2026-09-29 it read OPVCT once per poll without STAT78, so every
  * other call read the high byte (PPU2 open bus: the previous exit value)
  * and started at once: in superfx_3d a third of the bytes landed on

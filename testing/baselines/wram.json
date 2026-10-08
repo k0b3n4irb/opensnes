@@ -120,8 +120,8 @@
     "rom_sha256": "84d7c8f1e0cf2a67c76f6bee1ca9c1d0c9742c6d2b67c540721aa4f08ee6dfd9"
   },
   "chips_superfx_3d": {
-    "stream": "3ab32076c2a3818bb83daf63d60bf8336bab0afba16ce06141f6a6dc7f048e25",
-    "rom_sha256": "5dfdb50a717a33d027c7945ecbc4d41123b9ca0ffa6dbbf7e5c4a8e0afa906a2"
+    "stream": "f2c01a78a373c97742c678306fe46102342b799e6ce6a98da294643966e5b55f",
+    "rom_sha256": "47eb0ed0d327f85fb6a44237bbee4bbe71bfe0b096dc82ef032a6d4829877d48"
   },
   "chips_superfx_game_skeleton": {
     "stream": "d787024d10f404f5304bfcca443de728ad45b258815555c0516108b3d457e6cb",

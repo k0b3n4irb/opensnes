@@ -229,7 +229,8 @@ _tm_col:
 ;==============================================================================
 ; gsuDmaFullFrame — one 16 KB DMA from Game Pak RAM to VRAM, in the bands
 ;==============================================================================
-; Starts the DMA only on a line from which the whole 16 KB lands before
+; With the screen off (setScreenOff) it starts at once. Otherwise it
+; starts the DMA only on a line from which the whole 16 KB lands before
 ; the display comes back: from the first line of the bottom band
 ; (225 - bottom: the HDMA write for the band's first entry lands one line
 ; after its count says, luna --dma-trace showed 116 bytes on line 184) to
@@ -271,6 +272,16 @@ gsuDmaFullFrame:
     bcs +
     lda.l gsu_dff_first
 +   sta.l gsu_dff_last
+
+    ; Screen off (setScreenOff): every line is blank, start now. Without
+    ; this a call made before the bands exist (the first frame of a boot,
+    ; in force blank) waited for a window of one line, 225 — the line the
+    ; NMI starts on — and got through only when a poll happened to land
+    ; between the start of that line and the NMI: 20 frames of boot came
+    ; and went with the phase of the caller (2026-10-08).
+    lda.l console_force_blanked
+    and #$00FF
+    bne @go
 
 @poll:
     jsr _gsu_dff_read_v

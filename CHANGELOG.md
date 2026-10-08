@@ -381,6 +381,14 @@ freeze criterion that waits for hardware.
   faster. `mode7/extbg` builds its plane 16 frames sooner.
 
 ### Fixed
+- **`gsuDmaFullFrame()` with the screen off returned after a number of
+  frames that depended on timing** (lib): called before
+  `gsuSetupHdmaBlanking()` — the way `superfx_3d` loads its first frame,
+  in force blank — its window was one line, 225, the line vertical blank
+  and the NMI begin on, and it got through only when a poll landed between
+  the start of that line and the NMI. A faster compiler moved
+  `superfx_3d`'s boot from 17 to 38 frames without changing a byte of this
+  code. With the screen off it now starts at once (frame 8).
 - **`(y || K) && 1` could return `y != 0`** (compiler): QBE replaces a phi
   of 0 and 1 under a branch by the branch's condition, checking that both
   sides end in a jump but not that they jump to the phi's block. It folds
