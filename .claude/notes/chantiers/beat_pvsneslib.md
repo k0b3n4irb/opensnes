@@ -275,3 +275,14 @@ estimation.
   `lib/source/string.asm`
 - `docs/BENCHMARK.md`, `docs/PERF.md`, `compiler/ABI.md`,
   `docs/MIGRATING_FROM_PVSNESLIB.md`
+
+## Corrections to commit messages
+
+- `4d6624b9` (S4 part 2) says `superfx_game_skeleton` reports its audio
+  DIFF "on the partial last window alone". Wrong: read window by window
+  after the push, two complete windows are over the 2 % tolerance as well
+  (2500 ms: 3.00 %, 4500 ms: 2.22 %), the others under 1.9 %. The cause is
+  the one stated — the music starts one frame later (first sample above 64
+  at 33344 -> 33872) — but the last window is not the only one that shows
+  it. History is not rewritten; this line is the correction.
+
