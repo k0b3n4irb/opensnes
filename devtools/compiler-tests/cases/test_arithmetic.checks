@@ -11,7 +11,7 @@ in mul_8x8_simple: present lda 4,s\n\tpha\n\tlda 8,s\n\tpha\n\tjsl __mul16\n\tpl
 # (a * b) / c: the product in A becomes the dividend.
 in combined_mul_div: present jsl __mul16\n\tplx\n\tplx\n\tsta\.b tcc__r0\n\tlda 4,s\n\tsta\.b tcc__r1\n\tjsl __div16
 # a * b * c: the first product is pushed as the second call's operand.
-in chained_mul: present jsl __mul16\n\tplx\n\tplx\n\tsta \d+,s\n\tpha\n\tlda 16,s\n\tpha\n\tjsl __mul16
+in chained_mul: present jsl __mul16\n\tplx\n\tplx\n\tsta \d+,s\n\tpha\n\tlda 12,s\n\tpha\n\tjsl __mul16
 # Powers of two and identities.
 in mul_by_8: present lda 4,s\n(\tasl a\n){3}\trtl
 in mul_by_zero: present lda\.w #0\n\trtl

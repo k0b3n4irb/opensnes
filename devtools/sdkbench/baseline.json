@@ -8,27 +8,27 @@
       "res": 172
     },
     "sort": {
-      "cycles": 1658922,
-      "size": 362,
-      "stack": 49,
+      "cycles": 1657474,
+      "size": 356,
+      "stack": 47,
       "res": 12563
     },
     "physics": {
-      "cycles": 5321470,
-      "size": 696,
-      "stack": 76,
+      "cycles": 5318568,
+      "size": 690,
+      "stack": 70,
       "res": 12530
     },
     "collide": {
-      "cycles": 10098572,
-      "size": 695,
-      "stack": 82,
+      "cycles": 10095674,
+      "size": 689,
+      "stack": 78,
       "res": 162
     },
     "mul": {
       "cycles": 5049682,
       "size": 121,
-      "stack": 43,
+      "stack": 41,
       "res": 13728
     },
     "decimal": {
@@ -50,9 +50,9 @@
       "res": 819
     },
     "calls": {
-      "cycles": 3568224,
-      "size": 96,
-      "stack": 231,
+      "cycles": 3163192,
+      "size": 80,
+      "stack": 193,
       "res": 1597
     },
     "switch": {
@@ -80,15 +80,15 @@
       "res": 10608
     },
     "grid": {
-      "cycles": 2578056,
-      "size": 554,
-      "stack": 86,
+      "cycles": 2566436,
+      "size": 548,
+      "stack": 84,
       "res": 40897
     },
     "entities": {
-      "cycles": 4096256,
-      "size": 640,
-      "stack": 70,
+      "cycles": 4093356,
+      "size": 634,
+      "stack": 66,
       "res": 12530
     },
     "copy": {
@@ -106,7 +106,7 @@
     "state": {
       "cycles": 1349338,
       "size": 388,
-      "stack": 45,
+      "stack": 43,
       "res": 24876
     }
   }

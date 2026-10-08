@@ -56,13 +56,15 @@ from lib import find_luna  # noqa: E402
 
 # The gate: the pinned functions below, twelve seeds, and the seeds that
 # showed a defect first on 2026-10-08, whatever the generator has become
-# since (54084: `(v >> 15) & 1` lost its mask, QBE sizing a shift at 32 bits;
+# since (74144: a 32-bit multiply by 2..256 read its 16-bit operand twice, the
+# second time from a slot whose store was skipped;
+# 54084: `(v >> 15) & 1` lost its mask, QBE sizing a shift at 32 bits;
 # 44157: an index also read by a 32-bit operation lost its high half —
 # an internal error, never shipped; 19645: a 32-bit compare of a 16-bit temp read a slot whose store was
 # skipped, an internal error; 14657: gvn's phi-to-condition inference on a dead edge, `(y || K) && 1`;
 # 42, 51, 62, 2630, 3797; 336 and 2085 for the functions of more than
 # 256 temporaries, which no hand-written function here reproduces).
-GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797, 14657, 19645, 44157, 54084]
+GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797, 14657, 19645, 44157, 54084, 74144]
 
 # Hand-written functions for the defects this test found, reduced. Fixed-width
 # types and no operation that depends on the width of int, so the expected
@@ -76,6 +78,7 @@ s8 pin_a[8] = { 7, 3, 5, 3, -2, 1, -86, 4 };
 u32 pin_g = 1;
 s32 pin_x = 0x00050003;
 u8 pin_t[8] = { 10, 11, 12, 13, 14, 15, 16, 17 };
+u16 pin_w, pin_v, pin_u;
 """
 PINNED = [
     # phi moves were emitted one after the other: `prev` read the new `cur`
@@ -122,6 +125,15 @@ PINNED = [
     ("a condition returned as a 32-bit value",
      "u32 p10(u32 x) { return x ? 1L : (15L & x); }",
      "p10(0x00070000)", 1),
+    # a function that has parameters, makes a call that is not its last act and
+    # keeps nothing on the stack:
+    # no frame is allocated, and the parameters were read 2 bytes too high (the
+    # shape of textInit(); never shipped, 25 examples lost their text in validation)
+    ("parameters of a function with calls and no stack slot",
+     "void pin_nop(void) { pin_z = 0; } "
+     "void pin_set(u16 a, u16 b, u16 c) { pin_w = a; pin_v = b; pin_nop(); pin_u = c; pin_nop(); } "
+     "u32 p11(void) { pin_set(1, 2, 3); return ((u32)pin_w << 16) | (pin_v << 8) | pin_u; }",
+     "p11()", 0x00010203),
 ]
 
 PROGS_PER_ROM = 10

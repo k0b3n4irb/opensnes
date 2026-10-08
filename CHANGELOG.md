@@ -415,11 +415,34 @@ freeze criterion that waits for hardware.
   now shallower than PVSnesLib's. No cycle and no byte of code changes
   beyond the frame-size constants: the 86 examples render the same frames
   at the same frame numbers.
+- **A parameter is read where the caller pushed it** (compiler): a
+  function that calls another began by copying each parameter into its
+  own frame; only a function without calls read them in place. The
+  argument area lies above the frame and survives the calls, so every
+  function reads it directly now. And a value that never touches the
+  stack — such a parameter, or a result consumed at once from A — no
+  longer gets a slot: slots are assigned after those analyses, not before.
+  Measured on luna: recursive `fib(17)` (`calls`) from −29 % to −37 %
+  against PVSnesLib, its code from 96 to 80 bytes, its deepest stack from
+  231 to 193 bytes (PVSnesLib: 159); the eighteen workloads −40.8 %, their
+  code −27.5 %. The 86 examples render the same frames at the same frame
+  numbers.
 - **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
   (compiler): a consequence of the shift-width fix below; 71 example ROMs
   change by it and render the same frames.
 
 ### Fixed
+- **The high half of `(u32)w * 2..256` could be garbage** (compiler):
+  the 32-bit multiply by a power of two up to 256, of a 16-bit value,
+  loaded that value a second time for the high half — from its stack
+  slot, while the store to that slot is skipped when the value's only use
+  is the instruction that follows. The twin of a defect fixed on
+  2026-05-22 in the shift path (`fix32Sin(64)` returned 0), left in the
+  multiply. Reached when the optimizer hands the multiply a 16-bit
+  temporary directly (a comparison's result scaled as a `long`); the
+  operand is now loaded once. Found when such a value stopped getting a
+  slot at all and the read became an internal error (seed 74144 of the
+  program test, in its gate).
 - **`(v >> 15) & 1` on a signed value lost its mask** (compiler): QBE's
   redundant-mask rule sized a shift at 32 bits, the width of a word
   upstream. Here a word is 16 bits, so `v >> 15` was held to be one bit
