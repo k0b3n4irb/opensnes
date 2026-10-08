@@ -50,9 +50,9 @@
       "res": 819
     },
     "calls": {
-      "cycles": 3163192,
-      "size": 80,
-      "stack": 193,
+      "cycles": 2944962,
+      "size": 66,
+      "stack": 159,
       "res": 1597
     },
     "switch": {
@@ -104,8 +104,8 @@
       "res": 65535
     },
     "state": {
-      "cycles": 1349338,
-      "size": 388,
+      "cycles": 1345918,
+      "size": 382,
       "stack": 43,
       "res": 24876
     }

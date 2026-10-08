@@ -427,11 +427,30 @@ freeze criterion that waits for hardware.
   231 to 193 bytes (PVSnesLib: 159); the eighteen workloads −40.8 %, their
   code −27.5 %. The 86 examples render the same frames at the same frame
   numbers.
+- **The value a function returns is not stored first** (compiler): a
+  result produced by the last instruction of a block and returned at once
+  went to a stack slot and came back; only a function without calls
+  skipped that. Every function does now, and the slot is gone from the
+  frame. Recursive `fib(17)` (`calls`) keeps one 2-byte slot per level:
+  its deepest stack went 265 -> 231 -> 193 -> 159 bytes in three steps,
+  level with PVSnesLib, for 42 % fewer cycles and 66 bytes of code against
+  105. Seven example ROMs change and render the same frames.
 - **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
   (compiler): a consequence of the shift-width fix below; 71 example ROMs
   change by it and render the same frames.
 
 ### Fixed
+- **A bit-field chosen by a constant condition lost the conditional's
+  type** (compiler): `b3 - (3 ? bf.b2 : (v2 * v3))` — the two branches
+  have the common type `unsigned`, but with a condition the front end can
+  fold, the chosen bit-field operand was kept as a bit-field and promoted
+  again, to `int`, by the operator around it: the result was computed
+  signed and sign-extended into a `long` (0xFFFFFF78 for 0x0000FF78,
+  measured on luna; the same expression with a run-time condition was
+  right). Also, `c ? bf.a : bf.b` with two bit-fields of the same type is
+  now an `int`, as the standard has it and as `bf.a - bf.b` already was.
+  In the front end since the fork. Found by the program differential test
+  (seed 103247, in its gate with a hand-written function).
 - **The high half of `(u32)w * 2..256` could be garbage** (compiler):
   the 32-bit multiply by a power of two up to 256, of a 16-bit value,
   loaded that value a second time for the high half — from its stack

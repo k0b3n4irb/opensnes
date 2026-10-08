@@ -300,7 +300,7 @@ while it runs (bytes below the initial stack pointer).
 | `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,899,026 | -67.8 % | 154 | 131 | -14.9 % | 34 | 37 |
 | `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,813,428 | -52.7 % | 594 | 334 | -43.8 % | 76 | 67 |
 | `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 5,367,584 | -31.7 % | 605 | 428 | -29.3 % | 41 | 47 |
-| `calls` | recursive `fib(17)` | 5,041,934 | 3,163,192 | -37.3 % | 105 | 80 | -23.8 % | 159 | 193 |
+| `calls` | recursive `fib(17)` | 5,041,934 | 2,944,962 | -41.6 % | 105 | 66 | -37.1 % | 159 | 159 |
 | `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 1,857,692 | -31.1 % | 523 | 520 | -0.6 % | 34 | 41 |
 | `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,948,312 | -29.2 % | 233 | 163 | -30.0 % | 34 | 35 |
 | `list` | a 64-node linked list walked 40 times | 2,858,640 | 2,291,098 | -19.9 % | 402 | 373 | -7.2 % | 37 | 43 |
@@ -309,10 +309,10 @@ while it runs (bytes below the initial stack pointer).
 | `entities` | the 32 entities again, through a pointer | 8,851,406 | 4,093,356 | -53.8 % | 1098 | 634 | -42.3 % | 62 | 66 |
 | `copy` | word and byte copies as index loops | 4,485,144 | 2,200,126 | -50.9 % | 709 | 470 | -33.7 % | 31 | 39 |
 | `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,430,126 | -21.2 % | 1156 | 1010 | -12.6 % | 48 | 76 |
-| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,349,338 | -26.3 % | 392 | 388 | -1.0 % | 42 | 43 |
-| **Total** | | **99,641,418** | **58,963,184** | **-40.8 %** | **10210** | **7400** | **-27.5 %** | | |
+| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,345,918 | -26.5 % | 392 | 382 | -2.6 % | 42 | 43 |
+| **Total** | | **99,641,418** | **58,741,534** | **-41.0 %** | **10210** | **7380** | **-27.7 %** | | |
 
-Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 1**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 2**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to
@@ -343,8 +343,8 @@ either SDK's boot or per-frame handler in it.
   `arr[i]` is `lda.l arr,x` with the index in X, `p->field` is
   `lda.l N,x` with the pointer in X. `&nodes[k]` with a 6-byte element no
   longer calls the 32-bit multiply either.
-- **The stack is deeper on 17 workloads of 18** (by 1 to 45 bytes; `long`
-  is 9 bytes shallower): each temporary of the compiler owns a stack slot,
+- **The stack is deeper on 16 workloads of 18** (by 1 to 45 bytes; `long`
+  is 9 bytes shallower and `calls`, recursive `fib(17)`, is level): each temporary of the compiler owns a stack slot,
   where PVSnesLib keeps its temporaries in direct-page pseudo-registers
   and gives a function a frame only for its C locals. This is the one
   column still to win. (By 1 to 106 bytes on all 18 until 2026-10-08, when

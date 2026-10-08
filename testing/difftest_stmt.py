@@ -56,7 +56,8 @@ from lib import find_luna  # noqa: E402
 
 # The gate: the pinned functions below, twelve seeds, and the seeds that
 # showed a defect first on 2026-10-08, whatever the generator has become
-# since (74144: a 32-bit multiply by 2..256 read its 16-bit operand twice, the
+# since (103247: a bit-field chosen by a constant condition lost the
+# conditional's type; 74144: a 32-bit multiply by 2..256 read its 16-bit operand twice, the
 # second time from a slot whose store was skipped;
 # 54084: `(v >> 15) & 1` lost its mask, QBE sizing a shift at 32 bits;
 # 44157: an index also read by a 32-bit operation lost its high half —
@@ -64,7 +65,7 @@ from lib import find_luna  # noqa: E402
 # skipped, an internal error; 14657: gvn's phi-to-condition inference on a dead edge, `(y || K) && 1`;
 # 42, 51, 62, 2630, 3797; 336 and 2085 for the functions of more than
 # 256 temporaries, which no hand-written function here reproduces).
-GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797, 14657, 19645, 44157, 54084, 74144]
+GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797, 14657, 19645, 44157, 54084, 74144, 103247]
 
 # Hand-written functions for the defects this test found, reduced. Fixed-width
 # types and no operation that depends on the width of int, so the expected
@@ -79,6 +80,8 @@ u32 pin_g = 1;
 s32 pin_x = 0x00050003;
 u8 pin_t[8] = { 10, 11, 12, 13, 14, 15, 16, 17 };
 u16 pin_w, pin_v, pin_u;
+struct PinC { unsigned int a : 3; unsigned int b : 11; };
+struct PinC pin_c = { 4, 140 };
 """
 PINNED = [
     # phi moves were emitted one after the other: `prev` read the new `cur`
@@ -134,6 +137,14 @@ PINNED = [
      "void pin_set(u16 a, u16 b, u16 c) { pin_w = a; pin_v = b; pin_nop(); pin_u = c; pin_nop(); } "
      "u32 p11(void) { pin_set(1, 2, 3); return ((u32)pin_w << 16) | (pin_v << 8) | pin_u; }",
      "p11()", 0x00010203),
+    # a conditional whose condition is a constant kept its chosen bit-field operand
+    # as a bit-field, and the operator around promoted it again, to int, instead
+    # of using the conditional's own type. (This one does depend on int being 16
+    # bits: x is unsigned, 0x0000FF78; y, two bit-fields, is an int, 0xFFFFFF78.)
+    ("a bit-field chosen by a constant condition",
+     "u32 p12(void) { s32 x = pin_c.a - (3 ? pin_c.b : (pin_z * pin_after)); "
+     "s32 y = pin_c.a - (pin_g ? pin_c.b : pin_c.a); return (u32)x ^ ((u32)y << 1); }",
+     "p12()", 0x0000FF78 ^ 0xFFFFFEF0),
 ]
 
 PROGS_PER_ROM = 10

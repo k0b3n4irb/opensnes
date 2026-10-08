@@ -8,3 +8,6 @@ in set3: present lda 4,s\n\tsta\.w u
 # one load of the 16-bit operand, kept in tcc__r0 for the high half
 in scale: present sta\.b tcc__r0\n\tasl a
 in scale: present lda\.b tcc__r0\n\txba
+# the returned value is not stored before the return, in a function with calls
+in fib: present adc \d+,s\n\tplx\n\tplx\n\trtl
+in fib: absent adc \d+,s\n\tsta
