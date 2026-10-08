@@ -366,8 +366,29 @@ freeze criterion that waits for hardware.
   20 % smaller. Twenty-eight example ROMs change and render the same
   frames. A read whose result is never used is now removed (a `volatile`
   read is not).
+- **A condition branches where it is decided** (compiler): `a && b` and
+  `a || b` stored 0 or 1 on each side and tested the stored value again;
+  the compare a block branched on was computed as 0 or 1 whenever the
+  optimizer had scheduled anything after it; `x < 0` subtracted zero and
+  corrected for an overflow that cannot happen; `p != end` on two pointers
+  built a 0 or 1 and compared it with zero. Each side of a logical
+  operator now jumps straight to its target, the compare is the last thing
+  in its block and is fused with the branch, the sign test reads the sign,
+  and a 32-bit equality is two compares and a skip. Measured on luna
+  against PVSnesLib: `sort` from −7 % to −19 %, `collide` from −4 % to
+  −12 %, `entities` from −30 % to −41 %, `physics` from −20 % to −27 %, the
+  eighteen workloads together from −27 % to −30 %, and all eighteen are now
+  faster. `mode7/extbg` builds its plane 16 frames sooner.
 
 ### Fixed
+- **`(y || K) && 1` could return `y != 0`** (compiler): QBE replaces a phi
+  of 0 and 1 under a branch by the branch's condition, checking that both
+  sides end in a jump but not that they jump to the phi's block. It folds
+  a branch on a constant in the same pass, and the phi keeps its argument
+  for the edge that just died. Found by the differential test on the first
+  day the new branch pass produced that shape (no C program is known to
+  reach it without that pass). Fixed in the inference (`copy.c`); seed
+  14657 of the program test pins it.
 - **Thirteen silent miscompilations, a compiler hang and an internal error,
   found by a new differential test** (compiler): `testing/difftest.py` compiles random
   integer expressions, runs them on luna and compares with C's rules for

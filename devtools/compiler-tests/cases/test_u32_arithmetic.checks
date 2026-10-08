@@ -18,7 +18,10 @@ in extend16: present lda\.w #0\n\tsta \d+,s\n\tlda \d+,s\n\tsta\.b tcc__retval_h
 # Unsigned compare: high words first (equal -> low words), unsigned branch.
 in compare_gt: present cmp \d+,s\n\tbeq \+\n\tbcc \+\+\n\tbra \+\+\+\n\+\n\tlda \d+,s\n\tcmp \d+,s\n\tbcc \+\+
 in compare_gt: absent \bb(mi|pl|vc|vs)\b
-in compare_eq: present cmp \d+,s\n\tbne \+\n\tlda \d+,s\n\tcmp \d+,s\n\tbne \+
+# equality branches on Z over both halves: a low-half difference skips the
+# high compare (since 2026-10-08; a 0 or 1 was computed and tested before)
+in compare_eq: present cmp \d+,s\n\tbne @lcmp\.\d+\n\tlda \d+,s\n\tcmp \d+,s\n@lcmp\.\d+:\n\tbne \+
+in compare_eq: absent bra \+\+
 # << 8 moves bits across the halves: asl low, rol high, eight times. This is
 # today's shape, not the goal: a byte move would do (the missed optimisation
 # of 2026-09-26) — replace this check by the new shape when that lands.

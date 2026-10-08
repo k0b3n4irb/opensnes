@@ -229,15 +229,15 @@
   },
   "chips_superfx_3d": {
     "fbhash": [
-      "0ef01a718585c325",
-      "5957529d1118a325"
+      "f552017b01b58925",
+      "428db26cefb04765"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.34.0",
-    "rom_sha256": "22f74803756ca2d879bb14fac4c08683a1f579381a81da7065ed2a33f1aabbea"
+    "rom_sha256": "5dfdb50a717a33d027c7945ecbc4d41123b9ca0ffa6dbbf7e5c4a8e0afa906a2"
   },
   "chips_superfx_game_skeleton": {
     "fbhash": [
@@ -481,15 +481,15 @@
   },
   "mode7_extbg": {
     "fbhash": [
-      "27a2a9545cef0ebd",
-      "1c275d4ff7683b2d"
+      "da2737ec75e477d9",
+      "a4757a7a18932905"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.34.0",
-    "rom_sha256": "4f785149af6c442799251e77f3fd763eca6eff121a13aeed46be3f63722ad8d9"
+    "rom_sha256": "00682af4e242cd3695806eb2e11ec8df280a5be0d7303b28600c1d4193e81e29"
   },
   "mode7_perspective": {
     "fbhash": "b6d491935f26c865",

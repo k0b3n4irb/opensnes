@@ -216,7 +216,7 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   failing program is reduced statement by statement (a program that never
   returns counts as failing), then run again writing each variable out, so
   the report names the wrong one. Gate: eleven pinned functions and nineteen
-  seeds (201 programs). Its first day: a loop-carried copy
+  seeds (211 programs). Its first day: a loop-carried copy
   (`prev = cur; cur += d;`), a swap in a loop and Fibonacci miscompiled, a
   `do … while` with a `break`, initialisers starting with implicit zeros, a
   parameter read from an unwritten slot in a function of more than 256

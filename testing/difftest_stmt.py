@@ -56,9 +56,10 @@ from lib import find_luna  # noqa: E402
 
 # The gate: the pinned functions below, twelve seeds, and the seeds that
 # showed a defect first on 2026-10-08, whatever the generator has become
-# since (42, 51, 62, 2630, 3797; 336 and 2085 for the functions of more than
+# since (14657: gvn's phi-to-condition inference on a dead edge, `(y || K) && 1`;
+# 42, 51, 62, 2630, 3797; 336 and 2085 for the functions of more than
 # 256 temporaries, which no hand-written function here reproduces).
-GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797]
+GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797, 14657]
 
 # Hand-written functions for the defects this test found, reduced. Fixed-width
 # types and no operation that depends on the width of int, so the expected

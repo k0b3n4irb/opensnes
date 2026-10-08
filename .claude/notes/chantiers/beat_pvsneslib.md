@@ -11,7 +11,7 @@ live part.
 | S0 measurement | done except the library bench (`devtools/libbench`, to do before S6) | `d53f8605` | faster on 15 of 18, no larger on 13, no deeper in stack on 0 |
 | S1 link only what is referenced | done 2026-10-08. Minimal ROM 9.8 KB -> 2.4 KB in bank $00 (PVSnesLib 2.0 KB): the 0.6 KB left is the mouse / Super Scope / multitap readers the NMI handler always calls — make them linked only when their init is called, with the NMI work of S6 | `87e85fe7` | same three counts (S1 does not touch codegen) |
 | S2 dead code | done 2026-10-08 (qbe `f832c8e`: `sinkref` recurses on the emitted copy, `sweepdead` after `sink`). sort +63 % -> -7.5 %, collide +13 % -> -4.5 %, physics -4 % -> -20 %. 28 ROMs change, 86/86 MATCH, audio unchanged, WRAM re-captured (17 streams: stack, scratch, one code pointer) | `313df292` | faster on 17 of 18 (-27.0 %), no larger on 15 (-15.9 %), no deeper in stack on 0 |
-| S3 branches | to do | | |
+| S3 branches | done 2026-10-08 (qbe `7eed8b3`: `threadjnz` before gvn with trivial-phi removal, `simpljnz`, `cmplast`, sign test against 0, 32-bit equality fused). Exit criteria missed by a little on two lines — sort -19.2 % for -20, collide -11.6 % for -15 — what is left in both loops is address arithmetic (S4) and the phi copies (S5), no materialised condition remains. Found on the way: an upstream gvn inference bug (`phicopyref` on a dead edge, fixed), a pre-existing slot-ownership ICE on seed 19645 (open), and a boot race in `gsuDmaFullFrame` (lib, fixed in the next commit) | this commit | faster on 18 of 18 (-30.4 %), no larger on 15 (-18.2 %), no deeper in stack on 0 |
 | S4 addressing | to do | | |
 | S5 frames and ABI | to do | | |
 | S6 library hot paths | to do | | |
