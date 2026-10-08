@@ -72,7 +72,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -219,6 +219,9 @@ tests: test-compiler
 	@# rejected by CI. Refuse to test a corpus older than the lib outputs.
 	@python3 devtools/check_corpus_fresh.py
 	@scripts/install-luna.sh
+	@# The compiler against C's integer rules, on luna (2026-10-08): first,
+	@# because a wrong compiler makes every result below it meaningless.
+	@python3 testing/difftest.py
 	@python3 testing/luna_runner.py --coverage
 	@# Same liveness pass from pseudo-random RAM (fixed seed): a ROM that
 	@# reads memory it never initialised passes on luna's zero-fill and
@@ -368,6 +371,16 @@ clean-examples:
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
+
+# Differential test of the compiler: random integer expressions compiled by
+# cc65816 and run on luna in four shapes (globals, literals, parameters,
+# locals), against a model of C's integer rules that clang checks under a
+# 16-bit-int target. The gate is a fixed set (the expressions that found the
+# six defects of 2026-10-08, pinned, and fifteen seeds); hunting is
+# `make test-difftest SEEDS=1000-1999` (about 35 seeds a second).
+test-difftest:
+	@scripts/install-luna.sh
+	@python3 testing/difftest.py $(if $(SEEDS),--seeds $(SEEDS))
 
 # Golden-output tests for every asset tool. Byte-compares tool output
 # against committed goldens — needs `make tools` first. Also the CI job
@@ -688,6 +701,7 @@ help:
 	@echo "  release   - Create the SDK release zip (toolchain, tools, lib, make, templates, starter; no examples, no HTML)"
 	@echo "  release-examples - Create the examples archive (sources, assets, built ROMs), one per version"
 	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
+	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  check-upgrade SRC=<dir> - List the names 1.0 removes, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"
 	@echo "  clean     - Clean all build artifacts"

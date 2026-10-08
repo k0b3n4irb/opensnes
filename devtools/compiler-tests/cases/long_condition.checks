@@ -1,0 +1,8 @@
+# if (long): both halves, straight in the branch (no 0/1 materialised)
+in wide: present lda 2,s\n\tora 4,s\n\tbeq \+
+in wide: absent lda\.w #1\n\+\+
+# if ((short)long): the low word alone
+in narrowed: absent ora
+in narrowed: present lda 2,s\n\tbeq \+
+# a long right of &&: compared in 32 bits (the high half is read)
+in right_of_and: present lda 6,s\n\tcmp\.w #0

@@ -81,6 +81,11 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-05 | gfx4snes `-m`: the map entry's palette bank came from the tile's first pixel, and index 0 is transparent in every bank — a bank-2 tile starting transparent was drawn in bank 0's colours (63 of 64 pixels) | the build-tools audit's open question, measured with a pixel oracle on a four-tile image (`banks.png`); fixture `ROUNDTRIP` in the golden suite | `7a282da7` |
 | 2026-10-05 | gfx4snes `-a`: the palette rearrangement ran on the row-major image while the tiles had been converted before — `.pal` reordered, `.pic` on the old indices; `color/transparency`, the one user, decoded 51 056 of 52 509 opaque pixels to the wrong colour since the port (PVSnesLib's tool has the same order) | same oracle, 191 of 256 pixels on the fixture; the example decoded against its own `.bmp` | `7a282da7` |
 | 2026-10-07 | `DECLARE_ANIM_CLIP` with 256 frames or more: the count was cast to the `u8` `len` — 256 gave 0 and `animPlay()` stopped the player, 300 gave a 44-frame clip; no error | weekly header read (`anim.h`); refusal fixture `negative/anim_clip_256` (compiled with exit 0 before) | this commit (`_Static_assert` in the macro) |
+| 2026-10-08 | QBE folded constants at upstream's widths (32 and 64 bits) while `w` is 16 bits and `l` 32 here: `-(4294967291UL) == 5` was 0, `-22016 * 256U` and `512UL << 31` were nonzero as conditions; divisions, right shifts and compares of folded values the same | `testing/difftest.py` (new that day), seeds 2, 126; pins 1-3 | this commit (qbe `fold.c`: operands and result at `T.wordsz`) |
+| 2026-10-08 | A function whose only temp is a phi of constants (`int a = 1; return a && 1;`) got no stack frame while the edge still stored the phi: the store hit the return address or the caller's frame — the function did not return | `testing/difftest.py` (new that day), seed 8 (the ROM never reached the end of `main`); case `frame_for_const_phi` | this commit (qbe `w65816/emit.c`, `can_be_frameless`) |
+| 2026-10-08 | A 4-byte value converted to bool was compared in 16 bits: `y && x`, `0 || x` and `(bool)x` were false for a long whose low word is 0 (`0x00010000`), and for a far pointer to offset `$0000` of its bank | `testing/difftest.py` (new that day), seed 8; pins 4-5 | this commit (cproc `qbe.c`, `cnel`) |
+| 2026-10-08 | A branch read 32 bits whenever its argument was an `l` temp, and a 16-bit condition could be one: `if ((s16)x)`, `(s16)x ? a : b`, `((s16)x >> 0) ? …` were true for x = `0x00100000`; `(u16)(0x80000000) && y` true as a constant | `testing/difftest.py` (new that day), seeds 57, 116, 829, 5485; pins 6-8; case `long_condition` | this commit (cproc: a 4-byte condition is compared with zero; qbe: `jnz` tests a word, the compare is folded back into the branch; constant branch read at 16 bits) |
+| 2026-10-08 | cproc's evaluator returned an operand for `||` and `&&` of constants: `5 && 7` was 7, `0 || 9` was 9, `43732U || x` was 43732 — in enum values, array sizes, initialisers and folded sub-expressions | `testing/difftest.py` (new that day), seed 134; pins 9-10; case `const_logical_value` | this commit (cproc `eval.c`) |
 
 ## Campaign closed — 2026-10-05
 
@@ -97,6 +102,14 @@ at the top of this file; the first weekly line is due by 2026-10-12.
 
 **Restarted 2026-10-07** by the `DECLARE_ANIM_CLIP` row: the window now
 closes no earlier than **2026-10-21**.
+
+**Restarted 2026-10-08** by five compiler rows, all found by the
+differential test written that day (`testing/difftest.py`; 192 000
+expressions clean after the fixes, the 86 example ROMs byte-identical
+before and after): the window now closes no earlier than **2026-10-22**.
+A sixth defect of the same day is loud and has no row: `qbe` never returned
+on a 16-bit multiply by a constant of 31 bits (`(s16)2141188073UL * x`),
+held by seed 5728 of the gate.
 
 ### Weekly effort
 

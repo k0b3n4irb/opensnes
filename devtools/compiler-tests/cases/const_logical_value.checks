@@ -1,0 +1,5 @@
+section and_true: present RAMSECTION
+count 3 \.dw 2\n\t\.dw 1\n
+count 1 \.dw 2\n\t\.dw 0\n
+# int table[(2 || 0) + 1] has two elements
+in table_bytes: present lda\.w #4

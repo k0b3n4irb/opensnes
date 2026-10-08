@@ -17,6 +17,10 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`make test-difftest`** (testing): the differential compiler test, in
+  `make tests` with a fixed gate (ten pinned expressions and fifteen seeds)
+  and `SEEDS=A-B` to hunt. The expected values come from a model of C's
+  integer rules that clang checks under a 16-bit-int target.
 - **`opensnes budget` and `opensnes release`** (tools): the two commands
   the project tool still lacked. `budget` builds and prints one report of
   what the game uses of the console — ROM bank by bank, the C variables'
@@ -337,6 +341,23 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Fixed
+- **Five silent miscompilations and a compiler hang, found by a new
+  differential test** (compiler): `testing/difftest.py` compiles random
+  integer expressions, runs them on luna and compares with C's rules for
+  this target. Its first day:
+  - constants were folded at 32 and 64 bits while `int` is 16 and `long`
+    32: `-(4294967291UL) == 5` was 0, and `-22016 * 256U` or `512UL << 31`
+    counted as nonzero in a condition;
+  - `int a = 1; return a && 1;` — a function left with nothing but a
+    constant choice — had no stack frame and overwrote its return address;
+  - `y && x`, `0 || x` and `(bool)x` were false for a `long` whose low word
+    is 0 (`0x00010000`), and for a far pointer to offset `$0000`;
+  - `if ((s16)x)` and `(s16)x ? a : b` tested all 32 bits of `x`;
+  - `5 && 7` evaluated to 7 and `0 || 9` to 9 in enum values, array sizes
+    and initialisers;
+  - the compiler never returned on `(s16)2141188073UL * x`.
+  No ROM of the 86 examples changes by a byte: none of them wrote these
+  forms. `if (long)` and `if (pointer)` compile to the same code as before.
 - **`DECLARE_ANIM_CLIP` refuses more than 255 frames** (lib): the frame
   count went into the `u8` `AnimClip.len` through a cast, so a 256-frame
   clip had a length of 0 and `animPlay()` stopped the player, and a

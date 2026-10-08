@@ -15,6 +15,7 @@ make test-manifests                                  # functional probes: `luna 
 # ...and phase_sweep.py: the SNESMOD stop/pause/fade manifests replayed at sixteen press phases (a press/SPC700 race shows on some frames only)
 # luna_runner.py, rom_coverage.py and wram_regress.py run their luna calls in parallel
 # (LUNA_JOBS, default the CPU count; LUNA_JOBS=1 = serial, same output)
+python3 testing/difftest.py                 # the compiler against C's integer rules: random expressions run on luna in four shapes, model checked by clang (--seeds A-B to hunt; a Class A change runs a few thousand)
 python3 testing/wram_regress.py             # per-frame WRAM oracle over the corpus
 python3 testing/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 testing/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
@@ -82,7 +83,7 @@ side channel. Migration off snes9x-WASM: `.claude/notes/chantiers/luna_migration
 
 | Class | What changed | Required validation |
 |-------|-------------|-------------------|
-| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full `make tests` (luna) on ALL affected examples, **plus** the A/B proof: keep the ROMs built before the change (`rsync -a --include '*/' --include '*.sfc' --exclude '*' examples/ /tmp/examples_before/`) and run `python3 testing/diff_corpus.py --ref /tmp/examples_before [--tolerance N]` — every example must MATCH at its manifest frames (a boot-length offset is reported, a DIFF is a rendering change to explain before any re-baseline) |
+| **A** | Compiler (cproc/qbe/wla-dx) or runtime (crt0, runtime.asm) | `make clean && make` + full `make tests` (luna) on ALL affected examples, **plus** the A/B proof: keep the ROMs built before the change (`rsync -a --include '*/' --include '*.sfc' --exclude '*' examples/ /tmp/examples_before/`) and run `python3 testing/diff_corpus.py --ref /tmp/examples_before [--tolerance N]` — every example must MATCH at its manifest frames (a boot-length offset is reported, a DIFF is a rendering change to explain before any re-baseline), **and** a hunt of the differential test beyond its gate: `python3 testing/difftest.py --seeds 1-2000` (about a minute; since 2026-10-08) |
 | **B** | Library module (lib/source/) | `make lib` + `make tests` covering examples using that module |
 | **C** | Single example or new example | Build that example + `make tests` (`luna_runner.py --only <ex>`) |
 | **D** | Docs, Makefile, tools only | `make tests` only |

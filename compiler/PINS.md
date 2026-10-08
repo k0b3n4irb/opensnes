@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 11db8079ec38c70f0c2a2acbf8ce91fc21782eef | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | a89fd88b8195f647955c6f7029af360d06f97a18 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 80d542e9e3e64a61f2dfc3bd148ae486705baf5b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | b0b78af859397f9a1786dfc80d020418765f1df4 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 34 patches since upstream merge-base 7051114
+### compiler/cproc — 35 patches since upstream merge-base 7051114
 
 ```
+80d542e qbe, eval: conditions and logical constants at the w65816 widths — three silent miscompilations (difftest, 2026-10-08)
 11db807 qbe: file-scope statics are emitted name.<TU> so two sources may share a static (2026-10-05)
 a1474c4 qbe, expr: qualifiers and widths the w65816 target dropped — four silent miscompilations (2026-10-03 campaign)
 354a845 OpenSNES: __ramcode, a function specifier for the RAM code window
@@ -86,7 +87,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 86 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 87 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -98,6 +99,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+b0b78af fold, gvn, w65816: constants and branches at the target's widths; a frame for a phi of constants (difftest, 2026-10-08)
 a89fd88 w65816: a function in section ".ram_code" joins the RAM code window
 794c6e3 w65816: temps whose lives never overlap share a stack slot (slot colouring from liveness), under a slot-ownership check
 77998b5 fix exponential complexity in usewidthle() (upstream b58e2e6, cherry-picked 2026-09-26)

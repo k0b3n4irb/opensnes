@@ -185,6 +185,19 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   checkpointed WRAM value asserts.
 - **Audio** (`manifests/audio_v2.toml`) — `[asserts.dsp]` voice + PCM
   liveness on the raw-APU driver fixture.
+- **Compiler differential test** (`difftest.py`, `make test-difftest`, in
+  `make tests` since 2026-10-08) — random C integer expressions compiled by
+  cc65816 and run on luna in four shapes (operands as globals, as literals,
+  as parameters, as locals), compared with the value C gives them on this
+  target (int 16 bits, long 32). The expected value comes from a model in
+  the script that clang checks expression by expression (`_Static_assert`
+  under `--target=avr`), so a mistake in the model is reported as such. The
+  gate is fixed: ten pinned expressions and fifteen seeds (370 expressions);
+  `make test-difftest SEEDS=1000-1999` hunts, a failing expression is
+  reduced to its smallest failing sub-expression, and `--cc <path>` runs
+  another compiler (bisecting). Its first day found six compiler defects, three
+  of them within the first 192 expressions (`.claude/notes/status/silent_defects_log.md`).
+  It covers integer expressions only: no loops, arrays, structs or pointers.
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
   invisible to the framebuffer. **A CI gate since 2026-09-11**, inside `make tests`

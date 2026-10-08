@@ -1,0 +1,4 @@
+# the function reserves a frame before the edge stores the phi's value
+in both: present sbc\.w #\d+\n\ttas
+# fully folded: nothing is stored at all
+in either: absent sta \d+,s
