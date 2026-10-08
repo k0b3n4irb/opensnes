@@ -206,20 +206,24 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   array, `if` / `else`, `switch` with fall-through, compound assignments,
   `++` / `--`, stores through a pointer to a pointer, and calls to helper
   functions generated with the program (pure, recursive, taking an array, a
-  struct pointer or a pointer to write through). The ROM returns a checksum
+  struct pointer or a pointer to write through, two behind a table of
+  function pointers), a union read through its other members, array members
+  of the struct, static locals, loops and skips written with `goto`. The ROM
+  returns a checksum
   of everything the function left behind; the expected one comes from an
   interpreter in the script that evaluates each expression with the model
   above. A program that would meet undefined behaviour is thrown away. A
   failing program is reduced statement by statement (a program that never
   returns counts as failing), then run again writing each variable out, so
-  the report names the wrong one. Gate: ten pinned functions and eighteen
-  seeds (190 programs). Its first day: a loop-carried copy
+  the report names the wrong one. Gate: eleven pinned functions and nineteen
+  seeds (201 programs). Its first day: a loop-carried copy
   (`prev = cur; cur += d;`), a swap in a loop and Fibonacci miscompiled, a
   `do … while` with a `break`, initialisers starting with implicit zeros, a
   parameter read from an unwritten slot in a function of more than 256
   temporaries, an internal error on `a[x & 7]` with a long `x`, and a 32-bit
-  compare reading a neighbour's stack slot. Not covered: `goto`, function pointers, unions,
-  floats, structs passed by value (refused by the compiler).
+  compare reading a neighbour's stack slot. Not covered: floats, `long long` and structs
+  passed by value (all three refused by the compiler), nested function
+  pointer types, `setjmp`.
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
   invisible to the framebuffer. **A CI gate since 2026-09-11**, inside `make tests`

@@ -21,8 +21,8 @@ freeze criterion that waits for hardware.
   `make tests` with a fixed gate (ten pinned expressions and fifteen seeds)
   and `SEEDS=A-B` to hunt. The expected values come from a model of C's
   integer rules that clang checks under a 16-bit-int target. It also runs
-  `testing/difftest_stmt.py`, the same on small generated programs (ten
-  pinned functions and eighteen seeds).
+  `testing/difftest_stmt.py`, the same on small generated programs (eleven
+  pinned functions and nineteen seeds).
 - **`opensnes budget` and `opensnes release`** (tools): the two commands
   the project tool still lacked. `budget` builds and prints one report of
   what the game uses of the console — ROM bank by bank, the C variables'
@@ -343,7 +343,7 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Fixed
-- **Ten silent miscompilations, a compiler hang and an internal error,
+- **Thirteen silent miscompilations, a compiler hang and an internal error,
   found by a new differential test** (compiler): `testing/difftest.py` compiles random
   integer expressions, runs them on luna and compares with C's rules for
   this target. Its first day:
@@ -374,7 +374,15 @@ freeze criterion that waits for hardware.
   - in a function of more than 256 temporaries (a long game loop), the
     compiler's own tables stopped tracking without a word and a parameter
     could be read from a stack slot nobody had written. The limit is 2048
-    and a function past it is now refused with a message.
+    and a function past it is now refused with a message;
+  - `u32 f(u32 x) { return x ? 1 : (15 & x); }` returned garbage in its
+    low half;
+  - **floating point and `long long` compiled to wrong code without a
+    word**: `a * 2.5f` was a 16-bit integer multiply of the low word,
+    `long long a; a + 1` dropped its upper half. Both are now refused when
+    a value of those types is computed at run time. Constants the compiler
+    folds keep compiling: `(int)(1.5 * 256)`, `-2147483648`,
+    `(int)((1ULL << 40) >> 36)`.
   Three example ROMs change (`sprite_swarm`, `rpg`, `mode7_flying`): their
   `main` has more than 256 temporaries, so the optimisations that stopped
   at that limit now reach its end and the code is shorter. They show the

@@ -9,7 +9,10 @@ counted loops in four spellings with break and continue, a pointer walking
 an array, if / else, switch with fall-through, compound assignments, ++ and
 --, stores through a pointer to a pointer, and calls to helper functions
 generated with it (pure ones, recursive ones, ones that take an array, a
-struct pointer, or a pointer to write through) — compiles them with cc65816,
+struct pointer, or a pointer to write through, and two behind a table of
+function pointers), a union read through its other members, array members
+of the struct, static locals, and loops and skips written with goto —
+compiles them with cc65816,
 runs them on luna and compares a checksum of everything the function left
 behind (its variables, the arrays, the struct fields) with the value an
 interpreter in this script computes.
@@ -53,9 +56,9 @@ from lib import find_luna  # noqa: E402
 
 # The gate: the pinned functions below, twelve seeds, and the seeds that
 # showed a defect first on 2026-10-08, whatever the generator has become
-# since (42, 51, 62, 2630; 336 and 2085 for the functions of more than 256
-# temporaries, which no hand-written function here reproduces).
-GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630]
+# since (42, 51, 62, 2630, 3797; 336 and 2085 for the functions of more than
+# 256 temporaries, which no hand-written function here reproduces).
+GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797]
 
 # Hand-written functions for the defects this test found, reduced. Fixed-width
 # types and no operation that depends on the width of int, so the expected
@@ -111,6 +114,10 @@ PINNED = [
     ("initialisers that start with implicit zeros, and the object after them",
      "u32 p9(void) { return ((u32)pin_d[2] << 16) | ((u16)pin_b.pad << 12) | pin_after; }",
      "p9()", 0x00071234),
+    # the low half lived in A only and `lda #0` for the high half overwrote it
+    ("a condition returned as a 32-bit value",
+     "u32 p10(u32 x) { return x ? 1L : (15L & x); }",
+     "p10(0x00070000)", 1),
 ]
 
 PROGS_PER_ROM = 10
@@ -131,6 +138,9 @@ class UB(Exception):
 # ('f', base, field)        base is 's', 'p' (ps->), 'q' (a helper's q->) or ('a', index) for sa[index]
 # ('m', matrix, i, j)       matrix[i][j]
 # ('bf', field)             bf.field, a bit-field
+# ('fa', base, field, i)    an element of an array member of the struct
+# ('un', member, i)         a member of the union: 'l', or w[i], b[i], sw[i]
+# ('fcall', sel, args)      fpt[sel](args): a call through a table of function pointers
 # ('call', k, args)         helper k called with these arguments
 # ('c', type, e) ('u', op, e) ('b', op, l, r) ('t', c, a, b)
 
@@ -151,11 +161,20 @@ class Prog:
         self.bits = []        # [(name, signed, width)] of the bit-field struct
         self.binit = {}       # bit-field -> initial value
         self.helpers = []     # Helper objects
+        self.afields = []     # [(name, type)]: array members of the struct, 4 elements each
+        self.union = False    # a union of a u32, two u16, four u8 and two s16 is declared
+        self.uinit = 0
+        self.statics = []     # locals declared `static`
+        self.fptab = None     # (rtype, [(name, type)], [expr, expr]): two functions behind a table
+        self.nlabel = 0
         self.ctx = []         # generator only: 'loop' / 'switch' nesting
         self.body = []
 
     def ftype(self, name):
         return dict(self.fields)[name]
+
+    def atype(self, name):
+        return dict(self.afields)[name]
 
     def btype(self, name):
         _, signed, width = next(b for b in self.bits if b[0] == name)
@@ -213,6 +232,21 @@ def ev(e, P, env):
         return leaf(P.mats[e[1]][0], env[e[1]][i][j])
     if k == "bf":
         return leaf(P.btype(e[1]), env["bf"][e[1]])
+    if k == "fa":
+        i = ev(e[3], P, env).value
+        if not 0 <= i < 4:
+            raise UB
+        return leaf(P.atype(e[2]), struct_of(e[1], P, env)[e[2]][i])
+    if k == "un":
+        t, off, size = union_slot(e, P, env)
+        return leaf(t, int.from_bytes(env["un"][off:off + size], "little"))
+    if k == "fcall":
+        rt, params, bodies = P.fptab
+        which = ev(e[1], P, env).value
+        if which not in (0, 1):
+            raise UB
+        vals = [D.wrap(ev(a, P, env).value, t) for a, (_, t) in zip(e[2], params)]
+        return leaf(rt, D.wrap(ev(bodies[which], P.fpscope, dict(zip((n for n, _ in params), vals))).value, rt))
     if k == "call":
         return leaf(P.helpers[e[1]].rtype, call_helper(P.helpers[e[1]], e[2], P, env))
     if k == "c":
@@ -258,6 +292,18 @@ def call_helper(h, args, P, env) -> int:
     return acc
 
 
+UNION_MEMBERS = {"l": ("u32", 4, 1), "w": ("u16", 2, 2), "b": ("u8", 1, 4), "sw": ("s16", 2, 2)}
+
+
+def union_slot(e, P, env):
+    """(type, byte offset, size) of a union member access; little-endian."""
+    t, size, count = UNION_MEMBERS[e[1]]
+    i = ev(e[2], P, env).value if e[1] != "l" else 0
+    if not 0 <= i < count:
+        raise UB
+    return t, i * size, size
+
+
 def struct_of(base, P, env):
     if base in ("s", "p"):
         return env["s"]
@@ -284,6 +330,12 @@ def ty(e, P):
         return P.mats[e[1]][0]
     if k == "bf":
         return P.btype(e[1])
+    if k == "fa":
+        return P.atype(e[2])
+    if k == "un":
+        return UNION_MEMBERS[e[1]][0]
+    if k == "fcall":
+        return P.fptab[0]
     if k == "call":
         return P.helpers[e[1]].rtype
     if k == "c":
@@ -318,6 +370,12 @@ def rd(e):
         return f"{e[1]}[{rd(e[2])}][{rd(e[3])}]"
     if k == "bf":
         return "bf." + e[1]
+    if k == "fa":
+        return rd(("f", e[1], e[2])) + f"[{rd(e[3])}]"
+    if k == "un":
+        return "un.l" if e[1] == "l" else f"un.{e[1]}[{rd(e[2])}]"
+    if k == "fcall":
+        return f"fpt[{rd(e[1])}]({', '.join(rd(a) for a in e[2])})"
     if k == "call":
         return f"h{e[1]}({', '.join(rd_arg(a) for a in e[2])})"
     if k == "c":
@@ -358,6 +416,12 @@ def gen_lvalue(rng, P, addressable=False):
         return ("m", rng.choice(list(P.mats)), masked(gen_expr(rng, P, 1), 2), masked(gen_expr(rng, P, 1), 4))
     if pick < 0.52 and P.bits and not addressable:
         return ("bf", rng.choice(P.bits)[0])
+    if pick < 0.58 and P.union:
+        m = rng.choice(list(UNION_MEMBERS))
+        return ("un", m, masked(gen_expr(rng, P, 1), UNION_MEMBERS[m][2]))
+    if pick < 0.64 and P.afields:
+        base = rng.choice(["s", "p", ("a", masked(gen_expr(rng, P, 1), 2))])
+        return ("fa", base, rng.choice(P.afields)[0], masked(gen_expr(rng, P, 1), 4))
     if not P.arrays:                               # a helper's scope: parameters only
         return ("v", rng.choice(list(P.vars)))
     if pick < 0.70:
@@ -378,6 +442,9 @@ def gen_expr(rng, P, depth):
             return ("v", rng.choice(P.counters))
         return gen_lvalue(rng, P) if depth else ("v", rng.choice(list(P.vars)))
     k = rng.random()
+    if k < 0.03 and P.fptab:
+        return ("fcall", masked(gen_expr(rng, P, depth - 1), 2),
+                [gen_expr(rng, P, depth - 1) for _ in P.fptab[1]])
     if k < 0.10 and any(h.kind != "set" for h in P.helpers):
         return gen_call(rng, P, depth - 1)
     if k < 0.12:
@@ -485,7 +552,23 @@ def gen_stmt(rng, P, depth):
         P.ctx.pop()
         P.counters.remove(c)
         return ("for", rng.choice("ABCD"), c, rng.randint(1, 5), body)
-    if depth > 0 and pick < 0.37:
+    if depth > 0 and pick < 0.33 and free:
+        # a loop made of a label and a goto: no break or continue inside
+        c = free[0]
+        P.counters.append(c)
+        P.ctx.append("goto")
+        body = gen_block(rng, P, depth - 1, rng.randint(1, 3))
+        P.ctx.pop()
+        P.counters.remove(c)
+        P.nlabel += 1
+        return ("for", "G", c, rng.randint(1, 5), body, P.nlabel)
+    if depth > 0 and pick < 0.355:
+        P.ctx.append("goto")
+        body = gen_block(rng, P, depth - 1, rng.randint(1, 2))
+        P.ctx.pop()
+        P.nlabel += 1
+        return ("gskip", gen_expr(rng, P, 2), body, P.nlabel)
+    if depth > 0 and pick < 0.39:
         labels = rng.sample(range(8), rng.randint(2, 4))
         P.ctx.append("switch")
         arms = [[lab, gen_block(rng, P, depth - 1, rng.randint(1, 2)), rng.random() < 0.3]
@@ -494,7 +577,7 @@ def gen_stmt(rng, P, depth):
             arms.insert(rng.randint(0, len(arms)), [None, gen_block(rng, P, depth - 1, 1), rng.random() < 0.3])
         P.ctx.pop()
         return ("sw", masked(gen_expr(rng, P, 2), 8), arms)
-    if pick < 0.41 and P.ctx and P.ctx[-1] == "loop":
+    if pick < 0.42 and P.ctx and P.ctx[-1] == "loop":
         return (rng.choice(["brk", "cont"]), gen_expr(rng, P, 2))
     if pick < 0.46:
         sets = [n for n, h in enumerate(P.helpers) if h.kind == "set"]
@@ -552,6 +635,20 @@ def gen_prog(rng) -> Prog:
             signed, width = rng.random() < 0.4, rng.randint(1, 12)
             P.bits.append((f"b{n}", signed, max(width, 2) if signed else width))
         P.binit = {name: bit_wrap(rng.getrandbits(16), signed, width) for name, signed, width in P.bits}
+    if rng.random() < 0.5:
+        P.afields = [(f"d{n}", rng.choice(TYPES)) for n in range(rng.randint(1, 2))]
+        for d in [P.sinit] + P.sainit:
+            for f, t in P.afields:
+                d[f] = [D.interesting(rng, t) for _ in range(4)]
+    if rng.random() < 0.5:
+        P.union, P.uinit = True, rng.getrandbits(32)
+    P.statics = [n for n in P.vars if n not in P.params and n not in P.gvars
+                 and n not in ("i", "j") and rng.random() < 0.2]
+    if rng.random() < 0.5:
+        params = [(f"y{n}", rng.choice(TYPES)) for n in range(rng.randint(1, 3))]
+        P.fpscope = Prog()
+        P.fpscope.vars = dict(params)
+        P.fptab = (rng.choice(TYPES), params, [gen_expr(rng, P.fpscope, 2) for _ in range(2)])
     gen_helpers(rng, P)
     P.body = gen_block(rng, P, 2, rng.randint(3, 6))
     return P
@@ -592,6 +689,14 @@ def store(lv, value, P, env):
     elif k == "bf":
         _, signed, width = next(b for b in P.bits if b[0] == lv[1])
         env["bf"][lv[1]] = bit_wrap(value, signed, width)
+    elif k == "fa":
+        i = ev(lv[3], P, env).value
+        if not 0 <= i < 4:
+            raise UB
+        struct_of(lv[1], P, env)[lv[2]][i] = D.wrap(value, P.atype(lv[2]))
+    elif k == "un":
+        t, off, size = union_slot(lv, P, env)
+        env["un"][off:off + size] = (value & ((1 << (8 * size)) - 1)).to_bytes(size, "little")
     else:
         struct_of(lv[1], P, env)[lv[2]] = D.wrap(value, P.ftype(lv[2]))
 
@@ -610,6 +715,9 @@ def run_block(block, P, env):
             run_block(st[2] if ev(st[1], P, env).value else st[3], P, env)
         elif k in ("pp", "hset"):                 # a store through a pointer: the same store
             store(st[-2], ev(st[-1], P, env).value, P, env)
+        elif k == "gskip":                        # if (c) goto L; body; L: ;
+            if not ev(st[1], P, env).value:
+                run_block(st[2], P, env)
         elif k == "brk":
             if ev(st[1], P, env).value:
                 raise Brk
@@ -633,8 +741,16 @@ def run_block(block, P, env):
                 if write:
                     store(elem, ev(("v", acc), P, env).value, P, env)
         else:
-            _, form, c, count, body = st
+            form, c, count, body = st[1:5]
             ct = P.vars[c]
+            if form == "G":                       # c = K; L: body; if (--c > 0) goto L;
+                env[c] = count
+                while True:
+                    run_block(body, P, env)
+                    env[c] = D.wrap(env[c] - 1, ct)
+                    if not env[c] > 0:
+                        break
+                continue
             def once():
                 """The body; False when it left through `break`. `continue`
                 goes on to the loop's own step, as in C."""
@@ -673,8 +789,9 @@ def expected(P) -> int:
     env = dict(P.init)
     for name, (_, vals) in P.arrays.items():
         env[name] = list(vals)
-    env["s"] = dict(P.sinit)
-    env["sa"] = [dict(d) for d in P.sainit]
+    env["s"] = copy.deepcopy(P.sinit)
+    env["sa"] = copy.deepcopy(P.sainit)
+    env["un"] = bytearray(P.uinit.to_bytes(4, "little"))
     for name, (_, rows) in P.mats.items():
         env[name] = [list(r) for r in rows]
     env["bf"] = dict(P.binit)
@@ -701,6 +818,11 @@ def state_values(P, env):
             yield from row
     for name, _, _ in P.bits:
         yield env["bf"][name]
+    for d in [env["s"]] + env["sa"]:
+        for f, _ in P.afields:
+            yield from d[f]
+    if P.union:
+        yield int.from_bytes(env["un"], "little")
 
 
 # ------------------------------------------------------------------ C text --
@@ -727,6 +849,10 @@ def c_block(block, ind):
             out.append(f"{pad}{{ {st[1]} *q1 = &{rd(st[2])}; {st[1]} **q2 = &q1; **q2 = {rd(st[3])}; }}")
         elif k == "hset":
             out.append(f"{pad}h{st[1]}(&{rd(st[2])}, {rd(st[3])});")
+        elif k == "gskip":
+            out.append(f"{pad}if ({rd(st[1])}) goto L{st[3]};")
+            out += c_block(st[2], ind)
+            out.append(f"{pad}L{st[3]}: ;")
         elif k in ("brk", "cont"):
             out.append(f"{pad}if ({rd(st[1])}) {'break' if k == 'brk' else 'continue'};")
         elif k == "sw":
@@ -744,6 +870,12 @@ def c_block(block, ind):
             if write:
                 out.append(f"{pad}    *pw_{arr} = {acc};")
             out.append(f"{pad}}}")
+        elif k == "for" and st[1] == "G":
+            _, _, c, count, body, lab = st
+            out.append(f"{pad}{c} = {count};")
+            out.append(f"{pad}L{lab}: ;")
+            out += c_block(body, ind + 1)
+            out.append(f"{pad}if (--{c} > 0) goto L{lab};")
         else:
             _, form, c, count, body = st
             head = {"A": f"for ({c} = 0; {c} < {count}; {c}++) {{",
@@ -778,7 +910,8 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     """(file-scope text, call expression) of program n."""
     g = f"t{n}_"
     out = [f"/* {label}: expect 0x{exp:08X} */"]
-    out.append(f"struct S{n} {{ " + " ".join(f"{t} {f};" for f, t in P.fields) + " };")
+    out.append(f"struct S{n} {{ " + " ".join(f"{t} {f};" for f, t in P.fields)
+               + "".join(f" {t} {f}[4];" for f, t in P.afields) + " };")
     names = []                                         # file-scope names the statements use bare
     for name in P.gvars:
         out.append(f"{P.vars[name]} {g}{name} = {P.init[name]};")
@@ -790,17 +923,33 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
         out.append(f"{t} {g}{name}[2][4] = {{ " + ", ".join(
             "{ " + ", ".join(str(v) for v in r) + " }" for r in rows) + " };")
         names.append(name)
-    out.append(f"struct S{n} {g}s = {{ {', '.join(str(P.sinit[f]) for f, _ in P.fields)} }};")
-    out.append(f"struct S{n} {g}sa[2] = {{ " + ", ".join(
-        "{ " + ", ".join(str(d[f]) for f, _ in P.fields) + " }" for d in P.sainit) + " };")
+    def sinit(d):
+        parts = [str(d[f]) for f, _ in P.fields]
+        parts += ["{ " + ", ".join(str(v) for v in d[f]) + " }" for f, _ in P.afields]
+        return "{ " + ", ".join(parts) + " }"
+
+    out.append(f"struct S{n} {g}s = {sinit(P.sinit)};")
+    out.append(f"struct S{n} {g}sa[2] = {{ {sinit(P.sainit[0])}, {sinit(P.sainit[1])} }};")
     names += ["s", "sa"]
+    if P.union:
+        out.append(f"union U{n} {{ u32 l; u16 w[2]; u8 b[4]; s16 sw[2]; }};")
+        out.append(f"union U{n} {g}un = {{ {P.uinit}UL }};")
+        names.append("un")
     if P.bits:
         out.append(f"struct B{n} {{ " + " ".join(
             f"{'signed' if sg else 'unsigned'} int {nm} : {w};" for nm, sg, w in P.bits) + " u8 pad; };")
         out.append(f"struct B{n} {g}bf = {{ {', '.join(str(P.binit[nm]) for nm, _, _ in P.bits)}, 1 }};")
         names.append("bf")
     names += [f"h{k}" for k in range(len(P.helpers))]
+    if P.fptab:
+        names += ["fp0", "fp1", "fpt"]
     out += [f"#define {name} {g}{name}" for name in names]
+    if P.fptab:
+        rt, params, bodies = P.fptab
+        sig = ", ".join(f"{t} {nm}" for nm, t in params)
+        for k, body in enumerate(bodies):
+            out.append(f"{rt} fp{k}({sig}) {{ return {rd(body)}; }}")
+        out.append(f"{rt} (*fpt[2])({', '.join(t for _, t in params)}) = {{ fp0, fp1 }};")
     for k, h in enumerate(P.helpers):
         if h.kind == "sum":
             h.elem = P.arrays[h.array][0]
@@ -809,7 +958,7 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     out.append(f"u32 t{n}({params}) {{")
     for name, t in P.vars.items():
         if name not in P.params and name not in P.gvars:
-            out.append(f"    {t} {name} = {P.init[name]};")
+            out.append(f"    {'static ' if name in P.statics else ''}{t} {name} = {P.init[name]};")
     out.append(f"    struct S{n} *ps = &s;")
     out.append("    u32 h = 0x811C9DC5UL;")
     for name, (t, vals) in P.arrays.items():
@@ -827,6 +976,10 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     for name in P.mats:
         mix += [f"(u32){name}[{i}][{j}]" for i in range(2) for j in range(4)]
     mix += [f"(u32)bf.{nm}" for nm, _, _ in P.bits]
+    for base in ["s", "sa[0]", "sa[1]"]:
+        mix += [f"(u32){base}.{f}[{k}]" for f, _ in P.afields for k in range(4)]
+    if P.union:
+        mix.append("(u32)un.l")
     if probe:                 # every piece of state, one by one, for a failing program
         out += [f"    probe[{k}] = {m};" for k, m in enumerate(mix)]
         P.probe_names = [m[5:] for m in mix]
@@ -1000,6 +1153,8 @@ def stmt_paths(block, prefix=()):
             yield from stmt_paths(st[3], prefix + ((n, 3),))
         elif st[0] == "for":
             yield from stmt_paths(st[4], prefix + ((n, 4),))
+        elif st[0] == "gskip":
+            yield from stmt_paths(st[2], prefix + ((n, 2),))
         elif st[0] == "sw":
             for a, arm in enumerate(st[2]):
                 yield from stmt_paths(arm[1], prefix + ((n, 2, a, 1),))

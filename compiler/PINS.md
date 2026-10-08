@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 80d542e9e3e64a61f2dfc3bd148ae486705baf5b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 7b064954c03b84084cf4101f08d47cb3bd2afda7 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | dbc4f9f2fce6f0e7f2ce734164e2805f0524b7f8 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | bbdc3174b2533e3f605cee9e70f5e73c02a62699 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 35 patches since upstream merge-base 7051114
+### compiler/cproc — 36 patches since upstream merge-base 7051114
 
 ```
+dbc4f9f qbe: 64-bit integers are refused, their constants folded first (2026-10-08)
 80d542e qbe, eval: conditions and logical constants at the w65816 widths — three silent miscompilations (difftest, 2026-10-08)
 11db807 qbe: file-scope statics are emitted name.<TU> so two sources may share a static (2026-10-05)
 a1474c4 qbe, expr: qualifiers and widths the w65816 target dropped — four silent miscompilations (2026-10-03 campaign)
@@ -87,7 +88,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 89 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 90 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -99,6 +100,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+bbdc317 w65816: floating point is refused; a Kw temp returned as 32 bits keeps its low half (2026-10-08)
 7b06495 w65816: the two ways out of a branch do not share A; leading zero-fills are data; 2048 temps, checked (difftest_stmt, 2026-10-08)
 68e6e8a w65816: phi moves as a parallel copy; the high half of a Kw operand is 0; dead high halves stay dead (difftest_stmt, 2026-10-08)
 b0b78af fold, gvn, w65816: constants and branches at the target's widths; a frame for a phi of constants (difftest, 2026-10-08)

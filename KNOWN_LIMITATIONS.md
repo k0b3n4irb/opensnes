@@ -424,7 +424,11 @@ culprit files 100x monthly and fails on any segfault. Full investigation log:
 
 **Sizes** (since 2026-05-08):
 `sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
-`sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
+`sizeof(unsigned long) == 4`. `long long` stays at 8 per C99 but has no
+arithmetic: a `long long` (or a `float` / `double`) computed at run time is
+refused by the compiler since 2026-10-08 — it used to compile to 32-bit (16-bit
+for floats) integer code, silently. Constants the compiler folds are fine
+(`-2147483648`, `(int)(1.5 * 256)`). These match the
 canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
 **Test:** `devtools/compiler-tests/cases/type_sizes.c` pins every size with a
 `_Static_assert` (since 2026-10-05); the `long` semantics are the
