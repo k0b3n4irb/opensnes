@@ -1,0 +1,113 @@
+{
+  "frames": 900,
+  "workloads": {
+    "sieve": {
+      "cycles": 3048850,
+      "size": 215,
+      "stack": 45,
+      "res": 172
+    },
+    "sort": {
+      "cycles": 4277782,
+      "size": 591,
+      "stack": 65,
+      "res": 12563
+    },
+    "physics": {
+      "cycles": 9587046,
+      "size": 1094,
+      "stack": 84,
+      "res": 12530
+    },
+    "collide": {
+      "cycles": 15664232,
+      "size": 1074,
+      "stack": 100,
+      "res": 162
+    },
+    "mul": {
+      "cycles": 5049680,
+      "size": 121,
+      "stack": 49,
+      "res": 13728
+    },
+    "decimal": {
+      "cycles": 2899026,
+      "size": 131,
+      "stack": 43,
+      "res": 4118
+    },
+    "long": {
+      "cycles": 2813426,
+      "size": 334,
+      "stack": 77,
+      "res": 35405
+    },
+    "bytes": {
+      "cycles": 6174984,
+      "size": 481,
+      "stack": 61,
+      "res": 819
+    },
+    "calls": {
+      "cycles": 3568222,
+      "size": 96,
+      "stack": 265,
+      "res": 1597
+    },
+    "switch": {
+      "cycles": 2029708,
+      "size": 545,
+      "stack": 51,
+      "res": 9705
+    },
+    "crc": {
+      "cycles": 1948312,
+      "size": 163,
+      "stack": 43,
+      "res": 2842
+    },
+    "list": {
+      "cycles": 3050008,
+      "size": 432,
+      "stack": 65,
+      "res": 17376
+    },
+    "tilemap": {
+      "cycles": 1869312,
+      "size": 312,
+      "stack": 53,
+      "res": 10608
+    },
+    "grid": {
+      "cycles": 2636060,
+      "size": 560,
+      "stack": 84,
+      "res": 40897
+    },
+    "entities": {
+      "cycles": 6203562,
+      "size": 900,
+      "stack": 80,
+      "res": 12530
+    },
+    "copy": {
+      "cycles": 3427462,
+      "size": 576,
+      "stack": 45,
+      "res": 20921
+    },
+    "strings": {
+      "cycles": 2714450,
+      "size": 1079,
+      "stack": 90,
+      "res": 65535
+    },
+    "state": {
+      "cycles": 1750198,
+      "size": 433,
+      "stack": 56,
+      "res": 24876
+    }
+  }
+}

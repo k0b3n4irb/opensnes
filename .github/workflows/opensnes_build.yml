@@ -432,6 +432,15 @@ jobs:
         # run separately so a regression is reported on its own.
         run: python3 devtools/cyclecount/bench.py
 
+      - name: Measured workloads (luna)
+        # The eighteen workloads of devtools/sdkbench, OpenSNES side only
+        # (CI has no PVSnesLib): master cycles on luna against the committed
+        # baseline.json. Fails on +5 % in total, +25 % on one workload, or a
+        # changed checksum. The comparison with PVSnesLib is a local run
+        # (`make bench-sdk` with PVSNESLIB_HOME), frozen in
+        # pvsneslib_reference.json.
+        run: python3 devtools/sdkbench/run.py --check
+
       - name: Upload luna artifacts on failure
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

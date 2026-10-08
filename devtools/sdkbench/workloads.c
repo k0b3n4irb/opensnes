@@ -1,11 +1,13 @@
 /*
  * workloads.c — the same C for both SDKs.
  *
- * Twelve small workloads of the kind a game runs every frame: loops over
+ * Eighteen small workloads of the kind a game runs every frame: loops over
  * arrays, structs of entities, collisions, multiplies and divides, 32-bit
  * arithmetic, byte copies, calls, a switch-driven interpreter, bit work,
- * a linked list. Each leaves a checksum in `res`; the two SDKs must agree
- * on it, or the comparison of their speed means nothing.
+ * a linked list, a tilemap, a 2D grid, entities through a pointer, word
+ * and byte copies, strings, a state machine with a table of functions.
+ * Each leaves a checksum in `res`; the two SDKs must agree on it, or the
+ * comparison of their speed means nothing.
  *
  * Plain C89 so that 816-tcc and cc65816 both take it unchanged. WORKLOAD
  * (from which.h) selects the one this ROM runs; 0 runs none (the baseline
@@ -28,6 +30,10 @@ static struct Ent ent[NENT];
 static u8 bufa[512];
 static u8 bufb[512];
 static struct Node nodes[64];
+static u16 tmap[32 * 16];
+static u8 grid[16][32];
+static u16 wsrc[128];
+static u16 wdst[128];
 static u16 rnd;
 
 static u16 rnd16(void) {
@@ -254,6 +260,136 @@ static void w_list(void) {
     res = sum;
 }
 
+/* 13. a 32 x 16 tilemap: written from coordinates, then looked up */
+static void w_tilemap(void) {
+    u16 x, y, n, sum;
+    for (y = 0; y < 16; y++)
+        for (x = 0; x < 32; x++)
+            tmap[(y << 5) | x] = (x ^ y) + ((y & 3) << 10);
+    sum = 0;
+    x = 3;
+    y = 5;
+    for (n = 0; n < 600; n++) {
+        sum += tmap[(y << 5) | x];
+        x = (x + 7) & 31;
+        y = (y + 3) & 15;
+        if (tmap[(y << 5) | x] & 0x0400) sum ^= n;
+    }
+    res = sum;
+}
+
+/* 14. a 16 x 32 byte grid: the four neighbours of every inner cell */
+static void w_grid(void) {
+    u8 x, y;
+    u16 sum;
+    rnd = 4242;
+    for (y = 0; y < 16; y++)
+        for (x = 0; x < 32; x++)
+            grid[y][x] = (u8)(rnd16() >> 9);
+    sum = 0;
+    for (y = 1; y < 15; y++)
+        for (x = 1; x < 31; x++)
+            sum += grid[y - 1][x] + grid[y + 1][x] + grid[y][x - 1] + grid[y][x + 1];
+    res = sum;
+}
+
+/* 15. the entities again, walked with a pointer instead of an index */
+static void w_entities(void) {
+    u16 step, sum;
+    struct Ent *e;
+    ent_init();
+    for (step = 0; step < 60; step++) {
+        for (e = ent; e != ent + NENT; e++) {
+            e->x += e->vx;
+            e->y += e->vy;
+            if (e->x < 8 || e->x > 248) e->vx = -e->vx;
+            if (e->y < 16 || e->y > 208) e->vy = -e->vy;
+        }
+    }
+    sum = 0;
+    for (e = ent; e != ent + NENT; e++) sum += (u16)e->x * 3 + (u16)e->y;
+    res = sum;
+}
+
+/* 16. word and byte copies written as index loops */
+static void w_copy(void) {
+    u16 i, pass, sum;
+    for (i = 0; i < 128; i++) wsrc[i] = i * 517 + 9;
+    for (i = 0; i < 512; i++) bufa[i] = (u8)(i + (i >> 3));
+    sum = 0;
+    for (pass = 0; pass < 8; pass++) {
+        for (i = 0; i < 128; i++) wdst[i] = wsrc[i];
+        wsrc[pass * 9] += pass;
+        sum += wdst[pass * 15];
+    }
+    for (pass = 0; pass < 3; pass++) {
+        for (i = 0; i < 512; i++) bufb[i] = bufa[i];
+        bufa[pass * 150] ^= 0x0F;
+        sum += bufb[pass * 170];
+    }
+    res = sum;
+}
+
+/* 17. strings: length, compare, copy, by hand */
+static u16 slen(u8 *s) {
+    u16 n;
+    n = 0;
+    while (s[n]) n++;
+    return n;
+}
+
+static u16 scmp(u8 *a, u8 *b) {
+    while (*a && *a == *b) {
+        a++;
+        b++;
+    }
+    return (u16)*a - (u16)*b;
+}
+
+static void scpy(u8 *d, u8 *s) {
+    while ((*d++ = *s++) != 0) {
+    }
+}
+
+static void w_strings(void) {
+    u16 i, k, sum;
+    for (k = 0; k < 8; k++) {
+        for (i = 0; i < 40 + k * 2; i++) bufa[k * 64 + i] = (u8)('A' + ((i * (k + 3)) & 15));
+        bufa[k * 64 + i] = 0;
+    }
+    sum = 0;
+    for (k = 0; k < 8; k++) sum += slen(bufa + k * 64);
+    for (k = 0; k < 7; k++) sum ^= scmp(bufa + k * 64, bufa + (k + 1) * 64);
+    for (k = 0; k < 8; k++) scpy(bufb + k * 64, bufa + (7 - k) * 64);
+    for (k = 0; k < 8; k++) sum += scmp(bufb + k * 64, bufa + (7 - k) * 64) + slen(bufb + k * 64);
+    res = sum;
+}
+
+/* 18. a state machine: a switch on the state, and a table of functions */
+static u16 op_add(u16 v) { return v + 3; }
+static u16 op_xor(u16 v) { return v ^ 0x1234; }
+static u16 op_rot(u16 v) { return (v << 3) | (v >> 13); }
+static u16 op_dec(u16 v) { return v - 1; }
+
+static u16 (*ops[4])(u16) = { op_add, op_xor, op_rot, op_dec };
+
+static void w_state(void) {
+    u16 n, acc;
+    u8 state;
+    acc = 1;
+    state = 0;
+    for (n = 0; n < 600; n++) {
+        switch (state) {
+        case 0: state = (acc & 1) ? 2 : 1; break;
+        case 1: acc += n; state = 3; break;
+        case 2: acc ^= n << 2; state = (acc & 4) ? 0 : 3; break;
+        default: state = (u8)(n & 3) == 0 ? 0 : 1; break;
+        }
+        acc = ops[n & 3](acc);
+    }
+    res = acc;
+}
+
 int main(void) {
     consoleInit();
 #if WORKLOAD == 1
@@ -280,6 +416,18 @@ int main(void) {
     w_crc();
 #elif WORKLOAD == 12
     w_list();
+#elif WORKLOAD == 13
+    w_tilemap();
+#elif WORKLOAD == 14
+    w_grid();
+#elif WORKLOAD == 15
+    w_entities();
+#elif WORKLOAD == 16
+    w_copy();
+#elif WORKLOAD == 17
+    w_strings();
+#elif WORKLOAD == 18
+    w_state();
 #endif
     done = 0x600D;
     while (1) {

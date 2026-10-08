@@ -558,11 +558,15 @@ asset-budget:
 bench:
 	@python3 devtools/cyclecount/bench.py
 
-# The same C built by OpenSNES and by PVSnesLib, timed on luna (needs
-# PVSNESLIB_HOME; the measured table of docs/BENCHMARK.md).
+# The same C built by OpenSNES and by PVSnesLib, timed on luna: cycles, code
+# size and stack depth per workload (the measured table of
+# docs/BENCHMARK.md). With PVSNESLIB_HOME set PVSnesLib is measured again;
+# without, its figures come from devtools/sdkbench/pvsneslib_reference.json.
+# CHECK=1 is the CI gate (OpenSNES against baseline.json), UPDATE=1 rewrites
+# the committed files.
 bench-sdk:
 	@scripts/install-luna.sh
-	@python3 devtools/sdkbench/run.py
+	@python3 devtools/sdkbench/run.py $(if $(CHECK),--check) $(if $(UPDATE),--update)
 
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
 # errors. It is NOT the default: `release` depends on `docs`, and Doxygen
