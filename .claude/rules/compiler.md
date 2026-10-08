@@ -37,7 +37,8 @@ This is a Class A change — requires `make clean && make` + full test suite (lu
 - **LEFT-TO-RIGHT argument push**: cc65816 pushes function args left-to-right, NOT right-to-left like tcc816/PVSnesLib.
 - **`volatile` is honoured** (since chantier A2, 2026-05-09): cproc tags volatile loads/stores with a `volat` IR keyword that QBE's loadopt/promote/gcm passes respect. The SDK still favours plain globals for NMI handshake patterns for cycle-cost equivalence, but user code can use `volatile` for MMIO without silent coalescing.
 - **`unsigned int` = 2 bytes, `unsigned long` = 4 bytes** on this target (since chantier A1, 2026-05-08).
-- **The IR means what upstream QBE says, at this target's widths** (since 2026-10-08): `w` is 16 bits, `l` is 32, and `jnz` tests a word whatever the class of its argument — cproc compares a 4-byte condition with zero first (`cnel`) and the backend folds that compare back into the branch. A fork-only rule the optimizer does not know (the old "jnz tests both halves of an `l` temp") is a miscompilation waiting for a copy propagation; QBE's folder computes at `T.wordsz`. Six defects of this family were found in a day by `testing/difftest.py`.
+- **The IR means what upstream QBE says, at this target's widths** (since 2026-10-08): `w` is 16 bits, `l` is 32, and `jnz` tests a word whatever the class of its argument — cproc compares a 4-byte condition with zero first (`cnel`) and the backend folds that compare back into the branch. A fork-only rule the optimizer does not know (the old "jnz tests both halves of an `l` temp") is a miscompilation waiting for a copy propagation; QBE's folder computes at `T.wordsz`. Six defects of this family were found in a day by `testing/difftest.py`. The same holds inside the backend: a Kw temp standing where a Kl operand is expected is zero-extended and owns ONE slot word — every read of a high half goes through `emit_load_high` / `emitop2_high`, never through `slot + 1` by hand.
+- **Phi moves are a parallel copy** (since 2026-10-08): `emitphimoves` orders the moves of an edge and breaks a cycle through `tcc__r10`. Emitted in list order they miscompiled `prev = cur; cur += d;` in any loop. `QBE_DBG_PHI=1` lists them.
 - **A submodule commit is staged in the superproject before any `make`**: the `submodules` target runs `git submodule update`, which puts a committed-but-unstaged submodule back on the old pin (detached HEAD) and the build then uses the old compiler. Uncommitted edits survive; commits do not until `git add compiler/<name>`.
 
 ## After Any Compiler Change
@@ -48,7 +49,7 @@ This is a Class A change — requires `make clean && make` + full test suite (lu
    pass is the reference; interactive spot-check via `luna mcp` / luna GUI
    if needed — see docs/tutorials/debugging.md)
 4. Check for regressions in code generation with compiler test patterns
-5. `python3 testing/difftest.py --seeds 1-2000` — the differential test beyond its gate (about a minute)
+5. `python3 testing/difftest.py --seeds 1-2000` and `python3 testing/difftest_stmt.py --seeds 1-2000` — the two differential tests beyond their gates (about a minute each)
 
 ## Width literals in cproc are ratcheted (since 2026-10-05)
 

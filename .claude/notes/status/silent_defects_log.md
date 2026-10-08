@@ -86,6 +86,8 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-08 | A 4-byte value converted to bool was compared in 16 bits: `y && x`, `0 || x` and `(bool)x` were false for a long whose low word is 0 (`0x00010000`), and for a far pointer to offset `$0000` of its bank | `testing/difftest.py` (new that day), seed 8; pins 4-5 | this commit (cproc `qbe.c`, `cnel`) |
 | 2026-10-08 | A branch read 32 bits whenever its argument was an `l` temp, and a 16-bit condition could be one: `if ((s16)x)`, `(s16)x ? a : b`, `((s16)x >> 0) ? …` were true for x = `0x00100000`; `(u16)(0x80000000) && y` true as a constant | `testing/difftest.py` (new that day), seeds 57, 116, 829, 5485; pins 6-8; case `long_condition` | this commit (cproc: a 4-byte condition is compared with zero; qbe: `jnz` tests a word, the compare is folded back into the branch; constant branch read at 16 bits) |
 | 2026-10-08 | cproc's evaluator returned an operand for `||` and `&&` of constants: `5 && 7` was 7, `0 || 9` was 9, `43732U || x` was 43732 — in enum values, array sizes, initialisers and folded sub-expressions | `testing/difftest.py` (new that day), seed 134; pins 9-10; case `const_logical_value` | this commit (cproc `eval.c`) |
+| 2026-10-08 | Phi moves were emitted one after the other: a variable that saves another's value before it changes in a loop read the new value — `for (…) { prev = cur; cur += d; }` left `prev == cur`, a swap in a loop left both equal, a Fibonacci loop returned 512 for 55. In every release | `testing/difftest_stmt.py` (new that day), seed 51, reduced to two statements; pins p0-p6 (eleven of twelve hand-written loops wrong on the old compiler, all right on a host compiler) | this commit (qbe `w65816/emit.c`: ordered parallel copy, cycle through `tcc__r10`) |
+| 2026-10-08 | A Kw temp used as the second operand of a 32-bit operation, or feeding a 32-bit phi, had its high half read from the next temp's stack slot instead of 0. Reached when the optimizer replaces a 32-bit `c ? 1 : 0` phi by the condition (`(v3 ? v2 : v3) > y` with v2 = 1) | `testing/difftest_stmt.py` (new that day), seed 2630 (the per-variable probe named the variable) | this commit (qbe `emitop2_high`, `emit_one_phimove`) |
 
 ## Campaign closed — 2026-10-05
 
@@ -107,6 +109,10 @@ closes no earlier than **2026-10-21**.
 differential test written that day (`testing/difftest.py`; 192 000
 expressions clean after the fixes, the 86 example ROMs byte-identical
 before and after): the window now closes no earlier than **2026-10-22**.
+Two more rows the same day from `testing/difftest_stmt.py` (programs:
+loops, arrays, a struct, pointers; 120 000 programs clean after the fixes,
+ROMs still byte-identical), and a second loud one: the compiler's own Kl
+invariant stopped the build on `a[x & 7]` with a long `x`.
 A sixth defect of the same day is loud and has no row: `qbe` never returned
 on a 16-bit multiply by a constant of 31 bits (`(s16)2141188073UL * x`),
 held by seed 5728 of the gate.

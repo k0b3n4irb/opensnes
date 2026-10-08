@@ -222,6 +222,7 @@ tests: test-compiler
 	@# The compiler against C's integer rules, on luna (2026-10-08): first,
 	@# because a wrong compiler makes every result below it meaningless.
 	@python3 testing/difftest.py
+	@python3 testing/difftest_stmt.py
 	@python3 testing/luna_runner.py --coverage
 	@# Same liveness pass from pseudo-random RAM (fixed seed): a ROM that
 	@# reads memory it never initialised passes on luna's zero-fill and
@@ -377,10 +378,14 @@ test-compiler:
 # locals), against a model of C's integer rules that clang checks under a
 # 16-bit-int target. The gate is a fixed set (the expressions that found the
 # six defects of 2026-10-08, pinned, and fifteen seeds); hunting is
-# `make test-difftest SEEDS=1000-1999` (about 35 seeds a second).
+# `make test-difftest SEEDS=1000-1999` (about 35 seeds a second for the
+# expressions, 25 for the programs).
 test-difftest:
 	@scripts/install-luna.sh
 	@python3 testing/difftest.py $(if $(SEEDS),--seeds $(SEEDS))
+	@# ...and on small programs: loops, arrays, a struct, pointers, against
+	@# an interpreter that evaluates with the same model (2026-10-08).
+	@python3 testing/difftest_stmt.py $(if $(SEEDS),--seeds $(SEEDS))
 
 # Golden-output tests for every asset tool. Byte-compares tool output
 # against committed goldens — needs `make tools` first. Also the CI job

@@ -20,7 +20,9 @@ freeze criterion that waits for hardware.
 - **`make test-difftest`** (testing): the differential compiler test, in
   `make tests` with a fixed gate (ten pinned expressions and fifteen seeds)
   and `SEEDS=A-B` to hunt. The expected values come from a model of C's
-  integer rules that clang checks under a 16-bit-int target.
+  integer rules that clang checks under a 16-bit-int target. It also runs
+  `testing/difftest_stmt.py`, the same on small generated programs (eight
+  pinned functions and fourteen seeds).
 - **`opensnes budget` and `opensnes release`** (tools): the two commands
   the project tool still lacked. `budget` builds and prints one report of
   what the game uses of the console — ROM bank by bank, the C variables'
@@ -341,8 +343,8 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Fixed
-- **Five silent miscompilations and a compiler hang, found by a new
-  differential test** (compiler): `testing/difftest.py` compiles random
+- **Seven silent miscompilations, a compiler hang and an internal error,
+  found by a new differential test** (compiler): `testing/difftest.py` compiles random
   integer expressions, runs them on luna and compares with C's rules for
   this target. Its first day:
   - constants were folded at 32 and 64 bits while `int` is 16 and `long`
@@ -356,6 +358,15 @@ freeze criterion that waits for hardware.
   - `5 && 7` evaluated to 7 and `0 || 9` to 9 in enum values, array sizes
     and initialisers;
   - the compiler never returned on `(s16)2141188073UL * x`.
+  Then, on generated programs (`testing/difftest_stmt.py`: loops, arrays,
+  a struct, pointers):
+  - a variable that saves another's value before it changes in a loop read
+    the new value: `for (…) { prev = cur; cur += d; }` left `prev == cur`,
+    a swap in a loop left both variables equal, a Fibonacci loop returned
+    512 for 55;
+  - `(c ? 1 : x) > y` on 32 bits could compare a neighbouring stack slot;
+  - the compiler stopped with an internal error on `a[x & 7]` when `x` is
+    a `long`.
   No ROM of the 86 examples changes by a byte: none of them wrote these
   forms. `if (long)` and `if (pointer)` compile to the same code as before.
 - **`DECLARE_ANIM_CLIP` refuses more than 255 frames** (lib): the frame
