@@ -4,4 +4,7 @@
 # assertions no longer apply, see that file's note). The load of the
 # address after pha reads 2 bytes above where it was stored.
 in array_write: present lda \d+,s\n\tasl a\n\tsta (\d+),s\n\tlda \d+,s\n\tclc\n\tadc \1,s\n\tsta 18,s
-in array_write: present lda 30,s\n\tpha\n\tlda 20,s\n\ttax\n\tpla\n\tsta\.l \$0000,x
+# Re-pinned 2026-10-08: a store through a pointer loads X first, then the
+# value (`tax` / `lda` / `sta.l $00NNNN,x`); no pha / pla around it.
+in array_write: present tax\n\tlda 30,s\n\tsta\.l \$000000,x
+in array_write: absent pha

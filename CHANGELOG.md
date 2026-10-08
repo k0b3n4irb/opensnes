@@ -394,8 +394,33 @@ freeze criterion that waits for hardware.
   larger. Ten examples boot one or two frames sooner, and
   `chips/sa1_starfield` now shows 164 different images in 200 frames
   where it showed 99.
+- **A field through a pointer is indexed with X too** (compiler):
+  `p->field` added the offset to the pointer in A, stored the sum,
+  reloaded it and moved it to X; a store pushed its value around that.
+  Every 8- and 16-bit access through an address held in a temporary is
+  now `tax` / `lda.l $00000N,x`, with the field's offset in the operand,
+  and X is kept from one access to the next when nothing else lies
+  between them: `e->vx = v; e->vy = v;` loads X once. A 32-bit read
+  through a pointer keeps its form (the full 24-bit pointer). Measured on
+  luna against PVSnesLib: the eighteen workloads from −38 % to −40 %,
+  `entities` −54 %, `copy` −51 %, `physics` −47 %; the static table of
+  34 functions from 1637 to 1593 cycles (−17.4 % to −19.6 %), `struct_sum`
+  now ahead of PVSnesLib.
+- **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
+  (compiler): a consequence of the shift-width fix below; 71 example ROMs
+  change by it and render the same frames.
 
 ### Fixed
+- **`(v >> 15) & 1` on a signed value lost its mask** (compiler): QBE's
+  redundant-mask rule sized a shift at 32 bits, the width of a word
+  upstream. Here a word is 16 bits, so `v >> 15` was held to be one bit
+  wide whenever `v` had 16 bits or fewer — where bit 15 is the sign and the
+  result is 0 or −1. `sa[(v >> 15) & 1]` wrote to `sa[-1]`;
+  `((s16)(a & 0xFF00) >> 8) & 0xFF` kept its sign bits. In the compiler
+  since the fork's first commit. No C source of the library or of the
+  examples was affected (each compiles to the same code with the fix
+  alone); found by the program differential test on a seed range it had
+  never run (seed 54084, now in its gate).
 - **`gsuDmaFullFrame()` with the screen off returned after a number of
   frames that depended on timing** (lib): called before
   `gsuSetupHdmaBlanking()` — the way `superfx_3d` loads its first frame,

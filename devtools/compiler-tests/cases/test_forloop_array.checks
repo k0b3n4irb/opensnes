@@ -12,9 +12,8 @@ in init_with_loop: absent __mul16
 # Since 2026-10-08 each field is written with indexed-long addressing: X is
 # the scaled index, the field offset is in the operand, no value is pushed.
 in init_with_loop: present tax\n\tlda 10,s\n\tsta\.l entries,x
-in init_with_loop: present tax\n\tlda\.w #100\n\tsta\.l entries\+2,x
-in init_with_loop: present tax\n\tlda 8,s\n\tsta\.l entries\+4,x
-in init_with_loop: present tax\n\tlda\.w #16\n\tsta\.l entries\+6,x
+# ...and X is loaded once for the four fields (the X cache, same day).
+in init_with_loop: present tax\n\tlda 10,s\n\tsta\.l entries,x\n\tlda\.w #100\n\tsta\.l entries\+2,x\n\tlda 8,s\n\tsta\.l entries\+4,x\n\tlda\.w #16\n\tsta\.l entries\+6,x
 in init_with_loop: absent pha
 # x = 64 + i*16.
 in init_with_loop: present lda 8,s\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tclc\n\tadc\.w #64\n

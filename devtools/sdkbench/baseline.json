@@ -14,8 +14,8 @@
       "res": 12563
     },
     "physics": {
-      "cycles": 5734938,
-      "size": 711,
+      "cycles": 5321470,
+      "size": 696,
       "stack": 84,
       "res": 12530
     },
@@ -44,8 +44,8 @@
       "res": 35405
     },
     "bytes": {
-      "cycles": 5549032,
-      "size": 433,
+      "cycles": 5367584,
+      "size": 428,
       "stack": 61,
       "res": 819
     },
@@ -80,26 +80,26 @@
       "res": 10608
     },
     "grid": {
-      "cycles": 2636058,
-      "size": 560,
-      "stack": 84,
+      "cycles": 2578056,
+      "size": 554,
+      "stack": 92,
       "res": 40897
     },
     "entities": {
-      "cycles": 5203398,
-      "size": 704,
+      "cycles": 4096256,
+      "size": 640,
       "stack": 80,
       "res": 12530
     },
     "copy": {
-      "cycles": 2437486,
-      "size": 480,
+      "cycles": 2200126,
+      "size": 470,
       "stack": 45,
       "res": 20921
     },
     "strings": {
-      "cycles": 2458614,
-      "size": 1014,
+      "cycles": 2430126,
+      "size": 1010,
       "stack": 90,
       "res": 65535
     },

@@ -217,15 +217,15 @@
   },
   "chips_sa1_starfield": {
     "fbhash": [
-      "3944629a106b9f95",
-      "85034387eb04de03"
+      "734f4dba910e1215",
+      "47287c435508c5f9"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.34.0",
-    "rom_sha256": "06e73c0aa95cc9e174ba2879e46552cc678d97412c88ddac7002b44ff1ca6f08"
+    "rom_sha256": "1a1a008e6c592154019534ee58abbd67c85ada7baec075be176f71aaede7c8c1"
   },
   "chips_superfx_3d": {
     "fbhash": [

@@ -3,7 +3,7 @@
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "6200feca6ccf9c9534cfe113369762d941e6d9ee524cc82d577443d52bfac3de",
+      "sha256": "eecbce38476c4f5764e3b2f7c6a75c0941a8d224e5db8f4fda765be4cd14258a",
       "samples": 159936,
       "peak": 21204
     },
@@ -23,7 +23,7 @@
       "peak": 21204
     },
     "audio/echo": {
-      "sha256": "0926238ea9e7a81b415328069f6fd9595fd67a4e6740fc0a1abea4cd37aedffc",
+      "sha256": "c5d1880001af89746c5302e3f0637cdfaa9b5a067e2a0514aad71173bff4d23c",
       "samples": 159936,
       "peak": 10922
     },
@@ -38,9 +38,9 @@
       "peak": 17197
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "f08417816c52f3ad145c09309d47700d78ee5b9765281ae1d62d861a2024878d",
-      "samples": 159945,
-      "peak": 20922
+      "sha256": "6a65de5d5e5243485b632a61ac779057a18b4424e68b7801a8f5561d46f395b3",
+      "samples": 160007,
+      "peak": 20893
     },
     "audio/soundboard": {
       "sha256": "0733da5805248ad0b0e5258676a7ec80478d195bec12cc0a3dcc83ee468272f1",
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "1b9d5d19b2f484b5689f2a08d67dd1834f4b410eeefa18003075296bee504d87",
+      "sha256": "3385f4633840e374575ada8eba0d5f13eeb4f36b0f66153bafa136cb2534f393",
       "samples": 159936,
       "peak": 12192
     }

@@ -2,10 +2,10 @@
   "add_u16": 21,
   "array2d_read": 150,
   "array_read": 101,
-  "array_write": 111,
+  "array_write": 102,
   "bitwise_and": 19,
   "bitwise_or": 19,
-  "byte_store_loop": 158,
+  "byte_store_loop": 143,
   "call_add": 4,
   "call_chain": 19,
   "clamp": 66,
@@ -29,8 +29,8 @@
   "shift_right_4": 22,
   "signed_shift_right_1": 19,
   "signed_shift_right_8": 28,
-  "struct_sum": 94,
+  "struct_sum": 82,
   "sub_u16": 21,
-  "swap": 127,
+  "swap": 119,
   "zero_store_global": 14
 }
