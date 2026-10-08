@@ -3,13 +3,15 @@
 # `ldy.w #N; lda/sta [tcc__fp],y` (ported from opensnes-emu
 # test_large_local, which only checked the function existed).
 # 64-byte buffer: small frame, stack-relative only.
-in test_small_local: present sbc\.w #74\n
+# (72 and 520 since 2026-10-09, 74 and 522 before: an address-only 32-bit
+# temp takes one word)
+in test_small_local: present sbc\.w #72\n
 in test_small_local: absent tcc__fp
 # Re-pinned 2026-10-08: a store through a pointer loads X first, then the
 # value (`tax` / `lda` / `sta.l $00NNNN,x`); no pha / pla around it.
 in test_small_local: present lda 66,s\n\ttax\n\tsep #\$20\n\tlda #2\n\tsta\.l \$00003F,x
 # 512-byte buffer: the frame pointer is taken right after the frame is made.
-in test_large_local: present sbc\.w #522\n\ttas\n\ttsa\n\tsta\.b tcc__fp\n
+in test_large_local: present sbc\.w #520\n\ttas\n\ttsa\n\tsta\.b tcc__fp\n
 in test_large_local: present ldy\.w #\d{3}\n\tsta \[tcc__fp\],y
 # Slots above 255 never use the 8-bit stack-relative form.
 absent \t[a-z]{3} (\d{4,}|[3-9]\d\d|2[6-9]\d|25[6-9]),s

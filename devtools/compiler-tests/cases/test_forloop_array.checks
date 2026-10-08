@@ -7,7 +7,7 @@
 # (moved by the slot colouring of 2026-09-27, which also reuses the loop
 # variable's slot for the scaled index once i is dead in the body):
 # if they move, re-derive "reload = store + 2" before updating.
-in init_with_loop: present sta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tsta 12,s
+in init_with_loop: present sta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tsta 2,s
 in init_with_loop: absent __mul16
 # Since 2026-10-08 each field is written with indexed-long addressing: X is
 # the scaled index, the field offset is in the operand, no value is pushed.

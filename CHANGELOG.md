@@ -435,11 +435,28 @@ freeze criterion that waits for hardware.
   its deepest stack went 265 -> 231 -> 193 -> 159 bytes in three steps,
   level with PVSnesLib, for 42 % fewer cycles and 66 bytes of code against
   105. Seven example ROMs change and render the same frames.
+- **An address or an index takes one word of frame** (compiler): a
+  32-bit temporary of which only the low half is ever read kept two words
+  on the stack, the second never written and never read. It takes one.
+  Measured on luna against PVSnesLib: the deepest stack is level or
+  shallower on 7 of the eighteen workloads (2 before: `sort`, `physics`,
+  `collide`, `entities` and `state` join `long` and `calls`) and deeper by
+  1 to 29 bytes on the other 11 (`grid` 84 -> 68, `collide` 78 -> 64). The
+  86 examples render the same frames at the same frame numbers.
 - **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
   (compiler): a consequence of the shift-width fix below; 71 example ROMs
   change by it and render the same frames.
 
 ### Fixed
+- **A `long` could lose its high half to its own truncated copy**
+  (compiler): `a = 0 - v; j = a;` with `a` a long and `j` a `u8`, on a
+  path that joins another — the two variables get two phis with the same
+  arguments, one 32-bit and one 16-bit, and QBE's value numbering replaced
+  one by the other without comparing their widths. Every later use of `a`
+  then saw 16 bits (0 for 0xFFF80000). In the fork since its first commit;
+  no example ROM changes by a byte with the fix. Found by the program
+  differential test (seed 124152, in its gate with a hand-written
+  function).
 - **A bit-field chosen by a constant condition lost the conditional's
   type** (compiler): `b3 - (3 ? bf.b2 : (v2 * v3))` — the two branches
   have the common type `unsigned`, but with a condition the front end can

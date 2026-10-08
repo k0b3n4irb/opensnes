@@ -4,25 +4,25 @@
     "sieve": {
       "cycles": 2228804,
       "size": 179,
-      "stack": 39,
+      "stack": 33,
       "res": 172
     },
     "sort": {
       "cycles": 1657474,
       "size": 356,
-      "stack": 47,
+      "stack": 43,
       "res": 12563
     },
     "physics": {
       "cycles": 5318568,
       "size": 690,
-      "stack": 70,
+      "stack": 58,
       "res": 12530
     },
     "collide": {
       "cycles": 10095674,
       "size": 689,
-      "stack": 78,
+      "stack": 64,
       "res": 162
     },
     "mul": {
@@ -58,7 +58,7 @@
     "switch": {
       "cycles": 1857692,
       "size": 520,
-      "stack": 41,
+      "stack": 37,
       "res": 9705
     },
     "crc": {
@@ -76,25 +76,25 @@
     "tilemap": {
       "cycles": 1633268,
       "size": 286,
-      "stack": 45,
+      "stack": 41,
       "res": 10608
     },
     "grid": {
-      "cycles": 2566436,
-      "size": 548,
-      "stack": 84,
+      "cycles": 2533554,
+      "size": 544,
+      "stack": 68,
       "res": 40897
     },
     "entities": {
       "cycles": 4093356,
       "size": 634,
-      "stack": 66,
+      "stack": 58,
       "res": 12530
     },
     "copy": {
       "cycles": 2200126,
       "size": 470,
-      "stack": 39,
+      "stack": 35,
       "res": 20921
     },
     "strings": {
@@ -106,7 +106,7 @@
     "state": {
       "cycles": 1345918,
       "size": 382,
-      "stack": 43,
+      "stack": 39,
       "res": 24876
     }
   }

@@ -56,7 +56,8 @@ from lib import find_luna  # noqa: E402
 
 # The gate: the pinned functions below, twelve seeds, and the seeds that
 # showed a defect first on 2026-10-08, whatever the generator has become
-# since (103247: a bit-field chosen by a constant condition lost the
+# since (124152: two phis of different widths merged by gvn;
+# 103247: a bit-field chosen by a constant condition lost the
 # conditional's type; 74144: a 32-bit multiply by 2..256 read its 16-bit operand twice, the
 # second time from a slot whose store was skipped;
 # 54084: `(v >> 15) & 1` lost its mask, QBE sizing a shift at 32 bits;
@@ -65,7 +66,7 @@ from lib import find_luna  # noqa: E402
 # skipped, an internal error; 14657: gvn's phi-to-condition inference on a dead edge, `(y || K) && 1`;
 # 42, 51, 62, 2630, 3797; 336 and 2085 for the functions of more than
 # 256 temporaries, which no hand-written function here reproduces).
-GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797, 14657, 19645, 44157, 54084, 74144, 103247]
+GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630, 3797, 14657, 19645, 44157, 54084, 74144, 103247, 124152]
 
 # Hand-written functions for the defects this test found, reduced. Fixed-width
 # types and no operation that depends on the width of int, so the expected
@@ -145,6 +146,11 @@ PINNED = [
      "u32 p12(void) { s32 x = pin_c.a - (3 ? pin_c.b : (pin_z * pin_after)); "
      "s32 y = pin_c.a - (pin_g ? pin_c.b : pin_c.a); return (u32)x ^ ((u32)y << 1); }",
      "p12()", 0x0000FF78 ^ 0xFFFFFEF0),
+    # gvn merged two phis that had the same arguments and different classes: the
+    # long one (a) was replaced by the 16-bit one (j) and lost its high half
+    ("a long and its truncated copy assigned on the same path",
+     "u32 p13(u32 v) { s32 a = 0; u8 j = 0; if (pin_g) { a = 0 - v; j = a; } return (u32)a + j; }",
+     "p13(0x00080000)", 0xFFF80000),
 ]
 
 PROGS_PER_ROM = 10
