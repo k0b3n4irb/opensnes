@@ -20,7 +20,11 @@ it can be checked: every week of the window, (a) `make tests` on a clean
 tree plus `luna_runner.py --coverage --power-on random=N` with a new seed,
 `make test-pal` and `make luna-bench`; (b) one public header read against
 its code, chosen by the oldest "last read" date in the table at the end of
-this file; (c) the partner reports of the week answered. Each week's effort
+this file; (c) the partner reports of the week answered; (d) since
+2026-10-08, a long hunt of the two differential tests on seeds never run
+before — `make test-difftest SEEDS=A-B` over at least 20 000 seeds, the
+range written in the weekly line so the next one starts after it (ranges
+used so far: expressions 1-8000, programs 1-12000). Each week's effort
 is logged below the table with its date; a week without a line restarts the
 count.
 
