@@ -287,4 +287,6 @@ estimation.
   the one stated — the music starts one frame later (first sample above 64
   at 33344 -> 33872) — but the last window is not the only one that shows
   it. History is not rewritten; this line is the correction.
+- `54f2bab3` (S5 step 3) says recursive `fib(17)` used 265 bytes of stack
+  "two days ago". It was the day before, the morning of 2026-10-08.
 
