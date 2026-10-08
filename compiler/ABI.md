@@ -282,6 +282,13 @@ Constraints to respect:
   (`rep #$10`). The C caller has already issued `rep #$20` before the
   `jsl`. If your function manipulates 8-bit mode, restore 16-bit before
   `rtl` (the convention is "callee returns in 16-bit mode").
+- **Calling a C function from assembly** works in either A width: an
+  exported C function, and any C function whose address is used (a
+  callback given to `nmiSet()`, `irqSet()`, the object engine, a table of
+  function pointers), opens with `rep #$20` itself. Only a `static`
+  function that is called directly and nowhere else referenced leaves it
+  out (since 2026-10-09) — and assembly cannot name such a function. Have
+  X/Y in 16 bits and the arguments pushed left to right; that is all.
 - **Direct page**: assume DP = 0. C code does not touch DP, so it stays
   where crt0 set it.
 - **Data Bank Register (DBR)**: assume DBR = 0. Use `lda.l` for

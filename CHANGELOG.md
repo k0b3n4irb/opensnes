@@ -443,6 +443,16 @@ freeze criterion that waits for hardware.
   `collide`, `entities` and `state` join `long` and `calls`) and deeper by
   1 to 29 bytes on the other 11 (`grid` 84 -> 68, `collide` 78 -> 64). The
   86 examples render the same frames at the same frame numbers.
+- **A static function called only directly does not set the accumulator
+  width again** (compiler): every function opened with `rep #$20`, in
+  case assembly called it in 8-bit mode. A function that is not exported
+  and whose address is used nowhere can only be entered by a call the
+  compiler made itself, in 16 bits: it leaves the instruction out, 3
+  cycles and 2 bytes per call. An exported function, and any function
+  used as a callback or stored in a table, keeps it: calling C from
+  assembly is exactly what it was (`compiler/ABI.md`). The eighteen
+  workloads −41.2 %, their code −28.3 %; 60 example ROMs change and
+  render the same frames at the same frame numbers.
 - **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
   (compiler): a consequence of the shift-width fix below; 71 example ROMs
   change by it and render the same frames.
