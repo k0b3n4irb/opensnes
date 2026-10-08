@@ -22,7 +22,7 @@ to losses; the rest held. The cause is not the pointer width itself (see
 slots for values PVSnesLib keeps in the direct page, and code the
 optimizer leaves dead. The May text claimed "32 % faster";
 the honest figure today is **about 17 %** on these 34 functions, and
-30 % measured on eighteen whole workloads.
+38 % measured on eighteen whole workloads.
 
 ## Summary
 
@@ -293,27 +293,27 @@ while it runs (bytes below the initial stack pointer).
 <!-- sdkbench:begin -->
 | Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `sieve` | sieve of 1024 in a byte array | 4,199,010 | 3,048,852 | -27.4 % | 296 | 215 | -27.4 % | 31 | 45 |
-| `sort` | insertion sort of 64 words | 2,620,372 | 2,117,478 | -19.2 % | 507 | 424 | -16.4 % | 43 | 57 |
-| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 7,321,668 | -27.0 % | 1174 | 891 | -24.1 % | 60 | 84 |
-| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 12,212,184 | -11.6 % | 983 | 855 | -13.0 % | 74 | 104 |
+| `sieve` | sieve of 1024 in a byte array | 4,199,010 | 2,228,804 | -46.9 % | 296 | 179 | -39.5 % | 31 | 45 |
+| `sort` | insertion sort of 64 words | 2,620,372 | 1,658,922 | -36.7 % | 507 | 362 | -28.6 % | 43 | 57 |
+| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 5,734,938 | -42.8 % | 1174 | 711 | -39.4 % | 60 | 84 |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 10,098,572 | -26.9 % | 983 | 695 | -29.3 % | 74 | 104 |
 | `mul` | 2304 multiplies of two variables | 6,389,830 | 5,049,682 | -21.0 % | 188 | 121 | -35.6 % | 34 | 49 |
 | `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,899,026 | -67.8 % | 154 | 131 | -14.9 % | 34 | 43 |
 | `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,813,428 | -52.7 % | 594 | 334 | -43.8 % | 76 | 77 |
-| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 6,174,984 | -21.5 % | 605 | 481 | -20.5 % | 41 | 61 |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 5,549,032 | -29.4 % | 605 | 433 | -28.4 % | 41 | 61 |
 | `calls` | recursive `fib(17)` | 5,041,934 | 3,568,224 | -29.2 % | 105 | 96 | -8.6 % | 159 | 265 |
-| `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 2,022,788 | -25.0 % | 523 | 542 | +3.6 % | 34 | 51 |
+| `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 1,857,692 | -31.1 % | 523 | 520 | -0.6 % | 34 | 51 |
 | `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,948,312 | -29.2 % | 233 | 163 | -30.0 % | 34 | 43 |
-| `list` | a 64-node linked list walked 40 times | 2,858,640 | 2,807,408 | -1.8 % | 402 | 411 | +2.2 % | 37 | 65 |
-| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 1,869,314 | -35.9 % | 397 | 312 | -21.4 % | 33 | 53 |
+| `list` | a 64-node linked list walked 40 times | 2,858,640 | 2,291,098 | -19.9 % | 402 | 373 | -7.2 % | 37 | 53 |
+| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 1,633,268 | -44.0 % | 397 | 286 | -28.0 % | 33 | 53 |
 | `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 2,636,058 | -49.9 % | 694 | 560 | -19.3 % | 39 | 84 |
-| `entities` | the 32 entities again, through a pointer | 8,851,406 | 5,236,806 | -40.8 % | 1098 | 780 | -29.0 % | 62 | 80 |
-| `copy` | word and byte copies as index loops | 4,485,144 | 3,427,462 | -23.6 % | 709 | 576 | -18.8 % | 31 | 45 |
-| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,547,356 | -17.4 % | 1156 | 1042 | -9.9 % | 48 | 90 |
-| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,686,982 | -7.9 % | 392 | 421 | +7.4 % | 42 | 51 |
-| **Total** | | **99,641,418** | **69,388,012** | **-30.4 %** | **10210** | **8355** | **-18.2 %** | | |
+| `entities` | the 32 entities again, through a pointer | 8,851,406 | 5,203,398 | -41.2 % | 1098 | 704 | -35.9 % | 62 | 80 |
+| `copy` | word and byte copies as index loops | 4,485,144 | 2,437,486 | -45.7 % | 709 | 480 | -32.3 % | 31 | 45 |
+| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,458,614 | -20.2 % | 1156 | 1014 | -12.3 % | 48 | 90 |
+| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,349,338 | -26.3 % | 392 | 388 | -1.0 % | 42 | 51 |
+| **Total** | | **99,641,418** | **61,415,892** | **-38.4 %** | **10210** | **7550** | **-26.1 %** | | |
 
-Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 15**, and **no deeper in stack on 0**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 0**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to
@@ -329,33 +329,30 @@ either SDK's boot or per-frame handler in it.
 
 - **Divide, modulo and 32-bit arithmetic are where OpenSNES wins most**
   (`decimal` −68 %, `long` −53 %, `grid` −50 %).
-- **Every workload is faster**, from 2 % (`list`) to 68 %; calls, branches,
-  byte loops, bit work, tilemaps and entities by 20 to 41 %.
-- **`list` is the closest** (−2 %): its walk loop is faster than
-  PVSnesLib's, and 104 calls to the 32-bit multiply for `&nodes[k]` (the
-  element is 6 bytes) take most of that back; the compiler inlines that
-  multiply only when the address is used at once and not kept as a pointer.
+- **Every workload is faster, by 20 to 68 %, and none is larger.** Arrays,
+  byte loops, tilemaps and entities are 29 to 47 % faster; `list`,
+  `strings` and `mul` are the closest, at 20 %.
 - **Until 2026-10-08 three were slower** — `sort` +63 %, `collide` +13 %,
   `list` +7 % — and this page put it down to the 4-byte pointer. That was
   wrong: OpenSNES dereferences a plain pointer in 16 bits, it is PVSnesLib
-  that does a 24-bit access. Read instruction by instruction, 258 of the
-  496 cycles of an iteration of `sort` computed 32-bit index and address
-  values that were stored and never read, and another 66 computed the 0 or
-  1 of each half of `j > 0 && arr[j - 1] > key`, stored it and tested it
-  again. Both are gone: the dead values are removed, and a condition now
-  branches where it is decided.
+  that does a 24-bit access. Read instruction by instruction, an iteration
+  of `sort` spent 258 of its 496 cycles on 32-bit index and address values
+  that were stored and never read, 66 on the 0 or 1 of each half of
+  `j > 0 && arr[j - 1] > key`, stored and tested again, and about 95 on
+  building each address in A before moving it to X. All three are gone:
+  dead values are removed, a condition branches where it is decided, and
+  `arr[i]` is `lda.l arr,x` with the index in X. `&nodes[k]` with a
+  6-byte element no longer calls the 32-bit multiply either.
 - **The stack is deeper on every workload** (by 1 to 106 bytes): each
   temporary of the compiler owns a stack slot, where PVSnesLib keeps its
   temporaries in direct-page pseudo-registers and gives a function a frame
-  only for its C locals.
-- **Three workloads are larger** (`list` +2 %, `switch` +4 %, `state`
-  +7 %).
+  only for its C locals. This is the one column still to win.
 
-What is left has named causes — addresses built in A where an indexed
-mode would do, a stack frame for temporaries — and PVSnesLib is itself far from what a person
-would write (it never uses X or Y as an index: the inner loop of `sort` is
-255 cycles there and 27 by hand). The plan to be ahead on
-every line of this table is `.claude/notes/chantiers/beat_pvsneslib.md`.
+What is left has named causes — a stack frame for temporaries, X reloaded
+before each access, a struct field reached through a pointer still built
+in A — and PVSnesLib is itself far from what a person would write (it never
+uses X or Y as an index: the inner loop of `sort` is 255 cycles there and
+27 by hand). The plan is `.claude/notes/chantiers/beat_pvsneslib.md`.
 
 What this does not measure: the libraries (sprite, background, audio
 engines) and a whole game.

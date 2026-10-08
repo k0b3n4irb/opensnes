@@ -2,26 +2,26 @@
   "frames": 900,
   "workloads": {
     "sieve": {
-      "cycles": 3048852,
-      "size": 215,
+      "cycles": 2228804,
+      "size": 179,
       "stack": 45,
       "res": 172
     },
     "sort": {
-      "cycles": 2117478,
-      "size": 424,
+      "cycles": 1658922,
+      "size": 362,
       "stack": 57,
       "res": 12563
     },
     "physics": {
-      "cycles": 7321668,
-      "size": 891,
+      "cycles": 5734938,
+      "size": 711,
       "stack": 84,
       "res": 12530
     },
     "collide": {
-      "cycles": 12212184,
-      "size": 855,
+      "cycles": 10098572,
+      "size": 695,
       "stack": 104,
       "res": 162
     },
@@ -44,8 +44,8 @@
       "res": 35405
     },
     "bytes": {
-      "cycles": 6174984,
-      "size": 481,
+      "cycles": 5549032,
+      "size": 433,
       "stack": 61,
       "res": 819
     },
@@ -56,8 +56,8 @@
       "res": 1597
     },
     "switch": {
-      "cycles": 2022788,
-      "size": 542,
+      "cycles": 1857692,
+      "size": 520,
       "stack": 51,
       "res": 9705
     },
@@ -68,14 +68,14 @@
       "res": 2842
     },
     "list": {
-      "cycles": 2807408,
-      "size": 411,
-      "stack": 65,
+      "cycles": 2291098,
+      "size": 373,
+      "stack": 53,
       "res": 17376
     },
     "tilemap": {
-      "cycles": 1869314,
-      "size": 312,
+      "cycles": 1633268,
+      "size": 286,
       "stack": 53,
       "res": 10608
     },
@@ -86,26 +86,26 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 5236806,
-      "size": 780,
+      "cycles": 5203398,
+      "size": 704,
       "stack": 80,
       "res": 12530
     },
     "copy": {
-      "cycles": 3427462,
-      "size": 576,
+      "cycles": 2437486,
+      "size": 480,
       "stack": 45,
       "res": 20921
     },
     "strings": {
-      "cycles": 2547356,
-      "size": 1042,
+      "cycles": 2458614,
+      "size": 1014,
       "stack": 90,
       "res": 65535
     },
     "state": {
-      "cycles": 1686982,
-      "size": 421,
+      "cycles": 1349338,
+      "size": 388,
       "stack": 51,
       "res": 24876
     }

@@ -37,7 +37,7 @@ luna v1.34.0 · `luna state --until-frame <N>` per ROM · 86 ROMs · **84 OK, 2 
 | `chips/sa1_save` | OK | live (200f/198nmi) |
 | `chips/sa1_starfield` | OK | live (400f/398nmi) |
 | `chips/superfx_3d` | OK | live (400f/397nmi) |
-| `chips/superfx_game_skeleton` | OK | live (400f/389nmi) |
+| `chips/superfx_game_skeleton` | OK | live (400f/388nmi) |
 | `chips/superfx_hello` | OK | live (200f/197nmi) |
 | `chips/superfx_save` | OK | live (200f/197nmi) |
 | `color/direct_color` | OK | live (200f/198nmi) |
@@ -48,7 +48,7 @@ luna v1.34.0 · `luna state --until-frame <N>` per ROM · 86 ROMs · **84 OK, 2 
 | `color/transparency` | OK | live (400f/398nmi) |
 | `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
 | `games/breakout` | OK | live (200f/198nmi) |
-| `games/likemario` | OK | live (200f/189nmi) |
+| `games/likemario` | OK | live (200f/190nmi) |
 | `games/mapandobjects` | OK | live (200f/198nmi) |
 | `games/mode7_flying` | OK | live (200f/198nmi) |
 | `games/mode7_racing` | OK | live (200f/198nmi) |

@@ -2,6 +2,6 @@
 in sort_step: absent xba
 # no bank byte of the array is added to anything
 in sort_step: absent adc\.w #:arr
-# the loop still reads and writes the array
-in sort_step: present lda\.l \$0000,x
-in sort_step: present sta\.l \$0000,x
+# the loop still reads and writes the array (indexed long since 2026-10-08)
+in sort_step: present lda\.l arr,x
+in sort_step: present sta\.l arr,x

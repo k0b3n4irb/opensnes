@@ -9,10 +9,13 @@
 # if they move, re-derive "reload = store + 2" before updating.
 in init_with_loop: present sta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tsta 4,s
 in init_with_loop: absent __mul16
-in init_with_loop: present lda 4,s\n\tclc\n\tadc\.w #entries\n\tsta 12,s\n\tlda 10,s\n\tpha\n\tlda 14,s\n\ttax\n\tpla\n\tsta\.l \$0000,x
-in init_with_loop: present adc\.w #entries\+2\n\tsta 10,s\n\tlda\.w #100\n\tpha\n\tlda 12,s\n\ttax
-in init_with_loop: present adc\.w #entries\+4\n\tsta 10,s\n\tlda 8,s\n\tpha\n\tlda 12,s\n\ttax
-in init_with_loop: present adc\.w #entries\+6\n\tsta 10,s\n\tlda\.w #16\n\tpha\n\tlda 12,s\n\ttax
+# Since 2026-10-08 each field is written with indexed-long addressing: X is
+# the scaled index, the field offset is in the operand, no value is pushed.
+in init_with_loop: present tax\n\tlda 10,s\n\tsta\.l entries,x
+in init_with_loop: present tax\n\tlda\.w #100\n\tsta\.l entries\+2,x
+in init_with_loop: present tax\n\tlda 8,s\n\tsta\.l entries\+4,x
+in init_with_loop: present tax\n\tlda\.w #16\n\tsta\.l entries\+6,x
+in init_with_loop: absent pha
 # x = 64 + i*16.
 in init_with_loop: present lda 8,s\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tclc\n\tadc\.w #64\n
 # The unrolled twin: element k at entries + 48k.

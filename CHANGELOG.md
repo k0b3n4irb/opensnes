@@ -379,6 +379,21 @@ freeze criterion that waits for hardware.
   −12 %, `entities` from −30 % to −41 %, `physics` from −20 % to −27 %, the
   eighteen workloads together from −27 % to −30 %, and all eighteen are now
   faster. `mode7/extbg` builds its plane 16 frames sooner.
+- **A global array is indexed with X** (compiler): `tab[i]` built its
+  address in A (`clc` / `adc #tab` / `sta`), reloaded it, moved it to X and
+  went through `$0000,x`; a store pushed its value around that. It is now
+  `tax` / `lda.l tab,x`, the form the compiler already used for `FAR`
+  arrays, for reads and writes of 8, 16 and 32 bits. Kept to indices that
+  cannot be negative, or to a symbol with no offset. And a 16-bit value
+  times a small constant whose product may pass 16 bits — `&nodes[k]` with
+  a 6-byte element — is built inline instead of calling the 32-bit
+  multiply (about 50 cycles for 250). Measured on luna against PVSnesLib:
+  the eighteen workloads from −30 % to −38 %, their code from −18 % to
+  −26 %; `sort` −37 %, `sieve` −47 %, `copy` −46 %, `physics` −43 %,
+  `collide` −27 %, `list` −20 %. All eighteen are faster and none is
+  larger. Ten examples boot one or two frames sooner, and
+  `chips/sa1_starfield` now shows 164 different images in 200 frames
+  where it showed 99.
 
 ### Fixed
 - **`gsuDmaFullFrame()` with the screen off returned after a number of

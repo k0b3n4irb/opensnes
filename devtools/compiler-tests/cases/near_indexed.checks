@@ -1,0 +1,8 @@
+in rd: present tax\n\tlda\.l tab,x
+in rd: absent adc\.w #tab
+in wr: present sta\.l tab,x
+in wr: absent pha
+in rdb: present lda\.l bytes,x
+in rd_signed: absent tab\+8,x
+in rd_signed: present adc\.w #tab\+8
+in rd_unsigned: present lda\.l tab\+8,x

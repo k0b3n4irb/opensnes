@@ -18,10 +18,10 @@ rom = "../../examples/mode7/extbg/extbg.sfc"
 at_frame = 100
 [checkpoint.values]
 extbg_on = { eq = 1, width = 1 }
-# 54 since 2026-10-08 (38 before): the plane and the ball are built 16
-# frames sooner (the compiler's conditions branch directly), so the ball
-# starts 16 frames, 16 pixels, earlier.
-ball_x = { eq = 54, width = 2 }
+# 55 since 2026-10-08 (38 before): the plane and the ball are built 17
+# frames sooner (the compiler's conditions branch directly: 16; indexed
+# addressing: 1), so the ball starts that many pixels earlier.
+ball_x = { eq = 55, width = 2 }
 [checkpoint.ppu]
 setini = 0x40
 tm = 0x12

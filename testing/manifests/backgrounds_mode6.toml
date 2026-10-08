@@ -40,7 +40,9 @@ ts = 1
 "bgs.2.v_scroll" = 0
 
 [asserts.blocks]
-opt_row_h_words = { space = "vram", offset = "6000", hex = "222026202b202f20" }
+# The table's phase follows the boot's length: one frame shorter since the
+# compiler's indexed addressing of 2026-10-08 (22 26 2b 2f before).
+opt_row_h_words = { space = "vram", offset = "6000", hex = "232028202c203020" }
 opt_row_v_zero = { space = "vram", offset = "6040", hex = "0000000000000000" }
 
 [asserts.dma]

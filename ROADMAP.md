@@ -17,7 +17,7 @@ tag on `main` follows the first console session of the hardware protocol
 (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7): the one freeze criterion
 that needs hardware. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 17 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 30 % faster measured on luna on eighteen workloads, each of them faster (PVSnesLib is still ahead on stack depth and on the code size of three; the plan to pass it on every line is under way). 86
+produces code about 17 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 38 % faster measured on luna on eighteen workloads, each of them faster and none larger (PVSnesLib is still ahead on stack depth; the plan to pass it on every line is under way). 86
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -204,7 +204,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
 - [x] Developer guides (CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE)
-- [x] Published benchmark: 17 % (static) to 30 % (measured) faster than PVSnesLib + 816-opt overall, faster on all 18 measured workloads, deeper in stack on all (both compilers re-run and the same C measured on luna, 2026-10-08)
+- [x] Published benchmark: 17 % (static) to 38 % (measured) faster than PVSnesLib + 816-opt overall, faster and no larger on all 18 measured workloads, deeper in stack on all (both compilers re-run and the same C measured on luna, 2026-10-08)
 - [x] CHANGELOG, CONTRIBUTING (with branching policy), GitHub templates
 
 ### Developer tooling

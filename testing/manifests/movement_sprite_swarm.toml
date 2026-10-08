@@ -30,35 +30,35 @@ frames = 300
 [[checkpoint]]                 # outbound: both velocities positive
 at_frame = 60
 [checkpoint.values]
-swarm_frame  = { eq = 54, width = 2 }        # 60 - 6 boot frames
-"bx.main"           = { eq = 114, width = 1 }
-"by.main"           = { eq = 122, width = 1 }
+swarm_frame  = { eq = 55, width = 2 }        # 60 - 6 boot frames
+"bx.main"           = { eq = 116, width = 1 }
+"by.main"           = { eq = 124, width = 1 }
 "bvx.main"          = { eq = 2, width = 1 }
 "bvy.main"          = { eq = 2, width = 1 }
-oamMemory    = { eq = 114, width = 1 }       # oamMemory[0] == bx[0]
-"oamMemory+1"    = { eq = 121, width = 1 }       # oamMemory[1] == by[0] - 1
+oamMemory    = { eq = 116, width = 1 }       # oamMemory[0] == bx[0]
+"oamMemory+1"    = { eq = 123, width = 1 }       # oamMemory[1] == by[0] - 1
 
 [[checkpoint]]                 # after both edge bounces: both negative
 at_frame = 160
 [checkpoint.values]
-swarm_frame  = { eq = 154, width = 2 }
-"bx.main"           = { eq = 182, width = 1 }
-"by.main"           = { eq = 94,  width = 1 }
+swarm_frame  = { eq = 155, width = 2 }
+"bx.main"           = { eq = 180, width = 1 }
+"by.main"           = { eq = 92,  width = 1 }
 "bvx.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at XMAX
 "bvy.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at YMAX
-oamMemory    = { eq = 182, width = 1 }
-"oamMemory+1"    = { eq = 93,  width = 1 }
+oamMemory    = { eq = 180, width = 1 }
+"oamMemory+1"    = { eq = 91,  width = 1 }
 
 [[checkpoint]]                 # X has bounced back off XMIN, Y still inbound
 at_frame = 300
 [checkpoint.values]
-swarm_frame  = { eq = 294, width = 2 }       # 300 - 6: no frame was ever dropped
-"bx.main"           = { eq = 114, width = 1 }
-"by.main"           = { eq = 198, width = 1 }
+swarm_frame  = { eq = 295, width = 2 }       # 300 - 6: no frame was ever dropped
+"bx.main"           = { eq = 116, width = 1 }
+"by.main"           = { eq = 196, width = 1 }
 "bvx.main"          = { eq = 2, width = 1 }
 "bvy.main"          = { eq = 0xFE, width = 1 }
-oamMemory    = { eq = 114, width = 1 }
-"oamMemory+1"    = { eq = 197, width = 1 }
+oamMemory    = { eq = 116, width = 1 }
+"oamMemory+1"    = { eq = 195, width = 1 }
 
 [asserts.oam]                  # the whole flock really reaches the PPU
 visible = 32

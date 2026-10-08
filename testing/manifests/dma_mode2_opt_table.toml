@@ -31,17 +31,18 @@ rom = "../../examples/backgrounds/mode2/mode2.sfc"
 frames = 200
 
 [asserts.values]
-wave_phase = 380                  # +2 per loop iteration, 190 iterations by frame 200
+wave_phase = 382                  # +2 per loop iteration, 191 iterations by frame 200
 # The loop misses frames (lag_frame_counter), so the iteration count at
 # frame 200 follows the code's speed: 176 iterations until the compiler's
 # slot colouring of 2026-09-27, 178 until the tile module's asm encoder of
 # 2026-09-29 (the 16 tiles built at boot took ~14 frames in C, ~2 now),
-# 190 since. The values written are the same sequence either way: the row
-# below is the old one advanced by six entries.
+# 190 until the compiler's indexed addressing of 2026-10-08, 191 since. The
+# values written are the same sequence either way: the row below is the
+# previous one advanced by one entry.
 
 [asserts.blocks]
 opt_row0_h_offsets = { space = "vram", offset = "6000", hex = "00000000000000000000000000000000" }
-opt_row1_v_offsets = { space = "vram", offset = "6040", hex = "46203d2034202b2023201c2016201220102010201120142019201f2027202f20392042204b2054205c20632069206d206f2070206e206b206620602058205020" }
+opt_row1_v_offsets = { space = "vram", offset = "6040", hex = "44203b203220292021201b201520122010201020122015201b202120292032203b2044204d2056205e2064206a206d206f206f206d206a2064205e2056204d20" }
 # BG1 chr at word $0000: tile N is solid colour N (2 low bitplanes then 2 high).
 bg1_tile3_solid    = { space = "vram", offset = "0060", hex = "ffffffffffffffffffffffffffffffff00000000000000000000000000000000" }
 bg1_tile12_solid   = { space = "vram", offset = "0180", hex = "00000000000000000000000000000000ffffffffffffffffffffffffffffffff" }
