@@ -172,6 +172,17 @@ freeze criterion that waits for hardware.
   assert 1 then 2 across a battery file. 91 examples.
 
 ### Changed
+- **A ROM carries only the library code it uses** (build): the link now
+  drops every section nothing refers to (`wlalink -d`, on by default,
+  `LD_DISCARD=0` to go back). A module is still listed in `LIB_MODULES` as
+  before; what is left out is decided function by function. A program that
+  only calls `consoleInit()` went from about 9.8 KB of bank $00 to 2.4 KB;
+  the tightest example, tetris, goes from 1.9 KB of free code bank to
+  10.7 KB (`likemario` from 5.2 KB to 13.0 KB) and unused library variables no longer take
+  plain C RAM. Every example renders the same frames and plays the same
+  audio as before. Two things to know: a variable or function nothing
+  refers to is not in the `.sym` any more, and addresses in RAM move —
+  a test or a script that hard-codes one must read it from the `.sym`.
 - **luna pinned at v1.34.0** (testing): from v1.32.0, through v1.33.1.
   The whole suite is green and no frame, audio or WRAM baseline moves;
   `baselines.json` and `audio.json` are re-stamped, `docs/tools/luna.md`

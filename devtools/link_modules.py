@@ -74,6 +74,7 @@ LIB_MODULES := {modules}
 CSRC := main.c
 {flags}
 BANK0_FAIL_THRESHOLD := 0   # all-SUPERFREE code ROM: bank $00 is packed to the byte by design (same as testing/fixtures/libtests)
+LD_DISCARD := 0             # link every section: with -d an undeclared cross-module call would be dropped with its caller
 include $(OPENSNES)/make/common.mk
 """
 

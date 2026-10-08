@@ -79,6 +79,18 @@ BANK0_FAIL_THRESHOLD ?= 1024
 # threshold gives early drift visibility (breakout/tetris warn today —
 # deliberate: they ARE within 1 KB of the ceiling).
 RAM_FAIL_THRESHOLD ?= 512
+
+# Link only what is referenced (since 2026-10-08). wlalink -d drops every
+# section no kept section refers to: the library functions and the lib's RAM
+# a project does not use, and its own unused statics. A module is still
+# linked as a whole object; what is discarded is decided per section, and the
+# library emits one section per function. Before, a ROM carried every
+# function of every module it listed — about 9.8 KB of library in bank $00
+# for a program that calls consoleInit, where PVSnesLib (which has always
+# linked with -d) carries 2.0 KB. LD_DISCARD=0 links everything, as before;
+# `make test-link-modules` does, so that a module calling a symbol of a
+# module it does not declare still fails there.
+LD_DISCARD ?= 1
 RAM_WARN_THRESHOLD ?= 1024
 
 # Check toolchain exists (skip for 'clean' target)
@@ -667,7 +679,7 @@ endif
 
 $(TARGET): linkfile
 	@echo "[LD] $@"
-	@$(LD) -S linkfile $@
+	@$(LD) $(if $(filter 1,$(LD_DISCARD)),-d) -S linkfile $@
 ifeq ($(USE_SA1),1)
 	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
 	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.

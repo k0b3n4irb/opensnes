@@ -66,6 +66,27 @@ tried. 1024 sits 888 bytes under tetris and leaves the 2048 soft warning to
 name it at every build. Re-measure with the loop at the end of this file
 before quoting any figure here.
 
+## The link keeps only what is referenced (since 2026-10-08)
+
+`make/common.mk` links with `wlalink -d` (`LD_DISCARD ?= 1`): a section no
+kept section refers to is dropped. The library emits one section per
+function, so listing a module in `LIB_MODULES` no longer costs its whole
+size. A minimal ROM went from about 9.8 KB of library and startup code in
+bank $00 to 2.4 KB (PVSnesLib, which always linked this way: 2.0 KB; our
+remaining 0.6 KB is the mouse, Super Scope and multitap readers the NMI
+handler always calls). Across the corpus the smallest free space in bank
+$00 went from 1912 bytes (tetris) to **10 675** (tetris again; then
+likemario 13 048, mapandobjects 16 826), measured on the clean build of
+2026-10-08. `BANK0_FAIL_THRESHOLD` stays at 1024 for now: tightening it is
+the audit step described below, not a side effect of this change.
+
+What it changes for whoever writes library code: a section reached only
+through its **address** — a table of code read by offset, a blob copied by
+a hard-coded label that no instruction names — is dropped unless it is
+declared `KEEP`. Everything in the corpus is reached by symbol today;
+`make test-link-modules` links with `LD_DISCARD := 0` so that it still sees
+every cross-module reference.
+
 ## Keeping assets out of bank $00 in the first place (since 2026-07-22)
 
 Most bank-$00 pressure is not code — it is payload that never needed to

@@ -8,8 +8,8 @@ live part.
 
 | Stage | State | Commit | Figures after it |
 |---|---|---|---|
-| S0 measurement | in progress: 18 workloads, cycles / size / stack, CI gate; library bench to do | — | faster on 15 of 18, no larger on 13, no deeper in stack on 0 |
-| S1 link only what is referenced | to do | | |
+| S0 measurement | done except the library bench (`devtools/libbench`, to do before S6) | `d53f8605` | faster on 15 of 18, no larger on 13, no deeper in stack on 0 |
+| S1 link only what is referenced | done 2026-10-08. Minimal ROM 9.8 KB -> 2.4 KB in bank $00 (PVSnesLib 2.0 KB): the 0.6 KB left is the mouse / Super Scope / multitap readers the NMI handler always calls — make them linked only when their init is called, with the NMI work of S6 | this commit | same three counts (S1 does not touch codegen) |
 | S2 dead code | to do | | |
 | S3 branches | to do | | |
 | S4 addressing | to do | | |

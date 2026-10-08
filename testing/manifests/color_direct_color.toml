@@ -29,7 +29,9 @@ input = "100:0x0080,105:0"
 [checkpoint.values]
 direct_on = { eq = 0, width = 1 }
 colormath_cgwsel = { eq = 0x00, width = 1 }
-colormath_cgadsub = { eq = 0x00, width = 1 }       # the toggle must not touch colour math
+# colormath_cgadsub was asserted 0 here ("the toggle must not touch colour
+# math"). The example never refers to it, so since 2026-10-08 the link no
+# longer carries it: there is no such variable in this ROM to touch.
 
 [[checkpoint]]                 # A again -> back to direct colour
 at_frame = 220
