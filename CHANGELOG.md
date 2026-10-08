@@ -21,8 +21,8 @@ freeze criterion that waits for hardware.
   `make tests` with a fixed gate (ten pinned expressions and fifteen seeds)
   and `SEEDS=A-B` to hunt. The expected values come from a model of C's
   integer rules that clang checks under a 16-bit-int target. It also runs
-  `testing/difftest_stmt.py`, the same on small generated programs (eight
-  pinned functions and fourteen seeds).
+  `testing/difftest_stmt.py`, the same on small generated programs (ten
+  pinned functions and eighteen seeds).
 - **`opensnes budget` and `opensnes release`** (tools): the two commands
   the project tool still lacked. `budget` builds and prints one report of
   what the game uses of the console — ROM bank by bank, the C variables'
@@ -343,7 +343,7 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Fixed
-- **Seven silent miscompilations, a compiler hang and an internal error,
+- **Ten silent miscompilations, a compiler hang and an internal error,
   found by a new differential test** (compiler): `testing/difftest.py` compiles random
   integer expressions, runs them on luna and compares with C's rules for
   this target. Its first day:
@@ -359,16 +359,26 @@ freeze criterion that waits for hardware.
     and initialisers;
   - the compiler never returned on `(s16)2141188073UL * x`.
   Then, on generated programs (`testing/difftest_stmt.py`: loops, arrays,
-  a struct, pointers):
+  structs, bit-fields, pointers, switch, calls to generated helpers):
   - a variable that saves another's value before it changes in a loop read
     the new value: `for (…) { prev = cur; cur += d; }` left `prev == cur`,
     a swap in a loop left both variables equal, a Fibonacci loop returned
     512 for 55;
   - `(c ? 1 : x) > y` on 32 bits could compare a neighbouring stack slot;
   - the compiler stopped with an internal error on `a[x & 7]` when `x` is
-    a `long`.
-  No ROM of the 86 examples changes by a byte: none of them wrote these
-  forms. `if (long)` and `if (pointer)` compile to the same code as before.
+    a `long`;
+  - `do { if (g) break; } while (++j < 3);` left a wrong value in `j`;
+  - an initialiser that starts with implicit zeros — `int t[4] = { [2] = 7 };`,
+    a struct whose first bit-fields are 0 — was emitted short, and every
+    global initialised after it was read from the wrong place at startup;
+  - in a function of more than 256 temporaries (a long game loop), the
+    compiler's own tables stopped tracking without a word and a parameter
+    could be read from a stack slot nobody had written. The limit is 2048
+    and a function past it is now refused with a message.
+  Three example ROMs change (`sprite_swarm`, `rpg`, `mode7_flying`): their
+  `main` has more than 256 temporaries, so the optimisations that stopped
+  at that limit now reach its end and the code is shorter. They show the
+  same frames (`diff_corpus` 86/86 MATCH). The other 83 are byte-identical. `if (long)` and `if (pointer)` compile to the same code as before.
 - **`DECLARE_ANIM_CLIP` refuses more than 255 frames** (lib): the frame
   count went into the `u8` `AnimClip.len` through a cast, so a 256-frame
   clip had a length of 0 and `animPlay()` stopped the player, and a

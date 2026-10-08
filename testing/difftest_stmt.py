@@ -2,10 +2,14 @@
 """difftest_stmt.py — differential test of the C compiler on small programs.
 
 The statement side of testing/difftest.py: where that one compares single
-integer expressions, this one generates small functions — locals and
-parameters, global arrays, a struct reached by name, through a pointer and
-in an array, counted loops in four spellings, a pointer walking an array,
-if / else, compound assignments, ++ and -- — compiles them with cc65816,
+integer expressions, this one generates small functions — locals,
+parameters and global scalars, global arrays in one and two dimensions, a
+struct reached by name, through a pointer and in an array, bit-fields,
+counted loops in four spellings with break and continue, a pointer walking
+an array, if / else, switch with fall-through, compound assignments, ++ and
+--, stores through a pointer to a pointer, and calls to helper functions
+generated with it (pure ones, recursive ones, ones that take an array, a
+struct pointer, or a pointer to write through) — compiles them with cc65816,
 runs them on luna and compares a checksum of everything the function left
 behind (its variables, the arrays, the struct fields) with the value an
 interpreter in this script computes.
@@ -47,15 +51,21 @@ sys.path.insert(0, str(HERE))
 import difftest as D  # noqa: E402
 from lib import find_luna  # noqa: E402
 
-# The gate: the pinned functions below, twelve seeds (5, 8, 10 and 12 stopped
-# the compiler on `a[x & 7]` with a long x), and the seeds that showed the
-# two other defects of 2026-10-08 first (51, 2630).
-GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [51, 2630]
+# The gate: the pinned functions below, twelve seeds, and the seeds that
+# showed a defect first on 2026-10-08, whatever the generator has become
+# since (42, 51, 62, 2630; 336 and 2085 for the functions of more than 256
+# temporaries, which no hand-written function here reproduces).
+GATE_SEEDS = ["pinned"] + list(range(1, 13)) + [42, 51, 62, 336, 2085, 2630]
 
 # Hand-written functions for the defects this test found, reduced. Fixed-width
 # types and no operation that depends on the width of int, so the expected
 # values are the ones a host compiler gives (checked 2026-10-08).
-PINNED_GLOBALS = """s8 pin_a[8] = { 7, 3, 5, 3, -2, 1, -86, 4 };
+PINNED_GLOBALS = """u16 pin_d[4] = { [2] = 7 };
+struct PinB { unsigned int b0 : 2; unsigned int b1 : 2; u8 pad; };
+struct PinB pin_b = { 0, 0, 1 };
+u16 pin_after = 0x234;
+u16 pin_z;
+s8 pin_a[8] = { 7, 3, 5, 3, -2, 1, -86, 4 };
 u32 pin_g = 1;
 s32 pin_x = 0x00050003;
 u8 pin_t[8] = { 10, 11, 12, 13, 14, 15, 16, 17 };
@@ -92,7 +102,17 @@ PINNED = [
     ("a byte array indexed by a masked long",
      "u32 p7(void) { pin_t[pin_x & 7] = 99; return pin_t[3] + pin_t[(pin_x | 4) & 7] + pin_t[(pin_x ^ 1) & 7]; }",
      "p7()", 99 + 17 + 12),
+    # what the first moves of a branch left in A was believed to be there on the other way out
+    ("a do-while with a break that is not taken",
+     "u32 p8(void) { u8 j = 0; do { if (pin_z) break; } while (++j < 3); return j; }",
+     "p8()", 3),
+    # a zero-fill before the first value of an initialised object was not emitted:
+    # the object came out short and every init record after it was read shifted
+    ("initialisers that start with implicit zeros, and the object after them",
+     "u32 p9(void) { return ((u32)pin_d[2] << 16) | ((u16)pin_b.pad << 12) | pin_after; }",
+     "p9()", 0x00071234),
 ]
+
 PROGS_PER_ROM = 10
 TYPES = D.TYPES
 UNSIGNED = [t for t in TYPES if t not in D.SIGNED]
@@ -108,7 +128,10 @@ class UB(Exception):
 # ('v', name)               a scalar variable (local, parameter or counter)
 # ('i', array, index)       array[index]
 # ('d', array, index)       *(array + index)
-# ('f', base, field)        base is 's', 'p' (ps->) or ('a', index) for sa[index]
+# ('f', base, field)        base is 's', 'p' (ps->), 'q' (a helper's q->) or ('a', index) for sa[index]
+# ('m', matrix, i, j)       matrix[i][j]
+# ('bf', field)             bf.field, a bit-field
+# ('call', k, args)         helper k called with these arguments
 # ('c', type, e) ('u', op, e) ('b', op, l, r) ('t', c, a, b)
 
 class Prog:
@@ -123,10 +146,37 @@ class Prog:
         self.sinit = {}       # field -> initial value of `s`
         self.sainit = []      # two dicts: initial values of sa[0], sa[1]
         self.counters = []    # names never assigned by a generated statement
+        self.gvars = []       # names of the scalars declared at file scope
+        self.mats = {}        # name -> (type, [[values] * 4] * 2)
+        self.bits = []        # [(name, signed, width)] of the bit-field struct
+        self.binit = {}       # bit-field -> initial value
+        self.helpers = []     # Helper objects
+        self.ctx = []         # generator only: 'loop' / 'switch' nesting
         self.body = []
 
     def ftype(self, name):
         return dict(self.fields)[name]
+
+    def btype(self, name):
+        _, signed, width = next(b for b in self.bits if b[0] == name)
+        return "u16" if (not signed and width == 16) else "s16"
+
+
+class Helper:
+    """A function generated beside the test function and called by it.
+
+    pure  RT h(T0 a, T1 b...)        { return EXPR(a, b...); }
+    rec   RT h(u8 n, RT acc)         { if (n == 0) return acc; return h(n - 1, EXPR(acc, n)); }
+    recn  RT h(u8 n, RT acc)         { if (n == 0) return acc; rv = h(n - 1, acc); return EXPR(rv, n); }
+    sum   u32 h(T *p, u8 n)          { fold the n elements p points at }
+    set   void h(T *p, T v)          { *p = v; }
+    fld   RT h(struct S *q)          { return EXPR(q->fields); }
+    """
+
+    def __init__(self, kind, rtype, params, expr=None):
+        self.kind, self.rtype, self.params, self.expr = kind, rtype, params, expr
+        self.scope = Prog()
+        self.scope.vars = dict(params)
 
 
 def leaf(t, v):
@@ -156,6 +206,15 @@ def ev(e, P, env):
         return leaf(t, env[e[1]][idx])
     if k == "f":
         return leaf(P.ftype(e[2]), struct_of(e[1], P, env)[e[2]])
+    if k == "m":
+        i, j = ev(e[2], P, env).value, ev(e[3], P, env).value
+        if not (0 <= i < 2 and 0 <= j < 4):
+            raise UB
+        return leaf(P.mats[e[1]][0], env[e[1]][i][j])
+    if k == "bf":
+        return leaf(P.btype(e[1]), env["bf"][e[1]])
+    if k == "call":
+        return leaf(P.helpers[e[1]].rtype, call_helper(P.helpers[e[1]], e[2], P, env))
     if k == "c":
         return D.cast(e[1], ev(e[2], P, env))
     if k == "u":
@@ -176,9 +235,34 @@ def ev(e, P, env):
     raise AssertionError(e)
 
 
+def call_helper(h, args, P, env) -> int:
+    """The value a helper returns (already converted to its return type)."""
+    if h.kind == "sum":
+        t, total = P.arrays[args[0]][0], 0
+        for v in env[args[0]]:                      # t = (t << 1) ^ (u32)*p++
+            total = ((total << 1) ^ D.wrap(v, "u32")) & 0xFFFFFFFF
+        return total
+    if h.kind == "fld":
+        return D.wrap(ev(h.expr, h.scope, {"q": struct_of(args[0], P, env)}).value, h.rtype)
+    vals = [D.wrap(ev(a, P, env).value, t) for a, (_, t) in zip(args, h.params)]
+    if h.kind == "pure":
+        return D.wrap(ev(h.expr, h.scope, dict(zip((n for n, _ in h.params), vals))).value, h.rtype)
+    n, acc = vals
+    if h.kind == "rec":
+        while n:
+            acc = D.wrap(ev(h.expr, h.scope, {"n": n, "acc": acc}).value, h.rtype)
+            n -= 1
+        return acc
+    for step in range(1, n + 1):                    # recn: innermost call first
+        acc = D.wrap(ev(h.expr, h.scope, {"n": step, "rv": acc}).value, h.rtype)
+    return acc
+
+
 def struct_of(base, P, env):
     if base in ("s", "p"):
         return env["s"]
+    if base == "q":
+        return env["q"]
     idx = ev(base[1], P, env).value
     if not 0 <= idx < 2:
         raise UB
@@ -196,6 +280,12 @@ def ty(e, P):
         return P.arrays[e[1]][0]
     if k == "f":
         return P.ftype(e[2])
+    if k == "m":
+        return P.mats[e[1]][0]
+    if k == "bf":
+        return P.btype(e[1])
+    if k == "call":
+        return P.helpers[e[1]].rtype
     if k == "c":
         return e[1]
     if k == "u":
@@ -222,8 +312,14 @@ def rd(e):
     if k == "d":
         return f"(*({e[1]} + ({rd(e[2])})))"
     if k == "f":
-        base = {"s": "s.", "p": "ps->"}.get(e[1]) if isinstance(e[1], str) else f"sa[{rd(e[1][1])}]."
+        base = {"s": "s.", "p": "ps->", "q": "q->"}.get(e[1]) if isinstance(e[1], str) else f"sa[{rd(e[1][1])}]."
         return base + e[2]
+    if k == "m":
+        return f"{e[1]}[{rd(e[2])}][{rd(e[3])}]"
+    if k == "bf":
+        return "bf." + e[1]
+    if k == "call":
+        return f"h{e[1]}({', '.join(rd_arg(a) for a in e[2])})"
     if k == "c":
         return f"(({e[1]})({rd(e[2])}))"
     if k == "u":
@@ -231,6 +327,15 @@ def rd(e):
     if k == "b":
         return f"(({rd(e[2])}) {e[1]} ({rd(e[3])}))"
     return f"(({rd(e[1])}) ? ({rd(e[2])}) : ({rd(e[3])}))"
+
+
+def rd_arg(a):
+    """A call argument: an expression, an array name, or a struct designator."""
+    if isinstance(a, str):
+        return {"s": "&s", "p": "ps"}.get(a, a)
+    if a[0] == "a":
+        return f"&sa[{rd(a[1])}]"
+    return rd(a)
 
 
 # -------------------------------------------------------------- generator --
@@ -244,11 +349,18 @@ def masked(e, n):
     return ("b", "&", e, konst("s16", n - 1))
 
 
-def gen_lvalue(rng, P):
+def gen_lvalue(rng, P, addressable=False):
+    """addressable: something `&` may be applied to (not a bit-field)."""
     pick = rng.random()
-    if pick < 0.40:
+    if pick < 0.36:
         return ("v", rng.choice([n for n in P.vars if n not in P.counters]))
-    if pick < 0.65:
+    if pick < 0.44 and P.mats:
+        return ("m", rng.choice(list(P.mats)), masked(gen_expr(rng, P, 1), 2), masked(gen_expr(rng, P, 1), 4))
+    if pick < 0.52 and P.bits and not addressable:
+        return ("bf", rng.choice(P.bits)[0])
+    if not P.arrays:                               # a helper's scope: parameters only
+        return ("v", rng.choice(list(P.vars)))
+    if pick < 0.70:
         name = rng.choice(list(P.arrays))
         n = len(P.arrays[name][1])
         return (rng.choice("iid"), name, masked(gen_expr(rng, P, 1), n))
@@ -266,6 +378,8 @@ def gen_expr(rng, P, depth):
             return ("v", rng.choice(P.counters))
         return gen_lvalue(rng, P) if depth else ("v", rng.choice(list(P.vars)))
     k = rng.random()
+    if k < 0.10 and any(h.kind != "set" for h in P.helpers):
+        return gen_call(rng, P, depth - 1)
     if k < 0.12:
         return ("c", rng.choice(TYPES), gen_expr(rng, P, depth - 1))
     if k < 0.22:
@@ -279,6 +393,58 @@ def gen_expr(rng, P, depth):
                 gen_expr(rng, P, depth - 1))
     return gen_binary(rng, P, rng.choice(D.BIN_OPS), gen_expr(rng, P, depth - 1),
                       gen_expr(rng, P, depth - 1))
+
+
+def gen_call(rng, P, depth):
+    k = rng.choice([n for n, h in enumerate(P.helpers) if h.kind != "set"])
+    h = P.helpers[k]
+    if h.kind == "sum":
+        return ("call", k, [h.array, konst("u8", len(P.arrays[h.array][1]))])
+    if h.kind == "fld":
+        return ("call", k, [rng.choice(["s", "p", ("a", masked(gen_expr(rng, P, 1), 2))])])
+    if h.kind in ("rec", "recn"):
+        return ("call", k, [konst("u8", rng.randint(0, 5)), gen_expr(rng, P, depth)])
+    return ("call", k, [gen_expr(rng, P, depth) for _ in h.params])
+
+
+def gen_helpers(rng, P):
+    """One to three helpers. A helper's body is generated in its own scope:
+    it sees its parameters only, so a call has no side effect."""
+    for _ in range(rng.randint(1, 3)):
+        kind = rng.choice(["pure", "pure", "rec", "recn", "sum", "set", "fld"])
+        rt = rng.choice(TYPES)
+        if kind == "pure":
+            h = Helper(kind, rt, [(f"x{n}", rng.choice(TYPES)) for n in range(rng.randint(1, 4))])
+            h.expr = gen_expr(rng, h.scope, 2)
+        elif kind in ("rec", "recn"):
+            rt = rng.choice(UNSIGNED)        # an accumulator: unsigned arithmetic only
+            h = Helper(kind, rt, [("n", "u8"), ("acc", rt)])
+            h.scope.vars = {"n": "u8", "acc" if kind == "rec" else "rv": rt}
+            h.expr = gen_expr(rng, h.scope, 2)
+        elif kind == "sum":
+            h = Helper(kind, "u32", [])
+            h.array = rng.choice(list(P.arrays))
+        elif kind == "set":
+            h = Helper(kind, rng.choice(TYPES), [])
+        else:
+            h = Helper(kind, rt, [])
+            h.scope.fields = P.fields
+            h.scope.vars = {}
+            h.expr = gen_fld_expr(rng, P, 2)
+        P.helpers.append(h)
+
+
+def gen_fld_expr(rng, P, depth):
+    """An expression over the fields of *q."""
+    if depth == 0 or rng.random() < 0.25:
+        if rng.random() < 0.2:
+            t = rng.choice(TYPES)
+            return konst(t, D.interesting(rng, t))
+        return ("f", "q", rng.choice(P.fields)[0])
+    scope = Prog()
+    scope.fields = P.fields
+    return gen_binary(rng, scope, rng.choice(D.BIN_OPS), gen_fld_expr(rng, P, depth - 1),
+                      gen_fld_expr(rng, P, depth - 1))
 
 
 def gen_binary(rng, P, op, l, r):
@@ -308,24 +474,47 @@ def gen_block(rng, P, depth, n):
 def gen_stmt(rng, P, depth):
     pick = rng.random()
     free = [c for c in ("i", "j") if c not in P.counters]
-    if depth > 0 and pick < 0.16:
+    if depth > 0 and pick < 0.14:
         return ("if", gen_expr(rng, P, 2), gen_block(rng, P, depth - 1, rng.randint(1, 2)),
                 gen_block(rng, P, depth - 1, rng.randint(0, 2)))
-    if depth > 0 and pick < 0.34 and free:
+    if depth > 0 and pick < 0.30 and free:
         c = free[0]
         P.counters.append(c)
+        P.ctx.append("loop")
         body = gen_block(rng, P, depth - 1, rng.randint(1, 3))
+        P.ctx.pop()
         P.counters.remove(c)
         return ("for", rng.choice("ABCD"), c, rng.randint(1, 5), body)
-    if pick < 0.42:
+    if depth > 0 and pick < 0.37:
+        labels = rng.sample(range(8), rng.randint(2, 4))
+        P.ctx.append("switch")
+        arms = [[lab, gen_block(rng, P, depth - 1, rng.randint(1, 2)), rng.random() < 0.3]
+                for lab in labels]
+        if rng.random() < 0.7:               # a default arm, anywhere
+            arms.insert(rng.randint(0, len(arms)), [None, gen_block(rng, P, depth - 1, 1), rng.random() < 0.3])
+        P.ctx.pop()
+        return ("sw", masked(gen_expr(rng, P, 2), 8), arms)
+    if pick < 0.41 and P.ctx and P.ctx[-1] == "loop":
+        return (rng.choice(["brk", "cont"]), gen_expr(rng, P, 2))
+    if pick < 0.46:
+        sets = [n for n, h in enumerate(P.helpers) if h.kind == "set"]
+        cands = [lv for lv in (gen_lvalue(rng, P, True) for _ in range(6))]
+        if sets and rng.random() < 0.5:
+            k = rng.choice(sets)
+            cands = [lv for lv in cands if ty(lv, P) == P.helpers[k].rtype]
+            if cands:
+                return ("hset", k, cands[0], gen_expr(rng, P, 2))
+        else:
+            return ("pp", ty(cands[0], P), cands[0], gen_expr(rng, P, 2))
+    if pick < 0.50:
         acc = rng.choice([n for n, t in P.vars.items() if t in UNSIGNED and n not in P.counters])
         return ("walk", rng.choice(list(P.arrays)), acc, rng.choice("+^|-"), rng.random() < 0.4)
     lv = gen_lvalue(rng, P)
     lt = ty(lv, P)
-    if pick < 0.52 and lt not in ("s16", "s32"):
+    if pick < 0.58 and lt not in ("s16", "s32"):
         return ("inc", rng.choice(["++", "--"]), rng.random() < 0.5, lv)
-    if pick < 0.68:
-        ops = ["&", "|", "^", ">>"] + (["+", "-", "*", "<<"] if lt in UNSIGNED else [])
+    if pick < 0.72:
+        ops = ["&", "|", "^", ">>"] + (["+", "-", "*", "<<"] if lt in UNSIGNED and lv[0] != "bf" else [])
         op = rng.choice(ops)
         e = gen_expr(rng, P, 2)
         if op in ("<<", ">>"):
@@ -341,7 +530,11 @@ def gen_prog(rng) -> Prog:
     P.vars["u"] = rng.choice(UNSIGNED)            # always one unsigned accumulator
     for name, t in P.vars.items():
         P.init[name] = D.interesting(rng, t)
-    P.params = [n for n in P.vars if rng.random() < 0.4]
+    P.params = [n for n in P.vars if rng.random() < 0.4]       # before the globals join P.vars
+    for n in range(rng.randint(0, 2)):                 # scalars at file scope
+        P.vars[f"g{n}"] = rng.choice(TYPES)
+        P.init[f"g{n}"] = D.interesting(rng, P.vars[f"g{n}"])
+        P.gvars.append(f"g{n}")
     for c in ("i", "j"):
         P.vars[c] = rng.choice(["u8", "u16", "s16"])
         P.init[c] = 0
@@ -351,11 +544,36 @@ def gen_prog(rng) -> Prog:
     P.fields = [(f"f{n}", rng.choice(TYPES)) for n in range(rng.randint(2, 4))]
     P.sinit = {f: D.interesting(rng, t) for f, t in P.fields}
     P.sainit = [{f: D.interesting(rng, t) for f, t in P.fields} for _ in range(2)]
+    if rng.random() < 0.6:
+        t = rng.choice(TYPES)
+        P.mats["m0"] = (t, [[D.interesting(rng, t) for _ in range(4)] for _ in range(2)])
+    if rng.random() < 0.6:
+        for n in range(rng.randint(2, 4)):
+            signed, width = rng.random() < 0.4, rng.randint(1, 12)
+            P.bits.append((f"b{n}", signed, max(width, 2) if signed else width))
+        P.binit = {name: bit_wrap(rng.getrandbits(16), signed, width) for name, signed, width in P.bits}
+    gen_helpers(rng, P)
     P.body = gen_block(rng, P, 2, rng.randint(3, 6))
     return P
 
 
+def bit_wrap(v: int, signed: bool, width: int) -> int:
+    """v stored in a bit-field of that width."""
+    v &= (1 << width) - 1
+    if signed and v >> (width - 1):
+        v -= 1 << width
+    return v
+
+
 # ------------------------------------------------------------ interpreter --
+
+class Brk(Exception):
+    pass
+
+
+class Cont(Exception):
+    pass
+
 
 def store(lv, value, P, env):
     k = lv[0]
@@ -366,6 +584,14 @@ def store(lv, value, P, env):
         if not 0 <= idx < len(env[lv[1]]):
             raise UB
         env[lv[1]][idx] = D.wrap(value, P.arrays[lv[1]][0])
+    elif k == "m":
+        i, j = ev(lv[2], P, env).value, ev(lv[3], P, env).value
+        if not (0 <= i < 2 and 0 <= j < 4):
+            raise UB
+        env[lv[1]][i][j] = D.wrap(value, P.mats[lv[1]][0])
+    elif k == "bf":
+        _, signed, width = next(b for b in P.bits if b[0] == lv[1])
+        env["bf"][lv[1]] = bit_wrap(value, signed, width)
     else:
         struct_of(lv[1], P, env)[lv[2]] = D.wrap(value, P.ftype(lv[2]))
 
@@ -382,6 +608,23 @@ def run_block(block, P, env):
             store(st[3], ev(("b", "+" if st[1] == "++" else "-", st[3], konst("s16", 1)), P, env).value, P, env)
         elif k == "if":
             run_block(st[2] if ev(st[1], P, env).value else st[3], P, env)
+        elif k in ("pp", "hset"):                 # a store through a pointer: the same store
+            store(st[-2], ev(st[-1], P, env).value, P, env)
+        elif k == "brk":
+            if ev(st[1], P, env).value:
+                raise Brk
+        elif k == "cont":
+            if ev(st[1], P, env).value:
+                raise Cont
+        elif k == "sw":
+            sel = ev(st[1], P, env).value
+            arms = st[2]
+            at = next((n for n, a in enumerate(arms) if a[0] == sel), None)
+            if at is None:
+                at = next((n for n, a in enumerate(arms) if a[0] is None), None)
+            while at is not None and at < len(arms):
+                run_block(arms[at][1], P, env)
+                at = at + 1 if arms[at][2] else None
         elif k == "walk":
             _, arr, acc, op, write = st
             for n in range(len(env[arr])):
@@ -392,20 +635,28 @@ def run_block(block, P, env):
         else:
             _, form, c, count, body = st
             ct = P.vars[c]
+            def once():
+                """The body; False when it left through `break`. `continue`
+                goes on to the loop's own step, as in C."""
+                try:
+                    run_block(body, P, env)
+                except Cont:
+                    pass
+                except Brk:
+                    return False
+                return True
+
             if form == "A":                       # for (c = 0; c < K; c++)
                 env[c] = 0
-                while env[c] < count:
-                    run_block(body, P, env)
+                while env[c] < count and once():
                     env[c] = D.wrap(env[c] + 1, ct)
             elif form == "B":                     # for (c = K; c > 0; c--)
                 env[c] = count
-                while env[c] > 0:
-                    run_block(body, P, env)
+                while env[c] > 0 and once():
                     env[c] = D.wrap(env[c] - 1, ct)
             elif form == "C":                     # c = 0; do { } while (++c < K);
                 env[c] = 0
-                while True:
-                    run_block(body, P, env)
+                while once():
                     env[c] = D.wrap(env[c] + 1, ct)
                     if not env[c] < count:
                         break
@@ -414,9 +665,8 @@ def run_block(block, P, env):
                 while True:
                     was = env[c]
                     env[c] = D.wrap(env[c] - 1, ct)
-                    if not was:
+                    if not was or not once():
                         break
-                    run_block(body, P, env)
 
 
 def expected(P) -> int:
@@ -425,6 +675,9 @@ def expected(P) -> int:
         env[name] = list(vals)
     env["s"] = dict(P.sinit)
     env["sa"] = [dict(d) for d in P.sainit]
+    for name, (_, rows) in P.mats.items():
+        env[name] = [list(r) for r in rows]
+    env["bf"] = dict(P.binit)
     run_block(P.body, P, env)
     P.final = [D.wrap(v, "u32") for v in state_values(P, env)]
     h = 0x811C9DC5
@@ -443,6 +696,11 @@ def state_values(P, env):
     for d in env["sa"]:
         for f, _ in P.fields:
             yield d[f]
+    for name in P.mats:
+        for row in env[name]:
+            yield from row
+    for name, _, _ in P.bits:
+        yield env["bf"][name]
 
 
 # ------------------------------------------------------------------ C text --
@@ -465,6 +723,19 @@ def c_block(block, ind):
                 out.append(f"{pad}}} else {{")
                 out += c_block(st[3], ind + 1)
             out.append(f"{pad}}}")
+        elif k == "pp":
+            out.append(f"{pad}{{ {st[1]} *q1 = &{rd(st[2])}; {st[1]} **q2 = &q1; **q2 = {rd(st[3])}; }}")
+        elif k == "hset":
+            out.append(f"{pad}h{st[1]}(&{rd(st[2])}, {rd(st[3])});")
+        elif k in ("brk", "cont"):
+            out.append(f"{pad}if ({rd(st[1])}) {'break' if k == 'brk' else 'continue'};")
+        elif k == "sw":
+            out.append(f"{pad}switch ({rd(st[1])}) {{")
+            for lab, blk, falls in st[2]:
+                out.append(f"{pad}{'default' if lab is None else 'case ' + str(lab)}:")
+                out += c_block(blk, ind + 1)
+                out.append(f"{pad}    {'/* falls through */' if falls else 'break;'}")
+            out.append(f"{pad}}}")
         elif k == "walk":
             _, arr, acc, op, write = st
             n = "ARRLEN_" + arr
@@ -485,45 +756,83 @@ def c_block(block, ind):
     return out
 
 
+def c_helper(h, k: int, n: int) -> str:
+    rt = h.rtype
+    if h.kind == "pure":
+        return f"{rt} h{k}({', '.join(f'{t} {nm}' for nm, t in h.params)}) {{ return {rd(h.expr)}; }}"
+    if h.kind == "rec":
+        return (f"{rt} h{k}(u8 n, {rt} acc) {{ if (n == 0) return acc; "
+                f"return h{k}(n - 1, {rd(h.expr)}); }}")
+    if h.kind == "recn":
+        return (f"{rt} h{k}(u8 n, {rt} acc) {{ {rt} rv; if (n == 0) return acc; "
+                f"rv = h{k}(n - 1, acc); return {rd(h.expr)}; }}")
+    if h.kind == "sum":
+        return (f"u32 h{k}({h.elem} *p, u8 n) {{ u32 t = 0; "
+                f"while (n--) {{ t = (t << 1) ^ (u32)*p++; }} return t; }}")
+    if h.kind == "set":
+        return f"void h{k}({rt} *p, {rt} v) {{ *p = v; }}"
+    return f"{rt} h{k}(struct S{n} *q) {{ return {rd(h.expr)}; }}"
+
+
 def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     """(file-scope text, call expression) of program n."""
     g = f"t{n}_"
-    ren = lambda s: s                                  # names are local to the function
     out = [f"/* {label}: expect 0x{exp:08X} */"]
     out.append(f"struct S{n} {{ " + " ".join(f"{t} {f};" for f, t in P.fields) + " };")
-    body = []
+    names = []                                         # file-scope names the statements use bare
+    for name in P.gvars:
+        out.append(f"{P.vars[name]} {g}{name} = {P.init[name]};")
+        names.append(name)
     for name, (t, vals) in P.arrays.items():
         out.append(f"{t} {g}{name}[{len(vals)}] = {{ {', '.join(str(v) for v in vals)} }};")
+        names.append(name)
+    for name, (t, rows) in P.mats.items():
+        out.append(f"{t} {g}{name}[2][4] = {{ " + ", ".join(
+            "{ " + ", ".join(str(v) for v in r) + " }" for r in rows) + " };")
+        names.append(name)
     out.append(f"struct S{n} {g}s = {{ {', '.join(str(P.sinit[f]) for f, _ in P.fields)} }};")
     out.append(f"struct S{n} {g}sa[2] = {{ " + ", ".join(
         "{ " + ", ".join(str(d[f]) for f, _ in P.fields) + " }" for d in P.sainit) + " };")
+    names += ["s", "sa"]
+    if P.bits:
+        out.append(f"struct B{n} {{ " + " ".join(
+            f"{'signed' if sg else 'unsigned'} int {nm} : {w};" for nm, sg, w in P.bits) + " u8 pad; };")
+        out.append(f"struct B{n} {g}bf = {{ {', '.join(str(P.binit[nm]) for nm, _, _ in P.bits)}, 1 }};")
+        names.append("bf")
+    names += [f"h{k}" for k in range(len(P.helpers))]
+    out += [f"#define {name} {g}{name}" for name in names]
+    for k, h in enumerate(P.helpers):
+        if h.kind == "sum":
+            h.elem = P.arrays[h.array][0]
+        out.append(c_helper(h, k, n))
     params = ", ".join(f"{P.vars[p]} {p}" for p in P.params) or "void"
     out.append(f"u32 t{n}({params}) {{")
     for name, t in P.vars.items():
-        if name not in P.params:
-            body.append(f"    {t} {name} = {P.init[name]};")
-    body.append(f"    struct S{n} *ps = &{g}s;")
-    body.append("    u32 h = 0x811C9DC5UL;")
+        if name not in P.params and name not in P.gvars:
+            out.append(f"    {t} {name} = {P.init[name]};")
+    out.append(f"    struct S{n} *ps = &s;")
+    out.append("    u32 h = 0x811C9DC5UL;")
     for name, (t, vals) in P.arrays.items():
-        body.append(f"    {t} *pw_{name};")
+        out.append(f"    {t} *pw_{name};")
     text = "\n".join(c_block(P.body, 1))
     for name, (t, vals) in P.arrays.items():
         text = text.replace("ARRLEN_" + name, str(len(vals)))
-    # the globals carry the test's prefix; the statements name them bare
-    defs = [f"#define {name} {g}{name}" for name in list(P.arrays) + ["s", "sa"]]
-    undefs = [f"#undef {name}" for name in list(P.arrays) + ["s", "sa"]]
-    mix = []
-    for name in P.vars:
-        mix.append(f"(u32){name}")
+    if text:
+        out.append(text)
+    mix = [f"(u32){name}" for name in P.vars]
     for name, (t, vals) in P.arrays.items():
         mix += [f"(u32){name}[{k}]" for k in range(len(vals))]
     mix += [f"(u32)s.{f}" for f, _ in P.fields]
     mix += [f"(u32)sa[{k}].{f}" for k in range(2) for f, _ in P.fields]
-    hash_lines = [f"    h = (h ^ {m}) * {FNV_PRIME}UL;" for m in mix]
+    for name in P.mats:
+        mix += [f"(u32){name}[{i}][{j}]" for i in range(2) for j in range(4)]
+    mix += [f"(u32)bf.{nm}" for nm, _, _ in P.bits]
     if probe:                 # every piece of state, one by one, for a failing program
-        hash_lines = [f"    probe[{k}] = {m};" for k, m in enumerate(mix)] + hash_lines
+        out += [f"    probe[{k}] = {m};" for k, m in enumerate(mix)]
         P.probe_names = [m[5:] for m in mix]
-    out = out[:-1] + defs + [out[-1]] + body + [text] + hash_lines + ["    return h;", "}"] + undefs
+    out += [f"    h = (h ^ {m}) * {FNV_PRIME}UL;" for m in mix]
+    out += ["    return h;", "}"]
+    out += [f"#undef {name}" for name in names]
     call = f"t{n}({', '.join(D.literal(P.vars[p], P.init[p]) for p in P.params)})"
     return "\n".join(out), call
 
@@ -581,7 +890,7 @@ def run_batch(cases: list, name: str, luna: str):
             return f"luna gave no state for {rom}:\n{out.stderr[-800:]}"
         if int.from_bytes(bytes.fromhex(peeks[1]["bytes_hex"]), "little") == D.DONE_MAGIC:
             break
-        if steps >= 128_000_000:
+        if steps >= 16_000_000:
             return f"{rom} never reached the end of main (done != 0x{D.DONE_MAGIC:04X})"
         steps *= 4
     raw = bytes.fromhex(peeks[0]["bytes_hex"])
@@ -615,6 +924,8 @@ def probe_case(case: Case, luna: str, name: str) -> list:
         got = int.from_bytes(raw[k * 4:k * 4 + 4], "little")
         if got != exp:
             lines.append(f"  wrong: {nm} = 0x{got:08X}, expected 0x{exp:08X}")
+    if all(b == 0 for b in raw):
+        return ["  (the program never reached its end: nothing was written out)"]
     return lines or ["  (every variable is right when read one by one: the checksum itself differs)"]
 
 
@@ -650,12 +961,33 @@ def run_pinned(luna: str):
     return "pinned", (1 if msgs else 0), msgs
 
 
+def verdicts(cases: list, name: str, luna: str):
+    """True per case that fails. A ROM that does not finish (a program that
+    crashes takes the others with it) is run again one program at a time; a
+    program that does not finish alone fails. A build error is returned as text."""
+    res = run_batch(cases, name, luna)
+    if not isinstance(res, str):
+        return [got != c.expected for c, got in zip(cases, res)]
+    if "never reached" not in res:
+        return res
+    if len(cases) == 1:
+        return [True]
+    out = []
+    for k, c in enumerate(cases):
+        one = verdicts([c], f"{name}_one{k}", luna)
+        if isinstance(one, str):
+            return one
+        out += one
+    return out
+
+
 def without(block, path):
     """A copy of the block with the statement at `path` removed."""
     block = copy.deepcopy(block)
     cur = block
     for step in path[:-1]:
-        cur = cur[step[0]][step[1]]
+        for key in step:
+            cur = cur[key]
     del cur[path[-1]]
     return block
 
@@ -668,6 +1000,9 @@ def stmt_paths(block, prefix=()):
             yield from stmt_paths(st[3], prefix + ((n, 3),))
         elif st[0] == "for":
             yield from stmt_paths(st[4], prefix + ((n, 4),))
+        elif st[0] == "sw":
+            for a, arm in enumerate(st[2]):
+                yield from stmt_paths(arm[1], prefix + ((n, 2, a, 1),))
 
 
 def reduce_case(case: Case, luna: str, name: str) -> Case:
@@ -685,10 +1020,10 @@ def reduce_case(case: Case, luna: str, name: str) -> Case:
         hit = None
         for i in range(0, len(cands), PROGS_PER_ROM):
             chunk = cands[i:i + PROGS_PER_ROM]
-            res = run_batch(chunk, f"{name}_reduce{rnd}_{i // PROGS_PER_ROM}", luna)
+            res = verdicts(chunk, f"{name}_reduce{rnd}_{i // PROGS_PER_ROM}", luna)
             if isinstance(res, str):
                 return best
-            hit = next((c for c, got in zip(chunk, res) if got != c.expected), None)
+            hit = next((c for c, bad in zip(chunk, res) if bad), None)
             if hit:
                 break
         if not hit:
@@ -701,13 +1036,13 @@ def run_seed(seed, luna: str, keep: bool):
         return run_pinned(luna)
     cases = make_cases(seed)
     name = f"stmt_{seed}"
-    res = run_batch(cases, name, luna)
+    res = verdicts(cases, name, luna)
     if isinstance(res, str):
         return seed, 2, [f"seed {seed}: {res}"]
     msgs = []
-    for c, got in zip(cases, res):
-        if got != c.expected:
-            msgs.append(f"MISMATCH {c.label}: expected 0x{c.expected:08X}, got 0x{got:08X}")
+    for c, bad in zip(cases, res):
+        if bad:
+            msgs.append(f"MISMATCH {c.label}: expected 0x{c.expected:08X} (a wrong checksum, or the program never returned)")
             small = reduce_case(c, luna, name)
             msgs.append(f"  reduced to {sum(1 for _ in stmt_paths(small.P.body))} statement(s):")
             msgs += ["    " + ln for ln in c_prog(small.P, 0, small.label, small.expected)[0].splitlines()]

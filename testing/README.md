@@ -199,21 +199,27 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   of them within the first 192 expressions (`.claude/notes/status/silent_defects_log.md`).
   It covers integer expressions only; the programs are the next entry.
 - **Compiler differential test, programs** (`difftest_stmt.py`, same target,
-  in `make tests` since 2026-10-08) — small generated functions: locals and
-  parameters, global arrays, a struct reached by name, through a pointer and
-  in an array, counted loops in four spellings, a pointer walking an array,
-  `if` / `else`, compound assignments, `++` / `--`. The ROM returns a
-  checksum of everything the function left behind; the expected one comes
-  from an interpreter in the script that evaluates each expression with the
-  model above. A program that would meet undefined behaviour is thrown away.
-  A failing program is reduced statement by statement, then run again
-  writing each variable out, so the report names the wrong one. Gate: eight
-  pinned functions and fourteen seeds (148 programs). Its first day: a
-  loop-carried copy (`prev = cur; cur += d;`), a swap in a loop and
-  Fibonacci miscompiled, an internal error on `a[x & 7]` with a long `x`,
-  and a 32-bit compare reading a neighbour's stack slot. Not covered:
-  function calls between generated functions, `switch`, `goto`, pointers to
-  pointers, bit-fields, floats.
+  in `make tests` since 2026-10-08) — small generated functions: locals,
+  parameters and global scalars, arrays in one and two dimensions, a struct
+  reached by name, through a pointer and in an array, bit-fields, counted
+  loops in four spellings with `break` and `continue`, a pointer walking an
+  array, `if` / `else`, `switch` with fall-through, compound assignments,
+  `++` / `--`, stores through a pointer to a pointer, and calls to helper
+  functions generated with the program (pure, recursive, taking an array, a
+  struct pointer or a pointer to write through). The ROM returns a checksum
+  of everything the function left behind; the expected one comes from an
+  interpreter in the script that evaluates each expression with the model
+  above. A program that would meet undefined behaviour is thrown away. A
+  failing program is reduced statement by statement (a program that never
+  returns counts as failing), then run again writing each variable out, so
+  the report names the wrong one. Gate: ten pinned functions and eighteen
+  seeds (190 programs). Its first day: a loop-carried copy
+  (`prev = cur; cur += d;`), a swap in a loop and Fibonacci miscompiled, a
+  `do … while` with a `break`, initialisers starting with implicit zeros, a
+  parameter read from an unwritten slot in a function of more than 256
+  temporaries, an internal error on `a[x & 7]` with a long `x`, and a 32-bit
+  compare reading a neighbour's stack slot. Not covered: `goto`, function pointers, unions,
+  floats, structs passed by value (refused by the compiler).
 - **WRAM-state regression** (`wram_regress.py`, `make test-wram`, H7) — per-frame
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
   invisible to the framebuffer. **A CI gate since 2026-09-11**, inside `make tests`

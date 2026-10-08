@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 80d542e9e3e64a61f2dfc3bd148ae486705baf5b | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 68e6e8aaf146e65b413d598bedb9e39997f77d55 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 7b064954c03b84084cf4101f08d47cb3bd2afda7 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -87,7 +87,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 88 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 89 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -99,6 +99,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+7b06495 w65816: the two ways out of a branch do not share A; leading zero-fills are data; 2048 temps, checked (difftest_stmt, 2026-10-08)
 68e6e8a w65816: phi moves as a parallel copy; the high half of a Kw operand is 0; dead high halves stay dead (difftest_stmt, 2026-10-08)
 b0b78af fold, gvn, w65816: constants and branches at the target's widths; a frame for a phi of constants (difftest, 2026-10-08)
 a89fd88 w65816: a function in section ".ram_code" joins the RAM code window
