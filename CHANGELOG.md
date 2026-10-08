@@ -389,6 +389,14 @@ freeze criterion that waits for hardware.
   the start of that line and the NMI. A faster compiler moved
   `superfx_3d`'s boot from 17 to 38 frames without changing a byte of this
   code. With the screen off it now starts at once (frame 8).
+- **An internal compiler error on a boolean compared again as a 32-bit
+  value** (compiler): a 32-bit compare reads the high half of its first
+  operand before the low one, but the backend counted it among the
+  instructions that take that operand straight from A, and skipped the
+  store of a 16-bit temporary that fed one. The slot-ownership check
+  stopped the build instead of letting the compare read another value
+  (seed 19645 of the program test, now in its gate). No ROM of the corpus
+  changes by a byte.
 - **`(y || K) && 1` could return `y != 0`** (compiler): QBE replaces a phi
   of 0 and 1 under a branch by the branch's condition, checking that both
   sides end in a jump but not that they jump to the phi's block. It folds
