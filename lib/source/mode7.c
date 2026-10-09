@@ -41,8 +41,15 @@
 /* Module state (WRAM) — mirrors the ASM's .mode7vars */
 static u16 m7_scale_x;
 static u16 m7_scale_y;
-static s8 m7_sin;
-static s8 m7_cos;
+/* The sine and cosine of the current angle. Nothing in the module reads
+ * them back: they are what a debugger or a test looks at (the
+ * mode7_rotate_scale manifest asserts them at each angle). Not `static` for
+ * that reason — a write-only static is an error to the host compiler's
+ * syntax check since clang 23 (-Wunused-but-set-global; the Windows CI leg
+ * went red on it on 2026-10-09), and rightly so for a variable nobody
+ * could read. */
+s8 m7_sin;
+s8 m7_cos;
 
 
 /* Sin LUT: 256 entries, signed 8-bit, index 64 = cos(0) = 127.
