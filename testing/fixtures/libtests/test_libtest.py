@@ -214,6 +214,8 @@ CASES = [
     ("r_world", 24, sum(w << (16 * i) for i, w in enumerate([
         0x0000, 0x0AE1, 0xDFFF, 0xE164, 0xF001, 0x3313, 0x5145, 0x0154,
         75, 0x0101, 0x0101, 0x0165]))),
+    # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
+    ("r_vq", 8, 3 | (0 << 16) | (32 << 32) | (0x0A51 << 48)),
     ("r_done",     2, 0xBEEF),
 ]
 
@@ -286,6 +288,13 @@ VRAM_CASES = [
                     0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0, 0x01, 0x02])),
     # dmaFillVRAM(0x1234, word 0x6100, 8 bytes): a word fill (was 34 34 34 34 ...)
     (0xC200, bytes([0x34, 0x12] * 4)),
+    # vramQueueFlush: a row of 8 bytes at word $6200, then a column of two
+    # words at $6240 and $6260 (32 words on); the 0-byte entry at $6300 wrote
+    # nothing
+    (0xC400, bytes([0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88])),
+    (0xC480, bytes([0x99, 0xAA])),
+    (0xC4C0, bytes([0xBB, 0xCC])),
+    (0xC600, bytes([0x00] * 8)),
 ]
 
 

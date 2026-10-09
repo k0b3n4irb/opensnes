@@ -17,6 +17,17 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`<snes/vramqueue.h>`: VRAM uploads noted during the frame, sent in
+  VBlank by one routine** (lib, module `vramqueue`; issue #165).
+  `vramQueuePush(src, addr, size, step)` notes a transfer (it returns 0
+  when the 32 entries are taken), `vramQueueFlush()` sends them all, one
+  DMA each; `VRAM_QUEUE_COLUMN` steps 32 words for a tilemap column, an
+  entry of 0 bytes is skipped. Both in assembly: as a C macro, the five
+  indexed stores of a push cost three times the call. **It buys VBlank
+  time, not time**: six 128-byte transfers cost 21,700 master cycles
+  queued against 16,600 by six `dmaCopyVram()` calls, but 10,700 of them
+  in VBlank instead of all 16,600 (`devtools/libbench`, rows `vramc`,
+  `vramq`). Five assertions in the library test ROM, VRAM bytes included.
 - **`oamPlaceWorld(&batch, cam_x, cam_y)`: the sprites of a scrolling
   game placed in one assembly call** (lib, module `sprite`; issue #165).
   For each sprite of an `OamWorldBatch` (arrays of world x, world y, tile,

@@ -43,6 +43,10 @@
 #include <snes/tile.h>
 #include <snes/apu.h>
 #include <snes/string.h>
+#include <snes/vramqueue.h>
+
+/* the VRAM upload queue (issue #165): entries before, after, free */
+u16 r_vq[4];
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -671,6 +675,17 @@ static void coverage_lot_b(void) {
     bgInitTileSetData(0xFF, lotb_vram, 16, 0x6000);
     dmaFillVRAM(0x1234, 0x6100, 8);         /* a WORD fill: 34 12 34 12 ... (was 34 34) */
     dmaCopyVram(lotb_vram + 16, 0x6008, 16);
+    /* the queue: a row of 8 bytes, an entry of 0 bytes (skipped: 0 would be
+     * 65,536 to the DMA), a column of two words — 32 words apart */
+    vramQueuePush(lotb_vram, 0x6200, 8, VRAM_QUEUE_ROW);
+    vramQueuePush(lotb_vram, 0x6300, 0, VRAM_QUEUE_ROW);
+    vramQueuePush(lotb_vram + 8, 0x6240, 4, VRAM_QUEUE_COLUMN);
+    r_vq[0] = vram_queue_count;             /* 3 */
+    vramQueueFlush();
+    r_vq[1] = vram_queue_count;             /* 0 */
+    r_vq[2] = vramQueueFree();              /* 32 */
+    vramQueueFlush();                       /* empty: returns at once */
+    r_vq[3] = 0x0A51;
     dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;

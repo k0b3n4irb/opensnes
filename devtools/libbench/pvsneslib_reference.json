@@ -69,7 +69,7 @@
     "frame": {
       "cycles": 169798,
       "detail": {
-        "__local_76": 622000,
+        "__local_92": 622000,
         "__local_162": 603800,
         "osbyte4": 587120,
         "oamSet": 411960
@@ -91,6 +91,24 @@
         "__local_58": 584040,
         "__local_59": 216702,
         "__local_60": 200862
+      }
+    },
+    "vramc": {
+      "cycles": 17400,
+      "detail": {
+        "dmaCopyVram": 212336,
+        "__local_76": 135462,
+        "__local_77": 160,
+        "__JumpTo_nmi_handler": 40
+      }
+    },
+    "vramq": {
+      "cycles": 17400,
+      "detail": {
+        "dmaCopyVram": 212336,
+        "__local_84": 135462,
+        "__local_85": 160,
+        "__JumpTo_nmi_handler": 40
       }
     }
   }

@@ -71,7 +71,7 @@
       "cycles": 142333,
       "detail": {
         "oamSet": 679800,
-        "row_frame@for_body.107": 504560,
+        "row_frame@for_body.127": 504560,
         "textPrint@do_body.45": 373600,
         "tilemapFlush": 335236
       }
@@ -92,6 +92,24 @@
         "oamPlaceWorld@next8": 147026,
         "opensnes_font_2bpp_end": 109160,
         "oamPlaceWorld@x_done": 86160
+      }
+    },
+    "vramc": {
+      "cycles": 16595,
+      "detail": {
+        "opensnes_font_2bpp_end": 206578,
+        "row_vramc@for_body.107": 121304,
+        "row_vramc@for_cont.108": 2400,
+        "row_vramc@for_cond.106": 720
+      }
+    },
+    "vramq": {
+      "cycles": 10744,
+      "detail": {
+        "vramQueueFlush@next": 142440,
+        "vramQueueFlush@entry": 60360,
+        "vramQueueFlush": 9200,
+        "vramQueueFlush@out": 2080
       }
     }
   }
