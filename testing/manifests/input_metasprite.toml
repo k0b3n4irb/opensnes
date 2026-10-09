@@ -14,7 +14,7 @@
 #     8/16 -> $00, 8/32 -> $20, 16/32 -> $60 (sprite.h: 0, 1, 3).
 #   * At the end, in mode 2, the first OAM entry is the 32x32 hero drawn
 #     LARGE at (48, 108) — the size the PPU reads from OBJSEL + the size bit;
-#     OAM holds y - 1 = 107 (sprite.h, the +1 scanline compensation).
+#     OAM holds y = 108 (107 until 2026-10-09, when the library stored y - 1).
 #
 # Measured: `luna state --until-frame N --input <the script below> --peek
 # selectedItem:2 --out -` (+ `ppu.obsel`) at 60/120/200/300 -> 0/$00, 1/$20,
@@ -55,6 +55,6 @@ obsel = 0x60                   # OBJ_SIZE16_L32 << 5
 [asserts.oam]                  # mode 2: hero32 drawn LARGE = one 32x32 entry
 [asserts.oam.sprites.0]
 x = 48
-y = 107                        # OAM holds y - 1: sprite.h compensates the PPU's +1 line
+y = 108                        # OAM holds the caller's y
 w = 32
 h = 32

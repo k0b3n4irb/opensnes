@@ -22,4 +22,4 @@ xloc = { eq = 128, width = 2 }
 # Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
 # xloc is the camera's map x: 128 at boot, +59 after 59 frames of RIGHT, back to 128 after as many of LEFT.
 [asserts]
-fbhash = "abcb585fcab9bddf"
+fbhash = "eb140a6483caf147"

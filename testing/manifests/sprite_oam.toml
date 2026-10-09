@@ -4,4 +4,4 @@
 rom = "../../examples/sprites/simple_sprite/simple_sprite.sfc"
 steps = 4000000
 [asserts.blocks]
-oamMemory = "705f1030"
+oamMemory = "70601030"

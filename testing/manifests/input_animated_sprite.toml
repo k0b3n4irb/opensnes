@@ -17,7 +17,7 @@
 #     (12, 14, 32) and 30 ticks later it is on frame floor(29 / 6) mod 3 = 1
 #     -> tile 14. Releasing the pad (frame 290) freezes everything.
 #   * LEFT reuses the right-facing tiles with flipx = 1, which reaches OAM
-#     as the H-flip bit of entry 0 (OAM y is y - 1 = -18 -> $EE, sprite.h).
+#     as the H-flip bit of entry 0 (OAM y is y = -17 -> $EF).
 #
 # Measured: `luna state --until-frame N --input "60:0x0100,120:0x0800,
 # 260:0x0200,290:0" --peek monster:8 --out -` at 120/260/290/320 ->

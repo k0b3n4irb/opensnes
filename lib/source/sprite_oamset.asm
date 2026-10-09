@@ -215,11 +215,13 @@ oamSet:
 
     lda 14,s            ; x low byte
     sta.l oamMemory,x
-    ; The PPU draws a sprite one line below its OAM y (snesdev-wiki, Sprites /
-    ; OAM; cartouche 857cd9077cef3a88): store y - 1 so that the caller's y is
-    ; the first line drawn.
+    ; y is stored as given: a sprite at OAM y = 0 begins on the first visible
+    ; line (snesdev-wiki, Sprites / OAM: "a sprite with Y=0 will appear to
+    ; begin on the first visible line"; cartouche 9dd075095fd0d965). The
+    ; library stored y - 1 from 2026-04-27 to 2026-10-09, which drew every
+    ; sprite one line too high — one line above a background scrolled to the
+    ; same y since bgSetScroll() got its own, correct, - 1 (2026-09-12).
     lda 12,s            ; y low byte
-    dec a
     sta.l oamMemory+1,x
 
     lda 15,s             ; x high byte
@@ -314,7 +316,6 @@ oamSetY:
     sep #$20
     .ACCU 8
     lda 4,s             ; y low byte
-    dec a               ; see oamSet
     sta.l oamMemory+1,x
     lda #$01
     sta.w oam_update_flag
@@ -352,7 +353,6 @@ oamSetXY:
     lda 6,s             ; x low byte
     sta.l oamMemory,x
     lda 4,s             ; y low byte
-    dec a               ; see oamSet
     sta.l oamMemory+1,x
     lda 7,s             ; x high byte
     lsr a               ; carry = bit 8 of x

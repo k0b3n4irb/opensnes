@@ -100,8 +100,7 @@ u16 oamGetX(u16 id) {
 
 u8 oamGetY(u16 id) {
     if (id >= MAX_SPRITES) return 0;
-    /* oamSetY() stores y - 1 (the PPU draws a line lower): give y back */
-    return (u8)(oam_buffer[(id << 2) + 1] + 1);
+    return oam_buffer[(id << 2) + 1];
 }
 
 void oamSetTile(u16 id, u16 tile) {

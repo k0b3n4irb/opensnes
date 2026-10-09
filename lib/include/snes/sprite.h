@@ -294,7 +294,11 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  *
  * @param id Sprite ID (0-127)
  * @param x X position (0-511, negative wraps)
- * @param y Y position (0-255, use OBJ_HIDE_Y to hide)
+ * @param y Y position (0-255, use OBJ_HIDE_Y to hide): the picture line of
+ *          the sprite's top row, 0 being the first visible line — the same
+ *          y as bgSetScroll()'s, so a sprite and the background it stands
+ *          on take the same camera value. (Until 2026-10-09 the library
+ *          stored y - 1 and every sprite was drawn one line too high.)
  * @param tile Tile number (0-511)
  * @param palette Palette (0-7)
  * @param priority Priority (0-3, 3=highest)
@@ -358,13 +362,12 @@ u16 oamGetX(u16 id);
 /**
  * @brief Read back a sprite's Y position
  *
- * The y that was given to oamSet() / oamSetY() / oamSetXY() — not the raw
- * OAM byte, which the library stores one less to cancel the PPU's
- * one-line offset.
+ * The y that was given to oamSet() / oamSetY() / oamSetXY(), which is the
+ * OAM byte.
  *
  * @param id Sprite ID (0-127)
  * @return Y position (0-255), 0 for an invalid id
- * @note A hidden sprite reads 241 (see oamHide()).
+ * @note A hidden sprite reads 240 (see oamHide()).
  */
 u8 oamGetY(u16 id);
 
@@ -789,7 +792,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 #define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
     oamMemory[_off + 2] = (u8)((_tile) & 0xFF); \
     oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
@@ -815,7 +818,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 #define oamSetXYFast(_id, _x, _y) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
     u16 _sl = (u16)(_id) & 0x03; \
     u8 _xhi = OAM_XHI_MASK(_sl); \

@@ -17,10 +17,8 @@
 #   * At the end, in mode 2, the engine packs OAM from entry 0: the 32x32
 #     hero's four pieces LARGE (entries 0-3, name table 0, first at x 64),
 #     then the 16x16 hero's six pieces SMALL (entries 4-9, tiles 256+ =
-#     name table 1 at $1000, first at x 192). Y is deliberately not pinned:
-#     this engine writes the caller's y as is (140) where oamSet() and
-#     oamDrawMetasprite() write y - 1 — an open inconsistency, reported
-#     2026-09-26, that a manifest must not freeze.
+#     name table 1 at $1000, first at x 192). Y is the caller's y (140), as
+#     everywhere in the library since 2026-10-09.
 #
 # Measured: `luna state --until-frame N --input <the script below> --peek
 # selectedItem:2 --out -` (+ ppu.obsel, ppu.inidisp) at 60/120/200/320 ->
@@ -64,14 +62,14 @@ inidisp = 0x0F
 
 [asserts.oam.sprites.0]        # hero32 piece 0, LARGE in 16/32, name table 0
 x = 64
-y = 139                        # drawn at y = 140: OAM holds y - 1, like oamSet (fixed 2026-09-26)
+y = 140                        # drawn at y = 140: OAM holds y, like oamSet (139 from 2026-09-26 to 2026-10-09, when the library stored y - 1)
 tile = 0
 w = 32
 h = 32
 
 [asserts.oam.sprites.4]        # hero16 piece 0, SMALL, name table 1 (tile 256+)
 x = 192
-y = 139
+y = 140
 tile = 256
 w = 16
 h = 16

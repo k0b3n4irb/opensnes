@@ -548,8 +548,8 @@ u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back
 extern u8 oamMemory[];   /* crt0's OAM shadow ($7E:0300, mirrored in bank $00), read back here only */
 u16 r_lerp_t256;     /* fixLerp(FIX(10), FIX(37), 256): t = 1.0 -> b = 9472 (a u8 t gave a = 2560) */
 u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */
-u16 r_oam_id256;     /* oamSetX(256, ..) then oamSetY(257, ..): refused, sprites 0/1 keep 0x21 / 0x42
-                      * (u8 ids wrapped to 0 and 1 and overwrote them) -> 0x4221 */
+u16 r_oam_id256;     /* oamSetX(256, ..) then oamSetY(257, ..): refused, sprites 0/1 keep 0x21 / 0x43
+                      * (u8 ids wrapped to 0 and 1 and overwrote them) -> 0x4321 */
 u16 r_meta_n;        /* oamDrawMetasprite(10, ..., OBJ_FLIPX), two items: next free id -> 12 */
 u16 r_meta_style;    /* oamDrawMetasprite(20, ..., 0): next free id -> 22, pieces at x 100 / 108 -> 0x6C64 in r_meta_plain */
 u16 r_meta_plain;
@@ -610,7 +610,7 @@ static void coverage_lot_c(void) {
         r_lerp_t300 = (u16)fixLerp(FIX(10), FIX(37), wide + 44);
         r_lerp_wide = (u16)fixLerp(FIX(-64), FIX(64), (u16)(wide >> 1));   /* t = 128 */
         oamSetX(0, 0x21);
-        oamSetY(1, 0x43);                   /* stored as y - 1 = 0x42 */
+        oamSetY(1, 0x43);                   /* stored as given */
         oamSetX(wide, 0x99);
         oamSetY(wide + 1, 0x77);
         r_oam_id256 = (u16)oamMemory[0] | ((u16)oamMemory[5] << 8);
@@ -1230,13 +1230,13 @@ int main(void) {
         u8 flag = oam_update_flag;
         oamSetXY(100, 300, 100);          /* ninth X bit set */
         r_oamget[0] = oamGetX(100);       /* 300 */
-        r_oamget[1] = oamGetY(100);       /* 100, not the stored 99 */
+        r_oamget[1] = oamGetY(100);       /* 100 */
         oamSetXY(101, 0, 0);
         r_oamget[2] = oamGetX(101);       /* 0 */
-        r_oamget[3] = oamGetY(101);       /* 0: stored as 255 */
+        r_oamget[3] = oamGetY(101);       /* 0 */
         oamHide(102);
         r_oamget[4] = oamGetX(102);       /* 257 */
-        r_oamget[5] = oamGetY(102);       /* 241 */
+        r_oamget[5] = oamGetY(102);       /* 240 */
         r_oamget[6] = oamGetX(200);       /* invalid id: 0 */
         r_oamget[7] = 0x0A00 | oamGetY(200);  /* 0, and the block ran */
         /* the ninth x bit and the size bit of neighbours in one byte of the
@@ -1253,7 +1253,7 @@ int main(void) {
         r_fast[2] = oamGetX(106);         /* 511 */
         r_fast[3] = oamMemory[512 + 26];  /* sprites 104-107: size 104, size 105, x 106, and 107 still hidden (x = 257) = 0x02 | 0x08 | 0x10 | 0x40 */
         oamSetY(107, 0);
-        r_fast[4] = oamMemory[107 * 4 + 1] | (oamGetY(106) << 8);   /* 255, 7 */
+        r_fast[4] = oamMemory[107 * 4 + 1] | (oamGetY(106) << 8);   /* 0, 7 */
         oamSetX(128, 5);                  /* not sprites: nothing may move */
         oamSetY(300, 5);
         oamSetXY(128, 5, 5);

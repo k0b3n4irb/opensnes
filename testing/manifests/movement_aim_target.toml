@@ -33,4 +33,4 @@ unsafe_writes = 0
 # moves it redraws seven numbers: 59 frames of RIGHT are 30 updates since 2026-10-09
 # (textPrint writes a run at once), 20 before. x 200 -> 230, y 60 -> 30.
 [asserts]
-fbhash = "962919012d5bc224"
+fbhash = "795194e749faa6b4"

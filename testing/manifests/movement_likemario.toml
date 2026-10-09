@@ -21,4 +21,4 @@ unsafe_writes = 0
 # Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
 # mario_x 48 -> 119 over 59 frames of RIGHT: acceleration, then the run speed.
 [asserts]
-fbhash = "7e26ae1fd04f5b10"
+fbhash = "4053ced56b6b66c8"

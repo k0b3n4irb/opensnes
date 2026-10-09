@@ -538,6 +538,22 @@ freeze criterion that waits for hardware.
   change by it and render the same frames.
 
 ### Fixed
+- **Every sprite was drawn one line too high** (lib; found by issue #165).
+  `oamSet()`, `oamSetY()`, `oamSetXY()`, the `oamSetFast` /
+  `oamSetXYFast` macros and the dynamic sprite engine stored `y - 1`.
+  The PPU does draw a sprite one scanline below its OAM `Y`, but it never
+  outputs scanline 0, and the two cancel: OAM `Y` = 0 is the first
+  visible line (SNESdev wiki, *Sprites*; measured on luna: an 8x8 sprite
+  with `Y` = 0 covers lines 0-7, with `Y` = 255 lines 0-6). Only a
+  background needs a correction, which `bgSetScroll()` has had since
+  0.43 — and since then a sprite sat one line above a background
+  scrolled to the same `y`: in `games/likemario` the character stood one
+  line above the floor. The library now stores `y` as given, and
+  `oamGetY()` returns the OAM byte. **Code to change**: a direct
+  `oamMemory[id * 4 + 1]` write that subtracted 1 must stop (five
+  examples did); a `y + 1` passed to `oamSet()` to line a sprite up with
+  its background must stop too. 24 example baselines move by one line.
+  `docs/hardware/OAM.md` has the arbiter's sentence and the history.
 - **A newline, a tab, a quote, a backslash or a byte above 0x7E in a string
   literal gave wrong bytes** (compiler): the front end hands such a byte to
   the back end as an octal escape, and the back end converted only the

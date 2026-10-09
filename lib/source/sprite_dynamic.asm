@@ -837,7 +837,7 @@ _o32d_no_refresh:
     ror a                           ; X bit 8 into carry
 
     lda.w oambuffer+OAM_OAMY,y        ; Y position
-    dec a                           ; OAM Y = N draws from line N+1 (snesdev-wiki, cartouche 857cd9077cef3a88): store y - 1 like oamSet (carry = X bit 8 is kept)
+                                    ; stored as given, like oamSet (see sprite_oamset.asm): OAM y = 0 is the first visible line
     xba                             ; Swap: now A = Y:X_high_bit_in_carry
     rep #$20
     .ACCU 16
@@ -1046,7 +1046,6 @@ _o16d_store_tile:
     .ACCU 8
     ror a
     lda.w oambuffer+OAM_OAMY,y
-    dec a                           ; y - 1, as above
     xba
     rep #$20
     .ACCU 16
@@ -1252,7 +1251,6 @@ _o8d_no_refresh:
     .ACCU 8
     ror a
     lda.w oambuffer+OAM_OAMY,y
-    dec a                           ; y - 1, as above
     xba
     rep #$20
     .ACCU 16

@@ -16,9 +16,8 @@
 #    (it has hit XMAX=248 and YMAX=208), +2 again in X at frame 300.
 #
 # Each leg also re-checks the hand-written OAM plumbing the example exists
-# to show: the loop writes bx into oamMemory[0] and by-1 into oamMemory[1]
-# by hand (the PPU's +1 scanline quirk), so oamMemory must equal bx and
-# by-1 exactly, at every leg. Measured (each boot shortening moved the
+# to show: the loop writes bx into oamMemory[0] and by into oamMemory[1]
+# by hand, so oamMemory must equal bx and by exactly, at every leg. Measured (each boot shortening moved the
 # positions one iteration further — 2026-09-27, then 2026-09-29 with the
 # asm tile encoder; luna diff shows the same frames one frame earlier):
 #   frame  60  bx0=114 by0=122  oam = (114, 121)
@@ -36,7 +35,7 @@ swarm_frame  = { eq = 55, width = 2 }        # 60 - 6 boot frames
 "bvx.main"          = { eq = 2, width = 1 }
 "bvy.main"          = { eq = 2, width = 1 }
 oamMemory    = { eq = 116, width = 1 }       # oamMemory[0] == bx[0]
-"oamMemory+1"    = { eq = 123, width = 1 }       # oamMemory[1] == by[0] - 1
+"oamMemory+1"    = { eq = 124, width = 1 }       # oamMemory[1] == by[0]
 
 [[checkpoint]]                 # after both edge bounces: both negative
 at_frame = 160
@@ -47,7 +46,7 @@ swarm_frame  = { eq = 155, width = 2 }
 "bvx.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at XMAX
 "bvy.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at YMAX
 oamMemory    = { eq = 180, width = 1 }
-"oamMemory+1"    = { eq = 91,  width = 1 }
+"oamMemory+1"    = { eq = 92,  width = 1 }
 
 [[checkpoint]]                 # X has bounced back off XMIN, Y still inbound
 at_frame = 300
@@ -58,7 +57,7 @@ swarm_frame  = { eq = 295, width = 2 }       # 300 - 6: no frame was ever droppe
 "bvx.main"          = { eq = 2, width = 1 }
 "bvy.main"          = { eq = 0xFE, width = 1 }
 oamMemory    = { eq = 116, width = 1 }
-"oamMemory+1"    = { eq = 195, width = 1 }
+"oamMemory+1"    = { eq = 196, width = 1 }
 
 [asserts.oam]                  # the whole flock really reaches the PPU
 visible = 32

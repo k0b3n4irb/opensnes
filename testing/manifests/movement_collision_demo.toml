@@ -34,4 +34,4 @@ unsafe_writes = 0
 # Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
 # the square walks one pixel per frame and stops at the wall: 120 -> 176 (right wall), 112 -> 152.
 [asserts]
-fbhash = "beee95d741617575"
+fbhash = "39b4d33362dc3375"

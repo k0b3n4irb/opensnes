@@ -164,7 +164,7 @@ CASES = [
     ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
     ("r_aud_on", 2, 6), ("r_aud_on_bad", 2, 0xFF), ("r_aud_on_rr", 2, 1),   # audioPlaySampleOn: the caller picks the voice
     # types: fixLerp's t is a u16 so 1.0 is reachable; sprite ids are u16 so the range check sees 256
-    ("r_lerp_t256", 2, 9472), ("r_lerp_t300", 2, 9472), ("r_oam_id256", 2, 0x4221),
+    ("r_lerp_t256", 2, 9472), ("r_lerp_t300", 2, 9472), ("r_oam_id256", 2, 0x4321),
     ("r_lerp_wide", 2, 0),       # 2026-10-03: b - a over 17 bits (was 0x8000, -128.0)
     ("r_hide_x", 2, 1),          # 2026-10-03: hidden at X = 257, not 256
     ("r_rng_boot_moved", 2, 1),  # 2026-10-03: the boot seed is latched H/V, not the $8001 of unlatched counters
@@ -200,13 +200,13 @@ CASES = [
         0x0A5A, 0x005A,  5, 0,  ord("O"), 1,
         0, 0xFFFF, 1, (-ord("C")) & 0xFFFF, 0xE0,
         ord("I"), 0x7E00, ord("D") | 0x7E00,  0x5712]))),
-    # oamGetX / oamGetY: (300, 100), (0, 0), a hidden sprite (257, 241), an invalid id (0, 0)
-    ("r_oamget", 16, sum(w << (16 * i) for i, w in enumerate([300, 100, 0, 0, 257, 241, 0, 0x0A00]))),
+    # oamGetX / oamGetY: (300, 100), (0, 0), a hidden sprite (257, 240), an invalid id (0, 0)
+    ("r_oamget", 16, sum(w << (16 * i) for i, w in enumerate([300, 100, 0, 0, 257, 240, 0, 0x0A00]))),
     # the setters in assembly since 2026-10-09: x and size bits of four
     # neighbours, ids that are not sprites, the dirty flag, scroll of a layer
     # that does not exist, the pad macros and the functions behind them
     ("r_fast", 26, sum(w << (16 * i) for i, w in enumerate([
-        40, 20, 511, 0x5A, 255 | (7 << 8), 0x5555, 1,
+        40, 20, 511, 0x5A, 0 | (7 << 8), 0x5555, 1,
         0x1234 ^ 0x0567, 0x1234, 0x9942, 0, 0, 0xFA57]))),
     ("r_done",     2, 0xBEEF),
 ]
@@ -267,7 +267,7 @@ PPU_CASES = [
     ("oam_full.4", 0x21), ("oam_full.5", 0x43), ("oam_full.6", 0x65), ("oam_full.7", 0x07),
     # lot C: oamDrawMetasprite(10, x=100, y=50, OBJ_FLIPX, 16-pixel style): item dx=0 -> 108, dx=8 -> 100;
     # bit 6 of the attribute byte is the H-flip the mirror set
-    ("oam_full.40", 108), ("oam_full.41", 49), ("oam_full.44", 100), ("oam_full.45", 49),   # OAM Y = y - 1
+    ("oam_full.40", 108), ("oam_full.41", 50), ("oam_full.44", 100), ("oam_full.45", 50),   # OAM Y = y
     ("oam_full.43", 0x40),
 ]
 

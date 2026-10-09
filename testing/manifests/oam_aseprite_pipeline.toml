@@ -7,6 +7,6 @@ steps = 3000000
 visible = { ge = 6 }
 [asserts.oam.sprites.0]
 x = 112
-y = 87
+y = 88
 w = 16
 h = 16
