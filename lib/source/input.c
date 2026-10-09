@@ -30,6 +30,9 @@ extern u8  pad_present[2];   /* [port] 1 = a pad answered its 17th serial bit (c
  * All 2-byte arrays: [0] = port 1, [1] = port 2.
  * NMI handler detects connection per-frame and handles sensitivity sync. */
 extern u8  mouse_con;          /* Bitmask: bit 0 = port 1, bit 1 = port 2 */
+/* crt0: the NMI handler's mouse reader and the pointer it is called through */
+extern void ReadMouse(void);
+extern void (*mouse_reader)(void);
 extern u8  mouse_x[2];        /* X displacement per port (sign-magnitude) */
 extern u8  mouse_y[2];        /* Y displacement per port (sign-magnitude) */
 extern u8  mouseConnect[2];   /* Per-port connection flag (set by NMI handler) */
@@ -124,6 +127,9 @@ u8 mouseInit(u8 port) {
      * The NMI handler will detect the connection per-frame, automatically
      * sync sensitivity on first connection (fixing the Nintendo mouse
      * power-on bug), and process deferred sensitivity change commands. */
+    /* The reader is linked because it is named here, and the NMI handler
+     * reaches it through this pointer: set it before the flag. */
+    mouse_reader = ReadMouse;
     if (port == 0) {
         mouse_con |= 0x01;
     } else {
@@ -180,6 +186,8 @@ u8 mouseGetSensitivity(u8 port) {
 
 /* Super Scope state (populated by VBlank ISR when scope_con != 0) */
 extern u8  scope_con;
+extern void ReadScope(void);
+extern void (*scope_reader)(void);
 extern u16 scope_sinceshot;
 extern u16 scope_shoth, scope_shotv;
 extern u16 scope_shothraw, scope_shotvraw;
@@ -201,7 +209,9 @@ u8 scopeInit(void) {
     /* Super Scope signature: bits 0-7 all 1, bits 10-11 both 0 */
     if ((val & 0x0CFF) != 0x00FF) return 0;
 
-    /* Enable Super Scope reading in NMI handler */
+    /* Enable Super Scope reading in NMI handler: the pointer the handler
+     * calls the reader through, then the flag (see mouseInit) */
+    scope_reader = ReadScope;
     scope_con = 1;
 
     /* Set default delays */

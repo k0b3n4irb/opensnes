@@ -363,6 +363,9 @@ Scope while it is (the devices are mutually exclusive).
 Nothing ever sets `snes_mplay5`. There is no detection routine, and `input.h`
 exposes no function to enable it, so the flag stays 0 for the life of every
 ROM and the routine never executes. Pads 3, 4 and 5 are unreachable today.
+Since 2026-10-09 the routine is not even linked unless something names it:
+the handler calls it through the pointer `mplay5_reader`, which whoever sets
+`snes_mplay5` must set to `ScanMPlay5` first.
 
 **Mitigation:** none — write for two players. Closing this needs three things
 together: a detection routine (the protocol is on the SNES Development Wiki),

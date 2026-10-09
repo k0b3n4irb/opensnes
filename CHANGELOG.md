@@ -468,6 +468,14 @@ freeze criterion that waits for hardware.
   `array_read` 101 → 70, `array_write` 102 → 75, `array2d_read` 150 → 117,
   `struct_sum` 82 → 55, `loop_sum` 119 → 84. `mode7/extbg` boots 4 frames
   sooner; the 86 examples render the same frames.
+- **A ROM carries the mouse, Super Scope and multitap readers only if it
+  arms them** (runtime, lib): the NMI handler called the three by name,
+  so every ROM linked them, 569 bytes. It now calls each through a pointer
+  that `mouseInit()` and `scopeInit()` set before they set the device's
+  flag. A ROM that only calls `consoleInit()` uses 1.9 KB of bank $00
+  (2.4 KB the day before, 9.8 KB before the link kept only what is
+  referenced; PVSnesLib: 2.0 KB). The
+  86 examples render the same frames and play the same audio.
 - **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
   (compiler): a consequence of the shift-width fix below; 71 example ROMs
   change by it and render the same frames.

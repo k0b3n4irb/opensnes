@@ -23,6 +23,12 @@ The NMI handler runs at VBlank (~60Hz) in this exact order:
 
 Steps 1-3 MUST complete before VBlank ends (~4KB DMA budget). Do NOT reorder them.
 
+Steps 6 and 7 (and the multitap scan of step 5) are reached through
+pointers — `mouse_reader`, `scope_reader`, `mplay5_reader` (since 2026-10-09)
+— so that a ROM which arms no such device does not link its reader. Each
+pointer is read only while its flag (`mouse_con`, `scope_con`,
+`snes_mplay5`) is set: whatever sets a flag sets the pointer FIRST.
+
 ## Handshake Protocol
 
 ```

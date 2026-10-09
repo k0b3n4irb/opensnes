@@ -189,6 +189,15 @@
     pad_keysold     dsb 10  ; Previous frame button state
     pad_keysdown    dsb 10  ; Buttons pressed this frame (edge detection)
     snes_mplay5     dsb 1   ; 1 if MultiPlayer5 adapter is connected
+    ; The three device readers below are reached through these pointers,
+    ; not by name (since 2026-10-09): a ROM that never arms a device does
+    ; not link its reader (569 bytes for the three). Each is read only
+    ; while the matching flag is set, and whoever sets the flag sets the
+    ; pointer first: mouseInit() and scopeInit() do; snes_mplay5 has no
+    ; such function (KNOWN_LIMITATIONS.md) — arm it by hand with both.
+    mouse_reader    dsb 4   ; -> ReadMouse  (24-bit pointer + padding)
+    scope_reader    dsb 4   ; -> ReadScope
+    mplay5_reader   dsb 4   ; -> ScanMPlay5
     pad_present     dsb 2   ; [port]: 1 = a pad answered its 17th serial bit (padIsConnected)
     mp5read         dsb 1   ; Temporary for MultiPlayer5 plug detection
     bg_scroll_x     dsb 8   ; u16[4] BG1-4 horizontal scroll shadows
@@ -1353,7 +1362,7 @@ FastNmi:
     ;--------------------------------------------------------------------------
     lda.w snes_mplay5
     beq @mp5_done
-        jsl ScanMPlay5
+        jsl CallMPlay5Reader
 @mp5_done:
 
     ;--------------------------------------------------------------------------
@@ -1441,7 +1450,7 @@ FastNmi:
     ; A is already 8-bit (sep #$20 from MP5 skip check above)
     lda.w mouse_con
     beq @mouse_done
-        jsl ReadMouse
+        jsl CallMouseReader
 @mouse_done:
 
     ;--------------------------------------------------------------------------
@@ -1451,7 +1460,7 @@ FastNmi:
     .ACCU 8
     lda.w scope_con
     beq @scope_done
-        jsl ReadScope
+        jsl CallScopeReader
 @scope_done:
 
     ; Clear VBlank flag (handshake: signal main thread "done")
@@ -1530,6 +1539,21 @@ WaitForVBlank:
 ;==============================================================================
 ; MultiPlayer5 Pad Reading (SUPERFREE — can be placed in any bank)
 ;==============================================================================
+
+.SECTION ".reader_calls" SEMIFREE
+;------------------------------------------------------------------------------
+; Calls through mouse_reader / scope_reader / mplay5_reader. `jml [addr]`
+; reads its 24-bit target from bank $00, where those pointers live; the
+; reader's `rtl` returns to the NMI handler's `jsl`. A, X, Y and the
+; widths are passed through untouched.
+;------------------------------------------------------------------------------
+CallMPlay5Reader:
+    jml [mplay5_reader]
+CallMouseReader:
+    jml [mouse_reader]
+CallScopeReader:
+    jml [scope_reader]
+.ENDS
 
 .SECTION ".scan_mplay5" SUPERFREE
 

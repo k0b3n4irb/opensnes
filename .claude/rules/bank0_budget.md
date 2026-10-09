@@ -72,9 +72,11 @@ before quoting any figure here.
 kept section refers to is dropped. The library emits one section per
 function, so listing a module in `LIB_MODULES` no longer costs its whole
 size. A minimal ROM went from about 9.8 KB of library and startup code in
-bank $00 to 2.4 KB (PVSnesLib, which always linked this way: 2.0 KB; our
-remaining 0.6 KB is the mouse, Super Scope and multitap readers the NMI
-handler always calls). Across the corpus the smallest free space in bank
+bank $00 to 2.4 KB, then to 1.9 KB on 2026-10-09 (PVSnesLib, which always
+linked this way: 2.0 KB) when the mouse, Super Scope and multitap readers
+stopped being called by name: the NMI handler reaches each through a
+pointer that `mouseInit()` / `scopeInit()` set, so a ROM that arms no such
+device does not link them (569 bytes). Across the corpus the smallest free space in bank
 $00 went from 1912 bytes (tetris) to **10 675** (tetris again; then
 likemario 13 048, mapandobjects 16 826), measured on the clean build of
 2026-10-08. `BANK0_FAIL_THRESHOLD` stays at 1024 for now: tightening it is
