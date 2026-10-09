@@ -1,0 +1,6 @@
+in near_target: present \tbcs @if_false\.\d+\n
+in near_target: absent \tjmp @
+in near_target: absent ^\+$
+# the far one keeps the triple: the bound says no, and the assembler would
+in far_target: present \tbcc \+\n\tjmp @if_false\.\d+\n\+\n
+in far_target: absent \tbcs @if_false

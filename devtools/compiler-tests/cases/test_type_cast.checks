@@ -21,4 +21,4 @@ in test_snes_patterns: present lda\.w #43981\n\tsta\.w u16_val\n\tlda\.w #43981\
 in test_pointer_cast: present lda 2,s\n\tsta\.w u16_val\n
 in test_pointer_cast: present tax\n\tsep #\$20\n\tlda\.l \$000001,x\n\trep #\$20\n\tand\.w #\$00FF\n\tsep #\$20\n\tsta\.w u8_val
 # u8 < u16: the u8 is zero-extended and compared unsigned.
-in test_implicit: present lda\.w u8_val\n\trep #\$20\n\tand\.w #\$00FF\n\tcmp\.w #200\n\tbcc \+
+in test_implicit: present lda\.w u8_val\n\trep #\$20\n\tand\.w #\$00FF\n\tcmp\.w #200\n\tbcs @

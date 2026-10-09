@@ -17,7 +17,7 @@ in negate_s8: present ora\.w #\$FF00\n\+\n\teor\.w #\$FFFF\n\tinc a
 # (s16)(s8)val re-extends from bit 7.
 in narrow_widen: present cmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00
 # s8 < s8: both sign-extended, then the signed-overflow-corrected branch.
-in compare_s8: present sbc(?: \d+,s|\.b tcc__lf\+\d+)\n\tbvc @scmp\.\d+\n\teor\.w #\$8000\n@scmp\.\d+:\n\tbpl \+
+in compare_s8: present sbc(?: \d+,s|\.b tcc__lf\+\d+)\n\tbvc @scmp\.\d+\n\teor\.w #\$8000\n@scmp\.\d+:\n\tbmi @
 # s16 >> 1 is arithmetic; u16 >> 8 to u8 is the high byte.
 in arith_shr: present cmp\.w #\$8000\n\tror a
 in extract_high: present xba\n\tand\.w #\$00FF

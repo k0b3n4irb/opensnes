@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 63ad4e9c6005701716f394a7c051799186a64053 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 8d514fbc213b1f5c21fffca5b99ed51792decb46 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 316955e310d0100b4205909da46ac39d28c3276c | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -89,7 +89,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 106 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 107 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -101,6 +101,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+316955e emit: a conditional over a near target is one inverted branch — `bcs @target` for `bcc + / jmp @target / +`, on an upper bound of the distance (issue #166, pattern 5; 2026-10-09)
 8d514fb emit: a plain object indexed takes abs,x, not long,x — `lda.w sym,x`, a byte and a cycle less (issue #166, pattern 3; 2026-10-09)
 58449ce emit: every octal escape of a string is a byte, not only \000 — `"\n"` came out as 0 '1' '2' (2026-10-09)
 c794f42 w65816: the frame of a leaf function is in the direct page, `tcc__lf` (2026-10-09)
