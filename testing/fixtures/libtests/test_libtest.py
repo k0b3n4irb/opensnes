@@ -192,6 +192,14 @@ CASES = [
     # one hand-derived vector that does not go through it
     ("r_tile2", 16, None), ("r_tile4", 32, None), ("r_tile8", 64, None),
     ("r_tile4_dot", 32, 0x80 | (0x80 << (8 * 16))),
+    # string module (2026-10-09): 24 words, in main.c's order — memcpy ROM->FAR
+    # and FAR->plain, memmove both ways, memset (7 bytes, then 0), strlen,
+    # strcpy, strcmp (0, -1, 1, -'C', 0xF0 - 0x10), strncpy (padded, then cut)
+    ("r_str", 48, sum(w << (16 * i) for i, w in enumerate([
+        0x01EE, 0xEE0D, 1,  0x0C01, 0,  0x0800, 0x0C02,  0x0A03, 8,
+        0x0A5A, 0x005A,  5, 0,  ord("O"), 1,
+        0, 0xFFFF, 1, (-ord("C")) & 0xFFFF, 0xE0,
+        ord("I"), 0x7E00, ord("D") | 0x7E00,  0x5712]))),
     ("r_done",     2, 0xBEEF),
 ]
 

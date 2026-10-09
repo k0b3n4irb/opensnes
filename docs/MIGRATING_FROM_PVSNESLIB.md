@@ -122,7 +122,7 @@ miscompiled silently, and each has a mechanical workaround:
 | Refused | Workaround |
 |---|---|
 | Struct passed or returned **by value** | Pass a pointer to it |
-| Struct assignment by value (`a = b`) | Copy the fields, or `memcpy` |
+| Struct assignment by value (`a = b`) | Copy the fields, or `memcpy` (`<snes/string.h>`, module `string`) |
 | Variadic functions (`...`) | Fixed-arity wrappers |
 | Inline assembly inside C | A separate `.asm` file with a C prototype |
 

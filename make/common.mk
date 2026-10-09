@@ -548,7 +548,10 @@ endef
 # even though clang's host model would flag them. -Wno-unused-parameter
 # silences callback signatures (e.g. object engine init takes minx/maxx that
 # specific objects ignore — the ABI requires them).
-CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
+# -fno-builtin: <snes/string.h> declares memcpy & co. with this target's
+# size (unsigned int, 16 bits); clang's builtin prototypes carry the host's
+# size_t and it refuses the "incompatible redeclaration" (2026-10-09).
+CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
 	-Wno-unused-parameter -Wno-error=deprecated-declarations \
 	-Wno-error=deprecated-pragma

@@ -42,6 +42,7 @@
 #include <snes/registers.h>
 #include <snes/tile.h>
 #include <snes/apu.h>
+#include <snes/string.h>
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -1061,6 +1062,76 @@ static void part_objects_irq(void) {
     irqDisable();
 }
 
+/* string module (2026-10-09): the seven functions, across the three kinds of
+ * memory — a const table (ROM), plain RAM and FAR RAM — with odd and even
+ * counts, both directions of an overlapping move, a zero count, and bytes
+ * above 0x7F in a compare. r_str[] holds 24 words; test_libtest.py has the
+ * expected value of each. */
+static const u8 s_rom[13] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+static const char s_hello[] = "HELLO";
+static const char s_hi[] = "\xF0";
+static const char s_lo[] = "\x10";
+static FAR u8 s_far[32];
+static FAR char s_buf[16];
+static u8 s_near[16];
+u16 r_str[24];
+
+static void test_string(void) {
+    u16 i;
+    volatile u16 zero = 0;
+    void FAR *p;
+    char FAR *q;
+
+    /* memcpy ROM -> FAR, 13 bytes at an odd address; the guard bytes stay */
+    memset(s_far, 0xEE, 32);
+    p = memcpy(s_far + 1, s_rom, 13);
+    r_str[0] = s_far[0] | (s_far[1] << 8);        /* EE, 1 */
+    r_str[1] = s_far[13] | (s_far[14] << 8);      /* 13, EE */
+    r_str[2] = (p == (void FAR *)(s_far + 1));
+    /* memcpy FAR -> plain, 12 bytes */
+    memset(s_near, 0, 16);
+    memcpy(s_near, s_far + 1, 12);
+    r_str[3] = s_near[0] | (s_near[11] << 8);     /* 1, 12 */
+    r_str[4] = s_near[12];                        /* untouched: 0 */
+    /* memmove, dst above src: backward, 9 bytes */
+    for (i = 0; i < 16; i++) s_near[i] = i;
+    memmove(s_near + 3, s_near, 9);
+    r_str[5] = s_near[3] | (s_near[11] << 8);     /* 0, 8 */
+    r_str[6] = s_near[2] | (s_near[12] << 8);     /* 2, 12: neighbours intact */
+    /* memmove, dst below src: forward, 8 bytes */
+    for (i = 0; i < 16; i++) s_near[i] = i;
+    memmove(s_near, s_near + 3, 8);
+    r_str[7] = s_near[0] | (s_near[7] << 8);      /* 3, 10 */
+    r_str[8] = s_near[8];                         /* 8 */
+    /* memset: 7 bytes, then none */
+    memset(s_near, 0x5A, 7);
+    r_str[9] = s_near[6] | (s_near[7] << 8);      /* 5A, 10 */
+    memset(s_near, 0x11, zero);
+    r_str[10] = s_near[0];                        /* still 5A */
+    /* strlen, on ROM and on an empty string */
+    r_str[11] = strlen(s_hello);                  /* 5 */
+    r_str[12] = strlen("");                       /* 0 */
+    /* strcpy ROM -> FAR, terminator included */
+    q = strcpy(s_buf, s_hello);
+    r_str[13] = (u8)s_buf[4] | ((u8)s_buf[5] << 8);   /* 'O', 0 */
+    r_str[14] = (q == (char FAR *)s_buf);
+    /* strcmp: equal, before, after, shorter, and unsigned bytes */
+    r_str[15] = (u16)strcmp(s_buf, s_hello);      /* 0 */
+    r_str[16] = (u16)strcmp("ABC", "ABD");        /* -1 */
+    r_str[17] = (u16)strcmp("ABD", "ABC");        /* 1 */
+    r_str[18] = (u16)strcmp("AB", "ABC");         /* -'C' */
+    r_str[19] = (u16)strcmp(s_hi, s_lo);          /* 0xF0 - 0x10 */
+    /* strncpy: shorter source pads with zeros, longer one is cut and not
+     * terminated */
+    memset(s_buf, 0x7E, 16);
+    strncpy(s_buf, "HI", 6);
+    r_str[20] = (u8)s_buf[1] | ((u8)s_buf[2] << 8);   /* 'I', 0 */
+    r_str[21] = (u8)s_buf[5] | ((u8)s_buf[6] << 8);   /* 0, 7E */
+    strncpy(s_buf + 8, "ABCDEFGH", 4);
+    r_str[22] = (u8)s_buf[11] | ((u8)s_buf[12] << 8); /* 'D', 7E */
+    r_str[23] = 0x5712;                           /* the block ran to its end */
+}
+
 int main(void) {
 
     /* audio v2 first: audioInit blocks on the APU boot + driver upload
@@ -1144,6 +1215,8 @@ int main(void) {
         t_px[0] = 5;
         tileEncode4bpp(t_px, r_tile4_dot);
     }
+
+    test_string();
 
     r_done      = 0xBEEF;
 

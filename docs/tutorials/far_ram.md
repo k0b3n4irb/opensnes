@@ -140,6 +140,37 @@ helpers taking `FAR` pointers, and `(const u8 *)` on the DMA calls. The
 ROM renders pixel for pixel the same, and bank 0 went from 1436 to 6880
 free bytes.
 
+## Copying: `<snes/string.h>`
+
+A loop in C over a plain pointer reads and writes bank $00, so it cannot
+fill a `FAR` buffer from a `const` table: the table is in ROM, the buffer in
+bank $7E. The `string` module does it. Its seven functions — `memcpy`,
+`memmove`, `memset`, `strlen`, `strcmp`, `strcpy`, `strncpy` — follow the
+full 24-bit pointer on both sides, so every pairing of ROM, plain RAM and
+`FAR` RAM works, and a ROM links only the functions it calls.
+
+```c
+#include <snes/string.h>          /* and `string` in LIB_MODULES */
+
+static const u8 level1[256] = { /* ... */ };   /* ROM, any bank */
+FAR u8 level[256];                              /* $7E:2000 and up */
+
+memcpy(level, level1, sizeof(level));   /* ROM -> FAR */
+memset(level, 0, sizeof(level));        /* clear it */
+```
+
+`memcpy` and `memset` move a word at a time: 23 CPU cycles a word in the
+copy loop, so about 12 a byte. For VRAM, CGRAM and OAM the data goes
+through PPU ports: that is DMA's job (`dmaCopyVram()` and friends), not
+`memcpy`'s.
+
+Three things differ from a desktop C library, all following from the
+target: a size is an `unsigned int`, 16 bits, so 65535 bytes at most; a
+destination is typed `FAR` (the type every pointer converts to), and the
+functions that return their destination return it as a `FAR` pointer;
+`strcmp` returns the difference of the first two differing bytes, taken
+as unsigned, of which only the sign matters.
+
 ## Debugging
 
 `symmap.py --check-ram-budget game.sym` prints both bands. In luna, a

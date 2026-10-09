@@ -17,6 +17,17 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`<snes/string.h>`: `memcpy`, `memmove`, `memset`, `strlen`, `strcmp`,
+  `strcpy`, `strncpy`** (lib, module `string`): the SDK had none of them,
+  while its own migration guide told you to use `memcpy`. Written in
+  assembly, each follows the full 24-bit pointer on both sides, so it
+  works between ROM, plain RAM and `FAR` RAM — which a C loop over a
+  plain pointer cannot do, since it reads bank $00. One section per
+  function: a ROM links only those it calls. Standard prototypes at this
+  target's widths (a size is an `unsigned int`, 16 bits); a destination
+  is typed `FAR`, the type every pointer converts to. Twenty-four
+  assertions in the library test ROM cover odd and even counts, both
+  directions of an overlapping move, a zero count and bytes above 0x7F.
 - **`make test-difftest`** (testing): the differential compiler test, in
   `make tests` with a fixed gate (ten pinned expressions and fifteen seeds)
   and `SEEDS=A-B` to hunt. The expected values come from a model of C's
