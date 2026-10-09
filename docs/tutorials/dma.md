@@ -241,6 +241,12 @@ vramQueueFlush();          /* first thing in VBlank */
 `VRAM_QUEUE_COLUMN` steps 32 words after each word, for a column of a
 32-wide tilemap.
 
+A streamed sprite frame is several strips — one per row of tiles, 512
+bytes apart in the sheet `opensnes-sprite sheet` writes and 256 words
+apart in VRAM. `vramQueuePushSprite(src, addr, size_px)` notes them all
+in one call (two strips for 16x16, four for 32x32), or none if they do
+not all fit.
+
 Be clear about what it buys. Six 128-byte transfers, measured
 (`devtools/libbench`):
 
