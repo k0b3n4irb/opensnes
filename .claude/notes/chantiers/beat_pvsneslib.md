@@ -296,3 +296,39 @@ estimation.
   The first 120 000 had one failure, seed 124152 — the gvn defect the same
   commit fixes; the 60 000 run after the fix were clean, and so is that seed.
 
+## S7: PVSnesLib's examples against ours (mapped 2026-10-09)
+
+PVSnesLib `fa758c9b` has 62 example directories; ours has 86. Read by name
+and by what each demonstrates, not built side by side.
+
+**Covered** (theirs -> ours): hello_world -> text/print_string; the
+Backgrounds (Mode0, Mode1, Mode1BG3HighPriority, Mode1ContinuosScroll,
+Mode1LZ77, Mode1MixedScroll, Mode3, Mode5, Mode7, Mode7Perspective); the
+Effects (Fading, GradientColors, HDMAGradient, MosaicShading,
+ParallaxScrolling, Transparency, TransparentWindow, Waves, Window); the
+seven Sprites; input controller / mouse / superscope; maps DynamicMap,
+mapscroll, slopemario, tiled; objects/mapandobjects; games breakout and
+likemario; audio effects, music, musicGreaterThan32k; memory_mapping ->
+memory/hirom_demo; sram -> memory/save_game; timer -> basics/timer.
+
+**No twin yet, and one is owed** (to port with the `port-example` skill,
+each with README, screenshot and a manifest):
+
+| PVSnesLib | What it shows | Note |
+|---|---|---|
+| `random` | the generator | we have `rngNext()`; no example calls it for its own sake |
+| `testregion` | NTSC / PAL detection | `getRegion()` / `isPAL()` exist, tested by `make test-pal` only |
+| `typeconsole` | the text console's modes | to read before deciding what it maps to |
+| `debug`, `breakpoints` | emulator messages and breakpoints | `debug.h` has both, no example |
+| `objects/moveobjects`, `objects/nogravityobject` | the object engine without a map | ours only shows it inside `games/mapandobjects` |
+| `maps/mapbuffer` | a map drawn from a RAM buffer | to read first |
+| `audio/music2`, `audio/musicHiROM`, `audio/effectsandmusic`, `audio/tada` | SNESMOD variants | check what `soundboard`, `sfx_from_wav` and `hirom_demo` already cover |
+| `input/mouse-data-test` | raw mouse data | probably covered by input/mouse; to check |
+| `Mode1Png`, `Mode1Scroll` | a PNG background, a scrolled one | probably covered by backgrounds/mode1 and maps/map_scroll; to check |
+
+**No twin, by decision**: `scoring` (BCD scores: non-goal),
+`Palette/GetColors` (reading CGRAM back: not provided), `input/multiplay5`
+(the multitap path cannot be armed, KNOWN_LIMITATIONS.md), the three
+`logo/*` (two of them reproduce Capcom's and Konami's boot logos: not
+ours to ship).
+
