@@ -367,10 +367,38 @@ this goes ahead of the twin bench's leftovers.
 |---|---|
 | Sprites one line above the background | fixed, `caa73986`: the library stored y - 1 for sprites; the arbiter says only the background needs it |
 | `oamPlaceWorld` (batch placement, camera, culling) | done, this commit: `lib/source/sprite_world.asm`, 12 words asserted in libtests, two `libbench` rows. 31,379 master cycles a frame against 63,783 for the same loop in C (19 sprites, 13 on screen, slow ROM): 1,650 a sprite, not the "few hundred" hoped for |
-| A VRAM upload queue drained by one assembly routine | to do next. The project has its own (`game/vramq.asm`, `vramq.h`): the reference for the shape |
+| A VRAM upload queue drained by one assembly routine | done, this commit: `<snes/vramqueue.h>`, `vramQueuePush` / `vramQueueFlush`, both assembly. Measured, and said so: it costs MORE in total than the calls it replaces (21,700 against 16,600 master cycles for six 128-byte transfers) and a third LESS in VBlank (10,700). The project's own version pushes with a C macro; compiled by us that macro costs three times the call (five indexed stores, the count reloaded each time) — a compiler finding to keep: an index used by several consecutive stores is rebuilt for each |
 | Answer on the issue | not written: published under the owner's name, needs the owner's go |
 
 The project could not be built here (its assets come from an original ROM),
 so the figures are from a reconstruction of its match screen in `libbench`;
 its own measurement, once it calls the routine, is the one that counts.
+
+## Issue #166: the compiler on per-entity loops (2026-10-09, next in line)
+
+From the same project. A loop over N entities reading parallel `u16` tables
+compiles to 76 instructions per iteration (reproduced on qbe `58449ce` with
+the issue's `place()`); about 35-50 would do. Six patterns, all visible in
+the output; these were T-stage items ("after 1.0") and move up because a
+game in C pays them on every entity, every frame. Plan posted on the issue
+(comment of 2026-10-09), in this order, one commit each, full Class A
+protocol each:
+
+0. `place()` as a bench row first (instructions and master cycles per
+   iteration, gated).
+1. pattern 3: `lda.w sym,x` for a plain (non-FAR, non-const) object.
+2. pattern 5: an inverted short branch when a safe upper bound of the
+   distance fits (a wrong bound is refused by the assembler, never
+   miscompiled).
+3. pattern 2: X kept across every instruction that does not write X (today
+   any non-indexed instruction drops it).
+4. pattern 1: the index's dead high half and the reload of what A holds.
+5. pattern 4: the store nobody reads on the loop increment.
+6. pattern 6 (loop shape, scaled index kept in X) only after the five are
+   measured: induction-variable work, days, the largest risk.
+
+Also from it: "prefer u16 in hot loops" belongs in the docs.
+
+Both issues were answered in writing on 2026-10-09 (owner's go), under the
+owner's name: what is fixed, what is measured, what is not promised.
 

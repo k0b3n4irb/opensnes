@@ -171,6 +171,7 @@ topic without naming most of the API.
 | `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
 | `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
 | `string.h` | [FAR RAM](tutorials/far_ram.md) — copying between ROM, RAM and FAR RAM | ✅ |
+| `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
 | `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects; four are fixed, the rest are in the page's Gotchas |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |

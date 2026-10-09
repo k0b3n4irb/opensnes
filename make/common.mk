@@ -325,6 +325,7 @@ _DEP_hdma            := dma math_sqrt
 _DEP_math            := math_sqrt
 _DEP_asset           := dma background
 _DEP_panel           := dma console
+_DEP_vramqueue       :=                                                         # vramQueueFlush: registers only
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)

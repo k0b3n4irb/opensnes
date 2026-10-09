@@ -14,6 +14,7 @@
  * - `<snes/collision.h>` — bounding-box collision
  * - `<snes/lzss.h>` — LZSS decompression to VRAM
  * - `<snes/string.h>` — memcpy, memset, strlen and four more
+ * - `<snes/vramqueue.h>` — VRAM uploads noted during the frame, sent in VBlank
  * - `<snes/gameloop.h>` — gameloop framework opt-in
  * - `<snes/asset.h>` — typed background / tileset bundles
  * - `<snes/scene.h>` — push/pop scene stack
@@ -137,6 +138,7 @@
  *   #include <snes/collision.h> // bounding-box collision
  *   #include <snes/lzss.h>      // LZSS decompression to VRAM
  *   #include <snes/string.h>    // memcpy, memmove, memset, strlen, strcmp, strcpy, strncpy
+ *   #include <snes/vramqueue.h> // VRAM uploads noted during the frame, sent in VBlank
  *   #include <snes/gameloop.h>  // gameloop framework opt-in
  *   #include <snes/asset.h>     // typed BgAsset / GfxAsset bundles
  *   #include <snes/scene.h>     // push/pop scene stack

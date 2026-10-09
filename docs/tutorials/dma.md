@@ -214,6 +214,50 @@ dmaCopyVram(huge_tileset, 0x4000, 16384);   /* 16 KB in one shot */
 setScreenOn();
 ```
 
+## Several small uploads in one VBlank: the queue
+
+A game that streams graphics while it plays — a sprite's new frame, the
+row or column of map a scroll uncovered — makes several small transfers in
+the same VBlank. Each `dmaCopyVram()` call spends more on its arguments
+and its setup than on a 128-byte transfer itself, and all of it in the
+VBlank, the one stretch of the frame where time is short.
+
+`<snes/vramqueue.h>` (module `vramqueue`) splits the work in two. During
+the frame the game **notes** each transfer; in VBlank one assembly routine
+**sends** them all:
+
+```c
+#include <snes/vramqueue.h>
+
+/* during the frame */
+if (!vramQueuePush(frame_tiles, 0x0000, 128, VRAM_QUEUE_ROW)) {
+    /* 32 entries are waiting: keep this one for the next frame */
+}
+
+WaitForVBlank();
+vramQueueFlush();          /* first thing in VBlank */
+```
+
+`VRAM_QUEUE_COLUMN` steps 32 words after each word, for a column of a
+32-wide tilemap.
+
+Be clear about what it buys. Six 128-byte transfers, measured
+(`devtools/libbench`):
+
+| | Whole cost | Of which in VBlank |
+|---|---:|---:|
+| six `dmaCopyVram()` calls | 16,600 | 16,600 |
+| six `vramQueuePush()` and one `vramQueueFlush()` | 21,700 | 10,700 |
+
+The queue costs **more** in total — noting an entry is a call too — and a
+third **less** in VBlank. Use it when the VBlank is what you are short of;
+for one or two uploads, or in force blank, call `dmaCopyVram()`.
+
+The budget stays yours: what does not fit in the VBlank lands in active
+display and is ignored by the PPU, with no error. A real project (issue
+#165) found six 512-byte sprite frames to be the most that fit after the
+NMI handler, and queues five.
+
 ## Lib API tour
 
 | Function | What it does |

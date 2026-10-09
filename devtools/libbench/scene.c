@@ -14,6 +14,9 @@
  */
 #include <snes.h>
 #include "which.h"
+#if !PVS
+#include <snes/vramqueue.h>
+#endif
 
 u16 res;
 u16 done;
@@ -215,6 +218,48 @@ void row_world(void) {
     }
 }
 
+/* Six small VRAM transfers, 128 bytes each, as a game streaming sprite
+ * frames makes in one VBlank (issue #165).
+ *   vramc: six dmaCopyVram() calls, both SDKs.
+ *   vramq: what the six cost IN VBLANK, where time is short. OpenSNES notes
+ *          them during the frame (not timed: both ROMs do it) and pays one
+ *          vramQueueFlush(); PVSnesLib has no queue and pays the six calls.
+ *          In total the queue costs more than the calls (noting an entry is
+ *          a call too); it is the VBlank it relieves. */
+void row_vramc(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        for (i = 0; i < 6; i++) {
+#if CALLS
+            dmaCopyVram(payload + (i << 7), 0x4000 + (i << 8), 128);
+#endif
+        }
+    }
+}
+
+void row_vramq(void) {
+    u16 r, i;
+    for (r = 0; r < REPS; r++) {
+        for (i = 0; i < 6; i++) {
+#if PVS
+#if CALLS
+            dmaCopyVram(payload + (i << 7), 0x4000 + (i << 8), 128);
+#endif
+#else
+            /* noted during the frame, in both ROMs: not what this row times */
+            vramQueuePush(payload + (i << 7), 0x4000 + (i << 8), 128, VRAM_QUEUE_ROW);
+#endif
+        }
+#if !PVS
+#if CALLS
+        vramQueueFlush();
+#else
+        vram_queue_count = 0;
+#endif
+#endif
+    }
+}
+
 /* All of it in one frame, REPS frames in a row: the pad, three scrolls, 32
  * sprites placed, 20 characters, then the frame boundary — where each SDK's
  * handler sends what the calls left for it (PVSnesLib uploads the sprite
@@ -281,6 +326,10 @@ int main(void) {
     row_worldc();
 #elif ROW == 10
     row_world();
+#elif ROW == 11
+    row_vramc();
+#elif ROW == 12
+    row_vramq();
 #endif
     done = 0x600D;
     while (1) {
