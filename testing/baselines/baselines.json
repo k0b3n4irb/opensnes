@@ -619,15 +619,15 @@
   },
   "text_scroll_message": {
     "fbhash": [
-      "c23bc54d1eb473f5",
-      "6d538aea3c577865"
+      "d93409a4d5bd98f5",
+      "0fa4c738939125d5"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.34.0",
-    "rom_sha256": "8309b91ef2a2f62d55aea58084e8600251b9a06392e1b6182ede55f4b9ba5487"
+    "rom_sha256": "15ddd773f2537d8b77cb78ef8877b2fea906077b4f8b02fabfad5b2315125b77"
   },
   "transitions_fading": {
     "fbhash": "cd685395875fba95",

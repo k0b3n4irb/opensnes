@@ -441,6 +441,12 @@ jobs:
         # pvsneslib_reference.json.
         run: python3 devtools/sdkbench/run.py --check
 
+      - name: Measured library calls (luna)
+        # The rows of devtools/libbench, OpenSNES side only: what a frame's
+        # worth of pad reads, scrolls, sprite setters, DMA and text costs,
+        # against the committed baseline.json. Fails on +10 % on a row.
+        run: python3 devtools/libbench/run.py --check
+
       - name: Upload luna artifacts on failure
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

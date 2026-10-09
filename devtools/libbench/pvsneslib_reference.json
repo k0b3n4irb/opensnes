@@ -1,0 +1,79 @@
+{
+  "pvsneslib": "fa758c9b 2025-12-28",
+  "rows": {
+    "idle": {
+      "cycles": 7184,
+      "detail": {}
+    },
+    "pad": {
+      "cycles": 11429,
+      "detail": {
+        "__local_4": 145742,
+        "padsUp": 82480,
+        "__local_5": 320,
+        "__local_2": 40
+      }
+    },
+    "scroll": {
+      "cycles": 39539,
+      "detail": {
+        "bgSetScroll": 517942,
+        "__local_12": 272640,
+        "__local_13": 80,
+        "__JumpTo_nmi_handler": 40
+      }
+    },
+    "oamset": {
+      "cycles": 81070,
+      "detail": {
+        "__local_20": 621102,
+        "osbyte4": 588404,
+        "oamSet": 411400,
+        "__local_22": 222
+      }
+    },
+    "oamxy": {
+      "cycles": 45047,
+      "detail": {
+        "oamSetXY": 491760,
+        "__local_28": 409066,
+        "__local_31": 80,
+        "__local_29": 40
+      }
+    },
+    "oamsize": {
+      "cycles": 48746,
+      "detail": {
+        "oamSetEx": 504044,
+        "__local_36": 235744,
+        "oamSetEx1nex": 121440,
+        "oamSetEx1end": 113520
+      }
+    },
+    "dma": {
+      "cycles": 17894,
+      "detail": {
+        "dmaCopyVram": 351918,
+        "__local_41": 5960
+      }
+    },
+    "text": {
+      "cycles": 84676,
+      "detail": {
+        "__local_162": 600200,
+        "consoleVblank": 349760,
+        "_psm_nextchar": 216120,
+        "__local_163": 183760
+      }
+    },
+    "frame": {
+      "cycles": 169798,
+      "detail": {
+        "__local_52": 622000,
+        "__local_162": 603800,
+        "osbyte4": 587120,
+        "oamSet": 411960
+      }
+    }
+  }
+}

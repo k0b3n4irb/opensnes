@@ -1077,6 +1077,8 @@ static u8 s_near[16];
 u16 r_str[24];
 /* oamGetX / oamGetY (2026-10-09): what was set, read back from the shadow */
 u16 r_oamget[8];
+/* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
+u16 r_fast[16];
 
 static void test_string(void) {
     u16 i;
@@ -1237,8 +1239,54 @@ int main(void) {
         r_oamget[5] = oamGetY(102);       /* 241 */
         r_oamget[6] = oamGetX(200);       /* invalid id: 0 */
         r_oamget[7] = 0x0A00 | oamGetY(200);  /* 0, and the block ran */
+        /* the ninth x bit and the size bit of neighbours in one byte of the
+         * high table (sprites 104-107) do not disturb each other */
+        oamSetX(104, 300);
+        oamSetX(105, 20);
+        oamSetSize(105, 1);
+        oamSetXY(106, 511, 7);
+        oamSetSize(104, 1);
+        oamSetX(104, 40);                 /* clears its x bit, keeps its size */
+        oamSetSize(106, 0);
+        r_fast[0] = oamGetX(104);         /* 40 */
+        r_fast[1] = oamGetX(105);         /* 20 */
+        r_fast[2] = oamGetX(106);         /* 511 */
+        r_fast[3] = oamMemory[512 + 26];  /* sprites 104-107: size 104, size 105, x 106, and 107 still hidden (x = 257) = 0x02 | 0x08 | 0x10 | 0x40 */
+        oamSetY(107, 0);
+        r_fast[4] = oamMemory[107 * 4 + 1] | (oamGetY(106) << 8);   /* 255, 7 */
+        oamSetX(128, 5);                  /* not sprites: nothing may move */
+        oamSetY(300, 5);
+        oamSetXY(128, 5, 5);
+        oamSetSize(128, 1);
+        oamSet(128, 5, 5, 1, 1, 1, 0);
+        r_fast[5] = oamMemory[512 + 27] | (oamMemory[512 + 31] << 8);  /* untouched since oamInit hid every sprite at x = 257: 0x55, 0x55 */
+        oam_update_flag = 0;
+        oamSetXY(104, 40, 1);
+        r_fast[6] = (oam_update_flag != 0);   /* 1: any non-zero value is the flag */
         oam_update_flag = flag;
     }
+    {
+        /* scroll: a layer number of 4 or more is ignored; each setter marks
+         * its layer */
+        u16 x3 = bgGetScrollX(3);
+        u16 y0 = bgGetScrollY(0);
+        bgSetScroll(3, 0x1234, 0x0567);
+        r_fast[7] = bgGetScrollX(3) ^ bgGetScrollY(3);      /* 0x1234 ^ 0x0567 */
+        bgSetScroll(4, 0x7777, 0x7777);
+        bgSetScrollX(200, 0x7777);
+        bgSetScrollY(4, 0x7777);
+        r_fast[8] = bgGetScrollX(3) + bgGetScrollY(0) - y0; /* still 0x1234 */
+        bgSetScrollX(2, 0x0042);
+        bgSetScrollY(2, 0x0099);
+        r_fast[9] = bgGetScrollX(2) | (bgGetScrollY(2) << 8);  /* 0x9942 */
+        bgSetScroll(3, x3, 0);
+        bgSetScroll(2, 0, 0);
+    }
+    /* pads: no button is down in this ROM. The macros, the functions behind
+     * them, and an index out of range (functions only) */
+    r_fast[10] = padHeld(0) | padPressed(1) | padReleased(0);          /* 0 */
+    r_fast[11] = (padHeld)(1) | (padPressed)(0) | (padHeld)(9) | (padPressed)(200) | padReleased(5);  /* 0 */
+    r_fast[12] = 0xFA57;
 
     r_done      = 0xBEEF;
 

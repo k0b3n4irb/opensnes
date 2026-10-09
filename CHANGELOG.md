@@ -371,6 +371,29 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **The library's per-frame calls, measured against PVSnesLib's for the
+  first time, and brought level or ahead** (lib, devtools). The new
+  `devtools/libbench` (`make bench-lib`) builds one scene with both SDKs
+  and times each request on luna. Its first run had OpenSNES behind on
+  seven rows of eight: pad read 3.5 times PVSnesLib's cost, `oamSetXY` 3.6
+  times, text +83 %, sprite size +41 %, scroll +13 %, `oamSet` +9 %. Now:
+  pad −10 %, scroll −30 %, `oamSet` −17 %, `oamSetXY` −1 %, sprite size
+  −39 %, 2 KB DMA level, text −20 %, a whole frame of all of it −16 %
+  (table in `docs/PERF.md`; CI refuses +10 % on a row). What changed:
+  - `padHeld(pad)` and `padPressed(pad)` are also macros over the word
+    the NMI handler filled (the functions remain: `(padHeld)(0)`, or its
+    address). The handler already stores 0 for a port without a pad, which
+    was all the functions added besides bounding the index — the macros do
+    not bound it. `padReleased` is assembly.
+  - `oamSet`, `oamSetX`, `oamSetY`, `oamSetXY`, `oamSetSize` are assembly
+    over a table of masks (512 bytes, in the asset banks); `oamSet` built
+    its mask with a shift loop, the others were compiled C.
+  - `bgSetScroll`, `bgSetScrollX`, `bgSetScrollY` are assembly. A layer
+    number of 4 or more is now ignored; it wrote past the arrays.
+  - `textPrint` (and `textPrintAt`) writes a run of printable characters
+    with the buffer position computed once; every character went through
+    three calls and a 16-bit multiply.
+  - `dmaCopyVram` no longer saves and restores the status register.
 - **The compiler no longer emits what it computed for nothing** (compiler):
   QBE moves the address of `arr[j - 1]` to the top of a loop and copies it
   back beside each use; the originals and half of the copies were left

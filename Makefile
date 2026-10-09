@@ -72,7 +72,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -568,6 +568,13 @@ bench-sdk:
 	@scripts/install-luna.sh
 	@python3 devtools/sdkbench/run.py $(if $(CHECK),--check) $(if $(UPDATE),--update)
 
+# The same library calls through OpenSNES and through PVSnesLib, timed on
+# luna: what a frame's worth of pad reads, scrolls, sprites, DMA and text
+# costs with each (the table of docs/PERF.md). Same switches as bench-sdk.
+bench-lib:
+	@scripts/install-luna.sh
+	@python3 devtools/libbench/run.py $(if $(CHECK),--check) $(if $(UPDATE),--update)
+
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
 # errors. It is NOT the default: `release` depends on `docs`, and Doxygen
 # resolves some directory links differently on Windows, so a doc warning must
@@ -717,6 +724,7 @@ help:
 	@echo "  release-examples - Create the examples archive (sources, assets, built ROMs), one per version"
 	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
 	@echo "  bench-sdk - The same C built by OpenSNES and by PVSnesLib, timed on luna (needs PVSNESLIB_HOME)"
+	@echo "  bench-lib - The same library calls through both SDKs, timed on luna (needs PVSNESLIB_HOME)"
 	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
 	@echo "  check-upgrade SRC=<dir> - List the names 1.0 removes, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"

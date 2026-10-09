@@ -83,41 +83,8 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * The C version had framesize=158 (~100+ cycles overhead per call).
  * The assembly version eliminates all frame allocation. */
 
-void oamSetX(u16 id, u16 x) {
-    if (id >= MAX_SPRITES) return;
-
-    u16 offset = id << 2;
-    oam_buffer[offset + 0] = (u8)(x & 0xFF);
-
-    /* Update X high bit in extension table */
-    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
-    u16 slot = id & 0x03;
-
-    if (x & 0x100) {
-        oam_buffer[ext_offset] = (oam_buffer[ext_offset] & ~OAM_XHI_BIT(slot)) | OAM_XHI_BIT(slot);
-    } else {
-        oam_buffer[ext_offset] &= ~OAM_XHI_BIT(slot);
-    }
-
-    OAM_TRACK_MAX(id);
-    oam_update_flag = 1;
-}
-
-void oamSetY(u16 id, u16 y) {
-    if (id >= MAX_SPRITES) return;
-    /* SNES PPU quirk: OAM_Y = N renders sprite on scanlines N+1..N+8
-     * (snesdev-wiki, Sprites / OAM: "sprites appear 1 line lower than their
-     * Y value"; cartouche 857cd9077cef3a88). Subtract 1 so caller's y
-     * matches the sprite's rendered top scanline. */
-    oam_buffer[(id << 2) + 1] = (u8)(y - 1);
-    OAM_TRACK_MAX(id);
-    oam_update_flag = 1;
-}
-
-void oamSetXY(u16 id, u16 x, u16 y) {
-    oamSetX(id, x);
-    oamSetY(id, y);
-}
+/* oamSetX(), oamSetY(), oamSetXY() and oamSetSize() are in
+ * sprite_oamset.asm with oamSet() (since 2026-10-09). */
 
 u16 oamGetX(u16 id) {
     u16 x;
@@ -166,23 +133,6 @@ void oamHide(u16 id) {
     u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
     u16 slot = id & 0x03;
     oam_buffer[ext_offset] |= OAM_XHI_BIT(slot);
-
-    OAM_TRACK_MAX(id);
-    oam_update_flag = 1;
-}
-
-void oamSetSize(u16 id, u16 large) {
-    /* All parameters u16 to avoid calling convention issues */
-    if (id >= MAX_SPRITES) return;
-
-    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
-    u16 slot = id & 0x03;
-
-    if (large) {
-        oam_buffer[ext_offset] |= OAM_SIZE_BIT(slot);
-    } else {
-        oam_buffer[ext_offset] &= ~OAM_SIZE_BIT(slot);
-    }
 
     OAM_TRACK_MAX(id);
     oam_update_flag = 1;

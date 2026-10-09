@@ -145,6 +145,19 @@ u16 padHeld(u8 pad);
  */
 u16 padReleased(u8 pad);
 
+/* padHeld() and padPressed() read one word that the NMI handler filled, so
+ * they are also macros (since 2026-10-09): a call cost about 125 CPU cycles,
+ * three times a frame in most games, for what is one load. The handler
+ * already stores 0 for a port that holds no pad, which is all the functions
+ * added. The functions remain — `(padHeld)(0)` calls one, and so does taking
+ * its address. Unlike them the macros do not check `pad`: an index above 4
+ * reads whatever follows the array. */
+extern u16 pad_keys[5];      /**< Buttons down, per pad (written by the NMI handler) */
+extern u16 pad_keysold[5];   /**< Buttons down on the previous frame */
+extern u16 pad_keysdown[5];  /**< Buttons that went down on this frame */
+#define padHeld(pad)    (pad_keys[(pad)])
+#define padPressed(pad) (pad_keysdown[(pad)])
+
 /**
  * @brief Check if controller is connected
  *

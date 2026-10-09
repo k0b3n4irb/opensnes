@@ -42,17 +42,17 @@
 ;   12,s    = pad                    (high byte of Kl high half, unused)
 ;------------------------------------------------------------------------------
 dmaCopyVram:
-    php
-
+    ; No php / plp: A is 16-bit on return, as C expects, and the index
+    ; width is not touched (6 CPU cycles a call, 2026-10-09).
     rep #$20
     .ACCU 16
-    lda 7,s                 ; vramAddr
+    lda 6,s                 ; vramAddr
     sta.l $2116             ; REG_VMADDL/H
 
-    lda 5,s                 ; size
+    lda 4,s                 ; size
     sta.l $4305             ; DMA size
 
-    lda 9,s                 ; source LOW (16-bit offset within bank)
+    lda 8,s                 ; source LOW (16-bit offset within bank)
     sta.l $4302             ; DMA source address
 
     sep #$20
@@ -60,19 +60,18 @@ dmaCopyVram:
     lda #$80
     sta.l $2115             ; REG_VMAIN: increment after high byte write
 
-    lda 11,s                ; source bank byte (Kl high half low byte)
+    lda 10,s                ; source bank byte (Kl high half low byte)
     sta.l $4304             ; DMA source bank
-
-    lda #$01
-    sta.l $4300             ; DMA mode: 2-register write (word)
 
     lda #$18
     sta.l $4301             ; Destination: VMDATAL ($2118)
 
     lda #$01
-    sta.l $420B             ; Start DMA channel 0
+    sta.l $4300             ; DMA mode: 2-register write (word)
+    sta.l $420B             ; Start DMA channel 0 (the same $01)
 
-    plp
+    rep #$20
+    .ACCU 16
     rtl
 
 ;------------------------------------------------------------------------------

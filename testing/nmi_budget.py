@@ -89,8 +89,13 @@ EXTRA = [
     # A fifth field names a `luna test` manifest whose input script drives the
     # run (merged as rom_coverage does): without a button press these hooks
     # barely run — breakout's tilemapFlush never does in 150 idle frames.
+    # A sixth field is the first frame measured. luna credits a symbol
+    # whoever called it, and textInit() calls tilemapFlush() itself, in force
+    # blank: since 2026-10-09 the boot is short enough for that call and the
+    # hook's first one to fall in the same frame (3), which read as a
+    # doubling. The row is about the hook, so it starts after the boot.
     ("basics/scene_stack", "tilemapFlush", 17652,
-     "the text module's full-map DMA from the NMI hook (a title redraw)", "state_scene_stack"),
+     "the text module's full-map DMA from the NMI hook (a title redraw)", "state_scene_stack", 10),
     ("sprites/dynamic_sprite", "oamDynamicNmiFlush", 296,
      "the dynamic-sprite engine's NMI step under the sprite manifest", "oam_dynamic_sprite"),
     ("sprites/dynamic_sprite", "oamVramQueueUpdate", 312,
@@ -129,6 +134,7 @@ def main() -> int:
         rows = [(key, "NmiHandler", ref, CEILING, why, None) for key, ref, why in SUBSET]
         rows = [r for r in rows if len(r) == 6] + \
                [(e[0], e[1], e[2], None, e[3], e[4] if len(e) > 4 else None) for e in EXTRA]
+        first = {(e[0], e[1]): e[5] for e in EXTRA if len(e) > 5}
         for key, symbol, ref, limit, why, manifest in rows:
             rom = rom_for(key)
             sym = folded_sym(rom, Path(td), symbol)
@@ -141,6 +147,8 @@ def main() -> int:
                 _, bound, script = found[0]
                 if script:
                     bound = bound + ["--input", script]
+            if (key, symbol) in first:
+                bound = ["--from-frame", str(first[(key, symbol)])] + bound
             # --report still asks for a budget, with a ceiling nothing reaches:
             # luna then prints its `budget:` line (worst frame and its number)
             # and never gates. Reading the `--top` table instead broke the day

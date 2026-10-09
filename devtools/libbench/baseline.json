@@ -1,0 +1,80 @@
+{
+  "rows": {
+    "idle": {
+      "cycles": 5780,
+      "detail": {}
+    },
+    "pad": {
+      "cycles": 10233,
+      "detail": {
+        "row_pad@for_body.10": 133760,
+        "padReleased": 64840,
+        "row_pad@for_cont.11": 3960,
+        "row_pad@for_cond.9": 1222
+      }
+    },
+    "scroll": {
+      "cycles": 27611,
+      "detail": {
+        "bgSetScroll": 318764,
+        "row_scroll@for_body.20": 198880,
+        "bgSetScroll@out": 27240,
+        "row_scroll@for_cont.21": 3760
+      }
+    },
+    "oamset": {
+      "cycles": 67010,
+      "detail": {
+        "oamSet": 688520,
+        "row_oamset@for_body.30": 505450,
+        "oamSet@x_done": 96246,
+        "oamSet@none": 28920
+      }
+    },
+    "oamxy": {
+      "cycles": 44528,
+      "detail": {
+        "row_oamxy@for_body.40": 381200,
+        "oamSetXY": 362680,
+        "oamSetXY@x_done": 96192,
+        "oamSetXY@none": 29080
+      }
+    },
+    "oamsize": {
+      "cycles": 29696,
+      "detail": {
+        "oamSetSize": 387788,
+        "row_oamsize@for_body.50": 155622,
+        "oamSetSize@none": 29040,
+        "row_oamsize@for_cont.51": 12120
+      }
+    },
+    "dma": {
+      "cycles": 17885,
+      "detail": {
+        "opensnes_font_2bpp_end": 350960,
+        "row_dma@for_body.56": 6000,
+        "row_dma@for_cont.57": 320,
+        "row_dma@for_cond.55": 126
+      }
+    },
+    "text": {
+      "cycles": 67684,
+      "detail": {
+        "textPrint@do_body.45": 373600,
+        "tilemapFlush": 335276,
+        "textPrint@scmp.11": 194080,
+        "textPrint@do_cond.46": 153640
+      }
+    },
+    "frame": {
+      "cycles": 142821,
+      "detail": {
+        "oamSet": 688880,
+        "row_frame@for_body.72": 504680,
+        "textPrint@do_body.45": 373600,
+        "tilemapFlush": 335236
+      }
+    }
+  }
+}

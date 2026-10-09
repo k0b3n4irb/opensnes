@@ -12,7 +12,7 @@ input = "60:0x0100,119:0"
 [checkpoint.delta]
 "target_x.main" = "increased"
 [checkpoint.values]
-"target_x.main" = { eq = 220, width = 2 }
+"target_x.main" = { eq = 230, width = 2 }
 "target_y.main" = { eq = 60, width = 2 }
 [[checkpoint]]                 # UP -> target_y down
 at_frame = 180
@@ -24,11 +24,13 @@ input = "120:0x0800,179:0"
 # (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
 # what a button press triggers is here, one manifest at a time).
 [checkpoint.values]
-"target_x.main" = { eq = 220, width = 2 }
-"target_y.main" = { eq = 40, width = 2 }
+"target_x.main" = { eq = 230, width = 2 }
+"target_y.main" = { eq = 30, width = 2 }
 [asserts.dma]
 unsafe_writes = 0
 # Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
-# the target moves 20 pixels per held direction then stops at its bound: x 200 -> 220, y 60 -> 40.
+# the target moves one pixel per update while a direction is held, and an update that
+# moves it redraws seven numbers: 59 frames of RIGHT are 30 updates since 2026-10-09
+# (textPrint writes a run at once), 20 before. x 200 -> 230, y 60 -> 30.
 [asserts]
-fbhash = "d5dcd3f4dfc51b74"
+fbhash = "962919012d5bc224"

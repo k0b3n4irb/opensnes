@@ -21,9 +21,7 @@
  *============================================================================*/
 
 /* These are read in the NMI handler for reliable, glitch-free input */
-extern u16 pad_keys[5];      /* Current button state (5 pads × 16 bits) */
-extern u16 pad_keysold[5];   /* Previous frame button state */
-extern u16 pad_keysdown[5];  /* Buttons pressed this frame (edge detection) */
+/* pad_keys[], pad_keysold[] and pad_keysdown[] are declared by input.h */
 extern u8  pad_present[2];   /* [port] 1 = a pad answered its 17th serial bit (crt0 NMI) */
 
 /* Mouse state — PVSnesLib-compatible indexed layout.
@@ -46,31 +44,22 @@ extern u8  mouseRequestChangeSensitivity[2]; /* Deferred sensitivity command */
  * Input Functions
  *============================================================================*/
 
-u16 padPressed(u8 pad) {
+/* The NMI handler stores 0 for a port whose device signature is not a pad's
+ * (crt0, "Invalid input - clear it"), so a word of pad_keys[] is never the
+ * $FFFF these three used to test for (until 2026-10-09): they only bound the
+ * index. padHeld and padPressed are also macros in input.h, hence the
+ * parentheses around the names here. */
+u16 (padPressed)(u8 pad) {
     if (pad >= 5) return 0;
-    u16 state = pad_keysdown[pad];
-    /* Disconnected controller reads as $FFFF - treat as no input */
-    if (pad_keys[pad] == 0xFFFF) return 0;
-    return state;
+    return pad_keysdown[pad];
 }
 
-u16 padHeld(u8 pad) {
+u16 (padHeld)(u8 pad) {
     if (pad >= 5) return 0;
-    u16 state = pad_keys[pad];
-    /* Disconnected controller reads as $FFFF - treat as no input */
-    if (state == 0xFFFF) return 0;
-    return state;
+    return pad_keys[pad];
 }
 
-u16 padReleased(u8 pad) {
-    if (pad >= 5) return 0;
-    u16 current = pad_keys[pad];
-    u16 previous = pad_keysold[pad];
-    /* Disconnected controller reads as $FFFF - treat as no input */
-    if (previous == 0xFFFF) return 0;
-    /* Buttons that were down last frame but aren't now */
-    return previous & ~current;
-}
+/* padReleased() is in input_pad.asm. */
 
 u8 padIsConnected(u8 pad) {
     /* crt0's NMI handler reads one serial bit past the 16 of auto-read on

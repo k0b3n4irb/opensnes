@@ -305,12 +305,13 @@ _DEP_text            := dma background console                                  
 _DEP_text4bpp        := dma
 _DEP_object          := map sprite sprite_dynamic                               # L2a: oambuffer (sprite_dynamic's)
 _DEP_map             := dma
-_DEP_background      := dma                                                     # L2a: dmaCopyVram
+_DEP_background      := dma background_scroll                                                     # L2a: dmaCopyVram
 _DEP_fixed32         := math                                                    # L2a: sine_table
 _DEP_snesmod         := console
 # console's C references clearNmiFlag/unmaskIrq/clearIrqFlag (dma.asm) —
 # surfaced by the first example linking console WITHOUT dma (SPC700 arc)
 _DEP_console         := dma
+_DEP_input           := input_pad                                               # padReleased (assembly)
 _DEP_superfx         := dma hdma background console
 _DEP_hdma            := dma math_sqrt
 # math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt

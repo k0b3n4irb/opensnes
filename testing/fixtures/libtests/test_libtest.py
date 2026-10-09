@@ -202,6 +202,12 @@ CASES = [
         ord("I"), 0x7E00, ord("D") | 0x7E00,  0x5712]))),
     # oamGetX / oamGetY: (300, 100), (0, 0), a hidden sprite (257, 241), an invalid id (0, 0)
     ("r_oamget", 16, sum(w << (16 * i) for i, w in enumerate([300, 100, 0, 0, 257, 241, 0, 0x0A00]))),
+    # the setters in assembly since 2026-10-09: x and size bits of four
+    # neighbours, ids that are not sprites, the dirty flag, scroll of a layer
+    # that does not exist, the pad macros and the functions behind them
+    ("r_fast", 26, sum(w << (16 * i) for i, w in enumerate([
+        40, 20, 511, 0x5A, 255 | (7 << 8), 0x5555, 1,
+        0x1234 ^ 0x0567, 0x1234, 0x9942, 0, 0, 0xFA57]))),
     ("r_done",     2, 0xBEEF),
 ]
 
