@@ -40,6 +40,7 @@ NOT_TWINS = {
     "dynamicsprite": "ours draws 4 sprites and refreshes them every 8 frames, theirs 1 every 16",
     "metasprite": "ours redraws its metasprites every frame, theirs draws them once",
     "animatedsprite": "ours plays through the anim module (animPlay + animTick), theirs steps a counter",
+    "breakout": "same game, but under this input script PVSnesLib's waits (only its handler runs) while ours plays: the script has to be fixed before the pair says anything",
 }
 # name, PVSnesLib directory, ours, input script (or None), first and last frame
 PAIRS = [

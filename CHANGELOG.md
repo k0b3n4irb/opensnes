@@ -371,6 +371,12 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **`oamMetaDrawDyn` is assembly** (lib, `sprite_dynamic_meta`): the
+  iterator that fills one dynamic-sprite entry per metasprite item and
+  calls the draw routine of its size was compiled C. The dynamic
+  metasprite example went from 77,656 to 55,364 master cycles of work a
+  frame (PVSnesLib's twin: 44,332 — its iterator draws each item itself
+  instead of calling a routine per item, which is the difference left).
 - **The object engine copies an object twice per update where it copied
   it six times** (lib/contrib, `object`): `objWorkspace` moved from bank
   $00 to right behind the object pool, so `objCollidMap`,

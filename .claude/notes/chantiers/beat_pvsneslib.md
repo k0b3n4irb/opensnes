@@ -349,5 +349,8 @@ First pass, 26 pairs: ahead on 17, behind on 9. Read so far:
 | mapandobjects, slopemario | +40.9 %, +39.6 % | real: the object engine copied each object six times a frame between its pool and the workspace. Workspace moved behind the pool, the four collision routines work on it in place: +17.4 %, +13.9 %. The two copies around each update callback remain; removing them needs callbacks that work in the slot (the compiler folds `o->field` on `&objbuffers[idx]` into `lda.l objbuffers+N,x`, tried) — an API addition, about a day |
 | dynamicmetasprite | +75.2 % | real twins: `oamMetaDrawDyn` is compiled C here, assembly there. Next |
 | dynamicsprite, metasprite, animatedsprite | +148 %, +977 %, +38 % | NOT twins (4 sprites against 1; redraw every frame against once; the anim module against a counter). Left out of the bench. The anim module costs about 5,000 mclk a frame for one sprite: to look at |
-| mapscroll, breakout, mode7 | +5.9 %, +2.4 %, +0.9 % | to read |
+| dynamicmetasprite (2) | +75.2 % -> +24.9 % | `oamMetaDrawDyn` rewritten in assembly (77,656 -> 55,364; theirs 44,332). What is left: ours fills an oambuffer entry per item, then calls the draw routine of its size, which reads it back (about 2,700 mclk an item in the callee, 1,900 in the iterator); theirs draws each item in the iterator. Closing it means entry points in sprite_dynamic.asm that take the entry offset in X with the data bank already set, or a fused loop |
+| mapscroll | +5.9 % | read: same work (`main` 3,100 against 3,015). The difference is our NMI handler on a frame where a sprite moved (7,670 against their 6,726 every frame) and the map's column upload (`_pvb1` 3,164 against 2,501). The handler is paid by every game: next after the engines |
+| breakout | +2.4 % | says nothing yet: under the bench's input script theirs waits and ours plays. Left out until the script is right |
+| mode7 | +0.9 % | to read |
 
