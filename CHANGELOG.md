@@ -481,6 +481,15 @@ freeze criterion that waits for hardware.
   change by it and render the same frames.
 
 ### Fixed
+- **A newline, a tab, a quote, a backslash or a byte above 0x7E in a string
+  literal gave wrong bytes** (compiler): the front end hands such a byte to
+  the back end as an octal escape, and the back end converted only the
+  terminating zero. The others were copied into the assembler's string,
+  which reads `\0` as a zero and any other backslash as itself: `"\n"`
+  became the three bytes 0, `1`, `2`, and `"\xF0"` a backslash and three
+  digits — wrong, and longer than the C code counts. In the compiler since
+  the fork. No example has such a literal (the 86 ROMs are unchanged);
+  found while testing `strcmp` on bytes above 0x7F.
 - **A `long` could lose its high half to its own truncated copy**
   (compiler): `a = 0 - v; j = a;` with `a` a long and `j` a `u8`, on a
   path that joins another — the two variables get two phis with the same
