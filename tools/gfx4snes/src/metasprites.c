@@ -114,7 +114,20 @@ void metasprite_save (const char *filename, unsigned short *sprites, int nbtilex
     {
         int ofsmtx=0;
         int ofsmty=0;
-        idxmetaspr=i*(nbincrspr);  // reset index for each metasprite (for palette access)
+        // First block of metasprite i: the sheet is a grid of metasprites,
+        // `perrow` to a row, read left to right then top to bottom. Until
+        // 2026-10-09 this was i * nbincrspr with nbincrspr =
+        // (nbsprx * nbspry) / nbtiley, which is right only when the sheet
+        // holds ONE row of metasprites (or, by the special case below, one
+        // column): on a sheet of several rows it gave tile 0 to every
+        // 32x32 metasprite made of one 32x32 block (the division is 0), and
+        // overlapping blocks otherwise (OpenSNES issue #165).
+        {
+            int perrow = nbtilex / nbsprx;
+            if (perrow < 1) perrow = 1;
+            idxmetaspr = (i / perrow) * nbspry * nbtilex + (i % perrow) * nbsprx;
+        }
+        (void)nbincrspr;
 
         fprintf(fp, "const t_metasprite %s_metasprite%d[] = {\n", incname, i);
         for (y=0;y<nbspry;y++)
