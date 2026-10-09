@@ -22,7 +22,7 @@ to losses; the rest held. The cause is not the pointer width itself (see
 slots for values PVSnesLib keeps in the direct page, and code the
 optimizer leaves dead. The May text claimed "32 % faster";
 the figure today is **about 30 %** on these 34 functions, and
-44 % measured on eighteen whole workloads.
+44 % measured on nineteen whole workloads.
 
 ## Summary
 
@@ -286,7 +286,7 @@ committed in `devtools/sdkbench/`; CI re-measures the OpenSNES side at every
 push.*
 
 The same C file, `devtools/sdkbench/workloads.c`, is built unchanged by
-both SDKs and run on luna, which is cycle-accurate. It holds eighteen small
+both SDKs and run on luna, which is cycle-accurate. It holds nineteen small
 workloads of the kind a game runs every frame. Three things are measured
 for each: the **master cycles** it costs (an NTSC frame is about 357,370),
 the **bytes of code** of its functions, and how deep the **stack** goes
@@ -313,9 +313,10 @@ while it runs (bytes below the initial stack pointer).
 | `copy` | word and byte copies as index loops | 4,485,144 | 2,020,012 | -55.0 % | 709 | 456 | -35.7 % | 31 | 23 |
 | `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,264,658 | -26.5 % | 1156 | 962 | -16.8 % | 48 | 58 |
 | `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,322,716 | -27.8 % | 392 | 372 | -5.1 % | 42 | 39 |
-| **Total** | | **99,641,418** | **56,020,244** | **-43.8 %** | **10210** | **7108** | **-30.4 %** | | |
+| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 7,417,820 | -48.5 % | 831 | 535 | -35.6 % | 52 | 40 |
+| **Total** | | **114,032,548** | **63,438,064** | **-44.4 %** | **11041** | **7643** | **-30.8 %** | | |
 
-Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 16**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 19 workloads OpenSNES is **faster on 19**, **no larger on 19**, and **no deeper in stack on 17**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to

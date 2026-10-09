@@ -71,6 +71,15 @@ The 65816 runs at 3.58 MHz (FastROM) or 2.68 MHz (slow), so a frame is only so
 many thousand cycles. When logic outgrows it, in rough order of reach-for:
 
 - **FastROM** — a near-free ~33% speedup for ROM-bound code (a build flag).
+- **In a loop that runs for every entity, use `u16` / `s16`**, for the
+  variables and for the tables it reads. The CPU's natural width here is 16
+  bits: an 8-bit variable makes the compiler switch the accumulator's width
+  around each access and mask the result (and sign-extend an `s8`). A real
+  project measured the difference on its per-player loops (issue #166). Keep
+  `u8` for what is stored in bulk, not for what a hot loop computes with.
+- **A loop the library already has in assembly is not worth writing in C**:
+  placing the sprites of a scrolling game is `oamPlaceWorld()`, copying is
+  `memcpy()`, several small VRAM uploads are the `vramqueue` module.
 - **Do PPU tricks in the PPU, not the CPU.** A per-scanline gradient or wave is
   free via HDMA and ruinous in a CPU loop — see the @ref examples_hdma_hdma_helpers
   family. Per-column effects go through offset-per-tile (@ref

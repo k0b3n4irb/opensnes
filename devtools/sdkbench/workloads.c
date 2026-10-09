@@ -1,7 +1,7 @@
 /*
  * workloads.c — the same C for both SDKs.
  *
- * Eighteen small workloads of the kind a game runs every frame: loops over
+ * Nineteen small workloads of the kind a game runs every frame: loops over
  * arrays, structs of entities, collisions, multiplies and divides, 32-bit
  * arithmetic, byte copies, calls, a switch-driven interpreter, bit work,
  * a linked list, a tilemap, a 2D grid, entities through a pointer, word
@@ -390,6 +390,47 @@ static void w_state(void) {
     res = acc;
 }
 
+/* A per-entity loop over parallel tables (issue #166, from a real game):
+ * world position to screen position for 19 sprites, with an on-screen test.
+ * place() is the issue's function, unchanged. */
+#define PN 19
+static u16 size_tab[PN];
+static s16 pxs[PN];
+static s16 pys[PN];
+static u16 pslot[PN];
+static u16 pout[2 * PN];
+
+static void place(u16 cam_x, u16 cam_y) {
+    u16 id;
+
+    for (id = 0; id < PN; id++) {
+        u16 size = size_tab[id];
+        u16 x = pxs[id] - cam_x;
+        u16 y = pys[id] - cam_y;
+
+        if ((u16)(x + size) < 256 + size && (u16)(y + size) < 224 + size)
+            pout[pslot[id]] = (x & 0xFF) | (y << 8);
+    }
+}
+
+static void w_place(void) {
+    u16 i, n, acc;
+    for (i = 0; i < PN; i++) {
+        size_tab[i] = (i == 18) ? 16 : 32;
+        pxs[i] = (s16)(i * 23) - 40;
+        pys[i] = (s16)(i * 17) - 20;
+        pslot[i] = i << 1;
+    }
+    for (i = 0; i < 2 * PN; i++) pout[i] = 0;
+    acc = 0;
+    for (n = 0; n < 200; n++) {
+        place(n, n >> 1);
+        acc += pout[(n % PN) << 1];
+    }
+    for (i = 0; i < 2 * PN; i++) acc ^= pout[i] + i;
+    res = acc;
+}
+
 int main(void) {
     consoleInit();
 #if WORKLOAD == 1
@@ -428,6 +469,8 @@ int main(void) {
     w_strings();
 #elif WORKLOAD == 18
     w_state();
+#elif WORKLOAD == 19
+    w_place();
 #endif
     done = 0x600D;
     while (1) {

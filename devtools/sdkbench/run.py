@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """run.py — the same C, built by OpenSNES and by PVSnesLib, timed on luna.
 
-`workloads.c` holds eighteen small workloads; this script builds one ROM
+`workloads.c` holds nineteen small workloads; this script builds one ROM
 per workload (plus a baseline that runs none), runs each on luna for the
 same number of frames, and reports for every workload:
 
@@ -55,7 +55,7 @@ from lib import find_luna  # noqa: E402
 WORK = REPO / "build" / "sdkbench"
 NAMES = ["baseline", "sieve", "sort", "physics", "collide", "mul", "decimal",
          "long", "bytes", "calls", "switch", "crc", "list",
-         "tilemap", "grid", "entities", "copy", "strings", "state"]
+         "tilemap", "grid", "entities", "copy", "strings", "state", "place"]
 WHAT = {"sieve": "sieve of 1024, byte array", "sort": "insertion sort, 64 words",
         "physics": "32 entities x 60 steps", "collide": "496 box pairs x 8",
         "mul": "2304 variable multiplies", "decimal": "200 numbers to digits (/10, %10)",
@@ -64,7 +64,8 @@ WHAT = {"sieve": "sieve of 1024, byte array", "sort": "insertion sort, 64 words"
         "crc": "CRC-16 of 256 bytes, bitwise", "list": "linked list, 40 walks",
         "tilemap": "32x16 tilemap, write + 1200 lookups", "grid": "16x32 grid, 4 neighbours",
         "entities": "32 entities x 60, by pointer", "copy": "word and byte copy loops",
-        "strings": "strlen / strcmp / strcpy by hand", "state": "600 steps, switch + fn table"}
+        "strings": "strlen / strcmp / strcpy by hand", "state": "600 steps, switch + fn table",
+        "place": "19 sprites x 200, parallel tables (issue #166)"}
 FRAMES = 900
 DONE = 0x600D
 BASELINE = HERE / "baseline.json"
@@ -140,7 +141,8 @@ FUNCS = {"sieve": ["w_sieve"], "sort": ["w_sort", "rnd16"],
          "tilemap": ["w_tilemap"], "grid": ["w_grid", "rnd16"],
          "entities": ["w_entities", "ent_init", "rnd16"], "copy": ["w_copy"],
          "strings": ["w_strings", "slen", "scmp", "scpy"],
-         "state": ["w_state", "op_add", "op_xor", "op_rot", "op_dec"]}
+         "state": ["w_state", "op_add", "op_xor", "op_rot", "op_dec"],
+         "place": ["w_place", "place"]}
 STACK_TOP = 0x1FFF          # both SDKs start their stack there
 
 
@@ -244,7 +246,8 @@ DESCRIPTION = {
     "grid": "a 16×32 byte grid, four neighbours of each cell",
     "entities": "the 32 entities again, through a pointer", "copy": "word and byte copies as index loops",
     "strings": "`strlen`, `strcmp`, `strcpy` written by hand",
-    "state": "600 steps of a `switch` state machine and a table of functions"}
+    "state": "600 steps of a `switch` state machine and a table of functions",
+    "place": "19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166)"}
 
 
 def write_doc() -> None:

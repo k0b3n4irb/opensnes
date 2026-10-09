@@ -396,6 +396,14 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **A nineteenth measured workload, `place`: a per-entity loop over
+  parallel tables** (devtools; issue #166). The issue's function,
+  unchanged: 19 sprites from world to screen with an on-screen test, 200
+  times. Today 7,417,820 master cycles (PVSnesLib 14,391,130) and 76
+  instructions per iteration where 35 to 50 would do — the starting
+  point of the work the issue asks for, and the gate that will catch a
+  regression. `docs/craft/frame-budget.md` gains the advice that came
+  with it: 16-bit variables and tables in a loop that runs per entity.
 - **`oamMetaDrawDyn` is assembly** (lib, `sprite_dynamic_meta`): the
   iterator that fills one dynamic-sprite entry per metasprite item and
   calls the draw routine of its size was compiled C. The dynamic
