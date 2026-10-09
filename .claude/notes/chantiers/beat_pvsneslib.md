@@ -354,3 +354,23 @@ First pass, 26 pairs: ahead on 17, behind on 9. Read so far:
 | breakout | +2.4 % | says nothing yet: under the bench's input script theirs waits and ours plays. Left out until the script is right |
 | mode7 | +0.9 % | to read |
 
+## Issue #165: a real game on the SDK (2026-10-09, owner: this comes first)
+
+A port in progress (`~/workspace/speedball2-snes`, its own repository and
+its own clone of OpenSNES; read, never modified from here) reported that
+placing 19 world-space sprites cost a third of its frame, and on the way
+that a sprite and its background did not line up. Owner's decision the
+same day: a real game finding things is worth more than our benches, so
+this goes ahead of the twin bench's leftovers.
+
+| Part of the issue | State |
+|---|---|
+| Sprites one line above the background | fixed, `caa73986`: the library stored y - 1 for sprites; the arbiter says only the background needs it |
+| `oamPlaceWorld` (batch placement, camera, culling) | done, this commit: `lib/source/sprite_world.asm`, 12 words asserted in libtests, two `libbench` rows. 31,379 master cycles a frame against 63,783 for the same loop in C (19 sprites, 13 on screen, slow ROM): 1,650 a sprite, not the "few hundred" hoped for |
+| A VRAM upload queue drained by one assembly routine | to do next. The project has its own (`game/vramq.asm`, `vramq.h`): the reference for the shape |
+| Answer on the issue | not written: published under the owner's name, needs the owner's go |
+
+The project could not be built here (its assets come from an original ROM),
+so the figures are from a reconstruction of its match screen in `libbench`;
+its own measurement, once it calls the routine, is the one that counts.
+

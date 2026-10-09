@@ -17,6 +17,20 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`oamPlaceWorld(&batch, cam_x, cam_y)`: the sprites of a scrolling
+  game placed in one assembly call** (lib, module `sprite`; issue #165).
+  For each sprite of an `OamWorldBatch` (arrays of world x, world y, tile,
+  attribute): subtract the camera, cull by the sprite's size on both
+  axes, write the OAM entry and the ninth x bit or hide the sprite, and
+  say which were placed in `visible[]`. The loop every scrolling game
+  writes, which in C cost the project that asked about 6,000 master
+  cycles a sprite. Measured on a reconstruction of its match screen (19
+  sprites, 13 on screen; `devtools/libbench` rows `worldc`, `world`):
+  31,379 master cycles a frame against 63,783 for the same loop in C
+  writing `oamMemory[]` directly — 1,650 a sprite, not the "few hundred"
+  the request hoped for. Twelve words asserted in the library test ROM: the
+  four edges, partial visibility on the left and at the top, the
+  high-table bits of neighbours, `visible[]`, a batch cut at sprite 127.
 - **`oamGetX(id)`, `oamGetY(id)`** (lib, module `sprite`): read a
   sprite's position back from the OAM shadow — the 9-bit X, and the y that
   was given to `oamSetY`, not the raw byte the library stores one less.

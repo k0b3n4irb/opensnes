@@ -208,6 +208,12 @@ CASES = [
     ("r_fast", 26, sum(w << (16 * i) for i, w in enumerate([
         40, 20, 511, 0x5A, 0 | (7 << 8), 0x5555, 1,
         0x1234 ^ 0x0567, 0x1234, 0x9942, 0, 0, 0xFA57]))),
+    # oamPlaceWorld (issue #165): the four edges, partial visibility on the
+    # left and at the top, the high-table bits of neighbours, visible[], the
+    # dirty flag, a batch cut at sprite 127
+    ("r_world", 24, sum(w << (16 * i) for i, w in enumerate([
+        0x0000, 0x0AE1, 0xDFFF, 0xE164, 0xF001, 0x3313, 0x5145, 0x0154,
+        75, 0x0101, 0x0101, 0x0165]))),
     ("r_done",     2, 0xBEEF),
 ]
 

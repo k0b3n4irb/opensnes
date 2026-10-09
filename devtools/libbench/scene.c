@@ -126,6 +126,95 @@ void row_text(void) {
     }
 }
 
+/* World-space sprites (issue #165, after a real project's match screen): 19
+ * sprites in world coordinates, 18 of 32x32 and one of 16x16, 13 of them on
+ * screen, placed once a frame against a camera that moves.
+ *   worldc: the loop in C, the same source for both SDKs, writing the OAM
+ *           shadow directly — the cheapest a game could write it in C.
+ *   world:  OpenSNES calls oamPlaceWorld(), twice (one size a call);
+ *           PVSnesLib has no such call and runs the C loop. */
+#define WN 19
+static s16 wx[WN];
+static s16 wy[WN];
+static u8 wtile[WN];
+static u8 wattr[WN];
+static u8 wsize[WN];
+static u8 wxhi[WN];
+static u8 wseen[WN];
+
+static void world_setup(void) {
+    u16 i;
+    for (i = 0; i < WN; i++) {
+        wx[i] = (i < 12) ? i * 18 : 600 + i;       /* players 12-17 are off screen */
+        wy[i] = 40 + (i & 3) * 40;
+        wtile[i] = i << 2;
+        wattr[i] = 0x20;
+        wsize[i] = 32;
+        wxhi[i] = 1 << ((i & 3) << 1);
+        wseen[i] = 0;
+    }
+    wx[18] = 120;                                  /* the ball: 16x16, on screen */
+    wsize[18] = 16;
+}
+
+static void world_c(u16 cam_x, u16 cam_y) {
+    u16 id;
+    for (id = 0; id < WN; id++) {
+        u16 x = wx[id] - cam_x;
+        u16 y = wy[id] - cam_y;
+        u16 size = wsize[id];
+        u8 *oam = (u8 *)oamMemory + (id << 2);
+        u8 *high = (u8 *)oamMemory + 512 + (id >> 2);
+        if ((u16)(x + size) < 256 + size && (u16)(y + size) < 224 + size) {
+            oam[0] = x;
+            oam[1] = y;
+            oam[2] = wtile[id];
+            oam[3] = wattr[id];
+            if (x & 0x100) *high |= wxhi[id];
+            else *high &= ~wxhi[id];
+            wseen[id] = 1;
+        } else {
+            oam[0] = 1;
+            oam[1] = 240;
+            *high |= wxhi[id];
+            wseen[id] = 0;
+        }
+    }
+}
+
+void row_worldc(void) {
+    u16 r;
+    world_setup();
+    for (r = 0; r < REPS; r++) {
+#if CALLS
+        world_c(r, 0);
+#endif
+    }
+}
+
+void row_world(void) {
+    u16 r;
+#if !PVS
+    static OamWorldBatch big;
+    static OamWorldBatch small;
+    big.x = wx; big.y = wy; big.tile = wtile; big.attr = wattr; big.visible = wseen;
+    big.first_id = 0; big.count = 18; big.size = 32;
+    small.x = wx + 18; small.y = wy + 18; small.tile = wtile + 18; small.attr = wattr + 18;
+    small.visible = wseen + 18; small.first_id = 18; small.count = 1; small.size = 16;
+#endif
+    world_setup();
+    for (r = 0; r < REPS; r++) {
+#if CALLS
+#if PVS
+        world_c(r, 0);
+#else
+        oamPlaceWorld(&big, r, 0);
+        oamPlaceWorld(&small, r, 0);
+#endif
+#endif
+    }
+}
+
 /* All of it in one frame, REPS frames in a row: the pad, three scrolls, 32
  * sprites placed, 20 characters, then the frame boundary — where each SDK's
  * handler sends what the calls left for it (PVSnesLib uploads the sprite
@@ -188,6 +277,10 @@ int main(void) {
     row_text();
 #elif ROW == 8
     row_frame();
+#elif ROW == 9
+    row_worldc();
+#elif ROW == 10
+    row_world();
 #endif
     done = 0x600D;
     while (1) {

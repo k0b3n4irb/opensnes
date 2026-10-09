@@ -372,6 +372,72 @@ u16 oamGetX(u16 id);
 u8 oamGetY(u16 id);
 
 /**
+ * @brief A batch of sprites in world coordinates, for oamPlaceWorld()
+ *
+ * Structure of arrays: one array per property, one element per sprite,
+ * which is what the 65816 indexes cheaply. The arrays may live in ROM, in
+ * plain RAM or in `FAR` RAM.
+ */
+typedef struct {
+    const s16 *x;        /**<  0: world x of each sprite's top-left corner */
+    const s16 *y;        /**<  4: world y */
+    const u8  *tile;     /**<  8: tile number, low byte */
+    const u8  *attr;     /**< 12: attribute byte (vhoopppc), as OAM_ATTR() builds it */
+    u8  *visible;        /**< 16: out, one byte per sprite: 1 placed, 0 hidden. May be 0 */
+    u8   first_id;       /**< 20: OAM id of the first sprite of the batch */
+    u8   count;          /**< 21: number of sprites */
+    u8   size;           /**< 22: width and height in pixels: 8, 16, 32 or 64 */
+} OamWorldBatch;
+
+/* Not under the host's syntax check (clang, 8-byte pointers): the layout
+ * that matters is cc65816's, 4 bytes a pointer. */
+#ifndef __clang__
+_Static_assert(__builtin_offsetof(OamWorldBatch, y) == 4, "OamWorldBatch.y offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, tile) == 8, "OamWorldBatch.tile offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, attr) == 12, "OamWorldBatch.attr offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, visible) == 16, "OamWorldBatch.visible offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, first_id) == 20, "OamWorldBatch.first_id offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, count) == 21, "OamWorldBatch.count offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, size) == 22, "OamWorldBatch.size offset (sprite_world.asm)");
+#endif
+
+/**
+ * @brief Place a batch of world-space sprites: camera, culling, OAM, in one call
+ *
+ * For each sprite of the batch: screen position = world position - camera.
+ * A sprite that is on screen, even partly, gets its x, y, tile, attribute
+ * and ninth x bit written; any other is hidden the way oamHide() hides.
+ * The loop a scrolling game runs every frame, in assembly: in compiled C it
+ * cost a real project about 6,000 master cycles a sprite (issue #165).
+ *
+ * - **Culling is by `size`, on both axes.** A 32x32 sprite at x = -31 is
+ *   still drawn, with its ninth x bit set; at x = -32 it is hidden.
+ * - **`visible[]`** tells the game which sprites were placed, so that it
+ *   can skip its own work (animation, streaming) for the others without
+ *   testing again. Pass 0 if it is not wanted.
+ * - **The size bit is not touched**: set it once with oamSetSize(). A batch
+ *   has one size; a game with two sizes makes two calls.
+ * - **`cam_y` is the y you give bgSetScroll()**: a sprite and the
+ *   background it stands on take the same camera value.
+ * - A batch that runs past sprite 127 stops there.
+ *
+ * @param batch The sprites (see OamWorldBatch)
+ * @param cam_x World x of the screen's left edge
+ * @param cam_y World y of the screen's first line
+ *
+ * @code
+ * static s16 ax[12], ay[12];              // moved by the game
+ * static u8  atile[12], aattr[12], aseen[12];
+ * static const OamWorldBatch actors = {
+ *     ax, ay, atile, aattr, aseen, 0, 12, 32
+ * };
+ *
+ * oamPlaceWorld(&actors, cam_x, cam_y);   // every frame, after the game moved them
+ * @endcode
+ */
+void oamPlaceWorld(const OamWorldBatch *batch, u16 cam_x, u16 cam_y);
+
+/**
  * @brief Set sprite tile
  *
  * @param id Sprite ID (0-127)

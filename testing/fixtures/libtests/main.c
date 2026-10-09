@@ -1079,6 +1079,16 @@ u16 r_str[24];
 u16 r_oamget[8];
 /* the setters rewritten in assembly on 2026-10-09 (sprites, scroll, pads) */
 u16 r_fast[16];
+/* oamPlaceWorld (issue #165): eight 32x32 sprites around the four edges of
+ * the screen, camera at (100, 50) */
+u16 r_world[12];
+static s16 w_x[8];
+static s16 w_y[8];
+static u8 w_tile[8];
+static u8 w_attr[8];
+static u8 w_seen[8];
+static const s16 w_sx[8] = { 0, -31, -32, 255, 256, 100, 100, 100 };   /* wanted on screen */
+static const s16 w_sy[8] = { 0,  10,  10, 223, 100, 224, -31, -32 };
 
 static void test_string(void) {
     u16 i;
@@ -1281,6 +1291,48 @@ int main(void) {
         r_fast[9] = bgGetScrollX(2) | (bgGetScrollY(2) << 8);  /* 0x9942 */
         bgSetScroll(3, x3, 0);
         bgSetScroll(2, 0, 0);
+    }
+    {
+        /* Sprites 110-117 (two of byte 27 of the high table, all of byte 28,
+         * two of byte 29); every sprite is hidden at x = 257 since oamInit,
+         * so those bytes start at $55. On screen: 0, 1 (partly, on the left),
+         * 3 (the last pixel, bottom right), 6 (partly, at the top). Hidden:
+         * 2 (one pixel further left than 1), 4 (x = 256), 5 (y = 224),
+         * 7 (one line further up than 6). */
+        static OamWorldBatch wb;
+        u8 flag = oam_update_flag;
+        u8 before;
+        u16 i;
+        for (i = 0; i < 8; i++) {
+            w_x[i] = w_sx[i] + 100;
+            w_y[i] = w_sy[i] + 50;
+            w_tile[i] = 0x10 + i;
+            w_attr[i] = 0x30 | i;
+            w_seen[i] = 0xEE;
+        }
+        wb.x = w_x; wb.y = w_y; wb.tile = w_tile; wb.attr = w_attr; wb.visible = w_seen;
+        wb.first_id = 110; wb.count = 8; wb.size = 32;
+        oam_update_flag = 0;
+        oamPlaceWorld(&wb, 100, 50);
+        r_world[0] = oamMemory[110 * 4] | (oamMemory[110 * 4 + 1] << 8);   /* 0, 0 */
+        r_world[1] = oamMemory[111 * 4] | (oamMemory[111 * 4 + 1] << 8);   /* $E1 (x = -31), 10 */
+        r_world[2] = oamMemory[113 * 4] | (oamMemory[113 * 4 + 1] << 8);   /* 255, 223 */
+        r_world[3] = oamMemory[116 * 4] | (oamMemory[116 * 4 + 1] << 8);   /* 100, $E1 (y = -31) */
+        r_world[4] = oamMemory[112 * 4] | (oamMemory[112 * 4 + 1] << 8);   /* hidden: 1, 240 */
+        r_world[5] = oamMemory[113 * 4 + 2] | (oamMemory[113 * 4 + 3] << 8);   /* tile $13, attr $33 */
+        r_world[6] = oamMemory[512 + 27] | (oamMemory[512 + 28] << 8);     /* $45, $51 */
+        r_world[7] = oamMemory[512 + 29] | ((oam_update_flag != 0) << 8);  /* $54, flag set */
+        r_world[8] = 0;
+        for (i = 0; i < 8; i++) r_world[8] |= (u16)w_seen[i] << i;         /* 1,1,0,1,0,0,1,0 = 75 */
+        /* a batch that runs past sprite 127 stops there; no `visible` */
+        wb.visible = 0; wb.first_id = 126; wb.count = 5; wb.size = 8;
+        before = oamMemory[512];
+        oamPlaceWorld(&wb, 100, 50);
+        r_world[9] = oamMemory[127 * 4] | ((oamMemory[512] == before) << 8);   /* sprite 1 of the batch, 8 pixels wide at x = -31: hidden (x byte 1); byte 512, where a 129th sprite would land, untouched */
+        r_world[10] = w_seen[0] | (w_seen[1] << 8);                        /* unchanged: 1, 1 */
+        r_world[11] = 0x0165;
+        for (i = 110; i < 128; i++) oamHide(i);
+        oam_update_flag = flag;
     }
     /* pads: no button is down in this ROM. The macros, the functions behind
      * them, and an index out of range (functions only) */
