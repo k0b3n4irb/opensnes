@@ -74,6 +74,24 @@ extern u16 vram_queue_count;
 u16 vramQueuePush(const u8 *src, u16 addr, u16 size, u16 step);
 
 /**
+ * @brief Note one frame of a streamed sprite: all its strips in one call
+ *
+ * A sprite frame in OBJ VRAM is `size_px / 8` rows of tiles; each row is a
+ * strip of `size_px * 4` bytes (at 4 bpp), and the rows are 16 tiles apart:
+ * 512 bytes in the sheet, 256 words in VRAM. That is the layout
+ * `opensnes-sprite sheet` writes (a 128-pixel-wide raster) and the one OBJ
+ * VRAM expects. This notes the 1, 2, 4 or 8 strips of one frame.
+ *
+ * @param src      First byte of the frame in the sheet (its top-left tile).
+ *                 The frame must not straddle a bank boundary.
+ * @param addr     VRAM word address of the frame's top-left tile
+ * @param size_px  Width and height of the sprite: 8, 16, 32 or 64
+ * @return 1, or 0 when the strips do not all fit in the queue (none is
+ *         noted) or size_px is under 8
+ */
+u16 vramQueuePushSprite(const u8 *src, u16 addr, u16 size_px);
+
+/**
  * @brief Send every queued transfer to VRAM and empty the queue
  *
  * One DMA per entry, on channel 0. Call it in VBlank — right after

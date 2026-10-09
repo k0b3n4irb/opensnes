@@ -216,6 +216,9 @@ CASES = [
         75, 0x0101, 0x0101, 0x0165]))),
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (32 << 32) | (0x0A51 << 48)),
+    # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
+    # apart; refused under 8 pixels and when the strips do not all fit
+    ("r_vqs", 16, sum(w << (16 * i) for i, w in enumerate([1, 2, 512, 0x6500, 64 | (0x80 << 8), 0, 0, 30]))),
     ("r_done",     2, 0xBEEF),
 ]
 
@@ -295,6 +298,9 @@ VRAM_CASES = [
     (0xC480, bytes([0x99, 0xAA])),
     (0xC4C0, bytes([0xBB, 0xCC])),
     (0xC600, bytes([0x00] * 8)),
+    # vramQueuePushSprite + flush: the two strips of a 16x16 frame
+    (0xC800, bytes([0xA1])), (0xC83F, bytes([0xA2])),
+    (0xCA00, bytes([0xB1])), (0xCA3F, bytes([0xB2])),
 ]
 
 

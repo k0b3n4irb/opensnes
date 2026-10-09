@@ -416,8 +416,8 @@ Asked for, and accepted (answered on the issues):
 
 | Request | Where | State |
 |---|---|---|
-| `opensnes-sprite sheet --size 32 --metasprite 32 32`: every `METASPR_ITEM` has tile 0 | tools | to do: a plain bug, first |
-| `vramQueuePushSprite(src, addr, size_px)`: the strips of one streamed frame in one call | lib | to do |
+| `opensnes-sprite sheet --size 32 --metasprite 32 32`: every `METASPR_ITEM` has tile 0 | tools | fixed, `ed7903ed`: wrong on any sheet of several rows of metasprites, not only 32x32 |
+| `vramQueuePushSprite(src, addr, size_px)`: the strips of one streamed frame in one call | lib | done, this commit; its gain is theirs to measure |
 | `opensnes-sprite sheet --size 32 --flip`: mirrored 32x32 blocks not deduplicated | tools | to do |
 | optional `const u8 *order` in `OamWorldBatch` (depth sort without a second copy of x and y) | lib | to do; its own path in the routine, cost of the indirection to be measured |
 | pattern 7: `T tab[N][M]` const table, 59 instructions a read against 17 flattened | compiler | with `array2d_read`, same root |

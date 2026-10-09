@@ -47,6 +47,9 @@
 
 /* the VRAM upload queue (issue #165): entries before, after, free */
 u16 r_vq[4];
+/* vramQueuePushSprite: one 16x16 frame = two strips of 64 bytes */
+u16 r_vqs[8];
+static FAR u8 vq_sheet[576];
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -686,6 +689,20 @@ static void coverage_lot_b(void) {
     r_vq[2] = vramQueueFree();              /* 32 */
     vramQueueFlush();                       /* empty: returns at once */
     r_vq[3] = 0x0A51;
+    /* a 16x16 frame: strips at sheet + 0 and + 512, to VRAM words $6400 and
+     * $6500, 64 bytes each */
+    vq_sheet[0] = 0xA1; vq_sheet[63] = 0xA2; vq_sheet[512] = 0xB1; vq_sheet[575] = 0xB2;
+    r_vqs[0] = vramQueuePushSprite(vq_sheet, 0x6400, 16);      /* 1 */
+    r_vqs[1] = vram_queue_count;                               /* 2 */
+    r_vqs[2] = vram_queue_src[1] - vram_queue_src[0];          /* 512 */
+    r_vqs[3] = vram_queue_addr[1];                             /* $6500 */
+    r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
+    vramQueueFlush();
+    r_vqs[5] = vramQueuePushSprite(vq_sheet, 0x6400, 4);       /* under 8 pixels: 0 */
+    vram_queue_count = 30;
+    r_vqs[6] = vramQueuePushSprite(vq_sheet, 0x6400, 32);      /* four strips, two places left: 0 */
+    r_vqs[7] = vram_queue_count;                               /* still 30: nothing noted */
+    vram_queue_count = 0;
     dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;

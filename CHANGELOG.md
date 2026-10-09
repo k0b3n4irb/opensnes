@@ -17,6 +17,13 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`vramQueuePushSprite(src, addr, size_px)`** (lib, module `vramqueue`;
+  issue #165): one frame of a streamed sprite in one call — its
+  `size_px / 8` strips, 512 bytes apart in the sheet `opensnes-sprite
+  sheet` writes and 256 words apart in VRAM. All of them are noted or
+  none (0 is returned when they do not fit, or under 8 pixels). Asked by
+  the project that measured four `vramQueuePush` calls per 32x32 frame at
+  21,000 master cycles a frame; not measured here.
 - **`<snes/vramqueue.h>`: VRAM uploads noted during the frame, sent in
   VBlank by one routine** (lib, module `vramqueue`; issue #165).
   `vramQueuePush(src, addr, size, step)` notes a transfer (it returns 0

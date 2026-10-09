@@ -139,3 +139,73 @@ vramQueuePush:
 
 .ENDS
 
+;------------------------------------------------------------------------------
+; u16 vramQueuePushSprite(const u8 *src, u16 addr, u16 size_px)
+;   10,s src (bank)   8,s src   6,s addr   4,s size_px
+; Returns 1, or 0 when the strips do not all fit (nothing is noted) or
+; size_px is under 8.
+;
+; One frame of a streamed sprite in one call: size_px / 8 strips of
+; size_px * 4 bytes, 512 bytes apart in the sheet and 256 words apart in
+; VRAM — the layout `opensnes-sprite sheet` writes (a 128-pixel-wide raster:
+; 16 tiles a row, 32 bytes a tile at 4 bpp) and OBJ VRAM expects. Four calls
+; with a far pointer each cost a real project 21,000 master cycles a frame
+; for 4.5 frames of 32x32 (issue #165).
+;------------------------------------------------------------------------------
+.SECTION ".text.vramQueuePushSprite" SUPERFREE
+
+vramQueuePushSprite:
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 4,s             ; size_px
+    lsr a
+    lsr a
+    lsr a
+    beq @no             ; under 8 pixels: no strip
+    sta.b tcc__r9       ; strips left
+    clc
+    adc.w vram_queue_count
+    cmp.w #VRAM_QUEUE_MAX+1
+    bcc +
+@no:
+    lda.w #0
+    rtl
++   lda 4,s             ; size_px
+    asl a
+    asl a
+    sta.b tcc__r9+2     ; bytes in a strip
+    lda 8,s             ; src
+    sta.b tcc__r10
+    lda 6,s             ; addr
+    sta.b tcc__r10+2
+    lda.w vram_queue_count
+    asl a
+    tax
+@strip:
+    lda.b tcc__r10
+    sta.w vram_queue_src,x
+    clc
+    adc.w #512          ; the next row of tiles in the sheet
+    sta.b tcc__r10
+    lda 10,s            ; src (bank)
+    sta.w vram_queue_bank,x
+    lda.b tcc__r10+2
+    sta.w vram_queue_addr,x
+    clc
+    adc.w #256          ; the next row of tiles in VRAM
+    sta.b tcc__r10+2
+    lda.b tcc__r9+2
+    sta.w vram_queue_size,x
+    lda.w #$0080        ; VRAM_QUEUE_ROW
+    sta.w vram_queue_step,x
+    inx
+    inx
+    inc.w vram_queue_count
+    dec.b tcc__r9
+    bne @strip
+    lda.w #1
+    rtl
+
+.ENDS
+
