@@ -40,7 +40,7 @@ CASES = [
     ("r_chips",      2, 0),      # no SA-1, no GSU on this LoROM
     ("r_nmi_after",  2, 5),
     # mode7Rotate(90) -> angle 63 -> sine table entry 126
-    ("m7_sin.mode7",  1, 126),
+    ("m7_sin",  1, 126),
     # snesmod: the 24-bit table pointer (bank byte included), a clean u16
     # position, an emptied queue whose last command was the volume (0x5A)
     ("r_mod_flush",  2, 1),
