@@ -343,6 +343,32 @@ void oamSetY(u16 id, u16 y);
 void oamSetXY(u16 id, u16 x, u16 y);
 
 /**
+ * @brief Read back a sprite's X position
+ *
+ * What oamSet() / oamSetX() / oamSetXY() last stored, from the OAM shadow:
+ * 0-511, the ninth bit included (a value of 256 or more is a sprite partly
+ * or wholly off the left edge, as written with a negative X).
+ *
+ * @param id Sprite ID (0-127)
+ * @return X position, 0 for an invalid id
+ * @note A hidden sprite reads 257 (see oamHide()).
+ */
+u16 oamGetX(u16 id);
+
+/**
+ * @brief Read back a sprite's Y position
+ *
+ * The y that was given to oamSet() / oamSetY() / oamSetXY() — not the raw
+ * OAM byte, which the library stores one less to cancel the PPU's
+ * one-line offset.
+ *
+ * @param id Sprite ID (0-127)
+ * @return Y position (0-255), 0 for an invalid id
+ * @note A hidden sprite reads 241 (see oamHide()).
+ */
+u8 oamGetY(u16 id);
+
+/**
  * @brief Set sprite tile
  *
  * @param id Sprite ID (0-127)

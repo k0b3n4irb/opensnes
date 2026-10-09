@@ -17,6 +17,12 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`oamGetX(id)`, `oamGetY(id)`** (lib, module `sprite`): read a
+  sprite's position back from the OAM shadow — the 9-bit X, and the y that
+  was given to `oamSetY`, not the raw byte the library stores one less.
+  The migration guide listed them as a gap; it also listed
+  `setPaletteColor` as one, which `setColor(index, color)` has always
+  covered.
 - **`<snes/string.h>`: `memcpy`, `memmove`, `memset`, `strlen`, `strcmp`,
   `strcpy`, `strncpy`** (lib, module `string`): the SDK had none of them,
   while its own migration guide told you to use `memcpy`. Written in

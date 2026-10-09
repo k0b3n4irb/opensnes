@@ -200,6 +200,8 @@ CASES = [
         0x0A5A, 0x005A,  5, 0,  ord("O"), 1,
         0, 0xFFFF, 1, (-ord("C")) & 0xFFFF, 0xE0,
         ord("I"), 0x7E00, ord("D") | 0x7E00,  0x5712]))),
+    # oamGetX / oamGetY: (300, 100), (0, 0), a hidden sprite (257, 241), an invalid id (0, 0)
+    ("r_oamget", 16, sum(w << (16 * i) for i, w in enumerate([300, 100, 0, 0, 257, 241, 0, 0x0A00]))),
     ("r_done",     2, 0xBEEF),
 ]
 

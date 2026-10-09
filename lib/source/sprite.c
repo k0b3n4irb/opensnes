@@ -119,6 +119,24 @@ void oamSetXY(u16 id, u16 x, u16 y) {
     oamSetY(id, y);
 }
 
+u16 oamGetX(u16 id) {
+    u16 x;
+
+    if (id >= MAX_SPRITES) return 0;
+    x = oam_buffer[id << 2];
+    /* the ninth bit is in the extension table, two bits per sprite */
+    if (oam_buffer[OAM_EXT_OFFSET + (id >> 2)] & OAM_XHI_BIT(id & 0x03)) {
+        x |= 0x100;
+    }
+    return x;
+}
+
+u8 oamGetY(u16 id) {
+    if (id >= MAX_SPRITES) return 0;
+    /* oamSetY() stores y - 1 (the PPU draws a line lower): give y back */
+    return (u8)(oam_buffer[(id << 2) + 1] + 1);
+}
+
 void oamSetTile(u16 id, u16 tile) {
     if (id >= MAX_SPRITES) return;
 

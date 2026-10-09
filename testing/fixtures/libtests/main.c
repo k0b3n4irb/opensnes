@@ -1075,6 +1075,8 @@ static FAR u8 s_far[32];
 static FAR char s_buf[16];
 static u8 s_near[16];
 u16 r_str[24];
+/* oamGetX / oamGetY (2026-10-09): what was set, read back from the shadow */
+u16 r_oamget[8];
 
 static void test_string(void) {
     u16 i;
@@ -1217,6 +1219,26 @@ int main(void) {
     }
 
     test_string();
+
+    /* Sprites 100-102, which nothing else in this ROM uses, and the upload
+     * flag put back: the OAM the probe reads at the end was placed there by
+     * earlier blocks (some through dmaCopyOam), and an upload of the shadow
+     * from here would replace it. */
+    {
+        u8 flag = oam_update_flag;
+        oamSetXY(100, 300, 100);          /* ninth X bit set */
+        r_oamget[0] = oamGetX(100);       /* 300 */
+        r_oamget[1] = oamGetY(100);       /* 100, not the stored 99 */
+        oamSetXY(101, 0, 0);
+        r_oamget[2] = oamGetX(101);       /* 0 */
+        r_oamget[3] = oamGetY(101);       /* 0: stored as 255 */
+        oamHide(102);
+        r_oamget[4] = oamGetX(102);       /* 257 */
+        r_oamget[5] = oamGetY(102);       /* 241 */
+        r_oamget[6] = oamGetX(200);       /* invalid id: 0 */
+        r_oamget[7] = 0x0A00 | oamGetY(200);  /* 0, and the block ran */
+        oam_update_flag = flag;
+    }
 
     r_done      = 0xBEEF;
 

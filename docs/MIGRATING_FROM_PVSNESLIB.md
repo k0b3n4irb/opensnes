@@ -180,14 +180,14 @@ has to write itself, and whether that is a decision or a gap.
 | `setFadeEffect`, `setFadeEffectEx` | `fadeIn`, `fadeOut`, `setBrightness` | Renamed |
 | `setColorEffect`, `setColorIntensity` | module `colormath`: `colorMathInit`, `colorMathTint`, `colorMathShadow`, `colorMathSetFixedColor` | Own module |
 | `setMosaicEffect` | module `mosaic`: `mosaicSetSize`, `mosaicFadeIn`, `mosaicFadeOut` | Own module |
-| `setPalette`, `setPaletteColor`, `getPalette*` | `dmaCopyCGram` for a block; a single colour is two writes to `REG_CGADD` / `REG_CGDATA` in VBlank | **Gap, assumed.** No single-colour helper |
+| `setPalette`, `setPaletteColor`, `getPalette*` | `dmaCopyCGram` for a block, `setColor(index, color)` for one colour | Renamed. Reading CGRAM back (`getPalette*`) is **not provided**: keep the palette you uploaded |
 | `dmaClearVram`, `dmaFillVram8/16` | `dmaClearVRAM`, `dmaFillVRAM` | Renamed |
 | `dmaCopyOAram` | `oamUpdate()` (the NMI uploads the shadow) | The OAM upload is the sprite module's, not a DMA call |
 | `dmaCopySpr16Vram`, `dmaCopySpr32Vram` | `oamInitGfxSet` | One call for the sprite sheet |
 | `oamMetaDraw8/16/32`, `oamFix8/16/32Draw` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | One call; the size is a field of the `MetaspriteStyle` |
 | `oamMetaDrawDyn8/16/32`, `oamDynamicMetaDraw`, `oamInitDynamicSprite*` | module `sprite_dynamic`: `oamDynamicInit`, `oamDynamicDraw`, `oamMetaDrawDyn`, `oamDynamicSetSize` | Own module |
 | `oamSetEx`, `oamSetAttr`, `oamFlip`, `oamSetGfxOffset` | `oamSetSize`, `oamHide`, `oamSetTile`, `oamSetXY`, the `flags` argument of `oamSet` | Split by concern |
-| `oamGetX`, `oamGetY` | — | **Gap, assumed.** Keep your own coordinates; the OAM shadow is write-only from C |
+| `oamGetX`, `oamGetY` | `oamGetX(id)`, `oamGetY(id)` | Same names (since 2026-10-09); they return what was last set, the 9-bit X and the y given to `oamSetY`, not the raw OAM byte |
 | `padsCurrent/Down/Up/Clear` | `padHeld`, `padPressed`, `padReleased` | Renamed |
 | `detectMouse`, `initMouse`, `mouseCycleSensitivity*` | `mouseInit`, `mouseIsConnected`, `mouseSetSensitivity` | Renamed |
 | `detectSuperScope` | `scopeInit`, `scopeIsConnected` | Renamed |
