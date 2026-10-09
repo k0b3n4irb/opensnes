@@ -396,6 +396,12 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **A plain array indexed is `lda.w sym,x`, not `lda.l sym,x`** (compiler;
+  issue #166, pattern 3): a byte and a cycle less on every indexed access
+  to a plain object, as scalars always had. `FAR` and `const` objects keep
+  the long form, and so do accesses through a pointer. Small by itself
+  (`place`: 7,417,820 -> 7,383,730 master cycles, 535 -> 523 bytes); the
+  first of the steps the issue lists.
 - **A nineteenth measured workload, `place`: a per-entity loop over
   parallel tables** (devtools; issue #166). The issue's function,
   unchanged: 19 sprites from world to screen with an on-screen test, 200
@@ -403,7 +409,9 @@ freeze criterion that waits for hardware.
   instructions per iteration where 35 to 50 would do — the starting
   point of the work the issue asks for, and the gate that will catch a
   regression. `docs/craft/frame-budget.md` gains the advice that came
-  with it: 16-bit variables and tables in a loop that runs per entity.
+  with it, as its author corrected it: compute in 16 bits in a loop that
+  runs per entity (8-bit arithmetic and `s8` are what cost; a `u8` table
+  is no slower to index than a `u16` one).
 - **`oamMetaDrawDyn` is assembly** (lib, `sprite_dynamic_meta`): the
   iterator that fills one dynamic-sprite entry per metasprite item and
   calls the draw routine of its size was compiled C. The dynamic
@@ -571,6 +579,16 @@ freeze criterion that waits for hardware.
   change by it and render the same frames.
 
 ### Fixed
+- **The link-time guard against bank-blind reads did not see `static`
+  objects** (tools, devtools): `opensnes-rom check` and
+  `check_bank_reads.py` read a symbol's name up to its first dot, and a
+  `static` object is `name.unit` — so a ROM reading a `static const`
+  table of bank $07 through `lda.w` linked with "OK: no bank-blind C
+  reads". Seen when a compiler change under test emitted exactly that for
+  17 examples and the link accepted all of them (the picture comparison
+  and two compiler checks caught it). Both tools read the whole name now;
+  the corpus passes the stricter guard. If it fails your link after an
+  update, the read it names is real.
 - **Every sprite was drawn one line too high** (lib; found by issue #165).
   `oamSet()`, `oamSetY()`, `oamSetXY()`, the `oamSetFast` /
   `oamSetXYFast` macros and the dynamic sprite engine stored `y - 1`.

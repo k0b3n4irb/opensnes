@@ -17,7 +17,8 @@
 # emitter uses `pha` for one of the two copies and `sta N,s` for the
 # other; both preserve the value, and pinning only `sta` made a
 # correctness-neutral codegen improvement look like a regression.
-# Re-pinned 2026-10-08: `mirror[id].field` is read with indexed-long
-# addressing (`lda.l mirror+N,x`); the invariant is unchanged.
-in getinfo: absent lda\.l mirror[^\n]*,x\n\tlda
-count 2 lda\.l mirror[^\n]*,x\n\t(?:sta|pha)
+# Re-pinned 2026-10-08: `mirror[id].field` is read with indexed
+# addressing (`lda.l mirror+N,x`, then `lda.w` on 2026-10-09: a plain
+# object, issue #166); the invariant is unchanged.
+in getinfo: absent lda\.w mirror[^\n]*,x\n\tlda
+count 2 lda\.w mirror[^\n]*,x\n\t(?:sta|pha)

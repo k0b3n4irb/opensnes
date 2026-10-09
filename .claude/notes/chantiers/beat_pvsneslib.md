@@ -402,3 +402,36 @@ Also from it: "prefer u16 in hot loops" belongs in the docs.
 Both issues were answered in writing on 2026-10-09 (owner's go), under the
 owner's name: what is fixed, what is measured, what is not promised.
 
+### What the project said back (2026-10-09, comments on #165 and #166)
+
+It adopted all three pieces of #165 the same day (`41603464`); its game has
+no assembly file of its own any more. Measured there, FastROM:
+`oamPlaceWorld` 1,320 master cycles a sprite (ours: 1,652 in SlowROM); the
+push function took its `spritesUpdate` from 78,112 to 64,285 against its
+macro. Whole frame with 18 players walking: 70.2 % -> 65.4 %. Modest,
+because the rest is game logic in C: 95,000 a tick for 18 players, 28,000
+for a depth sort.
+
+Asked for, and accepted (answered on the issues):
+
+| Request | Where | State |
+|---|---|---|
+| `opensnes-sprite sheet --size 32 --metasprite 32 32`: every `METASPR_ITEM` has tile 0 | tools | to do: a plain bug, first |
+| `vramQueuePushSprite(src, addr, size_px)`: the strips of one streamed frame in one call | lib | to do |
+| `opensnes-sprite sheet --size 32 --flip`: mirrored 32x32 blocks not deduplicated | tools | to do |
+| optional `const u8 *order` in `OamWorldBatch` (depth sort without a second copy of x and y) | lib | to do; its own path in the routine, cost of the indirection to be measured |
+| pattern 7: `T tab[N][M]` const table, 59 instructions a read against 17 flattened | compiler | with `array2d_read`, same root |
+| pattern 8: absolute difference and signed compare, 37 instructions (compare materialised as 0/1, `cmp #0` after an `sbc`) | compiler | to do |
+| pattern 9: inline a `static` function with one call site | compiler | to size: the back end has no inliner; the largest lever and the largest piece |
+| its insertion sort as a benchmark (97 instructions, 3,300 mclk an element when already sorted) | devtools | to add as written |
+
+Withdrawn by its author, and corrected in our docs: "prefer u16 tables".
+What costs is 8-bit arithmetic, comparison and `s8`; a `u8` table is no
+slower to index.
+
+Step 1 of #166 (pattern 3) on `place`: 7,417,820 -> 7,383,730 (-0.5 %).
+The first version was wrong (FAR and const objects got the short form too:
+17 pictures, two checks); it exposed that the link-time bank guard saw no
+`static` symbol at all, in both its implementations — fixed. And that the
+differential tests index no const or FAR table: to close.
+
