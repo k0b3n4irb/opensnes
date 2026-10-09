@@ -293,7 +293,8 @@ endif
 # Module Dependency Auto-Resolution
 #------------------------------------------------------------------------------
 
-_DEP_sprite          := dma sprite_oamset
+_DEP_sprite          := dma sprite_oamset sprite_world
+_DEP_sprite_world    := sprite_oamset                                           # oam_ext_tab
 # The seven entries marked L2a were found by devtools/link_modules.py
 # (2026-09-13), which links every module ALONE: each of these modules
 # referenced a symbol of a module it never declared, and only linked in

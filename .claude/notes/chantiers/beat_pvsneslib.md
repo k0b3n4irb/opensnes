@@ -354,3 +354,17 @@ First pass, 26 pairs: ahead on 17, behind on 9. Read so far:
 | breakout | +2.4 % | says nothing yet: under the bench's input script theirs waits and ours plays. Left out until the script is right |
 | mode7 | +0.9 % | to read |
 
+## Issue #165: world-space sprites and VRAM uploads (2026-10-09, owner: this comes first)
+
+Asked by a game built on the SDK: placing world-space sprites from C was
+costly, and a sprite and its background did not line up. Owner's decision
+the same day: this goes ahead of the twin bench's leftovers.
+
+| Part of the issue | State |
+|---|---|
+| Sprites one line above the background | fixed, `caa73986`: the library stored y - 1 for sprites; the arbiter says only the background needs it |
+| A VRAM upload queue drained by one assembly routine | to do next. The project has its own (`game/vramq.asm`, `vramq.h`): the reference for the shape |
+| Answer on the issue | not written: published under the owner's name, needs the owner's go |
+
+The figures are from a scene of 19 sprites in `libbench`.
+
