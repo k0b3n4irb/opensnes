@@ -579,6 +579,16 @@ freeze criterion that waits for hardware.
   change by it and render the same frames.
 
 ### Fixed
+- **`opensnes-sprite sheet --metasprite W H` on a sheet of several rows of
+  metasprites** (tools; found by issue #165): the first block of each
+  metasprite was computed by a formula that holds for a sheet of one row
+  (or one column) only. On a sheet of two rows of 32x32 cells, every
+  32x32 metasprite got tile 0; at `--size 16` the metasprites overlapped
+  (the second began at tile 2 instead of 4). Each metasprite is now
+  located in the sheet's grid. Sheets of one row or one column give the
+  same output as before (the eleven and fourteen existing golden cases of
+  `gfx4snes` and `opensnes-sprite` are unchanged); two new cases pin a
+  two-row sheet.
 - **The link-time guard against bank-blind reads did not see `static`
   objects** (tools, devtools): `opensnes-rom check` and
   `check_bank_reads.py` read a symbol's name up to its first dot, and a

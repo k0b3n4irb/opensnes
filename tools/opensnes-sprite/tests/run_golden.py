@@ -35,6 +35,26 @@ g.expect_outputs("sheet three.png --flip (mirror drift) == gfx4snes", ["sheet", 
                  copy=["three.png"], outputs=["three_meta.inc"], want_dir=GFX)
 
 
+# A sheet of SEVERAL ROWS of metasprites (grid.png: 128x64, two rows of four
+# 32x32 cells). Until 2026-10-09 the first block of a metasprite was right
+# only on a sheet of one row or one column: here every 32x32 metasprite got
+# tile 0, and at --size 16 the metasprites overlapped (issue #165). The
+# tile names read 0, 4, 8, 12, 64, ... and 0 2 32 34 / 4 6 36 38 / ...
+def grid_case(label, size, golden):
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["sheet", "-q", "--size", size, "--colors", "16", "--metasprite", "32", "32", "grid.png"], work, ["grid.png"], None)
+        err = g.failure(proc)
+        errs = [err] if err else ([] if (work / "grid_meta.inc").read_bytes() == (g.here / "golden" / golden).read_bytes()
+                                  else [f"grid_meta.inc differs from golden/{golden}"])
+    g.record(label, "the metasprite table matches", errs)
+
+
+grid_case("sheet grid.png --size 32 --metasprite 32 32: two rows of metasprites", "32", "grid32_meta.inc")
+grid_case("sheet grid.png --size 16 --metasprite 32 32: two rows, four blocks each", "16", "grid16_meta.inc")
+
+
 def anim_matches():
     with tempfile.TemporaryDirectory() as td:
         work = Path(td)
