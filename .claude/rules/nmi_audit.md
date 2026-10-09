@@ -64,12 +64,19 @@ Regression tests: `python3 devtools/test_check_nmi_wram_race.py`.
 NMI uses `tcc__nmi_registers` (page-aligned, != 0) as its direct page.
 All dp-relative accesses in NMI callback C code hit NMI registers, NOT main thread registers. No save/restore needed — saves 260 cycles.
 
+The page is 160 bytes (since 2026-10-09; 48 before) and must cover everything
+the compiler addresses relative to the direct page: `.registers` ($00-$33) and
+`tcc__lf` ($80-$9F), the frame of leaf C functions. A leaf called from the NMI
+callback keeps its temporaries at `tcc__lf` relative to this page; if the page
+stopped covering it, that frame would land on whatever RAM follows. Fixture
+`testing/fixtures/compiler/leaf_frame` runs the same leaf on both pages.
+
 ## Audit Checklist (before modifying NMI)
 
 - [ ] VBlank-critical steps (OAM, tilemap, scroll) remain first
 - [ ] DMA budget stays within ~4KB per frame
 - [ ] No WRAM data port ($2180-$2183) access in NMI path
 - [ ] Handshake protocol (vblank_flag) unchanged
-- [ ] DP isolation preserved (tcc__nmi_registers)
+- [ ] DP isolation preserved (tcc__nmi_registers, 160 bytes: `.registers` and `tcc__lf`)
 - [ ] FASTROM variant (jml.l FastNmi) updated if applicable
 - [ ] Every example still passes visual regression (run the full `--quick` suite — counts drift; the gate is "all green", not a hard-coded number)

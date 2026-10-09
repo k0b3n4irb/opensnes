@@ -481,15 +481,15 @@
   },
   "mode7_extbg": {
     "fbhash": [
-      "f519efc7e8f0c5a1",
-      "2e3688eeae61a9cd"
+      "bedf40f06d5f71a1",
+      "7ab3fab37a813205"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.34.0",
-    "rom_sha256": "0f9989f8b66f6a5a8b1bf5965ee1766ca65213891ed34f0d93eb7b00b732fa32"
+    "rom_sha256": "dbf6cc9b189eab6af29f737e3ee27a0b01be584cb173e695acde47d8f335142c"
   },
   "mode7_perspective": {
     "fbhash": "b6d491935f26c865",

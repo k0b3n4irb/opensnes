@@ -1,4 +1,7 @@
-# the function reserves a frame before the edge stores the phi's value
-in both: present sbc\.w #\d+\n\ttas
+# the phi's value is stored somewhere the function owns: a stack frame it
+# reserved, or (a leaf, since 2026-10-09) its direct-page frame — never a
+# stack offset without a frame, which was the return address
+in both: present sbc\.w #\d+\n\ttas|sta\.b tcc__lf\+\d+
+in both: absent sta \d+,s
 # fully folded: nothing is stored at all
 in either: absent sta \d+,s

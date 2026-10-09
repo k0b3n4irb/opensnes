@@ -4,11 +4,11 @@
 # The offsets below are today's frame layout: if a frame change moves them,
 # re-derive "shift load = zero-extended bg store + 2" before updating.
 # u8: bg is zero-extended into 2,s, the shift reads it back at 4,s.
-in set_scroll_u8: present and\.w #\$00FF\n\tsta 2,s
-in set_scroll_u8: present lda\.w #1\n\tpha\n\tlda 4,s\n\ttax\n\tpla\n\tcpx #0\n\tbeq \+\n-\tasl a
+in set_scroll_u8: present and\.w #\$00FF\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)
+in set_scroll_u8: present lda\.w #1\n\tpha\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\ttax\n\tpla\n\tcpx #0\n\tbeq \+\n-\tasl a
 # u16: bg stays in its parameter slot, 14,s since 2026-10-09 (24 before 2026-10-08, 36 before the slot colouring
 # of 2026-09-27 shrank the frame); after pha it is 16,s.
-in set_scroll_u16: present lda\.w #1\n\tpha\n\tlda 16,s\n\ttax\n\tpla\n\tcpx #0
+in set_scroll_u16: present lda\.w #1\n\tpha\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\ttax\n\tpla\n\tcpx #0
 # The array store: X is the index, the value is loaded after it (indexed
 # long since 2026-10-08; a pha / tax / pla around `sta.l $0000,x` before).
 in set_scroll_u8: present tax\n\tlda \d+,s\n\tsta\.l scroll_x,x

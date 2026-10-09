@@ -11,7 +11,7 @@ in test_widen_signed: present lda\.w #10\n\tsta\.w s16_val\n
 # byte, stored with an 8-bit store.
 in test_narrow: present lda #52\n\tsta\.w u8_val\n
 in test_narrow: present lda\.w #22136\n\tsta\.w u32_val\n\tlda\.w #4660\n\tsta\.w u32_val\+2\n\tlda\.w #22136\n\tsta\.w u16_val\n
-in test_narrow: present lda\.w u32_val\n\tsta (\d+),s\n[\s\S]*?lda \1,s\n\tsep #\$20\n\tsta\.w u8_val\n
+in test_narrow: present lda\.w u32_val\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n[\s\S]*?lda(?: |\.b tcc__lf\+)\1(?:,s)?\n\tsep #\$20\n\tsta\.w u8_val\n
 # Same bits both ways: 200 <-> -56, -10 <-> 246.
 in test_sign_cast: present lda #200\n\tsta\.w s8_val\n\tlda #246\n\tsta\.w s8_val\n\tlda #246\n\tsta\.w u8_val\n
 # (hi << 8) | lo rebuilds 0xABCD.

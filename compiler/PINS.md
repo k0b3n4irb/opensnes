@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 63ad4e9c6005701716f394a7c051799186a64053 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 576aa1d9a97dccb6904748afb3352449b89ea423 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | c794f42c3b95dff04214bd22c1da3e20bca16fca | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -89,7 +89,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 103 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 104 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -101,6 +101,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+c794f42 w65816: the frame of a leaf function is in the direct page, `tcc__lf` (2026-10-09)
 576aa1d w65816: a static function whose address is never used does not open with rep #$20 (2026-10-09)
 44bfca5 copy: two phis are the same only if they have the same class — a long lost its high half to its truncated copy (difftest_stmt seed 124152, 2026-10-09)
 efc6996 w65816: a 32-bit temp of which only the low half is read takes one word of frame (2026-10-09)

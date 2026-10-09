@@ -453,6 +453,21 @@ freeze criterion that waits for hardware.
   assembly is exactly what it was (`compiler/ABI.md`). The eighteen
   workloads −41.2 %, their code −28.3 %; 60 example ROMs change and
   render the same frames at the same frame numbers.
+- **A function that calls nothing has no stack frame** (compiler, runtime):
+  its temporaries live in the direct page, at `tcc__lf` (32 bytes at
+  `$0080`), when they fit 16 words and it has no local array. No
+  prologue, no epilogue, `lda.b` for `lda n,s`, nothing on the stack below
+  the return address. It is safe because such a function cannot be
+  re-entered on the same direct page: it calls nothing, and the NMI
+  handler runs the code it calls on its own page, which now mirrors that
+  block (160 bytes, 48 before); an IRQ handler is assembly. Measured on
+  luna against PVSnesLib: the eighteen workloads from −41.2 % to −43.8 %,
+  their code from −28.3 % to −30.4 %, and the deepest stack level or
+  shallower on 16 of them (7 before; `grid` and `strings` remain). The
+  static table of 34 functions goes from 1593 to 1380 cycles (−30.3 %):
+  `array_read` 101 → 70, `array_write` 102 → 75, `array2d_read` 150 → 117,
+  `struct_sum` 82 → 55, `loop_sum` 119 → 84. `mode7/extbg` boots 4 frames
+  sooner; the 86 examples render the same frames.
 - **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
   (compiler): a consequence of the shift-width fix below; 71 example ROMs
   change by it and render the same frames.

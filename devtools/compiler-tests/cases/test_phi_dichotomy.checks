@@ -4,10 +4,10 @@
 # backreferences tie the update's source slot (\1) to the write-back's
 # destination. No original check existed (opensnes-emu only compiled it).
 # L1: acc = acc + 1.
-in level1_single_acc: present @for_cont\.\d+:[\s\S]*?lda (\d+),s\n\tinc a\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n\tjmp @for_cond
+in level1_single_acc: present @for_cont\.\d+:[\s\S]*?lda(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tinc a\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n[\s\S]*?lda(?: |\.b tcc__lf\+)\2(?:,s)?\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?\n\tjmp @for_cond
 # L2: acc1 + 1 and acc2 + 2 each go back to their own slot.
-in level2_two_acc: present lda (\d+),s\n\tclc\n\tadc\.w #2\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
-in level2_two_acc: present @for_cont\.\d+:\n\tlda \d+,s\n\tinc a\n\tsta \d+,s\n\tlda (\d+),s\n\tinc a\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level2_two_acc: present lda(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tclc\n\tadc\.w #2\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n[\s\S]*?lda(?: |\.b tcc__lf\+)\2(?:,s)?\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?\n[\s\S]*?jmp @for_cond
+in level2_two_acc: present @for_cont\.\d+:\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tinc a\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tinc a\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n[\s\S]*?lda(?: |\.b tcc__lf\+)\2(?:,s)?\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?\n[\s\S]*?jmp @for_cond
 # L3: acc | val, val from the call.
 in level3_or_acc: present jsl get_value\n\tsta (\d+),s\n[\s\S]*?lda \1,s\n\tora (\d+),s\n\tsta (\d+),s\n[\s\S]*?lda \3,s\n\tsta \2,s\n\tjmp @for_cond
 # L4: an OR accumulator and a sum accumulator over the same val.

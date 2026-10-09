@@ -10,4 +10,4 @@ in get_value: present lda\.w #42\n\trtl
 in add_one: present lda 4,s\n\tinc a\n\trtl
 # A static in RAM, read-modify-written by address.
 section counter: present \.RAMSECTION
-in increment: present lda\.w counter\n\tinc a\n\tsta \d+,s\n\tsta\.w counter
+in increment: present lda\.w counter\n\tinc a\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.w counter

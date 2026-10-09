@@ -21,14 +21,14 @@ to losses; the rest held. The cause is not the pointer width itself (see
 "Reading it" at the end of this page): it is a stack frame and stack
 slots for values PVSnesLib keeps in the direct page, and code the
 optimizer leaves dead. The May text claimed "32 % faster";
-the honest figure today is **about 20 %** on these 34 functions, and
-40 % measured on eighteen whole workloads.
+the figure today is **about 30 %** on these 34 functions, and
+44 % measured on eighteen whole workloads.
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| **Total cycle reduction** | **−19.6 %** vs PVSnesLib + 816-opt (1593 vs 1981 cycles) |
+| **Total cycle reduction** | **−30.3 %** vs PVSnesLib + 816-opt (1380 vs 1981 cycles) |
 | Functions compared | 34 (the May `helper` row has no standalone body any more: it is inlined into `call_chain`; `array2d_read` joined on 2026-10-08, it was in the gate's baseline but not on this page) |
 | OpenSNES wins | 29 |
 | PVSnesLib+opt wins | 5 (`array_read`, `array_write`, `array2d_read`, `pea_constant_args`, `mod_const_10`) |
@@ -69,17 +69,17 @@ no page-crossing penalties).
   bitwise_and                 39        32        19    -40.6%
   bitwise_or                  39        32        19    -40.6%
   conditional                 81        65        40    -38.5%
-  loop_sum                   208       185       119    -35.7%
-  array_write                 74        65       102    +56.9%
-  array_read                  68        60       101    +68.3%
-  struct_sum                 111        86        82     -4.7%
-  swap                       158       142       119    -16.2%
+  loop_sum                   208       185        84    -54.6%
+  array_write                 74        65        75    +15.4%
+  array_read                  68        60        70    +16.7%
+  struct_sum                 111        86        55     -36.0%
+  swap                       158       142        91    -35.9%
   call_add                    56        41         4    -90.2%
   mul_variable                55        48        45     -6.2%
   clamp                      142       124        66    -46.8%
   signed_shift_right_8        38        31        28     -9.7%
   signed_shift_right_1        28        25        19    -24.0%
-  byte_store_loop            212       192       143    -25.5%
+  byte_store_loop            212       192       111    -42.2%
   global_increment            49        43        21    -51.2%
   zero_store_global           23        19        14    -26.3%
   compare_and_branch         136       129        60    -53.5%
@@ -90,9 +90,9 @@ no page-crossing penalties).
   mul_const_20                45        42        32    -23.8%
   mul_const_40                45        42        34    -19.0%
   mul_const_96                45        42        36    -14.3%
-  array2d_read               131       112       150    +33.9%
+  array2d_read               131       112       117    +4.5%
   ────────────────────  ────────  ────────  ────────  ────────
-  TOTAL                     2284      1981      1593    -19.6%
+  TOTAL                     2284      1981      1380    -30.3%
 ```
 
 ## Analysis
@@ -111,20 +111,23 @@ no page-crossing penalties).
 
 | Function | Delta | Why |
 |----------|-------|-----|
-| `array_read` | +68.3% | a 22-byte frame for temporaries only, and the index and address stored to it and reloaded |
-| `array_write` | +56.9% | same cause as `array_read` (111 cycles until the store stopped pushing its value, 2026-10-08) |
-| `array2d_read` | +33.9% | same cause, twice: the row address then the column |
+| `array_read` | +16.7% | the index and the address are still stored and reloaded (101 cycles until its temporaries moved to the direct page, 2026-10-09) |
+| `array_write` | +15.4% | same cause as `array_read` |
+| `array2d_read` | +4.5% | same cause, twice: the row address then the column |
 | `pea_constant_args` | +12.1% | `pea.w` constant push vs PVSnesLib's direct load |
 | `mod_const_10` | +3.1% | Both use runtime `__mod16`; slight overhead difference |
 
-The first three were wins in May (−48 %, −45 %, −14 %). They were put down
-to far pointers; read again on 2026-10-08, instruction by instruction, the
-dereference itself costs the same as before (`tax; lda.l $0000,x`, 16 bits).
-The 40 to 46 cycles lost per function are a stack frame set up and torn
-down for the compiler's temporaries (22), values stored to that frame and
-reloaded at once (about 40), a high word written and never read (8) and the
-`rep #$20` every function starts with (3). PVSnesLib has no frame here: its
-temporaries are direct-page pseudo-registers.
+The first three were wins in May (−48 %, −45 %, −14 %) and lost 34 to 70 %
+after far pointers. That was put down to the pointers; read again on
+2026-10-08, instruction by instruction, the dereference itself cost the
+same as before. The 40 to 46 cycles lost per function were a stack frame
+set up and torn down for the compiler's temporaries (22), values stored to
+that frame and reloaded at once (about 40), a high word written and never
+read (8) and the `rep #$20` every function starts with (3). The frame is
+gone since 2026-10-09 — these functions call nothing, so their temporaries
+live in the direct page, as PVSnesLib's do — and what is left of the gap is
+the store-and-reload and the `rep #$20`, which an exported function keeps
+on purpose: it is what lets assembly call it in either accumulator width.
 
 The `pea_constant_args` regression is a trade-off: `pea.w` is smaller in code size
 (2 bytes vs 3) but costs 1 extra cycle. PVSnesLib's `lda #imm; pha` is faster but
@@ -292,27 +295,27 @@ while it runs (bytes below the initial stack pointer).
 <!-- sdkbench:begin -->
 | Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `sieve` | sieve of 1024 in a byte array | 4,199,010 | 2,228,782 | -46.9 % | 296 | 177 | -40.2 % | 31 | 33 |
-| `sort` | insertion sort of 64 words | 2,620,372 | 1,656,006 | -36.8 % | 507 | 352 | -30.6 % | 43 | 43 |
-| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 5,315,628 | -47.0 % | 1174 | 684 | -41.7 % | 60 | 58 |
-| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 10,092,694 | -27.0 % | 983 | 683 | -30.5 % | 74 | 64 |
-| `mul` | 2304 multiplies of two variables | 6,389,830 | 5,049,658 | -21.0 % | 188 | 119 | -36.7 % | 34 | 41 |
-| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,899,006 | -67.8 % | 154 | 129 | -16.2 % | 34 | 37 |
-| `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,813,406 | -52.7 % | 594 | 332 | -44.1 % | 76 | 67 |
-| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 5,367,562 | -31.7 % | 605 | 426 | -29.6 % | 41 | 47 |
-| `calls` | recursive `fib(17)` | 5,041,934 | 2,827,700 | -43.9 % | 105 | 62 | -41.0 % | 159 | 159 |
-| `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 1,857,670 | -31.1 % | 523 | 518 | -1.0 % | 34 | 37 |
-| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,948,292 | -29.2 % | 233 | 161 | -30.9 % | 34 | 35 |
-| `list` | a 64-node linked list walked 40 times | 2,858,640 | 2,291,074 | -19.9 % | 402 | 371 | -7.7 % | 37 | 43 |
-| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 1,633,246 | -44.0 % | 397 | 284 | -28.5 % | 33 | 41 |
-| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 2,521,948 | -52.1 % | 694 | 540 | -22.2 % | 39 | 68 |
-| `entities` | the 32 entities again, through a pointer | 8,851,406 | 4,090,422 | -53.8 % | 1098 | 628 | -42.8 % | 62 | 58 |
-| `copy` | word and byte copies as index loops | 4,485,144 | 2,200,104 | -50.9 % | 709 | 468 | -34.0 % | 31 | 35 |
-| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,429,206 | -21.2 % | 1156 | 1002 | -13.3 % | 48 | 76 |
-| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,345,896 | -26.5 % | 392 | 380 | -3.1 % | 42 | 39 |
-| **Total** | | **99,641,418** | **58,568,300** | **-41.2 %** | **10210** | **7316** | **-28.3 %** | | |
+| `sieve` | sieve of 1024 in a byte array | 4,199,010 | 2,021,434 | -51.9 % | 296 | 165 | -44.3 % | 31 | 23 |
+| `sort` | insertion sort of 64 words | 2,620,372 | 1,645,356 | -37.2 % | 507 | 344 | -32.1 % | 43 | 43 |
+| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 5,294,296 | -47.2 % | 1174 | 676 | -42.4 % | 60 | 54 |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 10,071,356 | -27.1 % | 983 | 675 | -31.3 % | 74 | 60 |
+| `mul` | 2304 multiplies of two variables | 6,389,830 | 4,846,710 | -24.1 % | 188 | 107 | -43.1 % | 34 | 29 |
+| `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,821,866 | -68.6 % | 154 | 117 | -24.0 % | 34 | 29 |
+| `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,633,336 | -55.7 % | 594 | 320 | -46.1 % | 76 | 33 |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 4,818,064 | -38.7 % | 605 | 414 | -31.6 % | 41 | 23 |
+| `calls` | recursive `fib(17)` | 5,041,934 | 2,827,702 | -43.9 % | 105 | 62 | -41.0 % | 159 | 159 |
+| `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 1,670,370 | -38.1 % | 523 | 506 | -3.3 % | 34 | 23 |
+| `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,740,554 | -36.8 % | 233 | 149 | -36.1 % | 34 | 23 |
+| `list` | a 64-node linked list walked 40 times | 2,858,640 | 2,061,014 | -27.9 % | 402 | 359 | -10.7 % | 37 | 23 |
+| `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 1,455,356 | -50.1 % | 397 | 272 | -31.5 % | 33 | 23 |
+| `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 2,436,360 | -53.7 % | 694 | 532 | -23.3 % | 39 | 63 |
+| `entities` | the 32 entities again, through a pointer | 8,851,406 | 4,069,084 | -54.0 % | 1098 | 620 | -43.5 % | 62 | 54 |
+| `copy` | word and byte copies as index loops | 4,485,144 | 2,020,012 | -55.0 % | 709 | 456 | -35.7 % | 31 | 23 |
+| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,264,658 | -26.5 % | 1156 | 962 | -16.8 % | 48 | 58 |
+| `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,322,716 | -27.8 % | 392 | 372 | -5.1 % | 42 | 39 |
+| **Total** | | **99,641,418** | **56,020,244** | **-43.8 %** | **10210** | **7108** | **-30.4 %** | | |
 
-Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 7**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 18 workloads OpenSNES is **faster on 18**, **no larger on 18**, and **no deeper in stack on 16**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to
@@ -328,9 +331,9 @@ either SDK's boot or per-frame handler in it.
 
 - **Divide, modulo and 32-bit arithmetic are where OpenSNES wins most**
   (`decimal` −68 %, `long` −53 %, `grid` −50 %).
-- **Every workload is faster, by 20 to 68 %, and none is larger.** Arrays,
-  byte loops, tilemaps and entities are 32 to 54 % faster; `list`,
-  `strings` and `mul` are the closest, at 20 %.
+- **Every workload is faster, by 24 to 69 %, and none is larger.** Arrays,
+  byte loops, tilemaps and entities are 39 to 55 % faster; `mul`,
+  `strings`, `collide` and `state` are the closest, at 24 to 28 %.
 - **Until 2026-10-08 three were slower** — `sort` +63 %, `collide` +13 %,
   `list` +7 % — and this page put it down to the 4-byte pointer. That was
   wrong: OpenSNES dereferences a plain pointer in 16 bits, it is PVSnesLib
@@ -343,20 +346,20 @@ either SDK's boot or per-frame handler in it.
   `arr[i]` is `lda.l arr,x` with the index in X, `p->field` is
   `lda.l N,x` with the pointer in X. `&nodes[k]` with a 6-byte element no
   longer calls the 32-bit multiply either.
-- **The stack is deeper on 11 workloads of 18** (by 1 to 29 bytes) and
-  level or shallower on 7 (`collide` by 10 bytes, `long` by 9; `calls`,
-  recursive `fib(17)`, is level): each temporary of the compiler owns a stack slot,
-  where PVSnesLib keeps its temporaries in direct-page pseudo-registers
-  and gives a function a frame only for its C locals. This is the one
-  column still to win. (By 1 to 106 bytes on all 18 until 2026-10-08, when
-  locals the optimizer had turned into temporaries stopped keeping their
-  bytes of frame as well, parameters stopped being copied into the frame,
-  values that never touch the stack stopped having a slot, and an address
-  or an index stopped taking two words.)
+- **The stack is level or shallower on 16 workloads of 18**, by up to 43
+  bytes (`long`); `grid` (64 bytes against 39) and `strings` (58 against
+  48) are deeper. Until 2026-10-08 it was deeper on all 18, by 1 to 106
+  bytes: each temporary of the compiler owned a stack slot, where
+  PVSnesLib keeps its temporaries in direct-page pseudo-registers. Since
+  then a function that calls nothing keeps its temporaries in the direct
+  page too, promoted locals and values that never touch the stack have no
+  slot, parameters are read where the caller pushed them, and an address
+  takes one word. The two that remain are single large functions whose
+  temporaries do not fit the 16 words of the direct-page frame.
 
-What is left has named causes — a stack frame for temporaries, X reloaded
-after every instruction that is not an access, a 32-bit read through a
-pointer still staged in the direct page — and PVSnesLib is itself far from what a person would write (it never
+What is left has named causes — a stack frame in every function that
+calls another, X reloaded after every instruction that is not an access,
+a 32-bit read through a pointer still staged in the direct page — and PVSnesLib is itself far from what a person would write (it never
 uses X or Y as an index: the inner loop of `sort` is 255 cycles there and
 27 by hand). The plan is `.claude/notes/chantiers/beat_pvsneslib.md`.
 
