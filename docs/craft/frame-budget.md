@@ -71,12 +71,14 @@ The 65816 runs at 3.58 MHz (FastROM) or 2.68 MHz (slow), so a frame is only so
 many thousand cycles. When logic outgrows it, in rough order of reach-for:
 
 - **FastROM** — a near-free ~33% speedup for ROM-bound code (a build flag).
-- **In a loop that runs for every entity, use `u16` / `s16`**, for the
-  variables and for the tables it reads. The CPU's natural width here is 16
-  bits: an 8-bit variable makes the compiler switch the accumulator's width
-  around each access and mask the result (and sign-extend an `s8`). A real
-  project measured the difference on its per-player loops (issue #166). Keep
-  `u8` for what is stored in bulk, not for what a hot loop computes with.
+- **In a loop that runs for every entity, compute in 16 bits.** What
+  costs with an 8-bit type is arithmetic and comparison (the accumulator's
+  width is switched and the result masked each time) and `s8` (a sign
+  extension on every read) — not the type of the table: reading or writing
+  a `u8` array is no slower than a `u16` one (measured on a real project,
+  issue #166, which first reported the opposite and corrected it). So keep
+  `u8` tables where they save RAM, and read them into `u16` / `s16` locals
+  before computing with them.
 - **A loop the library already has in assembly is not worth writing in C**:
   placing the sprites of a scrolling game is `oamPlaceWorld()`, copying is
   `memcpy()`, several small VRAM uploads are the `vramqueue` module.

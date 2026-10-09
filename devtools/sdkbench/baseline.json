@@ -2,26 +2,26 @@
   "frames": 900,
   "workloads": {
     "sieve": {
-      "cycles": 2021434,
-      "size": 165,
+      "cycles": 2013088,
+      "size": 162,
       "stack": 23,
       "res": 172
     },
     "sort": {
-      "cycles": 1645356,
-      "size": 344,
+      "cycles": 1638634,
+      "size": 337,
       "stack": 43,
       "res": 12563
     },
     "physics": {
-      "cycles": 5294296,
-      "size": 676,
+      "cycles": 5254112,
+      "size": 652,
       "stack": 54,
       "res": 12530
     },
     "collide": {
-      "cycles": 10071356,
-      "size": 675,
+      "cycles": 10035082,
+      "size": 657,
       "stack": 60,
       "res": 162
     },
@@ -44,8 +44,8 @@
       "res": 35405
     },
     "bytes": {
-      "cycles": 4818064,
-      "size": 414,
+      "cycles": 4808114,
+      "size": 408,
       "stack": 23,
       "res": 819
     },
@@ -56,8 +56,8 @@
       "res": 1597
     },
     "switch": {
-      "cycles": 1670370,
-      "size": 506,
+      "cycles": 1667602,
+      "size": 504,
       "stack": 23,
       "res": 9705
     },
@@ -68,14 +68,14 @@
       "res": 2842
     },
     "list": {
-      "cycles": 2061014,
-      "size": 359,
+      "cycles": 2060630,
+      "size": 356,
       "stack": 23,
       "res": 17376
     },
     "tilemap": {
-      "cycles": 1455356,
-      "size": 272,
+      "cycles": 1451850,
+      "size": 269,
       "stack": 23,
       "res": 10608
     },
@@ -86,32 +86,32 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 4069084,
-      "size": 620,
+      "cycles": 4068660,
+      "size": 612,
       "stack": 54,
       "res": 12530
     },
     "copy": {
-      "cycles": 2020012,
-      "size": 456,
+      "cycles": 2008066,
+      "size": 444,
       "stack": 23,
       "res": 20921
     },
     "strings": {
-      "cycles": 2264658,
-      "size": 962,
+      "cycles": 2263852,
+      "size": 960,
       "stack": 58,
       "res": 65535
     },
     "state": {
-      "cycles": 1322716,
-      "size": 372,
+      "cycles": 1320276,
+      "size": 370,
       "stack": 39,
       "res": 24876
     },
     "place": {
-      "cycles": 7417820,
-      "size": 535,
+      "cycles": 7383730,
+      "size": 523,
       "stack": 40,
       "res": 30752
     }

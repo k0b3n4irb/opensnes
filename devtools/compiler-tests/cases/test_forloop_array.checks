@@ -11,9 +11,9 @@ in init_with_loop: present sta\.b tcc__r9\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\ta
 in init_with_loop: absent __mul16
 # Since 2026-10-08 each field is written with indexed-long addressing: X is
 # the scaled index, the field offset is in the operand, no value is pushed.
-in init_with_loop: present tax\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.l entries,x
+in init_with_loop: present tax\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.w entries,x
 # ...and X is loaded once for the four fields (the X cache, same day).
-in init_with_loop: present tax\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.l entries,x\n\tlda\.w #100\n\tsta\.l entries\+2,x\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.l entries\+4,x\n\tlda\.w #16\n\tsta\.l entries\+6,x
+in init_with_loop: present tax\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.w entries,x\n\tlda\.w #100\n\tsta\.w entries\+2,x\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.w entries\+4,x\n\tlda\.w #16\n\tsta\.w entries\+6,x
 in init_with_loop: absent pha
 # x = 64 + i*16.
 in init_with_loop: present lda(?: \d+,s|\.b tcc__lf\+\d+)\n\tasl a\n\tasl a\n\tasl a\n\tasl a\n\tclc\n\tadc\.w #64\n

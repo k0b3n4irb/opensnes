@@ -397,3 +397,28 @@ Also from it: "prefer u16 in hot loops" belongs in the docs.
 Both issues were answered in writing on 2026-10-09 (owner's go), under the
 owner's name: what is fixed, what is measured, what is not promised.
 
+### Requests that followed (2026-10-09, comments on #165 and #166)
+
+Asked for, and accepted (answered on the issues):
+
+| Request | Where | State |
+|---|---|---|
+| `opensnes-sprite sheet --size 32 --metasprite 32 32`: every `METASPR_ITEM` has tile 0 | tools | to do: a plain bug, first |
+| `vramQueuePushSprite(src, addr, size_px)`: the strips of one streamed frame in one call | lib | to do |
+| `opensnes-sprite sheet --size 32 --flip`: mirrored 32x32 blocks not deduplicated | tools | to do |
+| optional `const u8 *order` in `OamWorldBatch` (depth sort without a second copy of x and y) | lib | to do; its own path in the routine, cost of the indirection to be measured |
+| pattern 7: `T tab[N][M]` const table, 59 instructions a read against 17 flattened | compiler | with `array2d_read`, same root |
+| pattern 8: absolute difference and signed compare, 37 instructions (compare materialised as 0/1, `cmp #0` after an `sbc`) | compiler | to do |
+| pattern 9: inline a `static` function with one call site | compiler | to size: the back end has no inliner; the largest lever and the largest piece |
+| an insertion sort as a benchmark | devtools | to add |
+
+Withdrawn, and corrected in our docs: "prefer u16 tables".
+What costs is 8-bit arithmetic, comparison and `s8`; a `u8` table is no
+slower to index.
+
+Step 1 of #166 (pattern 3) on `place`: 7,417,820 -> 7,383,730 (-0.5 %).
+The first version was wrong (FAR and const objects got the short form too:
+17 pictures, two checks); it exposed that the link-time bank guard saw no
+`static` symbol at all, in both its implementations — fixed. And that the
+differential tests index no const or FAR table: to close.
+

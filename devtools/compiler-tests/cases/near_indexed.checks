@@ -1,8 +1,14 @@
-in rd: present tax\n\tlda\.l tab,x
+in rd: present tax\n\tlda\.w tab,x
 in rd: absent adc\.w #tab
-in wr: present sta\.l tab,x
+in wr: present sta\.w tab,x
 in wr: absent pha
-in rdb: present lda\.l bytes,x
+in rdb: present lda\.w bytes,x
 in rd_signed: absent tab\+8,x
 in rd_signed: present adc\.w #tab\+8
-in rd_unsigned: present lda\.l tab\+8,x
+in rd_unsigned: present lda\.w tab\+8,x
+# Issue #166, pattern 3 (2026-10-09): a PLAIN object indexed is abs,x. The
+# long form stays for what is not plain — far_ram_forms pins `lda.l fbuf,x`
+# for a FAR buffer and cst_indexed_long `lda.l romtab,x` for a const table,
+# and the first version of this change, which gave them `.w` too, failed
+# both (and changed 17 pictures of the corpus).
+absent \.l (?:tab|bytes)[^\n]*,x

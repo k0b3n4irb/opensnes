@@ -89,6 +89,23 @@ static size_t take_ident(const char *p, char *out, size_t n)
     return l;
 }
 
+/* A symbol as an operand names it: an identifier that may hold dots. A
+ * `static` object is `name.unit` in the output of cc65816, and until
+ * 2026-10-09 the scan stopped at the dot, looked up `name`, found nothing
+ * and let the read through: every static was invisible to the guard
+ * (seen when a compiler change under test emitted `lda.w message.main,x`
+ * for a const table in bank $07 and the link said OK). */
+static size_t take_sym(const char *p, char *out, size_t n)
+{
+    if (!ident_start(*p)) return 0;
+    size_t l = 0;
+    while (ident_char(p[l]) || (p[l] == '.' && ident_char(p[l + 1]))) l++;
+    if (l >= n) l = n - 1;
+    memcpy(out, p, l);
+    out[l] = '\0';
+    return l;
+}
+
 /* ---------------------------------------------------------- bank reads */
 
 static const char *const MEM_MNEMONICS[] = {
@@ -111,8 +128,8 @@ static void scan_bank_line(const char *line, str_set *mem, str_set *imm, str_set
         if (p[0] == '.' && (p[1] == 'w' || p[1] == 'W')) p += 2;
         if (!isspace((unsigned char)*p)) return;
         while (isspace((unsigned char)*p)) p++;
-        if (*p == ':') { if (take_ident(p + 1, name, sizeof name)) set_add(banked, name); }
-        else if (take_ident(p, name, sizeof name)) set_add(imm, name);
+        if (*p == ':') { if (take_sym(p + 1, name, sizeof name)) set_add(banked, name); }
+        else if (take_sym(p, name, sizeof name)) set_add(imm, name);
         return;
     }
     int is_mem = 0;
@@ -123,10 +140,10 @@ static void scan_bank_line(const char *line, str_set *mem, str_set *imm, str_set
     if (!isspace((unsigned char)*p)) return;
     while (isspace((unsigned char)*p)) p++;
     if (*p == '#') {
-        if (p[1] == ':') { if (take_ident(p + 2, name, sizeof name)) set_add(banked, name); }
-        else if (take_ident(p + 1, name, sizeof name)) set_add(imm, name);
+        if (p[1] == ':') { if (take_sym(p + 2, name, sizeof name)) set_add(banked, name); }
+        else if (take_sym(p + 1, name, sizeof name)) set_add(imm, name);
     } else if (*p != '$' && *p != ':') {
-        if (take_ident(p, name, sizeof name)) set_add(mem, name);
+        if (take_sym(p, name, sizeof name)) set_add(mem, name);
     }
 }
 
