@@ -403,6 +403,17 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **A conditional over a near target is one branch** (compiler; issue
+  #166, pattern 5): `bcc + / jmp @target / +` becomes `bcs @target` when
+  the target is within reach of a relative branch — two bytes instead of
+  five, 3 cycles less when the branch is taken. "Within reach" is an upper
+  bound of the bytes in between, computed instruction by instruction; a
+  wrong bound would be refused by the assembler, not miscompiled, and
+  during development one was (an instruction sharing its line with a
+  label was not counted: the link failed with "too large distance").
+  `place`: 7,383,730 -> 7,325,978 master cycles, 523 -> 502 bytes; over
+  the 19 workloads the code is 33.9 % smaller than PVSnesLib's (31.7 %
+  before).
 - **A plain array indexed is `lda.w sym,x`, not `lda.l sym,x`** (compiler;
   issue #166, pattern 3): a byte and a cycle less on every indexed access
   to a plain object, as scalars always had. `FAR` and `const` objects keep

@@ -435,3 +435,13 @@ The first version was wrong (FAR and const objects got the short form too:
 `static` symbol at all, in both its implementations — fixed. And that the
 differential tests index no const or FAR table: to close.
 
+Step 2 of #166 (pattern 5, short branches): `place` 7,383,730 -> 7,325,978,
+523 -> 502 bytes; 76 -> 74 instructions an iteration (two of its three
+conditionals; the loop exit is out of reach). Mostly a size gain: -33.9 %
+against PVSnesLib over the 19 workloads. Its first version undercounted a
+line that carries a label and an instruction, and difftest showed it as
+link failures ("too large distance", 129 bytes), never as wrong results.
+Two examples boot one frame sooner (mode4, mode7/extbg: MATCH at tolerance
+2). play_noise's audio differs by 6 % in its first window with an onset two
+samples earlier: noise, whose windows are not phase-stable.
+
