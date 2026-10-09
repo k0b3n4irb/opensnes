@@ -63,18 +63,21 @@ That is the line both shipped examples use.
 
 | Where | Bytes | Contents |
 |---|---:|---|
-| Bank `$00` (the 8 KB C band) | 69 | `objWorkspace` (64) + the engine's current id, slot and kill flag |
-| Bank `$7E` (the far band) | 6842 | 80 × 64-byte records, the per-type active-list heads, the three 256-byte callback tables, the object-loading scratch buffer |
+| Bank `$00` (the 8 KB C band) | 5 | the engine's current id, slot and kill flag |
+| Bank `$7E` (the far band) | 6910 | 80 × 64-byte records, `objWorkspace` (64) right behind them, the per-type active-list heads, the three 256-byte callback tables, the object-loading scratch buffer |
 
 Measured on `examples/maps/slope_collision`: the `.obj_bank7e` RAMSECTION is
-`$1ABA` bytes at `$7E:2466`, `.obj_bank00` is `$45` bytes at `$00:0109`. The
+`$1AFE` bytes at `$7E:2466`, `.obj_bank00` is 5 bytes. The
 big allocation sits in the far band, so it does not eat your scarce bank-`$00`
 RAM budget (see @ref tutorial_far_ram) — but 6.8 KB is 6.8 KB, and the pool
 is fixed at compile time. `OB_MAX` is 80 whether you spawn 3 objects or 80.
 
-Per-frame CPU cost is dominated by two 64-byte block copies per live,
-in-range object: one into the workspace before the callback, one back out
-after. Budget for that before putting 40 objects on screen.
+Per-frame CPU cost is dominated by two block copies per live, in-range
+object: 64 bytes into the workspace before the callback, 60 back out after
+— about 870 CPU cycles, 7,000 master cycles, per object. Budget for that
+before putting 40 objects on screen. The collision routines a callback
+calls add none (since 2026-10-09; each used to copy the record out and
+back in, which made six copies an object where there are now two).
 
 ## Registering a type
 
@@ -203,14 +206,19 @@ is shaped this way.
 
 The 80 records live in bank `$7E`, above `$2000`. Plain C pointers on this
 target are bank-`$00` addresses (see the RAM constraint in
-`KNOWN_LIMITATIONS.md`), so C simply cannot reach the array. Rather than
-making every field access a far read, the engine keeps **one** 64-byte
-scratch record in bank `$00`, where C can touch it with ordinary struct
-syntax:
+`KNOWN_LIMITATIONS.md`), so a plain pointer cannot reach the array. The
+engine keeps **one** 64-byte scratch record at a fixed address, which C
+touches with ordinary struct syntax:
 
 ```c
-extern t_objs objWorkspace;
+extern FAR t_objs objWorkspace;
 ```
+
+It is a `FAR` object (@ref tutorial_far_ram): `objWorkspace.xpos` reads and
+writes at the cost of any global, and a pointer to it, or to one of its
+fields, is a `FAR` pointer. It was in bank `$00` until 2026-10-09; it now
+sits right behind the pool, which is what lets the collision routines work
+on it where it is.
 
 The contract is a copy-in / copy-out sandwich around every callback:
 
@@ -223,8 +231,11 @@ The contract is a copy-in / copy-out sandwich around every callback:
 
 Engine functions you call from inside the callback keep the illusion intact:
 `objCollidMap`, `objCollidMapWithSlopes`, `objCollidMap1D` and `objUpdateXY`
-each flush the workspace to the record on entry and reload it on exit, so the
-values you see afterwards are the ones the routine computed.
+work on the workspace itself when it holds the object you name — the case
+inside that object's callback — so the values you see afterwards are the
+ones the routine computed, and nothing was copied. Called for any other
+object, they flush the workspace to its record, work on the record you
+named, and leave that one in the workspace.
 
 ### Reaching an object you are not currently updating
 

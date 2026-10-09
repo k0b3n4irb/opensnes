@@ -58,6 +58,7 @@ compile-time pattern checks (`cases/`, `run.py`).
 | `cyclecount/cyclecount.py`, `cyclecount/bench.py` | static 65816 cycle counts of the compiler's output for 34 functions against `bench_baseline.json`; `docs/BENCHMARK.md` is anchored to it | `bench`, `functional-tests` job |
 | `sdkbench/run.py`, `sdkbench/workloads.c` | the same C built by OpenSNES and by PVSnesLib and timed on luna (master cycles per workload); the measured table of `docs/BENCHMARK.md`. Needs `PVSNESLIB_HOME`, so no gate runs it | `bench-sdk` |
 | `libbench/run.py`, `libbench/scene.c` | the same library calls through OpenSNES and through PVSnesLib, timed on luna (master cycles per frame's worth of pad reads, scrolls, sprites, DMA, text) | `make bench-lib`; the Build workflow runs `--check` |
+| `twinbench/run.py` | the examples that exist in both SDKs, run side by side on luna with the same input script: master cycles of work per frame. The twins are ports, not the same source, so it reports and gates nothing; pairs found not to do the same work are listed in the script and left out | `make bench-twins` (needs `PVSNESLIB_HOME`) |
 | `asset_budget.py` | static VRAM / CGRAM weight of an example's converted assets | `asset-budget`, `common.mk` (one line per link) |
 | `vram_layout/` | `vram.spec` → `vram_map.h` by CP-SAT (ortools, opt-in; six examples use it) | by hand, gated by `lint-vram` |
 

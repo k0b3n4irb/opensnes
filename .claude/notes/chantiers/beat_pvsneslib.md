@@ -332,3 +332,22 @@ each with README, screenshot and a manifest):
 `logo/*` (two of them reproduce Capcom's and Konami's boot logos: not
 ours to ship).
 
+## Third bench: the twins, side by side (started 2026-10-09)
+
+Owner's question, same day: port the missing examples first, to have a
+one-to-one benchmark? Decided no: the missing ones do almost nothing per
+frame, and about forty examples already have their twin. `devtools/twinbench`
+(`make bench-twins`) runs each pair on luna with the same input script and
+reports the master cycles of work per frame. The twins are ports, not the
+same source: a pair is quoted only after its two sources were read side by
+side.
+
+First pass, 26 pairs: ahead on 17, behind on 9. Read so far:
+
+| Pair | First pass | Verdict |
+|---|---|---|
+| mapandobjects, slopemario | +40.9 %, +39.6 % | real: the object engine copied each object six times a frame between its pool and the workspace. Workspace moved behind the pool, the four collision routines work on it in place: +17.4 %, +13.9 %. The two copies around each update callback remain; removing them needs callbacks that work in the slot (the compiler folds `o->field` on `&objbuffers[idx]` into `lda.l objbuffers+N,x`, tried) — an API addition, about a day |
+| dynamicmetasprite | +75.2 % | real twins: `oamMetaDrawDyn` is compiled C here, assembly there. Next |
+| dynamicsprite, metasprite, animatedsprite | +148 %, +977 %, +38 % | NOT twins (4 sprites against 1; redraw every frame against once; the anim module against a counter). Left out of the bench. The anim module costs about 5,000 mclk a frame for one sprite: to look at |
+| mapscroll, breakout, mode7 | +5.9 %, +2.4 %, +0.9 % | to read |
+

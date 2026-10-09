@@ -371,6 +371,17 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **The object engine copies an object twice per update where it copied
+  it six times** (lib/contrib, `object`): `objWorkspace` moved from bank
+  $00 to right behind the object pool, so `objCollidMap`,
+  `objCollidMap1D`, `objCollidMapWithSlopes` and `objUpdateXY` work on it
+  in place when it holds the object they are called for, instead of
+  copying 60 bytes to its slot and 64 back. `games/mapandobjects` spent
+  25,000 master cycles a frame on those copies and now spends 10,000
+  (frame work 90,272 -> 75,209; PVSnesLib's twin 64,057); found by running
+  the two SDKs' twins side by side (`devtools/twinbench`). For game code:
+  `objWorkspace` is declared `FAR`. `objWorkspace.field` reads and costs
+  as before; a pointer to it is a `FAR` pointer.
 - **The library's per-frame calls, measured against PVSnesLib's for the
   first time, and brought level or ahead** (lib, devtools). The new
   `devtools/libbench` (`make bench-lib`) builds one scene with both SDKs
