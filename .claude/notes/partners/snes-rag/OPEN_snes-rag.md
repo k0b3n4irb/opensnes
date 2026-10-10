@@ -45,3 +45,18 @@ for: `sa1.h` and `docs/tutorials/sa1.md` now follow the console photographs
 main CPU, `$40-$5F` from the SA-1 with the fiche's reserve. The line above
 that owed the `sa1.h` rewrite is paid.
 
+
+**2026-10-10, later: re-queried after the owner said the corpus was
+updated** (MCP reconnected in this session). Same query, no exclusion,
+"luna diff --audio --align-onset per-window shift --max-shift": still
+`86a0d1666e161484` and `f2ca4b411354b69e`, still the single-shift text of
+v1.35.0 / v1.36.0 ("starts each capture's windows at its own first sample
+above `--silence`"); nothing names `--max-shift`. So as served here,
+`luna-docs` is not at v1.37.0 yet — or this update was about something
+else. On the hardware fact we proposed a fiche for, the corpus already
+answers with an arbiter: "DMA duration… realigns to a whole number of its
+own cycles…" gives anomie-timing, *S-CPU (5A22) / DMA*
+(`a8f6e03510109a8f`): "after the pause, wait 2-8 master cycles to reach a
+whole multiple of 8 master cycles since reset". The fiche is therefore not
+needed for the fact itself; what no source states is which emulators
+followed it and since when, which is luna's to report.
