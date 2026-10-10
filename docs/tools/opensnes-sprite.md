@@ -1,6 +1,6 @@
 # opensnes-sprite — sheets, metasprites and Aseprite clips {#tools_opensnes_sprite}
 
-The sprite artist's tool of the 1.x family (@ref tools_conventions). It
+The sprite artist's tool of the `opensnes-*` family (@ref tools_conventions). It
 takes what the artist exports — a sprite sheet, an Aseprite animation — and
 writes what the OBJ layer and the `anim` module consume. The converters are
 `gfx4snes`'s and `aseprite2snes`'s, linked as libraries: a `.pic` or a
@@ -85,7 +85,7 @@ every later run reads them, the command line overrides for one run.
 
 ## From gfx4snes and aseprite2snes
 
-| 0.x | opensnes-sprite |
+| earlier tools | opensnes-sprite |
 |---|---|
 | `gfx4snes -s 16 -p -i hero.png` | `sheet hero.png --size 16` |
 | `-o 16 -u 16` | `--colors 16 --bpp 4` |

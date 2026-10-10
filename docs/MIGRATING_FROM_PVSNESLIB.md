@@ -144,9 +144,9 @@ need output to the host rather than the screen.
 | `spcBoot`, `spcLoad`, `spcPlay` | `snesmodInit`, `snesmodLoadModule`, `snesmodPlay` | Module `snesmod`; the driver is the same SNESMOD |
 | `spcProcess()` | `snesmodProcess()` | Call once per frame |
 | `padsCurrent(pad)` | `padHeld(pad)` | Also `padPressed`, `padReleased` |
-| `rand()`, `srand(s)` | `rngNext()`, `rngSeed(s)` | Not libc's: 1-65535, a 16-bit LFSR. The libc names are deprecated and go at 1.0 |
+| `rand()`, `srand(s)` | `rngNext()`, `rngSeed(s)` | Not libc's: 1-65535, a 16-bit LFSR. The libc names went at 0.49 |
 | `LzssDecodeVram(s, a)` | `lzssDecodeVram(s, a)` | Lower-case `l`; the old spelling is deprecated |
-| `hdmaEnable(1 << ch)` | `hdmaEnable(ch)`, or `hdmaEnableMask(1 << ch)` for several | A channel number since 1.0, like the other `hdma*` calls; a mask above 7 is refused — see @ref upgrading |
+| `hdmaEnable(1 << ch)` | `hdmaEnable(ch)`, or `hdmaEnableMask(1 << ch)` for several | A channel number since 0.49, like the other `hdma*` calls; a mask above 7 is refused — see @ref upgrading |
 | `oamDrawMeta(id, x, y, m, tile, pal, size)` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | `tile`, `pal`, `size` are fields of a `static const MetaspriteStyle` |
 | `pvsneslibfont` | `textLoadFont()` with your own font | No implicit font |
 

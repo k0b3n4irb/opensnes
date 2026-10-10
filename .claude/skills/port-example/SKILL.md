@@ -169,7 +169,7 @@ read; `devtools/check_bank_reads.py` fails the link on a bank-blind one.
 | `oamSet(...)` | `oamSet(...)` | Same, 7 arguments (see Pitfall 2) |
 | `oamSetEx(...)`, `oamSetVisible(...)` | `oamSetSize()`, `oamHide()`, `oamSetXY()` | Split by concern |
 | `hdmaSetup(ch, ...)` | `hdmaSetup(ch, ...)` | Same |
-| `hdmaEnable(1 << ch)` | `hdmaEnable(ch)` | **Channel number since 1.0** (mask: `hdmaEnableMask(1 << ch)`) |
+| `hdmaEnable(1 << ch)` | `hdmaEnable(ch)` | **Channel number since 0.49** (mask: `hdmaEnableMask(1 << ch)`) |
 
 #### Color Math Mapping
 

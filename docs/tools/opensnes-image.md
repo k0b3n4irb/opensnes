@@ -1,6 +1,6 @@
 # opensnes-image — full-screen pictures and their tables {#tools_opensnes_image}
 
-The picture tool of the 1.x family (@ref tools_conventions), for the
+The picture tool of the `opensnes-*` family (@ref tools_conventions), for the
 screens that are not a tileset-and-tilemap: the **HiColor** technique, and
 the **Mode 7 perspective** tables that turn a flat Mode 7 plane into a
 road receding to the horizon. Both were maintainer scripts until 2026-10

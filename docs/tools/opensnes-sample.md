@@ -1,6 +1,6 @@
 # opensnes-sample — WAV to BRR samples {#tools_opensnes_sample}
 
-The first tool of the 1.x family (@ref tools_conventions). It turns a PCM
+The first tool of the `opensnes-*` family (@ref tools_conventions). It turns a PCM
 `.wav` — a jump, a hit, a UI blip, a voice clip — into the `.brr` the SNES
 DSP plays, plus a header with its sizes, and it tells you what a sample
 costs before you commit to it. The encoder is the one `smconv` bakes into

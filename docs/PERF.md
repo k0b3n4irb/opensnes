@@ -1,6 +1,6 @@
 # Measured frame costs of the library {#perf}
 What the library functions cost per frame in real scenes, measured on luna
-(cycle-accurate) on 2026-10-09 with the SDK of that day (1.0.0 in
+(cycle-accurate) on 2026-10-09 with the SDK of that day (0.49.0 in
 preparation; first measured on 2026-09-26, and the differences are noted).
 `PHILOSOPHY.md` asks every API with a cost to say it; this page is the
 measured side of that promise, and `docs/BENCHMARK.md` the compiler side.

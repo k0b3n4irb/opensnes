@@ -1,6 +1,6 @@
 # opensnes-music — Impulse Tracker to soundbank {#tools_opensnes_music}
 
-The music tool of the 1.x family (@ref tools_conventions). Your composer
+The music tool of the `opensnes-*` family (@ref tools_conventions). Your composer
 writes in OpenMPT or Schism Tracker and exports `.it`; `opensnes-music`
 turns one or several modules into the **soundbank** the SNESMOD driver
 plays, tells you what each song costs in the SPC700's 64 KB, and writes a

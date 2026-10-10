@@ -44,9 +44,9 @@ old.c:45: snesmodSetSoundTable — removed: use nothing: no SDK call started a s
 old.c:46: snesmodAllocateSoundRegion — removed: use nothing: no SDK call started a stream (removed from snesmod.h)
 old.c:47: oamDrawMeta — removed: use oamDrawMetasprite(id, x, y, frame, &style, 0) (removed from sprite.h)
 old.c:48: oamDrawMetaFlip — removed: use oamDrawMetasprite(id, x, y, frame, &style, flip) (removed from sprite.h)
-old.c:49: hdmaEnable — changes meaning: takes a channel number 0-7 since 1.0 (a bit mask until 0.48; above 7 it is refused) — 1 << n becomes n, or hdmaEnableMask(1 << n)
+old.c:49: hdmaEnable — changes meaning: takes a channel number 0-7 since 0.49 (a bit mask until 0.48; above 7 it is refused) — 1 << n becomes n, or hdmaEnableMask(1 << n)
 old.c:49: hdmaDisable — changes meaning: same as hdmaEnable: n, or hdmaDisableMask(1 << n)
-old.c:51: dmaTransfer — changes meaning: takes the source as one far pointer since 1.0 (bank + address until 0.48): dmaTransfer(ch, mode, src, destReg, size)
+old.c:51: dmaTransfer — changes meaning: takes the source as one far pointer since 0.49 (bank + address until 0.48): dmaTransfer(ch, mode, src, destReg, size)
 old.c:52: mode7SetScale — changes meaning: 0x0100 is 1:1 since 0.47 (it was 0x0200): check the value
 old.c:52: mode7Transform — changes meaning: 100 is 1:1 since 0.47: check the percentage
 two.h:1: BGMODE_MODE7 — removed: use BG_MODE7 (video.h) (removed from registers.h)

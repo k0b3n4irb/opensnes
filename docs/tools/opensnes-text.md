@@ -1,6 +1,6 @@
 # opensnes-text — bitmap fonts for the text module {#tools_opensnes_text}
 
-The text tool of the 1.x family (@ref tools_conventions). The text module
+The text tool of the `opensnes-*` family (@ref tools_conventions). The text module
 ships a font, so you may never need it; when you want your own typeface —
 a chunky title face, a themed UI face — `opensnes-text font` turns a
 picture of the glyphs into the tiles the text routines draw from. The tile
@@ -77,4 +77,4 @@ this tool's name and come after 1.0; the text module draws C strings.
 ## See also
 
 - @ref tutorial_text — drawing text, colours, the built-in font.
-- @ref tools_font2snes — the 0.x tool; shipped for one more version.
+- @ref tools_font2snes — the earlier tool; shipped for one more version.

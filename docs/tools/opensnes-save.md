@@ -1,6 +1,6 @@
 # opensnes-save — battery save files {#tools_opensnes_save}
 
-The save tool of the 1.x family (@ref tools_conventions). A `.srm` is the
+The save tool of the `opensnes-*` family (@ref tools_conventions). A `.srm` is the
 raw image of a cartridge's save RAM: what an emulator writes beside the
 ROM, and what luna reads and writes with `srm_in` / `srm_out` in a test
 manifest. `opensnes-save` makes one,

@@ -1,6 +1,6 @@
 # opensnes-tileset — pictures to tilesets and tilemaps {#tools_opensnes_tileset}
 
-The background tool of the 1.x family (@ref tools_conventions). A picture
+The background tool of the `opensnes-*` family (@ref tools_conventions). A picture
 drawn at the screen's size becomes the three things a BG layer loads: the
 tileset (`.pic`), the tilemap (`.map`) and the palette (`.pal`). The
 converter is `gfx4snes -m`'s, linked as a library: the bytes are its own.

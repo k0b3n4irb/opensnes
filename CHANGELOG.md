@@ -2,19 +2,23 @@
 
 All notable changes to OpenSNES are documented in this file.
 
-## [1.0.0] — 2026-10-05
+## [0.49.0] — 2026-10-10
 
-The first stable release of the public API: what `lib/include/snes/*.h`
-declares at this version stays, and changes again only at 2.0
-(`docs/STABILITY.md`). Against 0.48, the forty-seven names deprecated
-through the 0.x releases are gone (twenty constants, `OAM_SET_GFX_BANK`,
-twenty-six renamed functions), `hdmaEnable()` / `hdmaDisable()` take a
-channel number and `dmaTransfer()` a far pointer; `docs/UPGRADING.md`
-gives each replacement and `make check-upgrade SRC=<folder>` reads a 0.x
-project against the list. Version cut on `develop` on 2026-10-05 with the
-lots below; the `v1.0.0` tag on `main` follows the console session of the
-hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
-freeze criterion that waits for hardware.
+The release that carries the API meant for 1.0, without being 1.0. Against
+0.48, the forty-seven names deprecated through the earlier releases are
+gone (twenty constants, `OAM_SET_GFX_BANK`, twenty-six renamed functions),
+`hdmaEnable()` / `hdmaDisable()` take a channel number and `dmaTransfer()`
+a far pointer; `docs/UPGRADING.md` gives each replacement and
+`opensnes upgrade <folder>` reads a 0.48 project against the list.
+
+This section was headed `[1.0.0]` on `develop` from 2026-10-05 to
+2026-10-10, and the tree called itself 1.0.0 in that interval without a
+tag. The owner renamed it on 2026-10-10: the public API is the one 1.0 is
+expected to freeze (`docs/STABILITY.md`), but 1.0 waits for the compiler
+and library work still under way (issue #166 and what a first real game
+keeps showing), for the examples to be reviewed and their assets redone,
+and for the console session of the hardware protocol
+(`docs/HARDWARE_VERIFICATION.md`). Nothing below changes with the name.
 
 ### Added
 - **`opensnes-sprite sheet --compact`** (tools; issue #165): each distinct
@@ -687,6 +691,24 @@ freeze criterion that waits for hardware.
   change by it and render the same frames.
 
 ### Fixed
+- **A game with more than 32 KB of code was refused a ROM that works**
+  (build, tools; issue #168): when bank $00 is full the linker places the
+  next C functions and library routines in bank $01 and up — they are
+  `SUPERFREE` sections reached by `jsl`, and nothing in them depends on
+  their bank — but the post-link check then failed the build under 1024
+  free bytes with "the next code section will not fit". That ratchet dates
+  from the time a C-read const table had to live in bank $00; the data
+  moved to the asset banks in v0.41 and the check stayed. Measured on the
+  first game to get there: with 6 KB of filler pinned to bank $00, 31
+  functions ran from bank $01 (its own and `vramQueueFlush`, `oamSetSize`,
+  `bgSetScroll`, `setMode`…), its boot test passed and seven frames matched
+  exactly. `BANK0_FAIL_THRESHOLD` is now 0 by default (the knob stays for a
+  project that wants its code bank watched); `opensnes-rom check` reports
+  the free bytes of bank $00 and how much code is in the next banks;
+  `make test-bank-spill`, in `make tests`, rebuilds four examples with bank
+  $00 given no room and compares them frame for frame with the normal
+  build; `KNOWN_LIMITATIONS.md`, the build page and the tool page said the
+  old thing and are rewritten.
 - **`audioLoadSample()` could time out on a valid sample** (lib, module
   `audio`): for a sample whose last index byte is 0 — 513 bytes, 769, any
   size of the form 256 k + 1 — the driver showed its end-of-stream mark

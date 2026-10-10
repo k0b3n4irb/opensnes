@@ -1,8 +1,14 @@
-# What 1.0 freezes {#stability}
+# What 1.0 will freeze {#stability}
 
-This page is the promise behind the version number. It says what a project
-built on OpenSNES 1.0 can count on until 2.0, what is not part of that
+This page is the promise 1.0 will make. It says what a project built on
+OpenSNES 1.0 will be able to count on until 2.0, what is not part of that
 promise, and how a change reaches you when one is needed.
+
+**Where 0.49 stands.** 0.49 carries the API this promise is written for:
+the removals and the two changes of meaning below are done. It is not yet
+bound by the promise — a 0.x release may still rename or remove, one
+release after saying so (`docs/UPGRADING.md`) — but nothing is planned to,
+and the same checks run (`opensnes upgrade`, the lint on removed names).
 
 ## The promise
 
@@ -56,8 +62,8 @@ version. A new module costs nothing to a project that does not link it.
   `opensnes upgrade <folder>` reads a whole project against the list.
 - A **change of meaning** (the same name, a different effect) happens only
   at a major version, is announced one minor version ahead, and gets an
-  entry in `docs/UPGRADING.md` and a check in `opensnes upgrade`. The 1.0
-  release carries one: `hdmaEnable()` / `hdmaDisable()`, mask-taking and
+  entry in `docs/UPGRADING.md` and a check in `opensnes upgrade`. The 0.49
+  release carried one ahead of 1.0: `hdmaEnable()` / `hdmaDisable()`, mask-taking and
   deprecated in 0.48, take a channel number (and refuse a value above 7).
 - A **bug fix that changes behaviour** (the hardware did not do what the
   function promised, or the function did not do what its header said) is

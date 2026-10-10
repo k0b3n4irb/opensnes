@@ -1,13 +1,13 @@
 # The opensnes-* tools: conventions {#tools_conventions}
 
-OpenSNES 1.x replaces the 0.x converters (`gfx4snes`, `smconv`, `wav2brr`,
+The `opensnes-*` family replaces the earlier converters (`gfx4snes`, `smconv`, `wav2brr`,
 `tmx2snes`, `font2snes`, `img2snes`, `palplan`, `aseprite2snes`,
 `sa1_patch`) with a family of tools written for a studio shipping a game:
 **one tool per function, the same conventions everywhere, settings that
 live beside the asset, no interpreter to install**. This page is the
 contract every tool in the family follows; a tool that does not is a bug.
 
-The 0.x tools stay in the zip for one more release, each printing where
+The earlier tools stay in the zip for one more release, each printing where
 its function went.
 
 ## The family
@@ -152,5 +152,5 @@ For contributors (the rule itself is `.claude/rules/two_audiences.md`):
 - Every tool ships its golden suite (`tests/run_golden.py` over
   `tools/tests/golden.py`), its page under `docs/tools/`, and its fuzz
   harness for every parser it feeds with a user file.
-- A tool that absorbs a 0.x tool reproduces that tool's golden suite byte
+- A tool that absorbs an earlier tool reproduces that tool's golden suite byte
   for byte before the old one is retired.
