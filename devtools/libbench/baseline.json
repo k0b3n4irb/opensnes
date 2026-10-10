@@ -77,21 +77,21 @@
       }
     },
     "worldc": {
-      "cycles": 62797,
+      "cycles": 61275,
       "detail": {
-        "world_c.scene@for_body.77": 454040,
-        "world_c.scene@if_true.82": 292142,
-        "world_c.scene@if_false.85": 150342,
-        "world_c.scene@if_false.83": 114280
+        "world_c.scene@for_body.77": 423764,
+        "world_c.scene@if_true.82": 292342,
+        "world_c.scene@if_false.85": 150120,
+        "world_c.scene@if_false.83": 114584
       }
     },
     "world": {
-      "cycles": 31379,
+      "cycles": 31384,
       "detail": {
-        "oamPlaceWorld@sprite": 230120,
-        "oamPlaceWorld@next8": 143608,
-        "opensnes_font_2bpp_end": 109098,
-        "oamPlaceWorld@x_done": 86182
+        "oamPlaceWorld@sprite": 227422,
+        "oamPlaceWorld@next8": 143266,
+        "opensnes_font_2bpp_end": 109162,
+        "oamPlaceWorld@x_done": 89000
       }
     },
     "vramc": {

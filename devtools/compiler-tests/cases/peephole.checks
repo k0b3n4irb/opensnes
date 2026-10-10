@@ -1,0 +1,10 @@
+# one index, one tax, three accesses through it
+in three: present \ttax\n
+in three: absent \ttax\n[\s\S]*\ttax\n
+in three: present \tasl a\n\ttax\n\tlda\.w size_tab,x\n
+in three: present \tlda\.w xs,x\n
+in three: present \tlda\.w ys,x\n
+# nothing stored is loaded back on the next line
+in three: absent \tsta([^\n]*)\n\tlda\1\n
+# a call ends the straight line: `v`, whose address was passed, is read back
+in alias: present \tjsl bump[^\n]*\n[\s\S]*\tlda 2,s\n
