@@ -72,7 +72,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -272,6 +272,7 @@ tests: test-compiler
 	@for d in $(FIXTURE_TESTS); do \
 		$(MAKE) -s -C $$d clean && $(MAKE) -s -C $$d && python3 $$d/test_*.py || exit 1; done
 	@python3 devtools/link_modules.py
+	@python3 testing/bank_spill.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
@@ -504,6 +505,12 @@ test-toolchain-suites:
 test-link-modules:
 	@python3 devtools/link_modules.py
 
+# Code that does not fit bank $00 must run from the next banks (issue #168,
+# 2026-10-10): four examples rebuilt with bank $00 given no room, compared
+# frame for frame with the normal build. Also runs inside `make tests`.
+test-bank-spill:
+	@python3 testing/bank_spill.py
+
 # Fuzzing the asset parsers (gaps review H5): libFuzzer harnesses under
 # tools/fuzz/ for lodepng (gfx4snes, img2snes) and smconv's IT loader,
 # built with ASan + UBSan. `fuzz` runs each for FUZZ_SECONDS from the golden
@@ -709,7 +716,7 @@ hardware-preflight:
 	@scripts/install-luna.sh
 	@python3 testing/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
 
-# A project's sources against the names 1.0 removes and the two calls that
+# A project's sources against the names 0.49 removed and the two calls that
 # change meaning (docs/UPGRADING.md): make check-upgrade SRC=<folder>
 check-upgrade:
 	@test -n "$(SRC)" || { echo "usage: make check-upgrade SRC=<folder-or-file>"; exit 2; }
@@ -735,7 +742,7 @@ help:
 	@echo "  bench-twins - The examples both SDKs have, side by side on luna (needs PVSNESLIB_HOME)"
 	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
-	@echo "  check-upgrade SRC=<dir> - List the names 1.0 removes, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"
+	@echo "  check-upgrade SRC=<dir> - List the names 0.49 removed, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"
@@ -747,6 +754,7 @@ help:
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"
+	@echo "  test-bank-spill   - Rebuild four examples with bank $$00 full: code in bank $$01 must show the same frames"
 	@echo "  fuzz      - Fuzz lodepng and the IT loader with libFuzzer for FUZZ_SECONDS each (ASan+UBSan)"
 	@echo "  fuzz-replay - Replay the committed fuzz regression inputs (tools/fuzz/crashes/)"
 	@echo "  help      - Show this help"

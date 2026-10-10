@@ -27,7 +27,7 @@ from golden import Golden  # noqa: E402
 g = Golden("opensnes-rom", __file__)
 g.expect_stdout("check good.sym --json (healthy)", ["check", "--json", "good.sym"], golden="good.json", copy=["good.sym", "good.c.asm"])
 g.expect_refused("check good.sym --bank0-fail 30000 (ratchet)", ["check", "--bank0-fail", "30000", "good.sym"],
-                 copy=["good.sym", "good.c.asm"], needles=["imminent overflow"])
+                 copy=["good.sym", "good.c.asm"], needles=["under the threshold asked for"])
 g.expect_refused("check good.sym --ram-fail 8000 (ratchet)", ["check", "--ram-fail", "8000", "good.sym"],
                  copy=["good.sym", "good.c.asm"], needles=["C RAM band nearly full"])
 g.expect_refused("check ram_crosser.sym (a section across $2000)", ["check", "--no-nmi-race", "ram_crosser.sym"],

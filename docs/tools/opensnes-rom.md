@@ -10,7 +10,7 @@ five scripts the checks lived in stayed with the contributors.
 
 ```sh
 opensnes-rom check game.sfc                                  # the .sym and the .c.asm beside it
-opensnes-rom check game.sfc --bank0-fail 1024 --ram-fail 512 # what make/common.mk passes
+opensnes-rom check game.sfc --bank0-fail 0 --ram-fail 512    # what make/common.mk passes
 opensnes-rom check game.sfc --json
 ```
 
@@ -19,7 +19,7 @@ failure, the others are information:
 
 | Check | What it refuses | Why it is silent on hardware |
 |---|---|---|
-| **bank $00 ROM** | fewer than `--bank0-fail` bytes free in the code bank (the ratchet, `.claude/rules/bank0_budget.md`); warns under `--bank0-warn` and names asset payload that sits in bank $00 | the next section that does not fit is placed elsewhere and read as garbage |
+| **bank $00 ROM** | nothing by default: it reports the free bytes of the code bank and how much code the linker placed in the next banks (code runs from any bank). `--bank0-fail N` fails under N free bytes, for a project that wants it; asset payload that sits in bank $00 is named | — (until 2026-10-10 this was a failure under 1024 bytes, from the time C const data had to live there) |
 | **C RAM band** | a RAM section that crosses or sits past `$2000`; fewer than `--ram-fail` bytes free; warns under `--ram-warn` with the three largest sections | plain C RAM addressing is bank-$00-implicit; above `$1FFF` it is wrong-banked or hits the registers (`FAR` is the way above) |
 | **data-init sentinel** | `DataInitEnd` not at the end of `.data_init` | an object linked after `data_init_end.o` has globals that boot uninitialised |
 | **bank-blind reads** | a symbol read with 16-bit addressing (`lda.w sym`, `lda.w #sym` without `#:sym`) that the linker placed in bank $01+ | the read returns garbage; pass the data as a far pointer or keep it in bank $00 |
