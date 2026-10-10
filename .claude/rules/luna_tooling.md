@@ -49,7 +49,9 @@ working reference, not a hunch.
 
 | Script | The luna capability it proves | Status |
 |---|---|---|
-| `testing/frame_sequence.py` | `luna diff --sequence`: do two ROMs show the same pictures in the same order, at another cadence or offset (a free-running loop that got faster, a boot shifted by more than the tolerance) | validated 2026-10-08 on two real cases, a negative control and an identity control; asked of luna the same day (`partners/luna/2026-10-08_to_luna_rapport-v1.34.0.md`, D4); delete when luna ships it |
+| — | — | none since 2026-10-10 |
+
+`testing/frame_sequence.py` was the last one: validated on 2026-10-08, asked of luna the same day, shipped as `luna diff --sequence` in v1.35.0, reproduced line for line on three pairs at the v1.36.0 pin (2026-10-10) and deleted. `testing/diff_corpus.py` replays a DIFF with it.
 
 When a missing capability forces a prototype, add a row here (script path ·
 the luna capability it proves · status) and follow the lifecycle above; when
