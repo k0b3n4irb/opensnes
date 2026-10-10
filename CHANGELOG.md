@@ -56,6 +56,12 @@ All notable changes to OpenSNES are documented in this file.
   called from loops, values live across a call, a table indexed by
   row * 9 + column, 32-bit sums in two halves. OpenSNES: -54.7 % cycles, -49.8 % size.
   With it the total reads -54.1 % and -43.7 % (`docs/BENCHMARK.md`).
+- test(bench): the `dist` workload is rewritten: every point of one group
+  against every point of another, with the textbook "larger side plus
+  three eighths of the smaller" for the distance. Same shape
+  (nested loop, two absolute values, a static function with one call
+  site): -66.2 % cycles, -47.6 % size. Total over the twenty-one
+  workloads: -57.3 % and -47.3 %.
 
 ## [0.49.0] — 2026-10-10
 

@@ -322,9 +322,9 @@ while it runs (bytes below the initial stack pointer).
 | `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 2,066,110 | -33.0 % | 1156 | 855 | -26.0 % | 48 | 48 |
 | `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 1,015,678 | -44.5 % | 392 | 308 | -21.4 % | 42 | 27 |
 | `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 6,158,872 | -57.2 % | 831 | 419 | -49.6 % | 52 | 29 |
-| `dist` | 81 distances between two teams, 40 times: a nested loop, two absolute values and a call (issue #166) | 26,066,224 | 9,073,702 | -65.2 % | 1060 | 563 | -46.9 % | 55 | 28 |
+| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 9,388,534 | -66.2 % | 1018 | 533 | -47.6 % | 61 | 23 |
 | `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 16,410,356 | -56.6 % | 7722 | 3739 | -51.6 % | 93 | 65 |
-| **Total** | | **177,926,400** | **76,494,662** | **-57.0 %** | **19823** | **10446** | **-47.3 %** | | |
+| **Total** | | **179,676,446** | **76,809,494** | **-57.3 %** | **19781** | **10416** | **-47.3 %** | | |
 
 Of the 21 workloads OpenSNES is **faster on 21**, **no larger on 21**, and **no deeper in stack on 20**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
 <!-- sdkbench:end -->
