@@ -4,7 +4,7 @@
 |---|---|
 | **De** | OpenSNES (`develop` @ `4ae15903` poussé ; luna épinglée : `v1.37.0`) |
 | **Date** | 2026-10-10, nuit |
-| **Statut** | à transmettre |
+| **Statut** | **sans objet avant d'être transmis** : luna a publié la v1.38.0 le même soir, qui apporte des clés `"vram:MOT"` dans `[checkpoint.values]` — un mot de VRAM lu à un point de contrôle, ce que la demande du §2 cherchait. Gardé pour le §1 (ce que la v1.37.0 a permis) et le §3. À vérifier à l'épinglage de la v1.38.0 sur `backgrounds_mode4.toml`. |
 | **En bref** | Une demande, simple : pouvoir écrire `[checkpoint.blocks]`. Elle vient de la conversion de nos manifestes indexés par trame vers `at_symbol` / `input_at`, commencée ce soir avec votre v1.37.0. |
 
 ## 1. Ce que votre v1.37.0 a rendu possible ce soir
