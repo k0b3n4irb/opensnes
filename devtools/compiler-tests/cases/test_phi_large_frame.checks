@@ -1,3 +1,7 @@
+# Since 2026-10-10 a phi and the value that feeds it share a slot when they
+# can (see phi_share): the copies this case pins are the ones made when
+# they cannot, so it is compiled with the sharing off.
+env QBE_NO_PHI_SHARE=1
 # Since 2026-10-10 a temporary that no call crosses lives in the direct page
 # even in a function that calls (see dp_temps); the case pins the phi moves between stack slots in a large frame.
 env QBE_NO_DP_TEMPS=1

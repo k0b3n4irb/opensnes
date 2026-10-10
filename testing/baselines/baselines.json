@@ -91,15 +91,15 @@
   },
   "backgrounds_mode2": {
     "fbhash": [
-      "38f961e0c897ae95",
-      "0e23bd2fc9eac405"
+      "9b70a82dbae32745",
+      "48f2171570813ca5"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "f553bf14a58cb7979abf29661389fa689c652dfd5c07adad65bd7ae27c0d3fa2"
+    "luna_version": "v1.36.0",
+    "rom_sha256": "6d688ec666ac559a59c7b271462fa76d82ab97df1ab5ceace084ffa383234db9"
   },
   "backgrounds_mode3": {
     "fbhash": "dcdc281d00d69ece",
@@ -151,15 +151,15 @@
   },
   "basics_fix32_orbit": {
     "fbhash": [
-      "c1a4269328a63625",
-      "bb5723e9d12a5625"
+      "ceca34c901609825",
+      "5ddee3fa8f8a5625"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "9e98d38e6766094eafbe964a74e316a84f5356c2311410f5f4325f5beb1d96f9"
+    "luna_version": "v1.36.0",
+    "rom_sha256": "ef12542ef1b0b890ba63e85087b2882f42c0db1b6929ac0af0c140376e776d3b"
   },
   "basics_game_skeleton": {
     "fbhash": "4960ffea16eaeb4d",
@@ -193,15 +193,15 @@
   },
   "chips_dsp1_cube": {
     "fbhash": [
-      "7f8acd058472f125",
-      "3436ed2d42fd4925"
+      "5f5c59d382d18d25",
+      "6a68e5d1861d3925"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "31a463f0c679bc4cb134254902e491f4f42b2d11b1a6d939d5d15aeb40e46949"
+    "luna_version": "v1.36.0",
+    "rom_sha256": "e205aca14860545bba6cc34380c8a3972fcb22f76b44d6f93f76afb8fccab31c"
   },
   "chips_sa1_hello": {
     "fbhash": "7aee1820d6cdfed5",
@@ -481,15 +481,15 @@
   },
   "mode7_extbg": {
     "fbhash": [
-      "a1d865f84feb85e5",
-      "6539cb8c1257a17f"
+      "98963babefa780e3",
+      "a1d865f84feb85e5"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "7f703cfb57556ec2bc56f0f8c53253e7c73a28caf375f70b8d58103caf0bb1be"
+    "luna_version": "v1.36.0",
+    "rom_sha256": "d69fc600dff92ce1df1a7249b83047e3c22b3ab73e116b6117868a64bf94d241"
   },
   "mode7_perspective": {
     "fbhash": "b6d491935f26c865",

@@ -20,6 +20,23 @@ All notable changes to OpenSNES are documented in this file.
   -41.9 % -> -46.2 %), nothing slower. `QBE_SINK_DEEP=1` restores the
   copies (compiler check `index_once`).
 
+- perf(compiler): **a loop variable is updated in place.** A variable
+  that changes around a loop (`i++`, `acc += x`, a value one arm of an
+  `if` replaces) had two slots, the value of this turn and the next one,
+  and every turn ended by copying one to the other. They share a slot
+  when nothing else needs both: `i++` is `lda S / inc a / sta S`, the
+  jump back copies nothing, and an `if` that changes an accumulator
+  writes the accumulator. Same game, same method: match logic 68.6 M to
+  64.2 M master cycles (-6.5 %), everything but the idle wait -7.7 %,
+  three-frame ticks from 4 to 1. Against PVSnesLib over the twenty-one
+  workloads: -54.1 % -> -57.0 % in cycles, -43.7 % -> -47.3 % in size;
+  the static table goes from 1270 to 1258 cycles (`loop_sum` 81 -> 73,
+  `byte_store_loop` 100 -> 96); every row of the library bench stays
+  ahead. Four free-running examples show the same pictures one to seven
+  frames earlier (shorter boot). `QBE_NO_PHI_SHARE=1` and
+  `QBE_NO_OPND_SHARE=1` turn the two halves off (compiler check
+  `phi_share`).
+
 ### Fixed
 - fix(compiler): **`(u8)v` after a loop that shifts a signed char right
   kept the sign's high byte** (silent). `v >>= n` in a loop on an `s8`,
@@ -29,6 +46,13 @@ All notable changes to OpenSNES are documented in this file.
   while going round the loop and reused the assumption for a narrower
   question. Found by the differential test on a new seed range (one
   program in 40,000), fixed in `copy.c`; compiler check `width_cycle`.
+
+- fix(compiler): **a shift by a constant count narrowed by a cast gave 0**
+  (silent). `x >> (s16)(3 + 0x20000000UL)` shifts by 3; the count reached
+  the code generator un-narrowed, 536870915, and was read as "16 or more".
+  A count held in a variable was right. Found by the differential test
+  (three expressions in 144,000), fixed in `w65816/isel.c`; compiler check
+  `shift_count_word`.
 
 ### Changed
 - test(bench): the benchmark against PVSnesLib gains a twenty-first

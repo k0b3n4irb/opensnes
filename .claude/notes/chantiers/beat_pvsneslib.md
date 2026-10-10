@@ -684,3 +684,49 @@ pushing develop; and `make test-toolchain-suites` chained right after
 (rebuild first). Removed the same day: the three submodule worktrees, the
 worktree, both branches.
 
+### Step 8 of #166: a phi shares the slot of what feeds it (2026-10-10)
+
+Counted in the game's assembly after step 7: 297 copies from one
+direct-page slot to another, most of them a loop variable written back at
+the end of each turn. The slot colouring gave a phi and each of its
+arguments different slots by construction: a phi result interfered with
+everything live at the end of each predecessor, its own argument included,
+and a result with its own operands.
+
+What changed in `color_slots` (emit.c):
+- a phi's own argument on an edge is no longer an interference by itself
+  (any other reason still is: the argument live into the block, the old
+  value read after the new one exists — `while (j--)`);
+- a 16-bit add / sub / and / or / xor / copy may take its operand's slot
+  (the emitter computes these in A and stores once);
+- an argument asks for its phi's slot, or a sibling argument's when the
+  phi is not placed yet; a phi asks for an argument's;
+- two 32-bit values share exactly or not at all. The first version let
+  first fit put one a word over the other, since nothing separated them
+  any more: 233 difftest seeds stopped on the slot-ownership check (loud,
+  never a wrong result), which is the net doing its job.
+`emitphimoves` already skipped a move between equal slots.
+
+- the game, develop 551787e9 against this: match.c 68.59 M -> 64.16 M
+  (-6.5 %), everything but the wait 117.84 M -> 108.72 M (-7.7 %),
+  three-frame ticks 4 -> 1; the game replayed it: reference model in
+  agreement at every tick (946 + 496 + six provoked states), no internal
+  error;
+- four free-running examples show the same pictures earlier (mode2,
+  fix32_orbit, dsp1_cube one frame; mode7/extbg seven: `diff_corpus
+  --tolerance 3` and its sequence pass), three manifests indexed by frame
+  moved with them. These three (and the three of step 6) should name a
+  moment, not a frame: `at_symbol` (debt, still open);
+- audio: nine hashes moved; seven MATCH under `--align-onset`; `echo`
+  (21.8 %) and `speech_synth` (2.6 %) read DIFF and are the same signal 2
+  and 16 samples apart, measured sample against sample (the limit is noted
+  for luna in `OPEN_luna.md`);
+- tried and dropped: taking the phi interference from the block's live-in
+  only instead of each predecessor's live-out (the moves are on the edge,
+  so it would be sound): 3 instructions of 13,000 on the game.
+
+The hunt found one more defect that was not this step's: a constant shift
+count narrowed by a cast (`silent_defects_log.md`). Two inherited silent
+defects in one day from ranges nobody had run: the hunt on NEW seeds at
+each Class A step is worth more than the gate's fixed ones.
+

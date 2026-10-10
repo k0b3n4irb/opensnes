@@ -1,0 +1,8 @@
+# i++ and acc += in place, nothing copied before the jump back
+in count_up: present \tlda\.b tcc__lf\+(\d+)\n\tinc a\n\tsta\.b tcc__lf\+\1\n
+in count_up: absent \tlda\.b tcc__lf\+\d+\n\tsta\.b tcc__lf\+\d+\n\tjmp @for_cond
+# the arm that adds writes the accumulator's slot; no slot-to-slot copy anywhere
+in cond_add: present \tlda\.b tcc__lf\+(\d+)\n\tclc\n\tadc\.w #3\n\tsta\.b tcc__lf\+\1\n
+in cond_add: absent \tlda\.b tcc__lf\+\d+\n\tsta\.b tcc__lf\+\d+\n
+# keeps_old still loops; that it computes the right sum is the differential test's
+in keeps_old: present jmp @while_cond

@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 63ad4e9c6005701716f394a7c051799186a64053 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 79ff312ff616113b580e4c5f890687381d089de3 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 2872cf762604de7fea7e7abd42e720d5ef7c848d | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -89,7 +89,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 113 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 115 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -101,6 +101,8 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+2872cf7 isel: the constant count of a shift is cut to a word (16 bits here): the front end passes `x >> (s16)(3 + 0x20000000UL)` as `shr x, 536870915` and the emitter read "16 or more", result 0; a count in a temp was already read as its low word (difftest seeds 102026, 102200, 103718, three expressions in 144,000; 2026-10-10)
+61c373f emit: the slot colouring lets a phi share the slot of the value that feeds it (its own argument on an edge no longer counts as interfering; the phi move is then nothing) and a 16-bit add/sub/and/or/xor/copy share its operand's; an argument asks for its phi's slot, a phi for an argument's; two 32-bit ones share exactly or not at all. `i++` is `lda S / inc a / sta S` and the back edge copies nothing. QBE_NO_PHI_SHARE=1 / QBE_NO_OPND_SHARE=1 turn each off (issue #166; 2026-10-10)
 79ff312 copy: `defwidthle` took a phi it was already proving "no wider than 8 bits" as proven for ANY width asked; through an `extsb` the question becomes "no wider than 7", so `v = sar (extsb v), n` in a loop made `(u8)v` after it lose its `extub`, and a negative v reached a 16-bit xor with its high byte set. Inherited from upstream QBE. The phi's mark now carries the width being proven (difftest_stmt seed 241214, one program in 40,000; 2026-10-10)
 635044f gcm: sink() moves the address of a load or store next to it and no longer copies that address's operands with it: every access of `a[i]` carried its own `mul i, 2` (`lda i / asl a / tax`), a dozen per iteration in a loop over parallel arrays; found on a real game, whose match logic went from 75.1 M to 68.3 M master cycles over the same ticks; QBE_SINK_DEEP=1 restores the copies (issue #166; 2026-10-10)
 757df81 emit: in a function that CALLS, a temp that is not live across any call gets a direct-page slot (`tcc__lf`, slot numbers from DPSLOT; first fit in 16 words, the stack when full or when a call is crossed); found by measuring a real game, 59 % of whose logic ran on stack frames; QBE_NO_DP_TEMPS=1 turns it off (issue #166; 2026-10-10)

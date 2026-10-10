@@ -1,3 +1,7 @@
+# Since 2026-10-10 a phi and the value that feeds it share a slot when they
+# can (see phi_share): the copies this case pins are the ones made when
+# they cannot, so it is compiled with the sharing off.
+env QBE_NO_PHI_SHARE=1
 # Several phi moves in a row each load their own source: the A-cache must
 # not believe A still holds a value a previous move replaced (the
 # writestring() regression). Ported from opensnes-emu test_phi_acache

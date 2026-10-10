@@ -28,3 +28,27 @@ choices and lists what we replay at the pin: then `frame_sequence.py` and
 its row in `luna_tooling.md` are deleted, `diff_corpus.py` gains a
 `--sequence` pass, and the audio re-capture rule of `testing.md` cites
 `--align-onset`. The two rows above stay held.
+
+**2026-10-10, `diff --audio --align-onset` with more than one sound.**
+`audio/echo` before and after a compiler step (ROMs in
+`~/workspace/partner-reports/opensnes/2026-10-10_roms_audio-onsets/`):
+`luna diff --audio --align-onset echo_before.sfc echo_after.sfc
+--until-frame 300` says DIFF, max delta 21.83 % in the 1500 ms window,
+onset shift +2 samples. Sample against sample the two captures are the
+same signal: lag 0 from 0.6 to 1.4 s, lag 2 samples from 1.5 to 2.5 s
+(sum of absolute differences over the window 87 540 unshifted, 7 542 at
+lag 2), lag 0 again after 3 s. One global shift, taken from the first
+sound, cannot line up a second sound that moved by a different amount,
+and a 500 ms window whose edge falls on an attack turns two samples into
+21 % of RMS. What we would use: the onset found per window (or per burst)
+and printed, so that "same sound, each burst within N samples" reads as
+MATCH with its N. Told to luna's session the same day; not blocking (we
+did the lag search in twenty lines of Python for the commit message, which
+is exactly the kind of script `luna_tooling.md` wants gone).
+Answered within the hour: luna `develop` 260397f fits every window by
+itself (`--max-shift`, default 64; the final line says "per-window shift,
+max N samples"). Replayed with its release build on our two pairs: `echo`
+shifts +2, 0, 0, -2, -2, 0…, max delta 0.15 %, MATCH; `speech_synth` -12
+then -16 eight times, 0.77 %, MATCH. Not in a version yet (no 1.37.0
+without the owner's word): the row closes at the pin that carries it,
+when `testing.md` can quote the new final line.

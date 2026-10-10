@@ -28,10 +28,10 @@
 # bitplanes 0+1 set and 2+3 clear, tile 12 (0b1100) the exact mirror. The map
 # rows are "tile = row & 15", so map row 3 is 32 copies of tile 3.
 rom = "../../examples/backgrounds/mode2/mode2.sfc"
-frames = 200
+frames = 199
 
 [asserts.values]
-wave_phase = 382                  # +2 per loop iteration, 191 iterations by frame 200
+wave_phase = 382                  # +2 per loop iteration, 191 iterations by frame 199 (200 until 2026-10-10: the boot is a frame shorter)
 # The loop misses frames (lag_frame_counter), so the iteration count at
 # frame 200 follows the code's speed: 176 iterations until the compiler's
 # slot colouring of 2026-09-27, 178 until the tile module's asm encoder of
