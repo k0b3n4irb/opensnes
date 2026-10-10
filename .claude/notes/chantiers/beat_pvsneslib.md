@@ -493,3 +493,49 @@ hides the slot; one routine only if the identity path costs nothing).
 A hand-made working copy of the player's fields did NOT pay there (+3.5
 points): the cost left is the index per block and the calls.
 
+### State at `a66a4f53` (2026-10-10, CI green on every leg)
+
+The project's figures with step 4: kick-off 50.9 % of the frame (52.4 %
+before the step; its own source work took it from 56 to 52.4), one player
+running with collisions 33.0 %. `movePlayer` -7 %, `animate` -13 %,
+`stepPlayer` -4 %. The AI is transcribed and nothing reads the 81 distances
+every tick: the matrix is off the list. One threshold left for #166:
+**kick-off under 40 %**, the per-player path.
+
+What that path is made of, counted on a copy of its `match.c` (dummy
+tables, instructions): `movePlayer` 175 with 19 `tax` (9 of them after an
+`asl a`), `head` 196 with 20, `control` 148 with 13 and 3 calls, `animate`
+69 with 9, `moving` 115 with 4 calls, `matchTick` 62 with 7 calls. Read on
+the output:
+
+- the IR has `extuh id / mul 2` once per block (the front end reloads `id`
+  from its alloc in each block; after mem2reg and gvn, `sink` puts the
+  cheap computation back next to each use). After the peephole that is
+  `lda id / asl a / [sta slot] / tax` per block: 3 or 4 instructions, not
+  the 9 of before. Keeping it in a slot would save one instruction a block;
+  keeping it in X ACROSS blocks would save all of them, and X is also
+  wanted for the other indices (`anim_data[...]`). `lda.w sym,y` exists for
+  plain RAM (not `long,y`): a loop-invariant index in Y is the option to
+  size;
+- `sta slot` of the scaled index in each block, never read again;
+- `jmp` to a block that is only a `jmp`;
+- a value reloaded right after the conditional branch that tested it, when
+  the fall-through label has no other way in.
+
+Candidates for the next step, to be chosen by what they do to `movePlayer`
+and `dist`: (a) a forward dataflow over the function's text for "X holds
+slot S" across labels (join = equal, loops to a fixed point), the natural
+extension of the peephole; (b) Y for an index that does not change in the
+function; (c) inlining a single-call-site static (`stepPlayer`, `control`,
+`moving`, `matchTick` are calls).
+
+### Owed to others
+
+- #164 (DiscoC, external contributor): answered on 2026-10-10. Said in the
+  owner's name, without a date: the layout of bank $70 will be written down
+  and posted on that issue. Also named as ours: a helper that copies a GSU
+  program to Game Pak RAM, and a way to pin a GSU binary at a fixed ROM
+  address. After the port's issues.
+- #167: `order` in `OamWorldBatch`; design answered there; after #166's
+  next step.
+
