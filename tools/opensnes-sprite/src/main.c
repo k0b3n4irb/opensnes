@@ -62,7 +62,8 @@ static const cli_opt sheet_opts[] = {
     { "palette-entry", 0, CLI_INT, "N", "OBJ palette number (0..7) the metasprite entries carry", "0" },
     { "metasprite", 0, CLI_INT2, "W H", "write <stem>_meta.inc: one metasprite per W x H pixels of the sheet", NULL },
     { "priority", 0, CLI_INT, "N", "OBJ priority (0..3) of the metasprite entries", "0" },
-    { "flip", 0, CLI_FLAG, NULL, "deduplicate mirrored blocks; metasprite entries carry OBJ_FLIPX / OBJ_FLIPY", NULL },
+    { "flip", 0, CLI_FLAG, NULL, "a block that is the mirror of another is that block, flipped (metasprite entries carry OBJ_FLIPX / OBJ_FLIPY)", NULL },
+    { "compact", 0, CLI_FLAG, NULL, "write each distinct block once (with --flip, mirrors count as one) and <stem>_blocks.inc: where each block of the sheet went", NULL },
     { "pack", 0, CLI_FLAG, NULL, "packed-pixel tile format (Mode 7 style)", NULL },
     { "lz", 0, CLI_FLAG, NULL, "LZ77-compress the .pic (LzssDecode at runtime)", NULL },
     { "blank", 0, CLI_FLAG, NULL, "prepend a blank tile", NULL },
@@ -73,6 +74,51 @@ static const cli_opt sheet_opts[] = {
 };
 
 static int bpp_to_colors(int bpp) { return bpp == 2 ? 4 : bpp == 8 ? 256 : bpp == 4 ? 16 : 0; }
+
+/* --compact. A sheet often holds the same block several times, and its
+ * mirror as often (a character facing left and right). Until 2026-10-10
+ * --flip only said so in the metasprite table: the .pic still held every
+ * block, mirrors included, so nothing was saved in ROM or in VRAM, and
+ * without --metasprite nothing told the game which block was whose mirror
+ * (issue #165).
+ *
+ * One pixel of block `b` of the sheet, 0 outside the picture. */
+static int block_px(const unsigned char *img, int w, int h, int size, int blksx, int b, int x, int y)
+{
+    int px = (b % blksx) * size + x, py = (b / blksx) * size + y;
+    return (px < w && py < h) ? img[py * w + px] : 0;
+}
+
+/* Is block `b` block `u` seen through `flips` (bit 0: mirrored in x, bit 1: in y)? */
+static int block_is(const unsigned char *img, int w, int h, int size, int blksx, int b, int u, int flips)
+{
+    for (int y = 0; y < size; y++)
+        for (int x = 0; x < size; x++)
+            if (block_px(img, w, h, size, blksx, b, x, y)
+                != block_px(img, w, h, size, blksx, u, (flips & 1) ? size - 1 - x : x, (flips & 2) ? size - 1 - y : y))
+                return 0;
+    return 1;
+}
+
+#define BLOCK_FLIPX 0x4000      /* the bits of an OAM tile word, and of the block map */
+#define BLOCK_FLIPY 0x8000
+
+/* Fills where[b] = stored block | flip bits for every block of the sheet and
+ * kept[k] = the sheet block stored as block k; returns how many are kept. */
+static int compact_blocks(const unsigned char *img, int w, int h, int size, int blksx, int blksy,
+                          int flip, unsigned short *where, int *kept)
+{
+    int n = 0;
+    for (int b = 0; b < blksx * blksy; b++) {
+        int found = -1, how = 0;
+        for (int k = 0; k < n && found < 0; k++)
+            for (int f = 0; f < (flip ? 4 : 1); f++)
+                if (block_is(img, w, h, size, blksx, b, kept[k], f)) { found = k; how = f; break; }
+        if (found < 0) { kept[n] = b; found = n++; }
+        where[b] = (unsigned short)(found | ((how & 1) ? BLOCK_FLIPX : 0) | ((how & 2) ? BLOCK_FLIPY : 0));
+    }
+    return n;
+}
 
 static int sheet_one(cli_ctx *ctx, const char *in)
 {
@@ -89,6 +135,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     int entry = cli_int(ctx, "palette-entry", 0), prio = cli_int(ctx, "priority", 0);
     int metaw = 0, metah = 0, meta = cli_int2(ctx, "metasprite", &metaw, &metah);
     int flip = cli_has(ctx, "flip"), pack = cli_has(ctx, "pack"), lz = cli_has(ctx, "lz"), blank = cli_has(ctx, "blank");
+    int compact = cli_has(ctx, "compact");
     int ncolors = bpp_to_colors(bpp);
     if (size != 8 && size != 16 && size != 32 && size != 64) { cli_error(ctx, in, "--size %d: the OBJ sizes are 8, 16, 32 and 64", size); return CLI_REFUSED; }
     if (!ncolors) { cli_error(ctx, in, "--bpp %d: 2, 4 or 8", bpp); return CLI_REFUSED; }
@@ -112,9 +159,47 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     if (w % size || h % size)
         cli_warn(ctx, in, "%dx%d px is not a multiple of the %d px block: the last row or column of blocks is padded with pixels that are not in the sheet", w, h, size);
 
+    /* --compact: the picture the rest of this function converts becomes the
+     * distinct blocks, 128 pixels to a row as OBJ VRAM is, and `where` says
+     * which of them each block of the sheet is */
+    unsigned short *where = NULL;
+    int nkept = 0, sheet_blocks = blksx * blksy, sheet_blksx = blksx;
+    unsigned char *sheet_img = NULL;
+    int sheet_w = w, sheet_h = h;
+    if (compact) {
+        int *kept = malloc(sizeof *kept * (size_t)sheet_blocks);
+        where = malloc(sizeof *where * (size_t)sheet_blocks);
+        if (!kept || !where) { cli_error(ctx, in, "out of memory"); return CLI_IO; }
+        nkept = compact_blocks(snesimage.buffer, w, h, size, blksx, blksy, flip, where, kept);
+        int perrow = 128 / size, cw = perrow * size, ch = ((nkept + perrow - 1) / perrow) * size;
+        unsigned char *packed = calloc((size_t)cw * (size_t)ch, 1);
+        if (!packed) { cli_error(ctx, in, "out of memory"); return CLI_IO; }
+        for (int k = 0; k < nkept; k++)
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                    packed[((k / perrow) * size + y) * cw + (k % perrow) * size + x]
+                        = (unsigned char)block_px(snesimage.buffer, w, h, size, blksx, kept[k], x, y);
+        free(kept);
+        sheet_img = snesimage.buffer;       /* the sheet itself, for the metasprite map below */
+        snesimage.buffer = packed;
+        w = cw; h = ch;
+        blksx = perrow; blksy = ch / size;
+    }
+
     unsigned short *map = NULL;
     int nmeta = 0;
-    if (meta) {
+    if (meta && compact) {
+        /* the map of the SHEET, with each block's index and flips replaced by
+         * where it went: the metasprite names then follow the compacted .pic */
+        int bx = sheet_blksx, sby = sheet_blocks / sheet_blksx, nbt = sby;
+        unsigned char *mt = tiles_convertsnes(sheet_img, sheet_w, sheet_h, size, size, &bx, &nbt, size, true);
+        map = map_convertsnes(mt, &nbt, size, size, sheet_blksx, sby, ncolors, entry, 0, 1, 0, 0, 0, true);
+        for (int b = 0; b < sheet_blocks; b++)
+            map[b] = (unsigned short)((map[b] & ~(TILEIDX_MASK | BLOCK_FLIPX | BLOCK_FLIPY)) | where[b]);
+        metasprite_save(outbase, map, sheet_blksx, sby, size, metaw, metah, prio, sheet_w, sheet_h, true);
+        nmeta = sheet_blocks / ((metaw / size) * (metah / size));
+        free(mt);
+    } else if (meta) {
         int bx = blksx, by = blksy, nbtiles = by;
         unsigned char *mt = tiles_convertsnes(snesimage.buffer, w, h, size, size, &bx, &nbtiles, size, true);
         map = map_convertsnes(mt, &nbtiles, size, size, blksx, blksy, ncolors, entry, 0, 1, 0, 0, flip, true);
@@ -133,6 +218,26 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     else { tiles_checkbanks(tiles, nbtiles, ncolors); tiles_save(outbase, tiles, nbtiles, ncolors, blank, lz, true); }
     int savepal = !cli_has(ctx, "no-palette");
     if (savepal) palette_save(outbase, palette_snes, colors, true);
+    if (compact) {
+        /* <stem>_blocks.inc: one word per block of the sheet, in reading order */
+        char path[1100], ident2[256];
+        snprintf(path, sizeof path, "%s_blocks.inc", outbase);
+        cli_ident(in, ident2, sizeof ident2);
+        FILE *fp = fopen(path, "wb");
+        if (!fp) { cli_error(ctx, in, "can't write %s", path); return CLI_IO; }
+        fprintf(fp, "/* Generated by %s %s --compact%s. One word per %dx%d block of the\n"
+                    " * sheet, in reading order: the low bits are the block of the .pic that holds\n"
+                    " * its pixels, bit 14 says it is drawn mirrored in x, bit 15 in y — the bits\n"
+                    " * of OBJ_FLIPX / OBJ_FLIPY in an OAM attribute word. %d blocks in the sheet,\n"
+                    " * %d in the .pic. */\n", ctx->tool->name, ctx->tool->version, flip ? " --flip" : "", size, size, sheet_blocks, nkept);
+        fprintf(fp, "#define %s_BLOCKS %d\n#define %s_STORED_BLOCKS %d\n", ident2, sheet_blocks, ident2, nkept);
+        fprintf(fp, "const unsigned short %s_blocks[%d] = {", ident2, sheet_blocks);
+        for (int b = 0; b < sheet_blocks; b++)
+            fprintf(fp, "%s0x%04X%s", b % 8 ? " " : "\n\t", where[b], b + 1 < sheet_blocks ? "," : "");
+        fprintf(fp, "\n};\n");
+        fclose(fp);
+    }
+    free(where); free(sheet_img);
     free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
     /* the glue: <stem>.inc (DECLARE_GFX_ASSET) and <stem>_data.as, in asset.h's naming */
     char ident[256], generator[64], err[160];
@@ -150,9 +255,10 @@ static int sheet_one(cli_ctx *ctx, const char *in)
         cli_json_object(ctx, "sheet"); cli_json_int(ctx, "width", w); cli_json_int(ctx, "height", h);
         cli_json_int(ctx, "block", size); cli_json_int(ctx, "blocks_x", blksx); cli_json_int(ctx, "blocks_y", blksy); cli_json_close(ctx);
         cli_json_array(ctx, "outputs");
-        const char *exts[] = { pack ? ".pc7" : ".pic", ".inc", "_data.as", savepal ? ".pal" : NULL, meta ? "_meta.inc" : NULL };
-        const char *kinds[] = { "tiles", "header", "asm", "palette", "metasprites" };
-        for (int i = 0; i < 5; i++) {
+        const char *exts[] = { pack ? ".pc7" : ".pic", ".inc", "_data.as", savepal ? ".pal" : NULL, meta ? "_meta.inc" : NULL,
+                               compact ? "_blocks.inc" : NULL };
+        const char *kinds[] = { "tiles", "header", "asm", "palette", "metasprites", "blocks" };
+        for (int i = 0; i < 6; i++) {
             if (!exts[i]) continue;
             char path[1100]; snprintf(path, sizeof path, "%s%s", outbase, exts[i]);
             cli_json_object(ctx, NULL); cli_json_str(ctx, "path", path); cli_json_str(ctx, "kind", kinds[i]); cli_json_close(ctx);
@@ -165,6 +271,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
         printf("%s: %s -> %s.%s (%d tiles, %ld bytes of VRAM at %d bpp%s%s)\n", ctx->tool->name, in, outbase, pack ? "pc7" : "pic",
                nbtiles, vram, bpp, savepal ? ", .pal" : "", meta ? ", _meta.inc" : "");
         if (nmeta) printf("  %d metasprite%s of %dx%d\n", nmeta, nmeta == 1 ? "" : "s", metaw, metah);
+        if (compact) printf("  %d blocks of %dx%d in the sheet, %d kept (_blocks.inc)\n", sheet_blocks, size, size, nkept);
     }
     return CLI_OK;
 }

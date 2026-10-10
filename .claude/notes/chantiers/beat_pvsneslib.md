@@ -404,7 +404,8 @@ Asked for, and accepted (answered on the issues):
 | Request | Where | State |
 |---|---|---|
 | `opensnes-sprite sheet --size 32 --metasprite 32 32`: every `METASPR_ITEM` has tile 0 | tools | fixed, `ed7903ed`: wrong on any sheet of several rows of metasprites, not only 32x32 |
-| `opensnes-sprite sheet --size 32 --flip`: mirrored 32x32 blocks not deduplicated | tools | to do |
+| `vramQueuePushSprite(src, addr, size_px)`: the strips of one streamed frame in one call | lib | done, this commit |
+| `opensnes-sprite sheet --size 32 --flip`: mirrored 32x32 blocks not deduplicated | tools | done, this commit: `--compact` writes each distinct block once and `<stem>_blocks.inc` says where each block of the sheet went (stored block + flip bits). `--flip` alone only ever marked mirrors in the metasprite table |
 | optional `const u8 *order` in `OamWorldBatch` (depth sort without a second copy of x and y) | lib | to do; its own path in the routine, cost of the indirection to be measured |
 | pattern 7: `T tab[N][M]` const table, 59 instructions a read against 17 flattened | compiler | with `array2d_read`, same root |
 | pattern 8: absolute difference and signed compare, 37 instructions (compare materialised as 0/1, `cmp #0` after an `sbc`) | compiler | to do |
@@ -443,4 +444,8 @@ table then an operation on it (`lda.w gx,x / sta / lda.w xs,x / sta / lda /
 sbc`) where `sbc.w xs,x` would do; `cmp.w #0` after an operation that set
 the flags; the comparison result materialised as 0 or 1 (pattern 8); the
 loop counter in memory with the test at the top (pattern 6).
+
+### Step 4 of #166 (2026-10-10)
+
+
 

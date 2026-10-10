@@ -51,6 +51,28 @@ def grid_case(label, size, golden):
     g.record(label, "the metasprite table matches", errs)
 
 
+# --compact (issue #165): mirror.png is A, A mirrored, B, B mirrored, 32x32
+# each. With --flip two blocks are kept and _blocks.inc reads 0, 0|FLIPX, 1,
+# 1|FLIPX; the metasprite names follow the compacted sheet (0, 0, 4, 4).
+# Without --flip, at --size 16, no 16x16 block of the random picture repeats:
+# every block is kept and the table is the identity.
+g.expect_outputs("sheet mirror.png --flip --compact: two blocks kept of four, the table and the names",
+                 ["sheet", "-q", "--size", "32", "--colors", "16", "--flip", "--compact", "--metasprite", "32", "32", "mirror.png"],
+                 copy=["mirror.png"], outputs=["mirror_blocks.inc", "mirror_meta.inc", "mirror.pic"])
+
+
+def compact16():
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["sheet", "-q", "--size", "16", "--colors", "16", "--compact", "mirror.png"], work, ["mirror.png"], None)
+        err = g.failure(proc)
+        errs = [err] if err else ([] if (work / "mirror_blocks.inc").read_bytes() == (g.here / "golden" / "mirror16_blocks.inc").read_bytes()
+                                  else ["mirror_blocks.inc differs from golden/mirror16_blocks.inc"])
+    g.record("sheet mirror.png --size 16 --compact (no --flip): nothing repeats, the identity", "the block table matches", errs)
+
+
+compact16()
 grid_case("sheet grid.png --size 32 --metasprite 32 32: two rows of metasprites", "32", "grid32_meta.inc")
 grid_case("sheet grid.png --size 16 --metasprite 32 32: two rows, four blocks each", "16", "grid16_meta.inc")
 
