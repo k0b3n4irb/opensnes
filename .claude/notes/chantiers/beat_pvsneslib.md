@@ -730,3 +730,23 @@ count narrowed by a cast (`silent_defects_log.md`). Two inherited silent
 defects in one day from ranges nobody had run: the hunt on NEW seeds at
 each Class A step is worth more than the gate's fixed ones.
 
+The worktree recipe's trap, understood the second time (2026-10-10): a
+submodule checkout made with `git -C compiler/qbe worktree add` shares the
+submodule's `config`, and as soon as git runs in the new superproject
+worktree (`git add compiler/qbe`, `git status`) it rewrites
+`core.worktree` in that shared config to point at the NEW checkout — with
+a relative path that only resolves from the linked git directory. From
+then on every git command in the main tree's `compiler/qbe` and
+`compiler/wla-dx` dies with "cannot chdir to …/opensnes-s9/compiler/qbe"
+(`cproc` has its git directory elsewhere and is spared). Landing
+therefore goes: read the commit with `git --git-dir=.git/modules/compiler/qbe
+rev-parse wip/<name>`, remove the linked worktrees, then
+`git config -f .git/modules/compiler/<m>/config core.worktree
+../../../../compiler/<m>` for qbe and wla-dx, and only then checkout,
+push the fork (`git ls-remote` to see it arrived) and rebuild. The game
+builds with `bin/` and never runs git here, so it did not see it; a
+session that had run `git status` in this tree during the chantier would
+have. Next time: a plain clone of the three submodules into the worktree
+(`git clone compiler/qbe ../opensnes-<name>/compiler/qbe`) costs a few
+seconds and shares nothing.
+
