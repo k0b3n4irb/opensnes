@@ -4,6 +4,13 @@
 
 ![Screenshot](sa1_hello.png)
 
+## What You'll Learn
+
+- SA-1 coprocessor cartridge type detection
+- I-RAM shared memory between SNES CPU and SA-1
+- SA-1 boot status codes and diagnostics
+- Using `USE_SA1 := 1` in the Makefile
+
 ## Build & Run
 
 ```bash
@@ -12,13 +19,6 @@ make -C examples/chips/sa1_hello
 ```
 
 Then open `sa1_hello.sfc` in luna (or any SNES emulator).
-
-## What You'll Learn
-
-- SA-1 coprocessor cartridge type detection
-- I-RAM shared memory between SNES CPU and SA-1
-- SA-1 boot status codes and diagnostics
-- Using `USE_SA1 := 1` in the Makefile
 
 ## Status Codes
 

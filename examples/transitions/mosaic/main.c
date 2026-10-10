@@ -29,11 +29,9 @@
 #include <snes.h>
 
 /** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
-extern u8 tiles[], tiles_end[];
+#include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
 /** @brief Background tilemap data mapping tiles to the 32x32 grid */
-extern u8 tilemap[], tilemap_end[];
 /** @brief 16-color palette for the background tiles */
-extern u8 palette[], palette_end[];
 
 /**
  * @brief Block until a button is pressed, debouncing any currently held buttons.
@@ -91,11 +89,11 @@ int main(void) {
     consoleInit();
 
     /* Load 4bpp tiles to VRAM $4000 and palette to CGRAM slot 0 */
-    bgInitTileSet(0, tiles, palette, 0, tiles_end - tiles, palette_end - palette, BG_16COLORS, 0x4000);
+    bgInitTileSet(0, opensnes_tiles, opensnes_pal, 0, opensnes_tiles_end - opensnes_tiles, opensnes_pal_end - opensnes_pal, BG_16COLORS, 0x4000);
 
     /* Place the tilemap at VRAM $1000 with a 32x32 tile arrangement */
     bgSetMapPtr(0, 0x1000, BG_MAP_32x32);
-    dmaCopyVram(tilemap, 0x1000, tilemap_end - tilemap);
+    dmaCopyVram(opensnes_map, 0x1000, opensnes_map_end - opensnes_map);
 
     /* Mode 1 with only BG1 visible on the main screen */
     setMode(BG_MODE1, 0);

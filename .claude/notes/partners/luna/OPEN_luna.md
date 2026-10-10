@@ -2,11 +2,29 @@
 
 Opened 2026-09-26. One line per item. Every item is re-checked on the pinned
 luna the day the report goes out (`.claude/rules/partners.md`); the pin is
-v1.31.0 (2026-10-03).
+v1.34.0 (2026-10-06).
+
+Sent on 2026-10-06 in `2026-10-06_to_luna_rapport-v1.33.1.md`; answered
+the same day (`2026-10-06_from_luna_reponse-rapport-v1.33.1.md`) and closed by
+v1.34.0, pinned that day: the bare static name (D1), the cartridge RAM of
+`--power-on random` (D3); the archive sums (D2) are GitHub's `digest` field,
+which our pin recipe now reads (`testing/luna.sha256`). The two below were
+held back: not re-run, they go out with a reproduction ROM or not at all.
 
 | Date | Item | Seen on | What we would run |
 |---|---|---|---|
-| - | (empty: the audio comparison request went out on 2026-10-03 in `2026-10-03_to_luna_messages-region_reply.md`, §2) | - | - |
-| - | (done 2026-10-03 at the v1.32.0 pin: the three runs of the diff-audio reply replayed on the pinned binary, rule written in `testing.md`) | | |
-| 2026-10-03 | `luna state --dsp-trace` writes `spc_cycles = 0` on every line (seen on `games/likemario`, 80 589 lines, and `audio/echo`, 92 lines) — so the order of a voice's KON against its volume, pitch and ADSR writes cannot be timed; the examples auditor could not settle whether SNESMOD sets voice 7 up after KON | v1.31.0 | `luna state examples/audio/snesmod_sfx/sfx.sfc --until-frame 800 --dsp-trace sfx.csv --input "100:0x80,104:0,200:0x8000,…"` with a non-zero `spc_cycles` per row | **Réglé sur luna `develop` `33116ad`** (vérifié le 2026-10-05 sur leur binaire : 92 lignes, `spc_cycles` croissants, 95632, 95642, …) ; à fermer à l'épinglage de la version qui le porte |
-| 2026-10-05 | `rom.checksum_valid` in `luna state` is true as soon as checksum XOR complement == 0xFFFF; it does not sum the ROM. A copy of `print_string.sfc` with byte $0100 flipped (true sum 0xB01F, header 0xAF40) still reports `checksum_valid: true`, `checksum: 44864`. Needed: `checksum_valid` = header sum equals the computed sum (with the usual mirroring of a non-power-of-two tail), or a separate `checksum_computed` field. Our corpus gate (`luna_runner.py --coverage`, `header_problem`) reads this field and can only catch an inconsistent pair until then | v1.32.0 | `cp print_string.sfc bad.sfc; printf '\xff' \| dd of=bad.sfc bs=1 seek=256 conv=notrunc; luna state bad.sfc --until-frame 0 --out - \| jq .rom` | **Réglé sur luna `develop` `39359de`** : champ `rom.checksum_computed` à côté (`checksum_valid` garde son sens, la détection de mapper s'en sert) ; vérifié le 2026-10-05 sur leur binaire : `print_string.sfc` 0xAF40 = 0xAF40, copie altérée 0xAF40 ≠ 0xB01F. `luna_runner.py` compare les deux dès que le champ existe ; à fermer à l'épinglage |
+| 2026-10-05 | No diagnostic when CFGR bit 5 (MS0, fast multiply) and CLSR bit 0 (21 MHz) are both set: « MS0 must be zero in 21MHz mode » (fullsnes `1adef8e33ff3c4e9`; ares `06c6d2324e3c6d01`: products « may sometimes be invalid » in that mode). Our launchers mask the bit, but a program writing CFGR itself runs green on luna and may multiply wrong on a console. Needed: a counter or a note in `state.gsu` (like `bus_violations`) when a MUL/FMULT executes with both bits set | v1.32.0 | a ROM writing `$A0` to `$3037` then `$01` to `$3039` and running `fmult`; `luna state … --out - \| jq .gsu` shows `cfgr: 160, clsr: true` and nothing else |
+| 2026-10-05 | A DSP-1 LoROM of 2 MB (`ROM_BANKS=64`, `USE_DSP1=1`, before our build refused it) loads and runs on luna while the only 2 MB DSP-1 LoROM board (SHVC-2B3B-01) maps the DSP registers elsewhere (chips audit S5). Low priority: `make` refuses the combination since 2026-10-04 (`ROM_BANKS_MAX` 32 for DSP-1); an emulator warning on header-vs-board inconsistencies would still be a service | v1.32.0 | build with `ROM_BANKS=64 USE_DSP1=1` on a tree before `a8113dd8`, `luna state` boots it without a word |
+
+Sent on 2026-10-08 in `2026-10-08_to_luna_rapport-v1.34.0.md` (four
+requests: `assets-dump --until-frame`, the actual bytes of a failing block,
+`diff --audio --align-onset`, `diff --sequence` with its prototype
+`testing/frame_sequence.py`; reproduction ROMs in the exchange folder,
+`2026-10-08_roms/`). Answered the same day
+(`2026-10-08_from_luna_reponse-rapport-v1.34.0.md`): all four are done on
+luna `develop`, to ship as v1.35.0. Our reply
+(`2026-10-08_to_luna_reponse-rapport-v1.34.0_reply.md`) accepts their three
+choices and lists what we replay at the pin: then `frame_sequence.py` and
+its row in `luna_tooling.md` are deleted, `diff_corpus.py` gains a
+`--sequence` pass, and the audio re-capture rule of `testing.md` cites
+`--align-onset`. The two rows above stay held.

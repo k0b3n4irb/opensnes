@@ -65,6 +65,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): snesmodSetSoundTable, snesmodAllocateSoundRegion.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Initialization
  *============================================================================*/
@@ -328,35 +331,6 @@ void snesmodFlush(void);
  * @defgroup snesmod_stream Streaming Audio
  * @{
  */
-
-/**
- * @brief Set the streaming sound table
- *
- * Points to a table of streaming sound descriptors. Nothing in the SDK
- * starts a stream, so the table is stored and never read.
- *
- * @param table Pointer to sound table data
- */
-OPENSNES_DEPRECATED("no SDK call starts a stream — the table is never read")
-void snesmodSetSoundTable(const u8 *table);
-
-/**
- * @brief Allocate SPC RAM for streaming buffer
- *
- * Reserves memory in SPC RAM for streaming audio.
- *
- * @warning Call it BEFORE snesmodLoadModule(). The driver resizes its SPC
- *          RAM layout on this command, and a module that is already loaded
- *          stops playing (measured on the libtest_fx fixture: five active
- *          voices when allocated before the load, none when after).
- *
- * Nothing in the SDK starts a stream, so the region is reserved for nothing
- * and only takes the memory away from the module.
- *
- * @param size Buffer size (in units specific to driver)
- */
-OPENSNES_DEPRECATED("no SDK call starts a stream — the region is never used")
-void snesmodAllocateSoundRegion(u8 size);
 
 /** @} */
 

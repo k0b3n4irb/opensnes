@@ -21,15 +21,16 @@
  *============================================================================*/
 
 /* These are read in the NMI handler for reliable, glitch-free input */
-extern u16 pad_keys[5];      /* Current button state (5 pads × 16 bits) */
-extern u16 pad_keysold[5];   /* Previous frame button state */
-extern u16 pad_keysdown[5];  /* Buttons pressed this frame (edge detection) */
+/* pad_keys[], pad_keysold[] and pad_keysdown[] are declared by input.h */
 extern u8  pad_present[2];   /* [port] 1 = a pad answered its 17th serial bit (crt0 NMI) */
 
 /* Mouse state — PVSnesLib-compatible indexed layout.
  * All 2-byte arrays: [0] = port 1, [1] = port 2.
  * NMI handler detects connection per-frame and handles sensitivity sync. */
 extern u8  mouse_con;          /* Bitmask: bit 0 = port 1, bit 1 = port 2 */
+/* crt0: the NMI handler's mouse reader and the pointer it is called through */
+extern void ReadMouse(void);
+extern void (*mouse_reader)(void);
 extern u8  mouse_x[2];        /* X displacement per port (sign-magnitude) */
 extern u8  mouse_y[2];        /* Y displacement per port (sign-magnitude) */
 extern u8  mouseConnect[2];   /* Per-port connection flag (set by NMI handler) */
@@ -43,36 +44,22 @@ extern u8  mouseRequestChangeSensitivity[2]; /* Deferred sensitivity command */
  * Input Functions
  *============================================================================*/
 
-u16 padPressed(u8 pad) {
+/* The NMI handler stores 0 for a port whose device signature is not a pad's
+ * (crt0, "Invalid input - clear it"), so a word of pad_keys[] is never the
+ * $FFFF these three used to test for (until 2026-10-09): they only bound the
+ * index. padHeld and padPressed are also macros in input.h, hence the
+ * parentheses around the names here. */
+u16 (padPressed)(u8 pad) {
     if (pad >= 5) return 0;
-    u16 state = pad_keysdown[pad];
-    /* Disconnected controller reads as $FFFF - treat as no input */
-    if (pad_keys[pad] == 0xFFFF) return 0;
-    return state;
+    return pad_keysdown[pad];
 }
 
-u16 padHeld(u8 pad) {
-    if (pad >= 5) return 0;
-    u16 state = pad_keys[pad];
-    /* Disconnected controller reads as $FFFF - treat as no input */
-    if (state == 0xFFFF) return 0;
-    return state;
-}
-
-u16 padReleased(u8 pad) {
-    if (pad >= 5) return 0;
-    u16 current = pad_keys[pad];
-    u16 previous = pad_keysold[pad];
-    /* Disconnected controller reads as $FFFF - treat as no input */
-    if (previous == 0xFFFF) return 0;
-    /* Buttons that were down last frame but aren't now */
-    return previous & ~current;
-}
-
-u16 padRaw(u8 pad) {
+u16 (padHeld)(u8 pad) {
     if (pad >= 5) return 0;
     return pad_keys[pad];
 }
+
+/* padReleased() is in input_pad.asm. */
 
 u8 padIsConnected(u8 pad) {
     /* crt0's NMI handler reads one serial bit past the 16 of auto-read on
@@ -129,6 +116,9 @@ u8 mouseInit(u8 port) {
      * The NMI handler will detect the connection per-frame, automatically
      * sync sensitivity on first connection (fixing the Nintendo mouse
      * power-on bug), and process deferred sensitivity change commands. */
+    /* The reader is linked because it is named here, and the NMI handler
+     * reaches it through this pointer: set it before the flag. */
+    mouse_reader = ReadMouse;
     if (port == 0) {
         mouse_con |= 0x01;
     } else {
@@ -185,6 +175,8 @@ u8 mouseGetSensitivity(u8 port) {
 
 /* Super Scope state (populated by VBlank ISR when scope_con != 0) */
 extern u8  scope_con;
+extern void ReadScope(void);
+extern void (*scope_reader)(void);
 extern u16 scope_sinceshot;
 extern u16 scope_shoth, scope_shotv;
 extern u16 scope_shothraw, scope_shotvraw;
@@ -206,7 +198,9 @@ u8 scopeInit(void) {
     /* Super Scope signature: bits 0-7 all 1, bits 10-11 both 0 */
     if ((val & 0x0CFF) != 0x00FF) return 0;
 
-    /* Enable Super Scope reading in NMI handler */
+    /* Enable Super Scope reading in NMI handler: the pointer the handler
+     * calls the reader through, then the flag (see mouseInit) */
+    scope_reader = ReadScope;
     scope_con = 1;
 
     /* Set default delays */
@@ -243,10 +237,6 @@ u16 scopeGetRawY(void) {
 
 u16 scopeButtonsHeld(void) {
     return scope_down;
-}
-
-u16 scopeButtonsDown(void) {
-    return scope_down;          /* deprecated name of scopeButtonsHeld() */
 }
 
 u16 scopeButtonsPressed(void) {

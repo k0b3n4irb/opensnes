@@ -1,7 +1,7 @@
 /**
  * @file sprite_dynamic_internal.h
  * @brief Internal helpers shared by sprite_dynamic_dispatch.c and
- *        sprite_dynamic_meta.c.
+ *        sprite_dynamic_meta.asm (which carries the same sizes as a table).
  *
  * NOT a public header — do not install, do not include from
  * lib/include/snes/. This file lives next to the .c files that

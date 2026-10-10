@@ -68,6 +68,9 @@
  *          2, 4 and 6 is the offset-per-tile table, and its y is written
  *          raw — y / 8 is the table row the PPU reads first.
  *
+ * @note A layer number of 4 or more is ignored, here and in bgSetScrollX()
+ *       and bgSetScrollY().
+ *
  * @code
  * // Scroll BG1 right by 10 pixels
  * bgSetScroll(0, scrollX, 0);

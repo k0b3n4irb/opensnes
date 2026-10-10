@@ -94,7 +94,8 @@ channels risks running out of HBlank time (1364 master cycles per scanline).
 | File | Purpose |
 |------|---------|
 | `main.c` | Input handling, scroll updates, HDMA initialization |
-| `data.asm` | Mode 7 ground data, sky tiles, HDMA perspective tables, assembly helpers |
+| `res/ground.png.toml`, `res/sky.png.toml` | the import settings of the ground (Mode 7) and the sky (`opensnes-tileset`); the build converts and links them |
+| `data.asm` | HDMA perspective tables, assembly helpers (hand-written) |
 | `res/ground.png` | Mode 7 ground texture source |
 | `res/sky.png` | Sky background source |
 | `Makefile` | `LIB_MODULES := console dma background sprite input mode7` |

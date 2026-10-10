@@ -48,15 +48,15 @@ ROM mode: LoROM (project default).
   hero's tiles with a second OBJ palette — recolored, not redrawn. The
   sheet is converted with `-s 16` because it holds 16×16 frames (see
   `docs/tutorials/sprites.md`).
-- **`palplan` owns the sprite-palette slots**: `res/sprites.palplan`
-  lists the OBJ palettes; the build runs `palplan` (see
-  `docs/tools/palplan.md`) to assign each a collision-free CGRAM slot and
-  generate `res/palplan.h`. `main.c` uses `PAL_HERO_CGRAM` / `PAL_NPC_CGRAM`
-  and the matching `_SLOT` for the OAM palette field, so adding a villager
-  never desyncs the code from the layout — no hand-counted `128` / `144`.
-  The BG palettes stay hand-managed on purpose: the two scenes *swap* the
-  same slot 0 and the text layer owns slot 1 at runtime, a dynamic layout
-  palplan's static plan does not model.
+- **The plan owns the sprite-palette slots**: `res/palettes.toml` lists
+  the OBJ palettes; the build runs `opensnes-palette plan` (see
+  `docs/tools/opensnes-palette.md`) to assign each a collision-free CGRAM
+  slot and generate `res/palettes.inc`. `main.c` uses `PAL_HERO_CGRAM` /
+  `PAL_NPC_CGRAM` and the matching `_SLOT` for the OAM palette field, so
+  adding a villager never desyncs the code from the layout — no
+  hand-counted `128` / `144`. The BG palettes stay hand-managed on purpose:
+  the two scenes *swap* the same slot 0 and the text layer owns slot 1 at
+  runtime, a dynamic layout a static plan does not model.
 - **Off-camera entities must be hidden, not just drawn**: OAM X is 9
   bits and Y is 8, so an entity outside the camera does not vanish —
   its coordinates *wrap* and it reappears somewhere plausible, e.g. a

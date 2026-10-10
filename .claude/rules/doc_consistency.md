@@ -21,7 +21,7 @@ opt-in list.
 
 3. **Examples count claims in active docs** (`ROADMAP.md`, `README.md`,
    `.claude/rules/*.md`, and since 2026-09-26 the `Makefile`, the
-   workflows and `tools/luna-test/README.md`) must match
+   workflows and `testing/README.md`) must match
    `find examples -name 'main.c' | wc -l`.
    Caught historically as the pre-v0.16.0 count (one off the current
    total) sticking around in `testing.md` and `nmi_audit.md` after
@@ -72,8 +72,10 @@ opt-in list.
     `objRegisterTypes`, `spcLoad/spcPlay`, `mosaicEnable` in API_INDEX.
 
 11. **No retired tool in `.claude/agents`, `skills`, `hooks`** (since
-    2026-09-26): Mesen2, opensnes-emu, `tests/*.sh` — caught as the
-    snes-engine-reviewer agent committed with all three.
+    2026-09-26), **nor in `.github`** (since 2026-10-08): Mesen2,
+    opensnes-emu, `tests/*.sh` — caught as the snes-engine-reviewer agent
+    committed with all three, then as the PR template and the bug report
+    form still asking for a Mesen2 test.
 
 12. **Every `?=` variable of `make/common.mk` is on `docs/tools/build.md`**
     (since 2026-09-26), backticked. Caught as eight knobs named in no page
@@ -102,6 +104,22 @@ opt-in list.
     and tutorial a row names exists. The page called the table "generated"
     while nothing produced or checked it (docs audit, E_docs.md rec 8).
     `CLAUDE.md` joined the files whose example count is checked (anchor 3).
+
+16. **No removed name is taught** (since 2026-10-05, lots B/G of the 1.0
+    plan): every name of `make/removed_api.txt` is absent from `docs/`,
+    the examples, the templates, the headers and the manifests, unless the
+    line says it is removed; `UPGRADING.md` and the PVSnesLib migration
+    guide are exempt. The list grows with each removal lot and is also what
+    `opensnes upgrade` reports to a project written against 0.x.
+
+17. **No interpreter in a user build** (since 2026-10-06): no recipe or
+    variable line of `make/common.mk` names `python`, `perl`, `ruby`,
+    `node` or `uv run`, and the `release` recipe of the `Makefile` copies
+    nothing from `devtools/` and no `.py`. `common.mk` had ten `python3`
+    calls on the morning of 2026-10-05; the last one (the 0.x-name hint)
+    became `opensnes upgrade`, in the CLI (compiled the same day), the next day
+    (`.claude/rules/two_audiences.md`, rule 1). Comments may tell the
+    history; a call may not come back.
 
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
@@ -162,7 +180,7 @@ solve a class of drift twice — solve it in the sentinel.
 ## What NOT to add to the sentinel
 
 - Anything inherently dynamic (test counts that move every chantier; the
-  full corpus is covered by `tools/luna-test/luna_runner.py --coverage`).
+  full corpus is covered by `testing/luna_runner.py --coverage`).
 - Pure prose (commit messages, README narrative). The lint should catch
   drift in *anchored claims*, not in writing.
 - Anything CHANGELOG-frozen by design.

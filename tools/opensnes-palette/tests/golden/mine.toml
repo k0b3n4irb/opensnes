@@ -1,0 +1,6 @@
+# import settings of mine, written by opensnes-palette --save; the build reads `tool`
+tool = "opensnes-palette"
+
+[plan]
+bg = ["bg1.pal"]
+sprite = ["hero.pal", "enemy.pal"]

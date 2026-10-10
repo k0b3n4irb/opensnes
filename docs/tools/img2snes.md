@@ -1,5 +1,8 @@
 # img2snes — RGB artwork to indexed palettes {#tools_img2snes}
 
+> **New tool:** the same quantizer is `opensnes-palette quantize` (@ref tools_opensnes_palette), with a
+> settings file beside the asset; this tool stays shipped for one more version.
+
 `gfx4snes` needs **indexed** images, but artists work in RGB. `img2snes` is the
 bridge: it quantises a full-colour PNG down to a SNES-legal indexed palette, so
 your artwork feeds the rest of the pipeline without hand-editing palettes in an

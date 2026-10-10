@@ -1,0 +1,38 @@
+# color/pseudo_hires: SETINI bit 3 interleaves the sub screen (even
+# columns) and the main screen (odd columns) into a 512-pixel line, a 50 %
+# blend without colour math. What this pins that the fbhash cannot:
+#   * the register really toggles: SETINI = $08 at boot, $00 after one A,
+#     $08 after the second (luna's PPU view of the write-only register);
+#   * the sub screen holds BG2 and the main screen BG1 (TS / TM), with no
+#     colour math, so pseudo-hires is the only way BG2 reaches the output;
+#   * the game loop runs: BG2 scrolls one pixel a frame.
+# Measured on luna v1.30.2 (`luna state --until-frame N --input … --out -`):
+# in --native-res the even columns carry BG2's blue, the odd ones BG1's red.
+rom = "../../examples/color/pseudo_hires/pseudo_hires.sfc"
+
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+ph_on = { eq = 1, width = 1 }
+[checkpoint.ppu]
+setini = 8
+tm = 1
+ts = 2
+
+[[checkpoint]]
+at_frame = 90
+input = "70:0x0080,72:0"          # A
+[checkpoint.values]
+ph_on = { eq = 0, width = 1 }
+[checkpoint.ppu]
+setini = 0
+
+[[checkpoint]]
+at_frame = 120
+input = "100:0x0080,102:0"        # A again
+[checkpoint.values]
+ph_on = { eq = 1, width = 1 }
+[checkpoint.delta]
+bg2_x = "increased"            # BG2 keeps scrolling, whatever pseudo-hires does
+[checkpoint.ppu]
+setini = 8

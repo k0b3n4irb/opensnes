@@ -190,3 +190,14 @@ Le deuxième rapport de la passe math / puces / audio vient d'arriver. Il ajoute
   centre ; `SRAM_SAVE_BLOCK` traite la banque 0 ≥ `$2000` comme ROM, vecteur
   `r_sram_rom0` ; `hdma.h` nomme le canal 1 du GSU) — la liste du 10-04 les
   disait encore ouvertes.
+- **Ligne 21 / PF3 (réentrance en callback NMI)** : le callback tourne
+  avec D sur `tcc__nmi_registers` ; tout accès page directe aux registres
+  de travail est donc isolé, et seuls les accès `.w` / `.l` traversent le
+  miroir `$7E` vers les registres du fil principal. Balayage de tous les
+  `sta`/`stz`/`adc` sur `tcc__r*` de la lib : six routines concernées
+  (`objCollidObj`, `mapGetMetaTile`, `mapGetMetaTilesProp`,
+  `profileColorStart`, `dsp1SetCamera`, `dsp1Raster`), passées en `.b`
+  (code, journal) ; `textLoadFont*` écrivent `$43xx` en absolu sous
+  DB = `$7E` : avertissement d'en-tête (usage d'initialisation). La règle
+  d'ensemble est écrite sur `nmiSet()` avec la liste de ce qui n'est pas
+  sûr (multiplieur matériel, DSP-1, chargeurs de police, port WRAM).

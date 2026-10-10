@@ -4,15 +4,6 @@
 > three pitch settings on the D-pad. No background music -- effects only.
 
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/audio/snesmod_sfx
-```
-
-Then open `sfx.sfc` in your emulator (Mesen2 recommended).
-
 ## Controls
 
 | Button | Action |
@@ -33,6 +24,15 @@ Then open `sfx.sfc` in your emulator (Mesen2 recommended).
 - Why `snesmodProcess()` must be called every frame, even without music
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/audio/snesmod_sfx
+```
+
+Then open `sfx.sfc` in your emulator (Mesen2 recommended).
 
 ## SNES Concepts
 

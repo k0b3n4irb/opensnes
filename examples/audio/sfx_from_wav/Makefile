@@ -9,6 +9,4 @@ USE_LIB     := 1
 LIB_MODULES := console dma audio input background text
 
 CSRC   := main.c
-ASMSRC := data.asm
-
 include $(OPENSNES)/make/common.mk

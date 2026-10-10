@@ -1,0 +1,8 @@
+section newline: present \.rodata
+present newline:\n\t\.ASC "AB", 10, "C", 0
+present high:\n\t\.ASC 240, 0
+present quote:\n\t\.ASC "say ", 34, "hi", 34, 0
+present backslash:\n\t\.ASC "a", 92, "b", 0
+present tab_first:\n\t\.ASC 9, "X", 0
+# no escape is left for the assembler to misread
+absent \.ASC [^\n]*\\[0-9]

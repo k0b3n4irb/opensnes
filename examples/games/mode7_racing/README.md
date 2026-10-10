@@ -16,7 +16,7 @@ C-migrated mode7 module (`mode7SetAngle` + `SetCenter` + `SetScroll`).
 Grass slows the car to a crawl; the red border wall is solid. The
 track (rounded rectangle + chicane, checker start line) is generated
 at build time by `gen_track.py` (committed, deterministic) and
-converted with `gfx4snes -M 7`.
+converted by `opensnes-tileset` with `mode = 7` in `res/track.png.toml`.
 
 ROM mode: LoROM (project default).
 

@@ -1,0 +1,12 @@
+good.sfc — "GOLDEN GAME", LoROM, 64 KB in 2 banks of 32 KB
+ROM
+  bank $00 (code)                 64 / 32768   bytes     0%   32704 free
+  1 empty bank
+  whole ROM                       64 / 65536   bytes     0%   65472 free
+RAM
+  C variables $0000-$1FFF       3072 / 8192    bytes    38%   5120 free
+  FAR $7E:2000-$FFFF            4096 / 57344   bytes     7%   53248 free
+  save RAM on the cartridge: 8192 bytes (battery)
+Video (the assets of the project, if all were loaded at once)
+  VRAM                             0 / 65536   bytes     0%   65536 free
+  CGRAM                            0 / 256     colours   0%   256 free

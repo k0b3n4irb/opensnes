@@ -74,3 +74,12 @@ python3 gen_assets.py && make
 ## Modules Used
 
 `console`, `dma`, `background`
+
+## Further: Mode 5 without interlace (512 x 256)
+
+The plain Mode 5 picture, the `mode5` example until 2026-10-05, is this
+program minus `videoSetInterlace()`: 512 pixels wide at 256 lines, 16x8
+tiles stored as pairs of 8x8 characters (N on the left half, N+1 on the
+right), loaded with `bgInitTileSet()` at 4 bpp for BG1 and 2 bpp for BG2. The
+same two traps apply — the layer shows through main AND sub screen, and the
+VRAM budget doubles (24 KB of interleaved tiles for one screen).

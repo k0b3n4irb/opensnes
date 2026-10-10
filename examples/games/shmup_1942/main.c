@@ -36,14 +36,12 @@
 #include <snes/asset.h>
 #include <snes/input.h>
 
-DECLARE_BG_ASSET(scene, BG_16COLORS, SC_32x64);
 
-extern u8 player_tiles[], player_tiles_end[];
-extern u8 player_pal[], player_pal_end[];
-extern u8 enemy_tiles[], enemy_tiles_end[];
-extern u8 enemy_pal[], enemy_pal_end[];
-extern u8 bullet_tiles[], bullet_tiles_end[];
-extern u8 bullet_pal[], bullet_pal_end[];
+#include "res/scene.inc"
+#include "res/player.inc"
+#include "res/enemy.inc"
+#include "res/bullet.inc"
+/* generated: <name>_tiles[], <name>_pal[] (and scene_map[]), each with _end */
 
 #define MAP_HEIGHT_PX  512
 #define PLAYER_SPEED   2

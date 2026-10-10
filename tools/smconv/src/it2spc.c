@@ -6,10 +6,9 @@
 
 #include "it2spc.h"
 #include "brr.h"
+#include "report.h"
 #include "spc_program.h"
 
-#define ERRORRED(STRING) "\x1B[31m" STRING "\033[0m"
-#define ERRORBRIGHT(STRING) "\x1B[97m" STRING "\033[0m"
 
 static u8 g_current_instrument = 0;
 static const u8 patch_byte = 0x3C;
@@ -210,7 +209,7 @@ spc_instrument_t *spc_instrument_create(const itl_instrument_t *src)
                     ed->delta = 64;
                     ed->duration = 255;
                     if (g_verbose)
-                        fprintf(stderr, "smconv: note: Volume envelope for instrument %i has only one node\n", g_current_instrument);
+                        smconv_report(SMC_NOTE, NULL, "Volume envelope for instrument %i has only one node", g_current_instrument);
                 }
             } else {
                 ed->delta = 0;
@@ -288,7 +287,7 @@ spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
                 row_buf_cap = row_buf_cap ? row_buf_cap * 2 : 64; \
                 grown = realloc(row_buf, row_buf_cap); \
                 if (!grown) { \
-                    fprintf(stderr, "smconv: out of memory (pattern row buffer)\n"); \
+                    smconv_report(SMC_FATAL, NULL, "out of memory (pattern row buffer)"); \
                     exit(1); \
                 } \
                 row_buf = grown; \
@@ -333,7 +332,7 @@ spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
             int channel = (chvar - 1) & 63;
             data_bits |= 1 << channel;
             if (channel > 7) {
-                printf("%s: " ERRORRED("error") ": More than 8 channels. Found channel %i\n", ERRORBRIGHT("smconv"), channel + 1);
+                smconv_report(SMC_ERROR, NULL, "More than 8 channels. Found channel %i", channel + 1);
                 free(row_buf);
                 exit(1);    /* until 2026-10-03: returned the truncated pattern and exit code 0 */
             }
@@ -610,14 +609,14 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
 
         if (g_verbose) {
             if (g_chksfx && (totalsizem1 != 0)) {
-                printf(
+                smconv_report(SMC_INFO, mod->filename,
                     "Conversion report:\n"
                     "    Pattern data: [%5i bytes]   Module Length: [%i/%i]\n"
                     "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
                     " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
                     "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
                     "     Echo region: [%5u bytes]\n"
-                    "           Total: [%5u bytes]   *%u bytes free* *%u bytes free with 1st module*\n",
+                    "           Total: [%5u bytes]   *%u bytes free* *%u bytes free with 1st module*",
                     pattsize, mod->length, max_length,
                     sampsize, mod->pattern_count, max_patterns,
                     instrsize, mod->instrument_count, max_instruments,
@@ -625,14 +624,14 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
                     echosize,
                     m->totalsize, bytesfree, bytesfree - totalsizem1);
             } else {
-                printf(
+                smconv_report(SMC_INFO, mod->filename,
                     "Conversion report:\n"
                     "    Pattern data: [%5i bytes]   Module Length: [%i/%i]\n"
                     "     Sample data: [%5i bytes]        Patterns: [%i/%i]\n"
                     " Instrument data: [%5i bytes]     Instruments: [%i/%i]\n"
                     "   Envelope data: [%5i bytes]         Samples: [%i/%i]\n"
                     "     Echo region: [%5u bytes]\n"
-                    "           Total: [%5u bytes]   *%u bytes free*\n",
+                    "           Total: [%5u bytes]   *%u bytes free*",
                     pattsize, mod->length, max_length,
                     sampsize, mod->pattern_count, max_patterns,
                     instrsize, mod->instrument_count, max_instruments,
@@ -642,7 +641,7 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
             }
 
             if (m->totalsize > spc_ram_size_g) {
-                printf("%s: " ERRORRED("error") ": Module is too big. Maximum is %i bytes\n", ERRORBRIGHT("smconv"), spc_ram_size_g);
+                smconv_report(SMC_ERROR, mod->filename, "Module is too big. Maximum is %i bytes", spc_ram_size_g);
                 exit(1);    /* until 2026-10-03: printed, then wrote the soundbank with exit code 0 */
             }
         }
@@ -718,7 +717,7 @@ void spc_module_export(const spc_module_t *m, io_file_t *f, bool write_header)
     for (int i = 0; i < m->pattern_count; i++) {
         u32 ptr = io_tell(f) - module_start;
         if (ptr > SPC_RAM_SIZE)
-            printf("\nERROR: Module is too big.");
+            smconv_report(SMC_ERROR, NULL, "Module is too big.");
         pattern_ptr[i] = (u16)ptr;
         spc_pattern_export(m->patterns[i], f);
     }
@@ -726,7 +725,7 @@ void spc_module_export(const spc_module_t *m, io_file_t *f, bool write_header)
     for (int i = 0; i < m->instrument_count; i++) {
         u32 ptr = io_tell(f) - module_start;
         if (ptr > SPC_RAM_SIZE)
-            printf("\nERROR: Module is too big.");
+            smconv_report(SMC_ERROR, NULL, "Module is too big.");
         instrument_ptr[i] = (u16)ptr;
         spc_instrument_export(m->instruments[i], f);
     }
@@ -734,7 +733,7 @@ void spc_module_export(const spc_module_t *m, io_file_t *f, bool write_header)
     for (int i = 0; i < m->sample_count; i++) {
         u32 ptr = io_tell(f) - module_start;
         if (ptr > SPC_RAM_SIZE)
-            printf("\nERROR: Module is too big.");
+            smconv_report(SMC_ERROR, NULL, "Module is too big.");
         sample_ptr[i] = (u16)ptr;
         spc_sample_export(m->samples[i], f);
     }
@@ -798,11 +797,11 @@ static void bank_add_module(spc_bank_t *b, const itl_module_t *mod)
     int size = io_file_size(mod->filename);
 
     if (g_verbose) {
-        printf("-----------------------------------------------------------------------\n");
-        printf("Adding module, Filename: <%s>\n", mod->filename);
-        printf("             Title: <%s>\n", mod->title);
-        printf("             IT Size: [%5i bytes]\n", size);
-        fflush(stdout);
+        smconv_report(SMC_INFO, mod->filename,
+                      "-----------------------------------------------------------------------\n"
+                      "Adding module, Filename: <%s>\n"
+                      "             Title: <%s>\n"
+                      "             IT Size: [%5i bytes]", mod->filename, mod->title, size);
     }
     totalitsize += size;
 
@@ -863,10 +862,10 @@ spc_bank_t *spc_bank_create(const itl_bank_t *bank, bool hirom, bool chksfx)
         bank_add_module(b, bank->modules[i]);
 
     if (g_verbose) {
-        printf("-----------------------------------------------------------------------\n");
-        printf("  Total Modules Size: [%6u bytes]\n", totabanksize);
-        printf("       Total IT Size: [%6u bytes]\n", totalitsize);
-        fflush(stdout);
+        smconv_report(SMC_INFO, NULL,
+                      "-----------------------------------------------------------------------\n"
+                      "  Total Modules Size: [%6u bytes]\n"
+                      "       Total IT Size: [%6u bytes]", totabanksize, totalitsize);
     }
 
     return b;

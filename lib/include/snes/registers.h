@@ -430,20 +430,8 @@
 #define INIDISP_FORCE_BLANK  0x80  /**< Force screen blank */
 #define INIDISP_BRIGHTNESS(n) ((n) & 0x0F)  /**< Set brightness (0-15) */
 
-/* BGMODE values — deprecated: BG_MODE0..BG_MODE7 (video.h) are the same
- * numbers, all eight of them, and the names setMode() documents. */
-#define BGMODE_MODE0  0  /**< 4 BG layers, 4 colors each */
-#define BGMODE_MODE1  1  /**< 2 BG 16-color, 1 BG 4-color (most common) */
-#define BGMODE_MODE2  2  /**< 2 BG 16-color with offset-per-tile */
-#define BGMODE_MODE3  3  /**< 1 BG 256-color, 1 BG 16-color */
-#define BGMODE_MODE7  7  /**< Mode 7 (rotation/scaling) */
-#ifdef __clang__
-#pragma clang deprecated(BGMODE_MODE0, "use BG_MODE0")
-#pragma clang deprecated(BGMODE_MODE1, "use BG_MODE1")
-#pragma clang deprecated(BGMODE_MODE2, "use BG_MODE2")
-#pragma clang deprecated(BGMODE_MODE3, "use BG_MODE3")
-#pragma clang deprecated(BGMODE_MODE7, "use BG_MODE7")
-#endif
+/* BGMODE_MODE0..BGMODE_MODE7 were removed on 2026-10-05: setMode() documents
+ * BG_MODE0..BG_MODE7 (video.h), the same numbers (docs/UPGRADING.md). */
 
 /* NMITIMEN values */
 #define NMITIMEN_NMI_ENABLE   0x80  /**< Enable NMI on VBlank */

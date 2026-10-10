@@ -1,0 +1,31 @@
+# The picture of a mosaic, which nothing else looks at: transition_mosaic.toml
+# pins the lib's shadow of $2106 through the four transitions and ends with
+# the mosaic off, and the corpus fbhash sees the idle screen at size 0. So a
+# change in how the blocks are drawn passed every oracle: luna v1.33.0 moved
+# the mosaic grid down one line (its blocks started one line too high, fixed
+# against ares and Mesen2) and none of our baselines noticed (2026-10-06).
+#
+# Same script as transition_mosaic.toml up to the third press, stopped where
+# mosaicFadeOut(3) has reached and holds MOSAIC_MAX: the frame hashed is BG1
+# in 16x16 blocks. Negative control on the day it was written: luna v1.32.0
+# gives another hash for this frame (b40b834549507f25) and fails this manifest,
+# while the 86 corpus hashes and transition_mosaic.toml are the same on both.
+rom = "../../examples/transitions/mosaic/mosaic.sfc"
+
+[[checkpoint]]                 # fadeOut(2) then fadeIn(2): back to full brightness
+at_frame = 145
+input = "60:0x0080,64:0,110:0x0080,114:0"
+[checkpoint.values]
+console_brightness = { eq = 15, width = 1 }
+mosaic_size = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # mosaicFadeOut(3) complete and held
+at_frame = 210
+input = "160:0x0080,164:0"
+[checkpoint.values]
+mosaic_size = { eq = 15, width = 1 }
+mosaic_bg_mask = { eq = 1, width = 1 }
+console_brightness = { eq = 15, width = 1 }
+
+[asserts]
+fbhash = "9980548a31063b25"

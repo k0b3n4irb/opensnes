@@ -1,0 +1,9 @@
+in leaf: present \.b tcc__lf\+\d+
+in leaf: absent \btas\b
+in leaf: absent sta \d+,s
+# the parameters are still read from the stack, with no frame in the way
+in leaf: present lda [46],s
+in caller: absent tcc__lf
+in caller: present sta \d+,s
+in with_array: absent tcc__lf
+in with_array: present \btas\b

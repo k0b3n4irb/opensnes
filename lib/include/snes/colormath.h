@@ -56,6 +56,9 @@
 #include <snes/types.h>
 #include <snes/registers.h>  /* REG_CGWSEL / REG_CGADSUB / REG_COLDATA */
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): colorMathEnable.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Layer Masks (for colorMathSetLayers)
  *============================================================================*/
@@ -70,21 +73,8 @@
 /** @brief Apply color math to all layers and the backdrop */
 #define COLORMATH_ALL       0x3F
 
-/** @name Deprecated layer names (use LAYER_*)
- * @{ */
-#define COLORMATH_BG1       BIT(0)  /**< @deprecated use LAYER_BG1 */
-#define COLORMATH_BG2       BIT(1)  /**< @deprecated use LAYER_BG2 */
-#define COLORMATH_BG3       BIT(2)  /**< @deprecated use LAYER_BG3 */
-#define COLORMATH_BG4       BIT(3)  /**< @deprecated use LAYER_BG4 */
-#define COLORMATH_OBJ       BIT(4)  /**< @deprecated use LAYER_OBJ */
-/** @} */
-#ifdef __clang__
-#pragma clang deprecated(COLORMATH_BG1, "use LAYER_BG1")
-#pragma clang deprecated(COLORMATH_BG2, "use LAYER_BG2")
-#pragma clang deprecated(COLORMATH_BG3, "use LAYER_BG3")
-#pragma clang deprecated(COLORMATH_BG4, "use LAYER_BG4")
-#pragma clang deprecated(COLORMATH_OBJ, "use LAYER_OBJ")
-#endif
+/* COLORMATH_BG1..COLORMATH_BG4 and COLORMATH_OBJ were removed on 2026-10-05: use
+ * LAYER_BG1..LAYER_OBJ (video.h), the same values (docs/UPGRADING.md). */
 
 /*============================================================================
  * Color Math Operations
@@ -153,18 +143,13 @@ void colorMathInit(void);
  * @brief Set the layers colour math applies to — REPLACES the previous set
  *
  * `colorMathSetLayers(LAYER_BG1)` after `colorMathSetLayers(LAYER_BG2)`
- * leaves only BG1 blended. This is the function colorMathEnable() was until
- * 2026-09-22; it is renamed because "Enable" reads as additive — windowEnable()
+ * leaves only BG1 blended. This is the function the removed colorMathEnable()
+ * was (renamed 2026-09-22, removed 2026-10-05) because "Enable" reads as additive — windowEnable()
  * IS additive — and the old name silently undid the previous call.
  *
  * @param layers Layer mask (LAYER_BG1, LAYER_BG2, ...; 0 disables)
  */
 void colorMathSetLayers(u8 layers);
-
-/** @brief The pre-2026-09-22 name of colorMathSetLayers(). Same behaviour:
- *         it REPLACES the layer set. */
-OPENSNES_DEPRECATED("use colorMathSetLayers() — this call replaces the layer set, it does not add to it")
-void colorMathEnable(u8 layers);
 
 /**
  * @brief Disable all color math

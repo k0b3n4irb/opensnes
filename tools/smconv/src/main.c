@@ -15,8 +15,8 @@
 #define ERRORRED(STRING) "\x1B[31m" STRING "\033[0m"
 #define ERRORBRIGHT(STRING) "\x1B[97m" STRING "\033[0m"
 
-#define SMCONVVERSION __BUILD_VERSION
-#define SMCONVDATE __BUILD_DATE
+#define SMCONVVERSION TOOL_VERSION
+#define SMCONVDATE TOOL_BUILD_DATE
 
 static const char USAGE[] =
     "\nUsage : smconv [options] [input]...\n"

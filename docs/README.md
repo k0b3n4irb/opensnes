@@ -13,11 +13,11 @@ map for people reading the repository on GitHub.
 | [Examples by Category](EXAMPLES_BY_CATEGORY.md) | The exhaustive index of the example corpus |
 | [API Index](API_INDEX.md) | The SDK indexed by *what you are trying to do* |
 | [FAQ](FAQ.md) | Short answers to the questions newcomers actually ask |
-| [Hardware verification](HARDWARE_VERIFICATION.md) | The real-console session: 24 ROMs, one check each, and the grid to fill in |
+| [Hardware verification](HARDWARE_VERIFICATION.md) | The real-console session: 26 ROMs, one check each, and the grid to fill in |
 | [Troubleshooting](TROUBLESHOOTING.md) | Symptoms and their causes |
 | [Migrating from PVSnesLib](MIGRATING_FROM_PVSNESLIB.md) | Porting an existing project, and the five traps that bite |
-| [Upgrading to 1.0](UPGRADING.md) | The names 0.x deprecates and 1.0 removes, and the two calls that change meaning |
-| [What 1.0 freezes](STABILITY.md) | The promise behind the version number: what stays, what may move, how a change reaches you |
+| [Upgrading from 0.48 to 0.49](UPGRADING.md) | The names the earlier releases deprecated and 0.49 removes, and the two calls that change meaning |
+| [What 1.0 will freeze](STABILITY.md) | The promise 1.0 will make, and what 0.49 already keeps of it: what stays, what may move, how a change reaches you |
 
 ## Guides
 
@@ -170,6 +170,8 @@ topic without naming most of the API.
 | `fixed32.h` | [Math](tutorials/math.md) — the 16.16 section | ✅ |
 | `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
 | `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
+| `string.h` | [FAR RAM](tutorials/far_ram.md) — copying between ROM, RAM and FAR RAM | ✅ |
+| `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
 | `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects; four are fixed, the rest are in the page's Gotchas |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |

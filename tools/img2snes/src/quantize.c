@@ -28,17 +28,24 @@ typedef struct {
  * comparison functions. */
 static ucolor_t *g_sort_colors; /* temporary global for qsort */
 
+/* Ties break on the index, so the order — and the median split, and the
+ * palette — is the same under every libc's qsort (glibc's is stable for
+ * small arrays, others are not; the family's tools must give the same
+ * bytes on every OS). */
 static int cmp_by_r(const void *a, const void *b) {
     int ia = *(const int *)a, ib = *(const int *)b;
-    return (int)g_sort_colors[ia].r - (int)g_sort_colors[ib].r;
+    int d = (int)g_sort_colors[ia].r - (int)g_sort_colors[ib].r;
+    return d ? d : ia - ib;
 }
 static int cmp_by_g(const void *a, const void *b) {
     int ia = *(const int *)a, ib = *(const int *)b;
-    return (int)g_sort_colors[ia].g - (int)g_sort_colors[ib].g;
+    int d = (int)g_sort_colors[ia].g - (int)g_sort_colors[ib].g;
+    return d ? d : ia - ib;
 }
 static int cmp_by_b(const void *a, const void *b) {
     int ia = *(const int *)a, ib = *(const int *)b;
-    return (int)g_sort_colors[ia].b - (int)g_sort_colors[ib].b;
+    int d = (int)g_sort_colors[ia].b - (int)g_sort_colors[ib].b;
+    return d ? d : ia - ib;
 }
 
 static void box_compute_bounds(color_box_t *box, const ucolor_t *colors) {

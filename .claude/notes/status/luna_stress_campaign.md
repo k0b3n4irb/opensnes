@@ -596,3 +596,7 @@ registers, measured:
 
 The `m7b = -m7c` antisymmetry is the rotation invariant worth pinning, and the
 pivot staying at (128,128) while the matrix turns is the free negative.
+
+---
+
+**2026-10-05** — `stress/mcp_probe.py` and `stress/mcp_sweep.py` deleted: one-shot validations of luna's MCP surface at v1.14.0, never a standing regression (`luna_tooling.md` lifecycle, step 5; tools/devtools review of the same day, lot 2). The five stress ROMs stay, run by `make test-manifests`.

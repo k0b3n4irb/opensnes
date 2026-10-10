@@ -81,6 +81,8 @@ behaviour, and the note under the table says which.
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
 | 23 | `backgrounds/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `examples/backgrounds/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
 | 24 | `chips/superfx_game_skeleton` | hold the D-pad, listen | The crosshair follows the pad at full frame rate while the GSU's cube turns at half rate and the music plays: no torn or half-drawn cube (`gsuPresent` double-buffers and the NMI swaps in blank), no pause in the music while the GSU runs from its cache. Firmware-dependent, like rows 16-18. |
+| 25 | `chips/sa1_save` | read NOW, power-cycle, read again | The SA-1 save path: NOW is one more after every power cycle and FOUND shows the previous value (BW-RAM, battery). A NOW that stays at 1 means the cart's SA-1 core does not keep BW-RAM across power, or the header's `$35` is not honoured. |
+| 26 | `chips/superfx_save` | read NOW, power-cycle, read again | The Super FX save path: same check in the GSU's Game Pak RAM at `$E000` (header `$15`, size at `$FFBD`). Firmware-dependent, like rows 16-18 and 24. |
 
 **What a failure in each row points at.** Rows 1 and 2 failing means nothing
 else is worth running: the boot path or the joypad read is wrong. Row 3 is
@@ -91,7 +93,7 @@ the lib (HDMA table shape, IRQ position, DMA length) that luna and the console
 disagree on — query the corpus before touching code
 (`.claude/rules/hardware_claims.md`). Rows 11 and 12 are the APU path,
 including the cold-boot upload. Row 13 is the only test of battery-backed
-persistence the project has. Rows 16 to 18 and 24 depend on the cart as much as on
+persistence the project has. Rows 16 to 18 and 24 to 26 depend on the cart as much as on
 the SDK; a failure needs the firmware version and, if possible, a second cart
 before it is filed against the SDK. Rows 19 and 20 are the integration rows:
 they fail last and tell you least, but they are what a user will run first.
@@ -103,11 +105,9 @@ Row 24 is the Super FX presentation path (`gsuPresent`, the code cache) with
 SNESMOD running at the same time; a torn cube is a blanking claim of the
 presenter, a music pause is the GSU holding the ROM bus.
 
-**Not covered by a row yet:** the SA-1 and Super FX save paths (BW-RAM and
-Game Pak RAM through `sramSave`/`sramLoad`) have no example with a visible
-result — they are exercised on luna only, by the `libtests_sa1_sram` and
-`libtests_gsu` fixtures. A console row needs an example that shows a value
-surviving a power cycle on each chip (to write before the session).
+Rows 25 and 26 are the two chip save paths (BW-RAM, Game Pak RAM): each
+example counts its own power-ons, so the check is a number that grows by
+one per power cycle, with the previous value shown next to it.
 
 ## The grid
 
@@ -146,6 +146,8 @@ Peripherals:   pads / mouse / scope
 22  input/superscope            n/a
 23  backgrounds/mode6
 24  chips/superfx_game_skeleton
+25  chips/sa1_save
+26  chips/superfx_save
 ```
 
 ## What to do with a KO

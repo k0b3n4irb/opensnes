@@ -88,7 +88,7 @@ menu overlays, and spotlight effects. It costs zero CPU time -- all hardware.
 | File | Purpose |
 |------|---------|
 | `main.c` | HDMA tables, color math setup, window config |
-| `data.asm` | Background tiles, tilemap, and palette data |
+| `res/background.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it, `res/background.inc` declares the symbols |
 | `res/background.png` | Source background image |
 | `Makefile` | `LIB_MODULES := console sprite dma background window colormath hdma math` |
 

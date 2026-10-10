@@ -3,6 +3,12 @@
 > Large soundbank music playback (>32KB, multi-bank LoROM)
 
 
+## What You'll Learn
+
+- Soundbanks larger than 32KB are automatically split across ROM banks by smconv
+- SNESMOD `incptr` macro handles bank boundary crossing during playback
+- Single `snesmodSetSoundbank()` call works regardless of bank count
+
 ## Build & Run
 
 ```bash
@@ -11,12 +17,6 @@ make -C examples/audio/snesmod_music_large
 ```
 
 Then open `music_large.sfc` in your emulator (Mesen2 recommended).
-
-## What You'll Learn
-
-- Soundbanks larger than 32KB are automatically split across ROM banks by smconv
-- SNESMOD `incptr` macro handles bank boundary crossing during playback
-- Single `snesmodSetSoundbank()` call works regardless of bank count
 
 ## Controls
 

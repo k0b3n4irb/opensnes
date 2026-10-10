@@ -48,7 +48,7 @@ Probe oracles: `game_state` (0 title / 1 play / 2 over), `score`, `time_left`.
 
 ```bash
 make
-../../../tools/luna-test/bin/luna game_skeleton.sfc   # luna-gui: tap START, steer with the D-pad
+../../../testing/bin/luna game_skeleton.sfc   # luna-gui: tap START, steer with the D-pad
 ```
 
 ## Modules used

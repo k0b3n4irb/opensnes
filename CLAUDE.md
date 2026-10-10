@@ -36,9 +36,9 @@ cd examples/text/print_string && make
 All testing goes through **luna** (cycle-accurate native emulator, pinned
 binary — no Node/WASM/Mesen2):
 ```bash
-scripts/install-luna.sh                                  # fetch pinned luna (tools/luna-test/luna.version)
-python3 tools/luna-test/luna_runner.py --coverage        # corpus liveness
-python3 tools/luna-test/luna_runner.py --compare         # visual regression (fbhash; multi-point for animated examples)
+scripts/install-luna.sh                                  # fetch pinned luna (testing/luna.version)
+python3 testing/luna_runner.py --coverage        # corpus liveness
+python3 testing/luna_runner.py --compare         # visual regression (fbhash; multi-point for animated examples)
 make test-manifests                                      # functional probes: luna test manifests (input→WRAM asserts)
 make tests                                               # all of the above
 ```
@@ -54,7 +54,7 @@ Changes are classified A/B/C/D by impact scope.
 main.c → cproc (C11 frontend) → QBE w65816 (codegen) → wla-65816 (assembler) → wlalink (linker) → game.sfc
 ```
 
-The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE's w65816 backend emits WLA-DX syntax directly (`.db`, `.dw`, `.SECTION`) — no post-transform.
+The `bin/cc65816` driver (compiled, `compiler/cc65816/`) orchestrates cproc→QBE→wla-65816. QBE's w65816 backend emits WLA-DX syntax directly (`.db`, `.dw`, `.SECTION`) — no post-transform.
 
 ## Architecture
 
@@ -64,8 +64,8 @@ The `bin/cc65816` wrapper orchestrates cproc→QBE→wla-65816. QBE's w65816 bac
 - **lib/** — Hardware library. C sources in `lib/source/*.c`, ASM in `lib/source/*.asm`, headers in `lib/include/snes/`. Built as separate LoROM, HiROM, SA-1, and SuperFX object sets.
 - **templates/** — ROM bootstrap: `crt0.asm` (startup + NMI handler), `hdr*.asm` (ROM headers), `runtime.asm` (math routines, now in lib/source/), `memmap*.inc` (memory maps). These are the single source of truth — examples don't duplicate them.
 - **make/common.mk** — Universal build rules included by every example. Handles graphics conversion, multi-file C compilation, SNESMOD audio, SA-1/SuperFX/HiROM mode selection, module linking.
-- **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), `luna-test/` (luna-driven test harness: runner, manifest, baselines, probes)
-- **examples/** — 89 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
+- **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), and the other asset converters (shipped)
+- **examples/** — 86 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
 
 ### Enhancement Chip Support
 
@@ -92,6 +92,7 @@ include $(OPENSNES)/make/common.mk
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/) — `feat(scope):`, `fix(scope):`, `perf(scope):`, etc.
 - Scopes: `lib`, `compiler`, `runtime`, `tools`, `examples`, `build`
 - IMPORTANT: Do NOT add `Co-Authored-By` trailers for AI tools in commit messages.
+- IMPORTANT: every commit is authored and committed by the maintainer, `k0b3n4irb <k0b3n4irb@gmail.com>` — no bot (no Dependabot), no tool identity, no `noreply` committer. A bot's proposal is applied by hand (`.claude/rules/commits.md`, "One author").
 
 ## Critical Constraints
 
@@ -101,7 +102,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 
 - **VRAM writes only work during VBlank or forced blank** — the PPU silently ignores writes during active display
 - **VBlank DMA budget**: ~4KB max per frame. Larger transfers need force blank (`setScreenOff/On`) or multi-frame splitting
-- **Bank $00 ROM is code only** (since #127.3, v0.41.0): C const data (`static const` arrays, string literals, const structs) is placed in the asset banks by default and every C read of it is a far read. The one bank-blind path left is casting `const` away and reading through a plain pointer; `devtools/check_bank_reads.py` fails the link on it. The bank $00 free-space ratchet (`BANK0_FAIL_THRESHOLD`) still guards the code bank.
+- **Bank $00 ROM is code only** (since #127.3, v0.41.0): C const data (`static const` arrays, string literals, const structs) is placed in the asset banks by default and every C read of it is a far read. The one bank-blind path left is casting `const` away and reading through a plain pointer; `devtools/check_bank_reads.py` fails the link on it. Code that does not fit bank $00 goes to bank $01 and up by itself (C functions and library routines are `SUPERFREE`, reached by `jsl`; `make test-bank-spill`); the free-space ratchet (`BANK0_FAIL_THRESHOLD`) is off by default since 2026-10-10, when it refused a working ROM to a game past 32 KB of code (#168).
 - **Plain C RAM lives below $2000; `FAR` is the way above it** (since chantier B2, v0.39.0): `sta.l $0000,x` reads bank $00, so a plain global must sit in `$00:0000-$1FFF`. Declare bulk buffers `FAR` (`snes/types.h`) to place them in `$7E:2000-$FFFF` with bank-honouring codegen; `symmap.py --check-ram-budget` fails the link on a plain-band overflow. Tutorial: `docs/tutorials/far_ram.md`.
 - **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
 - **`data_init_end.o` provides the data-init terminator** — `make/common.mk` lists it last; wlalink's size-descending sort of appended sections is what keeps the 5-byte terminator after every record, and `symmap.py --check-data-init` verifies it after every link (since 2026-10-05)
@@ -114,7 +115,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 
 The `.claude/rules/` directory contains mandatory rules automatically loaded by context:
 - `testing.md` — 2-pillar validation (luna + full rebuild), change classification (A/B/C/D)
-- `commits.md` — Never add Co-Authored-By trailers
+- `commits.md` — One author for every commit (the maintainer, no bot, no tool); never add Co-Authored-By trailers
 - `compiler.md` — Compiler architecture, build, constraints
 - `templates.md` — Templates & build system, memory layout, linker order
 - `new_example.md` — Example checklist: init order, Doxygen docs, README + screenshot mandatory
@@ -125,11 +126,12 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `memory_routing.md` — project knowledge goes to `.claude/notes/` in the repo, not to the per-user memory directory.
 - `release.md` — Release workflow, CHANGELOG format, version tagging
 - `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
-- `bank0_budget.md` — Bank $00 ROM hard-fail ratchet (`BANK0_FAIL_THRESHOLD`); must consult before adding const data or tuning the threshold.
+- `bank0_budget.md` — Bank $00 ROM: what lives there, where code goes when it is full, the retired ratchet (`BANK0_FAIL_THRESHOLD`, off by default); must consult before pinning a section to bank $00 or setting the threshold.
 - `abi_lint.md` — ASM ABI lint policy and the `; lint-asm-abi: skip-file` marker; must consult before adding a new ASM file or retrofitting for an ABI change.
-- `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → luna issue → luna ships → delete). Must consult before adding any internal validation/analysis script.
+- `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → message to luna's session → luna ships → delete). Must consult before adding any internal validation/analysis script.
 - `hardware_claims.md` — every new hardware claim in docs/ or KNOWN_LIMITATIONS.md must be verified against the Cartouche corpus (`snes_search` with opensnes-docs excluded; `contrast=true` on conflicts); unexplained hardware-shaped symptoms get a corpus query before blaming the toolchain.
 - `partners.md` — the two shoulders, luna and snes-rag: the three work jointly, and feedback to each is a duty, not an option. A gap in a partner is written down the same day in `.claude/notes/partners/<partner>/`; snes-rag is passive and only learns what we and luna report; we are the bridge between the two.
+- `exchanges.md` — direct exchanges (owner decision 2026-10-10): OpenSNES, luna and the game talk session to session and challenge one another, no GitHub issue between the three; two axes (our own work, and collaboration); the game builds on this tree's `develop`, so a compiler chantier goes in a separate worktree and a full rebuild is announced. Charter: `~/workspace/snes-tutor/protocole/ECHANGES.md`.
 
 ## Strategic Planning
 

@@ -1,0 +1,6 @@
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+bpp = 8
+colors = 256

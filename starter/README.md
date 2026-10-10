@@ -38,7 +38,7 @@ That produces `game.sfc`. Run it in any SNES emulator, or with the SDK's
 bundled emulator:
 
 ```sh
-/path/to/opensnes/tools/luna-test/bin/luna run game.sfc
+/path/to/opensnes/testing/bin/luna run game.sfc
 ```
 
 > If you copied this directory *while it was still inside the SDK repo*, the
@@ -50,8 +50,9 @@ bundled emulator:
 ```
 starter/
   main.c        the game: setup, screen-on, game loop (edit the marked parts)
-  data.asm      links res/player.pic + .pal into the ROM (add your assets here)
-  res/player.png  the sprite art — gfx4snes converts it at build time
+  res/player.png       the sprite art
+  res/player.png.toml  how it is converted (opensnes-sprite: block size, colours);
+                       the build runs the tool and links the result for you
   Makefile      TARGET, ROM_NAME, LIB_MODULES, OPENSNES path
   .github/workflows/build.yml   CI that builds your ROM on every push
 ```
@@ -61,8 +62,9 @@ starter/
 Everything in `main.c` is one of three parts — **setup**, **screen-on**, and
 the **game loop** — labelled in the file. To go further:
 
-- **Add graphics** — drop a `.png` in `res/`, copy the gfx4snes rule in the
-  `Makefile`, and `.incbin` its `.pic`/`.pal` in `data.asm`.
+- **Add graphics** — drop a `.png` in `res/` with a `.png.toml` beside it
+  (copy `player.png.toml`); the build converts it and links the tiles, and
+  `res/<name>.inc` declares the symbols (`<name>_tiles`, `<name>_pal`) and a ready `GfxAsset`.
 - **Add sound** — drop a `.wav` in `res/` and `.incbin` its `.brr`; it converts
   automatically (see the SDK's audio tutorial).
 - **Add layers, text, scrolling, more** — the SDK ships **82 examples** and a

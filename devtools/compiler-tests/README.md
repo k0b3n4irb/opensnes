@@ -18,6 +18,9 @@ absent  <regex>                  ASM does not contain regex
 count   <N> <regex>              exactly N matches
 in <func>: present|absent <re>   regex (a)present within that function's body
 section <sym>: present|absent <re>   the .SECTION/.RAMSECTION line of <sym> matches
+raw <directive>                  the same directive on the unstripped ASM: a file-scope
+                                 static is emitted `name.<case>` and the runner strips
+                                 that suffix before the other checks run
 # lines and blank lines are ignored
 ```
 
@@ -49,7 +52,7 @@ alongside the other `devtools/` linters. See
   doesn't fit `present`/`absent`/`count`/`in`/`section`, extend the DSL in
   `run.py` rather than weakening the check.
 
-## Runtime fixture ROMs (`runtime/`)
+## Runtime fixture ROMs (`testing/fixtures/compiler/`, since 2026-10-05)
 
 Pattern checks prove shapes; these ROMs prove results. Each directory is a
 one-TU ROM whose globals the sibling `test_*.py` asserts through

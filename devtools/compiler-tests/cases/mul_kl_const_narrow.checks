@@ -1,5 +1,7 @@
 # byte index times the row size: inline shift-add, no runtime call
 in cell: absent jsl tcc_mul32
 in cell: present sta\.b tcc__r9\n\tasl a\n\tasl a\n\tclc\n\tadc\.b tcc__r9\n\tasl a
-# a u16 times 10 may exceed 16 bits: the real 32-bit multiply stays
-in wide: present jsl tcc_mul32
+# a u16 times 10 may exceed 16 bits: the 32-bit product is built inline,
+# high half in tcc__r9h (since 2026-10-08; a call to tcc_mul32 before)
+in wide: absent jsl tcc_mul32
+in wide: present stz\.b tcc__r9h\n\tasl a\n\trol\.b tcc__r9h\n\tasl a\n\trol\.b tcc__r9h\n\tclc\n\tadc\.b tcc__r9\n\tbcc @mulc\.\d+\n\tinc\.b tcc__r9h

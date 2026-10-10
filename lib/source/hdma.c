@@ -19,6 +19,19 @@
  * These call the assembly core functions (hdmaSetup, hdmaEnableMask)
  *============================================================================*/
 
+/* The channel forms of the enable pair (1.0 API, 2026-10-05). Until 0.48
+ * these two names took the mask themselves; a value above 7 is a mask left
+ * behind by a 0.x caller, and is refused so that it fails visibly. */
+void hdmaEnable(u8 channel) {
+    if (channel > 7) return;
+    hdmaEnableMask((u8)(1 << channel));
+}
+
+void hdmaDisable(u8 channel) {
+    if (channel > 7) return;
+    hdmaDisableMask((u8)(1 << channel));
+}
+
 void hdmaParallax(u8 channel, u8 bg, const void *scrollTable) {
     u8 destReg;
 

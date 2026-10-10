@@ -147,75 +147,42 @@ sprite whose Y wraps onto visible lines therefore still consumes the
 32-sprites / 34-slivers budget on those lines — if the top of your
 screen drops sprites mysteriously, audit your hidden large sprites.
 
-## Sprite Y +1 Scanline Quirk
+## Sprite Y: no correction {#oam_sprite_y}
 
-The SNES PPU renders sprites with a 1-scanline vertical delay: a sprite whose
-`OAM_Y = N` is drawn on scanlines **N+1 through N+8**, not N through N+7. The
-OAM is scanned and tile-fetched on the previous scanline, so by the time the
-sprite is composited it has already advanced by one.
+A sprite's OAM `Y` is the picture line of its top row, 0 being the first
+visible line. The PPU does draw a sprite one scanline below its `Y`, and it
+never outputs scanline 0: the two cancel. The arbiter, word for word
+(SNESdev wiki, *Sprites*, <https://snes.nesdev.org/wiki/Sprites>):
 
-This is documented hardware behavior, confirmed in two places on the SNESdev
-community wiki:
+> Like the NES, sprites appear 1 line lower than their Y value, however
+> because the first line of rendering is always hidden on SNES, a sprite
+> with Y=0 will appear to begin on the first visible line. However, a
+> background with Y scroll of 0 will appear to have its top pixel cut off
+> by the hidden line.
 
-- *Sprites* — "Like the NES, sprites appear 1 line lower than their Y value,
-  however because the first line of rendering is always hidden on SNES, a
-  sprite with Y=0 will appear to begin on the first visible line."
-  <https://snes.nesdev.org/wiki/Sprites>
-- *SNES PPU for NES developers* — "Sprites are delayed vertically by 1
-  scanline, just as on NES, so scroll and sprite positions will work
-  unmodified on SNES (...)."
-  <https://snes.nesdev.org/wiki/SNES_PPU_for_NES_developers>
+So only the **background** needs a correction, and the library applies it:
+`bgSetScroll()` writes `y - 1` to `BGnVOFS`. Every sprite API stores the
+`y` it is given, and a direct write to `oamMemory[id * 4 + 1]` stores `y`
+too. A sprite and the background it stands on take the same camera value.
 
-The X axis has no equivalent quirk.
+Measured on luna (2026-10-09): an 8x8 sprite with OAM `Y` = 0 covers
+picture lines 0 to 7; with `Y` = 255 it covers lines 0 to 6, its top row
+lost on the scanline that is never output.
 
-### OpenSNES SDK convention
+**History, because code written against it exists.** From 2026-04-27 to
+2026-10-09 `oamSet()`, `oamSetY()`, `oamSetXY()` and the `oamSetFast`
+macros stored `y - 1`, on a reading of the first half of the sentence
+above without the second; the dynamic engine followed on 2026-09-26. Every
+sprite was drawn one line too high, and since `bgSetScroll()` got its
+`- 1` (2026-09-12) one line above a background scrolled to the same `y`.
+Code that subtracted 1 by hand before a direct `oamMemory[]` write must
+stop; code that added 1 to a `y` passed to `oamSet()` to line a sprite up
+with the background must stop too.
 
-The Y semantics depend on which API you use. Two camps:
+Sentinel values that hide a sprite (`OBJ_HIDE_Y = 240`) are positions like
+any other: 240 is below the last visible line (223).
 
-**Camp 1 — Y is the rendered top scanline (`visual_top`)**
-
-The API auto-subtracts 1 before writing OAM, so the value you pass is what
-you see on screen.
-
-| API | Notes |
-|-----|-------|
-| `oamSet(id, x, y, ...)` | auto Y-1 in `sprite_oamset.asm` |
-| `oamSetY(id, y)` / `oamSetXY(...)` | auto Y-1 in `sprite.c` |
-| `oamDrawMetasprite` | calls `oamSet` |
-
-**Camp 2 — Y is the legacy PVSnesLib `y_logical` (= `visual_top - 1`)**
-
-The dynamic sprite engine inherits PVSnesLib's collision-and-render contract:
-collision math sets `oambuffer[id].oamy = visual_top - 1`, the engine writes
-that raw to OAM, and the PPU's +1 quirk lifts it back to `visual_top` on
-screen. **Do not pre-subtract** when feeding these APIs.
-
-| API | Notes |
-|-----|-------|
-| `oamDynamicDraw(id)` | use `oambuffer[id].oamy` raw |
-| `oamMetaDrawDyn{8,16,32}` | dynamic engine path, same convention |
-
-**Camp 3 — direct OAM writes**
-
-When bypassing both APIs and writing `oamMemory[id*4 + 1]` yourself, no one
-compensates for you. Subtract 1 manually so the rendered top matches the
-caller's intent.
-
-```c
-oamMemory[id*4 + 1] = (u8)(player_y - 1);   /* visual_top semantics */
-```
-
-Sentinel values used to hide a sprite (`OBJ_HIDE_Y = 240`,
-`OAM_Y_OFFSCREEN = 224`) are **not** compensated — they are not logical
-positions, just markers that push the sprite off the visible area.
-
-### Why two camps?
-
-Most of OpenSNES treats Y as `visual_top`, which is what programmers expect.
-The dynamic engine is the exception because its collision-driven `oamy`
-field is set by ported PVSnesLib code that already accounts for the quirk.
-Adding our own compensation on top would double the offset and lift sprites
-2 px off the ground — easily visible on slope_collision / likemario.
+The X axis has no such subtlety.
 
 ## Timing
 

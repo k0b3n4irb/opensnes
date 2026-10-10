@@ -24,6 +24,9 @@
 #include <snes/types.h>
 #include <snes/registers.h>  /* REG_MOSAIC for the inline mosaicInit body */
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): mosaicEnable.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Background Mask Constants
  *============================================================================*/
@@ -32,16 +35,8 @@
  * bits everywhere a call takes a set of layers. */
 #define MOSAIC_BG_ALL 0x0F    /**< Enable mosaic for all backgrounds */
 
-#define MOSAIC_BG1    0x01    /**< @deprecated use LAYER_BG1 */
-#define MOSAIC_BG2    0x02    /**< @deprecated use LAYER_BG2 */
-#define MOSAIC_BG3    0x04    /**< @deprecated use LAYER_BG3 */
-#define MOSAIC_BG4    0x08    /**< @deprecated use LAYER_BG4 */
-#ifdef __clang__
-#pragma clang deprecated(MOSAIC_BG1, "use LAYER_BG1")
-#pragma clang deprecated(MOSAIC_BG2, "use LAYER_BG2")
-#pragma clang deprecated(MOSAIC_BG3, "use LAYER_BG3")
-#pragma clang deprecated(MOSAIC_BG4, "use LAYER_BG4")
-#endif
+/* MOSAIC_BG1..MOSAIC_BG4 were removed on 2026-10-05: use LAYER_BG1..LAYER_BG4
+ * (video.h), the same values (docs/UPGRADING.md). */
 
 /*============================================================================
  * Mosaic Size Constants
@@ -65,8 +60,8 @@ void mosaicInit(void);
  * @brief Set the backgrounds the mosaic applies to — REPLACES the previous set
  *
  * `mosaicSetLayers(LAYER_BG1)` after `mosaicSetLayers(LAYER_BG2)` leaves
- * only BG1 pixelated. This is the function mosaicEnable() was until
- * 2026-09-22, renamed because "Enable" reads as additive — windowEnable() IS
+ * only BG1 pixelated. This is the function the removed mosaicEnable() was
+ * (renamed 2026-09-22, removed 2026-10-05) because "Enable" reads as additive — windowEnable() IS
  * additive — and the old name silently undid the previous call.
  *
  * @param bgMask Bitmask of backgrounds (LAYER_BG1 | LAYER_BG2 | ...; 0
@@ -79,11 +74,6 @@ void mosaicInit(void);
  * @endcode
  */
 void mosaicSetLayers(u8 bgMask);
-
-/** @brief The pre-2026-09-22 name of mosaicSetLayers(). Same behaviour: it
- *         REPLACES the background set. */
-OPENSNES_DEPRECATED("use mosaicSetLayers() — this call replaces the background set, it does not add to it")
-void mosaicEnable(u8 bgMask);
 
 /**
  * @brief Disable mosaic effect for all backgrounds

@@ -14,12 +14,3 @@ LIB_MODULES := console sprite dma background input
 SOUNDBANK_SRC := music/tetris_theme.it
 
 include $(OPENSNES)/make/common.mk
-
-res/tiles.pic res/tiles.pal: res/tiles.png
-	@echo "[GFX] $<"
-	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -i $<
-
-clean: clean-tetris
-.PHONY: clean-tetris
-clean-tetris:
-	@rm -f res/tiles.pic res/tiles.pal res/tiles.inc res/tiles_data.as

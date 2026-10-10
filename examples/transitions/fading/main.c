@@ -38,11 +38,9 @@
  *============================================================================*/
 
 /** @brief 4bpp tile data for the background image. */
-extern u8 tiles[], tiles_end[];
+#include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
 /** @brief Tilemap data (32x32 tile grid) for the background image. */
-extern u8 tilemap[], tilemap_end[];
 /** @brief 15-bit BGR palette (up to 16 colors) for the background image. */
-extern u8 palette[], palette_end[];
 
 /**
  * @brief Block until the user presses a button (with debounce).
@@ -89,16 +87,16 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     /* BG1: tiles at $4000, palette at slot 0 (offset 0) */
-    bgInitTileSet(0, tiles, palette, 0,
-                  tiles_end - tiles,
-                  palette_end - palette,
+    bgInitTileSet(0, opensnes_tiles, opensnes_pal, 0,
+                  opensnes_tiles_end - opensnes_tiles,
+                  opensnes_pal_end - opensnes_pal,
                   BG_16COLORS, VRAM_BG_TILES);
 
     /*------------------------------------------------------------------------
      * Load Tilemap Data
      *------------------------------------------------------------------------*/
 
-    dmaCopyVram(tilemap, VRAM_BG_MAP, tilemap_end - tilemap);
+    dmaCopyVram(opensnes_map, VRAM_BG_MAP, opensnes_map_end - opensnes_map);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode

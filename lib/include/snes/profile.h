@@ -43,6 +43,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): profileGetFrameCount.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Color Constants for Visual Profiling
  *
@@ -124,15 +127,6 @@ u16 profileScanlineEnd(void);
 /*============================================================================
  * Frame Counters
  *============================================================================*/
-
-/**
- * @brief The same counter as getFrameCount() (wraps at 65535)
- *
- * It reads the frame counter the NMI handler keeps, not a counter of the
- * profiler; getFrameCount() (console.h) is the name kept.
- */
-OPENSNES_DEPRECATED("use getFrameCount() — it reads the same counter")
-u16 profileGetFrameCount(void);
 
 /**
  * @brief Get lag frame count since boot

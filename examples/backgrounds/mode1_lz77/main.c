@@ -45,9 +45,7 @@
 
 /** @name Graphics data pointers (defined in data.asm via .incbin)
  * @{ */
-extern u8 patterns[];           /**< LZ77-compressed 4bpp tile data (decompressed to VRAM by lzssDecodeVram) */
-extern u8 palette[], palette_end[]; /**< Uncompressed 16-color BGR555 palette */
-extern u8 map[], map_end[];     /**< Uncompressed 32x32 tilemap entries */
+#include "res/opensnes.inc"   /* generated: opensnes_tiles[] (LZ77), opensnes_pal[], opensnes_map[], each with _end */
 /** @} */
 
 /**
@@ -73,15 +71,15 @@ int main(void) {
     setScreenOff();
 
     /* Decompress tiles directly to VRAM at $4000 (LZ77 → VRAM) */
-    lzssDecodeVram(patterns, VRAM_BG_TILES);
+    lzssDecodeVram(opensnes_tiles, VRAM_BG_TILES);
 
     /* Load palette (16 colors) */
-    dmaCopyCGram(palette, 0,
-                 (u16)(palette_end - palette));
+    dmaCopyCGram(opensnes_pal, 0,
+                 (u16)(opensnes_pal_end - opensnes_pal));
 
     /* Load tilemap to VRAM at $0000 */
-    dmaCopyVram(map, VRAM_BG_MAP,
-                (u16)(map_end - map));
+    dmaCopyVram(opensnes_map, VRAM_BG_MAP,
+                (u16)(opensnes_map_end - opensnes_map));
 
     /* Configure BG1: tilemap at $0000, tiles at $4000 */
     bgSetMapPtr(0, VRAM_BG_MAP, SC_32x32);

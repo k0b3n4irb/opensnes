@@ -14,15 +14,6 @@
 | Start | Begin; pause during play; after GAME OVER, a new game |
 | Any button | Continue after losing a ball |
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/games/breakout
-```
-
-Then open `breakout.sfc` in your emulator (Mesen2 recommended).
-
 ## What You'll Learn
 
 - How to pack tilemaps in VRAM when space is tight (yes, they can overlap on purpose)
@@ -33,6 +24,15 @@ Then open `breakout.sfc` in your emulator (Mesen2 recommended).
 - Grid-based collision without testing 100 bricks individually
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/games/breakout
+```
+
+Then open `breakout.sfc` in your emulator (Mesen2 recommended).
 
 ## Walkthrough
 

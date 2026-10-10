@@ -264,7 +264,7 @@ wider type for the aiming maths behind an 8.8 presentation.
 
 @note `fix32Sin` and `fix32Cos` are implemented in assembly. Two compiler
 bugs once made the obvious C body wrong, which is why; both were fixed long
-ago, and `devtools/libtests` now computes that C expression alongside the
+ago, and `testing/fixtures/libtests` now computes that C expression alongside the
 assembly one and asserts they agree. The assembly stays because there is no
 reason to churn a working routine.
 

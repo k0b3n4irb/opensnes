@@ -169,7 +169,7 @@ read; `devtools/check_bank_reads.py` fails the link on a bank-blind one.
 | `oamSet(...)` | `oamSet(...)` | Same, 7 arguments (see Pitfall 2) |
 | `oamSetEx(...)`, `oamSetVisible(...)` | `oamSetSize()`, `oamHide()`, `oamSetXY()` | Split by concern |
 | `hdmaSetup(ch, ...)` | `hdmaSetup(ch, ...)` | Same |
-| `hdmaEnable(ch)` | `hdmaEnableMask(1 << ch)` | **BITMASK not channel number!** |
+| `hdmaEnable(1 << ch)` | `hdmaEnable(ch)` | **Channel number since 0.49** (mask: `hdmaEnableMask(1 << ch)`) |
 
 #### Color Math Mapping
 
@@ -178,7 +178,7 @@ PVSnesLib's `setColorEffect(CM_SUBBGOBJ_ENABLE, CM_MSCR_BACK | CM_MSCR_BG1)` bec
 colorMathInit();
 colorMathSetSource(COLORMATH_SRC_SUBSCREEN);
 colorMathSetOp(COLORMATH_ADD);
-colorMathEnable(LAYER_BG1 | COLORMATH_BACKDROP);
+colorMathSetLayers(LAYER_BG1 | COLORMATH_BACKDROP);
 ```
 
 #### BG Register Setup (when not using bgInitTileSet)
@@ -246,9 +246,9 @@ clean-example:
 ### Phase 6 — Build and Verify
 
 1. Full rebuild: `make clean && make`
-2. The example alone: `python3 tools/luna-test/luna_runner.py --coverage --only <category>/<name>`
+2. The example alone: `python3 testing/luna_runner.py --coverage --only <category>/<name>`
    then `--compare --only …` once a baseline exists (`--update` for a new example)
-3. A `luna test` manifest under `tools/luna-test/manifests/` if the example
+3. A `luna test` manifest under `testing/manifests/` if the example
    takes input (scripted input → WRAM asserts), then `make tests`
 4. **STOP** — Ask user to validate interactively (luna GUI / `luna mcp`;
    Category C protocol)
@@ -256,10 +256,12 @@ clean-example:
 
 ## Critical Pitfalls (from hard experience)
 
-### 1. hdmaEnableMask takes a BITMASK, not a channel number
+### 1. hdmaEnable takes a channel, hdmaEnableMask a BITMASK
 ```c
-hdmaEnableMask(1 << 3);   // CORRECT: enable channel 3
+hdmaEnable(3);             // CORRECT: enable channel 3
+hdmaEnableMask(1 << 3);   // CORRECT: the same, as a mask
 hdmaEnableMask(3);         // WRONG: enables channels 0+1 !
+hdmaEnable(1 << 3);        // REFUSED (8 > 7): a PVSnesLib mask left behind
 ```
 
 ### 2. oamSet() is cheap — do not bypass it
@@ -276,7 +278,7 @@ PVSnesLib ASM functions ported verbatim have SWAPPED stack offsets.
 ### 4. HDMA tables may live in any bank
 `hdmaSetup()` reads the bank from the table pointer (chantier A6); a `const`
 table works wherever the linker puts it. (This pitfall used to say it
-hardcoded bank $00; `hdmaSetupBank()` is deprecated since 2026-09-20.)
+hardcoded bank $00; `hdmaSetupBank()` was removed on 2026-10-05.)
 Tables on `BGnVOFS` carry the vertical-scroll -1 themselves (KNOWN_LIMITATIONS).
 
 ### 5. Tilemap padding for 256×224 images
@@ -333,7 +335,7 @@ PVSnesLib's audio calls map to the `snesmod` module (same SNESMOD driver):
 - [ ] gfx4snes flags match PVSnesLib exactly
 - [ ] Assets in `ASSET_SECTION`, loaded from C with the DMA helpers (Phase 3)
 - [ ] Palette loaded at correct CGRAM offset (check `-e` flag)
-- [ ] `hdmaEnableMask(1 << ch)` not `hdmaEnableMask(ch)`
+- [ ] `hdmaEnable(ch)` or `hdmaEnableMask(1 << ch)`, never `hdmaEnableMask(ch)` or `hdmaEnable(1 << ch)`
 - [ ] Sprites through `oamSet()` / `oamSetFast()` (no hand-written `oamMemory[]`)
 - [ ] `make clean && make` passes
 - [ ] `luna_runner.py --coverage --only <example>` and `make tests` pass

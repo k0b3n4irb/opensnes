@@ -13,6 +13,8 @@
  * - `<snes/sram.h>` — battery-backed save RAM
  * - `<snes/collision.h>` — bounding-box collision
  * - `<snes/lzss.h>` — LZSS decompression to VRAM
+ * - `<snes/string.h>` — memcpy, memset, strlen and four more
+ * - `<snes/vramqueue.h>` — VRAM uploads noted during the frame, sent in VBlank
  * - `<snes/gameloop.h>` — gameloop framework opt-in
  * - `<snes/asset.h>` — typed background / tileset bundles
  * - `<snes/scene.h>` — push/pop scene stack
@@ -55,13 +57,13 @@
 #define OPENSNES_VERSION_MAJOR 0
 
 /** @brief OpenSNES minor version */
-#define OPENSNES_VERSION_MINOR 48
+#define OPENSNES_VERSION_MINOR 49
 
 /** @brief OpenSNES patch version */
 #define OPENSNES_VERSION_PATCH 0
 
 /** @brief OpenSNES version string */
-#define OPENSNES_VERSION_STRING "0.48.0"
+#define OPENSNES_VERSION_STRING "0.49.0"
 
 /*============================================================================
  * Core Headers
@@ -135,6 +137,8 @@
  *   #include <snes/sram.h>      // battery-backed save RAM
  *   #include <snes/collision.h> // bounding-box collision
  *   #include <snes/lzss.h>      // LZSS decompression to VRAM
+ *   #include <snes/string.h>    // memcpy, memmove, memset, strlen, strcmp, strcpy, strncpy
+ *   #include <snes/vramqueue.h> // VRAM uploads noted during the frame, sent in VBlank
  *   #include <snes/gameloop.h>  // gameloop framework opt-in
  *   #include <snes/asset.h>     // typed BgAsset / GfxAsset bundles
  *   #include <snes/scene.h>     // push/pop scene stack

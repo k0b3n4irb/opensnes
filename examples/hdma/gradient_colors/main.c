@@ -34,11 +34,9 @@
 #include <snes/hdma.h>
 
 /** @brief 4bpp tile data for the background layer. */
-extern u8 tiles[], tiles_end[];
+#include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
 /** @brief Tilemap data (32x32 tile grid) for the background layer. */
-extern u8 tilemap[], tilemap_end[];
 /** @brief 15-bit BGR palette for the background (up to 16 colors). */
-extern u8 palette[], palette_end[];
 
 /**
  * @brief Pre-built HDMA table for the backdrop color gradient (defined in data.asm).
@@ -104,14 +102,14 @@ int main(void) {
     consoleInit();
 
     /* Load BG1 tiles and palette */
-    bgInitTileSet(0, tiles, palette, 0,
-                  tiles_end - tiles,
-                  palette_end - palette,
+    bgInitTileSet(0, opensnes_tiles, opensnes_pal, 0,
+                  opensnes_tiles_end - opensnes_tiles,
+                  opensnes_pal_end - opensnes_pal,
                   BG_16COLORS, 0x4000);
 
     /* Load tilemap */
     bgSetMapPtr(0, 0x0000, BG_MAP_32x32);
-    dmaCopyVram(tilemap, 0x0000, tilemap_end - tilemap);
+    dmaCopyVram(opensnes_map, 0x0000, opensnes_map_end - opensnes_map);
 
     setMode(BG_MODE1, 0);
     setMainScreen(TM_BG1);

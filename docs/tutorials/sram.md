@@ -66,7 +66,7 @@ HiROM one and `$40:0000` (BW-RAM) on an SA-1 one. Two limits to know:
 
 This paragraph claimed the helpers "hide these details" long before they
 did — until 2026-09-20 they used the LoROM address on every build. The HiROM
-mapping is pinned by `devtools/libtests_hirom`, which reads the bytes back
+mapping is pinned by `testing/fixtures/libtests_hirom`, which reads the bytes back
 from `$30:6000`.
 
 ## Build setup

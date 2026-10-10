@@ -39,11 +39,9 @@
 #include <snes/hdma.h>
 
 /** @brief 4bpp tile data for the background image. */
-extern u8 tiles[], tiles_end[];
+#include "res/bg.inc"   /* generated: bg_tiles[], bg_map[], bg_pal[], each with _end (and a BgAsset bg) */
 /** @brief 15-bit BGR palette for the background (up to 16 colors). */
-extern u8 palette[], palette_end[];
 /** @brief Tilemap data (32x32 tile grid) for the background. */
-extern u8 tilemap[], tilemap_end[];
 
 /**
  * @brief Current wave amplitude for the water ripple effect (library variable).
@@ -110,7 +108,7 @@ static void stopCurrentEffect(void) {
 
     /* Restore original palette from ROM source during VBlank */
     WaitForVBlank();
-    dmaCopyCGram(palette, 0, palette_end - palette);
+    dmaCopyCGram(bg_pal, 0, bg_pal_end - bg_pal);
 
     fx.active_effect = 0;
 }
@@ -140,11 +138,11 @@ int main(void) {
 
     /* Load background: tiles at $0000, tilemap at $1000 (no overlap) */
     bgSetMapPtr(0, 0x1000, SC_32x32);
-    bgInitTileSet(0, tiles, palette, 0,
-                  tiles_end - tiles,
-                  palette_end - palette,
+    bgInitTileSet(0, bg_tiles, bg_pal, 0,
+                  bg_tiles_end - bg_tiles,
+                  bg_pal_end - bg_pal,
                   BG_16COLORS, 0x0000);
-    dmaCopyVram(tilemap, 0x1000, tilemap_end - tilemap);
+    dmaCopyVram(bg_map, 0x1000, bg_map_end - bg_map);
 
     setMode(BG_MODE1, 0);
     setMainScreen(LAYER_BG1);

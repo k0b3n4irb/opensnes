@@ -37,21 +37,18 @@
 #include <snes.h>
 
 /** @brief 8x8 sprite tile data (defined in data.asm) */
-extern u8 sprite8[], sprite8_end[];
+#include "res/sprite8.inc"
+#include "res/sprite16.inc"
+#include "res/sprite32.inc"
+#include "res/sprite64.inc"
+/* generated: spriteN_tiles[], spriteN_tiles_end[], spriteN_pal[] for each size */
 /** @brief 16x16 sprite tile data */
-extern u8 sprite16[], sprite16_end[];
 /** @brief 32x32 sprite tile data */
-extern u8 sprite32[], sprite32_end[];
 /** @brief 64x64 sprite tile data */
-extern u8 sprite64[], sprite64_end[];
 /** @brief Palette for the 8x8 sprite */
-extern u8 palsprite8[], palsprite8_end[];
 /** @brief Palette for the 16x16 sprite */
-extern u8 palsprite16[], palsprite16_end[];
 /** @brief Palette for the 32x32 sprite */
-extern u8 palsprite32[], palsprite32_end[];
 /** @brief Palette for the 64x64 sprite */
-extern u8 palsprite64[], palsprite64_end[];
 
 /**
  * @brief VRAM word address where the "small" sprite tiles are loaded.
@@ -131,40 +128,40 @@ static void changeObjSize(void) {
 
     if (selectedItem == 0) {
         /* 8x8 small / 16x16 large */
-        oamInitGfxSet(sprite8, sprite8_end - sprite8,
-                      palsprite8, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L16);
-        dmaCopyVram(sprite16, ADRSPRITLARGE, sprite16_end - sprite16);
-        dmaCopyCGram(palsprite16, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
+        oamInitGfxSet(sprite8_tiles, sprite8_tiles_end - sprite8_tiles,
+                      sprite8_pal, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L16);
+        dmaCopyVram(sprite16_tiles, ADRSPRITLARGE, sprite16_tiles_end - sprite16_tiles);
+        dmaCopyCGram(sprite16_pal, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 1) {
         /* 8x8 small / 32x32 large */
-        oamInitGfxSet(sprite8, sprite8_end - sprite8,
-                      palsprite8, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L32);
-        dmaCopyVram(sprite32, ADRSPRITLARGE, sprite32_end - sprite32);
-        dmaCopyCGram(palsprite32, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
+        oamInitGfxSet(sprite8_tiles, sprite8_tiles_end - sprite8_tiles,
+                      sprite8_pal, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L32);
+        dmaCopyVram(sprite32_tiles, ADRSPRITLARGE, sprite32_tiles_end - sprite32_tiles);
+        dmaCopyCGram(sprite32_pal, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 2) {
         /* 8x8 small / 64x64 large */
-        oamInitGfxSet(sprite8, sprite8_end - sprite8,
-                      palsprite8, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L64);
-        dmaCopyVram(sprite64, ADRSPRITLARGE, sprite64_end - sprite64);
-        dmaCopyCGram(palsprite64, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
+        oamInitGfxSet(sprite8_tiles, sprite8_tiles_end - sprite8_tiles,
+                      sprite8_pal, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE8_L64);
+        dmaCopyVram(sprite64_tiles, ADRSPRITLARGE, sprite64_tiles_end - sprite64_tiles);
+        dmaCopyCGram(sprite64_pal, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 3) {
         /* 16x16 small / 32x32 large */
-        oamInitGfxSet(sprite16, sprite16_end - sprite16,
-                      palsprite16, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE16_L32);
-        dmaCopyVram(sprite32, ADRSPRITLARGE, sprite32_end - sprite32);
-        dmaCopyCGram(palsprite32, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
+        oamInitGfxSet(sprite16_tiles, sprite16_tiles_end - sprite16_tiles,
+                      sprite16_pal, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE16_L32);
+        dmaCopyVram(sprite32_tiles, ADRSPRITLARGE, sprite32_tiles_end - sprite32_tiles);
+        dmaCopyCGram(sprite32_pal, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 4) {
         /* 16x16 small / 64x64 large */
-        oamInitGfxSet(sprite16, sprite16_end - sprite16,
-                      palsprite16, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE16_L64);
-        dmaCopyVram(sprite64, ADRSPRITLARGE, sprite64_end - sprite64);
-        dmaCopyCGram(palsprite64, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
+        oamInitGfxSet(sprite16_tiles, sprite16_tiles_end - sprite16_tiles,
+                      sprite16_pal, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE16_L64);
+        dmaCopyVram(sprite64_tiles, ADRSPRITLARGE, sprite64_tiles_end - sprite64_tiles);
+        dmaCopyCGram(sprite64_pal, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     } else if (selectedItem == 5) {
         /* 32x32 small / 64x64 large */
-        oamInitGfxSet(sprite32, sprite32_end - sprite32,
-                      palsprite32, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE32_L64);
-        dmaCopyVram(sprite64, ADRSPRITLARGE, sprite64_end - sprite64);
-        dmaCopyCGram(palsprite64, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
+        oamInitGfxSet(sprite32_tiles, sprite32_tiles_end - sprite32_tiles,
+                      sprite32_pal, PALETTESPRSIZE, 0, ADRSPRITE, OBJ_SIZE32_L64);
+        dmaCopyVram(sprite64_tiles, ADRSPRITLARGE, sprite64_tiles_end - sprite64_tiles);
+        dmaCopyCGram(sprite64_pal, OBJ_CGRAM_PAL(1), PALETTESPRSIZE);
     }
 
     /* Display small sprite (left side): palette 0, priority 3, no flip.

@@ -227,7 +227,7 @@ def _gather_active_doc_paths() -> list[Path]:
             paths.append(p)
     # Build, CI and harness files (since 2026-09-26, audit tests 11): their
     # comments quoted "54/56 examples" long after the corpus moved.
-    for rel in ("Makefile", "tools/luna-test/README.md"):
+    for rel in ("Makefile", "testing/README.md"):
         p = repo_path(rel)
         if p.is_file():
             paths.append(p)
@@ -879,7 +879,7 @@ def deprecated_citations_in_text(text: str, deprecated: set[str]) -> list[tuple[
 def check_sdk_names_in_docs() -> list[str]:
     api = _public_api_names()
     prefixes = sdk_prefixes(api)
-    deprecated = deprecated_api_names() - {"rand", "srand"}  # libc names: too common in prose
+    deprecated = deprecated_api_names()
     root = repo_path()
     drifts: list[str] = []
     for path in _sdk_doc_paths():
@@ -923,7 +923,9 @@ def retired_tool_lines(text: str) -> list[int]:
 def check_no_retired_tools() -> list[str]:
     root = repo_path()
     drifts: list[str] = []
-    for sub in (".claude/agents", ".claude/skills", ".claude/hooks"):
+    # .github joined on 2026-10-08: the PR template still asked for a Mesen2
+    # test and the bug report form suggested it, a year after the migration.
+    for sub in (".claude/agents", ".claude/skills", ".claude/hooks", ".github"):
         base = repo_path(sub)
         if not base.is_dir():
             continue
@@ -1085,6 +1087,90 @@ HEADER_MAP_DOC = "docs/README.md"
 HEADER_MAP_HEADING = "## Header → tutorial map"
 
 
+# --------------------------------------------------------------------------
+# Check 16: no page, example or template cites a name removed from the SDK
+# (added 2026-10-05, lot B/G of the 1.0 plan). The list is
+# make/removed_api.txt; docs/UPGRADING.md and MIGRATING_FROM_PVSNESLIB.md
+# exist to name them and are exempt, CHANGELOG.md is history.
+# --------------------------------------------------------------------------
+
+_REMOVED_SCAN_GLOBS = ["docs/**/*.md", "examples/**/*.c", "examples/**/*.h",
+                       "examples/**/*.asm", "examples/**/*.md", "templates/*",
+                       "lib/include/snes/*.h", "lib/source/*", "KNOWN_LIMITATIONS.md",
+                       "README.md", "testing/manifests/*.toml"]
+_REMOVED_EXEMPT = {"docs/UPGRADING.md", "docs/MIGRATING_FROM_PVSNESLIB.md"}
+
+
+def removed_api_names() -> dict[str, str]:
+    path = repo_path("make/removed_api.txt")
+    names: dict[str, str] = {}
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line and not line.startswith("#"):
+                parts = line.split("\t")
+                names[parts[0]] = parts[1] if len(parts) > 1 else ""
+    return names
+
+
+# Anchor 17 (2026-10-06): nothing a user project's build executes is an
+# interpreted script (.claude/rules/two_audiences.md, rule 1). make/common.mk
+# had ten python3 calls on 2026-10-05; the last one left the next day. A
+# recipe or variable line that names an interpreter fails here; comments may
+# tell the history. The release recipe must not copy a devtools script
+# either: the zip is what the game developer gets.
+INTERPRETER_RE = re.compile(r"\b(python3?|perl|ruby|node|uv run)\b")
+
+
+def check_user_build_has_no_interpreter() -> list[str]:
+    drifts: list[str] = []
+    for n, line in enumerate(repo_path("make/common.mk").read_text(encoding="utf-8").splitlines(), 1):
+        stripped = line.strip()
+        if stripped.startswith("#") or stripped.startswith("@#"):
+            continue
+        m = INTERPRETER_RE.search(line)
+        if m:
+            drifts.append(f"make/common.mk:{n}: a user build calls `{m.group(1)}` — every step is a binary "
+                          f"of bin/ or the shell CLI (.claude/rules/two_audiences.md, rule 1)")
+    makefile = repo_path("Makefile").read_text(encoding="utf-8")
+    start = makefile.find("\nrelease:")
+    end = makefile.find("\nrelease-", start + 1)
+    recipe = makefile[start:end if end > start else len(makefile)]
+    for n, line in enumerate(recipe.splitlines()):
+        if line.strip().startswith("@#"):
+            continue
+        if re.search(r"devtools/|\.py\b", line):
+            drifts.append(f"Makefile, release recipe: `{line.strip()[:80]}` puts a contributor script in the zip "
+                          f"(.claude/rules/two_audiences.md, rule 3)")
+    return drifts
+
+
+def check_removed_api_names() -> list[str]:
+    names = removed_api_names()
+    if not names:
+        return []
+    rx = re.compile(r"\b(" + "|".join(re.escape(n) for n in names) + r")\b")
+    drifts: list[str] = []
+    seen: set[Path] = set()
+    for g in _REMOVED_SCAN_GLOBS:
+        for path in sorted(repo_path().glob(g)):
+            if not path.is_file() or path in seen:
+                continue
+            seen.add(path)
+            rel = path.relative_to(repo_path()).as_posix()
+            if rel in _REMOVED_EXEMPT or "/build/" in rel:
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for lineno, line in enumerate(text.splitlines(), 1):
+                for m in rx.finditer(line):
+                    low = line.lower()
+                    if "removed" in low or "retir" in low:
+                        continue        # the line says it is gone
+                    drifts.append(f"{rel}:{lineno}: `{m.group(1)}` was removed from the SDK "
+                                  f"(make/removed_api.txt: use {names[m.group(1)]}); "
+                                  f"a page or example must not teach it")
+    return drifts
+
+
 def check_header_map() -> list[str]:
     drifts: list[str] = []
     doc = repo_path(HEADER_MAP_DOC)
@@ -1153,6 +1239,8 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_build_knobs())
     all_drifts.extend(check_benchmark_table())
     all_drifts.extend(check_header_map())
+    all_drifts.extend(check_removed_api_names())
+    all_drifts.extend(check_user_build_has_no_interpreter())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

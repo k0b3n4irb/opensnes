@@ -130,3 +130,10 @@ La documentation est exacte sur ce qu'elle vérifie, et elle en vérifie beaucou
   contrôle `symmap.py --check-data-init` existe désormais après chaque
   édition de liens (contrôle négatif sur un `.sym` forgé). La ligne 751
   n'est pas une entrée (paragraphe de la section ABI) : rien à dater.
+- **Jaune 6 / rec 10 (aucune image dans les tutoriels)** : les cinq
+  tutoriels visuels ouvrent sur la capture de leur exemple (`perspective`,
+  `transparency`, `window`, `mosaic`, `gradient_colors`), référencée par
+  nom de fichier comme les README (Doxygen copie depuis `IMAGE_PATH` et
+  aplatit : un chemin relatif passait tel quel dans le HTML et cassait).
+  Les 23 autres tutoriels n'ont pas de sujet visuel propre ; pas d'image
+  pour l'image.

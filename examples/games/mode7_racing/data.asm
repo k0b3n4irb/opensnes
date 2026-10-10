@@ -3,26 +3,6 @@
 ; -M 7) and the collision class map (1 byte/tile, far-pointer read).
 ;----------------------------------------------------------------------
 
-ASSET_SECTION ".rodata1"
-
-track_til:
-.incbin "res/track.pc7"
-track_til_end:
-
-track_pal:
-.incbin "res/track.pal"
-track_pal_end:
-
-.ends
-
-ASSET_SECTION ".rodata2"
-
-track_map:
-.incbin "res/track.mp7"
-track_map_end:
-
-.ends
-
 ASSET_SECTION ".rodata3"
 
 ; 128x128 bytes: 0 = road, 1 = grass, 2 = wall. Read from C through a

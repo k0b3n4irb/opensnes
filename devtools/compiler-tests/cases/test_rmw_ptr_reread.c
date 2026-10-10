@@ -9,7 +9,7 @@
  * the re-read hits the wrong page. The bug only surfaced for structs
  * outside page zero (a stack local), which is why lib code masked it.
  *
- * Behavioural pin: r_rmw_u8 in devtools/libtests. This is the static
+ * Behavioural pin: r_rmw_u8 in testing/fixtures/libtests. This is the static
  * codegen shape. */
 
 typedef unsigned char u8;

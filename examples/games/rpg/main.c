@@ -72,7 +72,7 @@
 #include <snes/panel.h>
 
 #include "res/entities.inc"     /* SPAWN/CHEST/NPC_TABLE from the .tmj */
-#include "res/palplan.h"        /* PAL_HERO_* / PAL_NPC_* — sprite-slot plan */
+#include "res/palettes.inc"     /* PAL_HERO_* / PAL_NPC_* — the sprite-slot plan (opensnes-palette) */
 
 /** @brief A villager: where it stands and what it says. The struct
  * shape and the rows both come from the Entities layer of town.tmj, so
@@ -85,18 +85,14 @@ typedef struct { NPC_FIELDS } Npc;
  * array of structs was read from bank $00). */
 static const Npc npcs[NPC_COUNT] = NPC_TABLE;
 
-extern u8 town_tiles[], town_tiles_end[];
+#include "res/tileset.inc"    /* generated: tileset_tiles[], tileset_pal[] (the town), each with _end */
+#include "res/interior.inc"   /* generated: interior_tiles[], interior_pal[] (the house) */
+#include "res/uibox.inc"      /* generated: uibox_tiles[], uibox_pal[] */
+#include "res/hero.inc"       /* generated: hero_tiles[], hero_pal[] */
 extern u8 town_map[];
-extern u8 town_pal[];
 extern const u8 town_collision[];      /* const -> far reads (#121) */
-extern u8 hero_tiles[], hero_tiles_end[];
-extern u8 hero_pal[];
 extern u8 npc_pal[];
-extern u8 ui_tiles[], ui_tiles_end[];
-extern u8 ui_pal[];
-extern u8 house_tiles[], house_tiles_end[];
 extern u8 house_map[];
-extern u8 house_pal[];
 extern const u8 house_collision[];     /* const -> far reads (#121) */
 
 /* VRAM word layout */
@@ -280,21 +276,21 @@ static void dialog_close(void) {
 static void scene_load(u8 which, u16 tx, u16 ty, u8 facing) {
     setScreenOff();                 /* forced blank: 8 KB will not fit VBlank */
     if (which == SCENE_HOUSE) {
-        dmaCopyVram(house_tiles, VRAM_HOUSE_TILES,
-                    (u16)(house_tiles_end - house_tiles));
+        dmaCopyVram(interior_tiles, VRAM_HOUSE_TILES,
+                    (u16)(interior_tiles_end - interior_tiles));
         dmaCopyVram(house_map, VRAM_TOWN_MAP, 32 * 32 * 2);
-        dmaCopyCGram(house_pal, 0, 32);
+        dmaCopyCGram(interior_pal, 0, 32);
         bgSetGfxPtr(0, VRAM_HOUSE_TILES);
         bgSetMapPtr(0, VRAM_TOWN_MAP, SC_32x32);
         bgSetScroll(0, 0, 0);
     } else {
-        dmaCopyVram(town_tiles, VRAM_TOWN_TILES,
-                    (u16)(town_tiles_end - town_tiles));
+        dmaCopyVram(tileset_tiles, VRAM_TOWN_TILES,
+                    (u16)(tileset_tiles_end - tileset_tiles));
         dmaCopyVram(town_map, VRAM_TOWN_MAP, 8192);
-        dmaCopyCGram(town_pal, 0, 32);
+        dmaCopyCGram(tileset_pal, 0, 32);
         bgSetGfxPtr(0, VRAM_TOWN_TILES);
         bgSetMapPtr(0, VRAM_TOWN_MAP, SC_64x64);
-    dmaCopyCGram(town_pal, 0, 32);
+    dmaCopyCGram(tileset_pal, 0, 32);
     }
     scene = which;
     hero_x = (u16)(tx * 8);
@@ -358,11 +354,11 @@ int main(void) {
     setMode(BG_MODE1, 0x08);               /* BG3 high priority */
 
     /* BG1 town, from the Tiled map */
-    dmaCopyVram(town_tiles, VRAM_TOWN_TILES, (u16)(town_tiles_end - town_tiles));
+    dmaCopyVram(tileset_tiles, VRAM_TOWN_TILES, (u16)(tileset_tiles_end - tileset_tiles));
     dmaCopyVram(town_map, VRAM_TOWN_MAP, 8192);
     bgSetGfxPtr(0, VRAM_TOWN_TILES);
     bgSetMapPtr(0, VRAM_TOWN_MAP, SC_64x64);
-    dmaCopyCGram(town_pal, 0, 32);
+    dmaCopyCGram(tileset_pal, 0, 32);
 
     /* BG3 text overlay */
     textInit(VRAM_TEXT_MAP, 0, 4);
@@ -373,14 +369,14 @@ int main(void) {
     setColor(4 * 4 + 1, RGB(31, 31, 31));
 
     /* BG2 dialog box */
-    dmaCopyVram(ui_tiles, VRAM_UI_TILES, (u16)(ui_tiles_end - ui_tiles));
-    dmaCopyCGram(ui_pal, BOX_PAL * 16, 32);
+    dmaCopyVram(uibox_tiles, VRAM_UI_TILES, (u16)(uibox_tiles_end - uibox_tiles));
+    dmaCopyCGram(uibox_pal, BOX_PAL * 16, 32);
     bgSetGfxPtr(1, VRAM_UI_TILES);
     bgSetMapPtr(1, VRAM_UI_MAP, SC_32x32);
     build_panel();
 
     /* OBJ: hero and villager share the tiles, one palette slot each.
-     * The CGRAM offsets come from res/palplan.h — palplan assigned the
+     * The CGRAM offsets come from res/palettes.inc — the plan assigned the
      * slots, so these never collide even as more sprite palettes appear. */
     dmaCopyVram(hero_tiles, VRAM_HERO, (u16)(hero_tiles_end - hero_tiles));
     dmaCopyCGram(hero_pal, PAL_HERO_CGRAM, 32);   /* OBJ slot PAL_HERO_SLOT */

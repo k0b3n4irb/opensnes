@@ -1,0 +1,75 @@
+# dynamic_metasprite — UP/DOWN re-initialises the dynamic sprite engine in
+# a new OBJSEL size mode under force blank; no other test presses them.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness and the fbhash baseline only see mode 0: changeObjSize()
+#     past boot — oamDynamicInit() with a new sizeMode, the forced
+#     re-upload of both metasprites, oamDynamicDrainQueue() looping over
+#     VBlanks — never runs without input.
+#   * Each switch blanks the screen; INIDISP must be back to $0F after it
+#     (a drain that never empties its queue would leave the screen black,
+#     and the black frame would still hash the same every run).
+#   * Both clamps: UP twice from 1 stops at 0, DOWN three times from 0 stops
+#     at 2 — an index of 3 would read past obj_sizes[3].
+#   * ppu.obsel is the latched register: size << 5 with name base 0 and
+#     name select 0, the second name table then sitting at $1000 words,
+#     where vramSmall points (8/16 -> $00, 8/32 -> $20, 16/32 -> $60).
+#   * At the end, in mode 2, the engine packs OAM from entry 0: the 32x32
+#     hero's four pieces LARGE (entries 0-3, name table 0, first at x 64),
+#     then the 16x16 hero's six pieces SMALL (entries 4-9, tiles 256+ =
+#     name table 1 at $1000, first at x 192). Y is the caller's y (140), as
+#     everywhere in the library since 2026-10-09.
+#
+# Measured: `luna state --until-frame N --input <the script below> --peek
+# selectedItem:2 --out -` (+ ppu.obsel, ppu.inidisp) at 60/120/200/320 ->
+# 0/$00, 1/$20, 0/$00, 2/$60, INIDISP $0F at each.
+rom = "../../examples/sprites/dynamic_metasprite/dynamic_metasprite.sfc"
+
+[[checkpoint]]                 # boot, mode 0
+at_frame = 60
+[checkpoint.values]
+selectedItem = 0
+[checkpoint.ppu]
+obsel = 0x00
+inidisp = 0x0F
+
+[[checkpoint]]                 # DOWN: mode 1, screen back on
+at_frame = 120
+input = "60:0x0400,64:0"
+[checkpoint.values]
+selectedItem = 1
+[checkpoint.ppu]
+obsel = 0x20
+inidisp = 0x0F
+
+[[checkpoint]]                 # UP twice from 1: clamps at 0
+at_frame = 200
+input = "120:0x0800,124:0,140:0x0800,144:0"
+[checkpoint.values]
+selectedItem = 0
+[checkpoint.ppu]
+obsel = 0x00
+inidisp = 0x0F
+
+[[checkpoint]]                 # DOWN three times from 0: clamps at 2
+at_frame = 320
+input = "200:0x0400,204:0,230:0x0400,234:0,260:0x0400,264:0"
+[checkpoint.values]
+selectedItem = 2
+[checkpoint.ppu]
+obsel = 0x60
+inidisp = 0x0F
+
+[asserts.oam.sprites.0]        # hero32 piece 0, LARGE in 16/32, name table 0
+x = 64
+y = 140                        # drawn at y = 140: OAM holds y, like oamSet (139 from 2026-09-26 to 2026-10-09, when the library stored y - 1)
+tile = 0
+w = 32
+h = 32
+
+[asserts.oam.sprites.4]        # hero16 piece 0, SMALL, name table 1 (tile 256+)
+x = 192
+y = 140
+tile = 256
+w = 16
+h = 16

@@ -1,0 +1,1 @@
+slot1.srm: 8192 bytes, 6 written (offsets 0 to 7), the rest $00

@@ -12,23 +12,7 @@
 ; SNES color format: 0bbbbbgg gggrrrrr (15-bit)
 ;==============================================================================
 
-ASSET_SECTION ".rodata1"
-
-tiles:
-.incbin "res/opensnes.pic"
-tiles_end:
-
-.ends
-
 ASSET_SECTION ".rodata2"
-
-tilemap:
-.incbin "res/opensnes.map"
-tilemap_end:
-
-palette:
-.incbin "res/opensnes.pal"
-palette_end:
 
 ;------------------------------------------------------------------------------
 ; HDMA Gradient Table (from PVSnesLib original)

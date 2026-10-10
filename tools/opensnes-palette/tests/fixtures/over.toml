@@ -1,0 +1,5 @@
+# nine distinct sprite palettes for eight slots (palplan's over.txt)
+tool = "opensnes-palette"
+
+[plan]
+sprite = ["spr0.pal", "spr1.pal", "spr2.pal", "spr3.pal", "spr4.pal", "spr5.pal", "spr6.pal", "spr7.pal", "spr8.pal"]

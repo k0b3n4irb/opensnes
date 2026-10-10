@@ -133,7 +133,8 @@ if (mouseButtonsPressed(0) & MOUSE_BUTTON_LEFT) {
 ```
 mouse/
 ├── main.c        — Mouse detection, cursor movement, button handling
-├── data.asm      — Cursor sprite tiles and palette (ROM data)
+├── res/cursor.png.toml — import settings of the cursor sheet (opensnes-sprite, 8-pixel blocks);
+│                     the build converts and links it, res/cursor.inc declares the symbols
 ├── Makefile      — Build configuration (6 library modules)
 └── res/
     └── cursor.png — 16x16 cursor sprite source graphic (4bpp)

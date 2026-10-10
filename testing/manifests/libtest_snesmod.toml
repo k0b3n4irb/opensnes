@@ -1,0 +1,33 @@
+# libtest_snesmod — what snesmodProcess and the SNESMOD command queue do to
+# the rest of the machine (testing/fixtures/libtests_snesmod/main.c). No soundbank:
+# the messages are module-volume commands, one queue entry each.
+#
+# Before the fix of 2026-10-03 the same ROM gave, on luna v1.30.4:
+#   r_latch = $40   the wait loop latched the H/V counters ($2137): STAT78
+#                   bit 6 was left set, which crt0 takes for a Super Scope shot
+#   r_lines = 3     "process for 5 scanlines" ran out early: OPVCT was read
+#                   once per turn and every other read is its high byte
+#   r_depth = 44    100 sends with no process wrapped the 256-byte queue
+#   r_done never    after the wrap the driver received the middle of a message
+#                   as a command and stopped answering (1484 frames, still
+#                   draining)
+#
+# Now: no latch, the wait counts H-blank edges ($4212 bit 6) for five lines,
+# and a message that does not fit (85 messages = 255 bytes) is dropped.
+# r_vline is profileGetScanline() right after a waiting snesmodProcess: a sane
+# line number, so the OPVCT read pointer was not left shifted.
+# r_irq: a V-timer IRQ armed before snesmodInit() still fires after it, ten
+# times in ten frames. Until 2026-10-03 snesmodInit ended on NMITIMEN = $81
+# whatever the caller had, and the same ROM gave 0.
+rom = "../fixtures/libtests_snesmod/libtest_snesmod.sfc"
+frames = 400
+
+[asserts.values]
+r_done = { eq = 0xBEEF, width = 2 }
+r_irq = { eq = 10, width = 2 }
+r_latch = { eq = 0, width = 2 }
+r_lines = { ge = 5, le = 7, width = 2 }
+r_vline = { ge = 225, le = 261, width = 2 }
+r_drain = { ge = 2, le = 4, width = 2 }
+r_depth = { eq = 255, width = 2 }
+r_drain_full = { ge = 20, le = 90, width = 2 }

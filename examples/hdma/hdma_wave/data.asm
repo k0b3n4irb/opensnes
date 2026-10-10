@@ -7,23 +7,7 @@
 ; dmaCopyVram reads it directly.
 ;----------------------------------------------------------------------
 
-ASSET_SECTION ".rodata1"
-
-tiles:      .incbin "res/water.pic" skip 0 read 32768
-tiles_end:
-
-.ends
-
 ASSET_SECTION ".rodata2"
-
-tiles2:     .incbin "res/water.pic" skip 32768
-tiles2_end:
-
-tilemap:    .incbin "res/water.map"
-tilemap_end:
-
-palette:    .incbin "res/water.pal"
-palette_end:
 
 ; krom's exact HDMA wave table, extracted verbatim from WaveHDMA.asm
 ; (896 entries [1][off16] + terminator; his generator's quasi-period is

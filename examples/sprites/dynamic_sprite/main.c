@@ -40,10 +40,9 @@
  * engine reads individual frames from this ROM data and DMAs only the
  * currently-needed tiles to VRAM each frame, conserving OBJ VRAM space.
  */
-extern u8 spr16_tiles[];
+#include "res/sprite16_grid.inc"   /* generated: sprite16_grid_tiles[], sprite16_grid_pal[] */
 
 /** @brief 16-color palette for the 16x16 sprites */
-extern u8 spr16_properpal[];
 
 /**
  * @brief X positions for the four sprites displayed in a horizontal row.
@@ -107,7 +106,7 @@ int main(void) {
 
     /* Load sprite palette to CGRAM 128 (first sprite palette slot).
      * 32 bytes = 16 colors x 2 bytes per color (15-bit BGR). */
-    dmaCopyCGram(spr16_properpal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    dmaCopyCGram(sprite16_grid_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Initialize all frame counters to 0 (same starting frame) */
     frame0 = 0;
@@ -127,28 +126,28 @@ int main(void) {
     oambuffer[0].oamframeid = frame0;
     oambuffer[0].oamattribute = OBJ_PRIO(3);   /**< Priority 3 = in front of all BGs */
     oambuffer[0].oamrefresh = 1;                /**< Force initial tile upload */
-    OAM_SET_GFX(0, spr16_tiles);                /**< Point to ROM tile source */
+    OAM_SET_GFX(0, sprite16_grid_tiles);                /**< Point to ROM tile source */
 
     oambuffer[1].oamx = xpos[1];
     oambuffer[1].oamy = 100;
     oambuffer[1].oamframeid = frame1;
     oambuffer[1].oamattribute = OBJ_PRIO(3);
     oambuffer[1].oamrefresh = 1;
-    OAM_SET_GFX(1, spr16_tiles);
+    OAM_SET_GFX(1, sprite16_grid_tiles);
 
     oambuffer[2].oamx = xpos[2];
     oambuffer[2].oamy = 100;
     oambuffer[2].oamframeid = frame2;
     oambuffer[2].oamattribute = OBJ_PRIO(3);
     oambuffer[2].oamrefresh = 1;
-    OAM_SET_GFX(2, spr16_tiles);
+    OAM_SET_GFX(2, sprite16_grid_tiles);
 
     oambuffer[3].oamx = xpos[3];
     oambuffer[3].oamy = 100;
     oambuffer[3].oamframeid = frame3;
     oambuffer[3].oamattribute = OBJ_PRIO(3);
     oambuffer[3].oamrefresh = 1;
-    OAM_SET_GFX(3, spr16_tiles);
+    OAM_SET_GFX(3, sprite16_grid_tiles);
 
     /* Initial draw pass: queue starting tiles, then let NMI auto-flush
      * during force blank so all 4 tile uploads land in VRAM before

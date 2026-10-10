@@ -176,7 +176,7 @@ if (dsp1Range(dx, dy, dz, radius) < 0) {   /* clearly inside the sphere? */
 ```
 
 Two properties measured on luna's DSP-1B firmware and pinned by the library
-fixture (`devtools/libtests_dsp1`), neither stated by any hardware reference
+fixture (`testing/fixtures/libtests_dsp1`), neither stated by any hardware reference
 we could find. `dsp1Distance` reads one low on exact lengths — (3, 4, 12)
 gives 12 — so compare with `>=` / `<`, never `==`. `dsp1Range` returns the
 squared difference **shifted right by 15**, not the raw difference: a point

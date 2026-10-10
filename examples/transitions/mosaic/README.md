@@ -104,7 +104,7 @@ a transition, making characters stand out against the dissolving background.
 | File | Purpose |
 |------|---------|
 | `main.c` | Fade/mosaic transition logic, button-driven state machine |
-| `data.asm` | Background tiles, tilemap, and palette data |
+| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it, `res/opensnes.inc` declares the symbols |
 | `res/opensnes.png` | Source background image |
 | `Makefile` | `LIB_MODULES := console dma background sprite input mosaic` |
 

@@ -33,11 +33,9 @@
 #include <snes.h>
 
 /** @brief Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), from data.asm. */
-extern u8 mode7_tiles[], mode7_tiles_end[];
+#include "res/mode7bg.inc"   /* generated: mode7bg_tiles[], mode7bg_map[], mode7bg_pal[] (Mode 7 .pc7 / .mp7), each with _end */
 /** @brief Mode 7 tilemap (128x128 tile indices, one byte each), from data.asm. */
-extern u8 mode7_map[], mode7_map_end[];
 /** @brief 256-colour palette for the Mode 7 plane (512 bytes), from data.asm. */
-extern u8 mode7_pal[], mode7_pal_end[];
 
 /**
  * @brief Entry point -- interactive Mode 7 rotation and scaling demo.
@@ -64,9 +62,9 @@ int main(void) {
      * the low bytes, 8bpp pixels in the high bytes), so dmaCopyVramMode7()
      * runs the two DMAs with the right VMAIN each time; the palette is a
      * plain CGRAM copy. Both need forced blank. */
-    dmaCopyVramMode7(mode7_map, (u16)(mode7_map_end - mode7_map),
-                     mode7_tiles, (u16)(mode7_tiles_end - mode7_tiles));
-    dmaCopyCGram(mode7_pal, 0, (u16)(mode7_pal_end - mode7_pal));
+    dmaCopyVramMode7(mode7bg_map, (u16)(mode7bg_map_end - mode7bg_map),
+                     mode7bg_tiles, (u16)(mode7bg_tiles_end - mode7bg_tiles));
+    dmaCopyCGram(mode7bg_pal, 0, (u16)(mode7bg_pal_end - mode7bg_pal));
 
     /* Set Mode 7 and initialize the affine transformation matrix.
      * mode7Init() sets the center (M7X/M7Y) and the scroll (M7HOFS/M7VOFS).

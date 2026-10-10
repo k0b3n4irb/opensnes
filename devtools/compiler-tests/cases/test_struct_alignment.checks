@@ -16,5 +16,7 @@ in test_nested_access: present sta\.w nested\+4\n[\s\S]*sta\.w nested\+6\n[\s\S]
 in test_threewords: present sta\.w three\+4\n
 # Array of Simple: element stride 4, so .b fields at base+2, +6, +10 and
 # .a fields of elements 1 and 2 at base+4, +8.
-in test_array_stride: present adc\.w #2\n[\s\S]*adc\.w #4\n[\s\S]*adc\.w #6\n[\s\S]*adc\.w #8\n[\s\S]*adc\.w #10\n
-in test_array_stride: present adc\.w #10\n\tsta \d+,s\n\tlda\.w #300\n
+# Re-pinned 2026-10-08: the offsets are operands of `sta.l $00000N,x`,
+# X the array's address, instead of five `adc`.
+in test_array_stride: present \$000002,x[\s\S]*\$000004,x[\s\S]*\$000006,x[\s\S]*\$000008,x[\s\S]*\$00000A,x
+in test_array_stride: present lda\.w #300\n\tsta\.l \$00000A,x

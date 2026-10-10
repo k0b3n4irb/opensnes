@@ -1,8 +1,14 @@
-# What 1.0 freezes {#stability}
+# What 1.0 will freeze {#stability}
 
-This page is the promise behind the version number. It says what a project
-built on OpenSNES 1.0 can count on until 2.0, what is not part of that
+This page is the promise 1.0 will make. It says what a project built on
+OpenSNES 1.0 will be able to count on until 2.0, what is not part of that
 promise, and how a change reaches you when one is needed.
+
+**Where 0.49 stands.** 0.49 carries the API this promise is written for:
+the removals and the two changes of meaning below are done. It is not yet
+bound by the promise — a 0.x release may still rename or remove, one
+release after saying so (`docs/UPGRADING.md`) — but nothing is planned to,
+and the same checks run (`opensnes upgrade`, the lint on removed names).
 
 ## The promise
 
@@ -35,8 +41,8 @@ version. A new module costs nothing to a project that does not link it.
 - **Performance figures** (`docs/PERF.md`, `docs/BENCHMARK.md`) are
   measurements, not contracts; a release may make a call cheaper or, with
   a stated reason, slightly dearer.
-- **The emulator pin** (`tools/luna-test/luna.version`) and the test
-  harness under `tools/luna-test/` are the SDK's own test infrastructure;
+- **The emulator pin** (`testing/luna.version`) and the test
+  harness under `testing/` are the SDK's own test infrastructure;
   they move with luna.
 - **The examples** are teaching material and may be rewritten, merged or
   removed; `docs/HARDWARE_VERIFICATION.md` names the ones a release is
@@ -51,14 +57,14 @@ version. A new module costs nothing to a project that does not link it.
 - A name that has to go is **deprecated first**: it keeps working, the
   clang pre-pass of every build prints a warning naming its replacement,
   and `docs/UPGRADING.md` lists it. It is removed at the next major
-  version only. A build without clang runs the same scan in Python on each
-  source it compiles and prints the names it finds (since 2026-10-04);
-  `make check-upgrade SRC=<folder>` reads a whole project against the list.
+  version only. Once it is removed, a source that names it fails to
+  compile and the build prints its replacement under the error;
+  `opensnes upgrade <folder>` reads a whole project against the list.
 - A **change of meaning** (the same name, a different effect) happens only
   at a major version, is announced one minor version ahead, and gets an
-  entry in `docs/UPGRADING.md` and a check in `check-upgrade`. The 1.0
-  release carries one: the deprecated `hdmaEnable()` / `hdmaDisable()`
-  (mask-taking today) come back taking a channel number.
+  entry in `docs/UPGRADING.md` and a check in `opensnes upgrade`. The 0.49
+  release carried one ahead of 1.0: `hdmaEnable()` / `hdmaDisable()`, mask-taking and
+  deprecated in 0.48, take a channel number (and refuse a value above 7).
 - A **bug fix that changes behaviour** (the hardware did not do what the
   function promised, or the function did not do what its header said) is
   not a break: the header is the contract, and the fix makes the code

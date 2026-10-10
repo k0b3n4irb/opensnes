@@ -34,7 +34,7 @@ worst frame costs 30 000 mclk has eaten 8 % of the frame; one that costs
 ## Profiling from outside: luna profile
 
 ```bash
-tools/luna-test/bin/luna profile examples/sprites/sprite_swarm/sprite_swarm.sfc \
+testing/bin/luna profile examples/sprites/sprite_swarm/sprite_swarm.sfc \
     --until-frame 60
 ```
 
@@ -166,7 +166,7 @@ working, not as shipped code.
 | Whether a routine stays under budget forever | `luna profile --budget`, in CI |
 | Where my own section sits inside the frame | `profileColorStart` / `profileColorEnd` |
 | Whether the game is dropping frames on hardware | `profileGetLagFrames` |
-| Which lib functions my ROM never executes | `luna profile --pc-set` (the harness does this: `tools/luna-test/rom_coverage.py`) |
+| Which lib functions my ROM never executes | `luna profile --pc-set` (the harness does this: `testing/rom_coverage.py`) |
 
 ## The optimisation loop
 
@@ -178,7 +178,7 @@ working, not as shipped code.
 4. **Re-measure the same scene with the same input**, and compare the two
    numbers.
 5. **Prove you changed only the speed.** Keep the ROMs from before the change
-   and run `python3 tools/luna-test/diff_corpus.py --ref <tree>`: every example
+   and run `python3 testing/diff_corpus.py --ref <tree>`: every example
    must still match at its capture frames. An optimisation that changes a pixel
    is a bug until explained.
 

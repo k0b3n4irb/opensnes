@@ -4,24 +4,28 @@
 present result32:\n\tdsb 4\n
 present sta\.w result32\+2
 # add: clc once, then the high word adds WITH the carry (no second clc).
-in add32: present clc\n\tadc \d+,s\n\tsta \d+,s\n\tlda \d+,s\n\tadc \d+,s\n
+in add32: present clc\n\tadc(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tadc(?: \d+,s|\.b tcc__lf\+\d+)\n
 # sub: sec once, the high word subtracts with the borrow.
-in sub32: present sec\n\tsbc \d+,s\n\tsta \d+,s\n\tlda \d+,s\n\tsbc \d+,s\n
+in sub32: present sec\n\tsbc(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsbc(?: \d+,s|\.b tcc__lf\+\d+)\n
 # Both words of a bitwise op.
-in and32: present and \d+,s\n\tsta \d+,s\n\tlda \d+,s\n\tand \d+,s\n
+in and32: present and(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tand(?: \d+,s|\.b tcc__lf\+\d+)\n
 # +1: the carry out of the low word reaches the high word.
-in inc32: present adc\.w #1\n\tsta \d+,s\n\tlda \d+,s\n\tadc\.w #0\n
+in inc32: present adc\.w #1\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tadc\.w #0\n
 # A u32 is returned with its high word in tcc__retval_hi.
 in add32: present sta\.b tcc__retval_hi
 # u16 -> u32 zero-extends: the high word is 0.
-in extend16: present lda\.w #0\n\tsta \d+,s\n\tlda \d+,s\n\tsta\.b tcc__retval_hi
+# (the reload of the 0 just stored is gone since 2026-10-10: the peephole)
+in extend16: present lda\.w #0\n\tsta\.b tcc__retval_hi
 # Unsigned compare: high words first (equal -> low words), unsigned branch.
-in compare_gt: present cmp \d+,s\n\tbeq \+\n\tbcc \+\+\n\tbra \+\+\+\n\+\n\tlda \d+,s\n\tcmp \d+,s\n\tbcc \+\+
+in compare_gt: present cmp(?: \d+,s|\.b tcc__lf\+\d+)\n\tbeq \+\n\tbcc \+\+\n\tbra \+\+\+\n\+\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tcmp(?: \d+,s|\.b tcc__lf\+\d+)\n\tbcc \+\+
 in compare_gt: absent \bb(mi|pl|vc|vs)\b
-in compare_eq: present cmp \d+,s\n\tbne \+\n\tlda \d+,s\n\tcmp \d+,s\n\tbne \+
+# equality branches on Z over both halves: a low-half difference skips the
+# high compare (since 2026-10-08; a 0 or 1 was computed and tested before)
+in compare_eq: present cmp(?: \d+,s|\.b tcc__lf\+\d+)\n\tbne @lcmp\.\d+\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tcmp(?: \d+,s|\.b tcc__lf\+\d+)\n@lcmp\.\d+:\n\tbeq @
+in compare_eq: absent bra \+\+
 # << 8 moves bits across the halves: asl low, rol high, eight times. This is
 # today's shape, not the goal: a byte move would do (the missed optimisation
 # of 2026-09-26) — replace this check by the new shape when that lands.
-in shl_const: present (asl a\n\tsta \d+,s\n\tlda \d+,s\n\trol a\n[\s\S]*?){8}
+in shl_const: present (asl a\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\trol a\n[\s\S]*?){8}
 # >> 8: lsr high, ror low (logical: nothing shifted into bit 31).
-in shr_const: present (lsr a\n\tsta \d+,s\n\tlda \d+,s\n\tror a\n[\s\S]*?){8}
+in shr_const: present (lsr a\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tror a\n[\s\S]*?){8}

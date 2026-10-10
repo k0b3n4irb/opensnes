@@ -108,7 +108,9 @@ slope_collision/
 ├── main.c          — Console init, map/object setup, main loop
 ├── mario.c         — Mario init/update callbacks, physics, animation
 ├── mario.h         — Mario callback prototypes
-├── data.asm        — ROM data: tileset, palette, map, object types, bank byte registration
+├── res/*.png.toml  — import settings of the tileset and the sprite sheet; the build converts
+│                   and links them, res/*.inc declare the symbols
+├── data.asm        — ROM data: map, object types, tile attributes (hand-written)
 ├── Makefile        — Build configuration
 └── res/
     ├── tiles.png        — Tileset with slope tiles (4bpp, Mode 1)

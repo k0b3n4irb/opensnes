@@ -5,10 +5,10 @@
 in test_write_register: present lda #15\n\tsta\.l \$002100\n\tlda #128\n\tsta\.l \$002100\n\tlda #15\n\tsta\.l \$002100
 # Two reads of JOY1 ($4218 = 16920): two loads, the second not replaced
 # by the first's value.
-in test_read_register: present lda\.w #16920\n\ttax\n\tlda\.l \$0000,x\n\tsta \d+,s\n\tlda\.w #16920\n\ttax\n\tlda\.l \$0000,x\n\tora
+in test_read_register: present lda\.w #16920\n\ttax\n\tlda\.l \$0000,x\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda\.w #16920\n\ttax\n\tlda\.l \$0000,x\n\tora
 # The VRAM port sequence, in order, as 8-bit stores.
 in test_vram_write_sequence: present sta\.l \$002115\n[\s\S]*sta\.l \$002116\n[\s\S]*sta\.l \$002117\n[\s\S]*sta\.l \$002118\n[\s\S]*sta\.l \$002119\n
 # Read-modify-write: an 8-bit read, then the write.
 in test_read_modify_write: present sep #\$20\n\tlda\.l \$0000,x\n[\s\S]*ora\.w #128\n[\s\S]*sta\.l \$002100
 # Both port writes stay inside the loop body.
-in test_volatile_loop: present @for_body\.\d+:\n\tlda \d+,s\n\tsep #\$20\n\tsta\.l \$002118\n\tlda #0\n\tsta\.l \$002119
+in test_volatile_loop: present @for_body\.\d+:\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsep #\$20\n\tsta\.l \$002118\n\tlda #0\n\tsta\.l \$002119

@@ -48,11 +48,12 @@
 #include "koopatroopa.h"
 
 /** @brief BG1 tileset tile data (4bpp) -- start label */
-extern u8 tileset;
+#include "res/tilesMario.inc"    /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
+#include "res/mario.inc"         /* generated: mario_tiles[], mario_pal[] */
+#include "res/goomba.inc"        /* generated: goomba_tiles[], goomba_pal[] */
+#include "res/koopatroopa.inc"   /* generated: koopatroopa_tiles[], koopatroopa_pal[] */
 /** @brief BG1 tileset tile data -- end label (for size calculation) */
-extern u8 tilesetend;
 /** @brief BG1 tileset palette (BGR555, 16 colors) */
-extern u8 tilesetpal;
 /** @brief Tile definition table (visual properties per tile index) */
 extern u8 tilesetdef;
 /** @brief Tile attribute table (collision flags per tile index) */
@@ -62,7 +63,6 @@ extern u8 mapmario;
 /** @brief Object layer data (spawn positions and type IDs for entities) */
 extern u8 objmario;
 /** @brief Shared sprite palette for all entity types (BGR555) */
-extern u8 palsprite;
 
 
 /**
@@ -90,8 +90,8 @@ u16 nbobjects;
  */
 int main(void) {
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
-    bgInitTileSet(0, &tileset, &tilesetpal, 0,
-                  (&tilesetend - &tileset), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
+    bgInitTileSet(0, tilesMario_tiles, tilesMario_pal, 0,
+                  (tilesMario_tiles_end - tilesMario_tiles), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
     bgSetMapPtr(0, 0x6800, SC_64x32);
 
     /* Mode 1, enable only BG1 + sprites */
@@ -99,7 +99,7 @@ int main(void) {
     setMainScreen(TM_BG1 | TM_OBJ);
 
     /* Sprite palette at CGRAM 128 (sprite palette 0) */
-    dmaCopyCGram(&palsprite, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    dmaCopyCGram(mario_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Init dynamic sprite engine (large at $0000, small at $1000) */
     {

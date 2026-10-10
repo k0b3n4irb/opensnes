@@ -38,20 +38,16 @@
  *============================================================================*/
 
 /* BG1 - Main scrolling background */
-extern u8 bg1_tiles[], bg1_tiles_end[];
-extern u8 bg1_pal[], bg1_pal_end[];
-extern u8 bg1_map[], bg1_map_end[];
+#include "res/BG1.inc"
+#include "res/BG2.inc"
+#include "res/character.inc"
+/* generated: BG1_tiles/_pal/_map, BG2_tiles/_pal/_map, character_tiles/_pal (each with _end) */
 
 /* BG2 - Sub scrolling background (parallax) */
-extern u8 bg2_tiles[], bg2_tiles_end[];
-extern u8 bg2_pal[], bg2_pal_end[];
-extern u8 bg2_map[], bg2_map_end[];
 
 /* BG3 assets not used in this example */
 
 /* Character sprite */
-extern u8 char_tiles[], char_tiles_end[];
-extern u8 char_pal[], char_pal_end[];
 
 /*============================================================================
  * Game State
@@ -131,16 +127,16 @@ int main(void) {
 
     /* BG1: tiles at $2000, palette at slot 2 (offset 32)
      * BG1 tiles = 7552 bytes, occupies $2000-$3D7F */
-    bgInitTileSet(0, bg1_tiles, bg1_pal, 2,
-                  bg1_tiles_end - bg1_tiles,
-                  bg1_pal_end - bg1_pal,
+    bgInitTileSet(0, BG1_tiles, BG1_pal, 2,
+                  BG1_tiles_end - BG1_tiles,
+                  BG1_pal_end - BG1_pal,
                   BG_16COLORS, 0x2000);
 
     /* BG2: tiles at $4000, palette at slot 4 (offset 64)
      * Must not overlap with BG1! */
-    bgInitTileSet(1, bg2_tiles, bg2_pal, 4,
-                  bg2_tiles_end - bg2_tiles,
-                  bg2_pal_end - bg2_pal,
+    bgInitTileSet(1, BG2_tiles, BG2_pal, 4,
+                  BG2_tiles_end - BG2_tiles,
+                  BG2_pal_end - BG2_pal,
                   BG_16COLORS, 0x4000);
 
     /* BG3 disabled - not loading tiles */
@@ -150,16 +146,16 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     /* Load initial tilemaps (first 2KB of each) */
-    dmaCopyVram(bg1_map, 0x0000, 2048);
-    dmaCopyVram(bg2_map, 0x0800, 2048);
+    dmaCopyVram(BG1_map, 0x0000, 2048);
+    dmaCopyVram(BG2_map, 0x0800, 2048);
 
     /*------------------------------------------------------------------------
      * Load Sprite Graphics
      *------------------------------------------------------------------------*/
 
     /* Sprite tiles at $6000, palette 0 (colors 128-143) */
-    oamInitGfxSet(char_tiles, char_tiles_end - char_tiles,
-                  char_pal, char_pal_end - char_pal,
+    oamInitGfxSet(character_tiles, character_tiles_end - character_tiles,
+                  character_pal, character_pal_end - character_pal,
                   0, 0x6000, OBJ_SIZE16_L32);
 
     /*------------------------------------------------------------------------

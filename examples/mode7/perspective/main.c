@@ -35,7 +35,8 @@
 
 /** @brief Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm.
  *  Loaded with dmaCopyVram() to VRAM $5000 (tiles) and $4000 (map). */
-extern u8 sky_tiles[], sky_tiles_end[], sky_map[], sky_map_end[];
+#include "res/ground.inc"   /* generated: ground_tiles[], ground_map[], ground_pal[] (Mode 7 .pc7 / .mp7), each with _end */
+#include "res/sky.inc"      /* generated: sky_tiles[], sky_map[], sky_pal[], each with _end */
 
 /**
  * @brief Build and activate the 4-channel HDMA perspective split.
@@ -61,16 +62,13 @@ extern void asm_setupHdmaPerspective(u16 sx, u16 sy);
  * Mode 7 tilemaps are 128x128 bytes. Each byte is a tile index (0-255)
  * referencing the 8bpp tile set. Loaded to VRAM via dmaCopyVramMode7()
  * which handles the interleaved format (map in low bytes, tiles in high bytes). */
-extern u8 ground_map[], ground_map_end[];
 
 /** @brief Mode 7 ground tile pixel data (256 tiles, 64 bytes each = 16KB).
  *
  * Each tile is 8x8 pixels at 8bpp (one byte per pixel, 64 bytes/tile).
  * Written to the high bytes of VRAM words by dmaCopyVramMode7(). */
-extern u8 ground_tiles[], ground_tiles_end[];
 
 /** @brief 256-color palette for the ground plane (512 bytes). */
-extern u8 ground_pal[], ground_pal_end[];
 
 u16 pad0;           /**< Current joypad button state */
 u16 sx;             /**< Mode 7 ground horizontal scroll offset (camera X) */

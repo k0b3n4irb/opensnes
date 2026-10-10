@@ -1,0 +1,23 @@
+; synthetic wlalink .sym — a healthy LoROM
+[information]
+version 3
+[labels]
+00:8000 main
+00:9000 helper
+00:a000 NmiHandler
+00:a100 DefaultNmiCallback
+00:a1a0 DataInitEnd
+00:0300 counter
+02:8000 mapdata
+[definitions]
+00000010 _sizeof_main
+00000020 _sizeof_helper
+00000008 _sizeof_DataInitEnd
+[sections]
+00000000 00:0000 8000 00000010 .text.main
+00001000 00:1000 9000 00000020 .text.helper
+00002190 00:2190 a190 00000010 .data_init
+[ramsections]
+00:0300 0300 00000002 .bss.counter
+00:0400 0400 00000800 .bss.buffer
+7e:2000 2000 00001000 .far.table

@@ -23,8 +23,13 @@ main     ──────────●─●  (fast-forward; tag is the seco
 1. Open a release PR `develop → main` titled `release: vX.Y.Z`. Body lists
    the CHANGELOG entries.
 2. CI must be green on `develop`'s tip (build + functional-tests).
-3. After merge, tag the new `main` head: `git tag -a vX.Y.Z -m "..."` then
-   `git push origin vX.Y.Z`.
+3. Merge **locally, never with GitHub's merge button** (since 2026-10-06):
+   `git checkout main && git merge --no-ff develop -m "release: vX.Y.Z" &&
+   git push origin main`. GitHub marks the PR merged by itself. The web
+   button commits as `GitHub <noreply@github.com>`, which the commit lint
+   refuses (`commits.md`, "One author"); `main` is not protected against
+   the maintainer's push. Then tag the new `main` head:
+   `git tag -a vX.Y.Z -m "..."` then `git push origin vX.Y.Z`.
 4. `release.yml` runs the tag-on-main guard, then builds the per-OS
    release zips and creates a GitHub Release with the assets. On the two
    Linux legs (x86_64 + arm64) it also smoke-tests the built tree with a

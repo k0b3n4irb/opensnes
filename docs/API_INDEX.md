@@ -86,8 +86,11 @@ nothing you do not list is linked.
 | draw a HUD / dialog box (9-slice) | `panelInit`, `panelDraw`, `panelPut`, `panelFlush` | `panel` | [basics/panel_hud](../examples/basics/panel_hud/) |
 | structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
+| send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushSprite`, `vramQueueFlush` | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
+| place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
 | decompress | `lzssDecodeVram` | `lzss` | |
+| copy, fill or compare memory and strings | `memcpy`, `memmove`, `memset`, `strlen`, `strcmp`, `strcpy`, `strncpy` | `string` | [FAR RAM: copying](tutorials/far_ram.md) |
 
 ## 3D math on the DSP-1 coprocessor
 
@@ -119,14 +122,13 @@ its header.
 | `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch` | [audio: volume and pitch](tutorials/audio.md) |
 | `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio.md) |
 | `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho` | [audio: echo](tutorials/audio.md) |
-| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState`, `audioUpdate` (deprecated: does nothing) | [audio: asking the engine](tutorials/audio.md) |
+| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio.md) |
 | `background.h` | `bgInitTileSetData`, `bgInit` | [graphics](tutorials/graphics.md) |
 | `collision.h` | `rectSetPos`, `rectGetCenter` | [collision](tutorials/collision.md) |
 | `colormath.h` | `colorMathSetChannel`, `colorMathSetBrightness`, `colorMathTransparency50`, `colorMathSetDirectColor` | [colour math](tutorials/colormath.md) |
 | `console.h` | `rngNext`, `rngSeed` | [math: random numbers](tutorials/math.md) |
 | `console.h` | `resetFrameCount` | [animation](tutorials/animation.md) |
 | `console.h` | `isInVBlank` | [DMA](tutorials/dma.md) |
-| `console.h` | `consoleInitEx` — deprecated: the same as `consoleInit()`, its argument is ignored | — |
 | `debug.h` | `consoleMesenBreakpoint`, `consoleNocashMessage` (behind `SNES_BREAK`, `SNES_NOCASH`) | [debugging](tutorials/debugging.md) |
 | `hdma.h` | `hdmaColorGradient`, `hdmaColorGradientStop`, `hdmaBrightnessGradientStop`, `hdmaIrisWipe`, `hdmaIrisWipeStop`, `hdmaWaterRipple`, `hdmaWaveInit`, `hdmaWaveStop`, `hdmaWindowShape`, `hdmaGetEnabled`, `hdmaDisableAll` | [HDMA: ready-made effects](tutorials/hdma.md) |
 | `input.h` | `padIsConnected` | [input: is a pad plugged in?](tutorials/input.md) |
@@ -135,7 +137,7 @@ its header.
 | `interrupt.h` | `nmiSet`, `nmiClear`, `irqSet`, `irqClear`, `irqSetHTimer`, `irqSetVTimer`, `irqEnable`, `irqDisable` | [interrupts](tutorials/interrupts.md) |
 | `math.h` | `easeInQuad`, `easeOutQuad` (module `math_ease`) | [math: easing curves](tutorials/math.md) |
 | `profile.h` | `profileGetScanline` | [profiling](tutorials/profiling.md) |
-| `snesmod.h` | `snesmodGetPosition`, `snesmodFlush`; deprecated, no stream can be started: `snesmodSetSoundTable`, `snesmodAllocateSoundRegion` | [audio: following the music](tutorials/audio.md) |
+| `snesmod.h` | `snesmodGetPosition`, `snesmodFlush` | [audio: following the music](tutorials/audio.md) |
 | `sprite.h` | `oamSetX` | [sprites](tutorials/sprites.md) |
 | `superfx.h` | `gsuIsPresent`, `gsuSetupBitmapTilemap`, `gsuDmaFullFrame`, `gsuSetupHdmaBlanking`, `gsuCacheLoad`, `gsuStartCached`, `gsuBusy`, `gsuWait` | [Super FX](tutorials/superfx.md) |
 

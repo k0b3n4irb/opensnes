@@ -46,10 +46,7 @@
  */
 
 /** @brief Tile/palette/tilemap symbols defined in data.asm (.incbin). */
-extern u8 tiles[], tiles_end[];
-extern u8 tiles2[], tiles2_end[];
-extern u8 tilemap[], tilemap_end[];
-extern u8 palette[], palette_end[];
+#include "res/bg.inc"   /* generated: bg_tiles[] + bg_tiles_1[] (the 39 KB tileset in two bank-sized parts), bg_map[], bg_pal[] */
 
 /**
  * @brief Entry point -- load 256-color tileset and display Mode 3 image
@@ -70,10 +67,10 @@ int main(void) {
     /* Tile data is split across two SUPERFREE sections so the linker can
      * place each half in whatever bank has room. The 4-byte Kl pointer
      * pushed by cproc carries the bank byte; lib/source/dma.asm reads it. */
-    dmaCopyVram(tiles,   0x0000, tiles_end - tiles);
-    dmaCopyVram(tiles2,  0x4000, tiles2_end - tiles2);
-    dmaCopyVram(tilemap, 0x6000, tilemap_end - tilemap);
-    dmaCopyCGram(palette, 0,     palette_end - palette);
+    dmaCopyVram(bg_tiles,   0x0000, bg_tiles_end - bg_tiles);
+    dmaCopyVram(bg_tiles_1,  0x4000, bg_tiles_1_end - bg_tiles_1);
+    dmaCopyVram(bg_map, 0x6000, bg_map_end - bg_map);
+    dmaCopyCGram(bg_pal, 0,     bg_pal_end - bg_pal);
 
     bgSetMapPtr(0, 0x6000, SC_32x32);
 

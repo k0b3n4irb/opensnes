@@ -1,0 +1,5 @@
+tool = "opensnes-tileset"
+
+[convert]
+rearrange = true
+palette-entry = 1

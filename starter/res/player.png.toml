@@ -1,0 +1,8 @@
+# import settings of player.png — the build converts it with the tool named
+# here before compiling; the symbols are in res/player.inc (player_til,
+# player_tilend, player_pal). Change the settings here, not in the Makefile.
+tool = "opensnes-sprite"
+
+[sheet]
+size = 32          # one 32x32 sprite
+colors = 16        # one OBJ palette

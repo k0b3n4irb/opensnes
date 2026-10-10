@@ -3,5 +3,10 @@
 # from opensnes-emu test_indirect_store_acache; its pre-A6 frameless
 # assertions no longer apply, see that file's note). The load of the
 # address after pha reads 2 bytes above where it was stored.
-in array_write: present lda \d+,s\n\tasl a\n\tsta (\d+),s\n\tlda \d+,s\n\tclc\n\tadc \1,s\n\tsta 18,s
-in array_write: present lda 30,s\n\tpha\n\tlda 20,s\n\ttax\n\tpla\n\tsta\.l \$0000,x
+in array_write: present lda(?: \d+,s|\.b tcc__lf\+\d+)\n\tasl a\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tclc\n\tadc(?: |\.b tcc__lf\+)\1(?:,s)?\n\ttax
+# Re-pinned 2026-10-08: a store through a pointer loads X first, then the
+# value (`tax` / `lda` / `sta.l $00NNNN,x`); no pha / pla around it.
+# (offsets moved again on 2026-10-08: parameters are read in place and a
+# value that never touches the stack gets no slot)
+in array_write: present tax\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.l \$000000,x
+in array_write: absent pha

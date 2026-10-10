@@ -355,9 +355,8 @@ cmd_load_size:
 ; the sized block-receive loop (IPL-shaped): for each byte i, the CPU
 ; puts data on $F5 and the index low byte on $F4; the driver stores and
 ; echoes the index. Both sides count ZP_SIZE bytes, so the end needs no
-; in-band marker. Epilogue: the CPU writes 0 to $F4, the driver echoes
-; 0 on $F4 out and resets ZP_LAST_CMD — unambiguous even when the last
-; index byte was already 0. APU_CHECK_RESET is NOT polled inside the
+; in-band marker. Epilogue: a held three-step handshake, see load_done.
+; APU_CHECK_RESET is NOT polled inside the
 ; transfer (documented: no hot-swap mid-load).
 ;------------------------------------------------------------------------------
 cmd_load:
@@ -397,19 +396,32 @@ load_byte:
     jmp !load_byte
 
 load_done:
-    ; epilogue handshake. First say the stream is over with a value no
-    ; index echo can be mistaken for at this point ($FF: the last echo was
-    ; (size-1) & $FF, and when that was 0 the CPU, waiting for our 0,
-    ; read the echo instead, sent its next command, and we waited here for
-    ; a 0 that never came — a 513-byte sample hung both sides until
-    ; 2026-10-03). Then the CPU parks the input latch at 0, we mirror it.
+    ; Epilogue: a three-step handshake in which every value one side waits
+    ; for is HELD by the other until it is answered.
+    ;   1. we show an end mark the CPU cannot mistake for an index echo:
+    ;      $FF, or $7F when the last index byte was itself $FF;
+    ;   2. the CPU, which shows that last index byte until then, answers
+    ;      with the same mark;
+    ;   3. we show 0 ("back in command mode") and the CPU parks its latch
+    ;      at 0 when it likes: the main loop ignores the mark, which is
+    ;      left in ZP_LAST_CMD (no command byte has opcode $3F).
+    ; History: until 2026-10-03 there was no mark and a 513-byte sample
+    ; (last index byte 0) hung both sides. From then until 2026-10-10 we
+    ; showed $FF and waited for the CPU's 0 — which, for the same sizes, was
+    ; ALREADY on its latch: the $FF lasted a few of our cycles, and the CPU
+    ; saw it or timed out according to the phase of its polling loop, that
+    ; is, according to how fast its compiler had made that loop.
     mov a, #$FF
-    mov $F4, a          ; "stream done, park the latch"
+    mov y, ZP_IDX       ; last index + 1: zero when the last index was $FF
+    bne +
+    mov a, #$7F
++   mov ZP_LAST_CMD, a
+    mov $F4, a          ; 1. "stream done"
 -   mov a, $F4
-    bne -
+    cmp a, ZP_LAST_CMD
+    bne -               ; 2. the CPU saw it
     mov a, #$00
-    mov ZP_LAST_CMD, a
-    mov $F4, a          ; "back in command mode"
+    mov $F4, a          ; 3. "back in command mode"
     jmp !main_loop
 
 ;------------------------------------------------------------------------------

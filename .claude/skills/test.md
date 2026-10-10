@@ -32,11 +32,11 @@ make test-compiler
 make test-manifests
 
 # One example
-python3 tools/luna-test/luna_runner.py --coverage --only $1
-python3 tools/luna-test/luna_runner.py --compare  --only $1
+python3 testing/luna_runner.py --coverage --only $1
+python3 testing/luna_runner.py --compare  --only $1
 
 # Class A changes: the A/B proof against ROMs built before the change
-python3 tools/luna-test/diff_corpus.py --ref /tmp/examples_before
+python3 testing/diff_corpus.py --ref /tmp/examples_before
 ```
 
 ## Report

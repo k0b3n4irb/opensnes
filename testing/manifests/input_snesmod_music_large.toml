@@ -1,0 +1,93 @@
+# snesmod_music_large — A (play), B (stop) and X (pause/resume) on the
+# 56 KB two-bank soundbank; the committed manifest only checks that the
+# music plays at boot.
+#
+# What this proves that the other pillars cannot:
+#   * Each press queues exactly one 3-byte command in the driver's FIFO
+#     (QueueMessage: command, then the two bytes of spc1), and
+#     snesmodProcess() drains it to the SPC within two frames: spc_fwrite
+#     and spc_fread advance together by 3 per press, and spc_pr (the
+#     APUIO0 mirror) holds the command last sent — PLAY $03, STOP $04,
+#     PAUSE $0A, RESUME $0B (snesmod.asm).
+#   * The X toggle lives in a local, `paused`, that A resets: X after A must
+#     PAUSE again ($0A), not RESUME. Sequence X, A, X, X, B -> $0A, $03,
+#     $0A, $0B, $04.
+#   * Nothing is lost: the whole FIFO reads boot PLAY, then the five
+#     commands in order, 18 bytes.
+#   * After B, every voice's envelope is 0 at frame 500; the same script
+#     without B leaves voices 1 and 2 sounding (ENVX 14 and 121) — the
+#     stop is real on this module too (the KOFF fix of v0.45.0).
+#   * Presses must come after boot: the 56 KB upload runs until about
+#     frame 85 (the boot PLAY reaches the FIFO then), and a press during
+#     it is never seen as an edge.
+#
+# Measured: `luna state --until-frame N --input <the script below> --peek
+# spc_fwrite:1 --peek spc_fread:1 --peek spc_pr:1 --out -` at
+# 140/200/260/320/380/440/500 -> 3/3/$03, 6/6/$0A, 9/9/$03, 12/12/$0A,
+# 15/15/$0B, 18/18/$04, 18/18/$04; `--peek spc_fifo:12` at 500 ->
+# 0300000a00000300000a00000b0000040000; `apu.dsp_regs[v*16+8]` for ENVX.
+# (Until 2026-10-03 the second byte of each command was $14: commands with
+# no parameter queued whatever spc1 held. They queue 0 now.)
+rom = "../../examples/audio/snesmod_music_large/music_large.sfc"
+
+[[checkpoint]]                 # boot: the module's PLAY was queued and sent
+at_frame = 140
+[checkpoint.values]
+spc_fwrite = { eq = 3, width = 1 }
+spc_fread = { eq = 3, width = 1 }
+spc_pr = { eq = 0x03, width = 1 }
+
+[[checkpoint]]                 # X: pause
+at_frame = 200
+input = "150:0x0040,154:0"
+[checkpoint.values]
+spc_fwrite = { eq = 6, width = 1 }
+spc_fread = { eq = 6, width = 1 }
+spc_pr = { eq = 0x0A, width = 1 }
+
+[[checkpoint]]                 # A: play again (and `paused` = 0)
+at_frame = 260
+input = "210:0x0080,214:0"
+[checkpoint.values]
+spc_fwrite = { eq = 9, width = 1 }
+spc_pr = { eq = 0x03, width = 1 }
+
+[[checkpoint]]                 # X after A: PAUSE, not RESUME
+at_frame = 320
+input = "270:0x0040,274:0"
+[checkpoint.values]
+spc_fwrite = { eq = 12, width = 1 }
+spc_pr = { eq = 0x0A, width = 1 }
+
+[[checkpoint]]                 # X again: resume
+at_frame = 380
+input = "330:0x0040,334:0"
+[checkpoint.values]
+spc_fwrite = { eq = 15, width = 1 }
+spc_pr = { eq = 0x0B, width = 1 }
+
+[[checkpoint]]                 # B: stop
+at_frame = 440
+input = "390:0x8000,394:0"
+[checkpoint.values]
+spc_fwrite = { eq = 18, width = 1 }
+spc_fread = { eq = 18, width = 1 }
+spc_pr = { eq = 0x04, width = 1 }
+
+[[checkpoint]]                 # no press: nothing queued
+at_frame = 500
+[checkpoint.delta]
+spc_fwrite = { dir = "unchanged", width = 1 }
+
+[asserts.blocks]               # the whole FIFO, in order
+spc_fifo = "0300000a00000300000a00000b0000040000"
+
+[asserts.dsp]                  # stopped: every envelope at 0
+V0_ENVX = 0
+V1_ENVX = 0
+V2_ENVX = 0
+V3_ENVX = 0
+V4_ENVX = 0
+V5_ENVX = 0
+V6_ENVX = 0
+V7_ENVX = 0

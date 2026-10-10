@@ -11,20 +11,21 @@
 # (smconv's Impulse Tracker loader, which trusts its header), tiled
 # (tmx2snes's cute_tiled .tmj loader), json (aseprite2snes's JSON parser)
 # and stbimage (font2snes's stb_image PNG decoder) — every parser an asset
-# tool feeds with a file (H5 complete, 2026-09-15). Seeds are the goldens'
+# tool feeds with a file (H5 complete, 2026-09-15) — and wav (opensnes-sample's
+# WAV parser, 2026-10-05). Seeds are the goldens'
 # fixtures. The evolving corpus (corpus/) is local and ignored; only
 # crashes/ is committed, one file per fixed bug.
 
 CLANG        ?= clang
 FUZZ_SECONDS ?= 60
 FUZZ_CFLAGS  := -g -O1 -fsanitize=fuzzer,address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined
-COMMON       := ../common
+COMMON       := ../third_party
 SMC          := ../smconv/src
-TMX          := ../tmx2snes
+TMX          := ../third_party
 ASE          := ../aseprite2snes/src
-FNT          := ../font2snes/src
+FNT          := ../third_party
 
-FUZZERS := lodepng itloader tiled json stbimage
+FUZZERS := lodepng itloader tiled json stbimage wav
 TARGETS := $(addprefix fuzz_,$(FUZZERS))
 
 all: $(TARGETS)
@@ -32,7 +33,7 @@ all: $(TARGETS)
 fuzz_lodepng: fuzz_lodepng.c $(COMMON)/lodepng.c
 	$(CLANG) $(FUZZ_CFLAGS) -I$(COMMON) -DLODEPNG_NO_COMPILE_ENCODER -DLODEPNG_NO_COMPILE_DISK $^ -o $@
 
-fuzz_itloader: fuzz_itloader.c $(SMC)/itloader.c $(SMC)/io.c
+fuzz_itloader: fuzz_itloader.c $(SMC)/itloader.c $(SMC)/io.c $(SMC)/report.c
 	$(CLANG) $(FUZZ_CFLAGS) -I$(SMC) $^ -o $@
 
 fuzz_tiled: fuzz_tiled.c $(TMX)/cute_tiled.h
@@ -44,15 +45,20 @@ fuzz_json: fuzz_json.c $(ASE)/json.c
 fuzz_stbimage: fuzz_stbimage.c $(FNT)/stb_image.h
 	$(CLANG) $(FUZZ_CFLAGS) -I$(FNT) $< -o $@
 
+fuzz_wav: fuzz_wav.c ../opensnes-sample/src/wav.c
+	$(CLANG) $(FUZZ_CFLAGS) -I../opensnes-sample/src -I$(SMC) $^ -o $@
+
 # Seed corpora: the golden fixtures (real files the tools accept).
 corpus/lodepng:
 	@mkdir -p $@ && cp ../gfx4snes/tests/fixtures/*.png ../img2snes/tests/fixtures/*.png $@/
 corpus/itloader:
 	@mkdir -p $@ && cp ../smconv/tests/fixtures/*.it $@/
 corpus/tiled:
-	@mkdir -p $@ && cp $(TMX)/tests/fixtures/*.tmj $@/
+	@mkdir -p $@ && cp ../tmx2snes/tests/fixtures/*.tmj $@/
 corpus/json:
 	@mkdir -p $@ && cp ../aseprite2snes/tests/fixtures/*.json $@/
+corpus/wav:
+	@mkdir -p $@ && cp ../opensnes-sample/tests/fixtures/*.wav $@/
 corpus/stbimage:
 	@mkdir -p $@ && cp ../font2snes/tests/fixtures/*.png ../gfx4snes/tests/fixtures/*.png $@/
 

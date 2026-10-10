@@ -12,6 +12,14 @@
 | **luna** | ✅ Detects and runs the GSU natively (used by the test harness) |
 | **snes9x** | ❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED" |
 
+## What You'll Learn
+
+- Detecting the SuperFX (GSU) coprocessor via the VCR register ($303B)
+- Launching a GSU program with the WRAM stub (CPU cannot read ROM while GSU runs)
+- SRAM shared memory: byte writes (STB: $42, $55) and word write (STW: $BEEF)
+- FMULT fixed-point multiplication validation (2.0×2.0=$4000, 1.5×3.0=$4800)
+- Reading GSU registers (R0=$CAFE) after STOP
+
 ## Build & Run
 
 ```bash
@@ -20,14 +28,6 @@ make -C examples/chips/superfx_hello
 ```
 
 Then open `superfx_hello.sfc` in luna (or any SNES emulator).
-
-## What You'll Learn
-
-- Detecting the SuperFX (GSU) coprocessor via the VCR register ($303B)
-- Launching a GSU program with the WRAM stub (CPU cannot read ROM while GSU runs)
-- SRAM shared memory: byte writes (STB: $42, $55) and word write (STW: $BEEF)
-- FMULT fixed-point multiplication validation (2.0×2.0=$4000, 1.5×3.0=$4800)
-- Reading GSU registers (R0=$CAFE) after STOP
 
 ## Status Codes
 

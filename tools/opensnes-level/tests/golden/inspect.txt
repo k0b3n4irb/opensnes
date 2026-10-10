@@ -1,0 +1,1 @@
+town.tmj: 64x64 tiles of 8x8 px, 1 tile layer (BG1), 8198 bytes of map each, tileset of 16 tiles, 4 entities

@@ -46,6 +46,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): padRaw, scopeButtonsDown.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Button Constants
  *============================================================================*/
@@ -142,20 +145,18 @@ u16 padHeld(u8 pad);
  */
 u16 padReleased(u8 pad);
 
-/**
- * @brief The same value as padHeld() for a connected pad
- *
- * Never was the raw register: the NMI handler has already replaced a word
- * that is not a joypad's (low four bits set) by 0 before this reads it, so
- * it returns what padHeld() returns. The one difference: padHeld() answers
- * 0 for a word of $FFFF (an unplugged port), this returns the $FFFF.
- *
- * @param pad Controller number: 0 or 1. Indices 2-4 are accepted and always
- *            read 0 — the multitap path cannot be armed (KNOWN_LIMITATIONS.md)
- * @return Button mask of held buttons
- */
-OPENSNES_DEPRECATED("use padHeld() — this never returned the raw register")
-u16 padRaw(u8 pad);
+/* padHeld() and padPressed() read one word that the NMI handler filled, so
+ * they are also macros (since 2026-10-09): a call cost about 125 CPU cycles,
+ * three times a frame in most games, for what is one load. The handler
+ * already stores 0 for a port that holds no pad, which is all the functions
+ * added. The functions remain — `(padHeld)(0)` calls one, and so does taking
+ * its address. Unlike them the macros do not check `pad`: an index above 4
+ * reads whatever follows the array. */
+extern u16 pad_keys[5];      /**< Buttons down, per pad (written by the NMI handler) */
+extern u16 pad_keysold[5];   /**< Buttons down on the previous frame */
+extern u16 pad_keysdown[5];  /**< Buttons that went down on this frame */
+#define padHeld(pad)    (pad_keys[(pad)])
+#define padPressed(pad) (pad_keysdown[(pad)])
 
 /**
  * @brief Check if controller is connected
@@ -406,7 +407,8 @@ u16 scopeGetRawY(void);
  *        mouseButtonsHeld().
  *
  * Until 2026-09-22 this name returned the auto-repeat mask (now
- * scopeButtonsRepeat()) and "currently down" was scopeButtonsDown(): the
+ * scopeButtonsRepeat()) and "currently down" had a name ending in Down
+ * (removed 2026-10-05): the
  * one word had the opposite meaning on the third device. A caller that
  * wanted the repeat behaviour from this name must move to
  * scopeButtonsRepeat().
@@ -431,10 +433,6 @@ u16 scopeButtonsPressed(void);
  *         2026-09-22)
  */
 u16 scopeButtonsRepeat(void);
-
-/** @brief The pre-2026-09-22 name of scopeButtonsHeld(). Same value. */
-OPENSNES_DEPRECATED("use scopeButtonsHeld() — it means \"currently down\" like padHeld()")
-u16 scopeButtonsDown(void);
 
 /**
  * @brief Calibrate aim from a center-screen shot.

@@ -9,4 +9,4 @@ present lda\.w global_x
 in read_globals: present lda\.w global_x\n\tlda\.w global_y\n\tlda\.w global_x\n\tinc a\n\tsta\.w global_x\n\tlda\.w global_y\n\tdec a\n\tsta\.w global_y
 # extern_x/y are not volatile: the dead reads go, the updates stay.
 in read_externs: present rep #\$20\n(@\S+\n)*\tlda\.w extern_x\n\tinc a\n\tsta\.w extern_x\n\tlda\.w extern_y\n\tdec a\n\tsta\.w extern_y
-in get_global_sum: present lda\.w global_y\n\tclc\n\tadc \d+,s
+in get_global_sum: present lda\.w global_y\n\tclc\n\tadc(?: \d+,s|\.b tcc__lf\+\d+)

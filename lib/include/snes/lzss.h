@@ -36,6 +36,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): LzssDecodeVram.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /**
  * @brief Decompress LZ77 data directly to VRAM
  *
@@ -54,10 +57,5 @@
  *       honoured since 2026-09-20). VMAIN is left at $00 on return.
  */
 void lzssDecodeVram(const u8 *source, u16 address);
-
-/** @brief The pre-2026-09-22 spelling of lzssDecodeVram() — the one
- *         capitalised function of the SDK. Same routine. */
-OPENSNES_DEPRECATED("use lzssDecodeVram() (lower-case l, like every other function)")
-void LzssDecodeVram(const u8 *source, u16 address);
 
 #endif /* OPENSNES_LZSS_H */

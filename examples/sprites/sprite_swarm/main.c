@@ -131,9 +131,9 @@ int main(void) {
             if (ny < YMIN || ny > YMAX) { bvy[i] = (s8)(-bvy[i]); ny = (u8)(by[i] + bvy[i]); }
             bx[i] = nx;
             by[i] = ny;
-            /* Direct OAM buffer write: X, then Y-1 (PPU +1 scanline quirk). */
+            /* Direct OAM buffer write: X, then Y. */
             oamMemory[off + 0] = nx;
-            oamMemory[off + 1] = (u8)(ny - 1);
+            oamMemory[off + 1] = ny;
         }
         oam_update_flag = 1;
         swarm_frame = (u16)(swarm_frame + 1);

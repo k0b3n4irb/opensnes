@@ -141,7 +141,7 @@ silent recolouring of the whole scene.
 |------|-------------|
 | `-p` | Generate palette output (.pal) |
 | `-c FILE` | Impose FILE as the palette; fail if the image uses a colour that is not in it |
-| `-a` | Rearrange palette across banks (preserves tilemap references) |
+| `-a` | Rearrange palette across banks (preserves tilemap references). Until 2026-10-05 it reordered the `.pal` without rewriting the tiles — wrong colours; it works on the tile buffer now |
 | `-e N` | Palette entry offset in tilemap (0-7) |
 | `-o N` | Number of colors to output (0-256) |
 | `-u N` | Number of colors to use per tile: 4, 16, 128, 256 |
@@ -176,3 +176,13 @@ The `$(GFX4SNES)` variable is set by `common.mk` to point to `$(OPENSNES)/bin/gf
 ## Attribution
 
 Based on gfx4snes/pcx2snes by Alekmaul (PVSnesLib). License: zlib.
+
+## One palette bank per map tile
+
+A 2bpp or 4bpp map entry carries one palette number, read from the tile's
+first **opaque** pixel (index 0 is the transparent colour of every bank; the
+first pixel, transparent or not, decided until 2026-10-05 and a bank-2 tile
+starting transparent was drawn in bank 0's colours). A tile whose opaque
+pixels sit in two banks is refused with its block position: give the image
+one bank per 8x8 tile, or let `-a` rearrange the palette. 8bpp and Mode 7
+conversions have no banks and are not checked.

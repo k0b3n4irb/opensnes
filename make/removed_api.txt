@@ -1,0 +1,55 @@
+# Names removed from lib/include/snes/ (lot B of the 1.0 plan, 2026-10-05).
+# One per line: NAME<TAB>what to use<TAB>header it lived in. Read by
+# `opensnes upgrade` (a user's sources; this file ships in the zip with
+# make/) and by devtools/check_doc_drift.py (anchor 16: no page or example
+# cites a removed name, UPGRADING.md and MIGRATING_FROM_PVSNESLIB.md
+# excepted). Append, never delete: a name once public stays here so a
+# project written against 0.x keeps getting the hint. The calls that keep
+# their name and change meaning are in changed_api.txt, beside this file.
+WINDOW_BG1	LAYER_BG1 (video.h)	window.h
+WINDOW_BG2	LAYER_BG2 (video.h)	window.h
+WINDOW_BG3	LAYER_BG3 (video.h)	window.h
+WINDOW_BG4	LAYER_BG4 (video.h)	window.h
+WINDOW_OBJ	LAYER_OBJ (video.h)	window.h
+COLORMATH_BG1	LAYER_BG1 (video.h)	colormath.h
+COLORMATH_BG2	LAYER_BG2 (video.h)	colormath.h
+COLORMATH_BG3	LAYER_BG3 (video.h)	colormath.h
+COLORMATH_BG4	LAYER_BG4 (video.h)	colormath.h
+COLORMATH_OBJ	LAYER_OBJ (video.h)	colormath.h
+MOSAIC_BG1	LAYER_BG1 (video.h)	mosaic.h
+MOSAIC_BG2	LAYER_BG2 (video.h)	mosaic.h
+MOSAIC_BG3	LAYER_BG3 (video.h)	mosaic.h
+MOSAIC_BG4	LAYER_BG4 (video.h)	mosaic.h
+BGMODE_MODE0	BG_MODE0 (video.h)	registers.h
+BGMODE_MODE1	BG_MODE1 (video.h)	registers.h
+BGMODE_MODE2	BG_MODE2 (video.h)	registers.h
+BGMODE_MODE3	BG_MODE3 (video.h)	registers.h
+BGMODE_MODE7	BG_MODE7 (video.h)	registers.h
+OAM_SET_GFX_BANK	OAM_SET_GFX(id, p): the bank comes from the pointer	sprite.h
+# Lot C (2026-10-05): the functions whose name changed with no change of meaning.
+audioUpdate	nothing: the engine sends each change itself	audio.h
+colorMathEnable	colorMathSetLayers(mask) — it replaces the set	colormath.h
+consoleInitEx	consoleInit()	console.h
+getRegion	isPAL()	console.h
+rand	rngNext() — a 16-bit LFSR, not libc's	console.h
+srand	rngSeed()	console.h
+dmaCopyVramBank	dmaCopyVram(src, vram, size): the bank comes from the pointer	dma.h
+dmaCopyCGramBank	dmaCopyCGram(src, colour, size)	dma.h
+dsp1Parameter	dsp1SetCamera(&cam)	dsp1.h
+dsp1Present	dsp1IsPresent()	dsp1.h
+hdmaSetupBank	hdmaSetup(ch, mode, dest, table): the bank comes from the pointer	hdma.h
+padRaw	padHeld(pad)	input.h
+scopeButtonsDown	scopeButtonsHeld()	input.h
+nmiSetBank	nmiSet(callback): the bank comes from the pointer	interrupt.h
+irqSetBank	irqSet(handler)	interrupt.h
+LzssDecodeVram	lzssDecodeVram(src, address)	lzss.h
+ease_in_quad	easeInQuad(t)	math.h
+ease_out_quad	easeOutQuad(t)	math.h
+mode7SetPivot	mode7SetCenter(x, y)	mode7.h
+mosaicEnable	mosaicSetLayers(mask) — it replaces the set	mosaic.h
+profileGetFrameCount	getFrameCount()	profile.h
+sa1Init	sa1IsReady() — crt0 boots the SA-1	sa1.h
+snesmodSetSoundTable	nothing: no SDK call started a stream	snesmod.h
+snesmodAllocateSoundRegion	nothing: no SDK call started a stream	snesmod.h
+oamDrawMeta	oamDrawMetasprite(id, x, y, frame, &style, 0)	sprite.h
+oamDrawMetaFlip	oamDrawMetasprite(id, x, y, frame, &style, flip)	sprite.h

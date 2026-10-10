@@ -65,9 +65,8 @@
 static const MetaspriteStyle hero_style = { .baseTile = 0, .size = OBJ_SMALL };
 
 /** @brief 4bpp hero tiles (res/hero.pic, incbin'd in data.asm) */
-extern u8 hero_til[], hero_tilend[];
+#include "res/hero.inc"   /* generated: hero_tiles[], hero_tiles_end[], hero_pal[] */
 /** @brief Hero sprite palette, 16 colours (res/hero.pal) */
-extern u8 hero_pal[];
 
 /** @brief OBJ VRAM word address for the hero tiles (OBJSEL name base = 0) */
 #define VRAM_HERO   0x0000
@@ -119,7 +118,7 @@ int main(void) {
     setColor(1, RGB(31, 31, 31));
 
     /* All VRAM/CGRAM writes happen here, under the boot force-blank. */
-    dmaCopyVram(hero_til, VRAM_HERO, (u16)(hero_tilend - hero_til));
+    dmaCopyVram(hero_tiles, VRAM_HERO, (u16)(hero_tiles_end - hero_tiles));
     dmaCopyCGram(hero_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* 16×16 hardware sprites (small size of the 16/32 pair), OBJ base $0000. */

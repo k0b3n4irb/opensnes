@@ -115,12 +115,6 @@ void consoleInit(void) {
     REG_NMITIMEN = nmitimen_shadow;
 }
 
-void consoleInitEx(u16 options) {
-    /* For now, just call standard init */
-    consoleInit();
-    (void)options;  /* Reserved for future use */
-}
-
 /*============================================================================
  * Screen Control
  *============================================================================*/
@@ -202,10 +196,6 @@ u8 isPAL(void) {
     return is_pal_system;
 }
 
-u8 getRegion(void) {
-    return is_pal_system;           /* the same 0 / 1 as isPAL() since 2026-09-22 */
-}
-
 /*============================================================================
  * Random Number Generation
  *============================================================================*/
@@ -222,15 +212,6 @@ u16 rngNext(void) {
 void rngSeed(u16 seed) {
     rand_seed = seed;
     if (rand_seed == 0) rand_seed = 0xACE1;  /* Avoid zero state */
-}
-
-/* The deprecated libc-looking names, kept until the next major. */
-u16 rand(void) {
-    return rngNext();
-}
-
-void srand(u16 seed) {
-    rngSeed(seed);
 }
 
 /*============================================================================
@@ -271,8 +252,7 @@ void setMode(u8 mode, u8 flags) {
 /* Assembly helper to read REG_RDNMI - compiler optimizes away volatile reads */
 extern void clearNmiFlag(void);
 
-/* The one installer. nmiSet(), nmiClear() and the deprecated nmiSetBank() all
- * come here, so the lib never calls its own deprecated entry point. */
+/* The one installer: nmiSet() and nmiClear() both come here. */
 static void nmi_install(VBlankCallback callback, u8 bank) {
     /* Disable NMI during pointer write to prevent partial reads */
     REG_NMITIMEN = 0;
@@ -304,13 +284,9 @@ void nmiSet(VBlankCallback callback) {
     }
     /* Post-A6 a function pointer is a 4-byte far pointer carrying its own bank
      * in bits 16-23, so a callback in ANY bank works — derive the bank from the
-     * pointer and let nmiSetBank do the rest. The old bug was only the literal
+     * pointer and let nmi_install do the rest. The old bug was only the literal
      * bank 0 here; the 4-byte pointer itself forwards correctly. */
     nmi_install(callback, (u8)((u32)callback >> 16));
-}
-
-void nmiSetBank(VBlankCallback callback, u8 bank) {
-    nmi_install(callback, bank);
 }
 
 void nmiClear(void) {
@@ -342,10 +318,6 @@ void irqSet(void *handler) {
      * outside bank $00 — any SUPERFREE section can be — was entered at the
      * same offset of bank $00 (fixed 2026-09-20). */
     irq_install(handler, (u8)((u32)handler >> 16));
-}
-
-void irqSetBank(void *handler, u8 bank) {
-    irq_install(handler, bank);
 }
 
 void irqClear(void) {

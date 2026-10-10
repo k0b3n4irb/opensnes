@@ -94,6 +94,11 @@ void textInit(u16 tilemap_addr, u16 font_tile, u8 palette);
  * Call during forced blank.
  *
  * @param vram_addr VRAM word address for tiles
+ * @warning Not callable from an nmiSet() callback: the DMA registers are
+ *          written with absolute addressing (`sta $4300`) and the callback
+ *          runs with the data bank at `$7E`, so the writes would land in
+ *          WRAM and no font would be uploaded (library audit l.21). An
+ *          init-time call, before the loop, is the intended use.
  */
 void textLoadFont(u16 vram_addr);
 
@@ -107,6 +112,8 @@ void textLoadFont(u16 vram_addr);
  * Requires 'text4bpp' in LIB_MODULES.
  *
  * @param vram_addr VRAM word address for tiles
+ * @warning Not callable from an nmiSet() callback, like textLoadFont():
+ *          absolute DMA register writes under the callback's `$7E` data bank.
  */
 void textLoadFont4bpp(u16 vram_addr);
 

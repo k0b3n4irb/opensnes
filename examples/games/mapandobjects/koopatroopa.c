@@ -13,7 +13,10 @@
 #define KOOPATROOPA_RIGHT   2
 #define KOOPATROOPA_XVELOC  0x028A
 
-extern u8 sprkoopatroopa;
+#include "res/tilesMario.inc"    /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
+#include "res/mario.inc"         /* generated: mario_tiles[], mario_pal[] */
+#include "res/goomba.inc"        /* generated: goomba_tiles[], goomba_pal[] */
+#include "res/koopatroopa.inc"   /* generated: koopatroopa_tiles[], koopatroopa_pal[] */
 extern u16 nbobjects;
 
 u16 koopatroopanum;
@@ -27,7 +30,7 @@ static void koopatroopa_setup_sprites(u16 xp, u16 yp) {
     oambuffer[n].oamframeid = 0;
     oambuffer[n].oamrefresh = 1;
     oambuffer[n].oamattribute = OBJ_PRIO(2);
-    OAM_SET_GFX(n, &sprkoopatroopa);
+    OAM_SET_GFX(n, koopatroopa_tiles);
     nbobjects++;
     n++;
 
@@ -36,7 +39,7 @@ static void koopatroopa_setup_sprites(u16 xp, u16 yp) {
     oambuffer[n].oamframeid = 1;
     oambuffer[n].oamrefresh = 1;
     oambuffer[n].oamattribute = OBJ_PRIO(2);
-    OAM_SET_GFX(n, &sprkoopatroopa);
+    OAM_SET_GFX(n, koopatroopa_tiles);
     nbobjects++;
 }
 

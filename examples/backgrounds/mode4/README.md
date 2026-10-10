@@ -50,7 +50,7 @@ Open `mode4.sfc` in luna (or any SNES emulator) and press A.
 
 ## Testing
 
-`tools/luna-test/manifests/backgrounds_mode4.toml` checks the mode and
+`testing/manifests/backgrounds_mode4.toml` checks the mode and
 BG3VOFS, the vertical words at frame 100 and the horizontal words after A
 (`$2008`, `$2010`… in VRAM), and that the row is uploaded in blank.
 

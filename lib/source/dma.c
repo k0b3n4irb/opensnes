@@ -60,7 +60,9 @@ void dmaClearVRAM(void) {
  * Generic DMA
  *============================================================================*/
 
-void dmaTransfer(u8 channel, u8 mode, u8 srcBank, u16 srcAddr, u8 destReg, u16 size) {
+void dmaTransfer(u8 channel, u8 mode, const u8 *src, u8 destReg, u16 size) {
+    u32 far = (u32)src;     /* 24-bit far pointer: bank in bits 16-23 */
+
     /* Validate channel */
     if (channel > 7) return;
 
@@ -68,9 +70,9 @@ void dmaTransfer(u8 channel, u8 mode, u8 srcBank, u16 srcAddr, u8 destReg, u16 s
     REG_DMAP(channel) = mode;
     REG_BBAD(channel) = destReg;
 
-    REG_A1TL(channel) = srcAddr & 0xFF;
-    REG_A1TH(channel) = (srcAddr >> 8) & 0xFF;
-    REG_A1B(channel) = srcBank;
+    REG_A1TL(channel) = (u8)far;
+    REG_A1TH(channel) = (u8)(far >> 8);
+    REG_A1B(channel) = (u8)(far >> 16);
 
     REG_DASL(channel) = size & 0xFF;
     REG_DASH(channel) = (size >> 8) & 0xFF;

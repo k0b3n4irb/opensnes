@@ -1,0 +1,53 @@
+# Super FX game skeleton (2026-09-29): the game loop runs every frame while
+# the GSU renders from its code cache and gsuPresent moves each finished
+# frame to VRAM in the NMI (Game Pak RAM taken from the GSU per transfer).
+#
+# What this proves that the other pillars cannot:
+#   * The game never waits for the GSU: RIGHT held from frame 100 moves the
+#     crosshair one pixel per frame (124 -> 183 at frame 160), and the loop
+#     counts a frame per VBlank (r_game_frames).
+#   * The GSU and the presentation run at their own rate: 16 KB frames over
+#     a 40 + 40 letterbox land in two VBlanks each, ~30 per second
+#     (gsu_pres_frames 196 at frame 400, one job per presented frame).
+#   * The music plays through it (2026-09-29): SNESMOD fed every frame from
+#     ROM while the GSU works — the module position moves, and luna hears
+#     it (audio_rms_min, as audio_snesmod_music.toml). WAV hash:
+#     audio_regress.py.
+#   * The ROM stays the CPU's during the cache jobs, and the NMI's RAN
+#     hand-over never lets the CPU touch the cart while the GSU owns it:
+#     bus_violations = 0.
+# Every framebuffer byte landing in blank or force blank, whole frames
+# only, alternating blocks: testing/vram_dma_blank.py (luna
+# --dma-trace), the pillar a manifest cannot express.
+#
+# Measured: `luna state --until-frame N --input "100:0x0100,160:0" --peek
+# <sym>:2 --out -` on the example ROM, luna v1.30.0.
+rom = "../../examples/chips/superfx_game_skeleton/superfx_game_skeleton.sfc"
+
+[[checkpoint]]
+at_frame = 100
+input = "100:0x0100"            # RIGHT held from frame 100
+[checkpoint.values]
+r_ship_x = 124
+r_game_frames = { ge = 58, le = 64 }
+
+[[checkpoint]]
+at_frame = 160
+input = "160:0"
+[checkpoint.values]
+r_ship_x = 183
+r_game_frames = { ge = 118, le = 124 }
+
+[[checkpoint]]
+at_frame = 400
+[checkpoint.values]
+r_ship_x = 184
+r_game_frames = { ge = 358, le = 364 }
+gsu_pres_frames = { ge = 176, le = 186 }
+r_jobs = { ge = 176, le = 187 }
+r_music_pos = { ge = 2 }
+[checkpoint.gsu]
+bus_violations = 0
+
+[asserts]
+audio_rms_min = 100.0

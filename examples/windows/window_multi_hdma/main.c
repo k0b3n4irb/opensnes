@@ -36,9 +36,7 @@
 #include <snes.h>
 
 /** @brief 256-color ring artwork (original, procedural) */
-extern u8 rings_pic[], rings_pic_end[];
-extern u8 rings_map[], rings_map_end[];
-extern u8 rings_pal[], rings_pal_end[];
+#include "res/rings.inc"   /* generated: rings_tiles[], rings_map[], rings_pal[], each with _end */
 
 /** @brief krom's VRAM layout: map at word $0000, tiles at word $4000 */
 #define VRAM_MAP 0x0000
@@ -82,7 +80,7 @@ int main(void) {
 
     dmaCopyCGram(rings_pal, 0, (u16)(rings_pal_end - rings_pal));
     dmaCopyVram(rings_map, VRAM_MAP, (u16)(rings_map_end - rings_map));
-    dmaCopyVram(rings_pic, VRAM_GFX, (u16)(rings_pic_end - rings_pic));
+    dmaCopyVram(rings_tiles, VRAM_GFX, (u16)(rings_tiles_end - rings_tiles));
 
     /* Backdrop (CGRAM color 0) = krom's green — what shows outside the
      * windows once TMW masks BG1 there. */

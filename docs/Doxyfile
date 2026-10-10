@@ -85,7 +85,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/basics/game_skeleton \
                          ../examples/basics/panel_hud \
                          ../examples/basics/fix32_orbit \
-                         ../examples/basics/random \
                          ../examples/basics/scene_stack \
                          ../examples/basics/timer \
                          ../examples/games/breakout \
@@ -104,7 +103,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/backgrounds/mode1_lz77 \
                          ../examples/backgrounds/mode3 \
                          ../examples/backgrounds/mode2 \
-                         ../examples/backgrounds/mode5 \
                          ../examples/mode7/rotate_scale \
                          ../examples/mode7/perspective \
                          ../examples/mode7/dsp1_ground \
@@ -112,19 +110,19 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/color/palette_cycle \
                          ../examples/color/shadow_tint \
                          ../examples/transitions/fading \
-                         ../examples/color/gradient_9bit \
                          ../examples/hdma/gradient_colors \
                          ../examples/hdma/hdma_helpers \
                          ../examples/hdma/hdma_indirect_gradient \
                          ../examples/hdma/hdma_wave \
                          ../examples/color/hicolor_1792 \
-                         ../examples/color/hicolor_blend \
                          ../examples/backgrounds/mode5_hires \
                          ../examples/mode7/perspective_rotate \
                          ../examples/transitions/mosaic \
                          ../examples/scrolling/parallax_scroll \
                          ../examples/chips/superfx_3d \
                          ../examples/chips/superfx_game_skeleton \
+                         ../examples/chips/superfx_save \
+                         ../examples/chips/sa1_save \
                          ../examples/color/pseudo_hires \
                          ../examples/mode7/extbg \
                          ../examples/backgrounds/mode4 \
@@ -142,7 +140,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/sprites/simple_sprite \
                          ../examples/sprites/sprite_swarm \
                          ../examples/input/controller \
-                         ../examples/input/move_sprite \
                          ../examples/input/mouse \
                          ../examples/input/superscope \
                          ../examples/input/two_players \

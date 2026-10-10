@@ -17,11 +17,3 @@ include $(OPENSNES)/make/common.mk
 # Graphics conversion (4bpp Mode 1 background)
 #------------------------------------------------------------------------------
 
-res/opensnes.pic res/opensnes.pal res/opensnes.map: res/opensnes.png
-	@echo "[GFX] Converting background..."
-	@$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
-
-clean: clean-gradient_colors
-.PHONY: clean-gradient_colors
-clean-gradient_colors:
-	@rm -f res/opensnes.pic res/opensnes.pal res/opensnes.map res/opensnes.inc res/opensnes_data.as

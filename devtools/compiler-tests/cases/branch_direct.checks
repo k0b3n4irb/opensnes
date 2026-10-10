@@ -1,0 +1,12 @@
+# no 0 or 1 is materialised for a condition that only branches
+# (the materialisation is: bcc + / lda #0 / bra ++ / + lda #1 / ++)
+in both: absent bra \+\+
+in either: absent bra \+\+
+in sort_step: absent bra \+\+
+# a signed test against 0 reads the sign, it does not subtract
+in magnitude: absent sbc\.w #0
+in magnitude: absent bvc
+in magnitude: present b(mi|pl)
+# a 32-bit equality branches on Z over both halves
+in walk: present cmp\.w #ent\+64\n\tbne @lcmp
+in walk: absent bra \+\+

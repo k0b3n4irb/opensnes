@@ -35,8 +35,13 @@ assembly. Pass a pointer instead. The refusals are deliberate: each one would
 otherwise be a silent miscompilation.
 
 **Can I use floating point?**
-There is no FPU and no soft-float library. Use the fixed-point types: `fixed`
-(8.8) from `<snes/math.h>`, `fixed32` (16.16) from `<snes/fixed32.h>`.
+There is no FPU and no soft-float library, and the compiler says so: a
+`float` or `double` computed at run time stops the build with a message
+naming the function. A floating constant the compiler can fold is fine —
+`(int)(1.5 * 256)` is the usual way to write a fixed-point constant. Use the
+fixed-point types: `fixed` (8.8) from `<snes/math.h>`, `fixed32` (16.16) from
+`<snes/fixed32.h>`. The same holds for `long long`: the widest integer is
+`long`, 32 bits, and 64-bit arithmetic is refused.
 @ref tutorial_math has the arithmetic and the pitfalls.
 
 **Is there a `printf`?**

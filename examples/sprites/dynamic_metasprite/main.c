@@ -40,10 +40,10 @@
  * Sprite graphics data (from data.asm)
  *========================================================================*/
 
-extern u8 spritehero32_til[];
-extern u8 spritehero32_pal[];
-extern u8 spritehero16_til[];
-extern u8 spritehero8_til[];
+#include "res/spritehero32.inc"
+#include "res/spritehero16.inc"
+#include "res/spritehero8.inc"
+/* generated: spriteheroN_tiles[], spriteheroN_pal[] (and spriteheroN_meta.inc) */
 
 
 /*========================================================================
@@ -90,16 +90,16 @@ u16 pad0;
 void drawSprites(void) {
     if (selectedItem == 0) {
         /* mode 0 (8/16): 16 large + 8 small */
-        oamMetaDrawDyn(1, 64, 140, hero16_frame0, spritehero16_til, OBJ_LARGE);
-        oamMetaDrawDyn(10, 128, 140, hero8_frame0, spritehero8_til, OBJ_SMALL);
+        oamMetaDrawDyn(1, 64, 140, hero16_frame0, spritehero16_tiles, OBJ_LARGE);
+        oamMetaDrawDyn(10, 128, 140, hero8_frame0, spritehero8_tiles, OBJ_SMALL);
     } else if (selectedItem == 1) {
         /* mode 1 (8/32): 32 large + 8 small */
-        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_til, OBJ_LARGE);
-        oamMetaDrawDyn(10, 192, 140, hero8_frame0, spritehero8_til, OBJ_SMALL);
+        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_tiles, OBJ_LARGE);
+        oamMetaDrawDyn(10, 192, 140, hero8_frame0, spritehero8_tiles, OBJ_SMALL);
     } else {
         /* mode 3 (16/32): 32 large + 16 small */
-        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_til, OBJ_LARGE);
-        oamMetaDrawDyn(10, 192, 140, hero16_frame0, spritehero16_til, OBJ_SMALL);
+        oamMetaDrawDyn(1, 64, 140, hero32_frame0, spritehero32_tiles, OBJ_LARGE);
+        oamMetaDrawDyn(10, 192, 140, hero16_frame0, spritehero16_tiles, OBJ_SMALL);
     }
 }
 

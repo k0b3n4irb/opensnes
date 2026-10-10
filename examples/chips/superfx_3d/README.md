@@ -12,15 +12,6 @@
 | **luna** | ✅ Detects and runs the GSU natively (used by the test harness) |
 | **snes9x** | ❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED" |
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/chips/superfx_3d
-```
-
-Then open `superfx_3d.sfc` in luna (or any SNES emulator).
-
 ## What You'll Learn
 
 - **3D rotation**: Y+X axis rotation using 256-entry sine table (C-side)
@@ -33,6 +24,15 @@ Then open `superfx_3d.sfc` in luna (or any SNES emulator).
 - **BG scroll centering**: VOFS=208 centers 128px framebuffer in visible area
 - **Vertex clamping**: projected coords clamped to framebuffer bounds (0-126)
 - **SuperFX library API**: `gsuLaunch()`, `gsuSetupHdmaBlanking()`, `gsuDmaFullFrame()`
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/chips/superfx_3d
+```
+
+Then open `superfx_3d.sfc` in luna (or any SNES emulator).
 
 ## Architecture
 

@@ -1,71 +1,9 @@
-# wav2brr Makefile
-# WAV -> SNES BRR sample converter for OpenSNES.
-# Reuses smconv's BRR encoder (../smconv/src/brr.c) so output matches
-# soundbank-baked samples byte-for-byte.
-
-VERSION := 1.0.0
-
-CC      := clang
-CFLAGS  := -g -Wall -Wextra -O2 -pedantic -std=c11
-CFLAGS  += -DVERSION=\"$(VERSION)\"
-
-SRC       := src
-BUILD     := build
-SMCONV    := ../smconv/src
-# Our own sources plus the shared encoder from smconv.
-SOURCES   := $(wildcard $(SRC)/*.c) $(SMCONV)/brr.c
-OBJECTS   := $(patsubst %.c,$(BUILD)/%.o,$(notdir $(SOURCES)))
-
-TARGET  := wav2brr
-
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-    # macOS - dynamic linking
-else ifeq ($(OS),Windows_NT)
-    ifneq ($(SANITIZE),1)
-    CFLAGS += -static
-    endif
-    TARGET := wav2brr.exe
-else
-    ifneq ($(SANITIZE),1)
-    CFLAGS += -static
-    endif
-endif
-
-.PHONY: all clean install debug
-
-all: $(TARGET)
-
-$(TARGET): $(OBJECTS)
-	@echo "[LD] $@"
-	@$(CC) $(CFLAGS) $(OBJECTS) -o $@ -lm
-
-$(BUILD)/%.o: $(SRC)/%.c $(wildcard $(SRC)/*.h) | $(BUILD)
-	@echo "[CC] $<"
-	@$(CC) $(CFLAGS) -I$(SRC) -I$(SMCONV) -c $< -o $@
-
-$(BUILD)/%.o: $(SMCONV)/%.c $(wildcard $(SMCONV)/*.h) | $(BUILD)
-	@echo "[CC] $<"
-	@$(CC) $(CFLAGS) -I$(SRC) -I$(SMCONV) -c $< -o $@
-
-$(BUILD):
-	@mkdir -p $(BUILD)
-
-install: $(TARGET)
-	@echo "Installing $(TARGET) to ../../bin/"
-	@mkdir -p ../../bin
-	@cp $(TARGET) ../../bin/
-
-clean:
-	@echo "Cleaning..."
-	@rm -rf $(BUILD) $(TARGET)
-
-debug: CFLAGS += -g -DDEBUG
-debug: clean all
-
-# SANITIZE=1: ASan + UBSan build for the host-side sanitizer job
-# (make test-sanitizers). Not static — the sanitizer runtimes do not link
-# statically — and -O1 for readable reports.
-ifeq ($(SANITIZE),1)
-CFLAGS += -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer
-endif
+# wav2brr — PCM .wav → .brr sample; the BRR encoder is smconv's brr.c
+TOOL        := wav2brr
+VERSION     := 1.0.0
+SRCS        := $(wildcard src/*.c) ../smconv/src/brr.c
+HDRS        := $(wildcard src/*.h) $(wildcard ../smconv/src/*.h)
+INCLUDES    := -Isrc -I../smconv/src
+TOOL_CFLAGS := -std=c11
+LDLIBS      := -lm
+include ../tool.mk

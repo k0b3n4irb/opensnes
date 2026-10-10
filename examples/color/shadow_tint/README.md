@@ -52,7 +52,7 @@ COLDATA (the fixed colour).
 
 ```bash
 make
-../../../tools/luna-test/bin/luna run -n 3000000 shadow_tint.sfc
+../../../testing/bin/luna run -n 3000000 shadow_tint.sfc
 ```
 
 ## Modules used

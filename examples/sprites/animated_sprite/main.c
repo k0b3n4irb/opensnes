@@ -42,9 +42,8 @@
  *============================================================================*/
 
 /** @brief Sprite sheet tile data containing all animation frames (defined in data.asm) */
-extern u8 sprite_tiles[], sprite_tiles_end[];
+#include "res/sprites.inc"   /* generated: sprites_tiles[], sprites_tiles_end[], sprites_pal[], sprites_pal_end[] */
 /** @brief Palette for the character sprite (16 colors, 4bpp) */
-extern u8 sprite_pal[], sprite_pal_end[];
 
 /*============================================================================
  * Constants
@@ -148,8 +147,8 @@ int main(void) {
      * 2. DMAs palette to CGRAM address 128 (sprite palette 0)
      * 3. Sets OBJSEL size mode to 16x16 small / 32x32 large
      * Palette slot 0 = CGRAM 128-159 (16 colors x 2 bytes) */
-    oamInitGfxSet(sprite_tiles, sprite_tiles_end - sprite_tiles,
-                  sprite_pal, sprite_pal_end - sprite_pal,
+    oamInitGfxSet(sprites_tiles, sprites_tiles_end - sprites_tiles,
+                  sprites_pal, sprites_pal_end - sprites_pal,
                   0, 0x0000, OBJ_SIZE16_L32);
 
     /* Initialize OAM entry 0 at the monster's starting position.

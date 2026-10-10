@@ -1,0 +1,5 @@
+# import settings of font.png, written by opensnes-text --save; the build reads `tool`
+tool = "opensnes-text"
+
+[font]
+bpp = 4

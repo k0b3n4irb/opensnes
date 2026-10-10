@@ -28,8 +28,6 @@ Run:  python3 tools/smconv/tests/run_golden.py
 """
 from __future__ import annotations
 
-import filecmp
-import shutil
 import struct
 import subprocess
 import sys
@@ -37,11 +35,12 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
-TOOL = REPO / "bin" / "smconv"
-
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parents[1] / "tests"))
 import itcompress  # noqa: E402
+from golden import Golden  # noqa: E402
+
+g = Golden("smconv", __file__)
 
 FIXTURE = "pollen8.it"
 COMPRESSED_FIXTURE = "reflection.it"
@@ -55,38 +54,18 @@ STRETCH = 16
 
 def convert(work: Path, name: str, data: bytes) -> subprocess.CompletedProcess:
     """Write `data` as work/name and run smconv on it there."""
-    work.mkdir(parents=True, exist_ok=True)
-    (work / name).write_bytes(data)
-    return subprocess.run([str(TOOL), *FLAGS, name],
-                          cwd=work, capture_output=True, text=True, timeout=60)
+    return g.run([*FLAGS, name], work, write={name: data})
 
 
 def compare(work: Path, proc: subprocess.CompletedProcess, want_dir: Path) -> list[str]:
     """The run succeeded and its outputs are byte-identical to want_dir's."""
-    if proc.returncode != 0:
-        return [f"exit {proc.returncode}: {(proc.stderr or proc.stdout).strip()[:200]}"]
-    errs = []
-    for out in OUTPUTS:
-        got, want = work / out, want_dir / out
-        if not got.is_file():
-            errs.append(f"{out}: not produced")
-        elif not filecmp.cmp(got, want, shallow=False):
-            errs.append(f"{out}: differs ({got.stat().st_size} "
-                        f"vs {want.stat().st_size} bytes)")
-    return errs
+    err = g.failure(proc)
+    return [err] if err else g.compare(work, OUTPUTS, want_dir)
 
 
 def refused(work: Path, proc: subprocess.CompletedProcess, *needles: str) -> list[str]:
     """The run failed, said why, and wrote nothing."""
-    errs = []
-    if proc.returncode == 0:
-        errs.append("exit 0")
-    said = proc.stdout + proc.stderr
-    errs += [f"no message saying {n!r}" for n in needles if n not in said]
-    left = [out for out in OUTPUTS if (work / out).exists()]
-    if left:
-        errs.append(f"wrote {', '.join(left)}")
-    return errs
+    return g.refused(work, proc, needles, nothing_written=OUTPUTS)
 
 
 def compressed(src: bytes, how: str, **kw) -> tuple[bytes, list[str]]:
@@ -102,17 +81,15 @@ def sample_pointer(mod: bytes, n: int) -> int:
 
 
 def main() -> int:
-    if not TOOL.is_file():
-        sys.exit(f"ERROR: {TOOL} not found — run `make tools` first")
     results: list[tuple[str, str, list[str]]] = []   # (name, what passed, errors)
-    pollen8 = (HERE / "fixtures" / FIXTURE).read_bytes()
-    reflection = (HERE / "fixtures" / COMPRESSED_FIXTURE).read_bytes()
+    pollen8 = (g.fixtures / FIXTURE).read_bytes()
+    reflection = (g.fixtures / COMPRESSED_FIXTURE).read_bytes()
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
 
         work = root / "plain"
         results.append((FIXTURE, f"{len(OUTPUTS)} outputs match",
-                        compare(work, convert(work, FIXTURE, pollen8), HERE / "golden")))
+                        compare(work, convert(work, FIXTURE, pollen8), g.golden)))
 
         # Negative case (2026-09-26): a file that is not an IT module must fail
         # the run and write nothing. It used to exit 0 with an empty soundbank.
@@ -125,13 +102,13 @@ def main() -> int:
         work = root / "reflection"
         results.append((COMPRESSED_FIXTURE, "real IT 2.14 file, outputs match",
                         compare(work, convert(work, COMPRESSED_FIXTURE, reflection),
-                                HERE / "golden" / "reflection")))
+                                g.golden / "reflection")))
 
         # pollen8 with every sample compressed: the committed golden, unchanged.
         for how in ("it214", "it215"):
             work = root / how
             data, errs = compressed(pollen8, how)
-            errs += compare(work, convert(work, FIXTURE, data), HERE / "golden")
+            errs += compare(work, convert(work, FIXTURE, data), g.golden)
             results.append((f"{FIXTURE} as {how}", "same soundbank as uncompressed", errs))
 
         # 16-bit and multi-block: no golden, the uncompressed twin is the
@@ -166,13 +143,8 @@ def main() -> int:
                                     "corrupt compressed data (block 1)")))
 
     for name, what, errs in results:
-        if errs:
-            print(f"  FAIL {name}: " + "; ".join(errs))
-        else:
-            print(f"  PASS {name} ({what})")
-    ok = sum(1 for _, _, errs in results if not errs)
-    print(f"\nsmconv golden: {ok}/{len(results)} ok")
-    return 0 if ok == len(results) else 1
+        g.record(name, what, errs)
+    return g.report()
 
 
 if __name__ == "__main__":

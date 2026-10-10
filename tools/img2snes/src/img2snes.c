@@ -318,7 +318,7 @@ static int process_image(const char *input_path, const char *output_path) {
 /* CLI callback */
 static cmdp_action_t cmd_process(cmdp_process_param_st *params) {
     if (opt_version) {
-        printf("img2snes %s (%s)\n", IMG2SNES_VERSION, __BUILD_DATE);
+        printf("img2snes %s (%s)\n", IMG2SNES_VERSION, TOOL_BUILD_DATE);
         return CMDP_ACT_OK;
     }
 

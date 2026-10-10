@@ -83,40 +83,24 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  * The C version had framesize=158 (~100+ cycles overhead per call).
  * The assembly version eliminates all frame allocation. */
 
-void oamSetX(u16 id, u16 x) {
-    if (id >= MAX_SPRITES) return;
+/* oamSetX(), oamSetY(), oamSetXY() and oamSetSize() are in
+ * sprite_oamset.asm with oamSet() (since 2026-10-09). */
 
-    u16 offset = id << 2;
-    oam_buffer[offset + 0] = (u8)(x & 0xFF);
+u16 oamGetX(u16 id) {
+    u16 x;
 
-    /* Update X high bit in extension table */
-    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
-    u16 slot = id & 0x03;
-
-    if (x & 0x100) {
-        oam_buffer[ext_offset] = (oam_buffer[ext_offset] & ~OAM_XHI_BIT(slot)) | OAM_XHI_BIT(slot);
-    } else {
-        oam_buffer[ext_offset] &= ~OAM_XHI_BIT(slot);
+    if (id >= MAX_SPRITES) return 0;
+    x = oam_buffer[id << 2];
+    /* the ninth bit is in the extension table, two bits per sprite */
+    if (oam_buffer[OAM_EXT_OFFSET + (id >> 2)] & OAM_XHI_BIT(id & 0x03)) {
+        x |= 0x100;
     }
-
-    OAM_TRACK_MAX(id);
-    oam_update_flag = 1;
+    return x;
 }
 
-void oamSetY(u16 id, u16 y) {
-    if (id >= MAX_SPRITES) return;
-    /* SNES PPU quirk: OAM_Y = N renders sprite on scanlines N+1..N+8
-     * (snesdev-wiki, Sprites / OAM: "sprites appear 1 line lower than their
-     * Y value"; cartouche 857cd9077cef3a88). Subtract 1 so caller's y
-     * matches the sprite's rendered top scanline. */
-    oam_buffer[(id << 2) + 1] = (u8)(y - 1);
-    OAM_TRACK_MAX(id);
-    oam_update_flag = 1;
-}
-
-void oamSetXY(u16 id, u16 x, u16 y) {
-    oamSetX(id, x);
-    oamSetY(id, y);
+u8 oamGetY(u16 id) {
+    if (id >= MAX_SPRITES) return 0;
+    return oam_buffer[(id << 2) + 1];
 }
 
 void oamSetTile(u16 id, u16 tile) {
@@ -148,23 +132,6 @@ void oamHide(u16 id) {
     u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
     u16 slot = id & 0x03;
     oam_buffer[ext_offset] |= OAM_XHI_BIT(slot);
-
-    OAM_TRACK_MAX(id);
-    oam_update_flag = 1;
-}
-
-void oamSetSize(u16 id, u16 large) {
-    /* All parameters u16 to avoid calling convention issues */
-    if (id >= MAX_SPRITES) return;
-
-    u16 ext_offset = OAM_EXT_OFFSET + (id >> 2);
-    u16 slot = id & 0x03;
-
-    if (large) {
-        oam_buffer[ext_offset] |= OAM_SIZE_BIT(slot);
-    } else {
-        oam_buffer[ext_offset] &= ~OAM_SIZE_BIT(slot);
-    }
 
     OAM_TRACK_MAX(id);
     oam_update_flag = 1;
@@ -233,9 +200,9 @@ void oamClear(void) {
  * Metasprite Functions
  *============================================================================*/
 
-/* The two positional forms below are deprecated as public names
- * (2026-10-03) and kept as they were until 1.0. */
-u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
+/* The unflipped loop of oamDrawMetasprite(): the public positional draw of
+ * 0.x, internal since 2026-10-05 (1.0 plan, lot D). */
+static u16 drawMetaUnflipped(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
                u16 baseTile, u8 basePalette, u8 size) {
     u16 id = startId;
 
@@ -327,75 +294,18 @@ static u16 meta_draw_flipped(u16 id, s16 x, s16 y, const MetaspriteItem *frame,
     return id;
 }
 
-/* oamDrawMeta() is the unflipped loop, and stays the one copy of it: it is
+/* drawMetaUnflipped() is the unflipped loop, and stays the one copy of it: it is
  * deprecated as a public name, not as code (at 1.0 it becomes static). */
 #if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 u16 oamDrawMetasprite(u16 startId, s16 x, s16 y, const MetaspriteItem *frame,
                       const MetaspriteStyle *style, u8 flip) {
     if (flip == 0) {
-        return oamDrawMeta(startId, x, y, frame, style->baseTile,
+        return drawMetaUnflipped(startId, x, y, frame, style->baseTile,
                            style->basePalette, style->size);
     }
     return meta_draw_flipped(startId, x, y, frame, style, flip);
 }
 #if defined(__clang__)
-#pragma clang diagnostic pop
 #endif
-
-u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
-                   u16 baseTile, u8 basePalette, u8 size,
-                   u8 flipX, u8 flipY, u8 width, u8 height) {
-    u16 id = startId;
-
-    /* Sprite size for offset calculations (depends on size mode) */
-    /* For now, assume 16x16 when large, 8x8 when small */
-    u8 spriteSize = size ? 16 : 8;
-
-    while (meta->dx != metasprite_end && id < MAX_SPRITES) {
-        s16 dx = meta->dx;
-        s16 dy = meta->dy;
-        u8 flags = meta->attr & 0xC0;
-
-        /* Apply horizontal flip */
-        if (flipX) {
-            dx = width - dx - spriteSize;
-            flags ^= OBJ_FLIPX;
-        }
-
-        /* Apply vertical flip */
-        if (flipY) {
-            dy = height - dy - spriteSize;
-            flags ^= OBJ_FLIPY;
-        }
-
-        /* Calculate final position */
-        s16 sx = x + dx;
-        s16 sy = y + dy;
-
-        /* Skip sprites that are completely off-screen */
-        if (sx > -64 && sx < 256 && sy > -64 && sy < 240) {
-            u16 tile = baseTile + meta->tile;
-
-            u8 attr = meta->attr;
-            u8 palette = (attr >> 1) & 0x07;
-            u8 priority = (attr >> 4) & 0x03;
-
-            if (palette == 0) {
-                palette = basePalette;
-            }
-
-            oamSet(id, (u16)sx, (u8)sy, tile, palette, priority, flags);
-            oamSetSize(id, size);
-
-            id++;
-        }
-
-        meta++;
-    }
-
-    return id;
-}
 

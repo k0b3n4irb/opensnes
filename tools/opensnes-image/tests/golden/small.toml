@@ -1,0 +1,7 @@
+# import settings of small, written by opensnes-image --save; the build reads `tool`
+tool = "opensnes-image"
+
+[perspective]
+angles = 4
+lines = 8
+zoom = 2

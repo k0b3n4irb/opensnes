@@ -1,0 +1,1 @@
+{"tool": "opensnes-image", "version": "1.0.0", "pictures": [{"input": "scene.png", "width": 256, "height": 224, "distinct_colors": 1365, "hicolor": true, "max_colors_in_a_segment": 20}]}

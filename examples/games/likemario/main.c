@@ -53,7 +53,8 @@
  *============================================================================*/
 
 /** @brief Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine */
-extern u8 mario_sprite_til[];
+#include "res/tiles.inc"          /* generated: tiles_tiles[], tiles_pal[], tiles_map[], each with _end */
+#include "res/mario_sprite.inc"   /* generated: mario_sprite_tiles[], mario_sprite_pal[], each with _end */
 /** @brief Map data (tile indices + header with width/height) */
 extern const u8 mapmario[];   /* asset bank: every C read must be a far read, hence const */
 /** @brief Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format) */
@@ -62,9 +63,6 @@ extern const u8 tilesetatt[];
 /** @brief Asset symbols from data.asm (.incbin sections in SUPERFREE banks).
  * Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram
  * read it directly — no ASM loader stub needed. */
-extern u8 tiles_til[], tiles_tilend[];
-extern u8 tiles_pal[], tiles_palend[];
-extern u8 mario_sprite_pal[], mario_sprite_palend[];
 
 /*============================================================================
  * Constants
@@ -414,7 +412,7 @@ static void mario_init(void) {
     oambuffer[0].oamframeid = FRAME_STAND;
     oambuffer[0].oamrefresh = 1;
     oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
-    OAM_SET_GFX(0, mario_sprite_til);
+    OAM_SET_GFX(0, mario_sprite_tiles);
 }
 
 /**
@@ -698,9 +696,9 @@ int main(void) {
 
     /* DMA tile + palette assets. C pointers carry the bank byte post-A6+A7
      * so dmaCopyVram / dmaCopyCGram resolve SUPERFREE source banks natively. */
-    dmaCopyVram(tiles_til,        VRAM_BG_TILES, tiles_tilend - tiles_til);
-    dmaCopyCGram(tiles_pal,        0,             tiles_palend - tiles_pal);
-    dmaCopyCGram(mario_sprite_pal, 128,           mario_sprite_palend - mario_sprite_pal);
+    dmaCopyVram(tiles_tiles,        VRAM_BG_TILES, tiles_tiles_end - tiles_tiles);
+    dmaCopyCGram(tiles_pal,        0,             tiles_pal_end - tiles_pal);
+    dmaCopyCGram(mario_sprite_pal, 128,           mario_sprite_pal_end - mario_sprite_pal);
 
     {
         static const OamDynamicConfig dyn_cfg = {

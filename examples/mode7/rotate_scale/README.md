@@ -120,7 +120,7 @@ the low byte.
 | File | Purpose |
 |------|---------|
 | `main.c` | Input handling, rotation/zoom logic |
-| `data.asm` | Mode 7 tile/tilemap/palette loading helper |
+| `res/mode7bg.png.toml` | the import settings of the Mode 7 picture (`opensnes-tileset`, `mode = 7`); the build converts and links it, `res/mode7bg.inc` declares the symbols |
 | `res/mode7bg.png` | Source image for Mode 7 ground |
 | `Makefile` | `LIB_MODULES := console dma background sprite input mode7` |
 

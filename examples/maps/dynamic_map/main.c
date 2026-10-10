@@ -52,13 +52,11 @@
 #define SPRITE_ROCKFORD 2
 
 /** @brief 8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm) */
-extern u8 sprite16, sprite16_end;
+#include "res/sprite16.inc"         /* generated: sprite16_tiles[], sprite16_pal[], each with _end */
+#include "res/sprite16_64x64.inc"   /* generated: sprite16_64x64_tiles[], sprite16_64x64_pal[] */
 /** @brief Palette for gargoyle sprite in 32x32 mode */
-extern u8 palsprite16, palsprite16_end;
 /** @brief 8bpp gargoyle sprite tiles for 64x64 map mode (from data.asm) */
-extern u8 sprite16_64x64, sprite16_64x64_end;
 /** @brief Palette for gargoyle sprite in 64x64 mode */
-extern u8 palsprite16_64x64, palsprite16_64x64_end;
 
 /**
  * @brief DMA a portion of the WRAM tilemap buffer to VRAM.
@@ -186,11 +184,11 @@ static void initDemoMap32x32(void) {
      * Each 8bpp tile = 32 VRAM words. Sprite = 4 tiles = 128 words. */
     for (i = 1; i < 10; i++) {
         u16 vram_off = VRAM_SPRITE_GFX + element2sprite32x32(i) * 32;
-        dmaCopyVram((u8*)&sprite16, vram_off, 256);
+        dmaCopyVram((u8*)sprite16_tiles, vram_off, 256);
     }
 
     /* Load palette to CGRAM slot 0 (16 colors = 32 bytes) */
-    dmaCopyCGram((u8*)&palsprite16, 0, 32);
+    dmaCopyCGram((u8*)sprite16_pal, 0, 32);
 
     /* Configure BG1 */
     bgSetGfxPtr(0, VRAM_SPRITE_GFX);
@@ -234,13 +232,13 @@ static void initDemoMap64x64(void) {
     for (i = 1; i < 9; i++) {
         u16 vram_base = VRAM_SPRITE_GFX + element2sprite64x64(i) * 32;
         /* Top half: first 128 bytes of .pic */
-        dmaCopyVram((u8*)&sprite16_64x64, vram_base, 128);
+        dmaCopyVram((u8*)sprite16_64x64_tiles, vram_base, 128);
         /* Bottom half: 1024 bytes into .pic, 512 words later in VRAM */
-        dmaCopyVram((u8*)&sprite16_64x64 + 1024, vram_base + 512, 128);
+        dmaCopyVram((u8*)sprite16_64x64_tiles + 1024, vram_base + 512, 128);
     }
 
     /* Load palette (16 colors = 32 bytes) */
-    dmaCopyCGram((u8*)&palsprite16_64x64, 0, 32);
+    dmaCopyCGram((u8*)sprite16_64x64_pal, 0, 32);
 
     /* Configure BG1 */
     bgSetGfxPtr(0, VRAM_SPRITE_GFX);

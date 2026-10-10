@@ -1,0 +1,5 @@
+in scaled: present lda\.w #384
+in lowest: present lda\.w #32768
+in highest: present lda\.w #65535
+in shifted: present lda\.w #16
+absent jsl

@@ -48,9 +48,7 @@
 #include <snes/math.h>
 #include <snes/input.h>
 
-extern u8 track_til[], track_til_end[];
-extern u8 track_map[], track_map_end[];
-extern u8 track_pal[], track_pal_end[];
+#include "res/track.inc"   /* generated: track_tiles[], track_map[], track_pal[] (Mode 7 .pc7 / .mp7), each with _end */
 /** @brief Banked-data accessor (data.asm): C pointer derefs are
  * bank-$00-hardcoded (B2), so the 16 KB class map in bank $01+ is
  * read through one `lda.l track_class,x` in ASM. */
@@ -140,7 +138,7 @@ int main(void) {
 
     /* Mode 7 plane: interleaved tiles+map upload */
     dmaCopyVramMode7(track_map, (u16)(track_map_end - track_map),
-                     track_til, (u16)(track_til_end - track_til));
+                     track_tiles, (u16)(track_tiles_end - track_tiles));
     dmaCopyCGram(track_pal, 0, (u16)(track_pal_end - track_pal));
 
     /* Car sprite: procedural tiles at OBJ name base 3 (word $6000),

@@ -1,0 +1,5 @@
+tool = "opensnes-tileset"
+
+[convert]
+mode = 7
+bpp = 8

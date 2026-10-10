@@ -35,7 +35,7 @@ jobs:
             compiler/cproc
             compiler/qbe
             compiler/wla-dx
-          key: toolchain-ubuntu-latest-x86_64-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/scripts/cc65816') }}
+          key: toolchain-ubuntu-latest-x86_64-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/cc65816/cc65816.c') }}
 
       - name: Stamp cached toolchain up-to-date (cache hit)
         if: steps.toolchain.outputs.cache-hit == 'true'

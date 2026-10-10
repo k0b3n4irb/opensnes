@@ -1,0 +1,44 @@
+# backgrounds/mode6 — the B test card: hi-res horizontal offset bit 3.
+#
+# B freezes the wave and writes a still card into BG3's offset table: row 0
+# (horizontal words, VRAM byte $6000) = $2000 on even columns, $2008 on odd
+# ones — bit 13 (apply to BG1) plus the offset 8, the one bit that falls
+# inside a 16-half-pixel tile — and row 1 (vertical, $6040) = 0.
+# Emulators disagree on what offset 8 draws in hi-res (ares/bsnes/luna: half
+# a tile; Mesen2: nothing), and no reference covers it (cartouche-fiches
+# 61be8d9e9e954b38): the card is for a console photo
+# (docs/HARDWARE_VERIFICATION.md). This manifest pins what the ROM writes,
+# not what the PPU draws.
+#   * frame 120, after B at 110: the card is up;
+#   * frame 140: the wave is frozen (wave_phase unchanged), the table is the card.
+# Measured on luna v1.30.4 (`luna state --until-frame N --input … --dump-vram`).
+rom = "../../examples/backgrounds/mode6/mode6.sfc"
+frames = 140
+input = "110:0x8000,112:0"        # B: test card on
+
+[[checkpoint]]
+at_frame = 120
+[checkpoint.values]
+opt_card = { eq = 1, width = 1 }
+
+[[checkpoint]]
+at_frame = 140
+[checkpoint.delta]
+wave_phase = "unchanged"
+
+[asserts.values]
+opt_card = { eq = 1, width = 1 }
+opt_vertical = { eq = 1, width = 1 }
+
+[asserts.ppu]
+bgmode = 6
+tm = 1
+ts = 1
+"bgs.2.v_scroll" = 0
+
+[asserts.blocks]
+card_row_h = { space = "vram", offset = "6000", hex = "0020082000200820002008200020082000200820002008200020082000200820" }
+card_row_v_zero = { space = "vram", offset = "6040", hex = "0000000000000000" }
+
+[asserts.dma]
+unsafe_writes = 0

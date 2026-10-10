@@ -49,7 +49,7 @@ sudo dnf install make
 **luna** is the SDK's emulator: it plays ROMs, runs the test harness and
 debugs (`tutorials/debugging.md`). `scripts/install-luna.sh` fetches the
 pinned release for Linux, macOS or Windows (MSYS2 / Git Bash) into
-`tools/luna-test/bin/`: `luna` (headless: tests, state, debugging) and
+`testing/bin/`: `luna` (headless: tests, state, debugging) and
 `luna-gui` (a window you play in). Any other SNES emulator works too, for a second
 opinion:
 
@@ -72,16 +72,22 @@ Download the latest release for your platform from the
 | Windows x86_64 | `opensnes_<version>_windows_x86_64.zip` |
 
 Extract the archive somewhere permanent (e.g., `~/opensnes` or `C:\opensnes`).
+It holds what a project build needs: the toolchain and asset tools in `bin/`,
+the library, the build system, the starter project. The documentation you
+are reading is online at https://k0b3n4irb.github.io/opensnes/ and the
+examples come as a separate, platform-independent archive on the same
+releases page: `opensnes-examples_<version>.zip` (sources, assets, and
+every ROM already built under `examples/bin/`).
 
 ### A4. Run Your First ROM
 
-The SDK comes with pre-built example ROMs:
+Extract the examples archive next to the SDK and pick a ROM:
 
 ```bash
-cd opensnes/examples/text/print_string
+cd opensnes-examples_<version>/examples/text/print_string
 
 # Play it in luna's window (install it once from the SDK root: scripts/install-luna.sh)
-../../../tools/luna-test/bin/luna-gui print_string.sfc
+~/opensnes/testing/bin/luna-gui print_string.sfc
 ```
 
 > Any other SNES emulator opens the `.sfc` as well (Mesen, bsnes, Snes9x —
@@ -114,9 +120,9 @@ template:
 - **`--template game`** — a white sprite you move with the D-pad, a starting
   point for an action game.
 
-Other commands: `opensnes build`, `opensnes clean`, and `opensnes doctor` (checks
+Other commands (@ref tools_opensnes): `opensnes build`, `opensnes clean`, and `opensnes doctor` (checks
 your toolchain, library, and emulator and tells you what is missing). Run
-`opensnes help` for the full list.
+`opensnes --help` for the full list.
 
 #### Manual setup (the long way)
 
@@ -183,55 +189,76 @@ my-snes-game/
 ├── res/            # Assets (optional)
 │   ├── tiles.png
 │   └── music.it
-└── test/           # Project tests (optional — see below)
-    ├── manifest.toml
-    └── baselines.json
+└── test/           # Project tests (optional — see below): one luna manifest each
+    ├── boot.toml
+    └── walk_right.toml
 ```
 
 ### Test Your Game
 
 Projects can declare automated tests that run in **luna**, the same
-cycle-accurate emulator the SDK's own test suite uses. Opt-in is simply the
-presence of `test/manifest.toml` (the `game` template ships one):
+cycle-accurate emulator the SDK's own test suite uses, with luna's own
+manifests: one `test/<name>.toml` per test, run by `luna test`. Opt-in is
+simply the presence of a `test/*.toml` (the `game` template ships two):
 
 ```toml
-default_steps = 3_000_000
+# test/boot.toml — a visual baseline and WRAM values at frame 180
+rom = "../my-snes-game.sfc"
+frames = 180
 
-# Visual baseline (fbhash) + WRAM asserts by symbol name.
-# Assert values are little-endian hex bytes (an s16 of 120 -> "7800").
-[tests.boot]
-assert = ["player_x = 7800"]
+[asserts]
+fbhash = ""                       # the frame's hash; `make test-update` fills it
 
-# Input-driven: hold RIGHT for 60 frames, then check the game state.
-# Input format is "frame:buttons_hex" (RIGHT = 0x100).
-[tests.walk_right]
-input = "30:0x100,90:0"
-assert = ["player_x = b400"]
+[[checkpoint]]
+at_frame = 180
+[checkpoint.values]
+player_x = 120                    # by the variable's name in your C
+player_y = 100
+```
+
+```toml
+# test/walk_right.toml — hold RIGHT for 60 frames, then check the game state
+rom = "../my-snes-game.sfc"
+frames = 150
+input = "30:0x100,90:0"           # "frame:buttons_hex" (RIGHT = 0x100), until frame 90
+
+[[checkpoint]]
+at_frame = 150
+[checkpoint.values]
+player_x = 180                    # 120 + 60
 ```
 
 Workflow:
 
 ```bash
 scripts/install-luna.sh   # once, from the SDK root: fetch the pinned luna
-make test-update          # seed test/baselines.json + reference PNGs
+make test-update          # seed the visual baselines (asserts.fbhash) in place
 make test                 # from now on: exit 0 = green, 1 = regression
 ```
 
 (Or `opensnes test` / `opensnes test --update` from the project directory.)
 
-Three oracles run per test:
+What a manifest can judge:
 
-- **WRAM asserts** — `symbol = hexbytes` entries are checked by luna
-  directly, with symbol names resolved from your ROM's `.sym` file;
-- **Visual baselines** — tests *without* an `input` script compare a
-  framebuffer hash per capture point (`steps` can be a list for
-  multi-point capture); failures leave the actual PNG in `test/actual/`
-  for eyeballing;
-- **In-ROM assertions** — any `SNES_ASSERT` that fires during a visual
-  run fails the test for free.
+- **WRAM values** — `[checkpoint.values]` entries are read by luna at
+  `at_frame`, with symbol names resolved from your ROM's `.sym` file:
+  write the name the variable has in your C. Two sources may define a
+  `static` of the same name; luna then refuses the bare name and lists
+  the candidates, each with its source file as a suffix
+  (`"player_x.main"` for the one of `main.c`, quoted because of the
+  dot). A value is a number, or `{ eq = 0x10, width = 1 }` to
+  set the width; `[checkpoint.delta]` says `"increased"` / `"unchanged"`
+  between two checkpoints;
+- **Visual baselines** — `asserts.fbhash` is the hash of the frame at
+  `frames`; `make test-update` rewrites it in place, comments kept, after
+  an intended change of what the game shows;
+- **The machine** — `region = "pal"` runs the test under PAL, `power_on`
+  / `seed` the RAM the ROM boots on; `[asserts.dma] unsafe_writes = 0`
+  fails on a VRAM write outside blanking.
 
-Commit `test/` to your repo; rerun `make test-update` when you
-intentionally change what the game shows or does.
+`luna test --help` lists everything a manifest can say. Commit `test/` to
+your repo; rerun `make test-update` when you intentionally change what the
+game shows.
 
 ---
 

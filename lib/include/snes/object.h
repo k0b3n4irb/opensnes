@@ -19,7 +19,7 @@
  *
  * Because the object buffer resides in Bank $7E (not directly accessible from C),
  * a workspace pattern is used. Before each C callback, the engine copies the
- * current object's data to `objWorkspace` (Bank $00). After the callback returns,
+ * current object's data to `objWorkspace`. After the callback returns,
  * changes are copied back.
  *
  * @code
@@ -135,13 +135,18 @@ _Static_assert(__builtin_offsetof(t_objs, onscreen) == 56, "onscreen offset mism
 /* --- Bank $00 SLOT 1 (C-accessible, < $2000) --- */
 
 /**
- * @brief Object workspace (Bank $00)
+ * @brief Object workspace
  *
  * Single 64-byte workspace populated before each C callback.
  * Read/write this in init, update, and refresh callbacks.
  * Changes are automatically copied back to the object buffer.
+ *
+ * It is a `FAR` object since 2026-10-09 (it sits behind the object pool, in
+ * bank $7E, so that the collision routines work on it without copying it):
+ * `objWorkspace.field` reads and writes as before, at the same cost; a
+ * pointer to it or to one of its fields is a `FAR` pointer.
  */
-extern t_objs objWorkspace;
+extern FAR t_objs objWorkspace;
 
 /* Three more variables were exported here until 2026-10-03 (API decision D4:
  * a public header must not claim unprefixed names):

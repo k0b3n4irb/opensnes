@@ -21,7 +21,7 @@
 - [ ] Commits follow [Conventional Commits](https://www.conventionalcommits.org/) format
 - [ ] No unrelated changes mixed in (one topic per PR)
 - [ ] New code has Doxygen documentation
-- [ ] Tested in Mesen2 (if runtime change — describe what you tested below)
+- [ ] Checked in luna (if runtime change — `luna_runner.py --only <example>`, or the luna GUI; describe what you tested below)
 
 ## Testing
 

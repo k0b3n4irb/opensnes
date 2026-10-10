@@ -1,0 +1,9 @@
+# krom's Perspective tables, regenerated: 48 angles of 7.5 degrees, 224 lines,
+# entry = trig(angle) * 80 * 256 / line (8.8 fixed point). Byte for byte the
+# tables the demo shipped (tools/opensnes-image/tests/golden).
+tool = "opensnes-image"
+
+[perspective]
+angles = 48
+lines = 224
+zoom = 80

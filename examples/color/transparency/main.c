@@ -44,12 +44,9 @@
  * C pointers carry the bank byte, so `dmaCopyVram` / `dmaCopyCGram`
  * resolve the correct source bank automatically — no ASM stub needed.
  */
-extern u8 land_tiles[], land_tiles_end[];
-extern u8 land_map[], land_map_end[];
-extern u8 land_pal[], land_pal_end[];
-extern u8 cloud_tiles[], cloud_tiles_end[];
-extern u8 cloud_map[], cloud_map_end[];
-extern u8 cloud_pal[], cloud_pal_end[];
+#include "res/backgrounds.inc"
+#include "res/clouds.inc"
+/* generated: backgrounds_tiles/_map/_pal (the landscape), clouds_tiles/_map/_pal (each with _end) */
 
 /**
  * @brief Entry point: color math transparency with scrolling clouds over a landscape.
@@ -76,14 +73,14 @@ int main(void) {
     setScreenOff();
 
     /* Load BG1 (4bpp landscape) tiles, tilemap, and palette */
-    dmaCopyVram(land_tiles, 0x0000, land_tiles_end - land_tiles);
-    dmaCopyVram(land_map,   0x2000, land_map_end   - land_map);
-    dmaCopyCGram(land_pal,  16,     land_pal_end   - land_pal);
+    dmaCopyVram(backgrounds_tiles, 0x0000, backgrounds_tiles_end - backgrounds_tiles);
+    dmaCopyVram(backgrounds_map,   0x2000, backgrounds_map_end   - backgrounds_map);
+    dmaCopyCGram(backgrounds_pal,  16,     backgrounds_pal_end   - backgrounds_pal);
 
     /* Load BG3 (2bpp clouds) tiles, tilemap, and palette */
-    dmaCopyVram(cloud_tiles, 0x1000, cloud_tiles_end - cloud_tiles);
-    dmaCopyVram(cloud_map,   0x2400, cloud_map_end   - cloud_map);
-    dmaCopyCGram(cloud_pal,  0,      cloud_pal_end   - cloud_pal);
+    dmaCopyVram(clouds_tiles, 0x1000, clouds_tiles_end - clouds_tiles);
+    dmaCopyVram(clouds_map,   0x2400, clouds_map_end   - clouds_map);
+    dmaCopyCGram(clouds_pal,  0,      clouds_pal_end   - clouds_pal);
 
     /* BG1 screen map at VRAM $2000, 32x32 tile arrangement (SC_32x32).
      * The screen size bits (0-1) are 0x00 = 32x32. The upper bits hold

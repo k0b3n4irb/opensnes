@@ -22,5 +22,5 @@ grep -E '^\| [0-9]+ \| `[a-z0-9_/]+` \|' "$doc" | while IFS= read -r line; do
     echo "$dst"
 done
 if [ -e "$out/.missing" ]; then rm -f "$out/.missing"; exit 1; fi
-sed -n '/^Session:/,/^24 /p' "$doc" > "$out/GRID.txt"
+sed -n '/^Session:/,/^26 /p' "$doc" > "$out/GRID.txt"
 echo "hardware-kit: $(ls "$out"/*.sfc | wc -l) ROMs + GRID.txt in $out"

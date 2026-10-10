@@ -1,0 +1,6 @@
+# import settings of soundbank, written by opensnes-music --save; the build reads `tool`
+tool = "opensnes-music"
+
+[bank]
+inputs = ["pollen8.it"]
+name = "soundbank"

@@ -12,9 +12,10 @@ palette slots** from a mode that nominally allows 128. HDMA cannot do this:
 its widest mode moves 4 bytes per scanline; the technique needs 16.
 
 The sunset art is original (procedural, `res/sunset.png` — 15,885 source
-colors); `devtools/hicolor64.py` reimplements krom's converter contract
-(64×8-pixel segments quantized to 15 colors + black). 357 distinct colors
-land on screen — any static 4bpp screen caps at 128.
+colors); `opensnes-image hicolor` converts it at build time to krom's asset
+contract (64×8-pixel segments quantized to 15 colors + black, settings in
+`res/sunset.png.toml`). 377 distinct colors land on screen — any static 4bpp
+screen caps at 128.
 
 ## SNES Concepts
 
@@ -37,7 +38,7 @@ land on screen — any static 4bpp screen caps at 128.
 | HTIME | 190 | **128** (`irqSetHTimer(128)`) | our handler saves registers and latches the V counter before the DMA, which krom's does not; with 190 the DMA spills past H-blank into the next line (a CGRAM write during the picture lands on the wrong entry). Measured clean window on luna v1.23.0: 80..175 |
 | NMITIMEN | `%10010000` | `%10010001` | we keep auto-joypad (SDK default) |
 | IRQ handler | HTIMERIRQ verbatim | + save/restore, `$213F` reset | ours interrupts arbitrary C |
-| VBlank rewind | VBLANKIRQ verbatim | C callback via `nmiSetBank` | CGADD=0, 128 B, source reset |
+| VBlank rewind | VBLANKIRQ verbatim | C callback via `nmiSet` | CGADD=0, 128 B, source reset |
 
 ## Measured parity (luna v1.9.0 + Mesen2 cross-check)
 
@@ -59,7 +60,7 @@ land on screen — any static 4bpp screen caps at 128.
    leaving the latch read pointers mid-sequence for the whole session —
    every later latched V read returned hi/lo-swapped garbage. Fixed in
    `lib/source/console.c` (STAT78 read after seeding resets the pointers).
-2. `nmiSetBank()` restored NMITIMEN from a literal, which would have
+2. The former `nmiSetBank()` (removed 2026-10-05) restored NMITIMEN from a literal, which would have
    clobbered IRQ enable bits — replaced by the `nmitimen_shadow` scheme
    (all $4200 writes compose through the shadow).
 
@@ -69,12 +70,20 @@ land on screen — any static 4bpp screen caps at 128.
 cd examples/color/hicolor_1792 && make
 ```
 
-To regenerate the assets from different art (requires Pillow):
-
-```bash
-python3 ../../../../devtools/hicolor64.py res/sunset.png res/sunset
-```
+The build converts `res/sunset.png` itself (`opensnes-image hicolor`, from
+`res/sunset.png.toml`); replace the picture with any 256×224 art and `make`.
 
 ## Modules Used
 
 `console`, `dma`, `background`
+
+## Further: 3840 colours by splitting the channels
+
+A second HiColor technique, krom's HiColor3840, was the `hicolor_blend`
+example until 2026-10-05. It keeps CGRAM still and splits the image's RGB
+channels across two layers blended by colour math (`colorMathSetSource`,
+`colorMathSetHalf`, one layer on the main screen, the other on the sub
+screen): each pixel's colour is the sum of two 15-bit colours, which reaches
+3840 distinct values. The blend costs the two layers and the sub screen;
+the H-IRQ stream above costs CPU time per scanline instead. The colour math
+calls are those of `color/transparency`.

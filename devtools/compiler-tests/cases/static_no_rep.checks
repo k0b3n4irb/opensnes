@@ -1,0 +1,4 @@
+in helper: absent rep #\$20
+in in_table: present rep #\$20
+in taken: present rep #\$20
+in pub: present rep #\$20

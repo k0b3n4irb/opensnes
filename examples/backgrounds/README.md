@@ -14,7 +14,7 @@ trade of colours against layers against resolution.
 | 2.4 | [mode1_bg3_priority](mode1_bg3_priority/) | How do I make BG3 draw in front for a HUD overlay? |
 | 2.5 | [mode0](mode0/) | How do I run four 2bpp layers (Mode 0)? |
 | 2.6 | [mode3](mode3/) | How do I show a 256-colour (8bpp, Mode 3) background? |
-| 2.7 | [mode5](mode5/) · [mode5_hires](mode5_hires/) | How do I use a hi-res (512-wide, Mode 5 + interlace) background? |
+| 2.7 | [mode5_hires](mode5_hires/) | How do I use a hi-res (512-wide, Mode 5 + interlace) background? |
 | 2.8 | [mode2](mode2/) | How do I scroll each column independently (offset-per-tile, modes 2/4/6)? |
 | 2.9 | [mode4](mode4/) | How does offset-per-tile work with a 256-colour layer (Mode 4's single row)? |
 | 2.10 | [mode6](mode6/) | How does offset-per-tile work in hi-res (Mode 6)? |

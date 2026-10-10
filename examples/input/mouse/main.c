@@ -38,9 +38,8 @@
 #include <snes/dma.h>
 
 /** @brief Cursor sprite tile data (16x16, 4bpp) defined in data.asm */
-extern u8 cursor_tiles[], cursor_tiles_end[];
+#include "res/cursor.inc"   /* generated: cursor_tiles[], cursor_tiles_end[], cursor_pal[], cursor_pal_end[] */
 /** @brief Cursor sprite palette (SNES BGR555 format) defined in data.asm */
-extern u8 cursor_pal[], cursor_pal_end[];
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
@@ -132,7 +131,7 @@ int main(void) {
     pos_x = 128;
     pos_y = 112;
     oamMemory[0] = (u8)pos_x;
-    oamMemory[1] = (u8)(pos_y - 1);  /* PPU +1 scanline quirk: write Y-1 */
+    oamMemory[1] = (u8)pos_y;
     oamMemory[2] = 0x00;         /* Tile number low */
     oamMemory[3] = 0x30;         /* priority 3, palette 0, no flip */
     oamMemory[512] = 0x02;       /* Large sprite (16x16), X high = 0 */
@@ -153,9 +152,9 @@ int main(void) {
         if (pos_y < 0) pos_y = 0;
         if (pos_y > 223) pos_y = 223;
 
-        /* Update cursor sprite position (PPU +1 quirk: write Y-1) */
+        /* Update cursor sprite position */
         oamMemory[0] = (u8)pos_x;
-        oamMemory[1] = (u8)(pos_y - 1);
+        oamMemory[1] = (u8)pos_y;
         oam_update_flag = 1;
 
         /* Show button state: HELD or blank */

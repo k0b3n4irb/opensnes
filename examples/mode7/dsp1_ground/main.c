@@ -42,11 +42,8 @@
 
 /** @name Assets (data.asm, ASSET_SECTION — any bank, DMA reads the far pointer)
  *  @{ */
-extern u8 ground_tiles[], ground_tiles_end[];
-extern u8 ground_map[], ground_map_end[];
-extern u8 ground_pal[], ground_pal_end[];
-extern u8 sky_tiles[], sky_tiles_end[];
-extern u8 sky_map[], sky_map_end[];
+#include "res/ground.inc"   /* generated: ground_tiles[], ground_map[], ground_pal[] (Mode 7 .pc7 / .mp7), each with _end */
+#include "res/sky.inc"      /* generated: sky_tiles[], sky_map[], sky_pal[], each with _end */
 /** @} */
 
 /** @brief Camera height above the ground plane (DSP-1 integer units). Lower

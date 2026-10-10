@@ -1,0 +1,26 @@
+rom = "../../examples/chips/superfx_3d/superfx_3d.sfc"
+# superfx-runtime phase B (2026-09-25): the NMI survives GSU jobs. gsuLaunch
+# used to disable NMI for each job, and superfx_3d lost one VBlank in three —
+# frame_count read 400 at frame 600. The $0108 stub now enters a WRAM NMI
+# that counts the frame while the GSU owns the Game Pak; frame_count tracks
+# real frames minus the boot (597 at frame 600 on luna v1.24.0).
+[[checkpoint]]
+at_frame = 600
+[checkpoint.values]
+frame_count = { ge = 590, le = 600, width = 2 }
+# The IRQ path (2026-09-26): superfx_3d arms a V-timer IRQ on line 200 for
+# the whole demo. Outside a job its ROM handler counts it (irq_ticks); during
+# a job crt0's WRAM stub acknowledges it — the $010C stub used to JML into
+# the ROM IrqHandler, which a job makes unreadable. Measured on luna v1.27.0:
+# irq_ticks 396 at frame 600 (the rest landed inside jobs), 788 vector
+# fetches during jobs, 0 bus violations. With the old stub: CPU lost at PC
+# $84, frame_count stuck at 27, 5446 bus violations.
+# 2026-09-29: 294 at frame 600, 1180 vector fetches — gsuDmaFullFrame now
+# starts only in lines 185-192 (a read-twice flip-flop left on the high byte used to start it anywhere
+# and drop a third of the framebuffer), the loop runs at ~30 fps instead of
+# ~53, and more of the line-200 IRQs land inside jobs. Lower bound 250.
+irq_ticks = { ge = 250, le = 600, width = 2 }
+
+[checkpoint.gsu]
+bus_violations = 0
+bus_vector_fetches = { gt = 0 }   # interrupts taken during jobs, served from WRAM

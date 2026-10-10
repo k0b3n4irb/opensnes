@@ -118,7 +118,7 @@ allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank on
 | File | Purpose |
 |------|---------|
 | `main.c` | Dynamic sprite initialization, animation loop |
-| `data.asm` | Sprite tile data (24-frame sheet) and palette via `.INCBIN` |
+| `res/sprite16_grid.png.toml`, `res/sprite32.png.toml` | the import settings of the two sheets (`opensnes-sprite`); the build converts them and links the result, `res/sprite16_grid.inc` declares the symbols |
 | `res/sprite16_grid.png` | 16x16 sprite sheet source |
 | `Makefile` | `LIB_MODULES := console sprite sprite_dynamic sprite_lut dma background input` |
 

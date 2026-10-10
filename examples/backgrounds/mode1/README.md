@@ -169,7 +169,7 @@ Then open `mode1.sfc` in your emulator (Mesen2 recommended).
 | File | Purpose |
 |------|---------|
 | `main.c` | Background setup code |
-| `data.asm` | Tiles, tilemap, and palette data |
+| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`, 16 colours); the build converts it and links the result, `res/opensnes.inc` declares the `BgAsset` |
 | `Makefile` | Build configuration (`LIB_MODULES := console sprite dma background`) |
 | `res/` | Source graphics files |
 

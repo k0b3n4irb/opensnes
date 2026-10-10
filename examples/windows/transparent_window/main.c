@@ -41,11 +41,9 @@
  *============================================================================*/
 
 /** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
-extern u8 tiles[], tiles_end[];
+#include "res/background.inc"   /* generated: background_tiles[], background_map[], background_pal[], each with _end */
 /** @brief Background tilemap data for the 32x32 tile grid */
-extern u8 tilemap[], tilemap_end[];
 /** @brief 16-color palette for the background */
-extern u8 palette[];
 
 /*============================================================================
  * Rectangle parameters
@@ -144,10 +142,10 @@ int main(void) {
      *   tiles at VRAM $4000, tilemap at $0000, palette slot 0
      *--------------------------------------------------------------------*/
     bgSetMapPtr(1, 0x0000, SC_32x32);
-    bgInitTileSet(1, tiles, palette, 0,
-                  tiles_end - tiles,
+    bgInitTileSet(1, background_tiles, background_pal, 0,
+                  background_tiles_end - background_tiles,
                   PALETTE_16_SIZE, BG_16COLORS, 0x4000);
-    dmaCopyVram(tilemap, 0x0000, tilemap_end - tilemap);
+    dmaCopyVram(background_map, 0x0000, background_map_end - background_map);
 
     /*--------------------------------------------------------------------
      * Video mode: Mode 1, display BG2 only

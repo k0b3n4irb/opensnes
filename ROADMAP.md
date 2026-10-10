@@ -8,16 +8,23 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.48.0
+## Current Status: post-v0.49.0
 
-A modern, well-tested SNES SDK ready for serious hobby development, game jams,
+Version 0.49.0 (2026-10-10) carries the public API meant for 1.0: the
+deprecated aliases are gone and the two calls that change meaning have
+changed (`docs/UPGRADING.md`). It is not 1.0 — the tree called itself
+1.0.0 from 2026-10-05 to 2026-10-10 and the owner renamed it: before 1.0
+come the compiler and library work still under way, a review of the
+examples with their assets redone, and the first console session of the
+hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7).
+`docs/STABILITY.md` is the promise 1.0 will make. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 20 % faster than PVSnesLib + 816-opt on the benchmark suite (PVSnesLib wins on pointer-heavy code since the 4-byte pointer ABI). 89
+produces code about 30 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 44 % faster measured on luna on eighteen workloads, each of them faster, none larger, and level or shallower in stack on sixteen. 86
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
 regression + functional probes; SA-1/Super FX/DSP-1 run natively). Run
-`make tests`, or `python3 tools/luna-test/luna_runner.py --list` for the corpus —
+`make tests`, or `python3 testing/luna_runner.py --list` for the corpus —
 the suite grows
 with new chantiers and a single hard-coded number rots fast.
 
@@ -62,7 +69,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
   and vice versa).
 - `KNOWN_LIMITATIONS.md`: 14-entry severity-tagged catalog of silent
   failures inherited from the 65816 / SNES architecture and the toolchain.
-- `tools/luna-test/`: luna-driven test harness — visual baselines keyed on
+- `testing/`: luna-driven test harness — visual baselines keyed on
   luna's cross-arch-stable `--print-fbhash`, regenerated with
   `luna_runner.py --update`.
 
@@ -144,20 +151,20 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `dsp1` | DSP-1 commands (multiply, trig, rotation, projection, distance) over the two-register port | core (runs the real firmware on luna) |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (89)
+### Examples (86)
 - **Text**: print_string, scroll_message · **Fundamentals**: text_glyphs
 - **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode4, mode5, mode5_hires, mode6
 - **Sprites**: simple_sprite, sprite_sizes, animated_sprite, metasprite, dynamic_sprite, dynamic_metasprite, sprite_swarm
 - **Scrolling**: mixed_scroll, continuous_scroll, parallax_scroll
 - **Mode 7**: rotate_scale, perspective, perspective_rotate, dsp1_ground, extbg
 - **HDMA & raster**: gradient_colors, hdma_indirect_gradient, hdma_wave, hdma_helpers
-- **Colour**: palette_cycle, transparency, shadow_tint, direct_color, gradient_9bit, hicolor_1792, hicolor_blend, pseudo_hires
+- **Colour**: palette_cycle, transparency, shadow_tint, direct_color, hicolor_1792, pseudo_hires
 - **Windows**: window, window_multi_hdma, transparent_window · **Transitions**: fading, mosaic
-- **Input**: controller, move_sprite, two_players, mouse, superscope
+- **Input**: controller, two_players, mouse, superscope
 - **Audio**: snesmod_music, snesmod_music_large, snesmod_sfx, soundboard, apu_switch, play_noise, pitch_mod, speech_synth, echo
 - **Maps**: map_scroll, tiled, dynamic_map, slope_collision
-- **Game math**: collision_demo, aim_target, fix32_orbit, random, timer, scene_stack, panel_hud, game_skeleton
-- **Memory**: hirom_demo, save_game · **Enhancement chips**: sa1_hello, sa1_starfield, superfx_hello, superfx_3d, superfx_game_skeleton
+- **Game math**: collision_demo, aim_target, fix32_orbit, timer, scene_stack, panel_hud, game_skeleton
+- **Memory**: hirom_demo, save_game · **Enhancement chips**: sa1_hello, sa1_starfield, sa1_save, superfx_hello, superfx_3d, superfx_game_skeleton, superfx_save
 - **Games**: breakout, tetris, likemario, mapandobjects, shmup_1942, mode7_racing, mode7_flying, rpg
 
 ### Build system
@@ -194,12 +201,12 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (89 / 89)
+- [x] Example READMEs with hardware explanations (86 / 86)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
 - [x] Developer guides (CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE)
-- [x] Published benchmark: about 20 % faster than PVSnesLib + 816-opt overall, slower on pointer-heavy functions (re-measured 2026-09-26)
+- [x] Published benchmark: 30 % (static) to 44 % (measured) faster than PVSnesLib + 816-opt overall, faster and no larger on all 18 measured workloads, level or shallower in stack on 16 (both compilers re-run and the same C measured on luna, 2026-10-08)
 - [x] CHANGELOG, CONTRIBUTING (with branching policy), GitHub templates
 
 ### Developer tooling
@@ -208,18 +215,14 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] **verify_toolchain.py** — Compiler-submodule pin enforcement
 - [x] **lint_commits.py** — Conventional-Commits + no-`Co-Authored-By` lint
 - [x] **cyclecount.py** — CPU cycle estimation
-- [x] **check_mvn.py** — MVN/MVP operand linter
 - [x] **Interactive debugging via luna** (CLI + MCP) — replaced the retired
       Mesen2-bound snesdbg Lua library (see `docs/tutorials/debugging.md`;
       breakpoints/symbols tracked upstream as luna#63)
-- [x] **brr2it** — BRR → Impulse Tracker conversion
-- [x] **benchmark** — Compiler-performance comparison tool
-- [x] **gen_hud_bar** — HUD bar generator
 - [x] **font2snes** — Font → SNES-tile converter
 
 ---
 
-## Planned: v1.0
+## The v1.0 gate
 
 ### Must-have
 
@@ -228,7 +231,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Pre-built binary releases | Done (`release.yml`) | Adoption blocker — users shouldn't need to compile the compiler |
 | Hardware verification docs | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress, **outside this repository**: the RPG prototype ("Giuseppe", ~3000 lines of C) moved to its own repository on 2026-09-26 and builds against the SDK from there. Not verifiable from a clone of this repo until it is published | Proves the SDK can ship a complete game |
-| Asset provenance cleanup | **Planned, deferred (owner decision 2026-09-26)**: 66 asset files in 23 examples are byte-identical to PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa); replace them with original art and credit every remaining one in `ATTRIBUTION.md` | A 1.0 release zip must not redistribute third-party IP under the MIT banner |
+| Asset provenance cleanup | **A 1.0 gate again (owner decision, 2026-10-10): every asset redone and the examples reviewed before a 1.0 release candidate.** Until then it had been deferred (2026-09-26, confirmed 2026-10-05). 66 asset files in 23 examples are byte-identical to PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa). The owner is not a graphic artist; the two routes on the table are an artist friend drawing original replacements, or a tool-driven port (generated placeholder art of the same tile counts and palettes). Until one happens the files stay as they are, listed in `ATTRIBUTION.md`. | Legal clarity for a 1.0 that ships Nintendo-derived art |
 | Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows where cc65816 wins and loses, with data |
 | Migration guide PVSnesLib → OpenSNES | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`, v0.43.0) | Smoothest adoption path for existing PVSnesLib users |
 | FAQ | Done (`docs/FAQ.md`, v0.43.0) | Reduces support load |
@@ -242,6 +245,8 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Tiled map editor integration | **Shipped**: `tools/tmx2snes`, `examples/maps/tiled`, `examples/games/rpg` (maps, collision, entities and dialogue in `.tmj`) | Workflow convenience for level designers |
 | Video tutorials | Not started | Wider audience reach |
 | Project scaffolding (`opensnes init`) | **Shipped (v0.25.0)** — `opensnes` CLI: init/build/run/doctor | Reduce friction for new users |
+| Save format in the library (checksum, version, slots), then `opensnes-save verify` | **After 1.0** (owner decision, 2026-10-06: 1.1) — a new public API is not frozen with 1.0 | A save that survives a corrupted byte and a new version of the game |
+| String tables in `opensnes-text` (the strings of a game, by language) | **After 1.0** (owner decision, 2026-10-06) — no example needs them yet | Localisation without editing C sources |
 
 ### Next steps (audit-driven, prioritised)
 
@@ -318,7 +323,7 @@ existed on 2026-09-14 were all superseded by commits already on
 branch of 2026-06-22) and were deleted that day. The luna side of the
 plan lives with the luna team: the exchanges are in
 `.claude/notes/partners/luna/` (and the owner's exchange folder), the
-pinned release in `tools/luna-test/luna.version`.
+pinned release in `testing/luna.version`.
 
 ## Known limitations
 
@@ -346,6 +351,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-05. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-10. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

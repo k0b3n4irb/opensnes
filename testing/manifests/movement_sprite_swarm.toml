@@ -1,0 +1,69 @@
+# sprite_swarm makes two claims the other two pillars cannot check.
+#
+# 1. "32 dots at a rock-steady 60 fps." The visual baseline captures two
+#    frames of a moving cloud, which proves the picture changes — not that
+#    the game loop kept up. `swarm_frame` counts main-loop iterations, so
+#    if the per-sprite C update ever overran a frame the counter would fall
+#    behind the PPU. Measured on luna, swarm_frame == PPU frame - 7 at
+#    frames 60, 160 and 300 alike (6 = the boot frames before the loop
+#    starts; 8 until the compiler's slot colouring of 2026-09-27, 7 until
+#    the tile module's asm encoder of 2026-09-29 made the init faster):
+#    294 iterations for 294 displayed frames, zero slip.
+#
+# 2. "each bounces independently, reversing at the edges." A frozen-velocity
+#    ROM still renders a moving cloud. So each leg pins sprite 0's velocity
+#    bytes across a real reversal: +2/+2 at frame 60, -2/-2 at frame 160
+#    (it has hit XMAX=248 and YMAX=208), +2 again in X at frame 300.
+#
+# Each leg also re-checks the hand-written OAM plumbing the example exists
+# to show: the loop writes bx into oamMemory[0] and by into oamMemory[1]
+# by hand, so oamMemory must equal bx and by exactly, at every leg. Measured (each boot shortening moved the
+# positions one iteration further — 2026-09-27, then 2026-09-29 with the
+# asm tile encoder; luna diff shows the same frames one frame earlier):
+#   frame  60  bx0=114 by0=122  oam = (114, 121)
+#   frame 160  bx0=182 by0= 94  oam = (182,  93)
+#   frame 300  bx0=114 by0=198  oam = (114, 197)
+rom = "../../examples/sprites/sprite_swarm/sprite_swarm.sfc"
+frames = 300
+
+[[checkpoint]]                 # outbound: both velocities positive
+at_frame = 60
+[checkpoint.values]
+swarm_frame  = { eq = 55, width = 2 }        # 60 - 6 boot frames
+"bx.main"           = { eq = 116, width = 1 }
+"by.main"           = { eq = 124, width = 1 }
+"bvx.main"          = { eq = 2, width = 1 }
+"bvy.main"          = { eq = 2, width = 1 }
+oamMemory    = { eq = 116, width = 1 }       # oamMemory[0] == bx[0]
+"oamMemory+1"    = { eq = 124, width = 1 }       # oamMemory[1] == by[0]
+
+[[checkpoint]]                 # after both edge bounces: both negative
+at_frame = 160
+[checkpoint.values]
+swarm_frame  = { eq = 155, width = 2 }
+"bx.main"           = { eq = 180, width = 1 }
+"by.main"           = { eq = 92,  width = 1 }
+"bvx.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at XMAX
+"bvy.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at YMAX
+oamMemory    = { eq = 180, width = 1 }
+"oamMemory+1"    = { eq = 92,  width = 1 }
+
+[[checkpoint]]                 # X has bounced back off XMIN, Y still inbound
+at_frame = 300
+[checkpoint.values]
+swarm_frame  = { eq = 295, width = 2 }       # 300 - 6: no frame was ever dropped
+"bx.main"           = { eq = 116, width = 1 }
+"by.main"           = { eq = 196, width = 1 }
+"bvx.main"          = { eq = 2, width = 1 }
+"bvy.main"          = { eq = 0xFE, width = 1 }
+oamMemory    = { eq = 116, width = 1 }
+"oamMemory+1"    = { eq = 196, width = 1 }
+
+[asserts.oam]                  # the whole flock really reaches the PPU
+visible = 32
+
+# Every VRAM DMA of this input-driven run lands in blank or forced blank
+# (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
+# what a button press triggers is here, one manifest at a time).
+[asserts.dma]
+unsafe_writes = 0

@@ -121,7 +121,7 @@ A 64x64 sprite is 8 KB of tile data -- far too much for VBlank DMA. Use
 | File | Purpose |
 |------|---------|
 | `main.c` | Menu UI, size mode switching, sprite loading |
-| `data.asm` | Four sprite sizes (8/16/32/64) with palettes via `.INCBIN` |
+| `res/sprite{8,16,32,64}.png.toml` | the import settings of the four sheets (`opensnes-sprite`, one block size each); the build converts them and links the result, `res/spriteN.inc` declares the symbols |
 | `res/` | Source PNGs for each sprite size |
 | `Makefile` | `LIB_MODULES := console sprite dma text text4bpp input background` |
 

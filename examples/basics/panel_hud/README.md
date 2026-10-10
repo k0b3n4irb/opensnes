@@ -65,7 +65,7 @@ Probe oracles: `hero_hp` (0–5, hearts shown) and `dialog_shown` (0/1).
 
 ```bash
 make
-../../../tools/luna-test/bin/luna run -n 3000000 panel_hud.sfc
+../../../testing/bin/luna run -n 3000000 panel_hud.sfc
 ```
 
 ## Modules used

@@ -71,21 +71,8 @@
 /** @brief All layers including sprites */
 #define WINDOW_ALL      0x1F
 
-/** @name Deprecated layer names (use LAYER_*)
- * @{ */
-#define WINDOW_BG1      BIT(0)  /**< @deprecated use LAYER_BG1 */
-#define WINDOW_BG2      BIT(1)  /**< @deprecated use LAYER_BG2 */
-#define WINDOW_BG3      BIT(2)  /**< @deprecated use LAYER_BG3 */
-#define WINDOW_BG4      BIT(3)  /**< @deprecated use LAYER_BG4 */
-#define WINDOW_OBJ      BIT(4)  /**< @deprecated use LAYER_OBJ */
-/** @} */
-#ifdef __clang__
-#pragma clang deprecated(WINDOW_BG1, "use LAYER_BG1")
-#pragma clang deprecated(WINDOW_BG2, "use LAYER_BG2")
-#pragma clang deprecated(WINDOW_BG3, "use LAYER_BG3")
-#pragma clang deprecated(WINDOW_BG4, "use LAYER_BG4")
-#pragma clang deprecated(WINDOW_OBJ, "use LAYER_OBJ")
-#endif
+/* WINDOW_BG1..WINDOW_BG4 and WINDOW_OBJ were removed on 2026-10-05: the layer
+ * bits are LAYER_BG1..LAYER_OBJ (video.h), the same values (docs/UPGRADING.md). */
 
 /*============================================================================
  * Window Logic Operations

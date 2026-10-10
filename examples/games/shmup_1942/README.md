@@ -9,7 +9,7 @@ Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
 
 | Stage | What it added |
 |-------|---------------|
-| S1 | gfx4snes pipeline + procedural land-with-water-channels |
+| S1 | asset pipeline (settings files beside the PNGs) + procedural land-with-water-channels |
 | S2 | 256×512 scene + SC_32x64 + vertical auto-scroll |
 | S3 | Player ship (sprite) + D-pad movement |
 | S4 | Enemy spawn pool (≤8 simultaneous) |

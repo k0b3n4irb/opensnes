@@ -1,0 +1,1 @@
+{"tool": "opensnes-text", "version": "1.0.0", "fonts": [{"input": "font.png", "width": 128, "height": 48, "source": "grey", "glyphs": 96, "first_char": 32, "bpp": 2, "colors_used": 4, "outputs": [{"path": "font.pic", "kind": "tiles"}, {"path": "font.pal", "kind": "palette"}, {"path": "font.inc", "kind": "header"}, {"path": "font_data.as", "kind": "asm"}], "vram_bytes": 1536}]}

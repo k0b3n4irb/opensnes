@@ -5,15 +5,6 @@
 
 ![Screenshot](collision_demo.png)
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/basics/collision_demo
-```
-
-Then open `collision_demo.sfc` in your emulator (Mesen2 recommended).
-
 ## Controls
 
 | Button | Action |
@@ -30,6 +21,15 @@ Then open `collision_demo.sfc` in your emulator (Mesen2 recommended).
 - Palette bank swapping for visual collision feedback
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/basics/collision_demo
+```
+
+Then open `collision_demo.sfc` in your emulator (Mesen2 recommended).
 
 ## SNES Concepts
 

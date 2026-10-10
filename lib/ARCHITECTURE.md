@@ -34,7 +34,7 @@ verdict:
 
 ## The process (non-negotiable)
 
-- Measure with `devtools/benchrom` (frame-count brackets, empty-loop
+- Measure with `testing/fixtures/benchrom` (frame-count brackets, empty-loop
   calibration) BEFORE and AFTER. Same harness both sides.
 - Migration passes at **≤ +10 %** on the hot paths. Exceptions must be
   argued in absolute cycles on the real per-frame callers and recorded

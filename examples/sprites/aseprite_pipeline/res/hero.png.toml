@@ -1,0 +1,11 @@
+# import settings of hero.png: the sheet of 16x16 blocks, one 32x48 metasprite
+# per frame (the shape the Aseprite export lists its frames in), priority 2.
+# The build converts it with opensnes-sprite before compiling; res/hero.inc
+# and res/hero_meta.inc are generated from it.
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
+metasprite = [32, 48]
+priority = 2

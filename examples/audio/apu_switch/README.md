@@ -36,7 +36,7 @@ ROM mode: LoROM (project default).
 
 ## Validation
 
-Functional probe (`tools/luna-test/probes/apu_switch.py`): boot state,
+luna manifest (`testing/manifests/apu_switch.toml`): boot state,
 non-silent drums, and the B-press swap asserted on `current_song` via
 WRAM. Audio parity of each program vs its source example verified by
 capture (drums RMS/onsets; cello 174.6 Hz, vibrato ±1.1 %, LFO 5 Hz —

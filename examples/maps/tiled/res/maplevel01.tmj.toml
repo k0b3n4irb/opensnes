@@ -1,0 +1,4 @@
+tool = "opensnes-level"
+
+[convert]
+tileset = "tileslevel1.map"

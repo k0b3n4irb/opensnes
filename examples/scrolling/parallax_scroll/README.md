@@ -108,7 +108,7 @@ the zones -- each zone is a strict horizontal band.
 | File | Purpose |
 |------|---------|
 | `main.c` | HDMA table setup, per-frame scroll updates |
-| `data.asm` | Background tiles, tilemap, and palette data |
+| `res/back.png.toml` | the import settings of the picture (`opensnes-tileset`, 32 colours); the build converts and links it, `res/back.inc` declares the symbols |
 | `res/back.png` | Source background image (512 pixels wide) |
 | `Makefile` | `LIB_MODULES := console dma background sprite hdma input math` |
 

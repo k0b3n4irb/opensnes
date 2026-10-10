@@ -36,30 +36,23 @@
 
 /** @name BG0 asset pointers (defined in data.asm via .incbin)
  * @{ */
-extern u8 t0[], t0_end[];    /**< BG0 tile data (2bpp) */
-extern u8 p0[];              /**< BG0 palette (4 colors, 8 bytes) */
-extern u8 bgm0[], bgm0_end[];/**< BG0 tilemap */
+#include "res/bg0.inc"
+#include "res/bg1.inc"
+#include "res/bg2.inc"
+#include "res/bg3.inc"
+/* generated: bgN_tiles[], bgN_pal[], bgN_map[] (each with _end) and a BgAsset bgN */
 /** @} */
 
 /** @name BG1 asset pointers (defined in data.asm via .incbin)
  * @{ */
-extern u8 t1[], t1_end[];    /**< BG1 tile data (2bpp) */
-extern u8 p1[];              /**< BG1 palette */
-extern u8 bgm1[], bgm1_end[];/**< BG1 tilemap */
 /** @} */
 
 /** @name BG2 asset pointers (defined in data.asm via .incbin)
  * @{ */
-extern u8 t2[], t2_end[];    /**< BG2 tile data (2bpp) */
-extern u8 p2[];              /**< BG2 palette */
-extern u8 bgm2[], bgm2_end[];/**< BG2 tilemap */
 /** @} */
 
 /** @name BG3 asset pointers (defined in data.asm via .incbin)
  * @{ */
-extern u8 t3[], t3_end[];    /**< BG3 tile data (2bpp) */
-extern u8 p3[];              /**< BG3 palette */
-extern u8 bgm3[], bgm3_end[];/**< BG3 tilemap */
 /** @} */
 
 /** @brief Horizontal scroll position for BG1 (fastest layer, 3px per tick) */
@@ -87,23 +80,23 @@ int main(void) {
     /* Load 4 tilesets to VRAM at separate addresses.
      * Mode 0 palette banking: each BG has its own 4-color palette bank.
      * BG0=bank 0, BG1=bank 1, BG2=bank 2, BG3=bank 3 */
-    bgInitTileSet(0, t0, p0, 0, t0_end - t0, 8, BG_4COLORS0, VRAM_BG0_TILES);
-    bgInitTileSet(1, t1, p1, 0, t1_end - t1, 8, BG_4COLORS0, VRAM_BG1_TILES);
-    bgInitTileSet(2, t2, p2, 0, t2_end - t2, 8, BG_4COLORS0, VRAM_BG2_TILES);
-    bgInitTileSet(3, t3, p3, 0, t3_end - t3, 16, BG_4COLORS0, VRAM_BG3_TILES);
+    bgInitTileSet(0, bg0_tiles, bg0_pal, 0, bg0_tiles_end - bg0_tiles, 8, BG_4COLORS0, VRAM_BG0_TILES);
+    bgInitTileSet(1, bg1_tiles, bg1_pal, 0, bg1_tiles_end - bg1_tiles, 8, BG_4COLORS0, VRAM_BG1_TILES);
+    bgInitTileSet(2, bg2_tiles, bg2_pal, 0, bg2_tiles_end - bg2_tiles, 8, BG_4COLORS0, VRAM_BG2_TILES);
+    bgInitTileSet(3, bg3_tiles, bg3_pal, 0, bg3_tiles_end - bg3_tiles, 16, BG_4COLORS0, VRAM_BG3_TILES);
 
     /* Load 4 tilemaps */
     WaitForVBlank();
-    dmaCopyVram(bgm0, VRAM_BG0_MAP, bgm0_end - bgm0);
+    dmaCopyVram(bg0_map, VRAM_BG0_MAP, bg0_map_end - bg0_map);
     bgSetMapPtr(0, VRAM_BG0_MAP, SC_32x32);
 
-    dmaCopyVram(bgm1, VRAM_BG1_MAP, bgm1_end - bgm1);
+    dmaCopyVram(bg1_map, VRAM_BG1_MAP, bg1_map_end - bg1_map);
     bgSetMapPtr(1, VRAM_BG1_MAP, SC_32x32);
 
-    dmaCopyVram(bgm2, VRAM_BG2_MAP, bgm2_end - bgm2);
+    dmaCopyVram(bg2_map, VRAM_BG2_MAP, bg2_map_end - bg2_map);
     bgSetMapPtr(2, VRAM_BG2_MAP, SC_32x32);
 
-    dmaCopyVram(bgm3, VRAM_BG3_MAP, bgm3_end - bgm3);
+    dmaCopyVram(bg3_map, VRAM_BG3_MAP, bg3_map_end - bg3_map);
     bgSetMapPtr(3, VRAM_BG3_MAP, SC_32x32);
 
     /* Mode 0: 4 BGs — enable all on main screen */
