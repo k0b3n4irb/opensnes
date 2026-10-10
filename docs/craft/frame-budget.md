@@ -112,6 +112,20 @@ designing *for* 30 fps buys you double the CPU and DMA per update. Decide your
 target framerate up front and budget to it, rather than discovering it in the
 explosion that fills the screen.
 
+A lag frame is also **never shown half done**. When the main loop has not
+reached `WaitForVBlank()` by the time VBlank arrives, the NMI handler does
+none of its work for that frame: the sprite buffer is not sent to OAM, the
+tilemap buffer is not uploaded, the scroll set with `bgSetScroll()` is not
+written to the PPU, the pads are not read and the callback set with
+`nmiSet()` is not called; only `frame_count` advances. The screen keeps
+the previous frame, whole, until the frame being computed is finished. So
+a 30 Hz game does not need a "logic frame, display frame" alternation:
+compute the whole tick straight through, call `WaitForVBlank()` once at
+its end, and a heavy tick simply spills into the next frame (the layout a
+real project settled on, issue #166). What this does not cover is anything
+written to the PPU directly, outside those buffers: a register poked in
+the middle of a long computation is visible at once.
+
 ## The one rule
 
 Space is measured with `make budget`; time is measured in frames. For both,
