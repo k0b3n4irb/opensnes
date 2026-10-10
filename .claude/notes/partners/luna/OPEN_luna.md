@@ -52,3 +52,15 @@ shifts +2, 0, 0, -2, -2, 0…, max delta 0.15 %, MATCH; `speech_synth` -12
 then -16 eight times, 0.77 %, MATCH. Not in a version yet (no 1.37.0
 without the owner's word): the row closes at the pin that carries it,
 when `testing.md` can quote the new final line.
+
+Closed at the pin of v1.37.0 the same evening: `echo` reads "max delta
+0.15 %, per-window shift, max 2 samples (searched ±64): MATCH" with the
+pinned binary, and `testing.md` describes the new line. The whole suite is
+green on v1.37.0 with NO reference moved — neither the cycle rows of the
+library bench (`dma` 17,903, `vramc` 16,243, `vramq` 10,732, the same to
+the cycle, and PVSnesLib's too, measured again), nor the NMI budget, nor
+the audio hashes, nor a Super FX picture: the DMA duration fix does not
+reach what our oracles measure (no burst of ours starts from a 6-cycle
+access with a count that is not a multiple of three, and none with an HDMA
+channel enabled in the measured windows). Said to luna.
+
