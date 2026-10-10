@@ -10,6 +10,19 @@
 #    the tile module's asm encoder of 2026-09-29 made the init faster):
 #    294 iterations for 294 displayed frames, zero slip.
 #
+#    Since 2026-10-10 the three checkpoints stop on a MOMENT of the
+#    program, not on a frame: the Nth arrival on WaitForVBlank, which the
+#    main loop calls once per iteration and the boot never (`at_symbol`,
+#    luna v1.37.0). `swarm_frame` is then N by construction, and the
+#    positions are those of iteration N whatever the length of the boot —
+#    which had moved these values by a frame three times in two days, each
+#    time the compiler made the init faster. The 60 fps claim is the last
+#    block: at PPU frame 300 the counter is within the boot's few frames of
+#    300. The positions are one step behind those the frame-indexed
+#    version asserted: a frame boundary fell in the MIDDLE of an iteration
+#    (positions already moved, counter not yet counted), so it read step
+#    N + 1 beside counter N. Here both belong to iteration N.
+#
 # 2. "each bounces independently, reversing at the edges." A frozen-velocity
 #    ROM still renders a moving cloud. So each leg pins sprite 0's velocity
 #    bytes across a real reversal: +2/+2 at frame 60, -2/-2 at frame 160
@@ -27,37 +40,43 @@ rom = "../../examples/sprites/sprite_swarm/sprite_swarm.sfc"
 frames = 300
 
 [[checkpoint]]                 # outbound: both velocities positive
-at_frame = 60
+at_symbol = "WaitForVBlank"
+hit = 55
 [checkpoint.values]
-swarm_frame  = { eq = 55, width = 2 }        # 60 - 6 boot frames
-"bx.main"           = { eq = 116, width = 1 }
-"by.main"           = { eq = 124, width = 1 }
+swarm_frame  = { eq = 55, width = 2 }        # the 55th iteration
+"bx.main"           = { eq = 114, width = 1 }
+"by.main"           = { eq = 122, width = 1 }
 "bvx.main"          = { eq = 2, width = 1 }
 "bvy.main"          = { eq = 2, width = 1 }
-oamMemory    = { eq = 116, width = 1 }       # oamMemory[0] == bx[0]
-"oamMemory+1"    = { eq = 124, width = 1 }       # oamMemory[1] == by[0]
+oamMemory    = { eq = 114, width = 1 }       # oamMemory[0] == bx[0]
+"oamMemory+1"    = { eq = 122, width = 1 }       # oamMemory[1] == by[0]
 
 [[checkpoint]]                 # after both edge bounces: both negative
-at_frame = 160
+at_symbol = "WaitForVBlank"
+hit = 155
 [checkpoint.values]
 swarm_frame  = { eq = 155, width = 2 }
-"bx.main"           = { eq = 180, width = 1 }
-"by.main"           = { eq = 92,  width = 1 }
+"bx.main"           = { eq = 182, width = 1 }
+"by.main"           = { eq = 94,  width = 1 }
 "bvx.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at XMAX
 "bvy.main"          = { eq = 0xFE, width = 1 }      # -2: reversed at YMAX
-oamMemory    = { eq = 180, width = 1 }
-"oamMemory+1"    = { eq = 92,  width = 1 }
+oamMemory    = { eq = 182, width = 1 }
+"oamMemory+1"    = { eq = 94,  width = 1 }
 
 [[checkpoint]]                 # X has bounced back off XMIN, Y still inbound
-at_frame = 300
+at_symbol = "WaitForVBlank"
+hit = 295
 [checkpoint.values]
-swarm_frame  = { eq = 295, width = 2 }       # 300 - 6: no frame was ever dropped
-"bx.main"           = { eq = 116, width = 1 }
-"by.main"           = { eq = 196, width = 1 }
+swarm_frame  = { eq = 295, width = 2 }
+"bx.main"           = { eq = 114, width = 1 }
+"by.main"           = { eq = 198, width = 1 }
 "bvx.main"          = { eq = 2, width = 1 }
 "bvy.main"          = { eq = 0xFE, width = 1 }
-oamMemory    = { eq = 116, width = 1 }
-"oamMemory+1"    = { eq = 196, width = 1 }
+oamMemory    = { eq = 114, width = 1 }
+"oamMemory+1"    = { eq = 198, width = 1 }
+
+[asserts.values]               # at PPU frame 300: no frame was ever dropped
+swarm_frame = { ge = 290, le = 299, width = 2 }   # 300 less the boot's frames (4 to 8 so far)
 
 [asserts.oam]                  # the whole flock really reaches the PPU
 visible = 32

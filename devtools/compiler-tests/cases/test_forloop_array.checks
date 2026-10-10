@@ -1,3 +1,5 @@
+# Since the evening of 2026-10-10: a store to a slot nothing reads afterwards is removed across branches (see peep_flow); the case pins the store.
+env QBE_NO_PEEP_FLOW=1
 # entries[i].field = v in a loop, 48-byte elements: the index is scaled
 # inline (i*48 = ((i<<1) + i) << 4), each field adds its offset to the
 # scaled index, and each address, stored to a slot, is reloaded 2 bytes

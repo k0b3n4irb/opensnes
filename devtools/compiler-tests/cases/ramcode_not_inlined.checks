@@ -1,0 +1,6 @@
+# the RAM function keeps its body, in its section, and is called
+raw present \nwait_in_ram\.ramcode_not_inlined:
+in launch: present jsl wait_in_ram
+# the ordinary helper went into the RAM function
+raw absent \ntwice\.
+in ram_caller: absent jsl

@@ -127,17 +127,17 @@ compilers.
 | `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,780 | -19.5 % |
 | `pad` | held, pressed, released of pad 0, ten times | 11,429 | 10,213 | -10.6 % |
 | `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,539 | 27,839 | -29.6 % |
-| `oamset` | `oamSet` on 32 sprites | 81,070 | 66,394 | -18.1 % |
+| `oamset` | `oamSet` on 32 sprites | 81,070 | 66,393 | -18.1 % |
 | `oamxy` | `oamSetXY` on 32 sprites | 45,047 | 43,911 | -2.5 % |
-| `oamsize` | the size of 32 sprites | 48,746 | 30,333 | -37.8 % |
+| `oamsize` | the size of 32 sprites | 48,746 | 30,331 | -37.8 % |
 | `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,894 | 17,903 | +0.1 % |
-| `text` | 20 characters printed and shown | 84,676 | 61,446 | -27.4 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 136,760 | -19.5 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 57,315 | -55.7 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,790 | -75.4 % |
+| `text` | 20 characters printed and shown | 84,676 | 59,684 | -29.5 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 134,968 | -20.5 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 54,681 | -57.7 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,788 | -75.4 % |
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,243 | -6.6 % |
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,400 | 10,732 | -38.3 % |
-| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,703 | 36,358 | -73.4 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,703 | 36,360 | -73.4 % |
 
 OpenSNES costs no more than PVSnesLib on **13 of the 14 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
 <!-- libbench:end -->

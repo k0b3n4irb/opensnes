@@ -1,3 +1,5 @@
+# Since the evening of 2026-10-10: a store to a slot nothing reads afterwards is removed across branches (see peep_flow); the case pins the stores of the phi moves.
+env QBE_NO_PEEP_FLOW=1
 # Since 2026-10-10 a phi and the value that feeds it share a slot when they
 # can (see phi_share): the copies this case pins are the ones made when
 # they cannot, so it is compiled with the sharing off.
