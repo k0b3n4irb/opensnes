@@ -53,6 +53,16 @@ palette then holds the eight banks, 128 colours at 4 bpp); `--palette FILE`
 imposes an authored `.pal` so indices never drift when the picture changes.
 `--palette-entry N` offsets the bank numbers for a layer that shares CGRAM.
 
+**Colour 0 of a bank is never drawn.** On a background a tile pixel of 0 is
+transparent, whatever the palette holds at that index
+([SNESdev wiki, Palettes](https://snes.nesdev.org/wiki/Palettes): "a tile
+pixel of 0 is always transparent"): what shows there is the layer behind,
+or the backdrop. A picture that comes from a machine without that rule (an
+Amiga bitmap, say) and uses index 0 as its black will have holes; a cell
+that must be opaque black needs another index set to black. Asked by the
+first game built on the SDK, for a status bar that had to hide what scrolls
+under it.
+
 The hardware limits are refused, not masked: a tilemap addresses 1024 tiles
 (the 10-bit field), a Mode 7 map 256 (one byte per tile).
 
