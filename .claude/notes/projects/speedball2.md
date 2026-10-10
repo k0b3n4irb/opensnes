@@ -148,3 +148,11 @@ not heard in ours): the game keeps 30 ticks a second, and its criterion is
 "no four-frame tick and at least 29 ticks a second". So the frame budget
 question of points 1 and 2 above is settled; what remains for the SDK is
 the cost of a decision burst (`decide.c`).
+
+2026-10-10, late: goals are ported (the game's `7fd9094`). Its play script
+now holds a goal and a full kick-off, a phase where few players decide:
+**74.86 M over 340 ticks**, not comparable with the 103.47 M above. The
+rule for measuring a step on the game from now on: build BOTH compilers on
+the game's sources of the day and compare those two figures; never compare
+with a figure of the day before. Bank $00: 1,894 bytes free, the rest in
+bank $01 without the game having to think about it.
