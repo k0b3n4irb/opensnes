@@ -29,6 +29,49 @@ g.expect_outputs("convert bg.png: the glue in asset.h's naming (.inc with DECLAR
                  copy=["bg.png"], outputs=["bg.inc", "bg_data.as"])
 
 
+
+def column_major():
+    """--column-major: <stem>.cmap holds the entries of <stem>.map column after
+    column — entry (c, r) at byte (c * height + r) * 2 — on a 16x8 map, so that
+    a width taken for a height shows; --offset is in both files."""
+    def run():
+        W, H = 16, 8
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            proc = g.run(["convert", "-q", "--colors", "16", "--offset", "3", "--column-major", "wide.png"], work, copy=["wide.png"])
+            if g.failure(proc):
+                return [g.failure(proc)]
+            rows = (work / "wide.map").read_bytes()
+            cols = (work / "wide.cmap").read_bytes()
+            inc = (work / "wide.inc").read_text()
+            asm = (work / "wide_data.as").read_text()
+        errs = []
+        if len(cols) != W * H * 2:
+            errs.append(f"wide.cmap is {len(cols)} bytes, {W * H * 2} expected")
+        at = lambda blob, k: blob[k * 2:k * 2 + 2]            # noqa: E731
+        bad = [(c, r) for c in range(W) for r in range(H) if at(cols, c * H + r) != at(rows, r * W + c)]
+        if bad:
+            errs.append(f"{len(bad)} entries differ from the .map, first at column {bad[0][0]} row {bad[0][1]}")
+        if len({at(rows, k) for k in range(W * H)}) < 20:
+            errs.append("the fixture's map is too uniform to prove an order")
+        if min(struct.unpack_from("<H", rows, k * 2)[0] & 0x3FF for k in range(W * H)) < 3:
+            errs.append("--offset 3 is not in the entries")
+        for needle, where, text in (("extern const u8 wide_cols[], wide_cols_end[];", "wide.inc", inc),
+                                    ("(c * 8 + r) * 2", "wide.inc", inc),
+                                    ('ASSET_SECTION "wide_cols"', "wide_data.as", asm),
+                                    ('.incbin "wide.cmap"', "wide_data.as", asm)):
+            if needle not in text:
+                errs.append(f"{where} lacks {needle!r}")
+        return errs
+    return run
+
+
+g.check("convert wide.png --column-major: the .cmap is the .map by columns, declared as wide_cols", "transposition checked independently", column_major())
+g.expect_refused("convert --column-major --mode 7 (one byte per entry)", ["convert", "--mode", "7", "--bpp", "8", "--column-major", "bg.png"],
+                 copy=["bg.png"], needles=["--column-major with Mode 7"])
+g.expect_refused("convert --column-major --pages (not row after row)", ["convert", "--colors", "16", "--pages", "--column-major", "bg.png"],
+                 copy=["bg.png"], needles=["--column-major with --pages"])
+
 def _read_pixels(path: Path):
     pal, rows = [], []
     for line in path.read_text(encoding="utf-8").splitlines():
