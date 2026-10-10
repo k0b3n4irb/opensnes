@@ -99,3 +99,15 @@ Suite green on v1.38.0 with no reference moved. Also in it, to use next:
 `luna profile --until-pc SYMBOL --hit N` (a measuring window counted in
 loop turns), which is how the bench should be clocked.
 
+**2026-10-10, observation for luna (said by message): a per-window shift
+equal to the search limit.** `audio/echo` before and after the faster
+sample upload: at the default `--max-shift 64` the verdict is "max delta
+0.56 %, per-window shift, max 64 samples (searched ±64): MATCH". With
+`--max-shift 1200` every window is at -532 or -534, max delta 0.08 %: the
+sound starts ONE FRAME earlier. So a one-frame shift did not stay a DIFF
+at 64 on this sound (sustained, echoing): the best fit inside the window
+was good enough. What we would use: a mark on the final line when the
+largest shift equals the limit ("at the search limit — widen
+--max-shift"), since that is the case where the printed number is not the
+real one.
+
