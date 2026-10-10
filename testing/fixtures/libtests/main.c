@@ -188,7 +188,13 @@ u16 r_audio_load513; /* audioLoadSample(1, 513 bytes, 513, 0): the last index by
 u16 r_audio_load512; /* 512 bytes: the last index byte is $FF, the value the end mark
                       * usually has — the driver then marks the end with $7F
                       * (2026-10-10) -> AUDIO_OK (0) */
-u16 r_audio_free;   /* audioGetFreeMemory() -> 0xC000-0x0B00-9 = 0xB4F7 */
+u16 r_audio_load770; /* 770 patterned bytes: 256 three-byte exchanges (the count's low byte
+                      * is 0) and a two-byte tail; their content is asserted in ARAM by
+                      * testing/manifests/lib_audio_stream.toml */
+u16 r_audio_load10;  /* 10 bytes: three exchanges and a one-byte tail */
+static u8 FAR pat_brr[770];   /* FAR: the plain RAM band of this ROM is nearly full */
+u16 r_audio_free;   /* audioGetFreeMemory() with no echo configured -> 0xFFC0-0x0B00-9 = 0xF4B7 */
+u16 r_audio_free_echo; /* after audioSetEcho(): the area ends at $C000 -> 0xC000-0x0B00-9 = 0xB4F7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
 u16 r_audio_voice;  /* audioPlaySampleEx(...) -> voice 0 (round-robin)  */
 
@@ -1209,6 +1215,18 @@ int main(void) {
      * (round-robin starts there). Probe asserts the ARAM bytes, the
      * directory entry, and the playing voice's DSP state. */
     r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
+    {
+        /* The stream itself (three bytes an exchange since 2026-10-10): a
+         * pattern no byte of which is 0, loaded right after the beep, at
+         * $0B09. The loads below overwrite its first 513 bytes only; the
+         * manifest reads the rest, and the byte after its end. */
+        u16 k;
+        for (k = 0; k < 770; k++) pat_brr[k] = (u8)((k * 7 + 3) | 1);
+        r_audio_load770 = audioLoadSample(1, pat_brr, 770, 0);
+        audioUnloadSample(1);
+        r_audio_load10 = audioLoadSample(1, pat_brr + 760, 10, 0);   /* $0B09-$0B12 */
+        audioUnloadSample(1);
+    }
     r_audio_load513 = audioLoadSample(1, big_brr, 513, 0);
     audioUnloadSample(1);              /* give the 513 bytes back: the memory vectors below count them */
     r_audio_load512 = audioLoadSample(1, big_brr, 512, 0);
@@ -1225,6 +1243,7 @@ int main(void) {
     /* phase 3: hall on voice 0's beep + live envelope readback. The
      * echo values are arbitrary-but-distinct probe vectors. */
     audioSetEcho(3, 40, 20, 20);
+    r_audio_free_echo = audioGetFreeMemory();
     {
         static const s8 fir[8] = { 96, 0, 0, 0, 0, 0, 0, 0 };
         audioSetEchoFilter(fir);

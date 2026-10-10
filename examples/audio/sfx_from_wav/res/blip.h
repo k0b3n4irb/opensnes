@@ -8,6 +8,7 @@ extern u8 blip_brr[], blip_brr_end[];   /* the .incbin in assets_gen.asm (or you
 #define blip_brr_size 684   /* bytes: 76 BRR blocks of 16 samples */
 #define blip_brr_loop 0   /* byte offset of the loop point; 0 with no loop */
 #define blip_brr_loops 0   /* 1 = the sample loops */
+#define blip_tuning 4096   /* x4096: multiply the playback pitch by this / 4096 (4096 = as encoded) */
 #define blip_rate 11025   /* Hz of the source; the DSP plays at 32000 */
 
 #endif

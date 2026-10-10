@@ -42,6 +42,7 @@
 .DEFINE ZP_LOAD_L   $09     ; start address of the LAST completed LOAD
 .DEFINE ZP_LOAD_H   $0A     ;  (DIR_SET builds the directory entry from it)
 .DEFINE ZP_IDX      $0B     ; LOAD: expected stream index (no CMP A,X on SPC700)
+.DEFINE ZP_TAIL     $0C     ; LOAD: bytes in the last, partial exchange (0-2)
 
 .DEFINE DRIVER_VERSION 1
 
@@ -341,23 +342,32 @@ cmd_envx:
     jmp !ack
 
 ;------------------------------------------------------------------------------
-; $0F LOAD_SIZE — p1 = byte count of the NEXT LOAD transfer
+; $0F LOAD_SIZE — for the NEXT LOAD transfer: p1 = number of full
+; three-byte exchanges, p0 = bytes in the last partial one (0, 1 or 2)
 ;------------------------------------------------------------------------------
 cmd_load_size:
     mov a, ZP_P1L
     mov ZP_SIZE_L, a
     mov a, ZP_P1H
     mov ZP_SIZE_H, a
+    mov a, ZP_P0
+    mov ZP_TAIL, a
     jmp !ack
 
 ;------------------------------------------------------------------------------
-; $0C LOAD — p1 = ARAM destination. Acks the command FIRST, then enters
-; the sized block-receive loop (IPL-shaped): for each byte i, the CPU
-; puts data on $F5 and the index low byte on $F4; the driver stores and
-; echoes the index. Both sides count ZP_SIZE bytes, so the end needs no
-; in-band marker. Epilogue: a held three-step handshake, see load_done.
-; APU_CHECK_RESET is NOT polled inside the
-; transfer (documented: no hot-swap mid-load).
+; $0C LOAD — p1 = ARAM destination. Acks the command FIRST, then receives
+; the stream THREE BYTES AN EXCHANGE: the CPU puts three data bytes on
+; $F5, $F6, $F7 and then the exchange's index (low byte) on $F4; the driver
+; stores the three and echoes the index. LOAD_SIZE gave the number of full
+; exchanges (p1) and how many bytes a last, partial one carries (p0: 0, 1
+; or 2); both sides count, so the end needs no in-band marker.
+; Epilogue: a held three-step handshake, see load_done.
+; APU_CHECK_RESET is NOT polled inside the transfer (documented: no
+; hot-swap mid-load).
+;
+; Until 2026-10-10 this was one byte an exchange, about 60 cycles of this
+; loop a byte (1,766 master cycles a byte on examples/audio/soundboard).
+; Now about 22 cycles a byte here.
 ;------------------------------------------------------------------------------
 cmd_load:
     mov a, ZP_P1L
@@ -372,28 +382,64 @@ cmd_load:
     mov $F4, a
 
     mov a, #$00
-    mov ZP_IDX, a       ; expected stream index (low byte)
+    mov ZP_IDX, a       ; expected exchange index (low byte)
     mov y, #$00         ; store offset relative to the ZP pointer
-load_byte:
+    ; The count of full exchanges, N, as two nested counters: X runs the
+    ; low byte down, ZP_SIZE_H the passes. A low byte of 0 is 256 turns of
+    ; X, so the passes are N >> 8, plus one when the low byte is not 0.
     mov a, ZP_SIZE_L
     or a, ZP_SIZE_H
-    beq load_done
+    beq load_tail       ; no full exchange at all
+    mov x, ZP_SIZE_L
+    beq load_next
+    inc ZP_SIZE_H
+load_next:
 -   mov a, $F4          ; wait for the CPU to present the expected index
     cmp a, ZP_IDX
     bne -
-    mov a, $F5          ; data byte
+    mov a, $F5
     mov [ZP_DST_L]+y, a
-    mov a, ZP_IDX
-    mov $F4, a          ; echo the index = byte acknowledged
-    inc ZP_IDX
     inc y
     bne +
     inc ZP_DST_H        ; next 256-byte page
-+   mov a, ZP_SIZE_L    ; 16-bit decrement of the remaining count
-    bne ++
++   mov a, $F6
+    mov [ZP_DST_L]+y, a
+    inc y
+    bne +
+    inc ZP_DST_H
++   mov a, $F7
+    mov [ZP_DST_L]+y, a
+    inc y
+    bne +
+    inc ZP_DST_H
++   mov a, ZP_IDX
+    mov $F4, a          ; echo the index = exchange acknowledged
+    inc ZP_IDX
+    dec x
+    bne load_next
     dec ZP_SIZE_H
-++  dec ZP_SIZE_L
-    jmp !load_byte
+    bne load_next
+
+load_tail:
+    ; the last, partial exchange: ZP_TAIL bytes (0: there is none)
+    mov a, ZP_TAIL
+    beq load_done
+-   mov a, $F4
+    cmp a, ZP_IDX
+    bne -
+    mov a, $F5
+    mov [ZP_DST_L]+y, a
+    mov a, ZP_TAIL
+    cmp a, #$02
+    bne +
+    inc y
+    bne ++
+    inc ZP_DST_H
+++  mov a, $F6
+    mov [ZP_DST_L]+y, a
++   mov a, ZP_IDX
+    mov $F4, a
+    inc ZP_IDX
 
 load_done:
     ; Epilogue: a three-step handshake in which every value one side waits

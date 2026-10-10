@@ -86,7 +86,11 @@ CASES = [
                                  # depends on the phase of the CPU's polling loop (the end mark is held)
     ("r_audio_load512", 2, 0),   # last index byte $FF: the end mark is $7F
     ("r_audio_load",  2, 0),
-    ("r_audio_free",  2, 0xB4F7),
+    ("r_audio_load770", 2, 0),
+    ("r_audio_load10",  2, 0),
+    # the sample area reaches $FFC0 while no echo is configured, $C000 after
+    ("r_audio_free",  2, 0xF4B7),
+    ("r_audio_free_echo", 2, 0xB4F7),
     ("r_audio_addr",  2, 0x0B00),
     ("r_audio_voice", 2, 0),
     # phase 3: the DSP->CPU read path — voice 0's envelope is live

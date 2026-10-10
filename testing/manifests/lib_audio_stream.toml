@@ -1,0 +1,27 @@
+# The sample upload stream, byte for byte (three bytes an exchange since
+# 2026-10-10: lib/source/audio_stream.asm on the CPU, cmd_load in the driver).
+#
+# The library test ROM loads 770 patterned bytes at $0B09, right after its
+# 9-byte beep: 256 full exchanges — the case where the low byte of the
+# driver's count is 0 — and a two-byte tail. Three more loads then land on
+# the same address: 10 bytes of the pattern's end (three exchanges and a
+# one-byte tail), 513 and 512 zero bytes. What is left of the 770 is read
+# here: the bytes around the third page crossing ($0D00), the last full
+# exchange and the tail, and the byte after the end, which no exchange may
+# have written.
+rom = "../fixtures/libtests/libtest.sfc"
+frames = 200
+
+[asserts.values]
+r_audio_load770 = { eq = 0, width = 2 }
+r_audio_load10  = { eq = 0, width = 2 }
+r_done = { eq = 0xBEEF, width = 2 }
+
+[asserts.blocks]
+# offset 513 of the sample, $0D0A: the first byte the zero loads left
+after_zero_loads = { space = "aram", offset = "0D0A", hex = "0b11191f272d353b434951575f656d73" }
+# offsets 754-769, $0DFB-$0E0A: across the page at $0E00, the last full
+# exchange (765-767) and the two-byte tail (768, 769)
+last_exchange_and_tail = { space = "aram", offset = "0DFB", hex = "a1a9afb7bdc5cbd3d9e1e7eff5fd030b" }
+# $0E0B: one past the end
+one_past_the_end = { space = "aram", offset = "0E0B", hex = "00" }

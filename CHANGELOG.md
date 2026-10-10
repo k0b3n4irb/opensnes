@@ -39,6 +39,20 @@ All notable changes to OpenSNES are documented in this file.
   written `{ x, y, tile, attr, seen, 0, 12, 32 }`, as the documentation
   shows it, stopped compiling when `order` arrived.
 
+- feat(lib): **the sample area of the sound CPU reaches $FFC0 while no echo
+  is configured**: 62,656 bytes instead of 46,336. The 16 KB above $C000
+  were kept for the echo ring whether the game used an echo or not; they
+  are the game's until its first `audioSetEcho()`, which now answers
+  `AUDIO_ERR_NO_MEMORY` if samples already reach into the ring.
+  `audioGetFreeMemory()` reports the limit that applies. The DSP writes
+  nothing there while echo writes are off (FLG bit 5), which the driver
+  sets at start.
+- feat(tools): `opensnes-sample` writes the tuning factor of a resampled
+  loop in the generated header (`<name>_tuning`, x4096) and in `--json`
+  (`"tuning_x4096"`); its page says what it does of a loop that is not a
+  multiple of 16 samples (repeats it under 2,000 samples, resamples it
+  above).
+
 ### Performance
 - perf(compiler): **the scaled index of an array access is computed once,
   not in front of every access.** In a loop over parallel arrays
@@ -98,6 +112,24 @@ All notable changes to OpenSNES are documented in this file.
   -52.3 % in size (`depot` -57.4 % -> -60.0 %). `QBE_NO_PEEP_FLOW=1`,
   `QBE_SLOT_ORDER=def` and `CC_INLINE_LEAF_MAX=16` restore each (compiler
   checks `peep_flow`, `auto_inline`).
+
+- perf(lib): **`audioLoadSample()` is 2.7 times faster.** The stream to
+  the sound CPU goes three bytes an exchange instead of one, with the CPU
+  side in assembly (`audio_stream.asm`) and the driver's receive loop
+  rewritten: 650 master cycles a byte instead of 1,766 on
+  `examples/audio/soundboard` (18 KB of samples: 31.7 M to 11.7 M).
+- perf(lib): **an audio command no longer waits for its own
+  acknowledgement.** Volume, pitch, envelope, key on and key off return as
+  soon as they are sent; the next command waits, before writing, for the
+  one before, and `audioPlaySampleOn()` sends only what changes: a voice
+  replayed at the same volume and pitch is one command instead of four.
+  Measured on `examples/audio/soundboard`, five notes on fresh voices: the
+  time spent sending goes from 60,946 to 41,894 master cycles; a voice in
+  vibrato, one command a frame, is the case that gains most. **A
+  return code
+  changes meaning**: `AUDIO_ERR_TIMEOUT` from one of these functions now
+  reports the command BEFORE it. Loading a sample, `audioSetEcho()` and
+  the functions that read a state back are synchronous as before.
 
 ### Fixed
 - fix(compiler): **`(u8)v` after a loop that shifts a signed char right

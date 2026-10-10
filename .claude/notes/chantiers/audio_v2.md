@@ -214,3 +214,29 @@ owner listening where audible).
 - **NMI reentrancy**: audio API is main-thread-only (like dma queue
   rules). Stated in the header.
 - **snesmod coexistence**: unchanged rule — one engine per ROM.
+
+## 2026-10-10: three costs of the module, asked by a game built on the SDK
+
+- **Sample upload**: one byte an exchange, the CPU side in compiled C, the driver's
+  loop about 60 SPC700 cycles a byte. Now three bytes an exchange (data on
+  $2141-$2143, the exchange's index on $2140, echoed by the driver),
+  LOAD_SIZE carrying the number of full exchanges and the size of a last
+  partial one; CPU side in `audio_stream.asm`. 650 master cycles a byte on
+  soundboard (1,766 before, SlowROM). Tightening the driver's count from
+  83 to 67 cycles an exchange gained 7 master cycles a byte only: what is
+  after the echo overlaps with the CPU preparing the next exchange. The
+  critical path is detect + three stores + echo on the driver, and detect
+  + three reads and four port writes on the CPU. The bytes are asserted
+  in ARAM by `testing/manifests/lib_audio_stream.toml` (a page crossing,
+  the last exchange, a two-byte tail, one past the end).
+- **A command**: nearly all of its time was waiting for the
+  ack. The ack is now awaited by the NEXT command (`cmd_post` /
+  `cmd_wait`); commands that read a result and the whole load stay
+  synchronous (`cmd_send`). And `audioPlaySampleOn` sends only what the
+  voice does not already hold (`VoiceMirror.sent`, `vol_lr`): the default
+  envelope was re-sent at every note.
+- **Sample area**: `$0B00-$C000` whether or not the game uses an echo.
+  It is `$0B00-$FFC0` until the first `audioSetEcho()`.
+
+Not done: a note in one command (39 bits for 30 an exchange: two commands
+and a new opcode). To look at if a game is still at its limit.

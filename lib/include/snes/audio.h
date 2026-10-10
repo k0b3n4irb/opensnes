@@ -164,7 +164,7 @@
 typedef struct {
     u16 spcAddress;     /**< Address in SPC RAM */
     u16 size;           /**< Size in bytes */
-    u16 loopPoint;      /**< Loop offset (0 = no loop) */
+    u16 loopPoint;      /**< Loop offset in bytes, as given to audioLoadSample() */
     u8  flags;          /**< Status flags */
     u8  reserved;       /**< Padding */
 } AudioSample;
@@ -207,6 +207,15 @@ typedef struct {
  *         code of the command they sent (AUDIO_ERR_INVALID_ID for a voice
  *         out of range) instead of swallowing it. Existing callers that
  *         ignore the value are unaffected.
+ *
+ * **Return codes of the functions that send a command** (volume, pitch,
+ * envelope, key on / off, echo taps): a command is sent and the function
+ * returns at once; the driver's acknowledgement is awaited by the NEXT
+ * command, before it writes. So AUDIO_OK means "sent", and
+ * AUDIO_ERR_TIMEOUT from one of these functions means the command BEFORE it
+ * was never acknowledged (the one just asked for was then not sent).
+ * Loading a sample, audioSetEcho() and the functions that read a state back
+ * wait for their own acknowledgement, as before.
  */
 u8 audioInit(void);
 
@@ -238,7 +247,12 @@ u8 audioIsReady(void);
  * @param id Sample slot (0-63)
  * @param brrData Pointer to BRR sample data
  * @param size Size in bytes (must be multiple of 9)
- * @param loopPoint Loop offset in bytes, or 0 for no loop
+ * @param loopPoint Loop offset in bytes from the start of the sample (a
+ *                  multiple of 9, one BRR block). It is where a sample that
+ *                  loops comes back to — 0 for a loop from the very start.
+ *                  WHETHER the sample loops is the loop flag of its last
+ *                  BRR block (opensnes-sample sets it), not this value: a
+ *                  one-shot sample ignores it.
  * @return AUDIO_OK on success, or error code
  *
  * @code
@@ -271,7 +285,17 @@ u8 audioGetSampleInfo(u8 id, AudioSample *info);
 
 /**
  * @brief Get available SPC700 RAM for samples
- * @return Free bytes available
+ *
+ * The sample area starts at $0B00 of the sound CPU's 64 KB (below it: the
+ * driver and the sample directory) and ends
+ * - at **$FFC0, 62,656 bytes**, as long as the game has configured no
+ *   echo;
+ * - at **$C000, 46,336 bytes**, from the first audioSetEcho(): the echo
+ *   ring lives above. audioSetEcho() answers AUDIO_ERR_NO_MEMORY when
+ *   samples already loaded reach into it, so a game that wants an echo
+ *   calls audioSetEcho() before loading, or keeps its samples under 46 KB.
+ *
+ * @return Free bytes available, under the limit that applies now
  */
 u16 audioGetFreeMemory(void);
 
@@ -439,8 +463,9 @@ u8 audioSetGain(u8 voice, u8 mode);
  * @brief Configure echo parameters
  *
  * @param delay Echo delay 1-7 (delay_ms = value * 16; values above 7
- *              are clamped — the ARAM map reserves 14 KB max for the
- *              echo ring, keeping 46 KB for samples)
+ *              are clamped — the echo ring takes up to 14 KB from $C000,
+ *              and the first call brings the sample area down from 62 KB
+ *              to 46 KB: see audioGetFreeMemory())
  * @param feedback Feedback amount (-128 to 127)
  * @param volumeL Left echo volume (-128 to 127)
  * @param volumeR Right echo volume (-128 to 127)
@@ -448,6 +473,10 @@ u8 audioSetGain(u8 voice, u8 mode);
  * Reconfiguration clears the whole echo ring before re-enabling echo
  * writes (~9 ms per delay unit) — call at scene setup, not per frame.
  * Call this BEFORE audioEnableEcho().
+ *
+ * @return AUDIO_OK; AUDIO_ERR_NO_MEMORY when samples already loaded reach
+ *         past $C000, where the ring goes (nothing is changed then);
+ *         AUDIO_ERR_TIMEOUT if the driver does not answer
  */
 u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR);
 
