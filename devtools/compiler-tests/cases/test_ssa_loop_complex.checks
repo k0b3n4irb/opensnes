@@ -1,3 +1,6 @@
+# Since 2026-10-10 a temporary that no call crosses lives in the direct page
+# even in a function that calls (see dp_temps); the case pins the loop's stores to stack slots.
+env QBE_NO_DP_TEMPS=1
 # The hdma_wave-shaped function: many conditional updates of u8 globals,
 # then a result that combines them (offsets[state_b] + state_d * 3) or
 # stays 0. Checked: the u8 globals are re-read from memory where they may

@@ -523,3 +523,35 @@ static inline (4k+3). Audio: unchanged with the final rule. WRAM: 11
 examples re-captured (their inlined functions use other temporaries;
 pictures identical on 86).
 
+### Step 6 of #166: direct-page temps in functions that call (2026-10-10)
+
+Delivered (`color_slots` in `emit.c`): a temp no call crosses gets a slot
+in `tcc__lf` (16 words, first fit), the others the stack. Rules in
+`.claude/rules/compiler.md`.
+
+- sdkbench: -50.8 % -> -52.9 % cycles, -37.3 % -> -38.4 % size, stack no
+  deeper on 19 of 20; libbench 13 rows of 13 (`oamxy`, `dma` ahead again,
+  `text` -6.8 %); static table unchanged (1270: its functions are leaves);
+- hunt: programs 217401-237400, expressions 89001-93000, clean;
+- four free-running examples one frame early (boot shorter): pictures and
+  three manifests re-captured after `diff_corpus --tolerance 2` and
+  `frame_sequence.py` said "same pictures, offset -1".
+
+Tried and not kept: a size limit on what is absorbed into a caller that
+keeps calling (16, 40, 80, 160 IR instructions): no measurable difference
+either way. Inlining a non-leaf into a non-leaf is worth its bytes, not
+time.
+
+Found on the way, not a compiler defect: `audioLoadSample` raced on its
+end mark (`silent_defects_log.md`, 2026-10-10). The test had passed by
+phase since 2026-10-03; the faster loop exposed it. Lesson for the
+protocol side of the library: a value one side waits for must be HELD by
+the other until answered; and a wait counted in loop turns is a wait whose
+length the compiler decides.
+
+What is left after this step in a large function: stack-relative
+instructions for values that do cross a call, and the 16 words taken
+first-come. Candidates: choose which temps get the 16
+words by use count instead of definition order; more words (the block is
+32 bytes; the NMI page mirrors up to $A0).
+

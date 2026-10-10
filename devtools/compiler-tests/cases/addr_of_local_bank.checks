@@ -1,3 +1,6 @@
+# Since 2026-10-10 a temporary that no call crosses lives in the direct page
+# even in a function that calls (see dp_temps); the address of a local is kept in a temporary: on the stack here, so that the pair of stores is the one pinned.
+env QBE_NO_DP_TEMPS=1
 # Each alloc'd local whose address escapes gets its bank word zeroed (bank $00:
 # the stack) right after the address is stored — two locals, two pairs.
 in two_locals: present tsa\n\tclc\n\tadc\.w #\d+\n\tsta \d+,s\n\tlda\.w #0\n\tsta \d+,s

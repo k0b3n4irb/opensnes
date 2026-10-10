@@ -1,3 +1,6 @@
+# Since 2026-10-10 a temporary that no call crosses lives in the direct page
+# even in a function that calls (see dp_temps); the case pins the phi moves between stack slots.
+env QBE_NO_DP_TEMPS=1
 # Accumulators carried around a while(1) loop across calls (the
 # button_test "maxraw" pattern): each update reads its own slot (\1), the
 # new value (\2) is what the calls receive and what goes back to \1 on the

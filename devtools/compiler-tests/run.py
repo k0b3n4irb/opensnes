@@ -26,6 +26,9 @@ Run:  python3 devtools/compiler-tests/run.py        # all cases (checked + compi
     in <func>: absent  <regex>      regex absent within that function's body
     section <sym>: present <regex>   the .SECTION/.RAMSECTION line of <sym> matches
     section <sym>: absent  <regex>   ...does not match
+    env <NAME>=<VALUE>              compile this case with that variable set (a
+                                    compiler toggle: the case pins a mechanism
+                                    a later optimisation no longer reaches)
 
 `cases/negative/<name>.c` + `<name>.expect` pin C the toolchain must REFUSE
 (variadic functions, struct by value, inline asm): the compile must fail and
@@ -37,6 +40,7 @@ Exit 0 = all pass, 1 = any failure / compile error.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -90,6 +94,18 @@ def run_negative(only: str | None) -> tuple[int, int]:
     return passed, failed
 
 
+def case_env(src: Path) -> dict:
+    """The environment of a case: os.environ plus its `env NAME=VALUE` lines."""
+    env = dict(os.environ)
+    cf = src.with_suffix(".checks")
+    if cf.is_file():
+        for line in cf.read_text().splitlines():
+            m = re.match(r"\s*env\s+(\w+)=(\S*)\s*$", line)
+            if m:
+                env[m.group(1)] = m.group(2)
+    return env
+
+
 def compile_asm(src: Path) -> str:
     with tempfile.NamedTemporaryFile(suffix=".asm", delete=False) as tf:
         out = Path(tf.name)
@@ -97,7 +113,8 @@ def compile_asm(src: Path) -> str:
         # SDK include path: fixtures may use <snes/*.h> (e.g. test_metasprite).
         proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
                                str(src), "-o", str(out)],
-                              capture_output=True, text=True, timeout=60)
+                              capture_output=True, text=True, timeout=60,
+                              env=case_env(src))
         if not out.is_file() or out.stat().st_size == 0:
             raise RuntimeError(f"compile failed: {(proc.stderr or proc.stdout).strip()[:300]}")
         return out.read_text()
@@ -208,7 +225,7 @@ def run(only: str | None) -> int:
         errs = []
         for raw in cf.read_text().splitlines():
             line = raw.strip()
-            if not line or line.startswith("#"):
+            if not line or line.startswith("#") or line.startswith("env "):
                 continue
             e = apply_check(asm, line, raw=raw_asm)
             if e:

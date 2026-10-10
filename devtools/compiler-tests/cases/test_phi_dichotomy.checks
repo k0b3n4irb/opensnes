@@ -1,3 +1,6 @@
+# Since 2026-10-10 a temporary that no call crosses lives in the direct page
+# even in a function that calls (see dp_temps); the case pins the phi moves between stack slots.
+env QBE_NO_DP_TEMPS=1
 # Loop-carried accumulators (phis), one layer of complexity per level. The
 # property: on the back edge, each accumulator's slot receives the value
 # computed FROM THAT SAME SLOT — the historical bug crossed them. The

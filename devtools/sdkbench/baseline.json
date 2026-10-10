@@ -8,21 +8,21 @@
       "res": 172
     },
     "sort": {
-      "cycles": 1496450,
-      "size": 313,
-      "stack": 43,
+      "cycles": 1209086,
+      "size": 285,
+      "stack": 25,
       "res": 12563
     },
     "physics": {
-      "cycles": 4671524,
-      "size": 594,
-      "stack": 54,
+      "cycles": 4054672,
+      "size": 554,
+      "stack": 30,
       "res": 12530
     },
     "collide": {
-      "cycles": 9269102,
-      "size": 618,
-      "stack": 60,
+      "cycles": 8032446,
+      "size": 581,
+      "stack": 30,
       "res": 162
     },
     "mul": {
@@ -80,15 +80,15 @@
       "res": 10608
     },
     "grid": {
-      "cycles": 2343582,
-      "size": 506,
-      "stack": 64,
+      "cycles": 2232268,
+      "size": 502,
+      "stack": 44,
       "res": 40897
     },
     "entities": {
-      "cycles": 3789456,
-      "size": 572,
-      "stack": 54,
+      "cycles": 3337800,
+      "size": 547,
+      "stack": 30,
       "res": 12530
     },
     "copy": {
@@ -98,15 +98,15 @@
       "res": 20921
     },
     "strings": {
-      "cycles": 2189506,
+      "cycles": 2105696,
       "size": 888,
-      "stack": 62,
+      "stack": 45,
       "res": 65535
     },
     "state": {
-      "cycles": 1278050,
+      "cycles": 1188948,
       "size": 337,
-      "stack": 39,
+      "stack": 29,
       "res": 24876
     },
     "place": {

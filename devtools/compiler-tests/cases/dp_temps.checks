@@ -1,0 +1,11 @@
+# nothing crosses the call: direct page only, no frame built
+in short_lived: present tcc__lf
+in short_lived: absent \d+,s\n[\s\S]*tsa
+in short_lived: absent \bsbc\b
+# one value crosses: a stack slot for it, the direct page for the rest
+in crosses: present tcc__lf
+in crosses: present jsl ext\n[\s\S]*\d+,s
+# the loop's counter and sum cross the call: they are stack slots
+in loop: present sta \d+,s
+in loop: present jsl ext
+in pushes: present pha\n[\s\S]*jsl sink

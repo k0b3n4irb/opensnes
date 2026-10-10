@@ -1,3 +1,6 @@
+# Since 2026-10-10 a temporary that no call crosses lives in the direct page
+# even in a function that calls (see dp_temps); the case pins the phi moves between stack slots in a large frame.
+env QBE_NO_DP_TEMPS=1
 # Many loop-carried accumulators in a large (100+ byte) frame, updated
 # under conditions, the pattern of the original button_test bug. On the
 # back edge, each accumulator's slot must receive the merge of ITS OWN

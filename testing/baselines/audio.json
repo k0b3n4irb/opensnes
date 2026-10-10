@@ -3,14 +3,14 @@
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "1b6242b1b364072ec2b7b1f6787b969f7fea95430fd3a3c9a892a87bbb60791e",
+      "sha256": "2e596d83fa4300bbd16a664f441cf1ed7336a8e3c1212e35edb36a305169ed52",
       "samples": 159936,
       "peak": 21264
     },
     "audio/snesmod_music": {
-      "sha256": "9cb84959f968128e1c5a402ea3f3fcbc07b8cb1db0f8aad5beac7ac590cd0a1a",
+      "sha256": "c4d28cbf236878267fd0ba8d14df9a815a020f3d9186933384d81f77f8f098a7",
       "samples": 159936,
-      "peak": 20923
+      "peak": 20924
     },
     "audio/pitch_mod": {
       "sha256": "4919d2728dba029a1575ab855952d64745ee48f62b3caa41ed3f1ea62e87490e",
@@ -23,7 +23,7 @@
       "peak": 21614
     },
     "audio/echo": {
-      "sha256": "11a6244e2e4dd74f1168217c51ae81677ab4647ea102028df9ca97ee0425d083",
+      "sha256": "7eb05f43e5cfb1a79c7b2b03b532f0e6f55ff1051ee9c1a185dfaf5baf033a82",
       "samples": 159936,
       "peak": 10922
     },
@@ -33,17 +33,17 @@
       "peak": 22867
     },
     "audio/snesmod_music_large": {
-      "sha256": "b29b7ee0109a037270f8b5c175a3d9e2ec24d851d436f0ce42b21abbe80bd517",
+      "sha256": "aca408fa7444162ba1d48ed95bd6b26282161c44a0852e92032006a511d35351",
       "samples": 159936,
-      "peak": 17080
+      "peak": 17197
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "9e35a8e3e5b106d0013ee7ba21a6459055a8fadd412b181c219fcb0f9f2e699f",
+      "sha256": "5a25113f261c2aef664b18cd05cd02c4fdc551e365b3d30812c14f06a71db963",
       "samples": 159945,
       "peak": 20922
     },
     "audio/soundboard": {
-      "sha256": "b88afa8bbf50633137955453bde79989765d796b0361706ef96fee56d6b59e7a",
+      "sha256": "b3a334388fa6d0770e5c6bfd0c15bc39420156797f2c400e00b10aa921d90028",
       "samples": 159936,
       "peak": 9323
     },
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "ad827b0f23db64c02c4e464930b2d464988b698e15d1f2831e21f3b33aec85a6",
+      "sha256": "fa820e1b918906315760e22a19795b7d42bbd889770fd77d62b9318a1d2f46a4",
       "samples": 159936,
       "peak": 12192
     }
