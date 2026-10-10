@@ -460,3 +460,37 @@ the twentieth workload: 3,665 master cycles a distance.
 design points answered there (visible[] by sprite; an out-of-range entry
 hides the slot; one routine only if the identity path costs nothing).
 
+### State at `a66a4f53` (2026-10-10, CI green on every leg)
+
+What per-entity code compiles to at this point, read on the output:
+
+- the IR has `extuh id / mul 2` once per block (the front end reloads `id`
+  from its alloc in each block; after mem2reg and gvn, `sink` puts the
+  cheap computation back next to each use). After the peephole that is
+  `lda id / asl a / [sta slot] / tax` per block: 3 or 4 instructions, not
+  the 9 of before. Keeping it in a slot would save one instruction a block;
+  keeping it in X ACROSS blocks would save all of them, and X is also
+  wanted for the other indices. `lda.w sym,y` exists for
+  plain RAM (not `long,y`): a loop-invariant index in Y is the option to
+  size;
+- `sta slot` of the scaled index in each block, never read again;
+- `jmp` to a block that is only a `jmp`;
+- a value reloaded right after the conditional branch that tested it, when
+  the fall-through label has no other way in.
+
+Candidates for the next step, to be chosen by what they do to `place`
+and `dist`: (a) a forward dataflow over the function's text for "X holds
+slot S" across labels (join = equal, loops to a fixed point), the natural
+extension of the peephole; (b) Y for an index that does not change in the
+function; (c) inlining a single-call-site static.
+
+### Owed to others
+
+- #164 (DiscoC, external contributor): answered on 2026-10-10. Said in the
+  owner's name, without a date: the layout of bank $70 will be written down
+  and posted on that issue. Also named as ours: a helper that copies a GSU
+  program to Game Pak RAM, and a way to pin a GSU binary at a fixed ROM
+  address. After #165 and #166.
+- #167: `order` in `OamWorldBatch`; design answered there; after #166's
+  next step.
+
