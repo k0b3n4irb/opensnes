@@ -555,3 +555,35 @@ first-come. Candidates: choose which temps get the 16
 words by use count instead of definition order; more words (the block is
 32 bytes; the NMI page mirrors up to $A0).
 
+### Step 7 of #166: the scaled index computed once (2026-10-10)
+
+Read in a loop over a dozen parallel arrays: `lda i / asl a / tax` in
+front of EVERY access, twelve times per iteration. Cause, in the IR after gcm: `sink()` copies the
+address of a load or store next to it (wanted: the emitter folds it into
+the addressing mode) and, since our fix of 2026-10-08 made its recursion
+real, the address's operands too — so each access had its own `mul i, 2`.
+Upstream's recursion acts on a local copy and never reaches the emitted
+instruction; we had repaired a bug into a pessimisation. `sinkref` no
+longer recurses (`QBE_SINK_DEEP=1` restores it).
+
+- sdkbench: -52.9 % -> -53.9 % cycles, -38.4 % -> -39.8 % size; physics,
+  collide, sort, entities, dist move, nothing regresses; static table
+  unchanged (1270);
+- corpus: 86/86 MATCH at offset 0; nine WRAM streams re-captured (direct
+  page temps renumbered);
+- the work was done in a separate worktree (`~/workspace/opensnes-s8`,
+  submodules as worktrees of the main tree's), the compiler binary given
+  meanwhile in a separate directory: the first chantier run under
+  `exchanges.md`.
+
+The hunt on a new range found a defect that was not this change's
+(`silent_defects_log.md`, 2026-10-10: a `(u8)` cast dropped after a signed
+shift in a loop, inherited from upstream `copy.c`); fixed in the same lot.
+
+The benchmark gains a workload, `depot` (eighteen agents, bursts of
+sixteen decisions), which gains -5.0 % from this step.
+
+Next candidates read in the same listing: `lda.b S / tax` before a load is
+`ldx.b S` (2 cycles each); a phi copy `lda S / sta T` at each loop turn;
+`bne L1 / jmp L2 / L1: jmp L3` (a branch to a jump).
+

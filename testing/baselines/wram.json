@@ -64,8 +64,8 @@
     "rom_sha256": "019e10c85bd3c2863660540232cd1192577c0cae13ff433b5eea59a5cc857993"
   },
   "backgrounds_mode4": {
-    "stream": "a38e76d7a17c4fc5cae24d11c6a221af11ed5a8a32d79d99eea7a46af343aa95",
-    "rom_sha256": "f96bef52a1f65c08fca158e05482f183a95b15372a9d26aabadab1655b504568"
+    "stream": "870c8a72e53bf70b342f7a4393bc5043ab0baa66941775dcea3457532b59f5a7",
+    "rom_sha256": "c29c0e6c0bff6214d61eaa63a77efdb15700315b2a82d65245c5a607e9aeaea9"
   },
   "backgrounds_mode5_hires": {
     "stream": "d63e44924e63adfdd1bdcb8951e713bc4149c5b5b51a4691041656238b2c563a",
@@ -92,12 +92,12 @@
     "rom_sha256": "3941f1951ef94ced71e757fc8713249fd51daf1c4b3b0493bb6491cbd3726d59"
   },
   "basics_panel_hud": {
-    "stream": "f77d21978e3701e89ac4c5ddf24cebc44074722db30fba9f3bbc8886ac2037a4",
-    "rom_sha256": "d64f6eafd9f959374fd02c5c36b3bebeb16a42b5fef0bb15a7fbe99adbb13b01"
+    "stream": "190c8b600971045ad5f755fd7a3fcd591fc679a95a8a89835120805a524b8f1e",
+    "rom_sha256": "350ff759ea6f244266205d9b398b0abe7fdf484a46b8bfd3fd238c4282b80ba9"
   },
   "basics_scene_stack": {
-    "stream": "e8105891856e8dcf17bda7993ba84cbc57d628ff121dc9a72f5b221cb2ca3e7b",
-    "rom_sha256": "f4f1dea882112075be9f550af72b099b6dbbb12b7edfa39bc53c2b202bb379e4"
+    "stream": "5dc6499434dc3eade57609b38fce4e9d4796a3418df2bec035b89759937df10a",
+    "rom_sha256": "fea335205c8f6b51d23bad7940446ff1b599ef4aa001639ef5ed0fd64d076407"
   },
   "basics_timer": {
     "stream": "8c7d949ce8e6a73c1a98a798ed2745ee3a4ca40e93d53db0a08128abbf458d0e",
@@ -136,24 +136,24 @@
     "rom_sha256": "f5286761698278a991f5a1c074ea0759f7ae51c180cb6434ee77a2f69c8cd10a"
   },
   "color_direct_color": {
-    "stream": "f84c96473ac850096c0f3133a94827ae461c6095e22f9ca6f398d43d39ea70f6",
-    "rom_sha256": "379b1f4ec70baf0ddccb0bc20da5e1584b5dbd817e144b205735bc5ee1dbdf44"
+    "stream": "42bfc4d82a8e9d47d7cd27e2602007e3e4500ac22e01ca419a9e4e3c5815fd0d",
+    "rom_sha256": "6b64356149791b5c42f38bb113d4a2170f22da838871eef0a9c5b8464659b29a"
   },
   "color_hicolor_1792": {
     "stream": "d1efb70714393c07ea61dbbe63322b5572dc3ed525ad957f0bce44a8578f1da3",
     "rom_sha256": "5f7ccf55740b5f1e1222c058f29fe3768deaad629c2653cadc356c263edb1c23"
   },
   "color_palette_cycle": {
-    "stream": "f0fdee311cb9c57fd08c14f5b9dabcba6e1b010150320ba92f1f84ccada06791",
-    "rom_sha256": "475869aa54cbe05bd0ded4b244ea3efa3ea57b426d5da9f9a2d9c5b1f4a165e6"
+    "stream": "1bde77b3bccff84e597e4c6ebb3adf73cdb56ddc7138b5f6bc37e965fb2cb812",
+    "rom_sha256": "1801976b5c5045cb6fd628c42731a3cf4be49879f92a0ac7bcca8dadeed7f92b"
   },
   "color_pseudo_hires": {
     "stream": "674d0624abd7bd4728f772e48d6761607df18240256360ddeceee5ef700204fe",
     "rom_sha256": "200d165681300482e95cdba895cacd777469a03207413e9c6a944820ec0b59c6"
   },
   "color_shadow_tint": {
-    "stream": "e9cb7a2577dbd1875bd68dd33faa17b56338dd55475dcc9c537f99a0d3cc4847",
-    "rom_sha256": "f946e4553cdae1ee1bb62475e7af3348938715b56ba0fa80bdc26da014f61763"
+    "stream": "ce33dbc17d7e1e0e394a93aab587bcf1e96658677f26dbb694204eedba0f952b",
+    "rom_sha256": "7da931e324f0151b6f2a9bd16433259eff80dd4aa48ae64a0c88cd3dba7bdfd3"
   },
   "color_transparency": {
     "stream": "a34fa15a4dae5b206cef6f2af5d7cc7551b6c060c70762f7c3e17042c3a92e5b",
@@ -172,8 +172,8 @@
     "rom_sha256": "003a68e4afa9ee0c66baa6396017aa00fb842bc00222098d6b22b1fc05ff1487"
   },
   "games_mapandobjects": {
-    "stream": "52cc301de738daaf3dcccada1078c9c7c8f6e12bf8478b2a7a3a0991021012c6",
-    "rom_sha256": "af5b0b9423e75bf9f08c8276861e4a13ef8586b7cc12d7cea0a5560d712eaebd"
+    "stream": "4c8f46017e0ecb2d6b9837b74e238f9728deea2cd2c50ba5ae7df0c29e589726",
+    "rom_sha256": "25bbfa5147d7feac1313852c836d614dadfb25492a5c4a1255d9e053b8dbaac4"
   },
   "games_mode7_flying": {
     "stream": "3cb539551116404082d52a6f456869fb65b548c125d197bb4446b1ed53e30d27",
@@ -184,16 +184,16 @@
     "rom_sha256": "9684720ec8c791814c9ca5e8da959731195b5d27d1e06c58d409a5e6bd8e944f"
   },
   "games_rpg": {
-    "stream": "c7f1206bb32cb1f25f02dc128881b3ae66706eeaae009911760bfd9682fdab08",
-    "rom_sha256": "b243ceb6d2547a37da761029144c97e8ff2775e4161875969c948c7b05275ac1"
+    "stream": "c4e6b4c5e4570b1b47c484e0bb3ac93293dfcc169fbda357e28c464358f5136a",
+    "rom_sha256": "b5a6c9daab245cce7bc6c3f955db77a81dde796c5669779d5a55e3bcf5120b44"
   },
   "games_shmup_1942": {
-    "stream": "c39fe9b1bd7b03d587e5d99e6d5e021128748e3b554ddc295ba18f67cb2ba62e",
-    "rom_sha256": "07b1b7e4c9866753ad6d4f607eedcbc5b8118b47d5690ff672c7f6e6992736c2"
+    "stream": "3735a3d495e98bb5a229274c74733cfe43ea0ac243041d5d7b4fa4d69d562d23",
+    "rom_sha256": "4193e4e5c6ac1a56033e892ac99ba04f4e558a08f16e9df6b53cc4cca49b50b8"
   },
   "games_tetris": {
     "stream": "5b28132c801ff52e103fdb6753fd5bf814bee8c330676a70d51b9d36122b47c4",
-    "rom_sha256": "a62302958e8ebea40cc37c20df240b43f6eb3976335f3aaad0a119a9978862b0"
+    "rom_sha256": "ae990a4abf3954ea989586720c9d4d1daddf789e7779f656498086974e922632"
   },
   "hdma_gradient_colors": {
     "stream": "8bfa7bc0b86a58b7ff4ed4203bc18f18346338c02dd95cf9de3779a18e4d9fba",

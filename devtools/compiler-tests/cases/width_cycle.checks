@@ -1,0 +1,2 @@
+# the mask of (u8)v is the instruction before the xor
+in shift_then_mask: present and\.w #\$00FF\n\s*eor

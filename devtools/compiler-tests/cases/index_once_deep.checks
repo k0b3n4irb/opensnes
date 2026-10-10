@@ -1,0 +1,2 @@
+env QBE_SINK_DEEP=1
+in move_all: present asl a[\s\S]*asl a[\s\S]*asl a

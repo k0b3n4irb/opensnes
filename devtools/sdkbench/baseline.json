@@ -8,21 +8,21 @@
       "res": 172
     },
     "sort": {
-      "cycles": 1209086,
-      "size": 285,
+      "cycles": 1193084,
+      "size": 281,
       "stack": 25,
       "res": 12563
     },
     "physics": {
-      "cycles": 4054672,
-      "size": 554,
-      "stack": 30,
+      "cycles": 3428908,
+      "size": 483,
+      "stack": 26,
       "res": 12530
     },
     "collide": {
-      "cycles": 8032446,
-      "size": 581,
-      "stack": 30,
+      "cycles": 7441850,
+      "size": 520,
+      "stack": 26,
       "res": 162
     },
     "mul": {
@@ -86,9 +86,9 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 3337800,
-      "size": 547,
-      "stack": 30,
+      "cycles": 3328752,
+      "size": 520,
+      "stack": 26,
       "res": 12530
     },
     "copy": {
@@ -116,10 +116,16 @@
       "res": 30752
     },
     "dist": {
-      "cycles": 9455574,
-      "size": 607,
-      "stack": 23,
+      "cycles": 9239564,
+      "size": 599,
+      "stack": 24,
       "res": 29121
+    },
+    "depot": {
+      "cycles": 17128540,
+      "size": 3880,
+      "stack": 65,
+      "res": 54047
     }
   }
 }
