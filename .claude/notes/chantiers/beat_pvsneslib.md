@@ -688,3 +688,18 @@ for ldx and inc (no stack-relative form).
   manifest now asserts a range for `ball_x` instead of a value. The other
   frame-indexed manifests are the debt (`at_symbol`, `input_at`).
 
+
+The worktree recipe that works (step 9, 2026-10-10): plain clones.
+
+    git worktree add ../opensnes-<name> -b wip/<name> develop
+    for m in cproc qbe wla-dx; do rmdir ../opensnes-<name>/compiler/$m
+      git clone -q compiler/$m ../opensnes-<name>/compiler/$m
+      git -C ../opensnes-<name>/compiler/$m checkout -q --detach $(git -C compiler/$m rev-parse HEAD)
+    done
+    cp -a testing/bin/. ../opensnes-<name>/testing/bin/
+
+Landing: `git -C compiler/qbe fetch ../opensnes-<name>/compiler/qbe <sha>`,
+checkout that sha here, `git merge --ff-only wip/<name>` (rebase the branch
+first if `develop` took note commits meanwhile), push the fork, `git
+ls-remote` to see it, remove the worktree, rebuild. Nothing in the main
+tree's git was disturbed during the chantier.
