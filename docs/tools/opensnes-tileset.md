@@ -23,8 +23,27 @@ folds mirrored blocks, the map carrying the flip bits.
 |---|---|
 | `town.pic` | the unique tiles, `--bpp` deep (2, 4 or 8); `--lz` compresses; `--pack` writes packed pixels (`--mode 7` implies it, as `.pc7`) |
 | `town.map` | one 16-bit entry per block: tile number (+ `--offset`), palette bank, `--priority` bit, flips; `--pages` lays it out in 32x32 pages; Modes 5 and 6 halve the width; Mode 7 writes one byte per tile (`.mp7`) |
+| `town.cmap` | only with `--column-major`: the entries of `town.map` column after column (see below) |
 | `town.pal` | the palette (`--colors` entries, 256 by default); `--no-palette` skips it |
 | `town.inc`, `town_data.as` | the glue, in the lib's `asset.h` naming: `town.inc` declares `town_tiles`, `town_map`, `town_pal` (each with `_end`) and a ready `BgAsset town` (`DECLARE_BG_ASSET`, when the map is 32x32, 64x32, 32x64 or 64x64) so `bgLoad(0, &town, slot, tiles_vram, map_vram)` is the whole load; `town_data.as` is the `.incbin` fragment the build gathers into `assets_gen.asm` |
+
+**A map larger than the screen, scrolled in both axes.** Such a game keeps
+a window of the map in VRAM and feeds it a row and a column at a time. A row
+of `town.map` is one contiguous block; a column is not — its entries are a
+whole row apart. `--column-major` (`column-major = true` in the settings
+file) also writes `town.cmap`, the same entries column after column, each
+column from top to bottom, and declares `town_cols[]` / `town_cols_end[]`
+in `town.inc`: the entry of column `c`, row `r` is at byte
+`(c * height + r) * 2`, `height` being the map's height in entries. A
+column is then one block, pushed to VRAM with a vertical increment
+(`vramQueuePush(town_cols + (c * height + r) * 2, addr, n * 2,
+VRAM_QUEUE_COLUMN)`), straight from ROM: no copy in RAM, nothing built at
+boot. It costs the map a second time in ROM, in the asset banks. Refused
+where there is no column order to write: Mode 7 (one byte per entry),
+`--pages`, and a picture of exactly 64x32, 32x64 or 64x64 entries, which
+is written in 32x32 screens as the PPU reads it. Asked by the first game
+that scrolled a 80x144 map on the SDK: it was building that table in RAM
+at boot, 23 KB and 38 frames.
 
 **Palette banks.** At 4 bpp a map entry names one of eight 16-colour banks,
 so every opaque pixel of a tile must sit in one bank of the palette. A tile

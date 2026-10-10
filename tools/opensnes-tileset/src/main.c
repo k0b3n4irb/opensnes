@@ -49,6 +49,43 @@ static int bpp_to_colors(int bpp) { return bpp == 2 ? 4 : bpp == 8 ? 256 : bpp =
 
 /* --------------------------------------------------------------- convert */
 
+/* --column-major: <stem>.cmap, the entries of <stem>.map column after column
+ * (each column top to bottom). A map scrolled in both axes is fed a row and a
+ * column at a time; a row of the .map is one block, a column of it is not —
+ * a game built the column order in RAM at boot (23 KB and 38 frames, on the
+ * first game to need it) for a table known at build time. Read back from the
+ * file map_save wrote, so that --offset and --priority are in it. */
+static int write_column_major(cli_ctx *ctx, const char *in, const char *outbase, int cols, int rows)
+{
+    char path[1100];
+    long n = (long)cols * rows * 2;
+    unsigned char *src = malloc((size_t)n), *dst = malloc((size_t)n);
+    if (!src || !dst) { free(src); free(dst); cli_error(ctx, in, "out of memory"); return CLI_IO; }
+    snprintf(path, sizeof path, "%s.map", outbase);
+    FILE *f = fopen(path, "rb");
+    if (!f || fread(src, 1, (size_t)n, f) != (size_t)n) {
+        if (f) fclose(f);
+        free(src); free(dst);
+        cli_error(ctx, in, "cannot read back %s (%d x %d entries expected)", path, cols, rows);
+        return CLI_IO;
+    }
+    fclose(f);
+    for (int c = 0; c < cols; c++)
+        for (int r = 0; r < rows; r++)
+            memcpy(dst + ((long)c * rows + r) * 2, src + ((long)r * cols + c) * 2, 2);
+    snprintf(path, sizeof path, "%s.cmap", outbase);
+    f = fopen(path, "wb");
+    if (!f || fwrite(dst, 1, (size_t)n, f) != (size_t)n) {
+        if (f) fclose(f);
+        free(src); free(dst);
+        cli_error(ctx, in, "cannot write %s", path);
+        return CLI_IO;
+    }
+    fclose(f);
+    free(src); free(dst);
+    return CLI_OK;
+}
+
 static const cli_opt convert_opts[] = {
     { "size", 0, CLI_INT, "N", "the block in pixels: 8 (a BG tile) or 16", "8" },
     { "bpp", 0, CLI_INT, "N", "bits per pixel: 2 (4 colours, Mode 0), 4 (16), 8 (256, Modes 3/4/7)", "4" },
@@ -67,6 +104,7 @@ static const cli_opt convert_opts[] = {
     { "pack", 0, CLI_FLAG, NULL, "packed-pixel tiles (what --mode 7 implies)", NULL },
     { "round", 0, CLI_FLAG, NULL, "round the palette (to a maximum of 63 per channel)", NULL },
     { "no-palette", 0, CLI_FLAG, NULL, "do not write the .pal", NULL },
+    { "column-major", 0, CLI_FLAG, NULL, "also write <stem>.cmap, the same map column after column (<name>_cols): a column of a scrolling map is then one block", NULL },
     CLI_OPT_OUT,
     CLI_OPT_SAVE,
 };
@@ -94,6 +132,9 @@ static int convert_one(cli_ctx *ctx, const char *in)
     if (mode != 1 && mode != 5 && mode != 6 && mode != 7) { cli_error(ctx, in, "--mode %d: 1 (Modes 0 to 4), 5, 6 or 7", mode); return CLI_REFUSED; }
     if (entry < 0 || entry > 7) { cli_error(ctx, in, "--palette-entry %d: 0 to 7", entry); return CLI_REFUSED; }
     if (offset < 0 || offset > 2047) { cli_error(ctx, in, "--offset %d: 0 to 2047", offset); return CLI_REFUSED; }
+    int colmajor = cli_has(ctx, "column-major");
+    if (colmajor && pack) { cli_error(ctx, in, "--column-major with Mode 7: a Mode 7 map has one byte per entry and is not written by columns"); return CLI_REFUSED; }
+    if (colmajor && pages) { cli_error(ctx, in, "--column-major with --pages: a map in 32x32 pages is not row after row, there is no column order of it"); return CLI_REFUSED; }
     if (rearrange && (ncolors == 128 || ncolors == 256)) {
         cli_warn(ctx, in, "--rearrange means nothing at %d bpp (one palette); ignored", bpp);
         rearrange = 0;
@@ -117,7 +158,17 @@ static int convert_one(cli_ctx *ctx, const char *in)
     if (rearrange) palette_rearrange_snes(tiles, palette_snes, nbtiles, ncolors, true);
     unsigned short *map = map_convertsnes(tiles, &nbtiles, size, size, blksx, blksy, ncolors, entry, mode, noreduce, blank, pages, flip, true);
     int map_blksx = (mode == 5 || mode == 6) ? blksx >> 1 : blksx;
+    if (colmajor && mode != 5 && mode != 6
+        && ((blksx == 64 && (blksy == 32 || blksy == 64)) || (blksx == 32 && blksy == 64))) {
+        cli_error(ctx, in, "--column-major on a %dx%d map: a map of exactly 64x32, 32x64 or 64x64 entries is written in 32x32 screens, as the PPU reads it, not row after row; it is already a tilemap, upload it whole", blksx, blksy);
+        free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
+        return CLI_REFUSED;
+    }
     map_save(outbase, map, mode, map_blksx, blksy, offset, prio, true);
+    if (colmajor && write_column_major(ctx, in, outbase, map_blksx, blksy) != CLI_OK) {
+        free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
+        return CLI_IO;
+    }
     if (pack) tiles_savepacked(outbase, tiles, nbtiles, blank, true);
     else tiles_save(outbase, tiles, nbtiles, ncolors, blank, lz, true);
     int savepal = !cli_has(ctx, "no-palette");
@@ -127,7 +178,7 @@ static int convert_one(cli_ctx *ctx, const char *in)
     char ident[256], generator[64], err[160];
     cli_ident(in, ident, sizeof ident);
     snprintf(generator, sizeof generator, "%s %s", ctx->tool->name, ctx->tool->version);
-    incfile_spec spec = { generator, bpp, savepal, 1, 0, mode == 7, map_blksx, blksy, cli_has(ctx, "lz") };
+    incfile_spec spec = { generator, bpp, savepal, 1, 0, mode == 7, map_blksx, blksy, cli_has(ctx, "lz"), colmajor };
     if (incfile_write(outbase, ident, &spec, err, sizeof err) != 0) { cli_error(ctx, in, "%s", err); return CLI_IO; }
 
     if (cli_has(ctx, "save") && (rc = cli_save_settings(ctx, in)) != CLI_OK) return rc;
@@ -140,9 +191,9 @@ static int convert_one(cli_ctx *ctx, const char *in)
         cli_json_object(ctx, "picture"); cli_json_int(ctx, "width", w); cli_json_int(ctx, "height", h);
         cli_json_int(ctx, "block", size); cli_json_int(ctx, "blocks_x", blksx); cli_json_int(ctx, "blocks_y", blksy); cli_json_close(ctx);
         cli_json_array(ctx, "outputs");
-        const char *exts[] = { pack ? ".pc7" : ".pic", pack ? ".mp7" : ".map", ".inc", "_data.as", savepal ? ".pal" : NULL };
-        const char *kinds[] = { "tiles", "map", "header", "asm", "palette" };
-        for (int i = 0; i < 5; i++) {
+        const char *exts[] = { pack ? ".pc7" : ".pic", pack ? ".mp7" : ".map", ".inc", "_data.as", savepal ? ".pal" : NULL, colmajor ? ".cmap" : NULL };
+        const char *kinds[] = { "tiles", "map", "header", "asm", "palette", "map_by_columns" };
+        for (int i = 0; i < 6; i++) {
             if (!exts[i]) continue;
             char path[1100]; snprintf(path, sizeof path, "%s%s", outbase, exts[i]);
             cli_json_object(ctx, NULL); cli_json_str(ctx, "path", path); cli_json_str(ctx, "kind", kinds[i]); cli_json_close(ctx);

@@ -21,6 +21,18 @@ and for the console session of the hardware protocol
 (`docs/HARDWARE_VERIFICATION.md`). Nothing below changes with the name.
 
 ### Added
+- **`opensnes-tileset convert --column-major`** (tools; asked by the first
+  game built on the SDK): also writes `<stem>.cmap`, the entries of the map
+  column after column, and declares `<name>_cols[]` in the `.inc` — the
+  entry of column c, row r at byte `(c * height + r) * 2`. A game that
+  scrolls a map larger than the screen in both axes feeds its tilemap a
+  row and a column at a time; a row of the `.map` is one block in ROM, a
+  column was not, and that game built the column order in RAM at boot
+  (23 KB, 38 frames) for a table known at build time. `column-major =
+  true` in the asset's settings file. Refused for Mode 7, `--pages` and
+  the three sizes written in screens. Its form was agreed with that game
+  before it was written. Three golden cases, the transposition checked
+  independently on a 16x8 map.
 - **`opensnes-sprite sheet --compact`** (tools; issue #165): each distinct
   block of the sheet is written once to the `.pic` — with `--flip`, a
   block and its mirrors count as one — and `<stem>_blocks.inc` holds one

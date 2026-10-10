@@ -123,6 +123,20 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
         if (spec->has_pal) fprintf(f, "extern const u8 %s_pal[], %s_pal_end[];\n", name, name);
         if (spec->has_map) fprintf(f, "extern const u8 %s_map[], %s_map_end[];\n", name, name);
     }
+    if (spec->has_cols) {
+        char cols_path[1100];
+        snprintf(cols_path, sizeof cols_path, "%s.cmap", outbase);
+        int cols_parts = parts_of(cols_path);
+        fprintf(f, "\n/* the same %dx%d map column after column (each column top to bottom): the entry of\n"
+                   " * column c, row r is at byte (c * %d + r) * 2 of %s_cols — a column is one block */\n",
+                spec->map_blocks_x, spec->map_blocks_y, spec->map_blocks_y, name);
+        for (int i = 0; i < cols_parts; i++)
+            i == 0 ? fprintf(f, "extern const u8 %s_cols[], %s_cols_end[];\n", name, name)
+                   : fprintf(f, "extern const u8 %s_cols_%d[], %s_cols_%d_end[];\n", name, i, name, i);
+        if (cols_parts > 1)
+            fprintf(f, "/* larger than one 32 KB bank: written in parts of 32768 bytes; a column that\n"
+                       " * crosses a part boundary is in two blocks */\n");
+    }
     if (spec->has_meta)
         fprintf(f, "\n/* the metasprite table: #include \"%s_meta.inc\" once, in the file that draws it */\n", name);
     fprintf(f, "\n#endif\n");
@@ -136,6 +150,11 @@ int incfile_write(const char *outbase, const char *name, const incfile_spec *spe
     write_blob(f, name, "tiles", tiles_path);
     if (spec->has_map) write_blob(f, name, "map", map_path);
     if (spec->has_pal) write_blob(f, name, "pal", pal_path);
+    if (spec->has_cols) {
+        char cols_path[1100];
+        snprintf(cols_path, sizeof cols_path, "%s.cmap", outbase);
+        write_blob(f, name, "cols", cols_path);
+    }
     fclose(f);
     return 0;
 }

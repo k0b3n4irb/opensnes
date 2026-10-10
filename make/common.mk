@@ -755,7 +755,7 @@ clean:
 	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(ASSET_STAMPS) $(if $(ASSET_TOML),assets_gen.asm) \
-		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
+		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
 	@rm -f $(GSU_BINS) $(GSU_HEADERS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link) $(GSUSRC:.sfx=.sfx.sym)

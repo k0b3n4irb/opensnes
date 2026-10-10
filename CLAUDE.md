@@ -128,9 +128,10 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `doc_consistency.md` — Anchored doc/code claims (version macros, ROADMAP status, examples count). Run `make lint-docs` before any release commit; must consult before editing version strings or example counts.
 - `bank0_budget.md` — Bank $00 ROM: what lives there, where code goes when it is full, the retired ratchet (`BANK0_FAIL_THRESHOLD`, off by default); must consult before pinning a section to bank $00 or setting the threshold.
 - `abi_lint.md` — ASM ABI lint policy and the `; lint-asm-abi: skip-file` marker; must consult before adding a new ASM file or retrofitting for an ABI change.
-- `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → luna issue → luna ships → delete). Must consult before adding any internal validation/analysis script.
+- `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → message to luna's session → luna ships → delete). Must consult before adding any internal validation/analysis script.
 - `hardware_claims.md` — every new hardware claim in docs/ or KNOWN_LIMITATIONS.md must be verified against the Cartouche corpus (`snes_search` with opensnes-docs excluded; `contrast=true` on conflicts); unexplained hardware-shaped symptoms get a corpus query before blaming the toolchain.
 - `partners.md` — the two shoulders, luna and snes-rag: the three work jointly, and feedback to each is a duty, not an option. A gap in a partner is written down the same day in `.claude/notes/partners/<partner>/`; snes-rag is passive and only learns what we and luna report; we are the bridge between the two.
+- `exchanges.md` — direct exchanges (owner decision 2026-10-10): OpenSNES, luna and the game talk session to session and challenge one another, no GitHub issue between the three; two axes (our own work, and collaboration); the game builds on this tree's `develop`, so a compiler chantier goes in a separate worktree and a full rebuild is announced. Charter: `~/workspace/snes-tutor/protocole/ECHANGES.md`.
 
 ## Strategic Planning
 
