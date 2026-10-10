@@ -1,0 +1,4 @@
+# the index is stored because the other side of the branch reloads it into X
+in keep: present \tsta\.b tcc__lf\+(\d+)\n\ttax\n[\s\S]*\tldx\.b tcc__lf\+\1\n
+# after the branch, the slots are written again and never read: both stores go
+in keep: present \tadc\.w #2\n\tasl a\n\ttax\n\tlda\.w tab,x\n\trtl

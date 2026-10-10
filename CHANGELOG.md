@@ -74,6 +74,28 @@ All notable changes to OpenSNES are documented in this file.
   the empty loop more. `QBE_NO_PEEP_LATE=1` turns it off (compiler check
   `peep_late`).
 
+- perf(compiler): **three things about where a function keeps its values**
+  (step 10 of the work on a real game's logic):
+  - a store to a direct-page slot that nothing reads afterwards is removed
+    **across branches**. In a large function every slot is shared by
+    several values and the older rule ("nobody in the function reads this
+    slot") no longer fired: 453 instructions of 16,313 in that game's
+    logic;
+  - the sixteen direct-page words of a function go to its **costliest**
+    values (uses weighted by loop depth), not to the first ones it
+    computes;
+  - a `static` function with one call site is poured into its caller even
+    when it calls nothing and the caller still calls something else. The
+    rule that refused that case, written the same morning, had become a
+    loss, and it evicted a function called sixteen times a tick the day
+    its caller gained one cold call.
+  Same game, same method: match logic 66.95 M to 61.18 M master cycles
+  (-8.6 %), everything but the idle wait -5.5 %. Against PVSnesLib over
+  the twenty-one workloads: -58.4 % -> -60.1 % in cycles, -50.5 % ->
+  -52.3 % in size (`depot` -57.4 % -> -60.0 %). `QBE_NO_PEEP_FLOW=1`,
+  `QBE_SLOT_ORDER=def` and `CC_INLINE_LEAF_MAX=16` restore each (compiler
+  checks `peep_flow`, `auto_inline`).
+
 ### Fixed
 - fix(compiler): **`(u8)v` after a loop that shifts a signed char right
   kept the sign's high byte** (silent). `v >>= n` in a loop on an `s8`,
@@ -90,6 +112,24 @@ All notable changes to OpenSNES are documented in this file.
   A count held in a variable was right. Found by the differential test
   (three expressions in 144,000), fixed in `w65816/isel.c`; compiler check
   `shift_count_word`.
+
+- fix(compiler): **a `RAM_CODE` function could be inlined into a caller
+  in ROM** (silent). A `static` function marked `RAM_CODE` (`__ramcode`:
+  code that must run from the RAM window while a coprocessor owns the ROM)
+  with one call site was a candidate for whole-function inlining like any
+  other, and its body then ran from wherever the caller was. A function
+  with a section of its own is never copied into a caller any more. Found
+  by the Super FX library test ROM, which stopped finishing when another
+  rule stopped hiding the case; compiler check `ramcode_not_inlined`.
+- fix(examples): **tetris enabled its gradient HDMA in mid-frame**, by a
+  raw write to `$420C`, without the channel's table address and line
+  counter being set (the hardware loads them at the start of a frame
+  only). For the rest of that frame the channel wrote to CGADD / CGDATA
+  whatever those registers pointed at — a few palette entries took values
+  from the direct page, the same at every boot, on colours the screen
+  does not show. A compiler change moved what the direct page held and
+  the playfield border turned green. It now goes through `hdmaSetup()` /
+  `hdmaEnable()`, in VBlank; no other example writes `$420C` by hand.
 
 ### Changed
 - test(bench): the benchmark against PVSnesLib gains a twenty-first

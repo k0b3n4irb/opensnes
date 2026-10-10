@@ -13,14 +13,22 @@
 #     bytes $20, low 3 bits clear.
 # Measured on luna v1.30.2 (`luna state --until-frame N --input … --dump-vram`).
 rom = "../../examples/backgrounds/mode4/mode4.sfc"
-frames = 129                           # 130 until 2026-10-10: the boot is a frame shorter (direct-page temporaries), the wave one step further at a given frame
-input = "110:0x0080,112:0"        # A: vertical -> horizontal
+# Clocked by the program since 2026-10-10 (luna v1.37.0): the checkpoints
+# stop at the Nth arrival on WaitForVBlank, which the main loop calls once
+# per iteration, and the press of A is indexed by the same arrivals. The
+# wave words read at the end are then those of a known iteration, whatever
+# the length of the boot (the frame-indexed version moved twice that day).
+input_at = "WaitForVBlank"
+frames = 200                           # the horizon: where the run gives up
+input = "105:0x0080,107:0"        # A at the 105th iteration: vertical -> horizontal
 
 [[checkpoint]]                 # the reference for the delta below: the booted scene, not power-on RAM (2026-10-04)
-at_frame = 60
+at_symbol = "WaitForVBlank"
+hit = 55
 
 [[checkpoint]]
-at_frame = 100
+at_symbol = "WaitForVBlank"
+hit = 95
 [checkpoint.values]
 opt_vertical = { eq = 1, width = 1 }
 [checkpoint.delta]
@@ -29,15 +37,27 @@ wave_phase = "increased"
 bgmode = 4
 "bgs.2.v_scroll" = 0
 
+[[checkpoint]]                 # twenty iterations after the press: horizontal words, of a known iteration
+at_symbol = "WaitForVBlank"
+hit = 125
+[checkpoint.values]
+opt_vertical = { eq = 0, width = 1 }
+# The offset row of iteration 125, as the loop just built it in RAM: with
+# bit 13 set and bit 15 clear in every word, they are HORIZONTAL words.
+# (Until 2026-10-10 the same row was read from VRAM $6000 at the last
+# frame; a checkpoint cannot assert a block yet — noted for luna — and the
+# upload itself is covered by [asserts.dma] below.)
+"owords.main"   = { eq = 0x2018, width = 2 }
+"owords.main+2" = { eq = 0x2020, width = 2 }
+"owords.main+4" = { eq = 0x2020, width = 2 }
+"owords.main+6" = { eq = 0x2028, width = 2 }
+
 [asserts.values]
 opt_vertical = { eq = 0, width = 1 }
 
 [asserts.ppu]
 bgmode = 4
 "bgs.2.v_scroll" = 0
-
-[asserts.blocks]
-opt_row_h_words = { space = "vram", offset = "6000", hex = "0820082010201020" }
 
 [asserts.dma]
 unsafe_writes = 0

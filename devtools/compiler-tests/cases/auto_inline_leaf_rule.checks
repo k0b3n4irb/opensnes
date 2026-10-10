@@ -1,0 +1,7 @@
+env CC_INLINE_LEAF_MAX=16
+# a leaf of some size is not poured into a caller that still calls
+raw present \nsweep\.auto_inline_leaf_rule:
+in boot: present jsl sweep
+# into a caller that calls nothing else, it is
+raw absent \nsweep2\.
+in alone: absent jsl

@@ -807,3 +807,53 @@ checkout that sha here, `git merge --ff-only wip/<name>` (rebase the branch
 first if `develop` took note commits meanwhile), push the fork, `git
 ls-remote` to see it, remove the worktree, rebuild. Nothing in the main
 tree's git was disturbed during the chantier.
+
+### Step 10 of #166: flow-aware dead stores, cost-ordered slots, the leaf rule off (2026-10-10, night)
+
+Started from two real cases the game sent (`/tmp/speedball2_pour_opensnes_inlining_cas_reels.md`):
+a static called sixteen times a tick stopped being absorbed when its
+caller gained one cold call. Not a budget: our leaf rule of the morning.
+Measured again with the rule off, it had become a loss (game -0.7 %,
+`depot` -5.7 %), so it is off unless `CC_INLINE_LEAF_MAX` is set.
+
+That exposed three things, each caught by a different gate:
+
+1. **mode7/extbg booted two frames later** (diff_corpus): the 16 KB fill
+   poured into `main` ran 5 % slower than as a function. Read side by
+   side, the inlined loop kept one `sta.b tcc__lf+N` per iteration that
+   nothing read: in a large function the slot is shared, so "nobody reads
+   this slot" never fires. `peephole_flow` is the answer — liveness of the
+   sixteen words over the function's text — and it is the big one: 172 of
+   902 slot stores in the game's logic, -6.2 % of its cycles. Cost-ordered
+   colouring came first as a guess at the same symptom and stays (-2.0 %).
+2. **tetris's border turned green** (diff_corpus, with cost order): not
+   the compiler. The example enabled its HDMA in mid-frame by a raw write;
+   the channel ran on stale registers and wrote direct-page contents into
+   CGRAM. Bisected to `hud.c` / `hudShowMessage`, whose code read correct
+   under both orders — which was the clue: same memory, different CGRAM.
+   `luna assets-dump` (cgram.bin) and `--peek-at renderEnableGradient`
+   (frame 26, line 155) settled it. The old reference already held the
+   corruption, on entries nobody sees.
+3. **The Super FX library test ROM never finished** (manifests): a
+   `RAM_CODE static` leaf with one call site was absorbed into its ROM
+   caller. The leaf rule had hidden it; a non-leaf one could be absorbed
+   on develop already. A function with a section is never absorbed now.
+   diff_corpus does not see the fixtures: only `make tests` did.
+
+Lessons: (a) three gates, three different catches, and none redundant —
+the hunts were clean throughout (344,000 programs and expressions);
+(b) "the same pictures, the same WRAM, a different CGRAM" means a write
+that depends on WHEN, not on what; (c) a rule that helps on average can
+hide a real defect: taking it away is also a test.
+
+Two frame-indexed manifests were moved to `at_symbol` / `input_at` in the
+same lot (`movement_sprite_swarm`, `backgrounds_mode4`): they stop on the
+Nth arrival at `WaitForVBlank`. The first had been reading a state astride
+two iterations. luna lacks a block assertion in a checkpoint (the VRAM row
+of mode4 is asserted in RAM instead): to report.
+
+Still open from the game's note: a function pays its stack frame on the
+path where it does nothing, or for a call rarely taken (its cases 2 and
+3). Needs the frame opened only where it is used, or values saved around
+the cold call: the next chantier in the emitter.
+
