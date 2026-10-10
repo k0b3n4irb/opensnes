@@ -412,6 +412,15 @@ C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 # aim_target WRAM stream diverged from a clean build twice before this).
 # Coarse — any header change recompiles the example — but correct.
 LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)/lib/include/snes/*.h)
+
+# A project's C objects must rebuild when the COMPILER changes: the driver,
+# the front end or the back end. Without this an SDK update (or `git pull`
+# and `make` in the SDK) left every `.c.o` of a project as the old compiler
+# step's figures to the cycle (2026-10-10). `wildcard` so that the names
+# exist with or without `.exe`, and a missing file is no prerequisite.
+COMPILER_BINS := $(wildcard $(OPENSNES)/bin/cc65816 $(OPENSNES)/bin/cc65816.exe \
+                            $(OPENSNES)/bin/cproc-qbe $(OPENSNES)/bin/cproc-qbe.exe \
+                            $(OPENSNES)/bin/qbe $(OPENSNES)/bin/qbe.exe)
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
 GSU_HEADERS := $(patsubst %.sfx,%.sfx.h,$(GSUSRC))
@@ -590,7 +599,7 @@ CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes upgrade -q --removed-only $(1); then \
 	echo "  (the names above were removed at OpenSNES 0.49 — docs/UPGRADING.md)"; fi
 LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
-%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
+%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) $(COMPILER_BINS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \

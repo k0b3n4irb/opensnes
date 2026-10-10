@@ -19,6 +19,12 @@ All notable changes to OpenSNES are documented in this file.
   call (about 180 master cycles). `compiler/ABI.md` now says that the
   32 bytes of `tcc__lf` are scratch for a callee, which this routine uses,
   and its direct-page map is corrected against a linked `.sym`.
+- build: **a project and the library rebuild their C when the compiler
+  changes.** The C objects did not depend on `bin/cc65816`, `cproc-qbe`
+  and `qbe`: after an SDK update, `make` in a project said "nothing to be
+  done" and linked what the old compiler had produced; `make` in the SDK
+  kept the library's C functions as the old compiler had made them. Both
+  now list the three binaries as prerequisites. Found by the first game
 - build: the syntax check of a project's C no longer refuses an
   initializer that leaves out the last fields of a structure
   (`-Wno-missing-field-initializers`). C sets them to 0, and that is how a
