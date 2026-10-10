@@ -775,3 +775,18 @@ for ldx and inc (no stack-relative form).
 Session totals on the game, same 340 ticks: 75.43 M (morning) -> 68.59
 (step 7) -> 64.16 (step 8) -> 62.22 (step 9), -17.5 %.
 
+
+The worktree recipe that works (step 9, 2026-10-10): plain clones.
+
+    git worktree add ../opensnes-<name> -b wip/<name> develop
+    for m in cproc qbe wla-dx; do rmdir ../opensnes-<name>/compiler/$m
+      git clone -q compiler/$m ../opensnes-<name>/compiler/$m
+      git -C ../opensnes-<name>/compiler/$m checkout -q --detach $(git -C compiler/$m rev-parse HEAD)
+    done
+    cp -a testing/bin/. ../opensnes-<name>/testing/bin/
+
+Landing: `git -C compiler/qbe fetch ../opensnes-<name>/compiler/qbe <sha>`,
+checkout that sha here, `git merge --ff-only wip/<name>` (rebase the branch
+first if `develop` took note commits meanwhile), push the fork, `git
+ls-remote` to see it, remove the worktree, rebuild. Nothing in the main
+tree's git was disturbed during the chantier.
