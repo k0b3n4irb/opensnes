@@ -112,16 +112,17 @@ so validation is now 2 pillars:
 4. **For library changes (Class B)**: grep all example Makefiles for the changed
    module name in LIB_MODULES to enumerate the candidate set, then triage.
 5. **The validation is ours, by this protocol; nobody is waited for.** Since
-   2026-10-10 (decision D-004 of the owner's orchestration session,
-   `~/workspace/snes-tutor/registre/DECISIONS.md`; it writes down the
-   mandate the owner gave on 2026-09-22 — "je ne valide rien" — and the
-   chief-engineer mandate noted in `compiler.md`): a change that passed the
+   2026-10-10 (it writes down the mandate the owner gave on 2026-09-22 —
+   "je ne valide rien" — and the chief-engineer mandate noted in
+   `compiler.md`; recorded as D-004 in
+   `~/workspace/snes-tutor/registre/DECISIONS.md` on our recommendation): a change that passed the
    steps above is committed. Do not assume examples work because they
    compiled: the luna visual-regression pass is the visual reference, and
    the triaged subset says what to look at. Until that date this line read
    "NEVER commit without user validation", which the practice had
-   contradicted for weeks. **What does wait for a go** — the owner's, or
-   `snes-tutor`'s under a decision number — is a public or irreversible
+   contradicted for weeks. **What does wait for a go — the owner's, typed here or
+   relayed in his quoted words; nobody else's** (`snes-tutor` decides
+   nothing since D-009 of the same day) — is a public or irreversible
    act: a merge to `main`, a tag, a release, closing an issue, writing in
    someone else's repository (`exchanges.md`).
 6. Conventional Commits format in message

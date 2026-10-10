@@ -67,16 +67,19 @@ own words** is the owner's decision here, as if he had typed it in this
 session — including for a public or irreversible act (a merge to `main`,
 a tag, closing an issue, writing in someone else's repository).
 
-Relayed that way the same day (quoted in full by `snes-tutor`, decision
-D-003 of its registry): « tu reprends le main sur les validations de chaque
-projet : la régle est : toi ou moi peuvent légiférer. A terme ça ne sera
-que toi ». So `snes-tutor` may itself validate, give a go and set a rule
-common to the three projects. A decision of its own carries an identifier
-(`D-NNN`), is written with the facts it rests on in
-`~/workspace/snes-tutor/registre/DECISIONS.md`, and is contested by a new
-fact; the owner can undo it. A message of `snes-tutor` without an
-identifier is a neighbour's request. Before a public or irreversible act
-taken on such a decision, read its line in that file.
+**`snes-tutor` decides nothing.** The owner's last word of 2026-10-10 on
+it, relayed quoted in full (decision D-009 of its registry, which replaces
+two earlier ones of the same day that had given it a power to decide): «
+tu est juste un facilateur pour faire les projets ensemble, tu es un chef
+de projet, pas le chef. Tu te fis à leur expertise et facilite les échangex
+entre eux. Je passes par toi en priorité mais je m'accorde le droit de
+parler avec chacun d'entre eux selon le besoin. L'idéeal serait que ça soit
+toi qui me remonnte leurs doutes et choix de décsision. Toi tu ne décide
+rien, tu les fait juste échanger ensemble ». So: no go, no validation and
+no rule comes from `snes-tutor` itself. It makes the three projects talk,
+relies on their expertise, and carries their doubts and their choices to
+the owner. A decision is the owner's — typed here, or relayed by
+`snes-tutor` in his own quoted words.
 
 What this covers, and what it does not:
 
@@ -93,9 +96,14 @@ What this covers, and what it does not:
   quoted words or not (precedent of the same day: the luna MCP server the
   owner wanted opened "chez toi" was meant for `snes-tutor`'s session, not
   this one — the quotation was exact and the reading was wrong).
-- Our reports and questions for the owner go to `snes-tutor`, which
-  carries one point for the three projects; if the owner writes here, we
-  answer here.
+- A doubt or a choice that is not ours alone goes to `snes-tutor` in one
+  line, with our recommendation; it carries it to the owner. The owner may
+  also come and speak here: what he decides here is said to `snes-tutor`
+  in one line, for its registry.
+- More than one session may carry the name (`snes-tutor-…`): a message
+  that restricts what `snes-tutor` may do is safe to follow; one that
+  widens it is checked against the owner's quoted words and the registry
+  on disk, or asked of him.
 
 ## The game lives on this tree
 
