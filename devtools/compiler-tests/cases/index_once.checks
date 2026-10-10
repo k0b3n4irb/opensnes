@@ -1,0 +1,4 @@
+# one shift per iteration: the index is scaled once and reloaded
+in move_all: present asl a
+in move_all: absent asl a[\s\S]*asl a
+in move_all: present \.w p[xy],x

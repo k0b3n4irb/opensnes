@@ -2,6 +2,44 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [Unreleased]
+
+### Performance
+- perf(compiler): **the scaled index of an array access is computed once,
+  not in front of every access.** In a loop over parallel arrays
+  (`x[i]`, `y[i]`, `dx[i]`…), each load and each store carried its own
+  `i * 2` (`lda i / asl a / tax`), a dozen per iteration in a function
+  that moves eighteen players. The pass that moves an address next to its
+  access (where it becomes the addressing mode) also copied the address's
+  operands; it no longer does. Measured on the first game built on the
+  SDK, two builds of the same sources: its match logic goes from 75.1 M
+  to 68.3 M master cycles over the same 340 ticks (-9.1 %), and the ticks
+  that took three frames from 9 to 4. On the benchmark against PVSnesLib:
+  -52.9 % -> -53.9 % in cycles and -38.4 % -> -39.8 % in size over the
+  same twenty workloads (`physics` -59.6 % -> -65.8 %, `collide`
+  -41.9 % -> -46.2 %), nothing slower. `QBE_SINK_DEEP=1` restores the
+  copies (compiler check `index_once`).
+
+### Fixed
+- fix(compiler): **`(u8)v` after a loop that shifts a signed char right
+  kept the sign's high byte** (silent). `v >>= n` in a loop on an `s8`,
+  then `(u8)v` used in a 16-bit or 32-bit expression: the mask of the
+  cast was dropped, so a negative `v` gave 0xFFxx where 0x00xx was
+  expected. The width analysis inherited from QBE assumed "fits 8 bits"
+  while going round the loop and reused the assumption for a narrower
+  question. Found by the differential test on a new seed range (one
+  program in 40,000), fixed in `copy.c`; compiler check `width_cycle`.
+
+### Changed
+- test(bench): the benchmark against PVSnesLib gains a twenty-first
+  workload, `depot`: eighteen agents in two crews, thirty bursts of
+  sixteen decisions — parallel arrays indexed by the agent, small helpers
+  called from loops, values live across a call, a table indexed by
+  row * 9 + column, 32-bit sums in two halves. It was written for the
+  bench by the first game built on the SDK, to carry the shape of its
+  code without any of its rules. OpenSNES: -54.7 % cycles, -49.8 % size.
+  With it the total reads -54.1 % and -43.7 % (`docs/BENCHMARK.md`).
+
 ## [0.49.0] — 2026-10-10
 
 The release that carries the API meant for 1.0, without being 1.0. Against

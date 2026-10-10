@@ -494,6 +494,375 @@ void w_dist(void) {
     res = acc;
 }
 
+/* ---- depot: a burst of decisions by eighteen agents -----------------------
+ * Two crews of nine carts in a depot of 512 x 960; every few ticks the
+ * sixteen that are not leaders decide where to go, all on the same tick.
+ * That burst is the workload: 30 of them, 480 decisions.
+ *
+ *   decide -> crowd       a rival within arm's length? sidestep or chase
+ *          -> intruder    sometimes: shadow the rival nearest my bay's middle
+ *          -> slotFor     else a slot relative to my leader, from a table of
+ *                         6 rows x 9 columns
+ *          -> depart -> bearing, steer
+ *
+ * Written for this bench by the first game built on the SDK, to have the
+ * shape its compiled C spends its time on without any of its rules: one
+ * global array per field indexed by the agent, small helpers called from
+ * loops, values live across a call, signed compares, a table indexed by
+ * row * 9 + column, 32-bit sums kept in two 16-bit halves with the carry
+ * rebuilt by a compare. Expected: res = 0xD31F (the same file built
+ * natively). */
+#define NA          18
+#define CREW        9
+#define NONE        0xFFFF
+#define ROWS        6
+#define COLS        9
+#define STILL       8       /* no heading: already there */
+
+#define ARM         24      /* a rival this close is in the way */
+#define SNAP        4
+#define DEPOT_W     512
+#define DEPOT_H     960
+
+#define TASK_IDLE   0
+#define TASK_ROLL   1
+#define TASK_CHASE  2
+#define TASK_DODGE  3
+
+static s16 px[NA];
+static s16 py[NA];
+static s16 vx[NA];
+static s16 vy[NA];
+static s16 wx[NA];              /* waypoint */
+static s16 wy[NA];
+static u16 heading[NA];         /* 0 = north, then clockwise */
+static u16 wait[NA];            /* ticks before the next decision */
+static u16 task[NA];
+static u16 busy[NA];
+static u16 dice[NA];            /* byte drawn at each decision */
+
+static s16 bay_x0[NA];
+static s16 bay_x1[NA];
+static s16 bay_y0[NA];
+static s16 bay_y1[NA];
+static u16 rank[NA];            /* row of the slot table */
+static u16 nerve[NA];           /* 0 to 255: how readily it leaves its slot */
+static u16 range[NA];           /* how far it looks for an intruder */
+static u16 lead[NA];            /* look-ahead shift on the other's velocity */
+static u16 pace[NA];            /* 0 to 7 */
+
+static s16 slot_x[ROWS * COLS];
+static s16 slot_y[ROWS * COLS];
+static s16 step_x[64];          /* pace * 8 + heading */
+static s16 step_y[64];
+
+/* (sign of dy + 1) * 3 + sign of dx + 1 -> heading */
+static const u16 compass[9] = { 7, 0, 1, 6, STILL, 2, 5, 4, 3 };
+
+static u16 leader[2];
+static u16 load;                /* the cart that carries the load, or NONE */
+static s16 aim_x, aim_y;        /* point being worked out */
+static u16 mix_hi, mix_lo;      /* 32-bit state of the dice */
+static u16 odo_hi, odo_lo;      /* 32-bit sum of the distances decided */
+
+/* Distance between two offsets, without a square root: the longer side plus
+ * half the shorter. */
+static u16 gap(s16 dx, s16 dy) {
+    u16 a = (dx < 0) ? -dx : dx;
+    u16 b = (dy < 0) ? -dy : dy;
+
+    if (a < b) return b + (a >> 1);
+    return a + (b >> 1);
+}
+
+/* One byte of dice: a 32-bit add in two halves, the carry rebuilt by a
+ * compare, then the halves stirred into each other. */
+static u16 shake(void) {
+    u16 lo = mix_lo + 0x9E37;
+    u16 carry = lo < mix_lo;
+    u16 hi = mix_hi + 0x79B9 + carry;
+
+    mix_lo = lo ^ (hi >> 3);
+    mix_hi = hi ^ (u16)(lo << 5);
+    return (mix_hi ^ mix_lo) & 0xFF;
+}
+
+static void tally(u16 d) {
+    u16 sum = odo_lo + d;
+
+    if (sum < odo_lo) odo_hi++;
+    odo_lo = sum;
+}
+
+static void clampX(u16 id) {
+    if (aim_x < bay_x0[id]) aim_x = bay_x0[id];
+    else if (aim_x > bay_x1[id]) aim_x = bay_x1[id];
+}
+
+static void clampY(u16 id) {
+    if (aim_y < bay_y0[id]) aim_y = bay_y0[id];
+    else if (aim_y > bay_y1[id]) aim_y = bay_y1[id];
+}
+
+/* Heading from a cart to a point: an axis counts only if its offset is more
+ * than a quarter of the other one. */
+static u16 bearing(u16 id, s16 x, s16 y) {
+    s16 dx = x - px[id];
+    s16 dy = y - py[id];
+    s16 ax = (dx < 0) ? -dx : dx;
+    s16 ay = (dy < 0) ? -dy : dy;
+    u16 at = 4;
+
+    if (ax < SNAP && ay < SNAP) return STILL;
+    if (ay > (ax >> 2)) at = (dy < 0) ? 1 : 7;
+    if (ax > (ay >> 2)) at += (dx < 0) ? -1 : 1;
+    return compass[at];
+}
+
+static void halt(u16 id) {
+    vx[id] = 0;
+    vy[id] = 0;
+    task[id] = TASK_IDLE;
+}
+
+/* Take a heading: velocity from the table, and an axis already within reach
+ * of the waypoint is put on it. */
+static u16 steer(u16 id, u16 h) {
+    u16 at;
+    s16 d;
+
+    if (h == STILL) {
+        halt(id);
+        return 0;
+    }
+    heading[id] = h;
+    at = (pace[id] << 3) + h;
+    vx[id] = step_x[at];
+    vy[id] = step_y[at];
+    d = wx[id] - px[id];
+    if (d < 0) d = -d;
+    if (d < SNAP) {
+        px[id] = wx[id];
+        vx[id] = 0;
+    }
+    d = wy[id] - py[id];
+    if (d < 0) d = -d;
+    if (d < SNAP) {
+        py[id] = wy[id];
+        vy[id] = 0;
+    }
+    return 1;
+}
+
+/* Go to the point worked out, kept inside the bay. */
+static void depart(u16 id, u16 what) {
+    clampX(id);
+    clampY(id);
+    wx[id] = aim_x;
+    wy[id] = aim_y;
+    if (steer(id, bearing(id, aim_x, aim_y))) task[id] = what;
+    tally(gap(aim_x - px[id], aim_y - py[id]));
+}
+
+/* Where the other will be, as far ahead as this cart can foresee. */
+static void forecast(u16 id, u16 other) {
+    aim_x = px[other] + (vx[other] << lead[id]);
+    aim_y = py[other] + (vy[other] << lead[id]);
+}
+
+/* Step aside: at right angles to the line between the two carts, on the
+ * side the other is not heading to. */
+static void sidestep(u16 id, u16 other) {
+    s16 dx = px[other] - px[id];
+    s16 dy = py[other] - py[id];
+
+    if (vx[other] + vy[other] < 0) {
+        aim_x = px[id] + dy;
+        aim_y = py[id] - dx;
+    } else {
+        aim_x = px[id] - dy;
+        aim_y = py[id] + dx;
+    }
+}
+
+/* A rival within arm's length: chase it if it carries the load and this cart
+ * has the nerve, otherwise step aside. */
+static u16 crowd(u16 id) {
+    u16 other = (id < CREW) ? CREW : 0;
+    u16 end = other + CREW;
+    s16 dx, dy;
+
+    for (; other < end; other++) {
+        dx = px[other] - px[id];
+        dy = py[other] - py[id];
+        if (dx > ARM || dx < -ARM || dy > ARM || dy < -ARM) continue;
+        if (gap(dx, dy) > ARM) continue;
+        if (other == load && nerve[id] > dice[id]) {
+            forecast(id, other);
+            depart(id, TASK_CHASE);
+        } else {
+            sidestep(id, other);
+            depart(id, TASK_DODGE);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+/* The rival inside this cart's bay that is nearest to the middle of it, if
+ * it is within twice the cart's range. */
+static u16 intruder(u16 id) {
+    u16 other = (id < CREW) ? CREW : 0;
+    u16 end = other + CREW;
+    u16 best = NONE;
+    u16 nearest = range[id] << 1;
+    s16 mx = (bay_x0[id] + bay_x1[id]) >> 1;
+    s16 my = (bay_y0[id] + bay_y1[id]) >> 1;
+    u16 d;
+
+    for (; other < end; other++) {
+        if (busy[other]) continue;
+        if (px[other] < bay_x0[id] || px[other] > bay_x1[id]) continue;
+        if (py[other] < bay_y0[id] || py[other] > bay_y1[id]) continue;
+        d = gap(px[other] - mx, py[other] - my);
+        if (d >= nearest) continue;
+        nearest = d;
+        best = other;
+    }
+    return best;
+}
+
+/* A slot relative to the leader: the row is the cart's rank, the column is
+ * the ninth of the depot the leader stands in. The second crew uses the
+ * table turned half a turn. */
+static void slotFor(u16 id, u16 ref) {
+    s16 x = px[ref];
+    s16 y = py[ref];
+    u16 col = 0;
+    u16 at;
+
+    if (x >= 342) col = 2;
+    else if (x >= 171) col = 1;
+    if (y >= 640) col += 6;
+    else if (y >= 320) col += 3;
+    if (id >= CREW) col = COLS - 1 - col;
+    at = rank[id] * COLS + col;
+    if (id < CREW) {
+        aim_x = x + slot_x[at];
+        aim_y = y + slot_y[at];
+    } else {
+        aim_x = x - slot_x[at];
+        aim_y = y - slot_y[at];
+    }
+    aim_x += vx[ref] << lead[id];
+    aim_y += vy[ref] << lead[id];
+}
+
+static void decide(u16 id) {
+    u16 crew = id >= CREW;
+    u16 ref, other;
+
+    dice[id] = shake();
+    wait[id] = 4 + (pace[id] >> 1);
+    if (busy[id]) return;
+    if (crowd(id)) return;
+    if (dice[id] < nerve[id]) {
+        other = intruder(id);
+        if (other != NONE) {
+            forecast(id, other);
+            depart(id, TASK_CHASE);
+            return;
+        }
+    }
+    ref = leader[crew];
+    slotFor(id, ref);
+    if (rank[id] >= 3 && load != NONE && (load >= CREW) == crew) {
+        /* the front ranks run ahead when their crew carries the load */
+        if (crew) aim_y += 48;
+        else aim_y -= 48;
+    }
+    depart(id, TASK_ROLL);
+}
+
+static void setup(void) {
+    u16 id, n, h;
+    s16 v, w;
+
+    for (id = 0; id < NA; id++) {
+        u16 crew = id >= CREW;
+        u16 k = crew ? id - CREW : id;
+
+        rank[id] = k % ROWS;
+        bay_x0[id] = 16 + (k % 3) * 120;
+        bay_x1[id] = bay_x0[id] + 250;
+        bay_y0[id] = 16 + (k / 3) * 190 + (crew ? 150 : 0);
+        bay_y1[id] = bay_y0[id] + 400;
+        px[id] = bay_x0[id] + 40 + ((id * 37) & 127);
+        py[id] = bay_y0[id] + 60 + ((id * 53) & 255);
+        vx[id] = (s16)(id % 5) - 2;
+        vy[id] = (s16)(id % 7) - 3;
+        wx[id] = px[id];
+        wy[id] = py[id];
+        heading[id] = crew ? 4 : 0;
+        wait[id] = 0;
+        task[id] = TASK_IDLE;
+        busy[id] = 0;
+        dice[id] = 0;
+        nerve[id] = (id * 29 + 40) & 0xFF;
+        range[id] = 60 + (id & 3) * 30;
+        lead[id] = 1 + (id & 1);
+        pace[id] = 3 + (id % 4);
+    }
+    for (n = 0; n < ROWS * COLS; n++) {
+        slot_x[n] = (s16)((n * 23) % 181) - 90;
+        slot_y[n] = (s16)((n * 41) % 221) - 110;
+    }
+    for (n = 0; n < 8; n++) {
+        for (h = 0; h < 8; h++) {
+            v = (h == 1 || h == 2 || h == 3) ? (s16)n : (h == 5 || h == 6 || h == 7) ? -(s16)n : 0;
+            w = (h == 3 || h == 4 || h == 5) ? (s16)n : (h == 7 || h == 0 || h == 1) ? -(s16)n : 0;
+            step_x[(n << 3) + h] = v;
+            step_y[(n << 3) + h] = w;
+        }
+    }
+    mix_hi = 0x2545;
+    mix_lo = 0xF491;
+    odo_hi = 0;
+    odo_lo = 0;
+}
+
+void w_depot(void) {
+    u16 n, id, acc;
+
+    setup();
+    acc = 0;
+    for (n = 0; n < 30; n++) {
+        /* the tick before: everybody rolls, kept inside the depot */
+        for (id = 0; id < NA; id++) {
+            px[id] += vx[id];
+            py[id] += vy[id];
+            if (px[id] < 8) px[id] = 8;
+            else if (px[id] > DEPOT_W - 8) px[id] = DEPOT_W - 8;
+            if (py[id] < 8) py[id] = 8;
+            else if (py[id] > DEPOT_H - 8) py[id] = DEPOT_H - 8;
+            busy[id] = ((id + n * 3) & 15) == 5;
+        }
+        leader[0] = (n & 1) ? 6 : 3;
+        leader[1] = (n & 4) ? 15 : 11;
+        load = (n & 2) ? (n * 7 + 2) % NA : NONE;
+        /* the burst: the sixteen others decide, the crews interleaved */
+        for (id = 0; id < NA; id++) {
+            u16 who = (id & 1) ? (id >> 1) : (id >> 1) + CREW;
+
+            if (who != leader[0] && who != leader[1]) decide(who);
+        }
+        acc += (u16)wx[n % NA] ^ (u16)wy[(n * 5) % NA];
+    }
+    for (id = 0; id < NA; id++)
+        acc ^= (u16)(wx[id] + wy[id]) + (heading[id] << 8) + task[id] + (u16)(vx[id] * 3) + (u16)vy[id] + dice[id] + wait[id] + id;
+    res = acc ^ odo_lo ^ (u16)(odo_hi << 9) ^ mix_hi;
+}
+
 int main(void) {
     consoleInit();
 #if WORKLOAD == 1
@@ -536,6 +905,8 @@ int main(void) {
     w_place();
 #elif WORKLOAD == 20
     w_dist();
+#elif WORKLOAD == 21
+    w_depot();
 #endif
     done = 0x600D;
     while (1) {
