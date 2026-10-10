@@ -668,3 +668,23 @@ have seen it. Next time: a plain clone of the three submodules into the worktree
 (`git clone compiler/qbe ../opensnes-<name>/compiler/qbe`) costs a few
 seconds and shares nothing.
 
+### Step 9 of #166: a late peephole pass (2026-10-10)
+
+Counted after step 8: `lda.b S / tax` in front
+of a load, stores of 0 through A, counters through `lda / inc a /
+sta`. `peephole_late` (emit.c) rewrites them once the ordinary peephole
+has settled: `ldx.b S`, `stz`, `inc.b S` / `dec.b S`, and a constant
+stored to several places is loaded once. 16-bit accumulator only (the
+width is known line by line: an 8-bit section never crosses a label or a
+branch — 5,348 sections checked over the corpus), direct-page slots only
+for ldx and inc (no stack-relative form).
+
+- the first version ran the rules INSIDE the peephole loop and the code
+  went slower with fewer instructions: a `stz` to a slot written and
+  never read (the high half of a widened index) was not a `sta` any more,
+  so neither dead-store rule removed it, and the `sta S / lda S` behind it
+  stayed. A new form is put in after the rules that do not know it;
+- mode7/extbg one frame earlier again (the fourth time that day): its
+  manifest now asserts a range for `ball_x` instead of a value. The other
+  frame-indexed manifests are the debt (`at_symbol`, `input_at`).
+

@@ -481,7 +481,7 @@
   },
   "mode7_extbg": {
     "fbhash": [
-      "98963babefa780e3",
+      "e24be61763dbf225",
       "a1d865f84feb85e5"
     ],
     "frames": [
@@ -489,7 +489,7 @@
       400
     ],
     "luna_version": "v1.36.0",
-    "rom_sha256": "d69fc600dff92ce1df1a7249b83047e3c22b3ab73e116b6117868a64bf94d241"
+    "rom_sha256": "4c7a4ac0aaa781b7c64e5fa0c3deb496b6d63507d62cb1d5acb1b12ee0c5044b"
   },
   "mode7_perspective": {
     "fbhash": "b6d491935f26c865",

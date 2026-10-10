@@ -1,3 +1,6 @@
+# Since 2026-10-10 a late pass writes `stz` for a store of 0 (see peep_late);
+# the stores this case pins are read in the form the emitter writes.
+env QBE_NO_PEEP_LATE=1
 # Casts between widths and signedness produce the C value: zero- or
 # sign-extension on widening, truncation on narrowing (ported from
 # opensnes-emu test_type_cast, which only required it to compile; most
