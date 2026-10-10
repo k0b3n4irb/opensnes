@@ -20,3 +20,11 @@ unsigned int alias(unsigned int a) {
     bump(&v);
     return v + g;
 }
+
+// A compare with zero whose CARRY is read two lines further (a 32-bit
+// unsigned compare against a small constant: `cmp.w #0 / beq + / bcc ++`)
+// must stay, even though the load before it set N and Z. The first version
+// of the rule that drops `cmp.w #0` looked at the next line only, and the
+// differential tests returned wrong checksums.
+unsigned long big;
+unsigned int below(void) { return big < 5; }

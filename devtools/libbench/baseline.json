@@ -5,111 +5,111 @@
       "detail": {}
     },
     "pad": {
-      "cycles": 10229,
+      "cycles": 10560,
       "detail": {
-        "row_pad@for_body.10": 133542,
-        "padReleased": 65000,
-        "row_pad@for_cont.11": 3640,
-        "row_pad@for_cond.9": 1560
+        "row_pad@for_body.10": 133504,
+        "padReleased": 65320,
+        "row_pad@for_cont.11": 10120,
+        "row_pad@for_cond.9": 1320
       }
     },
     "scroll": {
-      "cycles": 27610,
+      "cycles": 27940,
       "detail": {
-        "bgSetScroll": 318942,
-        "row_scroll@for_body.20": 198782,
+        "bgSetScroll": 319302,
+        "row_scroll@for_body.20": 198422,
         "bgSetScroll@out": 27200,
-        "row_scroll@for_cont.21": 4200
+        "row_scroll@for_cont.21": 10560
       }
     },
     "oamset": {
-      "cycles": 66546,
+      "cycles": 67600,
       "detail": {
-        "oamSet": 679206,
-        "row_oamset@for_body.30": 505422,
-        "oamSet@x_done": 96388,
-        "oamSet@none": 28960
+        "oamSet": 679184,
+        "row_oamset@for_body.30": 505342,
+        "oamSet@x_done": 96370,
+        "row_oamset@for_cont.31": 32880
       }
     },
     "oamxy": {
-      "cycles": 44066,
+      "cycles": 45120,
       "detail": {
-        "row_oamxy@for_body.40": 381000,
-        "oamSetXY": 353546,
-        "oamSetXY@x_done": 96206,
-        "oamSetXY@none": 29120
+        "row_oamxy@for_body.40": 381120,
+        "oamSetXY": 353466,
+        "oamSetXY@x_done": 96246,
+        "row_oamxy@for_cont.41": 33000
       }
     },
     "oamsize": {
-      "cycles": 29694,
+      "cycles": 30748,
       "detail": {
-        "oamSetSize": 387908,
-        "row_oamsize@for_body.50": 155582,
-        "oamSetSize@none": 29000,
-        "row_oamsize@for_cont.51": 11960
+        "oamSetSize": 388010,
+        "row_oamsize@for_body.50": 155360,
+        "row_oamsize@for_cont.51": 32960,
+        "oamSetSize@none": 29080
       }
     },
     "dma": {
-      "cycles": 17885,
+      "cycles": 17917,
       "detail": {
         "opensnes_font_2bpp_end": 350920,
-        "row_dma@for_body.56": 6080,
-        "row_dma@for_cont.57": 360,
+        "row_dma@for_body.56": 6040,
+        "row_dma@for_cont.57": 1040,
         "row_dma@for_cond.55": 86
       }
     },
     "text": {
-      "cycles": 67440,
+      "cycles": 67392,
       "detail": {
-        "textPrint@do_body.45": 373560,
+        "textPrint@do_body.45": 372800,
         "tilemapFlush": 335276,
         "textPrint@scmp.11": 194080,
-        "textPrint@do_cond.46": 154440
+        "textPrint@do_cond.46": 155200
       }
     },
     "frame": {
-      "cycles": 142257,
+      "cycles": 142167,
       "detail": {
-        "oamSet": 676120,
-        "row_frame@for_body.127": 509280,
+        "oamSet": 676160,
+        "row_frame@for_body.127": 509880,
         "textPrint@do_body.45": 372840,
         "tilemapFlush": 335228
       }
     },
     "worldc": {
-      "cycles": 61275,
+      "cycles": 59219,
       "detail": {
-        "world_c.scene@for_body.77": 423764,
-        "world_c.scene@if_true.82": 292342,
+        "world_c.scene@for_body.77": 389068,
+        "world_c.scene@if_true.82": 285800,
         "world_c.scene@if_false.85": 150120,
-        "world_c.scene@if_false.83": 114584
+        "world_c.scene@if_false.83": 114360
       }
     },
     "world": {
       "cycles": 31384,
       "detail": {
-        "oamPlaceWorld@sprite": 227422,
-        "oamPlaceWorld@next8": 143266,
-        "opensnes_font_2bpp_end": 109162,
-        "oamPlaceWorld@x_done": 89000
+        "oamPlaceWorld@sprite": 229902,
+        "oamPlaceWorld@next8": 144370,
+        "opensnes_font_2bpp_end": 109098,
+        "oamPlaceWorld@x_done": 85760
       }
     },
     "vramc": {
-      "cycles": 16605,
+      "cycles": 16803,
       "detail": {
-        "opensnes_font_2bpp_end": 207040,
-        "row_vramc@for_body.107": 121080,
-        "row_vramc@for_cont.108": 2280,
+        "opensnes_font_2bpp_end": 206840,
+        "row_vramc@for_body.107": 121280,
+        "row_vramc@for_cont.108": 6200,
         "row_vramc@for_cond.106": 920
       }
     },
     "vramq": {
-      "cycles": 10737,
+      "cycles": 10736,
       "detail": {
-        "vramQueueFlush@next": 142520,
-        "vramQueueFlush@entry": 60320,
-        "vramQueueFlush": 9160,
-        "vramQueueFlush@out": 2080
+        "vramQueueFlush@next": 142480,
+        "vramQueueFlush@entry": 60360,
+        "vramQueueFlush": 9200,
+        "vramQueueFlush@out": 2040
       }
     }
   }

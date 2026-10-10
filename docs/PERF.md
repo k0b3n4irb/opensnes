@@ -125,20 +125,20 @@ compilers.
 | Row | What it asks for | PVSnesLib | OpenSNES | |
 |---|---|---:|---:|---:|
 | `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,780 | -19.5 % |
-| `pad` | held, pressed, released of pad 0, ten times | 11,429 | 10,229 | -10.5 % |
-| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,539 | 27,610 | -30.2 % |
-| `oamset` | `oamSet` on 32 sprites | 81,070 | 66,546 | -17.9 % |
-| `oamxy` | `oamSetXY` on 32 sprites | 45,047 | 44,066 | -2.2 % |
-| `oamsize` | the size of 32 sprites | 48,746 | 29,694 | -39.1 % |
-| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,894 | 17,885 | -0.1 % |
-| `text` | 20 characters printed and shown | 84,676 | 67,440 | -20.4 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 142,257 | -16.2 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 61,275 | -52.6 % |
+| `pad` | held, pressed, released of pad 0, ten times | 11,429 | 10,560 | -7.6 % |
+| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,539 | 27,940 | -29.3 % |
+| `oamset` | `oamSet` on 32 sprites | 81,070 | 67,600 | -16.6 % |
+| `oamxy` | `oamSetXY` on 32 sprites | 45,047 | 45,120 | +0.2 % |
+| `oamsize` | the size of 32 sprites | 48,746 | 30,748 | -36.9 % |
+| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,894 | 17,917 | +0.1 % |
+| `text` | 20 characters printed and shown | 84,676 | 67,392 | -20.4 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 142,167 | -16.3 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 59,219 | -54.2 % |
 | `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,384 | -75.7 % |
-| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,605 | -4.6 % |
-| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,400 | 10,737 | -38.3 % |
+| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,803 | -3.4 % |
+| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,400 | 10,736 | -38.3 % |
 
-OpenSNES costs no more than PVSnesLib on **13 of the 13 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
+OpenSNES costs no more than PVSnesLib on **11 of the 13 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library
@@ -164,7 +164,13 @@ is that handler alone, in a ROM that only waits.
   loop used to build; `textPrint` writes a run of characters with the
   buffer position computed once instead of three calls and a multiply per
   character.
-- **`oamxy` and `dma` are level**, within about 1 %. PVSnesLib's
+- **`oamxy` and `dma` are level**, within about 1 %, and sit on either side
+  of PVSnesLib's figure from one compiler step to the next (+0.2 % and
+  +0.1 % on 2026-10-10, −1.2 % and −0.1 % the day before) although the
+  library routines did not change: a row is the difference between a loop
+  with the calls and the same loop empty, and a compiler improvement that
+  helps the empty loop more than the loop around a call moves the row up.
+  Read these two as ties. PVSnesLib's
   `oamSetXY` checks nothing and marks nothing; ours refuses an id that is
   not a sprite, marks the table dirty and records the highest sprite
   written, which is what lets the handler skip the upload on a frame where

@@ -15,7 +15,7 @@ in inc32: present adc\.w #1\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.
 in add32: present sta\.b tcc__retval_hi
 # u16 -> u32 zero-extends: the high word is 0.
 # (the reload of the 0 just stored is gone since 2026-10-10: the peephole)
-in extend16: present lda\.w #0\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.b tcc__retval_hi
+in extend16: present lda\.w #0\n\tsta\.b tcc__retval_hi
 # Unsigned compare: high words first (equal -> low words), unsigned branch.
 in compare_gt: present cmp(?: \d+,s|\.b tcc__lf\+\d+)\n\tbeq \+\n\tbcc \+\+\n\tbra \+\+\+\n\+\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tcmp(?: \d+,s|\.b tcc__lf\+\d+)\n\tbcc \+\+
 in compare_gt: absent \bb(mi|pl|vc|vs)\b

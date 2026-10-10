@@ -1,6 +1,6 @@
 # sdkbench — the same C on OpenSNES and on PVSnesLib, measured on luna
 
-`workloads.c` holds nineteen small workloads in plain C89. `run.py` builds
+`workloads.c` holds twenty small workloads in plain C89. `run.py` builds
 one ROM per workload, runs it on luna and reports, per workload, the master
 cycles it cost, the bytes of code of its functions and how deep the stack
 went. The measured table of `docs/BENCHMARK.md` comes from it.

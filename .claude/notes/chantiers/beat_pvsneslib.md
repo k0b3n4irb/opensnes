@@ -447,5 +447,16 @@ loop counter in memory with the test at the top (pattern 6).
 
 ### Step 4 of #166 (2026-10-10)
 
+Two peephole rules: `cmp.w #0`
+after the flags are set; a direct-page slot nobody reads. Two silent
+mistakes on the way, both found by the differential tests before anything
+was pushed: the compare's carry read two lines on (six programs of the
+gate), then the reload rule removing the load the compare rule had relied
+on (one program in 100,000; seed 179180, now in the gate). Final hunt:
+76001-84000 and 173001-193000 clean. `place` unchanged. `dist` added as
+the twentieth workload: 3,665 master cycles a distance.
 
+#165 is closed; `order` in the batch is #167, not urgent, three
+design points answered there (visible[] by sprite; an out-of-range entry
+hides the slot; one routine only if the identity path costs nothing).
 
