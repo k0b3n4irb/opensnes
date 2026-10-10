@@ -116,10 +116,10 @@
       "res": 30752
     },
     "dist": {
-      "cycles": 9073702,
-      "size": 563,
-      "stack": 28,
-      "res": 29121
+      "cycles": 9388534,
+      "size": 533,
+      "stack": 23,
+      "res": 29147
     },
     "depot": {
       "cycles": 16410356,

@@ -436,29 +436,25 @@ void w_place(void) {
     res = acc;
 }
 
-/* Every player of one team against every player of the other (issue #166,
- * from the same game): a nested loop, the index rebuilt in each block, two
- * absolute values and a static function with one call site. distances() and
- * vectorLength() are the issue's functions, unchanged but for the names of
- * the tables. */
-static s16 dpx[18];
-static s16 dpy[18];
-static s16 dpoff[18];
+/* Every point of one group against every point of the other: a nested
+ * loop, the index rebuilt in each block, two absolute values and a static
+ * function with one call site (the shape issue #166 asked the compiler to
+ * handle). The distance is the textbook "larger side plus three eighths of
+ * the smaller", and each target has a radius taken off the result. */
+static s16 gx[18];              /* nine points of group A, then nine of B */
+static s16 gy[18];
+static u16 gradius[18];
 static u16 dist_flat[81];
 
-/* length of (a, b) without a square root */
-static u16 vectorLength(u16 a, u16 b) {
-    u16 r;
+/* about the length of (a, b), no square root: max + 3/8 min */
+static u16 approxDist(u16 a, u16 b) {
+    u16 mx = a, mn = b;
 
     if (a < b) {
-        r = a;
-        a = b;
-        b = r;
+        mx = b;
+        mn = a;
     }
-    r = a + (b >> 1);
-    if (r < (b << 1)) return r - (b >> 3);
-    if (r < (b << 2)) return r - (b >> 2);
-    return r - ((b >> 2) + (b >> 3));
+    return mx + (mn >> 2) + (mn >> 3);
 }
 
 static void distances(void) {
@@ -466,12 +462,14 @@ static void distances(void) {
 
     for (i = 0; i < 9; i++) {
         for (j = 0; j < 9; j++) {
-            s16 dx = dpx[i] - dpx[j + 9];
-            s16 dy = dpy[i] - dpy[j + 9] - dpoff[j + 9];
+            s16 dx = gx[i] - gx[j + 9];
+            s16 dy = gy[i] - gy[j + 9];
+            u16 d;
 
             if (dx < 0) dx = -dx;
             if (dy < 0) dy = -dy;
-            dist_flat[i * 9 + j] = vectorLength(dx, dy);
+            d = approxDist(dx, dy);
+            dist_flat[i * 9 + j] = d > gradius[j + 9] ? d - gradius[j + 9] : 0;
         }
     }
 }
@@ -479,14 +477,14 @@ static void distances(void) {
 void w_dist(void) {
     u16 i, n, acc;
     for (i = 0; i < 18; i++) {
-        dpx[i] = (s16)(i * 37) - 200;
-        dpy[i] = (s16)(i * 53) - 300;
-        dpoff[i] = i & 7;
+        gx[i] = (s16)(i * 37) - 200;
+        gy[i] = (s16)(i * 53) - 300;
+        gradius[i] = i & 7;
     }
     acc = 0;
     for (n = 0; n < 40; n++) {
-        dpx[n % 18] += 7;
-        dpy[(n * 5) % 18] -= 3;
+        gx[n % 18] += 7;
+        gy[(n * 5) % 18] -= 3;
         distances();
         acc += dist_flat[n % 81];
     }

@@ -63,6 +63,14 @@ All notable changes to OpenSNES are documented in this file.
   bench by the first game built on the SDK, to carry the shape of its
   code without any of its rules. OpenSNES: -54.7 % cycles, -49.8 % size.
   With it the total reads -54.1 % and -43.7 % (`docs/BENCHMARK.md`).
+- test(bench): the `dist` workload is rewritten: every point of one group
+  against every point of another, with the textbook "larger side plus
+  three eighths of the smaller" for the distance. The version of
+  2026-10-10 carried a distance routine taken from the game that had shown
+  us the shape; nothing of a game belongs in this bench. Same shape
+  (nested loop, two absolute values, a static function with one call
+  site): -66.2 % cycles, -47.6 % size. Total over the twenty-one
+  workloads: -57.3 % and -47.3 %.
 
 ## [0.49.0] — 2026-10-10
 

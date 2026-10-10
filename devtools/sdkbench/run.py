@@ -145,7 +145,7 @@ FUNCS = {"sieve": ["w_sieve"], "sort": ["w_sort", "rnd16"],
          "strings": ["w_strings", "slen", "scmp", "scpy"],
          "state": ["w_state", "op_add", "op_xor", "op_rot", "op_dec"],
          "place": ["w_place", "place"],
-         "dist": ["w_dist", "distances", "vectorLength"],
+         "dist": ["w_dist", "distances", "approxDist"],
          "depot": ["w_depot", "gap", "shake", "tally", "clampX", "clampY", "bearing", "halt", "steer", "depart", "forecast", "sidestep", "crowd", "intruder", "slotFor", "decide", "setup"]}
 STACK_TOP = 0x1FFF          # both SDKs start their stack there
 
@@ -257,7 +257,7 @@ DESCRIPTION = {
     "strings": "`strlen`, `strcmp`, `strcpy` written by hand",
     "state": "600 steps of a `switch` state machine and a table of functions",
     "place": "19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166)",
-    "dist": "81 distances between two teams, 40 times: a nested loop, two absolute values and a call (issue #166)",
+    "dist": "81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166)",
     "depot": "eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166)"}
 
 
