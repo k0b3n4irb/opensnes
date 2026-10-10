@@ -62,12 +62,17 @@ stays the guard, the comparison says by how much it moved. A half-volume
 module gives 75 % and DIFF; two silent captures give MATCH with
 `a=none b=none` on the onset line — read that line for an example meant
 to play.
-`--align-onset` (luna v1.35.0, pinned 2026-10-10) lines the two captures up
-on their first sample above the silence level before cutting the windows,
-and prints the shift: a sound that starts a few samples earlier because
-the code got faster is then compared with itself (music_large on
-2026-10-10: 0.25 % without, 0.09 % with, "onset shift +6 samples"), and a
-shift of thousands of samples is a fact to explain, not noise.
+`--align-onset` (luna v1.37.0, pinned 2026-10-10) compares each window of
+the first capture with the stretch of the second that resembles it most
+within `--max-shift` samples (64 by default) and prints the shift kept per
+window; the final line reads "per-window shift, max N samples (searched
+±64)". A sound that starts a few samples earlier because the code got
+faster is then compared with itself, burst by burst (`echo` on 2026-10-10,
+whose second sound alone had moved by two samples: DIFF at 21.83 % with
+the single global shift of v1.35.0 / v1.36.0, MATCH at 0.15 % since). A
+sound one frame early (534 samples) stays a DIFF at the default: it is a
+fact to explain, and `--max-shift 534` names it. A line quoted from before
+the pin says "onset shift".
 
 The WRAM oracle hashes every WRAM page at each vblank **except the pages of
 the plain C band that lie wholly above the ROM's last C variable** — the
