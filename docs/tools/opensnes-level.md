@@ -1,6 +1,6 @@
 # opensnes-level — Tiled levels to SNES map data {#tools_opensnes_level}
 
-The level tool of the 1.x family (@ref tools_conventions). A map drawn in
+The level tool of the `opensnes-*` family (@ref tools_conventions). A map drawn in
 [Tiled](https://www.mapeditor.org/) against a tileset that `opensnes-tileset`
 converted becomes what the `map` and `object` modules load. The converter is
 `tmx2snes`'s (@ref tools_tmx2snes), linked as a library: the bytes are its own.
@@ -67,5 +67,5 @@ cannot be written.
 
 ## See also
 
-- @ref tools_tmx2snes — the 0.x tool, same converter, one explicit Makefile line; shipped for one more version.
+- @ref tools_tmx2snes — the earlier tool, same converter, one explicit Makefile line; shipped for one more version.
 - `examples/maps/map_scroll` and `examples/maps/tiled` convert their levels this way.

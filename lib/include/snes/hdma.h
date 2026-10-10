@@ -334,7 +334,7 @@ void hdmaDisableMask(u8 channelMask);
  * HBlank, the others are left as they are. A value above 7 is refused and
  * nothing changes — the 0.x form of this call took a bit mask, so a call
  * left as hdmaEnable(1 << HDMA_CHANNEL_6) fails visibly instead of
- * enabling channel 64. (Since 2026-10-05, the 1.0 API; a mask of 1, 2 or 4
+ * enabling channel 64. (Since 0.49, 2026-10-05; a mask of 1, 2 or 4
  * left behind is the one case this check cannot see — `make check-upgrade`
  * lists every call to re-read.)
  *

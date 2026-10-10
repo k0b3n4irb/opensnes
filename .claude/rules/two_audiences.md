@@ -28,7 +28,7 @@ OpenSNES has two populations, and they do not want the same thing.
    `-level`, `-text`, `-palette`, `-image`, `-sample`, `-music`, `-rom`,
    `-save`. Same conventions everywhere: named subcommands, long options,
    `--help`, `--json`, `inspect`, a TOML settings file beside each asset,
-   same error style. They arrive in 1.x; the 0.x tools stay shipped for one
+   same error style. They arrived with 0.49 (planned as "1.x" when this was written); the earlier tools stay shipped for one
    version with a pointer. A fused tool must reproduce the absorbed tool's
    golden suite byte for byte before the old one goes.
 3. **`devtools/` is contributor-only and never shipped.** Scripts that the

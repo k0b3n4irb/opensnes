@@ -892,7 +892,7 @@ static const cli_cmd cmds[] = {
       release_opts, CLI_N(release_opts), "release --tag v1.0", 0, run_release },
     { "doctor", "check the installation: SDK, host compiler, make, the binaries, the library, luna, an emulator (exit 1 on a failure)", NULL, 0,
       "doctor", 0, run_doctor },
-    { "upgrade", "in your sources, the names OpenSNES 1.0 removed and the calls whose meaning changed, with what to use (exit 1 on a hit)",
+    { "upgrade", "in your sources, the names OpenSNES 0.49 removed and the calls whose meaning changed, with what to use (exit 1 on a hit)",
       upgrade_opts, CLI_N(upgrade_opts), "upgrade src/", 1, run_upgrade },
 };
 

@@ -1,6 +1,6 @@
 # tmx2snes — Tiled levels to SNES map data {#tools_tmx2snes}
 
-> **1.x:** the same converter is `opensnes-level` (@ref tools_opensnes_level),
+> **New tool:** the same converter is `opensnes-level` (@ref tools_opensnes_level),
 > driven by a settings file beside the map; tmx2snes stays shipped for one
 > more version.
 

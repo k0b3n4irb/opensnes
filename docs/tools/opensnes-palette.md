@@ -1,6 +1,6 @@
 # opensnes-palette — a project's palettes {#tools_opensnes_palette}
 
-The palette tool of the 1.x family (@ref tools_conventions). Two jobs a
+The palette tool of the `opensnes-*` family (@ref tools_conventions). Two jobs a
 game has around colour, before and after the picture tools: **planning**
 how every `.pal` of the project fits the SNES's 8 background and 8 sprite
 palettes of 16 colours (CGRAM 0..127 and 128..255), and **quantizing** the
@@ -84,7 +84,7 @@ opensnes-palette inspect res/*.pal
 
 ## From palplan and img2snes
 
-| 0.x | opensnes-palette |
+| earlier tools | opensnes-palette |
 |---|---|
 | `palplan -o plan.h -b plan.pal project.txt` (a three-column manifest) | `plan palettes.toml` with `bg = [...]`, `sprite = [...]`, `cgram = true` |
 | `name type file` lines | the file's stem is the name; two lists are the types |
@@ -102,4 +102,4 @@ library's `qsort` before).
 ## See also
 
 - @ref craft_planning — why 8 + 8 slots, and how to budget them.
-- @ref tools_palplan, @ref tools_img2snes — the 0.x tools; shipped for one more version.
+- @ref tools_palplan, @ref tools_img2snes — the earlier tools; shipped for one more version.

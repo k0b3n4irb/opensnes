@@ -1,6 +1,6 @@
 # img2snes — RGB artwork to indexed palettes {#tools_img2snes}
 
-> **1.x:** the same quantizer is `opensnes-palette quantize` (@ref tools_opensnes_palette), with a
+> **New tool:** the same quantizer is `opensnes-palette quantize` (@ref tools_opensnes_palette), with a
 > settings file beside the asset; this tool stays shipped for one more version.
 
 `gfx4snes` needs **indexed** images, but artists work in RGB. `img2snes` is the

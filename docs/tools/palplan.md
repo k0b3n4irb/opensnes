@@ -1,6 +1,6 @@
 # palplan — project shared-palette planner {#tools_palplan}
 
-> **1.x:** the same planner is `opensnes-palette plan` (@ref tools_opensnes_palette), with a
+> **New tool:** the same planner is `opensnes-palette plan` (@ref tools_opensnes_palette), with a
 > settings file beside the asset; this tool stays shipped for one more version.
 
 The SNES gives you exactly **8 background palettes and 8 sprite palettes** of 16

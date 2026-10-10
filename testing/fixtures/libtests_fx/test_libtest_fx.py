@@ -33,7 +33,7 @@ CASES = [
     ("hdma_wave_amplitude", 1, 60),   # hdmaWaveH(…, 200, …): clamped, as the header always said
     ("r_hdma_setup", 2, 0x0040),
     ("r_hdma_both",  2, 0x0070),
-    ("r_hdma_chan",  2, 1),      # D1 at 1.0: hdmaEnable(4) / hdmaDisable(4) by channel; 8, 0x10, 0x40, 0xFF refused
+    ("r_hdma_chan",  2, 1),      # D1 at 0.49: hdmaEnable(4) / hdmaDisable(4) by channel; 8, 0x10, 0x40, 0xFF refused
     ("r_hdma_speed", 2, 3),      # hdmaWaveSetSpeed: a lib function since 2026-10-03 (was inline)
     # nmiSet: one callback per frame, none after nmiClear
     ("r_nmi_calls",  2, 5),

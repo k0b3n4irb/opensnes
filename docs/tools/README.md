@@ -63,7 +63,7 @@ right one:
    Looping `wav2brr` samples are also hand-built (the loop points are yours).
    `palplan` sits a level up from the per-asset tools: it plans your *whole
    project's* palettes into the SNES's 8 BG + 8 sprite slots at once, so you run
-   it when your palette count grows, not per asset. (In the 1.x family these
+   it when your palette count grows, not per asset. (In the `opensnes-*` family these
    three are `opensnes-palette quantize`, `opensnes-text font` and
    `opensnes-palette plan`, and the font and the plan run from the build.)
 
@@ -72,9 +72,9 @@ All binaries live in `bin/` and are built by `make tools`. Every tool prints
 
 ## Where the tools are going
 
-1.x replaces these converters with the `opensnes-*` family — one tool per
+The `opensnes-*` family replaces these converters — one tool per
 function, the same conventions everywhere, settings beside each asset.
-@subpage tools_conventions is the contract; the 0.x tools stay one more
+@subpage tools_conventions is the contract; the earlier tools stay one more
 release. The first two are @subpage tools_opensnes_sample (WAV → BRR) and
 @subpage tools_opensnes_music (Impulse Tracker → soundbank); @subpage tools_opensnes_rom
 runs the post-link checks of every build; @subpage tools_opensnes_sprite is the sprite

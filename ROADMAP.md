@@ -8,14 +8,16 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v1.0.0
+## Current Status: post-v0.49.0
 
-Version 1.0.0 is cut on `develop` (2026-10-05): the public API is frozen,
-the 0.x aliases are gone, and nothing in `lib/include/snes/*.h` changes
-again before 2.0 (`docs/STABILITY.md`, `docs/UPGRADING.md`). The `v1.0.0`
-tag on `main` follows the first console session of the hardware protocol
-(`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7): the one freeze criterion
-that needs hardware. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
+Version 0.49.0 (2026-10-10) carries the public API meant for 1.0: the
+deprecated aliases are gone and the two calls that change meaning have
+changed (`docs/UPGRADING.md`). It is not 1.0 — the tree called itself
+1.0.0 from 2026-10-05 to 2026-10-10 and the owner renamed it: before 1.0
+come the compiler and library work still under way, a review of the
+examples with their assets redone, and the first console session of the
+hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7).
+`docs/STABILITY.md` is the promise 1.0 will make. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
 produces code about 30 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 44 % faster measured on luna on eighteen workloads, each of them faster, none larger, and level or shallower in stack on sixteen. 86
 working examples cover every major subsystem, with cross-platform CI on Linux,
@@ -229,7 +231,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | Pre-built binary releases | Done (`release.yml`) | Adoption blocker — users shouldn't need to compile the compiler |
 | Hardware verification docs | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility — document testing on real SNES via FXPak Pro |
 | Showcase game (not a port) | In progress, **outside this repository**: the RPG prototype ("Giuseppe", ~3000 lines of C) moved to its own repository on 2026-09-26 and builds against the SDK from there. Not verifiable from a clone of this repo until it is published | Proves the SDK can ship a complete game |
-| Asset provenance cleanup | **Deferred by owner decision (2026-09-26, confirmed 2026-10-05): not a 1.0 gate.** 66 asset files in 23 examples are byte-identical to PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa). The owner is not a graphic artist; the two routes on the table are an artist friend drawing original replacements, or a tool-driven port (generated placeholder art of the same tile counts and palettes). Until one happens the files stay as they are, listed in `ATTRIBUTION.md`. | Legal clarity for a 1.0 that ships Nintendo-derived art |
+| Asset provenance cleanup | **A 1.0 gate again (owner decision, 2026-10-10): every asset redone and the examples reviewed before a 1.0 release candidate.** Until then it had been deferred (2026-09-26, confirmed 2026-10-05). 66 asset files in 23 examples are byte-identical to PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa). The owner is not a graphic artist; the two routes on the table are an artist friend drawing original replacements, or a tool-driven port (generated placeholder art of the same tile counts and palettes). Until one happens the files stay as they are, listed in `ATTRIBUTION.md`. | Legal clarity for a 1.0 that ships Nintendo-derived art |
 | Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows where cc65816 wins and loses, with data |
 | Migration guide PVSnesLib → OpenSNES | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`, v0.43.0) | Smoothest adoption path for existing PVSnesLib users |
 | FAQ | Done (`docs/FAQ.md`, v0.43.0) | Reduces support load |
@@ -349,6 +351,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-08. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-10. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

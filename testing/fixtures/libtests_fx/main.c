@@ -128,7 +128,7 @@ int main(void) {
     r_hdma_setup = hdmaGetEnabled();
     hdmaEnableMask((1 << 5) | (1 << 4));
     r_hdma_both = hdmaGetEnabled();
-    /* D1 at 1.0: the short names take a channel number; a 0.x mask (any
+    /* D1 at 0.49: the short names take a channel number; a 0.x mask (any
      * value above 7) is refused and leaves HDMAEN alone */
     hdmaDisable(4);
     r_hdma_chan = (hdmaGetEnabled() == 0x60) ? 1 : 0;
