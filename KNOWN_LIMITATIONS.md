@@ -86,14 +86,22 @@ HiROM: every HiROM unit carries `.BASE $C0` so a datum at offset $0000 of
 a high bank is addressed in the full 64 KB view (`$Cn:0000`); the wlalink
 fork keeps that base off RAMSECTION labels.
 
-**What the ratchet still guards:** bank $00 free space. `make/common.mk`
-runs `devtools/symmap/symmap.py --check-bank0-overflow` after every link:
-free space below `BANK0_FAIL_THRESHOLD` fails the build, below 2 KB
-prints a soft warning, and every link prints how much declared payload
-sits in bank $00. Set `SKIP_BANK0_CHECK=1` to bypass for debugging. Corpus
-minimum at the flip: 2168 bytes (was 12).
+**When bank $00 is full, code goes to the next banks by itself.** A C
+function and a library routine are `SUPERFREE` sections reached by `jsl`,
+with function pointers that carry their bank: the linker places in bank
+$01 and up what bank $00 cannot hold, and nothing in the code is tied to
+its bank (a `switch` is a chain of compares, const tables are read far,
+plain RAM is read through the data bank). The link report says how much
+code is there. Until 2026-10-10 the build refused instead: a ratchet from
+the time C const data lived in bank $00 failed the link under 1024 free
+bytes, on a ROM that worked (issue #168; `BANK0_FAIL_THRESHOLD`, now 0 by
+default, is kept for a project that wants its code bank watched).
+`make test-bank-spill` rebuilds four examples with bank $00 given no room
+and compares them frame for frame with the normal build. What cannot move
+is what is pinned (`BANK 0`): the startup code, the interrupt handlers, a
+hand-written section that says so — if those do not fit, the linker fails.
 
-If bank $00 still runs out (code plus hand-written asm payload):
+To keep bank $00 for what must be there:
 - Declare `.incbin` / `.db` payload with `ASSET_SECTION` (`templates/assets.inc`)
   instead of a bank-$00 `.SECTION` — it takes the same asset banks the
   compiler uses.

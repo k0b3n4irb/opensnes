@@ -64,11 +64,15 @@ WAV2BRR  := $(OPENSNES)/bin/wav2brr
 ASEPRITE2SNES := $(OPENSNES)/bin/aseprite2snes
 TEMPLATES := $(OPENSNES)/templates
 
-# Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.
-# 1024 since 2026-09-23, when the examples' data moved to ASSET_SECTION and
-# the corpus minimum rose from 12 bytes to 1912 (tetris). History, policy
-# and the re-measure loop: .claude/rules/bank0_budget.md.
-BANK0_FAIL_THRESHOLD ?= 1024
+# Bank $00 free-space threshold (bytes free) under which the link fails.
+# 0 = never, the default since 2026-10-10: bank $00 holds code only (C const
+# data is in the asset banks since #127.3), and code that does not fit goes
+# to bank $01 and up by itself — a C function and a library routine are
+# SUPERFREE sections reached by `jsl`. At 1024 (2026-09-23 to 2026-10-10)
+# this refused a working ROM to the first game that outgrew 32 KB of code
+# (issue #168). A project that wants its code bank watched sets a value.
+# History: .claude/rules/bank0_budget.md.
+BANK0_FAIL_THRESHOLD ?= 0
 
 # C RAM band ($00:0000-$1FFF) budget — the RAM twin of the ROM ratchet
 # above (structural defect B2: all C-accessible RAM must sit in the 8 KB
@@ -571,13 +575,13 @@ CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 # Local headers count too (2026-09-26): tetris's main.c includes board.h,
 # piece.h, render.h and hud.h, and editing them rebuilt nothing. Every .h
 # next to a C source, rather than exact -MD deps: cheap and never stale.
-# When a source fails to compile, say which of its names OpenSNES 1.0 removed
+# When a source fails to compile, say which of its names OpenSNES 0.49 removed
 # and what to use instead (`opensnes upgrade`, make/removed_api.txt): the
 # compiler can only call them undeclared. A binary of bin/ like the rest: the
 # last interpreted step of a user build left this file on 2026-10-06
 # (.claude/rules/two_audiences.md; check_doc_drift.py anchor 17 keeps it so).
 upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes upgrade -q --removed-only $(1); then \
-	echo "  (the names above were removed at OpenSNES 1.0 — docs/UPGRADING.md)"; fi
+	echo "  (the names above were removed at OpenSNES 0.49 — docs/UPGRADING.md)"; fi
 LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
 %.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)

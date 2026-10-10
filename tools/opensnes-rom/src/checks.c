@@ -64,16 +64,35 @@ int check_bank0(cli_ctx *ctx, const sym_file *s, const char *rom, int warn, int 
         free_bytes = 0x10000 - (highest->address + size);
     }
     r->bank0_free = free_bytes;
+    /* Code that did not fit bank $00 is in the next banks, where the linker
+     * put it: a C function and a library routine are SUPERFREE sections
+     * reached by `jsl`, and nothing in them is tied to their bank. */
+    long far_code = 0;
+    int far_n = 0;
+    for (size_t i = 0; i < s->nsections; i++)
+        if (s->sections[i].bank > 0 && starts(s->sections[i].name, ".text.")) {
+            far_code += s->sections[i].size;
+            far_n++;
+        }
     if (fail > 0 && free_bytes < fail) {
-        cli_error(ctx, rom, "bank $00 ROM imminent overflow: %ld bytes free, fail threshold %d — the next code section or hand-written bank-$00 payload will not fit (.claude/rules/bank0_budget.md)", free_bytes, fail);
+        cli_error(ctx, rom, "bank $00 ROM: %ld bytes free, under the threshold asked for (%d) — code that does not fit goes to the next banks by itself; this threshold is for a project that wants its code bank watched (.claude/rules/bank0_budget.md)", free_bytes, fail);
         return 1;
     }
-    if (free_bytes < warn) {
-        cli_warn(ctx, rom, "bank $00 ROM nearly full: %ld bytes free (threshold %d); only code and hand-written bank-$00 payload consume it", free_bytes, warn);
-        report_bank0_payload(ctx, s, rom);
-        return 2;
+    /* Until 2026-10-10 a bank $00 under `warn` bytes free was a warning and,
+     * under the build's threshold, a failed link — a ratchet from the time
+     * C const data had to live there. Since #127.3 that data is in the asset
+     * banks, and a full bank $00 only means the next functions go to bank
+     * $01: a game that outgrew 32 KB of code was refused a ROM that worked
+     * (issue #168). It is now a line of the report; what cannot move (the
+     * sections pinned to bank $00) fails in the linker, loudly. */
+    (void)warn;
+    if (!ctx->json && !ctx->quiet) {
+        if (far_n)
+            printf("OK: bank $00 ROM (code): %ld bytes free; %ld bytes of code (%d functions) are in the next banks, where the linker put them\n",
+                   free_bytes, far_code, far_n);
+        else
+            printf("OK: bank $00 ROM (code): %ld bytes free\n", free_bytes);
     }
-    if (!ctx->json && !ctx->quiet) printf("OK: bank $00 ROM (code): %ld bytes free\n", free_bytes);
     report_bank0_payload(ctx, s, rom);
     return 0;
 }
