@@ -12,6 +12,13 @@ the base commit built with the old toolchain) and runs
 `MATCH (offset k)` means the new build renders the reference frame F at
 F ± k — the boot-length shift a codegen change can introduce is reported,
 not hidden. `DIFF` is a real rendering change and the example is listed.
+A DIFF is then replayed with `luna diff --sequence` over frames 1 to the last
+manifest frame, and its verdict printed under it: SAME-SEQUENCE says the two
+ROMs show the same pictures in the same order (a boot that got shorter, a
+free-running loop that got faster); DIFF says they do not. It informs the
+reading; it does not turn a DIFF into a MATCH. On a nearly static screen
+(three pictures, one of them a transition) the sequence verdict means
+little: read the frame comparison.
 This is the proof a compiler / library change wants BEFORE any re-baseline:
 "same picture at the same frame on every example, modulo k".
 
@@ -82,8 +89,21 @@ def main() -> int:
             matched += 1
             print(f"  MATCH   {key}: {summary}")
         elif proc.returncode == 1:
+            # Second pass (luna v1.35.0, `diff --sequence`): does the example
+            # show the same pictures in the same order, at another offset or
+            # cadence? A free-running loop that got faster is SAME-SEQUENCE
+            # here and still counts as a DIFF at equal frame — the verdict is
+            # printed, the decision to re-baseline stays with whoever reads it.
+            last = max(capture_frames(key, manifest))
+            seq = subprocess.run([luna, "diff", str(ref_rom), str(rom), "--sequence", "--from", "1", "--to", str(last)]
+                                 + (["--power-on", args.power_on] if args.power_on else []),
+                                 capture_output=True, text=True, timeout=900)
+            tail = [l for l in seq.stdout.splitlines() if l.strip()]
+            verdict = tail[-1] if tail else seq.stderr.strip()[:120]
+            run = next((l for l in tail if l.startswith("longest common run")), "")
             diffs += 1
             print(f"  DIFF    {key}: {summary}  (PNGs: {args.screenshot_dir}/{key.replace('/', '_')})")
+            print(f"          as a sequence over frames 1-{last}: {verdict}" + (f" [{run}]" if run else ""))
         else:
             diffs += 1
             print(f"  ERROR   {key}: {proc.stderr.strip()[:200]}")

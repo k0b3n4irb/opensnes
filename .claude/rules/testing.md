@@ -55,13 +55,19 @@ with its `_DEP_` line.
 The audio oracle is a hash of the WAV, so it flips on a shift of a few CPU
 cycles in the code that talks to the SPC700 (the phase, not the sound).
 **A commit that re-captures `baselines/audio.json` quotes the output of
-`luna diff --audio <before>.sfc <after>.sfc --until-frame 300`** (luna
+`luna diff --audio --align-onset <before>.sfc <after>.sfc --until-frame 300`** (luna
 v1.32.0: RMS per 500 ms window, first non-silent sample, MATCH / DIFF at
 2 %) for the ROM built before the change against the one after; the hash
 stays the guard, the comparison says by how much it moved. A half-volume
 module gives 75 % and DIFF; two silent captures give MATCH with
 `a=none b=none` on the onset line — read that line for an example meant
 to play.
+`--align-onset` (luna v1.35.0, pinned 2026-10-10) lines the two captures up
+on their first sample above the silence level before cutting the windows,
+and prints the shift: a sound that starts a few samples earlier because
+the code got faster is then compared with itself (music_large on
+2026-10-10: 0.25 % without, 0.09 % with, "onset shift +6 samples"), and a
+shift of thousands of samples is a fact to explain, not noise.
 
 The WRAM oracle hashes every WRAM page at each vblank **except the pages of
 the plain C band that lie wholly above the ROM's last C variable** — the
