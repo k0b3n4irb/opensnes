@@ -301,6 +301,17 @@ estimation.
   in the tree are the library test ROM and `devtools/libbench`. The path
   is covered by those two, not by a game. An example that scrolls with
   world-space sprites is owed (the examples review before 1.0).
+- `f09884de` (luna pin v1.37.0) puts likemario's NMI count in the
+  coverage page, 189 for 190 over 200 frames, down to "a shorter boot".
+  Wrong direction, and not luna's doing: measured after the commit with
+  both luna binaries, the ROM built before step 9 services 190 NMIs and
+  the one after 189 — one frame MORE before NMIs are enabled, after a pass
+  that only shortens code. Cause not established; likemario loads a
+  SNESMOD module at boot, and the SPC700's side of that handshake does
+  not speed up with ours, so a faster main loop can land on the other side
+  of a frame boundary. Its pictures are identical at its manifest frames
+  (`diff_corpus`, offset 0). To look at if a boot ever gains a frame it
+  should not.
 
 ## S7: PVSnesLib's examples against ours (mapped 2026-10-09)
 
