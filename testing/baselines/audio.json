@@ -1,5 +1,5 @@
 {
-  "luna": "v1.37.0",
+  "luna": "v1.38.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
@@ -23,7 +23,7 @@
       "peak": 21143
     },
     "audio/echo": {
-      "sha256": "93a27b48f906fe1c8e7fd5bc010c3b57100f5194f77557c064b271e54cbbfd47",
+      "sha256": "fa54c5738a158cebce90733f85d52f86a7dccdb71aa05c6d9c83468d858a27f5",
       "samples": 159936,
       "peak": 10922
     },
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "6ccac1f66c4fe2ce45061c6a25bc5997f7176c94a295d1a2d6ff74e05bc95499",
+      "sha256": "4b52863ffc01c8d8b0e159c083dc50bc080a75c780347f4d98c2803ca60cd6c0",
       "samples": 159936,
       "peak": 12192
     }
