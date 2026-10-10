@@ -154,5 +154,6 @@ now holds a goal and a full kick-off, a phase where few players decide:
 **74.86 M over 340 ticks**, not comparable with the 103.47 M above. The
 rule for measuring a step on the game from now on: build BOTH compilers on
 the game's sources of the day and compare those two figures; never compare
-with a figure of the day before. Bank $00: 1,894 bytes free, the rest in
-bank $01 without the game having to think about it.
+with a figure of the day before. Bank $00: 1,894 bytes free and nothing in
+bank $01 yet (the game first wrote the opposite and corrected itself: the
+spill comes with its next step).
