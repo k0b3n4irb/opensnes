@@ -1,3 +1,6 @@
+# Since 2026-10-10 a late pass writes `stz` for a store of 0 (see peep_late);
+# the stores this case pins are read in the form the emitter writes.
+env QBE_NO_PEEP_LATE=1
 # 32-bit (u32) values take two words and every operation carries between
 # them (ported from opensnes-emu test_u32_arithmetic — result32 4 bytes, its
 # high word accessed, add/sub not folded — plus the carry chains).

@@ -5,7 +5,7 @@
   "array_write": 52,
   "bitwise_and": 19,
   "bitwise_or": 19,
-  "byte_store_loop": 96,
+  "byte_store_loop": 90,
   "call_add": 4,
   "call_chain": 19,
   "clamp": 60,
@@ -14,7 +14,7 @@
   "div_const_10": 33,
   "empty_func": 12,
   "global_increment": 21,
-  "loop_sum": 73,
+  "loop_sum": 67,
   "mod_const_10": 33,
   "mul_const_13": 36,
   "mul_const_20": 32,
@@ -29,8 +29,8 @@
   "shift_right_4": 22,
   "signed_shift_right_1": 19,
   "signed_shift_right_8": 28,
-  "struct_sum": 51,
+  "struct_sum": 49,
   "sub_u16": 21,
-  "swap": 91,
+  "swap": 83,
   "zero_store_global": 14
 }

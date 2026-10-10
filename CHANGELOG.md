@@ -37,6 +37,20 @@ All notable changes to OpenSNES are documented in this file.
   `QBE_NO_OPND_SHARE=1` turn the two halves off (compiler check
   `phi_share`).
 
+- perf(compiler): **a last pass over the generated code writes four
+  shorter forms**: an index kept in a slot goes straight to X
+  (`ldx.b S` for `lda.b S / tax`), a store of 0 is one `stz`, a counter is
+  one `inc` or `dec` of its slot, and a constant stored to several places
+  is loaded once. Same game, same method: match logic 64.2 M to 62.2 M
+  master cycles (-3.0 %), everything but the idle wait -2.0 %. Against
+  PVSnesLib over the twenty-one workloads: -57.3 % -> -58.4 % in cycles,
+  -47.3 % -> -50.5 % in size (half the bytes); the static table goes from
+  1258 to 1236 cycles. On the library bench the `dma` row, a tie since the
+  first day, reads +0.1 % (nine master cycles in 17,900): the bench times
+  a loop with the call against the same loop empty, and this pass helps
+  the empty loop more. `QBE_NO_PEEP_LATE=1` turns it off (compiler check
+  `peep_late`).
+
 ### Fixed
 - fix(compiler): **`(u8)v` after a loop that shifts a signed char right
   kept the sign's high byte** (silent). `v >>= n` in a loop on an `s8`,
