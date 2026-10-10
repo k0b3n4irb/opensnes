@@ -60,3 +60,14 @@ own cycles…" gives anomie-timing, *S-CPU (5A22) / DMA*
 whole multiple of 8 master cycles since reset". The fiche is therefore not
 needed for the fact itself; what no source states is which emulators
 followed it and since when, which is luna's to report.
+
+**2026-10-10, third query, after the MCP itself was updated: closed.** The
+same query now returns `2dda265e2f4d3aa9` (luna-docs, arbitre-domaine):
+"`--align-onset` compares each window of A with the stretch of B that
+fits it best … within `--max-shift` samples either way, and prints the
+shift it kept", with the `echo` example and its `shift=+2` lines. That is
+v1.37.0. The request of `2026-10-10_to_snes-rag_apres-mise-a-jour-luna-docs.md`
+(§2) is answered; what we saw before was our own connection serving the
+earlier index, as that report had allowed for. Golden query to add at each
+luna pin: "per-window shift --max-shift" must return a passage that names
+`--max-shift`.
