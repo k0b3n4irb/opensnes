@@ -987,9 +987,9 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     for k, h in enumerate(P.helpers):
         if h.kind == "sum":
             h.elem = P.arrays[h.array][0]
-        out.append(c_helper(h, k, n))
+        out.append(STATIC(P) + c_helper(h, k, n))
     params = ", ".join(f"{P.vars[p]} {p}" for p in P.params) or "void"
-    out.append(f"u32 t{n}({params}) {{")
+    out.append(f"{STATIC(P)}u32 t{n}({params}) {{")
     for name, t in P.vars.items():
         if name not in P.params and name not in P.gvars:
             out.append(f"    {'static ' if name in P.statics else ''}{t} {name} = {P.init[name]};")
@@ -1032,11 +1032,28 @@ class Case:
         self.expected = expected(P)        # raises UB
 
 
+def STATIC(P) -> str:
+    """`static ` for the programs of an odd seed (2026-10-10). cc65816 gives a
+    static function with ONE call site to its caller, body and control flow
+    (whole-function inlining, issue #166): with every function global, no
+    generated program went through that code. An odd seed's programs and
+    helpers are static — each program is called once, from main, so it is
+    inlined there; a helper is inlined when the program happens to call it
+    once, or at every call when the seed makes them `static inline`; the two
+    in the table of function pointers are not. The program computes the
+    same thing either way."""
+    return getattr(P, "static_fns", "")
+
+
 def make_cases(seed: int) -> list:
     rng = random.Random(f"stmt-{seed}")
     cases = []
     while len(cases) < PROGS_PER_ROM:
         P = gen_prog(rng)
+        # seeds 4k+1: `static`; seeds 4k+3: `static inline`, which also copies
+        # a helper called from several places
+        P.static_fns = ("" if not isinstance(seed, int) or seed % 2 == 0
+                        else "static " if seed % 4 == 1 else "static inline ")
         try:
             cases.append(Case(P, f"seed {seed} program {len(cases)}"))
         except UB:

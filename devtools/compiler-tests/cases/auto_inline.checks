@@ -1,0 +1,25 @@
+# absorbed: no label, no call
+raw absent \nclamp\.
+raw absent \ninner\.
+raw absent \nmiddle\.
+raw absent \nlow\.
+in once: absent jsl
+in chain: absent jsl
+in cut: absent jsl
+# the byte parameter is cut
+in cut: present and\.w #\$00FF
+# kept: more than one call site, address used, recursion, an escaping local
+raw present \ntwice\.auto_inline:
+raw present \ntaken\.auto_inline:
+raw present \ndown\.auto_inline:
+raw present \nlocal\.auto_inline:
+in two: present jsl twice[\s\S]*jsl twice
+in rec: present jsl down
+# `static inline` with two call sites: copied twice, gone
+raw absent \npick\.
+in both: absent jsl
+# a leaf of some size is not poured into a caller that still calls
+raw present \nsweep\.auto_inline:
+in boot: present jsl sweep
+raw absent \nsweep2\.
+in alone: absent jsl

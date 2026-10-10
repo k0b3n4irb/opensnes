@@ -160,7 +160,11 @@ def code_size(sdk: str, rom: Path, funcs: list) -> int:
             parts = line.split()
             if on and len(parts) == 5 and parts[4].startswith(".text."):
                 size[parts[4][6:].split(".")[0]] = int(parts[3], 16)
-        return sum(size[f] for f in funcs)
+        # a helper that is no longer a function was inlined into its one
+        # caller (cc65816, 2026-10-10): its bytes are counted there
+        if funcs[0] not in size:
+            sys.exit(f"sdkbench: {funcs[0]} is not a function of {rom.name}")
+        return sum(size.get(f, 0) for f in funcs)
     # PVSnesLib: no section sizes. A function runs to the next function label
     # of its bank; the last one of a bank runs to its `rtl` ($6B), looked for
     # after the function's last local label so that an operand byte is not
@@ -175,7 +179,8 @@ def code_size(sdk: str, rom: Path, funcs: list) -> int:
     image = rom.read_bytes()
     total = 0
     for f in funcs:
-        k = next(n for n, lab in enumerate(labels) if lab[2].endswith(".asm_" + f))
+        # a static function is `<file>.asm_<name>` to 816-tcc, a global one `<name>`
+        k = next(n for n, lab in enumerate(labels) if lab[2] == f or lab[2].endswith(".asm_" + f))
         bank, start = labels[k][0], labels[k][1]
         last, end = start, None
         for b2, a2, name in labels[k + 1:]:

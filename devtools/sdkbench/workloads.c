@@ -9,6 +9,11 @@
  * Each leaves a checksum in `res`; the two SDKs must agree on it, or the
  * comparison of their speed means nothing.
  *
+ * The workloads themselves (w_*) are not static: each must remain a
+ * function of its own to be measured, and since 2026-10-10 cc65816 gives a
+ * static function with one call site to its caller. Their helpers stay
+ * static, as a game would write them.
+ *
  * Plain C89 so that 816-tcc and cc65816 both take it unchanged. WORKLOAD
  * (from which.h) selects the one this ROM runs; 0 runs none (the baseline
  * the runner subtracts).
@@ -55,7 +60,7 @@ static void ent_init(void) {
 }
 
 /* 1. sieve of Eratosthenes: byte array writes, nested loops */
-static void w_sieve(void) {
+void w_sieve(void) {
     u16 i, j, count;
     count = 0;
     for (i = 0; i < 1024; i++) sieve[i] = 1;
@@ -69,7 +74,7 @@ static void w_sieve(void) {
 }
 
 /* 2. insertion sort of 64 words: compares and moves in an array */
-static void w_sort(void) {
+void w_sort(void) {
     u16 i, j, key, sum;
     rnd = 777;
     for (i = 0; i < 64; i++) arr[i] = rnd16();
@@ -88,7 +93,7 @@ static void w_sort(void) {
 }
 
 /* 3. entities bouncing in a box, 60 frames of it: struct fields, signed math */
-static void w_physics(void) {
+void w_physics(void) {
     u16 step, i, sum;
     ent_init();
     for (step = 0; step < 60; step++) {
@@ -105,7 +110,7 @@ static void w_physics(void) {
 }
 
 /* 4. box against box for every pair, 8 rounds: struct reads through pointers */
-static void w_collide(void) {
+void w_collide(void) {
     u16 round, i, j, hits;
     s16 dx, dy;
     struct Ent *a;
@@ -131,7 +136,7 @@ static void w_collide(void) {
 }
 
 /* 5. multiply two variables, 48 x 48 times */
-static void w_mul(void) {
+void w_mul(void) {
     u16 i, j, acc;
     acc = 0;
     for (i = 1; i <= 48; i++)
@@ -141,7 +146,7 @@ static void w_mul(void) {
 }
 
 /* 6. numbers to decimal digits: divide and modulo by 10 */
-static void w_decimal(void) {
+void w_decimal(void) {
     u16 n, v, sum;
     sum = 0;
     for (n = 0; n < 200; n++) {
@@ -155,7 +160,7 @@ static void w_decimal(void) {
 }
 
 /* 7. a 32-bit generator and hash: long multiply, add, shifts */
-static void w_long(void) {
+void w_long(void) {
     u32 x, h;
     u16 i;
     x = 1;
@@ -169,7 +174,7 @@ static void w_long(void) {
 }
 
 /* 8. byte buffers: fill, copy, compare, scan */
-static void w_bytes(void) {
+void w_bytes(void) {
     u16 i, pass, sum;
     u8 *s;
     u8 *d;
@@ -193,12 +198,12 @@ static u16 fib(u16 n) {
     return fib(n - 1) + fib(n - 2);
 }
 
-static void w_calls(void) {
+void w_calls(void) {
     res = fib(17);
 }
 
 /* 10. a small bytecode interpreter: switch, branches, a state machine */
-static void w_switch(void) {
+void w_switch(void) {
     u16 pc, acc, x, round;
     u8 op;
     for (pc = 0; pc < 64; pc++) bufa[pc] = (u8)((pc * 5 + (pc >> 2)) & 7);
@@ -223,7 +228,7 @@ static void w_switch(void) {
 }
 
 /* 11. CRC-16 bit by bit over 256 bytes: shifts and xors */
-static void w_crc(void) {
+void w_crc(void) {
     u16 i, crc;
     u8 b, k;
     crc = 0xFFFF;
@@ -239,7 +244,7 @@ static void w_crc(void) {
 }
 
 /* 12. a linked list walked 40 times: pointer chasing */
-static void w_list(void) {
+void w_list(void) {
     u16 i, round, sum;
     struct Node *p;
     for (i = 0; i < 64; i++) {
@@ -261,7 +266,7 @@ static void w_list(void) {
 }
 
 /* 13. a 32 x 16 tilemap: written from coordinates, then looked up */
-static void w_tilemap(void) {
+void w_tilemap(void) {
     u16 x, y, n, sum;
     for (y = 0; y < 16; y++)
         for (x = 0; x < 32; x++)
@@ -279,7 +284,7 @@ static void w_tilemap(void) {
 }
 
 /* 14. a 16 x 32 byte grid: the four neighbours of every inner cell */
-static void w_grid(void) {
+void w_grid(void) {
     u8 x, y;
     u16 sum;
     rnd = 4242;
@@ -294,7 +299,7 @@ static void w_grid(void) {
 }
 
 /* 15. the entities again, walked with a pointer instead of an index */
-static void w_entities(void) {
+void w_entities(void) {
     u16 step, sum;
     struct Ent *e;
     ent_init();
@@ -312,7 +317,7 @@ static void w_entities(void) {
 }
 
 /* 16. word and byte copies written as index loops */
-static void w_copy(void) {
+void w_copy(void) {
     u16 i, pass, sum;
     for (i = 0; i < 128; i++) wsrc[i] = i * 517 + 9;
     for (i = 0; i < 512; i++) bufa[i] = (u8)(i + (i >> 3));
@@ -351,7 +356,7 @@ static void scpy(u8 *d, u8 *s) {
     }
 }
 
-static void w_strings(void) {
+void w_strings(void) {
     u16 i, k, sum;
     for (k = 0; k < 8; k++) {
         for (i = 0; i < 40 + k * 2; i++) bufa[k * 64 + i] = (u8)('A' + ((i * (k + 3)) & 15));
@@ -373,7 +378,7 @@ static u16 op_dec(u16 v) { return v - 1; }
 
 static u16 (*ops[4])(u16) = { op_add, op_xor, op_rot, op_dec };
 
-static void w_state(void) {
+void w_state(void) {
     u16 n, acc;
     u8 state;
     acc = 1;
@@ -413,7 +418,7 @@ static void place(u16 cam_x, u16 cam_y) {
     }
 }
 
-static void w_place(void) {
+void w_place(void) {
     u16 i, n, acc;
     for (i = 0; i < PN; i++) {
         size_tab[i] = (i == 18) ? 16 : 32;
@@ -471,7 +476,7 @@ static void distances(void) {
     }
 }
 
-static void w_dist(void) {
+void w_dist(void) {
     u16 i, n, acc;
     for (i = 0; i < 18; i++) {
         dpx[i] = (s16)(i * 37) - 200;

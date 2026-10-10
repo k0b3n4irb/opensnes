@@ -79,6 +79,17 @@ many thousand cycles. When logic outgrows it, in rough order of reach-for:
   issue #166, which first reported the opposite and corrected it). So keep
   `u8` tables where they save RAM, and read them into `u16` / `s16` locals
   before computing with them.
+- **Cut the logic into small `static` functions freely.** A `static`
+  function called from one place costs nothing: the compiler puts its body
+  where the call was, loops and tests included, and emits no function. One
+  called from several places stays a call (pushed arguments, `jsl`, `rtl`:
+  some tens of cycles each time) unless it says `static inline`, which
+  copies its body at each call — speed bought with code size, where you
+  decide. The exception the compiler makes on its own: a function that
+  calls nothing, unless it is tiny, is kept apart from a caller that calls
+  other things, because apart it runs faster. Do not expect much from
+  inlining alone: on a real game cut this way the logic gained under 1 %;
+  the time is in the bodies, not in the calls.
 - **A loop the library already has in assembly is not worth writing in C**:
   placing the sprites of a scrolling game is `oamPlaceWorld()`, copying is
   `memcpy()`, several small VRAM uploads are the `vramqueue` module.

@@ -11,3 +11,5 @@ unsigned short pub(unsigned short a) {
     unsigned short (*q)(unsigned short) = taken;
     return helper(a) + q(a);
 }
+/* a second call site: with one, `helper` would be inlined (2026-10-10) */
+unsigned short pub2(unsigned short a) { return helper(a) * 2; }
