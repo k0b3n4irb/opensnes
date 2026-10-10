@@ -52,3 +52,25 @@ Noté comme défaut chez vous ; rien ne dépend de lui ici.
   `at_symbol` pour les points de contrôle, `input_at` pour les scripts.
   C'est notre prochaine dette à payer de ce côté, et votre outil existe
   déjà.
+
+## Réponse de luna au §3 (message du même jour)
+
+Mesuré par luna sur nos seize exemples dont une source cite HDMA
+(`luna profile --frames-out`, colonne `dma_mclk`, trames 100 à 199, ancien
+binaire contre binaire avec le lot DMA) :
+
+- `hdma/gradient_colors`, `hdma_wave`, `hdma_helpers` : aucun DMA par
+  trame, avant comme après. C'est attendu chez nous : le gestionnaire NMI
+  n'envoie l'OAM que si un sprite a bougé, et ces exemples n'en bougent
+  aucun. Rien ne bougera pour eux.
+- `tetris` : 24 cycles maîtres par rafale avant, 40 ou 48 après ; en
+  moyenne +2,4 par trame.
+- `superfx_game_skeleton` : +26 à +56 par trame, aucune trame en retard.
+- `superfx_3d` : la rafale est à cheval sur la frontière de trame, la
+  somme par trame bouge de −868 à +884, +375 en moyenne ; c'est l'exemple
+  à passer à `luna diff --sequence` au relevé.
+- `mode2`, `hicolor_1792` : inchangés au cycle près.
+
+Règle pour prévoir : par rafale lancée avec un canal HDMA activé,
++ (1 à 8) + 8 par canal + (1 à la durée de l'accès suivant) ; sans HDMA
+activé, ±2 ou 4 seulement quand l'accès qui lance dure 6 cycles.
