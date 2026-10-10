@@ -133,8 +133,8 @@ compilers.
 | `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,894 | 17,885 | -0.1 % |
 | `text` | 20 characters printed and shown | 84,676 | 67,440 | -20.4 % |
 | `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 142,257 | -16.2 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 62,797 | -51.4 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,379 | -75.7 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 61,275 | -52.6 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,384 | -75.7 % |
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,605 | -4.6 % |
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,400 | 10,737 | -38.3 % |
 

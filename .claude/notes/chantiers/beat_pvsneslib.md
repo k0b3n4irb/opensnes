@@ -445,3 +445,16 @@ Two examples boot one frame sooner (mode4, mode7/extbg: MATCH at tolerance
 2). play_noise's audio differs by 6 % in its first window with an onset two
 samples earlier: noise, whose windows are not phase-stable.
 
+Step 3 of #166 (patterns 1, 2, 4: a peephole over the emitted text):
+`place` 7,325,978 -> 6,460,002 (-12.9 % since the issue opened), 74 -> 66
+instructions an iteration; `near` 37 -> 32, `sort` 95 -> 80, 2D lookup
+59 -> 51. 19 workloads: -47.5 % cycles, -35.8 % size against PVSnesLib.
+Corpus 86/86 at tolerance 0; hunt 66001-70000 and 167001-173000 clean.
+The hunt found a defect of step 2 (a backward bound that did not count the
+branches already shortened: link failure at 129 bytes), fixed with this
+step. What the listing still shows, for the next steps: the load of a
+table then an operation on it (`lda.w gx,x / sta / lda.w xs,x / sta / lda /
+sbc`) where `sbc.w xs,x` would do; `cmp.w #0` after an operation that set
+the flags; the comparison result materialised as 0 or 1 (pattern 8); the
+loop counter in memory with the test at the top (pattern 6).
+

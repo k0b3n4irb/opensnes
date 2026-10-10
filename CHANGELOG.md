@@ -403,6 +403,18 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **A value just stored is not loaded back, and an index stays in X**
+  (compiler; issue #166, patterns 1, 2 and 4): a peephole over each
+  function's emitted text removes, inside a straight line of code, the
+  reload of a value just stored, a store overwritten before it is read, a
+  load overwritten by the next, and `lda slot / tax` when X already holds
+  that slot. An array index went from nine instructions to four
+  (`lda / asl a / sta / tax`, once for all the accesses that use it).
+  `place`: 7,325,978 -> 6,460,002 master cycles (−12.9 % since the issue
+  was opened), 502 -> 478 bytes, 74 -> 66 instructions an iteration; the
+  issue's other functions: `near` 37 -> 32 instructions, `sort` 95 -> 80,
+  the 2D lookup 59 -> 51. Over the 19 workloads: 47.5 % fewer cycles and
+  35.8 % less code than PVSnesLib.
 - **A conditional over a near target is one branch** (compiler; issue
   #166, pattern 5): `bcc + / jmp @target / +` becomes `bcs @target` when
   the target is within reach of a relative branch — two bytes instead of
@@ -597,6 +609,13 @@ freeze criterion that waits for hardware.
   change by it and render the same frames.
 
 ### Fixed
+- **A short branch could be one byte out of reach, and fail the link**
+  (compiler; in `develop` for a day, never in a release): the pass that
+  shortens conditionals did not count the branches it had already
+  shortened earlier in the same function, so a backward branch judged at
+  123 bytes was at 129. The assembler refuses such a branch ("too large
+  distance") — a build failure, never wrong code. One program in 4,000 of
+  the differential hunt hit it; the corpus did not.
 - **`opensnes-sprite sheet --metasprite W H` on a sheet of several rows of
   metasprites** (tools; found by issue #165): the first block of each
   metasprite was computed by a formula that holds for a sheet of one row
