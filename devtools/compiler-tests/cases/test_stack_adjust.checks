@@ -1,3 +1,6 @@
+# Since 2026-10-10 a temporary that no call crosses lives in the direct page
+# even in a function that calls (see dp_temps); the case pins how stack-relative offsets climb while arguments are pushed.
+env QBE_NO_DP_TEMPS=1
 # sp_adjust: locals sit at 12/14/16/18/20,s; each pha moves SP by 2, so
 # the stack-relative loads must climb 12,16,20,24,28 as args are pushed.
 in test_stack_adjust: present lda\.w ext_a\n\tsta 2,s

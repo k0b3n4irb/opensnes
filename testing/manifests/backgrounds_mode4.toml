@@ -13,7 +13,7 @@
 #     bytes $20, low 3 bits clear.
 # Measured on luna v1.30.2 (`luna state --until-frame N --input … --dump-vram`).
 rom = "../../examples/backgrounds/mode4/mode4.sfc"
-frames = 130
+frames = 129                           # 130 until 2026-10-10: the boot is a frame shorter (direct-page temporaries), the wave one step further at a given frame
 input = "110:0x0080,112:0"        # A: vertical -> horizontal
 
 [[checkpoint]]                 # the reference for the delta below: the booted scene, not power-on RAM (2026-10-04)

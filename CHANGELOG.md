@@ -412,6 +412,31 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **A function that calls keeps its short-lived temporaries in the direct
+  page** (compiler; issue #166): until now only a function that calls
+  nothing had its temporaries there (`lda.b`, no frame to build); one call
+  anywhere and every temporary went to a stack frame. Now a temporary that
+  is not live across any call gets a direct-page slot — whatever the callee
+  does with that block, the value is dead by then — and only what a call
+  crosses stays on the stack. Found by measuring a real game: 59 % of its
+  logic's time was in functions that call, and 145 of the 250 instructions
+  of the heaviest were stack-relative. On that game (whole scripted run,
+  time in its logic file): 98.6 M -> 93.6 M master cycles, -5.4 % against
+  the compiler of the morning before inlining, and 370 bytes less code;
+  92.1 M with `inline` on its two geometry helpers. On the bench against
+  PVSnesLib: total -50.8 % -> -52.9 % in cycles, -37.3 % -> -38.4 % in
+  size (`sort` -42.9 -> -53.9 %, `collide` -32.9 -> -41.9 %, `entities`
+  -57.2 -> -62.3 %), the stack no deeper on 19 workloads of 20 (18). The
+  library bench gains too, its C functions being functions that call:
+  `text` 67,392 -> 62,840, `frame` 142,167 -> 138,384, and `oamxy` and
+  `dma` are no longer behind PVSnesLib (13 rows of 13). `QBE_NO_DP_TEMPS=1`
+  turns it off. Validation: the 86 examples show the same pictures (four
+  free-running ones a frame earlier, the boot being a frame shorter:
+  re-captured, with the three manifests that pinned an animated value at a
+  frame); 200,000 generated programs and 96,000 generated expressions on
+  new seeds, clean. Eight compiler checks that pin a stack mechanism now
+  compile with the feature off (an `env` line in their `.checks`), and a
+  new one pins the feature.
 - **A `static` function with one call site is its caller's code**
   (compiler; issue #166, pattern 9): when a function is not exported, its
   address is not used and the file calls it from exactly one place, its
@@ -662,6 +687,18 @@ freeze criterion that waits for hardware.
   change by it and render the same frames.
 
 ### Fixed
+- **`audioLoadSample()` could time out on a valid sample** (lib, module
+  `audio`): for a sample whose last index byte is 0 — 513 bytes, 769, any
+  size of the form 256 k + 1 — the driver showed its end-of-stream mark
+  only until it read a 0 on the CPU's port, and that 0 was already there.
+  The mark lasted a few SPC700 cycles; the loader saw it or returned
+  `AUDIO_ERR_TIMEOUT` according to the phase of its polling loop. The
+  2026-10-03 fix had removed the hang for those sizes, not the race, and
+  the test passed by phase — until a compiler step made that loop one cycle
+  shorter per turn. The end is now a handshake in which each value one side
+  waits for is held by the other until answered (the mark is `$FF`, or
+  `$7F` when the last index byte is itself `$FF`). The library test loads
+  513 and 512 bytes and was run with the loader compiled two ways.
 - **A short branch could be one byte out of reach, and fail the link**
   (compiler; in `develop` for a day, never in a release): the pass that
   shortens conditionals did not count the branches it had already
