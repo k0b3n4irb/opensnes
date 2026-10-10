@@ -23,7 +23,7 @@ extbg_on = { eq = 1, width = 1 }
 # addressing: 1; leaf frames in the direct page: 4; short branches: 1; the
 # peephole's compare and dead-slot rules: 1), so the ball starts that many
 # pixels earlier.
-ball_x = { eq = 62, width = 2 }       # 61 until 2026-10-10: the boot is a frame shorter (direct-page temporaries)
+ball_x = { eq = 69, width = 2 }       # 61, then 62, until 2026-10-10: the boot got a frame shorter (direct-page temporaries), then seven (a loop variable updated in place)
 [checkpoint.ppu]
 setini = 0x40
 tm = 0x12

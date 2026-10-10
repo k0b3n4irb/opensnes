@@ -25,35 +25,35 @@
 rom = "../../examples/basics/fix32_orbit/fix32_orbit.sfc"
 
 [[checkpoint]]                 # Q1: cos > 0, sin > 0
-at_frame = 35
+at_frame = 34
 [checkpoint.values]
 g_angle8 = { eq = 0x20, width = 1 }
 g_sx     = { eq = 170, width = 2 }
 g_sy     = { eq = 138, width = 2 }
 
 [[checkpoint]]                 # Q2: cos < 0, sin > 0
-at_frame = 99
+at_frame = 98
 [checkpoint.values]
 g_angle8 = { eq = 0x60, width = 1 }
 g_sx     = { eq = 85,  width = 2 }
 g_sy     = { eq = 138, width = 2 }
 
 [[checkpoint]]                 # Q3: cos < 0, sin < 0
-at_frame = 163
+at_frame = 162
 [checkpoint.values]
 g_angle8 = { eq = 0xA0, width = 1 }
 g_sx     = { eq = 85, width = 2 }
 g_sy     = { eq = 53, width = 2 }
 
 [[checkpoint]]                 # Q4: cos > 0, sin < 0
-at_frame = 227
+at_frame = 226
 [checkpoint.values]
 g_angle8 = { eq = 0xE0, width = 1 }
 g_sx     = { eq = 170, width = 2 }
 g_sy     = { eq = 53,  width = 2 }
 
 [[checkpoint]]                 # exactly 256 steps after the Q1 sample
-at_frame = 291
+at_frame = 290
 [checkpoint.values]
 g_angle8 = { eq = 0x20, width = 1 }
 g_sx     = { eq = 170, width = 2 }

@@ -1,0 +1,6 @@
+# three shifts, not a constant 0
+in right3: present lda\.w x\n\tlsr a\n\tlsr a\n\tlsr a\n
+in right3: absent lda\.w #0\n\trtl
+# a count of 0: x itself
+in left0: present lda\.w x\n
+in left0: absent asl a
