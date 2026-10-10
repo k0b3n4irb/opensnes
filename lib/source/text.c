@@ -194,26 +194,29 @@ void textPrintAt(u8 x, u8 y, const char *str) {
     textPrint(str);
 }
 
-void textPrintU16(u16 value) {
-    /* Print most-significant digit first, no reversed stack buffer / pointer.
-     * (The reversed-buffer form miscompiled under some link layouts — see
-     * .claude/notes/tech/textprintu16_codegen_hang.md.) */
-    u16 place = 10000;
-    u8 started = 0;
+/* One decimal digit of textPrintU16: how many times P goes into the value. */
+#define U16_DIGIT(P) \
+    d = 0; \
+    while (value >= (P)) { value = (u16)(value - (P)); d++; } \
+    if (d != 0 || n != 0) { buf[n] = (char)('0' + d); n++; }
 
-    if (value == 0) {
-        textPutChar('0');
-        return;
-    }
-    while (place > 0) {
-        u8 digit = (u8)(value / place);
-        if (digit != 0 || started) {
-            textPutChar((char)('0' + digit));
-            started = 1;
-        }
-        value = (u16)(value % place);
-        place = (u16)(place / 10);
-    }
+void textPrintU16(u16 value) {
+    /* Digits by subtraction, most significant first, into a buffer handed
+     * to textPrint() once. Until 2026-10-11 this divided: three divisions
+     * a digit, two of them by a divisor above 255 that the hardware
+     * divider does not take — about 45,000 master cycles for one number, an
+     * eighth of a frame for a score. At most nine subtractions a digit. */
+    char buf[6];
+    u8 n = 0;
+    u8 d;
+
+    U16_DIGIT(10000)
+    U16_DIGIT(1000)
+    U16_DIGIT(100)
+    U16_DIGIT(10)
+    buf[n] = (char)('0' + (u8)value);
+    buf[n + 1] = '\0';
+    textPrint(buf);
 }
 
 void textPrintHex(u16 value, u8 digits) {

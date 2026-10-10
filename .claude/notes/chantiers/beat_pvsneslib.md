@@ -814,3 +814,21 @@ passes. Check the length of what was read before comparing it.
 
 No sdkbench workload divides 32 bits by a variable. A row to add if the
 bench is extended.
+
+## 2026-10-11: a profile of the whole corpus
+
+Owner, the same day: do not optimise for one program alone. Method: `luna
+profile` frames 60-300 on each of the 86 examples, summed by symbol
+(661 M master cycles of work in all). What it shows: the examples' own
+`main` 20 %, `NmiHandler` 18 % (the fixed price of a frame, already
+worked), then chip and effect code of single examples, `textPrint` 3 %,
+`tcc_mul16` 2.5 % (7 examples), `oamDrawMetasprite` 2.5 %, `tcc_div16`
+1.9 % (5 examples). The multiply and divide helpers already use the
+hardware units; what was wrong was a caller: `textPrintU16` made 15
+divisions a number, ten of them in software (divisor above 255). Now by
+subtraction: timer 132,211 → 93,849 master cycles a frame.
+
+Left on that list, not done: `textPrint` itself (63,000 master cycles a
+frame in `timer` for "COUNT=", three spaces and a 16-character line —
+about 2,400 a character, to look at next), `oamDrawMetasprite`, the four
+`nop` after each hardware multiply in `tcc_mul16`.

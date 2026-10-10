@@ -1251,6 +1251,36 @@ static void part_div32(void) {
     }
 }
 
+/* textPrintU16 (2026-10-11, digits by subtraction): the characters that
+ * land in the text buffer, and where the cursor stops. */
+u16 r_pu16_bad;     /* numbers printed wrong -> 0 */
+u16 r_pu16_n;       /* numbers printed -> 14 */
+extern u8 tilemapBuffer[];
+static void chk_pu16(u16 v, const char *want) {
+    u16 k;
+    u16 bad = 0;
+    textSetPos(0, 20);
+    textPrint("          ");
+    textSetPos(0, 20);
+    textPrintU16(v);
+    for (k = 0; want[k]; k++) {
+        u16 cell = tilemapBuffer[(20 * 32 + k) * 2] | ((u16)tilemapBuffer[(20 * 32 + k) * 2 + 1] << 8);
+        if ((cell & 0x03FF) != (u16)(text_config.font_tile - 32 + (u8)want[k])) bad = 1;
+    }
+    if (textGetX() != k) bad = 1;
+    r_pu16_bad += bad;
+    r_pu16_n++;
+}
+static void part_pu16(void) {
+    r_pu16_bad = 0;
+    r_pu16_n = 0;
+    chk_pu16(0, "0");       chk_pu16(7, "7");         chk_pu16(10, "10");
+    chk_pu16(99, "99");     chk_pu16(100, "100");     chk_pu16(109, "109");
+    chk_pu16(1000, "1000"); chk_pu16(9999, "9999");   chk_pu16(10000, "10000");
+    chk_pu16(10001, "10001"); chk_pu16(30000, "30000"); chk_pu16(40005, "40005");
+    chk_pu16(65535, "65535"); chk_pu16(60090, "60090");
+}
+
 int main(void) {
 
     /* audio v2 first: audioInit blocks on the APU boot + driver upload
@@ -1315,6 +1345,7 @@ int main(void) {
     part_collision_sram();
     part_objects_irq();
     part_div32();
+    part_pu16();
 
 
     coverage_bank_bytes();
