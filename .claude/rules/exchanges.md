@@ -69,7 +69,12 @@ The game builds against this working tree, on `develop`, as it is built —
 never a release.
 
 - A compiler chantier goes in a **separate worktree** (`release.md`, the
-  one-session-per-tree point), not in the tree the game consumes.
+  one-session-per-tree point), not in the tree the game consumes. **So
+  does a change to a public header or to `make/common.mk`**: the game's
+  next build sees an uncommitted edit of this tree at once (2026-10-10:
+  a field added to `OamWorldBatch` here broke its `-Werror` build before
+  our own validation had run). Library assembly behind an unchanged
+  header may be worked on here.
 - What lands on `develop` for a neighbour is **announced to it**: the
   commit, what changes for it, what to try again.
 - A full rebuild of this tree (`make clean && make`, minutes during which

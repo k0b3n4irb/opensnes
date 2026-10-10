@@ -71,7 +71,7 @@
       "cycles": 136760,
       "detail": {
         "oamSet": 678440,
-        "row_frame@for_body.127": 490600,
+        "row_frame@for_body.151": 490600,
         "textPrint@do_body.45": 345600,
         "tilemapFlush": 335236
       }
@@ -86,21 +86,21 @@
       }
     },
     "world": {
-      "cycles": 31436,
+      "cycles": 31790,
       "detail": {
-        "oamPlaceWorld@sprite": 230364,
-        "oamPlaceWorld@next8": 141906,
-        "opensnes_font_2bpp_end": 109098,
-        "oamPlaceWorld@x_done": 87680
+        "oamPlaceWorld@sprite": 229520,
+        "oamPlaceWorld@next8": 132984,
+        "opensnes_font_2bpp_end": 116258,
+        "oamPlaceWorld@x_done": 86622
       }
     },
     "vramc": {
       "cycles": 16243,
       "detail": {
         "opensnes_font_2bpp_end": 206960,
-        "row_vramc@for_body.107": 110720,
-        "row_vramc@for_cont.108": 4400,
-        "row_vramc@for_cond.106": 920
+        "row_vramc@for_body.131": 110720,
+        "row_vramc@for_cont.132": 4400,
+        "row_vramc@for_cond.130": 920
       }
     },
     "vramq": {
@@ -110,6 +110,15 @@
         "vramQueueFlush@entry": 60440,
         "vramQueueFlush": 9120,
         "vramQueueFlush@out": 2000
+      }
+    },
+    "worldo": {
+      "cycles": 36358,
+      "detail": {
+        "oamPlaceWorld@oslot": 297486,
+        "opensnes_font_2bpp_end": 116098,
+        "oamPlaceWorld@onext8": 114280,
+        "oamPlaceWorld@ox_done": 87320
       }
     }
   }

@@ -216,6 +216,10 @@ CASES = [
     ("r_world", 24, sum(w << (16 * i) for i, w in enumerate([
         0x0000, 0x0AE1, 0xDFFF, 0xE164, 0xF001, 0x3313, 0x5145, 0x0154,
         75, 0x0101, 0x0101, 0x0165]))),
+    # oamPlaceWorld with `order`: a reversal (slot 7 shows sprite 0, slot 0
+    # sprite 7), visible[] by sprite, then order bytes out of range
+    ("r_worldo", 16, sum(w << (16 * i) for i, w in enumerate([
+        0x0000, 0x0AE1, 0xDFFF, 0x3313, 0xF001, 75, 0x3F, 0x0167]))),
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (32 << 32) | (0x0A51 << 48)),
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words

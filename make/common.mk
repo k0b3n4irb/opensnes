@@ -558,9 +558,16 @@ endef
 # -fno-builtin: <snes/string.h> declares memcpy & co. with this target's
 # size (unsigned int, 16 bits); clang's builtin prototypes carry the host's
 # size_t and it refuses the "incompatible redeclaration" (2026-10-09).
+# -Wno-missing-field-initializers: a structure of the SDK may gain an
+# optional field at its end (OamWorldBatch.order, 2026-10-10), and C sets a
+# field an initializer leaves out to 0. With the warning as an error, every
+# project that had written `{ x, y, tile, attr, seen, 0, 12, 32 }` — the
+# form of the SDK's own documentation — stopped compiling the day the field
+# arrived (found by the first game on the SDK, on our working tree).
 CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
-	-Wno-unused-parameter -Wno-error=deprecated-declarations \
+	-Wno-unused-parameter -Wno-missing-field-initializers \
+	-Wno-error=deprecated-declarations \
 	-Wno-error=deprecated-pragma
 
 # C sources → objects

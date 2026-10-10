@@ -134,11 +134,12 @@ compilers.
 | `text` | 20 characters printed and shown | 84,676 | 61,446 | -27.4 % |
 | `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 136,760 | -19.5 % |
 | `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 57,315 | -55.7 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,436 | -75.7 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,790 | -75.4 % |
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,243 | -6.6 % |
 | `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,400 | 10,732 | -38.3 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,703 | 36,358 | -73.4 % |
 
-OpenSNES costs no more than PVSnesLib on **12 of the 13 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
+OpenSNES costs no more than PVSnesLib on **13 of the 14 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library

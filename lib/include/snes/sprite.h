@@ -387,6 +387,7 @@ typedef struct {
     u8   first_id;       /**< 20: OAM id of the first sprite of the batch */
     u8   count;          /**< 21: number of sprites */
     u8   size;           /**< 22: width and height in pixels: 8, 16, 32 or 64 */
+    const u8 *order;     /**< 24: optional, one byte per slot: slot i shows sprite order[i]. 0: slot i shows sprite i */
 } OamWorldBatch;
 
 /* Not under the host's syntax check (clang, 8-byte pointers): the layout
@@ -399,6 +400,7 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, visible) == 16, "OamWorldBatch.
 _Static_assert(__builtin_offsetof(OamWorldBatch, first_id) == 20, "OamWorldBatch.first_id offset (sprite_world.asm)");
 _Static_assert(__builtin_offsetof(OamWorldBatch, count) == 21, "OamWorldBatch.count offset (sprite_world.asm)");
 _Static_assert(__builtin_offsetof(OamWorldBatch, size) == 22, "OamWorldBatch.size offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, order) == 24, "OamWorldBatch.order offset (sprite_world.asm)");
 #endif
 
 /**
@@ -420,6 +422,19 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, size) == 22, "OamWorldBatch.siz
  * - **`cam_y` is the y you give bgSetScroll()**: a sprite and the
  *   background it stands on take the same camera value.
  * - A batch that runs past sprite 127 stops there.
+ * - **`order`, for a game that sorts its sprites by depth.** OAM order is
+ *   drawing order: of two sprites, the lower id is in front, whatever
+ *   their priority bits (those place a sprite against the backgrounds
+ *   only). Without `order`, slot `first_id + i` shows element i of the
+ *   arrays, so a game that sorts every frame has to move x, y, tile and
+ *   attr with the sort. With `order`, slot `first_id + i` shows sprite
+ *   `order[i]`: the arrays stay indexed by the sprite and the sort permutes
+ *   `count` bytes. `visible[]` stays indexed by the sprite. An `order`
+ *   byte that is not under `count` hides its slot. A batch declared without
+ *   the field (the eight initialisers of the example below) has `order` 0.
+ *   Cost, measured (devtools/libbench, rows `world` and `worldo`): with
+ *   `order`, about 240 master cycles more a sprite (+14 %); without it,
+ *   one test a call, about 180 master cycles whatever the count.
  *
  * @param batch The sprites (see OamWorldBatch)
  * @param cam_x World x of the screen's left edge
@@ -433,6 +448,12 @@ _Static_assert(__builtin_offsetof(OamWorldBatch, size) == 22, "OamWorldBatch.siz
  * };
  *
  * oamPlaceWorld(&actors, cam_x, cam_y);   // every frame, after the game moved them
+ *
+ * // sorted by depth: the arrays stay where they are, the game sorts 12 bytes
+ * static u8 by_depth[12];                 // by_depth[0]: the actor in front
+ * static const OamWorldBatch sorted = {
+ *     ax, ay, atile, aattr, aseen, 0, 12, 32, by_depth
+ * };
  * @endcode
  */
 void oamPlaceWorld(const OamWorldBatch *batch, u16 cam_x, u16 cam_y);

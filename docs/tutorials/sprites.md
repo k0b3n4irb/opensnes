@@ -320,9 +320,50 @@ What it does for each sprite, and what it leaves to you:
   graphics are not loaded yet, say) is one `oamHide(id)` after the call.
 
 Measured (`devtools/libbench`, rows `worldc` and `world`: 19 sprites, 13
-on screen, a moving camera): 31,400 master cycles a frame with
-`oamPlaceWorld()`, 63,800 for the same loop in C writing `oamMemory[]`
+on screen, a moving camera): 31,800 master cycles a frame with
+`oamPlaceWorld()`, 57,300 for the same loop in C writing `oamMemory[]`
 directly — the cheapest way to write it in C.
+
+### Sorted by depth: `order`
+
+Of two sprites, the one with the lower OAM id is drawn in front, whatever
+their priority bits: those only place a sprite against the backgrounds
+([SNESdev wiki, Sprites](https://snes.nesdev.org/wiki/Sprites): "sprites
+with lower index within OAM always appear on top of sprites with a higher
+index"; the `order` array below assumes priority rotation is off, which
+is the library's setting). A game seen from above sorts its actors by y every frame so that
+the one lower on the screen hides the one behind it — and the sorted order
+is an order of OAM **slots**, while everything else in the game (state,
+animation, target) is indexed by the **actor**. Without help the game
+keeps a second, sorted copy of x, y, tile and attr and refills it each
+frame.
+
+Give the batch an `order` array instead: slot `first_id + i` shows actor
+`order[i]`. The arrays stay indexed by the actor and never move; the sort
+permutes one byte per actor.
+
+```c
+static u8 by_depth[ACTORS];       /* by_depth[0] is the actor in front */
+
+static const OamWorldBatch actors = {
+    actor_x, actor_y, actor_tile, actor_attr, actor_seen,
+    0, ACTORS, 32,
+    by_depth                      /* 0 or left out: slot i shows actor i */
+};
+
+sortByDepth(by_depth);            /* the game's own sort: 18 bytes to permute */
+oamPlaceWorld(&actors, cam_x, cam_y);
+```
+
+- **`visible[]` stays indexed by the actor**: `actor_seen[n]` still answers
+  "is actor n on screen", whichever slot shows it.
+- **The size bit belongs to the slot**, as before: every slot of a batch
+  has the batch's size, so a sort changes nothing there.
+- **An `order` byte that is not under `count` hides its slot** and reads
+  no array.
+- Cost (rows `world` and `worldo`): about 240 master cycles more a sprite
+  than the unsorted call, 36,400 a frame for the same 19 sprites; the C
+  loop with the same indirection costs 136,700 with PVSnesLib's compiler.
 
 ## Performance Tips
 

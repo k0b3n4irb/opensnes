@@ -218,6 +218,63 @@ void row_world(void) {
     }
 }
 
+/* The same 19 sprites sorted by depth: OAM slot i shows sprite word[i], the
+ * arrays stay indexed by the sprite (a game that sorts its actors every
+ * frame). OpenSNES gives oamPlaceWorld() the order array; PVSnesLib runs
+ * the C loop with the same indirection. */
+static u8 word[WN];
+
+static void world_co(u16 cam_x, u16 cam_y) {
+    u16 slot;
+    for (slot = 0; slot < WN; slot++) {
+        u16 id = word[slot];
+        u16 x = wx[id] - cam_x;
+        u16 y = wy[id] - cam_y;
+        u16 size = wsize[id];
+        u8 *oam = (u8 *)oamMemory + (slot << 2);
+        u8 *high = (u8 *)oamMemory + 512 + (slot >> 2);
+        if ((u16)(x + size) < 256 + size && (u16)(y + size) < 224 + size) {
+            oam[0] = x;
+            oam[1] = y;
+            oam[2] = wtile[id];
+            oam[3] = wattr[id];
+            if (x & 0x100) *high |= wxhi[slot];
+            else *high &= ~wxhi[slot];
+            wseen[id] = 1;
+        } else {
+            oam[0] = 1;
+            oam[1] = 240;
+            *high |= wxhi[slot];
+            wseen[id] = 0;
+        }
+    }
+}
+
+void row_worldo(void) {
+    u16 r, i;
+#if !PVS
+    static OamWorldBatch big;
+    static OamWorldBatch small;
+    big.x = wx; big.y = wy; big.tile = wtile; big.attr = wattr; big.visible = wseen;
+    big.first_id = 0; big.count = 18; big.size = 32; big.order = word;
+    small.x = wx + 18; small.y = wy + 18; small.tile = wtile + 18; small.attr = wattr + 18;
+    small.visible = wseen + 18; small.first_id = 18; small.count = 1; small.size = 16;
+#endif
+    world_setup();
+    for (i = 0; i < 18; i++) word[i] = (i * 7) % 18;   /* a permutation of 0..17 */
+    word[18] = 18;
+    for (r = 0; r < REPS; r++) {
+#if CALLS
+#if PVS
+        world_co(r, 0);
+#else
+        oamPlaceWorld(&big, r, 0);
+        oamPlaceWorld(&small, r, 0);
+#endif
+#endif
+    }
+}
+
 /* Six small VRAM transfers, 128 bytes each, as a game streaming sprite
  * frames makes in one VBlank (issue #165).
  *   vramc: six dmaCopyVram() calls, both SDKs.
@@ -330,6 +387,8 @@ int main(void) {
     row_vramc();
 #elif ROW == 12
     row_vramq();
+#elif ROW == 13
+    row_worldo();
 #endif
     done = 0x600D;
     while (1) {

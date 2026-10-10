@@ -4,6 +4,29 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Added
+- feat(lib): **`OamWorldBatch.order`, for a game that sorts its sprites by
+  depth** (asked by the first game built on the SDK). OAM order is drawing
+  order, so a game seen from above re-sorts its actors every frame; until
+  now it had to keep a second copy of x, y, tile and attr in sorted order
+  and refill it. With `order`, slot `first_id + i` shows sprite
+  `order[i]`: the arrays stay indexed by the sprite and the sort permutes
+  one byte each. `visible[]` stays indexed by the sprite; an `order` byte
+  that is not under `count` hides its slot. A batch written without the
+  field behaves as before (`order` is 0). Measured (`devtools/libbench`,
+  new row `worldo`): 36,400 master cycles a frame for 19 sorted sprites,
+  about 240 more a sprite than unsorted; the unsorted path pays one test a
+  call (about 180 master cycles). `compiler/ABI.md` now says that the
+  32 bytes of `tcc__lf` are scratch for a callee, which this routine uses,
+  and its direct-page map is corrected against a linked `.sym`.
+- build: the syntax check of a project's C no longer refuses an
+  initializer that leaves out the last fields of a structure
+  (`-Wno-missing-field-initializers`). C sets them to 0, and that is how a
+  structure of the SDK gains an optional field without breaking the
+  projects that already declare it: with the warning as an error, a batch
+  written `{ x, y, tile, attr, seen, 0, 12, 32 }`, as the documentation
+  shows it, stopped compiling when `order` arrived.
+
 ### Performance
 - perf(compiler): **the scaled index of an array access is computed once,
   not in front of every access.** In a loop over parallel arrays

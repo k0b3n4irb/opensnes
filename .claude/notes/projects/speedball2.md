@@ -195,3 +195,14 @@ files (`/tmp/speedball2_pour_opensnes_<subject>.md`) and a one-line
 message with the path; we answer the same way
 (`/tmp/opensnes_pour_speedball2_<subject>.md`). `/tmp` does not survive a
 reboot: what is decided is copied here.
+
+## The order array is delivered (2026-10-10, late)
+
+`OamWorldBatch.order` (the need of #167): see the CHANGELOG. Two things the
+game taught us on the way: its `-Werror` build broke on our UNCOMMITTED
+header the minute the field was added (a public header is now worked on in
+a separate worktree, `exchanges.md`), and a structure of the SDK can only
+grow if the build does not make a missing trailing initializer an error
+(`-Wno-missing-field-initializers` in `common.mk`, pinned by an old-form
+batch in the library test ROM). Waiting for its figure on `spritesUpdate`
+once it replaces its sorted copy.

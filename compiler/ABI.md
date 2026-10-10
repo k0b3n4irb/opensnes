@@ -207,22 +207,34 @@ Nothing to do. Callee restores SP and returns; A is undefined on exit.
 
 ## Direct page layout
 
-`templates/crt0.asm` reserves the bottom of bank `$00` for compiler scratch
-registers. Layout:
+`templates/crt0.asm` reserves two blocks of the direct page of bank `$00`
+for the compiler. Layout (read from a linked `.sym`; the gaps hold the
+project's own variables, placed by the linker):
 
 ```
-$00:0000-001F   tcc__r0 ..  tcc__r5h     (6 register pairs, low+high)
-$00:0028-002B   tcc__r9, tcc__r9h        (kept separate from r0-r5)
-$00:002C-002F   tcc__r10, tcc__r10h
-$00:0030-007F   System variables (vblank_flag, oam_update_flag, frame_count, …)
-$00:0080        nmi_callback pointer
-$00:0100 page   tcc__nmi_registers       (DP-isolated copy for NMI callback)
-$00:0200+       free for application use (above the SDK's reservation)
+$00:0000-0017   tcc__r0 ..  tcc__r5h     (6 register pairs, low+high)
+$00:0018-001B   tcc__r9, tcc__r9h
+$00:001C-001F   tcc__r10, tcc__r10h
+$00:0020        tcc__retval_hi           (high half of a 32-bit return)
+$00:0022-0033   the handlers' pointers and flags (nmi_callback, …), tcc__fp
+$00:0080-009F   tcc__lf                  (32 bytes: values that do not live across a call)
+$00:1700 page   tcc__nmi_registers       (the NMI handler's own direct page)
 ```
 
 `tcc__r9` and `tcc__r10` are the **scratch registers** used for inline
 multiply, function pointers, and similar idioms. Treat all `tcc__r*` slots
 as **caller-saved**: any function call may clobber them.
+
+**`tcc__lf` is caller-saved too, and a callee may use it.** The compiler
+keeps there the temporaries of a function that calls nothing, and, in a
+function that calls, only the temporaries no call crosses (a value that
+must survive a call is on the stack). So nothing in `tcc__lf` is expected
+to survive a `jsl`, and hand-written assembly called from C may use its 32
+bytes as scratch for the length of the call, like the `tcc__r*` slots.
+First user in the library: `oamPlaceWorld()` with an `order` array
+(`lib/source/sprite_world.asm`, 2026-10-10). Assembly that is NOT called
+from C — a handler — must not touch it: it would be writing the
+interrupted function's temporaries.
 
 The NMI handler runs with its direct page set to `tcc__nmi_registers` (a
 page-aligned mirror of the layout above). This isolates NMI-side

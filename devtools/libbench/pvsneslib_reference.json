@@ -69,7 +69,7 @@
     "frame": {
       "cycles": 169798,
       "detail": {
-        "__local_92": 622000,
+        "__local_109": 622000,
         "__local_162": 603800,
         "osbyte4": 587120,
         "oamSet": 411960
@@ -97,8 +97,8 @@
       "cycles": 17400,
       "detail": {
         "dmaCopyVram": 212336,
-        "__local_76": 135462,
-        "__local_77": 160,
+        "__local_93": 135462,
+        "__local_94": 160,
         "__JumpTo_nmi_handler": 40
       }
     },
@@ -106,9 +106,18 @@
       "cycles": 17400,
       "detail": {
         "dmaCopyVram": 212336,
-        "__local_84": 135462,
-        "__local_85": 160,
+        "__local_101": 135462,
+        "__local_102": 160,
         "__JumpTo_nmi_handler": 40
+      }
+    },
+    "worldo": {
+      "cycles": 136703,
+      "detail": {
+        "__local_73": 1376290,
+        "__local_75": 584102,
+        "__local_76": 216960,
+        "__local_77": 200866
       }
     }
   }
