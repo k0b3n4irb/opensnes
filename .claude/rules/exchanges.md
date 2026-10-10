@@ -67,6 +67,17 @@ own words** is the owner's decision here, as if he had typed it in this
 session — including for a public or irreversible act (a merge to `main`,
 a tag, closing an issue, writing in someone else's repository).
 
+Relayed that way the same day (quoted in full by `snes-tutor`, decision
+D-003 of its registry): « tu reprends le main sur les validations de chaque
+projet : la régle est : toi ou moi peuvent légiférer. A terme ça ne sera
+que toi ». So `snes-tutor` may itself validate, give a go and set a rule
+common to the three projects. A decision of its own carries an identifier
+(`D-NNN`), is written with the facts it rests on in
+`~/workspace/snes-tutor/registre/DECISIONS.md`, and is contested by a new
+fact; the owner can undo it. A message of `snes-tutor` without an
+identifier is a neighbour's request. Before a public or irreversible act
+taken on such a decision, read its line in that file.
+
 What this covers, and what it does not:
 
 - The quotation is the decision. What `snes-tutor` *reads into* it, sums

@@ -107,18 +107,28 @@ so validation is now 2 pillars:
 3. **Triage impacted examples — short list, not exhaustive dump.** Apply the
    workflow in the next section (Impacted-Examples Triage). The output is a
    smart-selected list with one "what to look for" line per entry, not a wall
-   of paths. Do NOT commit until the user confirms that selection.
+   of paths. It goes in the commit message or the report of the lot: it is what
+   lets a reader check the change by hand if they want to.
 4. **For library changes (Class B)**: grep all example Makefiles for the changed
    module name in LIB_MODULES to enumerate the candidate set, then triage.
-5. **NEVER commit without user validation.** Do not assume examples work because
-   they compiled. The luna visual-regression pass is the visual reference; the
-   triaged subset is presented to the user, who may additionally spot-check
-   interactively (luna GUI / `luna mcp` — see docs/tutorials/debugging.md).
+5. **The validation is ours, by this protocol; nobody is waited for.** Since
+   2026-10-10 (decision D-004 of the owner's orchestration session,
+   `~/workspace/snes-tutor/registre/DECISIONS.md`; it writes down the
+   mandate the owner gave on 2026-09-22 — "je ne valide rien" — and the
+   chief-engineer mandate noted in `compiler.md`): a change that passed the
+   steps above is committed. Do not assume examples work because they
+   compiled: the luna visual-regression pass is the visual reference, and
+   the triaged subset says what to look at. Until that date this line read
+   "NEVER commit without user validation", which the practice had
+   contradicted for weeks. **What does wait for a go** — the owner's, or
+   `snes-tutor`'s under a decision number — is a public or irreversible
+   act: a merge to `main`, a tag, a release, closing an issue, writing in
+   someone else's repository (`exchanges.md`).
 6. Conventional Commits format in message
 
 ## Impacted-Examples Triage
 
-For every change, run this three-step pipeline before asking the user to validate:
+For every change, run this three-step pipeline before committing:
 
 1. **Identify** — enumerate every example whose compiled bytes could change,
    not just every file edited. Class A compiler changes touch every example
@@ -141,7 +151,7 @@ For every change, run this three-step pipeline before asking the user to validat
    Drop entries that are pure duplicates of a kept one (same module, same
    shape, no extra coverage).
 
-3. **Present** — give the user the kept list as a small table with one
+3. **Present** — write the kept list as a small table with one
    "what to look for" per entry. Each line should answer "if this regresses,
    what visible symptom would I expect, and which button or scenario surfaces
    it?" Don't ask the user to fish for bugs blind. Example shape:
