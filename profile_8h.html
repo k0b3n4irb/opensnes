@@ -145,8 +145,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:acddb56e86b147fe8d8b6e0b72a37d702"><td class="mdescLeft">&#160;</td><td class="mdescRight">End a color-bar profiling section.  <br /></td></tr>
 <tr class="memitem:a5e46903fa24e1c3b20d101e9d4bddde6" id="r_a5e46903fa24e1c3b20d101e9d4bddde6"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5e46903fa24e1c3b20d101e9d4bddde6">profileColorStart</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="games_2breakout_2main_8c.html#afbe561487f384d8fc8576b24bda1f8b6">color</a>)</td></tr>
 <tr class="memdesc:a5e46903fa24e1c3b20d101e9d4bddde6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start a color-bar profiling section.  <br /></td></tr>
-<tr class="memitem:a3f567bb59e4729e6cec85b827b3f97e0" id="r_a3f567bb59e4729e6cec85b827b3f97e0"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3f567bb59e4729e6cec85b827b3f97e0">profileGetFrameCount</a> (void)</td></tr>
-<tr class="memdesc:a3f567bb59e4729e6cec85b827b3f97e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The same counter as <a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a> (wraps at 65535).  <br /></td></tr>
 <tr class="memitem:a071021ac9abd338ac63cf48b2d10f8c7" id="r_a071021ac9abd338ac63cf48b2d10f8c7"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a071021ac9abd338ac63cf48b2d10f8c7">profileGetLagFrames</a> (void)</td></tr>
 <tr class="memdesc:a071021ac9abd338ac63cf48b2d10f8c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get lag frame count since boot.  <br /></td></tr>
 <tr class="memitem:a30c81ab840017529f70ad63238c8a79f" id="r_a30c81ab840017529f70ad63238c8a79f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a30c81ab840017529f70ad63238c8a79f">profileGetScanline</a> (void)</td></tr>
@@ -186,7 +184,7 @@ Quick Start</h2>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="aprofile_8h_html"><div class="ttname"><a href="profile_8h.html">profile.h</a></div><div class="ttdoc">Performance profiling tools for SNES development.</div></div>
 <div class="ttc" id="aprofile_8h_html_a5e46903fa24e1c3b20d101e9d4bddde6"><div class="ttname"><a href="#a5e46903fa24e1c3b20d101e9d4bddde6">profileColorStart</a></div><div class="ttdeci">void profileColorStart(u16 color)</div><div class="ttdoc">Start a color-bar profiling section.</div></div>
-<div class="ttc" id="aprofile_8h_html_aafce9d527876301c4d22eae1ea946631"><div class="ttname"><a href="#aafce9d527876301c4d22eae1ea946631">PROFILE_RED</a></div><div class="ttdeci">#define PROFILE_RED</div><div class="ttdef"><b>Definition</b> profile.h:52</div></div>
+<div class="ttc" id="aprofile_8h_html_aafce9d527876301c4d22eae1ea946631"><div class="ttname"><a href="#aafce9d527876301c4d22eae1ea946631">PROFILE_RED</a></div><div class="ttdeci">#define PROFILE_RED</div><div class="ttdef"><b>Definition</b> profile.h:55</div></div>
 <div class="ttc" id="aprofile_8h_html_acc2a7d890f2e61d20dc72d9964d92c9d"><div class="ttname"><a href="#acc2a7d890f2e61d20dc72d9964d92c9d">profileInit</a></div><div class="ttdeci">void profileInit(void)</div><div class="ttdoc">Initialize the profiler.</div></div>
 <div class="ttc" id="aprofile_8h_html_acddb56e86b147fe8d8b6e0b72a37d702"><div class="ttname"><a href="#acddb56e86b147fe8d8b6e0b72a37d702">profileColorEnd</a></div><div class="ttdeci">void profileColorEnd(void)</div><div class="ttdoc">End a color-bar profiling section.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
@@ -337,26 +335,6 @@ Build</h2>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="a3f567bb59e4729e6cec85b827b3f97e0" name="a3f567bb59e4729e6cec85b827b3f97e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f567bb59e4729e6cec85b827b3f97e0">&#9670;&#160;</a></span>profileGetFrameCount()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> profileGetFrameCount </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The same counter as <a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a> (wraps at 65535). </p>
-<p>It reads the frame counter the NMI handler keeps, not a counter of the profiler; <a class="el" href="console_8h.html#a8fd1f41354b0d09ca258af07c1cb6fa6" title="Get frame counter.">getFrameCount()</a> (<a class="el" href="console_8h.html" title="SNES Console Initialization and Core Functions.">console.h</a>) is the name kept. </p>
 
 </div>
 </div>

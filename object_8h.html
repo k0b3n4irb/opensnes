@@ -191,8 +191,8 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:aff685114554f887d186a87bacbe786b9" id="r_aff685114554f887d186a87bacbe786b9"><td class="memItemLeft"><a class="el" href="structt__objs.html">t_objs</a>&#160;</td><td class="memItemRight"><a class="el" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a></td></tr>
-<tr class="memdesc:aff685114554f887d186a87bacbe786b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object workspace (Bank $00).  <br /></td></tr>
+<tr class="memitem:ad12284001e1281ab118cc485e76959b7" id="r_ad12284001e1281ab118cc485e76959b7"><td class="memItemLeft"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="structt__objs.html">t_objs</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad12284001e1281ab118cc485e76959b7">objWorkspace</a></td></tr>
+<tr class="memdesc:ad12284001e1281ab118cc485e76959b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object workspace.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Game object engine with physics and collision (CONTRIB module). </p>
@@ -206,27 +206,27 @@ Variables</h2></td></tr>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="workspace-pattern"></a>
 Workspace Pattern</h2>
-<p>Because the object buffer resides in Bank $7E (not directly accessible from C), a workspace pattern is used. Before each C callback, the engine copies the current object's data to <span class="tt"><a class="el" href="#aff685114554f887d186a87bacbe786b9" title="Object workspace (Bank $00).">objWorkspace</a></span> (Bank $00). After the callback returns, changes are copied back.</p>
+<p>Because the object buffer resides in Bank $7E (not directly accessible from C), a workspace pattern is used. Before each C callback, the engine copies the current object's data to <span class="tt"><a class="el" href="#ad12284001e1281ab118cc485e76959b7" title="Object workspace.">objWorkspace</a></span>. After the callback returns, changes are copied back.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="object_8h.html">snes/object.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">void</span> enemy_update(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx) {</div>
 <div class="line">    <span class="comment">// objWorkspace is pre-populated with current object data</span></div>
-<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.action == <a class="code hl_define" href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a>) {</div>
-<div class="line">        <a class="code hl_variable" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.xvel = 0x0100;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#ad12284001e1281ab118cc485e76959b7">objWorkspace</a>.action == <a class="code hl_define" href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a>) {</div>
+<div class="line">        <a class="code hl_variable" href="#ad12284001e1281ab118cc485e76959b7">objWorkspace</a>.xvel = 0x0100;</div>
 <div class="line">    }</div>
 <div class="line">    <span class="comment">// Call engine functions (they sync workspace automatically)</span></div>
 <div class="line">    <a class="code hl_function" href="#a550404601c3ea5018c859871fc99ebd4">objCollidMap</a>(idx);</div>
 <div class="line">    <a class="code hl_function" href="#af27124be823e35daf579362d3820738d">objUpdateXY</a>(idx);</div>
 <div class="line">    <span class="comment">// Read updated position from workspace</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> screenx = <a class="code hl_variable" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.xpos[1] | (<a class="code hl_variable" href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.xpos[2] &lt;&lt; 8);</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> screenx = <a class="code hl_variable" href="#ad12284001e1281ab118cc485e76959b7">objWorkspace</a>.xpos[1] | (<a class="code hl_variable" href="#ad12284001e1281ab118cc485e76959b7">objWorkspace</a>.xpos[2] &lt;&lt; 8);</div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="amap_8h_html_a912cfae6ccf6375f3c2831d65646c76b"><div class="ttname"><a href="map_8h.html#a912cfae6ccf6375f3c2831d65646c76b">ACT_WALK</a></div><div class="ttdeci">#define ACT_WALK</div><div class="ttdef"><b>Definition</b> map.h:94</div></div>
 <div class="ttc" id="aobject_8h_html"><div class="ttname"><a href="object_8h.html">object.h</a></div><div class="ttdoc">Game object engine with physics and collision (CONTRIB module).</div></div>
 <div class="ttc" id="aobject_8h_html_a550404601c3ea5018c859871fc99ebd4"><div class="ttname"><a href="#a550404601c3ea5018c859871fc99ebd4">objCollidMap</a></div><div class="ttdeci">void objCollidMap(u16 objindex)</div><div class="ttdoc">Check object collision with map tiles.</div></div>
+<div class="ttc" id="aobject_8h_html_ad12284001e1281ab118cc485e76959b7"><div class="ttname"><a href="#ad12284001e1281ab118cc485e76959b7">objWorkspace</a></div><div class="ttdeci">FAR t_objs objWorkspace</div><div class="ttdoc">Object workspace.</div></div>
 <div class="ttc" id="aobject_8h_html_af27124be823e35daf579362d3820738d"><div class="ttname"><a href="#af27124be823e35daf579362d3820738d">objUpdateXY</a></div><div class="ttdeci">void objUpdateXY(u16 objindex)</div><div class="ttdoc">Update object position from velocity.</div></div>
-<div class="ttc" id="aobject_8h_html_aff685114554f887d186a87bacbe786b9"><div class="ttname"><a href="#aff685114554f887d186a87bacbe786b9">objWorkspace</a></div><div class="ttdeci">t_objs objWorkspace</div><div class="ttdoc">Object workspace (Bank $00).</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="attribution-2"></a>
 Attribution</h2>
@@ -797,8 +797,8 @@ Attribution</h2>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="aff685114554f887d186a87bacbe786b9" name="aff685114554f887d186a87bacbe786b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aff685114554f887d186a87bacbe786b9">&#9670;&#160;</a></span>objWorkspace</h2>
+<a id="ad12284001e1281ab118cc485e76959b7" name="ad12284001e1281ab118cc485e76959b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad12284001e1281ab118cc485e76959b7">&#9670;&#160;</a></span>objWorkspace</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -807,7 +807,7 @@ Attribution</h2>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structt__objs.html">t_objs</a> objWorkspace</td>
+          <td class="memname"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="structt__objs.html">t_objs</a> objWorkspace</td>
         </tr>
       </table>
   </td>
@@ -817,8 +817,9 @@ Attribution</h2>
 </table>
 </div><div class="memdoc">
 
-<p>Object workspace (Bank $00). </p>
-<p>Single 64-byte workspace populated before each C callback. Read/write this in init, update, and refresh callbacks. Changes are automatically copied back to the object buffer. </p>
+<p>Object workspace. </p>
+<p>Single 64-byte workspace populated before each C callback. Read/write this in init, update, and refresh callbacks. Changes are automatically copied back to the object buffer.</p>
+<p>It is a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> object since 2026-10-09 (it sits behind the object pool, in bank $7E, so that the collision routines work on it without copying it): <span class="tt">objWorkspace.field</span> reads and writes as before, at the same cost; a pointer to it or to one of its fields is a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> pointer. </p>
 
 </div>
 </div>

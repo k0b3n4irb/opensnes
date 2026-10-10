@@ -151,8 +151,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:ada4c1ec4449e797d007bd17766156e9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable H/V timer IRQs and unmask interrupts (CLI).  <br /></td></tr>
 <tr class="memitem:a69f348e722cc5916ff3b4007eadcc928" id="r_a69f348e722cc5916ff3b4007eadcc928"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a69f348e722cc5916ff3b4007eadcc928">irqSet</a> (void *handler)</td></tr>
 <tr class="memdesc:a69f348e722cc5916ff3b4007eadcc928"><td class="mdescLeft">&#160;</td><td class="mdescRight">Install a raw hardware IRQ handler (H/V timer interrupts).  <br /></td></tr>
-<tr class="memitem:ae06802aa2d547c5c1481fd24b5fd5785" id="r_ae06802aa2d547c5c1481fd24b5fd5785"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae06802aa2d547c5c1481fd24b5fd5785">irqSetBank</a> (void *handler, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank)</td></tr>
-<tr class="memdesc:ae06802aa2d547c5c1481fd24b5fd5785"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> with an explicit ROM bank for the handler  <br /></td></tr>
 <tr class="memitem:a979596926059d6d8cab64e9b719a7df9" id="r_a979596926059d6d8cab64e9b719a7df9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a979596926059d6d8cab64e9b719a7df9">irqSetHTimer</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> h)</td></tr>
 <tr class="memdesc:a979596926059d6d8cab64e9b719a7df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the H-timer target (0-339 dots).  <br /></td></tr>
 <tr class="memitem:a1579b3231b62226f9bf5ba4077660409" id="r_a1579b3231b62226f9bf5ba4077660409"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1579b3231b62226f9bf5ba4077660409">irqSetVTimer</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> v)</td></tr>
@@ -161,8 +159,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:a4a0a4690d2c70b58584eed95377325a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the VBlank callback.  <br /></td></tr>
 <tr class="memitem:a54a7e26f751984f6f3241ed2d2c5eda7" id="r_a54a7e26f751984f6f3241ed2d2c5eda7"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7">nmiSet</a> (<a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a> callback)</td></tr>
 <tr class="memdesc:a54a7e26f751984f6f3241ed2d2c5eda7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a VBlank callback function.  <br /></td></tr>
-<tr class="memitem:af408cb8d09dc9ab56ae7245c18792c2d" id="r_af408cb8d09dc9ab56ae7245c18792c2d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af408cb8d09dc9ab56ae7245c18792c2d">nmiSetBank</a> (<a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a> callback, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bank)</td></tr>
-<tr class="memdesc:af408cb8d09dc9ab56ae7245c18792c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a VBlank callback with explicit bank.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Interrupt Handling. </p>
@@ -322,37 +318,6 @@ A handler that fires general DMA owns that channel: don't call lib DMA helpers (
 
 </div>
 </div>
-<a id="ae06802aa2d547c5c1481fd24b5fd5785" name="ae06802aa2d547c5c1481fd24b5fd5785"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae06802aa2d547c5c1481fd24b5fd5785">&#9670;&#160;</a></span>irqSetBank()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void irqSetBank </td>
-          <td>(</td>
-          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>handler</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>bank</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p><a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> with an explicit ROM bank for the handler </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">handler</td><td>Address of the ASM handler </td></tr>
-    <tr><td class="paramname">bank</td><td>ROM bank containing the handler</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000010">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a69f348e722cc5916ff3b4007eadcc928" title="Install a raw hardware IRQ handler (H/V timer interrupts).">irqSet()</a> reads the bank from the handler pointer. Removed at the next major version. </dd></dl>
-
-</div>
-</div>
 <a id="a979596926059d6d8cab64e9b719a7df9" name="a979596926059d6d8cab64e9b719a7df9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a979596926059d6d8cab64e9b719a7df9">&#9670;&#160;</a></span>irqSetHTimer()</h2>
 
@@ -457,39 +422,8 @@ A handler that fires general DMA owns that channel: don't call lib DMA helpers (
 <dd>
 Callback runs with interrupts disabled </dd>
 <dd>
-The callback may live in any ROM bank: the bank is taken from the function pointer. (This note said "must be in bank 0" until 2026-09-20; that was only ever true of irqSet, fixed the same day.) </dd></dl>
-
-</div>
-</div>
-<a id="af408cb8d09dc9ab56ae7245c18792c2d" name="af408cb8d09dc9ab56ae7245c18792c2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af408cb8d09dc9ab56ae7245c18792c2d">&#9670;&#160;</a></span>nmiSetBank()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void nmiSetBank </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="#aa38e3794779028b8480958ff866d102b">VBlankCallback</a></td>          <td class="paramname"><span class="paramname"><em>callback</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>bank</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Register a VBlank callback with explicit bank. </p>
-<p>Not needed from C — <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> reads the bank from the pointer. Kept for callers that only have a 16-bit address (assembly).</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">callback</td><td>Function to call during VBlank </td></tr>
-    <tr><td class="paramname">bank</td><td>ROM bank where the callback is located (0-255)</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000009">Deprecated</a></b></dt><dd>Since 2026-09-20: <a class="el" href="#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> reads the bank from the function pointer. Removed at the next major version. </dd></dl>
+The callback may live in any ROM bank: the bank is taken from the function pointer. (This note said "must be in bank 0" until 2026-09-20; that was only ever true of irqSet, fixed the same day.)</dd></dl>
+<dl class="section user"><dt>What the callback may call</dt><dd>The callback runs with the direct page on its own copy of the compiler's scratch registers (<span class="tt">tcc__r0</span>..<span class="tt">tcc__r10</span>), so C code and every library routine that reaches them direct-page-relative, as the compiler does, are isolated from the interrupted main thread; plain <span class="tt">*</span>, <span class="tt">/</span> and <span class="tt">%</span> take a software path there (<span class="tt">in_nmi_ctx</span>). What is NOT callback-safe, and says so in its own header: the hardware-multiplier users <span class="tt"><a class="el" href="math_8h.html#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul()</a></span>, <span class="tt"><a class="el" href="math_8h.html#ae34cfd84f2c85f3ad0d03ae9fd61a332" title="Linear interpolation.">fixLerp()</a></span>, <span class="tt"><a class="el" href="fixed32_8h.html#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul()</a></span>, <span class="tt"><a class="el" href="fixed32_8h.html#ae768d89e719729bb2c993cef7d07bda3" title="16.16 fixed-point sine of an 8-bit angle (0..255 = 0..360°)">fix32Sin()</a></span>/<span class="tt"><a class="el" href="fixed32_8h.html#aec1027df65880f0e7826db6dcf6053f2">fix32Cos()</a></span>; every DSP-1 call (a port protocol); <span class="tt"><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont()</a></span>/<span class="tt"><a class="el" href="text_8h.html#a21a39509cc61fba3c98500627619baf0" title="Load font as 4bpp tiles for Mode 1 BGs.">textLoadFont4bpp()</a></span> (DMA registers written with the callback's data bank); the WRAM data port (<span class="tt">$2180</span>). Until 2026-10-05 <span class="tt"><a class="el" href="object_8h.html#aefe003a2fb685e0f08d4b5f35ef0257c" title="Test collision between two objects.">objCollidObj()</a></span>, <span class="tt"><a class="el" href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a></span>, <span class="tt"><a class="el" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7" title="Get tile collision property at map coordinates.">mapGetMetaTilesProp()</a></span>, <span class="tt"><a class="el" href="profile_8h.html#a5e46903fa24e1c3b20d101e9d4bddde6" title="Start a color-bar profiling section.">profileColorStart()</a></span>, <span class="tt"><a class="el" href="dsp1_8h.html#af14660034a8e2f3a7a33516e48f1ba16" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1SetCamera()</a></span> and <span class="tt"><a class="el" href="dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9" title="Stream per-scanline Mode 7 matrices into two HDMA payloads (DSP-1 command $0A, &quot;Raster&quot;).">dsp1Raster()</a></span> reached the scratch registers with absolute or long addressing, which wrote the main thread's copy through the <span class="tt">$7E</span> mirror; they are direct-page-relative now (library audit l.21). </dd></dl>
 
 </div>
 </div>

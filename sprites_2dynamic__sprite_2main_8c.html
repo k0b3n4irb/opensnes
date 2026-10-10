@@ -126,6 +126,7 @@ $(function(){initNavTree('sprites_2dynamic__sprite_2main_8c.html','',''); });
 <p>Dynamic sprite engine with per-frame VRAM tile streaming.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/sprite16_grid.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -144,12 +145,8 @@ Variables</h2></td></tr>
 <tr class="memdesc:aaf47a9315cba731325a26e9eacff5c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Animation frame index for sprite 3 (0-23, wraps at 24).  <br /></td></tr>
 <tr class="memitem:af743d5de011168f86bbdb716e0afbc47" id="r_af743d5de011168f86bbdb716e0afbc47"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af743d5de011168f86bbdb716e0afbc47">frame_counter</a></td></tr>
 <tr class="memdesc:af743d5de011168f86bbdb716e0afbc47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global frame counter for animation timing.  <br /></td></tr>
-<tr class="memitem:a632036013b8e1695f31d41a144254c3e" id="r_a632036013b8e1695f31d41a144254c3e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a632036013b8e1695f31d41a144254c3e">spr16_properpal</a> []</td></tr>
-<tr class="memdesc:a632036013b8e1695f31d41a144254c3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">16-color palette for the 16x16 sprites  <br /></td></tr>
-<tr class="memitem:ac917b076df172412b9f00526ac9ecc7c" id="r_ac917b076df172412b9f00526ac9ecc7c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac917b076df172412b9f00526ac9ecc7c">spr16_tiles</a> []</td></tr>
-<tr class="memdesc:ac917b076df172412b9f00526ac9ecc7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">ROM source for the 16x16 sprite sheet tile data.  <br /></td></tr>
 <tr class="memitem:ace36248f57cf8494fae6acbe77b274f0" id="r_ace36248f57cf8494fae6acbe77b274f0"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ace36248f57cf8494fae6acbe77b274f0">xpos</a> [4] = {64, 112, 160, 208}</td></tr>
-<tr class="memdesc:ace36248f57cf8494fae6acbe77b274f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">X positions for the four sprites displayed in a horizontal row.  <br /></td></tr>
+<tr class="memdesc:ace36248f57cf8494fae6acbe77b274f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">ROM source for the 16x16 sprite sheet tile data.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Dynamic sprite engine with per-frame VRAM tile streaming. </p>
@@ -321,55 +318,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a632036013b8e1695f31d41a144254c3e" name="a632036013b8e1695f31d41a144254c3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a632036013b8e1695f31d41a144254c3e">&#9670;&#160;</a></span>spr16_properpal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> spr16_properpal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>16-color palette for the 16x16 sprites </p>
-
-</div>
-</div>
-<a id="ac917b076df172412b9f00526ac9ecc7c" name="ac917b076df172412b9f00526ac9ecc7c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac917b076df172412b9f00526ac9ecc7c">&#9670;&#160;</a></span>spr16_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> spr16_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>ROM source for the 16x16 sprite sheet tile data. </p>
-<p>Contains all 24 animation frames laid out sequentially. The dynamic sprite engine reads individual frames from this ROM data and DMAs only the currently-needed tiles to VRAM each frame, conserving OBJ VRAM space. </p>
-
-</div>
-</div>
 <a id="ace36248f57cf8494fae6acbe77b274f0" name="ace36248f57cf8494fae6acbe77b274f0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ace36248f57cf8494fae6acbe77b274f0">&#9670;&#160;</a></span>xpos</h2>
 
@@ -390,7 +338,10 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>X positions for the four sprites displayed in a horizontal row. </p>
+<p>ROM source for the 16x16 sprite sheet tile data. </p>
+<p>Contains all 24 animation frames laid out sequentially. The dynamic sprite engine reads individual frames from this ROM data and DMAs only the currently-needed tiles to VRAM each frame, conserving OBJ VRAM space.</p>
+<p>16-color palette for the 16x16 sprites</p>
+<p>X positions for the four sprites displayed in a horizontal row.</p>
 <p>Static const arrays are placed in ROM (SUPERFREE section) by the compiler. The sprites are evenly spaced across the 256-pixel screen width. </p>
 
 </div>

@@ -137,7 +137,7 @@ Screenshot</div></div>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">B  </td><td class="markdownTableBodyNone">brake  </td></tr>
 </table>
-<p>Grass slows the car to a crawl; the red border wall is solid. The track (rounded rectangle + chicane, checker start line) is generated at build time by <span class="tt">gen_track.py</span> (committed, deterministic) and converted with <span class="tt">gfx4snes -M 7</span>.</p>
+<p>Grass slows the car to a crawl; the red border wall is solid. The track (rounded rectangle + chicane, checker start line) is generated at build time by <span class="tt">gen_track.py</span> (committed, deterministic) and converted by <span class="tt">opensnes-tileset</span> with <span class="tt">mode = 7</span> in <span class="tt">res/track.png.toml</span>.</p>
 <p>ROM mode: LoROM (project default).</p>
 <h2 class="doxsection"><a class="anchor" id="snes-concepts-26"></a>
 SNES Concepts</h2>
@@ -147,11 +147,11 @@ SNES Concepts</h2>
 <li><b>Banked-data access (B2)</b>: the 16 KB collision class map lives outside bank $00, where C pointer derefs cannot reach (they are bank-$00-hardcoded) — a one-instruction ASM accessor (<span class="tt">lda.l track_class,x</span>) does it right, and the hardened <span class="tt">check_bank_reads</span> guard fails any build that tries from C</li>
 <li>Mode 7 VRAM interleave (<span class="tt"><a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7</a></span>) + OBJ tiles at name base 3; a procedural 4bpp car sprite built in C</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-15"></a>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-14"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
 </div><!-- fragment --><p>(Regenerate the track: <span class="tt">python3 gen_track.py</span>, then <span class="tt">make</span>.)</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-43"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-40"></a>
 Modules Used</h2>
 <p>console, dma, background, sprite, math, mode7, input </p>
 </div></div><!-- contents -->

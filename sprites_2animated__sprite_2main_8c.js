@@ -13,9 +13,5 @@ var sprites_2animated__sprite_2main_8c =
     [ "DECLARE_ANIM_CLIP", "sprites_2animated__sprite_2main_8c.html#a9ad3a8f9a9a1caf7ca1ea67aee4fe282", null ],
     [ "main", "sprites_2animated__sprite_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "monster", "sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024", null ],
-    [ "monster_anim", "sprites_2animated__sprite_2main_8c.html#a4ec2838b1e79778c47a2d4700a27be3a", null ],
-    [ "sprite_pal", "sprites_2animated__sprite_2main_8c.html#a20fcfc492e0b93bed7aab47c9177550f", null ],
-    [ "sprite_pal_end", "sprites_2animated__sprite_2main_8c.html#a1660f8115c72c5a201d18eb468a19d54", null ],
-    [ "sprite_tiles", "sprites_2animated__sprite_2main_8c.html#a9f62f8ac72d6193b2b27e1c8949e2180", null ],
-    [ "sprite_tiles_end", "sprites_2animated__sprite_2main_8c.html#ab70c48d98fc2ba28acebfe2acc51c291", null ]
+    [ "monster_anim", "sprites_2animated__sprite_2main_8c.html#a4ec2838b1e79778c47a2d4700a27be3a", null ]
 ];

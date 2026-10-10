@@ -157,9 +157,9 @@ The workflow: design in Tiled, convert for the SNES</h2>
 <div class="line">level +      → tiles +      + tileset.map   loop</div>
 <div class="line">tile props   palette+.map   → map binaries</div>
 </div><!-- fragment --><ol type="1">
-<li><b>Paint</b> the level in Tiled from your tileset image, and set each tile's <span class="tt">attribute</span> / <span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></span> / <span class="tt">priority</span> custom properties (these become the collision and rendering data above).</li>
-<li><b>Convert the tileset</b> with <span class="tt">gfx4snes</span> — it produces the tiles, the palette, and a <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> optimisation table.</li>
-<li><b>Convert the level</b> with <span class="tt">tmx2snes</span>, handing it the <span class="tt">.tmj</span> export and that <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> table; it emits the tilemap, tile-definition, and attribute binaries.</li>
+<li><b>Paint</b> the level in Tiled from your tileset image, and set each tile's <span class="tt">attribute</span> / <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a></span> / <span class="tt">priority</span> custom properties (these become the collision and rendering data above).</li>
+<li><b>Convert the tileset</b> with <span class="tt">gfx4snes</span> — it produces the tiles, the palette, and a <span class="tt">.map</span> optimisation table.</li>
+<li><b>Convert the level</b> with <span class="tt">tmx2snes</span>, handing it the <span class="tt">.tmj</span> export and that <span class="tt">.map</span> table; it emits the tilemap, tile-definition, and attribute binaries.</li>
 <li><b>Load</b> them with <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> and scroll with the map engine.</li>
 </ol>
 <p>The point of the tooling is that <b>the Tiled file stays the single source of truth.</b> Change the level in the editor, re-run two commands, and the collision, palettes and visuals all move together — no separate hand-maintained collision map to drift out of sync.</p>

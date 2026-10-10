@@ -3,9 +3,9 @@ var examples_games =
     [ "Breakout", "examples_games_breakout.html", [
       [ "Example ROMs", "examples_games.html#example-roms-5", null ],
       [ "What These Demonstrate", "examples_games.html#what-these-demonstrate", [
-        [ "Controls", "examples_games_breakout.html#controls-10", null ],
-        [ "Build &amp; Run", "examples_games_breakout.html#build--run-24", null ],
-        [ "What You'll Learn", "examples_games_breakout.html#what-youll-learn-20", null ],
+        [ "Controls", "examples_games_breakout.html#controls-9", null ],
+        [ "What You'll Learn", "examples_games_breakout.html#what-youll-learn-19", null ],
+        [ "Build &amp; Run", "examples_games_breakout.html#build--run-25", null ],
         [ "Walkthrough", "examples_games_breakout.html#walkthrough-2", [
           [ "1. Lights Off, Load Everything", "examples_games_breakout.html#autotoc_md1-lights-off-load-everything", null ],
           [ "2. The VRAM Map — A Deliberate Overlap", "examples_games_breakout.html#autotoc_md2-the-vram-map--a-deliberate-overlap", null ],
@@ -25,7 +25,7 @@ var examples_games =
           [ "Pre-Converted Assets", "examples_games_breakout.html#pre-converted-assets", null ],
           [ "Why These Modules?", "examples_games_breakout.html#why-these-modules-1", null ]
         ] ],
-        [ "Modules Used", "examples_games_breakout.html#modules-used-39", null ],
+        [ "Modules Used", "examples_games_breakout.html#modules-used-36", null ],
         [ "Technical Reference", "examples_games_breakout.html#technical-reference-1", null ],
         [ "Files", "examples_games_breakout.html#files-6", null ],
         [ "Credits", "examples_games_breakout.html#credits-1", null ]

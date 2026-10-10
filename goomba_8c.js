@@ -8,6 +8,5 @@ var goomba_8c =
     [ "goombanum", "goomba_8c.html#a99b0830fc737786e314626ea562da36a", null ],
     [ "goombax", "goomba_8c.html#a5af8f39b4f7cd5a9ae448a28511dca97", null ],
     [ "goombay", "goomba_8c.html#abe23c045ef78a61e422680ba2b6ce4b4", null ],
-    [ "nbobjects", "goomba_8c.html#a1f11a4fc65e8bd72a9ba9c513f6a24a9", null ],
-    [ "sprgoomba", "goomba_8c.html#acf284eba4663713f98f8d023965f8304", null ]
+    [ "nbobjects", "goomba_8c.html#a1f11a4fc65e8bd72a9ba9c513f6a24a9", null ]
 ];

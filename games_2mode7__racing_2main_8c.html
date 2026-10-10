@@ -129,6 +129,7 @@ $(function(){initNavTree('games_2mode7__racing_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="mode7_8h_source.html">snes/mode7.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="math_8h_source.html">snes/math.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
+<code>#include &quot;res/track.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -161,12 +162,6 @@ Variables</h2></td></tr>
 <tr class="memitem:abcb5c457114635db8310446698d4f3b6" id="r_abcb5c457114635db8310446698d4f3b6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#abcb5c457114635db8310446698d4f3b6">car_x</a></td></tr>
 <tr class="memdesc:abcb5c457114635db8310446698d4f3b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracles / game state (12.4 fixed-point pixels).  <br /></td></tr>
 <tr class="memitem:a546e1ce171b0deba47ed2d8dc8c46402" id="r_a546e1ce171b0deba47ed2d8dc8c46402"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a546e1ce171b0deba47ed2d8dc8c46402">car_y</a></td></tr>
-<tr class="memitem:a5b08e2c62d62f66e4e86a15ed6f69490" id="r_a5b08e2c62d62f66e4e86a15ed6f69490"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5b08e2c62d62f66e4e86a15ed6f69490">track_map</a> []</td></tr>
-<tr class="memitem:afc136ab27761f7850d8c1d4b942ce43d" id="r_afc136ab27761f7850d8c1d4b942ce43d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#afc136ab27761f7850d8c1d4b942ce43d">track_map_end</a> []</td></tr>
-<tr class="memitem:ad4e789171815bfc9344432fc37505541" id="r_ad4e789171815bfc9344432fc37505541"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad4e789171815bfc9344432fc37505541">track_pal</a> []</td></tr>
-<tr class="memitem:a264ba1cf70e1d9e4794e543f257df5bd" id="r_a264ba1cf70e1d9e4794e543f257df5bd"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a264ba1cf70e1d9e4794e543f257df5bd">track_pal_end</a> []</td></tr>
-<tr class="memitem:a96cb89482abccd2f57a24f3c7211a0a0" id="r_a96cb89482abccd2f57a24f3c7211a0a0"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a96cb89482abccd2f57a24f3c7211a0a0">track_til</a> []</td></tr>
-<tr class="memitem:a0f1893cdd9e9dd918f4411acc36b7a88" id="r_a0f1893cdd9e9dd918f4411acc36b7a88"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0f1893cdd9e9dd918f4411acc36b7a88">track_til_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Mode 7 racing — an F-Zero-style mini game (#4, part 1). </p>
@@ -470,114 +465,6 @@ lib/source/mode7.c — the C Mode 7 module this <a class="el" href="games_2shmup
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> car_y</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5b08e2c62d62f66e4e86a15ed6f69490" name="a5b08e2c62d62f66e4e86a15ed6f69490"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b08e2c62d62f66e4e86a15ed6f69490">&#9670;&#160;</a></span>track_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afc136ab27761f7850d8c1d4b942ce43d" name="afc136ab27761f7850d8c1d4b942ce43d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc136ab27761f7850d8c1d4b942ce43d">&#9670;&#160;</a></span>track_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad4e789171815bfc9344432fc37505541" name="ad4e789171815bfc9344432fc37505541"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4e789171815bfc9344432fc37505541">&#9670;&#160;</a></span>track_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a264ba1cf70e1d9e4794e543f257df5bd" name="a264ba1cf70e1d9e4794e543f257df5bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a264ba1cf70e1d9e4794e543f257df5bd">&#9670;&#160;</a></span>track_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a96cb89482abccd2f57a24f3c7211a0a0" name="a96cb89482abccd2f57a24f3c7211a0a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96cb89482abccd2f57a24f3c7211a0a0">&#9670;&#160;</a></span>track_til</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_til[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0f1893cdd9e9dd918f4411acc36b7a88" name="a0f1893cdd9e9dd918f4411acc36b7a88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f1893cdd9e9dd918f4411acc36b7a88">&#9670;&#160;</a></span>track_til_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_til_end[]</td>
         </tr>
       </table>
 </div><div class="memdoc">

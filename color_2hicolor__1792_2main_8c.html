@@ -126,6 +126,7 @@ $(function(){initNavTree('color_2hicolor__1792_2main_8c.html','',''); });
 <p>HiColor — 1792 colors on screen from a 4bpp background.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/sunset.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -150,12 +151,6 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:aab69b39c0dc10b51b77e2d6aedc71bd8" id="r_aab69b39c0dc10b51b77e2d6aedc71bd8"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aab69b39c0dc10b51b77e2d6aedc71bd8">pal_offset</a></td></tr>
 <tr class="memdesc:aab69b39c0dc10b51b77e2d6aedc71bd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">16-bit offset of sunset_pal within its bank (IRQ stream source)  <br /></td></tr>
-<tr class="memitem:a4acccf3e85eba76fc2f760264aca258a" id="r_a4acccf3e85eba76fc2f760264aca258a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4acccf3e85eba76fc2f760264aca258a">sunset_pal</a> []</td></tr>
-<tr class="memdesc:a4acccf3e85eba76fc2f760264aca258a"><td class="mdescLeft">&#160;</td><td class="mdescRight">28 rows x 4 segments x 16 colors BGR555 — streamed by the IRQ  <br /></td></tr>
-<tr class="memitem:ae05ae7393f29aed9b9a8fc5133904de9" id="r_ae05ae7393f29aed9b9a8fc5133904de9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae05ae7393f29aed9b9a8fc5133904de9">sunset_pal_end</a> []</td></tr>
-<tr class="memitem:abb165798de1b8c2bfc26bab41235769c" id="r_abb165798de1b8c2bfc26bab41235769c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abb165798de1b8c2bfc26bab41235769c">sunset_pic</a> []</td></tr>
-<tr class="memdesc:abb165798de1b8c2bfc26bab41235769c"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp planar tiles, 896 sequential tiles (28 rows x 32), no dedup  <br /></td></tr>
-<tr class="memitem:af731178ac22a8d7dd40f4c95131b252d" id="r_af731178ac22a8d7dd40f4c95131b252d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af731178ac22a8d7dd40f4c95131b252d">sunset_pic_end</a> []</td></tr>
 <tr class="memitem:a0f3022f9764c547f3d14e6646b2b6f99" id="r_a0f3022f9764c547f3d14e6646b2b6f99"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a> [896]</td></tr>
 <tr class="memdesc:a0f3022f9764c547f3d14e6646b2b6f99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generated 32x28 tilemap (krom's fixed pattern — see buildTilemap).  <br /></td></tr>
 </table>
@@ -171,7 +166,7 @@ ceiling" technique. An H-timer IRQ fires on EVERY scanline and DMAs 16 bytes (8 
 <li>The NMITIMEN shadow: nmiSet/irqEnable compose instead of clobbering</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>What to Observe</dt><dd>A sunset over water with perfectly smooth gradients — 357 distinct colors on screen (measure any static 4bpp screen: max 128). The top of each 8-pixel band is where the palette race lives; the H-timer is set so the DMA lands in H-blank for THIS handler (128, not krom's 190 — see the comment at <a class="el" href="interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9" title="Set the H-timer target (0-339 dots).">irqSetHTimer()</a>).</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd>A sunset over water with perfectly smooth gradients — 377 distinct colors on screen (measure any static 4bpp screen: max 128). The top of each 8-pixel band is where the palette race lives; the H-timer is set so the DMA lands in H-blank for THIS handler (128, not krom's 190 — see the comment at <a class="el" href="interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9" title="Set the H-timer target (0-339 dots).">irqSetHTimer()</a>).</dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://github.com/PeterLemon/SNES">https://github.com/PeterLemon/SNES</a> — original demo &amp; converter </dd>
 <dd>
@@ -347,82 +342,6 @@ ceiling" technique. An H-timer IRQ fires on EVERY scanline and DMAs 16 bytes (8 
 </div><div class="memdoc">
 
 <p>16-bit offset of sunset_pal within its bank (IRQ stream source) </p>
-
-</div>
-</div>
-<a id="a4acccf3e85eba76fc2f760264aca258a" name="a4acccf3e85eba76fc2f760264aca258a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4acccf3e85eba76fc2f760264aca258a">&#9670;&#160;</a></span>sunset_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sunset_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>28 rows x 4 segments x 16 colors BGR555 — streamed by the IRQ </p>
-
-</div>
-</div>
-<a id="ae05ae7393f29aed9b9a8fc5133904de9" name="ae05ae7393f29aed9b9a8fc5133904de9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae05ae7393f29aed9b9a8fc5133904de9">&#9670;&#160;</a></span>sunset_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sunset_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abb165798de1b8c2bfc26bab41235769c" name="abb165798de1b8c2bfc26bab41235769c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb165798de1b8c2bfc26bab41235769c">&#9670;&#160;</a></span>sunset_pic</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sunset_pic[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>4bpp planar tiles, 896 sequential tiles (28 rows x 32), no dedup </p>
-
-</div>
-</div>
-<a id="af731178ac22a8d7dd40f4c95131b252d" name="af731178ac22a8d7dd40f4c95131b252d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af731178ac22a8d7dd40f4c95131b252d">&#9670;&#160;</a></span>sunset_pic_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sunset_pic_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

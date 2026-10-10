@@ -132,20 +132,12 @@ $(function(){initNavTree('backgrounds_2mode1__lz77_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="dma_8h_source.html">snes/dma.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="background_8h_source.html">snes/background.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="lzss_8h_source.html">snes/lzss.h</a>&gt;</code><br />
+<code>#include &quot;res/opensnes.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; decompress LZ77 tiles to VRAM and display Mode 1 image.  <br /></td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr id="var-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">Graphics data pointers (defined in data.asm via .incbin)</div></td></tr>
-<tr class="memitem:ab681dbad7040a7043e763217feece40e" id="r_ab681dbad7040a7043e763217feece40e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab681dbad7040a7043e763217feece40e">map</a> []</td></tr>
-<tr class="memitem:a09bcbf47ad43b2cd8ad075b8c1299959" id="r_a09bcbf47ad43b2cd8ad075b8c1299959"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a09bcbf47ad43b2cd8ad075b8c1299959">map_end</a> []</td></tr>
-<tr class="memitem:aa81235770612a39a2668d11264dc308f" id="r_aa81235770612a39a2668d11264dc308f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa81235770612a39a2668d11264dc308f">palette</a> []</td></tr>
-<tr class="memitem:a3da363538ba291dd89fe3717bcf9b000" id="r_a3da363538ba291dd89fe3717bcf9b000"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3da363538ba291dd89fe3717bcf9b000">palette_end</a> []</td></tr>
-<tr class="memitem:a1e0184a17fe5b101fa49c2ba1bb147a1" id="r_a1e0184a17fe5b101fa49c2ba1bb147a1"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1e0184a17fe5b101fa49c2ba1bb147a1">patterns</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>LZ77-compressed tile loading with LZSS decompression to VRAM. </p>
@@ -188,104 +180,6 @@ Variables</h2></td></tr>
 <p>Initializes the console, forces blank, then uses <a class="el" href="lzss_8h.html#a98bf298dae04c21afcd57da9f2f92104" title="Decompress LZ77 data directly to VRAM.">lzssDecodeVram()</a> to stream LZ77-compressed tile data directly into VRAM at $4000. Unlike DMA (which copies raw data at ~1 byte per CPU cycle), LZSS decompression is CPU-driven and slower, so the screen must remain in forced blank for the entire decode. Palette and tilemap are loaded uncompressed via standard DMA calls.</p>
 <p>The benefit is ROM space savings: compressed tiles occupy ~30% less ROM than raw tile data, which matters when ROM banks are limited to 32KB.</p>
 <dl class="section return"><dt>Returns</dt><dd>Never returns (infinite loop). </dd></dl>
-
-</div>
-</div>
-<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="ab681dbad7040a7043e763217feece40e" name="ab681dbad7040a7043e763217feece40e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab681dbad7040a7043e763217feece40e">&#9670;&#160;</a></span>map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a09bcbf47ad43b2cd8ad075b8c1299959" name="a09bcbf47ad43b2cd8ad075b8c1299959"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09bcbf47ad43b2cd8ad075b8c1299959">&#9670;&#160;</a></span>map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Uncompressed 32x32 tilemap entries </p>
-
-</div>
-</div>
-<a id="aa81235770612a39a2668d11264dc308f" name="aa81235770612a39a2668d11264dc308f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa81235770612a39a2668d11264dc308f">&#9670;&#160;</a></span>palette</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3da363538ba291dd89fe3717bcf9b000" name="a3da363538ba291dd89fe3717bcf9b000"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3da363538ba291dd89fe3717bcf9b000">&#9670;&#160;</a></span>palette_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Uncompressed 16-color BGR555 palette </p>
-
-</div>
-</div>
-<a id="a1e0184a17fe5b101fa49c2ba1bb147a1" name="a1e0184a17fe5b101fa49c2ba1bb147a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e0184a17fe5b101fa49c2ba1bb147a1">&#9670;&#160;</a></span>patterns</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> patterns[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>LZ77-compressed 4bpp tile data (decompressed to VRAM by lzssDecodeVram) </p>
 
 </div>
 </div>

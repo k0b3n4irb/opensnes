@@ -125,6 +125,7 @@ $(function(){initNavTree('maps_2slope__collision_2mario_8c.html','',''); });
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="map_8h_source.html">snes/map.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="object_8h_source.html">snes/object.h</a>&gt;</code><br />
+<code>#include &quot;res/mario_sprite.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -146,9 +147,7 @@ Variables</h2></td></tr>
 <tr class="memitem:ac3ec10c7966221f17621e68908bfa9b4" id="r_ac3ec10c7966221f17621e68908bfa9b4"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac3ec10c7966221f17621e68908bfa9b4">flip</a></td></tr>
 <tr class="memitem:a54213932cd9c24437d4c3d3d8731b48e" id="r_a54213932cd9c24437d4c3d3d8731b48e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a54213932cd9c24437d4c3d3d8731b48e">mariofidx</a></td></tr>
 <tr class="memitem:a125e942c95f5539f10e66b7bb8a8083a" id="r_a125e942c95f5539f10e66b7bb8a8083a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a125e942c95f5539f10e66b7bb8a8083a">marioflp</a></td></tr>
-<tr class="memitem:a53716e2abcc85b968842b92a4705dd50" id="r_a53716e2abcc85b968842b92a4705dd50"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a53716e2abcc85b968842b92a4705dd50">mariogfx</a></td></tr>
 <tr class="memitem:a3486f7a8cf9a9894d082c117181c957f" id="r_a3486f7a8cf9a9894d082c117181c957f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3486f7a8cf9a9894d082c117181c957f">marioid</a></td></tr>
-<tr class="memitem:a9c404b92f0c1acebd3283646550fc797" id="r_a9c404b92f0c1acebd3283646550fc797"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9c404b92f0c1acebd3283646550fc797">mariopal</a></td></tr>
 <tr class="memitem:a1940f6c79dc61a38090f9f76e5cdd6d2" id="r_a1940f6c79dc61a38090f9f76e5cdd6d2"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1940f6c79dc61a38090f9f76e5cdd6d2">mariox</a></td></tr>
 <tr class="memitem:ad21b0092689f2ffa549ecaabf2bcada1" id="r_ad21b0092689f2ffa549ecaabf2bcada1"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad21b0092689f2ffa549ecaabf2bcada1">marioy</a></td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
@@ -382,28 +381,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a53716e2abcc85b968842b92a4705dd50" name="a53716e2abcc85b968842b92a4705dd50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53716e2abcc85b968842b92a4705dd50">&#9670;&#160;</a></span>mariogfx</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mariogfx</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a3486f7a8cf9a9894d082c117181c957f" name="a3486f7a8cf9a9894d082c117181c957f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3486f7a8cf9a9894d082c117181c957f">&#9670;&#160;</a></span>marioid</h2>
 
@@ -414,28 +391,6 @@ Variables</h2></td></tr>
           <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> marioid</td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a9c404b92f0c1acebd3283646550fc797" name="a9c404b92f0c1acebd3283646550fc797"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c404b92f0c1acebd3283646550fc797">&#9670;&#160;</a></span>mariopal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mariopal</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

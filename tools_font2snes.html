@@ -122,7 +122,10 @@ $(function(){initNavTree('tools_font2snes.html','',''); });
   <div class="headertitle"><div class="title">font2snes — font images to text tiles </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The text module ships with a built-in font, so you may never need this tool. But when you want your <em>own</em> typeface — a chunky title font, a themed UI face — <span class="tt">font2snes</span> converts a font image into the SNES text tiles the text routines draw from.</p>
+<div class="textblock"><blockquote class="doxtable">
+<p><b>New tool:</b> the same tile packer is <span class="tt">opensnes-text font</span> (<a class="el" href="tools_opensnes_text.html" title="opensnes-text — bitmap fonts for the text module">opensnes-text — bitmap fonts for the text module</a>), with a settings file beside the asset; this tool stays shipped for one more version. </p>
+</blockquote>
+<p>The text module ships with a built-in font, so you may never need this tool. But when you want your <em>own</em> typeface — a chunky title font, a themed UI face — <span class="tt">font2snes</span> converts a font image into the SNES text tiles the text routines draw from.</p>
 <h2 class="doxsection"><a class="anchor" id="what-goes-in-what-comes-out"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> an indexed <span class="tt">.png</span> holding exactly <b>96 characters</b> (ASCII 32–127, so character 0 is the space), with dimensions that are multiples of 8.</p>

@@ -128,6 +128,8 @@ $(function(){initNavTree('maps_2dynamic__map_2main_8c.html','',''); });
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="map32x32_8h_source.html">map32x32.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="map64x64_8h_source.html">map64x64.h</a>&quot;</code><br />
+<code>#include &quot;res/sprite16.inc&quot;</code><br />
+<code>#include &quot;res/sprite16_64x64.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -161,7 +163,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point &ndash; dynamic tilemap sprite engine demo.  <br /></td></tr>
 <tr class="memitem:a917e20f94898d50947290c35e5612d6e" id="r_a917e20f94898d50947290c35e5612d6e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a917e20f94898d50947290c35e5612d6e">smapDma</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_offset, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_addr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_count)</td></tr>
-<tr class="memdesc:a917e20f94898d50947290c35e5612d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">DMA a portion of the WRAM tilemap buffer to VRAM.  <br /></td></tr>
+<tr class="memdesc:a917e20f94898d50947290c35e5612d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm)  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -171,22 +173,10 @@ Variables</h2></td></tr>
 <tr class="memdesc:a799e60ce2f39f87a4e9712520da582fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum vertical scroll offset in pixels for the current map mode.  <br /></td></tr>
 <tr class="memitem:ac31b92f2c43357d5d53909f29aa0734b" id="r_ac31b92f2c43357d5d53909f29aa0734b"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac31b92f2c43357d5d53909f29aa0734b">max_scroll_width</a></td></tr>
 <tr class="memdesc:ac31b92f2c43357d5d53909f29aa0734b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum horizontal scroll offset in pixels for the current map mode.  <br /></td></tr>
-<tr class="memitem:acbf1453a7b5b29c674fe5ad6b95038af" id="r_acbf1453a7b5b29c674fe5ad6b95038af"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#acbf1453a7b5b29c674fe5ad6b95038af">palsprite16</a></td></tr>
-<tr class="memdesc:acbf1453a7b5b29c674fe5ad6b95038af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette for gargoyle sprite in 32x32 mode.  <br /></td></tr>
-<tr class="memitem:a439390c51be79ec9a36a644fcbe10039" id="r_a439390c51be79ec9a36a644fcbe10039"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a439390c51be79ec9a36a644fcbe10039">palsprite16_64x64</a></td></tr>
-<tr class="memdesc:a439390c51be79ec9a36a644fcbe10039"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette for gargoyle sprite in 64x64 mode.  <br /></td></tr>
-<tr class="memitem:af9dd4bc41fb916ae544b72541d912eb0" id="r_af9dd4bc41fb916ae544b72541d912eb0"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af9dd4bc41fb916ae544b72541d912eb0">palsprite16_64x64_end</a></td></tr>
-<tr class="memitem:ad4fbeffc86c58167235e0df136719ef3" id="r_ad4fbeffc86c58167235e0df136719ef3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad4fbeffc86c58167235e0df136719ef3">palsprite16_end</a></td></tr>
 <tr class="memitem:a62e581f8c19ac69c131a30adf4744803" id="r_a62e581f8c19ac69c131a30adf4744803"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a62e581f8c19ac69c131a30adf4744803">rockford_8bpp</a> [256]</td></tr>
 <tr class="memdesc:a62e581f8c19ac69c131a30adf4744803"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-computed Rockford sprite in SNES 8bpp planar format.  <br /></td></tr>
 <tr class="memitem:a9a76f8e20b8fb58c5b19eccf437e270d" id="r_a9a76f8e20b8fb58c5b19eccf437e270d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9a76f8e20b8fb58c5b19eccf437e270d">scroll_lock</a> = 1</td></tr>
 <tr class="memdesc:a9a76f8e20b8fb58c5b19eccf437e270d"><td class="mdescLeft">&#160;</td><td class="mdescRight">When true, scrolling is clamped to map boundaries; when false, wraps freely.  <br /></td></tr>
-<tr class="memitem:acc327d6c7703d7c67d2a68ec02a7f164" id="r_acc327d6c7703d7c67d2a68ec02a7f164"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#acc327d6c7703d7c67d2a68ec02a7f164">sprite16</a></td></tr>
-<tr class="memdesc:acc327d6c7703d7c67d2a68ec02a7f164"><td class="mdescLeft">&#160;</td><td class="mdescRight">8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm)  <br /></td></tr>
-<tr class="memitem:af5a1b5f09402dedf55379015e8512e29" id="r_af5a1b5f09402dedf55379015e8512e29"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af5a1b5f09402dedf55379015e8512e29">sprite16_64x64</a></td></tr>
-<tr class="memdesc:af5a1b5f09402dedf55379015e8512e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">8bpp gargoyle sprite tiles for 64x64 map mode (from data.asm)  <br /></td></tr>
-<tr class="memitem:a0d6343c2f1642cb8489efdb8cbc9629f" id="r_a0d6343c2f1642cb8489efdb8cbc9629f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a0d6343c2f1642cb8489efdb8cbc9629f">sprite16_64x64_end</a></td></tr>
-<tr class="memitem:a3c961fd263633808fa72b41971f2a28c" id="r_a3c961fd263633808fa72b41971f2a28c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3c961fd263633808fa72b41971f2a28c">sprite16_end</a></td></tr>
 <tr class="memitem:ac30aab70c1004e65fbf2c919da03bf1d" id="r_ac30aab70c1004e65fbf2c919da03bf1d"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac30aab70c1004e65fbf2c919da03bf1d">spritemap_len</a> = 0x2000</td></tr>
 <tr class="memdesc:ac30aab70c1004e65fbf2c919da03bf1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total size of the SC_64x64 tilemap in bytes (4 pages x 2KB).  <br /></td></tr>
 </table>
@@ -524,7 +514,11 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>DMA a portion of the WRAM tilemap buffer to VRAM. </p>
+<p>8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm) </p>
+<p>Palette for gargoyle sprite in 32x32 mode</p>
+<p>8bpp gargoyle sprite tiles for 64x64 map mode (from data.asm)</p>
+<p>Palette for gargoyle sprite in 64x64 mode</p>
+<p>DMA a portion of the WRAM tilemap buffer to VRAM.</p>
 <p>Because the tilemap lives in extended WRAM (bank $7E, above $2000), C code cannot access it directly &ndash; the compiler generates <span class="tt">sta.l $0000,x</span> which always reads bank $00. This assembly helper sets the DMA source bank to $7E and performs the transfer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -586,82 +580,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="acbf1453a7b5b29c674fe5ad6b95038af" name="acbf1453a7b5b29c674fe5ad6b95038af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acbf1453a7b5b29c674fe5ad6b95038af">&#9670;&#160;</a></span>palsprite16</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite16</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Palette for gargoyle sprite in 32x32 mode. </p>
-
-</div>
-</div>
-<a id="a439390c51be79ec9a36a644fcbe10039" name="a439390c51be79ec9a36a644fcbe10039"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a439390c51be79ec9a36a644fcbe10039">&#9670;&#160;</a></span>palsprite16_64x64</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite16_64x64</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Palette for gargoyle sprite in 64x64 mode. </p>
-
-</div>
-</div>
-<a id="af9dd4bc41fb916ae544b72541d912eb0" name="af9dd4bc41fb916ae544b72541d912eb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af9dd4bc41fb916ae544b72541d912eb0">&#9670;&#160;</a></span>palsprite16_64x64_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite16_64x64_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad4fbeffc86c58167235e0df136719ef3" name="ad4fbeffc86c58167235e0df136719ef3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4fbeffc86c58167235e0df136719ef3">&#9670;&#160;</a></span>palsprite16_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite16_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a62e581f8c19ac69c131a30adf4744803" name="a62e581f8c19ac69c131a30adf4744803"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a62e581f8c19ac69c131a30adf4744803">&#9670;&#160;</a></span>rockford_8bpp</h2>
 
@@ -700,82 +618,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>When true, scrolling is clamped to map boundaries; when false, wraps freely. </p>
-
-</div>
-</div>
-<a id="acc327d6c7703d7c67d2a68ec02a7f164" name="acc327d6c7703d7c67d2a68ec02a7f164"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc327d6c7703d7c67d2a68ec02a7f164">&#9670;&#160;</a></span>sprite16</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite16</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm) </p>
-
-</div>
-</div>
-<a id="af5a1b5f09402dedf55379015e8512e29" name="af5a1b5f09402dedf55379015e8512e29"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af5a1b5f09402dedf55379015e8512e29">&#9670;&#160;</a></span>sprite16_64x64</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite16_64x64</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>8bpp gargoyle sprite tiles for 64x64 map mode (from data.asm) </p>
-
-</div>
-</div>
-<a id="a0d6343c2f1642cb8489efdb8cbc9629f" name="a0d6343c2f1642cb8489efdb8cbc9629f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d6343c2f1642cb8489efdb8cbc9629f">&#9670;&#160;</a></span>sprite16_64x64_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite16_64x64_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3c961fd263633808fa72b41971f2a28c" name="a3c961fd263633808fa72b41971f2a28c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c961fd263633808fa72b41971f2a28c">&#9670;&#160;</a></span>sprite16_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite16_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

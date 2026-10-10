@@ -16,6 +16,5 @@ var games_2mapandobjects_2mario_8c =
     [ "mariox", "games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2", null ],
     [ "marioy", "games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1", null ],
     [ "nbobjects", "games_2mapandobjects_2mario_8c.html#a1f11a4fc65e8bd72a9ba9c513f6a24a9", null ],
-    [ "pad0", "games_2mapandobjects_2mario_8c.html#a50a1287c6a673d98dd90c61df91fd33c", null ],
-    [ "sprmario", "games_2mapandobjects_2mario_8c.html#ae7ed0bfcff98edc34032ed944c935864", null ]
+    [ "pad0", "games_2mapandobjects_2mario_8c.html#a50a1287c6a673d98dd90c61df91fd33c", null ]
 ];

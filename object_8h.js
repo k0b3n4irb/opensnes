@@ -24,5 +24,5 @@ var object_8h =
     [ "objRefreshAll", "object_8h.html#aede8c571a7e8bdb8129b5df55b45225b", null ],
     [ "objUpdateAll", "object_8h.html#ae992e39d4420d4053b6b9e9084ee9b83", null ],
     [ "objUpdateXY", "object_8h.html#af27124be823e35daf579362d3820738d", null ],
-    [ "objWorkspace", "object_8h.html#aff685114554f887d186a87bacbe786b9", null ]
+    [ "objWorkspace", "object_8h.html#ad12284001e1281ab118cc485e76959b7", null ]
 ];

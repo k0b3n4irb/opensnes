@@ -135,7 +135,7 @@ What goes in, what comes out</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span>  </td><td class="markdownTableBodyNone">palette, BGR555, 2 bytes/colour  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span>  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span>  </td><td class="markdownTableBodyNone">16-bit tilemap entries (tile + flip + palette + priority)  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / the map engine  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">.map</span>  </td><td class="markdownTableBodyNone">16-bit tilemap entries (tile + flip + palette + priority)  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / the map engine  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">.inc</span>  </td><td class="markdownTableBodyNone">C size constants for the above  </td><td class="markdownTableBodyNone"><span class="tt">#include</span>  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -171,7 +171,7 @@ The flags you will actually use</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">-p</span>  </td><td class="markdownTableBodyNone">emit the palette <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-m</span>  </td><td class="markdownTableBodyNone">emit the tilemap <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> (backgrounds; <b>omit for sprites</b>)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">-m</span>  </td><td class="markdownTableBodyNone">emit the tilemap <span class="tt">.map</span> (backgrounds; <b>omit for sprites</b>)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">-e N</span>  </td><td class="markdownTableBodyNone">palette-bank offset (0–7) baked into tilemap entries  </td></tr>
 <tr class="markdownTableRowEven">
@@ -209,9 +209,12 @@ See it in practice</h2>
 <li><a class="el" href="examples_backgrounds_mode0.html" title="Mode 0 — 4-Layer 2bpp Background">Mode 0 — 4-Layer 2bpp Background</a> — 2bpp, four cheap layers.</li>
 <li><a class="el" href="examples_backgrounds_mode3.html" title="Mode 3 — 256-Color Background">Mode 3 — 256-Color Background</a> — 8bpp, and why one screen costs ~40 KB.</li>
 <li><a class="el" href="examples_games_rpg.html" title="rpg — an RPG template driven by a Tiled map">rpg — an RPG template driven by a Tiled map</a> — fixed-palette backgrounds <em>and</em> <span class="tt">-s 16</span> sprites.</li>
-<li><a class="el" href="examples_input_move_sprite.html" title="Drive a sprite with the pad">Drive a sprite with the pad</a> — the simplest sprite-tile case.</li>
+<li><a class="el" href="examples_sprites_simple_sprite.html" title="Simple Sprite -- Your First OAM Sprite">Simple Sprite -- Your First OAM Sprite</a> — the simplest sprite-tile case.</li>
 </ul>
-<p>Next in the pipeline: feed the <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> this produces into <a class="el" href="tools_tmx2snes.html" title="tmx2snes — Tiled levels to SNES map data">tmx2snes — Tiled levels to SNES map data</a> to turn a Tiled level into ready-to-load map binaries. </p>
+<p>Next in the pipeline: feed the <span class="tt">.map</span> this produces into <a class="el" href="tools_tmx2snes.html" title="tmx2snes — Tiled levels to SNES map data">tmx2snes — Tiled levels to SNES map data</a> to turn a Tiled level into ready-to-load map binaries.</p>
+<h2 class="doxsection"><a class="anchor" id="palette-banks-in-maps"></a>
+Palette banks in maps</h2>
+<p>A 2bpp or 4bpp map entry names one palette bank, taken from the tile's first opaque pixel; a tile whose opaque pixels span two banks is refused with its block position. <span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a></span> rearranges the palette so that each tile's colours fit one bank and rewrites the tiles accordingly (since 2026-10-05 — before, the palette moved and the tiles did not, which is what made <span class="tt">examples/color/transparency</span> brown and mauve instead of blue and grey). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

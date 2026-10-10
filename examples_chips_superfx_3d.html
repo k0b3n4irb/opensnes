@@ -138,12 +138,7 @@ Emulator Compatibility</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>snes9x</b>  </td><td class="markdownTableBodyNone">❌ Does not detect GSU despite correct header — example shows "GSU: NOT DETECTED"  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-16"></a>
-Build &amp; Run</h2>
-<div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
-<div class="line">make -C examples/chips/superfx_3d</div>
-</div><!-- fragment --><p>Then open <span class="tt">superfx_3d.sfc</span> in luna (or any SNES emulator).</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-13"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-12"></a>
 What You'll Learn</h2>
 <ul>
 <li><b>3D rotation</b>: Y+X axis rotation using 256-entry sine table (C-side)</li>
@@ -154,7 +149,12 @@ What You'll Learn</h2>
 <li><b>Vertex clamping</b>: projected coords clamped to framebuffer bounds (0-126)</li>
 <li><b>SuperFX library API</b>: <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae7a88cd0ea3830d8a308cf5c0ca8b00a" title="Setup HDMA screen blanking for DMA bandwidth.">gsuSetupHdmaBlanking()</a></span>, <span class="tt"><a class="el" href="superfx_8h.html#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox.">gsuDmaFullFrame()</a></span></li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="architecture-3"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-16"></a>
+Build &amp; Run</h2>
+<div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
+<div class="line">make -C examples/chips/superfx_3d</div>
+</div><!-- fragment --><p>Then open <span class="tt">superfx_3d.sfc</span> in luna (or any SNES emulator).</p>
+<h2 class="doxsection"><a class="anchor" id="architecture-2"></a>
 Architecture</h2>
 <div class="fragment"><div class="line">SNES CPU (C)                    GSU (SuperFX ASM)</div>
 <div class="line">─────────────                   ─────────────────</div>
@@ -177,7 +177,7 @@ Per-Example Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">gsu_loader.asm</span>  </td><td class="markdownTableBodyNone">Minimal: <span class="tt">.incbin</span> + <span class="tt"><a class="el" href="superfx_8h.html#a54c1329e34940920937be4e71bce9d99" title="Tell the library where the GSU program lives.">gsuSetProgram</a></span> + <span class="tt"><a class="el" href="chips_2superfx__3d_2main_8c.html#a17000e52c641974ad31ef2386e695fe1">writeEdgesToSRAM</a></span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="modules-used-27"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-26"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

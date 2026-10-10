@@ -129,6 +129,8 @@ $(function(){initNavTree('games_2likemario_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="anim_8h_source.html">snes/anim.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="snesmod_8h_source.html">snes/snesmod.h</a>&gt;</code><br />
 <code>#include &quot;soundbank.h&quot;</code><br />
+<code>#include &quot;res/tiles.inc&quot;</code><br />
+<code>#include &quot;res/mario_sprite.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -167,7 +169,7 @@ Macros</h2></td></tr>
 <tr class="memitem:aec9dcf2ea648f7c52b3593d354a663a3" id="r_aec9dcf2ea648f7c52b3593d354a663a3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aec9dcf2ea648f7c52b3593d354a663a3">VRAM_BG_TILES</a>&#160;&#160;&#160;0x2000</td></tr>
 <tr class="memdesc:aec9dcf2ea648f7c52b3593d354a663a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address for BG1 tile character data.  <br /></td></tr>
 <tr class="memitem:a307f7a66d00de9b68d22f059e6490ee3" id="r_a307f7a66d00de9b68d22f059e6490ee3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a307f7a66d00de9b68d22f059e6490ee3">VRAM_SPR_LARGE</a>&#160;&#160;&#160;0x0000</td></tr>
-<tr class="memdesc:a307f7a66d00de9b68d22f059e6490ee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address for large (16x16) sprite tiles.  <br /></td></tr>
+<tr class="memdesc:a307f7a66d00de9b68d22f059e6490ee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asset symbols from data.asm (.incbin sections in SUPERFREE banks). Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram read it directly — no ASM loader stub needed.  <br /></td></tr>
 <tr class="memitem:a7969a37ad80a90f7ec11c8eccd822291" id="r_a7969a37ad80a90f7ec11c8eccd822291"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7969a37ad80a90f7ec11c8eccd822291">VRAM_SPR_SMALL</a>&#160;&#160;&#160;0x1000</td></tr>
 <tr class="memdesc:a7969a37ad80a90f7ec11c8eccd822291"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address for small (8x8) sprite tiles.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -228,13 +230,9 @@ Variables</h2></td></tr>
 <tr class="memdesc:a499e4f488545f6833a11f296329be32f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Precomputed row pointers into map_data for fast tile lookup.  <br /></td></tr>
 <tr class="memitem:a569ad8f9a5117f4c707337b7d0141497" id="r_a569ad8f9a5117f4c707337b7d0141497"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a569ad8f9a5117f4c707337b7d0141497">map_width</a></td></tr>
 <tr class="memitem:a71d82d48b8dd21a3abef1fe25a1cadc8" id="r_a71d82d48b8dd21a3abef1fe25a1cadc8"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a71d82d48b8dd21a3abef1fe25a1cadc8">mapmario</a> []</td></tr>
-<tr class="memdesc:a71d82d48b8dd21a3abef1fe25a1cadc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map data (tile indices + header with width/height).  <br /></td></tr>
+<tr class="memdesc:a71d82d48b8dd21a3abef1fe25a1cadc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine.  <br /></td></tr>
 <tr class="memitem:abf248dfba13f521a932e34626741bacd" id="r_abf248dfba13f521a932e34626741bacd"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abf248dfba13f521a932e34626741bacd">mario_action</a></td></tr>
 <tr class="memitem:aa76ec2900485bf1fadac5ac5b141958e" id="r_aa76ec2900485bf1fadac5ac5b141958e"><td class="memItemLeft">static <a class="el" href="structAnimPlayer.html">AnimPlayer</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa76ec2900485bf1fadac5ac5b141958e">mario_anim</a> = {0, 0, 0, 0, 0}</td></tr>
-<tr class="memitem:a9af184ace3867c5be24dd33e44af0da6" id="r_a9af184ace3867c5be24dd33e44af0da6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9af184ace3867c5be24dd33e44af0da6">mario_sprite_pal</a> []</td></tr>
-<tr class="memitem:a11a8a7513255e600674887fb85159d0f" id="r_a11a8a7513255e600674887fb85159d0f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a11a8a7513255e600674887fb85159d0f">mario_sprite_palend</a> []</td></tr>
-<tr class="memitem:a67fd1acd5ce2ce121082795cd1b28695" id="r_a67fd1acd5ce2ce121082795cd1b28695"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a67fd1acd5ce2ce121082795cd1b28695">mario_sprite_til</a> []</td></tr>
-<tr class="memdesc:a67fd1acd5ce2ce121082795cd1b28695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine.  <br /></td></tr>
 <tr class="memitem:a3f5722ffc5d3e0c7a778e8ff46794706" id="r_a3f5722ffc5d3e0c7a778e8ff46794706"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3f5722ffc5d3e0c7a778e8ff46794706">mario_x</a></td></tr>
 <tr class="memitem:af256f257e72a75081871dc3bd08def7d" id="r_af256f257e72a75081871dc3bd08def7d"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af256f257e72a75081871dc3bd08def7d">mario_xfrac</a></td></tr>
 <tr class="memitem:a98b8dfe2ed7fb9745be169bc642114e4" id="r_a98b8dfe2ed7fb9745be169bc642114e4"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a98b8dfe2ed7fb9745be169bc642114e4">mario_xvel</a></td></tr>
@@ -244,11 +242,6 @@ Variables</h2></td></tr>
 <tr class="memitem:a986e5fe5d150399d454bd76e054a771a" id="r_a986e5fe5d150399d454bd76e054a771a"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a986e5fe5d150399d454bd76e054a771a">sfx_jump_slot</a></td></tr>
 <tr class="memdesc:a986e5fe5d150399d454bd76e054a771a"><td class="mdescLeft">&#160;</td><td class="mdescRight">SPC700 sound effect slot index for the jump sound.  <br /></td></tr>
 <tr class="memitem:a65dd3ad8a61a8517b934da783ac17f2f" id="r_a65dd3ad8a61a8517b934da783ac17f2f"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a65dd3ad8a61a8517b934da783ac17f2f">tile_props</a></td></tr>
-<tr class="memitem:a78181ef85e5654d84864c62594ea2973" id="r_a78181ef85e5654d84864c62594ea2973"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a78181ef85e5654d84864c62594ea2973">tiles_pal</a> []</td></tr>
-<tr class="memitem:a8d43101d158fd384f23308d6c6e4a160" id="r_a8d43101d158fd384f23308d6c6e4a160"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8d43101d158fd384f23308d6c6e4a160">tiles_palend</a> []</td></tr>
-<tr class="memitem:a51595c729c9abdf4532ec0b74a4dd272" id="r_a51595c729c9abdf4532ec0b74a4dd272"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a51595c729c9abdf4532ec0b74a4dd272">tiles_til</a> []</td></tr>
-<tr class="memdesc:a51595c729c9abdf4532ec0b74a4dd272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asset symbols from data.asm (.incbin sections in SUPERFREE banks). Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram read it directly — no ASM loader stub needed.  <br /></td></tr>
-<tr class="memitem:a6eb885e6f296dd921a08cb0b10a06a53" id="r_a6eb885e6f296dd921a08cb0b10a06a53"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6eb885e6f296dd921a08cb0b10a06a53">tiles_tilend</a> []</td></tr>
 <tr class="memitem:a6647ca308a222a3f219d7ba77ea28b15" id="r_a6647ca308a222a3f219d7ba77ea28b15"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a6647ca308a222a3f219d7ba77ea28b15">tilesetatt</a> []</td></tr>
 <tr class="memdesc:a6647ca308a222a3f219d7ba77ea28b15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format).  <br /></td></tr>
 </table>
@@ -564,7 +557,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>VRAM word address for large (16x16) sprite tiles. </p>
+<p>Asset symbols from data.asm (.incbin sections in SUPERFREE banks). Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram read it directly — no ASM loader stub needed. </p>
+<p>VRAM word address for large (16x16) sprite tiles </p>
 
 </div>
 </div>
@@ -1495,7 +1489,8 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Map data (tile indices + header with width/height). </p>
+<p>Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine. </p>
+<p>Map data (tile indices + header with width/height) </p>
 
 </div>
 </div>
@@ -1542,66 +1537,6 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Mario's animation state </p>
-
-</div>
-</div>
-<a id="a9af184ace3867c5be24dd33e44af0da6" name="a9af184ace3867c5be24dd33e44af0da6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9af184ace3867c5be24dd33e44af0da6">&#9670;&#160;</a></span>mario_sprite_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mario_sprite_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a11a8a7513255e600674887fb85159d0f" name="a11a8a7513255e600674887fb85159d0f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11a8a7513255e600674887fb85159d0f">&#9670;&#160;</a></span>mario_sprite_palend</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mario_sprite_palend[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a67fd1acd5ce2ce121082795cd1b28695" name="a67fd1acd5ce2ce121082795cd1b28695"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a67fd1acd5ce2ce121082795cd1b28695">&#9670;&#160;</a></span>mario_sprite_til</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mario_sprite_til[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine. </p>
 
 </div>
 </div>
@@ -1787,80 +1722,6 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Pointer to the tile property table (T_SOLID/T_EMPTY) </p>
-
-</div>
-</div>
-<a id="a78181ef85e5654d84864c62594ea2973" name="a78181ef85e5654d84864c62594ea2973"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78181ef85e5654d84864c62594ea2973">&#9670;&#160;</a></span>tiles_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8d43101d158fd384f23308d6c6e4a160" name="a8d43101d158fd384f23308d6c6e4a160"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d43101d158fd384f23308d6c6e4a160">&#9670;&#160;</a></span>tiles_palend</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_palend[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a51595c729c9abdf4532ec0b74a4dd272" name="a51595c729c9abdf4532ec0b74a4dd272"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51595c729c9abdf4532ec0b74a4dd272">&#9670;&#160;</a></span>tiles_til</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_til[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Asset symbols from data.asm (.incbin sections in SUPERFREE banks). Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram read it directly — no ASM loader stub needed. </p>
-
-</div>
-</div>
-<a id="a6eb885e6f296dd921a08cb0b10a06a53" name="a6eb885e6f296dd921a08cb0b10a06a53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6eb885e6f296dd921a08cb0b10a06a53">&#9670;&#160;</a></span>tiles_tilend</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_tilend[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

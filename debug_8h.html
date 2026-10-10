@@ -154,7 +154,7 @@ Usage</h2>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="debug_8h.html">snes/debug.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">void</span> enemy_update(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx) {</div>
-<div class="line">    <a class="code hl_define" href="#ace0973c12e9f5c64790c99c36375f086">SNES_ASSERT</a>(<a class="code hl_variable" href="object_8h.html#aff685114554f887d186a87bacbe786b9">objWorkspace</a>.type != 0);</div>
+<div class="line">    <a class="code hl_define" href="#ace0973c12e9f5c64790c99c36375f086">SNES_ASSERT</a>(<a class="code hl_variable" href="object_8h.html#ad12284001e1281ab118cc485e76959b7">objWorkspace</a>.type != 0);</div>
 <div class="line">    <a class="code hl_define" href="#a0d70da9a3ad98f46019e0066b9805837">SNES_NOCASH</a>(<span class="stringliteral">&quot;enemy_update called&quot;</span>);</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">    <span class="keywordflow">if</span> (something_wrong) {</div>
@@ -166,7 +166,7 @@ Usage</h2>
 <div class="ttc" id="adebug_8h_html_a2bfec3c05a1c52d8a6b31762500af6e4"><div class="ttname"><a href="#a2bfec3c05a1c52d8a6b31762500af6e4">SNES_BREAK</a></div><div class="ttdeci">#define SNES_BREAK()</div><div class="ttdoc">Breakpoint — WDM $00 (luna assert channel / Mesen2 debugger halt).</div><div class="ttdef"><b>Definition</b> debug.h:73</div></div>
 <div class="ttc" id="adebug_8h_html_ace0973c12e9f5c64790c99c36375f086"><div class="ttname"><a href="#ace0973c12e9f5c64790c99c36375f086">SNES_ASSERT</a></div><div class="ttdeci">#define SNES_ASSERT(cond)</div><div class="ttdoc">Runtime assertion — breaks in emulator if condition is false.</div><div class="ttdef"><b>Definition</b> debug.h:92</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-<div class="ttc" id="aobject_8h_html_aff685114554f887d186a87bacbe786b9"><div class="ttname"><a href="object_8h.html#aff685114554f887d186a87bacbe786b9">objWorkspace</a></div><div class="ttdeci">t_objs objWorkspace</div><div class="ttdoc">Object workspace (Bank $00).</div></div>
+<div class="ttc" id="aobject_8h_html_ad12284001e1281ab118cc485e76959b7"><div class="ttname"><a href="object_8h.html#ad12284001e1281ab118cc485e76959b7">objWorkspace</a></div><div class="ttdeci">FAR t_objs objWorkspace</div><div class="ttdoc">Object workspace.</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build"></a>
 Build</h2>

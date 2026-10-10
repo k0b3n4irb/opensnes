@@ -129,6 +129,7 @@ $(function(){initNavTree('games_2mode7__flying_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="mode7_8h_source.html">snes/mode7.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="math_8h_source.html">snes/math.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
+<code>#include &quot;res/terrain.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -166,12 +167,6 @@ Variables</h2></td></tr>
 <tr class="memitem:a38aefd46976ba858c7007b4fa548c536" id="r_a38aefd46976ba858c7007b4fa548c536"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a38aefd46976ba858c7007b4fa548c536">shape_tiles</a> [128]</td></tr>
 <tr class="memdesc:a38aefd46976ba858c7007b4fa548c536"><td class="mdescLeft">&#160;</td><td class="mdescRight">4 8x8 4bpp tiles = one 16x16 shape (built at init)  <br /></td></tr>
 <tr class="memitem:af4da8279099100e3ffc14d0676a942e3" id="r_af4da8279099100e3ffc14d0676a942e3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af4da8279099100e3ffc14d0676a942e3">surface</a></td></tr>
-<tr class="memitem:a34f94b3bf95b8a59d3a8a087fac0341f" id="r_a34f94b3bf95b8a59d3a8a087fac0341f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a34f94b3bf95b8a59d3a8a087fac0341f">terrain_map</a> []</td></tr>
-<tr class="memitem:a4fb48ff3acf6512feef3b8d1311bd600" id="r_a4fb48ff3acf6512feef3b8d1311bd600"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4fb48ff3acf6512feef3b8d1311bd600">terrain_map_end</a> []</td></tr>
-<tr class="memitem:a087f7f2872be34c25b5636dcc1eccf54" id="r_a087f7f2872be34c25b5636dcc1eccf54"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a087f7f2872be34c25b5636dcc1eccf54">terrain_pal</a> []</td></tr>
-<tr class="memitem:a06d6d557ccc3a8e374b18d0e4912cd48" id="r_a06d6d557ccc3a8e374b18d0e4912cd48"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a06d6d557ccc3a8e374b18d0e4912cd48">terrain_pal_end</a> []</td></tr>
-<tr class="memitem:a324ac271d5dcb142d25179e650449fe1" id="r_a324ac271d5dcb142d25179e650449fe1"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a324ac271d5dcb142d25179e650449fe1">terrain_til</a> []</td></tr>
-<tr class="memitem:a9c91ee21b6b7d8f068c537b94615d58d" id="r_a9c91ee21b6b7d8f068c537b94615d58d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9c91ee21b6b7d8f068c537b94615d58d">terrain_til_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Mode 7 flying — a Pilotwings-style demo (#4, part 2). </p>
@@ -541,114 +536,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> surface</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a34f94b3bf95b8a59d3a8a087fac0341f" name="a34f94b3bf95b8a59d3a8a087fac0341f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a34f94b3bf95b8a59d3a8a087fac0341f">&#9670;&#160;</a></span>terrain_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4fb48ff3acf6512feef3b8d1311bd600" name="a4fb48ff3acf6512feef3b8d1311bd600"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4fb48ff3acf6512feef3b8d1311bd600">&#9670;&#160;</a></span>terrain_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a087f7f2872be34c25b5636dcc1eccf54" name="a087f7f2872be34c25b5636dcc1eccf54"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a087f7f2872be34c25b5636dcc1eccf54">&#9670;&#160;</a></span>terrain_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a06d6d557ccc3a8e374b18d0e4912cd48" name="a06d6d557ccc3a8e374b18d0e4912cd48"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06d6d557ccc3a8e374b18d0e4912cd48">&#9670;&#160;</a></span>terrain_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a324ac271d5dcb142d25179e650449fe1" name="a324ac271d5dcb142d25179e650449fe1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a324ac271d5dcb142d25179e650449fe1">&#9670;&#160;</a></span>terrain_til</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_til[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a9c91ee21b6b7d8f068c537b94615d58d" name="a9c91ee21b6b7d8f068c537b94615d58d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c91ee21b6b7d8f068c537b94615d58d">&#9670;&#160;</a></span>terrain_til_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_til_end[]</td>
         </tr>
       </table>
 </div><div class="memdoc">

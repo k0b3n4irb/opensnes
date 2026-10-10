@@ -126,6 +126,8 @@ $(function(){initNavTree('windows_2window_2main_8c.html','',''); });
 <p>HDMA-driven triangle window masking on selectable BG layers.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/bg1.inc&quot;</code><br />
+<code>#include &quot;res/bg2.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -145,26 +147,10 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a07411e9603bc9e8333c3f3c5578eefd6" id="r_a07411e9603bc9e8333c3f3c5578eefd6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a07411e9603bc9e8333c3f3c5578eefd6">palette_bg1</a> []</td></tr>
-<tr class="memdesc:a07411e9603bc9e8333c3f3c5578eefd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">16-color palette for BG1  <br /></td></tr>
-<tr class="memitem:a2dbdc26e05e097bd7834986fbfb66406" id="r_a2dbdc26e05e097bd7834986fbfb66406"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2dbdc26e05e097bd7834986fbfb66406">palette_bg2</a> []</td></tr>
-<tr class="memdesc:a2dbdc26e05e097bd7834986fbfb66406"><td class="mdescLeft">&#160;</td><td class="mdescRight">16-color palette for BG2 (loaded to CGRAM palette slot 1)  <br /></td></tr>
 <tr class="memitem:ae8ca7c4d0b07e2c52fa9fd77df638833" id="r_ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae8ca7c4d0b07e2c52fa9fd77df638833">tablelefttriangle</a> []</td></tr>
-<tr class="memdesc:ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA table for the left window boundary (WH0, $2126).  <br /></td></tr>
+<tr class="memdesc:ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for background layer 1 (defined in data.asm)  <br /></td></tr>
 <tr class="memitem:a05283269f5b57e738841b4cfe551530c" id="r_a05283269f5b57e738841b4cfe551530c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a05283269f5b57e738841b4cfe551530c">tablerighttriangle</a> []</td></tr>
 <tr class="memdesc:a05283269f5b57e738841b4cfe551530c"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA table for the right window boundary (WH1, $2127).  <br /></td></tr>
-<tr class="memitem:a62bfb1c2c4ad59a934e24058b5251969" id="r_a62bfb1c2c4ad59a934e24058b5251969"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a62bfb1c2c4ad59a934e24058b5251969">tilemap_bg1</a> []</td></tr>
-<tr class="memdesc:a62bfb1c2c4ad59a934e24058b5251969"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tilemap data for BG1 (32x32 grid).  <br /></td></tr>
-<tr class="memitem:a89b933ea384cc7e129ff917876396570" id="r_a89b933ea384cc7e129ff917876396570"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a89b933ea384cc7e129ff917876396570">tilemap_bg1_end</a> []</td></tr>
-<tr class="memitem:a5cb406b385a0d32cf14cdd38e5fe5186" id="r_a5cb406b385a0d32cf14cdd38e5fe5186"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5cb406b385a0d32cf14cdd38e5fe5186">tilemap_bg2</a> []</td></tr>
-<tr class="memdesc:a5cb406b385a0d32cf14cdd38e5fe5186"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tilemap data for BG2 (32x32 grid).  <br /></td></tr>
-<tr class="memitem:a758d1906d1414ad19915ac0b46451bfb" id="r_a758d1906d1414ad19915ac0b46451bfb"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a758d1906d1414ad19915ac0b46451bfb">tilemap_bg2_end</a> []</td></tr>
-<tr class="memitem:a8412390abb53f9c3a3a3a36892a1f8c4" id="r_a8412390abb53f9c3a3a3a36892a1f8c4"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8412390abb53f9c3a3a3a36892a1f8c4">tiles_bg1</a> []</td></tr>
-<tr class="memdesc:a8412390abb53f9c3a3a3a36892a1f8c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for background layer 1 (defined in data.asm)  <br /></td></tr>
-<tr class="memitem:a56861a1f2ef805b2b4a73efc16afd928" id="r_a56861a1f2ef805b2b4a73efc16afd928"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a56861a1f2ef805b2b4a73efc16afd928">tiles_bg1_end</a> []</td></tr>
-<tr class="memitem:a2392af57b565616efd8a5fffe7402faf" id="r_a2392af57b565616efd8a5fffe7402faf"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2392af57b565616efd8a5fffe7402faf">tiles_bg2</a> []</td></tr>
-<tr class="memdesc:a2392af57b565616efd8a5fffe7402faf"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for background layer 2 (defined in data.asm)  <br /></td></tr>
-<tr class="memitem:a2508c4b62c360ae87a2f6cbe5ad53f54" id="r_a2508c4b62c360ae87a2f6cbe5ad53f54"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2508c4b62c360ae87a2f6cbe5ad53f54">tiles_bg2_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>HDMA-driven triangle window masking on selectable BG layers. </p>
@@ -300,54 +286,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a07411e9603bc9e8333c3f3c5578eefd6" name="a07411e9603bc9e8333c3f3c5578eefd6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a07411e9603bc9e8333c3f3c5578eefd6">&#9670;&#160;</a></span>palette_bg1</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette_bg1[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>16-color palette for BG1 </p>
-
-</div>
-</div>
-<a id="a2dbdc26e05e097bd7834986fbfb66406" name="a2dbdc26e05e097bd7834986fbfb66406"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2dbdc26e05e097bd7834986fbfb66406">&#9670;&#160;</a></span>palette_bg2</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palette_bg2[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>16-color palette for BG2 (loaded to CGRAM palette slot 1) </p>
-
-</div>
-</div>
 <a id="ae8ca7c4d0b07e2c52fa9fd77df638833" name="ae8ca7c4d0b07e2c52fa9fd77df638833"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae8ca7c4d0b07e2c52fa9fd77df638833">&#9670;&#160;</a></span>tablelefttriangle</h2>
 
@@ -373,7 +311,13 @@ Variables</h2></td></tr>
 <div class="line">    0xFF, 0             </div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p>HDMA table for the left window boundary (WH0, $2126). </p>
+<p>4bpp tile data for background layer 1 (defined in data.asm) </p>
+<p>Tilemap data for BG1 (32x32 grid)</p>
+<p>16-color palette for BG1</p>
+<p>4bpp tile data for background layer 2 (defined in data.asm)</p>
+<p>Tilemap data for BG2 (32x32 grid)</p>
+<p>16-color palette for BG2 (loaded to CGRAM palette slot 1)</p>
+<p>HDMA table for the left window boundary (WH0, $2126).</p>
 <p>Defines a diamond/triangle shape: the left edge starts at x=0x7F (pixel 127, center of screen), narrows toward x=0x60 (pixel 96) over 32 scanlines, then widens back to 0x7F over 32 more scanlines. The 60-line header disables the window above the triangle by setting WH0=0xFF (left &gt; right = no window). </p>
 
 </div>
@@ -405,158 +349,6 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p>HDMA table for the right window boundary (WH1, $2127). </p>
 <p>Mirrors the left table: starts at x=0x81 (pixel 129), expands outward to x=0xA0 (pixel 160) then converges back. Together with tablelefttriangle, this creates a diamond shape centered at pixel 128 that is 64 scanlines tall. </p>
-
-</div>
-</div>
-<a id="a62bfb1c2c4ad59a934e24058b5251969" name="a62bfb1c2c4ad59a934e24058b5251969"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62bfb1c2c4ad59a934e24058b5251969">&#9670;&#160;</a></span>tilemap_bg1</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilemap_bg1[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Tilemap data for BG1 (32x32 grid). </p>
-
-</div>
-</div>
-<a id="a89b933ea384cc7e129ff917876396570" name="a89b933ea384cc7e129ff917876396570"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89b933ea384cc7e129ff917876396570">&#9670;&#160;</a></span>tilemap_bg1_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilemap_bg1_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5cb406b385a0d32cf14cdd38e5fe5186" name="a5cb406b385a0d32cf14cdd38e5fe5186"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5cb406b385a0d32cf14cdd38e5fe5186">&#9670;&#160;</a></span>tilemap_bg2</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilemap_bg2[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Tilemap data for BG2 (32x32 grid). </p>
-
-</div>
-</div>
-<a id="a758d1906d1414ad19915ac0b46451bfb" name="a758d1906d1414ad19915ac0b46451bfb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a758d1906d1414ad19915ac0b46451bfb">&#9670;&#160;</a></span>tilemap_bg2_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilemap_bg2_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8412390abb53f9c3a3a3a36892a1f8c4" name="a8412390abb53f9c3a3a3a36892a1f8c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8412390abb53f9c3a3a3a36892a1f8c4">&#9670;&#160;</a></span>tiles_bg1</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_bg1[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>4bpp tile data for background layer 1 (defined in data.asm) </p>
-
-</div>
-</div>
-<a id="a56861a1f2ef805b2b4a73efc16afd928" name="a56861a1f2ef805b2b4a73efc16afd928"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56861a1f2ef805b2b4a73efc16afd928">&#9670;&#160;</a></span>tiles_bg1_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_bg1_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2392af57b565616efd8a5fffe7402faf" name="a2392af57b565616efd8a5fffe7402faf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2392af57b565616efd8a5fffe7402faf">&#9670;&#160;</a></span>tiles_bg2</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_bg2[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>4bpp tile data for background layer 2 (defined in data.asm) </p>
-
-</div>
-</div>
-<a id="a2508c4b62c360ae87a2f6cbe5ad53f54" name="a2508c4b62c360ae87a2f6cbe5ad53f54"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2508c4b62c360ae87a2f6cbe5ad53f54">&#9670;&#160;</a></span>tiles_bg2_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tiles_bg2_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

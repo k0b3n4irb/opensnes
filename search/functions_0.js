@@ -34,6 +34,5 @@ var searchData=
   ['audiosetvolume_31',['audioSetVolume',['../group__audio__volume.html#gae5aa27f79f19beb398a3163a76a87d05',1,'audio.h']]],
   ['audiostopall_32',['audioStopAll',['../group__audio__playback.html#ga08d3a1cc8f2e0e4bd9da475bc6e2afc9',1,'audio.h']]],
   ['audiostopvoice_33',['audioStopVoice',['../group__audio__playback.html#gaab4342a06378dea04a8d7a9e032e222f',1,'audio.h']]],
-  ['audiounloadsample_34',['audioUnloadSample',['../group__audio__samples.html#ga09d2e53a4a311fffed540c0410edab88',1,'audio.h']]],
-  ['audioupdate_35',['audioUpdate',['../group__audio__init.html#gac25577949f0b4226318e6fb714cc6ef9',1,'audio.h']]]
+  ['audiounloadsample_34',['audioUnloadSample',['../group__audio__samples.html#ga09d2e53a4a311fffed540c0410edab88',1,'audio.h']]]
 ];

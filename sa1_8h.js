@@ -56,6 +56,5 @@ var sa1_8h =
     [ "SA1_IRAM_SIZE", "sa1_8h.html#a7a2caa74d77a1917b615c36ccfc330af", null ],
     [ "SA1_READY_ADDR", "sa1_8h.html#a252c3f3a7303781b97c3c4ed31ead2c0", null ],
     [ "SA1_READY_MAGIC", "sa1_8h.html#a6e7c292405db3658c4a73d93802d99bc", null ],
-    [ "sa1Init", "sa1_8h.html#acd5594c8f4e4a51d822db1fa86f35f87", null ],
     [ "sa1IsReady", "sa1_8h.html#aa2c5d1881453f27ceaa36ab5ebf122fc", null ]
 ];

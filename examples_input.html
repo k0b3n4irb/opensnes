@@ -131,24 +131,23 @@ The ladder</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">4.1  </td><td class="markdownTableBodyNone"><a href="controller/">controller</a>  </td><td class="markdownTableBodyNone">How do I read a joypad — held vs just-pressed?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">4.2  </td><td class="markdownTableBodyNone"><a href="move_sprite/">move_sprite</a>  </td><td class="markdownTableBodyNone">How do I drive a sprite with the pad?  </td></tr>
+<td class="markdownTableBodyNone">4.2  </td><td class="markdownTableBodyNone"><a href="two_players/">two_players</a>  </td><td class="markdownTableBodyNone">How do I read two players independently?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">4.3  </td><td class="markdownTableBodyNone"><a href="two_players/">two_players</a>  </td><td class="markdownTableBodyNone">How do I read two players independently?  </td></tr>
+<td class="markdownTableBodyNone">4.3  </td><td class="markdownTableBodyNone"><a href="mouse/">mouse</a>  </td><td class="markdownTableBodyNone">How do I read the SNES Mouse?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">4.4  </td><td class="markdownTableBodyNone"><a href="mouse/">mouse</a>  </td><td class="markdownTableBodyNone">How do I read the SNES Mouse?  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">4.5  </td><td class="markdownTableBodyNone"><a href="superscope/">superscope</a>  </td><td class="markdownTableBodyNone">How do I read the Super Scope light gun?  </td></tr>
+<td class="markdownTableBodyNone">4.4  </td><td class="markdownTableBodyNone"><a href="superscope/">superscope</a>  </td><td class="markdownTableBodyNone">How do I read the Super Scope light gun?  </td></tr>
 </table>
+<p>Driving a sprite with the pad is the <span class="tt">starter/</span> project at the SDK root — the same program, with the asset pipeline of 1.x.</p>
 <h2 class="doxsection"><a class="anchor" id="the-idea-in-one-screen-4"></a>
 The idea in one screen</h2>
-<p><span class="tt">padHeld(0)</span> returns a 16-bit bitmask of the buttons held this frame; <span class="tt">padPressed(0)</span> returns only those <em>newly</em> pressed (edge detection — without it, a single tap registers dozens of times at 60 Hz). Act on the bits, and for movement push the result to a sprite with <span class="tt"><a class="el" href="sprite_8h.html#a7797ff0c3210fcbd0cbbe0e55d23a83c" title="Set sprite position.">oamSetXY</a></span>.</p>
+<p><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a></span> returns a 16-bit bitmask of the buttons held this frame; <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed(0)</a></span> returns only those <em>newly</em> pressed (edge detection — without it, a single tap registers dozens of times at 60 Hz). Act on the bits, and for movement push the result to a sprite with <span class="tt"><a class="el" href="sprite_8h.html#a7797ff0c3210fcbd0cbbe0e55d23a83c" title="Set sprite position.">oamSetXY</a></span>.</p>
 <div class="fragment"><div class="line">Bit: 15  14  13   12   11  10  9   8   7  6  5  4</div>
 <div class="line">     B   Y   Sel  Sta  Up  Dn  Lt  Rt  A  X  L  R</div>
 </div><!-- fragment --><p>The <b>mouse</b> and <b>Super Scope</b> are read the same way after a device-ID check; the Super Scope lives on port 2 and latches its aim from the PPU's H/V counters.</p>
 <blockquote class="doxtable">
 <p>Start at 4.1 to read the pad, then 4.2 to feel a sprite respond to it — that's the moment it becomes a game. </p>
 </blockquote>
-<p><a class="el" href="examples_input_controller.html" title="Controller Input">Controller Input</a> <a class="el" href="examples_input_mouse.html" title="SNES Mouse">SNES Mouse</a> <a class="el" href="examples_input_move_sprite.html" title="Drive a sprite with the pad">Drive a sprite with the pad</a> <a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a> <a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a> </p>
+<p><a class="el" href="examples_input_controller.html" title="Controller Input">Controller Input</a> <a class="el" href="examples_input_mouse.html" title="SNES Mouse">SNES Mouse</a> <a class="el" href="examples_input_superscope.html" title="Super Scope">Super Scope</a> <a class="el" href="examples_input_two_players.html" title="Two Players Example">Two Players Example</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

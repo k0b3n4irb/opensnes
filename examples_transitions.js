@@ -16,8 +16,8 @@ var examples_transitions =
           [ "Quick Flash", "examples_transitions_fading.html#quick-flash", null ]
         ] ],
         [ "Scene Transition Pattern", "examples_transitions_fading.html#scene-transition-pattern", null ],
-        [ "Build &amp; Run", "examples_transitions_fading.html#build--run-52", null ],
-        [ "Modules Used", "examples_transitions_fading.html#modules-used-78", null ],
+        [ "Build &amp; Run", "examples_transitions_fading.html#build--run-53", null ],
+        [ "Modules Used", "examples_transitions_fading.html#modules-used-74", null ],
         [ "Files", "examples_transitions_fading.html#files-12", null ],
         [ "Exercises", "examples_transitions_fading.html#exercises-3", [
           [ "Exercise 1: Smooth Fade", "examples_transitions_fading.html#exercise-1-smooth-fade", null ],

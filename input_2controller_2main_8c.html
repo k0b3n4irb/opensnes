@@ -141,10 +141,10 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Single controller input display. </p>
 <p>Reads the SNES controller and displays which button is currently held. The simplest possible input example — one controller, one text line, real-time feedback. This is the starting point for understanding how SNES games read player input.</p>
-<p>The SNES joypad has 12 buttons: 4 face buttons (A, B, X, Y), 2 shoulder buttons (L, R), a D-pad (4 directions), START, and SELECT. The NMI handler reads the joypad automatically every VBlank. Your code just calls padHeld(0) to get the current state as a 16-bit bitmask.</p>
+<p>The SNES joypad has 12 buttons: 4 face buttons (A, B, X, Y), 2 shoulder buttons (L, R), a D-pad (4 directions), START, and SELECT. The NMI handler reads the joypad automatically every VBlank. Your code just calls <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a> to get the current state as a 16-bit bitmask.</p>
 <p>Ported from PVSnesLib "controller" example by alekmaul.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li>padHeld(0) — 16-bit bitmask of currently held buttons</li>
+<li><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a> — 16-bit bitmask of currently held buttons</li>
 <li>KEY_A, KEY_B, KEY_X, KEY_Y, KEY_L, KEY_R — button constants</li>
 <li>KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT — D-pad constants</li>
 <li>KEY_START, KEY_SELECT — system button constants</li>
@@ -231,7 +231,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Per-frame: read joypad, paint the held button name. </p>
-<p><span class="tt"><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></span> returns the bitmask of currently-pressed buttons (latched by the NMI handler this frame). The if/else cascade prints the first match — multiple-button combinations only show one. </p>
+<p><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> returns the bitmask of currently-pressed buttons (latched by the NMI handler this frame). The if/else cascade prints the first match — multiple-button combinations only show one. </p>
 
 </div>
 </div>

@@ -157,7 +157,7 @@ Memory map</h2>
 <li>on <b>SA-1</b> they work since 2026-09-26 (crt0 sets SBWE); until then the build refused <span class="tt">USE_SRAM=1</span> with <span class="tt">USE_SA1=1</span>, because the writes were dropped. Two luna manifests (<span class="tt">d_sa1_bwram_write.toml</span>, <span class="tt">e_sa1_bwram_read.toml</span>) power the cartridge off and on between the save and the read.</li>
 <li><b>Super FX</b> — the save is the GSU's own Game Pak RAM, shared with the framebuffers: see <a class="el" href="tutorial_superfx.html#saving" title="Saving">Super FX: Saving</a>.</li>
 </ul>
-<p>This paragraph claimed the helpers "hide these details" long before they did — until 2026-09-20 they used the LoROM address on every build. The HiROM mapping is pinned by <span class="tt">devtools/libtests_hirom</span>, which reads the bytes back from <span class="tt">$30:6000</span>.</p>
+<p>This paragraph claimed the helpers "hide these details" long before they did — until 2026-09-20 they used the LoROM address on every build. The HiROM mapping is pinned by <span class="tt">testing/fixtures/libtests_hirom</span>, which reads the bytes back from <span class="tt">$30:6000</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="build-setup"></a>
 Build setup</h2>
 <p>Two changes to enable SRAM in a project:</p>

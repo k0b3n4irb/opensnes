@@ -152,7 +152,7 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Two-player simultaneous input with independent sprites. </p>
-<p>Demonstrates reading two SNES controllers simultaneously via the auto-joypad registers. The NMI handler reads both ports every frame, and padHeld(0) / padHeld(1) return the held-button bitmasks for each player. Each player controls an independent 8x8 sprite with the D-pad.</p>
+<p>Demonstrates reading two SNES controllers simultaneously via the auto-joypad registers. The NMI handler reads both ports every frame, and <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a> / <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(1)</a> return the held-button bitmasks for each player. Each player controls an independent 8x8 sprite with the D-pad.</p>
 <p>Sprite tiles are defined inline as constant data (a solid 4bpp square), and two palettes (blue for <a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> 1, red for <a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> 2) are loaded to separate CGRAM sprite palette slots so each player has a distinct color.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Simultaneous two-controller reading via auto-joypad</li>
@@ -205,7 +205,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> 1 state, initialized at left-center of screen. </p>
-<p>BG1 palette </p>
 
 </div>
 </div>
@@ -222,7 +221,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> 2 state, initialized at right-center of screen. </p>
-<p>BG2 palette </p>
 
 </div>
 </div>

@@ -122,7 +122,12 @@ $(function(){initNavTree('tutorial_window.html','',''); });
   <div class="headertitle"><div class="title">Window Masking Tutorial </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This tutorial covers the SNES window-masking hardware: two configurable rectangles that clip individual BG layers, sprites, and the colour-math area on a per-pixel basis. The reach of this feature is wider than its name suggests — windows are how you do spotlights, scene transitions (an iris fade), split-screen status bars, animated triangle / diamond / circle reveals, and the area gate for transparency / blending effects.</p>
+<div class="textblock"><div class="image">
+<img src="window.png" alt=""/>
+<div class="caption">
+window example</div></div>
+    <p><em><span class="tt">examples/windows/window</span>: two windows clipping the backgrounds, their edges driven by HDMA tables.</em></p>
+<p>This tutorial covers the SNES window-masking hardware: two configurable rectangles that clip individual BG layers, sprites, and the colour-math area on a per-pixel basis. The reach of this feature is wider than its name suggests — windows are how you do spotlights, scene transitions (an iris fade), split-screen status bars, animated triangle / diamond / circle reveals, and the area gate for transparency / blending effects.</p>
 <p>It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial. The animated-shape patterns also depend on the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a>. The pair tutorial is <a class="el" href="colormath_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/colormath.md">Colormath</a>, which uses the window to gate which screen region gets blended.</p>
 <h2 class="doxsection"><a class="anchor" id="what-windows-are"></a>
 What windows are</h2>

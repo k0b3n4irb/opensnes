@@ -122,7 +122,7 @@ $(function(){initNavTree('examples.html','',''); });
   <div class="headertitle"><div class="title">OpenSNES Examples </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Learn SNES development step by step. 89 examples organized by topic, building from basic concepts to complete games.</p>
+<div class="textblock"><p>Learn SNES development step by step. 86 examples organized by topic, building from basic concepts to complete games.</p>
 <h2 class="doxsection"><a class="anchor" id="categories"></a>
 Categories</h2>
 <table class="markdownTable">
@@ -133,15 +133,15 @@ Categories</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="fundamentals/">fundamentals/</a>  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">Under-the-hood: raw tiles, direct VRAM writes  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="basics/">basics/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton  </td></tr>
+<td class="markdownTableBodyNone"><a href="basics/">basics/</a>  </td><td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone">Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="backgrounds/">backgrounds/</a>  </td><td class="markdownTableBodyNone">10  </td><td class="markdownTableBodyNone">BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile  </td></tr>
+<td class="markdownTableBodyNone"><a href="backgrounds/">backgrounds/</a>  </td><td class="markdownTableBodyNone">9  </td><td class="markdownTableBodyNone">BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="sprites/">sprites/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="hdma/">hdma/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Per-scanline HDMA effects: gradients, waves, raster  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="color/">color/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Palette cycling, colour math, shadow/tint, direct colour, hi-colour tricks, pseudo-hires blend  </td></tr>
+<td class="markdownTableBodyNone"><a href="color/">color/</a>  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a href="windows/">windows/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Hardware window masking, shaped per scanline  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -151,7 +151,7 @@ Categories</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="mode7/">mode7/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="input/">input/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">Joypads, drive a sprite, mouse, Super Scope, multi-player  </td></tr>
+<td class="markdownTableBodyNone"><a href="input/">input/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Joypads, mouse, Super Scope, multi-player  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="audio/">audio/</a>  </td><td class="markdownTableBodyNone">10  </td><td class="markdownTableBodyNone">Music and sound effects: SNESMOD and raw APU/DSP  </td></tr>
 <tr class="markdownTableRowEven">
@@ -159,7 +159,7 @@ Categories</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="memory/">memory/</a>  </td><td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">HiROM mode, battery-backed saves  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="chips/">chips/</a>  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">Enhancement chips: SA-1 and SuperFX/GSU coprocessors  </td></tr>
+<td class="markdownTableBodyNone"><a href="chips/">chips/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Enhancement chips: SA-1 and SuperFX/GSU coprocessors  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a href="games/">games/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG)  </td></tr>
 </table>
@@ -214,37 +214,33 @@ Level 3 &ndash; Scrolling and Effects</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">15  </td><td class="markdownTableBodyNone"><a href="hdma/hdma_wave/">hdma/hdma_wave</a>  </td><td class="markdownTableBodyNone">HDMA wave: build the table by hand (krom port), then use the hdma module  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">15c  </td><td class="markdownTableBodyNone"><a href="hdma/hdma_indirect_gradient/">hdma/hdma_indirect_gradient</a>  </td><td class="markdownTableBodyNone">Indirect HDMA: pointer table drives a backdrop gradient (krom port)  </td></tr>
+<td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone"><a href="hdma/hdma_indirect_gradient/">hdma/hdma_indirect_gradient</a>  </td><td class="markdownTableBodyNone">Indirect HDMA: pointer table drives a backdrop gradient (krom port)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">15d  </td><td class="markdownTableBodyNone"><a href="color/hicolor_1792/">color/hicolor_1792</a>  </td><td class="markdownTableBodyNone">H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port)  </td></tr>
+<td class="markdownTableBodyNone">17  </td><td class="markdownTableBodyNone"><a href="color/hicolor_1792/">color/hicolor_1792</a>  </td><td class="markdownTableBodyNone">H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">15e  </td><td class="markdownTableBodyNone"><a href="mode7/perspective_rotate/">mode7/perspective_rotate</a>  </td><td class="markdownTableBodyNone">Full Mode 7 matrix per scanline: rotating perspective (krom port)  </td></tr>
+<td class="markdownTableBodyNone">18  </td><td class="markdownTableBodyNone"><a href="mode7/perspective_rotate/">mode7/perspective_rotate</a>  </td><td class="markdownTableBodyNone">Full Mode 7 matrix per scanline: rotating perspective (krom port)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">15f  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode5_hires/">backgrounds/mode5_hires</a>  </td><td class="markdownTableBodyNone">BG Mode 5 + interlace: 512x448 hi-res text (krom port)  </td></tr>
+<td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode5_hires/">backgrounds/mode5_hires</a>  </td><td class="markdownTableBodyNone">BG Mode 5 + interlace: 512x448 hi-res text (krom port)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">15g  </td><td class="markdownTableBodyNone"><a href="windows/window_multi_hdma/">windows/window_multi_hdma</a>  </td><td class="markdownTableBodyNone">Both windows shaped per scanline: HDMA porthole grid (krom port)  </td></tr>
+<td class="markdownTableBodyNone">20  </td><td class="markdownTableBodyNone"><a href="windows/window_multi_hdma/">windows/window_multi_hdma</a>  </td><td class="markdownTableBodyNone">Both windows shaped per scanline: HDMA porthole grid (krom port)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">15h  </td><td class="markdownTableBodyNone"><a href="color/gradient_9bit/">color/gradient_9bit</a>  </td><td class="markdownTableBodyNone">Brightness-dithered backdrop: the 9-bit color trick (krom port)  </td></tr>
+<td class="markdownTableBodyNone">21  </td><td class="markdownTableBodyNone"><a href="color/direct_color/">color/direct_color</a>  </td><td class="markdownTableBodyNone">Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">15j  </td><td class="markdownTableBodyNone"><a href="color/hicolor_blend/">color/hicolor_blend</a>  </td><td class="markdownTableBodyNone">RGB channel-split color-math blend: 3840 colors (krom port)  </td></tr>
+<td class="markdownTableBodyNone">22  </td><td class="markdownTableBodyNone"><a href="color/pseudo_hires/">color/pseudo_hires</a>  </td><td class="markdownTableBodyNone">Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">15k  </td><td class="markdownTableBodyNone"><a href="color/direct_color/">color/direct_color</a>  </td><td class="markdownTableBodyNone">Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed  </td></tr>
+<td class="markdownTableBodyNone">23  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode4/">backgrounds/mode4</a>  </td><td class="markdownTableBodyNone">Mode 4: offset-per-tile on a 256-colour layer, one row of H-or-V words  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">15l  </td><td class="markdownTableBodyNone"><a href="color/pseudo_hires/">color/pseudo_hires</a>  </td><td class="markdownTableBodyNone">Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3)  </td></tr>
+<td class="markdownTableBodyNone">24  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode6/">backgrounds/mode6</a>  </td><td class="markdownTableBodyNone">Mode 6: offset-per-tile on a hi-res layer, 16-half-pixel columns  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">15m  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode4/">backgrounds/mode4</a>  </td><td class="markdownTableBodyNone">Mode 4: offset-per-tile on a 256-colour layer, one row of H-or-V words  </td></tr>
+<td class="markdownTableBodyNone">25  </td><td class="markdownTableBodyNone"><a href="hdma/gradient_colors/">hdma/gradient_colors</a>  </td><td class="markdownTableBodyNone">HDMA + CGRAM color gradients  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">15n  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode6/">backgrounds/mode6</a>  </td><td class="markdownTableBodyNone">Mode 6: offset-per-tile on a hi-res layer, 16-half-pixel columns  </td></tr>
+<td class="markdownTableBodyNone">26  </td><td class="markdownTableBodyNone"><a href="scrolling/parallax_scroll/">scrolling/parallax_scroll</a>  </td><td class="markdownTableBodyNone">HDMA parallax scrolling  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone"><a href="hdma/gradient_colors/">hdma/gradient_colors</a>  </td><td class="markdownTableBodyNone">HDMA + CGRAM color gradients  </td></tr>
+<td class="markdownTableBodyNone">27  </td><td class="markdownTableBodyNone"><a href="color/transparency/">color/transparency</a>  </td><td class="markdownTableBodyNone">Color math (add/subtract blending)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">17  </td><td class="markdownTableBodyNone"><a href="scrolling/parallax_scroll/">scrolling/parallax_scroll</a>  </td><td class="markdownTableBodyNone">HDMA parallax scrolling  </td></tr>
+<td class="markdownTableBodyNone">28  </td><td class="markdownTableBodyNone"><a href="windows/window/">windows/window</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">18  </td><td class="markdownTableBodyNone"><a href="color/transparency/">color/transparency</a>  </td><td class="markdownTableBodyNone">Color math (add/subtract blending)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone"><a href="windows/window/">windows/window</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">20  </td><td class="markdownTableBodyNone"><a href="windows/transparent_window/">windows/transparent_window</a>  </td><td class="markdownTableBodyNone">Color math + HDMA windowed transparency  </td></tr>
+<td class="markdownTableBodyNone">29  </td><td class="markdownTableBodyNone"><a href="windows/transparent_window/">windows/transparent_window</a>  </td><td class="markdownTableBodyNone">Color math + HDMA windowed transparency  </td></tr>
 </table>
 <h3 class="doxsection"><a class="anchor" id="level-4----advanced-topics"></a>
 Level 4 &ndash; Advanced Topics</h3>
@@ -252,39 +248,39 @@ Level 4 &ndash; Advanced Topics</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">#  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What You Will Learn  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">21  </td><td class="markdownTableBodyNone"><a href="mode7/rotate_scale/">mode7/rotate_scale</a>  </td><td class="markdownTableBodyNone">Mode 7 rotation and scaling  </td></tr>
+<td class="markdownTableBodyNone">30  </td><td class="markdownTableBodyNone"><a href="mode7/rotate_scale/">mode7/rotate_scale</a>  </td><td class="markdownTableBodyNone">Mode 7 rotation and scaling  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">22  </td><td class="markdownTableBodyNone"><a href="mode7/perspective/">mode7/perspective</a>  </td><td class="markdownTableBodyNone">Pseudo-3D perspective (F-Zero style)  </td></tr>
+<td class="markdownTableBodyNone">31  </td><td class="markdownTableBodyNone"><a href="mode7/perspective/">mode7/perspective</a>  </td><td class="markdownTableBodyNone">Pseudo-3D perspective (F-Zero style)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">22b  </td><td class="markdownTableBodyNone"><a href="mode7/dsp1_ground/">mode7/dsp1_ground</a>  </td><td class="markdownTableBodyNone">Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices  </td></tr>
+<td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone"><a href="mode7/dsp1_ground/">mode7/dsp1_ground</a>  </td><td class="markdownTableBodyNone">Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">22c  </td><td class="markdownTableBodyNone"><a href="mode7/extbg/">mode7/extbg</a>  </td><td class="markdownTableBodyNone">Mode 7 EXTBG: one plane, two layers split by bit 7, a sprite between them  </td></tr>
+<td class="markdownTableBodyNone">33  </td><td class="markdownTableBodyNone"><a href="mode7/extbg/">mode7/extbg</a>  </td><td class="markdownTableBodyNone">Mode 7 EXTBG: one plane, two layers split by bit 7, a sprite between them  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">23  </td><td class="markdownTableBodyNone"><a href="sprites/metasprite/">sprites/metasprite</a>  </td><td class="markdownTableBodyNone">Multi-tile composite sprites  </td></tr>
+<td class="markdownTableBodyNone">34  </td><td class="markdownTableBodyNone"><a href="sprites/metasprite/">sprites/metasprite</a>  </td><td class="markdownTableBodyNone">Multi-tile composite sprites  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">23b  </td><td class="markdownTableBodyNone"><a href="sprites/aseprite_pipeline/">sprites/aseprite_pipeline</a>  </td><td class="markdownTableBodyNone">Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite  </td></tr>
+<td class="markdownTableBodyNone">35  </td><td class="markdownTableBodyNone"><a href="sprites/aseprite_pipeline/">sprites/aseprite_pipeline</a>  </td><td class="markdownTableBodyNone">Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">24  </td><td class="markdownTableBodyNone"><a href="input/mouse/">input/mouse</a>  </td><td class="markdownTableBodyNone">Mouse detection, cursor, sensitivity  </td></tr>
+<td class="markdownTableBodyNone">36  </td><td class="markdownTableBodyNone"><a href="input/mouse/">input/mouse</a>  </td><td class="markdownTableBodyNone">Mouse detection, cursor, sensitivity  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">25  </td><td class="markdownTableBodyNone"><a href="input/superscope/">input/superscope</a>  </td><td class="markdownTableBodyNone">Light gun detection, PPU H/V counters  </td></tr>
+<td class="markdownTableBodyNone">37  </td><td class="markdownTableBodyNone"><a href="input/superscope/">input/superscope</a>  </td><td class="markdownTableBodyNone">Light gun detection, PPU H/V counters  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">26  </td><td class="markdownTableBodyNone"><a href="memory/hirom_demo/">memory/hirom_demo</a>  </td><td class="markdownTableBodyNone">HiROM vs LoROM memory mapping  </td></tr>
+<td class="markdownTableBodyNone">38  </td><td class="markdownTableBodyNone"><a href="memory/hirom_demo/">memory/hirom_demo</a>  </td><td class="markdownTableBodyNone">HiROM vs LoROM memory mapping  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">27  </td><td class="markdownTableBodyNone"><a href="memory/save_game/">memory/save_game</a>  </td><td class="markdownTableBodyNone">SRAM persistence (battery saves)  </td></tr>
+<td class="markdownTableBodyNone">39  </td><td class="markdownTableBodyNone"><a href="memory/save_game/">memory/save_game</a>  </td><td class="markdownTableBodyNone">SRAM persistence (battery saves)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">28  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_music/">audio/snesmod_music</a>  </td><td class="markdownTableBodyNone">SPC700 music playback via SNESMOD  </td></tr>
+<td class="markdownTableBodyNone">40  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_music/">audio/snesmod_music</a>  </td><td class="markdownTableBodyNone">SPC700 music playback via SNESMOD  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">29  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_sfx/">audio/snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Sound effects via SNESMOD  </td></tr>
+<td class="markdownTableBodyNone">41  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_sfx/">audio/snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Sound effects via SNESMOD  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">42c  </td><td class="markdownTableBodyNone"><a href="audio/speech_synth/">audio/speech_synth</a>  </td><td class="markdownTableBodyNone">Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port)  </td></tr>
+<td class="markdownTableBodyNone">42  </td><td class="markdownTableBodyNone"><a href="audio/speech_synth/">audio/speech_synth</a>  </td><td class="markdownTableBodyNone">Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">42d  </td><td class="markdownTableBodyNone"><a href="audio/play_noise/">audio/play_noise</a>  </td><td class="markdownTableBodyNone">Drum kit from the DSP noise generator — zero samples (krom port)  </td></tr>
+<td class="markdownTableBodyNone">43  </td><td class="markdownTableBodyNone"><a href="audio/play_noise/">audio/play_noise</a>  </td><td class="markdownTableBodyNone">Drum kit from the DSP noise generator — zero samples (krom port)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">42e  </td><td class="markdownTableBodyNone"><a href="audio/pitch_mod/">audio/pitch_mod</a>  </td><td class="markdownTableBodyNone">Hardware vibrato: PMON pitch modulation + LFO voice (krom port)  </td></tr>
+<td class="markdownTableBodyNone">44  </td><td class="markdownTableBodyNone"><a href="audio/pitch_mod/">audio/pitch_mod</a>  </td><td class="markdownTableBodyNone">Hardware vibrato: PMON pitch modulation + LFO voice (krom port)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">42f  </td><td class="markdownTableBodyNone"><a href="audio/apu_switch/">audio/apu_switch</a>  </td><td class="markdownTableBodyNone">Hot-swap APU programs at runtime: <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> + IPL re-entry  </td></tr>
+<td class="markdownTableBodyNone">45  </td><td class="markdownTableBodyNone"><a href="audio/apu_switch/">audio/apu_switch</a>  </td><td class="markdownTableBodyNone">Hot-swap APU programs at runtime: <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> + IPL re-entry  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">42g  </td><td class="markdownTableBodyNone"><a href="audio/soundboard/">audio/soundboard</a>  </td><td class="markdownTableBodyNone">The audio v2 engine from pure C: dynamic samples, pan/pitch, echo  </td></tr>
+<td class="markdownTableBodyNone">46  </td><td class="markdownTableBodyNone"><a href="audio/soundboard/">audio/soundboard</a>  </td><td class="markdownTableBodyNone">The audio v2 engine from pure C: dynamic samples, pan/pitch, echo  </td></tr>
 </table>
 <h3 class="doxsection"><a class="anchor" id="level-5----maps-and-complete-projects"></a>
 Level 5 &ndash; Maps and Complete Projects</h3>
@@ -292,23 +288,23 @@ Level 5 &ndash; Maps and Complete Projects</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">#  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What You Will Learn  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">30  </td><td class="markdownTableBodyNone"><a href="maps/dynamic_map/">maps/dynamic_map</a>  </td><td class="markdownTableBodyNone">Dynamic tile map streaming  </td></tr>
+<td class="markdownTableBodyNone">47  </td><td class="markdownTableBodyNone"><a href="maps/dynamic_map/">maps/dynamic_map</a>  </td><td class="markdownTableBodyNone">Dynamic tile map streaming  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">31  </td><td class="markdownTableBodyNone"><a href="maps/slope_collision/">maps/slope_collision</a>  </td><td class="markdownTableBodyNone">Slopes and tile-based collision  </td></tr>
+<td class="markdownTableBodyNone">48  </td><td class="markdownTableBodyNone"><a href="maps/slope_collision/">maps/slope_collision</a>  </td><td class="markdownTableBodyNone">Slopes and tile-based collision  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone"><a href="basics/collision_demo/">basics/collision_demo</a>  </td><td class="markdownTableBodyNone">Bounding-box sprite collision  </td></tr>
+<td class="markdownTableBodyNone">49  </td><td class="markdownTableBodyNone"><a href="basics/collision_demo/">basics/collision_demo</a>  </td><td class="markdownTableBodyNone">Bounding-box sprite collision  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">33  </td><td class="markdownTableBodyNone"><a href="games/breakout/">games/breakout</a>  </td><td class="markdownTableBodyNone">Complete game: sprites, input, game logic  </td></tr>
+<td class="markdownTableBodyNone">50  </td><td class="markdownTableBodyNone"><a href="games/breakout/">games/breakout</a>  </td><td class="markdownTableBodyNone">Complete game: sprites, input, game logic  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">34  </td><td class="markdownTableBodyNone"><a href="games/likemario/">games/likemario</a>  </td><td class="markdownTableBodyNone">Platformer with scrolling and animation  </td></tr>
+<td class="markdownTableBodyNone">51  </td><td class="markdownTableBodyNone"><a href="games/likemario/">games/likemario</a>  </td><td class="markdownTableBodyNone">Platformer with scrolling and animation  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">35  </td><td class="markdownTableBodyNone"><a href="games/mapandobjects/">games/mapandobjects</a>  </td><td class="markdownTableBodyNone">Maps with interactive objects  </td></tr>
+<td class="markdownTableBodyNone">52  </td><td class="markdownTableBodyNone"><a href="games/mapandobjects/">games/mapandobjects</a>  </td><td class="markdownTableBodyNone">Maps with interactive objects  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">36  </td><td class="markdownTableBodyNone"><a href="games/mode7_racing/">games/mode7_racing</a>  </td><td class="markdownTableBodyNone">F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data  </td></tr>
+<td class="markdownTableBodyNone">53  </td><td class="markdownTableBodyNone"><a href="games/mode7_racing/">games/mode7_racing</a>  </td><td class="markdownTableBodyNone">F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">37  </td><td class="markdownTableBodyNone"><a href="games/mode7_flying/">games/mode7_flying</a>  </td><td class="markdownTableBodyNone">Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings  </td></tr>
+<td class="markdownTableBodyNone">54  </td><td class="markdownTableBodyNone"><a href="games/mode7_flying/">games/mode7_flying</a>  </td><td class="markdownTableBodyNone">Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">38  </td><td class="markdownTableBodyNone"><a href="games/rpg/">games/rpg</a>  </td><td class="markdownTableBodyNone">RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box  </td></tr>
+<td class="markdownTableBodyNone">55  </td><td class="markdownTableBodyNone"><a href="games/rpg/">games/rpg</a>  </td><td class="markdownTableBodyNone">RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="building"></a>
 Building</h2>

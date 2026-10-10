@@ -7,5 +7,6 @@ var searchData=
   ['colormath_2eh_4',['colormath.h',['../colormath_8h.html',1,'']]],
   ['colormath_2emd_5',['colormath.md',['../colormath_8md.html',1,'']]],
   ['console_2eh_6',['console.h',['../console_8h.html',1,'']]],
-  ['contributing_2emd_7',['CONTRIBUTING.md',['../CONTRIBUTING_8md.html',1,'']]]
+  ['contributing_2emd_7',['CONTRIBUTING.md',['../CONTRIBUTING_8md.html',1,'']]],
+  ['conventions_2emd_8',['CONVENTIONS.md',['../CONVENTIONS_8md.html',1,'']]]
 ];

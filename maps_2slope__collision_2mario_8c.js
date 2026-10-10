@@ -12,9 +12,7 @@ var maps_2slope__collision_2mario_8c =
     [ "flip", "maps_2slope__collision_2mario_8c.html#ac3ec10c7966221f17621e68908bfa9b4", null ],
     [ "mariofidx", "maps_2slope__collision_2mario_8c.html#a54213932cd9c24437d4c3d3d8731b48e", null ],
     [ "marioflp", "maps_2slope__collision_2mario_8c.html#a125e942c95f5539f10e66b7bb8a8083a", null ],
-    [ "mariogfx", "maps_2slope__collision_2mario_8c.html#a53716e2abcc85b968842b92a4705dd50", null ],
     [ "marioid", "maps_2slope__collision_2mario_8c.html#a3486f7a8cf9a9894d082c117181c957f", null ],
-    [ "mariopal", "maps_2slope__collision_2mario_8c.html#a9c404b92f0c1acebd3283646550fc797", null ],
     [ "mariox", "maps_2slope__collision_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2", null ],
     [ "marioy", "maps_2slope__collision_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1", null ],
     [ "pad0", "maps_2slope__collision_2mario_8c.html#a50a1287c6a673d98dd90c61df91fd33c", null ]

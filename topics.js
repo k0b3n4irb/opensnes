@@ -30,7 +30,7 @@ var topics =
     [ "Register Constants", "group__reg__const.html", "group__reg__const" ],
     [ "Sample Management", "group__audio__samples.html", "group__audio__samples" ],
     [ "Sound Effects", "group__snesmod__sfx.html", "group__snesmod__sfx" ],
-    [ "Streaming Audio", "group__snesmod__stream.html", "group__snesmod__stream" ],
+    [ "Streaming Audio", "group__snesmod__stream.html", null ],
     [ "Super Scope Input", "group__scope__input.html", "group__scope__input" ],
     [ "UI", "group__ui.html", "group__ui" ],
     [ "Volatile Types", "group__volatile__types.html", "group__volatile__types" ],

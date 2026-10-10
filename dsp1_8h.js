@@ -10,8 +10,6 @@ var dsp1_8h =
     [ "dsp1IsPresent", "dsp1_8h.html#a81b161546a1a9a9ee0cadf6f103c3244", null ],
     [ "dsp1Multiply", "dsp1_8h.html#a8de00734310d578780eb7243d5e9dda2", null ],
     [ "dsp1Objective", "dsp1_8h.html#a351e716537c49d2587a195d327448f57", null ],
-    [ "dsp1Parameter", "dsp1_8h.html#a9f4e45822ce7d01f4a61a80c136e1aa9", null ],
-    [ "dsp1Present", "dsp1_8h.html#ad09a7de4eb9586c1da0a738628af9b1f", null ],
     [ "dsp1Project", "dsp1_8h.html#a39767ab0d98ace72ba92e541085e1b60", null ],
     [ "dsp1Range", "dsp1_8h.html#a152f59d6d62b0d9f544e08db046de212", null ],
     [ "dsp1Raster", "dsp1_8h.html#ae3a3ca2d7d42d475f5b73b962dce7da9", null ],

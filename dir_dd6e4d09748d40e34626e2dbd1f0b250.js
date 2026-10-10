@@ -30,11 +30,13 @@ var dir_dd6e4d09748d40e34626e2dbd1f0b250 =
     [ "snesmod.h", "snesmod_8h.html", "snesmod_8h" ],
     [ "sprite.h", "sprite_8h.html", "sprite_8h" ],
     [ "sram.h", "sram_8h.html", "sram_8h" ],
+    [ "string.h", "string_8h.html", "string_8h" ],
     [ "superfx.h", "superfx_8h.html", "superfx_8h" ],
     [ "system.h", "system_8h.html", "system_8h" ],
     [ "text.h", "text_8h.html", "text_8h" ],
     [ "tile.h", "tile_8h.html", "tile_8h" ],
     [ "types.h", "types_8h.html", "types_8h" ],
     [ "video.h", "video_8h.html", "video_8h" ],
+    [ "vramqueue.h", "vramqueue_8h.html", "vramqueue_8h" ],
     [ "window.h", "window_8h.html", "window_8h" ]
 ];

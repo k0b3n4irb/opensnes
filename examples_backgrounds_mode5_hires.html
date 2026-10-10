@@ -171,7 +171,10 @@ How to Build</h2>
 <div class="line">python3 gen_assets.py &amp;&amp; make</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-14"></a>
 Modules Used</h2>
-<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span> </p>
+<p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span></p>
+<h2 class="doxsection"><a class="anchor" id="further-mode-5-without-interlace-512-x-256"></a>
+Further: Mode 5 without interlace (512 x 256)</h2>
+<p>The plain Mode 5 picture, the <span class="tt">mode5</span> example until 2026-10-05, is this program minus <span class="tt"><a class="el" href="video_8h.html#a12143ed10506b5feef9fc9fb5da18a3c" title="Enable/disable screen interlace (SETINI bit 0).">videoSetInterlace()</a></span>: 512 pixels wide at 256 lines, 16x8 tiles stored as pairs of 8x8 characters (N on the left half, N+1 on the right), loaded with <span class="tt"><a class="el" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39" title="Initialize tileset with tiles and palette.">bgInitTileSet()</a></span> at 4 bpp for BG1 and 2 bpp for BG2. The same two traps apply — the layer shows through main AND sub screen, and the VRAM budget doubles (24 KB of interleaved tiles for one screen). </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -132,7 +132,7 @@ What This Example Shows</h2>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-6"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">mode7/rotate_scale</span> first (Mode 7 basics), then <span class="tt">effects/hdma_wave</span> (HDMA per-scanline programming).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-26"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-25"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,7 +140,7 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-PAD  </td><td class="markdownTableBodyNone">Scroll the ground plane  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-40"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-41"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/perspective</div>
@@ -175,15 +175,15 @@ How It Works</h2>
 <div class="line"><span class="keywordflow">if</span> (<a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>++;</div>
 <div class="line"><a class="code hl_function" href="mode7_2perspective_2main_8c.html#ad3aafbc6c7613c06add64a85321eb473">asm_setupHdmaPerspective</a>(<a class="code hl_variable" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a>, <a class="code hl_variable" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>);</div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:166</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:76</div></div>
-<div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
-<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:77</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:76</div></div>
-<div class="ttc" id="amode7_2perspective_2main_8c_html_ad3aafbc6c7613c06add64a85321eb473"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad3aafbc6c7613c06add64a85321eb473">asm_setupHdmaPerspective</a></div><div class="ttdeci">void asm_setupHdmaPerspective(u16 sx, u16 sy)</div><div class="ttdoc">Build and activate the 4-channel HDMA perspective split.</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:79</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:80</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_a79b6065ee73ca292d26db6390aa19d63"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a></div><div class="ttdeci">u16 sy</div><div class="ttdef"><b>Definition</b> main.c:75</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_ad20c28dc8fb00b3174dce460e3598548"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a></div><div class="ttdeci">u16 sx</div><div class="ttdef"><b>Definition</b> main.c:74</div></div>
+<div class="ttc" id="amode7_2perspective_2main_8c_html_ad3aafbc6c7613c06add64a85321eb473"><div class="ttname"><a href="mode7_2perspective_2main_8c.html#ad3aafbc6c7613c06add64a85321eb473">asm_setupHdmaPerspective</a></div><div class="ttdeci">void asm_setupHdmaPerspective(u16 sx, u16 sy)</div><div class="ttdoc">Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with dmaCopyVram() to VRAM $5000 (ti...</div></div>
 </div><!-- fragment --><p>The scroll values are passed to the assembly helper, which writes them to the Mode 7 scroll registers (M7HOFS/M7VOFS at $210D/$210E) and re-enables the HDMA channels each frame.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-41"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-40"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="mode-switching-mid-frame"></a>
 Mode Switching Mid-Frame</h3>
@@ -202,12 +202,14 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Input handling, scroll updates, HDMA initialization  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">Mode 7 ground data, sky tiles, HDMA perspective tables, assembly helpers  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/ground.png.toml</span>, <span class="tt">res/sky.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the ground (Mode 7) and the sky (<span class="tt">opensnes-tileset</span>); the build converts and links them  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">res/ground.png</span>  </td><td class="markdownTableBodyNone">Mode 7 ground texture source  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">HDMA perspective tables, assembly helpers (hand-written)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">res/sky.png</span>  </td><td class="markdownTableBodyNone">Sky background source  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/ground.png</span>  </td><td class="markdownTableBodyNone">Mode 7 ground texture source  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">res/sky.png</span>  </td><td class="markdownTableBodyNone">Sky background source  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console dma background sprite input mode7</span>  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="going-further-5"></a>
@@ -221,7 +223,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-62"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-58"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

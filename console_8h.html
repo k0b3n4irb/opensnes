@@ -134,8 +134,6 @@ $(function(){initNavTree('console_8h.html','',''); });
 Functions</h2></td></tr>
 <tr class="memitem:aa4254c9de45f6aa2de26e8ea70dd96e1" id="r_aa4254c9de45f6aa2de26e8ea70dd96e1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a> (void)</td></tr>
 <tr class="memdesc:aa4254c9de45f6aa2de26e8ea70dd96e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize SNES hardware.  <br /></td></tr>
-<tr class="memitem:a61f5e51d0173ceaad88679ed162359d1" id="r_a61f5e51d0173ceaad88679ed162359d1"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a61f5e51d0173ceaad88679ed162359d1">consoleInitEx</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> options)</td></tr>
-<tr class="memdesc:a61f5e51d0173ceaad88679ed162359d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The same as <a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a>.  <br /></td></tr>
 <tr class="memitem:a54ab05fa0c4c26a7efb81e86d57661fb" id="r_a54ab05fa0c4c26a7efb81e86d57661fb"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
 <tr class="memdesc:a54ab05fa0c4c26a7efb81e86d57661fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fade the screen from black (0) up to full brightness (15).  <br /></td></tr>
 <tr class="memitem:a6c68f9393684a2b251292a9e93891a02" id="r_a6c68f9393684a2b251292a9e93891a02"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6c68f9393684a2b251292a9e93891a02">fadeOut</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> speed)</td></tr>
@@ -144,22 +142,16 @@ Functions</h2></td></tr>
 <tr class="memdesc:a10a8dd24d5584e2cb833c5acfbf332c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current brightness.  <br /></td></tr>
 <tr class="memitem:a8fd1f41354b0d09ca258af07c1cb6fa6" id="r_a8fd1f41354b0d09ca258af07c1cb6fa6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a> (void)</td></tr>
 <tr class="memdesc:a8fd1f41354b0d09ca258af07c1cb6fa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get frame counter.  <br /></td></tr>
-<tr class="memitem:a2dc1e4cf693184256120eada1beaca14" id="r_a2dc1e4cf693184256120eada1beaca14"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2dc1e4cf693184256120eada1beaca14">getRegion</a> (void)</td></tr>
-<tr class="memdesc:a2dc1e4cf693184256120eada1beaca14"><td class="mdescLeft">&#160;</td><td class="mdescRight">The same value as <a class="el" href="#a3b56ab7f353055ded8e2960b94d6ba57" title="Check if PAL system.">isPAL()</a>: 0 = NTSC, 1 = PAL.  <br /></td></tr>
 <tr class="memitem:a1bb80e4838ae89136bf886d0bc9ddfc2" id="r_a1bb80e4838ae89136bf886d0bc9ddfc2"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1bb80e4838ae89136bf886d0bc9ddfc2">isInVBlank</a> (void)</td></tr>
 <tr class="memdesc:a1bb80e4838ae89136bf886d0bc9ddfc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if currently in VBlank.  <br /></td></tr>
 <tr class="memitem:a3b56ab7f353055ded8e2960b94d6ba57" id="r_a3b56ab7f353055ded8e2960b94d6ba57"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3b56ab7f353055ded8e2960b94d6ba57">isPAL</a> (void)</td></tr>
 <tr class="memdesc:a3b56ab7f353055ded8e2960b94d6ba57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if PAL system.  <br /></td></tr>
-<tr class="memitem:a0a8330f5fde79854d4f2ad10e9388485" id="r_a0a8330f5fde79854d4f2ad10e9388485"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a0a8330f5fde79854d4f2ad10e9388485">OPENSNES_DEPRECATED</a> (&quot;use <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() — this is not libc's rand()&quot;) u16 rand(void)</td></tr>
-<tr class="memdesc:a0a8330f5fde79854d4f2ad10e9388485"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a>. Same generator.  <br /></td></tr>
-<tr class="memitem:ac08a84fbd42326227013eeb91984cee2" id="r_ac08a84fbd42326227013eeb91984cee2"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ac08a84fbd42326227013eeb91984cee2">OPENSNES_DEPRECATED</a> (&quot;use <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd">rngSeed</a>() — this is not libc's srand()&quot;) void srand(<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> seed)</td></tr>
-<tr class="memdesc:ac08a84fbd42326227013eeb91984cee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a>.  <br /></td></tr>
 <tr class="memitem:a66b5cb8d7cb64a0afb9392e880020a0b" id="r_a66b5cb8d7cb64a0afb9392e880020a0b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a66b5cb8d7cb64a0afb9392e880020a0b">resetFrameCount</a> (void)</td></tr>
 <tr class="memdesc:a66b5cb8d7cb64a0afb9392e880020a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset frame counter.  <br /></td></tr>
 <tr class="memitem:af00b46ef13a81876e2a8806eee9dde8c" id="r_af00b46ef13a81876e2a8806eee9dde8c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a> (void)</td></tr>
 <tr class="memdesc:af00b46ef13a81876e2a8806eee9dde8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Next pseudo-random 16-bit number.  <br /></td></tr>
 <tr class="memitem:a82344e91af2df5885fa4f7e92fa42efd" id="r_a82344e91af2df5885fa4f7e92fa42efd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd">rngSeed</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> seed)</td></tr>
-<tr class="memdesc:a82344e91af2df5885fa4f7e92fa42efd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Seed the generator (named srand() until 2026-09-22).  <br /></td></tr>
+<tr class="memdesc:a82344e91af2df5885fa4f7e92fa42efd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Seed the generator (the srand() of 0.x, removed 2026-10-05).  <br /></td></tr>
 <tr class="memitem:a5a1bfaf2babf4d8dac31cafc468c735f" id="r_a5a1bfaf2babf4d8dac31cafc468c735f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5a1bfaf2babf4d8dac31cafc468c735f">setBrightness</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> brightness)</td></tr>
 <tr class="memdesc:a5a1bfaf2babf4d8dac31cafc468c735f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set screen brightness.  <br /></td></tr>
 <tr class="memitem:a5380410c3dc97fbaa3b36b095d631512" id="r_a5380410c3dc97fbaa3b36b095d631512"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a> (void)</td></tr>
@@ -245,31 +237,6 @@ Attribution</h2>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 </div><!-- fragment --> 
-</div>
-</div>
-<a id="a61f5e51d0173ceaad88679ed162359d1" name="a61f5e51d0173ceaad88679ed162359d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61f5e51d0173ceaad88679ed162359d1">&#9670;&#160;</a></span>consoleInitEx()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void consoleInitEx </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>options</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The same as <a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">options</td><td>Ignored: no option was ever defined. </td></tr>
-  </table>
-  </dd>
-</dl>
-
 </div>
 </div>
 <a id="a54ab05fa0c4c26a7efb81e86d57661fb" name="a54ab05fa0c4c26a7efb81e86d57661fb"></a>
@@ -388,29 +355,9 @@ Attribution</h2>
 <dl class="section return"><dt>Returns</dt><dd>Frame count</dd></dl>
 <div class="fragment"><div class="line"><span class="comment">// Simple animation timing</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> anim_frame = (<a class="code hl_function" href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a>() / 8) % 4;</div>
-<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:274</div></div>
+<div class="ttc" id="aconsole_8h_html_a8fd1f41354b0d09ca258af07c1cb6fa6"><div class="ttname"><a href="#a8fd1f41354b0d09ca258af07c1cb6fa6">getFrameCount</a></div><div class="ttdeci">u16 getFrameCount(void)</div><div class="ttdoc">Get frame counter.</div><div class="ttdef"><b>Definition</b> console.h:269</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --> 
-</div>
-</div>
-<a id="a2dc1e4cf693184256120eada1beaca14" name="a2dc1e4cf693184256120eada1beaca14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2dc1e4cf693184256120eada1beaca14">&#9670;&#160;</a></span>getRegion()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> getRegion </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The same value as <a class="el" href="#a3b56ab7f353055ded8e2960b94d6ba57" title="Check if PAL system.">isPAL()</a>: 0 = NTSC, 1 = PAL. </p>
-<p>Two names for one answer since 2026-09-22; <a class="el" href="#a3b56ab7f353055ded8e2960b94d6ba57" title="Check if PAL system.">isPAL()</a> is the one kept. </p>
-
 </div>
 </div>
 <a id="a1bb80e4838ae89136bf886d0bc9ddfc2" name="a1bb80e4838ae89136bf886d0bc9ddfc2"></a>
@@ -457,44 +404,6 @@ Attribution</h2>
 </div><!-- fragment --> 
 </div>
 </div>
-<a id="a0a8330f5fde79854d4f2ad10e9388485" name="a0a8330f5fde79854d4f2ad10e9388485"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a8330f5fde79854d4f2ad10e9388485">&#9670;&#160;</a></span>OPENSNES_DEPRECATED() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">OPENSNES_DEPRECATED </td>
-          <td>(</td>
-          <td class="paramtype">&quot;use <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() — this is not libc's rand()&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The pre-2026-09-22 name of <a class="el" href="#af00b46ef13a81876e2a8806eee9dde8c" title="Next pseudo-random 16-bit number.">rngNext()</a>. Same generator. </p>
-
-</div>
-</div>
-<a id="ac08a84fbd42326227013eeb91984cee2" name="ac08a84fbd42326227013eeb91984cee2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac08a84fbd42326227013eeb91984cee2">&#9670;&#160;</a></span>OPENSNES_DEPRECATED() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">OPENSNES_DEPRECATED </td>
-          <td>(</td>
-          <td class="paramtype">&quot;use <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd">rngSeed</a>() — this is not libc's srand()&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The pre-2026-09-22 name of <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a>. </p>
-
-</div>
-</div>
 <a id="a66b5cb8d7cb64a0afb9392e880020a0b" name="a66b5cb8d7cb64a0afb9392e880020a0b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a66b5cb8d7cb64a0afb9392e880020a0b">&#9670;&#160;</a></span>resetFrameCount()</h2>
 
@@ -531,8 +440,8 @@ Attribution</h2>
 </div><div class="memdoc">
 
 <p>Next pseudo-random 16-bit number. </p>
-<p>A 16-bit linear feedback shift register (x^16 + x^14 + x^13 + x^11 + 1). Named rand() until 2026-09-22 — a libc name for a function that is not the libc one (no RAND_MAX, 1-65535, a <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a>), which collides the day any C library code is linked.</p>
-<dl class="section return"><dt>Returns</dt><dd>Random value 1-65535 — a 16-bit LFSR never yields 0 (and a zero seed is replaced, see <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a>)</dd></dl>
+<p>A 16-bit linear feedback shift register (x^16 + x^14 + x^13 + x^11 + 1). Named rand() until 2026-09-22 (that name was removed on 2026-10-05) — a libc name for a function that is not the libc one (no RAND_MAX, 1-65535, a <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a>), which collides the day any C library code is linked.</p>
+<dl class="section return"><dt>Returns</dt><dd>Random value 1-65535 — a 16-bit LFSR never yields 0 (and a zero seed is replaced, see <a class="el" href="#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (the srand() of 0.x, removed 2026-10-05).">rngSeed()</a>)</dd></dl>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a> = <a class="code hl_function" href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a>() % 256;</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_abf70ecc0e4a9aa1bbb6b25093973a297"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abf70ecc0e4a9aa1bbb6b25093973a297">enemy_x</a></div><div class="ttdeci">static s16 enemy_x[4]</div><div class="ttdoc">X positions of the four static enemy sprites.</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
 <div class="ttc" id="aconsole_8h_html_af00b46ef13a81876e2a8806eee9dde8c"><div class="ttname"><a href="#af00b46ef13a81876e2a8806eee9dde8c">rngNext</a></div><div class="ttdeci">u16 rngNext(void)</div><div class="ttdoc">Next pseudo-random 16-bit number.</div></div>
@@ -555,7 +464,7 @@ Attribution</h2>
       </table>
 </div><div class="memdoc">
 
-<p>Seed the generator (named srand() until 2026-09-22). </p>
+<p>Seed the generator (the srand() of 0.x, removed 2026-10-05). </p>
 <p><a class="el" href="#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a> seeds it from the H/V counters; reseed from a player action (<span class="tt">rngSeed(getFrameCount())</span> on START) for a different game each run.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

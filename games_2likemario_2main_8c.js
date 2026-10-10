@@ -55,9 +55,6 @@ var games_2likemario_2main_8c =
     [ "mapmario", "games_2likemario_2main_8c.html#a71d82d48b8dd21a3abef1fe25a1cadc8", null ],
     [ "mario_action", "games_2likemario_2main_8c.html#abf248dfba13f521a932e34626741bacd", null ],
     [ "mario_anim", "games_2likemario_2main_8c.html#aa76ec2900485bf1fadac5ac5b141958e", null ],
-    [ "mario_sprite_pal", "games_2likemario_2main_8c.html#a9af184ace3867c5be24dd33e44af0da6", null ],
-    [ "mario_sprite_palend", "games_2likemario_2main_8c.html#a11a8a7513255e600674887fb85159d0f", null ],
-    [ "mario_sprite_til", "games_2likemario_2main_8c.html#a67fd1acd5ce2ce121082795cd1b28695", null ],
     [ "mario_x", "games_2likemario_2main_8c.html#a3f5722ffc5d3e0c7a778e8ff46794706", null ],
     [ "mario_xfrac", "games_2likemario_2main_8c.html#af256f257e72a75081871dc3bd08def7d", null ],
     [ "mario_xvel", "games_2likemario_2main_8c.html#a98b8dfe2ed7fb9745be169bc642114e4", null ],
@@ -66,9 +63,5 @@ var games_2likemario_2main_8c =
     [ "mario_yvel", "games_2likemario_2main_8c.html#a05709ec4afee417fb1d9d0bc3432e02d", null ],
     [ "sfx_jump_slot", "games_2likemario_2main_8c.html#a986e5fe5d150399d454bd76e054a771a", null ],
     [ "tile_props", "games_2likemario_2main_8c.html#a65dd3ad8a61a8517b934da783ac17f2f", null ],
-    [ "tiles_pal", "games_2likemario_2main_8c.html#a78181ef85e5654d84864c62594ea2973", null ],
-    [ "tiles_palend", "games_2likemario_2main_8c.html#a8d43101d158fd384f23308d6c6e4a160", null ],
-    [ "tiles_til", "games_2likemario_2main_8c.html#a51595c729c9abdf4532ec0b74a4dd272", null ],
-    [ "tiles_tilend", "games_2likemario_2main_8c.html#a6eb885e6f296dd921a08cb0b10a06a53", null ],
     [ "tilesetatt", "games_2likemario_2main_8c.html#a6647ca308a222a3f219d7ba77ea28b15", null ]
 ];

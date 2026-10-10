@@ -15,7 +15,6 @@ var examples_backgrounds =
     [ "mode2 — offset-per-tile: per-column scroll from BG3", "examples_backgrounds_mode2.html", null ],
     [ "Mode 3 — 256-Color Background", "examples_backgrounds_mode3.html", null ],
     [ "mode4 — a 256-colour layer with offset-per-tile", "examples_backgrounds_mode4.html", null ],
-    [ "Mode 5 — Hi-Res 512×256 Background", "examples_backgrounds_mode5.html", null ],
     [ "Hi-res text — BG Mode 5 + interlace (512 × 448)", "examples_backgrounds_mode5_hires.html", null ],
     [ "mode6 — one hi-res layer with offset-per-tile", "examples_backgrounds_mode6.html", null ]
 ];

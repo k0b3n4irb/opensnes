@@ -126,11 +126,15 @@ $(function(){initNavTree('sprites_2sprite__sizes_2main_8c.html','',''); });
 <p>Interactive demo of all six SNES OBJ size modes.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/sprite8.inc&quot;</code><br />
+<code>#include &quot;res/sprite16.inc&quot;</code><br />
+<code>#include &quot;res/sprite32.inc&quot;</code><br />
+<code>#include &quot;res/sprite64.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:aa9c94dbebbb68676d0e4a03bc5b8f79a" id="r_aa9c94dbebbb68676d0e4a03bc5b8f79a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa9c94dbebbb68676d0e4a03bc5b8f79a">ADRSPRITE</a>&#160;&#160;&#160;0x4100</td></tr>
-<tr class="memdesc:aa9c94dbebbb68676d0e4a03bc5b8f79a"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address where the "small" sprite tiles are loaded.  <br /></td></tr>
+<tr class="memdesc:aa9c94dbebbb68676d0e4a03bc5b8f79a"><td class="mdescLeft">&#160;</td><td class="mdescRight">8x8 sprite tile data (defined in data.asm)  <br /></td></tr>
 <tr class="memitem:af5abf90329e34db698a7774c40402b56" id="r_af5abf90329e34db698a7774c40402b56"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af5abf90329e34db698a7774c40402b56">ADRSPRITLARGE</a>&#160;&#160;&#160;0x4500</td></tr>
 <tr class="memdesc:af5abf90329e34db698a7774c40402b56"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address where the "large" sprite tiles are loaded.  <br /></td></tr>
 <tr class="memitem:ac2968ae95966edabc01549b91d731d2e" id="r_ac2968ae95966edabc01549b91d731d2e"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac2968ae95966edabc01549b91d731d2e">PALETTESPRSIZE</a>&#160;&#160;&#160;<a class="el" href="sprite_8h.html#a36d13bc82e1a6a64d0a2d59a961d9dfe">PALETTE_16_SIZE</a></td></tr>
@@ -151,32 +155,8 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a956ba5c01adb5de963a3be795b69ebd2" id="r_a956ba5c01adb5de963a3be795b69ebd2"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a956ba5c01adb5de963a3be795b69ebd2">palsprite16</a> []</td></tr>
-<tr class="memdesc:a956ba5c01adb5de963a3be795b69ebd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette for the 16x16 sprite.  <br /></td></tr>
-<tr class="memitem:a41ff91ab4cc758eb20af065fda1ef779" id="r_a41ff91ab4cc758eb20af065fda1ef779"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a41ff91ab4cc758eb20af065fda1ef779">palsprite16_end</a> []</td></tr>
-<tr class="memitem:ae7fc7b7e2d40971d1889700902ece784" id="r_ae7fc7b7e2d40971d1889700902ece784"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae7fc7b7e2d40971d1889700902ece784">palsprite32</a> []</td></tr>
-<tr class="memdesc:ae7fc7b7e2d40971d1889700902ece784"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette for the 32x32 sprite.  <br /></td></tr>
-<tr class="memitem:a87a31f97ab27a1bc5bc4dc6648e75146" id="r_a87a31f97ab27a1bc5bc4dc6648e75146"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a87a31f97ab27a1bc5bc4dc6648e75146">palsprite32_end</a> []</td></tr>
-<tr class="memitem:aad2bd146104de8219c31e04d17faee21" id="r_aad2bd146104de8219c31e04d17faee21"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aad2bd146104de8219c31e04d17faee21">palsprite64</a> []</td></tr>
-<tr class="memdesc:aad2bd146104de8219c31e04d17faee21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette for the 64x64 sprite.  <br /></td></tr>
-<tr class="memitem:a2eaa18c8c844ec970c745b920e6209a3" id="r_a2eaa18c8c844ec970c745b920e6209a3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2eaa18c8c844ec970c745b920e6209a3">palsprite64_end</a> []</td></tr>
-<tr class="memitem:ac2d5d63c3525982feffba3df7f8421c7" id="r_ac2d5d63c3525982feffba3df7f8421c7"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac2d5d63c3525982feffba3df7f8421c7">palsprite8</a> []</td></tr>
-<tr class="memdesc:ac2d5d63c3525982feffba3df7f8421c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette for the 8x8 sprite.  <br /></td></tr>
-<tr class="memitem:a3aa27003a3390c81fd3a7104fddf2dec" id="r_a3aa27003a3390c81fd3a7104fddf2dec"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3aa27003a3390c81fd3a7104fddf2dec">palsprite8_end</a> []</td></tr>
 <tr class="memitem:a588ff5082ccab493c90422d028d31b4d" id="r_a588ff5082ccab493c90422d028d31b4d"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a588ff5082ccab493c90422d028d31b4d">selectedItem</a></td></tr>
 <tr class="memdesc:a588ff5082ccab493c90422d028d31b4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Currently selected OBJ size mode index (0-5), controlled by UP/DOWN.  <br /></td></tr>
-<tr class="memitem:a080d27298f89976bee877cbaf3d17b4a" id="r_a080d27298f89976bee877cbaf3d17b4a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a080d27298f89976bee877cbaf3d17b4a">sprite16</a> []</td></tr>
-<tr class="memdesc:a080d27298f89976bee877cbaf3d17b4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">16x16 sprite tile data  <br /></td></tr>
-<tr class="memitem:a5d0521dbc42e1d7b1f6515e0490d6bd3" id="r_a5d0521dbc42e1d7b1f6515e0490d6bd3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5d0521dbc42e1d7b1f6515e0490d6bd3">sprite16_end</a> []</td></tr>
-<tr class="memitem:a49792cd3b2365c1f10bed7be6e830759" id="r_a49792cd3b2365c1f10bed7be6e830759"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a49792cd3b2365c1f10bed7be6e830759">sprite32</a> []</td></tr>
-<tr class="memdesc:a49792cd3b2365c1f10bed7be6e830759"><td class="mdescLeft">&#160;</td><td class="mdescRight">32x32 sprite tile data  <br /></td></tr>
-<tr class="memitem:a1a85e2c184625aee857345308a67ab50" id="r_a1a85e2c184625aee857345308a67ab50"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1a85e2c184625aee857345308a67ab50">sprite32_end</a> []</td></tr>
-<tr class="memitem:abcec115c0ff168ae1eae89f71e09ec99" id="r_abcec115c0ff168ae1eae89f71e09ec99"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abcec115c0ff168ae1eae89f71e09ec99">sprite64</a> []</td></tr>
-<tr class="memdesc:abcec115c0ff168ae1eae89f71e09ec99"><td class="mdescLeft">&#160;</td><td class="mdescRight">64x64 sprite tile data  <br /></td></tr>
-<tr class="memitem:af99f9695f82bacd6261bc8f1d45f3874" id="r_af99f9695f82bacd6261bc8f1d45f3874"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af99f9695f82bacd6261bc8f1d45f3874">sprite64_end</a> []</td></tr>
-<tr class="memitem:a23294ed35e3d2c2784b8218f56991f04" id="r_a23294ed35e3d2c2784b8218f56991f04"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a23294ed35e3d2c2784b8218f56991f04">sprite8</a> []</td></tr>
-<tr class="memdesc:a23294ed35e3d2c2784b8218f56991f04"><td class="mdescLeft">&#160;</td><td class="mdescRight">8x8 sprite tile data (defined in data.asm)  <br /></td></tr>
-<tr class="memitem:a66eed545e46a00ac0699913ac0186df8" id="r_a66eed545e46a00ac0699913ac0186df8"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a66eed545e46a00ac0699913ac0186df8">sprite8_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interactive demo of all six SNES OBJ size modes. </p>
@@ -212,7 +192,15 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>VRAM word address where the "small" sprite tiles are loaded. </p>
+<p>8x8 sprite tile data (defined in data.asm) </p>
+<p>16x16 sprite tile data</p>
+<p>32x32 sprite tile data</p>
+<p>64x64 sprite tile data</p>
+<p>Palette for the 8x8 sprite</p>
+<p>Palette for the 16x16 sprite</p>
+<p>Palette for the 32x32 sprite</p>
+<p>Palette for the 64x64 sprite</p>
+<p>VRAM word address where the "small" sprite tiles are loaded.</p>
 <p>Placed at $4100 (offset $100 from name base $4000), giving tile number $0010 = ($4100 - $4000) / 16. The offset from the name base determines the OAM tile number used to reference these tiles. </p>
 
 </div>
@@ -365,158 +353,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a956ba5c01adb5de963a3be795b69ebd2" name="a956ba5c01adb5de963a3be795b69ebd2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a956ba5c01adb5de963a3be795b69ebd2">&#9670;&#160;</a></span>palsprite16</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite16[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Palette for the 16x16 sprite. </p>
-
-</div>
-</div>
-<a id="a41ff91ab4cc758eb20af065fda1ef779" name="a41ff91ab4cc758eb20af065fda1ef779"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a41ff91ab4cc758eb20af065fda1ef779">&#9670;&#160;</a></span>palsprite16_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite16_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae7fc7b7e2d40971d1889700902ece784" name="ae7fc7b7e2d40971d1889700902ece784"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7fc7b7e2d40971d1889700902ece784">&#9670;&#160;</a></span>palsprite32</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite32[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Palette for the 32x32 sprite. </p>
-
-</div>
-</div>
-<a id="a87a31f97ab27a1bc5bc4dc6648e75146" name="a87a31f97ab27a1bc5bc4dc6648e75146"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a87a31f97ab27a1bc5bc4dc6648e75146">&#9670;&#160;</a></span>palsprite32_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite32_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aad2bd146104de8219c31e04d17faee21" name="aad2bd146104de8219c31e04d17faee21"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad2bd146104de8219c31e04d17faee21">&#9670;&#160;</a></span>palsprite64</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite64[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Palette for the 64x64 sprite. </p>
-
-</div>
-</div>
-<a id="a2eaa18c8c844ec970c745b920e6209a3" name="a2eaa18c8c844ec970c745b920e6209a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2eaa18c8c844ec970c745b920e6209a3">&#9670;&#160;</a></span>palsprite64_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite64_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ac2d5d63c3525982feffba3df7f8421c7" name="ac2d5d63c3525982feffba3df7f8421c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2d5d63c3525982feffba3df7f8421c7">&#9670;&#160;</a></span>palsprite8</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite8[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Palette for the 8x8 sprite. </p>
-
-</div>
-</div>
-<a id="a3aa27003a3390c81fd3a7104fddf2dec" name="a3aa27003a3390c81fd3a7104fddf2dec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3aa27003a3390c81fd3a7104fddf2dec">&#9670;&#160;</a></span>palsprite8_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> palsprite8_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a588ff5082ccab493c90422d028d31b4d" name="a588ff5082ccab493c90422d028d31b4d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a588ff5082ccab493c90422d028d31b4d">&#9670;&#160;</a></span>selectedItem</h2>
 
@@ -530,158 +366,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Currently selected OBJ size mode index (0-5), controlled by UP/DOWN. </p>
-
-</div>
-</div>
-<a id="a080d27298f89976bee877cbaf3d17b4a" name="a080d27298f89976bee877cbaf3d17b4a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a080d27298f89976bee877cbaf3d17b4a">&#9670;&#160;</a></span>sprite16</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite16[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>16x16 sprite tile data </p>
-
-</div>
-</div>
-<a id="a5d0521dbc42e1d7b1f6515e0490d6bd3" name="a5d0521dbc42e1d7b1f6515e0490d6bd3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d0521dbc42e1d7b1f6515e0490d6bd3">&#9670;&#160;</a></span>sprite16_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite16_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a49792cd3b2365c1f10bed7be6e830759" name="a49792cd3b2365c1f10bed7be6e830759"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49792cd3b2365c1f10bed7be6e830759">&#9670;&#160;</a></span>sprite32</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite32[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>32x32 sprite tile data </p>
-
-</div>
-</div>
-<a id="a1a85e2c184625aee857345308a67ab50" name="a1a85e2c184625aee857345308a67ab50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a85e2c184625aee857345308a67ab50">&#9670;&#160;</a></span>sprite32_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite32_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abcec115c0ff168ae1eae89f71e09ec99" name="abcec115c0ff168ae1eae89f71e09ec99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abcec115c0ff168ae1eae89f71e09ec99">&#9670;&#160;</a></span>sprite64</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite64[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>64x64 sprite tile data </p>
-
-</div>
-</div>
-<a id="af99f9695f82bacd6261bc8f1d45f3874" name="af99f9695f82bacd6261bc8f1d45f3874"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af99f9695f82bacd6261bc8f1d45f3874">&#9670;&#160;</a></span>sprite64_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite64_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a23294ed35e3d2c2784b8218f56991f04" name="a23294ed35e3d2c2784b8218f56991f04"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23294ed35e3d2c2784b8218f56991f04">&#9670;&#160;</a></span>sprite8</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite8[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>8x8 sprite tile data (defined in data.asm) </p>
-
-</div>
-</div>
-<a id="a66eed545e46a00ac0699913ac0186df8" name="a66eed545e46a00ac0699913ac0186df8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66eed545e46a00ac0699913ac0186df8">&#9670;&#160;</a></span>sprite8_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite8_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

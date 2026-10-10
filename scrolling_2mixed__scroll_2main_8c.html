@@ -127,6 +127,8 @@ $(function(){initNavTree('scrolling_2mixed__scroll_2main_8c.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="scrolling_2mixed__scroll_2vram__map_8h_source.html">vram_map.h</a>&quot;</code><br />
+<code>#include &quot;res/opensnes.inc&quot;</code><br />
+<code>#include &quot;res/shader.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -135,26 +137,8 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a486e37cb0a43595f5c5bd0f034c4233c" id="r_a486e37cb0a43595f5c5bd0f034c4233c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a486e37cb0a43595f5c5bd0f034c4233c">bg1_map</a></td></tr>
-<tr class="memdesc:a486e37cb0a43595f5c5bd0f034c4233c"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 tilemap (32x32 tile grid loaded to VRAM $1800).  <br /></td></tr>
-<tr class="memitem:af4f60ac5a528220806284101851aeaf5" id="r_af4f60ac5a528220806284101851aeaf5"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af4f60ac5a528220806284101851aeaf5">bg1_map_end</a></td></tr>
-<tr class="memitem:a533e9c98f4112ff21456ab9a8fc3071d" id="r_a533e9c98f4112ff21456ab9a8fc3071d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a533e9c98f4112ff21456ab9a8fc3071d">bg1_pal</a></td></tr>
-<tr class="memdesc:a533e9c98f4112ff21456ab9a8fc3071d"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 palette (16 colors loaded to CGRAM slot 1, offset 16).  <br /></td></tr>
-<tr class="memitem:a46bdbfa2f4261fd027712621378a777a" id="r_a46bdbfa2f4261fd027712621378a777a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a46bdbfa2f4261fd027712621378a777a">bg1_pal_end</a></td></tr>
-<tr class="memitem:a7cb97f4d9381e49340d991ab9ab84f18" id="r_a7cb97f4d9381e49340d991ab9ab84f18"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7cb97f4d9381e49340d991ab9ab84f18">bg1_tiles</a></td></tr>
-<tr class="memdesc:a7cb97f4d9381e49340d991ab9ab84f18"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 tile data &ndash; repeating shader pattern (4bpp, tiles at VRAM $4000).  <br /></td></tr>
-<tr class="memitem:a9bca91e8ec700e397926c164436e59af" id="r_a9bca91e8ec700e397926c164436e59af"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9bca91e8ec700e397926c164436e59af">bg1_tiles_end</a></td></tr>
-<tr class="memitem:aa6e85f85ca55bdf5f108dfb17cba59c0" id="r_aa6e85f85ca55bdf5f108dfb17cba59c0"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa6e85f85ca55bdf5f108dfb17cba59c0">bg2_map</a></td></tr>
-<tr class="memdesc:aa6e85f85ca55bdf5f108dfb17cba59c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG2 tilemap (32x32 tile grid loaded to VRAM $1400).  <br /></td></tr>
-<tr class="memitem:a8f96fadb0258a5ff499a1441512b8ff9" id="r_a8f96fadb0258a5ff499a1441512b8ff9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8f96fadb0258a5ff499a1441512b8ff9">bg2_map_end</a></td></tr>
-<tr class="memitem:a45a9dd601a3008817e935111dec6260e" id="r_a45a9dd601a3008817e935111dec6260e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a45a9dd601a3008817e935111dec6260e">bg2_pal</a></td></tr>
-<tr class="memdesc:a45a9dd601a3008817e935111dec6260e"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG2 palette (16 colors loaded to CGRAM slot 0, offset 0).  <br /></td></tr>
-<tr class="memitem:aa8d6f3ca7b338f6bcbaa3592d46b63de" id="r_aa8d6f3ca7b338f6bcbaa3592d46b63de"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa8d6f3ca7b338f6bcbaa3592d46b63de">bg2_pal_end</a></td></tr>
-<tr class="memitem:a24f8d60414c675df5cd53cf8c97c3ca1" id="r_a24f8d60414c675df5cd53cf8c97c3ca1"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a24f8d60414c675df5cd53cf8c97c3ca1">bg2_tiles</a></td></tr>
-<tr class="memdesc:a24f8d60414c675df5cd53cf8c97c3ca1"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG2 tile data &ndash; static logo (4bpp, tiles at VRAM $5000).  <br /></td></tr>
-<tr class="memitem:af5287437871d2120c617374243fe87c0" id="r_af5287437871d2120c617374243fe87c0"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af5287437871d2120c617374243fe87c0">bg2_tiles_end</a></td></tr>
 <tr class="memitem:af9529d671c3b039626d154728894df1b" id="r_af9529d671c3b039626d154728894df1b"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af9529d671c3b039626d154728894df1b">scrX</a> = 0</td></tr>
-<tr class="memdesc:af9529d671c3b039626d154728894df1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 horizontal scroll offset (auto-incremented each frame).  <br /></td></tr>
+<tr class="memdesc:af9529d671c3b039626d154728894df1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 tile data &ndash; repeating shader pattern (4bpp, tiles at VRAM $4000).  <br /></td></tr>
 <tr class="memitem:a2349c3f40df58d5ea4c0d99fe5a2ca73" id="r_a2349c3f40df58d5ea4c0d99fe5a2ca73"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2349c3f40df58d5ea4c0d99fe5a2ca73">scrY</a> = 0</td></tr>
 <tr class="memdesc:a2349c3f40df58d5ea4c0d99fe5a2ca73"><td class="mdescLeft">&#160;</td><td class="mdescRight">BG1 vertical scroll offset (auto-incremented each frame).  <br /></td></tr>
 </table>
@@ -198,240 +182,12 @@ Variables</h2></td></tr>
 <li>BG2: static logo (tiles at $5000, tilemap at $1400, palette slot 0)</li>
 </ul>
 <p>Each frame, BG1's scroll position is incremented diagonally by 1 pixel in both X and Y, causing the shader pattern to scroll continuously. BG2 has no scroll updates, so it remains fixed on screen. The SNES PPU composites both layers together, with BG2 (the logo) appearing on top of BG1 due to default priority ordering.</p>
-<dl class="section note"><dt>Note</dt><dd>The extern declarations use scalar syntax (not array) because the data symbols are defined in assembly as labels. Address-of (<span class="tt">&amp;</span>) is used to obtain their pointers for DMA operations.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The tile, map and palette symbols come from the generated res/opensnes.inc and res/shader.inc (opensnes-tileset writes them from the settings files beside the pictures).</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Does not return (infinite loop). </dd></dl>
 
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a486e37cb0a43595f5c5bd0f034c4233c" name="a486e37cb0a43595f5c5bd0f034c4233c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a486e37cb0a43595f5c5bd0f034c4233c">&#9670;&#160;</a></span>bg1_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_map</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>BG1 tilemap (32x32 tile grid loaded to VRAM $1800). </p>
-
-</div>
-</div>
-<a id="af4f60ac5a528220806284101851aeaf5" name="af4f60ac5a528220806284101851aeaf5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4f60ac5a528220806284101851aeaf5">&#9670;&#160;</a></span>bg1_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_map_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a533e9c98f4112ff21456ab9a8fc3071d" name="a533e9c98f4112ff21456ab9a8fc3071d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a533e9c98f4112ff21456ab9a8fc3071d">&#9670;&#160;</a></span>bg1_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_pal</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>BG1 palette (16 colors loaded to CGRAM slot 1, offset 16). </p>
-
-</div>
-</div>
-<a id="a46bdbfa2f4261fd027712621378a777a" name="a46bdbfa2f4261fd027712621378a777a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46bdbfa2f4261fd027712621378a777a">&#9670;&#160;</a></span>bg1_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_pal_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7cb97f4d9381e49340d991ab9ab84f18" name="a7cb97f4d9381e49340d991ab9ab84f18"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7cb97f4d9381e49340d991ab9ab84f18">&#9670;&#160;</a></span>bg1_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_tiles</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>BG1 tile data &ndash; repeating shader pattern (4bpp, tiles at VRAM $4000). </p>
-
-</div>
-</div>
-<a id="a9bca91e8ec700e397926c164436e59af" name="a9bca91e8ec700e397926c164436e59af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9bca91e8ec700e397926c164436e59af">&#9670;&#160;</a></span>bg1_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg1_tiles_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa6e85f85ca55bdf5f108dfb17cba59c0" name="aa6e85f85ca55bdf5f108dfb17cba59c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6e85f85ca55bdf5f108dfb17cba59c0">&#9670;&#160;</a></span>bg2_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2_map</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>BG2 tilemap (32x32 tile grid loaded to VRAM $1400). </p>
-
-</div>
-</div>
-<a id="a8f96fadb0258a5ff499a1441512b8ff9" name="a8f96fadb0258a5ff499a1441512b8ff9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f96fadb0258a5ff499a1441512b8ff9">&#9670;&#160;</a></span>bg2_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2_map_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a45a9dd601a3008817e935111dec6260e" name="a45a9dd601a3008817e935111dec6260e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45a9dd601a3008817e935111dec6260e">&#9670;&#160;</a></span>bg2_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2_pal</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>BG2 palette (16 colors loaded to CGRAM slot 0, offset 0). </p>
-
-</div>
-</div>
-<a id="aa8d6f3ca7b338f6bcbaa3592d46b63de" name="aa8d6f3ca7b338f6bcbaa3592d46b63de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8d6f3ca7b338f6bcbaa3592d46b63de">&#9670;&#160;</a></span>bg2_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2_pal_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a24f8d60414c675df5cd53cf8c97c3ca1" name="a24f8d60414c675df5cd53cf8c97c3ca1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24f8d60414c675df5cd53cf8c97c3ca1">&#9670;&#160;</a></span>bg2_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2_tiles</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>BG2 tile data &ndash; static logo (4bpp, tiles at VRAM $5000). </p>
-
-</div>
-</div>
-<a id="af5287437871d2120c617374243fe87c0" name="af5287437871d2120c617374243fe87c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af5287437871d2120c617374243fe87c0">&#9670;&#160;</a></span>bg2_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> bg2_tiles_end</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="af9529d671c3b039626d154728894df1b" name="af9529d671c3b039626d154728894df1b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af9529d671c3b039626d154728894df1b">&#9670;&#160;</a></span>scrX</h2>
 
@@ -444,6 +200,12 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>BG1 tile data &ndash; repeating shader pattern (4bpp, tiles at VRAM $4000). </p>
+<p>BG1 palette (16 colors loaded to CGRAM slot 1, offset 16).</p>
+<p>BG1 tilemap (32x32 tile grid loaded to VRAM $1800).</p>
+<p>BG2 tile data &ndash; static logo (4bpp, tiles at VRAM $5000).</p>
+<p>BG2 palette (16 colors loaded to CGRAM slot 0, offset 0).</p>
+<p>BG2 tilemap (32x32 tile grid loaded to VRAM $1400).</p>
 <p>BG1 horizontal scroll offset (auto-incremented each frame). </p>
 
 </div>

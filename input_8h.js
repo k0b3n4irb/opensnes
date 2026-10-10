@@ -19,6 +19,8 @@ var input_8h =
     [ "MOUSE_SENS_HIGH", "group__mouse__input.html#ga8fd0081aecdfaaa58856982b52482343", null ],
     [ "MOUSE_SENS_LOW", "group__mouse__input.html#ga9cd00a8f17f236eb4ed042f91229bf35", null ],
     [ "MOUSE_SENS_MEDIUM", "group__mouse__input.html#gaba64f1f305bb293e1c0f10b97f4409df", null ],
+    [ "padHeld", "input_8h.html#a91ebd3f122c9ba2913248112f7dc3647", null ],
+    [ "padPressed", "input_8h.html#aed650db72d53439d6b554063a88de5cb", null ],
     [ "SSC_CURSOR", "group__scope__input.html#ga6bd752d354b163e5292749cdbc94c2ff", null ],
     [ "SSC_FIRE", "group__scope__input.html#ga344f48f7c3fce32fbc23768dff4e0b57", null ],
     [ "SSC_NOISE", "group__scope__input.html#gae815bd4531c5ddc8c70560e3ef25b2d8", null ],
@@ -33,11 +35,9 @@ var input_8h =
     [ "mouseInit", "group__mouse__input.html#ga7452fe56733af8f085a8c7c7b814de0e", null ],
     [ "mouseIsConnected", "group__mouse__input.html#ga5068f6438c4c46d041f3cbf31a35421b", null ],
     [ "mouseSetSensitivity", "group__mouse__input.html#gaf222011bc82c48e1e935a20ad3a0443d", null ],
-    [ "OPENSNES_DEPRECATED", "group__scope__input.html#ga72b3ab97bb0675eaa1bbceb420769133", null ],
     [ "padHeld", "input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5", null ],
     [ "padIsConnected", "input_8h.html#a81de395bc8d5dc741526d1378981a261", null ],
     [ "padPressed", "input_8h.html#ac697a43420bb5e1a038e129d79e88de8", null ],
-    [ "padRaw", "input_8h.html#abcf020412a5fcc70c31c207517f97a48", null ],
     [ "padReleased", "input_8h.html#a2ef786c923fe4841a3b4f1d2f7350dda", null ],
     [ "scopeButtonsHeld", "group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0", null ],
     [ "scopeButtonsPressed", "group__scope__input.html#ga81b12c4a14aec097adf26b2e99080ef6", null ],
@@ -51,5 +51,8 @@ var input_8h =
     [ "scopeIsConnected", "group__scope__input.html#ga865c2249dcdf9265bca5c70991ab348a", null ],
     [ "scopeSetHoldDelay", "group__scope__input.html#ga7d4402727331f161185f2b0dceabe5ff", null ],
     [ "scopeSetRepeatDelay", "group__scope__input.html#gab8752dda2561271655c015698a4787af", null ],
-    [ "scopeSinceShot", "group__scope__input.html#ga1bc41db00d3b5875405a440d733a2d07", null ]
+    [ "scopeSinceShot", "group__scope__input.html#ga1bc41db00d3b5875405a440d733a2d07", null ],
+    [ "pad_keys", "input_8h.html#a62c2179d57a63ddbc863a036e0fc7a71", null ],
+    [ "pad_keysdown", "input_8h.html#aa198072f87b95ed8de962cfb04081dd8", null ],
+    [ "pad_keysold", "input_8h.html#a2790388adf50ca78a52564f00c495ea8", null ]
 ];

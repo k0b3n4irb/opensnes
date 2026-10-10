@@ -133,7 +133,7 @@ SNES Concepts</h2>
 <ul>
 <li><b>BRR samples</b> — the SNES's ADPCM sample format; the DSP plays BRR, nothing else</li>
 <li><b>Direct sample playback</b> — <span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a></span> uploads a sample to the SPC700 once; <span class="tt"><a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample()</a></span> triggers it on demand</li>
-<li><b>Edge-triggered input</b> — <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> fires once per press, so one button tap plays one sound</li>
+<li><b>Edge-triggered input</b> — <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> fires once per press, so one button tap plays one sound</li>
 <li><b>Asset pipeline</b> — a source <span class="tt">.wav</span> auto-converted at build time, the .brr <span class="tt">.incbin</span>'d and linked (see <span class="tt">data.asm</span>)</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="how-the-wav-becomes-a-sample"></a>

@@ -129,6 +129,8 @@ $(function(){initNavTree('audio_2sfx__from__wav_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="audio_8h_source.html">snes/audio.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="text_8h_source.html">snes/text.h</a>&gt;</code><br />
+<code>#include &quot;res/blip.h&quot;</code><br />
+<code>#include &quot;res/coin.h&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -138,17 +140,10 @@ Macros</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a2bf1b7f5a1f66f0190c96fc59d106e0e" id="r_a2bf1b7f5a1f66f0190c96fc59d106e0e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2bf1b7f5a1f66f0190c96fc59d106e0e">blip_brr</a> []</td></tr>
-<tr class="memitem:aef89bcbfa3990a6efb116ae574b8b12a" id="r_aef89bcbfa3990a6efb116ae574b8b12a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aef89bcbfa3990a6efb116ae574b8b12a">blip_brr_end</a> []</td></tr>
-<tr class="memitem:a48e50cae202d1d3ae232c15c135b2241" id="r_a48e50cae202d1d3ae232c15c135b2241"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a48e50cae202d1d3ae232c15c135b2241">coin_brr</a> []</td></tr>
-<tr class="memitem:afa613fda3d34dea8afdf5c3a8ca3b485" id="r_afa613fda3d34dea8afdf5c3a8ca3b485"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#afa613fda3d34dea8afdf5c3a8ca3b485">coin_brr_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>One-shot sound effects from WAV files — the wav2brr pipeline. </p>
-<p>The smallest "press a button, hear a sound" example, and a showcase of the zero-config .wav -&gt; .brr build rule: <span class="tt">res/blip.wav</span> and <span class="tt">res/coin.wav</span> are plain PCM WAV files. data.asm .incbin's them as <span class="tt">blip.brr</span> / <span class="tt">coin.brr</span>, and the build system converts each with wav2brr automatically — no .brr is committed, they are generated on demand like a .pic from a .png.</p>
+<p>The smallest "press a button, hear a sound" example, and a showcase of the settings-file build: <span class="tt">res/blip.wav</span> and <span class="tt">res/coin.wav</span> are plain PCM WAV files with a <span class="tt">.wav.toml</span> beside each (<span class="tt">tool = "opensnes-sample"</span>); the build converts them with opensnes-sample and links the .brr — no .brr is committed, they are generated on demand like a .pic from a .png.</p>
 <p>See <a class="el" href="audio_8md.html">docs/tutorials/audio.md</a> ("One-shot samples from WAV") and tools/wav2brr for the converter.</p>
 <p>Init order: textModeInit (display), audioInit, load samples, setScreenOn. Modules: console, dma, audio, input, background, text.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="audio_8h.html" title="OpenSNES Audio System.">lib/include/snes/audio.h</a> — <a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample</a> / <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample</a> </dd></dl>
@@ -193,79 +188,6 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a2bf1b7f5a1f66f0190c96fc59d106e0e" name="a2bf1b7f5a1f66f0190c96fc59d106e0e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2bf1b7f5a1f66f0190c96fc59d106e0e">&#9670;&#160;</a></span>blip_brr</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> blip_brr[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aef89bcbfa3990a6efb116ae574b8b12a" name="aef89bcbfa3990a6efb116ae574b8b12a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef89bcbfa3990a6efb116ae574b8b12a">&#9670;&#160;</a></span>blip_brr_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> blip_brr_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a48e50cae202d1d3ae232c15c135b2241" name="a48e50cae202d1d3ae232c15c135b2241"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48e50cae202d1d3ae232c15c135b2241">&#9670;&#160;</a></span>coin_brr</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> coin_brr[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afa613fda3d34dea8afdf5c3a8ca3b485" name="afa613fda3d34dea8afdf5c3a8ca3b485"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa613fda3d34dea8afdf5c3a8ca3b485">&#9670;&#160;</a></span>coin_brr_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> coin_brr_end[]</td>
         </tr>
       </table>
 </div><div class="memdoc">

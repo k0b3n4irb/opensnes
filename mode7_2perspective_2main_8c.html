@@ -126,31 +126,20 @@ $(function(){initNavTree('mode7_2perspective_2main_8c.html','',''); });
 <p>Mode 7 perspective with HDMA split-screen (F-Zero style).  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/ground.inc&quot;</code><br />
+<code>#include &quot;res/sky.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ad3aafbc6c7613c06add64a85321eb473" id="r_ad3aafbc6c7613c06add64a85321eb473"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad3aafbc6c7613c06add64a85321eb473">asm_setupHdmaPerspective</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ad20c28dc8fb00b3174dce460e3598548">sx</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#a79b6065ee73ca292d26db6390aa19d63">sy</a>)</td></tr>
-<tr class="memdesc:ad3aafbc6c7613c06add64a85321eb473"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build and activate the 4-channel HDMA perspective split.  <br /></td></tr>
+<tr class="memdesc:ad3aafbc6c7613c06add64a85321eb473"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map).  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; F-Zero-style Mode 7 perspective with HDMA split-screen.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a7ef644f4cbca08b8c4830f66c08330d7" id="r_a7ef644f4cbca08b8c4830f66c08330d7"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7ef644f4cbca08b8c4830f66c08330d7">ground_map</a> []</td></tr>
-<tr class="memdesc:a7ef644f4cbca08b8c4830f66c08330d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground tilemap (128x128 entries, one byte per tile index).  <br /></td></tr>
-<tr class="memitem:aef57732bc4709eaf757da302dc02293e" id="r_aef57732bc4709eaf757da302dc02293e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aef57732bc4709eaf757da302dc02293e">ground_map_end</a> []</td></tr>
-<tr class="memitem:a534a970bd1fed69f5998c09e6e32abb9" id="r_a534a970bd1fed69f5998c09e6e32abb9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a534a970bd1fed69f5998c09e6e32abb9">ground_pal</a> []</td></tr>
-<tr class="memdesc:a534a970bd1fed69f5998c09e6e32abb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">256-color palette for the ground plane (512 bytes).  <br /></td></tr>
-<tr class="memitem:a04a03c1fe8deb545e3e59430f79c6d58" id="r_a04a03c1fe8deb545e3e59430f79c6d58"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a04a03c1fe8deb545e3e59430f79c6d58">ground_pal_end</a> []</td></tr>
-<tr class="memitem:a104cbd84dfd0889dd256703da2382a59" id="r_a104cbd84dfd0889dd256703da2382a59"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a104cbd84dfd0889dd256703da2382a59">ground_tiles</a> []</td></tr>
-<tr class="memdesc:a104cbd84dfd0889dd256703da2382a59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground tile pixel data (256 tiles, 64 bytes each = 16KB).  <br /></td></tr>
-<tr class="memitem:a91488c47affe2c43b79535f7663eea90" id="r_a91488c47affe2c43b79535f7663eea90"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a91488c47affe2c43b79535f7663eea90">ground_tiles_end</a> []</td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
-<tr class="memitem:ac001861481b97e3b120708270175e27b" id="r_ac001861481b97e3b120708270175e27b"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac001861481b97e3b120708270175e27b">sky_map</a> []</td></tr>
-<tr class="memitem:abfd96373e60ac0028427ffca2ca35f59" id="r_abfd96373e60ac0028427ffca2ca35f59"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abfd96373e60ac0028427ffca2ca35f59">sky_map_end</a> []</td></tr>
-<tr class="memitem:a013671df86165ee8fdc047bf262c29a5" id="r_a013671df86165ee8fdc047bf262c29a5"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a013671df86165ee8fdc047bf262c29a5">sky_tiles</a> []</td></tr>
-<tr class="memdesc:a013671df86165ee8fdc047bf262c29a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map).  <br /></td></tr>
-<tr class="memitem:adf4f0ba41d4a59380a2164323ea1af6d" id="r_adf4f0ba41d4a59380a2164323ea1af6d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adf4f0ba41d4a59380a2164323ea1af6d">sky_tiles_end</a> []</td></tr>
+<tr class="memdesc:a50a1287c6a673d98dd90c61df91fd33c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground tilemap (128x128 entries, one byte per tile index).  <br /></td></tr>
 <tr class="memitem:ad20c28dc8fb00b3174dce460e3598548" id="r_ad20c28dc8fb00b3174dce460e3598548"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad20c28dc8fb00b3174dce460e3598548">sx</a></td></tr>
 <tr class="memitem:a79b6065ee73ca292d26db6390aa19d63" id="r_a79b6065ee73ca292d26db6390aa19d63"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a79b6065ee73ca292d26db6390aa19d63">sy</a></td></tr>
 </table>
@@ -201,7 +190,8 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Build and activate the 4-channel HDMA perspective split. </p>
+<p>Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map). </p>
+<p>Build and activate the 4-channel HDMA perspective split.</p>
 <p>Configures four HDMA channels that cooperate each frame:</p><ul>
 <li>Channel A: Switches BGMODE register from Mode 3 (sky) to Mode 7 (ground) at the split scanline (scanline 96).</li>
 <li>Channel B: Toggles TM (main screen enable) from BG2 (sky) to BG1 (ground).</li>
@@ -241,122 +231,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a7ef644f4cbca08b8c4830f66c08330d7" name="a7ef644f4cbca08b8c4830f66c08330d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ef644f4cbca08b8c4830f66c08330d7">&#9670;&#160;</a></span>ground_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Mode 7 ground tilemap (128x128 entries, one byte per tile index). </p>
-<p>Mode 7 tilemaps are 128x128 bytes. Each byte is a tile index (0-255) referencing the 8bpp tile set. Loaded to VRAM via <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a> which handles the interleaved format (map in low bytes, tiles in high bytes). </p>
-
-</div>
-</div>
-<a id="aef57732bc4709eaf757da302dc02293e" name="aef57732bc4709eaf757da302dc02293e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef57732bc4709eaf757da302dc02293e">&#9670;&#160;</a></span>ground_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a534a970bd1fed69f5998c09e6e32abb9" name="a534a970bd1fed69f5998c09e6e32abb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a534a970bd1fed69f5998c09e6e32abb9">&#9670;&#160;</a></span>ground_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>256-color palette for the ground plane (512 bytes). </p>
-
-</div>
-</div>
-<a id="a04a03c1fe8deb545e3e59430f79c6d58" name="a04a03c1fe8deb545e3e59430f79c6d58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04a03c1fe8deb545e3e59430f79c6d58">&#9670;&#160;</a></span>ground_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a104cbd84dfd0889dd256703da2382a59" name="a104cbd84dfd0889dd256703da2382a59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a104cbd84dfd0889dd256703da2382a59">&#9670;&#160;</a></span>ground_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Mode 7 ground tile pixel data (256 tiles, 64 bytes each = 16KB). </p>
-<p>Each tile is 8x8 pixels at 8bpp (one byte per pixel, 64 bytes/tile). Written to the high bytes of VRAM words by <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a>. </p>
-
-</div>
-</div>
-<a id="a91488c47affe2c43b79535f7663eea90" name="a91488c47affe2c43b79535f7663eea90"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91488c47affe2c43b79535f7663eea90">&#9670;&#160;</a></span>ground_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a50a1287c6a673d98dd90c61df91fd33c" name="a50a1287c6a673d98dd90c61df91fd33c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a50a1287c6a673d98dd90c61df91fd33c">&#9670;&#160;</a></span>pad0</h2>
 
@@ -368,73 +242,12 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Current joypad button state </p>
 
-</div>
-</div>
-<a id="ac001861481b97e3b120708270175e27b" name="ac001861481b97e3b120708270175e27b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac001861481b97e3b120708270175e27b">&#9670;&#160;</a></span>sky_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_map[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abfd96373e60ac0028427ffca2ca35f59" name="abfd96373e60ac0028427ffca2ca35f59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abfd96373e60ac0028427ffca2ca35f59">&#9670;&#160;</a></span>sky_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a013671df86165ee8fdc047bf262c29a5" name="a013671df86165ee8fdc047bf262c29a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a013671df86165ee8fdc047bf262c29a5">&#9670;&#160;</a></span>sky_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map). </p>
-
-</div>
-</div>
-<a id="adf4f0ba41d4a59380a2164323ea1af6d" name="adf4f0ba41d4a59380a2164323ea1af6d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adf4f0ba41d4a59380a2164323ea1af6d">&#9670;&#160;</a></span>sky_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Mode 7 ground tilemap (128x128 entries, one byte per tile index). </p>
+<p>Mode 7 tilemaps are 128x128 bytes. Each byte is a tile index (0-255) referencing the 8bpp tile set. Loaded to VRAM via <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a> which handles the interleaved format (map in low bytes, tiles in high bytes).</p>
+<p>Mode 7 ground tile pixel data (256 tiles, 64 bytes each = 16KB).</p>
+<p>Each tile is 8x8 pixels at 8bpp (one byte per pixel, 64 bytes/tile). Written to the high bytes of VRAM words by <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a>.</p>
+<p>256-color palette for the ground plane (512 bytes). Current joypad button state </p>
 
 </div>
 </div>

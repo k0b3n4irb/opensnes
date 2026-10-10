@@ -213,18 +213,17 @@ Basic Setup</h2>
 <div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x1000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Load tiles and palette */</span></div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, <a class="code hl_variable" href="backgrounds_2mode3_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a>, <a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0,</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, tiles, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0,</div>
 <div class="line">              tiles_size, palette_size,</div>
 <div class="line">              <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x4000);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Load tilemap */</span></div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a>, 0x1000, tilemap_size);</div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a>, 0x1000, tilemap_size);</div>
 <div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
 <div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
-<div class="ttc" id="abackgrounds_2mode1__lz77_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div></div>
-<div class="ttc" id="abackgrounds_2mode3_2main_8c_html_adb9ddd7f438b5617fa5426c0b131ee96"><div class="ttname"><a href="backgrounds_2mode3_2main_8c.html#adb9ddd7f438b5617fa5426c0b131ee96">tilemap</a></div><div class="ttdeci">u8 tilemap[]</div></div>
-<div class="ttc" id="abackgrounds_2mode3_2main_8c_html_adbf45f9654fccf61f3aa31645fd95120"><div class="ttname"><a href="backgrounds_2mode3_2main_8c.html#adbf45f9654fccf61f3aa31645fd95120">tiles</a></div><div class="ttdeci">u8 tiles[]</div><div class="ttdoc">Assembly DMA loader for large 8bpp tile data (defined in data.asm).</div></div>
+<div class="ttc" id="acolor_2hicolor__1792_2main_8c_html_a0f3022f9764c547f3d14e6646b2b6f99"><div class="ttname"><a href="color_2hicolor__1792_2main_8c.html#a0f3022f9764c547f3d14e6646b2b6f99">tilemap</a></div><div class="ttdeci">static u16 tilemap[896]</div><div class="ttdoc">Generated 32x28 tilemap (krom&#39;s fixed pattern — see buildTilemap).</div><div class="ttdef"><b>Definition</b> main.c:55</div></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga11724b6748ce0954e9b43819263537fc"><div class="ttname"><a href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a></div><div class="ttdeci">#define SC_32x32</div><div class="ttdef"><b>Definition</b> background.h:36</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md3-enable-display"></a>
@@ -233,7 +232,7 @@ Basic Setup</h2>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gad38434618e3dc4ee900ffcf1768ecf45"><div class="ttname"><a href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a></div><div class="ttdeci">#define REG_TM</div><div class="ttdoc">Main screen designation (W).</div><div class="ttdef"><b>Definition</b> registers.h:187</div></div>
-<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:455</div></div>
+<div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:443</div></div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="vram-layout-1"></a>
 VRAM Layout</h2>
@@ -280,7 +279,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Background setup code  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">Tiles, tilemap, and palette data  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/opensnes.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the picture (<span class="tt">opensnes-tileset</span>, 16 colours); the build converts it and links the result, <span class="tt">res/opensnes.inc</span> declares the <span class="tt"><a class="el" href="structBgAsset.html" title="A full background bundle: tileset + tilemap + map size.">BgAsset</a></span>  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build configuration (<span class="tt">LIB_MODULES := console sprite dma background</span>)  </td></tr>
 <tr class="markdownTableRowEven">
@@ -292,10 +291,9 @@ Exercises</h2>
 <h3 class="doxsection"><a class="anchor" id="exercise-1-add-a-second-layer"></a>
 Exercise 1: Add a Second Layer</h3>
 <p>Enable BG2 with a different tileset: </p><div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(1, 0x1800, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, <a class="code hl_variable" href="windows_2window_2main_8c.html#a2392af57b565616efd8a5fffe7402faf">tiles_bg2</a>, <a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 1, ...);</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, tiles_bg2, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 1, ...);</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad38434618e3dc4ee900ffcf1768ecf45">REG_TM</a> = <a class="code hl_define" href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a> | <a class="code hl_define" href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a>;</div>
-<div class="ttc" id="agroup__reg__const_html_gaae76565c377b5604fdbfa058ca79b433"><div class="ttname"><a href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a></div><div class="ttdeci">#define TM_BG2</div><div class="ttdef"><b>Definition</b> registers.h:456</div></div>
-<div class="ttc" id="awindows_2window_2main_8c_html_a2392af57b565616efd8a5fffe7402faf"><div class="ttname"><a href="windows_2window_2main_8c.html#a2392af57b565616efd8a5fffe7402faf">tiles_bg2</a></div><div class="ttdeci">u8 tiles_bg2[]</div><div class="ttdoc">4bpp tile data for background layer 2 (defined in data.asm)</div></div>
+<div class="ttc" id="agroup__reg__const_html_gaae76565c377b5604fdbfa058ca79b433"><div class="ttname"><a href="group__reg__const.html#gaae76565c377b5604fdbfa058ca79b433">TM_BG2</a></div><div class="ttdeci">#define TM_BG2</div><div class="ttdef"><b>Definition</b> registers.h:444</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-2-change-palette"></a>
 Exercise 2: Change Palette</h3>
 <p>Modify colors by writing to CGRAM: </p><div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a> = 0;  <span class="comment">/* Start at color 0 */</span></div>

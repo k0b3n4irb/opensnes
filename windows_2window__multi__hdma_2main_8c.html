@@ -126,12 +126,13 @@ $(function(){initNavTree('windows_2window__multi__hdma_2main_8c.html','',''); })
 <p>Multi-window HDMA — both windows' edges driven per scanline.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/rings.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a635f83dffe92dc5908a5054ea372a82a" id="r_a635f83dffe92dc5908a5054ea372a82a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a635f83dffe92dc5908a5054ea372a82a">VRAM_GFX</a>&#160;&#160;&#160;0x4000</td></tr>
 <tr class="memitem:a7e86a195c7d8001d20a2c1770430ccc7" id="r_a7e86a195c7d8001d20a2c1770430ccc7"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7e86a195c7d8001d20a2c1770430ccc7">VRAM_MAP</a>&#160;&#160;&#160;0x0000</td></tr>
-<tr class="memdesc:a7e86a195c7d8001d20a2c1770430ccc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">krom's VRAM layout: map at word $0000, tiles at word $4000  <br /></td></tr>
+<tr class="memdesc:a7e86a195c7d8001d20a2c1770430ccc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">256-color ring artwork (original, procedural)  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -139,13 +140,6 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a3812dca8c36f296c32bb384f0f475250" id="r_a3812dca8c36f296c32bb384f0f475250"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3812dca8c36f296c32bb384f0f475250">rings_map</a> []</td></tr>
-<tr class="memitem:a351e7e9518bf170ff969c21960ba55ac" id="r_a351e7e9518bf170ff969c21960ba55ac"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a351e7e9518bf170ff969c21960ba55ac">rings_map_end</a> []</td></tr>
-<tr class="memitem:a692402f9d0dc51dd2dd4a32af2531501" id="r_a692402f9d0dc51dd2dd4a32af2531501"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a692402f9d0dc51dd2dd4a32af2531501">rings_pal</a> []</td></tr>
-<tr class="memitem:aff502defb878955da41fe185c4a0411f" id="r_aff502defb878955da41fe185c4a0411f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aff502defb878955da41fe185c4a0411f">rings_pal_end</a> []</td></tr>
-<tr class="memitem:a85e2048e5702aeb991cd2e330fa08832" id="r_a85e2048e5702aeb991cd2e330fa08832"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a85e2048e5702aeb991cd2e330fa08832">rings_pic</a> []</td></tr>
-<tr class="memdesc:a85e2048e5702aeb991cd2e330fa08832"><td class="mdescLeft">&#160;</td><td class="mdescRight">256-color ring artwork (original, procedural)  <br /></td></tr>
-<tr class="memitem:a679be4aa21fdb2b5027860f6fabdd22c" id="r_a679be4aa21fdb2b5027860f6fabdd22c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a679be4aa21fdb2b5027860f6fabdd22c">rings_pic_end</a> []</td></tr>
 <tr class="memitem:a95518c8f78fade4f7756c1fed229fde4" id="r_a95518c8f78fade4f7756c1fed229fde4"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a95518c8f78fade4f7756c1fed229fde4">window_table</a> []</td></tr>
 <tr class="memdesc:a95518c8f78fade4f7756c1fed229fde4"><td class="mdescLeft">&#160;</td><td class="mdescRight">krom's exact HDMA window table: 16-line bands alternating "both windows empty" (edges 1..0 = degenerate = fully masked = green) and "two portholes" (W1 16-112, W2 144-240). 5-byte entries: [count][W1L][W1R][W2L][W2R], terminator 0.  <br /></td></tr>
 </table>
@@ -192,6 +186,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>256-color ring artwork (original, procedural) </p>
 <p>krom's VRAM layout: map at word $0000, tiles at word $4000 </p>
 
 </div>
@@ -215,116 +210,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a3812dca8c36f296c32bb384f0f475250" name="a3812dca8c36f296c32bb384f0f475250"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3812dca8c36f296c32bb384f0f475250">&#9670;&#160;</a></span>rings_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> rings_map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a351e7e9518bf170ff969c21960ba55ac" name="a351e7e9518bf170ff969c21960ba55ac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a351e7e9518bf170ff969c21960ba55ac">&#9670;&#160;</a></span>rings_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> rings_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a692402f9d0dc51dd2dd4a32af2531501" name="a692402f9d0dc51dd2dd4a32af2531501"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a692402f9d0dc51dd2dd4a32af2531501">&#9670;&#160;</a></span>rings_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> rings_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aff502defb878955da41fe185c4a0411f" name="aff502defb878955da41fe185c4a0411f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aff502defb878955da41fe185c4a0411f">&#9670;&#160;</a></span>rings_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> rings_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a85e2048e5702aeb991cd2e330fa08832" name="a85e2048e5702aeb991cd2e330fa08832"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a85e2048e5702aeb991cd2e330fa08832">&#9670;&#160;</a></span>rings_pic</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> rings_pic[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>256-color ring artwork (original, procedural) </p>
-
-</div>
-</div>
-<a id="a679be4aa21fdb2b5027860f6fabdd22c" name="a679be4aa21fdb2b5027860f6fabdd22c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a679be4aa21fdb2b5027860f6fabdd22c">&#9670;&#160;</a></span>rings_pic_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> rings_pic_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a95518c8f78fade4f7756c1fed229fde4" name="a95518c8f78fade4f7756c1fed229fde4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a95518c8f78fade4f7756c1fed229fde4">&#9670;&#160;</a></span>window_table</h2>
 

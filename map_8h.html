@@ -199,7 +199,7 @@ Usage</h2>
 <div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2likemario_2main_8c.html#a71d82d48b8dd21a3abef1fe25a1cadc8">mapmario</a>, <a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#a4965470887c9118da7d82fd0cba95f23">tilesetdef</a>, <a class="code hl_variable" href="games_2likemario_2main_8c.html#a6647ca308a222a3f219d7ba77ea28b15">tilesetatt</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Background tileset must be loaded at VRAM $2000 (tiles) and $6800 (tilemap)</span></div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, &amp;<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a>, &amp;<a class="code hl_variable" href="games_2mapandobjects_2main_8c.html#a9df981b10fb8046ea0732f34f6cd1533">tilesetpal</a>, 0, size, 16*2, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
+<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, &amp;tileset, &amp;tilesetpal, 0, size, 16*2, <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x6800, <a class="code hl_define" href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Load map data (flushes VRAM internally — screen must be off)</span></div>
@@ -219,10 +219,8 @@ Usage</h2>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
 <div class="ttc" id="agames_2likemario_2main_8c_html_a6647ca308a222a3f219d7ba77ea28b15"><div class="ttname"><a href="games_2likemario_2main_8c.html#a6647ca308a222a3f219d7ba77ea28b15">tilesetatt</a></div><div class="ttdeci">const u8 tilesetatt[]</div><div class="ttdoc">Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format).</div></div>
-<div class="ttc" id="agames_2likemario_2main_8c_html_a71d82d48b8dd21a3abef1fe25a1cadc8"><div class="ttname"><a href="games_2likemario_2main_8c.html#a71d82d48b8dd21a3abef1fe25a1cadc8">mapmario</a></div><div class="ttdeci">const u8 mapmario[]</div><div class="ttdoc">Map data (tile indices + header with width/height).</div></div>
-<div class="ttc" id="agames_2mapandobjects_2main_8c_html_a4965470887c9118da7d82fd0cba95f23"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#a4965470887c9118da7d82fd0cba95f23">tilesetdef</a></div><div class="ttdeci">u8 tilesetdef</div><div class="ttdoc">Tile definition table (visual properties per tile index).</div></div>
-<div class="ttc" id="agames_2mapandobjects_2main_8c_html_a9df981b10fb8046ea0732f34f6cd1533"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#a9df981b10fb8046ea0732f34f6cd1533">tilesetpal</a></div><div class="ttdeci">u8 tilesetpal</div><div class="ttdoc">BG1 tileset palette (BGR555, 16 colors).</div></div>
-<div class="ttc" id="agames_2mapandobjects_2main_8c_html_ad82028c95075b062fde3c871e9dabdbd"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#ad82028c95075b062fde3c871e9dabdbd">tileset</a></div><div class="ttdeci">u8 tileset</div><div class="ttdoc">BG1 tileset tile data (4bpp) – start label.</div></div>
+<div class="ttc" id="agames_2likemario_2main_8c_html_a71d82d48b8dd21a3abef1fe25a1cadc8"><div class="ttname"><a href="games_2likemario_2main_8c.html#a71d82d48b8dd21a3abef1fe25a1cadc8">mapmario</a></div><div class="ttdeci">const u8 mapmario[]</div><div class="ttdoc">Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine.</div></div>
+<div class="ttc" id="agames_2mapandobjects_2main_8c_html_a4965470887c9118da7d82fd0cba95f23"><div class="ttname"><a href="games_2mapandobjects_2main_8c.html#a4965470887c9118da7d82fd0cba95f23">tilesetdef</a></div><div class="ttdeci">u8 tilesetdef</div><div class="ttdoc">BG1 tileset tile data (4bpp) – start label.</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga6129b86a7c2913a31f1bca293fa7c1e7"><div class="ttname"><a href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a></div><div class="ttdeci">#define SC_64x32</div><div class="ttdef"><b>Definition</b> background.h:37</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
@@ -637,7 +635,7 @@ Attribution</h2>
 <p>Get metatile index at map coordinates. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0" title="X positions for the four sprites displayed in a horizontal row.">xpos</a></td><td>X coordinate in map pixels </td></tr>
+    <tr><td class="paramname"><a class="el" href="sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0" title="ROM source for the 16x16 sprite sheet tile data.">xpos</a></td><td>X coordinate in map pixels </td></tr>
     <tr><td class="paramname">ypos</td><td>Y coordinate in map pixels </td></tr>
   </table>
   </dd>
@@ -668,7 +666,7 @@ Attribution</h2>
 <p>Get tile collision property at map coordinates. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0" title="X positions for the four sprites displayed in a horizontal row.">xpos</a></td><td>X coordinate in map pixels </td></tr>
+    <tr><td class="paramname"><a class="el" href="sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0" title="ROM source for the 16x16 sprite sheet tile data.">xpos</a></td><td>X coordinate in map pixels </td></tr>
     <tr><td class="paramname">ypos</td><td>Y coordinate in map pixels </td></tr>
   </table>
   </dd>
@@ -713,7 +711,7 @@ Attribution</h2>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Must be called during forced blank (screen off). The function writes directly to VRAM via DMA.</dd>
 <dd>
-Data placement: the three blobs may live in ANY bank — mapLoad and the scroll runtime honour each far pointer's bank byte, so pinning the map out of bank $00 (e.g. <span class="tt">.section ".rodata2" semifree bank 2</span>) is the recommended layout for big maps. But that data is then for the MAP ENGINE only: reading it directly from C (<span class="tt"><a class="el" href="maps_2map__scroll_2main_8c.html#aa8892da899241eed696fcdcb7ccb6b72" title="Full level tilemap from tmx2snes.">mapdata</a>[6]</span>, <span class="tt">*ptr</span>) silently reads bank $00 instead (cc65816 near-pointer deref — see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>). To consult tiles/attributes from C, use <a class="el" href="#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a>/mapGetMetaTilesProp() — they are bank-safe. </dd></dl>
+Data placement: the three blobs may live in ANY bank — mapLoad and the scroll runtime honour each far pointer's bank byte, so pinning the map out of bank $00 (e.g. <span class="tt">.section ".rodata2" semifree bank 2</span>) is the recommended layout for big maps. But that data is then for the MAP ENGINE only: reading it directly from C (<span class="tt">mapdata[6]</span>, <span class="tt">*ptr</span>) silently reads bank $00 instead (cc65816 near-pointer deref — see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>). To consult tiles/attributes from C, use <a class="el" href="#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a>/mapGetMetaTilesProp() — they are bank-safe. </dd></dl>
 
 </div>
 </div>
@@ -786,7 +784,7 @@ Data placement: the three blobs may live in ANY bank — mapLoad and the scroll 
 <p>Centers the camera on the given coordinates with boundary clamping. Scroll trigger distances: X=128px from edges, Y=80px from edges.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0" title="X positions for the four sprites displayed in a horizontal row.">xpos</a></td><td>X coordinate to focus on (in map pixels) </td></tr>
+    <tr><td class="paramname"><a class="el" href="sprites_2dynamic__sprite_2main_8c.html#ace36248f57cf8494fae6acbe77b274f0" title="ROM source for the 16x16 sprite sheet tile data.">xpos</a></td><td>X coordinate to focus on (in map pixels) </td></tr>
     <tr><td class="paramname">ypos</td><td>Y coordinate to focus on (in map pixels)</td></tr>
   </table>
   </dd>

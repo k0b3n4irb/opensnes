@@ -133,7 +133,11 @@ $(function(){initNavTree('games_2rpg_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="collision_8h_source.html">snes/collision.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="panel_8h_source.html">snes/panel.h</a>&gt;</code><br />
 <code>#include &quot;res/entities.inc&quot;</code><br />
-<code>#include &quot;res/palplan.h&quot;</code><br />
+<code>#include &quot;res/palettes.inc&quot;</code><br />
+<code>#include &quot;res/tileset.inc&quot;</code><br />
+<code>#include &quot;res/interior.inc&quot;</code><br />
+<code>#include &quot;res/uibox.inc&quot;</code><br />
+<code>#include &quot;res/hero.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -147,7 +151,7 @@ Macros</h2></td></tr>
 <tr class="memitem:ad2d65150d32417f45f4c3533cfa28276" id="r_ad2d65150d32417f45f4c3533cfa28276"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad2d65150d32417f45f4c3533cfa28276">BOX_BR</a>&#160;&#160;&#160;10</td></tr>
 <tr class="memitem:a130c4de91f78d20b3dc17034c535ad94" id="r_a130c4de91f78d20b3dc17034c535ad94"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a130c4de91f78d20b3dc17034c535ad94">BOX_C</a>&#160;&#160;&#160;5</td></tr>
 <tr class="memitem:a0e1f7f9eaba410fd3f04d83a9ffe02ad" id="r_a0e1f7f9eaba410fd3f04d83a9ffe02ad"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a0e1f7f9eaba410fd3f04d83a9ffe02ad">BOX_L</a>&#160;&#160;&#160;4</td></tr>
-<tr class="memitem:a8e791df8044f93f29f1b3a742c9903ab" id="r_a8e791df8044f93f29f1b3a742c9903ab"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a8e791df8044f93f29f1b3a742c9903ab">BOX_PAL</a>&#160;&#160;&#160;2                 /* BG2 <a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> 2 -&gt; CGRAM 32-47 */</td></tr>
+<tr class="memitem:a8e791df8044f93f29f1b3a742c9903ab" id="r_a8e791df8044f93f29f1b3a742c9903ab"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a8e791df8044f93f29f1b3a742c9903ab">BOX_PAL</a>&#160;&#160;&#160;2                 /* BG2 <a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> 2 -&gt; CGRAM 32-47 */</td></tr>
 <tr class="memitem:ad8099e73c06610e1a603b21dd8c1c5b0" id="r_ad8099e73c06610e1a603b21dd8c1c5b0"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ad8099e73c06610e1a603b21dd8c1c5b0">BOX_R</a>&#160;&#160;&#160;6</td></tr>
 <tr class="memitem:ae26b204d3b2b20122704c4c88c5f4ba5" id="r_ae26b204d3b2b20122704c4c88c5f4ba5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ae26b204d3b2b20122704c4c88c5f4ba5">BOX_T</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memitem:a031644d2b7acb1a0e3ed09ae57b08200" id="r_a031644d2b7acb1a0e3ed09ae57b08200"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a031644d2b7acb1a0e3ed09ae57b08200">BOX_TL</a>&#160;&#160;&#160;0</td></tr>
@@ -200,7 +204,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a8e4819170cf8d8eb4f6255e9d2d1bf19" id="r_a8e4819170cf8d8eb4f6255e9d2d1bf19"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8e4819170cf8d8eb4f6255e9d2d1bf19">build_panel</a> (void)</td></tr>
 <tr class="memitem:aff4413b9c5908a35a4925c39d4b26b16" id="r_aff4413b9c5908a35a4925c39d4b26b16"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aff4413b9c5908a35a4925c39d4b26b16">dialog_close</a> (void)</td></tr>
 <tr class="memitem:a840d9041574fa3e5fc8deaff320f50e5" id="r_a840d9041574fa3e5fc8deaff320f50e5"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a840d9041574fa3e5fc8deaff320f50e5">dialog_open</a> (const char *line)</td></tr>
-<tr class="memitem:a795251140fff6b8d6afb27e6d0f80a11" id="r_a795251140fff6b8d6afb27e6d0f80a11"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a795251140fff6b8d6afb27e6d0f80a11">draw_char</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> oam_id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> wx, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> wy, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> cam_x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> cam_y, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> facing, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> phase, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>)</td></tr>
+<tr class="memitem:a795251140fff6b8d6afb27e6d0f80a11" id="r_a795251140fff6b8d6afb27e6d0f80a11"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a795251140fff6b8d6afb27e6d0f80a11">draw_char</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> oam_id, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> wx, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> wy, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> cam_x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> cam_y, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> facing, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> phase, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>)</td></tr>
 <tr class="memdesc:a795251140fff6b8d6afb27e6d0f80a11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw a 16x16 character straddling its 8x8 tile, or hide it.  <br /></td></tr>
 <tr class="memitem:a4174676dc02aa2043bd420699a10cfea" id="r_a4174676dc02aa2043bd420699a10cfea"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a4174676dc02aa2043bd420699a10cfea">front_tile</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *tx, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *ty)</td></tr>
 <tr class="memitem:af5843751a04e597a1908666299bab281" id="r_af5843751a04e597a1908666299bab281"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af5843751a04e597a1908666299bab281">hero_tx</a> (void)</td></tr>
@@ -222,17 +226,11 @@ Variables</h2></td></tr>
 <tr class="memitem:a2e0a10e0650f3547e5b43a36756c818c" id="r_a2e0a10e0650f3547e5b43a36756c818c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2e0a10e0650f3547e5b43a36756c818c">gold</a></td></tr>
 <tr class="memitem:ac81e751b11e39a34beb51ddc08e01d65" id="r_ac81e751b11e39a34beb51ddc08e01d65"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac81e751b11e39a34beb51ddc08e01d65">hero_facing</a></td></tr>
 <tr class="memitem:a9d4103d95694e4e6d7f6909f19c62de9" id="r_a9d4103d95694e4e6d7f6909f19c62de9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9d4103d95694e4e6d7f6909f19c62de9">hero_hp</a></td></tr>
-<tr class="memitem:a9b21e29063c8d2b1be8b05654463d6c0" id="r_a9b21e29063c8d2b1be8b05654463d6c0"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9b21e29063c8d2b1be8b05654463d6c0">hero_pal</a> []</td></tr>
-<tr class="memitem:afc5391e424cce3cbd12a48c21e2f9c34" id="r_afc5391e424cce3cbd12a48c21e2f9c34"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#afc5391e424cce3cbd12a48c21e2f9c34">hero_tiles</a> []</td></tr>
-<tr class="memitem:a4a4dbf216b7922a3cf8775aacb7ed67e" id="r_a4a4dbf216b7922a3cf8775aacb7ed67e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4a4dbf216b7922a3cf8775aacb7ed67e">hero_tiles_end</a> []</td></tr>
 <tr class="memitem:a00bf7e567a21358159eedc20291c0602" id="r_a00bf7e567a21358159eedc20291c0602"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a00bf7e567a21358159eedc20291c0602">hero_x</a></td></tr>
 <tr class="memdesc:a00bf7e567a21358159eedc20291c0602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracles / state. hero_x/hero_y are the PIXEL position of the tile the hero occupies (a multiple of 8 when idle).  <br /></td></tr>
 <tr class="memitem:a4c8f2f7228133dd17220040c98d7facf" id="r_a4c8f2f7228133dd17220040c98d7facf"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4c8f2f7228133dd17220040c98d7facf">hero_y</a></td></tr>
 <tr class="memitem:a3185fe42d33e03f236eebe812d038352" id="r_a3185fe42d33e03f236eebe812d038352"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3185fe42d33e03f236eebe812d038352">house_collision</a> []</td></tr>
 <tr class="memitem:aa676b51f71d3ba23878dcc4067cdeb71" id="r_aa676b51f71d3ba23878dcc4067cdeb71"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa676b51f71d3ba23878dcc4067cdeb71">house_map</a> []</td></tr>
-<tr class="memitem:a343b272b331aff30fc0b71982fe72aa2" id="r_a343b272b331aff30fc0b71982fe72aa2"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a343b272b331aff30fc0b71982fe72aa2">house_pal</a> []</td></tr>
-<tr class="memitem:aa60d7d2e05169a3c958feae598a89c78" id="r_aa60d7d2e05169a3c958feae598a89c78"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa60d7d2e05169a3c958feae598a89c78">house_tiles</a> []</td></tr>
-<tr class="memitem:a755289ff57cd54e81dd642d327dcd95d" id="r_a755289ff57cd54e81dd642d327dcd95d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a755289ff57cd54e81dd642d327dcd95d">house_tiles_end</a> []</td></tr>
 <tr class="memitem:a2a3683e0c24cf6a0d11b6ab83ca5d930" id="r_a2a3683e0c24cf6a0d11b6ab83ca5d930"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2a3683e0c24cf6a0d11b6ab83ca5d930">npc_pal</a> []</td></tr>
 <tr class="memitem:aef67a614243f6a40b8e9d467b6383c3c" id="r_aef67a614243f6a40b8e9d467b6383c3c"><td class="memItemLeft">static const <a class="el" href="structNpc.html">Npc</a>&#160;</td><td class="memItemRight"><a class="el" href="#aef67a614243f6a40b8e9d467b6383c3c">npcs</a> [NPC_COUNT] = NPC_TABLE</td></tr>
 <tr class="memdesc:aef67a614243f6a40b8e9d467b6383c3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The villagers. <span class="tt">const</span>, so the table lives in ROM and is read with bank-honouring far addressing — <span class="tt"><a class="el" href="#aef67a614243f6a40b8e9d467b6383c3c" title="The villagers. const, so the table lives in ROM and is read with bank-honouring far addressing — npcs...">npcs</a>[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>].tx</span> compiles to <span class="tt">lda.l <a class="el" href="#aef67a614243f6a40b8e9d467b6383c3c" title="The villagers. const, so the table lives in ROM and is read with bank-honouring far addressing — npcs...">npcs</a>,x</span> (this needed issue #132 fixed; before that a const array of structs was read from bank $00).  <br /></td></tr>
@@ -243,13 +241,7 @@ Variables</h2></td></tr>
 <tr class="memitem:af37fdddde904aca33482c05e7ff742c1" id="r_af37fdddde904aca33482c05e7ff742c1"><td class="memItemLeft">static <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af37fdddde904aca33482c05e7ff742c1">step_dy</a></td></tr>
 <tr class="memitem:ac289ba5e069ee5ed78f65c0628da1dcb" id="r_ac289ba5e069ee5ed78f65c0628da1dcb"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac289ba5e069ee5ed78f65c0628da1dcb">town_collision</a> []</td></tr>
 <tr class="memitem:a269b7e3b6f59ca9cf35c892d3a005f25" id="r_a269b7e3b6f59ca9cf35c892d3a005f25"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a269b7e3b6f59ca9cf35c892d3a005f25">town_map</a> []</td></tr>
-<tr class="memitem:ae8023a37874d6304e7a6dd4fbbc58ea9" id="r_ae8023a37874d6304e7a6dd4fbbc58ea9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae8023a37874d6304e7a6dd4fbbc58ea9">town_pal</a> []</td></tr>
-<tr class="memitem:ae67e590b49be0412be97a978606a4faf" id="r_ae67e590b49be0412be97a978606a4faf"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae67e590b49be0412be97a978606a4faf">town_tiles</a> []</td></tr>
-<tr class="memitem:a9dcffb724b419c302ff3659e9b74ad8a" id="r_a9dcffb724b419c302ff3659e9b74ad8a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9dcffb724b419c302ff3659e9b74ad8a">town_tiles_end</a> []</td></tr>
 <tr class="memitem:adb4660c7233d9cfcef3a529a39341bcb" id="r_adb4660c7233d9cfcef3a529a39341bcb"><td class="memItemLeft">static const <a class="el" href="structPanel.html">Panel</a>&#160;</td><td class="memItemRight"><a class="el" href="#adb4660c7233d9cfcef3a529a39341bcb">ui</a></td></tr>
-<tr class="memitem:ac4997dcb73b7911233677ae6b084cba8" id="r_ac4997dcb73b7911233677ae6b084cba8"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac4997dcb73b7911233677ae6b084cba8">ui_pal</a> []</td></tr>
-<tr class="memitem:a70c6fc1ec0644c1087e9576bcdb94097" id="r_a70c6fc1ec0644c1087e9576bcdb94097"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a70c6fc1ec0644c1087e9576bcdb94097">ui_tiles</a> []</td></tr>
-<tr class="memitem:afabe2e3d0e4ecaf787e9e2dd892e301f" id="r_afabe2e3d0e4ecaf787e9e2dd892e301f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#afabe2e3d0e4ecaf787e9e2dd892e301f">ui_tiles_end</a> []</td></tr>
 <tr class="memitem:aeca1e60bf32d711399e7c7a2687cbf69" id="r_aeca1e60bf32d711399e7c7a2687cbf69"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aeca1e60bf32d711399e7c7a2687cbf69">walk_phase</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
@@ -358,7 +350,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define BOX_PAL&#160;&#160;&#160;2                 /* BG2 <a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> 2 -&gt; CGRAM 32-47 */</td>
+          <td class="memname">#define BOX_PAL&#160;&#160;&#160;2                 /* BG2 <a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a> 2 -&gt; CGRAM 32-47 */</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1398,64 +1390,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a9b21e29063c8d2b1be8b05654463d6c0" name="a9b21e29063c8d2b1be8b05654463d6c0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b21e29063c8d2b1be8b05654463d6c0">&#9670;&#160;</a></span>hero_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hero_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afc5391e424cce3cbd12a48c21e2f9c34" name="afc5391e424cce3cbd12a48c21e2f9c34"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc5391e424cce3cbd12a48c21e2f9c34">&#9670;&#160;</a></span>hero_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hero_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4a4dbf216b7922a3cf8775aacb7ed67e" name="a4a4dbf216b7922a3cf8775aacb7ed67e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a4dbf216b7922a3cf8775aacb7ed67e">&#9670;&#160;</a></span>hero_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> hero_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a00bf7e567a21358159eedc20291c0602" name="a00bf7e567a21358159eedc20291c0602"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a00bf7e567a21358159eedc20291c0602">&#9670;&#160;</a></span>hero_x</h2>
 
@@ -1526,64 +1460,6 @@ Variables</h2></td></tr>
 <span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
   </tr>
 </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a343b272b331aff30fc0b71982fe72aa2" name="a343b272b331aff30fc0b71982fe72aa2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a343b272b331aff30fc0b71982fe72aa2">&#9670;&#160;</a></span>house_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> house_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa60d7d2e05169a3c958feae598a89c78" name="aa60d7d2e05169a3c958feae598a89c78"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa60d7d2e05169a3c958feae598a89c78">&#9670;&#160;</a></span>house_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> house_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a755289ff57cd54e81dd642d327dcd95d" name="a755289ff57cd54e81dd642d327dcd95d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a755289ff57cd54e81dd642d327dcd95d">&#9670;&#160;</a></span>house_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> house_tiles_end[]</td>
-        </tr>
-      </table>
 </div><div class="memdoc">
 
 </div>
@@ -1781,64 +1657,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ae8023a37874d6304e7a6dd4fbbc58ea9" name="ae8023a37874d6304e7a6dd4fbbc58ea9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8023a37874d6304e7a6dd4fbbc58ea9">&#9670;&#160;</a></span>town_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> town_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae67e590b49be0412be97a978606a4faf" name="ae67e590b49be0412be97a978606a4faf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae67e590b49be0412be97a978606a4faf">&#9670;&#160;</a></span>town_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> town_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a9dcffb724b419c302ff3659e9b74ad8a" name="a9dcffb724b419c302ff3659e9b74ad8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9dcffb724b419c302ff3659e9b74ad8a">&#9670;&#160;</a></span>town_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> town_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="adb4660c7233d9cfcef3a529a39341bcb" name="adb4660c7233d9cfcef3a529a39341bcb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adb4660c7233d9cfcef3a529a39341bcb">&#9670;&#160;</a></span>ui</h2>
 
@@ -1868,64 +1686,6 @@ Variables</h2></td></tr>
 <div class="line">}</div>
 <div class="ttc" id="abasics_2panel__hud_2main_8c_html_a77160f5cc4ed8fcf25075a934f835c02"><div class="ttname"><a href="basics_2panel__hud_2main_8c.html#a77160f5cc4ed8fcf25075a934f835c02">panel_map</a></div><div class="ttdeci">static u16 panel_map[32 *32]</div><div class="ttdoc">The panel tilemap — caller-owned (the module never allocates 2 KB).</div><div class="ttdef"><b>Definition</b> main.c:98</div></div>
 </div><!-- fragment -->
-</div>
-</div>
-<a id="ac4997dcb73b7911233677ae6b084cba8" name="ac4997dcb73b7911233677ae6b084cba8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac4997dcb73b7911233677ae6b084cba8">&#9670;&#160;</a></span>ui_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ui_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a70c6fc1ec0644c1087e9576bcdb94097" name="a70c6fc1ec0644c1087e9576bcdb94097"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70c6fc1ec0644c1087e9576bcdb94097">&#9670;&#160;</a></span>ui_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ui_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afabe2e3d0e4ecaf787e9e2dd892e301f" name="afabe2e3d0e4ecaf787e9e2dd892e301f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afabe2e3d0e4ecaf787e9e2dd892e301f">&#9670;&#160;</a></span>ui_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ui_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
 </div>
 </div>
 <a id="aeca1e60bf32d711399e7c7a2687cbf69" name="aeca1e60bf32d711399e7c7a2687cbf69"></a>

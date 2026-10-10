@@ -175,7 +175,7 @@ Code Type</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Sprite display  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="sprite_8h.html#a0ab1cfd8e05842654a0e146b83d62664" title="Initialize the sprite (OAM) system.">oamInit</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260" title="Copy OAM buffer to hardware.">oamUpdate</a></span>)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Input reading  </td><td class="markdownTableBodyNone">Library (<span class="tt">padHeld(0)</span>, <span class="tt">padHeld(1)</span>)  </td></tr>
+<td class="markdownTableBodyNone">Input reading  </td><td class="markdownTableBodyNone">Library (<span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a></span>, <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(1)</a></span>)  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Boundary check  </td><td class="markdownTableBodyNone">C code  </td></tr>
 </table>
@@ -199,9 +199,9 @@ Controller Registers</h3>
 <h3 class="doxsection"><a class="anchor" id="reading-both-controllers"></a>
 Reading Both Controllers</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Read both controllers (NMI handler reads joypads automatically) */</span></div>
-<div class="line">pad1 = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0);</div>
-<div class="line">pad2 = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(1);</div>
-<div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
+<div class="line">pad1 = <a class="code hl_define" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(0);</div>
+<div class="line">pad2 = <a class="code hl_define" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(1);</div>
+<div class="ttc" id="ainput_8h_html_a91ebd3f122c9ba2913248112f7dc3647"><div class="ttname"><a href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></div><div class="ttdeci">#define padHeld(pad)</div><div class="ttdef"><b>Definition</b> input.h:158</div></div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="player-state"></a>
 Player State</h2>
@@ -212,11 +212,11 @@ Struct Pattern (Required)</h3>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, y;</div>
 <div class="line">} <a class="code hl_struct" href="structPlayer.html">Player</a>;</div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_struct" href="structPlayer.html">Player</a> <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a> = {64, 112};</div>
-<div class="line"><a class="code hl_struct" href="structPlayer.html">Player</a> <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a> = {192, 112};</div>
-<div class="ttc" id="abackgrounds_2mode0_2main_8c_html_a484a4880604b9d010eb04b38ec267f41"><div class="ttname"><a href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a></div><div class="ttdeci">u8 p2[]</div><div class="ttdoc">Player 2 state, initialized at right-center of screen.</div><div class="ttdef"><b>Definition</b> main.c:105</div></div>
-<div class="ttc" id="abackgrounds_2mode0_2main_8c_html_adae424b8373ce417295e0072e3ccad6d"><div class="ttname"><a href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a></div><div class="ttdeci">u8 p1[]</div><div class="ttdoc">Player 1 state, initialized at left-center of screen.</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
+<div class="line"><a class="code hl_struct" href="structPlayer.html">Player</a> <a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a> = {64, 112};</div>
+<div class="line"><a class="code hl_struct" href="structPlayer.html">Player</a> <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a> = {192, 112};</div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
+<div class="ttc" id="ainput_2two__players_2main_8c_html_a5b2fd7a008c2231968a9736a14aab00f"><div class="ttname"><a href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a></div><div class="ttdeci">Player p2</div><div class="ttdoc">Player 2 state, initialized at right-center of screen.</div><div class="ttdef"><b>Definition</b> main.c:105</div></div>
+<div class="ttc" id="ainput_2two__players_2main_8c_html_a84ca794211044aa1810646b2e9b6177e"><div class="ttname"><a href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a></div><div class="ttdeci">Player p1</div><div class="ttdoc">Player 1 state, initialized at left-center of screen.</div><div class="ttdef"><b>Definition</b> main.c:103</div></div>
 <div class="ttc" id="astructPlayer_html"><div class="ttname"><a href="structPlayer.html">Player</a></div><div class="ttdoc">Per-player position state.</div><div class="ttdef"><b>Definition</b> main.c:97</div></div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="player-movement"></a>
@@ -224,20 +224,20 @@ Player Movement</h2>
 <h3 class="doxsection"><a class="anchor" id="independent-control"></a>
 Independent Control</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Player 1 movement */</span></div>
-<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.x &lt; 248) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.x++; }</div>
-<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.x &gt; 0) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.x--; }</div>
-<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.y &lt; 224) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.y++; }</div>
-<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.y &gt; 0) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.y--; }</div>
+<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.x &lt; 248) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.x++; }</div>
+<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.x &gt; 0) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.x--; }</div>
+<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.y &lt; 224) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.y++; }</div>
+<div class="line"><span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.y &gt; 0) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.y--; }</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Player 2 movement */</span></div>
-<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.x &lt; 248) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.x++; }</div>
-<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.x &gt; 0) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.x--; }</div>
-<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.y &lt; 224) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.y++; }</div>
-<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.y &gt; 0) <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.y--; }</div>
-<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:76</div></div>
-<div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:77</div></div>
-<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
+<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.x &lt; 248) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.x++; }</div>
+<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.x &gt; 0) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.x--; }</div>
+<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.y &lt; 224) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.y++; }</div>
+<div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (<a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.y &gt; 0) <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.y--; }</div>
+<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:79</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:80</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="player-differentiation"></a>
 Player Differentiation</h2>
@@ -255,10 +255,10 @@ Separate Palettes</h3>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="sprite-setup"></a>
 Sprite Setup</h3>
 <div class="fragment"><div class="line"><span class="comment">/* Player 1: Palette 0 (blue) */</span></div>
-<div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.x, <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.y, 0, 0, 3, 0);</div>
+<div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, <a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.x, <a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.y, 0, 0, 3, 0);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Player 2: Palette 1 (red) */</span></div>
-<div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.x, <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.y, 0, 1, 3, 0);</div>
+<div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.x, <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.y, 0, 1, 3, 0);</div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="controller-detection"></a>
@@ -279,13 +279,13 @@ Controller Types</h3>
 <li>Multitap (4+ players)</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-32"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-33"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/two_players</div>
 </div><!-- fragment --><p>Then open <span class="tt">two_players.sfc</span> in your emulator (Mesen2 recommended). Configure the emulator for two controllers.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-53"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-49"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="files-10"></a>
@@ -303,7 +303,7 @@ Files</h2>
 Exercises</h2>
 <h3 class="doxsection"><a class="anchor" id="exercise-1-player-collision"></a>
 Exercise 1: Player Collision</h3>
-<p>Detect when players touch: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (abs(<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.x - <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.x) &lt; 16 &amp;&amp; abs(<a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#adae424b8373ce417295e0072e3ccad6d">p1</a>.y - <a class="code hl_variable" href="backgrounds_2mode0_2main_8c.html#a484a4880604b9d010eb04b38ec267f41">p2</a>.y) &lt; 16) {</div>
+<p>Detect when players touch: </p><div class="fragment"><div class="line"><span class="keywordflow">if</span> (abs(<a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.x - <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.x) &lt; 16 &amp;&amp; abs(<a class="code hl_variable" href="input_2two__players_2main_8c.html#a84ca794211044aa1810646b2e9b6177e">p1</a>.y - <a class="code hl_variable" href="input_2two__players_2main_8c.html#a5b2fd7a008c2231968a9736a14aab00f">p2</a>.y) &lt; 16) {</div>
 <div class="line">    <span class="comment">/* Players colliding! */</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-2-different-speeds"></a>
@@ -318,7 +318,7 @@ Exercise 3: Button Actions</h3>
 <div class="line"><span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <span class="comment">/* Player 2 action */</span></div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-4-split-screen"></a>
 Exercise 4: Split Screen</h3>
 <p>Implement split-screen view for versus games (advanced): </p><div class="fragment"><div class="line"><span class="comment">/* Use windows to divide screen */</span></div>

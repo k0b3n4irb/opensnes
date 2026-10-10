@@ -127,12 +127,12 @@ $(function(){initNavTree('examples_mode7_extbg.html','',''); });
 </blockquote>
 <p><img src="extbg.png" alt="" class="inline" title="Screenshot"/>    </p>
 <p>SETINI bit 6 (EXTBG) gives Mode 7 a BG2 that shows the same plane as BG1 but reads bit 7 of every pixel as a priority bit. Here the floor's pixels have bit 7 clear and the pillars' have it set, so the ball — a priority-1 sprite — rolls over the floor and behind the pillars of one single plane. Press <b>A</b> to switch EXTBG off: BG1 is shown instead, one layer, and the ball covers the pillars too.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-39"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-40"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/extbg</div>
 </div><!-- fragment --><p>Open <span class="tt">extbg.sfc</span> in luna (or any SNES emulator) and press A.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-40"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-39"></a>
 SNES Concepts</h2>
 <ul>
 <li><b>SETINI ($2133) bit 6</b>, Mode 7 EXTBG, through <span class="tt"><a class="el" href="mode7_8h.html#a0e44ac5fc77a39c643b06d55b00b768f" title="Enable/disable Mode 7 EXTBG (SETINI bit 6): a second, split layer.">mode7SetExtBg()</a></span> (the lib keeps a shadow of the write-only register, shared with the other SETINI setters)</li>
@@ -149,8 +149,8 @@ What You'll See</h2>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="testing-4"></a>
 Testing</h2>
-<p><span class="tt">tools/luna-test/manifests/mode7_extbg.toml</span> checks SETINI ($40 / $00 / $40) and the main-screen designation across two A presses, the 1:1 matrix and the scroll, and that the ball moves. The visual baselines capture the occlusion.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-61"></a>
+<p><span class="tt">testing/manifests/mode7_extbg.toml</span> checks SETINI ($40 / $00 / $40) and the main-screen designation across two A presses, the 1:1 matrix and the scroll, and that the ball moves. The visual baselines capture the occlusion.</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-57"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

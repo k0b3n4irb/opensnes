@@ -26,16 +26,11 @@ var searchData=
   ['colormath_5fall_23',['COLORMATH_ALL',['../colormath_8h.html#a6c2c8c46d31bdc310520d1d11f3e68b8',1,'colormath.h']]],
   ['colormath_5falways_24',['COLORMATH_ALWAYS',['../colormath_8h.html#ad59332e55e295fa6538ca72085c3a77b',1,'colormath.h']]],
   ['colormath_5fbackdrop_25',['COLORMATH_BACKDROP',['../colormath_8h.html#a68e6232f50f8471623e03b1351662cf4',1,'colormath.h']]],
-  ['colormath_5fbg1_26',['COLORMATH_BG1',['../colormath_8h.html#ab6a733f0b0c44bd3b5df36d28bf8c482',1,'colormath.h']]],
-  ['colormath_5fbg2_27',['COLORMATH_BG2',['../colormath_8h.html#a546876b0dadd1d28989de89def196c27',1,'colormath.h']]],
-  ['colormath_5fbg3_28',['COLORMATH_BG3',['../colormath_8h.html#ad58175dd873e38c38c4cda6f7bb02fd7',1,'colormath.h']]],
-  ['colormath_5fbg4_29',['COLORMATH_BG4',['../colormath_8h.html#ab7ae2ce067f80be5dc7e7ef51388b0c4',1,'colormath.h']]],
-  ['colormath_5finside_30',['COLORMATH_INSIDE',['../colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3',1,'colormath.h']]],
-  ['colormath_5fnever_31',['COLORMATH_NEVER',['../colormath_8h.html#ac84ee9932c7187b24fcac570a843cabc',1,'colormath.h']]],
-  ['colormath_5fobj_32',['COLORMATH_OBJ',['../colormath_8h.html#a7f349afd40df9ce4d4ccafa0b03d9d6a',1,'colormath.h']]],
-  ['colormath_5foutside_33',['COLORMATH_OUTSIDE',['../colormath_8h.html#af0d86f069412ad52e766931e954b6cde',1,'colormath.h']]],
-  ['colormath_5fsrc_5ffixed_34',['COLORMATH_SRC_FIXED',['../colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579',1,'colormath.h']]],
-  ['colormath_5fsrc_5fsubscreen_35',['COLORMATH_SRC_SUBSCREEN',['../colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b',1,'colormath.h']]],
-  ['colormath_5fsub_36',['COLORMATH_SUB',['../colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea',1,'colormath.h']]],
-  ['cube_5fdist_37',['CUBE_DIST',['../chips_2dsp1__cube_2main_8c.html#a70452993a6803d8849ad86f920dff52e',1,'main.c']]]
+  ['colormath_5finside_26',['COLORMATH_INSIDE',['../colormath_8h.html#a4071dbd0a7992b17481aa199e5c8a3c3',1,'colormath.h']]],
+  ['colormath_5fnever_27',['COLORMATH_NEVER',['../colormath_8h.html#ac84ee9932c7187b24fcac570a843cabc',1,'colormath.h']]],
+  ['colormath_5foutside_28',['COLORMATH_OUTSIDE',['../colormath_8h.html#af0d86f069412ad52e766931e954b6cde',1,'colormath.h']]],
+  ['colormath_5fsrc_5ffixed_29',['COLORMATH_SRC_FIXED',['../colormath_8h.html#aba2a18b87756e861ed9c66e8766f2579',1,'colormath.h']]],
+  ['colormath_5fsrc_5fsubscreen_30',['COLORMATH_SRC_SUBSCREEN',['../colormath_8h.html#a0fc0a3fbd2a3a1bf383ced27a723c66b',1,'colormath.h']]],
+  ['colormath_5fsub_31',['COLORMATH_SUB',['../colormath_8h.html#abcda76899184da13fe9c9a4637ca82ea',1,'colormath.h']]],
+  ['cube_5fdist_32',['CUBE_DIST',['../chips_2dsp1__cube_2main_8c.html#a70452993a6803d8849ad86f920dff52e',1,'main.c']]]
 ];

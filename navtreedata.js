@@ -31,11 +31,10 @@ var NAVTREE =
     [ "DSP-1 Coprocessor Tutorial", "tutorial_dsp1.html", null ],
     [ "Interrupts: VBlank callbacks and timer IRQs", "tutorial_interrupts.html", null ],
     [ "Hardware verification protocol", "hardware_verification.html", null ],
-    [ "Upgrading to OpenSNES 1.0", "upgrading.html", null ],
-    [ "What 1.0 freezes", "stability.html", null ],
+    [ "Upgrading from 0.48 to 0.49", "upgrading.html", null ],
+    [ "What 1.0 will freeze", "stability.html", null ],
     [ "Known Limitations", "KNOWN_LIMITATIONS.html", null ],
     [ "API index — by what you are trying to do", "api_index.html", null ],
-    [ "Deprecated List", "deprecated.html", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -63,15 +62,15 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "BENCHMARK.html",
-"dir_48d1372267f661946c55cb171d37ab4d.html",
-"examples_chips_dsp1_cube.html",
-"examples_scrolling_continuous_scroll.html",
-"globals_func_r.html",
-"group__mouse__input.html#ga2cdb51c5e8b9145b02d9ae990cd1b2cf",
-"hud_8c.html#ac227dd593be30965c4ace4b497e4c9c8",
-"mosaic_8h_source.html",
-"sprite_8h.html#a2ae2a968b390cd097d6362def10c0e11",
-"structt__sprites.html#a562c9dae7fe86f4faa5a9b2651567004"
+"dir_73eeb5547b39d97bc3ac59f165437536.html",
+"examples_color_direct_color.html#modules-used-29",
+"examples_sprites_animated_sprite.html",
+"globals_vars_i.html",
+"group__ppu__regs.html#ga466a20c79b0739bae02668b1b764d8f1",
+"input_8h_source.html",
+"piece_8h.html#af61f6b9ea3ffb9213de838f02c4cdd9b",
+"sprites_2metasprite_2vram__map_8h.html",
+"superfx_8h.html#a804577ccbf422bf02562e1eb210fb1c7"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

@@ -8,9 +8,8 @@ var searchData=
   ['irqdisable_5',['irqDisable',['../interrupt_8h.html#a7824431e7a255f980b881a0e29773a1a',1,'interrupt.h']]],
   ['irqenable_6',['irqEnable',['../interrupt_8h.html#ada4c1ec4449e797d007bd17766156e9f',1,'interrupt.h']]],
   ['irqset_7',['irqSet',['../interrupt_8h.html#a69f348e722cc5916ff3b4007eadcc928',1,'interrupt.h']]],
-  ['irqsetbank_8',['irqSetBank',['../interrupt_8h.html#ae06802aa2d547c5c1481fd24b5fd5785',1,'interrupt.h']]],
-  ['irqsethtimer_9',['irqSetHTimer',['../interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9',1,'interrupt.h']]],
-  ['irqsetvtimer_10',['irqSetVTimer',['../interrupt_8h.html#a1579b3231b62226f9bf5ba4077660409',1,'interrupt.h']]],
-  ['isinvblank_11',['isInVBlank',['../console_8h.html#a1bb80e4838ae89136bf886d0bc9ddfc2',1,'console.h']]],
-  ['ispal_12',['isPAL',['../console_8h.html#a3b56ab7f353055ded8e2960b94d6ba57',1,'console.h']]]
+  ['irqsethtimer_8',['irqSetHTimer',['../interrupt_8h.html#a979596926059d6d8cab64e9b719a7df9',1,'interrupt.h']]],
+  ['irqsetvtimer_9',['irqSetVTimer',['../interrupt_8h.html#a1579b3231b62226f9bf5ba4077660409',1,'interrupt.h']]],
+  ['isinvblank_10',['isInVBlank',['../console_8h.html#a1bb80e4838ae89136bf886d0bc9ddfc2',1,'console.h']]],
+  ['ispal_11',['isPAL',['../console_8h.html#a3b56ab7f353055ded8e2960b94d6ba57',1,'console.h']]]
 ];

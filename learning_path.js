@@ -9,10 +9,10 @@ var learning_path =
       [ "Stage 5 — \"Can I hold it all together?\"", "learning_path.html#stage-5--can-i-hold-it-all-together", null ],
       [ "Stage 6 — \"Can I finish and ship?\"", "learning_path.html#stage-6--can-i-finish-and-ship", [
         [ "More horsepower — the cartridge coprocessors", "learning_path.html#more-horsepower--the-cartridge-coprocessors", null ],
-        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-37", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-52", null ],
-        [ "How to build", "examples_text_print_string.html#how-to-build-22", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-76", null ],
+        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-35", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-51", null ],
+        [ "How to build", "examples_text_print_string.html#how-to-build-20", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-72", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -51,7 +51,6 @@ var learning_path =
     [ "game_skeleton — the smallest complete game", "examples_basics_game_skeleton.html", null ],
     [ "aim_target", "examples_basics_aim_target.html", null ],
     [ "fix32_orbit", "examples_basics_fix32_orbit.html", null ],
-    [ "Random Numbers", "examples_basics_random.html", null ],
     [ "Save Game -- SRAM Persistence", "examples_memory_save_game.html", null ],
     [ "HiROM Demo -- Understanding SNES Memory Mapping", "examples_memory_hirom_demo.html", null ],
     [ "Breakout", "examples_games_breakout.html", null ],

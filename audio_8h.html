@@ -240,8 +240,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:gaab4342a06378dea04a8d7a9e032e222f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop a specific voice.  <br /></td></tr>
 <tr class="memitem:ga09d2e53a4a311fffed540c0410edab88" id="r_ga09d2e53a4a311fffed540c0410edab88"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="group__audio__samples.html#ga09d2e53a4a311fffed540c0410edab88">audioUnloadSample</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> id)</td></tr>
 <tr class="memdesc:ga09d2e53a4a311fffed540c0410edab88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unload a sample from a slot.  <br /></td></tr>
-<tr class="memitem:gac25577949f0b4226318e6fb714cc6ef9" id="r_gac25577949f0b4226318e6fb714cc6ef9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="group__audio__init.html#gac25577949f0b4226318e6fb714cc6ef9">audioUpdate</a> (void)</td></tr>
-<tr class="memdesc:gac25577949f0b4226318e6fb714cc6ef9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kept for source compatibility; does nothing.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>OpenSNES Audio System. </p>
@@ -268,7 +266,7 @@ Quick Start</h2>
 <div class="line"> </div>
 <div class="line">    <span class="keywordflow">while</span> (1) {</div>
 <div class="line">        <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_function" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="line">        <span class="keywordflow">if</span> (<a class="code hl_define" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">            <a class="code hl_function" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff">audioPlaySample</a>(0);</div>
 <div class="line">        }</div>
 <div class="line">    }</div>
@@ -279,10 +277,10 @@ Quick Start</h2>
 <div class="ttc" id="agroup__audio__init_html_ga7d44cacb545a813f38250020bbfa5ecd"><div class="ttname"><a href="group__audio__init.html#ga7d44cacb545a813f38250020bbfa5ecd">audioInit</a></div><div class="ttdeci">u8 audioInit(void)</div><div class="ttdoc">Initialize the audio system.</div></div>
 <div class="ttc" id="agroup__audio__playback_html_gac3b302f98812d4adfcb042412d3d64ff"><div class="ttname"><a href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff">audioPlaySample</a></div><div class="ttdeci">u8 audioPlaySample(u8 sampleId)</div><div class="ttdoc">Play a sample with default settings.</div></div>
 <div class="ttc" id="agroup__audio__samples_html_gadeb5b5b2ca5fd6cad1127442a546af6d"><div class="ttname"><a href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d">audioLoadSample</a></div><div class="ttdeci">u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint)</div><div class="ttdoc">Load a BRR sample into SPC700 RAM.</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
+<div class="ttc" id="ainput_8h_html_aed650db72d53439d6b554063a88de5cb"><div class="ttname"><a href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a></div><div class="ttdeci">#define padPressed(pad)</div><div class="ttdef"><b>Definition</b> input.h:159</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="features"></a>
 Features</h2>

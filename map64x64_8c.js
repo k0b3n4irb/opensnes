@@ -7,6 +7,5 @@ var map64x64_8c =
     [ "screenRefreshPos64x64", "map64x64_8c.html#a323da0e00876fe0b122ebaad6c58d867", null ],
     [ "smapClear", "map64x64_8c.html#a3c13d72fbe5aca196252d3046d42c7fd", null ],
     [ "smapDma", "map64x64_8c.html#a917e20f94898d50947290c35e5612d6e", null ],
-    [ "smapWrite", "map64x64_8c.html#a050f9333a50d1016f983fdc9344d8cff", null ],
-    [ "map64_len", "map64x64_8c.html#a1d70787528dec471e7b6cecfe97bb38c", null ]
+    [ "smapWrite", "map64x64_8c.html#a050f9333a50d1016f983fdc9344d8cff", null ]
 ];

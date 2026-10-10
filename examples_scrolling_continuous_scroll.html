@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_scrolling_continuous_scroll.html','',''); });
 <p>Two-layer parallax scrolling with a player sprite that triggers camera movement. Move with the D-pad. Walk past the threshold and the world scrolls to follow. </p>
 </blockquote>
 <p><img src="continuous_scroll.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="controls-28"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-27"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -134,12 +134,7 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-Pad  </td><td class="markdownTableBodyNone">Move the character  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-42"></a>
-Build &amp; Run</h2>
-<div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
-<div class="line">make -C examples/scrolling/continuous_scroll</div>
-</div><!-- fragment --><p>Then open <span class="tt">continuous_scroll.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-32"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-30"></a>
 What You'll Learn</h2>
 <ul>
 <li>How SNES background scrolling actually works (it's not moving tiles &ndash; it's moving the camera)</li>
@@ -148,6 +143,11 @@ What You'll Learn</h2>
 <li>Why scroll register updates must happen during VBlank (and how bgSetScroll's dirty-flag mechanism guarantees it)</li>
 </ul>
 <hr  />
+<h2 class="doxsection"><a class="anchor" id="build--run-43"></a>
+Build &amp; Run</h2>
+<div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
+<div class="line">make -C examples/scrolling/continuous_scroll</div>
+</div><!-- fragment --><p>Then open <span class="tt">continuous_scroll.sfc</span> in your emulator (Mesen2 recommended).</p>
 <h2 class="doxsection"><a class="anchor" id="walkthrough-6"></a>
 Walkthrough</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-two-layers-two-speeds"></a>
@@ -162,18 +162,14 @@ Walkthrough</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x0000, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);   <span class="comment">/* BG1 tilemap at $0000 */</span></div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(1, 0x0800, <a class="code hl_define" href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a>);   <span class="comment">/* BG2 tilemap at $0800 */</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, <a class="code hl_variable" href="scrolling_2continuous__scroll_2main_8c.html#ad82e6af0bf2560f208dc9d80b8bb6213">bg1_tiles</a>, <a class="code hl_variable" href="scrolling_2continuous__scroll_2main_8c.html#af082268a77de6b87b9cc0c1f123d05a8">bg1_pal</a>, 2,   <span class="comment">/* BG1 tiles at $2000 */</span></div>
+<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, bg1_tiles, bg1_pal, 2,   <span class="comment">/* BG1 tiles at $2000 */</span></div>
 <div class="line">              ..., <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
-<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, <a class="code hl_variable" href="scrolling_2continuous__scroll_2main_8c.html#a4daa24340e99ea06ca91f83bf4857544">bg2_tiles</a>, <a class="code hl_variable" href="scrolling_2continuous__scroll_2main_8c.html#ac9aedb0dda63f721c34d4774c1b9f948">bg2_pal</a>, 4,   <span class="comment">/* BG2 tiles at $4000 */</span></div>
+<div class="line"><a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(1, bg2_tiles, bg2_pal, 4,   <span class="comment">/* BG2 tiles at $4000 */</span></div>
 <div class="line">              ..., <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x4000);</div>
 <div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
 <div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
 <div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="agroup__bg__size_html_ga11724b6748ce0954e9b43819263537fc"><div class="ttname"><a href="group__bg__size.html#ga11724b6748ce0954e9b43819263537fc">SC_32x32</a></div><div class="ttdeci">#define SC_32x32</div><div class="ttdef"><b>Definition</b> background.h:36</div></div>
-<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_a4daa24340e99ea06ca91f83bf4857544"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#a4daa24340e99ea06ca91f83bf4857544">bg2_tiles</a></div><div class="ttdeci">u8 bg2_tiles[]</div></div>
-<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_ac9aedb0dda63f721c34d4774c1b9f948"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#ac9aedb0dda63f721c34d4774c1b9f948">bg2_pal</a></div><div class="ttdeci">u8 bg2_pal[]</div></div>
-<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_ad82e6af0bf2560f208dc9d80b8bb6213"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#ad82e6af0bf2560f208dc9d80b8bb6213">bg1_tiles</a></div><div class="ttdeci">u8 bg1_tiles[]</div></div>
-<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_af082268a77de6b87b9cc0c1f123d05a8"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#af082268a77de6b87b9cc0c1f123d05a8">bg1_pal</a></div><div class="ttdeci">u8 bg1_pal[]</div></div>
 </div><!-- fragment --><blockquote class="doxtable">
 <p><b>Why palette slot 2 and 4?</b> Each BG palette slot holds 16 colors. Slot 0 starts at CGRAM address 0, slot 2 at address 32, slot 4 at address 64. Using different slots means BG1 and BG2 get independent color palettes. </p>
 </blockquote>
@@ -188,9 +184,9 @@ Walkthrough</h2>
 <div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg2_scroll_x += 1;</div>
 <div class="line">    <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.player_x -= 1;   <span class="comment">/* Push player back to keep them visually centered */</span></div>
 <div class="line">}</div>
-<div class="ttc" id="agames_2shmup__1942_2main_8c_html_a73de383a83473e9a755b640ccca7fd44"><div class="ttname"><a href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></div><div class="ttdeci">static GameState game</div><div class="ttdef"><b>Definition</b> main.c:112</div></div>
-<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_addf5d5626d788a05436c14e2a00c1974"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a></div><div class="ttdeci">#define MAX_SCROLL_X</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
-<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_ae3ddf372515f487a80742c4ac55de93f"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a></div><div class="ttdeci">#define SCROLL_THRESHOLD_RIGHT</div><div class="ttdef"><b>Definition</b> main.c:65</div></div>
+<div class="ttc" id="agames_2shmup__1942_2main_8c_html_a73de383a83473e9a755b640ccca7fd44"><div class="ttname"><a href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></div><div class="ttdeci">static GameState game</div><div class="ttdef"><b>Definition</b> main.c:110</div></div>
+<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_addf5d5626d788a05436c14e2a00c1974"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a></div><div class="ttdeci">#define MAX_SCROLL_X</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
+<div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_ae3ddf372515f487a80742c4ac55de93f"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a></div><div class="ttdeci">#define SCROLL_THRESHOLD_RIGHT</div><div class="ttdef"><b>Definition</b> main.c:61</div></div>
 </div><!-- fragment --><p>The player walks right, reaches column 140, the world scrolls right while the player stays at column 140. It looks like the camera is following the character, but it's actually the background moving in the opposite direction.</p>
 <blockquote class="doxtable">
 <p><b>Why push the player back?</b> Without <span class="tt"><a class="el" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26" title="Player X position in screen coordinates.">player_x</a> -= 1</span>, the player would walk past the threshold and keep going off-screen. The push-back keeps them locked to the threshold while the world scrolls beneath them. This is the same pattern used in Super Mario World's camera system. </p>
@@ -230,7 +226,7 @@ Walkthrough</h2>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
-<div class="ttc" id="astructGameState_html"><div class="ttname"><a href="structGameState.html">GameState</a></div><div class="ttdoc">Centralized game state structure.</div><div class="ttdef"><b>Definition</b> main.c:101</div></div>
+<div class="ttc" id="astructGameState_html"><div class="ttname"><a href="structGameState.html">GameState</a></div><div class="ttdoc">Centralized game state structure.</div><div class="ttdef"><b>Definition</b> main.c:99</div></div>
 </div><!-- fragment --><blockquote class="doxtable">
 <p><b>Why a struct instead of separate variables?</b> The OpenSNES compiler has a known quirk: separate <span class="tt">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> variables can generate broken code for some access patterns, while struct members work correctly. Using a struct also keeps related state together, which makes the code easier to follow. </p>
 </blockquote>
@@ -260,7 +256,6 @@ The Makefile</h3>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console sprite input background dma</div>
 <div class="line">CSRC        := main.c</div>
-<div class="line">ASMSRC      := data.asm</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="why-these-modules-2"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
@@ -278,7 +273,7 @@ Why These Modules?</h3>
 <td class="markdownTableBodyNone"><span class="tt">dma</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span>, <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram()</a></span> for bulk asset transfers, plus OAM DMA in NMI  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-65"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-61"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">dma</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-5"></a>
@@ -309,7 +304,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Game loop, scrolling logic, input handling (~265 lines)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">BG1/BG2 tiles, palettes, tilemaps, character sprite  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/*.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the three layers and the character sheet (<span class="tt">opensnes-tileset</span>, <span class="tt">opensnes-sprite</span>); the build converts and links them, <span class="tt">res/&lt;name&gt;.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite input background dma</span>  </td></tr>
 </table>

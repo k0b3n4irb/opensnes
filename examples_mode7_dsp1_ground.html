@@ -138,7 +138,7 @@ How it works</h2>
 <li>The tables are double-buffered: the DSP-1 fills the back set during active display (≈ 50 µs per raster, 126 rasters ≈ 40 % of the frame), and VBlank swaps them with <span class="tt"><a class="el" href="hdma_8h.html#a60a2966565cd8b728a5acd019859e8e6" title="Update HDMA table pointer (for dynamic effects).">hdmaSetTable</a></span> and moves M7X/M7Y and the Mode 7 scroll so the ground under the imaginary centre stays pinned to the middle of the screen.</li>
 </ol>
 <p>Moving forward uses the chip too: <span class="tt">dsp1Triangle(heading, speed)</span> gives the sin/cos step on the ground plane.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-25"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-24"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -148,7 +148,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-pad Up / Down  </td><td class="markdownTableBodyNone">Drive forward / backward along the heading  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-39"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-38"></a>
 SNES Concepts</h2>
 <ul>
 <li>DSP-1 Raster: an open-ended command that streams until the CPU writes the <span class="tt">$8000</span> sentinel in place of a D read (the lib does this for you)</li>
@@ -157,11 +157,11 @@ SNES Concepts</h2>
 <li>Double-buffered HDMA tables swapped in VBlank</li>
 <li>Mid-frame BG mode switch (sky above, Mode 7 below)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="how-to-build-19"></a>
+<h2 class="doxsection"><a class="anchor" id="how-to-build-17"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">make</div>
 </div><!-- fragment --><p>The ROM needs a DSP-1 on the cartridge (<span class="tt">USE_DSP1 := 1</span> sets the header) and luna needs Sony's <span class="tt">dsp1b.rom</span> firmware installed once (<span class="tt">luna state --dsp1-rom &lt;path&gt; dsp1_ground.sfc</span>); the luna test manifest is firmware-gated and skips cleanly in CI.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-60"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-56"></a>
 Modules Used</h2>
 <p>console, dma, background, input, mode7, hdma, dsp1 (auto-added by <span class="tt">USE_DSP1</span>)</p>
 <h2 class="doxsection"><a class="anchor" id="project-structure-11"></a>
@@ -172,7 +172,7 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Camera, DSP-1 calls, HDMA tables, double buffering  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">Ground (Mode 7) and sky (Mode 3) assets in <span class="tt">ASSET_SECTION</span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/ground.png.toml</span>, <span class="tt">res/sky.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the Mode 7 ground (<span class="tt">mode = 7</span>) and the Mode 3 sky (<span class="tt">opensnes-tileset</span>); the build converts and links them, <span class="tt">res/*.inc</span> declare the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">res/ground.png</span>, <span class="tt">res/sky.png</span>  </td><td class="markdownTableBodyNone">Textures shared with <span class="tt">mode7/perspective</span> (PVSnesLib Mode7Perspective, mills32 / alekmaul)  </td></tr>
 </table>

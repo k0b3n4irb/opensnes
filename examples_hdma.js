@@ -5,8 +5,8 @@ var examples_hdma =
       [ "The idea in one screen", "examples_hdma.html#the-idea-in-one-screen-3", [
         [ "What This Example Shows", "examples_hdma_gradient_colors.html#what-this-example-shows-1", null ],
         [ "Prerequisites", "examples_hdma_gradient_colors.html#prerequisites-2", null ],
-        [ "Controls", "examples_hdma_gradient_colors.html#controls-14", null ],
-        [ "Build &amp; Run", "examples_hdma_gradient_colors.html#build--run-27", null ],
+        [ "Controls", "examples_hdma_gradient_colors.html#controls-13", null ],
+        [ "Build &amp; Run", "examples_hdma_gradient_colors.html#build--run-28", null ],
         [ "How It Works", "examples_hdma_gradient_colors.html#how-it-works-4", [
           [ "1. HDMA targets CGADD ($2121)", "examples_hdma_gradient_colors.html#autotoc_md1-hdma-targets-cgadd-2121", null ],
           [ "2. The gradient table", "examples_hdma_gradient_colors.html#autotoc_md2-the-gradient-table", null ],
@@ -19,7 +19,8 @@ var examples_hdma =
         ] ],
         [ "Project Structure", "examples_hdma_gradient_colors.html#project-structure-4", null ],
         [ "Going Further", "examples_hdma_gradient_colors.html#going-further-1", null ],
-        [ "Modules Used", "examples_hdma_gradient_colors.html#modules-used-46", null ]
+        [ "Modules Used", "examples_hdma_gradient_colors.html#modules-used-43", null ],
+        [ "Further: the \"9-bit\" backdrop (two channels, one visual)", "examples_hdma_gradient_colors.html#further-the-9-bit-backdrop-two-channels-one-visual", null ]
       ] ]
     ] ],
     [ "HDMA Helpers Demo", "examples_hdma_hdma_helpers.html", null ],

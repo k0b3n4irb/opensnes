@@ -1139,7 +1139,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Raw joypad state buffer written by the NMI handler every frame. </p>
-<p>Used directly (instead of <a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a>) for precise edge detection: pressed = pad_keys[0] &amp; ~prev_pad gives newly-pressed buttons this frame. </p>
+<p>Used directly (instead of <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a>) for precise edge detection: pressed = pad_keys[0] &amp; ~prev_pad gives newly-pressed buttons this frame. </p>
 
 </div>
 </div>
@@ -1338,7 +1338,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Global frame counter incremented by the NMI handler. </p>
-<p>Used to seed <a class="el" href="console_8h.html#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (named srand() until 2026-09-22).">rngSeed()</a> at game start &ndash; the player's variable-length wait on the title screen produces a different seed each game, ensuring different piece sequences.</p>
+<p>Used to seed <a class="el" href="console_8h.html#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (the srand() of 0.x, removed 2026-10-05).">rngSeed()</a> at game start &ndash; the player's variable-length wait on the title screen produces a different seed each game, ensuring different piece sequences.</p>
 <p>"PAUSED" overlay message string (in data.asm for bank $00 placement) </p>
 
 </div>

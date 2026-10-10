@@ -129,13 +129,15 @@ $(function(){initNavTree('input_2superscope_2main_8c.html','',''); });
 <code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="text_8h_source.html">snes/text.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="dma_8h_source.html">snes/dma.h</a>&gt;</code><br />
+<code>#include &quot;res/aim_adjust_target.inc&quot;</code><br />
+<code>#include &quot;res/sprites.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:aec55d6f47fd0fe1a42e7bd09f0e2929c" id="r_aec55d6f47fd0fe1a42e7bd09f0e2929c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aec55d6f47fd0fe1a42e7bd09f0e2929c">STATE_CALIBRATE</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:aec55d6f47fd0fe1a42e7bd09f0e2929c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asking player to shoot screen center for aim offset calibration.  <br /></td></tr>
 <tr class="memitem:ac3bd49a6808ba1a64a446fdd14cb2a21" id="r_ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac3bd49a6808ba1a64a446fdd14cb2a21">STATE_DETECT</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Waiting for Super Scope to be connected to port 2.  <br /></td></tr>
+<tr class="memdesc:ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aim target background tile data (2bpp, crosshair pattern) from data.asm.  <br /></td></tr>
 <tr class="memitem:aa74af0876332d1a6258cff9745a1bd53" id="r_aa74af0876332d1a6258cff9745a1bd53"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa74af0876332d1a6258cff9745a1bd53">STATE_READY</a>&#160;&#160;&#160;2</td></tr>
 <tr class="memdesc:aa74af0876332d1a6258cff9745a1bd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrated and tracking fire events; placing red dot markers.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -149,24 +151,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point &ndash; Super Scope detection, calibration, and fire tracking.  <br /></td></tr>
 <tr class="memitem:a8fac21c510e5bd8768b159adc86309e9" id="r_a8fac21c510e5bd8768b159adc86309e9"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a8fac21c510e5bd8768b159adc86309e9">showDot</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> y)</td></tr>
 <tr class="memdesc:a8fac21c510e5bd8768b159adc86309e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show the red dot marker at the given screen coordinates.  <br /></td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a35859279ec6a363be2a0c91d75550e7f" id="r_a35859279ec6a363be2a0c91d75550e7f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a35859279ec6a363be2a0c91d75550e7f">aim_target_map</a> []</td></tr>
-<tr class="memdesc:a35859279ec6a363be2a0c91d75550e7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aim target tilemap (32x32 BG2 layout) from data.asm.  <br /></td></tr>
-<tr class="memitem:a4cdde5edfe65f3612c751be90e094935" id="r_a4cdde5edfe65f3612c751be90e094935"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4cdde5edfe65f3612c751be90e094935">aim_target_map_end</a> []</td></tr>
-<tr class="memitem:ad519a816142e0ae816ee1fe86224511c" id="r_ad519a816142e0ae816ee1fe86224511c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad519a816142e0ae816ee1fe86224511c">aim_target_pal</a> []</td></tr>
-<tr class="memdesc:ad519a816142e0ae816ee1fe86224511c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aim target palette (BGR555) from data.asm.  <br /></td></tr>
-<tr class="memitem:ab38c4bfbc2b43a9eb19d741e19b45d73" id="r_ab38c4bfbc2b43a9eb19d741e19b45d73"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab38c4bfbc2b43a9eb19d741e19b45d73">aim_target_pal_end</a> []</td></tr>
-<tr class="memitem:aebeabd9e4131b3a9e586a46f151cfc93" id="r_aebeabd9e4131b3a9e586a46f151cfc93"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aebeabd9e4131b3a9e586a46f151cfc93">aim_target_tiles</a> []</td></tr>
-<tr class="memdesc:aebeabd9e4131b3a9e586a46f151cfc93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aim target background tile data (2bpp, crosshair pattern) from data.asm.  <br /></td></tr>
-<tr class="memitem:a1ad9275b167fd0034b2886e140037768" id="r_a1ad9275b167fd0034b2886e140037768"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1ad9275b167fd0034b2886e140037768">aim_target_tiles_end</a> []</td></tr>
-<tr class="memitem:a05781c71f066bceef0fa1c4ec9a6fbca" id="r_a05781c71f066bceef0fa1c4ec9a6fbca"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a05781c71f066bceef0fa1c4ec9a6fbca">sprites_pal</a> []</td></tr>
-<tr class="memdesc:a05781c71f066bceef0fa1c4ec9a6fbca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite palette (BGR555) from data.asm.  <br /></td></tr>
-<tr class="memitem:a7c56b7b11f5473c3f72e469eb169e3d3" id="r_a7c56b7b11f5473c3f72e469eb169e3d3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7c56b7b11f5473c3f72e469eb169e3d3">sprites_pal_end</a> []</td></tr>
-<tr class="memitem:a3c8dee3f0db5cc4fca5de243000816c7" id="r_a3c8dee3f0db5cc4fca5de243000816c7"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3c8dee3f0db5cc4fca5de243000816c7">sprites_tiles</a> []</td></tr>
-<tr class="memdesc:a3c8dee3f0db5cc4fca5de243000816c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite tile data (red dot marker, 4bpp) from data.asm.  <br /></td></tr>
-<tr class="memitem:acd254337f494f1c92b00722b24287c7f" id="r_acd254337f494f1c92b00722b24287c7f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#acd254337f494f1c92b00722b24287c7f">sprites_tiles_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Super Scope light gun detection, calibration, and firing. </p>
@@ -219,7 +203,12 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Waiting for Super Scope to be connected to port 2. </p>
+<p>Aim target background tile data (2bpp, crosshair pattern) from data.asm. </p>
+<p>Aim target tilemap (32x32 BG2 layout) from data.asm</p>
+<p>Aim target palette (BGR555) from data.asm</p>
+<p>Sprite tile data (red dot marker, 4bpp) from data.asm</p>
+<p>Sprite palette (BGR555) from data.asm</p>
+<p>Waiting for Super Scope to be connected to port 2 </p>
 
 </div>
 </div>
@@ -358,197 +347,6 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
-<a id="a35859279ec6a363be2a0c91d75550e7f" name="a35859279ec6a363be2a0c91d75550e7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35859279ec6a363be2a0c91d75550e7f">&#9670;&#160;</a></span>aim_target_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> aim_target_map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Aim target tilemap (32x32 BG2 layout) from data.asm. </p>
-
-</div>
-</div>
-<a id="a4cdde5edfe65f3612c751be90e094935" name="a4cdde5edfe65f3612c751be90e094935"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4cdde5edfe65f3612c751be90e094935">&#9670;&#160;</a></span>aim_target_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> aim_target_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad519a816142e0ae816ee1fe86224511c" name="ad519a816142e0ae816ee1fe86224511c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad519a816142e0ae816ee1fe86224511c">&#9670;&#160;</a></span>aim_target_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> aim_target_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Aim target palette (BGR555) from data.asm. </p>
-
-</div>
-</div>
-<a id="ab38c4bfbc2b43a9eb19d741e19b45d73" name="ab38c4bfbc2b43a9eb19d741e19b45d73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab38c4bfbc2b43a9eb19d741e19b45d73">&#9670;&#160;</a></span>aim_target_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> aim_target_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aebeabd9e4131b3a9e586a46f151cfc93" name="aebeabd9e4131b3a9e586a46f151cfc93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebeabd9e4131b3a9e586a46f151cfc93">&#9670;&#160;</a></span>aim_target_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> aim_target_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Aim target background tile data (2bpp, crosshair pattern) from data.asm. </p>
-
-</div>
-</div>
-<a id="a1ad9275b167fd0034b2886e140037768" name="a1ad9275b167fd0034b2886e140037768"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ad9275b167fd0034b2886e140037768">&#9670;&#160;</a></span>aim_target_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> aim_target_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a05781c71f066bceef0fa1c4ec9a6fbca" name="a05781c71f066bceef0fa1c4ec9a6fbca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05781c71f066bceef0fa1c4ec9a6fbca">&#9670;&#160;</a></span>sprites_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprites_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sprite palette (BGR555) from data.asm. </p>
-
-</div>
-</div>
-<a id="a7c56b7b11f5473c3f72e469eb169e3d3" name="a7c56b7b11f5473c3f72e469eb169e3d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c56b7b11f5473c3f72e469eb169e3d3">&#9670;&#160;</a></span>sprites_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprites_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3c8dee3f0db5cc4fca5de243000816c7" name="a3c8dee3f0db5cc4fca5de243000816c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c8dee3f0db5cc4fca5de243000816c7">&#9670;&#160;</a></span>sprites_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprites_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sprite tile data (red dot marker, 4bpp) from data.asm. </p>
-
-</div>
-</div>
-<a id="acd254337f494f1c92b00722b24287c7f" name="acd254337f494f1c92b00722b24287c7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd254337f494f1c92b00722b24287c7f">&#9670;&#160;</a></span>sprites_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprites_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

@@ -127,6 +127,8 @@ $(function(){initNavTree('mode7_2dsp1__ground_2main_8c.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="dsp1_8h_source.html">snes/dsp1.h</a>&gt;</code><br />
+<code>#include &quot;res/ground.inc&quot;</code><br />
+<code>#include &quot;res/sky.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -189,17 +191,6 @@ Variables</h2></td></tr>
 <tr class="memitem:ad484e4dd4663b8e2f5bb4878e08d408c" id="r_ad484e4dd4663b8e2f5bb4878e08d408c"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad484e4dd4663b8e2f5bb4878e08d408c">vof</a></td></tr>
 <tr class="memdesc:ad484e4dd4663b8e2f5bb4878e08d408c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Geometry from the last dsp1SetCamera: imaginary-centre raster, horizon raster.  <br /></td></tr>
 <tr class="memitem:a7c5dd6b6daea44eb646a7ed0f61b674c" id="r_a7c5dd6b6daea44eb646a7ed0f61b674c"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7c5dd6b6daea44eb646a7ed0f61b674c">vva</a></td></tr>
-<tr id="var-members-0" class="groupHeader"><td colspan="2"><div class="groupHeader">Assets (data.asm, ASSET_SECTION — any bank, DMA reads the far pointer)</div></td></tr>
-<tr class="memitem:a7ef644f4cbca08b8c4830f66c08330d7" id="r_a7ef644f4cbca08b8c4830f66c08330d7"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7ef644f4cbca08b8c4830f66c08330d7">ground_map</a> []</td></tr>
-<tr class="memitem:aef57732bc4709eaf757da302dc02293e" id="r_aef57732bc4709eaf757da302dc02293e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aef57732bc4709eaf757da302dc02293e">ground_map_end</a> []</td></tr>
-<tr class="memitem:a534a970bd1fed69f5998c09e6e32abb9" id="r_a534a970bd1fed69f5998c09e6e32abb9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a534a970bd1fed69f5998c09e6e32abb9">ground_pal</a> []</td></tr>
-<tr class="memitem:a04a03c1fe8deb545e3e59430f79c6d58" id="r_a04a03c1fe8deb545e3e59430f79c6d58"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a04a03c1fe8deb545e3e59430f79c6d58">ground_pal_end</a> []</td></tr>
-<tr class="memitem:a104cbd84dfd0889dd256703da2382a59" id="r_a104cbd84dfd0889dd256703da2382a59"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a104cbd84dfd0889dd256703da2382a59">ground_tiles</a> []</td></tr>
-<tr class="memitem:a91488c47affe2c43b79535f7663eea90" id="r_a91488c47affe2c43b79535f7663eea90"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a91488c47affe2c43b79535f7663eea90">ground_tiles_end</a> []</td></tr>
-<tr class="memitem:ac001861481b97e3b120708270175e27b" id="r_ac001861481b97e3b120708270175e27b"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac001861481b97e3b120708270175e27b">sky_map</a> []</td></tr>
-<tr class="memitem:abfd96373e60ac0028427ffca2ca35f59" id="r_abfd96373e60ac0028427ffca2ca35f59"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#abfd96373e60ac0028427ffca2ca35f59">sky_map_end</a> []</td></tr>
-<tr class="memitem:a013671df86165ee8fdc047bf262c29a5" id="r_a013671df86165ee8fdc047bf262c29a5"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a013671df86165ee8fdc047bf262c29a5">sky_tiles</a> []</td></tr>
-<tr class="memitem:adf4f0ba41d4a59380a2164323ea1af6d" id="r_adf4f0ba41d4a59380a2164323ea1af6d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adf4f0ba41d4a59380a2164323ea1af6d">sky_tiles_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>DSP-1 ground: the Super Mario Kart floor — per-scanline Mode 7 matrices streamed by the coprocessor's Raster command. </p>
@@ -653,114 +644,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a7ef644f4cbca08b8c4830f66c08330d7" name="a7ef644f4cbca08b8c4830f66c08330d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ef644f4cbca08b8c4830f66c08330d7">&#9670;&#160;</a></span>ground_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aef57732bc4709eaf757da302dc02293e" name="aef57732bc4709eaf757da302dc02293e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef57732bc4709eaf757da302dc02293e">&#9670;&#160;</a></span>ground_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a534a970bd1fed69f5998c09e6e32abb9" name="a534a970bd1fed69f5998c09e6e32abb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a534a970bd1fed69f5998c09e6e32abb9">&#9670;&#160;</a></span>ground_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a04a03c1fe8deb545e3e59430f79c6d58" name="a04a03c1fe8deb545e3e59430f79c6d58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04a03c1fe8deb545e3e59430f79c6d58">&#9670;&#160;</a></span>ground_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a104cbd84dfd0889dd256703da2382a59" name="a104cbd84dfd0889dd256703da2382a59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a104cbd84dfd0889dd256703da2382a59">&#9670;&#160;</a></span>ground_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a91488c47affe2c43b79535f7663eea90" name="a91488c47affe2c43b79535f7663eea90"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91488c47affe2c43b79535f7663eea90">&#9670;&#160;</a></span>ground_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="abedcfba005b8c73773b4b8fbe04fc615" name="abedcfba005b8c73773b4b8fbe04fc615"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abedcfba005b8c73773b4b8fbe04fc615">&#9670;&#160;</a></span>raster_lines</h2>
 
@@ -798,78 +681,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Screen line of the first ground raster and the block length. </p>
-
-</div>
-</div>
-<a id="ac001861481b97e3b120708270175e27b" name="ac001861481b97e3b120708270175e27b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac001861481b97e3b120708270175e27b">&#9670;&#160;</a></span>sky_map</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_map[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abfd96373e60ac0028427ffca2ca35f59" name="abfd96373e60ac0028427ffca2ca35f59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abfd96373e60ac0028427ffca2ca35f59">&#9670;&#160;</a></span>sky_map_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_map_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a013671df86165ee8fdc047bf262c29a5" name="a013671df86165ee8fdc047bf262c29a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a013671df86165ee8fdc047bf262c29a5">&#9670;&#160;</a></span>sky_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="adf4f0ba41d4a59380a2164323ea1af6d" name="adf4f0ba41d4a59380a2164323ea1af6d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adf4f0ba41d4a59380a2164323ea1af6d">&#9670;&#160;</a></span>sky_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sky_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

@@ -122,7 +122,12 @@ $(function(){initNavTree('tutorial_mosaic.html','',''); });
   <div class="headertitle"><div class="title">Mosaic Tutorial </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This tutorial covers the SNES PPU's mosaic effect: a hardware pixel-block filter that progressively enlarges the pixels of selected BG layers. Used canonically for <b>RPG battle transitions</b> (Final Fantasy IV–VI), <b>death sequences</b>, <b>damage flashes</b>, <b>scene transitions</b> ("the
+<div class="textblock"><div class="image">
+<img src="mosaic.png" alt=""/>
+<div class="caption">
+mosaic example</div></div>
+    <p><em><span class="tt">examples/transitions/mosaic</span>: the pixel-block effect mid-transition.</em></p>
+<p>This tutorial covers the SNES PPU's mosaic effect: a hardware pixel-block filter that progressively enlarges the pixels of selected BG layers. Used canonically for <b>RPG battle transitions</b> (Final Fantasy IV–VI), <b>death sequences</b>, <b>damage flashes</b>, <b>scene transitions</b> ("the
 screen pixelates, then resolves into the new room"), and any retro visual style that wants chunky pixels on demand.</p>
 <p>It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial. Mosaic is one of the simplest PPU effects on the SNES — under 100 lines of C typically suffices.</p>
 <h2 class="doxsection"><a class="anchor" id="what-mosaic-actually-is"></a>
@@ -193,7 +198,7 @@ Animated transitions</h2>
 <div class="line">                            <span class="comment">/*  the chunky pixel blocks)          */</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e">mosaicFadeIn</a>(2);           <span class="comment">/* 15 → 0 over ~30 frames */</span></div>
-<div class="ttc" id="amosaic_8h_html_a087a0125524bbc2887b242600077b081"><div class="ttname"><a href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a></div><div class="ttdeci">#define MOSAIC_BG_ALL</div><div class="ttdef"><b>Definition</b> mosaic.h:33</div></div>
+<div class="ttc" id="amosaic_8h_html_a087a0125524bbc2887b242600077b081"><div class="ttname"><a href="mosaic_8h.html#a087a0125524bbc2887b242600077b081">MOSAIC_BG_ALL</a></div><div class="ttdeci">#define MOSAIC_BG_ALL</div><div class="ttdef"><b>Definition</b> mosaic.h:36</div></div>
 <div class="ttc" id="amosaic_8h_html_a660392c09a19dd7c76a4cf326370461e"><div class="ttname"><a href="mosaic_8h.html#a660392c09a19dd7c76a4cf326370461e">mosaicFadeIn</a></div><div class="ttdeci">void mosaicFadeIn(u8 speed)</div><div class="ttdoc">Animate mosaic fade in (pixelated -&gt; clear).</div></div>
 <div class="ttc" id="amosaic_8h_html_a706149f9c377234abaca910959bddb0d"><div class="ttname"><a href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d">mosaicFadeOut</a></div><div class="ttdeci">void mosaicFadeOut(u8 speed)</div><div class="ttdoc">Animate mosaic fade out (clear -&gt; pixelated).</div></div>
 </div><!-- fragment --><p>The <span class="tt">speed</span> parameter is "frames to wait between steps". <span class="tt">1</span> = fast (~16 frames total), <span class="tt">2</span> = medium (~30 frames), <span class="tt">4</span> = dramatic (~60 frames). The functions block — they call <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> internally — so during the fade the main thread is idle. Schedule any heavy gameplay logic (level swap, palette change, DMA) <b>at the midpoint</b> when the screen is fully pixelated and the artefacts are masked.</p>

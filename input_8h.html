@@ -152,6 +152,8 @@ Macros</h2></td></tr>
 <tr class="memitem:ga8fd0081aecdfaaa58856982b52482343" id="r_ga8fd0081aecdfaaa58856982b52482343"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__mouse__input.html#ga8fd0081aecdfaaa58856982b52482343">MOUSE_SENS_HIGH</a>&#160;&#160;&#160;2</td></tr>
 <tr class="memitem:ga9cd00a8f17f236eb4ed042f91229bf35" id="r_ga9cd00a8f17f236eb4ed042f91229bf35"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__mouse__input.html#ga9cd00a8f17f236eb4ed042f91229bf35">MOUSE_SENS_LOW</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memitem:gaba64f1f305bb293e1c0f10b97f4409df" id="r_gaba64f1f305bb293e1c0f10b97f4409df"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__mouse__input.html#gaba64f1f305bb293e1c0f10b97f4409df">MOUSE_SENS_MEDIUM</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memitem:a91ebd3f122c9ba2913248112f7dc3647" id="r_a91ebd3f122c9ba2913248112f7dc3647"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(pad)</td></tr>
+<tr class="memitem:aed650db72d53439d6b554063a88de5cb" id="r_aed650db72d53439d6b554063a88de5cb"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aed650db72d53439d6b554063a88de5cb">padPressed</a>(pad)</td></tr>
 <tr class="memitem:ga6bd752d354b163e5292749cdbc94c2ff" id="r_ga6bd752d354b163e5292749cdbc94c2ff"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga6bd752d354b163e5292749cdbc94c2ff">SSC_CURSOR</a>&#160;&#160;&#160;0x4000</td></tr>
 <tr class="memitem:ga344f48f7c3fce32fbc23768dff4e0b57" id="r_ga344f48f7c3fce32fbc23768dff4e0b57"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga344f48f7c3fce32fbc23768dff4e0b57">SSC_FIRE</a>&#160;&#160;&#160;0x8000</td></tr>
 <tr class="memitem:gae815bd4531c5ddc8c70560e3ef25b2d8" id="r_gae815bd4531c5ddc8c70560e3ef25b2d8"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#gae815bd4531c5ddc8c70560e3ef25b2d8">SSC_NOISE</a>&#160;&#160;&#160;0x0100</td></tr>
@@ -177,20 +179,16 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga5068f6438c4c46d041f3cbf31a35421b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if mouse is connected on port.  <br /></td></tr>
 <tr class="memitem:gaf222011bc82c48e1e935a20ad3a0443d" id="r_gaf222011bc82c48e1e935a20ad3a0443d"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="group__mouse__input.html#gaf222011bc82c48e1e935a20ad3a0443d">mouseSetSensitivity</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> port, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sensitivity)</td></tr>
 <tr class="memdesc:gaf222011bc82c48e1e935a20ad3a0443d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set mouse sensitivity.  <br /></td></tr>
-<tr class="memitem:ga72b3ab97bb0675eaa1bbceb420769133" id="r_ga72b3ab97bb0675eaa1bbceb420769133"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga72b3ab97bb0675eaa1bbceb420769133">OPENSNES_DEPRECATED</a> (&quot;use <a class="el" href="group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0">scopeButtonsHeld</a>() — it means \&quot;currently down\&quot; like <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>()&quot;) u16 scopeButtonsDown(void)</td></tr>
-<tr class="memdesc:ga72b3ab97bb0675eaa1bbceb420769133"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0" title="Buttons currently down — the same meaning as padHeld() and mouseButtonsHeld().">scopeButtonsHeld()</a>. Same value.  <br /></td></tr>
 <tr class="memitem:a4f095dc343f6b5ac5712cc69e1bd20b5" id="r_a4f095dc343f6b5ac5712cc69e1bd20b5"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
 <tr class="memdesc:a4f095dc343f6b5ac5712cc69e1bd20b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons currently held.  <br /></td></tr>
 <tr class="memitem:a81de395bc8d5dc741526d1378981a261" id="r_a81de395bc8d5dc741526d1378981a261"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a81de395bc8d5dc741526d1378981a261">padIsConnected</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
 <tr class="memdesc:a81de395bc8d5dc741526d1378981a261"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if controller is connected.  <br /></td></tr>
 <tr class="memitem:ac697a43420bb5e1a038e129d79e88de8" id="r_ac697a43420bb5e1a038e129d79e88de8"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac697a43420bb5e1a038e129d79e88de8">padPressed</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
 <tr class="memdesc:ac697a43420bb5e1a038e129d79e88de8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons pressed this frame.  <br /></td></tr>
-<tr class="memitem:abcf020412a5fcc70c31c207517f97a48" id="r_abcf020412a5fcc70c31c207517f97a48"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#abcf020412a5fcc70c31c207517f97a48">padRaw</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
-<tr class="memdesc:abcf020412a5fcc70c31c207517f97a48"><td class="mdescLeft">&#160;</td><td class="mdescRight">The same value as <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> for a connected pad.  <br /></td></tr>
 <tr class="memitem:a2ef786c923fe4841a3b4f1d2f7350dda" id="r_a2ef786c923fe4841a3b4f1d2f7350dda"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2ef786c923fe4841a3b4f1d2f7350dda">padReleased</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pad)</td></tr>
 <tr class="memdesc:a2ef786c923fe4841a3b4f1d2f7350dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get buttons released this frame.  <br /></td></tr>
 <tr class="memitem:ga1baff359c18cc5b5811aa718f6cc3aa0" id="r_ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0">scopeButtonsHeld</a> (void)</td></tr>
-<tr class="memdesc:ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buttons currently down — the same meaning as <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> and <a class="el" href="group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060" title="Get currently held mouse buttons.">mouseButtonsHeld()</a>.  <br /></td></tr>
+<tr class="memdesc:ga1baff359c18cc5b5811aa718f6cc3aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buttons currently down — the same meaning as <a class="el" href="#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a> and <a class="el" href="group__mouse__input.html#ga35390cb1647a191cf68672cc2c781060" title="Get currently held mouse buttons.">mouseButtonsHeld()</a>.  <br /></td></tr>
 <tr class="memitem:ga81b12c4a14aec097adf26b2e99080ef6" id="r_ga81b12c4a14aec097adf26b2e99080ef6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga81b12c4a14aec097adf26b2e99080ef6">scopeButtonsPressed</a> (void)</td></tr>
 <tr class="memdesc:ga81b12c4a14aec097adf26b2e99080ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get newly pressed buttons this frame.  <br /></td></tr>
 <tr class="memitem:ga1f9c6c7b3ae5feb1f4025caa938d088f" id="r_ga1f9c6c7b3ae5feb1f4025caa938d088f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga1f9c6c7b3ae5feb1f4025caa938d088f">scopeButtonsRepeat</a> (void)</td></tr>
@@ -215,13 +213,19 @@ Functions</h2></td></tr>
 <tr class="memdesc:gab8752dda2561271655c015698a4787af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set repeat delay (frames between repeat fires after hold).  <br /></td></tr>
 <tr class="memitem:ga1bc41db00d3b5875405a440d733a2d07" id="r_ga1bc41db00d3b5875405a440d733a2d07"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="group__scope__input.html#ga1bc41db00d3b5875405a440d733a2d07">scopeSinceShot</a> (void)</td></tr>
 <tr class="memdesc:ga1bc41db00d3b5875405a440d733a2d07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get frames since last detected shot.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a62c2179d57a63ddbc863a036e0fc7a71" id="r_a62c2179d57a63ddbc863a036e0fc7a71"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a> [5]</td></tr>
+<tr class="memitem:aa198072f87b95ed8de962cfb04081dd8" id="r_aa198072f87b95ed8de962cfb04081dd8"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa198072f87b95ed8de962cfb04081dd8">pad_keysdown</a> [5]</td></tr>
+<tr class="memitem:a2790388adf50ca78a52564f00c495ea8" id="r_a2790388adf50ca78a52564f00c495ea8"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2790388adf50ca78a52564f00c495ea8">pad_keysold</a> [5]</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SNES Controller Input. </p>
 <p>Functions for reading controller input.</p>
 <h2 class="doxsection"><a class="anchor" id="button-constants"></a>
 Button Constants</h2>
-<p>Use these constants with <a class="el" href="#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a>, <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a>, etc:</p>
+<p>Use these constants with <a class="el" href="#aed650db72d53439d6b554063a88de5cb">padPressed()</a>, <a class="el" href="#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a>, etc:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Constant  </th><th class="markdownTableHeadNone">Button  </th></tr>
@@ -253,21 +257,60 @@ Button Constants</h2>
 <h2 class="doxsection"><a class="anchor" id="usage-1"></a>
 Usage</h2>
 <div class="fragment"><div class="line"><span class="comment">// Check for button press (just pressed this frame)</span></div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#ac697a43420bb5e1a038e129d79e88de8">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    playerJump();</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Check for button held (continuously pressed)</span></div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
 <div class="line">    playerMoveRight();</div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
-<div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
-<div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
+<div class="ttc" id="ainput_8h_html_a91ebd3f122c9ba2913248112f7dc3647"><div class="ttname"><a href="#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></div><div class="ttdeci">#define padHeld(pad)</div><div class="ttdef"><b>Definition</b> input.h:158</div></div>
+<div class="ttc" id="ainput_8h_html_aed650db72d53439d6b554063a88de5cb"><div class="ttname"><a href="#aed650db72d53439d6b554063a88de5cb">padPressed</a></div><div class="ttdeci">#define padPressed(pad)</div><div class="ttdef"><b>Definition</b> input.h:159</div></div>
 </div><!-- fragment --><dl class="section author"><dt>Author</dt><dd>OpenSNES Team </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd>MIT License </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a91ebd3f122c9ba2913248112f7dc3647" name="a91ebd3f122c9ba2913248112f7dc3647"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91ebd3f122c9ba2913248112f7dc3647">&#9670;&#160;</a></span>padHeld</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define padHeld</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>pad</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_variable" href="#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a>[(pad)])</div>
+<div class="ttc" id="ainput_8h_html_a62c2179d57a63ddbc863a036e0fc7a71"><div class="ttname"><a href="#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a></div><div class="ttdeci">u16 pad_keys[5]</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aed650db72d53439d6b554063a88de5cb" name="aed650db72d53439d6b554063a88de5cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed650db72d53439d6b554063a88de5cb">&#9670;&#160;</a></span>padPressed</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define padPressed</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>pad</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_variable" href="#aa198072f87b95ed8de962cfb04081dd8">pad_keysdown</a>[(pad)])</div>
+<div class="ttc" id="ainput_8h_html_aa198072f87b95ed8de962cfb04081dd8"><div class="ttname"><a href="#aa198072f87b95ed8de962cfb04081dd8">pad_keysdown</a></div><div class="ttdeci">u16 pad_keysdown[5]</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a4f095dc343f6b5ac5712cc69e1bd20b5" name="a4f095dc343f6b5ac5712cc69e1bd20b5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4f095dc343f6b5ac5712cc69e1bd20b5">&#9670;&#160;</a></span>padHeld()</h2>
 
@@ -292,7 +335,7 @@ Usage</h2>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Button mask of held buttons</dd></dl>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
 <div class="line">    <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>++;</div>
 <div class="line">}</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
@@ -353,37 +396,10 @@ Usage</h2>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Button mask of newly pressed buttons</dd></dl>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="#ac697a43420bb5e1a038e129d79e88de8">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <span class="comment">// A was just pressed</span></div>
 <div class="line">}</div>
 </div><!-- fragment --> <dl class="section see"><dt>See also</dt><dd><a class="el" href="perf.html" title="Measured frame costs of the library">Measured frame costs</a> — what this call costs per <a class="el" href="maps_2map__scroll_2main_8c.html#a046e42fc978f81375d5b89664d72d1f4" title="Current sprite tile number.">frame</a> in five real scenes. </dd></dl>
-
-</div>
-</div>
-<a id="abcf020412a5fcc70c31c207517f97a48" name="abcf020412a5fcc70c31c207517f97a48"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abcf020412a5fcc70c31c207517f97a48">&#9670;&#160;</a></span>padRaw()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> padRaw </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>pad</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The same value as <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> for a connected pad. </p>
-<p>Never was the raw register: the NMI handler has already replaced a word that is not a joypad's (low four bits set) by 0 before this reads it, so it returns what <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> returns. The one difference: <a class="el" href="#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a> answers 0 for a word of $FFFF (an unplugged port), this returns the $FFFF.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pad</td><td>Controller number: 0 or 1. Indices 2-4 are accepted and always read 0 — the multitap path cannot be armed (<a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Button mask of held buttons </dd></dl>
 
 </div>
 </div>
@@ -411,6 +427,76 @@ Usage</h2>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Button mask of released buttons </dd></dl>
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="a62c2179d57a63ddbc863a036e0fc7a71" name="a62c2179d57a63ddbc863a036e0fc7a71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62c2179d57a63ddbc863a036e0fc7a71">&#9670;&#160;</a></span>pad_keys</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_keys[5]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Buttons down, per pad (written by the NMI handler) </p>
+
+</div>
+</div>
+<a id="aa198072f87b95ed8de962cfb04081dd8" name="aa198072f87b95ed8de962cfb04081dd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa198072f87b95ed8de962cfb04081dd8">&#9670;&#160;</a></span>pad_keysdown</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_keysdown[5]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Buttons that went down on this frame </p>
+
+</div>
+</div>
+<a id="a2790388adf50ca78a52564f00c495ea8" name="a2790388adf50ca78a52564f00c495ea8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2790388adf50ca78a52564f00c495ea8">&#9670;&#160;</a></span>pad_keysold</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_keysold[5]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Buttons down on the previous frame </p>
 
 </div>
 </div>

@@ -6,7 +6,6 @@ var group__scope__input =
     [ "SSC_OFFSCREEN", "group__scope__input.html#ga378e6b24d97fa4641a8b98ab6ef83103", null ],
     [ "SSC_PAUSE", "group__scope__input.html#gafff7ec04ce6a6da475dfec0b78fe316d", null ],
     [ "SSC_TURBO", "group__scope__input.html#ga70b379ab162b1146fc9cd87e990bab5d", null ],
-    [ "OPENSNES_DEPRECATED", "group__scope__input.html#ga72b3ab97bb0675eaa1bbceb420769133", null ],
     [ "scopeButtonsHeld", "group__scope__input.html#ga1baff359c18cc5b5811aa718f6cc3aa0", null ],
     [ "scopeButtonsPressed", "group__scope__input.html#ga81b12c4a14aec097adf26b2e99080ef6", null ],
     [ "scopeButtonsRepeat", "group__scope__input.html#ga1f9c6c7b3ae5feb1f4025caa938d088f", null ],

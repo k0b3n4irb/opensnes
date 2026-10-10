@@ -8,9 +8,5 @@ var sprites_2dynamic__metasprite_2main_8c =
     [ "hero32_frame0", "sprites_2dynamic__metasprite_2main_8c.html#a39748e25a7a4234b8d7fe367a6199c94", null ],
     [ "hero8_frame0", "sprites_2dynamic__metasprite_2main_8c.html#abc082b417d7da07574502ec922386fb4", null ],
     [ "pad0", "sprites_2dynamic__metasprite_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c", null ],
-    [ "selectedItem", "sprites_2dynamic__metasprite_2main_8c.html#a588ff5082ccab493c90422d028d31b4d", null ],
-    [ "spritehero16_til", "sprites_2dynamic__metasprite_2main_8c.html#a31447f39fe58257bd10616a4fe45f35d", null ],
-    [ "spritehero32_pal", "sprites_2dynamic__metasprite_2main_8c.html#aeaf8c79ab42cf83a6b899f58c55ac559", null ],
-    [ "spritehero32_til", "sprites_2dynamic__metasprite_2main_8c.html#a4a7f6eee3d43e9509a60fe80f1738130", null ],
-    [ "spritehero8_til", "sprites_2dynamic__metasprite_2main_8c.html#a159bd91dc35ea86a3a0c8a842231a938", null ]
+    [ "selectedItem", "sprites_2dynamic__metasprite_2main_8c.html#a588ff5082ccab493c90422d028d31b4d", null ]
 ];

@@ -3,9 +3,9 @@ var examples_fundamentals =
     [ "Fundamentals: how a glyph is drawn", "examples_fundamentals_text_glyphs.html", [
       [ "Example ROMs", "examples_fundamentals.html#example-roms-4", null ],
       [ "Why this tier exists", "examples_fundamentals.html#why-this-tier-exists", [
-        [ "Build &amp; Run", "examples_fundamentals_text_glyphs.html#build--run-23", null ],
-        [ "Controls", "examples_fundamentals_text_glyphs.html#controls-9", null ],
-        [ "What You'll Learn", "examples_fundamentals_text_glyphs.html#what-youll-learn-19", null ],
+        [ "Controls", "examples_fundamentals_text_glyphs.html#controls-8", null ],
+        [ "What You'll Learn", "examples_fundamentals_text_glyphs.html#what-youll-learn-18", null ],
+        [ "Build &amp; Run", "examples_fundamentals_text_glyphs.html#build--run-24", null ],
         [ "Walkthrough", "examples_fundamentals_text_glyphs.html#walkthrough-1", [
           [ "1. There Is No printf", "examples_fundamentals_text_glyphs.html#autotoc_md1-there-is-no-printf", null ],
           [ "2. Drawing Letters in Hex", "examples_fundamentals_text_glyphs.html#autotoc_md2-drawing-letters-in-hex", null ],
@@ -22,7 +22,7 @@ var examples_fundamentals =
           [ "The Makefile", "examples_fundamentals_text_glyphs.html#the-makefile", null ],
           [ "Why These Modules?", "examples_fundamentals_text_glyphs.html#why-these-modules", null ]
         ] ],
-        [ "Modules Used", "examples_fundamentals_text_glyphs.html#modules-used-38", null ],
+        [ "Modules Used", "examples_fundamentals_text_glyphs.html#modules-used-35", null ],
         [ "Technical Reference", "examples_fundamentals_text_glyphs.html#technical-reference", null ],
         [ "Files", "examples_fundamentals_text_glyphs.html#files-5", null ]
       ] ]

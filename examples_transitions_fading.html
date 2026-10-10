@@ -280,13 +280,13 @@ Scene Transition Pattern</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__reg__const_html_gab18ce2bcee19d38256a74af702ebe4a3"><div class="ttname"><a href="group__reg__const.html#gab18ce2bcee19d38256a74af702ebe4a3">INIDISP_FORCE_BLANK</a></div><div class="ttdeci">#define INIDISP_FORCE_BLANK</div><div class="ttdef"><b>Definition</b> registers.h:430</div></div>
 </div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-52"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-53"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/transitions/fading</div>
 </div><!-- fragment --><p>Then open <span class="tt">fading.sfc</span> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-78"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-74"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="files-12"></a>
@@ -297,7 +297,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Fade logic and demo sequence  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">Background graphics  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/opensnes.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the picture (<span class="tt">opensnes-tileset</span>); the build converts and links it, <span class="tt">res/opensnes.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone">Build configuration (<span class="tt">LIB_MODULES := console sprite dma input background</span>)  </td></tr>
 </table>
@@ -350,12 +350,12 @@ Fade During Gameplay</h3>
 Alternative: Palette Fade</h3>
 <p>Instead of hardware brightness, modify palette colors: </p><div class="fragment"><div class="line"><span class="comment">/* Fade palette toward black */</span></div>
 <div class="line"><span class="keywordflow">for</span> (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> = 0; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a> &lt; 256; <a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>++) {</div>
-<div class="line">    <a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] = (<a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] * <a class="code hl_variable" href="games_2rpg_2main_8c.html#a0de00e990f7f0ba3ca89aac35bb35ac2">fade_level</a>) &gt;&gt; 4;</div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] = (<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>[<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>] * <a class="code hl_variable" href="games_2rpg_2main_8c.html#a0de00e990f7f0ba3ca89aac35bb35ac2">fade_level</a>) &gt;&gt; 4;</div>
 <div class="line">}</div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(<a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, 512);</div>
-<div class="ttc" id="abackgrounds_2mode1__lz77_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div></div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0, 512);</div>
 <div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
-<div class="ttc" id="agames_2rpg_2main_8c_html_a0de00e990f7f0ba3ca89aac35bb35ac2"><div class="ttname"><a href="games_2rpg_2main_8c.html#a0de00e990f7f0ba3ca89aac35bb35ac2">fade_level</a></div><div class="ttdeci">static u8 fade_level</div><div class="ttdef"><b>Definition</b> main.c:173</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
+<div class="ttc" id="agames_2rpg_2main_8c_html_a0de00e990f7f0ba3ca89aac35bb35ac2"><div class="ttname"><a href="games_2rpg_2main_8c.html#a0de00e990f7f0ba3ca89aac35bb35ac2">fade_level</a></div><div class="ttdeci">static u8 fade_level</div><div class="ttdef"><b>Definition</b> main.c:169</div></div>
 </div><!-- fragment --><p>This allows fading specific layers independently.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="whats-next-7"></a>

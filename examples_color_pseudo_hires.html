@@ -127,7 +127,7 @@ $(function(){initNavTree('examples_color_pseudo_hires.html','',''); });
 </blockquote>
 <p><img src="pseudo_hires.png" alt="" class="inline" title="Screenshot"/>    </p>
 <p>BG1 (red horizontal bars) is on the main screen, BG2 (blue vertical bars, scrolling) on the sub screen, and colour math is off: without pseudo-hires the sub screen never reaches the output. With it, the PPU outputs 512 pixels per line, the sub screen on the even columns and the main screen on the odd ones; a CRT on composite blends each pair, and so does an emulator's 256-pixel view — purple where the bars cross. Press <b>A</b> to toggle it.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-20"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-21"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/color/pseudo_hires</div>
@@ -150,8 +150,8 @@ What You'll See</h2>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="testing-3"></a>
 Testing</h2>
-<p><span class="tt">tools/luna-test/manifests/color_pseudo_hires.toml</span> presses A twice and checks SETINI ($08, $00, $08), the screen designations and that BG2 keeps scrolling.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-35"></a>
+<p><span class="tt">testing/manifests/color_pseudo_hires.toml</span> presses A twice and checks SETINI ($08, $00, $08), the screen designations and that BG2 keeps scrolling.</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-32"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

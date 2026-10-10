@@ -154,7 +154,7 @@ A1. Install Prerequisites</h3>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="a2-get-an-emulator"></a>
 A2. Get an Emulator</h3>
-<p><b>luna</b> is the SDK's emulator: it plays ROMs, runs the test harness and debugs (<span class="tt"><a class="el" href="debugging_8md.html">tutorials/debugging.md</a></span>). <span class="tt">scripts/install-luna.sh</span> fetches the pinned release for Linux, macOS or Windows (MSYS2 / Git Bash) into <span class="tt">tools/luna-test/bin/</span>: <span class="tt">luna</span> (headless: tests, state, debugging) and <span class="tt">luna-gui</span> (a window you play in). Any other SNES emulator works too, for a second opinion:</p>
+<p><b>luna</b> is the SDK's emulator: it plays ROMs, runs the test harness and debugs (<span class="tt"><a class="el" href="debugging_8md.html">tutorials/debugging.md</a></span>). <span class="tt">scripts/install-luna.sh</span> fetches the pinned release for Linux, macOS or Windows (MSYS2 / Git Bash) into <span class="tt">testing/bin/</span>: <span class="tt">luna</span> (headless: tests, state, debugging) and <span class="tt">luna-gui</span> (a window you play in). Any other SNES emulator works too, for a second opinion:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Emulator  </th><th class="markdownTableHeadNone">Best For  </th><th class="markdownTableHeadNone">Download  </th></tr>
@@ -180,14 +180,14 @@ A3. Download OpenSNES SDK</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Windows x86_64  </td><td class="markdownTableBodyNone"><span class="tt">opensnes_&lt;version&gt;_windows_x86_64.zip</span>  </td></tr>
 </table>
-<p>Extract the archive somewhere permanent (e.g., <span class="tt">~/opensnes</span> or <span class="tt">C:\opensnes</span>).</p>
+<p>Extract the archive somewhere permanent (e.g., <span class="tt">~/opensnes</span> or <span class="tt">C:\opensnes</span>). It holds what a project build needs: the toolchain and asset tools in <span class="tt">bin/</span>, the library, the build system, the starter project. The documentation you are reading is online at <a href="https://k0b3n4irb.github.io/opensnes/">https://k0b3n4irb.github.io/opensnes/</a> and the examples come as a separate, platform-independent archive on the same releases page: <span class="tt">opensnes-examples_&lt;version&gt;.zip</span> (sources, assets, and every ROM already built under <span class="tt">examples/bin/</span>).</p>
 <h3 class="doxsection"><a class="anchor" id="a4-run-your-first-rom"></a>
 A4. Run Your First ROM</h3>
-<p>The SDK comes with pre-built example ROMs:</p>
-<div class="fragment"><div class="line">cd opensnes/examples/text/print_string</div>
+<p>Extract the examples archive next to the SDK and pick a ROM:</p>
+<div class="fragment"><div class="line">cd opensnes-examples_&lt;version&gt;/examples/text/print_string</div>
 <div class="line"> </div>
 <div class="line"># Play it in luna&#39;s window (install it once from the SDK root: scripts/install-luna.sh)</div>
-<div class="line">../../../tools/luna-test/bin/luna-gui print_string.sfc</div>
+<div class="line">~/opensnes/testing/bin/luna-gui print_string.sfc</div>
 </div><!-- fragment --><blockquote class="doxtable">
 <p>Any other SNES emulator opens the <span class="tt">.sfc</span> as well (Mesen, bsnes, Snes9x — see the table above). </p>
 </blockquote>
@@ -205,7 +205,7 @@ A5. Create Your Own Project</h3>
 <li><b><span class="tt">--template blank</span></b> — a "HELLO SNES!" text screen, the simplest starting point.</li>
 <li><b><span class="tt">--template <a class="el" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span></b> — a white sprite you move with the D-pad, a starting point for an action game.</li>
 </ul>
-<p>Other commands: <span class="tt">opensnes build</span>, <span class="tt">opensnes clean</span>, and <span class="tt">opensnes doctor</span> (checks your toolchain, library, and emulator and tells you what is missing). Run <span class="tt">opensnes help</span> for the full list.</p>
+<p>Other commands (<a class="el" href="tools_opensnes.html" title="opensnes — the project tool">opensnes — the project tool</a>): <span class="tt">opensnes build</span>, <span class="tt">opensnes clean</span>, and <span class="tt">opensnes doctor</span> (checks your toolchain, library, and emulator and tells you what is missing). Run <span class="tt">opensnes --help</span> for the full list.</p>
 <h4 class="doxsection"><a class="anchor" id="manual-setup-the-long-way"></a>
 Manual setup (the long way)</h4>
 <p>Prefer to wire it by hand, or curious what <span class="tt">init</span> generates? Create a new directory anywhere on your machine:</p>
@@ -257,36 +257,45 @@ Project Structure</h3>
 <div class="line">├── res/            # Assets (optional)</div>
 <div class="line">│   ├── tiles.png</div>
 <div class="line">│   └── music.it</div>
-<div class="line">└── test/           # Project tests (optional — see below)</div>
-<div class="line">    ├── manifest.toml</div>
-<div class="line">    └── baselines.json</div>
+<div class="line">└── test/           # Project tests (optional — see below): one luna manifest each</div>
+<div class="line">    ├── boot.toml</div>
+<div class="line">    └── walk_right.toml</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="test-your-game"></a>
 Test Your Game</h3>
-<p>Projects can declare automated tests that run in <b>luna</b>, the same cycle-accurate emulator the SDK's own test suite uses. Opt-in is simply the presence of <span class="tt">test/manifest.toml</span> (the <span class="tt"><a class="el" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span> template ships one):</p>
-<div class="fragment"><div class="line">default_steps = 3_000_000</div>
+<p>Projects can declare automated tests that run in <b>luna</b>, the same cycle-accurate emulator the SDK's own test suite uses, with luna's own manifests: one <span class="tt">test/&lt;name&gt;.toml</span> per test, run by <span class="tt">luna test</span>. Opt-in is simply the presence of a <span class="tt">test/*.toml</span> (the <span class="tt"><a class="el" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a></span> template ships two):</p>
+<div class="fragment"><div class="line"># test/boot.toml — a visual baseline and WRAM values at frame 180</div>
+<div class="line">rom = &quot;../my-snes-game.sfc&quot;</div>
+<div class="line">frames = 180</div>
 <div class="line"> </div>
-<div class="line"># Visual baseline (fbhash) + WRAM asserts by symbol name.</div>
-<div class="line"># Assert values are little-endian hex bytes (an s16 of 120 -&gt; &quot;7800&quot;).</div>
-<div class="line">[tests.boot]</div>
-<div class="line">assert = [&quot;player_x = 7800&quot;]</div>
+<div class="line">[asserts]</div>
+<div class="line">fbhash = &quot;&quot;                       # the frame&#39;s hash; `make test-update` fills it</div>
 <div class="line"> </div>
-<div class="line"># Input-driven: hold RIGHT for 60 frames, then check the game state.</div>
-<div class="line"># Input format is &quot;frame:buttons_hex&quot; (RIGHT = 0x100).</div>
-<div class="line">[tests.walk_right]</div>
-<div class="line">input = &quot;30:0x100,90:0&quot;</div>
-<div class="line">assert = [&quot;player_x = b400&quot;]</div>
+<div class="line">[[checkpoint]]</div>
+<div class="line">at_frame = 180</div>
+<div class="line">[checkpoint.values]</div>
+<div class="line">player_x = 120                    # by the variable&#39;s name in your C</div>
+<div class="line">player_y = 100</div>
+</div><!-- fragment --><div class="fragment"><div class="line"># test/walk_right.toml — hold RIGHT for 60 frames, then check the game state</div>
+<div class="line">rom = &quot;../my-snes-game.sfc&quot;</div>
+<div class="line">frames = 150</div>
+<div class="line">input = &quot;30:0x100,90:0&quot;           # &quot;frame:buttons_hex&quot; (RIGHT = 0x100), until frame 90</div>
+<div class="line"> </div>
+<div class="line">[[checkpoint]]</div>
+<div class="line">at_frame = 150</div>
+<div class="line">[checkpoint.values]</div>
+<div class="line">player_x = 180                    # 120 + 60</div>
 </div><!-- fragment --><p>Workflow:</p>
 <div class="fragment"><div class="line">scripts/install-luna.sh   # once, from the SDK root: fetch the pinned luna</div>
-<div class="line">make test-update          # seed test/baselines.json + reference PNGs</div>
+<div class="line">make test-update          # seed the visual baselines (asserts.fbhash) in place</div>
 <div class="line">make test                 # from now on: exit 0 = green, 1 = regression</div>
 </div><!-- fragment --><p>(Or <span class="tt">opensnes test</span> / <span class="tt">opensnes test --update</span> from the project directory.)</p>
-<p>Three oracles run per test:</p>
+<p>What a manifest can judge:</p>
 <ul>
-<li><b>WRAM asserts</b> — <span class="tt">symbol = hexbytes</span> entries are checked by luna directly, with symbol names resolved from your ROM's <span class="tt">.sym</span> file;</li>
-<li><b>Visual baselines</b> — tests <em>without</em> an <span class="tt">input</span> script compare a framebuffer hash per capture point (<span class="tt">steps</span> can be a list for multi-point capture); failures leave the actual PNG in <span class="tt">test/actual/</span> for eyeballing;</li>
-<li><b>In-ROM assertions</b> — any <span class="tt"><a class="el" href="debug_8h.html#ace0973c12e9f5c64790c99c36375f086" title="Runtime assertion — breaks in emulator if condition is false.">SNES_ASSERT</a></span> that fires during a visual run fails the test for free.</li>
+<li><b>WRAM values</b> — <span class="tt">[checkpoint.values]</span> entries are read by luna at <span class="tt">at_frame</span>, with symbol names resolved from your ROM's <span class="tt">.sym</span> file: write the name the variable has in your C. Two sources may define a <span class="tt">static</span> of the same name; luna then refuses the bare name and lists the candidates, each with its source file as a suffix (<span class="tt">"player_x.main"</span> for the one of <span class="tt">main.c</span>, quoted because of the dot). A value is a number, or <span class="tt">{ eq = 0x10, width = 1 }</span> to set the width; <span class="tt">[checkpoint.delta]</span> says <span class="tt">"increased"</span> / <span class="tt">"unchanged"</span> between two checkpoints;</li>
+<li><b>Visual baselines</b> — <span class="tt">asserts.fbhash</span> is the hash of the frame at <span class="tt">frames</span>; <span class="tt">make test-update</span> rewrites it in place, comments kept, after an intended change of what the game shows;</li>
+<li><b>The machine</b> — <span class="tt">region = "<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a>"</span> runs the test under PAL, <span class="tt">power_on</span> / <span class="tt">seed</span> the RAM the ROM boots on; <span class="tt">[asserts.dma] unsafe_writes = 0</span> fails on a VRAM write outside blanking.</li>
 </ul>
-<p>Commit <span class="tt">test/</span> to your repo; rerun <span class="tt">make test-update</span> when you intentionally change what the game shows or does.</p>
+<p><span class="tt">luna test --help</span> lists everything a manifest can say. Commit <span class="tt">test/</span> to your repo; rerun <span class="tt">make test-update</span> when you intentionally change what the game shows.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="path-b-sdk-developer"></a>
 Path B: SDK Developer</h2>

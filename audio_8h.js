@@ -61,6 +61,5 @@ var audio_8h =
     [ "audioSetVolume", "group__audio__volume.html#gae5aa27f79f19beb398a3163a76a87d05", null ],
     [ "audioStopAll", "group__audio__playback.html#ga08d3a1cc8f2e0e4bd9da475bc6e2afc9", null ],
     [ "audioStopVoice", "group__audio__playback.html#gaab4342a06378dea04a8d7a9e032e222f", null ],
-    [ "audioUnloadSample", "group__audio__samples.html#ga09d2e53a4a311fffed540c0410edab88", null ],
-    [ "audioUpdate", "group__audio__init.html#gac25577949f0b4226318e6fb714cc6ef9", null ]
+    [ "audioUnloadSample", "group__audio__samples.html#ga09d2e53a4a311fffed540c0410edab88", null ]
 ];

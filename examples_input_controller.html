@@ -127,15 +127,15 @@ $(function(){initNavTree('examples_input_controller.html','',''); });
 <img src="controller.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-24"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-23"></a>
 What You'll Learn</h2>
 <ul>
-<li>How to read controller state with <span class="tt">padHeld(0)</span> (returns a 16-bit bitmask)</li>
+<li>How to read controller state with <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(0)</a></span> (returns a 16-bit bitmask)</li>
 <li>The SNES button constants: <span class="tt"><a class="el" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga832280ef5a7afeda19f32939951e8b10">KEY_X</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gad9db04899df9fe71bb221c02721e28ac">KEY_Y</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#ga90b3ea4616669bfe7fab021c68db7abf">KEY_START</a></span>, <span class="tt"><a class="el" href="group__input__buttons.html#gaa8d060e03fe1ea2c54b64698c1b6c8b5">KEY_SELECT</a></span></li>
 <li>That the NMI handler reads joypads automatically — no manual polling needed</li>
-<li>The difference between <span class="tt"><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></span> (held right now) and <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> (just pressed this frame)</li>
+<li>The difference between <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> (held right now) and <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> (just pressed this frame)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="controls-16"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-15"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -159,24 +159,24 @@ Controls</h2>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="how-input-works-on-the-snes"></a>
 How Input Works on the SNES</h3>
-<p>The SNES joypad is a shift register — the hardware clocks out 16 bits of button state every frame during the auto-joypad read period (after VBlank). The NMI handler in <span class="tt">crt0.asm</span> captures this automatically into <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321" title="Raw joypad state buffer written by the NMI handler every frame.">pad_keys</a>[]</span>. Your code never touches hardware registers directly.</p>
+<p>The SNES joypad is a shift register — the hardware clocks out 16 bits of button state every frame during the auto-joypad read period (after VBlank). The NMI handler in <span class="tt">crt0.asm</span> captures this automatically into <span class="tt"><a class="el" href="input_8h.html#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a>[]</span>. Your code never touches hardware registers directly.</p>
 <h3 class="doxsection"><a class="anchor" id="padheld-vs-padpressed"></a>
 padHeld vs padPressed</h3>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> held = <a class="code hl_function" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a>(0);      <span class="comment">// Buttons held RIGHT NOW (every frame)</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pressed = <a class="code hl_function" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a>(0); <span class="comment">// Buttons pressed THIS FRAME ONLY (edge detection)</span></div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> held = <a class="code hl_define" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(0);      <span class="comment">// Buttons held RIGHT NOW (every frame)</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pressed = <a class="code hl_define" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0); <span class="comment">// Buttons pressed THIS FRAME ONLY (edge detection)</span></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-<div class="ttc" id="ainput_8h_html_a4f095dc343f6b5ac5712cc69e1bd20b5"><div class="ttname"><a href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5">padHeld</a></div><div class="ttdeci">u16 padHeld(u8 pad)</div><div class="ttdoc">Get buttons currently held.</div></div>
-<div class="ttc" id="ainput_8h_html_ac697a43420bb5e1a038e129d79e88de8"><div class="ttname"><a href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8">padPressed</a></div><div class="ttdeci">u16 padPressed(u8 pad)</div><div class="ttdoc">Get buttons pressed this frame.</div></div>
-</div><!-- fragment --><p>Use <span class="tt"><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld</a></span> for continuous actions (movement, charging). Use <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed</a></span> for one-shot actions (jump, menu select, pause toggle).</p>
+<div class="ttc" id="ainput_8h_html_a91ebd3f122c9ba2913248112f7dc3647"><div class="ttname"><a href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></div><div class="ttdeci">#define padHeld(pad)</div><div class="ttdef"><b>Definition</b> input.h:158</div></div>
+<div class="ttc" id="ainput_8h_html_aed650db72d53439d6b554063a88de5cb"><div class="ttname"><a href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a></div><div class="ttdeci">#define padPressed(pad)</div><div class="ttdef"><b>Definition</b> input.h:159</div></div>
+</div><!-- fragment --><p>Use <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></span> for continuous actions (movement, charging). Use <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a></span> for one-shot actions (jump, menu select, pause toggle).</p>
 <h3 class="doxsection"><a class="anchor" id="button-bitmask"></a>
 Button Bitmask</h3>
 <p>Multiple buttons can be held simultaneously. Test with bitwise AND:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) { <span class="comment">/* A is held */</span> }</div>
 <div class="line"><span class="keywordflow">if</span> ((pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a>) &amp;&amp; (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a>)) { <span class="comment">/* both shoulders held */</span> }</div>
-<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga600bb1ce7eb7b6ca4dcbb41546c32ec5"><div class="ttname"><a href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></div><div class="ttdeci">#define KEY_L</div><div class="ttdef"><b>Definition</b> input.h:83</div></div>
-<div class="ttc" id="agroup__input__buttons_html_gaa020da9e48a194889ac72f94408b3c25"><div class="ttname"><a href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></div><div class="ttdeci">#define KEY_R</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-49"></a>
+<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga600bb1ce7eb7b6ca4dcbb41546c32ec5"><div class="ttname"><a href="group__input__buttons.html#ga600bb1ce7eb7b6ca4dcbb41546c32ec5">KEY_L</a></div><div class="ttdeci">#define KEY_L</div><div class="ttdef"><b>Definition</b> input.h:86</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gaa020da9e48a194889ac72f94408b3c25"><div class="ttname"><a href="group__input__buttons.html#gaa020da9e48a194889ac72f94408b3c25">KEY_R</a></div><div class="ttdeci">#define KEY_R</div><div class="ttdef"><b>Definition</b> input.h:87</div></div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-46"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -192,10 +192,10 @@ Modules Used</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">text</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e" title="Initialize the text rendering system.">textInit()</a></span>, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt()</a></span>, <span class="tt"><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush()</a></span> for button name display  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5" title="Get buttons currently held.">padHeld()</a></span>, <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span> for reading controller state  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span>, <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> for reading controller state  </td></tr>
 </table>
 <p>Also linked: <span class="tt">gameloop</span> — the <span class="tt"><a class="el" href="gameloop_8h.html#a5d1a6a94538a167bfa984b00cf166af6" title="Run the OpenSNES game loop. Never returns.">gameLoopRun()</a></span> frame loop.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-29"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-30"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/controller</div>

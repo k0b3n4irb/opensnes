@@ -126,7 +126,7 @@ $(function(){initNavTree('examples_games_breakout.html','',''); });
 <p>A fully playable Breakout clone — ball, paddle, bricks, levels, score, and shadows. This is the "put it all together" example. If you can follow this one, you can make a game. </p>
 </blockquote>
 <p><img src="breakout.png" alt="" class="inline" title="Screenshot"/>    </p>
-<h2 class="doxsection"><a class="anchor" id="controls-10"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-9"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,12 +140,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Any button  </td><td class="markdownTableBodyNone">Continue after losing a ball  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-24"></a>
-Build &amp; Run</h2>
-<div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
-<div class="line">make -C examples/games/breakout</div>
-</div><!-- fragment --><p>Then open <span class="tt">breakout.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-20"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-19"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to pack tilemaps in VRAM when space is tight (yes, they can overlap on purpose)</li>
@@ -156,6 +151,11 @@ What You'll Learn</h2>
 <li>Grid-based collision without testing 100 bricks individually</li>
 </ul>
 <hr  />
+<h2 class="doxsection"><a class="anchor" id="build--run-25"></a>
+Build &amp; Run</h2>
+<div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
+<div class="line">make -C examples/games/breakout</div>
+</div><!-- fragment --><p>Then open <span class="tt">breakout.sfc</span> in your emulator (Mesen2 recommended).</p>
 <h2 class="doxsection"><a class="anchor" id="walkthrough-2"></a>
 Walkthrough</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-lights-off-load-everything"></a>
@@ -164,9 +164,9 @@ Walkthrough</h2>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x80;  <span class="comment">// Force blank — screen goes black, VRAM is ours</span></div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a528a98f57a33487a445fc0fdd6b3b71e">tiles1</a>, 0x1000, 0x0F00);  <span class="comment">// 3840 bytes of BG tiles</span></div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="backgrounds_2mode3_2main_8c.html#a4e2ff104ea000ee1feab2f58b34bb791">tiles2</a>, 0x2000, 0x0250);  <span class="comment">// 592 bytes of sprite tiles</span></div>
-<div class="ttc" id="abackgrounds_2mode3_2main_8c_html_a4e2ff104ea000ee1feab2f58b34bb791"><div class="ttname"><a href="backgrounds_2mode3_2main_8c.html#a4e2ff104ea000ee1feab2f58b34bb791">tiles2</a></div><div class="ttdeci">u8 tiles2[]</div></div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a4e2ff104ea000ee1feab2f58b34bb791">tiles2</a>, 0x2000, 0x0250);  <span class="comment">// 592 bytes of sprite tiles</span></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a4e2ff104ea000ee1feab2f58b34bb791"><div class="ttname"><a href="games_2breakout_2main_8c.html#a4e2ff104ea000ee1feab2f58b34bb791">tiles2</a></div><div class="ttdeci">u8 tiles2[]</div><div class="ttdoc">Sprite tiles: ball, paddle, and shadow shapes (4bpp, ~592 bytes).</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a528a98f57a33487a445fc0fdd6b3b71e"><div class="ttname"><a href="games_2breakout_2main_8c.html#a528a98f57a33487a445fc0fdd6b3b71e">tiles1</a></div><div class="ttdeci">u8 tiles1[]</div><div class="ttdoc">BG tiles: border, bricks, and font glyphs (4bpp, ~3840 bytes).</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gabec6eb1bc9f87a1143464c7418c96388"><div class="ttname"><a href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a></div><div class="ttdeci">#define REG_INIDISP</div><div class="ttdoc">Display control (W).</div><div class="ttdef"><b>Definition</b> registers.h:49</div></div>
 </div><!-- fragment --><blockquote class="doxtable">
@@ -201,12 +201,12 @@ Walkthrough</h2>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="games_2breakout_2main_8c.html#a0c82ae47431846a462f117483de2ede7">mycopy</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)<a class="code hl_variable" href="games_2breakout_2main_8c.html#a03a4934bef9319bc930389c594beaeda">blockmap</a>, <a class="code hl_variable" href="games_2breakout_2main_8c.html#a91c63eb9edd62eb732e0452a4b373c2a">bg1map</a>, 0x800);</div>
 <div class="line"><a class="code hl_function" href="games_2breakout_2main_8c.html#a0c82ae47431846a462f117483de2ede7">mycopy</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)<a class="code hl_variable" href="games_2breakout_2main_8c.html#a45cc3a09fc11ee9da04087957808bcd3">backmap</a>,  <a class="code hl_variable" href="games_2breakout_2main_8c.html#a8e7548ddd361df192f748341942e1088">bg2map</a>, 0x800);</div>
-<div class="line"><a class="code hl_function" href="games_2breakout_2main_8c.html#a0c82ae47431846a462f117483de2ede7">mycopy</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)<a class="code hl_variable" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13">pal</a>,      <a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0x200);</div>
-<div class="ttc" id="abackgrounds_2mode1__lz77_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div></div>
+<div class="line"><a class="code hl_function" href="games_2breakout_2main_8c.html#a0c82ae47431846a462f117483de2ede7">mycopy</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)<a class="code hl_variable" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13">pal</a>,      <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, 0x200);</div>
 <div class="ttc" id="abackgrounds_2mode4_2main_8c_html_aac60372fe4d6c084814898fafeb64f13"><div class="ttname"><a href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13">pal</a></div><div class="ttdeci">static u16 pal[256]</div><div class="ttdoc">The 256-colour palette, built at boot.</div><div class="ttdef"><b>Definition</b> main.c:57</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a0c82ae47431846a462f117483de2ede7"><div class="ttname"><a href="games_2breakout_2main_8c.html#a0c82ae47431846a462f117483de2ede7">mycopy</a></div><div class="ttdeci">static void mycopy(u8 FAR *dest, const u8 *src, u16 len)</div><div class="ttdoc">Simple byte-by-byte memory copy.</div><div class="ttdef"><b>Definition</b> main.c:251</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a8e7548ddd361df192f748341942e1088"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8e7548ddd361df192f748341942e1088">bg2map</a></div><div class="ttdeci">u8 bg2map[]</div><div class="ttdoc">BG3 tilemap: all 4 background fill patterns concatenated (2KB).</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a91c63eb9edd62eb732e0452a4b373c2a"><div class="ttname"><a href="games_2breakout_2main_8c.html#a91c63eb9edd62eb732e0452a4b373c2a">bg1map</a></div><div class="ttdeci">u8 bg1map[]</div><div class="ttdoc">BG1 tilemap: playfield border frame and HUD layout (2KB).</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 </div><!-- fragment --><blockquote class="doxtable">
 <p><b>Why are these in <span class="tt">data.asm</span> instead of C?</b> They're big — 2 KB each. If you declared them as C static arrays, the compiler would place them around <span class="tt">$00A0</span>, which crashes into the OAM buffer at <span class="tt">$0300</span>-<span class="tt">$051F</span>. In assembly, we pin them to <span class="tt">$0800</span> with <span class="tt">.RAMSECTION ... ORGA $0800 FORCE</span>. Problem solved. </p>
@@ -290,7 +290,7 @@ Walkthrough</h2>
 9. The Game Loop</h3>
 <p>One iteration per frame, clean and predictable:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code hl_function" href="games_2breakout_2main_8c.html#a63cb35fc84a9e0d4a5a8f24a52e330df">run_frame</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321">pad_keys</a>[0];    <span class="comment">// Read joypad (filled by NMI handler every frame)</span></div>
+<div class="line">    <a class="code hl_variable" href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a> = <a class="code hl_variable" href="input_8h.html#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a>[0];    <span class="comment">// Read joypad (filled by NMI handler every frame)</span></div>
 <div class="line">    <a class="code hl_function" href="games_2breakout_2main_8c.html#ac642a9b1897de1b5599c80f5582d8a50">handle_pause</a>();</div>
 <div class="line">    <a class="code hl_function" href="games_2breakout_2main_8c.html#a86f0a72efd3f0594182d7d3ffca5fe7e">move_paddle</a>();</div>
 <div class="line">    <a class="code hl_function" href="games_2breakout_2main_8c.html#a3857ebece42afc91e3df0ce596a2e2a0">move_ball</a>();</div>
@@ -312,10 +312,10 @@ Walkthrough</h2>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ab3fb8acabd08cd49c4d24492477abc52"><div class="ttname"><a href="games_2breakout_2main_8c.html#ab3fb8acabd08cd49c4d24492477abc52">check_paddle</a></div><div class="ttdeci">static void check_paddle(void)</div><div class="ttdoc">Check collision with paddle.</div><div class="ttdef"><b>Definition</b> main.c:688</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ac642a9b1897de1b5599c80f5582d8a50"><div class="ttname"><a href="games_2breakout_2main_8c.html#ac642a9b1897de1b5599c80f5582d8a50">handle_pause</a></div><div class="ttdeci">static void handle_pause(void)</div><div class="ttdoc">Handle pause functionality.</div><div class="ttdef"><b>Definition</b> main.c:607</div></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_ad0fcab62a86a951249be4547707961b2"><div class="ttname"><a href="games_2breakout_2main_8c.html#ad0fcab62a86a951249be4547707961b2">draw_screen</a></div><div class="ttdeci">static void draw_screen(void)</div><div class="ttdoc">Update all sprite positions.</div><div class="ttdef"><b>Definition</b> main.c:294</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_ae9c339aae8aff07a48de9f6355e02321"><div class="ttname"><a href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321">pad_keys</a></div><div class="ttdeci">u16 pad_keys[]</div><div class="ttdoc">Raw joypad state buffer written by the NMI handler every frame.</div></div>
+<div class="ttc" id="ainput_8h_html_a62c2179d57a63ddbc863a036e0fc7a71"><div class="ttname"><a href="input_8h.html#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a></div><div class="ttdeci">u16 pad_keys[5]</div></div>
 <div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
 </div><!-- fragment --><blockquote class="doxtable">
-<p>Note that we read <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321" title="Raw joypad state buffer written by the NMI handler every frame.">pad_keys</a>[0]</span> directly — not through <span class="tt"><a class="el" href="input_8h.html#ac697a43420bb5e1a038e129d79e88de8" title="Get buttons pressed this frame.">padPressed()</a></span>. This is the raw buffer that the NMI handler fills every frame. Sometimes the simple way is the right way. </p>
+<p>Note that we read <span class="tt"><a class="el" href="input_8h.html#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a>[0]</span> directly — not through <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span>. This is the raw buffer that the NMI handler fills every frame. Sometimes the simple way is the right way. </p>
 </blockquote>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="tips--tricks-1"></a>
@@ -323,7 +323,7 @@ Tips &amp; Tricks</h2>
 <ul>
 <li><b>Getting a pink flash on level change?</b> Your overlapping tilemap DMAs are split across two VBlanks. Put them both after the same <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> call.</li>
 <li><b>Sprite 0 looks glitched?</b> Known issue related to WRAM/OAM mirroring. Just start at index 1 and hide sprite 0 with <span class="tt">oamHide(0)</span>. Not glamorous, but it works.</li>
-<li><b>Why <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#a0c82ae47431846a462f117483de2ede7" title="Simple byte-by-byte memory copy.">mycopy()</a></span> instead of <span class="tt">memcpy()</span>?</b> Standard memcpy can have issues with cross-bank addressing on the 65816. The three-line <span class="tt">while(len--)</span> version is dumb but reliable for bank 0 addresses.</li>
+<li><b>Why <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#a0c82ae47431846a462f117483de2ede7" title="Simple byte-by-byte memory copy.">mycopy()</a></span> instead of <span class="tt"><a class="el" href="string_8h.html#aa9d0690efb1119eb2e6acfbcbaee0127" title="Copy n bytes from src to dst.">memcpy()</a></span>?</b> Standard memcpy can have issues with cross-bank addressing on the 65816. The three-line <span class="tt">while(len--)</span> version is dumb but reliable for bank 0 addresses.</li>
 <li><b>Why are loop variables global?</b> <span class="tt">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a> <a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>, <a class="el" href="games_2breakout_2main_8c.html#a8a71261a266a41e4450a2f006404ea8a">j</a>, <a class="el" href="games_2breakout_2main_8c.html#adb6f3c87384808b3b79f7d8e3c2345f6">k</a>;</span> at file scope reduces stack pressure. On the 65816, stack-relative addressing is slower than direct/zero-page access. In a game loop running 60 times per second, this matters.</li>
 </ul>
 <hr  />
@@ -366,7 +366,7 @@ Pre-Converted Assets</h3>
 <p>The <span class="tt">res/</span> folder contains <span class="tt">.dat</span> files — raw binary data ready for DMA to VRAM. These were originally converted from PVSnesLib's asset pipeline. No <span class="tt">gfx4snes</span> step in the Makefile because the conversion was done once, offline, and the results checked into the repository.</p>
 <p>For a new game, you'd typically add a gfx4snes rule:</p>
 <div class="fragment"><div class="line">GFXSRC := res/tiles.png res/sprites.png</div>
-</div><!-- fragment --><p>This tells <span class="tt">make/common.mk</span> to run <span class="tt">gfx4snes</span> on each PNG, producing <span class="tt">.pic</span> (tiles), <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> (palette), and <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> (tilemap) files.</p>
+</div><!-- fragment --><p>This tells <span class="tt">make/common.mk</span> to run <span class="tt">gfx4snes</span> on each PNG, producing <span class="tt">.pic</span> (tiles), <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> (palette), and <span class="tt">.map</span> (tilemap) files.</p>
 <h3 class="doxsection"><a class="anchor" id="why-these-modules-1"></a>
 Why These Modules?</h3>
 <table class="markdownTable">
@@ -381,10 +381,10 @@ Why These Modules?</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr()</a></span> for configuring BG1/BG3 tilemap addresses  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone">Joypad buffers — though Breakout reads <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae9c339aae8aff07a48de9f6355e02321" title="Raw joypad state buffer written by the NMI handler every frame.">pad_keys</a>[0]</span> directly  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">input</span>  </td><td class="markdownTableBodyNone">Joypad buffers — though Breakout reads <span class="tt"><a class="el" href="input_8h.html#a62c2179d57a63ddbc863a036e0fc7a71">pad_keys</a>[0]</span> directly  </td></tr>
 </table>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-39"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-36"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-1"></a>

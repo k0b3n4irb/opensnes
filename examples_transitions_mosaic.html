@@ -136,7 +136,7 @@ What This Example Shows</h2>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-12"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">effects/fading</span> first (brightness control basics).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-37"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-36"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -145,7 +145,7 @@ Controls</h2>
 <td class="markdownTableBodyNone">Any button  </td><td class="markdownTableBodyNone">Advance to next transition step  </td></tr>
 </table>
 <p>The cycle repeats: fade out -&gt; fade in -&gt; mosaic out -&gt; mosaic in -&gt; (loop)</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-53"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-54"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/transitions/mosaic</div>
@@ -174,7 +174,7 @@ How It Works</h2>
 <div class="ttc" id="agroup__layer__enable_html_ga03db8f61af46c3dad07c27597f7f52f3"><div class="ttname"><a href="group__layer__enable.html#ga03db8f61af46c3dad07c27597f7f52f3">LAYER_BG1</a></div><div class="ttdeci">#define LAYER_BG1</div><div class="ttdef"><b>Definition</b> video.h:108</div></div>
 <div class="ttc" id="amosaic_8h_html_a706149f9c377234abaca910959bddb0d"><div class="ttname"><a href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d">mosaicFadeOut</a></div><div class="ttdeci">void mosaicFadeOut(u8 speed)</div><div class="ttdoc">Animate mosaic fade out (clear -&gt; pixelated).</div></div>
 <div class="ttc" id="amosaic_8h_html_ab9d8f44d0140477e5b748ac9773d34df"><div class="ttname"><a href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df">mosaicSetLayers</a></div><div class="ttdeci">void mosaicSetLayers(u8 bgMask)</div><div class="ttdoc">Set the backgrounds the mosaic applies to — REPLACES the previous set.</div></div>
-<div class="ttc" id="atransitions_2mosaic_2main_8c_html_a8f770fb59cba307b44c7c22adaeed074"><div class="ttname"><a href="transitions_2mosaic_2main_8c.html#a8f770fb59cba307b44c7c22adaeed074">doMosaicOut</a></div><div class="ttdeci">void doMosaicOut(void)</div><div class="ttdoc">Activate the hardware mosaic filter and animate pixel blocks growing.</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
+<div class="ttc" id="atransitions_2mosaic_2main_8c_html_a8f770fb59cba307b44c7c22adaeed074"><div class="ttname"><a href="transitions_2mosaic_2main_8c.html#a8f770fb59cba307b44c7c22adaeed074">doMosaicOut</a></div><div class="ttdeci">void doMosaicOut(void)</div><div class="ttdoc">Activate the hardware mosaic filter and animate pixel blocks growing.</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
 </div><!-- fragment --><p>The library functions <span class="tt"><a class="el" href="mosaic_8h.html#ab9d8f44d0140477e5b748ac9773d34df" title="Set the backgrounds the mosaic applies to — REPLACES the previous set.">mosaicSetLayers()</a></span> and <span class="tt"><a class="el" href="mosaic_8h.html#a706149f9c377234abaca910959bddb0d" title="Animate mosaic fade out (clear -&gt; pixelated).">mosaicFadeOut()</a></span> write to register $2106 (MOSAIC). The parameter <span class="tt">3</span> controls the speed of the transition.</p>
 <p>Register $2106 layout:</p><ul>
 <li><b>Bits 7-4</b>: Block size (0 = 1x1 pixel, 15 = 16x16 pixel blocks)</li>
@@ -191,7 +191,7 @@ How It Works</h2>
 <li>Mosaic in (blocks shrink to reveal the scene)</li>
 </ol>
 <p>This gives a polished "dissolve" effect.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-54"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-53"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="mosaic-register-2106"></a>
 Mosaic Register ($2106)</h3>
@@ -210,7 +210,7 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Fade/mosaic transition logic, button-driven state machine  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">Background tiles, tilemap, and palette data  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/opensnes.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the picture (<span class="tt">opensnes-tileset</span>); the build converts and links it, <span class="tt">res/opensnes.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">res/opensnes.png</span>  </td><td class="markdownTableBodyNone">Source background image  </td></tr>
 <tr class="markdownTableRowEven">
@@ -227,7 +227,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-79"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-75"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mosaic</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

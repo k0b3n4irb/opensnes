@@ -160,10 +160,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:a8de00734310d578780eb7243d5e9dda2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signed 1.15 × 1.15 multiply (DSP-1 command $00).  <br /></td></tr>
 <tr class="memitem:a351e716537c49d2587a195d327448f57" id="r_a351e716537c49d2587a195d327448f57"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a351e716537c49d2587a195d327448f57">dsp1Objective</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z)</td></tr>
 <tr class="memdesc:a351e716537c49d2587a195d327448f57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a point by matrix A: local → world (DSP-1 command $0D, "Objective").  <br /></td></tr>
-<tr class="memitem:a9f4e45822ce7d01f4a61a80c136e1aa9" id="r_a9f4e45822ce7d01f4a61a80c136e1aa9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9f4e45822ce7d01f4a61a80c136e1aa9">dsp1Parameter</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="hdma_2hdma__helpers_2main_8c.html#a4b67d017fa4ec6ea13f600ac4e12b7e0">fx</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> fy, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> fz, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> lfe, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> les, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> aas, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> azs)</td></tr>
-<tr class="memdesc:a9f4e45822ce7d01f4a61a80c136e1aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#af14660034a8e2f3a7a33516e48f1ba16" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1SetCamera()</a> with its seven inputs as arguments  <br /></td></tr>
-<tr class="memitem:ad09a7de4eb9586c1da0a738628af9b1f" id="r_ad09a7de4eb9586c1da0a738628af9b1f"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad09a7de4eb9586c1da0a738628af9b1f">dsp1Present</a> (void)</td></tr>
-<tr class="memdesc:ad09a7de4eb9586c1da0a738628af9b1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pre-2026-09-22 name of <a class="el" href="#a81b161546a1a9a9ee0cadf6f103c3244" title="Is a DSP-1 responding? Known-answer self-test.">dsp1IsPresent()</a>. Same routine.  <br /></td></tr>
 <tr class="memitem:a39767ab0d98ace72ba92e541085e1b60" id="r_a39767ab0d98ace72ba92e541085e1b60"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a39767ab0d98ace72ba92e541085e1b60">dsp1Project</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z)</td></tr>
 <tr class="memdesc:a39767ab0d98ace72ba92e541085e1b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Project a world point to the screen (DSP-1 command $06, "Project").  <br /></td></tr>
 <tr class="memitem:a152f59d6d62b0d9f544e08db046de212" id="r_a152f59d6d62b0d9f544e08db046de212"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a152f59d6d62b0d9f544e08db046de212">dsp1Range</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> x, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> y, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> z, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> r)</td></tr>
@@ -394,7 +390,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 
 <p>Is a DSP-1 responding? Known-answer self-test. </p>
 <dl class="section return"><dt>Returns</dt><dd>1 if the chip answered dsp1Multiply(0x4000, 0x4000) == 0x2000, 0 if the status port never raised RQM or the product was wrong.</dd></dl>
-<p>Unlike the other calls this one cannot hang on a missing chip (bounded poll). Use it at boot the way <a class="el" href="sa1_8h.html#aa2c5d1881453f27ceaa36ab5ebf122fc" title="Did the SA-1 boot? (crt0 starts it; this only reads the outcome).">sa1IsReady()</a> / <a class="el" href="superfx_8h.html#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a> are used — e.g. to fall back to software math when running on the wrong board or on an emulator without the firmware. (Named <a class="el" href="#ad09a7de4eb9586c1da0a738628af9b1f" title="The pre-2026-09-22 name of dsp1IsPresent(). Same routine.">dsp1Present()</a> until 2026-09-22.) </p>
+<p>Unlike the other calls this one cannot hang on a missing chip (bounded poll). Use it at boot the way <a class="el" href="sa1_8h.html#aa2c5d1881453f27ceaa36ab5ebf122fc" title="Did the SA-1 boot? (crt0 starts it; this only reads the outcome).">sa1IsReady()</a> / <a class="el" href="superfx_8h.html#ad737693bad4b2b768309bfebf6b5ece8" title="Is a GSU on this cartridge? (crt0 detects it; this reads the outcome).">gsuIsPresent()</a> are used — e.g. to fall back to software math when running on the wrong board or on an emulator without the firmware. (Named dsp1Present() until 2026-09-22; that name was removed on 2026-10-05.) </p>
 
 </div>
 </div>
@@ -464,74 +460,6 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
   </dd>
 </dl>
 <p>Writes <a class="el" href="#a50d2a07715de61e5e3c706de54b856b4" title="dsp1_o0">dsp1_o0</a> = x', <a class="el" href="#a173400a4c478dc40a8754b8b7117cc67" title="dsp1_o1">dsp1_o1</a> = y', <a class="el" href="#a6b8c0440cf7578bc7c98e40d39a43f06" title="dsp1_o2">dsp1_o2</a> = z' (world space). Run dsp1Attitude first to set the matrix. </p>
-
-</div>
-</div>
-<a id="a9f4e45822ce7d01f4a61a80c136e1aa9" name="a9f4e45822ce7d01f4a61a80c136e1aa9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f4e45822ce7d01f4a61a80c136e1aa9">&#9670;&#160;</a></span>dsp1Parameter()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void dsp1Parameter </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>fx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>fy</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>fz</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>lfe</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></td>          <td class="paramname"><span class="paramname"><em>les</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>aas</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>azs</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p><a class="el" href="#af14660034a8e2f3a7a33516e48f1ba16" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1SetCamera()</a> with its seven inputs as arguments </p>
-<p>The same command and the same outputs. (fx, fy, fz, lfe, les, aas, azs) are the fields of <a class="el" href="structDsp1Camera.html" title="The camera of the projection: the seven inputs of DSP-1 command $02, &quot;Parameter&quot;, under their names i...">Dsp1Camera</a> in order. </p>
-
-</div>
-</div>
-<a id="ad09a7de4eb9586c1da0a738628af9b1f" name="ad09a7de4eb9586c1da0a738628af9b1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad09a7de4eb9586c1da0a738628af9b1f">&#9670;&#160;</a></span>dsp1Present()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> dsp1Present </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The pre-2026-09-22 name of <a class="el" href="#a81b161546a1a9a9ee0cadf6f103c3244" title="Is a DSP-1 responding? Known-answer self-test.">dsp1IsPresent()</a>. Same routine. </p>
 
 </div>
 </div>
@@ -689,7 +617,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 <p>Rotate a 2D point about the origin (DSP-1 command $0C, "Rotate"). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Rotation step index, 0..47.">angle</a></td><td>16-bit rotation angle (A) </td></tr>
+    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: 9-tile prefab track (original art).">angle</a></td><td>16-bit rotation angle (A) </td></tr>
     <tr><td class="paramname">x</td><td>point X (I) </td></tr>
     <tr><td class="paramname">y</td><td>point Y (I)</td></tr>
   </table>
@@ -783,7 +711,7 @@ DSP-1 calls are NOT safe inside <a class="el" href="interrupt_8h.html#a54a7e26f7
 <p>Scaled sine and cosine of an angle (DSP-1 command $04, "Triangle"). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Rotation step index, 0..47.">angle</a></td><td>16-bit angle (A; full turn = 2^16) </td></tr>
+    <tr><td class="paramname"><a class="el" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3" title="Mode 7 ground: 9-tile prefab track (original art).">angle</a></td><td>16-bit angle (A; full turn = 2^16) </td></tr>
     <tr><td class="paramname">radius</td><td>integer magnitude (I) to scale the result by</td></tr>
   </table>
   </dd>

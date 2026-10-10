@@ -126,14 +126,9 @@ $(function(){initNavTree('mode7_2perspective__rotate_2main_8c.html','',''); });
 <p>Rotating Mode 7 perspective — full matrix driven by 4 HDMA channels.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/ground.inc&quot;</code><br />
+<code>#include &quot;res/perspective.inc&quot;</code><br />
 </div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a0340fae0459def110b731df3291e7e68" id="r_a0340fae0459def110b731df3291e7e68"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a0340fae0459def110b731df3291e7e68">ANGLES</a>&#160;&#160;&#160;48u</td></tr>
-<tr class="memdesc:a0340fae0459def110b731df3291e7e68"><td class="mdescLeft">&#160;</td><td class="mdescRight">48 rotation steps of 7.5 degrees  <br /></td></tr>
-<tr class="memitem:ab100bf439412df374fb54e1d8bfdabe6" id="r_ab100bf439412df374fb54e1d8bfdabe6"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab100bf439412df374fb54e1d8bfdabe6">TABLE_STRIDE</a>&#160;&#160;&#160;673u</td></tr>
-<tr class="memdesc:ab100bf439412df374fb54e1d8bfdabe6"><td class="mdescLeft">&#160;</td><td class="mdescRight">One angle table: 224 x 3-byte HDMA entries + terminator.  <br /></td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
@@ -143,18 +138,7 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a313857711c86124ca4a23076d196f8e3" id="r_a313857711c86124ca4a23076d196f8e3"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a313857711c86124ca4a23076d196f8e3">angle</a></td></tr>
-<tr class="memdesc:a313857711c86124ca4a23076d196f8e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotation step index, 0..47.  <br /></td></tr>
-<tr class="memitem:a3d632dbed4fc9bf31ec0e080857d6a93" id="r_a3d632dbed4fc9bf31ec0e080857d6a93"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3d632dbed4fc9bf31ec0e080857d6a93">ground_mp7</a> []</td></tr>
-<tr class="memitem:a3e01b9e68b5daf5d7b1f86913c0bf7ea" id="r_a3e01b9e68b5daf5d7b1f86913c0bf7ea"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3e01b9e68b5daf5d7b1f86913c0bf7ea">ground_mp7_end</a> []</td></tr>
-<tr class="memitem:a534a970bd1fed69f5998c09e6e32abb9" id="r_a534a970bd1fed69f5998c09e6e32abb9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a534a970bd1fed69f5998c09e6e32abb9">ground_pal</a> []</td></tr>
-<tr class="memitem:a04a03c1fe8deb545e3e59430f79c6d58" id="r_a04a03c1fe8deb545e3e59430f79c6d58"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a04a03c1fe8deb545e3e59430f79c6d58">ground_pal_end</a> []</td></tr>
-<tr class="memitem:afa63e5014d5f3c0cf7cefd1b403f78f4" id="r_afa63e5014d5f3c0cf7cefd1b403f78f4"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#afa63e5014d5f3c0cf7cefd1b403f78f4">ground_pc7</a> []</td></tr>
-<tr class="memdesc:afa63e5014d5f3c0cf7cefd1b403f78f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground: 9-tile prefab track (original art).  <br /></td></tr>
-<tr class="memitem:a5db59bf4d829955c198d1c9f57f91db9" id="r_a5db59bf4d829955c198d1c9f57f91db9"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5db59bf4d829955c198d1c9f57f91db9">ground_pc7_end</a> []</td></tr>
-<tr class="memitem:aae096ff31028fde218e386eab62ec666" id="r_aae096ff31028fde218e386eab62ec666"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aae096ff31028fde218e386eab62ec666">m7cos</a> []</td></tr>
-<tr class="memdesc:aae096ff31028fde218e386eab62ec666"><td class="mdescLeft">&#160;</td><td class="mdescRight">krom's tables, verbatim: 48 x [1][val16]x224 + terminator  <br /></td></tr>
-<tr class="memitem:a1c74c72916dfbe518b4f6ea3161e4355" id="r_a1c74c72916dfbe518b4f6ea3161e4355"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1c74c72916dfbe518b4f6ea3161e4355">m7nsin</a> []</td></tr>
-<tr class="memitem:aa000f183d43e6515b27d6fa92e503381" id="r_aa000f183d43e6515b27d6fa92e503381"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa000f183d43e6515b27d6fa92e503381">m7sin</a> []</td></tr>
+<tr class="memdesc:a313857711c86124ca4a23076d196f8e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground: 9-tile prefab track (original art).  <br /></td></tr>
 <tr class="memitem:a4eec51eb21414f626d3c1aae5ad26934" id="r_a4eec51eb21414f626d3c1aae5ad26934"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4eec51eb21414f626d3c1aae5ad26934">pos_x</a></td></tr>
 <tr class="memdesc:a4eec51eb21414f626d3c1aae5ad26934"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 pivot shadows (krom init: 512, 1152).  <br /></td></tr>
 <tr class="memitem:a47999cdb6b6701ff9f57b3bf80c818ca" id="r_a47999cdb6b6701ff9f57b3bf80c818ca"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a47999cdb6b6701ff9f57b3bf80c818ca">pos_y</a></td></tr>
@@ -177,41 +161,8 @@ Variables</h2></td></tr>
 <dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, hdma, input, mode7</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a href="https://github.com/PeterLemon/SNES">https://github.com/PeterLemon/SNES</a> — original demo &amp; tables </dd>
 <dd>
-devtools/m7ptables.py — table extraction + math verification </dd></dl>
-</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
-<a id="a0340fae0459def110b731df3291e7e68" name="a0340fae0459def110b731df3291e7e68"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0340fae0459def110b731df3291e7e68">&#9670;&#160;</a></span>ANGLES</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ANGLES&#160;&#160;&#160;48u</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>48 rotation steps of 7.5 degrees </p>
-
-</div>
-</div>
-<a id="ab100bf439412df374fb54e1d8bfdabe6" name="ab100bf439412df374fb54e1d8bfdabe6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab100bf439412df374fb54e1d8bfdabe6">&#9670;&#160;</a></span>TABLE_STRIDE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define TABLE_STRIDE&#160;&#160;&#160;673u</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>One angle table: 224 x 3-byte HDMA entries + terminator. </p>
-
-</div>
-</div>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+tools/opensnes-image — <span class="tt">perspective</span> regenerates the tables from the formula </dd></dl>
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -278,169 +229,8 @@ devtools/m7ptables.py — table extraction + math verification </dd></dl>
 </table>
 </div><div class="memdoc">
 
-<p>Rotation step index, 0..47. </p>
-
-</div>
-</div>
-<a id="a3d632dbed4fc9bf31ec0e080857d6a93" name="a3d632dbed4fc9bf31ec0e080857d6a93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d632dbed4fc9bf31ec0e080857d6a93">&#9670;&#160;</a></span>ground_mp7</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_mp7[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3e01b9e68b5daf5d7b1f86913c0bf7ea" name="a3e01b9e68b5daf5d7b1f86913c0bf7ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e01b9e68b5daf5d7b1f86913c0bf7ea">&#9670;&#160;</a></span>ground_mp7_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_mp7_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a534a970bd1fed69f5998c09e6e32abb9" name="a534a970bd1fed69f5998c09e6e32abb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a534a970bd1fed69f5998c09e6e32abb9">&#9670;&#160;</a></span>ground_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a04a03c1fe8deb545e3e59430f79c6d58" name="a04a03c1fe8deb545e3e59430f79c6d58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04a03c1fe8deb545e3e59430f79c6d58">&#9670;&#160;</a></span>ground_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afa63e5014d5f3c0cf7cefd1b403f78f4" name="afa63e5014d5f3c0cf7cefd1b403f78f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa63e5014d5f3c0cf7cefd1b403f78f4">&#9670;&#160;</a></span>ground_pc7</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pc7[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
 <p>Mode 7 ground: 9-tile prefab track (original art). </p>
-
-</div>
-</div>
-<a id="a5db59bf4d829955c198d1c9f57f91db9" name="a5db59bf4d829955c198d1c9f57f91db9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5db59bf4d829955c198d1c9f57f91db9">&#9670;&#160;</a></span>ground_pc7_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> ground_pc7_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aae096ff31028fde218e386eab62ec666" name="aae096ff31028fde218e386eab62ec666"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae096ff31028fde218e386eab62ec666">&#9670;&#160;</a></span>m7cos</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> m7cos[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>krom's tables, verbatim: 48 x [1][val16]x224 + terminator </p>
-
-</div>
-</div>
-<a id="a1c74c72916dfbe518b4f6ea3161e4355" name="a1c74c72916dfbe518b4f6ea3161e4355"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c74c72916dfbe518b4f6ea3161e4355">&#9670;&#160;</a></span>m7nsin</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> m7nsin[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa000f183d43e6515b27d6fa92e503381" name="aa000f183d43e6515b27d6fa92e503381"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa000f183d43e6515b27d6fa92e503381">&#9670;&#160;</a></span>m7sin</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> m7sin[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Rotation step index, 0..47 </p>
 
 </div>
 </div>

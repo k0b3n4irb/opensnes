@@ -144,8 +144,10 @@ Sources</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">SPRITE_SIZE</span>  </td><td class="markdownTableBodyNone"><span class="tt">8</span>  </td><td class="markdownTableBodyNone">Tile size passed to <span class="tt">gfx4snes -s</span> for the <span class="tt">GFXSRC</span> files  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">SPCSRC</span>  </td><td class="markdownTableBodyNone">(none)  </td><td class="markdownTableBodyNone">SPC700 assembly (<span class="tt">*.spc700.asm</span>), assembled with <span class="tt">wla-spc700</span> into a <span class="tt">.spc700.bin</span> your 65816 code <span class="tt">.incbin</span>s  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">LUNA</span>  </td><td class="markdownTableBodyNone"><span class="tt">$(OPENSNES)/testing/bin/luna</span>  </td><td class="markdownTableBodyNone">The luna binary <span class="tt">make test</span> / <span class="tt">make test-update</span> run the project's <span class="tt">test/*.toml</span> with (<span class="tt">scripts/install-luna.sh</span> puts it there); a <span class="tt">LUNA_BIN</span> in the environment, the installer's own override, takes precedence  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">SPCSRC</span>  </td><td class="markdownTableBodyNone">(none)  </td><td class="markdownTableBodyNone">SPC700 assembly (<span class="tt">*.spc700.asm</span>), assembled with <span class="tt">wla-spc700</span> into a <span class="tt">.spc700.bin</span> your 65816 code <span class="tt">.incbin</span>s  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">GSUSRC</span>  </td><td class="markdownTableBodyNone">(none)  </td><td class="markdownTableBodyNone">Super FX assembly (<span class="tt">*.sfx</span>), assembled with <span class="tt">wla-superfx</span> into a <span class="tt">.sfx.bin</span> (needs <span class="tt">USE_SUPERFX := 1</span>)  </td></tr>
 </table>
 <p>A <span class="tt">.wav</span> that an assembly file <span class="tt">.incbin</span>s as its <span class="tt">.brr</span> is converted by <span class="tt">wav2brr</span> automatically (one-shot samples; run <span class="tt">wav2brr --loop</span> by hand for looping ones).</p>
@@ -171,16 +173,18 @@ Cartridge</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">ROM_BANKS</span>  </td><td class="markdownTableBodyNone"><span class="tt">8</span>  </td><td class="markdownTableBodyNone">Number of linker banks: 256 KB LoROM, 512 KB HiROM by default. The header's ROM size byte and the asset bank range follow it  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">ASSET_TOML</span>  </td><td class="markdownTableBodyNone"><span class="tt">*.toml</span> and <span class="tt">res/*.toml</span> that name an <span class="tt">opensnes-*</span> tool  </td><td class="markdownTableBodyNone">The assets' settings files the build converts before compiling (one <span class="tt">opensnes-&lt;tool&gt; &lt;subcommand&gt;</span> run per file, then <span class="tt">assets_gen.asm</span> gathers their <span class="tt">.incbin</span> fragments); see <a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">ROMSIZE</span>  </td><td class="markdownTableBodyNone">from <span class="tt">ROM_BANKS</span>  </td><td class="markdownTableBodyNone">The header's ROM size byte (<span class="tt">$FFD7</span>, 1 KB &lt;&lt; n, rounded up to a power of two). Leave it computed  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">ASSET_BANKS_RANGE</span>  </td><td class="markdownTableBodyNone"><span class="tt">ROM_BANKS - 1</span> down to 1  </td><td class="markdownTableBodyNone">Banks the linker may use for <span class="tt">ASSET_SECTION</span> data and C const data, highest first. Leave it computed  </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">ROM_REGION</span>  </td><td class="markdownTableBodyNone"><span class="tt">ntsc</span>  </td><td class="markdownTableBodyNone">The region the header declares (<span class="tt">$FFD9</span>): <span class="tt">ntsc</span> = <span class="tt">$01</span> USA, <span class="tt"><a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> = <span class="tt">$02</span> Europe, <span class="tt">jp</span> = <span class="tt">$00</span> Japan. A console runs at its own standard whatever the byte says (<span class="tt"><a class="el" href="console_8h.html#a3b56ab7f353055ded8e2960b94d6ba57" title="Check if PAL system.">isPAL()</a></span> reads the console); emulators, luna included, choose 50 or 60 Hz from it  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">USE_SRAM</span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span>  </td><td class="markdownTableBodyNone"><span class="tt">1</span> declares battery-backed save RAM and links the <span class="tt">sram</span> module  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">SRAM_SIZE</span>  </td><td class="markdownTableBodyNone"><span class="tt">3</span>  </td><td class="markdownTableBodyNone">Save RAM size as the header byte <span class="tt">$FFD8</span>: 1 KB &lt;&lt; n, n = 1..7 (3 = 8 KB)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">USE_SRAM</span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span>  </td><td class="markdownTableBodyNone"><span class="tt">1</span> declares battery-backed save RAM and links the <span class="tt">sram</span> module  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">SRAM_SIZE</span>  </td><td class="markdownTableBodyNone"><span class="tt">3</span>  </td><td class="markdownTableBodyNone">Save RAM size as the header byte <span class="tt">$FFD8</span>: 1 KB &lt;&lt; n, n = 1..7 (3 = 8 KB)  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">RAM_CODE_SIZE</span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span>  </td><td class="markdownTableBodyNone">Bytes (1 to 16384) of a code window at the top of WRAM bank <span class="tt">$7E</span>, for code that runs from RAM (<span class="tt">RAM_CODE_SECTION</span>): stored in the top of ROM bank 1, copied by crt0 at boot. <span class="tt">0</span> = no window. A Super FX build adds 768 bytes for the SDK's own interrupt entries, <span class="tt"><a class="el" href="superfx_8h.html#afa2477b5e4a9d17cf5cf4103cc5ca5a8" title="Launch GSU program and wait for completion (WRAM-safe).">gsuLaunch</a></span> wait loop and presentation step. The window shares ROM bank 1 with SNESMOD's default soundbank bank: a soundbank that fills bank 1 fails the link with "No room for section .ram_code" — move it with <span class="tt">SOUNDBANK_BANK := 2</span>. See the Super FX tutorial  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="coprocessors"></a>
@@ -223,11 +227,13 @@ Build checks</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Variable  </th><th class="markdownTableHeadNone">Default  </th><th class="markdownTableHeadNone">What it does  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">BANK0_FAIL_THRESHOLD</span>  </td><td class="markdownTableBodyNone"><span class="tt">1024</span>  </td><td class="markdownTableBodyNone">Fail the link when bank $00 (code) has fewer free bytes than this  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">BANK0_FAIL_THRESHOLD</span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span>  </td><td class="markdownTableBodyNone"><span class="tt">0</span>: never. Bank $00 holds code only, and code that does not fit goes to the next banks by itself (the link report says how much). A value fails the link when bank $00 has fewer free bytes: for a project that wants its code bank watched  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">RAM_FAIL_THRESHOLD</span>  </td><td class="markdownTableBodyNone"><span class="tt">512</span>  </td><td class="markdownTableBodyNone">Fail the link when the plain C RAM band (<span class="tt">$0000-$1FFF</span>) has fewer free bytes than this  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">RAM_WARN_THRESHOLD</span>  </td><td class="markdownTableBodyNone"><span class="tt">1024</span>  </td><td class="markdownTableBodyNone">Warn below this many free bytes in that band  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">LD_DISCARD</span>  </td><td class="markdownTableBodyNone"><span class="tt">1</span>  </td><td class="markdownTableBodyNone">Link only the sections something refers to (<span class="tt">wlalink -d</span>): the library functions and RAM your program does not use are left out of the ROM. <span class="tt">0</span> links every section of every listed module, as before 2026-10-08  </td></tr>
 </table>
 <p>Each check has a bypass for debugging, never for a commit: <span class="tt">SKIP_LINT=1</span> (the clang syntax pass over your C), <span class="tt">SKIP_BANK0_CHECK=1</span>, <span class="tt">SKIP_RAM_CHECK=1</span>, <span class="tt">SKIP_BANKREAD_CHECK=1</span> (bank-blind reads of const data), <span class="tt">SKIP_NMI_RACE_CHECK=1</span> (WRAM data port use in NMI code), <span class="tt">SKIP_ASSET_BUDGET=1</span>. </p>
 </div></div><!-- contents -->

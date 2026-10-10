@@ -17,15 +17,7 @@ var maps_2dynamic__map_2main_8c =
     [ "is_map32x32", "maps_2dynamic__map_2main_8c.html#aee4468215190b975dc2661b09e698851", null ],
     [ "max_scroll_height", "maps_2dynamic__map_2main_8c.html#a799e60ce2f39f87a4e9712520da582fd", null ],
     [ "max_scroll_width", "maps_2dynamic__map_2main_8c.html#ac31b92f2c43357d5d53909f29aa0734b", null ],
-    [ "palsprite16", "maps_2dynamic__map_2main_8c.html#acbf1453a7b5b29c674fe5ad6b95038af", null ],
-    [ "palsprite16_64x64", "maps_2dynamic__map_2main_8c.html#a439390c51be79ec9a36a644fcbe10039", null ],
-    [ "palsprite16_64x64_end", "maps_2dynamic__map_2main_8c.html#af9dd4bc41fb916ae544b72541d912eb0", null ],
-    [ "palsprite16_end", "maps_2dynamic__map_2main_8c.html#ad4fbeffc86c58167235e0df136719ef3", null ],
     [ "rockford_8bpp", "maps_2dynamic__map_2main_8c.html#a62e581f8c19ac69c131a30adf4744803", null ],
     [ "scroll_lock", "maps_2dynamic__map_2main_8c.html#a9a76f8e20b8fb58c5b19eccf437e270d", null ],
-    [ "sprite16", "maps_2dynamic__map_2main_8c.html#acc327d6c7703d7c67d2a68ec02a7f164", null ],
-    [ "sprite16_64x64", "maps_2dynamic__map_2main_8c.html#af5a1b5f09402dedf55379015e8512e29", null ],
-    [ "sprite16_64x64_end", "maps_2dynamic__map_2main_8c.html#a0d6343c2f1642cb8489efdb8cbc9629f", null ],
-    [ "sprite16_end", "maps_2dynamic__map_2main_8c.html#a3c961fd263633808fa72b41971f2a28c", null ],
     [ "spritemap_len", "maps_2dynamic__map_2main_8c.html#ac30aab70c1004e65fbf2c919da03bf1d", null ]
 ];

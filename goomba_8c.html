@@ -125,6 +125,10 @@ $(function(){initNavTree('goomba_8c.html','',''); });
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="map_8h_source.html">snes/map.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="object_8h_source.html">snes/object.h</a>&gt;</code><br />
+<code>#include &quot;res/tilesMario.inc&quot;</code><br />
+<code>#include &quot;res/mario.inc&quot;</code><br />
+<code>#include &quot;res/goomba.inc&quot;</code><br />
+<code>#include &quot;res/koopatroopa.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
@@ -143,8 +147,7 @@ Variables</h2></td></tr>
 <tr class="memitem:a5af8f39b4f7cd5a9ae448a28511dca97" id="r_a5af8f39b4f7cd5a9ae448a28511dca97"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5af8f39b4f7cd5a9ae448a28511dca97">goombax</a></td></tr>
 <tr class="memitem:abe23c045ef78a61e422680ba2b6ce4b4" id="r_abe23c045ef78a61e422680ba2b6ce4b4"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#abe23c045ef78a61e422680ba2b6ce4b4">goombay</a></td></tr>
 <tr class="memitem:a1f11a4fc65e8bd72a9ba9c513f6a24a9" id="r_a1f11a4fc65e8bd72a9ba9c513f6a24a9"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1f11a4fc65e8bd72a9ba9c513f6a24a9">nbobjects</a></td></tr>
-<tr class="memdesc:a1f11a4fc65e8bd72a9ba9c513f6a24a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Running count of active objects in the level.  <br /></td></tr>
-<tr class="memitem:acf284eba4663713f98f8d023965f8304" id="r_acf284eba4663713f98f8d023965f8304"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#acf284eba4663713f98f8d023965f8304">sprgoomba</a></td></tr>
+<tr class="memdesc:a1f11a4fc65e8bd72a9ba9c513f6a24a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared sprite palette for all entity types (BGR555).  <br /></td></tr>
 </table>
 <a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="adb9325cd6ec6251c1c589c8fc1fed7f7" name="adb9325cd6ec6251c1c589c8fc1fed7f7"></a>
@@ -306,30 +309,9 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Running count of active objects in the level. </p>
+<p>Shared sprite palette for all entity types (BGR555). </p>
+<p>Running count of active objects in the level.</p>
 <p>Initialized to 1 (Mario is always object 0) and incremented as enemies are loaded from the map's object layer by <a class="el" href="object_8h.html#aa14cd55e5ffb19f7030a32f47e84f2a5" title="Load objects from a data table.">objLoadObjects()</a>. </p>
-
-</div>
-</div>
-<a id="acf284eba4663713f98f8d023965f8304" name="acf284eba4663713f98f8d023965f8304"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf284eba4663713f98f8d023965f8304">&#9670;&#160;</a></span>sprgoomba</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprgoomba</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>

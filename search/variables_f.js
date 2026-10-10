@@ -12,7 +12,7 @@ var searchData=
   ['oamy_9',['oamy',['../structt__sprites.html#a6c499b96e640bbad488eb8874bf36281',1,'t_sprites']]],
   ['objmario_10',['objmario',['../games_2mapandobjects_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c'],['../maps_2slope__collision_2main_8c.html#ae4bdd299c41a93b2fe976cfb116e75c3',1,'objmario:&#160;main.c']]],
   ['objnotused_11',['objnotused',['../structt__objs.html#aed65e6435d869acf9aa711fa28e740de',1,'t_objs']]],
-  ['objworkspace_12',['objWorkspace',['../object_8h.html#aff685114554f887d186a87bacbe786b9',1,'object.h']]],
+  ['objworkspace_12',['objWorkspace',['../object_8h.html#ad12284001e1281ab118cc485e76959b7',1,'object.h']]],
   ['obx_13',['obx',['../games_2breakout_2main_8c.html#aaf6173e5c080f27dd1240193e946fd92',1,'main.c']]],
   ['oby_14',['oby',['../games_2breakout_2main_8c.html#ab8301075e8707b76d42be10e10874bcc',1,'main.c']]],
   ['onscreen_15',['onscreen',['../structt__objs.html#a158edcd064c0b2a21b8eea4cc5dcfa8a',1,'t_objs']]],

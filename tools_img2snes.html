@@ -122,7 +122,10 @@ $(function(){initNavTree('tools_img2snes.html','',''); });
   <div class="headertitle"><div class="title">img2snes — RGB artwork to indexed palettes </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><span class="tt">gfx4snes</span> needs <b>indexed</b> images, but artists work in RGB. <span class="tt">img2snes</span> is the bridge: it quantises a full-colour PNG down to a SNES-legal indexed palette, so your artwork feeds the rest of the pipeline without hand-editing palettes in an image editor. Run it once on new art, commit the indexed result, and gfx4snes takes it from there.</p>
+<div class="textblock"><blockquote class="doxtable">
+<p><b>New tool:</b> the same quantizer is <span class="tt">opensnes-palette quantize</span> (<a class="el" href="tools_opensnes_palette.html" title="opensnes-palette — a project&#39;s palettes">opensnes-palette — a project's palettes</a>), with a settings file beside the asset; this tool stays shipped for one more version. </p>
+</blockquote>
+<p><span class="tt">gfx4snes</span> needs <b>indexed</b> images, but artists work in RGB. <span class="tt">img2snes</span> is the bridge: it quantises a full-colour PNG down to a SNES-legal indexed palette, so your artwork feeds the rest of the pipeline without hand-editing palettes in an image editor. Run it once on new art, commit the indexed result, and gfx4snes takes it from there.</p>
 <h2 class="doxsection"><a class="anchor" id="what-goes-in-what-comes-out-2"></a>
 What goes in, what comes out</h2>
 <p><b>In:</b> a <span class="tt">.png</span> — RGB, RGBA, or already indexed.</p>

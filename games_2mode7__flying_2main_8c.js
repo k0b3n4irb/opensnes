@@ -20,11 +20,5 @@ var games_2mode7__flying_2main_8c =
     [ "plane_x", "games_2mode7__flying_2main_8c.html#af4139b2e021811aa7083503b5f70921d", null ],
     [ "plane_y", "games_2mode7__flying_2main_8c.html#a85c1a2fa6ac57003584123ca0251abe2", null ],
     [ "shape_tiles", "games_2mode7__flying_2main_8c.html#a38aefd46976ba858c7007b4fa548c536", null ],
-    [ "surface", "games_2mode7__flying_2main_8c.html#af4da8279099100e3ffc14d0676a942e3", null ],
-    [ "terrain_map", "games_2mode7__flying_2main_8c.html#a34f94b3bf95b8a59d3a8a087fac0341f", null ],
-    [ "terrain_map_end", "games_2mode7__flying_2main_8c.html#a4fb48ff3acf6512feef3b8d1311bd600", null ],
-    [ "terrain_pal", "games_2mode7__flying_2main_8c.html#a087f7f2872be34c25b5636dcc1eccf54", null ],
-    [ "terrain_pal_end", "games_2mode7__flying_2main_8c.html#a06d6d557ccc3a8e374b18d0e4912cd48", null ],
-    [ "terrain_til", "games_2mode7__flying_2main_8c.html#a324ac271d5dcb142d25179e650449fe1", null ],
-    [ "terrain_til_end", "games_2mode7__flying_2main_8c.html#a9c91ee21b6b7d8f068c537b94615d58d", null ]
+    [ "surface", "games_2mode7__flying_2main_8c.html#af4da8279099100e3ffc14d0676a942e3", null ]
 ];

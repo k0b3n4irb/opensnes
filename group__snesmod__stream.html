@@ -122,71 +122,7 @@ $(function(){initNavTree('group__snesmod__stream.html','',''); });
   <div class="headertitle"><div class="title">Streaming Audio </div></div>
 </div><!--header-->
 <div class="contents">
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:ga1404de31f8d0d90140aa190c3ffea268" id="r_ga1404de31f8d0d90140aa190c3ffea268"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ga1404de31f8d0d90140aa190c3ffea268">snesmodAllocateSoundRegion</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> size)</td></tr>
-<tr class="memdesc:ga1404de31f8d0d90140aa190c3ffea268"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate SPC RAM for streaming buffer.  <br /></td></tr>
-<tr class="memitem:gac0658f7f553444a88821c4f6530df26a" id="r_gac0658f7f553444a88821c4f6530df26a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#gac0658f7f553444a88821c4f6530df26a">snesmodSetSoundTable</a> (const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *table)</td></tr>
-<tr class="memdesc:gac0658f7f553444a88821c4f6530df26a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the streaming sound table.  <br /></td></tr>
-</table>
-<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"></div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ga1404de31f8d0d90140aa190c3ffea268" name="ga1404de31f8d0d90140aa190c3ffea268"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1404de31f8d0d90140aa190c3ffea268">&#9670;&#160;</a></span>snesmodAllocateSoundRegion()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void snesmodAllocateSoundRegion </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>size</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Allocate SPC RAM for streaming buffer. </p>
-<p>Reserves memory in SPC RAM for streaming audio.</p>
-<dl class="section warning"><dt>Warning</dt><dd>Call it BEFORE <a class="el" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358" title="Load a module from the soundbank.">snesmodLoadModule()</a>. The driver resizes its SPC RAM layout on this command, and a module that is already loaded stops playing (measured on the libtest_fx fixture: five active voices when allocated before the load, none when after).</dd></dl>
-<p>Nothing in the SDK starts a stream, so the region is reserved for nothing and only takes the memory away from the module.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">size</td><td>Buffer size (in units specific to driver) </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="gac0658f7f553444a88821c4f6530df26a" name="gac0658f7f553444a88821c4f6530df26a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac0658f7f553444a88821c4f6530df26a">&#9670;&#160;</a></span>snesmodSetSoundTable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void snesmodSetSoundTable </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *</td>          <td class="paramname"><span class="paramname"><em>table</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the streaming sound table. </p>
-<p>Points to a table of streaming sound descriptors. Nothing in the SDK starts a stream, so the table is stored and never read.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">table</td><td>Pointer to sound table data </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-</div><!-- contents -->
+<div class="textblock"></div></div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
 <div id="page-nav-resize-handle"></div>

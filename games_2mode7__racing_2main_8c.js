@@ -16,11 +16,5 @@ var games_2mode7__racing_2main_8c =
     [ "car_surface", "games_2mode7__racing_2main_8c.html#a4ec1ea176eeefb26906fdf312ec4f98f", null ],
     [ "car_tiles", "games_2mode7__racing_2main_8c.html#a5166f1d245bca63c25726e6479a3ae56", null ],
     [ "car_x", "games_2mode7__racing_2main_8c.html#abcb5c457114635db8310446698d4f3b6", null ],
-    [ "car_y", "games_2mode7__racing_2main_8c.html#a546e1ce171b0deba47ed2d8dc8c46402", null ],
-    [ "track_map", "games_2mode7__racing_2main_8c.html#a5b08e2c62d62f66e4e86a15ed6f69490", null ],
-    [ "track_map_end", "games_2mode7__racing_2main_8c.html#afc136ab27761f7850d8c1d4b942ce43d", null ],
-    [ "track_pal", "games_2mode7__racing_2main_8c.html#ad4e789171815bfc9344432fc37505541", null ],
-    [ "track_pal_end", "games_2mode7__racing_2main_8c.html#a264ba1cf70e1d9e4794e543f257df5bd", null ],
-    [ "track_til", "games_2mode7__racing_2main_8c.html#a96cb89482abccd2f57a24f3c7211a0a0", null ],
-    [ "track_til_end", "games_2mode7__racing_2main_8c.html#a0f1893cdd9e9dd918f4411acc36b7a88", null ]
+    [ "car_y", "games_2mode7__racing_2main_8c.html#a546e1ce171b0deba47ed2d8dc8c46402", null ]
 ];

@@ -127,6 +127,7 @@ $(function(){initNavTree('sprites_2animated__sprite_2main_8c.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="anim_8h_source.html">snes/anim.h</a>&gt;</code><br />
+<code>#include &quot;res/sprites.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -151,7 +152,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#af7ccac6abcbe8bf213b36feaa7b69cdaadb3898c81625762236e0f115992de1f0">W_RIGHT</a> = 2
 , <a class="el" href="#af7ccac6abcbe8bf213b36feaa7b69cdaaed37cc1ae9548b4a4f651e488ad14dfa">W_LEFT</a> = 2
  }</td></tr>
-<tr class="memdesc:af7ccac6abcbe8bf213b36feaa7b69cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Animation direction states.  <a href="#af7ccac6abcbe8bf213b36feaa7b69cda">More...</a><br /></td></tr>
+<tr class="memdesc:af7ccac6abcbe8bf213b36feaa7b69cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite sheet tile data containing all animation frames (defined in data.asm).  <a href="#af7ccac6abcbe8bf213b36feaa7b69cda">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -167,12 +168,6 @@ Variables</h2></td></tr>
 <tr class="memdesc:a22e2bc93d6832b63ced1b19352729024"><td class="mdescLeft">&#160;</td><td class="mdescRight">The player-controlled character sprite, initialized facing down at (100, 100).  <br /></td></tr>
 <tr class="memitem:a4ec2838b1e79778c47a2d4700a27be3a" id="r_a4ec2838b1e79778c47a2d4700a27be3a"><td class="memItemLeft"><a class="el" href="structAnimPlayer.html">AnimPlayer</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4ec2838b1e79778c47a2d4700a27be3a">monster_anim</a> = <a class="el" href="anim_8h.html#a25f993fda11a7a5575dd46548ef6c30c">ANIM_PLAYER_INIT</a></td></tr>
 <tr class="memdesc:a4ec2838b1e79778c47a2d4700a27be3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Playback head for the monster (zero-init = stopped).  <br /></td></tr>
-<tr class="memitem:a20fcfc492e0b93bed7aab47c9177550f" id="r_a20fcfc492e0b93bed7aab47c9177550f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a20fcfc492e0b93bed7aab47c9177550f">sprite_pal</a> []</td></tr>
-<tr class="memdesc:a20fcfc492e0b93bed7aab47c9177550f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Palette for the character sprite (16 colors, 4bpp).  <br /></td></tr>
-<tr class="memitem:a1660f8115c72c5a201d18eb468a19d54" id="r_a1660f8115c72c5a201d18eb468a19d54"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a1660f8115c72c5a201d18eb468a19d54">sprite_pal_end</a> []</td></tr>
-<tr class="memitem:a9f62f8ac72d6193b2b27e1c8949e2180" id="r_a9f62f8ac72d6193b2b27e1c8949e2180"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a9f62f8ac72d6193b2b27e1c8949e2180">sprite_tiles</a> []</td></tr>
-<tr class="memdesc:a9f62f8ac72d6193b2b27e1c8949e2180"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite sheet tile data containing all animation frames (defined in data.asm).  <br /></td></tr>
-<tr class="memitem:ab70c48d98fc2ba28acebfe2acc51c291" id="r_ab70c48d98fc2ba28acebfe2acc51c291"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab70c48d98fc2ba28acebfe2acc51c291">sprite_tiles_end</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Direction-based sprite animation with horizontal flip. </p>
@@ -253,7 +248,9 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Animation direction states. </p>
+<p>Sprite sheet tile data containing all animation frames (defined in data.asm). </p>
+<p>Palette for the character sprite (16 colors, 4bpp)</p>
+<p>Animation direction states.</p>
 <p>Each state maps to a row in the sprite sheet. W_LEFT reuses the W_RIGHT row and sets the OAM horizontal flip bit to mirror the frames, which is a common SNES technique to halve the sprite sheet size for left/right symmetric characters. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d" name="af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d"></a>W_DOWN&#160;</td><td class="fielddoc"><p>Walking downward (facing camera) </p>
@@ -444,82 +441,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Playback head for the monster (zero-init = stopped). </p>
-
-</div>
-</div>
-<a id="a20fcfc492e0b93bed7aab47c9177550f" name="a20fcfc492e0b93bed7aab47c9177550f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a20fcfc492e0b93bed7aab47c9177550f">&#9670;&#160;</a></span>sprite_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Palette for the character sprite (16 colors, 4bpp). </p>
-
-</div>
-</div>
-<a id="a1660f8115c72c5a201d18eb468a19d54" name="a1660f8115c72c5a201d18eb468a19d54"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1660f8115c72c5a201d18eb468a19d54">&#9670;&#160;</a></span>sprite_pal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_pal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a9f62f8ac72d6193b2b27e1c8949e2180" name="a9f62f8ac72d6193b2b27e1c8949e2180"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f62f8ac72d6193b2b27e1c8949e2180">&#9670;&#160;</a></span>sprite_tiles</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_tiles[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sprite sheet tile data containing all animation frames (defined in data.asm). </p>
-
-</div>
-</div>
-<a id="ab70c48d98fc2ba28acebfe2acc51c291" name="ab70c48d98fc2ba28acebfe2acc51c291"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab70c48d98fc2ba28acebfe2acc51c291">&#9670;&#160;</a></span>sprite_tiles_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_tiles_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

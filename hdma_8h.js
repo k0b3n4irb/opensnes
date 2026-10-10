@@ -36,8 +36,10 @@ var hdma_8h =
     [ "hdmaBrightnessGradientStop", "hdma_8h.html#ad669b33978f84ff190f1bb6050483ccd", null ],
     [ "hdmaColorGradient", "hdma_8h.html#a72729443b1db1842e795d733563d5c90", null ],
     [ "hdmaColorGradientStop", "hdma_8h.html#ab4a0a92619e221e36d2650874c0fabd5", null ],
+    [ "hdmaDisable", "hdma_8h.html#ad8219f40b0c8e2cfc0a185a696148192", null ],
     [ "hdmaDisableAll", "hdma_8h.html#ad5a8e7d96e85c1d7ec49a488d6f3838f", null ],
     [ "hdmaDisableMask", "hdma_8h.html#ad8470df7667a8f028edea11e40f63e67", null ],
+    [ "hdmaEnable", "hdma_8h.html#ac379c76694b0ca7f2e30e395a138b06b", null ],
     [ "hdmaEnableMask", "hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794", null ],
     [ "hdmaGetEnabled", "hdma_8h.html#a61f8ea3d04917cd5272ac7c73b5af4b0", null ],
     [ "hdmaGradient", "hdma_8h.html#a3ef990bb74e3837ca73837c0619f6043", null ],
@@ -46,7 +48,6 @@ var hdma_8h =
     [ "hdmaParallax", "hdma_8h.html#adf1c0451139948b3f1049b84580ce906", null ],
     [ "hdmaSetTable", "hdma_8h.html#a60a2966565cd8b728a5acd019859e8e6", null ],
     [ "hdmaSetup", "hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23", null ],
-    [ "hdmaSetupBank", "hdma_8h.html#a79da757d3be21ef94b3e9a78b9cdf2f0", null ],
     [ "hdmaSetupIndirect", "hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318", null ],
     [ "hdmaWaterRipple", "hdma_8h.html#af4cd68c6a5535d13dd11fa4c487abbfe", null ],
     [ "hdmaWaveH", "hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241", null ],
@@ -54,7 +55,5 @@ var hdma_8h =
     [ "hdmaWaveSetSpeed", "hdma_8h.html#a51e3697c2d4ec0f4a9f121822f5f584e", null ],
     [ "hdmaWaveStop", "hdma_8h.html#a0579bc90a6b79d6737dcf2c15a3eb7e1", null ],
     [ "hdmaWaveUpdate", "hdma_8h.html#a415b729e4a24c33a2d71d7f6ed925216", null ],
-    [ "hdmaWindowShape", "hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6", null ],
-    [ "OPENSNES_DEPRECATED", "hdma_8h.html#a92b0ca833b15dc97e5193fe9ef7cf231", null ],
-    [ "OPENSNES_DEPRECATED", "hdma_8h.html#a8162f10d0746ad55ee1410c796155bac", null ]
+    [ "hdmaWindowShape", "hdma_8h.html#a765faa4cbc6e070b2c6ec768cf9762f6", null ]
 ];

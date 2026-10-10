@@ -122,13 +122,16 @@ $(function(){initNavTree('tools_tmx2snes.html','',''); });
   <div class="headertitle"><div class="title">tmx2snes — Tiled levels to SNES map data </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><span class="tt">tmx2snes</span> is how a level you paint in <a href="https://www.mapeditor.org/">Tiled</a> becomes something the SNES map engine can load and scroll. It takes a Tiled map exported as JSON, plus the tile-optimisation table from <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a>, and emits the binary tilemap, collision, and object files the runtime reads. It is the tool that makes <a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a> a real workflow instead of a theory.</p>
+<div class="textblock"><blockquote class="doxtable">
+<p><b>New tool:</b> the same converter is <span class="tt">opensnes-level</span> (<a class="el" href="tools_opensnes_level.html" title="opensnes-level — Tiled levels to SNES map data">opensnes-level — Tiled levels to SNES map data</a>), driven by a settings file beside the map; tmx2snes stays shipped for one more version. </p>
+</blockquote>
+<p><span class="tt">tmx2snes</span> is how a level you paint in <a href="https://www.mapeditor.org/">Tiled</a> becomes something the SNES map engine can load and scroll. It takes a Tiled map exported as JSON, plus the tile-optimisation table from <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a>, and emits the binary tilemap, collision, and object files the runtime reads. It is the tool that makes <a class="el" href="craft_tiles_to_levels.html" title="From tiles to levels">From tiles to levels</a> a real workflow instead of a theory.</p>
 <h2 class="doxsection"><a class="anchor" id="what-goes-in-what-comes-out-5"></a>
 What goes in, what comes out</h2>
 <p><b>In</b> — two positional arguments, in this order:</p>
 <ol type="1">
 <li><span class="tt">map.tmj</span> — your Tiled map, <b>exported as JSON</b> (<span class="tt">.tmj</span>), not the XML <span class="tt">.tmx</span>.</li>
-<li><span class="tt">tileset.map</span> — the <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> file <span class="tt">gfx4snes</span> produced for the same tileset (it lets tmx2snes reuse gfx4snes's tile de-duplication).</li>
+<li><span class="tt">tileset.map</span> — the <span class="tt">.map</span> file <span class="tt">gfx4snes</span> produced for the same tileset (it lets tmx2snes reuse gfx4snes's tile de-duplication).</li>
 </ol>
 <p><b>Out</b> — the defaults, always emitted:</p>
 <table class="markdownTable">
@@ -148,7 +151,7 @@ What goes in, what comes out</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Flag  </th><th class="markdownTableHeadNone">Adds  </th><th class="markdownTableHeadNone">For  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-e</span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a>&gt;.inc</span> — the Entities layer as C <span class="tt">#define</span>s  </td><td class="markdownTableBodyNone">referencing objects from game code  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">-e</span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;map&gt;.inc</span> — the Entities layer as C <span class="tt">#define</span>s  </td><td class="markdownTableBodyNone">referencing objects from game code  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">-Q</span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;layer&gt;.q16</span> — a quadrant-ordered 64×64 tilemap  </td><td class="markdownTableBodyNone">a <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span>-straight-to-VRAM map you scroll yourself  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -158,7 +161,7 @@ What goes in, what comes out</h2>
 How you actually use it</h2>
 <p>Because a Tiled project has choices the build cannot guess, tmx2snes is called explicitly from the example's Makefile — typically from inside <span class="tt">res/</span>:</p>
 <div class="fragment"><div class="line">cd res &amp;&amp; tmx2snes maplevel01.tmj tileslevel1.map</div>
-</div><!-- fragment --><p>where the tileset <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> came from, e.g.:</p>
+</div><!-- fragment --><p>where the tileset <span class="tt">.map</span> came from, e.g.:</p>
 <div class="fragment"><div class="line">gfx4snes -s 8 -o 48 -u 16 -p -m -i tileset.png</div>
 </div><!-- fragment --><p>Then in C you hand the three defaults to <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> and scroll with the map engine — see <a class="el" href="tutorial_map.html" title="Scrolling maps">Scrolling maps</a> for the loading and scrolling code.</p>
 <h2 class="doxsection"><a class="anchor" id="authoring-the-level-in-tiled"></a>
@@ -170,7 +173,7 @@ Authoring the level in Tiled</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">attribute</span>  </td><td class="markdownTableBodyNone">hex string  </td><td class="markdownTableBodyNone">the collision/behaviour byte (<span class="tt">.b16</span>) — solid, ladder, spike, slope…  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></span>  </td><td class="markdownTableBodyNone">"0"–"7"  </td><td class="markdownTableBodyNone">which of the 8 sub-palettes the tile uses  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a></span>  </td><td class="markdownTableBodyNone">"0"–"7"  </td><td class="markdownTableBodyNone">which of the 8 sub-palettes the tile uses  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">priority</span>  </td><td class="markdownTableBodyNone">"0" / "1"  </td><td class="markdownTableBodyNone">whether the tile draws in front of sprites  </td></tr>
 </table>
@@ -191,8 +194,8 @@ See it in practice</h2>
 <li><a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a> — the map engine scrolling a level wider than VRAM.</li>
 <li><a class="el" href="examples_games_rpg.html" title="rpg — an RPG template driven by a Tiled map">rpg — an RPG template driven by a Tiled map</a> — a full game driving its world from Tiled.</li>
 </ul>
-<p>Upstream of this: <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a> makes the tileset and the <span class="tt">.<a class="el" href="backgrounds_2mode1__lz77_2main_8c.html#ab681dbad7040a7043e763217feece40e">map</a></span> table tmx2snes needs.</p>
-<h2 class="doxsection"><a class="anchor" id="refused-maps"></a>
+<p>Upstream of this: <a class="el" href="tools_gfx4snes.html" title="gfx4snes — images to tiles, palettes &amp; maps">gfx4snes — images to tiles, palettes &amp; maps</a> makes the tileset and the <span class="tt">.map</span> table tmx2snes needs.</p>
+<h2 class="doxsection"><a class="anchor" id="refused-maps-1"></a>
 Refused maps</h2>
 <p>A rotated tile (Tiled's diagonal flip), a tile id above 1024 and a map with more than one tileset are refused with a message naming the tile: each converted silently to a wrong map until 2026-10-05. </p>
 </div></div><!-- contents -->

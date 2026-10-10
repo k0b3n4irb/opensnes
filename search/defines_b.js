@@ -40,15 +40,11 @@ var searchData=
   ['mode7_5ftile0_37',['MODE7_TILE0',['../mode7_8h.html#ad4c105a9c2165ccf56070e30b8943bae',1,'mode7.h']]],
   ['mode7_5ftransparent_38',['MODE7_TRANSPARENT',['../mode7_8h.html#a0c468d883ece574391e63d990e082aa7',1,'mode7.h']]],
   ['mode7_5fwrap_39',['MODE7_WRAP',['../mode7_8h.html#a42a1485d7600874477a6805a9567a32d',1,'mode7.h']]],
-  ['mosaic_5fbg1_40',['MOSAIC_BG1',['../mosaic_8h.html#aeae429c8e286da71bda14e930468367c',1,'mosaic.h']]],
-  ['mosaic_5fbg2_41',['MOSAIC_BG2',['../mosaic_8h.html#a3392bbb0a16063c6fa3c2a4d785602ab',1,'mosaic.h']]],
-  ['mosaic_5fbg3_42',['MOSAIC_BG3',['../mosaic_8h.html#a310a4d7b11cd15e26c8b0276f49714d6',1,'mosaic.h']]],
-  ['mosaic_5fbg4_43',['MOSAIC_BG4',['../mosaic_8h.html#acead97fc4126a191f810a5c424518a54',1,'mosaic.h']]],
-  ['mosaic_5fbg_5fall_44',['MOSAIC_BG_ALL',['../mosaic_8h.html#a087a0125524bbc2887b242600077b081',1,'mosaic.h']]],
-  ['mosaic_5fmax_45',['MOSAIC_MAX',['../mosaic_8h.html#adff19067a3ace55a83b54b343000e326',1,'mosaic.h']]],
-  ['mosaic_5fmin_46',['MOSAIC_MIN',['../mosaic_8h.html#a1a8d8268b9ee6a832931e47428d76d07',1,'mosaic.h']]],
-  ['move_5fstep_47',['MOVE_STEP',['../mode7_2dsp1__ground_2main_8c.html#a1f98dd72ca62af59cb4d6417173b66dd',1,'main.c']]],
-  ['msg_5fcolor_5fcount_48',['MSG_COLOR_COUNT',['../games_2tetris_2main_8c.html#aa6621b953614b37d7579ba97adb6773f',1,'main.c']]],
-  ['msg_5fcolor_5fspeed_49',['MSG_COLOR_SPEED',['../games_2tetris_2main_8c.html#a9881eb69e55d465da15c58d1435ed60b',1,'main.c']]],
-  ['msg_5frow_50',['MSG_ROW',['../render_8c.html#a63b80f00c14fea9726ff446d72bf706e',1,'render.c']]]
+  ['mosaic_5fbg_5fall_40',['MOSAIC_BG_ALL',['../mosaic_8h.html#a087a0125524bbc2887b242600077b081',1,'mosaic.h']]],
+  ['mosaic_5fmax_41',['MOSAIC_MAX',['../mosaic_8h.html#adff19067a3ace55a83b54b343000e326',1,'mosaic.h']]],
+  ['mosaic_5fmin_42',['MOSAIC_MIN',['../mosaic_8h.html#a1a8d8268b9ee6a832931e47428d76d07',1,'mosaic.h']]],
+  ['move_5fstep_43',['MOVE_STEP',['../mode7_2dsp1__ground_2main_8c.html#a1f98dd72ca62af59cb4d6417173b66dd',1,'main.c']]],
+  ['msg_5fcolor_5fcount_44',['MSG_COLOR_COUNT',['../games_2tetris_2main_8c.html#aa6621b953614b37d7579ba97adb6773f',1,'main.c']]],
+  ['msg_5fcolor_5fspeed_45',['MSG_COLOR_SPEED',['../games_2tetris_2main_8c.html#a9881eb69e55d465da15c58d1435ed60b',1,'main.c']]],
+  ['msg_5frow_46',['MSG_ROW',['../render_8c.html#a63b80f00c14fea9726ff446d72bf706e',1,'render.c']]]
 ];

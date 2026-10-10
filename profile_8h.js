@@ -9,7 +9,6 @@ var profile_8h =
     [ "PROFILE_YELLOW", "profile_8h.html#ac130467a2fa8d19c757d293ae2d1e83f", null ],
     [ "profileColorEnd", "profile_8h.html#acddb56e86b147fe8d8b6e0b72a37d702", null ],
     [ "profileColorStart", "profile_8h.html#a5e46903fa24e1c3b20d101e9d4bddde6", null ],
-    [ "profileGetFrameCount", "profile_8h.html#a3f567bb59e4729e6cec85b827b3f97e0", null ],
     [ "profileGetLagFrames", "profile_8h.html#a071021ac9abd338ac63cf48b2d10f8c7", null ],
     [ "profileGetScanline", "profile_8h.html#a30c81ab840017529f70ad63238c8a79f", null ],
     [ "profileInit", "profile_8h.html#acc2a7d890f2e61d20dc72d9964d92c9d", null ],

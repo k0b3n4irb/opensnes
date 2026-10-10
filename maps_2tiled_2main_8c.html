@@ -127,6 +127,8 @@ $(function(){initNavTree('maps_2tiled_2main_8c.html','',''); });
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="map_8h_source.html">snes/map.h</a>&gt;</code><br />
+<code>#include &quot;res/tileslevel1.inc&quot;</code><br />
+<code>#include &quot;res/maplevel01.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -136,19 +138,7 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a227c68e862019565bec898cb08a1c38f" id="r_a227c68e862019565bec898cb08a1c38f"><td class="memItemLeft"><a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a227c68e862019565bec898cb08a1c38f">focusx</a></td></tr>
-<tr class="memdesc:a227c68e862019565bec898cb08a1c38f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Focus-point X in map pixels — the point the camera FOLLOWS (your player's position), NOT a scroll origin. <a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera()</a> centers the view on it with boundary clamping; passing a view origin here shifts the whole level by half a screen (see <a class="el" href="map_8h.html" title="Scrolling tilemap engine for Mode 1 backgrounds.">map.h</a>).  <br /></td></tr>
-<tr class="memitem:aa8892da899241eed696fcdcb7ccb6b72" id="r_aa8892da899241eed696fcdcb7ccb6b72"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa8892da899241eed696fcdcb7ccb6b72">mapdata</a> []</td></tr>
-<tr class="memdesc:aa8892da899241eed696fcdcb7ccb6b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Full level tilemap — 224x30 tiles, 16-bit entries (from BG1.m16).  <br /></td></tr>
-<tr class="memitem:a88074065e44bab6048421a86d5c2011a" id="r_a88074065e44bab6048421a86d5c2011a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a88074065e44bab6048421a86d5c2011a">tileset</a> []</td></tr>
-<tr class="memdesc:a88074065e44bab6048421a86d5c2011a"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tileset graphics (converted from tileslevel1.png)  <br /></td></tr>
-<tr class="memitem:a2ea3f462c860f7f0c35ae2204a43d598" id="r_a2ea3f462c860f7f0c35ae2204a43d598"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2ea3f462c860f7f0c35ae2204a43d598">tileset_end</a> []</td></tr>
-<tr class="memitem:a7c2cc3f600a848059ca53a4f836c1a40" id="r_a7c2cc3f600a848059ca53a4f836c1a40"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a7c2cc3f600a848059ca53a4f836c1a40">tilesetatt</a> []</td></tr>
-<tr class="memdesc:a7c2cc3f600a848059ca53a4f836c1a40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tile collision attributes — one property byte per metatile (from .b16).  <br /></td></tr>
-<tr class="memitem:ac9602745b64f7585d7be28c916048def" id="r_ac9602745b64f7585d7be28c916048def"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ac9602745b64f7585d7be28c916048def">tilesetdef</a> []</td></tr>
-<tr class="memdesc:ac9602745b64f7585d7be28c916048def"><td class="mdescLeft">&#160;</td><td class="mdescRight">Metatile definitions — 4 tile indices per metatile (from .t16).  <br /></td></tr>
-<tr class="memitem:ad8fc13122eddb6865eefeb60342b09f1" id="r_ad8fc13122eddb6865eefeb60342b09f1"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad8fc13122eddb6865eefeb60342b09f1">tilesetpal</a> []</td></tr>
-<tr class="memdesc:ad8fc13122eddb6865eefeb60342b09f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tileset palette (3 palette banks x 16 colors = 96 bytes).  <br /></td></tr>
-<tr class="memitem:a2e762b8242ea46470c4df153cbf50717" id="r_a2e762b8242ea46470c4df153cbf50717"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2e762b8242ea46470c4df153cbf50717">tilesetpal_end</a> []</td></tr>
+<tr class="memdesc:a227c68e862019565bec898cb08a1c38f"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tileslevel1_tiles graphics (converted from tileslevel1.png)  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Tiled map editor integration with the map scrolling engine. </p>
@@ -157,7 +147,7 @@ Variables</h2></td></tr>
 <li>Design your level in Tiled (paint tiles, set collision properties)</li>
 <li>Export as .tmj (JSON) or .tmx (XML)</li>
 <li>Convert with tmxconv to .m16 (tilemap) + .t16 (tile defs) + .b16 (attributes)</li>
-<li>Convert tileset PNG with gfx4snes to .pic + .pal</li>
+<li>Convert tileslevel1_tiles PNG with gfx4snes to .pic + .pal</li>
 <li>Include all binaries in data.asm</li>
 </ol>
 <p>This example uses pre-converted binaries. The original Tiled source file (maplevel01.tmj) is included in res/ for reference.</p>
@@ -175,7 +165,7 @@ Variables</h2></td></tr>
 <li>Press LEFT/RIGHT on D-pad to scroll through the level</li>
 <li>The background scrolls smoothly at 1 pixel per frame</li>
 <li>Notice the level is much wider than the screen (1792px vs 256px)</li>
-<li>The tileset uses platformer-style tiles (platforms, ladders, walls)</li>
+<li>The tileslevel1_tiles uses platformer-style tiles (platforms, ladders, walls)</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, input, background, map</dd></dl>
@@ -214,155 +204,12 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>4bpp tileslevel1_tiles graphics (converted from tileslevel1.png) </p>
+<p>Tileset palette (3 palette banks x 16 colors = 96 bytes)</p>
+<p>Full level tilemap — 224x30 tiles, 16-bit entries (from BG1.m16)</p>
+<p>Metatile definitions — 4 tile indices per metatile (from .t16)</p>
+<p>Tile collision attributes — one property byte per metatile (from .b16)</p>
 <p>Focus-point X in map pixels — the point the camera FOLLOWS (your player's position), NOT a scroll origin. <a class="el" href="map_8h.html#a310e106b68443357988f941a95a27266" title="Update camera position to follow an object.">mapUpdateCamera()</a> centers the view on it with boundary clamping; passing a view origin here shifts the whole level by half a screen (see <a class="el" href="map_8h.html" title="Scrolling tilemap engine for Mode 1 backgrounds.">map.h</a>). </p>
-
-</div>
-</div>
-<a id="aa8892da899241eed696fcdcb7ccb6b72" name="aa8892da899241eed696fcdcb7ccb6b72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8892da899241eed696fcdcb7ccb6b72">&#9670;&#160;</a></span>mapdata</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mapdata[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Full level tilemap — 224x30 tiles, 16-bit entries (from BG1.m16). </p>
-
-</div>
-</div>
-<a id="a88074065e44bab6048421a86d5c2011a" name="a88074065e44bab6048421a86d5c2011a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a88074065e44bab6048421a86d5c2011a">&#9670;&#160;</a></span>tileset</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tileset[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>4bpp tileset graphics (converted from tileslevel1.png) </p>
-
-</div>
-</div>
-<a id="a2ea3f462c860f7f0c35ae2204a43d598" name="a2ea3f462c860f7f0c35ae2204a43d598"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ea3f462c860f7f0c35ae2204a43d598">&#9670;&#160;</a></span>tileset_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tileset_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7c2cc3f600a848059ca53a4f836c1a40" name="a7c2cc3f600a848059ca53a4f836c1a40"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c2cc3f600a848059ca53a4f836c1a40">&#9670;&#160;</a></span>tilesetatt</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilesetatt[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Tile collision attributes — one property byte per metatile (from .b16). </p>
-
-</div>
-</div>
-<a id="ac9602745b64f7585d7be28c916048def" name="ac9602745b64f7585d7be28c916048def"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9602745b64f7585d7be28c916048def">&#9670;&#160;</a></span>tilesetdef</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilesetdef[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Metatile definitions — 4 tile indices per metatile (from .t16). </p>
-
-</div>
-</div>
-<a id="ad8fc13122eddb6865eefeb60342b09f1" name="ad8fc13122eddb6865eefeb60342b09f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8fc13122eddb6865eefeb60342b09f1">&#9670;&#160;</a></span>tilesetpal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilesetpal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Tileset palette (3 palette banks x 16 colors = 96 bytes). </p>
-
-</div>
-</div>
-<a id="a2e762b8242ea46470c4df153cbf50717" name="a2e762b8242ea46470c4df153cbf50717"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e762b8242ea46470c4df153cbf50717">&#9670;&#160;</a></span>tilesetpal_end</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tilesetpal_end[]</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>

@@ -127,7 +127,7 @@ $(function(){initNavTree('examples_input_mouse.html','',''); });
 <img src="mouse.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-25"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-24"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to detect whether a SNES Mouse is connected to a controller port</li>
@@ -147,7 +147,7 @@ Mouse Sensitivity</h3>
 <h3 class="doxsection"><a class="anchor" id="sprites-as-ui-elements"></a>
 Sprites as UI Elements</h3>
 <p>This example uses a hardware sprite (OAM entry 0) as the cursor rather than drawing into a background tilemap. Sprites can be positioned at arbitrary pixel coordinates without affecting backgrounds and are drawn on top of all BG layers. The cursor tile data is DMA'd to OBJ VRAM at $4000 and configured as 16x16 via <span class="tt"><a class="el" href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554" title="Object (sprite) size and base (W).">REG_OBJSEL</a></span> ($2101).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-17"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-16"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -191,13 +191,11 @@ How It Works</h2>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md2-load-cursor-sprite"></a>
 2. Load Cursor Sprite</h3>
 <p>The cursor is a 16x16 4bpp sprite. Because SNES OBJ tiles are arranged in a 16-tile-wide grid in VRAM, a 16x16 sprite uses tiles 0-1 (top row) and tiles 16-17 (bottom row). The tile data is split across two DMA transfers:</p>
-<div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="input_2mouse_2main_8c.html#a822d2ab788802a6222ba00ee1c5f2da4">cursor_tiles</a>, 0x4000, 64);          <span class="comment">/* top half: tiles 0-1 */</span></div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="input_2mouse_2main_8c.html#a822d2ab788802a6222ba00ee1c5f2da4">cursor_tiles</a> + 64, 0x4100, 64);     <span class="comment">/* bottom half: tiles 16-17 */</span></div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(<a class="code hl_variable" href="input_2mouse_2main_8c.html#a08cc1a6eb08977efde23b65826f2775d">cursor_pal</a>, 128, ...);              <span class="comment">/* sprite palette 0 */</span></div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(cursor_tiles, 0x4000, 64);          <span class="comment">/* top half: tiles 0-1 */</span></div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(cursor_tiles + 64, 0x4100, 64);     <span class="comment">/* bottom half: tiles 16-17 */</span></div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(cursor_pal, 128, ...);              <span class="comment">/* sprite palette 0 */</span></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
 <div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
-<div class="ttc" id="ainput_2mouse_2main_8c_html_a08cc1a6eb08977efde23b65826f2775d"><div class="ttname"><a href="input_2mouse_2main_8c.html#a08cc1a6eb08977efde23b65826f2775d">cursor_pal</a></div><div class="ttdeci">u8 cursor_pal[]</div><div class="ttdoc">Cursor sprite palette (SNES BGR555 format) defined in data.asm.</div></div>
-<div class="ttc" id="ainput_2mouse_2main_8c_html_a822d2ab788802a6222ba00ee1c5f2da4"><div class="ttname"><a href="input_2mouse_2main_8c.html#a822d2ab788802a6222ba00ee1c5f2da4">cursor_tiles</a></div><div class="ttdeci">u8 cursor_tiles[]</div><div class="ttdoc">Cursor sprite tile data (16x16, 4bpp) defined in data.asm.</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md3-set-up-oam-directly"></a>
 3. Set Up OAM Directly</h3>
 <p>Rather than calling <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> every frame (which has high overhead on the 65816), the cursor sprite is configured by writing directly to the <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> buffer. The NMI handler DMA's this buffer to OAM hardware each VBlank:</p>
@@ -229,7 +227,7 @@ How It Works</h2>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x00;</div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a> = 0x7C;    <span class="comment">/* Set BG to blue */</span></div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__mouse__input_html_ga67d41b5dcdb6d241343bf97e15304079"><div class="ttname"><a href="group__mouse__input.html#ga67d41b5dcdb6d241343bf97e15304079">MOUSE_BUTTON_LEFT</a></div><div class="ttdeci">#define MOUSE_BUTTON_LEFT</div><div class="ttdef"><b>Definition</b> input.h:223</div></div>
+<div class="ttc" id="agroup__mouse__input_html_ga67d41b5dcdb6d241343bf97e15304079"><div class="ttname"><a href="group__mouse__input.html#ga67d41b5dcdb6d241343bf97e15304079">MOUSE_BUTTON_LEFT</a></div><div class="ttdeci">#define MOUSE_BUTTON_LEFT</div><div class="ttdef"><b>Definition</b> input.h:224</div></div>
 <div class="ttc" id="agroup__mouse__input_html_gafc97172b71c6aafca462a667f3eb2f8d"><div class="ttname"><a href="group__mouse__input.html#gafc97172b71c6aafca462a667f3eb2f8d">mouseButtonsPressed</a></div><div class="ttdeci">u8 mouseButtonsPressed(u8 port)</div><div class="ttdoc">Get newly pressed mouse buttons this frame.</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga47b1bf21d0ed441344efcaf573350c46"><div class="ttname"><a href="group__ppu__regs.html#ga47b1bf21d0ed441344efcaf573350c46">REG_CGADD</a></div><div class="ttdeci">#define REG_CGADD</div><div class="ttdoc">CGRAM address (W).</div><div class="ttdef"><b>Definition</b> registers.h:154</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_ga516211e9100d80fc834bf19ad542dbde"><div class="ttname"><a href="group__ppu__regs.html#ga516211e9100d80fc834bf19ad542dbde">REG_CGDATA</a></div><div class="ttdeci">#define REG_CGDATA</div><div class="ttdoc">CGRAM data write (W).</div><div class="ttdef"><b>Definition</b> registers.h:157</div></div>
@@ -237,16 +235,17 @@ How It Works</h2>
 Project Structure</h2>
 <div class="fragment"><div class="line">mouse/</div>
 <div class="line">├── main.c        — Mouse detection, cursor movement, button handling</div>
-<div class="line">├── data.asm      — Cursor sprite tiles and palette (ROM data)</div>
+<div class="line">├── res/cursor.png.toml — import settings of the cursor sheet (opensnes-sprite, 8-pixel blocks);</div>
+<div class="line">│                     the build converts and links it, res/cursor.inc declares the symbols</div>
 <div class="line">├── Makefile      — Build configuration (6 library modules)</div>
 <div class="line">└── res/</div>
 <div class="line">    └── cursor.png — 16x16 cursor sprite source graphic (4bpp)</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build--run-30"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build--run-31"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/mouse</div>
 </div><!-- fragment --><p>Then open <span class="tt">mouse.sfc</span> in your emulator (Mesen2 recommended). Enable SNES Mouse emulation in your emulator's input configuration and assign it to port 1.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-50"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-47"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

@@ -1,10 +1,5 @@
 var registers_8h =
 [
-    [ "BGMODE_MODE0", "group__reg__const.html#gaf5c203785bc02536dbf8c471192df671", null ],
-    [ "BGMODE_MODE1", "group__reg__const.html#gaa3235e8a5a53d51220c4d3582e1804e8", null ],
-    [ "BGMODE_MODE2", "group__reg__const.html#ga7adfcde7ddd81e2497dc4fedaa18873e", null ],
-    [ "BGMODE_MODE3", "group__reg__const.html#gae763e3ad4e6e2a514eedac824f76efa9", null ],
-    [ "BGMODE_MODE7", "group__reg__const.html#ga89d4f64610e55992ddf37d38f65614ab", null ],
     [ "INIDISP_BRIGHTNESS", "group__reg__const.html#gaaf3fc9440cf26732b7b05473e07bfec4", null ],
     [ "INIDISP_FORCE_BLANK", "group__reg__const.html#gab18ce2bcee19d38256a74af702ebe4a3", null ],
     [ "NMITIMEN_JOY_ENABLE", "group__reg__const.html#ga25c5bb53354cc1a7d89d1174d15a313a", null ],

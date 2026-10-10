@@ -11,6 +11,5 @@ var koopatroopa_8c =
     [ "koopatroopanum", "koopatroopa_8c.html#ae3d6d007cf2553f4f13f79656418d114", null ],
     [ "koopatroopax", "koopatroopa_8c.html#a6233b6b9ad8f42297bbf552f29e5ce2a", null ],
     [ "koopatroopay", "koopatroopa_8c.html#a5eb98bd1101ba8eb86b987c859f2ff0c", null ],
-    [ "nbobjects", "koopatroopa_8c.html#a1f11a4fc65e8bd72a9ba9c513f6a24a9", null ],
-    [ "sprkoopatroopa", "koopatroopa_8c.html#aaa7a83b847fb1605cdaccf1f1ded70fa", null ]
+    [ "nbobjects", "koopatroopa_8c.html#a1f11a4fc65e8bd72a9ba9c513f6a24a9", null ]
 ];

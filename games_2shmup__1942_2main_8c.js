@@ -39,7 +39,6 @@ var games_2shmup__1942_2main_8c =
     [ "bullets_render", "games_2shmup__1942_2main_8c.html#a130d46bc8814527c43630807fd70cf92", null ],
     [ "bullets_update", "games_2shmup__1942_2main_8c.html#ab2ea1aafd7d5a6283af67b3db431d88d", null ],
     [ "collisions_resolve", "games_2shmup__1942_2main_8c.html#ae7918e32f1952e750d4cde8b15a1068b", null ],
-    [ "DECLARE_BG_ASSET", "games_2shmup__1942_2main_8c.html#ab89fd6715a2d151f8bc9be0be89be811", null ],
     [ "enemies_init", "games_2shmup__1942_2main_8c.html#ad0ad1b3a2c87c160bb04994a90a8f2e3", null ],
     [ "enemies_render", "games_2shmup__1942_2main_8c.html#a7ec57cfaeb4d61596ac1ed3374698a7f", null ],
     [ "enemies_update", "games_2shmup__1942_2main_8c.html#ac0081dca576e0c6e41c8f645209098a9", null ],
@@ -47,17 +46,5 @@ var games_2shmup__1942_2main_8c =
     [ "enemy_spawn", "games_2shmup__1942_2main_8c.html#aae43988739bdac5879cb0f90f5915a20", null ],
     [ "main", "games_2shmup__1942_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "prng_next", "games_2shmup__1942_2main_8c.html#a9b16e64baba188eeed94dc6638273e3d", null ],
-    [ "bullet_pal", "games_2shmup__1942_2main_8c.html#a684546c96eca9151bc5619a54ae72eb9", null ],
-    [ "bullet_pal_end", "games_2shmup__1942_2main_8c.html#a2f8b20c6e021f1cc323505bce984146a", null ],
-    [ "bullet_tiles", "games_2shmup__1942_2main_8c.html#a90ae922c4bae9ad47aa4578bfc03c27f", null ],
-    [ "bullet_tiles_end", "games_2shmup__1942_2main_8c.html#ac1f29b9b9e903f6636b09cc351dda6fc", null ],
-    [ "enemy_pal", "games_2shmup__1942_2main_8c.html#a166ee3ec117a57c0fc187b10c484d296", null ],
-    [ "enemy_pal_end", "games_2shmup__1942_2main_8c.html#a8469aaffa1cfee79bd293a28ef1aa584", null ],
-    [ "enemy_tiles", "games_2shmup__1942_2main_8c.html#ac0143e3714d1ca79bb94ddd7687630d3", null ],
-    [ "enemy_tiles_end", "games_2shmup__1942_2main_8c.html#a2eb10061228b4f0bea644f9bbaf07043", null ],
-    [ "game", "games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44", null ],
-    [ "player_pal", "games_2shmup__1942_2main_8c.html#a021cc3af08a3b3cec2749e7514e08222", null ],
-    [ "player_pal_end", "games_2shmup__1942_2main_8c.html#ac68063429b056a8cda19fe5e74412e46", null ],
-    [ "player_tiles", "games_2shmup__1942_2main_8c.html#a10e1db9413b95cad058f73b48d03cad4", null ],
-    [ "player_tiles_end", "games_2shmup__1942_2main_8c.html#a39a5cbf3814a39bc1a44491227835d0a", null ]
+    [ "game", "games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44", null ]
 ];

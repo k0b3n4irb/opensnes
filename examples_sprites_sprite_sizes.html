@@ -129,7 +129,7 @@ Screenshot</div></div>
     <h2 class="doxsection"><a class="anchor" id="what-this-example-shows-10"></a>
 What This Example Shows</h2>
 <p>An interactive menu to switch between all <b>6 SNES sprite size combinations</b>. The SNES OBJSEL register defines two sizes (small and large) that apply to all 128 sprites. Each sprite chooses small or large via its OAM high-table bit.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-36"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-35"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -137,7 +137,7 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">D-PAD UP/DOWN  </td><td class="markdownTableBodyNone">Select sprite size mode  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-50"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-51"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/sprites/sprite_sizes</div>
@@ -163,17 +163,15 @@ How It Works</h2>
 2. Load sprites with force blank</h3>
 <div class="fragment"><div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x80;  <span class="comment">/* Force blank -- unlimited VRAM write time */</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_function" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c">oamInitGfxSet</a>(<a class="code hl_variable" href="sprites_2sprite__sizes_2main_8c.html#a23294ed35e3d2c2784b8218f56991f04">sprite8</a>, size, <a class="code hl_variable" href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, palsize, 0, 0x4100, <a class="code hl_define" href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a>);</div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="input_2move__sprite_2main_8c.html#a49792cd3b2365c1f10bed7be6e830759">sprite32</a>, 0x4500, size32);</div>
+<div class="line"><a class="code hl_function" href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c">oamInitGfxSet</a>(sprite8, size, <a class="code hl_variable" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a>, palsize, 0, 0x4100, <a class="code hl_define" href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a>);</div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(sprite32, 0x4500, size32);</div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a> = 0x0F;  <span class="comment">/* Restore display */</span></div>
-<div class="ttc" id="abackgrounds_2mode1__lz77_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="backgrounds_2mode1__lz77_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div></div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_aa81235770612a39a2668d11264dc308f"><div class="ttname"><a href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f">palette</a></div><div class="ttdeci">u8 palette[]</div><div class="ttdoc">Full 256-color palette for BG and sprite layers (512 bytes).</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gabec6eb1bc9f87a1143464c7418c96388"><div class="ttname"><a href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a></div><div class="ttdeci">#define REG_INIDISP</div><div class="ttdoc">Display control (W).</div><div class="ttdef"><b>Definition</b> registers.h:49</div></div>
-<div class="ttc" id="ainput_2move__sprite_2main_8c_html_a49792cd3b2365c1f10bed7be6e830759"><div class="ttname"><a href="input_2move__sprite_2main_8c.html#a49792cd3b2365c1f10bed7be6e830759">sprite32</a></div><div class="ttdeci">u8 sprite32[]</div><div class="ttdoc">4bpp 32x32 sprite tile data (data.asm, in ROM)</div></div>
-<div class="ttc" id="asprite_8h_html_a4e8556727bbae22ac2e0fa8392a13fc4"><div class="ttname"><a href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a></div><div class="ttdeci">#define OBJ_SIZE8_L32</div><div class="ttdef"><b>Definition</b> sprite.h:50</div></div>
+<div class="ttc" id="asprite_8h_html_a4e8556727bbae22ac2e0fa8392a13fc4"><div class="ttname"><a href="sprite_8h.html#a4e8556727bbae22ac2e0fa8392a13fc4">OBJ_SIZE8_L32</a></div><div class="ttdeci">#define OBJ_SIZE8_L32</div><div class="ttdef"><b>Definition</b> sprite.h:53</div></div>
 <div class="ttc" id="asprite_8h_html_aadaab0bfc2df6de17aee9515212c290c"><div class="ttname"><a href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c">oamInitGfxSet</a></div><div class="ttdeci">void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette, u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize)</div><div class="ttdoc">Initialize sprite graphics and palette (PVSnesLib compatible).</div></div>
-<div class="ttc" id="asprites_2sprite__sizes_2main_8c_html_a23294ed35e3d2c2784b8218f56991f04"><div class="ttname"><a href="sprites_2sprite__sizes_2main_8c.html#a23294ed35e3d2c2784b8218f56991f04">sprite8</a></div><div class="ttdeci">u8 sprite8[]</div><div class="ttdoc">8x8 sprite tile data (defined in data.asm)</div></div>
 </div><!-- fragment --><p><b>Force blank is required</b> because larger sprites (32x32, 64x64) exceed the ~4 KB VBlank DMA budget. Without it, VRAM writes are silently dropped by the PPU.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-two-sprites-per-mode"></a>
 3. Two sprites per mode</h3>
@@ -183,9 +181,9 @@ How It Works</h2>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, 170, 120, 0x0050, 1, 3, 0);  <span class="comment">/* Large sprite, right */</span></div>
 <div class="line"><a class="code hl_function" href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5">oamSetSize</a>(1, <a class="code hl_define" href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a>);</div>
 <div class="ttc" id="asprite_8h_html_a2ffba63a8844c983761138b1fbf81bd5"><div class="ttname"><a href="sprite_8h.html#a2ffba63a8844c983761138b1fbf81bd5">oamSetSize</a></div><div class="ttdeci">void oamSetSize(u16 id, u16 large)</div><div class="ttdoc">Set sprite size (large/small).</div></div>
-<div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:100</div></div>
+<div class="ttc" id="asprite_8h_html_a330d199fcaadc1fab59ca0b7f1ca3b0c"><div class="ttname"><a href="sprite_8h.html#a330d199fcaadc1fab59ca0b7f1ca3b0c">OBJ_LARGE</a></div><div class="ttdeci">#define OBJ_LARGE</div><div class="ttdef"><b>Definition</b> sprite.h:103</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
-<div class="ttc" id="asprite_8h_html_a908b094470fa9632302b14321338ae7a"><div class="ttname"><a href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a></div><div class="ttdeci">#define OBJ_SMALL</div><div class="ttdoc">Sprite size selection.</div><div class="ttdef"><b>Definition</b> sprite.h:99</div></div>
+<div class="ttc" id="asprite_8h_html_a908b094470fa9632302b14321338ae7a"><div class="ttname"><a href="sprite_8h.html#a908b094470fa9632302b14321338ae7a">OBJ_SMALL</a></div><div class="ttdeci">#define OBJ_SMALL</div><div class="ttdoc">Sprite size selection.</div><div class="ttdef"><b>Definition</b> sprite.h:102</div></div>
 </div><!-- fragment --><p>Tile numbers are offsets from the OBJSEL name base (<span class="tt">$4000</span>):</p><ul>
 <li>Small at VRAM <span class="tt">$4100</span>: tile = (<span class="tt">$4100</span> - <span class="tt">$4000</span>) / 16 = <span class="tt">$10</span></li>
 <li>Large at VRAM <span class="tt">$4500</span>: tile = (<span class="tt">$4500</span> - <span class="tt">$4000</span>) / 16 = <span class="tt">$50</span></li>
@@ -209,7 +207,7 @@ The 6 Size Modes</h2>
 <td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">32x32  </td><td class="markdownTableBodyNone">64x64  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="sprite_8h.html#a449cd6f7c4fc8ca09a632e0c58cdb365">OBJ_SIZE32_L64</a></span>  </td></tr>
 </table>
 <p>Most SNES games use mode 3 (<span class="tt"><a class="el" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></span>) &ndash; 16x16 for characters and 32x32 for bosses/effects. Mode 0 (<span class="tt"><a class="el" href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf" title="Sprite size indices (for oamInit, oamInitGfxSet).">OBJ_SIZE8_L16</a></span>) is common for simple games with small sprites.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-51"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-50"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="objsel-register-2101"></a>
 OBJSEL Register ($2101)</h3>
@@ -248,7 +246,7 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Menu UI, size mode switching, sprite loading  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">Four sprite sizes (8/16/32/64) with palettes via <span class="tt">.INCBIN</span>  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/sprite{8,16,32,64}.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the four sheets (<span class="tt">opensnes-sprite</span>, one block size each); the build converts them and links the result, <span class="tt">res/spriteN.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">res/</span>  </td><td class="markdownTableBodyNone">Source PNGs for each sprite size  </td></tr>
 <tr class="markdownTableRowEven">
@@ -266,7 +264,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-74"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-70"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">text4bpp</span>, <span class="tt">input</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->

@@ -8,8 +8,6 @@ var math_8h =
     [ "fixed", "math_8h.html#ac1976de9516b58f7a0352917f8d8bedd", null ],
     [ "atan2_8", "math_8h.html#ac0e3632ad4ed7071906c0aaae0fd50b5", null ],
     [ "div16", "math_8h.html#a6088dfaae404ecf484ca911a8ed7b6ab", null ],
-    [ "ease_in_quad", "math_8h.html#a8a300b912155f22476053ffc3cc15d33", null ],
-    [ "ease_out_quad", "math_8h.html#a8b6668394e715b1f4faf5b11dda38fa2", null ],
     [ "easeInQuad", "math_8h.html#af15f7ac5b37ea60e9dd480c3daa0fa11", null ],
     [ "easeOutQuad", "math_8h.html#a71cba99b6f60cdd98abd1e244d552f69", null ],
     [ "fixAbs", "math_8h.html#aa1c28dae34a0097f2f4c5e4bf4160e4a", null ],

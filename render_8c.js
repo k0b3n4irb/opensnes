@@ -62,9 +62,5 @@ var render_8c =
     [ "red_pal", "render_8c.html#a72e7599f5246c03e063969192051a3ba", null ],
     [ "red_pal_end", "render_8c.html#a5ca877bee4fd0a03f9cda26df2c16b48", null ],
     [ "tilemap_bg1", "render_8c.html#af90853037d53e057ba0389ec2d851d9e", null ],
-    [ "tilemap_bg2", "render_8c.html#a1aacb9e58bb611ab2fd5aaec6804340c", null ],
-    [ "tiles_gfx", "render_8c.html#a7974b7c39b7980bf5580f5dc9a2cf2c0", null ],
-    [ "tiles_gfx_end", "render_8c.html#a2fbf2bf2a89951ef6a1cc02fb0a1e5be", null ],
-    [ "tiles_pal", "render_8c.html#a78181ef85e5654d84864c62594ea2973", null ],
-    [ "tiles_pal_end", "render_8c.html#acf5936840a79bb20c55346c8416106f3", null ]
+    [ "tilemap_bg2", "render_8c.html#a1aacb9e58bb611ab2fd5aaec6804340c", null ]
 ];

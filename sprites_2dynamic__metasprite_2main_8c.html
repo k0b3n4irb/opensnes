@@ -126,6 +126,9 @@ $(function(){initNavTree('sprites_2dynamic__metasprite_2main_8c.html','',''); })
 <p>Dynamic metasprite engine demo — multi-tile characters with VRAM streaming.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &quot;res/spritehero32.inc&quot;</code><br />
+<code>#include &quot;res/spritehero16.inc&quot;</code><br />
+<code>#include &quot;res/spritehero8.inc&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -148,10 +151,6 @@ Variables</h2></td></tr>
 <tr class="memdesc:abc082b417d7da07574502ec922386fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">8x8 metasprite: 16x16 character (2x2 grid of 8x8)  <br /></td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
 <tr class="memitem:a588ff5082ccab493c90422d028d31b4d" id="r_a588ff5082ccab493c90422d028d31b4d"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a588ff5082ccab493c90422d028d31b4d">selectedItem</a></td></tr>
-<tr class="memitem:a31447f39fe58257bd10616a4fe45f35d" id="r_a31447f39fe58257bd10616a4fe45f35d"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a31447f39fe58257bd10616a4fe45f35d">spritehero16_til</a> []</td></tr>
-<tr class="memitem:aeaf8c79ab42cf83a6b899f58c55ac559" id="r_aeaf8c79ab42cf83a6b899f58c55ac559"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aeaf8c79ab42cf83a6b899f58c55ac559">spritehero32_pal</a> []</td></tr>
-<tr class="memitem:a4a7f6eee3d43e9509a60fe80f1738130" id="r_a4a7f6eee3d43e9509a60fe80f1738130"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a4a7f6eee3d43e9509a60fe80f1738130">spritehero32_til</a> []</td></tr>
-<tr class="memitem:a159bd91dc35ea86a3a0c8a842231a938" id="r_a159bd91dc35ea86a3a0c8a842231a938"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a159bd91dc35ea86a3a0c8a842231a938">spritehero8_til</a> []</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Dynamic metasprite engine demo — multi-tile characters with VRAM streaming. </p>
@@ -288,10 +287,10 @@ Variables</h2></td></tr>
 <div class="line">    <a class="code hl_define" href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a>(16, 32, 5, <a class="code hl_define" href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a>(0) | <a class="code hl_define" href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a>(3)),</div>
 <div class="line">    <a class="code hl_define" href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div>
 <div class="line">}</div>
-<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:477</div></div>
-<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:465</div></div>
-<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:468</div></div>
-<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:474</div></div>
+<div class="ttc" id="asprite_8h_html_a719045957a857d18f56354a20313ae37"><div class="ttname"><a href="sprite_8h.html#a719045957a857d18f56354a20313ae37">OBJ_PRIO</a></div><div class="ttdeci">#define OBJ_PRIO(prio)</div><div class="ttdoc">Metasprite priority attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:560</div></div>
+<div class="ttc" id="asprite_8h_html_a8f6b3c20ebf5d5ee31b8363d62e1889b"><div class="ttname"><a href="sprite_8h.html#a8f6b3c20ebf5d5ee31b8363d62e1889b">METASPR_ITEM</a></div><div class="ttdeci">#define METASPR_ITEM(dx, dy, tile, attr)</div><div class="ttdoc">Metasprite item macro (PVSnesLib compatible).</div><div class="ttdef"><b>Definition</b> sprite.h:548</div></div>
+<div class="ttc" id="asprite_8h_html_aa1d425dcce3cd104751744535b6a389a"><div class="ttname"><a href="sprite_8h.html#aa1d425dcce3cd104751744535b6a389a">METASPR_TERM</a></div><div class="ttdeci">#define METASPR_TERM</div><div class="ttdoc">End marker for metasprite data (dx = -128).</div><div class="ttdef"><b>Definition</b> sprite.h:551</div></div>
+<div class="ttc" id="asprite_8h_html_afaa85a4b677edfc58a4b9e26df8890f7"><div class="ttname"><a href="sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7">OBJ_PAL</a></div><div class="ttdeci">#define OBJ_PAL(pal)</div><div class="ttdoc">Metasprite palette attribute macro.</div><div class="ttdef"><b>Definition</b> sprite.h:557</div></div>
 </div><!-- fragment -->
 <p>16x16 metasprite: 32x48 character (2x3 grid of 16x16) </p>
 
@@ -383,94 +382,6 @@ Variables</h2></td></tr>
           <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> selectedItem</td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a31447f39fe58257bd10616a4fe45f35d" name="a31447f39fe58257bd10616a4fe45f35d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31447f39fe58257bd10616a4fe45f35d">&#9670;&#160;</a></span>spritehero16_til</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> spritehero16_til[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aeaf8c79ab42cf83a6b899f58c55ac559" name="aeaf8c79ab42cf83a6b899f58c55ac559"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeaf8c79ab42cf83a6b899f58c55ac559">&#9670;&#160;</a></span>spritehero32_pal</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> spritehero32_pal[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4a7f6eee3d43e9509a60fe80f1738130" name="a4a7f6eee3d43e9509a60fe80f1738130"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a7f6eee3d43e9509a60fe80f1738130">&#9670;&#160;</a></span>spritehero32_til</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> spritehero32_til[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a159bd91dc35ea86a3a0c8a842231a938" name="a159bd91dc35ea86a3a0c8a842231a938"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a159bd91dc35ea86a3a0c8a842231a938">&#9670;&#160;</a></span>spritehero8_til</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> spritehero8_til[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

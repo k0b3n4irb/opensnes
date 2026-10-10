@@ -245,54 +245,17 @@ Hiding Sprites</h2>
 <div class="line"><span class="comment">// ...and set bit 0 of the sprite&#39;s extended-table pair (X bit 8).</span></div>
 </div><!-- fragment --><p>Y=240 alone only hides sprites up to 16 px tall: sprite Y wraps vertically, so a 32x32 sprite at Y=240 shows its last ~16 rows at the <b>top of the screen</b>, and no Y value can fully hide a 64x64. This is exactly what the lib's <span class="tt"><a class="el" href="sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a></span> / <span class="tt"><a class="el" href="sprite_8h.html#a7ffabc8e75e6d2ca0ae455c38c9ebfe8" title="Clear all sprites.">oamClear()</a></span> do — prefer them over manual pokes.</p>
 <p>One refinement worth knowing: a sprite at X=256 is still treated as X=0 for the per-scanline range/time evaluation. A hidden <em>large</em> sprite whose Y wraps onto visible lines therefore still consumes the 32-sprites / 34-slivers budget on those lines — if the top of your screen drops sprites mysteriously, audit your hidden large sprites.</p>
-<h2 class="doxsection"><a class="anchor" id="sprite-y-1-scanline-quirk"></a>
-Sprite Y +1 Scanline Quirk</h2>
-<p>The SNES PPU renders sprites with a 1-scanline vertical delay: a sprite whose <span class="tt">OAM_Y = N</span> is drawn on scanlines <b>N+1 through N+8</b>, not N through N+7. The OAM is scanned and tile-fetched on the previous scanline, so by the time the sprite is composited it has already advanced by one.</p>
-<p>This is documented hardware behavior, confirmed in two places on the SNESdev community wiki:</p>
-<ul>
-<li><em>Sprites</em> — "Like the NES, sprites appear 1 line lower than their Y value,
-  however because the first line of rendering is always hidden on SNES, a
-  sprite with Y=0 will appear to begin on the first visible line." <a href="https://snes.nesdev.org/wiki/Sprites">https://snes.nesdev.org/wiki/Sprites</a></li>
-<li><em>SNES PPU for NES developers</em> — "Sprites are delayed vertically by 1
-  scanline, just as on NES, so scroll and sprite positions will work
-  unmodified on SNES (...)." <a href="https://snes.nesdev.org/wiki/SNES_PPU_for_NES_developers">https://snes.nesdev.org/wiki/SNES_PPU_for_NES_developers</a></li>
-</ul>
-<p>The X axis has no equivalent quirk.</p>
-<h3 class="doxsection"><a class="anchor" id="opensnes-sdk-convention"></a>
-OpenSNES SDK convention</h3>
-<p>The Y semantics depend on which API you use. Two camps:</p>
-<p><b>Camp 1 — Y is the rendered top scanline (<span class="tt">visual_top</span>)</b></p>
-<p>The API auto-subtracts 1 before writing OAM, so the value you pass is what you see on screen.</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">API  </th><th class="markdownTableHeadNone">Notes  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">oamSet(id, x, y, ...)</span>  </td><td class="markdownTableBodyNone">auto Y-1 in <span class="tt">sprite_oamset.asm</span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">oamSetY(id, y)</span> / <span class="tt">oamSetXY(...)</span>  </td><td class="markdownTableBodyNone">auto Y-1 in <span class="tt">sprite.c</span>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite</a></span>  </td><td class="markdownTableBodyNone">calls <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet</a></span>  </td></tr>
-</table>
-<p><b>Camp 2 — Y is the legacy PVSnesLib <span class="tt">y_logical</span> (= <span class="tt">visual_top - 1</span>)</b></p>
-<p>The dynamic sprite engine inherits PVSnesLib's collision-and-render contract: collision math sets <span class="tt"><a class="el" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f" title="Dynamic sprite buffer (128 entries, 2048 bytes).">oambuffer</a>[id].oamy = visual_top - 1</span>, the engine writes that raw to OAM, and the PPU's +1 quirk lifts it back to <span class="tt">visual_top</span> on screen. <b>Do not pre-subtract</b> when feeding these APIs.</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">API  </th><th class="markdownTableHeadNone">Notes  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">oamDynamicDraw(id)</span>  </td><td class="markdownTableBodyNone">use <span class="tt"><a class="el" href="sprite_8h.html#a26ae9bbf7a98025a5d9b529bbe403a7f" title="Dynamic sprite buffer (128 entries, 2048 bytes).">oambuffer</a>[id].oamy</span> raw  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="sprite_8h.html#ae4d4517a682025275d57356f692e2548" title="Draw a dynamic metasprite — engine picks the size routine.">oamMetaDrawDyn</a>{8,16,32}</span>  </td><td class="markdownTableBodyNone">dynamic engine path, same convention  </td></tr>
-</table>
-<p><b>Camp 3 — direct OAM writes</b></p>
-<p>When bypassing both APIs and writing <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[id*4 + 1]</span> yourself, no one compensates for you. Subtract 1 manually so the rendered top matches the caller's intent.</p>
-<div class="fragment"><div class="line"><a class="code hl_variable" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a>[<span class="keywordtype">id</span>*4 + 1] = (<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>)(<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> - 1);   <span class="comment">/* visual_top semantics */</span></div>
-<div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-<div class="ttc" id="asystem_8h_html_a7c7ba6f353be470fff7b41590a12a0e9"><div class="ttname"><a href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9">oamMemory</a></div><div class="ttdeci">u8 oamMemory[]</div><div class="ttdoc">Hardware OAM buffer (544 bytes at $7E:0300).</div></div>
-</div><!-- fragment --><p>Sentinel values used to hide a sprite (<span class="tt"><a class="el" href="sprite_8h.html#aa4a3dec16e47237ca76dafdef88883b8" title="Y position to hide sprite.">OBJ_HIDE_Y</a> = 240</span>, <span class="tt"><a class="el" href="sprite_8h.html#a7e322aa2d519ca5856491a92e0827405" title="Y coordinate that hides a sprite below the NTSC visible area.">OAM_Y_OFFSCREEN</a> = 224</span>) are <b>not</b> compensated — they are not logical positions, just markers that push the sprite off the visible area.</p>
-<h3 class="doxsection"><a class="anchor" id="why-two-camps"></a>
-Why two camps?</h3>
-<p>Most of OpenSNES treats Y as <span class="tt">visual_top</span>, which is what programmers expect. The dynamic engine is the exception because its collision-driven <span class="tt">oamy</span> field is set by ported PVSnesLib code that already accounts for the quirk. Adding our own compensation on top would double the offset and lift sprites 2 px off the ground — easily visible on slope_collision / likemario.</p>
+<h2 class="doxsection"><a class="anchor" id="oam_sprite_y"></a>
+Sprite Y: no correction</h2>
+<p>A sprite's OAM <span class="tt">Y</span> is the picture line of its top row, 0 being the first visible line. The PPU does draw a sprite one scanline below its <span class="tt">Y</span>, and it never outputs scanline 0: the two cancel. The arbiter, word for word (SNESdev wiki, <em>Sprites</em>, <a href="https://snes.nesdev.org/wiki/Sprites">https://snes.nesdev.org/wiki/Sprites</a>):</p>
+<blockquote class="doxtable">
+<p>Like the NES, sprites appear 1 line lower than their Y value, however because the first line of rendering is always hidden on SNES, a sprite with Y=0 will appear to begin on the first visible line. However, a background with Y scroll of 0 will appear to have its top pixel cut off by the hidden line. </p>
+</blockquote>
+<p>So only the <b>background</b> needs a correction, and the library applies it: <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span> writes <span class="tt">y - 1</span> to <span class="tt">BGnVOFS</span>. Every sprite API stores the <span class="tt">y</span> it is given, and a direct write to <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[id * 4 + 1]</span> stores <span class="tt">y</span> too. A sprite and the background it stands on take the same camera value.</p>
+<p>Measured on luna (2026-10-09): an 8x8 sprite with OAM <span class="tt">Y</span> = 0 covers picture lines 0 to 7; with <span class="tt">Y</span> = 255 it covers lines 0 to 6, its top row lost on the scanline that is never output.</p>
+<p><b>History, because code written against it exists.</b> From 2026-04-27 to 2026-10-09 <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a1e502976736192dfc725c51f471a24d6" title="Set sprite Y position.">oamSetY()</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a7797ff0c3210fcbd0cbbe0e55d23a83c" title="Set sprite position.">oamSetXY()</a></span> and the <span class="tt"><a class="el" href="sprite_8h.html#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast</a></span> macros stored <span class="tt">y - 1</span>, on a reading of the first half of the sentence above without the second; the dynamic engine followed on 2026-09-26. Every sprite was drawn one line too high, and since <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span> got its <span class="tt">- 1</span> (2026-09-12) one line above a background scrolled to the same <span class="tt">y</span>. Code that subtracted 1 by hand before a direct <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> write must stop; code that added 1 to a <span class="tt">y</span> passed to <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> to line a sprite up with the background must stop too.</p>
+<p>Sentinel values that hide a sprite (<span class="tt"><a class="el" href="sprite_8h.html#aa4a3dec16e47237ca76dafdef88883b8" title="Y position to hide sprite.">OBJ_HIDE_Y</a> = 240</span>) are positions like any other: 240 is below the last visible line (223).</p>
+<p>The X axis has no such subtlety.</p>
 <h2 class="doxsection"><a class="anchor" id="timing"></a>
 Timing</h2>
 <p>OAM writes should be done during <b>VBlank</b> or <b>forced blank</b> (screen off). Writing during active display can cause visual glitches.</p>
@@ -319,6 +282,7 @@ Complete Example</h2>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = tile; <span class="comment">// Pair 2: Tile</span></div>
 <div class="line">    <a class="code hl_define" href="group__ppu__regs.html#gac7a5db74119e971459fad469a4caa92c">REG_OAMDATA</a> = attr; <span class="comment">//         Attr (commits tile,attr)</span></div>
 <div class="line">}</div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="common-pitfalls"></a>
 Common Pitfalls</h2>
 <ol type="1">
@@ -327,7 +291,7 @@ Common Pitfalls</h2>
 <li><b>Forgetting extended table</b> - Large sprites need size bit set</li>
 <li><b>X position &gt; 255</b> - Need to set bit 0 in extended table</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="see-also-17"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-23"></a>
 See Also</h2>
 <ul>
 <li><a class="el" href="REGISTERS_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/REGISTERS.md">Registers</a> - Full register reference</li>

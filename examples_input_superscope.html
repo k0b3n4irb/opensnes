@@ -127,7 +127,7 @@ $(function(){initNavTree('examples_input_superscope.html','',''); });
 <div class="caption">
 Screenshot</div></div>
     <p>Light gun detection, calibration via PPU H/V counters, and fire tracking with a red dot sprite.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-18"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-17"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -139,12 +139,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Cursor  </td><td class="markdownTableBodyNone">Advance to ready state  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-31"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-32"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/input/superscope</div>
 </div><!-- fragment --><p>Then open <span class="tt">superscope.sfc</span> in your emulator (Mesen2 recommended). Enable Super Scope in Mesen2 Input settings, port 2.</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-27"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-25"></a>
 What You'll Learn</h2>
 <ul>
 <li>How the SNES Super Scope communicates hit position via PPU H/V counters</li>
@@ -180,22 +180,19 @@ Walkthrough</h2>
 </div><!-- fragment --><p>The built-in 2bpp font is loaded to VRAM $0000. BG1's tilemap sits at $3800 to avoid conflicts with BG2 graphics.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md3-calibration-background-bg2"></a>
 3. Calibration Background (BG2)</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="input_2superscope_2main_8c.html#aebeabd9e4131b3a9e586a46f151cfc93">aim_target_tiles</a>, 0x1000, ...);</div>
-<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="input_2superscope_2main_8c.html#a35859279ec6a363be2a0c91d75550e7f">aim_target_map</a>, 0x2000, ...);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(aim_target_tiles, 0x1000, ...);</div>
+<div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(aim_target_map, 0x2000, ...);</div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d">bgSetGfxPtr</a>(1, 0x1000);</div>
 <div class="line"><a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(1, 0x2000, <a class="code hl_define" href="group__bg__size.html#ga034f9e445b3659542009666f92520fd3">BG_MAP_32x32</a>);</div>
 <div class="ttc" id="adma_8h_html_a428ee7d96f20485046c89d95f8719ca5"><div class="ttname"><a href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a></div><div class="ttdeci">void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size)</div><div class="ttdoc">Copy data to VRAM (PVSnesLib compatible).</div></div>
-<div class="ttc" id="ainput_2superscope_2main_8c_html_a35859279ec6a363be2a0c91d75550e7f"><div class="ttname"><a href="input_2superscope_2main_8c.html#a35859279ec6a363be2a0c91d75550e7f">aim_target_map</a></div><div class="ttdeci">u8 aim_target_map[]</div><div class="ttdoc">Aim target tilemap (32x32 BG2 layout) from data.asm.</div></div>
-<div class="ttc" id="ainput_2superscope_2main_8c_html_aebeabd9e4131b3a9e586a46f151cfc93"><div class="ttname"><a href="input_2superscope_2main_8c.html#aebeabd9e4131b3a9e586a46f151cfc93">aim_target_tiles</a></div><div class="ttdeci">u8 aim_target_tiles[]</div><div class="ttdoc">Aim target background tile data (2bpp, crosshair pattern) from data.asm.</div></div>
 </div><!-- fragment --><p>The crosshair target image is a 256x224 background. Tiles at $1000, tilemap at $2000.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md4-sprites"></a>
 4. Sprites</h3>
-<div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(<a class="code hl_variable" href="input_2superscope_2main_8c.html#a3c8dee3f0db5cc4fca5de243000816c7">sprites_tiles</a>, 0x4000, ...);</div>
+<div class="fragment"><div class="line"><a class="code hl_function" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5">dmaCopyVram</a>(sprites_tiles, 0x4000, ...);</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554">REG_OBJSEL</a> = <a class="code hl_define" href="sprite_8h.html#a7ad237518b773199a39686500d459ced">OBJSEL</a>(<a class="code hl_define" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a>, 0x4000);</div>
 <div class="ttc" id="agroup__ppu__regs_html_ga82c4b53f10fe0de6176e3f96b49ae554"><div class="ttname"><a href="group__ppu__regs.html#ga82c4b53f10fe0de6176e3f96b49ae554">REG_OBJSEL</a></div><div class="ttdeci">#define REG_OBJSEL</div><div class="ttdoc">Object (sprite) size and base (W).</div><div class="ttdef"><b>Definition</b> registers.h:52</div></div>
-<div class="ttc" id="ainput_2superscope_2main_8c_html_a3c8dee3f0db5cc4fca5de243000816c7"><div class="ttname"><a href="input_2superscope_2main_8c.html#a3c8dee3f0db5cc4fca5de243000816c7">sprites_tiles</a></div><div class="ttdeci">u8 sprites_tiles[]</div><div class="ttdoc">Sprite tile data (red dot marker, 4bpp) from data.asm.</div></div>
-<div class="ttc" id="asprite_8h_html_a1893eab6ffef9928ff2de22d49bd18c0"><div class="ttname"><a href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></div><div class="ttdeci">#define OBJ_SIZE16_L32</div><div class="ttdef"><b>Definition</b> sprite.h:52</div></div>
-<div class="ttc" id="asprite_8h_html_a7ad237518b773199a39686500d459ced"><div class="ttname"><a href="sprite_8h.html#a7ad237518b773199a39686500d459ced">OBJSEL</a></div><div class="ttdeci">#define OBJSEL(size, vram_addr)</div><div class="ttdoc">Build OBJSEL register value from size constant + VRAM base address.</div><div class="ttdef"><b>Definition</b> sprite.h:72</div></div>
+<div class="ttc" id="asprite_8h_html_a1893eab6ffef9928ff2de22d49bd18c0"><div class="ttname"><a href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></div><div class="ttdeci">#define OBJ_SIZE16_L32</div><div class="ttdef"><b>Definition</b> sprite.h:55</div></div>
+<div class="ttc" id="asprite_8h_html_a7ad237518b773199a39686500d459ced"><div class="ttname"><a href="sprite_8h.html#a7ad237518b773199a39686500d459ced">OBJSEL</a></div><div class="ttdeci">#define OBJSEL(size, vram_addr)</div><div class="ttdoc">Build OBJSEL register value from size constant + VRAM base address.</div><div class="ttdef"><b>Definition</b> sprite.h:75</div></div>
 </div><!-- fragment --><p>The <span class="tt"><a class="el" href="sprite_8h.html#a7ad237518b773199a39686500d459ced" title="Build OBJSEL register value from size constant + VRAM base address.">OBJSEL()</a></span> macro replaces the cryptic <span class="tt">0x62</span> with a readable size + base address. <span class="tt"><a class="el" href="sprite_8h.html#a1893eab6ffef9928ff2de22d49bd18c0">OBJ_SIZE16_L32</a></span> means small=16x16, large=32x32. The sprite sheet has the red dot at tile 0x80 (pixel position 0,64 in the 128-wide sheet).</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md5-direct-oam-setup"></a>
 5. Direct OAM Setup</h3>
@@ -220,8 +217,8 @@ Walkthrough</h2>
 <h2 class="doxsection"><a class="anchor" id="tips--tricks-4"></a>
 Tips &amp; Tricks</h2>
 <ul>
-<li><b>2bpp quantization</b>: When converting images with mostly one color (blue background), gfx4snes may lose minority colors (white crosshair lines). Pre-process the PNG with a fixed indexed palette (e.g. via PIL <span class="tt">quantize()</span>) to control which colors are preserved.</li>
-<li><b>Sprite tile numbering</b>: In a 128px-wide sprite sheet with 16x16 sprites, tile numbers follow <span class="tt">row * 32 + col * 2</span>. Use <span class="tt">gfx4snes --sprite-map</span> to print the full tile map and find the right tile number.</li>
+<li><b>2bpp quantization</b>: When converting images with mostly one color (blue background), the converter may lose minority colors (white crosshair lines). Pre-process the PNG with a fixed indexed palette (e.g. via PIL <span class="tt">quantize()</span>) to control which colors are preserved.</li>
+<li><b>Sprite tile numbering</b>: In a 128px-wide sprite sheet with 16x16 sprites, tile numbers follow <span class="tt">row * 32 + col * 2</span>. <span class="tt">opensnes-sprite inspect</span> reports the block and tile counts; <span class="tt">gfx4snes --sprite-map</span> (the legacy converter, still shipped) prints the full tile map to find a tile number.</li>
 <li><b>OBJSEL macro</b>: Instead of memorizing that <span class="tt">0x62</span> means "16/32 sizes at VRAM $4000", use <span class="tt"><a class="el" href="sprite_8h.html#a7ad237518b773199a39686500d459ced" title="Build OBJSEL register value from size constant + VRAM base address.">OBJSEL(OBJ_SIZE16_L32, 0x4000)</a></span>.</li>
 <li><b>Mesen2 Super Scope setup</b>: In Input settings, assign Super Scope to port 2. Map Fire and Pause to keyboard keys. The scope cursor must be over the emulator window for H/V counters to register.</li>
 </ul>
@@ -230,7 +227,6 @@ Under the Hood: The Build</h2>
 <div class="fragment"><div class="line">TARGET      := superscope.sfc</div>
 <div class="line">USE_LIB     := 1</div>
 <div class="line">LIB_MODULES := console input sprite dma text background</div>
-<div class="line">ASMSRC      := data.asm</div>
 </div><!-- fragment --><table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Module  </th><th class="markdownTableHeadNone">Why it's here  </th></tr>
@@ -247,7 +243,7 @@ Under the Hood: The Build</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">background</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="background_8h.html#a80e3887b5a1a50ba4985e4270ed6673d" title="Set background tile graphics address.">bgSetGfxPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924" title="Set background tilemap address and size.">bgSetMapPtr()</a></span>, <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="modules-used-52"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-48"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">input</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="technical-reference-4"></a>
@@ -276,7 +272,7 @@ Files</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">State machine, sprite control, text display  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone"><span class="tt">.incbin</span> references for background and sprite graphics  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/*.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the target picture (<span class="tt">opensnes-tileset</span>, 2bpp) and the sprite sheet (<span class="tt">opensnes-sprite</span>, 32-pixel blocks, 48 colours); the build converts and links them  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">res/</span>  </td><td class="markdownTableBodyNone">Pre-converted graphics (.pic, .pal, .map) and source PNGs  </td></tr>
 <tr class="markdownTableRowEven">

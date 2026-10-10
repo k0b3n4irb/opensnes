@@ -136,7 +136,7 @@ What This Example Shows</h2>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-7"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">backgrounds/mode1</span> first (basic background setup). Mode 7 is fundamentally different from tile-based modes but the initialization flow is similar.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-27"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-26"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -150,7 +150,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Down  </td><td class="markdownTableBodyNone">Zoom in (magnify)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-41"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-42"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/rotate_scale</div>
@@ -183,8 +183,8 @@ How It Works</h2>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line">}</div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:166</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
-<div class="ttc" id="amode7_2perspective__rotate_2main_8c_html_a313857711c86124ca4a23076d196f8e3"><div class="ttname"><a href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a></div><div class="ttdeci">static u16 angle</div><div class="ttdoc">Rotation step index, 0..47.</div><div class="ttdef"><b>Definition</b> main.c:53</div></div>
+<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
+<div class="ttc" id="amode7_2perspective__rotate_2main_8c_html_a313857711c86124ca4a23076d196f8e3"><div class="ttname"><a href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a></div><div class="ttdeci">static u16 angle</div><div class="ttdoc">Mode 7 ground: 9-tile prefab track (original art).</div><div class="ttdef"><b>Definition</b> main.c:46</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> recalculates the 2x2 transformation matrix (registers M7A-M7D at $211B-$211E) using the current angle and scale. The angle is 0-255, mapping to 0-360 degrees.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md4-zoom-control"></a>
 4. Zoom control</h3>
@@ -193,9 +193,9 @@ How It Works</h2>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668">mode7SetScale</a>(zscale, zscale);</div>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:75</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 </div><!-- fragment --><p>After changing the scale, you must call <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> again because the matrix depends on both angle and scale. The scale range is clamped to <span class="tt">0x0008</span>-<span class="tt">0x0780</span> &ndash; values outside this range produce extreme distortion.</p>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-43"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-42"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="affine-transformation"></a>
 Affine Transformation</h3>
@@ -229,7 +229,7 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">main.c</span>  </td><td class="markdownTableBodyNone">Input handling, rotation/zoom logic  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">data.asm</span>  </td><td class="markdownTableBodyNone">Mode 7 tile/tilemap/palette loading helper  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">res/mode7bg.png.toml</span>  </td><td class="markdownTableBodyNone">the import settings of the Mode 7 picture (<span class="tt">opensnes-tileset</span>, <span class="tt">mode = 7</span>); the build converts and links it, <span class="tt">res/mode7bg.inc</span> declares the symbols  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">res/mode7bg.png</span>  </td><td class="markdownTableBodyNone">Source image for Mode 7 ground  </td></tr>
 <tr class="markdownTableRowEven">
@@ -246,7 +246,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-64"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-60"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
