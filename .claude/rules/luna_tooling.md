@@ -16,7 +16,7 @@ working reference, not a hunch.
 
 1. **PROTOTYPE** — write the smallest internal script that proves the capability
    and pins its exact shape (what input, what output, what assertion). Use it for
-   real work in the meantime. Keep it under `tools/luna-test/`.
+   real work in the meantime. Keep it under `testing/`.
 2. **VALIDATE** — prove the prototype does what's needed on real work, with
    its inputs, outputs and a negative control written down. Do **not** file
    a luna issue on a guess. (Until 2026-09-22 this step was "the owner
@@ -40,17 +40,21 @@ working reference, not a hunch.
   hand-rolled state differ.
 - **Not transitory (the thin orchestration layer):** the harness that merely
   *drives* luna and asserts on its outputs — `luna_runner.py`, `wram_regress.py`,
-  `budget.py`, `probes/*`. These call luna; they do not reimplement it. They are
+  `budget.py`, `lib/probes.py`. These call luna; they do not reimplement it. They are
   the pragmatic exception, and still shrink as luna exposes more. When in doubt:
   *am I asking luna and checking its answer (keep), or computing the answer luna
   should give (transitory)?*
 
 ## Current transitory prototypes (keep this list live)
 
-**None right now** — the ideal steady state. When a missing capability forces a
-prototype, add a row here (script path · the luna capability it proves · status)
-and follow the lifecycle above; when luna ships the capability and it is
-validated, delete the script and remove the row.
+| Script | The luna capability it proves | Status |
+|---|---|---|
+| `testing/frame_sequence.py` | `luna diff --sequence`: do two ROMs show the same pictures in the same order, at another cadence or offset (a free-running loop that got faster, a boot shifted by more than the tolerance) | validated 2026-10-08 on two real cases, a negative control and an identity control; asked of luna the same day (`partners/luna/2026-10-08_to_luna_rapport-v1.34.0.md`, D4); delete when luna ships it |
+
+When a missing capability forces a prototype, add a row here (script path ·
+the luna capability it proves · status) and follow the lifecycle above; when
+luna ships the capability and it is validated, delete the script and remove
+the row. No row = the ideal steady state.
 
 A prior audio-output-analysis prototype (`audio_analyze.py`) was dropped rather
 than promoted: it proved unreliable for melody/tempo verification, so it is not
@@ -68,8 +72,9 @@ scaffolding. The finished building is luna.
 
 - `.claude/rules/testing.md` — luna is already the test backend; this rule adds
   the transitory-tooling discipline on top.
-- The owner runs luna engineering: validated capability requests become luna
-  issues (`gh issue create --repo k0b3n4irb/luna`), tracked to deletion here.
+- luna has its own session: a validated capability request goes to it as a
+  direct message with the prototype (`.claude/rules/exchanges.md`; no GitHub
+  issue since 2026-10-10), tracked to deletion here.
 - `.claude/rules/partners.md` — luna is one of the two partners this project
   stands on; reports to and from it live in `.claude/notes/partners/luna/`,
   and every note luna sends gets a written answer.

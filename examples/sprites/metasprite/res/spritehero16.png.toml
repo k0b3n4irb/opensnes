@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
+metasprite = [32, 48]
+priority = 2

@@ -88,7 +88,8 @@ dynamic_map/
 ├── map32x32.h      — API for 32x32 mode
 ├── map64x64.c      — 64x64 grid engine (16x16 tile mode, 1 tile per sprite)
 ├── map64x64.h      — API for 64x64 mode
-├── data.asm        — ROM data: 8bpp sprite tiles and palettes
+├── res/*.png.toml  — import settings of the two 8bpp sheets (opensnes-tileset, opensnes-sprite);
+│                   the build converts and links them, res/*.inc declare the symbols
 ├── ram.asm         — Bank $7E/$7F RAM sections and assembly DMA helpers
 ├── Makefile        — Build configuration
 └── res/

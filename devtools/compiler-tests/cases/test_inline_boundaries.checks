@@ -2,9 +2,18 @@
 # and the caller computes x+42 itself with no call.
 absent \ntrivial:
 in call_trivial: present lda 4,s\n\tclc\n\tadc\.w #42\n\trtl
-# Cases 1-5 (no keyword / control flow / nested call / recursion / too
-# big) stay real calls: six tail jumps in the file.
-count 6 \tjml \w
-in call_too_big: present jml too_big
-# The recursive inline candidate calls itself through a real jsl.
+# Since 2026-10-10 a static function is inlined, control flow and calls
+# included, when it has one call site (case 1, the helper of case 3) or
+# when it says `inline` (cases 2, 3, 5): none is left as a function, and
+# no tail jump is left in the file (see auto_inline).
+count 0 \tjml \w
+raw absent \nno_kw\.
+raw absent \nwith_if\.
+raw absent \nhelper_for_nested\.
+raw absent \nwith_nested_call\.
+raw absent \ntoo_big\.
+# Case 4, the recursive one: its body is copied once into its caller, and
+# the call it makes to itself stays a real call to the function, kept.
+raw present \nwith_recursion\.test_inline_boundaries:
 in with_recursion: present jsl with_recursion
+in call_with_recursion: present jsl with_recursion

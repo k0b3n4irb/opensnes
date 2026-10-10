@@ -4,15 +4,6 @@
 
 ![Screenshot](sa1_starfield.png)
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/chips/sa1_starfield
-```
-
-Then open `sa1_starfield.sfc` in luna (or any SNES emulator).
-
 ## What You'll Learn
 
 - SA-1 computing 128 sprite positions per frame using sine harmonics
@@ -21,6 +12,15 @@ Then open `sa1_starfield.sfc` in luna (or any SNES emulator).
 - Depth illusion via 4 brightness palettes cycling across sprites
 - Synchronization protocol between SA-1 and main CPU
 - Running SA-1 code from I-RAM: copy it there, keep it position-independent
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/chips/sa1_starfield
+```
+
+Then open `sa1_starfield.sfc` in luna (or any SNES emulator).
 
 ## What to Observe
 

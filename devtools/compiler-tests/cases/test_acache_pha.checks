@@ -1,7 +1,9 @@
 # A-cache across pha: pushing the same param twice loads it ONCE, then
 # pushes A twice — a regression re-reads the slot before the second push.
 in call_same_twice: present lda 4,s\n\tpha\n\tpha\n\tjsl add_two
-count 1 lda 4,s
+# (per function since 2026-10-09: call_with_computed lost its frame too and
+# now reads its own parameter at 4,s)
+in call_same_twice: absent lda 4,s[\s\S]*lda 4,s
 # A computed arg is pushed straight from A: no intermediate slot store
 # between the add and the pha (dead store + A-cache pha).
 in call_with_computed: present adc\.w #5\n\tpha\n\tjsl do_something

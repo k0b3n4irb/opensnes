@@ -12,7 +12,10 @@
 #define GOOMBA_RIGHT   2
 #define GOOMBA_XVELOC  0x028A
 
-extern u8 sprgoomba;
+#include "res/tilesMario.inc"    /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
+#include "res/mario.inc"         /* generated: mario_tiles[], mario_pal[] */
+#include "res/goomba.inc"        /* generated: goomba_tiles[], goomba_pal[] */
+#include "res/koopatroopa.inc"   /* generated: koopatroopa_tiles[], koopatroopa_pal[] */
 extern u16 nbobjects;
 
 u16 goombanum;
@@ -40,7 +43,7 @@ void goombainit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     oambuffer[nbobjects].oamframeid = 0;
     oambuffer[nbobjects].oamrefresh = 1;
     oambuffer[nbobjects].oamattribute = OBJ_PRIO(2);
-    OAM_SET_GFX(nbobjects, &sprgoomba);
+    OAM_SET_GFX(nbobjects, goomba_tiles);
     nbobjects++;
 }
 

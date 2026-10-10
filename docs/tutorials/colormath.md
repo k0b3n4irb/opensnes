@@ -1,5 +1,9 @@
 # Colour Math Tutorial {#tutorial_colormath}
 
+![colormath example](transparency.png)
+
+*`examples/color/transparency`: a sub-screen layer blended over the main screen by the colour-math unit.*
+
 This tutorial covers the SNES colour-math unit: the per-pixel hardware
 that *adds* or *subtracts* the colour of one layer onto another, with an
 optional half-divide step. It's how every SNES game does

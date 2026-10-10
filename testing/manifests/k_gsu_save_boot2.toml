@@ -1,0 +1,10 @@
+# chips/superfx_save, second power-on from j_'s battery file: found 1, now 2
+# (docs/HARDWARE_VERIFICATION.md row 26).
+rom = "../../examples/chips/superfx_save/superfx_save.sfc"
+frames = 120
+srm_in = "superfx_save.srm"
+[asserts.values]
+had_save = 1
+"found+2" = 1
+"now+2" = 2
+gsu_present = 1

@@ -1,0 +1,1 @@
+{"tool": "opensnes-palette", "version": "1.0.0", "pictures": [{"input": "rgb.png", "source_width": 64, "source_height": 32, "width": 64, "height": 32, "colors": 16, "transparent": false, "palette": "hero.pal", "outputs": [{"path": "rgb_indexed.png", "kind": "indexed_png"}]}]}

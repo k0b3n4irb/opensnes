@@ -1,18 +1,47 @@
 # Bank $00 ROM Budget (Auto-loaded)
 
-CRITICAL: Bank $00 ROM overflow is a silent-failure 🔴 documented in
-`KNOWN_LIMITATIONS.md`. The compiler emits 16-bit addresses that always
-read bank $00 **for a C dereference**, so a `static const` array (string
-literals, LUTs, C-indexed data) that is read by C code (`arr[i]`, `*p`) and
-spills past the 32 KB bank-$00 boundary is read as **garbage** at runtime —
-no error, no warning, just wrong data. (Data merely *passed* to a lib
-DMA/asset function — tiles/maps/palettes/fonts via `dmaCopyVram` &
-friends — carries its bank in the 4-byte pointer and works in any bank; see
-`KNOWN_LIMITATIONS.md`. The ratchet still guards the C-deref + string-literal
-class, which remains the silent failure.)
+## What is true since 2026-10-10: a full bank $00 is not a failure
 
-The build system enforces a two-step ratchet on this. Read this file before
-adding const data, refactoring an example, or tuning the threshold.
+Bank $00 ROM holds **code only** (C const data is in the asset banks since
+#127.3), and code is not tied to it: every C function and every library
+routine is a `SUPERFREE` section reached by `jsl`, function pointers carry
+their bank, a `switch` compiles to compares, const tables are read far and
+plain RAM through the data bank. When bank $00 is full the linker places
+the next sections in bank $01 and up, and the ROM works.
+
+The build used to refuse it. `BANK0_FAIL_THRESHOLD` (1024 from 2026-09-23)
+failed the link under 1024 free bytes with "the next code section will not
+fit" — a ratchet from the time a C-read const table HAD to be in bank $00.
+The first real game on the SDK reached 3.6 KB free with half its logic
+ported and stopped to ask where code goes next (issue #168). Measured the
+same day on a copy of it: with 6 KB of filler pinned to bank $00, 31
+functions (its own and the library's: `vramQueueFlush`, `oamSetSize`,
+`bgSetScroll`, `setMode`…) ran from bank $01, its boot test passed and
+seven frames matched exactly, at the same cost.
+
+So:
+
+- `BANK0_FAIL_THRESHOLD` is **0 by default** (never fails). The knob stays
+  for a project that wants its code bank watched.
+- `opensnes-rom check` reports, at every link, the free bytes of bank $00
+  and how much code the linker placed in the next banks.
+- `make test-bank-spill` (in `make tests`) rebuilds four examples with bank
+  $00 given no room and compares them frame for frame with the normal
+  build; it fails if no code section actually left bank $00.
+- What cannot move is what is **pinned** (`BANK 0`, `FORCE`): the startup
+  code and the interrupt handlers of `crt0.asm`, a hand-written section
+  that says so. Those failing to fit is a linker error, loud.
+
+**Before pinning a section to bank $00, or writing library assembly:** a
+routine that may be placed anywhere must not read ROM data, nor `jsr` /
+`jmp` to another section, with 16-bit addressing. An audit of
+`lib/source`, `lib/contrib` and `templates` on 2026-10-10 found none in a
+`SUPERFREE` section. The bank-blind read guard covers the project's C; it
+does not read library assembly.
+
+Everything below is the history of the ratchet and of the asset banks. The
+parts on `ASSET_SECTION`, on `-d` and on the RAM band are current; the
+threshold tables are not.
 
 ## The two-step ratchet
 
@@ -65,6 +94,29 @@ the current build's actual minimum dropped below it after a refactor was
 tried. 1024 sits 888 bytes under tetris and leaves the 2048 soft warning to
 name it at every build. Re-measure with the loop at the end of this file
 before quoting any figure here.
+
+## The link keeps only what is referenced (since 2026-10-08)
+
+`make/common.mk` links with `wlalink -d` (`LD_DISCARD ?= 1`): a section no
+kept section refers to is dropped. The library emits one section per
+function, so listing a module in `LIB_MODULES` no longer costs its whole
+size. A minimal ROM went from about 9.8 KB of library and startup code in
+bank $00 to 2.4 KB, then to 1.9 KB on 2026-10-09 (PVSnesLib, which always
+linked this way: 2.0 KB) when the mouse, Super Scope and multitap readers
+stopped being called by name: the NMI handler reaches each through a
+pointer that `mouseInit()` / `scopeInit()` set, so a ROM that arms no such
+device does not link them (569 bytes). Across the corpus the smallest free space in bank
+$00 went from 1912 bytes (tetris) to **10 675** (tetris again; then
+likemario 13 048, mapandobjects 16 826), measured on the clean build of
+2026-10-08. `BANK0_FAIL_THRESHOLD` stays at 1024 for now: tightening it is
+the audit step described below, not a side effect of this change.
+
+What it changes for whoever writes library code: a section reached only
+through its **address** — a table of code read by offset, a blob copied by
+a hard-coded label that no instruction names — is dropped unless it is
+declared `KEEP`. Everything in the corpus is reached by symbol today;
+`make test-link-modules` links with `LD_DISCARD := 0` so that it still sees
+every cross-module reference.
 
 ## Keeping assets out of bank $00 in the first place (since 2026-07-22)
 

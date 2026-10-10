@@ -26,6 +26,9 @@ Run:  python3 devtools/compiler-tests/run.py        # all cases (checked + compi
     in <func>: absent  <regex>      regex absent within that function's body
     section <sym>: present <regex>   the .SECTION/.RAMSECTION line of <sym> matches
     section <sym>: absent  <regex>   ...does not match
+    env <NAME>=<VALUE>              compile this case with that variable set (a
+                                    compiler toggle: the case pins a mechanism
+                                    a later optimisation no longer reaches)
 
 `cases/negative/<name>.c` + `<name>.expect` pin C the toolchain must REFUSE
 (variadic functions, struct by value, inline asm): the compile must fail and
@@ -37,6 +40,7 @@ Exit 0 = all pass, 1 = any failure / compile error.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -90,6 +94,18 @@ def run_negative(only: str | None) -> tuple[int, int]:
     return passed, failed
 
 
+def case_env(src: Path) -> dict:
+    """The environment of a case: os.environ plus its `env NAME=VALUE` lines."""
+    env = dict(os.environ)
+    cf = src.with_suffix(".checks")
+    if cf.is_file():
+        for line in cf.read_text().splitlines():
+            m = re.match(r"\s*env\s+(\w+)=(\S*)\s*$", line)
+            if m:
+                env[m.group(1)] = m.group(2)
+    return env
+
+
 def compile_asm(src: Path) -> str:
     with tempfile.NamedTemporaryFile(suffix=".asm", delete=False) as tf:
         out = Path(tf.name)
@@ -97,7 +113,8 @@ def compile_asm(src: Path) -> str:
         # SDK include path: fixtures may use <snes/*.h> (e.g. test_metasprite).
         proc = subprocess.run([str(CC), f"-I{REPO_ROOT / 'lib' / 'include'}",
                                str(src), "-o", str(out)],
-                              capture_output=True, text=True, timeout=60)
+                              capture_output=True, text=True, timeout=60,
+                              env=case_env(src))
         if not out.is_file() or out.stat().st_size == 0:
             raise RuntimeError(f"compile failed: {(proc.stderr or proc.stdout).strip()[:300]}")
         return out.read_text()
@@ -131,8 +148,15 @@ def section_of(asm: str, sym: str) -> str:
     return ""
 
 
-def apply_check(asm: str, line: str) -> str | None:
-    """Return an error string if the directive fails, else None."""
+def apply_check(asm: str, line: str, raw: str | None = None) -> str | None:
+    """Return an error string if the directive fails, else None.
+
+    `asm` has the per-TU suffix of file-scope statics stripped (`counter.test_x`
+    reads `counter`, the way the checks were written); a `raw ...` directive
+    runs on the unstripped text.
+    """
+    if raw is not None and line.startswith("raw "):
+        return apply_check(raw, line[4:].strip())
     m = re.match(r"in\s+(\S+):\s*(present|absent)\s+(.+)", line)
     if m:
         fn, mode, pat = m.group(1), m.group(2), m.group(3)
@@ -185,7 +209,10 @@ def run(only: str | None) -> int:
         if only and only not in name:
             continue
         try:
-            asm = compile_asm(src)
+            raw_asm = compile_asm(src)
+            # file-scope statics are emitted `name.<source stem>` (cproc, 2026-10-05);
+            # the checks name them bare, so strip the suffix of this case
+            asm = re.sub(rf"\.{re.escape(src.stem)}\b", "", raw_asm)
         except RuntimeError as e:
             print(f"  FAIL {name}: {e}")
             failed += 1
@@ -198,9 +225,9 @@ def run(only: str | None) -> int:
         errs = []
         for raw in cf.read_text().splitlines():
             line = raw.strip()
-            if not line or line.startswith("#"):
+            if not line or line.startswith("#") or line.startswith("env "):
                 continue
-            e = apply_check(asm, line)
+            e = apply_check(asm, line, raw=raw_asm)
             if e:
                 errs.append(e)
         if errs:
@@ -225,6 +252,66 @@ def run(only: str | None) -> int:
     return 1 if failed else 0
 
 
+def run_driver() -> int:
+    """The driver itself (compiler/cc65816/cc65816.c): its options, its exit
+    codes, and the temporary files it must not leave behind."""
+    import os
+    failed = total = 0
+
+    def check(name: str, ok: bool, detail: str = "") -> None:
+        nonlocal failed, total
+        total += 1
+        if not ok:
+            failed += 1
+            print(f"FAIL driver: {name} {detail}".rstrip())
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        scratch = tmp / "scratch"
+        scratch.mkdir()
+        env = dict(os.environ, TMPDIR=str(scratch))
+        src = tmp / "my unit.c"   # a space in the path, and in the label prefix
+        src.write_text('#ifndef WANT\n#error no WANT\n#endif\n'
+                       'const char *f(void) { return "hi" WANT; }\n')
+        out = tmp / "out.asm"
+
+        def cc(*a: str) -> subprocess.CompletedProcess:
+            return subprocess.run([str(CC), *a], capture_output=True, text=True, env=env)
+
+        r = cc(str(src), "-D", 'WANT="x"', "-o", str(out))
+        check("-D NAME, -o", r.returncode == 0 and out.is_file() and "f:" in out.read_text(), r.stderr)
+        check("says what it wrote", r.stdout == f"Generated: {out}\n", r.stdout)
+        check("anonymous labels carry the unit's stem", out.is_file() and "my_unit_string" in out.read_text())
+        r2 = cc(str(src), '-DWANT="x"')
+        check("assembly on stdout without -o", r2.returncode == 0 and out.is_file() and r2.stdout == out.read_text())
+        r = cc(str(src))
+        check("a preprocessor error fails", r.returncode != 0 and "no WANT" in r.stderr, r.stderr)
+        r = cc()
+        check("no input: usage, exit 1", r.returncode == 1 and "No input file" in r.stderr and "Usage:" in r.stdout)
+        r = cc(str(tmp / "absent.c"))
+        check("absent input: exit 1", r.returncode == 1 and "Input file not found" in r.stderr)
+        r = cc("-x", str(src))
+        check("unknown option: exit 1", r.returncode == 1 and "Unknown option: -x" in r.stderr)
+        r = cc(str(src), str(src))
+        check("two inputs: exit 1", r.returncode == 1 and "Multiple input files" in r.stderr)
+        bad = tmp / "bad.c"
+        bad.write_text("int g(void) { return nope; }\n")
+        r = cc(str(bad), "-o", str(tmp / "bad.asm"))
+        check("a cproc error fails with its message", r.returncode == 1 and "undeclared identifier" in r.stderr, r.stderr)
+        r = subprocess.run([str(CC), str(src), '-DWANT="x"', "-o", str(out)], capture_output=True, text=True,
+                           env=dict(env, CC65816_CPP="no-such-preprocessor"))
+        check("an absent CC65816_CPP is named", r.returncode == 1 and "no host C preprocessor" in r.stderr, r.stderr)
+        ir = tmp / "ir"
+        r = subprocess.run([str(CC), str(src), '-DWANT="x"', "-o", str(out)], capture_output=True, text=True,
+                           env=dict(env, CC65816_KEEP_IR=str(ir)))
+        check("CC65816_KEEP_IR keeps the unit's IR", r.returncode == 0 and len(list(ir.glob("*my__unit.ssa"))) == 1)
+        left = sorted(p.name for p in scratch.iterdir())
+        check("no temporary file left", not left, str(left))
+    if not failed:
+        print(f"driver: {total} checks pass")
+    return failed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="cc65816 C→ASM pattern checks")
     ap.add_argument("--only", metavar="SUBSTR")
@@ -241,6 +328,8 @@ def main() -> int:
         return 0
     if not CC.is_file():
         sys.exit(f"ERROR: {CC} not found — build the toolchain (make compiler) first")
+    if args.only is None and run_driver():
+        return 1
     return run(args.only)
 
 

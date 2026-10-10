@@ -15,7 +15,3 @@ u8 sa1IsReady(void) {
     return (sa1_status == SA1_READY_MAGIC) ? 1 : 0;
 }
 
-/* The deprecated name, kept until the next major. */
-u8 sa1Init(void) {
-    return sa1IsReady();
-}

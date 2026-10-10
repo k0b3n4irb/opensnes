@@ -38,6 +38,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): oamDrawMeta, oamDrawMetaFlip.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Constants
  *============================================================================*/
@@ -181,23 +184,8 @@ _Static_assert(__builtin_offsetof(t_sprites, oamgfxbank) == 10, "oamgfxbank offs
     oambuffer[id].oamgfxbank = (u8)((u32)(const void *)(gfx) >> 16); \
 } while(0)
 
-/**
- * @brief Set sprite graphics address with explicit bank byte
- *
- * Only needed when @p gfx is a bare 16-bit address rather than a pointer.
- * With a pointer, OAM_SET_GFX() already takes the bank from it.
- *
- * @param id Sprite index (0-127)
- * @param gfx Pointer to graphics data
- * @param bank ROM bank where graphics data is located (0-255)
- *
- * @deprecated Since 2026-09-20: OAM_SET_GFX() reads the bank from the
- *             pointer. Removed at the next major version.
- */
-#define OAM_SET_GFX_BANK(id, gfx, bank) do { \
-    oambuffer[id].oamgfxaddr = (u16)(gfx); \
-    oambuffer[id].oamgfxbank = (u8)(bank); \
-} while(0)
+/* OAM_SET_GFX_BANK(id, gfx, bank) was removed on 2026-10-05: OAM_SET_GFX() reads
+ * the bank from its pointer (docs/UPGRADING.md). */
 
 /* --- Bank $00 SLOT 1 (C-accessible, < $2000) --- */
 
@@ -306,7 +294,11 @@ void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette,
  *
  * @param id Sprite ID (0-127)
  * @param x X position (0-511, negative wraps)
- * @param y Y position (0-255, use OBJ_HIDE_Y to hide)
+ * @param y Y position (0-255, use OBJ_HIDE_Y to hide): the picture line of
+ *          the sprite's top row, 0 being the first visible line — the same
+ *          y as bgSetScroll()'s, so a sprite and the background it stands
+ *          on take the same camera value. (Until 2026-10-09 the library
+ *          stored y - 1 and every sprite was drawn one line too high.)
  * @param tile Tile number (0-511)
  * @param palette Palette (0-7)
  * @param priority Priority (0-3, 3=highest)
@@ -353,6 +345,97 @@ void oamSetY(u16 id, u16 y);
  * @param y Y position
  */
 void oamSetXY(u16 id, u16 x, u16 y);
+
+/**
+ * @brief Read back a sprite's X position
+ *
+ * What oamSet() / oamSetX() / oamSetXY() last stored, from the OAM shadow:
+ * 0-511, the ninth bit included (a value of 256 or more is a sprite partly
+ * or wholly off the left edge, as written with a negative X).
+ *
+ * @param id Sprite ID (0-127)
+ * @return X position, 0 for an invalid id
+ * @note A hidden sprite reads 257 (see oamHide()).
+ */
+u16 oamGetX(u16 id);
+
+/**
+ * @brief Read back a sprite's Y position
+ *
+ * The y that was given to oamSet() / oamSetY() / oamSetXY(), which is the
+ * OAM byte.
+ *
+ * @param id Sprite ID (0-127)
+ * @return Y position (0-255), 0 for an invalid id
+ * @note A hidden sprite reads 240 (see oamHide()).
+ */
+u8 oamGetY(u16 id);
+
+/**
+ * @brief A batch of sprites in world coordinates, for oamPlaceWorld()
+ *
+ * Structure of arrays: one array per property, one element per sprite,
+ * which is what the 65816 indexes cheaply. The arrays may live in ROM, in
+ * plain RAM or in `FAR` RAM.
+ */
+typedef struct {
+    const s16 *x;        /**<  0: world x of each sprite's top-left corner */
+    const s16 *y;        /**<  4: world y */
+    const u8  *tile;     /**<  8: tile number, low byte */
+    const u8  *attr;     /**< 12: attribute byte (vhoopppc), as OAM_ATTR() builds it */
+    u8  *visible;        /**< 16: out, one byte per sprite: 1 placed, 0 hidden. May be 0 */
+    u8   first_id;       /**< 20: OAM id of the first sprite of the batch */
+    u8   count;          /**< 21: number of sprites */
+    u8   size;           /**< 22: width and height in pixels: 8, 16, 32 or 64 */
+} OamWorldBatch;
+
+/* Not under the host's syntax check (clang, 8-byte pointers): the layout
+ * that matters is cc65816's, 4 bytes a pointer. */
+#ifndef __clang__
+_Static_assert(__builtin_offsetof(OamWorldBatch, y) == 4, "OamWorldBatch.y offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, tile) == 8, "OamWorldBatch.tile offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, attr) == 12, "OamWorldBatch.attr offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, visible) == 16, "OamWorldBatch.visible offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, first_id) == 20, "OamWorldBatch.first_id offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, count) == 21, "OamWorldBatch.count offset (sprite_world.asm)");
+_Static_assert(__builtin_offsetof(OamWorldBatch, size) == 22, "OamWorldBatch.size offset (sprite_world.asm)");
+#endif
+
+/**
+ * @brief Place a batch of world-space sprites: camera, culling, OAM, in one call
+ *
+ * For each sprite of the batch: screen position = world position - camera.
+ * A sprite that is on screen, even partly, gets its x, y, tile, attribute
+ * and ninth x bit written; any other is hidden the way oamHide() hides.
+ * The loop a scrolling game runs every frame, in assembly: in compiled C it
+ * cost a real project about 6,000 master cycles a sprite (issue #165).
+ *
+ * - **Culling is by `size`, on both axes.** A 32x32 sprite at x = -31 is
+ *   still drawn, with its ninth x bit set; at x = -32 it is hidden.
+ * - **`visible[]`** tells the game which sprites were placed, so that it
+ *   can skip its own work (animation, streaming) for the others without
+ *   testing again. Pass 0 if it is not wanted.
+ * - **The size bit is not touched**: set it once with oamSetSize(). A batch
+ *   has one size; a game with two sizes makes two calls.
+ * - **`cam_y` is the y you give bgSetScroll()**: a sprite and the
+ *   background it stands on take the same camera value.
+ * - A batch that runs past sprite 127 stops there.
+ *
+ * @param batch The sprites (see OamWorldBatch)
+ * @param cam_x World x of the screen's left edge
+ * @param cam_y World y of the screen's first line
+ *
+ * @code
+ * static s16 ax[12], ay[12];              // moved by the game
+ * static u8  atile[12], aattr[12], aseen[12];
+ * static const OamWorldBatch actors = {
+ *     ax, ay, atile, aattr, aseen, 0, 12, 32
+ * };
+ *
+ * oamPlaceWorld(&actors, cam_x, cam_y);   // every frame, after the game moved them
+ * @endcode
+ */
+void oamPlaceWorld(const OamWorldBatch *batch, u16 cam_x, u16 cam_y);
 
 /**
  * @brief Set sprite tile
@@ -547,28 +630,6 @@ typedef struct {
  */
 u16 oamDrawMetasprite(u16 startId, s16 x, s16 y, const MetaspriteItem *frame,
                       const MetaspriteStyle *style, u8 flip);
-
-/**
- * @brief oamDrawMetasprite() without flip, its style given as three arguments
- *
- * (startId, x, y, meta) as oamDrawMetasprite(); baseTile, basePalette and
- * size are the fields of MetaspriteStyle. Same return value.
- */
-OPENSNES_DEPRECATED("use oamDrawMetasprite() — baseTile, basePalette and size are now a MetaspriteStyle")
-u16 oamDrawMeta(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
-               u16 baseTile, u8 basePalette, u8 size);
-
-/**
- * @brief oamDrawMetasprite() with its style and flip given as seven arguments
- *
- * It assumes a piece is 16 pixels when `size` is OBJ_LARGE and 8 when
- * OBJ_SMALL, whatever the OBJSEL mode: a flipped metasprite of 32x32 pieces
- * comes out wrong. oamDrawMetasprite() takes the piece size.
- */
-OPENSNES_DEPRECATED("use oamDrawMetasprite() — eleven positional arguments, and it assumes 8 / 16 pixel pieces")
-u16 oamDrawMetaFlip(u16 startId, s16 x, s16 y, const MetaspriteItem *meta,
-                   u16 baseTile, u8 basePalette, u8 size,
-                   u8 flipX, u8 flipY, u8 width, u8 height);
 
 /*============================================================================
  * Dynamic Sprite Engine
@@ -797,7 +858,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 #define oamSetFast(_id, _x, _y, _tile, _pal, _prio, _fl) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
     oamMemory[_off + 2] = (u8)((_tile) & 0xFF); \
     oamMemory[_off + 3] = OAM_ATTR(_tile, _pal, _prio, _fl); \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
@@ -823,7 +884,7 @@ void oamMetaDrawDyn(u16 id, s16 x, s16 y,
 #define oamSetXYFast(_id, _x, _y) do { \
     u16 _off = (u16)(_id) << 2; \
     oamMemory[_off + 0] = (u8)((_x) & 0xFF); \
-    oamMemory[_off + 1] = (u8)(((_y) - 1) & 0xFF); /* compensate +1 PPU scanline quirk */ \
+    oamMemory[_off + 1] = (u8)((_y) & 0xFF); \
     u16 _ext = 512 + ((u16)(_id) >> 2); \
     u16 _sl = (u16)(_id) & 0x03; \
     u8 _xhi = OAM_XHI_MASK(_sl); \

@@ -1,0 +1,8 @@
+# the terrain tileset. `palette` imposes the committed palette: a colour of the
+# picture that is not in it fails the build, instead of the converter quietly
+# re-deriving all 16 slots and shifting every tile already drawn.
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+palette = "town_fixed.pal"

@@ -5,9 +5,11 @@
 # exact sequence that followed it. The emitter now recomputes the
 # address (lda/clc/adc) instead of reloading it, so the old regex no
 # longer matched while the property it protects still held.
-present sta\.l \$0000,x\n\trep #\$20
+# Re-pinned 2026-10-08: the store is `sta.l $00000N,x` (field offset in
+# the operand) and X is kept across the pair, so no address is reloaded.
+present sta\.l \$00000[0-9A-F],x\n\trep #\$20
 # The bug signature must never come back: byte store, then address reload
 # + tax + byte load with NO mode switch between them — the store's 8-bit
 # mode leaked through, so the reload ran in 8-bit and grabbed only the low
 # byte. (Verified this exact regex matched the pre-fix output.)
-absent sta\.l \$0000,x\n\tlda \d+,s\n\ttax\n\tlda\.l \$0000,x
+absent sta\.l \$00[0-9A-F]*,x\n\tlda \d+,s\n\ttax\n\tlda\.l \$00[0-9A-F]*,x

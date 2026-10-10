@@ -122,7 +122,7 @@ miscompiled silently, and each has a mechanical workaround:
 | Refused | Workaround |
 |---|---|
 | Struct passed or returned **by value** | Pass a pointer to it |
-| Struct assignment by value (`a = b`) | Copy the fields, or `memcpy` |
+| Struct assignment by value (`a = b`) | Copy the fields, or `memcpy` (`<snes/string.h>`, module `string`) |
 | Variadic functions (`...`) | Fixed-arity wrappers |
 | Inline assembly inside C | A separate `.asm` file with a C prototype |
 
@@ -144,9 +144,9 @@ need output to the host rather than the screen.
 | `spcBoot`, `spcLoad`, `spcPlay` | `snesmodInit`, `snesmodLoadModule`, `snesmodPlay` | Module `snesmod`; the driver is the same SNESMOD |
 | `spcProcess()` | `snesmodProcess()` | Call once per frame |
 | `padsCurrent(pad)` | `padHeld(pad)` | Also `padPressed`, `padReleased` |
-| `rand()`, `srand(s)` | `rngNext()`, `rngSeed(s)` | Not libc's: 1-65535, a 16-bit LFSR. The libc names are deprecated and go at 1.0 |
+| `rand()`, `srand(s)` | `rngNext()`, `rngSeed(s)` | Not libc's: 1-65535, a 16-bit LFSR. The libc names went at 0.49 |
 | `LzssDecodeVram(s, a)` | `lzssDecodeVram(s, a)` | Lower-case `l`; the old spelling is deprecated |
-| `hdmaEnable(1 << ch)` | `hdmaEnableMask(1 << ch)` | The name says it takes a mask. At 1.0 `hdmaEnable(ch)` takes a channel number, like the other `hdma*` calls — see @ref upgrading |
+| `hdmaEnable(1 << ch)` | `hdmaEnable(ch)`, or `hdmaEnableMask(1 << ch)` for several | A channel number since 0.49, like the other `hdma*` calls; a mask above 7 is refused — see @ref upgrading |
 | `oamDrawMeta(id, x, y, m, tile, pal, size)` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | `tile`, `pal`, `size` are fields of a `static const MetaspriteStyle` |
 | `pvsneslibfont` | `textLoadFont()` with your own font | No implicit font |
 
@@ -180,14 +180,14 @@ has to write itself, and whether that is a decision or a gap.
 | `setFadeEffect`, `setFadeEffectEx` | `fadeIn`, `fadeOut`, `setBrightness` | Renamed |
 | `setColorEffect`, `setColorIntensity` | module `colormath`: `colorMathInit`, `colorMathTint`, `colorMathShadow`, `colorMathSetFixedColor` | Own module |
 | `setMosaicEffect` | module `mosaic`: `mosaicSetSize`, `mosaicFadeIn`, `mosaicFadeOut` | Own module |
-| `setPalette`, `setPaletteColor`, `getPalette*` | `dmaCopyCGram` for a block; a single colour is two writes to `REG_CGADD` / `REG_CGDATA` in VBlank | **Gap, assumed.** No single-colour helper |
+| `setPalette`, `setPaletteColor`, `getPalette*` | `dmaCopyCGram` for a block, `setColor(index, color)` for one colour | Renamed. Reading CGRAM back (`getPalette*`) is **not provided**: keep the palette you uploaded |
 | `dmaClearVram`, `dmaFillVram8/16` | `dmaClearVRAM`, `dmaFillVRAM` | Renamed |
 | `dmaCopyOAram` | `oamUpdate()` (the NMI uploads the shadow) | The OAM upload is the sprite module's, not a DMA call |
 | `dmaCopySpr16Vram`, `dmaCopySpr32Vram` | `oamInitGfxSet` | One call for the sprite sheet |
 | `oamMetaDraw8/16/32`, `oamFix8/16/32Draw` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | One call; the size is a field of the `MetaspriteStyle` |
 | `oamMetaDrawDyn8/16/32`, `oamDynamicMetaDraw`, `oamInitDynamicSprite*` | module `sprite_dynamic`: `oamDynamicInit`, `oamDynamicDraw`, `oamMetaDrawDyn`, `oamDynamicSetSize` | Own module |
 | `oamSetEx`, `oamSetAttr`, `oamFlip`, `oamSetGfxOffset` | `oamSetSize`, `oamHide`, `oamSetTile`, `oamSetXY`, the `flags` argument of `oamSet` | Split by concern |
-| `oamGetX`, `oamGetY` | — | **Gap, assumed.** Keep your own coordinates; the OAM shadow is write-only from C |
+| `oamGetX`, `oamGetY` | `oamGetX(id)`, `oamGetY(id)` | Same names (since 2026-10-09); they return what was last set, the 9-bit X and the y given to `oamSetY`, not the raw OAM byte |
 | `padsCurrent/Down/Up/Clear` | `padHeld`, `padPressed`, `padReleased` | Renamed |
 | `detectMouse`, `initMouse`, `mouseCycleSensitivity*` | `mouseInit`, `mouseIsConnected`, `mouseSetSensitivity` | Renamed |
 | `detectSuperScope` | `scopeInit`, `scopeIsConnected` | Renamed |

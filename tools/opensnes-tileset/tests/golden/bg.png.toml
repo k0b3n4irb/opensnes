@@ -1,0 +1,6 @@
+# import settings of bg.png, written by opensnes-tileset --save; the build reads `tool`
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+flip = true

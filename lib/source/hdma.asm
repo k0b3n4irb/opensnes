@@ -153,102 +153,6 @@ hdmaSetup:
     rtl
 
 ;------------------------------------------------------------------------------
-; void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank)
-;
-; Same as hdmaSetup but with explicit bank byte for HDMA tables in banks > $00.
-; (The `bank` arg overrides what the 4-byte pointer's bank half would give.)
-;
-; A6+A7 chantier — post-A6 layout: cproc passes 4-byte pointers, so the
-; table arg occupies 4 bytes on stack (low word + bank word). All later
-; args (destReg, mode, channel) shift +2 vs the pre-A6 layout.
-;
-; Stack layout (after PHP):
-;   1,s     = P (saved status)
-;   2-4,s   = return address (3 bytes from JSL)
-;   5-6,s   = bank (rightmost, u8 in 16-bit slot — last pushed)
-;   7-8,s   = table low 16
-;   9-10,s  = table bank word (caller's `pea.w :sym` push, ignored here —
-;             the explicit `bank` arg at 5,s overrides)
-;   11-12,s = destReg (u8 in 16-bit slot)
-;   13-14,s = mode (u8 in 16-bit slot)
-;   15-16,s = channel (leftmost, u8 in 16-bit slot)
-;------------------------------------------------------------------------------
-hdmaSetupBank:
-    php
-    rep #$30                ; 16-bit A and X/Y
-    .ACCU 16
-    .INDEX 16
-
-    ; Calculate DMA register base address for this channel
-    sep #$20
-    .ACCU 8
-    lda 15,s                ; channel (8-bit)
-    cmp #8
-    bcs @hdmaSetupBank_done ; Invalid channel, bail out
-
-    rep #$20
-    .ACCU 16
-    and #$00FF              ; Mask to 8-bit
-    asl a
-    asl a
-    asl a
-    asl a                   ; channel * 16
-    clc
-    adc #$4300              ; Base address
-    tax                     ; X = register base ($43x0)
-
-    ; Set HDMA mode (DMAPx at $43x0)
-    sep #$20
-    .ACCU 8
-    lda 13,s                ; mode (8-bit)
-    sta.l $0000,x           ; $43x0 = DMAP
-
-    ; Set destination register (BBADx at $43x1)
-    lda 11,s                ; destReg (8-bit)
-    sta.l $0001,x           ; $43x1 = BBAD
-
-    ; Set table address (A1Tx at $43x2-$43x3)
-    rep #$20
-    .ACCU 16
-    lda 7,s                 ; table low 16
-    sta.l $0002,x           ; $43x2-$43x3 = A1TL/A1TH
-    sta.l $0008,x           ; $43x8-$43x9 = A2A, see the NTRL note below
-
-    ; Set bank from explicit parameter
-    sep #$20
-    .ACCU 8
-    lda 5,s                 ; bank byte
-    sta.l $0004,x           ; $43x4 = A1B (bank)
-
-    ; Mid-frame enable hazard (B2 chantier, 2026-09-06): the PPU copies
-    ; A1T -> A2A and loads the first table entry only at the start of a
-    ; frame, for channels enabled at that moment. A channel enabled during
-    ; active display runs from the next HBlank with whatever A2A/NTRL hold
-    ; (zero at reset -> it reads a "table" at $00:0000, the tcc__r* scratch
-    ; bytes, and writes that residue to the destination register). Presetting
-    ; A2A to the table and the line counter to 1 makes the next HBlank load
-    ; the real first entry instead: a mid-frame hdmaEnableMask() starts the table
-    ; one line late and clean, whatever the boot timing or DP residue.
-    ; Observed with luna on hdma/gradient_colors (CGRAM entry 1 clobbered)
-    ; and hdma/hdma_helpers (BG1HOFS left at a stale value). Arbitrated
-    ; against the SNES corpus (Cartouche, 2026-09-07): anomie-regs marks
-    ; Address ($43x8-9) and Line Counter ($43xA) as "required if HDMA is to
-    ; be started mid-frame" — "you must basically do the init process
-    ; manually by setting $43x8-A"; the snesdev VBlank-routine page states
-    ; the symptom ("enabling a HDMA channel too late will not reset the
-    ; HDMA table position and cause invalid values to be written to the
-    ; target register"); the per-scanline order (decrement $43xA, reload
-    ; the entry when it reaches zero) is in the sfc-dev-wiki register
-    ; explanations. Sources: romhacking.net/documents/196,
-    ; snes.nesdev.org/wiki/VBlank_routine, wiki.superfamicom.org/registers.
-    lda #1
-    sta.l $000A,x           ; $43xA = NTRL: reload the first entry at the next HBlank
-
-@hdmaSetupBank_done:
-    plp
-    rtl
-
-;------------------------------------------------------------------------------
 ; void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg,
 ;                        const void *table, u8 dataBank)
 ;
@@ -354,7 +258,6 @@ hdmaSetupIndirect:
 ; Stack layout (after PHP):
 ;   5,s = channelMask (8-bit)
 ;------------------------------------------------------------------------------
-hdmaEnable:                 ; deprecated name, same entry point (until 1.0)
 hdmaEnableMask:
     php
     sep #$20
@@ -375,7 +278,6 @@ hdmaEnableMask:
 ;
 ; Disables specified HDMA channels.
 ;------------------------------------------------------------------------------
-hdmaDisable:                ; deprecated name, same entry point (until 1.0)
 hdmaDisableMask:
     php
     sep #$20

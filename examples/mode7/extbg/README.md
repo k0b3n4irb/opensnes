@@ -47,7 +47,7 @@ Open `extbg.sfc` in luna (or any SNES emulator) and press A.
 
 ## Testing
 
-`tools/luna-test/manifests/mode7_extbg.toml` checks SETINI ($40 / $00 /
+`testing/manifests/mode7_extbg.toml` checks SETINI ($40 / $00 /
 $40) and the main-screen designation across two A presses, the 1:1 matrix
 and the scroll, and that the ball moves. The visual baselines capture the
 occlusion.

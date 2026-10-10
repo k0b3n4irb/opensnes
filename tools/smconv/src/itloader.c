@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "itloader.h"
+#include "report.h"
 
-#define ERRORRED(STRING) "\x1B[31m" STRING "\033[0m"
-#define ERRORBRIGHT(STRING) "\x1B[97m" STRING "\033[0m"
 
 /*==========================================================================
  * Pattern
@@ -284,8 +283,8 @@ static bool itl_sample_load_data(itl_sample_t *s, io_file_t *f)
         if (avail > 0x7FFFFFFFu)
             avail = 0x7FFFFFFFu;   /* length is an int */
         if ((u32)s->data.length > avail) {   /* a negative length is huge here: caught too */
-            printf("%s: " ERRORRED("warning") ": sample '%s' claims %u frames but the file has %u left — truncated\n",
-                   ERRORBRIGHT("smconv"), s->name, (unsigned)s->data.length, (unsigned)avail);
+            smconv_report(SMC_WARNING, NULL, "sample '%s' claims %u frames but the file has %u left — truncated",
+                          s->name, (unsigned)s->data.length, (unsigned)avail);
             s->data.length = (int)avail;
         }
         if (s->data.bits16) {
@@ -313,8 +312,7 @@ static bool itl_sample_load_data(itl_sample_t *s, io_file_t *f)
             s->data.data8 = malloc(frames * sizeof(s8));
         int block = itl_sample_decompress(s, f);
         if (block) {
-            printf("%s: " ERRORRED("error") ": sample '%s': corrupt compressed data (block %d)\n",
-                   ERRORBRIGHT("smconv"), s->name, block);
+            smconv_report(SMC_ERROR, NULL, "sample '%s': corrupt compressed data (block %d)", s->name, block);
             if (s->data.bits16)
                 free(s->data.data16);
             else
@@ -423,7 +421,7 @@ itl_sample_data_t *itl_sample_data_from_wav(const char *filename)
         switch (chunk_code) {
         case 0x20746D66: /* fmt  */
             if (io_read16(&f) != 1) {
-                printf("%s: " ERRORRED("fatal error") ": Unsupported WAV format\n", ERRORBRIGHT("smconv"));
+                smconv_report(SMC_FATAL, filename, "Unsupported WAV format");
                 io_close(&f);
                 return sd;
             }
@@ -433,7 +431,7 @@ itl_sample_data_t *itl_sample_data_from_wav(const char *filename)
             io_read16(&f);
             bit_depth = io_read16(&f);
             if (bit_depth != 8 && bit_depth != 16) {
-                printf("%s: " ERRORRED("fatal error") ": Unsupported WAV bit depth\n", ERRORBRIGHT("smconv"));
+                smconv_report(SMC_FATAL, filename, "Unsupported WAV bit depth");
                 io_close(&f);
                 return sd;
             }
@@ -446,7 +444,7 @@ itl_sample_data_t *itl_sample_data_from_wav(const char *filename)
 
         case 0x61746164: { /* data */
             if (!hasformat) {
-                printf("%s: " ERRORRED("fatal error") ": CORRUPT WAV FILE...\n", ERRORBRIGHT("smconv"));
+                smconv_report(SMC_FATAL, filename, "CORRUPT WAV FILE...");
                 io_close(&f);
                 return sd;
             }
@@ -494,7 +492,7 @@ itl_module_t *itl_module_create(const char *filename)
     io_file_t f;
     io_init(&f);
     if (!io_open(&f, filename, IO_MODE_READ)) {
-        printf("%s: " ERRORRED("error") ": cannot open '%s'\n", ERRORBRIGHT("smconv"), filename);
+        smconv_report(SMC_ERROR, filename, "cannot open '%s'", filename);
         m->invalid = 1;
         return m;
     }
@@ -503,8 +501,7 @@ itl_module_t *itl_module_create(const char *filename)
      * give an empty module and a successful run — a PNG passed by mistake
      * built a silent soundbank (2026-09-26 build audit). */
     if (io_read8(&f) != 'I' || io_read8(&f) != 'M' || io_read8(&f) != 'P' || io_read8(&f) != 'M') {
-        printf("%s: " ERRORRED("error") ": '%s' is not an Impulse Tracker module "
-               "(no IMPM signature)\n", ERRORBRIGHT("smconv"), filename);
+        smconv_report(SMC_ERROR, filename, "'%s' is not an Impulse Tracker module (no IMPM signature)", filename);
         m->invalid = 1;
         io_close(&f);
         return m;
@@ -555,10 +552,9 @@ itl_module_t *itl_module_create(const char *filename)
      * (tools/fuzz, 2026-09-22: 65535 of each in a 2.5 KB file exhausted
      * memory, and a 4.4 KB one took 30 s). */
     if (4u * ((u32)m->instrument_count + m->sample_count + m->pattern_count) > io_remaining(&f)) {
-        printf("%s: " ERRORRED("error") ": '%s' declares %u instruments, %u samples, %u patterns — "
-               "more offset-table entries than the file has bytes; not an IT module\n",
-               ERRORBRIGHT("smconv"), filename, (unsigned)m->instrument_count,
-               (unsigned)m->sample_count, (unsigned)m->pattern_count);
+        smconv_report(SMC_ERROR, filename, "'%s' declares %u instruments, %u samples, %u patterns — "
+                      "more offset-table entries than the file has bytes; not an IT module",
+                      filename, (unsigned)m->instrument_count, (unsigned)m->sample_count, (unsigned)m->pattern_count);
         m->instrument_count = m->sample_count = m->pattern_count = 0;
         m->invalid = 1;
         io_close(&f);

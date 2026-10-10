@@ -1,0 +1,8 @@
+[labels]
+00:8000 main
+[definitions]
+00000010 _sizeof_main
+[sections]
+00000000 00:0000 8000 00000010 .text.main
+[ramsections]
+00:1f00 1f00 00000200 .bss.big

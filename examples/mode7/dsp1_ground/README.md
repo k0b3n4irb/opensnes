@@ -70,7 +70,7 @@ console, dma, background, input, mode7, hdma, dsp1 (auto-added by `USE_DSP1`)
 | File | Purpose |
 |------|---------|
 | `main.c` | Camera, DSP-1 calls, HDMA tables, double buffering |
-| `data.asm` | Ground (Mode 7) and sky (Mode 3) assets in `ASSET_SECTION` |
+| `res/ground.png.toml`, `res/sky.png.toml` | the import settings of the Mode 7 ground (`mode = 7`) and the Mode 3 sky (`opensnes-tileset`); the build converts and links them, `res/*.inc` declare the symbols |
 | `res/ground.png`, `res/sky.png` | Textures shared with `mode7/perspective` (PVSnesLib Mode7Perspective, mills32 / alekmaul) |
 
 ## Going Further

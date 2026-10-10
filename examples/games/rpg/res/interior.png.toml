@@ -1,0 +1,6 @@
+# the house interior, against its own committed palette (see tileset.png.toml)
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+palette = "interior_fixed.pal"

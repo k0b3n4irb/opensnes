@@ -97,9 +97,9 @@ The `fire_armed` flag prevents the calibration fire from immediately re-triggeri
 
 ## Tips & Tricks
 
-- **2bpp quantization**: When converting images with mostly one color (blue background), gfx4snes may lose minority colors (white crosshair lines). Pre-process the PNG with a fixed indexed palette (e.g. via PIL `quantize()`) to control which colors are preserved.
+- **2bpp quantization**: When converting images with mostly one color (blue background), the converter may lose minority colors (white crosshair lines). Pre-process the PNG with a fixed indexed palette (e.g. via PIL `quantize()`) to control which colors are preserved.
 
-- **Sprite tile numbering**: In a 128px-wide sprite sheet with 16x16 sprites, tile numbers follow `row * 32 + col * 2`. Use `gfx4snes --sprite-map` to print the full tile map and find the right tile number.
+- **Sprite tile numbering**: In a 128px-wide sprite sheet with 16x16 sprites, tile numbers follow `row * 32 + col * 2`. `opensnes-sprite inspect` reports the block and tile counts; `gfx4snes --sprite-map` (the legacy converter, still shipped) prints the full tile map to find a tile number.
 
 - **OBJSEL macro**: Instead of memorizing that `0x62` means "16/32 sizes at VRAM $4000", use `OBJSEL(OBJ_SIZE16_L32, 0x4000)`.
 
@@ -111,7 +111,6 @@ The `fire_armed` flag prevents the calibration fire from immediately re-triggeri
 TARGET      := superscope.sfc
 USE_LIB     := 1
 LIB_MODULES := console input sprite dma text background
-ASMSRC      := data.asm
 ```
 
 | Module | Why it's here |
@@ -143,6 +142,6 @@ ASMSRC      := data.asm
 | File | What's in it |
 |------|-------------|
 | `main.c` | State machine, sprite control, text display |
-| `data.asm` | `.incbin` references for background and sprite graphics |
+| `res/*.png.toml` | the import settings of the target picture (`opensnes-tileset`, 2bpp) and the sprite sheet (`opensnes-sprite`, 32-pixel blocks, 48 colours); the build converts and links them |
 | `res/` | Pre-converted graphics (.pic, .pal, .map) and source PNGs |
 | `Makefile` | `LIB_MODULES := console input sprite dma text background` |

@@ -160,7 +160,7 @@ since qbe `3e79c8c`, 2026-05-21): the callee returns the **low 16 bits in
 After the `jsl`, the caller stores `A` to the low half of the destination
 and `lda.b tcc__retval_hi` to its high half. Hand-written asm that returns a
 32-bit value must follow this (`lib/source/fixed32.asm`, `fix32Sin`, is the
-reference; `devtools/libtests` asserts its full 32 bits at run time). The
+reference; `testing/fixtures/libtests` asserts its full 32 bits at run time). The
 direct page must be `$0000` at the `sta.b`, as it is for all C code.
 
 **Runtime helpers (`__mul32`, `__[s]divmod32`)**: low 16 returned in `A`,
@@ -282,6 +282,13 @@ Constraints to respect:
   (`rep #$10`). The C caller has already issued `rep #$20` before the
   `jsl`. If your function manipulates 8-bit mode, restore 16-bit before
   `rtl` (the convention is "callee returns in 16-bit mode").
+- **Calling a C function from assembly** works in either A width: an
+  exported C function, and any C function whose address is used (a
+  callback given to `nmiSet()`, `irqSet()`, the object engine, a table of
+  function pointers), opens with `rep #$20` itself. Only a `static`
+  function that is called directly and nowhere else referenced leaves it
+  out (since 2026-10-09) — and assembly cannot name such a function. Have
+  X/Y in 16 bits and the arguments pushed left to right; that is all.
 - **Direct page**: assume DP = 0. C code does not touch DP, so it stays
   where crt0 set it.
 - **Data Bank Register (DBR)**: assume DBR = 0. Use `lda.l` for
@@ -486,7 +493,7 @@ the keyword is an error.
   silently-wrong code"). Pass a pointer. Pinned by
   `devtools/compiler-tests/cases/negative/struct_param` and `struct_return`.
   Assigning a struct (`a = b;`) works since 2026-10-03 (bytes, words and
-  longs per the member alignment; `devtools/compiler-tests/runtime/d_quals`
+  longs per the member alignment; `testing/fixtures/compiler/d_quals`
   checks every byte lands), except from or to a `FAR` object, which is
   refused: copy field by field.
 

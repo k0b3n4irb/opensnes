@@ -64,7 +64,7 @@ lzss_m6     DW      ; bit counter
 .16bit
 
 ;---------------------------------------------------------------------------------
-; void lzssDecodeVram(const u8 *source, u16 address)   (LzssDecodeVram: deprecated alias, same address)
+; void lzssDecodeVram(const u8 *source, u16 address)   (the capitalised 0.x spelling was removed on 2026-10-05)
 ;
 ; Decompresses LZ77-encoded data directly to VRAM.
 ;
@@ -86,7 +86,6 @@ lzss_m6     DW      ; bit counter
 ;            NMI handler from corrupting VRAM writes.
 ;---------------------------------------------------------------------------------
 lzssDecodeVram:
-LzssDecodeVram:                         ; deprecated spelling, kept until the next major
     php
     phb
     phx

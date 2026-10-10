@@ -13,7 +13,10 @@
 #define MARIO_JUMPING   0x0394
 #define MARIO_HIJUMPING 0x0594
 
-extern u8 sprmario;
+#include "res/tilesMario.inc"    /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
+#include "res/mario.inc"         /* generated: mario_tiles[], mario_pal[] */
+#include "res/goomba.inc"        /* generated: goomba_tiles[], goomba_pal[] */
+#include "res/koopatroopa.inc"   /* generated: koopatroopa_tiles[], koopatroopa_pal[] */
 extern u16 nbobjects;
 
 u16 pad0;
@@ -73,7 +76,7 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     oambuffer[0].oamframeid = 0;
     oambuffer[0].oamrefresh = 1;
     oambuffer[0].oamattribute = OBJ_PRIO(2);
-    OAM_SET_GFX(0, &sprmario);
+    OAM_SET_GFX(0, mario_tiles);
 }
 
 void marioupdate(u16 idx) {

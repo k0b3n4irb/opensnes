@@ -1,0 +1,9 @@
+# the hero sheet holds 16x16 frames, so the blocks are 16x16 (docs/tutorials/sprites.md);
+# the game loads its first 16 colours into one OBJ slot, so the palette is capped at 16
+# (a full 256-colour .pal would be 480 bytes of ROM the game never reads, and res/palplan.h
+# plans the sprite palettes from these 16).
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16

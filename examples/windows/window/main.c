@@ -43,18 +43,15 @@
  *============================================================================*/
 
 /** @brief 4bpp tile data for background layer 1 (defined in data.asm) */
-extern u8 tiles_bg1[], tiles_bg1_end[];
+#include "res/bg1.inc"
+#include "res/bg2.inc"
+/* generated: bgN_tiles[], bgN_map[], bgN_pal[] (each with _end) and a BgAsset bgN */
 /** @brief Tilemap data for BG1 (32x32 grid) */
-extern u8 tilemap_bg1[], tilemap_bg1_end[];
 /** @brief 16-color palette for BG1 */
-extern u8 palette_bg1[];
 
 /** @brief 4bpp tile data for background layer 2 (defined in data.asm) */
-extern u8 tiles_bg2[], tiles_bg2_end[];
 /** @brief Tilemap data for BG2 (32x32 grid) */
-extern u8 tilemap_bg2[], tilemap_bg2_end[];
 /** @brief 16-color palette for BG2 (loaded to CGRAM palette slot 1) */
-extern u8 palette_bg2[];
 
 /*============================================================================
  * HDMA Triangle Tables (in RAM)
@@ -197,19 +194,19 @@ int main(void) {
      * Load BG1: tiles at VRAM $4000, tilemap at $0000, palette slot 0
      *--------------------------------------------------------------------*/
     bgSetMapPtr(0, 0x0000, SC_32x32);
-    bgInitTileSet(0, tiles_bg1, palette_bg1, 0,
-                  tiles_bg1_end - tiles_bg1,
+    bgInitTileSet(0, bg1_tiles, bg1_pal, 0,
+                  bg1_tiles_end - bg1_tiles,
                   PALETTE_16_SIZE, BG_16COLORS, 0x4000);
-    dmaCopyVram(tilemap_bg1, 0x0000, tilemap_bg1_end - tilemap_bg1);
+    dmaCopyVram(bg1_map, 0x0000, bg1_map_end - bg1_map);
 
     /*--------------------------------------------------------------------
      * Load BG2: tiles at VRAM $6000, tilemap at $1000, palette slot 1
      *--------------------------------------------------------------------*/
     bgSetMapPtr(1, 0x1000, SC_32x32);
-    bgInitTileSet(1, tiles_bg2, palette_bg2, 1,
-                  tiles_bg2_end - tiles_bg2,
+    bgInitTileSet(1, bg2_tiles, bg2_pal, 1,
+                  bg2_tiles_end - bg2_tiles,
                   PALETTE_16_SIZE, BG_16COLORS, 0x6000);
-    dmaCopyVram(tilemap_bg2, 0x1000, tilemap_bg2_end - tilemap_bg2);
+    dmaCopyVram(bg2_map, 0x1000, bg2_map_end - bg2_map);
 
     /*--------------------------------------------------------------------
      * Video mode: Mode 1, enable BG1 + BG2

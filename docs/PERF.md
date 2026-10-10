@@ -1,6 +1,7 @@
 # Measured frame costs of the library {#perf}
 What the library functions cost per frame in real scenes, measured on luna
-(cycle-accurate) on 2026-09-26 with the SDK of that day (v0.45.0 + develop).
+(cycle-accurate) on 2026-10-09 with the SDK of that day (0.49.0 in
+preparation; first measured on 2026-09-26, and the differences are noted).
 `PHILOSOPHY.md` asks every API with a cost to say it; this page is the
 measured side of that promise, and `docs/BENCHMARK.md` the compiler side.
 
@@ -12,14 +13,15 @@ written, about 49,000 of them (48,988: 37 lines of 1324 available master clocks,
 
 | Scene | What runs | Idle (in `WaitForVBlank`) |
 |---|---|---|
-| `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 85 % of the frame |
-| `examples/games/rpg` | walking: map, sprites, HUD | 83 % of the frame |
-| `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 17 % of the frame |
-| `examples/games/tetris` | playing: board redraw, HUD, SNESMOD | 68 % of the frame |
-| `examples/audio/snesmod_music` | music playing, nothing else | 97 % of the frame |
+| `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
+| `examples/games/rpg` | walking: map, sprites, HUD | 91 % of the frame |
+| `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 69 % of the frame |
+| `examples/games/tetris` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
+| `examples/audio/snesmod_music` | music playing, nothing else | 98 % of the frame |
 
-Idle time is what the game still has: a scene at 17 % idle (sprite_swarm)
-is close to dropping frames, one at 97 % (snesmod_music) does almost nothing.
+Idle time is what the game still has. On 2026-09-26 sprite_swarm had 17 %
+of its frame left and was close to dropping frames; on 2026-10-09 it has
+69 %.
 
 ## Per function
 
@@ -29,17 +31,15 @@ above 300 mclk per frame.
 
 | Function | likemario | rpg | sprite_swarm | tetris | snesmod_music |
 |---|---|---|---|---|---|
-| `NmiHandler` | 8,164 (8,170) | 8,164 (8,170) | 7,670 (7,716) | 5,676 (5,676) | 5,650 (5,650) |
-| `oamSetSize` |  | 8,049 (9,502) |  |  |  |
-| `oamSet` |  | 4,612 (5,490) |  |  |  |
-| `animTick` | 4,226 (6,198) |  |  |  |  |
-| `animPlay` | 3,161 (4,926) |  |  |  |  |
-| `dmaCopyVram` |  |  |  | 1,766 (2,292) |  |
-| `bgSetScroll` | 1,652 (1,652) | 1,657 (1,692) |  | 1,652 (1,652) |  |
-| `oamDynamicDraw` | 1,548 (3,076) |  |  |  |  |
-| `padPressed` | 1,247 (1,370) |  |  |  | 1,250 (1,250) |
-| `padHeld` | 1,036 (1,036) | 1,036 (1,036) |  |  |  |
-| `oamHide` |  | 961 (6,612) |  |  |  |
+| `NmiHandler` | 8,162 (8,170) | 8,163 (8,170) | 7,670 (7,716) | 5,676 (5,676) | 5,650 (5,650) |
+| `oamSet` |  | 3,426 (4,068) |  |  |  |
+| `animTick` | 3,387 (5,306) |  |  |  |  |
+| `animPlay` | 2,125 (3,214) |  |  |  |  |
+| `dmaCopyVram` |  |  |  | 1,747 (2,248) |  |
+| `oamSetSize` |  | 1,736 (1,970) |  |  |  |
+| `oamDynamicDraw` | 1,351 (1,626) |  |  |  |  |
+| `oamHide` |  | 624 (4,290) |  |  |  |
+| `bgSetScroll` | 561 (600) | 589 (640) |  | 560 (560) |  |
 
 ## Reading it
 
@@ -48,17 +48,19 @@ above 300 mclk per frame.
   is 544 bytes of DMA, at 8 mclk per byte (anomie's timing doc: "DMA takes
   8 master cycles per byte transferred") about 4,350 of those. It
   includes the 17th-bit pad read added on 2026-09-26 (+378 mclk). The
-  per-example gate is `tools/luna-test/nmi_budget.py`.
+  per-example gate is `testing/nmi_budget.py`.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about
-  13,600 mclk per frame (3.8 %) for its handful of characters and HUD
-  sprites. `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
+  5,800 mclk per frame (1.6 %) for its handful of characters and HUD
+  sprites; 13,600 on 2026-09-26, before the setters were written in
+  assembly. `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
   `oamMemory[]` directly (sprite_swarm) are the escape hatches for large
   counts.
-- **Animation**: `animTick` + `animPlay` about 7,400 mclk per frame in
-  likemario.
-- **`bgSetScroll`**: about 1,650 mclk per frame in each of the three games.
-- **Pads**: `padPressed` / `padHeld` about 1,000-1,250 mclk per frame each
-  in the scenes that read them.
+- **Animation**: `animTick` + `animPlay` about 5,500 mclk per frame in
+  likemario (7,400 on 2026-09-26; both are compiled C).
+- **`bgSetScroll`**: about 570 mclk per frame in each of the three games
+  (1,650 on 2026-09-26).
+- **Pads**: `padPressed` / `padHeld` no longer appear: they are macros over
+  one word since 2026-10-09 (1,000-1,250 mclk per frame each before).
 
 The per-function figures are what luna counts at the function's own
 labels. Asm routines a function calls under their own names (the map
@@ -100,7 +102,7 @@ frames 60 to 300):
 
 | | master cycles per frame in the draw | share of the frame |
 |---|---|---|
-| the deprecated `oamDrawMeta` (before) | 51,992 | 14.55 % |
+| the former public `oamDrawMeta` (before; removed from the API 2026-10-05) | 51,992 | 14.55 % |
 | one function, flip tested per piece | 58,190 | 16.28 % |
 | one function, two loops | 61,252 | 17.14 % |
 | reads the style, then runs the old loop (what ships) | 56,057 | 15.69 % |
@@ -110,12 +112,80 @@ three reads through the style pointer and one more call. The two attempts
 above it were slower although they add no call: with the mirrored loop in
 the same function, the compiler's copies between the two loops fell on
 every piece. The mirrored draw is therefore a function of its own, and the
-unflipped one still runs the loop of the deprecated `oamDrawMeta`.
+unflipped one still runs the same loop, now the internal (removed from the API) `oamDrawMeta`.
+
+## Against PVSnesLib, call for call {#perf-libbench}
+
+`devtools/libbench` asks both libraries for the same things — what a game
+asks every frame — and times each request on luna. Master cycles for one
+frame's worth; `docs/BENCHMARK.md` has the same comparison for the
+compilers.
+
+<!-- libbench:begin -->
+| Row | What it asks for | PVSnesLib | OpenSNES | |
+|---|---|---:|---:|---:|
+| `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,780 | -19.5 % |
+| `pad` | held, pressed, released of pad 0, ten times | 11,429 | 10,245 | -10.4 % |
+| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,539 | 27,532 | -30.4 % |
+| `oamset` | `oamSet` on 32 sprites | 81,070 | 66,606 | -17.8 % |
+| `oamxy` | `oamSetXY` on 32 sprites | 45,047 | 44,124 | -2.0 % |
+| `oamsize` | the size of 32 sprites | 48,746 | 29,476 | -39.5 % |
+| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,894 | 17,877 | -0.1 % |
+| `text` | 20 characters printed and shown | 84,676 | 62,840 | -25.8 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 138,384 | -18.5 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 59,246 | -54.2 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,405 | -75.7 % |
+| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,389 | -5.8 % |
+| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,400 | 10,738 | -38.3 % |
+
+OpenSNES costs no more than PVSnesLib on **13 of the 13 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
+<!-- libbench:end -->
+
+**How a row is timed.** Each row is built twice per SDK, with its library
+calls and with the same loops around nothing; both run the same number of
+frames, and the cost is what the symbols of the first gained over the
+second. The call, its arguments, the library function and what it calls
+are counted, the loop is not. `text` and `frame` include the frame
+boundary, where each SDK's handler sends what the calls prepared; `idle`
+is that handler alone, in a ROM that only waits.
+
+**Reading it.**
+
+- **The first run of this bench, on 2026-10-09, had OpenSNES behind on
+  seven rows of eight**: the pad read at 3.5 times PVSnesLib's cost,
+  `oamSetXY` at 3.6 times, text +83 %, sprite size +41 %, scroll +13 %,
+  `oamSet` +9 %. The compiler had been measured against PVSnesLib for
+  months; the library had only been measured against itself (the tables
+  above).
+- What changed that day: `padHeld` and `padPressed` are also macros over
+  the word the handler filled, and `padReleased` is assembly; the sprite
+  setters (`oamSet`, `oamSetX`, `oamSetY`, `oamSetXY`, `oamSetSize`) and
+  the three scroll setters are assembly, with a table for the bits a shift
+  loop used to build; `textPrint` writes a run of characters with the
+  buffer position computed once instead of three calls and a multiply per
+  character.
+- **`oamxy` and `dma` are level**, within about 1 %, and sit on either side
+  of PVSnesLib's figure from one compiler step to the next (+0.2 % and
+  +0.1 % on the morning of 2026-10-10, −1.2 % and −0.1 % the day before,
+  −2.0 % and −0.1 % that evening, once a function that calls kept its short
+  temporaries in the direct page) although the
+  library routines did not change: a row is the difference between a loop
+  with the calls and the same loop empty, and a compiler improvement that
+  helps the empty loop more than the loop around a call moves the row up.
+  Read these two as ties. PVSnesLib's
+  `oamSetXY` checks nothing and marks nothing; ours refuses an id that is
+  not a sprite, marks the table dirty and records the highest sprite
+  written, which is what lets the handler skip the upload on a frame where
+  no sprite moved and send only the sprites in use otherwise — the `idle`
+  row is where that is paid back. A 2 KB `dmaCopyVram` is the transfer
+  itself (16,384 of its master cycles) under either SDK.
+- **`frame` is the row to read for a whole game**: everything in one
+  frame, uploads included.
 
 ## Reproduce
 
 ```sh
-tools/luna-test/bin/luna profile examples/games/rpg/rpg.sfc \
+testing/bin/luna profile examples/games/rpg/rpg.sfc \
     --from-frame 120 --until-frame 420 \
     --input "130:0x0100,250:0,260:0x0400,400:0" --out - --top 0
 ```

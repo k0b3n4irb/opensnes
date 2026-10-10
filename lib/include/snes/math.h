@@ -53,6 +53,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): ease_in_quad, ease_out_quad.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Fixed-Point Type and Macros
  *============================================================================*/
@@ -429,13 +432,5 @@ u8 easeInQuad(u8 t);
  * into its final state (e.g., a sprite sliding into position).
  */
 u8 easeOutQuad(u8 t);
-
-/** @brief The pre-2026-10-03 name of easeInQuad(). Same value. */
-OPENSNES_DEPRECATED("use easeInQuad()")
-u8 ease_in_quad(u8 t);
-
-/** @brief The pre-2026-10-03 name of easeOutQuad(). Same value. */
-OPENSNES_DEPRECATED("use easeOutQuad()")
-u8 ease_out_quad(u8 t);
 
 #endif /* OPENSNES_MATH_H */

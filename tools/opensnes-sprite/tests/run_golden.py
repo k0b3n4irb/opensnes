@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+"""Golden tests for opensnes-sprite (sheets and Aseprite exports; the 1.x successor of gfx4snes -s/-T and aseprite2snes).
+
+The family's contract: a tool that absorbs a 0.x tool reproduces that
+tool's golden suite byte for byte. The `sheet` cases compare against
+gfx4snes's goldens (`tools/gfx4snes/tests/golden`: spr, flip, two, three),
+the `anim` case against aseprite2snes's hero_anim.h from its second line
+(the first names the generator). Fixtures are copies of theirs.
+
+Run:  python3 tools/opensnes-sprite/tests/run_golden.py
+"""
+from __future__ import annotations
+
+import sys
+import tempfile
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
+from golden import Golden  # noqa: E402
+
+g = Golden("opensnes-sprite", __file__)
+GFX = g.here.parents[1] / "gfx4snes" / "tests" / "golden"
+ASE = g.here.parents[1] / "aseprite2snes" / "tests" / "golden"
+META = ["--colors", "16", "--metasprite", "32", "16", "--priority", "2"]
+
+g.expect_outputs("sheet spr.png --size 16 == gfx4snes -s 16 -p (the data)", ["sheet", "-q", "--size", "16", "spr.png"],
+                 copy=["spr.png"], outputs=["spr.pic", "spr.pal"], want_dir=GFX)
+g.expect_outputs("sheet spr.png: the glue in asset.h's naming (.inc, _data.as)", ["sheet", "-q", "--size", "16", "spr.png"],
+                 copy=["spr.png"], outputs=["spr.inc", "spr_data.as"])
+g.expect_outputs("sheet flip.png --metasprite 32 16 --flip == gfx4snes -T -F (the data)", ["sheet", "-q", "--size", "16", *META, "--flip", "flip.png"],
+                 copy=["flip.png"], outputs=["flip.pic", "flip.pal", "flip_meta.inc"], want_dir=GFX)
+g.expect_outputs("sheet two.png (char names, not block indices) == gfx4snes", ["sheet", "-q", "--size", "16", *META, "two.png"],
+                 copy=["two.png"], outputs=["two_meta.inc"], want_dir=GFX)
+g.expect_outputs("sheet three.png --flip (mirror drift) == gfx4snes", ["sheet", "-q", "--size", "16", "--colors", "16", "--metasprite", "48", "16", "--priority", "2", "--flip", "three.png"],
+                 copy=["three.png"], outputs=["three_meta.inc"], want_dir=GFX)
+
+
+# A sheet of SEVERAL ROWS of metasprites (grid.png: 128x64, two rows of four
+# 32x32 cells). Until 2026-10-09 the first block of a metasprite was right
+# only on a sheet of one row or one column: here every 32x32 metasprite got
+# tile 0, and at --size 16 the metasprites overlapped (issue #165). The
+# tile names read 0, 4, 8, 12, 64, ... and 0 2 32 34 / 4 6 36 38 / ...
+def grid_case(label, size, golden):
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["sheet", "-q", "--size", size, "--colors", "16", "--metasprite", "32", "32", "grid.png"], work, ["grid.png"], None)
+        err = g.failure(proc)
+        errs = [err] if err else ([] if (work / "grid_meta.inc").read_bytes() == (g.here / "golden" / golden).read_bytes()
+                                  else [f"grid_meta.inc differs from golden/{golden}"])
+    g.record(label, "the metasprite table matches", errs)
+
+
+# --compact (issue #165): mirror.png is A, A mirrored, B, B mirrored, 32x32
+# each. With --flip two blocks are kept and _blocks.inc reads 0, 0|FLIPX, 1,
+# 1|FLIPX; the metasprite names follow the compacted sheet (0, 0, 4, 4).
+# Without --flip, at --size 16, no 16x16 block of the random picture repeats:
+# every block is kept and the table is the identity.
+g.expect_outputs("sheet mirror.png --flip --compact: two blocks kept of four, the table and the names",
+                 ["sheet", "-q", "--size", "32", "--colors", "16", "--flip", "--compact", "--metasprite", "32", "32", "mirror.png"],
+                 copy=["mirror.png"], outputs=["mirror_blocks.inc", "mirror_meta.inc", "mirror.pic"])
+
+
+def compact16():
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["sheet", "-q", "--size", "16", "--colors", "16", "--compact", "mirror.png"], work, ["mirror.png"], None)
+        err = g.failure(proc)
+        errs = [err] if err else ([] if (work / "mirror_blocks.inc").read_bytes() == (g.here / "golden" / "mirror16_blocks.inc").read_bytes()
+                                  else ["mirror_blocks.inc differs from golden/mirror16_blocks.inc"])
+    g.record("sheet mirror.png --size 16 --compact (no --flip): nothing repeats, the identity", "the block table matches", errs)
+
+
+compact16()
+grid_case("sheet grid.png --size 32 --metasprite 32 32: two rows of metasprites", "32", "grid32_meta.inc")
+grid_case("sheet grid.png --size 16 --metasprite 32 32: two rows, four blocks each", "16", "grid16_meta.inc")
+
+
+def anim_matches():
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["anim", "-q", "--prefix", "hero", "hero.json"], work, copy=["hero.json"])
+        if g.failure(proc):
+            return [g.failure(proc)]
+        got = (work / "hero_anim.h").read_text().splitlines()[1:]
+        want = (ASE / "hero_anim.h").read_text().splitlines()[1:]
+        if got != want:
+            return ["hero_anim.h differs from aseprite2snes's golden after the generator line"]
+        first = (work / "hero_anim.h").read_text().splitlines()[0]
+        if "opensnes-sprite" not in first:
+            return [f"generator line: {first!r}"]
+    return []
+
+
+g.check("anim hero.json == aseprite2snes hero_anim.h from line 2", "same clips, own generator line", anim_matches)
+g.expect_stdout("sheet --json", ["sheet", "--json", "--size", "16", *META, "--flip", "flip.png"], golden="sheet.json", copy=["flip.png"])
+g.expect_stdout("inspect --json", ["inspect", "--json", "--size", "16", "spr.png", "flip.png"], golden="inspect.json", copy=["spr.png", "flip.png"])
+g.expect_outputs("sheet --save writes spr.png.toml", ["sheet", "-q", "--size", "16", "--colors", "16", "--save", "spr.png"],
+                 copy=["spr.png"], outputs=["spr.png.toml"])
+g.expect_refused("sheet index5_2bpp.png --bpp 2 (two palette banks in one tile)", ["sheet", "--size", "8", "--bpp", "2", "index5_2bpp.png"],
+                 copy=["index5_2bpp.png"], needles=["one 4-colour palette per tile"])
+g.expect_refused("sheet --size 12 (not an OBJ size)", ["sheet", "--size", "12", "spr.png"], copy=["spr.png"], needles=["8, 16, 32 and 64"])
+g.expect_refused("sheet --metasprite 20 16 (not a multiple of the block)", ["sheet", "--size", "16", "--metasprite", "20", "16", "spr.png"],
+                 copy=["spr.png"], needles=["multiples of the block size"], nothing_written=["spr_meta.inc"])
+g.expect_refused("anim bad_range.json", ["anim", "bad_range.json"], copy=["bad_range.json"], needles=["out of bounds"], nothing_written=["bad_range_anim.h"])
+g.expect_refused("sheet hero.json (not a sheet)", ["sheet", "hero.json"], copy=["hero.json"], needles=["not a .png or .bmp sheet"])
+sys.exit(g.report())

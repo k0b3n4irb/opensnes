@@ -58,12 +58,6 @@ void colorMathSetLayers(u8 layers) {
     REG_CGADSUB = colormath_cgadsub;
 }
 
-/* The deprecated name, out of line: a use of a deprecated symbol is an error
- * in this strict build, a definition is not. Removed at the next major. */
-void colorMathEnable(u8 layers) {
-    colorMathSetLayers(layers);
-}
-
 void colorMathDisable(void) {
     colormath_cgadsub &= 0xC0;  /* Clear layer bits */
     REG_CGADSUB = colormath_cgadsub;

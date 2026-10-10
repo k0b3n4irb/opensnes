@@ -33,18 +33,14 @@
 #include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /** @brief BG1 tile data -- repeating shader pattern (4bpp, tiles at VRAM $4000). */
-extern u8 bg1_tiles, bg1_tiles_end;
+#include "res/opensnes.inc"   /* generated: opensnes_tiles/_map/_pal, each with _end (BG2) */
+#include "res/shader.inc"     /* generated: shader_tiles/_map/_pal (BG1) */
 /** @brief BG1 palette (16 colors loaded to CGRAM slot 1, offset 16). */
-extern u8 bg1_pal, bg1_pal_end;
 /** @brief BG1 tilemap (32x32 tile grid loaded to VRAM $1800). */
-extern u8 bg1_map, bg1_map_end;
 
 /** @brief BG2 tile data -- static logo (4bpp, tiles at VRAM $5000). */
-extern u8 bg2_tiles, bg2_tiles_end;
 /** @brief BG2 palette (16 colors loaded to CGRAM slot 0, offset 0). */
-extern u8 bg2_pal, bg2_pal_end;
 /** @brief BG2 tilemap (32x32 tile grid loaded to VRAM $1400). */
-extern u8 bg2_map, bg2_map_end;
 
 /** @brief BG1 horizontal scroll offset (auto-incremented each frame). */
 s16 scrX = 0;
@@ -64,9 +60,9 @@ s16 scrY = 0;
  * both layers together, with BG2 (the logo) appearing on top of BG1 due to
  * default priority ordering.
  *
- * @note The extern declarations use scalar syntax (not array) because the
- *       data symbols are defined in assembly as labels. Address-of (`&`)
- *       is used to obtain their pointers for DMA operations.
+ * @note The tile, map and palette symbols come from the generated
+ *       res/opensnes.inc and res/shader.inc (opensnes-tileset writes them
+ *       from the settings files beside the pictures).
  *
  * @return Does not return (infinite loop).
  */
@@ -76,17 +72,17 @@ int main(void) {
     /* Load BG2 tiles + palette (static logo).
      * Palette slot 0 = CGRAM offset 0 (colors 0-15).
      * Tiles at VRAM $5000 to avoid overlapping BG1 tiles at $4000. */
-    bgInitTileSet(1, &bg2_tiles, &bg2_pal, 0,
-                  &bg2_tiles_end - &bg2_tiles,
-                  &bg2_pal_end - &bg2_pal,
+    bgInitTileSet(1, opensnes_tiles, opensnes_pal, 0,
+                  opensnes_tiles_end - opensnes_tiles,
+                  opensnes_pal_end - opensnes_pal,
                   BG_16COLORS, VRAM_BG2_TILES);
 
     /* Load BG1 tiles + palette (shader pattern).
      * Palette slot 1 = CGRAM offset 16 (colors 16-31).
      * Each layer needs its own palette slot to avoid color conflicts. */
-    bgInitTileSet(0, &bg1_tiles, &bg1_pal, 1,
-                  &bg1_tiles_end - &bg1_tiles,
-                  &bg1_pal_end - &bg1_pal,
+    bgInitTileSet(0, shader_tiles, shader_pal, 1,
+                  shader_tiles_end - shader_tiles,
+                  shader_pal_end - shader_pal,
                   BG_16COLORS, VRAM_BG1_TILES);
 
     /* Set tilemap locations -- tilemaps must not overlap each other
@@ -97,8 +93,8 @@ int main(void) {
     /* Copy tilemaps to VRAM -- must happen during VBlank or forced blank
      * because the PPU silently ignores VRAM writes during active display. */
     WaitForVBlank();
-    dmaCopyVram(&bg2_map, VRAM_BG2_MAP, &bg2_map_end - &bg2_map);
-    dmaCopyVram(&bg1_map, VRAM_BG1_MAP, &bg1_map_end - &bg1_map);
+    dmaCopyVram(opensnes_map, VRAM_BG2_MAP, opensnes_map_end - opensnes_map);
+    dmaCopyVram(shader_map, VRAM_BG1_MAP, shader_map_end - shader_map);
 
     /* Mode 1, enable only BG1 + BG2 (BG3 disabled).
      * TM_BG1 | TM_BG2 enables both layers on the main screen. */

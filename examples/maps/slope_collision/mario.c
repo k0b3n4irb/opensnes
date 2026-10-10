@@ -14,8 +14,7 @@
 #define MARIO_JUMPING   0x0394
 #define MARIO_HIJUMPING 0x0594
 
-extern u8 mariogfx;
-extern u8 mariopal;
+#include "res/mario_sprite.inc"   /* generated: mario_sprite_tiles[], mario_sprite_pal[] */
 
 u16 pad0;
 u16 marioid;
@@ -79,10 +78,10 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     oambuffer[0].oamframeid = 6;
     oambuffer[0].oamrefresh = 1;
     oambuffer[0].oamattribute = OBJ_PRIO(2);
-    OAM_SET_GFX(0, &mariogfx);
+    OAM_SET_GFX(0, mario_sprite_tiles);
 
     /* Sprite palette at CGRAM 128 (sprite palette 0) */
-    dmaCopyCGram(&mariopal, OBJ_CGRAM_BASE, 32);
+    dmaCopyCGram(mario_sprite_pal, OBJ_CGRAM_BASE, 32);
 }
 
 void marioupdate(u16 idx) {

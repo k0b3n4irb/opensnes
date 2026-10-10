@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | a1474c4a3a4e5e756819090d668d53fcba7c77ed | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | a89fd88b8195f647955c6f7029af360d06f97a18 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 63ad4e9c6005701716f394a7c051799186a64053 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 757df814090976192aa93024077e65cd5a1e37e9 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -44,9 +44,13 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 33 patches since upstream merge-base 7051114
+### compiler/cproc — 37 patches since upstream merge-base 7051114
 
 ```
+63ad4e9 expr: a conditional's result has the conditional's type, bit-field or not — `b3 - (3 ? bf.b2 : u)` was computed signed (difftest_stmt seed 103247, 2026-10-09)
+dbc4f9f qbe: 64-bit integers are refused, their constants folded first (2026-10-08)
+80d542e qbe, eval: conditions and logical constants at the w65816 widths — three silent miscompilations (difftest, 2026-10-08)
+11db807 qbe: file-scope statics are emitted name.<TU> so two sources may share a static (2026-10-05)
 a1474c4 qbe, expr: qualifiers and widths the w65816 target dropped — four silent miscompilations (2026-10-03 campaign)
 354a845 OpenSNES: __ramcode, a function specifier for the RAM code window
 771bdf0 expr: typechar.u.basic, not u.arith, in the fork's type layout (adapts 23c57a7)
@@ -85,7 +89,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 86 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 111 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -97,6 +101,31 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+757df81 emit: in a function that CALLS, a temp that is not live across any call gets a direct-page slot (`tcc__lf`, slot numbers from DPSLOT; first fit in 16 words, the stack when full or when a call is crossed); found by measuring a real game, 59 % of whose logic ran on stack frames; QBE_NO_DP_TEMPS=1 turns it off (issue #166; 2026-10-10)
+25145b1 inline: a static function with ONE call site (address not taken) is inlined whole, control flow included, and not emitted; `static inline` with several sites is copied at each, up to 160 IR instructions (CC_INLINE_MAX_BIG); a leaf above 16 IR instructions is left alone when its caller still calls something else (it keeps its direct-page frame; CC_INLINE_LEAF_MAX); QBE_NO_AUTO_INLINE=1 turns it off (issue #166, pattern 9; 2026-10-10)
+d831408 emit: the peephole drops `cmp.w #0` after the flags are set and a direct-page slot nobody reads in the function (issue #166, from a real game's output; 2026-10-10)
+0288ec6 emit: a peephole over the emitted text — `sta S / lda S`, a store overwritten unread, a load overwritten, `lda S / tax` with X already holding S (issue #166, patterns 1, 2, 4; 2026-10-10)
+316955e emit: a conditional over a near target is one inverted branch — `bcs @target` for `bcc + / jmp @target / +`, on an upper bound of the distance (issue #166, pattern 5; 2026-10-09)
+8d514fb emit: a plain object indexed takes abs,x, not long,x — `lda.w sym,x`, a byte and a cycle less (issue #166, pattern 3; 2026-10-09)
+58449ce emit: every octal escape of a string is a byte, not only \000 — `"\n"` came out as 0 '1' '2' (2026-10-09)
+c794f42 w65816: the frame of a leaf function is in the direct page, `tcc__lf` (2026-10-09)
+576aa1d w65816: a static function whose address is never used does not open with rep #$20 (2026-10-09)
+44bfca5 copy: two phis are the same only if they have the same class — a long lost its high half to its truncated copy (difftest_stmt seed 124152, 2026-10-09)
+efc6996 w65816: a 32-bit temp of which only the low half is read takes one word of frame (2026-10-09)
+db935a1 w65816: the value a block returns, produced by its last instruction, gets no slot in any function (2026-10-08)
+c88fc56 w65816: a parameter is read in place in every function, a temp that never touches its slot gets none, and a 32-bit multiply by 2..256 loads its operand once (2026-10-08)
+e24db85 w65816: a promoted local no longer keeps its words of frame (2026-10-08)
+2f09916 copy: shift widths are computed at the target's word size — `(v >> 15) & 1` lost its mask, a silent miscompilation since the fork's first commit (difftest_stmt seed 54084, 2026-10-08)
+c566d99 w65816: every near access through a temp is X-indexed (`p->field` as `lda.l N,x`), and X is remembered between accesses (2026-10-08)
+f6e5aea w65816: near sym[index] uses indexed-long addressing; a 16-bit value times a small constant gives its 32-bit product inline (2026-10-08)
+cc3b9e0 w65816: a far access keeps its short form only for an index known >= 0 — `(far_arr + 8)[-1]` read and wrote the next bank (2026-10-08)
+b2a7a26 w65816: a 32-bit compare does not take its first operand from A — an internal error on `cnel` of a 16-bit temp (difftest_stmt seed 19645, 2026-10-08)
+f25d973 cfg, copy, w65816: a condition branches where it is decided — jump threading, compare scheduled last, sign and 32-bit equality tests fused; gvn's phi inference on a dead edge fixed (2026-10-08)
+f832c8e gcm: the sunk copy takes the sunk operands, and what sink leaves unused is removed (2026-10-08; upstream candidate)
+bbdc317 w65816: floating point is refused; a Kw temp returned as 32 bits keeps its low half (2026-10-08)
+7b06495 w65816: the two ways out of a branch do not share A; leading zero-fills are data; 2048 temps, checked (difftest_stmt, 2026-10-08)
+68e6e8a w65816: phi moves as a parallel copy; the high half of a Kw operand is 0; dead high halves stay dead (difftest_stmt, 2026-10-08)
+b0b78af fold, gvn, w65816: constants and branches at the target's widths; a frame for a phi of constants (difftest, 2026-10-08)
 a89fd88 w65816: a function in section ".ram_code" joins the RAM code window
 794c6e3 w65816: temps whose lives never overlap share a stack slot (slot colouring from liveness), under a slot-ownership check
 77998b5 fix exponential complexity in usewidthle() (upstream b58e2e6, cherry-picked 2026-09-26)
@@ -162,7 +191,7 @@ the item's base unconditionally. Under `.BASE $C0` (every HiROM unit)
 **every C pointer to RAM carried a ROM bank on HiROM**, and any routine that
 honours the bank byte of its pointer read or wrote `$C0:xxxx` instead of work
 RAM. Found by an SRAM round trip on the HiROM fixture
-(`devtools/libtests_hirom`). Not behaviour-neutral: HiROM and FastROM ROMs
+(`testing/fixtures/libtests_hirom`). Not behaviour-neutral: HiROM and FastROM ROMs
 change (the bank byte pushed for RAM pointers goes from `$C0` / `$80` to
 `$00`); LoROM SlowROM ROMs are byte-identical.
 
@@ -236,4 +265,4 @@ unauthorised submodule pointer can never produce a release artifact.
 
 - `docs/doxygen-awesome-css` — cosmetic, third-party, low-risk; not pinned.
 - **luna** (test backend) — not a submodule; pinned as a downloaded binary via
-  `tools/luna-test/luna.version` + `scripts/install-luna.sh` (SHA-256 verified).
+  `testing/luna.version` + `scripts/install-luna.sh` (SHA-256 verified).

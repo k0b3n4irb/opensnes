@@ -1,0 +1,11 @@
+; The smallest GSU program: a Super FX build links exactly one, and this
+; example never starts it — the save lives in the GSU's RAM, written by the
+; SNES CPU through the sram module while the GSU is stopped.
+.include "memmap_gsu.inc"
+
+.BANK 0 SLOT 0
+.ORG 0
+
+gsu_start:
+    STOP
+    NOP

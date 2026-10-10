@@ -63,10 +63,29 @@ right one:
    Looping `wav2brr` samples are also hand-built (the loop points are yours).
    `palplan` sits a level up from the per-asset tools: it plans your *whole
    project's* palettes into the SNES's 8 BG + 8 sprite slots at once, so you run
-   it when your palette count grows, not per asset.
+   it when your palette count grows, not per asset. (In the `opensnes-*` family these
+   three are `opensnes-palette quantize`, `opensnes-text font` and
+   `opensnes-palette plan`, and the font and the plan run from the build.)
 
 All binaries live in `bin/` and are built by `make tools`. Every tool prints
 `--help`; the pages here are the guided version.
+
+## Where the tools are going
+
+The `opensnes-*` family replaces these converters — one tool per
+function, the same conventions everywhere, settings beside each asset.
+@subpage tools_conventions is the contract; the earlier tools stay one more
+release. The first two are @subpage tools_opensnes_sample (WAV → BRR) and
+@subpage tools_opensnes_music (Impulse Tracker → soundbank); @subpage tools_opensnes_rom
+runs the post-link checks of every build; @subpage tools_opensnes_sprite is the sprite
+artist's tool (sheets, metasprites, Aseprite clips); @subpage tools_opensnes_level turns a
+Tiled level into map, tile tables and entities; @subpage tools_opensnes_tileset the
+background artist's (tilesets, tilemaps, palette banks); @subpage tools_opensnes_text
+converts a typeface; @subpage tools_opensnes_palette plans a project's palettes into
+CGRAM and quantizes RGB art; @subpage tools_opensnes_image makes HiColor screens and
+the Mode 7 perspective tables; @subpage tools_opensnes_save creates, reads and patches
+battery save files; and @subpage tools_opensnes is the project's own command (`init`,
+`build`, `run`, `test`, `doctor`).
 
 ## Your Makefile
 
@@ -80,7 +99,7 @@ Testing is not a converter, but it is the other tool you will run every
 day. luna is the cycle-accurate emulator behind `make tests`, `luna mcp`
 is the debugger, and @subpage tools_luna is the pinned release's own
 `--help`, one section per subcommand — generated from the binary, so it
-cannot drift from `tools/luna-test/luna.version`.
+cannot drift from `testing/luna.version`.
 
 ## Where they fit with the rest of the docs
 

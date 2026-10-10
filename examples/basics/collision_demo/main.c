@@ -299,21 +299,18 @@ static void update_sprites(void) {
     u8 palette;
     u16 offset;
 
-    /* SNES PPU +1 scanline sprite quirk: write Y-1 so caller's Y matches
-     * the rendered top scanline. Required when bypassing oamSet (which
-     * compensates internally). See docs/hardware/OAM.md. */
     palette = (collision_flags != 0) ? 1 : 0;
     oamMemory[0] = (u8)player_x;
-    oamMemory[1] = (u8)(player_y - 1);
+    oamMemory[1] = (u8)player_y;
     oamMemory[2] = 0;  /* tile 0 */
     oamMemory[3] = (u8)((3 << 4) | (palette << 1));  /* priority 3 */
 
-    /* Enemy sprites (IDs 1-4) - same -1 compensation */
+    /* Enemy sprites (IDs 1-4) */
     for (i = 0; i < NUM_ENEMIES; i++) {
         offset = (i + 1) << 2;
         palette = (collision_flags & (1 << i)) ? 1 : 0;
         oamMemory[offset] = (u8)enemy_x[i];
-        oamMemory[offset + 1] = (u8)(enemy_y[i] - 1);
+        oamMemory[offset + 1] = (u8)enemy_y[i];
         oamMemory[offset + 2] = 1;  /* tile 1 */
         oamMemory[offset + 3] = (u8)((2 << 4) | (palette << 1));  /* priority 2 */
     }

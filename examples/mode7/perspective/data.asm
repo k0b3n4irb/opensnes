@@ -10,37 +10,9 @@
 ;----------------------------------------------------------------------
 ; Ground data (Mode 7 format: interleaved tilemap + tile pixels)
 ;----------------------------------------------------------------------
-ASSET_SECTION ".rodata1"
-
-ground_tiles:
-.incbin "res/ground.pc7"
-ground_tiles_end:
-
-ground_map:
-.incbin "res/ground.mp7"
-ground_map_end:
-
-ground_pal:
-.incbin "res/ground.pal"
-ground_pal_end:
-
-.ends
-
 ;----------------------------------------------------------------------
 ; Sky data (Mode 3 format: regular 4bpp tiles + tilemap)
 ;----------------------------------------------------------------------
-ASSET_SECTION ".rodata2"
-
-sky_tiles:
-.incbin "res/sky.pic"
-sky_tiles_end:
-
-sky_map:
-.incbin "res/sky.map"
-sky_map_end:
-
-.ends
-
 ;----------------------------------------------------------------------
 ; HDMA tables (must be in a known section for correct bank byte)
 ;----------------------------------------------------------------------

@@ -20,6 +20,10 @@
 # align 4, since `long` = 4 on this target): builtin-va-copy+aarch64.c,
 # local-init.c, struct-copy.c. Caught by the sanitizer job, not locally —
 # run `make test-toolchain-suites` after any change under compiler/.
+# 2026-10-08: four tests whose source computes a 64-bit integer at run time
+# (`long long`, `unsigned long long`), which the fork now refuses instead of
+# compiling at 32 bits: float-to-uint64.c, struct-passing-bitfield.c,
+# switch-long-long.c, uint64-to-float.c. A front-end error by design.
 
 add-int-pointer.c
 alignas-0.c
@@ -71,6 +75,7 @@ do-loop.c
 enum-large-value.c
 escaped-newline.c
 extern-initializer.c
+float-to-uint64.c
 for-loop.c
 func-array-param.c
 func-noreturn.c
@@ -104,11 +109,13 @@ string-octal.c
 struct-copy.c
 struct-flexible-array.c
 struct-packed.c
+struct-passing-bitfield.c
 struct-passing-call.c
 struct-passing.c
 struct-return-1.c
 struct-return-2.c
 subtract-pointer.c
+switch-long-long.c
 tentative.c
 thread-local.c
 typedef-name.c
@@ -118,6 +125,7 @@ typeof-array.c
 typeof-vm.c
 typeof.c
 typeof_unqual.c
+uint64-to-float.c
 union-passing.c
 union-struct-flexible-array.c
 union.c

@@ -1,11 +1,19 @@
-# Upgrading to OpenSNES 1.0 {#upgrading}
+# Upgrading from 0.48 to 0.49 {#upgrading}
 
-The 0.x releases deprecate; 1.0 removes. Every name below builds with a
-warning in 0.48 and later 0.x releases (the clang pre-pass reports each use;
-without clang the build runs the same scan in Python on each source it
-compiles, and `make check-upgrade SRC=<folder>` reads a whole project) and
-is gone at 1.0. Nothing else of the public API changes at 1.0, and nothing changes
-again before 2.0.
+The releases up to 0.48 deprecate; 0.49 removes, so that 1.0 has nothing
+left to remove. Every name below built with a warning in 0.48 (the clang
+pre-pass reported each use; without clang the build ran the same scan in
+Python on each source it compiled) and is gone at 0.49: a project that
+names one no longer compiles, and `opensnes upgrade <folder>` reads a
+whole project against the list and says what to use. This is the API 1.0
+is expected to freeze (`docs/STABILITY.md`).
+
+**State at 0.49.0 (2026-10-10; the removals date from 2026-10-05):** the constants of
+section 3, the `OAM_SET_GFX_BANK` macro and the twenty-six renamed
+functions of section 2 are gone from the headers, `opensnes upgrade` reports
+each use from `make/removed_api.txt`, `hdmaEnable()` / `hdmaDisable()`
+take a channel number and `dmaTransfer()` a far pointer (section 1). No
+`OPENSNES_DEPRECATED` declaration is left.
 
 Two things on this page are not removals but **changes of meaning**: read
 them first. Everything else is a rename where the old and new name do the
@@ -13,21 +21,33 @@ same thing.
 
 ## 1. Two calls that change meaning
 
-### `hdmaEnable(x)` and `hdmaDisable(x)` take a channel number at 1.0
+### `hdmaEnable(x)` and `hdmaDisable(x)` take a channel number at 0.49
 
-Until 1.0 they take a **bit mask** (`1 << channel`), like nothing else in
+Until 0.48 they took a **bit mask** (`1 << channel`), like nothing else in
 `hdma.h`. Since 0.48 that meaning has its own names, `hdmaEnableMask()` and
-`hdmaDisableMask()`, and the two short names warn. At 1.0 they come back
-taking a **channel number** 0-7, like the other twenty functions of the
-header. A call left as `hdmaEnable(0x40)` compiles at 1.0 and means
-something else; values above 7 are refused (nothing is enabled), so
-`0x40`, `0x0F`, `0xFF` and `1 << 6` fail visibly, but the masks 1, 2 and 4
-silently become channels 1, 2 and 4 instead of 0, 1 and 2.
+`hdmaDisableMask()`, and in 0.48 the two short names warn. At 0.49 (on
+`develop` since 2026-10-05) they take a **channel number** 0-7, like the
+other twenty functions of the header. A call left as `hdmaEnable(0x40)`
+compiles and means something else; values above 7 are refused (nothing is
+enabled), so `0x40`, `0x0F`, `0xFF` and `1 << 6` fail visibly, but the masks
+1, 2 and 4 silently become channels 1, 2 and 4 instead of 0, 1 and 2.
 
 ```c
-hdmaEnable(1 << HDMA_CHANNEL_6);      /* 0.x: mask. 1.0: refused (64 > 7) */
+hdmaEnable(1 << HDMA_CHANNEL_6);      /* 0.48: mask. 0.49: refused (64 > 7) */
 hdmaEnableMask(1 << HDMA_CHANNEL_6);  /* 0.48+: the mask, by its name     */
-hdmaEnable(HDMA_CHANNEL_6);           /* 1.0: the channel                 */
+hdmaEnable(HDMA_CHANNEL_6);           /* 0.49: the channel                 */
+```
+
+### `dmaTransfer()` takes the source as one far pointer at 0.49
+
+Until 0.48 the generic transfer took the bank and the 16-bit address as
+two arguments; since 0.49 the source is a `const u8 *`, whose bank byte the
+function reads, like every `dmaCopy*` helper. A six-argument call no longer
+compiles (one argument too many), so nothing changes silently.
+
+```c
+dmaTransfer(1, 0x00, bank, addr, 0x22, 4);   /* 0.48 */
+dmaTransfer(1, 0x00, table, 0x22, 4);        /* 0.49: the far pointer */
 ```
 
 ### `mode7SetScale(0x0100)` is 1:1 since 0.47
@@ -40,7 +60,7 @@ No warning can catch this one: search your sources for `mode7SetScale` and
 
 ## 2. Renamed functions (same behaviour)
 
-| Removed at 1.0 | Use instead | Header | Note |
+| Removed at 0.49 | Use instead | Header | Note |
 |---|---|---|---|
 | `rand()` | `rngNext()` | `console.h` | not libc's `rand`: 1-65535, a 16-bit LFSR |
 | `srand(s)` | `rngSeed(s)` | `console.h` | |
@@ -71,7 +91,7 @@ No warning can catch this one: search your sources for `mode7SetScale` and
 
 ## 3. Renamed constants (same values)
 
-| Removed at 1.0 | Use instead | Header |
+| Removed at 0.49 | Use instead | Header |
 |---|---|---|
 | `BGMODE_MODE0`, `BGMODE_MODE1`, `BGMODE_MODE2`, `BGMODE_MODE3`, `BGMODE_MODE7` | `BG_MODE0` … `BG_MODE7` | `registers.h` → `video.h` |
 | `WINDOW_BG1` … `WINDOW_BG4`, `WINDOW_OBJ` | `LAYER_BG1` … `LAYER_BG4`, `LAYER_OBJ` | `window.h` → `video.h` |
@@ -82,7 +102,7 @@ What only one module has keeps its name: `WINDOW_MATH`, `WINDOW_ALL`,
 `WINDOW_ALL_BG`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`, `MOSAIC_BG_ALL`,
 and the `TM_*` register bit names of `registers.h`.
 
-## 4. Other changes a 0.x project may notice
+## 4. Other changes a 0.48 project may notice
 
 - **Struct assignment works** (`a = b;`) since 0.48 for objects in bank $00
   or in ROM; it was refused by accident. A copy from or to a `FAR` struct
@@ -107,8 +127,11 @@ meaning:
 grep -rnE 'hdma(Enable|Disable)\(|mode7SetScale\(|mode7Transform\(' src/
 ```
 
-`make check-upgrade SRC=<folder>` lists every removed name with its
-replacement, and every `hdmaEnable` / `hdmaDisable` / `mode7SetScale` /
-`mode7Transform` call, one line per hit (`devtools/check_upgrade.py`; the
-list of names is read from the SDK headers, so it cannot lag them). Exit 0
-when nothing is found.
+`opensnes upgrade <folder>` lists every removed name with its
+replacement, and every `hdmaEnable` / `hdmaDisable` / `dmaTransfer` /
+`mode7SetScale` / `mode7Transform` call, one line per hit (the names are
+`make/removed_api.txt` and `make/changed_api.txt` in the SDK; nothing to
+install — in the repository, `make check-upgrade SRC=<folder>` is the same
+command). Exit 0 when nothing is found. A source that fails to compile
+gets the removed names it uses, with their replacements, right under the
+compiler's error.

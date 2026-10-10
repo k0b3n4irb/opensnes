@@ -32,9 +32,8 @@
 #include <snes.h>
 
 /** @brief 4bpp 32x32 sprite tile data (defined in data.asm, stored in ROM) */
-extern u8 sprite32[], sprite32_end[];
+#include "res/sprite32.inc"   /* generated: sprite32_tiles[], sprite32_tiles_end[], sprite32_pal[] */
 /** @brief 16-color palette for the 32x32 sprite */
-extern u8 palsprite32[];
 
 /**
  * @brief Entry point: display a single static 32x32 sprite at screen center.
@@ -58,12 +57,12 @@ int main(void) {
      * WaitForVBlank() ensures we are in VBlank when the DMA runs, because
      * the PPU silently ignores VRAM writes during active display. */
     WaitForVBlank();
-    dmaCopyVram(sprite32, 0x2100, sprite32_end - sprite32);
+    dmaCopyVram(sprite32_tiles, 0x2100, sprite32_tiles_end - sprite32_tiles);
 
     /* Load the 16-color sprite palette to CGRAM address 128.
      * CGRAM 0-127 = BG palettes, 128-255 = OBJ (sprite) palettes.
      * 32 bytes = 16 colors x 2 bytes/color (15-bit BGR format). */
-    dmaCopyCGram(palsprite32, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    dmaCopyCGram(sprite32_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Configure OBJSEL ($2101):
      * - Size mode OBJ_SIZE8_L32: small=8x8, large=32x32

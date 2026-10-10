@@ -1,3 +1,6 @@
-# return value preserved across stack-frame teardown via tax/txa
-present \btax\b
-present \btxa\b
+# The return value must survive the function's exit. With a stack frame
+# that is `tax` / teardown / `txa`; since 2026-10-09 these leaf functions
+# keep their temps in the direct page and have no teardown at all, so the
+# value simply stays in A: no `tsa` may follow its computation.
+absent \btsa\b
+present \brtl\b

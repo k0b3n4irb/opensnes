@@ -104,7 +104,7 @@ Use luna to generate screenshots autonomously (run far enough in to reach
 a representative scene; pulse Start via `--input` if the example waits on it):
 ```bash
 scripts/install-luna.sh   # once
-tools/luna-test/bin/luna run -n 3000000 \
+testing/bin/luna run -n 3000000 \
   --screenshot examples/<path>/<example>.png examples/<path>/<rom>.sfc
 ```
 

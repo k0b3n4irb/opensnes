@@ -1,0 +1,5 @@
+# the HiColor conversion (krom's HiColor64PerTileRow contract): 896 sequential
+# 4 bpp tiles and one 16-colour palette per 64x8 segment, streamed per scanline
+tool = "opensnes-image"
+
+[hicolor]

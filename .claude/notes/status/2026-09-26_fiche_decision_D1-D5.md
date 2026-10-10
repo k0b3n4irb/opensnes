@@ -158,3 +158,77 @@ La 1.0 part quand toutes ces lignes sont vraies, chacune prouvée dans le dépô
 5. Une session console a rempli au moins les rangées 1 à 7 du protocole matériel.
 6. Le chantier Super FX est soit terminé (phases C–F), soit borné et documenté comme expérimental, avec des signatures `gsu*` qui ne gèleront pas un pipeline de démo.
 7. Deux semaines sans **découvrir** de défaut silencieux dans la bibliothèque, le runtime ou le compilateur, corrigé ou non (reformulé le 2026-10-03 : la première rédaction, « sans nouvelle entrée 🟠 dans `KNOWN_LIMITATIONS.md` », ne comptait que les défauts laissés ouverts). Journal et date d'ouverture de la fenêtre : `status/silent_defects_log.md` ; la fenêtre s'ouvre à la fin de la campagne de chasse.
+
+**Avancement, 2026-10-05.** Étape 0 du plan du 10-03 faite : **v0.48.0**
+publiée (PR #162 `develop → main`, fusion `de7cde72`, étiquette sur `main`,
+`release.yml` vert : quatre zips, passe luna sur les deux Linux). C'est la
+version « anciens noms + avertissements » ; les lots B à I (retrait des
+alias, `hdmaEnable(channel)`, `dmaTransfer`, garde-fou `removed_api.txt`,
+macros 1.0.0) peuvent commencer sur `develop`. Le job Lint de la PR était
+rouge sur les seuls sujets de `0d30ec65` et `756da353` (déjà sur
+`develop`, laissés tels quels par décision) ; le job de poussée sur la
+pointe de `develop` était vert, ce que le critère 2 de `release.md`
+demande. Critères de gel : 1, 3, 4, 6 tenus ; 2 en attente de votre mot
+sur le « bus factor » ; 5 (console) et 7 (fenêtre après la campagne)
+ouverts.
+
+**Avancement, 2026-10-05 (soir).** Campagne de chasse close : les constats
+d'audit qui ne dépendent pas du propriétaire sont traités (liste du 10-04,
+suivis datés dans chaque rapport), deux exemples à résultat visible pour
+les sauvegardes SA-1 et Super FX ajoutés (rangées 25 et 26 du protocole,
+pré-vol vert). **Critère 7 : fenêtre ouverte le 2026-10-05, fermeture au
+plus tôt le 2026-10-19** (quatre défauts trouvés et corrigés le 10-05 ; une
+nouvelle ligne au journal remet le compteur à zéro). Lots B à I du plan
+(retrait des alias, `hdmaEnable(channel)`, `dmaTransfer`, garde-fou
+`removed_api.txt`, macros 1.0.0) : à commencer sur `develop`.
+
+**Décision du propriétaire, 2026-10-05.** Les assets PVSnesLib restent de
+côté : pas de compétence graphique en interne ; deux voies, un ami qui sait
+dessiner, ou un portage par outil. Ce n'est pas une porte de la 1.0 (le
+critère 2 les exempte). **La 1.0 attendra** le temps qu'il faut ; le lot B
+du plan (retrait des constantes dépréciées) commence sur `develop`.
+
+**Lots B, C et D faits, 2026-10-05 (soir).** Lot B : les vingt constantes
+dépréciées et `OAM_SET_GFX_BANK` retirées (`959a8e9c`), ROM identiques
+octet pour octet. Lot C : les vingt-six fonctions renommées sans changement
+de sens retirées avec leurs corps et leurs vecteurs de fixture ; seuls
+`hdmaEnable()` / `hdmaDisable()` gardent leur avertissement pour le lot E.
+Lot D plié dans le même commit : la boucle de `oamDrawMeta` est devenue la
+fonction `static` interne de `oamDrawMetasprite()`, plus de pragma ; le code
+engendré est identique ligne pour ligne (260 lignes d'assembleur, diff
+vide), donc les chiffres de `docs/PERF.md` tiennent sans remesure. Preuves :
+`diff_corpus` 91/91 MATCH, onze flux WRAM recapturés après lecture octet
+par octet (adresses de code en RAM : `dynamic_flush_hook`, `nmi_callback`,
+`irq_callback`, tables de l'object engine, un registre de travail
+`tcc__r9`), `check-upgrade` nomme les sept noms d'un fichier témoin.
+Restent E (`hdmaEnable(channel)`), F (`dmaTransfer`) et I (macros 1.0.0,
+après la session console) ; G et H sont livrés avec B et C.
+
+**Lot E fait, 2026-10-05 (soir).** D1, second temps : `hdmaEnable(u8
+channel)` / `hdmaDisable(u8 channel)` prennent un canal 0-7 ; au-dessus de 7
+l'appel est refusé et HDMAEN ne bouge pas (un masque 0.x laissé en place
+échoue visiblement). `hdmaEnableMask` / `hdmaDisableMask` restent. Vecteur
+de fixture : `hdmaDisable(4)` → $60, `hdmaEnable(4)` → $70, puis 8, $40, $10
+et $FF refusés, HDMAEN toujours à $70 ; sous l'ancien sens le même vecteur
+donnerait $70 puis $74. Plus aucune déclaration `OPENSNES_DEPRECATED` dans
+les en-têtes (seule la macro reste dans `types.h`) ; les pragmas des trois
+fixtures sont partis avec. `check-upgrade` continue de lister chaque appel.
+Restent F (`dmaTransfer`) et I (macros 1.0.0, après la session console).
+
+**Lot F fait, 2026-10-05 (soir).** `dmaTransfer(channel, mode, const u8 *src,
+destReg, size)` : la banque vient du pointeur lointain, comme chaque
+`dmaCopy*` ; la forme à six arguments ne compile plus (rien de silencieux).
+Un seul appel dans le dépôt (la fixture, vecteur CGRAM 254-255 inchangé).
+`compiler/ABI.md` ne citait pas le prototype. Reste I (macros 1.0.0, après
+la session console).
+
+**Lot I fait, 2026-10-05 (nuit), sur demande du propriétaire.** Version
+coupée sur `develop` : macros `1.0.0`, `CHANGELOG.md` `## [1.0.0] —
+2026-10-05` avec un chapeau (API gelée, 47 noms retirés, deux changements
+de sens, le tag `main` après la session console), `ROADMAP.md` « post-v1.0.0
+» avec la même réserve et la table « Planned: v1.0 » devenue « The v1.0
+gate », `UPGRADING.md` au présent de la 1.0. `PHILOSOPHY.md` ne mentionnait
+déjà plus d'alias. Les macros ne sont lues par aucun code : ROM identiques
+octet pour octet. Le tag `v1.0.0` reste la porte 5 (console, rangées 1 à 7)
+et la porte 7 (fenêtre ouverte le 10-05, fermeture au plus tôt le 10-19).
+

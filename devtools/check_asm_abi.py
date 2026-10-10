@@ -107,8 +107,8 @@ SIG_RX = re.compile(
     r"(?:(?:extern|static|inline)\s+)*"                      # qualifiers (ignored)
     r"(?P<ret>(?:const\s+)?(?:unsigned\s+|signed\s+)?"
     r"(?:void|u8|s8|u16|s16|u32|s32|int|char|short|long|bool)"
-    r"(?:\s*\*)*)"                                           # return type
-    r"\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)"                   # function name
+    r"(?:\s+FAR)?(?:\s*\*)*)"                                # return type (`void FAR *`)
+    r"(?:\s+|(?<=\*))(?P<name>[A-Za-z_][A-Za-z0-9_]*)"       # function name (`*name` too)
     r"\s*\((?P<args>[^;{]*?)\)"                              # arg list
     r"\s*;",
     re.MULTILINE,

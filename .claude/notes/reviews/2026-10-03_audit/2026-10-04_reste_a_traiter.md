@@ -135,3 +135,22 @@ Aucun rapport n'est à zéro constat ouvert.
 - **B l.20, l.22, l.31** : fermés le 10-04 (ligne de la liste périmée) ; **B l.30** fermé (doc `fixMul`).
 - **D rec 12** fermé : les deux autres textes (`wram_regress.py`, `manifest.toml`) étaient déjà corrigés.
 - **G PF7, PF8** fermés ; **G PF10** partiel (rangée 24, note `dsp1b.bin`, chemins de sauvegarde déclarés non couverts).
+- **E PF6 / rec 10** fermé : une capture en tête des cinq tutoriels visuels.
+- **C rec 5** fermé : le troisième point est tenu par `ROM_BANKS_MAX` (voir `C_build_tools.md`).
+- **G rec 11** fermé : six lignes partenaires écrites avec reproduction ; **G S1** côté doc fermé (`superfx.h`, `superfx_hello`).
+- **B l.21** fermé : six routines en page directe, contrat du callback écrit sur `nmiSet()`.
+- **A PF3** fermé : ratchet `check_cproc_widths.py` dans `make lint` (la matrice de propriétés reste `d_quals`).
+- **C questions `-a` et palette du premier pixel** fermées : deux défauts mesurés et corrigés (oracle pixel dans les goldens).
+- **G PF5** fermé : géométries, drapeau de retard, sauvegarde en vol et PAL dans `libtests_gsu`.
+
+## Clôture — 2026-10-05
+
+Tout ce qui ne dépendait pas du propriétaire est traité (suivis datés dans
+`A_compiler.md` à `H_governance.md`) ; deux exemples de sauvegarde
+(`chips/sa1_save`, `chips/superfx_save`) couvrent le dernier trou matériel
+de G PF10. Restent au propriétaire : B PF9 (fonctions à plus de cinq
+arguments : exempter ou refondre), les assets PVSnesLib (F PF1), les portes
+1.0 datées (H PF14), le bus factor (H PF19, critère 2), les patches A5 et le
+blob SNESMOD (H PF16/17), le ménage des releases luna, et la session console
+(critère 5). La campagne est close ; la fenêtre du critère 7 s'ouvre.
+- **F PF1 (assets PVSnesLib)** : décision du propriétaire le 10-05 — mis de côté, pas une porte de la 1.0 ; voies possibles : un graphiste ami, ou un portage par outil (ROADMAP mis à jour).

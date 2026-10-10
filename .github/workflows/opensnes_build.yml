@@ -70,7 +70,7 @@ jobs:
 
       - name: Install dependencies for Windows
         if: matrix.name == 'windows'
-        uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2.33.0
         with:
           update: true
           msystem: UCRT64
@@ -112,7 +112,7 @@ jobs:
             compiler/cproc
             compiler/qbe
             compiler/wla-dx
-          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/scripts/cc65816') }}
+          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/cc65816/cc65816.c') }}
 
       - name: Stamp cached toolchain up-to-date (cache hit)
         if: steps.toolchain.outputs.cache-hit == 'true'
@@ -171,7 +171,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           scripts/install-luna.sh
-          python3 tools/luna-test/luna_runner.py --coverage
+          python3 testing/luna_runner.py --coverage
 
       - name: Execute the corpus on luna (Windows)
         if: matrix.name == 'windows'
@@ -181,7 +181,7 @@ jobs:
           PYTHONUTF8: '1'   # the reports carry non-ASCII; cp1252 crashed the first run
         run: |
           scripts/install-luna.sh
-          python3 tools/luna-test/luna_runner.py --coverage
+          python3 testing/luna_runner.py --coverage
 
       # Consume the zip just built the way a user does: extract it, build
       # the starter and a scaffolded project (devtools/release_smoke.py).
@@ -337,10 +337,9 @@ jobs:
   # ====================================================================== #
   # Functional tests via luna (cycle-accurate native emulator)             #
   #                                                                        #
-  # Replaces the snes9x-WASM + Mesen2 harness with ONE pinned native luna  #
-  # binary — no emsdk / WASM build / Node / Mesen2 / xvfb / ubuntu-22.04   #
-  # pin. luna runs SA-1 / SuperFX natively, so there is no chip-ROM side   #
-  # channel. Runs: corpus liveness, visual regression, functional probes.  #
+  # One pinned native luna binary: no WASM build, no Node, no display, no  #
+  # distribution pin. luna runs SA-1 / SuperFX / DSP-1 natively, so there  #
+  # is no chip-ROM side channel. Runs the whole of `make tests`.           #
   # ====================================================================== #
   functional-tests:
     name: Functional Tests (luna, ${{ matrix.arch }})
@@ -379,7 +378,7 @@ jobs:
             compiler/cproc
             compiler/qbe
             compiler/wla-dx
-          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/scripts/cc65816') }}
+          key: toolchain-${{ matrix.os }}-${{ matrix.arch }}-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/cc65816/cc65816.c') }}
 
       - name: Stamp cached toolchain up-to-date (cache hit)
         if: steps.toolchain.outputs.cache-hit == 'true'
@@ -433,12 +432,27 @@ jobs:
         # run separately so a regression is reported on its own.
         run: python3 devtools/cyclecount/bench.py
 
+      - name: Measured workloads (luna)
+        # The twenty workloads of devtools/sdkbench, OpenSNES side only
+        # (CI has no PVSnesLib): master cycles on luna against the committed
+        # baseline.json. Fails on +5 % in total, +25 % on one workload, or a
+        # changed checksum. The comparison with PVSnesLib is a local run
+        # (`make bench-sdk` with PVSNESLIB_HOME), frozen in
+        # pvsneslib_reference.json.
+        run: python3 devtools/sdkbench/run.py --check
+
+      - name: Measured library calls (luna)
+        # The rows of devtools/libbench, OpenSNES side only: what a frame's
+        # worth of pad reads, scrolls, sprite setters, DMA and text costs,
+        # against the committed baseline.json. Fails on +10 % on a row.
+        run: python3 devtools/libbench/run.py --check
+
       - name: Upload luna artifacts on failure
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: luna-test artifacts
           path: |
-            tools/luna-test/baselines/
+            testing/baselines/
             /tmp/luna-test-actual/
             /tmp/luna-test-corpus/

@@ -40,7 +40,9 @@ const Book manual = {"SNES Dev Guide", "OpenSNES Team", 2026};
 // Non-const items (RAM) with string pointers (ROM)
 Item player_weapon = {"Rusty Sword", 100, 3};
 
-void test_string_access(void) {
+// Returns the two characters: since 2026-10-08 the compiler removes a read
+// whose result is not used, and the far reads this case pins went with it.
+int test_string_access(void) {
     // Access string through struct
     const char *name = sword.name;
     char first = name[0];  // Should be 'S'
@@ -48,6 +50,7 @@ void test_string_access(void) {
     // Access through array
     const char *item_name = inventory[1].name;
     char c = item_name[0];  // Should be 'K'
+    return first + c;
 }
 
 void test_modify_non_const(void) {

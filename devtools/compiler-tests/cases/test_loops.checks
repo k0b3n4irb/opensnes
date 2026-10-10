@@ -2,19 +2,19 @@
 # edge, and where break / continue go (ported from opensnes-emu test_loops,
 # which only required some branch instruction).
 # for: test i < 10 (signed int compare after promotion), body, i++, back.
-in test_for_basic: present sbc\.w #10\n\tbvc @scmp\.\d+\n\teor\.w #\$8000\n@scmp\.\d+:\n\tbmi \+\n\tjmp @for_join
-in test_for_basic: present @for_cont\.\d+:\n\tlda \d+,s\n\tinc a\n[\s\S]*?jmp @for_cond
+in test_for_basic: present sbc\.w #10\n\tbvc @scmp\.\d+\n\teor\.w #\$8000\n@scmp\.\d+:\n\tbpl @for_join
+in test_for_basic: present @for_cont\.\d+:\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tinc a\n[\s\S]*?jmp @for_cond
 # Countdown: 0 < i, then i-- on the back edge.
-in test_for_countdown: present lda\.w #0\n\tsec\n\tsbc \d+,s\n\tbvc
-in test_for_countdown: present @for_cont\.\d+:\n\tlda \d+,s\n\tdec a\n[\s\S]*?jmp @for_cond
+in test_for_countdown: present lda\.w #0\n\tsec\n\tsbc(?: \d+,s|\.b tcc__lf\+\d+)\n\tbvc
+in test_for_countdown: present @for_cont\.\d+:\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tdec a\n[\s\S]*?jmp @for_cond
 # do/while: the body comes first and the back edge targets it.
 in test_do_while: present @do_body\.\d+:[\s\S]*@do_cond\.\d+:[\s\S]*jmp @do_body
 # Nested: two conditions (y < 4, x < 8), two back edges.
 in test_nested_loops: present sbc\.w #4\n[\s\S]*sbc\.w #8\n[\s\S]*jmp @for_cond\.\d+\n@for_join\.\d+:\n@for_cont\.\d+:[\s\S]*jmp @for_cond
 # break leaves the loop: the i == 10 branch lands on the loop exit.
-in test_break: present cmp\.w #10\n\tbne \+\n\tjmp @if_true\.\d+\n[\s\S]*@if_true\.\d+:\n@for_join
+in test_break: present cmp\.w #10\n\tbeq @if_true\.\d+\n[\s\S]*@if_true\.\d+:\n@for_join
 # continue skips the addition but still reaches the increment.
-in test_continue: present @if_true\.\d+:\n\tlda \d+,s\n\tsta \d+,s\n@for_cont\.\d+:\n\tlda \d+,s\n\tinc a
+in test_continue: present @if_true\.\d+:\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n@for_cont\.\d+:\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tinc a
 # while (1): no condition at the top; the only exit is counter >= 20.
 in test_infinite_with_break: present @while_cond\.\d+:\n@while_body\.\d+:
-in test_infinite_with_break: present cmp\.w #20\n\tbcc \+\n\tjmp @if_true\.\d+\n[\s\S]*jmp @while_cond\.\d+\n@if_true\.\d+:\n@while_join
+in test_infinite_with_break: present cmp\.w #20\n\tbcs @if_true\.\d+\n[\s\S]*jmp @while_cond\.\d+\n@if_true\.\d+:\n@while_join

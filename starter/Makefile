@@ -19,21 +19,12 @@ USE_LIB     := 1
 LIB_MODULES := console dma sprite input
 
 CSRC   := main.c
-ASMSRC := data.asm
 
 include $(OPENSNES)/make/common.mk
 
 # -----------------------------------------------------------------------------
-# Graphics: res/player.png -> res/player.pic + res/player.pal (gfx4snes).
-# A 4bpp 32x32 sprite. Copy this block for each new .png you add.
-# (A .wav .incbin'd as its .brr auto-converts too — see the audio tutorial.)
+# Graphics: res/player.png is converted by opensnes-sprite before the build
+# compiles anything, from the settings beside it (res/player.png.toml), and
+# its .incbin lands in the generated assets_gen.asm. Add a .png and its .toml
+# in res/ and you are done — no rule here, no data.asm.
 # -----------------------------------------------------------------------------
-res/player.pic res/player.pal: res/player.png
-	@echo "[GFX] $< -> player.pic/.pal"
-	@$(GFX4SNES) -s 32 -o 16 -u 16 -p -i $<
-
-
-clean: clean-assets
-.PHONY: clean-assets
-clean-assets:
-	@rm -f res/player.pic res/player.pal res/player.inc res/player_data.as

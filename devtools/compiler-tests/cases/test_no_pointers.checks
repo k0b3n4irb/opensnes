@@ -8,5 +8,5 @@ in get_value: present lda\.w #42\n\trtl
 # a + b: a (first, deeper) at 6,s, b at 4,s.
 in add_numbers: present lda 6,s\n\tclc\n\tadc 4,s\n\trtl
 in get_counter: present lda\.w global_counter\n\trtl
-in inc_counter: present lda\.w global_counter\n\tinc a\n\tsta \d+,s\n\tsta\.w global_counter
+in inc_counter: present lda\.w global_counter\n\tinc a\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.w global_counter
 section global_counter: present \.RAMSECTION

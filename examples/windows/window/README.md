@@ -111,7 +111,7 @@ can be rendered as a window.
 | File | Purpose |
 |------|---------|
 | `main.c` | HDMA triangle tables, window setup, input loop |
-| `data.asm` | Two backgrounds (BG1 + BG2) graphics data |
+| `res/bg1.png.toml`, `res/bg2.png.toml` | the import settings of the two pictures (`opensnes-tileset`, palette bank 1 for BG2); the build converts and links them, `res/bgN.inc` declares the symbols |
 | `res/bg1.png` | Background 1 (palette slot 0) |
 | `res/bg2.png` | Background 2 (palette slot 1) |
 | `Makefile` | `LIB_MODULES := console sprite dma input background window hdma math` |

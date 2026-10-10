@@ -13,22 +13,6 @@
 ;----------------------------------------------------------------------
 ; Tile and sprite graphics (DMA-only access, any bank is fine)
 ;----------------------------------------------------------------------
-ASSET_SECTION ".rodata1"
-
-tiles_til:        .incbin "res/tiles.pic"
-tiles_tilend:
-
-tiles_pal:        .incbin "res/tiles.pal"
-tiles_palend:
-
-mario_sprite_til: .incbin "res/mario_sprite.pic"
-mario_sprite_tilend:
-
-mario_sprite_pal: .incbin "res/mario_sprite.pal"
-mario_sprite_palend:
-
-.ends
-
 ;----------------------------------------------------------------------
 ; Map and collision data. C reads them directly — through CONST pointers
 ; since 2026-09-23, so every read is a far read and the data can live in

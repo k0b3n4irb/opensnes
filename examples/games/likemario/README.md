@@ -12,15 +12,6 @@
 | D-Pad Left/Right | Walk |
 | A | Jump (hold Up + A for higher jump) |
 
-## Build & Run
-
-```bash
-cd $OPENSNES_HOME
-make -C examples/games/likemario
-```
-
-Then open `likemario.sfc` in your emulator (Mesen2 recommended).
-
 ## What You'll Learn
 
 - How tile streaming works — loading new map columns into VRAM as the camera scrolls
@@ -30,6 +21,15 @@ Then open `likemario.sfc` in your emulator (Mesen2 recommended).
 - Why the camera position and the scroll register are two different things
 
 ---
+
+## Build & Run
+
+```bash
+cd $OPENSNES_HOME
+make -C examples/games/likemario
+```
+
+Then open `likemario.sfc` in your emulator (Mesen2 recommended).
 
 ## Walkthrough
 
@@ -260,28 +260,29 @@ USE_LIB     := 1
 LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background
 ```
 
-### Asset Conversion with gfx4snes
+### Asset Conversion
 
-The Makefile includes custom rules for two different asset types:
+The Makefile has no conversion rule: each picture carries its import settings
+in a file beside it, and the build runs the right tool before compiling.
 
-```makefile
-# Background tiles: 8x8, 4bpp, 16 colors
-res/tiles.pic res/tiles.pal: res/tiles.png
-	$(GFX4SNES) -s 8 -o 16 -u 16 -p -m -i $<
+```toml
+# res/tiles.png.toml — the background tileset (opensnes-tileset)
+tool = "opensnes-tileset"
 
-# Mario sprites: 16x16, 4bpp, 16 colors
-res/mario_sprite.pic res/mario_sprite.pal: res/mario_sprite.png
-	$(GFX4SNES) -s 16 -o 16 -u 16 -p -i $<
+[convert]
+colors = 16
+
+# res/mario_sprite.png.toml — the sprite sheet (opensnes-sprite)
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
 ```
 
-| Flag | Meaning |
-|------|---------|
-| `-s 8` / `-s 16` | Tile size (8x8 for backgrounds, 16x16 for sprites) |
-| `-o 16` | Palette offset: start at color 16 in CGRAM |
-| `-u 16` | Use up to 16 unique colors |
-| `-p` | Generate palette file (`.pal`) |
-| `-m` | Generate tilemap file (`.map`) — only for backgrounds |
-| `-i` | Input file (PNG format, the default) |
+The tools write the `.pic` / `.pal` (and the `.map` for the tileset), a
+`res/<name>_data.as` the build links, and a `res/<name>.inc` that declares
+`<name>_tiles[]`, `<name>_pal[]` (each with `_end`) — `main.c` includes it.
 
 ### Why So Many Modules?
 
@@ -297,15 +298,16 @@ res/mario_sprite.pic res/mario_sprite.pal: res/mario_sprite.png
 
 ### Data Placement
 
-`data.asm` declares every asset with `ASSET_SECTION` (`templates/assets.inc`):
-the linker puts it in the asset banks, never in bank $00, which is kept for
-code.
+Every asset sits in an `ASSET_SECTION` (`templates/assets.inc`): the linker
+puts it in the asset banks, never in bank $00, which is kept for code. The
+converted graphics get theirs from the generated `res/<name>_data.as`; the
+map and collision data, which no tool converts, keep a hand-written one in
+`data.asm`:
 
 ```asm
-; Graphics — handed to the DMA helpers, which read the bank from the pointer
-ASSET_SECTION ".rodata1"
-tiles_til:        .incbin "res/tiles.pic"
-mario_sprite_til: .incbin "res/mario_sprite.pic"
+ASSET_SECTION "rodata2"
+mapmario:       .incbin "res/BG1.m16"
+tilesetatt:     .incbin "res/map_1_1.b16"
 .ends
 ```
 
@@ -338,7 +340,8 @@ said until 2026-09-26.
 | File | What's in it |
 |------|-------------|
 | `main.c` | All game logic: physics, collision, streaming, camera (~493 lines) |
-| `data.asm` | ROM assets: tiles, sprites, palettes, map data, collision table |
+| `res/*.png.toml` | the import settings of the tileset and the sprite sheet; the build converts and links them |
+| `data.asm` | ROM assets no tool converts: map data, collision table |
 | `res/tiles.png` | Background tileset source (8x8 tiles) |
 | `res/mario_sprite.png` | Sprite sheet source (16x16 frames) |
 | `res/BG1.m16` | World tilemap (tile indices + flip/palette bits) |

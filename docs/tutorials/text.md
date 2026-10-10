@@ -185,7 +185,7 @@ Two wraps, and both are guards rather than errors:
   row. There is no word wrapping — a long string simply continues one row down.
 - **End of the last row.** Past row 31 the cursor returns to **row 0**. This is
   the bound that keeps output inside the 2048-byte buffer, and it is pinned by
-  the library fixture: `devtools/libtests/main.c` prints 40 rows of an
+  the library fixture: `testing/fixtures/libtests/main.c` prints 40 rows of an
   eight-glyph string plus a newline each, then `test_libtest.py` asserts
   `textGetY() == 8` (40 wrapping to 40 − 32) and `text_config.map_width == 32`.
   The second assert is the real point — before the wrap existed, row 32 wrote
@@ -312,18 +312,21 @@ is the transparent background. To colour your text, write colour 1 of its slot:
 
 ### Your own typeface
 
-A custom font is just different tiles at the same VRAM address. Convert an
-indexed PNG of exactly 96 glyphs (ASCII 32–127, space first) with
-@ref tools_font2snes, upload it yourself, and point `textInit` at it:
+A custom font is just different tiles at the same VRAM address. Draw the 96
+glyphs (ASCII 32–127, space first) in 8x8 cells, put `res/myfont.png.toml`
+beside the picture with `tool = "opensnes-text"` and a `[font]` table
+(@ref tools_opensnes_text; the 0.x `font2snes` is @ref tools_font2snes), and
+the build writes the tiles and `res/myfont.inc`. Upload them yourself and
+point `textInit` at them:
 
 ```c
-#include "myfont.h"
-dmaCopyVram(myfont_data, FONT_VRAM_ADDR, sizeof(myfont_data));
+#include "res/myfont.inc"
+dmaCopyVram(myfont_tiles, FONT_VRAM_ADDR, myfont_tiles_end - myfont_tiles);
 textInit(TEXT_DEFAULT_TILEMAP_ADDR, 0, 0);
 ```
 
-font2snes is optional and not wired into the build — no example needs it,
-because `textLoadFont` already gives you a usable face.
+No example needs a custom font, because `textLoadFont` already gives you a
+usable face.
 
 ## Mistakes the module will not save you from
 

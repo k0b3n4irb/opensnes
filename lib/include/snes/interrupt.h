@@ -13,6 +13,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): nmiSetBank, irqSetBank.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * VBlank Callback
  *============================================================================*/
@@ -69,23 +72,24 @@ typedef void (*VBlankCallback)(void);
  * @note The callback may live in any ROM bank: the bank is taken from the
  *       function pointer. (This note said "must be in bank 0" until
  *       2026-09-20; that was only ever true of irqSet, fixed the same day.)
+ *
+ * @par What the callback may call
+ * The callback runs with the direct page on its own copy of the compiler's
+ * scratch registers (`tcc__r0`..`tcc__r10`), so C code and every library
+ * routine that reaches them direct-page-relative, as the compiler does,
+ * are isolated from the interrupted main thread; plain `*`, `/` and `%`
+ * take a software path there (`in_nmi_ctx`). What is NOT callback-safe,
+ * and says so in its own header: the hardware-multiplier users
+ * `fixMul()`, `fixLerp()`, `fix32Mul()`, `fix32Sin()`/`fix32Cos()`; every
+ * DSP-1 call (a port protocol); `textLoadFont()`/`textLoadFont4bpp()` (DMA
+ * registers written with the callback's data bank); the WRAM data port
+ * (`$2180`). Until 2026-10-05 `objCollidObj()`, `mapGetMetaTile()`,
+ * `mapGetMetaTilesProp()`, `profileColorStart()`, `dsp1SetCamera()` and
+ * `dsp1Raster()` reached the scratch registers with absolute or long
+ * addressing, which wrote the main thread's copy through the `$7E`
+ * mirror; they are direct-page-relative now (library audit l.21).
  */
 void nmiSet(VBlankCallback callback);
-
-/**
- * @brief Register a VBlank callback with explicit bank
- *
- * Not needed from C — nmiSet() reads the bank from the pointer. Kept for
- * callers that only have a 16-bit address (assembly).
- *
- * @param callback Function to call during VBlank
- * @param bank ROM bank where the callback is located (0-255)
- *
- * @deprecated Since 2026-09-20: nmiSet() reads the bank from the function
- *             pointer. Removed at the next major version.
- */
-OPENSNES_DEPRECATED("nmiSet() takes the bank from the function pointer")
-void nmiSetBank(VBlankCallback callback, u8 bank);
 
 /**
  * @brief Clear the VBlank callback
@@ -130,17 +134,6 @@ void nmiClear(void);
  *                hicolor_1792/irq_stream.asm for the canonical shape)
  */
 void irqSet(void *handler);
-
-/**
- * @brief irqSet() with an explicit ROM bank for the handler
- * @param handler Address of the ASM handler
- * @param bank ROM bank containing the handler
- *
- * @deprecated Since 2026-09-20: irqSet() reads the bank from the handler
- *             pointer. Removed at the next major version.
- */
-OPENSNES_DEPRECATED("irqSet() takes the bank from the handler pointer")
-void irqSetBank(void *handler, u8 bank);
 
 /**
  * @brief Restore the default IRQ handler (acknowledge + return)

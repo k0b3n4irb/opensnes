@@ -51,7 +51,7 @@ Probe oracle: `wave_phase` advances every frame.
 
 ```bash
 make
-../../../tools/luna-test/bin/luna run -n 3000000 mode2.sfc
+../../../testing/bin/luna run -n 3000000 mode2.sfc
 ```
 
 ## Modules used
@@ -62,5 +62,5 @@ make
 
 ← the rest of the family covers the everyday modes
 ([mode1](../mode1/), [mode0](../mode0/), [mode3](../mode3/),
-[mode5](../mode5/)); this rung is the specialist OPT modes. For per-scanline
+[mode5_hires](../mode5_hires/)); this rung is the specialist OPT modes. For per-scanline
 (rather than per-column) tricks, see the [hdma](../../hdma/) family.

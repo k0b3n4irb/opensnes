@@ -1201,7 +1201,7 @@ mapGetMetaTile:
     and #$03FF
     plx
 
-    sta.w tcc__r0
+    sta.b tcc__r0
 
     ply
     plx
@@ -1268,7 +1268,7 @@ mapGetMetaTilesProp:
     lda.l metatilesprop,x                   ; long: $7E table, caller DB is $00
                                             ; from C — the issue #103 read
 
-    sta.w tcc__r0
+    sta.b tcc__r0
 
     ply
     plx

@@ -33,8 +33,8 @@ wider than the 256-pixel screen, which is what enables scrolling.
 
 The object engine manages a pool of game entities. Each object type registers two
 callbacks: an **init** function and an **update** function. These callbacks are
-registered in assembly (`data.asm`) because the 65816 requires 24-bit addresses
-(16-bit pointer + 8-bit bank byte) and the C compiler only emits 16-bit pointers.
+registered from C with `objInitFunctions()`, which takes the callbacks as far
+pointers (24-bit: 16-bit address + bank byte), so a type's code may live in any bank.
 Each frame, `objUpdateAll()` iterates over all active objects, loads their state
 into `objWorkspace`, and calls their update function.
 
@@ -136,7 +136,9 @@ mapandobjects/
 ├── mario.c / .h       — Player: input, physics, walk/jump/fall animation
 ├── goomba.c / .h      — Goomba enemy: patrol AI, 2-frame animation
 ├── koopatroopa.c / .h — Koopa Troopa: 2-sprite composite, flip on turn
-├── data.asm           — ROM data + object type registration (ASM)
+├── res/*.png.toml     — import settings of the tileset and the three sprite sheets; the
+│                       build converts and links them, res/*.inc declare the symbols
+├── data.asm           — ROM data no tool converts: the level (.m16/.o16/.t16/.b16)
 ├── Makefile           — Build config (4 C files, 8 library modules)
 └── res/               — Tileset, sprite sheets, level data (.m16/.o16/.t16/.b16)
 ```

@@ -26,7 +26,7 @@
 #include "brr.h"   /* from tools/smconv/src, via -I */
 
 #ifndef VERSION
-#define VERSION "1.0.0"
+#define VERSION TOOL_VERSION   /* from tools/tool.mk */
 #endif
 
 /*----------------------------------------------------------------------------

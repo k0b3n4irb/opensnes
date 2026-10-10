@@ -139,15 +139,21 @@ the source at or below **32 kHz**; that is the DSP's ceiling, and a higher rate
 just plays back sharp. Pass `-v` to see the block count, loop offset, and a
 ready-to-paste `audioLoadSample()` line.
 
-**2. Bake the `.brr` into the ROM.** Put it in a `data.asm` with a label and an
-end label, exactly as the example does:
+**2. Bake the `.brr` into the ROM.** Put a settings file beside the WAV and
+the build does the rest, exactly as `audio/sfx_from_wav` does:
 
-```asm
-ASSET_SECTION "samples"          ; templates/assets.inc: any bank but $00
-brr_jump:     .incbin "res/jump.brr"
-brr_jump_end:
-.ends
+```toml
+# res/jump.wav.toml
+tool = "opensnes-sample"
+
+[encode]
 ```
+
+`opensnes-sample encode` runs before the first C object; it writes
+`res/jump.brr`, a `res/jump_data.as` the build links (its own
+`ASSET_SECTION`, so any bank but $00), and a `res/jump.h` that declares
+`jump_brr[]`, `jump_brr_end[]` and the size. A looping sample adds
+`loop = [start, end]` to the table.
 
 **3. Load it once, play it on demand.** The label becomes a C symbol; the size
 is the two labels subtracted, and the loop point is the byte offset `wav2brr`
@@ -254,7 +260,7 @@ scanlines (about 2 % of a frame) before leaving the rest to the next frame.
 A command sent while the queue is full is dropped, so a burst of dozens of
 effects in one frame loses the last ones rather than corrupting the queue.
 
-Deprecated: `snesmodSetSoundTable(table)` and `snesmodAllocateSoundRegion(size)`.
+(The 0.x names `snesmodSetSoundTable` and `snesmodAllocateSoundRegion`, which set up a stream no SDK call could start, were removed on 2026-10-05.)
 They prepare the driver's streamed-sample path, and no SDK call starts a
 stream. The allocation reorganises the SPC700's memory and stops a
 module already loaded, so a call left in old code must stay before
@@ -428,9 +434,8 @@ a scene starts, not every frame.
 | `audioGetFreeMemory()` | bytes left for samples in the SPC700's RAM |
 | `audioGetVoiceState(voice, &state)` | whether the voice's envelope is still sounding, and the sample, volume, pan and pitch last sent to it |
 
-`audioUpdate()` is deprecated and does nothing: the engine sends each
-command as you call it. It is kept until 1.0 so code written for the older
-engine still builds.
+The 0.x `audioUpdate` was removed on 2026-10-05 (it did nothing): the engine
+sends each command as you call it, nothing is deferred to a per-frame call.
 
 Choosing a path: **snesmod** for tracker music (IT modules),
 **audio** for C-driven samples and DSP effects, **apu** (below) for

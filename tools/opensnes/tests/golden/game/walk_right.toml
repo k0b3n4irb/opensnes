@@ -1,0 +1,11 @@
+# Input-driven: hold RIGHT from frame 30 to 89 (0x100 is RIGHT), then check
+# the player moved 60 pixels. No fbhash: the values are the oracle.
+rom = "../my_game-2.sfc"
+frames = 150
+input = "30:0x100,90:0"
+
+[[checkpoint]]
+at_frame = 150
+[checkpoint.values]
+player_x = 180                    # 120 + 60
+player_y = 100

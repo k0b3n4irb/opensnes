@@ -174,7 +174,8 @@ analysis on `luna frames` sequences of both ROMs):
 | File | What's in it |
 |------|-------------|
 | `main.c` | Setup, the hand-built repoint loop, the switch to the `hdma` module |
-| `data.asm` | The Mode 3 image (tiles in two sections, map, palette) and krom's table |
+| `res/water.bmp.toml` | the import settings of the Mode 3 image (`opensnes-tileset`, 8bpp); the 57 KB tileset comes out in two bank-sized parts, `water_tiles` and `water_tiles_1` |
+| `data.asm` | krom's wave table (`wavetable.bin`), hand-written |
 | `res/water.bmp` | Original art: procedurally generated water caustics (256 colours) |
 | `res/wavetable.bin` | krom's 896-entry HDMA table, extracted verbatim |
-| `Makefile` | `LIB_MODULES`, and the `gfx4snes` rule for the 8bpp image |
+| `Makefile` | `LIB_MODULES` (no conversion rule: the settings file drives it) |

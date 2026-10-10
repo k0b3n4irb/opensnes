@@ -18,10 +18,9 @@
 
 #include <snes.h>
 
-/* Sprite graphics, converted from res/player.png by gfx4snes at build time
- * and .incbin'd via data.asm. */
-extern u8 player[], player_end[];
-extern u8 player_pal[];
+/* Sprite graphics: res/player.png, converted at build time by opensnes-sprite
+ * from the settings in res/player.png.toml; the .incbin is generated too. */
+#include "res/player.inc"   /* generated: player_tiles[], player_tiles_end[], player_pal[] (and a GfxAsset `player`) */
 
 /** Pixels the player moves per frame while a direction is held. */
 #define SPEED 2
@@ -37,7 +36,7 @@ int main(void) {
 
     WaitForVBlank();
     /* Upload the sprite tiles to VRAM and its palette to sprite CGRAM. */
-    dmaCopyVram(player, 0x2100, player_end - player);
+    dmaCopyVram(player_tiles, 0x2100, player_tiles_end - player_tiles);
     dmaCopyCGram(player_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     oamInit(OBJ_SIZE8_L32, 1);

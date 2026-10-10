@@ -20,7 +20,11 @@ it can be checked: every week of the window, (a) `make tests` on a clean
 tree plus `luna_runner.py --coverage --power-on random=N` with a new seed,
 `make test-pal` and `make luna-bench`; (b) one public header read against
 its code, chosen by the oldest "last read" date in the table at the end of
-this file; (c) the partner reports of the week answered. Each week's effort
+this file; (c) the partner reports of the week answered; (d) since
+2026-10-08, a long hunt of the two differential tests on seeds never run
+before — `make test-difftest SEEDS=A-B` over at least 20 000 seeds, the
+range written in the weekly line so the next one starts after it (ranges
+used so far: expressions 1-8000, programs 1-12000). Each week's effort
 is logged below the table with its date; a week without a line restarts the
 count.
 
@@ -77,6 +81,69 @@ crash that stops the build (loud, not silent), a defect of a partner.
 | 2026-10-04 | gfx4snes: more than 1024 BG tiles carried into the palette bits; more than 256 Mode 7 tiles truncated to a byte; a sprite/font tile (no map) mixing two palette banks drew its odd pixels with the wrong colour — all converted without a word | build-tools audit S7/S8/S12, code; three refused fixtures (exit 0 before) | `a0d26613` |
 | 2026-10-04 | `mode7_flying` (379 distinct tiles, 123 entries wrapped) and `mode7_racing` (406, 150) for 256-tile Mode 7 maps: wrong tiles on screen since the examples' creation | found by the gfx4snes refusal at the corpus rebuild | `edd54f0f` |
 | 2026-10-05 | Object engine: a slot index of 80 or more (`OB_MAX`) given to `objCollidObj`, `objCollidMap`, `objCollidMap1D`, `objCollidMapWithSlopes` or `objUpdateXY` was scaled by 64 and addressed the engine's own state past the pool — slot 106's `xvel` is `objunused`, the free-list head, so `objCollidMap1D(106)` under friction zeroed it and the next `objNew` handed out slot 0 again | reading `object.asm` against the library audit (B l.24); pinned by the libtest vector `r_obj_oob_idx`, red on the previous `object.asm` | `47f40f7f` |
+| 2026-10-05 | `objCollidObj`, `mapGetMetaTile`, `mapGetMetaTilesProp`, `profileColorStart`, `dsp1SetCamera`, `dsp1Raster` wrote `tcc__r0` / `tcc__r9` with absolute or long addressing: called from an `nmiSet()` callback (whose direct page is the NMI's own register copy) they clobbered the interrupted main thread's scratch through the `$7E` mirror — a wrong intermediate in whatever C expression the NMI cut | reading the ASM against the library audit's l.21 (which named `profileColorStart` and `dsp1`); addressing-mode scan of every `tcc__r` write in `lib/` | `36b5c03f` |
+| 2026-10-05 | gfx4snes `-m`: the map entry's palette bank came from the tile's first pixel, and index 0 is transparent in every bank — a bank-2 tile starting transparent was drawn in bank 0's colours (63 of 64 pixels) | the build-tools audit's open question, measured with a pixel oracle on a four-tile image (`banks.png`); fixture `ROUNDTRIP` in the golden suite | `7a282da7` |
+| 2026-10-05 | gfx4snes `-a`: the palette rearrangement ran on the row-major image while the tiles had been converted before — `.pal` reordered, `.pic` on the old indices; `color/transparency`, the one user, decoded 51 056 of 52 509 opaque pixels to the wrong colour since the port (PVSnesLib's tool has the same order) | same oracle, 191 of 256 pixels on the fixture; the example decoded against its own `.bmp` | `7a282da7` |
+| 2026-10-07 | `DECLARE_ANIM_CLIP` with 256 frames or more: the count was cast to the `u8` `len` — 256 gave 0 and `animPlay()` stopped the player, 300 gave a 44-frame clip; no error | weekly header read (`anim.h`); refusal fixture `negative/anim_clip_256` (compiled with exit 0 before) | this commit (`_Static_assert` in the macro) |
+| 2026-10-08 | QBE folded constants at upstream's widths (32 and 64 bits) while `w` is 16 bits and `l` 32 here: `-(4294967291UL) == 5` was 0, `-22016 * 256U` and `512UL << 31` were nonzero as conditions; divisions, right shifts and compares of folded values the same | `testing/difftest.py` (new that day), seeds 2, 126; pins 1-3 | this commit (qbe `fold.c`: operands and result at `T.wordsz`) |
+| 2026-10-08 | A function whose only temp is a phi of constants (`int a = 1; return a && 1;`) got no stack frame while the edge still stored the phi: the store hit the return address or the caller's frame — the function did not return | `testing/difftest.py` (new that day), seed 8 (the ROM never reached the end of `main`); case `frame_for_const_phi` | this commit (qbe `w65816/emit.c`, `can_be_frameless`) |
+| 2026-10-08 | A 4-byte value converted to bool was compared in 16 bits: `y && x`, `0 || x` and `(bool)x` were false for a long whose low word is 0 (`0x00010000`), and for a far pointer to offset `$0000` of its bank | `testing/difftest.py` (new that day), seed 8; pins 4-5 | this commit (cproc `qbe.c`, `cnel`) |
+| 2026-10-08 | A branch read 32 bits whenever its argument was an `l` temp, and a 16-bit condition could be one: `if ((s16)x)`, `(s16)x ? a : b`, `((s16)x >> 0) ? …` were true for x = `0x00100000`; `(u16)(0x80000000) && y` true as a constant | `testing/difftest.py` (new that day), seeds 57, 116, 829, 5485; pins 6-8; case `long_condition` | this commit (cproc: a 4-byte condition is compared with zero; qbe: `jnz` tests a word, the compare is folded back into the branch; constant branch read at 16 bits) |
+| 2026-10-08 | cproc's evaluator returned an operand for `||` and `&&` of constants: `5 && 7` was 7, `0 || 9` was 9, `43732U || x` was 43732 — in enum values, array sizes, initialisers and folded sub-expressions | `testing/difftest.py` (new that day), seed 134; pins 9-10; case `const_logical_value` | this commit (cproc `eval.c`) |
+| 2026-10-08 | Phi moves were emitted one after the other: a variable that saves another's value before it changes in a loop read the new value — `for (…) { prev = cur; cur += d; }` left `prev == cur`, a swap in a loop left both equal, a Fibonacci loop returned 512 for 55. In every release | `testing/difftest_stmt.py` (new that day), seed 51, reduced to two statements; pins p0-p6 (eleven of twelve hand-written loops wrong on the old compiler, all right on a host compiler) | this commit (qbe `w65816/emit.c`: ordered parallel copy, cycle through `tcc__r10`) |
+| 2026-10-08 | A Kw temp used as the second operand of a 32-bit operation, or feeding a 32-bit phi, had its high half read from the next temp's stack slot instead of 0. Reached when the optimizer replaces a 32-bit `c ? 1 : 0` phi by the condition (`(v3 ? v2 : v3) > y` with v2 = 1) | `testing/difftest_stmt.py` (new that day), seed 2630 (the per-variable probe named the variable) | this commit (qbe `emitop2_high`, `emit_one_phimove`) |
+| 2026-10-08 | After a conditional branch, the phi moves of the second way out trusted what the first way's moves had left in A: `do { if (g) break; } while (++j < 3);` wrote the compare's leftover to `j` on the way back up (j ended 255 for 3) | `testing/difftest_stmt.py`, extended that day (calls, switch, break / continue, bit-fields, 2D arrays, pointers to pointers), seed 3, reduced to three statements; pin p8 | this commit (qbe `w65816/emit.c`: `branch_fork` / `branch_join`) |
+| 2026-10-08 | A zero-fill placed before the first value of an initialised object was not emitted: `int t[4] = { [2] = 7 };`, a struct whose first bit-fields are 0, any designated initialiser that skips the first member. The object came out short (values moved to the front); for a RAM object the init record announced more bytes than it carried, so crt0 read every following record shifted — wrong globals, or a ROM that never reached `main` | `testing/difftest_stmt.py`, extended that day (calls, switch, break / continue, bit-fields, 2D arrays, pointers to pointers), seed 62, reduced to an empty function (the globals alone failed); pin p9 | this commit (qbe `emit.c`, `DZ` buffered) |
+| 2026-10-08 | The backend's per-temp tables held 256 entries and a larger function was not refused: each `idx < MAX` guard stopped tracking on its own side. A parameter kept in memory had its one store skipped (its slot's index was low) while a load numbered past 256 could not be aliased and read the slot, never written — the parameter read back as 0. Three example `main`s are past 256 temps (`sprite_swarm`, `rpg`, `mode7_flying`), none with that pattern | `testing/difftest_stmt.py`, 18 seeds of 7 700 (336, 403, 1790, 2085…), all a variable read as 0; found by reading the post-optimisation IR against the assembly | this commit (qbe `w65816/all.h`: 2048 entries, `w65816_check_temps` refuses more) |
+| 2026-10-08 | Floating-point arithmetic compiled: `a * 2.5f` was emitted as a 16-bit integer multiply of the low word, `a + b` as an integer add; only conversions and compares stopped the build | probing what the compiler accepts before extending the generator; refusal fixture `negative/float_arith` | this commit (qbe `w65816/emit.c`: a float class left after folding is an error) |
+| 2026-10-08 | `long long` arithmetic compiled at 32 bits: `a + 1` dropped the upper half, `a * b` called the 32-bit multiply, a 64-bit constant expression in a function body was folded at 32 bits | same probing; refusal fixture `negative/long_long`, and `wide_constants_fold` for the constants that must still compile | this commit (cproc `qbe.c`: refused in `qbetype`, constants folded in 64 bits first) |
+| 2026-10-08 | A Kw temp returned from a function returning 32 bits (the optimizer returns the condition itself for `x ? 1 : (15 & x)`): `lda #0` for the high half overwrote the low half, which lived in A only | `testing/difftest_stmt.py`, seed 3797, reduced to one statement; pin p10 | this commit (qbe `emitjmp`: `stz`) |
+| 2026-10-08 | `(y || K) && 1` returned `y != 0`: QBE's gvn replaces a 0/1 phi under a branch by the branch's condition without checking that both sides jump to the phi's block, and the phi still held the argument of an edge folded away in the same pass. Reached once jump threading (stage S3) produced that shape; never shipped | `testing/difftest_stmt.py`, seed 14657 (in the gate), the day the pass was written | `494a199a` (qbe `copy.c`, `phicopyref`) |
+| 2026-10-08 | `gsuDmaFullFrame()` called with the screen off before the letterbox bands exist waited for line 225 exactly, the line the NMI starts on, and returned by a race: the boot of `superfx_3d` lasted 17 or 38 frames depending on the caller's timing | `diff_corpus.py` on stage S3 (offset +20 on one example), then `luna profile` of the boot | `52f2a802` |
+| 2026-10-08 | A negative runtime index off a `FAR` address with an offset — `(far_arr + 8)[j]`, j = -1 — read and wrote the next bank ($7F): `sym+off,x` adds the index's low word unsigned. In the compiler since B2 (2026-09) | reading `mark_far_decomp` before extending it (stage S4); confirmed on luna, 0x0000 read for 0x1007 and a write lost | `27afe435` (qbe `idx_nonneg`); cells `r_neg16`, `r_negw`, `r_negp` of the `b2_far_ram` fixture |
+| 2026-10-08 | `(v >> 15) & 1` on a signed 16-bit value lost its mask (0 or -1 instead of 0 or 1): QBE's `defwidthle` sized shifts at 32 bits, so a `sar` of a value of 16 bits or fewer looked narrow and the `and` after it redundant. `sa[(v >> 15) & 1]` wrote `sa[-1]`. In the fork since its first commit; no lib or example source affected | `testing/difftest_stmt.py`, seed 54084, on a seed range run for stage S4 | `4d6624b9` (qbe `copy.c`, widths at `T.wordsz`) |
+| 2026-10-08 | The high half of a 32-bit multiply by 2..256 of a 16-bit temp came from the temp's stack slot, whose store is skipped when the multiply is its only use: garbage whenever that slot held something else. Twin of the Oshl defect fixed 2026-05-22 (`fix32Sin(64)` = 0), left in Omul | the new `temp_noslot` check of stage S5 turned the read into an internal error on `testing/difftest_stmt.py` seed 74144 | `f700f8f6` (qbe: one load, kept in `tcc__r0`) |
+| 2026-10-09 | A conditional with a constant condition returned its chosen operand still a bit-field: the operator around promoted it to `int` instead of using the conditional's type. `b3 - (3 ? bf.b2 : (v2 * v3))`, common type `unsigned`, came out signed: 0xFFFFFF78 for 0x0000FF78 in a `long`. In cproc since the fork | `testing/difftest_stmt.py`, seed 103247, on a range run for stage S5; four expressions measured on luna | `54f2bab3` (cproc `condexpr`); pinned function p12 |
+| 2026-10-09 | gvn replaced a 32-bit phi by a 16-bit phi of the same block with the same arguments (`phicopyref` compared arguments, not classes): after `a = 0 - v; j = a;` on a joining path, with `a` a long and `j` a u8, every later use of `a` saw its low word (0 for 0xFFF80000). In the fork since its first commit; 0 of the 86 ROMs change with the fix | `testing/difftest_stmt.py`, seed 124152, on a range run for stage S5; reduced by hand and measured on luna | `477259cd` (qbe `copy.c`); pinned function p13 |
+| 2026-10-09 | In a string literal, every byte the front end escapes in octal — control characters, `"`, `\`, anything above 0x7E — reached WLA-DX's `.ASC` as text, except `\000`: `"\n"` was assembled as 0, '1', '2', `"\xF0"` as '\', '3', '6', '0'. Wrong bytes and a longer object than `sizeof` says. In the fork since its first commit; no example has such a literal (0 of 86 ROMs change) | testing `strcmp()` of the new `string` module on bytes above 0x7F: the test read 0x5C for 0xF0 | `36d335e2` (qbe `emit.c`, every `\ooo` as a number); compiler check `string_escapes` |
+| 2026-10-09 | Every sprite was drawn one line too high: `oamSet`, `oamSetY`, `oamSetXY`, the `oamSetFast` macros (since 2026-04-27) and the dynamic engine (since 2026-09-26) stored y - 1, on half of the snesdev-wiki sentence (a sprite is drawn a line below its OAM Y) without the other half (scanline 0 is never output, so OAM Y = 0 IS the first visible line). Relative to the backgrounds, wrong since 2026-09-12, when `bgSetScroll` got its own correct - 1: a character stood one line above its floor. 24 example baselines had the wrong picture and five examples subtracted 1 by hand to match | issue #165 (a project lining a sprite up with its background, pixel by pixel against its source art); then the corpus (`9dd075095fd0d965`) and a probe on luna | this commit: the library stores y as given; docs/hardware/OAM.md rewritten |
+| 2026-10-09 | The link-time bank guard (`opensnes-rom check`, `check_bank_reads.py`) stopped a symbol's name at its first dot, so every `static` object (`name.unit`) was invisible to it: a bank-blind read of a static const table linked with "OK". No such read is in the corpus today (it passes the fixed guard); the hole had been there since the guard was written | a compiler change under test (issue #166, pattern 3, first version) emitted `lda.w message.main,x` for a const table in bank $07 in 17 examples; the picture comparison caught the pictures, the guard said OK | this commit: both tools read the whole name; a self-test and the corpus |
+| 2026-10-10 | `audioLoadSample` returned `AUDIO_ERR_TIMEOUT` for a valid sample whose last index byte is 0 (513, 769… bytes), or not, according to the phase of its polling loop: the driver held its end mark `$FF` only until it read a 0 on the CPU's latch, and for those sizes the 0 was already there (the 2026-10-03 fix removed the hang, not the race) | `libtests` under a compiler step that made that loop a cycle shorter per turn (direct-page temps); read on the driver's side | this batch: the mark is held until the CPU answers with it (`audio_driver.spc700.asm` `load_done`, `audio.c`) |
+
+## Campaign closed — 2026-10-05
+
+The hunting campaign the plan of 2026-10-03 required before the window
+(the eight audit reports of 2026-10-03, the header-by-header reading, the
+tools pushed further) ends today: every owner-independent finding of
+`.claude/notes/reviews/2026-10-03_audit/2026-10-04_reste_a_traiter.md` is
+closed or handed to its owner (bus factor, assets, the five-argument
+functions, the console session). The table above holds the defects it
+found; the last four are dated today. **The fourteen-day window of
+criterion 7 opens today and closes no earlier than 2026-10-19**, and it
+restarts at every new row. The weekly effort it requires is the paragraph
+at the top of this file; the first weekly line is due by 2026-10-12.
+
+**Restarted 2026-10-07** by the `DECLARE_ANIM_CLIP` row: the window now
+closes no earlier than **2026-10-21**.
+
+**Restarted 2026-10-08** by five compiler rows, all found by the
+differential test written that day (`testing/difftest.py`; 192 000
+expressions clean after the fixes, the 86 example ROMs byte-identical
+before and after): the window now closes no earlier than **2026-10-22**.
+Two more rows the same day from `testing/difftest_stmt.py` (programs:
+loops, arrays, a struct, pointers; 120 000 programs clean after the fixes,
+ROMs still byte-identical), and a second loud one: the compiler's own Kl
+invariant stopped the build on `a[x & 7]` with a long `x`.
+A sixth defect of the same day is loud and has no row: `qbe` never returned
+on a 16-bit multiply by a constant of 31 bits (`(s16)2141188073UL * x`),
+held by seed 5728 of the gate.
+
+### Weekly effort
+
+| Week | Date | (a) suites | (b) header read | (c) partners |
+|---|---|---|---|---|
+| 1 | 2026-10-07 | `make clean && make`, `make tests` green; `--coverage --power-on random=2026`: 84 OK / 2 INPUT-DEP / 0 dead of 86; `make luna-bench`: 0 bug; `make hardware-preflight`: 26 of 26 rows; `make test-pal` **failed** at its last step (the PAL-header manifest path still assumed the harness three levels deep, wrong since the move of 2026-10-05, `75d0d942`) — a loud recipe fault, fixed, then green (84 OK / 2 INPUT-DEP, 6 + 1 manifests) | `anim.h`: one defect (row above), one cost figure five to seven times too low, re-measured | luna's reply to the v1.33.1 report answered 2026-10-06, pin v1.34.0; nothing new from snes-rag |
+
 
 ## The hunting campaign
 
@@ -98,7 +165,7 @@ replace the date.
 
 | header | last read |
 |---|---|
-| `anim.h` | 2026-10-03 (library audit) |
+| `anim.h` | 2026-10-07 (weekly read: one defect, one wrong cost figure) |
 | `apu.h` | 2026-10-03 (library audit) |
 | `asset.h` | 2026-10-03 (library audit) |
 | `audio.h` | 2026-10-03 (library audit) |

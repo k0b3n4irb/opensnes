@@ -61,15 +61,18 @@ LD       := $(OPENSNES)/bin/wlalink
 GFX4SNES := $(OPENSNES)/bin/gfx4snes
 SMCONV   := $(OPENSNES)/bin/smconv
 WAV2BRR  := $(OPENSNES)/bin/wav2brr
-PALPLAN  := $(OPENSNES)/bin/palplan
 ASEPRITE2SNES := $(OPENSNES)/bin/aseprite2snes
 TEMPLATES := $(OPENSNES)/templates
 
-# Bank $00 imminent-overflow hard-fail threshold (bytes free). 0 = disabled.
-# 1024 since 2026-09-23, when the examples' data moved to ASSET_SECTION and
-# the corpus minimum rose from 12 bytes to 1912 (tetris). History, policy
-# and the re-measure loop: .claude/rules/bank0_budget.md.
-BANK0_FAIL_THRESHOLD ?= 1024
+# Bank $00 free-space threshold (bytes free) under which the link fails.
+# 0 = never, the default since 2026-10-10: bank $00 holds code only (C const
+# data is in the asset banks since #127.3), and code that does not fit goes
+# to bank $01 and up by itself — a C function and a library routine are
+# SUPERFREE sections reached by `jsl`. At 1024 (2026-09-23 to 2026-10-10)
+# this refused a working ROM to the first game that outgrew 32 KB of code
+# (issue #168). A project that wants its code bank watched sets a value.
+# History: .claude/rules/bank0_budget.md.
+BANK0_FAIL_THRESHOLD ?= 0
 
 # C RAM band ($00:0000-$1FFF) budget — the RAM twin of the ROM ratchet
 # above (structural defect B2: all C-accessible RAM must sit in the 8 KB
@@ -80,11 +83,23 @@ BANK0_FAIL_THRESHOLD ?= 1024
 # threshold gives early drift visibility (breakout/tetris warn today —
 # deliberate: they ARE within 1 KB of the ceiling).
 RAM_FAIL_THRESHOLD ?= 512
+
+# Link only what is referenced (since 2026-10-08). wlalink -d drops every
+# section no kept section refers to: the library functions and the lib's RAM
+# a project does not use, and its own unused statics. A module is still
+# linked as a whole object; what is discarded is decided per section, and the
+# library emits one section per function. Before, a ROM carried every
+# function of every module it listed — about 9.8 KB of library in bank $00
+# for a program that calls consoleInit, where PVSnesLib (which has always
+# linked with -d) carries 2.0 KB. LD_DISCARD=0 links everything, as before;
+# `make test-link-modules` does, so that a module calling a symbol of a
+# module it does not declare still fails there.
+LD_DISCARD ?= 1
 RAM_WARN_THRESHOLD ?= 1024
 
 # Check toolchain exists (skip for 'clean' target)
 ifneq ($(MAKECMDGOALS),clean)
-ifeq ($(wildcard $(CC)),)
+ifeq ($(wildcard $(CC) $(CC).exe),)
 $(error Compiler not built. Run: cd $(OPENSNES) && make compiler)
 endif
 endif
@@ -127,11 +142,13 @@ ROM_BANKS   ?= 8
 ROM_BANK_KB := $(if $(filter 1,$(USE_HIROM)),64,32)
 # Rounded UP to the next power of two: snesdev-wiki, ROM header ($FFD7,
 # "rounded up"); int(log2) declared 256 KB for a 384 KB ROM until 2026-09-26.
-ROMSIZE     ?= $(shell python3 -c "import math; print('$$%02X' % math.ceil(math.log2($(ROM_BANKS) * $(ROM_BANK_KB))))")
+# Shell arithmetic, not Python: a user build must not need an interpreter
+# (.claude/rules/two_audiences.md, 2026-10-05).
+ROMSIZE     ?= $(shell n=0; s=$$(( $(ROM_BANKS) * $(ROM_BANK_KB) )); while [ $$(( 1 << n )) -lt $$s ]; do n=$$(( n + 1 )); done; printf '$$%02X' $$n)
 ASSET_BANKS_RANGE ?= $(shell echo $$(( $(ROM_BANKS) - 1 )))-1
 # Super FX Game Pak RAM declared in the extended header ($FFBD, 1 KB << n).
 GSU_RAM_KB  ?= 64
-GSU_RAM_SIZE_VAL := $(shell python3 -c "import math; print('$$%02X' % int(math.log2($(GSU_RAM_KB))))")
+GSU_RAM_SIZE_VAL := $(shell n=0; while [ $$(( 1 << (n + 1) )) -le $(GSU_RAM_KB) ]; do n=$$(( n + 1 )); done; printf '$$%02X' $$n)
 # Region the cartridge declares in its header, $FFD9 (2026-10-02; it was
 # $01, North America, on every ROM). fullsnes "Country (also implies
 # PAL/NTSC)" and snesdev-wiki ROM header: $00 Japan and $01 USA are NTSC,
@@ -280,7 +297,8 @@ endif
 # Module Dependency Auto-Resolution
 #------------------------------------------------------------------------------
 
-_DEP_sprite          := dma sprite_oamset
+_DEP_sprite          := dma sprite_oamset sprite_world
+_DEP_sprite_world    := sprite_oamset                                           # oam_ext_tab
 # The seven entries marked L2a were found by devtools/link_modules.py
 # (2026-09-13), which links every module ALONE: each of these modules
 # referenced a symbol of a module it never declared, and only linked in
@@ -292,12 +310,13 @@ _DEP_text            := dma background console                                  
 _DEP_text4bpp        := dma
 _DEP_object          := map sprite sprite_dynamic                               # L2a: oambuffer (sprite_dynamic's)
 _DEP_map             := dma
-_DEP_background      := dma                                                     # L2a: dmaCopyVram
+_DEP_background      := dma background_scroll                                                     # L2a: dmaCopyVram
 _DEP_fixed32         := math                                                    # L2a: sine_table
 _DEP_snesmod         := console
 # console's C references clearNmiFlag/unmaskIrq/clearIrqFlag (dma.asm) —
 # surfaced by the first example linking console WITHOUT dma (SPC700 arc)
 _DEP_console         := dma
+_DEP_input           := input_pad                                               # padReleased (assembly)
 _DEP_superfx         := dma hdma background console
 _DEP_hdma            := dma math_sqrt
 # math splits into the small sqrt module (math_sqrt = sqrt16 + fixSqrt
@@ -310,6 +329,7 @@ _DEP_hdma            := dma math_sqrt
 _DEP_math            := math_sqrt
 _DEP_asset           := dma background
 _DEP_panel           := dma console
+_DEP_vramqueue       :=                                                         # vramQueueFlush: registers only
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
@@ -340,6 +360,45 @@ $(foreach mod,$(LIB_MODULES),$(if $(wildcard $(LIBDIR)/$(mod).o $(LIBDIR)/$(mod)
 endif
 INCLUDES := -I$(OPENSNES)/lib/include -I.
 ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
+
+#------------------------------------------------------------------------------
+# Assets by their settings file (2026-10-05, docs/tools/CONVENTIONS.md)
+#------------------------------------------------------------------------------
+# The rules below come before `all:`; the default goal stays the ROM.
+.DEFAULT_GOAL := all
+# Every <asset>.toml beside a source (res/hero.png.toml) or named after what it
+# produces (res/soundbank.toml) says which opensnes-* tool converts it, in its
+# `tool` line, and which subcommand, in its one [table]. The build runs the
+# tool once per file (a .done stamp beside the .toml), before any C or ASM
+# object, then gathers every <stem>_data.as the tools wrote into
+# assets_gen.asm — the .include of every <stem>_data.as (each carries its own
+# ASSET_SECTIONs, one per blob), assembled with the
+# project. The artist never opens this Makefile; a hand-written data.asm
+# and the GFXSRC rule below keep working for the projects that have them.
+# ASSET_TOML lists the files (default: *.toml and res/*.toml that name a tool).
+ASSET_TOML ?= $(foreach t,$(wildcard *.toml res/*.toml),$(if $(shell grep -l '^tool = "opensnes-' $(t) 2>/dev/null),$(t),))
+ASSET_STAMPS := $(addsuffix .done,$(ASSET_TOML))
+# a level (opensnes-level) reads the .map its tileset's conversion wrote, and a
+# palette plan (opensnes-palette [plan]) the .pal files the pictures' conversions
+# wrote: those convert after the others
+LATE_STAMPS := $(addsuffix .done,$(foreach t,$(ASSET_TOML),$(if $(shell grep -l '^tool = "opensnes-level"\|^\[plan\]' $(t) 2>/dev/null),$(t),)))
+ifneq ($(ASSET_TOML),)
+ASMSRC += assets_gen.asm
+endif
+define ASSET_RULE
+$(1).done: $(1) $(wildcard $(basename $(1))) .opensnes_config
+	@tool=$$$$(sed -n 's/^tool *= *"\([^"]*\)".*/\1/p' $(1) | head -1); \
+	 sub=$$$$(sed -n 's/^\[\([a-z_]*\)\].*/\1/p' $(1) | head -1); \
+	 asset=$(basename $(1)); [ -f "$$$$asset" ] || asset=$(1); \
+	 echo "[$$$$tool] $$$$sub $$$$asset"; \
+	 $(OPENSNES)/bin/$$$$tool $$$$sub -q $$$$asset && touch $$@
+endef
+$(foreach t,$(ASSET_TOML),$(eval $(call ASSET_RULE,$(t))))
+$(LATE_STAMPS): $(filter-out $(LATE_STAMPS),$(ASSET_STAMPS))
+assets_gen.asm: $(ASSET_STAMPS)
+	@{ echo '; generated by make/common.mk from the settings files of the assets - do not edit'; \
+	   for t in $(ASSET_TOML); do stem=$${t%.toml}; echo $${stem%.*}; done | sort -u | \
+	     while read stem; do [ -f "$$stem"_data.as ] && echo ".include \"$${stem}_data.as\""; done; } > $@
 
 #------------------------------------------------------------------------------
 # Derived Variables
@@ -496,7 +555,10 @@ endef
 # even though clang's host model would flag them. -Wno-unused-parameter
 # silences callback signatures (e.g. object engine init takes minx/maxx that
 # specific objects ignore — the ABI requires them).
-CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
+# -fno-builtin: <snes/string.h> declares memcpy & co. with this target's
+# size (unsigned int, 16 bits); clang's builtin prototypes carry the host's
+# size_t and it refuses the "incompatible redeclaration" (2026-10-09).
+CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
 	-Wno-unused-parameter -Wno-error=deprecated-declarations \
 	-Wno-error=deprecated-pragma
@@ -513,19 +575,23 @@ CLANG_LINT_FLAGS := -fsyntax-only -Wall -Wextra -Werror \
 # Local headers count too (2026-09-26): tetris's main.c includes board.h,
 # piece.h, render.h and hud.h, and editing them rebuilt nothing. Every .h
 # next to a C source, rather than exact -MD deps: cheap and never stale.
+# When a source fails to compile, say which of its names OpenSNES 0.49 removed
+# and what to use instead (`opensnes upgrade`, make/removed_api.txt): the
+# compiler can only call them undeclared. A binary of bin/ like the rest: the
+# last interpreted step of a user build left this file on 2026-10-06
+# (.claude/rules/two_audiences.md; check_doc_drift.py anchor 17 keeps it so).
+upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes upgrade -q --removed-only $(1); then \
+	echo "  (the names above were removed at OpenSNES 0.49 — docs/UPGRADING.md)"; fi
 LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
-%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config
+%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
-			(echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1); \
-	else \
-		python3 $(OPENSNES)/devtools/check_upgrade.py -q $< || \
-			echo "  (deprecated names above: removed at 1.0 — docs/UPGRADING.md; the clang pre-pass is absent on this machine)"; \
+			{ $(call upgrade_hint,$<); echo "  lint failed for $< — fix the warning or use SKIP_LINT=1 to bypass"; exit 1; }; \
 	fi
 endif
 	@echo "[CC] $<"
-	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm
+	@$(CC) $(ALL_CFLAGS) $< -o $*.c.asm || { $(call upgrade_hint,$<); exit 1; }
 	$(call wrap_asm,$*.c.asm,$@)
 
 #------------------------------------------------------------------------------
@@ -584,7 +650,7 @@ ram_code_end.o: $(TEMPLATES)/ram_code_end.asm $(MEMMAP_DEP) .opensnes_config
 
 # User ASM sources (explicit rules to avoid matching library objects)
 define ASM_OBJ_RULE
-$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP) .opensnes_config
+$(patsubst %.asm,%.o,$(1)): $(1) $(INCBIN_DEPS) $(MEMMAP_DEP) .opensnes_config | $(ASSET_STAMPS)
 	@echo "[AS] $(1)"
 	$$(call wrap_asm,$(1),$$@)
 endef
@@ -623,7 +689,7 @@ endif
 
 $(TARGET): linkfile
 	@echo "[LD] $@"
-	@$(LD) -S linkfile $@
+	@$(LD) $(if $(filter 1,$(LD_DISCARD)),-d) -S linkfile $@
 ifeq ($(USE_SA1),1)
 	@# SA-1: patch map mode byte at ROM offset $7FD5 from $20 (LoROM) to $23 (SA-1)
 	@# or from $30 (FastROM+LoROM) to $33 (FastROM+SA-1). Adds $03 to the byte.
@@ -631,123 +697,49 @@ ifeq ($(USE_SA1),1)
 	@# inline Python one-liner that used to live here).
 	@$(OPENSNES)/bin/sa1_patch $@ && echo "[SA1] Patched $$FFD5 map mode to SA-1"
 endif
-	@# Bank $$00 ROM overflow check — fails the build if string literals spill to
-	@# bank $$01+, OR if bank $$00 free space drops below BANK0_FAIL_THRESHOLD.
-	@# The compiler emits 16-bit addresses that always read bank $$00, so spilled
-	@# string.N symbols return GARBAGE silently in production. The fail-threshold
-	@# is a ratchet: catches "one-const-literal-away-from-spill" regressions
-	@# before they ship. The default lives at the BANK0_FAIL_THRESHOLD
-	@# definition near the top of this file (single source of truth) and is
-	@# always set just below the current example minimum; bumping it tighter
-	@# is a deliberate audit step — see .claude/rules/bank0_budget.md.
-	@# exit 1 from symmap = critical spill OR imminent overflow (hard fail).
-	@# exit 2 = soft warning (low free space) — printed but build continues.
-	@# Set SKIP_BANK0_CHECK=1 to disable; BANK0_FAIL_THRESHOLD=N to retune.
-ifneq ($(SKIP_BANK0_CHECK),1)
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-bank0-overflow \
-			--fail-threshold $(BANK0_FAIL_THRESHOLD) "$$SYM"; \
-		rc=$$?; \
-		if [ "$$rc" -eq 1 ]; then \
-			echo "ERROR: bank \$$00 ROM overflow / imminent overflow — see symmap output above"; \
-			echo "       reduce const data, split arrays, or set SKIP_BANK0_CHECK=1 to bypass."; \
-			exit 1; \
-		fi; \
-	fi
-endif
-	@# C RAM band budget check — the RAM twin of the ROM ratchet above
-	@# (defect B2: C RAM must sit below $$2000; higher is silently
-	@# wrong-banked). Prints the free-space number at every link so
-	@# approaching the 8 KB ceiling is visible long before it corrupts.
-	@# Set SKIP_RAM_CHECK=1 to disable; RAM_{FAIL,WARN}_THRESHOLD=N to retune.
-ifneq ($(SKIP_RAM_CHECK),1)
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-ram-budget \
-			--ram-fail-threshold $(RAM_FAIL_THRESHOLD) \
-			--ram-warn-threshold $(RAM_WARN_THRESHOLD) "$$SYM"; \
-		rc=$$?; \
-		if [ "$$rc" -eq 1 ]; then \
-			echo "ERROR: C RAM band overflow / imminent overflow — see symmap output above"; \
-			echo "       shrink RAM usage below \$$2000, or set SKIP_RAM_CHECK=1 to bypass."; \
-			exit 1; \
-		fi; \
-	fi
-endif
-	@# data_init_end.o must be the last object (the DMA copy loop stops at its
-	@# terminator): an object linked after it has globals that boot
-	@# uninitialised, silently. Read off the .sym: DataInitEnd must close the
-	@# .data_init section (2026-10-05; KNOWN_LIMITATIONS "no separate check").
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/symmap/symmap.py --check-data-init "$$SYM" | grep -v '^Loaded' || exit 1; \
-	fi
-	@# PPU asset budget — a per-build instrument (VRAM/CGRAM weight of the
-	@# converted graphics on disk), the build-time twin of `make budget`
-	@# (runtime footprint via luna). Report-only, NEVER a gate: an inventory
-	@# over 100% is legitimate (streaming, per-scene/per-scanline palette
-	@# swaps), so it only prints the number, no alarm. Silent for asset-less
-	@# examples. `|| true` keeps a tool hiccup from ever failing a build.
-	@# Set SKIP_ASSET_BUDGET=1 to disable; see docs/craft/craft_planning.
-ifneq ($(SKIP_ASSET_BUDGET),1)
-	@python3 $(OPENSNES)/devtools/asset_budget.py --oneline "$(CURDIR)" || true
-endif
-	@# Bank-blind C reads of bank $$01+ data (issue #104): the read-side
-	@# symmetric of the spill ratchet. A symbol deref'd from C without a
-	@# bank reference must be linked in bank $$00 — otherwise the 16-bit
-	@# deref reads garbage. SKIP_BANKREAD_CHECK=1 to bypass.
-ifneq ($(SKIP_BANKREAD_CHECK),1)
-	@SYM=$(TARGET:.sfc=.sym); \
-	if [ -f "$$SYM" ]; then \
-		python3 $(OPENSNES)/devtools/check_bank_reads.py "$$SYM" . ; \
-		rc=$$?; \
-		if [ "$$rc" -ne 0 ]; then \
-			echo "ERROR: bank-blind C read of bank \$$01+ data — see above."; \
-			exit 1; \
-		fi; \
-	fi
-endif
-	@# NMI / WRAM data port race lint — silent-failure 🔴 in
-	@# KNOWN_LIMITATIONS.md (chantier E1, 2026-05-09). Walks the
-	@# call graph from every NMI callback root (NmiHandler +
-	@# functions registered via nmiSet/nmiSetBank) and fails the
-	@# build if any reachable function writes to $$2180-$$2183.
-	@# Lib + crt0 are NOT followed (audited via
-	@# .claude/rules/nmi_audit.md); the lint only walks user code
-	@# in this example's .c.asm intermediates.
-	@# Set SKIP_NMI_RACE_CHECK=1 to disable for a build.
-ifneq ($(SKIP_NMI_RACE_CHECK),1)
-	@# Unconditional since 2026-09-26: it used to run only if combined.asm
-	@# existed, a file the build stopped producing (112cfc23), so the lint
-	@# had not run on a fresh tree or a user project since.
-	@python3 $(OPENSNES)/devtools/check_nmi_wram_race.py --rom-dir . --quiet; \
-	rc=$$?; \
-	if [ "$$rc" -ne 0 ]; then \
-		echo "ERROR: NMI / WRAM port race — see report above."; \
-		echo "       Functions reachable from an NMI callback must"; \
-		echo "       NOT touch \$$2180-\$$2183 (silent corruption)."; \
-		echo "       Set SKIP_NMI_RACE_CHECK=1 to bypass for this build."; \
-		exit 1; \
-	fi
-endif
+	@# Post-link checks (2026-10-05, .claude/rules/two_audiences.md): one compiled
+	@# tool, opensnes-rom check, runs what five Python scripts used to run here —
+	@# the bank $$00 ROM ratchet (BANK0_FAIL_THRESHOLD; .claude/rules/bank0_budget.md),
+	@# the C RAM band budget (RAM_FAIL_THRESHOLD / RAM_WARN_THRESHOLD; FAR is the
+	@# way above $$2000), the data-init sentinel (an object linked after
+	@# data_init_end.o boots uninitialised), the bank-blind read guard (issue
+	@# #104: a 16-bit read of bank $$01+ data returns garbage), the NMI / WRAM-port
+	@# race lint (KNOWN_LIMITATIONS red) and the asset inventory line. Exit 1
+	@# fails the link; warnings do not. The knobs keep their names:
+	@# SKIP_BANK0_CHECK=1 and SKIP_RAM_CHECK=1 set the ratchet to 0 (a RAM
+	@# section past $$2000 still fails: it is always a bug), SKIP_BANKREAD_CHECK,
+	@# SKIP_NMI_RACE_CHECK and SKIP_ASSET_BUDGET=1 skip their check. A game
+	@# developer's make needs no interpreter from here (docs/tools/opensnes-rom.md).
+	@$(OPENSNES)/bin/opensnes-rom check "$(TARGET)" \
+		--bank0-fail $(if $(filter 1,$(SKIP_BANK0_CHECK)),0,$(BANK0_FAIL_THRESHOLD)) \
+		--ram-fail $(if $(filter 1,$(SKIP_RAM_CHECK)),0,$(RAM_FAIL_THRESHOLD)) --ram-warn $(RAM_WARN_THRESHOLD) \
+		$(if $(filter 1,$(SKIP_BANKREAD_CHECK)),--no-bank-reads,) \
+		$(if $(filter 1,$(SKIP_NMI_RACE_CHECK)),--no-nmi-race,) \
+		$(if $(filter 1,$(SKIP_ASSET_BUDGET)),--no-assets,)
 
 #------------------------------------------------------------------------------
-# Project tests — opt-in by presence of test/manifest.toml (no flag needed).
-# `make test` runs the project's declared tests against the built ROM with
-# the pinned luna; `make test-update` (re)writes the project-local baselines.
-# See docs/GETTING_STARTED.md ("Test your game") for the manifest format.
+# Project tests — opt-in by presence of test/*.toml (no flag needed): luna's
+# own manifests (`luna test`), one per test. `make test` runs them against
+# the built ROM with the pinned luna; `make test-update` rewrites their
+# visual baselines (asserts.fbhash). Nothing interpreted runs here (the
+# two-audiences rule). See docs/GETTING_STARTED.md ("Test your game").
 #------------------------------------------------------------------------------
+
+# LUNA_BIN (the env override scripts/install-luna.sh honours) wins; the pinned install path otherwise
+LUNA ?= $(if $(LUNA_BIN),$(LUNA_BIN),$(OPENSNES)/testing/bin/luna)
 
 test test-update: $(TARGET)
-	@if [ ! -f test/manifest.toml ]; then \
-		echo "No test manifest: this project declares no tests."; \
-		echo "Create test/manifest.toml — see docs/GETTING_STARTED.md,"; \
-		echo "section 'Test your game' (manifest format + baselines)."; \
+	@if ! ls test/*.toml >/dev/null 2>&1; then \
+		echo "No tests: this project declares none."; \
+		echo "Create test/<name>.toml — see docs/GETTING_STARTED.md,"; \
+		echo "section 'Test your game' (a luna manifest per test)."; \
 		exit 1; \
 	fi
-	@python3 $(OPENSNES)/tools/luna-test/project_test.py \
-		--rom $(TARGET) $(if $(filter test-update,$@),--update)
+	@if [ ! -x "$(LUNA)" ]; then \
+		echo "luna not found at $(LUNA): run $(OPENSNES)/scripts/install-luna.sh (or set LUNA=/path/to/luna)."; \
+		exit 1; \
+	fi
+	@$(LUNA) test --jobs 0 $(if $(filter test-update,$@),--update) test/
 
 #------------------------------------------------------------------------------
 # Cleanup
@@ -762,6 +754,8 @@ clean:
 	@rm -f data_init_end.o data_init_end.wrap.asm
 	@rm -f ram_code_start.o ram_code_start.wrap.asm ram_code_end.o ram_code_end.wrap.asm
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
+	@rm -f $(ASSET_STAMPS) $(if $(ASSET_TOML),assets_gen.asm) \
+		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
 	@rm -f $(GFX_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
 	@rm -f $(GSU_BINS) $(GSU_HEADERS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link) $(GSUSRC:.sfx=.sfx.sym)

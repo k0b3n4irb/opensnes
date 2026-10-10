@@ -1,57 +1,77 @@
-# devtools/ — Developer Tools (Internal)
+# devtools/ — contributor-only scripts (never shipped)
 
-These tools are intended for **SDK contributors and advanced developers** only.
-They are **NOT distributed** in release packages.
+For people changing the SDK. Python 3.10+, standard library only, run as
+`python3 devtools/<script>.py` — except `vram_layout/`, whose generator
+needs `ortools` (its README says how; the lint that gates the committed
+output is stdlib). The game developer never sees this directory
+(`.claude/rules/two_audiences.md`).
 
-End users should use the compiled tools in `tools/` (gfx4snes, smconv, font2snes, img2snes).
+No script of this directory is run by a user build or copied into the zip
+(since 2026-10-06; `check_doc_drift.py` anchor 17 keeps it so). The five
+post-link checks `make/common.mk` used to run from here are `opensnes-rom
+check` since 2026-10-05 (same verdicts on the 99 built ROMs) — the Python
+originals stay for the contributor gates that use them — and the 0.x-name
+hint is `opensnes upgrade` (the compiled CLI, `tools/opensnes`).
 
-## Prerequisites
+Every file here is named by a `make` target, a workflow, or an example
+README; a script that none of them names is an orphan and is deleted
+(review of 2026-10-05, lot 2).
 
-All scripts require Python 3.10+. We use [uv](https://docs.astral.sh/uv/) to manage
-the Python version and dependencies.
+## Sentinels and lints (`make lint` and the Lint workflow)
 
-### Install uv
+| Script | What it refuses | Target |
+|--------|-----------------|--------|
+| `check_doc_drift.py` | the sixteen anchored doc/code claims (`.claude/rules/doc_consistency.md`) | `lint-docs` |
+| `check_doc_render.py` | un-rendered Markdown in the generated Doxygen HTML | `doc-render` job |
+| `check_asm_abi.py` | a `lda N,s` whose comment names a parameter at the wrong stack slot (`abi_lint.md`) | `lint-asm-abi` |
+| `lint_asm.py` | a `rep`/`sep` without its `.ACCU`/`.INDEX` marker | `lint` |
+| `lint_commits.py` | a commit subject outside Conventional Commits, or an attribution trailer | `lint-commits`, the git hooks |
+| `check_cproc_widths.py` | a new hard-coded width class in cproc's emitter not listed in `cproc_width_sites.txt` | `lint-cproc-widths` |
+| `check_vram_layout.py` | a misaligned VRAM base in an example, or a `vram_map.h` that drifted from its `vram.spec` | `lint-vram` |
+| `check_corpus_fresh.py` | testing a corpus older than the lib outputs | `tests`, `lint` |
+| `check_bank_reads.py` | a bank-blind C read of bank $01+ data (silent failure) — also on every user link | `lint` (selftest), `common.mk` |
+| `check_nmi_wram_race.py` | the WRAM port (`$2180`) reached from an NMI callback (silent failure) — also on every user link | `common.mk` |
+| `symmap/symmap.py` | WRAM overlaps, bank $00 overflow, RAM-band budget, the data-init terminator — on every user link and on the release ROMs | `common.mk`, the build workflows |
+| `verify_toolchain.py` | a submodule HEAD that is not the one `compiler/PINS.md` pins | `verify-toolchain`, `compiler` |
+| `link_modules.py` | a lib module that needs a symbol from a module it does not declare | `test-link-modules` |
+| `toolchain_suites.py` | a regression or an XPASS in the upstream cproc / QBE / wla-dx suites (`toolchain-suites/*.txt` ratchets) | `test-toolchain-suites` |
+| `gen_luna_doc.py` | `docs/tools/luna.md` that is not the pinned luna's own `--help` (`--check`) | `tests` |
+| `check_debug_info.sh` | debug metadata leaking into a normal build, or `-g` emission broken | `opensnes_build.yml` |
+| `release_smoke.py` | a release zip from which the starter or a scaffolded project does not build | `release-smoke`, the build and release workflows |
 
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+Their unit tests: `test_check_doc_drift.py`, `test_check_nmi_wram_race.py`,
+`test_check_vram_layout.py`, `test_asset_budget.py`, `symmap/test_symmap.py`
+(`devtools-tests` job of `lint.yml`; `make test-devtools`).
 
-### Setup
+## Fixtures: moved to `testing/fixtures/`
 
-From the `devtools/` directory:
+The twenty ROM projects that assert on the library, the compiler and luna
+(`libtests*`, the compiler runtime ROMs, the stress ROMs, `benchrom`) live
+under [`testing/fixtures/`](../testing/fixtures/README.md) since 2026-10-05,
+with one list in the root `Makefile`. `compiler-tests/` keeps the
+compile-time pattern checks (`cases/`, `run.py`).
 
-```bash
-cd devtools
-uv sync
-```
+## Benches and reports
 
-This installs the correct Python version and all dependencies (Pillow, etc.) in
-an isolated virtual environment.
+| Script | Measures | Target |
+|--------|----------|--------|
+| `cyclecount/cyclecount.py`, `cyclecount/bench.py` | static 65816 cycle counts of the compiler's output for 34 functions against `bench_baseline.json`; `docs/BENCHMARK.md` is anchored to it | `bench`, `functional-tests` job |
+| `sdkbench/run.py`, `sdkbench/workloads.c` | the same C built by OpenSNES and by PVSnesLib and timed on luna (master cycles per workload); the measured table of `docs/BENCHMARK.md`. Needs `PVSNESLIB_HOME`, so no gate runs it | `bench-sdk` |
+| `libbench/run.py`, `libbench/scene.c` | the same library calls through OpenSNES and through PVSnesLib, timed on luna (master cycles per frame's worth of pad reads, scrolls, sprites, DMA, text) | `make bench-lib`; the Build workflow runs `--check` |
+| `twinbench/run.py` | the examples that exist in both SDKs, run side by side on luna with the same input script: master cycles of work per frame. The twins are ports, not the same source, so it reports and gates nothing; pairs found not to do the same work are listed in the script and left out | `make bench-twins` (needs `PVSNESLIB_HOME`) |
+| `asset_budget.py` | static VRAM / CGRAM weight of an example's converted assets | `asset-budget`, `common.mk` (one line per link) |
+| `vram_layout/` | `vram.spec` → `vram_map.h` by CP-SAT (ortools, opt-in; six examples use it) | by hand, gated by `lint-vram` |
 
-### Running a script
+## Data files
 
-```bash
-# Using the managed environment
-uv run brr2it/brr2it.py input.brr output.it "SampleName" 8363
+`cproc_width_sites.txt`, `toolchain-suites/*_known_fail.txt`,
+`cyclecount/bench_baseline.json`. The names 1.0 removed live in
+`make/removed_api.txt` (shipped: `opensnes upgrade` reads it, and so does the
+sentinel's anchor 16).
 
-uv run gen_hud_bar/gen_hud_bar.py
-```
+## See also
 
-Or activate the environment first:
-
-```bash
-source .venv/bin/activate
-python3 brr2it/brr2it.py input.brr output.it "SampleName" 8363
-```
-
-## Available Tools
-
-| Tool | Description | Doc |
-|------|-------------|-----|
-| [`symmap/`](symmap/) | Check WRAM memory overlaps (used by test suite) | [README](symmap/README.md) |
-| [`cyclecount/`](cyclecount/) | Estimate CPU cycle costs of 65816 assembly | [README](cyclecount/README.md) |
-| [`check_mvn/`](check_mvn/) | Detect suspicious MVN/MVP bank operands in assembly | [README](check_mvn/README.md) |
-| [`brr2it/`](brr2it/) | Convert SNES BRR samples to Impulse Tracker (.it) | [README](brr2it/README.md) |
-| [`font2snes/`](font2snes/) | Font conversion (Python reference implementation) | [README](font2snes/README.md) |
-| [`gen_hud_bar/`](gen_hud_bar/) | Generate HUD health bar sprite sheets | [README](gen_hud_bar/README.md) |
-| [`benchmark/`](benchmark/) | Compiler benchmark (OpenSNES vs PVSnesLib) | [README](benchmark/README.md) |
+- [`tools/README.md`](../tools/README.md) — the shipped tools and the
+  harness.
+- `.claude/rules/two_audiences.md`, `.claude/rules/luna_tooling.md`,
+  `.claude/rules/doc_consistency.md`.

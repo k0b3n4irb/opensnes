@@ -124,3 +124,24 @@ Le Super FX a rattrapé l'écart du 26/09 (vrai runtime testé avec contrôles n
 - **PF5 (reste)** : `GSU_PRESENT_ON_LAG_FRAMES`, `SCMR_H160/H192`, PAL,
   sauvegarde pendant une présentation — toujours sans ROM qui les exerce.
 - **Rec 11** : non traité (cinq lignes partenaires à rejouer avant écriture).
+- **S1 (MS0 + 21 MHz), côté doc** : le masque `& $DF` était dans les deux
+  lanceurs et épinglé par `libtest_gsu_cached.toml` (`cfgr = 0x80` après une
+  demande `$A0`) ; restaient `superfx.h:88` (« $A0 = IRQ mask + fast
+  multiply »), le commentaire de `superfx.asm:20` et `superfx_hello` qui
+  demandait `$A0` : corrigés, citation fullsnes `1adef8e33ff3c4e9` dans
+  l'en-tête. La phrase de l'arbitre est servie par `snes_verify` avec
+  `states_point: false` (noté à snes-rag).
+- **Rec 11 (lignes partenaires)** : trois lignes dans `OPEN_luna.md`
+  (`--power-on` et la RAM de cartouche, MS0 + CLSR sans diagnostic, DSP-1
+  2 Mo accepté) et trois dans `OPEN_snes-rag.md` (ligne Super FX absente
+  de `sd2snes-changelog` — rejoué ce jour, seul `99d8550526ffa29f` remonte —,
+  choix `dsp1.bin`/`dsp1b.bin` du FXPak, `snes_verify` sur MS0), chacune
+  avec sa commande ou sa requête.
+- **PF5 (reste), fermé** : `libtests_gsu` exerce `gsuFrameBytes()` sur
+  toutes les géométries (H128/H160/H192 × 2/4/8 bpp, OBJ → 0), le refus de
+  deux frames de 48 Ko dans 64 Ko, une vraie présentation H160 (marqueurs
+  au dernier octet et à l'octet suivant, lus en VRAM à `$E7FF`/`$E800`),
+  `GSU_PRESENT_ON_LAG_FRAMES` (fil principal qui ne se gare jamais pendant
+  30 frames : la frame reste en vol sans le drapeau, atterrit avec), une
+  sauvegarde pendant une présentation, et le manifeste rejoué sous
+  `region = "pal"` (seuls les comptes de frames du job passent de 7 à 6).

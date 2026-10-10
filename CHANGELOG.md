@@ -2,7 +2,954 @@
 
 All notable changes to OpenSNES are documented in this file.
 
-## [Unreleased]
+## [0.49.0] — 2026-10-10
+
+The release that carries the API meant for 1.0, without being 1.0. Against
+0.48, the forty-seven names deprecated through the earlier releases are
+gone (twenty constants, `OAM_SET_GFX_BANK`, twenty-six renamed functions),
+`hdmaEnable()` / `hdmaDisable()` take a channel number and `dmaTransfer()`
+a far pointer; `docs/UPGRADING.md` gives each replacement and
+`opensnes upgrade <folder>` reads a 0.48 project against the list.
+
+This section was headed `[1.0.0]` on `develop` from 2026-10-05 to
+2026-10-10, and the tree called itself 1.0.0 in that interval without a
+tag. The owner renamed it on 2026-10-10: the public API is the one 1.0 is
+expected to freeze (`docs/STABILITY.md`), but 1.0 waits for the compiler
+and library work still under way (issue #166 and what a first real game
+keeps showing), for the examples to be reviewed and their assets redone,
+and for the console session of the hardware protocol
+(`docs/HARDWARE_VERIFICATION.md`). Nothing below changes with the name.
+
+### Added
+- **`opensnes-tileset convert --column-major`** (tools; asked by the first
+  game built on the SDK): also writes `<stem>.cmap`, the entries of the map
+  column after column, and declares `<name>_cols[]` in the `.inc` — the
+  entry of column c, row r at byte `(c * height + r) * 2`. A game that
+  scrolls a map larger than the screen in both axes feeds its tilemap a
+  row and a column at a time; a row of the `.map` is one block in ROM, a
+  column was not, and that game built the column order in RAM at boot
+  (23 KB, 38 frames) for a table known at build time. `column-major =
+  true` in the asset's settings file. Refused for Mode 7, `--pages` and
+  the three sizes written in screens. Its form was agreed with that game
+  before it was written. Three golden cases, the transposition checked
+  independently on a 16x8 map.
+- **`opensnes-sprite sheet --compact`** (tools; issue #165): each distinct
+  block of the sheet is written once to the `.pic` — with `--flip`, a
+  block and its mirrors count as one — and `<stem>_blocks.inc` holds one
+  word per block of the sheet: the stored block, and the OAM flip bits.
+  `--flip` alone never made the `.pic` smaller: it only marked mirrors in
+  the metasprite table, and without `--metasprite` it changed nothing at
+  all. The project that reported it deduplicated upstream of the tool.
+  Three golden cases on its own reproduction sheet (A, A mirrored, B, B
+  mirrored: two blocks kept, table `0, 0|X, 1, 1|X`).
+- **`vramQueuePushSprite(src, addr, size_px)`** (lib, module `vramqueue`;
+  issue #165): one frame of a streamed sprite in one call — its
+  `size_px / 8` strips, 512 bytes apart in the sheet `opensnes-sprite
+  sheet` writes and 256 words apart in VRAM. All of them are noted or
+  none (0 is returned when they do not fit, or under 8 pixels). Asked by
+  the project that measured four `vramQueuePush` calls per 32x32 frame at
+  21,000 master cycles a frame; not measured here.
+- **`<snes/vramqueue.h>`: VRAM uploads noted during the frame, sent in
+  VBlank by one routine** (lib, module `vramqueue`; issue #165).
+  `vramQueuePush(src, addr, size, step)` notes a transfer (it returns 0
+  when the 32 entries are taken), `vramQueueFlush()` sends them all, one
+  DMA each; `VRAM_QUEUE_COLUMN` steps 32 words for a tilemap column, an
+  entry of 0 bytes is skipped. Both in assembly: as a C macro, the five
+  indexed stores of a push cost three times the call. **It buys VBlank
+  time, not time**: six 128-byte transfers cost 21,700 master cycles
+  queued against 16,600 by six `dmaCopyVram()` calls, but 10,700 of them
+  in VBlank instead of all 16,600 (`devtools/libbench`, rows `vramc`,
+  `vramq`). Five assertions in the library test ROM, VRAM bytes included.
+- **`oamPlaceWorld(&batch, cam_x, cam_y)`: the sprites of a scrolling
+  game placed in one assembly call** (lib, module `sprite`; issue #165).
+  For each sprite of an `OamWorldBatch` (arrays of world x, world y, tile,
+  attribute): subtract the camera, cull by the sprite's size on both
+  axes, write the OAM entry and the ninth x bit or hide the sprite, and
+  say which were placed in `visible[]`. The loop every scrolling game
+  writes, which in C cost the project that asked about 6,000 master
+  cycles a sprite. Measured on a reconstruction of its match screen (19
+  sprites, 13 on screen; `devtools/libbench` rows `worldc`, `world`):
+  31,379 master cycles a frame against 63,783 for the same loop in C
+  writing `oamMemory[]` directly — 1,650 a sprite, not the "few hundred"
+  the request hoped for. Twelve words asserted in the library test ROM: the
+  four edges, partial visibility on the left and at the top, the
+  high-table bits of neighbours, `visible[]`, a batch cut at sprite 127.
+- **`oamGetX(id)`, `oamGetY(id)`** (lib, module `sprite`): read a
+  sprite's position back from the OAM shadow — the 9-bit X, and the y that
+  was given to `oamSetY`, not the raw byte the library stores one less.
+  The migration guide listed them as a gap; it also listed
+  `setPaletteColor` as one, which `setColor(index, color)` has always
+  covered.
+- **`<snes/string.h>`: `memcpy`, `memmove`, `memset`, `strlen`, `strcmp`,
+  `strcpy`, `strncpy`** (lib, module `string`): the SDK had none of them,
+  while its own migration guide told you to use `memcpy`. Written in
+  assembly, each follows the full 24-bit pointer on both sides, so it
+  works between ROM, plain RAM and `FAR` RAM — which a C loop over a
+  plain pointer cannot do, since it reads bank $00. One section per
+  function: a ROM links only those it calls. Standard prototypes at this
+  target's widths (a size is an `unsigned int`, 16 bits); a destination
+  is typed `FAR`, the type every pointer converts to. Twenty-four
+  assertions in the library test ROM cover odd and even counts, both
+  directions of an overlapping move, a zero count and bytes above 0x7F.
+- **`make test-difftest`** (testing): the differential compiler test, in
+  `make tests` with a fixed gate (ten pinned expressions and fifteen seeds)
+  and `SEEDS=A-B` to hunt. The expected values come from a model of C's
+  integer rules that clang checks under a 16-bit-int target. It also runs
+  `testing/difftest_stmt.py`, the same on small generated programs (eleven
+  pinned functions and nineteen seeds).
+- **`opensnes budget` and `opensnes release`** (tools): the two commands
+  the project tool still lacked. `budget` builds and prints one report of
+  what the game uses of the console — ROM bank by bank, the C variables'
+  8 KB and the FAR band, the save RAM, the VRAM and CGRAM of the assets.
+  `release [--tag TAG] [--out DIR] [--no-test]` makes the ROM to hand
+  over: a build from nothing, the project's tests in luna, the header and
+  checksum read back, then `release/<name>[-TAG].sfc` with its CRC32 and
+  SHA-1; a failing build, test or checksum releases nothing.
+- **`opensnes-rom inspect` and `opensnes-rom budget`** (tools): `inspect`
+  reads a ROM's cartridge header (title, mapping, coprocessor, sizes,
+  save RAM, region, version), recomputes the checksum against the header
+  (exit 1 when it is wrong) and gives the CRC32 and SHA-1; `budget` is
+  the report behind `opensnes budget`, with `--json` per bank.
+- **`opensnes` is a compiled program** (tools): the project CLI — `init`,
+  `build`, `clean`, `run`, `test`, `doctor`, `upgrade` — was the shell
+  script `scripts/opensnes`; it is `tools/opensnes`, built and installed
+  with the other tools, on the family's command line (`--help` per
+  subcommand, `--json` for `doctor` and `init`, the four exit codes).
+  `init` writes byte for byte the files the script wrote and `upgrade`
+  prints the same lines; the release zip now holds no script a user runs
+  except `install-luna.sh` and the `cc65816` wrapper. What changes for a
+  user: `doctor` exits 1 when something a build needs is missing, checks
+  `make` and the 1.x tools, and no longer asks for `python3`; `init`
+  refuses a name make cannot hold (a space); `run` opens the `TARGET` of
+  the Makefile rather than the first `.sfc` found; `build` and `test` no
+  longer print make's "Entering directory"; the short options `-t`, `-c`,
+  `-e`, `-u` are gone (long options only, as everywhere in the family).
+  `make release-smoke` now builds and tests its scaffolded project through
+  the CLI, with no `OPENSNES_HOME`, on the three OSes.
+- **`opensnes-save`** (tools): battery save files, the tenth tool of the
+  1.x family. `new` writes the blank `.srm` a ROM expects — the size its
+  header declares at `$FFD8`, or the expansion RAM of `$FFBD` on a Super FX
+  cartridge (8 KB, 32 KB and 64 KB on the SDK's LoROM / HiROM, SA-1 and
+  Super FX ROMs, the sizes of the files luna writes); `inspect` says how
+  much is written and where, and with `--rom` refuses a save of another
+  size; `get` and `set` read and patch bytes at the offsets the game gives
+  `sramLoadOffset()` / `sramSaveOffset()`; `diff` lists the ranges in which
+  two saves differ. A save made with `new` + `set` is byte for byte the one
+  luna's `srm_out` wrote for `memory/save_game`, so a test manifest can
+  start from a prepared `srm_in`. No checksum or version check: the SDK
+  defines no save format yet.
+- **`opensnes-text`, `opensnes-palette`, `opensnes-image`** (tools): three
+  more tools of the 1.x family (9 of 11). `opensnes-text font` turns a
+  picture of the 96 glyphs into the text module's tiles (indexed, grey or
+  RGB source; `--bpp 2|4`) with the `.inc` / `_data.as` glue — font2snes's
+  tiles byte for byte. `opensnes-palette plan` is the project's palette
+  plan as a composed asset (`res/palettes.toml`: `bg = [...]`,
+  `sprite = [...]`, `cgram = true`) → `PAL_<NAME>_CGRAM` / `_SLOT` /
+  `_COLORS` and an optional 512-byte CGRAM image, run by the build after
+  the pictures' conversions; `quantize` makes an indexed PNG of RGB art
+  (`--colors`, `--round`, `--palette FILE.pal|.png`, `--scale`, `--align`);
+  `inspect` reads `.pal` files — palplan's plan and img2snes's PNGs byte for
+  byte. `opensnes-image hicolor` converts a 256x224 picture to the HiColor
+  contract (896 sequential 4 bpp tiles, one 16-colour palette per 64x8
+  segment, median cut + k-means per segment) and `perspective` writes the
+  Mode 7 perspective-rotation HDMA tables from `res/perspective.toml`
+  (`angles`, `lines`, `zoom`) — krom's tables byte for byte, which the
+  golden suite keeps as the reference; the two maintainer scripts they
+  replace (`devtools/hicolor64.py`, `m7ptables.py`) are gone, and so is the
+  last Python an example's assets needed. `games/rpg` plans its sprite
+  palettes from `res/palettes.toml`, `color/hicolor_1792` converts its
+  sunset and `mode7/perspective_rotate` regenerates its tables from a
+  settings file; all three lose their `data.asm`.
+- **`opensnes-level`** (tools): the level tool of the 1.x family. `convert`
+  takes a Tiled JSON map and the `.map` its tileset's conversion wrote
+  (`--tileset`, `tileset = "tiles.map"` in `res/<level>.tmj.toml`) and writes
+  `<layer>.m16`, `.b16`, `.t16`, `.o16`, with `--entities`, `--quadrant`,
+  `--collision` for the entities header, the quadrant map and the per-cell
+  collision grid, plus the `.inc` / `_data.as` glue (`mapLoad(town_BG1_map,
+  town_tiledef, town_tileattr)`); `inspect` reads a level without writing.
+  The converter is tmx2snes's, extracted to `tools/tmx2snes/src/level.c`
+  with a buffered error path; tmx2snes's goldens are the family's (byte
+  for byte). The build converts a level after the other assets, so the
+  tileset's `.map` is fresh. `maps/map_scroll` and `maps/tiled` convert
+  their levels this way and lose their last `data.asm` (`games/mapandobjects`
+  has no Tiled source for its level and keeps the binaries).
+- **`opensnes-sample`, the first tool of the 1.x family** (tools): WAV → BRR
+  with `encode` (the `.brr` and a `.h` of its sizes and loop offset) and
+  `inspect` (what a `.wav` or `.brr` holds and costs in ARAM), long options,
+  `--help` that says everything, `--json`, four exit codes, a TOML settings
+  file beside the asset (`<input>.toml`, written by `--save`, read on every
+  run). Same encoder and same bytes as `wav2brr`, whose golden suite its own
+  reproduces; `wav2brr` stays shipped one more release. The command line,
+  messages and settings code is `tools/common/cli.c`, shared by the family;
+  the contract is `docs/tools/CONVENTIONS.md`.
+- **`opensnes-music`** (tools): Impulse Tracker modules → SNESMOD soundbank
+  with `bank` (`NAME.asm`, `NAME.h`, `NAME.bnk`, same bytes as
+  `smconv -s -n -p NAME`, whose golden it reproduces), `spc` (a standalone
+  `.spc` per module) and `inspect` (patterns, instruments, samples, and the
+  SPC RAM each module takes against the 57 957 bytes a module may use).
+  `smconv` stays shipped one more release.
+- **`opensnes-rom check`** (tools): the post-link checks of a user build in
+  one compiled tool — the bank $00 ROM ratchet, the C RAM band budget and
+  the far band figure, the data-init sentinel, the bank-blind read guard,
+  the NMI / WRAM-port race lint, the asset inventory line. Same verdicts and
+  same figures as the five Python scripts on the 99 built ROMs of the
+  repository; `make/common.mk` calls it instead of them, so a game
+  developer's `make` no longer needs Python (two-audiences rule).
+- **`opensnes-sprite`** (tools): the sprite artist's tool. `sheet` cuts an
+  indexed PNG or BMP into 8/16/32/64 blocks and writes the tiles in OBJ
+  VRAM order, the palette, the `.inc`/`_data.as` and, with
+  `--metasprite W H`, the `_meta.inc` table (`--flip` dedups mirrored
+  blocks into OBJ_FLIPX/Y entries); `anim` turns Aseprite's
+  `--data --list-tags` export into `<stem>_anim.h`, one AnimClip per tag;
+  `inspect` gives blocks, tiles, VRAM bytes and colours. gfx4snes's and
+  aseprite2snes's converters are linked as libraries: the golden suite
+  compares the outputs with both tools' own goldens, byte for byte (the
+  anim header differs by its generator line only). Both 0.x tools stay
+  shipped one more release; aseprite2snes's converter became `anim.c`,
+  which the 0.x tool itself now calls.
+- **`opensnes-tileset`** (tools): the background artist's tool. `convert`
+  cuts a picture into tiles, deduplicates them (and their mirrors with
+  `--flip`), writes the tileset, the tilemap (Modes 1, 5, 6, 7; `--pages`
+  for 32x32 pages; `--offset`, `--priority`) and the palette, with
+  `--rearrange` and `--palette` for the palette banks; `inspect` gives the
+  bound before deduplication, the map size and the banks touched. gfx4snes's
+  map path linked as a library: its golden and its pixel oracle (every pixel
+  decodes to the source's colour, with and without `--rearrange`) are the
+  suite. The hardware limits (1024 tiles, 256 in Mode 7, one palette bank per
+  tile) are refused with the position named.
+- **The build converts assets from their settings files** (build): every
+  `<asset>.toml` that names an `opensnes-*` tool is converted before the
+  first object (`ASSET_TOML`, one `.done` stamp per file), and the
+  `<stem>_data.as` fragments the tools write are included by
+  `assets_gen.asm`. The
+  `starter/` and `examples/sprites/aseprite_pipeline` are built this way:
+  no `data.asm`, no conversion rule in the Makefile, the symbols
+  (`player_tiles`, `hero_tiles`…) come from the generated `.inc`.
+  `opensnes-sample encode` writes its `_data.as` fragment too, and its
+  `.h` declares the `extern` symbols. A hand-written `data.asm` and the
+  `GFXSRC` rule keep working.
+  The glue speaks `asset.h`: `res/<name>.inc` declares
+  `<name>_tiles` / `<name>_pal` / `<name>_map` (each with `_end`) and a
+  ready `DECLARE_GFX_ASSET` / `DECLARE_BG_ASSET`, so `#include
+  "res/town.inc"` then `bgLoad(0, &town, …)` is the whole load; every
+  `<name>_data.as` carries one `ASSET_SECTION` per blob, a blob above 32 KB
+  is cut in bank-sized parts (`<name>_tiles`, `<name>_tiles_1`), and an
+  LZ77 or cut tileset gets plain `extern`s instead of a bundle. A `FILE`
+  option read from a settings file (`palette = "town.pal"`) is relative to
+  that file, and `--save` writes it that way.
+- feat(examples): **`chips/sa1_save`** and **`chips/superfx_save`** — a boot
+  counter kept in the SA-1's battery-backed BW-RAM and in the GSU's Game Pak
+  RAM: each power-on reads the saved value, adds one, saves and prints both.
+  The two chip save paths had no example with a visible result; they are
+  rows 25 and 26 of the console protocol, and on luna the power-cycle
+  chains `h_`/`i_sa1_save_boot*.toml` and `j_`/`k_gsu_save_boot*.toml`
+  assert 1 then 2 across a battery file. 91 examples.
+
+### Changed
+- **A ROM carries only the library code it uses** (build): the link now
+  drops every section nothing refers to (`wlalink -d`, on by default,
+  `LD_DISCARD=0` to go back). A module is still listed in `LIB_MODULES` as
+  before; what is left out is decided function by function. A program that
+  only calls `consoleInit()` went from about 9.8 KB of bank $00 to 2.4 KB;
+  the tightest example, tetris, goes from 1.9 KB of free code bank to
+  10.7 KB (`likemario` from 5.2 KB to 13.0 KB) and unused library variables no longer take
+  plain C RAM. Every example renders the same frames and plays the same
+  audio as before. Two things to know: a variable or function nothing
+  refers to is not in the `.sym` any more, and addresses in RAM move —
+  a test or a script that hard-codes one must read it from the `.sym`.
+- **luna pinned at v1.34.0** (testing): from v1.32.0, through v1.33.1.
+  The whole suite is green and no frame, audio or WRAM baseline moves;
+  `baselines.json` and `audio.json` are re-stamped, `docs/tools/luna.md`
+  regenerated from the new `--help`. The harness now compares
+  `rom.checksum` with luna's `rom.checksum_computed` on every ROM. v1.33.0
+  fixed how mosaic blocks are drawn and nothing of ours noticed: a new
+  manifest, `transition_mosaic_picture.toml`, hashes a frame with the
+  mosaic on (it fails on v1.32.0). v1.34.0 answers two requests of ours:
+  `--power-on random` also fills the cartridge RAM no battery keeps (Super
+  FX Game Pak RAM, SA-1 BW-RAM and I-RAM), and a bare name resolves to its
+  only `name.<source>` static.
+- **A project test names a variable as the C does** (tools, docs): the
+  manifests `opensnes init --template game` writes, and the guide, say
+  `player_x = 120` where they said `"player_x.main" = 120`; luna v1.34.0
+  resolves the bare name of a file-scope `static` and asks which one when
+  two sources define it.
+- **`cc65816` is a compiled program** (compiler, build): the driver that
+  runs the host preprocessor, `cproc-qbe` and `qbe` was a bash script
+  (`compiler/scripts/cc65816`); it is `compiler/cc65816/cc65816.c`, built
+  with the toolchain. Same options, same messages, same exit codes, and the
+  same assembly for every translation unit of the library and the examples.
+  The preprocessor is `cc`, then `clang`, then `gcc`, or whatever
+  `CC65816_CPP` names; `opensnes doctor` accepts the same three. Nothing in
+  `bin/` is a script any more.
+- **A user build runs no Python at all** (build, tools): the last call of
+  `make/common.mk` — the 0.x-name scan, `devtools/check_upgrade.py` — is
+  `opensnes upgrade [-q] [--removed-only] <folder-or-file>...` in the
+  `opensnes` CLI (see Added: compiled the same day), same hits on a project using all 46 removed
+  names. The build runs it only when a source fails to compile (after the
+  clang pre-pass or after `cc65816`), so a current project sees nothing,
+  where the Python scan nagged every `hdmaEnable()` call on a machine
+  without clang. The lists are `make/removed_api.txt` (moved from
+  `devtools/`) and `make/changed_api.txt`, shipped with `make/`; the
+  release recipe copies nothing from `devtools/` any more, and the doc
+  sentinel's new anchor 17 fails if an interpreter comes back.
+- **One author for every commit** (ci, devtools): Dependabot is gone
+  (`.github/dependabot.yml` removed, its PR #163 closed, the
+  `msys2/setup-msys2` bump it proposed applied by hand) and
+  `lint_commits.py` now checks the author and the committer of every
+  commit in a push range, and of the commit being made through the
+  `commit-msg` hook: the maintainer's identity only — no bot, no tool, no
+  `noreply` committer (`.claude/rules/commits.md`, "One author").
+- **The quantizer sorts deterministically** (tools): img2snes's median cut
+  broke sort ties by whatever the C library's `qsort` did, so the same art
+  quantized to different bytes on different OSes; the comparators now break
+  ties by index and the two goldens are re-recorded (error against the
+  source within 0.4 % of before). `opensnes-palette quantize` shares the code.
+- **`make/common.mk`**: the late conversion tier (after the pictures) is now
+  any level and any palette plan (`LATE_STAMPS`); the `PALPLAN` variable is
+  gone with the rpg's hand-written rule; `clean` removes the perspective
+  tables.
+- **A project's `make test` is `luna test`** (build): the tests of a user
+  project are luna's own manifests, one `test/<name>.toml` each (`rom`,
+  `frames`, `input`, `[[checkpoint]]` values by symbol name,
+  `asserts.fbhash`), run by the pinned luna (`LUNA ?=`); `make test-update`
+  rewrites the visual baselines in place. The game template ships
+  `test/boot.toml` and `test/walk_right.toml`. `testing/project_test.py`,
+  its `default_steps` / `steps` format and the `test/baselines.json` are
+  gone, and the release zip ships nothing of `testing/` but
+  `luna.version`.
+- refactor(examples): 28 of the 50 hand-written `data.asm` are gone and 13
+  more hold only what no tool converts (tmx2snes levels, HDMA and sine
+  tables, assembly helpers, binary fonts, RAM sections): 43 examples convert
+  their pictures, sheets and samples from a `res/<asset>.toml` beside each
+  source (`opensnes-tileset`, `opensnes-sprite`, `opensnes-sample`) and
+  include the generated `.inc`. Every regenerated output is byte-identical
+  to the old tool's and every ROM draws the same pixels; the WRAM baselines
+  that moved did so by the copies of relocated asset addresses, checked byte
+  by byte (`luna wram-trace`).
+- docs(examples): the learning ladder of `examples/README.md` is numbered
+  1 to 55 in reading order (the lettered rungs `15c…15n`, `22b`, `42c…42g`
+  were the order of the additions); thirteen READMEs put the lesson before
+  the build command.
+- **The SDK zip holds only what a project build needs** (build): no built
+  examples and no generated HTML inside it any more. Compressed, they were
+  14 MB of a 40 MB archive (v0.46.0, linux arm64), re-shipped for every
+  OS; the examples now ship once per version as
+  `opensnes-examples_<version>.zip` (`make release-examples`: sources,
+  assets, every ROM built, 4 MB) and the documentation is the online site.
+  What remains is the seventeen static binaries of `bin/` (23 MB
+  compressed) and the library; `release_smoke.py` still proves the zip
+  builds the starter and a scaffolded project.
+- **A user build no longer runs Python for the ROM-size header bytes**
+  (build): `ROMSIZE` and the Super FX RAM size are shell arithmetic in
+  `make/common.mk`, and the 0.x-name hint on a compile error is skipped
+  when `python3` is absent. Eight `python3` calls remain on a user's
+  `make` (the post-link checks); they are to be replaced by a compiled
+  `opensnes-rom check` under the two-audiences rule
+  (`.claude/rules/two_audiences.md`): the game developer gets compiled
+  tools and no interpreter, the contributor keeps the Python.
+- **Contributor tooling tidied** (devtools, luna-test): `tools/README.md`
+  and `devtools/README.md` describe the files that exist and who runs
+  them; `make test-devtools` runs the six unit tests of the sentinels and
+  the harness locally, as `lint.yml` does; the orphaned generators
+  (`gen_hud_bar`, `brr2it`, the Python `font2snes`, `hicolor64hires`) and
+  the one-shot MCP prototypes are gone.
+- **The test harness is `testing/`, with its fixtures** (testing): the
+  luna harness left `tools/luna-test` so that `tools/` means "shipped";
+  `testing/lib` is the one module the harness scripts and the fixture
+  tests import (luna resolver, pin, corpus, probes); the twenty ROM
+  fixtures (`libtests*`, the compiler runtime ROMs, the stress ROMs,
+  `benchrom`) gathered under `testing/fixtures/` with one list in the
+  `Makefile` (`make fixtures`) where three targets each spelled out a
+  different subset. The zip's `make test` path follows (`testing/`).
+- **`dmaTransfer(channel, mode, src, destReg, size)` takes the source as
+  one far pointer** (lot F of the 1.0 plan): the bank comes from the
+  pointer, like every `dmaCopy*` helper; the six-argument form of 0.x no
+  longer compiles. The fixture's CGRAM vector keeps it covered;
+  `check-upgrade` names the call.
+- **`hdmaEnable(channel)` / `hdmaDisable(channel)` take a channel number**
+  (lot E of the 1.0 plan, API decision D1 second step): 0-7 like the other
+  twenty functions of `hdma.h`; a value above 7 is refused and changes
+  nothing, so a 0.x mask left behind (`0x40`, `0x0F`, `1 << 6`) fails
+  visibly. `hdmaEnableMask` / `hdmaDisableMask` stay for several channels at
+  once. The fixture asserts both forms and four refused values;
+  `check-upgrade` still lists every call. No `OPENSNES_DEPRECATED`
+  declaration is left in the headers.
+- test(devtools): the GSU fixture runs the presentation paths no ROM
+  exercised (chips audit PF5): `gsuFrameBytes()` for every height and
+  depth (`SCMR_H160`, `SCMR_H192`, 2/4/8 bpp, OBJ mode), the refusal of
+  two 48 KB frames in 64 KB, a real 160-line frame checked at its last
+  byte in VRAM, `GSU_PRESENT_ON_LAG_FRAMES` (the frame stays in flight
+  across 30 frames of a main thread that never parks without the flag,
+  lands with it), a save while a frame moves, and the whole fixture again
+  under `region = "pal"` (`libtest_gsu_cached_pal.toml`, the 312-line path).
+- build(devtools): `make lint` ratchets the hard-coded width classes of
+  cproc's QBE emitter (`check_cproc_widths.py`, 19 known sites outside
+  `qbetype()`): a new `'w'` / `'l'` / `ILOADW` / `ISTOREW` literal fails
+  until it is reviewed against this target's sizes — the class of the
+  `funccopy`, `zero()` and bit-field miscompiles found one consumer at a
+  time (compiler audit PF3).
+- docs(lib): `superfx.h` no longer offers `$A0` as "IRQ mask + fast
+  multiply": the launchers run the GSU at 21 MHz and clear MS0 before
+  writing CFGR ("MS0 must be zero in 21MHz mode", fullsnes), so the value
+  reaches the register as `$80`; `superfx_hello` asks `$80` instead of a
+  fast multiply it never got; the GSU fixture's own C launch masks the bit
+  too (chips audit S1, doc side; the mask itself landed on 2026-10-04).
+- docs: the five visual tutorials (Mode 7, colour math, window, mosaic,
+  HDMA) open on a screenshot of the example they teach from, taken from
+  the example's own README image (docs audit rec 10 — no tutorial had an
+  illustration).
+
+### Removed
+- Five examples whose lesson another one already taught (examples
+  rationalisation, `.claude/notes/reviews/2026-10-05_examples_rationalisation.md`):
+  `input/move_sprite` (two_players), `color/hicolor_blend` (hicolor_1792),
+  `color/gradient_9bit` (hdma/gradient_colors), `backgrounds/mode5`
+  (mode5_hires), `basics/random` (the lib's `rand`); each absorber's README
+  carries what the retired folder said. 91 → 86 examples.
+- The twenty-six renamed functions (lot C of the 1.0 plan), with their
+  bodies and fixture vectors: `audioUpdate`, `colorMathEnable`,
+  `consoleInitEx`, `getRegion`, `rand`, `srand`, `dmaCopyVramBank`,
+  `dmaCopyCGramBank`, `dsp1Parameter`, `dsp1Present`, `hdmaSetupBank`,
+  `padRaw`, `scopeButtonsDown`, `nmiSetBank`, `irqSetBank`, `LzssDecodeVram`, `ease_in_quad`,
+  `ease_out_quad`, `mode7SetPivot`, `mosaicEnable`, `profileGetFrameCount`,
+  `sa1Init`, `snesmodSetSoundTable`, `snesmodAllocateSoundRegion`,
+  `oamDrawMeta`, `oamDrawMetaFlip`. Each replacement is in
+  `docs/UPGRADING.md` and `devtools/removed_api.txt`; `oamDrawMeta`'s loop
+  stays as the internal body of `oamDrawMetasprite()` (lot D). Only
+  `hdmaEnable` / `hdmaDisable` keep their warning until their own lot.
+- The twenty deprecated constants and the `OAM_SET_GFX_BANK` macro (lot B of
+  the 1.0 plan): `WINDOW_BG1`..`WINDOW_OBJ`, `COLORMATH_BG1`..`COLORMATH_OBJ`,
+  `MOSAIC_BG1`..`MOSAIC_BG4` (all `LAYER_*` of `video.h`, same values),
+  `BGMODE_MODE0/1/2/3/7` (`BG_MODE0`..`BG_MODE7`) and `OAM_SET_GFX_BANK`
+  (`OAM_SET_GFX` reads the bank from its pointer). `docs/UPGRADING.md` keeps
+  the table; `devtools/removed_api.txt` lists them for `make check-upgrade`,
+  which now reports a removed name as well as a still-deprecated one; the
+  doc sentinel (anchor 16) fails any page, example or template that teaches
+  one. No example used them; every ROM is byte-identical.
+
+### Performance
+- **A function that calls keeps its short-lived temporaries in the direct
+  page** (compiler; issue #166): until now only a function that calls
+  nothing had its temporaries there (`lda.b`, no frame to build); one call
+  anywhere and every temporary went to a stack frame. Now a temporary that
+  is not live across any call gets a direct-page slot — whatever the callee
+  does with that block, the value is dead by then — and only what a call
+  crosses stays on the stack. Found by measuring a real game: 59 % of its
+  logic's time was in functions that call, and 145 of the 250 instructions
+  of the heaviest were stack-relative. On that game (whole scripted run,
+  time in its logic file): 98.6 M -> 93.6 M master cycles, -5.4 % against
+  the compiler of the morning before inlining, and 370 bytes less code;
+  92.1 M with `inline` on its two geometry helpers. On the bench against
+  PVSnesLib: total -50.8 % -> -52.9 % in cycles, -37.3 % -> -38.4 % in
+  size (`sort` -42.9 -> -53.9 %, `collide` -32.9 -> -41.9 %, `entities`
+  -57.2 -> -62.3 %), the stack no deeper on 19 workloads of 20 (18). The
+  library bench gains too, its C functions being functions that call:
+  `text` 67,392 -> 62,840, `frame` 142,167 -> 138,384, and `oamxy` and
+  `dma` are no longer behind PVSnesLib (13 rows of 13). `QBE_NO_DP_TEMPS=1`
+  turns it off. Validation: the 86 examples show the same pictures (four
+  free-running ones a frame earlier, the boot being a frame shorter:
+  re-captured, with the three manifests that pinned an animated value at a
+  frame); 200,000 generated programs and 96,000 generated expressions on
+  new seeds, clean. Eight compiler checks that pin a stack mechanism now
+  compile with the feature off (an `env` line in their `.checks`), and a
+  new one pins the feature.
+- **A `static` function with one call site is its caller's code**
+  (compiler; issue #166, pattern 9): when a function is not exported, its
+  address is not used and the file calls it from exactly one place, its
+  body replaces the call — loops and `if`s included — and the function is
+  not emitted. Nothing to write and no size to pay: the code exists once
+  either way, without the pushed arguments, the `jsl` and the `rtl`. A
+  function called from several places is copied only where the source says
+  so: `static inline`, up to 160 instructions of IR (`CC_INLINE_MAX_BIG`),
+  which until now was honoured for single-block bodies of 16 instructions
+  only. One case is left alone on purpose: a function that calls nothing
+  (a leaf) and is not tiny stays a function when its caller would still
+  call something else, because apart it keeps its temporaries in the
+  direct page. That rule comes from two measurements: the corpus
+  comparison (a 16 KB fill poured into `main` made `mode7/extbg` boot four
+  frames later) and a real game built both ways (its logic ran 2 % slower
+  with every leaf absorbed). `QBE_NO_AUTO_INLINE=1` turns the whole thing
+  off. On the bench against PVSnesLib: `dist` 11,874,454 -> 9,455,574
+  master cycles (-20 %: its inner function went into the loop, which
+  stayed a leaf), `place` 6,460,006 -> 6,306,962, total -49.0 % -> -50.8 %;
+  the static table does not move (1270). On the real game (its whole
+  scripted test run, time spent in its logic file): 99.0 M master cycles
+  -> 98.6 M as written (-0.4 %: the time is in the bodies, not in the
+  calls), and 94.8 M (-4.3 %) with `inline` added to its two small geometry
+  helpers, because its heaviest function then calls nothing and becomes a
+  leaf. Validation: corpus identical on 86 examples; 24,400 program seeds
+  (244,000 programs) and 5,000 expression seeds on new ranges, clean. The
+  differential test now makes the programs and helpers of odd seeds
+  `static` or `static inline`: with every function global, no generated
+  program went through an inliner.
+- **No `cmp #0` after an operation that set the flags, no store to a slot
+  nobody reads** (compiler; issue #166): two more rules of the peephole,
+  taken from the output of a real game's functions rather than from the
+  bench (which they do not move: `place` stays at 6,460,006 master
+  cycles). On that game's logic, in instructions: `movePlayer` 184 -> 175,
+  `animate` 79 -> 69, `stand` 76 -> 69. On the static table: 1324 -> 1270
+  cycles (−35.9 % against PVSnesLib+opt), and `array_read` / `array_write`
+  are wins again (47 against 60, 52 against 65): 32 of 34. Over the 20
+  workloads: 49.0 % fewer cycles and 36.4 % less code than PVSnesLib.
+- **A twentieth measured workload, `dist`** (devtools; issue #166): every
+  player of one team against every player of the other, as its author
+  wrote it — a nested loop, two absolute values, a `static` function with
+  one call site. 11,874,454 master cycles for 3,240 distances (3,665
+  each; PVSnesLib 26,066,224), and a stack 12 bytes deeper than
+  PVSnesLib's: the starting point for the steps that remain.
+- **A value just stored is not loaded back, and an index stays in X**
+  (compiler; issue #166, patterns 1, 2 and 4): a peephole over each
+  function's emitted text removes, inside a straight line of code, the
+  reload of a value just stored, a store overwritten before it is read, a
+  load overwritten by the next, and `lda slot / tax` when X already holds
+  that slot. An array index went from nine instructions to four
+  (`lda / asl a / sta / tax`, once for all the accesses that use it).
+  `place`: 7,325,978 -> 6,460,002 master cycles (−12.9 % since the issue
+  was opened), 502 -> 478 bytes, 74 -> 66 instructions an iteration; the
+  issue's other functions: `near` 37 -> 32 instructions, `sort` 95 -> 80,
+  the 2D lookup 59 -> 51. Over the 19 workloads: 47.5 % fewer cycles and
+  35.8 % less code than PVSnesLib.
+- **A conditional over a near target is one branch** (compiler; issue
+  #166, pattern 5): `bcc + / jmp @target / +` becomes `bcs @target` when
+  the target is within reach of a relative branch — two bytes instead of
+  five, 3 cycles less when the branch is taken. "Within reach" is an upper
+  bound of the bytes in between, computed instruction by instruction; a
+  wrong bound would be refused by the assembler, not miscompiled, and
+  during development one was (an instruction sharing its line with a
+  label was not counted: the link failed with "too large distance").
+  `place`: 7,383,730 -> 7,325,978 master cycles, 523 -> 502 bytes; over
+  the 19 workloads the code is 33.9 % smaller than PVSnesLib's (31.7 %
+  before).
+- **A plain array indexed is `lda.w sym,x`, not `lda.l sym,x`** (compiler;
+  issue #166, pattern 3): a byte and a cycle less on every indexed access
+  to a plain object, as scalars always had. `FAR` and `const` objects keep
+  the long form, and so do accesses through a pointer. Small by itself
+  (`place`: 7,417,820 -> 7,383,730 master cycles, 535 -> 523 bytes); the
+  first of the steps the issue lists.
+- **A nineteenth measured workload, `place`: a per-entity loop over
+  parallel tables** (devtools; issue #166). The issue's function,
+  unchanged: 19 sprites from world to screen with an on-screen test, 200
+  times. Today 7,417,820 master cycles (PVSnesLib 14,391,130) and 76
+  instructions per iteration where 35 to 50 would do — the starting
+  point of the work the issue asks for, and the gate that will catch a
+  regression. `docs/craft/frame-budget.md` gains the advice that came
+  with it, as its author corrected it: compute in 16 bits in a loop that
+  runs per entity (8-bit arithmetic and `s8` are what cost; a `u8` table
+  is no slower to index than a `u16` one).
+- **`oamMetaDrawDyn` is assembly** (lib, `sprite_dynamic_meta`): the
+  iterator that fills one dynamic-sprite entry per metasprite item and
+  calls the draw routine of its size was compiled C. The dynamic
+  metasprite example went from 77,656 to 55,364 master cycles of work a
+  frame (PVSnesLib's twin: 44,332 — its iterator draws each item itself
+  instead of calling a routine per item, which is the difference left).
+- **The object engine copies an object twice per update where it copied
+  it six times** (lib/contrib, `object`): `objWorkspace` moved from bank
+  $00 to right behind the object pool, so `objCollidMap`,
+  `objCollidMap1D`, `objCollidMapWithSlopes` and `objUpdateXY` work on it
+  in place when it holds the object they are called for, instead of
+  copying 60 bytes to its slot and 64 back. `games/mapandobjects` spent
+  25,000 master cycles a frame on those copies and now spends 10,000
+  (frame work 90,272 -> 75,209; PVSnesLib's twin 64,057); found by running
+  the two SDKs' twins side by side (`devtools/twinbench`). For game code:
+  `objWorkspace` is declared `FAR`. `objWorkspace.field` reads and costs
+  as before; a pointer to it is a `FAR` pointer.
+- **The library's per-frame calls, measured against PVSnesLib's for the
+  first time, and brought level or ahead** (lib, devtools). The new
+  `devtools/libbench` (`make bench-lib`) builds one scene with both SDKs
+  and times each request on luna. Its first run had OpenSNES behind on
+  seven rows of eight: pad read 3.5 times PVSnesLib's cost, `oamSetXY` 3.6
+  times, text +83 %, sprite size +41 %, scroll +13 %, `oamSet` +9 %. Now:
+  pad −10 %, scroll −30 %, `oamSet` −17 %, `oamSetXY` −1 %, sprite size
+  −39 %, 2 KB DMA level, text −20 %, a whole frame of all of it −16 %
+  (table in `docs/PERF.md`; CI refuses +10 % on a row). What changed:
+  - `padHeld(pad)` and `padPressed(pad)` are also macros over the word
+    the NMI handler filled (the functions remain: `(padHeld)(0)`, or its
+    address). The handler already stores 0 for a port without a pad, which
+    was all the functions added besides bounding the index — the macros do
+    not bound it. `padReleased` is assembly.
+  - `oamSet`, `oamSetX`, `oamSetY`, `oamSetXY`, `oamSetSize` are assembly
+    over a table of masks (512 bytes, in the asset banks); `oamSet` built
+    its mask with a shift loop, the others were compiled C.
+  - `bgSetScroll`, `bgSetScrollX`, `bgSetScrollY` are assembly. A layer
+    number of 4 or more is now ignored; it wrote past the arrays.
+  - `textPrint` (and `textPrintAt`) writes a run of printable characters
+    with the buffer position computed once; every character went through
+    three calls and a 16-bit multiply.
+  - `dmaCopyVram` no longer saves and restores the status register.
+- **The compiler no longer emits what it computed for nothing** (compiler):
+  QBE moves the address of `arr[j - 1]` to the top of a loop and copies it
+  back beside each use; the originals and half of the copies were left
+  without a use, and a backend with no register allocator emitted them
+  all. In an insertion sort's inner loop 258 of 496 cycles were 32-bit
+  index and address values stored and never read. Fixed in the pass itself
+  (target-independent, a candidate for upstream QBE). Measured on luna
+  against PVSnesLib: `sort` from +63 % to −7 %, `collide` from +13 % to
+  −4 %, `physics` from −4 % to −20 %; the code of those functions is 10 to
+  20 % smaller. Twenty-eight example ROMs change and render the same
+  frames. A read whose result is never used is now removed (a `volatile`
+  read is not).
+- **A condition branches where it is decided** (compiler): `a && b` and
+  `a || b` stored 0 or 1 on each side and tested the stored value again;
+  the compare a block branched on was computed as 0 or 1 whenever the
+  optimizer had scheduled anything after it; `x < 0` subtracted zero and
+  corrected for an overflow that cannot happen; `p != end` on two pointers
+  built a 0 or 1 and compared it with zero. Each side of a logical
+  operator now jumps straight to its target, the compare is the last thing
+  in its block and is fused with the branch, the sign test reads the sign,
+  and a 32-bit equality is two compares and a skip. Measured on luna
+  against PVSnesLib: `sort` from −7 % to −19 %, `collide` from −4 % to
+  −12 %, `entities` from −30 % to −41 %, `physics` from −20 % to −27 %, the
+  eighteen workloads together from −27 % to −30 %, and all eighteen are now
+  faster. `mode7/extbg` builds its plane 16 frames sooner.
+- **A global array is indexed with X** (compiler): `tab[i]` built its
+  address in A (`clc` / `adc #tab` / `sta`), reloaded it, moved it to X and
+  went through `$0000,x`; a store pushed its value around that. It is now
+  `tax` / `lda.l tab,x`, the form the compiler already used for `FAR`
+  arrays, for reads and writes of 8, 16 and 32 bits. Kept to indices that
+  cannot be negative, or to a symbol with no offset. And a 16-bit value
+  times a small constant whose product may pass 16 bits — `&nodes[k]` with
+  a 6-byte element — is built inline instead of calling the 32-bit
+  multiply (about 50 cycles for 250). Measured on luna against PVSnesLib:
+  the eighteen workloads from −30 % to −38 %, their code from −18 % to
+  −26 %; `sort` −37 %, `sieve` −47 %, `copy` −46 %, `physics` −43 %,
+  `collide` −27 %, `list` −20 %. All eighteen are faster and none is
+  larger. Ten examples boot one or two frames sooner, and
+  `chips/sa1_starfield` now shows 164 different images in 200 frames
+  where it showed 99.
+- **A field through a pointer is indexed with X too** (compiler):
+  `p->field` added the offset to the pointer in A, stored the sum,
+  reloaded it and moved it to X; a store pushed its value around that.
+  Every 8- and 16-bit access through an address held in a temporary is
+  now `tax` / `lda.l $00000N,x`, with the field's offset in the operand,
+  and X is kept from one access to the next when nothing else lies
+  between them: `e->vx = v; e->vy = v;` loads X once. A 32-bit read
+  through a pointer keeps its form (the full 24-bit pointer). Measured on
+  luna against PVSnesLib: the eighteen workloads from −38 % to −40 %,
+  `entities` −54 %, `copy` −51 %, `physics` −47 %; the static table of
+  34 functions from 1637 to 1593 cycles (−17.4 % to −19.6 %), `struct_sum`
+  now ahead of PVSnesLib.
+- **Frames are smaller** (compiler): a local or a parameter that the
+  optimizer turns into temporaries kept the bytes the front end had
+  reserved for it, in every frame of every call — 2 to 4 bytes per
+  variable. They are no longer reserved. Measured on luna: the deepest
+  stack of the eighteen workloads is 6 to 34 bytes shallower (`calls`
+  265 -> 231, `strings` 90 -> 76, `collide` 104 -> 82), and one, `long`, is
+  now shallower than PVSnesLib's. No cycle and no byte of code changes
+  beyond the frame-size constants: the 86 examples render the same frames
+  at the same frame numbers.
+- **A parameter is read where the caller pushed it** (compiler): a
+  function that calls another began by copying each parameter into its
+  own frame; only a function without calls read them in place. The
+  argument area lies above the frame and survives the calls, so every
+  function reads it directly now. And a value that never touches the
+  stack — such a parameter, or a result consumed at once from A — no
+  longer gets a slot: slots are assigned after those analyses, not before.
+  Measured on luna: recursive `fib(17)` (`calls`) from −29 % to −37 %
+  against PVSnesLib, its code from 96 to 80 bytes, its deepest stack from
+  231 to 193 bytes (PVSnesLib: 159); the eighteen workloads −40.8 %, their
+  code −27.5 %. The 86 examples render the same frames at the same frame
+  numbers.
+- **The value a function returns is not stored first** (compiler): a
+  result produced by the last instruction of a block and returned at once
+  went to a stack slot and came back; only a function without calls
+  skipped that. Every function does now, and the slot is gone from the
+  frame. Recursive `fib(17)` (`calls`) keeps one 2-byte slot per level:
+  its deepest stack went 265 -> 231 -> 193 -> 159 bytes in three steps,
+  level with PVSnesLib, for 42 % fewer cycles and 66 bytes of code against
+  105. Seven example ROMs change and render the same frames.
+- **An address or an index takes one word of frame** (compiler): a
+  32-bit temporary of which only the low half is ever read kept two words
+  on the stack, the second never written and never read. It takes one.
+  Measured on luna against PVSnesLib: the deepest stack is level or
+  shallower on 7 of the eighteen workloads (2 before: `sort`, `physics`,
+  `collide`, `entities` and `state` join `long` and `calls`) and deeper by
+  1 to 29 bytes on the other 11 (`grid` 84 -> 68, `collide` 78 -> 64). The
+  86 examples render the same frames at the same frame numbers.
+- **A static function called only directly does not set the accumulator
+  width again** (compiler): every function opened with `rep #$20`, in
+  case assembly called it in 8-bit mode. A function that is not exported
+  and whose address is used nowhere can only be entered by a call the
+  compiler made itself, in 16 bits: it leaves the instruction out, 3
+  cycles and 2 bytes per call. An exported function, and any function
+  used as a callback or stored in a table, keeps it: calling C from
+  assembly is exactly what it was (`compiler/ABI.md`). The eighteen
+  workloads −41.2 %, their code −28.3 %; 60 example ROMs change and
+  render the same frames at the same frame numbers.
+- **A function that calls nothing has no stack frame** (compiler, runtime):
+  its temporaries live in the direct page, at `tcc__lf` (32 bytes at
+  `$0080`), when they fit 16 words and it has no local array. No
+  prologue, no epilogue, `lda.b` for `lda n,s`, nothing on the stack below
+  the return address. It is safe because such a function cannot be
+  re-entered on the same direct page: it calls nothing, and the NMI
+  handler runs the code it calls on its own page, which now mirrors that
+  block (160 bytes, 48 before); an IRQ handler is assembly. Measured on
+  luna against PVSnesLib: the eighteen workloads from −41.2 % to −43.8 %,
+  their code from −28.3 % to −30.4 %, and the deepest stack level or
+  shallower on 16 of them (7 before; `grid` and `strings` remain). The
+  static table of 34 functions goes from 1593 to 1380 cycles (−30.3 %):
+  `array_read` 101 → 70, `array_write` 102 → 75, `array2d_read` 150 → 117,
+  `struct_sum` 82 → 55, `loop_sum` 119 → 84. `mode7/extbg` boots 4 frames
+  sooner; the 86 examples render the same frames.
+- **A ROM carries the mouse, Super Scope and multitap readers only if it
+  arms them** (runtime, lib): the NMI handler called the three by name,
+  so every ROM linked them, 569 bytes. It now calls each through a pointer
+  that `mouseInit()` and `scopeInit()` set before they set the device's
+  flag. A ROM that only calls `consoleInit()` uses 1.9 KB of bank $00
+  (2.4 KB the day before, 9.8 KB before the link kept only what is
+  referenced; PVSnesLib: 2.0 KB). The
+  86 examples render the same frames and play the same audio.
+- **`(u >> 8) & 0xFF` on an unsigned value no longer emits its mask**
+  (compiler): a consequence of the shift-width fix below; 71 example ROMs
+  change by it and render the same frames.
+
+### Fixed
+- **A game with more than 32 KB of code was refused a ROM that works**
+  (build, tools; issue #168): when bank $00 is full the linker places the
+  next C functions and library routines in bank $01 and up — they are
+  `SUPERFREE` sections reached by `jsl`, and nothing in them depends on
+  their bank — but the post-link check then failed the build under 1024
+  free bytes with "the next code section will not fit". That ratchet dates
+  from the time a C-read const table had to live in bank $00; the data
+  moved to the asset banks in v0.41 and the check stayed. Measured on the
+  first game to get there: with 6 KB of filler pinned to bank $00, 31
+  functions ran from bank $01 (its own and `vramQueueFlush`, `oamSetSize`,
+  `bgSetScroll`, `setMode`…), its boot test passed and seven frames matched
+  exactly. `BANK0_FAIL_THRESHOLD` is now 0 by default (the knob stays for a
+  project that wants its code bank watched); `opensnes-rom check` reports
+  the free bytes of bank $00 and how much code is in the next banks;
+  `make test-bank-spill`, in `make tests`, rebuilds four examples with bank
+  $00 given no room and compares them frame for frame with the normal
+  build; `KNOWN_LIMITATIONS.md`, the build page and the tool page said the
+  old thing and are rewritten.
+- **`audioLoadSample()` could time out on a valid sample** (lib, module
+  `audio`): for a sample whose last index byte is 0 — 513 bytes, 769, any
+  size of the form 256 k + 1 — the driver showed its end-of-stream mark
+  only until it read a 0 on the CPU's port, and that 0 was already there.
+  The mark lasted a few SPC700 cycles; the loader saw it or returned
+  `AUDIO_ERR_TIMEOUT` according to the phase of its polling loop. The
+  2026-10-03 fix had removed the hang for those sizes, not the race, and
+  the test passed by phase — until a compiler step made that loop one cycle
+  shorter per turn. The end is now a handshake in which each value one side
+  waits for is held by the other until answered (the mark is `$FF`, or
+  `$7F` when the last index byte is itself `$FF`). The library test loads
+  513 and 512 bytes and was run with the loader compiled two ways.
+- **A short branch could be one byte out of reach, and fail the link**
+  (compiler; in `develop` for a day, never in a release): the pass that
+  shortens conditionals did not count the branches it had already
+  shortened earlier in the same function, so a backward branch judged at
+  123 bytes was at 129. The assembler refuses such a branch ("too large
+  distance") — a build failure, never wrong code. One program in 4,000 of
+  the differential hunt hit it; the corpus did not.
+- **`opensnes-sprite sheet --metasprite W H` on a sheet of several rows of
+  metasprites** (tools; found by issue #165): the first block of each
+  metasprite was computed by a formula that holds for a sheet of one row
+  (or one column) only. On a sheet of two rows of 32x32 cells, every
+  32x32 metasprite got tile 0; at `--size 16` the metasprites overlapped
+  (the second began at tile 2 instead of 4). Each metasprite is now
+  located in the sheet's grid. Sheets of one row or one column give the
+  same output as before (the eleven and fourteen existing golden cases of
+  `gfx4snes` and `opensnes-sprite` are unchanged); two new cases pin a
+  two-row sheet.
+- **The link-time guard against bank-blind reads did not see `static`
+  objects** (tools, devtools): `opensnes-rom check` and
+  `check_bank_reads.py` read a symbol's name up to its first dot, and a
+  `static` object is `name.unit` — so a ROM reading a `static const`
+  table of bank $07 through `lda.w` linked with "OK: no bank-blind C
+  reads". Seen when a compiler change under test emitted exactly that for
+  17 examples and the link accepted all of them (the picture comparison
+  and two compiler checks caught it). Both tools read the whole name now;
+  the corpus passes the stricter guard. If it fails your link after an
+  update, the read it names is real.
+- **Every sprite was drawn one line too high** (lib; found by issue #165).
+  `oamSet()`, `oamSetY()`, `oamSetXY()`, the `oamSetFast` /
+  `oamSetXYFast` macros and the dynamic sprite engine stored `y - 1`.
+  The PPU does draw a sprite one scanline below its OAM `Y`, but it never
+  outputs scanline 0, and the two cancel: OAM `Y` = 0 is the first
+  visible line (SNESdev wiki, *Sprites*; measured on luna: an 8x8 sprite
+  with `Y` = 0 covers lines 0-7, with `Y` = 255 lines 0-6). Only a
+  background needs a correction, which `bgSetScroll()` has had since
+  0.43 — and since then a sprite sat one line above a background
+  scrolled to the same `y`: in `games/likemario` the character stood one
+  line above the floor. The library now stores `y` as given, and
+  `oamGetY()` returns the OAM byte. **Code to change**: a direct
+  `oamMemory[id * 4 + 1]` write that subtracted 1 must stop (five
+  examples did); a `y + 1` passed to `oamSet()` to line a sprite up with
+  its background must stop too. 24 example baselines move by one line.
+  `docs/hardware/OAM.md` has the arbiter's sentence and the history.
+- **A newline, a tab, a quote, a backslash or a byte above 0x7E in a string
+  literal gave wrong bytes** (compiler): the front end hands such a byte to
+  the back end as an octal escape, and the back end converted only the
+  terminating zero. The others were copied into the assembler's string,
+  which reads `\0` as a zero and any other backslash as itself: `"\n"`
+  became the three bytes 0, `1`, `2`, and `"\xF0"` a backslash and three
+  digits — wrong, and longer than the C code counts. In the compiler since
+  the fork. No example has such a literal (the 86 ROMs are unchanged);
+  found while testing `strcmp` on bytes above 0x7F.
+- **A `long` could lose its high half to its own truncated copy**
+  (compiler): `a = 0 - v; j = a;` with `a` a long and `j` a `u8`, on a
+  path that joins another — the two variables get two phis with the same
+  arguments, one 32-bit and one 16-bit, and QBE's value numbering replaced
+  one by the other without comparing their widths. Every later use of `a`
+  then saw 16 bits (0 for 0xFFF80000). In the fork since its first commit;
+  no example ROM changes by a byte with the fix. Found by the program
+  differential test (seed 124152, in its gate with a hand-written
+  function).
+- **A bit-field chosen by a constant condition lost the conditional's
+  type** (compiler): `b3 - (3 ? bf.b2 : (v2 * v3))` — the two branches
+  have the common type `unsigned`, but with a condition the front end can
+  fold, the chosen bit-field operand was kept as a bit-field and promoted
+  again, to `int`, by the operator around it: the result was computed
+  signed and sign-extended into a `long` (0xFFFFFF78 for 0x0000FF78,
+  measured on luna; the same expression with a run-time condition was
+  right). Also, `c ? bf.a : bf.b` with two bit-fields of the same type is
+  now an `int`, as the standard has it and as `bf.a - bf.b` already was.
+  In the front end since the fork. Found by the program differential test
+  (seed 103247, in its gate with a hand-written function).
+- **The high half of `(u32)w * 2..256` could be garbage** (compiler):
+  the 32-bit multiply by a power of two up to 256, of a 16-bit value,
+  loaded that value a second time for the high half — from its stack
+  slot, while the store to that slot is skipped when the value's only use
+  is the instruction that follows. The twin of a defect fixed on
+  2026-05-22 in the shift path (`fix32Sin(64)` returned 0), left in the
+  multiply. Reached when the optimizer hands the multiply a 16-bit
+  temporary directly (a comparison's result scaled as a `long`); the
+  operand is now loaded once. Found when such a value stopped getting a
+  slot at all and the read became an internal error (seed 74144 of the
+  program test, in its gate).
+- **`(v >> 15) & 1` on a signed value lost its mask** (compiler): QBE's
+  redundant-mask rule sized a shift at 32 bits, the width of a word
+  upstream. Here a word is 16 bits, so `v >> 15` was held to be one bit
+  wide whenever `v` had 16 bits or fewer — where bit 15 is the sign and the
+  result is 0 or −1. `sa[(v >> 15) & 1]` wrote to `sa[-1]`;
+  `((s16)(a & 0xFF00) >> 8) & 0xFF` kept its sign bits. In the compiler
+  since the fork's first commit. No C source of the library or of the
+  examples was affected (each compiles to the same code with the fix
+  alone); found by the program differential test on a seed range it had
+  never run (seed 54084, now in its gate).
+- **`gsuDmaFullFrame()` with the screen off returned after a number of
+  frames that depended on timing** (lib): called before
+  `gsuSetupHdmaBlanking()` — the way `superfx_3d` loads its first frame,
+  in force blank — its window was one line, 225, the line vertical blank
+  and the NMI begin on, and it got through only when a poll landed between
+  the start of that line and the NMI. A faster compiler moved
+  `superfx_3d`'s boot from 17 to 38 frames without changing a byte of this
+  code. With the screen off it now starts at once (frame 8).
+- **A negative index off a `FAR` address read and wrote the next bank**
+  (compiler): `(far_arr + 8)[j]` with `j = -1` was compiled to
+  `lda.l far_arr+16,x`, which adds the low word of the index as an
+  unsigned offset — bank $7F instead of $7E, for the read and for the
+  write. Wrong since `FAR` exists (v0.39.0). The short forms are now kept
+  only for an index known to be non-negative (an unsigned index, or a
+  symbol with no offset, where a negative index is outside the object);
+  the others add in 24 bits. No ROM of the corpus changes by a byte; three
+  cells of the `b2_far_ram` fixture pin it.
+- **An internal compiler error on a boolean compared again as a 32-bit
+  value** (compiler): a 32-bit compare reads the high half of its first
+  operand before the low one, but the backend counted it among the
+  instructions that take that operand straight from A, and skipped the
+  store of a 16-bit temporary that fed one. The slot-ownership check
+  stopped the build instead of letting the compare read another value
+  (seed 19645 of the program test, now in its gate). No ROM of the corpus
+  changes by a byte.
+- **`(y || K) && 1` could return `y != 0`** (compiler): QBE replaces a phi
+  of 0 and 1 under a branch by the branch's condition, checking that both
+  sides end in a jump but not that they jump to the phi's block. It folds
+  a branch on a constant in the same pass, and the phi keeps its argument
+  for the edge that just died. Found by the differential test on the first
+  day the new branch pass produced that shape (no C program is known to
+  reach it without that pass). Fixed in the inference (`copy.c`); seed
+  14657 of the program test pins it.
+- **Thirteen silent miscompilations, a compiler hang and an internal error,
+  found by a new differential test** (compiler): `testing/difftest.py` compiles random
+  integer expressions, runs them on luna and compares with C's rules for
+  this target. Its first day:
+  - constants were folded at 32 and 64 bits while `int` is 16 and `long`
+    32: `-(4294967291UL) == 5` was 0, and `-22016 * 256U` or `512UL << 31`
+    counted as nonzero in a condition;
+  - `int a = 1; return a && 1;` — a function left with nothing but a
+    constant choice — had no stack frame and overwrote its return address;
+  - `y && x`, `0 || x` and `(bool)x` were false for a `long` whose low word
+    is 0 (`0x00010000`), and for a far pointer to offset `$0000`;
+  - `if ((s16)x)` and `(s16)x ? a : b` tested all 32 bits of `x`;
+  - `5 && 7` evaluated to 7 and `0 || 9` to 9 in enum values, array sizes
+    and initialisers;
+  - the compiler never returned on `(s16)2141188073UL * x`.
+  Then, on generated programs (`testing/difftest_stmt.py`: loops, arrays,
+  structs, bit-fields, pointers, switch, calls to generated helpers):
+  - a variable that saves another's value before it changes in a loop read
+    the new value: `for (…) { prev = cur; cur += d; }` left `prev == cur`,
+    a swap in a loop left both variables equal, a Fibonacci loop returned
+    512 for 55;
+  - `(c ? 1 : x) > y` on 32 bits could compare a neighbouring stack slot;
+  - the compiler stopped with an internal error on `a[x & 7]` when `x` is
+    a `long`;
+  - `do { if (g) break; } while (++j < 3);` left a wrong value in `j`;
+  - an initialiser that starts with implicit zeros — `int t[4] = { [2] = 7 };`,
+    a struct whose first bit-fields are 0 — was emitted short, and every
+    global initialised after it was read from the wrong place at startup;
+  - in a function of more than 256 temporaries (a long game loop), the
+    compiler's own tables stopped tracking without a word and a parameter
+    could be read from a stack slot nobody had written. The limit is 2048
+    and a function past it is now refused with a message;
+  - `u32 f(u32 x) { return x ? 1 : (15 & x); }` returned garbage in its
+    low half;
+  - **floating point and `long long` compiled to wrong code without a
+    word**: `a * 2.5f` was a 16-bit integer multiply of the low word,
+    `long long a; a + 1` dropped its upper half. Both are now refused when
+    a value of those types is computed at run time. Constants the compiler
+    folds keep compiling: `(int)(1.5 * 256)`, `-2147483648`,
+    `(int)((1ULL << 40) >> 36)`.
+  Three example ROMs change (`sprite_swarm`, `rpg`, `mode7_flying`): their
+  `main` has more than 256 temporaries, so the optimisations that stopped
+  at that limit now reach its end and the code is shorter. They show the
+  same frames (`diff_corpus` 86/86 MATCH). The other 83 are byte-identical. `if (long)` and `if (pointer)` compile to the same code as before.
+- **`DECLARE_ANIM_CLIP` refuses more than 255 frames** (lib): the frame
+  count went into the `u8` `AnimClip.len` through a cast, so a 256-frame
+  clip had a length of 0 and `animPlay()` stopped the player, and a
+  300-frame one played 44 frames — with no error. The macro now carries a
+  `_Static_assert`; the refusal is pinned by a compile-must-fail fixture.
+  The cost paragraph of `anim.h` gave 60-90 CPU cycles for `animTick()`,
+  an estimate; measured on luna it is about 3,300 master cycles on a tick
+  that does not advance (0.9 % of a frame) and about 7,000 on one that
+  does.
+- **`font2snes` refuses a PNG whose raw size overflows** (tools): stb_image
+  computed the decoded size of a PNG in 32 bits and passed it on as an
+  `int`; a 79-byte file declaring 45 x 7929880 pixels made it negative and
+  the decoder asked for 16 EB. The allocator refused, so the tool only
+  reported "out of memory"; the size is now checked and the file refused
+  as corrupt. Found by the fuzzer; the input is replayed on every push.
+- fix(compiler): two C sources of one project may define the same file-scope `static` (object or function): the symbol is emitted as `name.<source>` (`itable.main`), where it used to be a bare label that the linker refused as defined twice. The generated `res/<asset>.inc`, included from every file that draws the asset, needed it. The twenty manifests that read such a static by name use the suffixed form (`"score.main"`), the way `luna test` and the `.sym` now spell it.
+- fix(tools): two gfx4snes map defects measured with a pixel oracle (decode
+  `.pic` + `.pal` + `.map` and compare every pixel with the source). (1)
+  A map entry took its palette bank from the tile's **first** pixel; index
+  0 is the transparent colour of every bank, so a bank-2 tile that starts
+  transparent was drawn with bank 0's colours (63 of its 64 pixels wrong).
+  The bank now comes from the first opaque pixel, and a tile whose opaque
+  pixels span two banks is refused. (2) `-a` (`--pal-rearrange`) rearranged
+  the palette on the row-major image buffer while the tiles written out
+  were converted before: the `.pal` moved, the `.pic` kept the old indices
+  (191 of 256 pixels wrong on a three-bank image). The rearrangement now
+  runs on the tile buffer. `examples/color/transparency` is the one `-a`
+  user: its landscape decoded to the wrong colour on 51 056 of 52 509
+  opaque pixels and to transparent on 4 835 more since the port — the
+  picture looked like a landscape, in the wrong palette; image and WRAM
+  baselines and its README screenshot are re-captured. PVSnesLib's
+  gfx4snes has both defects (build-tools audit C, the two open questions).
+- fix(lib): `objCollidObj`, `mapGetMetaTile`, `mapGetMetaTilesProp`,
+  `profileColorStart`, `dsp1SetCamera` and `dsp1Raster` reach the
+  compiler's scratch registers direct-page-relative, as compiled C does.
+  They used absolute or long addressing, which from an `nmiSet()` callback
+  — where the direct page points at the NMI's own register copy — wrote
+  the main thread's `tcc__r0` / `tcc__r9` through the `$7E` mirror: a
+  collision test or a profiler bar in a callback could corrupt the value
+  the interrupted code was computing (library audit l.21). `nmiSet()`'s
+  header now says what a callback may call; `textLoadFont*` warn that
+  their absolute DMA writes land in WRAM under the callback's data bank.
+- ci(devtools): the commit lint exempts the release merge titled
+  `release: vX.Y.Z`, the title the release workflow prescribes; the Lint
+  run on `main` was red after the v0.47.0 and v0.48.0 merges for that
+  subject alone (plus, on 2026-10-05, two earlier subjects already on
+  `develop`).
 
 ## [0.48.0] — 2026-10-05
 
@@ -2551,7 +3498,7 @@ from v0.21.2. This release captures the luna v1.0.0 migration on `main`.
 
 ### Changed
 - **Test backend**: pinned luna bumped `v0.3.2` → `v1.0.0`
-  (`tools/luna-test/luna.version`). The v0.3.x releases were removed upstream,
+  (`testing/luna.version`). The v0.3.x releases were removed upstream,
   which broke CI; v1.0.0 is CLI-compatible and produces no rendering drift
   (visual regression 56/56). Affects the dev/CI test harness only.
 
@@ -2603,7 +3550,7 @@ or runtime changes — existing ROMs build byte-for-byte the same.
 
 ### Changed
 - Bump the pinned luna binary **v0.3.0 → v0.3.2** (no rendering drift; visual
-  baselines byte-identical). `LUNA_VERSION` now reads `tools/luna-test/luna.version`
+  baselines byte-identical). `LUNA_VERSION` now reads `testing/luna.version`
   (single source of truth with `install-luna.sh`).
 - Commit-scope lint accepts comma-separated scopes (`feat(compiler,lib): …`).
 
@@ -2638,7 +3585,7 @@ procedurally-generated shoot-'em-up example.
   shoot-'em-up (cellular-automata archipelago + autotile resolver, vertical
   auto-scroll, 8-enemy spawn pool, AABB collision, BG3 HUD).
 - `fadeOut` / `fadeIn` promoted into `snes/console.h`.
-- **luna test harness** (`tools/luna-test/`, Python): `make tests` runs corpus
+- **luna test harness** (`testing/`, Python): `make tests` runs corpus
   liveness coverage + full-corpus visual regression (56 examples, keyed on luna's
   cross-arch-stable `--print-fbhash`) + functional probes (scripted input → WRAM
   via `--assert`) + audio checks (`--audio-out` + SPC voices) + WRAM-state

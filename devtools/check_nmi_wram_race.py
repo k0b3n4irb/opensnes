@@ -22,7 +22,7 @@ The trap is:
     nmiSet(my_nmi_cb);
 
 This lint walks the call graph from each NMI callback root (NmiHandler
-itself plus any function passed to nmiSet/nmiSetBank) and flags any
+itself plus any function passed to nmiSet) and flags any
 function in the closure that writes to $2180-$2183.
 
 Usage:
@@ -36,7 +36,7 @@ Implementation notes:
   - Parses .c.asm and combined.asm intermediate files (kept by build).
   - Roots: NmiHandler (always present in crt0) + DefaultNmiCallback
     (always present, audited safe) + user callbacks registered via
-    `pea.w <sym>; jsl nmiSet` or `pea.w <sym>; ...; jsl nmiSetBank`.
+    `pea.w <sym>; jsl nmiSet`.
   - Lib code is treated as a black box: jsl into a lib function is
     NOT followed because lib ASM is audited via .claude/rules/
     nmi_audit.md.
@@ -64,17 +64,18 @@ WRAM_PORT_PATTERNS = [
     re.compile(r"\bstz\.l\s+\$00218[0-3]\b", re.IGNORECASE),
 ]
 
-# Patterns that mark a callback registration. Both nmiSet and
-# nmiSetBank take the callback as their FIRST C argument; under
-# cc65816's left-to-right push, that means it lands FIRST on the
-# stack — `pea.w <sym>` directly preceding (within ~10 lines) a
-# `jsl nmiSet` or `jsl nmiSetBank`.
+# Patterns that mark a callback registration. nmiSet takes the
+# callback as its FIRST C argument; under cc65816's left-to-right
+# push, that means it lands FIRST on the stack — `pea.w <sym>`
+# directly preceding (within ~10 lines) a `jsl nmiSet`. (The
+# explicit-bank installer of 0.x, same pattern with a bank argument
+# after the callback, was removed on 2026-10-05.)
 PEA_LABEL_RE = re.compile(
     r"^\s*pea(?:\.w)?\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:;.*)?$",
     re.IGNORECASE,
 )
 JSL_NMISET_RE = re.compile(
-    r"^\s*jsl(?:\.[wlb])?\s+(nmiSet|nmiSetBank)\s*(?:;.*)?$",
+    r"^\s*jsl(?:\.[wlb])?\s+(nmiSet)\s*(?:;.*)?$",
     re.IGNORECASE,
 )
 
@@ -177,18 +178,14 @@ def parse_asm_functions(asm_files: list[Path]) -> dict[str, Function]:
 
 
 def find_nmi_callback_roots(funcs: dict[str, Function]) -> set[str]:
-    """Find every symbol passed as the first argument to nmiSet or
-    nmiSetBank.  Returns the set of callback names (which are
-    expected to be functions; lookup against `funcs` is the caller's
-    job).
+    """Find every symbol passed as the first argument to nmiSet.
+    Returns the set of callback names (which are expected to be
+    functions; lookup against `funcs` is the caller's job).
 
     Heuristic: scan each function for `pea.w <sym>` followed within
-    a small window (10 lines) by `jsl nmiSet` or `jsl nmiSetBank`.
-    cc65816 pushes args left-to-right, so the callback (1st arg) is
-    the LATEST `pea.w` before the jsl in the no-ambiguity case for
-    nmiSet (single arg). For nmiSetBank the callback is followed by
-    the bank `pea.w`; we still pick the symbolic `pea.w` (the bank is
-    almost always a numeric literal, not a label).
+    a small window (10 lines) by `jsl nmiSet`. cc65816 pushes args
+    left-to-right, so the callback (1st arg) is the LATEST symbolic
+    `pea.w` before the jsl.
     """
     callbacks: set[str] = set()
 

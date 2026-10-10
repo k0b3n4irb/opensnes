@@ -29,7 +29,7 @@ load-bearing for cross-session continuity).
 >   runner + Mesen2) was **removed**. Every reference to `tools/opensnes-emu/...`,
 >   `*.mjs`, `run-all-tests.mjs`, `run-benchmark.mjs`, or Mesen2 below is
 >   **historical** — the live equivalents are `make tests` (luna),
->   `tools/luna-test/`, `devtools/compiler-tests/`, and `devtools/cyclecount/`.
+>   `testing/`, `devtools/compiler-tests/`, and `devtools/cyclecount/`.
 > These older entries are kept as investigation logs (they froze a past state on
 > purpose); only the headline status lines are updated.
 
@@ -1022,7 +1022,7 @@ representation in the toolchain.
 > "never extended past 16-bit" premise was stale — the `Kl` class was already
 > implemented broadly (prior chantiers + fix32 v0.21.0: return convention,
 > `__mul32`, long divide, pair lowering). Phase 0 built a luna runtime-correctness
-> harness (`devtools/compiler-tests/runtime/a7_32bit/`, 18 s32/u32 cases) which
+> harness (`testing/fixtures/compiler/a7_32bit/`, 18 s32/u32 cases) which
 > the static C→ASM checks couldn't provide; it found exactly **one** real bug —
 > the `Osar` constant-fold dropped the sign on negative 32-bit constants
 > (`compiler/qbe/fold.c`, folded `Kl` as 64-bit). Fixed (qbe `1884a20`, 32-bit
@@ -1331,7 +1331,7 @@ pointee taint. The "latent bug" was the HDMA mid-frame glitch and the
 RNG boot seed (both explained in v0.39.0); the corpus is clean on the
 frame-equal protocol. Lib −685 instructions (−4.25 %), asset −34 % /
 anim −17 % / panel −15 % estimated cycles. Measured on the ROM bench
-once `devtools/benchrom` gained const-path workloads (2026-09-07, luna,
+once `testing/fixtures/benchrom` gained const-path workloads (2026-09-07, luna,
 cycles per call, v0.39.0 → v0.40.0): animTick 1224 → 989 (−19 %),
 animTickMeta 1346 → 1108 (−18 %), const u8 walk ×32 7689 → 6832
 (−11 %), const u16 walk ×32 7380 → 6522 (−12 %), const→RAM copy ×32

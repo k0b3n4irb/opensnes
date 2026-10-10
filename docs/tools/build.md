@@ -26,6 +26,7 @@ Every variable can also be set on the command line for one build:
 | `ASMSRC` | (none) | Extra 65816 assembly sources (data sections, hand-written routines) |
 | `GFXSRC` | (none) | PNG files converted by `gfx4snes` into `.pic` / `.pal` (+ a C header) at build time |
 | `SPRITE_SIZE` | `8` | Tile size passed to `gfx4snes -s` for the `GFXSRC` files |
+| `LUNA` | `$(OPENSNES)/testing/bin/luna` | The luna binary `make test` / `make test-update` run the project's `test/*.toml` with (`scripts/install-luna.sh` puts it there); a `LUNA_BIN` in the environment, the installer's own override, takes precedence |
 | `SPCSRC` | (none) | SPC700 assembly (`*.spc700.asm`), assembled with `wla-spc700` into a `.spc700.bin` your 65816 code `.incbin`s |
 | `GSUSRC` | (none) | Super FX assembly (`*.sfx`), assembled with `wla-superfx` into a `.sfx.bin` (needs `USE_SUPERFX := 1`) |
 
@@ -47,6 +48,7 @@ looping ones).
 | `USE_HIROM` | `0` | `1` builds a HiROM cartridge (64 KB banks instead of 32 KB) |
 | `USE_FASTROM` | `0` | `1` marks the ROM as FastROM and runs the code from the fast mirror (~33 % more ROM bandwidth) |
 | `ROM_BANKS` | `8` | Number of linker banks: 256 KB LoROM, 512 KB HiROM by default. The header's ROM size byte and the asset bank range follow it |
+| `ASSET_TOML` | `*.toml` and `res/*.toml` that name an `opensnes-*` tool | The assets' settings files the build converts before compiling (one `opensnes-<tool> <subcommand>` run per file, then `assets_gen.asm` gathers their `.incbin` fragments); see @ref tools_conventions |
 | `ROMSIZE` | from `ROM_BANKS` | The header's ROM size byte (`$FFD7`, 1 KB << n, rounded up to a power of two). Leave it computed |
 | `ASSET_BANKS_RANGE` | `ROM_BANKS - 1` down to 1 | Banks the linker may use for `ASSET_SECTION` data and C const data, highest first. Leave it computed |
 | `ROM_REGION` | `ntsc` | The region the header declares (`$FFD9`): `ntsc` = `$01` USA, `pal` = `$02` Europe, `jp` = `$00` Japan. A console runs at its own standard whatever the byte says (`isPAL()` reads the console); emulators, luna included, choose 50 or 60 Hz from it |
@@ -85,9 +87,10 @@ write down, raising it is almost always wrong (`.claude/rules/bank0_budget.md`).
 
 | Variable | Default | What it does |
 |---|---|---|
-| `BANK0_FAIL_THRESHOLD` | `1024` | Fail the link when bank $00 (code) has fewer free bytes than this |
+| `BANK0_FAIL_THRESHOLD` | `0` | `0`: never. Bank $00 holds code only, and code that does not fit goes to the next banks by itself (the link report says how much). A value fails the link when bank $00 has fewer free bytes: for a project that wants its code bank watched |
 | `RAM_FAIL_THRESHOLD` | `512` | Fail the link when the plain C RAM band (`$0000-$1FFF`) has fewer free bytes than this |
 | `RAM_WARN_THRESHOLD` | `1024` | Warn below this many free bytes in that band |
+| `LD_DISCARD` | `1` | Link only the sections something refers to (`wlalink -d`): the library functions and RAM your program does not use are left out of the ROM. `0` links every section of every listed module, as before 2026-10-08 |
 
 Each check has a bypass for debugging, never for a commit: `SKIP_LINT=1`
 (the clang syntax pass over your C), `SKIP_BANK0_CHECK=1`,

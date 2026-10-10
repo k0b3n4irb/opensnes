@@ -1,0 +1,12 @@
+# File-scope statics are suffixed with the TU stem; externs are not.
+# (`^` would only match the start of the whole text: anchor on the newline.)
+raw present \ncounter\.static_tu_suffix:
+raw present \nbump\.static_tu_suffix:
+raw present \nshared:
+raw absent \nshared\.
+raw absent \ncounter:
+# the block-scope static keeps the anonymous-local form (<tu>_name.N)
+raw present \nstatic_tu_suffix_calls\.\d+:
+# and the stripped view reads as every other case
+section counter: present RAMSECTION
+in entry: present jsl bump

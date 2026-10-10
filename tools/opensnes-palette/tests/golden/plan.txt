@@ -1,0 +1,14 @@
+opensnes-palette: project.toml — 7 palettes, 6 distinct
+BG palettes (3 / 8 slots):
+  slot 0  cgram   0  bg1              (16 colours)  bg1.pal
+  slot 1  cgram  16  bg2              (16 colours)  bg2.pal
+  slot 2  cgram  32  hud              ( 4 colours)  hud.pal
+Sprite palettes (3 / 8 slots):
+  slot 0  cgram 128  hero             (16 colours)  hero.pal
+      + boss shares this slot (identical palette)
+  slot 1  cgram 144  enemy            (16 colours)  enemy.pal
+  slot 2  cgram 160  ghost            (16 colours)  ghost.pal
+Merge hints (near-duplicate palettes; a shared palette would free a slot):
+  hero ~ enemy differ in 2 colours (indexes 5,9) — consider a shared palette
+  hero ~ ghost differ only at colour 0, transparent for sprites — safe to merge into one palette
+OK: fits in 8 BG + 8 sprite slots -> project.inc + .pal (512 bytes)

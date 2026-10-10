@@ -97,38 +97,12 @@ jobs:
       - name: Check out OpenSNES
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: test_check_doc_drift
-        # Phantom-API detector and example-count patterns of the doc-drift
-        # sentinel (must match real phrasings, must NOT match prose like
-        # "12 examples were flagged").
-        working-directory: devtools
-        run: python3 -m unittest test_check_doc_drift
-
-      - name: test_check_nmi_wram_race
-        # Parser logic (call-graph + callback detection + closure) of the
-        # NMI→$2180-$2183 lint that runs per-example in make/common.mk.
-        run: python3 devtools/test_check_nmi_wram_race.py
-
-      - name: test_symmap
-        # Pins the WRAM-overlap detector's verdict against committed .sym
-        # fixtures (a broken one must fail, a clean one must pass).
-        run: python3 devtools/symmap/test_symmap.py
-
-      - name: test_check_vram_layout
-        working-directory: devtools
-        run: python3 -m unittest test_check_vram_layout
-
-      - name: test_harness
-        # The luna harness's own decisions: liveness (two snapshots), frame
-        # points, the `luna profile --budget` line, manifest input merging.
-        # A bug there passes or fails the whole corpus wrongly.
-        working-directory: tools/luna-test
-        run: python3 -m unittest test_harness
-
-      - name: test_asset_budget
-        # Script-style runner (its own main, not unittest). Was orphaned (no
-        # Makefile target, no workflow) until 2026-09-11.
-        run: python3 devtools/test_asset_budget.py
+      - name: make test-devtools
+        # The six unit tests of the sentinels and of the luna harness
+        # (devtools/test_*.py, symmap/test_symmap.py, testing/test_harness.py),
+        # through the same target `make lint` runs locally, so the two
+        # cannot drift (2026-10-05).
+        run: make test-devtools
 
   tools-golden:
     name: Asset-tool golden outputs (make test-tools)

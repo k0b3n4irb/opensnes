@@ -80,8 +80,8 @@ in VRAM, compared to 32 bytes for a 4bpp tile.
 
 ### Tilemap Palette Bits
 
-Each tilemap entry (2 bytes) encodes a palette number in bits 12-10. The `gfx4snes`
-converter bakes this in automatically, so the palette slot passed to `bgInitTileSet()`
+Each tilemap entry (2 bytes) encodes a palette number in bits 12-10. The `opensnes-tileset`
+converter bakes this in automatically (the `palette-entry` setting), so the palette slot passed to `bgInitTileSet()`
 must match what the map data expects. A mismatch means tiles display with the wrong
 colors.
 
@@ -101,7 +101,7 @@ colors.
 | File | Purpose |
 |------|---------|
 | `main.c` | BG setup, Mode 1 + BG3 priority configuration |
-| `data.asm` | Three sets of tile/palette/tilemap data via `.INCBIN` |
+| `res/BG{1,2,3}.png.toml` | the import settings of the three pictures (`opensnes-tileset`: palette bank 2 and 4 for BG1 and BG2, the priority bit on BG3); the build converts them and links the result, `res/BGn.inc` declares the `BgAsset`s |
 | `res/` | Source PNGs for BG1, BG2, BG3 |
 | `Makefile` | `LIB_MODULES := console sprite dma background` |
 

@@ -1,5 +1,9 @@
 # HDMA Tutorial {#tutorial_hdma}
 
+![hdma example](gradient_colors.png)
+
+*`examples/hdma/gradient_colors`: a COLDATA gradient written by HDMA, one colour step per scanline band.*
+
 This tutorial covers SNES HDMA (Horizontal-blanking DMA): what it is, when
 to reach for it, the four registers per channel, the eight transfer modes,
 and the per-scanline patterns the six shipped examples exercise. It
@@ -56,13 +60,16 @@ The lib hides those four register writes behind two helpers:
 
 - **`hdmaSetup(channel, mode, destReg, table)`** — for any table, RAM or
   const, in any bank: the bank is read from the table pointer.
-- `hdmaSetupBank(…, table, bank)` is deprecated — it predates far pointers.
+- `hdmaSetupBank`, the explicit-bank form, was removed on 2026-10-05 — it predated far pointers.
 
-…and a separate enable/disable pair:
+…and the enable/disable calls:
 
-- **`hdmaEnableMask(channelMask)`** — set bits in `$420C` for the channels you
-  want to run.
-- **`hdmaDisableMask(channelMask)`** — clear those bits.
+- **`hdmaEnable(channel)`** / **`hdmaDisable(channel)`** — one channel by
+  number, 0-7, like every other call of the header. A value above 7 is
+  refused: it is a 0.x bit mask left behind (until 0.48 these two names took
+  the mask).
+- **`hdmaEnableMask(channelMask)`** / **`hdmaDisableMask(channelMask)`** —
+  several channels at once: set or clear their bits in `$420C`.
 
 ## Transfer modes
 
@@ -254,9 +261,10 @@ enable** — without `hdmaEnableMask(0x0F)` you get a static 1:1 view that can
 look convincingly like a broken perspective. Check `dma.hdmaen` in luna's
 typed state when an HDMA effect "does nothing".
 
-### Two channels, one visual — `examples/color/gradient_9bit`
+### Two channels, one visual — the "9-bit" backdrop
 
-Channel 0 rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
+krom's RedSpace9BitHDMA trick, described in `examples/hdma/gradient_colors`'s
+README: channel 0 rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
 CGADD: `[addr16][data16]`), channel 1 rewrites INIDISP brightness per
 line. Colour x brightness plus per-line jitter dithers the gradient into
 more perceptual steps than the PPU's 5 bits — and INIDISP is owned by the
@@ -353,11 +361,11 @@ This is enforced by convention, not by code. The lib's documentation
 
 `hdmaSetup` used to hardcode bank `$00` for its table, so a `static const`
 table that the linker placed elsewhere was read from the wrong bank, and
-`hdmaSetupBank(…, bank)` existed to pass the right one by hand. Since
+`hdmaSetupBank` existed to pass the right one by hand (removed 2026-10-05). Since
 pointers became far pointers (A6) `hdmaSetup` reads the bank byte of the
 table pointer itself: a const table works from any bank — which is where
 const data lives by default since v0.41.0 — and so does a RAM table, on
-LoROM and on HiROM. `hdmaSetupBank` is **deprecated** (2026-09-20): it
+LoROM and on HiROM. `hdmaSetupBank` is **removed** (2026-10-05, deprecated since 2026-09-20): it
 carries two banks and the explicit one wins. Use `hdmaSetup`.
 
 ### 🟡 Repeat-mode discipline matters

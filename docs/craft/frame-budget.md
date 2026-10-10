@@ -71,6 +71,28 @@ The 65816 runs at 3.58 MHz (FastROM) or 2.68 MHz (slow), so a frame is only so
 many thousand cycles. When logic outgrows it, in rough order of reach-for:
 
 - **FastROM** — a near-free ~33% speedup for ROM-bound code (a build flag).
+- **In a loop that runs for every entity, compute in 16 bits.** What
+  costs with an 8-bit type is arithmetic and comparison (the accumulator's
+  width is switched and the result masked each time) and `s8` (a sign
+  extension on every read) — not the type of the table: reading or writing
+  a `u8` array is no slower than a `u16` one (measured on a real project,
+  issue #166, which first reported the opposite and corrected it). So keep
+  `u8` tables where they save RAM, and read them into `u16` / `s16` locals
+  before computing with them.
+- **Cut the logic into small `static` functions freely.** A `static`
+  function called from one place costs nothing: the compiler puts its body
+  where the call was, loops and tests included, and emits no function. One
+  called from several places stays a call (pushed arguments, `jsl`, `rtl`:
+  some tens of cycles each time) unless it says `static inline`, which
+  copies its body at each call — speed bought with code size, where you
+  decide. The exception the compiler makes on its own: a function that
+  calls nothing, unless it is tiny, is kept apart from a caller that calls
+  other things, because apart it runs faster. Do not expect much from
+  inlining alone: on a real game cut this way the logic gained under 1 %;
+  the time is in the bodies, not in the calls.
+- **A loop the library already has in assembly is not worth writing in C**:
+  placing the sprites of a scrolling game is `oamPlaceWorld()`, copying is
+  `memcpy()`, several small VRAM uploads are the `vramqueue` module.
 - **Do PPU tricks in the PPU, not the CPU.** A per-scanline gradient or wave is
   free via HDMA and ruinous in a CPU loop — see the @ref examples_hdma_hdma_helpers
   family. Per-column effects go through offset-per-tile (@ref
@@ -89,6 +111,20 @@ beloved SNES games drop to 30 fps in their busiest moments on purpose, and
 designing *for* 30 fps buys you double the CPU and DMA per update. Decide your
 target framerate up front and budget to it, rather than discovering it in the
 explosion that fills the screen.
+
+A lag frame is also **never shown half done**. When the main loop has not
+reached `WaitForVBlank()` by the time VBlank arrives, the NMI handler does
+none of its work for that frame: the sprite buffer is not sent to OAM, the
+tilemap buffer is not uploaded, the scroll set with `bgSetScroll()` is not
+written to the PPU, the pads are not read and the callback set with
+`nmiSet()` is not called; only `frame_count` advances. The screen keeps
+the previous frame, whole, until the frame being computed is finished. So
+a 30 Hz game does not need a "logic frame, display frame" alternation:
+compute the whole tick straight through, call `WaitForVBlank()` once at
+its end, and a heavy tick simply spills into the next frame (the layout a
+real project settled on, issue #166). What this does not cover is anything
+written to the PPU directly, outside those buffers: a register poked in
+the middle of a long computation is visible at once.
 
 ## The one rule
 

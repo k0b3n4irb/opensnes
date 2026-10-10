@@ -4,10 +4,10 @@
 # (at least 3 lda between @if_join and the back edge); the backreferences
 # also pin that the moves read the slots the branches wrote.
 # The back edge moves sp, pos and both words of st: four load/store pairs.
-in writestring: present @if_join\.\d+:\n[\s\S]*?(\tlda \d+,s\n\tsta \d+,s\n){4}\tjmp @while_cond
+in writestring: present @if_join\.\d+:\n[\s\S]*?(\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n){4}\tjmp @while_cond
 # The '\n' branch writes sp+32 into both phi slots (pos = sp)...
-in writestring: present adc\.w #32\n\tsta \d+,s\n\tsta (\d+),s\n\tsta (\d+),s\n@if_join\.\d+:[\s\S]*?\tlda \1,s\n\tsta \d+,s\n\tlda \2,s\n\tsta \d+,s
+in writestring: present adc\.w #32\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n@if_join\.\d+:[\s\S]*?\tlda(?: |\.b tcc__lf\+)\1(?:,s)?\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: |\.b tcc__lf\+)\2(?:,s)?\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)
 # ...the other branch writes them with a load each, not A reused.
-in writestring: present \tlda \d+,s\n\tsta \d+,s\n\tlda \d+,s\n\tsta \d+,s\n\tjmp @if_join
+in writestring: present \tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tjmp @if_join
 # st is a 4-byte far pointer: *st reads through [tcc__r9] with its bank.
-in writestring: present sta\.b tcc__r9\n\tlda \d+,s\n\tsta\.b tcc__r9\+2\n\tsep #\$20\n\tlda \[tcc__r9\]
+in writestring: present sta\.b tcc__r9\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta\.b tcc__r9\+2\n\tsep #\$20\n\tlda \[tcc__r9\]

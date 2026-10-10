@@ -95,7 +95,7 @@ const s16 math_sine_table[256] = {
  * ref_is_high_zero does not mark, so the shortcut it describes is not
  * taken; whether cproc's IR changed or the 2026-09-13 sign-extension work
  * closed it, the observable is what counts and it is now pinned in two
- * places: devtools/libtests computes `(u32)(s32)fixSin(192) << 8` in C and
+ * places: testing/fixtures/libtests computes `(u32)(s32)fixSin(192) << 8` in C and
  * asserts it equals fix32Sin(192), and c_features asserts the
  * widen-then-shift case on its own. Do not re-derive this from the prose
  * above — run the fixtures. */

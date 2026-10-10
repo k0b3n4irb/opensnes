@@ -190,7 +190,10 @@ filed from exactly that pain). luna v1.18.0 ships `--until-frame N` on
   and the probe manifests (`at_frame`) were frame-indexed already;
   `probes/lib.py` still ends runs at a generous `-n` after its last input
   checkpoint — unchanged, its reads are directional, not phase-sensitive.
-- **User projects stay on instruction counts.** `project_test.py` and the
+- **User projects stay on instruction counts.** *(Superseded 2026-10-05: a
+  project's `make test` is `luna test` on native manifests — `frames`,
+  `input`, `[[checkpoint]]` — and `project_test.py` is deleted.)*
+  `project_test.py` and the
   scaffold's `test/manifest.toml` keep `default_steps` / `steps` (the
   documented contract in GETTING_STARTED): their input-driven tests need
   `luna state -n … --input`, and `--input` is not applied under

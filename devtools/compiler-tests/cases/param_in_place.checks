@@ -1,0 +1,13 @@
+# no copy of n into the frame
+in fib: absent lda \d+,s\n\tsta \d+,s\n@body
+in fib: present @body\.\d+:\n\tlda \d+,s\n\tcmp\.w #2
+# no frame, parameters at 8 / 6 / 4
+in set3: absent tas
+in set3: present lda 8,s\n\tsta\.w w\n\tlda 6,s\n\tsta\.w v
+in set3: present lda 4,s\n\tsta\.w u
+# one load of the 16-bit operand, kept in tcc__r0 for the high half
+in scale: present sta\.b tcc__r0\n\tasl a
+in scale: present lda\.b tcc__r0\n\txba
+# the returned value is not stored before the return, in a function with calls
+in fib: present adc \d+,s\n\tplx\n\tplx\n\trtl
+in fib: absent adc \d+,s\n\tsta

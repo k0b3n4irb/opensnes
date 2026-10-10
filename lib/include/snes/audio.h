@@ -63,6 +63,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): audioUpdate.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * Constants
  *============================================================================*/
@@ -217,15 +220,6 @@ u8 audioInit(void);
  * @return Non-zero if the driver answered audioInit()'s ping, 0 otherwise
  */
 u8 audioIsReady(void);
-
-/**
- * @brief Kept for source compatibility; does nothing.
- *
- * The audio engine is command-driven: every call talks to the SPC700
- * directly, so there is no queue to pump. Calling it is harmless.
- */
-OPENSNES_DEPRECATED("it does nothing — remove the call")
-void audioUpdate(void);
 
 /** @} */
 

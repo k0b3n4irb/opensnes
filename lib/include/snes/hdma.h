@@ -57,7 +57,7 @@
  *
  * // Set up HDMA channel 6 to write to fixed color register
  * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, 0x32, gradient_table);
- * hdmaEnableMask(1 << HDMA_CHANNEL_6);   // a MASK, not a channel number
+ * hdmaEnable(HDMA_CHANNEL_6);            // one channel; hdmaEnableMask() takes a mask
  *
  * // In main loop, HDMA runs automatically each frame
  * @endcode
@@ -75,9 +75,9 @@
  * The table pointer is a 4-byte far pointer (chantier A6, v0.19.0):
  * hdmaSetup() programs the channel's source bank from the pointer's bank
  * byte, so a table in any ROM bank (the asset banks, where C const data
- * lives since #127.3) or in bank $7E RAM works as is. hdmaSetupBank()
- * remains for a bank chosen by hand: a table assembled outside C, or an
- * address computed at runtime.
+ * lives since #127.3) or in bank $7E RAM works as is. A table assembled
+ * outside C is a far pointer too (its label carries the bank); the
+ * explicit-bank form of 0.x was removed on 2026-10-05.
  *
  * ## Which mode for which register
  *
@@ -109,6 +109,9 @@
 #define OPENSNES_HDMA_H
 
 #include <snes/types.h>
+
+/* Removed on 2026-10-05 (1.0 plan, lot C): hdmaSetupBank.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
 
 /*============================================================================
  * HDMA Channel Definitions
@@ -271,27 +274,6 @@
 void hdmaSetup(u8 channel, u8 mode, u8 destReg, const void *table);
 
 /**
- * @brief Set up an HDMA channel with explicit source bank byte.
- *
- * Same as hdmaSetup() but with the source bank given explicitly instead of
- * taken from the pointer. hdmaSetup() already follows the pointer's bank
- * byte (chantier A6), so this form is for tables addressed by a 16-bit
- * offset you pair with a bank yourself (assembled outside C, computed).
- *
- * @param channel  HDMA channel (0-7, use HDMA_CHANNEL_6 or lower — 7 belongs to the NMI OAM DMA)
- * @param mode     Transfer mode (HDMA_MODE_*)
- * @param destReg  Destination B-bus register (low byte of $21xx address)
- * @param table    Pointer to HDMA table in ROM or RAM
- * @param bank     Source bank byte ($00-$3F for LoROM)
- *
- * @deprecated Since 2026-09-20: use hdmaSetup(), which reads the bank of
- *             @p table. This variant carries two banks and the explicit one
- *             wins. Removed at the next major version.
- */
-OPENSNES_DEPRECATED("hdmaSetup() takes the bank from the table pointer")
-void hdmaSetupBank(u8 channel, u8 mode, u8 destReg, const void *table, u8 bank);
-
-/**
  * @brief Configure an INDIRECT HDMA channel (table of pointers to data)
  *
  * Table entries are [count][ptr_lo][ptr_hi]: each 16-bit pointer
@@ -324,7 +306,8 @@ void hdmaSetupIndirect(u8 channel, u8 mode, u8 destReg, const void *table,
  * (anomie-regs, "DMA and HDMA"). snesdev-wiki advises writing HDMAEN during
  * VBlank while the screen is on; an effect enabled mid-frame shows from
  * the next line. The one pair of this header that takes a mask where every
- * other function takes a channel number: the name says so.
+ * other function takes a channel number: the name says so. For a single
+ * channel, hdmaEnable(channel) is the same write.
  *
  * @param channelMask Bitmask of channels to enable (1 << channel)
  *
@@ -345,17 +328,34 @@ void hdmaEnableMask(u8 channelMask);
 void hdmaDisableMask(u8 channelMask);
 
 /**
- * @brief The pre-2026-10-03 name of hdmaEnableMask(). Takes a MASK.
+ * @brief Enable one HDMA channel, given by number
  *
- * Deprecated so that the name can come back at 1.0 taking a channel number,
- * like the rest of this header. Until then it is the same function.
+ * The same as hdmaEnableMask(1 << channel): the channel runs from the next
+ * HBlank, the others are left as they are. A value above 7 is refused and
+ * nothing changes — the 0.x form of this call took a bit mask, so a call
+ * left as hdmaEnable(1 << HDMA_CHANNEL_6) fails visibly instead of
+ * enabling channel 64. (Since 0.49, 2026-10-05; a mask of 1, 2 or 4
+ * left behind is the one case this check cannot see — `make check-upgrade`
+ * lists every call to re-read.)
+ *
+ * @param channel HDMA channel 0-7 (HDMA_CHANNEL_0 … HDMA_CHANNEL_7)
+ *
+ * @code
+ * hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_1REG, HDMA_DEST_COLDATA, gradient_table);
+ * hdmaEnable(HDMA_CHANNEL_6);
+ * @endcode
  */
-OPENSNES_DEPRECATED("use hdmaEnableMask() — at 1.0 hdmaEnable() will take a channel number")
-void hdmaEnable(u8 channelMask);
+void hdmaEnable(u8 channel);
 
-/** @brief The pre-2026-10-03 name of hdmaDisableMask(). Takes a MASK. */
-OPENSNES_DEPRECATED("use hdmaDisableMask() — at 1.0 hdmaDisable() will take a channel number")
-void hdmaDisable(u8 channelMask);
+/**
+ * @brief Disable one HDMA channel, given by number
+ *
+ * The same as hdmaDisableMask(1 << channel). A value above 7 is refused and
+ * nothing changes (see hdmaEnable()).
+ *
+ * @param channel HDMA channel 0-7
+ */
+void hdmaDisable(u8 channel);
 
 /**
  * @brief Disable all HDMA channels

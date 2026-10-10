@@ -1,0 +1,25 @@
+# Migrated from probes/map_scroll.py.
+rom = "../../examples/maps/map_scroll/map_scroll.sfc"
+frames = 180
+[[checkpoint]]
+at_frame = 60
+[checkpoint.values]
+xloc = { eq = 128, width = 2 }
+[[checkpoint]]
+at_frame = 120
+input = "60:0x0100,119:0"
+[checkpoint.delta]
+xloc = "increased"
+[checkpoint.values]
+xloc = { eq = 187, width = 2 }
+[[checkpoint]]
+at_frame = 180
+input = "120:0x0200,179:0"
+[checkpoint.delta]
+xloc = "decreased"
+[checkpoint.values]
+xloc = { eq = 128, width = 2 }
+# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
+# xloc is the camera's map x: 128 at boot, +59 after 59 frames of RIGHT, back to 128 after as many of LEFT.
+[asserts]
+fbhash = "eb140a6483caf147"

@@ -3,13 +3,13 @@
 # slot, and the six slots must differ; the historical bug mixed them up
 # (ported from opensnes-emu test_ssa_phi_locals, which counted constants
 # and unique slots; the backreferences make the pairing itself the check).
-in test_many_locals: present lda\.w #1\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #10\n\tsta \1,s
-in test_many_locals: present lda\.w #2\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #20\n\tsta \1,s
-in test_many_locals: present lda\.w #3\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #30\n\tsta \1,s
-in test_many_locals: present lda\.w #4\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #40\n\tsta \1,s
-in test_many_locals: present lda\.w #5\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #50\n\tsta \1,s
-in test_many_locals: present lda\.w #6\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #60\n\tsta \1,s
+in test_many_locals: present lda\.w #1\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #10\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?
+in test_many_locals: present lda\.w #2\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #20\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?
+in test_many_locals: present lda\.w #3\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #30\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?
+in test_many_locals: present lda\.w #4\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #40\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?
+in test_many_locals: present lda\.w #5\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #50\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?
+in test_many_locals: present lda\.w #6\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda\.w #60\n\tsta(?: |\.b tcc__lf\+)\1(?:,s)?
 # The six taken values are stored to six different slots.
-in test_many_locals: present lda\.w #10\n\tsta (\d+),s[\s\S]*?lda\.w #20\n\tsta (?!\1,s)(\d+),s[\s\S]*?lda\.w #30\n\tsta (?!\1,s)(?!\2,s)(\d+),s[\s\S]*?lda\.w #40\n\tsta (?!\1,s)(?!\2,s)(?!\3,s)(\d+),s[\s\S]*?lda\.w #50\n\tsta (?!\1,s)(?!\2,s)(?!\3,s)(?!\4,s)(\d+),s[\s\S]*?lda\.w #60\n\tsta (?!\1,s)(?!\2,s)(?!\3,s)(?!\4,s)(?!\5,s)(\d+),s
+in test_many_locals: present lda\.w #10\n\tsta(?: |\.b tcc__lf\+)(\d+)(?:,s)?\n[\s\S]*?lda\.w #20\n\tsta(?: |\.b tcc__lf\+)(?!\1(?:,s)?\n)(\d+)(?:,s)?\n[\s\S]*?lda\.w #30\n\tsta(?: |\.b tcc__lf\+)(?!\1(?:,s)?\n)(?!\2(?:,s)?\n)(\d+)(?:,s)?\n[\s\S]*?lda\.w #40\n\tsta(?: |\.b tcc__lf\+)(?!\1(?:,s)?\n)(?!\2(?:,s)?\n)(?!\3(?:,s)?\n)(\d+)(?:,s)?\n[\s\S]*?lda\.w #50\n\tsta(?: |\.b tcc__lf\+)(?!\1(?:,s)?\n)(?!\2(?:,s)?\n)(?!\3(?:,s)?\n)(?!\4(?:,s)?\n)(\d+)(?:,s)?\n[\s\S]*?lda\.w #60\n\tsta(?: |\.b tcc__lf\+)(?!\1(?:,s)?\n)(?!\2(?:,s)?\n)(?!\3(?:,s)?\n)(?!\4(?:,s)?\n)(?!\5(?:,s)?\n)(\d+)(?:,s)?\n
 # The return sums the six phi slots: one load and five adds.
-in test_many_locals: present lda \d+,s(\n\tclc\n\tadc \d+,s){5}\n\ttax
+in test_many_locals: present lda(?: \d+,s|\.b tcc__lf\+\d+)(\n\tclc\n\tadc(?: \d+,s|\.b tcc__lf\+\d+)){5}\n\t(?:tax|rtl)

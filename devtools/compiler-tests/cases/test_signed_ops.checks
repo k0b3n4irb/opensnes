@@ -4,7 +4,7 @@
 # form is used instead.
 in extend_signed_byte: present lda 4,s\n\tand\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00\n\+\n\trtl
 # a < b on s16: a - b, overflow-corrected sign, a at 6,s and b at 4,s.
-in signed_compare: present lda 6,s\n\tsec\n\tsbc 4,s\n\tbvc @scmp\.\d+\n\teor\.w #\$8000\n@scmp\.\d+:\n\tbpl \+
+in signed_compare: present lda 6,s\n\tsec\n\tsbc 4,s\n\tbvc @scmp\.\d+\n\teor\.w #\$8000\n@scmp\.\d+:\n\tbmi @
 in signed_compare: absent \bbc[cs]\b
 in signed_divide: present lda 6,s\n\tsta\.b tcc__r0\n\tlda 4,s\n\tsta\.b tcc__r1\n\tjsl __sdiv16
 in signed_divide: absent __div16
@@ -14,4 +14,4 @@ in signed_shift_right: absent lsr
 # -100 - 50 = -150 = 0xFF6A.
 in use_negative_literal: present lda\.w #65386\n\trtl
 # s8 + u8: the s8 sign-extended, the u8 zero-extended.
-in mixed_ops: present lda 18,s\n\tand\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00\n\+\n\tsta 10,s\n\tlda 16,s\n\tand\.w #\$00FF\n\tclc\n\tadc 10,s
+in mixed_ops: present lda(?: \d+,s|\.b tcc__lf\+\d+)\n\tand\.w #\$00FF\n\tcmp\.w #\$0080\n\tbcc \+\n\tora\.w #\$FF00\n\+\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tand\.w #\$00FF\n\tclc\n\tadc(?: \d+,s|\.b tcc__lf\+\d+)

@@ -55,4 +55,4 @@ After regenerating assets, run `make clean && make`.
 - The PVSnesLib porting workflow (`memory/pvsneslib_porting.md`) — the
   "compare binary assets EARLY" step often surfaces this as the cause
   when ported visuals diverge.
-- `tools/gfx4snes/` (the C tool, separate from `devtools/font2snes/`).
+- `tools/gfx4snes/` (the C tool).

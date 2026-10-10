@@ -1,3 +1,6 @@
+# Since 2026-10-10 a temporary that no call crosses lives in the direct page
+# even in a function that calls (see dp_temps); the case pins the indirect call's sequence with the pointer in a stack slot.
+env QBE_NO_DP_TEMPS=1
 # Pointers are 4 bytes (offset + bank word): storing an address writes both
 # halves, a dereference of a known address folds to that address, and an
 # indirect call pushes a JSL-shaped return frame. No original check existed

@@ -160,8 +160,32 @@ void textPutChar(char c) {
 }
 
 void textPrint(const char *str) {
-    while (*str) {
-        textPutChar(*str++);
+    /* A run of printable characters that stays on its row is written here,
+     * with the buffer position computed once; a newline, a carriage return,
+     * a character the font does not have and the last column (which wraps)
+     * go through textPutChar(). Until 2026-10-09 every character did: three
+     * calls and a multiply each. The map is 32 columns wide (text.h). */
+    u16 attr = ((u16)text_config.palette << 10) | ((u16)text_config.priority << 13);
+    u16 font = text_config.font_tile - 32;
+    u16 *cell;
+    u8 x;
+    u8 c = (u8)*str;
+
+    while (c) {
+        x = text_cursor_x;
+        if (c < 32 || c > 127 || x >= 31) {
+            textPutChar((char)c);
+            c = (u8)*++str;
+            continue;
+        }
+        cell = (u16 *)(tilemapBuffer + ((((u16)text_cursor_y << 5) + x) << 1));
+        do {
+            *cell++ = (font + c) | attr;
+            x++;
+            c = (u8)*++str;
+        } while (c >= 32 && c <= 127 && x < 31);
+        text_cursor_x = x;
+        tilemap_update_flag = 1;
     }
 }
 

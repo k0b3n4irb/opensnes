@@ -1,0 +1,13 @@
+# SA-1 power cycle, first half (luna v1.29.0 writes SA-1 BW-RAM to srm_out;
+# until then the .srm of an SA-1 cart was 0 bytes). A fresh cart: the
+# fixture finds zeros at power-on (r_boot), then leaves C1 D2 E3 F4 ... in
+# BW-RAM, which luna saves as the battery file e_ reads back. This leg is
+# also e_'s negative control: without a loaded .srm, r_boot is zero.
+rom = "../fixtures/libtests_sa1_sram/libtest_sa1_sram.sfc"
+steps = 1500000
+srm_out = "sa1_bwram.srm"
+[asserts.values]
+r_done = 0xBEEF
+[asserts.blocks]
+r_boot = "00000000"
+"40:0000" = "C1D2E3F4"

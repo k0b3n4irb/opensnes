@@ -86,22 +86,30 @@ HiROM: every HiROM unit carries `.BASE $C0` so a datum at offset $0000 of
 a high bank is addressed in the full 64 KB view (`$Cn:0000`); the wlalink
 fork keeps that base off RAMSECTION labels.
 
-**What the ratchet still guards:** bank $00 free space. `make/common.mk`
-runs `devtools/symmap/symmap.py --check-bank0-overflow` after every link:
-free space below `BANK0_FAIL_THRESHOLD` fails the build, below 2 KB
-prints a soft warning, and every link prints how much declared payload
-sits in bank $00. Set `SKIP_BANK0_CHECK=1` to bypass for debugging. Corpus
-minimum at the flip: 2168 bytes (was 12).
+**When bank $00 is full, code goes to the next banks by itself.** A C
+function and a library routine are `SUPERFREE` sections reached by `jsl`,
+with function pointers that carry their bank: the linker places in bank
+$01 and up what bank $00 cannot hold, and nothing in the code is tied to
+its bank (a `switch` is a chain of compares, const tables are read far,
+plain RAM is read through the data bank). The link report says how much
+code is there. Until 2026-10-10 the build refused instead: a ratchet from
+the time C const data lived in bank $00 failed the link under 1024 free
+bytes, on a ROM that worked (issue #168; `BANK0_FAIL_THRESHOLD`, now 0 by
+default, is kept for a project that wants its code bank watched).
+`make test-bank-spill` rebuilds four examples with bank $00 given no room
+and compares them frame for frame with the normal build. What cannot move
+is what is pinned (`BANK 0`): the startup code, the interrupt handlers, a
+hand-written section that says so — if those do not fit, the linker fails.
 
-If bank $00 still runs out (code plus hand-written asm payload):
+To keep bank $00 for what must be there:
 - Declare `.incbin` / `.db` payload with `ASSET_SECTION` (`templates/assets.inc`)
   instead of a bank-$00 `.SECTION` — it takes the same asset banks the
   compiler uses.
 - Payload handed to the lib needs no bank of its own: every `dmaCopy*`
-  helper reads the bank from the far pointer. For a bank computed at
-  runtime, `dmaTransfer(channel, mode, srcBank, srcAddr, destReg, size)`
-  takes it as a parameter. (Deprecated since 2026-09-20:
-  `dmaCopyVramBank` / `dmaCopyCGramBank`.)
+  helper and `dmaTransfer()` read the bank from the far pointer. The 0.x
+  forms `dmaCopyVramBank` / `dmaCopyCGramBank` were removed on 2026-10-05,
+  with the six-argument `dmaTransfer`; a bank computed at runtime is a
+  pointer built from it, `(const u8 *)((u32)bank << 16 | addr)`.
 - Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
   bank-$00 sections.
 
@@ -121,7 +129,7 @@ is `y - 1` — the NMI shadow sync (`bgSetScroll`/`bgSetScrollY`), the map
 module, `mode7SetScroll`, and the reset default — so `y = 0` means "tilemap
 row 0 on the first picture line". **Test:** the lib fixture reads
 `bgs.1.v_scroll == 76` after `bgSetScrollY(1, 77)` on luna's PPU view
-(`devtools/libtests/test_libtest.py`), and the `backgrounds_mode6*.toml`
+(`testing/fixtures/libtests/test_libtest.py`), and the `backgrounds_mode6*.toml`
 manifests pin the one exception (BG3 as the offset-per-tile table, written
 raw). PVSnesLib writes the raw value; when
 porting, do not subtract 1 yourself. The one path the lib cannot cover is
@@ -306,7 +314,7 @@ register `$002229` (twice: early init ~`:519-526`, and the SA-1 boot block
 [Super Famicom Dev Wiki](https://wiki.superfamicom.org/sa-1-registers) says
 bit=1 *protects* a page. **Resolved 2026-09-02: the wiki page is wrong** and
 `$FF` (bit=1 = write-enable) is correct, on four independent grounds
-(**test:** the SA-1 fixture `devtools/libtests_sa1_sram` reads back a byte the
+(**test:** the SA-1 fixture `testing/fixtures/libtests_sa1_sram` reads back a byte the
 SA-1 wrote to BW-RAM from its boot stub, `r_sa1_bw == 0x5A`, and
 `sa1_hello` / `sa1_starfield` run in every coverage pass):
 
@@ -363,6 +371,9 @@ Scope while it is (the devices are mutually exclusive).
 Nothing ever sets `snes_mplay5`. There is no detection routine, and `input.h`
 exposes no function to enable it, so the flag stays 0 for the life of every
 ROM and the routine never executes. Pads 3, 4 and 5 are unreachable today.
+Since 2026-10-09 the routine is not even linked unless something names it:
+the handler calls it through the pointer `mplay5_reader`, which whoever sets
+`snes_mplay5` must set to `ScanMPlay5` first.
 
 **Mitigation:** none — write for two players. Closing this needs three things
 together: a detection routine (the protocol is on the SNES Development Wiki),
@@ -424,7 +435,11 @@ culprit files 100x monthly and fails on any segfault. Full investigation log:
 
 **Sizes** (since 2026-05-08):
 `sizeof(int) == 2`, `sizeof(unsigned int) == 2`, `sizeof(long) == 4`,
-`sizeof(unsigned long) == 4`. `long long` stays at 8 per C99. These match the
+`sizeof(unsigned long) == 4`. `long long` stays at 8 per C99 but has no
+arithmetic: a `long long` (or a `float` / `double`) computed at run time is
+refused by the compiler since 2026-10-08 — it used to compile to 32-bit (16-bit
+for floats) integer code, silently. Constants the compiler folds are fine
+(`-2147483648`, `(int)(1.5 * 256)`). These match the
 canonical SNES expectation: `int` is the native 16-bit word, `long` is 32 bits.
 **Test:** `devtools/compiler-tests/cases/type_sizes.c` pins every size with a
 `_Static_assert` (since 2026-10-05); the `long` semantics are the
@@ -482,7 +497,7 @@ caller reads both back. `compiler/ABI.md` ("32-bit values") documents the
 convention for hand-written asm. This entry said "not fixed" until
 2026-09-26, four months after the fix.
 
-**Pinned by:** `devtools/libtests` asserts all 32 bits of `fix32Sin`, an asm
+**Pinned by:** `testing/fixtures/libtests` asserts all 32 bits of `fix32Sin`, an asm
 callee using the convention. No runtime fixture yet calls a *C* function
 returning `u32` and consumes the full value (tracked in the 2026-09-26
 état des lieux).
@@ -533,8 +548,8 @@ upstream driver (snes-rag) then measuring ours on luna:
 at H=274 and cleared at H=1 on every line; anomie-timing, fullsnes): no
 latch, no counter read, and a real five-line budget. A command that does not
 fit is dropped (the newest). The `cli` is gone; the position is read until
-two reads agree; `snesmodInit()` restores NMITIMEN from the lib's copy. Pinned by `devtools/libtests_snesmod` and
-`tools/luna-test/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
+two reads agree; `snesmodInit()` restores NMITIMEN from the lib's copy. Pinned by `testing/fixtures/libtests_snesmod` and
+`testing/manifests/libtest_snesmod.toml` (latch flag 0, 5 to 7 lines,
 queue depth 255 after 100 sends, queue drained). Visible change: with
 several commands queued `snesmodProcess()` now really waits up to five
 scanlines, and commands reach the driver sooner (four commands in two frames
@@ -556,7 +571,7 @@ frames onto a manifest's.
 **Fix:** the instruction that followed the second write now sits between
 the two (same bytes, same size; the gap is 65 cycles, over one poll).
 0 stuck voices in 161 × 2 × 2 runs (pause and stop, both luna versions).
-Pinned by `tools/luna-test/manifests/audio_snesmod_music_{pause,stop}.toml`.
+Pinned by `testing/manifests/audio_snesmod_music_{pause,stop}.toml`.
 
 ### 🟢 `padIsConnected()` answered 1 for an empty port (fixed 2026-09-26)
 
@@ -565,7 +580,7 @@ not tell them apart. The NMI handler now reads one serial bit past the 16 of
 auto-read on each port whose signature is a pad's: a joypad returns 1s
 there (anomie's register doc). What an *empty* port returns is stated by no
 reference — luna, ares and Mesen2 return 0 — and has not been measured on
-a console: no example displays it yet, so the protocol has no row for it. Pinned by `devtools/libtests`
+a console: no example displays it yet, so the protocol has no row for it. Pinned by `testing/fixtures/libtests`
 with luna's `--port1 none --port2 none` (both read 0; both read 1 with pads).
 ### 🟢 Super FX: `gsuDmaFullFrame()` wrote a third of the framebuffer on visible lines (fixed 2026-09-29)
 
@@ -592,7 +607,7 @@ only on a line from which the frame lands whole — 225 - bottom to 152 + top,
 lines 185-192 with the usual 40 + 40 — or waits for the next frame, and
 `gsuSetupHdmaBlanking()` returns once its bands are on screen.
 `superfx_3d` shows about 30 whole frames per second where it showed 53
-partly lost ones. Pinned by `tools/luna-test/vram_dma_blank.py`, which since
+partly lost ones. Pinned by `testing/vram_dma_blank.py`, which since
 the same day holds every example to luna's `[asserts.dma] unsafe_writes = 0`.
 Code of your own that polls the V counter should read `$213F`, then `$2137`,
 then `$213D` twice, every time.
@@ -616,7 +631,7 @@ touches `$4200`. Since 2026-09-26 the IRQ vector takes the same route: its
 during a job ran garbage (measured with the old stub: CPU lost, 5446 GSU bus
 violations); now a WRAM handler acknowledges it (and a GSU IRQ) during the
 job, and the game's handler runs again after it. BRK and COP land on a WRAM
-`rti`. Pinned by `tools/luna-test/manifests/coproc_superfx_nmi.toml`
+`rti`. Pinned by `testing/manifests/coproc_superfx_nmi.toml`
 (frame count, IRQs counted by superfx_3d, `bus_violations = 0`).
 
 ### 🟢 The HiROM header claimed 256 KB for a 512 KB ROM; ROM size is a knob now (fixed 2026-09-24)
@@ -632,7 +647,7 @@ game needs (`.claude/notes/reviews/2026-09-24_superfx_game_gaps.md`).
 **Test:** since 2026-10-05 `luna_runner.py --coverage` fails any ROM whose
 header size byte covers less than the file (and, with luna's
 `checksum_computed`, whose header sum differs from the bytes); the HiROM
-fixture `devtools/libtests_hirom` is a 512 KB ROM in that pass.
+fixture `testing/fixtures/libtests_hirom` is a 512 KB ROM in that pass.
 
 In the same change the Super FX header gained the extended header it never
 had: sixteen `$FF` bytes and a zero licensee code meant no emulator or
@@ -689,7 +704,7 @@ work RAM when handed a RAM buffer on a HiROM build. LoROM was unaffected
 (`$80:xxxx`, the FastROM case, still mirrors work RAM below `$2000`).
 
 Fixed in the wlalink fork (`compiler/PINS.md`, third local patch). Found by
-the first HiROM library fixture, `devtools/libtests_hirom`: an SRAM save from
+the first HiROM library fixture, `testing/fixtures/libtests_hirom`: an SRAM save from
 a const template worked, the load into a RAM buffer wrote nowhere.
 
 ### 🟢 SRAM used the LoROM address on every build (fixed 2026-09-20)
@@ -701,7 +716,7 @@ addresses the first 8 KB window only. SA-1 + `USE_SRAM=1` was refused at
 build time until 2026-09-26: its save memory is BW-RAM ($40:0000), writable
 from the SNES CPU only once SBWE (`$2226`, fullsnes) is set. crt0 sets it
 now and the module addresses BW-RAM on SA-1 builds (without SBWE the writes
-are dropped — measured on luna). Pinned by `devtools/libtests_sa1_sram`
+are dropped — measured on luna). Pinned by `testing/fixtures/libtests_sa1_sram`
 (bytes read back at `$40:0000`). luna does not yet persist SA-1 BW-RAM to
 `.srm` (reported to luna).
 
@@ -712,12 +727,12 @@ accumulator (`tya / cmp`) and never reloaded the `#$00` it was storing, so
 byte 0 was cleared and bytes 1..n-1 received their own offset (0, 1, 2,
 3, …). `sramSave`/`sramLoad` were right, and no example called
 `sramClear`, so the "delete save" path in the SRAM tutorial shipped
-broken until the lib fixture (`devtools/libtests`, gaps review L2c) did a
+broken until the lib fixture (`testing/fixtures/libtests`, gaps review L2c) did a
 save / clear / load round trip. The loop now compares Y directly
 (`cpy DP_SIZE`) and the fixture asserts the reloaded bytes are all zero.
 
 ### 🟢 Five silent miscompilations found and fixed by the C-feature runtime ROM (2026-09-13)
-`devtools/compiler-tests/runtime/c_features` (gaps review C2) asserts the
+`testing/fixtures/compiler/c_features` (gaps review C2) asserts the
 result of every C feature that had no runtime check before. Its first run
 found five ways cc65816 produced wrong code with no diagnostic; all are
 fixed in the same chantier and the ROM gates `make tests` at 64/64:
@@ -805,8 +820,8 @@ preference, not necessity.
 
 **Since 2026-09-27 the compiler shares stack slots between temps whose
 lives never overlap**, and the helpers this paragraph used to list shrank
-with every other function: `oamSetX` 148 → 28 bytes, the now deprecated `oamDrawMeta`
-142 → 64 and (deprecated too) `oamDrawMetaFlip` 200 → 90, `collideRectEx` 176 → 66,
+with every other function: `oamSetX` 148 → 28 bytes, `oamDrawMeta` (removed from the API
+2026-10-05, now internal) 142 → 64 and `oamDrawMetaFlip` (removed too) 200 → 90, `collideRectEx` 176 → 66,
 `hdmaColorGradient` 162 → 72. Across the examples the median frame went
 from 38 to 16 bytes and no function passes 256 any more (six did, and
 paid for the slower `[tcc__fp],y` addressing).

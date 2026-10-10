@@ -51,6 +51,9 @@
 
 #include <snes/types.h>
 
+/* Removed on 2026-10-05 (1.0 plan, lot C): dmaCopyVramBank, dmaCopyCGramBank.
+ * The replacements are in docs/UPGRADING.md; `make check-upgrade` names them. */
+
 /*============================================================================
  * VRAM Transfers
  *============================================================================*/
@@ -88,31 +91,10 @@
  *
  * @note The bank is taken from @p source's own bank byte, so the data
  *       may live in ANY bank — a SUPERFREE section, a bank you pinned
- *       yourself. dmaCopyVramBank() exists for the case where the
- *       address and the bank are held separately.
+ *       yourself.
  * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void dmaCopyVram(const u8 *source, u16 vramAddr, u16 size);
-
-/**
- * @brief Copy data to VRAM with explicit source bank byte.
- *
- * Same as dmaCopyVram() but allows specifying the ROM bank for data
- * in banks other than $00 (e.g., SUPERFREE sections placed by linker).
- *
- * @param source   Source address (16-bit offset within bank)
- * @param bank     Source bank byte ($00-$3F for LoROM, $00-$7D for HiROM)
- * @param vramAddr VRAM destination word address
- * @param size     Number of bytes to transfer
- *
- * @warning Must be called during VBlank or force blank!
- *
- * @deprecated Since 2026-09-20: a C pointer is a far pointer and
- *             dmaCopyVram() reads its bank. This variant IGNORES the bank of
- *             @p source and uses @p bank. Removed at the next major version.
- */
-OPENSNES_DEPRECATED("dmaCopyVram() takes the bank from the source pointer")
-void dmaCopyVramBank(const u8 *source, u8 bank, u16 vramAddr, u16 size);
 
 /**
  * @brief Load Mode 7 interleaved data to VRAM.
@@ -183,29 +165,9 @@ void dmaClearVRAM(void);
  *          the PPU fetching and the write is rejected.
  *
  * @note The bank comes from @p source's own bank byte: a palette may
- *       live in any bank. dmaCopyCGramBank() exists for the case where
- *       the address and the bank are held separately.
+ *       live in any bank.
  */
 void dmaCopyCGram(const u8 *source, u16 startColor, u16 size);
-
-/**
- * @brief Copy palette data to CGRAM with explicit source bank byte.
- *
- * Same as dmaCopyCGram() but allows specifying the ROM bank for data
- * in banks other than $00 (e.g., SUPERFREE sections placed by linker).
- *
- * @param source     Source address (16-bit offset within bank)
- * @param bank       Source bank byte ($00-$3F for LoROM, $00-$7D for HiROM)
- * @param startColor Starting color index (0-255)
- * @param size       Number of bytes to transfer (2 bytes per color)
- *
- * @warning Must be called during VBlank or force blank!
- *
- * @deprecated Since 2026-09-20: use dmaCopyCGram(), which reads the bank
- *             of @p source. Removed at the next major version.
- */
-OPENSNES_DEPRECATED("dmaCopyCGram() takes the bank from the source pointer")
-void dmaCopyCGramBank(const u8 *source, u8 bank, u16 startColor, u16 size);
 
 /*============================================================================
  * OAM Transfers
@@ -230,18 +192,24 @@ void dmaCopyOam(const u8 *source, u16 size);
 /**
  * @brief Perform generic DMA transfer
  *
- * @param channel DMA channel (0-7)
- * @note The source is passed as a separate bank and 16-bit address — a shape
- *       that predates far pointers. It is slated to become a single
- *       `const u8 *src` at the next major version (API audit 2026-09-20, §3.1);
- *       the split form stays until then.
+ * Programs one channel and starts it at once: use it when no named helper
+ * fits (the WRAM data port, an experimental mode). The source's bank comes
+ * from the far pointer, like every other `dmaCopy*` call — until 0.48 this
+ * function took the bank and the 16-bit address as two arguments (the 1.0
+ * API since 2026-10-05; a six-argument call no longer compiles, see
+ * docs/UPGRADING.md). A channel above 7 is refused.
  *
- * @param mode DMA mode byte
- * @param srcBank Source bank
- * @param srcAddr Source address
- * @param destReg Destination B-bus register
- * @param size Transfer size
+ * @param channel DMA channel (0-7)
+ * @param mode DMA mode byte (DMAP: transfer pattern, direction, fixed source)
+ * @param src Source, in any bank (ROM, bank $7E RAM, FAR data)
+ * @param destReg Destination B-bus register (the low byte of $21xx)
+ * @param size Transfer size in bytes (0 = 65536)
+ *
+ * @code
+ * REG_CGADD = 254;
+ * dmaTransfer(1, 0x00, two_colours, 0x22, 4);   // 2 colours to CGDATA
+ * @endcode
  */
-void dmaTransfer(u8 channel, u8 mode, u8 srcBank, u16 srcAddr, u8 destReg, u16 size);
+void dmaTransfer(u8 channel, u8 mode, const u8 *src, u8 destReg, u16 size);
 
 #endif /* OPENSNES_DMA_H */

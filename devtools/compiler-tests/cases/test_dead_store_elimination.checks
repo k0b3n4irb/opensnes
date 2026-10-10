@@ -3,7 +3,8 @@
 present ; Function: global_increment \(framesize=0,
 in global_increment: present lda\.w g_counter\n\tinc a\n\tsta\.w g_counter\n\trtl
 in global_increment: absent tsa
-# A function with a phi keeps its frame...
-present ; Function: phi_loop \(framesize=[1-9]
+# A function with a phi keeps its frame — in the direct page since
+# 2026-10-09, phi_loop being a leaf (a stack frame before)...
+in phi_loop: present tcc__lf\+\d+
 # ...and the phi args keep their slots: two moves precede the back-edge.
-in phi_loop: present sta \d+,s\n\tlda \d+,s\n\tsta \d+,s\n\tjmp @for_cond
+in phi_loop: present sta(?: \d+,s|\.b tcc__lf\+\d+)\n\tlda(?: \d+,s|\.b tcc__lf\+\d+)\n\tsta(?: \d+,s|\.b tcc__lf\+\d+)\n\tjmp @for_cond

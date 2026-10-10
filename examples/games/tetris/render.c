@@ -3,8 +3,7 @@
 /* Bare-metal HDMA for gradient (avoids hdma module's large iris RAM) */
 
 /* External assets from data.asm */
-extern u8 tiles_gfx[], tiles_gfx_end[];
-extern u8 tiles_pal[], tiles_pal_end[];
+#include "res/tiles.inc"   /* generated: tiles_tiles[], tiles_pal[], each with _end */
 extern u8 font2bpp_gfx[], font2bpp_gfx_end[];
 extern u8 border_pal[], border_pal_end[];
 extern u8 red_pal[], red_pal_end[];
@@ -176,8 +175,8 @@ void renderInit(void) {
     setScreenOff();
 
     /* Upload 4bpp tile graphics (BG1/BG2 shared) */
-    gfx_size = (u16)(u32)(tiles_gfx_end - tiles_gfx);
-    dmaCopyVram(tiles_gfx, VRAM_TILES4, gfx_size);
+    gfx_size = (u16)(u32)(tiles_tiles_end - tiles_tiles);
+    dmaCopyVram(tiles_tiles, VRAM_TILES4, gfx_size);
 
     /* Upload 2bpp font tiles (BG3) */
     font_size = (u16)(u32)(font2bpp_gfx_end - font2bpp_gfx);

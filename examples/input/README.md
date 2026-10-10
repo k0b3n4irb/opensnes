@@ -10,10 +10,12 @@ just read the result.
 | Rung | Example | Developer question |
 |------|---------|--------------------|
 | 4.1 | [controller](controller/) | How do I read a joypad — held vs just-pressed? |
-| 4.2 | [move_sprite](move_sprite/) | How do I drive a sprite with the pad? |
-| 4.3 | [two_players](two_players/) | How do I read two players independently? |
-| 4.4 | [mouse](mouse/) | How do I read the SNES Mouse? |
-| 4.5 | [superscope](superscope/) | How do I read the Super Scope light gun? |
+| 4.2 | [two_players](two_players/) | How do I read two players independently? |
+| 4.3 | [mouse](mouse/) | How do I read the SNES Mouse? |
+| 4.4 | [superscope](superscope/) | How do I read the Super Scope light gun? |
+
+Driving a sprite with the pad is the `starter/` project at the SDK root —
+the same program, with the asset pipeline of 1.x.
 
 ## The idea in one screen
 

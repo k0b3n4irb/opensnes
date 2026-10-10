@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static PPU asset-budget report — VRAM / CGRAM weight of converted graphics.
 
-This is the *build-time, static* twin of `tools/luna-test/budget.py`. Where that
+This is the *build-time, static* twin of `testing/budget.py`. Where that
 one asks luna how much VRAM/CGRAM a running scene actually fills (a runtime
 footprint, a lower bound), this one weighs the **converted asset files on disk**
 before the ROM ever runs — the "budget before you draw" worksheet from

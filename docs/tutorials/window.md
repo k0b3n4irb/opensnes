@@ -1,5 +1,9 @@
 # Window Masking Tutorial {#tutorial_window}
 
+![window example](window.png)
+
+*`examples/windows/window`: two windows clipping the backgrounds, their edges driven by HDMA tables.*
+
 This tutorial covers the SNES window-masking hardware: two configurable
 rectangles that clip individual BG layers, sprites, and the colour-math
 area on a per-pixel basis. The reach of this feature is wider than its

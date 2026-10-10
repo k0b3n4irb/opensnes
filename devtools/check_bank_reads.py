@@ -33,13 +33,13 @@ from pathlib import Path
 #    the TU also takes `#:sym` (far-pointer building, the safe idiom).
 MEM_RE = re.compile(
     r'\b(?:lda|sta|ldx|stx|ldy|sty|adc|sbc|cmp|cpx|cpy|and|ora|eor)\.w\s+'
-    r'(?![#$:])([A-Za-z_][A-Za-z0-9_]*)\b')
+    r'(?![#$:])([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)*)\b')
 IMM_RE = re.compile(
     r'\b(?:lda|sta|ldx|stx|ldy|sty|adc|sbc|cmp|cpx|cpy|and|ora|eor)\.w\s+'
-    r'#(?!:)([A-Za-z_][A-Za-z0-9_]*)\b')
-BANKREF_RE = re.compile(r'#:([A-Za-z_][A-Za-z0-9_]*)\b')
-PEA_RE = re.compile(r'\bpea\.w\s+(?!:)([A-Za-z_][A-Za-z0-9_]*)\b')
-PEA_BANK_RE = re.compile(r'\bpea\.w\s+:([A-Za-z_][A-Za-z0-9_]*)\b')
+    r'#(?!:)([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)*)\b')
+BANKREF_RE = re.compile(r'#:([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)*)\b')
+PEA_RE = re.compile(r'\bpea\.w\s+(?!:)([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)*)\b')
+PEA_BANK_RE = re.compile(r'\bpea\.w\s+:([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)*)\b')
 
 
 def sym_table(sym_path: Path) -> dict[str, tuple[int, int]]:
@@ -96,6 +96,12 @@ def selftest() -> int:
         sys.argv = ["x", str(d / "rom.sym"), str(d)]
         if main() != 1:
             print("SELFTEST FAIL: bank-blind read not detected"); return 1
+        # the same for a `static` object, whose name holds a dot (`tab.main`):
+        # invisible to this guard until 2026-10-09 -> must FAIL
+        (d / "rom.sym").write_text("[labels]\n02:8000 mapdata\n07:8539 tab.main\n00:1000 ramvar\n")
+        (d / "bad.c.asm").write_text("\tlda.w tab.main,x\n")
+        if main() != 1:
+            print("SELFTEST FAIL: bank-blind read of a static object not detected"); return 1
         # far-pointer arg (bank carried) -> must PASS
         (d / "bad.c.asm").unlink()
         (d / "good.c.asm").write_text("\tpea.w :mapdata\n\tpea.w mapdata\n\tjsl mapLoad\n\tlda.w ramvar\n")

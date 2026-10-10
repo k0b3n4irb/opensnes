@@ -17,12 +17,12 @@
 #include "incgener.h"
 #include "metasprites.h"
 
-#ifndef __BUILD_VERSION
+#ifndef TOOL_VERSION
 #include "config.h"
 #else
-#define GFX4SNESVERSION __BUILD_VERSION
-#define GFX4SNESDATE __BUILD_DATE
-#endif /* __BUILD_VERSION */
+#define GFX4SNESVERSION TOOL_VERSION
+#define GFX4SNESDATE TOOL_BUILD_DATE
+#endif /* TOOL_VERSION */
 
 // global variables for options
 typedef struct

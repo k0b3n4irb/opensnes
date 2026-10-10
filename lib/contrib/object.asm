@@ -3,7 +3,8 @@
 ;==============================================================================
 ;
 ; Game object engine with physics, collision detection, and type-based dispatch.
-; Uses a workspace pattern for C callback access (objWorkspace in Bank $00).
+; Uses a workspace pattern for C callback access (objWorkspace, behind the
+; object pool in Bank $7E).
 ;
 ; Based on: PVSnesLib object engine by Alekmaul
 ; Slope management: Nub1604
@@ -129,7 +130,6 @@ objnotused      DSB 7
 
 .RAMSECTION ".obj_bank00" BANK 0 SLOT 1
 
-objWorkspace    INSTANCEOF t_objs           ; 64-byte workspace for C callbacks
 obj_current_id        DW                          ; return value of objNew
 obj_ptr          DW                          ; current object offset
 obj_kill_flag       DB                          ; set to 1 to kill current object
@@ -143,6 +143,14 @@ obj_kill_flag       DB                          ; set to 1 to kill current objec
 .RAMSECTION ".obj_bank7e" BANK $7E SLOT 2
 
 objbuffers      INSTANCEOF t_objs OB_MAX    ; object struct array (80 * 64 = 5120 bytes)
+; The workspace C callbacks read and write (`FAR t_objs objWorkspace`,
+; object.h). It sits right behind the pool ON PURPOSE (since 2026-10-09):
+; it is "slot OB_MAX" to every `objbuffers.1.field,x`, so the collision
+; routines work on it in place (OBJ_ENTER / OBJ_LEAVE below) instead of
+; copying it to its slot and back. In bank $00 until then, and each of those
+; calls cost two 60-byte block moves — devtools/twinbench measured 25,000
+; master cycles a frame of copies in games/mapandobjects.
+objWorkspace    INSTANCEOF t_objs
 objactives      DSW OB_TYPE_MAX             ; active object list heads
 
 objfctinit      DSB 4*OB_TYPE_MAX           ; init function pointers
@@ -185,7 +193,8 @@ objtmp4         DW
 ;==============================================================================
 ; Workspace Sync Macros
 ;==============================================================================
-; These copy 64 bytes between objWorkspace (Bank $00) and objbuffers (Bank $7E).
+; These copy 64 bytes between objWorkspace and a slot of objbuffers (both in
+; Bank $7E since 2026-10-09).
 ; X must contain the byte offset into objbuffers on entry.
 ; Implemented as macros because SUPERFREE sections may be placed in different
 ; banks, and jsr can't cross bank boundaries. phb/plb preserves DBR since
@@ -222,7 +231,7 @@ objtmp4         DW
     tay                         ; Y = owner's addr in Bank $7E, past the links
     ldx #objWorkspace.w + 4
     lda #OB_SIZE - 5
-    mvn $00, $7E                ; flush: workspace -> owner, bytes 4..63
+    mvn $7E, $7E                ; flush: workspace -> owner, bytes 4..63
 
 _stw_load\@:
     lda 3,s                     ; X as pushed above (Y at 1,s, X at 3,s)
@@ -231,10 +240,10 @@ _stw_load\@:
     adc #objbuffers.w
     tax                         ; X = source addr in Bank $7E
 
-    ldy #objWorkspace.w         ; Y = dest addr in Bank $00
+    ldy #objWorkspace.w         ; Y = dest addr
 
     lda #OB_SIZE - 1            ; A = byte count - 1
-    mvn $7E, $00                ; WLA-DX: src=$7E (buffers), dest=$00 (workspace)
+    mvn $7E, $7E                ; slot -> workspace
 
     ply
     plx
@@ -268,10 +277,10 @@ _stw_load\@:
     adc #objbuffers.w + 4
     tay                         ; Y = dest addr in Bank $7E, past the links
 
-    ldx #objWorkspace.w + 4     ; X = source addr in Bank $00, past the links
+    ldx #objWorkspace.w + 4     ; X = source addr, past the links
 
     lda #OB_SIZE - 5            ; A = byte count - 1 (bytes 4..63)
-    mvn $00, $7E                ; WLA-DX: src=$00 (workspace), dest=$7E (buffers)
+    mvn $7E, $7E                ; workspace -> slot
 
     lda #$FFFF
     sta.l objwsowner
@@ -280,6 +289,37 @@ _sfw_done\@:
     ply
     plx
     plb                         ; restore DBR
+.ENDM
+
+;==============================================================================
+; In-place work on the workspace
+;==============================================================================
+; For a routine C calls from a callback (objCollidMap and its kin, objUpdateXY)
+; on the object the workspace mirrors — the usual case: the engine loaded it
+; before the callback. The routine then indexes the workspace itself, as the
+; slot behind the pool, and no byte is copied. On any other object it works as
+; before: flush the workspace to its owner, work on the slot, reload.
+; DBR must be $7E, A and X/Y 16-bit. The routines these serve touch no link
+; field (bytes 0-3), which is what the workspace's copy of them is stale for.
+.DEFINE OBJ_WS_OFS OB_MAX*OB_SIZE
+
+; X = byte offset of the slot asked for. Out: X = the offset to index with.
+.MACRO OBJ_ENTER
+    cpx.w objwsowner
+    bne _oe_slot\@
+    ldx #OBJ_WS_OFS
+    bra _oe_go\@
+_oe_slot\@:
+    SYNC_FROM_WORKSPACE
+_oe_go\@:
+.ENDM
+
+; X = the offset OBJ_ENTER gave.
+.MACRO OBJ_LEAVE
+    cpx #OBJ_WS_OFS
+    beq _ol_done\@
+    SYNC_TO_WORKSPACE
+_ol_done\@:
 .ENDM
 
 ;==============================================================================
@@ -1272,9 +1312,9 @@ _oicmIn:
     asl a
     asl a
     tax
-    SYNC_FROM_WORKSPACE
+    OBJ_ENTER
 
-    stx objtmp2                             ; X preserved by SYNC macro (MVN clobbers A)
+    stx objtmp2                             ; the offset every later `ldx objtmp2` indexes with
 
     lda objbuffers.1.yvel,x
     bpl _oicm1
@@ -1782,7 +1822,7 @@ _oicmtstxnd:
 _oicmend:
     ; --- Sync objbuffers → workspace after collision ---
     ldx objtmp2
-    SYNC_TO_WORKSPACE
+    OBJ_LEAVE
 
 _oicmOut:
     ply
@@ -1834,9 +1874,9 @@ _oicm1dIn:
     asl a
     asl a
     tax
-    SYNC_FROM_WORKSPACE
+    OBJ_ENTER
 
-    stx objtmp2                             ; X preserved by SYNC macro (MVN clobbers A)
+    stx objtmp2                             ; the offset every later `ldx objtmp2` indexes with
 
     lda objbuffers.1.yvel,x
     bpl _oicm1d1
@@ -2338,7 +2378,7 @@ _oicm1dfrdone:
 
     ; --- Sync objbuffers → workspace after collision ---
     ldx objtmp2
-    SYNC_TO_WORKSPACE
+    OBJ_LEAVE
 
 _oicm1dOut:
     ply
@@ -2518,7 +2558,9 @@ objCollidObj:
     plb
 
     rep #$20
-    stz.w tcc__r0
+    stz.b tcc__r0                           ; direct page, like the compiler: an nmiSet() callback
+                                            ; runs with D on its own register area (.w hit the main
+                                            ; thread's through the $7E mirror until 2026-10-05)
 
     ; The workspace may hold an edit of one of the two objects (a callback
     ; that moved itself, then tests the contact): flush it first, as the map
@@ -2610,14 +2652,14 @@ _oicor5:
     bmi _oicoend
 
     lda #$0001
-    sta.w tcc__r0
+    sta.b tcc__r0
 
 _oicoend:
     ; The value is returned in A (cc65816), not in tcc__r0: every "no
     ; contact" exit used to return whatever A held — x + width, a y
     ; coordinate — and only the contact path returned 1 by accident
     ; (fixed 2026-09-20; libtest vector r_obj_cobj_no read 0x18).
-    lda.w tcc__r0
+    lda.b tcc__r0
     ply
     plx
     plb
@@ -2668,8 +2710,8 @@ _oicuxyIn:
     asl a
     asl a
     tax
-    phx                                     ; save byte offset for sync-back
-    SYNC_FROM_WORKSPACE
+    OBJ_ENTER
+    phx                                     ; the offset worked on, for OBJ_LEAVE
 
     clc
     lda objbuffers.1.xvel,x
@@ -2716,8 +2758,8 @@ _oicuxy3:
 
 _oicuxyend:
     ; --- Sync objbuffers → workspace ---
-    plx                                     ; restore byte offset
-    SYNC_TO_WORKSPACE
+    plx
+    OBJ_LEAVE
 
 _oicuxyOut:
     plx
@@ -2969,9 +3011,9 @@ _oicmsIn:
     asl a
     asl a
     tax
-    SYNC_FROM_WORKSPACE
+    OBJ_ENTER
 
-    OE_SETOBJHANDLE_STK 10
+    stx objtmp2                             ; (was OE_SETOBJHANDLE_STK 10: the slot's offset again)
     stz objtmp4
 
 _oicmsPrecheck:
@@ -3410,7 +3452,7 @@ _oicmststyn5:
 _oicmsend:
     ; --- Sync objbuffers → workspace after collision ---
     ldx objtmp2
-    SYNC_TO_WORKSPACE
+    OBJ_LEAVE
 
 _oicmsOut:
     ply

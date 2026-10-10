@@ -42,17 +42,17 @@
 ;   12,s    = pad                    (high byte of Kl high half, unused)
 ;------------------------------------------------------------------------------
 dmaCopyVram:
-    php
-
+    ; No php / plp: A is 16-bit on return, as C expects, and the index
+    ; width is not touched (6 CPU cycles a call, 2026-10-09).
     rep #$20
     .ACCU 16
-    lda 7,s                 ; vramAddr
+    lda 6,s                 ; vramAddr
     sta.l $2116             ; REG_VMADDL/H
 
-    lda 5,s                 ; size
+    lda 4,s                 ; size
     sta.l $4305             ; DMA size
 
-    lda 9,s                 ; source LOW (16-bit offset within bank)
+    lda 8,s                 ; source LOW (16-bit offset within bank)
     sta.l $4302             ; DMA source address
 
     sep #$20
@@ -60,64 +60,18 @@ dmaCopyVram:
     lda #$80
     sta.l $2115             ; REG_VMAIN: increment after high byte write
 
-    lda 11,s                ; source bank byte (Kl high half low byte)
+    lda 10,s                ; source bank byte (Kl high half low byte)
     sta.l $4304             ; DMA source bank
-
-    lda #$01
-    sta.l $4300             ; DMA mode: 2-register write (word)
 
     lda #$18
     sta.l $4301             ; Destination: VMDATAL ($2118)
 
     lda #$01
-    sta.l $420B             ; Start DMA channel 0
-
-    plp
-    rtl
-
-;------------------------------------------------------------------------------
-; void dmaCopyVramBank(u8 *source, u8 bank, u16 vramAddr, u16 size)
-;
-; DMA with explicit bank byte for data in banks other than 0.
-;
-; Stack layout (after PHP):
-;   5-6,s = size
-;   7-8,s = vramAddr
-;   9,s = bank (8-bit, padded to 16-bit push)
-;   10-11,s = source
-;------------------------------------------------------------------------------
-dmaCopyVramBank:
-    php
+    sta.l $4300             ; DMA mode: 2-register write (word)
+    sta.l $420B             ; Start DMA channel 0 (the same $01)
 
     rep #$20
     .ACCU 16
-    lda 7,s                 ; vramAddr
-    sta.l $2116             ; REG_VMADDL/H
-
-    lda 5,s                 ; size
-    sta.l $4305             ; DMA size
-
-    lda 11,s                ; source address (16-bit)
-    sta.l $4302             ; DMA source address
-
-    sep #$20
-    .ACCU 8
-    lda #$80
-    sta.l $2115             ; REG_VMAIN
-
-    lda 9,s                 ; bank byte
-    sta.l $4304             ; DMA source bank
-
-    lda #$01
-    sta.l $4300             ; DMA mode
-
-    lda #$18
-    sta.l $4301             ; Destination: VMDATAL
-
-    lda #$01
-    sta.l $420B             ; Start DMA
-
-    plp
     rtl
 
 ;------------------------------------------------------------------------------
@@ -152,50 +106,6 @@ dmaCopyCGram:
     sep #$20
     .ACCU 8
     lda 11,s                ; source bank byte (Kl high half low byte)
-    sta.l $4304             ; DMA source bank
-
-    lda #$00
-    sta.l $4300             ; DMA mode: 1-register write (byte)
-
-    lda #$22
-    sta.l $4301             ; Destination: CGDATA ($2122)
-
-    lda #$01
-    sta.l $420B             ; Start DMA channel 0
-
-    plp
-    rtl
-
-;------------------------------------------------------------------------------
-; void dmaCopyCGramBank(u8 *source, u8 bank, u16 startColor, u16 size)
-;
-; DMA palette data with explicit bank byte for data in banks other than 0.
-;
-; Stack layout (after PHP):
-;   5-6,s = size
-;   7-8,s = startColor
-;   9,s = bank (8-bit, padded to 16-bit push)
-;   10-11,s = source
-;------------------------------------------------------------------------------
-dmaCopyCGramBank:
-    php
-
-    sep #$20
-    .ACCU 8
-    lda 7,s                 ; startColor (low byte = color index)
-    sta.l $2121             ; REG_CGADD
-
-    rep #$20
-    .ACCU 16
-    lda 5,s                 ; size
-    sta.l $4305             ; DMA size
-
-    lda 11,s                ; source address (16-bit)
-    sta.l $4302             ; DMA source address
-
-    sep #$20
-    .ACCU 8
-    lda 9,s                 ; bank byte
     sta.l $4304             ; DMA source bank
 
     lda #$00

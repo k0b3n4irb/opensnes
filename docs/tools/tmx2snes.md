@@ -1,5 +1,9 @@
 # tmx2snes — Tiled levels to SNES map data {#tools_tmx2snes}
 
+> **New tool:** the same converter is `opensnes-level` (@ref tools_opensnes_level),
+> driven by a settings file beside the map; tmx2snes stays shipped for one
+> more version.
+
 `tmx2snes` is how a level you paint in [Tiled](https://www.mapeditor.org/)
 becomes something the SNES map engine can load and scroll. It takes a Tiled map
 exported as JSON, plus the tile-optimisation table from @ref tools_gfx4snes, and

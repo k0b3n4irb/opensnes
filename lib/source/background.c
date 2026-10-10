@@ -34,21 +34,8 @@ extern volatile u8 bg_scroll_dirty; /* Bitmask: bit 0-3 = BG1-4 dirty */
  * Scrolling Functions
  *============================================================================*/
 
-void bgSetScroll(u8 bg, u16 x, u16 y) {
-    bg_scroll_x[bg] = x;
-    bg_scroll_y[bg] = y;
-    bg_scroll_dirty |= (u8)(1 << bg);
-}
-
-void bgSetScrollX(u8 bg, u16 x) {
-    bg_scroll_x[bg] = x;
-    bg_scroll_dirty |= (u8)(1 << bg);
-}
-
-void bgSetScrollY(u8 bg, u16 y) {
-    bg_scroll_y[bg] = y;
-    bg_scroll_dirty |= (u8)(1 << bg);
-}
+/* bgSetScroll(), bgSetScrollX() and bgSetScrollY() are in
+ * background_scroll.asm (since 2026-10-09). */
 
 u16 bgGetScrollX(u8 bg) {
     return bg_scroll_x[bg];

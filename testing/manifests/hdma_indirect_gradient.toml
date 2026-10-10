@@ -1,0 +1,38 @@
+# hdma_indirect_gradient — the INDIRECT HDMA table is built correctly in WRAM
+# and channel 0 is armed with the payload bank the indirect mode needs.
+#
+# What this proves that the other pillars cannot:
+#   * Liveness only says the ROM kept servicing NMI.
+#   * The fbhash baseline says "the 32-band red ramp still hashes the same".
+#     It cannot say WHY it broke: a wrong band pointer, a missing terminator,
+#     a DASB (indirect data bank) left at $FF and a wrong CGADD payload all
+#     produce one undifferentiated "picture changed".
+#   * itable is COMPUTED at runtime from `(u16)(u32)(void *)band_data[i]` —
+#     a pointer-truncation or stride bug in that expression is a codegen
+#     failure, and this is the only test in the corpus that reads the
+#     resulting pointer table back byte for byte.
+#
+# Measured with `luna state --until-frame 60 --peek itable:61 --peek band_data:80`
+# and cross-checked against `luna state --out -`:
+#   dma.hdmaen = 1, dma.channels[0].params = 0x43 (indirect | 2REG_2X),
+#   bbad = 0x21 (CGADD), dasb = 0 — hdma_enabled_state below is the lib's
+#   own shadow of $420C and matched dma.hdmaen exactly at the measurement.
+#
+# itable: 32 x [7 lines][ptr_lo][ptr_hi] + terminator. The pointers walk
+# $01A0, $01A4, $01A8 … $021C — band_data with a 4-byte stride ($0034 … $00B0
+# until 2026-10-09, when the NMI handler's direct page grew to 160 bytes and
+# pushed the first free RAM past it). These
+# bytes follow band_data's address: when the RAM layout moves (it did on
+# 2026-10-08, the link stopped carrying the library's unused variables),
+# recompute them from `band_data.main` in the .sym.
+# band_data: 32 x [0][0][red][0], a $1F..$00 ramp (CGADD=0 twice, then the
+# BGR555 backdrop colour).
+rom = "../../examples/hdma/hdma_indirect_gradient/hdma_indirect_gradient.sfc"
+frames = 60
+
+[asserts.values]
+hdma_enabled_state = { eq = 0x01, width = 1 }   # channel 0 only
+
+[asserts.blocks]
+itable    = { space = "wram", offset = "itable.main", hex = "07a00107a40107a80107ac0107b00107b40107b80107bc0107c00107c40107c80107cc0107d00107d40107d80107dc0107e00107e40107e80107ec0107f00107f40107f80107fc01070002070402070802070c02071002071402071802071c0200" }
+band_data = { space = "wram", offset = "band_data.main", hex = "00001F0000001E0000001D0000001C0000001B0000001A000000190000001800000017000000160000001500000014000000130000001200000011000000100000000F0000000E0000000D0000000C0000000B0000000A0000000900000008000000070000000600000005000000040000000300000002000000010000000000" }

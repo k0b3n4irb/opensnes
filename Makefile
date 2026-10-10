@@ -46,9 +46,20 @@ EXAMPLES_PATH := examples
 TESTS_PATH    := tests
 
 RELEASE_DIR := release
-# devtools scripts that make/common.mk executes on every user build — the
-# release zip must ship each of them (see the `release` recipe).
-RELEASE_DEVTOOLS := $(sort $(shell grep 'python3' make/common.mk | grep -oE 'devtools/[A-Za-z0-9_/]+\.py'))
+
+# The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
+# rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
+# spelled them out in three places and each list was a different subset.
+FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram
+FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals leaf_frame static_dup
+FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
+FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
+                     $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
+                     $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS))
+# The fixtures that carry their own runtime assertions (a test_*.py beside
+# the ROM); the others are asserted by luna manifests (testing/manifests/).
+FIXTURE_TESTS     := $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
+                     $(addprefix testing/fixtures/,libtests libtests_fx libtests_dsp1 libtests_hirom libtests_sa1_sram)
 # The version of the tree, not the nearest tag: release tags sit on main's
 # merge commits, which develop never contains, so `git describe` on develop
 # named its zips after v0.17.0. snes.h is held equal to CHANGELOG by
@@ -61,7 +72,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench budget asset-budget submodules verify-toolchain hooks lint-commits lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -84,14 +95,12 @@ install: compiler tools lib cli
 	$(MAKE) -C $(COMPILER_PATH) install
 	$(MAKE) -C $(TOOLS_PATH) install
 
-# Install the `opensnes` project CLI (init/build/run/doctor) into bin/ so it
-# ships in the dev tree and, via the release target's `cp -r bin/*`, in the
-# release zip. The CLI resolves the SDK root from its own bin/ location.
-cli:
-	@mkdir -p bin
-	@cp scripts/opensnes bin/opensnes
-	@chmod +x bin/opensnes
-	@echo "Installed CLI: bin/opensnes  (run 'bin/opensnes doctor')"
+# The `opensnes` project CLI (init / build / run / test / doctor / upgrade) is
+# a compiled tool since 2026-10-06 (tools/opensnes; it was scripts/opensnes):
+# `make tools` builds and installs it in bin/ with the others. The target
+# stays as an alias for the habit and for `all`.
+cli: tools
+	@echo "CLI: bin/opensnes  (run 'bin/opensnes doctor')"
 
 #------------------------------------------------------------------------------
 # Components
@@ -107,6 +116,12 @@ verify-toolchain:
 RANGE ?= origin/develop..HEAD
 lint-commits:
 	@python3 devtools/lint_commits.py $(RANGE)
+
+# Hard-coded width classes in cproc's QBE emitter, outside qbetype(): a new
+# one fails until reviewed against this target (int 2, long 4, pointer 4
+# bytes) and added to devtools/cproc_width_sites.txt (compiler audit PF3).
+lint-cproc-widths:
+	@python3 devtools/check_cproc_widths.py
 
 # Git hooks that run the commit lint before a commit exists and before a
 # push leaves (scripts/githooks/). Opt-in: a clone has no hooks until this
@@ -125,8 +140,8 @@ lint-docs:
 # Static analysis of the host C (gaps review H4): the asset tools' own
 # sources and the lib's C. cppcheck needs no compile database, so it
 # gates on a recursive-make tree as is. Vendored decoders are suppressed
-# (lodepng, stb_image: upstream code with its own noise), gfx4snes's
-# version macros are supplied. The w65816 backend is checked advisory
+# (lodepng, stb_image: upstream code with its own noise), the tools'
+# version macros (TOOL_VERSION, TOOL_BUILD_DATE, tools/tool.mk) are supplied. The w65816 backend is checked advisory
 # only (upstream QBE idioms). First run found a dangling context pointer
 # in cmdparser (both copies), an uninitialised read in aseprite2snes and
 # the free-then-fatal paths cppcheck could not see were fatal (noreturn).
@@ -136,10 +151,11 @@ lint-cppcheck:
 		echo "lint-cppcheck: cppcheck not installed, skipped (CI runs it)"; \
 	else \
 		cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
-			--suppress='*:tools/common/lodepng.c' \
-			--suppress='*:tools/font2snes/src/stb_image.h' \
-			-DGFX4SNESVERSION='"x"' -DGFX4SNESDATE='"x"' -D__BUILD_DATE='"x"' -D__BUILD_VERSION='"x"' -DVERSION='"x"' \
-			-Itools/smconv/src -Itools/common tools/*/src tools/common \
+			--suppress='*:tools/third_party/lodepng.c' \
+			--suppress='*:tools/third_party/stb_image.h' \
+			--suppress='*:tools/third_party/cute_tiled.h' \
+			-DTOOL_VERSION='"x"' -DTOOL_BUILD_DATE='"x"' \
+			-Itools/smconv/src -Itools/third_party tools/*/src tools/third_party \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
 		&& { [ ! -d compiler/qbe/w65816 ] || cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \
@@ -161,15 +177,26 @@ lint-asm-abi:
 lint-vram:
 	@python3 devtools/check_vram_layout.py
 
+# Unit tests of the sentinels and of the luna harness. Until 2026-10-05 only
+# the harness's ran locally and the five others only in CI (lint.yml); the
+# gate a contributor runs must be the gate CI runs (testing.md).
+test-devtools:
+	@cd devtools && python3 -m unittest -q test_check_doc_drift test_check_vram_layout
+	@python3 devtools/test_check_nmi_wram_race.py
+	@python3 devtools/symmap/test_symmap.py
+	@python3 devtools/test_asset_budget.py
+	@cd testing && python3 -m unittest -q test_harness
+
 # Aggregate lint target — runs every lint we have. Run before opening a PR.
 lint: lint-docs
 	@python3 devtools/lint_asm.py
-	@cd tools/luna-test && python3 -m unittest -q test_harness
+	@$(MAKE) -s test-devtools
 	@python3 devtools/check_bank_reads.py --selftest
 	@python3 devtools/check_corpus_fresh.py
 	@$(MAKE) lint-asm-abi
 	@$(MAKE) lint-vram
 	@$(MAKE) lint-cppcheck
+	@$(MAKE) lint-cproc-widths
 	@$(MAKE) lint-commits
 
 compiler: submodules verify-toolchain
@@ -192,100 +219,60 @@ tests: test-compiler
 	@# rejected by CI. Refuse to test a corpus older than the lib outputs.
 	@python3 devtools/check_corpus_fresh.py
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/luna_runner.py --coverage
+	@# The compiler against C's integer rules, on luna (2026-10-08): first,
+	@# because a wrong compiler makes every result below it meaningless.
+	@python3 testing/difftest.py
+	@python3 testing/difftest_stmt.py
+	@python3 testing/luna_runner.py --coverage
 	@# Same liveness pass from pseudo-random RAM (fixed seed): a ROM that
 	@# reads memory it never initialised passes on luna's zero-fill and
 	@# fails here (gaps review item R1; the v0.40.0/v0.41.1 reset-vector
 	@# fix class). Report file untouched — the committed one is the
 	@# zero-fill pass.
-	@python3 tools/luna-test/luna_runner.py --coverage --power-on random=1
-	@python3 tools/luna-test/luna_runner.py --compare
+	@python3 testing/luna_runner.py --coverage --power-on random=1
+	@python3 testing/luna_runner.py --compare
 	@# The same visual baselines must hold from pseudo-random RAM: since
 	@# 2026-09-12 every example does (six audio examples cleared VRAM, the
 	@# vertical-scroll -1 landed in the lib), so this is a gate, not a report.
-	@python3 tools/luna-test/luna_runner.py --compare --power-on random=1
+	@python3 testing/luna_runner.py --compare --power-on random=1
 	@# Measured ROM coverage of the public lib API (luna profile --pc-set):
 	@# a public function no example executes must already be in
 	@# baselines/never_executed.txt — the ratchet may shrink, never grow
 	@# (gaps review item R5). The library fixture is one of the ROMs it
-	@# profiles, so it is built first (rebuilt clean for its own asserts below),
-	@# and so are the compiler's runtime ROMs.
-	@$(MAKE) -s -C devtools/libtests
-	@$(MAKE) -s -C devtools/libtests_fx
-	@$(MAKE) -s -C devtools/libtests_dsp1
-	@$(MAKE) -s -C devtools/libtests_hirom
-	@$(MAKE) -s -C devtools/libtests_gsu
-	@$(MAKE) -s -C devtools/libtests_snesmod
-	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
-		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
-	@python3 tools/luna-test/rom_coverage.py
+	@# profiles, so the fixtures are built first (rebuilt clean for their own
+	@# asserts below).
+	@$(MAKE) -s fixtures
+	@python3 testing/rom_coverage.py
 	@# APU output hashed for the ten audio examples (luna
 	@# --audio-out, gaps review R6): a changed hash means "the sound
 	@# changed, go listen" — the only audio oracle beyond driver liveness.
-	@python3 tools/luna-test/audio_regress.py
+	@python3 testing/audio_regress.py
 	@# The NMI handler must fit in VBlank (~51 800 master cycles), measured
 	@# by luna on a representative subset (gaps review R4). `make tests`
 	@# proved the handler correct but never short enough.
-	@python3 tools/luna-test/nmi_budget.py
+	@python3 testing/nmi_budget.py
 	@# No VRAM DMA byte outside blank in any example (luna --dma-trace: the
 	@# PPU drops such a write silently), and gsuPresent's frames whole,
 	@# double-buffered and swapped in blank (2026-09-29).
-	@python3 tools/luna-test/vram_dma_blank.py
+	@python3 testing/vram_dma_blank.py
 	@$(MAKE) -s test-manifests
 	@# The per-frame WRAM oracle runs here too, not only in CI. It used to
 	@# be a separate target, so `make tests` could be green on a codegen
 	@# change that CI then rejected on all five platforms — which is
 	@# exactly what happened on 2026-07-22. The gate a contributor is told
 	@# to run must be the gate CI runs.
-	@python3 tools/luna-test/wram_regress.py
+	@python3 testing/wram_regress.py
 	@# Runtime fixture ROMs are rebuilt from clean: a stale .sfc built with an
 	@# experimental toolchain once produced misleading XPASSes (a6_farptr trap,
 	@# 2026-07-04). Each is a single-TU ROM; the clean rebuild costs seconds.
 	@# clean and the build are SEPARATE invocations — this Makefile exports
 	@# -j, and `clean all` in one command runs both goals concurrently
 	@# (clean deleted crt0.o mid-link on the first parallel run).
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a7_32bit
-	@python3 devtools/compiler-tests/runtime/a7_32bit/test_a7_32bit.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/c_features clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/c_features
-	@python3 devtools/compiler-tests/runtime/c_features/test_c_features.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/debug_channel
-	@python3 devtools/compiler-tests/runtime/debug_channel/test_debug_channel.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/a6_farptr
-	@python3 devtools/compiler-tests/runtime/a6_farptr/test_a6_farptr.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/b2_far_ram
-	@python3 devtools/compiler-tests/runtime/b2_far_ram/test_b2_far_ram.py
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/d_quals clean
-	@$(MAKE) -s -C devtools/compiler-tests/runtime/d_quals
-	@python3 devtools/compiler-tests/runtime/d_quals/test_d_quals.py
-	@$(MAKE) -s -C devtools/libtests clean
-	@$(MAKE) -s -C devtools/libtests
-	@python3 devtools/libtests/test_libtest.py
-	@# Second fixture: hdma, mode7, SNESMOD, nmiSet (the first has no RAM
-	@# for the first two and boots the other audio driver).
-	@$(MAKE) -s -C devtools/libtests_fx clean
-	@$(MAKE) -s -C devtools/libtests_fx
-	@python3 devtools/libtests_fx/test_libtest_fx.py
-	@# Third fixture: the DSP-1 commands no example calls. SKIPs without
-	@# the user-supplied dsp1b.rom (CI), like the firmware-gated manifests.
-	@$(MAKE) -s -C devtools/libtests_dsp1 clean
-	@$(MAKE) -s -C devtools/libtests_dsp1
-	@python3 devtools/libtests_dsp1/test_libtest_dsp1.py
-	@# Fourth fixture: HiROM. The sram module's HiROM mapping, and the bank
-	@# byte of a pointer to RAM under .BASE $$C0 (a wlalink fix, 2026-09-20).
-	@$(MAKE) -s -C devtools/libtests_hirom clean
-	@$(MAKE) -s -C devtools/libtests_hirom
-	@python3 devtools/libtests_hirom/test_libtest_hirom.py
-	@# Fifth fixture: the sram module on SA-1 — BW-RAM at $$40:0000, writable
-	@# once crt0 sets SBWE (2026-09-26; USE_SRAM with USE_SA1 was refused).
-	@$(MAKE) -s -C devtools/libtests_sa1_sram clean
-	@$(MAKE) -s -C devtools/libtests_sa1_sram
-	@python3 devtools/libtests_sa1_sram/test_libtest_sa1_sram.py
+	@# What each fixture pins is written in testing/fixtures/README.md.
+	@for d in $(FIXTURE_TESTS); do \
+		$(MAKE) -s -C $$d clean && $(MAKE) -s -C $$d && python3 $$d/test_*.py || exit 1; done
 	@python3 devtools/link_modules.py
+	@python3 testing/bank_spill.py
 	@# docs/tools/luna.md must be the pinned luna's own --help (review D3)
 	@python3 devtools/gen_luna_doc.py --check
 	@$(MAKE) -s test-project
@@ -296,7 +283,7 @@ tests: test-compiler
 # numbers without failing.
 test-nmi-budget:
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/nmi_budget.py
+	@python3 testing/nmi_budget.py
 
 # PAL pass (gaps review R2): the whole corpus booted at 312 lines / 50 Hz
 # (luna --force-region pal), the lib fixture asserting getRegion() /
@@ -309,67 +296,74 @@ PAL_GAME_MANIFESTS := state_tetris movement_breakout state_breakout_game_over \
 
 test-pal:
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/luna_runner.py --coverage --region pal
+	@python3 testing/luna_runner.py --coverage --region pal
 	@# The fixture is not built by `make` (only by `make tests`): the weekly
 	@# pal.yml job never got past this line until 2026-09-26.
-	@$(MAKE) -s -C devtools/libtests
-	@python3 devtools/libtests/test_libtest.py --region pal
+	@$(MAKE) -s -C testing/fixtures/libtests
+	@python3 testing/fixtures/libtests/test_libtest.py --region pal
 	@# The games play their own scripted manifests on a PAL console
 	@# (2026-10-03): the NTSC-built ROMs with `region = "pal"` in the
 	@# manifest (luna v1.31.0; `force_region` before it; an import cartridge
 	@# on a PAL machine), and `stat78 = $$13` asserted so a manifest that ran at
 	@# 60 Hz fails. The manifests are the NTSC ones, generated here so the two
 	@# sets cannot drift. No rebuild.
-	@rm -rf tools/luna-test/manifests_pal && mkdir -p tools/luna-test/manifests_pal
+	@rm -rf testing/manifests_pal && mkdir -p testing/manifests_pal
 	@set -e; for m in $(PAL_GAME_MANIFESTS); do \
-	    sed -E '/^rom = /a region = "pal"' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/$$m.toml; \
-	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> tools/luna-test/manifests_pal/$$m.toml; \
-	    grep -q '^region = "pal"' tools/luna-test/manifests_pal/$$m.toml || { echo "test-pal: $$m has no rom line to anchor region"; exit 1; }; \
+	    sed -E '/^rom = /a region = "pal"' testing/manifests/$$m.toml > testing/manifests_pal/$$m.toml; \
+	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> testing/manifests_pal/$$m.toml; \
+	    grep -q '^region = "pal"' testing/manifests_pal/$$m.toml || { echo "test-pal: $$m has no rom line to anchor region"; exit 1; }; \
 	done
-	@tools/luna-test/bin/luna test --jobs $$(nproc) tools/luna-test/manifests_pal/*.toml
+	@testing/bin/luna test --jobs $$(nproc) testing/manifests_pal/*.toml
 	@# ROM_REGION itself (header $$FFD9 = $$02): one game built as a PAL
 	@# cartridge must be PAL for luna with nothing forced, and play its
 	@# manifest. The NTSC build is restored afterwards.
 	@set -e; g=tetris; m=state_tetris; \
 	    $(MAKE) -s -C examples/games/$$g ROM_REGION=pal TARGET=$${g}_pal.sfc >/dev/null; \
-	    tools/luna-test/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
+	    testing/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
 	        | grep -q '"region": "Pal"' || { echo "test-pal: $${g}_pal.sfc is not a PAL cartridge for luna"; exit 1; }; \
-	    mkdir -p tools/luna-test/manifests_pal/header; \
-	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#; s#"\.\./\.\./\.\./#"../../../../#' tools/luna-test/manifests/$$m.toml > tools/luna-test/manifests_pal/header/$$m.toml; \
-	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> tools/luna-test/manifests_pal/header/$$m.toml; \
-	    tools/luna-test/bin/luna test tools/luna-test/manifests_pal/header/$$m.toml; \
+	    mkdir -p testing/manifests_pal/header; \
+	    sed -E 's#(examples/games/[a-z0-9_]+/)([a-z0-9_]+)\.sfc#\1\2_pal.sfc#; s#"\.\./\.\./#"../../../#' testing/manifests/$$m.toml > testing/manifests_pal/header/$$m.toml; \
+	    printf '\n[asserts.ppu]\nstat78 = 0x13\n' >> testing/manifests_pal/header/$$m.toml; \
+	    testing/bin/luna test testing/manifests_pal/header/$$m.toml; \
 	    rm -f examples/games/$$g/$${g}_pal.sfc examples/games/$$g/$${g}_pal.sym; \
 	    $(MAKE) -s -C examples/games/$$g >/dev/null
 
 # User-project test story (init → build → test-update → test → FAIL path),
 # exactly as a user runs it. Was CI-only until 2026-09-11, when a harness
-# rename broke project_test.py and `make tests` stayed green — the gate a
+# rename broke the project test runner and `make tests` stayed green — the gate a
 # contributor runs must include everything CI runs. The deliberately wrong
 # assert must make `make test` exit non-zero. The sed is done in Python so
 # the target behaves the same on macOS (BSD sed) and Linux.
 TEST_PROJECT_DIR ?= /tmp/opensnes_test_project
 test-project:
 	@rm -rf $(TEST_PROJECT_DIR)
-	@OPENSNES_HOME=$(CURDIR) scripts/opensnes init $(TEST_PROJECT_DIR) --template game >/dev/null
+	@OPENSNES_HOME=$(CURDIR) bin/opensnes init $(TEST_PROJECT_DIR) --template game >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test-update >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test
-	@python3 -c "import pathlib; p = pathlib.Path('$(TEST_PROJECT_DIR)/test/manifest.toml'); p.write_text(p.read_text().replace('player_x = 7800', 'player_x = 9999'))"
+	@sed -i 's/^player_x = 120$$/player_x = 9999/' $(TEST_PROJECT_DIR)/test/boot.toml
 	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test >/dev/null 2>&1; then \
 		echo "ERROR: broken assert did not fail 'make test'"; exit 1; fi
-	@echo "user-project test story: OK (incl. the FAIL path)"
+	@if (cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes release -q) >/dev/null 2>&1; then \
+		echo "ERROR: 'opensnes release' shipped a ROM whose test fails"; exit 1; fi
+	@test ! -e $(TEST_PROJECT_DIR)/release || { echo "ERROR: a refused release wrote release/"; exit 1; }
+	@sed -i 's/^player_x = 9999$$/player_x = 120/' $(TEST_PROJECT_DIR)/test/boot.toml
+	@(cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes release -q --tag v1.0) >/dev/null 2>&1 \
+		|| { echo "ERROR: 'opensnes release' failed on a healthy project"; exit 1; }
+	@cmp -s $(TEST_PROJECT_DIR)/release/opensnes_test_project-v1.0.sfc $(TEST_PROJECT_DIR)/opensnes_test_project.sfc \
+		|| { echo "ERROR: the released ROM is not the built one"; exit 1; }
+	@bin/opensnes-rom inspect -q $(TEST_PROJECT_DIR)/release/opensnes_test_project-v1.0.sfc >/dev/null
+	@(cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes budget 2>/dev/null) | grep -q 'C variables' \
+		|| { echo "ERROR: 'opensnes budget' printed no report"; exit 1; }
+	@echo "user-project test story: OK (incl. the FAIL path, release and budget)"
 
 # Measured lib API coverage on its own (the `tests` target runs the check).
-rom-coverage:
-	@$(MAKE) -s -C devtools/libtests
-	@$(MAKE) -s -C devtools/libtests_fx
-	@$(MAKE) -s -C devtools/libtests_dsp1
-	@$(MAKE) -s -C devtools/libtests_hirom
-	@$(MAKE) -s -C devtools/libtests_gsu
-	@$(MAKE) -s -C devtools/libtests_snesmod
-	@for d in a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals; do \
-		$(MAKE) -s -C devtools/compiler-tests/runtime/$$d || exit 1; done
-	@python3 tools/luna-test/rom_coverage.py
+rom-coverage: fixtures
+	@python3 testing/rom_coverage.py
+
+# Build every ROM fixture (no clean: test-lib rebuilds the asserted ones clean).
+fixtures:
+	@for d in $(FIXTURE_DIRS); do $(MAKE) -s -C $$d || exit 1; done
 
 # Clean example build artifacts only — keeps the toolchain binaries in bin/
 # (a full `make clean` wipes bin/ and forces a compiler rebuild).
@@ -379,6 +373,20 @@ clean-examples:
 # Compile-time cc65816 C→ASM pattern checks (no emulator needed).
 test-compiler:
 	@python3 devtools/compiler-tests/run.py
+
+# Differential test of the compiler: random integer expressions compiled by
+# cc65816 and run on luna in four shapes (globals, literals, parameters,
+# locals), against a model of C's integer rules that clang checks under a
+# 16-bit-int target. The gate is a fixed set (the expressions that found the
+# six defects of 2026-10-08, pinned, and fifteen seeds); hunting is
+# `make test-difftest SEEDS=1000-1999` (about 35 seeds a second for the
+# expressions, 25 for the programs).
+test-difftest:
+	@scripts/install-luna.sh
+	@python3 testing/difftest.py $(if $(SEEDS),--seeds $(SEEDS))
+	@# ...and on small programs: loops, arrays, a struct, pointers, against
+	@# an interpreter that evaluates with the same model (2026-10-08).
+	@python3 testing/difftest_stmt.py $(if $(SEEDS),--seeds $(SEEDS))
 
 # Golden-output tests for every asset tool. Byte-compares tool output
 # against committed goldens — needs `make tools` first. Also the CI job
@@ -392,6 +400,17 @@ test-tools:
 	@python3 tools/aseprite2snes/tests/run_golden.py
 	@python3 tools/font2snes/tests/run_golden.py
 	@python3 tools/img2snes/tests/run_golden.py
+	@python3 tools/opensnes-sample/tests/run_golden.py
+	@python3 tools/opensnes-music/tests/run_golden.py
+	@python3 tools/opensnes-rom/tests/run_golden.py
+	@python3 tools/opensnes-sprite/tests/run_golden.py
+	@python3 tools/opensnes-tileset/tests/run_golden.py
+	@python3 tools/opensnes-level/tests/run_golden.py
+	@python3 tools/opensnes-text/tests/run_golden.py
+	@python3 tools/opensnes-palette/tests/run_golden.py
+	@python3 tools/opensnes-image/tests/run_golden.py
+	@python3 tools/opensnes-save/tests/run_golden.py
+	@python3 tools/opensnes/tests/run_golden.py
 
 # Host-side sanitizer pass (gaps review H3, 2026-09-12). Rebuilds cproc-qbe,
 # QBE, wla-dx and the asset tools from clean with ASan + UBSan (SANITIZE=1:
@@ -464,7 +483,7 @@ luna-bench:
 	@for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
 		for r in $$d/*.sfc; do [ -f "$$r" ] && cp "$$r" "$(BENCH_ROMS)/$$(echo $$d | sed 's|examples/||; s|/|_|g').sfc"; done; done; \
 		echo "luna-bench: $$(ls $(BENCH_ROMS) | wc -l) ROMs"
-	tools/luna-test/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
+	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
 	@ls $(BENCH_OUT); n=$$(ls $(BENCH_OUT)/*.md 2>/dev/null | grep -vc "report.md\|README"); \
 		echo "luna-bench: $$n bug file(s) under $(BENCH_OUT)"; [ "$$n" -eq 0 ]
 
@@ -486,6 +505,12 @@ test-toolchain-suites:
 test-link-modules:
 	@python3 devtools/link_modules.py
 
+# Code that does not fit bank $00 must run from the next banks (issue #168,
+# 2026-10-10): four examples rebuilt with bank $00 given no room, compared
+# frame for frame with the normal build. Also runs inside `make tests`.
+test-bank-spill:
+	@python3 testing/bank_spill.py
+
 # Fuzzing the asset parsers (gaps review H5): libFuzzer harnesses under
 # tools/fuzz/ for lodepng (gfx4snes, img2snes) and smconv's IT loader,
 # built with ASan + UBSan. `fuzz` runs each for FUZZ_SECONDS from the golden
@@ -502,27 +527,14 @@ fuzz-replay:
 # Native `luna test` manifests (issue #181) — probes migrated off the Python
 # harness onto luna's own manifest runner (the luna-first direction). Builds
 # the stress ROMs, then runs the manifests through `luna test` (exit 0/1/2).
-test-manifests:
-	@$(MAKE) -s -C tools/luna-test/stress/hwmath
-	@$(MAKE) -s -C tools/luna-test/stress/ppumul
-	@$(MAKE) -s -C tools/luna-test/stress/openbus
-	@$(MAKE) -s -C tools/luna-test/stress/bcd
-	@$(MAKE) -s -C tools/luna-test/stress/sprite_overflow
-	@$(MAKE) -s -C devtools/libtests            # audio_v2.toml fixture
-	@$(MAKE) -s -C devtools/libtests_gsu        # libtest_gsu_cached.toml fixture
-	@$(MAKE) -s -C devtools/libtests_snesmod    # libtest_snesmod.toml fixture
-	@$(MAKE) -s -C devtools/libtests_sa1_sram   # d_/e_sa1_bwram power-cycle fixture
-	@tools/luna-test/bin/luna test --jobs 0 \
-		tools/luna-test/stress/hwmath/hwmath.toml \
-		tools/luna-test/stress/ppumul/ppumul.toml \
-		tools/luna-test/stress/openbus/openbus.toml \
-		tools/luna-test/stress/bcd/bcd.toml \
-		tools/luna-test/stress/sprite_overflow/sprite_overflow.toml \
-		tools/luna-test/manifests
+test-manifests: fixtures
+	@testing/bin/luna test --jobs 0 \
+		$(foreach s,$(FIXTURES_STRESS),testing/fixtures/stress/$(s)/$(s).toml) \
+		testing/manifests
 	@# The three SNESMOD transitions at sixteen press phases: a press/SPC700
 	@# race shows on some frames only (8 of 161 for the 2026-09-26 key-off
 	@# defect), so one press frame per manifest sees it by luck.
-	@python3 tools/luna-test/phase_sweep.py
+	@python3 testing/phase_sweep.py
 	@# Power-cycle chains (a_/b_ sram, d_/e_ SA-1 BW-RAM, f_/g_ Super FX) write a .srm the next
 	@# manifest reads: luna >= v1.30.1 runs manifests chained by a battery
 	@# file in order inside the parallel batch (they sat in a serial
@@ -532,15 +544,15 @@ test-manifests:
 # CI-gated on every example, both arches (the old arch-dependent pair was a
 # stale-luna artefact, re-verified 2026-08-09); the stack's pages are left
 # out. Re-baseline after an intentional change with
-# `python3 tools/luna-test/wram_regress.py --update` (same commit).
+# `python3 testing/wram_regress.py --update` (same commit).
 test-wram:
-	@python3 tools/luna-test/wram_regress.py
+	@python3 testing/wram_regress.py
 
 # PPU resource-budget report (VRAM/CGRAM/OAM footprint per example, via luna).
 # The PPU-side twin of symmap's bank $00 / C-RAM checks. Report-only; pairs
 # with docs/craft/planning.md. `make budget ARGS="--only mode2"` to focus.
 budget:
-	@python3 tools/luna-test/budget.py $(ARGS)
+	@python3 testing/budget.py $(ARGS)
 
 # Static asset-budget report (VRAM/CGRAM weight of the converted graphics on
 # disk, no ROM run). The build-time twin of `make budget`: that measures the
@@ -552,6 +564,30 @@ asset-budget:
 # Compiler cycle-count regression guard (static estimate vs committed baseline).
 bench:
 	@python3 devtools/cyclecount/bench.py
+
+# The same C built by OpenSNES and by PVSnesLib, timed on luna: cycles, code
+# size and stack depth per workload (the measured table of
+# docs/BENCHMARK.md). With PVSNESLIB_HOME set PVSnesLib is measured again;
+# without, its figures come from devtools/sdkbench/pvsneslib_reference.json.
+# CHECK=1 is the CI gate (OpenSNES against baseline.json), UPDATE=1 rewrites
+# the committed files.
+bench-sdk:
+	@scripts/install-luna.sh
+	@python3 devtools/sdkbench/run.py $(if $(CHECK),--check) $(if $(UPDATE),--update)
+
+# The same library calls through OpenSNES and through PVSnesLib, timed on
+# luna: what a frame's worth of pad reads, scrolls, sprites, DMA and text
+# costs with each (the table of docs/PERF.md). Same switches as bench-sdk.
+bench-lib:
+	@scripts/install-luna.sh
+	@python3 devtools/libbench/run.py $(if $(CHECK),--check) $(if $(UPDATE),--update)
+
+# The examples both SDKs have, run side by side on luna with the same input:
+# master cycles of work per frame. Needs PVSNESLIB_HOME with its examples
+# built; a report, no gate (the twins are ports, not the same source).
+bench-twins:
+	@scripts/install-luna.sh
+	@python3 devtools/twinbench/run.py $(if $(DETAIL),--detail)
 
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
 # errors. It is NOT the default: `release` depends on `docs`, and Doxygen
@@ -583,7 +619,7 @@ docs-strict: docs
 # Release packaging
 #------------------------------------------------------------------------------
 
-release: all docs
+release: all
 	@echo ""
 	@echo "=========================================="
 	@echo "Creating OpenSNES SDK release package..."
@@ -593,7 +629,6 @@ release: all docs
 	@mkdir -p $(RELEASE_DIR)/opensnes/lib
 	@mkdir -p $(RELEASE_DIR)/opensnes/make
 	@mkdir -p $(RELEASE_DIR)/opensnes/templates
-	@mkdir -p $(RELEASE_DIR)/opensnes/docs
 	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
 	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
@@ -605,31 +640,27 @@ release: all docs
 	@# objects, so the user's first `make` linked nothing.
 	@git ls-files starter | tar -cf - -T - | tar -xf - -C $(RELEASE_DIR)/opensnes
 	@# Project test harness (`make test` in user projects) + the pinned-luna
-	@# installer. Only the pieces project_test.py imports — not the SDK's
+	@# installer. Only luna.version — a project's `make test` is `luna test` — not the SDK's
 	@# corpus manifest/baselines.
-	@mkdir -p $(RELEASE_DIR)/opensnes/tools/luna-test/probes
-	@mkdir -p $(RELEASE_DIR)/opensnes/scripts
-	@cp tools/luna-test/project_test.py tools/luna-test/luna_runner.py \
-		tools/luna-test/luna.version $(RELEASE_DIR)/opensnes/tools/luna-test/
-	@cp tools/luna-test/probes/lib.py $(RELEASE_DIR)/opensnes/tools/luna-test/probes/
+	@mkdir -p $(RELEASE_DIR)/opensnes/testing $(RELEASE_DIR)/opensnes/scripts
+	@cp testing/luna.version $(RELEASE_DIR)/opensnes/testing/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
-	@# Every devtools script make/common.mk runs on a user build (post-link
-	@# ratchets and lints). The list is read from common.mk itself: until
-	@# 2026-09-26 it was two hand-written cp lines, check_bank_reads.py was
-	@# missing, and every zip from July to v0.44.0 failed at the first link.
-	@for f in $(RELEASE_DEVTOOLS); do \
-		mkdir -p $(RELEASE_DIR)/opensnes/$$(dirname $$f) && cp $$f $(RELEASE_DIR)/opensnes/$$f || exit 1; \
-	done
-	@cp -r examples $(RELEASE_DIR)/opensnes/examples/
-	@mkdir -p $(RELEASE_DIR)/opensnes/examples/bin
-	@find $(RELEASE_DIR)/opensnes/examples -path "*/bin" -prune -o -name "*.sfc" -exec cp {} $(RELEASE_DIR)/opensnes/examples/bin/ \;
-	@cp -r docs/build/html $(RELEASE_DIR)/opensnes/docs/ 2>/dev/null || true
+	@# No devtools script in the zip (2026-10-06): a user build runs binaries
+	@# of bin/ and the shell CLI only, and check_doc_drift.py (anchor 17)
+	@# fails if make/common.mk calls an interpreter again. Its name lists
+	@# (make/removed_api.txt, changed_api.txt) ship with make/.
+	@# No examples and no generated HTML in the SDK zip (2026-10-05, the
+	@# two-audiences rule): the examples ship once, for every OS, as
+	@# opensnes-examples_<version>.zip (`make release-examples`), and the
+	@# documentation is published online from `main` (deploy_docs.yml).
+	@# Compressed, they were 14 MB of a 40 MB zip (v0.46.0 arm64), re-shipped
+	@# four times; the 17 static binaries of bin/ are the 23 MB that remain.
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp ATTRIBUTION.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@# Apache-2.0 §4: the binaries built with cmdparser ship with its licence.
-	@cp tools/common/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
+	@cp tools/third_party/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
 	@# GPL-2.0 §3: the wla-dx binaries (a patched fork) ship with the licence
 	@# text and a pointer to their exact source (compiler/PINS.md: fork URL and
 	@# commit of every toolchain submodule).
@@ -644,6 +675,20 @@ release: all docs
 	@echo "=========================================="
 	@echo "Release created: $(RELEASE_DIR)/$(RELEASE_NAME).zip"
 	@echo "=========================================="
+
+# The examples archive: the tracked sources and assets of every example,
+# plus the ROMs built in this tree under examples/bin/. One archive per
+# version, not per OS — nothing in it is platform-specific.
+EXAMPLES_NAME := opensnes-examples_$(VERSION)
+release-examples: examples
+	@rm -rf $(RELEASE_DIR)/$(EXAMPLES_NAME) $(RELEASE_DIR)/$(EXAMPLES_NAME).zip
+	@mkdir -p $(RELEASE_DIR)/$(EXAMPLES_NAME)/examples/bin
+	@git ls-files examples | tar -cf - -T - | tar -xf - -C $(RELEASE_DIR)/$(EXAMPLES_NAME)
+	@find examples -path "*/bin" -prune -o -name "*.sfc" -exec cp {} $(RELEASE_DIR)/$(EXAMPLES_NAME)/examples/bin/ \;
+	@cp README.md LICENSE ATTRIBUTION.md $(RELEASE_DIR)/$(EXAMPLES_NAME)/
+	@cd $(RELEASE_DIR) && zip -q -r $(EXAMPLES_NAME).zip $(EXAMPLES_NAME)
+	@rm -rf $(RELEASE_DIR)/$(EXAMPLES_NAME)
+	@echo "Examples archive: $(RELEASE_DIR)/$(EXAMPLES_NAME).zip ($$(ls examples/*/*/*.sfc examples/*/*/*/*.sfc 2>/dev/null | wc -l) ROMs)"
 
 # Consume the release zip the way a user does: extract it, build the
 # starter and a scaffolded project, run the project test when luna is here.
@@ -669,13 +714,13 @@ hardware-kit:
 # table as hardware-kit. ROWS=1-7 restricts it to the gate rows.
 hardware-preflight:
 	@scripts/install-luna.sh
-	@python3 tools/luna-test/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
+	@python3 testing/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
 
-# A project's sources against the names 1.0 removes and the two calls that
+# A project's sources against the names 0.49 removed and the two calls that
 # change meaning (docs/UPGRADING.md): make check-upgrade SRC=<folder>
 check-upgrade:
 	@test -n "$(SRC)" || { echo "usage: make check-upgrade SRC=<folder-or-file>"; exit 2; }
-	@python3 devtools/check_upgrade.py $(SRC)
+	@bin/opensnes upgrade $(SRC)
 
 help:
 	@echo "OpenSNES SDK Build System"
@@ -687,21 +732,29 @@ help:
 	@echo "  lib       - Build OpenSNES library"
 	@echo "  examples  - Build all example ROMs"
 	@echo "  tests     - Build test ROMs"
+	@echo "  fixtures  - Build every ROM fixture of testing/fixtures/ (lib, compiler, stress)"
 	@echo "  docs      - Generate API documentation (requires doxygen)"
-	@echo "  release   - Create SDK release package (zip)"
+	@echo "  release   - Create the SDK release zip (toolchain, tools, lib, make, templates, starter; no examples, no HTML)"
+	@echo "  release-examples - Create the examples archive (sources, assets, built ROMs), one per version"
 	@echo "  hardware-kit - Collect the real-console protocol ROMs (docs/HARDWARE_VERIFICATION.md)"
+	@echo "  bench-sdk - The same C built by OpenSNES and by PVSnesLib, timed on luna (needs PVSNESLIB_HOME)"
+	@echo "  bench-lib - The same library calls through both SDKs, timed on luna (needs PVSNESLIB_HOME)"
+	@echo "  bench-twins - The examples both SDKs have, side by side on luna (needs PVSNESLIB_HOME)"
+	@echo "  test-difftest - Random C integer expressions, compiled and run on luna, against a model of C checked by clang (SEEDS=1000-1999 to hunt)"
 	@echo "  hardware-preflight - Replay those ROMs on luna from random RAM and under PAL before a console session (ROWS=1-7)"
-	@echo "  check-upgrade SRC=<dir> - List the names 1.0 removes, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"
+	@echo "  check-upgrade SRC=<dir> - List the names 0.49 removed, and the calls that change meaning, in a project's sources (docs/UPGRADING.md)"
 	@echo "  clean     - Clean all build artifacts"
 	@echo "  install   - Install binaries to bin/"
 	@echo "  verify-toolchain - Check that compiler submodules match compiler/PINS.md"
 	@echo "  lint-commits - Validate commit messages in origin/develop..HEAD (RANGE=... overrides)"
 	@echo "  lint-docs - Check anchored doc claims (version macros, ROADMAP status, examples count)"
-	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + lint-commits)"
+	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + test-devtools + lint-commits)"
+	@echo "  test-devtools - Unit tests of the sentinels (devtools/test_*.py) and of the luna harness"
 	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"
+	@echo "  test-bank-spill   - Rebuild four examples with bank $$00 full: code in bank $$01 must show the same frames"
 	@echo "  fuzz      - Fuzz lodepng and the IT loader with libFuzzer for FUZZ_SECONDS each (ASan+UBSan)"
 	@echo "  fuzz-replay - Replay the committed fuzz regression inputs (tools/fuzz/crashes/)"
 	@echo "  help      - Show this help"

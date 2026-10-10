@@ -67,7 +67,9 @@ int main(void) {
         textPrintAt(3, 8, "LAUNCHING GSU...");
         WaitForVBlank();
 
-        gsu_cfgr = 0xA0;              /* IRQ mask + fast multiply (FMULT tests) */
+        gsu_cfgr = 0x80;              /* IRQ mask. Not CFGR_FAST_MUL: MS0 must be 0 at the
+                                         21 MHz gsuLaunch() uses (fullsnes), and the launcher
+                                         masks it anyway — this line set $A0 until 2026-10-05 */
         gsu_scmr = 0x18;              /* RAN + RON */
         gsuSetProgram(gsu_program);
         gsuLaunch();

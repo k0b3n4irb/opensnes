@@ -1,0 +1,2 @@
+{ "frames": [ { "duration": 100 }, { "duration": 100 } ],
+  "meta": { "frameTags": [ { "name": "walk", "from": 0, "to": 9, "direction": "forward" } ] } }

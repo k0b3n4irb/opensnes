@@ -52,7 +52,7 @@ Probe oracle: `swarm_frame` advances once per displayed frame.
 
 ```bash
 make
-../../../tools/luna-test/bin/luna run -n 3000000 sprite_swarm.sfc
+../../../testing/bin/luna run -n 3000000 sprite_swarm.sfc
 ```
 
 ## Modules used

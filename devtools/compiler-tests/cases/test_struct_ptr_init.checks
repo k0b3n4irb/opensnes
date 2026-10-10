@@ -6,4 +6,4 @@ present \.dw myAnim\n\t\.db :myAnim\n\t\.dw 6\n\t\.dl myFrames\+0\n\t\.dsb 1, 0\
 absent \.dl [a-z]\+0\n
 present \.dw myFrames\n\t\.db :myFrames\n\t\.dw 3\n\t\.db 10\n\t\.db 20\n\t\.db 30\n
 # The read goes through the pointer loaded from myAnim.
-in main: present lda\.w myAnim\n[\s\S]*tax\n\tsep #\$20\n\tlda\.l \$0000,x
+in main: present lda\.w myAnim\n[\s\S]*tax\n\tsep #\$20\n\tlda\.l \$000000,x

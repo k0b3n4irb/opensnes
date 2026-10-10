@@ -1,0 +1,6 @@
+good.sfc: "GOLDEN GAME" — LoROM, 64 KB, 8 KB battery RAM, PAL (country $02), version 1.1
+  checksum $0612 ok · crc32 24d69500 · sha1 dce2756f1636fa8524cd13f2c25be3076eddafe2
+hirom.sfc: "HIROM FAST" — HiROM FastROM, 64 KB, NTSC (country $00), version 1.0
+  checksum $0615 ok · crc32 4f437e7a · sha1 f56438fa4c2c34096ebf8e16b16b74205386d922
+oddsize.sfc: "ODD SIZE" — LoROM, 96 KB, NTSC (country $01), version 1.0
+  checksum $04AB ok · crc32 c9058643 · sha1 9b54971e5f42467aa9d7c91c46535eaead9e850f

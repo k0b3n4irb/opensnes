@@ -6,7 +6,7 @@ helps the other two, and each one owes the other two its feedback.
 
 | Partner | What it is | What it gives us | What we give it |
 |---|---|---|---|
-| **luna** | the cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `tools/luna-test/luna.version`) | the one source of truth for running, inspecting and judging ROMs (`.claude/rules/luna_tooling.md`) | capability requests specified by a working prototype, bug reports with a ROM and a command line, and the answer to every note it sends us |
+| **luna** | the cycle-accurate emulator, test backend and debugger (`k0b3n4irb/luna`, pinned in `testing/luna.version`) | the one source of truth for running, inspecting and judging ROMs (`.claude/rules/luna_tooling.md`) | capability requests specified by a working prototype, bug reports with a ROM and a command line, and the answer to every note it sends us |
 | **snes-rag** (the Cartouche corpus, MCP `cartouche`) | the arbitrated SNES reference corpus: hardware, chips, SPC700, formats, toolchain docs, luna's own docs | the arbiter for every hardware claim and every "is this the hardware or the toolchain?" question (`.claude/rules/hardware_claims.md`) | every query that came back empty, wrong or unsettled; every source it is missing; every fact we established that no source states |
 
 This rule is the contract between the three. The two rules it cites say
@@ -24,8 +24,8 @@ the same day, with what you tried and what you needed. Concretely:
   flag, device, oracle or diagnostic is missing; when its output
   contradicts a reference; when a note it sent us needs an answer.
   Lifecycle in `luna_tooling.md`: prototype → we validate it in writing →
-  luna issue (`gh issue create --repo k0b3n4irb/luna`) → luna ships → we
-  delete the prototype. A *report* (several requests, priorities, what luna
+  a direct message to luna's session with the prototype (`exchanges.md`;
+  no GitHub issue since 2026-10-10) → luna ships → we delete the prototype. A *report* (several requests, priorities, what luna
   made possible since the last one) is a file luna's engineers read as is.
 - **To snes-rag** (passive partner: it waits for our feedback and luna's,
   it does not come to us): when `snes_search` / `snes_verify` returns
@@ -46,9 +46,11 @@ the same day, with what you tried and what you needed. Concretely:
 `.claude/notes/partners/<partner>/YYYY-MM-DD_<direction>_<topic>.md`, with
 `direction` = `to` (ours) or `from` (theirs). Versioned in the repo, not in
 `/tmp` or on one machine: a report that lives only in `/tmp` is lost with
-the session, and the *answers* to it are project knowledge. The owner
-forwards our `to_` files and drops the partner's replies in as `from_`
-files (or in `/tmp`, from where we copy them in).
+the session, and the *answers* to it are project knowledge. Since
+2026-10-10 the owner no longer carries them: a report to luna is announced
+to luna's session directly (`exchanges.md`), and its file delivered in the
+exchange folder below; snes-rag, which has no standing session, is reached
+by its folder only.
 
 **snes-rag's exchange folder** (on this machine):
 `/media/psf/Home/workspaces/SNES/snes-rag/.claude/notes/partners/opensnes/`.
@@ -56,6 +58,20 @@ Their `from_` reports land there, and **ours are always delivered there**
 (owner instruction, 2026-10-02): write the `to_` file in the repo, then copy
 it into that folder. Check which `to_` files they already have first, so an
 outdated report is folded into the current one instead of sent late.
+
+**luna's exchange folder** (on this machine, since 2026-10-06):
+`~/workspace/partner-reports/opensnes/`, named
+`AAAA-MM-JJ_<émetteur>-vers-<destinataire>_<sujet>.md` (its `INDEX.md` is
+one level up). Read it at every exchange: four notes of 2026-10-05 sat
+there unanswered because we only looked at what the owner pasted. Copy
+each `luna-vers-opensnes` file into the repo as `from_luna_…`, and deliver
+each `to_luna_…` there as `opensnes-vers-luna_…` (the owner may already
+have).
+
+**The game (speedball2)** is not a partner in the sense of this rule — it
+is the first project built on the SDK, and since 2026-10-10 it speaks to us
+directly and we to it (`exchanges.md`; `.claude/notes/projects/speedball2.md`
+is where what it shows us is kept).
 
 Every `to_` report has the same spine: header (who, which pin / index
 fingerprint, status: sent as is, or still accumulating), what the

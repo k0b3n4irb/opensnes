@@ -42,15 +42,13 @@
 #include <snes/dma.h>
 
 /** @brief Aim target background tile data (2bpp, crosshair pattern) from data.asm */
-extern u8 aim_target_tiles[], aim_target_tiles_end[];
+#include "res/aim_adjust_target.inc"
+#include "res/sprites.inc"
+/* generated: aim_adjust_target_tiles/_map/_pal, sprites_tiles/_pal (each with _end) */
 /** @brief Aim target tilemap (32x32 BG2 layout) from data.asm */
-extern u8 aim_target_map[], aim_target_map_end[];
 /** @brief Aim target palette (BGR555) from data.asm */
-extern u8 aim_target_pal[], aim_target_pal_end[];
 /** @brief Sprite tile data (red dot marker, 4bpp) from data.asm */
-extern u8 sprites_tiles[], sprites_tiles_end[];
 /** @brief Sprite palette (BGR555) from data.asm */
-extern u8 sprites_pal[], sprites_pal_end[];
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
@@ -84,7 +82,7 @@ static void hideDot(void) {
  */
 static void showDot(u16 x, u16 y) {
     oamMemory[0] = (u8)x;
-    oamMemory[1] = (u8)(y - 1);  /* PPU +1 scanline quirk: write Y-1 */
+    oamMemory[1] = (u8)y;
     oam_update_flag = 1;
 }
 
@@ -124,10 +122,10 @@ int main(void) {
     textModeInit();
 
     /* --- BG2: aim calibration target --- */
-    dmaCopyVram(aim_target_tiles, 0x1000,
-                (u16)(aim_target_tiles_end - aim_target_tiles));
-    dmaCopyVram(aim_target_map, 0x2000,
-                (u16)(aim_target_map_end - aim_target_map));
+    dmaCopyVram(aim_adjust_target_tiles, 0x1000,
+                (u16)(aim_adjust_target_tiles_end - aim_adjust_target_tiles));
+    dmaCopyVram(aim_adjust_target_map, 0x2000,
+                (u16)(aim_adjust_target_map_end - aim_adjust_target_map));
     bgSetGfxPtr(1, 0x1000);
     bgSetMapPtr(1, 0x2000, BG_MAP_32x32);
 
@@ -141,10 +139,10 @@ int main(void) {
     setColor(1, RGB(31, 31, 31)); /* Text: white */
 
     /* BG2: all 4 sub-palettes (CGRAM 32-47) */
-    dmaCopyCGram(aim_target_pal, 32, 8);
-    dmaCopyCGram(aim_target_pal, 36, 8);
-    dmaCopyCGram(aim_target_pal, 40, 8);
-    dmaCopyCGram(aim_target_pal, 44, 8);
+    dmaCopyCGram(aim_adjust_target_pal, 32, 8);
+    dmaCopyCGram(aim_adjust_target_pal, 36, 8);
+    dmaCopyCGram(aim_adjust_target_pal, 40, 8);
+    dmaCopyCGram(aim_adjust_target_pal, 44, 8);
 
     /* Sprite palette (CGRAM 128+) */
     dmaCopyCGram(sprites_pal, OBJ_CGRAM_BASE,

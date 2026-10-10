@@ -17,10 +17,7 @@ extern void smapWrite(u16 byte_offset, u16 value);
 extern void smapClear(u16 byte_count);
 extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
 
-static u16 map64_len;
-
 void initSpriteMap64x64(u16 len) {
-    map64_len = len;
     smapClear(len);
 }
 

@@ -268,6 +268,62 @@ REG_OBJSEL = 0x60;  // 16x16/32x32, tiles at $0000
 
 See `examples/input/two_players/` for a complete example with two independently controlled sprites.
 
+## A scrolling game's sprites: `oamPlaceWorld`
+
+A game whose background scrolls keeps its actors in **world** coordinates,
+and every frame has to turn each one into an OAM entry: subtract the
+camera, decide whether it is on screen, write it or hide it. Written as a
+loop in C around `oamSet()` and `oamHide()`, that is where the frame goes
+— a real project measured about 6,000 master cycles a sprite, a third of
+its frame for 19 sprites. `oamPlaceWorld()` is that loop, once, in
+assembly:
+
+```c
+#define ACTORS 18
+static s16 actor_x[ACTORS], actor_y[ACTORS];      /* world, moved by the game */
+static u8  actor_tile[ACTORS], actor_attr[ACTORS];
+static u8  actor_seen[ACTORS];                    /* filled by the call */
+
+static const OamWorldBatch actors = {
+    actor_x, actor_y, actor_tile, actor_attr, actor_seen,
+    0,          /* first OAM id */
+    ACTORS,
+    32          /* every sprite of a batch has this size, in pixels */
+};
+
+/* once: */
+for (i = 0; i < ACTORS; i++) oamSetSize(i, 1);    /* the size bit is yours */
+
+/* every frame, after the game moved its actors: */
+oamPlaceWorld(&actors, cam_x, cam_y);
+for (i = 0; i < ACTORS; i++) {
+    if (!actor_seen[i]) continue;                 /* off screen: nothing to animate */
+    /* ... */
+}
+```
+
+What it does for each sprite, and what it leaves to you:
+
+- **Culling is by the sprite's size, on both axes.** A 32x32 sprite at
+  x = -31 is drawn, with its ninth x bit set; one pixel further it is
+  hidden, the way `oamHide()` hides.
+- **`cam_y` is the y you give `bgSetScroll()`.** A sprite and the
+  background it stands on take the same camera value (see
+  [OAM](../hardware/OAM.md): a sprite's y needs no correction).
+- **Structure of arrays.** One array per property is what this CPU indexes
+  cheaply, and each array can live where it suits: positions in RAM, tile
+  numbers in a `const` table if they never change.
+- **One size per batch.** A game with 32x32 players and a 16x16 ball makes
+  two calls; the second batch can point into the same arrays
+  (`actor_x + 18`).
+- **A sprite the game wants hidden although it is on screen** (its
+  graphics are not loaded yet, say) is one `oamHide(id)` after the call.
+
+Measured (`devtools/libbench`, rows `worldc` and `world`: 19 sprites, 13
+on screen, a moving camera): 31,400 master cycles a frame with
+`oamPlaceWorld()`, 63,800 for the same loop in C writing `oamMemory[]`
+directly — the cheapest way to write it in C.
+
 ## Performance Tips
 
 1. **Minimize oamUpdate() calls** - Only call once per frame

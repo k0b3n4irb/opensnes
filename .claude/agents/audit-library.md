@@ -17,13 +17,13 @@ Questions auxquelles tu dois répondre :
 - Robustesse : les classes de défaillance silencieuse listées dans `CLAUDE.md`/`KNOWN_LIMITATIONS.md` — lesquelles sont attrapées par un lint ou un test, lesquelles restent à la charge de l'utilisateur. Cite les lints (`check_bank_reads.py`, `check_asm_abi.py`, `check_nmi_wram_race.py`, ratchets symmap).
 - Le bug de l'object engine (banque codée en dur à 13 sites, c9ddef1d) : cherche des motifs analogues restants dans `lib/source/*.asm` et `lib/contrib/object.asm` (`lda #$00 / pha / plb`, `lda.l $7E...` avec pointeur utilisateur, DB supposé) ; liste-les avec ligne.
 - Le modèle mémoire (RAM plain < $2000, `FAR`, budgets), la NMI (ordre, budget 12 000 mclk, ce qui est `jsl` vers de la ROM), `WaitForVBlank`.
-- Performance : ce que `docs/BENCHMARK.md` prouve vs affirme ; `nmi_budget.py` (`tools/luna-test/`) et ses baselines.
+- Performance : ce que `docs/BENCHMARK.md` prouve vs affirme ; `nmi_budget.py` (`testing/`) et ses baselines.
 - Ce qui manque encore à une lib de moteur 2D 1.0 par rapport à PVSnesLib (`docs/MIGRATING_FROM_PVSNESLIB.md` liste les écarts) : évalue si les manques sont assumés ou oubliés.
 
 
 ## Règles communes à tous les agents d'audit (non négociables)
 
-- **Lecture seule sur le dépôt.** Aucune modification de fichier suivi, aucun commit, aucun `git checkout`, aucun `make clean`, aucun `make` global (il reconstruit tout). Autorisé : lire, `grep`, `find`, `wc`, `git log`/`git diff`/`git blame`, `python3 devtools/...` en lecture, `make lint-docs`, `make -n`, construire UN exemple (`make -C examples/<x>`), lancer `tools/luna-test/bin/luna` sur un `.sfc` existant, `snes_search`/`snes_verify` du MCP cartouche (avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` pour toute affirmation matérielle).
+- **Lecture seule sur le dépôt.** Aucune modification de fichier suivi, aucun commit, aucun `git checkout`, aucun `make clean`, aucun `make` global (il reconstruit tout). Autorisé : lire, `grep`, `find`, `wc`, `git log`/`git diff`/`git blame`, `python3 devtools/...` en lecture, `make lint-docs`, `make -n`, construire UN exemple (`make -C examples/<x>`), lancer `testing/bin/luna` sur un `.sfc` existant, `snes_search`/`snes_verify` du MCP cartouche (avec `exclude_sources=["opensnes-docs","opensnes-notes-tech"]` pour toute affirmation matérielle).
 - **Preuves, pas d'impressions.** Chaque constat cite un fichier et une ligne, un chiffre mesuré, une commande et sa sortie, ou un chunk id du corpus. Un point positif sans preuve est un compliment ; un point négatif sans preuve est une opinion — ni l'un ni l'autre n'a sa place dans le rapport.
 - **Sans compromis.** Le propriétaire veut l'état réel du projet. Ne pas adoucir. Ne pas gonfler non plus : une faiblesse mineure est dite mineure.
 - **Classer chaque faiblesse** : 🔴 bloque v1.0 ou casse un utilisateur ; 🟠 dette qui coûtera cher à repousser ; 🟡 confort / cohérence. Donner un effort (S ≤ 1 j, M ≤ 1 sem, L > 1 sem).

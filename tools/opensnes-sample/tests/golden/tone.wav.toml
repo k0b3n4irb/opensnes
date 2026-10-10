@@ -1,0 +1,5 @@
+# import settings of tone.wav, written by opensnes-sample --save; the build reads `tool`
+tool = "opensnes-sample"
+
+[encode]
+loop = [40, 200]

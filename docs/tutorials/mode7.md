@@ -1,5 +1,9 @@
 # Mode 7 Tutorial {#tutorial_mode7}
 
+![mode7 example](perspective.png)
+
+*`examples/mode7/perspective`: the Mode 7 plane receding to a horizon, one HDMA-fed matrix per scanline.*
+
 This tutorial covers SNES Mode 7: what the affine background mode actually
 is, why its VRAM format is interleaved, the matrix maths the lib hides
 behind `mode7SetAngle`/`mode7SetScale`, and how the F-Zero / Pilotwings
@@ -427,4 +431,5 @@ angle tables (entry = `trig(2*pi*a/48) * 20480 / scanline`, 8.8 fixed:
 the hyperbolic perspective divide). Four HDMA channels, one per register,
 repointed per frame with `hdmaSetup(ch, HDMA_MODE_1REG_2X,
 HDMA_DEST_M7A..D, table + angle * 673)`. The tables are machine-verified
-against the math by `devtools/m7ptables.py verify`.
+by `opensnes-image perspective`, which regenerates them from that formula
+(`res/perspective.toml`; its golden suite holds krom's bytes).

@@ -97,7 +97,8 @@ writes every scanline.
 | File | Purpose |
 |------|---------|
 | `main.c` | Gradient setup, enable/disable, input handling |
-| `data.asm` | Background tiles/tilemap/palette, HDMA gradient table |
+| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it |
+| `data.asm` | the HDMA gradient table (`hdmaGradientList`), hand-written |
 | `res/opensnes.png` | Source background image |
 | `Makefile` | `LIB_MODULES := console dma background sprite hdma input math` |
 
@@ -117,3 +118,14 @@ writes every scanline.
 ## Modules Used
 
 `console`, `dma`, `background`, `sprite`, `hdma`, `input` (`LIB_MODULES` in the Makefile).
+
+## Further: the "9-bit" backdrop (two channels, one visual)
+
+krom's RedSpace9BitHDMA trick, the `gradient_9bit` example until 2026-10-05:
+one channel rewrites the backdrop colour per scanline exactly as this
+example does, and a second channel rewrites INIDISP's master brightness per
+scanline (`HDMA_MODE_1REG` into `$2100`). Colour x brightness, plus a
+one-line jitter, dithers the 5-bit gradient into more perceptual steps than
+the PPU has. INIDISP then belongs to the stream: the program never calls
+`setScreenOn()` itself, and the brightness table must end at full
+brightness or the screen stays dim after the last line.

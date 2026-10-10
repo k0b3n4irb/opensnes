@@ -13,7 +13,7 @@
 /* Get printable character representation for comments */
 static const char *char_repr(int ascii_code)
 {
-    static char buf[8];
+    static char buf[12];   /* "0x%02X" of an int: gcc counts up to 8 digits */
 
     if (ascii_code == 32) {
         return "space";

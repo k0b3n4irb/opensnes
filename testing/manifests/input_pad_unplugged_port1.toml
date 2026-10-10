@@ -1,0 +1,14 @@
+# padIsConnected() with nothing in port 1 and a pad in port 2 (luna v1.28.0
+# port keys). Until 2026-09-26 an empty port answered 1: its auto-read word
+# and an idle pad's are both $0000; crt0's NMI now reads the 17th serial
+# bit, 1 on a pad and 0 on an empty port (anomie-regs 5d9adb34c2fab21f for
+# the plugged half). One port at a time, so the answer is per port.
+# r_pad_conn = padIsConnected(0), r_pad_conn1 = padIsConnected(1).
+# Moved from testing/fixtures/libtests/test_libtest.py (UNPLUGGED, both ports none).
+rom = "../fixtures/libtests/libtest.sfc"
+steps = 3000000
+port1 = "none"
+
+[asserts.values]
+r_pad_conn = { eq = 0, width = 2 }
+r_pad_conn1 = { eq = 1, width = 2 }

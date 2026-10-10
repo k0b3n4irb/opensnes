@@ -91,7 +91,7 @@ lib is at fault. The corpus note is `cartouche-fiches` chunk
 
 ## Testing
 
-`tools/luna-test/manifests/backgrounds_mode6.toml` checks the mode, both
+`testing/manifests/backgrounds_mode6.toml` checks the mode, both
 screens and BG3VOFS, the wave in the vertical row at frame 100, then in the
 horizontal row after A with the vertical row back to zero (VRAM `$6000` and
 `$6040`), and that every upload lands in blank. Without the A press it

@@ -34,11 +34,9 @@
 #include <snes.h>
 
 /** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
-extern u8 tiles[], tiles_end[];
+#include "res/back.inc"   /* generated: back_tiles[], back_tiles_end[], back_map[], back_pal[] */
 /** @brief 64x32 tilemap data for the parallax background */
-extern u8 tilemap[];
 /** @brief 16-color palette for the background */
-extern u8 palette[];
 
 /**
  * @brief HDMA scroll table in RAM — a plain C global, so it sits in
@@ -75,8 +73,8 @@ int main(void) {
 
     /* Load 4bpp tiles to VRAM word address $1000, palette to CGRAM slot 0.
      * 2 * PALETTE_16_SIZE = 64 bytes = 2 palettes. */
-    bgInitTileSet(0, tiles, palette, 0,
-                  tiles_end - tiles,
+    bgInitTileSet(0, back_tiles, back_pal, 0,
+                  back_tiles_end - back_tiles,
                   2 * PALETTE_16_SIZE,
                   BG_16COLORS, 0x1000);
 
@@ -84,7 +82,7 @@ int main(void) {
      * SC_64x32 means two 32x32 screen pages side-by-side (4096 bytes total).
      * This provides a 512-pixel-wide virtual background for smooth scrolling. */
     bgSetMapPtr(0, 0x0000, SC_64x32);
-    dmaCopyVram(tilemap, 0x0000, 64 * 32 * 2);
+    dmaCopyVram(back_map, 0x0000, 64 * 32 * 2);
 
     setMode(BG_MODE1, 0);
     setMainScreen(TM_BG1);  /**< Enable only BG1 on the main screen */
