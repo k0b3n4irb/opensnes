@@ -10,16 +10,23 @@ It shares the same instruction set, so you already know how to program it — in
 assembly: the SDK does not run C on it, because the C runtime lives in work RAM,
 which the SA-1 cannot see (table below).
 
-**How fast it really runs depends on memory, not on the clock.** The higan SA-1
-speed tests measured ([higan test ROMs](https://gitlab.com/higan/snes-test-roms),
-"SA-1 Speed Test"):
+**How fast it really runs depends on memory, not on the clock.** The SA-1
+Speed Test of the [higan test ROMs](https://gitlab.com/higan/snes-test-roms)
+was photographed running on a real console (one console, one board:
+1L8B-10). Read off those photographs:
 
 | Main CPU runs from | SA-1 runs from | SA-1 effective speed |
 |---|---|---|
-| WRAM or ROM | I-RAM | ~10.7 MHz (~3.7 MHz if the main CPU also works in I-RAM) |
-| WRAM | ROM | ~10 MHz |
-| ROM | ROM | **~5.4 MHz** — the two CPUs share the ROM bus |
-| any | BW-RAM | ~5.4 MHz, ~2.7 MHz if both use BW-RAM |
+| WRAM | I-RAM | 10.74 MHz |
+| I-RAM | I-RAM | 3.72 MHz |
+| WRAM | ROM | 10.07 MHz (7.67 across a `JMP`) |
+| ROM | ROM | **5.04 MHz** — the two CPUs share the ROM bus |
+| BW-RAM | BW-RAM | 2.69 MHz |
+
+The summary table in that test's README gives about 5.4 MHz for ROM / ROM
+and is the figure most often repeated; the photographs of the same run say
+5.04, and the measurement is what this page follows. No reference manual
+states these speeds: they are measurements, on one machine.
 
 So "3× the main CPU" holds only for SA-1 code that keeps off the ROM while the
 main CPU is on it. The table gives the rate while both CPUs are in a case; a

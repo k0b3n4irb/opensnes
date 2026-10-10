@@ -21,3 +21,27 @@ corpus the day the report goes out (`.claude/rules/partners.md`).
   reserves and its chunk ids. Next batch that touches headers.
 - 2026-10-10 — relayed, not re-queried: the speedball2 project found no
   arbiter for the SA-1's effective speed by memory (its decision 0007).
+
+**2026-10-10, pin v1.37.0: `luna-docs` lags the tag.** Query (no
+exclusion): "luna diff --audio --align-onset per-window shift --max-shift".
+Returned: `86a0d1666e161484` and `f2ca4b411354b69e` (luna-docs,
+arbitre-domaine), which describe `--align-onset` as it was in v1.35.0 /
+v1.36.0 — one shift, taken at each capture's first sample above
+`--silence`. v1.37.0 (luna `f44025b`, 2026-10-10) fits every window by
+itself within `--max-shift` samples (default 64) and its final line says
+"per-window shift, max N samples (searched ±64)". Nothing in the corpus
+names `--max-shift`. Needed: `luna-docs` re-captured at v1.37.0. Also new
+in that tag and absent for the same reason: `--input-at`, `--poke-at` /
+`[[poke]]`, `test --update` printing `UPDATED`, and the duration of a DMA
+(the end of a burst realigned on the whole burst's count, as ares, Mesen2
+and anomie's timing document have it: ±2 or 4 master cycles from a
+6-cycle access) — that last one is a hardware fact with three sources
+luna cites, worth a fiche of its own.
+
+Sent the same evening in `2026-10-10_to_snes-rag_vitesse-sa1-et-index_reply.md`
+(delivered in their folder), with the SA-1 corrections their note asked
+for: `sa1.h` and `docs/tutorials/sa1.md` now follow the console photographs
+(5.04 MHz for ROM / ROM, not 5.4) and give BW-RAM as `$40-$4F` from the
+main CPU, `$40-$5F` from the SA-1 with the fiche's reserve. The line above
+that owed the `sa1.h` rewrite is paid.
+
