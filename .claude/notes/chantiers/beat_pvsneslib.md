@@ -295,6 +295,12 @@ estimation.
 - `477259cd` (S5 step 4) counts "180 000 programs clean on new seeds".
   The first 120 000 had one failure, seed 124152 — the gvn defect the same
   commit fixes; the 60 000 run after the fix were clean, and so is that seed.
+- `8d97b5e9` (`OamWorldBatch.order`) ends with "games/rpg and
+  games/likemario use the unordered path every frame". Wrong: no example
+  calls `oamPlaceWorld()` at all (checked after the push); the only users
+  in the tree are the library test ROM and `devtools/libbench`. The path
+  is covered by those two, not by a game. An example that scrolls with
+  world-space sprites is owed (the examples review before 1.0).
 
 ## S7: PVSnesLib's examples against ours (mapped 2026-10-09)
 
