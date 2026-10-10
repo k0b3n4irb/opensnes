@@ -114,3 +114,37 @@ unvalidated compiler. Say so when a step is in progress.
   chantier, if it is ever opened, is not "raise the ceiling" but **the
   lower half of the map engine exposed alone**: the map in ROM in both
   orders, and nothing else.
+
+## The measurement method changed (2026-10-10, evening)
+
+luna delivered inputs indexed by arrival at a routine (luna `60b05e9`,
+after v1.36.0 — NOT in our pinned binary). The game's `play.toml` now has
+`input_at = "matchDecide"` and entries per tick: the command above
+(`--input <script>` alone) would read those numbers as frames. Use the
+game's own script, with the luna of the neighbouring checkout:
+
+    cd <copy of game/> && ../tools/verif/measure.sh x      # last line
+    # luna: ~/workspace/luna/target/stable/luna
+
+It profiles from frame 0 to the frame where `matchDecide` is reached for
+the 341st time (`luna state --input-at matchDecide --until-pc matchDecide
+--hit 341`), with `--input-at matchDecide`: two builds then run exactly the
+same logic, whatever their speed. This is the fixed-work measure the frame
+windows could not give; it replaces the "760 frames" figures above, which
+are not comparable with it.
+
+Reference at `34cf0292`, with `inline` on its two helpers and the map by
+columns: **103.47 M master cycles in `match.c` over 340 ticks**, reached at
+frame 704, 16 three-frame ticks.
+
+Also from the game, same day: with `--column-major` its first screen comes
+at frame 9 instead of 50 and it no longer uses far RAM (23,040 bytes
+given back); its three tests keep the same picture hashes once shifted by
+41 frames. An unknown key in an asset's `.toml` is refused with a message
+(provoked: `column_major` with an underscore).
+
+Decided by the owner on 2026-10-10 (relayed by the orchestration session,
+not heard in ours): the game keeps 30 ticks a second, and its criterion is
+"no four-frame tick and at least 29 ticks a second". So the frame budget
+question of points 1 and 2 above is settled; what remains for the SDK is
+the cost of a decision burst (`decide.c`).
