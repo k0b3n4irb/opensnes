@@ -40,11 +40,13 @@ MEMMAP_SUPERFX = ../templates/memmap.inc
 CC = ../bin/cc65816
 # The library's C objects are rebuilt when the compiler changes: a `make`
 # after a compiler update otherwise linked games against library functions
-# the OLD compiler had made (same reason as COMPILER_BINS in
-# make/common.mk, 2026-10-10).
-COMPILER_BINS := $(wildcard ../bin/cc65816 ../bin/cc65816.exe \
-                            ../bin/cproc-qbe ../bin/cproc-qbe.exe \
-                            ../bin/qbe ../bin/qbe.exe)
+# the OLD compiler had made. By a stamp holding a checksum of the three
+# binaries, written below only when it changes — not by naming the binaries
+# as prerequisites of the pattern rules, which on Windows left every C
+# object unbuilt without an error (see COMPILER_ID in make/common.mk,
+# 2026-10-10).
+COMPILER_ID := $(shell cksum $(wildcard ../bin/cc65816* ../bin/cproc-qbe* ../bin/qbe*) 2>/dev/null | cksum | tr -d ' \t')
+COMPILER_STAMP := build/.compiler_id
 AS = ../bin/wla-65816
 SPC_AS = ../bin/wla-spc700
 LD = ../bin/wlalink
@@ -125,7 +127,15 @@ OBJECTS_SUPERFX = $(C_OBJECTS_SUPERFX) $(ASM_OBJECTS_SUPERFX)
 LIB_ASM_DEPS := $(wildcard $(SRCDIR)/*.inc $(CONTRIBDIR)/*.inc ../templates/*.inc) $(SRCDIR)/sm_spc.asm
 LIB_C_DEPS   := $(wildcard $(INCDIR)/snes.h $(INCDIR)/snes/*.h)
 $(ASM_OBJECTS_LOROM) $(ASM_OBJECTS_HIROM) $(ASM_OBJECTS_SA1) $(ASM_OBJECTS_SUPERFX): $(LIB_ASM_DEPS)
-$(C_OBJECTS_LOROM) $(C_OBJECTS_HIROM) $(C_OBJECTS_SA1) $(C_OBJECTS_SUPERFX): $(LIB_C_DEPS)
+$(C_OBJECTS_LOROM) $(C_OBJECTS_HIROM) $(C_OBJECTS_SA1) $(C_OBJECTS_SUPERFX): $(LIB_C_DEPS) $(COMPILER_STAMP)
+
+# Rewritten only when the checksum differs, so that its date moves with the
+# compiler and not with each `make`.
+$(COMPILER_STAMP): FORCE_COMPILER_ID
+	@mkdir -p build
+	@if [ "$$(cat $@ 2>/dev/null)" != "$(COMPILER_ID)" ]; then echo "$(COMPILER_ID)" > $@; fi
+.PHONY: FORCE_COMPILER_ID
+FORCE_COMPILER_ID:
 
 #------------------------------------------------------------------------------
 # Main Target - Build All
@@ -180,7 +190,7 @@ lorom: $(OBJECTS_LOROM)
 	@echo "[DONE] LoROM library: $(BUILDDIR_LOROM)/"
 
 # C compilation for LoROM
-$(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_LOROM) $(COMPILER_BINS) | $(BUILDDIR_LOROM)
+$(BUILDDIR_LOROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_LOROM) | $(BUILDDIR_LOROM)
 	@echo "[CC-LOROM] $<"
 	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_LOROM)/$*.c.asm
@@ -208,7 +218,7 @@ hirom: $(OBJECTS_HIROM)
 	@echo "[DONE] HiROM library: $(BUILDDIR_HIROM)/"
 
 # C compilation for HiROM
-$(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_HIROM) $(COMPILER_BINS) | $(BUILDDIR_HIROM)
+$(BUILDDIR_HIROM)/%.o: $(SRCDIR)/%.c $(MEMMAP_HIROM) | $(BUILDDIR_HIROM)
 	@echo "[CC-HIROM] $<"
 	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_HIROM)/$*.c.asm
@@ -236,7 +246,7 @@ sa1: $(OBJECTS_SA1)
 	@echo "[DONE] SA-1 library: $(BUILDDIR_SA1)/"
 
 # C compilation for SA-1
-$(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c $(MEMMAP_SA1) $(COMPILER_BINS) | $(BUILDDIR_SA1)
+$(BUILDDIR_SA1)/%.o: $(SRCDIR)/%.c $(MEMMAP_SA1) | $(BUILDDIR_SA1)
 	@echo "[CC-SA1] $<"
 	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SA1)/$*.c.asm
@@ -264,7 +274,7 @@ superfx: $(OBJECTS_SUPERFX)
 	@echo "[DONE] SuperFX library: $(BUILDDIR_SUPERFX)/"
 
 # C compilation for SuperFX
-$(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) $(COMPILER_BINS) | $(BUILDDIR_SUPERFX)
+$(BUILDDIR_SUPERFX)/%.o: $(SRCDIR)/%.c $(MEMMAP_SUPERFX) | $(BUILDDIR_SUPERFX)
 	@echo "[CC-SUPERFX] $<"
 	$(LINT_C)
 	@$(CC) $(CFLAGS) $< -o $(BUILDDIR_SUPERFX)/$*.c.asm

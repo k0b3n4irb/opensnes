@@ -416,11 +416,16 @@ LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)
 # A project's C objects must rebuild when the COMPILER changes: the driver,
 # the front end or the back end. Without this an SDK update (or `git pull`
 # and `make` in the SDK) left every `.c.o` of a project as the old compiler
-# step's figures to the cycle (2026-10-10). `wildcard` so that the names
-# exist with or without `.exe`, and a missing file is no prerequisite.
-COMPILER_BINS := $(wildcard $(OPENSNES)/bin/cc65816 $(OPENSNES)/bin/cc65816.exe \
-                            $(OPENSNES)/bin/cproc-qbe $(OPENSNES)/bin/cproc-qbe.exe \
-                            $(OPENSNES)/bin/qbe $(OPENSNES)/bin/qbe.exe)
+# had made it, and `make` there said "nothing to be done" (2026-10-10).
+#
+# By a checksum written into the configuration stamp (.opensnes_config,
+# below), not by naming the binaries as prerequisites: the first version
+# did that, and on Windows the library's C objects were silently NOT built
+# (a pattern rule one of whose prerequisites make cannot find is skipped,
+# and those objects also have a rule without a recipe, so make called them
+# done). A stamp is a file this Makefile writes itself. The glob patterns
+# read the directory, so they give the names as they are, `.exe` or not.
+COMPILER_ID := $(shell cksum $(wildcard $(OPENSNES)/bin/cc65816* $(OPENSNES)/bin/cproc-qbe* $(OPENSNES)/bin/qbe*) 2>/dev/null | cksum | tr -d ' \t')
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
 GSU_HEADERS := $(patsubst %.sfx,%.sfx.h,$(GSUSRC))
@@ -598,8 +603,18 @@ CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 # (.claude/rules/two_audiences.md; check_doc_drift.py anchor 17 keeps it so).
 upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes upgrade -q --removed-only $(1); then \
 	echo "  (the names above were removed at OpenSNES 0.49 — docs/UPGRADING.md)"; fi
-LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
-%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) $(COMPILER_BINS) .opensnes_config | $(ASSET_STAMPS)
+# What a project's C may include besides the library's headers: the `.h` and
+# the `.inc` beside the sources and in their `res/` folders (generated
+# tables are commonly `#include "res/x.inc"`). Coarse — any of them changing
+# recompiles all the project's C — but a stale object is silent: a
+# regenerated `.inc` recompiled nothing, and a missing array looked like a
+# compiler defect (2026-10-10). The exact answer
+# is a dependency file written by the preprocessor, which the cc65816
+# driver does not offer yet.
+_CSRC_DIRS := $(filter-out ./,$(sort $(dir $(CSRC))))
+LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc \
+                   $(foreach d,$(_CSRC_DIRS),$(d)*.h $(d)*.inc $(d)res/*.h $(d)res/*.inc))
+%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
@@ -619,7 +634,7 @@ endif
 # ignored, and the old header shipped. The stamp holds every knob that
 # reaches the header, the assembler flags or the link; it is rewritten only
 # when that text changes, so a rebuild with the same knobs stays a no-op.
-_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) $(SPRITE_SIZE) \
+_CONFIG_TEXT := [cc $(COMPILER_ID)] $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) $(SPRITE_SIZE) \
   [$(ROM_NAME)] [$(ASFLAGS)] [$(CFLAGS)] [$(LIB_MODULES)] [$(LIBDIR)] \
   [$(USE_SNESMOD) $(SOUNDBANK_BANK)]
 .opensnes_config: FORCE

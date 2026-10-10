@@ -24,7 +24,13 @@ All notable changes to OpenSNES are documented in this file.
   and `qbe`: after an SDK update, `make` in a project said "nothing to be
   done" and linked what the old compiler had produced; `make` in the SDK
   kept the library's C functions as the old compiler had made them. Both
-  now list the three binaries as prerequisites. Found by the first game
+  now keep a checksum of the three binaries in a stamp their C objects
+  depend on (a first version named the binaries as prerequisites, and on
+  Windows the library's C was then not built at all, without an error:
+  one push of `develop` was red for it).
+- build: a project's C objects also depend on the `.inc` files beside the
+  sources and in their `res/` folders, not only on the `.h`: a regenerated
+  `res/tables.inc` that a `.c` includes now recompiles it.
 - build: the syntax check of a project's C no longer refuses an
   initializer that leaves out the last fields of a structure
   (`-Wno-missing-field-initializers`). C sets them to 0, and that is how a
