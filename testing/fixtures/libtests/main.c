@@ -1117,6 +1117,9 @@ u16 r_fast[16];
 /* oamPlaceWorld (issue #165): eight 32x32 sprites around the four edges of
  * the screen, camera at (100, 50) */
 u16 r_world[12];
+u16 r_worldo[8];
+static const u8 w_rev[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
+static const u8 w_bad[8] = { 0, 200, 1, 8, 3, 3, 6, 255 };
 static s16 w_x[8];
 static s16 w_y[8];
 static u8 w_tile[8];
@@ -1124,6 +1127,11 @@ static u8 w_attr[8];
 static u8 w_seen[8];
 static const s16 w_sx[8] = { 0, -31, -32, 255, 256, 100, 100, 100 };   /* wanted on screen */
 static const s16 w_sy[8] = { 0,  10,  10, 223, 100, 224, -31, -32 };
+/* A batch written before `order` existed: eight initializers, as the
+ * documentation of 0.49 shows it. It must still compile under the build's
+ * -Werror, and `order` must be 0 (2026-10-10: it did not compile). */
+static u8 w_old_seen[2];
+static const OamWorldBatch w_old = { w_sx, w_sy, w_rev, w_rev, w_old_seen, 108, 2, 32 };
 
 static void test_string(void) {
     u16 i;
@@ -1368,7 +1376,38 @@ int main(void) {
         r_world[9] = oamMemory[127 * 4] | ((oamMemory[512] == before) << 8);   /* sprite 1 of the batch, 8 pixels wide at x = -31: hidden (x byte 1); byte 512, where a 129th sprite would land, untouched */
         r_world[10] = w_seen[0] | (w_seen[1] << 8);                        /* unchanged: 1, 1 */
         r_world[11] = 0x0165;
-        for (i = 110; i < 128; i++) oamHide(i);
+        /* `order`, a reversal: slot 110 shows sprite 7 and slot 117 sprite 0.
+         * The arrays did not move; visible[] is still indexed by the sprite. */
+        for (i = 0; i < 8; i++) w_seen[i] = 0xEE;
+        wb.visible = w_seen; wb.first_id = 110; wb.count = 8; wb.size = 32;
+        wb.order = w_rev;
+        oamPlaceWorld(&wb, 100, 50);
+        r_worldo[0] = oamMemory[117 * 4] | (oamMemory[117 * 4 + 1] << 8);  /* sprite 0: 0, 0 */
+        r_worldo[1] = oamMemory[116 * 4] | (oamMemory[116 * 4 + 1] << 8);  /* sprite 1: $E1, 10 */
+        r_worldo[2] = oamMemory[114 * 4] | (oamMemory[114 * 4 + 1] << 8);  /* sprite 3: 255, 223 */
+        r_worldo[3] = oamMemory[114 * 4 + 2] | (oamMemory[114 * 4 + 3] << 8);  /* its tile $13, attr $33 */
+        r_worldo[4] = oamMemory[110 * 4] | (oamMemory[110 * 4 + 1] << 8);  /* sprite 7: hidden, 1, 240 */
+        r_worldo[5] = 0;
+        for (i = 0; i < 8; i++) r_worldo[5] |= (u16)w_seen[i] << i;        /* by sprite: 75, as without order */
+        /* order bytes out of range (200, 8, 255) hide their slot and touch
+         * no array; sprite 3 shown twice is two slots with the same picture */
+        for (i = 0; i < 8; i++) w_seen[i] = 0xEE;
+        wb.order = w_bad;
+        oamPlaceWorld(&wb, 100, 50);
+        r_worldo[6] = (oamMemory[111 * 4] == 1 && oamMemory[111 * 4 + 1] == 240)            /* slot 1: 200 */
+                    | ((oamMemory[113 * 4] == 1 && oamMemory[113 * 4 + 1] == 240) << 1)     /* slot 3: 8 */
+                    | ((oamMemory[117 * 4] == 1 && oamMemory[117 * 4 + 1] == 240) << 2)     /* slot 7: 255 */
+                    | ((oamMemory[114 * 4] == 255 && oamMemory[115 * 4] == 255) << 3)       /* slots 4 and 5: sprite 3 */
+                    | ((w_seen[2] == 0xEE && w_seen[4] == 0xEE && w_seen[5] == 0xEE && w_seen[7] == 0xEE) << 4)  /* never named: untouched */
+                    | ((w_seen[0] == 1 && w_seen[1] == 1 && w_seen[3] == 1 && w_seen[6] == 1) << 5);
+        /* the old form: no order, slot 108 shows sprite 0 (camera at 0: on
+         * screen at 0, 0) and slot 109 sprite 1 (x = -31) */
+        oamPlaceWorld(&w_old, 0, 0);
+        r_worldo[7] = 0x0167
+                    ^ ((oamMemory[108 * 4] == 0 && oamMemory[108 * 4 + 1] == 0
+                        && oamMemory[109 * 4] == 0xE1 && w_old.order == 0) ? 0 : 0xFFFF);
+        wb.order = 0;
+        for (i = 108; i < 128; i++) oamHide(i);
         oam_update_flag = flag;
     }
     /* pads: no button is down in this ROM. The macros, the functions behind

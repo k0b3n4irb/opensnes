@@ -48,7 +48,7 @@ from lib import find_luna  # noqa: E402
 import run as sdkbench  # noqa: E402  (wla_sym, git_head)
 
 WORK = REPO / "build" / "libbench"
-ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq"]
+ROWS = ["idle", "pad", "scroll", "oamset", "oamxy", "oamsize", "dma", "text", "frame", "worldc", "world", "vramc", "vramq", "worldo"]
 # what one repetition asks for, and how many calls that is
 WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "scroll": ("`bgSetScroll` on three backgrounds, ten times", 30),
@@ -61,7 +61,8 @@ WHAT = {"pad": ("held, pressed, released of pad 0, ten times", 30),
         "worldc": ("19 world-space sprites placed by a loop in C (the same source)", 19),
         "world": ("the same 19 sprites: `oamPlaceWorld` here, the C loop there", 19),
         "vramc": ("six 128-byte VRAM transfers, six `dmaCopyVram` calls", 6),
-        "vramq": ("the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there", 6)}
+        "vramq": ("the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there", 6),
+        "worldo": ("the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there", 19)}
 REPS = 20
 FRAMES = 300
 DONE = 0x600D
