@@ -54,3 +54,63 @@ input and `testing/frame_sequence.py` tell "earlier" from "wrong".
 4. `buildColMap` copies the map by columns into 23 KB of RAM at boot, 38
    frames: a table the asset tool can produce, left in ROM.
 5. "Kick-off under 40 %" no longer compares two builds (see above).
+
+## Answers and what followed (2026-10-10, relayed by the owner's orchestration session)
+
+1. Checked by the game on the two disassemblies: the US Mega Drive version
+   keeps the PAL constants (seven tables identical byte for byte,
+   `frames_per_tick` = 2 on both). 30 ticks a second is the US Mega Drive's
+   pace, 20 % above the Amiga's. 30 or 25: the owner's decision; the game
+   proposes 30.
+2. Agreed; proposed criterion "no four-frame tick and at least 29 ticks a
+   second". Owner's decision.
+3. Agreed; what is missing is on luna's side (inputs indexed by arrival at
+   a routine): the game drafts that request.
+4. Agreed; the column table should come out of `opensnes-tileset`, after its
+   deduplication: an issue for us is drafted, not yet published.
+5. Adopted: its `measure.sh` gives the sum of cycles of `match.c`'s symbols.
+   Reference with `9ec70672`: 107.24 M over 347 ticks (the game has grown).
+
+The same day it hit bank $00 (issue #168): 3.6 KB free with half the logic
+ported. Not a limit: code runs from bank $01 and up, our build refused it
+wrongly (`.claude/rules/bank0_budget.md`). And it gave `decide.c`
+(`~/workspace/speedball2-snes/tools/workloads/decide.c`, also in #166): the
+decision burst, stand-alone, checksum `0x30B3`; 17.03 M master cycles
+without the two compiler steps of the day, 14.98 M with — to become the
+bench's 21st workload after 0.49.0. Its `rnd` rebuilds a carry by
+comparisons (1,445 cycles a call): `s = a + b; c = s < a;` is a pattern the
+back end should turn into `adc`.
+
+Its build uses this working tree: between two of our commits it may hold an
+unvalidated compiler. Say so when a step is in progress.
+
+
+## Direct exchanges, 2026-10-10 afternoon (session to session, the owner's new mode)
+
+- **#168 closed on evidence from the game**: on its real sources, bank $00
+  at 92 bytes free, 32 functions in bank $01 (its own hot `rnd`,
+  `vectorLength`, `predict`, and the library's `bgInitTileSet`, `oamClear`,
+  `vramQueueFlush`, `oamSetSize`…), and its reference model agrees at every
+  tick: 348/348, 420/420, 420/420. Its remark: a non-static C function that
+  nothing calls is not linked (`-d`), so a C filler fills nothing.
+- **`inline` on `vectorLength` and `octantTo` at `9ec70672`**: 107.24 M ->
+  105.65 M (-1.5 %) for 1,265 bytes; kept. Less than the -4 % of the
+  morning: with direct-page temps, `selectActive` gains less from becoming
+  a leaf. The advice was right in direction and smaller in size a step
+  later: quote such figures with the compiler commit.
+- **Column-major map in `opensnes-tileset`: taken**, form agreed before a
+  line was written: `column_major = true` in `[convert]`, `<name>.cmap`,
+  `<name>_cols[]` / `<name>_cols_end[]`, 2-byte entries, column after
+  column, rows top to bottom; entry of column c, row r at byte
+  `(c * height + r) * 2`, height in tiles — to be written in the option's
+  doc; refused with a message for `lz` and Mode 7.
+- **The map engine: noted, not planned — and reformulated by the game.**
+  What made it leave was the 512-entry ceiling, but it would have left
+  anyway: its scroll must go out at the same VBlank as OAM and never on a
+  lag frame (tick computed straight through, scroll set at the end, rows
+  and columns through `vramqueue`), and its camera moves up to 16 px a
+  tick. What it would have kept of the engine: none of its objects or
+  collisions, only "give me row r and column c, ready to push". So the
+  chantier, if it is ever opened, is not "raise the ceiling" but **the
+  lower half of the map engine exposed alone**: the map in ROM in both
+  orders, and nothing else.
