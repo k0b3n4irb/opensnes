@@ -113,6 +113,13 @@ All notable changes to OpenSNES are documented in this file.
   `QBE_SLOT_ORDER=def` and `CC_INLINE_LEAF_MAX=16` restore each (compiler
   checks `peep_flow`, `auto_inline`).
 
+- perf(runtime): **a 32-bit division or remainder is about four times
+  faster.** Both entries ran 32 turns of a 64-bit shift and a 32-bit trial
+  subtraction whatever the operands. They share a core now: a divisor
+  under 65,536 is divided word by word with the remainder in the
+  accumulator, and the first word is skipped when the quotient fits 16
+  bits; a wider divisor needs 16 turns. Same results, division by zero included (quotient $FFFFFFFF,
+  remainder the dividend).
 - perf(lib): **`audioLoadSample()` is 2.7 times faster.** The stream to
   the sound CPU goes three bytes an exchange instead of one, with the CPU
   side in assembly (`audio_stream.asm`) and the driver's receive loop

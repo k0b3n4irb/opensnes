@@ -790,3 +790,27 @@ frame, and a leaf loses its direct page for one cold call.
   that does run loses 25 cycles. It would need the source to say the call
   is cold. Kept as an idea (a `COLD` mark on a function, in `types.h`)
   for the day a measured case cannot be rearranged in the source.
+
+## 2026-10-11: step 11 — the 32-bit division of the runtime
+
+Found in a profile, not in a bench: one site dividing a 32-bit constant
+by a 16-bit value made `tcc_udivmod32` visible. The routine ran 32 turns of `asl/rol/rol/rol` on absolute words plus a 32-bit
+trial subtraction, about 16,000 master cycles a call. `div32_ucore`
+(shared by the signed entry): divisor under 65,536 → word by word,
+remainder in A, the high word skipped when it is below the divisor;
+wider divisor → 16 turns.
+
+Validation (runtime = Class A): diff_corpus 86/86; hunts on new seeds,
+expressions 129001-133000 and programs 327401-330400, clean; libtests 73
+vectors (`r_div32_bad`), two deliberate breaks caught (6 and 18 wrong).
+The WRAM oracle moved on 41 examples for a reason worth knowing: the
+section is 45 bytes longer, it shares the asset banks, so the constant
+data after it moved, and stale POINTERS to that data in the direct page
+(`tcc__r9`, `tcc__lf`) changed by 45 — three bytes on print_string, read
+with `luna state --peek tcc__r0:256` on both builds. Two of my reads on
+the way were void and said "0 bytes differ": a `--peek` whose address
+form luna did not accept returns nothing, and comparing two nothings
+passes. Check the length of what was read before comparing it.
+
+No sdkbench workload divides 32 bits by a variable. A row to add if the
+bench is extended.

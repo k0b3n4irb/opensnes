@@ -9,17 +9,24 @@
 ; (Session 7+ of the A1-followup chantier), no example references
 ; __[s]divmod32 and the helpers do not contribute to any shipping ROM.
 ;
-; Algorithm: restoring shift-subtract bit-by-bit, 32 iterations.
-;   * The quotient is built up in the same slot as the dividend
-;     (classic "dividend doubles as quotient" trick — each shift moves
-;     a dividend bit into the remainder MSB and leaves room at bit 0
-;     for the new quotient bit).
-;   * Signed: track signs at entry, abs() in place, run unsigned core,
+; Algorithm: restoring shift-subtract, at most 16 iterations a word
+; (div32_ucore, shared by the two entries):
+;   * divisor under 65536 (the common case: a 32-bit quantity divided by a
+;     16-bit one): the high word of the dividend is divided first, then
+;     the low word with that remainder, the remainder kept in A. When the
+;     high word is smaller than the divisor — the quotient fits 16 bits —
+;     the first step is skipped: 16 iterations of about 30 cycles.
+;   * divisor of 65536 or more: the quotient fits 16 bits, so the
+;     remainder starts as the dividend's high word and 16 iterations of
+;     the 32-bit trial subtraction remain.
+;   * divisor 0: quotient $FFFFFFFF, remainder = the dividend, as the
+;     32-iteration loop this replaces gave (C leaves it undefined).
+;   * Signed: track signs at entry, abs() in place, run the unsigned core,
 ;     then negate q (if signs differ) and r (if dividend was negative,
 ;     per C99 truncation-toward-zero semantics).
 ;
-; Cycle budget: ~1500 cycles per __udivmod32 call (32 iters × ~45 cyc),
-; ~1700 for __sdivmod32 (adds ~200 for sign handling).
+; Until 2026-10-11 both entries ran 32 iterations of a 64-bit shift and a
+; 32-bit trial subtraction whatever the operands.
 ;
 ; Author: OpenSNES Team
 ; License: MIT
@@ -102,37 +109,7 @@ tcc_udivmod32:
     lda 11,s
     sta.w div32_div_hi
 
-    ; Initialize remainder to 0
-    stz.w div32_rl
-    stz.w div32_rh
-
-    ldx.w #32
-@uloop:
-    ; 64-bit left shift: rh:rl:qh:ql <<= 1
-    asl.w div32_ql
-    rol.w div32_qh
-    rol.w div32_rl
-    rol.w div32_rh
-
-    ; Trial subtract: r - divisor; check final carry (no borrow = r >= divisor)
-    lda.w div32_rl
-    cmp.w div32_div_lo
-    lda.w div32_rh
-    sbc.w div32_div_hi
-    bcc @uno_sub                 ; borrow → r < divisor, skip
-
-    ; r >= divisor: subtract for real and set quotient bit 0
-    lda.w div32_rl
-    sec
-    sbc.w div32_div_lo
-    sta.w div32_rl
-    lda.w div32_rh
-    sbc.w div32_div_hi
-    sta.w div32_rh
-    inc.w div32_ql               ; bit 0 was 0 from the shift; set it now
-@uno_sub:
-    dex
-    bne @uloop
+    jsr div32_ucore
 
     lda.w div32_ql               ; return A = quotient low
     plp
@@ -204,33 +181,8 @@ tcc_sdivmod32:
         sta.w div32_quot_sign
 @sdsr_done:
 
-    ; --- Unsigned divide loop on absolute values ---
-    stz.w div32_rl
-    stz.w div32_rh
-    ldx.w #32
-@sloop:
-    asl.w div32_ql
-    rol.w div32_qh
-    rol.w div32_rl
-    rol.w div32_rh
-
-    lda.w div32_rl
-    cmp.w div32_div_lo
-    lda.w div32_rh
-    sbc.w div32_div_hi
-    bcc @sno_sub
-
-    lda.w div32_rl
-    sec
-    sbc.w div32_div_lo
-    sta.w div32_rl
-    lda.w div32_rh
-    sbc.w div32_div_hi
-    sta.w div32_rh
-    inc.w div32_ql
-@sno_sub:
-    dex
-    bne @sloop
+    ; --- Unsigned divide on absolute values ---
+    jsr div32_ucore
 
     ; --- Apply signs ---
     lda.w div32_quot_sign
@@ -263,6 +215,95 @@ tcc_sdivmod32:
     lda.w div32_ql               ; return A = quotient low
     plp
     rtl
+
+
+;------------------------------------------------------------------------------
+; div32_ucore - the unsigned division both entries share
+;------------------------------------------------------------------------------
+; In:  div32_ql:qh = dividend, div32_div_lo:div_hi = divisor. A and X 16-bit.
+; Out: div32_ql:qh = quotient, div32_rl:rh = remainder. A, X clobbered.
+;------------------------------------------------------------------------------
+div32_ucore:
+    lda.w div32_div_hi
+    bne @big
+
+    ; --- divisor under 65536: the remainder fits 16 bits, kept in A ---
+    stz.w div32_rh
+    lda.w div32_div_lo
+    beq @zero
+    lda.w div32_qh
+    cmp.w div32_div_lo
+    bcs @hi_init
+    stz.w div32_qh               ; high word < divisor: it IS the remainder
+    bra @lo_init
+@hi_init:
+    lda.w #0
+    ldx.w #16
+@hi:
+    asl.w div32_qh
+    rol a
+    bcs @hi_sub                  ; 17 bits: above any 16-bit divisor
+    cmp.w div32_div_lo
+    bcc @hi_no
+@hi_sub:
+    sbc.w div32_div_lo           ; carry is set on both ways in
+    inc.w div32_qh
+@hi_no:
+    dex
+    bne @hi
+@lo_init:
+    ldx.w #16
+@lo:
+    asl.w div32_ql
+    rol a
+    bcs @lo_sub
+    cmp.w div32_div_lo
+    bcc @lo_no
+@lo_sub:
+    sbc.w div32_div_lo
+    inc.w div32_ql
+@lo_no:
+    dex
+    bne @lo
+    sta.w div32_rl
+    rts
+
+@zero:
+    lda.w div32_ql
+    sta.w div32_rl
+    lda.w div32_qh
+    sta.w div32_rh
+    lda.w #$FFFF
+    sta.w div32_ql
+    sta.w div32_qh
+    rts
+
+    ; --- divisor of 65536 or more: the quotient fits 16 bits ---
+@big:
+    lda.w div32_qh
+    sta.w div32_rl
+    stz.w div32_rh
+    stz.w div32_qh
+    ldx.w #16
+@b:
+    asl.w div32_ql
+    rol.w div32_rl
+    rol.w div32_rh               ; no carry out: the remainder is under 2^32
+    lda.w div32_rl
+    cmp.w div32_div_lo
+    lda.w div32_rh
+    sbc.w div32_div_hi
+    bcc @b_no
+    sta.w div32_rh               ; A is already the high word of r - divisor
+    lda.w div32_rl
+    sec
+    sbc.w div32_div_lo
+    sta.w div32_rl
+    inc.w div32_ql
+@b_no:
+    dex
+    bne @b
+    rts
 
 .ENDS
 
