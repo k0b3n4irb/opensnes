@@ -768,3 +768,25 @@ Still open: a function pays its stack frame on the
 path where it does nothing, or for a call rarely taken. Needs the frame opened only where it is used, or values saved around
 the cold call: the next chantier in the emitter.
 
+
+## 2026-10-11: a frame paid for nothing — measured, not pursued
+
+Two cases reported: a function that tests and returns still pays its
+frame, and a leaf loses its direct page for one cold call.
+
+- **A leaf already pays nothing** on an early return (no frame at all).
+  The case is a function that calls. Opening the frame after the early
+  test is only possible when the entry region touches no frame slot — and
+  a function with parameters homes them first. Counted on the assembly
+  the compiler produces today: 14 of the 130 framed functions of the
+  examples reach an exit before using their frame (ten of them are
+  `main`). Not worth an emitter change.
+- **Saving direct-page words around a cold call** instead of homing them
+  on the stack: `pei` + `plx` / `stx` is about 14 cycles a word a call,
+  against about 22 cycles of frame a function entry plus one a stack
+  access. With four words live across the call it wins only if the call
+  runs less than about four times in ten, and the compiler has no
+  frequency for a branch: under an even guess the gain is nil, and a call
+  that does run loses 25 cycles. It would need the source to say the call
+  is cold. Kept as an idea (a `COLD` mark on a function, in `types.h`)
+  for the day a measured case cannot be rearranged in the source.
