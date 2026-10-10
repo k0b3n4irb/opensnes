@@ -3,7 +3,7 @@
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "2e596d83fa4300bbd16a664f441cf1ed7336a8e3c1212e35edb36a305169ed52",
+      "sha256": "1b6242b1b364072ec2b7b1f6787b969f7fea95430fd3a3c9a892a87bbb60791e",
       "samples": 159936,
       "peak": 21264
     },
@@ -18,12 +18,12 @@
       "peak": 22617
     },
     "audio/play_noise": {
-      "sha256": "96a942a27e68895ab33a1ac6f8376056cd3ef63692cec3707ec6b4f66c7ee4fc",
+      "sha256": "ae22c67fd67bf22aceb427ce5f8f32457917e3ceafa272e870cf175f637c362d",
       "samples": 159936,
       "peak": 21614
     },
     "audio/echo": {
-      "sha256": "d8ac5db91c0508778b6df96edd4131bc913c201a1e5bdc47fa6c22a394622b57",
+      "sha256": "11a6244e2e4dd74f1168217c51ae81677ab4647ea102028df9ca97ee0425d083",
       "samples": 159936,
       "peak": 10922
     },
@@ -38,12 +38,12 @@
       "peak": 17080
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "a34de25f3c788be703ca6673e0388fac9e52c6c26257eb7623a44ca0601ce945",
+      "sha256": "9e35a8e3e5b106d0013ee7ba21a6459055a8fadd412b181c219fcb0f9f2e699f",
       "samples": 159945,
       "peak": 20922
     },
     "audio/soundboard": {
-      "sha256": "b3a334388fa6d0770e5c6bfd0c15bc39420156797f2c400e00b10aa921d90028",
+      "sha256": "b88afa8bbf50633137955453bde79989765d796b0361706ef96fee56d6b59e7a",
       "samples": 159936,
       "peak": 9323
     },
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "fa820e1b918906315760e22a19795b7d42bbd889770fd77d62b9318a1d2f46a4",
+      "sha256": "ad827b0f23db64c02c4e464930b2d464988b698e15d1f2831e21f3b33aec85a6",
       "samples": 159936,
       "peak": 12192
     }

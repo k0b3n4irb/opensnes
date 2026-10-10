@@ -2,8 +2,8 @@
   "frames": 900,
   "workloads": {
     "sieve": {
-      "cycles": 1984790,
-      "size": 153,
+      "cycles": 1925838,
+      "size": 148,
       "stack": 23,
       "res": 172
     },
@@ -14,38 +14,38 @@
       "res": 12563
     },
     "physics": {
-      "cycles": 4673080,
-      "size": 598,
+      "cycles": 4671502,
+      "size": 592,
       "stack": 54,
       "res": 12530
     },
     "collide": {
-      "cycles": 9270692,
-      "size": 622,
+      "cycles": 9269080,
+      "size": 616,
       "stack": 60,
       "res": 162
     },
     "mul": {
-      "cycles": 4831244,
+      "cycles": 4831242,
       "size": 101,
       "stack": 29,
       "res": 13728
     },
     "decimal": {
-      "cycles": 2810950,
+      "cycles": 2810948,
       "size": 111,
       "stack": 29,
       "res": 4118
     },
     "long": {
-      "cycles": 2593736,
+      "cycles": 2593738,
       "size": 312,
       "stack": 35,
       "res": 35405
     },
     "bytes": {
-      "cycles": 4778052,
-      "size": 396,
+      "cycles": 4772612,
+      "size": 393,
       "stack": 23,
       "res": 819
     },
@@ -56,8 +56,8 @@
       "res": 1597
     },
     "switch": {
-      "cycles": 1635520,
-      "size": 465,
+      "cycles": 1631562,
+      "size": 462,
       "stack": 23,
       "res": 9705
     },
@@ -68,14 +68,14 @@
       "res": 2842
     },
     "list": {
-      "cycles": 2039992,
+      "cycles": 2039990,
       "size": 348,
       "stack": 23,
       "res": 17376
     },
     "tilemap": {
-      "cycles": 1368172,
-      "size": 252,
+      "cycles": 1279132,
+      "size": 240,
       "stack": 23,
       "res": 10608
     },
@@ -86,34 +86,40 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 3791012,
-      "size": 576,
+      "cycles": 3789434,
+      "size": 570,
       "stack": 54,
       "res": 12530
     },
     "copy": {
-      "cycles": 1853756,
-      "size": 389,
+      "cycles": 1769192,
+      "size": 385,
       "stack": 23,
       "res": 20921
     },
     "strings": {
-      "cycles": 2225424,
-      "size": 932,
+      "cycles": 2145928,
+      "size": 922,
       "stack": 58,
       "res": 65535
     },
     "state": {
-      "cycles": 1285540,
-      "size": 344,
+      "cycles": 1278028,
+      "size": 335,
       "stack": 39,
       "res": 24876
     },
     "place": {
-      "cycles": 6460002,
+      "cycles": 6460006,
       "size": 478,
       "stack": 40,
       "res": 30752
+    },
+    "dist": {
+      "cycles": 11874454,
+      "size": 675,
+      "stack": 67,
+      "res": 29121
     }
   }
 }

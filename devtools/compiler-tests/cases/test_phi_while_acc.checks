@@ -12,5 +12,5 @@ in levelC_while_cond: present ora (\d+),s\n\tsta (\d+),s\n[\s\S]*?@if_true\.\d+:
 in levelC_while_cond: present lda (\d+),s\n\tinc a\n\tsta (\d+),s\n\tpha\n\tjsl use_value\n\tplx\n\tlda \2,s\n\tsta \1,s\n
 # D: toggled + 1 under a condition: both arms fill the merge slot (\2),
 # which is passed to use_value and carried back.
-in levelD_while_complex: present and\.w #128\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \1,s\n\tinc a\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tpha\n\tjsl use_value\n\tplx\n\tlda \2,s\n\tsta \1,s\n
+in levelD_while_complex: present and\.w #128\n\tsta \d+,s\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \1,s\n\tinc a\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tpha\n\tjsl use_value\n\tplx\n\tlda \2,s\n\tsta \1,s\n
 in levelD_while_complex: present ora (\d+),s\n\tsta (\d+),s\n[\s\S]*?lda \2,s\n\tsta \1,s\n\tjmp @while_cond

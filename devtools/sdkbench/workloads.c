@@ -1,7 +1,7 @@
 /*
  * workloads.c — the same C for both SDKs.
  *
- * Nineteen small workloads of the kind a game runs every frame: loops over
+ * Twenty small workloads of the kind a game runs every frame: loops over
  * arrays, structs of entities, collisions, multiplies and divides, 32-bit
  * arithmetic, byte copies, calls, a switch-driven interpreter, bit work,
  * a linked list, a tilemap, a 2D grid, entities through a pointer, word
@@ -431,6 +431,64 @@ static void w_place(void) {
     res = acc;
 }
 
+/* Every player of one team against every player of the other (issue #166,
+ * from the same game): a nested loop, the index rebuilt in each block, two
+ * absolute values and a static function with one call site. distances() and
+ * vectorLength() are the issue's functions, unchanged but for the names of
+ * the tables. */
+static s16 dpx[18];
+static s16 dpy[18];
+static s16 dpoff[18];
+static u16 dist_flat[81];
+
+/* length of (a, b) without a square root */
+static u16 vectorLength(u16 a, u16 b) {
+    u16 r;
+
+    if (a < b) {
+        r = a;
+        a = b;
+        b = r;
+    }
+    r = a + (b >> 1);
+    if (r < (b << 1)) return r - (b >> 3);
+    if (r < (b << 2)) return r - (b >> 2);
+    return r - ((b >> 2) + (b >> 3));
+}
+
+static void distances(void) {
+    u16 i, j;
+
+    for (i = 0; i < 9; i++) {
+        for (j = 0; j < 9; j++) {
+            s16 dx = dpx[i] - dpx[j + 9];
+            s16 dy = dpy[i] - dpy[j + 9] - dpoff[j + 9];
+
+            if (dx < 0) dx = -dx;
+            if (dy < 0) dy = -dy;
+            dist_flat[i * 9 + j] = vectorLength(dx, dy);
+        }
+    }
+}
+
+static void w_dist(void) {
+    u16 i, n, acc;
+    for (i = 0; i < 18; i++) {
+        dpx[i] = (s16)(i * 37) - 200;
+        dpy[i] = (s16)(i * 53) - 300;
+        dpoff[i] = i & 7;
+    }
+    acc = 0;
+    for (n = 0; n < 40; n++) {
+        dpx[n % 18] += 7;
+        dpy[(n * 5) % 18] -= 3;
+        distances();
+        acc += dist_flat[n % 81];
+    }
+    for (i = 0; i < 81; i++) acc ^= dist_flat[i] + i;
+    res = acc;
+}
+
 int main(void) {
     consoleInit();
 #if WORKLOAD == 1
@@ -471,6 +529,8 @@ int main(void) {
     w_state();
 #elif WORKLOAD == 19
     w_place();
+#elif WORKLOAD == 20
+    w_dist();
 #endif
     done = 0x600D;
     while (1) {

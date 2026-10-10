@@ -217,15 +217,15 @@
   },
   "chips_sa1_starfield": {
     "fbhash": [
-      "2b81a843fae8b05f",
-      "28430d80cbef4f2d"
+      "cb9fb6f68b138456",
+      "37d6416b5ac7401f"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.34.0",
-    "rom_sha256": "ecd032c0ff693b58671b1b9d179f475897fb02a6d111ea4c60bbc65ae44a96ae"
+    "rom_sha256": "88911d4d25331d15ccb165d61308aafdc4a52e4af87fdd37a71745a04ac1c048"
   },
   "chips_superfx_3d": {
     "fbhash": [
@@ -481,15 +481,15 @@
   },
   "mode7_extbg": {
     "fbhash": [
-      "38636896538aec57",
-      "c0c89e53b2542107"
+      "88701ad16c5b53dd",
+      "5856f9d4fc4f1815"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.34.0",
-    "rom_sha256": "9b72f6010c7dfb6e31e5c6813288f52d75c35912ffbef9f7bf5d5b14b77c4499"
+    "rom_sha256": "a7ba4d026eb5942e92a90cb26db55caab4079a8c9d2735d1088d85f765acf9d0"
   },
   "mode7_perspective": {
     "fbhash": "b6d491935f26c865",

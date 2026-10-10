@@ -412,6 +412,21 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **No `cmp #0` after an operation that set the flags, no store to a slot
+  nobody reads** (compiler; issue #166): two more rules of the peephole,
+  taken from the output of a real game's functions rather than from the
+  bench (which they do not move: `place` stays at 6,460,006 master
+  cycles). On that game's logic, in instructions: `movePlayer` 184 -> 175,
+  `animate` 79 -> 69, `stand` 76 -> 69. On the static table: 1324 -> 1270
+  cycles (−35.9 % against PVSnesLib+opt), and `array_read` / `array_write`
+  are wins again (47 against 60, 52 against 65): 32 of 34. Over the 20
+  workloads: 49.0 % fewer cycles and 36.4 % less code than PVSnesLib.
+- **A twentieth measured workload, `dist`** (devtools; issue #166): every
+  player of one team against every player of the other, as its author
+  wrote it — a nested loop, two absolute values, a `static` function with
+  one call site. 11,874,454 master cycles for 3,240 distances (3,665
+  each; PVSnesLib 26,066,224), and a stack 12 bytes deeper than
+  PVSnesLib's: the starting point for the steps that remain.
 - **A value just stored is not loaded back, and an index stays in X**
   (compiler; issue #166, patterns 1, 2 and 4): a peephole over each
   function's emitted text removes, inside a straight line of code, the

@@ -16,9 +16,9 @@ in level4_mixed_acc: present clc\n\tadc (\d+),s\n\tsta (\d+),s\n[\s\S]*?lda \2,s
 # L5: a conditional update: both arms feed one merge slot (\2) — the
 # unchanged acc on one side, acc | val on the other — and the merge slot
 # goes back to acc.
-in level5_cond_acc: present and\.w #128\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tora \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n\tjmp @for_cond
+in level5_cond_acc: present and\.w #128\n\tsta \d+,s\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tora \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n\tjmp @for_cond
 # L6: three conditional accumulators (+1, |val, +val), each on its own
 # slot pair.
-in level6_multi_cond: present and\.w #1\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \1,s\n\tinc a\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
-in level6_multi_cond: present and\.w #2\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tora \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
-in level6_multi_cond: present and\.w #4\n\tsta \d+,s\n\tcmp\.w #0\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tclc\n\tadc \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level6_multi_cond: present and\.w #1\n\tsta \d+,s\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \1,s\n\tinc a\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level6_multi_cond: present and\.w #2\n\tsta \d+,s\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tora \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond
+in level6_multi_cond: present and\.w #4\n\tsta \d+,s\n\tbne \+\n\tlda (\d+),s\n\tsta (\d+),s\n\tjmp @if_false\.\d+\n\+\n@if_true\.\d+:\n\tlda \d+,s\n\tclc\n\tadc \1,s\n\tsta \d+,s\n\tsta \2,s\n[\s\S]*?lda \2,s\n\tsta \1,s\n[\s\S]*?jmp @for_cond

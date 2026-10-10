@@ -474,3 +474,22 @@ cycles a frame. Logic of the tick, for the choice of what comes next:
 `movePlayer` 26,304, `animate` 14,734, `stepPlayer` 12,841, `control`
 12,154 (runs one tick in eight: mostly entry and exit), `moving` 8,220.
 
+Step 4 of #166 (two peephole rules from the real game's output: `cmp.w #0`
+after the flags are set; a direct-page slot nobody reads). Two silent
+mistakes on the way, both found by the differential tests before anything
+was pushed: the compare's carry read two lines on (six programs of the
+gate), then the reload rule removing the load the compare rule had relied
+on (one program in 100,000; seed 179180, now in the gate). Final hunt:
+76001-84000 and 173001-193000 clean. `place` unchanged; real functions
+`movePlayer` 184 -> 175, `animate` 79 -> 69. `dist` added as the twentieth
+workload: 3,665 master cycles a distance.
+
+The project's own framing of "done" for #166 (2026-10-10): kick-off scene
+under 40 % of the frame (56 % at `d235abe9`). Its 1,750-per-distance
+threshold is withdrawn (it found an exact pre-reject: 1,100 a pair). #165
+is closed by its author; `order` in the batch is #167, not urgent, three
+design points answered there (visible[] by sprite; an out-of-range entry
+hides the slot; one routine only if the identity path costs nothing).
+A hand-made working copy of the player's fields did NOT pay there (+3.5
+points): the cost left is the index per block and the calls.
+

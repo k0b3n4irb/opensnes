@@ -8,3 +8,5 @@ in three: present \tlda\.w ys,x\n
 in three: absent \tsta([^\n]*)\n\tlda\1\n
 # a call ends the straight line: `v`, whose address was passed, is read back
 in alias: present \tjsl bump[^\n]*\n[\s\S]*\tlda 2,s\n
+# the carry of this compare is read by the `bcc` after the `beq`: it stays
+in below: present \tlda\.w big\+2\n\tcmp\.w #0\n\tbeq \+\n\tbcc \+\+\n
