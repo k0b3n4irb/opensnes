@@ -494,3 +494,32 @@ function; (c) inlining a single-call-site static.
 - #167: `order` in `OamWorldBatch`; design answered there; after #166's
   next step.
 
+### Step 5 of #166: whole-function inlining (2026-10-10)
+
+Delivered (`inline.c`, `splice_fn`): a static function with one call site
+is inlined whole and not emitted; `static inline` with several sites is
+copied at each (160 IR instructions). Rules and declines in
+`.claude/rules/compiler.md`.
+
+What it taught, against what I had announced ("(c) is the only lever on
+the functions made of calls"):
+
+- the time is in the bodies, not in the calls;
+- pouring a leaf into a non-leaf LOSES (the direct-page frame and the
+  peephole's rules on its slots are worth more than a call): hence the
+  leaf rule, by size, and its refinement (a caller whose every call can be
+  absorbed becomes a leaf);
+- **much of the time of per-entity C is in non-leaf functions, on stack
+  frames**. That is the next step, and it is
+  T4 of the plan in a small form: a temporary that is NOT live across a
+  call can live in the direct page (`tcc__lf`) even in a function that
+  calls — a leaf callee clobbers that page, which does not matter to a
+  value dead at the call. Needs a liveness of slots across call sites in
+  `emit.c`; the stack keeps what crosses a call.
+
+Hunt for this step: programs 193001-217400, expressions 84001-89000, on
+new ranges, clean. The generator now makes odd seeds static (4k+1) or
+static inline (4k+3). Audio: unchanged with the final rule. WRAM: 11
+examples re-captured (their inlined functions use other temporaries;
+pictures identical on 86).
+

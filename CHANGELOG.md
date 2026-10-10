@@ -408,6 +408,29 @@ freeze criterion that waits for hardware.
   one. No example used them; every ROM is byte-identical.
 
 ### Performance
+- **A `static` function with one call site is its caller's code**
+  (compiler; issue #166, pattern 9): when a function is not exported, its
+  address is not used and the file calls it from exactly one place, its
+  body replaces the call — loops and `if`s included — and the function is
+  not emitted. Nothing to write and no size to pay: the code exists once
+  either way, without the pushed arguments, the `jsl` and the `rtl`. A
+  function called from several places is copied only where the source says
+  so: `static inline`, up to 160 instructions of IR (`CC_INLINE_MAX_BIG`),
+  which until now was honoured for single-block bodies of 16 instructions
+  only. One case is left alone on purpose: a function that calls nothing
+  (a leaf) and is not tiny stays a function when its caller would still
+  call something else, because apart it keeps its temporaries in the
+  direct page. That rule comes from the corpus
+  comparison (a 16 KB fill poured into `main` made `mode7/extbg` boot four
+  frames later). `QBE_NO_AUTO_INLINE=1` turns the whole thing
+  off. On the bench against PVSnesLib: `dist` 11,874,454 -> 9,455,574
+  master cycles (-20 %: its inner function went into the loop, which
+  stayed a leaf), `place` 6,460,006 -> 6,306,962, total -49.0 % -> -50.8 %;
+  the static table does not move (1270). Validation: corpus identical on 86 examples; 24,400 program seeds
+  (244,000 programs) and 5,000 expression seeds on new ranges, clean. The
+  differential test now makes the programs and helpers of odd seeds
+  `static` or `static inline`: with every function global, no generated
+  program went through an inliner.
 - **No `cmp #0` after an operation that set the flags, no store to a slot
   nobody reads** (compiler; issue #166): two more rules of the peephole,
   which the bench does not move (`place` stays at 6,460,006 master

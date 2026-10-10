@@ -14,7 +14,8 @@ unsigned int three(unsigned int id, unsigned int cam) {
 // A store through a pointer may write an addressable local: the reload of
 // `v` after it must stay.
 unsigned int g;
-static void bump(unsigned int *p) { *p += 1; }
+/* not static: a static function with one call site is inlined (2026-10-10) */
+void bump(unsigned int *p) { *p += 1; }
 unsigned int alias(unsigned int a) {
     unsigned int v = a;
     bump(&v);
