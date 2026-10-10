@@ -663,3 +663,24 @@ Next candidates read in the same listing: `lda.b S / tax` before a load is
 `ldx.b S` (2 cycles each); a phi copy `lda S / sta T` at each loop turn;
 `bne L1 / jmp L2 / L1: jmp L3` (a branch to a jump).
 
+How the separate worktree was made (the recipe, since `git submodule
+update` in a new worktree would fetch from the network):
+
+    git worktree add ../opensnes-s8 -b wip/s8-sink develop
+    for m in cproc qbe wla-dx; do rmdir ../opensnes-s8/compiler/$m
+      git -C compiler/$m worktree add [--detach] ../opensnes-s8/compiler/$m <branch|HEAD>
+    done
+    cp -a testing/bin/. ../opensnes-s8/testing/bin/     # luna
+
+Each submodule checkout there is a linked worktree of the main tree's
+submodule repository, so a commit made there is already in it; landing is
+`git merge --ff-only` here, then `git -C compiler/qbe checkout --detach
+<sha>`, then the fork push and the rebuild. Two traps met: git printed
+"cannot chdir to …/opensnes-s8/compiler/qbe" from the main tree while the
+linked worktrees existed, and a `$(git -C … rev-parse HEAD)` came back
+empty, so the fork push did nothing — check `git ls-remote` before
+pushing develop; and `make test-toolchain-suites` chained right after
+`make test-sanitizers` runs on its half-cleaned tree and fails everything
+(rebuild first). Removed the same day: the three submodule worktrees, the
+worktree, both branches.
+
