@@ -82,7 +82,9 @@ CASES = [
     ("r_audio_vol",   2, 100),
     # phase 2: sample pipeline. load=AUDIO_OK; free = 0xC000-0x0B00-9;
     # slot-0 address = sample base; play returns round-robin voice 0.
-    ("r_audio_load513", 2, 0),   # 2026-10-03: the end-of-stream handshake no longer races on a 0 index
+    ("r_audio_load513", 2, 0),   # last index byte 0. 2026-10-03: no longer hangs; 2026-10-10: no longer
+                                 # depends on the phase of the CPU's polling loop (the end mark is held)
+    ("r_audio_load512", 2, 0),   # last index byte $FF: the end mark is $7F
     ("r_audio_load",  2, 0),
     ("r_audio_free",  2, 0xB4F7),
     ("r_audio_addr",  2, 0x0B00),

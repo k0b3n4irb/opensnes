@@ -298,21 +298,24 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
         }
     }
 
-    /* Epilogue. The driver says the stream is over with $FF — a value
-     * distinct from the last index echo — then we park the input latch at
-     * 0 and it mirrors it. (Until 2026-10-03 we parked at once and waited
-     * for the mirror; when the last index byte was 0 — size 513, 2817… —
-     * its echo passed for the mirror, the next command went out while the
-     * driver still waited for the 0, and both sides hung.) */
+    /* Epilogue: a handshake in which each value one side waits for is
+     * held by the other until answered (audio_driver.spc700.asm, load_done).
+     * The driver shows an end mark that cannot be an index echo here; we
+     * answer with it; it shows 0; we park the latch at 0. Until 2026-10-10
+     * we waited for a $FF that the driver held only until it read a 0 on
+     * our latch — and when the last index byte was 0 (size 513, 769…) that
+     * 0 was already there: the $FF lasted a few SPC700 cycles, and whether
+     * this loop caught it depended on its phase, hence on the compiler. */
+    idx = (u8)(size - 1) == 0xFF ? 0x7F : 0xFF;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
-        if (APU_IO0 == 0xFF) {
+        if (APU_IO0 == idx) {
             break;
         }
     }
     if (spin == ACK_SPIN_MAX) {
         return AUDIO_ERR_TIMEOUT;
     }
-    APU_IO0 = 0;
+    APU_IO0 = idx;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
         if (APU_IO0 == 0) {
             break;
@@ -321,6 +324,7 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (spin == ACK_SPIN_MAX) {
         return AUDIO_ERR_TIMEOUT;
     }
+    APU_IO0 = 0;
 
     if (cmd_send(OP_DIR_SET, id, loopPoint) != AUDIO_OK) {
         return AUDIO_ERR_TIMEOUT;
