@@ -88,3 +88,14 @@ channel 0, which `hdma.h` itself warns against — harmless only because
 none of them transfers anything with the screen on (measured the same
 evening). Both are debts, for the examples review.
 
+**2026-10-10, night: luna v1.38.0 pinned.** `"vram:WORD"` keys in
+`[checkpoint.values]` answer what we were about to ask (a block at a
+checkpoint; the report was written and never sent,
+`2026-10-10_to_luna_blocs-dans-un-checkpoint.md`): `backgrounds_mode4`
+asserts two words of the offset row in VRAM at the 125th arrival on
+WaitForVBlank, and the assertion fails on a wrong value
+(`checkpoint@WaitForVBlank#125 (frame 142, line 7) values.vram:3001`).
+Suite green on v1.38.0 with no reference moved. Also in it, to use next:
+`luna profile --until-pc SYMBOL --hit N` (a measuring window counted in
+loop turns), which is how the bench should be clocked.
+

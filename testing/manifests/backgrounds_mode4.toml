@@ -44,13 +44,17 @@ hit = 125
 opt_vertical = { eq = 0, width = 1 }
 # The offset row of iteration 125, as the loop just built it in RAM: with
 # bit 13 set and bit 15 clear in every word, they are HORIZONTAL words.
-# (Until 2026-10-10 the same row was read from VRAM $6000 at the last
-# frame; a checkpoint cannot assert a block yet — noted for luna — and the
-# upload itself is covered by [asserts.dma] below.)
+# And the row the PPU has at that moment, which is the one of iteration
+# 124, uploaded at the last VBlank: two words of VRAM read by their word
+# address (`"vram:WORD"`, luna v1.38.0). The row lives at byte $6000 of
+# VRAM, word $3000. Until 2026-10-10 a block was read there at the last
+# frame, whatever iteration that was.
 "owords.main"   = { eq = 0x2018, width = 2 }
 "owords.main+2" = { eq = 0x2020, width = 2 }
 "owords.main+4" = { eq = 0x2020, width = 2 }
 "owords.main+6" = { eq = 0x2028, width = 2 }
+"vram:3000" = { eq = 0x2018 }
+"vram:3001" = { eq = 0x2018 }
 
 [asserts.values]
 opt_vertical = { eq = 0, width = 1 }
