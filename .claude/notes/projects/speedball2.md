@@ -206,3 +206,9 @@ grow if the build does not make a missing trailing initializer an error
 (`-Wno-missing-field-initializers` in `common.mk`, pinned by an old-form
 batch in the library test ROM). Waiting for its figure on `spritesUpdate`
 once it replaces its sorted copy.
+
+`order` measured by the game on its match screen the same evening: same
+rendering, everything but the idle wait 110.70 M -> 107.10 M master cycles
+over the 340 ticks (-3.3 %); `spritesUpdate` -9,000 a frame against +2,300
+in `oamPlaceWorld`. Its sorted copy of x, y, tile and attr is gone. Thread
+closed on both sides.
