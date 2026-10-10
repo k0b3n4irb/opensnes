@@ -17,6 +17,15 @@ hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7), the one
 freeze criterion that waits for hardware.
 
 ### Added
+- **`opensnes-sprite sheet --compact`** (tools; issue #165): each distinct
+  block of the sheet is written once to the `.pic` — with `--flip`, a
+  block and its mirrors count as one — and `<stem>_blocks.inc` holds one
+  word per block of the sheet: the stored block, and the OAM flip bits.
+  `--flip` alone never made the `.pic` smaller: it only marked mirrors in
+  the metasprite table, and without `--metasprite` it changed nothing at
+  all. The project that reported it deduplicated upstream of the tool.
+  Three golden cases on its own reproduction sheet (A, A mirrored, B, B
+  mirrored: two blocks kept, table `0, 0|X, 1, 1|X`).
 - **`vramQueuePushSprite(src, addr, size_px)`** (lib, module `vramqueue`;
   issue #165): one frame of a streamed sprite in one call — its
   `size_px / 8` strips, 512 bytes apart in the sheet `opensnes-sprite

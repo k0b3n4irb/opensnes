@@ -418,7 +418,7 @@ Asked for, and accepted (answered on the issues):
 |---|---|---|
 | `opensnes-sprite sheet --size 32 --metasprite 32 32`: every `METASPR_ITEM` has tile 0 | tools | fixed, `ed7903ed`: wrong on any sheet of several rows of metasprites, not only 32x32 |
 | `vramQueuePushSprite(src, addr, size_px)`: the strips of one streamed frame in one call | lib | done, this commit; its gain is theirs to measure |
-| `opensnes-sprite sheet --size 32 --flip`: mirrored 32x32 blocks not deduplicated | tools | to do |
+| `opensnes-sprite sheet --size 32 --flip`: mirrored 32x32 blocks not deduplicated | tools | done, this commit, as the author's second message specified it: `--compact` writes each distinct block once and `<stem>_blocks.inc` says where each block of the sheet went (stored block + flip bits). `--flip` alone only ever marked mirrors in the metasprite table |
 | optional `const u8 *order` in `OamWorldBatch` (depth sort without a second copy of x and y) | lib | to do; its own path in the routine, cost of the indirection to be measured |
 | pattern 7: `T tab[N][M]` const table, 59 instructions a read against 17 flattened | compiler | with `array2d_read`, same root |
 | pattern 8: absolute difference and signed compare, 37 instructions (compare materialised as 0/1, `cmp #0` after an `sbc`) | compiler | to do |
@@ -457,4 +457,20 @@ table then an operation on it (`lda.w gx,x / sta / lda.w xs,x / sta / lda /
 sbc`) where `sbc.w xs,x` would do; `cmp.w #0` after an operation that set
 the flags; the comparison result materialised as 0 or 1 (pattern 8); the
 loop counter in memory with the test at the top (pattern 6).
+
+### Second round of answers (2026-10-10 06:55, both issues)
+
+On the real game at `a95512f6`, source unchanged: 18 players walking
+65.4 % -> 57.9 % of the frame, walking + scrolling 71.1 % -> 63.8 %.
+Per function, none a leaf: `movePlayer` -21.5 %, `sortPlayers` -28.4 %,
+`animate` -16.4 %, `stepPlayer` (three calls) -7.9 %, `spritesUpdate`
+-6.6 %. So step 3 gives more on non-leaf code than on `place` (-12.9 %)
+where the body is array accesses, and little where it is calls: pattern 9
+seen from the measurement side. No build failure, the stricter bank guard
+says OK, same frame hashes.
+
+`vramQueuePushSprite` adopted: its `sendFrame` 12,973 -> 3,901 master
+cycles a frame. Logic of the tick, for the choice of what comes next:
+`movePlayer` 26,304, `animate` 14,734, `stepPlayer` 12,841, `control`
+12,154 (runs one tick in eight: mostly entry and exit), `moving` 8,220.
 
