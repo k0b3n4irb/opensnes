@@ -185,6 +185,9 @@ u16 r_audio_load;   /* audioLoadSample(0, beep, 9, 0) -> AUDIO_OK (0)  */
 u16 r_audio_load513; /* audioLoadSample(1, 513 bytes, 513, 0): the last index byte is 0
                       * (513 = 2 x 256 + 1) — the end-of-stream race (until 2026-10-03:
                       * AUDIO_ERR_TIMEOUT and a hung driver) -> AUDIO_OK (0) */
+u16 r_audio_load512; /* 512 bytes: the last index byte is $FF, the value the end mark
+                      * usually has — the driver then marks the end with $7F
+                      * (2026-10-10) -> AUDIO_OK (0) */
 u16 r_audio_free;   /* audioGetFreeMemory() -> 0xC000-0x0B00-9 = 0xB4F7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
 u16 r_audio_voice;  /* audioPlaySampleEx(...) -> voice 0 (round-robin)  */
@@ -1200,6 +1203,8 @@ int main(void) {
     r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
     r_audio_load513 = audioLoadSample(1, big_brr, 513, 0);
     audioUnloadSample(1);              /* give the 513 bytes back: the memory vectors below count them */
+    r_audio_load512 = audioLoadSample(1, big_brr, 512, 0);
+    audioUnloadSample(1);
     r_audio_free = audioGetFreeMemory();
     {
         AudioSample s;
