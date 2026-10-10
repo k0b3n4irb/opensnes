@@ -182,3 +182,16 @@ spill comes with its next step).
 - Lesson: an excerpt pasted in a public issue is published. What the game
   shows us comes by path on this machine, and what we publish about it is
   a shape described in words or a stand-alone example of ours.
+
+## Issues closed, and how we talk (2026-10-10, evening)
+
+The game closed #166 (completed: 75.4 M -> 64.2 M master cycles over the
+day, three-frame ticks 9 -> 1) and #167 on the owner's request typed in
+its session. **#167's need is unchanged and nothing was delivered**: an
+optional order array in `OamWorldBatch`. It is owed, followed between the
+two sessions, and its API shape goes to the game before a line is written.
+#164 (ours, SuperFX) stays open. The game now writes to us in markdown
+files (`/tmp/speedball2_pour_opensnes_<subject>.md`) and a one-line
+message with the path; we answer the same way
+(`/tmp/opensnes_pour_speedball2_<subject>.md`). `/tmp` does not survive a
+reboot: what is decided is copied here.
