@@ -172,6 +172,13 @@ spill comes with its next step).
   (`lookupflat`, `near`, `sort`, 31 lines), 6095506664 (`vectorLength` and
   `distances` in full, 31 lines) and 6096440845 (two lines). Not touched
   without his word.
+- Later the same day the game's session, on the owner's words typed
+  there, deleted 6095506664 and reposted its text without the code as
+  6100054429 (deleting leaves no revision behind; editing would have).
+  The game re-read the rest: the body of #166 and 6087019566 are code
+  written for the port, not transcriptions. Two comments still NAME the
+  original routine without copying it (6095577985, 6095597152): put to
+  the owner by the game.
 - Lesson: an excerpt pasted in a public issue is published. What the game
   shows us comes by path on this machine, and what we publish about it is
   a shape described in words or a stand-alone example of ours.
