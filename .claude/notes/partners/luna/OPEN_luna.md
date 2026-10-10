@@ -59,8 +59,20 @@ pinned binary, and `testing.md` describes the new line. The whole suite is
 green on v1.37.0 with NO reference moved — neither the cycle rows of the
 library bench (`dma` 17,903, `vramc` 16,243, `vramq` 10,732, the same to
 the cycle, and PVSnesLib's too, measured again), nor the NMI budget, nor
-the audio hashes, nor a Super FX picture: the DMA duration fix does not
-reach what our oracles measure (no burst of ours starts from a 6-cycle
-access with a count that is not a multiple of three, and none with an HDMA
-channel enabled in the measured windows). Said to luna.
+the audio hashes, nor a Super FX picture. Said to luna.
+
+**Corrected by luna the same evening, and replayed here:** the parenthesis
+we first wrote ("no burst of ours starts from a 6-cycle access…") was a
+cause we had not checked, and it is false. The change exists on our ROMs:
+`luna profile examples/games/tetris/tetris.sfc --until-frame 200
+--frames-out f.csv`, column `dma_mclk`, frames 100 to 199 — v1.36.0: 12
+bursts of 24 master cycles (288); v1.37.0: six of 40 and six of 48 (528).
+luna measured the same on `superfx_game_skeleton` and `superfx_3d`. What
+is true is narrower: NONE OF OUR ORACLES SEES IT (pictures, WRAM, audio
+hashes, NMI budget, the library bench to the cycle). Why the bench rows
+`dma` / `vramc` / `vramq` do not move is not established: either they
+start their bursts from an 8-cycle access with no HDMA channel enabled, or
+the profile credits the burst elsewhere than the symbols the bench sums.
+If a DMA's duration ever matters to a gate of ours, the column to read is
+`dma_mclk` per frame.
 
