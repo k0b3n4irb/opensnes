@@ -157,3 +157,21 @@ the game's sources of the day and compare those two figures; never compare
 with a figure of the day before. Bank $00: 1,894 bytes free and nothing in
 bank $01 yet (the game first wrote the opposite and corrected itself: the
 spill comes with its next step).
+
+## Rights: what was removed on 2026-10-10 (owner decisions, typed here)
+
+- The `dist` workload of `devtools/sdkbench` carried `vectorLength`, the
+  game's transcription of an original routine: rewritten in an ordinary
+  commit (`de759bd4`), no history rewrite — `a66a4f53` to `54b164a9` still
+  show it.
+- The comment of issue #166 that held `decide.c` in full (id 6096834930)
+  is deleted. `decide.c` stays private in the game's repository; `depot`
+  replaces it in the bench.
+- Still public, found while doing it and put to the owner: the body of
+  #166 (103 lines of code, `place`), and the comments 6087019566
+  (`lookupflat`, `near`, `sort`, 31 lines), 6095506664 (`vectorLength` and
+  `distances` in full, 31 lines) and 6096440845 (two lines). Not touched
+  without his word.
+- Lesson: an excerpt pasted in a public issue is published. What the game
+  shows us comes by path on this machine, and what we publish about it is
+  a shape described in words or a stand-alone example of ours.
