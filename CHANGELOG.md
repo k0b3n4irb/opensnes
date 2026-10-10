@@ -132,6 +132,16 @@ All notable changes to OpenSNES are documented in this file.
   the functions that read a state back are synchronous as before.
 
 ### Fixed
+- fix(lib): **`audioLoadSample()` could time out, and every audio call
+  after it, depending on where the vblank interrupt fell.** At the end of a
+  load the sound driver showed the acknowledgement of the last exchange for
+  about 40 of its cycles only, then its end mark; a console taken by its
+  NMI handler in that window never saw the acknowledgement, gave up, and
+  left the driver waiting for an answer that no later command gives. Rare
+  with a short handler, more likely the longer the
+  handler. The end of the stream is rewritten so that every value one side
+  waits for is held by the other until answered. Present since the audio
+  module's rewrite.
 - fix(compiler): **`(u8)v` after a loop that shifts a signed char right
   kept the sign's high byte** (silent). `v >>= n` in a loop on an `s8`,
   then `(u8)v` used in a 16-bit or 32-bit expression: the mask of the

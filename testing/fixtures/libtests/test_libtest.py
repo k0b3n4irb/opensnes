@@ -89,6 +89,7 @@ CASES = [
     ("r_audio_load770", 2, 0),
     ("r_audio_load10",  2, 0),
     # the sample area reaches $FFC0 while no echo is configured, $C000 after
+    ("r_audio_phase", 2, 0),     # 400 loads under a long vblank callback, each ending at another phase of the frame
     ("r_audio_free",  2, 0xF4B7),
     ("r_audio_free_echo", 2, 0xB4F7),
     ("r_audio_addr",  2, 0x0B00),

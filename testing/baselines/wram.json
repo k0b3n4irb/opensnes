@@ -4,8 +4,8 @@
     "rom_sha256": "db8fd815892af3abd50aadbc3c81aeff421d881532eee67b917c61cdd329b68e"
   },
   "audio_echo": {
-    "stream": "35cfc8c9bb21f78661da1a46b2a69b438cf1a8564b2efa289ffb8c75deca9c38",
-    "rom_sha256": "fecd57ce566bd78d20d344f8291d037536254386dd8a26c357cfaeae8c5e393f"
+    "stream": "8a33e7ba676c93249563e693f90b0d13673faf29327d9146dc53e23b037a662e",
+    "rom_sha256": "7c74b31b88f05384a938933708e0794a4df8787a4913c05b339d33753ed72fff"
   },
   "audio_pitch_mod": {
     "stream": "189440a13631c78860cfd5ca42a445b1d65138a7040ce07a7f81cf3a3ce5acf7",
@@ -16,8 +16,8 @@
     "rom_sha256": "40387c4d6fad04328ea076fa871b32f9c4f8de4c7570ae3909f30914b3fbbbfc"
   },
   "audio_sfx_from_wav": {
-    "stream": "eaf60a0272c72109793115efaa8af740e2c6f278fd9ef882b12cb1bc03799499",
-    "rom_sha256": "dcc3beb10a815ee954a707e7002130cfcda738887689e9c55a8db4a998658489"
+    "stream": "369f8f5ab8d5869d2d6f001612df24c394b25e24cce0deda18f9c9ccfe0cbcb8",
+    "rom_sha256": "bbd63305058fcd904681bc5fd6e0115e11e3600d14a5640966b6b66a8405932d"
   },
   "audio_snesmod_music": {
     "stream": "f97b19fab52f2cdd12115e2f7b703561b617998b831e27b664703cd02f6c4f93",
@@ -32,8 +32,8 @@
     "rom_sha256": "c17f9362428ff78ae5300655a790c8fe8ddfa2ab2406a61834de0896a2ad212b"
   },
   "audio_soundboard": {
-    "stream": "98bdd5505328bd55c81f0dea1fd2878509533660330d2a4aa212add95fc43012",
-    "rom_sha256": "d85094830e5aa8859b86f756dc14a970882c3361e458417add8f53a624bf4e55"
+    "stream": "15b4fc02bb1ff4746c36bc353e2a956af1c6a658ffc682ba05ecaaeb184a8552",
+    "rom_sha256": "3804886acf9eca3beb3f845bdcc9b5ce6b2b26ba1b6fbf2774ad2cd5729e45f6"
   },
   "audio_speech_synth": {
     "stream": "1e694caebdd07ad2570af7ab0ef31c2436fd2acffb0c7cad1cd5b8f18b4410e1",

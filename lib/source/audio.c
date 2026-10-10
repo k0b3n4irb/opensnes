@@ -358,16 +358,17 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
         return AUDIO_ERR_TIMEOUT;
     }
 
-    /* Epilogue: a handshake in which each value one side waits for is
-     * held by the other until answered (audio_driver.spc700.asm, load_done).
-     * The driver shows an end mark that cannot be an index echo here; we
-     * answer with it; it shows 0; we park the latch at 0. Until 2026-10-10
-     * we waited for a $FF that the driver held only until it read a 0 on
-     * our latch — and when the last index byte was 0 (size 513, 769…) that
-     * 0 was already there: the $FF lasted a few SPC700 cycles, and whether
-     * this loop caught it depended on its phase, hence on the compiler. */
+    /* Epilogue (audio_driver.spc700.asm, load_done): every value one side
+     * waits for is held by the other until answered. The driver still
+     * shows the echo of the last exchange; we show an end mark that cannot
+     * be an index we were showing; it answers with the mark; we park the
+     * latch at 0; it shows 0, and only then may another command go.
+     * Until the evening of 2026-10-10 the driver showed its mark right
+     * after the last echo, which then lasted about 40 of its cycles: an NMI
+     * taken here in that window made the stream time out. */
     /* the last index sent: exchanges are numbered from 0 */
     idx = (u8)(full + (tail ? 1 : 0) - 1) == 0xFF ? 0x7F : 0xFF;
+    APU_IO0 = idx;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
         if (APU_IO0 == idx) {
             break;
@@ -376,7 +377,7 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (spin == ACK_SPIN_MAX) {
         return AUDIO_ERR_TIMEOUT;
     }
-    APU_IO0 = idx;
+    APU_IO0 = 0;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
         if (APU_IO0 == 0) {
             break;
@@ -385,7 +386,6 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (spin == ACK_SPIN_MAX) {
         return AUDIO_ERR_TIMEOUT;
     }
-    APU_IO0 = 0;
 
     if (cmd_send(OP_DIR_SET, id, loopPoint) != AUDIO_OK) {
         return AUDIO_ERR_TIMEOUT;

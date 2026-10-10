@@ -193,6 +193,12 @@ u16 r_audio_load770; /* 770 patterned bytes: 256 three-byte exchanges (the count
                       * testing/manifests/lib_audio_stream.toml */
 u16 r_audio_load10;  /* 10 bytes: three exchanges and a one-byte tail */
 static u8 FAR pat_brr[770];   /* FAR: the plain RAM band of this ROM is nearly full */
+u16 r_audio_phase;  /* failures over 400 consecutive 9-byte loads, under a
+                     * vblank callback of a few thousand master cycles -> 0. Each load
+                     * ends on the end-of-stream handshake at another phase of
+                     * the frame: until 2026-10-10 an NMI taken while the driver
+                     * showed the last echo (about 40 of its cycles) made the
+                     * load time out, and every load after it */
 u16 r_audio_free;   /* audioGetFreeMemory() with no echo configured -> 0xFFC0-0x0B00-9 = 0xF4B7 */
 u16 r_audio_free_echo; /* after audioSetEcho(): the area ends at $C000 -> 0xC000-0x0B00-9 = 0xB4F7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
@@ -587,6 +593,14 @@ static const MetaspriteStyle lotc_style32 = {
     .pieceSize = 32, .width = 64, .height = 32,
 };
 
+static u16 nmi_burn;
+static void nmiBurn(void) {
+    u16 i;
+    for (i = 0; i < 40; i++) {
+        nmi_burn += i;
+    }
+}
+
 static void coverage_lot_c(void) {
     AudioVoiceState vs;
     AudioSample smp;
@@ -614,6 +628,20 @@ static void coverage_lot_c(void) {
     audioUnloadSample(0);
     r_aud_unload = audioGetSampleInfo(0, &smp);
     r_aud_unfree = audioGetFreeMemory();
+
+    /* 400 loads, each ending at another phase of the frame, under a
+     * vblank callback of a few thousand master cycles (a game's handler:
+     * an empty one returns before the window closes). */
+    r_audio_phase = 0;
+    nmiSet(nmiBurn);
+    {
+        u16 ph;
+        for (ph = 0; ph < 400; ph++) {
+            if (audioLoadSample(1, pat_brr, 9, 0) != AUDIO_OK) r_audio_phase++;
+            audioUnloadSample(1);
+        }
+    }
+    nmiClear();
 
     /* sprites: a two-item metasprite mirrored in a 16-px-wide box lands its
      * items swapped (dx = 16 - dx - 8) with the flip bit set; asserted on

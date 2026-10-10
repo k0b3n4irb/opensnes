@@ -240,3 +240,18 @@ owner listening where audible).
 
 Not done: a note in one command (39 bits for 30 an exchange: two commands
 and a new opcode). To look at if a game is still at its limit.
+
+## 2026-10-11: the end of a load, third version
+
+A load could time out, and all the loads after it, once the upload got
+faster. Cause: `load_done` showed the end mark right after the last
+echo (38 SPC700 cycles, about 800 master cycles); an NMI between the
+console's last index write and that echo, with a handler outlasting the
+window, and the console never sees the echo. A short handler makes it a
+narrow hit; a longer handler makes it common. Now: the driver holds the last echo until the
+console shows the mark ($FF, or $7F after index $FF), answers with the
+mark and holds it until the console shows 0, then shows 0. Guard:
+`r_audio_phase` in libtests (400 loads under an `nmiSet` callback — a
+load made before `consoleInit` runs under a handler too short to hit).
+The rule the three versions teach: in this protocol no value is ever
+shown "for a while"; each is held until the other side answers it.
