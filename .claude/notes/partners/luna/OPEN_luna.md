@@ -76,3 +76,16 @@ the profile credits the burst elsewhere than the symbols the bench sums.
 If a DMA's duration ever matters to a gate of ours, the column to read is
 `dma_mclk` per frame.
 
+**Settled by luna's full report** (`2026-10-10_from_luna_duree-dma-rapport-complet.md`,
+answered in `…_reply.md`): the bench rows do not move because their bursts
+start from bank `$00` (an 8-cycle access) with no HDMA channel enabled,
+where the old and the new formula are algebraically equal; the rows DO
+contain the bursts (the first reading we had kept as possible is false).
+On a SDK whose code runs in bank `$00`, v1.37.0 changes a DMA's duration
+only when it is started with an HDMA channel enabled. Two things of ours
+it shows: the library bench is SlowROM and its page does not say so (the
+first game on the SDK is FastROM); and four examples teach an HDMA on
+channel 0, which `hdma.h` itself warns against — harmless only because
+none of them transfers anything with the screen on (measured the same
+evening). Both are debts, for the examples review.
+
