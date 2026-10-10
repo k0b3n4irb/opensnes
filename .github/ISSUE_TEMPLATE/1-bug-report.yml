@@ -78,7 +78,7 @@ body:
     attributes:
       label: Environment
       description: OS, architecture, emulator
-      placeholder: "Linux x86_64, luna v1.34.0"
+      placeholder: "Linux x86_64, luna v1.36.0"
     validations:
       required: true
 
