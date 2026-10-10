@@ -66,6 +66,10 @@ extern u16 vram_queue_count;
  * @brief Note one transfer for the next vramQueueFlush()
  *
  * @param src   Source bytes (ROM, plain RAM or FAR RAM)
+ *              The queue keeps the POINTER: the bytes are read at the
+ *              flush, not here. They must not change before
+ *              vramQueueFlush(); a buffer filled again before the flush
+ *              sends its last contents for every entry that points to it.
  * @param addr  VRAM word address
  * @param size  Bytes (even; an entry of 0 bytes is skipped by the flush)
  * @param step  VRAM_QUEUE_ROW or VRAM_QUEUE_COLUMN
@@ -84,6 +88,8 @@ u16 vramQueuePush(const u8 *src, u16 addr, u16 size, u16 step);
  *
  * @param src      First byte of the frame in the sheet (its top-left tile).
  *                 The frame must not straddle a bank boundary.
+ *                 Read at the flush, like vramQueuePush(): the bytes
+ *                 must not change before vramQueueFlush().
  * @param addr     VRAM word address of the frame's top-left tile
  * @param size_px  Width and height of the sprite: 8, 16, 32 or 64
  * @return 1, or 0 when the strips do not all fit in the queue (none is

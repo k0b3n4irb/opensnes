@@ -47,6 +47,9 @@ All notable changes to OpenSNES are documented in this file.
   `audioGetFreeMemory()` reports the limit that applies. The DSP writes
   nothing there while echo writes are off (FLG bit 5), which the driver
   sets at start.
+- docs(lib): `vramQueuePush()` and `vramQueuePushSprite()` say that the
+  queue keeps the pointer: the bytes are read at the flush, and a buffer
+  filled again before it sends its last contents for every entry.
 - feat(tools): `opensnes-sample` writes the tuning factor of a resampled
   loop in the generated header (`<name>_tuning`, x4096) and in `--json`
   (`"tuning_x4096"`); its page says what it does of a loop that is not a
@@ -113,6 +116,14 @@ All notable changes to OpenSNES are documented in this file.
   `QBE_SLOT_ORDER=def` and `CC_INLINE_LEAF_MAX=16` restore each (compiler
   checks `peep_flow`, `auto_inline`).
 
+- perf(lib): **`textPrintU16()` no longer divides.** It made three
+  divisions a digit, two of them by a divisor above 255 that the hardware
+  divider does not take: about 45,000 master cycles for one number, an
+  eighth of a frame for a score. Digits come by subtraction now and go to
+  the text buffer in one run. `examples/basics/timer`, which prints one
+  counter a frame: 132,211 master cycles of work a frame to 93,849;
+  `examples/basics/aim_target`, which redraws seven numbers when its
+  target moves, updates every frame instead of every other one.
 - perf(runtime): **a 32-bit division or remainder is about four times
   faster.** Both entries ran 32 turns of a 64-bit shift and a 32-bit trial
   subtraction whatever the operands. They share a core now: a divisor
