@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 63ad4e9c6005701716f394a7c051799186a64053 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 5784dbc7a62efb681b00f232376af5acf92f57c5 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 9338622023186bc45ac19f7d77d4f2fcbf6bfbd1 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -89,7 +89,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 116 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 120 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -101,6 +101,10 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+9338622 inline: a function that has a section of its own (`__ramcode`, the RAM code window) is never copied into a caller, by either inliner: its body would run from wherever the caller is. `RAM_CODE static void job(void)` with one call site was absorbed into a ROM caller once the leaf rule stopped refusing it (it had hidden the case), and the Super FX library test ROM never finished; a non-leaf one could already be absorbed before. A caller in such a section may absorb an ordinary function (2026-10-10)
+fe9b7e3 emit: `peephole_flow`, liveness of the sixteen words of `tcc__lf` over a function's text (successors: the next line and the branch target; nothing live at a return; a call does nothing; an 8-bit store is neither a read nor a kill; anything unrecognised leaves the function alone). A `sta.b tcc__lf+N` nothing reads afterwards goes even when the slot is read elsewhere in the function, which in a large function is every slot: 453 instructions of 16,313 in a real game's logic, -6.2 % of its cycles. QBE_NO_PEEP_FLOW=1 turns it off (issue #166; 2026-10-10)
+03bc837 emit: `color_slots` places temps in decreasing order of QBE's cost (use count weighted by loop depth, `fillcost`) instead of definition order, so the sixteen direct-page words of a function go to what its loops use and not to its setup; needed once a looping leaf may be poured into a big caller (the commit below), whose own temporaries came first. QBE_SLOT_ORDER=def restores the old order (issue #166; 2026-10-10)
+8df59cb inline: the rule "a leaf above 16 IR instructions is not absorbed into a caller that keeps a call" (25145b1, the same morning) is off unless CC_INLINE_LEAF_MAX is set: after the direct-page temps, the index computed once and the in-place loop variable, a leaf loses little by being poured into such a caller, and the rule evicted a static called sixteen times a tick the day its caller gained one cold call (+11,000 master cycles a tick on a real game). With it off: that game's logic -0.7 %, `depot` -5.7 % (issue #166; 2026-10-10)
 5784dbc emit: `peephole_late`, run once after the peephole has settled: `lda.b S / tax / lda` is `ldx.b S / lda`; `lda.w #0 / sta M` with A reloaded after is `stz M`; `lda.b S / inc a / sta.b S` is `inc.b S` (dec likewise); a constant stored to several places is loaded once. 16-bit accumulator only, direct-page slots only for ldx/inc. Inside the loop the new forms hid dead stores from the older rules (tried: 2 % slower on a real game). QBE_NO_PEEP_LATE=1 turns it off (issue #166; 2026-10-10)
 2872cf7 isel: the constant count of a shift is cut to a word (16 bits here): the front end passes `x >> (s16)(3 + 0x20000000UL)` as `shr x, 536870915` and the emitter read "16 or more", result 0; a count in a temp was already read as its low word (difftest seeds 102026, 102200, 103718, three expressions in 144,000; 2026-10-10)
 61c373f emit: the slot colouring lets a phi share the slot of the value that feeds it (its own argument on an edge no longer counts as interfering; the phi move is then nothing) and a 16-bit add/sub/and/or/xor/copy share its operand's; an argument asks for its phi's slot, a phi for an argument's; two 32-bit ones share exactly or not at all. `i++` is `lda S / inc a / sta S` and the back edge copies nothing. QBE_NO_PHI_SHARE=1 / QBE_NO_OPND_SHARE=1 turn each off (issue #166; 2026-10-10)

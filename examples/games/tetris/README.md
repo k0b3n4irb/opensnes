@@ -37,4 +37,4 @@ Classic Tetris game with Korobeiniki music.
 
 ## Modules
 
-`console sprite dma background input` + `USE_SNESMOD := 1`
+`console sprite dma background input hdma` + `USE_SNESMOD := 1`

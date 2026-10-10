@@ -8,7 +8,7 @@ ASMSRC   := data.asm
 
 USE_LIB  := 1
 USE_SNESMOD := 1
-LIB_MODULES := console sprite dma background input
+LIB_MODULES := console sprite dma background input hdma
 
 # SNESMOD audio
 SOUNDBANK_SRC := music/tetris_theme.it

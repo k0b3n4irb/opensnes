@@ -259,17 +259,8 @@ void renderInit(void) {
         }
         *p = 0;  /* HDMA terminator */
 
-        /* Set up HDMA channel 6 registers (enable deferred to after setScreenOn).
-         *
-         * Channel 7 is reserved by the OpenSNES NMI handler for the OAM DMA
-         * (see lib/include/snes/hdma.h:61 "Do NOT use HDMA_CHANNEL_7"). Using
-         * it here was a latent bug masked by the runtime's per-frame channel-7
-         * re-programming — exposed when WaitForVBlank stopped setting
-         * oam_update_flag unconditionally. */
-        *(u8 *)0x4360 = 0x03;                          /* Mode 3: AABB → reg,reg,reg+1,reg+1 */
-        *(u8 *)0x4361 = 0x21;                          /* B-bus: $2121 (CGADD) */
-        *(u16 *)0x4362 = (u16)(u32)hdma_grad_tbl;      /* Table addr low+high */
-        *(u8 *)0x4364 = 0x00;                          /* Bank 0 (RAM) */
+        /* The channel itself is set up in renderEnableGradient(), each time
+         * the gradient is switched on. */
     }
 
     /* Mark all visible rows dirty for initial force-blank flush */
@@ -373,8 +364,24 @@ void renderLineClearFlash(LineClearResult *result, u8 frame) {
 static u16 msg_color;
 static u8 msg_color_dirty;
 
+/* Switch the gradient on: channel 6 (7 belongs to the NMI handler's OAM
+ * DMA), CGADD twice then CGDATA twice per entry of the table.
+ *
+ * Through the library, in VBlank. Until 2026-10-10 this function wrote
+ * $420C by itself, wherever the main loop happened to be in the frame
+ * (line 155, measured). The hardware loads a channel's table address and
+ * line counter at the start of a frame only: enabled in mid-frame, the
+ * channel ran to the bottom of the screen on whatever those registers
+ * held, and wrote that to CGADD / CGDATA. A few palette entries got
+ * values taken from the direct page — the same ones at every boot, so the
+ * picture looked deliberate, until a compiler change moved what the
+ * direct page held and the border changed colour. hdmaSetup() sets the
+ * address and the counter by hand; waiting for VBlank first also spares
+ * the one frame where the gradient would start mid-screen. */
 void renderEnableGradient(void) {
-    *(u8 *)0x420C = 0x40;  /* Enable HDMA channel 6 (channel 7 reserved for OAM DMA) */
+    WaitForVBlank();
+    hdmaSetup(HDMA_CHANNEL_6, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_grad_tbl);
+    hdmaEnable(HDMA_CHANNEL_6);
 }
 
 void renderSetMsgColor(u16 color) {
