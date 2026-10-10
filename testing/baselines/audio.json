@@ -1,5 +1,5 @@
 {
-  "luna": "v1.36.0",
+  "luna": "v1.37.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
@@ -8,9 +8,9 @@
       "peak": 21143
     },
     "audio/snesmod_music": {
-      "sha256": "9cb84959f968128e1c5a402ea3f3fcbc07b8cb1db0f8aad5beac7ac590cd0a1a",
+      "sha256": "c4d28cbf236878267fd0ba8d14df9a815a020f3d9186933384d81f77f8f098a7",
       "samples": 159936,
-      "peak": 20923
+      "peak": 20924
     },
     "audio/pitch_mod": {
       "sha256": "86cbe7da349b0a732f39bec676a1a4daa9bc276d6ea415539d162f8de091eef9",
@@ -23,7 +23,7 @@
       "peak": 21143
     },
     "audio/echo": {
-      "sha256": "f87642bffac39e47397780c163970c2dbf53ea87745f94ce3569801dc4219417",
+      "sha256": "93a27b48f906fe1c8e7fd5bc010c3b57100f5194f77557c064b271e54cbbfd47",
       "samples": 159936,
       "peak": 10922
     },
@@ -33,17 +33,17 @@
       "peak": 22487
     },
     "audio/snesmod_music_large": {
-      "sha256": "22e42dad8a0279f343efacf10ced0eb1d284e4c8a7f4ab8676eb1449f79dbd4e",
+      "sha256": "aca408fa7444162ba1d48ed95bd6b26282161c44a0852e92032006a511d35351",
       "samples": 159936,
       "peak": 17197
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "c007af3100a409d9c7b27c01690ed7bcce3a286345f52a2e2c86fb6283269444",
+      "sha256": "afd0d1b7cf91ec9038e9ae0b38588838ec6c54076cc94d78ebf45dd73aea444f",
       "samples": 159945,
       "peak": 20902
     },
     "audio/soundboard": {
-      "sha256": "b88afa8bbf50633137955453bde79989765d796b0361706ef96fee56d6b59e7a",
+      "sha256": "38ba5594086cb860f22e9265059483e823db66a68a0119efad86de6a0b0ecbdf",
       "samples": 159936,
       "peak": 9323
     },
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "821d597620afd803269144203a00300b205b6a0e381ce86c37c7f452b809e244",
+      "sha256": "6ccac1f66c4fe2ce45061c6a25bc5997f7176c94a295d1a2d6ff74e05bc95499",
       "samples": 159936,
       "peak": 12192
     }
