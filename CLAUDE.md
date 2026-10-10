@@ -131,7 +131,7 @@ The `.claude/rules/` directory contains mandatory rules automatically loaded by 
 - `luna_tooling.md` — Luna-First: everything goes through luna; internal capability scripts are transitory prototypes (prototype → owner-validate → message to luna's session → luna ships → delete). Must consult before adding any internal validation/analysis script.
 - `hardware_claims.md` — every new hardware claim in docs/ or KNOWN_LIMITATIONS.md must be verified against the Cartouche corpus (`snes_search` with opensnes-docs excluded; `contrast=true` on conflicts); unexplained hardware-shaped symptoms get a corpus query before blaming the toolchain.
 - `partners.md` — the two shoulders, luna and snes-rag: the three work jointly, and feedback to each is a duty, not an option. A gap in a partner is written down the same day in `.claude/notes/partners/<partner>/`; snes-rag is passive and only learns what we and luna report; we are the bridge between the two.
-- `exchanges.md` — direct exchanges (owner decision 2026-10-10): OpenSNES, luna and the game talk session to session and challenge one another, no GitHub issue between the three; two axes (our own work, and collaboration); the game builds on this tree's `develop`, so a compiler chantier goes in a separate worktree and a full rebuild is announced. Charter: `~/workspace/snes-tutor/protocole/ECHANGES.md`.
+- `exchanges.md` — direct exchanges (owner decision 2026-10-10): OpenSNES, luna and the game talk session to session and challenge one another, no GitHub issue between the three; two axes (our own work, and collaboration); the game builds on this tree's `develop`, so a compiler chantier goes in a separate worktree and a full rebuild is announced.
 
 ## Strategic Planning
 
