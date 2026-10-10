@@ -111,3 +111,10 @@ largest shift equals the limit ("at the search limit — widen
 --max-shift"), since that is the case where the printed number is not the
 real one.
 
+Taken within the hour (luna `develop` 92c5677, for a 1.38.1 with the
+doubled-arrival fix): the window prints `shift=-64 (limit)`, the final
+line ends "at the search limit — widen --max-shift", the JSON gains
+`shift_at_limit`; the verdict stays MATCH (a comparison of levels), which
+we agreed to. To do at that pin: `testing.md` — a line carrying the mark
+is not quoted in a commit before it has been run again wider — and replay
+the `echo` pair.
