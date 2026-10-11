@@ -839,9 +839,14 @@ assembly on 2026-10-12 (profile of the corpus re-run on `0202ea6a`, work
 only: `main` 20 %, `NmiHandler` 19 %, then `oamDrawMetasprite` 2.6 %,
 `tcc_mul16` 2.4 %, `oamSet` 1.4 %, `tcc_div16` 0.8 % — down from 1.9 since
 `textPrintU16` stopped dividing in software; `metasprite` 61,460 → 27,470 a
-frame, `aseprite_pipeline` 30,220 → 15,930). Still not done: the `nop`s
-of `tcc_mul16` (below), and the index of a loop kept in X (stage 2, T3),
-which the game asks for.
+frame, `aseprite_pipeline` 30,220 → 15,930). The same day, `86471b90`:
+the NMI's text flush sends only the bytes written since the last VBlank
+(`tilemap_dirty_lo/hi` in `crt0`'s system block; `timer` 17,650 → 3,400
+master cycles of flush a frame, `controller` 17,650 → 1,350; the timer
+manifest caps its VBlank DMA at 1,024 bytes, which the ROM before fails).
+Still not done: the `nop`s of `tcc_mul16` (below), and the index of a loop
+kept in X (stage 2, T3) — stage 2 waits for the
+owner's word (the plan of 2026-10-08 opens it after 1.0).
 
 ## 2026-10-11 — the four `nop` of `tcc_mul16`: not shortened
 

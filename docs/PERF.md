@@ -149,7 +149,9 @@ OpenSNES costs no more than PVSnesLib on **14 of the 14 rows**. PVSnesLib at `fa
 **How a row is timed.** Each row is built twice per SDK, with its library
 calls and with the same loops around nothing; both run the same number of
 frames, and the cost is what the symbols of the first gained over the
-second. The call, its arguments, the library function and what it calls
+second. Both SDKs build the scene as LoROM, SlowROM (the build's default,
+`USE_FASTROM=0`): a FastROM game pays about a quarter less for the
+instruction fetches of these routines, on either side. The call, its arguments, the library function and what it calls
 are counted, the loop is not. `text` and `frame` include the frame
 boundary, where each SDK's handler sends what the calls prepared; `idle`
 is that handler alone, in a ROM that only waits.
