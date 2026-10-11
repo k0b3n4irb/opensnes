@@ -78,9 +78,14 @@ data carries the bank:
   `lda.l sym`, `lda.l sym,x` or `[tcc__r9]`.
 - **The one bank-blind path left:** casting the `const` away and reading
   through a plain pointer (`*(u8 *)tab`) — the compiler then emits the
-  bank-$00-implicit `lda.l $0000,x`. `devtools/check_bank_reads.py` runs
-  at every link and fails on a symbol in bank $01+ read with bank-$00
-  addressing, so this cannot ship silently.
+  bank-$00-implicit `lda.l $0000,x`. The link fails on a symbol in bank
+  $01+ read with bank-$00 addressing (`opensnes-rom check`), which
+  catches the read that names its symbol. It cannot see a plain pointer
+  that travels — stored, or passed to a function, then read there: that
+  read is silently wrong. The cast is the only way in: a string literal
+  is `const char[]` since 2026-10-11 (until then `f("abc")` with
+  `void f(char *)` took this path with no cast at all), so the compiler
+  refuses every implicit loss of `const`.
 
 HiROM: every HiROM unit carries `.BASE $C0` so a datum at offset $0000 of
 a high bank is addressed in the full 64 KB view (`$Cn:0000`); the wlalink

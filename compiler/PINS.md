@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | b2e42056f034e91fa7ef829cfc0a8736c29e7d35 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/cproc | 7e6a4e5a97ac3f86cfc04674996039747d20c9ae | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 9338622023186bc45ac19f7d77d4f2fcbf6bfbd1 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
@@ -44,9 +44,16 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 38 patches since upstream merge-base 7051114
+### compiler/cproc — 45 patches since upstream merge-base 7051114
 
 ```
+7e6a4e5 expr: a string literal is const char[] — handed to a plain `char *` it was read from the wrong bank in silence, and `"abc"[i]` was read bank-blind; a store to a literal is refused (2026-10-11)
+1071b97 expr: *"a" is the first character — the *& collapse skips string literals; it stopped on "unimplemented expression" (upstream 482c69c + d30bfcc, adapted, 2026-10-11)
+9877cd2 expr: Use exprassign to check for invalid assignment — `int y; y = a_struct;` stopped on "internal error; unsupported conversion" (upstream 2a70719, cherry-picked 2026-10-11)
+4e8eb9c Disallow qualifiers in nested array types — `int a[const 3][const 4]` was accepted (upstream ac51461, cherry-picked 2026-10-11)
+f8483cd decl: Error out if 'restrict' is used in non-pointer, non-array types — `int restrict r;` was accepted (upstream 007035e, cherry-picked 2026-10-11)
+d082fc0 Add error for initialization of flexible array members — it stopped on an assertion in emitdata (upstream 3fcb352, cherry-picked 2026-10-11)
+9ff8eb3 stmt: Fix error message for incorrect token after `for` — the message said "while" (upstream 96367c3, cherry-picked 2026-10-11)
 b2e4205 expr: a hex escape stops at the first non-hex character — hexval took a to z for digits: "\x7Fw" was one wrong byte and the w was gone (a defect of upstream's 19b6342 of 2026-04-24, which upstream fixed in 7e9a684 on 2026-05-02; our merge-base is between the two — 2026-10-11)
 63ad4e9 expr: a conditional's result has the conditional's type, bit-field or not — `b3 - (3 ? bf.b2 : u)` was computed signed (difftest_stmt seed 103247, 2026-10-09)
 dbc4f9f qbe: 64-bit integers are refused, their constants folded first (2026-10-08)

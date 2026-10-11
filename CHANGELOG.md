@@ -160,6 +160,31 @@ All notable changes to OpenSNES are documented in this file.
   the functions that read a state back are synchronous as before.
 
 ### Fixed
+- fix(compiler): **a string literal is `const char[]`.** A literal is ROM
+  data in a bank the linker picks, and only a read through a `const`
+  pointee is a far read. C types a literal `char[]`, so a literal handed
+  to a plain `char *` (`void f(char *s)` called with `"WXYZ"`) was read
+  from bank $00 at run time: a wrong byte, no diagnostic, and the link
+  guard said OK because no symbol is named in such a read. Typed `const`,
+  as in C++:
+  - `char *p = "abc";` and a literal passed to a `char *` parameter are
+    **refused** ("assignment to pointer discards qualifiers"): declare the
+    pointer `const char *`. The library and the 86 examples needed no
+    change;
+  - `"0123456789ABCDEF"[n]` now compiles to a far read (the link refused
+    it, with a message that blamed the C), and `*"a"` compiles (it stopped
+    the compiler on "unimplemented expression");
+  - a store to a literal (`"abc"[0] = 'x'`, which did nothing at run
+    time) is refused;
+  - `char a[] = "abc";` and tables of `const char *` are unchanged.
+- fix(compiler): five fixes taken from upstream cproc after a review of
+  its 97 commits since our fork point. Two programs that stopped the
+  compiler on an internal error now get a diagnostic (a struct assigned
+  to an int; a flexible array member given an initialiser); two invalid
+  declarations are refused instead of accepted (`int restrict r;`,
+  qualifiers inside a nested array parameter); the message for a `for`
+  without its parenthesis no longer says "while". The review is in
+  `.claude/notes/tech/cproc_upstream_review.md`.
 - fix(compiler): **a hex escape stops at the first character that is not
   a hex digit.** `"\x7Fw"` compiled to one byte, 0xC0, instead of 0x7F
   followed by `w`: the frontend took every letter a to z for a digit, so

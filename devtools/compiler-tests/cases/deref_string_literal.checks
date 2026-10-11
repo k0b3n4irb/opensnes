@@ -1,0 +1,6 @@
+# Each read of the literal is far (lda.l, or through a 24-bit pointer); none is bank-blind (lda.w).
+in first: present lda\.l deref_string_literal_string
+in nth: present lda\.l deref_string_literal_string
+in idx: present lda\.l deref_string_literal_string
+in swapped: present lda \[tcc__r9\]
+absent lda\.w deref_string_literal_string
