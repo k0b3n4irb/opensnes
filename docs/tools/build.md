@@ -78,6 +78,18 @@ A cartridge carries one coprocessor: setting two of these is refused.
 | `SOUNDBANK_OUT` | `soundbank` | Base name of the generated soundbank files |
 | `SOUNDBANK_BANK` | `1` | ROM bank passed to `smconv -b` for the soundbank data |
 
+## What a change rebuilds
+
+A C object depends on every header of the library (`lib/include/snes.h`,
+`lib/include/snes/*.h`), on every header of the project (`*.h`, `*.inc`,
+`res/*.h`, `res/*.inc`, next to each C source), on the generated graphics
+headers, on the memory map and on `.opensnes_config`; and, through a stamp
+that holds a checksum of `bin/cc65816`, `cproc-qbe` and `qbe`, on the
+compiler itself. So a header edited anywhere rebuilds every C file of the
+project, and an SDK update rebuilds them too — coarse, and never stale. An
+assembled object depends on the files its `.incbin` lines name. The link
+runs again whenever an object did.
+
 ## Build checks
 
 Every link runs checks that catch silent failures (a const table read
