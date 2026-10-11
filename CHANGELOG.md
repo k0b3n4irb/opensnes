@@ -5,6 +5,11 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- bench: **a 32-bit division row in `make bench-sdk`** (`div32`: 200 steps
+  of `u32 / u16`, twice a step, and a `u32 / u32` every eighth).
+  Measured: PVSnesLib 11,361,754 master cycles, OpenSNES 5,124,814
+  (-54.9 %); code 888 to 452 bytes. PVSnesLib's figures re-measured on the
+  same tree (`fa758c9b`) for the whole table.
 - feat(lib): **`OamWorldBatch.order`, for a game that sorts its sprites by
   depth**. OAM order is drawing
   order, so a game seen from above re-sorts its actors every frame; until

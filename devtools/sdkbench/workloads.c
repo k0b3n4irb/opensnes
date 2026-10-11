@@ -173,6 +173,29 @@ void w_long(void) {
     res = (u16)(h ^ (h >> 16));
 }
 
+/* 7b. 32-bit division: a pitch, a distance, a score, each divided by a
+ * 16-bit value computed at run time (u32 / u16, what tcc_udivmod32 serves),
+ * and a few u32 / u32. */
+void w_div32(void) {
+    u32 x, h, q;
+    u16 i, d;
+    x = 12345;
+    h = 0;
+    for (i = 0; i < 200; i++) {
+        x = x * 1664525 + 1013904223;
+        d = (u16)((x >> 7) | 1);
+        q = x / d;
+        h += q;
+        q = (x >> 3) / (u16)(i + 3);
+        h ^= q;
+        if ((i & 7) == 0) {
+            q = x / (h | 0x10000UL);
+            h += q;
+        }
+    }
+    res = (u16)(h ^ (h >> 16));
+}
+
 /* 8. byte buffers: fill, copy, compare, scan */
 void w_bytes(void) {
     u16 i, pass, sum;
@@ -903,6 +926,8 @@ int main(void) {
     w_dist();
 #elif WORKLOAD == 21
     w_depot();
+#elif WORKLOAD == 22
+    w_div32();
 #endif
     done = 0x600D;
     while (1) {

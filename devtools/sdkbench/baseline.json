@@ -2,13 +2,13 @@
   "frames": 900,
   "workloads": {
     "sieve": {
-      "cycles": 1219302,
+      "cycles": 1219300,
       "size": 112,
       "stack": 23,
       "res": 172
     },
     "sort": {
-      "cycles": 931106,
+      "cycles": 931144,
       "size": 231,
       "stack": 25,
       "res": 12563
@@ -16,23 +16,23 @@
     "physics": {
       "cycles": 3060114,
       "size": 454,
-      "stack": 33,
+      "stack": 30,
       "res": 12530
     },
     "collide": {
       "cycles": 5580422,
       "size": 438,
-      "stack": 33,
+      "stack": 30,
       "res": 162
     },
     "mul": {
-      "cycles": 4700546,
+      "cycles": 4700538,
       "size": 91,
       "stack": 29,
       "res": 13728
     },
     "decimal": {
-      "cycles": 2589276,
+      "cycles": 2589274,
       "size": 83,
       "stack": 28,
       "res": 4118
@@ -40,7 +40,7 @@
     "long": {
       "cycles": 2525134,
       "size": 289,
-      "stack": 35,
+      "stack": 33,
       "res": 35405
     },
     "bytes": {
@@ -50,7 +50,7 @@
       "res": 819
     },
     "calls": {
-      "cycles": 2561730,
+      "cycles": 2561732,
       "size": 57,
       "stack": 159,
       "res": 1597
@@ -62,19 +62,19 @@
       "res": 9705
     },
     "crc": {
-      "cycles": 1380410,
+      "cycles": 1380452,
       "size": 116,
       "stack": 23,
       "res": 2842
     },
     "list": {
-      "cycles": 1707746,
+      "cycles": 1707750,
       "size": 278,
       "stack": 29,
       "res": 17376
     },
     "tilemap": {
-      "cycles": 813210,
+      "cycles": 813212,
       "size": 181,
       "stack": 23,
       "res": 10608
@@ -86,9 +86,9 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 3274466,
+      "cycles": 3274464,
       "size": 531,
-      "stack": 33,
+      "stack": 30,
       "res": 12530
     },
     "copy": {
@@ -110,22 +110,28 @@
       "res": 24876
     },
     "place": {
-      "cycles": 5353188,
+      "cycles": 5353230,
       "size": 361,
       "stack": 29,
       "res": 30752
     },
     "dist": {
-      "cycles": 7800880,
+      "cycles": 7800876,
       "size": 472,
       "stack": 28,
       "res": 29147
     },
     "depot": {
-      "cycles": 14440426,
+      "cycles": 14440428,
       "size": 3465,
       "stack": 53,
       "res": 54047
+    },
+    "div32": {
+      "cycles": 5124814,
+      "size": 452,
+      "stack": 71,
+      "res": 54707
     }
   }
 }
