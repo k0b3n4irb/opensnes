@@ -23,7 +23,7 @@ typedef struct {
     u8  priority;       /**< Priority bit (0 or 1) */
     u8  map_width;      /**< Tilemap width in tiles. **32 only.** `textInit`
                          *   sets it, `tilemapBuffer` is sized for 32x32 and
-                         *   the NMI's flush DMAs a fixed 2048 bytes, so
+                         *   the NMI's flush sends the buffer's bytes, so
                          *   writing 64 here indexes past the buffer instead
                          *   of widening anything. */
 } TextConfig;
@@ -206,8 +206,11 @@ void textClearRect(u8 x, u8 y, u8 w, u8 h);
  *
  * Keep using this only when you wrote to `tilemapBuffer` directly,
  * outside of the `text*` API — for example, if you patched a tile
- * by hand for a custom UI element. Calling it redundantly after a
- * regular `textPrint*` is a no-op.
+ * by hand for a custom UI element: it sends the whole buffer (2048
+ * bytes, 16,384 master cycles of the VBlank), where the `text*` writers
+ * have the NMI send only the bytes they wrote since the last VBlank
+ * (since 2026-10-12). Calling it after a regular `textPrint*` costs that
+ * full transfer once.
  */
 void textFlush(void);
 

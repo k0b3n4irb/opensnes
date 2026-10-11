@@ -57,6 +57,20 @@ All notable changes to OpenSNES are documented in this file.
   above).
 
 ### Performance
+- perf(runtime,lib): **the NMI sends only the text that changed.** The
+  tilemap flush DMAed all 2048 bytes of the text buffer at every VBlank
+  that followed a write — 16,384 master cycles, above the 12,000 of the
+  NMI budget, for a counter that changes one row. The text writers
+  (`textPutChar`, `textPrint` and its run, `textClear`, `textClearRect`)
+  now keep the range of bytes written since the last flush
+  (`tilemap_dirty_lo` / `_hi`, next to `tilemap_src_addr` in `crt0.asm`),
+  and the flush sends that range to the matching VRAM address.
+  `textFlush()` keeps its contract for a buffer written by hand: it marks
+  the whole buffer. Measured on luna, frames 60-300: `basics/timer`'s
+  flush 17,650 to 3,400 master cycles a frame (its active frame -21 %),
+  `input/controller`'s 17,650 to 1,350 (-40 %); the timer manifest now
+  caps the VBlank DMA at 1,024 bytes a frame, which the ROM built before
+  fails.
 - perf(lib): **`oamDrawMetasprite` is assembly** (`lib/source/sprite_meta.asm`;
   header unchanged). It was compiled C calling `oamSet()` and
   `oamSetSize()` for every piece — the library's heaviest function in a

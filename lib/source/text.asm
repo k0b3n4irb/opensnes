@@ -284,6 +284,9 @@ asm_textFillBuffer:
     inx
     dey
     bne -
+    stz.w tilemap_dirty_lo  ; the whole buffer is to send
+    lda #2048
+    sta.w tilemap_dirty_hi
     plp
     rtl
 
@@ -302,6 +305,8 @@ asm_textFillBuffer:
 ; the string included) or `maxn` characters. Returns how many it wrote.
 ; textPrint() computes the position once and calls this for each run; the
 ; same loop compiled from C cost about 170 cycles a character (2026-10-11).
+ ; The bytes written, cell to cell + 2 n, widen tilemap_dirty_lo / _hi, the
+; range the NMI's flush sends (2026-10-12).
 ; Stack (after php): 13,s str  15,s str bank  11,s cell  9,s font
 ;                    7,s attr  5,s maxn
 ;------------------------------------------------------------------------------
@@ -334,7 +339,19 @@ asm_textRun:
     inx
     iny
     bra -
-+   tya
++   cpy.w #0
+    beq @run_ret        ; nothing written: the range is as it was
+    lda 11,s            ; cell: the first byte written
+    cmp.w tilemap_dirty_lo
+    bcs @run_hi
+    sta.w tilemap_dirty_lo
+@run_hi:
+    txa                 ; one past the last byte written
+    cmp.w tilemap_dirty_hi
+    bcc @run_ret
+    sta.w tilemap_dirty_hi
+@run_ret:
+    tya
     plp
     rtl
 

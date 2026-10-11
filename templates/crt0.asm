@@ -181,6 +181,8 @@
     tilemap_update_flag dsb 1 ; Set when tilemap buffer needs DMA to VRAM
     tilemap_vram_addr dsb 2   ; VRAM word address for tilemap DMA target
     tilemap_src_addr dsb 2    ; 16-bit RAM address of tilemap buffer (bank $00)
+    tilemap_dirty_lo dsb 2    ; first byte of the buffer written since the last flush ($FFFF: none)
+    tilemap_dirty_hi dsb 2    ; one past the last
     frame_count     dsb 2   ; Frame counter (incremented by NMI handler)
     frame_count_svg dsb 2   ; Saved frame count
     lag_frame_counter dsb 2 ; Lag frame detection
@@ -678,6 +680,9 @@ FastStart:
 
     ; Initialize VBlank callback to default (does nothing)
     rep #$20
+    .ACCU 16
+    lda #$FFFF
+    sta tilemap_dirty_lo    ; no byte of the text buffer written yet (hi is 0)
     .ACCU 16
     lda #DefaultNmiCallback
     sta nmi_callback
@@ -2102,8 +2107,12 @@ DefaultIrqHandler:
 ; Tilemap Flush (DMA tilemap buffer to VRAM)
 ;==============================================================================
 ; Called during VBlank by NMI handler when tilemap_update_flag is set.
-; DMA transfers 2048 bytes from tilemapBuffer to VRAM. The buffer is a plain
-; C global, so the linker places it in the bank $00 band below $2000 and the
+; DMA transfers the bytes of tilemapBuffer written since the last flush —
+; tilemap_dirty_lo to tilemap_dirty_hi, kept by the text module's writers
+; (since 2026-10-12; 2048 bytes every time until then: 16,384 master cycles
+; of VBlank for a counter that changes one row, over the 12,000 of the NMI
+; budget). textFlush() marks the whole buffer. The buffer is a plain C
+; global, so the linker places it in the bank $00 band below $2000 and the
 ; source bank below is $00 — not $7E:3000, which an older comment claimed.
 ; Uses DMA channel 1 to avoid conflicting with OAM on channel 0/7.
 ;==============================================================================
@@ -2126,20 +2135,36 @@ tilemapFlush:
 
     rep #$20            ; 16-bit A
     .ACCU 16
-    lda.w tilemap_vram_addr
+    ; the range: nothing written since the last flush, nothing to send
+    lda.w tilemap_dirty_hi
+    sec
+    sbc.w tilemap_dirty_lo
+    beq @flush_none
+    bcc @flush_none     ; lo above hi: the reset state, or a writer's mistake
+    sta $4315           ; DMA size: the bytes of the range
+
+    ; VRAM word address = tilemap_vram_addr + lo / 2
+    lda.w tilemap_dirty_lo
+    lsr a
+    clc
+    adc.w tilemap_vram_addr
     sta $2116           ; VMADDL/H: VRAM word address
 
     ; DMA channel 1: word write mode (2 regs write once: VMDATAL+VMDATAH)
     lda #$1801          ; Mode 01 (ab), target $18 (VMDATAL)
     sta $4310
 
-    ; Transfer size = 2048 bytes
-    lda #2048
-    sta $4315
-
-    ; Source address from tilemap_src_addr (set by textInit in C)
+    ; Source address = tilemap_src_addr (set by textInit in C) + lo
     lda.w tilemap_src_addr
+    clc
+    adc.w tilemap_dirty_lo
     sta $4312           ; DMA source address (low word)
+
+    ; the range is sent: reset it (the NMI is not interrupted, so no
+    ; write can land between the DMA and this)
+    lda #$FFFF
+    sta.w tilemap_dirty_lo
+    stz.w tilemap_dirty_hi
 
     sep #$20            ; 8-bit A
     .ACCU 8
@@ -2152,6 +2177,12 @@ tilemapFlush:
     plb                 ; Restore data bank
     plp
     rtl                 ; Return long (called with JSL)
+
+@flush_none:
+    .ACCU 16
+    plb
+    plp
+    rtl
 
 .ENDS
 

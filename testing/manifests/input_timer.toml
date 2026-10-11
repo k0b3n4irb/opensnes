@@ -40,3 +40,11 @@ frame_count = { eq = 1, width = 2 }
 at_frame = 240
 [checkpoint.values]
 frame_count = { eq = 39, width = 2 }         # 240 - 201
+
+# The NMI's text flush sends only the bytes written since the last VBlank
+# (2026-10-12): a counter that redraws one row costs a few dozen bytes of
+# VBlank DMA, where it cost the whole 2048-byte buffer until then. The ceiling
+# fails on the ROM built before the change (negative control run that day).
+[asserts.dma]
+unsafe_writes = 0
+max_vblank_bytes = 1024
