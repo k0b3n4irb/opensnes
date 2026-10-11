@@ -57,24 +57,28 @@ Checked and already right here: `8` is not an octal digit (`576b89c`; our
   `noreturn` and `section` attributes (`c5a3f28`, `aa7da0f`; we have our
   own section mechanism), `#error` / `#warning` handled by cproc's own
   preprocessor (we preprocess with the host `cc -E`).
-- **Refactors** that conflict with our 45 patches and change no behaviour:
+- **Refactors** that conflict with our 46 patches and change no behaviour:
   `7ed7742`, `80ed174`, `5c85062`, `866d74a`, `0833cbb`, `3666542`,
   `6e8426c`.
 - **More thorough `restrict` checking** (`5f90023`) and the better message
   for a bad struct assignment (`ee95238`): they sit on the refactors above.
   The simple forms are refused since this backport.
 
-## To study as an optimisation, separately
+## The two optimisation series, measured (2026-10-11)
 
-Two upstream series change the IR cproc hands to QBE, and conflict with
-our own changes in the same functions. They are not fixes; each would be a
-Class A change measured on `make bench` and `make bench-sdk`:
+Two upstream series change the IR cproc hands to QBE. Each first commit
+applies alone; both were built in a worktree and measured on
+`make bench-sdk` (21 workloads, 71,772,676 master cycles before).
 
-- switch: `863e1e7` (no redundant `ceq` in a leaf), `f68a36f` (min/max in
-  the case search);
-- branches: `84107ab`, `e9ee698`, `9afa9df`, `92ef417` (`funcbranch`: a
-  condition compiled as a branch instead of a value then a test). Our QBE
-  has its own passes on the same shapes; measure before assuming a gain.
+| Commit | Effect | Decision |
+|---|---|---|
+| `863e1e7` switch: no redundant `ceq` in a leaf | `switch` 1,100,558 -> 1,066,794 (-3.1 %), `state` 995,956 -> 968,636 (-2.7 %), nothing else moves; 85 bytes less | **taken** (46th patch), compiler check `switch_dense_leaf` |
+| `84107ab` branches: `funcbranch`, a condition compiled as a branch | `strings` 2,007,864 -> 1,960,282 (-2.4 %), `depot` +0.008 %, nothing else; the compiler check `long_condition` fails (the pattern it pins for a 32-bit condition on the right of `&&` is no longer produced) | **not taken**: one workload gains, a pinned shape is lost, and its three follow-ups (`e9ee698`, `9afa9df`, `92ef417`) conflict with our changes. To reopen only with the `long_condition` shape understood |
+| `f68a36f` switch: min/max in the case search | conflicts with our changes | not tried |
+
+A first reading of these figures was void: the build had failed on the
+patch count of `compiler/PINS.md` and the benches ran on the old binaries,
+giving the reference to the cycle. A trial script stops on a failed build.
 
 ## Not recommended: a rebase onto upstream
 

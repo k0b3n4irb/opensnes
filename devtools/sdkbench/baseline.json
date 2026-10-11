@@ -56,8 +56,8 @@
       "res": 1597
     },
     "switch": {
-      "cycles": 1100558,
-      "size": 332,
+      "cycles": 1066794,
+      "size": 275,
       "stack": 23,
       "res": 9705
     },
@@ -104,8 +104,8 @@
       "res": 65535
     },
     "state": {
-      "cycles": 995956,
-      "size": 297,
+      "cycles": 968636,
+      "size": 269,
       "stack": 32,
       "res": 24876
     },

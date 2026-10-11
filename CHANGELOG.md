@@ -57,6 +57,12 @@ All notable changes to OpenSNES are documented in this file.
   above).
 
 ### Performance
+- perf(compiler): **a `switch` skips a test it does not need.** The case
+  search is a tree of "equal? below?" tests; a case reached with the value
+  just below and the value just above already ruled out can only be that
+  value, and is entered without a compare (upstream cproc `863e1e7`).
+  Measured on `devtools/sdkbench`: `switch` -3.1 %, `state` -2.7 %, the
+  other nineteen workloads unchanged; 85 bytes less code over the bench.
 - perf(compiler): **the scaled index of an array access is computed once,
   not in front of every access.** In a loop over parallel arrays
   (`x[i]`, `y[i]`, `dx[i]`…), each load and each store carried its own
