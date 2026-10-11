@@ -6,11 +6,13 @@ All notable changes to OpenSNES are documented in this file.
 
 ### Added
 - feat(examples): **`sprites/world_sprites`** — the example `oamPlaceWorld()`
-  did not have: 23 coins and a 16 x 16 player in a 512 x 448 world, a
-  camera the D-pad scrolls, two batches (one size each, the size bit set
-  once), and `visible[]` read back to count the coins in view. The 87th
-  example; manifest `oam_world_sprites` pins the camera's clamp at the
-  world's edge and the count the call reports.
+  did not have: 17 coins of 16 x 16 and six walkers of 32 x 32 in a 512 x 448
+  world, a camera the D-pad scrolls, two batches (one size each, the size
+  bit set once), the walkers sorted by depth every frame with the batch's
+  `order` (slots permuted, arrays untouched), and `visible[]` read back.
+  The 87th example; manifest `oam_world_sprites` pins the camera's clamp
+  at the world's edge, the count the call reports and the walker in the
+  front slot.
 - bench: **a 32-bit division row in `make bench-sdk`** (`div32`: 200 steps
   of `u32 / u16`, twice a step, and a `u32 / u32` every eighth).
   Measured: PVSnesLib 11,361,754 master cycles, OpenSNES 5,124,814
