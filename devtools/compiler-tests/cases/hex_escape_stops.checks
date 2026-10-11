@@ -1,0 +1,5 @@
+# The letter after a hex escape is a character of its own.
+present \.ASC "z", 127, "w", 0
+present \.ASC "ZQ", 0
+present \.ASC 4, "g", 0
+present \.ASC "q", 127, 0

@@ -150,6 +150,15 @@ All notable changes to OpenSNES are documented in this file.
   the functions that read a state back are synchronous as before.
 
 ### Fixed
+- fix(compiler): **a hex escape stops at the first character that is not
+  a hex digit.** `"\x7Fw"` compiled to one byte, 0xC0, instead of 0x7F
+  followed by `w`: the frontend took every letter a to z for a digit, so
+  the escape ran on through the letters that followed and kept the low
+  byte of the sum. No diagnostic. A string whose escape was followed by a
+  digit, a space, punctuation or the end of the string was right; one
+  followed by a letter from g to z (or G to Z) was wrong. Inherited from
+  upstream cproc (in on 2026-04-24, fixed there on 2026-05-02). Compiler
+  check `hex_escape_stops`.
 - fix(build): `make clean` in the SDK, or `make` in a project, no longer
   waits for ever when `bin/` holds no compiler and the standard input is
   not a terminal nor closed (a job started in the background):

@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 63ad4e9c6005701716f394a7c051799186a64053 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/cproc | b2e42056f034e91fa7ef829cfc0a8736c29e7d35 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 9338622023186bc45ac19f7d77d4f2fcbf6bfbd1 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 37 patches since upstream merge-base 7051114
+### compiler/cproc — 38 patches since upstream merge-base 7051114
 
 ```
+b2e4205 expr: a hex escape stops at the first non-hex character — hexval took a to z for digits: "\x7Fw" was one wrong byte and the w was gone (a defect of upstream's 19b6342 of 2026-04-24, which upstream fixed in 7e9a684 on 2026-05-02; our merge-base is between the two — 2026-10-11)
 63ad4e9 expr: a conditional's result has the conditional's type, bit-field or not — `b3 - (3 ? bf.b2 : u)` was computed signed (difftest_stmt seed 103247, 2026-10-09)
 dbc4f9f qbe: 64-bit integers are refused, their constants folded first (2026-10-08)
 80d542e qbe, eval: conditions and logical constants at the w65816 widths — three silent miscompilations (difftest, 2026-10-08)
