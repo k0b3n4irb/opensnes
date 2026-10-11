@@ -250,6 +250,14 @@ All notable changes to OpenSNES are documented in this file.
   `hdmaEnable()`, in VBlank; no other example writes `$420C` by hand.
 
 ### Changed
+- refactor(lib): **the audio module's sample table leaves the plain RAM
+  band.** `sample_mirror` (64 samples, 512 bytes, reached only by name in
+  `audio.c`) is `FAR`: a ROM that links `audio` gets 512 bytes back below
+  `$2000`, where plain C variables and the stack live
+  (`examples/audio/echo`: 1,550 to 1,038 bytes used; its free figure goes
+  from 6,496 to 6,880, since the band is counted from its highest section
+  and the OAM table is fixed at `$0300`). Header unchanged. Audio: `echo` re-captured (`luna
+  diff --audio --align-onset`: MATCH, max delta 0.08 %, shift 2 samples).
 - test(bench): the benchmark against PVSnesLib gains a twenty-first
   workload, `depot`: eighteen agents in two crews, thirty bursts of
   sixteen decisions — parallel arrays indexed by the agent, small helpers

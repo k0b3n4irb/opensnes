@@ -99,8 +99,9 @@ typedef struct {
 static VoiceMirror voice_mirror[AUDIO_MAX_VOICES];
 
 /* Sample directory mirror + bump allocator (CPU side owns allocation;
- * the driver only writes the ARAM directory entries it is told to). */
-static AudioSample sample_mirror[AUDIO_MAX_SAMPLES];
+ * the driver only writes the ARAM directory entries it is told to).
+ * FAR: 512 bytes reached only by name, kept out of the 8 KB plain band. */
+static FAR AudioSample sample_mirror[AUDIO_MAX_SAMPLES];
 static u16 sample_next_free;
 static u8 audio_echo_reserved;  /* audioSetEcho() was called since audioInit() */
 static u8 audio_rr_voice;   /* round-robin auto-allocation cursor */
