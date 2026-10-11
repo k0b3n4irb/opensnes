@@ -45,8 +45,11 @@ dwl(%q, 8) tries %p first: %p is marked, its argument %a fails, dwl returns
 0 and the mark stays. It then tries %s: its argument %p is "visited at a
 width <= 8", so yes; 3 fits; %s is narrow, hence %q.
 
-Clearing the mark when a proof fails (keeping it only for phis proven
-narrow) restores the result here; I have not measured what that does to
-the case e01207f was written for.
+Clearing the mark of the phi whose proof fails restores the result here
+(checked on the tip; `make check` still passes). It is probably not
+enough in general: a phi proven narrow while an outer phi was only
+assumed narrow keeps its mark when that outer proof fails later. I have
+not measured what a complete fix does to the case e01207f was written
+for.
 
 Thanks for QBE.

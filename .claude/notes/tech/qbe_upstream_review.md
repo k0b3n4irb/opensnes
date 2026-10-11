@@ -75,7 +75,10 @@ is removed. Run on this machine (aarch64), with a C `main`:
 
 Our `defwidthle()` clears the mark when a proof ends, failed or not. It may
 therefore still cost exponential time on a deep diamond of phis — never
-seen; if it is, the memo must keep proven phis only.
+seen. If it is, beware of the obvious memo: clearing only the failed phi
+repairs the input above on upstream's tip (tried, `make check` passes),
+but a phi proven while an outer one was merely assumed would keep its
+mark after that outer proof fails.
 
 Reporting this upstream is a public act: a draft is in
 `.claude/notes/partners/qbe-upstream/`, and it waits for the owner's word.
