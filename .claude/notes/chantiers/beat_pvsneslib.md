@@ -859,3 +859,11 @@ tests pass with no `nop` at all and nothing here can tell eight from
 seven. To reopen when luna models or flags the early read, or with a
 console.
 
+2026-10-12: luna confirmed the fact against ares (`aluEdge`) and Mesen2
+(`AluMulDiv`) — one bit per CPU cycle, eight steps for a product, sixteen
+for a quotient — and has the port written (mulprobe gives
+`f1fec1fe01fe01fe01fe5a00` there), not yet committed (its validation waits
+for its owner). When it lands: re-run the probe on the pinned luna, then
+shorten the waits of `tcc_mul16` and look at the eight `nop` of `tcc_div16`
+with the libtests as the judge.
+
