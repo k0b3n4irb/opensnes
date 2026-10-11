@@ -20,7 +20,7 @@ and `rega`. Only commits in those shared passes can matter.
 |---|---|---|
 | `b58e2e6` exponential `usewidthle()` | compile time | already carried (`77998b5`) |
 | `e01207f` exponential `defwidthle()` | compile time, **and it changes the phi rule** | **not taken, and wrong upstream** — see below. The correct half (a phi being proven at width w0 answers yes only for a question at w0 or wider) is what we fixed ourselves on 2026-10-10 (`79ff312`), found by `difftest_stmt` |
-| `ade9f31` more phis are copies (`phi(a, self)`) | optimisation, applies alone | not measured yet; a Class A lot of its own if tried |
+| `ade9f31` more phis are copies (`phi(a, self)`) | optimisation, applies alone | **measured, not taken**: built in a worktree (the backend binary differs), and not one of the 86 example ROMs changes by a byte; the three benches are identical to the cycle. Our frontend and passes do not produce that phi shape |
 | `3cfca4b` fewer temps in `loadopt()`, `6fa30d5` its range fix | compile time; the second fixes a function the first adds | not needed; if `3cfca4b` is ever taken, `6fa30d5` comes with it |
 | `afd5d2e` drop dead predecessors in `fixphis` | "odd but probably harmless" phi arguments (its own words) | not taken; no symptom here |
 | `8ff0651` `-` followed by a non-digit in the IL | parser robustness | not taken: our IL comes from cproc |
