@@ -118,3 +118,13 @@ line ends "at the search limit — widen --max-shift", the JSON gains
 we agreed to. To do at that pin: `testing.md` — a line carrying the mark
 is not quoted in a commit before it has been run again wider — and replay
 the `echo` pair.
+
+- 2026-10-11 — **the hardware multiplier has no latency**: `$4216/$4217`
+  hold the full product four CPU cycles after the write to `$4203` (probe
+  ROM, 0xFF x 0xFF read after 0 to 4 `nop`: 0xFE01 five times). References:
+  eight cycles, built as it goes. Needed: the early read modelled or
+  flagged, so that a wait that is too short fails a test. Until then the
+  four `nop` of `tcc_mul16` (and the waits of `math.asm`, `mul32.asm`,
+  `fixed32.asm`, `tcc_div16`) are not shortened: luna cannot judge it.
+  Sent: `2026-10-11_to_luna_multiplier_latency.md`.
+

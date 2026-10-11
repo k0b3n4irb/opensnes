@@ -832,3 +832,15 @@ Left on that list, not done: `textPrint` itself (63,000 master cycles a
 frame in `timer` for "COUNT=", three spaces and a 16-character line —
 about 2,400 a character, to look at next), `oamDrawMetasprite`, the four
 `nop` after each hardware multiply in `tcc_mul16`.
+
+## 2026-10-11 — the four `nop` of `tcc_mul16`: not shortened
+
+The references ask for eight CPU cycles between the write to `$4203` and
+the read of `$4216`; the routine waits fourteen. One `nop` instead of four
+would be eight by our count, three times a call. Not done: luna 1.38.0
+returns the full product at once (probe ROM, see
+`partners/luna/2026-10-11_to_luna_multiplier_latency.md`), so the library
+tests pass with no `nop` at all and nothing here can tell eight from
+seven. To reopen when luna models or flags the early read, or with a
+console.
+
