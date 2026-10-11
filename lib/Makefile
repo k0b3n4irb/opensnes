@@ -45,7 +45,7 @@ CC = ../bin/cc65816
 # as prerequisites of the pattern rules, which on Windows left every C
 # object unbuilt without an error (see COMPILER_ID in make/common.mk,
 # 2026-10-10).
-COMPILER_ID := $(shell cksum $(wildcard ../bin/cc65816* ../bin/cproc-qbe* ../bin/qbe*) 2>/dev/null | cksum | tr -d ' \t')
+COMPILER_ID := $(shell cksum $(wildcard ../bin/cc65816* ../bin/cproc-qbe* ../bin/qbe*) </dev/null 2>/dev/null | cksum | tr -d ' \t')
 COMPILER_STAMP := build/.compiler_id
 AS = ../bin/wla-65816
 SPC_AS = ../bin/wla-spc700

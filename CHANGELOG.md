@@ -150,6 +150,11 @@ All notable changes to OpenSNES are documented in this file.
   the functions that read a state back are synchronous as before.
 
 ### Fixed
+- fix(build): `make clean` in the SDK, or `make` in a project, no longer
+  waits for ever when `bin/` holds no compiler and the standard input is
+  not a terminal nor closed (a job started in the background):
+  the checksum of the compiler binaries was `cksum` with no file to read,
+  which reads its standard input. It now reads `/dev/null`.
 - fix(lib): **`audioLoadSample()` could time out, and every audio call
   after it, depending on where the vblank interrupt fell.** At the end of a
   load the sound driver showed the acknowledgement of the last exchange for

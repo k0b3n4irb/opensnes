@@ -425,7 +425,7 @@ LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)
 # and those objects also have a rule without a recipe, so make called them
 # done). A stamp is a file this Makefile writes itself. The glob patterns
 # read the directory, so they give the names as they are, `.exe` or not.
-COMPILER_ID := $(shell cksum $(wildcard $(OPENSNES)/bin/cc65816* $(OPENSNES)/bin/cproc-qbe* $(OPENSNES)/bin/qbe*) 2>/dev/null | cksum | tr -d ' \t')
+COMPILER_ID := $(shell cksum $(wildcard $(OPENSNES)/bin/cc65816* $(OPENSNES)/bin/cproc-qbe* $(OPENSNES)/bin/qbe*) </dev/null 2>/dev/null | cksum | tr -d ' \t')
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
 GSU_HEADERS := $(patsubst %.sfx,%.sfx.h,$(GSUSRC))
