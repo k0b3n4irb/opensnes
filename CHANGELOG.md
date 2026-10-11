@@ -57,6 +57,20 @@ All notable changes to OpenSNES are documented in this file.
   above).
 
 ### Performance
+- perf(compiler): **a loop tests its condition at the bottom, and its body
+  does not reload the index.** A block that ended in a jump back to a
+  condition (`for`, `while`) now carries a copy of the compare and branch:
+  one `jmp` less every turn. And a load at a block's entry is dropped when
+  every way in has just loaded or stored the same slot — the body of a
+  loop right after its compare. `for (k = 0; k < n; k++) t[k] = 0;` goes
+  from 36 to 29 CPU cycles a turn. Measured: the 21 workloads of
+  `make bench-sdk` 71,711,592 to 68,797,694 master cycles (-4.1 %; switch
+  -14.6 %, sieve -14.0 %, copy -13.2 %, none slower), code 9,348 to 9,608 bytes (+2.8 %: the
+  copied test); the library bench is now at or under PVSnesLib on its 14
+  rows (`dma`, the last tie above, is at -0.1 %). The static count of
+  `make bench` reads 1,238 for 1,236: it adds up the text of a function
+  once, and a loop now has its test twice. QBE
+  `fbdda87`; `QBE_NO_ROTATE=1`, `QBE_NO_PEEP_ENTRY=1` turn each rule off.
 - perf(compiler): **a `switch` skips a test it does not need.** The case
   search is a tree of "equal? below?" tests; a case reached with the value
   just below and the value just above already ruled out can only be that
@@ -166,6 +180,14 @@ All notable changes to OpenSNES are documented in this file.
   the functions that read a state back are synchronous as before.
 
 ### Fixed
+- fix(compiler): **`(c ? 1L : 0L) % d` stopped the compiler with an
+  internal error.** A 32-bit divide or remainder whose first operand is a
+  condition used as a value ("%x has no stack slot and is read from the
+  stack"): the four 32-bit operations read that operand from the stack
+  after pushing the second, and one rule assumed it was still in A. A
+  refusal, never wrong code. Found by the differential hunt on the loop
+  change above (seed 364296 of `difftest_stmt.py`; the compiler before it
+  stopped on the same program). Check `div32_cond_operand`.
 - fix(compiler): **a string literal is `const char[]`.** A literal is ROM
   data in a bank the linker picks, and only a read through a `const`
   pointee is a far read. C types a literal `char[]`, so a literal handed

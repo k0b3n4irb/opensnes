@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 9338622023186bc45ac19f7d77d4f2fcbf6bfbd1 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | c8e0f5fad784fa92003d36d6e95b41c2c74352b0 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -98,7 +98,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 120 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 122 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -110,6 +110,8 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+c8e0f5f emit: the first operand of a 32-bit divide or remainder keeps its stack slot — the four operations push the second operand first and read the first from the stack, and `(!g ? 1L : 0L) % d` stopped the compiler with an internal error, "has no stack slot" (difftest_stmt seed 364296, 2026-10-11)
+fbdda87 emit: a block that ends in a jump to a block made of one compare and its branch (the condition of a `for` or a `while`) emits that compare and branch itself — one `jmp` less every turn; and `lda S` at a block's entry goes when every way in comes straight from a load or a store of S (`peephole_entry`, last and once; kept when anything could read its flags). `for (k = 0; k < n; k++) t[k] = 0;`: 36 to 29 CPU cycles a turn (2026-10-11)
 9338622 inline: a function that has a section of its own (`__ramcode`, the RAM code window) is never copied into a caller, by either inliner: its body would run from wherever the caller is. `RAM_CODE static void job(void)` with one call site was absorbed into a ROM caller once the leaf rule stopped refusing it (it had hidden the case), and the Super FX library test ROM never finished; a non-leaf one could already be absorbed before. A caller in such a section may absorb an ordinary function (2026-10-10)
 fe9b7e3 emit: `peephole_flow`, liveness of the sixteen words of `tcc__lf` over a function's text (successors: the next line and the branch target; nothing live at a return; a call does nothing; an 8-bit store is neither a read nor a kill; anything unrecognised leaves the function alone). A `sta.b tcc__lf+N` nothing reads afterwards goes even when the slot is read elsewhere in the function, which in a large function is every slot. QBE_NO_PEEP_FLOW=1 turns it off (issue #166; 2026-10-10)
 03bc837 emit: `color_slots` places temps in decreasing order of QBE's cost (use count weighted by loop depth, `fillcost`) instead of definition order, so the sixteen direct-page words of a function go to what its loops use and not to its setup; needed once a looping leaf may be poured into a big caller (the commit below), whose own temporaries came first. QBE_SLOT_ORDER=def restores the old order (issue #166; 2026-10-10)

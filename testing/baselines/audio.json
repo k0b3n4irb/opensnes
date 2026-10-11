@@ -3,9 +3,9 @@
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "8973b6e6cf9b60d91838fc084c7a3085298bcad6a0065bd7aecb363198443a5a",
+      "sha256": "20a98751bca17c5ebf20951f8a6d897fba602bd37bcb00b6b1034cbf17cb9d10",
       "samples": 159936,
-      "peak": 21143
+      "peak": 21551
     },
     "audio/snesmod_music": {
       "sha256": "88c5a75994f01d1913f90890885e8bfad0f6bc1f6956a7b2a898bb8b30299218",
@@ -13,34 +13,34 @@
       "peak": 20902
     },
     "audio/pitch_mod": {
-      "sha256": "86cbe7da349b0a732f39bec676a1a4daa9bc276d6ea415539d162f8de091eef9",
+      "sha256": "b8c4cca17c2b5ad1850e101e33e8729d0141daf3a286397f9151d791276b9aca",
       "samples": 159936,
       "peak": 22617
     },
     "audio/play_noise": {
-      "sha256": "58e8b17ae5341b5046963c2263cbcad9b5452f14245ef27bff799f3fa1bf9a66",
+      "sha256": "df1b8de4dd454a8b5065bde17069a57e4e242d814364d0cd6e45b6fca348c95b",
       "samples": 159936,
-      "peak": 21143
+      "peak": 21551
     },
     "audio/echo": {
-      "sha256": "f49c44242977c7fe58f5a70a6a2f2e6192ef860dcdd75e6a5db618daeb467c5d",
+      "sha256": "7b2048c325b3876a41d2722628c521aee1d06b4a70fe39e7d6b1397249517ea1",
       "samples": 159936,
       "peak": 10922
     },
     "audio/speech_synth": {
-      "sha256": "172ace332feae4ff84a3beb4e211d5da342bafc5ef5908b57c84a9d561a9e972",
+      "sha256": "5c1e437d178f5615bf16b4fcc7e7d37de46ed5ec1a43b5f3c1e88d58bbcc1e45",
       "samples": 159936,
       "peak": 22487
     },
     "audio/snesmod_music_large": {
-      "sha256": "5b1738032e9d8a0b4f76fdfb6639d9becb552cc68ef8e38e401248ff865b35b4",
+      "sha256": "7d94f8cee28002622109c3865b9e8b1d36e4d3f038a4e965aa0d28e4c98df1af",
       "samples": 159936,
       "peak": 17197
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "afd0d1b7cf91ec9038e9ae0b38588838ec6c54076cc94d78ebf45dd73aea444f",
+      "sha256": "109113a0709d38540ac80369bea703ab55ad34cd9f4e4d2adce6494a9df345cf",
       "samples": 159945,
-      "peak": 20902
+      "peak": 20922
     },
     "audio/soundboard": {
       "sha256": "38ba5594086cb860f22e9265059483e823db66a68a0119efad86de6a0b0ecbdf",

@@ -1,0 +1,9 @@
+# Each loop compares its index with the bound twice in the text (once on the
+# way in, once at the bottom of the body) and nothing jumps back up.
+count 4 cmp\.w #240
+in clear: absent jmp @
+in sum: absent jmp @
+# The body starts with the index still in A: no load between its label and
+# the shift that scales it.
+in clear: present @for_body[.0-9]*:\n\tasl a
+in sum: present @for_body[.0-9]*:\n\tasl a

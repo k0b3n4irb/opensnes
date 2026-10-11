@@ -128,3 +128,17 @@ the `echo` pair.
   `fixed32.asm`, `tcc_div16`) are not shortened: luna cannot judge it.
   Sent: `2026-10-11_to_luna_multiplier_latency.md`.
 
+- 2026-10-11 — `luna diff --audio` on an example that plays NOISE: a codegen
+  change that moves the first `KON` by 10 samples gave DIFF at 6.43 % on
+  `audio/apu_switch` (per-window shift found at −96 on the noise-only
+  windows, −8/−9 on the others). What settled it was two traces luna already
+  has: `state --apu-log` (1,016 port writes identical in value and order
+  between the two ROMs) and `state --dsp-trace` (75 DSP writes identical;
+  only the SPC timestamps differ, by 313 cycles). The S-DSP has one noise
+  generator, clocked by the global counter at the FLG rate (fullsnes
+  `bc0eacb8a82c13c4`, anomie `65daaafcdc153ad3`), so a key-on that lands
+  elsewhere in its sequence reads other values, and at slow NCK rates a
+  500 ms window holds a handful of them. Asked: a `diff --dsp` (or an
+  `--audio` mode) that compares the DSP write sequences of the two ROMs,
+  value and order, and reports the timing shift — the right oracle for a
+  noise-driven example, where a waveform RMS cannot be. Light.

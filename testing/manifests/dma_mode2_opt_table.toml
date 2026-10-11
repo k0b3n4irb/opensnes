@@ -31,12 +31,13 @@ rom = "../../examples/backgrounds/mode2/mode2.sfc"
 frames = 199
 
 [asserts.values]
-wave_phase = 382                  # +2 per loop iteration, 191 iterations by frame 199 (200 until 2026-10-10: the boot is a frame shorter)
+wave_phase = 384                  # +2 per loop iteration, 192 iterations by frame 199 (200 until 2026-10-10: the boot is a frame shorter)
 # The loop misses frames (lag_frame_counter), so the iteration count at
 # frame 200 follows the code's speed: 176 iterations until the compiler's
 # slot colouring of 2026-09-27, 178 until the tile module's asm encoder of
 # 2026-09-29 (the 16 tiles built at boot took ~14 frames in C, ~2 now),
-# 190 until the compiler's indexed addressing of 2026-10-08, 191 since. The
+# 190 until the compiler's indexed addressing of 2026-10-08, 191 until loops
+# tested at their bottom on 2026-10-11, 192 since. The
 # values written are the same sequence either way: the row below is the
 # previous one advanced by one entry.
 
