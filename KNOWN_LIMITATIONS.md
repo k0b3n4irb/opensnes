@@ -507,7 +507,14 @@ callee using the convention. No runtime fixture yet calls a *C* function
 returning `u32` and consumes the full value (tracked in the 2026-09-26
 état des lieux).
 
-### 🟡 Sprite palettes start at CGRAM offset 128, not 0
+### 🟢 A C identifier is at most 79 characters (refused, never truncated)
+QBE keeps names in a fixed buffer (`NString`, 80), so a global, a function or a
+static whose IR name — the C name, plus `.file` for a file-scope static — is
+longer than 79 characters is refused: `qbe:main.c (IR line N): identifier too
+long: 79 characters at most, starting …`. Since 2026-10-12 the message names
+the limit and the name, and the C file rather than the temporary IR file the
+driver hands to QBE. Nothing is truncated or renamed in silence.
+
 Standard SNES quirk that surprises everyone once. The first 128 colours of
 CGRAM are BG palettes (palettes 0-7); sprite palettes start at offset 128
 (palettes 0-7 mapped to colours 128-255). Loading a sprite palette via

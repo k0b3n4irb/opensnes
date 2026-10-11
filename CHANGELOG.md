@@ -209,6 +209,14 @@ All notable changes to OpenSNES are documented in this file.
   the functions that read a state back are synchronous as before.
 
 ### Fixed
+- fix(compiler): **a compiler message names your C file, not a temporary
+  file.** The driver runs QBE on a temporary IR file, and every message
+  from that stage read `qbe:/tmp/cc65816_ir.XXXXXX:5803: …` — a path that
+  no longer exists when you read it. It now reads `qbe:main.c (IR line
+  5803): …` (the IR line stays: `CC65816_KEEP_IR` saves the file it counts
+  in). And a C identifier longer than the 79 characters QBE names allow
+  is refused with the limit and the start of the name, where the message
+  was "identifier too long" alone (negative check `identifier_too_long`).
 - fix(compiler): **`(c ? 1L : 0L) % d` stopped the compiler with an
   internal error.** A 32-bit divide or remainder whose first operand is a
   condition used as a value ("%x has no stack slot and is read from the

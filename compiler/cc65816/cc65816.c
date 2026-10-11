@@ -530,10 +530,14 @@ int main(int argc, char *argv[])
     if (env && *env)
         keep_ir(env, input);
 
-    /* Stage 3: QBE IR -> 65816 assembly. */
+    /* Stage 3: QBE IR -> 65816 assembly. qbe reads a temporary file; it
+     * names the C source in its messages when told which (QBE_SOURCE_NAME,
+     * read by its err()). */
     {
         char *args[8];
         int n = 0;
+
+        set_env("QBE_SOURCE_NAME", input);
 
         args[n++] = qbe;
         if (debug)

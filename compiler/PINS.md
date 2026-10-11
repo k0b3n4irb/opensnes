@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | c8e0f5fad784fa92003d36d6e95b41c2c74352b0 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 0301a5e078dcc4fea0c0fa025bf4c86c9d7887c6 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -98,7 +98,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 122 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 123 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -110,6 +110,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+0301a5e parse: a message names the C source when the driver says which (`QBE_SOURCE_NAME`, set by cc65816 before stage 3): `qbe:main.c (IR line N): …` instead of a temporary file nobody can open; `identifier too long` says the 79-character limit and the start of the name (2026-10-12)
 c8e0f5f emit: the first operand of a 32-bit divide or remainder keeps its stack slot — the four operations push the second operand first and read the first from the stack, and `(!g ? 1L : 0L) % d` stopped the compiler with an internal error, "has no stack slot" (difftest_stmt seed 364296, 2026-10-11)
 fbdda87 emit: a block that ends in a jump to a block made of one compare and its branch (the condition of a `for` or a `while`) emits that compare and branch itself — one `jmp` less every turn; and `lda S` at a block's entry goes when every way in comes straight from a load or a store of S (`peephole_entry`, last and once; kept when anything could read its flags). `for (k = 0; k < n; k++) t[k] = 0;`: 36 to 29 CPU cycles a turn (2026-10-11)
 9338622 inline: a function that has a section of its own (`__ramcode`, the RAM code window) is never copied into a caller, by either inliner: its body would run from wherever the caller is. `RAM_CODE static void job(void)` with one call site was absorbed into a ROM caller once the leaf rule stopped refusing it (it had hidden the case), and the Super FX library test ROM never finished; a non-leaf one could already be absorbed before. A caller in such a section may absorb an ordinary function (2026-10-10)
