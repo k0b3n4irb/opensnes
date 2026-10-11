@@ -131,8 +131,8 @@ compilers.
 | `oamxy` | `oamSetXY` on 32 sprites | 45,047 | 43,911 | -2.5 % |
 | `oamsize` | the size of 32 sprites | 48,746 | 30,331 | -37.8 % |
 | `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,894 | 17,903 | +0.1 % |
-| `text` | 20 characters printed and shown | 84,676 | 59,684 | -29.5 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 134,968 | -20.5 % |
+| `text` | 20 characters printed and shown | 84,676 | 32,316 | -61.8 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 107,602 | -36.6 % |
 | `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 54,681 | -57.7 % |
 | `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,788 | -75.4 % |
 | `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,243 | -6.6 % |
@@ -165,6 +165,10 @@ is that handler alone, in a ROM that only waits.
   loop used to build; `textPrint` writes a run of characters with the
   buffer position computed once instead of three calls and a multiply per
   character.
+- On 2026-10-11 the run of characters inside `textPrint` became assembly
+  too (about 170 master cycles a character in compiled C until then): the
+  `text` row went from 59,684 to 32,316, and `frame` from 134,968 to
+  107,602.
 - **`oamxy` and `dma` are level**, within about 1 %, and sit on either side
   of PVSnesLib's figure from one compiler step to the next (+0.2 % and
   +0.1 % on the morning of 2026-10-10, −1.2 % and −0.1 % the day before,

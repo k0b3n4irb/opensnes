@@ -59,21 +59,21 @@
       }
     },
     "text": {
-      "cycles": 59684,
+      "cycles": 32316,
       "detail": {
-        "textPrint@do_body.45": 340640,
-        "tilemapFlush": 335276,
-        "textPrint@do_cond.46": 138560,
-        "textPrint@scmp.11": 115680
+        "tilemapFlush": 335236,
+        "asm_textRun": 187600,
+        "textPrint@if_false.44": 41480,
+        "textPrint@body.35": 19560
       }
     },
     "frame": {
-      "cycles": 134968,
+      "cycles": 107602,
       "detail": {
-        "oamSet": 679640,
-        "row_frame@for_body.151": 489600,
-        "textPrint@do_body.45": 340000,
-        "tilemapFlush": 335316
+        "oamSet": 678400,
+        "row_frame@for_body.151": 490800,
+        "tilemapFlush": 335276,
+        "asm_textRun": 188400
       }
     },
     "worldc": {

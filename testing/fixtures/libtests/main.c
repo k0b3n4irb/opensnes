@@ -1281,6 +1281,37 @@ static void part_pu16(void) {
     chk_pu16(65535, "65535"); chk_pu16(60090, "60090");
 }
 
+/* textPrint runs (2026-10-11, asm_textRun): a run that reaches the last
+ * column, a newline inside a string, a character the font does not have.
+ * The values are those the C loop gave. */
+u16 r_trun_bad;     /* cells or cursor positions wrong -> 0 */
+static u16 trun_cell(u16 col, u16 row) {
+    u16 k = (row * 32 + col) * 2;
+    return (u16)((tilemapBuffer[k] | ((u16)tilemapBuffer[k + 1] << 8)) & 0x03FF);
+}
+static void part_trun(void) {
+    u16 f = (u16)(text_config.font_tile - 32);
+    r_trun_bad = 0;
+    textSetPos(0, 21); textPrint("                                ");
+    textSetPos(0, 22); textPrint("          ");
+    textSetPos(28, 21);
+    textPrint("ABCDEF");                     /* three by the run, D on the last column, then the next row */
+    if (trun_cell(28, 21) != f + 'A') r_trun_bad |= 1;
+    if (trun_cell(30, 21) != f + 'C') r_trun_bad |= 2;
+    if (trun_cell(31, 21) != f + 'D') r_trun_bad |= 4;
+    if (trun_cell(0, 22) != f + 'E' || trun_cell(1, 22) != f + 'F') r_trun_bad |= 8;
+    if (textGetX() != 2 || textGetY() != 22) r_trun_bad |= 16;
+    textSetPos(3, 23);
+    textPrint("xy\nz\x7Fw");                 /* a newline, and the last printable code */
+    if (trun_cell(3, 23) != f + 'x' || trun_cell(4, 23) != f + 'y') r_trun_bad |= 32;
+    if (trun_cell(0, 24) != f + 'z' || trun_cell(1, 24) != f + 0x7F || trun_cell(2, 24) != f + 'w') r_trun_bad |= 64;
+    if (textGetX() != 3 || textGetY() != 24) r_trun_bad |= 128;
+    textSetPos(0, 23); textPrint("        ");
+    textSetPos(0, 24); textPrint("        ");
+    textSetPos(0, 21); textPrint("                               ");
+    textSetPos(0, 22); textPrint("    ");
+}
+
 int main(void) {
 
     /* audio v2 first: audioInit blocks on the APU boot + driver upload
@@ -1346,6 +1377,7 @@ int main(void) {
     part_objects_irq();
     part_div32();
     part_pu16();
+    part_trun();
 
 
     coverage_bank_bytes();

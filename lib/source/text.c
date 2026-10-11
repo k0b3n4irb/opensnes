@@ -20,6 +20,7 @@ extern const unsigned char opensnes_font_2bpp[];
 /* Assembly helpers for performance-critical operations (text.asm) */
 extern void asm_textDMAFont(void);
 extern void asm_textFillBuffer(u16 value);
+extern u16 asm_textRun(const char *str, u16 cell, u16 font, u16 attr, u16 maxn);
 
 /* Tilemap DMA function (defined in crt0.asm) */
 extern void tilemapFlush(void);
@@ -160,14 +161,16 @@ void textPutChar(char c) {
 }
 
 void textPrint(const char *str) {
-    /* A run of printable characters that stays on its row is written here,
-     * with the buffer position computed once; a newline, a carriage return,
-     * a character the font does not have and the last column (which wraps)
-     * go through textPutChar(). Until 2026-10-09 every character did: three
-     * calls and a multiply each. The map is 32 columns wide (text.h). */
+    /* A run of printable characters that stays on its row is written by
+     * asm_textRun(), with the buffer position computed once; a newline, a
+     * carriage return, a character the font does not have and the last
+     * column (which wraps) go through textPutChar(). Until 2026-10-09 every
+     * character did: three calls and a multiply each. The run was a C loop
+     * until 2026-10-11, about 170 cycles a character. The map is 32
+     * columns wide (text.h). */
     u16 attr = ((u16)text_config.palette << 10) | ((u16)text_config.priority << 13);
     u16 font = text_config.font_tile - 32;
-    u16 *cell;
+    u16 n;
     u8 x;
     u8 c = (u8)*str;
 
@@ -178,14 +181,12 @@ void textPrint(const char *str) {
             c = (u8)*++str;
             continue;
         }
-        cell = (u16 *)(tilemapBuffer + ((((u16)text_cursor_y << 5) + x) << 1));
-        do {
-            *cell++ = (font + c) | attr;
-            x++;
-            c = (u8)*++str;
-        } while (c >= 32 && c <= 127 && x < 31);
-        text_cursor_x = x;
+        n = asm_textRun(str, (u16)((((u16)text_cursor_y << 5) + x) << 1),
+                        font, attr, (u16)(31 - x));
+        str += n;
+        text_cursor_x = (u8)(x + n);
         tilemap_update_flag = 1;
+        c = (u8)*str;
     }
 }
 

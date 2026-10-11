@@ -116,6 +116,16 @@ All notable changes to OpenSNES are documented in this file.
   `QBE_SLOT_ORDER=def` and `CC_INLINE_LEAF_MAX=16` restore each (compiler
   checks `peep_flow`, `auto_inline`).
 
+- perf(lib): **`textPrint()` writes a run of characters in assembly.**
+  The run loop was compiled C, about 170 master cycles a character; it is
+  now `asm_textRun` (internal), which reads the string through its far
+  pointer and stops at a control character, a byte of 128 or more, or
+  column 31, exactly where the C loop did. Measured on
+  `examples/basics/timer`, which prints its counters every frame: 91,387
+  to 60,046 active master cycles a frame (-34 %). The `text` row of
+  `devtools/libbench` (20 characters printed and shown) goes from 59,684
+  to 32,316, against 84,676 for PVSnesLib. Line breaks, wrapping
+  and the bytes outside the font still go through the C around it.
 - perf(lib): **`textPrintU16()` no longer divides.** It made three
   divisions a digit, two of them by a divisor above 255 that the hardware
   divider does not take: about 45,000 master cycles for one number, an

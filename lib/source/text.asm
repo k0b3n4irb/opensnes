@@ -288,3 +288,54 @@ asm_textFillBuffer:
     rtl
 
 .ENDS
+
+.SECTION ".text_run" SUPERFREE
+
+;------------------------------------------------------------------------------
+; asm_textRun - Write a run of printable characters into tilemapBuffer
+;------------------------------------------------------------------------------
+; C prototype:
+;   extern u16 asm_textRun(const char *str, u16 cell, u16 font, u16 attr,
+;                          u16 maxn);
+; Writes (font + c) | attr for each character c of str, from byte offset
+; `cell` of tilemapBuffer on, until a character outside 32..127 (the end of
+; the string included) or `maxn` characters. Returns how many it wrote.
+; textPrint() computes the position once and calls this for each run; the
+; same loop compiled from C cost about 170 cycles a character (2026-10-11).
+; Stack (after php): 13,s str  15,s str bank  11,s cell  9,s font
+;                    7,s attr  5,s maxn
+;------------------------------------------------------------------------------
+asm_textRun:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    lda 13,s            ; str
+    sta.b tcc__r0
+    lda 15,s            ; str (bank)
+    sta.b tcc__r0+2
+    lda 11,s            ; cell
+    tax
+    ldy.w #0
+-   tya
+    cmp 5,s             ; maxn
+    bcs +
+    lda [tcc__r0],y
+    and.w #$00FF
+    cmp.w #32
+    bcc +
+    cmp.w #128
+    bcs +
+    clc
+    adc 9,s             ; font
+    ora 7,s             ; attr
+    sta.l tilemapBuffer,x
+    inx
+    inx
+    iny
+    bra -
++   tya
+    plp
+    rtl
+
+.ENDS
