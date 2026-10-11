@@ -84,8 +84,7 @@ int main(void) {
     textPrintU16(now.boots);
     textPrintAt(3, 13, sa1_ready ? "SA-1 READY" : "SA-1 NOT READY");
     textPrintAt(3, 17, "POWER OFF AND ON:");
-    textPrintAt(3, 18, "NOW COUNTS ONE MORE");
-    textFlush();
+    textPrintAt(3, 18, "NOW COUNTS ONE MORE");   /* the writers raise the flush themselves */
 
     WaitForVBlank();
     setScreenOn();

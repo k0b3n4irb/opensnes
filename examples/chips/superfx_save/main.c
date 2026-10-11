@@ -83,8 +83,7 @@ int main(void) {
     textPrintU16(now.boots);
     textPrintAt(3, 13, gsu_present ? "GSU PRESENT" : "GSU NOT PRESENT");
     textPrintAt(3, 17, "POWER OFF AND ON:");
-    textPrintAt(3, 18, "NOW COUNTS ONE MORE");
-    textFlush();
+    textPrintAt(3, 18, "NOW COUNTS ONE MORE");   /* the writers raise the flush themselves */
 
     WaitForVBlank();
     setScreenOn();

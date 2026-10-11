@@ -113,7 +113,7 @@
   },
   "chips_sa1_save": {
     "stream": "57cda5083173ddb23b01a4f525ec07b6527ab70ff06a7c656da6aed80677ad0b",
-    "rom_sha256": "8cca17c4afae94b7aa4f6c86b303e5d59b27d0ff04c51ca0e8bdd3ffa238f3ca"
+    "rom_sha256": "1e4b938a6d2d0325eca5d1b267533f8447b8ae003201bde65fe6b6f0d11ae6fa"
   },
   "chips_sa1_starfield": {
     "stream": "a2c3bc7d27523a42fc048ec66a65de2cc90f67b11d6e989ed962bd73ad47d4ad",
@@ -132,8 +132,8 @@
     "rom_sha256": "04a3270ebffe0728d2b6dd7f0840f322e3c3d6cde92118137db0f4df228637bc"
   },
   "chips_superfx_save": {
-    "stream": "f5dee58c67da5e4ae61f74b318753db7b50c72a03f233cc1c3023644fe6aa541",
-    "rom_sha256": "505b3dd5b6ae8edbb5b2ef25959c24e691f24ccef298b4e3ec62979d6f65f053"
+    "stream": "b1082f4ac083e70b8c3270ccee5e2abd2ef80fd0ae2e9e6d9d6db0acc9383ab3",
+    "rom_sha256": "c4920f8a0b622d209a20f189aea74ed31c42500ab1ef86b3e22255ef6950251a"
   },
   "color_direct_color": {
     "stream": "0a9351c2054d0be0820540a830a7a75231003976570bb07582a494ef5c050254",
