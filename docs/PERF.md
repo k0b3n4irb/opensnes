@@ -108,7 +108,11 @@ frames 60 to 300):
 | reads the style, then runs the old loop (what ships) | 56,057 | 15.69 % |
 
 About 2,000 master cycles per call, 0.6 % of a frame per metasprite drawn:
-three reads through the style pointer and one more call. The two attempts
+three reads through the style pointer and one more call. (Since 2026-10-12
+the draw is assembly, `lib/source/sprite_meta.asm`, and writes each piece
+itself instead of calling `oamSet` and `oamSetSize`: 27,470 master cycles a
+frame for the two metasprites of this example, 61,460 before — the table
+above is the history of the C version.) The two attempts
 above it were slower although they add no call: with the mirrored loop in
 the same function, the compiler's copies between the two loops fell on
 every piece. The mirrored draw is therefore a function of its own, and the

@@ -578,6 +578,27 @@ u16 r_meta_plain;
 u16 r_meta_flipx;    /* ... OBJ_FLIPX in a 16-wide box of 8-pixel pieces: x 108 / 100 -> 0x646C */
 u16 r_meta_flipattr; /* ... and each piece's own H-flip bit toggled -> 0x40 */
 u16 r_meta_piece32;  /* a 32-pixel piece in a 64-wide box, flipped: x 10 + 32 -> 42 (the 11-argument form assumed 16: 58) */
+u16 r_meta_edge;     /* the draw in assembly (2026-10-12): pieces at x -63 and y 239 drawn, x -64 and y 240 skipped: 2 ids of 4 -> 2 */
+u16 r_meta_attr;     /* a piece naming no palette under basePalette 5, priority 2, tile 0xF0 + base 0x10 = 0x100:
+                      * attribute (2 << 4) | (5 << 1) | bit 8 of the tile = 0x2B, tile low byte 0 -> 0x2B00 */
+u16 r_meta_xhi;      /* the same piece at x -10 + 8 = -2: x low byte 0xFE, and in the high table its x bit and its
+                      * size bit (OBJ_LARGE) both set -> 0x03FE */
+u16 r_meta_flipy;    /* OBJ_FLIPY in a 24-tall box of 8-pixel pieces: the piece at dy 0 lands at y 50 + 16 = 66, its
+                      * V bit set -> 0x8042 */
+u16 r_meta_full;     /* three pieces from id 126: two drawn, the table is full at 128 -> 128, and oam_max_id 127 -> 0x7F80 */
+extern u8 oam_max_id;
+static const MetaspriteItem lotd_edge[] = {
+    METASPR_ITEM(-63, 0, 0, 0), METASPR_ITEM(-64, 0, 0, 0),
+    METASPR_ITEM(0, 239, 0, 0), METASPR_ITEM(0, 240, 0, 0),
+    METASPR_TERM,
+};
+static const MetaspriteItem lotd_attr[] = { METASPR_ITEM(8, 0, 0xF0, OBJ_PRIO(2)), METASPR_TERM };
+static const MetaspriteItem lotd_three[] = {
+    METASPR_ITEM(0, 0, 0, 0), METASPR_ITEM(8, 0, 1, 0), METASPR_ITEM(16, 0, 2, 0), METASPR_TERM,
+};
+static const MetaspriteStyle lotd_style5 = {
+    .baseTile = 0x10, .basePalette = 5, .size = OBJ_LARGE, .pieceSize = 8, .width = 16, .height = 24,
+};
 static const MetaspriteItem lotc_meta[] = {
     METASPR_ITEM(0, 0, 0, 0),
     METASPR_ITEM(8, 0, 1, 0),
@@ -673,6 +694,15 @@ static void coverage_lot_c(void) {
     r_meta_flipattr = oamMemory[83] & 0xC0;
     oamDrawMetasprite(24, 10, 50, lotc_meta, &lotc_style32, OBJ_FLIPX);
     r_meta_piece32 = oamMemory[96];
+    r_meta_edge = oamDrawMetasprite(30, 0, 0, lotd_edge, &lotc_style, 0) - 30;
+    oamDrawMetasprite(32, -10, 50, lotd_attr, &lotd_style5, 0);
+    r_meta_attr = (u16)oamMemory[130] | ((u16)oamMemory[131] << 8);
+    r_meta_xhi = (u16)oamMemory[128] | ((u16)(oamMemory[520] & 0x03) << 8);
+    oamDrawMetasprite(34, 100, 50, lotd_attr, &lotd_style5, OBJ_FLIPY);
+    r_meta_flipy = (u16)oamMemory[137] | ((u16)(oamMemory[139] & 0x80) << 8);
+    r_meta_full = oamDrawMetasprite(126, 0, 0, lotd_three, &lotc_style, 0) | ((u16)oam_max_id << 8);
+    oamHide(126);                         /* the lot-F reads expect sprites 124-127 as oamInit left them */
+    oamHide(127);
     oamDynamicSetSize(0, 16);
     WaitForVBlank();
     /* bank-byte chantier: an OAM table in ROM. Right after WaitForVBlank we

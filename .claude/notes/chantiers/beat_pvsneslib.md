@@ -833,6 +833,16 @@ frame in `timer` for "COUNT=", three spaces and a 16-character line —
 about 2,400 a character, to look at next), `oamDrawMetasprite`, the four
 `nop` after each hardware multiply in `tcc_mul16`.
 
+Done since: `textPrint`'s run of characters in assembly the same day
+(`1c173f87`, timer 91,387 → 60,046 a frame); `oamDrawMetasprite` in
+assembly on 2026-10-12 (profile of the corpus re-run on `0202ea6a`, work
+only: `main` 20 %, `NmiHandler` 19 %, then `oamDrawMetasprite` 2.6 %,
+`tcc_mul16` 2.4 %, `oamSet` 1.4 %, `tcc_div16` 0.8 % — down from 1.9 since
+`textPrintU16` stopped dividing in software; `metasprite` 61,460 → 27,470 a
+frame, `aseprite_pipeline` 30,220 → 15,930). Still not done: the `nop`s
+of `tcc_mul16` (below), and the index of a loop kept in X (stage 2, T3),
+which the game asks for.
+
 ## 2026-10-11 — the four `nop` of `tcc_mul16`: not shortened
 
 The references ask for eight CPU cycles between the write to `$4203` and

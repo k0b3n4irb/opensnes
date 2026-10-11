@@ -57,6 +57,21 @@ All notable changes to OpenSNES are documented in this file.
   above).
 
 ### Performance
+- perf(lib): **`oamDrawMetasprite` is assembly** (`lib/source/sprite_meta.asm`;
+  header unchanged). It was compiled C calling `oamSet()` and
+  `oamSetSize()` for every piece — the library's heaviest function in a
+  profile of the whole corpus (2.6 % of its work, two examples). The loop
+  now writes a piece's four bytes and two high-table bits itself, and
+  keeps every rule of the C version: the frame ends at dx = -128 or at id
+  128, a piece outside x -63..255 or y -63..239 is skipped without an id,
+  a piece naming no palette takes the style's, the tile's bit 8 goes to
+  the attribute, a flip mirrors the piece in the style's box and toggles
+  its own bit, `oam_max_id` and `oam_update_flag` are kept. Measured on
+  luna, frames 60-300: `examples/sprites/metasprite` 61,460 to 27,470
+  master cycles a frame for its draw (the function and the two setters it
+  called), `examples/sprites/aseprite_pipeline` 30,220 to 15,930. Five
+  libtests pin the edges (clipping bounds, the palette default and tile
+  bit 8, x bit 8 and the size bit, a vertical flip, the full table).
 - perf(compiler): **a loop tests its condition at the bottom, and its body
   does not reload the index.** A block that ended in a jump back to a
   condition (`for`, `while`) now carries a copy of the compare and branch:
