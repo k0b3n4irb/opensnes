@@ -31,7 +31,7 @@ rom = "../../examples/hdma/hdma_indirect_gradient/hdma_indirect_gradient.sfc"
 frames = 60
 
 [asserts.values]
-hdma_enabled_state = { eq = 0x01, width = 1 }   # channel 0 only
+hdma_enabled_state = { eq = 0x04, width = 1 }   # channel 2 only (0 is the DMA helpers', since 2026-10-12)
 
 [asserts.blocks]
 itable    = { space = "wram", offset = "itable.main", hex = "07a00107a40107a80107ac0107b00107b40107b80107bc0107c00107c40107c80107cc0107d00107d40107d80107dc0107e00107e40107e80107ec0107f00107f40107f80107fc01070002070402070802070c02071002071402071802071c0200" }

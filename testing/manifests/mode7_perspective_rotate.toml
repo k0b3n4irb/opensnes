@@ -10,7 +10,7 @@
 #     window right after NMI returns. hdmaSetup configures but does not
 #     enable; if a refactor ever made it clear HDMAEN (or if one of the four
 #     calls were dropped), the matrix would go stale or the plane would
-#     collapse. hdma_enabled_state is asserted = 0x0F at every checkpoint;
+#     collapse. hdma_enabled_state is asserted = 0x3C (channels 2-5 since 2026-10-12; 0x0F, 0-3, before) at every checkpoint;
 #     `luna state --out -` confirmed dma.hdmaen = 15 at each of them, so the
 #     lib shadow is a faithful stand-in for $420C here.
 #   * The example carries TWO coupled coordinate pairs — scr_x/scr_y (the BG1
@@ -36,7 +36,7 @@ at_frame = 60
 "scr_y.main" = 768
 "pos_x.main" = 512
 "pos_y.main" = 1152
-hdma_enabled_state = { eq = 0x0F, width = 1 }   # M7A, M7B, M7C, M7D
+hdma_enabled_state = { eq = 0x3C, width = 1 }   # M7A, M7B, M7C, M7D
 
 [[checkpoint]]                 # L held: the angle selector advances, mod 48
 at_frame = 120
@@ -47,7 +47,7 @@ input = "60:0x0020,119:0"
 "scr_y.main" = 768                                     # camera or the pivot
 "pos_x.main" = 512
 "pos_y.main" = 1152
-hdma_enabled_state = { eq = 0x0F, width = 1 }   # re-arming kept all four
+hdma_enabled_state = { eq = 0x3C, width = 1 }   # re-arming kept all four
 
 [[checkpoint]]                 # RIGHT held: scroll and pivot move together
 at_frame = 180
@@ -58,7 +58,7 @@ input = "120:0x0100,179:0"
 "scr_y.main" = 768                                     # and only on the X axis
 "pos_y.main" = 1152
 "angle.main" = 11                                      # panning must not rotate
-hdma_enabled_state = { eq = 0x0F, width = 1 }
+hdma_enabled_state = { eq = 0x3C, width = 1 }
 [checkpoint.delta]
 "scr_x.main" = "increased"
 "pos_x.main" = "increased"

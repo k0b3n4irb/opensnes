@@ -64,10 +64,12 @@
  *
  * @warning **Do NOT use HDMA_CHANNEL_7** — the NMI handler uses DMA channel 7
  *          for OAM transfers every frame, which destroys any HDMA setup on that
- *          channel. Safe HDMA channels: 1-6 (channel 0 is used by dmaCopyVram).
- *          On a Super FX build, gsuSetupHdmaBlanking() takes **channel 1**
- *          for its INIDISP letterbox while the bands are on (superfx.h);
- *          pick 2-6 there.
+ *          channel. Channel 0 is the DMA helpers' (dmaCopyVram and friends
+ *          rewrite its registers at every call) and channel 1 is the NMI's
+ *          text flush (every VBlank after a text write). Safe HDMA channels:
+ *          **2-6**; the examples use 2 and 6. On a Super FX build,
+ *          gsuSetupHdmaBlanking() also takes channel 1 for its INIDISP
+ *          letterbox while the bands are on (superfx.h).
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
  * ## Bank byte

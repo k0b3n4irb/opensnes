@@ -204,12 +204,12 @@
     "rom_sha256": "319f4dfb8a3e0cbb427b878d0f2e09d11e181f42f6db891d2f79671d82144738"
   },
   "hdma_hdma_indirect_gradient": {
-    "stream": "165f960319629cd5fa8cc4310ebb307dc1d58866942f7369f0519ebf17823055",
-    "rom_sha256": "a780aaa418b48e0627bbc7a9ee7052a08932bcbc95254f74061ba6fef79060c5"
+    "stream": "1a4b84b619d706ad457e42f6cf49337d7eb72c9d4a85df371fd8a27ee562a263",
+    "rom_sha256": "768bfaf5063e830b416e60c62dfa5d68139eb5e48a446cbfdd6cf5b92619d212"
   },
   "hdma_hdma_wave": {
-    "stream": "51d0add9f45b8f56f2e6a3d559587063292bc4c39a7d50c3417b6488653764c3",
-    "rom_sha256": "56ce45bdcdb6e30e45c7760d6e3b4f293a3a7476d05a2f29155d9fb6813932a8"
+    "stream": "f9a87a73d4e0275f587cab025b901340a91616838f2f4542e8d3019d28bb32a7",
+    "rom_sha256": "48a48df43043d7f2168285553066a1fabd9ff8c629acdac014de571480ff04df"
   },
   "input_controller": {
     "stream": "b07fbc8e3f3f567e7dafb19035c230867627c32a1e459650faf13768517ceda7",
@@ -264,8 +264,8 @@
     "rom_sha256": "aac0f8fd36846ef7c1561ae861b6ef5d2517e614fdf0abe960390a006bf27ceb"
   },
   "mode7_perspective_rotate": {
-    "stream": "a930cd4c0bc2fde296179176e7f4cf7a52102be9d488f6dfaec6f9dddf2bc21d",
-    "rom_sha256": "26eae3d96d3d662f6589f74f03ce76b239893622554be719aa4abdc3e7b6b504"
+    "stream": "dd364cb6811fb17a52142493c828d1afe7ae6572c6d5311901e1ee394031bd91",
+    "rom_sha256": "b119fbca7e37ef2bf9cc4d0d8d421175e456e847fd48def49b8eaa8b51f17313"
   },
   "mode7_rotate_scale": {
     "stream": "2ca6e9d888a4d260e3e15d8a4cc23f75ed58635760f7581e84da06f6fb2f4868",
@@ -340,7 +340,7 @@
     "rom_sha256": "604d60c230ef1c8d58afd66e9911da3de1c3dd089e855407ce0df2fa4d0846f4"
   },
   "windows_window_multi_hdma": {
-    "stream": "76cdc6f3ee912c11ae2b94ca2aec5be03c40ed5fd79c47528fbc69617c9edb22",
-    "rom_sha256": "42e0f4368613aa3b5e762fdb64c90189c83bc847bbe8d90eb713b4798fb47bbd"
+    "stream": "199f1642a0ee3ebf90e9f3352317918194c2c10bdc1c50f9c5ef7aca669f468b",
+    "rom_sha256": "ee5155faf4db965256e077fae751e237c7d4ba6ea645f862d4db1f848906a6c2"
   }
 }

@@ -35,7 +35,7 @@ at_frame = 60
 "wobjsel.window" = { eq = 0x00, width = 1 }
 "wbglog.window" = { eq = 0x01, width = 1 }               # WINDOW_LOGIC_AND on BG1
 "wobjlog.window" = { eq = 0x00, width = 1 }
-hdma_enabled_state = { eq = 0x01, width = 1 }   # one channel, four registers
+hdma_enabled_state = { eq = 0x04, width = 1 }   # one channel (2), four registers
 bg_scroll_x = 0
 bg_scroll_y = 0
 
@@ -47,7 +47,7 @@ bg_scroll_x = 59
 bg_scroll_y = 0
 "w12sel.window" = { eq = 0x0F, width = 1 }
 "wbglog.window" = { eq = 0x01, width = 1 }
-hdma_enabled_state = { eq = 0x01, width = 1 }
+hdma_enabled_state = { eq = 0x04, width = 1 }
 
 [[checkpoint]]                 # UP: u16 scroll underflows cleanly to -59
 at_frame = 180
@@ -60,4 +60,4 @@ bg_scroll_x = 59                                # UP must not scroll sideways
 "wobjsel.window" = { eq = 0x00, width = 1 }
 "wbglog.window" = { eq = 0x01, width = 1 }
 "wobjlog.window" = { eq = 0x00, width = 1 }
-hdma_enabled_state = { eq = 0x01, width = 1 }
+hdma_enabled_state = { eq = 0x04, width = 1 }

@@ -90,7 +90,7 @@ LEFT/RIGHT call `hdmaWaveH` again with a new amplitude.
 
 ### 4. Handing the channel over and back
 
-The hand-built table runs on channel 0 (krom's), the module's wave on
+The hand-built table runs on channel 2 (krom's used 0, which `dmaCopyVram` owns here), the module's wave on
 channel 6. `hdmaWaveInit()` switches off every HDMA channel, yours
 included, so it comes before arming the module's. Going back,
 `hdmaWaveStop()` releases channel 6 and restores BG1's scroll, then the

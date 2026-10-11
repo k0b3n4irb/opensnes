@@ -59,10 +59,10 @@ static u16 pos_x, pos_y;
  */
 static void repointTables(void) {
     u16 off = angle * PERSPECTIVE_STRIDE;
-    hdmaSetup(HDMA_CHANNEL_0, HDMA_MODE_1REG_2X, HDMA_DEST_M7A, perspective_cos + off);
-    hdmaSetup(HDMA_CHANNEL_1, HDMA_MODE_1REG_2X, HDMA_DEST_M7B, perspective_sin + off);
-    hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_1REG_2X, HDMA_DEST_M7C, perspective_nsin + off);
-    hdmaSetup(HDMA_CHANNEL_3, HDMA_MODE_1REG_2X, HDMA_DEST_M7D, perspective_cos + off);
+    hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_1REG_2X, HDMA_DEST_M7A, perspective_cos + off);
+    hdmaSetup(HDMA_CHANNEL_3, HDMA_MODE_1REG_2X, HDMA_DEST_M7B, perspective_sin + off);
+    hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG_2X, HDMA_DEST_M7C, perspective_nsin + off);
+    hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG_2X, HDMA_DEST_M7D, perspective_cos + off);
 }
 
 
@@ -97,7 +97,7 @@ int main(void) {
     repointTables();
     /* hdmaSetup configures but does NOT enable — arm all four channels
      * (krom: HDMAEN = %00001111) */
-    hdmaEnableMask(0x0F);
+    hdmaEnableMask(0x3C);   /* channels 2-5: 0 is the DMA helpers', 1 the NMI's text flush, 7 its OAM upload */
     setScreenOn();
 
     while (1) {

@@ -309,6 +309,15 @@ All notable changes to OpenSNES are documented in this file.
   `hdmaEnable()`, in VBlank; no other example writes `$420C` by hand.
 
 ### Changed
+- fix(examples,docs): **no example sets HDMA on channel 0 any more.** Four
+  did (`hdma_wave`'s hand-built table, `hdma_indirect_gradient`,
+  `window_multi_hdma`, `perspective_rotate`'s four channels 0-3), and
+  channel 0 is the DMA helpers': `dmaCopyVram` and friends rewrite its
+  registers at every call, so an HDMA armed there breaks at the next
+  transfer — the examples only worked because they transfer before they
+  arm. They use channels 2 to 5 now; `hdma.h` says why 0 and 1 (the
+  NMI's text flush) are taken and 7 (the OAM upload) forbidden; the four
+  manifests pin the new masks and the tutorials follow.
 - refactor(lib): **the audio module's sample table leaves the plain RAM
   band.** `sample_mirror` (64 samples, 512 bytes, reached only by name in
   `audio.c`) is `FAR`: a ROM that links `audio` gets 512 bytes back below
