@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-Learn SNES development step by step. 86 examples organized by topic, building
+Learn SNES development step by step. 87 examples organized by topic, building
 from basic concepts to complete games.
 
 ## Categories
@@ -11,7 +11,7 @@ from basic concepts to complete games.
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 7 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
 | [backgrounds/](backgrounds/) | 9 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
-| [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
+| [sprites/](sprites/) | 9 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 6 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
@@ -85,31 +85,32 @@ deep-dive of a step below.
 | 33 | [mode7/extbg](mode7/extbg/) | Mode 7 EXTBG: one plane, two layers split by bit 7, a sprite between them |
 | 34 | [sprites/metasprite](sprites/metasprite/) | Multi-tile composite sprites |
 | 35 | [sprites/aseprite_pipeline](sprites/aseprite_pipeline/) | Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite |
-| 36 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
-| 37 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
-| 38 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
-| 39 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
-| 40 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback via SNESMOD |
-| 41 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects via SNESMOD |
-| 42 | [audio/speech_synth](audio/speech_synth/) | Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port) |
-| 43 | [audio/play_noise](audio/play_noise/) | Drum kit from the DSP noise generator — zero samples (krom port) |
-| 44 | [audio/pitch_mod](audio/pitch_mod/) | Hardware vibrato: PMON pitch modulation + LFO voice (krom port) |
-| 45 | [audio/apu_switch](audio/apu_switch/) | Hot-swap APU programs at runtime: apuReset() + IPL re-entry |
-| 46 | [audio/soundboard](audio/soundboard/) | The audio v2 engine from pure C: dynamic samples, pan/pitch, echo |
+| 36 | [sprites/world_sprites](sprites/world_sprites/) | World-space sprites: a camera, culling and OAM in one call per batch (`oamPlaceWorld`) |
+| 37 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
+| 38 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
+| 39 | [memory/hirom_demo](memory/hirom_demo/) | HiROM vs LoROM memory mapping |
+| 40 | [memory/save_game](memory/save_game/) | SRAM persistence (battery saves) |
+| 41 | [audio/snesmod_music](audio/snesmod_music/) | SPC700 music playback via SNESMOD |
+| 42 | [audio/snesmod_sfx](audio/snesmod_sfx/) | Sound effects via SNESMOD |
+| 43 | [audio/speech_synth](audio/speech_synth/) | Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port) |
+| 44 | [audio/play_noise](audio/play_noise/) | Drum kit from the DSP noise generator — zero samples (krom port) |
+| 45 | [audio/pitch_mod](audio/pitch_mod/) | Hardware vibrato: PMON pitch modulation + LFO voice (krom port) |
+| 46 | [audio/apu_switch](audio/apu_switch/) | Hot-swap APU programs at runtime: apuReset() + IPL re-entry |
+| 47 | [audio/soundboard](audio/soundboard/) | The audio v2 engine from pure C: dynamic samples, pan/pitch, echo |
 
 ### Level 5 -- Maps and Complete Projects
 
 | # | Example | What You Will Learn |
 |---|---------|---------------------|
-| 47 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
-| 48 | [maps/slope_collision](maps/slope_collision/) | Slopes and tile-based collision |
-| 49 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
-| 50 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
-| 51 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
-| 52 | [games/mapandobjects](games/mapandobjects/) | Maps with interactive objects |
-| 53 | [games/mode7_racing](games/mode7_racing/) | F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data |
-| 54 | [games/mode7_flying](games/mode7_flying/) | Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings |
-| 55 | [games/rpg](games/rpg/) | RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box |
+| 48 | [maps/dynamic_map](maps/dynamic_map/) | Dynamic tile map streaming |
+| 49 | [maps/slope_collision](maps/slope_collision/) | Slopes and tile-based collision |
+| 50 | [basics/collision_demo](basics/collision_demo/) | Bounding-box sprite collision |
+| 51 | [games/breakout](games/breakout/) | Complete game: sprites, input, game logic |
+| 52 | [games/likemario](games/likemario/) | Platformer with scrolling and animation |
+| 53 | [games/mapandobjects](games/mapandobjects/) | Maps with interactive objects |
+| 54 | [games/mode7_racing](games/mode7_racing/) | F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data |
+| 55 | [games/mode7_flying](games/mode7_flying/) | Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings |
+| 56 | [games/rpg](games/rpg/) | RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box |
 
 ## Building
 

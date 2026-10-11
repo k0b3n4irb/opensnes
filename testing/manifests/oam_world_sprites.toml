@@ -1,0 +1,33 @@
+# world_sprites — oamPlaceWorld() on two batches (23 coins of 8x8, a 16x16
+# player) against a camera the D-pad moves. The visual baseline runs with
+# no input, so the camera never leaves the centre there and the ninth x
+# bit, the culling on the left edge and the clamp are never reached.
+#
+# Measured on luna (`luna state --until-frame N --input … --peek …`):
+#   * frame 50, no input: cam (128, 112), 5 coins in view (world_visible,
+#     the sum of visible[] the call filled; the coins drift, so the count
+#     is the frame's: 6 at frame 120);
+#   * frame 200, RIGHT held from frame 60: the camera moves 2 px a frame
+#     and stops at the world's edge (512 - 256 = 256) on frame 124; 10
+#     coins in view at the right edge of the world.
+# A regression in the call's culling or in visible[] moves world_visible;
+# one in the clamp or the pad moves cam_x.
+rom = "../../examples/sprites/world_sprites/world_sprites.sfc"
+input = "60:0x0100,180:0"
+
+[[checkpoint]]                 # before any input: the centre of the world
+at_frame = 50
+[checkpoint.values]
+cam_x = { eq = 128, width = 2 }
+cam_y = { eq = 112, width = 2 }
+world_visible = { eq = 5, width = 2 }
+
+[[checkpoint]]                 # RIGHT held: the camera reached the edge and stays
+at_frame = 200
+[checkpoint.values]
+cam_x = { eq = 256, width = 2 }
+cam_y = { eq = 112, width = 2 }
+world_visible = { eq = 10, width = 2 }
+
+[asserts.dma]
+unsafe_writes = 0
