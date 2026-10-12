@@ -1,6 +1,6 @@
 # Luna corpus coverage (whole-suite headless liveness pass)
 
-luna v1.38.0 · `luna state --until-frame <N>` per ROM · 87 ROMs · **85 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
+luna v1.38.0 · `luna state --until-frame <N>` per ROM · 88 ROMs · **86 OK, 2 INPUT-DEP, 0 DEAD, 0 FAIL**
 
 > Liveness from `luna state` (NMI/VBlank advancing, CPU not halted, and the latest NMI within one frame of the capture) — not a PNG-size heuristic. **INPUT-DEP** = runs+renders but its device input (Mouse/Super Scope, gap G4) is unmodelled → boot+visual only, *not* a clean functional pass. **DEAD** = ran but not live (crash/hang). **FAIL** = luna errored, or the ROM header's size byte does not cover the file or its checksum complement does not match. PNGs: `/tmp/luna-test-corpus/`. (In-ROM `SNES_ASSERT`/WDM is caught separately by the visual pass via `--wdm-out`.)
 
@@ -86,6 +86,7 @@ luna v1.38.0 · `luna state --until-frame <N>` per ROM · 87 ROMs · **85 OK, 2 
 | `sprites/sprite_sizes` | OK | live (200f/198nmi) |
 | `sprites/sprite_swarm` | OK | live (400f/398nmi) |
 | `sprites/world_sprites` | OK | live (200f/198nmi) |
+| `text/pixel_text` | OK | live (200f/198nmi) |
 | `text/print_string` | OK | live (200f/198nmi) |
 | `text/scroll_message` | OK | live (400f/398nmi) |
 | `transitions/fading` | OK | live (200f/198nmi) |

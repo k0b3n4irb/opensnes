@@ -5,6 +5,19 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`tileBlitGlyph2bpp()`** (`snes/tile.h`, module `tile`): ORs
+  rows of a 2bpp glyph into a tile and the tile to its right at a pixel shift
+  of 0 to 7 — the primitive of text composed at the pixel in a 2bpp layer
+  (a proportional font, a label at any x and y). Two calls cover the four
+  tiles a glyph placed at (x, y) can touch. Assembly, far pointers, a
+  jump into a chain of `lsr` for the shift, reentrant. About 12 000
+  master cycles a glyph for the two calls on luna. Pinned by the libtests (32 cases against a C
+  reference in the ROM, one case pinned from outside).
+- feat(examples): `text/pixel_text` — four lines of a 5x7 font at a 6-pixel
+  pitch, none on the tile grid, composed in a FAR layer and sent to VRAM in
+  two halves; A shifts every line one pixel. No assets: the font is bits,
+  the glyphs are built at boot. Manifest `text_pixel_text` (a checksum of the
+  layer before and after the press). The 88th example.
 - feat(examples): **`sprites/world_sprites`** — the example `oamPlaceWorld()`
   did not have: 17 coins of 16 x 16 and six walkers of 32 x 32 in a 512 x 448
   world, a camera the D-pad scrolls, two batches (one size each, the size
@@ -341,6 +354,8 @@ All notable changes to OpenSNES are documented in this file.
   `hdmaEnable()`, in VBlank; no other example writes `$420C` by hand.
 
 ### Changed
+- test: the libtests ROM runs 4 M instructions (3 M before): the glyph
+  reference written in C on far pointers needs the fourth.
 - fix(examples,docs): **no example sets HDMA on channel 0 any more.** Four
   did (`hdma_wave`'s hand-built table, `hdma_indirect_gradient`,
   `window_multi_hdma`, `perspective_rotate`'s four channels 0-3), and

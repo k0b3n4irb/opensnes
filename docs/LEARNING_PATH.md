@@ -28,6 +28,7 @@ sprite that isn't tied to the grid. The tile / palette / VRAM trinity that
 underpins everything visual on the SNES.
 
 @subpage examples_text_scroll_message
+@subpage examples_text_pixel_text
 
 @subpage examples_backgrounds_mode1
 

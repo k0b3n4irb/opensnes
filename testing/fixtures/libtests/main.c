@@ -440,6 +440,8 @@ u8 r_tile2[16];
 u8 r_tile4[32];
 u8 r_tile8[64];
 u8 r_tile4_dot[32];
+u16 r_glyph_ok;            /* tileBlitGlyph2bpp: cases equal to the C reference */
+u8 r_glyph_pin[32];        /* one case's tile and right tile, pinned outside the ROM */
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
@@ -1342,6 +1344,65 @@ static void part_trun(void) {
     textSetPos(0, 22); textPrint("    ");
 }
 
+/* tileBlitGlyph2bpp against a C reference of its contract: every shift,
+ * with and without a right tile, whole and partial rows, on tiles that
+ * already hold bits (the call ORs). r_glyph_ok counts the cases where the
+ * assembly and the reference leave the same bytes (expected: all 32);
+ * r_glyph_pin holds one case so that an expected value computed outside
+ * this ROM pins the reference too. */
+static FAR u8 gb_glyph[16];
+static FAR u8 gb_t[16], gb_r[16], gb_rt[16], gb_rr[16];
+
+static void glyph_ref(u8 FAR *t, u8 FAR *r, const u8 FAR *g,
+                      u8 gr, u8 tr, u8 n, u8 sh)
+{
+    u8 k;
+    for (k = 0; k < n; k++) {
+        u8 p0 = g[(gr + k) * 2], p1 = g[(gr + k) * 2 + 1];
+        u8 o = (u8)((tr + k) * 2);
+        t[o] |= (u8)(p0 >> sh);
+        t[o + 1] |= (u8)(p1 >> sh);
+        if (r && sh) {
+            r[o] |= (u8)(p0 << (8 - sh));
+            r[o + 1] |= (u8)(p1 << (8 - sh));
+        }
+    }
+}
+
+static void test_glyph_blit(void)
+{
+    static const u8 shape[4][3] = { {0, 0, 8}, {0, 3, 5}, {3, 0, 5}, {1, 2, 5} };
+    u8 i, sh, c, w, ok = 0;
+
+    for (i = 0; i < 16; i++)
+        gb_glyph[i] = (u8)(i * 37 + 11);
+    for (sh = 0; sh < 8; sh++)
+        for (c = 0; c < 4; c++) {
+            {
+                u8 same = 1;
+                w = (u8)((sh + c) & 1);     /* each shape with and without a right tile */
+                for (i = 0; i < 16; i++) {
+                    gb_t[i] = gb_rt[i] = (u8)((i * 13) & 0x5A);
+                    gb_r[i] = gb_rr[i] = (u8)((i * 7) & 0xA5);
+                }
+                tileBlitGlyph2bpp(gb_t, w ? gb_r : (u8 FAR *)0, gb_glyph,
+                                  shape[c][0], shape[c][1], shape[c][2], sh);
+                glyph_ref(gb_rt, w ? gb_rr : (u8 FAR *)0, gb_glyph,
+                          shape[c][0], shape[c][1], shape[c][2], sh);
+                for (i = 0; i < 16; i++)
+                    if (gb_t[i] != gb_rt[i] || gb_r[i] != gb_rr[i])
+                        same = 0;
+                ok += same;
+                if (sh == 3 && c == 3)      /* w is 0 here: shift 3 keeps the right part */
+                    for (i = 0; i < 16; i++) {
+                        r_glyph_pin[i] = gb_t[i];
+                        r_glyph_pin[16 + i] = gb_r[i];
+                    }
+            }
+        }
+    r_glyph_ok = ok;
+}
+
 int main(void) {
 
     /* audio v2 first: audioInit blocks on the APU boot + driver upload
@@ -1443,6 +1504,8 @@ int main(void) {
         t_px[0] = 5;
         tileEncode4bpp(t_px, r_tile4_dot);
     }
+
+    test_glyph_blit();
 
     test_string();
 

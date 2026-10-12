@@ -39,7 +39,7 @@ from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
 # instructions) before the rest of the fixture runs — hence the budget.
-STEPS = 3_000_000
+STEPS = 4_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
 
 # (global, width-bytes, expected-value)
 CASES = [
@@ -205,6 +205,11 @@ CASES = [
     # one hand-derived vector that does not go through it
     ("r_tile2", 16, None), ("r_tile4", 32, None), ("r_tile8", 64, None),
     ("r_tile4_dot", 32, 0x80 | (0x80 << (8 * 16))),
+    # tileBlitGlyph2bpp (2026-10-12): 32 cases against a C reference in the
+    # ROM (every shift, four row shapes, a right tile on half of them), and
+    # one (shift 3, glyph row 1 onto tile row 2, 5 rows, no right tile: the
+    # right half of the pin is the untouched prefill) pinned by _glyph_ref below
+    ("r_glyph_ok", 2, 32), ("r_glyph_pin", 32, None),
     # string module (2026-10-09): 24 words, in main.c's order — memcpy ROM->FAR
     # and FAR->plain, memmove both ways, memset (7 bytes, then 0), strlen,
     # strcpy, strcmp (0, -1, 1, -'C', 0xF0 - 0x10), strncpy (padded, then cut)
@@ -258,8 +263,24 @@ def _tile_ref(pairs: int) -> int:
     return int.from_bytes(out, "little")
 
 
+def _glyph_ref() -> int:
+    """tileBlitGlyph2bpp's pinned case: glyph byte i = i*37 + 11, the tile
+    prefilled with (i*13) & 0x5A and its right tile with (i*7) & 0xA5, rows
+    1-5 of the glyph ORed onto rows 2-6 of the tile shifted right by 3; no
+    right tile is passed, so its 16 bytes stay the prefill."""
+    g = [(i * 37 + 11) & 0xFF for i in range(16)]
+    t = bytearray((i * 13) & 0x5A for i in range(16))
+    r = bytearray((i * 7) & 0xA5 for i in range(16))
+    for k in range(5):
+        p0, p1 = g[(1 + k) * 2], g[(1 + k) * 2 + 1]
+        o = (2 + k) * 2
+        t[o] |= p0 >> 3
+        t[o + 1] |= p1 >> 3
+    return int.from_bytes(bytes(t) + bytes(r), "little")
+
+
 CASES = [(n, w, {"r_tile2": _tile_ref(1), "r_tile4": _tile_ref(2),
-                 "r_tile8": _tile_ref(4)}.get(n, v) if v is None else v)
+                 "r_tile8": _tile_ref(4), "r_glyph_pin": _glyph_ref()}.get(n, v) if v is None else v)
          for n, w, v in CASES]
 
 # Region getters: NTSC by default (the header's country byte), PAL under
