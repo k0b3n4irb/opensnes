@@ -867,3 +867,38 @@ for its owner). When it lands: re-run the probe on the pinned luna, then
 shorten the waits of `tcc_mul16` and look at the eight `nop` of `tcc_div16`
 with the libtests as the judge.
 
+## 2026-10-12 — the waits shortened, judged by luna `64c771d`
+
+luna committed the port the same day (`64c771d`, not yet released; binary
+`~/workspace/luna/target/stable/luna`). Our probe gives
+`f1fec1fe01fe01fe01fe5a00` there, and a finer one (nop and xba fillers,
+8-bit and 16-bit reads: `partners/luna/2026-10-12_to_luna_multiplicateur_reply.md`)
+says the product is complete 8 CPU cycles after the write of `$4203`
+exactly — at 7 the low byte is right and the high byte still lacks its top
+bit, which an 8-bit-read probe would miss — and the quotient 16 after
+`$4206`. The two figures of anomie-regs.
+
+Done, in one lot, with one `nop` of margin kept over the figure (no console
+measured; every reference and emulator counts CPU cycles): `tcc_mul16` 14
+→ 10 cycles from write to read on each of its three products, `tcc_div16`
+22 → 18, and `tcc_mul32` (ten products), `fixMul`, `fixLerp` and the
+`fixed32` products 13-15 → 11. Second cut from the same arbiter ("$4202
+will not be altered by this process, thus a new value may be written to
+$4203 to perform another multiplication without resetting $4202"): the
+products are ordered so that two in a row share WRMPYA and the second does
+not rewrite it — four writes saved in `tcc_mul32`, one in `tcc_mul16`,
+two in `fixMul`, one in `fixLerp`, two per `fixed32` product. Per call:
+`tcc_mul16` −20 cycles, `tcc_div16` −4, `tcc_mul32` −76, `fixMul` −26,
+`fixLerp` −13. The library tests and the differential hunts (new seeds)
+ran with `LUNA_BIN` on `64c771d`, the rest of the protocol on the pin.
+
+Seen on the way, a debt of the map module: `mapLoad` DMAs
+`MAP_MAXMTILES` entries into `metatiles` (4096 bytes) and `metatilesprop`
+(2048) whatever the asset's size, so the tail of each table is whatever
+ROM follows the asset — the `.mul32` / `.div32` sections for `maps/tiled`,
+which is how a change in a helper's size moved the WRAM oracle of the five
+map examples. Harmless (no metatile id reaches the tail) but a 6 KB copy
+for tables of a few hundred bytes, and an oracle that reads section
+placement. A copy sized by the asset (the map header knows its count)
+would end both. Not done in this lot.
+

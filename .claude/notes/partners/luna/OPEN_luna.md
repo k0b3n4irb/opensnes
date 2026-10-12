@@ -13,8 +13,8 @@ held back: not re-run, they go out with a reproduction ROM or not at all.
 
 | Date | Item | Seen on | What we would run |
 |---|---|---|---|
-| 2026-10-05 → sent 2026-10-12 with `gsu_ms0.sfc`; luna confirmed the same day, `state.gsu.ms0_at_21mhz` planned with the v9 save format | No diagnostic when CFGR bit 5 (MS0, fast multiply) and CLSR bit 0 (21 MHz) are both set: « MS0 must be zero in 21MHz mode » (fullsnes `1adef8e33ff3c4e9`; ares `06c6d2324e3c6d01`: products « may sometimes be invalid » in that mode). Our launchers mask the bit, but a program writing CFGR itself runs green on luna and may multiply wrong on a console. Needed: a counter or a note in `state.gsu` (like `bus_violations`) when a MUL/FMULT executes with both bits set | v1.32.0 | a ROM writing `$A0` to `$3037` then `$01` to `$3039` and running `fmult`; `luna state … --out - \| jq .gsu` shows `cfgr: 160, clsr: true` and nothing else |
-| 2026-10-05 → sent 2026-10-12 with `dsp1_cube_2mb.sfc`; luna confirmed and will decode the DSP where the SHVC-2B3B-01 places it (`$60-$6F:$0000-$7FFF`, fullsnes `f8cfa059b665dc1c`, higan `20df9e15303d8f17`) with a word at load — agreed | A DSP-1 LoROM of 2 MB (`ROM_BANKS=64`, `USE_DSP1=1`, before our build refused it) loads and runs on luna while the only 2 MB DSP-1 LoROM board (SHVC-2B3B-01) maps the DSP registers elsewhere (chips audit S5). Low priority: `make` refuses the combination since 2026-10-04 (`ROM_BANKS_MAX` 32 for DSP-1); an emulator warning on header-vs-board inconsistencies would still be a service | v1.32.0 | build with `ROM_BANKS=64 USE_DSP1=1` on a tree before `a8113dd8`, `luna state` boots it without a word |
+| 2026-10-05 → sent 2026-10-12 with `gsu_ms0.sfc`; shipped the same day on luna's `develop` `1e0df1f` as `state.gsu.ms0_at_21mhz` (2 on our ROM, 0 on the four Super FX examples; a diagnostic, not in the save states; usable under `[asserts.gsu]`). To do at the pin bump that carries it: `ms0_at_21mhz = 0` in the four Super FX manifests and `luna_runner.py --coverage` refusing a non-zero count | No diagnostic when CFGR bit 5 (MS0, fast multiply) and CLSR bit 0 (21 MHz) are both set: « MS0 must be zero in 21MHz mode » (fullsnes `1adef8e33ff3c4e9`; ares `06c6d2324e3c6d01`: products « may sometimes be invalid » in that mode). Our launchers mask the bit, but a program writing CFGR itself runs green on luna and may multiply wrong on a console. Needed: a counter or a note in `state.gsu` (like `bus_violations`) when a MUL/FMULT executes with both bits set | v1.32.0 | a ROM writing `$A0` to `$3037` then `$01` to `$3039` and running `fmult`; `luna state … --out - \| jq .gsu` shows `cfgr: 160, clsr: true` and nothing else |
+| 2026-10-05 → sent 2026-10-12 with `dsp1_cube_2mb.sfc`; luna decodes the DSP by board since its `develop` `1e0df1f` (ares' choice: no save RAM `$30-$3F:8000`; RAM and ≤ 1 MB `$20-$3F:8000`; RAM and > 1 MB, SHVC-2B3B-01, `$60-$6F:0000-7FFF`; fullsnes `f8cfa059b665dc1c`). Our 2 MB ROM declares no save RAM, so it matches no board: luna loads it as a SHVC-1B0N, its DSP answers at `$30`, and a warning at load and `rom.board_note` say so — the word we asked for; it does not fail by itself. Closed | A DSP-1 LoROM of 2 MB (`ROM_BANKS=64`, `USE_DSP1=1`, before our build refused it) loads and runs on luna while the only 2 MB DSP-1 LoROM board (SHVC-2B3B-01) maps the DSP registers elsewhere (chips audit S5). Low priority: `make` refuses the combination since 2026-10-04 (`ROM_BANKS_MAX` 32 for DSP-1); an emulator warning on header-vs-board inconsistencies would still be a service | v1.32.0 | build with `ROM_BANKS=64 USE_DSP1=1` on a tree before `a8113dd8`, `luna state` boots it without a word |
 
 Sent on 2026-10-08 in `2026-10-08_to_luna_rapport-v1.34.0.md` (four
 requests: `assets-dump --until-frame`, the actual bytes of a failing block,
@@ -119,14 +119,18 @@ we agreed to. To do at that pin: `testing.md` — a line carrying the mark
 is not quoted in a commit before it has been run again wider — and replay
 the `echo` pair.
 
-- 2026-10-11 — **the hardware multiplier has no latency**: `$4216/$4217`
-  hold the full product four CPU cycles after the write to `$4203` (probe
-  ROM, 0xFF x 0xFF read after 0 to 4 `nop`: 0xFE01 five times). References:
-  eight cycles, built as it goes. Needed: the early read modelled or
-  flagged, so that a wait that is too short fails a test. Until then the
-  four `nop` of `tcc_mul16` (and the waits of `math.asm`, `mul32.asm`,
-  `fixed32.asm`, `tcc_div16`) are not shortened: luna cannot judge it.
-  Sent: `2026-10-11_to_luna_multiplier_latency.md`.
+- 2026-10-11 → **closed 2026-10-12** — the hardware multiplier had no
+  latency in luna 1.38.0 (`$4216/$4217` held the full product four CPU
+  cycles after the write to `$4203`; references: eight, built as it goes).
+  luna's `develop` `64c771d` builds it one bit per cycle (ares `aluEdge`,
+  Mesen2 agree): our probe gives `f1fec1fe01fe01fe01fe5a00` there, and a
+  finer one (`pieces/2026-10-12_mulprobe_fine.*`) puts the product complete
+  at 8 cycles exactly, the quotient at 16. The waits of `tcc_mul16`,
+  `tcc_div16`, `mul32.asm`, `math.asm` and `fixed32.asm` were shortened
+  the same day, judged by that binary. To re-run at the pin bump that
+  carries it. Sent: `2026-10-11_to_luna_multiplier_latency.md`, answered by
+  `2026-10-12_from_luna_multiplicateur_commite.md`, closed by
+  `2026-10-12_to_luna_multiplicateur_reply.md`.
 
 - 2026-10-11 — `luna diff --audio` on an example that plays NOISE: a codegen
   change that moves the first `KON` by 10 samples gave DIFF at 6.43 % on

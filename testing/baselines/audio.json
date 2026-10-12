@@ -23,7 +23,7 @@
       "peak": 21551
     },
     "audio/echo": {
-      "sha256": "ad7f0d95bdec14458e975cc15b2d3955c0c58ab139fbe54257da124cc01fbbf9",
+      "sha256": "04993721759f65cea4d376fa455df1d293966c252756e3d8ed9808711af03927",
       "samples": 159936,
       "peak": 10922
     },
@@ -38,9 +38,9 @@
       "peak": 17119
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "8fbccda6be751876bf6f88ce299b6d1acfeae913342a3c5766b88a348257f0c3",
+      "sha256": "1c161848421a75cca18819fc57197d1c08e2bdc2ceda8ac24124d3418ea0fff4",
       "samples": 159945,
-      "peak": 20893
+      "peak": 20902
     },
     "audio/soundboard": {
       "sha256": "38ba5594086cb860f22e9265059483e823db66a68a0119efad86de6a0b0ecbdf",
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "4b52863ffc01c8d8b0e159c083dc50bc080a75c780347f4d98c2803ca60cd6c0",
+      "sha256": "64951fc867c2a0fd156fdc64141f9c4cf8e3789ee83a3c6395ad8a65f1da45a6",
       "samples": 159936,
       "peak": 12192
     }

@@ -97,6 +97,16 @@ tcc_mul32:
     ;   p3 = a_lo.hi * b_lo.hi  (bits 16..31)
     ;------------------------------------------------------------------
 
+    ; Timing of every product below: the result is complete 8 CPU cycles
+    ; after the write of WRMPYB (anomie-regs; luna reads a wrong high byte
+    ; at 7, the right one at 8). `rep #$20` (3) and the four cycles of
+    ; `lda.l $4216` before its read make 7; two nops make 11, one nop of
+    ; margin for the silicon (tcc_mul16 in runtime.asm says why). Four
+    ; nops were 15. The products are ordered so that two in a row share
+    ; the WRMPYA operand: "$4202 will not be altered by this process, thus
+    ; a new value may be written to $4203 to perform another
+    ; multiplication without resetting $4202" (anomie-regs).
+
     ; --- p0 = a_lo.lo * b_lo.lo ---
     sep #$20
     .ACCU 8
@@ -104,8 +114,6 @@ tcc_mul32:
     sta.l $4202
     lda 9,s
     sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20
@@ -116,6 +124,27 @@ tcc_mul32:
     sep #$20
     .ACCU 8
 
+    ; --- p2 = a_lo.lo * b_lo.hi  ->  add (p2 << 8) --- WRMPYA still a_lo.lo
+    lda 10,s
+    sta.l $4203
+    nop
+    nop
+    rep #$20
+    .ACCU 16
+    lda.l $4216
+    xba
+    pha
+    and.w #$FF00
+    clc
+    adc.w mul32_lo
+    sta.w mul32_lo
+    pla
+    and.w #$00FF
+    adc.w mul32_hi
+    sta.w mul32_hi
+    sep #$20
+    .ACCU 8
+
     ; --- p1 = a_lo.hi * b_lo.lo  ->  add (p1 << 8) ---
     lda 6,s
     sta.l $4202
@@ -123,8 +152,6 @@ tcc_mul32:
     sta.l $4203
     nop
     nop
-    nop
-    nop
     rep #$20
     .ACCU 16
     lda.l $4216
@@ -141,38 +168,9 @@ tcc_mul32:
     sep #$20
     .ACCU 8
 
-    ; --- p2 = a_lo.lo * b_lo.hi  ->  add (p2 << 8) ---
-    lda 5,s
-    sta.l $4202
+    ; --- p3 = a_lo.hi * b_lo.hi  ->  add (p3 to high; p3 << 16 = high word only) --- WRMPYA still a_lo.hi
     lda 10,s
     sta.l $4203
-    nop
-    nop
-    nop
-    nop
-    rep #$20
-    .ACCU 16
-    lda.l $4216
-    xba
-    pha
-    and.w #$FF00
-    clc
-    adc.w mul32_lo
-    sta.w mul32_lo
-    pla
-    and.w #$00FF
-    adc.w mul32_hi
-    sta.w mul32_hi
-    sep #$20
-    .ACCU 8
-
-    ; --- p3 = a_lo.hi * b_lo.hi  ->  add (p3 to high; p3 << 16 = high word only) ---
-    lda 6,s
-    sta.l $4202
-    lda 10,s
-    sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20
@@ -191,14 +189,13 @@ tcc_mul32:
     ;   q3 ignored (past bit 15 — irrelevant for truncated result)
     ;------------------------------------------------------------------
 
+    ; q0 = a_hi.lo * b_lo.lo
     sep #$20
     .ACCU 8
     lda 7,s
     sta.l $4202
     lda 9,s
     sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20
@@ -210,12 +207,9 @@ tcc_mul32:
     sep #$20
     .ACCU 8
 
-    lda 8,s
-    sta.l $4202
-    lda 9,s
+    ; q2 = a_hi.lo * b_lo.hi — WRMPYA still a_hi.lo
+    lda 10,s
     sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20
@@ -229,12 +223,11 @@ tcc_mul32:
     sep #$20
     .ACCU 8
 
-    lda 7,s
+    ; q1 = a_hi.hi * b_lo.lo
+    lda 8,s
     sta.l $4202
-    lda 10,s
+    lda 9,s
     sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20
@@ -250,14 +243,13 @@ tcc_mul32:
     ; STEP 3: low-16 of a_lo * b_hi  ->  add to mul32_hi
     ;------------------------------------------------------------------
 
+    ; r0 = a_lo.lo * b_hi.lo
     sep #$20
     .ACCU 8
     lda 5,s
     sta.l $4202
     lda 11,s
     sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20
@@ -269,12 +261,9 @@ tcc_mul32:
     sep #$20
     .ACCU 8
 
-    lda 6,s
-    sta.l $4202
-    lda 11,s
+    ; r2 = a_lo.lo * b_hi.hi — WRMPYA still a_lo.lo
+    lda 12,s
     sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20
@@ -288,12 +277,11 @@ tcc_mul32:
     sep #$20
     .ACCU 8
 
-    lda 5,s
+    ; r1 = a_lo.hi * b_hi.lo
+    lda 6,s
     sta.l $4202
-    lda 12,s
+    lda 11,s
     sta.l $4203
-    nop
-    nop
     nop
     nop
     rep #$20

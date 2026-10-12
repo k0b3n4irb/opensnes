@@ -78,18 +78,36 @@ fixMul:
     sep #$20                    ; 8-bit A for hardware multiplier
     .ACCU 8
 
+    ; Timing: the product is complete 8 CPU cycles after the write of
+    ; WRMPYB; `rep #$20` and the four cycles of `lda.l $4216` before its
+    ; read make 7, two nops make 11 (one nop of margin; the count and its
+    ; sources are in runtime.asm, tcc_mul16). P2 follows P0 and P3 follows
+    ; P1 without rewriting WRMPYA, which the unit does not alter
+    ; (anomie-regs).
+
     ;-- P0 = a_lo * b_lo --
     lda.w fmul_a               ; a low byte
     sta.l $4202                 ; WRMPYA
     lda.w fmul_b               ; b low byte
-    sta.l $4203                 ; WRMPYB (8-cycle delay starts)
-    nop                         ; \
-    nop                         ;  | fill 8 cycles
-    nop                         ; /
+    sta.l $4203                 ; WRMPYB (the 8 cycles start)
+    nop
+    nop
     rep #$20
     .ACCU 16
     lda.l $4216                 ; P0 result
     sta.w fmul_p0
+
+    ;-- P2 = a_lo * b_hi -- WRMPYA still a_lo
+    sep #$20
+    .ACCU 8
+    lda.w fmul_b + 1           ; b high byte
+    sta.l $4203
+    nop
+    nop
+    rep #$20
+    .ACCU 16
+    lda.l $4216                 ; P2 result
+    sta.w fmul_p2
 
     ;-- P1 = a_hi * b_lo --
     sep #$20
@@ -100,35 +118,16 @@ fixMul:
     sta.l $4203
     nop
     nop
-    nop
     rep #$20
     .ACCU 16
     lda.l $4216                 ; P1 result
     sta.w fmul_p1
 
-    ;-- P2 = a_lo * b_hi --
+    ;-- P3 = a_hi * b_hi -- WRMPYA still a_hi
     sep #$20
     .ACCU 8
-    lda.w fmul_a               ; a low byte
-    sta.l $4202
     lda.w fmul_b + 1           ; b high byte
     sta.l $4203
-    nop
-    nop
-    nop
-    rep #$20
-    .ACCU 16
-    lda.l $4216                 ; P2 result
-    sta.w fmul_p2
-
-    ;-- P3 = a_hi * b_hi --
-    sep #$20
-    .ACCU 8
-    lda.w fmul_a + 1           ; a high byte
-    sta.l $4202
-    lda.w fmul_b + 1           ; b high byte
-    sta.l $4203
-    nop
     nop
     nop
     rep #$20
@@ -233,12 +232,14 @@ fixLerp:
     sep #$20
     .ACCU 8
 
-    ;-- P0 = |diff_lo| * t --
-    lda.w fmul_a               ; diff low byte
-    sta.l $4202
+    ; t is the WRMPYA operand of both products, written once: the unit
+    ; does not alter it (anomie-regs). Two nops per product, as in fixMul.
+
+    ;-- P0 = t * |diff_lo| --
     lda 5,s                     ; t
+    sta.l $4202
+    lda.w fmul_a               ; diff low byte
     sta.l $4203
-    nop
     nop
     nop
     rep #$20
@@ -246,14 +247,11 @@ fixLerp:
     lda.l $4216
     sta.w fmul_p0
 
-    ;-- P1 = |diff_hi| * t --
+    ;-- P1 = t * |diff_hi| -- WRMPYA still t
     sep #$20
     .ACCU 8
     lda.w fmul_a + 1           ; diff high byte
-    sta.l $4202
-    lda 5,s                     ; t
     sta.l $4203
-    nop
     nop
     nop
     rep #$20

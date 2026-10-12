@@ -70,6 +70,20 @@ All notable changes to OpenSNES are documented in this file.
   above).
 
 ### Performance
+- perf(lib): **the hardware multiply and divide helpers wait the time the
+  unit needs, not twice it.** The product is complete 8 CPU cycles after
+  the write of `$4203`, the quotient 16 after `$4206` (anomie-regs; luna
+  models it one bit per cycle since its `64c771d`, and a probe reads a
+  wrong high byte at 7 and the right one at 8). `tcc_mul16` waited 14
+  cycles on each of its three products, `tcc_div16` 22, `tcc_mul32`,
+  `fixMul`, `fixLerp` and the `fixed32` products 13 to 15: now 10, 18 and
+  11, one `nop` of margin kept over the figure. The products are also
+  ordered so that two in a row share the WRMPYA operand, which the unit
+  does not alter, and the second does not rewrite `$4202`. Per call:
+  `tcc_mul16` −20 cycles, `tcc_mul32` −76, `fixMul` −26, `fixLerp` −13,
+  `tcc_div16` −4. Judged by the library tests and the differential hunts
+  run on that luna binary; the pinned 1.38.0 returns the product at once
+  and cannot tell a short wait from a long one.
 - perf(runtime,lib): **the NMI sends only the text that changed.** The
   tilemap flush DMAed all 2048 bytes of the text buffer at every VBlank
   that followed a write — 16,384 master cycles, above the 12,000 of the
