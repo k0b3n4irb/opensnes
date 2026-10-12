@@ -236,6 +236,11 @@ All notable changes to OpenSNES are documented in this file.
   the functions that read a state back are synchronous as before.
 
 ### Fixed
+- docs: `KNOWN_LIMITATIONS.md` has its "Sprite palettes start at CGRAM offset
+  128" heading back — the identifier-length entry of 2026-10-12 had replaced
+  it instead of sitting above it — and a 🟢 entry for the compiler refusing a
+  local that is read before any store (`slot %.1 is read but never stored
+  to`: right, but the message names an IR slot, not the variable).
 - fix(compiler): **a compiler message names your C file, not a temporary
   file.** The driver runs QBE on a temporary IR file, and every message
   from that stage read `qbe:/tmp/cc65816_ir.XXXXXX:5803: …` — a path that

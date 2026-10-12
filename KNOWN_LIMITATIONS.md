@@ -515,6 +515,18 @@ long: 79 characters at most, starting …`. Since 2026-10-12 the message names
 the limit and the name, and the C file rather than the temporary IR file the
 driver hands to QBE. Nothing is truncated or renamed in silence.
 
+### 🟢 A local read before any store is refused, with an IR-level message
+QBE's `promote` (`mem.c`) refuses a stack slot that is loaded and never
+stored: `qbe:main.c (IR line N): slot %.1 is read but never stored to`. In C
+that is a local variable declared, never assigned, and read — `u16 k;
+(void)k;`, or a value returned from a branch that never set it — whose
+value is indeterminate; refusing it is right, but the message names an IR
+slot, not the C variable, and only the C file (since 2026-10-12). Found on
+2026-10-12 while measuring a workload. Assign the variable, or remove the
+read.
+
+### 🟡 Sprite palettes start at CGRAM offset 128, not 0
+
 Standard SNES quirk that surprises everyone once. The first 128 colours of
 CGRAM are BG palettes (palettes 0-7); sprite palettes start at offset 128
 (palettes 0-7 mapped to colours 128-255). Loading a sprite palette via
