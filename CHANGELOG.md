@@ -2,7 +2,18 @@
 
 All notable changes to OpenSNES are documented in this file.
 
-## [Unreleased]
+## [0.50.0] — 2026-10-12
+
+A primitive for text
+composed at the pixel (`tileBlitGlyph2bpp()`, with the example that teaches
+it), the compiler's stage 2 (a counted loop runs on its byte offset, kept in
+X: `farClear` 291 → 126 master cycles a word over the two lots), the
+hardware multiply and divide helpers waiting the cycles the unit needs and
+no more (judged by luna, which models the unit since its `64c771d`), the
+workload `farfill` at the SDK bench. Four examples off HDMA
+channel 0, the NMI's text flush by dirty range, `oamDrawMetasprite` in
+assembly.
+
 
 ### Added
 - feat(bench): `farfill`, the 23rd workload of `make bench-sdk`: a screen of

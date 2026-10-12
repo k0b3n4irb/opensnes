@@ -57,13 +57,13 @@
 #define OPENSNES_VERSION_MAJOR 0
 
 /** @brief OpenSNES minor version */
-#define OPENSNES_VERSION_MINOR 49
+#define OPENSNES_VERSION_MINOR 50
 
 /** @brief OpenSNES patch version */
 #define OPENSNES_VERSION_PATCH 0
 
 /** @brief OpenSNES version string */
-#define OPENSNES_VERSION_STRING "0.49.0"
+#define OPENSNES_VERSION_STRING "0.50.0"
 
 /*============================================================================
  * Core Headers
