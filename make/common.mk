@@ -297,7 +297,8 @@ endif
 # Module Dependency Auto-Resolution
 #------------------------------------------------------------------------------
 
-_DEP_sprite          := dma sprite_oamset sprite_world
+_DEP_sprite          := dma sprite_oamset sprite_world sprite_meta
+_DEP_sprite_meta     := sprite_oamset                                           # oam_ext_tab
 _DEP_sprite_world    := sprite_oamset                                           # oam_ext_tab
 # The seven entries marked L2a were found by devtools/link_modules.py
 # (2026-09-13), which links every module ALONE: each of these modules
@@ -333,7 +334,7 @@ _DEP_vramqueue       :=                                                         
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
-_DEP_audio           := apu audio_blob
+_DEP_audio           := apu audio_blob audio_stream
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
@@ -412,6 +413,20 @@ C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 # aim_target WRAM stream diverged from a clean build twice before this).
 # Coarse — any header change recompiles the example — but correct.
 LIB_HEADERS := $(wildcard $(OPENSNES)/lib/include/snes.h) $(wildcard $(OPENSNES)/lib/include/snes/*.h)
+
+# A project's C objects must rebuild when the COMPILER changes: the driver,
+# the front end or the back end. Without this an SDK update (or `git pull`
+# and `make` in the SDK) left every `.c.o` of a project as the old compiler
+# had made it, and `make` there said "nothing to be done" (2026-10-10).
+#
+# By a checksum written into the configuration stamp (.opensnes_config,
+# below), not by naming the binaries as prerequisites: the first version
+# did that, and on Windows the library's C objects were silently NOT built
+# (a pattern rule one of whose prerequisites make cannot find is skipped,
+# and those objects also have a rule without a recipe, so make called them
+# done). A stamp is a file this Makefile writes itself. The glob patterns
+# read the directory, so they give the names as they are, `.exe` or not.
+COMPILER_ID := $(shell cksum $(wildcard $(OPENSNES)/bin/cc65816* $(OPENSNES)/bin/cproc-qbe* $(OPENSNES)/bin/qbe*) </dev/null 2>/dev/null | cksum | tr -d ' \t')
 ASM_OBJS := $(patsubst %.asm,%.o,$(ASMSRC))
 GSU_BINS := $(patsubst %.sfx,%.sfx.bin,$(GSUSRC))
 GSU_HEADERS := $(patsubst %.sfx,%.sfx.h,$(GSUSRC))
@@ -558,9 +573,16 @@ endef
 # -fno-builtin: <snes/string.h> declares memcpy & co. with this target's
 # size (unsigned int, 16 bits); clang's builtin prototypes carry the host's
 # size_t and it refuses the "incompatible redeclaration" (2026-10-09).
+# -Wno-missing-field-initializers: a structure of the SDK may gain an
+# optional field at its end (OamWorldBatch.order, 2026-10-10), and C sets a
+# field an initializer leaves out to 0. With the warning as an error, every
+# project that had written `{ x, y, tile, attr, seen, 0, 12, 32 }` — the
+# form of the SDK's own documentation — stopped compiling the day the field
+# arrived.
 CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 	-Wno-pointer-to-int-cast -Wno-int-to-pointer-cast \
-	-Wno-unused-parameter -Wno-error=deprecated-declarations \
+	-Wno-unused-parameter -Wno-missing-field-initializers \
+	-Wno-error=deprecated-declarations \
 	-Wno-error=deprecated-pragma
 
 # C sources → objects
@@ -582,7 +604,17 @@ CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 # (.claude/rules/two_audiences.md; check_doc_drift.py anchor 17 keeps it so).
 upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes upgrade -q --removed-only $(1); then \
 	echo "  (the names above were removed at OpenSNES 0.49 — docs/UPGRADING.md)"; fi
-LOCAL_HEADERS := $(wildcard *.h $(addsuffix *.h,$(filter-out ./,$(sort $(dir $(CSRC))))))
+# What a project's C may include besides the library's headers: the `.h` and
+# the `.inc` beside the sources and in their `res/` folders (generated
+# tables are commonly `#include "res/x.inc"`). Coarse — any of them changing
+# recompiles all the project's C — but a stale object is silent: a
+# regenerated `.inc` recompiled nothing, and a missing array looked like a
+# compiler defect (2026-10-10). The exact answer
+# is a dependency file written by the preprocessor, which the cc65816
+# driver does not offer yet.
+_CSRC_DIRS := $(filter-out ./,$(sort $(dir $(CSRC))))
+LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc \
+                   $(foreach d,$(_CSRC_DIRS),$(d)*.h $(d)*.inc $(d)res/*.h $(d)res/*.inc))
 %.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
@@ -603,7 +635,7 @@ endif
 # ignored, and the old header shipped. The stamp holds every knob that
 # reaches the header, the assembler flags or the link; it is rewritten only
 # when that text changes, so a rebuild with the same knobs stays a no-op.
-_CONFIG_TEXT := $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) $(SPRITE_SIZE) \
+_CONFIG_TEXT := [cc $(COMPILER_ID)] $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) $(SPRITE_SIZE) \
   [$(ROM_NAME)] [$(ASFLAGS)] [$(CFLAGS)] [$(LIB_MODULES)] [$(LIBDIR)] \
   [$(USE_SNESMOD) $(SOUNDBANK_BANK)]
 .opensnes_config: FORCE

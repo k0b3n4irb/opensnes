@@ -1,0 +1,5 @@
+# The counter of a loop whose every use is the same scaled index is that
+# index (ivar, 2026-10-12): no shift at all, the accesses index with it.
+in move_all: absent asl a
+in move_all: present \.w p[xy],x
+count 2 cmp\.w #36

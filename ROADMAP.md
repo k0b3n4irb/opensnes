@@ -8,7 +8,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.49.0
+## Current Status: post-v0.50.0
 
 Version 0.49.0 (2026-10-10) carries the public API meant for 1.0: the
 deprecated aliases are gone and the two calls that change meaning have
@@ -19,7 +19,7 @@ examples with their assets redone, and the first console session of the
 hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7).
 `docs/STABILITY.md` is the promise 1.0 will make. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 30 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 44 % faster measured on luna on eighteen workloads, each of them faster, none larger, and level or shallower in stack on sixteen. 86
+produces code about 30 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 60 % faster measured on luna on 23 workloads, each of them faster, none larger, and level or shallower in stack on sixteen. 88
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
@@ -151,7 +151,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 | `dsp1` | DSP-1 commands (multiply, trig, rotation, projection, distance) over the two-register port | core (runs the real firmware on luna) |
 | `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
 
-### Examples (86)
+### Examples (88)
 - **Text**: print_string, scroll_message · **Fundamentals**: text_glyphs
 - **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode4, mode5, mode5_hires, mode6
 - **Sprites**: simple_sprite, sprite_sizes, animated_sprite, metasprite, dynamic_sprite, dynamic_metasprite, sprite_swarm
@@ -201,7 +201,7 @@ This stretch focused on closing process gaps surfaced by an internal audit
 - [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
 - [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
       local-patch lists
-- [x] Example READMEs with hardware explanations (86 / 86)
+- [x] Example READMEs with hardware explanations (88 / 88)
 - [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
 - [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
 - [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
@@ -351,6 +351,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-10. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-12. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
 and `.claude/rules/doc_consistency.md`.*

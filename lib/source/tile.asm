@@ -182,3 +182,190 @@ _tile_next_pair:
     .ACCU 8
     rts
 .ENDS
+
+;==============================================================================
+; void tileBlitGlyph2bpp(u8 FAR *tile, u8 FAR *right, const u8 FAR *glyph,
+;                        u8 glyph_row, u8 tile_row, u8 rows, u8 shift)
+;
+; ORs `rows` rows of a 2 bpp glyph (16 bytes, the two planes interleaved by
+; row as a SNES tile) into `tile`, from the glyph's row `glyph_row` onto the
+; tile's row `tile_row`, each row shifted right by `shift` pixels (0-7); the
+; bits that leave the tile on the right land in `right` (NULL: dropped). A
+; glyph put at a pixel position touches up to four tiles: two calls, one per
+; tile row, cover it. This call is measured in the libtests report and on
+; devtools/sdkbench `farfill`.
+;
+; Stack at entry (php), pushed left to right: 5,s = shift, 7,s = rows,
+; 9,s = tile_row, 11,s = glyph_row, 13,s = glyph (4-byte pointer), 17,s =
+; right, 21,s = tile. A 12-byte frame on the stack becomes the direct page
+; (phd / tcd), as tileEncode*: no global scratch, reentrant.
+;
+; Per row and plane: the plane byte is put in the high byte of A (16-bit),
+; then shifted right `shift` times through a jump into a chain of seven
+; `lsr a`: the high byte is the part that stays in the tile, the low byte
+; the part that crosses into `right` — one shift gives both. A zero part is
+; not written (an OR of zero costs two long indirect accesses for nothing).
+;
+; Frame (direct page while the call runs):
+;   $00-$02  tile (24-bit, + tile_row * 2)    $03-$05  right (same offset)
+;   $06-$08  glyph (24-bit, + glyph_row * 2)  $09      right present and shift != 0
+;   $0A      rows left                        $0B      unused
+; Arguments, D-relative (N,s is dp N-1, +2 for phd, +12 for the frame):
+;   shift $12, rows $14, tile_row $16, glyph_row $18, glyph $1A/$1C,
+;   right $1E/$20, tile $22/$24
+;==============================================================================
+.SECTION ".tile_blit" SEMIFREE
+.ACCU 16
+.INDEX 16
+
+tileBlitGlyph2bpp:
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    phd
+    tsc
+    sec
+    sbc #12
+    tcs                         ; 12-byte frame
+    inc a
+    tcd                         ; D = the frame's first byte
+
+    ; The three pointers, each with its row offset added (a buffer never
+    ; crosses a bank; the carry is kept anyway). Every 16-bit store of a bank
+    ; byte also writes the byte above it, so the order is tile, right, glyph,
+    ; flag, rows: each store's spill is the next field, written after.
+    lda $16                     ; tile_row
+    and #$00FF
+    asl a
+    tax                         ; X = tile_row * 2, for right too
+    clc
+    adc $22                     ; tile, low 16
+    sta $00
+    lda $24                     ; tile bank
+    adc #0
+    sta $02                     ; $02 = bank ($03 next)
+    txa
+    clc
+    adc $1E                     ; right, low 16 (NULL: a dead value)
+    sta $03
+    lda $20                     ; right bank
+    adc #0
+    sta $05                     ; $05 = bank ($06 next)
+    lda $18                     ; glyph_row
+    and #$00FF
+    asl a
+    clc
+    adc $1A                     ; glyph, low 16
+    sta $06
+    lda $1C                     ; glyph bank
+    adc #0
+    sta $08                     ; $08 = bank ($09 next)
+
+    stz $09                     ; no right part ($09; $0A next)
+    lda $12                     ; shift
+    and #$0007
+    beq @no_right               ; shift 0: nothing crosses
+    lda $1E                     ; right, low 16
+    bne @has_right
+    lda $20
+    and #$00FF
+    beq @no_right               ; NULL
+@has_right:
+    inc $09                     ; right present ($0A still 0)
+@no_right:
+
+    sep #$20
+    .ACCU 8
+    lda $14                     ; rows
+    sta $0A
+    rep #$20
+    .ACCU 16
+    lda $12                     ; shift
+    and #$0007
+    asl a
+    tax                         ; X = shift * 2: the jump table index
+    ldy #$0000                  ; Y = row * 2 in the tile and in the glyph
+
+@row:
+    ; ---- plane 0 ----
+    lda [$06],y                 ; p1:p0
+    and #$00FF
+    xba                         ; A = p0 << 8
+    jmp (@shift0,x)
+@sh0_7: lsr a
+@sh0_6: lsr a
+@sh0_5: lsr a
+@sh0_4: lsr a
+@sh0_3: lsr a
+@sh0_2: lsr a
+@sh0_1: lsr a
+@sh0_0:
+    sep #$20
+    .ACCU 8
+    xba                         ; A = the part that stays; B = the part that crosses
+    beq @p0_no_left
+    ora [$00],y
+    sta [$00],y
+@p0_no_left:
+    lda $09
+    beq @p0_done
+    xba                         ; A = the part that crosses
+    beq @p0_done
+    ora [$03],y
+    sta [$03],y
+@p0_done:
+    rep #$20
+    .ACCU 16
+
+    ; ---- plane 1 ----
+    lda [$06],y                 ; p1:p0 again
+    and #$FF00                  ; A = p1 << 8
+    jmp (@shift1,x)
+@sh1_7: lsr a
+@sh1_6: lsr a
+@sh1_5: lsr a
+@sh1_4: lsr a
+@sh1_3: lsr a
+@sh1_2: lsr a
+@sh1_1: lsr a
+@sh1_0:
+    iny                         ; the plane-1 byte of the row
+    sep #$20
+    .ACCU 8
+    xba
+    beq @p1_no_left
+    ora [$00],y
+    sta [$00],y
+@p1_no_left:
+    lda $09
+    beq @p1_done
+    xba
+    beq @p1_done
+    ora [$03],y
+    sta [$03],y
+@p1_done:
+    iny                         ; next row
+    dec $0A
+    beq @done
+    rep #$20
+    .ACCU 16
+    bra @row
+
+@done:
+    rep #$20
+    .ACCU 16
+    tsc
+    clc
+    adc #12
+    tcs
+    pld
+    plp
+    rtl
+
+; jump tables: entry n lands on the chain so that n `lsr a` run
+@shift0:
+    .dw @sh0_0, @sh0_1, @sh0_2, @sh0_3, @sh0_4, @sh0_5, @sh0_6, @sh0_7
+@shift1:
+    .dw @sh1_0, @sh1_1, @sh1_2, @sh1_3, @sh1_4, @sh1_5, @sh1_6, @sh1_7
+.ENDS

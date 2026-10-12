@@ -11,7 +11,7 @@
 #     quasi-period): the f672 -> f700 pair is the only place in the corpus
 #     where the wrap runs, 668 -> 24 = 696 mod 672.
 #   * Every control is dead code without input: A hands the ripple to the
-#     hdma module (channel 0 off, channel 6 on — hdma_enabled_state is the
+#     hdma module (channel 2 off, channel 6 on — hdma_enabled_state is the
 #     lib's shadow of $420C), LEFT/RIGHT move the module's amplitude, which
 #     must clamp at 24 and at 2 (asserted past both ends), and A again
 #     must re-arm the hand-built table from the phase it left, not from 0.
@@ -19,12 +19,12 @@
 #     reaching it proves hdmaWaveH() took the new value.
 rom = "../../examples/hdma/hdma_wave/hdma_wave.sfc"
 
-[[checkpoint]]                 # armed at boot, the hand-built table on ch0
+[[checkpoint]]                 # armed at boot, the hand-built table on ch2 (0 is the DMA helpers')
 at_frame = 60
 [checkpoint.values]
 "wave_phase.main" = 56
 "use_lib.main" = { eq = 0, width = 1 }
-hdma_enabled_state = { eq = 0x01, width = 1 }
+hdma_enabled_state = { eq = 0x04, width = 1 }
 
 [[checkpoint]]                 # exactly +1 entry per frame over 60 frames
 at_frame = 120
@@ -42,7 +42,7 @@ at_frame = 672
 at_frame = 700
 [checkpoint.values]
 "wave_phase.main" = 24
-hdma_enabled_state = { eq = 0x01, width = 1 }   # the wrap must not disarm it
+hdma_enabled_state = { eq = 0x04, width = 1 }   # the wrap must not disarm it
 [checkpoint.delta]
 "wave_phase.main" = "decreased"
 
@@ -56,7 +56,7 @@ at_frame = 800
 input = "760:0x0080,764:0"
 [checkpoint.values]
 "use_lib.main" = { eq = 1, width = 1 }
-hdma_enabled_state = { eq = 0x40, width = 1 }   # ch0 off, ch6 on
+hdma_enabled_state = { eq = 0x40, width = 1 }   # ch2 off, ch6 on
 "amp.main" = { eq = 10, width = 1 }
 hdma_wave_amplitude = { eq = 10, width = 1 }
 "wave_phase.main" = 84                                 # frozen where A found it
@@ -77,12 +77,12 @@ input = "900:0x0200,904:0,910:0x0200,914:0,920:0x0200,924:0,930:0x0200,934:0,940
 hdma_wave_amplitude = { eq = 2, width = 1 }
 "use_lib.main" = { eq = 1, width = 1 }
 
-[[checkpoint]]                 # A again: back on ch0, from the frozen phase
+[[checkpoint]]                 # A again: back on ch2, from the frozen phase
 at_frame = 1100
 input = "1040:0x0080,1044:0"
 [checkpoint.values]
 "use_lib.main" = { eq = 0, width = 1 }
-hdma_enabled_state = { eq = 0x01, width = 1 }
+hdma_enabled_state = { eq = 0x04, width = 1 }
 "amp.main" = { eq = 2, width = 1 }                     # the amplitude survives
 [checkpoint.delta]
 "wave_phase.main" = "increased"

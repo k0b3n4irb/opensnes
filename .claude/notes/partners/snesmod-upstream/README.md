@@ -38,8 +38,9 @@ the same plain style as the issues.
 | Date | #6 | #7 | #8 | #9 | #10 | Repo activity | Note |
 |---|---|---|---|---|---|---|---|
 | 2026-10-03 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | posted today |
+| 2026-10-12 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved (two days late: the loop lot) |
 
-Next check due: 2026-10-10.
+Next check due: 2026-10-19.
 
 ## PVSnesLib: waits for Mukunda (owner decision, 2026-10-03)
 

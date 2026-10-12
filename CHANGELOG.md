@@ -2,6 +2,420 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [0.50.0] — 2026-10-12
+
+A primitive for text
+composed at the pixel (`tileBlitGlyph2bpp()`, with the example that teaches
+it), the compiler's stage 2 (a counted loop runs on its byte offset, kept in
+X: `farClear` 291 → 126 master cycles a word over the two lots), the
+hardware multiply and divide helpers waiting the cycles the unit needs and
+no more (judged by luna, which models the unit since its `64c771d`), the
+workload `farfill` at the SDK bench. Four examples off HDMA
+channel 0, the NMI's text flush by dirty range, `oamDrawMetasprite` in
+assembly.
+
+
+### Added
+- feat(bench): `farfill`, the 23rd workload of `make bench-sdk`: a screen of
+  96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, four
+  times, then the same on a near buffer (`farClear` is the
+  bare `for` over an index, the line the compiler's stage 2 is measured
+  on). PVSnesLib 134,854,318 master cycles, OpenSNES 56,639,980 (−58.0 %),
+  both leaving the same checksum; the two SDKs' totals become 325.9 M and
+  129.6 M (−60.2 %).
+- feat(lib): **`tileBlitGlyph2bpp()`** (`snes/tile.h`, module `tile`): ORs
+  rows of a 2bpp glyph into a tile and the tile to its right at a pixel shift
+  of 0 to 7 — the primitive of text composed at the pixel in a 2bpp layer
+  (a proportional font, a label at any x and y). Two calls cover the four
+  tiles a glyph placed at (x, y) can touch. Assembly, far pointers, a
+  jump into a chain of `lsr` for the shift, reentrant. About 12 000
+  master cycles a glyph for the two calls on luna. Pinned by the libtests (32 cases against a C
+  reference in the ROM, one case pinned from outside).
+- feat(examples): `text/pixel_text` — four lines of a 5x7 font at a 6-pixel
+  pitch, none on the tile grid, composed in a FAR layer and sent to VRAM in
+  two halves; A shifts every line one pixel. No assets: the font is bits,
+  the glyphs are built at boot. Manifest `text_pixel_text` (a checksum of the
+  layer before and after the press). The 88th example.
+- feat(examples): **`sprites/world_sprites`** — the example `oamPlaceWorld()`
+  did not have: 17 coins of 16 x 16 and six walkers of 32 x 32 in a 512 x 448
+  world, a camera the D-pad scrolls, two batches (one size each, the size
+  bit set once), the walkers sorted by depth every frame with the batch's
+  `order` (slots permuted, arrays untouched), and `visible[]` read back.
+  The 87th example; manifest `oam_world_sprites` pins the camera's clamp
+  at the world's edge, the count the call reports and the walker in the
+  front slot.
+- bench: **a 32-bit division row in `make bench-sdk`** (`div32`: 200 steps
+  of `u32 / u16`, twice a step, and a `u32 / u32` every eighth).
+  Measured: PVSnesLib 11,361,754 master cycles, OpenSNES 5,124,814
+  (-54.9 %); code 888 to 452 bytes. PVSnesLib's figures re-measured on the
+  same tree (`fa758c9b`) for the whole table.
+- feat(lib): **`OamWorldBatch.order`, for a game that sorts its sprites by
+  depth**. OAM order is drawing
+  order, so a game seen from above re-sorts its actors every frame; until
+  now it had to keep a second copy of x, y, tile and attr in sorted order
+  and refill it. With `order`, slot `first_id + i` shows sprite
+  `order[i]`: the arrays stay indexed by the sprite and the sort permutes
+  one byte each. `visible[]` stays indexed by the sprite; an `order` byte
+  that is not under `count` hides its slot. A batch written without the
+  field behaves as before (`order` is 0). Measured (`devtools/libbench`,
+  new row `worldo`): 36,400 master cycles a frame for 19 sorted sprites,
+  about 240 more a sprite than unsorted; the unsorted path pays one test a
+  call (about 180 master cycles). `compiler/ABI.md` now says that the
+  32 bytes of `tcc__lf` are scratch for a callee, which this routine uses,
+  and its direct-page map is corrected against a linked `.sym`.
+- build: **a project and the library rebuild their C when the compiler
+  changes.** The C objects did not depend on `bin/cc65816`, `cproc-qbe`
+  and `qbe`: after an SDK update, `make` in a project said "nothing to be
+  done" and linked what the old compiler had produced; `make` in the SDK
+  kept the library's C functions as the old compiler had made them. Both
+  now keep a checksum of the three binaries in a stamp their C objects
+  depend on (a first version named the binaries as prerequisites, and on
+  Windows the library's C was then not built at all, without an error:
+  one push of `develop` was red for it).
+- build: a project's C objects also depend on the `.inc` files beside the
+  sources and in their `res/` folders, not only on the `.h`: a regenerated
+  `res/tables.inc` that a `.c` includes now recompiles it.
+- build: the syntax check of a project's C no longer refuses an
+  initializer that leaves out the last fields of a structure
+  (`-Wno-missing-field-initializers`). C sets them to 0, and that is how a
+  structure of the SDK gains an optional field without breaking the
+  projects that already declare it: with the warning as an error, a batch
+  written `{ x, y, tile, attr, seen, 0, 12, 32 }`, as the documentation
+  shows it, stopped compiling when `order` arrived.
+
+- feat(lib): **the sample area of the sound CPU reaches $FFC0 while no echo
+  is configured**: 62,656 bytes instead of 46,336. The 16 KB above $C000
+  were kept for the echo ring whether the game used an echo or not; they
+  are the game's until its first `audioSetEcho()`, which now answers
+  `AUDIO_ERR_NO_MEMORY` if samples already reach into the ring.
+  `audioGetFreeMemory()` reports the limit that applies. The DSP writes
+  nothing there while echo writes are off (FLG bit 5), which the driver
+  sets at start.
+- docs(lib): `vramQueuePush()` and `vramQueuePushSprite()` say that the
+  queue keeps the pointer: the bytes are read at the flush, and a buffer
+  filled again before it sends its last contents for every entry.
+- feat(tools): `opensnes-sample` writes the tuning factor of a resampled
+  loop in the generated header (`<name>_tuning`, x4096) and in `--json`
+  (`"tuning_x4096"`); its page says what it does of a loop that is not a
+  multiple of 16 samples (repeats it under 2,000 samples, resamples it
+  above).
+
+### Performance
+- perf(compiler): **stage 2, T2 and T3 — a counted loop runs on its byte
+  offset, kept in X.** `ivar.c` (QBE, before `gcm`) replaces a loop
+  counter whose every use is the same scaled index `c·i` by that index: a
+  phi initialised to `c·i0`, stepping by `c·step`, tested against `c·N`,
+  when the three are constants and nothing wraps at 16 bits. Then a text
+  rule of the emitter's peephole stage (`peephole_loop_x`) keeps that
+  counter in X across a loop whose body has no call and does not write X:
+  `ldx / cpx` on the way in, `inx` as the step, `cpx` at the bottom.
+  `for (k = 0; k < 1920; k++) layer.w[k] = 0`, 10 instructions and 231
+  master cycles a word before: 5 instructions, 126 a word. sdkbench total 129.57 M → 128.77 M master cycles (−0.6 %; −60.5 % against
+  PVSnesLib); `copy` −17 %, `decimal` −10 %, `sieve` −7 %.
+  `QBE_NO_IVAR=1` and `QBE_NO_PEEP_LOOPX=1` switch each off.
+- perf(lib): **the hardware multiply and divide helpers wait the time the
+  unit needs, not twice it.** The product is complete 8 CPU cycles after
+  the write of `$4203`, the quotient 16 after `$4206` (anomie-regs; luna
+  models it one bit per cycle since its `64c771d`, and a probe reads a
+  wrong high byte at 7 and the right one at 8). `tcc_mul16` waited 14
+  cycles on each of its three products, `tcc_div16` 22, `tcc_mul32`,
+  `fixMul`, `fixLerp` and the `fixed32` products 13 to 15: now 10, 18 and
+  11, one `nop` of margin kept over the figure. The products are also
+  ordered so that two in a row share the WRMPYA operand, which the unit
+  does not alter, and the second does not rewrite `$4202`. Per call:
+  `tcc_mul16` −20 cycles, `tcc_mul32` −76, `fixMul` −26, `fixLerp` −13,
+  `tcc_div16` −4. Judged by the library tests and the differential hunts
+  run on that luna binary; the pinned 1.38.0 returns the product at once
+  and cannot tell a short wait from a long one.
+- perf(runtime,lib): **the NMI sends only the text that changed.** The
+  tilemap flush DMAed all 2048 bytes of the text buffer at every VBlank
+  that followed a write — 16,384 master cycles, above the 12,000 of the
+  NMI budget, for a counter that changes one row. The text writers
+  (`textPutChar`, `textPrint` and its run, `textClear`, `textClearRect`)
+  now keep the range of bytes written since the last flush
+  (`tilemap_dirty_lo` / `_hi`, next to `tilemap_src_addr` in `crt0.asm`),
+  and the flush sends that range to the matching VRAM address.
+  `textFlush()` keeps its contract for a buffer written by hand: it marks
+  the whole buffer. Measured on luna, frames 60-300: `basics/timer`'s
+  flush 17,650 to 3,400 master cycles a frame (its active frame -21 %),
+  `input/controller`'s 17,650 to 1,350 (-40 %); the timer manifest now
+  caps the VBlank DMA at 1,024 bytes a frame, which the ROM built before
+  fails.
+- perf(lib): **`oamDrawMetasprite` is assembly** (`lib/source/sprite_meta.asm`;
+  header unchanged). It was compiled C calling `oamSet()` and
+  `oamSetSize()` for every piece — the library's heaviest function in a
+  profile of the whole corpus (2.6 % of its work, two examples). The loop
+  now writes a piece's four bytes and two high-table bits itself, and
+  keeps every rule of the C version: the frame ends at dx = -128 or at id
+  128, a piece outside x -63..255 or y -63..239 is skipped without an id,
+  a piece naming no palette takes the style's, the tile's bit 8 goes to
+  the attribute, a flip mirrors the piece in the style's box and toggles
+  its own bit, `oam_max_id` and `oam_update_flag` are kept. Measured on
+  luna, frames 60-300: `examples/sprites/metasprite` 61,460 to 27,470
+  master cycles a frame for its draw (the function and the two setters it
+  called), `examples/sprites/aseprite_pipeline` 30,220 to 15,930. Five
+  libtests pin the edges (clipping bounds, the palette default and tile
+  bit 8, x bit 8 and the size bit, a vertical flip, the full table).
+- perf(compiler): **a loop tests its condition at the bottom, and its body
+  does not reload the index.** A block that ended in a jump back to a
+  condition (`for`, `while`) now carries a copy of the compare and branch:
+  one `jmp` less every turn. And a load at a block's entry is dropped when
+  every way in has just loaded or stored the same slot — the body of a
+  loop right after its compare. `for (k = 0; k < n; k++) t[k] = 0;` goes
+  from 36 to 29 CPU cycles a turn. Measured: the 21 workloads of
+  `make bench-sdk` 71,711,592 to 68,797,694 master cycles (-4.1 %; switch
+  -14.6 %, sieve -14.0 %, copy -13.2 %, none slower), code 9,348 to 9,608 bytes (+2.8 %: the
+  copied test); the library bench is now at or under PVSnesLib on its 14
+  rows (`dma`, the last tie above, is at -0.1 %). The static count of
+  `make bench` reads 1,238 for 1,236: it adds up the text of a function
+  once, and a loop now has its test twice. QBE
+  `fbdda87`; `QBE_NO_ROTATE=1`, `QBE_NO_PEEP_ENTRY=1` turn each rule off.
+- perf(compiler): **a `switch` skips a test it does not need.** The case
+  search is a tree of "equal? below?" tests; a case reached with the value
+  just below and the value just above already ruled out can only be that
+  value, and is entered without a compare (upstream cproc `863e1e7`).
+  Measured on `devtools/sdkbench`: `switch` -3.1 %, `state` -2.7 %, the
+  other nineteen workloads unchanged; 85 bytes less code over the bench.
+- perf(compiler): **the scaled index of an array access is computed once,
+  not in front of every access.** In a loop over parallel arrays
+  (`x[i]`, `y[i]`, `dx[i]`…), each load and each store carried its own
+  `i * 2` (`lda i / asl a / tax`), a dozen per iteration in such a
+  loop. The pass that moves an address next to its
+  access (where it becomes the addressing mode) also copied the address's
+  operands; it no longer does. On the benchmark against PVSnesLib:
+  -52.9 % -> -53.9 % in cycles and -38.4 % -> -39.8 % in size over the
+  same twenty workloads (`physics` -59.6 % -> -65.8 %, `collide`
+  -41.9 % -> -46.2 %), nothing slower. `QBE_SINK_DEEP=1` restores the
+  copies (compiler check `index_once`).
+
+- perf(compiler): **a loop variable is updated in place.** A variable
+  that changes around a loop (`i++`, `acc += x`, a value one arm of an
+  `if` replaces) had two slots, the value of this turn and the next one,
+  and every turn ended by copying one to the other. They share a slot
+  when nothing else needs both: `i++` is `lda S / inc a / sta S`, the
+  jump back copies nothing, and an `if` that changes an accumulator
+  writes the accumulator. Against PVSnesLib over the twenty-one
+  workloads: -54.1 % -> -57.0 % in cycles, -43.7 % -> -47.3 % in size;
+  the static table goes from 1270 to 1258 cycles (`loop_sum` 81 -> 73,
+  `byte_store_loop` 100 -> 96); every row of the library bench stays
+  ahead. Four free-running examples show the same pictures one to seven
+  frames earlier (shorter boot). `QBE_NO_PHI_SHARE=1` and
+  `QBE_NO_OPND_SHARE=1` turn the two halves off (compiler check
+  `phi_share`).
+
+- perf(compiler): **a last pass over the generated code writes four
+  shorter forms**: an index kept in a slot goes straight to X
+  (`ldx.b S` for `lda.b S / tax`), a store of 0 is one `stz`, a counter is
+  one `inc` or `dec` of its slot, and a constant stored to several places
+  is loaded once. Against
+  PVSnesLib over the twenty-one workloads: -57.3 % -> -58.4 % in cycles,
+  -47.3 % -> -50.5 % in size (half the bytes); the static table goes from
+  1258 to 1236 cycles. On the library bench the `dma` row, a tie since the
+  first day, reads +0.1 % (nine master cycles in 17,900): the bench times
+  a loop with the call against the same loop empty, and this pass helps
+  the empty loop more. `QBE_NO_PEEP_LATE=1` turns it off (compiler check
+  `peep_late`).
+
+- perf(compiler): **three things about where a function keeps its values**:
+  - a store to a direct-page slot that nothing reads afterwards is removed
+    **across branches**. In a large function every slot is shared by
+    several values and the older rule ("nobody in the function reads this
+    slot") no longer fired;
+  - the sixteen direct-page words of a function go to its **costliest**
+    values (uses weighted by loop depth), not to the first ones it
+    computes;
+  - a `static` function with one call site is poured into its caller even
+    when it calls nothing and the caller still calls something else. The
+    rule that refused that case, written the same morning, had become a
+    loss, and it evicted a hot function the day its caller gained one
+    cold call.
+  Against PVSnesLib over
+  the twenty-one workloads: -58.4 % -> -60.1 % in cycles, -50.5 % ->
+  -52.3 % in size (`depot` -57.4 % -> -60.0 %). `QBE_NO_PEEP_FLOW=1`,
+  `QBE_SLOT_ORDER=def` and `CC_INLINE_LEAF_MAX=16` restore each (compiler
+  checks `peep_flow`, `auto_inline`).
+
+- perf(lib): **`textPrint()` writes a run of characters in assembly.**
+  The run loop was compiled C, about 170 master cycles a character; it is
+  now `asm_textRun` (internal), which reads the string through its far
+  pointer and stops at a control character, a byte of 128 or more, or
+  column 31, exactly where the C loop did. Measured on
+  `examples/basics/timer`, which prints its counters every frame: 91,387
+  to 60,046 active master cycles a frame (-34 %). The `text` row of
+  `devtools/libbench` (20 characters printed and shown) goes from 59,684
+  to 32,316, against 84,676 for PVSnesLib. Line breaks, wrapping
+  and the bytes outside the font still go through the C around it.
+- perf(lib): **`textPrintU16()` no longer divides.** It made three
+  divisions a digit, two of them by a divisor above 255 that the hardware
+  divider does not take: about 45,000 master cycles for one number, an
+  eighth of a frame for a score. Digits come by subtraction now and go to
+  the text buffer in one run. `examples/basics/timer`, which prints one
+  counter a frame: 132,211 master cycles of work a frame to 93,849;
+  `examples/basics/aim_target`, which redraws seven numbers when its
+  target moves, updates every frame instead of every other one.
+- perf(runtime): **a 32-bit division or remainder is about four times
+  faster.** Both entries ran 32 turns of a 64-bit shift and a 32-bit trial
+  subtraction whatever the operands. They share a core now: a divisor
+  under 65,536 is divided word by word with the remainder in the
+  accumulator, and the first word is skipped when the quotient fits 16
+  bits; a wider divisor needs 16 turns. Same results, division by zero included (quotient $FFFFFFFF,
+  remainder the dividend).
+- perf(lib): **`audioLoadSample()` is 2.7 times faster.** The stream to
+  the sound CPU goes three bytes an exchange instead of one, with the CPU
+  side in assembly (`audio_stream.asm`) and the driver's receive loop
+  rewritten: 650 master cycles a byte instead of 1,766 on
+  `examples/audio/soundboard` (18 KB of samples: 31.7 M to 11.7 M).
+- perf(lib): **an audio command no longer waits for its own
+  acknowledgement.** Volume, pitch, envelope, key on and key off return as
+  soon as they are sent; the next command waits, before writing, for the
+  one before, and `audioPlaySampleOn()` sends only what changes: a voice
+  replayed at the same volume and pitch is one command instead of four.
+  Measured on `examples/audio/soundboard`, five notes on fresh voices: the
+  time spent sending goes from 60,946 to 41,894 master cycles; a voice in
+  vibrato, one command a frame, is the case that gains most. **A
+  return code
+  changes meaning**: `AUDIO_ERR_TIMEOUT` from one of these functions now
+  reports the command BEFORE it. Loading a sample, `audioSetEcho()` and
+  the functions that read a state back are synchronous as before.
+
+### Fixed
+- docs: `KNOWN_LIMITATIONS.md` has its "Sprite palettes start at CGRAM offset
+  128" heading back — the identifier-length entry of 2026-10-12 had replaced
+  it instead of sitting above it — and a 🟢 entry for the compiler refusing a
+  local that is read before any store (`slot %.1 is read but never stored
+  to`: right, but the message names an IR slot, not the variable).
+- fix(compiler): **a compiler message names your C file, not a temporary
+  file.** The driver runs QBE on a temporary IR file, and every message
+  from that stage read `qbe:/tmp/cc65816_ir.XXXXXX:5803: …` — a path that
+  no longer exists when you read it. It now reads `qbe:main.c (IR line
+  5803): …` (the IR line stays: `CC65816_KEEP_IR` saves the file it counts
+  in). And a C identifier longer than the 79 characters QBE names allow
+  is refused with the limit and the start of the name, where the message
+  was "identifier too long" alone (negative check `identifier_too_long`).
+- fix(compiler): **`(c ? 1L : 0L) % d` stopped the compiler with an
+  internal error.** A 32-bit divide or remainder whose first operand is a
+  condition used as a value ("%x has no stack slot and is read from the
+  stack"): the four 32-bit operations read that operand from the stack
+  after pushing the second, and one rule assumed it was still in A. A
+  refusal, never wrong code. Found by the differential hunt on the loop
+  change above (seed 364296 of `difftest_stmt.py`; the compiler before it
+  stopped on the same program). Check `div32_cond_operand`.
+- fix(compiler): **a string literal is `const char[]`.** A literal is ROM
+  data in a bank the linker picks, and only a read through a `const`
+  pointee is a far read. C types a literal `char[]`, so a literal handed
+  to a plain `char *` (`void f(char *s)` called with `"WXYZ"`) was read
+  from bank $00 at run time: a wrong byte, no diagnostic, and the link
+  guard said OK because no symbol is named in such a read. Typed `const`,
+  as in C++:
+  - `char *p = "abc";` and a literal passed to a `char *` parameter are
+    **refused** ("assignment to pointer discards qualifiers"): declare the
+    pointer `const char *`. The library and the 86 examples needed no
+    change;
+  - `"0123456789ABCDEF"[n]` now compiles to a far read (the link refused
+    it, with a message that blamed the C), and `*"a"` compiles (it stopped
+    the compiler on "unimplemented expression");
+  - a store to a literal (`"abc"[0] = 'x'`, which did nothing at run
+    time) is refused;
+  - `char a[] = "abc";` and tables of `const char *` are unchanged.
+- fix(compiler): five fixes taken from upstream cproc after a review of
+  its 97 commits since our fork point. Two programs that stopped the
+  compiler on an internal error now get a diagnostic (a struct assigned
+  to an int; a flexible array member given an initialiser); two invalid
+  declarations are refused instead of accepted (`int restrict r;`,
+  qualifiers inside a nested array parameter); the message for a `for`
+  without its parenthesis no longer says "while". The review is in
+  `.claude/notes/tech/cproc_upstream_review.md`.
+- fix(compiler): **a hex escape stops at the first character that is not
+  a hex digit.** `"\x7Fw"` compiled to one byte, 0xC0, instead of 0x7F
+  followed by `w`: the frontend took every letter a to z for a digit, so
+  the escape ran on through the letters that followed and kept the low
+  byte of the sum. No diagnostic. A string whose escape was followed by a
+  digit, a space, punctuation or the end of the string was right; one
+  followed by a letter from g to z (or G to Z) was wrong. Inherited from
+  upstream cproc (in on 2026-04-24, fixed there on 2026-05-02). Compiler
+  check `hex_escape_stops`.
+- fix(build): `make clean` in the SDK, or `make` in a project, no longer
+  waits for ever when `bin/` holds no compiler and the standard input is
+  not a terminal nor closed (a job started in the background):
+  the checksum of the compiler binaries was `cksum` with no file to read,
+  which reads its standard input. It now reads `/dev/null`.
+- fix(lib): **`audioLoadSample()` could time out, and every audio call
+  after it, depending on where the vblank interrupt fell.** At the end of a
+  load the sound driver showed the acknowledgement of the last exchange for
+  about 40 of its cycles only, then its end mark; a console taken by its
+  NMI handler in that window never saw the acknowledgement, gave up, and
+  left the driver waiting for an answer that no later command gives. Rare
+  with a short handler, more likely the longer the
+  handler. The end of the stream is rewritten so that every value one side
+  waits for is held by the other until answered. Present since the audio
+  module's rewrite.
+- fix(compiler): **`(u8)v` after a loop that shifts a signed char right
+  kept the sign's high byte** (silent). `v >>= n` in a loop on an `s8`,
+  then `(u8)v` used in a 16-bit or 32-bit expression: the mask of the
+  cast was dropped, so a negative `v` gave 0xFFxx where 0x00xx was
+  expected. The width analysis inherited from QBE assumed "fits 8 bits"
+  while going round the loop and reused the assumption for a narrower
+  question. Found by the differential test on a new seed range (one
+  program in 40,000), fixed in `copy.c`; compiler check `width_cycle`.
+
+- fix(compiler): **a shift by a constant count narrowed by a cast gave 0**
+  (silent). `x >> (s16)(3 + 0x20000000UL)` shifts by 3; the count reached
+  the code generator un-narrowed, 536870915, and was read as "16 or more".
+  A count held in a variable was right. Found by the differential test
+  (three expressions in 144,000), fixed in `w65816/isel.c`; compiler check
+  `shift_count_word`.
+
+- fix(compiler): **a `RAM_CODE` function could be inlined into a caller
+  in ROM** (silent). A `static` function marked `RAM_CODE` (`__ramcode`:
+  code that must run from the RAM window while a coprocessor owns the ROM)
+  with one call site was a candidate for whole-function inlining like any
+  other, and its body then ran from wherever the caller was. A function
+  with a section of its own is never copied into a caller any more. Found
+  by the Super FX library test ROM, which stopped finishing when another
+  rule stopped hiding the case; compiler check `ramcode_not_inlined`.
+- fix(examples): **tetris enabled its gradient HDMA in mid-frame**, by a
+  raw write to `$420C`, without the channel's table address and line
+  counter being set (the hardware loads them at the start of a frame
+  only). For the rest of that frame the channel wrote to CGADD / CGDATA
+  whatever those registers pointed at — a few palette entries took values
+  from the direct page, the same at every boot, on colours the screen
+  does not show. A compiler change moved what the direct page held and
+  the playfield border turned green. It now goes through `hdmaSetup()` /
+  `hdmaEnable()`, in VBlank; no other example writes `$420C` by hand.
+
+### Changed
+- test: the libtests ROM runs 4 M instructions (3 M before): the glyph
+  reference written in C on far pointers needs the fourth.
+- fix(examples,docs): **no example sets HDMA on channel 0 any more.** Four
+  did (`hdma_wave`'s hand-built table, `hdma_indirect_gradient`,
+  `window_multi_hdma`, `perspective_rotate`'s four channels 0-3), and
+  channel 0 is the DMA helpers': `dmaCopyVram` and friends rewrite its
+  registers at every call, so an HDMA armed there breaks at the next
+  transfer — the examples only worked because they transfer before they
+  arm. They use channels 2 to 5 now; `hdma.h` says why 0 and 1 (the
+  NMI's text flush) are taken and 7 (the OAM upload) forbidden; the four
+  manifests pin the new masks and the tutorials follow.
+- refactor(lib): **the audio module's sample table leaves the plain RAM
+  band.** `sample_mirror` (64 samples, 512 bytes, reached only by name in
+  `audio.c`) is `FAR`: a ROM that links `audio` gets 512 bytes back below
+  `$2000`, where plain C variables and the stack live
+  (`examples/audio/echo`: 1,550 to 1,038 bytes used; its free figure goes
+  from 6,496 to 6,880, since the band is counted from its highest section
+  and the OAM table is fixed at `$0300`). Header unchanged. Audio: `echo` re-captured (`luna
+  diff --audio --align-onset`: MATCH, max delta 0.08 %, shift 2 samples).
+- test(bench): the benchmark against PVSnesLib gains a twenty-first
+  workload, `depot`: eighteen agents in two crews, thirty bursts of
+  sixteen decisions — parallel arrays indexed by the agent, small helpers
+  called from loops, values live across a call, a table indexed by
+  row * 9 + column, 32-bit sums in two halves. OpenSNES: -54.7 % cycles, -49.8 % size.
+  With it the total reads -54.1 % and -43.7 % (`docs/BENCHMARK.md`).
+- test(bench): the `dist` workload is rewritten: every point of one group
+  against every point of another, with the textbook "larger side plus
+  three eighths of the smaller" for the distance. Same shape
+  (nested loop, two absolute values, a static function with one call
+  site): -66.2 % cycles, -47.6 % size. Total over the twenty-one
+  workloads: -57.3 % and -47.3 %.
+
 ## [0.49.0] — 2026-10-10
 
 The release that carries the API meant for 1.0, without being 1.0. Against

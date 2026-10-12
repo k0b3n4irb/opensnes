@@ -20,6 +20,7 @@ extern const unsigned char opensnes_font_2bpp[];
 /* Assembly helpers for performance-critical operations (text.asm) */
 extern void asm_textDMAFont(void);
 extern void asm_textFillBuffer(u16 value);
+extern u16 asm_textRun(const char *str, u16 cell, u16 font, u16 attr, u16 maxn);
 
 /* Tilemap DMA function (defined in crt0.asm) */
 extern void tilemapFlush(void);
@@ -34,6 +35,17 @@ u8 tilemapBuffer[2048];
 extern volatile u8 tilemap_update_flag;
 extern u16 tilemap_vram_addr;
 extern u16 tilemap_src_addr;
+/* The bytes of tilemapBuffer written since the NMI's last flush: it sends
+ * [lo, hi) and resets them (lo = 0xFFFF, hi = 0). Every writer widens the
+ * range; textFlush() marks the whole buffer (since 2026-10-12; 2048 bytes
+ * went every time until then). */
+extern u16 tilemap_dirty_lo;
+extern u16 tilemap_dirty_hi;
+
+static void text_dirty(u16 lo, u16 hi) {
+    if (lo < tilemap_dirty_lo) tilemap_dirty_lo = lo;
+    if (hi > tilemap_dirty_hi) tilemap_dirty_hi = hi;
+}
 
 /* Font size constants */
 #define FONT_SIZE 1536  /* 96 chars * 16 bytes per tile */
@@ -78,6 +90,7 @@ static void buffer_write_entry(u8 x, u8 y, u16 entry) {
     u16 buf_offset = ((u16)y * text_config.map_width + x) * 2;
     tilemapBuffer[buf_offset]     = entry & 0xFF;
     tilemapBuffer[buf_offset + 1] = entry >> 8;
+    text_dirty(buf_offset, buf_offset + 2);
 }
 
 void textInit(u16 tilemap_addr, u16 font_tile, u8 palette) {
@@ -160,14 +173,16 @@ void textPutChar(char c) {
 }
 
 void textPrint(const char *str) {
-    /* A run of printable characters that stays on its row is written here,
-     * with the buffer position computed once; a newline, a carriage return,
-     * a character the font does not have and the last column (which wraps)
-     * go through textPutChar(). Until 2026-10-09 every character did: three
-     * calls and a multiply each. The map is 32 columns wide (text.h). */
+    /* A run of printable characters that stays on its row is written by
+     * asm_textRun(), with the buffer position computed once; a newline, a
+     * carriage return, a character the font does not have and the last
+     * column (which wraps) go through textPutChar(). Until 2026-10-09 every
+     * character did: three calls and a multiply each. The run was a C loop
+     * until 2026-10-11, about 170 cycles a character. The map is 32
+     * columns wide (text.h). */
     u16 attr = ((u16)text_config.palette << 10) | ((u16)text_config.priority << 13);
     u16 font = text_config.font_tile - 32;
-    u16 *cell;
+    u16 n;
     u8 x;
     u8 c = (u8)*str;
 
@@ -178,14 +193,12 @@ void textPrint(const char *str) {
             c = (u8)*++str;
             continue;
         }
-        cell = (u16 *)(tilemapBuffer + ((((u16)text_cursor_y << 5) + x) << 1));
-        do {
-            *cell++ = (font + c) | attr;
-            x++;
-            c = (u8)*++str;
-        } while (c >= 32 && c <= 127 && x < 31);
-        text_cursor_x = x;
+        n = asm_textRun(str, (u16)((((u16)text_cursor_y << 5) + x) << 1),
+                        font, attr, (u16)(31 - x));
+        str += n;
+        text_cursor_x = (u8)(x + n);
         tilemap_update_flag = 1;
+        c = (u8)*str;
     }
 }
 
@@ -194,26 +207,29 @@ void textPrintAt(u8 x, u8 y, const char *str) {
     textPrint(str);
 }
 
-void textPrintU16(u16 value) {
-    /* Print most-significant digit first, no reversed stack buffer / pointer.
-     * (The reversed-buffer form miscompiled under some link layouts — see
-     * .claude/notes/tech/textprintu16_codegen_hang.md.) */
-    u16 place = 10000;
-    u8 started = 0;
+/* One decimal digit of textPrintU16: how many times P goes into the value. */
+#define U16_DIGIT(P) \
+    d = 0; \
+    while (value >= (P)) { value = (u16)(value - (P)); d++; } \
+    if (d != 0 || n != 0) { buf[n] = (char)('0' + d); n++; }
 
-    if (value == 0) {
-        textPutChar('0');
-        return;
-    }
-    while (place > 0) {
-        u8 digit = (u8)(value / place);
-        if (digit != 0 || started) {
-            textPutChar((char)('0' + digit));
-            started = 1;
-        }
-        value = (u16)(value % place);
-        place = (u16)(place / 10);
-    }
+void textPrintU16(u16 value) {
+    /* Digits by subtraction, most significant first, into a buffer handed
+     * to textPrint() once. Until 2026-10-11 this divided: three divisions
+     * a digit, two of them by a divisor above 255 that the hardware
+     * divider does not take — about 45,000 master cycles for one number, an
+     * eighth of a frame for a score. At most nine subtractions a digit. */
+    char buf[6];
+    u8 n = 0;
+    u8 d;
+
+    U16_DIGIT(10000)
+    U16_DIGIT(1000)
+    U16_DIGIT(100)
+    U16_DIGIT(10)
+    buf[n] = (char)('0' + (u8)value);
+    buf[n + 1] = '\0';
+    textPrint(buf);
 }
 
 void textPrintHex(u16 value, u8 digits) {
@@ -259,6 +275,12 @@ static void textFillRect(u8 x, u8 y, u8 w, u8 h, char c) {
     if ((u16)x + w > text_config.map_width) w = text_config.map_width - x;
     if ((u16)y + h > TEXT_MAP_ROWS)         h = TEXT_MAP_ROWS - y;
 
+    if (w == 0 || h == 0) return;
+    /* the range sent: from the first cell to one past the last, whole rows
+     * in between (they hold what they hold; sending them changes nothing) */
+    text_dirty(((u16)y * text_config.map_width + x) * 2,
+               ((u16)(y + h - 1) * text_config.map_width + x + w) * 2);
+
     /* Compute offset once per row, increment in inner loop */
     for (row = 0; row < h; row++) {
         row_offset = ((u16)(y + row) * text_config.map_width + x) * 2;
@@ -277,9 +299,11 @@ void textClearRect(u8 x, u8 y, u8 w, u8 h) {
 }
 
 void textFlush(void) {
-    /* Set flag for NMI handler to DMA during next VBlank.
-     * This is safe to call anytime — the actual VRAM write
-     * happens during VBlank when VRAM access is allowed. */
+    /* The whole buffer: the caller wrote it directly, nothing tracked the
+     * range. Then the flag: the NMI DMAs it during the next VBlank, when
+     * VRAM may be written. */
+    tilemap_dirty_lo = 0;
+    tilemap_dirty_hi = 2048;
     tilemap_update_flag = 1;
 }
 

@@ -173,6 +173,29 @@ void w_long(void) {
     res = (u16)(h ^ (h >> 16));
 }
 
+/* 7b. 32-bit division: a pitch, a distance, a score, each divided by a
+ * 16-bit value computed at run time (u32 / u16, what tcc_udivmod32 serves),
+ * and a few u32 / u32. */
+void w_div32(void) {
+    u32 x, h, q;
+    u16 i, d;
+    x = 12345;
+    h = 0;
+    for (i = 0; i < 200; i++) {
+        x = x * 1664525 + 1013904223;
+        d = (u16)((x >> 7) | 1);
+        q = x / d;
+        h += q;
+        q = (x >> 3) / (u16)(i + 3);
+        h ^= q;
+        if ((i & 7) == 0) {
+            q = x / (h | 0x10000UL);
+            h += q;
+        }
+    }
+    res = (u16)(h ^ (h >> 16));
+}
+
 /* 8. byte buffers: fill, copy, compare, scan */
 void w_bytes(void) {
     u16 i, pass, sum;
@@ -435,29 +458,25 @@ void w_place(void) {
     res = acc;
 }
 
-/* Every player of one team against every player of the other (issue #166,
- * from the same game): a nested loop, the index rebuilt in each block, two
- * absolute values and a static function with one call site. distances() and
- * vectorLength() are the issue's functions, unchanged but for the names of
- * the tables. */
-static s16 dpx[18];
-static s16 dpy[18];
-static s16 dpoff[18];
+/* Every point of one group against every point of the other: a nested
+ * loop, the index rebuilt in each block, two absolute values and a static
+ * function with one call site (the shape issue #166 asked the compiler to
+ * handle). The distance is the textbook "larger side plus three eighths of
+ * the smaller", and each target has a radius taken off the result. */
+static s16 gx[18];              /* nine points of group A, then nine of B */
+static s16 gy[18];
+static u16 gradius[18];
 static u16 dist_flat[81];
 
-/* length of (a, b) without a square root */
-static u16 vectorLength(u16 a, u16 b) {
-    u16 r;
+/* about the length of (a, b), no square root: max + 3/8 min */
+static u16 approxDist(u16 a, u16 b) {
+    u16 mx = a, mn = b;
 
     if (a < b) {
-        r = a;
-        a = b;
-        b = r;
+        mx = b;
+        mn = a;
     }
-    r = a + (b >> 1);
-    if (r < (b << 1)) return r - (b >> 3);
-    if (r < (b << 2)) return r - (b >> 2);
-    return r - ((b >> 2) + (b >> 3));
+    return mx + (mn >> 2) + (mn >> 3);
 }
 
 static void distances(void) {
@@ -465,12 +484,14 @@ static void distances(void) {
 
     for (i = 0; i < 9; i++) {
         for (j = 0; j < 9; j++) {
-            s16 dx = dpx[i] - dpx[j + 9];
-            s16 dy = dpy[i] - dpy[j + 9] - dpoff[j + 9];
+            s16 dx = gx[i] - gx[j + 9];
+            s16 dy = gy[i] - gy[j + 9];
+            u16 d;
 
             if (dx < 0) dx = -dx;
             if (dy < 0) dy = -dy;
-            dist_flat[i * 9 + j] = vectorLength(dx, dy);
+            d = approxDist(dx, dy);
+            dist_flat[i * 9 + j] = d > gradius[j + 9] ? d - gradius[j + 9] : 0;
         }
     }
 }
@@ -478,18 +499,594 @@ static void distances(void) {
 void w_dist(void) {
     u16 i, n, acc;
     for (i = 0; i < 18; i++) {
-        dpx[i] = (s16)(i * 37) - 200;
-        dpy[i] = (s16)(i * 53) - 300;
-        dpoff[i] = i & 7;
+        gx[i] = (s16)(i * 37) - 200;
+        gy[i] = (s16)(i * 53) - 300;
+        gradius[i] = i & 7;
     }
     acc = 0;
     for (n = 0; n < 40; n++) {
-        dpx[n % 18] += 7;
-        dpy[(n * 5) % 18] -= 3;
+        gx[n % 18] += 7;
+        gy[(n * 5) % 18] -= 3;
         distances();
         acc += dist_flat[n % 81];
     }
     for (i = 0; i < 81; i++) acc ^= dist_flat[i] + i;
+    res = acc;
+}
+
+/* ---- depot: a burst of decisions by eighteen agents -----------------------
+ * Two crews of nine carts in a depot of 512 x 960; every few ticks the
+ * sixteen that are not leaders decide where to go, all on the same tick.
+ * That burst is the workload: 30 of them, 480 decisions.
+ *
+ *   decide -> crowd       a rival within arm's length? sidestep or chase
+ *          -> intruder    sometimes: shadow the rival nearest my bay's middle
+ *          -> slotFor     else a slot relative to my leader, from a table of
+ *                         6 rows x 9 columns
+ *          -> depart -> bearing, steer
+ *
+ * The shape per-entity C code spends its time on: one
+ * global array per field indexed by the agent, small helpers called from
+ * loops, values live across a call, signed compares, a table indexed by
+ * row * 9 + column, 32-bit sums kept in two 16-bit halves with the carry
+ * rebuilt by a compare. Expected: res = 0xD31F (the same file built
+ * natively). */
+#define NA          18
+#define CREW        9
+#define NONE        0xFFFF
+#define ROWS        6
+#define COLS        9
+#define STILL       8       /* no heading: already there */
+
+#define ARM         24      /* a rival this close is in the way */
+#define SNAP        4
+#define DEPOT_W     512
+#define DEPOT_H     960
+
+#define TASK_IDLE   0
+#define TASK_ROLL   1
+#define TASK_CHASE  2
+#define TASK_DODGE  3
+
+static s16 px[NA];
+static s16 py[NA];
+static s16 vx[NA];
+static s16 vy[NA];
+static s16 wx[NA];              /* waypoint */
+static s16 wy[NA];
+static u16 heading[NA];         /* 0 = north, then clockwise */
+static u16 wait[NA];            /* ticks before the next decision */
+static u16 task[NA];
+static u16 busy[NA];
+static u16 dice[NA];            /* byte drawn at each decision */
+
+static s16 bay_x0[NA];
+static s16 bay_x1[NA];
+static s16 bay_y0[NA];
+static s16 bay_y1[NA];
+static u16 rank[NA];            /* row of the slot table */
+static u16 nerve[NA];           /* 0 to 255: how readily it leaves its slot */
+static u16 range[NA];           /* how far it looks for an intruder */
+static u16 lead[NA];            /* look-ahead shift on the other's velocity */
+static u16 pace[NA];            /* 0 to 7 */
+
+static s16 slot_x[ROWS * COLS];
+static s16 slot_y[ROWS * COLS];
+static s16 step_x[64];          /* pace * 8 + heading */
+static s16 step_y[64];
+
+/* (sign of dy + 1) * 3 + sign of dx + 1 -> heading */
+static const u16 compass[9] = { 7, 0, 1, 6, STILL, 2, 5, 4, 3 };
+
+static u16 leader[2];
+static u16 load;                /* the cart that carries the load, or NONE */
+static s16 aim_x, aim_y;        /* point being worked out */
+static u16 mix_hi, mix_lo;      /* 32-bit state of the dice */
+static u16 odo_hi, odo_lo;      /* 32-bit sum of the distances decided */
+
+/* Distance between two offsets, without a square root: the longer side plus
+ * half the shorter. */
+static u16 gap(s16 dx, s16 dy) {
+    u16 a = (dx < 0) ? -dx : dx;
+    u16 b = (dy < 0) ? -dy : dy;
+
+    if (a < b) return b + (a >> 1);
+    return a + (b >> 1);
+}
+
+/* One byte of dice: a 32-bit add in two halves, the carry rebuilt by a
+ * compare, then the halves stirred into each other. */
+static u16 shake(void) {
+    u16 lo = mix_lo + 0x9E37;
+    u16 carry = lo < mix_lo;
+    u16 hi = mix_hi + 0x79B9 + carry;
+
+    mix_lo = lo ^ (hi >> 3);
+    mix_hi = hi ^ (u16)(lo << 5);
+    return (mix_hi ^ mix_lo) & 0xFF;
+}
+
+static void tally(u16 d) {
+    u16 sum = odo_lo + d;
+
+    if (sum < odo_lo) odo_hi++;
+    odo_lo = sum;
+}
+
+static void clampX(u16 id) {
+    if (aim_x < bay_x0[id]) aim_x = bay_x0[id];
+    else if (aim_x > bay_x1[id]) aim_x = bay_x1[id];
+}
+
+static void clampY(u16 id) {
+    if (aim_y < bay_y0[id]) aim_y = bay_y0[id];
+    else if (aim_y > bay_y1[id]) aim_y = bay_y1[id];
+}
+
+/* Heading from a cart to a point: an axis counts only if its offset is more
+ * than a quarter of the other one. */
+static u16 bearing(u16 id, s16 x, s16 y) {
+    s16 dx = x - px[id];
+    s16 dy = y - py[id];
+    s16 ax = (dx < 0) ? -dx : dx;
+    s16 ay = (dy < 0) ? -dy : dy;
+    u16 at = 4;
+
+    if (ax < SNAP && ay < SNAP) return STILL;
+    if (ay > (ax >> 2)) at = (dy < 0) ? 1 : 7;
+    if (ax > (ay >> 2)) at += (dx < 0) ? -1 : 1;
+    return compass[at];
+}
+
+static void halt(u16 id) {
+    vx[id] = 0;
+    vy[id] = 0;
+    task[id] = TASK_IDLE;
+}
+
+/* Take a heading: velocity from the table, and an axis already within reach
+ * of the waypoint is put on it. */
+static u16 steer(u16 id, u16 h) {
+    u16 at;
+    s16 d;
+
+    if (h == STILL) {
+        halt(id);
+        return 0;
+    }
+    heading[id] = h;
+    at = (pace[id] << 3) + h;
+    vx[id] = step_x[at];
+    vy[id] = step_y[at];
+    d = wx[id] - px[id];
+    if (d < 0) d = -d;
+    if (d < SNAP) {
+        px[id] = wx[id];
+        vx[id] = 0;
+    }
+    d = wy[id] - py[id];
+    if (d < 0) d = -d;
+    if (d < SNAP) {
+        py[id] = wy[id];
+        vy[id] = 0;
+    }
+    return 1;
+}
+
+/* Go to the point worked out, kept inside the bay. */
+static void depart(u16 id, u16 what) {
+    clampX(id);
+    clampY(id);
+    wx[id] = aim_x;
+    wy[id] = aim_y;
+    if (steer(id, bearing(id, aim_x, aim_y))) task[id] = what;
+    tally(gap(aim_x - px[id], aim_y - py[id]));
+}
+
+/* Where the other will be, as far ahead as this cart can foresee. */
+static void forecast(u16 id, u16 other) {
+    aim_x = px[other] + (vx[other] << lead[id]);
+    aim_y = py[other] + (vy[other] << lead[id]);
+}
+
+/* Step aside: at right angles to the line between the two carts, on the
+ * side the other is not heading to. */
+static void sidestep(u16 id, u16 other) {
+    s16 dx = px[other] - px[id];
+    s16 dy = py[other] - py[id];
+
+    if (vx[other] + vy[other] < 0) {
+        aim_x = px[id] + dy;
+        aim_y = py[id] - dx;
+    } else {
+        aim_x = px[id] - dy;
+        aim_y = py[id] + dx;
+    }
+}
+
+/* A rival within arm's length: chase it if it carries the load and this cart
+ * has the nerve, otherwise step aside. */
+static u16 crowd(u16 id) {
+    u16 other = (id < CREW) ? CREW : 0;
+    u16 end = other + CREW;
+    s16 dx, dy;
+
+    for (; other < end; other++) {
+        dx = px[other] - px[id];
+        dy = py[other] - py[id];
+        if (dx > ARM || dx < -ARM || dy > ARM || dy < -ARM) continue;
+        if (gap(dx, dy) > ARM) continue;
+        if (other == load && nerve[id] > dice[id]) {
+            forecast(id, other);
+            depart(id, TASK_CHASE);
+        } else {
+            sidestep(id, other);
+            depart(id, TASK_DODGE);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+/* The rival inside this cart's bay that is nearest to the middle of it, if
+ * it is within twice the cart's range. */
+static u16 intruder(u16 id) {
+    u16 other = (id < CREW) ? CREW : 0;
+    u16 end = other + CREW;
+    u16 best = NONE;
+    u16 nearest = range[id] << 1;
+    s16 mx = (bay_x0[id] + bay_x1[id]) >> 1;
+    s16 my = (bay_y0[id] + bay_y1[id]) >> 1;
+    u16 d;
+
+    for (; other < end; other++) {
+        if (busy[other]) continue;
+        if (px[other] < bay_x0[id] || px[other] > bay_x1[id]) continue;
+        if (py[other] < bay_y0[id] || py[other] > bay_y1[id]) continue;
+        d = gap(px[other] - mx, py[other] - my);
+        if (d >= nearest) continue;
+        nearest = d;
+        best = other;
+    }
+    return best;
+}
+
+/* A slot relative to the leader: the row is the cart's rank, the column is
+ * the ninth of the depot the leader stands in. The second crew uses the
+ * table turned half a turn. */
+static void slotFor(u16 id, u16 ref) {
+    s16 x = px[ref];
+    s16 y = py[ref];
+    u16 col = 0;
+    u16 at;
+
+    if (x >= 342) col = 2;
+    else if (x >= 171) col = 1;
+    if (y >= 640) col += 6;
+    else if (y >= 320) col += 3;
+    if (id >= CREW) col = COLS - 1 - col;
+    at = rank[id] * COLS + col;
+    if (id < CREW) {
+        aim_x = x + slot_x[at];
+        aim_y = y + slot_y[at];
+    } else {
+        aim_x = x - slot_x[at];
+        aim_y = y - slot_y[at];
+    }
+    aim_x += vx[ref] << lead[id];
+    aim_y += vy[ref] << lead[id];
+}
+
+static void decide(u16 id) {
+    u16 crew = id >= CREW;
+    u16 ref, other;
+
+    dice[id] = shake();
+    wait[id] = 4 + (pace[id] >> 1);
+    if (busy[id]) return;
+    if (crowd(id)) return;
+    if (dice[id] < nerve[id]) {
+        other = intruder(id);
+        if (other != NONE) {
+            forecast(id, other);
+            depart(id, TASK_CHASE);
+            return;
+        }
+    }
+    ref = leader[crew];
+    slotFor(id, ref);
+    if (rank[id] >= 3 && load != NONE && (load >= CREW) == crew) {
+        /* the front ranks run ahead when their crew carries the load */
+        if (crew) aim_y += 48;
+        else aim_y -= 48;
+    }
+    depart(id, TASK_ROLL);
+}
+
+static void setup(void) {
+    u16 id, n, h;
+    s16 v, w;
+
+    for (id = 0; id < NA; id++) {
+        u16 crew = id >= CREW;
+        u16 k = crew ? id - CREW : id;
+
+        rank[id] = k % ROWS;
+        bay_x0[id] = 16 + (k % 3) * 120;
+        bay_x1[id] = bay_x0[id] + 250;
+        bay_y0[id] = 16 + (k / 3) * 190 + (crew ? 150 : 0);
+        bay_y1[id] = bay_y0[id] + 400;
+        px[id] = bay_x0[id] + 40 + ((id * 37) & 127);
+        py[id] = bay_y0[id] + 60 + ((id * 53) & 255);
+        vx[id] = (s16)(id % 5) - 2;
+        vy[id] = (s16)(id % 7) - 3;
+        wx[id] = px[id];
+        wy[id] = py[id];
+        heading[id] = crew ? 4 : 0;
+        wait[id] = 0;
+        task[id] = TASK_IDLE;
+        busy[id] = 0;
+        dice[id] = 0;
+        nerve[id] = (id * 29 + 40) & 0xFF;
+        range[id] = 60 + (id & 3) * 30;
+        lead[id] = 1 + (id & 1);
+        pace[id] = 3 + (id % 4);
+    }
+    for (n = 0; n < ROWS * COLS; n++) {
+        slot_x[n] = (s16)((n * 23) % 181) - 90;
+        slot_y[n] = (s16)((n * 41) % 221) - 110;
+    }
+    for (n = 0; n < 8; n++) {
+        for (h = 0; h < 8; h++) {
+            v = (h == 1 || h == 2 || h == 3) ? (s16)n : (h == 5 || h == 6 || h == 7) ? -(s16)n : 0;
+            w = (h == 3 || h == 4 || h == 5) ? (s16)n : (h == 7 || h == 0 || h == 1) ? -(s16)n : 0;
+            step_x[(n << 3) + h] = v;
+            step_y[(n << 3) + h] = w;
+        }
+    }
+    mix_hi = 0x2545;
+    mix_lo = 0xF491;
+    odo_hi = 0;
+    odo_lo = 0;
+}
+
+void w_depot(void) {
+    u16 n, id, acc;
+
+    setup();
+    acc = 0;
+    for (n = 0; n < 30; n++) {
+        /* the tick before: everybody rolls, kept inside the depot */
+        for (id = 0; id < NA; id++) {
+            px[id] += vx[id];
+            py[id] += vy[id];
+            if (px[id] < 8) px[id] = 8;
+            else if (px[id] > DEPOT_W - 8) px[id] = DEPOT_W - 8;
+            if (py[id] < 8) py[id] = 8;
+            else if (py[id] > DEPOT_H - 8) py[id] = DEPOT_H - 8;
+            busy[id] = ((id + n * 3) & 15) == 5;
+        }
+        leader[0] = (n & 1) ? 6 : 3;
+        leader[1] = (n & 4) ? 15 : 11;
+        load = (n & 2) ? (n * 7 + 2) % NA : NONE;
+        /* the burst: the sixteen others decide, the crews interleaved */
+        for (id = 0; id < NA; id++) {
+            u16 who = (id & 1) ? (id >> 1) : (id >> 1) + CREW;
+
+            if (who != leader[0] && who != leader[1]) decide(who);
+        }
+        acc += (u16)wx[n % NA] ^ (u16)wy[(n * 5) % NA];
+    }
+    for (id = 0; id < NA; id++)
+        acc ^= (u16)(wx[id] + wy[id]) + (heading[id] << 8) + task[id] + (u16)(vx[id] * 3) + (u16)vy[id] + dice[id] + wait[id] + id;
+    res = acc ^ odo_lo ^ (u16)(odo_hi << 9) ^ mix_hi;
+}
+
+
+/* 23. farfill — a screen of text and bars composed at the pixel into a 2bpp
+ * layer in far RAM, then the same on a near buffer folded on itself: the
+ * cost of a `for` over an index (farClear is the bare loop, 1920 words x 4;
+ * farScreen 96 glyphs and 24 boxes x 4) and of __far addressing; the line
+ * of measure of the compiler's loop work: farClear per word. PVSnesLib has no
+ * far qualifier: the layer is a near array there. */
+#ifndef FAR
+#define FAR
+#endif
+#define FF_TILES       240
+#define FF_COLS        20              /* the layer: 20 x 12 tiles */
+#define FF_ROWS        12
+#define FF_GLYPHS      36
+#define FF_NEAR_TILES  30              /* the near buffer: 20 x 1.5 tiles, folded */
+
+FAR union { u8 b[FF_TILES * 16]; u16 w[FF_TILES * 8]; } far_layer;
+static union { u8 b[FF_NEAR_TILES * 16]; u16 w[FF_NEAR_TILES * 8]; } near_layer;
+
+/* A synthetic font: 36 glyphs of 8 rows x 2 planes, drawn by a formula. */
+static u8 font[FF_GLYPHS * 16];
+
+static void makeFont(void) {
+    u16 g, r;
+
+    for (g = 0; g < FF_GLYPHS; g++)
+        for (r = 0; r < 8; r++) {
+            u8 shape = (u8)(0x7E ^ (g * 37 + r * 11));
+            font[g * 16 + r * 2] = (r == 0 || r == 7) ? 0x7E : (u8)(shape & 0x66);
+            font[g * 16 + r * 2 + 1] = (u8)((shape >> 1) | 0x18);
+        }
+}
+
+static u16 slotOf(u16 col, u16 row) {
+    if (col >= FF_COLS || row >= FF_ROWS) return 0xFFFF;
+    return row * FF_COLS + col;
+}
+
+/* ---- the far pass --------------------------------------------------------- */
+
+void farClear(void) {                 /* not static either: the bare clear loop, far against near */
+    u16 k;
+
+    for (k = 0; k < FF_TILES * 8; k++) far_layer.w[k] = 0;
+}
+
+static void farGlyph(u16 g, u16 x, u16 y) {
+    u16 at = g << 4, col = x >> 3, sh = x & 7, r;
+    u16 row0 = y >> 3;
+    u16 s0 = slotOf(col, row0), s0b = sh ? slotOf(col + 1, row0) : 0xFFFF;
+    u16 s1 = 0xFFFF, s1b = 0xFFFF;
+
+    if (((y + 7) >> 3) != row0) {
+        s1 = slotOf(col, row0 + 1);
+        if (sh) s1b = slotOf(col + 1, row0 + 1);
+    }
+    for (r = 0; r < 8; r++, y++) {
+        u16 first = (y >> 3) == row0, off = (y & 7) << 1;
+        u16 sa = first ? s0 : s1, sb = first ? s0b : s1b;
+        u8 p0 = font[at + (r << 1)], p1 = font[at + (r << 1) + 1];
+        u8 b;
+
+        if (sa != 0xFFFF) {
+            b = (u8)(p0 >> sh); if (b) far_layer.b[(sa << 4) + off] |= b;
+            b = (u8)(p1 >> sh); if (b) far_layer.b[(sa << 4) + off + 1] |= b;
+        }
+        if (sb != 0xFFFF) {
+            b = (u8)(p0 << (8 - sh)); if (b) far_layer.b[(sb << 4) + off] |= b;
+            b = (u8)(p1 << (8 - sh)); if (b) far_layer.b[(sb << 4) + off + 1] |= b;
+        }
+    }
+}
+
+static void farBox(u16 x, u16 w, u16 y, u16 h, u16 c) {
+    u16 x1 = x + w, px = x;
+
+    while (px < x1) {
+        u16 cx = px & ~7, end = cx + 8, slot = 0xFFFF, r, yy;
+        u8 mask;
+
+        if (end > x1) end = x1;
+        mask = (u8)((0xFF >> (px - cx)) & (0xFF << (cx + 8 - end)));
+        for (r = h, yy = y; r; r--, yy++) {
+            u16 at;
+
+            if ((yy & 7) == 0 || yy == y) slot = slotOf(cx >> 3, yy >> 3);
+            if (slot == 0xFFFF) continue;
+            at = (slot << 4) + ((yy & 7) << 1);
+            if (c & 1) far_layer.b[at] |= mask; else far_layer.b[at] &= (u8)~mask;
+            if (c & 2) far_layer.b[at + 1] |= mask; else far_layer.b[at + 1] &= (u8)~mask;
+        }
+        px = end;
+    }
+}
+
+u16 farSum(void) {
+    u16 k, acc = 0;
+
+    for (k = 0; k < FF_TILES * 8; k++) acc = (u16)((acc << 1) | (acc >> 15)) ^ far_layer.w[k];
+    return acc;
+}
+
+/* ---- the near pass: the same code on a near buffer, slots folded ---------- */
+
+void nearClear(void) {
+    u16 k;
+
+    for (k = 0; k < FF_NEAR_TILES * 8; k++) near_layer.w[k] = 0;
+}
+
+static void nearGlyph(u16 g, u16 x, u16 y) {
+    u16 at = g << 4, col = x >> 3, sh = x & 7, r;
+    u16 row0 = y >> 3;
+    u16 s0 = slotOf(col, row0), s0b = sh ? slotOf(col + 1, row0) : 0xFFFF;
+    u16 s1 = 0xFFFF, s1b = 0xFFFF;
+
+    if (((y + 7) >> 3) != row0) {
+        s1 = slotOf(col, row0 + 1);
+        if (sh) s1b = slotOf(col + 1, row0 + 1);
+    }
+    if (s0 != 0xFFFF) s0 %= FF_NEAR_TILES;
+    if (s0b != 0xFFFF) s0b %= FF_NEAR_TILES;
+    if (s1 != 0xFFFF) s1 %= FF_NEAR_TILES;
+    if (s1b != 0xFFFF) s1b %= FF_NEAR_TILES;
+    for (r = 0; r < 8; r++, y++) {
+        u16 first = (y >> 3) == row0, off = (y & 7) << 1;
+        u16 sa = first ? s0 : s1, sb = first ? s0b : s1b;
+        u8 p0 = font[at + (r << 1)], p1 = font[at + (r << 1) + 1];
+        u8 b;
+
+        if (sa != 0xFFFF) {
+            b = (u8)(p0 >> sh); if (b) near_layer.b[(sa << 4) + off] |= b;
+            b = (u8)(p1 >> sh); if (b) near_layer.b[(sa << 4) + off + 1] |= b;
+        }
+        if (sb != 0xFFFF) {
+            b = (u8)(p0 << (8 - sh)); if (b) near_layer.b[(sb << 4) + off] |= b;
+            b = (u8)(p1 << (8 - sh)); if (b) near_layer.b[(sb << 4) + off + 1] |= b;
+        }
+    }
+}
+
+static void nearBox(u16 x, u16 w, u16 y, u16 h, u16 c) {
+    u16 x1 = x + w, px = x;
+
+    while (px < x1) {
+        u16 cx = px & ~7, end = cx + 8, slot = 0xFFFF, r, yy;
+        u8 mask;
+
+        if (end > x1) end = x1;
+        mask = (u8)((0xFF >> (px - cx)) & (0xFF << (cx + 8 - end)));
+        for (r = h, yy = y; r; r--, yy++) {
+            u16 at;
+
+            if ((yy & 7) == 0 || yy == y) {
+                slot = slotOf(cx >> 3, yy >> 3);
+                if (slot != 0xFFFF) slot %= FF_NEAR_TILES;
+            }
+            if (slot == 0xFFFF) continue;
+            at = (slot << 4) + ((yy & 7) << 1);
+            if (c & 1) near_layer.b[at] |= mask; else near_layer.b[at] &= (u8)~mask;
+            if (c & 2) near_layer.b[at + 1] |= mask; else near_layer.b[at + 1] &= (u8)~mask;
+        }
+        px = end;
+    }
+}
+
+u16 nearSum(void) {
+    u16 k, acc = 0;
+
+    for (k = 0; k < FF_NEAR_TILES * 8; k++) acc = (u16)((acc << 1) | (acc >> 15)) ^ near_layer.w[k];
+    return acc;
+}
+
+/* ---- one screen: 96 glyphs at a 6-pixel pitch, 24 boxes ------------------- */
+
+void farScreen(u16 seed) {           /* not static: kept as functions so a profiler can tell the two passes apart */
+    u16 k;
+
+    farClear();
+    for (k = 0; k < 96; k++) farGlyph((k * 7 + seed) % FF_GLYPHS, 4 + (k % 24) * 6, 3 + (k / 24) * 22);
+    for (k = 0; k < 24; k++) farBox(27, 10 + (k * 5 + seed) % 40, 1 + k * 4 - (k >> 1), 5, 1 + (k % 3));
+}
+
+void nearScreen(u16 seed) {
+    u16 k;
+
+    nearClear();
+    for (k = 0; k < 96; k++) nearGlyph((k * 7 + seed) % FF_GLYPHS, 4 + (k % 24) * 6, 3 + (k / 24) * 22);
+    for (k = 0; k < 24; k++) nearBox(27, 10 + (k * 5 + seed) % 40, 1 + k * 4 - (k >> 1), 5, 1 + (k % 3));
+}
+
+void w_farfill(void) {
+    u16 pass, acc = 0;
+
+    makeFont();
+    for (pass = 0; pass < 4; pass++) {
+        farScreen(pass * 5);
+        acc ^= farSum();
+        acc = (u16)((acc << 3) | (acc >> 13));
+    }
+    for (pass = 0; pass < 4; pass++) {
+        nearScreen(pass * 5);
+        acc ^= nearSum();
+        acc = (u16)((acc << 3) | (acc >> 13));
+    }
     res = acc;
 }
 
@@ -535,6 +1132,12 @@ int main(void) {
     w_place();
 #elif WORKLOAD == 20
     w_dist();
+#elif WORKLOAD == 21
+    w_depot();
+#elif WORKLOAD == 22
+    w_div32();
+#elif WORKLOAD == 23
+    w_farfill();
 #endif
     done = 0x600D;
     while (1) {

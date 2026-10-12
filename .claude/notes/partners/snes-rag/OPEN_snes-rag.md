@@ -21,3 +21,53 @@ corpus the day the report goes out (`.claude/rules/partners.md`).
   reserves and its chunk ids. Next batch that touches headers.
 - 2026-10-10 — relayed, not re-queried: a game built on the SDK found no
   arbiter for the SA-1's effective speed by memory.
+
+**2026-10-10, pin v1.37.0: `luna-docs` lags the tag.** Query (no
+exclusion): "luna diff --audio --align-onset per-window shift --max-shift".
+Returned: `86a0d1666e161484` and `f2ca4b411354b69e` (luna-docs,
+arbitre-domaine), which describe `--align-onset` as it was in v1.35.0 /
+v1.36.0 — one shift, taken at each capture's first sample above
+`--silence`. v1.37.0 (luna `f44025b`, 2026-10-10) fits every window by
+itself within `--max-shift` samples (default 64) and its final line says
+"per-window shift, max N samples (searched ±64)". Nothing in the corpus
+names `--max-shift`. Needed: `luna-docs` re-captured at v1.37.0. Also new
+in that tag and absent for the same reason: `--input-at`, `--poke-at` /
+`[[poke]]`, `test --update` printing `UPDATED`, and the duration of a DMA
+(the end of a burst realigned on the whole burst's count, as ares, Mesen2
+and anomie's timing document have it: ±2 or 4 master cycles from a
+6-cycle access) — that last one is a hardware fact with three sources
+luna cites, worth a fiche of its own.
+
+Sent the same evening in `2026-10-10_to_snes-rag_vitesse-sa1-et-index_reply.md`
+(delivered in their folder), with the SA-1 corrections their note asked
+for: `sa1.h` and `docs/tutorials/sa1.md` now follow the console photographs
+(5.04 MHz for ROM / ROM, not 5.4) and give BW-RAM as `$40-$4F` from the
+main CPU, `$40-$5F` from the SA-1 with the fiche's reserve. The line above
+that owed the `sa1.h` rewrite is paid.
+
+
+**2026-10-10, later: re-queried after the owner said the corpus was
+updated** (MCP reconnected in this session). Same query, no exclusion,
+"luna diff --audio --align-onset per-window shift --max-shift": still
+`86a0d1666e161484` and `f2ca4b411354b69e`, still the single-shift text of
+v1.35.0 / v1.36.0 ("starts each capture's windows at its own first sample
+above `--silence`"); nothing names `--max-shift`. So as served here,
+`luna-docs` is not at v1.37.0 yet — or this update was about something
+else. On the hardware fact we proposed a fiche for, the corpus already
+answers with an arbiter: "DMA duration… realigns to a whole number of its
+own cycles…" gives anomie-timing, *S-CPU (5A22) / DMA*
+(`a8f6e03510109a8f`): "after the pause, wait 2-8 master cycles to reach a
+whole multiple of 8 master cycles since reset". The fiche is therefore not
+needed for the fact itself; what no source states is which emulators
+followed it and since when, which is luna's to report.
+
+**2026-10-10, third query, after the MCP itself was updated: closed.** The
+same query now returns `2dda265e2f4d3aa9` (luna-docs, arbitre-domaine):
+"`--align-onset` compares each window of A with the stretch of B that
+fits it best … within `--max-shift` samples either way, and prints the
+shift it kept", with the `echo` example and its `shift=+2` lines. That is
+v1.37.0. The request of `2026-10-10_to_snes-rag_apres-mise-a-jour-luna-docs.md`
+(§2) is answered; what we saw before was our own connection serving the
+earlier index, as that report had allowed for. Golden query to add at each
+luna pin: "per-window shift --max-shift" must return a passage that names
+`--max-shift`.

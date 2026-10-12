@@ -1,0 +1,9 @@
+in fill: present ldx\.b tcc__lf
+in fill: present inx\n\tinx\n\tcpx\.w #512
+in fill: absent cmp\.w
+in fill_bytes: present inx\n\tcpx\.w #64
+in fill_bytes: absent inx\n\tinx
+in move: present txa\n\tclc\n\tadc\.w #8\n\ttax\n\tcpx\.w #128
+in fill_calls: absent cpx
+in fill_calls: present cmp\.w #512
+in count_up: absent cpx

@@ -42,6 +42,7 @@
 .DEFINE ZP_LOAD_L   $09     ; start address of the LAST completed LOAD
 .DEFINE ZP_LOAD_H   $0A     ;  (DIR_SET builds the directory entry from it)
 .DEFINE ZP_IDX      $0B     ; LOAD: expected stream index (no CMP A,X on SPC700)
+.DEFINE ZP_TAIL     $0C     ; LOAD: bytes in the last, partial exchange (0-2)
 
 .DEFINE DRIVER_VERSION 1
 
@@ -341,23 +342,32 @@ cmd_envx:
     jmp !ack
 
 ;------------------------------------------------------------------------------
-; $0F LOAD_SIZE — p1 = byte count of the NEXT LOAD transfer
+; $0F LOAD_SIZE — for the NEXT LOAD transfer: p1 = number of full
+; three-byte exchanges, p0 = bytes in the last partial one (0, 1 or 2)
 ;------------------------------------------------------------------------------
 cmd_load_size:
     mov a, ZP_P1L
     mov ZP_SIZE_L, a
     mov a, ZP_P1H
     mov ZP_SIZE_H, a
+    mov a, ZP_P0
+    mov ZP_TAIL, a
     jmp !ack
 
 ;------------------------------------------------------------------------------
-; $0C LOAD — p1 = ARAM destination. Acks the command FIRST, then enters
-; the sized block-receive loop (IPL-shaped): for each byte i, the CPU
-; puts data on $F5 and the index low byte on $F4; the driver stores and
-; echoes the index. Both sides count ZP_SIZE bytes, so the end needs no
-; in-band marker. Epilogue: a held three-step handshake, see load_done.
-; APU_CHECK_RESET is NOT polled inside the
-; transfer (documented: no hot-swap mid-load).
+; $0C LOAD — p1 = ARAM destination. Acks the command FIRST, then receives
+; the stream THREE BYTES AN EXCHANGE: the CPU puts three data bytes on
+; $F5, $F6, $F7 and then the exchange's index (low byte) on $F4; the driver
+; stores the three and echoes the index. LOAD_SIZE gave the number of full
+; exchanges (p1) and how many bytes a last, partial one carries (p0: 0, 1
+; or 2); both sides count, so the end needs no in-band marker.
+; Epilogue: a held three-step handshake, see load_done.
+; APU_CHECK_RESET is NOT polled inside the transfer (documented: no
+; hot-swap mid-load).
+;
+; Until 2026-10-10 this was one byte an exchange, about 60 cycles of this
+; loop a byte (1,766 master cycles a byte on examples/audio/soundboard).
+; Now about 22 cycles a byte here.
 ;------------------------------------------------------------------------------
 cmd_load:
     mov a, ZP_P1L
@@ -372,56 +382,100 @@ cmd_load:
     mov $F4, a
 
     mov a, #$00
-    mov ZP_IDX, a       ; expected stream index (low byte)
+    mov ZP_IDX, a       ; expected exchange index (low byte)
     mov y, #$00         ; store offset relative to the ZP pointer
-load_byte:
+    ; The count of full exchanges, N, as two nested counters: X runs the
+    ; low byte down, ZP_SIZE_H the passes. A low byte of 0 is 256 turns of
+    ; X, so the passes are N >> 8, plus one when the low byte is not 0.
     mov a, ZP_SIZE_L
     or a, ZP_SIZE_H
-    beq load_done
+    beq load_tail       ; no full exchange at all
+    mov x, ZP_SIZE_L
+    beq load_next
+    inc ZP_SIZE_H
+load_next:
 -   mov a, $F4          ; wait for the CPU to present the expected index
     cmp a, ZP_IDX
     bne -
-    mov a, $F5          ; data byte
+    mov a, $F5
     mov [ZP_DST_L]+y, a
-    mov a, ZP_IDX
-    mov $F4, a          ; echo the index = byte acknowledged
-    inc ZP_IDX
     inc y
     bne +
     inc ZP_DST_H        ; next 256-byte page
-+   mov a, ZP_SIZE_L    ; 16-bit decrement of the remaining count
-    bne ++
++   mov a, $F6
+    mov [ZP_DST_L]+y, a
+    inc y
+    bne +
+    inc ZP_DST_H
++   mov a, $F7
+    mov [ZP_DST_L]+y, a
+    inc y
+    bne +
+    inc ZP_DST_H
++   mov a, ZP_IDX
+    mov $F4, a          ; echo the index = exchange acknowledged
+    inc ZP_IDX
+    dec x
+    bne load_next
     dec ZP_SIZE_H
-++  dec ZP_SIZE_L
-    jmp !load_byte
+    bne load_next
+
+load_tail:
+    ; the last, partial exchange: ZP_TAIL bytes (0: there is none)
+    mov a, ZP_TAIL
+    beq load_done
+-   mov a, $F4
+    cmp a, ZP_IDX
+    bne -
+    mov a, $F5
+    mov [ZP_DST_L]+y, a
+    mov a, ZP_TAIL
+    cmp a, #$02
+    bne +
+    inc y
+    bne ++
+    inc ZP_DST_H
+++  mov a, $F6
+    mov [ZP_DST_L]+y, a
++   mov a, ZP_IDX
+    mov $F4, a
+    inc ZP_IDX
 
 load_done:
-    ; Epilogue: a three-step handshake in which every value one side waits
-    ; for is HELD by the other until it is answered.
-    ;   1. we show an end mark the CPU cannot mistake for an index echo:
-    ;      $FF, or $7F when the last index byte was itself $FF;
-    ;   2. the CPU, which shows that last index byte until then, answers
-    ;      with the same mark;
-    ;   3. we show 0 ("back in command mode") and the CPU parks its latch
-    ;      at 0 when it likes: the main loop ignores the mark, which is
-    ;      left in ZP_LAST_CMD (no command byte has opcode $3F).
-    ; History: until 2026-10-03 there was no mark and a 513-byte sample
-    ; (last index byte 0) hung both sides. From then until 2026-10-10 we
-    ; showed $FF and waited for the CPU's 0 — which, for the same sizes, was
-    ; ALREADY on its latch: the $FF lasted a few of our cycles, and the CPU
-    ; saw it or timed out according to the phase of its polling loop, that
-    ; is, according to how fast its compiler had made that loop.
+    ; Epilogue: three steps in which EVERY value one side waits for is HELD
+    ; by the other until it is answered. Nothing here may be shown for a
+    ; few cycles only: the CPU can be away in its NMI handler for thousands
+    ; of them.
+    ;   a. our port still shows the echo of the last exchange, and stays so
+    ;      until the CPU, having seen it, shows an end mark on its side —
+    ;      $FF, or $7F when the last index was itself $FF: never an index
+    ;      it could still be showing;
+    ;   b. we answer with the same mark and hold it until the CPU parks its
+    ;      latch at 0;
+    ;   c. we show 0 ("back in command mode"), which the CPU waits for
+    ;      before it sends anything else. The mark stays in ZP_LAST_CMD (no
+    ;      command byte has opcode $3F).
+    ; History. Until 2026-10-03 there was no mark, and a 513-byte sample
+    ; (last index 0) hung both sides. Then we showed $FF and waited for the
+    ; CPU's 0, which for the same sizes was ALREADY on its latch: the $FF
+    ; lasted a few cycles. On the morning of 2026-10-10 the mark was held —
+    ; but shown right after the last echo, which then lasted about 40 of
+    ; our cycles: a CPU taken by its NMI in that window never saw the echo
+    ; and timed out.
     mov a, #$FF
     mov y, ZP_IDX       ; last index + 1: zero when the last index was $FF
     bne +
     mov a, #$7F
 +   mov ZP_LAST_CMD, a
-    mov $F4, a          ; 1. "stream done"
--   mov a, $F4
+-   mov a, $F4          ; a. the CPU saw the last echo
     cmp a, ZP_LAST_CMD
-    bne -               ; 2. the CPU saw it
+    bne -
+    mov a, ZP_LAST_CMD
+    mov $F4, a          ; b. the mark, held
+-   mov a, $F4
+    bne -               ;    until the CPU's latch is 0
     mov a, #$00
-    mov $F4, a          ; 3. "back in command mode"
+    mov $F4, a          ; c. "back in command mode"
     jmp !main_loop
 
 ;------------------------------------------------------------------------------

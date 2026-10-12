@@ -28,8 +28,25 @@ flags set) and `jump.h`:
 #define jump_brr_size 1035   /* bytes: 115 BRR blocks of 16 samples */
 #define jump_brr_loop 0      /* byte offset of the loop point; 0 with no loop */
 #define jump_brr_loops 0     /* 1 = the sample loops */
+#define jump_tuning 4096     /* x4096: 4096 = plays at the pitch it was encoded at */
 #define jump_rate 32000      /* Hz of the source; the DSP plays at 32000 */
 ```
+
+**A loop has to be a whole number of 16-sample blocks**, because BRR is.
+When the one you give is not, the tool makes it so, in one of two ways:
+
+- **it repeats the loop** until the total is a multiple of 16, when that
+  stays under 2,000 samples: a waveform of 8 samples becomes one block
+  holding it twice, one of 12 samples becomes three blocks holding it four
+  times. Nothing changes in pitch, and `_tuning` is 4096;
+- **it resamples the loop** to the next multiple of 16 otherwise. The
+  sample then plays slightly lower, the tool warns, and `_tuning` (and
+  `"tuning_x4096"` in `--json`) carries the factor: multiply the playback
+  pitch by `_tuning / 4096` to get the original pitch back.
+
+A loop that does not start on a block boundary is preceded by silence so
+that it does. `_brr_loop` is the byte offset the loop comes back to; 0
+means "from the start", not "no loop": `_brr_loops` says whether it loops.
 
 Bake the `.brr` into the ROM and load it with the sizes from the header:
 

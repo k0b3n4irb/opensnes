@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 63ad4e9c6005701716f394a7c051799186a64053 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 757df814090976192aa93024077e65cd5a1e37e9 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 2dd729f88510450d8e958f6adf486ccfbefd9ad5 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -44,9 +44,20 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 37 patches since upstream merge-base 7051114
+### compiler/cproc — 46 patches since upstream merge-base 7051114
 
 ```
+2dd729f w65816: the counter of a rotated loop lives in X — a text rule of the peephole stage: ldx / cpx on the way in, inx or txa/clc/adc/tax as the step, cpx at the bottom, when nothing in the body writes X or the counter's slot and the counter dies with the loop; farClear 31 → 18 CPU cycles a turn; `QBE_NO_PEEP_LOOPX=1` (stage 2 T3, 2026-10-12)
+a4ce67c ivar: a loop counter used only as one scaled index becomes that index — a pass before gcm: `for (k = 0; k < N; k++) a[k] = v` runs on j = 2k, stepping by 2, tested against 2N, no shift in the body; exact when nothing wraps at 16 bits, nothing created otherwise; `QBE_NO_IVAR=1`, `-d V` (stage 2 T2, 2026-10-12)
+8c97293 qbe: Avoid redundant leaf ceq in switch (v2) — a case whose neighbours are the values just below and above needs no compare: `switch` workload -3.1 %, `state` -2.7 % (upstream 863e1e7, cherry-picked 2026-10-11)
+7e6a4e5 expr: a string literal is const char[] — handed to a plain `char *` it was read from the wrong bank in silence, and `"abc"[i]` was read bank-blind; a store to a literal is refused (2026-10-11)
+1071b97 expr: *"a" is the first character — the *& collapse skips string literals; it stopped on "unimplemented expression" (upstream 482c69c + d30bfcc, adapted, 2026-10-11)
+9877cd2 expr: Use exprassign to check for invalid assignment — `int y; y = a_struct;` stopped on "internal error; unsupported conversion" (upstream 2a70719, cherry-picked 2026-10-11)
+4e8eb9c Disallow qualifiers in nested array types — `int a[const 3][const 4]` was accepted (upstream ac51461, cherry-picked 2026-10-11)
+f8483cd decl: Error out if 'restrict' is used in non-pointer, non-array types — `int restrict r;` was accepted (upstream 007035e, cherry-picked 2026-10-11)
+d082fc0 Add error for initialization of flexible array members — it stopped on an assertion in emitdata (upstream 3fcb352, cherry-picked 2026-10-11)
+9ff8eb3 stmt: Fix error message for incorrect token after `for` — the message said "while" (upstream 96367c3, cherry-picked 2026-10-11)
+b2e4205 expr: a hex escape stops at the first non-hex character — hexval took a to z for digits: "\x7Fw" was one wrong byte and the w was gone (a defect of upstream's 19b6342 of 2026-04-24, which upstream fixed in 7e9a684 on 2026-05-02; our merge-base is between the two — 2026-10-11)
 63ad4e9 expr: a conditional's result has the conditional's type, bit-field or not — `b3 - (3 ? bf.b2 : u)` was computed signed (difftest_stmt seed 103247, 2026-10-09)
 dbc4f9f qbe: 64-bit integers are refused, their constants folded first (2026-10-08)
 80d542e qbe, eval: conditions and logical constants at the w65816 widths — three silent miscompilations (difftest, 2026-10-08)
@@ -89,7 +100,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 111 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 125 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -101,6 +112,19 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+0301a5e parse: a message names the C source when the driver says which (`QBE_SOURCE_NAME`, set by cc65816 before stage 3): `qbe:main.c (IR line N): …` instead of a temporary file nobody can open; `identifier too long` says the 79-character limit and the start of the name (2026-10-12)
+c8e0f5f emit: the first operand of a 32-bit divide or remainder keeps its stack slot — the four operations push the second operand first and read the first from the stack, and `(!g ? 1L : 0L) % d` stopped the compiler with an internal error, "has no stack slot" (difftest_stmt seed 364296, 2026-10-11)
+fbdda87 emit: a block that ends in a jump to a block made of one compare and its branch (the condition of a `for` or a `while`) emits that compare and branch itself — one `jmp` less every turn; and `lda S` at a block's entry goes when every way in comes straight from a load or a store of S (`peephole_entry`, last and once; kept when anything could read its flags). `for (k = 0; k < n; k++) t[k] = 0;`: 36 to 29 CPU cycles a turn (2026-10-11)
+9338622 inline: a function that has a section of its own (`__ramcode`, the RAM code window) is never copied into a caller, by either inliner: its body would run from wherever the caller is. `RAM_CODE static void job(void)` with one call site was absorbed into a ROM caller once the leaf rule stopped refusing it (it had hidden the case), and the Super FX library test ROM never finished; a non-leaf one could already be absorbed before. A caller in such a section may absorb an ordinary function (2026-10-10)
+fe9b7e3 emit: `peephole_flow`, liveness of the sixteen words of `tcc__lf` over a function's text (successors: the next line and the branch target; nothing live at a return; a call does nothing; an 8-bit store is neither a read nor a kill; anything unrecognised leaves the function alone). A `sta.b tcc__lf+N` nothing reads afterwards goes even when the slot is read elsewhere in the function, which in a large function is every slot. QBE_NO_PEEP_FLOW=1 turns it off (issue #166; 2026-10-10)
+03bc837 emit: `color_slots` places temps in decreasing order of QBE's cost (use count weighted by loop depth, `fillcost`) instead of definition order, so the sixteen direct-page words of a function go to what its loops use and not to its setup; needed once a looping leaf may be poured into a big caller (the commit below), whose own temporaries came first. QBE_SLOT_ORDER=def restores the old order (issue #166; 2026-10-10)
+8df59cb inline: the rule "a leaf above 16 IR instructions is not absorbed into a caller that keeps a call" (25145b1, the same morning) is off unless CC_INLINE_LEAF_MAX is set: after the direct-page temps, the index computed once and the in-place loop variable, a leaf loses little by being poured into such a caller, and the rule evicted a hot static the day its caller gained one cold call. With it off: `depot` -5.7 % (issue #166; 2026-10-10)
+5784dbc emit: `peephole_late`, run once after the peephole has settled: `lda.b S / tax / lda` is `ldx.b S / lda`; `lda.w #0 / sta M` with A reloaded after is `stz M`; `lda.b S / inc a / sta.b S` is `inc.b S` (dec likewise); a constant stored to several places is loaded once. 16-bit accumulator only, direct-page slots only for ldx/inc. Inside the loop the new forms hid dead stores from the older rules (tried: slower). QBE_NO_PEEP_LATE=1 turns it off (issue #166; 2026-10-10)
+2872cf7 isel: the constant count of a shift is cut to a word (16 bits here): the front end passes `x >> (s16)(3 + 0x20000000UL)` as `shr x, 536870915` and the emitter read "16 or more", result 0; a count in a temp was already read as its low word (difftest seeds 102026, 102200, 103718, three expressions in 144,000; 2026-10-10)
+61c373f emit: the slot colouring lets a phi share the slot of the value that feeds it (its own argument on an edge no longer counts as interfering; the phi move is then nothing) and a 16-bit add/sub/and/or/xor/copy share its operand's; an argument asks for its phi's slot, a phi for an argument's; two 32-bit ones share exactly or not at all. `i++` is `lda S / inc a / sta S` and the back edge copies nothing. QBE_NO_PHI_SHARE=1 / QBE_NO_OPND_SHARE=1 turn each off (issue #166; 2026-10-10)
+79ff312 copy: `defwidthle` took a phi it was already proving "no wider than 8 bits" as proven for ANY width asked; through an `extsb` the question becomes "no wider than 7", so `v = sar (extsb v), n` in a loop made `(u8)v` after it lose its `extub`, and a negative v reached a 16-bit xor with its high byte set. Inherited from upstream QBE. The phi's mark now carries the width being proven (difftest_stmt seed 241214, one program in 40,000; 2026-10-10)
+635044f gcm: sink() moves the address of a load or store next to it and no longer copies that address's operands with it: every access of `a[i]` carried its own `mul i, 2` (`lda i / asl a / tax`), a dozen per iteration in a loop over parallel arrays; QBE_SINK_DEEP=1 restores the copies (issue #166; 2026-10-10)
+757df81 emit: in a function that CALLS, a temp that is not live across any call gets a direct-page slot (`tcc__lf`, slot numbers from DPSLOT; first fit in 16 words, the stack when full or when a call is crossed); QBE_NO_DP_TEMPS=1 turns it off (issue #166; 2026-10-10)
 25145b1 inline: a static function with ONE call site (address not taken) is inlined whole, control flow included, and not emitted; `static inline` with several sites is copied at each, up to 160 IR instructions (CC_INLINE_MAX_BIG); a leaf above 16 IR instructions is left alone when its caller still calls something else (it keeps its direct-page frame; CC_INLINE_LEAF_MAX); QBE_NO_AUTO_INLINE=1 turns it off (issue #166, pattern 9; 2026-10-10)
 d831408 emit: the peephole drops `cmp.w #0` after the flags are set and a direct-page slot nobody reads in the function (issue #166; 2026-10-10)
 0288ec6 emit: a peephole over the emitted text — `sta S / lda S`, a store overwritten unread, a load overwritten, `lda S / tax` with X already holding S (issue #166, patterns 1, 2, 4; 2026-10-10)

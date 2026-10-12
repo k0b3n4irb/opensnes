@@ -28,6 +28,7 @@ sprite that isn't tied to the grid. The tile / palette / VRAM trinity that
 underpins everything visual on the SNES.
 
 @subpage examples_text_scroll_message
+@subpage examples_text_pixel_text
 
 @subpage examples_backgrounds_mode1
 
@@ -36,6 +37,8 @@ underpins everything visual on the SNES.
 @subpage examples_sprites_animated_sprite
 
 @subpage examples_sprites_sprite_swarm
+
+@subpage examples_sprites_world_sprites
 
 > Making it *your* art: @ref tools_gfx4snes turns a PNG into the tiles, palette
 > and tilemap this stage builds on, and @ref craft_planning budgets the VRAM

@@ -24,6 +24,9 @@
 # (`long long`, `unsigned long long`), which the fork now refuses instead of
 # compiling at 32 bits: float-to-uint64.c, struct-passing-bitfield.c,
 # switch-long-long.c, uint64-to-float.c. A front-end error by design.
+# 2026-10-11: string-u8-type.c asserts that a u8 literal is `unsigned char[]`.
+# The fork types every string literal const (ROM data, read far only through
+# a const pointee), so it is `const unsigned char[]` here. By design.
 
 add-int-pointer.c
 alignas-0.c
@@ -106,6 +109,7 @@ sizeof-string-literal.c
 sizeof-vla.c
 string-concat.c
 string-octal.c
+string-u8-type.c
 struct-copy.c
 struct-flexible-array.c
 struct-packed.c

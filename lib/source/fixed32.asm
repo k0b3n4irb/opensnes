@@ -217,6 +217,13 @@ fix32Mul:
     sep #$20
     .ACCU 8
 
+    ; Timing: the product is complete 8 CPU cycles after the write of
+    ; WRMPYB; `rep #$20` and the four cycles of `lda.l $4216` before its
+    ; read make 7, two nops make 11 (one nop of margin; the count and its
+    ; sources are in runtime.asm, tcc_mul16). p2 follows p0 and p3 follows
+    ; p1 without rewriting WRMPYA, which the unit does not alter
+    ; (anomie-regs).
+
     ; p0 = X.lo * Y.lo
     lda.w \1
     sta.l $4202
@@ -224,11 +231,22 @@ fix32Mul:
     sta.l $4203
     nop
     nop
-    nop
     rep #$20
     .ACCU 16
     lda.l $4216
     sta.w f32_p0
+
+    ; p2 = X.lo * Y.hi — WRMPYA still X.lo
+    sep #$20
+    .ACCU 8
+    lda.w \2 + 1
+    sta.l $4203
+    nop
+    nop
+    rep #$20
+    .ACCU 16
+    lda.l $4216
+    sta.w f32_p2
 
     ; p1 = X.hi * Y.lo
     sep #$20
@@ -239,35 +257,16 @@ fix32Mul:
     sta.l $4203
     nop
     nop
-    nop
     rep #$20
     .ACCU 16
     lda.l $4216
     sta.w f32_p1
 
-    ; p2 = X.lo * Y.hi
+    ; p3 = X.hi * Y.hi — WRMPYA still X.hi
     sep #$20
     .ACCU 8
-    lda.w \1
-    sta.l $4202
     lda.w \2 + 1
     sta.l $4203
-    nop
-    nop
-    nop
-    rep #$20
-    .ACCU 16
-    lda.l $4216
-    sta.w f32_p2
-
-    ; p3 = X.hi * Y.hi
-    sep #$20
-    .ACCU 8
-    lda.w \1 + 1
-    sta.l $4202
-    lda.w \2 + 1
-    sta.l $4203
-    nop
     nop
     nop
     rep #$20

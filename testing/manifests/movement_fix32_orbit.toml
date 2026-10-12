@@ -23,37 +23,48 @@
 # exactly 256 frames later: the orbit closes on itself, so the 16.16
 # accumulator has not drifted over a full revolution.
 rom = "../../examples/basics/fix32_orbit/fix32_orbit.sfc"
+# Clocked by the program since 2026-10-10 (luna v1.37.0): each checkpoint
+# stops at an arrival on WaitForVBlank. The boot calls it once and the loop
+# once per step, so arrival N + 1 is step N, and `g_angle8` is N there by
+# construction. Indexed by frame, the five checkpoints had to be moved by
+# one each time a compiler step shortened the boot.
+frames = 400                   # the horizon: where the run gives up
 
 [[checkpoint]]                 # Q1: cos > 0, sin > 0
-at_frame = 35
+at_symbol = "WaitForVBlank"
+hit = 33
 [checkpoint.values]
 g_angle8 = { eq = 0x20, width = 1 }
 g_sx     = { eq = 170, width = 2 }
 g_sy     = { eq = 138, width = 2 }
 
 [[checkpoint]]                 # Q2: cos < 0, sin > 0
-at_frame = 99
+at_symbol = "WaitForVBlank"
+hit = 97
 [checkpoint.values]
 g_angle8 = { eq = 0x60, width = 1 }
 g_sx     = { eq = 85,  width = 2 }
 g_sy     = { eq = 138, width = 2 }
 
 [[checkpoint]]                 # Q3: cos < 0, sin < 0
-at_frame = 163
+at_symbol = "WaitForVBlank"
+hit = 161
 [checkpoint.values]
 g_angle8 = { eq = 0xA0, width = 1 }
 g_sx     = { eq = 85, width = 2 }
 g_sy     = { eq = 53, width = 2 }
 
 [[checkpoint]]                 # Q4: cos > 0, sin < 0
-at_frame = 227
+at_symbol = "WaitForVBlank"
+hit = 225
 [checkpoint.values]
 g_angle8 = { eq = 0xE0, width = 1 }
 g_sx     = { eq = 170, width = 2 }
 g_sy     = { eq = 53,  width = 2 }
 
 [[checkpoint]]                 # exactly 256 steps after the Q1 sample
-at_frame = 291
+at_symbol = "WaitForVBlank"
+hit = 289
 [checkpoint.values]
 g_angle8 = { eq = 0x20, width = 1 }
 g_sx     = { eq = 170, width = 2 }

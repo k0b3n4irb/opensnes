@@ -1,3 +1,6 @@
+# These patterns pin the moves on the way back to the condition, as they
+# were written before a loop tested at its bottom (2026-10-11).
+env QBE_NO_ROTATE=1
 # Dead store elimination (Phase 7a): a global RMW is frameless and goes
 # load/inc/store with no intermediate slot store.
 present ; Function: global_increment \(framesize=0,

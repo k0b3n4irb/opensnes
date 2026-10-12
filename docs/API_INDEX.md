@@ -26,6 +26,7 @@ nothing you do not list is linked.
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
 | draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/metasprite](../examples/sprites/metasprite/) |
 | make a tile while the game runs (procedural art) | `tileEncode2bpp`, `tileEncode4bpp`, `tileEncode8bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
+| compose text at the pixel in a 2bpp layer (a proportional font, a label at any x and y) | `tileBlitGlyph2bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
 
 ## Moving around a world
 

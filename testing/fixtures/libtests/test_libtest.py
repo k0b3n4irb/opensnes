@@ -39,7 +39,7 @@ from lib import find_luna, assert_mem, dump_vram  # noqa: E402
 ROM = HERE / "libtest.sfc"
 # audioInit() blocks on the APU IPL boot + driver upload (~1.5M CPU
 # instructions) before the rest of the fixture runs — hence the budget.
-STEPS = 3_000_000
+STEPS = 4_000_000   # 3 M until 2026-10-12: the glyph reference on far pointers needs the fourth
 
 # (global, width-bytes, expected-value)
 CASES = [
@@ -86,7 +86,15 @@ CASES = [
                                  # depends on the phase of the CPU's polling loop (the end mark is held)
     ("r_audio_load512", 2, 0),   # last index byte $FF: the end mark is $7F
     ("r_audio_load",  2, 0),
-    ("r_audio_free",  2, 0xB4F7),
+    ("r_audio_load770", 2, 0),
+    ("r_audio_load10",  2, 0),
+    # the sample area reaches $FFC0 while no echo is configured, $C000 after
+    ("r_trun_bad", 2, 0),   # textPrint runs: the last column, a newline, code 0x7F
+    ("r_pu16_bad", 2, 0), ("r_pu16_n", 2, 14),   # textPrintU16: the digits in the text buffer
+    ("r_div32_bad", 2, 0), ("r_div32_n", 2, 73),   # 32-bit division vectors: 16-bit and wide divisors, signs
+    ("r_audio_phase", 2, 0),     # 400 loads under a long vblank callback, each ending at another phase of the frame
+    ("r_audio_free",  2, 0xF4B7),
+    ("r_audio_free_echo", 2, 0xB4F7),
     ("r_audio_addr",  2, 0x0B00),
     ("r_audio_voice", 2, 0),
     # phase 3: the DSP->CPU read path — voice 0's envelope is live
@@ -178,6 +186,9 @@ CASES = [
     ("r_meta_flipx",   2, 0x646C), ("r_meta_flipattr", 2, 0x40),
     ("r_meta_piece32", 2, 42),     # the piece size comes from the style, not from "large = 16"
     ("r_meta_n",       2, 12),     ("oam_dyn_sprite_size.sprite_dynamic_dispatch", 1, 16),
+    ("r_meta_edge",    2, 2),      ("r_meta_attr",    2, 0x2B00),   # the draw in assembly (2026-10-12)
+    ("r_meta_xhi",     2, 0x03FE), ("r_meta_flipy",   2, 0x8042),
+    ("r_meta_full",    2, 0x7F80),
     # fixed32: the asm sine and the C expression the header says is miscompiled
     ("r_f32sin_asm", 4, 0xFFFF0000),   # fix32Sin(192) = -1.0 in 16.16
     ("r_f32sin_c",   4, 0xFFFF0000),   # the same, computed in C
@@ -194,6 +205,11 @@ CASES = [
     # one hand-derived vector that does not go through it
     ("r_tile2", 16, None), ("r_tile4", 32, None), ("r_tile8", 64, None),
     ("r_tile4_dot", 32, 0x80 | (0x80 << (8 * 16))),
+    # tileBlitGlyph2bpp (2026-10-12): 32 cases against a C reference in the
+    # ROM (every shift, four row shapes, a right tile on half of them), and
+    # one (shift 3, glyph row 1 onto tile row 2, 5 rows, no right tile: the
+    # right half of the pin is the untouched prefill) pinned by _glyph_ref below
+    ("r_glyph_ok", 2, 32), ("r_glyph_pin", 32, None),
     # string module (2026-10-09): 24 words, in main.c's order — memcpy ROM->FAR
     # and FAR->plain, memmove both ways, memset (7 bytes, then 0), strlen,
     # strcpy, strcmp (0, -1, 1, -'C', 0xF0 - 0x10), strncpy (padded, then cut)
@@ -216,6 +232,10 @@ CASES = [
     ("r_world", 24, sum(w << (16 * i) for i, w in enumerate([
         0x0000, 0x0AE1, 0xDFFF, 0xE164, 0xF001, 0x3313, 0x5145, 0x0154,
         75, 0x0101, 0x0101, 0x0165]))),
+    # oamPlaceWorld with `order`: a reversal (slot 7 shows sprite 0, slot 0
+    # sprite 7), visible[] by sprite, then order bytes out of range
+    ("r_worldo", 16, sum(w << (16 * i) for i, w in enumerate([
+        0x0000, 0x0AE1, 0xDFFF, 0x3313, 0xF001, 75, 0x3F, 0x0167]))),
     # the VRAM upload queue: 3 entries noted, none after the flush, 32 free
     ("r_vq", 8, 3 | (0 << 16) | (32 << 32) | (0x0A51 << 48)),
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
@@ -243,8 +263,24 @@ def _tile_ref(pairs: int) -> int:
     return int.from_bytes(out, "little")
 
 
+def _glyph_ref() -> int:
+    """tileBlitGlyph2bpp's pinned case: glyph byte i = i*37 + 11, the tile
+    prefilled with (i*13) & 0x5A and its right tile with (i*7) & 0xA5, rows
+    1-5 of the glyph ORed onto rows 2-6 of the tile shifted right by 3; no
+    right tile is passed, so its 16 bytes stay the prefill."""
+    g = [(i * 37 + 11) & 0xFF for i in range(16)]
+    t = bytearray((i * 13) & 0x5A for i in range(16))
+    r = bytearray((i * 7) & 0xA5 for i in range(16))
+    for k in range(5):
+        p0, p1 = g[(1 + k) * 2], g[(1 + k) * 2 + 1]
+        o = (2 + k) * 2
+        t[o] |= p0 >> 3
+        t[o + 1] |= p1 >> 3
+    return int.from_bytes(bytes(t) + bytes(r), "little")
+
+
 CASES = [(n, w, {"r_tile2": _tile_ref(1), "r_tile4": _tile_ref(2),
-                 "r_tile8": _tile_ref(4)}.get(n, v) if v is None else v)
+                 "r_tile8": _tile_ref(4), "r_glyph_pin": _glyph_ref()}.get(n, v) if v is None else v)
          for n, w, v in CASES]
 
 # Region getters: NTSC by default (the header's country byte), PAL under

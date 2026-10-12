@@ -1,0 +1,2 @@
+env QBE_NO_PEEP_FLOW=1
+in keep: present \tadc\.w #2\n\tsta\.b tcc__lf\+\d+\n\tasl a\n\tsta\.b tcc__lf\+\d+\n\ttax

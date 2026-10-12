@@ -188,7 +188,19 @@ u16 r_audio_load513; /* audioLoadSample(1, 513 bytes, 513, 0): the last index by
 u16 r_audio_load512; /* 512 bytes: the last index byte is $FF, the value the end mark
                       * usually has — the driver then marks the end with $7F
                       * (2026-10-10) -> AUDIO_OK (0) */
-u16 r_audio_free;   /* audioGetFreeMemory() -> 0xC000-0x0B00-9 = 0xB4F7 */
+u16 r_audio_load770; /* 770 patterned bytes: 256 three-byte exchanges (the count's low byte
+                      * is 0) and a two-byte tail; their content is asserted in ARAM by
+                      * testing/manifests/lib_audio_stream.toml */
+u16 r_audio_load10;  /* 10 bytes: three exchanges and a one-byte tail */
+static u8 FAR pat_brr[770];   /* FAR: the plain RAM band of this ROM is nearly full */
+u16 r_audio_phase;  /* failures over 400 consecutive 9-byte loads, under a
+                     * vblank callback of a few thousand master cycles -> 0. Each load
+                     * ends on the end-of-stream handshake at another phase of
+                     * the frame: until 2026-10-10 an NMI taken while the driver
+                     * showed the last echo (about 40 of its cycles) made the
+                     * load time out, and every load after it */
+u16 r_audio_free;   /* audioGetFreeMemory() with no echo configured -> 0xFFC0-0x0B00-9 = 0xF4B7 */
+u16 r_audio_free_echo; /* after audioSetEcho(): the area ends at $C000 -> 0xC000-0x0B00-9 = 0xB4F7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
 u16 r_audio_voice;  /* audioPlaySampleEx(...) -> voice 0 (round-robin)  */
 
@@ -428,6 +440,8 @@ u8 r_tile2[16];
 u8 r_tile4[32];
 u8 r_tile8[64];
 u8 r_tile4_dot[32];
+u16 r_glyph_ok;            /* tileBlitGlyph2bpp: cases equal to the C reference */
+u8 r_glyph_pin[32];        /* one case's tile and right tile, pinned outside the ROM */
 u16 r_done;     /* 0xBEEF once every assignment above has executed */
 
 DECLARE_ANIM_CLIP(clip_a, ANIM_LOOP, 2, 10, 20, 30);
@@ -566,6 +580,27 @@ u16 r_meta_plain;
 u16 r_meta_flipx;    /* ... OBJ_FLIPX in a 16-wide box of 8-pixel pieces: x 108 / 100 -> 0x646C */
 u16 r_meta_flipattr; /* ... and each piece's own H-flip bit toggled -> 0x40 */
 u16 r_meta_piece32;  /* a 32-pixel piece in a 64-wide box, flipped: x 10 + 32 -> 42 (the 11-argument form assumed 16: 58) */
+u16 r_meta_edge;     /* the draw in assembly (2026-10-12): pieces at x -63 and y 239 drawn, x -64 and y 240 skipped: 2 ids of 4 -> 2 */
+u16 r_meta_attr;     /* a piece naming no palette under basePalette 5, priority 2, tile 0xF0 + base 0x10 = 0x100:
+                      * attribute (2 << 4) | (5 << 1) | bit 8 of the tile = 0x2B, tile low byte 0 -> 0x2B00 */
+u16 r_meta_xhi;      /* the same piece at x -10 + 8 = -2: x low byte 0xFE, and in the high table its x bit and its
+                      * size bit (OBJ_LARGE) both set -> 0x03FE */
+u16 r_meta_flipy;    /* OBJ_FLIPY in a 24-tall box of 8-pixel pieces: the piece at dy 0 lands at y 50 + 16 = 66, its
+                      * V bit set -> 0x8042 */
+u16 r_meta_full;     /* three pieces from id 126: two drawn, the table is full at 128 -> 128, and oam_max_id 127 -> 0x7F80 */
+extern u8 oam_max_id;
+static const MetaspriteItem lotd_edge[] = {
+    METASPR_ITEM(-63, 0, 0, 0), METASPR_ITEM(-64, 0, 0, 0),
+    METASPR_ITEM(0, 239, 0, 0), METASPR_ITEM(0, 240, 0, 0),
+    METASPR_TERM,
+};
+static const MetaspriteItem lotd_attr[] = { METASPR_ITEM(8, 0, 0xF0, OBJ_PRIO(2)), METASPR_TERM };
+static const MetaspriteItem lotd_three[] = {
+    METASPR_ITEM(0, 0, 0, 0), METASPR_ITEM(8, 0, 1, 0), METASPR_ITEM(16, 0, 2, 0), METASPR_TERM,
+};
+static const MetaspriteStyle lotd_style5 = {
+    .baseTile = 0x10, .basePalette = 5, .size = OBJ_LARGE, .pieceSize = 8, .width = 16, .height = 24,
+};
 static const MetaspriteItem lotc_meta[] = {
     METASPR_ITEM(0, 0, 0, 0),
     METASPR_ITEM(8, 0, 1, 0),
@@ -580,6 +615,14 @@ static const MetaspriteStyle lotc_style32 = {
     .baseTile = 0, .basePalette = 0, .size = OBJ_LARGE,
     .pieceSize = 32, .width = 64, .height = 32,
 };
+
+static u16 nmi_burn;
+static void nmiBurn(void) {
+    u16 i;
+    for (i = 0; i < 40; i++) {
+        nmi_burn += i;
+    }
+}
 
 static void coverage_lot_c(void) {
     AudioVoiceState vs;
@@ -608,6 +651,20 @@ static void coverage_lot_c(void) {
     audioUnloadSample(0);
     r_aud_unload = audioGetSampleInfo(0, &smp);
     r_aud_unfree = audioGetFreeMemory();
+
+    /* 400 loads, each ending at another phase of the frame, under a
+     * vblank callback of a few thousand master cycles (a game's handler:
+     * an empty one returns before the window closes). */
+    r_audio_phase = 0;
+    nmiSet(nmiBurn);
+    {
+        u16 ph;
+        for (ph = 0; ph < 400; ph++) {
+            if (audioLoadSample(1, pat_brr, 9, 0) != AUDIO_OK) r_audio_phase++;
+            audioUnloadSample(1);
+        }
+    }
+    nmiClear();
 
     /* sprites: a two-item metasprite mirrored in a 16-px-wide box lands its
      * items swapped (dx = 16 - dx - 8) with the flip bit set; asserted on
@@ -639,6 +696,15 @@ static void coverage_lot_c(void) {
     r_meta_flipattr = oamMemory[83] & 0xC0;
     oamDrawMetasprite(24, 10, 50, lotc_meta, &lotc_style32, OBJ_FLIPX);
     r_meta_piece32 = oamMemory[96];
+    r_meta_edge = oamDrawMetasprite(30, 0, 0, lotd_edge, &lotc_style, 0) - 30;
+    oamDrawMetasprite(32, -10, 50, lotd_attr, &lotd_style5, 0);
+    r_meta_attr = (u16)oamMemory[130] | ((u16)oamMemory[131] << 8);
+    r_meta_xhi = (u16)oamMemory[128] | ((u16)(oamMemory[520] & 0x03) << 8);
+    oamDrawMetasprite(34, 100, 50, lotd_attr, &lotd_style5, OBJ_FLIPY);
+    r_meta_flipy = (u16)oamMemory[137] | ((u16)(oamMemory[139] & 0x80) << 8);
+    r_meta_full = oamDrawMetasprite(126, 0, 0, lotd_three, &lotc_style, 0) | ((u16)oam_max_id << 8);
+    oamHide(126);                         /* the lot-F reads expect sprites 124-127 as oamInit left them */
+    oamHide(127);
     oamDynamicSetSize(0, 16);
     WaitForVBlank();
     /* bank-byte chantier: an OAM table in ROM. Right after WaitForVBlank we
@@ -1117,6 +1183,9 @@ u16 r_fast[16];
 /* oamPlaceWorld (issue #165): eight 32x32 sprites around the four edges of
  * the screen, camera at (100, 50) */
 u16 r_world[12];
+u16 r_worldo[8];
+static const u8 w_rev[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
+static const u8 w_bad[8] = { 0, 200, 1, 8, 3, 3, 6, 255 };
 static s16 w_x[8];
 static s16 w_y[8];
 static u8 w_tile[8];
@@ -1124,6 +1193,11 @@ static u8 w_attr[8];
 static u8 w_seen[8];
 static const s16 w_sx[8] = { 0, -31, -32, 255, 256, 100, 100, 100 };   /* wanted on screen */
 static const s16 w_sy[8] = { 0,  10,  10, 223, 100, 224, -31, -32 };
+/* A batch written before `order` existed: eight initializers, as the
+ * documentation of 0.49 shows it. It must still compile under the build's
+ * -Werror, and `order` must be 0 (2026-10-10: it did not compile). */
+static u8 w_old_seen[2];
+static const OamWorldBatch w_old = { w_sx, w_sy, w_rev, w_rev, w_old_seen, 108, 2, 32 };
 
 static void test_string(void) {
     u16 i;
@@ -1181,6 +1255,154 @@ static void test_string(void) {
     r_str[23] = 0x5712;                           /* the block ran to its end */
 }
 
+/* 32-bit division vectors (2026-10-11, the 16-iteration core): read by a
+ * run-time index, so nothing folds; expected values from Python. */
+static const u32 dv_ua[48] = {0x0UL, 0x1UL, 0xFFFFFFFFUL, 0xFFFFFFFFUL, 0xFFFE0001UL, 0xFFFFFFFFUL, 0x7FFFFFFFUL, 0x6ED73UL, 0x6ED73UL, 0x6ED73UL, 0x5FFFFUL, 0x60000UL, 0xFFFFUL, 0x10000UL, 0x12345678UL, 0xFFFFFFFFUL, 0xFFFFFFFFUL, 0x10000UL, 0xFFFFFFFFUL, 0xFFFFFFFEUL, 0xFFFFFFFFUL, 0x80000000UL, 0xDEADBEEFUL, 0xF4240UL, 0xF423FUL, 0x3UL, 0x8000UL, 0xFFFF0000UL, 0x510B2F6FUL, 0x85D441F8UL, 0x23ADUL, 0x93UL, 0x59UL, 0x99FB4CUL, 0x4UL, 0x6EUL, 0xF1BDBUL, 0x9B663UL, 0x2F53ABDCUL, 0x486FUL, 0x11FDUL, 0x197C5UL, 0xBEDFEE78UL, 0x49D4UL, 0x87UL, 0x12UL, 0x54UL, 0xE8UL};
+static const u32 dv_ub[48] = {0x1UL, 0x1UL, 0x1UL, 0xFFFFUL, 0xFFFFUL, 0x8001UL, 0x8000UL, 0x1ACUL, 0x6UL, 0x7UL, 0x6UL, 0x6UL, 0xFFFFUL, 0xFFFFUL, 0x100UL, 0x10000UL, 0x10001UL, 0x10000UL, 0xFFFFFFFFUL, 0xFFFFFFFFUL, 0x80000001UL, 0x7FFFFFFFUL, 0x12345UL, 0x3E8UL, 0x3E8UL, 0x5UL, 0x8001UL, 0xFFFFUL, 0xB606847BUL, 0xDUL, 0xB714UL, 0xADBDABUL, 0x5UL, 0x68UL, 0x19429UL, 0x1F81BUL, 0x1F552UL, 0x30ADUL, 0x2D46UL, 0x5387UL, 0x15C23425UL, 0x6UL, 0xF6UL, 0x9UL, 0x36A6UL, 0x7UL, 0xBD5FUL, 0xA8UL};
+static const u32 dv_uq[48] = {0x0UL, 0x1UL, 0xFFFFFFFFUL, 0x10001UL, 0xFFFFUL, 0x1FFFCUL, 0xFFFFUL, 0x424UL, 0x12793UL, 0xFD59UL, 0xFFFFUL, 0x10000UL, 0x1UL, 0x1UL, 0x123456UL, 0xFFFFUL, 0xFFFFUL, 0x1UL, 0x1UL, 0x0UL, 0x1UL, 0x1UL, 0xC3B6UL, 0x3E8UL, 0x3E7UL, 0x0UL, 0x0UL, 0x10000UL, 0x0UL, 0xA4B6789UL, 0x0UL, 0x0UL, 0x11UL, 0x17B08UL, 0x0UL, 0x0UL, 0x7UL, 0x33UL, 0x10B9CUL, 0x0UL, 0x0UL, 0x43F6UL, 0xC6A245UL, 0x834UL, 0x0UL, 0x2UL, 0x0UL, 0x1UL};
+static const u32 dv_ur[48] = {0x0UL, 0x0UL, 0x0UL, 0x0UL, 0x0UL, 0x3UL, 0x7FFFUL, 0x143UL, 0x1UL, 0x4UL, 0x5UL, 0x0UL, 0x0UL, 0x1UL, 0x78UL, 0xFFFFUL, 0x0UL, 0x0UL, 0x0UL, 0xFFFFFFFEUL, 0x7FFFFFFEUL, 0x1UL, 0x11CE1UL, 0x0UL, 0x3E7UL, 0x3UL, 0x8000UL, 0x0UL, 0x510B2F6FUL, 0x3UL, 0x23ADUL, 0x93UL, 0x4UL, 0xCUL, 0x4UL, 0x6EUL, 0x1669DUL, 0x3ECUL, 0x1334UL, 0x486FUL, 0x11FDUL, 0x1UL, 0x2AUL, 0x0UL, 0x87UL, 0x4UL, 0x54UL, 0x40UL};
+static const s32 dv_sa[25] = {(s32)0xFFFFFFF9UL, (s32)0x7UL, (s32)0xFFFFFFF9UL, (s32)0x80000000UL, (s32)0x80000000UL, (s32)0x7FFFFFFFUL, (s32)0xFFFFFFFFUL, (s32)0xFFF9128DUL, (s32)0x6ED73UL, (s32)0xFFFE7960UL, (s32)0x0UL, (s32)0xFFFF0000UL, (s32)0xFFFEFFFFUL, (s32)0xFFD203AFUL, (s32)0x8A76UL, (s32)0xAA7D0CDDUL, (s32)0x5E52FEUL, (s32)0xE92A0EUL, (s32)0x49BBBB47UL, (s32)0xFF1DBEDDUL, (s32)0x666BBUL, (s32)0x7244196DUL, (s32)0x84B994EEUL, (s32)0x89741A8EUL, (s32)0x6377C0A1UL};
+static const s32 dv_sb[25] = {(s32)0x2UL, (s32)0xFFFFFFFEUL, (s32)0xFFFFFFFEUL, (s32)0x1UL, (s32)0x1UL, (s32)0xFFFFFFFFUL, (s32)0x7FFFFFFFUL, (s32)0x1ACUL, (s32)0xFFFEEE90UL, (s32)0xFFFEEE90UL, (s32)0xFFFFFFFBUL, (s32)0xFFFFUL, (s32)0xFFFF0000UL, (s32)0xFFFFC282UL, (s32)0x8FUL, (s32)0x97UL, (s32)0x2C3315UL, (s32)0x9A759BAUL, (s32)0x54UL, (s32)0xFFFF9058UL, (s32)0x87UL, (s32)0xFFFFFFEEUL, (s32)0x67049A24UL, (s32)0xE0F965UL, (s32)0x351FUL};
+static const s32 dv_sq[25] = {(s32)0xFFFFFFFDUL, (s32)0xFFFFFFFDUL, (s32)0x3UL, (s32)0x80000000UL, (s32)0x80000000UL, (s32)0x80000001UL, (s32)0x0UL, (s32)0xFFFFFBDCUL, (s32)0xFFFFFFFAUL, (s32)0x1UL, (s32)0x0UL, (s32)0xFFFFFFFFUL, (s32)0x1UL, (s32)0xBFUL, (s32)0xF7UL, (s32)0xFF6F06DEUL, (s32)0x2UL, (s32)0x0UL, (s32)0xE0B609UL, (s32)0x206UL, (s32)0xC23UL, (s32)0xF9A6E225UL, (s32)0xFFFFFFFFUL, (s32)0xFFFFFF7AUL, (s32)0x1DF5AUL};
+static const s32 dv_sr[25] = {(s32)0xFFFFFFFFUL, (s32)0x1UL, (s32)0xFFFFFFFFUL, (s32)0x0UL, (s32)0x0UL, (s32)0x0UL, (s32)0xFFFFFFFFUL, (s32)0xFFFFFEBDUL, (s32)0x84D3UL, (s32)0xFFFF8AD0UL, (s32)0x0UL, (s32)0xFFFFFFFFUL, (s32)0xFFFFFFFFUL, (s32)0xFFFFE4B1UL, (s32)0x7DUL, (s32)0xFFFFFFEBUL, (s32)0x5ECD4UL, (s32)0xE92A0EUL, (s32)0x53UL, (s32)0xFFFFACCDUL, (s32)0x46UL, (s32)0x7UL, (s32)0xEBBE2F12UL, (s32)0xFF36A56CUL, (s32)0x12BBUL};
+u16 r_div32_bad;    /* vectors whose quotient or remainder is wrong -> 0 */
+u16 r_div32_n;      /* vectors run -> 73 */
+static void part_div32(void) {
+    u16 k;
+    r_div32_bad = 0;
+    r_div32_n = 0;
+    for (k = 0; k < 48; k++) {
+        if (dv_ua[k] / dv_ub[k] != dv_uq[k]) r_div32_bad++;
+        if (dv_ua[k] % dv_ub[k] != dv_ur[k]) r_div32_bad++;
+        r_div32_n++;
+    }
+    for (k = 0; k < 25; k++) {
+        if (dv_sa[k] / dv_sb[k] != dv_sq[k]) r_div32_bad++;
+        if (dv_sa[k] % dv_sb[k] != dv_sr[k]) r_div32_bad++;
+        r_div32_n++;
+    }
+}
+
+/* textPrintU16 (2026-10-11, digits by subtraction): the characters that
+ * land in the text buffer, and where the cursor stops. */
+u16 r_pu16_bad;     /* numbers printed wrong -> 0 */
+u16 r_pu16_n;       /* numbers printed -> 14 */
+extern u8 tilemapBuffer[];
+static void chk_pu16(u16 v, const char *want) {
+    u16 k;
+    u16 bad = 0;
+    textSetPos(0, 20);
+    textPrint("          ");
+    textSetPos(0, 20);
+    textPrintU16(v);
+    for (k = 0; want[k]; k++) {
+        u16 cell = tilemapBuffer[(20 * 32 + k) * 2] | ((u16)tilemapBuffer[(20 * 32 + k) * 2 + 1] << 8);
+        if ((cell & 0x03FF) != (u16)(text_config.font_tile - 32 + (u8)want[k])) bad = 1;
+    }
+    if (textGetX() != k) bad = 1;
+    r_pu16_bad += bad;
+    r_pu16_n++;
+}
+static void part_pu16(void) {
+    r_pu16_bad = 0;
+    r_pu16_n = 0;
+    chk_pu16(0, "0");       chk_pu16(7, "7");         chk_pu16(10, "10");
+    chk_pu16(99, "99");     chk_pu16(100, "100");     chk_pu16(109, "109");
+    chk_pu16(1000, "1000"); chk_pu16(9999, "9999");   chk_pu16(10000, "10000");
+    chk_pu16(10001, "10001"); chk_pu16(30000, "30000"); chk_pu16(40005, "40005");
+    chk_pu16(65535, "65535"); chk_pu16(60090, "60090");
+}
+
+/* textPrint runs (2026-10-11, asm_textRun): a run that reaches the last
+ * column, a newline inside a string, a character the font does not have.
+ * The values are those the C loop gave. */
+u16 r_trun_bad;     /* cells or cursor positions wrong -> 0 */
+static u16 trun_cell(u16 col, u16 row) {
+    u16 k = (row * 32 + col) * 2;
+    return (u16)((tilemapBuffer[k] | ((u16)tilemapBuffer[k + 1] << 8)) & 0x03FF);
+}
+static void part_trun(void) {
+    u16 f = (u16)(text_config.font_tile - 32);
+    r_trun_bad = 0;
+    textSetPos(0, 21); textPrint("                                ");
+    textSetPos(0, 22); textPrint("          ");
+    textSetPos(28, 21);
+    textPrint("ABCDEF");                     /* three by the run, D on the last column, then the next row */
+    if (trun_cell(28, 21) != f + 'A') r_trun_bad |= 1;
+    if (trun_cell(30, 21) != f + 'C') r_trun_bad |= 2;
+    if (trun_cell(31, 21) != f + 'D') r_trun_bad |= 4;
+    if (trun_cell(0, 22) != f + 'E' || trun_cell(1, 22) != f + 'F') r_trun_bad |= 8;
+    if (textGetX() != 2 || textGetY() != 22) r_trun_bad |= 16;
+    textSetPos(3, 23);
+    textPrint("xy\nz\x7Fw");                 /* a newline, and the last printable code */
+    if (trun_cell(3, 23) != f + 'x' || trun_cell(4, 23) != f + 'y') r_trun_bad |= 32;
+    if (trun_cell(0, 24) != f + 'z' || trun_cell(1, 24) != f + 0x7F || trun_cell(2, 24) != f + 'w') r_trun_bad |= 64;
+    if (textGetX() != 3 || textGetY() != 24) r_trun_bad |= 128;
+    textSetPos(0, 23); textPrint("        ");
+    textSetPos(0, 24); textPrint("        ");
+    textSetPos(0, 21); textPrint("                               ");
+    textSetPos(0, 22); textPrint("    ");
+}
+
+/* tileBlitGlyph2bpp against a C reference of its contract: every shift,
+ * with and without a right tile, whole and partial rows, on tiles that
+ * already hold bits (the call ORs). r_glyph_ok counts the cases where the
+ * assembly and the reference leave the same bytes (expected: all 32);
+ * r_glyph_pin holds one case so that an expected value computed outside
+ * this ROM pins the reference too. */
+static FAR u8 gb_glyph[16];
+static FAR u8 gb_t[16], gb_r[16], gb_rt[16], gb_rr[16];
+
+static void glyph_ref(u8 FAR *t, u8 FAR *r, const u8 FAR *g,
+                      u8 gr, u8 tr, u8 n, u8 sh)
+{
+    u8 k;
+    for (k = 0; k < n; k++) {
+        u8 p0 = g[(gr + k) * 2], p1 = g[(gr + k) * 2 + 1];
+        u8 o = (u8)((tr + k) * 2);
+        t[o] |= (u8)(p0 >> sh);
+        t[o + 1] |= (u8)(p1 >> sh);
+        if (r && sh) {
+            r[o] |= (u8)(p0 << (8 - sh));
+            r[o + 1] |= (u8)(p1 << (8 - sh));
+        }
+    }
+}
+
+static void test_glyph_blit(void)
+{
+    static const u8 shape[4][3] = { {0, 0, 8}, {0, 3, 5}, {3, 0, 5}, {1, 2, 5} };
+    u8 i, sh, c, w, ok = 0;
+
+    for (i = 0; i < 16; i++)
+        gb_glyph[i] = (u8)(i * 37 + 11);
+    for (sh = 0; sh < 8; sh++)
+        for (c = 0; c < 4; c++) {
+            {
+                u8 same = 1;
+                w = (u8)((sh + c) & 1);     /* each shape with and without a right tile */
+                for (i = 0; i < 16; i++) {
+                    gb_t[i] = gb_rt[i] = (u8)((i * 13) & 0x5A);
+                    gb_r[i] = gb_rr[i] = (u8)((i * 7) & 0xA5);
+                }
+                tileBlitGlyph2bpp(gb_t, w ? gb_r : (u8 FAR *)0, gb_glyph,
+                                  shape[c][0], shape[c][1], shape[c][2], sh);
+                glyph_ref(gb_rt, w ? gb_rr : (u8 FAR *)0, gb_glyph,
+                          shape[c][0], shape[c][1], shape[c][2], sh);
+                for (i = 0; i < 16; i++)
+                    if (gb_t[i] != gb_rt[i] || gb_r[i] != gb_rr[i])
+                        same = 0;
+                ok += same;
+                if (sh == 3 && c == 3)      /* w is 0 here: shift 3 keeps the right part */
+                    for (i = 0; i < 16; i++) {
+                        r_glyph_pin[i] = gb_t[i];
+                        r_glyph_pin[16 + i] = gb_r[i];
+                    }
+            }
+        }
+    r_glyph_ok = ok;
+}
+
 int main(void) {
 
     /* audio v2 first: audioInit blocks on the APU boot + driver upload
@@ -1201,6 +1423,18 @@ int main(void) {
      * (round-robin starts there). Probe asserts the ARAM bytes, the
      * directory entry, and the playing voice's DSP state. */
     r_audio_load = audioLoadSample(0, beep_brr, 9, 0);
+    {
+        /* The stream itself (three bytes an exchange since 2026-10-10): a
+         * pattern no byte of which is 0, loaded right after the beep, at
+         * $0B09. The loads below overwrite its first 513 bytes only; the
+         * manifest reads the rest, and the byte after its end. */
+        u16 k;
+        for (k = 0; k < 770; k++) pat_brr[k] = (u8)((k * 7 + 3) | 1);
+        r_audio_load770 = audioLoadSample(1, pat_brr, 770, 0);
+        audioUnloadSample(1);
+        r_audio_load10 = audioLoadSample(1, pat_brr + 760, 10, 0);   /* $0B09-$0B12 */
+        audioUnloadSample(1);
+    }
     r_audio_load513 = audioLoadSample(1, big_brr, 513, 0);
     audioUnloadSample(1);              /* give the 513 bytes back: the memory vectors below count them */
     r_audio_load512 = audioLoadSample(1, big_brr, 512, 0);
@@ -1217,6 +1451,7 @@ int main(void) {
     /* phase 3: hall on voice 0's beep + live envelope readback. The
      * echo values are arbitrary-but-distinct probe vectors. */
     audioSetEcho(3, 40, 20, 20);
+    r_audio_free_echo = audioGetFreeMemory();
     {
         static const s8 fir[8] = { 96, 0, 0, 0, 0, 0, 0, 0 };
         audioSetEchoFilter(fir);
@@ -1231,6 +1466,9 @@ int main(void) {
     part_math_anim();
     part_collision_sram();
     part_objects_irq();
+    part_div32();
+    part_pu16();
+    part_trun();
 
 
     coverage_bank_bytes();
@@ -1266,6 +1504,8 @@ int main(void) {
         t_px[0] = 5;
         tileEncode4bpp(t_px, r_tile4_dot);
     }
+
+    test_glyph_blit();
 
     test_string();
 
@@ -1368,7 +1608,38 @@ int main(void) {
         r_world[9] = oamMemory[127 * 4] | ((oamMemory[512] == before) << 8);   /* sprite 1 of the batch, 8 pixels wide at x = -31: hidden (x byte 1); byte 512, where a 129th sprite would land, untouched */
         r_world[10] = w_seen[0] | (w_seen[1] << 8);                        /* unchanged: 1, 1 */
         r_world[11] = 0x0165;
-        for (i = 110; i < 128; i++) oamHide(i);
+        /* `order`, a reversal: slot 110 shows sprite 7 and slot 117 sprite 0.
+         * The arrays did not move; visible[] is still indexed by the sprite. */
+        for (i = 0; i < 8; i++) w_seen[i] = 0xEE;
+        wb.visible = w_seen; wb.first_id = 110; wb.count = 8; wb.size = 32;
+        wb.order = w_rev;
+        oamPlaceWorld(&wb, 100, 50);
+        r_worldo[0] = oamMemory[117 * 4] | (oamMemory[117 * 4 + 1] << 8);  /* sprite 0: 0, 0 */
+        r_worldo[1] = oamMemory[116 * 4] | (oamMemory[116 * 4 + 1] << 8);  /* sprite 1: $E1, 10 */
+        r_worldo[2] = oamMemory[114 * 4] | (oamMemory[114 * 4 + 1] << 8);  /* sprite 3: 255, 223 */
+        r_worldo[3] = oamMemory[114 * 4 + 2] | (oamMemory[114 * 4 + 3] << 8);  /* its tile $13, attr $33 */
+        r_worldo[4] = oamMemory[110 * 4] | (oamMemory[110 * 4 + 1] << 8);  /* sprite 7: hidden, 1, 240 */
+        r_worldo[5] = 0;
+        for (i = 0; i < 8; i++) r_worldo[5] |= (u16)w_seen[i] << i;        /* by sprite: 75, as without order */
+        /* order bytes out of range (200, 8, 255) hide their slot and touch
+         * no array; sprite 3 shown twice is two slots with the same picture */
+        for (i = 0; i < 8; i++) w_seen[i] = 0xEE;
+        wb.order = w_bad;
+        oamPlaceWorld(&wb, 100, 50);
+        r_worldo[6] = (oamMemory[111 * 4] == 1 && oamMemory[111 * 4 + 1] == 240)            /* slot 1: 200 */
+                    | ((oamMemory[113 * 4] == 1 && oamMemory[113 * 4 + 1] == 240) << 1)     /* slot 3: 8 */
+                    | ((oamMemory[117 * 4] == 1 && oamMemory[117 * 4 + 1] == 240) << 2)     /* slot 7: 255 */
+                    | ((oamMemory[114 * 4] == 255 && oamMemory[115 * 4] == 255) << 3)       /* slots 4 and 5: sprite 3 */
+                    | ((w_seen[2] == 0xEE && w_seen[4] == 0xEE && w_seen[5] == 0xEE && w_seen[7] == 0xEE) << 4)  /* never named: untouched */
+                    | ((w_seen[0] == 1 && w_seen[1] == 1 && w_seen[3] == 1 && w_seen[6] == 1) << 5);
+        /* the old form: no order, slot 108 shows sprite 0 (camera at 0: on
+         * screen at 0, 0) and slot 109 sprite 1 (x = -31) */
+        oamPlaceWorld(&w_old, 0, 0);
+        r_worldo[7] = 0x0167
+                    ^ ((oamMemory[108 * 4] == 0 && oamMemory[108 * 4 + 1] == 0
+                        && oamMemory[109 * 4] == 0xE1 && w_old.order == 0) ? 0 : 0xFFFF);
+        wb.order = 0;
+        for (i = 108; i < 128; i++) oamHide(i);
         oam_update_flag = flag;
     }
     /* pads: no button is down in this ROM. The macros, the functions behind

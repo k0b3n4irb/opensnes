@@ -195,7 +195,7 @@ interactive demo; the patterns themselves are reusable building blocks.
 ### Per-scanline wave: by hand, then by the module — `examples/hdma/hdma_wave`
 
 At boot, krom's WaveHDMA idiom: 896 pre-built `[1][offset16]` entries on
-channel 0 in `HDMA_MODE_1REG_2X` (both bytes of `BG1HOFS`, $210D, every
+channel 2 (krom used 0, which `dmaCopyVram` owns here) in `HDMA_MODE_1REG_2X` (both bytes of `BG1HOFS`, $210D, every
 line), and the per-frame "animation" is just `hdmaSetup(..., table +
 phase * 3)` — a zero-copy pointer bump, cheaper than regenerating the
 table and immune to the VBlank budget. Press A and `hdmaWaveH()` /
@@ -264,8 +264,8 @@ typed state when an HDMA effect "does nothing".
 ### Two channels, one visual — the "9-bit" backdrop
 
 krom's RedSpace9BitHDMA trick, described in `examples/hdma/gradient_colors`'s
-README: channel 0 rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
-CGADD: `[addr16][data16]`), channel 1 rewrites INIDISP brightness per
+README: one channel rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
+CGADD: `[addr16][data16]`), another rewrites INIDISP brightness per
 line. Colour x brightness plus per-line jitter dithers the gradient into
 more perceptual steps than the PPU's 5 bits — and INIDISP is owned by the
 stream: the demo never calls `setScreenOn()`.

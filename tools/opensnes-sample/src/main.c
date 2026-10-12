@@ -93,11 +93,13 @@ static int encode_one(cli_ctx *ctx, const char *input)
         "#define %s_brr_size %d   /* bytes: %d BRR blocks of 16 samples */\n"
         "#define %s_brr_loop %d   /* byte offset of the loop point; 0 with no loop */\n"
         "#define %s_brr_loops %d   /* 1 = the sample loops */\n"
+        "#define %s_tuning %d   /* x4096: multiply the playback pitch by this / 4096 (4096 = as encoded) */\n"
         "#define %s_rate %d   /* Hz of the source; the DSP plays at 32000 */\n\n"
         "#endif\n",
         h_path + (strrchr(h_path, '/') ? strrchr(h_path, '/') - h_path + 1 : 0),
         input + (strrchr(input, '/') ? strrchr(input, '/') - input + 1 : 0),
         ident, ident, ident, ident, ident, brr_len, brr_len / BRR_BLOCK, ident, brr_loop, ident, has_loop ? 1 : 0,
+        ident, (int)(tuning * 4096.0 + 0.5),
         ident, w.rate);
     if (hn < 0 || (size_t)hn >= sizeof header) { cli_error(ctx, input, "identifier too long"); free(brr); return CLI_REFUSED; }
 
@@ -112,8 +114,8 @@ static int encode_one(cli_ctx *ctx, const char *input)
         cli_warn(ctx, input, "%d Hz; the DSP plays it at 32 kHz, so it comes out lower and slower (x%.2f) — resample it to 32000 Hz first",
                  w.rate, (double)DSP_RATE / w.rate);
     if (tuning != 1.0)
-        cli_warn(ctx, input, "the loop was resampled to fit 16-sample blocks (tuning x%.4f) — adjust the playback pitch",
-                 tuning);
+        cli_warn(ctx, input, "the loop was resampled to fit 16-sample blocks (tuning x%.4f) — multiply the playback pitch by %s_tuning / 4096",
+                 tuning, ident);
 
     if (ctx->json) {
         cli_json_object(ctx, NULL);
@@ -134,6 +136,10 @@ static int encode_one(cli_ctx *ctx, const char *input)
         cli_json_int(ctx, "aram_bytes", brr_len);
         cli_json_bool(ctx, "loops", has_loop);
         cli_json_int(ctx, "loop_offset", brr_loop);
+        /* 4096 unless the loop had to be resampled to a whole number of
+         * 16-sample blocks: then the sample plays at this / 4096 of its
+         * pitch and the game multiplies its playback pitch by it */
+        cli_json_int(ctx, "tuning_x4096", (int)(tuning * 4096.0 + 0.5));
         cli_json_close(ctx);
     } else if (!ctx->quiet) {
         printf("%s: %s -> %s (%d bytes, %d blocks%s)\n", ctx->tool->name, input, brr_path,

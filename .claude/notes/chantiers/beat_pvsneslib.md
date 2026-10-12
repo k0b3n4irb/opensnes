@@ -295,6 +295,23 @@ estimation.
 - `477259cd` (S5 step 4) counts "180 000 programs clean on new seeds".
   The first 120 000 had one failure, seed 124152 — the gvn defect the same
   commit fixes; the 60 000 run after the fix were clean, and so is that seed.
+- `8d97b5e9` (`OamWorldBatch.order`) ends with "games/rpg and
+  games/likemario use the unordered path every frame". Wrong: no example
+  calls `oamPlaceWorld()` at all (checked after the push); the only users
+  in the tree are the library test ROM and `devtools/libbench`. The path
+  is covered by those two, not by a game. An example that scrolls with
+  world-space sprites is owed (the examples review before 1.0).
+- `f09884de` (luna pin v1.37.0) puts likemario's NMI count in the
+  coverage page, 189 for 190 over 200 frames, down to "a shorter boot".
+  Wrong direction, and not luna's doing: measured after the commit with
+  both luna binaries, the ROM built before step 9 services 190 NMIs and
+  the one after 189 — one frame MORE before NMIs are enabled, after a pass
+  that only shortens code. Cause not established; likemario loads a
+  SNESMOD module at boot, and the SPC700's side of that handshake does
+  not speed up with ours, so a faster main loop can land on the other side
+  of a frame boundary. Its pictures are identical at its manifest frames
+  (`diff_corpus`, offset 0). To look at if a boot ever gains a frame it
+  should not.
 
 ## S7: PVSnesLib's examples against ours (mapped 2026-10-09)
 
@@ -555,3 +572,419 @@ first-come. Candidates: choose which temps get the 16
 words by use count instead of definition order; more words (the block is
 32 bytes; the NMI page mirrors up to $A0).
 
+### Step 7 of #166: the scaled index computed once (2026-10-10)
+
+Read in a loop over a dozen parallel arrays: `lda i / asl a / tax` in
+front of EVERY access, twelve times per iteration. Cause, in the IR after gcm: `sink()` copies the
+address of a load or store next to it (wanted: the emitter folds it into
+the addressing mode) and, since our fix of 2026-10-08 made its recursion
+real, the address's operands too — so each access had its own `mul i, 2`.
+Upstream's recursion acts on a local copy and never reaches the emitted
+instruction; we had repaired a bug into a pessimisation. `sinkref` no
+longer recurses (`QBE_SINK_DEEP=1` restores it).
+
+- sdkbench: -52.9 % -> -53.9 % cycles, -38.4 % -> -39.8 % size; physics,
+  collide, sort, entities, dist move, nothing regresses; static table
+  unchanged (1270);
+- corpus: 86/86 MATCH at offset 0; nine WRAM streams re-captured (direct
+  page temps renumbered);
+- the work was done in a separate worktree (`~/workspace/opensnes-s8`,
+  submodules as worktrees of the main tree's), the compiler binary given
+  meanwhile in a separate directory: the first chantier run under
+  `exchanges.md`.
+
+The hunt on a new range found a defect that was not this change's
+(`silent_defects_log.md`, 2026-10-10: a `(u8)` cast dropped after a signed
+shift in a loop, inherited from upstream `copy.c`); fixed in the same lot.
+
+The benchmark gains a workload, `depot` (eighteen agents, bursts of
+sixteen decisions), which gains -5.0 % from this step.
+
+Next candidates read in the same listing: `lda.b S / tax` before a load is
+`ldx.b S` (2 cycles each); a phi copy `lda S / sta T` at each loop turn;
+`bne L1 / jmp L2 / L1: jmp L3` (a branch to a jump).
+
+How the separate worktree was made (the recipe, since `git submodule
+update` in a new worktree would fetch from the network):
+
+    git worktree add ../opensnes-s8 -b wip/s8-sink develop
+    for m in cproc qbe wla-dx; do rmdir ../opensnes-s8/compiler/$m
+      git -C compiler/$m worktree add [--detach] ../opensnes-s8/compiler/$m <branch|HEAD>
+    done
+    cp -a testing/bin/. ../opensnes-s8/testing/bin/     # luna
+
+Each submodule checkout there is a linked worktree of the main tree's
+submodule repository, so a commit made there is already in it; landing is
+`git merge --ff-only` here, then `git -C compiler/qbe checkout --detach
+<sha>`, then the fork push and the rebuild. Two traps met: git printed
+"cannot chdir to …/opensnes-s8/compiler/qbe" from the main tree while the
+linked worktrees existed, and a `$(git -C … rev-parse HEAD)` came back
+empty, so the fork push did nothing — check `git ls-remote` before
+pushing develop; and `make test-toolchain-suites` chained right after
+`make test-sanitizers` runs on its half-cleaned tree and fails everything
+(rebuild first). Removed the same day: the three submodule worktrees, the
+worktree, both branches.
+
+### Step 8 of #166: a phi shares the slot of what feeds it (2026-10-10)
+
+Counted in per-entity code after step 7: many copies from one
+direct-page slot to another, most of them a loop variable written back at
+the end of each turn. The slot colouring gave a phi and each of its
+arguments different slots by construction: a phi result interfered with
+everything live at the end of each predecessor, its own argument included,
+and a result with its own operands.
+
+What changed in `color_slots` (emit.c):
+- a phi's own argument on an edge is no longer an interference by itself
+  (any other reason still is: the argument live into the block, the old
+  value read after the new one exists — `while (j--)`);
+- a 16-bit add / sub / and / or / xor / copy may take its operand's slot
+  (the emitter computes these in A and stores once);
+- an argument asks for its phi's slot, or a sibling argument's when the
+  phi is not placed yet; a phi asks for an argument's;
+- two 32-bit values share exactly or not at all. The first version let
+  first fit put one a word over the other, since nothing separated them
+  any more: 233 difftest seeds stopped on the slot-ownership check (loud,
+  never a wrong result), which is the net doing its job.
+`emitphimoves` already skipped a move between equal slots.
+
+- four free-running examples show the same pictures earlier (mode2,
+  fix32_orbit, dsp1_cube one frame; mode7/extbg seven: `diff_corpus
+  --tolerance 3` and its sequence pass), three manifests indexed by frame
+  moved with them. These three (and the three of step 6) should name a
+  moment, not a frame: `at_symbol` (debt, still open);
+- audio: nine hashes moved; seven MATCH under `--align-onset`; `echo`
+  (21.8 %) and `speech_synth` (2.6 %) read DIFF and are the same signal 2
+  and 16 samples apart, measured sample against sample (the limit is noted
+  for luna in `OPEN_luna.md`);
+- tried and dropped: taking the phi interference from the block's live-in
+  only instead of each predecessor's live-out (the moves are on the edge,
+  so it would be sound): next to nothing gained.
+
+The hunt found one more defect that was not this step's: a constant shift
+count narrowed by a cast (`silent_defects_log.md`). Two inherited silent
+defects in one day from ranges nobody had run: the hunt on NEW seeds at
+each Class A step is worth more than the gate's fixed ones.
+
+The worktree recipe's trap, understood the second time (2026-10-10): a
+submodule checkout made with `git -C compiler/qbe worktree add` shares the
+submodule's `config`, and as soon as git runs in the new superproject
+worktree (`git add compiler/qbe`, `git status`) it rewrites
+`core.worktree` in that shared config to point at the NEW checkout — with
+a relative path that only resolves from the linked git directory. From
+then on every git command in the main tree's `compiler/qbe` and
+`compiler/wla-dx` dies with "cannot chdir to …/opensnes-s9/compiler/qbe"
+(`cproc` has its git directory elsewhere and is spared). Landing
+therefore goes: read the commit with `git --git-dir=.git/modules/compiler/qbe
+rev-parse wip/<name>`, remove the linked worktrees, then
+`git config -f .git/modules/compiler/<m>/config core.worktree
+../../../../compiler/<m>` for qbe and wla-dx, and only then checkout,
+push the fork (`git ls-remote` to see it arrived) and rebuild. A
+session that had run `git status` in this tree during the chantier would
+have seen it. Next time: a plain clone of the three submodules into the worktree
+(`git clone compiler/qbe ../opensnes-<name>/compiler/qbe`) costs a few
+seconds and shares nothing.
+
+### Step 9 of #166: a late peephole pass (2026-10-10)
+
+Counted after step 8: `lda.b S / tax` in front
+of a load, stores of 0 through A, counters through `lda / inc a /
+sta`. `peephole_late` (emit.c) rewrites them once the ordinary peephole
+has settled: `ldx.b S`, `stz`, `inc.b S` / `dec.b S`, and a constant
+stored to several places is loaded once. 16-bit accumulator only (the
+width is known line by line: an 8-bit section never crosses a label or a
+branch — 5,348 sections checked over the corpus), direct-page slots only
+for ldx and inc (no stack-relative form).
+
+- the first version ran the rules INSIDE the peephole loop and the code
+  went slower with fewer instructions: a `stz` to a slot written and
+  never read (the high half of a widened index) was not a `sta` any more,
+  so neither dead-store rule removed it, and the `sta S / lda S` behind it
+  stayed. A new form is put in after the rules that do not know it;
+- mode7/extbg one frame earlier again (the fourth time that day): its
+  manifest now asserts a range for `ball_x` instead of a value. The other
+  frame-indexed manifests are the debt (`at_symbol`, `input_at`).
+
+
+The worktree recipe that works (step 9, 2026-10-10): plain clones.
+
+    git worktree add ../opensnes-<name> -b wip/<name> develop
+    for m in cproc qbe wla-dx; do rmdir ../opensnes-<name>/compiler/$m
+      git clone -q compiler/$m ../opensnes-<name>/compiler/$m
+      git -C ../opensnes-<name>/compiler/$m checkout -q --detach $(git -C compiler/$m rev-parse HEAD)
+    done
+    cp -a testing/bin/. ../opensnes-<name>/testing/bin/
+
+Landing: `git -C compiler/qbe fetch ../opensnes-<name>/compiler/qbe <sha>`,
+checkout that sha here, `git merge --ff-only wip/<name>` (rebase the branch
+first if `develop` took note commits meanwhile), push the fork, `git
+ls-remote` to see it, remove the worktree, rebuild. Nothing in the main
+tree's git was disturbed during the chantier.
+
+### Step 10 of #166: flow-aware dead stores, cost-ordered slots, the leaf rule off (2026-10-10, night)
+
+Started from a reported case: a hot static stopped being absorbed when
+its caller gained one cold call. Not a budget: our leaf rule of the
+morning. Measured again with the rule off, it had become a loss (`depot`
+-5.7 %), so it is off unless `CC_INLINE_LEAF_MAX` is set.
+
+That exposed three things, each caught by a different gate:
+
+1. **mode7/extbg booted two frames later** (diff_corpus): the 16 KB fill
+   poured into `main` ran 5 % slower than as a function. Read side by
+   side, the inlined loop kept one `sta.b tcc__lf+N` per iteration that
+   nothing read: in a large function the slot is shared, so "nobody reads
+   this slot" never fires. `peephole_flow` is the answer — liveness of the
+   sixteen words over the function's text — and it is the big one.
+   Cost-ordered colouring came first as a guess at the same symptom and
+   stays.
+2. **tetris's border turned green** (diff_corpus, with cost order): not
+   the compiler. The example enabled its HDMA in mid-frame by a raw write;
+   the channel ran on stale registers and wrote direct-page contents into
+   CGRAM. Bisected to `hud.c` / `hudShowMessage`, whose code read correct
+   under both orders — which was the clue: same memory, different CGRAM.
+   `luna assets-dump` (cgram.bin) and `--peek-at renderEnableGradient`
+   (frame 26, line 155) settled it. The old reference already held the
+   corruption, on entries nobody sees.
+3. **The Super FX library test ROM never finished** (manifests): a
+   `RAM_CODE static` leaf with one call site was absorbed into its ROM
+   caller. The leaf rule had hidden it; a non-leaf one could be absorbed
+   on develop already. A function with a section is never absorbed now.
+   diff_corpus does not see the fixtures: only `make tests` did.
+
+Lessons: (a) three gates, three different catches, and none redundant —
+the hunts were clean throughout (344,000 programs and expressions);
+(b) "the same pictures, the same WRAM, a different CGRAM" means a write
+that depends on WHEN, not on what; (c) a rule that helps on average can
+hide a real defect: taking it away is also a test.
+
+Two frame-indexed manifests were moved to `at_symbol` / `input_at` in the
+same lot (`movement_sprite_swarm`, `backgrounds_mode4`): they stop on the
+Nth arrival at `WaitForVBlank`. The first had been reading a state astride
+two iterations. luna lacks a block assertion in a checkpoint (the VRAM row
+of mode4 is asserted in RAM instead): to report.
+
+Still open: a function pays its stack frame on the
+path where it does nothing, or for a call rarely taken. Needs the frame opened only where it is used, or values saved around
+the cold call: the next chantier in the emitter.
+
+
+## 2026-10-11: a frame paid for nothing — measured, not pursued
+
+Two cases reported: a function that tests and returns still pays its
+frame, and a leaf loses its direct page for one cold call.
+
+- **A leaf already pays nothing** on an early return (no frame at all).
+  The case is a function that calls. Opening the frame after the early
+  test is only possible when the entry region touches no frame slot — and
+  a function with parameters homes them first. Counted on the assembly
+  the compiler produces today: 14 of the 130 framed functions of the
+  examples reach an exit before using their frame (ten of them are
+  `main`). Not worth an emitter change.
+- **Saving direct-page words around a cold call** instead of homing them
+  on the stack: `pei` + `plx` / `stx` is about 14 cycles a word a call,
+  against about 22 cycles of frame a function entry plus one a stack
+  access. With four words live across the call it wins only if the call
+  runs less than about four times in ten, and the compiler has no
+  frequency for a branch: under an even guess the gain is nil, and a call
+  that does run loses 25 cycles. It would need the source to say the call
+  is cold. Kept as an idea (a `COLD` mark on a function, in `types.h`)
+  for the day a measured case cannot be rearranged in the source.
+
+## 2026-10-11: step 11 — the 32-bit division of the runtime
+
+Found in a profile, not in a bench: one site dividing a 32-bit constant
+by a 16-bit value made `tcc_udivmod32` visible. The routine ran 32 turns of `asl/rol/rol/rol` on absolute words plus a 32-bit
+trial subtraction, about 16,000 master cycles a call. `div32_ucore`
+(shared by the signed entry): divisor under 65,536 → word by word,
+remainder in A, the high word skipped when it is below the divisor;
+wider divisor → 16 turns.
+
+Validation (runtime = Class A): diff_corpus 86/86; hunts on new seeds,
+expressions 129001-133000 and programs 327401-330400, clean; libtests 73
+vectors (`r_div32_bad`), two deliberate breaks caught (6 and 18 wrong).
+The WRAM oracle moved on 41 examples for a reason worth knowing: the
+section is 45 bytes longer, it shares the asset banks, so the constant
+data after it moved, and stale POINTERS to that data in the direct page
+(`tcc__r9`, `tcc__lf`) changed by 45 — three bytes on print_string, read
+with `luna state --peek tcc__r0:256` on both builds. Two of my reads on
+the way were void and said "0 bytes differ": a `--peek` whose address
+form luna did not accept returns nothing, and comparing two nothings
+passes. Check the length of what was read before comparing it.
+
+No sdkbench workload divides 32 bits by a variable. A row to add if the
+bench is extended.
+
+## 2026-10-11: a profile of the whole corpus
+
+Owner, the same day: do not optimise for one program alone. Method: `luna
+profile` frames 60-300 on each of the 86 examples, summed by symbol
+(661 M master cycles of work in all). What it shows: the examples' own
+`main` 20 %, `NmiHandler` 18 % (the fixed price of a frame, already
+worked), then chip and effect code of single examples, `textPrint` 3 %,
+`tcc_mul16` 2.5 % (7 examples), `oamDrawMetasprite` 2.5 %, `tcc_div16`
+1.9 % (5 examples). The multiply and divide helpers already use the
+hardware units; what was wrong was a caller: `textPrintU16` made 15
+divisions a number, ten of them in software (divisor above 255). Now by
+subtraction: timer 132,211 → 93,849 master cycles a frame.
+
+Left on that list, not done: `textPrint` itself (63,000 master cycles a
+frame in `timer` for "COUNT=", three spaces and a 16-character line —
+about 2,400 a character, to look at next), `oamDrawMetasprite`, the four
+`nop` after each hardware multiply in `tcc_mul16`.
+
+Done since: `textPrint`'s run of characters in assembly the same day
+(`1c173f87`, timer 91,387 → 60,046 a frame); `oamDrawMetasprite` in
+assembly on 2026-10-12 (profile of the corpus re-run on `0202ea6a`, work
+only: `main` 20 %, `NmiHandler` 19 %, then `oamDrawMetasprite` 2.6 %,
+`tcc_mul16` 2.4 %, `oamSet` 1.4 %, `tcc_div16` 0.8 % — down from 1.9 since
+`textPrintU16` stopped dividing in software; `metasprite` 61,460 → 27,470 a
+frame, `aseprite_pipeline` 30,220 → 15,930). The same day, `86471b90`:
+the NMI's text flush sends only the bytes written since the last VBlank
+(`tilemap_dirty_lo/hi` in `crt0`'s system block; `timer` 17,650 → 3,400
+master cycles of flush a frame, `controller` 17,650 → 1,350; the timer
+manifest caps its VBlank DMA at 1,024 bytes, which the ROM before fails).
+Still not done: the `nop`s of `tcc_mul16` (below), and the index of a loop
+kept in X (stage 2, T3) — stage 2 waits for the
+owner's word (the plan of 2026-10-08 opens it after 1.0).
+
+## 2026-10-11 — the four `nop` of `tcc_mul16`: not shortened
+
+The references ask for eight CPU cycles between the write to `$4203` and
+the read of `$4216`; the routine waits fourteen. One `nop` instead of four
+would be eight by our count, three times a call. Not done: luna 1.38.0
+returns the full product at once (probe ROM, see
+`partners/luna/2026-10-11_to_luna_multiplier_latency.md`), so the library
+tests pass with no `nop` at all and nothing here can tell eight from
+seven. To reopen when luna models or flags the early read, or with a
+console.
+
+2026-10-12: luna confirmed the fact against ares (`aluEdge`) and Mesen2
+(`AluMulDiv`) — one bit per CPU cycle, eight steps for a product, sixteen
+for a quotient — and has the port written (mulprobe gives
+`f1fec1fe01fe01fe01fe5a00` there), not yet committed (its validation waits
+for its owner). When it lands: re-run the probe on the pinned luna, then
+shorten the waits of `tcc_mul16` and look at the eight `nop` of `tcc_div16`
+with the libtests as the judge.
+
+## 2026-10-12 — the waits shortened, judged by luna `64c771d`
+
+luna committed the port the same day (`64c771d`, not yet released; binary
+`~/workspace/luna/target/stable/luna`). Our probe gives
+`f1fec1fe01fe01fe01fe5a00` there, and a finer one (nop and xba fillers,
+8-bit and 16-bit reads: `partners/luna/2026-10-12_to_luna_multiplicateur_reply.md`)
+says the product is complete 8 CPU cycles after the write of `$4203`
+exactly — at 7 the low byte is right and the high byte still lacks its top
+bit, which an 8-bit-read probe would miss — and the quotient 16 after
+`$4206`. The two figures of anomie-regs.
+
+Done, in one lot, with one `nop` of margin kept over the figure (no console
+measured; every reference and emulator counts CPU cycles): `tcc_mul16` 14
+→ 10 cycles from write to read on each of its three products, `tcc_div16`
+22 → 18, and `tcc_mul32` (ten products), `fixMul`, `fixLerp` and the
+`fixed32` products 13-15 → 11. Second cut from the same arbiter ("$4202
+will not be altered by this process, thus a new value may be written to
+$4203 to perform another multiplication without resetting $4202"): the
+products are ordered so that two in a row share WRMPYA and the second does
+not rewrite it — four writes saved in `tcc_mul32`, one in `tcc_mul16`,
+two in `fixMul`, one in `fixLerp`, two per `fixed32` product. Per call:
+`tcc_mul16` −20 cycles, `tcc_div16` −4, `tcc_mul32` −76, `fixMul` −26,
+`fixLerp` −13. The library tests and the differential hunts (new seeds)
+ran with `LUNA_BIN` on `64c771d`, the rest of the protocol on the pin.
+
+Seen on the way, a debt of the map module: `mapLoad` DMAs
+`MAP_MAXMTILES` entries into `metatiles` (4096 bytes) and `metatilesprop`
+(2048) whatever the asset's size, so the tail of each table is whatever
+ROM follows the asset — the `.mul32` / `.div32` sections for `maps/tiled`,
+which is how a change in a helper's size moved the WRAM oracle of the five
+map examples. Harmless (no metatile id reaches the tail) but a 6 KB copy
+for tables of a few hundred bytes, and an oracle that reads section
+placement. A copy sized by the asset (the map header knows its count)
+would end both. Not done in this lot.
+
+
+## 2026-10-12 — stage 2 opened: T2 and T3 (the owner's word: "enchaine T2 et T3")
+
+What the IR said before a line was written: after the passes, a clear
+loop of 1920 words is `i = phi(0, i + 1)`, `cultw i, 1920`, `extuh i → mul 2 → add
+$far_layer → storew`. A second counter `j = 2i` kept in the direct page
+beside `i` costs this target more than the `asl` it removes (`lda / clc /
+adc #2 / sta` is 13 cycles where `lda / inc a / sta` is 10), so T2 is not
+"strength reduction adds an induction variable": it is **the counter
+replaced by the scaled index when every use is that index** (`ivar.c`,
+before `gcm`: a w phi with constant init, step and `cultw` bound, the body
+on the true branch, every other use the same `c·i`, the stepped value
+feeding the phi alone, c·(N−1+step), c·i0 and c·N within 16 bits). Alone
+it is worth one instruction a turn (the `asl`) and nothing in cycles;
+what it buys is a counter that *is* the byte offset, so that T3 can keep
+it in X with the bound pre-multiplied.
+
+Two defects of the first version, both found by the corpus build, not by
+the hunts: a counter whose stepped value `i + 1` is also a value
+elsewhere (`backgrounds/mode6` uses it as a colour) left the old add
+dangling and `gcm` asserted — the stepped value must have one use, the
+phi; and a scaled copy `t = 2·i` with its own uses is a use of the
+counter (substituted: t = j). The qbe commit's `-d V` traces the
+rewrites.
+
+T3 is not the 10-15 day IR-level register pinning the plan estimated: it
+is a **text rule of the peephole stage** (`peephole_loop_x` in `emit.c`,
+after `peephole_late`), like the loop rotation and the entry peephole
+before it. It recognises the loop the emitter writes — `lda S / cmp #N /
+bcs @join`, the body with `ldx S` at its top, the step `lda S / clc / adc
+#c / sta S` (anywhere in the region: `gcm` may order the accumulation
+after it) and the test `cmp #N / bcc @body`, the branches possibly still
+the `bcc + / jmp / +` triples of that stage — and rewrites it `ldx S /
+cpx #N / bcs`, the top load gone, `inx` ×c or `txa / clc / adc #c / tax`,
+`cpx #N`. Conditions: nothing in the region writes X or the slot, every
+read of the slot is a `lda.b` (it becomes `txa`), no call, no `mvn`,
+every label of the region entered from inside only, the slot dead at
+every exit (a backward liveness of that one slot over the text, two bits
+for its two bytes, a `jsl` killing it since a direct-page temp never
+crosses a call), and the body's first touch of A before any branch a
+write (A is no longer the counter at the body's label). Found on the
+way: two nested empty loops both converted hung the `pad` ROM of the
+library bench — the outer was read first, its body then held no X write;
+the text is now read from the end (the inner's header comes later) and a
+loop overlapping a converted one is left alone. A first "slot mentioned
+nowhere else" condition converted nothing in the corpus; the liveness
+replaced it, and the `jsl` rule ("live at an exit" on every function
+that calls) was the second half of that.
+
+What it covers and what it does not: loops **without a call in the body**
+— fills, sieves, sums, the glyph rows, `farClear`. A loop that calls has
+to reload its counter after each call whatever register holds it (the
+callee may use X; the arg cleanup is `plx`), so X buys it nothing and the
+rule leaves it alone; across the 88 examples, 3 units and 8 loops take
+the rule, the sdkbench `sieve` −6.7 %, `farClear` 231 → 125.8 master
+cycles a word — 15 CPU cycles, the hand-written form, the invariant
+`lda #0` hoisted before the body by a second rule of the same pass (the
+label moves down into the line the deleted `ldx` left).
+
+The fourth battery caught the rule's one real defect: the liveness that
+decides whether the counter dies with the loop treated every `jsl` as a
+kill, which is right for a C call (a direct-page temp never crosses one)
+and wrong for a runtime helper (`__mul16`, `tcc_mul32`, the divisions),
+which is no call to the slot allocation and keeps the direct page —
+`difftest_stmt` seed 380493 read its counter back after twelve
+`tcc_mul32` and got 0 for 1 (12 seeds of 2 000, all this). Helpers are
+transparent now; everything else kills.
+
+The library bench's subtraction (a row = the loop with the calls minus
+the same loop without them) counted the rule's saving on the *empty*
+loop as a cost of the calls (`pad` 9,865 → 10,512 while nothing had
+slowed); every loop of a row now calls `bench_nop()` in both variants,
+and the reference was re-measured for both SDKs.
+
+## Debts and ideas left on 2026-10-12 (not opened)
+
+- `audioUnloadFrom(id)`: unload every sample loaded since slot `id` in one
+  call (the allocator is a stack); relaying two sample banks today takes
+  one `audioUnloadSample()` a sample in reverse order, which fits in a
+  frame. With it, a tutorial paragraph on relaying banks.
+- `mapLoad` copies `MAP_MAXMTILES` entries whatever the asset's size (the
+  tail is the ROM that follows); a copy sized by the asset.
+- T3 follow-ups: a loop whose body reads A as the counter at its top
+  (`txa` would be needed where the deleted `ldx` was: no line to put it
+  on when the body has no `ldx`); `!=` and signed loop tests (`bne`/`beq`
+  entries); stack-slot counters (`N,s`: no `ldx n,s` form).

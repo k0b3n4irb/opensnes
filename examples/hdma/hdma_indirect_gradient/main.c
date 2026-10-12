@@ -95,10 +95,10 @@ int main(void) {
     }
     *p = 0;                                     /* end of HDMA table */
 
-    hdmaSetupIndirect(HDMA_CHANNEL_0, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
+    hdmaSetupIndirect(HDMA_CHANNEL_2, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
                       itable,
                       (u8)((u32)(void *)band_data >> 16));
-    hdmaEnableMask(1 << HDMA_CHANNEL_0);
+    hdmaEnableMask(1 << HDMA_CHANNEL_2);   /* not 0 (dmaCopyVram) nor 1 (the NMI's text flush) */
 
     /* krom: TM = 0 — no layers; the backdrop is the whole picture */
     setMainScreen(0);

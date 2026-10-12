@@ -6,109 +6,120 @@
       "detail": {}
     },
     "pad": {
-      "cycles": 11429,
+      "cycles": 11427,
       "detail": {
-        "__local_4": 145742,
-        "padsUp": 82480,
-        "__local_5": 320,
-        "__local_2": 40
+        "__local_4": 145640,
+        "padsUp": 82542,
+        "bench_nop": 160,
+        "__local_2": 120
       }
     },
     "scroll": {
-      "cycles": 39539,
+      "cycles": 39540,
       "detail": {
-        "bgSetScroll": 517942,
-        "__local_12": 272640,
-        "__local_13": 80,
-        "__JumpTo_nmi_handler": 40
+        "bgSetScroll": 518182,
+        "__local_12": 272240,
+        "__local_13": 262,
+        "__local_15": 80
       }
     },
     "oamset": {
-      "cycles": 81070,
+      "cycles": 81061,
       "detail": {
-        "__local_20": 621102,
-        "osbyte4": 588404,
-        "oamSet": 411400,
-        "__local_22": 222
+        "__local_20": 621106,
+        "osbyte4": 588388,
+        "oamSet": 411440,
+        "__local_22": 80
       }
     },
     "oamxy": {
-      "cycles": 45047,
+      "cycles": 45048,
       "detail": {
-        "oamSetXY": 491760,
-        "__local_28": 409066,
-        "__local_31": 80,
-        "__local_29": 40
+        "oamSetXY": 492044,
+        "__local_28": 408680,
+        "__local_29": 142,
+        "__local_30": 62
       }
     },
     "oamsize": {
-      "cycles": 48746,
+      "cycles": 48744,
       "detail": {
-        "oamSetEx": 504044,
-        "__local_36": 235744,
-        "oamSetEx1nex": 121440,
-        "oamSetEx1end": 113520
+        "oamSetEx": 503924,
+        "__local_36": 235942,
+        "oamSetEx1nex": 121320,
+        "oamSetEx1end": 113400
       }
     },
     "dma": {
-      "cycles": 17894,
+      "cycles": 17897,
       "detail": {
-        "dmaCopyVram": 351918,
-        "__local_41": 5960
+        "dmaCopyVram": 351942,
+        "__local_41": 5880,
+        "__local_43": 80,
+        "consoleVblank": 40
       }
     },
     "text": {
-      "cycles": 84676,
+      "cycles": 84678,
       "detail": {
-        "__local_162": 600200,
-        "consoleVblank": 349760,
-        "_psm_nextchar": 216120,
-        "__local_163": 183760
+        "__local_162": 603800,
+        "consoleVblank": 349800,
+        "_psm_nextchar": 216600,
+        "__local_163": 183960
       }
     },
     "frame": {
       "cycles": 169798,
       "detail": {
-        "__local_92": 622000,
-        "__local_162": 603800,
-        "osbyte4": 587120,
-        "oamSet": 411960
+        "__local_109": 621560,
+        "__local_162": 602000,
+        "osbyte4": 588600,
+        "oamSet": 410800
       }
     },
     "worldc": {
-      "cycles": 129330,
+      "cycles": 129332,
       "detail": {
-        "__local_56": 1228788,
-        "__local_58": 584040,
-        "__local_59": 216702,
-        "__local_60": 200862
+        "__local_56": 1228526,
+        "__local_58": 584444,
+        "__local_59": 217044,
+        "__local_60": 200782
       }
     },
     "world": {
-      "cycles": 129330,
+      "cycles": 129332,
       "detail": {
-        "__local_56": 1228788,
-        "__local_58": 584040,
-        "__local_59": 216702,
-        "__local_60": 200862
+        "__local_56": 1228526,
+        "__local_58": 584444,
+        "__local_59": 217044,
+        "__local_60": 200782
       }
     },
     "vramc": {
-      "cycles": 17400,
+      "cycles": 17395,
       "detail": {
-        "dmaCopyVram": 212336,
-        "__local_76": 135462,
-        "__local_77": 160,
-        "__JumpTo_nmi_handler": 40
+        "dmaCopyVram": 212454,
+        "__local_93": 135200,
+        "__local_94": 160,
+        "bench_nop": 80
       }
     },
     "vramq": {
-      "cycles": 17400,
+      "cycles": 17395,
       "detail": {
-        "dmaCopyVram": 212336,
-        "__local_84": 135462,
-        "__local_85": 160,
-        "__JumpTo_nmi_handler": 40
+        "dmaCopyVram": 212454,
+        "__local_101": 135200,
+        "__local_102": 160,
+        "bench_nop": 80
+      }
+    },
+    "worldo": {
+      "cycles": 136701,
+      "detail": {
+        "__local_73": 1376026,
+        "__local_75": 584426,
+        "__local_76": 216800,
+        "__local_77": 200680
       }
     }
   }

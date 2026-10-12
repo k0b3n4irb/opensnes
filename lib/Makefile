@@ -38,6 +38,15 @@ MEMMAP_SUPERFX = ../templates/memmap.inc
 
 # Tools (using QBE-based compiler)
 CC = ../bin/cc65816
+# The library's C objects are rebuilt when the compiler changes: a `make`
+# after a compiler update otherwise linked games against library functions
+# the OLD compiler had made. By a stamp holding a checksum of the three
+# binaries, written below only when it changes — not by naming the binaries
+# as prerequisites of the pattern rules, which on Windows left every C
+# object unbuilt without an error (see COMPILER_ID in make/common.mk,
+# 2026-10-10).
+COMPILER_ID := $(shell cksum $(wildcard ../bin/cc65816* ../bin/cproc-qbe* ../bin/qbe*) </dev/null 2>/dev/null | cksum | tr -d ' \t')
+COMPILER_STAMP := build/.compiler_id
 AS = ../bin/wla-65816
 SPC_AS = ../bin/wla-spc700
 LD = ../bin/wlalink
@@ -118,7 +127,15 @@ OBJECTS_SUPERFX = $(C_OBJECTS_SUPERFX) $(ASM_OBJECTS_SUPERFX)
 LIB_ASM_DEPS := $(wildcard $(SRCDIR)/*.inc $(CONTRIBDIR)/*.inc ../templates/*.inc) $(SRCDIR)/sm_spc.asm
 LIB_C_DEPS   := $(wildcard $(INCDIR)/snes.h $(INCDIR)/snes/*.h)
 $(ASM_OBJECTS_LOROM) $(ASM_OBJECTS_HIROM) $(ASM_OBJECTS_SA1) $(ASM_OBJECTS_SUPERFX): $(LIB_ASM_DEPS)
-$(C_OBJECTS_LOROM) $(C_OBJECTS_HIROM) $(C_OBJECTS_SA1) $(C_OBJECTS_SUPERFX): $(LIB_C_DEPS)
+$(C_OBJECTS_LOROM) $(C_OBJECTS_HIROM) $(C_OBJECTS_SA1) $(C_OBJECTS_SUPERFX): $(LIB_C_DEPS) $(COMPILER_STAMP)
+
+# Rewritten only when the checksum differs, so that its date moves with the
+# compiler and not with each `make`.
+$(COMPILER_STAMP): FORCE_COMPILER_ID
+	@mkdir -p build
+	@if [ "$$(cat $@ 2>/dev/null)" != "$(COMPILER_ID)" ]; then echo "$(COMPILER_ID)" > $@; fi
+.PHONY: FORCE_COMPILER_ID
+FORCE_COMPILER_ID:
 
 #------------------------------------------------------------------------------
 # Main Target - Build All

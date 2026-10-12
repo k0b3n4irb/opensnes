@@ -51,7 +51,14 @@
 /* ARAM sample area (spec: driver $0200-$09FF, directory $0A00,
  * samples from $0B00 up to the echo region at $C000) */
 #define SAMPLE_BASE 0x0B00
-#define SAMPLE_CEIL 0xC000
+#define SAMPLE_CEIL_ECHO 0xC000   /* the echo ring starts here (ESA) */
+#define SAMPLE_CEIL_FULL 0xFFC0   /* under the IPL ROM's 64 bytes */
+/* Where the sample area ends: at the echo ring once the game has
+ * configured an echo, at the top of RAM as long as it has not (the DSP
+ * writes nothing there while FLG bit 5 is set — fullsnes, "6Ch - FLG":
+ * "Echo Buffer Writes (0=Enable, 1=Disable)" — and the driver sets it at
+ * start and keeps it until ECHO_CFG). */
+#define SAMPLE_CEIL (audio_echo_reserved ? SAMPLE_CEIL_ECHO : SAMPLE_CEIL_FULL)
 
 /* Default one-shot envelope for a voice whose ADSR/GAIN the user never
  * configured: instant attack, no decay, full sustain — KOFF releases. */
@@ -81,28 +88,73 @@ typedef struct {
     u8 pan;
     u8 env_set;         /* user called SetADSR/SetGain for this voice */
     u16 pitch;
+    u16 vol_lr;         /* the VVOL parameter last sent: right << 8 | left */
+    u8 sent;            /* what the driver already holds for this voice: SENT_* */
 } VoiceMirror;
+
+#define SENT_VOL   0x01     /* vol_lr was sent */
+#define SENT_PITCH 0x02     /* pitch was sent */
+#define SENT_ENV   0x04     /* the default envelope was sent */
 
 static VoiceMirror voice_mirror[AUDIO_MAX_VOICES];
 
 /* Sample directory mirror + bump allocator (CPU side owns allocation;
- * the driver only writes the ARAM directory entries it is told to). */
-static AudioSample sample_mirror[AUDIO_MAX_SAMPLES];
+ * the driver only writes the ARAM directory entries it is told to).
+ * FAR: 512 bytes reached only by name, kept out of the 8 KB plain band. */
+static FAR AudioSample sample_mirror[AUDIO_MAX_SAMPLES];
 static u16 sample_next_free;
+static u8 audio_echo_reserved;  /* audioSetEcho() was called since audioInit() */
 static u8 audio_rr_voice;   /* round-robin auto-allocation cursor */
+
+/* The CPU side of the upload stream (audio_stream.asm) */
+extern u16 audio_stream_blocks(const u8 *data, u16 full, u16 tail);
 
 /*============================================================================
  * Command primitive
  *============================================================================*/
 
-/**
- * @brief Send one command to the driver and wait (bounded) for the ack.
- * @return AUDIO_OK or AUDIO_ERR_TIMEOUT
- */
-static u8 cmd_send(u8 op, u8 p0, u16 p1) {
-    u8 cmd;
-    u16 spin;
+/* The command the driver has not acknowledged yet (0: none). */
+static u8 audio_pending;
 
+/**
+ * @brief Wait (bounded) for the driver to acknowledge the pending command.
+ * @return AUDIO_OK (also when nothing is pending) or AUDIO_ERR_TIMEOUT
+ */
+static u8 cmd_wait(void) {
+    u16 spin;
+    u8 cmd = audio_pending;
+
+    if (!cmd) {
+        return AUDIO_OK;
+    }
+    audio_pending = 0;
+    for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
+        if (APU_IO0 == cmd) {
+            return AUDIO_OK;
+        }
+    }
+    return AUDIO_ERR_TIMEOUT;
+}
+
+/**
+ * @brief Send one command and return at once; the ack is awaited by the
+ *        NEXT command, before it writes the ports.
+ *
+ * A command used to wait for its own ack, nearly all of it the driver's
+ * turn — and a voice in vibrato sends one a frame (2026-10-10). The ports must not change until
+ * the driver has taken the command, so the wait is not removed, it is
+ * moved to where it is needed: a command sent alone costs the port writes,
+ * commands sent in a burst wait for one another as before.
+ *
+ * @return AUDIO_OK, or AUDIO_ERR_TIMEOUT when the PREVIOUS command was
+ *         never acknowledged (nothing is sent then)
+ */
+static u8 cmd_post(u8 op, u8 p0, u16 p1) {
+    u8 cmd;
+
+    if (cmd_wait() != AUDIO_OK) {
+        return AUDIO_ERR_TIMEOUT;
+    }
     audio_seq = (u8)(audio_seq >= 3 ? 1 : audio_seq + 1);
     cmd = (u8)((audio_seq << 6) | op);
 
@@ -110,13 +162,21 @@ static u8 cmd_send(u8 op, u8 p0, u16 p1) {
     APU_IO2 = (u8)p1;
     APU_IO3 = (u8)(p1 >> 8);
     APU_IO0 = cmd;
+    audio_pending = cmd;
+    return AUDIO_OK;
+}
 
-    for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
-        if (APU_IO0 == cmd) {
-            return AUDIO_OK;
-        }
+/**
+ * @brief Send one command and wait (bounded) for its ack: for a command
+ *        whose result is read back, or that the ports must be free after
+ *        (the sample stream).
+ * @return AUDIO_OK or AUDIO_ERR_TIMEOUT
+ */
+static u8 cmd_send(u8 op, u8 p0, u16 p1) {
+    if (cmd_post(op, p0, p1) != AUDIO_OK) {
+        return AUDIO_ERR_TIMEOUT;
     }
-    return AUDIO_ERR_TIMEOUT;
+    return cmd_wait();
 }
 
 /*============================================================================
@@ -127,16 +187,20 @@ u8 audioInit(void) {
     u8 i;
 
     audio_ready = 0;
+    audio_pending = 0;
     audio_seq = 0;
     audio_mvol = AUDIO_VOL_MAX;
     audio_rr_voice = 0;
     sample_next_free = SAMPLE_BASE;
+    audio_echo_reserved = 0;
     for (i = 0; i < AUDIO_MAX_VOICES; i++) {
         voice_mirror[i].sample_id = 0xFF;
         voice_mirror[i].volume = AUDIO_VOL_MAX;
         voice_mirror[i].pan = AUDIO_PAN_CENTER;
         voice_mirror[i].env_set = 0;
         voice_mirror[i].pitch = AUDIO_PITCH_DEFAULT;
+        voice_mirror[i].vol_lr = 0;
+        voice_mirror[i].sent = 0;       /* the new driver was given nothing yet */
     }
     for (i = 0; i < AUDIO_MAX_SAMPLES; i++) {
         sample_mirror[i].flags = 0;
@@ -172,7 +236,7 @@ u8 audioSetVolume(u8 volume) {
     if (volume > AUDIO_VOL_MAX) {
         volume = AUDIO_VOL_MAX;
     }
-    err = cmd_send(OP_MVOL, volume, 0);
+    err = cmd_post(OP_MVOL, volume, 0);
     if (err == AUDIO_OK) {
         audio_mvol = volume;
     }
@@ -191,11 +255,11 @@ u8 audioStopVoice(u8 voice) {
     if (voice >= AUDIO_MAX_VOICES) {
         return AUDIO_ERR_INVALID_ID;
     }
-    return cmd_send(OP_KOFF, (u8)(1 << voice), 0);
+    return cmd_post(OP_KOFF, (u8)(1 << voice), 0);
 }
 
 u8 audioStopAll(void) {
-    return cmd_send(OP_KOFF, 0xFF, 0);
+    return cmd_post(OP_KOFF, 0xFF, 0);
 }
 
 u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
@@ -208,10 +272,12 @@ u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
      * header promises (until 2026-10-03 the byte went through as given). */
     if (volumeL > 127) volumeL = 127;
     if (volumeR > 127) volumeR = 127;
-    err = cmd_send(OP_VVOL, voice, (u16)((u16)volumeR << 8 | volumeL));
+    err = cmd_post(OP_VVOL, voice, (u16)((u16)volumeR << 8 | volumeL));
     if (err == AUDIO_OK) {
         /* mirror keeps the max of both for state reporting */
         voice_mirror[voice].volume = volumeL > volumeR ? volumeL : volumeR;
+        voice_mirror[voice].vol_lr = (u16)((u16)volumeR << 8 | volumeL);
+        voice_mirror[voice].sent |= SENT_VOL;
     }
     return err;
 }
@@ -224,9 +290,10 @@ u8 audioSetVoicePitch(u8 voice, u16 pitch) {
     if (pitch > 0x3FFF) {
         pitch = 0x3FFF;        /* DSP pitch is 14-bit */
     }
-    err = cmd_send(OP_VPITCH, voice, pitch);
+    err = cmd_post(OP_VPITCH, voice, pitch);
     if (err == AUDIO_OK) {
         voice_mirror[voice].pitch = pitch;
+        voice_mirror[voice].sent |= SENT_PITCH;
     }
     return err;
 }
@@ -238,7 +305,7 @@ u8 audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release) {
     }
     adsr1 = (u8)(0x80 | ((decay & 0x07) << 4) | (attack & 0x0F));
     adsr2 = (u8)(((sustain & 0x07) << 5) | (release & 0x1F));
-    err = cmd_send(OP_VADSR, voice, (u16)((u16)adsr2 << 8 | adsr1));
+    err = cmd_post(OP_VADSR, voice, (u16)((u16)adsr2 << 8 | adsr1));
     if (err == AUDIO_OK) {
         voice_mirror[voice].env_set = 1;
     }
@@ -251,7 +318,7 @@ u8 audioSetGain(u8 voice, u8 mode) {
         return AUDIO_ERR_INVALID_ID;
     }
     /* driver also zeroes VxADSR1 so GAIN mode actually applies */
-    err = cmd_send(OP_VGAIN, voice, mode);
+    err = cmd_post(OP_VGAIN, voice, mode);
     if (err == AUDIO_OK) {
         voice_mirror[voice].env_set = 1;
     }
@@ -263,8 +330,8 @@ u8 audioSetGain(u8 voice, u8 mode) {
  *============================================================================*/
 
 u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
-    u16 i, spin;
-    u8 idx;
+    u16 spin, full;
+    u8 idx, tail;
 
     if (id >= AUDIO_MAX_SAMPLES) {
         return AUDIO_ERR_INVALID_ID;
@@ -276,37 +343,33 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
         return AUDIO_ERR_NO_MEMORY;
     }
 
-    if (cmd_send(OP_LOAD_SIZE, 0, size) != AUDIO_OK ||
+    full = size / 3;
+    tail = (u8)(size - full * 3);
+    if (cmd_send(OP_LOAD_SIZE, tail, full) != AUDIO_OK ||
         cmd_send(OP_LOAD, 0, sample_next_free) != AUDIO_OK) {
         return AUDIO_ERR_TIMEOUT;
     }
 
-    /* Sized block stream (IPL-shaped): data on IO1, index low byte on
-     * IO0; the driver stores and echoes the index. Both sides count
-     * `size` bytes, so the end needs no in-band marker. */
-    for (i = 0; i < size; i++) {
-        idx = (u8)i;
-        APU_IO1 = brrData[i];
-        APU_IO0 = idx;
-        for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
-            if (APU_IO0 == idx) {
-                break;
-            }
-        }
-        if (spin == ACK_SPIN_MAX) {
-            return AUDIO_ERR_TIMEOUT;
-        }
+    /* The stream, three bytes an exchange: data on IO1-IO3, then the
+     * exchange's index on IO0, which the driver echoes once it has stored
+     * them. In assembly (audio_stream.asm): one byte an exchange from
+     * compiled C cost 1,766 master cycles a byte on examples/audio/soundboard
+     * (2026-10-10). */
+    if (audio_stream_blocks(brrData, full, tail) != 0) {
+        return AUDIO_ERR_TIMEOUT;
     }
 
-    /* Epilogue: a handshake in which each value one side waits for is
-     * held by the other until answered (audio_driver.spc700.asm, load_done).
-     * The driver shows an end mark that cannot be an index echo here; we
-     * answer with it; it shows 0; we park the latch at 0. Until 2026-10-10
-     * we waited for a $FF that the driver held only until it read a 0 on
-     * our latch — and when the last index byte was 0 (size 513, 769…) that
-     * 0 was already there: the $FF lasted a few SPC700 cycles, and whether
-     * this loop caught it depended on its phase, hence on the compiler. */
-    idx = (u8)(size - 1) == 0xFF ? 0x7F : 0xFF;
+    /* Epilogue (audio_driver.spc700.asm, load_done): every value one side
+     * waits for is held by the other until answered. The driver still
+     * shows the echo of the last exchange; we show an end mark that cannot
+     * be an index we were showing; it answers with the mark; we park the
+     * latch at 0; it shows 0, and only then may another command go.
+     * Until the evening of 2026-10-10 the driver showed its mark right
+     * after the last echo, which then lasted about 40 of its cycles: an NMI
+     * taken here in that window made the stream time out. */
+    /* the last index sent: exchanges are numbered from 0 */
+    idx = (u8)(full + (tail ? 1 : 0) - 1) == 0xFF ? 0x7F : 0xFF;
+    APU_IO0 = idx;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
         if (APU_IO0 == idx) {
             break;
@@ -315,7 +378,7 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (spin == ACK_SPIN_MAX) {
         return AUDIO_ERR_TIMEOUT;
     }
-    APU_IO0 = idx;
+    APU_IO0 = 0;
     for (spin = 0; spin < ACK_SPIN_MAX; spin++) {
         if (APU_IO0 == 0) {
             break;
@@ -324,7 +387,6 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (spin == ACK_SPIN_MAX) {
         return AUDIO_ERR_TIMEOUT;
     }
-    APU_IO0 = 0;
 
     if (cmd_send(OP_DIR_SET, id, loopPoint) != AUDIO_OK) {
         return AUDIO_ERR_TIMEOUT;
@@ -399,6 +461,8 @@ u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {
 
 u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch) {
     u8 l, r;
+    u16 lr;
+    VoiceMirror *vm;
 
     if (sampleId >= AUDIO_MAX_SAMPLES || !sample_mirror[sampleId].flags
             || !audio_ready) {
@@ -418,25 +482,41 @@ u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch) {
         return AUDIO_VOICE_NONE;
     }
 
+    /* A note is up to four commands — volume, pitch, envelope, key on —
+     * and only the ones that change anything are sent: the driver keeps
+     * what a voice was given. A voice replayed at the same volume and the
+     * same pitch is one command; a melody on one voice, two a note. */
     pan_to_lr(volume, pan, &l, &r);
-    if (cmd_send(OP_VVOL, voice, (u16)((u16)r << 8 | l)) != AUDIO_OK ||
-        cmd_send(OP_VPITCH, voice, pitch) != AUDIO_OK) {
-        return AUDIO_VOICE_NONE;
+    lr = (u16)((u16)r << 8 | l);
+    vm = &voice_mirror[voice];
+    if (!(vm->sent & SENT_VOL) || vm->vol_lr != lr) {
+        if (cmd_post(OP_VVOL, voice, lr) != AUDIO_OK) {
+            return AUDIO_VOICE_NONE;
+        }
+        vm->vol_lr = lr;
+        vm->sent |= SENT_VOL;
     }
-    if (!voice_mirror[voice].env_set) {
-        if (cmd_send(OP_VADSR, voice,
+    if (!(vm->sent & SENT_PITCH) || vm->pitch != pitch) {
+        if (cmd_post(OP_VPITCH, voice, pitch) != AUDIO_OK) {
+            return AUDIO_VOICE_NONE;
+        }
+        vm->pitch = pitch;
+        vm->sent |= SENT_PITCH;
+    }
+    if (!vm->env_set && !(vm->sent & SENT_ENV)) {
+        if (cmd_post(OP_VADSR, voice,
                      (u16)(DEFAULT_ADSR2 << 8 | DEFAULT_ADSR1)) != AUDIO_OK) {
             return AUDIO_VOICE_NONE;
         }
+        vm->sent |= SENT_ENV;
     }
-    if (cmd_send(OP_KON, voice, sampleId) != AUDIO_OK) {
+    if (cmd_post(OP_KON, voice, sampleId) != AUDIO_OK) {
         return AUDIO_VOICE_NONE;
     }
 
-    voice_mirror[voice].sample_id = sampleId;
-    voice_mirror[voice].volume = volume;
-    voice_mirror[voice].pan = pan;
-    voice_mirror[voice].pitch = pitch;
+    vm->sample_id = sampleId;
+    vm->volume = volume;
+    vm->pan = pan;
     return voice;
 }
 
@@ -475,9 +555,16 @@ u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR) {
          * EDL 8-15 would collide with the IPL region. Documented v2 cap. */
         delay = 7;
     }
+    /* The ring lives at $C000 and up. Samples loaded while no echo was
+     * configured may be there: the driver clears the ring when it sets it
+     * up, so say no rather than erase them. */
+    if (sample_next_free > SAMPLE_CEIL_ECHO) {
+        return AUDIO_ERR_NO_MEMORY;
+    }
+    audio_echo_reserved = 1;
     /* EFB rides the FIR command as tap index 8 (same signed-byte shape),
      * keeping ECHO_CFG's params free for EDL + both volumes. */
-    err = cmd_send(OP_ECHO_FIR, 8, (u16)(u8)feedback);
+    err = cmd_post(OP_ECHO_FIR, 8, (u16)(u8)feedback);
     if (err != AUDIO_OK) {
         return err;
     }
@@ -491,7 +578,7 @@ u8 audioSetEchoFilter(const s8 fir[8]) {
         return AUDIO_ERR_INVALID_ID;
     }
     for (i = 0; i < 8; i++) {
-        err = cmd_send(OP_ECHO_FIR, i, (u16)(u8)fir[i]);
+        err = cmd_post(OP_ECHO_FIR, i, (u16)(u8)fir[i]);
         if (err != AUDIO_OK) {
             return err;
         }
@@ -500,10 +587,10 @@ u8 audioSetEchoFilter(const s8 fir[8]) {
 }
 
 u8 audioEnableEcho(u8 voiceMask) {
-    return cmd_send(OP_ECHO_ON, voiceMask, 0);
+    return cmd_post(OP_ECHO_ON, voiceMask, 0);
 }
 
 u8 audioDisableEcho(void) {
     /* Mask 0 makes the driver also mute EVOL and stop ring writes. */
-    return cmd_send(OP_ECHO_ON, 0, 0);
+    return cmd_post(OP_ECHO_ON, 0, 0);
 }

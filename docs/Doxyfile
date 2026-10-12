@@ -139,6 +139,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/sprites/sprite_sizes \
                          ../examples/sprites/simple_sprite \
                          ../examples/sprites/sprite_swarm \
+                         ../examples/sprites/world_sprites \
                          ../examples/input/controller \
                          ../examples/input/mouse \
                          ../examples/input/superscope \
@@ -154,6 +155,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/memory/save_game \
                          ../examples/chips/superfx_hello \
                          ../examples/fundamentals/text_glyphs \
+                         ../examples/text/pixel_text \
                          ../examples/text/print_string \
                          ../examples/text/scroll_message
 

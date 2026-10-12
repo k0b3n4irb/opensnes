@@ -108,7 +108,11 @@ frames 60 to 300):
 | reads the style, then runs the old loop (what ships) | 56,057 | 15.69 % |
 
 About 2,000 master cycles per call, 0.6 % of a frame per metasprite drawn:
-three reads through the style pointer and one more call. The two attempts
+three reads through the style pointer and one more call. (Since 2026-10-12
+the draw is assembly, `lib/source/sprite_meta.asm`, and writes each piece
+itself instead of calling `oamSet` and `oamSetSize`: 27,470 master cycles a
+frame for the two metasprites of this example, 61,460 before — the table
+above is the history of the C version.) The two attempts
 above it were slower although they add no call: with the mirrored loop in
 the same function, the compiler's copies between the two loops fell on
 every piece. The mirrored draw is therefore a function of its own, and the
@@ -125,26 +129,29 @@ compilers.
 | Row | What it asks for | PVSnesLib | OpenSNES | |
 |---|---|---:|---:|---:|
 | `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,780 | -19.5 % |
-| `pad` | held, pressed, released of pad 0, ten times | 11,429 | 10,245 | -10.4 % |
-| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,539 | 27,532 | -30.4 % |
-| `oamset` | `oamSet` on 32 sprites | 81,070 | 66,606 | -17.8 % |
-| `oamxy` | `oamSetXY` on 32 sprites | 45,047 | 44,124 | -2.0 % |
-| `oamsize` | the size of 32 sprites | 48,746 | 29,476 | -39.5 % |
-| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,894 | 17,877 | -0.1 % |
-| `text` | 20 characters printed and shown | 84,676 | 62,840 | -25.8 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 138,384 | -18.5 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,330 | 59,246 | -54.2 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,330 | 31,405 | -75.7 % |
-| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,400 | 16,389 | -5.8 % |
-| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,400 | 10,738 | -38.3 % |
+| `pad` | held, pressed, released of pad 0, ten times | 11,427 | 9,722 | -14.9 % |
+| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,540 | 27,343 | -30.8 % |
+| `oamset` | `oamSet` on 32 sprites | 81,061 | 64,939 | -19.9 % |
+| `oamxy` | `oamSetXY` on 32 sprites | 45,048 | 42,453 | -5.8 % |
+| `oamsize` | the size of 32 sprites | 48,744 | 28,874 | -40.8 % |
+| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,897 | 17,868 | -0.2 % |
+| `text` | 20 characters printed and shown | 84,678 | 17,216 | -79.7 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 91,147 | -46.3 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,332 | 53,875 | -58.3 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,332 | 31,738 | -75.5 % |
+| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,886 | -8.7 % |
+| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,738 | -38.3 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,701 | 36,299 | -73.4 % |
 
-OpenSNES costs no more than PVSnesLib on **13 of the 13 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
+OpenSNES costs no more than PVSnesLib on **14 of the 14 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
 <!-- libbench:end -->
 
 **How a row is timed.** Each row is built twice per SDK, with its library
 calls and with the same loops around nothing; both run the same number of
 frames, and the cost is what the symbols of the first gained over the
-second. The call, its arguments, the library function and what it calls
+second. Both SDKs build the scene as LoROM, SlowROM (the build's default,
+`USE_FASTROM=0`): a FastROM game pays about a quarter less for the
+instruction fetches of these routines, on either side. The call, its arguments, the library function and what it calls
 are counted, the loop is not. `text` and `frame` include the frame
 boundary, where each SDK's handler sends what the calls prepared; `idle`
 is that handler alone, in a ROM that only waits.
@@ -164,11 +171,17 @@ is that handler alone, in a ROM that only waits.
   loop used to build; `textPrint` writes a run of characters with the
   buffer position computed once instead of three calls and a multiply per
   character.
+- On 2026-10-11 the run of characters inside `textPrint` became assembly
+  too (about 170 master cycles a character in compiled C until then): the
+  `text` row went from 59,684 to 32,316, and `frame` from 134,968 to
+  107,602.
 - **`oamxy` and `dma` are level**, within about 1 %, and sit on either side
   of PVSnesLib's figure from one compiler step to the next (+0.2 % and
   +0.1 % on the morning of 2026-10-10, −1.2 % and −0.1 % the day before,
   −2.0 % and −0.1 % that evening, once a function that calls kept its short
-  temporaries in the direct page) although the
+  temporaries in the direct page, then −2.5 % and +0.1 % — nine master
+  cycles in 17,900 — after the late peephole pass, and −4.8 % and −0.1 % on
+  2026-10-11, once a loop tested its condition at the bottom) although the
   library routines did not change: a row is the difference between a loop
   with the calls and the same loop empty, and a compiler improvement that
   helps the empty loop more than the loop around a call moves the row up.

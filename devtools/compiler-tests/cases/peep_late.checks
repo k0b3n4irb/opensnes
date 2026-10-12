@@ -1,0 +1,11 @@
+# the second access reloads the index straight into X
+in index_x: present \tldx\.b tcc__lf\+\d+\n\tlda\.w tab,x\n
+in index_x: absent \tlda\.b tcc__lf\+\d+\n\ttax\n\tlda
+# 7 is loaded once for the two stores
+in same_const: present \tlda\.w #7\n\tsta\.w flag_a\n\tsta\.w flag_b\n
+# both loop variables start with a stz of their slot, and i++ is one inc
+in count: present \tstz\.b tcc__lf\+\d+\n\tstz\.b tcc__lf\+\d+\n
+in count: present \tinc\.b tcc__lf\+\d+\n
+in count: absent \tinc a\n
+# A is the return value: it is still loaded
+in zero_and_return: present \tlda\.w #0\n\trtl

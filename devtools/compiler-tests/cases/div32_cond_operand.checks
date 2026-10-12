@@ -1,0 +1,4 @@
+# Compiles (it was an internal compiler error), and each function calls its
+# 32-bit helper.
+in rem_of_cond: present jsl tcc_sdivmod32
+in div_of_cond: present jsl tcc_udivmod32

@@ -1,0 +1,3 @@
+# Case 0 is reached without being tested: v is unsigned and below 1.
+in dense: absent cmp\.w #0
+count 6 cmp\.w #

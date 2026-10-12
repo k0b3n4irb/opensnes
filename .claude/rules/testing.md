@@ -55,13 +55,24 @@ with its `_DEP_` line.
 The audio oracle is a hash of the WAV, so it flips on a shift of a few CPU
 cycles in the code that talks to the SPC700 (the phase, not the sound).
 **A commit that re-captures `baselines/audio.json` quotes the output of
-`luna diff --audio <before>.sfc <after>.sfc --until-frame 300`** (luna
+`luna diff --audio --align-onset <before>.sfc <after>.sfc --until-frame 300`** (luna
 v1.32.0: RMS per 500 ms window, first non-silent sample, MATCH / DIFF at
 2 %) for the ROM built before the change against the one after; the hash
 stays the guard, the comparison says by how much it moved. A half-volume
 module gives 75 % and DIFF; two silent captures give MATCH with
 `a=none b=none` on the onset line — read that line for an example meant
 to play.
+`--align-onset` (luna v1.37.0, pinned 2026-10-10) compares each window of
+the first capture with the stretch of the second that resembles it most
+within `--max-shift` samples (64 by default) and prints the shift kept per
+window; the final line reads "per-window shift, max N samples (searched
+±64)". A sound that starts a few samples earlier because the code got
+faster is then compared with itself, burst by burst (`echo` on 2026-10-10,
+whose second sound alone had moved by two samples: DIFF at 21.83 % with
+the single global shift of v1.35.0 / v1.36.0, MATCH at 0.15 % since). A
+sound one frame early (534 samples) stays a DIFF at the default: it is a
+fact to explain, and `--max-shift 534` names it. A line quoted from before
+the pin says "onset shift".
 
 The WRAM oracle hashes every WRAM page at each vblank **except the pages of
 the plain C band that lie wholly above the ROM's last C variable** — the
@@ -107,18 +118,27 @@ so validation is now 2 pillars:
 3. **Triage impacted examples — short list, not exhaustive dump.** Apply the
    workflow in the next section (Impacted-Examples Triage). The output is a
    smart-selected list with one "what to look for" line per entry, not a wall
-   of paths. Do NOT commit until the user confirms that selection.
+   of paths. It goes in the commit message or the report of the lot: it is what
+   lets a reader check the change by hand if they want to.
 4. **For library changes (Class B)**: grep all example Makefiles for the changed
    module name in LIB_MODULES to enumerate the candidate set, then triage.
-5. **NEVER commit without user validation.** Do not assume examples work because
-   they compiled. The luna visual-regression pass is the visual reference; the
-   triaged subset is presented to the user, who may additionally spot-check
-   interactively (luna GUI / `luna mcp` — see docs/tutorials/debugging.md).
+5. **The validation is ours, by this protocol; nobody is waited for.** Since
+   2026-10-10 (it writes down the mandate the owner gave on 2026-09-22 —
+   "je ne valide rien" — and the chief-engineer mandate noted in
+   `compiler.md`): a change that passed the
+   steps above is committed. Do not assume examples work because they
+   compiled: the luna visual-regression pass is the visual reference, and
+   the triaged subset says what to look at. Until that date this line read
+   "NEVER commit without user validation", which the practice had
+   contradicted for weeks. **What does wait for a go — the owner's, typed here;
+   nobody else's** — is a public or irreversible
+   act: a merge to `main`, a tag, a release, closing an issue, writing in
+   someone else's repository (`exchanges.md`).
 6. Conventional Commits format in message
 
 ## Impacted-Examples Triage
 
-For every change, run this three-step pipeline before asking the user to validate:
+For every change, run this three-step pipeline before committing:
 
 1. **Identify** — enumerate every example whose compiled bytes could change,
    not just every file edited. Class A compiler changes touch every example
@@ -141,7 +161,7 @@ For every change, run this three-step pipeline before asking the user to validat
    Drop entries that are pure duplicates of a kept one (same module, same
    shape, no extra coverage).
 
-3. **Present** — give the user the kept list as a small table with one
+3. **Present** — write the kept list as a small table with one
    "what to look for" per entry. Each line should answer "if this regresses,
    what visible symptom would I expect, and which button or scenario surfaces
    it?" Don't ask the user to fish for bugs blind. Example shape:

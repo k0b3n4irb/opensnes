@@ -8,6 +8,7 @@ extern u8 coin_brr[], coin_brr_end[];   /* the .incbin in assets_gen.asm (or you
 #define coin_brr_size 999   /* bytes: 111 BRR blocks of 16 samples */
 #define coin_brr_loop 0   /* byte offset of the loop point; 0 with no loop */
 #define coin_brr_loops 0   /* 1 = the sample loops */
+#define coin_tuning 4096   /* x4096: multiply the playback pitch by this / 4096 (4096 = as encoded) */
 #define coin_rate 11025   /* Hz of the source; the DSP plays at 32000 */
 
 #endif

@@ -1,0 +1,31 @@
+# pixel_text — tileBlitGlyph2bpp() composing four lines of proportional text
+# at unaligned y into a FAR 2bpp layer; A shifts every line one pixel right.
+#
+# Measured on luna (`luna state --until-frame N --input … --peek …`):
+#   * frame 50, no input: x_off 0, layer_sum 0xC066 (the layer after the
+#     boot composition: a rotate-xor of its 2560 bytes);
+#   * frame 120, A pressed at 60: presses 1, x_off 1, layer_sum 0x782B —
+#     every glyph re-composed one pixel to the right, most of them now
+#     crossing a tile boundary at another shift.
+# A regression in the blit (a wrong shift, a lost right part, a plane
+# swapped) moves layer_sum; one in the pad path moves presses.
+rom = "../../examples/text/pixel_text/pixel_text.sfc"
+input = "60:0x0080,62:0"
+
+[[checkpoint]]                 # the boot composition
+at_frame = 50
+[checkpoint.values]
+x_off = { eq = 0, width = 2 }
+presses = { eq = 0, width = 2 }
+layer_sum = { eq = 0xC066, width = 2 }
+
+[[checkpoint]]                 # after A: shifted by one pixel, re-sent in two halves
+at_frame = 120
+[checkpoint.values]
+x_off = { eq = 1, width = 2 }
+presses = { eq = 1, width = 2 }
+layer_sum = { eq = 0x782B, width = 2 }
+
+[asserts.dma]
+unsafe_writes = 0
+max_vblank_bytes = 1536

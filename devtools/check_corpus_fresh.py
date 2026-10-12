@@ -59,8 +59,14 @@ def main() -> int:
     tool_m, tool_f = newest_mtime("compiler/qbe/qbe", "compiler/cproc/cproc-qbe",
                                   "compiler/wla-dx/binaries/wla-65816",
                                   "compiler/wla-dx/binaries/wlalink")
+    # An object assembled from hand-written assembly (`*-asm.o`) owes nothing
+    # to the C compiler: it is stale against the assembler only. Without
+    # this, a `make` after a frontend change — which rebuilds every C object
+    # through the compiler stamp — was still told to `make clean` for the
+    # 121 assembly objects it had rightly left alone.
+    asm_m, _ = newest_mtime("compiler/wla-dx/binaries/wla-65816")
     stale_lib = [o.relative_to(ROOT) for o in ROOT.glob("lib/build/**/*.o")
-                 if o.stat().st_mtime < tool_m]
+                 if o.stat().st_mtime < (asm_m if o.name.endswith("-asm.o") else tool_m)]
     if stale_lib:
         print(f"STALE LIB: {len(stale_lib)} lib object(s) predate the newest "
               f"toolchain binary ({tool_f.relative_to(ROOT)}).")

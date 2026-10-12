@@ -78,15 +78,23 @@ tcc_mul16:
     lda.l in_nmi_ctx
     bne @soft_mul
 
+    ; The product is complete 8 CPU cycles after the write of WRMPYB
+    ; (anomie-regs: "8 machine cycles after $4203 is set, the product may
+    ; be read"; luna, which builds it one bit per cycle since its commit
+    ; 64c771d, reads a wrong high byte at 7 and the right one at 8). Here
+    ; `rep #$20` (3) and the first three cycles of `lda $4216` already
+    ; separate the write from the read: two nops make 10, one nop more
+    ; than needed, kept as the margin for the silicon (the figure is a count of
+    ; CPU cycles in every reference and every emulator, not measured on a
+    ; console by us). Four nops were 14.
+
     ; --- a_lo * b_lo ---
     lda 5,s             ; a_lo (multiplicand low byte)
     sta $4202           ; WRMPYA
     lda 7,s             ; b_lo (multiplier low byte)
     sta $4203           ; WRMPYB - triggers multiply
 
-    nop                 ; Wait 8 cycles for result
-    nop
-    nop
+    nop                 ; 10 cycles to the read: see above
     nop
 
     rep #$20
@@ -97,14 +105,12 @@ tcc_mul16:
     sep #$20
     .ACCU 8
 
-    ; --- a_hi * b_lo ---
-    lda 6,s             ; a_hi (multiplicand high byte)
-    sta $4202           ; WRMPYA
-    lda 7,s             ; b_lo (multiplier low byte)
+    ; --- a_lo * b_hi --- WRMPYA still holds a_lo: anomie-regs, "$4202
+    ; will not be altered by this process, thus a new value may be written
+    ; to $4203 to perform another multiplication without resetting $4202".
+    lda 8,s             ; b_hi (multiplier high byte)
     sta $4203           ; WRMPYB
 
-    nop
-    nop
     nop
     nop
 
@@ -121,14 +127,12 @@ tcc_mul16:
     sep #$20
     .ACCU 8
 
-    ; --- a_lo * b_hi ---
-    lda 5,s             ; a_lo (multiplicand low byte)
+    ; --- a_hi * b_lo ---
+    lda 6,s             ; a_hi (multiplicand high byte)
     sta $4202           ; WRMPYA
-    lda 8,s             ; b_hi (multiplier high byte)
+    lda 7,s             ; b_lo (multiplier low byte)
     sta $4203           ; WRMPYB
 
-    nop
-    nop
     nop
     nop
 
@@ -219,9 +223,11 @@ tcc_div16:
     lda tcc__r1
     sta $4206           ; WRDIVB - triggers division
 
-    ; Wait 16 cycles
-    nop
-    nop
+    ; The quotient and the remainder are complete 16 CPU cycles after the
+    ; write of WRDIVB (anomie-regs; luna reads a wrong remainder at 15 and
+    ; the right one at 16). `rep #$20` and the first three cycles of
+    ; `lda $4216` make 6; six nops make 18, one nop of margin as in
+    ; tcc_mul16. Eight nops were 22.
     nop
     nop
     nop

@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 86 examples organized by topic. For a progressive learning path, see
+All 88 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -13,6 +13,7 @@ Print text, then move it.
 |---------|-------------|
 | @subpage examples_text_print_string | Print a string with the built-in font (`textModeInit` + `textPrintAt`) |
 | @subpage examples_text_scroll_message | Move text: scroll the text layer for a marquee (`bgSetScroll`) |
+| @subpage examples_text_pixel_text | Proportional text composed at the pixel: tileBlitGlyph2bpp() into a 2bpp layer |
 
 ---
 
@@ -57,6 +58,7 @@ Sprite display, animation, and OAM management.
 | @subpage examples_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads |
 | @subpage examples_sprites_dynamic_metasprite | Dynamic metasprite engine with batched OAM updates |
 | @subpage examples_sprites_sprite_swarm | A bouncing swarm + the per-sprite OAM throughput ceiling |
+| @subpage examples_sprites_world_sprites | World-space sprites: a camera, culling and OAM in one call per batch |
 
 ---
 

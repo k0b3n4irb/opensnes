@@ -19,7 +19,7 @@ textPrint("HI")      tilemapBuffer[2048]          VRAM tilemap
    │                  32 x 32 entries, 2 bytes        │
    └─ writes entries ─────► each ──────┐              │
                                         │  NMI, next VBlank:
-      tilemap_update_flag = 1 ──────────┴──► DMA 2048 bytes ──► ▓▓
+      tilemap_update_flag = 1 ──────────┴──► DMA the bytes written ──► ▓▓
 ```
 
 `tilemapBuffer` is 32×32 entries of 2 bytes = 2048 bytes, and it lives in the
@@ -251,16 +251,21 @@ fields.
 
 ## What a text update costs
 
-The flush is **all-or-nothing**: if any text writer ran since the last VBlank,
-the NMI handler DMAs the full **2048 bytes**, whether you changed one glyph or
-the whole screen. Against the roughly 4 KB of practical VBlank DMA budget
-(@ref tutorial_dma) that is about half the frame's transfer capacity spent on
-text.
+The flush sends **the bytes written since the last VBlank**: every `text*`
+writer records the first and the last byte it touched in `tilemapBuffer`, and
+the NMI handler DMAs that range — one glyph costs 2 bytes, a counter that
+redraws one row costs that row, `textClear()` costs the whole 2048. (Until
+2026-10-12 the flush was all-or-nothing: 2048 bytes, 16,384 master cycles of
+the VBlank, for one glyph — against the roughly 4 KB of practical VBlank DMA
+budget of @ref tutorial_dma, half the frame's transfer capacity.) The range
+is one span: text written at the top and at the bottom of the screen in the
+same frame sends everything in between too, which is still the content the
+rows hold.
 
 Two corollaries:
 
 - **Many writes, one DMA.** The flag coalesces — twenty `textPrintAt` calls in a
-  frame still cost one 2048-byte transfer. Batch freely.
+  frame still cost one transfer, of the span they covered. Batch freely.
 - **Don't reformat text you did not change.** The formatting loops themselves
   are not cheap either. `aim_target` learned this the measured way:
 
@@ -375,8 +380,8 @@ where the BG reads its map — a blank layer, no diagnostic.
 ### 🟡 Assuming the tilemap can be 64 wide
 
 `TextConfig` has a `map_width` field documented as 32 or 64, but `textInit`
-always sets it to 32, the buffer is sized for 32×32, and the NMI flush transfers
-a fixed 2048 bytes. Treat `map_width` as read-only; a 64-wide text layer is not
+always sets it to 32, the buffer is sized for 32×32, and the NMI flush sends
+the buffer's bytes. Treat `map_width` as read-only; a 64-wide text layer is not
 something the module supports today.
 
 ## See also

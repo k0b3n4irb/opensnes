@@ -41,8 +41,9 @@ ts = 1
 
 [asserts.blocks]
 # The table's phase follows the boot's length: one frame shorter since the
-# compiler's indexed addressing of 2026-10-08 (22 26 2b 2f before).
-opt_row_h_words = { space = "vram", offset = "6000", hex = "232028202c203020" }
+# compiler's indexed addressing of 2026-10-08 (22 26 2b 2f before), one more
+# since loops tested at their bottom on 2026-10-11 (23 28 2c 30 before).
+opt_row_h_words = { space = "vram", offset = "6000", hex = "242029202d203020" }
 opt_row_v_zero = { space = "vram", offset = "6040", hex = "0000000000000000" }
 
 [asserts.dma]
