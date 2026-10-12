@@ -3,9 +3,9 @@
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "20a98751bca17c5ebf20951f8a6d897fba602bd37bcb00b6b1034cbf17cb9d10",
+      "sha256": "765ad9889609d5cd44dbebfe8e54c6950f50c053b3ccd2a1ad30f40e0a0c9316",
       "samples": 159936,
-      "peak": 21551
+      "peak": 21264
     },
     "audio/snesmod_music": {
       "sha256": "c1e79192d45039f733dc9a2388096d9453c92314b7dcb12830489a6098c81bcd",
@@ -13,24 +13,24 @@
       "peak": 20923
     },
     "audio/pitch_mod": {
-      "sha256": "b8c4cca17c2b5ad1850e101e33e8729d0141daf3a286397f9151d791276b9aca",
+      "sha256": "2960dce3f647bbd63c1a2fad357dc8a538071ef1099c39f6a2ee07532250e2e8",
       "samples": 159936,
       "peak": 22617
     },
     "audio/play_noise": {
-      "sha256": "df1b8de4dd454a8b5065bde17069a57e4e242d814364d0cd6e45b6fca348c95b",
+      "sha256": "b6afe38a6b176e552216ccaf8aa5682296fb1aa6fd3fa07f1df9757c8b94888b",
       "samples": 159936,
-      "peak": 21551
+      "peak": 21264
     },
     "audio/echo": {
-      "sha256": "04993721759f65cea4d376fa455df1d293966c252756e3d8ed9808711af03927",
+      "sha256": "507e0a250cbca05fc9bc829cef235813a1094836fb9945b0f5cc89499b039f92",
       "samples": 159936,
       "peak": 10922
     },
     "audio/speech_synth": {
-      "sha256": "5c1e437d178f5615bf16b4fcc7e7d37de46ed5ec1a43b5f3c1e88d58bbcc1e45",
+      "sha256": "1e6a2d700f590151bd68d0e2dbfee371e85161a53d80a90fad995b5959da35f7",
       "samples": 159936,
-      "peak": 22487
+      "peak": 22960
     },
     "audio/snesmod_music_large": {
       "sha256": "0682b12e37c33115883c86fcf832534351b97c54e3c3dad79813d9367fefcc9d",
@@ -38,9 +38,9 @@
       "peak": 17119
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "1c161848421a75cca18819fc57197d1c08e2bdc2ceda8ac24124d3418ea0fff4",
+      "sha256": "3a84f8a661df706261407cc6fc423cf5cb7167d0b08ff657041bd340a006094d",
       "samples": 159945,
-      "peak": 20902
+      "peak": 20922
     },
     "audio/soundboard": {
       "sha256": "38ba5594086cb860f22e9265059483e823db66a68a0119efad86de6a0b0ecbdf",
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "64951fc867c2a0fd156fdc64141f9c4cf8e3789ee83a3c6395ad8a65f1da45a6",
+      "sha256": "4b52863ffc01c8d8b0e159c083dc50bc080a75c780347f4d98c2803ca60cd6c0",
       "samples": 159936,
       "peak": 12192
     }

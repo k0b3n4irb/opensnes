@@ -1,0 +1,3 @@
+env QBE_NO_IVAR=1
+in fill_words: present asl a
+in fill_words: present cmp\.w #64

@@ -1,0 +1,11 @@
+in fill_words: absent asl a
+in fill_words: present cpx\.w #128
+in fill_words: absent #64
+in every_third: absent asl a
+in every_third: present adc\.w #6
+in every_third: present cpx\.w #124
+in mixed: present asl a
+in mixed: present cmp\.w #64
+in ramp: present asl a
+in ramp: present cmp\.w #64
+in fill_some: present asl a

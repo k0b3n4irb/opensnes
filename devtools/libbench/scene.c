@@ -23,6 +23,13 @@ u16 done;
 
 #define REPS 20
 
+/* Every loop of a row calls this, with the calls and without: a loop with
+ * no call in its body would keep its counter in X (the compiler's loop rule,
+ * 2026-10-12) while the loop around the library calls cannot, and the
+ * subtraction of the empty ROM would then count the difference as the
+ * calls' cost. With the same call in both, the loops cost the same. */
+void bench_nop(void) { }
+
 static u8 payload[2048];
 #if PVS
 extern char tilfont, palfont;
@@ -31,7 +38,9 @@ extern char tilfont, palfont;
 void row_pad(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
         for (i = 0; i < 10; i++) {
+            bench_nop();
 #if CALLS
 #if PVS
             res += padsCurrent(0);
@@ -50,7 +59,9 @@ void row_pad(void) {
 void row_scroll(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
         for (i = 0; i < 10; i++) {
+            bench_nop();
 #if CALLS
             bgSetScroll(0, r + i, i);
             bgSetScroll(1, r, r);
@@ -63,7 +74,9 @@ void row_scroll(void) {
 void row_oamset(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
         for (i = 0; i < 32; i++) {
+            bench_nop();
 #if CALLS
 #if PVS
             oamSet(i << 2, i << 3, r + i, 3, 0, 0, i, 0);
@@ -78,7 +91,9 @@ void row_oamset(void) {
 void row_oamxy(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
         for (i = 0; i < 32; i++) {
+            bench_nop();
 #if CALLS
 #if PVS
             oamSetXY(i << 2, i << 3, r + i);
@@ -93,7 +108,9 @@ void row_oamxy(void) {
 void row_oamsize(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
         for (i = 0; i < 32; i++) {
+            bench_nop();
 #if CALLS
 #if PVS
             oamSetEx(i << 2, OBJ_LARGE, OBJ_SHOW);
@@ -108,6 +125,7 @@ void row_oamsize(void) {
 void row_dma(void) {
     u16 r;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
 #if CALLS
         dmaCopyVram(payload, 0x4000, 2048);
 #endif
@@ -117,6 +135,7 @@ void row_dma(void) {
 void row_text(void) {
     u16 r;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
 #if CALLS
 #if PVS
         consoleDrawText(2, 4 + (r & 15), "TWENTY CHARACTERS OK");
@@ -189,6 +208,7 @@ void row_worldc(void) {
     u16 r;
     world_setup();
     for (r = 0; r < REPS; r++) {
+        bench_nop();
 #if CALLS
         world_c(r, 0);
 #endif
@@ -207,6 +227,7 @@ void row_world(void) {
 #endif
     world_setup();
     for (r = 0; r < REPS; r++) {
+        bench_nop();
 #if CALLS
 #if PVS
         world_c(r, 0);
@@ -264,6 +285,7 @@ void row_worldo(void) {
     for (i = 0; i < 18; i++) word[i] = (i * 7) % 18;   /* a permutation of 0..17 */
     word[18] = 18;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
 #if CALLS
 #if PVS
         world_co(r, 0);
@@ -286,7 +308,9 @@ void row_worldo(void) {
 void row_vramc(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
         for (i = 0; i < 6; i++) {
+            bench_nop();
 #if CALLS
             dmaCopyVram(payload + (i << 7), 0x4000 + (i << 8), 128);
 #endif
@@ -297,7 +321,9 @@ void row_vramc(void) {
 void row_vramq(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
         for (i = 0; i < 6; i++) {
+            bench_nop();
 #if PVS
 #if CALLS
             dmaCopyVram(payload + (i << 7), 0x4000 + (i << 8), 128);
@@ -324,6 +350,7 @@ void row_vramq(void) {
 void row_frame(void) {
     u16 r, i;
     for (r = 0; r < REPS; r++) {
+        bench_nop();
 #if CALLS
 #if PVS
         res += padsCurrent(0);
@@ -339,6 +366,7 @@ void row_frame(void) {
         bgSetScroll(2, 0, r);
 #endif
         for (i = 0; i < 32; i++) {
+            bench_nop();
 #if CALLS
 #if PVS
             oamSet(i << 2, i << 3, r + i, 3, 0, 0, i, 0);

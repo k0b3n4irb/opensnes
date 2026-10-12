@@ -902,3 +902,76 @@ for tables of a few hundred bytes, and an oracle that reads section
 placement. A copy sized by the asset (the map header knows its count)
 would end both. Not done in this lot.
 
+
+## 2026-10-12 — stage 2 opened: T2 and T3 (the owner's word: "enchaine T2 et T3")
+
+What the IR said before a line was written: after the passes, a clear
+loop of 1920 words is `i = phi(0, i + 1)`, `cultw i, 1920`, `extuh i → mul 2 → add
+$far_layer → storew`. A second counter `j = 2i` kept in the direct page
+beside `i` costs this target more than the `asl` it removes (`lda / clc /
+adc #2 / sta` is 13 cycles where `lda / inc a / sta` is 10), so T2 is not
+"strength reduction adds an induction variable": it is **the counter
+replaced by the scaled index when every use is that index** (`ivar.c`,
+before `gcm`: a w phi with constant init, step and `cultw` bound, the body
+on the true branch, every other use the same `c·i`, the stepped value
+feeding the phi alone, c·(N−1+step), c·i0 and c·N within 16 bits). Alone
+it is worth one instruction a turn (the `asl`) and nothing in cycles;
+what it buys is a counter that *is* the byte offset, so that T3 can keep
+it in X with the bound pre-multiplied.
+
+Two defects of the first version, both found by the corpus build, not by
+the hunts: a counter whose stepped value `i + 1` is also a value
+elsewhere (`backgrounds/mode6` uses it as a colour) left the old add
+dangling and `gcm` asserted — the stepped value must have one use, the
+phi; and a scaled copy `t = 2·i` with its own uses is a use of the
+counter (substituted: t = j). The qbe commit's `-d V` traces the
+rewrites.
+
+T3 is not the 10-15 day IR-level register pinning the plan estimated: it
+is a **text rule of the peephole stage** (`peephole_loop_x` in `emit.c`,
+after `peephole_late`), like the loop rotation and the entry peephole
+before it. It recognises the loop the emitter writes — `lda S / cmp #N /
+bcs @join`, the body with `ldx S` at its top, the step `lda S / clc / adc
+#c / sta S` (anywhere in the region: `gcm` may order the accumulation
+after it) and the test `cmp #N / bcc @body`, the branches possibly still
+the `bcc + / jmp / +` triples of that stage — and rewrites it `ldx S /
+cpx #N / bcs`, the top load gone, `inx` ×c or `txa / clc / adc #c / tax`,
+`cpx #N`. Conditions: nothing in the region writes X or the slot, every
+read of the slot is a `lda.b` (it becomes `txa`), no call, no `mvn`,
+every label of the region entered from inside only, the slot dead at
+every exit (a backward liveness of that one slot over the text, two bits
+for its two bytes, a `jsl` killing it since a direct-page temp never
+crosses a call), and the body's first touch of A before any branch a
+write (A is no longer the counter at the body's label). Found on the
+way: two nested empty loops both converted hung the `pad` ROM of the
+library bench — the outer was read first, its body then held no X write;
+the text is now read from the end (the inner's header comes later) and a
+loop overlapping a converted one is left alone. A first "slot mentioned
+nowhere else" condition converted nothing in the corpus; the liveness
+replaced it, and the `jsl` rule ("live at an exit" on every function
+that calls) was the second half of that.
+
+What it covers and what it does not: loops **without a call in the body**
+— fills, sieves, sums, the glyph rows, `farClear`. A loop that calls has
+to reload its counter after each call whatever register holds it (the
+callee may use X; the arg cleanup is `plx`), so X buys it nothing and the
+rule leaves it alone; across the 88 examples, 3 units and 8 loops take
+the rule, the sdkbench `sieve` −6.7 %, `farClear` 231 → 125.8 master
+cycles a word — 15 CPU cycles, the hand-written form, the invariant
+`lda #0` hoisted before the body by a second rule of the same pass (the
+label moves down into the line the deleted `ldx` left).
+
+The fourth battery caught the rule's one real defect: the liveness that
+decides whether the counter dies with the loop treated every `jsl` as a
+kill, which is right for a C call (a direct-page temp never crosses one)
+and wrong for a runtime helper (`__mul16`, `tcc_mul32`, the divisions),
+which is no call to the slot allocation and keeps the direct page —
+`difftest_stmt` seed 380493 read its counter back after twelve
+`tcc_mul32` and got 0 for 1 (12 seeds of 2 000, all this). Helpers are
+transparent now; everything else kills.
+
+The library bench's subtraction (a row = the loop with the calls minus
+the same loop without them) counted the rule's saving on the *empty*
+loop as a cost of the calls (`pad` 9,865 → 10,512 while nothing had
+slowed); every loop of a row now calls `bench_nop()` in both variants,
+and the reference was re-measured for both SDKs.

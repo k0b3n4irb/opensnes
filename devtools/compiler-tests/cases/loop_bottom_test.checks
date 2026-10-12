@@ -1,9 +1,11 @@
-# Each loop compares its index with the bound twice in the text (once on the
-# way in, once at the bottom of the body) and nothing jumps back up.
-count 4 cmp\.w #240
+# Each loop compares its counter with the bound twice in the text (once on
+# the way in, once at the bottom of the body) and nothing jumps back up. The
+# counter is the byte offset (ivar, 2026-10-12) and lives in X (the loop
+# rule of the peephole, same day): cpx, no cmp, no shift.
+count 4 cpx\.w #480
 in clear: absent jmp @
 in sum: absent jmp @
-# The body starts with the index still in A: no load between its label and
-# the shift that scales it.
-in clear: present @for_body[.0-9]*:\n\tasl a
-in sum: present @for_body[.0-9]*:\n\tasl a
+in clear: absent asl a
+in sum: absent asl a
+in clear: absent cmp\.w
+in clear: present inx\n\tinx\n\tcpx

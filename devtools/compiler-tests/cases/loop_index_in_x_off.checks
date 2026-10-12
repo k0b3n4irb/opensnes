@@ -1,0 +1,3 @@
+env QBE_NO_PEEP_LOOPX=1
+in fill: absent cpx
+in fill: present cmp\.w #512

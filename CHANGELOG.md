@@ -90,6 +90,18 @@ All notable changes to OpenSNES are documented in this file.
   above).
 
 ### Performance
+- perf(compiler): **stage 2, T2 and T3 — a counted loop runs on its byte
+  offset, kept in X.** `ivar.c` (QBE, before `gcm`) replaces a loop
+  counter whose every use is the same scaled index `c·i` by that index: a
+  phi initialised to `c·i0`, stepping by `c·step`, tested against `c·N`,
+  when the three are constants and nothing wraps at 16 bits. Then a text
+  rule of the emitter's peephole stage (`peephole_loop_x`) keeps that
+  counter in X across a loop whose body has no call and does not write X:
+  `ldx / cpx` on the way in, `inx` as the step, `cpx` at the bottom.
+  `for (k = 0; k < 1920; k++) layer.w[k] = 0`, 10 instructions and 231
+  master cycles a word before: 5 instructions, 126 a word. sdkbench total 129.57 M → 128.77 M master cycles (−0.6 %; −60.5 % against
+  PVSnesLib); `copy` −17 %, `decimal` −10 %, `sieve` −7 %.
+  `QBE_NO_IVAR=1` and `QBE_NO_PEEP_LOOPX=1` switch each off.
 - perf(lib): **the hardware multiply and divide helpers wait the time the
   unit needs, not twice it.** The product is complete 8 CPU cycles after
   the write of `$4203`, the quotient 16 after `$4206` (anomie-regs; luna

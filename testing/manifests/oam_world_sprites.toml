@@ -4,10 +4,14 @@
 # leaves the centre there and the clamp at the world's edge is never reached.
 #
 # Measured on luna (`luna state --until-frame N --input … --peek …`):
-#   * frame 50, no input: cam (128, 112), 5 coins in view (world_visible,
-#     the sum of visible[] the call filled; the coins drift, so the count is
-#     the frame's), walker 0 in the front slot (world_front = walk_order[0]:
-#     the walker lowest on the screen);
+#   * frame 50, no input: cam (128, 112), 2 coins in view (world_visible,
+#     the sum of visible[] the call filled; the coins drift one step per
+#     main-loop turn, so the count is the frame's — it was 5 until the
+#     compiler's stage 2 of 2026-10-12 made the boot one lag frame shorter
+#     (12 for 13), which put the coins one step ahead: the fall from 5 to 2
+#     moved from frame 51 to 50; 120 and 200 did not move), walker 0 in
+#     the front slot (world_front = walk_order[0]: the walker lowest on the
+#     screen);
 #   * frame 120, RIGHT held from 60: cam_x 248 (2 px a frame), 4 coins,
 #     walker 1 in front — the walkers pace up and down, so the sort changes
 #     the front slot over time;
@@ -24,7 +28,7 @@ at_frame = 50
 [checkpoint.values]
 cam_x = { eq = 128, width = 2 }
 cam_y = { eq = 112, width = 2 }
-world_visible = { eq = 5, width = 2 }
+world_visible = { eq = 2, width = 2 }
 world_front = { eq = 0, width = 2 }
 
 [[checkpoint]]                 # RIGHT held: the camera on its way, another walker in front

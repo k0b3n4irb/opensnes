@@ -1,6 +1,7 @@
-/* The same loop with QBE_SINK_DEEP: every access carries its own scaled
- * index again (the behaviour of 2026-10-08 to 2026-10-10), which is what
- * index_once guards against. */
+/* The same loop with QBE_SINK_DEEP and the counter left alone
+ * (QBE_NO_IVAR): every access carries its own scaled index again (the
+ * behaviour of 2026-10-08 to 2026-10-10), which is what index_once guards
+ * against. */
 typedef unsigned short u16;
 typedef short s16;
 extern s16 px[18], py[18], dx[18], dy[18];

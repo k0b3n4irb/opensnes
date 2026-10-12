@@ -1,6 +1,6 @@
 /* A counted loop tests its condition at the bottom of each turn (no jmp back
- * to the condition), and its body does not reload the index the compare has
- * just left in A. */
+ * to the condition). Since ivar (2026-10-12) its counter is the byte offset
+ * of the array element, so no shift scales it. */
 unsigned short nw[240];
 
 void clear(void)
