@@ -5,6 +5,13 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(bench): `farfill`, the 23rd workload of `make bench-sdk`: a screen of
+  96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, four
+  times, then the same on a near buffer (`farClear` is the
+  bare `for` over an index, the line the compiler's stage 2 is measured
+  on). PVSnesLib 134,854,318 master cycles, OpenSNES 56,639,980 (−58.0 %),
+  both leaving the same checksum; the two SDKs' totals become 325.9 M and
+  129.6 M (−60.2 %).
 - feat(lib): **`tileBlitGlyph2bpp()`** (`snes/tile.h`, module `tile`): ORs
   rows of a 2bpp glyph into a tile and the tile to its right at a pixel shift
   of 0 to 7 — the primitive of text composed at the pixel in a 2bpp layer

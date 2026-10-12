@@ -56,11 +56,11 @@ WORK = REPO / "build" / "sdkbench"
 NAMES = ["baseline", "sieve", "sort", "physics", "collide", "mul", "decimal",
          "long", "bytes", "calls", "switch", "crc", "list",
          "tilemap", "grid", "entities", "copy", "strings", "state", "place", "dist", "depot",
-         "div32"]
+         "div32", "farfill"]
 WHAT = {"sieve": "sieve of 1024, byte array", "sort": "insertion sort, 64 words",
         "physics": "32 entities x 60 steps", "collide": "496 box pairs x 8",
         "mul": "2304 variable multiplies", "decimal": "200 numbers to digits (/10, %10)",
-        "long": "300 steps of 32-bit math", "div32": "200 steps of u32 / u16 (and a few / u32)", "bytes": "512-byte fill, copy, compare x 4",
+        "long": "300 steps of 32-bit math", "div32": "200 steps of u32 / u16 (and a few / u32)", "farfill": "a 2bpp text screen composed in far RAM, then near", "bytes": "512-byte fill, copy, compare x 4",
         "calls": "recursive fib(17)", "switch": "1280 interpreted ops",
         "crc": "CRC-16 of 256 bytes, bitwise", "list": "linked list, 40 walks",
         "tilemap": "32x16 tilemap, write + 1200 lookups", "grid": "16x32 grid, 4 neighbours",
@@ -139,7 +139,7 @@ def wla_sym(path: Path) -> None:
 # The functions of each workload, for the size column.
 FUNCS = {"sieve": ["w_sieve"], "sort": ["w_sort", "rnd16"],
          "physics": ["w_physics", "ent_init", "rnd16"], "collide": ["w_collide", "ent_init", "rnd16"],
-         "mul": ["w_mul"], "decimal": ["w_decimal"], "long": ["w_long"], "div32": ["w_div32"], "bytes": ["w_bytes"],
+         "mul": ["w_mul"], "decimal": ["w_decimal"], "long": ["w_long"], "div32": ["w_div32"], "farfill": ["w_farfill", "makeFont", "slotOf", "farClear", "farGlyph", "farBox", "farSum", "nearClear", "nearGlyph", "nearBox", "nearSum", "farScreen", "nearScreen"], "bytes": ["w_bytes"],
          "calls": ["w_calls", "fib"], "switch": ["w_switch"], "crc": ["w_crc"], "list": ["w_list"],
          "tilemap": ["w_tilemap"], "grid": ["w_grid", "rnd16"],
          "entities": ["w_entities", "ent_init", "rnd16"], "copy": ["w_copy"],
@@ -249,7 +249,7 @@ DESCRIPTION = {
     "sieve": "sieve of 1024 in a byte array", "sort": "insertion sort of 64 words",
     "physics": "32 entities bouncing, 60 steps, by index", "collide": "496 box pairs tested, 8 rounds",
     "mul": "2304 multiplies of two variables", "decimal": "200 numbers to decimal digits (`/ 10`, `% 10`)",
-    "long": "300 steps of a 32-bit generator and hash", "div32": "200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth", "bytes": "512-byte fill, copy and compare, 4 passes",
+    "long": "300 steps of a 32-bit generator and hash", "div32": "200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth", "farfill": "a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer", "bytes": "512-byte fill, copy and compare, 4 passes",
     "calls": "recursive `fib(17)`", "switch": "1280 operations of a `switch` interpreter",
     "crc": "CRC-16 of 256 bytes, bit by bit", "list": "a 64-node linked list walked 40 times",
     "tilemap": "a 32×16 tilemap written, then 1200 lookups",

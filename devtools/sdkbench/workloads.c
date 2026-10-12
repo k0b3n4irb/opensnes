@@ -882,6 +882,214 @@ void w_depot(void) {
     res = acc ^ odo_lo ^ (u16)(odo_hi << 9) ^ mix_hi;
 }
 
+
+/* 23. farfill — a screen of text and bars composed at the pixel into a 2bpp
+ * layer in far RAM, then the same on a near buffer folded on itself: the
+ * cost of a `for` over an index (farClear is the bare loop, 1920 words x 4;
+ * farScreen 96 glyphs and 24 boxes x 4) and of __far addressing; the line
+ * of measure of the compiler's loop work: farClear per word. PVSnesLib has no
+ * far qualifier: the layer is a near array there. */
+#ifndef FAR
+#define FAR
+#endif
+#define FF_TILES       240
+#define FF_COLS        20              /* the layer: 20 x 12 tiles */
+#define FF_ROWS        12
+#define FF_GLYPHS      36
+#define FF_NEAR_TILES  30              /* the near buffer: 20 x 1.5 tiles, folded */
+
+FAR union { u8 b[FF_TILES * 16]; u16 w[FF_TILES * 8]; } far_layer;
+static union { u8 b[FF_NEAR_TILES * 16]; u16 w[FF_NEAR_TILES * 8]; } near_layer;
+
+/* A synthetic font: 36 glyphs of 8 rows x 2 planes, drawn by a formula. */
+static u8 font[FF_GLYPHS * 16];
+
+static void makeFont(void) {
+    u16 g, r;
+
+    for (g = 0; g < FF_GLYPHS; g++)
+        for (r = 0; r < 8; r++) {
+            u8 shape = (u8)(0x7E ^ (g * 37 + r * 11));
+            font[g * 16 + r * 2] = (r == 0 || r == 7) ? 0x7E : (u8)(shape & 0x66);
+            font[g * 16 + r * 2 + 1] = (u8)((shape >> 1) | 0x18);
+        }
+}
+
+static u16 slotOf(u16 col, u16 row) {
+    if (col >= FF_COLS || row >= FF_ROWS) return 0xFFFF;
+    return row * FF_COLS + col;
+}
+
+/* ---- the far pass --------------------------------------------------------- */
+
+void farClear(void) {                 /* not static either: the bare clear loop, far against near */
+    u16 k;
+
+    for (k = 0; k < FF_TILES * 8; k++) far_layer.w[k] = 0;
+}
+
+static void farGlyph(u16 g, u16 x, u16 y) {
+    u16 at = g << 4, col = x >> 3, sh = x & 7, r;
+    u16 row0 = y >> 3;
+    u16 s0 = slotOf(col, row0), s0b = sh ? slotOf(col + 1, row0) : 0xFFFF;
+    u16 s1 = 0xFFFF, s1b = 0xFFFF;
+
+    if (((y + 7) >> 3) != row0) {
+        s1 = slotOf(col, row0 + 1);
+        if (sh) s1b = slotOf(col + 1, row0 + 1);
+    }
+    for (r = 0; r < 8; r++, y++) {
+        u16 first = (y >> 3) == row0, off = (y & 7) << 1;
+        u16 sa = first ? s0 : s1, sb = first ? s0b : s1b;
+        u8 p0 = font[at + (r << 1)], p1 = font[at + (r << 1) + 1];
+        u8 b;
+
+        if (sa != 0xFFFF) {
+            b = (u8)(p0 >> sh); if (b) far_layer.b[(sa << 4) + off] |= b;
+            b = (u8)(p1 >> sh); if (b) far_layer.b[(sa << 4) + off + 1] |= b;
+        }
+        if (sb != 0xFFFF) {
+            b = (u8)(p0 << (8 - sh)); if (b) far_layer.b[(sb << 4) + off] |= b;
+            b = (u8)(p1 << (8 - sh)); if (b) far_layer.b[(sb << 4) + off + 1] |= b;
+        }
+    }
+}
+
+static void farBox(u16 x, u16 w, u16 y, u16 h, u16 c) {
+    u16 x1 = x + w, px = x;
+
+    while (px < x1) {
+        u16 cx = px & ~7, end = cx + 8, slot = 0xFFFF, r, yy;
+        u8 mask;
+
+        if (end > x1) end = x1;
+        mask = (u8)((0xFF >> (px - cx)) & (0xFF << (cx + 8 - end)));
+        for (r = h, yy = y; r; r--, yy++) {
+            u16 at;
+
+            if ((yy & 7) == 0 || yy == y) slot = slotOf(cx >> 3, yy >> 3);
+            if (slot == 0xFFFF) continue;
+            at = (slot << 4) + ((yy & 7) << 1);
+            if (c & 1) far_layer.b[at] |= mask; else far_layer.b[at] &= (u8)~mask;
+            if (c & 2) far_layer.b[at + 1] |= mask; else far_layer.b[at + 1] &= (u8)~mask;
+        }
+        px = end;
+    }
+}
+
+u16 farSum(void) {
+    u16 k, acc = 0;
+
+    for (k = 0; k < FF_TILES * 8; k++) acc = (u16)((acc << 1) | (acc >> 15)) ^ far_layer.w[k];
+    return acc;
+}
+
+/* ---- the near pass: the same code on a near buffer, slots folded ---------- */
+
+void nearClear(void) {
+    u16 k;
+
+    for (k = 0; k < FF_NEAR_TILES * 8; k++) near_layer.w[k] = 0;
+}
+
+static void nearGlyph(u16 g, u16 x, u16 y) {
+    u16 at = g << 4, col = x >> 3, sh = x & 7, r;
+    u16 row0 = y >> 3;
+    u16 s0 = slotOf(col, row0), s0b = sh ? slotOf(col + 1, row0) : 0xFFFF;
+    u16 s1 = 0xFFFF, s1b = 0xFFFF;
+
+    if (((y + 7) >> 3) != row0) {
+        s1 = slotOf(col, row0 + 1);
+        if (sh) s1b = slotOf(col + 1, row0 + 1);
+    }
+    if (s0 != 0xFFFF) s0 %= FF_NEAR_TILES;
+    if (s0b != 0xFFFF) s0b %= FF_NEAR_TILES;
+    if (s1 != 0xFFFF) s1 %= FF_NEAR_TILES;
+    if (s1b != 0xFFFF) s1b %= FF_NEAR_TILES;
+    for (r = 0; r < 8; r++, y++) {
+        u16 first = (y >> 3) == row0, off = (y & 7) << 1;
+        u16 sa = first ? s0 : s1, sb = first ? s0b : s1b;
+        u8 p0 = font[at + (r << 1)], p1 = font[at + (r << 1) + 1];
+        u8 b;
+
+        if (sa != 0xFFFF) {
+            b = (u8)(p0 >> sh); if (b) near_layer.b[(sa << 4) + off] |= b;
+            b = (u8)(p1 >> sh); if (b) near_layer.b[(sa << 4) + off + 1] |= b;
+        }
+        if (sb != 0xFFFF) {
+            b = (u8)(p0 << (8 - sh)); if (b) near_layer.b[(sb << 4) + off] |= b;
+            b = (u8)(p1 << (8 - sh)); if (b) near_layer.b[(sb << 4) + off + 1] |= b;
+        }
+    }
+}
+
+static void nearBox(u16 x, u16 w, u16 y, u16 h, u16 c) {
+    u16 x1 = x + w, px = x;
+
+    while (px < x1) {
+        u16 cx = px & ~7, end = cx + 8, slot = 0xFFFF, r, yy;
+        u8 mask;
+
+        if (end > x1) end = x1;
+        mask = (u8)((0xFF >> (px - cx)) & (0xFF << (cx + 8 - end)));
+        for (r = h, yy = y; r; r--, yy++) {
+            u16 at;
+
+            if ((yy & 7) == 0 || yy == y) {
+                slot = slotOf(cx >> 3, yy >> 3);
+                if (slot != 0xFFFF) slot %= FF_NEAR_TILES;
+            }
+            if (slot == 0xFFFF) continue;
+            at = (slot << 4) + ((yy & 7) << 1);
+            if (c & 1) near_layer.b[at] |= mask; else near_layer.b[at] &= (u8)~mask;
+            if (c & 2) near_layer.b[at + 1] |= mask; else near_layer.b[at + 1] &= (u8)~mask;
+        }
+        px = end;
+    }
+}
+
+u16 nearSum(void) {
+    u16 k, acc = 0;
+
+    for (k = 0; k < FF_NEAR_TILES * 8; k++) acc = (u16)((acc << 1) | (acc >> 15)) ^ near_layer.w[k];
+    return acc;
+}
+
+/* ---- one screen: 96 glyphs at a 6-pixel pitch, 24 boxes ------------------- */
+
+void farScreen(u16 seed) {           /* not static: kept as functions so a profiler can tell the two passes apart */
+    u16 k;
+
+    farClear();
+    for (k = 0; k < 96; k++) farGlyph((k * 7 + seed) % FF_GLYPHS, 4 + (k % 24) * 6, 3 + (k / 24) * 22);
+    for (k = 0; k < 24; k++) farBox(27, 10 + (k * 5 + seed) % 40, 1 + k * 4 - (k >> 1), 5, 1 + (k % 3));
+}
+
+void nearScreen(u16 seed) {
+    u16 k;
+
+    nearClear();
+    for (k = 0; k < 96; k++) nearGlyph((k * 7 + seed) % FF_GLYPHS, 4 + (k % 24) * 6, 3 + (k / 24) * 22);
+    for (k = 0; k < 24; k++) nearBox(27, 10 + (k * 5 + seed) % 40, 1 + k * 4 - (k >> 1), 5, 1 + (k % 3));
+}
+
+void w_farfill(void) {
+    u16 pass, acc = 0;
+
+    makeFont();
+    for (pass = 0; pass < 4; pass++) {
+        farScreen(pass * 5);
+        acc ^= farSum();
+        acc = (u16)((acc << 3) | (acc >> 13));
+    }
+    for (pass = 0; pass < 4; pass++) {
+        nearScreen(pass * 5);
+        acc ^= nearSum();
+        acc = (u16)((acc << 3) | (acc >> 13));
+    }
+    res = acc;
+}
+
 int main(void) {
     consoleInit();
 #if WORKLOAD == 1
@@ -928,6 +1136,8 @@ int main(void) {
     w_depot();
 #elif WORKLOAD == 22
     w_div32();
+#elif WORKLOAD == 23
+    w_farfill();
 #endif
     done = 0x600D;
     while (1) {

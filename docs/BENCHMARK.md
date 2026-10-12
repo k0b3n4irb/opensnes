@@ -325,9 +325,10 @@ while it runs (bytes below the initial stack pointer).
 | `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 7,792,098 | -72.0 % | 1018 | 472 | -53.6 % | 61 | 28 |
 | `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 14,405,888 | -61.9 % | 7722 | 3465 | -55.1 % | 93 | 54 |
 | `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,754 | 5,011,094 | -55.9 % | 888 | 452 | -49.1 % | 94 | 71 |
-| **Total** | | **191,038,200** | **72,927,954** | **-61.8 %** | **20669** | **10060** | **-51.3 %** | | |
+| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,854,318 | 56,639,980 | -58.0 % | 5132 | 2955 | -42.4 % | 84 | 63 |
+| **Total** | | **325,892,518** | **129,567,934** | **-60.2 %** | **25801** | **13015** | **-49.6 %** | | |
 
-Of the 22 workloads OpenSNES is **faster on 22**, **no larger on 22**, and **no deeper in stack on 21**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 23 workloads OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to

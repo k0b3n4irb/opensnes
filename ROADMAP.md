@@ -19,7 +19,7 @@ examples with their assets redone, and the first console session of the
 hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7).
 `docs/STABILITY.md` is the promise 1.0 will make. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
 and educational use, building toward commercial-grade maturity. The compiler
-produces code about 30 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 61 % faster measured on luna on 22 workloads, each of them faster, none larger, and level or shallower in stack on sixteen. 88
+produces code about 30 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 60 % faster measured on luna on 23 workloads, each of them faster, none larger, and level or shallower in stack on sixteen. 88
 working examples cover every major subsystem, with cross-platform CI on Linux,
 macOS, and Windows enforcing not just "it compiles" but the full functional
 test suite (luna, cycle-accurate native — corpus liveness + visual
