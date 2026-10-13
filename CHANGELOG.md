@@ -2,6 +2,19 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [Unreleased]
+
+### Added
+- feat(bench): `stepseq`, the 24th workload of `make bench-sdk`, measured for
+  OpenSNES alone: a four-channel step sequencer ticked 2 000 times — parallel
+  `u16` arrays indexed by the channel, a `switch` on an opcode byte, `s8`
+  effect tables read at `e + 5 + k`, a 32-bit division at each period change
+  — the shape of a sound interpreter. 65,378,506 master
+  cycles, 8 172 a channel-tick (the criterion is 5 000). PVSnesLib's compiler
+  leaves another checksum (0x5078 for the 0x7552 of the native build and of
+  ours), so the runner prints the row "ours only" and keeps it out of the
+  totals (`OPENSNES_ONLY` in `run.py`).
+
 ## [0.50.0] — 2026-10-12
 
 A primitive for text
