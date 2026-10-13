@@ -590,10 +590,10 @@ bench-twins:
 	@python3 devtools/twinbench/run.py $(if $(DETAIL),--detail)
 
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
-# errors. It is NOT the default: `release` depends on `docs`, and Doxygen
-# resolves some directory links differently on Windows, so a doc warning must
-# not be able to block a release build on another platform (it did, on the
-# first push of the gaps-review P7 gate).
+# errors. It is NOT the default: Doxygen resolves some directory links
+# differently on Windows, so a doc warning must not be able to block a build
+# on another platform (it did, on the first push of the gaps-review P7 gate,
+# when `release` still depended on `docs`).
 docs:
 	cd docs && { cat Doxyfile; $(if $(DOXY_STRICT),echo "WARN_AS_ERROR = FAIL_ON_WARNINGS";) } | doxygen -
 	@# The showcase landing page is the site's front door. Doxygen emits the

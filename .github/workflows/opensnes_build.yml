@@ -84,17 +84,12 @@ jobs:
             zip
             unzip
 
-      - name: Install dependencies for macOS
-        if: matrix.name == 'darwin'
-        env:
-          # no cleanup of the runner image's own packages after the install:
-          # it is ten warnings a run about formulae we never use
-          HOMEBREW_NO_INSTALL_CLEANUP: 1
-          HOMEBREW_NO_ENV_HINTS: 1
-        run: |
-          brew update || true
-          brew install doxygen zip || true
-          # Xcode Command Line Tools provides the compiler
+      # macOS needs nothing installed: the Xcode Command Line Tools of the
+      # runner give the compiler, make and zip, and no step of this job runs
+      # Doxygen (`release` has not depended on `docs` since the zip stopped
+      # shipping the HTML). The step that was here ran `brew update` to
+      # install doxygen and zip: a minute, and a screen of warnings about the
+      # runner image's own packages, on every push.
 
       # ------------------------------------ #
       # Checkout the project                 #
