@@ -23,7 +23,7 @@
       "peak": 21264
     },
     "audio/echo": {
-      "sha256": "507e0a250cbca05fc9bc829cef235813a1094836fb9945b0f5cc89499b039f92",
+      "sha256": "caabf72c766a4cefdc39835d48e746aaa74aae39437cb4d7c5735ce3d1122385",
       "samples": 159936,
       "peak": 10922
     },
@@ -43,7 +43,7 @@
       "peak": 20922
     },
     "audio/soundboard": {
-      "sha256": "38ba5594086cb860f22e9265059483e823db66a68a0119efad86de6a0b0ecbdf",
+      "sha256": "397cce0ec3e2c5f45730b1e924ac3e23eb03f69c02cfda3c8d50e1cf11436bcb",
       "samples": 159936,
       "peak": 9323
     },
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "4b52863ffc01c8d8b0e159c083dc50bc080a75c780347f4d98c2803ca60cd6c0",
+      "sha256": "e9bdac7f940fa9b996478d7477c36d91512c4acda8b3b8568c3b58ecd5d96c5f",
       "samples": 159936,
       "peak": 12192
     }

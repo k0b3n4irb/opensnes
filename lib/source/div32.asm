@@ -225,12 +225,16 @@ tcc_sdivmod32:
 ;------------------------------------------------------------------------------
 div32_ucore:
     lda.w div32_div_hi
-    bne @big
+    beq +
+    brl @big                     ; past the unrolled steps: out of a short branch's reach
++
 
     ; --- divisor under 65536: the remainder fits 16 bits, kept in A ---
     stz.w div32_rh
     lda.w div32_div_lo
-    beq @zero
+    bne +
+    brl @zero                    ; past the unrolled steps as well
++
     lda.w div32_qh
     cmp.w div32_div_lo
     bcs @hi_init
@@ -252,19 +256,26 @@ div32_ucore:
     dex
     bne @hi
 @lo_init:
-    ldx.w #16
-@lo:
-    asl.w div32_ql
+    ; The sixteen steps unrolled (2026-10-13): the loop's dex / bne cost
+    ; five cycles of about thirty a step, and this path is the one a
+    ; sequencer takes at every period change (a constant over the period).
+    ; The quotient bit is
+    ; the carry the compare leaves (set when the divisor was subtracted),
+    ; rolled into the low word by the next step's `rol`: no `inc` in
+    ; memory. The first `rol` enters with the carry clear, the last bit is
+    ; rolled in after the steps. 16 x 12 bytes.
+    clc
+.REPT 16
+    rol.w div32_ql               ; the previous step's bit in, the top bit out
     rol a
-    bcs @lo_sub
+    bcs +                        ; 17 bits: above any 16-bit divisor
     cmp.w div32_div_lo
-    bcc @lo_no
-@lo_sub:
-    sbc.w div32_div_lo
-    inc.w div32_ql
-@lo_no:
-    dex
-    bne @lo
+    bcc ++                       ; carry clear: no subtraction, bit 0
++   sbc.w div32_div_lo           ; carry set on both ways in
+    sec                          ; bit 1 — the 17-bit way may have borrowed
+++
+.ENDR
+    rol.w div32_ql               ; the sixteenth bit
     sta.w div32_rl
     rts
 

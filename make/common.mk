@@ -334,7 +334,8 @@ _DEP_vramqueue       :=                                                         
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
-_DEP_audio           := apu audio_blob audio_stream
+_DEP_audio           := apu audio_blob audio_stream audio_vset
+_DEP_audio_vset      := audio                                                   # audioSetVoiceVolumePitch (asm): audio.c's pending command, sequence and voice mirror
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))

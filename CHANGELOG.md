@@ -5,6 +5,20 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`audioSetVoiceVolumePitch(voice, volume, pitch)`** and
+  `audioSetVoicePan(voice, pan)`: the volume and the pitch of a voice in one
+  command to the driver (`VSET`, opcode `$10`), the volume split between
+  left and right by the voice's pan — the one `audioPlaySampleOn()` gave it
+  or `audioSetVoicePan()` set since, with the same formula, so a voice hard
+  left stays hard left; the driver learns a pan (`VPAN`, `$11`) only when it
+  changes. A sequencer in tremolo and vibrato sent `audioSetVoiceVolume()`
+  then `audioSetVoicePitch()` at every tick, two handshakes: four voices
+  updated every frame cost 10 621 master cycles a voice, 5 500 with the one
+  call (−48 %, luna), the DSP left in the same state. The call is assembly
+  (`audio_vset.asm`): in C it cost more than the handshake it saved.
+  Driver protocol version 2. Pinned by the libtests and by fourteen register
+  assertions of manifest `audio_v2` (left, right, a pan in between, the
+  centre by default, the clamps).
 - feat(bench): `stepseq`, the 24th workload of `make bench-sdk`, measured for
   OpenSNES alone: a four-channel step sequencer ticked 2 000 times — parallel
   `u16` arrays indexed by the channel, a `switch` on an opcode byte, `s8`
@@ -14,6 +28,13 @@ All notable changes to OpenSNES are documented in this file.
   leaves another checksum (0x5078 for the 0x7552 of the native build and of
   ours), so the runner prints the row "ours only" and keeps it out of the
   totals (`OPENSNES_ONLY` in `run.py`).
+
+### Performance
+- perf(runtime): the 32-by-16 division of the runtime (`div32_ucore`, the
+  path `u32 / u16` takes) runs its sixteen low steps unrolled, the quotient
+  bit rolled in from the carry instead of an `inc` in memory: 1 167 → 946
+  master cycles a division on the sequencer workload (−19 %). 190 bytes
+  more in a ROM that divides 32 bits.
 
 ## [0.50.0] — 2026-10-12
 

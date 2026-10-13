@@ -109,6 +109,9 @@ blocking primitives, the v2 C layer never hangs the game.
 | $0C | LOAD | — | addr | — | enter block-receive mode (below) |
 | $0D | ENVX | voice | — | ENVX | audioGetVoiceState.active |
 | $0E | PING | — | — | version | audioIsReady |
+| $0F | LOAD_SIZE | — | size | — | the byte count of the LOAD that follows |
+| $10 | VSET | volume (bits 0-6), voice bit 2 (bit 7) | pitch (bits 0-13), voice bits 0-1 (bits 14-15) | — | audioSetVoiceVolumePitch (audio_vset.asm): VOLL, VOLR, PITCHL, PITCHH in one handshake, the volume split by the voice's pan weight (right = volume * w / 16, left = volume - right, as pan_to_lr()) (2026-10-13, driver version 2) |
+| $11 | VPAN | voice | weight 0..16 | — | the pan weight VSET splits with; sent by audioSetVoiceVolumePitch only when the voice's pan changed |
 
 `DIR_SET` needs start AND loop (2×16-bit) — two commands:
 `DIR_START(index, start)` + `DIR_LOOP(index, loop)`, or fold into the

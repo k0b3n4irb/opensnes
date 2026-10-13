@@ -47,6 +47,8 @@
 #define OP_ENVX      0x0D
 #define OP_PING      0x0E
 #define OP_LOAD_SIZE 0x0F
+#define OP_VSET      0x10   /* volume and pitch of a voice, one handshake; split by the voice's pan */
+#define OP_VPAN      0x11   /* the pan weight VSET splits a voice's volume with */
 
 /* ARAM sample area (spec: driver $0200-$09FF, directory $0A00,
  * samples from $0B00 up to the echo region at $C000) */
@@ -65,7 +67,7 @@
 #define DEFAULT_ADSR1 0x8F
 #define DEFAULT_ADSR2 0xE0
 
-#define DRIVER_VERSION 1
+#define DRIVER_VERSION 2
 #define SPC_DRIVER_BASE 0x0200
 
 /* Bounded-wait iterations for one ack (~2 frames of slow-ROM loop). */
@@ -79,7 +81,7 @@
 extern u8 audio_driver_blob[], audio_driver_blob_end[];
 
 static u8 audio_ready;          /* PING succeeded after upload */
-static u8 audio_seq;            /* command sequence bits, cycles 1..3 */
+u8 audio_seq;                   /* command sequence bits, cycles 1..3 (shared with audio_vset.asm) */
 static u8 audio_mvol;           /* mirrored master volume */
 
 typedef struct {
@@ -90,13 +92,18 @@ typedef struct {
     u16 pitch;
     u16 vol_lr;         /* the VVOL parameter last sent: right << 8 | left */
     u8 sent;            /* what the driver already holds for this voice: SENT_* */
+    u8 pan_drv;         /* the pan the driver's VSET holds for this voice (centre at boot) */
 } VoiceMirror;
 
 #define SENT_VOL   0x01     /* vol_lr was sent */
 #define SENT_PITCH 0x02     /* pitch was sent */
 #define SENT_ENV   0x04     /* the default envelope was sent */
 
-static VoiceMirror voice_mirror[AUDIO_MAX_VOICES];
+/* Shared with audio_vset.asm, which indexes it by voice * 10 and knows the
+ * offsets of volume, pan, pitch, vol_lr, sent and pan_drv: a change of this
+ * struct is a change of that file. */
+VoiceMirror audio_voice_mirror[AUDIO_MAX_VOICES];
+_Static_assert(sizeof(VoiceMirror) == 10, "audio_vset.asm indexes the mirror by voice * 10");
 
 /* Sample directory mirror + bump allocator (CPU side owns allocation;
  * the driver only writes the ARAM directory entries it is told to).
@@ -114,7 +121,7 @@ extern u16 audio_stream_blocks(const u8 *data, u16 full, u16 tail);
  *============================================================================*/
 
 /* The command the driver has not acknowledged yet (0: none). */
-static u8 audio_pending;
+u8 audio_pending;               /* shared with audio_vset.asm */
 
 /**
  * @brief Wait (bounded) for the driver to acknowledge the pending command.
@@ -194,13 +201,14 @@ u8 audioInit(void) {
     sample_next_free = SAMPLE_BASE;
     audio_echo_reserved = 0;
     for (i = 0; i < AUDIO_MAX_VOICES; i++) {
-        voice_mirror[i].sample_id = 0xFF;
-        voice_mirror[i].volume = AUDIO_VOL_MAX;
-        voice_mirror[i].pan = AUDIO_PAN_CENTER;
-        voice_mirror[i].env_set = 0;
-        voice_mirror[i].pitch = AUDIO_PITCH_DEFAULT;
-        voice_mirror[i].vol_lr = 0;
-        voice_mirror[i].sent = 0;       /* the new driver was given nothing yet */
+        audio_voice_mirror[i].sample_id = 0xFF;
+        audio_voice_mirror[i].volume = AUDIO_VOL_MAX;
+        audio_voice_mirror[i].pan = AUDIO_PAN_CENTER;
+        audio_voice_mirror[i].pan_drv = AUDIO_PAN_CENTER;
+        audio_voice_mirror[i].env_set = 0;
+        audio_voice_mirror[i].pitch = AUDIO_PITCH_DEFAULT;
+        audio_voice_mirror[i].vol_lr = 0;
+        audio_voice_mirror[i].sent = 0;       /* the new driver was given nothing yet */
     }
     for (i = 0; i < AUDIO_MAX_SAMPLES; i++) {
         sample_mirror[i].flags = 0;
@@ -275,9 +283,9 @@ u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR) {
     err = cmd_post(OP_VVOL, voice, (u16)((u16)volumeR << 8 | volumeL));
     if (err == AUDIO_OK) {
         /* mirror keeps the max of both for state reporting */
-        voice_mirror[voice].volume = volumeL > volumeR ? volumeL : volumeR;
-        voice_mirror[voice].vol_lr = (u16)((u16)volumeR << 8 | volumeL);
-        voice_mirror[voice].sent |= SENT_VOL;
+        audio_voice_mirror[voice].volume = volumeL > volumeR ? volumeL : volumeR;
+        audio_voice_mirror[voice].vol_lr = (u16)((u16)volumeR << 8 | volumeL);
+        audio_voice_mirror[voice].sent |= SENT_VOL;
     }
     return err;
 }
@@ -292,8 +300,8 @@ u8 audioSetVoicePitch(u8 voice, u16 pitch) {
     }
     err = cmd_post(OP_VPITCH, voice, pitch);
     if (err == AUDIO_OK) {
-        voice_mirror[voice].pitch = pitch;
-        voice_mirror[voice].sent |= SENT_PITCH;
+        audio_voice_mirror[voice].pitch = pitch;
+        audio_voice_mirror[voice].sent |= SENT_PITCH;
     }
     return err;
 }
@@ -307,7 +315,7 @@ u8 audioSetADSR(u8 voice, u8 attack, u8 decay, u8 sustain, u8 release) {
     adsr2 = (u8)(((sustain & 0x07) << 5) | (release & 0x1F));
     err = cmd_post(OP_VADSR, voice, (u16)((u16)adsr2 << 8 | adsr1));
     if (err == AUDIO_OK) {
-        voice_mirror[voice].env_set = 1;
+        audio_voice_mirror[voice].env_set = 1;
     }
     return err;
 }
@@ -320,7 +328,7 @@ u8 audioSetGain(u8 voice, u8 mode) {
     /* driver also zeroes VxADSR1 so GAIN mode actually applies */
     err = cmd_post(OP_VGAIN, voice, mode);
     if (err == AUDIO_OK) {
-        voice_mirror[voice].env_set = 1;
+        audio_voice_mirror[voice].env_set = 1;
     }
     return err;
 }
@@ -445,15 +453,38 @@ u16 audioGetFreeMemory(void) {
  * step: pan 8 (AUDIO_PAN_CENTER) gives L = R = vol/2, 0 is hard left, 15
  * hard right. Until 2026-10-04 the weights were pan/15 and (15-pan)/15,
  * which put the centre at L = 7/15, R = 8/15 (59 / 67 for vol 127). */
-static void pan_to_lr(u8 vol, u8 pan, u8 *l, u8 *r) {
-    u16 w;
+/* The right weight of a pan: 0 (hard left) to 16 (hard right), 8 at centre. */
+static u8 pan_weight(u8 pan) {
     if (pan > AUDIO_PAN_RIGHT) {
         pan = AUDIO_PAN_RIGHT;
     }
-    w = (pan <= AUDIO_PAN_CENTER) ? pan : (u16)pan + 1;   /* 0..16, 8 at centre */
-    *r = (u8)(((u16)vol * w) >> 4);
+    return (u8)((pan <= AUDIO_PAN_CENTER) ? pan : pan + 1);
+}
+
+static void pan_to_lr(u8 vol, u8 pan, u8 *l, u8 *r) {
+    u8 w = pan_weight(pan);
+    /* the three positions most voices sit at need no multiply */
+    if (w == 0) {
+        *r = 0;
+    } else if (w == 16) {
+        *r = vol;
+    } else if (w == 8) {
+        *r = (u8)(vol >> 1);
+    } else {
+        *r = (u8)(((u16)vol * w) >> 4);
+    }
     *l = (u8)(vol - *r);
 }
+
+void audioSetVoicePan(u8 voice, u8 pan) {
+    if (voice < AUDIO_MAX_VOICES) {
+        audio_voice_mirror[voice].pan = pan > AUDIO_PAN_RIGHT ? AUDIO_PAN_RIGHT : pan;
+    }
+}
+
+/* audioSetVoiceVolumePitch() is in audio_vset.asm: the path a sequencer
+ * takes at every tick. It shares audio_pending, audio_seq and
+ * audio_voice_mirror with this file. */
 
 u8 audioPlaySampleEx(u8 sampleId, u8 volume, u8 pan, u16 pitch) {
     return audioPlaySampleOn(AUDIO_VOICE_AUTO, sampleId, volume, pan, pitch);
@@ -488,7 +519,7 @@ u8 audioPlaySampleOn(u8 voice, u8 sampleId, u8 volume, u8 pan, u16 pitch) {
      * same pitch is one command; a melody on one voice, two a note. */
     pan_to_lr(volume, pan, &l, &r);
     lr = (u16)((u16)r << 8 | l);
-    vm = &voice_mirror[voice];
+    vm = &audio_voice_mirror[voice];
     if (!(vm->sent & SENT_VOL) || vm->vol_lr != lr) {
         if (cmd_post(OP_VVOL, voice, lr) != AUDIO_OK) {
             return AUDIO_VOICE_NONE;
@@ -535,10 +566,10 @@ void audioGetVoiceState(u8 voice, AudioVoiceState *state) {
     if (cmd_send(OP_ENVX, voice, 0) == AUDIO_OK && APU_IO1 > 0) {
         state->active = 1;
     }
-    state->sampleId = voice_mirror[voice].sample_id;
-    state->volume = voice_mirror[voice].volume;
-    state->pan = voice_mirror[voice].pan;
-    state->pitch = voice_mirror[voice].pitch;
+    state->sampleId = audio_voice_mirror[voice].sample_id;
+    state->volume = audio_voice_mirror[voice].volume;
+    state->pan = audio_voice_mirror[voice].pan;
+    state->pitch = audio_voice_mirror[voice].pitch;
 }
 
 /*============================================================================

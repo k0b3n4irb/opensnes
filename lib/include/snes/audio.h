@@ -413,6 +413,43 @@ u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR);
 u8 audioSetVoicePitch(u8 voice, u16 pitch);
 
 /**
+ * @brief Set the volume and the pitch of a voice in one command
+ *
+ * What a tracker or a sequencer does to a voice at every tick: the
+ * tremolo moves its volume and the vibrato its pitch. audioSetVoiceVolume()
+ * then audioSetVoicePitch() cost two handshakes with the driver; this is
+ * one, and the call itself is assembly (four voices updated every frame:
+ * about 10 600 master cycles a voice with the two calls, 5 500 with this
+ * one, measured on luna).
+ *
+ * The volume is split between the two channels by the voice's pan: the one
+ * the last audioPlaySampleOn() / audioPlaySampleEx() gave it, or the one
+ * audioSetVoicePan() set since — the same split as those calls make, so a
+ * voice that plays hard left stays hard left. The driver learns a voice's
+ * pan once, and again only when it changes.
+ *
+ * @param voice  Voice number (0-7)
+ * @param volume Volume (0-127), before the pan
+ * @param pitch  Pitch value ($1000 = normal, 14-bit)
+ * @return AUDIO_OK, AUDIO_ERR_INVALID_ID, or AUDIO_ERR_TIMEOUT when the
+ *         previous command was never acknowledged
+ */
+u8 audioSetVoiceVolumePitch(u8 voice, u8 volume, u16 pitch);
+
+/**
+ * @brief Set the pan audioSetVoiceVolumePitch() splits a voice's volume with
+ *
+ * Changes nothing that is sounding: it takes effect at the voice's next
+ * audioSetVoiceVolumePitch(). A voice started with audioPlaySampleOn()
+ * already has the pan of that call; this is for a voice whose side is
+ * decided once (a tracker channel) or changes without a new note.
+ *
+ * @param voice Voice number (0-7)
+ * @param pan   AUDIO_PAN_LEFT (0) to AUDIO_PAN_RIGHT (15), AUDIO_PAN_CENTER (8)
+ */
+void audioSetVoicePan(u8 voice, u8 pan);
+
+/**
  * @brief Get current state of a voice
  * @param voice Voice number (0-7)
  * @param state Pointer to AudioVoiceState to fill

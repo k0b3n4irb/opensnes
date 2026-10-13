@@ -43,8 +43,12 @@
 .DEFINE ZP_LOAD_H   $0A     ;  (DIR_SET builds the directory entry from it)
 .DEFINE ZP_IDX      $0B     ; LOAD: expected stream index (no CMP A,X on SPC700)
 .DEFINE ZP_TAIL     $0C     ; LOAD: bytes in the last, partial exchange (0-2)
+.DEFINE ZP_VBASE    $0D     ; VSET: the voice's DSP register base (voice << 4)
+.DEFINE ZP_VOL      $0E     ; VSET: the volume asked for
+.DEFINE ZP_VR       $0F     ; VSET: the right volume, volume * weight / 16
+.DEFINE ZP_PAN      $10     ; $10-$17: the pan weight of each voice, 0 (left) to 16 (right), 8 at boot
 
-.DEFINE DRIVER_VERSION 1
+.DEFINE DRIVER_VERSION 2
 
 .BANK 0 SLOT 0
 .ORG $0200
@@ -64,6 +68,11 @@ start:
     WDSP $5D, $0A       ; DIR: sample directory page $0A00
     WDSP $5C, $00       ; end the blanket KOFF
 
+    mov a, #8           ; every voice at the centre until VPAN says otherwise
+    mov x, #7
+-   mov ZP_PAN+x, a
+    dec x
+    bpl -
     mov a, #$00
     mov ZP_LAST_CMD, a
     mov $F4, a          ; ack port = 0: "no command executed yet"
@@ -94,8 +103,8 @@ main_loop:
     ; would exceed the +-128 branch range past a few handlers)
     mov a, ZP_CMD
     and a, #$3F
-    cmp a, #$10
-    bcs cmd_unknown     ; opcode >= $10: not in the table
+    cmp a, #$12
+    bcs cmd_unknown     ; opcode >= $12: not in the table
     asl a
     mov x, a
     jmp [!cmd_table+x]
@@ -124,6 +133,8 @@ cmd_table:
     .dw cmd_envx        ; $0D
     .dw cmd_ping        ; $0E
     .dw cmd_load_size   ; $0F
+    .dw cmd_vset        ; $10
+    .dw cmd_vpan        ; $11
 
 ;------------------------------------------------------------------------------
 ; $01 MVOL — p0 = master volume, both channels
@@ -201,6 +212,81 @@ cmd_vpitch:
     mov $F2, a
     mov a, ZP_P1H
     mov $F3, a
+    jmp !ack
+
+;------------------------------------------------------------------------------
+; $10 VSET — volume and pitch of a voice in one command (2026-10-13):
+;   p0 = volume 0-127 in bits 0-6, voice bit 2 in bit 7
+;   p1 = pitch 0-$3FFF in bits 0-13, voice bits 0-1 in bits 14-15
+; A voice in tremolo and vibrato used to send VVOL then VPITCH at every
+; tick, two handshakes; this is one. The volume is split by the voice's
+; pan weight w (ZP_PAN, set by VPAN): right = volume * w / 16, left =
+; volume - right — the formula of pan_to_lr() in audio.c, so a voice keeps
+; the side audioPlaySampleOn() gave it. Four DSP writes.
+;------------------------------------------------------------------------------
+cmd_vset:
+    mov a, ZP_P1H
+    and a, #$C0         ; voice bits 0-1, in bits 6-7
+    xcn a               ; -> bits 2-3
+    lsr a
+    lsr a               ; -> bits 0-1
+    mov ZP_VBASE, a
+    mov a, ZP_P0
+    and a, #$80         ; voice bit 2, in bit 7
+    beq +
+    mov a, #$04
++   or a, ZP_VBASE      ; A = voice 0-7 (the SPC700 has no OR A,X)
+    mov x, a            ; X = voice: the index of its pan weight
+    xcn a               ; -> the DSP register base: voice << 4
+    mov ZP_VBASE, a
+    mov a, ZP_P0
+    and a, #$7F
+    mov ZP_VOL, a
+    mov y, a            ; Y = volume
+    mov a, ZP_PAN+x     ; A = weight 0-16
+    mul ya              ; YA = volume * weight (at most 127 * 16)
+    xcn a
+    and a, #$0F         ; the product's bits 4-7
+    mov ZP_VR, a
+    mov a, y
+    xcn a
+    and a, #$F0         ; its bits 8-11
+    or a, ZP_VR
+    mov ZP_VR, a        ; right = product >> 4
+    mov a, ZP_VBASE
+    mov $F2, a          ; VxVOLL
+    mov a, ZP_VOL
+    setc
+    sbc a, ZP_VR        ; left = volume - right
+    mov $F3, a
+    mov a, ZP_VBASE
+    or a, #$01          ; VxVOLR
+    mov $F2, a
+    mov a, ZP_VR
+    mov $F3, a
+    mov a, ZP_VBASE
+    or a, #$02          ; VxPITCHL
+    mov $F2, a
+    mov a, ZP_P1L
+    mov $F3, a
+    mov a, ZP_VBASE
+    or a, #$03          ; VxPITCHH
+    mov $F2, a
+    mov a, ZP_P1H
+    and a, #$3F
+    mov $F3, a
+    jmp !ack
+
+;------------------------------------------------------------------------------
+; $11 VPAN — p0 = voice, p1lo = pan weight 0 (left) .. 16 (right), 8 = centre.
+; Changes no DSP register: the weight is what the next VSET splits with.
+;------------------------------------------------------------------------------
+cmd_vpan:
+    mov a, ZP_P0
+    and a, #$07
+    mov x, a
+    mov a, ZP_P1L
+    mov ZP_PAN+x, a
     jmp !ack
 
 ;------------------------------------------------------------------------------

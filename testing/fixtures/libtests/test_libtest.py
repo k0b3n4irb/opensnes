@@ -170,7 +170,7 @@ CASES = [
     ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
     # audio error returns (API audit 3.5, 2026-09-21): they used to be swallowed
     ("r_apu_boot_again", 2, 1),  # 2026-10-03: apuWaitBoot is bounded; 1 = no IPL
-    ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2),
+    ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2), ("r_aud_vset_bad", 2, 2),
     ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
     ("r_aud_on", 2, 6), ("r_aud_on_bad", 2, 0xFF), ("r_aud_on_rr", 2, 1),   # audioPlaySampleOn: the caller picks the voice
     # types: fixLerp's t is a u16 so 1.0 is reachable; sprite ids are u16 so the range check sees 256

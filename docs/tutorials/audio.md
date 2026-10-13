@@ -387,6 +387,22 @@ audioSetVoicePitch(3, 0x1800);           /* 0x1000 = the sample's own rate */
 
 Pitch is clamped to 0x3FFF, the S-DSP's 14-bit range.
 
+A sequencer that moves a voice's volume and its pitch at every tick (a
+tremolo and a vibrato) sends them together:
+
+```c
+audioSetVoicePan(3, AUDIO_PAN_LEFT);     /* once: the side of the voice */
+audioSetVoiceVolumePitch(3, 96, 0x1840); /* every tick: one command */
+```
+
+Each command is a handshake with the driver, so one call instead of two
+is what counts: four voices updated every frame cost about 10 600 master
+cycles a voice with the two calls and 5 500 with this one, measured on
+luna. The volume is split between left and right by the voice's pan — the
+one `audioPlaySampleOn()` gave it, or the one `audioSetVoicePan()` set
+since — exactly as `audioPlaySampleOn()` splits it, so a voice that plays
+hard left stays hard left.
+
 ### Shaping the envelope: ADSR or GAIN
 
 `audioSetADSR(voice, attack, decay, sustain, release)` gives a voice the

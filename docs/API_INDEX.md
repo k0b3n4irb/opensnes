@@ -120,7 +120,7 @@ its header.
 |---|---|---|
 | `anim.h` | `animRestart` | [animation](tutorials/animation.md) |
 | `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopAll` | [audio: choosing the voice](tutorials/audio.md) |
-| `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch` | [audio: volume and pitch](tutorials/audio.md) |
+| `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch`, `audioSetVoiceVolumePitch`, `audioSetVoicePan` | [audio: volume and pitch](tutorials/audio.md) |
 | `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio.md) |
 | `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho` | [audio: echo](tutorials/audio.md) |
 | `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio.md) |

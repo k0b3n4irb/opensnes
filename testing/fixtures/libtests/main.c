@@ -558,6 +558,7 @@ u16 r_apu_boot_again; /* apuWaitBoot() once the driver runs (no IPL any more): r
                        * within about seven frames instead of waiting for ever -> 1 */
 u16 r_aud_badvoice;  /* audioSetVoiceVolume(9, ...): voice out of range -> AUDIO_ERR_INVALID_ID (2) */
 u16 r_aud_badstop;   /* audioStopVoice(8)                               -> 2 */
+u16 r_aud_vset_bad;  /* audioSetVoiceVolumePitch(8, ...): no such voice     -> 2 */
 u16 r_aud_setvol;    /* audioSetVolume(100): the command was accepted   -> 0 */
 u16 r_aud_noplay;    /* audioPlaySample(63), a slot never loaded        -> AUDIO_VOICE_NONE (0xFF) */
 u16 r_aud_on;        /* audioPlaySampleOn(6, 0, 100, CENTER, 0x1A2B): the voice asked for -> 6 */
@@ -631,6 +632,7 @@ static void coverage_lot_c(void) {
 
     r_aud_badvoice = audioSetVoiceVolume(9, 60, 30);
     r_aud_badstop  = audioStopVoice(8);
+    r_aud_vset_bad = audioSetVoiceVolumePitch(8, 1, 1);
     r_aud_setvol   = audioSetVolume(100);  /* 100: audio_v2.toml pins MVOL to it */
     r_aud_noplay   = audioPlaySample(63);
     audioGetVoiceState(0, &vs);
@@ -1415,9 +1417,22 @@ int main(void) {
     audioSetVolume(100);
     r_audio_vol = audioGetVolume();
     audioSetVoiceVolume(2, 80, 40);
+    audioSetVoiceVolumePitch(3, 101, 0x0C00);   /* the centre by default; the pitch is set again below */
     audioSetVoicePitch(3, 0x1234);
     audioSetADSR(1, 15, 7, 7, 8);
     audioSetGain(4, 0x5A);
+    /* volume and pitch in one command (the driver's VSET, 2026-10-13), split
+     * by the voice's pan. Voice 5 (bits 2 and 0 of its number) hard left,
+     * voice 7 (all three bits) hard right with both values clamped, voice 4
+     * at pan 11 (weight 12: the driver's multiply, 100 * 12 / 16 = 75 right,
+     * 25 left); voice 3, above, at the centre nobody set (101: 50 right, 51 left).
+     * The manifest audio_v2 reads the four registers of each voice. */
+    audioSetVoicePan(5, AUDIO_PAN_LEFT);
+    audioSetVoiceVolumePitch(5, 77, 0x2ABC);
+    audioSetVoicePan(7, AUDIO_PAN_RIGHT);
+    audioSetVoiceVolumePitch(7, 200, 0x7FFF);
+    audioSetVoicePan(4, 11);
+    audioSetVoiceVolumePitch(4, 100, 0x0800);
 
     /* phase 2: stream the beep into ARAM, then key it on voice 0
      * (round-robin starts there). Probe asserts the ARAM bytes, the
