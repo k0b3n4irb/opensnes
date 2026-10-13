@@ -85,11 +85,9 @@ jobs:
             zip
             unzip
 
-      - name: Install dependencies for macOS
-        if: matrix.name == 'darwin'
-        run: |
-          brew update || true
-          brew install doxygen zip || true
+      # macOS needs nothing installed (the runner's Xcode Command Line Tools
+      # give the compiler, make and zip; no step here runs Doxygen): same as
+      # the build workflow, where the leg has passed without it since 2ed561da.
 
       # ------------------------------------ #
       # Checkout the project                 #
