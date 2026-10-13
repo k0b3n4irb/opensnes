@@ -48,6 +48,22 @@ All notable changes to OpenSNES are documented in this file.
   master cycles a division on the sequencer workload (−19 %). 190 bytes
   more in a ROM that divides 32 bits.
 
+### Changed
+- feat(lib): **the echo ring takes what its delay needs.** It started at
+  `$C000` whatever the delay: the first `audioSetEcho()` took 16 KB off the
+  sample area for a ring of 2 KB per unit of delay, and a game with more
+  than 46 KB of samples could have no echo at all. The ring is now the top
+  delay x 2 KB under `$FF00` (`ESA = $FF - 8 x delay`): 58,112 bytes of
+  samples with a delay of 2, 47,872 with 7. `audioSetEcho()` still answers
+  `AUDIO_ERR_NO_MEMORY`, nothing changed, when samples already loaded are
+  in the ring's way; a shorter delay than the last gives memory back.
+  **`audioSetEcho()` blocks longer**: the S-DSP takes a new delay only when
+  the ring it runs reaches its end (snesdev wiki, Errata), and a longer old
+  ring from the new start would pass `$FFFF` and write over the driver, so
+  the driver keeps the ring's writes off for that time — up to 240 ms on
+  the first call, 16 ms per unit of the previous delay after. Call it at
+  scene setup. Asked by a game built on the SDK.
+
 ### Fixed
 - fix(tools): **`opensnes-tileset convert --blank`** (and `gfx4snes -b`) on a
   picture whose first block is blank wrote the added blank tile **and** the
@@ -58,6 +74,13 @@ All notable changes to OpenSNES are documented in this file.
   where a map entry names two tiles side by side, the option wrote one blank
   tile and counted two: every cell but the first was one tile off; two are
   written. Found by a game built on the SDK. No example used the option.
+- fix(lib): `audioEnableEcho()` after `audioDisableEcho()` gave no echo:
+  the driver set the voice mask and left the echo volumes at 0 and the
+  ring's writes off, so only a new `audioSetEcho()` brought the echo back
+  (`examples/audio/echo` showed its "wet" colour over a dry sound after two
+  presses of START). The driver now starts the ring again as
+  `audioSetEcho()` configured it, cleared. `examples/audio/soundboard`
+  configures its hall once and toggles it with the two calls.
 
 ## [0.50.0] — 2026-10-12
 

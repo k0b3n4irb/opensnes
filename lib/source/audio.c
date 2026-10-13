@@ -51,16 +51,18 @@
 #define OP_VPAN      0x11   /* the pan weight VSET splits a voice's volume with */
 
 /* ARAM sample area (spec: driver $0200-$09FF, directory $0A00,
- * samples from $0B00 up to the echo region at $C000) */
+ * samples from $0B00 up to the echo ring, or to the IPL when there is
+ * none) */
 #define SAMPLE_BASE 0x0B00
-#define SAMPLE_CEIL_ECHO 0xC000   /* the echo ring starts here (ESA) */
 #define SAMPLE_CEIL_FULL 0xFFC0   /* under the IPL ROM's 64 bytes */
-/* Where the sample area ends: at the echo ring once the game has
- * configured an echo, at the top of RAM as long as it has not (the DSP
- * writes nothing there while FLG bit 5 is set — fullsnes, "6Ch - FLG":
- * "Echo Buffer Writes (0=Enable, 1=Disable)" — and the driver sets it at
- * start and keeps it until ECHO_CFG). */
-#define SAMPLE_CEIL (audio_echo_reserved ? SAMPLE_CEIL_ECHO : SAMPLE_CEIL_FULL)
+/* The echo ring ends here and starts delay x 2 KB below: it takes what its
+ * delay needs and no more (until 2026-10-13 it started at $C000 whatever
+ * the delay, 16 KB off the sample area for a 4 KB ring). ESA is a page
+ * number, so the ring ends on a page; the page above ($FF00) holds the IPL
+ * at $FFC0, and a ring that passed $FFFF would go on at $0000 (anomie's
+ * S-DSP doc: "The echo buffer will wrap within 16 bits"). The driver
+ * derives ESA the same way: $FF - 8 x delay. */
+#define ECHO_RING_END 0xFF00
 
 /* Default one-shot envelope for a voice whose ADSR/GAIN the user never
  * configured: instant attack, no decay, full sustain — KOFF releases. */
@@ -110,7 +112,12 @@ _Static_assert(sizeof(VoiceMirror) == 10, "audio_vset.asm indexes the mirror by 
  * FAR: 512 bytes reached only by name, kept out of the 8 KB plain band. */
 static FAR AudioSample sample_mirror[AUDIO_MAX_SAMPLES];
 static u16 sample_next_free;
-static u8 audio_echo_reserved;  /* audioSetEcho() was called since audioInit() */
+/* Where the sample area ends: at the echo ring once the game has
+ * configured an echo, at the top of RAM as long as it has not (the DSP
+ * writes nothing there while FLG bit 5 is set — fullsnes, "6Ch - FLG":
+ * "Echo Buffer Writes (0=Enable, 1=Disable)" — and the driver sets it at
+ * start and keeps it until ECHO_CFG). */
+static u16 sample_ceil;
 static u8 audio_rr_voice;   /* round-robin auto-allocation cursor */
 
 /* The CPU side of the upload stream (audio_stream.asm) */
@@ -199,7 +206,7 @@ u8 audioInit(void) {
     audio_mvol = AUDIO_VOL_MAX;
     audio_rr_voice = 0;
     sample_next_free = SAMPLE_BASE;
-    audio_echo_reserved = 0;
+    sample_ceil = SAMPLE_CEIL_FULL;
     for (i = 0; i < AUDIO_MAX_VOICES; i++) {
         audio_voice_mirror[i].sample_id = 0xFF;
         audio_voice_mirror[i].volume = AUDIO_VOL_MAX;
@@ -347,7 +354,7 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     if (!audio_ready) {
         return AUDIO_ERR_TIMEOUT;
     }
-    if (size == 0 || (u16)(SAMPLE_CEIL - sample_next_free) < size) {
+    if (size == 0 || (u16)(sample_ceil - sample_next_free) < size) {
         return AUDIO_ERR_NO_MEMORY;
     }
 
@@ -441,7 +448,7 @@ u8 audioGetSampleInfo(u8 id, AudioSample *info) {
 }
 
 u16 audioGetFreeMemory(void) {
-    return (u16)(SAMPLE_CEIL - sample_next_free);
+    return (u16)(sample_ceil - sample_next_free);
 }
 
 /*============================================================================
@@ -577,30 +584,46 @@ void audioGetVoiceState(u8 voice, AudioVoiceState *state) {
  *============================================================================*/
 
 u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR) {
-    u8 err;
+    u8 err, round;
+    u16 ring;
     if (delay < AUDIO_ECHO_DELAY_MIN) {
         delay = AUDIO_ECHO_DELAY_MIN;
     }
     if (delay > 7) {
-        /* The ARAM map reserves $C000-$F7FF for the ring (7 x 2 KB max);
-         * EDL 8-15 would collide with the IPL region. Documented v2 cap. */
+        /* 7 x 2 KB is the documented cap: 14 KB of the sample area. */
         delay = 7;
     }
-    /* The ring lives at $C000 and up. Samples loaded while no echo was
-     * configured may be there: the driver clears the ring when it sets it
-     * up, so say no rather than erase them. */
-    if (sample_next_free > SAMPLE_CEIL_ECHO) {
+    /* The ring takes the top delay x 2 KB under $FF00. Samples already
+     * loaded may be there: the driver clears the ring when it sets it up,
+     * so say no rather than erase them. A shorter delay than the last one
+     * gives the difference back to the sample area. */
+    ring = (u16)(ECHO_RING_END - ((u16)delay << 11));
+    if (sample_next_free > ring) {
         return AUDIO_ERR_NO_MEMORY;
     }
-    audio_echo_reserved = 1;
+    sample_ceil = ring;
     /* EFB rides the FIR command as tap index 8 (same signed-byte shape),
      * keeping ECHO_CFG's params free for EDL + both volumes. */
     err = cmd_post(OP_ECHO_FIR, 8, (u16)(u8)feedback);
     if (err != AUDIO_OK) {
         return err;
     }
-    return cmd_send(OP_ECHO_CFG, delay,
-                    (u16)((u16)(u8)volumeR << 8 | (u8)volumeL));
+    err = cmd_post(OP_ECHO_CFG, delay,
+                   (u16)((u16)(u8)volumeR << 8 | (u8)volumeL));
+    if (err != AUDIO_OK) {
+        return err;
+    }
+    /* The driver keeps the ring's writes off until the ring it replaces
+     * has run to its end (a new EDL is taken there and not before: up to
+     * 240 ms the first time, 16 ms per unit of the last delay after), then
+     * clears the new one. That is longer than one bounded wait. */
+    for (round = 0; round < 12; round++) {
+        audio_pending = (u8)((audio_seq << 6) | OP_ECHO_CFG);
+        if (cmd_wait() == AUDIO_OK) {
+            return AUDIO_OK;
+        }
+    }
+    return AUDIO_ERR_TIMEOUT;
 }
 
 u8 audioSetEchoFilter(const s8 fir[8]) {

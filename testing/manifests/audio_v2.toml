@@ -48,7 +48,7 @@ DIR = 0x0A
 # verified — the old probe printed some decimal: EFB 40=0x28, EVOL 20=0x14,
 # FIR0 96=0x60).
 FLG = 0x00
-ESA = 0xC0
+ESA = 0xE7        # the top 6 KB under $FF00: $FF - 8 x 3
 EDL = 0x03
 EFB = 0x28
 EON = 0x01

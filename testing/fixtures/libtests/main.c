@@ -200,7 +200,7 @@ u16 r_audio_phase;  /* failures over 400 consecutive 9-byte loads, under a
                      * showed the last echo (about 40 of its cycles) made the
                      * load time out, and every load after it */
 u16 r_audio_free;   /* audioGetFreeMemory() with no echo configured -> 0xFFC0-0x0B00-9 = 0xF4B7 */
-u16 r_audio_free_echo; /* after audioSetEcho(): the area ends at $C000 -> 0xC000-0x0B00-9 = 0xB4F7 */
+u16 r_audio_free_echo; /* after audioSetEcho(3): the ring is the top 6 KB under $FF00 -> 0xE700-0x0B00-9 = 0xDBF7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
 u16 r_audio_voice;  /* audioPlaySampleEx(...) -> voice 0 (round-robin)  */
 
@@ -569,7 +569,7 @@ u16 r_aud_v0_stop;   /* audioStopVoice(0), 6 frames later: active    -> 0 */
 u16 r_aud_v1_live;   /* voice 1, started meanwhile, still active     -> 1 */
 u16 r_aud_all_stop;  /* audioStopAll(), 6 frames later: voice 1      -> 0 */
 u16 r_aud_unload;    /* audioGetSampleInfo(0) after audioUnloadSample -> AUDIO_ERR_NOT_LOADED (3) */
-u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back -> 0xB500 */
+u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back -> 0xE700-0x0B00 = 0xDC00 (echo ring of delay 3) */
 extern u8 oamMemory[];   /* crt0's OAM shadow ($7E:0300, mirrored in bank $00), read back here only */
 u16 r_lerp_t256;     /* fixLerp(FIX(10), FIX(37), 256): t = 1.0 -> b = 9472 (a u8 t gave a = 2560) */
 u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */

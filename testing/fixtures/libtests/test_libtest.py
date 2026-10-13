@@ -94,7 +94,7 @@ CASES = [
     ("r_div32_bad", 2, 0), ("r_div32_n", 2, 73),   # 32-bit division vectors: 16-bit and wide divisors, signs
     ("r_audio_phase", 2, 0),     # 400 loads under a long vblank callback, each ending at another phase of the frame
     ("r_audio_free",  2, 0xF4B7),
-    ("r_audio_free_echo", 2, 0xB4F7),
+    ("r_audio_free_echo", 2, 0xDBF7),
     ("r_audio_addr",  2, 0x0B00),
     ("r_audio_voice", 2, 0),
     # phase 3: the DSP->CPU read path — voice 0's envelope is live
@@ -181,7 +181,7 @@ CASES = [
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),
-    ("r_aud_unload",   2, 3),      ("r_aud_unfree",   2, 0xB500),
+    ("r_aud_unload",   2, 3),      ("r_aud_unfree",   2, 0xDC00),
     ("r_meta_style",   2, 22),     ("r_meta_plain",   2, 0x6C64),
     ("r_meta_flipx",   2, 0x646C), ("r_meta_flipattr", 2, 0x40),
     ("r_meta_piece32", 2, 42),     # the piece size comes from the style, not from "large = 16"

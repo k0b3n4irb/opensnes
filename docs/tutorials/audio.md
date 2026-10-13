@@ -323,7 +323,7 @@ int main(void) {
 |-----------|------|
 | SPC700 Driver | ~5.5KB |
 | Sample Data | Up to ~58KB |
-| Echo Buffer | ~4KB (at $D000-$FFFF) |
+| Echo Buffer | 2 KB per unit of delay, under $FF00 (none without an echo) |
 
 Total audio RAM: 64KB
 
@@ -332,7 +332,7 @@ Total audio RAM: 64KB
 1. **Keep samples small** - Use lower sample rates for less important sounds
 2. **Reuse samples** - Same sample at different pitches for variety
 3. **Test on hardware** - Emulator timing may differ
-4. **Use echo sparingly** - Takes 4KB+ of audio RAM
+4. **Size the echo to what you hear** - its ring takes 2 KB of audio RAM per 16 ms of delay
 
 ## Example ROMs
 
@@ -438,9 +438,15 @@ audioDisableEcho();                      /* mutes the echo and stops the ring wr
 
 `{ 0x7F, 0, 0, 0, 0, 0, 0, 0 }` is the identity filter: the echo comes
 back unfiltered (snesdev-wiki, S-DSP registers, FIRx, which also says to
-set the filter before echo is enabled). `audioSetEcho()` clears the whole
-echo ring, which takes several milliseconds per delay step: call it when
-a scene starts, not every frame.
+set the filter before echo is enabled). `audioSetEcho()` takes the top of the
+sound CPU's memory for the echo ring, 2 KB per unit of delay, and answers
+`AUDIO_ERR_NO_MEMORY` when samples already loaded are in the way: a game
+short of sample memory sets its echo before it loads, and keeps the delay
+short. The call blocks: the driver waits for the ring it replaces to run
+out (up to 240 ms the first time, 16 ms per unit of the previous delay
+after) and clears the new one. Call it when a scene starts, never during
+play. `audioDisableEcho()` then `audioEnableEcho()` is the cheap way to
+turn the same echo off and on.
 
 ### Asking the engine
 

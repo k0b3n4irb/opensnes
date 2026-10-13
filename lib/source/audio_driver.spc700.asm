@@ -46,6 +46,11 @@
 .DEFINE ZP_VBASE    $0D     ; VSET: the voice's DSP register base (voice << 4)
 .DEFINE ZP_VOL      $0E     ; VSET: the volume asked for
 .DEFINE ZP_VR       $0F     ; VSET: the right volume, volume * weight / 16
+.DEFINE ZP_EDL      $18     ; ECHO_CFG: the delay whose ring may still be running (15 at boot: unknown)
+.DEFINE ZP_PAGES    $19     ; ECHO_CFG: pages of the ring, delay * 8 (0: no ring yet)
+.DEFINE ZP_EVL      $1A     ; the echo volumes ECHO_CFG was given: ECHO_ON gives them
+.DEFINE ZP_EVR      $1B     ;  back after a mask of 0 muted them
+.DEFINE ZP_ECHO_LIVE $1C    ; 1 while the ring is written (FLG bit 5 clear)
 .DEFINE ZP_PAN      $10     ; $10-$17: the pan weight of each voice, 0 (left) to 16 (right), 8 at boot
 
 .DEFINE DRIVER_VERSION 2
@@ -73,7 +78,11 @@ start:
 -   mov ZP_PAN+x, a
     dec x
     bpl -
+    mov a, #15          ; EDL is not ours yet: take the longest ring for the one running
+    mov ZP_EDL, a
     mov a, #$00
+    mov ZP_PAGES, a
+    mov ZP_ECHO_LIVE, a
     mov ZP_LAST_CMD, a
     mov $F4, a          ; ack port = 0: "no command executed yet"
 
@@ -337,31 +346,66 @@ cmd_ping:
 
 ;------------------------------------------------------------------------------
 ; $08 ECHO_CFG — p0 = EDL (1-7, validated CPU-side), p1 = EVOLL:EVOLR.
-; Full (re)configuration: disable echo writes, point ESA at $C000,
-; set EDL, CLEAR the whole EDL x 2 KB ring (an uncleared ring plays
-; garbage), set the volumes, then re-enable echo writes. The clear
-; takes ~EDL x 9 ms — config-time cost, not runtime.
+; Full (re)configuration: disable echo writes, place the ring so that it
+; ends at $FF00 (ESA = $FF - 8 * EDL: it takes EDL x 2 KB and no more), set
+; EDL, wait for the ring it replaces to run out, CLEAR the new ring (an
+; uncleared ring plays garbage), set the volumes, re-enable echo writes.
+;
+; The wait: the S-DSP takes a new EDL when it reaches the end of the echo
+; buffer, not when the register is written (snesdev wiki, Errata, S-DSP:
+; up to 240 ms for EDL 15). Until then the ring has its old length from the
+; NEW start; one that is longer than the new ring would pass $FFFF and go
+; on at $0000, over this driver's zero page. Writes stay off for the old
+; delay's time: 16 ms per unit, 240 ms the first time (EDL at power-on is
+; not ours). Then ~EDL x 9 ms of clear. Config-time cost, not runtime.
 ;------------------------------------------------------------------------------
 cmd_echo_cfg:
     WDSP $6C, $20       ; FLG: echo writes OFF during reconfig
-    mov $F2, #$6D       ; ESA: echo ring at $C000
-    mov $F3, #$C0
-    mov $F2, #$7D       ; EDL
-    mov a, ZP_P0
-    mov $F3, a
-
-    ; clear EDL * 2KB = EDL * 8 pages from $C000 (self-indexed via ZP ptr)
     mov a, ZP_P0
     asl a
     asl a
     asl a               ; pages = EDL * 8
+    mov ZP_PAGES, a
+    eor a, #$FF         ; $FF - pages: the ring's first page
+    mov ZP_DST_H, a
+    mov $F2, #$6D       ; ESA
+    mov $F3, a
+    mov $F2, #$7D       ; EDL
+    mov a, ZP_P0
+    mov $F3, a
+
+    ; wait 16 ms per unit of the delay being replaced: 11 turns of a
+    ; 1536-cycle loop (16.5 ms at 1.024 MHz) per unit
+    mov a, ZP_EDL
+    mov y, #11
+    mul ya              ; A = units * 11 (165 at most)
     mov x, a
+    mov y, #$00
+echo_wait:
+    dec y
+    bne echo_wait
+    dec x
+    bne echo_wait
+    mov a, ZP_P0
+    mov ZP_EDL, a       ; the ring running from now on
+
+    mov a, ZP_P1L
+    mov ZP_EVL, a
+    mov a, ZP_P1H
+    mov ZP_EVR, a
+    call !echo_start
+    jmp !ack
+
+; Clear the ring (ZP_PAGES pages under $FF00), set the echo volumes kept in
+; ZP_EVL / ZP_EVR and let the DSP write the ring. Echo writes are off on entry.
+echo_start:
+    mov a, ZP_PAGES
+    mov x, a
+    eor a, #$FF
+    mov ZP_DST_H, a     ; the ring's first page
     mov a, #$00
     mov ZP_DST_L, a
-    mov a, #$C0
-    mov ZP_DST_H, a
     mov y, #$00
-    mov a, #$00
 echo_clear:
     mov [ZP_DST_L]+y, a
     inc y
@@ -371,13 +415,15 @@ echo_clear:
     bne echo_clear
 
     mov $F2, #$2C       ; EVOLL
-    mov a, ZP_P1L
+    mov a, ZP_EVL
     mov $F3, a
     mov $F2, #$3C       ; EVOLR
-    mov a, ZP_P1H
+    mov a, ZP_EVR
     mov $F3, a
     WDSP $6C, $00       ; FLG: echo writes back ON
-    jmp !ack
+    mov a, #$01
+    mov ZP_ECHO_LIVE, a
+    ret
 
 ;------------------------------------------------------------------------------
 ; $09 ECHO_FIR — p0 = tap index 0-7 ($0F..$7F step $10), p1lo = coef.
@@ -407,10 +453,23 @@ cmd_echo_on:
     mov $F2, #$4D       ; EON
     mov a, ZP_P0
     mov $F3, a
-    bne @eon_done
+    bne @eon_on
     WDSP $2C, $00       ; EVOLL = 0
     WDSP $3C, $00       ; EVOLR = 0
     WDSP $6C, $20       ; FLG: echo writes off
+    mov a, #$00
+    mov ZP_ECHO_LIVE, a
+    jmp !ack
+@eon_on:
+    ; A mask after a mask of 0: the ring was stopped and muted, and routing
+    ; voices into it gave no echo (until 2026-10-13 only a new ECHO_CFG
+    ; brought it back). Start it again as ECHO_CFG left it — cleared, since
+    ; it still holds what was playing when it was stopped.
+    mov a, ZP_PAGES
+    beq @eon_done       ; no ring configured: EON alone, as before
+    mov a, ZP_ECHO_LIVE
+    bne @eon_done
+    call !echo_start
 @eon_done:
     jmp !ack
 
