@@ -11,6 +11,10 @@ fresh clone of upstream master (`e786f06`, still the tip, no change to
 "All is fine!". NOT SENT by this session: it has no mail tool, and the
 sending address is the owner's choice.
 
+**Final, 2026-10-13: not sent, by the owner's decision** — we keep our
+fork, take their changes, and do not contribute upstream (`README.md` of
+this folder). The text and the reproducer stay as the record.
+
 Status: draft. QBE takes reports by mail (`~mpu/qbe@lists.sr.ht`). Sending
 is a public act under the maintainer's name and waits for the owner's word.
 Evidence and the table of runs: `.claude/notes/tech/qbe_upstream_review.md`.

@@ -111,6 +111,12 @@ ask. Precedents: `partners/luna/2026-09-20_to_luna_report.md`,
    the command and the date the next check is due. PVSnesLib is told about
    the KOF bug only after he and we agree (owner decision).
 
+6. **Once a month**: read what QBE upstream committed since the last tip we
+   read, and take what serves us — nothing goes back to them (owner
+   decision, 2026-10-13: we keep our fork, we do not contribute upstream).
+   Policy, command and the date the next check is due:
+   `.claude/notes/partners/qbe-upstream/README.md`.
+
 ## When this rule does NOT apply
 
 - Non-SNES, non-toolchain questions (git, Python, CI syntax): no partner
