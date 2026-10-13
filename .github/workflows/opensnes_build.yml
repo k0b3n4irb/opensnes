@@ -86,6 +86,11 @@ jobs:
 
       - name: Install dependencies for macOS
         if: matrix.name == 'darwin'
+        env:
+          # no cleanup of the runner image's own packages after the install:
+          # it is ten warnings a run about formulae we never use
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_ENV_HINTS: 1
         run: |
           brew update || true
           brew install doxygen zip || true
@@ -323,7 +328,12 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: OpenSNES SDK (${{ matrix.name }}_${{ matrix.arch }})
-          path: release/opensnes_${{ matrix.name }}_${{ matrix.arch }}.zip
+          # `make release` names the zip after the tree's version
+          # (opensnes_vX.Y.Z_<os>_<arch>.zip). The path named it without the
+          # version, matched nothing, and the step only warned: no SDK zip
+          # was attached to a push until 2026-10-13. A miss is now an error.
+          path: release/opensnes_*_${{ matrix.name }}_${{ matrix.arch }}.zip
+          if-no-files-found: error
 
       # ------------------------------------ #
       # Upload build logs                    #
