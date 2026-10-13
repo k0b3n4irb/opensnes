@@ -146,3 +146,14 @@ the `echo` pair.
   `--audio` mode) that compares the DSP write sequences of the two ROMs,
   value and order, and reports the timing shift — the right oracle for a
   noise-driven example, where a waveform RMS cannot be. Light.
+
+## 2026-10-13 — `luna record` (luna `develop` fea4a77, not released)
+
+Announced, nothing asked (`2026-10-13_from_luna_luna_record.md`): one run
+writes a labelled video (`ffmpeg` needed; `--no-video` without it), a text
+account of when the picture moves, freezes or goes dark with the pad
+changes and the sound second by second, and one labelled picture a
+second. Not checked on their side: PAL, overscan, the libx264 path. To do
+at the pin bump that carries it: regenerate the luna reference page from
+`--help`, and try it on an example's manifest script — a bug report to the
+game or from it could carry the `.md` instead of a description.
