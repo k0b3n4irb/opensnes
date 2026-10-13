@@ -156,7 +156,8 @@ static int convert_one(cli_ctx *ctx, const char *in)
     /* gfx4snes's map path */
     unsigned char *tiles = tiles_convertsnes(snesimage.buffer, w, h, size, size, &nbtilesx, &nbtiles, 8, true);
     if (rearrange) palette_rearrange_snes(tiles, palette_snes, nbtiles, ncolors, true);
-    unsigned short *map = map_convertsnes(tiles, &nbtiles, size, size, blksx, blksy, ncolors, entry, mode, noreduce, blank, pages, flip, true);
+    int addblank = 0;   /* blank 8x8 tiles before the tiles: none when the image starts with a blank block, two in Modes 5 and 6 */
+    unsigned short *map = map_convertsnes(tiles, &nbtiles, size, size, blksx, blksy, ncolors, entry, mode, noreduce, blank, pages, flip, true, &addblank);
     int map_blksx = (mode == 5 || mode == 6) ? blksx >> 1 : blksx;
     if (colmajor && mode != 5 && mode != 6
         && ((blksx == 64 && (blksy == 32 || blksy == 64)) || (blksx == 32 && blksy == 64))) {
@@ -169,8 +170,8 @@ static int convert_one(cli_ctx *ctx, const char *in)
         free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
         return CLI_IO;
     }
-    if (pack) tiles_savepacked(outbase, tiles, nbtiles, blank, true);
-    else tiles_save(outbase, tiles, nbtiles, ncolors, blank, lz, true);
+    if (pack) tiles_savepacked(outbase, tiles, nbtiles, addblank, true);
+    else tiles_save(outbase, tiles, nbtiles, ncolors, addblank, lz, true);
     int savepal = !cli_has(ctx, "no-palette");
     if (savepal) palette_save(outbase, palette_snes, colors, true);
     free(map); free(tiles); free(snesimage.buffer); snesimage.buffer = NULL;
@@ -183,7 +184,7 @@ static int convert_one(cli_ctx *ctx, const char *in)
 
     if (cli_has(ctx, "save") && (rc = cli_save_settings(ctx, in)) != CLI_OK) return rc;
 
-    long vram_tiles = (long)(nbtiles + (blank ? 1 : 0)) * 8 * (mode == 7 ? 8 : bpp);
+    long vram_tiles = (long)(nbtiles + addblank) * 8 * (mode == 7 ? 8 : bpp);
     long vram_map = (long)map_blksx * blksy * (mode == 7 ? 1 : 2);
     if (ctx->json) {
         cli_json_object(ctx, NULL);

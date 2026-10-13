@@ -193,7 +193,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
          * where it went: the metasprite names then follow the compacted .pic */
         int bx = sheet_blksx, sby = sheet_blocks / sheet_blksx, nbt = sby;
         unsigned char *mt = tiles_convertsnes(sheet_img, sheet_w, sheet_h, size, size, &bx, &nbt, size, true);
-        map = map_convertsnes(mt, &nbt, size, size, sheet_blksx, sby, ncolors, entry, 0, 1, 0, 0, 0, true);
+        map = map_convertsnes(mt, &nbt, size, size, sheet_blksx, sby, ncolors, entry, 0, 1, 0, 0, 0, true, NULL);
         for (int b = 0; b < sheet_blocks; b++)
             map[b] = (unsigned short)((map[b] & ~(TILEIDX_MASK | BLOCK_FLIPX | BLOCK_FLIPY)) | where[b]);
         metasprite_save(outbase, map, sheet_blksx, sby, size, metaw, metah, prio, sheet_w, sheet_h, true);
@@ -202,7 +202,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     } else if (meta) {
         int bx = blksx, by = blksy, nbtiles = by;
         unsigned char *mt = tiles_convertsnes(snesimage.buffer, w, h, size, size, &bx, &nbtiles, size, true);
-        map = map_convertsnes(mt, &nbtiles, size, size, blksx, blksy, ncolors, entry, 0, 1, 0, 0, flip, true);
+        map = map_convertsnes(mt, &nbtiles, size, size, blksx, blksy, ncolors, entry, 0, 1, 0, 0, flip, true, NULL);
         metasprite_save(outbase, map, blksx, blksy, size, metaw, metah, prio, w, h, true);
         nmeta = (blksx * blksy) / ((metaw / size) * (metah / size));
         free(mt);

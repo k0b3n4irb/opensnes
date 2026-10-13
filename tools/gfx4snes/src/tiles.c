@@ -124,7 +124,7 @@ unsigned char *tiles_convertsnes (unsigned char *imgbuf, int imgwidth, int imghe
 // tiles = graphic tile buffer to save
 // nbtiles = number of tiles to write to file
 // nbcolors = number of colors of the graphic tile buffer
-// addblank = 1 if we need to add a blank tile
+// addblank = number of blank 8x8 tiles to write before the tiles (0, 1, or 2 for the 16-pixel tiles of Modes 5 and 6)
 // lzcompress = 1 if we want lz77 compression
 // isquiet = 0 if we want some messages in console
 // Sprite and font sheets (no map): in 2bpp and 4bpp the planes keep only
@@ -157,7 +157,7 @@ void tiles_checkbanks (unsigned char *tiles, int nbtiles, int nbcolors)
     }
 }
 
-void tiles_save (const char *filename, unsigned char *tiles,int nbtiles, int nbcolors, bool addblank, bool lzcompress,bool isquiet)
+void tiles_save (const char *filename, unsigned char *tiles,int nbtiles, int nbcolors, int addblank, bool lzcompress,bool isquiet)
 {
 	char *outputname;
 	FILE *fp;
@@ -182,7 +182,7 @@ void tiles_save (const char *filename, unsigned char *tiles,int nbtiles, int nbc
     else if (nbcolors <= 128) bitplanes = 4;
 
     // allocate local buffer for all the tiles (needed for lz77 packing), 1st (8 * bitplanes) if for blank tile
-    bufsize = (addblank ? (8 * bitplanes) : 0) + (nbtiles * 8 * bitplanes);  
+    bufsize = (addblank * 8 * bitplanes) + (nbtiles * 8 * bitplanes);  
     buftolzin = (unsigned char *) malloc( bufsize);
     if (buftolzin == NULL)
     {
@@ -193,7 +193,7 @@ void tiles_save (const char *filename, unsigned char *tiles,int nbtiles, int nbc
     // Add the blank if its needed....
     nbbytestowrite = 0;
     if (addblank) {
-        for (b = 0; b < 8 * bitplanes; b++, nbbytestowrite++) 
+        for (b = 0; b < addblank * 8 * bitplanes; b++, nbbytestowrite++) 
 		{
         	*(buftolzin + b) = 0;
 		}

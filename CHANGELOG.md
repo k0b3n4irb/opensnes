@@ -48,6 +48,17 @@ All notable changes to OpenSNES are documented in this file.
   master cycles a division on the sequencer workload (−19 %). 190 bytes
   more in a ROM that divides 32 bits.
 
+### Fixed
+- fix(tools): **`opensnes-tileset convert --blank`** (and `gfx4snes -b`) on a
+  picture whose first block is blank wrote the added blank tile **and** the
+  picture's own, while the map numbered the tiles as if there were one: every
+  cell showed the tile before its own. The blank tile is now written only
+  when the picture does not start with one (the map counts from 1 then, from
+  0 otherwise), so the `.pic` and the `.map` always agree. In Modes 5 and 6,
+  where a map entry names two tiles side by side, the option wrote one blank
+  tile and counted two: every cell but the first was one tile off; two are
+  written. Found by a game built on the SDK. No example used the option.
+
 ## [0.50.0] — 2026-10-12
 
 A primitive for text

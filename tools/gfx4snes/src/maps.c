@@ -152,8 +152,9 @@ static int hash_table_find(hash_table_t *ht, uint32_t hash, const unsigned char 
 // offsetpal = palette entry (0..7)
 // istilereduction = 1 if we want tile reduction (i hope often ;) )
 // isblanktile = 1 if we want the 1st tile to be blank
+// blanktiles = (out, may be NULL) how many blank 8x8 tiles the map counts on before the tiles (0, 1, or 2 in Modes 5 and 6)
 // isquiet = 0 if we want some messages in console
-unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksizex, int blksizey, int nbblockx, int nbblocky, int nbcolors, int offsetpal, int graphicmode, bool isnoreduction, bool isblanktile, bool is32size, bool isflip, bool isquiet)
+unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksizex, int blksizey, int nbblockx, int nbblocky, int nbcolors, int offsetpal, int graphicmode, bool isnoreduction, bool isblanktile, bool is32size, bool isflip, bool isquiet, int *blanktiles)
 {
     unsigned short *map;                                                            
     unsigned short tilevalue;
@@ -319,6 +320,18 @@ unsigned short *map_convertsnes (unsigned char *imgbuf, int *nbtiles, int blksiz
             if (!isquiet) info("no blank tile detected...");
         }
     }
+
+    // The map numbers the tiles from 1 only when the image's first block is
+    // not blank; when it is, that block IS tile 0 and nothing must be written
+    // before the tiles. The caller writes the tiles and has to be told: until
+    // 2026-10-13 it prepended a blank tile whenever the option was given, and
+    // an image starting with a blank block came out one tile off everywhere.
+    // In Modes 5 and 6 a map entry names a 16-pixel tile, two 8x8 ones: the
+    // blank is two tiles there, and the first entry is doubled like the others
+    // (it was not, and one blank tile was written: every cell but the first
+    // was one 8x8 tile off).
+    if ((graphicmode==5) || (graphicmode==6)) tilevalue <<= 1;
+    if (blanktiles) *blanktiles = blanktileabsent ? (((graphicmode==5) || (graphicmode==6)) ? 2 : 1) : 0;
 
     // save the first tilemap piece
     map[0] += tilevalue;
