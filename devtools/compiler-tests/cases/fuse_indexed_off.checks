@@ -1,0 +1,2 @@
+env QBE_NO_PEEP_FUSE=1
+in changed: absent \tcmp\.w sent,x

@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 2dd729f88510450d8e958f6adf486ccfbefd9ad5 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 96be7ae92afd84c3ff9745742b76fdf3fc75df91 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
 <!-- END PINS -->
 
@@ -47,6 +47,7 @@ commit that moves the pin.
 ### compiler/cproc — 46 patches since upstream merge-base 7051114
 
 ```
+96be7ae w65816: X known across the blocks of a function, and an indexed load as the operand of what it feeds — two text rules of the peephole stage: a forward analysis of the frame slot A and X equal (a `tax` or `ldx` of what X already holds goes; a function indexing parallel arrays reloaded its index at the top of every block), and `lda SYM,x / sta T / lda Y / op T` as `lda Y / op SYM,x` for cmp, adc, sbc, and, ora, eor; `QBE_NO_PEEP_XFLOW=1`, `QBE_NO_PEEP_FUSE=1` (2026-10-13)
 2dd729f w65816: the counter of a rotated loop lives in X — a text rule of the peephole stage: ldx / cpx on the way in, inx or txa/clc/adc/tax as the step, cpx at the bottom, when nothing in the body writes X or the counter's slot and the counter dies with the loop; farClear 31 → 18 CPU cycles a turn; `QBE_NO_PEEP_LOOPX=1` (stage 2 T3, 2026-10-12)
 a4ce67c ivar: a loop counter used only as one scaled index becomes that index — a pass before gcm: `for (k = 0; k < N; k++) a[k] = v` runs on j = 2k, stepping by 2, tested against 2N, no shift in the body; exact when nothing wraps at 16 bits, nothing created otherwise; `QBE_NO_IVAR=1`, `-d V` (stage 2 T2, 2026-10-12)
 8c97293 qbe: Avoid redundant leaf ceq in switch (v2) — a case whose neighbours are the values just below and above needs no compare: `switch` workload -3.1 %, `state` -2.7 % (upstream 863e1e7, cherry-picked 2026-10-11)
@@ -100,7 +101,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 125 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 126 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is

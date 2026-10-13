@@ -30,6 +30,18 @@ All notable changes to OpenSNES are documented in this file.
   totals (`OPENSNES_ONLY` in `run.py`).
 
 ### Performance
+- perf(compiler): **X is known across the blocks of a function, and an
+  indexed load is the operand of what it feeds.** Two text rules of the
+  emitter's peephole stage. A function that indexes parallel arrays by one
+  value — a channel, an entity — scaled it and put it in X at the
+  top of every block (`lda 2,s / tax`, seven cycles each time): a forward
+  analysis of what A and X hold now carries that knowledge across labels.
+  And `lda SYM,x / sta T / lda Y / cmp T` is `lda Y / cmp SYM,x` (also adc,
+  sbc, and, ora, eor), 17 cycles to 9. SDK bench: `physics` −26.5 %, `sort`
+  −14.6 %, `dist` −8.2 %, `collide` −5.4 %, `place` −3.8 %, `depot` −3.4 %,
+  the total −2.0 % (−61.4 % against PVSnesLib), 181 bytes smaller; the
+  sequencer workload 7 951 → 7 295 master cycles a channel-tick (−8.2 %).
+  `QBE_NO_PEEP_XFLOW=1` and `QBE_NO_PEEP_FUSE=1` switch each off.
 - perf(runtime): the 32-by-16 division of the runtime (`div32_ucore`, the
   path `u32 / u16` takes) runs its sixteen low steps unrolled, the quotient
   bit rolled in from the carry instead of an `inc` in memory: 1 167 → 946
