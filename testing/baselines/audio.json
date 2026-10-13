@@ -23,7 +23,7 @@
       "peak": 21264
     },
     "audio/echo": {
-      "sha256": "f0592672c7977b9ba22a246371bb3ab8534b8e96a61dd9c4ea37813288de1132",
+      "sha256": "d6807f5cdaeaf8b27c78610d00f4c6ec6afdfa77dc2ef57b2c31c489588135c7",
       "samples": 159936,
       "peak": 10922
     },
@@ -53,7 +53,7 @@
       "peak": 2644
     },
     "audio/sfx_from_wav": {
-      "sha256": "e9bdac7f940fa9b996478d7477c36d91512c4acda8b3b8568c3b58ecd5d96c5f",
+      "sha256": "64951fc867c2a0fd156fdc64141f9c4cf8e3789ee83a3c6395ad8a65f1da45a6",
       "samples": 159936,
       "peak": 12192
     }

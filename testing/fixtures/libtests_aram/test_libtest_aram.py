@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Runtime assertions for the echo-ring fixture (testing/fixtures/libtests_echo).
+"""Runtime assertions for the sound-memory fixture (testing/fixtures/libtests_aram).
 
 The ring takes the top delay x 2 KB of the sound CPU's memory: refused when
 the samples loaded reach into it (nothing changed), accepted when they do
@@ -15,7 +15,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROM = HERE / "libtest_echo.sfc"
+ROM = HERE / "libtest_aram.sfc"
 sys.path.insert(0, str(HERE.parents[2] / "testing"))
 from lib import find_luna, assert_mem  # noqa: E402
 
@@ -28,12 +28,18 @@ CASES = [
     ("r_ok6", 0), ("r_free6", 0x0400),
     ("r_ok1", 0), ("r_free1", 0xAC00), ("r_alive", 0),
     ("r_ok7", 0), ("r_free7", 0x7C00),
+    # a sample loaded in steps
+    ("s_begin", 0), ("s_free_begin", 0x7818), ("s_begin_twice", 2), ("s_play_early", 0xFF),
+    ("s_step1", 937), ("s_other", 0), ("s_other_addr", 0x4EE8), ("s_steps", 16),
+    ("s_addr", 0x4B00), ("s_play", 2), ("s_idle", 0),
+    ("s_odd1", 4), ("s_odd2", 0),
+    ("s_cancel", 0), ("s_free_cancel", 1), ("s_begin_after", 0),
 ]
 
 
 def main() -> int:
     if not ROM.is_file():
-        sys.exit(f"ROM missing: {ROM} (run `make -C testing/fixtures/libtests_echo` first)")
+        sys.exit(f"ROM missing: {ROM} (run `make -C testing/fixtures/libtests_aram` first)")
     luna = find_luna()
     fails = 0
     for name, want in CASES:
@@ -56,8 +62,24 @@ def main() -> int:
     print(f"  {'PASS' if ok else 'FAIL'}  sample 0 untouched by the ring it does not hold"
           + ("" if ok else f"  [{len(bad)} bytes written over, ${bad[0]:04X}-${bad[-1]:04X}]"))
     fails += 0 if ok else 1
-    total = len(CASES) + 1
-    print(f"\nLib runtime assertions (echo fixture): {total - fails}/{total} ok")
+    # The sample sent in sixteen steps is in the sound CPU's memory byte for
+    # byte, its directory entry (slot 10, at $0A28) names its first byte and
+    # not its last step's, the sample loaded between two steps sits above it,
+    # the ten-byte one after, and the voice command sent between two steps
+    # reached the DSP (V1VOLL / V1VOLR, read from the driver's last write).
+    pat = bytes(((n * 7 + 3) & 255) | 1 for n in range(1000))
+    checks = [
+        ("the 1000 bytes sent in steps, at $4B00", aram[0x4B00:0x4B00 + 1000] == pat),
+        ("slot 10's directory entry: start and loop $4B00", aram[0x0A28:0x0A2C] == bytes([0x00, 0x4B, 0x00, 0x4B])),
+        ("the sample loaded between two steps, at $4EE8", aram[0x4EE8:0x4EE8 + 9] == b"\x5A" * 9),
+        ("the ten bytes whose last step took the odd one, at $4EF1", aram[0x4EF1:0x4EF1 + 10] == pat[:10]),
+        ("slot 12's directory entry: $4EF1", aram[0x0A30:0x0A34] == bytes([0xF1, 0x4E, 0xF1, 0x4E])),
+    ]
+    for label, ok in checks:
+        print(f"  {'PASS' if ok else 'FAIL'}  {label}")
+        fails += 0 if ok else 1
+    total = len(CASES) + 1 + len(checks)
+    print(f"\nLib runtime assertions (aram fixture): {total - fails}/{total} ok")
     return 1 if fails else 0
 
 

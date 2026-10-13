@@ -170,6 +170,40 @@ audioPlaySample(0);
 See @ref audio_samples in the API reference for the full sample API
 (`audioLoadSample`, `audioPlaySample`, `audioUnloadSample`).
 
+#### Loading while the game runs
+
+`audioLoadSample()` returns when the whole sample is in the sound CPU's
+memory: about 650 master cycles a byte, so a 5.6 KB voice stops the game
+for ten frames. Fine under a title screen; not in a match. To swap a
+sample during play, send it a piece a frame:
+
+```c
+audioLoadSampleBegin(SMP_VOICE, brr_replay, (u16)(brr_replay_end - brr_replay), 0);
+loading = 1;
+// ...in the game loop, once a frame:
+if (loading && audioLoadSampleStep(64) == 0) {
+    loading = 0;            /* whole: SMP_VOICE can be played */
+}
+```
+
+Voices that are playing go on, and `audioPlaySample()`, volume, pitch and
+stop commands pass between two steps. The slot cannot be played before a
+step returns 0. One sample at a time; `audioUnloadSample()` on it gives
+the load up.
+
+What a step costs, measured on luna (interrupts included): about 18,700
+master cycles whatever its size (four commands and the end of the
+transfer), plus about 650 a byte. Bytes travel three at a time, so a step
+is a multiple of 3:
+
+| `maxBytes` | Sent | Master cycles | Share of a frame |
+|---:|---:|---:|---:|
+| 64  | 63  | 59,750  | 17 % |
+| 128 | 126 | 100,800 | 28 % |
+| 256 | 255 | 184,750 | 52 % |
+
+A 5.3 KB voice is whole in 85 frames at 64 bytes a frame.
+
 > The build converts a one-shot sample for you: when an assembly file
 > `.incbin`s `res/jump.brr` and `res/jump.wav` exists, `make` runs `wav2brr`
 > on it. A looping sample needs its loop points, so run `wav2brr --loop` by

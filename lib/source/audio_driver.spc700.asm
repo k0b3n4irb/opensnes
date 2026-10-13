@@ -68,6 +68,18 @@ start:
     WDSP $4D, $00       ; EON off
     WDSP $2C, $00       ; EVOLL 0
     WDSP $3C, $00       ; EVOLR 0
+    ; The echo filter passes the echo through until audioSetEchoFilter()
+    ; says otherwise: tap 0 at 127, the others 0. Left at the 0 the registers
+    ; hold after a reset, an echo configured and enabled was silent, and
+    ; nothing said why (2026-10-13).
+    WDSP $0F, $7F
+    WDSP $1F, $00
+    WDSP $2F, $00
+    WDSP $3F, $00
+    WDSP $4F, $00
+    WDSP $5F, $00
+    WDSP $6F, $00
+    WDSP $7F, $00
     WDSP $0C, 127       ; MVOL: header default (audioSetVolume can change)
     WDSP $1C, 127
     WDSP $5D, $0A       ; DIR: sample directory page $0A00
@@ -112,8 +124,8 @@ main_loop:
     ; would exceed the +-128 branch range past a few handlers)
     mov a, ZP_CMD
     and a, #$3F
-    cmp a, #$12
-    bcs cmd_unknown     ; opcode >= $12: not in the table
+    cmp a, #$13
+    bcs cmd_unknown     ; opcode >= $13: not in the table
     asl a
     mov x, a
     jmp [!cmd_table+x]
@@ -144,6 +156,7 @@ cmd_table:
     .dw cmd_load_size   ; $0F
     .dw cmd_vset        ; $10
     .dw cmd_vpan        ; $11
+    .dw cmd_load_base   ; $12
 
 ;------------------------------------------------------------------------------
 ; $01 MVOL — p0 = master volume, both channels
@@ -651,6 +664,18 @@ cmd_dir_set:
     mov a, ZP_LOAD_H
     adc a, ZP_P1H
     mov [ZP_DST_L]+y, a ; entry+3: loop high
+    jmp !ack
+
+;------------------------------------------------------------------------------
+; $12 LOAD_BASE — p1 = the address the next DIR_SET builds its entry from.
+; A sample sent in several LOADs (audioLoadSampleStep) starts where its
+; first one did, not its last.
+;------------------------------------------------------------------------------
+cmd_load_base:
+    mov a, ZP_P1L
+    mov ZP_LOAD_L, a
+    mov a, ZP_P1H
+    mov ZP_LOAD_H, a
     jmp !ack
 
 ;------------------------------------------------------------------------------

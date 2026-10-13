@@ -50,7 +50,7 @@ RELEASE_DIR := release
 # The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
 # spelled them out in three places and each list was a different subset.
-FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_echo
+FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram
 FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals leaf_frame static_dup
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
 FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
@@ -59,7 +59,7 @@ FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
 # The fixtures that carry their own runtime assertions (a test_*.py beside
 # the ROM); the others are asserted by luna manifests (testing/manifests/).
 FIXTURE_TESTS     := $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
-                     $(addprefix testing/fixtures/,libtests libtests_fx libtests_dsp1 libtests_hirom libtests_sa1_sram libtests_echo)
+                     $(addprefix testing/fixtures/,libtests libtests_fx libtests_dsp1 libtests_hirom libtests_sa1_sram libtests_aram)
 # The version of the tree, not the nearest tag: release tags sit on main's
 # merge commits, which develop never contains, so `git describe` on develop
 # named its zips after v0.17.0. snes.h is held equal to CHANGELOG by

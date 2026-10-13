@@ -5,6 +5,18 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **a sample loaded while the game runs** —
+  `audioLoadSampleBegin(id, brrData, size, loopPoint)` takes the place in
+  the sound CPU's memory and sends nothing, `audioLoadSampleStep(maxBytes)`
+  sends a piece and returns what is left (0: playable; `AUDIO_LOAD_FAILED`
+  if the driver stopped answering). `audioLoadSample()` does not return
+  before the whole sample is sent, ten frames of a stopped game for 5.6 KB;
+  between two steps the driver is in its command loop, so playing voices go
+  on and voice commands pass. One sample at a time; other
+  `audioLoadSample()` calls stay allowed and go above the place taken;
+  `audioUnloadSample()` on the slot gives the load up. A step of 64 costs
+  about 59,750 master cycles (18,700 fixed, 650 a byte), 17 % of a frame.
+  Asked by a game built on the SDK.
 - feat(lib): **`audioSetVoiceVolumePitch(voice, volume, pitch)`** and
   `audioSetVoicePan(voice, pan)`: the volume and the pitch of a voice in one
   command to the driver (`VSET`, opcode `$10`), the volume split between
@@ -74,6 +86,10 @@ All notable changes to OpenSNES are documented in this file.
   where a map entry names two tiles side by side, the option wrote one blank
   tile and counted two: every cell but the first was one tile off; two are
   written. Found by a game built on the SDK. No example used the option.
+- fix(lib): an echo configured without `audioSetEchoFilter()` was silent:
+  the filter's eight taps were the zeros a reset leaves. The driver starts
+  with tap 0 at 127, the filter that passes the echo through; the call is
+  optional.
 - fix(lib): `audioEnableEcho()` after `audioDisableEcho()` gave no echo:
   the driver set the voice mask and left the echo volumes at 0 and the
   ring's writes off, so only a new `audioSetEcho()` brought the echo back

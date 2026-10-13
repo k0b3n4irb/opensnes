@@ -263,9 +263,68 @@ u8 audioIsReady(void);
  */
 u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint);
 
+/** @brief What audioLoadSampleStep() returns when the driver stopped answering */
+#define AUDIO_LOAD_FAILED       0xFFFF
+
+/**
+ * @brief Start loading a sample in steps, while the game runs
+ *
+ * audioLoadSample() does not return before the whole sample is in the sound
+ * CPU's memory: about 560 bytes a frame, ten frames of a stopped game for
+ * 5.6 KB. This pair sends the same bytes a piece at a time, when the game
+ * says so: voices that are playing go on, and voice commands (play, volume,
+ * pitch, stop) pass between two steps.
+ *
+ * audioLoadSampleBegin() takes the place in memory and sends nothing; each
+ * audioLoadSampleStep() sends a piece. The slot is "not loaded" — playing
+ * it is refused — until a step returns 0.
+ *
+ * - One sample at a time: a second audioLoadSampleBegin() before the first
+ *   is whole is refused (AUDIO_ERR_INVALID_ID).
+ * - audioLoadSample() on other slots stays allowed meanwhile; those samples
+ *   go above the place taken here.
+ * - audioUnloadSample(id) before the last step gives the load up; the
+ *   memory comes back if nothing was loaded above it.
+ * - @p brrData must stay valid until the last step (it is ROM data in
+ *   every case we know).
+ *
+ * @param id Sample slot (0-63)
+ * @param brrData Pointer to the BRR data
+ * @param size Size in bytes (3 at least)
+ * @param loopPoint As for audioLoadSample()
+ * @return AUDIO_OK; AUDIO_ERR_NO_MEMORY; AUDIO_ERR_INVALID_ID (bad slot, or
+ *         a load in steps is already under way); AUDIO_ERR_TIMEOUT before
+ *         audioInit()
+ *
+ * @code
+ * audioLoadSampleBegin(SMP_VOICE, voice_brr, (u16)(voice_brr_end - voice_brr), 0);
+ * // then once a frame, in the game loop:
+ * if (voice_loading && audioLoadSampleStep(64) == 0) voice_loading = 0;
+ * @endcode
+ */
+u8 audioLoadSampleBegin(u8 id, const u8 *brrData, u16 size, u16 loopPoint);
+
+/**
+ * @brief Send the next piece of the sample audioLoadSampleBegin() started
+ *
+ * @param maxBytes How much to send at most. Bytes travel three at a time,
+ *                 so the step is @p maxBytes rounded down to a multiple of
+ *                 3 (3 at least); the last step takes up to two bytes more
+ *                 rather than leave them alone. The cost of a step is what
+ *                 the game chooses here, plus a fixed part: see
+ *                 docs/tutorials/audio.md for the measured figures.
+ * @return Bytes still to send; 0 when the sample is whole and playable (and
+ *         when no load is under way); AUDIO_LOAD_FAILED if the driver
+ *         stopped answering — the load is given up
+ */
+u16 audioLoadSampleStep(u16 maxBytes);
+
 /**
  * @brief Unload a sample from a slot
  * @param id Sample slot (0-63)
+ *
+ * On the sample audioLoadSampleBegin() started and no step has finished:
+ * gives that load up.
  *
  * It does NOT stop a voice that is playing the sample — stop it first. The
  * allocator is a bump pointer: SPC memory comes back only when the sample
@@ -527,6 +586,10 @@ u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR);
 /**
  * @brief Set FIR filter coefficients for echo
  * @param fir Array of 8 signed coefficients
+ *
+ * Optional: from audioInit() the filter is { 127, 0, 0, 0, 0, 0, 0, 0 },
+ * which passes the echo through unchanged. (Until 2026-10-13 it was all
+ * zeros, and an echo configured without this call was silent.)
  */
 u8 audioSetEchoFilter(const s8 fir[8]);
 

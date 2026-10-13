@@ -49,6 +49,7 @@
 #define OP_LOAD_SIZE 0x0F
 #define OP_VSET      0x10   /* volume and pitch of a voice, one handshake; split by the voice's pan */
 #define OP_VPAN      0x11   /* the pan weight VSET splits a voice's volume with */
+#define OP_LOAD_BASE 0x12   /* p1 = the address DIR_SET builds the next entry from (a sample sent in several LOADs) */
 
 /* ARAM sample area (spec: driver $0200-$09FF, directory $0A00,
  * samples from $0B00 up to the echo ring, or to the IPL when there is
@@ -118,6 +119,13 @@ static u16 sample_next_free;
  * "Echo Buffer Writes (0=Enable, 1=Disable)" — and the driver sets it at
  * start and keeps it until ECHO_CFG). */
 static u16 sample_ceil;
+
+/* The sample being loaded in steps (audioLoadSampleBegin / Step). */
+static u8 step_id = 0xFF;       /* 0xFF: none */
+static const u8 *step_src;      /* what is left to send */
+static u16 step_left;
+static u16 step_dst;            /* where the next byte goes */
+static u16 step_loop;
 static u8 audio_rr_voice;   /* round-robin auto-allocation cursor */
 
 /* The CPU side of the upload stream (audio_stream.asm) */
@@ -207,6 +215,7 @@ u8 audioInit(void) {
     audio_rr_voice = 0;
     sample_next_free = SAMPLE_BASE;
     sample_ceil = SAMPLE_CEIL_FULL;
+    step_id = 0xFF;
     for (i = 0; i < AUDIO_MAX_VOICES; i++) {
         audio_voice_mirror[i].sample_id = 0xFF;
         audio_voice_mirror[i].volume = AUDIO_VOL_MAX;
@@ -344,24 +353,20 @@ u8 audioSetGain(u8 voice, u8 mode) {
  * Sample management
  *============================================================================*/
 
-u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
+/**
+ * @brief Send size bytes (3 at least) to dst of the sound CPU's memory:
+ *        one whole LOAD of the protocol. The driver is back in its command
+ *        loop when this returns.
+ * @return AUDIO_OK or AUDIO_ERR_TIMEOUT
+ */
+static u8 load_block(u16 dst, const u8 *brrData, u16 size) {
     u16 spin, full;
     u8 idx, tail;
-
-    if (id >= AUDIO_MAX_SAMPLES) {
-        return AUDIO_ERR_INVALID_ID;
-    }
-    if (!audio_ready) {
-        return AUDIO_ERR_TIMEOUT;
-    }
-    if (size == 0 || (u16)(sample_ceil - sample_next_free) < size) {
-        return AUDIO_ERR_NO_MEMORY;
-    }
 
     full = size / 3;
     tail = (u8)(size - full * 3);
     if (cmd_send(OP_LOAD_SIZE, tail, full) != AUDIO_OK ||
-        cmd_send(OP_LOAD, 0, sample_next_free) != AUDIO_OK) {
+        cmd_send(OP_LOAD, 0, dst) != AUDIO_OK) {
         return AUDIO_ERR_TIMEOUT;
     }
 
@@ -403,7 +408,21 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
         return AUDIO_ERR_TIMEOUT;
     }
 
-    if (cmd_send(OP_DIR_SET, id, loopPoint) != AUDIO_OK) {
+    return AUDIO_OK;
+}
+
+u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
+    if (id >= AUDIO_MAX_SAMPLES || id == step_id) {
+        return AUDIO_ERR_INVALID_ID;
+    }
+    if (!audio_ready) {
+        return AUDIO_ERR_TIMEOUT;
+    }
+    if (size == 0 || (u16)(sample_ceil - sample_next_free) < size) {
+        return AUDIO_ERR_NO_MEMORY;
+    }
+    if (load_block(sample_next_free, brrData, size) != AUDIO_OK ||
+        cmd_send(OP_DIR_SET, id, loopPoint) != AUDIO_OK) {
         return AUDIO_ERR_TIMEOUT;
     }
 
@@ -416,7 +435,84 @@ u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
     return AUDIO_OK;
 }
 
+u8 audioLoadSampleBegin(u8 id, const u8 *brrData, u16 size, u16 loopPoint) {
+    if (id >= AUDIO_MAX_SAMPLES || step_id != 0xFF) {
+        return AUDIO_ERR_INVALID_ID;
+    }
+    if (!audio_ready) {
+        return AUDIO_ERR_TIMEOUT;
+    }
+    if (size < 3 || (u16)(sample_ceil - sample_next_free) < size) {
+        return AUDIO_ERR_NO_MEMORY;
+    }
+    /* The place is taken now, so a sample loaded meanwhile goes above it;
+     * the slot stays "not loaded" until the last step. */
+    sample_mirror[id].spcAddress = sample_next_free;
+    sample_mirror[id].size = size;
+    sample_mirror[id].loopPoint = loopPoint;
+    sample_mirror[id].flags = 0;
+    sample_mirror[id].reserved = 0;
+    step_id = id;
+    step_src = brrData;
+    step_left = size;
+    step_dst = sample_next_free;
+    step_loop = loopPoint;
+    sample_next_free += size;
+    return AUDIO_OK;
+}
+
+/* Give up the load in steps: its place comes back if nothing was loaded
+ * above it. */
+static void step_cancel(void) {
+    u8 id = step_id;
+
+    step_id = 0xFF;
+    if ((u16)(sample_mirror[id].spcAddress + sample_mirror[id].size)
+            == sample_next_free) {
+        sample_next_free = sample_mirror[id].spcAddress;
+    }
+}
+
+u16 audioLoadSampleStep(u16 maxBytes) {
+    u16 n;
+
+    if (step_id == 0xFF) {
+        return 0;
+    }
+    /* Three bytes an exchange: a step is a multiple of 3, and takes the
+     * last one or two bytes with it rather than leave them for a step the
+     * protocol has no shape for. */
+    n = maxBytes < 3 ? 3 : maxBytes - maxBytes % 3;
+    if (n >= step_left || step_left - n < 3) {
+        n = step_left;
+    }
+    if (load_block(step_dst, step_src, n) != AUDIO_OK) {
+        step_cancel();
+        return AUDIO_LOAD_FAILED;
+    }
+    step_src += n;
+    step_dst += n;
+    step_left -= n;
+    if (step_left) {
+        return step_left;
+    }
+    /* Whole: the directory entry, from the sample's first byte and not
+     * from the last step's. */
+    if (cmd_send(OP_LOAD_BASE, 0, sample_mirror[step_id].spcAddress) != AUDIO_OK ||
+        cmd_send(OP_DIR_SET, step_id, step_loop) != AUDIO_OK) {
+        step_cancel();
+        return AUDIO_LOAD_FAILED;
+    }
+    sample_mirror[step_id].flags = 1;
+    step_id = 0xFF;
+    return 0;
+}
+
 void audioUnloadSample(u8 id) {
+    if (id < AUDIO_MAX_SAMPLES && id == step_id) {
+        step_cancel();          /* being loaded in steps: give it up */
+        return;
+    }
     if (id >= AUDIO_MAX_SAMPLES || !sample_mirror[id].flags) {
         return;
     }
