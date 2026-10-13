@@ -324,11 +324,13 @@ while it runs (bytes below the initial stack pointer).
 | `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 5,377,870 | -62.6 % | 831 | 358 | -56.9 % | 52 | 29 |
 | `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 7,792,054 | -72.0 % | 1018 | 472 | -53.6 % | 61 | 25 |
 | `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 14,405,848 | -61.9 % | 7722 | 3465 | -55.1 % | 93 | 52 |
-| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,754 | 5,010,932 | -55.9 % | 888 | 452 | -49.1 % | 94 | 71 |
-| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | 155,507,934 | 65,378,506 | -58.0 % | 6748 | 3279 | -51.4 % | 89 | 62 |
-| **Total** | | **481,400,452** | **194,149,378** | **-59.7 %** | **32549** | **16260** | **-50.0 %** | | |
+| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,754 | 4,644,986 | -59.1 % | 888 | 452 | -49.1 % | 94 | 71 |
+| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 63,605,630 | ours only | — | 3279 | | — | 62 |
+| **Total** | | **325,892,518** | **128,404,926** | **-60.6 %** | **25801** | **12981** | **-49.7 %** | | |
 
-Of the 24 workloads OpenSNES is **faster on 24**, **no larger on 24**, and **no deeper in stack on 23**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 23 workloads both SDKs build OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for each of them, so they computed the same thing.
+
+`stepseq` is measured for OpenSNES alone and stays out of the totals: built by PVSnesLib's compiler it leaves another checksum than the native build of the same file and than ours, so its time there measures another computation.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to

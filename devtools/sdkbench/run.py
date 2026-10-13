@@ -262,6 +262,13 @@ DESCRIPTION = {
     "depot": "eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166)"}
 
 
+# Workloads PVSnesLib's compiler gets wrong: 816-tcc leaves another checksum
+# (stepseq: 0x5078 for 0x7552, the native build agreeing with ours,
+# 2026-10-13). Measured for OpenSNES alone: no PVSnesLib figure in the page
+# or in the reference file, and out of the totals and the counts.
+OPENSNES_ONLY = {"stepseq"}
+
+
 def write_doc() -> None:
     """Rewrite the table of docs/BENCHMARK.md between its two markers from
     the committed JSON files, so the page cannot drift from them."""
@@ -270,19 +277,29 @@ def write_doc() -> None:
     pct = lambda o, p: f"{100 * (o - p) / p:+.1f} %"
     out = ["| Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |",
            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    both = [n for n in b if n not in OPENSNES_ONLY]
     for n, o in b.items():
+        if n in OPENSNES_ONLY:
+            out.append(f"| `{n}` | {DESCRIPTION[n]} | — | {o['cycles']:,} | ours only | — | {o['size']} | | — | {o['stack']} |")
+            continue
         p = t[n]
         out.append(f"| `{n}` | {DESCRIPTION[n]} | {p['cycles']:,} | {o['cycles']:,} | {pct(o['cycles'], p['cycles'])} "
                    f"| {p['size']} | {o['size']} | {pct(o['size'], p['size'])} | {p['stack']} | {o['stack']} |")
-    tot = lambda d, k: sum(v[k] for v in d.values())
+    tot = lambda d, k: sum(d[n][k] for n in both)
     out.append(f"| **Total** | | **{tot(t, 'cycles'):,}** | **{tot(b, 'cycles'):,}** | "
                f"**{pct(tot(b, 'cycles'), tot(t, 'cycles'))}** | **{tot(t, 'size')}** | **{tot(b, 'size')}** | "
                f"**{pct(tot(b, 'size'), tot(t, 'size'))}** | | |")
     out.append("")
-    out.append(f"Of the {len(b)} workloads OpenSNES is **faster on {sum(b[n]['cycles'] < t[n]['cycles'] for n in b)}**, "
-               f"**no larger on {sum(b[n]['size'] <= t[n]['size'] for n in b)}**, and **no deeper in stack on "
-               f"{sum(b[n]['stack'] <= t[n]['stack'] for n in b)}**. Both ROMs leave the same checksum for every "
-               "workload, so they computed the same thing.")
+    out.append(f"Of the {len(both)} workloads both SDKs build OpenSNES is **faster on {sum(b[n]['cycles'] < t[n]['cycles'] for n in both)}**, "
+               f"**no larger on {sum(b[n]['size'] <= t[n]['size'] for n in both)}**, and **no deeper in stack on "
+               f"{sum(b[n]['stack'] <= t[n]['stack'] for n in both)}**. Both ROMs leave the same checksum for each of "
+               "them, so they computed the same thing.")
+    for n in b:
+        if n in OPENSNES_ONLY:
+            out.append("")
+            out.append(f"`{n}` is measured for OpenSNES alone and stays out of the totals: built by PVSnesLib's "
+                       "compiler it leaves another checksum than the native build of the same file and than ours, "
+                       "so its time there measures another computation.")
     text = DOC.read_text()
     a, z = "<!-- sdkbench:begin -->", "<!-- sdkbench:end -->"
     i, j = text.index(a) + len(a), text.index(z)
@@ -312,7 +329,8 @@ def main() -> int:
         origin = f"PVSnesLib measured now ({git_head(Path(pvs))})"
         if args.update and not args.only:
             REFERENCE.write_text(json.dumps({"pvsneslib": git_head(Path(pvs)), "frames": FRAMES,
-                                             "workloads": theirs}, indent=2) + "\n")
+                                             "workloads": {n: v for n, v in theirs.items()
+                                                           if n not in OPENSNES_ONLY}}, indent=2) + "\n")
     else:
         ref = json.loads(REFERENCE.read_text())
         theirs = {n: v for n, v in ref["workloads"].items() if n in wanted}
@@ -336,10 +354,6 @@ def main() -> int:
                 problems.append(f"{n}: checksum 0x{base[n]['res']:04X} -> 0x{ours[n]['res']:04X} — the workload computes something else")
 
     pct = lambda o, p: f"{100 * (o - p) / p:+.1f} %" if p else "-"
-    # Workloads PVSnesLib's compiler gets wrong: 816-tcc leaves another
-    # checksum (stepseq: 0x5078 for 0x7552, the native build agreeing with
-    # ours, 2026-10-13). Measured for OpenSNES alone, out of the totals.
-    OPENSNES_ONLY = {"stepseq"}
     print(f"{'workload':9} {'cycles PVS':>11} {'cycles OSN':>11} {'':>8}  {'size PVS':>8} {'OSN':>5} {'':>8}  {'stack PVS':>9} {'OSN':>4}")
     rows = []
     for n in wanted:
