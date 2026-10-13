@@ -1,0 +1,86 @@
+To: ~mpu/qbe@lists.sr.ht
+Subject: copy: defwidthle() takes a phi for proven after its proof failed (since e01207f)
+
+Hello,
+
+First of all, thank you for QBE. I maintain a small port of it to a
+16-bit target, and it has been a pleasure to read and to build on.
+
+While running a differential test on that port I came across a
+miscompilation that also shows on an unmodified QBE, so I thought you
+would want to know about it. I checked everything below today, on master
+(e786f06), on arm64.
+
+What happens
+
+Since e01207f ("fix exponential behavior of defwidthle()"), a phi visited
+by dwl() keeps visit = w until the whole query is over, including when its
+own proof returned 0. A later path of the same query that reaches this phi
+then takes it for proven. With `and`, where one narrow operand is enough,
+this removes an extension that is still needed.
+
+A small reproducer
+
+    export function w $f(w %a, w %c) {
+    @start
+    	jnz %c, @l, @r
+    @l
+    	jmp @j
+    @r
+    	jmp @j
+    @j
+    	%p =w phi @l %a, @r 1
+    	jnz %c, @m, @n
+    @m
+    	jmp @k
+    @n
+    	jmp @k
+    @k
+    	%s =w phi @m %p, @n 3
+    	%q =w and %p, %s
+    	%z =w extub %q
+    	ret %z
+    }
+
+Called from C as f(0x1234, 1), it returns 0x1234 on master and at e01207f.
+It returns 0x34 at e01207f~1, which is the value I expect, since %z is the
+low byte of %q. With -dG the function ends in "retw %q" after GVN: the
+extub is gone.
+
+Why, as far as I can tell
+
+dwl(%q, 8) tries %p first. %p is marked, its argument %a fails, dwl returns
+0 and the mark stays. It then tries %s: its argument %p looks visited at a
+width of 8 or less, so it is accepted; 3 fits; %s is considered narrow, and
+so is %q.
+
+A partial fix
+
+Clearing the mark of a phi whose proof fails gives the right result on
+this example, and "make check" still passes:
+
+    --- a/copy.c
+    +++ b/copy.c
+    @@ -162,8 +162,10 @@ dwl(Fn *fn, Ref r, int w)
+     			return 1;
+     		p->visit = w;
+     		for (n=0; n<p->narg; n++)
+    -			if (!dwl(fn, p->arg[n], w))
+    +			if (!dwl(fn, p->arg[n], w)) {
+    +				p->visit = 0;
+     				return 0;
+    +			}
+     		return 1;
+     	}
+
+I do not think this is complete, and I would rather say so than send it as
+a patch: a phi proven narrow while an outer phi was only assumed narrow
+keeps its mark when that outer proof fails later. I also have not measured
+what a complete fix does to the case e01207f was written for, so you are
+certainly better placed than I am to choose the right shape.
+
+I would be glad to test any change you would like to try, or to send more
+cases if that is useful.
+
+Thank you again for your work,
+k0b3n4irb
