@@ -1,4 +1,4 @@
-# Known Limitations
+# Known Limitations {#known_limitations}
 
 This file is the canonical, **public** list of known traps and limitations of
 the OpenSNES SDK. Skim it before you start a project; refer back when something
@@ -52,15 +52,15 @@ address with `$2181-$2183`. If NMI fires mid-sequence and any code in the NMI
 path touches those ports, the address pointer is silently corrupted and the
 main thread resumes writing garbage to a wrong location.
 
-**Mitigation (active since 2026-05-09):** `make/common.mk`
-runs `devtools/check_nmi_wram_race.py` after every link. The lint walks
-the call graph from every NMI callback root (NmiHandler + functions
+**Mitigation (active since 2026-05-09):** the post-link check
+(`opensnes-rom check`, run by `make/common.mk` after every link) walks the
+call graph for this. It starts
+from every NMI callback root (NmiHandler + functions
 registered via `nmiSet`) and **fails the build** if any
 reachable function writes to `$2180-$2183`. Lib + crt0 are audited and
 treated as a black box; the lint targets user code in NMI callbacks,
 where the actual risk lives. Bypass for a single build with
-`SKIP_NMI_RACE_CHECK=1`. Regression suite:
-`python3 devtools/test_check_nmi_wram_race.py` (6 cases).
+`SKIP_NMI_RACE_CHECK=1`.
 
 ### 🟢 Bank $00 ROM: code only — C const data lives in the asset banks (since #127.3)
 `static const` arrays, string literals and initialised const structs are
@@ -115,8 +115,7 @@ To keep bank $00 for what must be there:
   forms `dmaCopyVramBank` / `dmaCopyCGramBank` were removed on 2026-10-05,
   with the six-argument `dmaTransfer`; a bank computed at runtime is a
   pointer built from it, `(const u8 *)((u32)bank << 16 | addr)`.
-- Read `symmap.py --check-bank0-overflow game.sym`: it lists the largest
-  bank-$00 sections.
+- Read `opensnes-rom budget game.sfc`: it lists what fills each bank.
 
 ### 🟢 Vertical scroll is off by one: the PPU never outputs scanline 0 (hidden by the lib)
 The OBJ data of every scanline is fetched during the previous line, so the
@@ -207,7 +206,7 @@ one remaining silent path is an explicit cast that drops `FAR`.
 
 **Mitigation for the plain band (checked at link time since 2026-07-11):**
 the templates' memory maps reserve `$00:0000-$1FFF` for C RAM, and
-`make/common.mk` runs `symmap.py --check-ram-budget` after every link — the
+`make/common.mk` runs `opensnes-rom check` after every link — the
 RAM twin of the bank $00 ROM ratchet. A bank-$00 RAM section crossing or
 placed past $2000 fails the build; free space below `RAM_FAIL_THRESHOLD`
 (default 512 bytes) fails too, and below `RAM_WARN_THRESHOLD` (default
@@ -234,9 +233,9 @@ wlalink sorts appended sections by priority, then by size, largest first
 after them whatever the object order — measured: `print_string` relinked
 with `data_init_end.o` first, in the middle and last puts `DataInitEnd` at
 the section's end each time. `make/common.mk` still lists it last.
-**Test:** every link runs `symmap.py --check-data-init`, which fails when
+**Test:** every link runs `opensnes-rom check`, which fails when
 the `DataInitEnd` label does not close the `.data_init` section (a forged
-`.sym` with the label 8 bytes early fails; the 89 examples pass). A wlalink
+`.sym` with the label 8 bytes early fails; the 88 examples pass). A wlalink
 bump that changed the sort would stop here, not in a game.
 
 ### 🟠 cc65816 pushes function args **LEFT-TO-RIGHT**

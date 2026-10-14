@@ -1,4 +1,4 @@
-# OpenSNES Documentation {#mainpage}
+# OpenSNES Documentation {#documentation}
 
 A modern, open-source SDK for Super Nintendo development.
 Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
@@ -83,6 +83,10 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor
 
+@subpage tutorial_dsp1 -- DSP-1 Coprocessor (3D maths)
+
+@subpage tutorial_interrupts -- Interrupts: VBlank callbacks and timer IRQs
+
 @subpage tutorial_debugging -- Debugging with luna
 
 @subpage tutorial_profiling -- Profiling: measuring where the frame goes
@@ -101,9 +105,17 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage examples -- All examples grouped by category (sources + READMEs)
 
-@subpage example_sources -- Example Source Code (annotated by topic)
 
 ## API Reference
+
+@subpage api_index -- API index, by what you are trying to do
+
+@subpage known_limitations -- Known limitations: the silent failures, and how to avoid them
+
+@subpage benchmark -- Compiler benchmark against PVSnesLib
+
+### Headers
+
 
 - @ref snes.h "Main Header (snes.h)"
 - @ref console.h "Console Functions"
@@ -120,7 +132,16 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 - @ref scene.h "Scene stack (scene.h)"
 - @ref asset.h "Asset bundle convention (asset.h)"
 
-## Contributing {#mainpage_contributing}
+## Project {#mainpage_contributing}
+
+@subpage philosophy -- Design philosophy
+
+@subpage stability -- What 1.0 will freeze
+
+@subpage upgrading -- Upgrading from 0.48 to 0.49
+
+@subpage hardware_verification -- Hardware verification protocol
+
 
 @subpage code_style -- Code style conventions
 

@@ -7,7 +7,7 @@ This guide will get you from zero to running your first SNES ROM in about 10 min
 | | **I want to make SNES games** | **I want to contribute to the SDK** |
 |---|---|---|
 | **What** | Download the pre-built SDK, write C code, build ROMs | Clone the repo, modify compiler/library/tools |
-| **Prerequisites** | `make`, `python3` + text editor | clang, cmake, git, python3 |
+| **Prerequisites** | `make`, a host C compiler + text editor | clang, cmake, git, python3 |
 | **Time to start** | ~5 minutes | ~15 minutes |
 | **Go to** | [Path A: Game Developer](#path-a-game-developer) | [Path B: SDK Developer](#path-b-sdk-developer) |
 
@@ -20,9 +20,10 @@ to download it, write code, and run `make`.
 
 ### A1. Install Prerequisites
 
-You need `make` (the build tool), `python3` (the build's post-link checks —
-ROM size, bank budgets — are Python scripts) and an emulator. No compiler
-installation required — the SDK ships with its own cross-compiler.
+You need `make` (the build tool), a host C compiler and an emulator. The SDK
+ships its own cross-compiler for the SNES; the host compiler (`cc`, `clang`
+or `gcc`) only lends it its C preprocessor. Nothing else: no Python, no
+runtime. `opensnes doctor` checks all of it.
 
 **macOS:**
 ```bash
@@ -31,18 +32,18 @@ xcode-select --install
 
 **Linux (Ubuntu/Debian):**
 ```bash
-sudo apt install make python3
+sudo apt install make clang
 ```
 
 **Linux (Fedora):**
 ```bash
-sudo dnf install make
+sudo dnf install make clang
 ```
 
 **Windows:**
 1. Install [MSYS2](https://www.msys2.org/)
 2. Open **MSYS2 UCRT64** terminal
-3. Run: `pacman -S make python`
+3. Run: `pacman -S make mingw-w64-ucrt-x86_64-clang`
 
 ### A2. Get an Emulator
 
@@ -175,7 +176,7 @@ int main(void) {
 Build and run:
 ```bash
 make
-mesen my_game.sfc
+~/opensnes/testing/bin/luna-gui my_game.sfc     # or: opensnes run
 ```
 
 That's it — you're making SNES games.
@@ -366,7 +367,7 @@ ls examples/*/
 ## Tutorials
 
 The full set of tutorials, always current, is on the docs home page —
-see @ref index "the tutorial navigation in mainpage". The most common
+see @ref documentation "the tutorial navigation". The most common
 starting points:
 
 | Topic | Guide |
@@ -423,9 +424,10 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
 ### Build fails with "refusing to emit silently-wrong code"
 
 The compiler stops, with the feature named, rather than generate wrong code
-for what it does not support: struct assignment, structs passed or returned
-by value, variadic functions and inline assembly. Pass a pointer, copy the
-fields, or move the code to a `.asm` file. 32-bit `u32`/`s32` arithmetic is
+for what it does not support: structs passed or returned by value, a struct
+copied to or from a `FAR` object, variadic functions and inline assembly.
+Pass a pointer, copy the fields, or move the code to a `.asm` file. Plain
+struct assignment (`a = b;`) works. 32-bit `u32`/`s32` arithmetic is
 fully supported (it is slower than 16-bit, not wrong). See
 `KNOWN_LIMITATIONS.md` for the full list.
 

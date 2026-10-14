@@ -63,8 +63,9 @@ pacman -S mingw-w64-ucrt-x86_64-clang
 ### Build fails with "refusing to emit silently-wrong code"
 
 **Cause**: The code uses a C feature the 65816 backend does not lower. The
-message names it: struct assignment, a struct passed or returned by value,
-a variadic function, or inline assembly (`asm`).
+message names it: a struct passed or returned by value, a struct copied to
+or from a `FAR` object, a variadic function, or inline assembly (`asm`).
+Plain struct assignment (`a = b;`) works.
 
 **Fix**: pass a pointer to the struct, copy it field by field (or with a
 loop), give the function a fixed argument list, or move the assembly into a
@@ -110,16 +111,13 @@ while (1) {
 consoleInit();
 ```
 
-**4. Memory overlap (WRAM mirror bug)**
+**4. C variables past the 8 KB RAM band**
 
-Bank $00 addresses $0000-$1FFF mirror Bank $7E addresses $7E:0000-$1FFF. If you have variables in both ranges, they'll overwrite each other.
-
-**Diagnose**:
-```bash
-python3 devtools/symmap/symmap.py --check-overlap game.sym
-```
-
-**Fix**: The library uses `ORGA $0300` to avoid the overlap zone.
+Plain C variables must sit in `$0000-$1FFF`; a large buffer belongs in far
+RAM (`FAR`, see [Far RAM](tutorials/far_ram.md)). The build checks it after
+every link and stops when the band overflows; `opensnes-rom check game.sfc`
+prints how much of it is left, and `opensnes-rom budget game.sfc` what uses
+it.
 
 ### ROM runs but crashes after a few seconds
 
@@ -223,20 +221,24 @@ setMode(BG_MODE1, 0);
 bgInitTileSet(0, tiles_4bpp, ...);  // 4bpp for BG0 in Mode 1
 ```
 
-### Scrolling is jerky
+### Scrolling is jerky or tears
 
-**Cause**: Updating scroll registers outside VBlank.
+**Cause**: Writing `BGnHOFS` / `BGnVOFS` directly during the frame: the top
+of the picture uses the old value, the bottom the new one.
 
-**Fix**:
+**Fix**: use `bgSetScroll()`. It only records the position, and the NMI
+handler writes it during VBlank. Set it before `WaitForVBlank()`, with the
+rest of the frame's logic, so it is shown on the next frame:
+
 ```c
 while (1) {
-    WaitForVBlank();
-    // Update scroll AFTER VBlank starts
+    scrollX += 1;                       // game logic
     bgSetScroll(0, scrollX, scrollY);
-
-    // Game logic
+    WaitForVBlank();                    // the NMI commits the scroll
 }
 ```
+
+See [Scrolling](tutorials/scrolling.md) for per-line scroll (HDMA parallax).
 
 ## Memory Issues
 
@@ -271,8 +273,11 @@ If it's in ROM ($8000+), you can't write to it.
 ### Diagnostic Commands
 
 ```bash
-# Check for memory overlaps
-python3 devtools/symmap/symmap.py --check-overlap game.sym
+# The post-link checks: bank $00, the RAM bands, bank-blind reads
+opensnes-rom check game.sfc
+
+# What the game uses of ROM, RAM, VRAM and CGRAM
+opensnes-rom budget game.sfc
 
 # View symbol map
 cat game.sym | grep "variable_name"

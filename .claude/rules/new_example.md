@@ -81,7 +81,7 @@ Every new example main.c MUST have:
 2. `/** @brief */` on every function, define, global, and data array
 3. Pedagogical comments explaining WHY, not just WHAT
 
-See existing examples in `docs/examples_group.md` for the format.
+See any example's `main.c` for the format (`examples/sprites/simple_sprite/main.c`); every one carries `@ingroup examples` (the group is declared in `docs/examples_group.md`).
 
 ## README.md — MANDATORY for every example
 

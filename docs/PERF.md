@@ -5,9 +5,21 @@ preparation; first measured on 2026-09-26, and the differences are noted).
 `PHILOSOPHY.md` asks every API with a cost to say it; this page is the
 measured side of that promise, and `docs/BENCHMARK.md` the compiler side.
 
-**Unit: master cycles (mclk) per frame.** An NTSC frame is about
-**357,370 mclk** (21.477 MHz / 60.1 Hz); the VBlank, where VRAM may be
-written, about 49,000 of them (48,988: 37 lines of 1324 available master clocks, snesdev-wiki "Timing"). 1 % of a frame is about 3,570 mclk.
+**Unit: master cycles (mclk) per frame.** These are the figures every
+page of this documentation uses:
+
+| Quantity (NTSC) | Value |
+|---|---|
+| Master clock | 21.477 MHz, 60.1 frames a second |
+| Scanline | 1364 mclk, of which the CPU loses 40 to DRAM refresh |
+| Frame | **357,368 mclk** (262 lines; every other frame one line is 4 mclk shorter) |
+| VBlank, 224-line display | 37 lines (225-261): **50,468 mclk**, 48,988 of them outside the refresh pause |
+| VBlank, 239-line display (overscan) | 22 lines: 30,008 mclk, 29,128 outside the refresh pause |
+| 1 % of a frame | about 3,574 mclk |
+
+Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
+(1364 mclk a line, 262 lines, the 1360-mclk short line); snesdev wiki,
+*Timing* (the 40-mclk refresh pause, VBlank from line 225 or 240 to 261).
 
 ## The scenes
 

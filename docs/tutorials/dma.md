@@ -114,8 +114,8 @@ Two windows, two patterns:
    transfer more than ~4 KB at once. The screen goes black while it's
    set; users see this as a "loading flash" if it takes more than a
    frame.
-2. **VBlank** (37 scanlines on NTSC, about 50,500 master cycles or 8,400
-   CPU cycles, minus the NMI handler's own work) — automatic, every
+2. **VBlank** (37 scanlines on NTSC, 50,468 master cycles, minus the NMI
+   handler's own work; see [Measured frame costs](../PERF.md)) — automatic, every
    frame. Budget is small (~4 KB of DMA). The lib's NMI handler uses this for
    the OAM DMA and the optional tilemap-streaming path.
 
@@ -301,8 +301,7 @@ discipline is yours: wrap heavy bulk transfers in
 ### 🔴 VBlank DMA budget is ~4 KB per frame
 
 VBlank lasts 37 scanlines on NTSC with the standard 224-line display —
-about 50,500 master cycles (22 scanlines, ~30,000 cycles, with
-overscan). The lib's NMI handler reserves part of that for OAM DMA,
+50,468 master cycles (22 scanlines and 30,008 with overscan). The lib's NMI handler reserves part of that for OAM DMA,
 scroll sync, joypad read and the user callback; DMA moves 1 byte per
 8 master cycles, so the raw ceiling is ~6 KB and the practical *user*
 budget is about 4 KB before the PPU starts sampling registers for
@@ -358,19 +357,14 @@ tiles, tilesSize)` which performs two passes with the right
 `VMAIN`/`VMDATAL`/`VMDATAH` configuration, or write the equivalent
 assembly helper. See the [Mode 7 tutorial](mode7.md).
 
-### 🟡 WRAM data port `$2180`–`$2183` is NOT safe in NMI
+### 🟢 WRAM data port `$2180`–`$2183` in an NMI callback (caught at build time)
 
-Main-thread code sometimes writes multi-byte sequences via
-`$2180` after setting an address with `$2181-$2183`. **If NMI fires
-mid-sequence and any code in the NMI path touches those ports**, the
-address pointer corrupts silently and the main thread resumes writing
-garbage to a wrong location.
-
-The lib's NMI handler in `templates/crt0.asm` never touches
-`$2180-$2183`. If you write a custom `nmiSet()` callback, do not use
-any function that goes through these ports. This is documented in
-`KNOWN_LIMITATIONS.md` and called out inline in
-`templates/crt0.asm:798-802`.
+Code that writes WRAM through `$2180` sets the address in `$2181-$2183`
+first. If an NMI fires in the middle and the NMI path uses the same ports,
+the address is lost and the rest of the writes land elsewhere. The library's
+NMI handler never touches them, and the build refuses a `nmiSet()` callback
+that can reach them (`opensnes-rom check`). See
+[Known limitations](../../KNOWN_LIMITATIONS.md).
 
 ## Cycle cost
 

@@ -596,13 +596,17 @@ bench-twins:
 # when `release` still depended on `docs`).
 docs:
 	cd docs && { cat Doxyfile; $(if $(DOXY_STRICT),echo "WARN_AS_ERROR = FAIL_ON_WARNINGS";) } | doxygen -
-	@# The showcase landing page is the site's front door. Doxygen emits the
-	@# documentation hub (mainpage.md) as index.html; preserve it as
-	@# documentation.html, then install the showcase as the root index.html.
-	@# Every other generated page (getting_started.html, tools.html, …) is
-	@# untouched, so no doc URL breaks. Kept in the Makefile so a local
-	@# `make docs` and the CI deploy build the identical site.
-	@cp docs/build/html/index.html docs/build/html/documentation.html
+	@# The showcase landing page is the site's front door. The documentation
+	@# hub (mainpage.md) is an ordinary page, documentation.html, with its own
+	@# place in the navigation tree; Doxygen's index.html is an empty main page
+	@# that the showcase replaces. (Until 2026-10-14 the hub WAS index.html,
+	@# copied aside: every menu link to index.html#… then opened the showcase.)
+	@# Kept in the Makefile so a local `make docs` and the CI deploy build the
+	@# identical site.
+	@# A file name written in the text (KNOWN_LIMITATIONS.md) is autolinked by
+	@# Doxygen to that file's empty "File Reference" page: move those links to
+	@# the page itself (Markdown links are rewritten earlier, by the filter).
+	@python3 devtools/docs_relink.py
 	@cp docs/landing/index.html docs/build/html/index.html
 	@echo "========================================="
 	@echo "Documentation generated in docs/build/html/"

@@ -1,4 +1,4 @@
-# Compiler Benchmark — OpenSNES vs PVSnesLib
+# Compiler Benchmark — OpenSNES vs PVSnesLib {#benchmark}
 
 *Last updated: 2026-10-08. Both compilers were run that day on the same
 machine: `python3 devtools/cyclecount/bench.py` for OpenSNES (the code the
@@ -22,7 +22,7 @@ to losses; the rest held. The cause is not the pointer width itself (see
 slots for values PVSnesLib keeps in the direct page, and code the
 optimizer leaves dead. The May text claimed "32 % faster";
 the figure today is **about 38 %** on these 34 functions, and
-60 % measured on twenty-one whole workloads.
+61 % measured on 23 whole workloads (below).
 
 ## Summary
 
@@ -288,15 +288,16 @@ obvious base ref to compare against). The gate runs on
 
 ## Measured on luna {#measured}
 
-*Measured 2026-10-08 with `make bench-sdk` — luna v1.34.0, PVSnesLib at
-`fa758c9b 2025-12-28`, both ROMs LoROM SlowROM. The figures are the two files
-committed in `devtools/sdkbench/`; CI re-measures the OpenSNES side at every
-push.*
+*Measured with `make bench-sdk` on luna (the pin in `testing/luna.version`),
+PVSnesLib at `fa758c9b 2025-12-28`, both ROMs LoROM SlowROM. The figures are
+the two files committed in `devtools/sdkbench/`; CI re-measures the OpenSNES
+side at every push.*
 
 The same C file, `devtools/sdkbench/workloads.c`, is built unchanged by
-both SDKs and run on luna, which is cycle-accurate. It holds twenty-one small
-workloads of the kind a game runs every frame. Three things are measured
-for each: the **master cycles** it costs (an NTSC frame is about 357,370),
+both SDKs and run on luna, which is cycle-accurate. It holds 24 small
+workloads of the kind a game runs every frame (23 that both SDKs build the
+same way, and one measured for OpenSNES alone). Three things are measured
+for each: the **master cycles** it costs (an NTSC frame is 357,368),
 the **bytes of code** of its functions, and how deep the **stack** goes
 while it runs (bytes below the initial stack pointer).
 
@@ -345,40 +346,27 @@ either SDK's boot or per-frame handler in it.
 
 **Reading it.**
 
-- **Divide, modulo and 32-bit arithmetic are where OpenSNES wins most**
-  (`decimal` −68 %, `long` −53 %, `grid` −50 %).
-- **Every workload is faster, by 24 to 69 %, and none is larger.** Arrays,
-  byte loops, tilemaps and entities are 39 to 55 % faster; `mul`,
-  `strings`, `collide` and `state` are the closest, at 24 to 28 %.
-- **Until 2026-10-08 three were slower** — `sort` +63 %, `collide` +13 %,
-  `list` +7 % — and this page put it down to the 4-byte pointer. That was
-  wrong: OpenSNES dereferences a plain pointer in 16 bits, it is PVSnesLib
-  that does a 24-bit access. Read instruction by instruction, an iteration
-  of `sort` spent 258 of its 496 cycles on 32-bit index and address values
-  that were stored and never read, 66 on the 0 or 1 of each half of
-  `j > 0 && arr[j - 1] > key`, stored and tested again, and about 95 on
-  building each address in A before moving it to X. All three are gone:
-  dead values are removed, a condition branches where it is decided, and
-  `arr[i]` is `lda.l arr,x` with the index in X, `p->field` is
-  `lda.l N,x` with the pointer in X. `&nodes[k]` with a 6-byte element no
-  longer calls the 32-bit multiply either.
-- **The stack is level or shallower on 21 workloads of 22**, by up to 44
-  bytes (`collide`); `grid` (44 bytes against 39) is deeper. Until 2026-10-08 it was deeper on all 18, by 1 to 106
-  bytes: each temporary of the compiler owned a stack slot, where
-  PVSnesLib keeps its temporaries in direct-page pseudo-registers. Since
-  then a function that calls nothing keeps its temporaries in the direct
-  page too, promoted locals and values that never touch the stack have no
-  slot, parameters are read where the caller pushed them, and an address
-  takes one word. Since 2026-10-10 a function that does call keeps there
-  every temporary that no call crosses, and only the others on the stack.
-  The one that remains is a single large function whose temporaries do not
-  fit the 16 words of the direct-page block.
+- **Every workload is faster, by 32 to 78 %, and none is larger.**
+  Divide, modulo and 32-bit arithmetic gain most (`decimal` −75 %, `long`
+  −60 %, `div32` −59 %), and so do index loops over arrays (`physics`
+  −78 %, `copy` −78 %, `sieve` −73 %). The closest are `mul` (−32 %),
+  `strings` (−37 %) and `list`
+  (−41 %).
+- **Why it is faster.** The compiler removes values that are computed and
+  never read, branches where a condition is decided instead of storing a
+  0 or 1 and testing it again, reads `arr[i]` as `lda.l arr,x` with the
+  index in X and `p->field` as `lda.l N,x` with the pointer in X, and keeps
+  the temporaries of a function in the direct page when no call crosses
+  them.
+- **The stack is level or shallower on 22 workloads of 23.** `grid` is the
+  exception (44 bytes against 39): a single large function whose
+  temporaries do not fit the 16 words of the direct-page block.
 
 What is left has named causes — a stack frame in every function that
 calls another, X reloaded after every instruction that is not an access,
 a 32-bit read through a pointer still staged in the direct page — and PVSnesLib is itself far from what a person would write (it never
 uses X or Y as an index: the inner loop of `sort` is 255 cycles there and
-27 by hand). The plan is `.claude/notes/chantiers/beat_pvsneslib.md`.
+27 by hand).
 
 What this does not measure: the libraries (sprite, background, audio
 engines) and a whole game.

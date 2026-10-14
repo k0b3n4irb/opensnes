@@ -10,20 +10,24 @@ and **what is next**.
 
 ## Current Status: post-v0.50.0
 
-Version 0.49.0 (2026-10-10) carries the public API meant for 1.0: the
-deprecated aliases are gone and the two calls that change meaning have
-changed (`docs/UPGRADING.md`). It is not 1.0 — the tree called itself
-1.0.0 from 2026-10-05 to 2026-10-10 and the owner renamed it: before 1.0
-come the compiler and library work still under way, a review of the
-examples with their assets redone, and the first console session of the
-hardware protocol (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7).
-`docs/STABILITY.md` is the promise 1.0 will make. A modern, well-tested SNES SDK ready for serious hobby development, game jams,
-and educational use, building toward commercial-grade maturity. The compiler
-produces code about 30 % faster than PVSnesLib + 816-opt estimated on 34 functions, and 60 % faster measured on luna on 23 workloads, each of them faster, none larger, and level or shallower in stack on sixteen. 88
-working examples cover every major subsystem, with cross-platform CI on Linux,
-macOS, and Windows enforcing not just "it compiles" but the full functional
-test suite (luna, cycle-accurate native — corpus liveness + visual
-regression + functional probes; SA-1/Super FX/DSP-1 run natively). Run
+Since 0.49 the SDK carries the public API meant for 1.0: the deprecated
+aliases are gone and the two calls that change meaning have changed
+(`docs/UPGRADING.md`). It is not 1.0: before 1.0 come the compiler and
+library work still under way, a review of the examples with their assets
+redone, and the first console session of the hardware protocol
+(`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7). `docs/STABILITY.md` is the
+promise 1.0 will make.
+
+A modern, well-tested SNES SDK ready for serious hobby development, game
+jams, and educational use, building toward commercial-grade maturity. The
+compiler produces code about 38 % faster than PVSnesLib + 816-opt estimated
+on 34 functions, and 61 % faster measured on luna on 23 workloads, each of
+them faster, none larger, and level or shallower in stack on 22
+(`docs/BENCHMARK.md`). 88 working examples cover every major subsystem,
+with cross-platform CI on Linux, macOS, and Windows enforcing not just "it
+compiles" but the full functional test suite (luna, cycle-accurate native —
+corpus liveness + visual regression + functional probes; SA-1/Super FX/DSP-1
+run natively). Run
 `make tests`, or `python3 testing/luna_runner.py --list` for the corpus —
 the suite grows
 with new chantiers and a single hard-coded number rots fast.

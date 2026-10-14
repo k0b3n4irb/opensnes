@@ -148,7 +148,7 @@ topic without naming most of the API.
 | `dma.h` | [DMA](tutorials/dma.md) | ✅ |
 | `dsp1.h` | [DSP-1](tutorials/dsp1.md) | ✅ |
 | `hdma.h` | [HDMA](tutorials/hdma.md) | ✅ |
-| `input.h` | [Input](tutorials/input.md) | ✅ pads, mouse, Super Scope, multitap |
+| `input.h` | [Input](tutorials/input.md) | ✅ pads, mouse, Super Scope (the multitap cannot be switched on: Known limitations) |
 | `interrupt.h` | [Interrupts](tutorials/interrupts.md) | ✅ |
 | `tile.h` | [Graphics](tutorials/graphics.md) | ✅ |
 | `map.h` | [Maps](tutorials/map.md) | ✅ |
@@ -172,7 +172,7 @@ topic without naming most of the API.
 | `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
 | `string.h` | [FAR RAM](tutorials/far_ram.md) — copying between ROM, RAM and FAR RAM | ✅ |
 | `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
-| `object.h` | [The Object Engine](tutorials/object.md) | ✅ — writing it found five engine defects; four are fixed, the rest are in the page's Gotchas |
+| `object.h` | [The Object Engine](tutorials/object.md) | ✅ |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 

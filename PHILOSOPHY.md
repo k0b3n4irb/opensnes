@@ -1,4 +1,4 @@
-# OpenSNES — Design Philosophy
+# OpenSNES — Design Philosophy {#philosophy}
 
 This document captures the **principles** that guide design decisions in
 OpenSNES. When a feature, API, or refactor is on the table, the question
@@ -59,7 +59,7 @@ The 90% case is a one-liner; the 10% case is still possible.
 **Example — sprite drawing:**
 ```c
 oamDynamicDraw(id);              // high — engine picks size, NMI auto-flushes
-oamMemory[id * 4 + 1] = y - 1;   // low — direct OAM byte poke, full control
+oamMemory[id * 4 + 1] = y;       // low — direct OAM byte poke, full control
 ```
 
 Both are public API. We do not remove the low-level primitive in the

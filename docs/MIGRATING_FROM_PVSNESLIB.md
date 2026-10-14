@@ -107,7 +107,7 @@ Since the bank-$00 flip, C const data (arrays, string literals, const structs)
 is placed in the asset banks and every C read of it is a far read. That is
 invisible and free — until you cast the `const` away and read through a plain
 pointer, which reads bank $00 and returns garbage. The link fails on it
-(`devtools/check_bank_reads.py`), so you get told; the fix is to keep the
+(the bank-blind read check of `opensnes-rom check`), so you get told; the fix is to keep the
 `const`, or to pass the data to a library function as a far pointer.
 
 The RAM twin: plain C globals must sit below `$2000`. Anything bigger — a
@@ -122,7 +122,7 @@ miscompiled silently, and each has a mechanical workaround:
 | Refused | Workaround |
 |---|---|
 | Struct passed or returned **by value** | Pass a pointer to it |
-| Struct assignment by value (`a = b`) | Copy the fields, or `memcpy` (`<snes/string.h>`, module `string`) |
+| Struct assignment to or from a `FAR` object | Copy the fields, or `memcpy` (`<snes/string.h>`, module `string`); plain `a = b` works |
 | Variadic functions (`...`) | Fixed-arity wrappers |
 | Inline assembly inside C | A separate `.asm` file with a C prototype |
 

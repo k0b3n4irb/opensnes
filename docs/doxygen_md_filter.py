@@ -35,8 +35,10 @@ def main():
     rel = os.path.relpath(filepath)
     basename = os.path.basename(rel)
 
-    # Don't filter the root README or mainpage (handled by USE_MDFILE_AS_MAINPAGE)
-    if rel == "README.md" or basename == "mainpage.md":
+    # Don't filter the root README. mainpage.md is an ordinary page
+    # ({#documentation}): Doxygen's own index.html is replaced by the landing
+    # page, so the documentation hub must not be the main page.
+    if rel == "README.md":
         sys.stdout.write(content)
         return
 
@@ -47,31 +49,13 @@ def main():
         return
 
     title = match.group(1).strip()
-    explicit_id = match.group(2)
-
-    if explicit_id:
-        # Use the explicit {#page_id} from the heading
-        page_id = explicit_id.strip()
-    else:
-        # Auto-generate page ID from directory path
-        dirpath = os.path.dirname(rel)
-        # Normalize: strip ".." components (from ../examples/ paths)
-        parts = [
-            p
-            for p in dirpath.replace(os.sep, "/").split("/")
-            if p and p != ".."
-        ]
-
-        # For non-README files, append the filename stem
-        if basename != "README.md":
-            stem = os.path.splitext(basename)[0]
-            parts.append(stem)
-
-        page_id = "_".join(parts).replace("-", "_")
+    page_id = _page_id(rel, match.group(2))
 
     if not page_id:
         sys.stdout.write(content)
         return
+
+    content = _rewrite_links(content, filepath)
 
     # Inject \page before the first heading, replace the heading with \page
     new_first_line = f"\\page {page_id} {title}"
@@ -98,6 +82,103 @@ def main():
             content = content.rstrip() + block
 
     sys.stdout.write(content)
+
+
+def _page_id(rel: str, explicit_id: str | None) -> str:
+    """The page ID of the Markdown file at `rel` (relative to docs/)."""
+    if explicit_id:
+        # Use the explicit {#page_id} from the heading
+        return explicit_id.strip()
+    # Auto-generate page ID from directory path
+    dirpath = os.path.dirname(rel)
+    # Normalize: strip ".." components (from ../examples/ paths)
+    parts = [
+        p
+        for p in dirpath.replace(os.sep, "/").split("/")
+        if p and p != ".."
+    ]
+    # For non-README files, append the filename stem
+    basename = os.path.basename(rel)
+    if basename != "README.md":
+        parts.append(os.path.splitext(basename)[0])
+    return "_".join(parts).replace("-", "_")
+
+
+REPO = "https://github.com/k0b3n4irb/opensnes/blob/develop/"
+_page_files: set[str] | None = None
+
+
+def _pages() -> set[str]:
+    """Absolute paths of the Markdown files Doxygen makes pages of: those the
+    Doxyfile's INPUT names, or that sit under a directory it names, minus its
+    EXCLUDE_PATTERNS and the root README (passed through, not a page)."""
+    global _page_files
+    if _page_files is not None:
+        return _page_files
+    text = open("Doxyfile", encoding="utf-8").read()
+    def setting(name: str) -> list[str]:
+        m = re.search(rf"^{name}\s*=((?:.*\\\n)*.*)$", text, re.MULTILINE)
+        return m.group(1).replace("\\\n", " ").split() if m else []
+    excludes = [p.strip("*/") for p in setting("EXCLUDE_PATTERNS")]
+    root = os.path.abspath("..")
+    found: set[str] = set()
+    for entry in setting("INPUT"):
+        path = os.path.abspath(entry)
+        if os.path.isfile(path) and path.endswith(".md"):
+            found.add(path)
+        elif os.path.isdir(path):
+            for d, _, files in os.walk(path):
+                found.update(os.path.join(d, f) for f in files if f.endswith(".md"))
+    _page_files = {
+        p for p in found
+        if p != os.path.join(root, "README.md")
+        and not any(f"/{e}/" in p or p.endswith(e) for e in excludes)
+    }
+    return _page_files
+
+
+_LINK = re.compile(r"\]\(([^()\s#]+)(#[^()\s]*)?\)")
+
+
+def _rewrite_links(content: str, filepath: str) -> str:
+    """Point relative links to another Markdown file at that file's PAGE.
+
+    Doxygen resolves `[text](tutorials/dma.md)` to the empty "dma.md File
+    Reference" page, not to the tutorial (419 such links on 2026-10-14). A
+    link to a page becomes `page_id.html` (its anchor kept); a link to a
+    Markdown file that is not a page (ROADMAP.md, CHANGELOG.md, docs/README.md)
+    becomes its URL on GitHub. A link to a directory with a README page goes
+    to that page. Links inside fenced code are left alone; so are absolute
+    URLs and links that do not resolve to a file.
+    """
+    here = os.path.dirname(os.path.abspath(filepath))
+    root = os.path.abspath("..")
+    pages = _pages()
+
+    def target(m: re.Match) -> str:
+        link, anchor = m.group(1), m.group(2) or ""
+        if "://" in link or link.startswith(("mailto:", "@")):
+            return m.group(0)
+        path = os.path.normpath(os.path.join(here, link))
+        if os.path.isdir(path) and os.path.join(path, "README.md") in pages:
+            path = os.path.join(path, "README.md")
+        if not path.endswith(".md") or not os.path.isfile(path):
+            return m.group(0)
+        if path in pages:
+            head = re.search(r"^#\s+(.+?)(?:\s*\{#([^}]+)\})?\s*$",
+                             open(path, encoding="utf-8").read(), re.MULTILINE)
+            page = _page_id(os.path.relpath(path), head.group(2) if head else None)
+            return f"]({page}.html{anchor})"
+        if path.startswith(root + os.sep):
+            return f"]({REPO}{os.path.relpath(path, root)}{anchor})"
+        return m.group(0)
+
+    out, fence = [], False
+    for line in content.split("\n"):
+        if line.lstrip().startswith(("```", "~~~")):
+            fence = not fence
+        out.append(line if fence else _LINK.sub(target, line))
+    return "\n".join(out)
 
 
 def _discover_subpage_children(filepath: str) -> list[str]:

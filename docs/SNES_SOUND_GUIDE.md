@@ -262,7 +262,7 @@ void spc_send_command(u8 cmd, u8 data) {
 
 | Usage | Typical Size |
 |-------|--------------|
-| Sound driver | 2-4 KB |
+| Sound driver | 2-6 KB (the audio module: 2.3 KB; SNESMOD: about 5.5 KB) |
 | Sequence data | 2-8 KB |
 | Echo buffer | 0-30 KB |
 | **Samples** | **~30-50 KB** |
@@ -291,10 +291,17 @@ void spc_send_command(u8 cmd, u8 data) {
 
 ### Conversion Tools
 
+The SDK converts for you, from a settings file beside the asset:
+
 | Tool | Purpose |
 |------|---------|
-| **SNESMOD** | IT → SPC conversion |
-| **snesbrr** | WAV → BRR conversion |
+| **opensnes-music** | Impulse Tracker module → SNESMOD soundbank |
+| **opensnes-sample** | WAV → BRR sample |
+
+Third-party tools that help around them:
+
+| Tool | Purpose |
+|------|---------|
 | **brr2wav** | BRR → WAV (preview) |
 | **Split700** | Extract samples from SPC |
 
@@ -306,7 +313,7 @@ void spc_send_command(u8 cmd, u8 data) {
 | [OpenGameArt](https://opengameart.org) | CC0/CC-BY |
 | [Kenney.nl](https://kenney.nl) | CC0 |
 
-### Documentation
+### Documentation {#sound_guide_documentation}
 
 | Resource | Link |
 |----------|------|

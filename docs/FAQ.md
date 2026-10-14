@@ -30,8 +30,9 @@ from `<snes/types.h>` (`u8`, `u16`, `s16`, `u32`) and the question disappears.
 
 **Can I pass a struct to a function?**
 Not by value — the compiler refuses it with a message naming the feature, and
-so it does for struct returns, struct assignment, variadic functions and inline
-assembly. Pass a pointer instead. The refusals are deliberate: each one would
+so it does for struct returns, a struct copied to or from a `FAR` object,
+variadic functions and inline assembly. Pass a pointer instead. Plain struct
+assignment (`a = b;`) works. The refusals are deliberate: each one would
 otherwise be a silent miscompilation.
 
 **Can I use floating point?**

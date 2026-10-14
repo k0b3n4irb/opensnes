@@ -1,5 +1,6 @@
 /**
  * @file main.c
+ * @ingroup examples
  * @brief One-shot sound effects from WAV files — the wav2brr pipeline.
  *
  * The smallest "press a button, hear a sound" example, and a showcase of the

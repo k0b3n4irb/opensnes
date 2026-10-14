@@ -66,7 +66,7 @@ EXCLUDE_PATTERNS       = */doxygen-awesome-css/* \
 # Use markdown
 MARKDOWN_SUPPORT       = YES
 AUTOLINK_SUPPORT       = YES
-USE_MDFILE_AS_MAINPAGE = mainpage.md
+USE_MDFILE_AS_MAINPAGE =
 
 # Markdown filter: inject \page directives for unique page IDs
 FILTER_PATTERNS        = *.md="python3 doxygen_md_filter.py"
@@ -162,6 +162,10 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
 #---------------------------------------------------------------------------
 # Build Configuration
 #---------------------------------------------------------------------------
+
+# Page titles name a file by its path from the repository root
+# ("examples/text/print_string/main.c"), not from the machine that built it.
+STRIP_FROM_PATH        = ..
 
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO

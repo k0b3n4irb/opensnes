@@ -79,7 +79,7 @@ ground with tile collision.
 @subpage examples_basics_collision_demo
 
 > Author the world, don't hand-code it: @ref craft_tiles_to_levels is the
-> think-in-metatiles workflow, and @ref tools_tmx2snes converts a Tiled level
+> think-in-metatiles workflow, and @ref tools_opensnes_level converts a Tiled level
 > into the map binaries `map_scroll` and `tiled` load.
 
 ## Stage 4 — "Can I make it feel good?"

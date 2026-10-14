@@ -7,14 +7,14 @@ The `opensnes-*` family replaces the earlier converters (`gfx4snes`, `smconv`, `
 live beside the asset, no interpreter to install**. This page is the
 contract every tool in the family follows; a tool that does not is a bug.
 
-The earlier tools stay in the zip for one more release, each printing where
-its function went.
+The earlier tools (gfx4snes, smconv, font2snes…) are still in the zip; their
+pages say which tool of the family replaces each.
 
 ## The family
 
 | Tool | Function |
 |------|----------|
-| `opensnes` | the project: `init`, `build`, `clean`, `run`, `test`, `doctor`, `upgrade` (`budget` and `release`: later) |
+| `opensnes` | the project: `init`, `build`, `clean`, `run`, `test`, `budget`, `release`, `doctor`, `upgrade` |
 | `opensnes-sprite` | sprite sheet or Aseprite export → tiles, palette, metasprite table, animation clips |
 | `opensnes-tileset` | PNG → tileset and tilemap, deduplicated, with per-tile palettes and flips |
 | `opensnes-level` | Tiled (later LDtk) → map, objects, collision |

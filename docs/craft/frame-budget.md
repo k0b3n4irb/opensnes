@@ -14,7 +14,7 @@ the next one:
 - **Active display (~224 lines):** the PPU is reading VRAM to paint pixels.
   **You cannot write VRAM now** — writes are silently dropped. This is your
   compute window: game logic, physics, AI, building next frame's data.
-- **VBlank (~38 lines):** the PPU is idle. This is your **only safe window to
+- **VBlank (37 lines):** the PPU is idle. This is your **only safe window to
   touch VRAM, CGRAM and OAM** — and it is short.
 
 The single most common frame-timing bug follows directly: do your heavy

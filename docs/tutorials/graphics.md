@@ -152,35 +152,33 @@ void setup_palette(void) {
 
 ## Background Scrolling
 
+`bgSetScroll()` records a layer's position; the NMI handler writes it to the
+PPU during VBlank, and applies the vertical one-line correction the hardware
+needs (see [Scrolling](scrolling.md)):
+
 ```c
 s16 scroll_x = 0;
 s16 scroll_y = 0;
 
-void update_scroll(void) {
-    // Write scroll registers (write twice for 16-bit value)
-    REG_BG1HOFS = (u8)scroll_x;
-    REG_BG1HOFS = (u8)(scroll_x >> 8);
-    REG_BG1VOFS = (u8)scroll_y;
-    REG_BG1VOFS = (u8)(scroll_y >> 8);
+while (1) {
+    scroll_x++;
+    bgSetScroll(0, scroll_x, scroll_y);
+    WaitForVBlank();
 }
 ```
 
 ## Parallax Scrolling
 
-For depth effect, scroll backgrounds at different speeds:
+For depth, scroll the layers at different speeds:
 
 ```c
-// In main loop:
 scroll_x++;
-
-// BG1 (foreground) - full speed
-REG_BG1HOFS = (u8)scroll_x;
-REG_BG1HOFS = (u8)(scroll_x >> 8);
-
-// BG2 (background) - half speed
-REG_BG2HOFS = (u8)(scroll_x >> 1);
-REG_BG2HOFS = (u8)((scroll_x >> 1) >> 8);
+bgSetScroll(0, scroll_x, 0);          // BG1 (foreground): full speed
+bgSetScroll(1, scroll_x >> 1, 0);     // BG2 (background): half speed
 ```
+
+For a different speed on each band of the screen, see the HDMA parallax in
+[Scrolling](scrolling.md).
 
 ## Using gfx4snes
 

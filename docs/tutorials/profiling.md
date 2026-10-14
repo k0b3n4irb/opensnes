@@ -17,15 +17,16 @@ machine actually paid.
 
 ## The unit: master cycles per frame
 
-luna reports **master clocks** (mclk). One NTSC frame is about **357 400**
-of them:
+luna reports **master clocks** (mclk). One NTSC frame is **357,368** of
+them (the exact figures, with their sources, are on [Measured frame
+costs](../PERF.md)):
 
 | Quantity | Value |
 |---|---|
 | Master clock | 21.477 MHz |
 | Frames per second | 60.1 |
-| Master cycles in one frame | ≈ 357 400 |
-| Master cycles in VBlank (~38 lines of 262) | ≈ 51 800 |
+| Master cycles in one frame | 357,368 |
+| Master cycles in VBlank (37 lines of 262) | 50,468 |
 
 Those two last rows are the numbers to hold in your head. A routine whose
 worst frame costs 30 000 mclk has eaten 8 % of the frame; one that costs

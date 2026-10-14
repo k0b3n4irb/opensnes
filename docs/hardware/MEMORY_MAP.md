@@ -153,18 +153,16 @@ Color format: `0BBBBBGGGGGRRRRR` (15-bit)
 ## Example: Setting Up Memory
 
 ```c
-// Define variables in different memory regions
-#pragma bss-name(push, "BSS")    // Goes to $7E:0200+
+// A plain global lives in the 8 KB band $00:0000-$1FFF
 u8 game_variables[256];
-
-#pragma bss-name(push, "HRAM")   // Goes to $7F:0000+
-u8 large_buffer[16384];
-
-// Direct page variables (fast access)
-#pragma zeropage-name(push, "ZEROPAGE")
-u8 temp;
 u16 frame_counter;
+
+// A large buffer goes to far RAM, $7E:2000-$FFFF
+FAR u8 large_buffer[16384];
 ```
+
+The linker places both; the build stops if the plain band overflows. See
+[Far RAM](../tutorials/far_ram.md).
 
 ## Enhancement Chip Memory
 

@@ -278,7 +278,7 @@ void animation_update(Animation* anim) {
 | **OpenGameArt CC0** | https://opengameart.org/content/cc0-resources |
 | **Kenney Assets** | https://kenney.nl/assets (CC0) |
 
-### Documentation
+### Documentation {#graphics_guide_documentation}
 
 | Resource | Description |
 |----------|-------------|

@@ -227,4 +227,4 @@ void update_sprite(u8 x, u8 y, u8 tile, u8 attr) {
 
 - [Registers](REGISTERS.md) - Full register reference
 - [SNES Graphics Guide](../SNES_GRAPHICS_GUIDE.md) - Graphics system overview
-- [Animated Sprite Example](/examples/sprites/animated_sprite/) - Working sprite animation code
+- [Animated Sprite Example](../../examples/sprites/animated_sprite/) - Working sprite animation code

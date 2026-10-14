@@ -85,7 +85,7 @@ deep-dive of a step below.
 | 33 | [mode7/dsp1_ground](mode7/dsp1_ground/) | Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices |
 | 34 | [mode7/extbg](mode7/extbg/) | Mode 7 EXTBG: one plane, two layers split by bit 7, a sprite between them |
 | 35 | [sprites/metasprite](sprites/metasprite/) | Multi-tile composite sprites |
-| 36 | [sprites/aseprite_pipeline](sprites/aseprite_pipeline/) | Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite |
+| 36 | [sprites/aseprite_pipeline](sprites/aseprite_pipeline/) | Full asset pipeline: Aseprite → opensnes-sprite (sheet, anim) → animated metasprite |
 | 37 | [sprites/world_sprites](sprites/world_sprites/) | World-space sprites: a camera, culling and OAM in one call per batch (`oamPlaceWorld`) |
 | 38 | [input/mouse](input/mouse/) | Mouse detection, cursor, sensitivity |
 | 39 | [input/superscope](input/superscope/) | Light gun detection, PPU H/V counters |
@@ -129,20 +129,23 @@ make clean && make
 
 ## Running
 
-We recommend [Mesen2](https://github.com/SourMesen/Mesen2) for accurate SNES emulation:
+luna, the SDK's emulator (`scripts/install-luna.sh` installs it), plays any
+example in a window:
 
 ```bash
-mesen examples/text/print_string/print_string.sfc
+testing/bin/luna-gui examples/text/print_string/print_string.sfc
 ```
 
-Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.
+The headless `luna` dumps VRAM, OAM, palettes and registers
+(`luna assets-dump`, `luna state`) and is a full debugger over MCP: see
+[Debugging](../docs/tutorials/debugging.md). Any other SNES emulator works too.
 
 ## Tips
 
 1. **Follow the order** -- each example builds on concepts from earlier ones
 2. **Read the source** -- every `main.c` is commented to explain the "why"
 3. **Experiment** -- change values, break things, see what happens
-4. **Use the debugger** -- Mesen2's PPU viewer is invaluable for understanding VRAM
+4. **Look at the machine** -- `luna assets-dump` shows what the code put in VRAM, OAM and the palettes
 
 ---
 
