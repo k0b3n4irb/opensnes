@@ -28,7 +28,7 @@ opensnes doctor                         # is everything there?
 
 | Command | What it does |
 |---|---|
-| `init <name> [--template blank\|game]` | writes `main.c`, a `Makefile` and `res/`; `blank` is a text screen, `game` a sprite you steer with two luna tests in `test/`. The name is the ROM's (`<name>.sfc`): letters, digits, `-`, `_`, `.`. A path works (`init ~/projects/my-game`). |
+| `init <name> [--template blank\|game]` | writes `main.c`, a `Makefile` and `res/`; `blank` is a text screen, `game` the SDK's `starter/` project (a sprite you steer, its settings file in `res/`, two luna tests in `test/`). The name is the ROM's (`<name>.sfc`): letters, digits, `-`, `_`, `.`. A path works (`init ~/projects/my-game`). |
 | `build [--clean]` | runs `make` in the project — the build itself is `make/common.mk` (@ref tools_build). `--clean` rebuilds from nothing. |
 | `clean` | removes what the build made |
 | `run [--emulator NAME]` | builds, then opens the ROM (the `TARGET` of your Makefile) in the luna GUI that `scripts/install-luna.sh` installed, or the first of Mesen, bsnes, snes9x on your `PATH`; `--emulator` names another |

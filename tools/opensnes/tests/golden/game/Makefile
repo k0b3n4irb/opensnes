@@ -9,6 +9,6 @@ ROM_NAME := MY GAME 2
 CSRC     := main.c
 
 USE_LIB     := 1
-LIB_MODULES := console sprite dma input background
+LIB_MODULES := console dma sprite input
 
 include $(OPENSNES)/make/common.mk

@@ -273,21 +273,46 @@ static int write_text(cli_ctx *ctx, const char *path, const char *text)
     return cli_write_file(ctx, path, text, strlen(text));
 }
 
-/* text with every @LEAF@ replaced. */
-static int write_template(cli_ctx *ctx, const char *path, const char *tpl, const char *leaf)
+/* The game template is the SDK's starter/ project, the one copy kept up to
+ * date (it ships in the zip and release-smoke builds it): its main.c, its
+ * sprite and the settings file beside it, its .gitignore and its two luna
+ * tests, whose ROM is renamed after the project. The Makefile is written by
+ * init, with the project's own name and the SDK's path. */
+static const char *const STARTER_FILES[] = {
+    "main.c", "res/player.png", "res/player.png.toml", ".gitignore", "test/boot.toml", "test/walk_right.toml",
+};
+
+static int make_dirs(const char *path);
+
+static int copy_starter(cli_ctx *ctx, const char *sdk, const char *name, const char *leaf)
 {
-    size_t cap = strlen(tpl) + 8 * (strlen(leaf) + 1) + 1, j = 0;
-    char *out = malloc(cap);
-    if (!out) return CLI_IO;
-    for (const char *p = tpl; *p;) {
-        if (strncmp(p, "@LEAF@", 6) == 0 && j + strlen(leaf) < cap) { j += (size_t)sprintf(out + j, "%s", leaf); p += 6; }
-        else if (j + 1 < cap) out[j++] = *p++;
-        else break;
+    char src[PATHN], dst[PATHN];
+    snprintf(dst, sizeof dst, "%s/test", name);
+    if (!make_dirs(dst)) return CLI_IO;
+    for (size_t i = 0; i < sizeof STARTER_FILES / sizeof *STARTER_FILES; i++) {
+        snprintf(src, sizeof src, "%s/starter/%s", sdk, STARTER_FILES[i]);
+        snprintf(dst, sizeof dst, "%s/%s", name, STARTER_FILES[i]);
+        size_t len;
+        unsigned char *data = cli_read_file(ctx, src, &len);
+        if (!data) return CLI_IO;
+        int rc;
+        if (strncmp(STARTER_FILES[i], "test/", 5) == 0) {
+            /* rom = "../game.sfc" -> the project's ROM */
+            char *text = malloc(len + 1), *at;
+            if (!text) { free(data); return CLI_IO; }
+            memcpy(text, data, len); text[len] = '\0';
+            if ((at = strstr(text, "../game.sfc")) != NULL) {
+                char out[8192];
+                *at = '\0';
+                snprintf(out, sizeof out, "%s../%s.sfc%s", text, leaf, at + strlen("../game.sfc"));
+                rc = write_text(ctx, dst, out);
+            } else rc = cli_write_file(ctx, dst, data, len);
+            free(text);
+        } else rc = cli_write_file(ctx, dst, data, len);
+        free(data);
+        if (rc != CLI_OK) return rc;
     }
-    out[j] = '\0';
-    int rc = cli_write_file(ctx, path, out, j);
-    free(out);
-    return rc;
+    return CLI_OK;
 }
 
 /* mkdir -p */
@@ -303,7 +328,7 @@ static int make_dirs(const char *path)
 }
 
 static const cli_opt init_opts[] = {
-    { "template", 0, CLI_STR, "NAME", "blank (a text screen) or game (a sprite you steer, with two luna tests)", "blank" },
+    { "template", 0, CLI_STR, "NAME", "blank (a text screen) or game (the SDK's starter: a sprite you steer, its settings file, two luna tests)", "blank" },
 };
 
 static int run_init(cli_ctx *ctx)
@@ -312,7 +337,7 @@ static int run_init(cli_ctx *ctx)
     const char *name = ctx->args[0], *tpl = cli_str(ctx, "template", "blank");
     const char *modules;
     if (strcmp(tpl, "blank") == 0) modules = "console dma text background";
-    else if (strcmp(tpl, "game") == 0) modules = "console sprite dma input background";
+    else if (strcmp(tpl, "game") == 0) modules = "console dma sprite input";
     else { cli_error(ctx, NULL, "unknown template '%s' — blank or game", tpl); return CLI_REFUSED; }
 
     char sdk[PATHN];
@@ -337,15 +362,7 @@ static int run_init(cli_ctx *ctx)
     int rc;
     snprintf(p, sizeof p, "%s/main.c", name);
     if (strcmp(tpl, "blank") == 0) rc = write_text(ctx, p, TEMPLATE_BLANK_MAIN);
-    else {
-        rc = write_text(ctx, p, TEMPLATE_GAME_MAIN);
-        snprintf(p, sizeof p, "%s/test", name);
-        if (rc == CLI_OK && !make_dirs(p)) rc = CLI_IO;
-        snprintf(p, sizeof p, "%s/test/boot.toml", name);
-        if (rc == CLI_OK) rc = write_template(ctx, p, TEMPLATE_GAME_BOOT, leaf);
-        snprintf(p, sizeof p, "%s/test/walk_right.toml", name);
-        if (rc == CLI_OK) rc = write_template(ctx, p, TEMPLATE_GAME_WALK, leaf);
-    }
+    else rc = copy_starter(ctx, sdk, name, leaf);
     if (rc != CLI_OK) return rc;
 
     /* the header's title: 21 characters, upper case, _ and - as spaces */

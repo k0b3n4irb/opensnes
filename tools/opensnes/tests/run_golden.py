@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Golden tests for opensnes (the project CLI; a shell script until 2026-10-06).
 
-The contract of a port: the same bytes. golden/blank and golden/game hold
-what the shell script's `init` wrote (main.c, the two luna manifests, the
-Makefile with its SDK path replaced by @SDK@), and golden/upgrade.txt what
+The contract of a port: the same bytes. golden/blank holds what the shell
+script's `init` wrote (main.c, the Makefile with its SDK path replaced by
+@SDK@); `--template game` copies the SDK's starter/ (its main.c, sprite,
+settings file, .gitignore and two luna tests, the tests' ROM renamed after
+the project), so its files are compared with starter/ itself and only its
+Makefile with golden/game. golden/upgrade.txt holds what
 its `upgrade` printed on a source using all 46 removed names and the five
 calls that changed meaning — itself identical to the Python checker it had
 replaced the day before. `init` runs against a fake SDK (a folder holding
@@ -40,7 +43,15 @@ def fake_sdk(work: Path) -> Path:
     sdk = work / "sdk"
     (sdk / "make").mkdir(parents=True)
     (sdk / "make" / "common.mk").write_text("# a fake SDK for the init tests\n")
+    for rel in STARTER_FILES:   # the game template copies these
+        (sdk / "starter" / rel).parent.mkdir(parents=True, exist_ok=True)
+        (sdk / "starter" / rel).write_bytes((STARTER / rel).read_bytes())
     return sdk
+
+
+STARTER = Path(__file__).resolve().parents[3] / "starter"
+STARTER_FILES = ["main.c", "res/player.png", "res/player.png.toml", ".gitignore",
+                 "test/boot.toml", "test/walk_right.toml"]
 
 
 def init_case(template, name, files):
@@ -56,6 +67,13 @@ def init_case(template, name, files):
             leaf = Path(name).name
             for rel in files:
                 got = work / name / rel
+                if template == "game" and rel != "Makefile":
+                    want_bytes = (STARTER / rel).read_bytes().replace(b"../game.sfc", f"../{leaf}.sfc".encode())
+                    if not got.is_file():
+                        errs.append(f"{rel}: not written")
+                    elif got.read_bytes() != want_bytes:
+                        errs.append(f"{rel}: differs from starter/{rel}")
+                    continue
                 want = (g.golden / template / Path(rel).name).read_text()
                 want = want.replace("@SDK@", sdk.as_posix()).replace("my_game-2", leaf).replace("blank-one", leaf)
                 if rel == "Makefile":   # the title: 21 characters, upper case, - and _ as spaces
@@ -74,10 +92,11 @@ def init_case(template, name, files):
 
 
 g.check("init blank-one == the shell CLI's files", "main.c, Makefile, res/", init_case("blank", "blank-one", ["main.c", "Makefile"]))
-g.check("init my_game-2 --template game == the shell CLI's files", "main.c, Makefile, two manifests",
-        init_case("game", "my_game-2", ["main.c", "Makefile", "test/boot.toml", "test/walk_right.toml"]))
+GAME_FILES = ["Makefile"] + STARTER_FILES
+g.check("init my_game-2 --template game == starter/ + its Makefile", "the starter's files, tests renamed",
+        init_case("game", "my_game-2", GAME_FILES))
 g.check("init sub/dir/deep_game --template game (a path: the leaf names the ROM)", "nested folders made",
-        init_case("game", "sub/dir/deep_game", ["main.c", "Makefile", "test/boot.toml", "test/walk_right.toml"]))
+        init_case("game", "sub/dir/deep_game", GAME_FILES))
 
 
 def refused(label, argv, needle, home="fake", pre=None, nothing=None):

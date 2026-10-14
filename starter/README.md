@@ -15,10 +15,9 @@ page to make your own copy, then clone it.
 [OpenSNES](https://github.com/k0b3n4irb/opensnes) repo *is* this project. Copy
 it anywhere and start editing.
 
-> **Just want a project folder, no git repo or CI?** The SDK ships a scaffolder:
-> `opensnes init my-game --template game` writes a minimal single-file project
-> locally. This starter is the heavier option — a real git repo with CI and a
-> PNG→tiles asset pipeline, ready to push to GitHub.
+> **Just want a project folder, no git repo or CI?** `opensnes init my-game
+> --template game` copies this project (main.c, the sprite and its settings
+> file, the two tests) into a new folder named after your game.
 
 ## Build & run
 

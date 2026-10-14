@@ -118,8 +118,11 @@ opensnes run                            # builds the ROM and launches your emula
 template:
 
 - **`--template blank`** — a "HELLO SNES!" text screen, the simplest starting point.
-- **`--template game`** — a white sprite you move with the D-pad, a starting
-  point for an action game.
+- **`--template game`** — a sprite you steer with the D-pad: the SDK's
+  starter project. Its picture, `res/player.png`, has a settings file beside
+  it (`res/player.png.toml`) that the build reads to convert it, the model
+  for every asset you add; `test/` holds two luna tests that `make test`
+  runs.
 
 Other commands (@ref tools_opensnes): `opensnes build`, `opensnes clean`, and `opensnes doctor` (checks
 your toolchain, library, and emulator and tells you what is missing). Run
