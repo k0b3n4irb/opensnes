@@ -30,8 +30,8 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 96be7ae92afd84c3ff9745742b76fdf3fc75df91 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
+| compiler/qbe | a2cfdffe1c9d3ce6f0c313508c4d4ba7ffdd4dd7 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -101,7 +101,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 126 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 127 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -193,14 +193,21 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 4 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29)
+### compiler/wla-dx — 5 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29; no-room message, 2026-10-14)
 
 ```
+7382e4c wlalink: a section with no room names its first label, and says when it is larger than a bank
 8077133 wlalink: the [ramsections] listing of the .sym ignores .BASE too
 9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
+
+`7382e4c` (2026-10-14) changes a message only: a section that finds no
+room in ROM is refused naming its first label (for a C const object, its C
+name) and, when it is larger than a bank, saying that a section cannot span
+banks. A game built on the SDK hit it with a table larger than a bank
+that died, one step earlier, in QBE (see the QBE note). No ROM byte changes (88/88).
 
 `8077133` (2026-09-29) is the third place the base leaked: the
 `[ramsections]` block of the `.sym`, which listed a HiROM `$7E` section as

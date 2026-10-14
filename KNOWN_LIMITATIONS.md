@@ -228,6 +228,19 @@ them whatever the object order. **Test:** every link runs
 close the `.data_init` section; a wlalink change to that sort would stop
 there, not in a game.
 
+### 🟡 A const object fits in one ROM bank
+A C `const` table, string or struct is one linker section, and a section
+cannot span ROM banks: an object is at most a bank, **32 KB in LoROM**,
+64 KB in HiROM, less whatever else the linker put in the bank it chooses.
+The link stops naming the object, its size and the bank's:
+`No room for section ".rodata.1" (object "table.main") (43008 bytes) in ROM
+bank 7: it is larger than a ROM bank (32768 bytes), and a section cannot
+span banks; split it.` (A `static` is named `name.file`.)
+
+**Mitigation:** split the table, along a seam the code already has (one
+table per level, per variant, per screen). The compiler itself has no limit
+on the number of elements.
+
 ### 🟠 cc65816 pushes function args **LEFT-TO-RIGHT**
 PVSnesLib (tcc816) pushes args right-to-left, the C convention. cc65816 pushes
 **left-to-right**. ASM functions ported from PVSnesLib without changing the stack

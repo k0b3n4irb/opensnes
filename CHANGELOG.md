@@ -98,6 +98,14 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(compiler): **a const table of more than 16,384 elements compiles.**
+  QBE's emitter buffered the items of an initialized object in a fixed table
+  of 16,384 and died on the next with "too many data items", naming nothing
+  (found by a game built on the SDK). The buffer
+  grows. What bounds an object is the ROM bank — a section cannot span one —
+  and wlalink now says so: its no-room refusal names the object (the
+  section's first label), its size and the bank's (`KNOWN_LIMITATIONS.md`).
+  No ROM of the corpus changes (88/88 byte-identical).
 - fix(release): **the SDK zip installs luna again.** `scripts/install-luna.sh`
   checks the archive it downloads against `testing/luna.sha256`, and the zip
   shipped `luna.version` without it: in a freshly unzipped SDK, the installer
