@@ -6,7 +6,7 @@
  *   opensnes-music spc     [--out DIR] [--json] <a.it>...
  *   opensnes-music inspect [--json] <a.it>...
  *
- * The converter is smconv's (tools/smconv/src: itloader, it2spc, brr —
+ * The converter is smconv's (tools/lib/smconv/src: itloader, it2spc, brr —
  * SNESMOD by Mukunda Johnson, (C) 2009): a soundbank from here is byte for
  * byte what `smconv -s -o NAME -b N -n -p NAME` wrote. `bank` writes
  * NAME.asm, NAME.h and NAME.bnk; `spc` writes a standalone .spc per module

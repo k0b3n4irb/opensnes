@@ -41,11 +41,46 @@ bank = 1
 and `.bnk` beside the file; `opensnes-music bank music/*.it --name
 soundbank --save` writes that file from a command-line run.
 
-In a project, the build runs `opensnes-music bank` for you: `USE_SNESMOD :=
-1` and `SOUNDBANK_SRC := music/song.it` in the Makefile convert the modules
-and link the soundbank (`SOUNDBANK_BANK` is the `--bank`). A settings file
-is for running the tool by hand; the build links a soundbank only through
-`SOUNDBANK_SRC`.
+## In a game
+
+The build runs `opensnes-music bank` for you; you list the modules in the
+Makefile:
+
+```makefile
+USE_SNESMOD   := 1
+SOUNDBANK_SRC := music/theme.it sfx/effects.it    # one module per file
+```
+
+It converts them (`--name soundbank`, `--bank` from `SOUNDBANK_BANK`, 1 by
+default) and links the soundbank; the HiROM build relocates its origin for
+you. A settings file is for running the tool by hand: the build links a
+soundbank only through `SOUNDBANK_SRC`. In C, the `.h` gives each module
+and effect a name:
+
+```c
+#include "soundbank.h"
+
+snesmodInit();
+snesmodSetSoundbank(SOUNDBANK_BANK);
+snesmodLoadModule(MOD_THEME);             // load a module
+u8 jump = snesmodLoadEffect(SFX_JUMP);    // load an effect, keep its slot
+snesmodPlay(0);                           // play from pattern 0
+
+/* in the game loop */
+snesmodPlayEffect(jump, 127, 128, SNESMOD_PITCH_NORMAL);   // volume, pan, pitch
+snesmodProcess();                         // once per frame
+```
+
+`examples/audio/snesmod_music`, `snesmod_sfx`, and the games `likemario` and
+`tetris` do this. The runtime side is @ref tutorial_audio.
+
+- **Many modules, one bank.** Songs through `snesmodLoadModule(N)` and
+  `snesmodPlay(0)`, effects through `snesmodLoadEffect(N)` and
+  `snesmodPlayEffect(slot, …)`.
+- **The SPC700 limits are real.** Eight channels; samples become BRR at
+  32 kHz at most; `inspect` says how much of the 64 KB a module takes, and
+  music and samples share it.
+
 
 ## Inspect
 
@@ -79,13 +114,3 @@ outputs, the modules and their SPC RAM figures on stdout as one object.
 The converter's diagnostics come out in the same shape (`opensnes-music:
 file: message`), on stderr; under `--json` the warnings are listed in a
 `warnings` array.
-
-## From smconv
-
-| smconv | opensnes-music |
-|---|---|
-| `smconv -s -o NAME -b N -n -p NAME a.it b.it` | `opensnes-music bank a.it b.it --name NAME --bank N` |
-| `smconv -s -f ...` | `--same-size` |
-| `smconv a.it` (an `.spc`) | `opensnes-music spc a.it` |
-| `smconv -V` (RAM usage) | `opensnes-music inspect` |
-| `-i` (HiROM) | the build relocates the origin, as before |

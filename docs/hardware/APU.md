@@ -4,8 +4,8 @@ The audio processing unit: a sound CPU (SPC700), a sound generator (S-DSP)
 and their own 64 KB of RAM (ARAM), apart from the main CPU. This page is the
 hardware; music is @ref tutorial_audio, samples from C and SPC700 programs of
 your own are @ref tutorial_audio_samples, and the
-converters are @ref tools_opensnes_sample (WAV to BRR),
-@ref tools_opensnes_music (Impulse Tracker to soundbank) and @ref tools_smconv.
+converters are @ref tools_opensnes_sample (WAV to BRR) and
+@ref tools_opensnes_music (Impulse Tracker to soundbank).
 
 ## Overview
 

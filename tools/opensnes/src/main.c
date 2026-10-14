@@ -625,8 +625,7 @@ static int run_release(cli_ctx *ctx)
 static const char *const REQUIRED_BINS[] = { "cc65816", "cproc-qbe", "qbe", "wla-65816", "wlalink", "opensnes-rom" };
 static const char *const ASSET_BINS[] = {
     "opensnes-sprite", "opensnes-tileset", "opensnes-level", "opensnes-text", "opensnes-palette", "opensnes-image",
-    "opensnes-sample", "opensnes-music", "opensnes-save", "gfx4snes", "smconv", "wav2brr", "tmx2snes",
-    "wla-spc700", "wla-superfx", "sa1_patch",
+    "opensnes-sample", "opensnes-music", "opensnes-save", "wla-spc700", "wla-superfx", "sa1_patch",
 };
 
 typedef struct { cli_ctx *ctx; int fails, warns; } doctor;

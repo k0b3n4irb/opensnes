@@ -14,15 +14,7 @@
 *.dbg
 
 # Binary executables (rebuilt from source)
-tools/aseprite2snes/aseprite2snes
-tools/font2snes/font2snes
-tools/gfx4snes/gfx4snes
-tools/img2snes/img2snes
-tools/palplan/palplan
 tools/sa1-patch/sa1_patch
-tools/smconv/smconv
-tools/wav2brr/wav2brr
-tools/tmx2snes/tmx2snes
 tools/opensnes-sample/opensnes-sample
 tools/opensnes-music/opensnes-music
 tools/opensnes-rom/opensnes-rom

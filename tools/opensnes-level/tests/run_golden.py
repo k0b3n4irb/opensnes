@@ -2,7 +2,7 @@
 """Golden tests of opensnes-level.
 
 The data outputs (.m16 / .q16 / .c16 / .b16 / .o16) must equal tmx2snes's
-goldens byte for byte: the converter is the same code (tools/tmx2snes/src/level.c).
+goldens byte for byte: the converter is the same code (tools/lib/tmx2snes/src/level.c).
 The glue (.inc, _data.as) and the entities header are the family's own.
 """
 from __future__ import annotations
@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
 from golden import Golden  # noqa: E402
 
 g = Golden("opensnes-level", __file__)
-TMX = Path(__file__).resolve().parents[2] / "tmx2snes" / "tests" / "golden"
+TMX = Path(__file__).resolve().parents[2] / "lib" / "tmx2snes" / "tests" / "golden"
 INPUTS = ["town.tmj", "tileset.map"]
 ALL = ["convert", "-q", "--tileset", "tileset.map", "--entities", "--quadrant", "--collision", "town.tmj"]
 

@@ -21,8 +21,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
 from golden import Golden  # noqa: E402
 
 g = Golden("opensnes-palette", __file__)
-PALPLAN = g.here.parents[1] / "palplan" / "tests" / "golden"
-IMG = g.here.parents[1] / "img2snes" / "tests" / "golden"
+PALPLAN = g.here.parents[1] / "lib" / "palplan" / "tests" / "golden"
+IMG = g.here.parents[1] / "lib" / "img2snes" / "tests" / "golden"
 
 g.expect_outputs("plan project.toml (cgram = true): the CGRAM image == palplan -b", ["plan", "-q", "project.toml"], copy="*",
                  outputs=["project.pal"], want_dir=PALPLAN)

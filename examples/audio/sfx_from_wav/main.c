@@ -10,7 +10,7 @@
  * committed, they are generated on demand like a .pic from a .png.
  *
  * See docs/tutorials/audio_samples.md ("One-shot samples from WAV") and
- * tools/wav2brr for the converter.
+ * tools/opensnes-sample for the converter.
  *
  * Init order: textModeInit (display), audioInit, load samples, setScreenOn.
  * Modules: console, dma, audio, input, background, text.

@@ -1,20 +1,20 @@
 # Legacy tools {#tools_legacy}
 
-The SDK's `bin/` still holds the converters a project written before the
-`opensnes-*` family uses: `gfx4snes`, `tmx2snes`, `img2snes`, `font2snes`,
-`wav2brr`, `palplan` and `aseprite2snes`. They work as they always did, and
-the build still runs `gfx4snes` for a `GFXSRC` list and `wav2brr` for a
-`.wav` whose `.brr` is `.incbin`'d. This page is for someone holding such a
-project: what each tool did, and the `opensnes-*` command that replaces it,
-option by option. A new project starts from @ref tools.
+Before the `opensnes-*` family, the SDK shipped eight converters:
+`gfx4snes` and `smconv` (from PVSnesLib), `tmx2snes`, `img2snes`,
+`font2snes`, `wav2brr`, `palplan` and `aseprite2snes`. They are no longer
+shipped: each one's converter is linked into the tool that replaced it,
+which writes the same bytes. This page is for someone holding a project
+that used them: what each tool did, and the `opensnes-*` command that
+replaces it, option by option. A new project starts from @ref tools.
 
 Moving an asset over is one settings file beside it (`res/hero.png.toml`,
 with a `tool` line and one table, @ref tools_conventions): the build then
-converts it on its own, and the old Makefile line goes. Each new tool's page
-carries the same table, with the outputs it writes.
-
-`smconv` is not on this page: the build still drives it through
-`USE_SNESMOD` and `SOUNDBANK_SRC`, and it keeps its own page, @ref tools_smconv.
+converts it on its own, and the old Makefile line goes. A project that
+still sets `GFXSRC` stops with a message naming the replacement; the
+`.wav` → `.brr` rule is gone too (a `.wav.toml` beside the sound replaces
+it). Music needs nothing: `SOUNDBANK_SRC` works as before, converted by
+@ref tools_opensnes_music.
 
 # gfx4snes {#tools_gfx4snes}
 
@@ -143,3 +143,17 @@ tables, one per tag, for the `anim` module. Now `opensnes-sprite anim`
 | `-p PREFIX` | `--prefix NAME` |
 | `-t STRIDE` | `--stride N` |
 | `-f FPS` | `--fps N` |
+
+# smconv {#tools_smconv}
+
+Converted Impulse Tracker modules into a SNESMOD soundbank, or a
+standalone `.spc`. Replaced by `opensnes-music` (@ref tools_opensnes_music),
+which the build runs for `SOUNDBANK_SRC`.
+
+| smconv | opensnes-music |
+|---|---|
+| `smconv -s -o NAME -b N -n -p NAME a.it b.it` | `opensnes-music bank a.it b.it --name NAME --bank N` |
+| `smconv -s -f ...` | `--same-size` |
+| `smconv a.it` (an `.spc`) | `opensnes-music spc a.it` |
+| `smconv -V` (RAM usage) | `opensnes-music inspect` |
+| `-i` (HiROM) | the build relocates the origin, as before |

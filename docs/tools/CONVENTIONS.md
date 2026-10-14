@@ -7,8 +7,8 @@ The `opensnes-*` family replaces the earlier converters (`gfx4snes`, `smconv`, `
 live beside the asset, no interpreter to install**. This page is the
 contract every tool in the family follows; a tool that does not is a bug.
 
-The earlier tools (gfx4snes, font2snes…) are still in the zip; @ref tools_legacy
-says which tool of the family replaces each.
+The earlier tools (gfx4snes, smconv, font2snes…) are no longer shipped;
+@ref tools_legacy says which tool of the family replaces each.
 
 ## The family
 

@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
 from golden import Golden  # noqa: E402
 
 g = Golden("opensnes-text", __file__)
-FNT = g.here.parents[1] / "font2snes" / "tests" / "golden"
+FNT = g.here.parents[1] / "lib" / "font2snes" / "tests" / "golden"
 font4 = (g.fixtures / "font.png").read_bytes()   # font2snes's 4 bpp golden is named font4
 
 g.expect_outputs("font font.png == font2snes font.png font.pic (2 bpp tiles + grey palette)", ["font", "-q", "font.png"],

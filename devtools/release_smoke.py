@@ -94,6 +94,14 @@ def main() -> int:
                 sys.exit(f"release-smoke: FAIL: testing/luna.sha256 has no sum for "
                          f"luna_{version}_{target}.zip")
 
+        # The 0.x converters are retired: their code lives in the opensnes-*
+        # tools, and a binary of theirs in the zip is a stale bin/.
+        retired = {"gfx4snes", "smconv", "wav2brr", "tmx2snes", "aseprite2snes",
+                   "font2snes", "img2snes", "palplan"}
+        shipped = sorted(p.stem for p in (sdk / "bin").iterdir() if p.stem in retired)
+        if shipped:
+            sys.exit(f"release-smoke: FAIL: retired converters in bin/: {', '.join(shipped)}")
+
         stale = sorted(p.name for p in starter.rglob("*") if p.suffix in BUILD_OUTPUTS)
         if stale:
             sys.exit(f"release-smoke: FAIL: starter/ ships build output: {', '.join(stale[:8])}")

@@ -91,7 +91,7 @@ the link-time checks — are on @subpage tools_build, each with its default.
 Music is the one asset the build takes from the Makefile rather than from a
 settings file: `USE_SNESMOD := 1` and `SOUNDBANK_SRC := music/song.it` run
 @ref tools_opensnes_music and link the soundbank the SNESMOD driver plays.
-@subpage tools_smconv is the earlier converter of the same files.
+The earlier converter of the same files, `smconv`, is on @ref tools_legacy.
 
 ## The emulator: luna
 

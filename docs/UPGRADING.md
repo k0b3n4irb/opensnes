@@ -135,3 +135,22 @@ install — in the repository, `make check-upgrade SRC=<folder>` is the same
 command). Exit 0 when nothing is found. A source that fails to compile
 gets the removed names it uses, with their replacements, right under the
 compiler's error.
+
+## After 0.50: the earlier converters are retired
+
+`gfx4snes`, `smconv`, `wav2brr`, `tmx2snes`, `aseprite2snes`, `font2snes`,
+`img2snes` and `palplan` are no longer in `bin/` or in the zip. Their code
+is linked into the `opensnes-*` tools, which write the same bytes.
+
+- **Music** (`USE_SNESMOD`, `SOUNDBANK_SRC`): nothing to change. The build
+  converts the modules with `opensnes-music`, to the same soundbank.
+- **`GFXSRC`**: the build stops with a message. Put a settings file beside
+  each picture instead (`res/hero.png.toml` with `tool = "opensnes-sprite"`
+  for a sprite sheet, `"opensnes-tileset"` for a background);
+  @ref tools_legacy maps the gfx4snes options.
+- **A `.wav` whose `.brr` an assembly file `.incbin`s**: the automatic
+  rule is gone. A `res/sound.wav.toml` with `tool = "opensnes-sample"`
+  converts it, or commit the `.brr`.
+- **A script that called one of these commands**: @ref tools_legacy gives
+  the replacing command, option by option.
+

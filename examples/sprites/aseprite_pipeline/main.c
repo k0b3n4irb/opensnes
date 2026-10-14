@@ -37,7 +37,7 @@
  * @par Modules Used
  * console, sprite, dma, text, text4bpp, background, input, anim
  *
- * @see sprite.h, anim.h, dma.h, input.h, tools/aseprite2snes
+ * @see sprite.h, anim.h, dma.h, input.h, docs/tools/opensnes-sprite.md
  */
 
 #include <snes.h>

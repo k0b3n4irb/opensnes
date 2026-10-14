@@ -3,7 +3,7 @@
 
 The contract of the family (docs/tools/CONVENTIONS.md): a tool that absorbs
 a 0.x tool reproduces that tool's golden suite byte for byte. So the .brr
-cases compare against wav2brr's own goldens (`tools/wav2brr/tests/golden`),
+cases compare against wav2brr's own goldens (`tools/lib/wav2brr/tests/golden`),
 not against copies. The rest is this tool's: the generated header, the
 --json shapes, the settings file beside the asset, the refusals.
 
@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
 from golden import Golden  # noqa: E402
 
 g = Golden("opensnes-sample", __file__)
-WAV2BRR = g.here.parents[1] / "wav2brr" / "tests" / "golden"   # the absorbed tool's goldens
+WAV2BRR = g.here.parents[1] / "lib" / "wav2brr" / "tests" / "golden"   # the absorbed tool's goldens
 LOOP = ["--loop", "40", "200"]
 SETTINGS = 'tool = "opensnes-sample"\n[encode]\nloop = [40, 200]\n'
 

@@ -155,7 +155,7 @@ lint-cppcheck:
 			--suppress='*:tools/third_party/stb_image.h' \
 			--suppress='*:tools/third_party/cute_tiled.h' \
 			-DTOOL_VERSION='"x"' -DTOOL_BUILD_DATE='"x"' \
-			-Itools/smconv/src -Itools/third_party tools/*/src tools/third_party \
+			-Itools/lib/smconv/src -Itools/third_party tools/*/src tools/lib/*/src tools/third_party \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
 		&& { [ ! -d compiler/qbe/w65816 ] || cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \
@@ -203,9 +203,15 @@ compiler: submodules verify-toolchain
 	$(MAKE) -C $(COMPILER_PATH)
 	$(MAKE) -C $(COMPILER_PATH) install
 
+# The 0.x converters, retired: their code is linked into the opensnes-*
+# tools (tools/lib/), their binaries are no longer built. A tree that built
+# them before still has them in bin/, and the release copies bin/*.
+RETIRED_TOOLS := gfx4snes smconv wav2brr tmx2snes aseprite2snes font2snes img2snes palplan
+
 tools: compiler
 	$(MAKE) -C $(TOOLS_PATH)
 	$(MAKE) -C $(TOOLS_PATH) install
+	@rm -f $(foreach t,$(RETIRED_TOOLS),bin/$(t) bin/$(t).exe)
 
 lib: compiler
 	$(MAKE) -C $(LIB_PATH)
@@ -392,14 +398,6 @@ test-difftest:
 # against committed goldens — needs `make tools` first. Also the CI job
 # `tools-golden` (lint.yml) runs exactly this target (review P4).
 test-tools:
-	@python3 tools/gfx4snes/tests/run_golden.py
-	@python3 tools/tmx2snes/tests/run_golden.py
-	@python3 tools/smconv/tests/run_golden.py
-	@python3 tools/wav2brr/tests/run_golden.py
-	@python3 tools/palplan/tests/run_golden.py
-	@python3 tools/aseprite2snes/tests/run_golden.py
-	@python3 tools/font2snes/tests/run_golden.py
-	@python3 tools/img2snes/tests/run_golden.py
 	@python3 tools/opensnes-sample/tests/run_golden.py
 	@python3 tools/opensnes-music/tests/run_golden.py
 	@python3 tools/opensnes-rom/tests/run_golden.py

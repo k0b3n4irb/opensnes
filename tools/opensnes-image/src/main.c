@@ -31,8 +31,8 @@
 #include "cli.h"
 #include "incfile.h"
 #include "lodepng.h"
-#include "quantize.h"   /* tools/img2snes/src: median cut */
-#include "tiles.h"      /* tools/font2snes/src: convert_tile_4bpp */
+#include "quantize.h"   /* tools/lib/img2snes/src: median cut */
+#include "tiles.h"      /* tools/lib/font2snes/src: convert_tile_4bpp */
 
 #define PI 3.14159265358979323846
 

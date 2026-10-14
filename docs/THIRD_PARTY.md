@@ -10,7 +10,7 @@ This document lists third-party tools and libraries included in OpenSNES, along 
 
 **Original Author**: Alekmaul (https://github.com/alekmaul)
 
-**Source**: [PVSnesLib](https://github.com/alekmaul/pvsneslib) - `tools/gfx4snes/`
+**Source**: [PVSnesLib](https://github.com/alekmaul/pvsneslib) - `tools/lib/gfx4snes/`
 
 **Version**: 2.0.0 (develop branch, 2025-01-25)
 
@@ -41,7 +41,7 @@ SOFTWARE.
 ```
 
 **Embedded in**: `opensnes-tileset` and `opensnes-sprite`, which link its
-converter sources (`tools/gfx4snes/src/`: images, palettes, tiles, maps,
+converter sources (`tools/lib/gfx4snes/src/`: images, palettes, tiles, maps,
 metasprites, lz77, loadbmp) as a library; their `.pic`, `.map`, `.pal` and
 `_meta.inc` are byte for byte gfx4snes's. The standalone `gfx4snes` is
 legacy (@ref tools_legacy).
@@ -57,12 +57,12 @@ legacy (@ref tools_legacy).
 
 **Original Author**: Alekmaul (https://github.com/alekmaul)
 
-**Source**: [PVSnesLib](https://github.com/alekmaul/pvsneslib) - `tools/smconv/`
+**Source**: [PVSnesLib](https://github.com/alekmaul/pvsneslib) - `tools/lib/smconv/`
 
 **License**: MIT License (same as above)
 
 **Embedded in**: `opensnes-music`, which links the converter sources of
-`tools/smconv/src/` (IT loader, IT-to-SPC conversion, BRR encoder, report),
+`tools/lib/smconv/src/` (IT loader, IT-to-SPC conversion, BRR encoder, report),
 and `opensnes-sample`, which links its BRR encoder (`brr.c`). The build
 converts `SOUNDBANK_SRC` with `opensnes-music`.
 

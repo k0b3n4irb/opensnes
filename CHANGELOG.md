@@ -68,6 +68,20 @@ All notable changes to OpenSNES are documented in this file.
   more in a ROM that divides 32 bits.
 
 ### Changed
+- build(tools): **the eight earlier converters are retired.** `gfx4snes`,
+  `smconv`, `wav2brr`, `tmx2snes`, `aseprite2snes`, `font2snes`, `img2snes`
+  and `palplan` each did what an `opensnes-*` tool now does with the same
+  code, to the same bytes (every new tool's golden suite compares against
+  the old one's goldens; smconv's compressed-sample cases now run through
+  `opensnes-music`). Their binaries are no longer built or shipped; their
+  converter sources and goldens moved to `tools/lib/`, linked into the tools
+  that replaced them, so `tools/` lists only the shipped tools. SNESMOD
+  music (`SOUNDBANK_SRC`) is converted by `opensnes-music`, to identical
+  soundbanks and ROMs in the six examples that use it. `GFXSRC` (no example
+  or known project used it) stops the build with a message naming the
+  settings file that replaces it; the `.wav` -> `.brr` rule is gone (a
+  `.wav.toml` replaces it). `docs/UPGRADING.md` and `docs/tools/legacy.md`
+  say what to change.
 - feat(lib): **the echo ring takes what its delay needs.** It started at
   `$C000` whatever the delay: the first `audioSetEcho()` took 16 KB off the
   sample area for a ring of 2 KB per unit of delay, and a game with more

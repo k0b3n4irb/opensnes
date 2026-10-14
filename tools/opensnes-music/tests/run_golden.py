@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
 from golden import Golden  # noqa: E402
 
 g = Golden("opensnes-music", __file__)
-SMCONV = g.here.parents[1] / "smconv" / "tests" / "golden"
+SMCONV = g.here.parents[1] / "lib" / "smconv" / "tests" / "golden"
 BANK = ["bank", "-q", "--name", "soundbank", "--bank", "1", "pollen8.it"]
 
 g.expect_outputs("bank pollen8.it --name soundbank --bank 1 == smconv's soundbank.{asm,h,bnk}", BANK,
@@ -64,7 +64,7 @@ g.expect_refused("bank --bank x (usage)", ["bank", "--bank", "x", "pollen8.it"],
 # with every sample compressed (it214, it215: the plain golden, unchanged),
 # 16-bit and multi-block twins (the uncompressed twin converted in the same
 # run is the reference), and two cut-short compressed blocks refused.
-SMCONV_TESTS = g.here.parents[1] / "smconv" / "tests"
+SMCONV_TESTS = g.here.parents[1] / "lib" / "smconv" / "tests"
 sys.path.insert(0, str(SMCONV_TESTS))
 import itcompress  # noqa: E402
 import struct  # noqa: E402

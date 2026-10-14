@@ -55,9 +55,9 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **License**: MIT
 - **What we use**: the IT 2.14 / 2.15 sample decompressor of
   `itmod/itsamplecodec.go` and `itmod/bitstream.go`, ported to C in
-  `tools/smconv/src/itloader.c` (decoder only), and the test module
+  `tools/lib/smconv/src/itloader.c` (decoder only), and the test module
   `itmod/test/reflection.it`, copied as
-  `tools/smconv/tests/fixtures/reflection.it`
+  `tools/lib/smconv/tests/fixtures/reflection.it`
 - **Licence text**:
 
   > Copyright 2025 Mukunda Johnson (mukunda.com)

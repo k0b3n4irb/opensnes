@@ -4,7 +4,7 @@
 #define OPENSNES_SAMPLE_WAV_H
 
 #include <stddef.h>
-#include "basetypes.h"   /* s16, from tools/smconv/src */
+#include "basetypes.h"   /* s16, from tools/lib/smconv/src */
 
 typedef struct {
     s16 *pcm;        /* mono, signed 16-bit, malloc'd (caller frees) */

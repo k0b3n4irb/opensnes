@@ -27,7 +27,7 @@
 #include "cli.h"
 #include "incfile.h"
 #include "lodepng.h"
-#include "quantize.h"   /* tools/img2snes/src */
+#include "quantize.h"   /* tools/lib/img2snes/src */
 #include "scale.h"
 
 /* ================================================================== plan */
