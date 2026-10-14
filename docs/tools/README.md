@@ -7,6 +7,27 @@ takes an artist- or musician-friendly source format and writes the exact binary
 the hardware (and this SDK's runtime) expects. They are compiled programs in the
 SDK's `bin/`; a game's build needs nothing else installed.
 
+## Start from your asset
+
+You rarely type a tool's name. Put the asset in `res/`, a settings file
+beside it naming the tool, and `make` converts it; the generated `.inc`
+(next to the asset) lists the symbols your C uses.
+
+| I have… | Beside it I write… | In C I get… |
+|---------|--------------------|-------------|
+| a background picture `res/bg.png` | `res/bg.png.toml`: `tool = "opensnes-tileset"`, `[convert]` | tiles, tilemap and palette, and a `BgAsset` for `bgLoad()` |
+| a sprite sheet `res/hero.png` | `res/hero.png.toml`: `tool = "opensnes-sprite"`, `[sheet]` with `size` | sprite tiles and palette (and metasprites with `metasprite`) |
+| an Aseprite export `res/hero.json` | `res/hero.json.toml`: `tool = "opensnes-sprite"`, `[anim]` | one `AnimClip` per tag, for `animPlay()` |
+| a Tiled level `res/level.tmj` | `res/level.tmj.toml`: `tool = "opensnes-level"`, `[convert]` with `tileset` | the map data `mapLoad()` reads |
+| a font picture `res/font.png` | `res/font.png.toml`: `tool = "opensnes-text"`, `[font]` | text tiles for the text module |
+| a sound `res/jump.wav` | `res/jump.wav.toml`: `tool = "opensnes-sample"`, `[encode]` | a BRR sample for `audioLoadSample()` |
+| music `music/song.it` | no settings file: `USE_SNESMOD := 1` and `SOUNDBANK_SRC := music/song.it` in the Makefile | `soundbank.h`, one constant per module and effect |
+
+The starter project (`opensnes init my-game --template game`) has one:
+`res/player.png` and `res/player.png.toml`. Each tool's page lists its
+settings, and its `--save` option writes the settings file from a command
+you tried by hand.
+
 ## The tools at a glance
 
 | Tool | Turns… | …into |

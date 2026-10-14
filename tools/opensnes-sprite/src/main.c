@@ -4,7 +4,7 @@
  * converters are linked here as libraries, so the bytes are theirs).
  *
  *   opensnes-sprite sheet   [--size N] [--bpp N] [--colors N] [--palette FILE] [--palette-entry N]
- *                           [--metasprite W H] [--priority N] [--flip] [--pack] [--lz] [--blank]
+ *                           [--metasprite W H] [--priority N] [--flip] [--lz] [--blank]
  *                           [--no-palette] [--out DIR] [--save] [--json] <sheet.png | sheet.bmp>...
  *   opensnes-sprite anim    [--prefix NAME] [--stride N] [--fps N] [--out DIR] [--json] <export.json>...
  *   opensnes-sprite inspect [--size N] [--bpp N] [--json] <sheet.png>...
@@ -64,10 +64,9 @@ static const cli_opt sheet_opts[] = {
     { "priority", 0, CLI_INT, "N", "OBJ priority (0..3) of the metasprite entries", "0" },
     { "flip", 0, CLI_FLAG, NULL, "a block that is the mirror of another is that block, flipped (metasprite entries carry OBJ_FLIPX / OBJ_FLIPY)", NULL },
     { "compact", 0, CLI_FLAG, NULL, "write each distinct block once (with --flip, mirrors count as one) and <stem>_blocks.inc: where each block of the sheet went", NULL },
-    { "pack", 0, CLI_FLAG, NULL, "packed-pixel tile format (Mode 7 style)", NULL },
     { "lz", 0, CLI_FLAG, NULL, "LZ77-compress the .pic (LzssDecode at runtime)", NULL },
     { "blank", 0, CLI_FLAG, NULL, "prepend a blank tile", NULL },
-    { "round", 0, CLI_FLAG, NULL, "round the palette (to a maximum of 63 per channel)", NULL },
+    { "round", 0, CLI_FLAG, NULL, "round each colour to the SNES's 5-bit channels instead of truncating it (the nearest colour the hardware shows)", NULL },
     { "no-palette", 0, CLI_FLAG, NULL, "do not write the .pal", NULL },
     CLI_OPT_OUT,
     CLI_OPT_SAVE,
@@ -134,7 +133,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     int size = cli_int(ctx, "size", 16), bpp = cli_int(ctx, "bpp", 4), colors = cli_int(ctx, "colors", 256);
     int entry = cli_int(ctx, "palette-entry", 0), prio = cli_int(ctx, "priority", 0);
     int metaw = 0, metah = 0, meta = cli_int2(ctx, "metasprite", &metaw, &metah);
-    int flip = cli_has(ctx, "flip"), pack = cli_has(ctx, "pack"), lz = cli_has(ctx, "lz"), blank = cli_has(ctx, "blank");
+    int flip = cli_has(ctx, "flip"), lz = cli_has(ctx, "lz"), blank = cli_has(ctx, "blank");
     int compact = cli_has(ctx, "compact");
     int ncolors = bpp_to_colors(bpp);
     if (size != 8 && size != 16 && size != 32 && size != 64) { cli_error(ctx, in, "--size %d: the OBJ sizes are 8, 16, 32 and 64", size); return CLI_REFUSED; }
@@ -214,8 +213,8 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     free(nomap);
     int nbtiles = bx * by;
 
-    if (pack) tiles_savepacked(outbase, tiles, nbtiles, blank, true);
-    else { tiles_checkbanks(tiles, nbtiles, ncolors); tiles_save(outbase, tiles, nbtiles, ncolors, blank, lz, true); }
+    tiles_checkbanks(tiles, nbtiles, ncolors);
+    tiles_save(outbase, tiles, nbtiles, ncolors, blank, lz, true);
     int savepal = !cli_has(ctx, "no-palette");
     if (savepal) palette_save(outbase, palette_snes, colors, true);
     if (compact) {
@@ -243,7 +242,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
     char ident[256], generator[64], err[160];
     cli_ident(in, ident, sizeof ident);
     snprintf(generator, sizeof generator, "%s %s", ctx->tool->name, ctx->tool->version);
-    incfile_spec spec = { generator, bpp, savepal, 0, meta, pack, 0, 0, cli_has(ctx, "lz") };
+    incfile_spec spec = { generator, bpp, savepal, 0, meta, 0, 0, 0, cli_has(ctx, "lz") };
     if (incfile_write(outbase, ident, &spec, err, sizeof err) != 0) { cli_error(ctx, in, "%s", err); return CLI_IO; }
 
     if (cli_has(ctx, "save") && (rc = cli_save_settings(ctx, in)) != CLI_OK) return rc;
@@ -255,7 +254,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
         cli_json_object(ctx, "sheet"); cli_json_int(ctx, "width", w); cli_json_int(ctx, "height", h);
         cli_json_int(ctx, "block", size); cli_json_int(ctx, "blocks_x", blksx); cli_json_int(ctx, "blocks_y", blksy); cli_json_close(ctx);
         cli_json_array(ctx, "outputs");
-        const char *exts[] = { pack ? ".pc7" : ".pic", ".inc", "_data.as", savepal ? ".pal" : NULL, meta ? "_meta.inc" : NULL,
+        const char *exts[] = { ".pic", ".inc", "_data.as", savepal ? ".pal" : NULL, meta ? "_meta.inc" : NULL,
                                compact ? "_blocks.inc" : NULL };
         const char *kinds[] = { "tiles", "header", "asm", "palette", "metasprites", "blocks" };
         for (int i = 0; i < 6; i++) {
@@ -268,7 +267,7 @@ static int sheet_one(cli_ctx *ctx, const char *in)
         cli_json_int(ctx, "metasprites", nmeta); cli_json_int(ctx, "palette_colors", savepal ? colors : 0);
         cli_json_close(ctx);
     } else if (!ctx->quiet) {
-        printf("%s: %s -> %s.%s (%d tiles, %ld bytes of VRAM at %d bpp%s%s)\n", ctx->tool->name, in, outbase, pack ? "pc7" : "pic",
+        printf("%s: %s -> %s.%s (%d tiles, %ld bytes of VRAM at %d bpp%s%s)\n", ctx->tool->name, in, outbase, "pic",
                nbtiles, vram, bpp, savepal ? ", .pal" : "", meta ? ", _meta.inc" : "");
         if (nmeta) printf("  %d metasprite%s of %dx%d\n", nmeta, nmeta == 1 ? "" : "s", metaw, metah);
         if (compact) printf("  %d blocks of %dx%d in the sheet, %d kept (_blocks.inc)\n", sheet_blocks, size, size, nkept);

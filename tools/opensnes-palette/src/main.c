@@ -393,7 +393,7 @@ static int save_indexed(cli_ctx *ctx, const char *path, const unsigned char *ind
 
 static const cli_opt quantize_opts[] = {
     { "colors", 0, CLI_INT, "N", "colours of the result (2..256): 4 for 2 bpp, 16 for 4 bpp, 256 for 8 bpp", "16" },
-    { "round", 0, CLI_FLAG, NULL, "round the palette to the SNES's 15-bit colour (multiples of 8), so the picture shows what the hardware will", NULL },
+    { "round", 0, CLI_FLAG, NULL, "round each colour to the SNES's 5-bit channels instead of truncating it (the nearest colour the hardware shows)", NULL },
     { "palette", 0, CLI_STR, "FILE", "map the pixels onto these colours instead of choosing: a .pal, or a PNG (its palette, or its colours)", NULL },
     { "scale", 0, CLI_INT, "PERCENT", "resize first, nearest neighbour (50 = half size, 200 = double)", "100" },
     { "align", 0, CLI_INT, "N", "pad the size up to a multiple of N pixels (8 for tiles)", "0" },

@@ -102,7 +102,7 @@ static const cli_opt convert_opts[] = {
     { "blank", 0, CLI_FLAG, NULL, "prepend a blank tile", NULL },
     { "lz", 0, CLI_FLAG, NULL, "LZ77-compress the .pic", NULL },
     { "pack", 0, CLI_FLAG, NULL, "packed-pixel tiles (what --mode 7 implies)", NULL },
-    { "round", 0, CLI_FLAG, NULL, "round the palette (to a maximum of 63 per channel)", NULL },
+    { "round", 0, CLI_FLAG, NULL, "round each colour to the SNES's 5-bit channels instead of truncating it (the nearest colour the hardware shows)", NULL },
     { "no-palette", 0, CLI_FLAG, NULL, "do not write the .pal", NULL },
     { "column-major", 0, CLI_FLAG, NULL, "also write <stem>.cmap, the same map column after column (<name>_cols): a column of a scrolling map is then one block", NULL },
     CLI_OPT_OUT,
