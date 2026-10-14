@@ -298,9 +298,8 @@ if (collideRectEx(&player, &wall, &dx, &dy)) {
 }
 ```
 
-This snippet subtracted the overlap until 2026-09-20, which drove the player
-deeper into the wall; the library fixture pins the sign (`dx = -6` for a
-player to the left of the wall).
+Subtracting them drives the player deeper into the wall; the library
+fixture pins the sign (`dx = -6` for a player to the left of the wall).
 
 ### Bouncing (Breakout Pattern)
 

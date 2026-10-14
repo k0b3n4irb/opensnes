@@ -127,10 +127,9 @@ oamDynamicInit(&cfg);
 
 **Implication:** a new public function does not take more than five
 arguments that change from call to call; what stays the same between calls
-goes in a struct (`MetaspriteStyle`, `Dsp1Camera`). The threshold was three
-arguments of any kind until 2026-10-03: at four and five, a struct filled
-on every call costs more than the positional form it replaces, and putting
-per-call values in a struct means writing it before each call. The
+goes in a struct (`MetaspriteStyle`, `Dsp1Camera`). Below that, a struct
+filled on every call costs more than the positional form it replaces, and
+putting per-call values in a struct means writing it before each call. The
 functions inherited from PVSnesLib keep their signature whatever their
 length. Sentinel values (`OBJ_HIDE_Y = 240`, `OAM_Y_OFFSCREEN = 224`)
 get named macros. Magic numbers in tutorials are replaced by the

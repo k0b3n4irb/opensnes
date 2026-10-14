@@ -110,8 +110,7 @@ void textLoadFont4bpp(u16 vram_addr);  /* 4bpp, needs `text4bpp` in LIB_MODULES 
 ```
 
 - `tilemap_addr` is a VRAM **word** address — the same unit as `bgSetMapPtr()`
-  and the rest of the SDK. (Before v0.23.0 it was a byte address; code that
-  passed `W * 2` now passes `W`.)
+  and the rest of the SDK.
 - `font_tile` is the tile number of the first glyph **relative to the layer's
   tile base**, not an absolute VRAM address.
 - `palette` is a slot 0–7; `textInit` masks it with `& 0x07`.
@@ -254,10 +253,9 @@ fields.
 The flush sends **the bytes written since the last VBlank**: every `text*`
 writer records the first and the last byte it touched in `tilemapBuffer`, and
 the NMI handler DMAs that range — one glyph costs 2 bytes, a counter that
-redraws one row costs that row, `textClear()` costs the whole 2048. (Until
-2026-10-12 the flush was all-or-nothing: 2048 bytes, 16,384 master cycles of
-the VBlank, for one glyph — against the roughly 4 KB of practical VBlank DMA
-budget of @ref tutorial_dma, half the frame's transfer capacity.) The range
+redraws one row costs that row, `textClear()` costs the whole 2048 (16,384
+master cycles of the VBlank, half the roughly 4 KB of practical VBlank DMA
+budget of @ref tutorial_dma). The range
 is one span: text written at the top and at the bottom of the screen in the
 same frame sends everything in between too, which is still the content the
 rows hold.
@@ -373,7 +371,7 @@ it (see the `draw_score` idiom above).
 
 ### 🟡 Passing a byte address to `textInit`
 
-`tilemap_addr` has been a VRAM **word** address since v0.23.0. Ported code that
+`tilemap_addr` is a VRAM **word** address. Ported code that
 passes `0x7000` for a tilemap at word `$3800` puts the DMA target 16 KB past
 where the BG reads its map — a blank layer, no diagnostic.
 

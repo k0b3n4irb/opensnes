@@ -93,5 +93,5 @@ tmx2snes needs.
 ## Refused maps
 
 A rotated tile (Tiled's diagonal flip), a tile id above 1024 and a map
-with more than one tileset are refused with a message naming the tile:
-each converted silently to a wrong map until 2026-10-05.
+with more than one tileset are refused with a message naming the tile,
+rather than converted to a wrong map.

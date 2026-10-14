@@ -96,6 +96,4 @@ turn a Tiled level into ready-to-load map binaries.
 A 2bpp or 4bpp map entry names one palette bank, taken from the tile's first
 opaque pixel; a tile whose opaque pixels span two banks is refused with its
 block position. `-a` rearranges the palette so that each tile's colours fit
-one bank and rewrites the tiles accordingly (since 2026-10-05 — before, the
-palette moved and the tiles did not, which is what made
-`examples/color/transparency` brown and mauve instead of blue and grey).
+one bank and rewrites the tiles accordingly.

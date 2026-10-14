@@ -1171,6 +1171,41 @@ def check_removed_api_names() -> list[str]:
     return drifts
 
 
+# Anchor 18 (2026-10-14): user pages describe the present. A dated history
+# phrase ("until 2026-10-05 it did X", "fixed 2026-09-18", "since
+# 2026-05-09") and a link into the maintainer notes (.claude/) belong in the
+# CHANGELOG and the notes, not in a page a game developer reads. The
+# documentation review of that day took 600 such lines out.
+_HISTORY_SCAN_GLOBS = ["docs/**/*.md", "README.md", "KNOWN_LIMITATIONS.md",
+                       "PHILOSOPHY.md", "ROADMAP.md", "examples/README.md"]
+_HISTORY_EXEMPT = {"docs/UPGRADING.md", "docs/MIGRATING_FROM_PVSNESLIB.md",
+                   "docs/tools/luna.md"}
+_HISTORY_RX = re.compile(r"\b(?:[Uu]ntil|[Ss]ince|[Ff]ixed(?: on)?|[Rr]esolved)\s+20\d\d-\d\d")
+_NOTES_RX = re.compile(r"\.claude/")
+
+
+def check_no_history_in_user_docs() -> list[str]:
+    drifts: list[str] = []
+    seen: set[Path] = set()
+    for g in _HISTORY_SCAN_GLOBS:
+        for path in sorted(repo_path().glob(g)):
+            if not path.is_file() or path in seen:
+                continue
+            seen.add(path)
+            rel = path.relative_to(repo_path()).as_posix()
+            if rel in _HISTORY_EXEMPT or "/build/" in rel or "doxygen-awesome" in rel:
+                continue
+            for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                m = _HISTORY_RX.search(line)
+                if m:
+                    drifts.append(f"{rel}:{lineno}: `{m.group(0)}…` is history; a user page says how "
+                                  f"things are now (the CHANGELOG keeps what changed when)")
+                if _NOTES_RX.search(line):
+                    drifts.append(f"{rel}:{lineno}: a user page points into `.claude/` (maintainer "
+                                  f"notes); cite a user document or nothing")
+    return drifts
+
+
 def check_header_map() -> list[str]:
     drifts: list[str] = []
     doc = repo_path(HEADER_MAP_DOC)
@@ -1241,6 +1276,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_header_map())
     all_drifts.extend(check_removed_api_names())
     all_drifts.extend(check_user_build_has_no_interpreter())
+    all_drifts.extend(check_no_history_in_user_docs())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

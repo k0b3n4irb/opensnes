@@ -174,8 +174,7 @@ The scale is in texels per screen pixel, 8.8 fixed point:
 peaks at 127/128). `0x0080` magnifies twice, `0x0200` shrinks twice (you
 see four times the area). Smaller is closer, counter-intuitive at first,
 but the formula tells you why: a larger `A`/`D` means each screen pixel
-steps over more plane pixels. (Before 0.48.0 the helpers wrote half the
-scale, so `0x0200` was 1:1; code written then halves its scales.)
+steps over more plane pixels.
 
 ## Out-of-bounds behaviour
 

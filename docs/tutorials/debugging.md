@@ -5,7 +5,7 @@ Its headless CLI and its MCP server expose the full machine state (CPU, PPU,
 APU, DMA, every memory space) to scripts and AI agents, with no Lua layer
 and no external emulator required.
 
-This guide shows the standard debugging workflows. Since luna v1.6.0 the
+This guide shows the standard debugging workflows. The
 debugger is feature-complete for these: first-class breakpoints
 (`bp_add` / `run_until_break`), native WLA-DX symbol support
 (`load_symbols` / `resolve_symbol` — debug by variable name), MCP-side
@@ -160,8 +160,8 @@ by the same pass that compares pixels.
 
 ## What Mesen2 is still for
 
-Nothing is *required* anymore: the workflows above cover the watch /
+Nothing else is *required*: the workflows above cover the watch /
 breakpoint / OAM / poke use cases headlessly. Third-party GUI emulators
-(Mesen2, bsnes) remain fine for eyeballing gameplay, and Mesen2 stays cited
-in the hardware docs as the accuracy reference that settled some SDK
-behaviours (e.g. SA-1 SIWP polarity) — a historical role, not a dependency.
+(Mesen2, bsnes) are fine for eyeballing gameplay; Mesen2 is cited in the
+hardware docs as one of the references for some SDK behaviours (e.g. SA-1
+SIWP polarity), not as a dependency.

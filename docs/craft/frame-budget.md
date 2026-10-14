@@ -75,8 +75,7 @@ many thousand cycles. When logic outgrows it, in rough order of reach-for:
   costs with an 8-bit type is arithmetic and comparison (the accumulator's
   width is switched and the result masked each time) and `s8` (a sign
   extension on every read) — not the type of the table: reading or writing
-  a `u8` array is no slower than a `u16` one (measured on a real project,
-  issue #166, which first reported the opposite and corrected it). So keep
+  a `u8` array is no slower than a `u16` one (issue #166). So keep
   `u8` tables where they save RAM, and read them into `u16` / `s16` locals
   before computing with them.
 - **Cut the logic into small `static` functions freely.** A `static`
@@ -120,7 +119,7 @@ written to the PPU, the pads are not read and the callback set with
 the previous frame, whole, until the frame being computed is finished. So
 a 30 Hz game does not need a "logic frame, display frame" alternation:
 compute the whole tick straight through, call `WaitForVBlank()` once at
-real project settled on, issue #166). What this does not cover is anything
+its end, and a heavy tick simply spills into the next frame. What this does not cover is anything
 written to the PPU directly, outside those buffers: a register poked in
 the middle of a long computation is visible at once.
 

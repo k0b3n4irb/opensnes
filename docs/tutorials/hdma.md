@@ -60,14 +60,13 @@ The lib hides those four register writes behind two helpers:
 
 - **`hdmaSetup(channel, mode, destReg, table)`** — for any table, RAM or
   const, in any bank: the bank is read from the table pointer.
-- `hdmaSetupBank`, the explicit-bank form, was removed on 2026-10-05 — it predated far pointers.
+- `hdmaSetupBank`, the explicit-bank form, is removed: `hdmaSetup` reads the bank from the pointer.
 
 …and the enable/disable calls:
 
 - **`hdmaEnable(channel)`** / **`hdmaDisable(channel)`** — one channel by
   number, 0-7, like every other call of the header. A value above 7 is
-  refused: it is a 0.x bit mask left behind (until 0.48 these two names took
-  the mask).
+  refused: a bit mask goes to the `Mask` forms below.
 - **`hdmaEnableMask(channelMask)`** / **`hdmaDisableMask(channelMask)`** —
   several channels at once: set or clear their bits in `$420C`.
 
@@ -356,17 +355,6 @@ prefer channels 1–6 for HDMA.
 
 This is enforced by convention, not by code. The lib's documentation
 (`lib/include/snes/hdma.h`) names the trap explicitly.
-
-### 🟢 Bank byte trap on `hdmaSetup` (resolved)
-
-`hdmaSetup` used to hardcode bank `$00` for its table, so a `static const`
-table that the linker placed elsewhere was read from the wrong bank, and
-`hdmaSetupBank` existed to pass the right one by hand (removed 2026-10-05). Since
-pointers became far pointers (A6) `hdmaSetup` reads the bank byte of the
-table pointer itself: a const table works from any bank — which is where
-const data lives by default since v0.41.0 — and so does a RAM table, on
-LoROM and on HiROM. `hdmaSetupBank` is **removed** (2026-10-05, deprecated since 2026-09-20): it
-carries two banks and the explicit one wins. Use `hdmaSetup`.
 
 ### 🟡 Repeat-mode discipline matters
 

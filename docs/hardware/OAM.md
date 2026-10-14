@@ -165,19 +165,13 @@ So only the **background** needs a correction, and the library applies it:
 `y` it is given, and a direct write to `oamMemory[id * 4 + 1]` stores `y`
 too. A sprite and the background it stands on take the same camera value.
 
-Measured on luna (2026-10-09): an 8x8 sprite with OAM `Y` = 0 covers
+Measured on luna: an 8x8 sprite with OAM `Y` = 0 covers
 picture lines 0 to 7; with `Y` = 255 it covers lines 0 to 6, its top row
 lost on the scanline that is never output.
 
-**History, because code written against it exists.** From 2026-04-27 to
-2026-10-09 `oamSet()`, `oamSetY()`, `oamSetXY()` and the `oamSetFast`
-macros stored `y - 1`, on a reading of the first half of the sentence
-above without the second; the dynamic engine followed on 2026-09-26. Every
-sprite was drawn one line too high, and since `bgSetScroll()` got its
-`- 1` (2026-09-12) one line above a background scrolled to the same `y`.
-Code that subtracted 1 by hand before a direct `oamMemory[]` write must
-stop; code that added 1 to a `y` passed to `oamSet()` to line a sprite up
-with the background must stop too.
+So do not subtract 1 by hand before a direct `oamMemory[]` write, and do
+not add 1 to a `y` passed to `oamSet()` to line a sprite up with the
+background: the sprite would land one line off.
 
 Sentinel values that hide a sprite (`OBJ_HIDE_Y = 240`) are positions like
 any other: 240 is below the last visible line (223).

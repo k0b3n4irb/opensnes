@@ -141,7 +141,7 @@ cannot hold rather than silently masking it.
 
 ## Implementation rules
 
-For contributors (the rule itself is `.claude/rules/two_audiences.md`):
+For contributors:
 
 - C11, one binary, statically linked where the platform allows, built by
   `tools/tool.mk`; no runtime, no Python, no script on the user's path.

@@ -90,8 +90,7 @@ the one known difference between emulators and the console that the lib
 compensates for; if it fails, the compensation is being bypassed somewhere.
 Rows 4 to 10 are the PPU under load: a failure there is a timing claim in
 the lib (HDMA table shape, IRQ position, DMA length) that luna and the console
-disagree on — query the corpus before touching code
-(`.claude/rules/hardware_claims.md`). Rows 11 and 12 are the APU path,
+disagree on — query the corpus before touching code. Rows 11 and 12 are the APU path,
 including the cold-boot upload. Row 13 is the only test of battery-backed
 persistence the project has. Rows 16 to 18 and 24 to 26 depend on the cart as much as on
 the SDK; a failure needs the firmware version and, if possible, a second cart
@@ -160,7 +159,7 @@ Peripherals:   pads / mouse / scope
    moment. If luna shows it too, it is an ordinary bug: file it, fix it. If
    luna does not, it is either a hardware behaviour luna does not model or a
    wrong claim in the lib: query the corpus with the symptom
-   (`snes_search`, `.claude/rules/hardware_claims.md`), and only then
+   (`snes_search`), and only then
    decide which.
 3. Open an issue with the grid header (console, cart, firmware, display),
    the row, the note and the photo or video. A luna-side discrepancy is

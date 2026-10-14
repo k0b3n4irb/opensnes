@@ -95,14 +95,14 @@ runs again whenever an object did.
 Every link runs checks that catch silent failures (a const table read
 through the wrong bank, RAM past `$2000`, the stack reaching the C
 variables). Their thresholds are variables; lowering one is a decision to
-write down, raising it is almost always wrong (`.claude/rules/bank0_budget.md`).
+write down, raising it is almost always wrong.
 
 | Variable | Default | What it does |
 |---|---|---|
 | `BANK0_FAIL_THRESHOLD` | `0` | `0`: never. Bank $00 holds code only, and code that does not fit goes to the next banks by itself (the link report says how much). A value fails the link when bank $00 has fewer free bytes: for a project that wants its code bank watched |
 | `RAM_FAIL_THRESHOLD` | `512` | Fail the link when the plain C RAM band (`$0000-$1FFF`) has fewer free bytes than this |
 | `RAM_WARN_THRESHOLD` | `1024` | Warn below this many free bytes in that band |
-| `LD_DISCARD` | `1` | Link only the sections something refers to (`wlalink -d`): the library functions and RAM your program does not use are left out of the ROM. `0` links every section of every listed module, as before 2026-10-08 |
+| `LD_DISCARD` | `1` | Link only the sections something refers to (`wlalink -d`): the library functions and RAM your program does not use are left out of the ROM. `0` links every section of every listed module |
 
 Each check has a bypass for debugging, never for a commit: `SKIP_LINT=1`
 (the clang syntax pass over your C), `SKIP_BANK0_CHECK=1`,

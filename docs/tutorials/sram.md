@@ -56,16 +56,13 @@ HiROM one and `$40:0000` (BW-RAM) on an SA-1 one. Two limits to know:
 
 - on **HiROM** the helpers address the first 8 KB window only
   (`offset + size <= 8192`, the default `SRAM_SIZE`);
-- on **SA-1** they work since 2026-09-26 (crt0 sets SBWE); until then the
-  build refused `USE_SRAM=1` with `USE_SA1=1`, because the writes were
-  dropped. Two luna manifests (`d_sa1_bwram_write.toml`,
+- on **SA-1** crt0 sets SBWE, so the CPU's writes reach BW-RAM. Two luna manifests (`d_sa1_bwram_write.toml`,
   `e_sa1_bwram_read.toml`) power the cartridge off and on between the save
   and the read.
 - **Super FX** — the save is the GSU's own Game Pak RAM, shared with the
   framebuffers: see [Super FX: Saving](superfx.md#saving).
 
-This paragraph claimed the helpers "hide these details" long before they
-did — until 2026-09-20 they used the LoROM address on every build. The HiROM
+The HiROM
 mapping is pinned by `testing/fixtures/libtests_hirom`, which reads the bytes back
 from `$30:6000`.
 
@@ -294,7 +291,7 @@ random patterns. Your validation must catch both:
 - **Version field** (advanced): track save format version so old
   saves from a previous game build can be migrated or rejected.
 
-### 🟢 `SRAM_SIZE` mismatch between Makefile and code — refused since 2026-09-21
+### 🟢 `SRAM_SIZE` mismatch between Makefile and code — refused
 
 Every function of the family except `sramChecksum` returns a code:
 `SRAM_OK`, `SRAM_ERR_RANGE` (`offset + size` exceeds the declared SRAM) or
@@ -303,9 +300,8 @@ A refused call copies nothing. The capacity is read from your ROM's own
 header, so it always matches the `SRAM_SIZE` you built with (capped at what
 the module addresses in one bank: 32 KB on LoROM, 8 KB on HiROM).
 
-Before that the family returned `void` and copied whatever it was asked,
-past the declared size. The classic bug — `SRAM_SIZE := 1` (2 KB) in the
-Makefile, then `SLOT_SIZE = 1024` × 4 slots — now fails loudly on slot 2 if
+The classic bug — `SRAM_SIZE := 1` (2 KB) in the
+Makefile, then `SLOT_SIZE = 1024` × 4 slots — fails loudly on slot 2 if
 you look at the return value:
 
 ```c

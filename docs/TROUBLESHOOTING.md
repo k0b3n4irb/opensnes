@@ -73,17 +73,6 @@ loop), give the function a fixed argument list, or move the assembly into a
 shifts) is supported and tested — prefer `u16` for speed, not for
 correctness.
 
-### Static variables with initializers
-
-Initialized static variables now work correctly:
-```c
-// Both work correctly:
-static u8 counter = 0;   // Initial value copied from ROM to RAM at startup
-static u8 counter;       // Zero-initialized by C standard
-```
-
-The `CopyInitData` routine in crt0.asm copies initial values from ROM to RAM before `main()` is called.
-
 ## Runtime Issues (Black Screen / Crash)
 
 ### ROM loads but screen is black

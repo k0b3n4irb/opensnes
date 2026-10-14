@@ -367,7 +367,7 @@ Key details:
 
 `oamDynamicDraw(id)` looks up the sprite's pixel size from the size pair
 set at init plus an optional per-sprite override (`oamDynamicSetSize`),
-then dispatches to the matching internal routine. Callers no longer
+then dispatches to the matching internal routine. Callers do not
 pick a function by sprite size — the engine knows.
 
 For metasprite groups, `oamMetaDrawDyn(id, x, y, meta, gfx, size_class)`

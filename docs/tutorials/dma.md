@@ -169,10 +169,8 @@ int main(void) {
 ```
 
 The init order — `consoleInit` → `setMode` → DMAs → `bgSet*Ptr` →
-`setMainScreen` → `setScreenOn` — is the canonical pattern. See the
-[`new_example.md` rule](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/new_example.md) for the
-full checklist; getting it wrong produces a black screen or garbage
-on the first frame.
+`setMainScreen` → `setScreenOn` — is the canonical pattern; getting it
+wrong produces a black screen or garbage on the first frame.
 
 ## Per-frame DMA in the main loop
 
@@ -267,64 +265,36 @@ display and is ignored by the PPU, with no error.
 | Function | What it does |
 |---|---|
 | `dmaCopyVram(src, vramAddr, size)` | Copy bytes from WRAM/ROM to VRAM. The bank is taken from `src`'s own bank byte, so the source may live in any bank. Mode 1 (write `$2118`/`$2119`). The workhorse. |
-| `dmaCopyVramBank` | **Removed** (2026-10-05; deprecated since 2026-09-20). It predated far pointers: `dmaCopyVram` reads the bank from `src`. |
+| `dmaCopyVramBank` | **Removed**. `dmaCopyVram` reads the bank from `src`. |
 | `dmaFillVRAM(value, dest, size)` | Fill a VRAM region with a fixed 16-bit value (fixed-source mode). Used to clear tilemaps. |
 | `dmaClearVRAM(void)` | Zero all 64 KB of VRAM. Boot-time use only (force blank required). |
 | `dmaCopyCGram(src, startColor, size)` | Copy palette data to CGRAM. Mode 0 (write `$2122`). |
-| `dmaCopyCGramBank` | **Removed** (2026-10-05). Use `dmaCopyCGram`. |
+| `dmaCopyCGramBank` | **Removed**. Use `dmaCopyCGram`. |
 | `dmaCopyOam(src, size)` | One-shot OAM transfer, write `$2104`. Mostly used at init — the NMI handler does the per-frame OAM DMA automatically. |
 | `dmaCopyVramMode7(tilemap, mapSize, tiles, tilesSize)` | Two-pass interleaved DMA for Mode 7's split low-byte/high-byte VRAM layout. See the [Mode 7 tutorial](mode7.md). |
-| `dmaTransfer(channel, mode, src, destReg, size)` | Generic DMA — pick your own channel, mode, destination register; the bank comes from `src`. Use when the named helpers don't fit (e.g., transfers to `$2180` WRAM data port, or experimental modes). Until 0.48 it took the bank and the address as two arguments. |
+| `dmaTransfer(channel, mode, src, destReg, size)` | Generic DMA — pick your own channel, mode, destination register; the bank comes from `src`. Use when the named helpers don't fit (e.g., transfers to `$2180` WRAM data port, or experimental modes). |
 
 ## Gotchas
 
 ### 🔴 VRAM/CGRAM/OAM writes outside VBlank or force blank are silently dropped
 
-The first thing to internalise. The PPU returns silently from a write
-to `$2118`, `$2119`, `$2122`, `$2104`, etc. when active display is on.
-There is no error, no flag, no diagnostic. The next time you turn the
-screen on, the writes you "did" weren't.
-
-Two sharpening details from the hardware references: writes are also
-ignored during **HBlank** (only VBlank and force blank are safe), and
-the VRAM address in VMADD **still auto-increments even when the write
-is ignored** — which is why a transfer that straddles the end of
-VBlank resumes at the wrong VRAM address and shifts everything written
-after it.
-
-**Mitigation**: every DMA-touching function in the lib calls into a
-DMA register sequence that assumes VBlank or force blank. The
-discipline is yours: wrap heavy bulk transfers in
-`setScreenOff()`/`setScreenOn()`, and put per-frame transfers after
-`WaitForVBlank()`.
+Put per-frame transfers after `WaitForVBlank()` and wrap heavy bulk
+transfers in `setScreenOff()`/`setScreenOn()`; a write during active
+display is ignored with no error. Detail in
+[`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md).
 
 ### 🔴 VBlank DMA budget is ~4 KB per frame
 
-VBlank lasts 37 scanlines on NTSC with the standard 224-line display —
-50,468 master cycles (22 scanlines and 30,008 with overscan). The lib's NMI handler reserves part of that for OAM DMA,
-scroll sync, joypad read and the user callback; DMA moves 1 byte per
-8 master cycles, so the raw ceiling is ~6 KB and the practical *user*
-budget is about 4 KB before the PPU starts sampling registers for
-active display while you're still writing.
-
-Exceed it and the PPU starts reading mid-DMA — you get garbage tiles
-on the top scanlines for that frame. The corruption is *visible*, not
-silent — but it's also intermittent and hard to debug because it
-depends on game state.
-
-**Mitigation**: count your bytes. If a per-frame update needs > 4 KB,
-either drop into force blank (visible flash, OK for boss intro / scene
-transition) or split across multiple VBlanks ("1-page-per-VBlank"
-pattern — `KNOWN_LIMITATIONS.md` documents the canonical form).
+VBlank is 37 lines (50,468 master cycles) and the NMI handler uses part
+of it; past about 4 KB, force blank or split the update across several
+VBlanks. Detail in [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md).
 
 ### 🟢 SUPERFREE assets in any bank just work
 
 `dmaCopyVram(src, vramAddr, size)` takes the source bank from `src`'s
 own bank byte, so an asset the linker placed in bank `$01` or higher
-(because bank `$00`'s 32 KB ROM filled up — see
-`.claude/rules/bank0_budget.md`) transfers correctly with no extra
-work. The explicit-bank copy of 0.x, `dmaCopyVramBank`, was removed on
-2026-10-05: it predated far pointers and ignored the bank of `src`.
+(because bank `$00`'s 32 KB ROM filled up) transfers correctly with no
+extra work.
 
 ### 🟠 Channel 0 vs HDMA on channel 0
 
@@ -338,7 +308,7 @@ class of bug as the OAM-DMA-on-channel-7 trap — different channel.
 ### 🟠 OAM DMA is automated, don't double-up
 
 The lib's NMI handler triggers an OAM DMA every frame *when
-`oam_update_flag` is set* (since the perf fix in commit `6d438e6`).
+`oam_update_flag` is set*.
 You don't need to call `dmaCopyOam()` per frame — the runtime does it
 for you. Use `dmaCopyOam()` only at init (before the first
 `WaitForVBlank`), or for one-off forced refreshes.
@@ -359,12 +329,10 @@ assembly helper. See the [Mode 7 tutorial](mode7.md).
 
 ### 🟢 WRAM data port `$2180`–`$2183` in an NMI callback (caught at build time)
 
-Code that writes WRAM through `$2180` sets the address in `$2181-$2183`
-first. If an NMI fires in the middle and the NMI path uses the same ports,
-the address is lost and the rest of the writes land elsewhere. The library's
-NMI handler never touches them, and the build refuses a `nmiSet()` callback
-that can reach them (`opensnes-rom check`). See
-[Known limitations](../../KNOWN_LIMITATIONS.md).
+An NMI that uses `$2180-$2183` in the middle of a main-loop sequence loses
+its address. The library's NMI handler never touches them, and the build
+refuses a `nmiSet()` callback that can reach them (`opensnes-rom check`).
+See [Known limitations](../../KNOWN_LIMITATIONS.md).
 
 ## Cycle cost
 
@@ -376,16 +344,16 @@ per transfer:
 - Per-byte transferred: ~8 master cycles (mode 1 / mode 0).
 - MDMAEN trigger: ~8 cycles.
 
-A 1 KB DMA: 12 + 1024 × 8 + 8 ≈ 8,212 cycles, ~0.6 % of a 60 Hz frame.
+A 1 KB DMA: 12 + 1024 × 8 + 8 ≈ 8,212 cycles, ~2.3 % of a 60 Hz frame
+(357,368 master cycles).
 
-A 4 KB DMA: 12 + 4096 × 8 + 8 ≈ 32,800 cycles, ~2.4 % of a 60 Hz frame
+A 4 KB DMA: 12 + 4096 × 8 + 8 ≈ 32,800 cycles, ~9.2 % of a 60 Hz frame
 (and right at the VBlank budget — only works during force blank or with
 careful timing).
 
-The lib's NMI handler reports its DMA cost as part of its overall
-budget; the perf fix in commit `6d438e6` removed an unnecessary 544-byte
-OAM DMA per frame for sprite-idle ROMs (~4,300 cycles regained, ~12 %
-of VBlank budget).
+The lib's NMI handler skips the 544-byte OAM DMA on frames where
+`oam_update_flag` is clear, so a sprite-idle frame does not pay its
+~4,300 master cycles.
 
 ## See also
 
@@ -401,8 +369,4 @@ of VBlank budget).
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) —
   VRAM-during-active-display silent drop (🔴), VBlank DMA budget (🔴),
   bank `$00` overflow (🟢 caught at link time), WRAM data port NMI
-  trap (🔴).
-- [`.claude/rules/bank0_budget.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/bank0_budget.md)
-  — the bank `$00` ratchet that bites SUPERFREE spillover.
-- [`.claude/rules/nmi_audit.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/nmi_audit.md) —
-  what the NMI handler does with DMA channels 0 and 7 every frame.
+  race (🟢 caught at build time).

@@ -76,8 +76,7 @@ Per-frame CPU cost is dominated by two block copies per live, in-range
 object: 64 bytes into the workspace before the callback, 60 back out after
 — about 870 CPU cycles, 7,000 master cycles, per object. Budget for that
 before putting 40 objects on screen. The collision routines a callback
-calls add none (since 2026-10-09; each used to copy the record out and
-back in, which made six copies an object where there are now two).
+calls add none: they work on the workspace where it is.
 
 ## Registering a type
 
@@ -105,9 +104,9 @@ tests every pointer before dispatching and skips a null one.
 C callbacks routinely land outside bank `$00` — in `slope_collision.sym`,
 `marioinit` sits in bank `$01`. That works because the compiler pushes a
 function pointer as a four-byte slot, bank byte included, and
-`objInitFunctions` stores all three bytes. Until 2026-09-18 it did not (see
-the Gotchas), and both examples registered their types through a hand-written
-assembly routine; if you are porting code that copied that shim, delete it.
+`objInitFunctions` stores all three bytes. Code ported from an older version
+that registered its types through a hand-written assembly routine can drop
+that routine.
 
 The three callback signatures are:
 
@@ -216,9 +215,8 @@ extern FAR t_objs objWorkspace;
 
 It is a `FAR` object (@ref tutorial_far_ram): `objWorkspace.xpos` reads and
 writes at the cost of any global, and a pointer to it, or to one of its
-fields, is a `FAR` pointer. It was in bank `$00` until 2026-10-09; it now
-sits right behind the pool, which is what lets the collision routines work
-on it where it is.
+fields, is a `FAR` pointer. It sits right behind the pool, which is what
+lets the collision routines work on it where it is.
 
 The contract is a copy-in / copy-out sandwich around every callback:
 
@@ -260,11 +258,8 @@ replaces what you were looking at:
 - `objGetPointer()` — leaves the object you asked for in the workspace.
 - `objKill()` — calls `objGetPointer` internally, so it reloads it too.
 
-Until 2026-09-19 this was a trap: the engine wrote the workspace back into
-the slot **it was iterating**, whatever the workspace held by then, so an
-update callback that peeked at the player returned with the player's 64 bytes
-written over the enemy's slot. The workspace now tracks its **owner** — the
-slot it mirrors. Every reload first flushes the current contents to that
+So a callback may peek at another object: the workspace tracks its
+**owner** — the slot it mirrors. Every reload first flushes the current contents to that
 owner, and every write-back goes to the owner, not to the caller's index:
 
 ```c
@@ -440,8 +435,7 @@ A plain AABB test between two objects' boxes (`xpos + xofs`, `width`,
 `ypos + yofs`, `height`), returning 1 on overlap and 0 otherwise. It takes
 a callback's `idx` or a handle, as do `objCollidMap`, `objCollidMapWithSlopes`,
 `objCollidMap1D` and `objUpdateXY`: they work on a live slot and mask the
-handle's id byte themselves (since 2026-09-21 — before that a handle sent them
-to memory past the pool, silently). Only `objKill` and `objGetPointer` need
+handle's id byte themselves. Only `objKill` and `objGetPointer` need
 the whole handle, because the id byte is how they detect a stale one. Like the
 map collision routines it flushes the workspace on
 entry, so an object that has just moved itself is tested where it now is.
@@ -505,122 +499,20 @@ your slot first).
 
 ## Gotchas {#object_gotchas}
 
-This module is inherited from PVSnesLib and has not had the audit the core
-modules have. The following are verified against `lib/contrib/object.asm` and
-the shipped ROMs. Every public function is now executed by a test, but seven
-of the sixteen (`objCollidMap1D`, `objCollidObj`, `objInitFriction1D`,
-`objInitGravity`, `objKill`, `objKillAll`, `objRefreshAll`) only by the
-library fixture (`testing/fixtures/libtests`), not by any example — they have
-assertions, not mileage.
+This module is inherited from PVSnesLib. Every public function is executed by
+a test, but seven of the sixteen (`objCollidMap1D`, `objCollidObj`,
+`objInitFriction1D`, `objInitGravity`, `objKill`, `objKillAll`,
+`objRefreshAll`) only by the library fixture (`testing/fixtures/libtests`),
+not by any example — they have assertions, not mileage.
 
-### 🟢 `objInitFunctions` stored garbage — fixed 2026-09-18
+### `objCollidMap1D` has no friction unless you ask for it
 
-It read its arguments with the **pre-A6 stack map**, from before pointers
-became four-byte slots, so every offset was wrong: what it took for the type
-was the update callback's bank byte. Its comment then claimed C could not
-pass a bank byte at all, and it wrote `$00` into all three. Both examples
-worked around it with a hand-written assembly routine using `:label`.
+The routine zeroes velocity on a wall hit but does not decelerate otherwise,
+as in PVSnesLib. `objInitFriction1D(amount)` makes every `objCollidMap1D`
+call move `xvel` and `yvel` toward zero by `amount`, clamped at zero;
+`objInitEngine()` resets it to 0 (no friction).
 
-The compiler pushes `pea.w :fn` alongside `pea.w fn` for every pointer, so
-the bank is on the stack — the routine now reads it. Both examples dropped
-their shim and register from C, and their manifests pass unchanged, which is
-what proves the dispatch reaches bank `$01` correctly.
-
-### 🟢 A type with no registered callbacks jumped into nowhere — fixed 2026-09-19
-
-Neither the update pass, the refresh pass nor the `objLoadObjects` init
-dispatch checked for a null pointer, and the tables start zeroed, so an object
-whose type was never registered called address `$00:0000`. All three sites now
-test the 24-bit pointer and skip the call. An unregistered type is inert: it
-keeps its slot, is never updated, and `objLoadObjects` skips its table entry.
-A null refresh callback is likewise safe, so `objRefreshAll()` no longer
-depends on every type having one.
-
-### 🟢 `objLoadObjects` ignored the bank byte of your pointer — fixed 2026-09-18
-
-The routine block-copied the table into its scratch buffer with the source
-bank forced to `$00`. The examples got away with it because their `.o16` data
-sat in a `SUPERFREE` section the linker happened to place in bank `$00` — an
-`ASSET_SECTION` table (the asset banks, `ROM_BANKS - 1` down to 1, by design, see
-`.claude/rules/bank0_budget.md`) would have loaded garbage instead. The DMA
-now takes the bank the caller pushed, so the table can live anywhere.
-
-### 🟢 The collision routines read the map from bank `$00` — fixed 2026-09-23
-
-Same family, one week later. `objCollidMap`, `objCollidMapWithSlopes` and
-`objCollidMap1D` set the data bank to a hardcoded `$00` at their thirteen
-tile reads, while `mapLoad` had been storing the map's real bank since
-far pointers landed (v0.19.0). The day the examples' maps moved to the asset banks, Mario sank
-into the ground in `slope_collision`. The reads now use the bank `mapLoad`
-stored; the library fixture pins it with a map in bank `$02`. See
-`KNOWN_LIMITATIONS.md`.
-
-### 🟢 `objInitGravity`'s gravity argument did nothing — fixed 2026-09-18
-
-`objInitGravity(gravity, friction)` stored both values, but the three
-collision routines added the assemble-time constant `GRAVITY` instead of
-reading the one you passed; only friction was honoured. They now read the
-variable, which `objInitEngine` still seeds with `GRAVITY` (41, i.e. 41/256
-pixel per frame squared), so the default is unchanged and the argument is
-finally real.
-
-### 🟢 `ACT_BURN` and `ACT_DIE` went to slot 0 — fixed 2026-09-18
-
-When a collision routine found a `T_FIRES` or `T_SPIKE` tile it wrote the
-action word **without indexing by the current object**, so the hazard always
-landed in object slot 0 instead of the one that touched it. All three
-routines did it, at six sites. Writing this page is what found it.
-
-The index register already held the object there — the neighbouring
-`tilesprop` stores use it — so the fix was the missing `,x`. No map in the
-corpus carries `T_FIRES` or `T_SPIKE`, which is both why it survived and why
-the fix could not change any existing behaviour.
-
-### 🟢 A callback that peeked at another object became a copy of it — fixed 2026-09-19
-
-The write-back after a callback went to the slot being iterated, whatever the
-workspace held. The workspace is now owner-tracked (see *What reloads the
-workspace* above): edits are flushed to their owner before any reload, and
-write-backs go to the owner. The cost is about 140 CPU cycles per callback —
-enough to move a late-frame write across a frame boundary, which is how the
-slope example's manifest noticed.
-
-### 🟢 `objCollidObj` returned garbage for "no contact" — fixed 2026-09-20
-
-The routine stored its result in a scratch variable and returned without
-loading it, so the caller got whatever the accumulator held: 1 on contact by
-accident, and on every "no contact" exit an intermediate such as `x + width`
-— non-zero, so truthy. Nothing in the corpus called it, which is how it
-survived. It also read the slots without flushing the workspace first, so a
-callback that had just moved its object tested the old position. Both fixed;
-the first call from a test found them.
-
-### 🟢 Three ways a pending workspace edit could be lost or do damage — fixed 2026-09-20
-
-The owner-tracked workspace of 2026-09-19 had three holes, all found by the
-first test that edited an object *outside* a callback and then let the engine
-run:
-
-- Reloading the slot the workspace already mirrored skipped the flush and
-  reloaded, discarding the edit (`objNew`, `objGetPointer` on the same
-  object, field writes, `objUpdateAll`). Every reload now flushes first.
-- The write-back carried all 64 bytes, including the active-list links the
-  engine rewrites in the slot while the workspace holds the copy taken at
-  load time. The write-back now covers bytes 4 to 63; the links never travel.
-- `objUpdateAll` and `objRefreshAll` wrote `onscreen` into the slot and only
-  then flushed a pending edit, putting the workspace's stale `onscreen` back
-  over it. Both passes now flush on entry.
-
-### 🟢 `objCollidMap1D` had no friction, and no way to get any — opt-in since 2026-09-19
-
-The routine zeroes velocity on a wall hit but never decelerates otherwise;
-PVSnesLib's `FRICTION1D` constant was defined and never used. The default is
-unchanged — no friction, so ported code behaves the same — but
-`objInitFriction1D(amount)` now makes every `objCollidMap1D` call move `xvel`
-and `yvel` toward zero by `amount`, clamped at zero. `objInitEngine()` resets
-it to 0.
-
-### 🟡 A screen-edge crossing forces a full sprite refresh
+### A screen-edge crossing forces a full sprite refresh
 
 Whenever any object's `onscreen` flag flips, the engine sets the refresh flag
 on **all 128** `oambuffer` entries, once per frame at most. That re-uploads
@@ -628,23 +520,12 @@ every dynamic sprite's tiles that frame. It is correct, but it is a cost
 spike that lands exactly when a scrolling camera is busiest — worth knowing
 when you are chasing a dropped frame (see @ref tutorial_profiling).
 
-### 🟡 `objNew` leaves `objGetCurrentId()` stale when the pool is full
+### `objNew` leaves `objGetCurrentId()` stale when the pool is full
 
-On failure `objNew` returns 0 but does not clear the current id, which still holds
-the previous successful handle. This used to let `objLoadObjects` write the
-workspace into the previously created object; since the owner-tracked
-workspace (2026-09-19) the workspace has no owner at that point and nothing is
-written. `objGetCurrentId()` itself is still stale, so keep guarding with the return
-value, as the examples do: `if (objNew(type, xp, yp) == 0) return;`.
-
-### 🟢 `objKillAll` leaked slots — fixed 2026-09-19
-
-After killing every live object it forced the free-list head back to slot 0.
-`objKill` had already pushed each freed slot onto the list, so every slot
-chained ahead of slot 0 — anything killed after it — became unreachable. Two
-objects of different types were enough: the pool came back with 79 slots, and
-lost more on each level change. The reset is gone; the library fixture
-asserts that 80 allocations succeed after `objKillAll()`.
+On failure `objNew` returns 0 but does not clear the current id, which still
+holds the previous successful handle. Nothing is written to that object, but
+guard with the return value, as the examples do:
+`if (objNew(type, xp, yp) == 0) return;`.
 
 ## When not to use the object engine
 

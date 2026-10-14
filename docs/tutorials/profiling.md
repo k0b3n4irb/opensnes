@@ -188,4 +188,3 @@ working, not as shipped code.
 - @ref craft_frame_budget — what fits in a frame, and the ~4 KB VBlank DMA ceiling
 - @ref tutorial_debugging — stepping, breakpoints and memory inspection with luna
 - @ref tools_luna — every luna subcommand and flag, generated from the pinned binary
-- `.claude/rules/testing.md` — where the profile and coverage passes sit in the suite

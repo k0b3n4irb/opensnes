@@ -224,5 +224,24 @@ class BenchmarkTable(unittest.TestCase):
         self.assertTrue(any("summary" in d for d in out))
 
 
+class NoHistoryInUserDocs(unittest.TestCase):
+    RX = check_doc_drift._HISTORY_RX
+
+    def test_dated_history_is_refused(self):
+        for line in ("Until 2026-10-05 the build refused it.",
+                     "### 🟢 `sramClear()` wrote a ramp (fixed 2026-09-15)",
+                     "works since 2026-10-03 for objects in bank $00",
+                     "SIWP polarity resolved 2026-09-02"):
+            self.assertIsNotNone(self.RX.search(line), line)
+
+    def test_present_tense_and_versions_pass(self):
+        for line in ("It is refused since 0.49.", "PVSnesLib at `fa758c9b 2025-12-28`.",
+                     "*Last updated: 2026-10-14.*", "the loop runs until the terminator"):
+            self.assertIsNone(self.RX.search(line), line)
+
+    def test_maintainer_notes_link(self):
+        self.assertIsNotNone(check_doc_drift._NOTES_RX.search("see `.claude/notes/tech/x.md`"))
+
+
 if __name__ == "__main__":
     unittest.main()

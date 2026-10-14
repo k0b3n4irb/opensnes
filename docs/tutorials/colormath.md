@@ -226,9 +226,7 @@ unless math reads it.
 
 The lib's `colorMathSetSource` sets the source register `CGWSEL` bit 1.
 At the bare-metal level: bit 1 = 0 → fixed colour, bit 1 = 1 → sub
-screen. The lib was historically inverted; commit history (per
-`KNOWN_LIMITATIONS.md` and `lib/source/colormath.c`) records the fix.
-**Use the lib helper, not bare-metal writes.** If you do go bare metal,
+screen. **Use the lib helper, not bare-metal writes.** If you do go bare metal,
 verify polarity against the SNES PPU register reference, not against
 intuition.
 
@@ -296,10 +294,9 @@ SNES. The discipline is configuring it correctly, not avoiding it.
 
 ## See also
 
-- `lib/include/snes/colormath.h` — full API reference, polarity-fixed
-  helper definitions.
-- `lib/source/colormath.c` — implementation; commit history records
-  the `CGWSEL` bit-1 polarity fix.
+- `lib/include/snes/colormath.h` — full API reference, helper
+  definitions.
+- `lib/source/colormath.c` — implementation.
 - [`examples/color/transparency`](../../examples/color/transparency/README.md) — additive cloud overlay.
 - [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window-gated spotlight blend.
 - [`examples/color/pseudo_hires`](../../examples/color/pseudo_hires/README.md) — a 50 % blend
@@ -314,5 +311,4 @@ SNES. The discipline is configuring it correctly, not avoiding it.
 - [Graphics tutorial](graphics.md) — companion read for the BG-layer
   fundamentals colour math operates on.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) —
-  documents the historical `CGWSEL` polarity inversion and other
-  PPU-side traps.
+  documents the PPU-side traps.

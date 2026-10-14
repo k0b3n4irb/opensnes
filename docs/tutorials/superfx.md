@@ -22,16 +22,6 @@ registers, hardware PLOT for pixel rendering, and an instruction cache.
 | ROM access | Yes | Yes (**exclusive bus**) |
 | Special | -- | PLOT (hardware pixel rendering) |
 
-## Emulator Compatibility
-
-> **Important**: SuperFX examples require specific emulators.
-
-| Emulator | Status |
-|----------|--------|
-| **luna** | The SDK's emulator and test backend: runs the GSU natively, and exposes its state (`luna state` → `gsu`), bus violations and per-job profile |
-| **bsnes** | Cycle-accurate -- useful as a second reference |
-| **snes9x** | Does not detect SuperFX in our ROM header (example boots to "GSU: NOT DETECTED") |
-
 ## Getting Started
 
 ### 1. Enable SuperFX in Your Makefile
@@ -55,7 +45,7 @@ include $(OPENSNES)/make/common.mk
 `GSUSRC` lists your SuperFX assembly files (`.sfx`). The build system
 assembles them with `wla-superfx` and produces flat binaries (`.sfx.bin`).
 
-Two knobs matter for a GSU project (since 2026-09-24): `ROM_BANKS := 32`
+Two knobs matter for a GSU project: `ROM_BANKS := 32`
 gives a 1 MB ROM (Star Fox's size; the default 8 is 256 KB) — the header's
 size byte and the asset bank range follow — and `GSU_RAM_KB := 64` is the
 Game Pak RAM the cartridge declares in the extended header at `$FFBD`
@@ -138,8 +128,7 @@ int main(void) {
 loop while the GSU owns the cartridge, and interrupts keep working (next
 section). Adjust `gsu_cfgr` (IRQ mask, fast multiply) and `gsu_scmr`
 (colour depth, bus grants) before the call when your program needs it —
-`examples/chips/superfx_hello` sets both. (Until 2026-09-26 this page showed
-a hand-written WRAM launcher that disabled NMI for the job.)
+`examples/chips/superfx_hello` sets both.
 
 ## The Exclusive Bus
 
@@ -149,7 +138,7 @@ hardware plans for it: while the GSU owns the ROM, a vector fetch returns a
 dummy vector — `$0108` for NMI, `$010C` for IRQ, `$0104` COP, `$0100`
 BRK/ABORT (Nintendo dev manual Book II §5.4.1) — and a Super FX cartridge
 keeps a jump at each of those WRAM addresses. The SDK does this for you in
-every `USE_SUPERFX=1` build (since 2026-09-24/25):
+every `USE_SUPERFX=1` build:
 
 1. crt0 installs the four WRAM stubs at boot, and the header's vectors
    point at them, so an interrupt takes the same path whether the GSU is
@@ -162,20 +151,17 @@ every `USE_SUPERFX=1` build (since 2026-09-24/25):
 3. the IRQ stub enters a WRAM handler too: during a job it acknowledges an
    H/V-timer IRQ (`$4211`) and a GSU IRQ (SFR high byte) and returns — your
    IRQ handler is ROM code and runs again after the job; BRK and COP land on
-   a WRAM `rti` (since 2026-09-26);
+   a WRAM `rti`;
 4. the launch/poll code itself still executes from WRAM, as in every
    reference project (casfx, DOOM-FX, PeterLemon).
 
 The WRAM handlers and `gsuLaunch`'s wait loop live in the RAM code window
 (below): a Super FX build reserves 768 bytes of it for the SDK on top of
 your own `RAM_CODE_SIZE`. crt0 installs the four stubs before it enables the
-NMI (since 2026-09-29; before, a VBlank in that gap would have jumped into
-empty RAM).
+NMI.
 
-The NMI is **not** disabled during a job any more. It used to be, and one
-VBlank in three was lost in `superfx_3d` (game time ran at two thirds of
-real time); `gsuLaunch` also re-enabled NMI with a hardcoded `$81`, which
-silently cancelled an H/V-timer IRQ the game had armed.
+The NMI is **not** disabled during a job, so no VBlank is lost while the GSU
+runs, and an H/V-timer IRQ the game has armed stays armed.
 
 ## Letting the Game Run During a Job: the Code Cache
 
@@ -255,9 +241,7 @@ masked?"); ares and bsnes set it only when the IRQ is unmasked
 emulator's choice rather than a measurement. If a console did set it, the
 next timer IRQ would count that old STOP.
 `testing/fixtures/libtests_gsu` runs its job a second time this way (the count moves
-by exactly one, seven game frames during the job). Before 2026-09-27 this
-combination locked the CPU in its IRQ entry: the GSU's IRQ went to your
-handler, whose `$4211` read does not reset it.
+by exactly one, seven game frames during the job).
 
 ### A ROM job, with the wait loop in RAM
 
@@ -522,14 +506,12 @@ that give the transfer its time; it returns once they are on screen (HDMA
 starts a channel at line 0, so the bands appear a frame later). The two
 bands must add up to 73 lines or more for a 16 KB frame.
 
-Until 2026-09-29 the wait read OPVCT (`$213D`) once per iteration without
-ever reading STAT78 (`$213F`), the only reset of OPVCT's read-twice
-flip-flop (snesdev-wiki). Every other call then started on the high byte,
-whose bits 1-7 are PPU2 open bus (anomie, fullsnes) — the value the previous
-call had last read, 184 — and started the DMA at once: luna counted a third
-of `superfx_3d`'s framebuffer bytes landing on visible lines, dropped
-without a word. Read `$213F`, `$2137`, then `$213D` twice, every time. `superfx_3d` now presents about 30
-frames per second, all of them whole.
+The wait reads STAT78 (`$213F`), the only reset of OPVCT's read-twice
+flip-flop (snesdev-wiki), before each read of OPVCT (`$213D`). Code of your
+own that waits on the line counter must do the same: without it, every
+other read starts on the high byte, whose bits 1-7 are PPU2 open bus
+(anomie, fullsnes). Read `$213F`, `$2137`, then `$213D` twice, every time.
+`superfx_3d` presents about 30 frames per second, all of them whole.
 
 It uses HDMA channel 1 and arms it like `hdmaEnableMask()` does, so it
 combines with your own HDMA channels; just leave channel 1 to it.

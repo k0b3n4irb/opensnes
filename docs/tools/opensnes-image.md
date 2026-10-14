@@ -3,9 +3,8 @@
 The picture tool of the `opensnes-*` family (@ref tools_conventions), for the
 screens that are not a tileset-and-tilemap: the **HiColor** technique, and
 the **Mode 7 perspective** tables that turn a flat Mode 7 plane into a
-road receding to the horizon. Both were maintainer scripts until 2026-10
-(`hicolor64.py`, `m7ptables.py`); they are compiled now, so a game's build
-needs no Python. A Mode 7 *picture* is `opensnes-tileset convert --mode 7`
+road receding to the horizon. Like every tool of the SDK it is compiled:
+a game's build needs no Python. A Mode 7 *picture* is `opensnes-tileset convert --mode 7`
 (@ref tools_opensnes_tileset).
 
 ## HiColor

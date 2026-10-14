@@ -4,7 +4,7 @@ This page is the promise 1.0 will make. It says what a project built on
 OpenSNES 1.0 will be able to count on until 2.0, what is not part of that
 promise, and how a change reaches you when one is needed.
 
-**Where 0.x stands.** Since 0.49 the SDK carries the API this promise is written for:
+**Where 0.x stands.** The SDK carries the API this promise is written for:
 the removals and the two changes of meaning below are done. It is not yet
 bound by the promise — a 0.x release may still rename or remove, one
 release after saying so (`docs/UPGRADING.md`) — but nothing is planned to,
@@ -50,7 +50,6 @@ version. A new module costs nothing to a project that does not link it.
 - **The compiler's accepted C** grows; what it refuses today (struct
   parameters and returns by value, variadic functions, inline assembly)
   may be accepted later, never the other way.
-- **Internal notes** under `.claude/` are the maintainers' own.
 
 ## How a change reaches you
 

@@ -121,6 +121,15 @@ opt-in list.
     (`.claude/rules/two_audiences.md`, rule 1). Comments may tell the
     history; a call may not come back.
 
+18. **User pages describe the present** (since 2026-10-14): in `docs/`,
+    `README.md`, `KNOWN_LIMITATIONS.md`, `PHILOSOPHY.md`, `ROADMAP.md` and
+    `examples/README.md`, no dated history phrase (`until / since / fixed /
+    resolved 20YY-MM`) and no link into `.claude/`. The documentation review
+    of that day took about 600 lines of history out of the user pages
+    (KNOWN_LIMITATIONS 866 → 425 lines, ROADMAP 360 → 76): fixed bugs are the
+    CHANGELOG's, maintainer notes are the maintainers'. `UPGRADING.md`, the
+    PVSnesLib migration guide and the generated `tools/luna.md` are exempt.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the

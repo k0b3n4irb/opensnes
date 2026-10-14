@@ -53,12 +53,12 @@ From ROM, 86 % of the SA-1's accesses are ROM, but the penalty only applies
 when the main CPU is on ROM at the same moment, so it loses a fifth of its
 clocks, not half: about 8.5 MHz, 2.4× the main CPU. Code in ROM also pays
 one more cycle on every jump, call and return into ROM, so a loop that
-jumps often runs slower than its conflict share alone says (luna v1.30.0,
+jumps often runs slower than its conflict share alone says (luna,
 from ares, checked against a console on the SNES-SA1 Speed Test). From I-RAM it keeps
 almost all of them: 10.7 MHz, 3×. The remaining 0.4 % is the main CPU
 touching I-RAM too (it reads the positions there and polls the sync flag).
 Both builds draw the same frames; the I-RAM one simply finishes each frame's
-work sooner (luna v1.30.0, whose SA-1 timing matches a console on the
+work sooner (luna, whose SA-1 timing matches a console on the
 SNES-SA1 Speed Test; the instruction count includes the SA-1's wait
 for the next frame, so it grows with the spare time).
 
@@ -173,7 +173,7 @@ SA1Start:
     .ACCU 8
 
     ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable: fullsnes, the
-    ; Nintendo manual §4.1.25 and nocash agree (resolved 2026-09-02; the
+    ; Nintendo manual §4.1.25 and nocash agree (the
     ; sfc-dev-wiki states the inverse — see the box above).
     lda #$FF
     sta.l $00222A           ; CIWP = $FF (all I-RAM writable)

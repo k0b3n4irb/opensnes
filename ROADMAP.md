@@ -3,7 +3,8 @@
 Current state of the project and planned work. The single source of truth for
 known traps and trade-offs is [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md);
 the design principles every roadmap item must respect live in
-[`PHILOSOPHY.md`](PHILOSOPHY.md). This file tracks **what is shipped**
+[`PHILOSOPHY.md`](PHILOSOPHY.md); what has shipped, release by release, is in
+[`CHANGELOG.md`](CHANGELOG.md). This file tracks **where the project stands**
 and **what is next**.
 
 ---
@@ -27,202 +28,16 @@ them faster, none larger, and level or shallower in stack on 22
 with cross-platform CI on Linux, macOS, and Windows enforcing not just "it
 compiles" but the full functional test suite (luna, cycle-accurate native —
 corpus liveness + visual regression + functional probes; SA-1/Super FX/DSP-1
-run natively). Run
-`make tests`, or `python3 testing/luna_runner.py --list` for the corpus —
-the suite grows
-with new chantiers and a single hard-coded number rots fast.
+run natively).
 
 ### Audience
 
-OpenSNES targets developers with prior 65816 / SNES / PVSnesLib experience.
-The hardware traps (VRAM only during VBlank, 4 KB DMA budget per frame, bank
-$00 ROM overflow, push-order inversion vs PVSnesLib, etc.) are documented
-honestly in [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) — read it before
-starting a project. Newcomers to SNES development should ramp up on the
-hardware via the tutorials before adopting the SDK in earnest.
-
----
-
-## Recently shipped (post-v0.13.0 maintenance work)
-
-This stretch focused on closing process gaps surfaced by an internal audit
-(P0/P1/P2/P3/P4 remediation plan). Highlights:
-
-### Build & process safety
-- **Bank $00 ROM overflow check** runs on every link (`make/common.mk`).
-  String-literal spills now fail the build with a fix-it message instead of
-  producing garbage at runtime.
-- **`make verify-toolchain`** compares `compiler/{cproc,qbe,wla-dx}` HEADs
-  against [`compiler/PINS.md`](compiler/PINS.md). CI runs the same check
-  before every build — `git submodule update --remote` can no longer drift
-  the toolchain past tested commits.
-- **clang `-Wall -Wextra -Werror` syntax check** runs in parallel with
-  `cc65816` for every C source. The SDK is currently warning-clean and stays
-  that way (caught two real bugs in `lib/source/hdma.c` and tetris).
-- **Tag-on-main guard** (`.github/workflows/release.yml`): a tag whose commit
-  isn't on `main` fails fast instead of producing a release ZIP.
-- **Commit-message lint** (`.github/workflows/lint.yml`): rejects PRs whose
-  commits violate Conventional Commits or sneak in a `Co-Authored-By:`
-  trailer.
-
-### Architecture & docs
-- `lib/source/object.asm` (3 124 LOC game-engine) relocated to `lib/contrib/`
-  — `lib/source/` now only contains hardware-wrapping modules.
-- `compiler/ABI.md`: empirically verified calling-convention reference
-  (push order, frame layout, return values, type sizes, calling C from ASM
-  and vice versa).
-- `KNOWN_LIMITATIONS.md`: 14-entry severity-tagged catalog of silent
-  failures inherited from the 65816 / SNES architecture and the toolchain.
-- `testing/`: luna-driven test harness — visual baselines keyed on
-  luna's cross-arch-stable `--print-fbhash`, regenerated with
-  `luna_runner.py --update`.
-
-### Test suite
-- **luna** is the sole automated test backend (cycle-accurate native emulator,
-  pinned binary; runs SA-1 / Super FX / DSP-1 natively).
-- **CI runs the full luna suite** on Linux (coverage + visual regression +
-  functional probes) plus the compiler C→ASM checks and the cycle benchmark.
-- **2 new compiler regression guards** (`test_arg_push_order`,
-  `test_section_directives`) cover the ABI invariants P2.2 identified.
-- Visual baselines now carry provenance metadata (rom hash, snes9x commit,
-  capture timestamp). The runner emits `[WARN]` on drift instead of
-  silently miscomparing.
-
----
-
-## Completed
-
-### Toolchain
-- [x] **cc65816** — C11 compiler (cproc + QBE w65816 backend)
-- [x] **wla-65816 / wlalink** — Assembler and linker (WLA-DX)
-- [x] **wla-spc700** — SPC700 audio assembler
-- [x] **gfx4snes** — PNG/BMP to SNES tiles, palettes, tilemaps
-- [x] **font2snes** — Font converter
-- [x] **smconv** — Impulse Tracker (.it) to SNESMOD soundbank (rewritten in pure C)
-
-### Compiler optimisations
-- [x] Dead jump elimination + A-register cache
-- [x] 8/16-bit mode tracking + byte immediates
-- [x] Leaf and non-leaf function optimisation (param alias, frame elimination)
-- [x] Comparison + branch fusion
-- [x] `pea.w` for constant args, `.l` → `.w` address shortening
-- [x] `stz` for zero stores, redundant `cmp #0` elimination
-- [x] Dead store elimination + aggressive frame elimination
-- [x] Inline multiply (×3, ×5, ×6, ×7, ×9, ×10, ×11–×15)
-- [x] Composite constant multiply (×20, ×24, ×40, ×48, ×96)
-- [x] `.ACCU 16` / `.INDEX 16` for WLA-DX register-size tracking
-- [x] Variable shift codegen fix (`(1 << variable)`)
-- [x] Signed division and modulo (`__sdiv16` / `__smod16`)
-- [x] **Tail call optimisation** — shipped (chantiers C.1 / C.2.1 / C.2.2;
-      QBE patches `ed840fb` and `bab0164` per `compiler/PINS.md`). The
-      `tail_call`, `lazy_rep20`, `plx_cleanup` test cases that previously
-      ran under `--allow-known-bugs` were investigated in chantier A3 and
-      found to be testing optimisations that had already shipped; the
-      markers were stale. CI no longer passes `--allow-known-bugs`.
-- [x] **A-cache through `pha`** — shipped; chantier C.6's audit confirmed
-      the optimisation already worked, the `acache_pha` test was stale.
-      Hard-fails any regression since 2026-05-09.
-
-### Library modules
-| Module | Description | Status |
-|--------|-------------|--------|
-| `console` | Init, screen control, VBlank | core |
-| `sprite`, `sprite_dynamic`, `sprite_lut` | OAM management, dynamic sprites, metasprites | core |
-| `background` | BG layers, tilemaps, scrolling | core |
-| `dma`, `hdma` | DMA / HDMA transfers (gradients, wave, ripple, parallax) | core |
-| `input` | Joypad, mouse, Super Scope, MultiPlayer5 | core |
-| `text`, `text4bpp` | Text rendering (2bpp and 4bpp) | core |
-| `snesmod` | Tracker music and SFX (.it format, multi-bank) | core |
-| `audio`, `apu` | Audio v2 engine: pure-C driver over the raw APU (SPC700) path | core |
-| `anim` | Declarative data-driven frame animation player | core |
-| `mode7` | Mode 7 rotation/scaling | core |
-| `window` | Window masking | core |
-| `colormath` | Transparency, color blending | core |
-| `collision` | Bounding-box collision | core |
-| `math` | Fixed-point math, LUTs, hardware multiplier | core |
-| `sram` | Save RAM (battery-backed persistence) | core |
-| `mosaic` | Mosaic pixelation | core |
-| `lzss` | LZ77 decompression to VRAM | core |
-| `map` | Tile-based map engine with streaming | core |
-| `fixed32` | 16.16 signed fixed-point math for world-space coordinates | core |
-| `gameloop` | Opt-in game-loop framework (VBlank-synced update/render) | core |
-| `scene` | Opt-in scene/state stack (push/pop game scenes) | core |
-| `panel` | Opt-in 9-slice bordered panels on a background layer | core |
-| `debug` | Nocash messages, Mesen breakpoints | core |
-| `video` | Video mode and display control | core |
-| `sa1` | SA-1 enhancement-chip helpers | experimental |
-| `superfx` | Super FX (GSU): job launch, cached code, double-buffered frame presentation (`gsuLaunch`, `gsuStartCached`, `gsuPresent`); GSU code is assembly only (no C compiler) | core (luna-validated; the 1.0 freeze criterion) |
-| `dsp1` | DSP-1 commands (multiply, trig, rotation, projection, distance) over the two-register port | core (runs the real firmware on luna) |
-| `object` | Object engine with physics and collision | **contrib** (`lib/contrib/`) |
-
-### Examples (88)
-- **Text**: print_string, scroll_message · **Fundamentals**: text_glyphs
-- **Backgrounds**: mode1, mode1_bg3_priority, mode1_lz77, mode0, mode2, mode3, mode4, mode5, mode5_hires, mode6
-- **Sprites**: simple_sprite, sprite_sizes, animated_sprite, metasprite, dynamic_sprite, dynamic_metasprite, sprite_swarm
-- **Scrolling**: mixed_scroll, continuous_scroll, parallax_scroll
-- **Mode 7**: rotate_scale, perspective, perspective_rotate, dsp1_ground, extbg
-- **HDMA & raster**: gradient_colors, hdma_indirect_gradient, hdma_wave, hdma_helpers
-- **Colour**: palette_cycle, transparency, shadow_tint, direct_color, hicolor_1792, pseudo_hires
-- **Windows**: window, window_multi_hdma, transparent_window · **Transitions**: fading, mosaic
-- **Input**: controller, two_players, mouse, superscope
-- **Audio**: snesmod_music, snesmod_music_large, snesmod_sfx, soundboard, apu_switch, play_noise, pitch_mod, speech_synth, echo
-- **Maps**: map_scroll, tiled, dynamic_map, slope_collision
-- **Game math**: collision_demo, aim_target, fix32_orbit, timer, scene_stack, panel_hud, game_skeleton
-- **Memory**: hirom_demo, save_game · **Enhancement chips**: sa1_hello, sa1_starfield, sa1_save, superfx_hello, superfx_3d, superfx_game_skeleton, superfx_save
-- **Games**: breakout, tetris, likemario, mapandobjects, shmup_1942, mode7_racing, mode7_flying, rpg
-
-### Build system
-- [x] Cross-platform (Linux, macOS, Windows / MSYS2)
-- [x] LoROM (default), HiROM, SA-1, and SuperFX modes
-- [x] FastROM support (`USE_FASTROM := 1`)
-- [x] SRAM support
-- [x] `LIB_MODULES` selection with automatic dependency resolution
-- [x] Multi-file C compilation (`CSRC` variable)
-- [x] CI/CD pipeline (GitHub Actions) — build, test, docs, release
-- [x] SDK release packaging (`make release`) with pre-built binaries per OS
-- [x] Unified memmap files (single source of truth)
-- [x] Memmap-template dependency tracking (no more `make clean` after edits)
-
-### Testing & quality
-- [x] **luna** test backend (cycle-accurate native; runs SA-1 / Super FX / DSP-1)
-- [x] Automated luna suite: corpus liveness coverage, visual regression,
-      functional probes (input→WRAM via `--assert`), audio + VRAM/ARAM +
-      sprite-structure checks, and the `SNES_ASSERT`/WDM oracle
-- [x] **Compiler regression tests** (C → ASM pattern checks, `make test-compiler`)
-- [x] **Visual regression** keyed on luna's cross-arch-stable `--print-fbhash`
-- [x] **Cycle-count benchmark** (`make bench`)
-- [x] **Bank $00 ROM overflow** check on every link (build-time guard)
-- [x] **Toolchain pin verification** (`make verify-toolchain`)
-- [x] **clang `-Wall -Wextra -Werror`** syntax check on every C source
-- [x] **Multi-platform CI** (Linux, macOS, Windows) with functional-tests
-      gating PR merges
-- [x] **Commit-message lint** (Conventional Commits + no `Co-Authored-By`)
-
-### Documentation
-- [x] Doxygen API reference (with doxygen-awesome-css theme)
-- [x] [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) — severity-tagged catalog
-      of silent failures
-- [x] [`compiler/ABI.md`](compiler/ABI.md) — calling-convention reference
-- [x] [`compiler/PINS.md`](compiler/PINS.md) — pinned submodule SHAs +
-      local-patch lists
-- [x] Example READMEs with hardware explanations (88 / 88)
-- [x] Progressive learning path (GETTING_STARTED → LEARNING_PATH → tutorials)
-- [x] Hardware reference docs (MEMORY_MAP, OAM, REGISTERS)
-- [x] Tutorials (graphics, sprites, animation, scrolling, input, collision, audio, game states, SA-1)
-- [x] Developer guides (CODE_STYLE, TROUBLESHOOTING, SNES_GRAPHICS_GUIDE, SNES_SOUND_GUIDE)
-- [x] Published benchmark: 30 % (static) to 44 % (measured) faster than PVSnesLib + 816-opt overall, faster and no larger on all 18 measured workloads, level or shallower in stack on 16 (both compilers re-run and the same C measured on luna, 2026-10-08)
-- [x] CHANGELOG, CONTRIBUTING (with branching policy), GitHub templates
-
-### Developer tooling
-- [x] **symmap.py** — Symbol-map analysis, memory-overlap detection, bank
-      $00 overflow checking
-- [x] **verify_toolchain.py** — Compiler-submodule pin enforcement
-- [x] **lint_commits.py** — Conventional-Commits + no-`Co-Authored-By` lint
-- [x] **cyclecount.py** — CPU cycle estimation
-- [x] **Interactive debugging via luna** (CLI + MCP) — replaced the retired
-      Mesen2-bound snesdbg Lua library (see `docs/tutorials/debugging.md`;
-      breakpoints/symbols tracked upstream as luna#63)
-- [x] **font2snes** — Font → SNES-tile converter
+OpenSNES is for C programmers. No SNES experience is needed to start: the
+[learning path](docs/LEARNING_PATH.md) meets the hardware one example at a
+time. The hardware traps (VRAM only during VBlank, the DMA budget of a
+frame, the 8 KB RAM band, the argument order against PVSnesLib) are listed
+in [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md); read it before a project
+of your own.
 
 ---
 
@@ -232,120 +47,22 @@ This stretch focused on closing process gaps surfaced by an internal audit
 
 | Item | Status | Why it matters |
 |------|--------|----------------|
-| Pre-built binary releases | Done (`release.yml`) | Adoption blocker — users shouldn't need to compile the compiler |
-| Hardware verification docs | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility — document testing on real SNES via FXPak Pro |
-| Showcase game (not a port) | In progress, **outside this repository**: the RPG prototype ("Giuseppe", ~3000 lines of C) moved to its own repository on 2026-09-26 and builds against the SDK from there. Not verifiable from a clone of this repo until it is published | Proves the SDK can ship a complete game |
-| Asset provenance cleanup | **A 1.0 gate again (owner decision, 2026-10-10): every asset redone and the examples reviewed before a 1.0 release candidate.** Until then it had been deferred (2026-09-26, confirmed 2026-10-05). 66 asset files in 23 examples are byte-identical to PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa). The owner is not a graphic artist; the two routes on the table are an artist friend drawing original replacements, or a tool-driven port (generated placeholder art of the same tile counts and palettes). Until one happens the files stay as they are, listed in `ATTRIBUTION.md`. | Legal clarity for a 1.0 that ships Nintendo-derived art |
-| Published performance benchmark | Done (`docs/BENCHMARK.md`) | Shows where cc65816 wins and loses, with data |
-| Migration guide PVSnesLib → OpenSNES | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`, v0.43.0) | Smoothest adoption path for existing PVSnesLib users |
-| FAQ | Done (`docs/FAQ.md`, v0.43.0) | Reduces support load |
-| `examples/maps/dynamic_map` cleanup | **Done (2026-07-12)** | Dead code removed: unused `maputil.c` TU, `getSprite*`/`updateSprite*`/`calculateSprite*` engine paths, `sram*` ASM helpers + 16 KB dead `$7F` RAMSECTION; stale C64-converter claims corrected |
+| Pre-built binary releases | Done (`release.yml`) | Users do not compile the compiler |
+| Hardware verification | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility: tested on a real SNES through an FXPak Pro |
+| Showcase game (not a port) | In progress outside this repository | Proves the SDK can ship a complete game |
+| Asset provenance | Every asset redone and the examples reviewed before a 1.0 release candidate. 66 asset files in 23 examples are PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa); they are listed in `ATTRIBUTION.md` until then | Legal clarity for a 1.0 that would ship Nintendo-derived art |
+| Published performance benchmark | Done (`docs/BENCHMARK.md`, `docs/PERF.md`) | Where cc65816 and the library stand against PVSnesLib, with data |
+| Migration guide from PVSnesLib | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`) | The smoothest path for existing PVSnesLib users |
 
 ### Nice-to-have
 
 | Item | Status | Why it matters |
 |------|--------|----------------|
 | Pixel mode (Mode 3 direct drawing) | Not started | Feature parity with PVSnesLib (niche) |
-| Tiled map editor integration | **Shipped**: `tools/tmx2snes`, `examples/maps/tiled`, `examples/games/rpg` (maps, collision, entities and dialogue in `.tmj`) | Workflow convenience for level designers |
+| Streaming audio | Not started | Long samples and voice without a full upload |
 | Video tutorials | Not started | Wider audience reach |
-| Project scaffolding (`opensnes init`) | **Shipped (v0.25.0)** — `opensnes` CLI: init/build/run/doctor | Reduce friction for new users |
-| Save format in the library (checksum, version, slots), then `opensnes-save verify` | **After 1.0** (owner decision, 2026-10-06: 1.1) — a new public API is not frozen with 1.0 | A save that survives a corrupted byte and a new version of the game |
-| String tables in `opensnes-text` (the strings of a game, by language) | **After 1.0** (owner decision, 2026-10-06) — no example needs them yet | Localisation without editing C sources |
-
-### Next steps (audit-driven, prioritised)
-
-- [x] **Sprite/text duplication audit** (P3.2) — *(CLOSED 2026-09-13
-      by the D2/C2 refresh of `.claude/STRUCTURAL_DEFECTS.md`: the
-      sprite path is ASM-only since the OAM rewrite, the text path is
-      the console module; `make test-link-modules` links every module
-      alone and together so a parallel implementation cannot creep
-      back unnoticed.)*
-- [x] **SuperFX / SA-1 functional tests** (P3.4) — *(SUPERSEDED 2026-06-20: luna runs SA-1 / Super FX natively in the headless harness; the Mesen2 phase and the `opensnes-emu` submodule were removed. See `.claude/notes/chantiers/luna_migration.md`.)* Originally added a Mesen2-headless
-      visual regression phase
-      (`tools/opensnes-emu/test/phases/visual-mesen2.mjs`) running the
-      vendored Mesen2 binary in `--testrunner` mode against the four
-      chip-using examples. snes9x's libretro core does not detect the
-      GSU chip in OpenSNES' SuperFX ROM headers, so the snes9x-based
-      visual phase only validates "boots without crashing" for chip
-      ROMs; Mesen2 actually executes the chip code and gives a
-      meaningful baseline. The phase auto-skips when the binary is
-      absent (`scripts/install-mesen2.sh` fetches it once per CI run,
-      cached locally). 4 new checks, total 257 → 261. Done in
-      ~1 day rather than the originally estimated 2 weeks.
-- [x] **Retire residual TCO `[KNOWN_BUG]` test cases** — done in
-      chantier A3 (2026-05-09). Investigation showed every optimisation
-      the markers gated had already shipped; the test assertions had
-      drifted away from current emit-pass behaviour rather than
-      anticipating future work. Markers removed, assertions converted
-      to hard-fail, `--allow-known-bugs` dropped from CI.
-- [x] **Mode 7 game example** — `examples/games/mode7_racing` and
-      `examples/games/mode7_flying` (both shipped; luna manifests).
-- [x] **Gaps-review backlog** — the prioritised list in
-      `.claude/notes/reviews/2026-09-11_gaps_review.md` (§10–§11b).
-      Tiers 1 and 2 shipped 2026-09-12/15; Tier 3's four lots shipped
-      2026-09-15; the last two entries closed 2026-09-17 (see below). Delivered along the way: CI runs `make tests` and
-      `make lint` verbatim, host sanitizers, cppcheck, fuzzing of every
-      asset parser, the three upstream toolchain suites, a per-module
-      link smoke test, the C-feature and fixed-point runtime ROMs,
-      runtime asserts for collision / SRAM / IRQ / window / region, an
-      audio-output hash, a weekly PAL pass, nightly luna bench, host
-      coverage reporting, SHA-pinned actions, a Doxygen warning gate,
-      and the migration, FAQ, profiling and index docs.
-      R4 closed with luna v1.24.0's `profile --budget`: the NMI
-      handler's worst frame is gated at 12 000 master cycles on a
-      representative subset (`make test-nmi-budget`). R7 closed with
-      the 47 remaining manifests: every example has a functional test
-      (108 manifests, 85/85), mouse sensitivity included; the multitap
-      path is documented in `KNOWN_LIMITATIONS.md` as untestable until
-      luna exposes a multitap.
-- [ ] **Streaming audio support**
-- [x] **Hardware verification documentation** — protocol and kit written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`, `make hardware-preflight`); the first console session is the open part (see the v1.0 table)
-- [ ] **Original-game release** — in progress outside this repository (see the v1.0 table)
-- [ ] **Video tutorial series**
-
----
-
-## Work in flight
-
-None on a branch. The Super FX runtime work is merged, phases A to F
-(2026-09-24 to 2026-09-29): interrupt vectors in WRAM, an NMI that survives
-GSU jobs, non-blocking launch, `gsuPresent`, code in RAM, the C to GSU
-contract, and since 2026-10-03 a GSU program linked at its real ROM address
-(`GSU_BANK`) and a save for Super FX games (`USE_SRAM` with `USE_SUPERFX`).
-Nothing remains open there
-(`.claude/notes/chantiers/superfx_runtime.md`).
-The 2026-09-26 état des lieux (`.claude/notes/reviews/`) sets the order of
-the work before v1.0. The 2026-09-11 gaps-review backlog is closed (43 of
-43, 2026-09-17). Since then the work on `develop` is the module
-audit-by-tutorial (text, object, framework — twelve stale claims and
-nine object-engine defects fixed) and the road to v1.0 above: the
-hardware verification protocol, then coverage of the public functions
-no example executes, then the API audit before the freeze. The `wip/*` policy (`CONTRIBUTING.md`)
-still applies to multi-day chantiers; the four `wip/*` branches that
-existed on 2026-09-14 were all superseded by commits already on
-`develop` (three CI hygiene branches of 2026-09-07, one test-harness
-branch of 2026-06-22) and were deleted that day. The luna side of the
-plan lives with the luna team: the exchanges are in
-`.claude/notes/partners/luna/` (and the owner's exchange folder), the
-pinned release in `testing/luna.version`.
-
-## Known limitations
-
-The full catalog with severity tags lives in
-[`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md). Headlines:
-
-- **No floating-point** — use fixed-point math (`<snes/math.h>`)
-- **`int` is 2 bytes, `long` is 4 bytes** on this target (since
-  2026-05-08) — bare `int` is now correct, but `u16` / `s16` /
-  `u32` from `<snes/types.h>` remain preferred for portability
-- **~4 KB VBlank DMA budget** per frame
-- **Plain C RAM must sit below $2000** (compiler emits `sta.l $0000,x`);
-  bulk buffers go above it with `FAR` (v0.39.0) — see
-  [`docs/tutorials/far_ram.md`](docs/tutorials/far_ram.md)
-- **C const data lives in the asset banks by default** (#127.3, v0.41.0);
-  bank $00 keeps the code
-- **Push order is LEFT-TO-RIGHT** (vs PVSnesLib's right-to-left) — see
-  [`compiler/ABI.md`](compiler/ABI.md) before porting an ASM helper
+| Save format in the library (checksum, version, slots), then `opensnes-save verify` | After 1.0 (1.1): a new public API is not frozen with 1.0 | A save that survives a corrupted byte and a new version of the game |
+| String tables in `opensnes-text` (the strings of a game, by language) | After 1.0: no example needs them yet | Localisation without editing C sources |
 
 ---
 
@@ -355,6 +72,5 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-12. Anchored claims (version, examples count, framework
-opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`
-and `.claude/rules/doc_consistency.md`.*
+*Last updated: 2026-10-14. Anchored claims (version, examples count, framework
+opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`.*

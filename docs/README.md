@@ -132,8 +132,7 @@ The asset pipeline, one page per tool, under [tools/](tools/).
 Which public header each tutorial covers, and where the documentation is thin.
 Written by hand; `make lint-docs` checks that every header of
 `lib/include/snes/` has a row and that every header and tutorial a row names
-exists (this paragraph said the table was "generated" until 2026-10-05 —
-nothing generated or checked it). "Partial" means the tutorial teaches the
+exists. "Partial" means the tutorial teaches the
 topic without naming most of the API.
 
 | Header | Covered by | State |
@@ -176,21 +175,9 @@ topic without naming most of the API.
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 
-**Every public header is now covered.** The last three were small enough to
-belong in an existing page rather than one of their own: 16.16 maths went
-into the [Math](tutorials/math.md) tutorial, LZ77 decompression into
-[Graphics](tutorials/graphics.md), and the in-ROM debug channel into
-[Debugging](tutorials/debugging.md) as recipe 7.
-
-The map is worth keeping honest for a reason the last two days made plain:
-**writing a page is a detection instrument.** Closing `object.h`, `text.h`,
-`gameloop.h` and `asset.h` turned up ten defects in the code being
-documented — a field comment that invited a buffer overrun, an action stored
-to the wrong entity, a connection test that called every idle pad unplugged,
-an example that taught readers to write VRAM outside VBlank, two compiler-bug
-notes that had been fixed long ago and were still scaring people off correct
-C, and a compression example whose headline figures were wrong by an order of
-magnitude in the pessimistic direction.
+Every public header is covered: 16.16 maths in the [Math](tutorials/math.md)
+tutorial, LZ77 decompression in [Graphics](tutorials/graphics.md), and the
+in-ROM debug channel in [Debugging](tutorials/debugging.md) (recipe 7).
 
 ## Building the documentation
 
