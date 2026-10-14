@@ -71,7 +71,7 @@ CSRC       := main.c
 include $(OPENSNES)/make/common.mk
 ```
 
-For LIB_MODULES combinations, see `docs/GETTING_STARTED.md`.
+For LIB_MODULES combinations, see `docs/tools/build.md`.
 
 ## Doxygen Documentation
 

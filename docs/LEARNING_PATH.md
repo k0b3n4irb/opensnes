@@ -36,6 +36,12 @@ underpins everything visual on the SNES.
 
 @subpage examples_sprites_animated_sprite
 
+@subpage examples_sprites_metasprite
+
+@subpage examples_sprites_dynamic_sprite
+
+@subpage examples_sprites_aseprite_pipeline
+
 @subpage examples_sprites_sprite_swarm
 
 @subpage examples_sprites_world_sprites
@@ -72,6 +78,8 @@ ground with tile collision.
 
 @subpage examples_maps_map_scroll
 
+@subpage examples_maps_dynamic_map
+
 @subpage examples_maps_tiled
 
 @subpage examples_maps_slope_collision
@@ -93,6 +101,8 @@ windows, the Mode 7 plane, and sound.
 @subpage examples_transitions_mosaic
 
 @subpage examples_hdma_hdma_wave
+
+@subpage examples_scrolling_parallax_scroll
 
 @subpage examples_hdma_gradient_colors
 
@@ -134,13 +144,15 @@ every game needs.
 
 ## Stage 6 — "Can I finish and ship?"
 
-*Confidence: a complete cartridge.* Persist progress, choose a mapper, reach
-for a coprocessor when you need more, and study complete games that fuse
+*Confidence: a complete cartridge.* Persist progress, choose a mapper, fit
+more data in the cartridge with compression, reach for a coprocessor when you need more, and study complete games that fuse
 everything above.
 
 @subpage examples_memory_save_game
 
 @subpage examples_memory_hirom_demo
+
+@subpage examples_backgrounds_mode1_lz77
 
 @subpage examples_games_breakout
 

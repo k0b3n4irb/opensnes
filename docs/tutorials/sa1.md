@@ -126,17 +126,11 @@ the SA-1 reads it, computes results, writes them back, and signals "done."
 
 ### 1. Enable SA-1 in Your Makefile
 
-```makefile
-OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := mygame.sfc
-ROM_NAME := MY SA1 GAME
+On top of the template of @ref tools_build, add:
 
-CSRC     := main.c
-USE_LIB  := 1
+```makefile
 USE_SA1  := 1
 LIB_MODULES := console sprite dma background input sa1
-
-include $(OPENSNES)/make/common.mk
 ```
 
 `USE_SA1 := 1` does three things:

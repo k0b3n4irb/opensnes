@@ -137,24 +137,15 @@ cd ~/my-snes-game
 
 Create two files:
 
-**Makefile:**
-```makefile
-# Point to your OpenSNES installation
-OPENSNES := /path/to/opensnes
+**Makefile:** copy the template of @ref tools_build, which also lists every
+variable the build reads, and change the lines that are yours: where the SDK
+is, the ROM's name, and the modules this program uses.
 
-# ROM settings
+```makefile
+OPENSNES := /path/to/opensnes        # where you extracted the SDK
 TARGET   := my_game.sfc
 ROM_NAME := MY GAME
-
-# Source files
-CSRC     := main.c
-
-# Use OpenSNES library
-USE_LIB  := 1
 LIB_MODULES := console dma text background
-
-# Include the build system
-include $(OPENSNES)/make/common.mk
 ```
 
 **main.c:**
@@ -335,63 +326,20 @@ See [CLAUDE.md](https://github.com/k0b3n4irb/opensnes/blob/develop/CLAUDE.md) fo
 
 ## What's Next?
 
-You've built and run a ROM. Three complementary ways forward — pick by how you
-like to learn, or use all three:
+You've built and run a ROM. From here:
 
-- **Follow the journey.** @ref learning_path walks the examples as a developer's
+- **Follow the route.** @ref learning_path walks the examples as a developer's
   questions — "can I put something on screen?", "can I build a world?" — each
   stage buying real confidence, never a wall you can't climb.
-- **Make your own assets.** @ref tools is the converter pipeline that turns your
-  PNGs, Tiled maps, fonts, WAVs and tracker modules into SNES data — the
-  `opensnes-*` tools (`opensnes-tileset`, `opensnes-sprite`, `opensnes-level`,
-  `opensnes-sample`…), run by the build from a settings file beside each asset.
-- **Decide what to build.** @ref craft is hardware-grounded *design* advice:
-  budget your VRAM before you draw, choose a background mode from your genre,
-  compose layers, and scope a first game you can actually finish.
-
-Or explore the examples by complexity:
-
-| Level | Examples | What You'll Learn |
-|-------|----------|-------------------|
-| **Beginner** | `text/print_string`, `text/scroll_message` | Console output, text formatting |
-| **Intermediate** | `sprites/simple_sprite`, `input/two_players` | Sprites, controller input |
-| **Advanced** | `mode7/rotate_scale`, `audio/snesmod_music` | Mode 7, tracker music |
-| **Expert** | `games/breakout`, `games/likemario` | Complete game structure |
-| **SA-1 Coprocessor** | `chips/sa1_hello`, `chips/sa1_starfield` | 10.74 MHz second CPU ([tutorial](tutorials/sa1.md)) |
-| **SuperFX (GSU)** | `chips/superfx_hello`, `chips/superfx_3d` | RISC coprocessor, 3D rendering ([tutorial](tutorials/superfx.md)) |
-
-Browse all examples:
-```bash
-ls examples/*/
-```
-
-## Tutorials
-
-The full set of tutorials, always current, is on the docs home page —
-see @ref documentation "the tutorial navigation". The most common
-starting points:
-
-| Topic | Guide |
-|-------|-------|
-| Graphics & Backgrounds | [tutorials/graphics.md](tutorials/graphics.md) |
-| Sprites & Animation | [tutorials/sprites.md](tutorials/sprites.md), [tutorials/animation.md](tutorials/animation.md) |
-| Scrolling & Parallax | [tutorials/scrolling.md](tutorials/scrolling.md) |
-| Collision Detection | [tutorials/collision.md](tutorials/collision.md) |
-| Input Handling | [tutorials/input.md](tutorials/input.md) |
-| Audio & Music | [tutorials/audio.md](tutorials/audio.md) |
-| Math & Fixed-Point | [tutorials/math.md](tutorials/math.md) |
-| DMA | [tutorials/dma.md](tutorials/dma.md) |
-| HDMA Effects | [tutorials/hdma.md](tutorials/hdma.md) |
-| Color Math | [tutorials/colormath.md](tutorials/colormath.md) |
-| Hardware Windows | [tutorials/window.md](tutorials/window.md) |
-| Mosaic | [tutorials/mosaic.md](tutorials/mosaic.md) |
-| Mode 7 | [tutorials/mode7.md](tutorials/mode7.md) |
-| Game States | [tutorials/game_states.md](tutorials/game_states.md) |
-| SRAM Saves | [tutorials/sram.md](tutorials/sram.md) |
-| Far RAM (`FAR` objects) | [tutorials/far_ram.md](tutorials/far_ram.md) |
-| SA-1 Coprocessor | [tutorials/sa1.md](tutorials/sa1.md) |
-| SuperFX (GSU) | [tutorials/superfx.md](tutorials/superfx.md) |
-| Debugging | [tutorials/debugging.md](tutorials/debugging.md) |
+- **Find an example by topic.** @ref examples_by_category lists every example,
+  one line each.
+- **Find the function.** @ref api_index indexes the SDK by what you are trying
+  to do, with the example that does it. Worth a scan before you write a
+  helper: several already exist.
+- **Make your own assets.** @ref tools turns your PNGs, Tiled maps, fonts, WAVs
+  and tracker modules into SNES data.
+- **Everything else** — the tutorials, the game-craft guides, the hardware
+  reference — is on the docs home page, @ref documentation.
 
 ## Troubleshooting the setup
 
@@ -413,32 +361,13 @@ Run `make` from the SDK root first — the library must be compiled before examp
 cd /path/to/opensnes && make lib
 ```
 
-### Black screen when running ROM
+### Anything else
 
-Your ROM built but doesn't display anything. Common causes:
-1. Missing `setScreenOn()` call
-2. Missing `WaitForVBlank()` in main loop
-3. Wrong `LIB_MODULES` — check that you include all needed modules
-
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
-
-### Build fails with "refusing to emit silently-wrong code"
-
-The compiler stops, with the feature named, rather than generate wrong code
-for what it does not support: structs passed or returned by value, a struct
-copied to or from a `FAR` object, variadic functions and inline assembly.
-Pass a pointer, copy the fields, or move the code to a `.asm` file. Plain
-struct assignment (`a = b;`) works. 32-bit `u32`/`s32` arithmetic is
-fully supported (it is slower than 16-bit, not wrong). See
-`KNOWN_LIMITATIONS.md` for the full list.
+A black screen, a compiler that stops with "refusing to emit silently-wrong
+code", sprites that do not show: @ref troubleshooting goes from the symptom to
+the cause.
 
 ## Getting Help
 
 - **Issues**: [github.com/k0b3n4irb/opensnes/issues](https://github.com/k0b3n4irb/opensnes/issues)
 - **SNES Dev Wiki**: [snes.nesdev.org](https://snes.nesdev.org/)
-
-## Which API do I need?
-
-See [API_INDEX.md](API_INDEX.md) — the SDK indexed by *what you are
-trying to do*, with the example that does it. Worth a scan before you
-write a helper: several already exist.

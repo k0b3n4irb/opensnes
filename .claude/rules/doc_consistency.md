@@ -99,9 +99,10 @@ opt-in list.
     did, a string spill that #127.3 ended, and a stale cost figure
     (examples audit, F_examples.md PF4). Explain history in other words.
 
-15. **The header → tutorial map of `docs/README.md`** (since 2026-10-05):
-    every public header of `lib/include/snes/` has a row, and every header
-    and tutorial a row names exists. The page called the table "generated"
+15. **The header → tutorial map of `docs/API_INDEX.md`** (since 2026-10-05;
+    in `docs/README.md` until 2026-10-14): every public header of
+    `lib/include/snes/` has a row, and every header and tutorial a row names
+    exists. The page called the table "generated"
     while nothing produced or checked it (docs audit, E_docs.md rec 8).
     `CLAUDE.md` joined the files whose example count is checked (anchor 3).
 

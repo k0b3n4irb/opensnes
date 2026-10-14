@@ -153,9 +153,9 @@ up the PNG→tiles asset pipeline and a build workflow out of the box.
 
 ## Examples
 
-88 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
+88 examples — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games. The learning path is the route through them; the catalogue lists every one by topic.
 
-**[Browse all examples](examples/README.md)** · **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)**
+**[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)** · **[Examples by category](https://k0b3n4irb.github.io/opensnes/examples_by_category.html)** · **[All the documentation](docs/README.md)**
 
 ### Supported Platforms
 

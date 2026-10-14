@@ -26,20 +26,13 @@ registers, hardware PLOT for pixel rendering, and an instruction cache.
 
 ### 1. Enable SuperFX in Your Makefile
 
+On top of the template of @ref tools_build, add:
+
 ```makefile
-OPENSNES := $(shell cd ../../../.. && pwd)
-TARGET   := mygame.sfc
-ROM_NAME := MY SUPERFX GAME
-
-CSRC     := main.c
-ASMSRC   := gsu_loader.asm
-GSUSRC   := gsu_code.sfx
-
-USE_LIB     := 1
+ASMSRC      := gsu_loader.asm
+GSUSRC      := gsu_code.sfx
 USE_SUPERFX := 1
 LIB_MODULES := console sprite dma background superfx
-
-include $(OPENSNES)/make/common.mk
 ```
 
 `GSUSRC` lists your SuperFX assembly files (`.sfx`). The build system

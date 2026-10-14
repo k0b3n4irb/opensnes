@@ -1077,13 +1077,14 @@ def bench_table_drifts(page: str, baseline: dict[str, int]) -> list[str]:
 
 
 # --------------------------------------------------------------------------
-# Check 15: the header -> tutorial map of docs/README.md (added 2026-10-05,
-# docs audit rec 8). The page said the table was "generated"; nothing checked
+# Check 15: the header -> tutorial map of docs/API_INDEX.md (added 2026-10-05,
+# docs audit rec 8; the map lived in docs/README.md until lot 6 of the docs
+# plan, 2026-10-14). The page said the table was "generated"; nothing checked
 # it. Every public header must have a row, every header a row names must
 # exist, and every tutorial a row links must exist.
 # --------------------------------------------------------------------------
 
-HEADER_MAP_DOC = "docs/README.md"
+HEADER_MAP_DOC = "docs/API_INDEX.md"
 HEADER_MAP_HEADING = "## Header → tutorial map"
 
 
@@ -1217,6 +1218,9 @@ def check_header_map() -> list[str]:
         return [f"{HEADER_MAP_DOC}: the '{HEADER_MAP_HEADING}' section is gone — "
                 f"the sentinel (anchor 15) checks it; restore it or retire the check"]
     section = text[text.index(HEADER_MAP_HEADING):]
+    nxt = section.find("\n## ", len(HEADER_MAP_HEADING))
+    if nxt != -1:
+        section = section[:nxt]
     rows = [l for l in section.splitlines() if l.startswith("| `")]
     named: set[str] = set()
     for line in rows:

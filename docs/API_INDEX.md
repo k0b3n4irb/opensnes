@@ -144,20 +144,64 @@ its header.
 
 ## When something silently does nothing
 
-The SNES fails quietly. `KNOWN_LIMITATIONS.md` is the catalogue; the
-ones that cost the most time:
+The SNES fails quietly. @ref troubleshooting goes from the symptom to the
+cause, and @ref known_limitations is the catalogue of the traps behind them.
 
-| Symptom | Likely cause |
-|---|---|
-| a VRAM upload partly lands | outside VBlank/forced blank, or over the ~4 KB budget |
-| the screen stays black after a DMA | `setBrightness(0)` is not forced blank — use `setScreenOff()` |
-| a sprite renders as background garbage | `oamInit`'s second argument is a page number 0-7, not an address — use `OBJ_NAME_BASE(addr)` |
-| a sprite appears where no entity is | off-camera OAM coordinates wrap — `oamHide()` it |
-| a `const` array reads as garbage | it spilled past bank $00; the build's bank-blind check should catch it |
-| colours shift when you add a tile | the converter re-derives the whole palette — author a fixed one and impose it (`palette = "fixed.pal"` in the settings file) |
+## Header → tutorial map
+
+Which public header each tutorial covers, and where the documentation is thin.
+Written by hand; `make lint-docs` checks that every header of
+`lib/include/snes/` has a row and that every header and tutorial a row names
+exists. "Partial" means the tutorial teaches the
+topic without naming most of the API.
+
+| Header | Covered by | State |
+|---|---|---|
+| `anim.h` | [Animation](tutorials/animation.md) | ✅ |
+| `apu.h` | [Audio](tutorials/audio.md) | ✅ |
+| `audio.h` | [Audio](tutorials/audio.md) | ✅ |
+| `background.h` | [Scrolling](tutorials/scrolling.md), [Graphics](tutorials/graphics.md) | ✅ |
+| `collision.h` | [Collision](tutorials/collision.md) | ✅ |
+| `colormath.h` | [Colour Math](tutorials/colormath.md) | ✅ |
+| `console.h` | scattered across tutorials | 🟡 partial — no page owns init, brightness, fades, region |
+| `dma.h` | [DMA](tutorials/dma.md) | ✅ |
+| `dsp1.h` | [DSP-1](tutorials/dsp1.md) | ✅ |
+| `hdma.h` | [HDMA](tutorials/hdma.md) | ✅ |
+| `input.h` | [Input](tutorials/input.md) | ✅ pads, mouse, Super Scope (the multitap cannot be switched on: Known limitations) |
+| `interrupt.h` | [Interrupts](tutorials/interrupts.md) | ✅ |
+| `tile.h` | [Graphics](tutorials/graphics.md) | ✅ |
+| `map.h` | [Maps](tutorials/map.md) | ✅ |
+| `math.h` | [Fixed-Point Math](tutorials/math.md) | ✅ |
+| `mode7.h` | [Mode 7](tutorials/mode7.md) | ✅ |
+| `mosaic.h` | [Mosaic](tutorials/mosaic.md) | ✅ |
+| `panel.h` | [Panels](tutorials/panel.md) | ✅ |
+| `profile.h` | [Profiling](tutorials/profiling.md) | ✅ |
+| `sa1.h` | [SA-1](tutorials/sa1.md) | ✅ |
+| `scene.h` | [Game States](tutorials/game_states.md) | ✅ |
+| `snesmod.h` | [Audio](tutorials/audio.md) | ✅ |
+| `sprite.h` | [Sprites](tutorials/sprites.md), [Animation](tutorials/animation.md) | ✅ |
+| `sram.h` | [SRAM](tutorials/sram.md) | ✅ |
+| `superfx.h` | [SuperFX](tutorials/superfx.md) | ✅ |
+| `video.h` | [Graphics](tutorials/graphics.md) | ✅ |
+| `window.h` | [Window](tutorials/window.md) | ✅ |
+| `asset.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
+| `debug.h` | [Debugging](tutorials/debugging.md) — recipe 7 | ✅ |
+| `fixed32.h` | [Math](tutorials/math.md) — the 16.16 section | ✅ |
+| `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
+| `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
+| `string.h` | [FAR RAM](tutorials/far_ram.md) — copying between ROM, RAM and FAR RAM | ✅ |
+| `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
+| `object.h` | [The Object Engine](tutorials/object.md) | ✅ |
+| `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
+| `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
+
+Every public header is covered: 16.16 maths in the [Math](tutorials/math.md)
+tutorial, LZ77 decompression in [Graphics](tutorials/graphics.md), and the
+in-ROM debug channel in [Debugging](tutorials/debugging.md) (recipe 7).
 
 ## Keeping this page honest
 
-Example paths here are checked by `devtools/check_doc_drift.py`, so a
-renamed or deleted example fails `make lint-docs`. Function names are
+Example paths here, and the header map above, are checked by
+`devtools/check_doc_drift.py`, so a renamed or deleted example, a header
+without a row or a dead tutorial link fails `make lint-docs`. Function names are
 not checked — if you rename a public function, grep this file.

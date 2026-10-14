@@ -72,16 +72,11 @@ Two changes to enable SRAM in a project:
 
 ### 1. Makefile
 
+Add two lines to the project Makefile (@ref tools_build has the template):
+
 ```makefile
-OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := mygame.sfc
-ROM_NAME := MYGAME
-USE_LIB    := 1
-USE_SRAM   := 1            # turn on SRAM support
+USE_SRAM   := 1            # turn on SRAM support (links the sram module)
 SRAM_SIZE  := 3            # 3 = 8 KB (the common choice)
-LIB_MODULES := console sram dma background input
-CSRC := main.c
-include $(OPENSNES)/make/common.mk
 ```
 
 The `SRAM_SIZE` numeric value matches the ROM header's `SRAMSIZE`

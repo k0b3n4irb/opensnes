@@ -36,17 +36,11 @@ of the library not written in camelCase, and it will not be renamed.
 
 ## Step 1 — the Makefile
 
-An OpenSNES example Makefile is short, and the module list is the part that is
-new:
+An OpenSNES Makefile is a few variables and one `include`; @ref tools_build
+has the template and every variable. The module list is the part that is new:
 
 ```makefile
-OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := game.sfc
-ROM_NAME := MY GAME
-USE_LIB  := 1
 LIB_MODULES := console sprite dma input text
-CSRC := main.c
-include $(OPENSNES)/make/common.mk
 ```
 
 `LIB_MODULES` is the one real change of habit. OpenSNES links only the modules

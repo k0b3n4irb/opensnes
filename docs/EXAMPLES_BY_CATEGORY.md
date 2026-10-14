@@ -59,6 +59,7 @@ Sprite display, animation, and OAM management.
 | @subpage examples_sprites_dynamic_metasprite | Dynamic metasprite engine with batched OAM updates |
 | @subpage examples_sprites_sprite_swarm | A bouncing swarm + the per-sprite OAM throughput ceiling |
 | @subpage examples_sprites_world_sprites | World-space sprites: a camera, culling and OAM in one call per batch |
+| @subpage examples_sprites_aseprite_pipeline | The asset pipeline: an Aseprite export through `opensnes-sprite` into an animated metasprite |
 
 ---
 

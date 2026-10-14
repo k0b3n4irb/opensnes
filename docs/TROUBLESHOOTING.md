@@ -1,6 +1,8 @@
 # Troubleshooting OpenSNES {#troubleshooting}
 
-Common issues and their solutions.
+From a symptom to its cause. The SNES fails quietly, so many symptoms below
+lead to an entry of @ref known_limitations, the catalogue of silent failures:
+this page names the trap, that one explains it.
 
 ## Build Issues
 
@@ -100,13 +102,33 @@ while (1) {
 consoleInit();
 ```
 
-**4. C variables past the 8 KB RAM band**
+**4. A DMA under `setBrightness(0)`**
+
+`setBrightness(0)` darkens the picture but is not forced blank: the PPU still
+rejects VRAM writes. Upload under `setScreenOff()`.
+
+**5. C variables past the 8 KB RAM band**
 
 Plain C variables must sit in `$0000-$1FFF`; a large buffer belongs in far
 RAM (`FAR`, see [Far RAM](tutorials/far_ram.md)). The build checks it after
 every link and stops when the band overflows; `opensnes-rom check game.sfc`
 prints how much of it is left, and `opensnes-rom budget game.sfc` what uses
 it.
+
+### A big buffer behaves strangely
+
+Same cause as above: a plain C global past `$2000` is wrong-banked. Declare
+bulk buffers `FAR` (@ref tutorial_far_ram; the RAM entry of
+@ref known_limitations).
+
+### A `const` array reads garbage
+
+The `const` was cast away and the data read through a plain pointer. C const
+data lives in the asset banks and every C read of it is a far read; a plain
+pointer reads bank $00 instead. Keep the `const`, or hand the data to a library
+function that takes a far pointer. The build's bank-blind read check fails the
+link on this pattern; the bank $00 entry of @ref known_limitations has the
+details.
 
 ### ROM runs but crashes after a few seconds
 
@@ -143,6 +165,22 @@ oamSet(0, x, y, 0, 0, 3, 0);
 // The NMI handler uploads the OAM shadow when a sprite call changed it
 // (oam_update_flag); a direct write into oamMemory[] is not seen
 ```
+
+### A sprite renders as background garbage
+
+`oamInit`'s second argument is a name-base page number (0-7), not a VRAM
+address. Pass `OBJ_NAME_BASE(addr)` rather than the address.
+
+### A sprite appears where no entity is
+
+Off-camera OAM coordinates wrap around the screen. Hide a sprite that left
+the view with `oamHide()`; `oamPlaceWorld()` culls for you
+(@ref tutorial_sprites).
+
+### Sprites have the wrong colours
+
+Sprite palettes start at CGRAM entry 128, not 0: palette 0 of the sprites is
+entries 128-143. A palette loaded at 0 colours the backgrounds instead.
 
 ### Controller input not working
 
@@ -196,12 +234,24 @@ opensnes-tileset convert res/bg.png --colors 16               # backgrounds
 ```
 (or the same settings in `res/sprite.png.toml`, which the build runs for you).
 
-### Tiles appear corrupted
+### Colours shift when you add a tile
+
+The converter derives the whole palette again from the new art. Author a fixed
+palette and impose it: `palette = "fixed.pal"` in the asset's settings file
+(@ref tools_conventions).
+
+### Tiles appear corrupted, or an upload only partly lands
 
 **Causes**:
-1. Wrong tile format (2bpp vs 4bpp vs 8bpp)
-2. VRAM address overlap
-3. DMA transfer size mismatch
+1. VRAM written during the picture: the PPU drops it without an error. Upload
+   in VBlank or under `setScreenOff()`
+2. Over the ~4 KB of DMA a VBlank holds: split the upload across frames or
+   do it under forced blank
+3. Wrong tile format (2bpp vs 4bpp vs 8bpp)
+4. VRAM address overlap
+5. DMA transfer size mismatch
+
+The first two are the first two entries of @ref known_limitations.
 
 **Check your graphics mode**:
 ```c
@@ -230,6 +280,15 @@ while (1) {
 ```
 
 See [Scrolling](tutorials/scrolling.md) for per-line scroll (HDMA parallax).
+
+### Everything is one line off vertically
+
+The library already subtracts the 1 that the PPU's missing scanline 0
+requires (`bgSetScroll`, the map module, `mode7SetScroll`). Pass the row you
+want; keep your own -1 only in data that reaches the register without the
+library, such as an HDMA table on `BGnVOFS`. A PVSnesLib port that passed
+`y - 1` itself ends up one line off. The vertical scroll entry of
+@ref known_limitations has the details.
 
 ## Memory Issues
 

@@ -7,13 +7,13 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage getting_started -- Install the SDK and build your first ROM
 
-@subpage learning_path -- 88 examples from "Hello World" to complete games
+@subpage learning_path -- The route through the examples, from "Hello World" to complete games
 
-@subpage examples_by_category -- Browse examples by topic
+@subpage examples_by_category -- All 88 examples, by topic
 
-## Guides
+## Help
 
-@subpage troubleshooting -- Common problems and solutions
+@subpage troubleshooting -- From a symptom to its cause
 
 @subpage faq -- Frequently asked questions
 
@@ -22,8 +22,6 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 ## Game-Craft
 
 @subpage craft -- Design decisions: budgeting, choosing a mode, composing layers
-
-@subpage perf -- What the library functions cost per frame, measured in five real scenes
 
 ## Tools {#mainpage_tools}
 
@@ -111,6 +109,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 @subpage api_index -- API index, by what you are trying to do
 
 @subpage known_limitations -- Known limitations: the silent failures, and how to avoid them
+
+@subpage perf -- What the library functions cost per frame, measured in five real scenes
 
 @subpage benchmark -- Compiler benchmark against PVSnesLib
 

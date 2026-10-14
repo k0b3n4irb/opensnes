@@ -1,183 +1,70 @@
 # OpenSNES documentation
 
-Everything the SDK ships, indexed. The rendered version of these pages lives at
-<https://k0b3n4irb.github.io/opensnes/> (built by `make docs`); this file is the
-map for people reading the repository on GitHub.
+The map of `docs/` for people reading the repository on GitHub. The rendered
+site, <https://k0b3n4irb.github.io/opensnes/> (built by `make docs`), follows
+the same plan from its home page.
 
-## Start here
+## Start
 
-| Document | What it gives you |
-|---|---|
-| [Getting Started](GETTING_STARTED.md) | Install, build and run your first ROM |
-| [Learning Path](LEARNING_PATH.md) | A route through the examples, ordered by the question you are asking |
-| [Examples by Category](EXAMPLES_BY_CATEGORY.md) | The exhaustive index of the example corpus |
-| [API Index](API_INDEX.md) | The SDK indexed by *what you are trying to do* |
-| [FAQ](FAQ.md) | Short answers to the questions newcomers actually ask |
-| [Hardware verification](HARDWARE_VERIFICATION.md) | The real-console session: 26 ROMs, one check each, and the grid to fill in |
-| [Troubleshooting](TROUBLESHOOTING.md) | Symptoms and their causes |
-| [Migrating from PVSnesLib](MIGRATING_FROM_PVSNESLIB.md) | Porting an existing project, and the five traps that bite |
-| [Upgrading from 0.48 to 0.49](UPGRADING.md) | The names the earlier releases deprecated and 0.49 removes, and the two calls that change meaning |
-| [What 1.0 will freeze](STABILITY.md) | The promise 1.0 will make, and what 0.49 already keeps of it: what stays, what may move, how a change reaches you |
+1. [Getting Started](GETTING_STARTED.md) — install, your first ROM, your own project
+2. [Learning Path](LEARNING_PATH.md) — the route through the examples
+3. [Examples by Category](EXAMPLES_BY_CATEGORY.md) — every example, by topic
+
+When something goes wrong: [Troubleshooting](TROUBLESHOOTING.md) (symptom →
+cause), [FAQ](FAQ.md), [Migrating from PVSnesLib](MIGRATING_FROM_PVSNESLIB.md).
 
 ## Tutorials
 
-Twenty-eight task-shaped walkthroughs under [tutorials/](tutorials/).
+Task-shaped walkthroughs under [tutorials/](tutorials/).
 
-**Drawing the screen**
+- **Drawing the screen:** [Graphics](tutorials/graphics.md),
+  [Sprites](tutorials/sprites.md), [Animation](tutorials/animation.md),
+  [Scrolling](tutorials/scrolling.md), [Maps and Tiled](tutorials/map.md),
+  [Mode 7](tutorials/mode7.md)
+- **Effects:** [DMA](tutorials/dma.md), [HDMA](tutorials/hdma.md),
+  [Interrupts](tutorials/interrupts.md), [Colour Math](tutorials/colormath.md),
+  [Windows](tutorials/window.md), [Mosaic](tutorials/mosaic.md)
+- **Game systems:** [Input](tutorials/input.md),
+  [Collision](tutorials/collision.md), [Game States](tutorials/game_states.md),
+  [The Opt-In Framework](tutorials/framework.md), [Text](tutorials/text.md),
+  [The Object Engine](tutorials/object.md), [9-Slice Panels](tutorials/panel.md),
+  [Audio](tutorials/audio.md), [Fixed-Point Math](tutorials/math.md),
+  [SRAM Saves](tutorials/sram.md), [Far RAM](tutorials/far_ram.md)
+- **Coprocessors and tooling:** [SA-1](tutorials/sa1.md),
+  [SuperFX](tutorials/superfx.md), [DSP-1](tutorials/dsp1.md),
+  [Debugging with luna](tutorials/debugging.md),
+  [Profiling](tutorials/profiling.md)
 
-| Tutorial | Topic |
-|---|---|
-| [Graphics & Backgrounds](tutorials/graphics.md) | Tilemaps, BG modes, VRAM layout |
-| [Sprites & Animation](tutorials/sprites.md) | OAM, sprite sheets, metasprites |
-| [Animation Techniques](tutorials/animation.md) | Clips, frame timing, dynamic sprites |
-| [Scrolling & Parallax](tutorials/scrolling.md) | Map scrolling, layered depth |
-| [Scrolling Maps & the Tiled Pipeline](tutorials/map.md) | Tiled levels, streaming columns |
-| [Mode 7](tutorials/mode7.md) | Rotation, scaling, perspective |
+## Craft
 
-**Effects**
-
-| Tutorial | Topic |
-|---|---|
-| [DMA](tutorials/dma.md) | Bulk transfers and the VBlank budget |
-| [HDMA](tutorials/hdma.md) | Per-scanline register writes |
-| [Interrupts](tutorials/interrupts.md) | VBlank callbacks and H/V timer IRQs |
-| [Colour Math](tutorials/colormath.md) | Transparency, blending, the sub-screen |
-| [Window Masking](tutorials/window.md) | Clipping layers, spotlights, iris fades |
-| [Mosaic](tutorials/mosaic.md) | The pixelation transition |
-
-**Game systems**
-
-| Tutorial | Topic |
-|---|---|
-| [Controller Input](tutorials/input.md) | Button masks and multi-player |
-| [Collision Detection](tutorials/collision.md) | Rectangles, tiles, slopes |
-| [Game States](tutorials/game_states.md) | State machines and transitions |
-| [The Opt-In Framework](tutorials/framework.md) | Game loop and asset bundles |
-| [Text & Fonts](tutorials/text.md) | Printing, the tilemap buffer and the flush |
-| [The Object Engine](tutorials/object.md) | Entity pool, gravity, map collision |
-| [9-Slice Panels](tutorials/panel.md) | Dialog boxes and HUD frames |
-| [Audio & Music](tutorials/audio.md) | SNESMOD playback and sound effects |
-| [Fixed-Point Math](tutorials/math.md) | 8.8 and 16.16 arithmetic |
-| [SRAM Saves](tutorials/sram.md) | Battery-backed save data |
-| [Far RAM](tutorials/far_ram.md) | Buffers beyond the 8 KB band |
-
-**Coprocessors and tooling**
-
-| Tutorial | Topic |
-|---|---|
-| [SA-1](tutorials/sa1.md) | The 10.74 MHz second CPU |
-| [SuperFX](tutorials/superfx.md) | The GSU RISC coprocessor |
-| [DSP-1](tutorials/dsp1.md) | Hardware matrix and projection maths |
-| [Debugging with luna](tutorials/debugging.md) | Stepping, breakpoints, memory inspection |
-| [Profiling](tutorials/profiling.md) | Measuring where the frame goes |
-
-## Game-craft
-
-Design guides under [craft/](craft/) — the decisions *before* the code.
-
-| Guide | Question it answers |
-|---|---|
-| [Planning your game](craft/planning.md) | What can this machine hold? |
-| [The frame budget](craft/frame-budget.md) | What fits in 1/60th of a second? |
-| [Composing with backgrounds](craft/backgrounds.md) | Which layers, which mode? |
-| [From tiles to levels](craft/tiles-to-levels.md) | How do I turn art into a world? |
-| [Following the player](craft/camera.md) | How should the camera move? |
-| [Game feel](craft/game-feel.md) | Why does this feel dead? |
+[Game-craft guides](craft/) — the design decisions before the code:
+[planning](craft/planning.md), [the frame budget](craft/frame-budget.md),
+[backgrounds](craft/backgrounds.md), [tiles to levels](craft/tiles-to-levels.md),
+[the camera](craft/camera.md), [game feel](craft/game-feel.md).
 
 ## Tools
 
-The asset pipeline, one page per tool, under [tools/](tools/).
+[tools/](tools/) — one page per tool: the `opensnes` CLI, the `opensnes-*`
+asset converters, luna, and [your project's Makefile](tools/build.md).
 
-| Tool | Turns |
-|---|---|
-| [opensnes](tools/opensnes.md) | Your project: init, build, run, test, release |
-| [opensnes-tileset](tools/opensnes-tileset.md) | Background pictures into tilesets, tilemaps and palettes |
-| [opensnes-sprite](tools/opensnes-sprite.md) | Sprite sheets and Aseprite exports into tiles, metasprites and clips |
-| [opensnes-level](tools/opensnes-level.md) | Tiled levels into SNES map data |
-| [opensnes-palette](tools/opensnes-palette.md) | A project's palettes into CGRAM slots; RGB art into indexed PNGs |
-| [opensnes-text](tools/opensnes-text.md) | Font images into text tiles |
-| [opensnes-image](tools/opensnes-image.md) | HiColor screens and Mode 7 perspective tables |
-| [opensnes-sample](tools/opensnes-sample.md) | WAV files into BRR samples |
-| [opensnes-music](tools/opensnes-music.md) | Tracker modules into SNESMOD soundbanks |
-| [opensnes-rom](tools/opensnes-rom.md) | The post-link checks, the header, the budget |
-| [opensnes-save](tools/opensnes-save.md) | Battery save files |
-| [smconv](tools/smconv.md) | Tracker modules into SNESMOD soundbanks, from `SOUNDBANK_SRC` |
-| [luna](tools/luna.md) | The emulator: every subcommand and flag |
-| [Legacy tools](tools/legacy.md) | The earlier converters and what replaces each |
+## Reference
 
-## Hardware reference
+- [API Index](API_INDEX.md) — the SDK by what you are trying to do, and which
+  tutorial covers each header
+- [Known limitations](../KNOWN_LIMITATIONS.md) — every trap that fails
+  silently, with its mitigation
+- [Frame costs](PERF.md) and [Benchmark](BENCHMARK.md)
+- Hardware: [overview](hardware/README.md), [PPU](hardware/PPU.md),
+  [APU](hardware/APU.md), [memory map](hardware/MEMORY_MAP.md),
+  [registers](hardware/REGISTERS.md), [OAM](hardware/OAM.md)
 
-| Document | Content |
-|---|---|
-| [Hardware Overview](hardware/README.md) | CPU, PPU and APU architecture |
-| [The PPU](hardware/PPU.md) | Background modes, tiles, VRAM, palettes, sprite sizes |
-| [The APU](hardware/APU.md) | SPC700, S-DSP, ARAM, BRR samples, echo |
-| [Memory Map](hardware/MEMORY_MAP.md) | Address space layout |
-| [Registers](hardware/REGISTERS.md) | PPU, DMA and I/O registers |
-| [OAM](hardware/OAM.md) | Sprite attribute memory |
+## Project
 
-## For contributors
-
-| Document | Content |
-|---|---|
-| [CONTRIBUTING.md](../CONTRIBUTING.md) | Branch model, commit format, PR rules |
-| [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md) | Every trap that fails silently, with its mitigation |
-| [Code Style](CODE_STYLE.md) | Coding standards |
-| [Benchmark](BENCHMARK.md) | Compiler performance against PVSnesLib |
-| [Frame costs](PERF.md) | What the library functions cost per frame in real scenes, measured on luna |
-| [Third Party](THIRD_PARTY.md) | Attribution and licences |
-
-## Header → tutorial map
-
-Which public header each tutorial covers, and where the documentation is thin.
-Written by hand; `make lint-docs` checks that every header of
-`lib/include/snes/` has a row and that every header and tutorial a row names
-exists. "Partial" means the tutorial teaches the
-topic without naming most of the API.
-
-| Header | Covered by | State |
-|---|---|---|
-| `anim.h` | [Animation](tutorials/animation.md) | ✅ |
-| `apu.h` | [Audio](tutorials/audio.md) | ✅ |
-| `audio.h` | [Audio](tutorials/audio.md) | ✅ |
-| `background.h` | [Scrolling](tutorials/scrolling.md), [Graphics](tutorials/graphics.md) | ✅ |
-| `collision.h` | [Collision](tutorials/collision.md) | ✅ |
-| `colormath.h` | [Colour Math](tutorials/colormath.md) | ✅ |
-| `console.h` | scattered across tutorials | 🟡 partial — no page owns init, brightness, fades, region |
-| `dma.h` | [DMA](tutorials/dma.md) | ✅ |
-| `dsp1.h` | [DSP-1](tutorials/dsp1.md) | ✅ |
-| `hdma.h` | [HDMA](tutorials/hdma.md) | ✅ |
-| `input.h` | [Input](tutorials/input.md) | ✅ pads, mouse, Super Scope (the multitap cannot be switched on: Known limitations) |
-| `interrupt.h` | [Interrupts](tutorials/interrupts.md) | ✅ |
-| `tile.h` | [Graphics](tutorials/graphics.md) | ✅ |
-| `map.h` | [Maps](tutorials/map.md) | ✅ |
-| `math.h` | [Fixed-Point Math](tutorials/math.md) | ✅ |
-| `mode7.h` | [Mode 7](tutorials/mode7.md) | ✅ |
-| `mosaic.h` | [Mosaic](tutorials/mosaic.md) | ✅ |
-| `panel.h` | [Panels](tutorials/panel.md) | ✅ |
-| `profile.h` | [Profiling](tutorials/profiling.md) | ✅ |
-| `sa1.h` | [SA-1](tutorials/sa1.md) | ✅ |
-| `scene.h` | [Game States](tutorials/game_states.md) | ✅ |
-| `snesmod.h` | [Audio](tutorials/audio.md) | ✅ |
-| `sprite.h` | [Sprites](tutorials/sprites.md), [Animation](tutorials/animation.md) | ✅ |
-| `sram.h` | [SRAM](tutorials/sram.md) | ✅ |
-| `superfx.h` | [SuperFX](tutorials/superfx.md) | ✅ |
-| `video.h` | [Graphics](tutorials/graphics.md) | ✅ |
-| `window.h` | [Window](tutorials/window.md) | ✅ |
-| `asset.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
-| `debug.h` | [Debugging](tutorials/debugging.md) — recipe 7 | ✅ |
-| `fixed32.h` | [Math](tutorials/math.md) — the 16.16 section | ✅ |
-| `gameloop.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
-| `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
-| `string.h` | [FAR RAM](tutorials/far_ram.md) — copying between ROM, RAM and FAR RAM | ✅ |
-| `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
-| `object.h` | [The Object Engine](tutorials/object.md) | ✅ |
-| `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
-| `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
-
-Every public header is covered: 16.16 maths in the [Math](tutorials/math.md)
-tutorial, LZ77 decompression in [Graphics](tutorials/graphics.md), and the
-in-ROM debug channel in [Debugging](tutorials/debugging.md) (recipe 7).
+[Philosophy](../PHILOSOPHY.md), [What 1.0 will freeze](STABILITY.md),
+[Upgrading from 0.48 to 0.49](UPGRADING.md),
+[Hardware verification](HARDWARE_VERIFICATION.md),
+[Code Style](CODE_STYLE.md), [Contributing](../CONTRIBUTING.md),
+[Third Party](THIRD_PARTY.md).
 
 ## Building the documentation
 
