@@ -6,7 +6,7 @@ world larger than itself — and on the SNES there is no camera object to
 configure, only scroll registers you write every frame. The universal theory of
 good cameras is written down beautifully already (see the Go-deeper box); this
 guide is how to land it on this hardware, with this SDK. For the registers
-themselves, see @ref snes_graphics_guide.
+themselves, see @ref hardware_ppu.
 
 ## The camera *is* your scroll values
 

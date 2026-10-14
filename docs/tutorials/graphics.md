@@ -4,13 +4,9 @@ This tutorial covers SNES graphics fundamentals including video modes, backgroun
 
 ## SNES Video Modes
 
-The SNES has 8 video modes (0-7). OpenSNES primarily uses:
-
-| Mode | BG1 | BG2 | BG3 | BG4 | Best For |
-|------|-----|-----|-----|-----|----------|
-| **0** | 4 colors | 4 colors | 4 colors | 4 colors | Text, simple UI |
-| **1** | 16 colors | 16 colors | 4 colors | - | Most games |
-| **7** | 256 colors (rotatable) | - | - | - | Racing, rotation effects |
+The SNES has eight background modes (0-7); most games use Mode 1, text and
+simple UI use Mode 0, rotation uses Mode 7. What each mode gives each layer
+is tabled in @ref hardware_ppu_modes "The PPU: background modes".
 
 ## Setting Up Graphics
 
@@ -90,16 +86,9 @@ Like any DMA to VRAM, call it during force blank or VBlank.
 
 ## Setting Up Tilemaps
 
-Tilemaps define which tiles appear where on screen. Each entry is 2 bytes:
-
-```
-Bits: vhopppcc cccccccc
-  v = vertical flip
-  h = horizontal flip
-  o = priority
-  ppp = palette (0-7)
-  cccccccccc = tile number (0-1023)
-```
+Tilemaps define which tiles appear where on screen. Each entry is 2 bytes —
+tile number, palette, priority and flips; the bit layout is in
+@ref hardware_ppu_tilemaps "The PPU: tilemaps".
 
 ```c
 void setup_tilemap(void) {
@@ -121,7 +110,9 @@ void setup_tilemap(void) {
 
 ## Setting Palettes
 
-SNES uses 15-bit color (RGB555):
+Colours are 15-bit BGR555, written low byte first; the format and the
+split of CGRAM between backgrounds and sprites are in
+@ref hardware_ppu_cgram "The PPU: CGRAM and colours".
 
 ```c
 void setup_palette(void) {

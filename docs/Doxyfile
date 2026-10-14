@@ -34,8 +34,6 @@ INPUT                  = mainpage.md \
                          LEARNING_PATH.md \
                          EXAMPLES_BY_CATEGORY.md \
                          CODE_STYLE.md \
-                         SNES_GRAPHICS_GUIDE.md \
-                         SNES_SOUND_GUIDE.md \
                          TROUBLESHOOTING.md \
                          FAQ.md \
                          MIGRATING_FROM_PVSNESLIB.md \

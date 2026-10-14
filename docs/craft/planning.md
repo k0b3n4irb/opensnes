@@ -7,7 +7,7 @@ scarce resources, pick a background mode from your genre, and scope something
 you can actually finish.
 
 For the register-level detail behind every number here, see
-@ref snes_graphics_guide. This guide is about the *decisions*.
+@ref hardware_ppu. This guide is about the *decisions*.
 
 ## The three budgets
 
@@ -18,13 +18,8 @@ draw, the way you would a level's layout.
 
 VRAM holds your background tiles, your background maps, **and** your sprite
 tiles, all at once. It is one pool, not three. The cost of a tile depends only
-on its colour depth:
-
-| Colour depth | Colours | Bytes per 8×8 tile |
-|--------------|---------|--------------------|
-| 2bpp | 4 | 16 |
-| 4bpp | 16 | 32 |
-| 8bpp | 256 | 64 |
+on its colour depth: 16 bytes at 2bpp, 32 at 4bpp, 64 at 8bpp (the tile
+formats are tabled in @ref hardware_ppu "The PPU").
 
 A background *map* is separate from its tiles: a 32×32 screen of map entries
 is **2 KB** (each entry is 2 bytes — tile number, flip, palette, priority). A
@@ -102,8 +97,8 @@ how to *pick* one, starting from the game you want to make:
 
 Default to **Mode 1** unless your game has a specific reason not to — it is
 what most of the library used, and every other mode trades a layer or colour
-depth for its special power. Put your HUD on the low-priority layer (Mode 1's
-BG3) so it draws over the action; see @ref craft_backgrounds for how to
+depth for its special power. Put your HUD on the 4-colour layer (Mode 1's
+BG3) with its high-priority bit, so it draws over the action; see @ref craft_backgrounds for how to
 compose layers, and @ref examples_backgrounds_mode1_bg3_priority for the HUD
 overlay in practice.
 
@@ -111,7 +106,7 @@ overlay in practice.
 
 Each mode also trades layers and colour depth against **how much VRAM a tile
 costs**, because a tile's size is fixed by its colour depth (@ref
-snes_graphics_guide for the register detail):
+hardware_ppu for the register detail):
 
 | Mode | Layers (colours) | Bytes/tile | The budget trade |
 |------|------------------|-----------|------------------|

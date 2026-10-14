@@ -99,13 +99,26 @@ luna is the cycle-accurate emulator behind `opensnes run` and `opensnes test`,
 and `luna mcp` is the debugger. @subpage tools_luna is the pinned release's own
 `--help`, one section per subcommand, generated from the binary.
 
+## Free assets to start from
+
+Art and sound under CC0 or open licences, to prototype before your own
+(check each item's licence):
+
+| Source | What |
+|--------|------|
+| [itch.io, CC0 pixel art](https://itch.io/game-assets/assets-cc0/tag-pixel-art) | Sprites and tilesets |
+| [itch.io, 16-bit assets](https://itch.io/game-assets/free/tag-16-bit) | Sprites and tilesets |
+| [OpenGameArt, CC0](https://opengameart.org/content/cc0-resources) | Art and sound |
+| [Kenney](https://kenney.nl/assets) | Art and sound, CC0 |
+| [Freesound](https://freesound.org) | Samples, licence per sound |
+
 ## Where they fit with the rest of the docs
 
 - The **why** behind the numbers these tools produce — bpp, VRAM cost, palette
   conventions — is @ref craft_planning. Read it before you commit to a mode.
 - The **level workflow** that `opensnes-tileset` + `opensnes-level` enable end
   to end is @ref craft_tiles_to_levels and the @ref tutorial_map tutorial.
-- The **audio** side pairs with @ref snes_sound_guide and @ref tutorial_audio.
+- The **audio** side pairs with @ref hardware_apu and @ref tutorial_audio.
 
 > **The one rule.** Keep the *source* (the PNG, the Tiled project, the WAV, the
 > `.it`) as your single source of truth and let the tools regenerate the binary

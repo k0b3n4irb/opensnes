@@ -13,10 +13,6 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 ## Guides
 
-@subpage snes_graphics_guide -- Backgrounds, sprites, modes, VRAM
-
-@subpage snes_sound_guide -- SPC700, SNESMOD, music and SFX
-
 @subpage troubleshooting -- Common problems and solutions
 
 @subpage faq -- Frequently asked questions
@@ -94,6 +90,10 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 ## Hardware Reference
 
 @subpage hardware_overview -- CPU, PPU, APU architecture
+
+@subpage hardware_ppu -- Background modes, tiles, VRAM, palettes, sprite sizes
+
+@subpage hardware_apu -- SPC700, S-DSP, ARAM, BRR samples, echo
 
 @subpage memory_map -- Address space layout
 

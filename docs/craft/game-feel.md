@@ -7,7 +7,7 @@ depending on it. The universal principles are covered definitively elsewhere
 where you have no shader, no tween library, and a 4 KB VBlank budget. Almost
 every classic effect turns out to be a cheap trick on a PPU register. This guide
 is the SNES-specific toolbox; for the registers behind each, see
-@ref snes_graphics_guide.
+@ref hardware_ppu.
 
 ## Screen shake — nudge the scroll
 

@@ -3,7 +3,7 @@
 The API tutorials teach you **how to call** the SDK. These guides teach you
 **how to decide** — the seam between "I know the sprite API" and "I shipped a
 small game." They are hardware-grounded design advice, not reference: for the
-registers and exact hardware behaviour, see @ref snes_graphics_guide.
+registers and exact hardware behaviour, see @ref hardware_ppu.
 
 ## The philosophy
 

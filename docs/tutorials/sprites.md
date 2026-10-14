@@ -4,30 +4,11 @@ This tutorial covers SNES sprites (OBJ layer) including OAM management and anima
 
 ## SNES Sprite Basics
 
-- Up to **128 sprites** on screen
-- Sizes: 8x8, 16x16, 32x32, 64x64 (two sizes per mode)
-- 4bpp (16 colors per palette)
-- 8 palettes available (palettes 8-15 in CGRAM)
-- Stored in **OAM** (Object Attribute Memory) - 544 bytes
-
-## OAM Structure
-
-Each sprite uses 4 bytes in main OAM + 2 bits in high table:
-
-**Main OAM (4 bytes per sprite):**
-| Byte | Content |
-|------|---------|
-| 0 | X position (low 8 bits) |
-| 1 | Y position |
-| 2 | Tile number (low 8 bits) |
-| 3 | Attributes: vhoopppN |
-
-**Attributes:**
-- v = Vertical flip
-- h = Horizontal flip
-- oo = Priority (0-3)
-- ppp = Palette (0-7, maps to CGRAM 128-255)
-- N = Tile number bit 8
+The OBJ layer shows up to 128 sprites of 16 colours, each one of two sizes
+chosen for all sprites at once, with palettes in the upper half of CGRAM.
+The size combinations, the per-line limits and the palettes are in
+@ref hardware_ppu_sprites "The PPU: sprites"; each sprite's four bytes and
+two bits of OAM are in @ref oam.
 
 ## Using OpenSNES Sprite Functions
 
@@ -190,7 +171,7 @@ the VRAM cost before you convert.
 
 ## Sprite Palettes
 
-Sprite palettes use CGRAM addresses 128-255:
+Sprite palettes start at CGRAM colour 128 (`OBJ_CGRAM_BASE`):
 
 ```c
 void load_sprite_palette(void) {
@@ -213,27 +194,8 @@ void load_sprite_palette(void) {
 
 ### Frame-based Animation
 
-```c
-u8 anim_frame = 0;
-u8 anim_timer = 0;
-const u8 ANIM_SPEED = 8;  // Frames per animation step
-
-void update_animation(void) {
-    anim_timer++;
-    if (anim_timer >= ANIM_SPEED) {
-        anim_timer = 0;
-        anim_frame++;
-        if (anim_frame >= 4) {  // 4 frames of animation
-            anim_frame = 0;
-        }
-    }
-}
-
-// In main loop:
-update_animation();
-// Set tile based on frame (assuming tiles 0-3 are animation frames)
-oamSetTile(0, anim_frame);
-```
+Cycling a sprite's tile on a timer, and the `anim` module that does it from
+data, are in @ref tutorial_animation.
 
 ### Movement with Animation
 
@@ -259,25 +221,13 @@ void update_player(u16 pad) {
 
 ## Sprite Sizes
 
-Configure sprite sizes with REG_OBJSEL:
+`oamInit(size, name_base)` sets OBJSEL: `size` is one of `OBJ_SIZE8_L16` …
+`OBJ_SIZE32_L64`, the small and large size every sprite chooses between,
+and `oamSetSize(id, 1)` gives a sprite the large one. The table of size
+combinations is in @ref hardware_ppu_sprites "The PPU: sprites".
 
 ```c
-// REG_OBJSEL: sssnnbbb
-//   sss = size mode (see table)
-//   nn = name select (gap between tables)
-//   bbb = base address (/8192)
-
-// Size modes:
-// 0: 8x8 and 16x16
-// 1: 8x8 and 32x32
-// 2: 8x8 and 64x64
-// 3: 16x16 and 32x32
-// 4: 16x16 and 64x64
-// 5: 32x32 and 64x64
-
-REG_OBJSEL = 0x00;  // 8x8/16x16, tiles at $0000
-REG_OBJSEL = 0x20;  // 8x8/32x32, tiles at $0000
-REG_OBJSEL = 0x60;  // 16x16/32x32, tiles at $0000
+oamInit(OBJ_SIZE16_L32, OBJ_NAME_BASE(0x0000));   /* 16x16 and 32x32 sprites */
 ```
 
 ## Example: Two Players
@@ -384,7 +334,7 @@ oamPlaceWorld(&actors, cam_x, cam_y);
 
 1. **Minimize oamUpdate() calls** - Only call once per frame
 2. **Use sprite pooling** - Reuse sprite slots instead of creating/destroying
-3. **Check sprite limits** - Max 32 sprites per scanline, 128 total
+3. **Check sprite limits** - the per-line limits are in @ref hardware_ppu_sprites "The PPU: sprites"
 4. **Batch similar sprites** - Group sprites using same tiles/palettes
 
 ## Next Steps

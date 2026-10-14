@@ -5,7 +5,7 @@ Once @ref craft_planning has you in the right background mode, the craft is
 screen is a small stack of transparencies — a few background layers plus the
 sprite layer — and the art is assigning each element to the right sheet, at the
 right depth. This guide is those decisions; for the priority bits and registers
-that implement them, see @ref snes_graphics_guide.
+that implement them, see @ref hardware_ppu.
 
 ## Give every layer a job
 

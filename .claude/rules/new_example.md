@@ -17,12 +17,12 @@ paths:
    The rules apply to ALL code — new or ported.
 
 2. **Consult docs/** — it is the source of truth for all SNES concepts:
-   - Graphics & backgrounds: `docs/tutorials/graphics.md`, `docs/SNES_GRAPHICS_GUIDE.md`
+   - Graphics & backgrounds: `docs/tutorials/graphics.md`, `docs/hardware/PPU.md`
    - Sprites & animation: `docs/tutorials/sprites.md`, `docs/tutorials/animation.md`
    - Scrolling & parallax: `docs/tutorials/scrolling.md`
    - Collision detection: `docs/tutorials/collision.md`
    - Input handling: `docs/tutorials/input.md`
-   - Audio & music: `docs/tutorials/audio.md`, `docs/SNES_SOUND_GUIDE.md`
+   - Audio & music: `docs/tutorials/audio.md`, `docs/hardware/APU.md`
    - Game states: `docs/tutorials/game_states.md`
    - Hardware registers: `docs/hardware/REGISTERS.md`
    - Memory map: `docs/hardware/MEMORY_MAP.md`

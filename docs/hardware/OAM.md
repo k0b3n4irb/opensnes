@@ -111,16 +111,9 @@ REG_OAMADDH = 1;  // Bit 0 = 1 selects high table (bytes 512+)
 
 ## Sprite Sizes
 
-`$2101` (OBJSEL) configures sprite sizes:
-
-| Value | Small | Large |
-|-------|-------|-------|
-| 0x00 | 8x8 | 16x16 |
-| 0x20 | 8x8 | 32x32 |
-| 0x40 | 8x8 | 64x64 |
-| 0x60 | 16x16 | 32x32 |
-| 0x80 | 16x16 | 64x64 |
-| 0xA0 | 32x32 | 64x64 |
+`$2101` (OBJSEL) chooses the small and large size for all sprites; each
+sprite's size bit in the extended table picks one of the two. The size
+combinations are tabled in @ref hardware_ppu_sprites "The PPU: sprites".
 
 ## Hiding Sprites
 
@@ -220,5 +213,5 @@ void update_sprite(u8 x, u8 y, u8 tile, u8 attr) {
 ## See Also
 
 - [Registers](REGISTERS.md) - Full register reference
-- [SNES Graphics Guide](../SNES_GRAPHICS_GUIDE.md) - Graphics system overview
+- [The PPU](PPU.md) - Modes, tiles, palettes, sprite sizes
 - [Animated Sprite Example](../../examples/sprites/animated_sprite/) - Working sprite animation code

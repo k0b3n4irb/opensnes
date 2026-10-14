@@ -6,40 +6,20 @@ Understanding SNES hardware is essential for effective game development.
 
 | Document | Description |
 |----------|-------------|
+| [The PPU](PPU.md) | Background modes, tiles, VRAM, palettes, sprite sizes |
+| [The APU](APU.md) | SPC700, S-DSP, audio RAM, BRR samples, echo |
 | [Memory Map](MEMORY_MAP.md) | RAM, ROM, and register layout |
 | [Registers](REGISTERS.md) | Complete hardware register reference |
 | [OAM](OAM.md) | Sprite attribute memory documentation |
 
-For graphics (PPU, tiles, modes, palettes), see the [SNES Graphics Guide](../SNES_GRAPHICS_GUIDE.md).
-For audio (SPC700, DSP, BRR, SNESMOD), see the [SNES Sound Guide](../SNES_SOUND_GUIDE.md).
-
-## Quick Reference
-
-### Specifications
+## Specifications
 
 | Component | Specification |
 |-----------|---------------|
 | CPU | 65816 @ 3.58 MHz (NTSC) / 3.55 MHz (PAL) |
 | Work RAM | 128 KB |
-| VRAM | 64 KB |
-| OAM | 544 bytes (128 sprites + size/position bits) |
-| CGRAM | 512 bytes (256 colors x 2 bytes) |
-| APU | SPC700 @ 1.024 MHz + DSP |
-| Audio RAM | 64 KB |
-
-### Resolution
-
-| Mode | Resolution |
-|------|------------|
-| NTSC | 256x224 or 256x239 |
-| PAL | 256x239 or 256x224 (same picture sizes; more blank lines) |
-| Hi-res | 512x224 (Modes 5/6), 448/478 lines in interlace |
-
-### Colors
-
-- 15-bit color (32768 colors)
-- 256 simultaneous colors (8 palettes x 16 colors for BG, same for sprites)
-- Format: `0BBBBBGGGGGRRRRR`
+| PPU | 64 KB VRAM, 544-byte OAM, 512-byte CGRAM: @ref hardware_ppu |
+| APU | SPC700 + S-DSP with 64 KB of audio RAM: @ref hardware_apu |
 
 ## Key Concepts
 
@@ -55,30 +35,12 @@ WaitForVBlank();
 // Now safe to DMA to VRAM
 ```
 
-### Tiles and Sprites
+### Tiles, sprites and background modes
 
-**Tiles** are 8x8 pixel graphics used for both backgrounds and sprites.
-
-**Sprites** (Objects/OBJ) are movable graphics composed of one or more tiles:
-- 128 sprites maximum
-- Sizes: 8x8, 16x16, 32x32, 64x64
-- 32 sprites per scanline limit
-- Can be flipped horizontally/vertically
-
-### Background Modes
-
-| Mode | BG1 | BG2 | BG3 | BG4 | Colors |
-|------|-----|-----|-----|-----|--------|
-| 0 | 4 | 4 | 4 | 4 | 4 per BG |
-| 1 | 16 | 16 | 4 | - | Common |
-| 2 | 16 | 16 | - | - | Per-tile offset |
-| 3 | 256 | 16 | - | - | Direct color |
-| 4 | 256 | 4 | - | - | Per-tile offset |
-| 5 | 16 | 4 | - | - | Hi-res |
-| 6 | 16 | - | - | - | Hi-res + offset |
-| 7 | 256 | - | - | - | Mode 7 rotation |
-
-Most games use **Mode 1** (good balance of features).
+Everything on screen is built from 8x8 tiles: background layers arranged by
+a tilemap, and up to 128 movable sprites. The eight background modes trade
+layers against colours; Mode 1 is the usual choice. The mode table, the
+sprite sizes and the per-line limits are in @ref hardware_ppu.
 
 ### Banks and Addressing
 

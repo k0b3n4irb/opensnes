@@ -19,13 +19,6 @@ map for people reading the repository on GitHub.
 | [Upgrading from 0.48 to 0.49](UPGRADING.md) | The names the earlier releases deprecated and 0.49 removes, and the two calls that change meaning |
 | [What 1.0 will freeze](STABILITY.md) | The promise 1.0 will make, and what 0.49 already keeps of it: what stays, what may move, how a change reaches you |
 
-## Guides
-
-| Document | Topic |
-|---|---|
-| [SNES Graphics Guide](SNES_GRAPHICS_GUIDE.md) | PPU architecture, BG modes, tiles, palettes, sprites |
-| [SNES Sound Guide](SNES_SOUND_GUIDE.md) | SPC700, DSP registers, BRR samples, SNESMOD |
-
 ## Tutorials
 
 Twenty-eight task-shaped walkthroughs under [tutorials/](tutorials/).
@@ -117,6 +110,8 @@ The asset pipeline, one page per tool, under [tools/](tools/).
 | Document | Content |
 |---|---|
 | [Hardware Overview](hardware/README.md) | CPU, PPU and APU architecture |
+| [The PPU](hardware/PPU.md) | Background modes, tiles, VRAM, palettes, sprite sizes |
+| [The APU](hardware/APU.md) | SPC700, S-DSP, ARAM, BRR samples, echo |
 | [Memory Map](hardware/MEMORY_MAP.md) | Address space layout |
 | [Registers](hardware/REGISTERS.md) | PPU, DMA and I/O registers |
 | [OAM](hardware/OAM.md) | Sprite attribute memory |

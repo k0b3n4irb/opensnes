@@ -54,7 +54,7 @@ snesmodProcess();                         // once per frame
 `examples/games/likemario` does exactly this. (`spcLoad` / `spcPlay` are
 the PVSnesLib names — see @ref migrating_pvsneslib.)
 
-See @ref tutorial_audio and @ref snes_sound_guide for the runtime side.
+See @ref tutorial_audio and @ref hardware_apu for the runtime side.
 
 ## The flags behind the Makefile
 
