@@ -18,10 +18,10 @@ pixels, three or four frames, fading out. Costs nothing, sells everything. Shake
 the sprite layer too (offset your OAM Y) for an impact that rattles the whole
 screen, or shake only the backgrounds for a softer thud.
 
-## Hit flash — color math, not palette edits
+## Hit flash — colour math, not palette edits
 
 To flash a struck enemy white or tint the screen red on damage, do **not**
-rewrite palette entries every frame — that is a DMA you do not need. Use color
+rewrite palette entries every frame — that is a DMA you do not need. Use colour
 math: the PPU adds or subtracts a fixed colour across a layer or the sprites in
 one register write. A one-frame white add on hit, a red subtract while the
 player is hurt, a blue wash underwater — all are @ref examples_color_shadow_tint
@@ -88,6 +88,6 @@ comes from the sum of small, short responses to input, not from one big effect.
 Add them one at a time and stop when it feels right.
 
 > **Sources:**
-> [fullsnes](https://problemkaputt.de/fullsnes.htm) (color math, mosaic, INIDISP
+> [fullsnes](https://problemkaputt.de/fullsnes.htm) (colour math, mosaic, INIDISP
 > brightness) and the [SNESdev Wiki](https://snes.nesdev.org/wiki); the SDK's
-> color-math and transition examples for the working code.
+> colour-math and transition examples for the working code.

@@ -63,7 +63,7 @@ audioLoadSample(0, jump_brr, jump_brr_size, jump_brr_loop);
 audioPlaySample(0);
 ```
 
-`examples/audio/soundboard` is the worked example, @ref tutorial_audio the
+`examples/audio/soundboard` is the worked example, @ref tutorial_audio_samples the
 tutorial.
 
 ## Settings beside the asset

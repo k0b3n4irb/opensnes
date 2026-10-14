@@ -102,9 +102,9 @@ by the SIWP ($2229) and CIWP ($222A) write-protection registers.
 **BW-RAM** is battery-backed SRAM mapped in banks $40-$5F, with an 8 KB
 window visible at $6000-$7FFF for convenient access from bank $00 code.
 
-### SuperFX Cartridge
+### Super FX Cartridge
 
-The SuperFX (GSU) has its own register space and uses cartridge SRAM as
+The Super FX (GSU) has its own register space and uses cartridge SRAM as
 a shared framebuffer.
 
 ```
@@ -115,13 +115,13 @@ $3100-$32FF     512 B     GSU code cache (read-only from SNES side)
 $70-$71:0000    32-64 KB  Cartridge SRAM (shared framebuffer + data)
 ```
 
-**GSU registers ($3000-$303F)** control the SuperFX processor. The SNES
+**GSU registers ($3000-$303F)** control the Super FX processor. The SNES
 CPU writes parameters and starts the GSU by writing to R15 ($301E-$301F).
 
 **Code cache ($3100-$32FF)** holds the currently cached GSU instructions.
 The SNES can read but not write this region.
 
-**Cartridge SRAM ($70-$71)** serves as the GSU framebuffer. The SuperFX
+**Cartridge SRAM ($70-$71)** serves as the GSU framebuffer. The Super FX
 PLOT instruction writes pixels here, and the SNES reads it back for
 display. Bus ownership is controlled by the SCMR register ($303A) —
 the SNES and GSU cannot access SRAM simultaneously.

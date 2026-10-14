@@ -37,7 +37,7 @@ The PPU's background modes — colour vs layers vs resolution.
 | @subpage examples_backgrounds_mode1_bg3_priority | BG3 priority bit for overlay effects |
 | @subpage examples_backgrounds_mode1_lz77 | LZ77-compressed background data |
 | @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
-| @subpage examples_backgrounds_mode3 | Mode 3: 256-color (8bpp) single layer |
+| @subpage examples_backgrounds_mode3 | Mode 3: 256-colour (8bpp) single layer |
 | @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
 | @subpage examples_backgrounds_mode4 | Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words |
 | @subpage examples_backgrounds_mode6 | Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns |
@@ -95,7 +95,7 @@ Change a register every scanline.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_hdma_gradient_colors | HDMA + CGRAM color gradients |
+| @subpage examples_hdma_gradient_colors | HDMA + CGRAM colour gradients |
 | @subpage examples_hdma_hdma_indirect_gradient | Indirect HDMA pointer-table gradient (krom port) |
 | @subpage examples_hdma_hdma_wave | HDMA wave: a hand-built table (krom port), then the hdma module's helper |
 | @subpage examples_hdma_hdma_helpers | High-level HDMA effect library (wave, ripple, iris) |
@@ -109,10 +109,10 @@ Colour math, palette bypass, and beating the 256-colour limit.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_color_palette_cycle | Palette cycling: animate by rotating CGRAM, no pixels moved |
-| @subpage examples_color_transparency | Color math (add/subtract blending) |
+| @subpage examples_color_transparency | Colour math (add/subtract blending) |
 | @subpage examples_color_shadow_tint | Shadow & tint: darken or colour-cast a whole scene via fixed-colour math |
-| @subpage examples_color_direct_color | Direct color mode: the 8bpp pixel byte IS the RGB color |
-| @subpage examples_color_hicolor_1792 | 1792 colors from a 4bpp background via per-tile-row HDMA (krom port) |
+| @subpage examples_color_direct_color | Direct colour mode: the 8bpp pixel byte IS the RGB colour |
+| @subpage examples_color_hicolor_1792 | 1792 colours from a 4bpp background via per-tile-row HDMA (krom port) |
 | @subpage examples_color_pseudo_hires | 50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math |
 
 ---
@@ -125,7 +125,7 @@ Mask part of the screen — static or HDMA-shaped.
 |---------|-------------|
 | @subpage examples_windows_window | Hardware window masking |
 | @subpage examples_windows_window_multi_hdma | Both hardware windows animated per scanline (krom port) |
-| @subpage examples_windows_transparent_window | Color math + HDMA windowed transparency |
+| @subpage examples_windows_transparent_window | Colour math + HDMA windowed transparency |
 
 ---
 
@@ -227,9 +227,9 @@ sharing I-RAM with the main CPU for inter-processor communication.
 | @subpage examples_chips_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
 | @subpage examples_chips_sa1_save | A boot counter in battery-backed BW-RAM: one more at every power-on |
 
-### SuperFX (GSU)
+### Super FX (GSU)
 
-The SuperFX is a custom RISC processor (GSU) with built-in pixel PLOT,
+The Super FX is a custom RISC processor (GSU) with built-in pixel PLOT,
 hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 
 | Example | Description |

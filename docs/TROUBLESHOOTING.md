@@ -223,7 +223,7 @@ while (1) {
 
 ## Graphics Issues
 
-### Wrong colors / garbled palette
+### Wrong colours / garbled palette
 
 **Cause**: BGR555 format mismatch.
 

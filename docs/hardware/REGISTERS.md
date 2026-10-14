@@ -40,7 +40,7 @@ Every register this page names, and the ones it does not detail, by address.
 | $2122 | CGDATA | CGRAM data write |
 | $212C-2D | TM/TS | Main/sub screen enable |
 | $212E-2F | TMW/TSW | Window masks |
-| $2130-32 | CGWSEL/CGADSUB/COLDATA | Color math |
+| $2130-32 | CGWSEL/CGADSUB/COLDATA | Colour math |
 | $2133 | SETINI | Screen settings |
 
 ### CPU ($4200-$44FF)
@@ -240,11 +240,11 @@ REG_VMDATAL = 0x34;  // Low byte
 REG_VMDATAH = 0x12;  // High byte (triggers increment)
 ```
 
-### Color (CGRAM)
+### Colour (CGRAM)
 
 #### $2121 - CGADD (CGRAM Address)
 
-Color index (0-255).
+Colour index (0-255).
 
 ```c
 // Set palette address to color 0
@@ -298,7 +298,7 @@ REG_TM = 0x13;
 
 #### $212D - TS (Sub Screen Enable)
 
-Same bit layout as TM, for sub screen (color math).
+Same bit layout as TM, for sub screen (colour math).
 
 ---
 
@@ -620,9 +620,9 @@ sta.l $2200          ; CCNT — clear reset bit, SA-1 starts running
 
 ---
 
-## SuperFX / GSU Registers ($3000-$303F)
+## Super FX / GSU Registers ($3000-$303F)
 
-The SuperFX (Graphics Support Unit) is a custom RISC processor with
+The Super FX (Graphics Support Unit) is a custom RISC processor with
 16 general-purpose registers, hardware multiply, and a built-in pixel
 PLOT engine. GSU code runs from cartridge ROM/cache and renders into
 a shared SRAM framebuffer.
@@ -641,7 +641,7 @@ a shared SRAM framebuffer.
 - **R15 is the program counter** — writing to it triggers GSU execution
 - **SFR GO bit** — poll `$3030` bit 5 to wait for GSU to finish (STOP instruction clears it)
 - **SCMR bus ownership** — SNES and GSU cannot access ROM/SRAM simultaneously; set RAN/RON bits to hand off bus access between frames
-- **PLOT** — GSU instruction that writes a pixel to the framebuffer at coordinates set by R1 (X) and R2 (Y), using the color in the COLOR register
+- **PLOT** — GSU instruction that writes a pixel to the framebuffer at coordinates set by R1 (X) and R2 (Y), using the colour in the COLOR register
 
 ```asm
 ; Wait for GSU to finish (poll SFR GO bit)

@@ -37,7 +37,7 @@ int main(void) {
 
 ## Loading Tiles to VRAM
 
-Tiles are 8x8 pixel graphics stored in VRAM. For 4bpp (16 color) tiles:
+Tiles are 8x8 pixel graphics stored in VRAM. For 4bpp (16 colour) tiles:
 
 ```c
 // Tile data (32 bytes per 8x8 tile for 4bpp)

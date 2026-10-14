@@ -119,11 +119,11 @@ its header.
 | Header | Functions | Where it is explained |
 |---|---|---|
 | `anim.h` | `animRestart` | [animation](tutorials/animation.md) |
-| `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopAll` | [audio: choosing the voice](tutorials/audio.md) |
-| `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch`, `audioSetVoiceVolumePitch`, `audioSetVoicePan` | [audio: volume and pitch](tutorials/audio.md) |
-| `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio.md) |
-| `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho`, `audioReleaseEcho` | [audio: echo](tutorials/audio.md) |
-| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio.md) |
+| `audio.h` | `audioPlaySampleOn`, `audioStopVoice`, `audioStopAll` | [audio: choosing the voice](tutorials/audio_samples.md) |
+| `audio.h` | `audioSetVolume`, `audioGetVolume`, `audioSetVoiceVolume`, `audioSetVoicePitch`, `audioSetVoiceVolumePitch`, `audioSetVoicePan` | [audio: volume and pitch](tutorials/audio_samples.md) |
+| `audio.h` | `audioSetADSR`, `audioSetGain` | [audio: ADSR or GAIN](tutorials/audio_samples.md) |
+| `audio.h` | `audioSetEcho`, `audioSetEchoFilter`, `audioEnableEcho`, `audioDisableEcho`, `audioReleaseEcho` | [audio: echo](tutorials/audio_samples.md) |
+| `audio.h` | `audioIsReady`, `audioGetFreeMemory`, `audioGetVoiceState` | [audio: asking the engine](tutorials/audio_samples.md) |
 | `background.h` | `bgInitTileSetData`, `bgInit` | [graphics](tutorials/graphics.md) |
 | `collision.h` | `rectSetPos`, `rectGetCenter` | [collision](tutorials/collision.md) |
 | `colormath.h` | `colorMathSetChannel`, `colorMathSetBrightness`, `colorMathTransparency50`, `colorMathSetDirectColor` | [colour math](tutorials/colormath.md) |
@@ -140,7 +140,7 @@ its header.
 | `profile.h` | `profileGetScanline` | [profiling](tutorials/profiling.md) |
 | `snesmod.h` | `snesmodGetPosition`, `snesmodFlush` | [audio: following the music](tutorials/audio.md) |
 | `sprite.h` | `oamSetX` | [sprites](tutorials/sprites.md) |
-| `superfx.h` | `gsuIsPresent`, `gsuSetupBitmapTilemap`, `gsuDmaFullFrame`, `gsuSetupHdmaBlanking`, `gsuCacheLoad`, `gsuStartCached`, `gsuBusy`, `gsuWait` | [Super FX](tutorials/superfx.md) |
+| `superfx.h` | `gsuIsPresent`, `gsuSetupBitmapTilemap`, `gsuDmaFullFrame`, `gsuSetupHdmaBlanking`, `gsuCacheLoad`, `gsuStartCached`, `gsuBusy`, `gsuWait` | [Super FX](tutorials/superfx.md), [the code cache](tutorials/superfx_advanced.md) |
 
 ## When something silently does nothing
 
@@ -158,11 +158,11 @@ topic without naming most of the API.
 | Header | Covered by | State |
 |---|---|---|
 | `anim.h` | [Animation](tutorials/animation.md) | ✅ |
-| `apu.h` | [Audio](tutorials/audio.md) | ✅ |
-| `audio.h` | [Audio](tutorials/audio.md) | ✅ |
+| `apu.h` | [Samples and the raw APU](tutorials/audio_samples.md) | ✅ |
+| `audio.h` | [Samples and the raw APU](tutorials/audio_samples.md) | ✅ |
 | `background.h` | [Scrolling](tutorials/scrolling.md), [Graphics](tutorials/graphics.md) | ✅ |
 | `collision.h` | [Collision](tutorials/collision.md) | ✅ |
-| `colormath.h` | [Colour Math](tutorials/colormath.md) | ✅ |
+| `colormath.h` | [Colour math](tutorials/colormath.md) | ✅ |
 | `console.h` | scattered across tutorials | 🟡 partial — no page owns init, brightness, fades, region |
 | `dma.h` | [DMA](tutorials/dma.md) | ✅ |
 | `dsp1.h` | [DSP-1](tutorials/dsp1.md) | ✅ |
@@ -178,10 +178,10 @@ topic without naming most of the API.
 | `profile.h` | [Profiling](tutorials/profiling.md) | ✅ |
 | `sa1.h` | [SA-1](tutorials/sa1.md) | ✅ |
 | `scene.h` | [Game States](tutorials/game_states.md) | ✅ |
-| `snesmod.h` | [Audio](tutorials/audio.md) | ✅ |
+| `snesmod.h` | [Music with SNESMOD](tutorials/audio.md) | ✅ |
 | `sprite.h` | [Sprites](tutorials/sprites.md), [Animation](tutorials/animation.md) | ✅ |
 | `sram.h` | [SRAM](tutorials/sram.md) | ✅ |
-| `superfx.h` | [SuperFX](tutorials/superfx.md) | ✅ |
+| `superfx.h` | [Super FX: a first job](tutorials/superfx.md), [running a game around the GSU](tutorials/superfx_advanced.md) | ✅ |
 | `video.h` | [Graphics](tutorials/graphics.md) | ✅ |
 | `window.h` | [Window](tutorials/window.md) | ✅ |
 | `asset.h` | [The Opt-In Framework](tutorials/framework.md) | ✅ |
@@ -191,7 +191,7 @@ topic without naming most of the API.
 | `lzss.h` | [Graphics](tutorials/graphics.md) — compressed tiles | ✅ |
 | `string.h` | [FAR RAM](tutorials/far_ram.md) — copying between ROM, RAM and FAR RAM | ✅ |
 | `vramqueue.h` | [DMA](tutorials/dma.md) — several small uploads in one VBlank | ✅ |
-| `object.h` | [The Object Engine](tutorials/object.md) | ✅ |
+| `object.h` | [The Object Engine](tutorials/object.md), [how it works](tutorials/object_engine.md) | ✅ |
 | `text.h` | [Text & Fonts](tutorials/text.md) | ✅ |
 | `registers.h`, `system.h`, `types.h` | — | reference headers: macros and types, no prose needed |
 

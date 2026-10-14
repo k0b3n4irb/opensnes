@@ -2,7 +2,8 @@
 
 The audio processing unit: a sound CPU (SPC700), a sound generator (S-DSP)
 and their own 64 KB of RAM (ARAM), apart from the main CPU. This page is the
-hardware; playing music and samples from C is @ref tutorial_audio, and the
+hardware; music is @ref tutorial_audio, samples from C and SPC700 programs of
+your own are @ref tutorial_audio_samples, and the
 converters are @ref tools_opensnes_sample (WAV to BRR),
 @ref tools_opensnes_music (Impulse Tracker to soundbank) and @ref tools_smconv.
 
@@ -50,7 +51,8 @@ IPL boot ROM, then talks to that program through four ports.
 | $FFC0-$FFFF | IPL ROM (boot code) |
 
 The sound driver, the samples and the echo ring share the 64 KB. The SDK's
-drivers and what they leave for samples: @ref tutorial_audio.
+drivers and what they leave for samples: @ref tutorial_audio and
+@ref tutorial_audio_samples.
 
 ### Communication ports
 
@@ -80,7 +82,7 @@ At reset the SPC700 runs its boot ROM, which takes blocks from the main CPU
    $2141, and the SPC700 jumps to it.
 
 The SDK's drivers do this for you; writing your own SPC700 program is the
-raw APU path of @ref tutorial_audio.
+raw APU path of @ref tutorial_audio_samples.
 
 ## S-DSP registers
 

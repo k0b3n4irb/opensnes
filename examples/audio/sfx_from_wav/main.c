@@ -9,7 +9,7 @@
  * build converts them with opensnes-sample and links the .brr — no .brr is
  * committed, they are generated on demand like a .pic from a .png.
  *
- * See docs/tutorials/audio.md ("One-shot samples from WAV") and
+ * See docs/tutorials/audio_samples.md ("One-shot samples from WAV") and
  * tools/wav2brr for the converter.
  *
  * Init order: textModeInit (display), audioInit, load samples, setScreenOn.

@@ -1,4 +1,4 @@
-# Colour Math Tutorial {#tutorial_colormath}
+# Colour math tutorial {#tutorial_colormath}
 
 ![colormath example](transparency.png)
 

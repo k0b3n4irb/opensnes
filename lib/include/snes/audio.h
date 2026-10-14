@@ -312,7 +312,7 @@ u8 audioLoadSampleBegin(u8 id, const u8 *brrData, u16 size, u16 loopPoint);
  *                 3 (3 at least); the last step takes up to two bytes more
  *                 rather than leave them alone. The cost of a step is what
  *                 the game chooses here, plus a fixed part: see
- *                 docs/tutorials/audio.md for the measured figures.
+ *                 docs/tutorials/audio_samples.md for the measured figures.
  * @return Bytes still to send; 0 when the sample is whole and playable (and
  *         when no load is under way); AUDIO_LOAD_FAILED if the driver
  *         stopped answering — the load is given up

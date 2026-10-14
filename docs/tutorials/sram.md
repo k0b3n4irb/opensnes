@@ -60,7 +60,7 @@ HiROM one and `$40:0000` (BW-RAM) on an SA-1 one. Two limits to know:
   `e_sa1_bwram_read.toml`) power the cartridge off and on between the save
   and the read.
 - **Super FX** — the save is the GSU's own Game Pak RAM, shared with the
-  framebuffers: see [Super FX: Saving](superfx.md#saving).
+  framebuffers: see [Super FX: Saving](superfx_advanced.md#saving).
 
 The HiROM
 mapping is pinned by `testing/fixtures/libtests_hirom`, which reads the bytes back

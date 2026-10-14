@@ -171,7 +171,7 @@ everything above.
 ### More horsepower — the cartridge coprocessors
 
 When the base hardware isn't enough. SA-1 is the same 65816 ISA at 10.74 MHz;
-SuperFX / GSU is a custom RISC processor for bitmaps and 3D.
+Super FX / GSU is a custom RISC processor for bitmaps and 3D.
 
 @subpage examples_chips_sa1_hello
 

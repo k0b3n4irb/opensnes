@@ -14,7 +14,7 @@ On these 34 functions OpenSNES is **about 38 %** faster; measured on 23
 whole workloads, 61 % (below). What made the difference on code that
 indexes an array or follows a pointer was not the pointer width: it was the
 stack frame and stack slots for values PVSnesLib keeps in the direct page,
-and code the optimizer left dead. Both are gone (see "Reading it" at the
+and code the optimiser left dead. Both are gone (see "Reading it" at the
 end of this page).
 
 ## Summary
@@ -94,11 +94,11 @@ no page-crossing penalties).
 
 | Function | Improvement | Why |
 |----------|-------------|-----|
-| `call_add` | -90.2% | Tail call optimization — call forwarded directly |
+| `call_add` | -90.2% | Tail call optimisation — call forwarded directly |
 | `compare_and_branch` | -53.5% | Comparison+branch fusion eliminates redundant CMP |
 | `global_increment` | -51.2% | `.l` to `.w` shortening + `inc` instruction |
 | `clamp` | -46.8% | Comparison chain fusion + dead jump elimination |
-| `sub_u16` | -44.7% | Leaf optimization + A-register cache |
+| `sub_u16` | -44.7% | Leaf optimisation + A-register cache |
 
 ### Where PVSnesLib Wins
 
@@ -135,17 +135,17 @@ apart, it keeps the direct-page frame that makes it fast.
 post-inline. The PVSnesLib values (25 raw, 22 opt) remain the baseline
 for comparison.
 
-### Key Optimization Phases Contributing
+### Key Optimisation Phases Contributing
 
 | Phase | Impact | Example functions |
 |-------|--------|-------------------|
 | Dead jump elimination | ~5% | conditional, clamp, compare_and_branch |
 | A-register cache | ~8% | add_u16, sub_u16, bitwise_and/or |
-| Leaf function optimization | ~10% | array_read, array_write, struct_sum |
+| Leaf function optimisation | ~10% | array_read, array_write, struct_sum |
 | Frame elimination | ~5% | empty_func, helper, global_increment |
 | Comparison+branch fusion | ~8% | conditional, clamp, compare_and_branch |
 | Inline multiply | ~3% | mul_const_13/24/48/20/40/96 |
-| Tail call optimization | ~2% | call_add |
+| Tail call optimisation | ~2% | call_add |
 | Dead store elimination | ~3% | loop_sum, swap |
 | `.l` to `.w` shortening | ~2% | global_increment, zero_store_global |
 
@@ -160,7 +160,7 @@ PVSNESLIB_HOME=/path/to/pvsneslib devtools/benchmark/compare_compilers.sh
 
 - Cycle counts are **estimates** based on instruction timing tables, not hardware measurements
 - Functions are tested in isolation — real-world code has different calling patterns
-- Loop-heavy functions (loop_sum, byte_store_loop) benefit more from optimization
+- Loop-heavy functions (loop_sum, byte_store_loop) benefit more from optimisation
   because the overhead reduction is multiplied by iteration count
 - PVSnesLib's 816-opt is designed for tcc816's output patterns; a different C compiler
   might benefit differently from its peephole rules

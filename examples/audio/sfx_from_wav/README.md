@@ -42,7 +42,7 @@ tool = "opensnes-sample"
 compiling, and links the generated `blip_data.as`; `main.c` includes
 `res/blip.h`, which declares `blip_brr[]` and `blip_brr_end[]`. A looping
 sample (a sustained tone) adds `loop = [START, END]` to `[encode]`. See
-`docs/tutorials/audio.md` (One-shot samples from WAV).
+`docs/tutorials/audio_samples.md` (One-shot samples from WAV).
 
 ## How to Build
 

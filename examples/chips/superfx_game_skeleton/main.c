@@ -35,7 +35,7 @@
  * @par Modules Used
  * console, sprite, dma, background, input, superfx, snesmod
  *
- * @see superfx.h (gsuPresent, gsuStartCached), docs/tutorials/superfx.md
+ * @see superfx.h (gsuPresent, gsuStartCached), docs/tutorials/superfx_advanced.md
  */
 
 #include <snes.h>

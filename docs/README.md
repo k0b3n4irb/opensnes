@@ -22,16 +22,19 @@ Task-shaped walkthroughs under [tutorials/](tutorials/).
   [Scrolling](tutorials/scrolling.md), [Maps and Tiled](tutorials/map.md),
   [Mode 7](tutorials/mode7.md)
 - **Effects:** [DMA](tutorials/dma.md), [HDMA](tutorials/hdma.md),
-  [Interrupts](tutorials/interrupts.md), [Colour Math](tutorials/colormath.md),
+  [Interrupts](tutorials/interrupts.md), [Colour math](tutorials/colormath.md),
   [Windows](tutorials/window.md), [Mosaic](tutorials/mosaic.md)
 - **Game systems:** [Input](tutorials/input.md),
   [Collision](tutorials/collision.md), [Game States](tutorials/game_states.md),
   [The Opt-In Framework](tutorials/framework.md), [Text](tutorials/text.md),
-  [The Object Engine](tutorials/object.md), [9-Slice Panels](tutorials/panel.md),
-  [Audio](tutorials/audio.md), [Fixed-Point Math](tutorials/math.md),
+  [The Object Engine](tutorials/object.md) and
+  [how it works](tutorials/object_engine.md), [9-Slice Panels](tutorials/panel.md),
+  [Music with SNESMOD](tutorials/audio.md),
+  [Samples and the raw APU](tutorials/audio_samples.md), [Fixed-Point Math](tutorials/math.md),
   [SRAM Saves](tutorials/sram.md), [Far RAM](tutorials/far_ram.md)
 - **Coprocessors and tooling:** [SA-1](tutorials/sa1.md),
-  [SuperFX](tutorials/superfx.md), [DSP-1](tutorials/dsp1.md),
+  [Super FX: a first job](tutorials/superfx.md),
+  [Super FX: running a game around the GSU](tutorials/superfx_advanced.md), [DSP-1](tutorials/dsp1.md),
   [Debugging with luna](tutorials/debugging.md),
   [Profiling](tutorials/profiling.md)
 

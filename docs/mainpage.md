@@ -43,7 +43,9 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_map -- Scrolling Maps & the Tiled Pipeline
 
-@subpage tutorial_audio -- Audio & Music
+@subpage tutorial_audio -- Music with SNESMOD
+
+@subpage tutorial_audio_samples -- Samples, Voices and the Raw APU
 
 @subpage tutorial_game_states -- Game States & Transitions
 
@@ -53,6 +55,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_object -- The Object Engine (entities, gravity, map collision)
 
+@subpage tutorial_object_engine -- How the Object Engine Works (workspace, fields, collision)
+
 @subpage tutorial_panel -- 9-Slice Panels (dialog boxes, HUDs)
 
 @subpage tutorial_dma -- DMA (direct memory access)
@@ -61,7 +65,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_mode7 -- Mode 7 Rotation and Scaling
 
-@subpage tutorial_colormath -- Colour Math (transparency, blending)
+@subpage tutorial_colormath -- Colour math (transparency, blending)
 
 @subpage tutorial_mosaic -- Mosaic pixelation effect
 
@@ -75,7 +79,9 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_sa1 -- SA-1 Coprocessor (10.74 MHz second CPU)
 
-@subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor
+@subpage tutorial_superfx -- Super FX: a First Job (GSU RISC coprocessor)
+
+@subpage tutorial_superfx_advanced -- Super FX: Running a Game Around the GSU
 
 @subpage tutorial_dsp1 -- DSP-1 Coprocessor (3D maths)
 
