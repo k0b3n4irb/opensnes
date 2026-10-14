@@ -56,7 +56,7 @@ them tells you what an asset costs (VRAM, CGRAM, ARAM) before you convert it.
 
 An asset carries its settings in a TOML file beside it, named after it
 (`res/hero.png` → `res/hero.png.toml`); an asset made of several sources is
-named after what it produces (`res/palettes.toml`, `res/soundbank.toml`). The
+named after what it produces (`res/palettes.toml`). The
 file's `tool` line names the converter and its one table the subcommand:
 
 ```toml
@@ -86,12 +86,12 @@ to a default in silence.
 The build's own knobs — cartridge mapping, save RAM, coprocessor, ROM size,
 the link-time checks — are on @subpage tools_build, each with its default.
 
-## Music through smconv
+## Music
 
-A project can also build its music the SNESMOD way: `USE_SNESMOD := 1` and
-`SOUNDBANK_SRC := music/song.it` in the Makefile run `smconv` and link the
-soundbank. @subpage tools_smconv describes it; `opensnes-music` with a
-`res/soundbank.toml` is the alternative that follows the family's rule.
+Music is the one asset the build takes from the Makefile rather than from a
+settings file: `USE_SNESMOD := 1` and `SOUNDBANK_SRC := music/song.it` run
+@ref tools_opensnes_music and link the soundbank the SNESMOD driver plays.
+@subpage tools_smconv is the earlier converter of the same files.
 
 ## The emulator: luna
 

@@ -237,9 +237,9 @@ key is the option's name without the dashes:
 
 Maps exported from Tiled go through `opensnes-level`, Aseprite exports through
 `opensnes-sprite anim`, WAV samples through `opensnes-sample`, fonts through
-`opensnes-text`; each has a page under @ref tools. SNESMOD music still builds
-from `SOUNDBANK_SRC` with `USE_SNESMOD := 1` (smconv), or from a
-`res/soundbank.toml` read by `opensnes-music`. The earlier converters are on
+`opensnes-text`; each has a page under @ref tools. SNESMOD music builds
+from `SOUNDBANK_SRC` with `USE_SNESMOD := 1`, converted by `opensnes-music`
+(PVSnesLib's `smconv` invocation is done for you). The earlier converters are on
 @ref tools_legacy.
 
 ## Step 6 — when it still looks wrong

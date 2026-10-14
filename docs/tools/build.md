@@ -73,10 +73,10 @@ A cartridge carries one coprocessor: setting two of these is refused.
 
 | Variable | Default | What it does |
 |---|---|---|
-| `USE_SNESMOD` | `0` | `1` links the SNESMOD driver and converts `SOUNDBANK_SRC` with `smconv` |
+| `USE_SNESMOD` | `0` | `1` links the SNESMOD driver and converts `SOUNDBANK_SRC` with `opensnes-music` |
 | `SOUNDBANK_SRC` | (none) | Impulse Tracker `.it` files that make up the soundbank |
 | `SOUNDBANK_OUT` | `soundbank` | Base name of the generated soundbank files |
-| `SOUNDBANK_BANK` | `1` | ROM bank passed to `smconv -b` for the soundbank data |
+| `SOUNDBANK_BANK` | `1` | ROM bank passed to `opensnes-music bank --bank` for the soundbank data |
 
 ## What a change rebuilds
 

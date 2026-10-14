@@ -467,13 +467,15 @@ all: $(TARGET)
 
 ifneq ($(_HAS_SOUNDBANK),)
 # One recipe, one target: with both .asm and .h as targets of one rule, a
-# parallel make ran smconv twice and the second run truncated the .bnk the
-# first assembly was reading (2026-10-04, libtests_fx under make tests).
+# parallel make ran the converter twice and the second run truncated the .bnk
+# the first assembly was reading (2026-10-04, libtests_fx under make tests).
+# opensnes-music bank writes what smconv -s -o NAME -b N -n -p NAME wrote,
+# byte for byte (its golden suite runs smconv's cases).
 $(SOUNDBANK_OUT).h: $(SOUNDBANK_OUT).asm
-	@test -f $@ || { echo "soundbank: $@ missing after smconv" >&2; exit 1; }
+	@test -f $@ || { echo "soundbank: $@ missing after opensnes-music" >&2; exit 1; }
 $(SOUNDBANK_OUT).asm: $(SOUNDBANK_SRC) .opensnes_config
-	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
-	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
+	@echo "[MUSIC] Generating soundbank from: $(SOUNDBANK_SRC)"
+	@$(OPENSNES)/bin/opensnes-music bank -q --name $(SOUNDBANK_OUT) --bank $(SOUNDBANK_BANK) -o . $(SOUNDBANK_SRC)
 ifeq ($(USE_HIROM),1)
 	@# HiROM: SNESMOD reads via $$00-$$3F:$$8000 mirrors, data must be at $$8000+
 	@sed -i.bak 's/^\.ORG 0$$/.ORG $$8000/' $(SOUNDBANK_OUT).asm && rm -f $(SOUNDBANK_OUT).asm.bak

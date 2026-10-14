@@ -41,9 +41,11 @@ bank = 1
 and `.bnk` beside the file; `opensnes-music bank music/*.it --name
 soundbank --save` writes that file from a command-line run.
 
-Today the build calls `smconv` through `USE_SNESMOD` and `SOUNDBANK_SRC`;
-`opensnes-music bank` produces the same files, and the build switches to it
-with the family's generic rule.
+In a project, the build runs `opensnes-music bank` for you: `USE_SNESMOD :=
+1` and `SOUNDBANK_SRC := music/song.it` in the Makefile convert the modules
+and link the soundbank (`SOUNDBANK_BANK` is the `--bank`). A settings file
+is for running the tool by hand; the build links a soundbank only through
+`SOUNDBANK_SRC`.
 
 ## Inspect
 

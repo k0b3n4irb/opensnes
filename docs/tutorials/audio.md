@@ -34,7 +34,7 @@ SNESMOD is a tracker-based audio engine supporting Impulse Tracker (.it) modules
 
 1. Create music in a tracker (OpenMPT recommended)
 2. Export as Impulse Tracker (.it) format
-3. Convert with smconv tool
+3. List the modules in `SOUNDBANK_SRC`: the build converts them
 4. Link soundbank with your ROM
 
 ### Makefile Configuration
@@ -142,11 +142,12 @@ snesmodStop();
    - 32kHz max sample rate
 4. Export as .it file
 
-### smconv Tool
+### The converter
+
+The build runs this for you; by hand it is:
 
 ```bash
-# Convert music for soundbank
-smconv -s -o soundbank -b 1 music.it effects.it
+opensnes-music bank music.it effects.it --name soundbank --bank 1
 
 # Output files:
 # - soundbank.asm  (link with ROM)
@@ -154,10 +155,8 @@ smconv -s -o soundbank -b 1 music.it effects.it
 # - soundbank.bnk  (binary data)
 ```
 
-The build runs this for you from `SOUNDBANK_SRC` when `USE_SNESMOD := 1`.
-@ref tools_opensnes_music writes the same files from a settings file instead,
-`res/soundbank.toml` (`tool = "opensnes-music"`, a `[bank]` table with
-`inputs = ["mymusic.it", "effects.it"]`), and `opensnes-music inspect`
+The build runs it from `SOUNDBANK_SRC` when `USE_SNESMOD := 1`
+(@ref tools_opensnes_music), and `opensnes-music inspect`
 tells you what each module costs in the SPC700's 64 KB.
 
 ## Pitch Constants

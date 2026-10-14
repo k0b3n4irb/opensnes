@@ -64,7 +64,7 @@ legacy (@ref tools_legacy).
 **Embedded in**: `opensnes-music`, which links the converter sources of
 `tools/smconv/src/` (IT loader, IT-to-SPC conversion, BRR encoder, report),
 and `opensnes-sample`, which links its BRR encoder (`brr.c`). The build
-still runs `smconv` itself for `SOUNDBANK_SRC`.
+converts `SOUNDBANK_SRC` with `opensnes-music`.
 
 ---
 
