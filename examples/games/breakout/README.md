@@ -316,18 +316,23 @@ cycling colors), and C arrays can't be reliably placed at specific addresses.
 ### Pre-Converted Assets
 
 The `res/` folder contains `.dat` files — raw binary data ready for DMA to VRAM.
-These were originally converted from PVSnesLib's asset pipeline. No `gfx4snes` step
-in the Makefile because the conversion was done once, offline, and the results checked
+These were originally converted from PVSnesLib's asset pipeline. No conversion step
+runs at build time because the conversion was done once, offline, and the results checked
 into the repository.
 
-For a new game, you'd typically add a gfx4snes rule:
+For a new game, you'd typically put a settings file beside each PNG:
 
-```makefile
-GFXSRC := res/tiles.png res/sprites.png
+```toml
+# res/tiles.png.toml
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
 ```
 
-This tells `make/common.mk` to run `gfx4snes` on each PNG, producing `.pic` (tiles),
-`.pal` (palette), and `.map` (tilemap) files.
+This tells `make/common.mk` to run `opensnes-tileset` on the PNG, producing `.pic`
+(tiles), `.pal` (palette), `.map` (tilemap) and a `.inc` declaring them; a sprite sheet
+names `opensnes-sprite` instead.
 
 ### Why These Modules?
 

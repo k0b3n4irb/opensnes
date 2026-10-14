@@ -97,15 +97,20 @@ The asset pipeline, one page per tool, under [tools/](tools/).
 
 | Tool | Turns |
 |---|---|
-| [gfx4snes](tools/gfx4snes.md) | Images into tiles, palettes and maps |
-| [img2snes](tools/img2snes.md) | RGB artwork into indexed palettes |
-| [palplan](tools/palplan.md) | Many images into one shared palette plan |
-| [font2snes](tools/font2snes.md) | Font images into text tiles |
-| [tmx2snes](tools/tmx2snes.md) | Tiled levels into SNES map data |
-| [aseprite2snes](tools/aseprite2snes.md) | Aseprite animations into clip tables |
-| [smconv](tools/smconv.md) | Tracker modules into SNESMOD soundbanks |
-| [wav2brr](tools/wav2brr.md) | WAV files into BRR samples |
+| [opensnes](tools/opensnes.md) | Your project: init, build, run, test, release |
+| [opensnes-tileset](tools/opensnes-tileset.md) | Background pictures into tilesets, tilemaps and palettes |
+| [opensnes-sprite](tools/opensnes-sprite.md) | Sprite sheets and Aseprite exports into tiles, metasprites and clips |
+| [opensnes-level](tools/opensnes-level.md) | Tiled levels into SNES map data |
+| [opensnes-palette](tools/opensnes-palette.md) | A project's palettes into CGRAM slots; RGB art into indexed PNGs |
+| [opensnes-text](tools/opensnes-text.md) | Font images into text tiles |
+| [opensnes-image](tools/opensnes-image.md) | HiColor screens and Mode 7 perspective tables |
+| [opensnes-sample](tools/opensnes-sample.md) | WAV files into BRR samples |
+| [opensnes-music](tools/opensnes-music.md) | Tracker modules into SNESMOD soundbanks |
+| [opensnes-rom](tools/opensnes-rom.md) | The post-link checks, the header, the budget |
+| [opensnes-save](tools/opensnes-save.md) | Battery save files |
+| [smconv](tools/smconv.md) | Tracker modules into SNESMOD soundbanks, from `SOUNDBANK_SRC` |
 | [luna](tools/luna.md) | The emulator: every subcommand and flag |
+| [Legacy tools](tools/legacy.md) | The earlier converters and what replaces each |
 
 ## Hardware reference
 

@@ -24,7 +24,7 @@ A **hardware tilemap** is a 32×32 (2 KB) up to 64×64 (8 KB) grid of tile
 entries the PPU renders every frame; the hardware scroll registers pan across
 it for free. When the world is larger than 64×64, the `map` module **streams**
 fresh rows/columns into VRAM during VBlank as the camera moves
-(`mapLoad`/`mapUpdateCamera`), and `tmx2snes` turns a Tiled `.tmx`/`.tmj` into
+(`mapLoad`/`mapUpdateCamera`), and `opensnes-level` turns a Tiled `.tmj` into
 the `.m16`/`.b16` data it consumes. **Collision** reads tile *properties*
 (solid, platform, slope angle) from the map rather than testing sprite boxes;
 `collideTileEx` / `objCollidMapWithSlopes` add diagonal surfaces.

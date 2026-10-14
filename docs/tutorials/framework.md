@@ -401,7 +401,7 @@ Reach for the hand-written version when:
 
 - @ref tutorial_game_states — the scene stack, the third opt-in in this
   family, and the right answer once the game has more than one screen.
-- @ref tutorial_graphics — what gfx4snes actually emits into the `.pic`,
+- @ref tutorial_graphics — what `opensnes-tileset` emits into the `.pic`,
   `.pal` and `.map` files the bundles point at.
 - @ref tutorial_dma — why setup transfers go under forced blank and what the
   per-VBlank budget is.

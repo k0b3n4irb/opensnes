@@ -342,8 +342,9 @@ like to learn, or use all three:
   questions — "can I put something on screen?", "can I build a world?" — each
   stage buying real confidence, never a wall you can't climb.
 - **Make your own assets.** @ref tools is the converter pipeline that turns your
-  PNGs, Tiled maps, fonts, WAVs and tracker modules into SNES data — `gfx4snes`,
-  `tmx2snes`, `wav2brr` and friends, most wired into the build for you.
+  PNGs, Tiled maps, fonts, WAVs and tracker modules into SNES data — the
+  `opensnes-*` tools (`opensnes-tileset`, `opensnes-sprite`, `opensnes-level`,
+  `opensnes-sample`…), run by the build from a settings file beside each asset.
 - **Decide what to build.** @ref craft is hardware-grounded *design* advice:
   budget your VRAM before you draw, choose a background mode from your genre,
   compose layers, and scope a first game you can actually finish.

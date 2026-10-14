@@ -12,7 +12,7 @@ each villager's line of dialogue (a `text` property on the object).
 Adding a villager is a map edit, not a code edit. None of it is
 hardcoded — open the map in
 [Tiled](https://www.mapeditor.org/), edit it, re-run the generator,
-rebuild. The map is validated by the SDK's own `tmx2snes` converter.
+rebuild. The map is validated by the SDK's own `opensnes-level` converter.
 
 **2. A real bordered dialog box, and a HUD.** Both are 9-slice panels
 on BG2 with their text on BG3 above — the classic SNES RPG window, with
@@ -46,7 +46,8 @@ ROM mode: LoROM (project default).
   collides, which reads as random "too early / too late" blocking.
 - **Several characters, one sprite sheet**: the villagers reuse the
   hero's tiles with a second OBJ palette — recolored, not redrawn. The
-  sheet is converted with `-s 16` because it holds 16×16 frames (see
+  sheet is converted with `size = 16` (`res/hero.png.toml`) because it
+  holds 16×16 frames (see
   `docs/tutorials/sprites.md`).
 - **The plan owns the sprite-palette slots**: `res/palettes.toml` lists
   the OBJ palettes; the build runs `opensnes-palette plan` (see
@@ -104,15 +105,16 @@ whole map from the script's layout.
 too — a useful check that the file is well-formed:
 
 ```bash
-../../../bin/tmx2snes -e -Q res/town.tmj res/tileset.map
+../../../bin/opensnes-level convert res/town.tmj --tileset res/tileset.map --quadrant --entities --out /tmp/town
 ```
 
-`-Q` writes the quadrant-ordered 64×64 tilemap this example scrolls with
-the `background` module, and `-e` writes the entities as C defines —
-byte-identical to what `gen_assets.py` produces. The generator still runs
+`--quadrant` writes the quadrant-ordered 64×64 tilemap this example scrolls
+with the `background` module — byte-identical to the `res/town_map.bin`
+`gen_assets.py` produces — and `--entities` writes the Tiled entities as C
+defines. The generator still runs
 the conversion itself because it also builds the per-cell collision grid
 and marks the villagers' tiles blocked, which is game logic rather than
-map data; moving the rest onto the tool is a Makefile change.
+map data; moving the rest onto the tool is a settings file (`res/town.tmj.toml`) away.
 
 
 ## How to Build

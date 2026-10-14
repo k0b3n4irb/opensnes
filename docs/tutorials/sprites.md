@@ -138,39 +138,55 @@ void load_sprite_tiles(void) {
 }
 ```
 
-### Converting a sheet: `-s` must match the sprite size
+### Converting a sheet: `size` must match the sprite size
 
 A 16x16 OBJ does not read four consecutive tiles. It reads `n`, `n+1`,
 `n+16`, `n+17` — the second row comes from **16 tiles later**, because
 the hardware treats the sheet as 16 tiles (128 px) wide. Same idea for
 32x32 (`n`, `n+1`, `n+2`, `n+3`, `n+16` …) and 64x64.
 
-`gfx4snes` produces exactly that layout **when you tell it the sprite
-size**:
+@ref tools_opensnes_sprite produces exactly that layout **when you tell it
+the sprite size**, in the settings file beside the sheet:
 
-```bash
-gfx4snes -s 8  -p -i cursor.png    # a sheet of 8x8 sprites
-gfx4snes -s 16 -p -i hero.png      # a sheet of 16x16 sprites
-gfx4snes -s 32 -p -i boss.png      # a sheet of 32x32 sprites
+```toml
+# res/sprite32.png.toml (examples/sprites/simple_sprite)
+tool = "opensnes-sprite"
+
+[sheet]
+size = 32        # a sheet of 32x32 sprites (8, 16, 32 or 64)
+colors = 16      # one OBJ palette
 ```
 
-With `-s 16` the converter cuts the image into 16x16 blocks and emits
+The build runs `opensnes-sprite sheet` on it and writes `sprite32.pic`,
+`sprite32.pal` and `sprite32.inc`, which declares `sprite32_tiles`,
+`sprite32_pal` (each with `_end`) and a `GfxAsset`:
+
+```c
+#include "res/sprite32.inc"
+
+dmaCopyVram(sprite32_tiles, 0x2100, sprite32_tiles_end - sprite32_tiles);
+dmaCopyCGram(sprite32_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+```
+
+With `size = 16` the converter cuts the image into 16x16 blocks and emits
 each one as the four tiles the hardware expects, whatever the sheet's
 width or height.
 
-**The trap**: converting a sheet of 16x16 frames with `-s 8`. It
+**The trap**: converting a sheet of 16x16 frames with `size = 8`. It
 succeeds, produces the right number of tiles, and the sprite renders —
 wrong. The top half is one frame and the bottom half is whatever tile
 happened to land 16 slots later, which depends on the PNG's width. A
 sheet 16 tiles wide happens to work; make it 18 tiles wide by adding a
 frame and every sprite in the game breaks at once, with no diagnostic.
 
-The rule is one line: **`-s` is the sprite's size, not the tile size.**
+The rule is one line: **`size` is the sprite's size, not the tile size.**
 
-`gfx4snes` cannot catch the mistake — with `-s 8` it has no way to know
-you meant 16x16 sprites. It *does* warn when the image is not an exact
+The converter cannot catch the mistake — with `size = 8` it has no way to
+know you meant 16x16 sprites. It *does* warn when the image is not an exact
 multiple of the block size, since the last row or column of blocks would
 then be built from pixels that are not in the image.
+`opensnes-sprite inspect res/hero.png --size 16` prints the block count and
+the VRAM cost before you convert.
 
 ## Sprite Palettes
 

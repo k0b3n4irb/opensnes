@@ -14,7 +14,7 @@ build system first, then the five traps, then the API table.
 Almost all of the surface. Both SDKs give you `consoleInit`, `setMode`,
 `bgSetGfxPtr`, `bgSetMapPtr`, `oamSet`, `WaitForVBlank`, the same PPU register
 model, the same VRAM layout decisions and the same `.pic` / `.pal` / `.map`
-asset trio produced by a gfx4snes-shaped converter. A simple sprite demo often
+asset trio, produced by converters built on gfx4snes's code. A simple sprite demo often
 ports by changing the Makefile and nothing else.
 
 `WaitForVBlank` keeps its capital W for that reason: it is the only function
@@ -201,19 +201,52 @@ could, nobody asked yet — open an issue with the game that needs it.
 
 ## Step 5 — assets
 
-The converters take the same shapes of input and, for graphics, the same flags
-PVSnesLib users know:
+The converters take the same shapes of input. Each asset gets a settings file
+beside it whose first line names the tool, and `make/common.mk` runs it before
+compiling — the Makefile lists no asset:
 
-```bash
-gfx4snes -i sprite.png -p -t -s 16     # 16x16 sprites
-gfx4snes -i bg.png -p -t -m            # background with tilemap
-gfx4snes -i bg.png -p -t -m -R         # ... without tile reduction
+```toml
+# res/sprite.png.toml — was: gfx4snes -s 16 -o 16 -u 16 -p -i sprite.png
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
 ```
 
-Maps exported from Tiled go through `tmx2snes`, Aseprite sheets through
-`aseprite2snes`, audio through `smconv` and `wav2brr`. Each has a page under
-@ref tools, and `make/common.mk` runs them for you when the source file is
-listed in the example's Makefile.
+```toml
+# res/bg.png.toml — was: gfx4snes -s 8 -o 16 -u 16 -p -m -i bg.png
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+```
+
+The gfx4snes flags map onto the options of @ref tools_opensnes_tileset
+(backgrounds, `-m`) and @ref tools_opensnes_sprite (sprite sheets); a settings
+key is the option's name without the dashes:
+
+| gfx4snes | opensnes-tileset `convert` | opensnes-sprite `sheet` |
+|---|---|---|
+| `-m` (map output) | always written | — |
+| `-p` (palette output), `-o N` | always written; `--colors N` | always written; `--colors N` |
+| `-u 4` / `-u 16` / `-u 256` | `--bpp 2` / `--bpp 4` / `--bpp 8` | `--bpp 2` / `--bpp 4` / `--bpp 8` |
+| `-s N` | `--size N` (8 or 16) | `--size N` (8, 16, 32, 64) |
+| `-R` | `--no-reduce` | — |
+| `-F` | `--flip` | `--flip` |
+| `-g`, `-y`, `-f N` | `--priority`, `--pages`, `--offset N` | — |
+| `-M 7` | `--mode 7` | — |
+| `-e N`, `-c fixed.pal`, `-a` | `--palette-entry N`, `--palette fixed.pal`, `--rearrange` | `--palette-entry N`, `--palette fixed.pal`, — |
+| `-T -X W -Y H -P N` | — | `--metasprite W H --priority N` |
+| `-z`, `-k`, `-b`, `-d` | `--lz`, `--pack`, `--blank`, `--round` | `--lz`, `--pack`, `--blank`, `--round` |
+| `-t png` / `-t bmp` | the input's extension | the input's extension |
+
+Maps exported from Tiled go through `opensnes-level`, Aseprite exports through
+`opensnes-sprite anim`, WAV samples through `opensnes-sample`, fonts through
+`opensnes-text`; each has a page under @ref tools. SNESMOD music still builds
+from `SOUNDBANK_SRC` with `USE_SNESMOD := 1` (smconv), or from a
+`res/soundbank.toml` read by `opensnes-music`. The earlier converters are on
+@ref tools_legacy.
 
 ## Step 6 — when it still looks wrong
 

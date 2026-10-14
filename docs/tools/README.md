@@ -2,114 +2,116 @@
 
 Your game is written in C, but the SNES does not eat PNGs, Tiled maps, or WAV
 files — it eats tiles, tilemaps, BGR555 palettes, BRR samples, and SPC700
-soundbanks. The OpenSNES tools are the converters that bridge the two: each takes
-an artist- or musician-friendly source format and emits the exact binary the
-hardware (and this SDK's runtime) expects.
-
-You rarely run most of them by hand — the build system wires the common ones in,
-so dropping a `.png` or `.wav` in an example's `res/` is usually enough. But
-knowing what each tool does, and which knobs it exposes, is what takes you from
-"the example builds" to "I shaped my own assets on purpose." That confidence is
-what this section is here to give.
-
-## The pipeline
-
-Most assets flow through a short, one-way pipeline from source art to ROM data:
-
-```
-  RGB art ──► img2snes ──► gfx4snes ──► tmx2snes ──► map engine
-   (.png)     (quantize)   (tiles +     (Tiled map     (mapLoad)
-                            palette +     + that .map
-                            tilemap)      → map binaries)
-
-  font.png ──► font2snes ──► text tiles      (dmaCopyVram)
-  sound.wav ─► wav2brr   ──► .brr sample     (audioLoadSample)
-  music.it ──► smconv    ──► SNESMOD bank    (snesmodLoadModule / snesmodPlay)
-
-  hero.ase ─┬► gfx4snes -P    ──► tiles + metasprite table   (oamDrawMetasprite)
-            └► aseprite2snes  ──► AnimClip tables            (animPlay / animTick)
-```
-
-Each tool does exactly one conversion; the Makefile chains them. It is the
-Unix-pipe idea applied to asset building — small, composable, individually
-testable steps rather than one opaque converter.
+soundbanks. The `opensnes-*` tools are the converters that bridge the two: each
+takes an artist- or musician-friendly source format and writes the exact binary
+the hardware (and this SDK's runtime) expects. They are compiled programs in the
+SDK's `bin/`; a game's build needs nothing else installed.
 
 ## The tools at a glance
 
-| Tool | Turns… | …into | In your build |
-|------|--------|-------|---------------|
-| @subpage tools_gfx4snes | an indexed PNG/BMP | tiles + palette + tilemap | auto (drop a PNG in `GFXSRC`) |
-| @subpage tools_tmx2snes | a Tiled JSON map | tilemap + collision + objects | one line per example |
-| @subpage tools_img2snes | RGB/RGBA artwork | a palette-indexed PNG (feeds gfx4snes) | manual pre-step |
-| @subpage tools_font2snes | a 96-glyph font PNG | 2bpp/4bpp text tiles | manual, optional |
-| @subpage tools_wav2brr | a PCM `.wav` | a `.brr` sound sample | auto (drop a WAV in `res/`) |
-| @subpage tools_smconv | an Impulse Tracker `.it` | a SNESMOD soundbank | auto (`USE_SNESMOD`) |
-| @subpage tools_palplan | a manifest of `.pal` files | a CGRAM layout + C header | manual, project-level |
-| @subpage tools_aseprite2snes | an Aseprite animation export | AnimClip tables (one per tag) | one line per sprite |
+| Tool | Turns… | …into |
+|------|--------|-------|
+| @subpage tools_opensnes_tileset | an indexed picture of a background | tileset + tilemap + palette (Mode 7 included) |
+| @subpage tools_opensnes_sprite | a sprite sheet; an Aseprite export | OBJ tiles + palette + metasprite table; `AnimClip` tables |
+| @subpage tools_opensnes_level | a Tiled JSON map | tilemaps, tile tables, entities, collision |
+| @subpage tools_opensnes_palette | the project's `.pal` files; RGB art | a CGRAM plan with named offsets; an indexed PNG |
+| @subpage tools_opensnes_text | a picture of 96 glyphs | 2 bpp or 4 bpp text tiles |
+| @subpage tools_opensnes_image | a full-screen picture; perspective settings | HiColor tiles and palettes; Mode 7 perspective tables |
+| @subpage tools_opensnes_sample | a PCM `.wav` | a `.brr` sample + its sizes |
+| @subpage tools_opensnes_music | Impulse Tracker `.it` modules | a SNESMOD soundbank; a standalone `.spc` |
+| @subpage tools_opensnes_rom | a linked ROM | the post-link checks, its header, its budget |
+| @subpage tools_opensnes_save | a ROM or a `.srm` | a battery save file, read or patched |
+| @subpage tools_opensnes | your project | `init`, `build`, `run`, `test`, `budget`, `release`, `doctor` |
 
-## Three levels of wiring
+Every tool follows one contract — subcommands, long options, `--help`,
+`--json`, `inspect`, the same exit codes: @subpage tools_conventions.
 
-The tools sit at three levels of automation — worth knowing so you reach for the
-right one:
+## The pipeline
 
-1. **Zero-config, automatic.** `gfx4snes` (via the `GFXSRC` Makefile variable)
-   and `wav2brr` (any `res/*.wav`) and `smconv` (`USE_SNESMOD := 1`) run for you
-   during `make`. Drop the source in, reference the output, done.
-2. **One explicit line.** `tmx2snes` is called from an example's own Makefile,
-   because a Tiled project has choices (which layers, which extra outputs) the
-   build cannot guess.
-3. **By hand, when you need them.** `img2snes` (RGB → indexed) and `font2snes`
-   (custom font) are standalone pre-steps you run once and commit the result.
-   Looping `wav2brr` samples are also hand-built (the loop points are yours).
-   `palplan` sits a level up from the per-asset tools: it plans your *whole
-   project's* palettes into the SNES's 8 BG + 8 sprite slots at once, so you run
-   it when your palette count grows, not per asset. (In the `opensnes-*` family these
-   three are `opensnes-palette quantize`, `opensnes-text font` and
-   `opensnes-palette plan`, and the font and the plan run from the build.)
+```
+  RGB art ──► opensnes-palette quantize ──► indexed PNG
+                                              │
+              ┌───────────────────────────────┤
+              ▼                               ▼
+  opensnes-tileset convert          opensnes-sprite sheet
+  (.pic + .map + .pal)              (.pic + .pal + metasprites)
+              │                               │
+              ▼                               │
+  level.tmj ──► opensnes-level convert        │   hero.json ──► opensnes-sprite anim
+  (tilemaps, tile tables, entities)           │                 (AnimClip tables)
+                                              ▼
+              every .pal ──► opensnes-palette plan ──► CGRAM slots (PAL_<NAME>_CGRAM)
 
-All binaries live in `bin/` and are built by `make tools`. Every tool prints
-`--help`; the pages here are the guided version.
+  font.png  ──► opensnes-text font    ──► text tiles
+  sound.wav ──► opensnes-sample encode ──► .brr sample
+  music.it  ──► opensnes-music bank   ──► SNESMOD soundbank
 
-## Where the tools are going
+  game.sfc  ──► opensnes-rom check    ──► the post-link checks, at every link
+```
 
-The `opensnes-*` family replaces these converters — one tool per
-function, the same conventions everywhere, settings beside each asset.
-@subpage tools_conventions is the contract; the earlier tools stay one more
-release. The first two are @subpage tools_opensnes_sample (WAV → BRR) and
-@subpage tools_opensnes_music (Impulse Tracker → soundbank); @subpage tools_opensnes_rom
-runs the post-link checks of every build; @subpage tools_opensnes_sprite is the sprite
-artist's tool (sheets, metasprites, Aseprite clips); @subpage tools_opensnes_level turns a
-Tiled level into map, tile tables and entities; @subpage tools_opensnes_tileset the
-background artist's (tilesets, tilemaps, palette banks); @subpage tools_opensnes_text
-converts a typeface; @subpage tools_opensnes_palette plans a project's palettes into
-CGRAM and quantizes RGB art; @subpage tools_opensnes_image makes HiColor screens and
-the Mode 7 perspective tables; @subpage tools_opensnes_save creates, reads and patches
-battery save files; and @subpage tools_opensnes is the project's own command (`init`,
-`build`, `run`, `test`, `doctor`).
+Each tool does one conversion and the build chains them; `inspect` on any of
+them tells you what an asset costs (VRAM, CGRAM, ARAM) before you convert it.
+
+## How the build runs them
+
+An asset carries its settings in a TOML file beside it, named after it
+(`res/hero.png` → `res/hero.png.toml`); an asset made of several sources is
+named after what it produces (`res/palettes.toml`, `res/soundbank.toml`). The
+file's `tool` line names the converter and its one table the subcommand:
+
+```toml
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
+```
+
+`make/common.mk` finds every `*.toml` and `res/*.toml` with a
+`tool = "opensnes-…"` line (the list is `ASSET_TOML`, which a Makefile may set
+by hand), runs `bin/<tool> <subcommand>` on the asset once (a `.done` stamp
+beside the settings file), before any C or assembly is built, and again when the
+asset or its settings change. Levels and palette plans convert after the rest,
+so the tileset `.map` and the `.pal` files they read are fresh. The build then
+gathers the `<stem>_data.as` fragment each tool wrote into `assets_gen.asm` and
+assembles it with the project, so the data lands in the ROM's asset banks and C
+sees it through the `.inc` the tool wrote. Nothing to add to the Makefile.
+
+`--save` on any conversion writes that settings file for you, from the options
+of the run; a key the tool does not know is refused, so a typo cannot fall back
+to a default in silence.
 
 ## Your Makefile
 
-The build itself has knobs — cartridge mapping, save RAM, coprocessor,
-ROM size, the link-time checks. @subpage tools_build lists every one with
-its default.
+The build's own knobs — cartridge mapping, save RAM, coprocessor, ROM size,
+the link-time checks — are on @subpage tools_build, each with its default.
+
+## Music through smconv
+
+A project can also build its music the SNESMOD way: `USE_SNESMOD := 1` and
+`SOUNDBANK_SRC := music/song.it` in the Makefile run `smconv` and link the
+soundbank. @subpage tools_smconv describes it; `opensnes-music` with a
+`res/soundbank.toml` is the alternative that follows the family's rule.
 
 ## The emulator: luna
 
-Testing is not a converter, but it is the other tool you will run every
-day. luna is the cycle-accurate emulator behind `make tests`, `luna mcp`
-is the debugger, and @subpage tools_luna is the pinned release's own
-`--help`, one section per subcommand — generated from the binary, so it
-cannot drift from `testing/luna.version`.
+luna is the cycle-accurate emulator behind `opensnes run` and `opensnes test`,
+and `luna mcp` is the debugger. @subpage tools_luna is the pinned release's own
+`--help`, one section per subcommand, generated from the binary.
 
 ## Where they fit with the rest of the docs
 
 - The **why** behind the numbers these tools produce — bpp, VRAM cost, palette
   conventions — is @ref craft_planning. Read it before you commit to a mode.
-- The **level workflow** that `gfx4snes` + `tmx2snes` enable end-to-end is
-  @ref craft_tiles_to_levels and the @ref tutorial_map tutorial.
+- The **level workflow** that `opensnes-tileset` + `opensnes-level` enable end
+  to end is @ref craft_tiles_to_levels and the @ref tutorial_map tutorial.
 - The **audio** side pairs with @ref snes_sound_guide and @ref tutorial_audio.
 
 > **The one rule.** Keep the *source* (the PNG, the Tiled project, the WAV, the
 > `.it`) as your single source of truth and let the tools regenerate the binary
 > on every build. The moment you hand-edit a `.pic` or a `.brr`, it drifts from
 > its source and you have lost the pipeline's whole benefit.
+
+A project written with the earlier converters (gfx4snes, tmx2snes, img2snes,
+font2snes, wav2brr, palplan, aseprite2snes) finds each one, and the command that
+replaces it option by option, in @subpage tools_legacy.

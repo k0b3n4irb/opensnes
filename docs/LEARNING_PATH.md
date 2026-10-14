@@ -40,7 +40,7 @@ underpins everything visual on the SNES.
 
 @subpage examples_sprites_world_sprites
 
-> Making it *your* art: @ref tools_gfx4snes turns a PNG into the tiles, palette
+> Making it *your* art: @ref tools_opensnes_tileset turns a PNG into the tiles, palette
 > and tilemap this stage builds on, and @ref craft_planning budgets the VRAM
 > before you draw a pixel.
 

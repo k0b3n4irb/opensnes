@@ -252,7 +252,7 @@ void animation_update(Animation* anim) {
 1. **Create art** in any tool (Aseprite, GIMP, Photoshop)
 2. **Reduce colors** to 16 per palette
 3. **Export as indexed PNG** (8×8 grid alignment)
-4. **Convert with gfx4snes** or similar tool
+4. **Convert with `opensnes-tileset`** (backgrounds) or **`opensnes-sprite`** (sprite sheets): a settings file beside the PNG, and the build does the rest
 5. **Load via DMA** during VBlank
 
 ---
@@ -263,7 +263,8 @@ void animation_update(Animation* anim) {
 
 | Tool | Purpose | Link |
 |------|---------|------|
-| **gfx4snes** | PNG to SNES tiles/palettes | OpenSNES/tools |
+| **opensnes-tileset** | PNG to SNES tiles, tilemap, palette | @ref tools_opensnes_tileset |
+| **opensnes-sprite** | Sprite sheets, metasprites, Aseprite clips | @ref tools_opensnes_sprite |
 | **M1TE2** | Tile editor, map maker | Third-party |
 | **SuperTileMapper** | VRAM/tilemap editor | GitHub |
 | **Aseprite** | Pixel art (paid) | aseprite.org |

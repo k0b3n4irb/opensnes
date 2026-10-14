@@ -102,4 +102,4 @@ library's `qsort` before).
 ## See also
 
 - @ref craft_planning — why 8 + 8 slots, and how to budget them.
-- @ref tools_palplan, @ref tools_img2snes — the earlier tools; shipped for one more version.
+- @ref tools_palplan, @ref tools_img2snes — the earlier tools (@ref tools_legacy).

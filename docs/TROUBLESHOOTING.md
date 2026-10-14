@@ -189,10 +189,12 @@ while (1) {
 
 **Cause**: BGR555 format mismatch.
 
-SNES uses BGR555 (5 bits blue, 5 green, 5 red), not RGB. Use gfx4snes to convert PNGs correctly:
+SNES uses BGR555 (5 bits blue, 5 green, 5 red), not RGB. Let the converter write the palette from an indexed PNG:
 ```bash
-gfx4snes -i sprite.png -o sprite
+opensnes-sprite sheet res/sprite.png --size 16 --colors 16    # sprites
+opensnes-tileset convert res/bg.png --colors 16               # backgrounds
 ```
+(or the same settings in `res/sprite.png.toml`, which the build runs for you).
 
 ### Tiles appear corrupted
 

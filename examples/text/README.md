@@ -23,8 +23,8 @@ A ladder of developer questions: *how do I show text? → how do I move it?*
 ### How Text Works on SNES
 
 ```
-Font Image (PNG) --> gfx4snes/font2snes --> Tile Data (VRAM)
-                                        --> Tilemap (VRAM)
+Font Image (PNG) --> opensnes-text   --> Tile Data (VRAM)
+  (or the built-in font of textLoadFont) --> Tilemap (VRAM)
                                                 |
                                         PPU renders screen
 ```

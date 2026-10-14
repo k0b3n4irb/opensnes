@@ -40,8 +40,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+**Embedded in**: `opensnes-tileset` and `opensnes-sprite`, which link its
+converter sources (`tools/gfx4snes/src/`: images, palettes, tiles, maps,
+metasprites, lz77, loadbmp) as a library; their `.pic`, `.map`, `.pal` and
+`_meta.inc` are byte for byte gfx4snes's. The standalone `gfx4snes` is
+legacy (@ref tools_legacy).
+
 **Notes**:
-- Use the `-T -X -Y` flags for metasprite generation
 - Critical bug fixes are in the develop branch (main branch has tile index issues)
 
 ---
@@ -55,6 +60,11 @@ SOFTWARE.
 **Source**: [PVSnesLib](https://github.com/alekmaul/pvsneslib) - `tools/smconv/`
 
 **License**: MIT License (same as above)
+
+**Embedded in**: `opensnes-music`, which links the converter sources of
+`tools/smconv/src/` (IT loader, IT-to-SPC conversion, BRR encoder, report),
+and `opensnes-sample`, which links its BRR encoder (`brr.c`). The build
+still runs `smconv` itself for `SOUNDBANK_SRC`.
 
 ---
 

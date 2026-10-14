@@ -34,7 +34,7 @@ nothing you do not list is linked.
 |---|---|---|---|
 | scroll a background | `bgSetScroll` | `background` | [scrolling/parallax_scroll](../examples/scrolling/parallax_scroll/) |
 | scroll a map bigger than VRAM | `mapLoad`, `mapUpdate` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
-| load a map made in Tiled | `tmx2snes` → `.m16`/`.b16` | `map` | [maps/tiled](../examples/maps/tiled/) |
+| load a map made in Tiled | `opensnes-level` → `.m16`/`.b16` | `map` | [maps/tiled](../examples/maps/tiled/) |
 | ask whether a tile is solid | `collideTile`, `collideTileEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
 | ask whether two boxes overlap | `collideRect`, `collideRectEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
 | handle slopes | `collideTileEx` + per-tile attributes | `collision` | [maps/slope_collision](../examples/maps/slope_collision/) |
@@ -154,7 +154,7 @@ ones that cost the most time:
 | a sprite renders as background garbage | `oamInit`'s second argument is a page number 0-7, not an address — use `OBJ_NAME_BASE(addr)` |
 | a sprite appears where no entity is | off-camera OAM coordinates wrap — `oamHide()` it |
 | a `const` array reads as garbage | it spilled past bank $00; the build's bank-blind check should catch it |
-| colours shift when you add a tile | gfx4snes re-quantises the whole palette — author a fixed palette |
+| colours shift when you add a tile | the converter re-derives the whole palette — author a fixed one and impose it (`palette = "fixed.pal"` in the settings file) |
 
 ## Keeping this page honest
 

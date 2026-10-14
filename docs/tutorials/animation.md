@@ -132,23 +132,37 @@ Tile numbers for each direction:
 - **Right**: 12, 14, 32 (frame 3 wraps to next VRAM row)
 - **Left**: same tiles as Right, drawn with H-flip
 
-### Converting Sprite Sheets with gfx4snes
+### Converting Sprite Sheets
 
-```bash
-# 16x16 sprites, 4bpp, with palette output
-gfx4snes -s 16 -o 16 -u 16 -p -i sprites.png
+A settings file beside the sheet tells the build to convert it with
+@ref tools_opensnes_sprite (16x16 blocks, one 16-colour palette):
+
+```toml
+# res/sprites.png.toml
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
 ```
 
-Include the output in an assembly data file:
+The generated `res/sprites.inc` declares `sprites_tiles` and `sprites_pal`
+(each with `_end`); the data itself is placed in the asset banks by the
+build:
 
-```asm
-ASSET_SECTION "sprites"          ; templates/assets.inc: any bank but $00
-sprite_tiles: .incbin "res/sprites.pic"
-sprite_tiles_end:
-sprite_pal:   .incbin "res/sprites.pal"
-sprite_pal_end:
-.ends
+```c
+#include "res/sprites.inc"
+
+oamInitGfxSet(sprites_tiles, sprites_tiles_end - sprites_tiles,
+              sprites_pal, sprites_pal_end - sprites_pal,
+              0, 0x0000, OBJ_SIZE16_L32);
 ```
+
+Frames drawn in Aseprite go one step further: `metasprite = [32, 48]` in
+`[sheet]` writes one metasprite per frame (`hero_meta.inc`), and a
+`hero.json.toml` with `[anim]` turns the Aseprite tags into `AnimClip`s
+(`hero_anim.h`). `examples/sprites/aseprite_pipeline` is the worked
+example.
 
 ## Direction-Based Animation
 

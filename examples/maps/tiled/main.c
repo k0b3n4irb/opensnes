@@ -11,13 +11,11 @@
  *
  * The Tiled workflow:
  * 1. Design your level in Tiled (paint tiles, set collision properties)
- * 2. Export as .tmj (JSON) or .tmx (XML)
- * 3. Convert with tmxconv to .m16 (tilemap) + .t16 (tile defs) + .b16 (attributes)
- * 4. Convert tileslevel1_tiles PNG with gfx4snes to .pic + .pal
- * 5. Include all binaries in data.asm
- *
- * This example uses pre-converted binaries. The original Tiled source
- * file (maplevel01.tmj) is included in res/ for reference.
+ * 2. Export as .tmj (JSON)
+ * 3. A settings file beside each source tells the build which tool converts
+ *    it: res/tileslevel1.png.toml (opensnes-tileset: tiles + palette) and
+ *    res/maplevel01.tmj.toml (opensnes-level: map, tile definitions and
+ *    attributes)
  *
  * Ported from PVSnesLib "tiled" example by alekmaul.
  *
@@ -82,7 +80,7 @@ int main(void) {
      *
      * bgInitTileSet loads tile graphics to VRAM $2000 and palette to CGRAM.
      * The palette size (16*2*3 = 96 bytes) covers 3 palette banks of 16 colors,
-     * matching the gfx4snes -o 48 flag used during conversion.
+     * matching colors = 48 in res/tileslevel1.png.toml.
      *
      * The tilemap address $6800 with SC_64x32 is required by the map engine —
      * it uses this specific VRAM region for streaming.

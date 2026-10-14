@@ -180,43 +180,49 @@ bgSetScroll(1, scroll_x >> 1, 0);     // BG2 (background): half speed
 For a different speed on each band of the screen, see the HDMA parallax in
 [Scrolling](scrolling.md).
 
-## Using gfx4snes
+## Converting pictures
 
-Convert PNG images to SNES format using gfx4snes (based on PVSnesLib):
+A background picture becomes tiles, a tilemap and a palette with
+@ref tools_opensnes_tileset. Put a settings file beside the picture — its
+first line names the tool — and the build converts it before compiling
+anything; nothing goes in the Makefile:
 
-```bash
-# Convert 8x8 tiles with palette output
-gfx4snes -s 8 -p -i tiles.png
-# Output: tiles.pic (tile data), tiles.pal (palette)
+```toml
+# res/opensnes.png.toml (examples/backgrounds/mode1)
+tool = "opensnes-tileset"
 
-# Convert 16x16 sprites with palette
-gfx4snes -s 16 -p -i sprites.png
-
-# Convert with metasprite definition (for animation)
-gfx4snes -s 16 -p -T -X 32 -Y 48 -i character.png
-# Output: character.pic, character.pal, character_meta.inc
-
-# Convert against a committed palette (do not re-quantise)
-gfx4snes -s 8 -c master.pal -i tiles.png
+[convert]
+colors = 16
 ```
 
-`-c <file.pal>` imposes a committed palette instead of quantising the
-image's own colours. The build **fails** — naming the offending colour —
-if the image uses any colour not in that palette. This is the fix for the
-"adding one tile re-quantises the whole palette and shifts every existing
-tile's hue" problem: author the palette once, commit it, and impose it on
-every conversion so a new tile can only reuse existing entries.
+The same conversion by hand is `opensnes-tileset convert res/opensnes.png
+--colors 16` (`--save` writes the settings file for you). It writes
+`opensnes.pic` (the unique tiles), `opensnes.map` (the tilemap),
+`opensnes.pal` and `opensnes.inc`, which declares the arrays and a ready
+`BgAsset`:
 
-Include the generated data in your assembly file:
-```asm
-sprite_tiles:
-.incbin "res/sprites.pic"
-sprite_tiles_end:
+```c
+#include "res/opensnes.inc"   /* DECLARE_BG_ASSET(opensnes, BG_16COLORS, SC_32x32) */
 
-sprite_pal:
-.incbin "res/sprites.pal"
-sprite_pal_end:
+bgLoad(0, &opensnes, 0, 0x4000, 0x0000);   /* BG1, palette slot 0, tiles, map */
 ```
+
+The arrays behind it (`opensnes_tiles`, `opensnes_map`, `opensnes_pal`, each
+with `_end`) work with `dmaCopyVram` / `dmaCopyCGram` when you want to place
+each part yourself. Other keys of `[convert]` used by the examples: `bpp = 2`
+and `colors = 4` for a Mode 0 layer, `bpp = 8` for Mode 3,
+`mode = 7` for a Mode 7 plane, `priority = true`, `palette-entry = N` for a
+layer that uses a later palette bank, `pages = true` for a 64x64 scrolling
+map. Sprite sheets go through @ref tools_opensnes_sprite instead
+(@ref tutorial_sprites).
+
+`palette = "master.pal"` imposes a committed palette instead of deriving one
+from the image's own colours. The build **fails** — naming the offending
+colour — if the image uses any colour not in that palette. This is the fix
+for the problem where adding one tile re-derives the whole palette and shifts
+every existing tile's hue: author the palette once, commit it, and impose it
+on every conversion so a new tile can only reuse existing entries
+(`examples/games/rpg/res/tileset.png.toml` does this).
 
 ### Tiles made at run time
 
@@ -246,22 +252,32 @@ their art this way.
 
 Tile data compresses well — it is repetitive by construction — and the SDK
 can decompress it straight into VRAM, so the ROM carries the small form and
-the PPU gets the big one. Add `-z` to the gfx4snes invocation and link the
-module:
+the PPU gets the big one. Add `lz = true` to the picture's settings file
+and link the module:
+
+```toml
+# res/opensnes.png.toml (examples/backgrounds/mode1_lz77)
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+lz = true
+```
 
 ```makefile
 LIB_MODULES := console lzss background sprite
-...
-	$(GFX4SNES) -z -s 8 -o 16 -u 16 -e 0 -p -m -i $<
 ```
 
 ```c
-extern u8 patterns[];      /* the compressed .pic, as produced by -z */
+#include "res/opensnes.inc"   /* opensnes_tiles[] (compressed), opensnes_pal[], opensnes_map[] */
 
 setScreenOff();            /* VRAM writes need forced blank */
-lzssDecodeVram(patterns, VRAM_BG_TILES);
+lzssDecodeVram(opensnes_tiles, VRAM_BG_TILES);
 setScreenOn();
 ```
+
+With `lz = true` the `.inc` declares the arrays only, no `BgAsset`:
+`bgLoad()` would copy the compressed bytes.
 
 The saving is worth measuring rather than assuming. For the artwork in
 `examples/backgrounds/mode1_lz77`, the compressed `.pic` is **652 bytes**

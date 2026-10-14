@@ -116,53 +116,51 @@ void play_coin_sound(void) {
 }
 ```
 
-### One-shot samples from WAV (wav2brr) {#audio_wav2brr}
+### One-shot samples from WAV {#audio_wav2brr}
 
 SNESMOD is built around tracker modules. For a plain one-shot effect — a jump,
 a hit, a UI blip, a bit of speech — the lighter path is a **direct BRR
 sample**: convert an audio file to the SNES's BRR format once, bake it into the
-ROM, and trigger it from C. This is what @ref examples_audio_soundboard does.
+ROM, and trigger it from C. This is what @ref examples_audio_sfx_from_wav does.
 
-**1. Convert your WAV to BRR.** `wav2brr` (built by `make tools`) turns a PCM
-`.wav` into a `.brr` using the same encoder smconv uses on its own samples:
-
-```sh
-# one-shot effect
-wav2brr res/jump.wav res/jump.brr
-
-# a looping sample (loop between sample indices 2048 and 8192)
-wav2brr --loop 2048 8192 res/cello.wav res/cello.brr
-```
-
-Input is PCM WAV (8- or 16-bit, mono or stereo — stereo is downmixed). Keep
-the source at or below **32 kHz**; that is the DSP's ceiling, and a higher rate
-just plays back sharp. Pass `-v` to see the block count, loop offset, and a
-ready-to-paste `audioLoadSample()` line.
-
-**2. Bake the `.brr` into the ROM.** Put a settings file beside the WAV and
-the build does the rest, exactly as `audio/sfx_from_wav` does:
+**1. Put a settings file beside the WAV.** @ref tools_opensnes_sample turns a
+PCM `.wav` into a `.brr` using the same encoder smconv uses on its own
+samples, and the build runs it for every settings file that names it:
 
 ```toml
-# res/jump.wav.toml
+# res/jump.wav.toml — a one-shot effect
 tool = "opensnes-sample"
 
 [encode]
 ```
 
-`opensnes-sample encode` runs before the first C object; it writes
-`res/jump.brr`, a `res/jump_data.as` the build links (its own
-`ASSET_SECTION`, so any bank but $00), and a `res/jump.h` that declares
-`jump_brr[]`, `jump_brr_end[]` and the size. A looping sample adds
-`loop = [start, end]` to the table.
+```toml
+# res/cello.wav.toml — a looping sample (loop between sample indices 2048 and 8192)
+tool = "opensnes-sample"
 
-**3. Load it once, play it on demand.** The label becomes a C symbol; the size
-is the two labels subtracted, and the loop point is the byte offset `wav2brr`
-reported (0 for a one-shot):
+[encode]
+loop = [2048, 8192]
+```
+
+Input is PCM WAV (8- or 16-bit, mono or stereo — stereo is downmixed). Keep
+the source at or below **32 kHz**; that is the DSP's ceiling, and a higher rate
+plays back lower and slower (the tool warns, and says by how much).
+`opensnes-sample inspect res/jump.wav` prints the block count and the audio
+RAM a sample costs without writing anything.
+
+**2. The build bakes the `.brr` into the ROM.** `opensnes-sample encode` runs
+before the first C object; it writes `res/jump.brr`, a `res/jump_data.as` the
+build links (its own `ASSET_SECTION`, so any bank but $00), and a
+`res/jump.h` that declares `jump_brr[]`, `jump_brr_end[]`, the size
+(`jump_brr_size`) and the loop point (`jump_brr_loop`, a byte offset; 0 for
+a one-shot).
+
+**3. Load it once, play it on demand:**
 
 ```c
-extern u8 brr_jump[], brr_jump_end[];
+#include "res/jump.h"
 
-audioLoadSample(0, brr_jump, (u16)(brr_jump_end - brr_jump), 0);
+audioLoadSample(0, jump_brr, (u16)(jump_brr_end - jump_brr), jump_brr_loop);
 // ...later, when the player jumps:
 audioPlaySample(0);
 ```
@@ -178,7 +176,7 @@ for ten frames. Fine under a title screen; not in a match. To swap a
 sample during play, send it a piece a frame:
 
 ```c
-audioLoadSampleBegin(SMP_VOICE, brr_replay, (u16)(brr_replay_end - brr_replay), 0);
+audioLoadSampleBegin(SMP_VOICE, replay_brr, (u16)(replay_brr_end - replay_brr), 0);
 loading = 1;
 // ...in the game loop, once a frame:
 if (loading && audioLoadSampleStep(64) == 0) {
@@ -203,11 +201,6 @@ is a multiple of 3:
 | 256 | 255 | 184,750 | 52 % |
 
 A 5.3 KB voice is whole in 85 frames at 64 bytes a frame.
-
-> The build converts a one-shot sample for you: when an assembly file
-> `.incbin`s `res/jump.brr` and `res/jump.wav` exists, `make` runs `wav2brr`
-> on it. A looping sample needs its loop points, so run `wav2brr --loop` by
-> hand and commit the `.brr` next to its source WAV.
 
 ### Volume Control
 
@@ -247,6 +240,12 @@ smconv -s -o soundbank -b 1 music.it effects.it
 # - soundbank.h    (module/effect IDs)
 # - soundbank.bnk  (binary data)
 ```
+
+The build runs this for you from `SOUNDBANK_SRC` when `USE_SNESMOD := 1`.
+@ref tools_opensnes_music writes the same files from a settings file instead,
+`res/soundbank.toml` (`tool = "opensnes-music"`, a `[bank]` table with
+`inputs = ["mymusic.it", "effects.it"]`), and `opensnes-music inspect`
+tells you what each module costs in the SPC700's 64 KB.
 
 ## Pitch Constants
 

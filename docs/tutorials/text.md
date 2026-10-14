@@ -318,14 +318,23 @@ is the transparent background. To colour your text, write colour 1 of its slot:
 A custom font is just different tiles at the same VRAM address. Draw the 96
 glyphs (ASCII 32–127, space first) in 8x8 cells, put `res/myfont.png.toml`
 beside the picture with `tool = "opensnes-text"` and a `[font]` table
-(@ref tools_opensnes_text; the 0.x `font2snes` is @ref tools_font2snes), and
-the build writes the tiles and `res/myfont.inc`. Upload them yourself and
+(@ref tools_opensnes_text):
+
+```toml
+# res/myfont.png.toml
+tool = "opensnes-text"
+
+[font]
+bpp = 2          # 4 for a Mode 1 BG1 or BG2 text layer
+```
+
+The build writes the tiles and `res/myfont.inc`. Upload them yourself and
 point `textInit` at them:
 
 ```c
 #include "res/myfont.inc"
-dmaCopyVram(myfont_tiles, FONT_VRAM_ADDR, myfont_tiles_end - myfont_tiles);
-textInit(TEXT_DEFAULT_TILEMAP_ADDR, 0, 0);
+dmaCopyVram(myfont_tiles, 0x0000, myfont_tiles_end - myfont_tiles);   /* the layer's tile base */
+textInit(TEXT_DEFAULT_TILEMAP_ADDR, 0, 0);   /* first tile 0, palette slot 0 */
 ```
 
 No example needs a custom font, because `textLoadFont` already gives you a
@@ -391,7 +400,7 @@ something the module supports today.
 - @ref craft_frame_budget — where text sits among everything else a frame does.
 - @ref tutorial_panel — bordered boxes to put text *in*; the box is one layer,
   the text another.
-- @ref tools_font2snes — converting your own typeface.
+- @ref tools_opensnes_text — converting your own typeface.
 - @ref examples_text_print_string — the minimum program.
 - @ref examples_text_scroll_message — the text layer scrolled like any BG.
 - @ref examples_fundamentals_text_glyphs — what the module hides: a glyph as
