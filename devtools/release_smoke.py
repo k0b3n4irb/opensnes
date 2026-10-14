@@ -102,6 +102,11 @@ def main() -> int:
         if shipped:
             sys.exit(f"release-smoke: FAIL: retired converters in bin/: {', '.join(shipped)}")
 
+        # The library ships as objects: the build never reads its .asm.
+        lib_asm = sorted(p.name for p in (sdk / "lib" / "build").rglob("*.asm"))
+        if lib_asm:
+            sys.exit(f"release-smoke: FAIL: lib/build ships {len(lib_asm)} intermediate .asm files")
+
         stale = sorted(p.name for p in starter.rglob("*") if p.suffix in BUILD_OUTPUTS)
         if stale:
             sys.exit(f"release-smoke: FAIL: starter/ ships build output: {', '.join(stale[:8])}")

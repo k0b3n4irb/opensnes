@@ -26,6 +26,14 @@ SDK's `bin/`; a game's build needs nothing else installed.
 Every tool follows one contract — subcommands, long options, `--help`,
 `--json`, `inspect`, the same exit codes: @subpage tools_conventions.
 
+## What is in `bin/`
+
+Two kinds of programs. The ones you type: `opensnes` (the project) and the
+`opensnes-*` tools above, each with `--help`. The ones the build runs for
+you and you never type: the C compiler (`cc65816`, which drives
+`cproc-qbe` and `qbe`), the assemblers and linker (`wla-65816`,
+`wla-spc700`, `wla-superfx`, `wlalink`) and `sa1_patch`.
+
 ## The pipeline
 
 ```

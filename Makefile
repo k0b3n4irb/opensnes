@@ -633,7 +633,9 @@ release: all
 	@mkdir -p $(RELEASE_DIR)/opensnes/templates
 	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
-	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
+	@# The objects only: the build links lib/build/<flavour>/*.o and never
+	@# reads the .asm the compiler wrote on the way (about 200 files).
+	@cd lib && find build -name '*.o' | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@# Starter project — extract the zip and `make` in opensnes/starter/ works
@@ -657,7 +659,7 @@ release: all
 	@# opensnes-examples_<version>.zip (`make release-examples`), and the
 	@# documentation is published online from `main` (deploy_docs.yml).
 	@# Compressed, they were 14 MB of a 40 MB zip (v0.46.0 arm64), re-shipped
-	@# four times; the 17 static binaries of bin/ are the 23 MB that remain.
+	@# four times; the static binaries of bin/ are most of what remains.
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
