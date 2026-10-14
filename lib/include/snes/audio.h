@@ -355,7 +355,8 @@ u8 audioGetSampleInfo(u8 id, AudioSample *info);
  *   longest, 7. audioSetEcho() answers AUDIO_ERR_NO_MEMORY when samples
  *   already loaded reach into the ring it is asked for, so a game that
  *   wants an echo calls audioSetEcho() before loading, or picks a delay
- *   its samples leave room for. A shorter delay gives memory back.
+ *   its samples leave room for. A shorter delay gives memory back, and
+ *   audioReleaseEcho() gives the whole ring back.
  *
  * @return Free bytes available, under the limit that applies now
  */
@@ -610,6 +611,26 @@ u8 audioEnableEcho(u8 voiceMask);
  * audioEnableEcho() brings the same echo back.
  */
 u8 audioDisableEcho(void);
+
+/**
+ * @brief Turn the echo off and give its ring back to the samples
+ *
+ * Does what audioDisableEcho() does, then frees the ring: the sample area
+ * reaches $FFC0 again (audioGetFreeMemory() counts it at once), and
+ * samples may be loaded where the ring was as soon as this returns — the
+ * driver answers only once the sound chip has stopped writing there.
+ *
+ * For a game that wants an echo in one scene only: audioSetEcho() when
+ * the scene starts, this when it ends. audioEnableEcho() alone no longer
+ * brings an echo back afterwards; audioSetEcho() does, with its usual
+ * wait (16 ms per unit of the delay released), and it answers
+ * AUDIO_ERR_NO_MEMORY while samples loaded in the meantime occupy the
+ * ring it needs.
+ *
+ * @return AUDIO_OK, or AUDIO_ERR_TIMEOUT if the driver does not answer
+ *         (the ring is then still counted as taken)
+ */
+u8 audioReleaseEcho(void);
 
 /** @} */
 

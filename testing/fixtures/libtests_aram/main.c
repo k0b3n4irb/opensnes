@@ -55,6 +55,16 @@ u16 r_free1;         /* 0xF700 - 0x4B00: the shorter ring gave back  -> 0xAC00 *
 u16 r_alive;         /* a command twenty frames later: answered      -> 0 */
 u16 r_ok7;           /* audioSetEcho(7) now that it fits             -> 0 */
 u16 r_free7;         /* 0xC700 - 0x4B00                              -> 0x7C00 */
+
+/* --- the ring given back (slots 14-16; the samples above end at $4EFB) --- */
+u16 e_rel;           /* audioReleaseEcho()                            -> 0 */
+u16 e_free_rel;      /* up to $FFC0 again: 0xFFC0 - 0x4EFB            -> 0xB0C5 */
+u16 e_load;          /* 2 x 16 KB + 0x30C5, over the old ring         -> 0 */
+u16 e_free_full;     /* nothing left                                  -> 0 */
+u16 e_enable;        /* audioEnableEcho(0xFF) with no ring            -> 0 */
+u16 e_set_busy;      /* audioSetEcho(1): samples at $F700             -> 1 */
+u16 e_set_again;     /* after slot 16 is given back                   -> 0 */
+u16 e_free_again;    /* 0xF700 - 0xCEFB                               -> 0x2805 */
 u16 r_done;          /* 0xBEEF */
 
 int main(void) {
@@ -125,6 +135,23 @@ int main(void) {
         s_begin_after = audioLoadSampleBegin(13, step_pat, 30, 0);
         audioUnloadSample(13);
     }
+
+    /* --- the ring given back: the echo of one scene, then samples where it
+     * was. The ring of delay 7 ($C700-$FEFF) is running and written. --- */
+    e_rel = audioReleaseEcho();
+    e_free_rel = audioGetFreeMemory();
+    e_load = audioLoadSample(14, echo_fill, CHUNK, 0);
+    e_load |= audioLoadSample(15, echo_fill, CHUNK, 0);
+    e_load |= audioLoadSample(16, echo_fill, (u16)(0xFFC0 - 0xCEFB), 0);
+    e_free_full = audioGetFreeMemory();
+    e_enable = audioEnableEcho(0xFF);           /* no ring: must not clear one */
+    for (i = 0; i < 20; i++) {
+        WaitForVBlank();
+    }
+    e_set_busy = audioSetEcho(1, 40, 20, 20);   /* the samples are where it goes */
+    audioUnloadSample(16);
+    e_set_again = audioSetEcho(1, 40, 20, 20);
+    e_free_again = audioGetFreeMemory();
 
     r_done = 0xBEEF;
     while (1) {

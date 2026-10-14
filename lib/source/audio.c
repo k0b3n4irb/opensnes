@@ -744,3 +744,16 @@ u8 audioDisableEcho(void) {
     /* Mask 0 makes the driver also mute EVOL and stop ring writes. */
     return cmd_post(OP_ECHO_ON, 0, 0);
 }
+
+u8 audioReleaseEcho(void) {
+    u8 err;
+    /* p1 = 1: the driver also forgets the ring, and acks only once the DSP
+     * has stopped writing it. Wait for that ack before the CPU side hands
+     * the memory to the samples: a load right after must find it free. */
+    err = cmd_send(OP_ECHO_ON, 0, 1);
+    if (err != AUDIO_OK) {
+        return err;
+    }
+    sample_ceil = SAMPLE_CEIL_FULL;
+    return AUDIO_OK;
+}

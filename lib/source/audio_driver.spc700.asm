@@ -460,7 +460,8 @@ cmd_echo_fir:
 
 ;------------------------------------------------------------------------------
 ; $0A ECHO_ON — p0 = EON voice mask. Mask 0 = full echo off: mute the
-; echo output and stop ring writes too (audioDisableEcho).
+; echo output and stop ring writes too (audioDisableEcho); with p1 != 0,
+; also forget the ring (audioReleaseEcho).
 ;------------------------------------------------------------------------------
 cmd_echo_on:
     mov $F2, #$4D       ; EON
@@ -472,6 +473,19 @@ cmd_echo_on:
     WDSP $6C, $20       ; FLG: echo writes off
     mov a, #$00
     mov ZP_ECHO_LIVE, a
+    mov a, ZP_P1L
+    beq @eon_done       ; audioDisableEcho: the ring keeps its memory
+    ; p1 != 0 (audioReleaseEcho): forget the ring, its memory goes back to
+    ; the samples. The DSP reads FLG's echo-write bit at cycles 28-29 of
+    ; each 32-cycle sample (anomie's S-DSP doc), so the last ring write
+    ; lands within one sample of the FLG write: wait four (128 cycles)
+    ; before the ack lets the CPU load into the old ring. The ring is
+    ; still read (EVOL is 0, nothing is heard); ZP_EDL keeps the delay the
+    ; DSP is still running, which the next ECHO_CFG waits out.
+    mov a, #$00
+    mov ZP_PAGES, a     ; ECHO_ON no longer restarts a ring
+    mov y, #32
+-   dbnz y, -           ; 32 x 4 cycles
     jmp !ack
 @eon_on:
     ; A mask after a mask of 0: the ring was stopped and muted, and routing

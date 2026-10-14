@@ -5,6 +5,13 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`audioReleaseEcho()`** turns the echo off and gives its ring
+  back to the samples: the sample area reaches `$FFC0` again, and samples
+  may be loaded where the ring was as soon as it returns (the driver
+  answers once the S-DSP has stopped writing there). Until now a ring, once
+  configured, stayed taken: `audioDisableEcho()` keeps it so that
+  `audioEnableEcho()` can bring the same echo back. Asked by a game built
+  on the SDK.
 - feat(lib): **a sample loaded while the game runs** —
   `audioLoadSampleBegin(id, brrData, size, loopPoint)` takes the place in
   the sound CPU's memory and sends nothing, `audioLoadSampleStep(maxBytes)`

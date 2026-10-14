@@ -480,7 +480,19 @@ short. The call blocks: the driver waits for the ring it replaces to run
 out (up to 240 ms the first time, 16 ms per unit of the previous delay
 after) and clears the new one. Call it when a scene starts, never during
 play. `audioDisableEcho()` then `audioEnableEcho()` is the cheap way to
-turn the same echo off and on.
+turn the same echo off and on; the ring keeps its memory meanwhile.
+
+A game that wants an echo in one scene only gives the ring back when the
+scene ends:
+
+```c
+audioReleaseEcho();                      /* echo off, the ring's memory back to the samples */
+/* samples may be loaded where the ring was as soon as it returns */
+```
+
+The next `audioSetEcho()` takes a ring again, with the same wait, and
+answers `AUDIO_ERR_NO_MEMORY` if samples loaded in between are where it
+goes: unload them first.
 
 ### Asking the engine
 

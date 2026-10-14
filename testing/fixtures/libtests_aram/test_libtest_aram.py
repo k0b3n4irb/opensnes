@@ -34,6 +34,9 @@ CASES = [
     ("s_addr", 0x4B00), ("s_play", 2), ("s_idle", 0),
     ("s_odd1", 4), ("s_odd2", 0),
     ("s_cancel", 0), ("s_free_cancel", 1), ("s_begin_after", 0),
+    # the ring given back
+    ("e_rel", 0), ("e_free_rel", 0xB0C5), ("e_load", 0), ("e_free_full", 0),
+    ("e_enable", 0), ("e_set_busy", 1), ("e_set_again", 0), ("e_free_again", 0x2805),
 ]
 
 
@@ -74,6 +77,11 @@ def main() -> int:
         ("the sample loaded between two steps, at $4EE8", aram[0x4EE8:0x4EE8 + 9] == b"\x5A" * 9),
         ("the ten bytes whose last step took the odd one, at $4EF1", aram[0x4EF1:0x4EF1 + 10] == pat[:10]),
         ("slot 12's directory entry: $4EF1", aram[0x0A30:0x0A34] == bytes([0xF1, 0x4E, 0xF1, 0x4E])),
+        # Loaded where the released ring was ($C700-$FEFF), then echo routed
+        # to every voice for twenty frames: a ring still written, or cleared
+        # again by audioEnableEcho(), leaves zeros here. The new ring of
+        # delay 1 ($F700 up) is cleared by its own setup, so stop under it.
+        ("the samples loaded over the released ring, $4EFB-$F6FF", all(b == 0x5A for b in aram[0x4EFB:0xF700])),
     ]
     for label, ok in checks:
         print(f"  {'PASS' if ok else 'FAIL'}  {label}")
