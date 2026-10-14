@@ -84,6 +84,12 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(release): **the SDK zip installs luna again.** `scripts/install-luna.sh`
+  checks the archive it downloads against `testing/luna.sha256`, and the zip
+  shipped `luna.version` without it: in a freshly unzipped SDK, the installer
+  every page and message points to stopped with "no SHA-256" (every zip up
+  to v0.50.0). The release recipe copies the sums, and `release-smoke` fails
+  on a zip without them or without a sum for each of the four archives.
 - fix(tools): **`opensnes-tileset convert --blank`** (and `gfx4snes -b`) on a
   picture whose first block is blank wrote the added blank tile **and** the
   picture's own, while the map numbered the tiles as if there were one: every

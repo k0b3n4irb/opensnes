@@ -644,10 +644,11 @@ release: all
 	@# objects, so the user's first `make` linked nothing.
 	@git ls-files starter | tar -cf - -T - | tar -xf - -C $(RELEASE_DIR)/opensnes
 	@# Project test harness (`make test` in user projects) + the pinned-luna
-	@# installer. Only luna.version — a project's `make test` is `luna test` — not the SDK's
-	@# corpus manifest/baselines.
+	@# installer, with the pin and the archives' SHA-256 it checks (without
+	@# luna.sha256 the installer refuses every archive: the zips up to v0.50.0
+	@# shipped without it). Not the SDK's corpus manifest/baselines.
 	@mkdir -p $(RELEASE_DIR)/opensnes/testing $(RELEASE_DIR)/opensnes/scripts
-	@cp testing/luna.version $(RELEASE_DIR)/opensnes/testing/
+	@cp testing/luna.version testing/luna.sha256 $(RELEASE_DIR)/opensnes/testing/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
 	@# No devtools script in the zip (2026-10-06): a user build runs binaries
 	@# of bin/ and the shell CLI only, and check_doc_drift.py (anchor 17)
