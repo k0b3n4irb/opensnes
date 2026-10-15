@@ -184,6 +184,8 @@ static void setup_window(u8 layers, u8 w12sel_val) {
  * @return Never returns (infinite loop).
  */
 int main(void) {
+    consoleInit();
+
     /* Force blank during setup — screen off prevents visible VRAM corruption */
     setScreenOff();
 

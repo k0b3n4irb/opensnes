@@ -46,6 +46,8 @@
  * @return Never returns (infinite loop).
  */
 int main(void) {
+    consoleInit();
+
     setScreenOff();
 
     /* The tile data is in two parts so the linker can place each in a bank

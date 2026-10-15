@@ -139,6 +139,8 @@ AnimPlayer monster_anim = ANIM_PLAYER_INIT;
 int main(void) {
     u16 pad0;
 
+    consoleInit();
+
     /* Force blank during setup — prevents visible VRAM writes */
     setScreenOff();
 

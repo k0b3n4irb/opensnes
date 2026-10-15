@@ -62,14 +62,14 @@
   "backgrounds_mode0": {
     "fbhash": [
       "b0795af7af84e2a5",
-      "3fb32a3afe55fca0"
+      "c3fb07aac006d18e"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "2cb8f3f4ee696f8b61725be8f0eee376f97edf96c9f0ad6194d0fa22190b04fe"
+    "luna_version": "v1.38.0",
+    "rom_sha256": "84f47ed4049baa62aa5e1462e1ed3aa7a499d7e96f99cad503c3ccf985e6d9d2"
   },
   "backgrounds_mode1": {
     "fbhash": "cd685395875fba95",

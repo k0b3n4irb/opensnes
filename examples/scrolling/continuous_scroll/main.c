@@ -106,6 +106,8 @@ GameState game = {20, 100, 0, 32, 0, 32};
 int main(void) {
     u16 pad;              /**< Current joypad button state (read from hardware) */
 
+    consoleInit();
+
     /* Force blank during setup */
     setScreenOff();
 

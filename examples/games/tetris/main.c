@@ -55,13 +55,6 @@
 #include "render.h"
 #include "hud.h"
 
-/**
- * @brief Raw joypad state buffer written by the NMI handler every frame.
- *
- * Used directly (instead of padHeld()) for precise edge detection:
- * pressed = pad_keys[0] & ~prev_pad gives newly-pressed buttons this frame.
- */
-extern u16 pad_keys[];
 
 /**
  * @brief Global frame counter incremented by the NMI handler.
@@ -161,8 +154,10 @@ static u8 flash_timer;          /**< Frame counter during line clear flash anima
 /** @brief Duration of the line clear flash animation in frames */
 #define FLASH_FRAMES 10
 
-/** @brief Previous frame's joypad state (for edge-triggered button detection) */
-static u16 prev_pad;
+/** @brief Wait, frame by frame, until START is released. */
+static void waitStartReleased(void) {
+    do { WaitForVBlank(); } while (padHeld(0) & KEY_START);
+}
 
 /**
  * @brief Rainbow color cycle palette for animated message text (BGR555).
@@ -283,8 +278,8 @@ static void handleInput(void) {
     u8 new_rot;
     s8 new_col;
 
-    pad = pad_keys[0];
-    pressed = pad & ~prev_pad;  /* newly pressed this frame */
+    pad = padHeld(0);
+    pressed = padPressed(0);    /* newly pressed this frame */
 
     /* --- Pause toggle --- */
     if (pressed & KEY_START) {
@@ -299,14 +294,13 @@ static void handleInput(void) {
             WaitForVBlank();
             renderFlush();
             /* Wait until START released, then pressed again, then released */
-            do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
-            do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
-            do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+            waitStartReleased();
+            do { WaitForVBlank(); } while ((padHeld(0) & KEY_START) == 0);
+            waitStartReleased();
             hudClearMessage();
             /* Erase piece to restore clean delta state */
             renderErasePiece(cur_type, cur_rot, cur_row, cur_col);
             paused = 0;
-            prev_pad = pad_keys[0];
             return;
         }
     }
@@ -370,8 +364,6 @@ static void handleInput(void) {
     } else {
         das_down_timer = 0;
     }
-
-    prev_pad = pad;
 }
 
 /*============================================================================
@@ -398,7 +390,6 @@ static void startGame(void) {
     das_left_timer = 0;
     das_right_timer = 0;
     das_down_timer = 0;
-    prev_pad = 0;
     flash_timer = 0;
 
     rngSeed(frame_count);  /* seed RNG from frame count — varies with player timing on title screen */
@@ -592,7 +583,7 @@ static void stateGameOver(void) {
     renderEnableGradient();
 
     /* Rainbow cycle on GAME OVER until player presses START */
-    while ((pad_keys[0] & KEY_START) == 0) {
+    while ((padHeld(0) & KEY_START) == 0) {
         timer++;
         if (timer >= MSG_COLOR_SPEED) {
             timer = 0;
@@ -603,7 +594,7 @@ static void stateGameOver(void) {
         WaitForVBlank();
         renderFlush();
     }
-    do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+    waitStartReleased();
 
     renderSetMsgColor(0x7FFF);
     hudClearMessage();
@@ -623,7 +614,7 @@ static void stateTitle(void) {
     u8 cidx = 0;
 
     /* Rainbow cycle on PRESS START until player presses START */
-    while ((pad_keys[0] & KEY_START) == 0) {
+    while ((padHeld(0) & KEY_START) == 0) {
         timer++;
         if (timer >= MSG_COLOR_SPEED) {
             timer = 0;
@@ -635,7 +626,7 @@ static void stateTitle(void) {
         renderFlush();
     }
     /* Wait for START release */
-    do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+    waitStartReleased();
 
     renderSetMsgColor(0x7FFF);  /* restore white */
     hudClearMessage();
@@ -666,9 +657,7 @@ static void stateTitle(void) {
 int main(void) {
     u8 i;
 
-    /* Initialize joypads */
-    pad_keys[0] = 0;
-    pad_keys[1] = 0;
+    consoleInit();
 
     for (i = 0; i < 5; i++) {
         WaitForVBlank();

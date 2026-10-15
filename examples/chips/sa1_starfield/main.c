@@ -17,6 +17,8 @@
  *   shared I-RAM, read by the 65816 each frame
  * - A sync byte in I-RAM as the handshake between the two CPUs
  * - Sprites built in code (a 2x2 dot tile), no asset
+ * - oamMemory[] written directly, the escape hatch beside oamSet(): 128
+ *   positions copied from I-RAM each frame in one loop
  *
  * @par What to Observe
  * - 128 dots moving in smooth, coordinated flock-like patterns

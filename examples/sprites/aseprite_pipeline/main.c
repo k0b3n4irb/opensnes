@@ -65,7 +65,7 @@
  *  OBJ size; the frame comes from the animation at each call. */
 static const MetaspriteStyle hero_style = { .baseTile = 0, .size = OBJ_SMALL };
 
-/** @brief 4bpp hero tiles (res/hero.pic, incbin'd in data.asm) */
+/** @brief 4bpp hero tiles (res/hero.pic, converted by the build from res/hero.png) */
 #include "res/hero.inc"   /* generated: hero_tiles[], hero_tiles_end[], hero_pal[] */
 /** @brief Hero sprite palette, 16 colours (res/hero.pal) */
 

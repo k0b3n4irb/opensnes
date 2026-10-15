@@ -37,7 +37,7 @@
 #include <snes.h>
 
 /*========================================================================
- * Sprite graphics data (from data.asm)
+ * Sprite graphics data (converted by the build from res/)
  *========================================================================*/
 
 #include "res/spritehero32.inc"

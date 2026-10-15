@@ -72,6 +72,8 @@ static void wait_for_key(void) {
  * @return Does not return (infinite loop).
  */
 int main(void) {
+    consoleInit();
+
     /* Force blank during setup -- required for safe VRAM writes */
     setScreenOff();
 

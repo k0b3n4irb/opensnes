@@ -104,6 +104,8 @@ u8 hdma_right[8];
  * @return Never returns (infinite loop).
  */
 int main(void) {
+    consoleInit();
+
     /* Force blank during setup */
     setScreenOff();
 

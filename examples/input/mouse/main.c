@@ -18,6 +18,8 @@
  * - Relative-to-absolute coordinate accumulation from mouse deltas
  * - Sensitivity control (hardware-level scaling of mouse movement)
  * - Sprite used as a cursor overlay on a text background
+ * - oamMemory[] written directly, the escape hatch beside oamSet(): one
+ *   cursor, its four OAM bytes set where the mouse moved it
  *
  * @par What to Observe
  * - A 16x16 cursor sprite follows mouse movement on screen

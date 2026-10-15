@@ -67,19 +67,14 @@ static void map_prepare_column(u16 map_col, u16 vram_col) {
     for (row = 0; row < map_height; row++) {
         col_buffer[row] = map_row_ptrs[row][map_col];
     }
-    col_pending = 1;  /* Flag: "I have data ready" */
+    /* Note the transfer: 64 bytes, the address stepping by 32 words
+     * (down the column) */
+    vramQueuePush((const u8 *)col_buffer, vram_addr, 64, VRAM_QUEUE_COLUMN);
 }
 ```
 
-**During VBlank** (PPU is idle, VRAM is writable):
-```c
-static void map_flush_column(void) {
-    if (!col_pending) return;
-    REG_VMAIN = 0x81;  /* Auto-increment vertically (down the column) */
-    /* Write col_buffer to VRAM */
-    col_pending = 0;
-}
-```
+**During VBlank** (PPU is idle, VRAM is writable), `vramQueueFlush()` sends
+what was noted, one DMA per entry (the `vramqueue` module).
 
 **The decision logic** (every frame):
 ```c
@@ -199,7 +194,7 @@ while (1) {
 
     /* VBlank — hardware updates */
     WaitForVBlank();
-    map_flush_column();                  /* Write staged column to VRAM */
+    vramQueueFlush();                    /* Send the staged column to VRAM */
     bgSetScroll(0, camera_x, 0);        /* Update scroll register */
     /* NMI handler auto-flushes the dynamic sprite engine
      * (end-frame + VRAM tile queue) — no manual calls needed. */
@@ -294,6 +289,8 @@ The tools write the `.pic` / `.pal` (and the `.map` for the tileset), a
 | `dma` | Bulk transfers: tile data, palettes, OAM buffer |
 | `input` | `padHeld()`, `padPressed()` — NMI handler fills the buffers |
 | `background` | `bgSetScroll()`, `bgSetGfxPtr()`, `bgInitTileSet()` |
+| `anim` | Mario's walk and jump clips |
+| `vramqueue` | The map column, noted during the frame and sent in VBlank |
 
 ### Data Placement
 
@@ -318,7 +315,7 @@ read.
 
 ## Modules Used
 
-`console`, `sprite`, `sprite_dynamic`, `sprite_lut`, `dma`, `input`, `background`, `anim` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `sprite_dynamic`, `sprite_lut`, `dma`, `input`, `background`, `anim`, `vramqueue` (`LIB_MODULES` in the Makefile).
 
 ## Technical Reference
 

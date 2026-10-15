@@ -16,18 +16,19 @@
 # 64" instead of "some pixels moved".
 #
 # The parallax ratio is the second claim. The loop scrolls every 3rd frame by
-# 3/2/1 px. Measured at frame 200: sxbg3 = 66 ticks (200/3), sxbg2 = 132,
-# sxbg1 = 198 — the 3:2:1 ratio AND the /3 throttle in three numbers. flip = 0
+# 3/2/1 px. Measured at frame 200: sxbg3 = 65 ticks (the loop starts about
+# a frame after boot, behind consoleInit()), sxbg2 = 130, sxbg1 = 195 — the
+# 3:2:1 ratio AND the /3 throttle in three numbers. flip = 2
 # pins the throttle phase. A layer that stops scrolling, or one that loses the
 # throttle and runs every frame, is a wrong integer here.
 rom = "../../examples/backgrounds/mode0/mode0.sfc"
 frames = 200
 
 [asserts.values]
-sxbg3 = 66                        # 200 frames / 3 = 66 scroll ticks, 1 px each
-sxbg2 = 132                       # 2 px per tick  -> exactly 2 * sxbg3
-sxbg1 = 198                       # 3 px per tick  -> exactly 3 * sxbg3
-flip  = 0                         # throttle counter wrapped, phase 0
+sxbg3 = 65                        # ~196 loop frames / 3 = 65 scroll ticks, 1 px each
+sxbg2 = 130                       # 2 px per tick  -> exactly 2 * sxbg3
+sxbg1 = 195                       # 3 px per tick  -> exactly 3 * sxbg3
+flip  = 2                         # throttle counter phase at frame 200
 
 [asserts.blocks]
 # One 4-colour palette bank per BG, 32 CGRAM entries apart (BG_4COLORS0).

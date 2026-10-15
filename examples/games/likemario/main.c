@@ -10,9 +10,9 @@
  *
  * The map engine streams one tile column per frame using a prepare/flush
  * pattern: during active display, the next column is read from ROM into
- * a RAM buffer (map_prepare_column); during VBlank, a 64-byte DMA writes
- * it to VRAM (map_flush_column). This keeps VRAM writes within the VBlank
- * budget. The column at +32 tiles ahead is streamed to cover the 33rd
+ * a RAM buffer (map_prepare_column) and noted in the VRAM queue; during
+ * VBlank, vramQueueFlush() sends it with one 64-byte DMA. This keeps VRAM
+ * writes within the VBlank budget. The column at +32 tiles ahead is streamed to cover the 33rd
  * partial tile at the screen edge.
  *
  * Physics use 8.8 fixed-point velocities with arithmetic right shift for
@@ -38,12 +38,14 @@
  * - Falling off the bottom respawns Mario at the top
  *
  * @par Modules Used
- * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, anim
+ * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, anim,
+ * vramqueue
  *
  * @see background.h, sprite.h, input.h, dma.h, snesmod.h
  */
 
 #include <snes.h>
+#include <snes/vramqueue.h>
 #include <snes/anim.h>
 #include <snes/snesmod.h>
 #include "soundbank.h"
@@ -173,12 +175,10 @@ static u8 sfx_jump_slot;
  * @brief Column tile buffer for deferred VRAM streaming.
  *
  * During active display, map_prepare_column() fills this 32-entry
- * buffer from ROM map data (RAM-only writes). During VBlank,
- * map_flush_column() DMAs these 64 bytes to VRAM in one transfer.
+ * buffer from ROM map data (RAM-only writes) and notes it in the VRAM
+ * queue; vramQueueFlush() sends the 64 bytes in VBlank.
  */
 static u16 col_buffer[32];
-static u16 col_vram_base;     /**< VRAM word address for the pending column DMA */
-static u8  col_pending;       /**< Nonzero when col_buffer contains data awaiting flush */
 
 /*============================================================================
  * Map Engine
@@ -277,8 +277,6 @@ static void map_load(void) {
     map_max_x = (s16)(map_width * 8 - 16);
     cam_max_x = (s16)(map_width * 8 - 256);
 
-    col_pending = 0;
-
     /* Force blank is already set by consoleInit — safe for VRAM writes */
     for (col = 0; col < 64; col++) {
         if (col < map_width)
@@ -293,15 +291,15 @@ static void map_load(void) {
  * @brief Buffer a map column for deferred VRAM write (prepare phase).
  *
  * Called during active display (not VBlank). Reads tile indices from
- * ROM map data into the col_buffer[] RAM array and records the target
- * VRAM address. No VRAM writes occur here -- those happen in
- * map_flush_column() during the next VBlank.
+ * ROM map data into the col_buffer[] RAM array and notes the transfer in
+ * the VRAM queue (a column: the address steps by 32 words). No VRAM write
+ * occurs here -- vramQueueFlush() sends it during the next VBlank.
  *
  * @param map_col  Source column index in the map data
  * @param vram_col Target column in the SC_64x32 tilemap (0-63)
  */
 static void map_prepare_column(u16 map_col, u16 vram_col) {
-    u16 row;
+    u16 row, vram_addr;
 
     if (map_col >= map_width) return;
 
@@ -312,44 +310,11 @@ static void map_prepare_column(u16 map_col, u16 vram_col) {
         col_buffer[row] = 0;
 
     if (vram_col < 32)
-        col_vram_base = VRAM_BG_MAP + vram_col;
+        vram_addr = VRAM_BG_MAP + vram_col;
     else
-        col_vram_base = VRAM_BG_MAP + 0x0400 + (vram_col - 32);
+        vram_addr = VRAM_BG_MAP + 0x0400 + (vram_col - 32);
 
-    col_pending = 1;
-}
-
-/**
- * @brief Flush the buffered column to VRAM via DMA (flush phase).
- *
- * Must be called during VBlank. Uses DMA channel 1 in word mode to
- * transfer 64 bytes (32 tilemap entries) to VRAM with vertical
- * increment addressing. DMA takes ~512 master cycles vs ~57,600 for
- * a compiled C register-write loop -- a 100x speedup that fits easily
- * within the VBlank budget.
- */
-static void map_flush_column(void) {
-    if (!col_pending) return;
-
-    /* Set VRAM address and vertical column mode (increment by 32 words) */
-    REG_VMAIN = VMAIN_INC32;
-    REG_VMADDL = col_vram_base & 0xFF;
-    REG_VMADDH = col_vram_base >> 8;
-
-    /* DMA channel 1: transfer col_buffer (64 bytes) to VRAM
-     * Using DMA instead of C loop — the compiled register-write loop
-     * takes ~57,600 master cycles (exceeds VBlank), while DMA takes ~512. */
-    REG_DMAP(1) = 0x01;            /* 2-register word mode ($2118/$2119) */
-    REG_BBAD(1) = 0x18;            /* Destination: VMDATAL */
-    REG_A1TL(1) = (u16)col_buffer & 0xFF;
-    REG_A1TH(1) = ((u16)col_buffer >> 8) & 0xFF;
-    REG_A1B(1)  = 0x7E;            /* Source bank: WRAM */
-    REG_DASL(1) = 64;              /* 32 words = 64 bytes */
-    REG_DASH(1) = 0;
-    REG_MDMAEN  = 0x02;            /* Fire DMA channel 1 */
-
-    REG_VMAIN = VMAIN_INC1;
-    col_pending = 0;
+    vramQueuePush((const u8 *)col_buffer, vram_addr, 64, VRAM_QUEUE_COLUMN);
 }
 
 /**
@@ -676,7 +641,7 @@ static void mario_update_camera(void) {
  *   7. map_update() - prepare next column in RAM buffer
  *
  * VBlank (VRAM writes allowed):
- *   1. map_flush_column() - DMA one column (64 bytes)
+ *   1. vramQueueFlush() - DMA the column noted (64 bytes)
  *   2. bgSetScroll() - update hardware scroll registers
  *   3. oamVramQueueUpdate() - upload sprite tiles
  *   4. snesmodProcess() - SPC700 communication (no VBlank restriction)
@@ -749,7 +714,7 @@ int main(void) {
          * NMI auto-flushes the dynamic sprite engine (end-frame +
          * VRAM tile queue), so no manual oamInit*EndFrame /
          * oamVramQueueUpdate calls are needed here. */
-        map_flush_column();
+        vramQueueFlush();
         bgSetScroll(0, camera_x, 0);
         /* SPC700 communication last — no VBlank restriction */
         snesmodProcess();

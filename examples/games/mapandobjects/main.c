@@ -89,6 +89,8 @@ u16 nbobjects;
  * @return 0 (never reached -- infinite game loop)
  */
 int main(void) {
+    consoleInit();
+
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
     bgInitTileSet(0, tilesMario_tiles, tilesMario_pal, 0,
                   (tilesMario_tiles_end - tilesMario_tiles), PALETTE_16_SIZE, BG_16COLORS, 0x2000);

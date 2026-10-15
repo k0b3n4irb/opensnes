@@ -74,6 +74,8 @@ extern u8 objmario;
  * @return 0 (never reached -- infinite game loop)
  */
 int main(void) {
+    consoleInit();
+
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
     bgInitTileSet(0, tiles_tiles, tiles_pal, 0,
                   (tiles_tiles_end - tiles_tiles), PALETTE_16_SIZE, BG_16COLORS, 0x2000);

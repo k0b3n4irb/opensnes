@@ -77,6 +77,8 @@ u16 flip = 0;
  * @return Never returns (infinite loop).
  */
 int main(void) {
+    consoleInit();
+
     /* Load 4 tilesets to VRAM at separate addresses.
      * Mode 0 palette banking: each BG has its own 4-color palette bank.
      * BG0=bank 0, BG1=bank 1, BG2=bank 2, BG3=bank 3 */

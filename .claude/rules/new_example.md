@@ -47,7 +47,7 @@ consoleInit() → setMode() → palettes → tiles → tilemap → BG pointers
 
 | Mistake | Symptom | Fix |
 |---------|---------|-----|
-| Forget `consoleInit()` | VRAM garbage | Always call first |
+| Forget `consoleInit()` | The state crt0 left: CGRAM and BG pointers not set, `isPAL()` and `rand()` unseeded | Call it first: it sets a known state (black palettes, Mode 1, BG1 map at $0400, region, random seed); crt0 already enables NMI and force blank |
 | `setScreenOn()` before VRAM setup | Flicker, garbage frame | Screen on LAST |
 | DMA outside VBlank | Data silently lost | `WaitForVBlank()` before DMA |
 | Wrong text API | Compile error | `textInit`+`textPrintAt`+`textFlush` |

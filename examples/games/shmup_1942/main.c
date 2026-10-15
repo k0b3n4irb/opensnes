@@ -16,6 +16,8 @@
  *   addresses) plus distinct sprite palettes (0/1/2)
  * - Axis-aligned bounding-box (AABB) overlap test for 32×32 sprites
  * - Input edge detection via `padPressed()` for one-shot fire
+ * - oamMemory[] written directly, the escape hatch beside oamSet(): 17
+ *   sprites rewritten each frame from the pools, oam_update_flag set once a frame
  *
  * @par What to Observe
  * - Press A to fire a bullet upward from the player's nose
@@ -278,6 +280,8 @@ static void collisions_resolve(void) {
 /* ---- Main ----------------------------------------------------------------*/
 
 int main(void) {
+    consoleInit();
+
     setScreenOff();
 
     bgLoad(0, &scene, 0, 0x4000, 0x0000);

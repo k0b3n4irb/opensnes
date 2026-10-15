@@ -89,6 +89,8 @@ u16 flip;
 int main(void) {
     u16 pad;
 
+    consoleInit();
+
     /* Load tilesMario_tiles to VRAM $2000, palette to CGRAM */
     bgInitTileSet(0, tilesMario_tiles, tilesMario_pal, 0,
                   tilesMario_tiles_end - tilesMario_tiles,
