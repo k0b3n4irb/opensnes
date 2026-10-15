@@ -64,20 +64,11 @@ load, multi-channel HDMA, etc.), pick channels 1–6.
 
 ## The 8 transfer modes
 
-The same modes as HDMA — the `DMAPn` register's low 3 bits encode them.
-For DMA, the mode determines how the source is written to a PPU register
-*sequentially* (vs HDMA's per-scanline cadence):
-
-| Mode | Bytes per "unit" | Pattern |
-|:---:|:---:|---|
-| 0 | 1 | reg |
-| 1 | 2 | reg, reg+1 (the common case for VRAM word writes via `$2118`/`$2119`) |
-| 2 | 2 | reg, reg (same register twice — for CGRAM via `$2122`) |
-| 3 | 4 | reg, reg, reg+1, reg+1 |
-| 4 | 4 | reg, reg+1, reg+2, reg+3 |
-| 5 | 4 | reg, reg+1, reg, reg+1 (same bytes-to-registers result as mode 1) |
-| 6 | 2 | reg, reg (same as mode 2) |
-| 7 | 4 | reg, reg, reg+1, reg+1 (same as mode 3 — *not* four consecutive registers; that is mode 4) |
+The low 3 bits of the `DMAPn` register pick how the source bytes are spread
+over the PPU registers: one register, two in turn, a write-twice register…
+The eight patterns are in one table, under `$43x0 - DMAPx` in
+[the register reference](../hardware/REGISTERS.md); HDMA uses the same
+modes.
 
 The lib's `dmaCopyVram` uses mode 1 (16-bit VRAM word writes via
 `$2118`/`$2119`); `dmaCopyCGram` uses mode 0 with destination `$2122`

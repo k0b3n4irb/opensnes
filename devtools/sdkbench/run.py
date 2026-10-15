@@ -380,7 +380,7 @@ def main() -> int:
         shallower = sum(o["stack"] <= p["stack"] for _, o, p in rows)
         print(f"\n{origin}. Of {len(rows)} workloads OpenSNES is faster on {faster}, "
               f"no larger on {smaller}, no deeper in stack on {shallower}.")
-        print("cycles: master cycles (an NTSC frame is about 357,370); size: bytes of code; "
+        print("cycles: master cycles (an NTSC frame is 357,368); size: bytes of code; "
               "stack: bytes below the initial stack pointer at the deepest point.")
     for p in problems:
         print("PROBLEM:", p)

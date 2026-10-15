@@ -3,7 +3,8 @@
  *
  * One AnimClip per Aseprite tag, for the OpenSNES anim.h player.
  * Frame values are metasprite-table indices (frame index x stride=1);
- * pair with a gfx4snes -P pointer table, or index OAM tiles directly.
+ * pair with the pointer table of `opensnes-sprite sheet --metasprite`
+ * (<stem>_metasprites[] in <stem>_meta.inc), or index OAM tiles directly.
  * Durations are Aseprite per-frame milliseconds converted at 60 fps.
  * Include this AFTER <snes.h> (needs AnimClip, ANIM_LOOP, ANIM_ONCE).
  */

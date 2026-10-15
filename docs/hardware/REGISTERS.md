@@ -435,13 +435,20 @@ Each channel has 16 bytes of registers at $43x0-$43xF where x = channel (0-7).
 
 **Transfer Modes:**
 
-| Mode | Pattern | Description |
-|------|---------|-------------|
-| 0 | 1 byte | Write to single register |
-| 1 | 2 bytes | Write to reg, reg+1 alternating |
-| 2 | 2 bytes | Write to reg twice |
-| 3 | 4 bytes | Write to reg, reg+1 x2 each |
-| 4 | 4 bytes | Write to reg, reg+1, reg+2, reg+3 |
+The one table of the eight modes; the DMA and HDMA tutorials link here.
+For DMA the unit repeats until the byte count runs out; for HDMA it is what
+one table entry writes on one line.
+
+| Mode | Bytes per unit | Registers written, in order |
+|:---:|:---:|---|
+| 0 | 1 | reg |
+| 1 | 2 | reg, reg+1 (VRAM words through `$2118`/`$2119`) |
+| 2 | 2 | reg, reg (a write-twice register) |
+| 3 | 4 | reg, reg, reg+1, reg+1 (two write-twice registers) |
+| 4 | 4 | reg, reg+1, reg+2, reg+3 |
+| 5 | 4 | reg, reg+1, reg, reg+1 (same bytes-to-registers result as mode 1) |
+| 6 | 2 | reg, reg (same as mode 2) |
+| 7 | 4 | reg, reg, reg+1, reg+1 (same as mode 3 — *not* four consecutive registers; that is mode 4) |
 
 ```c
 // Mode 1 (for VRAM): write to $2118/$2119 alternating

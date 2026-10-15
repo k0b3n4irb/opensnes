@@ -72,19 +72,19 @@ The lib hides those four register writes behind two helpers:
 
 ## Transfer modes
 
-The "what does each table entry write" axis. Eight modes, set via the
-low 3 bits of `DMAPn`:
+The "what does each table entry write" axis, set by the low 3 bits of
+`DMAPn`. Which registers each mode writes, in order, is in one table under
+`$43x0 - DMAPx` in [the register reference](../hardware/REGISTERS.md);
+here is what each is for on a scanline:
 
-| Mode | Bytes per write | Goes to | Typical use |
-|:---:|:---:|---|---|
-| 0 | 1 | reg | INIDISP brightness, MOSAIC, single-byte registers |
-| 1 | 2 | reg, reg+1 | Two adjacent registers: the window edges WH0/WH1 (`hdmaWindowShape`) |
-| 2 | 2 | reg, reg | A write-twice register: BG scroll (`BGnHOFS`, low then high byte; `hdmaParallax`) |
-| 3 | 4 | reg, reg, reg+1, reg+1 | Mode 7 matrix elements |
-| 4 | 4 | reg, reg+1, reg+2, reg+3 | Window position pair (WH0L, WH0H, WH1L, WH1H) |
-| 5 | 4 | reg, reg+1, reg, reg+1 | Pair-of-2-byte registers |
-| 6 | 2 | reg, reg | Same as mode 2 |
-| 7 | 4 | reg, reg, reg+1, reg+1 | Same as mode 3 |
+| Mode | Typical use |
+|:---:|---|
+| 0 | One single-byte register: INIDISP brightness, MOSAIC |
+| 1 | Two adjacent registers: the window edges WH0/WH1 (`hdmaWindowShape`) |
+| 2 | A write-twice register: BG scroll (`BGnHOFS`, low then high byte; `hdmaParallax`) |
+| 3 | Two write-twice registers: a pair of Mode 7 matrix elements |
+| 4 | Four adjacent registers: both windows' edges, WH0-WH3 |
+| 5, 6, 7 | Repeat modes 1, 2 and 3 |
 
 The lib defines named constants — `HDMA_MODE_1REG`, `HDMA_MODE_1REG_2X`,
 `HDMA_MODE_2REG`, etc. Picking the right mode is mostly a question of
