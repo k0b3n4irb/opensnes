@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | a2cfdffe1c9d3ce6f0c313508c4d4ba7ffdd4dd7 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | 1721f6c22c8d75afc82581d249dee6be33982e1f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
@@ -47,9 +47,6 @@ commit that moves the pin.
 ### compiler/cproc — 46 patches since upstream merge-base 7051114
 
 ```
-96be7ae w65816: X known across the blocks of a function, and an indexed load as the operand of what it feeds — two text rules of the peephole stage: a forward analysis of the frame slot A and X equal (a `tax` or `ldx` of what X already holds goes; a function indexing parallel arrays reloaded its index at the top of every block), and `lda SYM,x / sta T / lda Y / op T` as `lda Y / op SYM,x` for cmp, adc, sbc, and, ora, eor; `QBE_NO_PEEP_XFLOW=1`, `QBE_NO_PEEP_FUSE=1` (2026-10-13)
-2dd729f w65816: the counter of a rotated loop lives in X — a text rule of the peephole stage: ldx / cpx on the way in, inx or txa/clc/adc/tax as the step, cpx at the bottom, when nothing in the body writes X or the counter's slot and the counter dies with the loop; farClear 31 → 18 CPU cycles a turn; `QBE_NO_PEEP_LOOPX=1` (stage 2 T3, 2026-10-12)
-a4ce67c ivar: a loop counter used only as one scaled index becomes that index — a pass before gcm: `for (k = 0; k < N; k++) a[k] = v` runs on j = 2k, stepping by 2, tested against 2N, no shift in the body; exact when nothing wraps at 16 bits, nothing created otherwise; `QBE_NO_IVAR=1`, `-d V` (stage 2 T2, 2026-10-12)
 8c97293 qbe: Avoid redundant leaf ceq in switch (v2) — a case whose neighbours are the values just below and above needs no compare: `switch` workload -3.1 %, `state` -2.7 % (upstream 863e1e7, cherry-picked 2026-10-11)
 7e6a4e5 expr: a string literal is const char[] — handed to a plain `char *` it was read from the wrong bank in silence, and `"abc"[i]` was read bank-blind; a store to a literal is refused (2026-10-11)
 1071b97 expr: *"a" is the first character — the *& collapse skips string literals; it stopped on "unimplemented expression" (upstream 482c69c + d30bfcc, adapted, 2026-10-11)
@@ -101,7 +98,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 127 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 128 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -113,6 +110,9 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+96be7ae w65816: X known across the blocks of a function, and an indexed load as the operand of what it feeds — two text rules of the peephole stage: a forward analysis of the frame slot A and X equal (a `tax` or `ldx` of what X already holds goes; a function indexing parallel arrays reloaded its index at the top of every block), and `lda SYM,x / sta T / lda Y / op T` as `lda Y / op SYM,x` for cmp, adc, sbc, and, ora, eor; `QBE_NO_PEEP_XFLOW=1`, `QBE_NO_PEEP_FUSE=1` (2026-10-13)
+2dd729f w65816: the counter of a rotated loop lives in X — a text rule of the peephole stage: ldx / cpx on the way in, inx or txa/clc/adc/tax as the step, cpx at the bottom, when nothing in the body writes X or the counter's slot and the counter dies with the loop; farClear 31 → 18 CPU cycles a turn; `QBE_NO_PEEP_LOOPX=1` (stage 2 T3, 2026-10-12)
+a4ce67c ivar: a loop counter used only as one scaled index becomes that index — a pass before gcm: `for (k = 0; k < N; k++) a[k] = v` runs on j = 2k, stepping by 2, tested against 2N, no shift in the body; exact when nothing wraps at 16 bits, nothing created otherwise; `QBE_NO_IVAR=1`, `-d V` (stage 2 T2, 2026-10-12)
 0301a5e parse: a message names the C source when the driver says which (`QBE_SOURCE_NAME`, set by cc65816 before stage 3): `qbe:main.c (IR line N): …` instead of a temporary file nobody can open; `identifier too long` says the 79-character limit and the start of the name (2026-10-12)
 c8e0f5f emit: the first operand of a 32-bit divide or remainder keeps its stack slot — the four operations push the second operand first and read the first from the stack, and `(!g ? 1L : 0L) % d` stopped the compiler with an internal error, "has no stack slot" (difftest_stmt seed 364296, 2026-10-11)
 fbdda87 emit: a block that ends in a jump to a block made of one compare and its branch (the condition of a `for` or a `while`) emits that compare and branch itself — one `jmp` less every turn; and `lda S` at a block's entry goes when every way in comes straight from a load or a store of S (`peephole_entry`, last and once; kept when anything could read its flags). `for (k = 0; k < n; k++) t[k] = 0;`: 36 to 29 CPU cycles a turn (2026-10-11)

@@ -49,6 +49,12 @@ All notable changes to OpenSNES are documented in this file.
   totals (`OPENSNES_ONLY` in `run.py`).
 
 ### Performance
+- perf(compiler): **`d[k] |= p[k]` from ROM into far RAM: 5 instructions a
+  word, 4 through a pointer, instead of 9 and 10.** An indexed load stays the
+  operand of the operation it feeds when the other operand is indexed by
+  another slot (X is set back before the operation) or read through a
+  pointer, and a 16-bit and, or or xor no longer makes the next word stage
+  that pointer again.
 - perf(compiler): **X is known across the blocks of a function, and an
   indexed load is the operand of what it feeds.** Two text rules of the
   emitter's peephole stage. A function that indexes parallel arrays by one

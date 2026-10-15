@@ -1,0 +1,7 @@
+# Source indexed by one slot, destination by another: X is set for the load,
+# set again for the operation, the operand read from the array itself.
+in orIndexed: present \tldx\.b tcc__lf\+2\n\tlda\.l src\+2,x\n\tldx\.b tcc__lf\+0\n\tora\.l dst\+2,x\n\tsta\.l dst\+2,x\n
+in orIndexed: absent \tora\.b tcc__lf
+# Through a pointer: staged in tcc__r9 once (the or between two words keeps
+# it), an ldy between the two loads.
+in orPointer: present \tsta\.l dst,x\n\tldy\.w #2\n\tlda \[tcc__r9\],y\n\tora\.l dst\+2,x\n
