@@ -1,69 +1,34 @@
 # shmup_1942
 
-Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0
-*Pixel Shmup* pack. Lands in stages so each commit is a working ROM.
+A vertical "1942-style" shoot 'em up on Kenney's CC0 *Pixel Shmup* pack: a
+terrain that scrolls down on BG1, the player's plane, a pool of enemies and
+the player's bullets as sprites, and the collision between bullets and
+enemies.
 
 ![Screenshot](shmup_1942.png)
 
-## Roadmap status
+## Controls
 
-| Stage | What it added |
-|-------|---------------|
-| S1 | asset pipeline (settings files beside the PNGs) + procedural land-with-water-channels |
-| S2 | 256×512 scene + SC_32x64 + vertical auto-scroll |
-| S3 | Player ship (sprite) + D-pad movement |
-| S4 | Enemy spawn pool (≤8 simultaneous) |
-| S5 | Bullets + AABB collision |
-| S5.2 *(this stage)* | Bullet despawn fix — clears top of screen properly |
-| **S6** *(open chantier)* | HUD on BG3 (deferred — see below) |
+| Input | Action |
+|---|---|
+| D-pad | move the plane |
+| A | fire (a short cooldown between two shots) |
 
-## Bullet despawn fix (S5.2)
+## SNES Concepts
 
-Earlier the bullet's `despawn` test was `y < -BULLET_SPRITE` (= `-32`).
-That left the bullet "alive" all the way down to the moment its
-sprite-anchor `y` reached `-32`, but the actual visible ball pixels
-(canvas y=4..11 of the 32×32 sprite) had already cleared the top of
-the screen at `y ≈ -12`. Between those two thresholds, the SNES
-8-bit OAM `y` byte wrapped (`(u8)(-33) = 223`) and the bullet
-flashed at the *bottom* of the screen for one frame before despawning.
+- **Vertical auto-scroll** of a 256×512 scene (`SC_32x64`) with `bgSetScroll`
+- **Sprite pools**: fixed-size arrays of `{x, y, active}` slots; the player
+  has OAM slot 0, the enemies 1-8, the bullets 9-16
+- **Several sprite types in one OAM grid**: distinct VRAM regions and
+  distinct sprite palettes (0, 1, 2)
+- **AABB overlap test** between 32×32 sprites
+- **Edge-triggered fire** with `padPressed()`
 
-Symptom from the user POV: "bullets stop before reaching the top of
-the screen". Fix in code: despawn at `y < -12`, just after the
-visible ball exits the top of the playfield.
+A bullet despawns once its visible pixels leave the top of the screen
+(`y < -12`), not when its 32×32 frame does: past that point the 8-bit OAM
+`y` wraps and the bullet would flash at the bottom for a frame.
 
-## Open chantier — S6 HUD on BG3
-
-I attempted a BG3 + `text` module HUD (score / lives) and it produced
-two symptoms I couldn't resolve in one session:
-
-1. **Bank $00 ROM was razor-tight** when this was written: the `text`
-   module plus two string literals brought bank 0 to 12 bytes free, under
-   the fail threshold, and at the time a string in bank 1 was read as
-   garbage. Neither holds since v0.41.0: C const data, strings included,
-   goes to the asset banks and every read of it is a far read (see
-   `KNOWN_LIMITATIONS.md`, "Bank $00 ROM is code only"). The
-   `textPutChar('S')` form stayed for brevity, not out of need.
-2. **BG3 enable hides BG1.** As soon as `setMainScreen` includes
-   `TM_BG3`, the procedural terrain disappears and the screen turns
-   solid backdrop colour, regardless of:
-   - BG3 priority bit (`BG3_MODE1_PRIORITY_HIGH` on/off)
-   - BG3 tile priority in tilemap entries (`text_config.priority = 0` or `1`)
-   - Whether `textInit` / `textLoadFont` are called at all
-   - VRAM address alignment for BG3 tiles + tilemap (verified at
-     word-vs-byte level against `mode1_bg3_priority` and `text_test`)
-   Other layers (BG1, sprites) keep working; the HUD text itself
-   renders correctly on BG3. There's just a mystery interaction
-   between enabling BG3 and BG1's visibility that the surrounding
-   examples in the repo don't trigger and that I couldn't find in
-   the SDK docs.
-
-The S6 work was reverted to keep the ROM in a known-good state. A
-future chantier can pick up the investigation — likely candidates:
-the BG3 tile priority bit semantics, REG_BG3SC quirks at non-default
-word boundaries, or a CGRAM colour-math interaction with the HUD
-palette slot.
-
-## Architecture (current)
+## Architecture
 
 ```
 VRAM (BYTE / WORD addresses)

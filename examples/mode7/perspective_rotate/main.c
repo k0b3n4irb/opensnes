@@ -8,7 +8,7 @@
  * one Mode 7 matrix register per scanline (M7A/M7B/M7C/M7D from cos, sin,
  * -sin, cos tables), so the ground plane is BOTH perspective-projected
  * (each line scaled by 20480/y) AND rotated (48 angle steps) — the full
- * affine matrix per line, where graphics/backgrounds/mode7_perspective
+ * affine matrix per line, where mode7/perspective
  * drives only the two diagonal terms (no rotation).
  *
  * Rotating means the whole matrix changes per angle: the demo precomputes
@@ -74,7 +74,7 @@ int main(void) {
 
     dmaCopyCGram(ground_pal, 0, (u16)(ground_pal_end - ground_pal));
     /* Out-of-map area renders the backdrop (CGRAM color 0) under
-     * M7SEL=$80 — force it black like krom's (gfx4snes put a tile
+     * M7SEL=$80 — force it black like krom's (the converter puts a tile
      * color there) */
     REG_CGADD = 0;
     REG_CGDATA = 0x00;

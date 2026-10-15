@@ -17,8 +17,10 @@ per frame.
 Objective: land on the three striped pads (slow and low over a pad —
 green flash). Water is a splash (respawn); touching fields too fast
 bounces you back up. The terrain (patchwork fields, river and lake,
-three helipads) is generated at build time by `gen_terrain.py`
-(committed, deterministic).
+three helipads) and its class map are written by `gen_terrain.py`,
+kept with the example and run by hand (its outputs are committed); the
+build converts the picture with `opensnes-tileset`, `mode = 7` in
+`res/terrain.png.toml`.
 
 ROM mode: LoROM (project default).
 
@@ -30,8 +32,8 @@ ROM mode: LoROM (project default).
   palette, screen offset proportional to altitude
 - A takeoff/landing state machine: the landing EVENT fires only on
   the airborne→ground transition, so taxiing and takeoff work
-- Banked-data ASM accessor for the 16 KB class map (B2 escape, the
-  mode7_racing pattern)
+- A 16 KB class map read from C as a const array: it sits in an asset
+  bank like any const data, and C reads it with its bank
 
 ## How to Build
 

@@ -7,7 +7,7 @@
  * commonly used SNES video mode. Mode 1 provides two 4bpp layers (BG1 and
  * BG2, each up to 16 colors) plus one 2bpp layer (BG3, 4 colors). This
  * example uses only BG1 with a 16-color tileset and tilemap converted from
- * a PNG by gfx4snes.
+ * a PNG by the build (opensnes-tileset and the settings file beside it).
  *
  * This is a direct port of the PVSnesLib "Mode1" example.
  *

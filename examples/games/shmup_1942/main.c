@@ -1,13 +1,12 @@
 /**
  * @file main.c
- * @brief shmup_1942 — S5: bullets, collision and enemy destruction
+ * @brief shmup_1942 — a vertical shoot 'em up: scrolling, enemies, bullets
  * @ingroup examples
  *
- * Adds player bullets and bullet↔enemy AABB collision on top of S4.
- * Pressing A fires a bullet upward (with a small cooldown). Bullets
- * travel at 4 px/frame; when a bullet's bounding box overlaps an
- * enemy, both deactivate. The scene composition, scroll direction
- * and enemy spawn logic are unchanged from S4.
+ * The terrain scrolls down on BG1; the player's plane moves with the D-pad
+ * and fires with A (a small cooldown between shots). Bullets travel at
+ * 4 px/frame; when a bullet's bounding box overlaps an enemy, both
+ * deactivate. Enemies spawn from a pool of eight and fly down.
  *
  * @par SNES Concepts
  * - Sprite pools as fixed-size arrays of `{x, y, active}` slots
@@ -22,8 +21,7 @@
  * - Press A to fire a bullet upward from the player's nose
  * - Bullets travel at 4 px/frame; they despawn at the top of the
  *   screen or on hitting an enemy
- * - Enemies hit by a bullet vanish immediately (S5.1 will add
- *   explosion animations)
+ * - Enemies hit by a bullet vanish immediately
  * - The terrain keeps scrolling and the enemy pool keeps spawning
  *
  * @par Modules Used

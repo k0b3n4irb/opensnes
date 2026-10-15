@@ -134,8 +134,8 @@ LIB_MODULES := console sprite dma
 | `sprite` | ... |
 | `dma`     | ... |
 
-If graphics tools are used (gfx4snes, font2snes, smconv), explain what they do
-and why the flags are set the way they are.
+If the example converts assets (a `<asset>.toml` beside each source, naming an
+`opensnes-*` tool), explain what each settings file asks for and why.
 
 ## Modules Used
 

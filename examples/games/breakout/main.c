@@ -93,7 +93,7 @@ extern u16 pad_keys[];
  */
 extern const u8 brick_map[];
 
-/** @brief "READY" message string (in data.asm for guaranteed bank $00 placement) */
+/** @brief "READY" message string (data.asm) */
 extern const char str_ready[];
 /** @brief "GAME OVER" message string */
 extern const char str_gameover[];

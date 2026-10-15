@@ -7,9 +7,8 @@ TARGET   := perspective.sfc
 ROM_NAME := OPENSNES MODE7 PERSP
 
 USE_LIB     := 1
-LIB_MODULES := console dma background sprite input mode7
+LIB_MODULES := console dma background sprite input mode7 hdma
 
 CSRC   := main.c
-ASMSRC := data.asm
 
 include $(OPENSNES)/make/common.mk

@@ -22,8 +22,8 @@
  * Inputs / interaction
  * --------------------
  * None — the sprite orbits autonomously. The example is structured as
- * the simplest possible fixed32 fixture; later examples (likemario,
- * aim_target, breakout) compose the same primitives into game logic.
+ * the simplest possible fixed32 example; basics/aim_target composes the
+ * same primitives into game logic.
  *
  * @par Modules Used
  * console, sprite, dma, background, fixed32, math

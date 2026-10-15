@@ -70,7 +70,7 @@ extern u16 pad_keys[];
  * wait on the title screen produces a different seed each game, ensuring
  * different piece sequences.
  */
-/** @brief "PAUSED" overlay message string (in data.asm for bank $00 placement) */
+/** @brief "PAUSED" overlay message string (data.asm) */
 extern const char str_paused[];
 /** @brief "GAME OVER" overlay message string */
 extern const char str_gameover[];

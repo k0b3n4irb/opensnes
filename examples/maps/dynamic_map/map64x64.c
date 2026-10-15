@@ -12,13 +12,10 @@
 #include <snes.h>
 #include "map64x64.h"
 
-/* Assembly helpers */
-extern void smapWrite(u16 byte_offset, u16 value);
-extern void smapClear(u16 byte_count);
-extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
-
 void initSpriteMap64x64(u16 len) {
-    smapClear(len);
+    u16 i;
+    for (i = 0; i < len / 2; i++)
+        spritemap_buf[i] = 0;
 }
 
 /*
@@ -33,8 +30,7 @@ void initSpriteMap64x64(u16 len) {
  * Row stride = 32 entries.
  */
 static void drawSpriteRaw64x64(u8 x, u8 y, u16 sprite) {
-    u16 i = (u16)(32 * y + x) * 2; /* byte offset */
-    smapWrite(i, sprite);
+    spritemap_buf[(u16)(32 * y + x)] = sprite;
 }
 
 void drawSprite64x64(u8 x, u8 y, u16 sprite) {
@@ -65,6 +61,6 @@ void screenRefreshPos64x64(u8 x, u8 y, u16 address) {
     else if (x < 64 && y < 64)
         offset = 32 * 32 * 3 + (x - 32) + (u16)(y - 32) * 32;
 
-    smapDma(offset * 2, address + offset, 256);
+    spritemapDma(offset * 2, address + offset, 256);
 }
 

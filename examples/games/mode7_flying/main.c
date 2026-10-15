@@ -22,8 +22,8 @@
  *   SetAngle (the scale feeds the matrix at SetAngle time)
  * - The shadow depth cue: same sprite shape, dark palette, screen
  *   offset proportional to altitude
- * - Surface classes read through a banked-data ASM accessor (B2 —
- *   same pattern as mode7_racing)
+ * - A 16 KB surface class map read from C as a const array (it sits
+ *   in an asset bank; C reads it with its bank)
  * - Fixed-point flight model: heading/speed/altitude in 8.8, the
  *   math module's shared 0-255 angle unit
  *
@@ -45,8 +45,9 @@
 
 #include "res/terrain.inc"   /* generated: terrain_tiles[], terrain_map[], terrain_pal[] (Mode 7 .pc7 / .mp7), each with _end */
 
-/** @brief Banked-data accessor (data.asm) for the class map */
-extern u8 terrain_class_at(u16 idx);
+/** @brief Surface class of each terrain tile, 128x128 (data.asm,
+ * res/terrain_class.bin): 0 field, 1 water, 2 landing pad. */
+extern const u8 terrain_class[];
 
 /** @brief Screen position of the plane (and its shadow's origin) */
 #define PLANE_SCREEN_X 120
@@ -205,7 +206,7 @@ int main(void) {
         plane_y = (u16)(plane_y + (vy >> 4)) & 0x3FFF;
 
         idx = (u16)(((plane_y >> 7) << 7) + (plane_x >> 7));
-        surface = terrain_class_at(idx);
+        surface = terrain_class[idx];
 
         /* flight state: the landing EVENT only fires on the
          * airborne -> ground transition; taxiing on the ground (pads,

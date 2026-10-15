@@ -14,6 +14,5 @@ USE_LIB    := 1
 LIB_MODULES := console sprite dma background text text4bpp input
 
 CSRC       := main.c map32x32.c map64x64.c
-ASMSRC     := ram.asm
 
 include $(OPENSNES)/make/common.mk

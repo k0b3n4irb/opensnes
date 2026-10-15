@@ -10,8 +10,8 @@ a static sky on top and a scaled ground that recedes into the distance.
 
 ## Prerequisites
 
-Read `mode7/rotate_scale` first (Mode 7 basics), then `effects/hdma_wave` (HDMA
-per-scanline programming).
+Read `mode7/rotate_scale` first (Mode 7 basics), then `hdma/hdma_wave`
+(HDMA tables written per scanline).
 
 ## Controls
 
@@ -26,7 +26,7 @@ cd $OPENSNES_HOME
 make -C examples/mode7/perspective
 ```
 
-Then open `mode7_perspective.sfc` in your emulator (Mesen2 recommended).
+Then run `perspective.sfc` in luna (`opensnes run`) or any SNES emulator.
 
 ## How It Works
 
@@ -36,13 +36,16 @@ The screen is divided by 4 HDMA channels running every frame:
 
 | Channel | Target | Effect |
 |---------|--------|--------|
-| Ch1 | BGMODE ($2105) | Switches from Mode 3 (sky) to Mode 7 (ground) |
+| Ch1 | BGMODE ($2105) | Switches from Mode 1 (sky) to Mode 7 (ground) |
 | Ch2 | TM ($212C) | Switches from BG2 (sky tiles) to BG1 (Mode 7 ground) |
 | Ch3 | M7A ($211B) | Per-scanline horizontal scale (perspective) |
 | Ch4 | M7D ($211E) | Per-scanline vertical scale (perspective) |
 
-Top 96 scanlines: Mode 3 displays a static sky background on BG2.
-Bottom 128 scanlines: Mode 7 displays the ground with per-scanline scaling.
+Top 96 scanlines: Mode 1 displays the sky on BG2.
+The lines below: Mode 7 displays the ground with per-scanline scaling.
+
+The four tables are set up once with `hdmaSetup()`: the hardware reads each
+from its start again at the top of every frame.
 
 ### 2. Perspective math
 
@@ -50,8 +53,8 @@ The key to the 3D illusion: scanlines near the top of the ground area (the
 "horizon") use a large scale value (small objects = far away), while scanlines
 near the bottom use a small scale value (large objects = close up).
 
-This is a pre-computed table in the assembly data -- each of the 128 ground
-scanlines has its own M7A/M7D scale pair.
+Two pre-computed tables in `main.c`, `perspective_x` and `perspective_y`,
+give each ground scanline its own M7A and M7D.
 
 ### 3. Scrolling
 
@@ -60,60 +63,61 @@ if (pad0 & KEY_LEFT)  sx--;
 if (pad0 & KEY_RIGHT) sx++;
 if (pad0 & KEY_UP)    sy--;
 if (pad0 & KEY_DOWN)  sy++;
-asm_setupHdmaPerspective(sx, sy);
+
+WaitForVBlank();
+setCamera();   /* mode7SetScroll, mode7SetCenter, bgSetScroll for the sky */
 ```
 
-The scroll values are passed to the assembly helper, which writes them to the
-Mode 7 scroll registers (M7HOFS/M7VOFS at $210D/$210E) and re-enables the HDMA
-channels each frame.
+`mode7SetScroll()` and `mode7SetCenter()` write the registers at once, so
+they run right after `WaitForVBlank()`.
 
 ## SNES Concepts
 
 ### Mode Switching Mid-Frame
 
 The SNES allows changing the BGMODE register ($2105) via HDMA between scanlines.
-This is how one screen shows two completely different video modes -- Mode 3 for
+This is how one screen shows two completely different video modes -- Mode 1 for
 the sky portion and Mode 7 for the ground portion. The switch happens during
 HBlank, so there is no visible glitch.
 
 ### Per-Scanline Scaling
 
-By writing M7A/M7D every scanline via HDMA repeat mode, each horizontal line of
+By writing M7A/M7D on every scanline (HDMA repeat mode: a new value each line), each horizontal line of
 the ground has a different scale factor. Lines near the horizon are scaled way
 down (far away), lines at the bottom are close to 1:1 (nearby). This creates the
 depth illusion without any 3D math at runtime -- it is all pre-computed tables.
 
 ### HDMA Budget
 
-4 simultaneous HDMA channels is feasible but uses significant bus time per scanline.
-Each HDMA transfer needs ~18 master cycles per byte during HBlank. Adding more
-channels risks running out of HBlank time (1364 master cycles per scanline).
+HDMA takes its time from the CPU on every line where a channel is active: about
+18 master cycles, plus 8 per active channel and 8 per byte written (anomie's
+register notes; at most 466 master cycles a line, all eight channels on). Here,
+on a ground line: 18 + 4 x 8 + 4 bytes x 8 = 82 master cycles of the 1364 a
+scanline lasts.
 
 ## Project Structure
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Input handling, scroll updates, HDMA initialization |
+| `main.c` | The HDMA tables, their setup, input and the camera |
 | `res/ground.png.toml`, `res/sky.png.toml` | the import settings of the ground (Mode 7) and the sky (`opensnes-tileset`); the build converts and links them |
-| `data.asm` | HDMA perspective tables, assembly helpers (hand-written) |
 | `res/ground.png` | Mode 7 ground texture source |
 | `res/sky.png` | Sky background source |
-| `Makefile` | `LIB_MODULES := console dma background sprite input mode7` |
+| `Makefile` | `LIB_MODULES := console dma background sprite input mode7 hdma` |
 
 ## Going Further
 
-- **Add rotation**: Combine the perspective tables with angle rotation for a
-  full F-Zero-style driving effect. You would need to recompute the M7A-M7D
-  table entries based on the current heading angle.
+- **Add rotation**: `mode7/perspective_rotate` drives all four matrix terms
+  per line from precomputed tables, one set per angle.
 
 - **Add sprites**: Place car or character sprites on top of the ground plane.
   Sprites render normally in Mode 7 and can be scaled/positioned to match the
   perspective.
 
 - **Explore related examples**:
-  - `effects/gradient_colors` -- Another HDMA technique (color gradients)
+  - `hdma/gradient_colors` -- Another HDMA technique (color gradients)
   - `games/likemario` -- Scrolling backgrounds with sprites (different approach)
 
 ## Modules Used
 
-`console`, `dma`, `background`, `sprite`, `input`, `mode7` (`LIB_MODULES` in the Makefile).
+`console`, `dma`, `background`, `sprite`, `input`, `mode7`, `hdma` (`LIB_MODULES` in the Makefile).

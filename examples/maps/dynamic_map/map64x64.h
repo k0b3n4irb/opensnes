@@ -2,6 +2,7 @@
 #define MAP64X64_H
 
 #include <snes/types.h>
+#include "map32x32.h"   /* spritemap_buf, spritemapDma */
 
 /* Max scroll area (visible: 16x14 sprites = 256x224 pixels) */
 #define MAX_SCROLL_WIDTH_64x64  (64*16 - 16*16)   /* 768 */

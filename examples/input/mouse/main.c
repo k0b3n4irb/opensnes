@@ -109,8 +109,8 @@ int main(void) {
 
     /* Load cursor sprite tiles to VRAM.
      * A 16x16 sprite uses tiles 0,1 (top) and 16,17 (bottom) in the
-     * sprite character page. gfx4snes outputs tiles sequentially (0,1,2,3)
-     * so we split the DMA: top half → tile 0, bottom half → tile 16. */
+     * sprite character page. The converted sheet (8x8 blocks, res/cursor.png.toml)
+     * holds its tiles in a row (0,1,2,3), so we split the DMA: top half → tile 0, bottom half → tile 16. */
     dmaCopyVram(cursor_tiles, 0x4000, 64);          /* tiles 0-1 (top) */
     dmaCopyVram(cursor_tiles + 64, 0x4100, 64);     /* tiles 16-17 (bottom) */
 

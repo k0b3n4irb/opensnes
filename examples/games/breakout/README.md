@@ -239,12 +239,10 @@ static void run_frame(void) {
 - **Getting a pink flash on level change?** Your overlapping tilemap DMAs are split
   across two VBlanks. Put them both after the same `WaitForVBlank()` call.
 
-- **Sprite 0 looks glitched?** Known issue related to WRAM/OAM mirroring.
-  Just start at index 1 and hide sprite 0 with `oamHide(0)`. Not glamorous, but it works.
-
-- **Why `mycopy()` instead of `memcpy()`?** Standard memcpy can have issues with
-  cross-bank addressing on the 65816. The three-line `while(len--)` version is dumb
-  but reliable for bank 0 addresses.
+- **Why `mycopy()` instead of `memcpy()`?** Either works: `mycopy()` takes a
+  `const` (far) source and a `FAR` destination, and `memcpy()` of the `string`
+  module follows the 24-bit pointer on both sides too. The example keeps its
+  three-line loop so that it links one module less.
 
 - **Why are loop variables global?** `static u8 i, j, k;` at file scope reduces stack
   pressure. On the 65816, stack-relative addressing is slower than direct/zero-page access.
