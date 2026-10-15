@@ -1,0 +1,3 @@
+# The variable shift's anonymous label is there, and the OR is still fused.
+in orWithShift: present \n-\tasl a\n\tdex\n\tbne -\n
+in orWithShift: present \tldy\.w #2\n\tlda \[tcc__r9\],y\n\tora\.l dst\+2,x\n

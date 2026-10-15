@@ -49,6 +49,10 @@ All notable changes to OpenSNES are documented in this file.
   totals (`OPENSNES_ONLY` in `run.py`).
 
 ### Performance
+- perf(compiler): **a function holding a variable shift keeps its peephole
+  optimisations.** The shift's loop has an anonymous label, which made the
+  liveness of the peephole stage give up on the whole function: dead
+  stores stayed and no indexed load was fused into its operation.
 - perf(compiler): **`d[k] |= p[k]` from ROM into far RAM: 5 instructions a
   word, 4 through a pointer, instead of 9 and 10.** An indexed load stays the
   operand of the operation it feeds when the other operand is indexed by
@@ -118,6 +122,12 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(compiler): **a loop counter whose address is taken keeps its value.**
+  `for (i = 0; i < 3; i++)` with `&i` taken somewhere left `i` at 0: the
+  rule that keeps a loop counter in X moved the increment to X and left the
+  second store of the step, to the counter's home on the stack, storing a
+  stale value. The rule now leaves such a loop alone. Found by the
+  statement differential test.
 - fix(tools): **`opensnes-tileset --rearrange` keeps an opaque black
   opaque.** Before regrouping the colours into banks, it folded every index
   onto the first index of the same colour, index 0 among them: a pixel of
