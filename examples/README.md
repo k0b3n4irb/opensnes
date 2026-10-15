@@ -19,7 +19,7 @@ The table below counts them per folder.
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 7 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
 | [backgrounds/](backgrounds/) | 9 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
-| [sprites/](sprites/) | 9 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
+| [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 6 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
@@ -27,8 +27,8 @@ The table below counts them per folder.
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
 | [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG |
 | [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
-| [audio/](audio/) | 10 | Music and sound effects: SNESMOD and raw APU/DSP |
-| [maps/](maps/) | 4 | Tile maps, dynamic streaming, slopes |
+| [audio/](audio/) | 9 | Music and sound effects: SNESMOD and raw APU/DSP |
+| [maps/](maps/) | 3 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
 | [chips/](chips/) | 8 | Enhancement chips: SA-1 and SuperFX/GSU coprocessors |
 | [games/](games/) | 8 | Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |

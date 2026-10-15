@@ -1,4 +1,4 @@
-OPENSNES := $(shell cd ../../.. && pwd)
+OPENSNES := $(shell cd ../../../.. && pwd)
 TARGET   := metasprite.sfc
 ROM_NAME := METASPRITE_DEMO
 

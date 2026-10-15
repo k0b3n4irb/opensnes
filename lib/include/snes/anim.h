@@ -30,7 +30,7 @@
  * pointers: about 3,300 master cycles per player per frame, call
  * included (0.9 % of an NTSC frame), and about 7,000 on the tick where
  * the frame advances. Measured on luna on 2026-10-07 (`luna profile` on
- * examples/sprites/metasprite, speed 8); the figure of 60-90 CPU cycles
+ * the metasprite fixture, testing/fixtures/retired_examples, speed 8); the figure of 60-90 CPU cycles
  * that stood here was an estimate, five to seven times too low. RAM cost
  * is 8 bytes per player; ROM cost 12 bytes per clip + 2 bytes per frame
  * (+1/frame if per-frame durations are used). Nothing runs in NMI; VRAM

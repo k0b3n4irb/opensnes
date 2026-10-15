@@ -70,7 +70,7 @@ the SNES's comfort zone.
 
 You do not hand-author map bytes. [Tiled](https://www.mapeditor.org/) is a free
 level editor, and the SDK bridges it to the hardware. The pipeline
-(@ref examples_maps_tiled is the complete worked example):
+(@ref examples_maps_map_scroll is the complete worked example):
 
 ```
   Tiled  ──►  opensnes-tileset  ──►  opensnes-level  ──►  mapLoad()

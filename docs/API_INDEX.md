@@ -7,8 +7,8 @@ to use** → **an example that does it**.
 It exists because that gap has a cost. While writing the RPG template
 the author re-implemented `collideTile()` by hand, wrote a sprite-culling
 helper without noticing `oamHide()`, hand-rolled scene switching without
-noticing `<snes/scene.h>`, and missed `examples/maps/tiled` — which
-already demonstrates the Tiled pipeline. All four were in the tree. If
+noticing `<snes/scene.h>`, and missed the example that already
+demonstrated the Tiled pipeline (now `examples/maps/map_scroll`). All four were in the tree. If
 you are about to write a helper, scan this page first.
 
 Modules are opt-in: add the name to `LIB_MODULES` in your Makefile and
@@ -24,7 +24,7 @@ nothing you do not list is linked.
 | draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
 | hide a sprite that left the screen | `oamHide` | `sprite` | [games/rpg](../examples/games/rpg/) |
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
-| draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/metasprite](../examples/sprites/metasprite/) |
+| draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/aseprite_pipeline](../examples/sprites/aseprite_pipeline/) |
 | make a tile while the game runs (procedural art) | `tileEncode2bpp`, `tileEncode4bpp`, `tileEncode8bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
 | compose text at the pixel in a 2bpp layer (a proportional font, a label at any x and y) | `tileBlitGlyph2bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
 
@@ -34,7 +34,7 @@ nothing you do not list is linked.
 |---|---|---|---|
 | scroll a background | `bgSetScroll` | `background` | [scrolling/parallax_scroll](../examples/scrolling/parallax_scroll/) |
 | scroll a map bigger than VRAM | `mapLoad`, `mapUpdate` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
-| load a map made in Tiled | `opensnes-level` → `.m16`/`.b16` | `map` | [maps/tiled](../examples/maps/tiled/) |
+| load a map made in Tiled | `opensnes-level` → `.m16`/`.b16` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
 | ask whether a tile is solid | `collideTile`, `collideTileEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
 | ask whether two boxes overlap | `collideRect`, `collideRectEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
 | handle slopes | `collideTileEx` + per-tile attributes | `collision` | [maps/slope_collision](../examples/maps/slope_collision/) |

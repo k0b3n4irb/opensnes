@@ -88,9 +88,9 @@ that a call costs about 96 master cycles more than an inline lookup:
 a call is not measurable.
 
 `oamDrawMetasprite()` takes the base tile, palette and size from a
-`MetaspriteStyle`; it is assembly and writes each piece itself. The two
-metasprites of `examples/sprites/metasprite` cost 27,470 master cycles a
-frame.
+`MetaspriteStyle`; it is assembly and writes each piece itself. Two
+metasprites of eight 16×16 pieces, drawn every frame, cost 27,470 master
+cycles a frame.
 
 ## Against PVSnesLib, call for call {#perf-libbench}
 

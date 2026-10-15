@@ -68,4 +68,4 @@ cannot be written.
 ## See also
 
 - @ref tools_tmx2snes — the earlier tool, same converter (@ref tools_legacy).
-- `examples/maps/map_scroll` and `examples/maps/tiled` convert their levels this way.
+- `examples/maps/map_scroll` converts its level this way.

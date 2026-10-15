@@ -1,4 +1,4 @@
-OPENSNES := $(shell cd ../../.. && pwd)
+OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET     := tiled.sfc
 ROM_NAME   := TILED MAP DEMO

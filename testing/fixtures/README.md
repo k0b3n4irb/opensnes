@@ -43,6 +43,19 @@ experimental toolchain once produced misleading XPASSes (a6_farptr,
 purpose — this Makefile exports `-j`, and `clean all` in one command ran
 both goals concurrently (clean deleted `crt0.o` mid-link).
 
+## Examples that left the corpus (`retired_examples/`)
+
+Three examples left `examples/` in the review before 1.0 (2026-10-15): they
+duplicated another example for a reader, but tests and comparisons read
+them. They are built by `make fixtures` and profiled by `make rom-coverage`
+like the others; nothing of them is in the user documentation.
+
+| Fixture | Read by | Its example now |
+|---|---|---|
+| `tiled/` | `dma_tiled.toml`, `movement_tiled.toml`; `devtools/twinbench` (PVSnesLib's maps/tiled) | `maps/map_scroll` (the same Tiled pipeline) |
+| `metasprite/` | `footprint_metasprite.toml`, `input_metasprite.toml`, `oam_metasprite.toml`; twinbench (PVSnesLib's MetaSprite); the `anim.h` cost figure | `sprites/sprite_sizes`, `sprites/aseprite_pipeline` |
+| `snesmod_music_large/` | `audio_snesmod_music_large.toml`, `input_snesmod_music_large.toml`; `audio_regress.py` | `audio/snesmod_music` (one call loads a soundbank of any size) |
+
 ## luna stress ROMs (`stress/`)
 
 Hardware corners that pin luna itself: see [`stress/README.md`](stress/README.md).

@@ -8,17 +8,15 @@ draws effects that look impossible for a 2D tile machine.
 
 ## The ladder
 
-| Rung | Example | Developer question |
-|------|---------|--------------------|
-| 6e.2 | [gradient_colors](gradient_colors/) | How do I gradient the backdrop colour per scanline? |
-| 6e.3 | [hdma_indirect_gradient](hdma_indirect_gradient/) | How does *indirect* HDMA (pointer-table addressing) work? |
-| 6e.4 | [hdma_wave](hdma_wave/) | How do I build an HDMA table by hand, animate it, and then let the `hdma` module do it? |
-| 6e.5 | [hdma_helpers](hdma_helpers/) | How do I just call the `hdma` module helpers (wave, ripple, iris)? |
+| Example | Developer question |
+|---------|--------------------|
+| [gradient_colors](gradient_colors/) | How do I gradient the backdrop colour per scanline? |
+| [hdma_indirect_gradient](hdma_indirect_gradient/) | How does *indirect* HDMA (pointer-table addressing) work? |
+| [hdma_wave](hdma_wave/) | How do I build an HDMA table by hand, animate it, and then let the `hdma` module do it? |
+| [hdma_helpers](hdma_helpers/) | How do I just call the `hdma` module helpers (wave, ripple, iris)? |
 
-> `hdma_wave` is the "build the table, then use the helper" rung: krom's
-> hand-built table at boot, the module's `hdmaWaveH` on A (it absorbed
-> `hdma_wave_table` on 2026-09-26). On-ramp to author: **6e.1 a minimal
-> single-channel HDMA**.
+> `hdma_wave` is the "build the table, then use the helper" step: krom's
+> hand-built table at boot, the module's `hdmaWaveH` on A.
 
 ## The idea in one screen
 

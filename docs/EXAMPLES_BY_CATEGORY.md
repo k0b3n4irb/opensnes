@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 88 examples organized by topic. For a progressive learning path, see
+All 85 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -54,7 +54,6 @@ Sprite display, animation, and OAM management.
 | @subpage examples_sprites_simple_sprite | Basic OAM setup, sprite display |
 | @subpage examples_sprites_sprite_sizes | OBJSEL size configurations (8x8 to 64x64) |
 | @subpage examples_sprites_animated_sprite | Frame animation, sprite sheets, H-flip |
-| @subpage examples_sprites_metasprite | Multi-tile composite sprites |
 | @subpage examples_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads |
 | @subpage examples_sprites_dynamic_metasprite | Dynamic metasprite engine with batched OAM updates |
 | @subpage examples_sprites_sprite_swarm | A bouncing swarm + the per-sprite OAM throughput ceiling |
@@ -160,7 +159,6 @@ Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls (LoROM) |
-| @subpage examples_audio_snesmod_music_large | Large soundbank: multi-bank module split |
 | @subpage examples_audio_snesmod_sfx | Sound effects alongside music |
 | @subpage examples_audio_soundboard | Audio v2 engine driven entirely from C (resident SPC700 driver) |
 | @subpage examples_audio_sfx_from_wav | One-shot SFX from WAV: a settings file beside each .wav, converted by opensnes-sample |
@@ -179,7 +177,6 @@ Tile-based maps, streaming, Tiled pipeline, and collision.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_maps_map_scroll | Smooth tile-aligned scrolling with viewport tracking |
-| @subpage examples_maps_tiled | Tiled Map Editor (.tmx) integration |
 | @subpage examples_maps_dynamic_map | Dynamic tile map streaming |
 | @subpage examples_maps_slope_collision | Slopes and tile-based collision |
 

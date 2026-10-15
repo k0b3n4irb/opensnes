@@ -1,5 +1,5 @@
 # Migrated from probes/dma_budget.py (#217: [asserts.dma] buckets like the probe).
-rom = "../../examples/maps/tiled/tiled.sfc"
+rom = "../fixtures/retired_examples/tiled/tiled.sfc"
 steps = 5000000
 [asserts.dma]
 unsafe_writes = 0

@@ -23,10 +23,10 @@ You do not hand-author the binary formats. Draw the map in
 (`.tmj`), and put two settings files in `res/`: one converts the tileset
 picture with `opensnes-tileset`, the other the level with
 @ref tools_opensnes_level, against the `.map` the first one writes
-(`examples/maps/tiled`):
+(`examples/maps/map_scroll`):
 
 ```toml
-# res/tileslevel1.png.toml
+# res/tilesMario.png.toml
 tool = "opensnes-tileset"
 
 [convert]
@@ -34,16 +34,16 @@ colors = 48
 ```
 
 ```toml
-# res/maplevel01.tmj.toml
+# res/tiledMario.tmj.toml
 tool = "opensnes-level"
 
 [convert]
-tileset = "tileslevel1.map"
+tileset = "tilesMario.map"
 ```
 
 The build converts the level after the pictures, so the tileset's `.map` is
 fresh when the level reads it; the Makefile names neither. By hand it is
-`opensnes-level convert res/maplevel01.tmj --tileset res/tileslevel1.map`.
+`opensnes-level convert res/tiledMario.tmj --tileset res/tilesMario.map`.
 It emits four files the modules consume:
 
 | File | Content | Consumed by |
@@ -53,8 +53,8 @@ It emits four files the modules consume:
 | `<map>.b16` | per-tile collision attribute | `mapLoad()` arg 3 |
 | `<map>.o16` | the Entities object layer | the `object` module |
 
-and `<map>.inc`, which declares them for C: `maplevel01_BG1_map`,
-`maplevel01_tiledef`, `maplevel01_tileattr`, `maplevel01_objects` (each
+and `<map>.inc`, which declares them for C: `tiledMario_BG1_map`,
+`tiledMario_tiledef`, `tiledMario_tileattr`, `tiledMario_objects` (each
 with `_end`).
 
 Three more keys of `[convert]` serve games that do **not** use the `map`
@@ -68,7 +68,7 @@ module and want the same content in a different shape:
 
 `examples/games/rpg` scrolls a fixed 64×64 town with `background`, not
 `map` (its `town.tmj` gives the same quadrant map under `--quadrant`);
-`examples/maps/tiled` uses the default `map` pipeline. Pick the module that
+`examples/maps/map_scroll` uses the default `map` pipeline. Pick the module that
 matches the map size — `map` for worlds larger than 64×64, `background` for
 a fixed screen or two.
 
@@ -153,10 +153,9 @@ mapSetMapOptions(MAP_OPT_BG2);    // stream a second map onto BG2
 
 ## Worked patterns (the shipped examples)
 
-- **`examples/maps/map_scroll`** — the minimum scroller above, a large map
-  moved with the D-pad.
-- **`examples/maps/tiled`** — the full Tiled pipeline: a `.tmj` drawn in
-  Tiled, converted with `opensnes-level`, loaded with `mapLoad`.
+- **`examples/maps/map_scroll`** — the full Tiled pipeline (a `.tmj` drawn in
+  Tiled, converted with `opensnes-level`, loaded with `mapLoad`) and the
+  minimum scroller above, a large map followed by a sprite.
 - **`examples/maps/slope_collision`** — per-tile collision *attributes* driving
   slope physics (the `.b16` values mean more than solid/empty).
 - **`examples/maps/dynamic_map`** — rewriting map tiles at runtime.

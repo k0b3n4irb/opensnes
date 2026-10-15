@@ -49,10 +49,6 @@ frames = [200, 400]
 [examples."color/palette_cycle"]
 frames = [200, 400]
 
-# hero16 walks in place via the anim module since #97 — self-animating.
-[examples."sprites/metasprite"]
-frames = [200, 400]
-
 # the hand-built HDMA wave (krom port) scrolls from boot — self-animating.
 [examples."hdma/hdma_wave"]
 frames = [200, 400]

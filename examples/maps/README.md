@@ -8,15 +8,15 @@ collision, and walked with slopes. This is Stage 3, "can I build a world?"
 
 ## The ladder
 
-| Rung | Example | Developer question |
-|------|---------|--------------------|
-| 5.5 | [map_scroll](map_scroll/) | How do I scroll a map bigger than VRAM (the `map` module)? |
-| 5.6 | [tiled](tiled/) | How do I author a map in Tiled and load it? |
-| 5.7 | [dynamic_map](dynamic_map/) | How do I drive a sprite from a tilemap and swap 32×32 ↔ 64×64 map modes? |
-| 5.8 | [slope_collision](slope_collision/) | How do I do tile collision with slopes — a full platformer? |
+| Example | Developer question |
+|---------|--------------------|
+| [map_scroll](map_scroll/) | How do I author a map in Tiled and scroll it past the camera when it is bigger than VRAM (the `map` module)? |
+| [dynamic_map](dynamic_map/) | How do I drive a sprite from a tilemap and swap 32×32 ↔ 64×64 map modes? |
+| [slope_collision](slope_collision/) | How do I do tile collision with slopes — a full platformer? |
 
-Climb from a scrolling world (5.5) to an authored one (5.6) to a sprite that
-reads it (5.7) to a character that stands on its slopes (5.8).
+Climb from a world authored in Tiled and scrolled past the camera
+(`map_scroll`) to a map rewritten at runtime (`dynamic_map`) to a character
+that stands on its slopes (`slope_collision`).
 
 ## The idea in one screen
 

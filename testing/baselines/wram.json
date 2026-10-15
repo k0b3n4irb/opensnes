@@ -23,10 +23,6 @@
     "stream": "75ea1abcc7eb379def68b90b0161d1d515b0b6d584468fd0dc43bc5538306255",
     "rom_sha256": "83cb278359a222c21b737bd8ffa184137d872f68cf1ed06ee4b9956fccb6e965"
   },
-  "audio_snesmod_music_large": {
-    "stream": "39df01d7691cee7c33eae969e2303d1b0dd8f4a8b41b5e34a41746e7238d0afd",
-    "rom_sha256": "36419c33e83a6f30b7282cd50aa363bd52a5b6e60cd53aa8d6cfa961d95a4397"
-  },
   "audio_snesmod_sfx": {
     "stream": "840ca73fd5f78ae9a14642edad459fe3fc9564d4541032825f88cfff4a0ffb2f",
     "rom_sha256": "1746bc069f37fd17458f43d2fadb4e42f3e753a72927fba189199d0a62a5d427"
@@ -239,10 +235,6 @@
     "stream": "c4a2df59008e3a3f4f7f6198f2a052694a3cdfaba217f169840146fd904cbc94",
     "rom_sha256": "7f537bcc130ec54f06fd717c2584a1a33776c1e23518c05f4fba26dc783f5e57"
   },
-  "maps_tiled": {
-    "stream": "3e0270503ab8c2483ae31ba57a6f736e6c42941a67f53493fef16e6bb4e263d6",
-    "rom_sha256": "c488827320efcd3c84f430b4cfc71ffbfe0a23955b7cb137e5feea17fb7f4442"
-  },
   "memory_hirom_demo": {
     "stream": "e1b8bc20a7ddc89f20a800c0173835f85f24c1d00bd708b588106032b5a70a70",
     "rom_sha256": "587cb4f609b52a9f2690ddd5dfc9ebed6cf19cc357ef1a39d078f7712ba1da00"
@@ -298,10 +290,6 @@
   "sprites_dynamic_sprite": {
     "stream": "158ff05c87c6ebb74a32eda943f616df0d6314cb303d58f4fe4be37297e18c3c",
     "rom_sha256": "1c8587b3c750743b7f8d5da547f32761830d7ab9acf0877fce5009eaeaf5ea58"
-  },
-  "sprites_metasprite": {
-    "stream": "169be858ceb5b14e181a406668d7328c1ecaa6f143d16f8b1e34bb143b5df025",
-    "rom_sha256": "d7d55210dd9da77715c719dc218ab6f900b62d6f107c38555d357e9e38d541a8"
   },
   "sprites_simple_sprite": {
     "stream": "d8a785cd9137282234880cdd4e22b7c0c3a1e79e8a59ef76f88f4d122a981531",

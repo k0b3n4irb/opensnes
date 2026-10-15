@@ -624,7 +624,7 @@ typedef struct {
  *             moved to the mirrored place and its own flip bit toggled.
  *
  * @return The next free sprite id (startId + the number of sprites drawn) —
- *         chain calls with it, as examples/sprites/metasprite does. Items
+ *         chain calls with it: `id = oamDrawMetasprite(id, ...)`. Items
  *         that fall off screen are skipped WITHOUT consuming an id, so the
  *         count varies per frame: hide the ids you used last frame and no
  *         longer use.

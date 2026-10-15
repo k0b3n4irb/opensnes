@@ -11,7 +11,7 @@
 #
 #==============================================================================
 
-OPENSNES := $(shell cd ../../.. && pwd)
+OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET   := music_large.sfc
 ROM_NAME := SNESMOD_LARGEMUS

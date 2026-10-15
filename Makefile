@@ -53,9 +53,13 @@ RELEASE_DIR := release
 FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram
 FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals leaf_frame static_dup
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
+# Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
+# manifests that read them: twins of PVSnesLib examples, library coverage.
+FIXTURES_RETIRED  := tiled metasprite snesmod_music_large
 FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
                      $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
-                     $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS))
+                     $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS)) \
+                     $(addprefix testing/fixtures/retired_examples/,$(FIXTURES_RETIRED))
 # The fixtures that carry their own runtime assertions (a test_*.py beside
 # the ROM); the others are asserted by luna manifests (testing/manifests/).
 FIXTURE_TESTS     := $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \

@@ -74,6 +74,20 @@ All notable changes to OpenSNES are documented in this file.
   more in a ROM that divides 32 bits.
 
 ### Changed
+- docs(examples): **the examples reviewed before 1.0; 85 of them.** Six
+  taught the opposite of the SDK or the hardware and are corrected
+  (an HDMA window table that "must be refreshed every scanline", two
+  Mode 7 games reading a const table through assembly because C "cannot",
+  a tilemap buffer reached through assembly instead of `FAR`, a Mode 7
+  perspective re-arming HDMA during the display, Mode 3's second layer
+  called 4-colour); the retired converters, dated history and internal
+  jargon are gone from the example pages; fifteen examples now start with
+  `consoleInit()`; breakout and tetris read the joypad through
+  `padHeld()` / `padPressed()`; likemario streams its map column through
+  `vramqueue`. Three examples that repeated another left the corpus and
+  became test fixtures: `maps/tiled` (its Tiled walkthrough is now in
+  `maps/map_scroll`), `sprites/metasprite` (see `sprites/sprite_sizes` and
+  `sprites/aseprite_pipeline`) and `audio/snesmod_music_large`.
 - build(tools): **the eight earlier converters are retired.** `gfx4snes`,
   `smconv`, `wav2brr`, `tmx2snes`, `aseprite2snes`, `font2snes`, `img2snes`
   and `palplan` each did what an `opensnes-*` tool now does with the same

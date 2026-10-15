@@ -1316,6 +1316,41 @@ def check_named_files() -> list[str]:
     return drifts
 
 
+# Anchor 5, second half (2026-10-15): every example is cited by the learning
+# path or by its category README. Thirty-one examples were on neither path
+# (tetris among them) and eighteen missing from their category's table.
+LEARNING_PATH_DOC = "docs/LEARNING_PATH.md"
+
+
+def example_citation_gaps(examples: list[str], path_text: str, readmes: dict) -> list[str]:
+    """The examples (`cat/name`) the learning path does not name
+    (`examples_cat_name`) and their category README does not link
+    (`](name/)`)."""
+    gaps = []
+    for ex in examples:
+        cat, name = ex.split("/")
+        in_path = re.search(rf"\bexamples_{cat}_{name}\b", path_text) is not None
+        in_readme = f"]({name}/)" in readmes.get(cat, "")
+        if not in_path or not in_readme:
+            gaps.append(ex + (" (learning path)" if not in_path else "")
+                        + (" (its category README)" if not in_readme else ""))
+    return gaps
+
+
+def check_examples_cited() -> list[str]:
+    root = repo_path("examples")
+    path = repo_path(LEARNING_PATH_DOC)
+    if not root.is_dir() or not path.is_file():
+        return []
+    examples = sorted(m.parent.relative_to(root).as_posix() for m in root.glob("*/*/main.c"))
+    readmes = {c.name: (c / "README.md").read_text(encoding="utf-8")
+               for c in root.iterdir() if (c / "README.md").is_file()}
+    return [f"examples/{g.split(' ')[0]}: not cited by"
+            f"{g[len(g.split(' ')[0]):]} — every example is on the learning path "
+            f"and in its category's table" for g in
+            example_citation_gaps(examples, path.read_text(encoding="utf-8"), readmes)]
+
+
 def check_header_map() -> list[str]:
     drifts: list[str] = []
     doc = repo_path(HEADER_MAP_DOC)
@@ -1391,6 +1426,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_user_build_has_no_interpreter())
     all_drifts.extend(check_no_history_in_user_docs())
     all_drifts.extend(check_named_files())
+    all_drifts.extend(check_examples_cited())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

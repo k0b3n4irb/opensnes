@@ -50,5 +50,5 @@ tiles, then `main.c` compiles (it `#include`s both generated headers). No
 ## See Also
 
 - `tools/opensnes-sprite` — sheets, metasprites and Aseprite clips (`docs/tools/opensnes-sprite.md`)
-- `examples/sprites/metasprite` — hand-authored metasprite composition
+- `examples/sprites/sprite_sizes` — the OBJ size pairs a metasprite is built from
 - `examples/sprites/animated_sprite` — single-sprite frame animation

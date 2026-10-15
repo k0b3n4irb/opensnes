@@ -283,6 +283,14 @@ class ExampleReview20261015(unittest.TestCase):
             self.assertEqual(m.group(1), name)
         self.assertIsNone(rx.search("converted by the build from res/"))
 
+    def test_examples_cited(self):
+        path = "@subpage examples_sprites_simple_sprite\n@ref examples_audio_echo"
+        readmes = {"sprites": "| [simple_sprite](simple_sprite/) |", "audio": ""}
+        gaps = check_doc_drift.example_citation_gaps(
+            ["sprites/simple_sprite", "audio/echo", "sprites/world_sprites"], path, readmes)
+        self.assertEqual(gaps, ["audio/echo (its category README)",
+                                "sprites/world_sprites (learning path) (its category README)"])
+
     def test_named_file_missing(self):
         import tempfile
         from pathlib import Path

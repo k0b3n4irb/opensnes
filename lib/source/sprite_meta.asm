@@ -4,7 +4,7 @@
 ; oamDrawMetasprite(): one frame of a multi-piece sprite, piece by piece,
 ; into the OAM shadow. Until 2026-10-12 it was compiled C that called
 ; oamSet() and oamSetSize() for every piece (about 7,000 master cycles a
-; piece on examples/sprites/metasprite: the library's heaviest function in
+; piece on the metasprite example, now a test fixture: the heaviest function in
 ; the corpus profile, 2.6 % of its work). The loop below writes the four
 ; bytes and the two high-table bits of a piece itself.
 ;

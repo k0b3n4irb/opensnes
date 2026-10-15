@@ -32,7 +32,7 @@
       "samples": 159936,
       "peak": 22960
     },
-    "audio/snesmod_music_large": {
+    "fixtures/snesmod_music_large": {
       "sha256": "0682b12e37c33115883c86fcf832534351b97c54e3c3dad79813d9367fefcc9d",
       "samples": 159936,
       "peak": 17119

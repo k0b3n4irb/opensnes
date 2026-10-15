@@ -133,7 +133,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/sprites/animated_sprite \
                          ../examples/sprites/dynamic_metasprite \
                          ../examples/sprites/dynamic_sprite \
-                         ../examples/sprites/metasprite \
                          ../examples/sprites/sprite_sizes \
                          ../examples/sprites/simple_sprite \
                          ../examples/sprites/sprite_swarm \
@@ -145,7 +144,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/maps/dynamic_map \
                          ../examples/maps/map_scroll \
                          ../examples/maps/slope_collision \
-                         ../examples/maps/tiled \
                          ../examples/memory/hirom_demo \
                          ../examples/chips/dsp1_cube \
                          ../examples/chips/sa1_hello \

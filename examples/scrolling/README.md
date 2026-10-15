@@ -7,11 +7,11 @@ scrolling for the parallax the SNES is famous for.
 
 ## The ladder
 
-| Rung | Example | Developer question |
-|------|---------|--------------------|
-| 5.1 | [mixed_scroll](mixed_scroll/) | How do I scroll layers at different rates for depth? |
-| 5.2 | [continuous_scroll](continuous_scroll/) | How do I scroll a world bigger than one screen, streaming tiles at the seam? |
-| 5.3 | [parallax_scroll](parallax_scroll/) | How do I get per-scanline parallax with HDMA? |
+| Example | Developer question |
+|---------|--------------------|
+| [mixed_scroll](mixed_scroll/) | How do I scroll layers at different rates for depth? |
+| [continuous_scroll](continuous_scroll/) | How do I scroll a world bigger than one screen, streaming tiles at the seam? |
+| [parallax_scroll](parallax_scroll/) | How do I get per-scanline parallax with HDMA? |
 
 ## The idea in one screen
 

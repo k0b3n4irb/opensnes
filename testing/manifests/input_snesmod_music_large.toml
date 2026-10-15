@@ -28,7 +28,7 @@
 # 0300000a00000300000a00000b0000040000; `apu.dsp_regs[v*16+8]` for ENVX.
 # (Until 2026-10-03 the second byte of each command was $14: commands with
 # no parameter queued whatever spc1 held. They queue 0 now.)
-rom = "../../examples/audio/snesmod_music_large/music_large.sfc"
+rom = "../fixtures/retired_examples/snesmod_music_large/music_large.sfc"
 
 [[checkpoint]]                 # boot: the module's PLAY was queued and sent
 at_frame = 140
