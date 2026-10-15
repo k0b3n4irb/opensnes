@@ -3,8 +3,8 @@
 ;
 ; Original procedural water-caustics art (res/water.bmp, generated —
 ; no krom assets). Tileset >32KB: split across two SUPERFREE sections
-; (LoROM bank limit); post-A6 C pointers carry the bank byte and
-; dmaCopyVram reads it directly.
+; (LoROM bank limit); a C pointer carries its bank byte and
+; dmaCopyVram reads it.
 ;----------------------------------------------------------------------
 
 ASSET_SECTION ".rodata2"

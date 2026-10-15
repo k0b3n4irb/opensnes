@@ -1,4 +1,4 @@
-# Pixel text — Family 1 (Text), rung 1.3: proportional text composed at the pixel
+# Pixel text — Text: proportional text composed at the pixel
 
 OPENSNES := $(shell cd ../../.. && pwd)
 

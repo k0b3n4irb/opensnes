@@ -1,6 +1,6 @@
 # HDMA & raster
 
-**Part of Family 6 (Colour & effects) — changing a register mid-frame.** Normal
+**Colour & effects — changing a register mid-frame.** Normal
 DMA moves data during VBlank; **HDMA** hands the PPU a table and fires a
 transfer at the start of each scanline, so a register holds a *different* value
 on every line. That is how the SNES bends backgrounds, gradients the sky, and

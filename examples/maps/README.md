@@ -1,6 +1,6 @@
 # Maps
 
-**Family 5, second half — "let an engine drive the world."** Where
+**"let an engine drive the world."** Where
 [`scrolling/`](../scrolling/) moves a background past the camera by hand,
 these examples hand the world to the `map` engine and a Tiled pipeline: a
 scrolling tile world bigger than VRAM, authored in a real editor, read for

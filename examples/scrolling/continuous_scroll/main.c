@@ -34,7 +34,7 @@
 #include <snes.h>
 
 /*============================================================================
- * External Graphics Data (defined in data.asm)
+ * Graphics Data (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
 /* BG1 - Main scrolling background */

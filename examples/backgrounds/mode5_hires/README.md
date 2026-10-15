@@ -77,7 +77,7 @@ python3 gen_assets.py && make
 
 ## Further: Mode 5 without interlace (512 x 256)
 
-The plain Mode 5 picture, the `mode5` example until 2026-10-05, is this
+The plain Mode 5 picture is this
 program minus `videoSetInterlace()`: 512 pixels wide at 256 lines, 16x8
 tiles stored as pairs of 8x8 characters (N on the left half, N+1 on the
 right), loaded with `bgInitTileSet()` at 4 bpp for BG1 and 2 bpp for BG2. The

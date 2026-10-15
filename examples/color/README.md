@@ -1,6 +1,6 @@
 # Colour
 
-**Part of Family 6 (Colour & effects) — squeezing more colour out of the
+**Colour & effects — squeezing more colour out of the
 PPU.** The SNES shows 256 colours at once from a 15-bit (32768-colour) palette
 — unless you cheat. This family is the colour-math blend, the palette-bypass
 mode, and the tricks that push past 256 by reloading the palette mid-frame.

@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief SA-1 boot diagnostic (Phase 1)
+ * @brief SA-1 boot diagnostic
  * @ingroup examples
  *
  * Minimal SA-1 readiness check. The SA-1 coprocessor (Super Accelerator 1)
@@ -28,7 +28,7 @@
  * @par Modules Used
  * console, sprite, dma, background, text, input, sa1
  *
- * @see sa1.h, .claude/notes/tech/sa1_phase1_diagnostic.md
+ * @see sa1.h, docs/tutorials/sa1.md
  */
 
 #include <snes.h>

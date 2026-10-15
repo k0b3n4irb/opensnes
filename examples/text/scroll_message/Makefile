@@ -1,4 +1,4 @@
-# Scroll a message — Family 1 (Text), rung 1.4: move text with bgSetScroll
+# Scroll a message — Text: move text with bgSetScroll
 
 OPENSNES := $(shell cd ../../.. && pwd)
 

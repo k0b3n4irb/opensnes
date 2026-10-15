@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Family 8 (Audio) · rung 8.9 — echo / reverb from the S-DSP
+ * @brief Audio — echo / reverb from the S-DSP
  * @ingroup examples
  *
  * Isolates one lesson the soundboard buries among many: the S-DSP's hardware

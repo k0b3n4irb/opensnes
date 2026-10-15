@@ -1,6 +1,6 @@
 # Backgrounds
 
-**Family 2 — "fill the screen with your own art."** The background layers are
+**"fill the screen with your own art."** The background layers are
 the SNES's canvas. This family is a ladder through the PPU's background modes,
 from a single Mode 1 image up to 256-colour and hi-res, each mode a different
 trade of colours against layers against resolution.

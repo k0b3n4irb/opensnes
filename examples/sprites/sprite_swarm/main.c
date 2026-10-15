@@ -39,7 +39,7 @@
  * oracle) advances every frame.
  *
  * @par Modules Used
- * console, dma, background, sprite
+ * console, dma, background, sprite, math, tile
  *
  * @see lib/include/snes/sprite.h — oamSetFast, oamMemory, oam_update_flag
  * @see examples/chips/sa1_starfield — 128 sprites of trig, offloaded to the SA-1

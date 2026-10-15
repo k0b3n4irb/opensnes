@@ -29,7 +29,7 @@
  * - The sprite stops animating when no button is pressed
  *
  * @par Modules Used
- * console, sprite, dma, input
+ * console, sprite, dma, input, anim
  *
  * @see sprite.h, input.h, dma.h
  */
@@ -38,10 +38,10 @@
 #include <snes/anim.h>
 
 /*============================================================================
- * External Graphics Data (defined in data.asm)
+ * Graphics Data (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
-/** @brief Sprite sheet tile data containing all animation frames (defined in data.asm) */
+/** @brief Sprite sheet tile data containing all animation frames (converted by the build from res/) */
 #include "res/sprites.inc"   /* generated: sprites_tiles[], sprites_tiles_end[], sprites_pal[], sprites_pal_end[] */
 /** @brief Palette for the character sprite (16 colors, 4bpp) */
 

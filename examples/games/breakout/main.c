@@ -12,8 +12,8 @@
  * Key technical patterns: RAM tilemap buffers for runtime brick destruction,
  * overlapping BG1/BG3 tilemaps in VRAM to save memory (requiring atomic
  * dual-DMA updates), palette cycling for per-level color variation, and
- * direct oamMemory[] writes (the escape hatch next to oamSet(); oamSet has
- * been an asm routine since 2026-03-03, so either is fine at 10 sprites).
+ * direct oamMemory[] writes (the escape hatch next to oamSet(); either is
+ * fine at 10 sprites).
  *
  * Ball bounce angle varies by paddle hit zone (4 zones), creating the
  * classic Breakout aiming mechanic. Scoring uses level multipliers.
@@ -111,7 +111,7 @@ extern const char str_blank[];
  * RAM Buffers (defined in data.asm)
  *
  * They are `FAR` (bank $7E, above the 8 KB plain C band — data.asm), so the
- * linker places them and every access carries its bank (chantier B2).
+ * linker places them and every access carries its bank.
  *
  * Why RAM buffers?
  * - Tilemaps need runtime modification (brick destruction, score updates)
@@ -168,9 +168,7 @@ static u16 pad0;             /**< Current frame's joypad button bitmask */
 /**
  * @brief Ball X velocity (-2 to +2 pixels/frame).
  *
- * Kept as two variables for readability. (An older comment blamed compiler
- * quirks with compound operations on struct members; the C-feature runtime
- * ROM pins those operations since 2026-09-13.)
+ * Kept as two variables for readability.
  */
 static s16 vel_x;
 static s16 vel_y;             /**< Ball Y velocity (-2 to +2 pixels/frame) */
@@ -294,7 +292,7 @@ static void mycopy(u8 FAR *dest, const u8 *src, u16 len) {
 static void draw_screen(void) {
     /*
      * Direct OAM buffer writes — the escape hatch next to oamSet(), shown
-     * here on purpose (oamSet's old 158-byte frame is gone since 2026-03-03).
+     * here on purpose.
      *
      * OAM low table: 4 bytes per sprite at offset id*4
      *   [0] X low, [1] Y, [2] tile low, [3] attributes (vhoopppc)
@@ -480,8 +478,7 @@ static void new_level(void) {
  * @brief Set up a new game: fresh maps, bricks, palette, score, lives, level
  *
  * Called once at boot and again after GAME OVER, so the game loops title →
- * play → game over → play (until 2026-09-26 GAME OVER froze the console in
- * a `while (1)`). The fresh map carries the HUD's starting values; the
+ * play → game over → play. The fresh map carries the HUD's starting values; the
  * caller keeps a beaten high score. Works on the RAM buffers only; the
  * caller uploads them.
  */

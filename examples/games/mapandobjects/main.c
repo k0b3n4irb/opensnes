@@ -116,11 +116,9 @@ int main(void) {
     /* Object engine */
     objInitEngine();
 
-    /* Register the three object types. This used to need a hand-written
-     * ASM shim because objInitFunctions() read its arguments with the
-     * pre-A6 stack map and stored garbage; fixed 2026-09-18, so the
-     * callbacks — C functions the linker puts in bank $01 — register from
-     * C with their bank bytes intact. */
+    /* Register the three object types. The callbacks are C functions the
+     * linker may put in any bank; a function pointer carries its bank, so
+     * they register from C as they are. */
     nbobjects = 1; /* mario is always object 0 */
     objInitFunctions(0, marioinit,        marioupdate,        0);
     objInitFunctions(1, goombainit,       goombaupdate,       0);

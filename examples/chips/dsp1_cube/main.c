@@ -24,7 +24,7 @@
  * console, dma, sprite, dsp1
  *
  * @warning Needs the DSP-1 firmware in luna (dsp1b.rom) — see the README.
- * @see snes/dsp1.h, .claude/notes/tech/dsp1_reference.md
+ * @see snes/dsp1.h, docs/tutorials/dsp1.md
  */
 #include <snes.h>
 #include <snes/dsp1.h>

@@ -1,6 +1,6 @@
 # Audio
 
-**Family 8 — "make it sound like a game."** The SNES has a whole second
+**"make it sound like a game."** The SNES has a whole second
 processor for sound — the SPC700, with its own 64 KB of RAM, its own S-DSP,
 and its own instruction set, talking to the main CPU through just 4 I/O bytes.
 This family has two on-ramps — tracker music, and driving the DSP straight

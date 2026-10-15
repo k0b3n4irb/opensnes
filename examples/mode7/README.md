@@ -1,6 +1,6 @@
 # Mode 7
 
-**Family 7 — the SNES's signature trick.** Mode 7 turns one background into a
+**the SNES's signature trick.** Mode 7 turns one background into a
 single texture the hardware can rotate, scale and skew per scanline — the
 floor of F-Zero, the map of Super Mario Kart, the world bending under
 Pilotwings. It gets its own family because it is a distinct render model with

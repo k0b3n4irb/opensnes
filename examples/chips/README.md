@@ -1,6 +1,6 @@
 # Enhancement chips
 
-**Family 11 — "more horsepower, when the base hardware isn't enough."** Some
+**"more horsepower, when the base hardware isn't enough."** Some
 SNES cartridges carry a coprocessor. These examples boot one, prove it runs,
 then put it to real work — the branch you reach for late in a project, not on
 day one.

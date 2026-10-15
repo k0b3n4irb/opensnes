@@ -33,7 +33,7 @@
 
 #include <snes.h>
 
-/** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
+/** @brief 4bpp background tile data (converted by the build from res/) */
 #include "res/back.inc"   /* generated: back_tiles[], back_tiles_end[], back_map[], back_pal[] */
 /** @brief 64x32 tilemap data for the parallax background */
 /** @brief 16-color palette for the background */

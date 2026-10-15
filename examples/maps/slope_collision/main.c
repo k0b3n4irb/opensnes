@@ -98,12 +98,9 @@ int main(void) {
     /* Object engine */
     objInitEngine();
 
-    /* Register Mario's callbacks. This used to need a hand-written ASM
-     * shim: objInitFunctions() read its arguments with the pre-A6 stack
-     * map, so it stored garbage, and its comment claimed C could not pass
-     * a bank byte. Both were fixed on 2026-09-18 — the compiler pushes
-     * `pea.w :fn` alongside `pea.w fn` for every pointer, so the bank is
-     * right there on the stack. No refresh callback for this example. */
+    /* Register Mario's callbacks: a function pointer carries its bank, so
+     * C functions in any bank register as they are. No refresh callback
+     * for this example. */
     objInitFunctions(0, marioinit, marioupdate, 0);
 
     /* Load objects from map data */

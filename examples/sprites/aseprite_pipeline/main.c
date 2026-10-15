@@ -90,10 +90,6 @@ static AnimPlayer hero_player = ANIM_PLAYER_INIT;
  */
 static void drawLabel(u16 idx) {
     textClearRect(2, 3, 28, 1);
-    /* if/else, not `textPrintAt(2, 3, idx ? "A" : "B")`: a ternary yielding a
-     * string literal currently miscompiles (the far pointer's bank byte is
-     * dropped, so the callee reads garbage). See
-     * .claude/notes/tech/ternary_addr_const_bank_drop.md. */
     if (idx == HERO_ANIM_WALK)
         textPrintAt(2, 3, "Clip: WALK  (forward loop)");
     else

@@ -1,6 +1,6 @@
 # Sprites
 
-**Family 3 of the developer journey — "things that move independently of the
+**"things that move independently of the
 background."** Sprites (OBJ) are the heart of any game: the player, enemies,
 bullets, pickups. The SNES gives you 128 hardware sprites; this family is a
 ladder from one static sprite up to streaming a multi-tile character every
@@ -32,7 +32,7 @@ palette, tile high bit). The high table (32 bytes) holds 2 bits/sprite: X high
 bit and size select.
 
 **Sizes (OBJSEL `$2101`)** — each value picks a *small*/*large* pair, e.g.
-`1` = 8×8 / 32×32, `5` = 32×32 / 64×64. Rung 3.2 walks all six.
+`1` = 8×8 / 32×32, `5` = 32×32 / 64×64. `sprite_sizes` walks all six.
 
 **Many sprites per frame** — write straight to the `oamMemory[]` buffer rather
 than calling `oamSet()` repeatedly; the NMI handler DMAs the buffer to OAM

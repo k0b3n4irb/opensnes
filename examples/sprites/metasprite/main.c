@@ -30,7 +30,7 @@
  * - Observe how the same character is recomposed with different tile sizes
  *
  * @par Modules Used
- * console, sprite, dma, text, text4bpp, background, input
+ * console, sprite, dma, text, text4bpp, background, input, anim
  *
  * @see sprite.h, dma.h, input.h
  */
@@ -38,7 +38,7 @@
 #include <snes.h>
 #include <snes/anim.h>
 
-/** @brief 4bpp tile data for the 32x32 hero sprite (defined in data.asm) */
+/** @brief 4bpp tile data for the 32x32 hero sprite (converted by the build from res/) */
 #include "res/spritehero32.inc"
 #include "res/spritehero16.inc"
 #include "res/spritehero8.inc"

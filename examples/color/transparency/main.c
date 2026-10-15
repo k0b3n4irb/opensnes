@@ -38,11 +38,10 @@
 #include <snes/colormath.h>
 
 /**
- * @brief Assembly DMA loader for SUPERFREE graphics data.
+ * @brief The landscape and the clouds, converted by the build from res/.
  *
- * Asset symbols from data.asm (.incbin sections). Post-A6+A7 (v0.19.0)
- * C pointers carry the bank byte, so `dmaCopyVram` / `dmaCopyCGram`
- * resolve the correct source bank automatically — no ASM stub needed.
+ * A C pointer carries its bank byte, so `dmaCopyVram` / `dmaCopyCGram`
+ * take the data wherever the linker placed it.
  */
 #include "res/backgrounds.inc"
 #include "res/clouds.inc"

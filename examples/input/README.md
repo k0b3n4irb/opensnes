@@ -1,6 +1,6 @@
 # Input & peripherals
 
-**Family 4 — "can the player act?"** This is the rung that turns a demo into a
+**"can the player act?"** This is the step that turns a demo into a
 game. Read the pad, move something with it, then branch out to the SNES's
 exotic controllers. The console auto-reads every input device each VBlank; you
 just read the result.

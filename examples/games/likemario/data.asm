@@ -3,12 +3,9 @@
 ; Tile/sprite graphics go in SUPERFREE (any bank, accessed via DMA only).
 ; Map/collision data are read from C through const pointers (far reads).
 ;
-; Post-A6+A7 (v0.19.0), C pointers carry the bank byte natively; dmaCopyVram
-; and dmaCopyCGram read it from the caller's Kl pointer. The legacy
-; loadGraphics() ASM loader is gone — main.c calls dma helpers directly.
-; The dynamic sprite engine gets its bank byte from OAM_SET_GFX(), which
-; reads it from the pointer (the getSpriteTilBank() helper that lived here
-; worked around a macro that recorded bank 0; removed 2026-09-20).
+; A C pointer carries its bank byte, and dmaCopyVram / dmaCopyCGram read
+; it: main.c calls the dma helpers directly. The dynamic sprite engine gets
+; its bank byte from OAM_SET_GFX(), which reads it from the pointer.
 
 ;----------------------------------------------------------------------
 ; Tile and sprite graphics (DMA-only access, any bank is fine)

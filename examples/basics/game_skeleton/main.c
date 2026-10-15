@@ -39,7 +39,7 @@
  * final score. `game_state`, `score`, `time_left` are the probe oracles.
  *
  * @par Modules Used
- * console, dma, background, sprite, text, input
+ * console, dma, background, sprite, text, input, tile
  *
  * @see examples/basics/scene_stack — the same idea via the `scene` framework
  */

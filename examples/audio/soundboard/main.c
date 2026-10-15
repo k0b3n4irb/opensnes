@@ -35,7 +35,7 @@
  * console, audio, input
  *
  * @see lib/include/snes/audio.h — the full engine API
- * @see .claude/notes/chantiers/audio_v2.md — engine design
+ * @see docs/tutorials/audio_samples.md — the audio module
  */
 
 #include <snes.h>

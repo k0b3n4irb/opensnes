@@ -1,4 +1,4 @@
-# Print a string — Family 1 (Text), rung 1.1: the built-in font
+# Print a string — Text: the built-in font
 
 OPENSNES := $(shell cd ../../.. && pwd)
 

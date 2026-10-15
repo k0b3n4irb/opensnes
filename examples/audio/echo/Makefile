@@ -1,4 +1,4 @@
-# Echo / reverb — Family 8 (Audio), rung 8.9: the S-DSP echo unit
+# Echo / reverb — Audio: the S-DSP echo unit
 
 OPENSNES := $(shell cd ../../.. && pwd)
 

@@ -39,17 +39,17 @@
 #include <snes.h>
 
 /*============================================================================
- * External Graphics Data (defined in data.asm)
+ * Graphics Data (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
-/** @brief 4bpp tile data for background layer 1 (defined in data.asm) */
+/** @brief 4bpp tile data for background layer 1 (converted by the build from res/) */
 #include "res/bg1.inc"
 #include "res/bg2.inc"
 /* generated: bgN_tiles[], bgN_map[], bgN_pal[] (each with _end) and a BgAsset bgN */
 /** @brief Tilemap data for BG1 (32x32 grid) */
 /** @brief 16-color palette for BG1 */
 
-/** @brief 4bpp tile data for background layer 2 (defined in data.asm) */
+/** @brief 4bpp tile data for background layer 2 (converted by the build from res/) */
 /** @brief Tilemap data for BG2 (32x32 grid) */
 /** @brief 16-color palette for BG2 (loaded to CGRAM palette slot 1) */
 
@@ -57,10 +57,8 @@
  * HDMA Triangle Tables (in RAM)
  *
  * Plain globals: hdmaSetup() takes a far pointer and reads the bank from
- * it (since the A6 chantier), so a const table in the asset banks would
- * work just as well; these stay in RAM because nothing here needs them in
- * ROM. (Until 2026-10-04 this comment claimed hdmaSetup needed them in
- * the code bank, a pre-A6 constraint.)
+ * it, so a const table in the asset banks would work just as well; these
+ * stay in RAM because nothing here needs them in ROM.
  *
  * Format: [count | 0x80] [data per scanline...]
  *   - 0x80 bit = repeat mode (HDMA reads one new byte per scanline)
@@ -151,9 +149,8 @@ static void setup_window(u8 layers, u8 w12sel_val) {
 
     /* Window 1, inverted (pixels OUTSIDE the triangle are clipped), on the
      * BGs W12SEL names — and, as PVSnesLib's setModeHdmaWindow does, the same
-     * bits mirrored into WOBJSEL: OBJ with BG1, the colour window with BG2.
-     * Through the window module since 2026-09-26 (it wrote W12SEL, WOBJSEL
-     * and TMW by hand); luna diff shows the same frames. */
+     * bits mirrored into WOBJSEL: OBJ with BG1, the colour window with BG2,
+     * through the window module. */
     {
         u8 w1 = 0;
         if (w12sel_val & 0x02) w1 |= LAYER_BG1 | LAYER_OBJ;

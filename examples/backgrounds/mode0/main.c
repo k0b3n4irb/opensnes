@@ -34,7 +34,7 @@
 #include <snes.h>
 #include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
-/** @name BG0 asset pointers (defined in data.asm via .incbin)
+/** @name BG0 asset pointers (converted by the build from res/)
  * @{ */
 #include "res/bg0.inc"
 #include "res/bg1.inc"
@@ -43,15 +43,15 @@
 /* generated: bgN_tiles[], bgN_pal[], bgN_map[] (each with _end) and a BgAsset bgN */
 /** @} */
 
-/** @name BG1 asset pointers (defined in data.asm via .incbin)
+/** @name BG1 asset pointers (converted by the build from res/)
  * @{ */
 /** @} */
 
-/** @name BG2 asset pointers (defined in data.asm via .incbin)
+/** @name BG2 asset pointers (converted by the build from res/)
  * @{ */
 /** @} */
 
-/** @name BG3 asset pointers (defined in data.asm via .incbin)
+/** @name BG3 asset pointers (converted by the build from res/)
  * @{ */
 /** @} */
 

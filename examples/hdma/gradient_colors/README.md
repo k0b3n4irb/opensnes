@@ -121,8 +121,7 @@ writes every scanline.
 
 ## Further: the "9-bit" backdrop (two channels, one visual)
 
-krom's RedSpace9BitHDMA trick, the `gradient_9bit` example until 2026-10-05:
-one channel rewrites the backdrop colour per scanline exactly as this
+krom's RedSpace9BitHDMA trick: one channel rewrites the backdrop colour per scanline exactly as this
 example does, and a second channel rewrites INIDISP's master brightness per
 scanline (`HDMA_MODE_1REG` into `$2100`). Colour x brightness, plus a
 one-line jitter, dithers the 5-bit gradient into more perceptual steps than

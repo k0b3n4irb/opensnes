@@ -1,6 +1,6 @@
 # Transitions
 
-**Part of Family 6 (Colour & effects) — how a scene *leaves*.** Cutting hard
+**Colour & effects — how a scene *leaves*.** Cutting hard
 between screens looks cheap; a transition sells the change. The SNES gives you
 two cheap, hardware-cheap ways to do it — dim the whole screen, or dissolve it
 into blocks — and this family is those two.

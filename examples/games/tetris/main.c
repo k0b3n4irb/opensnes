@@ -42,7 +42,7 @@
  * - START pauses with a "PAUSED" overlay; GAME OVER cycles rainbow text
  *
  * @par Modules Used
- * console, sprite, dma, background, input
+ * console, sprite, dma, background, input, hdma
  *
  * @see background.h, dma.h, input.h, snesmod.h
  */
@@ -101,9 +101,7 @@ extern const char str_start[];
  * frame/drop (fastest). Values match the original NES Tetris for authentic feel.
  *
  * `const`: it lives in ROM, in whichever bank the linker picks, and every C
- * read of const data is a far read (since v0.41.0). Until 2026-09-26 these
- * tables were left non-const out of an older fear of bank-$00-only reads,
- * which cost WRAM for nothing.
+ * read of const data is a far read.
  */
 static const u8 speed_table[] = {
     48, 43, 38, 33, 28, 23, 18, 13, 8, 6,   /* L0-9: NES NTSC */

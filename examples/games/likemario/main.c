@@ -38,7 +38,7 @@
  * - Falling off the bottom respawns Mario at the top
  *
  * @par Modules Used
- * console, sprite, sprite_dynamic, sprite_lut, dma, input, background
+ * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, anim
  *
  * @see background.h, sprite.h, input.h, dma.h, snesmod.h
  */
@@ -60,9 +60,8 @@ extern const u8 mapmario[];   /* asset bank: every C read must be a far read, he
 /** @brief Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format) */
 extern const u8 tilesetatt[];
 
-/** @brief Asset symbols from data.asm (.incbin sections in SUPERFREE banks).
- * Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram
- * read it directly — no ASM loader stub needed. */
+/** @brief Asset symbols from data.asm (.incbin sections in the asset banks).
+ * A C pointer carries its bank byte, and dmaCopyVram/dmaCopyCGram read it. */
 
 /*============================================================================
  * Constants
@@ -396,8 +395,7 @@ static void map_update(void) {
  * frame to the standing pose, and configures the sprite attribute byte
  * (priority 3, H-flip for facing right). The tile data may sit in any ROM
  * bank (SUPERFREE placement); OAM_SET_GFX() records the bank byte of the
- * pointer it is given. Until 2026-09-20 it recorded bank 0, and this example
- * carried a hand-written getSpriteTilBank() helper to work around it.
+ * pointer it is given.
  */
 static void mario_init(void) {
     mario_x = 48;
@@ -474,7 +472,6 @@ static void mario_handle_input(void) {
  * - Positive values: simple unsigned shift
  * - Negative values: bitwise NOT, unsigned shift, NOT back -- preserves
  *   the sign bit through the inversion trick.
- * (Until 2026-10-04 this comment claimed the compiler shifted logically.)
  *
  * @param val 8.8 fixed-point signed value
  * @return Integer part (effectively val / 256 with sign preservation)
@@ -694,8 +691,7 @@ int main(void) {
     bgSetGfxPtr(0, VRAM_BG_TILES);
     bgSetMapPtr(0, VRAM_BG_MAP, SC_64x32);
 
-    /* DMA tile + palette assets. C pointers carry the bank byte post-A6+A7
-     * so dmaCopyVram / dmaCopyCGram resolve SUPERFREE source banks natively. */
+    /* DMA tile + palette assets: the pointers carry their bank. */
     dmaCopyVram(tiles_tiles,        VRAM_BG_TILES, tiles_tiles_end - tiles_tiles);
     dmaCopyCGram(tiles_pal,        0,             tiles_pal_end - tiles_pal);
     dmaCopyCGram(mario_sprite_pal, 128,           mario_sprite_pal_end - mario_sprite_pal);

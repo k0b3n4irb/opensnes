@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Family 1 (Text) · rung 1.4 — move a message across the screen
+ * @brief Text — move a message across the screen
  * @ingroup examples
  *
  * The Text ladder's "make it move" rung. It prints one line, then scrolls

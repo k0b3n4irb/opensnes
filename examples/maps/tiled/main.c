@@ -43,7 +43,7 @@
 #include <snes/map.h>
 
 /*============================================================================
- * External Assets (defined in data.asm)
+ * Assets (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
 /** @brief 4bpp tileslevel1_tiles graphics (converted from tileslevel1.png) */

@@ -125,7 +125,6 @@ per frame — essential for smooth deceleration.
 > the intent is visible. cc65816's `>>` on a signed value IS arithmetic (the
 > compiler checks pin it: `devtools/compiler-tests/cases/test_signed_ops.c`), so
 > `val >> 8` would do the same; the helper is readability, not a workaround.
-> (Until 2026-10-04 this box claimed the compiler shifted logically.)
 
 ### 5. Gravity in Two Lines
 
@@ -313,9 +312,7 @@ tilesetatt:     .incbin "res/map_1_1.b16"
 
 The map and collision data are read by C too, and that works from any bank:
 the C side declares them `const`, and every C read of const data is a far
-read (since v0.41.0). Until 2026-09-23 they sat in `SEMIFREE BANK 0` "because
-the compiler reads bank $00" — true before far pointers, and what this page
-said until 2026-09-26.
+read.
 
 ---
 

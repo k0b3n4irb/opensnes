@@ -31,7 +31,7 @@
  * the probe oracle.
  *
  * @par Modules Used
- * console, dma, background, math
+ * console, dma, background, math, tile
  *
  * @see lib/include/snes/video.h — setMode(BG_MODE2)
  */

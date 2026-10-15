@@ -1,6 +1,6 @@
 # Print a string
 
-**Family 1 — Text · rung 1.1 (the built-in font)**
+**Text · the built-in font**
 
 The gentlest program that still exercises the whole SNES rhythm — tiles,
 palette, VRAM and the VBlank handshake — on the smallest possible surface.

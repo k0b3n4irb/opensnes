@@ -7,7 +7,7 @@
 ;------------------------------------------------------------------------------
 ; 4708 bytes of tilemap/palette/brick state. They used to sit in bank 0 at
 ; $0800 (ORGA, to dodge the OAM buffer) and left the C RAM band with 1436
-; bytes free. Declared `FAR` on the C side (chantier B2), every access is
+; bytes free. Declared `FAR` on the C side, every access is
 ; bank-honouring — `blocks[b]` is an absolute-long-indexed read, the DMA
 ; helpers take the bank from the far pointer — and bank 0 gets the space
 ; back. SLOT 2 is $2000-$FFFF of bank $7E (templates/memmap.inc).

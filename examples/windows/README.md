@@ -1,6 +1,6 @@
 # Windows
 
-**Part of Family 6 (Colour & effects) — masking part of the screen.** The PPU
+**Colour & effects — masking part of the screen.** The PPU
 has two hardware *windows*: rectangular (or, driven per scanline, any-shaped)
 regions that gate what each layer and colour-math shows. Spotlights, portholes,
 iris wipes, "only darken inside this shape" — all windows.

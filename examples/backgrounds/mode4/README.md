@@ -1,6 +1,6 @@
 # mode4 — a 256-colour layer with offset-per-tile
 
-**Family 2 (Backgrounds) · the offset-per-tile modes (2/4/6), after
+**Backgrounds · the offset-per-tile modes (2/4/6), after
 [`mode2`](../mode2/README.md).**
 
 ![Screenshot](mode4.png)

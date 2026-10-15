@@ -27,7 +27,7 @@
  *   so each 4-byte block is [CGADD][CGADD][color_lo][color_hi] —
  *   rewriting CGRAM color 0 (the backdrop) per band
  * - Extracting a C pointer's bank for $43x7:
- *   (u8)((u32)(void *)data >> 16) (post-A6 far pointers)
+ *   (u8)((u32)(void *)data >> 16) (a pointer carries its bank)
  *
  * @par What to Observe
  * - A pure red gradient: brightest red (BGR555 $001F) at the top fading

@@ -43,7 +43,7 @@
 #include <snes/background.h>
 #include <snes/lzss.h>
 
-/** @name Graphics data pointers (defined in data.asm via .incbin)
+/** @name Graphics data pointers (converted by the build from res/)
  * @{ */
 #include "res/opensnes.inc"   /* generated: opensnes_tiles[] (LZ77), opensnes_pal[], opensnes_map[], each with _end */
 /** @} */
