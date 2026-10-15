@@ -133,13 +133,15 @@ def roundtrip(argv):
 g.check("convert banks.png --colors 48: every pixel round-trips", "pixel oracle", roundtrip(["convert", "-q", "--colors", "48", "banks.png"]))
 g.check("convert banks.png --colors 48 --rearrange: every pixel round-trips", "pixel oracle after the rearrangement",
         roundtrip(["convert", "-q", "--colors", "48", "--rearrange", "banks.png"]))
-def _indexed_png(rows, ncol=16):
+def _indexed_png(rows, ncol=16, palette=None):
     """An indexed PNG from rows of palette indices, written here so the test needs no imaging module."""
     import zlib
 
     def chunk(kind, data):
         return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
-    plte = b"".join(bytes(((i * 53) % 256, (i * 97) % 256, (i * 29) % 256)) for i in range(ncol))
+    if palette is None:
+        palette = [((i * 53) % 256, (i * 97) % 256, (i * 29) % 256) for i in range(ncol)]
+    plte = b"".join(bytes(c) for c in palette)
     raw = b"".join(b"\0" + bytes(r) for r in rows)
     return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", len(rows[0]), len(rows), 8, 3, 0, 0, 0))
             + chunk(b"PLTE", plte) + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
@@ -204,6 +206,49 @@ for _first, _name in ((True, "a picture that starts with a blank block"), (False
                 blank_tile(_first, _extra))
     g.check("convert --blank --mode 5: " + _name, "every 16-pixel cell decoded against the source",
             blank_tile(_first, ["--mode", "5"], mode5=True))
+def opaque_like_zero(shade, extra):
+    """Index 0 is transparent by its place, not by its colour: an opaque
+    square of index 5 whose colour is index 0's (black, or (2, 2, 2), black on
+    five bits) keeps a non-zero index. --rearrange used to fold every index
+    onto the first of the same colour, index 0 among them, and the square came
+    out transparent (2026-10-15)."""
+    def run():
+        rows = [[0] * 16 for _ in range(8)]
+        for y in range(2, 6):
+            for x in range(2, 6):
+                rows[y][x] = 5
+            for x in range(10, 14):
+                rows[y][x] = 7
+        pal = [(0, 0, 0)] * 16
+        pal[5] = shade
+        pal[7] = (200, 100, 50)
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "o.png").write_bytes(_indexed_png(rows, palette=pal))
+            proc = g.run(["convert", "-q", "--colors", "16", *extra, "o.png"], work)
+            if g.failure(proc):
+                return [g.failure(proc)]
+            pic = (work / "o.pic").read_bytes()
+            mp = (work / "o.map").read_bytes()
+        bad = 0
+        for tx in range(2):
+            n = struct.unpack_from("<H", mp, tx * 2)[0] & 0x3FF
+            t = pic[n * 32:n * 32 + 32]
+            for y in range(8):
+                for x in range(8):
+                    bit = 7 - x
+                    idx = (((t[y * 2] >> bit) & 1) | (((t[y * 2 + 1] >> bit) & 1) << 1)
+                           | (((t[16 + y * 2] >> bit) & 1) << 2) | (((t[17 + y * 2] >> bit) & 1) << 3))
+                    if (idx == 0) != (rows[y][tx * 8 + x] == 0):
+                        bad += 1
+        return [f"{bad} pixel(s) changed between transparent and opaque"] if bad else []
+    return run
+
+
+for _shade in ((0, 0, 0), (2, 2, 2)):
+    for _extra in ([], ["--rearrange"]):
+        g.check(" ".join(["convert", *_extra]) + f": an opaque index of colour {_shade}, index 0's colour",
+                "stays opaque", opaque_like_zero(_shade, _extra))
 g.expect_stdout("convert --json", ["convert", "--json", "--colors", "16", "bg.png"], golden="convert.json", copy=["bg.png"])
 g.expect_stdout("inspect --json", ["inspect", "--json", "bg.png", "banks.png"], golden="inspect.json", copy=["bg.png", "banks.png"])
 g.expect_outputs("convert --save writes bg.png.toml", ["convert", "-q", "--colors", "16", "--flip", "--save", "bg.png"],

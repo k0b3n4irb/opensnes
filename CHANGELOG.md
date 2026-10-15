@@ -104,6 +104,13 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(tools): **`opensnes-tileset --rearrange` keeps an opaque black
+  opaque.** Before regrouping the colours into banks, it folded every index
+  onto the first index of the same colour, index 0 among them: a pixel of
+  index 5 whose colour equalled index 0's (black, or anything black on five
+  bits) came out as 0, transparent. Index 0 is transparent by its place,
+  not by its colour; it is no longer a target of that folding. Found by a
+  game built on the SDK.
 - fix(compiler): **a const table of more than 16,384 elements compiles.**
   QBE's emitter buffered the items of an initialized object in a fixed table
   of 16,384 and died on the next with "too many data items", naming nothing

@@ -168,8 +168,11 @@ void palette_rearrange_snes(unsigned char *imgbuf, int *palettesnes, int nbtiles
     }
 
     // if two colors have the same RGB values...
-    // replace all instances of the redundant color with the first color
-    for (i = 0; i < 256; i++)
+    // replace all instances of the redundant color with the first color.
+    // Never with color 0: it is transparent by its place, not by its colour,
+    // and an opaque black of another index must stay opaque (OpenSNES,
+    // 2026-10-15: an opaque black came out transparent).
+    for (i = 1; i < 256; i++)
     {
         for (ii = i + 1; ii < 256; ii++)
             if (palettesnes[i] == palettesnes[ii])
