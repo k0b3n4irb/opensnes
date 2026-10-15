@@ -523,7 +523,48 @@ _STALE_EXAMPLE_CLAIMS = [
     (re.compile(r"spills? to bank 1|spill to bank \$01", re.IGNORECASE), "since #127.3 const data lives in the asset banks and is read far"),
     (re.compile(r"must be in bank \$00 WRAM", re.IGNORECASE), "a plain global sits below $2000 by the compiler's rule; the lib reads the pointer's bank"),
     (re.compile(r"due to a compiler quirk", re.IGNORECASE), "name the bug or drop the claim"),
+    # 2026-10-15, examples review before 1.0
+    (re.compile(r"refreshed every scanline", re.IGNORECASE),
+     "an HDMA register keeps its value: \"write once, then wait\" (snesdev wiki); repeat mode is for values that change"),
+    (re.compile(r"bank-\$00-hardcoded", re.IGNORECASE),
+     "every C read of const data is a far read (#121, #127.3)"),
+    (re.compile(r"right-to-left (?:push|order)|cproc right-to-left", re.IGNORECASE),
+     "cc65816 pushes arguments left to right (compiler/ABI.md)"),
+    (re.compile(r"CANNOT be read from C"), "C reads const data far and RAM above $2000 through FAR"),
+    (re.compile(r"\b(?:gfx4snes|tmx2snes|wav2brr|aseprite2snes|font2snes|img2snes|palplan)\b"),
+     "a retired converter: the opensnes-* tools replace it (docs/tools/legacy.md)"),
+    (re.compile(r"make -C \S+ smconv|\bsmconv\s+-[a-z]"),
+     "music is built by opensnes-music from res/soundbank.toml"),
 ]
+
+
+def _example_build_output(path: Path) -> bool:
+    """A file the build writes in an example's folder (the compiler's .c.asm,
+    the wrappers, the generated assets), not one somebody wrote."""
+    n = path.name
+    return (n.endswith((".c.asm", ".wrap.asm", "_data.as")) or n in (
+        "project_hdr.asm", "project_sa1_boot.asm", "assets_gen.asm", "soundbank.asm")
+        or "/build/" in path.as_posix() or not _git_tracked(path))
+
+
+_TRACKED: set[str] | None = None
+
+
+def _git_tracked(path: Path) -> bool:
+    """Whether git tracks the file (an untracked file in an example is a build
+    output); everything counts as tracked outside a git checkout."""
+    global _TRACKED
+    if _TRACKED is None:
+        import subprocess
+        try:
+            out = subprocess.run(["git", "ls-files", "examples"], cwd=repo_path(),
+                                 capture_output=True, text=True, check=True).stdout
+            _TRACKED = set(out.splitlines())
+        except (OSError, subprocess.CalledProcessError):
+            _TRACKED = set()
+    if not _TRACKED:
+        return True
+    return path.relative_to(repo_path()).as_posix() in _TRACKED
 
 
 def check_example_stale_claims() -> list[str]:
@@ -531,7 +572,9 @@ def check_example_stale_claims() -> list[str]:
     root = repo_path("examples")
     if not root.is_dir():
         return []
-    for path in sorted(p for p in root.rglob("*") if p.suffix in (".c", ".h", ".md") and p.is_file()):
+    for path in sorted(p for p in root.rglob("*")
+                       if (p.suffix in (".c", ".h", ".md", ".asm") or p.name == "Makefile")
+                       and p.is_file() and not _example_build_output(p)):
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
         # a claim may wrap onto the next line of a comment ("assumes\n * bank $00"):
         # match each line joined with the next, comment leaders stripped
@@ -971,9 +1014,33 @@ def modules_missing_from_readme(readme_text: str, declared: list[str]) -> list[s
     return [mod for mod in declared if mod not in words]
 
 
+_PAR_MODULES_RE = re.compile(r"@par Modules Used(.*?)(?=@par |@see|\*/)", re.S)
+
+
+def modules_missing_from_par(main_text: str, declared: list[str]) -> list[str] | None:
+    """None when main.c has no `@par Modules Used`; else the declared modules
+    the paragraph does not name."""
+    m = _PAR_MODULES_RE.search(main_text)
+    if not m:
+        return None
+    words = set(re.findall(r"[a-z0-9_]+", m.group(1)))
+    return [mod for mod in declared if mod not in words]
+
+
 def check_example_modules() -> list[str]:
     root = repo_path()
     drifts: list[str] = []
+    # main.c's `@par Modules Used` too (2026-10-15): eleven omitted a module
+    # their Makefile links, which the README check could not see
+    for mk in sorted(repo_path("examples").glob("*/*/Makefile")):
+        main = mk.parent / "main.c"
+        declared = declared_lib_modules(mk.read_text(encoding="utf-8"))
+        if not declared or not main.is_file():
+            continue
+        missing = modules_missing_from_par(main.read_text(encoding="utf-8"), declared)
+        if missing:
+            drifts.append(f"{main.relative_to(root).as_posix()}: '@par Modules Used' omits "
+                          f"{', '.join(missing)}, which the Makefile links")
     for mk in sorted(repo_path("examples").glob("*/*/Makefile")):
         readme = mk.parent / "README.md"
         if not readme.is_file():
@@ -1178,7 +1245,9 @@ def check_removed_api_names() -> list[str]:
 # CHANGELOG and the notes, not in a page a game developer reads. The
 # documentation review of that day took 600 such lines out.
 _HISTORY_SCAN_GLOBS = ["docs/**/*.md", "README.md", "KNOWN_LIMITATIONS.md",
-                       "PHILOSOPHY.md", "ROADMAP.md", "examples/README.md"]
+                       "PHILOSOPHY.md", "ROADMAP.md", "examples/README.md",
+                       # the examples are user pages too (2026-10-15)
+                       "examples/*/README.md", "examples/*/*/README.md", "examples/*/*/main.c"]
 _HISTORY_EXEMPT = {"docs/UPGRADING.md", "docs/MIGRATING_FROM_PVSNESLIB.md",
                    "docs/tools/luna.md"}
 _HISTORY_RX = re.compile(r"\b(?:[Uu]ntil|[Ss]ince|[Ff]ixed(?: on)?|[Rr]esolved)\s+20\d\d-\d\d")
@@ -1204,6 +1273,46 @@ def check_no_history_in_user_docs() -> list[str]:
                 if _NOTES_RX.search(line):
                     drifts.append(f"{rel}:{lineno}: a user page points into `.claude/` (maintainer "
                                   f"notes); cite a user document or nothing")
+    return drifts
+
+
+# Anchor 19 (2026-10-15): a file an example's comment names exists. Twenty-six
+# examples said a symbol was "defined in data.asm" in a folder with no
+# data.asm: the assets had moved to settings files and the comments stayed.
+_NAMED_FILE_RX = re.compile(r"\b(?:(?:defined|declared|generated|lives?|loaded|included) (?:in|from|by)"
+                            r"|(?:from|in)) "
+                            r"`?((?:[\w-]+/)*[\w-]+\.(?:asm|s|inc|bin|c|h|as|pic|pal|map))\b")
+_GENERATED_EXT = (".pic", ".pal", ".map", ".inc", ".as", ".bin", ".h", ".cmap", ".brr")
+
+
+def named_file_missing(example: Path, name: str) -> bool:
+    """Whether a file named by a comment of `example` is absent: not in the
+    folder (or res/), and not an output of a settings file there."""
+    for base in (example, example / "res"):
+        if (base / name).is_file() or (base / Path(name).name).is_file():
+            return False
+    for sdk in ("templates", "lib/include", "lib/include/snes", "lib/source"):
+        if (repo_path(sdk) / name).is_file():
+            return False                # a file of the SDK
+    if name.endswith(_GENERATED_EXT):
+        stem = Path(name).name.split(".")[0].split("_")[0]
+        for base in (example, example / "res"):
+            if any(base.glob(f"{stem}*.toml")):
+                return False
+    return True
+
+
+def check_named_files() -> list[str]:
+    drifts: list[str] = []
+    for main in sorted(repo_path("examples").glob("*/*/main.c")):
+        ex = main.parent
+        for path in sorted(p for p in ex.iterdir() if p.suffix in (".c", ".h") and _git_tracked(p)):
+            for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+                for m in _NAMED_FILE_RX.finditer(line):
+                    if named_file_missing(ex, m.group(1)):
+                        drifts.append(f"{path.relative_to(repo_path()).as_posix()}:{lineno}: names "
+                                      f"`{m.group(1)}`, which is not in the example and no settings "
+                                      f"file there produces it")
     return drifts
 
 
@@ -1281,6 +1390,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_removed_api_names())
     all_drifts.extend(check_user_build_has_no_interpreter())
     all_drifts.extend(check_no_history_in_user_docs())
+    all_drifts.extend(check_named_files())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

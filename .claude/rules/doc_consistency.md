@@ -130,6 +130,19 @@ opt-in list.
     (KNOWN_LIMITATIONS 866 → 425 lines, ROADMAP 360 → 76): fixed bugs are the
     CHANGELOG's, maintainer notes are the maintainers'. `UPGRADING.md`, the
     PVSnesLib migration guide and the generated `tools/luna.md` are exempt.
+    Since 2026-10-15 the examples are user pages too: their `README.md` and
+    `main.c` are read by this anchor.
+
+19. **A file an example's comment names exists** (since 2026-10-15): "defined
+    in data.asm", "from data.asm", "lives in res/x.bin" — the file is in the
+    example's folder, is an output of a settings file there, or is a file of
+    the SDK. Caught as twenty-six comments naming a data.asm their folder no
+    longer had (the assets had moved to settings files) — examples review
+    before 1.0, which also extended anchor 9 to `main.c`'s `@par Modules
+    Used` and anchor 14 to the examples' `.asm` and Makefiles, with the
+    motifs "refreshed every scanline", "bank-$00-hardcoded", "right-to-left
+    push", "CANNOT be read from C", the retired converters' names and smconv
+    run by hand.
 
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —

@@ -243,5 +243,59 @@ class NoHistoryInUserDocs(unittest.TestCase):
         self.assertIsNotNone(check_doc_drift._NOTES_RX.search("see `.claude/notes/tech/x.md`"))
 
 
+class ExampleReview20261015(unittest.TestCase):
+    """The examples review before 1.0: stale motifs, @par Modules Used,
+    files a comment names (anchor 19)."""
+
+    def _stale(self, line):
+        return [why for rx, why in check_doc_drift._STALE_EXAMPLE_CLAIMS if rx.search(line)]
+
+    def test_new_stale_motifs(self):
+        for line in ("WH0/WH1 must be refreshed every scanline",
+                     "C pointer dereferences are bank-$00-hardcoded",
+                     "Stack: 5-6,s = sy (cproc right-to-left push)",
+                     "the map CANNOT be read from C directly",
+                     "converted from a PNG by gfx4snes",
+                     "smconv -s -o soundbank music/song.it",
+                     "Verify smconv is built: `make -C $OPENSNES/bin smconv`"):
+            self.assertTrue(self._stale(line), line)
+
+    def test_present_wording_passes(self):
+        for line in ("an entry writes its register once and holds it",
+                     "the build runs opensnes-music bank on the .it file",
+                     "smconv keeps its page (docs/tools/smconv.md)",
+                     "C reads it as a const array"):
+            self.assertFalse(self._stale(line), line)
+
+    def test_par_modules(self):
+        main = "/**\n * @par Modules Used\n * console, dma, sprite\n *\n * @see x.h\n */"
+        self.assertEqual(check_doc_drift.modules_missing_from_par(main, ["console", "dma", "anim"]), ["anim"])
+        self.assertEqual(check_doc_drift.modules_missing_from_par(main, ["console", "sprite"]), [])
+        self.assertIsNone(check_doc_drift.modules_missing_from_par("/** no par */", ["console"]))
+
+    def test_named_file_regex(self):
+        rx = check_doc_drift._NAMED_FILE_RX
+        for line, name in (("/** @brief tiles (defined in data.asm) */", "data.asm"),
+                           ("Sprite palette (BGR555) from data.asm */", "data.asm"),
+                           ("lives in res/track_class.bin", "res/track_class.bin")):
+            m = rx.search(line)
+            self.assertIsNotNone(m, line)
+            self.assertEqual(m.group(1), name)
+        self.assertIsNone(rx.search("converted by the build from res/"))
+
+    def test_named_file_missing(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as td:
+            ex = Path(td)
+            (ex / "res").mkdir()
+            (ex / "res" / "hero.png.toml").write_text("tool = \"opensnes-sprite\"\n")
+            (ex / "data.asm").write_text("")
+            self.assertFalse(check_doc_drift.named_file_missing(ex, "data.asm"))
+            self.assertFalse(check_doc_drift.named_file_missing(ex, "hero.pic"))   # produced by a settings file
+            self.assertTrue(check_doc_drift.named_file_missing(ex, "ram.asm"))
+            self.assertFalse(check_doc_drift.named_file_missing(ex, "crt0.asm"))   # a file of the SDK
+
+
 if __name__ == "__main__":
     unittest.main()
