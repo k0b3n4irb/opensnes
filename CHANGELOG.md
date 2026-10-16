@@ -49,6 +49,10 @@ All notable changes to OpenSNES are documented in this file.
   totals (`OPENSNES_ONLY` in `run.py`).
 
 ### Performance
+- perf(compiler): **a pointer read several times in a row is set up once.**
+  `q[0]`, `q[1]`, `q[2]` read through one pointer, with another array's
+  index computed between them, set the pointer up again before each read;
+  and `(d & m) | q[1]` ORs `q[1]` straight from memory.
 - perf(compiler): **a function holding a variable shift keeps its peephole
   optimisations.** The shift's loop has an anonymous label, which made the
   liveness of the peephole stage give up on the whole function: dead
