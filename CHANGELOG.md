@@ -60,7 +60,8 @@ All notable changes to OpenSNES are documented in this file.
   `i * 2 + 16` exactly, and the second access reads `a+16,x` on the X the
   first one loaded, instead of computing the index again. An unbounded
   16-bit index is left as it is, since `i + 8` may wrap: the compiler does
-  not assume an access stays inside its array.
+  not assume an access stays inside its array. A member of a union
+  (`u.w[k + 8]`) is folded the same way.
 - perf(compiler): **counted loops lose their copies and their jump back.**
   A step computed into temporaries then copied (`q += stride` on a far
   pointer) is stored into the variable at once; a value stored and read

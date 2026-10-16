@@ -30,7 +30,7 @@ reformat without updating the script.
 | path | sha | source |
 |------|-----|--------|
 | compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 653b143851671951f87d40302e8c85e7d7df16d9 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/qbe | d1ad402f6ff11f6260e0f0a06d677e31958c48be | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
@@ -98,7 +98,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 133 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 134 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -110,6 +110,14 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+d1ad402 reassoc: the symbol of a union member, `add $u, 0`, folds like a bare one (a game built on the SDK, 2026-10-16)
+653b143 w65816: a far pointer walked by a loop kept in tcc__r9 for the whole loop — staged once before the header, its step written to tcc__r9, copied back on the way out when read after; `QBE_NO_PEEP_R9LOOP=1` (a game built on the SDK, 2026-10-16)
+f3bb5bf reassoc: the constant of a bounded index folded into the symbol it indexes — `buf[i + 8]` reads `buf+16,x` on `buf[i]`'s X when i is proved bounded (extub, and with a constant, shr), never from an out-of-bounds access being undefined (owner decision); `QBE_NO_REASSOC=1` (a game built on the SDK, 2026-10-16)
+b6d9571 w65816: a value stored only to be copied goes to its slot at once; a counted loop tests at its end — peephole_forward_store (`q += stride` straight into q), the reload rule past a label, peephole_dec_loop (`dec n / bne @body`); `QBE_NO_PEEP_FWDSTORE=1`, `QBE_NO_PEEP_DECLOOP=1` (a game built on the SDK, 2026-10-16)
+f9c83c0 w65816: the staged pointer survives the ops that do not write tcc__r9; a stored value ORs the next load directly — q[0], q[1], q[2] in a loop staged q before each read, across the `asl a / tax` of an index; `sta T / ldy / lda Y / ora T` → `ldy / ora Y` (a game built on the SDK, 2026-10-16)
+42461f9 w65816: the peephole's liveness reads `-` labels; a loop counter read after its step stays in A — a variable shift's `-` loop made peephole_flow and pp_slot_live_at give up on the whole function (the OR fusion lost in a large function); that exposed peephole_loop_x keeping `sta 2,s` after the step of a counter whose address is taken, which stored a stale A (difftest_stmt seed 105) (a game built on the SDK, 2026-10-15)
+1721f6c w65816: an indexed load stays the operand of what it feeds across an ldx or an ldy, and an and/or/xor keeps tcc__r9 — `d[k] |= p[k]` from ROM into far RAM cost 9 or 10 instructions a word where 5 and 4 do; the fusion puts back the ldx that gave X its value at the first load when X is dead after the operation, and a 16-bit and/or/xor no longer drops the staged pointer (a game built on the SDK, 2026-10-15)
+a2cfdff emit: the buffer of an initialized object grows instead of dying at 16384 items — a const table of 16385 elements (16 KB of u8) died with "too many data items", naming nothing; what bounds an object now is the ROM bank, which wlalink says (a game built on the SDK, 2026-10-14)
 96be7ae w65816: X known across the blocks of a function, and an indexed load as the operand of what it feeds — two text rules of the peephole stage: a forward analysis of the frame slot A and X equal (a `tax` or `ldx` of what X already holds goes; a function indexing parallel arrays reloaded its index at the top of every block), and `lda SYM,x / sta T / lda Y / op T` as `lda Y / op SYM,x` for cmp, adc, sbc, and, ora, eor; `QBE_NO_PEEP_XFLOW=1`, `QBE_NO_PEEP_FUSE=1` (2026-10-13)
 2dd729f w65816: the counter of a rotated loop lives in X — a text rule of the peephole stage: ldx / cpx on the way in, inx or txa/clc/adc/tax as the step, cpx at the bottom, when nothing in the body writes X or the counter's slot and the counter dies with the loop; farClear 31 → 18 CPU cycles a turn; `QBE_NO_PEEP_LOOPX=1` (stage 2 T3, 2026-10-12)
 a4ce67c ivar: a loop counter used only as one scaled index becomes that index — a pass before gcm: `for (k = 0; k < N; k++) a[k] = v` runs on j = 2k, stepping by 2, tested against 2N, no shift in the body; exact when nothing wraps at 16 bits, nothing created otherwise; `QBE_NO_IVAR=1`, `-d V` (stage 2 T2, 2026-10-12)
