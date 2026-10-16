@@ -1,0 +1,13 @@
+# the pointer staged once, before the header; its step goes to tcc__r9
+in walk: present \tsta\.b tcc__r9\+2\n@for_cond
+in walk: present \tadc\.w #6\n\tsta\.b tcc__r9\n
+in walk: absent @for_body\.\d+:\n\tlda\.b tcc__lf\+0\n\tsta\.b tcc__r9
+# read after the loop: copied back after the exit label (only the loop leads there)
+in walk_live: present @for_join\.\d+:\n\tlda\.b tcc__r9\n\tsta\.b tcc__lf\+0\n
+in walk_live: absent @for_body\.\d+:\n\tlda\.b tcc__lf\+0\n\tsta\.b tcc__r9
+# returned: copied back between the loop's end and the exit label, which
+# the n == 0 test also reaches
+in walk_ret: present \tbne @for_body\.\d+\n\tlda\.b tcc__r9\n\tsta\.b tcc__lf\+0\n\tlda\.b tcc__r9\+2\n\tsta\.b tcc__lf\+2\n@for_join
+in walk_ret: present \tbeq @for_join\.\d+\n\tlda\.b tcc__lf\+0\n\tsta\.b tcc__r9\n
+# a call in the loop: staged in the body, every turn
+in walk_call: present @for_body\.\d+:\n\tlda [^\n]+\n\tsta\.b tcc__r9\n

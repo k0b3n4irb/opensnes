@@ -49,6 +49,12 @@ All notable changes to OpenSNES are documented in this file.
   totals (`OPENSNES_ONLY` in `run.py`).
 
 ### Performance
+- perf(compiler): **a pointer walked by a loop stays in place for the whole
+  loop.** A loop that reads through a far pointer and steps it, such as
+  `for (; n; n--, q += stride) ... q[0] ... q[1] ...`, loaded the pointer
+  again at the top of every turn. It is now loaded once before the loop and
+  stepped where it lies: four instructions a turn fewer. When the pointer is
+  read after the loop, it is written back on the way out.
 - perf(compiler): **`a[i + 8]` next to `a[i]` reuses its index when i is
   bounded.** When i is a byte or masked by a constant, `(i + 8) * 2` is
   `i * 2 + 16` exactly, and the second access reads `a+16,x` on the X the
