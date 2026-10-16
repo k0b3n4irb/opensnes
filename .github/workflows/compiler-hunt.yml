@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       start:
-        description: first seed (default: from the date)
+        description: 'first seed (default: from the date)'
         required: false
   schedule:
     - cron: '30 2 * * *'   # nightly, 02:30 UTC
