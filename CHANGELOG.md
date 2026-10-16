@@ -49,6 +49,12 @@ All notable changes to OpenSNES are documented in this file.
   totals (`OPENSNES_ONLY` in `run.py`).
 
 ### Performance
+- perf(compiler): **`a[i + 8]` next to `a[i]` reuses its index when i is
+  bounded.** When i is a byte or masked by a constant, `(i + 8) * 2` is
+  `i * 2 + 16` exactly, and the second access reads `a+16,x` on the X the
+  first one loaded, instead of computing the index again. An unbounded
+  16-bit index is left as it is, since `i + 8` may wrap: the compiler does
+  not assume an access stays inside its array.
 - perf(compiler): **counted loops lose their copies and their jump back.**
   A step computed into temporaries then copied (`q += stride` on a far
   pointer) is stored into the variable at once; a value stored and read

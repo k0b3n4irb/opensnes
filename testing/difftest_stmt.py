@@ -479,6 +479,11 @@ def gen_lvalue(rng, P, addressable=False):
     if pick < 0.70 and (not addressable or [a for a in P.arrays if a not in P.far]):
         name = rng.choice([a for a in P.arrays if not addressable or a not in P.far])
         n = len(P.arrays[name][1])
+        if n >= 4 and rng.random() < 0.3:
+            # a bounded index plus a constant, `a[(e & 3) + 2]`: the shape
+            # the reassociation folds into the symbol (2026-10-16)
+            return (rng.choice("iid"), name, ("b", "+", masked(gen_expr(rng, P, 1), n // 2),
+                                               konst("s16", rng.randint(1, n // 2))))
         return (rng.choice("iid"), name, masked(gen_expr(rng, P, 1), n))
     base = rng.choice(["s", "p", ("a", masked(gen_expr(rng, P, 1), 2))])
     return ("f", base, rng.choice(P.fields)[0])
