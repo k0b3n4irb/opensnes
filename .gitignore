@@ -138,3 +138,4 @@ testing/manifests_pal/
 *_pal.sfc
 *_pal.sym
 tools/fuzz/fuzz_wav
+tools/fuzz/fuzz_rearrange

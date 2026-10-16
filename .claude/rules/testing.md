@@ -17,6 +17,7 @@ make test-manifests                                  # functional probes: `luna 
 # (LUNA_JOBS, default the CPU count; LUNA_JOBS=1 = serial, same output)
 python3 testing/difftest.py                 # the compiler against C's integer rules: random expressions run on luna in four shapes, model checked by clang (--seeds A-B to hunt; a Class A change runs a few thousand)
 python3 testing/difftest_stmt.py            # the same for small programs: loops, arrays, a struct, pointers, against an interpreter built on that model; a failure is reduced and names the wrong variable
+# compiler-hunt.yml runs both every night on a new window of 3,000 seeds each, chosen by the date (2026-10-16): the gate is fixed, the hunt walks
 python3 testing/wram_regress.py             # per-frame WRAM oracle over the corpus
 python3 testing/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 testing/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)

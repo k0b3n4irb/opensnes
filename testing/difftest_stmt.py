@@ -84,6 +84,8 @@ u8 pin_t[8] = { 10, 11, 12, 13, 14, 15, 16, 17 };
 u16 pin_w, pin_v, pin_u;
 struct PinC { unsigned int a : 3; unsigned int b : 11; };
 struct PinC pin_c = { 4, 140 };
+static const u16 pin_k[9] = { 0xFF00, 0x1234, 0x0F0F, 0xF0F0, 0x5555, 0x00FF, 0x0FF0, 0xAAAA, 0x1111 };
+FAR u16 pin_far[16] = { 0, 40503, 15470, 55973, 30940, 5907, 46410, 21377, 61880, 36847, 11814, 52317, 27284, 2251, 42754, 17721 };
 """
 PINNED = [
     # phi moves were emitted one after the other: `prev` read the new `cur`
@@ -152,6 +154,20 @@ PINNED = [
     ("a long and its truncated copy assigned on the same path",
      "u32 p13(u32 v) { s32 a = 0; u8 j = 0; if (pin_g) { a = 0 - v; j = a; } return (u32)a + j; }",
      "p13(0x00080000)", 0xFFF80000),
+    # a loop counter whose address is taken: the rule keeping a counter in X
+    # moved the increment to X and left the counter's second store, of a stale
+    # A (difftest_stmt seed 105, 2026-10-15)
+    ("a loop counter whose address is taken",
+     "u32 p14(void) { u16 i; u16 *q = &i; for (i = 0; i < 3; i++) { } return *q; }",
+     "p14()", 3),
+    # a pointer read three times a turn while another index is computed, a
+    # step through temporaries, a count tested at the top (2026-10-16)
+    ("a const table walked three words a turn into a far array",
+     "u32 p15(void) { const u16 *q = pin_k; u16 n, i = 1, m; u32 h = 0; "
+     "for (n = 3; n; n--, i++, q += 3) { m = q[0]; pin_far[i] = (pin_far[i] & m) | q[1]; "
+     "pin_far[i + 8] = (pin_far[i + 8] & m) | q[2]; } "
+     "for (n = 0; n < 16; n++) h = h * 31 + pin_far[n]; return h; }",
+     "p15()", 0x0A8E68AE),
 ]
 
 PROGS_PER_ROM = 10
@@ -200,6 +216,8 @@ class Prog:
         self.uinit = 0
         self.statics = []     # locals declared `static`
         self.fptab = None     # (rtype, [(name, type)], [expr, expr]): two functions behind a table
+        self.far = set()      # arrays declared FAR (bank $7E, far codegen)
+        self.ctabs = {}       # name -> (type, stride, rows, [values]): const tables walked by a pointer
         self.nlabel = 0
         self.ctx = []         # generator only: 'loop' / 'switch' nesting
         self.body = []
@@ -458,8 +476,8 @@ def gen_lvalue(rng, P, addressable=False):
         return ("fa", base, rng.choice(P.afields)[0], masked(gen_expr(rng, P, 1), 4))
     if not P.arrays:                               # a helper's scope: parameters only
         return ("v", rng.choice(list(P.vars)))
-    if pick < 0.70:
-        name = rng.choice(list(P.arrays))
+    if pick < 0.70 and (not addressable or [a for a in P.arrays if a not in P.far]):
+        name = rng.choice([a for a in P.arrays if not addressable or a not in P.far])
         n = len(P.arrays[name][1])
         return (rng.choice("iid"), name, masked(gen_expr(rng, P, 1), n))
     base = rng.choice(["s", "p", ("a", masked(gen_expr(rng, P, 1), 2))])
@@ -625,6 +643,14 @@ def gen_stmt(rng, P, depth):
             return ("pp", ty(cands[0], P), cands[0], gen_expr(rng, P, 2))
     if pick < 0.50:
         acc = rng.choice([n for n, t in P.vars.items() if t in UNSIGNED and n not in P.counters])
+        if P.ctabs and rng.random() < 0.5:
+            # a pointer walking a const table by `stride` elements, several
+            # fields read a row, one array element masked and merged
+            tab = rng.choice(list(P.ctabs))
+            stride = P.ctabs[tab][1]
+            arr = rng.choice(list(P.arrays))
+            return ("swalk", tab, acc, rng.choice("&|^"), rng.choice("&|^"),
+                    rng.randrange(1, stride), arr, rng.randrange(stride), rng.randrange(1, stride))
         return ("walk", rng.choice(list(P.arrays)), acc, rng.choice("+^|-"), rng.random() < 0.4)
     lv = gen_lvalue(rng, P)
     lt = ty(lv, P)
@@ -658,6 +684,10 @@ def gen_prog(rng) -> Prog:
     for n in range(rng.randint(1, 2)):
         t = rng.choice(TYPES)
         P.arrays[f"a{n}"] = (t, [D.interesting(rng, t) for _ in range(rng.choice([4, 8]))])
+    P.far = {a for a in P.arrays if rng.random() < 0.5}
+    if rng.random() < 0.6:
+        t, stride, rows = rng.choice(TYPES), rng.choice([2, 3, 4]), rng.randint(2, 6)
+        P.ctabs["k0"] = (t, stride, rows, [D.interesting(rng, t) for _ in range(stride * rows)])
     P.fields = [(f"f{n}", rng.choice(TYPES)) for n in range(rng.randint(2, 4))]
     P.sinit = {f: D.interesting(rng, t) for f, t in P.fields}
     P.sainit = [{f: D.interesting(rng, t) for f, t in P.fields} for _ in range(2)]
@@ -767,6 +797,18 @@ def run_block(block, P, env):
             while at is not None and at < len(arms):
                 run_block(arms[at][1], P, env)
                 at = at + 1 if arms[at][2] else None
+        elif k == "swalk":
+            _, tab, acc, op1, op2, f2, arr, j1, j2 = st
+            t, stride, rows, vals = P.ctabs[tab]
+            n = len(env[arr])
+            for r in range(rows):
+                rn = rows - r                         # the down counter's value in this turn
+                row = vals[r * stride:(r + 1) * stride]
+                v = ev(("b", op2, ("b", op1, ("v", acc), konst(t, row[0])), konst(t, row[f2])), P, env)
+                store(("v", acc), v.value, P, env)
+                elem = ("i", arr, konst("s16", rn & (n - 1)))
+                v = ev(("b", "|", ("b", "&", elem, konst(t, row[j1])), konst(t, row[j2])), P, env)
+                store(elem, v.value, P, env)
         elif k == "walk":
             _, arr, acc, op, write = st
             for n in range(len(env[arr])):
@@ -896,6 +938,16 @@ def c_block(block, ind):
                 out += c_block(blk, ind + 1)
                 out.append(f"{pad}    {'/* falls through */' if falls else 'break;'}")
             out.append(f"{pad}}}")
+        elif k == "swalk":
+            _, tab, acc, op1, op2, f2, arr, j1, j2 = st
+            t, stride, rows, _ = P_CUR.ctabs[tab]
+            mask = "(ARRLEN_" + arr + " - 1)"
+            out.append(f"{pad}{{ const {t} *pq = {tab}; u8 rn;")
+            out.append(f"{pad}    for (rn = {rows}; rn; rn--, pq += {stride}) {{")
+            out.append(f"{pad}        {acc} = ({acc} {op1} pq[0]) {op2} pq[{f2}];")
+            out.append(f"{pad}        {arr}[rn & {mask}] = ({arr}[rn & {mask}] & pq[{j1}]) | pq[{j2}];")
+            out.append(f"{pad}    }}")
+            out.append(f"{pad}}}")
         elif k == "walk":
             _, arr, acc, op, write = st
             n = "ARRLEN_" + arr
@@ -933,11 +985,14 @@ def c_helper(h, k: int, n: int) -> str:
         return (f"{rt} h{k}(u8 n, {rt} acc) {{ {rt} rv; if (n == 0) return acc; "
                 f"rv = h{k}(n - 1, acc); return {rd(h.expr)}; }}")
     if h.kind == "sum":
-        return (f"u32 h{k}({h.elem} *p, u8 n) {{ u32 t = 0; "
+        return (f"u32 h{k}(const {h.elem} *p, u8 n) {{ u32 t = 0; "
                 f"while (n--) {{ t = (t << 1) ^ (u32)*p++; }} return t; }}")
     if h.kind == "set":
         return f"void h{k}({rt} *p, {rt} v) {{ *p = v; }}"
     return f"{rt} h{k}(struct S{n} *q) {{ return {rd(h.expr)}; }}"
+
+
+P_CUR = None   # the program whose block c_block is writing (its tables)
 
 
 def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
@@ -951,7 +1006,11 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
         out.append(f"{P.vars[name]} {g}{name} = {P.init[name]};")
         names.append(name)
     for name, (t, vals) in P.arrays.items():
-        out.append(f"{t} {g}{name}[{len(vals)}] = {{ {', '.join(str(v) for v in vals)} }};")
+        far = "FAR " if name in P.far else ""
+        out.append(f"{far}{t} {g}{name}[{len(vals)}] = {{ {', '.join(str(v) for v in vals)} }};")
+        names.append(name)
+    for name, (t, stride, rows, vals) in P.ctabs.items():
+        out.append(f"static const {t} {g}{name}[{stride * rows}] = {{ {', '.join(str(v) for v in vals)} }};")
         names.append(name)
     for name, (t, rows) in P.mats.items():
         out.append(f"{t} {g}{name}[2][4] = {{ " + ", ".join(
@@ -996,7 +1055,9 @@ def c_prog(P, n: int, label: str, exp: int, probe: bool = False) -> tuple:
     out.append(f"    struct S{n} *ps = &s;")
     out.append("    u32 h = 0x811C9DC5UL;")
     for name, (t, vals) in P.arrays.items():
-        out.append(f"    {t} *pw_{name};")
+        out.append(f"    {t} {'FAR ' if name in P.far else ''}*pw_{name};")
+    global P_CUR
+    P_CUR = P
     text = "\n".join(c_block(P.body, 1))
     for name, (t, vals) in P.arrays.items():
         text = text.replace("ARRLEN_" + name, str(len(vals)))
