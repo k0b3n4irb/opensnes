@@ -49,6 +49,12 @@ All notable changes to OpenSNES are documented in this file.
   totals (`OPENSNES_ONLY` in `run.py`).
 
 ### Performance
+- perf(compiler): **counted loops lose their copies and their jump back.**
+  A step computed into temporaries then copied (`q += stride` on a far
+  pointer) is stored into the variable at once; a value stored and read
+  back before the step's label is not; and a loop whose count is tested at
+  its top tests it at its end (`dec n / bne @body` instead of a jump back
+  to the test).
 - perf(compiler): **a pointer read several times in a row is set up once.**
   `q[0]`, `q[1]`, `q[2]` read through one pointer, with another array's
   index computed between them, set the pointer up again before each read;

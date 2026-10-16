@@ -1,3 +1,8 @@
+# Since 2026-10-16 a stored value copied to its slot further down is stored
+# there at once, and a counted loop tests at its end (see forward_store,
+# dec_loop): the case pins the phi moves themselves.
+env QBE_NO_PEEP_FWDSTORE=1
+env QBE_NO_PEEP_DECLOOP=1
 # Since 2026-10-10 a phi and the value that feeds it share a slot when they
 # can (see phi_share): the copies this case pins are the ones made when
 # they cannot, so it is compiled with the sharing off.

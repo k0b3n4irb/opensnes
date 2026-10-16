@@ -1,0 +1,4 @@
+# q += stride straight into q; the count tested at the end of the turn.
+in column: present \tadc\.b tcc__lf\+0\n\tsta\.b tcc__lf\+0\n\tlda\.b tcc__lf\+24\n\tadc\.b tcc__lf\+2\n\tsta\.b tcc__lf\+2\n\tdec\.b tcc__lf\+6\n\tbne @for_body
+# no store read back before the step's label
+in column: absent \tsta\.b (tcc__lf\+\d+)\n\tlda\.b \1\n\tsta\.l buf
