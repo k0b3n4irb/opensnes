@@ -40,12 +40,14 @@ concurrency:
 jobs:
   fuzz:
     runs-on: ubuntu-latest
-    # 5 targets x 600 s = 50 min of fuzzing, plus building the harnesses.
+    # 7 targets x 600 s = 70 min of fuzzing, plus building the harnesses
+    # (wav and rearrange came in at 70: the run of 2026-10-16 was cancelled
+    # at its 70th minute).
     # It was 40 when there were two targets; three were added without it,
     # so every night that found nothing was killed at 40 min and shown as
     # "cancelled" (2026-09-20, -21, -23, -25): the workflow could never pass.
     # Raise it with the target list or the seconds.
-    timeout-minutes: 70
+    timeout-minutes: 90
     steps:
       # A scheduled run starts on the default branch (main), which lags
       # develop by days between releases: every night re-tested the last
