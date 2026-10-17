@@ -7,6 +7,7 @@
 #include "quantize.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../../../common/xalloc.h"
 
 /* A "box" in RGB space containing a set of pixel colors */
 typedef struct {
@@ -218,11 +219,11 @@ int quantize_median_cut(
     /* Use a simple hash table for dedup */
     #define HASH_SIZE 65536
     typedef struct hnode { unsigned char r, g, b; int freq; int idx; struct hnode *next; } hnode;
-    hnode **htable = calloc(HASH_SIZE, sizeof(hnode *));
+    hnode **htable = xcalloc(HASH_SIZE, sizeof(hnode *));
     ucolor_t *ucolors = NULL;
     int nucolors = 0;
     int ucap = 4096;
-    ucolors = malloc(ucap * sizeof(ucolor_t));
+    ucolors = xmalloc(ucap * sizeof(ucolor_t));
 
     for (int i = 0; i < npixels; i++) {
         if (pixels[i].a < 128) continue;
@@ -242,7 +243,7 @@ int quantize_median_cut(
             if (nucolors >= ucap) {
                 ucolor_t *grown;
                 ucap *= 2;
-                grown = realloc(ucolors, ucap * sizeof(ucolor_t));
+                grown = xrealloc(ucolors, ucap * sizeof(ucolor_t));
                 if (!grown) {
                     fprintf(stderr, "img2snes: out of memory (unique colours)\n");
                     exit(1);
@@ -254,7 +255,7 @@ int quantize_median_cut(
             ucolors[nucolors].b = b;
             ucolors[nucolors].freq = 1;
 
-            hnode *nn = malloc(sizeof(hnode));
+            hnode *nn = xmalloc(sizeof(hnode));
             nn->r = r; nn->g = g; nn->b = b;
             nn->freq = 1; nn->idx = nucolors;
             nn->next = htable[h];
@@ -285,11 +286,11 @@ int quantize_median_cut(
         }
     } else {
         /* Median-cut: allocate index array for boxes */
-        int *idx_pool = malloc(nucolors * sizeof(int));
+        int *idx_pool = xmalloc(nucolors * sizeof(int));
         for (int i = 0; i < nucolors; i++) idx_pool[i] = i;
 
         /* Allocate boxes (max opaque_colors) */
-        color_box_t *boxes = calloc(opaque_colors, sizeof(color_box_t));
+        color_box_t *boxes = xcalloc(opaque_colors, sizeof(color_box_t));
         boxes[0].indices = idx_pool;
         boxes[0].count = nucolors;
         box_compute_bounds(&boxes[0], ucolors);

@@ -117,7 +117,8 @@ typedef struct {
 
 spc_bank_t *spc_bank_create(const itl_bank_t *bank, bool hirom, bool chksfx);
 void spc_bank_destroy(spc_bank_t *b);
-void spc_bank_export(const spc_bank_t *b, const char *output,
+/* false when one of the three outputs (.bnk, .asm, .h) cannot be opened */
+bool spc_bank_export(const spc_bank_t *b, const char *output,
                      bool no_header, const char *symbol_prefix, int banknum);
 void spc_bank_make_spc(const spc_bank_t *b, const char *spcfile);
 void spc_bank_set_verbose(bool v);

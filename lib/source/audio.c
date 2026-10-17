@@ -235,7 +235,7 @@ u8 audioInit(void) {
     }
     apuUpload(audio_driver_blob, SPC_DRIVER_BASE,
               /* two labels of one asm section, not two objects */
-              /* cppcheck-suppress comparePointers */
+              /* cppcheck-suppress [comparePointers,subtractPointers] */
               (u16)(audio_driver_blob_end - audio_driver_blob));
     apuExecute(SPC_DRIVER_BASE);
 

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include "brr.h"
+#include "../../../common/xalloc.h"
 
 enum {
     MaxUnrollThreshold = 2000,
@@ -287,7 +288,7 @@ static double resample_loop(s16 **data, int *length,
     int new_loopstart = new_length - new_looplength;
     double factor = (double)(*length) / (double)new_length;
 
-    s16 *newdata = malloc(new_length * sizeof(s16));
+    s16 *newdata = xmalloc(new_length * sizeof(s16));
     for (int t = 0; t < new_length; t++) {
         int a_idx = (int)floor((double)t * factor);
         double sa = a_idx < *length ? (*data)[a_idx] : (*data)[a_idx - *looplength];
@@ -314,7 +315,7 @@ static double resample_loop(s16 **data, int *length,
 static void pad_data(s16 **data, int *length, int *loopstart,
                      int begin, int end)
 {
-    s16 *newdata = malloc((*length + begin + end) * sizeof(s16));
+    s16 *newdata = xmalloc((*length + begin + end) * sizeof(s16));
     s16 *out = newdata;
     for (int i = 0; i < begin; i++)
         *out++ = 0;
@@ -331,7 +332,7 @@ static void pad_data(s16 **data, int *length, int *loopstart,
 static void unroll_loop(s16 **data, int *length, int *loopstart,
                         int *looplength, int unroll)
 {
-    s16 *newdata = malloc((*length + *looplength * unroll) * sizeof(s16));
+    s16 *newdata = xmalloc((*length + *looplength * unroll) * sizeof(s16));
     s16 *out = newdata;
     for (int i = 0; i < *loopstart; i++)
         *out++ = (*data)[i];
@@ -348,7 +349,7 @@ static void unroll_bidi_loop(s16 **data, int *length, int *loopstart,
                              int *looplength)
 {
     (void)loopstart;
-    s16 *newdata = malloc((*length + *looplength) * sizeof(s16));
+    s16 *newdata = xmalloc((*length + *looplength) * sizeof(s16));
     s16 *out = newdata;
     for (int i = 0; i < *length; i++)
         *out++ = (*data)[i];
@@ -383,7 +384,7 @@ void brr_encode(const s8 *data8, const s16 *data16, int bits16,
     if ((length > loopstart + looplength) && looplength)
         length = loopstart + looplength;
 
-    s16 *cdata = malloc(length * sizeof(s16));
+    s16 *cdata = xmalloc(length * sizeof(s16));
     if (bits16) {
         for (int i = 0; i < length; i++)
             cdata[i] = data16[i];
@@ -414,7 +415,7 @@ void brr_encode(const s8 *data8, const s16 *data16, int bits16,
 
     int brr_length = length / 16 * 9;
     int brr_loop = (loopstart / 16) * 9;
-    u8 *brr_data = malloc(brr_length);
+    u8 *brr_data = xmalloc(brr_length);
 
     double amp = 1.0;
     u8 c_redo = 1;

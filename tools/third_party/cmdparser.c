@@ -305,6 +305,10 @@ static void cmdp_fprint_all_documents_recursive(FILE *fp, cmdp_command_st *cmdp,
         }
         size_t cmd_name_len = strlen(command_name) + strlen(p->name) + 2;
         char *cmd_name      = (char *)malloc(cmd_name_len);
+        if (cmd_name == NULL) /* OpenSNES local change: a failed allocation skips the entry */
+        {
+            continue;
+        }
         memset(cmd_name, 0, cmd_name_len);
         snprintf(cmd_name, cmd_name_len, "%s %s", command_name, p->name);
 

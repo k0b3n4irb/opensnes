@@ -3,6 +3,7 @@
 #include <string.h>
 #include "itloader.h"
 #include "report.h"
+#include "../../../common/xalloc.h"
 
 
 /*==========================================================================
@@ -11,7 +12,7 @@
 
 itl_pattern_t *itl_pattern_create(io_file_t *f)
 {
-    itl_pattern_t *p = calloc(1, sizeof(*p));
+    itl_pattern_t *p = xcalloc(1, sizeof(*p));
     p->data_length = io_read16(f);
     p->rows = io_read16(f);
     io_skip(f, 4); /* reserved */
@@ -20,7 +21,7 @@ itl_pattern_t *itl_pattern_create(io_file_t *f)
      * asked for 4 GB from a 2.5 KB input (tools/fuzz, 2026-09-22). */
     if ((u32)p->data_length > io_remaining(f))
         p->data_length = (u16)io_remaining(f);
-    p->data = malloc(p->data_length ? p->data_length : 1);
+    p->data = xmalloc(p->data_length ? p->data_length : 1);
     for (int i = 0; i < p->data_length; i++)
         p->data[i] = io_read8(f);
     return p;
@@ -28,10 +29,10 @@ itl_pattern_t *itl_pattern_create(io_file_t *f)
 
 itl_pattern_t *itl_pattern_create_empty(void)
 {
-    itl_pattern_t *p = calloc(1, sizeof(*p));
+    itl_pattern_t *p = xcalloc(1, sizeof(*p));
     p->rows = 64;
     p->data_length = 0;
-    p->data = calloc(p->rows, 1);
+    p->data = xcalloc(p->rows, 1);
     return p;
 }
 
@@ -48,7 +49,7 @@ void itl_pattern_destroy(itl_pattern_t *p)
 
 itl_envelope_t *itl_envelope_create(io_file_t *f)
 {
-    itl_envelope_t *e = calloc(1, sizeof(*e));
+    itl_envelope_t *e = xcalloc(1, sizeof(*e));
     u8 flg = io_read8(f);
     e->enabled = !!(flg & 1);
     e->loop = !!(flg & 2);
@@ -77,7 +78,7 @@ void itl_envelope_destroy(itl_envelope_t *e)
 
 itl_instrument_t *itl_instrument_create(io_file_t *f)
 {
-    itl_instrument_t *inst = calloc(1, sizeof(*inst));
+    itl_instrument_t *inst = xcalloc(1, sizeof(*inst));
     io_skip(f, 4); /* IMPI */
     inst->dos_filename[12] = 0;
     for (int i = 0; i < 12; i++)
@@ -239,7 +240,7 @@ static int itl_sample_decompress(itl_sample_t *s, io_file_t *f)
     const bool bits16 = s->data.bits16;
     const bool it215 = !!(s->convert & 4);
     const u32 block_max = bits16 ? 0x4000 : 0x8000;
-    u8 *block = malloc(0x10000);
+    u8 *block = xmalloc(0x10000);
     u32 length = (u32)s->data.length;
     int failed = 0;
 
@@ -288,11 +289,11 @@ static bool itl_sample_load_data(itl_sample_t *s, io_file_t *f)
             s->data.length = (int)avail;
         }
         if (s->data.bits16) {
-            s->data.data16 = malloc(s->data.length * sizeof(s16));
+            s->data.data16 = xmalloc(s->data.length * sizeof(s16));
             for (int i = 0; i < s->data.length; i++)
                 s->data.data16[i] = io_read16(f) + offset;
         } else {
-            s->data.data8 = malloc(s->data.length * sizeof(s8));
+            s->data.data8 = xmalloc(s->data.length * sizeof(s8));
             for (int i = 0; i < s->data.length; i++)
                 s->data.data8[i] = io_read8(f) + offset;
         }
@@ -307,9 +308,9 @@ static bool itl_sample_load_data(itl_sample_t *s, io_file_t *f)
             s->data.length = (int)avail;
         size_t frames = s->data.length ? (size_t)s->data.length : 1;
         if (s->data.bits16)
-            s->data.data16 = malloc(frames * sizeof(s16));
+            s->data.data16 = xmalloc(frames * sizeof(s16));
         else
-            s->data.data8 = malloc(frames * sizeof(s8));
+            s->data.data8 = xmalloc(frames * sizeof(s8));
         int block = itl_sample_decompress(s, f);
         if (block) {
             smconv_report(SMC_ERROR, NULL, "sample '%s': corrupt compressed data (block %d)", s->name, block);
@@ -327,7 +328,7 @@ static bool itl_sample_load_data(itl_sample_t *s, io_file_t *f)
 
 itl_sample_t *itl_sample_create(io_file_t *f)
 {
-    itl_sample_t *s = calloc(1, sizeof(*s));
+    itl_sample_t *s = xcalloc(1, sizeof(*s));
     io_skip(f, 4); /* IMPS */
     s->dos_filename[12] = 0;
     for (int i = 0; i < 12; i++)
@@ -395,7 +396,7 @@ void itl_sample_data_init(itl_sample_data_t *sd)
 
 itl_sample_data_t *itl_sample_data_from_wav(const char *filename)
 {
-    itl_sample_data_t *sd = calloc(1, sizeof(*sd));
+    itl_sample_data_t *sd = xcalloc(1, sizeof(*sd));
     sd->c5speed = 32000;
 
     u32 file_size = io_file_size(filename);
@@ -453,9 +454,9 @@ itl_sample_data_t *itl_sample_data_from_wav(const char *filename)
             sd->length = chunk_size / (bit_depth / 8) / num_channels;
 
             if (bit_depth == 16)
-                sd->data16 = malloc(chunk_size / 2 * sizeof(s16));
+                sd->data16 = xmalloc(chunk_size / 2 * sizeof(s16));
             else
-                sd->data8 = malloc(chunk_size * sizeof(s8));
+                sd->data8 = xmalloc(chunk_size * sizeof(s8));
 
             for (int t = 0; t < sd->length; t++) {
                 int dat = 0;
@@ -486,7 +487,7 @@ itl_sample_data_t *itl_sample_data_from_wav(const char *filename)
 
 itl_module_t *itl_module_create(const char *filename)
 {
-    itl_module_t *m = calloc(1, sizeof(*m));
+    itl_module_t *m = xcalloc(1, sizeof(*m));
     strncpy(m->filename, filename, sizeof(m->filename) - 1);
 
     io_file_t f;
@@ -561,13 +562,13 @@ itl_module_t *itl_module_create(const char *filename)
         return m;
     }
 
-    m->instruments = malloc(m->instrument_count * sizeof(itl_instrument_t *));
-    m->samples = malloc(m->sample_count * sizeof(itl_sample_t *));
-    m->patterns = malloc(m->pattern_count * sizeof(itl_pattern_t *));
+    m->instruments = xmalloc(m->instrument_count * sizeof(itl_instrument_t *));
+    m->samples = xmalloc(m->sample_count * sizeof(itl_sample_t *));
+    m->patterns = xmalloc(m->pattern_count * sizeof(itl_pattern_t *));
 
-    u32 *instr_table = malloc(m->instrument_count * sizeof(u32));
-    u32 *sample_table = malloc(m->sample_count * sizeof(u32));
-    u32 *pattern_table = malloc(m->pattern_count * sizeof(u32));
+    u32 *instr_table = xmalloc(m->instrument_count * sizeof(u32));
+    u32 *sample_table = xmalloc(m->sample_count * sizeof(u32));
+    u32 *pattern_table = xmalloc(m->pattern_count * sizeof(u32));
 
     for (int i = 0; i < m->instrument_count; i++)
         instr_table[i] = io_read32(&f);
@@ -600,7 +601,7 @@ itl_module_t *itl_module_create(const char *filename)
     }
 
     if (m->message_length) {
-        m->message = malloc(m->message_length + 1);
+        m->message = xmalloc(m->message_length + 1);
         io_seek(&f, message_offset);
         m->message[m->message_length] = 0;
         for (int i = 0; i < m->message_length; i++)
@@ -638,8 +639,8 @@ void itl_module_destroy(itl_module_t *m)
 
 itl_bank_t *itl_bank_create(const char **files, int file_count)
 {
-    itl_bank_t *b = calloc(1, sizeof(*b));
-    b->modules = malloc(file_count * sizeof(itl_module_t *));
+    itl_bank_t *b = xcalloc(1, sizeof(*b));
+    b->modules = xmalloc(file_count * sizeof(itl_module_t *));
     b->module_count = file_count;
     for (int i = 0; i < file_count; i++)
         b->modules[i] = itl_module_create(files[i]);

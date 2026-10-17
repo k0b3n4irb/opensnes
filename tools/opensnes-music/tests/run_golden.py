@@ -50,6 +50,28 @@ def spc_written():
     return []
 
 
+def unwritable(blocked):
+    """An output that cannot be opened (a folder of that name is in the way):
+    the tool says so and exits 3, where it used to write through NULL (.asm,
+    .h) or skip the .bnk in silence and exit 0."""
+    def run():
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / blocked).mkdir()
+            proc = g.run(["bank", "-q", "--name", "soundbank", "pollen8.it"], work, copy=["pollen8.it"])
+            errs = []
+            if proc.returncode != 3:
+                errs.append(f"exit {proc.returncode}, want 3 (I/O)")
+            if "cannot write the soundbank" not in g.said(proc):
+                errs.append(f"without 'cannot write the soundbank': {g.said(proc).strip()[-120:]}")
+            return errs
+    return run
+
+
+for blocked in ("soundbank.bnk", "soundbank.asm", "soundbank.h"):
+    g.check(f"bank with {blocked} unwritable", "exit 3, said", unwritable(blocked))
+
+
 g.check("spc pollen8.it: a 66048-byte SPC file", "SPC700 header, 64 KB RAM + registers", spc_written)
 g.expect_refused("bank junk.it (not an IT module)", ["bank", "junk.it"], write={"junk.it": b"junk" * 16},
                  needles=["opensnes-music: junk.it: 'junk.it' is not an Impulse Tracker module"], nothing_written=["junk.asm", "junk.h", "junk.bnk"])

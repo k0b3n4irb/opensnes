@@ -165,11 +165,16 @@ static int run_bank(cli_ctx *ctx)
         if (out->modules[i]->totalsize > SPC_RAM_FOR_MUSIC)
             cli_warn(ctx, bank->modules[i]->filename, "needs %u bytes of SPC RAM, more than the %d a module may take — drop samples or patterns",
                      out->modules[i]->totalsize, SPC_RAM_FOR_MUSIC);
-    spc_bank_export(out, base, true, name, banknum);
+    if (!spc_bank_export(out, base, true, name, banknum)) {
+        cli_error(ctx, base, "cannot write the soundbank (.bnk, .asm or .h)");
+        spc_bank_destroy(out); itl_bank_destroy(bank); return CLI_IO;
+    }
 
     if (cli_has(ctx, "save") && !composed) {
         /* the composed form of this run: NAME.toml beside the outputs, listing the modules */
-        char toml[1100], list[2048] = "";
+        char toml[1100];
+        static char list[2048];   /* static: ctx->given points at it while the settings are saved */
+        list[0] = '\0';
         snprintf(toml, sizeof toml, "%s.toml", base);
         for (int i = 0; i < nfiles; i++) {
             const char *bn = strrchr(files[i], '/') ? strrchr(files[i], '/') + 1 : files[i];
@@ -178,8 +183,12 @@ static int run_bank(cli_ctx *ctx)
         }
         int idx = -1;
         for (int i = 0; i < ctx->cmd->nopts; i++) if (strcmp(ctx->cmd->opts[i].name, "inputs") == 0) idx = i;
+        /* the saved file lists the modules; the option is put back after,
+         * so that ctx never keeps a pointer to this block's buffer */
+        const char *was = idx >= 0 ? ctx->given[idx] : NULL;
         if (idx >= 0) ctx->given[idx] = list;
         rc = cli_save_settings_path(ctx, toml, name);
+        if (idx >= 0) ctx->given[idx] = was;
         if (rc != CLI_OK) { spc_bank_destroy(out); itl_bank_destroy(bank); return rc; }
     }
 

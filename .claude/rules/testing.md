@@ -46,7 +46,7 @@ runs inside the sanitizer job. A regression or an XPASS fails it.
 IT loader, cute_tiled, the aseprite2snes JSON parser, stb_image) for `FUZZ_SECONDS` each; `fuzz.yml` (on any push touching `tools/`, and weekly) gives them ten
 minutes, `make fuzz-replay` (in the sanitizer job) replays the committed
 crash inputs. `make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
-where cppcheck is absent, CI installs it). `make test-link-modules` links every lib module alone with only the
+where cppcheck is absent; CI builds the pinned 2.22.0 from its tag, sha256-checked, since 2026-10-17: a newer cppcheck reports more, so the version is part of the gate). `make test-link-modules` links every lib module alone with only the
 dependencies `make/common.mk` declares (`_DEP_<module>`), and in two
 all-together groups; a module that needs a symbol from a module it does
 not declare fails here instead of in a user's project. Runs in

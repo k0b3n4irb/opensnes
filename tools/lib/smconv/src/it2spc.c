@@ -8,6 +8,7 @@
 #include "brr.h"
 #include "report.h"
 #include "spc_program.h"
+#include "../../../common/xalloc.h"
 
 
 static u8 g_current_instrument = 0;
@@ -84,7 +85,7 @@ static void pat_push(spc_pattern_t *p, u8 val)
 {
     if (p->data_size >= p->data_cap) {
         p->data_cap = p->data_cap ? p->data_cap * 2 : 256;
-        p->data = realloc(p->data, p->data_cap);
+        p->data = xrealloc(p->data, p->data_cap);
     }
     p->data[p->data_size++] = val;
 }
@@ -95,7 +96,7 @@ static void pat_push(spc_pattern_t *p, u8 val)
 
 spc_source_t *spc_source_create(const itl_sample_data_t *src)
 {
-    spc_source_t *s = calloc(1, sizeof(*s));
+    spc_source_t *s = xcalloc(1, sizeof(*s));
     int length = 0, loop = 0;
     brr_encode(src->data8, src->data16, src->bits16,
                src->length, src->loop_start, src->loop_end,
@@ -148,7 +149,7 @@ void spc_source_export(const spc_source_t *s, io_file_t *f, bool spc_direct)
 
 spc_sample_t *spc_sample_create(const itl_sample_t *src, int directory, double tuning)
 {
-    spc_sample_t *s = calloc(1, sizeof(*s));
+    spc_sample_t *s = xcalloc(1, sizeof(*s));
     s->default_volume = src->default_volume;
     s->global_volume = src->global_volume;
     s->set_pan = src->default_panning ^ 128;
@@ -179,7 +180,7 @@ void spc_sample_export(const spc_sample_t *s, io_file_t *f)
 
 spc_instrument_t *spc_instrument_create(const itl_instrument_t *src)
 {
-    spc_instrument_t *inst = calloc(1, sizeof(*inst));
+    spc_instrument_t *inst = xcalloc(1, sizeof(*inst));
     int a = src->fadeout / 4;
     inst->fadeout = a > 255 ? 255 : a;
     inst->sample_index = src->notemap[60].sample - 1;
@@ -196,7 +197,7 @@ spc_instrument_t *spc_instrument_create(const itl_instrument_t *src)
         inst->envelope_loop_end = e->loop ? e->loop_end * 4 : 0xFF;
 
         int n = inst->envelope_length / 4;
-        inst->envelope_data = malloc(n * sizeof(spc_envelope_node_t));
+        inst->envelope_data = xmalloc(n * sizeof(spc_envelope_node_t));
         for (int i = 0; i < n; i++) {
             spc_envelope_node_t *ed = &inst->envelope_data[i];
             ed->y = e->nodes[i].y;
@@ -265,7 +266,7 @@ void spc_instrument_export(const spc_instrument_t *inst, io_file_t *f)
 
 spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
 {
-    spc_pattern_t *p = calloc(1, sizeof(*p));
+    spc_pattern_t *p = xcalloc(1, sizeof(*p));
     p->rows = (u8)(source->rows - 1);
 
     u8 *read = source->data;
@@ -285,7 +286,7 @@ spc_pattern_t *spc_pattern_create(itl_pattern_t *source)
             if (row_buf_size >= row_buf_cap) { \
                 u8 *grown; \
                 row_buf_cap = row_buf_cap ? row_buf_cap * 2 : 64; \
-                grown = realloc(row_buf, row_buf_cap); \
+                grown = xrealloc(row_buf, row_buf_cap); \
                 if (!grown) { \
                     smconv_report(SMC_FATAL, NULL, "out of memory (pattern row buffer)"); \
                     exit(1); \
@@ -543,14 +544,14 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
                                 spc_source_t **sources, int source_total)
 {
     (void)source_total;
-    spc_module_t *m = calloc(1, sizeof(*m));
+    spc_module_t *m = xcalloc(1, sizeof(*m));
     spc_path2id("MOD_", mod->filename, m->id, sizeof(m->id));
 
     m->initial_volume = mod->global_volume;
     m->initial_tempo = mod->initial_tempo;
     m->initial_speed = mod->initial_speed;
 
-    m->source_list = malloc(source_list_count * sizeof(u16));
+    m->source_list = xmalloc(source_list_count * sizeof(u16));
     memcpy(m->source_list, source_list, source_list_count * sizeof(u16));
     m->source_list_count = source_list_count;
 
@@ -566,19 +567,19 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
 
     /* Patterns */
     m->pattern_count = mod->pattern_count;
-    m->patterns = malloc(m->pattern_count * sizeof(spc_pattern_t *));
+    m->patterns = xmalloc(m->pattern_count * sizeof(spc_pattern_t *));
     for (int i = 0; i < mod->pattern_count; i++)
         m->patterns[i] = spc_pattern_create(mod->patterns[i]);
 
     /* Instruments */
     m->instrument_count = mod->instrument_count;
-    m->instruments = malloc(m->instrument_count * sizeof(spc_instrument_t *));
+    m->instruments = xmalloc(m->instrument_count * sizeof(spc_instrument_t *));
     for (int i = 0; i < mod->instrument_count; i++)
         m->instruments[i] = spc_instrument_create(mod->instruments[i]);
 
     /* Samples */
     m->sample_count = directory_count;
-    m->samples = malloc(m->sample_count * sizeof(spc_sample_t *));
+    m->samples = xmalloc(m->sample_count * sizeof(spc_sample_t *));
     for (int i = 0; i < directory_count; i++) {
         m->samples[i] = spc_sample_create(
             mod->samples[i],
@@ -710,9 +711,9 @@ void spc_module_export(const spc_module_t *m, io_file_t *f, bool write_header)
     for (int i = 0; i < (max_patterns + max_instruments + max_samples); i++)
         io_write16(f, 0xBAAA);
 
-    u16 *pattern_ptr = calloc(m->pattern_count, sizeof(u16));
-    u16 *instrument_ptr = calloc(m->instrument_count, sizeof(u16));
-    u16 *sample_ptr = calloc(m->sample_count, sizeof(u16));
+    u16 *pattern_ptr = xcalloc(m->pattern_count, sizeof(u16));
+    u16 *instrument_ptr = xcalloc(m->instrument_count, sizeof(u16));
+    u16 *sample_ptr = xcalloc(m->sample_count, sizeof(u16));
 
     for (int i = 0; i < m->pattern_count; i++) {
         u32 ptr = io_tell(f) - module_start;
@@ -787,7 +788,7 @@ static int bank_add_source(spc_bank_t *b, spc_source_t *s)
             return i;
         }
     }
-    b->sources = realloc(b->sources, (b->source_count + 1) * sizeof(spc_source_t *));
+    b->sources = xrealloc(b->sources, (b->source_count + 1) * sizeof(spc_source_t *));
     b->sources[b->source_count] = s;
     return b->source_count++;
 }
@@ -805,9 +806,9 @@ static void bank_add_module(spc_bank_t *b, const itl_module_t *mod)
     }
     totalitsize += size;
 
-    u16 *source_list = calloc(mod->sample_count, sizeof(u16));
+    u16 *source_list = xcalloc(mod->sample_count, sizeof(u16));
     int source_list_count = 0;
-    u8 *directory = calloc(mod->sample_count, sizeof(u8));
+    u8 *directory = xcalloc(mod->sample_count, sizeof(u8));
 
     for (int i = 0; i < mod->sample_count; i++) {
         spc_source_t *s = spc_source_create(&mod->samples[i]->data);
@@ -837,7 +838,7 @@ static void bank_add_module(spc_bank_t *b, const itl_module_t *mod)
                                          directory, mod->sample_count,
                                          b->sources, b->source_count);
 
-    b->modules = realloc(b->modules, (b->module_count + 1) * sizeof(spc_module_t *));
+    b->modules = xrealloc(b->modules, (b->module_count + 1) * sizeof(spc_module_t *));
     b->modules[b->module_count++] = m;
 
     free(source_list);
@@ -846,7 +847,7 @@ static void bank_add_module(spc_bank_t *b, const itl_module_t *mod)
 
 spc_bank_t *spc_bank_create(const itl_bank_t *bank, bool hirom, bool chksfx)
 {
-    spc_bank_t *b = calloc(1, sizeof(*b));
+    spc_bank_t *b = xcalloc(1, sizeof(*b));
     b->hirom = hirom;
     g_chksfx = chksfx;
 
@@ -963,9 +964,11 @@ void spc_bank_make_spc(const spc_bank_t *b, const char *spcfile)
     io_close(&f);
 }
 
-static void export_asm(const spc_bank_t *b, const char *inputfile, const char *outputfile)
+static bool export_asm(const spc_bank_t *b, const char *inputfile, const char *outputfile)
 {
     FILE *fp = fopen(outputfile, "w");
+    if (!fp)
+        return false;
     int size = io_file_size(inputfile);
 
     fprintf(fp,
@@ -1034,11 +1037,14 @@ static void export_asm(const spc_bank_t *b, const char *inputfile, const char *o
     }
 
     fclose(fp);
+    return true;
 }
 
-static void export_inc(const spc_bank_t *b, const char *output)
+static bool export_inc(const spc_bank_t *b, const char *output)
 {
     FILE *fp = fopen(output, "w");
+    if (!fp)
+        return false;
 
     fprintf(fp,
             "// snesmod soundbank definitions\n\n"
@@ -1079,9 +1085,10 @@ static void export_inc(const spc_bank_t *b, const char *output)
     fprintf(fp, "\n#define SOUNDBANK_BANK %i\n", g_banknum);
     fprintf(fp, "\n#endif // __SOUNDBANK_DEFINITIONS__\n");
     fclose(fp);
+    return true;
 }
 
-void spc_bank_export(const spc_bank_t *b, const char *output,
+bool spc_bank_export(const spc_bank_t *b, const char *output,
                      bool no_header, const char *symbol_prefix, int banknum)
 {
     g_no_header = no_header;
@@ -1093,7 +1100,8 @@ void spc_bank_export(const spc_bank_t *b, const char *output,
 
     io_file_t f;
     io_init(&f);
-    io_open(&f, bin_output, IO_MODE_WRITE);
+    if (!io_open(&f, bin_output, IO_MODE_WRITE))
+        return false;
 
     io_write16(&f, b->source_count);
     io_write16(&f, b->module_count);
@@ -1104,8 +1112,8 @@ void spc_bank_export(const spc_bank_t *b, const char *output,
     for (int i = 0; i < b->source_count * 3; i++)
         io_write8(&f, 0xAA);
 
-    u32 *module_ptr = calloc(b->module_count, sizeof(u32));
-    u32 *source_ptr = calloc(b->source_count, sizeof(u32));
+    u32 *module_ptr = xcalloc(b->module_count, sizeof(u32));
+    u32 *source_ptr = xcalloc(b->source_count, sizeof(u32));
 
     for (int i = 0; i < b->module_count; i++) {
         module_ptr[i] = io_tell(&f);
@@ -1156,11 +1164,12 @@ void spc_bank_export(const spc_bank_t *b, const char *output,
 
     char asm_out[1024];
     snprintf(asm_out, sizeof(asm_out), "%s.asm", output);
-    export_asm(b, bin_output, asm_out);
+    if (!export_asm(b, bin_output, asm_out))
+        return false;
 
     char inc_out[1024];
     snprintf(inc_out, sizeof(inc_out), "%s.h", output);
-    export_inc(b, inc_out);
+    return export_inc(b, inc_out);
 }
 
 void spc_bank_set_verbose(bool v)

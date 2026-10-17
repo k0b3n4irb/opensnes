@@ -152,6 +152,13 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(tools): **an output `opensnes-music bank` cannot open is an error.**
+  When the `.asm` or `.h` could not be opened the tool wrote through a null
+  pointer and crashed; when the `.bnk` could not, it wrote nothing and
+  exited 0. It now says "cannot write the soundbank" and exits 3. The
+  converters behind `opensnes-music`, `opensnes-image` and
+  `opensnes-palette` also stop with "out of memory" (exit 3) on a failed
+  allocation instead of writing through a null pointer.
 - fix(tools): **`opensnes-level` refuses a tile layer whose name is not a
   plain file name.** The name comes from the map and names the output file;
   a layer called `../escape/PWN` wrote outside `--out`, and a name of 1000
