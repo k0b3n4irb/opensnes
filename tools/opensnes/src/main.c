@@ -26,26 +26,26 @@
 
 #ifdef _WIN32
 #include <direct.h>
+#include <fcntl.h>
 #include <io.h>
 #include <process.h>
 #include <windows.h>
 #define os_mkdir(p) _mkdir(p)
 #define os_getcwd _getcwd
-#define os_popen _popen
-#define os_pclose _pclose
 #define PATH_LIST_SEP ';'
 #define DEVNULL "NUL"
 #define EXE ".exe"
 #else
 #include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
 #define os_mkdir(p) mkdir(p, 0777)
 #define os_getcwd getcwd
-#define os_popen popen
-#define os_pclose pclose
 #define PATH_LIST_SEP ':'
 #define DEVNULL "/dev/null"
 #define EXE ""
@@ -230,16 +230,121 @@ static int require_project(cli_ctx *ctx, char *out, size_t n)
     return 0;
 }
 
-/* The first line a command prints (a version). */
-static void first_line(const char *cmd, char *out, size_t n)
+/* Run a program with its arguments and no shell between: a path that holds
+ * $, a backquote, a quote or a space reaches the program as it is, and is
+ * never read as a command (audit 07-3, 2026-10-17: a project folder named
+ * p$(touch x) ran touch). Returns the program's exit code, or -1 when it
+ * could not be started. to_stderr sends its stdout to our stderr; line, when
+ * not NULL, receives the first line of its stdout instead, and its stderr
+ * goes nowhere. */
+#ifdef _WIN32
+/* One argument as the C runtime of the child splits it back: quoted, with
+ * the backslashes before a quote doubled and the quote escaped. */
+static void win_quote(const char *in, char *out, size_t n)
 {
-    out[0] = '\0';
-    char full[PATHN + 64];
-    snprintf(full, sizeof full, "%s 2>" DEVNULL, cmd);
-    FILE *p = os_popen(full, "r");
-    if (!p) return;
-    if (fgets(out, (int)n, p)) out[strcspn(out, "\r\n")] = '\0'; else out[0] = '\0';
-    os_pclose(p);
+    size_t o = 0;
+    if (n < 3) { if (n) out[0] = '\0'; return; }
+    out[o++] = '"';
+    for (const char *c = in; *c && o + 4 < n; c++) {
+        size_t bs = 0;
+        while (*c == '\\') { bs++; c++; }
+        if (*c == '\0' || *c == '"') bs *= 2;      /* doubled before a quote or the closing one */
+        while (bs-- && o + 4 < n) out[o++] = '\\';
+        if (*c == '\0') break;
+        if (*c == '"') out[o++] = '\\';
+        out[o++] = *c;
+    }
+    out[o++] = '"';
+    out[o] = '\0';
+}
+
+static int run_argv(const char *const argv[], int to_stderr, char *line, size_t n)
+{
+    static char quoted[16][PATHN + 64];
+    const char *q[17];
+    int i, fd[2] = {-1, -1}, saved_out = -1, saved_err = -1;
+    intptr_t rc;
+    for (i = 0; argv[i] && i < 16; i++) { win_quote(argv[i], quoted[i], sizeof quoted[i]); q[i] = quoted[i]; }
+    q[i] = NULL;
+    if (line) line[0] = '\0';
+    fflush(stdout);
+    fflush(stderr);
+    if (line) {
+        if (_pipe(fd, 4096, _O_BINARY) != 0) return -1;
+        saved_out = _dup(1); saved_err = _dup(2);
+        _dup2(fd[1], 1);
+        int nul = _open(DEVNULL, _O_WRONLY);
+        if (nul >= 0) { _dup2(nul, 2); _close(nul); }
+        _close(fd[1]);
+    } else if (to_stderr) {
+        saved_out = _dup(1);
+        _dup2(2, 1);
+    }
+    rc = _spawnvp(line ? _P_NOWAIT : _P_WAIT, argv[0], q);
+    if (saved_out >= 0) { _dup2(saved_out, 1); _close(saved_out); }
+    if (saved_err >= 0) { _dup2(saved_err, 2); _close(saved_err); }
+    if (line) {
+        FILE *f = _fdopen(fd[0], "r");
+        if (f) {
+            char buf[256];
+            if (rc != -1 && fgets(line, (int)n, f)) line[strcspn(line, "\r\n")] = '\0';
+            while (fread(buf, 1, sizeof buf, f) > 0) {}
+            fclose(f);
+        } else _close(fd[0]);
+        if (rc == -1) return -1;
+        int st;
+        if (_cwait(&st, rc, 0) == -1) return -1;
+        return st;
+    }
+    return rc == -1 ? -1 : (int)rc;
+}
+#else
+static int run_argv(const char *const argv[], int to_stderr, char *line, size_t n)
+{
+    int fd[2] = {-1, -1}, st;
+    if (line) {
+        line[0] = '\0';
+        if (pipe(fd) != 0) return -1;
+    }
+    fflush(stdout);
+    fflush(stderr);
+    pid_t pid = fork();
+    if (pid < 0) {
+        if (line) { close(fd[0]); close(fd[1]); }
+        return -1;
+    }
+    if (pid == 0) {
+        if (line) {
+            int nul = open(DEVNULL, O_WRONLY);
+            dup2(fd[1], 1);
+            if (nul >= 0) dup2(nul, 2);
+            close(fd[0]);
+            close(fd[1]);
+        } else if (to_stderr) dup2(2, 1);
+        execvp(argv[0], (char *const *)argv);
+        _exit(127);
+    }
+    if (line) {
+        close(fd[1]);
+        FILE *f = fdopen(fd[0], "r");
+        if (f) {
+            char buf[256];
+            if (fgets(line, (int)n, f)) line[strcspn(line, "\r\n")] = '\0';
+            while (fread(buf, 1, sizeof buf, f) > 0) {}
+            fclose(f);
+        } else close(fd[0]);
+    }
+    while (waitpid(pid, &st, 0) < 0)
+        if (errno != EINTR) return -1;
+    if (!WIFEXITED(st)) return -1;
+    return WEXITSTATUS(st) == 127 ? -1 : WEXITSTATUS(st);
+}
+#endif
+
+/* The first line a program prints (a version). */
+static void first_line(const char *const argv[], char *out, size_t n)
+{
+    if (run_argv(argv, 0, out, n) < 0) out[0] = '\0';
 }
 
 static void set_home(const char *sdk)
@@ -254,14 +359,12 @@ static void set_home(const char *sdk)
 /* make -C <proj> [target]; the exit code of make, as one of ours. */
 static int run_make(cli_ctx *ctx, const char *sdk, const char *proj, const char *target)
 {
-    char cmd[PATHN * 2], dir[PATHN];
+    char dir[PATHN];
     set_home(sdk);
     make_path(proj, dir, sizeof dir);
+    const char *argv[] = {"make", "--no-print-directory", "-C", dir, target, NULL};
     /* --json: our object is the only thing on stdout, make talks on stderr */
-    snprintf(cmd, sizeof cmd, "make --no-print-directory -C \"%s\"%s%s%s", dir, target ? " " : "", target ? target : "",
-             ctx->json ? " 1>&2" : "");
-    fflush(stdout);
-    int rc = system(cmd);
+    int rc = run_argv(argv, ctx->json, NULL, 0);
     if (rc == -1) { cli_error(ctx, NULL, "cannot run make — is it installed and on the PATH?"); return CLI_IO; }
     return rc == 0 ? CLI_OK : CLI_REFUSED;
 }
@@ -509,20 +612,14 @@ static int run_run(cli_ctx *ctx)
 
 /* ======================================================= budget, release */
 
-/* <sdk>/bin/<tool> <args> "<file>"; the tool's exit code as one of ours. */
-static int run_tool(cli_ctx *ctx, const char *sdk, const char *tool, const char *args, const char *file, int to_stderr)
+/* <sdk>/bin/<tool> <sub> [<opt>] <file>; the tool's exit code as one of ours. */
+static int run_tool(cli_ctx *ctx, const char *sdk, const char *tool, const char *sub, const char *opt, const char *file, int to_stderr)
 {
-    char exe[PATHN], found[PATHN], cmd[PATHN * 3];
+    char exe[PATHN], found[PATHN];
     snprintf(exe, sizeof exe, "%s/bin/%s", sdk, tool);
     if (!is_exe(exe, found, sizeof found)) { cli_error(ctx, exe, "not found — the SDK is not built (`opensnes doctor`)"); return CLI_IO; }
-    /* cmd.exe drops the first and the last quote of a line that has more than two */
-#ifdef _WIN32
-    snprintf(cmd, sizeof cmd, "\"\"%s\" %s \"%s\"%s\"", found, args, file, to_stderr ? " 1>&2" : "");
-#else
-    snprintf(cmd, sizeof cmd, "\"%s\" %s \"%s\"%s", found, args, file, to_stderr ? " 1>&2" : "");
-#endif
-    fflush(stdout);
-    int rc = system(cmd);
+    const char *argv[] = {found, sub, opt ? opt : file, opt ? file : NULL, NULL};
+    int rc = run_argv(argv, to_stderr, NULL, 0);
     if (rc == -1) { cli_error(ctx, found, "cannot start"); return CLI_IO; }
     return rc == 0 ? CLI_OK : CLI_REFUSED;
 }
@@ -547,7 +644,7 @@ static int run_budget(cli_ctx *ctx)
     int rc = run_make(&quiet, sdk, proj, NULL);
     if (rc != CLI_OK) return rc;
     if (!project_rom(proj, rom, sizeof rom)) { cli_error(ctx, proj, "no ROM after the build — TARGET of the Makefile names a .sfc that is not there"); return CLI_REFUSED; }
-    return run_tool(ctx, sdk, "opensnes-rom", ctx->json ? "budget --json" : "budget", shown(rom), 0);
+    return run_tool(ctx, sdk, "opensnes-rom", "budget", ctx->json ? "--json" : NULL, shown(rom), 0);
 }
 
 /* Does the project declare tests (test/<name>.toml)? */
@@ -610,7 +707,7 @@ static int run_release(cli_ctx *ctx)
     }
 
     /* the header and the checksum, on the ROM as built */
-    if ((rc = run_tool(ctx, sdk, "opensnes-rom", "inspect -q", rom, 1)) != CLI_OK) {
+    if ((rc = run_tool(ctx, sdk, "opensnes-rom", "inspect", "-q", rom, 1)) != CLI_OK) {
         cli_error(ctx, rom, "refused by opensnes-rom inspect — nothing released");
         return rc;
     }
@@ -633,7 +730,7 @@ static int run_release(cli_ctx *ctx)
         return CLI_OK;
     }
     if (!ctx->quiet) printf("Released: %s (tests: %s)\n", shown(out), tests);
-    return ctx->quiet ? CLI_OK : run_tool(ctx, sdk, "opensnes-rom", "inspect", shown(out), 0);
+    return ctx->quiet ? CLI_OK : run_tool(ctx, sdk, "opensnes-rom", "inspect", NULL, shown(out), 0);
 }
 
 /* ================================================================ doctor */
@@ -694,9 +791,9 @@ static int run_doctor(cli_ctx *ctx)
     } else {
         report(&d, "ok", "SDK", sdk);
         /* cc65816 preprocesses with the host's cc (or clang, or gcc) before cproc */
-        if (which("cc", found, sizeof found)) { first_line("cc --version", line, sizeof line); report(&d, "ok", "host cc", line); }
-        else if (which("clang", found, sizeof found)) { first_line("clang --version", line, sizeof line); report(&d, "ok", "host cc", line); }
-        else if (which("gcc", found, sizeof found)) { first_line("gcc --version", line, sizeof line); report(&d, "ok", "host cc", line); }
+        if (which("cc", found, sizeof found)) { { const char *v[] = {"cc", "--version", NULL}; first_line(v, line, sizeof line); } report(&d, "ok", "host cc", line); }
+        else if (which("clang", found, sizeof found)) { { const char *v[] = {"clang", "--version", NULL}; first_line(v, line, sizeof line); } report(&d, "ok", "host cc", line); }
+        else if (which("gcc", found, sizeof found)) { { const char *v[] = {"gcc", "--version", NULL}; first_line(v, line, sizeof line); } report(&d, "ok", "host cc", line); }
         else report(&d, "fail", "host cc", "no cc, clang or gcc on the PATH; cc65816 needs one for the preprocessing stage");
         if (which("make", found, sizeof found)) report(&d, "ok", "make", found);
         else report(&d, "fail", "make", "not found on the PATH; the build is make/common.mk");
@@ -719,9 +816,8 @@ static int run_doctor(cli_ctx *ctx)
         if (objs) { snprintf(detail, sizeof detail, "%d objects (lorom)", objs); report(&d, "ok", "library", detail); }
         else report(&d, "fail", "library", "not built — the release zip ships it; in the repository, `make lib`");
         if (find_luna(sdk, found, sizeof found)) {
-            char cmd[PATHN + 32];
-            snprintf(cmd, sizeof cmd, "\"%s\" --version", found);
-            first_line(cmd, line, sizeof line);
+            const char *v[] = {found, "--version", NULL};
+            first_line(v, line, sizeof line);
             snprintf(detail, sizeof detail, "%s (%s)", found, line);
             report(&d, "ok", "luna", detail);
         } else report(&d, "warn", "luna", "not found — scripts/install-luna.sh fetches it (`opensnes test` and the debugger need it)");

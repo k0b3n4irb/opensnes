@@ -169,6 +169,28 @@ def upgrade_folder():
         return errs
 
 
+def build_hostile_path():
+    """build in a folder whose name holds $(...), a quote and a backquote:
+    make receives the path as it is, and nothing in it runs (audit 07-3)."""
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td).resolve()
+        sdk = fake_sdk(work)
+        proj = work / 'p$(touch PWNED)"q`touch PWNED2`'
+        proj.mkdir()
+        (proj / "Makefile").write_text("all:\n\t@echo built-ok\nclean: ;\ninclude $(OPENSNES_HOME)/make/common.mk\n")
+        proc = cli(["build"], proj, sdk)
+        errs = []
+        if proc.returncode != 0:
+            errs.append(f"exit {proc.returncode}: {(proc.stderr + proc.stdout).strip()[-160:]}")
+        if "built-ok" not in proc.stdout + proc.stderr:
+            errs.append("make did not run the project's Makefile")
+        errs += [f"{p.relative_to(work)} was created" for p in work.rglob("PWNED*")]
+        return errs
+
+
+g.check("build in a folder named p$(touch PWNED)\"q`...`", "make runs, nothing in the path does", build_hostile_path)
+
+
 g.check("upgrade src/ (a folder: sources only, path order; a clean file exits 0)", "55 hits in 3 files", upgrade_folder)
 
 

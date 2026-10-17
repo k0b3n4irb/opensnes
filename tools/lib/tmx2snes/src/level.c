@@ -106,16 +106,29 @@ static void PutWord(int data, FILE *fp)
     putc(HI_BYTE(data), fp);
 } // end of PutWord
 
-/* <dir of filebase>/<layer>.<ext> */
+/* <dir of filebase>/<layer>.<ext>
+ *
+ * The layer's name comes from the map file, so it names a file and nothing
+ * else: no directory separator, no "..", no drive letter, a bounded length.
+ * A map from someone else must not choose where the tool writes. */
+#define LAYER_NAME_MAX 64
+
 static void layer_file(const char *ext)
 {
-    char *lastpostslash;
-    strcpy(filemapname, filebase);
-    lastpostslash = strrchr(filemapname, '/');
-    if (lastpostslash != NULL)
-        sprintf(lastpostslash + 1, "%s%s", layer->name.ptr, ext);
-    else
-        sprintf(filemapname, "%s%s", layer->name.ptr, ext);
+    const char *name = layer->name.ptr ? layer->name.ptr : "";
+    size_t dir = 0;
+    const char *slash = strrchr(filebase, '/');
+    int n;
+
+    if (name[0] == '\0' || strlen(name) > LAYER_NAME_MAX
+        || strpbrk(name, "/\\:") != NULL || strstr(name, "..") != NULL)
+        FAIL("layer name [%.80s] is not a plain file name (1 to %d characters, "
+             "no '/', '\\', ':' or \"..\"): it names the output file", name, LAYER_NAME_MAX);
+    if (slash != NULL)
+        dir = (size_t)(slash - filebase) + 1;
+    n = snprintf(filemapname, sizeof filemapname, "%.*s%s%s", (int)dir, filebase, name, ext);
+    if (n < 0 || (size_t)n >= sizeof filemapname)
+        FAIL("output path too long for layer [%s]", name);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -435,7 +448,7 @@ static void WriteTileset(void)
     char *pend;
 
     INFO("Writing tiles attribute file...");
-    sprintf(filemapname, "%s.b16", filebase);
+    snprintf(filemapname, sizeof filemapname, "%s.b16", filebase);
     fpo = fopen(filemapname, "wb");
     if (fpo == NULL)
         FAIL("Can't open tiles attribute file [%s] for writing", filemapname);
@@ -488,7 +501,7 @@ static void WriteMapTileset(void)
 {
     int i, blkprop;
 
-    sprintf(filemapname, "%s.t16", filebase);
+    snprintf(filemapname, sizeof filemapname, "%s.t16", filebase);
     fpo = fopen(filemapname, "wb");
     if (fpo == NULL)
         FAIL("Can't open tiles properties file [%s] for writing", filemapname);
@@ -512,7 +525,7 @@ static void WriteEntities(void)
     char *pend;
 
     INFO("Writing entities object file...");
-    sprintf(filemapname, "%s.o16", filebase);
+    snprintf(filemapname, sizeof filemapname, "%s.o16", filebase);
     fpo = fopen(filemapname, "wb");
     if (fpo == NULL)
         FAIL("Can't open layer object file [%s] for writing", filemapname);

@@ -54,4 +54,17 @@ for name, patch, expect in [("rotated tile", _rotated, "is rotated"),
     patch(bad)
     g.expect_refused(f"refused: {name}", ["convert", "--tileset", "tileset.map", "bad.tmj"], copy=["tileset.map"],
                      write={"bad.tmj": json.dumps(bad)}, needles=[expect])
+
+# The layer's name names the output file: a map from someone else must not
+# choose where the tool writes, nor overflow the path buffer (audit 07-1).
+for name, lname in [("layer name with ..", "../escape/PWN"),
+                    ("layer name with a slash", "sub/BG1"),
+                    ("layer name with a backslash", "sub\\BG1"),
+                    ("layer name with a drive", "C:BG1"),
+                    ("empty layer name", ""),
+                    ("layer name of 1000 characters", "B" * 1000)]:
+    bad = json.loads(json.dumps(town))
+    bad["layers"][0]["name"] = lname
+    g.expect_refused(f"refused: {name}", ["convert", "--tileset", "tileset.map", "bad.tmj"], copy=["tileset.map"],
+                     write={"bad.tmj": json.dumps(bad)}, needles=["is not a plain file name"])
 sys.exit(g.report())

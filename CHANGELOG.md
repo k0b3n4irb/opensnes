@@ -152,6 +152,18 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(tools): **`opensnes-level` refuses a tile layer whose name is not a
+  plain file name.** The name comes from the map and names the output file;
+  a layer called `../escape/PWN` wrote outside `--out`, and a name of 1000
+  characters overflowed the path buffer. A name is now 1 to 64 characters
+  with no `/`, `\`, `:` or `..`, and the paths are built bounded. The maps
+  of the examples (`BG1`, `Entities`) are unchanged.
+- fix(tools): **the `opensnes` CLI runs make and the SDK's tools without a
+  shell.** `build`, `test`, `run`, `budget`, `release` and `doctor` passed
+  paths to `system()` / `popen()` inside double quotes, so a project folder
+  named `p$(touch x)` ran `touch`, and a folder holding a quote broke the
+  build. They now start programs with an argument list (`fork` + `execvp`;
+  `_spawnvp` with each argument quoted on Windows).
 - fix(compiler): **a loop counter whose address is taken keeps its value.**
   `for (i = 0; i < 3; i++)` with `&i` taken somewhere left `i` at 0: the
   rule that keeps a loop counter in X moved the increment to X and left the
