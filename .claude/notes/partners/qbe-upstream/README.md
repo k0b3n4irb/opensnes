@@ -45,7 +45,8 @@ down here.
 | Date | Upstream tip read | New commits | Taken | Next check due |
 |---|---|---|---|---|
 | 2026-10-11 | `e786f06` | 41 since our base `120f316` | `863e1e7` (switch, via cproc's twin); `b58e2e6` already carried | |
-| 2026-10-13 | `e786f06` (unchanged) | 0 | — | 2026-11-13 |
+| 2026-10-13 | `e786f06` (unchanged) | 0 | — | |
+| 2026-10-17 | `e786f06` (unchanged, dated 2026-06-08) | 0 | — | 2026-11-17 |
 
 ## Known difference from upstream that is a defect of theirs
 
