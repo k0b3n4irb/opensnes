@@ -185,3 +185,15 @@ results after the fact today; an ARAM watchpoint for the audio driver's
 handshake races (two of them in `silent_defects_log.md`). To do at the
 pin bump that carries it: regenerate `docs/tools/luna.md`, and add a GSU
 or SA-1 breakpoint to `docs/tutorials/debugging.md`.
+
+2026-10-18, luna v1.39.0 released (`f2a8841`), nothing asked
+(`2026-10-18_from_luna_v1.39.0_released.md`, the four zip sums in it). Two
+changes can move our references at the pin bump: the 5A22 multiplier and
+divider return the value in progress when $4214-$4217 is read too early
+(our report), and arrival counts (`--hit`, `--peek-at`, `--input-at`,
+`at_symbol`, `profile --until-pc`) are exact where an interrupt fell on the
+watched instruction (one ahead before). Save states of 1.38.0 are refused
+(state v9). It also carries `gsu.ms0_at_21mhz`, which the 1.0 audit found
+missing from 1.38.0 (09-1 / 02-4). The bump is a lot of its own: the full
+suite, the corpus golden queries (`partners.md` step 4), the luna page
+regenerated from `--help`.
