@@ -1,7 +1,7 @@
 # Direct exchanges with luna and the game (Auto-loaded)
 
 CRITICAL, owner decision (2026-10-10). OpenSNES, luna and the game
-(the game) talk to each other **directly, session to session**, and
+talk to each other **directly, session to session**, and
 challenge one another. Where this rule and an older one disagree on *how
 a partner is reached*, this one wins.
 
@@ -54,9 +54,9 @@ another way (`How`, below).
 
 ## How
 
-- **`ListAgents`, then `SendMessage`**, to the sessions `luna` and
-  `the game` (recognised by their working directory when they do not
-  carry the name yet). **No GitHub issue between the three any more**: a
+- **`ListAgents`, then `SendMessage`**, to the session `luna` and to the
+  game's session (both recognised by their working directory; the game's
+  is in the user's private memory, never in this repository). **No GitHub issue between the three any more**: a
   capability request to luna is a direct message with its prototype, not
   `gh issue create`. The issues already open continue directly; closing one
   on GitHub is a public act and waits for the owner.
@@ -71,10 +71,18 @@ another way (`How`, below).
 - **A claim comes with its piece** (a measurement, a command to replay, a
   ROM, a test); and before stating a limit at a neighbour's, provoke it.
 - The game may show us its real case by path, on this machine. **Nothing of
-  the game enters a commit, a test or a document here**;
-  what has to enter is a stand-alone example.
-- **What is decided is written here** (notes, `CHANGELOG`, the project
-  note): a message disappears with its session. A long piece is still a
+  the game enters a commit, a test, a note or a document here, nor a commit
+  message — its name and title first** (owner, 2026-10-17: the game is a
+  port under licence, private until its rights are negotiated; respect what
+  belongs to each). Nor its rights holder, its paths, the names of its source
+  files or functions, nor a measurement tied to its sources. In this
+  repository it is "the game", nothing more. What has to enter is a
+  stand-alone example, written by us.
+  On 2026-10-17 its name had been public for a week (a project note and
+  thirteen files, two release tags); the history was rewritten that day.
+- **What is decided is written down** (notes, `CHANGELOG`; what concerns the
+  game alone goes to its private folder outside this repository, named in
+  the user's private memory): a message disappears with its session. A long piece is still a
   dated report (`.claude/notes/partners/`, `~/workspace/partner-reports/`);
   the message points to it. snes-rag has no standing session: it is still
   reached by files (`partners.md`).
