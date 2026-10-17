@@ -5,6 +5,13 @@ All notable changes to OpenSNES are documented in this file.
 ## [Unreleased]
 
 ### Added
+- feat(lib): **`vramQueueCost()`** — what the VRAM queue already holds
+  will cost the VBlank, in bytes: each entry's size plus
+  `VRAM_QUEUE_ENTRY_COST` (96, the flush's per-entry overhead). Kept by
+  `vramQueuePush()` / `vramQueuePushSprite()`, set to 0 by the flush,
+  saturated at `$FFFF`. A module that streams sprite frames after others
+  have queued their own uploads can budget what is left without walking
+  the queue's arrays. Asked by a game built on the SDK.
 - feat(lib): **`audioReleaseEcho()`** turns the echo off and gives its ring
   back to the samples: the sample area reaches `$FFC0` again, and samples
   may be loaded where the ring was as soon as it returns (the driver

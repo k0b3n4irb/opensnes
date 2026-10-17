@@ -28,6 +28,7 @@
 .endif
 
 .EQU VRAM_QUEUE_MAX 32          ; vramqueue.h says the same
+.EQU VRAM_QUEUE_ENTRY_COST 96   ; vramqueue.h says the same
 
 .RAMSECTION ".vram_queue" BANK 0 SLOT 1
     vram_queue_src      dsb VRAM_QUEUE_MAX*2    ; source address
@@ -36,6 +37,7 @@
     vram_queue_size     dsb VRAM_QUEUE_MAX*2    ; bytes
     vram_queue_step     dsb VRAM_QUEUE_MAX*2    ; VMAIN (low byte)
     vram_queue_count    dsb 2                   ; entries waiting
+    vram_queue_cost     dsb 2                   ; bytes + VRAM_QUEUE_ENTRY_COST each
 .ENDS
 
 .SECTION ".text.vramQueueFlush" SUPERFREE
@@ -94,6 +96,7 @@ vramQueueFlush:
     .ACCU 16
     stz.w vram_queue_count
 @out:
+    stz.w vram_queue_cost   ; also when the count was emptied by hand
     plb
     plp
     rtl
@@ -104,6 +107,7 @@ vramQueueFlush:
 ; u16 vramQueuePush(const u8 *src, u16 addr, u16 size, u16 step)
 ;   12,s src (bank)   10,s src   8,s addr   6,s size   4,s step
 ; Returns 1, or 0 when the queue is full (nothing is noted).
+; Adds size + VRAM_QUEUE_ENTRY_COST to vram_queue_cost.
 ;
 ; A function and not a macro: compiled, the five indexed stores of a macro
 ; reload the count and rebuild the index five times, and cost three times
@@ -130,6 +134,14 @@ vramQueuePush:
     sta.w vram_queue_addr,x
     lda 6,s             ; size
     sta.w vram_queue_size,x
+    clc
+    adc.w #VRAM_QUEUE_ENTRY_COST
+    bcs @sat
+    adc.w vram_queue_cost
+    bcc +
+@sat:
+    lda.w #$FFFF        ; saturated, never back through zero
++   sta.w vram_queue_cost
     lda 4,s             ; step
     sta.w vram_queue_step,x
     inc.w vram_queue_count
@@ -195,6 +207,12 @@ vramQueuePushSprite:
     sta.b tcc__r10+2
     lda.b tcc__r9+2
     sta.w vram_queue_size,x
+    clc
+    adc.w #VRAM_QUEUE_ENTRY_COST    ; 352 at most: no carry
+    adc.w vram_queue_cost
+    bcc +
+    lda.w #$FFFF        ; saturated, never back through zero
++   sta.w vram_queue_cost
     lda.w #$0080        ; VRAM_QUEUE_ROW
     sta.w vram_queue_step,x
     inx

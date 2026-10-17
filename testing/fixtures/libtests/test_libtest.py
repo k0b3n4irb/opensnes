@@ -241,6 +241,9 @@ CASES = [
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
     # apart; refused under 8 pixels and when the strips do not all fit
     ("r_vqs", 16, sum(w << (16 * i) for i, w in enumerate([1, 2, 512, 0x6500, 64 | (0x80 << 8), 0, 0, 30]))),
+    # vramQueueCost: bytes + 96 an entry (300 for 8 + 0 + 4 bytes, 320 for
+    # a 16x16 frame), 0 after a flush, $FFFF rather than a wrap three ways
+    ("r_vqc", 16, sum(w << (16 * i) for i, w in enumerate([300, 0, 320, 0xFFFF, 0, 0xFFFF, 0xFFFF, 0]))),
     ("r_done",     2, 0xBEEF),
 ]
 

@@ -33,7 +33,8 @@
  * **The budget is yours to keep.** A VBlank is about 49,000 master cycles
  * and the NMI handler takes the first 5,000 to 8,000 of them. What does
  * not fit lands in active display,
- * where the PPU ignores it: no error, missing tiles.
+ * where the PPU ignores it: no error, missing tiles. vramQueueCost() says
+ * what the entries already queued will take, whichever module queued them.
  *
  * Request and first user: issue #165.
  */
@@ -58,9 +59,40 @@ extern u16 vram_queue_addr[VRAM_QUEUE_MAX];
 extern u16 vram_queue_size[VRAM_QUEUE_MAX];
 extern u16 vram_queue_step[VRAM_QUEUE_MAX];
 extern u16 vram_queue_count;
+extern u16 vram_queue_cost;
 
 /** @brief Entries still free */
 #define vramQueueFree() (VRAM_QUEUE_MAX - vram_queue_count)
+
+/**
+ * @brief What one entry costs the flush beyond its bytes, in bytes
+ *
+ * The flush spends about 8 master cycles per byte and 770 per entry;
+ * 770 / 8 is 96 bytes' worth.
+ */
+#define VRAM_QUEUE_ENTRY_COST  96
+
+/**
+ * @brief VBlank cost of what is queued, in bytes: each entry's size plus
+ *        VRAM_QUEUE_ENTRY_COST
+ *
+ * Kept by vramQueuePush() and vramQueuePushSprite(), set to 0 by
+ * vramQueueFlush(); it stops at 0xFFFF rather than wrap. Multiply by 8 for
+ * master cycles. A module that streams what is left of the VBlank checks it
+ * against its own budget before each push:
+ *
+ * @code
+ * // a 32x32 frame: four strips of 128 bytes
+ * while (next < wanted && vramQueueCost() + 512 + 4 * VRAM_QUEUE_ENTRY_COST <= BUDGET) {
+ *     vramQueuePushSprite(frame_src[next], frame_dst[next], 32);
+ *     next++;
+ * }
+ * @endcode
+ *
+ * A count written by hand (`vram_queue_count = 0`) leaves it as it was
+ * until the next flush.
+ */
+#define vramQueueCost() (vram_queue_cost)
 
 /**
  * @brief Note one transfer for the next vramQueueFlush()

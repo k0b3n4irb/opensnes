@@ -251,6 +251,25 @@ for one or two uploads, or in force blank, call `dmaCopyVram()`.
 The budget stays yours: what does not fit in the VBlank lands in active
 display and is ignored by the PPU, with no error.
 
+When several modules fill the queue — a status bar, a message box, then
+the sprite frames — the last one needs to know what the others already
+took. `vramQueueCost()` says it: the bytes queued plus
+`VRAM_QUEUE_ENTRY_COST` (96) for each entry, the flush's cost per entry
+expressed in bytes. Multiply by 8 for master cycles. The flush sets it
+back to 0.
+
+```c
+/* sprites go last: they take what the VBlank has left */
+while (next < wanted
+       && vramQueueCost() + 512 + 4 * VRAM_QUEUE_ENTRY_COST <= SPRITE_BUDGET) {
+    vramQueuePushSprite(frame_src[next], frame_dst[next], 32);   /* 4 strips */
+    next++;
+}
+```
+
+The queue does not refuse an entry past a budget: which module gives way
+is the game's choice, and the order in which they push is not.
+
 ## Lib API tour
 
 | Function | What it does |

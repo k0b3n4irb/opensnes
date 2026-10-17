@@ -50,6 +50,8 @@ u16 r_vq[4];
 /* vramQueuePushSprite: one 16x16 frame = two strips of 64 bytes */
 u16 r_vqs[8];
 static FAR u8 vq_sheet[576];
+/* vramQueueCost: bytes + 96 an entry, emptied by the flush, saturated */
+u16 r_vqc[8];
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -755,8 +757,10 @@ static void coverage_lot_b(void) {
     vramQueuePush(lotb_vram, 0x6300, 0, VRAM_QUEUE_ROW);
     vramQueuePush(lotb_vram + 8, 0x6240, 4, VRAM_QUEUE_COLUMN);
     r_vq[0] = vram_queue_count;             /* 3 */
+    r_vqc[0] = vramQueueCost();             /* 8 + 0 + 4 + 3 * 96 = 300 */
     vramQueueFlush();
     r_vq[1] = vram_queue_count;             /* 0 */
+    r_vqc[1] = vramQueueCost();             /* 0 */
     r_vq[2] = vramQueueFree();              /* 32 */
     vramQueueFlush();                       /* empty: returns at once */
     r_vq[3] = 0x0A51;
@@ -765,6 +769,7 @@ static void coverage_lot_b(void) {
     vq_sheet[0] = 0xA1; vq_sheet[63] = 0xA2; vq_sheet[512] = 0xB1; vq_sheet[575] = 0xB2;
     r_vqs[0] = vramQueuePushSprite(vq_sheet, 0x6400, 16);      /* 1 */
     r_vqs[1] = vram_queue_count;                               /* 2 */
+    r_vqc[2] = vramQueueCost();                                /* 2 * (64 + 96) = 320 */
     r_vqs[2] = vram_queue_src[1] - vram_queue_src[0];          /* 512 */
     r_vqs[3] = vram_queue_addr[1];                             /* $6500 */
     r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
@@ -774,6 +779,22 @@ static void coverage_lot_b(void) {
     r_vqs[6] = vramQueuePushSprite(vq_sheet, 0x6400, 32);      /* four strips, two places left: 0 */
     r_vqs[7] = vram_queue_count;                               /* still 30: nothing noted */
     vram_queue_count = 0;
+    /* the cost stops at $FFFF: past it by the sum, by size + 96 alone, and
+     * by a sprite's strips; a count emptied by hand, then a flush, clears it */
+    vram_queue_cost = 0xFF00;
+    vramQueuePush(lotb_vram, 0x6300, 0x100, VRAM_QUEUE_ROW);
+    r_vqc[3] = vramQueueCost();                                /* $FFFF */
+    vram_queue_count = 0;
+    vramQueueFlush();
+    r_vqc[4] = vramQueueCost();                                /* 0 */
+    vramQueuePush(lotb_vram, 0x6300, 0xFFC0, VRAM_QUEUE_ROW);
+    r_vqc[5] = vramQueueCost();                                /* $FFFF */
+    vram_queue_cost = 0xFFF0;
+    vramQueuePushSprite(vq_sheet, 0x6400, 16);
+    r_vqc[6] = vramQueueCost();                                /* $FFFF */
+    vram_queue_count = 0;
+    vramQueueFlush();
+    r_vqc[7] = vramQueueCost();                                /* 0 */
     dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;
