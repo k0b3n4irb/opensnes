@@ -8,9 +8,9 @@
       "peak": 21264
     },
     "audio/snesmod_music": {
-      "sha256": "c1e79192d45039f733dc9a2388096d9453c92314b7dcb12830489a6098c81bcd",
+      "sha256": "bd1f352af6e1b1e17cedaf227918aa87fd5529e0cf7b904864302d0c4c703a6b",
       "samples": 159936,
-      "peak": 20923
+      "peak": 20922
     },
     "audio/pitch_mod": {
       "sha256": "2960dce3f647bbd63c1a2fad357dc8a538071ef1099c39f6a2ee07532250e2e8",
@@ -33,9 +33,9 @@
       "peak": 22960
     },
     "fixtures/snesmod_music_large": {
-      "sha256": "0682b12e37c33115883c86fcf832534351b97c54e3c3dad79813d9367fefcc9d",
+      "sha256": "722c9775b3e49cfed7efcd0b31da8c84312b7268252ee0bc5885287f3f6412fd",
       "samples": 159936,
-      "peak": 17119
+      "peak": 17197
     },
     "chips/superfx_game_skeleton": {
       "sha256": "f776c03e04475934a354335f167b5da5d2e0e7320abfffde8ced513ac760f486",

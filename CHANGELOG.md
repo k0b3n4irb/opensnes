@@ -157,6 +157,16 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(lib,runtime): **the NMI's DMAs leave the HDMA channels alone.** The
+  text flush ran on channel 1 and the dynamic sprite uploads on channels
+  1 to 4, so a Super FX letterbox (`gsuSetupHdmaBlanking`, HDMA channel 1)
+  with text on screen stayed black — the next frame read the text buffer as
+  its table — and the game's own HDMA on channels 2 to 4 was overwritten by
+  any dynamic sprite upload. Every DMA of the NMI now runs on channel 7,
+  after the OAM transfer's; `textInit()`'s immediate flush uses channel 0,
+  the DMA helpers'. Channels 1 to 6 are free for HDMA (`hdma.h`). Pinned by
+  the fixture `libtests_dma_channels`, which reads the channels' registers
+  back after forty frames of letterbox, HDMA, text and 32x32 uploads.
 - fix(build): **a ROM the post-link check refuses does not survive.** The
   linker writes the `.sfc` before `opensnes-rom check` reads it, so a ROM
   the check refused stayed on disk and the next `make`, finding it newer

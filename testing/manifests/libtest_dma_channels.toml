@@ -1,0 +1,22 @@
+# The NMI's DMAs leave the HDMA channels alone (audit 1.0, 01-1; 2026-10-17).
+# A Super FX letterbox on HDMA channel 1, the game's HDMA on channels 2-6,
+# and every frame a text flush and four 32x32 dynamic sprite uploads from
+# the NMI. After forty frames the fixture reads each channel's registers
+# back ($43n0-$43n3): channel 1 still writes INIDISP from gsu_hdma_table,
+# channels 2-6 still write COLDATA from the game's table.
+# Negative control (the library before the fix): r_ctrl[1] = 0x1801, the
+# text flush's word DMA to $2118, and channels 2-4 the same.
+rom = "../fixtures/libtests_dma_channels/libtest_dma_channels.sfc"
+frames = 120
+
+[asserts.values]
+r_frames = 40
+r_channels_ok = 1
+r_done = 0xD0E5
+
+[asserts.blocks]
+# u16 per channel 0-6, little-endian: (BBAD << 8) | DMAP; 0 is unread
+r_ctrl = "0000000000320032003200320032"
+
+[asserts.dma]
+unsafe_writes = 0

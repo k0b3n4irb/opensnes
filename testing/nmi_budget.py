@@ -83,18 +83,21 @@ EXTRA = [
     ("chips/superfx_game_skeleton", "gsu_present_step", 91956,
      "gsuPresent's half-frame upload, in the letterbox blank"),
     # The NmiHandler rows measure the handler's own time: the work it hands
-    # to a hook (tilemapFlush, the dynamic-sprite queue) runs in VBlank too
+    # to a hook (the text flush, the dynamic-sprite queue) runs in VBlank too
     # and was invisible to the gate (library audit 2026-10-03, PF2). Each is
     # gated on growth from its own measured reference (2026-10-04).
     # A fifth field names a `luna test` manifest whose input script drives the
     # run (merged as rom_coverage does): without a button press these hooks
     # barely run — breakout's tilemapFlush never does in 150 idle frames.
     # A sixth field is the first frame measured. luna credits a symbol
-    # whoever called it, and textInit() calls tilemapFlush() itself, in force
-    # blank: since 2026-10-09 the boot is short enough for that call and the
-    # hook's first one to fall in the same frame (3), which read as a
-    # doubling. The row is about the hook, so it starts after the boot.
-    ("basics/scene_stack", "tilemapFlush", 17652,
+    # whoever called it, and textInit() called tilemapFlush() itself, in
+    # force blank: since 2026-10-09 the boot is short enough for that call
+    # and the hook's first one to fall in the same frame (3), which read as
+    # a doubling. The row is about the hook, so it starts after the boot.
+    # Since 2026-10-17 the NMI calls its own entry, tilemapFlushNmi
+    # (channel 7; textInit's call keeps tilemapFlush, channel 0), and both
+    # fall into tilemapFlushOn, the body luna credits: the row reads that.
+    ("basics/scene_stack", "tilemapFlushOn", 17652,
      "the text module's full-map DMA from the NMI hook (a title redraw)", "state_scene_stack", 10),
     ("sprites/dynamic_sprite", "oamDynamicNmiFlush", 296,
      "the dynamic-sprite engine's NMI step under the sprite manifest", "oam_dynamic_sprite"),

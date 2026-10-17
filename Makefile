@@ -50,7 +50,7 @@ RELEASE_DIR := release
 # The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
 # spelled them out in three places and each list was a different subset.
-FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram
+FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram libtests_dma_channels
 FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals leaf_frame static_dup
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
