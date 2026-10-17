@@ -417,6 +417,18 @@ not supported on w65816; pass an array and a count`.
 pointer. `PHILOSOPHY.md` rules out `printf` in the core lib for the same
 reason. Pinned by `cases/negative/varargs.c`.
 
+### 🟡 Variable-length arrays are refused
+The w65816 backend gives every local array a fixed slot in the function's
+frame, so an array whose length is known only at run time has nowhere to
+go. The compiler refuses it — `variable-length arrays are not supported on
+w65816` — and defines `__STDC_NO_VLA__` (C11 6.10.8.3). A `const` variable
+is not an integer constant expression in C, so `static const u16 N = 4;
+u16 a[N];` is a variable-length array too, and refused the same way.
+
+**Mitigation:** give the length as an `enum` constant or a `#define`, or
+size the array for the largest case. Pinned by `cases/negative/vla.c` and
+`cases/negative/vla_const_length.c`.
+
 ### 🟡 Inline assembly is refused
 cproc has no `asm` statement: `__asm__("nop")` stops the build with
 `inline assembly is not yet supported`.

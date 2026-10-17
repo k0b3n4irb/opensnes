@@ -157,6 +157,15 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(compiler): **a variable-length array is refused.** `u16 a[n];` with
+  `n` known at run time — or a `const` variable, which is not a constant
+  expression in C — compiled without a word: the backend gave the array a
+  fixed 2-byte frame slot, and a function filling it wrote over its own
+  return address. cproc now stops with "variable-length arrays are not
+  supported on w65816", the driver
+  defines `__STDC_NO_VLA__`, and QBE refuses a run-time-sized alloc from
+  any front end. Use an `enum` or a `#define` for the length. No example or
+  library source changed. Pinned by `cases/negative/vla*.c`.
 - fix(tools): **an output `opensnes-music bank` cannot open is an error.**
   When the `.asm` or `.h` could not be opened the tool wrote through a null
   pointer and crashed; when the `.bnk` could not, it wrote nothing and

@@ -493,7 +493,10 @@ the keyword is an error.
 - **Variadic functions** (`...`): no support. Wrappers like `printf` use
   fixed-prototype variants.
 - **Nested function definitions** (GCC extension): not supported.
-- **`alloca`** (variable-length stack allocation): not supported.
+- **Variable-length arrays** and any stack allocation of a run-time size:
+  refused by cproc (`variable-length arrays are not supported on w65816`,
+  `__STDC_NO_VLA__` is defined) and, for any other front end, by QBE. Every
+  local gets a fixed frame slot.
 - **`__attribute__((interrupt))`**: not recognised. The NMI handler is
   hand-written assembly in `templates/crt0.asm` and dispatches to a C
   callback registered via `nmiSet()`.

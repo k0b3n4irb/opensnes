@@ -48,7 +48,8 @@ version. A new module costs nothing to a project that does not link it.
   removed; `docs/HARDWARE_VERIFICATION.md` names the ones a release is
   checked against.
 - **The compiler's accepted C** grows; what it refuses today (struct
-  parameters and returns by value, variadic functions, inline assembly)
+  parameters and returns by value, variadic functions, variable-length
+  arrays, inline assembly)
   may be accepted later, never the other way.
 
 ## How a change reaches you

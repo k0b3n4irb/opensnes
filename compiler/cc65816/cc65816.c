@@ -393,6 +393,8 @@ int main(int argc, char *argv[])
      * snes/types.h uses it to keep sizeof(s32) == 4 on both.
      */
     cpp[ncpp++] = "-D__OPENSNES__=1";
+    /* C11 6.10.8.3: variable-length arrays are refused by cproc. */
+    cpp[ncpp++] = "-D__STDC_NO_VLA__=1";
 
     for (i = 1; i < argc; i++) {
         const char *a = argv[i];

@@ -29,8 +29,8 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | d1ad402f6ff11f6260e0f0a06d677e31958c48be | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/cproc | b5ad29ea89b752064277e51b4aad06574587a862 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 40839d81eeee52c7661d742f6da53261cc0b187f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 46 patches since upstream merge-base 7051114
+### compiler/cproc — 47 patches since upstream merge-base 7051114
 
 ```
+b5ad29e decl: a variable-length array is refused — every local has a fixed frame slot on w65816, so `u16 a[n];` (or a `const` variable as the length) compiled into a pointer to 2 bytes the callee wrote past; the driver defines `__STDC_NO_VLA__` (audit 04-1, 2026-10-17)
 8c97293 qbe: Avoid redundant leaf ceq in switch (v2) — a case whose neighbours are the values just below and above needs no compare: `switch` workload -3.1 %, `state` -2.7 % (upstream 863e1e7, cherry-picked 2026-10-11)
 7e6a4e5 expr: a string literal is const char[] — handed to a plain `char *` it was read from the wrong bank in silence, and `"abc"[i]` was read bank-blind; a store to a literal is refused (2026-10-11)
 1071b97 expr: *"a" is the first character — the *& collapse skips string literals; it stopped on "unimplemented expression" (upstream 482c69c + d30bfcc, adapted, 2026-10-11)
@@ -98,7 +99,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 134 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 135 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -110,6 +111,7 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+40839d8 w65816: an alloc of a run-time size is refused — it had a fixed 2-byte frame slot; a defence behind cproc's VLA refusal, for any other front end (audit 04-1, 2026-10-17)
 d1ad402 reassoc: the symbol of a union member, `add $u, 0`, folds like a bare one (a game built on the SDK, 2026-10-16)
 653b143 w65816: a far pointer walked by a loop kept in tcc__r9 for the whole loop — staged once before the header, its step written to tcc__r9, copied back on the way out when read after; `QBE_NO_PEEP_R9LOOP=1` (a game built on the SDK, 2026-10-16)
 f3bb5bf reassoc: the constant of a bounded index folded into the symbol it indexes — `buf[i + 8]` reads `buf+16,x` on `buf[i]`'s X when i is proved bounded (extub, and with a constant, shr), never from an out-of-bounds access being undefined (owner decision); `QBE_NO_REASSOC=1` (a game built on the SDK, 2026-10-16)
