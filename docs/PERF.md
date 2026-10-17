@@ -103,19 +103,19 @@ compilers.
 | Row | What it asks for | PVSnesLib | OpenSNES | |
 |---|---|---:|---:|---:|
 | `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,780 | -19.5 % |
-| `pad` | held, pressed, released of pad 0, ten times | 11,427 | 9,722 | -14.9 % |
-| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,540 | 27,343 | -30.8 % |
-| `oamset` | `oamSet` on 32 sprites | 81,061 | 64,939 | -19.9 % |
-| `oamxy` | `oamSetXY` on 32 sprites | 45,048 | 42,453 | -5.8 % |
-| `oamsize` | the size of 32 sprites | 48,744 | 28,874 | -40.8 % |
-| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,897 | 17,868 | -0.2 % |
-| `text` | 20 characters printed and shown | 84,678 | 17,216 | -79.7 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 91,147 | -46.3 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,332 | 53,875 | -58.3 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,332 | 31,738 | -75.5 % |
-| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,886 | -8.7 % |
-| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,738 | -38.3 % |
-| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,701 | 36,299 | -73.4 % |
+| `pad` | held, pressed, released of pad 0, ten times | 11,427 | 9,702 | -15.1 % |
+| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,540 | 27,336 | -30.9 % |
+| `oamset` | `oamSet` on 32 sprites | 81,061 | 64,937 | -19.9 % |
+| `oamxy` | `oamSetXY` on 32 sprites | 45,048 | 42,446 | -5.8 % |
+| `oamsize` | the size of 32 sprites | 48,744 | 28,870 | -40.8 % |
+| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,897 | 17,858 | -0.2 % |
+| `text` | 20 characters printed and shown | 84,678 | 17,438 | -79.4 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 91,339 | -46.2 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,332 | 53,877 | -58.3 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,332 | 31,740 | -75.5 % |
+| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,888 | -8.7 % |
+| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,790 | -38.0 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,701 | 36,297 | -73.4 % |
 
 OpenSNES costs no more than PVSnesLib on **14 of the 14 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
 <!-- libbench:end -->
