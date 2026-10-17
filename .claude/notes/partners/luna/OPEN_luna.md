@@ -171,3 +171,17 @@ manifest, an invariant checked without code in the ROM. When we prototype
 it, say which granularity it needs — per frame is nearly free, per line
 about 262 evaluations a frame. To do at the pin bump that carries
 140d830: try `until_if` on a manifest that counts arrivals today.
+
+2026-10-17, direct exchange, nothing asked. luna develop 621758c, debugger
+wave D1 (MCP): exec breakpoints on the SA-1, the GSU and the DSP-1
+(`bp_add {kind: "exec", cpu: "sa1"|"gsu"|"dsp"}`); watchpoints on
+`Sa1Memory`, `GsuMemory`, `DspDataRam`, the ARAM (`SpcRam`), and read
+watchpoints on VRAM, CGRAM and OAM; `eval` in each chip's context
+(`{cpu: "gsu", expression: "r1 == 5"}`); `forbid` ranges as in Mesen2;
+every hit names its `cpu`. `luna test` unchanged, `[asserts.expr]` still
+held for our prototype. Where it serves us: the coprocessor examples
+(`chips/`) and the fixtures of the GSU and SA-1 jobs, where we read
+results after the fact today; an ARAM watchpoint for the audio driver's
+handshake races (two of them in `silent_defects_log.md`). To do at the
+pin bump that carries it: regenerate `docs/tools/luna.md`, and add a GSU
+or SA-1 breakpoint to `docs/tutorials/debugging.md`.
