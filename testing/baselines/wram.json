@@ -116,12 +116,12 @@
     "rom_sha256": "fc53a4dbb87d42bace16d04a961c85bbfd7fd8ea4dad5ad54cd0d119ced64fbc"
   },
   "chips_superfx_3d": {
-    "stream": "51a33e2d04bedf919a648e5b4dcfcdbd7d252bcec77584006ee554f401e5f753",
-    "rom_sha256": "a9b12f3849ec98808af021090ec4f6ba5c1eefeacb373d893c400c1e36c2da0e"
+    "stream": "aac371d5f8042c0bb6d488863e6b75e9f3e0b893bb8ea983a7d6681a2d641ac7",
+    "rom_sha256": "f9f3c883350e26c8978ced0410abef3b8bb706f30f003d3e4b7c0f601a46c6a4"
   },
   "chips_superfx_game_skeleton": {
-    "stream": "cfbadcef421b57c8d5a612251a0d9def922834c326dc995f91e9554e031a69b2",
-    "rom_sha256": "eb1c5a5a324fe9a26c5dce2cc20fb9ff7d6ef2790a7b3c2ce0ecf5dc1807e9b2"
+    "stream": "7b3876967ca2a7c8f1c39482b05aee07e9456231638334aa2f303cb68d4d00fe",
+    "rom_sha256": "102f4be2be50e5f578c04ee2421cbd6b950a65de713e81d0d06449c4fc1de6ed"
   },
   "chips_superfx_hello": {
     "stream": "a0beebd17d200b4353ceecff54f8e78ad51fea24a266dabdfc383a7681759441",
@@ -196,8 +196,8 @@
     "rom_sha256": "419dfc4441d851bd11057435511591fcfcf525df31641a13bb82fd43a940872c"
   },
   "hdma_hdma_helpers": {
-    "stream": "6238dda7ee9879b768a768bd661f3ea522f5c9c7cee48d2e3811148b59254eca",
-    "rom_sha256": "a526c47e35f6eff910d9e33a0504f92d15477e7bc14094fc92d2690647191a48"
+    "stream": "53d96a9359ccc44476bb5293a0ba2bc56c4f4597e89a48a7a6a538e9efbbefac",
+    "rom_sha256": "e00309df8b9bd22ae8d8ad43e9a5c48e90628bc8ce34f5904de7c113abde4b1f"
   },
   "hdma_hdma_indirect_gradient": {
     "stream": "2c6b2000773b5e2698c431330118d0b371f5eee877001456ba2b0ed337d4796d",

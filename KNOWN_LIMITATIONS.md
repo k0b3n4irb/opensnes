@@ -163,6 +163,27 @@ luna after any change to the handler — a lenient emulator does not show
 the corruption. `dmaCopyCGram()` / `setPalette*()` from
 the main loop are safe: they run in VBlank or forced blank.
 
+### 🟡 An HDMA to INIDISP: write it through `$21FF`, and blank with `$8F`
+Two errata of the console make INIDISP (`$2100`) a register to stream with
+care, and luna models neither (it has no console revision).
+On an S-CPU-A console (the second 5A22), "a recent HDMA transfer to/from
+INIDISP (Meaning that BBADn is set to zero $00) can make a DMA transfer
+fail. Nothing will happen and the DMA size registers (DASnL, DASnH) will be
+unchanged" (snesdev-wiki, Errata / S-CPU, chunk `97b76d7d4e2e34a6`;
+undisbeliever, chunk `8a82d25de6e99ae5`). On a 1-CHIP console a brightness
+change "may be a gradual fade that takes 72 pixels or more", so a band of
+forced blank written `$80` fades in at its end (snesdev-wiki, Errata /
+Video, chunk `172b5b77ea6fae37`).
+`gsuSetupHdmaBlanking()` and `hdmaBrightnessGradient()` use the form these
+sources give: transfer mode 1 to `$21FF`, which writes `$21FF` (nothing)
+and then `$2100` (the B-bus address wraps, anomie-regs), each value twice
+in the table, and `$8F` rather than `$80` for the blank.
+
+**Mitigation:** an HDMA of your own to INIDISP does the same:
+`hdmaSetup(ch, HDMA_MODE_2REG, 0xFF, table)` with entries
+`count, value, value`, and the brightness bits kept in a forced-blank
+value (`0x80 | brightness`).
+
 ### 🟡 BG1 scroll and Mode 7 matrix share one write-twice latch
 `$210D`/`$210E` are dual registers (BG1 scroll in modes 0-6, Mode 7 scroll
 in mode 7), and together with the Mode 7 registers `$211B`-`$2120` they go

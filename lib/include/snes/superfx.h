@@ -445,7 +445,10 @@ extern void gsuDmaFullFrame(void);
  * (Until 2026-10-03 a top band of 0 ended the table before it began, and
  * the whole frame was then transferred on visible lines.) The visible
  * lines are written with INIDISP = $0F, full brightness: setBrightness()
- * and the fades do not apply while the bands are on.
+ * and the fades do not apply while the bands are on. The bands are $8F
+ * (forced blank, brightness kept at 15: no fade-in on a 1-CHIP console),
+ * and the channel writes $21FF then $2100, the form that keeps an S-CPU-A
+ * console's general DMAs from failing.
  */
 extern void gsuSetupHdmaBlanking(u16 topBlank, u16 bottomBlank);
 

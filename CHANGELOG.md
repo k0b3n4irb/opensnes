@@ -157,6 +157,17 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(lib): **the HDMAs to INIDISP take the form two console errata ask
+  for.** `gsuSetupHdmaBlanking()` and `hdmaBrightnessGradient()` wrote
+  INIDISP with a one-register HDMA (B-bus address `$00`), which on an
+  S-CPU-A console can make a general DMA fail with no trace — and the Super
+  FX presentation runs its DMAs in those bands; and the letterbox blanked
+  with `$80`, which a 1-CHIP console fades in over 72 pixels or more at
+  each band's end. Both now write `$21FF` then `$2100` (transfer mode 1,
+  each value twice) and blank with `$8F` (snesdev-wiki Errata; undisbeliever).
+  luna models no console revision, so the change is in the tables and the
+  registers, asserted by the Super FX fixture; the console session will
+  see the rest. `hdmaBrightnessGradient()` takes 56 more bytes of RAM (169).
 - fix(compiler): **a struct copied from a named `const` object reads its
   bank.** `r = kl;`, with `kl` a `static const` struct in an asset bank,
   was copied with bank-$00 loads, where `s = kl.k` read the right bank;

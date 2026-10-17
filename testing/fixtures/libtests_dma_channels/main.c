@@ -40,7 +40,8 @@ static void read_channels(void) {
         r_ctrl[ch] = (u16)r[0] | ((u16)r[1] << 8);
         r_table[ch] = (u16)r[2] | ((u16)r[3] << 8);
     }
-    if (r_ctrl[1] != 0x0000 || r_table[1] != (u16)(u32)gsu_hdma_table)
+    /* the letterbox: mode 1 to $21FF, which writes $21FF then INIDISP */
+    if (r_ctrl[1] != 0xFF01 || r_table[1] != (u16)(u32)gsu_hdma_table)
         ok = 0;
     for (ch = 2; ch <= 6; ch++)
         if (r_ctrl[ch] != 0x3200 || r_table[ch] != (u16)(u32)coldata_table)
