@@ -157,3 +157,17 @@ second. Not checked on their side: PAL, overscan, the libx264 path. To do
 at the pin bump that carries it: regenerate the luna reference page from
 `--help`, and try it on an example's manifest script — a bug report to the
 game or from it could carry the `.md` instead of a description.
+
+2026-10-17, direct exchange, nothing asked yet. luna's debugger foundations
+(MCP: `memory_kinds` / `read_memory`, `eval` in Mesen2's expression
+language, `bp_add` with `condition` and `mark`, `set_break_sources`,
+`step_kind`) and, on its develop 140d830, `until_if = "expr"` on an
+`at_symbol` checkpoint or a poke, and `luna state --until-pc X --until-if`.
+Our side: `SNES_ASSERT` (WDM $00) is our assert channel, read by
+`--wdm-out` on every compare run; `set_break_sources {wdm: true}` stops at
+the call site in an interactive session. Candidate, held by luna until a
+prototype of ours shows the need: `[asserts.expr] never = "…"` in a
+manifest, an invariant checked without code in the ROM. When we prototype
+it, say which granularity it needs — per frame is nearly free, per line
+about 262 evaluations a frame. To do at the pin bump that carries
+140d830: try `until_if` on a manifest that counts arrivals today.
