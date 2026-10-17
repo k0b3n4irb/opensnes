@@ -83,7 +83,7 @@ extern u8 hdma_table_a[];
  * @brief Stop whichever HDMA effect is currently running and restore defaults.
  *
  * This function performs a complete cleanup:
- * 1. Stops ALL HDMA helper channels (ch6 and ch7) unconditionally, because
+ * 1. Stops ALL HDMA helper channels (ch5 and ch6) unconditionally, because
  *    different effects use different channels and a previous effect's channel
  *    may still be running when switching.
  * 2. Re-enables ch6 with a null (terminator-only) table. This is critical
@@ -96,7 +96,7 @@ extern u8 hdma_table_a[];
  *    CGRAM DMA must happen during VBlank to avoid visual artifacts.
  */
 static void stopCurrentEffect(void) {
-    hdmaBrightnessGradientStop(7);  /* Disables ch7, restores INIDISP=0x0F */
+    hdmaBrightnessGradientStop(5);  /* Disables ch5, restores INIDISP=0x0F */
     hdmaColorGradientStop(6);       /* Disables ch6 */
     hdmaIrisWipeStop(6);            /* Disables ch6, restores window regs */
     hdmaWaveStop();                 /* Disables wave ch, resets BG scroll */
@@ -176,7 +176,7 @@ int main(void) {
             }
             fx.brightness_bot = 0;
             WaitForVBlank();
-            hdmaBrightnessGradient(7, 15, fx.brightness_bot);
+            hdmaBrightnessGradient(5, 15, fx.brightness_bot);
             fx.active_effect = 1;
         }
 
@@ -219,7 +219,7 @@ int main(void) {
             if (fx.active_effect == 1 && fx.brightness_bot < 14) {
                 fx.brightness_bot += 2;
                 WaitForVBlank();
-                hdmaBrightnessGradient(7, 15, fx.brightness_bot);
+                hdmaBrightnessGradient(5, 15, fx.brightness_bot);
             }
             if (fx.active_effect == 3 && fx.iris_radius < 200) {
                 fx.iris_radius += 10;
@@ -235,7 +235,7 @@ int main(void) {
             if (fx.active_effect == 1 && fx.brightness_bot > 0) {
                 fx.brightness_bot -= 2;
                 WaitForVBlank();
-                hdmaBrightnessGradient(7, 15, fx.brightness_bot);
+                hdmaBrightnessGradient(5, 15, fx.brightness_bot);
             }
             if (fx.active_effect == 3 && fx.iris_radius > 10) {
                 fx.iris_radius -= 10;

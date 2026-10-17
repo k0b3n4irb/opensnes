@@ -8,11 +8,13 @@
 # What is observable: the lib's own shadow of HDMAEN (`hdma_enabled_state`),
 # the example's `fx.active_effect` (first byte of `fx`), the window registers
 # the iris wipe drives (`w12sel`, `tmw`) and the ripple amplitude the wave
-# helper reads every frame (`hdma_wave_amplitude`). Measured on luna:
+# helper reads every frame (`hdma_wave_amplitude`). Measured on luna
+# (the brightness gradient ran on channel 7, which hdma.h reserves for the
+# NMI's DMAs, until 2026-10-18):
 #
 #   idle             enabled 0x40 (the example's own base channel 6), effect 0
-#   A  brightness    enabled 0xC0: channel 7 joins, effect 1
-#   B  colour        enabled 0x40: hdmaBrightnessGradientStop dropped 7, effect 2
+#   A  brightness    enabled 0x60: channel 5 joins, effect 1
+#   B  colour        enabled 0x40: hdmaBrightnessGradientStop dropped 5, effect 2
 #   X  iris          effect 3, W12SEL 3 / TMW 1: the wipe masks BG1
 #   Y  ripple        effect 4, W12SEL back to 0: hdmaIrisWipeStop, amplitude 6
 #   UP on ripple     amplitude 8 (hdmaWaveUpdate reads it every frame)
@@ -25,11 +27,11 @@ at_frame = 50
 hdma_enabled_state = { eq = 0x40, width = 1 }
 fx = { eq = 0, width = 1 }
 
-[[checkpoint]]                  # A: brightness gradient on channel 7
+[[checkpoint]]                  # A: brightness gradient on channel 5
 at_frame = 75
 input = "60:0x0080,64:0"
 [checkpoint.values]
-hdma_enabled_state = { eq = 0xC0, width = 1 }
+hdma_enabled_state = { eq = 0x60, width = 1 }
 fx = { eq = 1, width = 1 }
 
 [[checkpoint]]                  # B: colour gradient replaces it (Stop ran)
