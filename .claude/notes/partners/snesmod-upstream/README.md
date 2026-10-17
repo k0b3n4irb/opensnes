@@ -39,8 +39,9 @@ the same plain style as the issues.
 |---|---|---|---|---|---|---|---|
 | 2026-10-03 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | posted today |
 | 2026-10-12 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved (two days late: the loop lot) |
+| 2026-10-17 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved (two days early, on the owner's word) |
 
-Next check due: 2026-10-19.
+Next check due: 2026-10-24.
 
 ## PVSnesLib: waits for Mukunda (owner decision, 2026-10-03)
 
