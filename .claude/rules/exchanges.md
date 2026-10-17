@@ -25,6 +25,33 @@ A gap of ours the game works around in silence is a failed proof.
      before a line was written);
    - say what rubs when we use a neighbour's work, with nothing to ask.
 
+## The SDK learns from the game; it does not bend to it
+
+Owner, 2026-10-17. The game tests the SDK; what the test reveals improves
+the SDK when **another game would need it too**. A request from the game
+lands only if it passes four checks, written in the reply to it:
+
+1. **The need is general.** A second game doing the same kind of thing
+   would hit it. A game that reads the lib's internals to compute
+   something (the queue's arrays, a private variable) is the usual sign
+   that the SDK lacks it.
+2. **The API speaks the SDK's terms.** Bytes, entries, frames, banks — not
+   a status bar or five 32x32 frames of a particular game. What the game sends is
+   reduced to a stand-alone case first (the compiler requests: synthetic
+   reproducers, never its sources).
+3. **Policy stays with the game.** The SDK gives the measure and the
+   mechanism; deciding priorities, budgets and trade-offs is the game's.
+   Precedent: `vramQueueCost()` was taken, a budget enforced by
+   `vramQueuePush()` was not (`01fe79bf`) — it would have decided by push
+   order which module gives way. Same for semantics: `i + 8` was folded
+   only where the index is proved bounded, not by leaning on undefined
+   behaviour the game wanted (owner's choice, `cdcc4580`).
+4. **The cost to every other user is small and stated.** Measured
+   (libbench, bench, WRAM drift explained) in the commit.
+
+A request that fails one of them gets a justified no, and the game finds
+another way (`How`, below).
+
 ## How
 
 - **`ListAgents`, then `SendMessage`**, to the sessions `luna` and
