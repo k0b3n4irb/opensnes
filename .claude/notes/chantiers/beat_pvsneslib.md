@@ -720,6 +720,11 @@ checkout that sha here, `git merge --ff-only wip/<name>` (rebase the branch
 first if `develop` took note commits meanwhile), push the fork, `git
 ls-remote` to see it, remove the worktree, rebuild. Nothing in the main
 tree's git was disturbed during the chantier.
+The fork is pushed **from the main tree's submodule**: a clone's `origin` is
+that submodule, so `git push origin` from the worktree lands on this machine,
+not on GitHub. On 2026-10-17 a push made that way printed success, `develop`
+went out pointing at two SHAs GitHub did not have, and every CI job failed
+at checkout ("not our ref"); `ls-remote` before pushing `develop` catches it.
 
 ### Step 10 of #166: flow-aware dead stores, cost-ordered slots, the leaf rule off (2026-10-10, night)
 
