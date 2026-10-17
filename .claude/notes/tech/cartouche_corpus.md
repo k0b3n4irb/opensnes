@@ -14,6 +14,15 @@ what is in there, how to tell it moved, and which queries prove the
 toolchain-side sources are reachable. Refresh it when `snes_sources`
 reports a new index fingerprint.
 
+## Index state (2026-10-18, read at the luna v1.39.0 pin: `4cc278d08305`)
+
+`snes_sources`: **35 021 chunks, 215 of 237 sources, built
+2026-10-10T18:43:03Z, chunker v10, fingerprint `4cc278d08305`**;
+`luna-docs` captured 2026-10-10, so it carries no v1.39.0 page (reported:
+`partners/snes-rag/2026-10-18_to_snes-rag_luna-docs-v1.39.0.md`). Golden
+queries **10/10** (the nine below plus "per-window shift `--max-shift`",
+`2dda265e2f4d3aa9`).
+
 ## Index state (2026-10-05, later: `f8f11bcced91`)
 
 `snes_sources`: **34 955 chunks, 215 of 237 sources, built 2026-10-05T00:41:07Z,
