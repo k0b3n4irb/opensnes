@@ -313,7 +313,7 @@ Several small uploads in one VBlank: the queue</h2>
 <td class="markdownTableBodyNone">six <span class="tt"><a class="el" href="vramqueue_8h.html#ade39bb80a8d7cf72a11075c930410086" title="Note one transfer for the next vramQueueFlush().">vramQueuePush()</a></span> and one <span class="tt"><a class="el" href="vramqueue_8h.html#afbd23358a6f4ed779b6b4361ab054234" title="Send every queued transfer to VRAM and empty the queue.">vramQueueFlush()</a></span>  </td><td class="markdownTableBodyRight">21,700  </td><td class="markdownTableBodyRight">10,700  </td></tr>
 </table>
 <p>The queue costs <b>more</b> in total — noting an entry is a call too — and a third <b>less</b> in VBlank. Use it when the VBlank is what you are short of; for one or two uploads, or in force blank, call <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a></span>.</p>
-<p>The budget stays yours: what does not fit in the VBlank lands in active display and is ignored by the PPU, with no error. A real project (issue #165) found six 512-byte sprite frames to be the most that fit after the NMI handler, and queues five.</p>
+<p>The budget stays yours: what does not fit in the VBlank lands in active display and is ignored by the PPU, with no error.</p>
 <h2 class="doxsection"><a class="anchor" id="lib-api-tour"></a>
 Lib API tour</h2>
 <table class="markdownTable">

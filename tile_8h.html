@@ -207,7 +207,7 @@ Functions</h2></td></tr>
 <div class="line">    <a class="code hl_function" href="#aa9eef28679b52dd479bff3449a952524">tileBlitGlyph2bpp</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>, br, g, 8 - top, 0, top, x &amp; 7);    <span class="comment">// lower tiles</span></div>
 <div class="ttc" id="agames_2breakout_2main_8c_html_a15f49ee344ac4630061e33b7661f1405"><div class="ttname"><a href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></div><div class="ttdeci">static u16 b</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
 <div class="ttc" id="atile_8h_html_aa9eef28679b52dd479bff3449a952524"><div class="ttname"><a href="#aa9eef28679b52dd479bff3449a952524">tileBlitGlyph2bpp</a></div><div class="ttdeci">void tileBlitGlyph2bpp(u8 FAR *tile, u8 FAR *right, const u8 FAR *glyph, u8 glyph_row, u8 tile_row, u8 rows, u8 shift)</div><div class="ttdoc">OR rows of a 2bpp glyph into a tile at a pixel offset.</div></div>
-</div><!-- fragment --><p>All pointers are far: the layer lives in FAR RAM and the font in an asset bank. Cost: about 9 000 master cycles for the eight rows of a glyph with a right tile (two calls), measured on luna; the C loop it replaces in the first game on the SDK cost about 41 000.</p>
+</div><!-- fragment --><p>All pointers are far: the layer lives in FAR RAM and the font in an asset bank. Cost: about 9 000 master cycles for the eight rows of a glyph with a right tile (two calls), measured on luna.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">tile</td><td>the tile that receives the glyph's left part (never NULL) </td></tr>
