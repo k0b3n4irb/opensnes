@@ -29,7 +29,7 @@ converts it. The user guide is `docs/tools/README.md`.
 |------|------|
 | [`common/`](common/) | linked into every `opensnes-*` tool: subcommands, long options, `--help`, `--json`, messages, exit codes, the TOML settings file (`cli.c`), the `.inc` / `_data.as` glue (`incfile.c`) |
 | [`lib/`](lib/) | the converters of the earlier tools (gfx4snes and smconv from PVSnesLib, and six of the SDK's own), linked into the tools above, with the goldens their suites compare against. Their binaries are retired (`docs/tools/legacy.md`) |
-| [`third_party/`](third_party/) | vendored lodepng, cmdparser, stb_image and cute_tiled, with their licences (`ATTRIBUTION.md`) |
+| [`third_party/`](third_party/) | vendored lodepng, stb_image and cute_tiled, with their licences (`ATTRIBUTION.md`) |
 | [`tests/`](tests/) | `golden.py`, the harness behind every `<tool>/tests/run_golden.py`; `make test-tools` runs them all |
 | [`fuzz/`](fuzz/) | libFuzzer harnesses for the parsers (`make fuzz`, `make fuzz-replay`, `fuzz.yml`); not shipped |
 | [`tool.mk`](tool.mk) | the one build recipe every tool's Makefile includes |

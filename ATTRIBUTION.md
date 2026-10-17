@@ -91,14 +91,6 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **Used in**: `gfx4snes`, `img2snes` and the other PNG-reading tools
 - **What it does**: PNG decoding/encoding
 
-### cmdparser
-- **Author**: XUJINKAI (github.com/XUJINKAI/cmdparser)
-- **License**: Apache License 2.0 — full text and notice in
-  `tools/third_party/LICENSE-cmdparser`, shipped next to the source
-- **Location**: `tools/third_party/cmdparser.{c,h}`
-- **Used in**: `gfx4snes`, `img2snes` (inherited from PVSnesLib's gfx4snes)
-- **What it does**: command-line option parsing
-
 ### stb_image
 - **Author**: Sean Barrett (nothings.org)
 - **License**: public domain (Unlicense) or MIT, at the user's choice

@@ -3,14 +3,15 @@
 | File | Origin | Licence | Used by |
 |---|---|---|---|
 | `lodepng.{c,h}` | [lodepng](https://github.com/lvandeve/lodepng) 20260119 (PNG decode/encode) | zlib | gfx4snes, img2snes, `tools/fuzz` |
-| `cmdparser.{c,h}` | [cmdparser](https://github.com/XUJINKAI/cmdparser), inherited from PVSnesLib's gfx4snes | Apache 2.0 (`LICENSE-cmdparser`, shipped in the zip) | gfx4snes, img2snes |
 | `stb_image.h` | [stb](https://github.com/nothings/stb) 2.30 | public domain or MIT | font2snes, `tools/fuzz` |
 | `cute_tiled.h` | [cute_headers](https://github.com/RandyGaul/cute_headers) 1.06 | zlib or public domain | tmx2snes, `tools/fuzz` |
 
 `ATTRIBUTION.md` at the repository root is the authoritative list. A tool
 that needs one of these adds `-I../third_party` to `INCLUDES` and the `.c`
 to `SRCS` in its Makefile (`tools/tool.mk`). Until 2026-09-15 two tools
-carried byte-identical copies of lodepng and cmdparser (a fix applied to
+carried byte-identical copies of lodepng and of cmdparser, an option
+parser no tool used after the `opensnes-*` tools came and removed on
+2026-10-17 (a fix applied to
 one silently missed the other); until 2026-10-05 the two headers sat in
 two tools' source trees. The cppcheck pass in `make lint-cppcheck`
 suppresses this directory (upstream code with its own noise).

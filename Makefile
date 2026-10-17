@@ -147,7 +147,7 @@ lint-docs:
 # (lodepng, stb_image: upstream code with its own noise), the tools'
 # version macros (TOOL_VERSION, TOOL_BUILD_DATE, tools/tool.mk) are supplied. The w65816 backend is checked advisory
 # only (upstream QBE idioms). First run found a dangling context pointer
-# in cmdparser (both copies), an uninitialised read in aseprite2snes and
+# in cmdparser (both copies, removed since), an uninitialised read in aseprite2snes and
 # the free-then-fatal paths cppcheck could not see were fatal (noreturn).
 # Skips with a note when cppcheck is not installed; CI installs it.
 lint-cppcheck:
@@ -668,8 +668,6 @@ release: all
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp ATTRIBUTION.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
-	@# Apache-2.0 §4: the binaries built with cmdparser ship with its licence.
-	@cp tools/third_party/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
 	@# GPL-2.0 §3: the wla-dx binaries (a patched fork) ship with the licence
 	@# text and a pointer to their exact source (compiler/PINS.md: fork URL and
 	@# commit of every toolchain submodule).

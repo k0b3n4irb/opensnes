@@ -108,6 +108,11 @@ All notable changes to OpenSNES are documented in this file.
   more in a ROM that divides 32 bits.
 
 ### Changed
+- chore(tools): **cmdparser is gone.** The vendored option parser (Apache
+  2.0) came with PVSnesLib's gfx4snes; no tool has compiled it since the
+  `opensnes-*` tools replaced gfx4snes and img2snes, yet the release still
+  shipped its licence. Its sources, its licence and the copy in the release
+  recipe are removed.
 - docs(examples): **the examples reviewed before 1.0; 85 of them.** Six
   taught the opposite of the SDK or the hardware and are corrected
   (an HDMA window table that "must be refreshed every scanline", two
