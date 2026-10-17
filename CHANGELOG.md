@@ -157,6 +157,12 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(build): **a ROM the post-link check refuses does not survive.** The
+  linker writes the `.sfc` before `opensnes-rom check` reads it, so a ROM
+  the check refused stayed on disk and the next `make`, finding it newer
+  than its objects, said "Built" and exited 0. `make/common.mk` now sets
+  `.DELETE_ON_ERROR:`; the failed target is deleted and every later `make`
+  links and fails again. Pinned by `make test-project`.
 - fix(compiler): **a variable-length array is refused.** `u16 a[n];` with
   `n` known at run time — or a `const` variable, which is not a constant
   expression in C — compiled without a word: the backend gave the array a

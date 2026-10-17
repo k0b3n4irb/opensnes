@@ -42,6 +42,12 @@
 #
 #==============================================================================
 
+# A target whose recipe fails is deleted. The ROM is written by the linker
+# before opensnes-rom check reads it; without this, a ROM the check refused
+# stayed on disk, and the next make found it newer than its objects, said
+# "Built" and exited 0 (audit 1.0, 04-3).
+.DELETE_ON_ERROR:
+
 #------------------------------------------------------------------------------
 # Paths and Tools
 #------------------------------------------------------------------------------

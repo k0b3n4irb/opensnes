@@ -365,7 +365,17 @@ test-project:
 	@bin/opensnes-rom inspect -q $(TEST_PROJECT_DIR)/release/opensnes_test_project-v1.0.sfc >/dev/null
 	@(cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes budget 2>/dev/null) | grep -q 'C variables' \
 		|| { echo "ERROR: 'opensnes budget' printed no report"; exit 1; }
-	@echo "user-project test story: OK (incl. the FAIL path, release and budget)"
+	@# A ROM the post-link check refuses does not survive: a second make
+	@# must fail again, not say "Built" (audit 1.0, 04-3; .DELETE_ON_ERROR).
+	@rm -f $(TEST_PROJECT_DIR)/opensnes_test_project.sfc
+	@for i in 1 2; do \
+		if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) RAM_FAIL_THRESHOLD=8190 >/dev/null 2>&1; then \
+			echo "ERROR: make $$i exited 0 on a ROM opensnes-rom check refuses"; exit 1; fi; \
+		test ! -e $(TEST_PROJECT_DIR)/opensnes_test_project.sfc \
+			|| { echo "ERROR: a ROM the check refused stayed on disk"; exit 1; }; \
+	done
+	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
+	@echo "user-project test story: OK (incl. the FAIL path, a refused ROM, release and budget)"
 
 # Measured lib API coverage on its own (the `tests` target runs the check).
 rom-coverage: fixtures
