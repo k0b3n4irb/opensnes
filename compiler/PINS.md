@@ -29,7 +29,7 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | b5ad29ea89b752064277e51b4aad06574587a862 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/cproc | 075fa2cb03f026af20e403bce58d336cb1556d09 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
 | compiler/qbe | 40839d81eeee52c7661d742f6da53261cc0b187f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
 | compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
@@ -44,9 +44,10 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 47 patches since upstream merge-base 7051114
+### compiler/cproc — 48 patches since upstream merge-base 7051114
 
 ```
+075fa2c qbe: a whole-object copy carries the access flags of both sides — `r = kl;` from a named `static const` struct, an element of a const array of structs, a const union, a local initialised from a const object read bank $00 (refused at link); a volatile source lost `volat` (audit 04-2, 2026-10-17)
 b5ad29e decl: a variable-length array is refused — every local has a fixed frame slot on w65816, so `u16 a[n];` (or a `const` variable as the length) compiled into a pointer to 2 bytes the callee wrote past; the driver defines `__STDC_NO_VLA__` (audit 04-1, 2026-10-17)
 8c97293 qbe: Avoid redundant leaf ceq in switch (v2) — a case whose neighbours are the values just below and above needs no compare: `switch` workload -3.1 %, `state` -2.7 % (upstream 863e1e7, cherry-picked 2026-10-11)
 7e6a4e5 expr: a string literal is const char[] — handed to a plain `char *` it was read from the wrong bank in silence, and `"abc"[i]` was read bank-blind; a store to a literal is refused (2026-10-11)

@@ -1,0 +1,9 @@
+# Every read of a named const object is far (lda.l); none is bank-blind (lda.w).
+in field: present lda\.l kl
+in whole: present lda\.l kl
+in elem: present lda\.l ktab
+in uni: present lda\.l ku
+in init: present lda\.l kl
+absent lda\.w kl\b
+absent lda\.w ku\b
+absent lda\.w ktab\b

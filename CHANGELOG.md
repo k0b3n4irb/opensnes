@@ -157,6 +157,15 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(compiler): **a struct copied from a named `const` object reads its
+  bank.** `r = kl;`, with `kl` a `static const` struct in an asset bank,
+  was copied with bank-$00 loads, where `s = kl.k` read the right bank;
+  an element of a const array of structs, a const union and a local
+  initialised from a const object did the same. The link check refused
+  those ROMs ("C code reads bank $01+ data with bank-$00 addressing"),
+  so nothing wrong shipped. The copy now carries the access flags of both
+  sides (`const` and `FAR` far, `volatile` kept). Pinned by the compiler
+  check `copy_from_named_const`.
 - fix(lib,runtime): **the NMI's DMAs leave the HDMA channels alone.** The
   text flush ran on channel 1 and the dynamic sprite uploads on channels
   1 to 4, so a Super FX letterbox (`gsuSetupHdmaBlanking`, HDMA channel 1)
