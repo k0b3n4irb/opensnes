@@ -157,6 +157,13 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(tools,docs): **an SA-1 ROM whose `SA1Start` left bank $00 is refused.**
+  The SA-1 reset vector is 16-bit, so the SA-1 starts only in the ROM of
+  bank $00. The SA-1 tutorial taught a boot section in `SUPERFREE`, which
+  the linker moves to bank $01 once bank $00 fills: the build was green and
+  the SA-1 never ran. `opensnes-rom check` now refuses the ROM and names
+  the directive; the tutorial uses the template's `BANK 0 SLOT "ROM"
+  SEMIFREE` and enables BW-RAM writes (CBWE) as the template does.
 - fix(lib): **the HDMAs to INIDISP take the form two console errata ask
   for.** `gsuSetupHdmaBlanking()` and `hdmaBrightnessGradient()` wrote
   INIDISP with a one-register HDMA (B-bus address `$00`), which on an

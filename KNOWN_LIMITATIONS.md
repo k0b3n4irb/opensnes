@@ -312,6 +312,18 @@ only when computed inside the callback. Mitigation: compute fixed-point
 math in the main loop, or use plain integer operators in the callback.
 (The headers carry the same `@warning`.)
 
+### 🟢 The SA-1 starts only in bank $00 (checked after every link)
+The SA-1 reset vector (CRV, `$2203-$2204`) is 16 bits ("Size: 16 bits",
+Nintendo manual Book II 4.1.4, chunk `fd09e9ca4f6df406`; fullsnes, CRV Lsb and
+Msb at `$2203` and `$2204`, chunk `0a5c49d9435a33b0`): `SA1Start` must
+be in the ROM of bank $00. The template's `sa1_boot.asm` pins its section
+there; a boot file of your own declared `SUPERFREE` moves to bank $01 once
+bank $00 fills, which is normal for a large game, and the SA-1 never runs.
+`opensnes-rom check` refuses such a ROM and names the directive.
+
+**Mitigation:** `.SECTION ".sa1_boot" BANK 0 SLOT "ROM" SEMIFREE`, as in
+`templates/sa1_boot.asm` and `docs/tutorials/sa1.md`.
+
 ### 🟢 SA-1 SIWP/CIWP write-protection polarity: bit = 1 enables writes
 `templates/crt0.asm` enables SA-1 I-RAM access by writing `$FF` to the SIWP
 register `$002229`. The

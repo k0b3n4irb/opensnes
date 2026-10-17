@@ -209,6 +209,28 @@ int check_data_init(cli_ctx *ctx, const sym_file *s, const char *rom)
     return 0;
 }
 
+/* ----------------------------------------------------------- SA-1 boot */
+
+/* The SA-1 starts at the 16-bit address in its reset vector (CRV $2203-$2204,
+ * "Size: 16 bits", Nintendo manual Book II 4.1.4): SA1Start must be in the
+ * ROM of bank $00. The template pins its section there; a sa1_boot.asm of
+ * the project's own in SUPERFREE drifts to bank $01 once bank $00 fills,
+ * which is normal for a big game, and the SA-1 then never runs a line —
+ * with a green build (audit 1.0, 02-1). */
+int check_sa1_boot(cli_ctx *ctx, const sym_file *s, const char *rom)
+{
+    const sym_label *l = sym_find(s, "SA1Start");
+    if (!l) return 0;
+    if (l->bank != 0 || l->address < 0x8000) {
+        cli_error(ctx, rom, "SA1Start is at $%02X:%04X, but the SA-1 reset vector is 16-bit: the SA-1 can only start in the ROM of bank $00 — declare the section of your sa1_boot.asm `.SECTION \".sa1_boot\" BANK 0 SLOT \"ROM\" SEMIFREE` (templates/sa1_boot.asm), not SUPERFREE",
+                  l->bank, l->address);
+        return 1;
+    }
+    if (!ctx->json && !ctx->quiet)
+        printf("OK: SA1Start in bank $00 ROM ($00:%04X), where the SA-1's 16-bit reset vector reaches\n", l->address);
+    return 0;
+}
+
 /* ------------------------------------------------------------- assets */
 
 static void scan_assets(const char *dir, check_results *r, int depth)

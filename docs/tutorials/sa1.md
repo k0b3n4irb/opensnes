@@ -146,7 +146,11 @@ This code runs on the SA-1:
 ```asm
 .ifdef SA1
 
-.SECTION ".sa1_boot" SUPERFREE
+; BANK 0, not SUPERFREE: the SA-1 reset vector is 16-bit, so the SA-1 can
+; only start in the ROM of bank $00. A big program fills bank $00 and the
+; linker would place a SUPERFREE section in bank $01; opensnes-rom check
+; refuses the ROM if SA1Start is not in bank $00.
+.SECTION ".sa1_boot" BANK 0 SLOT "ROM" SEMIFREE
 
 .ACCU 16
 .INDEX 16
@@ -171,6 +175,11 @@ SA1Start:
     ; sfc-dev-wiki states the inverse — see the box above).
     lda #$FF
     sta.l $00222A           ; CIWP = $FF (all I-RAM writable)
+
+    ; Enable SA-1 BW-RAM writes: CBWE ($2227) bit 7, 1 = write enabled
+    ; (fullsnes; Nintendo manual 4.1.23). crt0 sets the SNES side (SBWE).
+    lda #$80
+    sta.l $002227           ; CBWE = write enabled
 
     ; Signal ready to main CPU
     lda #$A5
@@ -332,7 +341,7 @@ To read data tables in ROM from the SA-1, use `lda.l table,x` (opcode $BF).
 This is a long indexed read — no DB dependency:
 
 ```asm
-; Sine table in the same SUPERFREE section
+; Sine table in the same section as the code that reads it
 lda.l $3006         ; index
 rep #$20
 .ACCU 16

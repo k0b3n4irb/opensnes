@@ -12,12 +12,13 @@ typedef struct {
     int  ram_sections, far_sections;
     long asset_vram, asset_colours;
     int  asset_files;
-    int  bank0, ram, datainit, bankreads, nmirace;   /* each check's verdict: 0 / 1 / 2 */
+    int  bank0, ram, datainit, bankreads, nmirace, sa1boot;   /* each check's verdict: 0 / 1 / 2 */
 } check_results;
 
 int check_bank0(cli_ctx *ctx, const sym_file *s, const char *rom, int warn, int fail, check_results *r);
 int check_ram(cli_ctx *ctx, const sym_file *s, const char *rom, int warn, int fail, check_results *r);
 int check_data_init(cli_ctx *ctx, const sym_file *s, const char *rom);
+int check_sa1_boot(cli_ctx *ctx, const sym_file *s, const char *rom);
 int check_bank_reads(cli_ctx *ctx, const sym_file *s, const char *dir);
 int check_nmi_race(cli_ctx *ctx, const char *dir);
 void report_assets(cli_ctx *ctx, const char *dir, check_results *r);
