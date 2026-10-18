@@ -11,6 +11,7 @@ Run:  python3 tools/opensnes-music/tests/run_golden.py
 """
 from __future__ import annotations
 
+import re
 import sys
 import tempfile
 from pathlib import Path
@@ -53,6 +54,17 @@ def spc_written():
         at = data[0x100 + 0x1A00:0x100 + 0x1A04]
         if at != bytes.fromhex("806e0324"):
             return [f"pollen8.spc: ARAM $1A00 holds {at.hex()}, not the module header 806e0324"]
+        # the driver at $0400 is the library's, the one games run (one copy:
+        # lib/source/sm_spc.asm); the tool clears the two bytes at $3C
+        # (a branch that waits for the console) so that a player starts it
+        asm = (g.here.parents[2] / "lib" / "source" / "sm_spc.asm").read_text()
+        driver = bytearray(int(x, 16) for line in asm.splitlines() if line.strip().startswith(".byte")
+                           for x in re.findall(r"\$([0-9A-Fa-f]{2})", line))
+        driver[0x3C:0x3E] = b"\0\0"
+        got = data[0x100 + 0x400:0x100 + 0x400 + len(driver)]
+        if len(driver) != 5522 or got != driver:
+            n = sum(1 for a, b in zip(got, driver) if a != b)
+            return [f"pollen8.spc: the driver at $0400 is not lib/source/sm_spc.asm ({len(driver)} bytes, {n} differ)"]
     return []
 
 
@@ -78,7 +90,7 @@ for blocked in ("soundbank.bnk", "soundbank.asm", "soundbank.h"):
     g.check(f"bank with {blocked} unwritable", "exit 3, said", unwritable(blocked))
 
 
-g.check("spc pollen8.it: a 66048-byte SPC file", "SPC700 header, 64 KB RAM + registers, module at $1A00", spc_written)
+g.check("spc pollen8.it: a 66048-byte SPC file", "SPC700 header, the library's driver, module at $1A00", spc_written)
 g.expect_refused("bank junk.it (not an IT module)", ["bank", "junk.it"], write={"junk.it": b"junk" * 16},
                  needles=["opensnes-music: junk.it: 'junk.it' is not an Impulse Tracker module"], nothing_written=["junk.asm", "junk.h", "junk.bnk"])
 g.expect_refused("bank --bank 0", ["bank", "--bank", "0", "pollen8.it"], copy=["pollen8.it"],

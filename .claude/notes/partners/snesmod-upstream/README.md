@@ -43,6 +43,21 @@ the same plain style as the issues.
 
 Next check due: 2026-10-24.
 
+## Where the driver comes from (measured 2026-10-18)
+
+`lib/source/sm_spc.asm` is PVSnesLib's `pvsneslib/source/sm_spc.asm` (the
+driver with pause and resume, PVSnesLib commits of 2025-02-08) plus our KOF
+patch: the two differ at five bytes, $92-$99, and nowhere else. Its source
+is upstream: `pvsneslib/snesmod/sm_spc.as7` (TASM syntax, Mukunda Johnson
+2009, bugfixes by KungFuFurby), converted to WLA-DX syntax by PVSnesLib on
+2025-12-29 (`df062883`, `pvsneslib/snesmod/sm_spc_wla.asm` on `develop`).
+That file, assembled by our `bin/wla-spc700` and linked with `wlalink -b`,
+gives PVSnesLib's 5 522 bytes exactly (0 differ).
+
+The tool's former copy, `tools/lib/smconv/src/spc_program.h` (5 546 bytes),
+was PVSnesLib's `tools/smconv/spc_program.h`, an older build. Since
+2026-10-18 the tool generates its array from `lib/source/sm_spc.asm`.
+
 ## PVSnesLib: waits for Mukunda (owner decision, 2026-10-03)
 
 PVSnesLib has the same KOF sequence (`pvsneslib/snesmod/sm_spc_wla.asm:545`)

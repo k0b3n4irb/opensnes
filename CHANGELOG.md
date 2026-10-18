@@ -157,6 +157,12 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(tools): **the `.spc` of `opensnes-music spc` runs the driver games
+  run.** The tool carried its own copy of the SNESMOD driver (5 546 bytes,
+  an older build from PVSnesLib's smconv), different from the library's
+  (5 522 bytes, with the stop and pause fix): 4 854 bytes differed. The
+  tool now builds its copy from `lib/source/sm_spc.asm` at compile time,
+  and its golden checks that the `.spc` holds that driver.
 - fix(tools): **`opensnes-music` puts the module where the driver reads it,
   and refuses one the SPC700's RAM cannot hold.** `opensnes-music spc` wrote
   the module at `$19AA` while the driver reads it at `$1A00`: the preview
