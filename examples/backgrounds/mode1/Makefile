@@ -11,7 +11,7 @@ ROM_NAME   := MODE1 BACKGROUND
 
 # Use the OpenSNES library
 USE_LIB    := 1
-LIB_MODULES := console sprite dma background asset
+LIB_MODULES := console sprite dma background asset lzss input
 
 # Source files
 CSRC       := main.c

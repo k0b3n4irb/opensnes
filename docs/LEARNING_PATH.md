@@ -156,8 +156,6 @@ everything above.
 
 @subpage examples_memory_hirom_demo
 
-@subpage examples_backgrounds_mode1_lz77
-
 @subpage examples_games_breakout
 
 @subpage examples_games_blocks

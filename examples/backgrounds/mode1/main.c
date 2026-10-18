@@ -9,7 +9,13 @@
  * example uses only BG1 with a 16-color tileset and tilemap converted from
  * a PNG by the build (opensnes-tileset and the settings file beside it).
  *
- * This is a direct port of the PVSnesLib "Mode1" example.
+ * The same picture is also linked a second time, LZ77-compressed by the
+ * build (`lz = true` in res/opensnes_lz.png.toml: 2592 bytes of tiles become
+ * 652), and decompressed at boot straight into VRAM by lzssDecodeVram().
+ * A and B point BG1 at one copy or the other: the screen does not change,
+ * and that is the lesson — same tiles, a quarter of the ROM.
+ *
+ * This began as the PVSnesLib "Mode1" and "Mode1LZ77" examples.
  *
  * @par SNES Concepts
  * - Mode 1: BG1/BG2 are 4bpp (16 colors each), BG3 is 2bpp (4 colors)
@@ -17,20 +23,26 @@
  * - dmaCopyVram() for tilemap data transfer to a separate VRAM region
  * - VRAM layout: tilemap at $0000, tiles at $4000 (non-overlapping regions)
  * - Force blank (setScreenOff) during VRAM setup to avoid mid-frame writes
+ * - LZ77-compressed tiles: lzssDecodeVram() decodes from ROM into VRAM
+ * - bgSetGfxPtr(): a background's character base is one register, switched
+ *   at any time
  *
  * @par What to Observe
  * - A static full-screen image rendered as 8x8 tiles on BG1
  * - Only BG1 is enabled; BG2 and BG3 are unused
  * - The image remains stationary (no scrolling)
+ * - A shows BG1 from the decompressed copy at VRAM $5000, B from the plain
+ *   one at $4000: the picture is the same pixel for pixel
  *
  * @par Modules Used
- * console, sprite, dma, background, asset
+ * console, sprite, dma, background, asset, lzss, input
  *
- * @see background.h, dma.h, video.h
+ * @see background.h, lzss.h, dma.h, video.h
  */
 
 #include <snes.h>
 #include <snes/asset.h>
+#include <snes/lzss.h>
 
 /*============================================================================
  * Asset bundle declaration — typed-value form
@@ -42,6 +54,11 @@
  *============================================================================*/
 
 #include "res/opensnes.inc"   /* generated: DECLARE_BG_ASSET(opensnes, BG_16COLORS, SC_32x32) and the arrays behind it */
+#include "res/opensnes_lz.inc" /* generated: opensnes_lz_tiles[] (LZ77), opensnes_lz_pal[], opensnes_lz_map[], each with _end */
+
+/** @brief VRAM word address of the plain tiles (bgLoad) and of the decompressed copy */
+#define TILES_PLAIN 0x4000
+#define TILES_LZ    0x5000
 
 /**
  * @brief Entry point -- load a 4bpp tileset and display a static Mode 1 image
@@ -68,7 +85,13 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     /* BG1: tiles at $4000, tilemap at $0000, palette at slot 0 */
-    bgLoad(0, &opensnes, 0, 0x4000, 0x0000);
+    bgLoad(0, &opensnes, 0, TILES_PLAIN, 0x0000);
+
+    /* The same tiles again, from their LZ77-compressed copy, decoded from
+     * ROM into VRAM at $5000 (still in force blank: the decoder writes the
+     * PPU data port). The map and the palette are the plain ones: the build
+     * made the same map for both copies. */
+    lzssDecodeVram(opensnes_lz_tiles, TILES_LZ);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode
@@ -86,9 +109,15 @@ int main(void) {
     /* Enable display at full brightness */
     setScreenOn();
 
-    /* Main loop - just wait for VBlank */
+    /* Main loop: A shows the decompressed copy, B the plain one */
     while (1) {
         WaitForVBlank();
+        if (padPressed(0) & KEY_A) {
+            bgSetGfxPtr(0, TILES_LZ);
+        }
+        if (padPressed(0) & KEY_B) {
+            bgSetGfxPtr(0, TILES_PLAIN);
+        }
     }
 
     return 0;

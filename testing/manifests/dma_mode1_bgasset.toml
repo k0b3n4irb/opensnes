@@ -13,8 +13,8 @@
 # pointers swapped, a stale `_end` label) shows up as "the screen looks
 # different" — which the fbhash pillar reports as an unexplained hash and the
 # next `--update` silently blesses. These blocks say WHICH of the three
-# transfers went wrong, and they are the same bytes the mode1_lz77 manifest
-# asserts for the decompressed path, so the two examples are pinned to one
+# transfers went wrong, and they are the same bytes dma_mode1_lz.toml asserts
+# for the decompressed copy at $5000, so the two paths are pinned to one
 # source of truth.
 rom = "../../examples/backgrounds/mode1/mode1.sfc"
 frames = 200

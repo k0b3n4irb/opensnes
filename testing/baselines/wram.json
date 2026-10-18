@@ -24,16 +24,12 @@
     "rom_sha256": "eb7fd2a1ce62403923edb57936f5be2f5ee51f19601d4e8a917add14d265da1a"
   },
   "backgrounds_mode1": {
-    "stream": "15eb3532af9125fa3cd660f326f1f5700972a48a6a927fb4c059b79fcd2d4c18",
-    "rom_sha256": "06aba73b54175c5b909bd9163acb855bbb40bef699d7c4179f995f682ad9e92e"
+    "stream": "63de4f3e9ec38ddaae033a240f5afd5386037d1c6a05f0c22c8c4913e09ce335",
+    "rom_sha256": "32e11b61b20dba05f0e7b449145550f7c8c2a8458c7f2cfbaa34449008c5e1eb"
   },
   "backgrounds_mode1_bg3_priority": {
     "stream": "f776df943105f30550134f10fc0dcd291f326b1ed3469544b91333aa812455ce",
     "rom_sha256": "60b54669d25e6fd5441d85c11718f237592bd79a403637d5a5205480de741a64"
-  },
-  "backgrounds_mode1_lz77": {
-    "stream": "d8324a875b8117cec5e74e7eeb37b58e2900a23764498aed01370964edeea4d7",
-    "rom_sha256": "9b1e3ff033fa96bfe524886f9c6f77d43067dc6118c96189fe4251d1fc3c716c"
   },
   "backgrounds_mode2": {
     "stream": "e3ddbe934630f7f4456b96616d5b5944daf6eba9097106bf89b15f13de91bbe3",

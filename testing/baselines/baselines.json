@@ -53,12 +53,6 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "e54f328d416840a7701b19aa449f539c24fefc13cf9bdab5a32dae6f4ca4e047"
   },
-  "backgrounds_mode1_lz77": {
-    "fbhash": "255ef4ce2740ba95",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "7e4c578965d738962b1d1fefda07b6506c94d89667544d8438b2f86e28b7af5d"
-  },
   "backgrounds_mode2": {
     "fbhash": [
       "9b70a82dbae32745",

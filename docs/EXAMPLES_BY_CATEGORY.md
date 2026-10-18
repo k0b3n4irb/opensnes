@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 78 examples organized by topic. For a progressive learning path, see
+All 77 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -35,7 +35,6 @@ The PPU's background modes — colour vs layers vs resolution.
 |---------|-------------|
 | @subpage examples_backgrounds_mode1 | Mode 1 multi-layer backgrounds (4bpp + 2bpp) |
 | @subpage examples_backgrounds_mode1_bg3_priority | BG3 priority bit for overlay effects |
-| @subpage examples_backgrounds_mode1_lz77 | LZ77-compressed background data |
 | @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
 | @subpage examples_backgrounds_mode3 | Mode 3: 256-colour (8bpp) single layer |
 | @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
