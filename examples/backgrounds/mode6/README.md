@@ -1,7 +1,7 @@
 # mode6 — one hi-res layer with offset-per-tile
 
 **Backgrounds · the offset-per-tile modes (2/4/6), after
-[`mode2`](../mode2/README.md) and [`mode4`](../mode4/README.md).**
+[`mode2`](../mode2/README.md) (Modes 2 and 4).**
 
 ![Screenshot](mode6.png)
 

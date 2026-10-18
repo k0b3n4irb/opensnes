@@ -6,14 +6,14 @@
 # that says "apply to BG1". BG3's map is at word $3000, so row 0 is VRAM byte
 # $6000 (32 words = 64 bytes) and row 1 is byte $6040.
 #
-# `opt_row1_v_offsets` is the whole example in 64 bytes: every word's high byte
+# The row-1 words are the whole example in 64 bytes: every word's high byte
 # is 0x20 (the BG1-enable bit) and the low bits walk a sine. The README lists
 # the three ways this goes wrong, and each is a distinct failure of this one
 # block:
 #   * "bands stay flat"          -> the row is zeros; the DMA missed VBlank.
 #   * "whole layer shifts"       -> high bytes are 0x00; the 0x2000 bit is gone.
 #   * "only column 0 is wrong"   -> hardware, not a bug; the block still passes.
-# `opt_row0_h_offsets` is the negative: this example writes NO horizontal
+# The row-0 words are the negative: this example writes NO horizontal
 # offsets, so row 0 must stay exactly zero for the whole run.
 #
 # `unsafe_writes = 0` is the assert that matches the README's own warning
@@ -27,45 +27,71 @@
 # solid tiles where tile N is uniformly colour N, so tile 3 (0b0011) must be
 # bitplanes 0+1 set and 2+3 clear, tile 12 (0b1100) the exact mirror. The map
 # rows are "tile = row & 15", so map row 3 is 32 copies of tile 3.
+#
+# Since the Mode 4 scene joined this example (2026-10-18, backgrounds/mode4
+# merged into it), the boot builds both scenes and lasts 15 frames longer:
+# the checks are taken at the 192nd arrival at WaitForVBlank instead of
+# frame 199 — the same loop iteration, so the same words as before
+# (wave_phase 384, 192 iterations of +2). The offset rows are asserted word
+# by word, as `vram:` values: a checkpoint takes no [blocks].
 rom = "../../examples/backgrounds/mode2/mode2.sfc"
-frames = 199
+frames = 260
 
-[asserts.values]
-wave_phase = 384                  # +2 per loop iteration, 192 iterations by frame 199 (200 until 2026-10-10: the boot is a frame shorter)
-# The loop misses frames (lag_frame_counter), so the iteration count at
-# frame 200 follows the code's speed: 176 iterations until the compiler's
-# slot colouring of 2026-09-27, 178 until the tile module's asm encoder of
-# 2026-09-29 (the 16 tiles built at boot took ~14 frames in C, ~2 now),
-# 190 until the compiler's indexed addressing of 2026-10-08, 191 until loops
-# tested at their bottom on 2026-10-11, 192 since. The
-# values written are the same sequence either way: the row below is the
-# previous one advanced by one entry.
-
-[asserts.blocks]
-opt_row0_h_offsets = { space = "vram", offset = "6000", hex = "00000000000000000000000000000000" }
-opt_row1_v_offsets = { space = "vram", offset = "6040", hex = "44203b203220292021201b201520122010201020122015201b202120292032203b2044204d2056205e2064206a206d206f206f206d206a2064205e2056204d20" }
-# BG1 chr at word $0000: tile N is solid colour N (2 low bitplanes then 2 high).
-bg1_tile3_solid    = { space = "vram", offset = "0060", hex = "ffffffffffffffffffffffffffffffff00000000000000000000000000000000" }
-bg1_tile12_solid   = { space = "vram", offset = "0180", hex = "00000000000000000000000000000000ffffffffffffffffffffffffffffffff" }
-# BG1 map at word $2000 (byte $4000): row R is 32 entries of tile R & 15.
-bg1_map_row3       = { space = "vram", offset = "40C0", hex = "03000300030003000300030003000300" }
-bg1_map_row12      = { space = "vram", offset = "4300", hex = "0c000c000c000c000c000c000c000c00" }
-
-# The table above can be perfect and still never be read: BG3VOFS selects
-# which rows of BG3 the PPU takes as the H and V rows (VOFS / 8 and the next;
-# snesdev-wiki, Offset-per-tile). From 2026-09-12 to 2026-10-02 the NMI wrote
-# BG3's VOFS as y - 1 like a displayed layer, $3FF: the PPU read row 31 (all
-# zeros) for H and row 0 (all zeros) for V, the bands stopped rippling, and
-# every assert in this file still passed — the visual baselines were re-captured
-# flat. In an OPT mode the lib now writes BG3's VOFS raw.
-[asserts.ppu]
+[[checkpoint]]                 # the 192nd loop iteration, in Mode 2
+at_symbol = "WaitForVBlank"
+hit = 192
+[checkpoint.values]
+wave_phase = 384                  # +2 per loop iteration
+"vram:3020" = { eq = 0x2044 }
+"vram:3021" = { eq = 0x203B }
+"vram:3022" = { eq = 0x2032 }
+"vram:3023" = { eq = 0x2029 }
+"vram:3024" = { eq = 0x2021 }
+"vram:3025" = { eq = 0x201B }
+"vram:3026" = { eq = 0x2015 }
+"vram:3027" = { eq = 0x2012 }
+"vram:3028" = { eq = 0x2010 }
+"vram:3029" = { eq = 0x2010 }
+"vram:302A" = { eq = 0x2012 }
+"vram:302B" = { eq = 0x2015 }
+"vram:302C" = { eq = 0x201B }
+"vram:302D" = { eq = 0x2021 }
+"vram:302E" = { eq = 0x2029 }
+"vram:302F" = { eq = 0x2032 }
+"vram:3030" = { eq = 0x203B }
+"vram:3031" = { eq = 0x2044 }
+"vram:3032" = { eq = 0x204D }
+"vram:3033" = { eq = 0x2056 }
+"vram:3034" = { eq = 0x205E }
+"vram:3035" = { eq = 0x2064 }
+"vram:3036" = { eq = 0x206A }
+"vram:3037" = { eq = 0x206D }
+"vram:3038" = { eq = 0x206F }
+"vram:3039" = { eq = 0x206F }
+"vram:303A" = { eq = 0x206D }
+"vram:303B" = { eq = 0x206A }
+"vram:303C" = { eq = 0x2064 }
+"vram:303D" = { eq = 0x205E }
+"vram:303E" = { eq = 0x2056 }
+"vram:303F" = { eq = 0x204D }
+"vram:3000" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:3001" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:3002" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:3003" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:3004" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:3005" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:3006" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:3007" = { eq = 0x0000 }   # row 0: no H offsets
+[checkpoint.ppu]
 bgmode = 2
 "bgs.2.v_scroll" = 0              # row 0 = H offsets, row 1 = V offsets
 
-# The only per-frame transfer in this example is the 64-byte offset row, and it
-# must happen inside VBlank. Measured: 64 screen-on VRAM bytes per frame. The
-# ceiling is set just above it so a transfer that grew (a whole-map upload
-# creeping into the loop) fails before it starts eating the VBlank budget.
+[asserts.blocks]                  # the scene itself, unchanged for the run
+bg1_tile3_solid    = { space = "vram", offset = "0060", hex = "ffffffffffffffffffffffffffffffff00000000000000000000000000000000" }
+bg1_tile12_solid   = { space = "vram", offset = "0180", hex = "00000000000000000000000000000000ffffffffffffffffffffffffffffffff" }
+bg1_map_row3       = { space = "vram", offset = "40C0", hex = "03000300030003000300030003000300" }
+bg1_map_row12      = { space = "vram", offset = "4300", hex = "0c000c000c000c000c000c000c000c00" }
+
 [asserts.dma]
 unsafe_writes    = 0
 max_vblank_bytes = 128

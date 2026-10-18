@@ -197,3 +197,15 @@ watched instruction (one ahead before). Save states of 1.38.0 are refused
 missing from 1.38.0 (09-1 / 02-4). The bump is a lot of its own: the full
 suite, the corpus golden queries (`partners.md` step 4), the luna page
 regenerated from `--help`.
+
+2026-10-18, a manifest checkpoint takes no `[blocks]` (luna v1.39.0, the pin).
+Asked: `[checkpoint.blocks]`, the same
+`{ space, offset, hex }` entries as `[asserts.blocks]`, checked at the
+checkpoint's frame or symbol arrival. Came back: `unknown field 'blocks',
+expected one of 'at_frame', 'at_symbol', 'hit', 'until_if', 'input',
+'input2', 'mouse', 'superscope', 'values', 'ppu', 'gsu', 'delta', 'fbhash'`.
+Needed because a checkpoint at a loop iteration (`at_symbol` + `hit`) is the
+form that does not move with the boot's length, and the offset rows of
+`dma_mode2_opt_table.toml` are 32 words: they are now 40 `"vram:NNNN"` value
+lines where one block line said it. Replay: any manifest with a
+`[checkpoint.blocks]` table. Not blocking; a light request.

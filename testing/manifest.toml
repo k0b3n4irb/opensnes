@@ -61,9 +61,6 @@ frames = [200, 400]
 [examples."backgrounds/mode2"]
 frames = [200, 400]
 
-[examples."backgrounds/mode4"]
-frames = [200, 400]          # the offset-per-tile wave travels
-
 [examples."backgrounds/mode6"]
 frames = [200, 400]          # the offset-per-tile wave travels
 

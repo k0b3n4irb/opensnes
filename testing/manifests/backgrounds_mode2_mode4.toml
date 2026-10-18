@@ -1,4 +1,5 @@
-# backgrounds/mode4 — offset-per-tile with Mode 4's single row.
+# backgrounds/mode2, Mode 4 scene (B) — offset-per-tile with Mode 4's single row.
+# (Written for backgrounds/mode4, which merged into mode2 on 2026-10-18.)
 #
 # Mode 4 reads ONE row of BG3 as the offset table (Mode 2 reads two): each
 # word is either a vertical offset (bit 15 set) or a horizontal one (bit 15
@@ -12,7 +13,7 @@
 #   * frame 130, after A at 110: the same wave as horizontal words — high
 #     bytes $20, low 3 bits clear.
 # Measured on luna v1.30.2 (`luna state --until-frame N --input … --dump-vram`).
-rom = "../../examples/backgrounds/mode4/mode4.sfc"
+rom = "../../examples/backgrounds/mode2/mode2.sfc"
 # Clocked by the program since 2026-10-10 (luna v1.37.0): the checkpoints
 # stop at the Nth arrival on WaitForVBlank, which the main loop calls once
 # per iteration, and the press of A is indexed by the same arrivals. The
@@ -20,11 +21,13 @@ rom = "../../examples/backgrounds/mode4/mode4.sfc"
 # the length of the boot (the frame-indexed version moved twice that day).
 input_at = "WaitForVBlank"
 frames = 200                           # the horizon: where the run gives up
-input = "105:0x0080,107:0"        # A at the 105th iteration: vertical -> horizontal
+input = "50:0x8000,52:0,105:0x0080,107:0"   # B at the 50th iteration: Mode 2 -> Mode 4; A at the 105th: vertical -> horizontal
 
-[[checkpoint]]                 # the reference for the delta below: the booted scene, not power-on RAM (2026-10-04)
+[[checkpoint]]                 # the reference for the delta below: Mode 4 shown, not power-on RAM (2026-10-04)
 at_symbol = "WaitForVBlank"
 hit = 55
+[checkpoint.values]
+in_mode4 = { eq = 1, width = 1 }
 
 [[checkpoint]]
 at_symbol = "WaitForVBlank"
