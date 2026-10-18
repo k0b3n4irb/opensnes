@@ -10,8 +10,7 @@ draws effects that look impossible for a 2D tile machine.
 
 | Example | Developer question |
 |---------|--------------------|
-| [gradient_colors](gradient_colors/) | How do I gradient the backdrop colour per scanline? |
-| [hdma_indirect_gradient](hdma_indirect_gradient/) | How does *indirect* HDMA (pointer-table addressing) work? |
+| [gradient_colors](gradient_colors/) | How do I gradient the backdrop colour per scanline — with a direct table, or an indirect one? |
 | [hdma_wave](hdma_wave/) | How do I build an HDMA table by hand, animate it, and then let the `hdma` module do it? |
 | [hdma_helpers](hdma_helpers/) | How do I just call the `hdma` module helpers (wave, ripple, iris)? |
 
@@ -25,7 +24,7 @@ writing `value` to a target register for `count` scanlines, then moves on. Aim
 it at the backdrop colour and you get a per-line gradient (`gradient_colors`);
 aim it at a BG scroll register with a sine table and the background ripples
 (`hdma_wave`). **Indirect** mode adds a level of pointer indirection so the
-table entries point at data elsewhere (`hdma_indirect_gradient`). The `hdma`
+table entries point at data elsewhere (`gradient_colors`, press X). The `hdma`
 module wraps the common cases (`hdmaWaveH`, `hdmaWaterRipple`, `hdmaIrisWipe`)
 so you rarely hand-roll the table — but building one once (`hdma_wave`, before
 you press A) is how you understand what the helpers do.

@@ -252,12 +252,12 @@ given, so one write per band holds: a band with the window empty
 (left > right), the rectangle's edges for its height, then empty again
 to stop it before the bottom of the frame. Three entries a table.
 
-### Indirect HDMA — `examples/hdma/hdma_indirect_gradient`
+### Indirect HDMA — `examples/hdma/gradient_colors` (press X)
 
 `hdmaSetupIndirect()` (DMAP bit 6): table entries hold POINTERS to the
 payload instead of the payload itself, letting many scanline bands share
-data blocks. The example reproduces krom's RedSpace gradient pixel-exactly
-with 32 shared 4-byte CGRAM blocks. The data bank for the pointed-to
+data blocks. Press X in the example: it switches its channel from the direct
+table to krom's RedSpace gradient, 32 4-byte CGRAM blocks in WRAM. The data bank for the pointed-to
 blocks goes in `$43x7` — pass it with the bank-extraction idiom
 (`(u8)((u32)(void *)table >> 16)`).
 

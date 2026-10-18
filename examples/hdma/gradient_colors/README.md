@@ -19,6 +19,7 @@ Read `effects/hdma_wave` first (HDMA basics and table format).
 |--------|--------|
 | A | Remove the gradient (flat background) |
 | B | Re-enable the gradient |
+| X | The indirect gradient: 32 red bands through a pointer table |
 
 ## Build & Run
 
@@ -27,7 +28,7 @@ cd $OPENSNES_HOME
 make -C examples/hdma/gradient_colors
 ```
 
-Then open `gradient_colors.sfc` in your emulator (Mesen2 recommended).
+Then open `gradient_colors.sfc` in luna (`luna-gui gradient_colors.sfc`) or any emulator.
 
 ## How It Works
 
@@ -69,6 +70,27 @@ if (pad0 & KEY_B) enableGradient();
 
 HDMA can be enabled/disabled at any time. When disabled, color 0 reverts to
 whatever was last written to CGRAM.
+
+### 4. The same effect through indirect HDMA (X)
+
+![Indirect](gradient_colors_indirect.png)
+
+```c
+hdmaSetupIndirect(HDMA_CHANNEL_6, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
+                  itable, (u8)((u32)(void *)band_data >> 16));
+```
+
+With DMAP bit 6 set, a table entry is `[count][ptr_lo][ptr_hi]`: the PPU
+fetches the entry's 4-byte payload (`[CGADD][CGADD][color_lo][color_hi]`)
+through the pointer, from the bank in `$43x7` — the register plain
+`hdmaSetup()` never writes, and `hdmaSetupIndirect()` does. The payloads live
+in a WRAM array (`band_data`) the CPU can rewrite at any time without
+touching the table: the layout of dynamic per-scanline palettes. A count of
+7 fetches the payload once and holds it for 7 lines; a repeat count (`$87`)
+would fetch a fresh payload every line, the HiColor pattern.
+
+The gradient is krom (Peter Lemon)'s "Red Space Indirect HDMA" demo, ported
+to C: 32 red bands of 7 lines, `$001F` at the top fading to black.
 
 ## SNES Concepts
 

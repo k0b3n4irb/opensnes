@@ -69,7 +69,7 @@ the **game loop** — labelled in the file. To go further:
 - **Add sound** — drop a `.wav` in `res/` with a `.wav.toml` beside it
   (`tool = "opensnes-sample"` and an `[encode]` table); the build converts it
   to BRR and `res/<name>.h` declares it (see the SDK's audio tutorial).
-- **Add layers, text, scrolling, more** — the SDK ships **79 examples** and a
+- **Add layers, text, scrolling, more** — the SDK ships **78 examples** and a
   set of [tutorials](https://github.com/k0b3n4irb/opensnes/tree/main/docs) plus
   game-craft guides (budgeting, choosing a background mode, composing layers).
   Add the module you need to `LIB_MODULES` and follow the matching example.
