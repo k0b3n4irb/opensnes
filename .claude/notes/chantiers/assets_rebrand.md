@@ -1,5 +1,16 @@
 # Chantier — our own assets, and a rebranding
 
+**Superseded in part (owner, 2026-10-18, later the same day):** start from
+zero, not from the logo; cyberpunk, anthropomorphic animal characters, a
+nuanced palette (no garish colours); the logo, the site and every example
+in one identity; the examples reviewed and challenged before any
+generation. The needs inventory and the review of the 85 examples are in
+[`assets_rebrand_needs.md`](assets_rebrand_needs.md) (85 → 58 examples
+proposed, 49 shared assets, ~600-800 generations); how to drive PixelLab
+is in [`../tech/pixellab.md`](../tech/pixellab.md). The identity proposals
+below (Kit the cartridge, the console's inside) are withdrawn; the
+hardware rules, the acceptance gates and the trial protocol stand.
+
 Status: PLANNING (2026-10-18). Owner decision of that day: 1.0 waits; first
 a complete rebranding, and every example's assets redone with assets made
 for OpenSNES. The owner has no graphics or sound expertise: the chantier
