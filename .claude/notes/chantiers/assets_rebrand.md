@@ -50,7 +50,21 @@ The examples are use cases, not ports: they need a world in which every
 use case (a platformer, a shooter, a menu, a save screen, Mode 7) has a
 place, and a cast that comes back from one to the next.
 
-**Recommended: the console's inside, built from the logo.** The logo
+**Owner's choice (2026-10-18): a cyberpunk / steampunk mood, Blade
+Runner's kind** — a rain-soaked neon megacity at night where brass steam
+machinery runs under the neon. The mood only: nothing of the film itself
+(no replicants, no flying police cars, no pyramid tower, no names). The
+logo's colours already are that palette (violet, phosphor green, magenta
+and amber neon on ink). Kit stays the mascot if the owner agrees: a small
+cartridge-headed courier droid with brass joints, carrying data through
+the city. The world: neon street levels and rooftops (the platformer),
+the steam-pipe undercity (scrolling, parallax), the rain and the fog
+(HDMA, colour math), the elevated tracks (Mode 7), the city's screens and
+terminals (text, menus, saves). Its enemies: security drones, glitch
+bugs, steam automatons. Backgrounds, sprites, tiles, UI and fonts all
+come from it.
+
+The first proposal, kept for the record: **the console's inside, built from the logo.** The logo
 (`assets/logo_256x256.png`) is a violet cartridge whose label is a dark
 screen showing `OS:` in phosphor green. The mascot is that cartridge come
 alive — **Kit**, a small cartridge with a screen for a face (two green
@@ -95,13 +109,16 @@ carries it:
    same character), never prompted again from text.
 
 Prompt shapes (English, as the tools expect), each with the forced palette:
-- Kit: "small walking game cartridge robot, violet plastic shell, dark
-  screen face with two green pixel eyes, tiny legs and arms, friendly,
-  side view, dark outline, light from top left".
-- Ground: "side-scroller tileset, green circuit board ground with gold
-  traces, solder pads along the top edge, floating chip platforms".
-- Enemy: "glitch bug, small magenta pixel insect made of corrupted
-  pixels, side view".
+- Kit: "small courier droid with a game cartridge for a head, violet
+  plastic shell, dark screen face with two green pixel eyes, brass joints,
+  short legs, a satchel, side view, dark outline, neon rim light".
+- Ground: "side-scroller tileset, wet neon city rooftop, dark metal and
+  brass pipes, rivets, puddles reflecting magenta and green neon,
+  floating catwalk platforms".
+- Background: "night megacity skyline, rain, fog, distant neon signs
+  without text, steam vents, layered for parallax".
+- Enemy: "hovering security drone, brass and dark metal, one magenta
+  eye, side view".
 
 ### A trial before a subscription
 
