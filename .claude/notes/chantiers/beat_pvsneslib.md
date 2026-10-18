@@ -743,7 +743,7 @@ That exposed three things, each caught by a different gate:
    sixteen words over the function's text — and it is the big one.
    Cost-ordered colouring came first as a guess at the same symptom and
    stays.
-2. **tetris's border turned green** (diff_corpus, with cost order): not
+2. **blocks's border turned green** (diff_corpus, with cost order): not
    the compiler. The example enabled its HDMA in mid-frame by a raw write;
    the channel ran on stale registers and wrote direct-page contents into
    CGRAM. Bisected to `hud.c` / `hudShowMessage`, whose code read correct

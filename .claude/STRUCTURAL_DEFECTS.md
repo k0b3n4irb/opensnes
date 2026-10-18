@@ -1116,7 +1116,7 @@ markers in the same file but didn't tighten this assertion either.
   (since `(s32)a << 8` truncates). Every example that does
   `fixDiv(FIX(N), M)` for `N > 0.5` gets garbage. Today no example
   hits the path, so the bug is latent.
-- **`examples/games/tetris/render.c:169-194`** — uses `(u16)(u32)(ptr_a - ptr_b)`
+- **`examples/games/blocks/render.c:169-194`** — uses `(u16)(u32)(ptr_a - ptr_b)`
   patterns to compute size differences. The `(u32)` cast is
   immediately narrowed back to `u16`, so these survive — the truncation
   affects the *intermediate*, but the final cast ignores the upper 16
@@ -1428,7 +1428,7 @@ mechanical (each is ≤ 30 LOC of C + ASM helper); the audit + migration
 - `lib/include/snes/*.h` has `*Bank` variants for every public function
   accepting `u8 *` / `const u8 *` from user data.
 - The 6 tightest examples (`mapscroll`, `likemario`, `mapandobjects`,
-  `window`, `tetris`, `continuous_scroll`) have ≥ 256 bytes free in
+  `window`, `blocks`, `continuous_scroll`) have ≥ 256 bytes free in
   bank `$00` after migration.
 - `BANK0_FAIL_THRESHOLD` bumped to 256.
 - All 54 examples build and pass visual regression.
@@ -1450,7 +1450,7 @@ mechanical (each is ≤ 30 LOC of C + ASM helper); the audit + migration
 **Investigation log — 2026-06-20 (P1-2 from the engine review):**
 
 Measured the 11 currently-tight examples (all report **exactly 12 bytes
-free**: `likemario`, `mapandobjects`, `tetris`, `continuous_scroll`,
+free**: `likemario`, `mapandobjects`, `blocks`, `continuous_scroll`,
 `mode5`, `mode7`, `mode7_perspective`, `window`, `mapscroll`, `slopemario`,
 `tiled`). Two findings refine — but do **not** invalidate — this entry:
 
@@ -1585,7 +1585,7 @@ the correct 24-bit form for above-`$2000` data.
   ROM ratchet. Hard-fails a bank-$00 RAM section crossing/past $2000
   and free space < `RAM_FAIL_THRESHOLD` (512); warns < 1024 with the
   largest sections listed. Corpus baseline at introduction: breakout
-  668 bytes free (`.game_buffers` 4708 B), tetris 928 — the two real
+  668 bytes free (`.game_buffers` 4708 B), blocks 928 — the two real
   games are already within 1 KB of the ceiling, which is the empirical
   trigger data for scheduling this chantier: if the showcase RPG's
   free-space number trends below ~2 KB with state still to add, B2

@@ -1347,7 +1347,7 @@ def check_named_files() -> list[str]:
 
 # Anchor 5, second half (2026-10-15): every example is cited by the learning
 # path or by its category README. Thirty-one examples were on neither path
-# (tetris among them) and eighteen missing from their category's table.
+# (blocks among them) and eighteen missing from their category's table.
 LEARNING_PATH_DOC = "docs/LEARNING_PATH.md"
 
 

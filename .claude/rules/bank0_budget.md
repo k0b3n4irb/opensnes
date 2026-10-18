@@ -69,13 +69,13 @@ this. Sections holding only `__opensnes_force_emit_*` anchors are exempt
 | wip/a6-a7-atomic-v3 (post-A6)           | 12 bytes                   | 8         |
 | #127.3 flip (2026-09-07)                | 2168 (mode5_hires)         | 8 (kept)  |
 | 2026-09-22, measured                    | **12** (continuous_scroll, likemario) | 8 |
-| **2026-09-23, examples on ASSET_SECTION** | **1912** (tetris); next 5359 (likemario) | **1024** |
+| **2026-09-23, examples on ASSET_SECTION** | **1912** (blocks); next 5359 (likemario) | **1024** |
 
 What happened on 2026-09-23: every data-only `superfree` section of the
 examples (94 sections, 53 files) became `ASSET_SECTION`, and the six
-sections forced `SEMIFREE BANK 0` (breakout, tetris, likemario) followed
+sections forced `SEMIFREE BANK 0` (breakout, blocks, likemario) followed
 once their C readers were `const`. Bank $00 went from "14 examples within
-28 bytes of full" to one example under 5 KB. That one, tetris, keeps the
+28 bytes of full" to one example under 5 KB. That one, blocks, keeps the
 SNESMOD driver blob (`.sm_spc`, 5.5 KB) and its code in bank $00 by
 choice — the next lever if it ever needs more.
 
@@ -89,7 +89,7 @@ map is in bank $02).
 
 The threshold is a **ratchet**: never RAISE it (= weaken the gate) unless
 the current build's actual minimum dropped below it after a refactor was
-tried. 1024 sits 888 bytes under tetris and leaves the 2048 soft warning to
+tried. 1024 sits 888 bytes under blocks and leaves the 2048 soft warning to
 name it at every build. Re-measure with the loop at the end of this file
 before quoting any figure here.
 
@@ -104,7 +104,7 @@ linked this way: 2.0 KB) when the mouse, Super Scope and multitap readers
 stopped being called by name: the NMI handler reaches each through a
 pointer that `mouseInit()` / `scopeInit()` set, so a ROM that arms no such
 device does not link them (569 bytes). Across the corpus the smallest free space in bank
-$00 went from 1912 bytes (tetris) to **10 675** (tetris again; then
+$00 went from 1912 bytes (blocks) to **10 675** (blocks again; then
 likemario 13 048, mapandobjects 16 826), measured on the clean build of
 2026-10-08. `BANK0_FAIL_THRESHOLD` stays at 1024 for now: tightening it is
 the audit step described below, not a side effect of this change.
@@ -184,8 +184,8 @@ under FastROM silently gave `$FE`). `compiler/wla-dx` therefore carries
 `$C0`/`$80` window back to the linker bank when they read a `.sym`.
 
 Corpus effect at the flip: the bank-$00 minimum went from **12 bytes**
-(tetris, likemario, mapandobjects) to **2168** (mode5_hires); the 2026-07
-note's "honest ceiling" — hand-written asm payload such as tetris's
+(blocks, likemario, mapandobjects) to **2168** (mode5_hires); the 2026-07
+note's "honest ceiling" — hand-written asm payload such as blocks's
 `data.asm` strings or snesmod's driver — is what remains in bank $00 by
 choice.
 
@@ -264,7 +264,7 @@ free). `make/common.mk` runs
 The free-byte count prints at every link — this is the *instrument* that
 turns "will the game hit the 8 KB RAM ceiling?" into a tracked number
 (the decision gate for scheduling the B2 chantier). Corpus baseline at
-introduction: breakout 668 bytes free, tetris 928 — warnings on those
+introduction: breakout 668 bytes free, blocks 928 — warnings on those
 two are deliberate, they really are within 1 KB of the ceiling.
 `SKIP_RAM_CHECK=1` bypasses; the same ratchet discipline applies (never
 raise the fail threshold above the corpus minimum without a refactor).

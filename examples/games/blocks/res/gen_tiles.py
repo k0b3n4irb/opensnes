@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate tiles.png for Tetris — 8x8 tiles, 4bpp indexed (16 colors).
+"""Generate tiles.png for blocks — 8x8 tiles, 4bpp indexed (16 colors).
 
 Tile layout:
   Row 0 (tiles 0-15):   empty, 7 colored blocks (I,O,T,S,Z,L,J), 3 border, 3 spare, ghost, spare

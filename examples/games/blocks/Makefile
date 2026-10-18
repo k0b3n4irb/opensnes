@@ -1,7 +1,7 @@
-# Tetris — Mode 1, 3-BG architecture (playfield / HUD / messages)
+# Blocks — falling-blocks puzzle, Mode 1, 3-BG architecture (playfield / HUD / messages)
 OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := tetris.sfc
-ROM_NAME := OPENSNES TETRIS
+TARGET   := blocks.sfc
+ROM_NAME := OPENSNES BLOCKS
 
 CSRC     := main.c board.c piece.c render.c hud.c
 ASMSRC   := data.asm
@@ -11,6 +11,6 @@ USE_SNESMOD := 1
 LIB_MODULES := console sprite dma background input hdma
 
 # SNESMOD audio
-SOUNDBANK_SRC := music/tetris_theme.it
+SOUNDBANK_SRC := music/blocks_theme.it
 
 include $(OPENSNES)/make/common.mk

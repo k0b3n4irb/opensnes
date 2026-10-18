@@ -92,7 +92,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/games/mode7_racing \
                          ../examples/games/rpg \
                          ../examples/games/shmup_1942 \
-                         ../examples/games/tetris \
+                         ../examples/games/blocks \
                          ../examples/scrolling/continuous_scroll \
                          ../examples/scrolling/mixed_scroll \
                          ../examples/backgrounds/mode0 \

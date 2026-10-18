@@ -1,15 +1,15 @@
-# Tetris
+# Blocks
 
-Classic Tetris game with Korobeiniki music.
+A falling-blocks puzzle with Korobeiniki music.
 
-![Screenshot](tetris.png)
+![Screenshot](blocks.png)
 
 ## Features
 
-- 7 standard Tetris pieces (I, O, T, S, Z, J, L)
+- 7 standard pieces (I, O, T, S, Z, J, L)
 - DAS (Delayed Auto Shift) for smooth horizontal movement
 - Line clear animation with screen shake
-- Multi-line clear (single, double, triple, Tetris)
+- Multi-line clear (single, double, triple, four lines)
 - NES-style gravity speed table (30 levels)
 - Score, level, and lines counter
 - Next piece preview

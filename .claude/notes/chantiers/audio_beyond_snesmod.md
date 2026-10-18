@@ -183,7 +183,7 @@ better tooling.* Measured, not asserted.
 ## 7. Retirement plan
 
 **Dependents are broader than assumed: `USE_SNESMOD=1` is in 6 examples**,
-not 4 — the four `audio/snesmod_*` **plus `games/tetris` and
+not 4 — the four `audio/snesmod_*` **plus `games/blocks` and
 `games/likemario`** (full games shipping music via SNESMOD; the
 migration-risk items). Do not delete SNESMOD until both are ported + pass
 their probes.
@@ -216,7 +216,7 @@ double-migrating those ROMs.
 
 - SFX/music coexistence was flagged "open" — the code shows v2 already has
   the primitives; the plan extends them.
-- Retirement was scoped to `snesmod_*` — **`games/tetris` and
+- Retirement was scoped to `snesmod_*` — **`games/blocks` and
   `games/likemario` also depend on SNESMOD** and are the harder migrations.
 - The under-stated crux: SNESMOD's sequencer is an **opaque 5522-byte blob
   with no source**. The chantier's true deliverable is *owning that source*;

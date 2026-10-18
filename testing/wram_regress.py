@@ -36,7 +36,7 @@ drops those of the plain C band ($00:0000-$1FFF, mirrored at $7E) that lie
 wholly above the ROM's last C variable (from its .sym, like the stack-floor
 gate of rom_coverage.py): only the stack lives there, and how deep it goes is
 gated separately. Measured on the compiler change of 2026-09-26 (qbe
-9a17010): tetris and rpg differed in stack pages only — no re-capture needed
+9a17010): blocks and rpg differed in stack pages only — no re-capture needed
 now; the direct page and moved globals still count, as they should.
 
 Exit 0 = all match, 1 = any drift.

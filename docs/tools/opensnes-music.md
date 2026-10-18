@@ -72,7 +72,7 @@ snesmodProcess();                         // once per frame
 ```
 
 `examples/audio/snesmod_music`, `snesmod_sfx`, and the games `likemario` and
-`tetris` do this. The runtime side is @ref tutorial_audio.
+`blocks` do this. The runtime side is @ref tutorial_audio.
 
 - **Many modules, one bank.** Songs through `snesmodLoadModule(N)` and
   `snesmodPlay(0)`, effects through `snesmodLoadEffect(N)` and

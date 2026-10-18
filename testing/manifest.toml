@@ -115,7 +115,7 @@ frames = [200, 400]
 [examples."games/shmup_1942"]
 frames = [200, 400]
 
-[examples."games/tetris"]
+[examples."games/blocks"]
 frames = [200, 400]
 
 [examples."mode7/extbg"]

@@ -254,7 +254,7 @@ Complete game projects combining multiple subsystems.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_games_breakout | Breakout clone: sprites, input, game logic, scoring |
-| @subpage examples_games_tetris | Tetris with Korobeiniki music, multi-line clear |
+| @subpage examples_games_blocks | Falling-blocks puzzle with Korobeiniki music, multi-line clear |
 | @subpage examples_games_likemario | Platformer with scrolling, animation, physics |
 | @subpage examples_games_mapandobjects | Map engine with interactive objects |
 | @subpage examples_games_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |

@@ -1,9 +1,9 @@
 /**
  * @file main.c
- * @brief Tetris with 3-layer BG architecture, DAS input, and SNESMOD audio
+ * @brief Falling-blocks puzzle with 3-layer BG architecture, DAS input, and SNESMOD audio
  * @ingroup examples
  *
- * A full Tetris implementation demonstrating a 3-layer Mode 1 architecture
+ * A full falling-blocks puzzle demonstrating a 3-layer Mode 1 architecture
  * where each BG layer serves a distinct purpose: BG1 (4bpp) renders the
  * playfield with border, locked blocks, and falling piece; BG2 (4bpp)
  * displays the HUD with score, level, lines, and next piece preview;
@@ -28,7 +28,7 @@
  * - HDMA gradient effect on background palette
  * - Delayed Auto Shift (DAS) for responsive piece movement
  * - NES gravity speed table and scoring system
- * - SNESMOD: SPC700 music playback (Tetris theme)
+ * - SNESMOD: SPC700 music playback (Korobeiniki)
  * - State machine: TITLE, PLAYING, LINE_CLEAR, GAME_OVER
  * - Screen shake effect during line clear animation
  *
@@ -91,7 +91,7 @@ extern const char str_start[];
  * @brief NES NTSC gravity speed table (frames per automatic drop).
  *
  * Index = level number. Level 0 = 48 frames/drop (slowest), level 29+ = 1
- * frame/drop (fastest). Values match the original NES Tetris for authentic feel.
+ * frame/drop (fastest). Values follow the classic 8-bit gravity table.
  *
  * `const`: it lives in ROM, in whichever bank the linker picks, and every C
  * read of const data is a far read.
@@ -122,7 +122,7 @@ static const u8 speed_table[] = {
  * @brief NES scoring table: base points per number of simultaneous line clears.
  *
  * Index 0 = 0 lines (unused), 1 = single (40), 2 = double (100),
- * 3 = triple (300), 4 = Tetris (1200). Multiplied by (level + 1).
+ * 3 = triple (300), 4 = four lines (1200). Multiplied by (level + 1).
  */
 static const u16 line_scores[] = { 0, 40, 100, 300, 1200 };
 
@@ -638,7 +638,7 @@ static void stateTitle(void) {
  *============================================================================*/
 
 /**
- * @brief Main entry point -- Tetris initialization and state machine loop.
+ * @brief Main entry point -- initialization and state machine loop.
  *
  * Initialization sequence (all during force blank):
  * 1. Wait 5 frames for NMI joypad reads to stabilize
@@ -677,7 +677,7 @@ int main(void) {
     /* Initialize SNESMOD audio */
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
-    snesmodLoadModule(MOD_TETRIS_THEME);
+    snesmodLoadModule(MOD_BLOCKS_THEME);
 
     /* Display comes on with everything visible at once */
     setScreenOn();

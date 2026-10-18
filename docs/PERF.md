@@ -28,7 +28,7 @@ Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
 | `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
 | `examples/games/rpg` | walking: map, sprites, HUD | 91 % of the frame |
 | `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 69 % of the frame |
-| `examples/games/tetris` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
+| `examples/games/blocks` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
 | `examples/audio/snesmod_music` | music playing, nothing else | 98 % of the frame |
 
 Idle time is what the game still has.
@@ -39,7 +39,7 @@ Mean mclk per frame over 300 frames, and in brackets an upper bound of the
 worst frame. A function appears only in the scenes that call it, and only
 above 300 mclk per frame.
 
-| Function | likemario | rpg | sprite_swarm | tetris | snesmod_music |
+| Function | likemario | rpg | sprite_swarm | blocks | snesmod_music |
 |---|---|---|---|---|---|
 | `NmiHandler` | 8,162 (8,170) | 8,163 (8,170) | 7,670 (7,716) | 5,676 (5,676) | 5,650 (5,650) |
 | `oamSet` |  | 3,426 (4,068) |  |  |  |
@@ -158,7 +158,7 @@ testing/bin/luna profile examples/games/rpg/rpg.sfc \
 
 `entries[].per_frame.mean` / `.max` per symbol; sum the `function@label`
 entries of one function. The other scenes use the same window (frames
-120-420; tetris 300-600, START at frame 100) with the inputs of the table
-above: likemario RIGHT held from frame 130, rpg RIGHT then DOWN, tetris
+120-420; blocks 300-600, START at frame 100) with the inputs of the table
+above: likemario RIGHT held from frame 130, rpg RIGHT then DOWN, blocks
 START. Re-measure after a change to the NMI handler, the sprite or
 animation modules, and update this page.

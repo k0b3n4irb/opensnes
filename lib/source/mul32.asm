@@ -60,7 +60,7 @@
 ; placed until link). `__mul32` resolved to $00:8000 — colliding with
 ; `tcc_mul16` which also exports $8000 from BANK 0. Every Kl mul call
 ; from C jumped to mul16 instead and computed the wrong 16-bit product.
-; Was tetris's root cause: every `board[r][c]` indexed `board[0][c]`
+; Was blocks's root cause: every `board[r][c]` indexed `board[0][c]`
 ; because `r * 10` always returned 0.
 ;------------------------------------------------------------------------------
 ; For two's-complement multiply, the low N bits of a*b are identical whether

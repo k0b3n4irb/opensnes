@@ -35,9 +35,9 @@ Clean rebuild, 257 QBE `.rodata.N` sections flipped across the corpus.
   wrongly moved — after the #121 const audit, C reads of const data are
   far reads, and anything read near (string literals, non-const derefs)
   either stayed put or the lint would have hard-failed. It did not.
-- **LoROM / SA-1: safe.** tetris and likemario freed bank $00 from 12 to
+- **LoROM / SA-1: safe.** blocks and likemario freed bank $00 from 12 to
   **71 bytes**. Their remaining bank-$00 payload (`.rodata1`, `.sm_spc`)
-  is *hand-written* asm — tetris's own `data.asm`, snesmod's driver —
+  is *hand-written* asm — blocks's own `data.asm`, snesmod's driver —
   which a compiler flip cannot and should not touch. That is the honest
   ceiling of this approach: it moves compiler-emitted const data only.
 - **HiROM: broken.** Both HiROM examples corrupt —
@@ -146,5 +146,5 @@ is the intent now; `check_bank_reads.py` is the guard that remains).
 Corpus, clean rebuild: visual **85/85 identical**, manifests 50/50,
 coverage unchanged, bank-blind lint 0/85, hirom_demo pixel-identical with
 its data in bank 7. Bank $00 minimum **12 → 2168 bytes** (mode5_hires);
-tetris/likemario/mapandobjects leave the 12-byte cliff for good. WRAM
+blocks/likemario/mapandobjects leave the 12-byte cliff for good. WRAM
 oracle re-baselined (layout shift → return addresses on the stack).

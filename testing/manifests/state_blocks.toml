@@ -1,4 +1,4 @@
-# Tetris is a state machine gated on START: stateTitle() spins until
+# Blocks is a state machine gated on START: stateTitle() spins until
 # KEY_START, then startGame() spawns the first piece and game_state goes
 # STATE_TITLE (0) -> STATE_PLAYING (1). The first leg pins the title
 # state; a ROM that started on its own would fail it.
@@ -11,7 +11,7 @@
 # cur_rot 0 -> 1 while LEFT is still held, so rotation is proven not to
 # be a side effect of the horizontal move. score stays 0 throughout: no
 # line can have been cleared this early.
-rom = "../../examples/games/tetris/tetris.sfc"
+rom = "../../examples/games/blocks/blocks.sfc"
 
 [[checkpoint]]                 # title screen
 at_frame = 90

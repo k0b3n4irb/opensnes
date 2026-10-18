@@ -26,7 +26,7 @@ u8 bg2_dirty, bg3_dirty;
  * last flush (lo > hi = nothing). Until 2026-10-03 this was one flag per row
  * and renderFlush() scanned the 28 flags to coalesce them — the scan cost
  * about 48 scanlines between two DMAs, so the BG1 transfer of a locked piece
- * left VBlank (luna --dma-trace; state_tetris.toml asserts unsafe_writes = 0).
+ * left VBlank (luna --dma-trace; state_blocks.toml asserts unsafe_writes = 0).
  * The span is known at marking time and costs nothing at flush time. */
 static u8 bg1_dirty_lo = 0xFF, bg1_dirty_hi = 0;
 

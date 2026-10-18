@@ -17,7 +17,7 @@ gate the catalogue set. Corpus, 2026-09-05:
 | Example | Free bytes | What sits there |
 |---|---|---|
 | games/breakout | 1436 | `.game_buffers` 4708 B |
-| games/tetris | 1696 | |
+| games/blocks | 1696 | |
 | mode7/dsp1_ground | 1744 | 2 KB of double-buffered HDMA tables |
 | sprites/dynamic_metasprite | 2016 | |
 | games/rpg (the showcase) | 2784 | state still to add |

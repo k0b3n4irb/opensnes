@@ -164,7 +164,7 @@ everything above.
 
 @subpage examples_games_breakout
 
-@subpage examples_games_tetris
+@subpage examples_games_blocks
 
 @subpage examples_games_likemario
 

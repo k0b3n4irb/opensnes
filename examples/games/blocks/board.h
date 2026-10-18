@@ -1,5 +1,5 @@
-#ifndef TETRIS_BOARD_H
-#define TETRIS_BOARD_H
+#ifndef BLOCKS_BOARD_H
+#define BLOCKS_BOARD_H
 
 #include <snes.h>
 
@@ -19,4 +19,4 @@ u8   boardFindFullLines(LineClearResult *result);
 void boardRemoveLines(LineClearResult *result);
 u8   boardGetCell(u8 row, u8 col);
 
-#endif /* TETRIS_BOARD_H */
+#endif /* BLOCKS_BOARD_H */

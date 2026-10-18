@@ -301,7 +301,7 @@ test-nmi-budget:
 # standard); the weekly `pal.yml` workflow runs it, and so should anyone
 # touching V-timer, frame-budget or region code.
 # Scripted game manifests replayed on PAL builds of their game (test-pal).
-PAL_GAME_MANIFESTS := state_tetris movement_breakout state_breakout_game_over \
+PAL_GAME_MANIFESTS := state_blocks movement_breakout state_breakout_game_over \
                       movement_likemario movement_shmup_1942 movement_rpg
 
 test-pal:
@@ -327,7 +327,7 @@ test-pal:
 	@# ROM_REGION itself (header $$FFD9 = $$02): one game built as a PAL
 	@# cartridge must be PAL for luna with nothing forced, and play its
 	@# manifest. The NTSC build is restored afterwards.
-	@set -e; g=tetris; m=state_tetris; \
+	@set -e; g=blocks; m=state_blocks; \
 	    $(MAKE) -s -C examples/games/$$g ROM_REGION=pal TARGET=$${g}_pal.sfc >/dev/null; \
 	    testing/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
 	        | grep -q '"region": "Pal"' || { echo "test-pal: $${g}_pal.sfc is not a PAL cartridge for luna"; exit 1; }; \

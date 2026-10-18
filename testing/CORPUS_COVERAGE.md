@@ -46,6 +46,7 @@ luna v1.39.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `color/shadow_tint` | OK | live (200f/198nmi) |
 | `color/transparency` | OK | live (400f/398nmi) |
 | `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
+| `games/blocks` | OK | live (400f/390nmi) |
 | `games/breakout` | OK | live (200f/198nmi) |
 | `games/likemario` | OK | live (200f/190nmi) |
 | `games/mapandobjects` | OK | live (200f/198nmi) |
@@ -53,7 +54,6 @@ luna v1.39.0 · `luna state --until-frame <N>` per ROM · 85 ROMs · **83 OK, 2 
 | `games/mode7_racing` | OK | live (200f/198nmi) |
 | `games/rpg` | OK | live (200f/198nmi) |
 | `games/shmup_1942` | OK | live (400f/398nmi) |
-| `games/tetris` | OK | live (400f/390nmi) |
 | `hdma/gradient_colors` | OK | live (200f/198nmi) |
 | `hdma/hdma_helpers` | OK | live (200f/198nmi) |
 | `hdma/hdma_indirect_gradient` | OK | live (200f/198nmi) |

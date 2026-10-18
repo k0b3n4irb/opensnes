@@ -187,7 +187,7 @@ u32 r_mul32;        /* 0x12345 * 0x100          -> 0x01234500 */
 u32 r_mulk_u8;      /* (u32)(u8)7 * 10: inlined since 2026-09-26 */
 u32 r_mulk_u8x24;   /* (u32)(u8)7 * 24: composite 3 * 8 */
 u32 r_mulk_u16;     /* (u32)60000 * 10 = 600000: must NOT be inlined */
-u16 r_mulk_2d;      /* big[row][col] with a byte row: the tetris case */
+u16 r_mulk_2d;      /* big[row][col] with a byte row: the blocks case */
 u8 big2d[24][10];
 u32 r_mul32_wrap;   /* 0xFFFFFFFF * 2           -> 0xFFFFFFFE */
 u32 r_div32;        /* 0xFFFFFFFF / 0x10000     -> 0x0000FFFF */

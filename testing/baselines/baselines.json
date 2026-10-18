@@ -365,7 +365,7 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "3e9e992661a4cc9209721e53e08776c59be38a77e8f95602329ba291de6f4f2c"
   },
-  "games_tetris": {
+  "games_blocks": {
     "fbhash": [
       "ff847e81e01fa2a0",
       "36c92bac2d64bad0"

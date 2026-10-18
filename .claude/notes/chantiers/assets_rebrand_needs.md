@@ -176,7 +176,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 
 | Exemple | Capacité | Aujourd'hui | Verdict | Scène | Assets |
 |---|---|---|---|---|---|
-| maps/dynamic_map | moteur de « sprites » en entrées de tilemap Mode 3, tampon FAR, 1 page par VBlank | portage PVSL + Rockford de Boulder Dash (autre propriété) | **S** — technique de niche (objets alignés sur la grille en 8bpp) ; les objets-tuiles sont enseignés par breakout (briques) et tetris, FAR par `docs/tutorials/far_ram.md` ; un personnage d'une autre propriété | — | — |
+| maps/dynamic_map | moteur de « sprites » en entrées de tilemap Mode 3, tampon FAR, 1 page par VBlank | portage PVSL + Rockford de Boulder Dash (autre propriété) | **S** — technique de niche (objets alignés sur la grille en 8bpp) ; les objets-tuiles sont enseignés par breakout (briques) et blocks, FAR par `docs/tutorials/far_ram.md` ; un personnage d'une autre propriété | — | — |
 | maps/map_scroll | Tiled → `opensnes-level` → moteur de carte, caméra | `tiledMario`, `tilesMario`, `mario.png` (PVSL) | **R** — la leçon reste, tout est renommé et redessiné (nouveau niveau dans Tiled) | une rue de toits dessinée dans Tiled, Kit marche | T1, K1 |
 | maps/slope_collision | `objCollidMapWithSlopes`, moteur d'objets, caméra | Mario + tuiles PVSL | **F→games/mapandobjects** — même pile (map + object + sprite_dynamic) ; la pente devient une partie du niveau | — | — |
 
@@ -211,7 +211,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 | games/mode7_racing | caméra de course Mode 7, carte de classes | circuit généré par `gen_track.py` (à nous) | **G** — le jeu Mode 7 | course d'aéro-motos sur un circuit aérien | M2, V1, F1 |
 | games/rpg | Tiled (terrain, collision, entités, dialogues), panneaux, HUD | tuiles, héros, PNJ (à nous mais fonctionnels) | **G** — le gabarit vue de dessus | la Rue basse : parler aux habitants, ouvrir un casier | K5, N1, T2, T3, O2, U1, F1 |
 | games/shmup_1942 | défilement vertical, pools de sprites, collisions tirs/ennemis | pack CC0 de Kenney | **R + renommer** (« 1942 » est un titre Capcom ; p. ex. `games/shmup`) | le planeur de Kit au-dessus de la ville contre des drones | T4, V2, E4, O3, O5 |
-| games/tetris | puzzle complet, DAS, HDMA, SNESMOD | tuiles générées (à nous), Korobeiniki | **R + renommer** (« Tetris » est une marque) — p. ex. `games/blocks` | empiler des conteneurs de données dans un puits | T5, MU3, F1 |
+| games/blocks | puzzle complet, DAS, HDMA, SNESMOD | tuiles générées (à nous), Korobeiniki | **R + renommer** (« Tetris » est une marque) — p. ex. `games/blocks` | empiler des conteneurs de données dans un puits | T5, MU3, F1 |
 
 ### Remarques transverses relevées pendant la revue
 
@@ -260,7 +260,7 @@ Conventions : tuiles 8x8, métatuiles 16x16 pour les décors, 4bpp sauf indicati
 | T2 | tileset | la Rue basse vue de dessus : chaussée, trottoirs, façades, flaques, vitrines, néons au sol | métatuiles 16x16, transitions (Wang), ~120 tuiles, 2 Pal BG | rpg (ville), world_sprites, animated_sprite, collision_demo, game_skeleton | PixelLab *tileset* top-down |
 | T3 | tileset | intérieur vue de dessus : bar, atelier | métatuiles 16x16, ~60 tuiles, 1 Pal BG | rpg (maison) | PixelLab *tileset* top-down, référence T2 |
 | T4 | tileset | la ville vue d'avion : toits, canaux, avenues | métatuiles 16x16, scène 256x512 en 4bpp (2 Pal BG) ; la même source réduite à ≤256 tuiles 8bpp donne M1 | shmup, (M1) | PixelLab *tileset* top-down ou *pixflux* + découpe |
-| T5 | tileset | l'Arcade : briques (6 teintes), blocs de puzzle (7 teintes), cadre de borne, puits | tuiles 8x8, 2 Pal BG | breakout, tetris | **à la main** ou script (comme `gen_tiles.py` aujourd'hui) ; PixelLab pour le cadre |
+| T5 | tileset | l'Arcade : briques (6 teintes), blocs de puzzle (7 teintes), cadre de borne, puits | tuiles 8x8, 2 Pal BG | breakout, blocks | **à la main** ou script (comme `gen_tiles.py` aujourd'hui) ; PixelLab pour le cadre |
 | B1 | fond/parallaxe | la skyline : plan lointain (tours, ciel, lune voilée), plan moyen, plan proche | 3 calques 512x256 4bpp (1 Pal chacun) ; déclinaisons : 4 plans 2bpp pour mode0, une image en 3 bandes pour parallax_scroll, le ciel pour Mode 7 | continuous_scroll, parallax_scroll, mode0, gradient_colors, perspective_rotate, dsp1_ground, likemario | PixelLab *pixflux* par tranches de 256 px + raccords à la main (ou *image-to-pixelart* d'une peinture) ; taille maximale d'une génération à vérifier |
 | B2 | fond | « la rue sous la pluie », l'illustration-vitrine | 256x224 4bpp, ≤3 Pal BG ; doit contenir une zone sombre (lampe), une enseigne, une flaque, de la vapeur | mode1, mode2, hdma_helpers, shadow_tint, transparency, window, fading, panel_hud, sprite_swarm | PixelLab *pixflux* / *image-to-pixelart*, retouches |
 | B3 | fond | panorama du canal la nuit, riche en couleurs | 256x224 en 8bpp (256 couleurs) ; la même source convertie en segments 64x8 pour hicolor | mode3, hicolor_1792, hdma_wave, window_multi_hdma, fading | PixelLab *image-to-pixelart* d'une image peinte, ou *pixflux* sans palette forcée |
@@ -279,7 +279,7 @@ Conventions : tuiles 8x8, métatuiles 16x16 pour les décors, 4bpp sauf indicati
 | L1 | logo | le logo OpenSNES dans la nouvelle identité | SVG + PNG 16/32/64/128/256 + favicon ; base de B5 et du site | site, README, `assets/`, B5 | dessin vectoriel (designer ou à la main) d'après K1 ; PixelLab seulement pour les petites tailles pixel |
 | MU1 | musique | thème de la ville (nuit, nappes, basse) | `.it` ≤ 8 voix, ≤ 58 Ko de banque (`opensnes-music inspect`) | snesmod_music, superfx_game_skeleton | **commande** à un musicien chiptune |
 | MU2 | musique | thème des Toits (plus rythmé) | idem | likemario | commande (ou variation de MU1) |
-| MU3 | musique | thème de l'Arcade | idem ; remplace Korobeiniki | tetris | commande |
+| MU3 | musique | thème de l'Arcade | idem ; remplace Korobeiniki | blocks | commande |
 | MU4 | bruitages | banque d'effets SNESMOD (saut, éclat, touché, tir, explosion, menu) | `.it` d'échantillons courts | snesmod_music, likemario | sons de S1 montés dans OpenMPT **à la main** |
 | S1 | bruitages | blip, éclat, saut, tir, explosion, touché, porte | WAV mono < 1 s → BRR par `opensnes-sample` | sfx_from_wav, soundboard, (MU4) | **sfxr / jsfxr / ChipTone** |
 | S2 | échantillons | note tenue en boucle (remplace le violoncelle de krom), une basse ou nappe | BRR bouclé, 32 kHz ou moins | apu_switch, soundboard | synthèse par script (procédural) ou commande |
@@ -362,8 +362,8 @@ moyenne, davantage pour les ancres).
 | 3 — Rue basse (vue de dessus) | T2 complet, T3, N1, O2, U1 | rpg, panel_hud, save_game, scene_stack, controller (+K6) | 120 à 160 |
 | 4 — illustrations et effets | B2, B3, B4, B5 (après L1), B6 | mode1, mode2, mode3, hicolor, hdma_*, color/*, windows/*, fading, mixed_scroll | 50 à 80 |
 | 5 — ciel et Mode 7 | T4, M1, M2, M3, V1, V2, E4, O5 | shmup, rotate_scale, perspective_rotate, dsp1_ground, extbg, mode7_racing, superscope, superfx_game_skeleton | 100 à 140 |
-| 6 — arcade | T5, O6, O7 (surtout à la main) | breakout, tetris | 10 à 30 |
-| 7 — son | S1 (sfxr), S2, MU4 ; commande de MU1-MU3 | sfx_from_wav, soundboard, apu_switch, snesmod_music, likemario, tetris | 0 (hors PixelLab) |
+| 6 — arcade | T5, O6, O7 (surtout à la main) | breakout, blocks | 10 à 30 |
+| 7 — son | S1 (sfxr), S2, MU4 ; commande de MU1-MU3 | sfx_from_wav, soundboard, apu_switch, snesmod_music, likemario, blocks | 0 (hors PixelLab) |
 | 8 — identité | L1 vectoriel, tailles pixel, favicon, site | site, README | 10 à 20 (petites tailles) |
 | **Total** | | | **≈ 600 à 800** |
 
@@ -387,14 +387,14 @@ adaptés à la nouvelle géométrie des niveaux.
    formes de jeu les plus courantes, mais cela coûte deux jeux de Kit (K1 et K5) et deux tilesets.
 5. **Kit en 16x16 ou en 16x32** dans le plateformer : un animal lisible demande plutôt 16x32 ; `likemario`
    lit aujourd'hui des trames 16x16.
-6. **Les fusions et le passage en fixtures** : acceptez-vous de passer de 85 à 58 exemples, de déplacer
+6. **[Tranché le 2026-10-18 : oui, moins d'exemples.]** **Les fusions et le passage en fixtures** : acceptez-vous de passer de 85 à 58 exemples, de déplacer
    `mode6`, `sa1_hello`, `sa1_save`, `superfx_hello`, `superfx_save` hors de `examples/` (toujours construits
    pour le protocole matériel) et de supprimer `maps/dynamic_map` ?
-7. **Les renommages** : `likemario`, `mapandobjects`, `shmup_1942`, `tetris` (marque déposée) — vos noms ?
+7. **[Tranché le 2026-10-18 : `tetris` devient `blocks` ; les autres attendent.]** **Les renommages** : `likemario`, `mapandobjects`, `shmup_1942`, `tetris` (marque déposée) — vos noms ?
 8. **La police intégrée de la lib** (F1) : la redessiner dans l'identité ? Elle change l'image de chaque
    ROM à texte et toutes les références fbhash.
 9. **La musique** : commander 3 modules et une banque d'effets à un musicien chiptune (budget ?), ou des
    modules libres vérifiés un par un ? Korobeiniki (domaine public mais lié à Tetris) part-il ?
-10. **La licence** des nouveaux assets : CC0 (honnête pour une sortie d'IA) ou CC-BY 4.0 (pour un kit
+10. **[Tranché le 2026-10-18 : CC0.]** **La licence** des nouveaux assets : CC0 (honnête pour une sortie d'IA) ou CC-BY 4.0 (pour un kit
     commandé et retouché) ; la clause de PixelLab sur l'entraînement est à confirmer avant CC0.
 11. **Le logo** : un designer pour la version vectorielle, ou le dessin de Kit retouché à la main ?
