@@ -379,7 +379,7 @@ adaptés à la nouvelle géométrie des niveaux.
 1. **La distribution** : Kit en renardeau coursier vous convient-il (le nom reste) ? Quels animaux pour les
    habitants ? Les adversaires sont-ils des machines (proposé : lisibles, sans ambiguïté morale) ou aussi
    des animaux (un gang de rats, des corbeaux de la sécurité) ?
-2. **Le côté vapeur/laiton** de la note de chantier reste-t-il dans le cyberpunk, ou part-on sur un
+2. **[Tranché le 2026-10-18 : Néo-Lumen, sans laiton.]** **Le côté vapeur/laiton** de la note de chantier reste-t-il dans le cyberpunk, ou part-on sur un
    cyberpunk pur (la rampe laiton disparaît alors au profit d'une rampe acier) ?
 3. **Une seule ville en quartiers** (proposé : Toits, Rue basse, Canal, Ciel, Arcade) ou plusieurs lieux ?
    Le nom de la ville (« Néo-Lumen » est un exemple) servira aussi à speech_synth et aux écrans-titres.

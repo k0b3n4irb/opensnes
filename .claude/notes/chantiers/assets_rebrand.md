@@ -236,6 +236,33 @@ Steps:
    the fbhash, WRAM and audio baselines are re-captured, each with its
    justification (`testing.md`).
 
+### Owner's choice of declination (2026-10-18): Néo-Lumen
+
+Of the three declinations shown on the shared page (Néo-Lumen, Rouille &
+Néon, Brume), the owner picked **Néo-Lumen**: pure cyberpunk on a wet
+night, no brass and no rust (this answers question 2 of
+`assets_rebrand_needs.md` §6; the steampunk side of the earlier direction
+is dropped).
+
+- Hero: Kit, a fox-kit courier (hooded jacket, waterproof satchel).
+- Cast: an owl who tends the noodle bar, a raccoon hacker, a pangolin
+  guard, a frog mechanic.
+- Foes: the security machines (one-eyed drones, patrol automatons,
+  robot insects), so an enemy always reads as an enemy.
+- One city in five districts: Rooftops (platformer), Low street
+  (top-down RPG), Canal (reflections, water, 256 colours), Sky (shmup,
+  Mode 7), Arcade (breakout, puzzle).
+- Palette, 32 colours on the 15-bit grid, muted neons rather than loud
+  ones: ink/night `#080810 #101828 #182838 #203048`, teal
+  `#183840 #205058 #307078 #48a0a0`, violet
+  `#281838 #402858 #604080 #8060a8`, steel `#384050 #586878 #8898a8`,
+  Kit's fur `#702810 #b04818 #e07830 #f0b880`, magenta neon
+  `#601838 #a02860 #e05090`, cyan neon `#186070 #28a0b0 #70e0e0`,
+  amber `#684018 #b07028 #f0b050`, mist `#485868 #7888a0 #b0c0d0`,
+  highlight `#e8e8f0`.
+- Risk named on the page: the closest to cyberpunk seen elsewhere, so the
+  animals and the details have to carry the identity.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.
