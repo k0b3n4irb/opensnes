@@ -1,0 +1,146 @@
+# Chantier — our own assets, and a rebranding
+
+Status: PLANNING (2026-10-18). Owner decision of that day: 1.0 waits; first
+a complete rebranding, and every example's assets redone with assets made
+for OpenSNES. The owner has no graphics or sound expertise: the chantier
+leans on generation tools, and on our pipeline as the quality gate.
+
+This note holds the charter (v0, proposals marked **to decide**), the tool
+facts checked on 2026-10-18, and the brief of the pilot, `likemario`.
+
+## Why
+
+- 56 files of 19 examples are byte-identical to PVSnesLib's, Nintendo
+  characters among them (1.0 audit, 11-1 / 13-1); every release ships them,
+  sources and built ROMs, under MIT, which does not cover them.
+- The rest of our art is functional, not a showcase: no shared style, no
+  shared palette, no identity.
+
+## The tools (checked 2026-10-18)
+
+| Tool | Driven by | What matters here | Terms |
+|---|---|---|---|
+| **PixelLab** | REST API v2 (`api.pixellab.ai/v2/docs`, all `POST /v2/…`) and an official MCP server (`https://api.pixellab.ai/mcp`, Bearer token; Claude Code is a listed client) | characters in 4/8 directions (≤168 px), text and skeleton animation (≤256 px), tilesets (`create-tileset`, side-scroller platforms included), map objects, inpaint, `image-to-pixelart`, style reference images; **forced palettes** on pixflux, bitforge, inpaint, rotate, skeleton animation (no colour-count parameter documented); ~$0.008 an image at 64x64, Pro tools ~$0.08 | ToS §1.3, §3.3: we own the outputs, commercial use allowed, free to distribute; outputs may **not** be used to train other models without permission; programmatic use only through the official API (§2.2) |
+| **Retro Diffusion** (Astropulse) | MCP server (Bearer token `rdpk-…`), pay per generation (~$0.01, prepaid credits, free cost estimate) | grid-aligned pixels, palette-constrained output, transparent backgrounds, Wang/blob tilesets, tile variations, scene objects | its ToS not read yet: **to check** before use |
+| Gemini / GPT image models | prompts, APIs | strong at concepts and keeping a character consistent across edits; not grid- or palette-native | per vendor |
+| sfxr / jsfxr / ChipTone | parameters, deterministic | retro sound effects; the output is ours | free |
+| Music | — | no AI tool found that writes tracker modules (`.it`): the AI music tools render audio. SNESMOD needs modules | commission a chiptune musician, or freely-licensed modules checked one by one |
+
+Legal frame (to keep in `ATTRIBUTION.md`, not legal advice): in the US raw
+AI output with no human authorship is not copyrightable (Copyright Office,
+Part 2 report, January 2025; *Thaler v. Perlmutter*, D.C. Cir. 2025); it
+can be distributed, but not really licensed. Human edits and a commissioned
+kit are protectable. Whatever the tool, nothing may resemble an existing
+property (no plumber, mushroom, warp pipe, question block, Goomba-like).
+
+## Charter v0
+
+### Identity — to decide
+
+- **A world and a mascot of our own**, used across the examples and the
+  site, so that the examples read as one SDK. Three directions to choose
+  from: (a) a small robot, the cartridge's spirit; (b) a creature of an
+  invented island world; (c) no mascot, a strong shared style only.
+- **Names**: the examples whose name points at another property are renamed
+  with their assets (`likemario` first; 156 references in the tree).
+
+### The hardware rules every asset follows (not negotiable)
+
+- Tiles of 8x8 pixels; backgrounds built from 16x16 metatiles; sprites
+  16x16 or 32x32 (the sizes `oamInit` pairs).
+- 4 bpp: at most 15 colours plus transparent (index 0) per palette; 8 BG
+  palettes and 8 sprite palettes on screen. Colours are 15-bit: each
+  channel a multiple of 8 (`--round`).
+- One pixel scale: no mixed resolutions, no anti-aliased edges, no
+  gradients beyond a 2-step dither.
+
+### Style — proposals, to decide
+
+- **One master palette** of about 48 colours in ramps (a ramp: 3 to 5
+  steps of one hue), from which every 16-colour palette is drawn.
+  `opensnes-palette plan` keeps each scene within its 8 slots.
+- Light from the top left; a dark selective outline on sprites (not pure
+  black); backgrounds less saturated and darker than sprites, so the
+  player reads at a glance.
+- Animation: walk 4 frames, idle 2, jump 1, fall 1, at 8 to 10 frames a
+  second.
+
+### Sound — proposals, to decide
+
+- Modules: up to 8 channels, short samples at 32 kHz or below, within the
+  driver's room (`opensnes-music inspect`: 58,368 bytes without echo,
+  58,624 - 2,048 x edl with it).
+- Effects: sfxr-family, mono, under a second, through `opensnes-sample`.
+
+### Acceptance of an asset
+
+1. It converts with its settings file and fits its budget
+   (`opensnes-sprite inspect`, `opensnes-tileset`, `opensnes-palette plan`,
+   `opensnes-music inspect`).
+2. It is judged in the ROM, on luna screenshots at the example's manifest
+   frames, side by side with the asset it replaces.
+3. Its provenance is written down: tool, prompt, date, the human edits
+   (an `ATTRIBUTION.md` row per asset family).
+4. Licence of the new assets: **to decide** — CC0 is the honest choice for
+   AI output that is not copyrightable; CC-BY 4.0 for a commissioned kit.
+   PixelLab's no-training clause binds us, not the people who reuse a CC0
+   asset — to confirm with PixelLab before choosing CC0.
+
+## The pilot: `likemario`
+
+What it uses today (measured 2026-10-18):
+
+| Asset | Today | Notes |
+|---|---|---|
+| Player | `res/mario_sprite.png`, 16x112: seven 16x16 frames, one OBJ palette; `[sheet] size = 16, colors = 16` | the code uses frames 1 (jump), 2-3 (walk), 6 (stand) |
+| Tileset | `res/tiles.png`, 64x48: 48 tiles of 8x8, one BG palette | its drawings are the other property's (warp pipe, question block, hills, palm trees, cloud) |
+| Level | `res/BG1.m16` (hand-made map, 47 tile indices used), `res/map_1_1.b16` (one property per tile: solid or empty) | both index the tileset by number |
+| Music | `res/overworld.it` (45 KB) | to replace |
+| Effect | `res/jump_sfx.it` (14 KB, the jump through `snesmodPlayEffect`) | to replace |
+| Unused | `res/mariojump.brr` | delete |
+
+Because the tileset's drawings are recognisable, redrawing tile for tile
+at the same indices would keep the other property's level design. The
+pilot therefore makes **a new tileset and a new level**: the level drawn in
+Tiled and converted by `opensnes-level` (the pipeline `maps/map_scroll`
+uses), its collision as tile properties. The format fits: `likemario`
+reads a header of width and height in pixels then the size in bytes
+(`main.c:264-266`), the same header as the `BG1.m16` `opensnes-level`
+writes for `maps/map_scroll` (2400/240/18000 here, 3376/240/25320 there,
+checked 2026-10-18). `maps/map_scroll` is itself built on the other
+property's art (`tiledMario`, `tilesMario`): it follows the pilot.
+
+Steps:
+
+1. The owner decides the identity (mascot or not, the world) and opens the
+   tool account (an API key; PixelLab's MCP is added to Claude Code with
+   its token).
+2. The master palette, then the player (4 directions not needed: a
+   side view, the four animations above), then the tileset (ground top and
+   fill, a floating platform, two decorations, a background layer if it
+   fits the palette budget).
+3. Conversion through the settings files, the level in Tiled, the build.
+4. luna screenshots at the manifest's frames, old and new side by side; the
+   owner judges.
+5. Music and the jump effect last (a commissioned module or a free one;
+   the jump from sfxr).
+6. The manifest `movement_likemario.toml` follows the new level geometry;
+   the fbhash, WRAM and audio baselines are re-captured, each with its
+   justification (`testing.md`).
+
+## Open questions for the owner
+
+- Identity: a mascot, which world.
+- Tool and budget: PixelLab, Retro Diffusion, or both compared on the
+  player sprite (a few dollars).
+- Music: commission a musician, or free modules.
+- Licence of the new assets: CC0 or CC-BY.
+- The rebranding beyond the assets: name, logo, colours of the site.
+
+## Sources
+
+- PixelLab: https://www.pixellab.ai/, https://www.pixellab.ai/pixellab-api,
+  https://api.pixellab.ai/v2/docs, https://www.pixellab.ai/termsofservice,
+  https://mcpservers.org/servers/pixellab-code/pixellab-mcp
+- Retro Diffusion: https://mcpservers.org/servers/retro-diffusion/retro-diffusion-mcp
+- Copyright frame: https://blog.promise.legal/ai-game-assets-copyright-steam-disclosure-2026/
