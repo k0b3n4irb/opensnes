@@ -1,7 +1,7 @@
 ;----------------------------------------------------------------------
-; apu_switch — program B: the pitch_mod vibrato cello, made hot-swappable
+; apu_switch — program B: the vibrato cello, made hot-swappable
 ;
-; Same DSP recipe as examples/audio/pitch_mod (PMON hardware vibrato,
+; The DSP recipe of krom's PitchMod demo (PMON hardware vibrato,
 ; bow-stroke ADSR, long FIR hall), with ONE addition: APU_CHECK_RESET
 ; inside the wait loop. Every ~ms the SPC700 peeks CPUIO0; when the
 ; 65816's apuReset() writes APU_RESET_MAGIC, the program silences the

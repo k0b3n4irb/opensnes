@@ -13,10 +13,19 @@
 # Measured with `--until-frame 150`. The key-on lands between frame 97 and 100,
 # so both legs sit well clear of the edge, and the cello is re-bowed only every
 # ~7 s (KON stays 0x01 through frame 240).
-rom = "../../examples/audio/pitch_mod/pitch_mod.sfc"
-frames = 150
+#
+# Since 2026-10-18 on audio/apu_switch, whose program B is this cello (the
+# pitch_mod example merged into it): B at frame 60 resets the APU and
+# starts the cello, so the legs are 60 frames later than on pitch_mod. The
+# drum kit that ran before must be gone: NON and FLG back to 0 (no noise
+# voice, no noise clock) prove apuReset() left nothing of program A.
+rom = "../../examples/audio/apu_switch/apu_switch.sfc"
+frames = 210
+input = "60:0x8000,63:0"
 
 [asserts.dsp]
+NON      = 0x00      # program A's noise voice is gone
+FLG      = 0x00      # and its noise clock
 V0_ENVX     = 0x02      # luna v1.24.0 named the read-back registers
                      # CHANGED vs leg 1 (0x00): the LFO is running
 KON      = 0x01      # CHANGED vs leg 1 (0x02): voice 0 was the last key-on

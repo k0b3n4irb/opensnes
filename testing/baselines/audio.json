@@ -3,19 +3,9 @@
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
-      "sha256": "765ad9889609d5cd44dbebfe8e54c6950f50c053b3ccd2a1ad30f40e0a0c9316",
+      "sha256": "5a1172ad4a645d75e937dcd504dd41abf3b46a99c8907b5edcb7704806ce3352",
       "samples": 159936,
-      "peak": 21264
-    },
-    "audio/pitch_mod": {
-      "sha256": "2960dce3f647bbd63c1a2fad357dc8a538071ef1099c39f6a2ee07532250e2e8",
-      "samples": 159936,
-      "peak": 22617
-    },
-    "audio/play_noise": {
-      "sha256": "b6afe38a6b176e552216ccaf8aa5682296fb1aa6fd3fa07f1df9757c8b94888b",
-      "samples": 159936,
-      "peak": 21264
+      "peak": 22506
     },
     "audio/speech_synth": {
       "sha256": "1e6a2d700f590151bd68d0e2dbfee371e85161a53d80a90fad995b5959da35f7",

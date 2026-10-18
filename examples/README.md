@@ -27,7 +27,7 @@ The table below counts them per folder.
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
 | [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG |
 | [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
-| [audio/](audio/) | 7 | Music and sound effects: SNESMOD and raw APU/DSP |
+| [audio/](audio/) | 5 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 3 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
 | [chips/](chips/) | 8 | Enhancement chips: SA-1, SuperFX/GSU and DSP-1 coprocessors |

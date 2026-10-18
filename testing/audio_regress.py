@@ -43,9 +43,7 @@ FRAMES = 300  # 5 s NTSC — past every driver's boot + sample upload
 
 # example key -> ROM path (relative to examples/)
 EXAMPLES = {
-    "audio/apu_switch":    ("audio/apu_switch/apu_switch.sfc", None),
-    "audio/pitch_mod":     ("audio/pitch_mod/pitch_mod.sfc", None),
-    "audio/play_noise":    ("audio/play_noise/play_noise.sfc", None),
+    "audio/apu_switch":    ("audio/apu_switch/apu_switch.sfc", "150:0x8000,153:0"),
     "audio/speech_synth":  ("audio/speech_synth/speech_synth.sfc", None),
     # left the examples in the 1.0 review; a soundbank across two banks
     "fixtures/snesmod_music_large": ("../testing/fixtures/retired_examples/snesmod_music_large/music_large.sfc", None),

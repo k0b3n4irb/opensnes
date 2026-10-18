@@ -13,7 +13,11 @@
 #
 # Measured with `--until-frame 40`. The bar is a 120-frame loop; the kick holds
 # frames ~30-55, so frame 40 sits mid-drum. Pair: audio_play_noise_snare.toml.
-rom = "../../examples/audio/play_noise/play_noise.sfc"
+#
+# Since 2026-10-18 on audio/apu_switch, whose program A is this drum kit
+# (the play_noise example merged into it): apu_switch boots on the drums,
+# and the registers are the same at the same frames.
+rom = "../../examples/audio/apu_switch/apu_switch.sfc"
 frames = 40
 
 [asserts.dsp]

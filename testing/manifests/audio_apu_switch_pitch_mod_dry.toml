@@ -14,10 +14,19 @@
 #   KON 0x02       the last key-on was the cello (voice 1), not the LFO
 # Measured with `--until-frame 60`; V0_ENVX is still 0 at frame 97 and 0x02 by
 # frame 100, so frame 60 has ~40 frames of margin. Pair: audio_pitch_mod_vibrato.toml.
-rom = "../../examples/audio/pitch_mod/pitch_mod.sfc"
-frames = 60
+#
+# Since 2026-10-18 on audio/apu_switch, whose program B is this cello (the
+# pitch_mod example merged into it): B at frame 60 resets the APU and
+# starts the cello, so the legs are 60 frames later than on pitch_mod. The
+# drum kit that ran before must be gone: NON and FLG back to 0 (no noise
+# voice, no noise clock) prove apuReset() left nothing of program A.
+rom = "../../examples/audio/apu_switch/apu_switch.sfc"
+frames = 120
+input = "60:0x8000,63:0"
 
 [asserts.dsp]
+NON      = 0x00      # program A's noise voice is gone
+FLG      = 0x00      # and its noise clock
 PMON     = 0x02      # voice 1's pitch is multiplied by voice 0's output
 V0_PITCHL = 0x03     # LFO rate $0003
 V0_PITCHH = 0x00

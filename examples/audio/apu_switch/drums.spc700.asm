@@ -1,7 +1,7 @@
 ;----------------------------------------------------------------------
-; apu_switch — program A: the play_noise drum kit, made hot-swappable
+; apu_switch — program A: the noise drum kit, made hot-swappable
 ;
-; Same DSP recipe as examples/audio/play_noise (NON noise drums through
+; The DSP recipe of krom's PlayNoise demo (NON noise drums through
 ; a single-tap FIR echo), with ONE addition: APU_CHECK_RESET inside the
 ; wait loop. Every ~ms the SPC700 peeks CPUIO0; when the 65816's
 ; apuReset() writes APU_RESET_MAGIC, the program silences the DSP and
