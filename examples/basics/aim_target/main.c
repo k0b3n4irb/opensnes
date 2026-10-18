@@ -18,6 +18,12 @@
  * direction vector. All five values are printed live in the text
  * panel above the play area.
  *
+ * A third sprite orbits the screen on its own: its angle is a 16.16
+ * accumulator (`fixed32`) advanced by a 16.16 angular velocity every frame,
+ * and its position is `radius * fix32Cos` / `radius * fix32Sin` through
+ * `fix32Mul` — the motion half of the fixed-point story (it was the
+ * fix32_orbit example).
+ *
  * @par SNES Concepts
  * - `<snes/math.h>` square-root and atan2:
  *     - `sqrt16(n)` → integer floor of √n, range 0–255
@@ -27,6 +33,9 @@
  *   into the trig LUT to recover a unit direction vector that points
  *   from player to target — the canonical pattern for projectile
  *   aiming, pursuit AI, and any "rotate sprite to face X" code.
+ * - `<snes/fixed32.h>` motion: an angle accumulator and a velocity in
+ *   16.16, `fix32Mul(radius, fix32Cos(angle))` for the position; the
+ *   integer part of the accumulator (`UNFIX32`) indexes the 256-step LUT
  * - Mode 0 + sprite overlay: BG1 hosts the text via the `text`
  *   module; the player and target are 8×8 OBJ sprites on the OBJ
  *   layer so they don't disturb the text display.
@@ -87,7 +96,7 @@
  * Both tiles use bitplanes 0 and 1; planes 2 and 3 are zero so
  * every drawn pixel is colour index 3 in the chosen palette.
  */
-static const u8 sprite_tiles[64] = {
+static const u8 sprite_tiles[96] = {
     /* Tile 0: filled diamond (player). Planes 0 AND 1 are set so
      * each drawn pixel = colour index 3 (binary 0011). The shape
      * is an 8×8 diamond: rows 18,3C,7E,FF,FF,7E,3C,18. */
@@ -102,6 +111,14 @@ static const u8 sprite_tiles[64] = {
      * back. Both planes set so colour index 3 again. */
     0xC3, 0x66, 0x3C, 0x18, 0x18, 0x3C, 0x66, 0xC3,  /* plane 0 */
     0xC3, 0x66, 0x3C, 0x18, 0x18, 0x3C, 0x66, 0xC3,  /* plane 1 */
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    /* Tile 2: a 6x6 square (the orbiter), colour 3 like the others. A 4bpp
+     * tile interleaves planes 0 and 1 row by row: (p0, p1) for row 0, then
+     * row 1... — the two shapes above are symmetric, so their plane order
+     * does not show; this one is written row by row. */
+    0x00, 0x00, 0x7E, 0x7E, 0x7E, 0x7E, 0x7E, 0x7E,  /* rows 0-3 */
+    0x7E, 0x7E, 0x7E, 0x7E, 0x7E, 0x7E, 0x00, 0x00,  /* rows 4-7 */
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
@@ -149,6 +166,30 @@ static s16 prev_target_x;
 /** @brief Previous target Y — see prev_target_x. */
 static s16 prev_target_y;
 
+/** @brief The orbiter: angle (16.16, its integer part a LUT step), velocity, radius */
+fixed32 g_angle;
+fixed32 g_omega;
+fixed32 g_radius;
+/** @brief The orbiter's screen position and its angle as a LUT index */
+s16     g_sx;
+s16     g_sy;
+u8      g_angle8;
+
+/**
+ * @brief Advance the orbiter one frame: centre (128, 96), radius 60 px,
+ * one LUT step a frame (an orbit in about 4.3 s at 60 Hz).
+ */
+static void orbit_step(void) {
+    fixed32 ox, oy;
+    g_angle  = g_angle + g_omega;
+    g_angle8 = (u8)UNFIX32(g_angle);
+    ox = fix32Mul(g_radius, fix32Cos(g_angle8));
+    oy = fix32Mul(g_radius, fix32Sin(g_angle8));
+    g_sx = 128 + (s16)UNFIX32(ox);
+    g_sy = 96  + (s16)UNFIX32(oy);
+    oamSet(2, g_sx, g_sy, 2, 0, 3, 0);
+}
+
 /*============================================================================
  * Lifecycle
  *============================================================================*/
@@ -165,7 +206,7 @@ static void on_init(void) {
      * `oamInitGfxSet` also recomputes the OBJ tile base from the
      * VRAM address (`base = addr >> 13` → 2 for $4000), updates
      * `REG_OBJSEL`, and calls `oamInit` for us. */
-    oamInitGfxSet((u8 *)sprite_tiles, 64,
+    oamInitGfxSet((u8 *)sprite_tiles, 96,
                   (u8 *)sprite_pal, 8,
                   0, 0x4000, OBJ_SIZE8_L16);
 
@@ -173,6 +214,10 @@ static void on_init(void) {
      * from the centre that DIST and ANGLE both have non-trivial
      * values out of the gate. Seed prev_* with a sentinel so the
      * first on_update() unconditionally formats the panel. */
+    g_angle  = 0;
+    g_omega  = FIX32(1);      /* 1 LUT step per frame */
+    g_radius = FIX32(60);     /* 60 px, inside the 256x224 screen */
+
     target_x = 200;
     target_y = 60;
     prev_target_x = -1;
@@ -226,6 +271,10 @@ static void on_update(void) {
     fixed   cos_v,  sin_v;   /* 8.8 lib trig (original) */
     fixed32 cos32, sin32;    /* 16.16 lifted trig */
 
+    /* The orbiter moves every frame, before the early return below that
+     * skips the aim maths while the target stands still. */
+    orbit_step();
+
     pad = padHeld(0);
 
     /* D-pad → target movement. Bounds keep the sprite on screen. */
@@ -273,8 +322,8 @@ static void on_update(void) {
     sin_v = fixSin(angle);
 
     /* Same angle, lifted to 16.16. Cost: ~25 cycles each (table
-     * lookup + xba byte-swap + sign-extend). Used in the new
-     * fix32_orbit example for sub-pixel-precise circular motion. */
+     * lookup + xba byte-swap + sign-extend). The orbiter uses the same
+     * calls for its sub-pixel-precise circular motion (orbit_step). */
     cos32 = fix32Cos(angle);
     sin32 = fix32Sin(angle);
 

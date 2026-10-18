@@ -1,4 +1,4 @@
-# fix32_orbit's whole subject is the 16.16 trig pipeline
+# The orbiter's whole subject (it was fix32_orbit's) is the 16.16 trig pipeline
 # (fix32Cos/fix32Sin -> fix32Mul -> UNFIX32), and its output is a *path*,
 # not a picture. Liveness only proves the ROM runs; the fbhash baseline
 # pins one frame of a dot on a black field — a ROM whose sin/cos were
@@ -22,7 +22,11 @@
 # half moves every coordinate. The last checkpoint repeats frame 35
 # exactly 256 frames later: the orbit closes on itself, so the 16.16
 # accumulator has not drifted over a full revolution.
-rom = "../../examples/basics/fix32_orbit/fix32_orbit.sfc"
+# Since 2026-10-18 on basics/aim_target, the orbiter of the fix32_orbit
+# example merged into it: same centre, radius and velocity, the same values
+# at each quadrant, one WaitForVBlank arrival later (the gameloop's init
+# waits once more before the first update), so every hit below is +1.
+rom = "../../examples/basics/aim_target/aim_target.sfc"
 # Clocked by the program since 2026-10-10 (luna v1.37.0): each checkpoint
 # stops at an arrival on WaitForVBlank. The boot calls it once and the loop
 # once per step, so arrival N + 1 is step N, and `g_angle8` is N there by
@@ -32,7 +36,7 @@ frames = 400                   # the horizon: where the run gives up
 
 [[checkpoint]]                 # Q1: cos > 0, sin > 0
 at_symbol = "WaitForVBlank"
-hit = 33
+hit = 34
 [checkpoint.values]
 g_angle8 = { eq = 0x20, width = 1 }
 g_sx     = { eq = 170, width = 2 }
@@ -40,7 +44,7 @@ g_sy     = { eq = 138, width = 2 }
 
 [[checkpoint]]                 # Q2: cos < 0, sin > 0
 at_symbol = "WaitForVBlank"
-hit = 97
+hit = 98
 [checkpoint.values]
 g_angle8 = { eq = 0x60, width = 1 }
 g_sx     = { eq = 85,  width = 2 }
@@ -48,7 +52,7 @@ g_sy     = { eq = 138, width = 2 }
 
 [[checkpoint]]                 # Q3: cos < 0, sin < 0
 at_symbol = "WaitForVBlank"
-hit = 161
+hit = 162
 [checkpoint.values]
 g_angle8 = { eq = 0xA0, width = 1 }
 g_sx     = { eq = 85, width = 2 }
@@ -56,7 +60,7 @@ g_sy     = { eq = 53, width = 2 }
 
 [[checkpoint]]                 # Q4: cos > 0, sin < 0
 at_symbol = "WaitForVBlank"
-hit = 225
+hit = 226
 [checkpoint.values]
 g_angle8 = { eq = 0xE0, width = 1 }
 g_sx     = { eq = 170, width = 2 }
@@ -64,7 +68,7 @@ g_sy     = { eq = 53,  width = 2 }
 
 [[checkpoint]]                 # exactly 256 steps after the Q1 sample
 at_symbol = "WaitForVBlank"
-hit = 289
+hit = 290
 [checkpoint.values]
 g_angle8 = { eq = 0x20, width = 1 }
 g_sx     = { eq = 170, width = 2 }

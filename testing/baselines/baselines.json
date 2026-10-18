@@ -90,28 +90,16 @@
     "rom_sha256": "268caad675a1f64da9bcbaf5726465fbf270797c0229512f0736e929083911c9"
   },
   "basics_aim_target": {
-    "fbhash": "028ed8dec6daa6cd",
+    "fbhash": "8e75f0026aa50a0c",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "b2a524a8f422de5f10942da03149344cc2aa6a8ce19e195f993ebca4407b6b2a"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "5cf7ab397afee1b997d10df0540706bb7b5fdd82b64fe3127ca5decd0d88fb33"
   },
   "basics_collision_demo": {
     "fbhash": "b651581ee61b0bf5",
     "frames": 200,
     "luna_version": "v1.34.0",
     "rom_sha256": "4f544d2e74a11bf38d37310c8bbc845f94085ff411c42a60a332cfe48aa93e3c"
-  },
-  "basics_fix32_orbit": {
-    "fbhash": [
-      "ceca34c901609825",
-      "5ddee3fa8f8a5625"
-    ],
-    "frames": [
-      200,
-      400
-    ],
-    "luna_version": "v1.36.0",
-    "rom_sha256": "ef12542ef1b0b890ba63e85087b2882f42c0db1b6929ac0af0c140376e776d3b"
   },
   "basics_game_skeleton": {
     "fbhash": "4960ffea16eaeb4d",

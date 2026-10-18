@@ -14,6 +14,9 @@ positions, calls `sqrt16(dx² + dy²)` for the pixel distance, calls
 `atan2_8(dy, dx)` for the 8-bit angle, then calls `fixCos` and `fixSin`
 on that angle to read back the unit direction vector.
 
+A third sprite, a small square, orbits the screen on its own: the motion
+half of the fixed-point story (it was the `fix32_orbit` example).
+
 ## SNES Concepts
 
 - `<snes/math.h>` square-root and atan2:
@@ -28,6 +31,14 @@ on that angle to read back the unit direction vector.
   the player and target are 8×8 OBJ sprites on the OBJ layer so they
   don't disturb the text display. Sprite tiles are placed at VRAM
   $4000 to keep $0000 free for the text font.
+- `<snes/fixed32.h>` motion, the orbiter — **keep the world in 16.16 and
+  the screen in 8.8**:
+    - an angle accumulator in 16.16 (`fixed32`), advanced each frame by a
+      16.16 angular velocity (`FIX32(1)`: one LUT step a frame)
+    - its integer part (`UNFIX32`) indexes the 256-step LUT
+    - the position is `fix32Mul(radius, fix32Cos(angle))` and the same with
+      `fix32Sin`, around (128, 96) at 60 px, and only the final screen
+      position is narrowed to integers
 
 ## What to Observe
 
@@ -43,7 +54,9 @@ The live readout panel updates every frame:
   and `SIN = 0x0100`.
 
 Move the X around with the D-pad and watch the entire panel react in
-real time.
+real time. The square circles at one LUT step a frame (an orbit in about
+4.3 s at 60 Hz), whether you move or not; it crosses the text, as sprites
+do over a background.
 
 ## How to Build
 

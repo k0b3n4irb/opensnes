@@ -48,16 +48,12 @@
     "rom_sha256": "28c4ee1d72abd8179d9157054306ca4d6e88d2c18246e24c282950be88d4c25f"
   },
   "basics_aim_target": {
-    "stream": "cbe1404b2ac5dce6148a59b3ff8bb91c412753df7710c45ac35b9704daf39f17",
-    "rom_sha256": "274f927709a0d9b1754f7095cb422c5d3425c3bfc318fe499d74860ee62f30f9"
+    "stream": "4599e7b04171efecd8d51edc37116bcb321189ce06faf312602b7562ea8a1f29",
+    "rom_sha256": "5cf7ab397afee1b997d10df0540706bb7b5fdd82b64fe3127ca5decd0d88fb33"
   },
   "basics_collision_demo": {
     "stream": "7cfd9c53b9ac71f0bf5d3f21264f14eaf12e6a9201bf385e1cb99e5e69612022",
     "rom_sha256": "361ffebaa25121a6fd3ac8ade24f0a29734418d7aaf25a9ac07caeacc719cf77"
-  },
-  "basics_fix32_orbit": {
-    "stream": "ad531301390cd4b9e589a66e7567a55b7fe9c4cbf7ee39479163d2b761ca89c6",
-    "rom_sha256": "d8d5a79a25811ff921268ee05b6d0da5f0671f59cb775be8a73f90d5c87d4751"
   },
   "basics_game_skeleton": {
     "stream": "dc2a0e4b5bb13567dc94dac3aae9fc3a8df6ac9c79be18946b78cff0bc2e4c0e",

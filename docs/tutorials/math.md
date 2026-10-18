@@ -256,10 +256,10 @@ before reaching for 16.16:
 nothing more, and it extrapolates happily outside `[0, FIX32(1)]`.
 
 A rule of thumb that holds on this machine: **keep the world in 16.16 and
-the screen in 8.8**. `examples/basics/fix32_orbit` does exactly that — the
-orbit is computed with `fix32Sin`/`fix32Cos` at 16.16 and only the final
-screen position is narrowed — and `examples/basics/aim_target` uses the
-wider type for the aiming maths behind an 8.8 presentation.
+the screen in 8.8**. `examples/basics/aim_target` does exactly that: its
+orbiter is computed with `fix32Sin`/`fix32Cos` at 16.16 and only the final
+screen position is narrowed, and its aiming maths use the wider type behind
+an 8.8 presentation.
 
 @note `fix32Sin` and `fix32Cos` are implemented in assembly. Two compiler
 bugs once made the obvious C body wrong, which is why; both were fixed long

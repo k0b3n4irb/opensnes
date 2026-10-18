@@ -34,4 +34,4 @@ unsafe_writes = 0
 # (textPrint writes a run at once), 20 before; one update a frame since 2026-10-11
 # (textPrintU16 no longer divides): x runs to its limit, 247, and y to 1.
 [asserts]
-fbhash = "30d87e20e8da7184"
+fbhash = "8c63b7384625a3d5"

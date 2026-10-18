@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 72 examples organized by topic. For a progressive learning path, see
+All 71 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -177,8 +177,7 @@ The reusable logic toolbox.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_basics_collision_demo | Bounding-box sprite collision detection |
-| @subpage examples_basics_aim_target | Aim a cursor at moving targets — sprites + input |
-| @subpage examples_basics_fix32_orbit | 16.16 fixed-point API: a sprite orbits the screen centre |
+| @subpage examples_basics_aim_target | Aim, distance and angle; a sprite orbiting in 16.16 fixed point |
 | @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
 | @subpage examples_basics_panel_hud | 9-slice HUD + dialog box on one layer (the `panel` module) |
 | @subpage examples_basics_game_skeleton | The smallest complete game: title → play → game-over state machine |
