@@ -201,6 +201,14 @@ COUNT_PATTERNS = [
     re.compile(r"\((\d{2,3})\s*/\s*\d{2,3}\)"),   # "(56 / 56)" completion claim, numerator
     re.compile(r"\(\d{2,3}\s*/\s*(\d{2,3})\)"),   # ...and its denominator
     re.compile(r"\b\d{2,3}/(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "54/56 examples" (Makefile comment)
+    # Since 2026-10-18 (docs review): README's "88 examples — backgrounds,
+    # sprites…" sat three lines under two correct "85", and the starter's
+    # "ships **82 examples**", the site's "83 worked examples" and its
+    # "83 / example ROMs" tile were in no file the anchor read.
+    re.compile(r"\b(\d{2,3})\s+examples?\s*[—–]", re.IGNORECASE),     # "88 examples — backgrounds…"
+    re.compile(r"\bships\s+(?:\*\*)?(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "ships **82 examples**"
+    re.compile(r"\b(\d{2,3})\s+worked\s+examples?\b", re.IGNORECASE),  # "83 worked examples"
+    re.compile(r'class="n">(\d{2,3})</div>\s*<div class="l">example ROMs'),  # the landing page's stat tile
     # Targeted phrasings only (NOT a bare "\d examples") so prose like
     # "12 examples were flagged" in bank0_budget.md stays a non-match.
 ]
@@ -221,7 +229,8 @@ def _gather_active_doc_paths() -> list[Path]:
     # these are where a newcomer first reads "N examples". docs/ at large is NOT
     # scanned — some tutorials intentionally pin a past state.
     for rel in ("examples/README.md", "docs/EXAMPLES_BY_CATEGORY.md",
-                "docs/LEARNING_PATH.md", "docs/mainpage.md"):
+                "docs/LEARNING_PATH.md", "docs/mainpage.md",
+                "starter/README.md", "docs/landing/index.html"):
         p = repo_path(rel)
         if p.is_file():
             paths.append(p)

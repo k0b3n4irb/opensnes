@@ -197,6 +197,21 @@ class SlashCount(unittest.TestCase):
                              for m in r.finditer(text)))
 
 
+class CountPhrasings(unittest.TestCase):
+    def test_forms_seen_in_the_docs_review(self):
+        for text, n in (("88 examples — backgrounds, sprites, scrolling", 88),
+                        ("the SDK ships **82 examples** and a", 82),
+                        ("<p>83 worked examples on a guided learning path", 83),
+                        ('<div class="stat"><div class="n">83</div><div class="l">example ROMs</div>', 83)):
+            self.assertTrue(any(int(m.group(1)) == n for r in COUNT_PATTERNS
+                                for m in r.finditer(text)), text)
+
+    def test_starter_and_landing_are_read(self):
+        names = [str(p) for p in check_doc_drift._gather_active_doc_paths()]
+        self.assertTrue(any(p.endswith("starter/README.md") for p in names))
+        self.assertTrue(any(p.endswith("docs/landing/index.html") for p in names))
+
+
 class BenchmarkTable(unittest.TestCase):
     PAGE = (
         "| **Total cycle reduction** | **−20.0 %** vs PVSnesLib + 816-opt (40 vs 50 cycles) |\n"
