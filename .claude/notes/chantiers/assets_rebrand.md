@@ -44,6 +44,86 @@ property (no plumber, mushroom, warp pipe, question block, Goomba-like).
 - **Names**: the examples whose name points at another property are renamed
   with their assets (`likemario` first; 156 references in the tree).
 
+### Identity proposal (2026-10-18, after the owner chose "an identity of our own")
+
+The examples are use cases, not ports: they need a world in which every
+use case (a platformer, a shooter, a menu, a save screen, Mode 7) has a
+place, and a cast that comes back from one to the next.
+
+**Recommended: the console's inside, built from the logo.** The logo
+(`assets/logo_256x256.png`) is a violet cartridge whose label is a dark
+screen showing `OS:` in phosphor green. The mascot is that cartridge come
+alive — **Kit**, a small cartridge with a screen for a face (two green
+pixel eyes), short legs and arms. The world is the inside of the console:
+circuit-board plains with gold traces, chip and capacitor towers, cable
+rivers, a CRT-phosphor sky. Its enemies are glitches (magenta pixel bugs,
+corrupted tiles). Why this one:
+
+- it is the brand: the mascot is the logo, the site and the examples say
+  the same thing;
+- its shapes are rectangles, pins and traces, which suit 8x8 tiles and
+  small palettes;
+- it resembles no existing property;
+- every use case has a room: the platformer on the board, the shooter in
+  the data bus, Mode 7 over the motherboard, the save screen in the
+  battery, the menus on Kit's screen.
+
+The two others, kept for comparison: an island world with an animal
+mascot (warm, generic, close to many existing games); no mascot, a shared
+style only (safest, least memorable).
+
+**Palette seed — the logo's own colours** (measured; SNES 5-bit values):
+`#12121e` (2,2,3) ink · `#1a2a3a` (3,5,7) and `#2b4555` (5,8,10) deep teal ·
+`#2a2a4a` (5,5,9), `#3a346e` (7,6,13), `#5c50a4` (11,10,20), `#8a7aee`
+(17,15,29) the violet ramp · `#09bb48` (1,23,9), `#0bdb52` (1,27,10)
+phosphor green · `#e71861` (28,3,12) magenta · `#f6d714` (30,26,2) amber ·
+`#6a6a8a` (13,13,17), `#a9b399` (21,22,19), `#f5f5f5` (30,30,30) greys.
+Fourteen colours: the master palette grows from them (a gold ramp for the
+traces, a warmer ramp for skin-like accents, a sky ramp).
+
+**How the universe is prompted.** One generator does not invent a
+universe from a word; the identity is written once and every prompt
+carries it:
+
+1. A *world bible* (this section): setting, shapes, palette, cast, tone.
+2. Two or three anchor images — Kit, one ground tile set, one enemy —
+   generated and retouched until they are right, with the palette forced.
+3. Every later generation takes those anchors as style references
+   (PixelLab's reference-image endpoints) and the forced palette: the
+   style comes from the anchors, the prompt says only what is new.
+4. Characters are made once and derived (rotation, animation from the
+   same character), never prompted again from text.
+
+Prompt shapes (English, as the tools expect), each with the forced palette:
+- Kit: "small walking game cartridge robot, violet plastic shell, dark
+  screen face with two green pixel eyes, tiny legs and arms, friendly,
+  side view, dark outline, light from top left".
+- Ground: "side-scroller tileset, green circuit board ground with gold
+  traces, solder pads along the top edge, floating chip platforms".
+- Enemy: "glitch bug, small magenta pixel insect made of corrupted
+  pixels, side view".
+
+### A trial before a subscription
+
+PixelLab has a free trial with no card. Five tests, judged before paying:
+
+| # | Test | Passes when |
+|---|---|---|
+| 1 | Kit, side view, 16x16 and 32x32 | one character at both sizes, readable at 16x16 |
+| 2 | Kit walking, 4 frames, from test 1 | the same Kit in every frame, no flicker of shape |
+| 3 | the ground tileset, 16x16 metatiles | the tiles join without seams; a level can be drawn with them |
+| 4 | a glitch enemy, with test 1 as style reference | it belongs to Kit's world at a glance |
+| 5 | test 1 through `opensnes-palette quantize` and the build | 15 colours + transparent, and it looks right in the ROM on luna |
+
+Four out of five, with retouches that take minutes rather than hours: the
+subscription is worth it. Fewer: Retro Diffusion gets the same five tests,
+or a pixel artist gets the brief and the anchors are commissioned (the
+rest is then derived by the tool from them).
+
+The logo itself is better as vector art than as pixel art at large sizes:
+a redrawn Kit logo (SVG, then the pixel sizes `assets/` ships) once Kit
+exists.
+
 ### The hardware rules every asset follows (not negotiable)
 
 - Tiles of 8x8 pixels; backgrounds built from 16x16 metatiles; sprites
