@@ -614,3 +614,25 @@ On 5000 generations, about 40 fully animated characters still leave room for til
   mirrored copy (`opensnes-tileset --flip`: 724 tiles for 512×256).
 - `create-tileset-sidescroller` with `transition_size: 0.5` and
   `text_guidance_scale: 10` drew the neon edge asked for (1 px).
+
+## Measured on the third trial (2026-10-18)
+
+- **Roofs in the city's style**: `generate-with-style-v2` with two
+  128×96 crops of the generated city as `style_images` and the city's
+  15 colours as `target_palette` gave four 128×128 rooftop pieces for 10
+  generations: neon strip, wall, windows, machinery, all on the palette,
+  sky transparent (`no_background` default true). Far richer than the
+  side-scroller tileset; the price is that a piece is a picture, not a
+  tile set (10 KB of tiles for two roofs: 323 tiles).
+- **A walk that reads**: `characters/animations` in `mode: v3` with a
+  precise `action_description` ("clear long strides, legs fully
+  alternating, arms swinging, tail bouncing") and `target_palette`:
+  1 generation, billed in generations, frames on the palette with no
+  clean-up. The frames come back on a **44×44 canvas** (the character
+  stays 20×28); crop them back to 32×32 around the feet.
+- **The cast keeps the hero's style**: `generate-image-v2` at 32×32 with
+  Kit's front frame as `style_image` — which takes `{"image", "size":
+  {width, height}}`, not `width`/`height` (422 "style_image.size Field
+  required") — `style_options.color_palette: false` and the owl's own
+  15-colour palette: 64 owls for 10 generations, one character, same
+  outline and pixel size as Kit.
