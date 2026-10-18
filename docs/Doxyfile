@@ -118,7 +118,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/chips/superfx_game_skeleton \
                          ../examples/chips/superfx_save \
                          ../examples/chips/sa1_save \
-                         ../examples/color/pseudo_hires \
                          ../examples/mode7/extbg \
                          ../examples/backgrounds/mode6 \
                          ../examples/color/transparency \

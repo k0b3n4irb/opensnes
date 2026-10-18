@@ -21,7 +21,7 @@ The table below counts them per folder.
 | [backgrounds/](backgrounds/) | 7 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 3 | Per-scanline HDMA effects: gradients, waves, raster |
-| [color/](color/) | 6 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
+| [color/](color/) | 5 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
 | [windows/](windows/) | 2 | Hardware window masking, shaped per scanline |
 | [transitions/](transitions/) | 1 | Screen transitions: fades and the mosaic dissolve |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |

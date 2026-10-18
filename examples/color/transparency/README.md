@@ -1,7 +1,8 @@
-# Color Addition Transparency
+# Color Addition Transparency — and Pseudo-Hires
 
-> Additive blending between two background layers: a static landscape with
-> semi-transparent clouds scrolling over it. No input required.
+> Two ways to mix two background layers: additive colour math (the clouds
+> brighten the landscape under them), and pseudo-hires (the clouds and the
+> landscape interleaved column by column, a 50 % blend with no colour math).
 
 ![Demo](transparency_demo.gif)
 
@@ -9,7 +10,11 @@
 
 ## Controls
 
-No interactive controls. The clouds scroll automatically.
+| Button | Action |
+|--------|--------|
+| A | Switch between colour addition and pseudo-hires |
+
+The clouds scroll by themselves.
 
 ## What You'll Learn
 
@@ -17,7 +22,8 @@ No interactive controls. The clouds scroll automatically.
 - The difference between main screen and sub screen layer assignment
 - How Mode 1 with BG3 priority high creates an overlay layer
 - Mixing 4bpp (BG1) and 2bpp (BG3) tile formats in the same mode
-- Using an assembly DMA loader for SUPERFREE graphics data with correct bank bytes
+- How pseudo-hires (SETINI bit 3) blends the main and sub screens without
+  colour math
 
 ---
 
@@ -28,9 +34,29 @@ cd $OPENSNES_HOME
 make -C examples/color/transparency
 ```
 
-Then open `transparency.sfc` in your emulator (Mesen2 recommended).
+Then open `transparency.sfc` in luna (`luna-gui transparency.sfc`) or any emulator.
 
 ## SNES Concepts
+
+### Pseudo-Hires: the Other Blend (A)
+
+![Pseudo-hires](transparency_pseudo_hires.png)
+
+```c
+colorMathSetLayers(0);      /* no layer in colour math */
+videoSetPseudoHires(1);     /* SETINI ($2133) bit 3 */
+```
+
+With SETINI bit 3 set, the PPU outputs 512 pixels per line: the sub screen
+on the even columns, the main screen on the odd ones (snesdev-wiki, *PPU
+registers* and *Uncommon graphics mode games*; anomie's register doc; the
+wiki's *Backgrounds* page has the inverse, a known error). A CRT on composite
+blends each pair, and so does an emulator's 256-pixel view: the clouds sit
+half over the landscape. The colour math is off here — the sub screen reaches
+the output only through the interleave — so this blend leaves the colour
+math free for something else; the price is horizontal detail, and on a sharp
+RGB display the columns show as stripes rather than a blend. The lib keeps a
+shadow of the write-only register.
 
 ### Color Math: Main Screen + Sub Screen
 
@@ -111,7 +137,7 @@ mechanism, ensuring scroll updates happen safely during VBlank.
 
 ## Modules Used
 
-`console`, `sprite`, `dma`, `background`, `colormath` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `dma`, `background`, `colormath`, `input` (`LIB_MODULES` in the Makefile).
 
 ## Files
 

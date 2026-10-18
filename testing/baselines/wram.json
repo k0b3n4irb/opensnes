@@ -119,17 +119,13 @@
     "stream": "f68c2f63bdddd43e4d0f11484d1ea6bb0773f6ee4157d22108e23f25aa609fde",
     "rom_sha256": "efc78d5f168e9bf136decf0bde7b97badc3dcdd3e070644c2483ab536750373f"
   },
-  "color_pseudo_hires": {
-    "stream": "c2ec5e998d3a4f9d959046c7a05b2f95da301b3f8713738b2b450b165c2b8891",
-    "rom_sha256": "49f677c2d35e6dbc3dcf68d83214fbed54c44b4e2145b588f3b54501261da1ae"
-  },
   "color_shadow_tint": {
     "stream": "fbc0f50f5130e71c64b926349bc21a375100e024cad5684dee8406ecbc3d9957",
     "rom_sha256": "cb0c0fdcf1535410c6853cacc1d47c2296f1b2089cb48b8de1c7594fe3848874"
   },
   "color_transparency": {
-    "stream": "a86c48be25fa185eb1a7081d5e2f39fe96f19f3e981f4e3ba292358a0b087d10",
-    "rom_sha256": "cf228f2a848ed8f193daa2690e46702569629a89ecd56215b923ac15f6bc9a68"
+    "stream": "cef5516ddec891e464f3f8eb10b5f33365c20c02fbcfd13db1c4866be7b324a0",
+    "rom_sha256": "71f2fd30b3342c7d292a5acccb4d1f1542119b535ad44b0df65379f699f8888e"
   },
   "fundamentals_text_glyphs": {
     "stream": "3177766bc6e314a76ddcb61bb2ea016c2dab5e6117b32bb654d4670f6f3f0f4b",

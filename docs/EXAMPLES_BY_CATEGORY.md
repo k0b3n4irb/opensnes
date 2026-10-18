@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 76 examples organized by topic. For a progressive learning path, see
+All 75 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -109,7 +109,6 @@ Colour math, palette bypass, and beating the 256-colour limit.
 | @subpage examples_color_shadow_tint | Shadow & tint: darken or colour-cast a whole scene via fixed-colour math |
 | @subpage examples_color_direct_color | Direct colour mode: the 8bpp pixel byte IS the RGB colour |
 | @subpage examples_color_hicolor_1792 | 1792 colours from a 4bpp background via per-tile-row HDMA (krom port) |
-| @subpage examples_color_pseudo_hires | 50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math |
 
 ---
 

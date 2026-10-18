@@ -204,8 +204,7 @@ taught; read the one your game needs.
   @ref examples_backgrounds_mode2 (offset-per-tile in Modes 2 and 4) and
   @ref examples_backgrounds_mode6 (offset-per-tile in hi-res), @ref examples_backgrounds_mode3
   (256 colours), @ref examples_backgrounds_mode5_hires (512 pixels, interlace).
-- **More colour** — @ref examples_color_direct_color, @ref examples_color_hicolor_1792,
-  @ref examples_color_pseudo_hires.
+- **More colour** — @ref examples_color_direct_color, @ref examples_color_hicolor_1792.
 - **More HDMA and windows** — @ref examples_hdma_hdma_helpers,
   @ref examples_windows_window_multi_hdma.
 - **More Mode 7** — @ref examples_mode7_extbg (a second layer from the same

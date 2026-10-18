@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Color addition transparency between two background layers
+ * @brief Two ways to mix two layers: colour addition, and pseudo-hires
  * @ingroup examples
  *
  * Demonstrates the SNES color math unit by blending two background layers.
@@ -13,21 +13,32 @@
  * above BG1. Color addition is applied to BG1 and the backdrop, meaning
  * the cloud colors are numerically added to whatever is underneath.
  *
- * Based on PVSnesLib Transparency example by Alekmaul.
+ * Press A for the other way the PPU mixes two layers: pseudo-hires (SETINI
+ * bit 3). The colour math is switched off, and the PPU interleaves the sub
+ * screen (even columns) with the main screen (odd columns) into a 512-pixel
+ * line: a 50 % blend that costs no colour math at all, at the price of the
+ * horizontal resolution of each layer. A again goes back to addition.
+ *
+ * Based on PVSnesLib Transparency example by Alekmaul; the pseudo-hires mode
+ * was the pseudo_hires example, merged here.
  *
  * @par SNES Concepts
  * - Color math: addition mode via CGWSEL/CGADSUB registers
  * - Main screen vs sub screen layer assignment
  * - Mode 1 with BG3 priority high for overlay effects
  * - 4bpp (BG1) and 2bpp (BG3) tile formats in the same mode
+ * - Pseudo-hires: SETINI ($2133) bit 3, videoSetPseudoHires(); main and sub
+ *   screens alternate pixel by pixel on a 512-pixel line
  *
  * @par What to Observe
  * - A landscape background with semi-transparent clouds scrolling over it
  * - The clouds blend additively, brightening the landscape beneath them
- * - No input required; clouds scroll automatically
+ * - The clouds scroll by themselves
+ * - Press A: the clouds are no longer added but interleaved column by column
+ *   with the landscape (pseudo-hires); A again: back to addition
  *
  * @par Modules Used
- * console, sprite, dma, background, colormath
+ * console, sprite, dma, background, colormath, input
  *
  * @see colormath.h, background.h, video.h
  */
@@ -36,6 +47,9 @@
 #include <snes/video.h>
 #include <snes/background.h>
 #include <snes/colormath.h>
+
+/** @brief 1 while the layers are mixed by pseudo-hires instead of addition */
+u8 ph_on;
 
 /**
  * @brief The landscape and the clouds, converted by the build from res/.
@@ -130,6 +144,20 @@ int main(void) {
         bgSetScroll(2, scrX, 0);
 
         WaitForVBlank();
+
+        /* A: addition <-> pseudo-hires. In pseudo-hires the colour math is
+         * off (no layer in CGADSUB): the sub screen reaches the picture only
+         * through the interleaving. */
+        if (padPressed(0) & KEY_A) {
+            ph_on ^= 1;
+            if (ph_on) {
+                colorMathSetLayers(0);
+                videoSetPseudoHires(1);
+            } else {
+                videoSetPseudoHires(0);
+                colorMathSetLayers(LAYER_BG1 | COLORMATH_BACKDROP);
+            }
+        }
     }
 
     return 0;
