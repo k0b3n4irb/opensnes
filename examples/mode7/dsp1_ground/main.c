@@ -74,7 +74,7 @@
 #define TABLE_SIZE   (TABLE_HDR + GROUND_MAX * 4 + 1)
 
 /** @brief HDMA channels: BGMODE switch, TM switch, M7A/M7B, M7C/M7D.
- *  1-4 like mode7/perspective (0 is the general-DMA channel, 7 the OAM one). */
+ *  1-4 like mode7/perspective (0 is the general-DMA channel, 7 the NMI handler's). */
 #define CH_MODE  HDMA_CHANNEL_1
 #define CH_TM    HDMA_CHANNEL_2
 #define CH_AB    HDMA_CHANNEL_3

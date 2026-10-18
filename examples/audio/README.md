@@ -8,7 +8,7 @@ from C — then the DSP's party tricks.
 
 ## The ladder
 
-**Tracker music (SNESMOD)** — compose in a tracker, `smconv` converts the
+**Tracker music (SNESMOD)** — compose in a tracker, `opensnes-music` converts the
 `.it`, the lib plays it:
 
 | Example | Developer question |

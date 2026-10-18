@@ -97,7 +97,7 @@ int main(void) {
     repointTables();
     /* hdmaSetup configures but does NOT enable — arm all four channels
      * (krom: HDMAEN = %00001111) */
-    hdmaEnableMask(0x3C);   /* channels 2-5: 0 is the DMA helpers', 1 the NMI's text flush, 7 its OAM upload */
+    hdmaEnableMask(0x3C);   /* channels 2-5: 0 is the DMA helpers', 7 carries every DMA of the NMI */
     setScreenOn();
 
     while (1) {

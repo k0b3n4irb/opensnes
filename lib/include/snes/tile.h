@@ -8,7 +8,7 @@
  * colour indices — one byte per pixel, row by row, the form a generator or
  * an effect writes naturally — into that layout, ready for dmaCopyVram().
  *
- * Tiles known at build time come from gfx4snes; these are for tiles made
+ * Tiles known at build time come from opensnes-tileset or opensnes-sprite; these are for tiles made
  * while the game runs (procedural art, a generated font, a plotted
  * sprite).
  *

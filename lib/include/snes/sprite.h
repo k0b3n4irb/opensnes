@@ -549,8 +549,8 @@ void oamClear(void);
  * for the sprite sheet as it sits in VRAM. It is NOT a block index: a
  * 16x16 sub-sprite one block to the right of another is `+2` (two 8x8
  * columns), and moving one block row down adds the sheet's row stride
- * (16 names for a 128px-wide sheet). gfx4snes `-T` emits these names
- * directly (fixed in issue #100); editors composing their own sheet
+ * (16 names for a 128px-wide sheet). `opensnes-sprite sheet --metasprite`
+ * emits these names directly; editors composing their own sheet
  * (Cooper) compute them from their own geometry.
  */
 typedef struct {

@@ -5,8 +5,8 @@
  * The S-SMP boots into a 64-byte IPL ROM speaking a handshake protocol
  * over the APU I/O ports ($2140-$2143). This module drives it from C:
  * wait for boot, push a wla-spc700-assembled binary into APU RAM, and
- * start it. It is the modern, ABI-verified alternative to the legacy
- * snesmod path for projects that want direct DSP control.
+ * start it. It is the alternative to SNESMOD (snesmod.h) for projects
+ * that want direct DSP control with a program of their own.
  *
  * Build side: list your APU program in the example Makefile's `SPCSRC`
  * (e.g. `SPCSRC := player.spc700.asm`); common.mk assembles it with

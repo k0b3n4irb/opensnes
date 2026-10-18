@@ -364,8 +364,8 @@ void renderLineClearFlash(LineClearResult *result, u8 frame) {
 static u16 msg_color;
 static u8 msg_color_dirty;
 
-/* Switch the gradient on: channel 6 (7 belongs to the NMI handler's OAM
- * DMA), CGADD twice then CGDATA twice per entry of the table.
+/* Switch the gradient on: channel 6 (7 carries every DMA of the NMI
+ * handler), CGADD twice then CGDATA twice per entry of the table.
  *
  * Through the library, in VBlank. Until 2026-10-10 this function wrote
  * $420C by itself, wherever the main loop happened to be in the frame

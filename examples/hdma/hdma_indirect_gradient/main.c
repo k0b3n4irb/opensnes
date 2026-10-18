@@ -98,7 +98,7 @@ int main(void) {
     hdmaSetupIndirect(HDMA_CHANNEL_2, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
                       itable,
                       (u8)((u32)(void *)band_data >> 16));
-    hdmaEnableMask(1 << HDMA_CHANNEL_2);   /* not 0 (dmaCopyVram) nor 1 (the NMI's text flush) */
+    hdmaEnableMask(1 << HDMA_CHANNEL_2);   /* not 0 (dmaCopyVram) nor 7 (the NMI's DMA) */
 
     /* krom: TM = 0 — no layers; the backdrop is the whole picture */
     setMainScreen(0);

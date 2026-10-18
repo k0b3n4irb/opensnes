@@ -9,7 +9,8 @@
  * A **frame value is an opaque u16** — the player sequences it without
  * interpreting it. Choose what it means per clip:
  *   - an `oamframeid` for the dynamic sprite engine (see animTickOam()),
- *   - an index into a gfx4snes `-T` metasprite pointer table
+ *   - an index into the metasprite pointer table that
+ *     `opensnes-sprite sheet --metasprite` writes
  *     (see animTickMeta()),
  *   - a raw OAM tile number for oamSetTile().
  *
@@ -169,7 +170,8 @@ u16 animTick(AnimPlayer *p);
 } while (0)
 
 /**
- * @brief Tick + resolve against a gfx4snes metasprite pointer table.
+ * @brief Tick + resolve against a metasprite pointer table (the one
+ *        `opensnes-sprite sheet --metasprite` writes).
  *
  * Feeds oamDrawMetasprite()/oamMetaDrawDyn() directly:
  * @code

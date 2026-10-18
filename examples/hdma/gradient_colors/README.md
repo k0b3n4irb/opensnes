@@ -123,7 +123,12 @@ writes every scanline.
 
 krom's RedSpace9BitHDMA trick: one channel rewrites the backdrop colour per scanline exactly as this
 example does, and a second channel rewrites INIDISP's master brightness per
-scanline (`HDMA_MODE_1REG` into `$2100`). Colour x brightness, plus a
+scanline. That second channel writes INIDISP through `$21FF`:
+`hdmaSetup(ch, HDMA_MODE_2REG, 0xFF, table)`, which writes `$21FF` (nothing)
+then `$2100`, with table entries `count, value, value` and `$8F` rather than
+`$80` for a blank band. A one-register HDMA straight into `$2100` can make a
+general DMA fail on an S-CPU-A console (`KNOWN_LIMITATIONS.md`, "An HDMA to
+INIDISP"). Colour x brightness, plus a
 one-line jitter, dithers the 5-bit gradient into more perceptual steps than
 the PPU has. INIDISP then belongs to the stream: the program never calls
 `setScreenOn()` itself, and the brightness table must end at full

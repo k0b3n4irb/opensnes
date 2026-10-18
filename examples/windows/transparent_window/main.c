@@ -185,7 +185,7 @@ int main(void) {
     /*--------------------------------------------------------------------
      * HDMA: drive WH0 and WH1 to define the rectangle
      *--------------------------------------------------------------------*/
-    /* NMI uses DMA channel 7 for OAM — use channels 4+5 for HDMA */
+    /* Every DMA of the NMI runs on channel 7 — use channels 4+5 for HDMA */
     hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0, hdma_left);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1, hdma_right);
     hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));

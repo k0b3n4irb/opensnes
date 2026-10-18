@@ -7,8 +7,8 @@ Ships:
   - #9  (row 2, col 1) — medium red chasseur → `enemy.png`
 
 Each sprite is exported as a 16-colour indexed PNG with the dark-blue
-Kenney background forced to palette index 0, because gfx4snes treats
-that index as transparent for sprites. PIL's adaptive quantizer puts
+Kenney background forced to palette index 0, because index 0 of a
+sprite palette is transparent. PIL's adaptive quantizer puts
 the background at an arbitrary index, so the script does an explicit
 palette swap to put it at slot 0.
 

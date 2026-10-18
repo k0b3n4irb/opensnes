@@ -162,8 +162,8 @@ int main(void) {
     setCamera();
 
     /* The four channels. Each table is read from its start again at the
-     * top of every frame, so this is done once. (The NMI handler uses
-     * channel 7 for OAM; channel 0 serves the DMA helpers.) */
+     * top of every frame, so this is done once. (Every DMA of the NMI
+     * handler runs on channel 7; channel 0 serves the DMA helpers.) */
     hdmaSetup(HDMA_CHANNEL_1, HDMA_MODE_1REG,    HDMA_DEST_BGMODE, mode_table);
     hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_1REG,    HDMA_DEST_TM,     layer_table);
     hdmaSetup(HDMA_CHANNEL_3, HDMA_MODE_1REG_2X, HDMA_DEST_M7A,    perspective_x);

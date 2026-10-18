@@ -30,7 +30,7 @@ The table below counts them per folder.
 | [audio/](audio/) | 9 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 3 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
-| [chips/](chips/) | 8 | Enhancement chips: SA-1 and SuperFX/GSU coprocessors |
+| [chips/](chips/) | 8 | Enhancement chips: SA-1, SuperFX/GSU and DSP-1 coprocessors |
 | [games/](games/) | 8 | Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
 
 ## Building

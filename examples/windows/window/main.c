@@ -136,8 +136,8 @@ u8 tablerighttriangle[] = {
  * OUTSIDE the triangle shape are clipped to black, while pixels inside remain
  * visible. This is the opposite of the default behavior (which masks inside).
  *
- * HDMA channels 4 and 5 are used (not 7, which the NMI handler reserves for
- * OAM DMA). HDMA is disabled before reconfiguration and re-enabled after to
+ * HDMA channels 4 and 5 are used (not 7, which carries every DMA of the NMI
+ * handler). HDMA is disabled before reconfiguration and re-enabled after to
  * avoid partial-table reads during the transition.
  *
  * @param layers  Bitmask of BG layers for TMW (e.g., TM_BG1 | TM_BG2)

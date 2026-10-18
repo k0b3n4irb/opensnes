@@ -2,14 +2,11 @@
  * @file audio.h
  * @brief OpenSNES Audio System
  *
- * @note **v2 engine** (2026-07): rebuilt on the raw-APU path — a pure C
- *       command layer (`audio.c`) driving a resident SPC700 driver built
- *       from source at lib build time (the legacy PVSnesLib-ABI
- *       `audio.asm` is gone). The full surface below is implemented:
- *       init/ready, master volume, per-voice control, dynamic BRR
- *       loading, playback with pan/pitch, echo with FIR filter, and
- *       live voice-state readback. Design notes:
- *       `.claude/notes/chantiers/audio_v2.md`.
+ * @note Built on the raw-APU path: a pure C command layer (`audio.c`)
+ *       driving a resident SPC700 driver built from source at lib build
+ *       time. The full surface below is implemented: init/ready, master
+ *       volume, per-voice control, dynamic BRR loading, playback with
+ *       pan/pitch, echo with FIR filter, and live voice-state readback.
  *
  * @warning Main-thread only — do not call audio functions from an NMI
  *          callback. One engine per ROM: do not link `audio` and

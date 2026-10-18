@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Reproduce the split of Kenney's "Pixel Shmup" tiles_packed.png into the two
-# inputs gfx4snes consumes. The original packed sheet bundles sprite/HUD tiles
+# inputs opensnes-sprite and opensnes-tileset consume. The original packed sheet bundles sprite/HUD tiles
 # (top 3 rows) with terrain tiles (bottom 7 rows); SNES wants them on distinct
 # palettes (sprites in CGRAM 128+, BG in CGRAM 0+), so we split before import.
 #
