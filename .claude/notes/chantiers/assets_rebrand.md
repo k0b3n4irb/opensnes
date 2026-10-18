@@ -263,6 +263,31 @@ is dropped).
 - Risk named on the page: the closest to cyberpunk seen elsewhere, so the
   animals and the details have to carry the identity.
 
+### The direction validated on the console (2026-10-18)
+
+Three trials, about 74 generations, one ROM after each (built outside the
+repository, filmed with `luna record`): Kit with an idle, a walk, a run
+and a jump, roofs drawn in the city's style, the generated city in
+parallax, the owl on the next roof. The owner played the third one:
+"c'est joli et fun… une super étape pour valider et prendre cette
+direction". Néo-Lumen and the PixelLab method are taken; the next work is
+the examples themselves, wave by wave (`assets_rebrand_needs.md` §5).
+
+What the owner hit while playing, and why, so the examples do not repeat it:
+
+- **A frame of another character for four frames on each landing**: the
+  jump had been cut to 8 frames and the code still asked for the ninth,
+  which was the owl's block in the same OBJ sheet. An example's frame
+  table must come from the sheet (`opensnes-sprite anim` or a generated
+  header), not from numbers typed in `main.c`.
+- **A roof out of reach**: walking at 1 px a frame, a 33-frame jump
+  covered 33 px for a 32 px gap and a roof 16 px higher. Jump reach is a
+  number to compute from speed, impulse and gravity when the level is
+  laid out, and the movement manifests should check it.
+- **Lag**: not the ROM (595 loop turns, one per frame, measured with
+  `luna state --peek-at WaitForVBlank`); the GUI fell to 8–16 fps while
+  the machine ran a dozen `rustc` at a load of 17 on 8 cores.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.
