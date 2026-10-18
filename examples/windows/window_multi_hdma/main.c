@@ -96,7 +96,7 @@ int main(void) {
     windowSetMainMask(LAYER_BG1);
 
     /* One channel, 4 registers per line: WH0-WH3 = both windows' edges */
-    hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_4REG, HDMA_DEST_WH0, window_table);   /* not 0 (dmaCopyVram) nor 1 (the NMI's text flush) */
+    hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_4REG, HDMA_DEST_WH0, window_table);   /* not 0 (dmaCopyVram) nor 7 (the NMI's DMA) */
     hdmaEnableMask(1 << HDMA_CHANNEL_2);
 
     setMainScreen(LAYER_BG1);

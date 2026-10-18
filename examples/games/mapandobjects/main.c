@@ -89,6 +89,8 @@ u16 nbobjects;
  * @return 0 (never reached -- infinite game loop)
  */
 int main(void) {
+    consoleInit();
+
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
     bgInitTileSet(0, tilesMario_tiles, tilesMario_pal, 0,
                   (tilesMario_tiles_end - tilesMario_tiles), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
@@ -116,11 +118,9 @@ int main(void) {
     /* Object engine */
     objInitEngine();
 
-    /* Register the three object types. This used to need a hand-written
-     * ASM shim because objInitFunctions() read its arguments with the
-     * pre-A6 stack map and stored garbage; fixed 2026-09-18, so the
-     * callbacks — C functions the linker puts in bank $01 — register from
-     * C with their bank bytes intact. */
+    /* Register the three object types. The callbacks are C functions the
+     * linker may put in any bank; a function pointer carries its bank, so
+     * they register from C as they are. */
     nbobjects = 1; /* mario is always object 0 */
     objInitFunctions(0, marioinit,        marioupdate,        0);
     objInitFunctions(1, goombainit,       goombaupdate,       0);

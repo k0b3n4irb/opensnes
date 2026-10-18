@@ -2,7 +2,7 @@
 """Generate every RPG asset from a Tiled map (the source of truth).
 
 Outputs in res/:
-  tileset.png            — 16 unique 8x8 terrain tiles (gfx4snes input)
+  tileset.png            — 16 unique 8x8 terrain tiles (opensnes-tileset input)
   town.tmj               — the Tiled map: terrain + per-tile collision
                            + an Entities object layer (spawn/npc/chest)
   town_map.bin           — SNES 64x64 tilemap (4 quadrant pages) from the .tmj
@@ -185,8 +185,8 @@ INTERIOR_ART = {
 def write_pal(palette, out):
     """Emit the palette as a raw SNES .pal (BGR555, little-endian).
 
-    Committed and passed to gfx4snes with -c, so the converter must use
-    THIS palette: any colour that creeps into the art without being
+    Committed and imposed by the picture's settings file (palette = ...),
+    so opensnes-tileset must use THIS palette: any colour that creeps into the art without being
     declared here fails the build instead of silently re-deriving all 16
     slots and shifting every existing tile's hue.
     """
@@ -385,8 +385,7 @@ def gen_tmj(grid):
         }],
     }
     # Indented on purpose: this file is meant to be opened and edited in
-    # Tiled, and read in a diff. tmx2snes minifies before parsing since
-    # issue #125 (its parser used to choke on any whitespace).
+    # Tiled, and read in a diff; opensnes-level reads it as is.
     (RES / "town.tmj").write_text(json.dumps(tmj, indent=1))
     print("town.tmj (editable in Tiled: terrain + collision + entities)")
 
@@ -549,8 +548,7 @@ def convert_tmj():
         inc.append(f"#define {macro}_TY {ty}")
     inc.append("")
     inc.append(f"#define NPC_COUNT {len(npcs)}")
-    # Same macro shape `tmx2snes -e` emits, so moving this example onto
-    # the tool is a Makefile change rather than a code change.
+    # Same macro shape the retired `tmx2snes -e` emitted.
     inc.append("#define NPC_FIELDS \\\n    u8 tx; u8 ty; const char *text;")
     rows = ", \\\n    ".join(
         '{ %d, %d, "%s" }' % (pos[0], pos[1], line) for pos, line in npcs)

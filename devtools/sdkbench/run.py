@@ -56,11 +56,11 @@ WORK = REPO / "build" / "sdkbench"
 NAMES = ["baseline", "sieve", "sort", "physics", "collide", "mul", "decimal",
          "long", "bytes", "calls", "switch", "crc", "list",
          "tilemap", "grid", "entities", "copy", "strings", "state", "place", "dist", "depot",
-         "div32", "farfill"]
+         "div32", "farfill", "stepseq"]
 WHAT = {"sieve": "sieve of 1024, byte array", "sort": "insertion sort, 64 words",
         "physics": "32 entities x 60 steps", "collide": "496 box pairs x 8",
         "mul": "2304 variable multiplies", "decimal": "200 numbers to digits (/10, %10)",
-        "long": "300 steps of 32-bit math", "div32": "200 steps of u32 / u16 (and a few / u32)", "farfill": "a 2bpp text screen composed in far RAM, then near", "bytes": "512-byte fill, copy, compare x 4",
+        "long": "300 steps of 32-bit math", "div32": "200 steps of u32 / u16 (and a few / u32)", "farfill": "a 2bpp text screen composed in far RAM, then near", "stepseq": "a 4-channel step sequencer, 2000 ticks", "bytes": "512-byte fill, copy, compare x 4",
         "calls": "recursive fib(17)", "switch": "1280 interpreted ops",
         "crc": "CRC-16 of 256 bytes, bitwise", "list": "linked list, 40 walks",
         "tilemap": "32x16 tilemap, write + 1200 lookups", "grid": "16x32 grid, 4 neighbours",
@@ -139,7 +139,7 @@ def wla_sym(path: Path) -> None:
 # The functions of each workload, for the size column.
 FUNCS = {"sieve": ["w_sieve"], "sort": ["w_sort", "rnd16"],
          "physics": ["w_physics", "ent_init", "rnd16"], "collide": ["w_collide", "ent_init", "rnd16"],
-         "mul": ["w_mul"], "decimal": ["w_decimal"], "long": ["w_long"], "div32": ["w_div32"], "farfill": ["w_farfill", "makeFont", "slotOf", "farClear", "farGlyph", "farBox", "farSum", "nearClear", "nearGlyph", "nearBox", "nearSum", "farScreen", "nearScreen"], "bytes": ["w_bytes"],
+         "mul": ["w_mul"], "decimal": ["w_decimal"], "long": ["w_long"], "div32": ["w_div32"], "farfill": ["w_farfill", "makeFont", "slotOf", "farClear", "farGlyph", "farBox", "farSum", "nearClear", "nearGlyph", "nearBox", "nearSum", "farScreen", "nearScreen"], "stepseq": ["w_stepseq", "makeSequences", "put", "resetTremolo", "resetVibrato", "startNote", "commands", "seqStep", "pitchOf", "seqHardware", "seqTick"], "bytes": ["w_bytes"],
          "calls": ["w_calls", "fib"], "switch": ["w_switch"], "crc": ["w_crc"], "list": ["w_list"],
          "tilemap": ["w_tilemap"], "grid": ["w_grid", "rnd16"],
          "entities": ["w_entities", "ent_init", "rnd16"], "copy": ["w_copy"],
@@ -249,7 +249,7 @@ DESCRIPTION = {
     "sieve": "sieve of 1024 in a byte array", "sort": "insertion sort of 64 words",
     "physics": "32 entities bouncing, 60 steps, by index", "collide": "496 box pairs tested, 8 rounds",
     "mul": "2304 multiplies of two variables", "decimal": "200 numbers to decimal digits (`/ 10`, `% 10`)",
-    "long": "300 steps of a 32-bit generator and hash", "div32": "200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth", "farfill": "a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer", "bytes": "512-byte fill, copy and compare, 4 passes",
+    "long": "300 steps of a 32-bit generator and hash", "div32": "200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth", "farfill": "a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer", "stepseq": "a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change", "bytes": "512-byte fill, copy and compare, 4 passes",
     "calls": "recursive `fib(17)`", "switch": "1280 operations of a `switch` interpreter",
     "crc": "CRC-16 of 256 bytes, bit by bit", "list": "a 64-node linked list walked 40 times",
     "tilemap": "a 32×16 tilemap written, then 1200 lookups",
@@ -262,6 +262,13 @@ DESCRIPTION = {
     "depot": "eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166)"}
 
 
+# Workloads PVSnesLib's compiler gets wrong: 816-tcc leaves another checksum
+# (stepseq: 0x5078 for 0x7552, the native build agreeing with ours,
+# 2026-10-13). Measured for OpenSNES alone: no PVSnesLib figure in the page
+# or in the reference file, and out of the totals and the counts.
+OPENSNES_ONLY = {"stepseq"}
+
+
 def write_doc() -> None:
     """Rewrite the table of docs/BENCHMARK.md between its two markers from
     the committed JSON files, so the page cannot drift from them."""
@@ -270,19 +277,29 @@ def write_doc() -> None:
     pct = lambda o, p: f"{100 * (o - p) / p:+.1f} %"
     out = ["| Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |",
            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    both = [n for n in b if n not in OPENSNES_ONLY]
     for n, o in b.items():
+        if n in OPENSNES_ONLY:
+            out.append(f"| `{n}` | {DESCRIPTION[n]} | — | {o['cycles']:,} | ours only | — | {o['size']} | | — | {o['stack']} |")
+            continue
         p = t[n]
         out.append(f"| `{n}` | {DESCRIPTION[n]} | {p['cycles']:,} | {o['cycles']:,} | {pct(o['cycles'], p['cycles'])} "
                    f"| {p['size']} | {o['size']} | {pct(o['size'], p['size'])} | {p['stack']} | {o['stack']} |")
-    tot = lambda d, k: sum(v[k] for v in d.values())
+    tot = lambda d, k: sum(d[n][k] for n in both)
     out.append(f"| **Total** | | **{tot(t, 'cycles'):,}** | **{tot(b, 'cycles'):,}** | "
                f"**{pct(tot(b, 'cycles'), tot(t, 'cycles'))}** | **{tot(t, 'size')}** | **{tot(b, 'size')}** | "
                f"**{pct(tot(b, 'size'), tot(t, 'size'))}** | | |")
     out.append("")
-    out.append(f"Of the {len(b)} workloads OpenSNES is **faster on {sum(b[n]['cycles'] < t[n]['cycles'] for n in b)}**, "
-               f"**no larger on {sum(b[n]['size'] <= t[n]['size'] for n in b)}**, and **no deeper in stack on "
-               f"{sum(b[n]['stack'] <= t[n]['stack'] for n in b)}**. Both ROMs leave the same checksum for every "
-               "workload, so they computed the same thing.")
+    out.append(f"Of the {len(both)} workloads both SDKs build OpenSNES is **faster on {sum(b[n]['cycles'] < t[n]['cycles'] for n in both)}**, "
+               f"**no larger on {sum(b[n]['size'] <= t[n]['size'] for n in both)}**, and **no deeper in stack on "
+               f"{sum(b[n]['stack'] <= t[n]['stack'] for n in both)}**. Both ROMs leave the same checksum for each of "
+               "them, so they computed the same thing.")
+    for n in b:
+        if n in OPENSNES_ONLY:
+            out.append("")
+            out.append(f"`{n}` is measured for OpenSNES alone and stays out of the totals: built by PVSnesLib's "
+                       "compiler it leaves another checksum than the native build of the same file and than ours, "
+                       "so its time there measures another computation.")
     text = DOC.read_text()
     a, z = "<!-- sdkbench:begin -->", "<!-- sdkbench:end -->"
     i, j = text.index(a) + len(a), text.index(z)
@@ -312,7 +329,8 @@ def main() -> int:
         origin = f"PVSnesLib measured now ({git_head(Path(pvs))})"
         if args.update and not args.only:
             REFERENCE.write_text(json.dumps({"pvsneslib": git_head(Path(pvs)), "frames": FRAMES,
-                                             "workloads": theirs}, indent=2) + "\n")
+                                             "workloads": {n: v for n, v in theirs.items()
+                                                           if n not in OPENSNES_ONLY}}, indent=2) + "\n")
     else:
         ref = json.loads(REFERENCE.read_text())
         theirs = {n: v for n, v in ref["workloads"].items() if n in wanted}
@@ -340,6 +358,9 @@ def main() -> int:
     rows = []
     for n in wanted:
         o, p = ours[n], theirs.get(n)
+        if n in OPENSNES_ONLY:
+            print(f"{n:9} {'-':>11} {o['cycles']:>11,} {'(ours only)':>8}  {'-':>8} {o['size']:>5} {'':>8}  {'-':>9} {o['stack']:>4}")
+            continue
         if not p:
             continue
         if o["res"] != p["res"]:
@@ -359,7 +380,7 @@ def main() -> int:
         shallower = sum(o["stack"] <= p["stack"] for _, o, p in rows)
         print(f"\n{origin}. Of {len(rows)} workloads OpenSNES is faster on {faster}, "
               f"no larger on {smaller}, no deeper in stack on {shallower}.")
-        print("cycles: master cycles (an NTSC frame is about 357,370); size: bytes of code; "
+        print("cycles: master cycles (an NTSC frame is 357,368); size: bytes of code; "
               "stack: bytes below the initial stack pointer at the deepest point.")
     for p in problems:
         print("PROBLEM:", p)

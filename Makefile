@@ -50,16 +50,20 @@ RELEASE_DIR := release
 # The ROM fixtures (testing/fixtures/README.md): one list, used by tests,
 # rom-coverage, test-manifests and test-lib. Until 2026-10-05 the Makefile
 # spelled them out in three places and each list was a different subset.
-FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram
+FIXTURES_LIB      := libtests libtests_fx libtests_dsp1 libtests_hirom libtests_gsu libtests_snesmod libtests_sa1_sram libtests_aram libtests_dma_channels
 FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_quals leaf_frame static_dup
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
+# Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
+# manifests that read them: twins of PVSnesLib examples, library coverage.
+FIXTURES_RETIRED  := tiled metasprite snesmod_music_large
 FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
                      $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
-                     $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS))
+                     $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS)) \
+                     $(addprefix testing/fixtures/retired_examples/,$(FIXTURES_RETIRED))
 # The fixtures that carry their own runtime assertions (a test_*.py beside
 # the ROM); the others are asserted by luna manifests (testing/manifests/).
 FIXTURE_TESTS     := $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
-                     $(addprefix testing/fixtures/,libtests libtests_fx libtests_dsp1 libtests_hirom libtests_sa1_sram)
+                     $(addprefix testing/fixtures/,libtests libtests_fx libtests_dsp1 libtests_hirom libtests_sa1_sram libtests_aram)
 # The version of the tree, not the nearest tag: release tags sit on main's
 # merge commits, which develop never contains, so `git describe` on develop
 # named its zips after v0.17.0. snes.h is held equal to CHANGELOG by
@@ -143,7 +147,7 @@ lint-docs:
 # (lodepng, stb_image: upstream code with its own noise), the tools'
 # version macros (TOOL_VERSION, TOOL_BUILD_DATE, tools/tool.mk) are supplied. The w65816 backend is checked advisory
 # only (upstream QBE idioms). First run found a dangling context pointer
-# in cmdparser (both copies), an uninitialised read in aseprite2snes and
+# in cmdparser (both copies, removed since), an uninitialised read in aseprite2snes and
 # the free-then-fatal paths cppcheck could not see were fatal (noreturn).
 # Skips with a note when cppcheck is not installed; CI installs it.
 lint-cppcheck:
@@ -155,7 +159,7 @@ lint-cppcheck:
 			--suppress='*:tools/third_party/stb_image.h' \
 			--suppress='*:tools/third_party/cute_tiled.h' \
 			-DTOOL_VERSION='"x"' -DTOOL_BUILD_DATE='"x"' \
-			-Itools/smconv/src -Itools/third_party tools/*/src tools/third_party \
+			-Itools/lib/smconv/src -Itools/third_party tools/*/src tools/lib/*/src tools/third_party \
 		&& cppcheck --quiet --enable=warning,performance,portability --error-exitcode=1 --inline-suppr \
 			-D__OPENSNES__=1 -Ilib/include lib/source/*.c \
 		&& { [ ! -d compiler/qbe/w65816 ] || cppcheck --quiet --enable=warning --inline-suppr compiler/qbe/w65816/*.c || true; } \
@@ -203,9 +207,15 @@ compiler: submodules verify-toolchain
 	$(MAKE) -C $(COMPILER_PATH)
 	$(MAKE) -C $(COMPILER_PATH) install
 
+# The 0.x converters, retired: their code is linked into the opensnes-*
+# tools (tools/lib/), their binaries are no longer built. A tree that built
+# them before still has them in bin/, and the release copies bin/*.
+RETIRED_TOOLS := gfx4snes smconv wav2brr tmx2snes aseprite2snes font2snes img2snes palplan
+
 tools: compiler
 	$(MAKE) -C $(TOOLS_PATH)
 	$(MAKE) -C $(TOOLS_PATH) install
+	@rm -f $(foreach t,$(RETIRED_TOOLS),bin/$(t) bin/$(t).exe)
 
 lib: compiler
 	$(MAKE) -C $(LIB_PATH)
@@ -341,13 +351,13 @@ test-project:
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test-update >/dev/null
 	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test
-	@sed -i 's/^player_x = 120$$/player_x = 9999/' $(TEST_PROJECT_DIR)/test/boot.toml
+	@sed -i 's/^player_x = 112$$/player_x = 9999/' $(TEST_PROJECT_DIR)/test/boot.toml
 	@if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) test >/dev/null 2>&1; then \
 		echo "ERROR: broken assert did not fail 'make test'"; exit 1; fi
 	@if (cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes release -q) >/dev/null 2>&1; then \
 		echo "ERROR: 'opensnes release' shipped a ROM whose test fails"; exit 1; fi
 	@test ! -e $(TEST_PROJECT_DIR)/release || { echo "ERROR: a refused release wrote release/"; exit 1; }
-	@sed -i 's/^player_x = 9999$$/player_x = 120/' $(TEST_PROJECT_DIR)/test/boot.toml
+	@sed -i 's/^player_x = 9999$$/player_x = 112/' $(TEST_PROJECT_DIR)/test/boot.toml
 	@(cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes release -q --tag v1.0) >/dev/null 2>&1 \
 		|| { echo "ERROR: 'opensnes release' failed on a healthy project"; exit 1; }
 	@cmp -s $(TEST_PROJECT_DIR)/release/opensnes_test_project-v1.0.sfc $(TEST_PROJECT_DIR)/opensnes_test_project.sfc \
@@ -355,7 +365,17 @@ test-project:
 	@bin/opensnes-rom inspect -q $(TEST_PROJECT_DIR)/release/opensnes_test_project-v1.0.sfc >/dev/null
 	@(cd $(TEST_PROJECT_DIR) && OPENSNES_HOME=$(CURDIR) $(CURDIR)/bin/opensnes budget 2>/dev/null) | grep -q 'C variables' \
 		|| { echo "ERROR: 'opensnes budget' printed no report"; exit 1; }
-	@echo "user-project test story: OK (incl. the FAIL path, release and budget)"
+	@# A ROM the post-link check refuses does not survive: a second make
+	@# must fail again, not say "Built" (audit 1.0, 04-3; .DELETE_ON_ERROR).
+	@rm -f $(TEST_PROJECT_DIR)/opensnes_test_project.sfc
+	@for i in 1 2; do \
+		if OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) RAM_FAIL_THRESHOLD=8190 >/dev/null 2>&1; then \
+			echo "ERROR: make $$i exited 0 on a ROM opensnes-rom check refuses"; exit 1; fi; \
+		test ! -e $(TEST_PROJECT_DIR)/opensnes_test_project.sfc \
+			|| { echo "ERROR: a ROM the check refused stayed on disk"; exit 1; }; \
+	done
+	@OPENSNES_HOME=$(CURDIR) $(MAKE) -s -C $(TEST_PROJECT_DIR) >/dev/null
+	@echo "user-project test story: OK (incl. the FAIL path, a refused ROM, release and budget)"
 
 # Measured lib API coverage on its own (the `tests` target runs the check).
 rom-coverage: fixtures
@@ -392,14 +412,6 @@ test-difftest:
 # against committed goldens — needs `make tools` first. Also the CI job
 # `tools-golden` (lint.yml) runs exactly this target (review P4).
 test-tools:
-	@python3 tools/gfx4snes/tests/run_golden.py
-	@python3 tools/tmx2snes/tests/run_golden.py
-	@python3 tools/smconv/tests/run_golden.py
-	@python3 tools/wav2brr/tests/run_golden.py
-	@python3 tools/palplan/tests/run_golden.py
-	@python3 tools/aseprite2snes/tests/run_golden.py
-	@python3 tools/font2snes/tests/run_golden.py
-	@python3 tools/img2snes/tests/run_golden.py
 	@python3 tools/opensnes-sample/tests/run_golden.py
 	@python3 tools/opensnes-music/tests/run_golden.py
 	@python3 tools/opensnes-rom/tests/run_golden.py
@@ -590,19 +602,23 @@ bench-twins:
 	@python3 devtools/twinbench/run.py $(if $(DETAIL),--detail)
 
 # DOXY_STRICT=1 (set by the docs-strict target) turns Doxygen warnings into
-# errors. It is NOT the default: `release` depends on `docs`, and Doxygen
-# resolves some directory links differently on Windows, so a doc warning must
-# not be able to block a release build on another platform (it did, on the
-# first push of the gaps-review P7 gate).
+# errors. It is NOT the default: Doxygen resolves some directory links
+# differently on Windows, so a doc warning must not be able to block a build
+# on another platform (it did, on the first push of the gaps-review P7 gate,
+# when `release` still depended on `docs`).
 docs:
 	cd docs && { cat Doxyfile; $(if $(DOXY_STRICT),echo "WARN_AS_ERROR = FAIL_ON_WARNINGS";) } | doxygen -
-	@# The showcase landing page is the site's front door. Doxygen emits the
-	@# documentation hub (mainpage.md) as index.html; preserve it as
-	@# documentation.html, then install the showcase as the root index.html.
-	@# Every other generated page (getting_started.html, tools.html, …) is
-	@# untouched, so no doc URL breaks. Kept in the Makefile so a local
-	@# `make docs` and the CI deploy build the identical site.
-	@cp docs/build/html/index.html docs/build/html/documentation.html
+	@# The showcase landing page is the site's front door. The documentation
+	@# hub (mainpage.md) is an ordinary page, documentation.html, with its own
+	@# place in the navigation tree; Doxygen's index.html is an empty main page
+	@# that the showcase replaces. (Until 2026-10-14 the hub WAS index.html,
+	@# copied aside: every menu link to index.html#… then opened the showcase.)
+	@# Kept in the Makefile so a local `make docs` and the CI deploy build the
+	@# identical site.
+	@# A file name written in the text (KNOWN_LIMITATIONS.md) is autolinked by
+	@# Doxygen to that file's empty "File Reference" page: move those links to
+	@# the page itself (Markdown links are rewritten earlier, by the filter).
+	@python3 devtools/docs_relink.py
 	@cp docs/landing/index.html docs/build/html/index.html
 	@echo "========================================="
 	@echo "Documentation generated in docs/build/html/"
@@ -631,7 +647,9 @@ release: all
 	@mkdir -p $(RELEASE_DIR)/opensnes/templates
 	@cp -r bin/* $(RELEASE_DIR)/opensnes/bin/ 2>/dev/null || true
 	@cp -r lib/include $(RELEASE_DIR)/opensnes/lib/
-	@cp -r lib/build $(RELEASE_DIR)/opensnes/lib/
+	@# The objects only: the build links lib/build/<flavour>/*.o and never
+	@# reads the .asm the compiler wrote on the way (about 200 files).
+	@cd lib && find build -name '*.o' | tar -cf - -T - | tar -xf - -C $(abspath $(RELEASE_DIR))/opensnes/lib
 	@cp -r make/* $(RELEASE_DIR)/opensnes/make/
 	@cp -r templates/* $(RELEASE_DIR)/opensnes/templates/
 	@# Starter project — extract the zip and `make` in opensnes/starter/ works
@@ -640,10 +658,11 @@ release: all
 	@# objects, so the user's first `make` linked nothing.
 	@git ls-files starter | tar -cf - -T - | tar -xf - -C $(RELEASE_DIR)/opensnes
 	@# Project test harness (`make test` in user projects) + the pinned-luna
-	@# installer. Only luna.version — a project's `make test` is `luna test` — not the SDK's
-	@# corpus manifest/baselines.
+	@# installer, with the pin and the archives' SHA-256 it checks (without
+	@# luna.sha256 the installer refuses every archive: the zips up to v0.50.0
+	@# shipped without it). Not the SDK's corpus manifest/baselines.
 	@mkdir -p $(RELEASE_DIR)/opensnes/testing $(RELEASE_DIR)/opensnes/scripts
-	@cp testing/luna.version $(RELEASE_DIR)/opensnes/testing/
+	@cp testing/luna.version testing/luna.sha256 $(RELEASE_DIR)/opensnes/testing/
 	@cp scripts/install-luna.sh $(RELEASE_DIR)/opensnes/scripts/
 	@# No devtools script in the zip (2026-10-06): a user build runs binaries
 	@# of bin/ and the shell CLI only, and check_doc_drift.py (anchor 17)
@@ -654,13 +673,11 @@ release: all
 	@# opensnes-examples_<version>.zip (`make release-examples`), and the
 	@# documentation is published online from `main` (deploy_docs.yml).
 	@# Compressed, they were 14 MB of a 40 MB zip (v0.46.0 arm64), re-shipped
-	@# four times; the 17 static binaries of bin/ are the 23 MB that remain.
+	@# four times; the static binaries of bin/ are most of what remains.
 	@cp README.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp LICENSE $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp CHANGELOG.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
 	@cp ATTRIBUTION.md $(RELEASE_DIR)/opensnes/ 2>/dev/null || true
-	@# Apache-2.0 §4: the binaries built with cmdparser ship with its licence.
-	@cp tools/third_party/LICENSE-cmdparser $(RELEASE_DIR)/opensnes/
 	@# GPL-2.0 §3: the wla-dx binaries (a patched fork) ship with the licence
 	@# text and a pointer to their exact source (compiler/PINS.md: fork URL and
 	@# commit of every toolchain submodule).

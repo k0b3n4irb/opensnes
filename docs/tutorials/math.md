@@ -32,8 +32,7 @@ Cost comparison (rough):
 - `float` multiply: ~500 cycles.
 - `fixMul` 8.8 × 8.8 → 8.8: ~30 cycles.
 - `fixSin(angle)`: a table read in assembly, about 260 master cycles (34 CPU
-  cycles) plus the call. It was inlined in the header until 2026-10-03; a call
-  now costs about 96 master cycles more than the inlined lookup did.
+  cycles) plus the call.
 - `mul16(a, b)` (16 × 16 → low 16): ~10 cycles (hardware).
 
 Order-of-magnitude: fixed-point is 10–25× faster than software floats.
@@ -137,8 +136,8 @@ Both `fixSin` and `fixCos` return values in `[-256, +256]` (i.e.,
 is a velocity vector component in 8.8 fixed.
 
 The LUTs are 256-entry, 2 bytes per entry, 512 bytes total. They live
-in ROM in `lib/source/math.asm`. Lookups are O(1) — ~20 cycles per
-call.
+in ROM in `lib/source/math.asm`. Lookups are O(1) — about 34 CPU cycles
+per call, plus the call.
 
 ## Hardware multiplier and divider
 
@@ -355,20 +354,20 @@ table byte.
 
 ## Gotchas
 
-### 🟢 `int` and `long` sizes are correct on this target (since v0.20.0)
+### 🟢 `int` and `long` sizes are correct on this target
 
 `sizeof(int) == 2`, `sizeof(long) == 4`. Bare `int` is the native 16-bit
 word; `long` is 32 bits. C convention says `int` is the natural word size
-of the machine, and on the w65816 that's now true.
+of the machine, and on the w65816 that's true.
 
 For **portability** across compilers (cross-platform tooling, code shared
 with PC-side helpers), keep using `s16`, `u16`, `s32`, `u32`, `fixed` from
 `lib/include/snes/types.h` — they make intent explicit and work
-identically everywhere. Bare `int speed = 5;` no longer doubles your
-cycle cost on cc65816, but a build of the same code with a different
-compiler may behave differently.
+identically everywhere. Bare `int speed = 5;` is a 16-bit word on
+cc65816, but a build of the same code with a different compiler may
+behave differently.
 
-The `fixed` type is still `s16`. No change for fixed-point users.
+The `fixed` type is `s16`.
 
 ### 🔴 `FIX(x)` overflows for `|x| ≥ 128`
 
@@ -380,8 +379,8 @@ If you need values larger than `±127`, either:
 
 - Switch to **integer pixel coordinates** for position and reserve
   fixed-point for *velocity* / *acceleration* (which stay small).
-- Use a custom **16.16 format** in `s32` for higher range. The lib
-  doesn't ship 16.16 helpers — write them per-game.
+- Use the **16.16 format**, `fixed32` (`<snes/fixed32.h>`, see above),
+  for higher range.
 
 ### 🔴 `fixMul` truncates fractional precision
 
@@ -405,10 +404,8 @@ when the player isn't moving).
 
 ### 🟠 Compiler `*` vs `mul16`
 
-The C `*` operator works correctly on `s16`/`u16` operands; the
-"runtime can have bugs" caveat in `mul16`'s docstring is historical
-(early QBE backend bugs that have shipped fixes per `compiler/PINS.md`).
-Today, `a * b` where both are `u16` is generally safe and faster than
+The C `*` operator works correctly on `s16`/`u16` operands:
+`a * b` where both are `u16` is generally safe and faster than
 `mul16(a, b)` (the compiler inlines the hardware multiplier write).
 
 Use `mul16` when:
@@ -434,11 +431,10 @@ early and you get partial results.
 This is the right shape for game code, but if you're translating
 from a different engine, watch the signedness boundary.
 
-### `atan2` and `sqrt` ship in the lib (since 2026-05-09)
+### `atan2` and `sqrt` ship in the lib
 
-The full inverse-trig and square-root surface arrived together so
-the canonical "where is the target relative to me, and how far?"
-question is one call away. Three entry points cover almost every
+The inverse-trig and square-root helpers make the canonical "where is
+the target relative to me, and how far?" question one call away. Three entry points cover almost every
 game-side use:
 
 | Function | Returns | Cost |
@@ -473,9 +469,8 @@ fits in `u8` for tile-grid distances. For the 8.8 fractional
 variant use `fixSqrt`. Note that `fixSqrt`'s precision is
 capped at 4 fractional bits: it is one 16-bit root shifted, which
 is what keeps it at about 80 cycles. The full 8 bits would need
-the root of a 24-bit value, a 32-bit loop. (When it was written
-the compiler also truncated that shift; it no longer does, since
-v0.21.2, so the cap is now a speed choice.)
+the root of a 24-bit value, a 32-bit loop: the cap is a speed
+choice.
 
 ### What's still missing: `pow`, `exp`, `log`
 
@@ -497,7 +492,7 @@ weight that most games don't.
 | `fixed + fixed` (addition) | 4–8 |
 | `fixMul(a, b)` | ~30 |
 | `fixDiv(a, b)` | ~80 |
-| `fixSin(angle)` / `fixCos(angle)` | ~20 (LUT lookup) |
+| `fixSin(angle)` / `fixCos(angle)` | ~34 (LUT lookup) |
 | `fixLerp(a, b, t)` | ~40 |
 | `mul16(a, b)` (hardware multiply) | ~10 |
 | `div16(a, b)` (hardware divide) | ~20 |
@@ -505,16 +500,17 @@ weight that most games don't.
 | `fixSqrt(x)` | ~80 (delegates to sqrt16) |
 | `atan2_8(dy, dx)` | ~120 (LUT + one 16-bit divide) |
 
-A typical sprite-physics frame (position update + sin/cos rotation +
-two `fixMul` calls per sprite × 64 sprites) is ~6 K cycles, well
-under 1 % of the frame. Fixed-point is *cheap*; the budget is rarely
-binding.
+Fixed-point is *cheap*, but a sprite-physics frame (position update +
+sin/cos rotation + two `fixMul` calls per sprite, for 64 sprites) adds
+up: measure your own loop with luna (see the
+[Profiling tutorial](profiling.md)) rather than estimating it from this
+table.
 
 ## See also
 
 - `lib/include/snes/math.h` — full API reference.
-- `lib/source/math.asm` — implementation (273 LOC; the sin/cos LUTs
-  live here).
+- `lib/source/math.asm` — implementation (the sin/cos LUTs live
+  here).
 - [Mode 7 tutorial](mode7.md) — the natural application: matrix
   building via `fixSin`/`fixCos`/`fixMul`.
 - [HDMA tutorial](hdma.md) — for runtime HDMA table generation that
@@ -524,5 +520,5 @@ binding.
 - [Collision tutorial](collision.md) — the bounding-box collision
   module uses integer math, but advanced collision (circle, swept,
   ray-cast) goes through fixed-point.
-- [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — covers the
-  historical `int = 32 bits` trap (closed in v0.20.0, 2026-05-08).
+- [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — the silent
+  traps of the target, integer widths included.

@@ -3,7 +3,7 @@
 
 The family's contract: a tool that absorbs a 0.x tool reproduces that
 tool's golden suite byte for byte. The `sheet` cases compare against
-gfx4snes's goldens (`tools/gfx4snes/tests/golden`: spr, flip, two, three),
+gfx4snes's goldens (`tools/lib/gfx4snes/tests/golden`: spr, flip, two, three),
 the `anim` case against aseprite2snes's hero_anim.h from its second line
 (the first names the generator). Fixtures are copies of theirs.
 
@@ -19,8 +19,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
 from golden import Golden  # noqa: E402
 
 g = Golden("opensnes-sprite", __file__)
-GFX = g.here.parents[1] / "gfx4snes" / "tests" / "golden"
-ASE = g.here.parents[1] / "aseprite2snes" / "tests" / "golden"
+GFX = g.here.parents[1] / "lib" / "gfx4snes" / "tests" / "golden"
+ASE = g.here.parents[1] / "lib" / "aseprite2snes" / "tests" / "golden"
 META = ["--colors", "16", "--metasprite", "32", "16", "--priority", "2"]
 
 g.expect_outputs("sheet spr.png --size 16 == gfx4snes -s 16 -p (the data)", ["sheet", "-q", "--size", "16", "spr.png"],

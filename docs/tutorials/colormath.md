@@ -1,4 +1,4 @@
-# Colour Math Tutorial {#tutorial_colormath}
+# Colour math tutorial {#tutorial_colormath}
 
 ![colormath example](transparency.png)
 
@@ -118,7 +118,7 @@ for (u8 step = 0; step <= 15; step++) {
 }
 ```
 
-The `lib/include/snes/video.h` `setBrightness()` is a *different*
+The `lib/include/snes/console.h` `setBrightness()` is a *different*
 mechanism — it scales every channel uniformly by a 4-bit factor via
 `INIDISP`, and is the right tool for "global brightness". Colour math
 gives finer control: per-layer fades, asymmetric R/G/B fades for
@@ -169,7 +169,7 @@ lib has no function for the clip bits yet.
 |---|---|
 | `colorMathInit()` | Reset all colour-math registers to "off". Call before configuring a new scene. |
 | `colorMathSetLayers(layers)` | Bitmask of which layers' pixels can be modified by math (`LAYER_BG1`, …, `LAYER_OBJ`, `COLORMATH_BACKDROP`, `COLORMATH_ALL`). |
-| `colorMathDisable(layers)` | Take layers out of the per-pixel math gate. |
+| `colorMathDisable()` | Switch all colour math off. To take some layers out of the math, call `colorMathSetLayers(mask)` with a smaller mask. |
 | `colorMathSetOp(op)` | `COLORMATH_ADD` or `COLORMATH_SUB`. |
 | `colorMathSetHalf(half)` | 0 = don't divide result, 1 = divide by 2 (true 50 % blend). |
 | `colorMathSetSource(src)` | `COLORMATH_SRC_SUBSCREEN` or `COLORMATH_SRC_FIXED`. |
@@ -191,21 +191,22 @@ backdrop. The clouds *brighten* what's underneath without dimming
 themselves — characteristic of additive blending.
 
 The example uses Mode 1 with BG3 priority high (so the 2 bpp cloud
-layer renders above BG1). It uses bare-metal `REG_CGWSEL` /
-`REG_CGADSUB` writes for byte-perfect parity with the PVSnesLib
-original, but the lib's helpers cover the same configuration.
+layer renders above BG1). It configures the blend with
+`colorMathInit()`, `colorMathSetSource()`, `colorMathSetOp()` and
+`colorMathSetLayers()`.
 
-### Window-gated spotlight blend — `examples/windows/transparent_window`
+### Window-gated darkening — `examples/windows/transparent_window`
 
-Combines colour math with a *window-gated* math area. Inside the
-window, BG1 is half-blended with BG2 (true transparency); outside, BG1
-is fully opaque. The example also uses HDMA to animate the window
-shape — see the [Window](window.md) and [HDMA](hdma.md) tutorials for
-those sides.
+Combines colour math with a *window-gated* math area. BG2 alone is on
+screen; inside a rectangular window, colour math subtracts a fixed colour
+(12, 12, 12) from BG2, so the rectangle looks darkened; outside it, BG2
+is untouched. Two HDMA channels write the window edges to define the
+rectangle, and the effect is static — see the [Window](window.md) and
+[HDMA](hdma.md) tutorials for those sides.
 
 This is the canonical demonstration of how three SNES PPU subsystems
 (window, colour math, HDMA) compose: window says where, colour math
-says what to blend, HDMA animates the shape per scanline.
+says what to do to the pixels, HDMA draws the shape per scanline.
 
 ## Gotchas
 
@@ -226,9 +227,7 @@ unless math reads it.
 
 The lib's `colorMathSetSource` sets the source register `CGWSEL` bit 1.
 At the bare-metal level: bit 1 = 0 → fixed colour, bit 1 = 1 → sub
-screen. The lib was historically inverted; commit history (per
-`KNOWN_LIMITATIONS.md` and `lib/source/colormath.c`) records the fix.
-**Use the lib helper, not bare-metal writes.** If you do go bare metal,
+screen. **Use the lib helper, not bare-metal writes.** If you do go bare metal,
 verify polarity against the SNES PPU register reference, not against
 intuition.
 
@@ -296,10 +295,9 @@ SNES. The discipline is configuring it correctly, not avoiding it.
 
 ## See also
 
-- `lib/include/snes/colormath.h` — full API reference, polarity-fixed
-  helper definitions.
-- `lib/source/colormath.c` — implementation; commit history records
-  the `CGWSEL` bit-1 polarity fix.
+- `lib/include/snes/colormath.h` — full API reference, helper
+  definitions.
+- `lib/source/colormath.c` — implementation.
 - [`examples/color/transparency`](../../examples/color/transparency/README.md) — additive cloud overlay.
 - [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window-gated spotlight blend.
 - [`examples/color/pseudo_hires`](../../examples/color/pseudo_hires/README.md) — a 50 % blend
@@ -314,5 +312,4 @@ SNES. The discipline is configuring it correctly, not avoiding it.
 - [Graphics tutorial](graphics.md) — companion read for the BG-layer
   fundamentals colour math operates on.
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) —
-  documents the historical `CGWSEL` polarity inversion and other
-  PPU-side traps.
+  documents the PPU-side traps.

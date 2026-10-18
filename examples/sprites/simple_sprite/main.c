@@ -31,7 +31,7 @@
 
 #include <snes.h>
 
-/** @brief 4bpp 32x32 sprite tile data (defined in data.asm, stored in ROM) */
+/** @brief 4bpp 32x32 sprite tile data (converted by the build from res/) */
 #include "res/sprite32.inc"   /* generated: sprite32_tiles[], sprite32_tiles_end[], sprite32_pal[] */
 /** @brief 16-color palette for the 32x32 sprite */
 

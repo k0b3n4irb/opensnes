@@ -16,7 +16,7 @@ on that angle to read back the unit direction vector.
 
 ## SNES Concepts
 
-- `<snes/math.h>` square-root and atan2 (chantier B6, 2026-05-09):
+- `<snes/math.h>` square-root and atan2:
     - `sqrt16(n)` → integer floor of √n, range 0–255
     - `atan2_8(dy, dx)` → 8-bit angle in the same convention as the
       `fixSin` / `fixCos` LUTs (0 = +X, 64 = +Y, 128 = −X, 192 = −Y)
@@ -64,6 +64,6 @@ Also linked: `fixed32` — 32-bit fixed point (`fix32*`).
 
 - [`docs/tutorials/math.md`](../../../docs/tutorials/math.md) — the
   full fixed-point math tutorial, including the section on
-  `sqrt16`/`atan2_8` added with chantier B6.
+  `sqrt16`/`atan2_8`.
 - [`lib/include/snes/math.h`](../../../lib/include/snes/math.h) —
   Doxygen reference for the math API.

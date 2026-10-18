@@ -28,7 +28,7 @@
 
 #include <snes.h>
 
-/** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
+/** @brief 4bpp background tile data (converted by the build from res/) */
 #include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
 /** @brief Background tilemap data mapping tiles to the 32x32 grid */
 /** @brief 16-color palette for the background tiles */

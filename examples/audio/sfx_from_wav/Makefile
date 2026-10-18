@@ -1,4 +1,4 @@
-# sfx_from_wav — Family 8 (Audio): one-shot SFX from WAV via wav2brr
+# sfx_from_wav — one-shot sound effects from WAV files (res/*.wav.toml, opensnes-sample)
 
 OPENSNES := $(shell cd ../../.. && pwd)
 

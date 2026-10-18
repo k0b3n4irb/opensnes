@@ -1,8 +1,8 @@
 # Frequently asked questions {#faq}
 
 Short answers, each pointing at the page that has the long one. If your ROM
-misbehaves in a way that is not here, @ref troubleshooting walks the symptoms
-and `KNOWN_LIMITATIONS.md` lists every trap that fails silently.
+misbehaves, @ref troubleshooting walks the symptoms and @ref known_limitations
+lists every trap that fails silently.
 
 ## Getting started
 
@@ -30,8 +30,9 @@ from `<snes/types.h>` (`u8`, `u16`, `s16`, `u32`) and the question disappears.
 
 **Can I pass a struct to a function?**
 Not by value — the compiler refuses it with a message naming the feature, and
-so it does for struct returns, struct assignment, variadic functions and inline
-assembly. Pass a pointer instead. The refusals are deliberate: each one would
+so it does for struct returns, a struct copied to or from a `FAR` object,
+variadic functions and inline assembly. Pass a pointer instead. Plain struct
+assignment (`a = b;`) works. The refusals are deliberate: each one would
 otherwise be a silent miscompilation.
 
 **Can I use floating point?**
@@ -50,49 +51,23 @@ Not in the core library, by design. Print to the screen with `textPrint`,
 developing.
 
 **Does `volatile` work?**
-Yes, since 2026-05-09: a volatile load or store survives the optimiser and is
+Yes: a volatile load or store survives the optimiser and is
 not coalesced. The library still uses plain globals for its NMI handshakes, for
 cycle-cost reasons, but your MMIO patterns can rely on `volatile`.
 
 ## Things that go wrong silently
 
-**My screen is black.**
-Almost always the initialisation order: `setScreenOn()` must come last, after
-every VRAM upload. See the checklist in @ref migrating_pvsneslib, trap 2.
-
-**My tiles are garbage on the first frames.**
-VRAM writes during active display are dropped by the PPU with no error. Upload
-during forced blank or inside VBlank, and keep the per-frame DMA under ~4 KB —
-@ref craft_frame_budget explains the ceiling and the two ways around it.
-
-**My sprites have the wrong colours.**
-Sprite palettes start at CGRAM offset 128, not 0.
-
-**A `const` array reads garbage.**
-You cast the `const` away and dereferenced it. Const data lives in the asset
-banks and every C read of it is a far read; a plain pointer reads bank $00
-instead. Keep the `const`, or hand the data to a library function that takes a
-far pointer. The linker check fails the build on this pattern.
-
-**A big buffer behaves strangely.**
-Plain C globals must fit under `$2000`. Declare bulk buffers `FAR` so they land
-in `$7E:2000-$FFFF` with bank-honouring code — @ref tutorial_far_ram.
-
-**Everything scrolls one line off after a port.**
-The library already subtracts the 1 that the PPU's missing scanline 0 requires.
-Pass the row you want; keep your own -1 only in data that reaches the register
-without the library, such as an HDMA table.
-
-**My sound is silent.**
-The audio driver has to be uploaded and serviced: initialise it, then call the
-module's process function once per frame. @ref tutorial_audio walks the whole
-path, and the audio examples are the shortest working reference.
+A black screen, garbage tiles, sprites in the wrong colours, a `const` array
+that reads garbage, a picture one line off, silent sound: @ref troubleshooting
+goes from each symptom to its cause, and @ref known_limitations is the
+catalogue of every trap that fails silently.
 
 ## Building and shipping
 
 **How large can my ROM be?**
-The shipped memory maps cover LoROM, HiROM and the coprocessor layouts. Bank
-$00 is code only and is guarded by a hard-fail free-space ratchet; your assets
+The shipped memory maps cover LoROM, HiROM and the coprocessor layouts;
+`ROM_BANKS` sets the size (@ref tools_build). Bank $00 holds code only, and
+code that does not fit there moves to the next banks by itself; your assets
 belong in the asset banks, which the converters and the `ASSET_SECTION` macro
 handle for you.
 

@@ -17,12 +17,12 @@ paths:
    The rules apply to ALL code — new or ported.
 
 2. **Consult docs/** — it is the source of truth for all SNES concepts:
-   - Graphics & backgrounds: `docs/tutorials/graphics.md`, `docs/SNES_GRAPHICS_GUIDE.md`
+   - Graphics & backgrounds: `docs/tutorials/graphics.md`, `docs/hardware/PPU.md`
    - Sprites & animation: `docs/tutorials/sprites.md`, `docs/tutorials/animation.md`
    - Scrolling & parallax: `docs/tutorials/scrolling.md`
    - Collision detection: `docs/tutorials/collision.md`
    - Input handling: `docs/tutorials/input.md`
-   - Audio & music: `docs/tutorials/audio.md`, `docs/SNES_SOUND_GUIDE.md`
+   - Audio & music: `docs/tutorials/audio.md`, `docs/hardware/APU.md`
    - Game states: `docs/tutorials/game_states.md`
    - Hardware registers: `docs/hardware/REGISTERS.md`
    - Memory map: `docs/hardware/MEMORY_MAP.md`
@@ -47,7 +47,7 @@ consoleInit() → setMode() → palettes → tiles → tilemap → BG pointers
 
 | Mistake | Symptom | Fix |
 |---------|---------|-----|
-| Forget `consoleInit()` | VRAM garbage | Always call first |
+| Forget `consoleInit()` | The state crt0 left: CGRAM and BG pointers not set, `isPAL()` and `rand()` unseeded | Call it first: it sets a known state (black palettes, Mode 1, BG1 map at $0400, region, random seed); crt0 already enables NMI and force blank |
 | `setScreenOn()` before VRAM setup | Flicker, garbage frame | Screen on LAST |
 | DMA outside VBlank | Data silently lost | `WaitForVBlank()` before DMA |
 | Wrong text API | Compile error | `textInit`+`textPrintAt`+`textFlush` |
@@ -56,7 +56,6 @@ consoleInit() → setMode() → palettes → tiles → tilemap → BG pointers
 | Sprite palette at CGRAM 0 | Wrong colors | Sprite palettes start at CGRAM 128 |
 | `mapLoad()` called after `setScreenOn()` | Garbage tiles on first frame | `mapLoad()` before `setScreenOn()` — it flushes VRAM internally |
 | Missing LIB_MODULES | Link error | Match `#include` with module |
-| `volatile` semantics in loops | (resolved chantier A2, 2026-05-09 — `volat` IR keyword tags volatile accesses so loadopt/promote/gcm leave them intact) | Use `volatile` freely now; SDK still favours globals for NMI handshakes for cycle-cost equivalence |
 | ASM stack offset 7,s | Works for arg=0 only | First arg is at **6,s** after PHP+PHB |
 
 ## Makefile
@@ -71,7 +70,7 @@ CSRC       := main.c
 include $(OPENSNES)/make/common.mk
 ```
 
-For LIB_MODULES combinations, see `docs/GETTING_STARTED.md`.
+For LIB_MODULES combinations, see `docs/tools/build.md`.
 
 ## Doxygen Documentation
 
@@ -81,7 +80,7 @@ Every new example main.c MUST have:
 2. `/** @brief */` on every function, define, global, and data array
 3. Pedagogical comments explaining WHY, not just WHAT
 
-See existing examples in `docs/examples_group.md` for the format.
+See any example's `main.c` for the format (`examples/sprites/simple_sprite/main.c`); every one carries `@ingroup examples` (the group is declared in `docs/examples_group.md`).
 
 ## README.md — MANDATORY for every example
 

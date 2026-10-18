@@ -1,11 +1,8 @@
-# Compiler Benchmark — OpenSNES vs PVSnesLib
+# Compiler Benchmark — OpenSNES vs PVSnesLib {#benchmark}
 
-*Last updated: 2026-10-08. Both compilers were run that day on the same
-machine: `python3 devtools/cyclecount/bench.py` for OpenSNES (the code the
-CI cycle gate compares against `devtools/cyclecount/bench_baseline.json`),
-and PVSnesLib's `816-tcc` + `816-opt` from a local PVSnesLib tree for the
-other two columns. The PVSnesLib figures had been frozen since 2026-05-13;
-the re-run gives the same numbers, to the cycle.*
+*OpenSNES figures: `make bench` (`devtools/cyclecount/bench.py`, which CI
+compares against `devtools/cyclecount/bench_baseline.json` at every push).
+PVSnesLib figures: its `816-tcc` + `816-opt` on the same C file.*
 
 This page has two benchmarks. The first, below, is a **static estimate** on
 34 isolated functions: the cost of the instructions each compiler emits,
@@ -13,23 +10,19 @@ added up. The second, @ref measured "measured on luna", runs the same C
 program built by both SDKs and counts the master cycles the machine
 really spent.
 
-**What changed since the May figure (−32.2 %).** On 2026-05-15 pointers and
-`u32` became 4-byte values (far pointers, v0.19.0, so data can live in any
-bank). The functions that index an array or follow a pointer —
-`array_read`, `array_write`, `array2d_read`, `struct_sum` — went from wins
-to losses; the rest held. The cause is not the pointer width itself (see
-"Reading it" at the end of this page): it is a stack frame and stack
-slots for values PVSnesLib keeps in the direct page, and code the
-optimizer leaves dead. The May text claimed "32 % faster";
-the figure today is **about 38 %** on these 34 functions, and
-60 % measured on twenty-one whole workloads.
+On these 34 functions OpenSNES is **about 38 %** faster; measured on 23
+whole workloads, 62 % (below). What made the difference on code that
+indexes an array or follows a pointer was not the pointer width: it was the
+stack frame and stack slots for values PVSnesLib keeps in the direct page,
+and code the optimiser left dead. Both are gone (see "Reading it" at the
+end of this page).
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
 | **Total cycle reduction** | **−37.5 %** vs PVSnesLib + 816-opt (1238 vs 1981 cycles) |
-| Functions compared | 34 (the May `helper` row has no standalone body any more: it is inlined into `call_chain`; `array2d_read` joined on 2026-10-08, it was in the gate's baseline but not on this page) |
+| Functions compared | 34 (`helper` has no standalone body: it is inlined into `call_chain`) |
 | OpenSNES wins | 32 |
 | PVSnesLib+opt wins | 2 (`pea_constant_args`, `mod_const_10`) |
 | Ties | 0 |
@@ -101,11 +94,11 @@ no page-crossing penalties).
 
 | Function | Improvement | Why |
 |----------|-------------|-----|
-| `call_add` | -90.2% | Tail call optimization — call forwarded directly |
+| `call_add` | -90.2% | Tail call optimisation — call forwarded directly |
 | `compare_and_branch` | -53.5% | Comparison+branch fusion eliminates redundant CMP |
 | `global_increment` | -51.2% | `.l` to `.w` shortening + `inc` instruction |
 | `clamp` | -46.8% | Comparison chain fusion + dead jump elimination |
-| `sub_u16` | -44.7% | Leaf optimization + A-register cache |
+| `sub_u16` | -44.7% | Leaf optimisation + A-register cache |
 
 ### Where PVSnesLib Wins
 
@@ -114,189 +107,86 @@ no page-crossing penalties).
 | `pea_constant_args` | +12.1% | `pea.w` constant push vs PVSnesLib's direct load |
 | `mod_const_10` | +3.1% | Both use runtime `__mod16`; slight overhead difference |
 
-`array_read`, `array_write` and `array2d_read` were wins in May (−48 %,
-−45 %, −14 %), lost 34 to 70 % after far pointers, and are wins again since
-2026-10-10 (47 cycles against 60, 52 against 65, 86 against 112). The loss
-had been put down to the pointers; read instruction by instruction on
-2026-10-08, the dereference itself cost the same as before. The 40 to 46
-cycles lost per function were a stack frame set up and torn down for the
-compiler's temporaries (22), values stored to that frame and reloaded at
-once (about 40), a high word written and never read (8) and the `rep #$20`
-every function starts with (3). The frame went on 2026-10-09 (a function
-that calls nothing keeps its temporaries in the direct page), the reloads
-and the dead high word on 2026-10-10 (a peephole over the emitted text).
-The `rep #$20` stays, on purpose: it is what lets assembly call an exported
+`array_read`, `array_write` and `array2d_read` are wins (47 cycles against
+60, 52 against 65, 86 against 112): a function that calls nothing keeps its
+temporaries in the direct page, and values stored and reloaded at once, or
+written and never read, are removed. Every function still starts with a
+`rep #$20` (3 cycles), on purpose: it is what lets assembly call an exported
 function in either accumulator width.
 
 The `pea_constant_args` regression is a trade-off: `pea.w` is smaller in code size
 (2 bytes vs 3) but costs 1 extra cycle. PVSnesLib's `lda #imm; pha` is faster but
 larger. Both approaches are valid.
 
-The previous `call_chain` regression (+31.9%) was resolved by the 2026-05-12
-function-inlining work (qbe commits `13d9b14`, `29b0941`, `77d07a0`). With
-`helper` marked `static inline`, the qbe inline pass collapses `helper(helper(x))`
-to inlined arithmetic, dropping the function from 62 cycles to 19 (-59.6 % vs
-PVSnesLib+opt's 47).
-
-The 2026-05-13 follow-up (qbe `988073d`, cproc `42a5c46`) added deferred
-asm emission and consumption-aware standalone suppression: when every direct
-caller of an inline-marked function in a TU has been spliced and no
-indirect reference remains, the QBE emit stage drops the standalone body
-entirely. The bench `helper` ends up "0 cycles" in the table marker (†)
-because its body now lives exclusively inside `call_chain` — the
-standalone is dead-code-eliminated at compile time. Cycle-count semantics
-are unchanged (the work always happened inside `call_chain`); the win is
-ROM-size (≈ 6 bytes per such helper).
-
-The pre-inlining historical note is preserved for context: TCO had landed
-in qbe `ed840fb` and lowered TOTAL from 1420 (pre-TCO) to 1341 (post-TCO),
-trading +14 cycles on `call_chain` for wins elsewhere. The function-inlining
-work took TOTAL from 1341 to 1298 by recovering the `call_chain`
-regression entirely (and going further: -28 cycles below PVSnesLib+opt rather
-than +14 above the pre-TCO baseline). The deferred-emit follow-up dropped
-TOTAL another 16 cycles to 1282 via the `helper` dead-code elimination.
-
-Inlining is opt-in via the `inline` keyword and gated by a conservative
-heuristic (linear flow, ≤ 8 IR instructions, no nested calls, no allocas).
-Functions that don't qualify fall back to JSL/JML and incur no overhead.
-
-Since 2026-10-10 a second, whole-function inliner takes what that one
-declines. A `static` function with exactly one call site in its file, whose
-address is not used, is inlined with its control flow and not emitted (no
-keyword needed: the code exists once either way). A `static inline`
-function called from several places is copied at each, up to 160 IR
-instructions (`CC_INLINE_MAX_BIG=N`). A function that calls nothing (a leaf), unless it is tiny, is left a
-function when its caller still calls something else: apart, it keeps the
-direct-page frame that makes it fast. `QBE_NO_AUTO_INLINE=1` turns it off, to measure.
-Lib helpers using the C99 inline pattern (`inline` body in header +
-force-emit anchor in canonical `.c`) participate automatically — 7 lib
-symbols retrofitted as of v0.17.0+ (`setScreenOff`, `getBrightness`,
-`mosaicInit`, `hdmaWaveSetSpeed`, `scopeCalibrate`, `colorMathInit`,
-`colorMathDisable`).
+**Inlining.** A function marked `inline` that is short (linear flow, ≤ 8 IR
+instructions, no nested calls, no allocas) is spliced into its callers, and
+when every direct call has been spliced its standalone body is not emitted:
+`helper(helper(x))` in `call_chain` becomes arithmetic. A second inliner
+takes what that one declines: a `static` function with exactly one call
+site in its file, whose address is not used, is inlined with its control
+flow and not emitted (no keyword needed: the code exists once either way);
+a `static inline` function called from several places is copied at each, up
+to 160 IR instructions (`CC_INLINE_MAX_BIG=N`). A leaf function, unless it
+is tiny, stays a function when its caller still calls something else:
+apart, it keeps the direct-page frame that makes it fast.
+`QBE_NO_AUTO_INLINE=1` turns the second inliner off, to measure.
 
 (†) `helper` appears as 0 cycles because its standalone is suppressed
 post-inline. The PVSnesLib values (25 raw, 22 opt) remain the baseline
 for comparison.
 
-### Key Optimization Phases Contributing
+### Key Optimisation Phases Contributing
 
 | Phase | Impact | Example functions |
 |-------|--------|-------------------|
 | Dead jump elimination | ~5% | conditional, clamp, compare_and_branch |
 | A-register cache | ~8% | add_u16, sub_u16, bitwise_and/or |
-| Leaf function optimization | ~10% (May) | array_read, array_write, struct_sum — no longer fires on pointer code since A6 |
+| Leaf function optimisation | ~10% | array_read, array_write, struct_sum |
 | Frame elimination | ~5% | empty_func, helper, global_increment |
 | Comparison+branch fusion | ~8% | conditional, clamp, compare_and_branch |
 | Inline multiply | ~3% | mul_const_13/24/48/20/40/96 |
-| Tail call optimization | ~2% | call_add |
+| Tail call optimisation | ~2% | call_add |
 | Dead store elimination | ~3% | loop_sum, swap |
 | `.l` to `.w` shortening | ~2% | global_increment, zero_store_global |
 
 ## Reproducing
 
 ```bash
-# Requires both OpenSNES and PVSnesLib toolchains
-PVSNESLIB_HOME=/path/to/pvsneslib devtools/benchmark/compare_compilers.sh
+make bench                                   # the 34 functions (cycle counts of the generated code)
+make bench-sdk                               # the 23 workloads on luna, against PVSnesLib's recorded figures
+PVSNESLIB_HOME=/path/to/pvsneslib make bench-sdk   # the same, PVSnesLib rebuilt from that tree
+PVSNESLIB_HOME=/path/to/pvsneslib make bench-twins   # whole examples both SDKs have, side by side on luna
 ```
 
 ## Caveats
 
 - Cycle counts are **estimates** based on instruction timing tables, not hardware measurements
 - Functions are tested in isolation — real-world code has different calling patterns
-- Loop-heavy functions (loop_sum, byte_store_loop) benefit more from optimization
+- Loop-heavy functions (loop_sum, byte_store_loop) benefit more from optimisation
   because the overhead reduction is multiplied by iteration count
 - PVSnesLib's 816-opt is designed for tcc816's output patterns; a different C compiler
   might benefit differently from its peephole rules
 
-## CI gate (hard, with override trailer)
+## The CI gate
 
-Every pull request to `main` or `develop` runs `.github/workflows/benchmark.yml`,
-which:
-
-1. Builds `cc65816` at the PR HEAD and runs `bench_functions.c` through it.
-2. Builds `cc65816` at the PR base ref and runs the same benchmark.
-3. Compares the two assembly outputs via
-   `devtools/cyclecount/cyclecount.py --compare --fail-on-regression`.
-4. Posts (or updates, idempotently) a comment on the PR with the per-function
-   delta, total, and the gate verdict (clean / overridden / blocking).
-5. **Fails the job** if the comparison breaches a threshold AND no override
-   trailer is present in the PR's commit messages.
-
-### Thresholds
-
-The gate is **two-armed** so each arm catches a class of regression the
-other misses. A breach on either arm fails the gate.
-
-| Arm | Trips when | Reason |
-|---|---|---|
-| **Total** | Total cycles regress > **5 %** | Catches "many small regressions add up" — broad-drift detection across the whole bench surface. |
-| **Per-function** | A single function regresses > **25 %** AND > **50 cycles** absolute | Catches pathological per-function regressions. The combined percent + absolute floor avoids false positives on small routines (a 4-instruction function going +3 cycles is +30 % but doesn't matter in practice; both knobs must trip together). |
-
-Thresholds are tunable via flags on `cyclecount.py --fail-on-regression`
-(`--total-pct-limit`, `--fn-pct-limit`, `--fn-abs-limit`); the workflow
-uses the script defaults.
-
-### Override mechanism
-
-When a regression is **deliberate** (a correctness fix that costs cycles,
-a refactor for code clarity, a trade-off for compiler-stack
-maintainability), include this trailer in any commit in the PR's range:
-
-```
-Cycle-Regression-OK: <one-line reason for the regression>
-```
-
-The workflow scans `git log <base>..<head> --format=%B` for the trailer.
-If present, the gate exits 0 even on a breached threshold; the
-comparison is still posted as a comment (with the `regression
-overridden` header) so the regression is recorded for reviewer
-awareness.
-
-Why a trailer rather than a PR label or special comment marker:
-
-- **Audit trail in git history.** The reason for the trade-off lives in
-  the commit message forever. `git log --grep='Cycle-Regression-OK:'`
-  enumerates every deliberate regression the project has accepted, with
-  its rationale.
-- **Self-service.** Anyone with push access to the PR's branch can add
-  the trailer. PR labels would require the override step to depend on
-  who has the right to set labels.
-- **Survives rebase / squash-merge.** The trailer is in the commit
-  message, not metadata around the PR.
-
-### What the gate does NOT cover
-
-The benchmark surface is narrow: 34 isolated functions in
-`devtools/cyclecount/bench_functions.c`. A PR can
-regress on real-world code without regressing on the benchmark, and vice
-versa. The gate is one input among several when evaluating
-compiler-touching changes — the visual-regression suite, runtime tests,
-and ASM-pattern checks in `compiler-tests.mjs` are the other arms.
-
-Direct pushes to `develop` or `main` don't trigger the workflow (no
-obvious base ref to compare against). The gate runs on
-`pull_request` events only.
-
-### History
-
-- 2026-05-08: shipped soft / comment-only (commit `98d5014`) as the
-  audit response to §14 of the external review.
-- 2026-05-09: promoted to hard gate. Catalogue entry in
-  `.claude/STRUCTURAL_DEFECTS.md`. Decision rationale: the soft gate
-  had operated long enough to confirm the threshold design is workable;
-  the override mechanism gives a clean path for deliberate trade-offs.
+Every push runs `make bench` and the luna workloads below on the OpenSNES
+side and fails on a regression: more than 5 % in total, or more than 25 %
+and 50 cycles on one function (25 % on one workload). The benchmark is
+narrow — 34 functions and 24 workloads — so it is one check among the
+others (`make tests`, the compiler tests).
 
 ## Measured on luna {#measured}
 
-*Measured 2026-10-08 with `make bench-sdk` — luna v1.34.0, PVSnesLib at
-`fa758c9b 2025-12-28`, both ROMs LoROM SlowROM. The figures are the two files
-committed in `devtools/sdkbench/`; CI re-measures the OpenSNES side at every
-push.*
+*Measured with `make bench-sdk` on luna (the pin in `testing/luna.version`),
+PVSnesLib at `fa758c9b 2025-12-28`, both ROMs LoROM SlowROM. The figures are
+the two files committed in `devtools/sdkbench/`; CI re-measures the OpenSNES
+side at every push.*
 
 The same C file, `devtools/sdkbench/workloads.c`, is built unchanged by
-both SDKs and run on luna, which is cycle-accurate. It holds twenty-one small
-workloads of the kind a game runs every frame. Three things are measured
-for each: the **master cycles** it costs (an NTSC frame is about 357,370),
+both SDKs and run on luna, which is cycle-accurate. It holds 24 small
+workloads of the kind a game runs every frame (23 that both SDKs build the
+same way, and one measured for OpenSNES alone). Three things are measured
+for each: the **master cycles** it costs (an NTSC frame is 357,368),
 the **bytes of code** of its functions, and how deep the **stack** goes
 while it runs (bytes below the initial stack pointer).
 
@@ -304,30 +194,34 @@ while it runs (bytes below the initial stack pointer).
 | Workload | What it does | Cycles: PVSnesLib | OpenSNES | | Size: PVS | OSN | | Stack: PVS | OSN |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `sieve` | sieve of 1024 in a byte array | 4,199,010 | 1,137,028 | -72.9 % | 296 | 107 | -63.9 % | 31 | 23 |
-| `sort` | insertion sort of 64 words | 2,620,372 | 925,720 | -64.7 % | 507 | 239 | -52.9 % | 43 | 25 |
-| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 3,003,034 | -70.1 % | 1174 | 452 | -61.5 % | 60 | 33 |
-| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 5,561,408 | -59.8 % | 983 | 438 | -55.4 % | 74 | 33 |
+| `sort` | insertion sort of 64 words | 2,620,372 | 790,208 | -69.8 % | 507 | 231 | -54.4 % | 43 | 25 |
+| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 2,203,644 | -78.0 % | 1174 | 399 | -66.0 % | 60 | 30 |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 5,243,496 | -62.1 % | 983 | 405 | -58.8 % | 74 | 30 |
 | `mul` | 2304 multiplies of two variables | 6,389,830 | 4,358,600 | -31.8 % | 188 | 91 | -51.6 % | 34 | 29 |
 | `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,243,024 | -75.1 % | 154 | 73 | -52.6 % | 34 | 28 |
 | `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,354,368 | -60.4 % | 594 | 289 | -51.3 % | 76 | 33 |
-| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 3,697,872 | -53.0 % | 605 | 327 | -46.0 % | 41 | 23 |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 3,157,202 | -59.8 % | 605 | 307 | -49.3 % | 41 | 23 |
 | `calls` | recursive `fib(17)` | 5,041,934 | 2,561,730 | -49.2 % | 105 | 57 | -45.7 % | 159 | 159 |
 | `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 911,554 | -66.2 % | 523 | 284 | -45.7 % | 34 | 23 |
 | `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,342,978 | -51.2 % | 233 | 108 | -53.6 % | 34 | 23 |
-| `list` | a 64-node linked list walked 40 times | 2,858,640 | 1,698,250 | -40.6 % | 402 | 278 | -30.8 % | 37 | 23 |
+| `list` | a 64-node linked list walked 40 times | 2,858,640 | 1,323,922 | -53.7 % | 402 | 267 | -33.6 % | 37 | 23 |
 | `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 813,208 | -72.1 % | 397 | 181 | -54.4 % | 33 | 23 |
 | `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 1,997,894 | -62.0 % | 694 | 444 | -36.0 % | 39 | 44 |
-| `entities` | the 32 entities again, through a pointer | 8,851,406 | 3,255,454 | -63.2 % | 1098 | 531 | -51.6 % | 62 | 33 |
-| `copy` | word and byte copies as index loops | 4,485,144 | 1,006,488 | -77.6 % | 709 | 309 | -56.4 % | 31 | 23 |
-| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 1,937,314 | -37.1 % | 1156 | 797 | -31.1 % | 48 | 48 |
+| `entities` | the 32 entities again, through a pointer | 8,851,406 | 2,991,200 | -66.2 % | 1098 | 489 | -55.5 % | 62 | 30 |
+| `copy` | word and byte copies as index loops | 4,485,144 | 1,006,290 | -77.6 % | 709 | 302 | -57.4 % | 31 | 23 |
+| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 1,734,876 | -43.7 % | 1156 | 749 | -35.2 % | 48 | 48 |
 | `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 944,974 | -48.4 % | 392 | 270 | -31.1 % | 42 | 29 |
-| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 5,377,870 | -62.6 % | 831 | 358 | -56.9 % | 52 | 29 |
-| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 7,792,054 | -72.0 % | 1018 | 472 | -53.6 % | 61 | 25 |
-| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 14,405,848 | -61.9 % | 7722 | 3465 | -55.1 % | 93 | 52 |
-| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,754 | 5,010,932 | -55.9 % | 888 | 452 | -49.1 % | 94 | 71 |
-| **Total** | | **325,892,518** | **128,770,872** | **-60.5 %** | **25801** | **12981** | **-49.7 %** | | |
+| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 5,172,382 | -64.1 % | 831 | 350 | -57.9 % | 52 | 23 |
+| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 7,147,052 | -74.3 % | 1018 | 452 | -55.6 % | 61 | 29 |
+| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 12,947,774 | -65.8 % | 7722 | 3224 | -58.2 % | 93 | 56 |
+| `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,754 | 4,644,986 | -59.1 % | 888 | 452 | -49.1 % | 94 | 71 |
+| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,854,318 | 55,691,046 | -58.7 % | 5132 | 2933 | -42.8 % | 84 | 63 |
+| `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 58,359,746 | ours only | — | 3168 | | — | 62 |
+| **Total** | | **325,892,518** | **122,719,436** | **-62.3 %** | **25801** | **12464** | **-51.7 %** | | |
 
-Of the 23 workloads OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for every workload, so they computed the same thing.
+Of the 23 workloads both SDKs build OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for each of them, so they computed the same thing.
+
+`stepseq` is measured for OpenSNES alone and stays out of the totals: built by PVSnesLib's compiler it leaves another checksum than the native build of the same file and than ours, so its time there measures another computation.
 <!-- sdkbench:end -->
 
 **How a workload is timed.** `luna profile` credits every master cycle to
@@ -341,40 +235,27 @@ either SDK's boot or per-frame handler in it.
 
 **Reading it.**
 
-- **Divide, modulo and 32-bit arithmetic are where OpenSNES wins most**
-  (`decimal` −68 %, `long` −53 %, `grid` −50 %).
-- **Every workload is faster, by 24 to 69 %, and none is larger.** Arrays,
-  byte loops, tilemaps and entities are 39 to 55 % faster; `mul`,
-  `strings`, `collide` and `state` are the closest, at 24 to 28 %.
-- **Until 2026-10-08 three were slower** — `sort` +63 %, `collide` +13 %,
-  `list` +7 % — and this page put it down to the 4-byte pointer. That was
-  wrong: OpenSNES dereferences a plain pointer in 16 bits, it is PVSnesLib
-  that does a 24-bit access. Read instruction by instruction, an iteration
-  of `sort` spent 258 of its 496 cycles on 32-bit index and address values
-  that were stored and never read, 66 on the 0 or 1 of each half of
-  `j > 0 && arr[j - 1] > key`, stored and tested again, and about 95 on
-  building each address in A before moving it to X. All three are gone:
-  dead values are removed, a condition branches where it is decided, and
-  `arr[i]` is `lda.l arr,x` with the index in X, `p->field` is
-  `lda.l N,x` with the pointer in X. `&nodes[k]` with a 6-byte element no
-  longer calls the 32-bit multiply either.
-- **The stack is level or shallower on 21 workloads of 22**, by up to 44
-  bytes (`collide`); `grid` (44 bytes against 39) is deeper. Until 2026-10-08 it was deeper on all 18, by 1 to 106
-  bytes: each temporary of the compiler owned a stack slot, where
-  PVSnesLib keeps its temporaries in direct-page pseudo-registers. Since
-  then a function that calls nothing keeps its temporaries in the direct
-  page too, promoted locals and values that never touch the stack have no
-  slot, parameters are read where the caller pushed them, and an address
-  takes one word. Since 2026-10-10 a function that does call keeps there
-  every temporary that no call crosses, and only the others on the stack.
-  The one that remains is a single large function whose temporaries do not
-  fit the 16 words of the direct-page block.
+- **Every workload is faster, by 32 to 78 %, and none is larger.**
+  Divide, modulo and 32-bit arithmetic gain most (`decimal` −75 %, `long`
+  −60 %, `div32` −59 %), and so do index loops over arrays (`physics`
+  −78 %, `copy` −78 %, `sieve` −73 %). The closest are `mul` (−32 %),
+  `strings` (−37 %) and `list`
+  (−41 %).
+- **Why it is faster.** The compiler removes values that are computed and
+  never read, branches where a condition is decided instead of storing a
+  0 or 1 and testing it again, reads `arr[i]` as `lda.l arr,x` with the
+  index in X and `p->field` as `lda.l N,x` with the pointer in X, and keeps
+  the temporaries of a function in the direct page when no call crosses
+  them.
+- **The stack is level or shallower on 22 workloads of 23.** `grid` is the
+  exception (44 bytes against 39): a single large function whose
+  temporaries do not fit the 16 words of the direct-page block.
 
 What is left has named causes — a stack frame in every function that
 calls another, X reloaded after every instruction that is not an access,
 a 32-bit read through a pointer still staged in the direct page — and PVSnesLib is itself far from what a person would write (it never
 uses X or Y as an index: the inner loop of `sort` is 255 cycles there and
-27 by hand). The plan is `.claude/notes/chantiers/beat_pvsneslib.md`.
+27 by hand).
 
 What this does not measure: the libraries (sprite, background, audio
 engines) and a whole game.

@@ -81,6 +81,32 @@ def main() -> int:
         if not (sdk / "make" / "common.mk").is_file():
             sys.exit("release-smoke: FAIL: the zip has no opensnes/make/common.mk")
 
+        # The luna installer checks each archive against luna.sha256: a zip
+        # without it (every release up to v0.50.0) cannot install luna.
+        version = (sdk / "testing" / "luna.version").read_text().strip()
+        sums = sdk / "testing" / "luna.sha256"
+        if not sums.is_file():
+            sys.exit("release-smoke: FAIL: the zip has no testing/luna.sha256: "
+                     "scripts/install-luna.sh refuses every archive without it")
+        lines = sums.read_text()
+        for target in ("linux_x86_64", "linux_arm64", "darwin_arm64", "windows_x86_64"):
+            if f"  luna_{version}_{target}.zip" not in lines:
+                sys.exit(f"release-smoke: FAIL: testing/luna.sha256 has no sum for "
+                         f"luna_{version}_{target}.zip")
+
+        # The 0.x converters are retired: their code lives in the opensnes-*
+        # tools, and a binary of theirs in the zip is a stale bin/.
+        retired = {"gfx4snes", "smconv", "wav2brr", "tmx2snes", "aseprite2snes",
+                   "font2snes", "img2snes", "palplan"}
+        shipped = sorted(p.stem for p in (sdk / "bin").iterdir() if p.stem in retired)
+        if shipped:
+            sys.exit(f"release-smoke: FAIL: retired converters in bin/: {', '.join(shipped)}")
+
+        # The library ships as objects: the build never reads its .asm.
+        lib_asm = sorted(p.name for p in (sdk / "lib" / "build").rglob("*.asm"))
+        if lib_asm:
+            sys.exit(f"release-smoke: FAIL: lib/build ships {len(lib_asm)} intermediate .asm files")
+
         stale = sorted(p.name for p in starter.rglob("*") if p.suffix in BUILD_OUTPUTS)
         if stale:
             sys.exit(f"release-smoke: FAIL: starter/ ships build output: {', '.join(stale[:8])}")

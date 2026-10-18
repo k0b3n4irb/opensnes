@@ -19,6 +19,8 @@ roots. The root `Makefile` holds the one list (`FIXTURES_LIB`,
 | `libtests_hirom/` | the HiROM map: the sram module's HiROM mapping, the bank byte of a pointer to RAM under `.BASE $C0` (a wlalink fix, 2026-09-20) | `test_libtest_hirom.py` |
 | `libtests_sa1_sram/` | the sram module on SA-1: BW-RAM at `$40:0000`, writable once crt0 sets SBWE (2026-09-26) | `test_libtest_sa1_sram.py`; `d_`/`e_sa1_bwram_*.toml` power-cycle chain |
 | `libtests_gsu/` | the Super FX job path: cache-resident job, RAM job, ROM job, a save while a job runs | `libtest_gsu_cached*.toml`, `f_`/`g_gsu_save_*.toml` |
+| `libtests_dma_channels/` | the DMA channels the library takes: a Super FX letterbox, the game's HDMA on 2-6, the NMI's text flush and dynamic sprite uploads together; the channels' registers read back | `libtest_dma_channels.toml` |
+| `libtests_aram/` | the sound CPU's memory. A sample loaded in steps (`audioLoadSampleBegin` / `Step`): refusals, a voice command and another load between two steps, the bytes and the directory entry read back, a load given up. The echo ring's place: refused when 48 KB of samples reach into it, accepted when they do not, a shorter delay giving memory back; the sample still loaded whole after a 12 KB ring is replaced by a 2 KB one (the driver's wait) | `test_libtest_aram.py` |
 | `libtests_snesmod/` | the SNESMOD stop / pause / fade queue and what the driver leaves of the machine | `libtest_snesmod.toml` |
 
 ## Compiler (`compiler/`)
@@ -41,6 +43,19 @@ experimental toolchain once produced misleading XPASSes (a6_farptr,
 2026-07-04). The clean and the build are separate `make` invocations on
 purpose — this Makefile exports `-j`, and `clean all` in one command ran
 both goals concurrently (clean deleted `crt0.o` mid-link).
+
+## Examples that left the corpus (`retired_examples/`)
+
+Three examples left `examples/` in the review before 1.0 (2026-10-15): they
+duplicated another example for a reader, but tests and comparisons read
+them. They are built by `make fixtures` and profiled by `make rom-coverage`
+like the others; nothing of them is in the user documentation.
+
+| Fixture | Read by | Its example now |
+|---|---|---|
+| `tiled/` | `dma_tiled.toml`, `movement_tiled.toml`; `devtools/twinbench` (PVSnesLib's maps/tiled) | `maps/map_scroll` (the same Tiled pipeline) |
+| `metasprite/` | `footprint_metasprite.toml`, `input_metasprite.toml`, `oam_metasprite.toml`; twinbench (PVSnesLib's MetaSprite); the `anim.h` cost figure | `sprites/sprite_sizes`, `sprites/aseprite_pipeline` |
+| `snesmod_music_large/` | `audio_snesmod_music_large.toml`, `input_snesmod_music_large.toml`; `audio_regress.py` | `audio/snesmod_music` (one call loads a soundbank of any size) |
 
 ## luna stress ROMs (`stress/`)
 

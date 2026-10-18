@@ -77,11 +77,26 @@ jobs:
             fi
           fi
 
-      - name: Install cppcheck
+      - name: Install cppcheck (pinned)
         # `make lint` runs lint-cppcheck (gaps review H4): the asset tools'
         # sources and the lib's C, vendored decoders suppressed. The target
         # skips itself where cppcheck is absent; here it must gate.
-        run: sudo apt-get install -y -qq cppcheck >/dev/null && cppcheck --version
+        # Pinned and built from the tag's sources (about a minute): apt's
+        # version moves with the runner image, and 2.22 reports what the
+        # image's 2.13 did not (about 180 unchecked allocations, 2026-10-17),
+        # so a contributor with a recent cppcheck saw a red lint on a green CI.
+        # The sha256 is the tag archive's, the same on two downloads that day.
+        env:
+          CPPCHECK_VERSION: 2.22.0
+          CPPCHECK_SHA256: d74945deb2d50393430e07596b766f8a779512c7f60dac2a30ea64e059ece57b
+        run: |
+          curl -fsSL -o /tmp/cppcheck.tgz "https://github.com/danmar/cppcheck/archive/refs/tags/${CPPCHECK_VERSION}.tar.gz"
+          echo "${CPPCHECK_SHA256}  /tmp/cppcheck.tgz" | sha256sum -c -
+          tar xzf /tmp/cppcheck.tgz -C /tmp
+          make -C "/tmp/cppcheck-${CPPCHECK_VERSION}" -j"$(nproc)" FILESDIR=/opt/cppcheck/share CXXOPTS=-O2 >/dev/null
+          sudo make -C "/tmp/cppcheck-${CPPCHECK_VERSION}" install FILESDIR=/opt/cppcheck/share PREFIX=/opt/cppcheck >/dev/null
+          echo /opt/cppcheck/bin >> "$GITHUB_PATH"
+          /opt/cppcheck/bin/cppcheck --version
 
       - name: make lint
         # No build here: check_corpus_fresh.py passes trivially on a tree with

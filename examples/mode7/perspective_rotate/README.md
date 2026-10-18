@@ -28,7 +28,7 @@ prefab tiles composed into a 128×128 Mode 7 world).
 ## SNES Concepts
 
 - Per-scanline Mode 7 matrix writes (perspective + rotation combined)
-- 4-channel HDMA coordination (`hdmaSetup` ×4 + `hdmaEnableMask(0x0F)`)
+- 4-channel HDMA coordination (`hdmaSetup` ×4 + `hdmaEnableMask(0x3C)`)
 - HDMA table repointing as a zero-copy animation primitive
 - Mode 7 interleaved VRAM (`dmaCopyVramMode7`); out-of-map backdrop (M7SEL=$80)
 - VBlank-window discipline: repoint right after `WaitForVBlank()` — re-arming
@@ -40,9 +40,9 @@ prefab tiles composed into a 128×128 Mode 7 world).
 |---|---|---|
 | BGMODE | `$07` | same (`setMode(BG_MODE7, 0)`) |
 | M7SEL | `$80` | same (`mode7SetSettings`) |
-| DMAP0-3 / BBAD0-3 | `%010` / $1B,$1C,$1D,$1E | same (`hdmaSetup` ch 0-3) |
+| DMAP0-3 / BBAD0-3 | `%010` / $1B,$1C,$1D,$1E | same, on channels 2-5 (`hdmaSetup`) |
 | A1B0-3 | banks 1,2,3,1 | from the far pointers (SUPERFREE sections) |
-| HDMAEN | `%00001111` | same (`hdmaEnableMask(0x0F)`) |
+| HDMAEN | `%00001111` | `%00111100` (`hdmaEnableMask(0x3C)`): channels 2-5, since 0 is the DMA helpers' and 7 the NMI's |
 | BG1HOFS/VOFS, M7X/M7Y | 384/768, 512/1152 | same pose, same per-frame sync order |
 | Table repoint | A1Tx rewrite after WaitNMI | `hdmaSetup` ×4 after `WaitForVBlank()` |
 

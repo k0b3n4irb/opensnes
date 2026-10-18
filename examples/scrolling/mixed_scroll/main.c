@@ -15,7 +15,7 @@
  * @par SNES Concepts
  * - Independent per-layer scroll registers (BG1 scrolls, BG2 stays fixed)
  * - Multiple tile sets sharing VRAM without overlap
- * - Separate palette slots per layer via gfx4snes `-e` flag
+ * - Separate palette slots per layer (`palette-entry` in a picture's settings file)
  * - Mode 1 dual-layer compositing (BG1 behind BG2)
  *
  * @par What to Observe

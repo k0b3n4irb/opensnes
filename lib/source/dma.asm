@@ -32,14 +32,13 @@
 ; need for the `loadGraphics()` ASM stubs that several pre-A6 examples
 ; shipped to bypass this routine.
 ;
-; Stack layout (after PHP), cc65816 left-to-right push:
-;   1,s     = P (processor status, from PHP)
-;   2-4,s   = return address (3 bytes from JSL)
-;   5-6,s   = size                   (rightmost arg, pushed last)
-;   7-8,s   = vramAddr
-;   9-10,s  = source LOW (16-bit offset within bank)
-;   11,s    = source bank byte       (low byte of Kl high half)
-;   12,s    = pad                    (high byte of Kl high half, unused)
+; Stack layout (no PHP), cc65816 left-to-right push:
+;   1-3,s   = return address (3 bytes from JSL)
+;   4-5,s   = size                   (rightmost arg, pushed last)
+;   6-7,s   = vramAddr
+;   8-9,s   = source LOW (16-bit offset within bank)
+;   10,s    = source bank byte       (low byte of Kl high half)
+;   11,s    = pad                    (high byte of Kl high half, unused)
 ;------------------------------------------------------------------------------
 dmaCopyVram:
     ; No php / plp: A is 16-bit on return, as C expects, and the index

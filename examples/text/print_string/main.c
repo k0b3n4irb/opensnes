@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Family 1 (Text) · rung 1.1 — print a string with the built-in font
+ * @brief Text — print a string with the built-in font
  * @ingroup examples
  *
  * The gentlest possible program that still exercises the whole SNES rhythm

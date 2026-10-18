@@ -53,12 +53,12 @@ From ROM, 86 % of the SA-1's accesses are ROM, but the penalty only applies
 when the main CPU is on ROM at the same moment, so it loses a fifth of its
 clocks, not half: about 8.5 MHz, 2.4× the main CPU. Code in ROM also pays
 one more cycle on every jump, call and return into ROM, so a loop that
-jumps often runs slower than its conflict share alone says (luna v1.30.0,
+jumps often runs slower than its conflict share alone says (luna,
 from ares, checked against a console on the SNES-SA1 Speed Test). From I-RAM it keeps
 almost all of them: 10.7 MHz, 3×. The remaining 0.4 % is the main CPU
 touching I-RAM too (it reads the positions there and polls the sync flag).
 Both builds draw the same frames; the I-RAM one simply finishes each frame's
-work sooner (luna v1.30.0, whose SA-1 timing matches a console on the
+work sooner (luna, whose SA-1 timing matches a console on the
 SNES-SA1 Speed Test; the instruction count includes the SA-1's wait
 for the next frame, so it grows with the spare time).
 
@@ -76,7 +76,7 @@ AI, physics, and decompression that the main CPU couldn't keep up with.
 | PPU access | Yes | **No** |
 | APU access | Yes | **No** |
 | I-RAM access | Yes ($3000-$37FF) | Yes ($0000-$07FF, mirrors $3000) |
-| ROM access | Yes | Yes (separate bus, no conflicts) |
+| ROM access | Yes | Yes (shared with the main CPU: conflicts, see above) |
 | BW-RAM access | Yes (via $6000 window) | Yes (256 KB max) |
 
 The key constraint: **SA-1 cannot touch WRAM, PPU, or APU**. It can only
@@ -126,17 +126,11 @@ the SA-1 reads it, computes results, writes them back, and signals "done."
 
 ### 1. Enable SA-1 in Your Makefile
 
-```makefile
-OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := mygame.sfc
-ROM_NAME := MY SA1 GAME
+On top of the template of @ref tools_build, add:
 
-CSRC     := main.c
-USE_LIB  := 1
+```makefile
 USE_SA1  := 1
 LIB_MODULES := console sprite dma background input sa1
-
-include $(OPENSNES)/make/common.mk
 ```
 
 `USE_SA1 := 1` does three things:
@@ -152,7 +146,11 @@ This code runs on the SA-1:
 ```asm
 .ifdef SA1
 
-.SECTION ".sa1_boot" SUPERFREE
+; BANK 0, not SUPERFREE: the SA-1 reset vector is 16-bit, so the SA-1 can
+; only start in the ROM of bank $00. A big program fills bank $00 and the
+; linker would place a SUPERFREE section in bank $01; opensnes-rom check
+; refuses the ROM if SA1Start is not in bank $00.
+.SECTION ".sa1_boot" BANK 0 SLOT "ROM" SEMIFREE
 
 .ACCU 16
 .INDEX 16
@@ -173,10 +171,15 @@ SA1Start:
     .ACCU 8
 
     ; Enable SA-1 I-RAM writes (CRITICAL!). $FF = writable: fullsnes, the
-    ; Nintendo manual §4.1.25 and nocash agree (resolved 2026-09-02; the
+    ; Nintendo manual §4.1.25 and nocash agree (the
     ; sfc-dev-wiki states the inverse — see the box above).
     lda #$FF
     sta.l $00222A           ; CIWP = $FF (all I-RAM writable)
+
+    ; Enable SA-1 BW-RAM writes: CBWE ($2227) bit 7, 1 = write enabled
+    ; (fullsnes; Nintendo manual 4.1.23). crt0 sets the SNES side (SBWE).
+    lda #$80
+    sta.l $002227           ; CBWE = write enabled
 
     ; Signal ready to main CPU
     lda #$A5
@@ -338,7 +341,7 @@ To read data tables in ROM from the SA-1, use `lda.l table,x` (opcode $BF).
 This is a long indexed read — no DB dependency:
 
 ```asm
-; Sine table in the same SUPERFREE section
+; Sine table in the same section as the code that reads it
 lda.l $3006         ; index
 rep #$20
 .ACCU 16
@@ -405,8 +408,9 @@ Common issues:
 
 | Example | What it demonstrates |
 |---------|---------------------|
-| [sa1_hello](../../../examples/chips/sa1_hello/) | Boot diagnostic — verifies SA-1 initialization |
-| [sa1_starfield](../../../examples/chips/sa1_starfield/) | 128 sprites with sine-wave Lissajous patterns |
+| [sa1_hello](../../examples/chips/sa1_hello/) | Boot diagnostic — verifies SA-1 initialization |
+| [sa1_starfield](../../examples/chips/sa1_starfield/) | 128 sprites with sine-wave Lissajous patterns |
+| [sa1_save](../../examples/chips/sa1_save/) | A boot counter kept in the battery-backed BW-RAM, through the `sram` module |
 
 ## What SA-1 Can't Do
 

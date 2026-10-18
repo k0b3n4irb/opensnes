@@ -1,0 +1,19 @@
+# testing/fixtures/libtests_aram — a voice command sent between two steps of
+# a sample loaded in steps reaches the DSP.
+#
+# audioLoadSampleStep() leaves the driver in its command loop, so the game's
+# own commands pass between two pieces: the fixture sends
+# audioSetVoiceVolume(1, 11, 22) after the first of sixteen steps, and
+# nothing sets voice 1's volume afterwards. The rest of what the fixture
+# pins (bytes, directory, refusals) is in test_libtest_aram.py.
+rom = "../fixtures/libtests_aram/libtest_aram.sfc"
+steps = 12000000
+
+[asserts.dsp]
+V1_VOLL = 11
+V1_VOLR = 22
+# The fixture never calls audioSetEchoFilter(): the driver's default filter
+# passes the echo through (tap 0 open), so an echo is heard without it.
+FIR0 = 0x7F
+FIR1 = 0x00
+FIR7 = 0x00

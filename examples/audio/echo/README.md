@@ -1,6 +1,6 @@
 # Echo / reverb
 
-**Family 8 — Audio · rung 8.9**
+**Audio · echo and reverb**
 
 The S-DSP has a hardware **echo** (reverb) unit. This example isolates it — one
 short "pop" on a timer, turned into a decaying tail by the echo — with **START

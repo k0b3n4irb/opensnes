@@ -44,7 +44,7 @@ ROM mode: **LoROM** (project default).
 
 `luna spc-dump` exports the full APU state (64 KB ARAM + all 128 DSP
 registers) as a playable .spc — diffing two dumps localized every one
-of the bugs above. See `docs/tutorials/audio.md`.
+of the bugs above. See `docs/tutorials/audio_samples.md`.
 
 ## Modules Used
 

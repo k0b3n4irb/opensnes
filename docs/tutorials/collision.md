@@ -298,19 +298,17 @@ if (collideRectEx(&player, &wall, &dx, &dy)) {
 }
 ```
 
-This snippet subtracted the overlap until 2026-09-20, which drove the player
-deeper into the wall; the library fixture pins the sign (`dx = -6` for a
-player to the left of the wall).
+Subtracting them drives the player deeper into the wall; the library
+fixture pins the sign (`dx = -6` for a player to the left of the wall).
 
 ### Bouncing (Breakout Pattern)
 
-The `breakout` example reverses velocity on collision with walls and paddle. Negation uses a temporary variable to work around compiler constraints:
+The `breakout` example reverses velocity on collision with walls and paddle:
 
 ```c
 /* Wall bounce */
 if (pos_x > 171) {
-    s16 neg_vx = -vel_x;
-    vel_x = neg_vx;
+    vel_x = -vel_x;
     pos_x = 171;
 }
 

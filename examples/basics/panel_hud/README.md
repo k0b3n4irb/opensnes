@@ -1,6 +1,6 @@
 # panel_hud — a HUD that survives a dialog box
 
-**Family 5 (Game math & framework) · a `panel` building block.**
+**Game math & framework · a `panel` building block.**
 
 ## Why it matters for your game
 

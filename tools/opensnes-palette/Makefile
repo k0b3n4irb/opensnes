@@ -2,7 +2,7 @@
 # of palplan) and the quantization of RGB art (img2snes's quantizer, linked here).
 TOOL        := opensnes-palette
 VERSION     := 1.0.0
-IMG         := ../img2snes/src
+IMG         := ../lib/img2snes/src
 SRCS        := $(wildcard src/*.c) ../common/cli.c ../common/incfile.c $(IMG)/quantize.c $(IMG)/scale.c ../third_party/lodepng.c
 HDRS        := $(wildcard src/*.h) ../common/cli.h ../common/incfile.h $(IMG)/quantize.h $(IMG)/scale.h ../third_party/lodepng.h
 INCLUDES    := -Isrc -I../common -I$(IMG) -I../third_party

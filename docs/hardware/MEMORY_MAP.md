@@ -48,123 +48,39 @@ $C0-$FF                         Mirror of $40-$7F (ROM only)
 | Range | Size | Common Use |
 |-------|------|------------|
 | $7E:0000-$7E:00FF | 256 B | Direct Page (fast access) |
-| $7E:0100-$7E:01FF | 256 B | Stack |
-| $7E:0200-$7E:1FFF | 7.5 KB | Variables, BSS |
+| $7E:0100-$7E:1FFF | 7.75 KB | Variables, BSS, and the stack |
 | $7E:2000-$7E:FFFF | 56 KB | General use |
 | $7F:0000-$7F:FFFF | 64 KB | General use / buffers |
 
-### Video RAM ($2116-$2119)
+In OpenSNES the stack starts at `$1FFF` and grows down, under the C
+globals of the `$0000-$1FFF` band; `FAR` objects live above `$2000`
+(`docs/tutorials/far_ram.md`).
 
-64 KB accessed through registers, not directly mapped.
+### Video RAM, OAM and CGRAM
 
-| Range | Common Use |
-|-------|------------|
-| $0000-$3FFF | Background tiles |
-| $4000-$7FFF | Sprite tiles |
-| $8000-$FFFF | Tilemaps |
+The PPU's three memories are not in the CPU's address space: they are
+reached through ports ($2116-$2119 for VRAM, $2102-$2104 for OAM,
+$2121-$2122 for CGRAM). Their sizes, layout and formats are in
+@ref hardware_ppu; OAM byte by byte is in @ref oam.
 
-Actual layout depends on your configuration.
+### Hardware registers
 
-### OAM (Object Attribute Memory)
-
-544 bytes accessed through registers $2102-$2104.
-
-```c
-// Structure per sprite (bytes 0-511, 4 bytes each)
-struct OAM_Entry {
-    u8 x_low;      // X position (low 8 bits)
-    u8 y;          // Y position
-    u8 tile;       // Tile number (low 8 bits)
-    u8 attr;       // vhoopppc (flip, priority, palette, tile high)
-};
-
-// Extension table (bytes 512-543)
-// 2 bits per sprite: X high bit, size select
-```
-
-### CGRAM (Color RAM)
-
-512 bytes (256 colors x 2 bytes each).
-
-| Range | Use |
-|-------|-----|
-| colours 0-127 | Background palettes (8 palettes x 16 colours in the 4bpp modes; 2bpp modes split them into 4-colour groups, Mode 3/4/7 8bpp use all 256) |
-| colours 128-255 | Sprite palettes (8 palettes x 16 colours; only palettes 4-7 take part in colour math) |
-
-Color format: `0BBBBBGGGGGRRRRR` (15-bit)
-
-## PPU Registers ($2100-$213F)
-
-| Address | Name | Description |
-|---------|------|-------------|
-| $2100 | INIDISP | Display control |
-| $2101 | OBJSEL | Sprite settings |
-| $2102-03 | OAMADDL/H | OAM address |
-| $2104 | OAMDATA | OAM data write |
-| $2105 | BGMODE | BG mode and tile size |
-| $2106 | MOSAIC | Mosaic effect |
-| $2107-0A | BGnSC | BG tilemap addresses |
-| $210B-0C | BGnNBA | BG tile data addresses |
-| $210D-14 | BGnHOFS/VOFS | BG scroll positions |
-| $2115 | VMAIN | VRAM address increment |
-| $2116-17 | VMADDL/H | VRAM address |
-| $2118-19 | VMDATAL/H | VRAM data write |
-| $211A | M7SEL | Mode 7 settings |
-| $211B-20 | M7A-D/X/Y | Mode 7 matrix |
-| $2121 | CGADD | CGRAM address |
-| $2122 | CGDATA | CGRAM data write |
-| $212C-2D | TM/TS | Main/sub screen enable |
-| $212E-2F | TMW/TSW | Window masks |
-| $2130-32 | CGWSEL/CGADSUB/COLDATA | Color math |
-| $2133 | SETINI | Screen settings |
-
-## CPU Registers ($4200-$44FF)
-
-| Address | Name | Description |
-|---------|------|-------------|
-| $4200 | NMITIMEN | Interrupt enable |
-| $4201 | WRIO | I/O port write |
-| $4202-03 | WRMPYA/B | Multiplication operands |
-| $4204-06 | WRDIVL/H/B | Division operands |
-| $4207-0A | HTIMEL/H, VTIMEL/H | IRQ timer |
-| $420B | MDMAEN | DMA enable |
-| $420C | HDMAEN | HDMA enable |
-| $420D | MEMSEL | FastROM enable |
-| $4210 | RDNMI | NMI flag |
-| $4211 | TIMEUP | IRQ flag |
-| $4212 | HVBJOY | H/V blank and joypad status |
-| $4214-17 | RDDIVL/H, RDMPYL/H | Division/multiplication result |
-| $4218-1F | JOY1L-4H | Joypad data |
-
-## DMA Registers ($43x0-$43xF)
-
-8 DMA channels (x = 0-7):
-
-| Offset | Name | Description |
-|--------|------|-------------|
-| $43x0 | DMAPx | DMA parameters |
-| $43x1 | BBADx | B-bus address |
-| $43x2-04 | A1TxL/H/B | A-bus address |
-| $43x5-06 | DASxL/H | Transfer size / HDMA count |
-| $43x7 | DASBx | HDMA indirect bank |
-| $43x8-09 | A2AxL/H | HDMA table address |
-| $43xA | NTRLx | HDMA line counter |
+The registers mapped at $2100-$21FF, $4200-$44FF and $4300-$437F are
+indexed, then detailed, in @ref registers.
 
 ## Example: Setting Up Memory
 
 ```c
-// Define variables in different memory regions
-#pragma bss-name(push, "BSS")    // Goes to $7E:0200+
+// A plain global lives in the 8 KB band $00:0000-$1FFF
 u8 game_variables[256];
-
-#pragma bss-name(push, "HRAM")   // Goes to $7F:0000+
-u8 large_buffer[16384];
-
-// Direct page variables (fast access)
-#pragma zeropage-name(push, "ZEROPAGE")
-u8 temp;
 u16 frame_counter;
+
+// A large buffer goes to far RAM, $7E:2000-$FFFF
+FAR u8 large_buffer[16384];
 ```
+
+The linker places both; the build stops if the plain band overflows. See
+[Far RAM](../tutorials/far_ram.md).
 
 ## Enhancement Chip Memory
 
@@ -186,29 +102,30 @@ $40-$4F:0000    up to     BW-RAM (up to 256 KB of fast static RAM; the rest of t
 SNES main CPU and the SA-1. Both processors can read and write it, gated
 by the SIWP ($2229) and CIWP ($222A) write-protection registers.
 
-**BW-RAM** is battery-backed SRAM mapped in banks $40-$5F, with an 8 KB
+**BW-RAM** is battery-backed SRAM mapped in banks $40-$4F, with an 8 KB
 window visible at $6000-$7FFF for convenient access from bank $00 code.
 
-### SuperFX Cartridge
+### Super FX Cartridge
 
-The SuperFX (GSU) has its own register space and uses cartridge SRAM as
+The Super FX (GSU) has its own register space and uses cartridge SRAM as
 a shared framebuffer.
 
 ```
 Address         Size      Description
 ────────────────────────────────────────────────────────────────
 $3000-$303F     64 B      GSU registers (R0-R15, SFR, SCMR, PBR, etc.)
-$3100-$32FF     512 B     GSU code cache (read-only from SNES side)
+$3100-$32FF     512 B     GSU code cache (the SNES can read and write it)
 $70-$71:0000    32-64 KB  Cartridge SRAM (shared framebuffer + data)
 ```
 
-**GSU registers ($3000-$303F)** control the SuperFX processor. The SNES
+**GSU registers ($3000-$303F)** control the Super FX processor. The SNES
 CPU writes parameters and starts the GSU by writing to R15 ($301E-$301F).
 
 **Code cache ($3100-$32FF)** holds the currently cached GSU instructions.
-The SNES can read but not write this region.
+The SNES CPU can also write opcodes there, in 16-byte lines, to load code
+into the cache itself (fullsnes, "Writing to Code-Cache (by SNES CPU)").
 
-**Cartridge SRAM ($70-$71)** serves as the GSU framebuffer. The SuperFX
+**Cartridge SRAM ($70-$71)** serves as the GSU framebuffer. The Super FX
 PLOT instruction writes pixels here, and the SNES reads it back for
 display. Bus ownership is controlled by the SCMR register ($303A) —
 the SNES and GSU cannot access SRAM simultaneously.
@@ -216,5 +133,6 @@ the SNES and GSU cannot access SRAM simultaneously.
 ## Further Reading
 
 - [Hardware Registers](REGISTERS.md) - PPU, DMA, I/O registers
+- [The PPU](PPU.md) - VRAM, OAM and CGRAM
 - [OAM](OAM.md) - Sprite attribute memory
 - [SNESdev Wiki Memory Map](https://snes.nesdev.org/wiki/Memory_map)

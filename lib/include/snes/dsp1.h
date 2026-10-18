@@ -44,7 +44,7 @@
  * s16 y = dsp1_o1;   // -99
  * @endcode
  *
- * @see .claude/notes/tech/dsp1_reference.md — the full command reference.
+ * @see docs/tutorials/dsp1.md — the commands and their parameters.
  */
 #ifndef SNES_DSP1_H
 #define SNES_DSP1_H

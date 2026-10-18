@@ -68,10 +68,11 @@ each `luna-vers-opensnes` file into the repo as `from_luna_…`, and deliver
 each `to_luna_…` there as `opensnes-vers-luna_…` (the owner may already
 have).
 
-**The game (the game)** is not a partner in the sense of this rule — it
-is the first project built on the SDK, and since 2026-10-10 it speaks to us
-directly and we to it (`exchanges.md`; a private note
-is where what it shows us is kept).
+**The game** is not a partner in the sense of this rule — it is the first
+project built on the SDK, and since 2026-10-10 it speaks to us directly and
+we to it (`exchanges.md`). What it shows us is kept outside this repository,
+in its private folder (the user's private memory names it): the game is
+under licence and is never named here.
 
 Every `to_` report has the same spine: header (who, which pin / index
 fingerprint, status: sent as is, or still accumulating), what the
@@ -110,6 +111,12 @@ ask. Precedents: `partners/luna/2026-09-20_to_luna_report.md`,
    check in `.claude/notes/partners/snesmod-upstream/README.md`, which has
    the command and the date the next check is due. PVSnesLib is told about
    the KOF bug only after he and we agree (owner decision).
+
+6. **Once a month**: read what QBE upstream committed since the last tip we
+   read, and take what serves us — nothing goes back to them (owner
+   decision, 2026-10-13: we keep our fork, we do not contribute upstream).
+   Policy, command and the date the next check is due:
+   `.claude/notes/partners/qbe-upstream/README.md`.
 
 ## When this rule does NOT apply
 

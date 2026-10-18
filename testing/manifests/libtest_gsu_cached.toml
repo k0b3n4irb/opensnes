@@ -104,7 +104,7 @@ r_save_pres_rt = 1        # ...and reads back
 r_done = 0xD0E5
 
 [asserts.blocks]
-gsu_hdma_table = "7F0F110F508000"   # gsuSetupHdmaBlanking(0, 80): [127 show][17 show][80 blank] end — no empty top entry
+gsu_hdma_table = "7F0F0F110F0F508F8F00"   # gsuSetupHdmaBlanking(0, 80): [127 show][17 show][80 blank] end — no empty top entry; each value twice (to $21FF, then $2100), the blank $8F
 # the presented buffer A (its first six bytes are the job's results: sum, outer, marker) lands
 # in the BACK char block, vram_b = word 0x2000 = byte 0x4000; BG12NBA then flips to it
 presented_frame = { space = "vram", offset = "4000", hex = "40160000DEC0" }

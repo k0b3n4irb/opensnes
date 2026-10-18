@@ -50,6 +50,8 @@ u16 r_vq[4];
 /* vramQueuePushSprite: one 16x16 frame = two strips of 64 bytes */
 u16 r_vqs[8];
 static FAR u8 vq_sheet[576];
+/* vramQueueCost: bytes + 96 an entry, emptied by the flush, saturated */
+u16 r_vqc[8];
 
 /* --- math vectors --- */
 u16 r_div_a;    /* div16(100, 7)    -> 14 */
@@ -200,7 +202,7 @@ u16 r_audio_phase;  /* failures over 400 consecutive 9-byte loads, under a
                      * showed the last echo (about 40 of its cycles) made the
                      * load time out, and every load after it */
 u16 r_audio_free;   /* audioGetFreeMemory() with no echo configured -> 0xFFC0-0x0B00-9 = 0xF4B7 */
-u16 r_audio_free_echo; /* after audioSetEcho(): the area ends at $C000 -> 0xC000-0x0B00-9 = 0xB4F7 */
+u16 r_audio_free_echo; /* after audioSetEcho(3): the ring is the top 6 KB under $FF00 -> 0xE700-0x0B00-9 = 0xDBF7 */
 u16 r_audio_addr;   /* AudioSample.spcAddress of slot 0 -> 0x0B00       */
 u16 r_audio_voice;  /* audioPlaySampleEx(...) -> voice 0 (round-robin)  */
 
@@ -558,6 +560,7 @@ u16 r_apu_boot_again; /* apuWaitBoot() once the driver runs (no IPL any more): r
                        * within about seven frames instead of waiting for ever -> 1 */
 u16 r_aud_badvoice;  /* audioSetVoiceVolume(9, ...): voice out of range -> AUDIO_ERR_INVALID_ID (2) */
 u16 r_aud_badstop;   /* audioStopVoice(8)                               -> 2 */
+u16 r_aud_vset_bad;  /* audioSetVoiceVolumePitch(8, ...): no such voice     -> 2 */
 u16 r_aud_setvol;    /* audioSetVolume(100): the command was accepted   -> 0 */
 u16 r_aud_noplay;    /* audioPlaySample(63), a slot never loaded        -> AUDIO_VOICE_NONE (0xFF) */
 u16 r_aud_on;        /* audioPlaySampleOn(6, 0, 100, CENTER, 0x1A2B): the voice asked for -> 6 */
@@ -568,7 +571,7 @@ u16 r_aud_v0_stop;   /* audioStopVoice(0), 6 frames later: active    -> 0 */
 u16 r_aud_v1_live;   /* voice 1, started meanwhile, still active     -> 1 */
 u16 r_aud_all_stop;  /* audioStopAll(), 6 frames later: voice 1      -> 0 */
 u16 r_aud_unload;    /* audioGetSampleInfo(0) after audioUnloadSample -> AUDIO_ERR_NOT_LOADED (3) */
-u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back -> 0xB500 */
+u16 r_aud_unfree;    /* audioGetFreeMemory(): LIFO reclaim gave the 9 bytes back -> 0xE700-0x0B00 = 0xDC00 (echo ring of delay 3) */
 extern u8 oamMemory[];   /* crt0's OAM shadow ($7E:0300, mirrored in bank $00), read back here only */
 u16 r_lerp_t256;     /* fixLerp(FIX(10), FIX(37), 256): t = 1.0 -> b = 9472 (a u8 t gave a = 2560) */
 u16 r_lerp_t300;     /* fixLerp(FIX(10), FIX(37), 300): clamped to b  -> 9472 */
@@ -631,6 +634,7 @@ static void coverage_lot_c(void) {
 
     r_aud_badvoice = audioSetVoiceVolume(9, 60, 30);
     r_aud_badstop  = audioStopVoice(8);
+    r_aud_vset_bad = audioSetVoiceVolumePitch(8, 1, 1);
     r_aud_setvol   = audioSetVolume(100);  /* 100: audio_v2.toml pins MVOL to it */
     r_aud_noplay   = audioPlaySample(63);
     audioGetVoiceState(0, &vs);
@@ -753,8 +757,10 @@ static void coverage_lot_b(void) {
     vramQueuePush(lotb_vram, 0x6300, 0, VRAM_QUEUE_ROW);
     vramQueuePush(lotb_vram + 8, 0x6240, 4, VRAM_QUEUE_COLUMN);
     r_vq[0] = vram_queue_count;             /* 3 */
+    r_vqc[0] = vramQueueCost();             /* 8 + 0 + 4 + 3 * 96 = 300 */
     vramQueueFlush();
     r_vq[1] = vram_queue_count;             /* 0 */
+    r_vqc[1] = vramQueueCost();             /* 0 */
     r_vq[2] = vramQueueFree();              /* 32 */
     vramQueueFlush();                       /* empty: returns at once */
     r_vq[3] = 0x0A51;
@@ -763,6 +769,7 @@ static void coverage_lot_b(void) {
     vq_sheet[0] = 0xA1; vq_sheet[63] = 0xA2; vq_sheet[512] = 0xB1; vq_sheet[575] = 0xB2;
     r_vqs[0] = vramQueuePushSprite(vq_sheet, 0x6400, 16);      /* 1 */
     r_vqs[1] = vram_queue_count;                               /* 2 */
+    r_vqc[2] = vramQueueCost();                                /* 2 * (64 + 96) = 320 */
     r_vqs[2] = vram_queue_src[1] - vram_queue_src[0];          /* 512 */
     r_vqs[3] = vram_queue_addr[1];                             /* $6500 */
     r_vqs[4] = vram_queue_size[0] | (vram_queue_step[1] << 8); /* 64, $80 */
@@ -772,6 +779,22 @@ static void coverage_lot_b(void) {
     r_vqs[6] = vramQueuePushSprite(vq_sheet, 0x6400, 32);      /* four strips, two places left: 0 */
     r_vqs[7] = vram_queue_count;                               /* still 30: nothing noted */
     vram_queue_count = 0;
+    /* the cost stops at $FFFF: past it by the sum, by size + 96 alone, and
+     * by a sprite's strips; a count emptied by hand, then a flush, clears it */
+    vram_queue_cost = 0xFF00;
+    vramQueuePush(lotb_vram, 0x6300, 0x100, VRAM_QUEUE_ROW);
+    r_vqc[3] = vramQueueCost();                                /* $FFFF */
+    vram_queue_count = 0;
+    vramQueueFlush();
+    r_vqc[4] = vramQueueCost();                                /* 0 */
+    vramQueuePush(lotb_vram, 0x6300, 0xFFC0, VRAM_QUEUE_ROW);
+    r_vqc[5] = vramQueueCost();                                /* $FFFF */
+    vram_queue_cost = 0xFFF0;
+    vramQueuePushSprite(vq_sheet, 0x6400, 16);
+    r_vqc[6] = vramQueueCost();                                /* $FFFF */
+    vram_queue_count = 0;
+    vramQueueFlush();
+    r_vqc[7] = vramQueueCost();                                /* 0 */
     dmaCopyCGram(lotb_pal, 250, 4);
     WaitForVBlank();
     REG_CGADD = 254;
@@ -1415,9 +1438,22 @@ int main(void) {
     audioSetVolume(100);
     r_audio_vol = audioGetVolume();
     audioSetVoiceVolume(2, 80, 40);
+    audioSetVoiceVolumePitch(3, 101, 0x0C00);   /* the centre by default; the pitch is set again below */
     audioSetVoicePitch(3, 0x1234);
     audioSetADSR(1, 15, 7, 7, 8);
     audioSetGain(4, 0x5A);
+    /* volume and pitch in one command (the driver's VSET, 2026-10-13), split
+     * by the voice's pan. Voice 5 (bits 2 and 0 of its number) hard left,
+     * voice 7 (all three bits) hard right with both values clamped, voice 4
+     * at pan 11 (weight 12: the driver's multiply, 100 * 12 / 16 = 75 right,
+     * 25 left); voice 3, above, at the centre nobody set (101: 50 right, 51 left).
+     * The manifest audio_v2 reads the four registers of each voice. */
+    audioSetVoicePan(5, AUDIO_PAN_LEFT);
+    audioSetVoiceVolumePitch(5, 77, 0x2ABC);
+    audioSetVoicePan(7, AUDIO_PAN_RIGHT);
+    audioSetVoiceVolumePitch(7, 200, 0x7FFF);
+    audioSetVoicePan(4, 11);
+    audioSetVoiceVolumePitch(4, 100, 0x0800);
 
     /* phase 2: stream the beep into ARAM, then key it on voice 0
      * (round-robin starts there). Probe asserts the ARAM bytes, the

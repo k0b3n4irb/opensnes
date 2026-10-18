@@ -22,7 +22,7 @@ warning: the last row or column is padded with pixels that are not there.
 
 | File | What it is |
 |---|---|
-| `hero.pic` | the 8x8 tiles in OBJ VRAM order (128-px raster rows), `--bpp` deep (4 by default); `--lz` compresses, `--pack` writes packed pixels |
+| `hero.pic` | the 8x8 tiles in OBJ VRAM order (128-px raster rows), `--bpp` deep (4 by default); `--lz` compresses |
 | `hero.pal` | the palette, `--colors` entries (256 by default; 16 for one OBJ palette); `--no-palette` skips it |
 | `hero.inc`, `hero_data.as` | the glue, in the lib's `asset.h` naming: `hero.inc` declares `hero_tiles`, `hero_tiles_end`, `hero_pal`, `hero_pal_end` and a ready `GfxAsset hero` (`DECLARE_GFX_ASSET`); `hero_data.as` is the `.incbin` fragment the build gathers into `assets_gen.asm` |
 | `hero_meta.inc` | with `--metasprite W H`: one `t_metasprite` table per W x H cell of the sheet, `METASPR_ITEM(x, y, tile, OBJ_PAL(n) \| OBJ_PRIO(p))` entries for `oamDrawMetasprite`; with `--flip` an entry whose block is the mirror of another names that block and carries `OBJ_FLIPX` / `OBJ_FLIPY` |
@@ -91,7 +91,7 @@ every later run reads them, the command line overrides for one run.
 | `-o 16 -u 16` | `--colors 16 --bpp 4` |
 | `-T -X 32 -Y 48 -P 2 -F` | `--metasprite 32 48 --priority 2 --flip` |
 | `-c fixed.pal`, `-e N` | `--palette fixed.pal`, `--palette-entry N` |
-| `-k`, `-z`, `-b`, `-d` | `--pack`, `--lz`, `--blank`, `--round` |
+| `-z`, `-b`, `-d` | `--lz`, `--blank`, `--round` (`-k`, packed pixels, is a Mode 7 background format: `opensnes-tileset --pack`) |
 | `aseprite2snes -o hero_anim.h -p hero -t N -f 60 hero.json` | `anim hero.json --prefix hero --stride N --fps 60` |
 
 Backgrounds and tilemaps (`gfx4snes -m`) are `opensnes-tileset`'s, the next

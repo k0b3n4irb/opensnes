@@ -2,11 +2,11 @@
 
 ![hdma example](gradient_colors.png)
 
-*`examples/hdma/gradient_colors`: a COLDATA gradient written by HDMA, one colour step per scanline band.*
+*`examples/hdma/gradient_colors`: a backdrop-colour (CGRAM) gradient written by HDMA, one colour step per scanline band.*
 
 This tutorial covers SNES HDMA (Horizontal-blanking DMA): what it is, when
 to reach for it, the four registers per channel, the eight transfer modes,
-and the per-scanline patterns the six shipped examples exercise. It
+and the per-scanline patterns the shipped examples exercise. It
 assumes you have already worked through the [Graphics](graphics.md) and
 [Scrolling](scrolling.md) tutorials.
 
@@ -44,7 +44,8 @@ The SNES has eight DMA channels (0–7). Each channel has the same set of
 registers; HDMA configures them slightly differently from MDMA.
 
 For HDMA channel `n` (where `n` is 0–7), the addresses are `$43n0`,
-`$43n1`, `$43n2`, `$43n3`, `$43n4`. The lib defines them as `HDMA_CHANNEL_n`.
+`$43n1`, `$43n2`, `$43n3`, `$43n4`. The lib names the channel numbers
+`HDMA_CHANNEL_0` to `HDMA_CHANNEL_7`.
 
 | Register | Name | Purpose |
 |---|---|---|
@@ -60,32 +61,37 @@ The lib hides those four register writes behind two helpers:
 
 - **`hdmaSetup(channel, mode, destReg, table)`** — for any table, RAM or
   const, in any bank: the bank is read from the table pointer.
-- `hdmaSetupBank`, the explicit-bank form, was removed on 2026-10-05 — it predated far pointers.
+- `hdmaSetupBank`, the explicit-bank form, is removed: `hdmaSetup` reads the bank from the pointer.
 
 …and the enable/disable calls:
 
 - **`hdmaEnable(channel)`** / **`hdmaDisable(channel)`** — one channel by
   number, 0-7, like every other call of the header. A value above 7 is
-  refused: it is a 0.x bit mask left behind (until 0.48 these two names took
-  the mask).
+  refused: a bit mask goes to the `Mask` forms below.
 - **`hdmaEnableMask(channelMask)`** / **`hdmaDisableMask(channelMask)`** —
   several channels at once: set or clear their bits in `$420C`.
 
 ## Transfer modes
 
-The "what does each table entry write" axis. Eight modes, set via the
-low 3 bits of `DMAPn`:
+The "what does each table entry write" axis, set by the low 3 bits of
+`DMAPn`. Which registers each mode writes, in order, is in one table under
+`$43x0 - DMAPx` in [the register reference](../hardware/REGISTERS.md);
+here is what each is for on a scanline:
 
-| Mode | Bytes per write | Goes to | Typical use |
-|:---:|:---:|---|---|
-| 0 | 1 | reg | INIDISP brightness, MOSAIC, single-byte registers |
-| 1 | 2 | reg, reg+1 | BG scroll (`BGnHOFS` writes `$210D` low then high), CGADD/CGDATA pairs |
-| 2 | 2 | reg, reg | Two-byte writes to the **same** register (e.g. CGADD-then-CGADD) |
-| 3 | 4 | reg, reg, reg+1, reg+1 | Mode 7 matrix elements |
-| 4 | 4 | reg, reg+1, reg+2, reg+3 | Window position pair (WH0L, WH0H, WH1L, WH1H) |
-| 5 | 4 | reg, reg+1, reg, reg+1 | Pair-of-2-byte registers |
-| 6 | 2 | reg, reg | Same as mode 2, alternate latching |
-| 7 | 4 | reg, reg+1, reg+2, reg+3 | Same as mode 4 |
+| Mode | Typical use |
+|:---:|---|
+| 0 | One single-byte register: MOSAIC (INIDISP is the exception: see the note below) |
+| 1 | Two adjacent registers: the window edges WH0/WH1 (`hdmaWindowShape`) |
+| 2 | A write-twice register: BG scroll (`BGnHOFS`, low then high byte; `hdmaParallax`) |
+| 3 | Two write-twice registers: a pair of Mode 7 matrix elements |
+| 4 | Four adjacent registers: both windows' edges, WH0-WH3 |
+| 5, 6, 7 | Repeat modes 1, 2 and 3 |
+
+INIDISP (`$2100`) is not streamed in mode 0: an HDMA to it uses
+`HDMA_MODE_2REG` with B-bus address `$FF` (it writes `$21FF`, then `$2100`),
+each entry `count, value, value`, and blanks with `$8F` rather than `$80`.
+`hdmaBrightnessGradient()` builds its table that way; the reasons are in
+the INIDISP entry of `KNOWN_LIMITATIONS.md`.
 
 The lib defines named constants — `HDMA_MODE_1REG`, `HDMA_MODE_1REG_2X`,
 `HDMA_MODE_2REG`, etc. Picking the right mode is mostly a question of
@@ -204,13 +210,12 @@ table the module computes in RAM, with the amplitude as a parameter.
 
 ### Parallax scrolling — `examples/scrolling/parallax_scroll`
 
-A static BG3 with a moving BG1 on top, where BG1 scrolls at one rate at
-the top of the screen and a *different* rate at the bottom — classic
-two-speed parallax. The HDMA table is regenerated each frame in RAM
-(non-const) to update the scroll offsets, written to `BG1HOFS`. This
-example is also a real-world demonstration of why HDMA tables that
-change every frame want to be in RAM rather than in const ROM (see
-"bank byte trap" below).
+BG1 alone on screen, split into three horizontal zones that each scroll
+at their own speed — classic multi-speed parallax. The HDMA table is
+updated each frame in RAM (non-const) to move the scroll offsets, written
+to `BG1HOFS` by `hdmaParallax()` on channel 6. This example is also a
+real-world demonstration of why HDMA tables that change every frame want
+to be in RAM rather than in const ROM.
 
 ### Static colour gradient — `examples/hdma/gradient_colors`
 
@@ -223,16 +228,20 @@ table can live in const ROM.
 
 Walks through the lib's HDMA helpers (`hdmaSetup`,
 `hdmaEnableMask`, `hdmaDisableMask`, the brightness-gradient builder) on a
-single screen, with on-screen text labelling each. The example to skim
+single screen. The example to skim
 when you want to remember the API surface.
 
-### Window animation — `examples/windows/transparent_window`
+### Window and colour math — `examples/windows/transparent_window`
 
-Combines HDMA with the window/colour-math pipeline. HDMA writes to the
-window position registers (`WH0L`, `WH0H`, `WH1L`, `WH1H`) per scanline
-to animate a moving window, while colour math blends the BG1 layer
-through the window onto the BG2 layer beneath. Mode 4 transfer (4 bytes,
-4 sequential registers) does the four window writes in one HDMA group.
+Combines HDMA with the window/colour-math pipeline. Two channels (4 and 5)
+in `HDMA_MODE_1REG` write the window edges `WH0` and `WH1`, a few
+non-repeat entries each, to define a rectangle; colour math subtracts a
+fixed colour from BG2 inside it, so the rectangle looks darkened. The
+effect is static.
+
+Driving both windows' edges from one channel is mode 4 (4 bytes, 4
+sequential registers, `WH0`-`WH3` in one HDMA group):
+`examples/windows/window_multi_hdma` does it with `HDMA_MODE_4REG`.
 
 ### Stationary window — `examples/windows/window`
 
@@ -257,7 +266,7 @@ blocks goes in `$43x7` — pass it with the bank-extraction idiom
 Four channels, one per matrix register (M7A/B/C/D ← `HDMA_DEST_M7A..D`),
 each in `HDMA_MODE_1REG_2X`. See the Mode 7 tutorial for the technique;
 the HDMA lesson here is arming: **`hdmaSetup()` configures but does NOT
-enable** — without `hdmaEnableMask(0x0F)` you get a static 1:1 view that can
+enable** — without `hdmaEnableMask(0x3C)` (channels 2-5) you get a static 1:1 view that can
 look convincingly like a broken perspective. Check `dma.hdmaen` in luna's
 typed state when an HDMA effect "does nothing".
 
@@ -266,7 +275,7 @@ typed state when an HDMA effect "does nothing".
 krom's RedSpace9BitHDMA trick, described in `examples/hdma/gradient_colors`'s
 README: one channel rewrites the backdrop colour per line (`HDMA_MODE_2REG_2X` into
 CGADD: `[addr16][data16]`), another rewrites INIDISP brightness per
-line. Colour x brightness plus per-line jitter dithers the gradient into
+line (`HDMA_MODE_2REG` to `$FF`, as in the note under Transfer modes). Colour x brightness plus per-line jitter dithers the gradient into
 more perceptual steps than the PPU's 5 bits — and INIDISP is owned by the
 stream: the demo never calls `setScreenOn()`.
 
@@ -344,11 +353,12 @@ but `fixMul()`/`fixLerp()` are not — see KNOWN_LIMITATIONS.
 
 ## Gotchas
 
-### 🔴 Channel 7 is reserved for OAM DMA
+### 🔴 Channel 7 is reserved for the NMI handler's DMA
 
-The runtime's NMI handler uses **DMA channel 7** to transfer the OAM
-shadow buffer to the PPU each frame. **Do not configure HDMA on channel
-7** — the OAM DMA will overwrite your HDMA register setup, the HDMA will
+The runtime's NMI handler runs **every one of its DMAs on channel 7**: the
+OAM upload, the text tilemap flush and the dynamic sprite uploads.
+**Do not configure HDMA on channel 7** — those transfers will overwrite your
+HDMA register setup, the HDMA will
 read garbage, and you will spend an hour wondering why your gradient
 disappears every few frames. Use channels 1–6 for HDMA. Channel 0 is
 also taken by `dmaCopyVram`, so if you have a hot-loop that calls it,
@@ -356,17 +366,6 @@ prefer channels 1–6 for HDMA.
 
 This is enforced by convention, not by code. The lib's documentation
 (`lib/include/snes/hdma.h`) names the trap explicitly.
-
-### 🟢 Bank byte trap on `hdmaSetup` (resolved)
-
-`hdmaSetup` used to hardcode bank `$00` for its table, so a `static const`
-table that the linker placed elsewhere was read from the wrong bank, and
-`hdmaSetupBank` existed to pass the right one by hand (removed 2026-10-05). Since
-pointers became far pointers (A6) `hdmaSetup` reads the bank byte of the
-table pointer itself: a const table works from any bank — which is where
-const data lives by default since v0.41.0 — and so does a RAM table, on
-LoROM and on HiROM. `hdmaSetupBank` is **removed** (2026-10-05, deprecated since 2026-09-20): it
-carries two banks and the explicit one wins. Use `hdmaSetup`.
 
 ### 🟡 Repeat-mode discipline matters
 
@@ -440,11 +439,11 @@ missed timing in inner game-logic loops.
 - `lib/source/hdma.asm` and `lib/source/hdma.c` — implementation.
 - [`examples/hdma/hdma_wave`](../../examples/hdma/hdma_wave/README.md) — sine-wave per-scanline scroll.
 - [`examples/hdma/hdma_helpers`](../../examples/hdma/hdma_helpers/README.md) — API surface walkthrough.
-- [`examples/scrolling/parallax_scroll`](../../examples/scrolling/parallax_scroll/README.md) — RAM table, two-speed parallax.
+- [`examples/scrolling/parallax_scroll`](../../examples/scrolling/parallax_scroll/README.md) — RAM table, three-zone parallax.
 - [`examples/hdma/gradient_colors`](../../examples/hdma/gradient_colors/README.md) — static ROM gradient table.
 - [`examples/windows/window`](../../examples/windows/window/README.md) — stationary window via HDMA.
-- [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — animated window + colour math.
-- [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — bank `$00` overflow,
-  channel-7 reservation, and the runtime traps that bite HDMA work.
+- [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — HDMA window + colour math.
+- [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — the INIDISP HDMA
+  form and the runtime traps that bite HDMA work.
 - [Scrolling tutorial](scrolling.md) — companion read; HDMA on
   `BGnHOFS`/`BGnVOFS` is the next step beyond the static `bgSetScroll`.

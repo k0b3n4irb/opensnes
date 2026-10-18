@@ -1,6 +1,8 @@
 # Troubleshooting OpenSNES {#troubleshooting}
 
-Common issues and their solutions.
+From a symptom to its cause. The SNES fails quietly, so many symptoms below
+lead to an entry of @ref known_limitations, the catalogue of silent failures:
+this page names the trap, that one explains it.
 
 ## Build Issues
 
@@ -63,25 +65,15 @@ pacman -S mingw-w64-ucrt-x86_64-clang
 ### Build fails with "refusing to emit silently-wrong code"
 
 **Cause**: The code uses a C feature the 65816 backend does not lower. The
-message names it: struct assignment, a struct passed or returned by value,
-a variadic function, or inline assembly (`asm`).
+message names it: a struct passed or returned by value, a struct copied to
+or from a `FAR` object, a variadic function, or inline assembly (`asm`).
+Plain struct assignment (`a = b;`) works.
 
 **Fix**: pass a pointer to the struct, copy it field by field (or with a
 loop), give the function a fixed argument list, or move the assembly into a
 `.asm` file of the project. 32-bit arithmetic (`u32`, `s32`, `*`, `/`, `%`,
 shifts) is supported and tested — prefer `u16` for speed, not for
 correctness.
-
-### Static variables with initializers
-
-Initialized static variables now work correctly:
-```c
-// Both work correctly:
-static u8 counter = 0;   // Initial value copied from ROM to RAM at startup
-static u8 counter;       // Zero-initialized by C standard
-```
-
-The `CopyInitData` routine in crt0.asm copies initial values from ROM to RAM before `main()` is called.
 
 ## Runtime Issues (Black Screen / Crash)
 
@@ -110,16 +102,33 @@ while (1) {
 consoleInit();
 ```
 
-**4. Memory overlap (WRAM mirror bug)**
+**4. A DMA under `setBrightness(0)`**
 
-Bank $00 addresses $0000-$1FFF mirror Bank $7E addresses $7E:0000-$1FFF. If you have variables in both ranges, they'll overwrite each other.
+`setBrightness(0)` darkens the picture but is not forced blank: the PPU still
+rejects VRAM writes. Upload under `setScreenOff()`.
 
-**Diagnose**:
-```bash
-python3 devtools/symmap/symmap.py --check-overlap game.sym
-```
+**5. C variables past the 8 KB RAM band**
 
-**Fix**: The library uses `ORGA $0300` to avoid the overlap zone.
+Plain C variables must sit in `$0000-$1FFF`; a large buffer belongs in far
+RAM (`FAR`, see [Far RAM](tutorials/far_ram.md)). The build checks it after
+every link and stops when the band overflows; `opensnes-rom check game.sfc`
+prints how much of it is left, and `opensnes-rom budget game.sfc` what uses
+it.
+
+### A big buffer behaves strangely
+
+Same cause as above: a plain C global past `$2000` is wrong-banked. Declare
+bulk buffers `FAR` (@ref tutorial_far_ram; the RAM entry of
+@ref known_limitations).
+
+### A `const` array reads garbage
+
+The `const` was cast away and the data read through a plain pointer. C const
+data lives in the asset banks and every C read of it is a far read; a plain
+pointer reads bank $00 instead. Keep the `const`, or hand the data to a library
+function that takes a far pointer. The build's bank-blind read check fails the
+link on this pattern; the bank $00 entry of @ref known_limitations has the
+details.
 
 ### ROM runs but crashes after a few seconds
 
@@ -156,6 +165,22 @@ oamSet(0, x, y, 0, 0, 3, 0);
 // The NMI handler uploads the OAM shadow when a sprite call changed it
 // (oam_update_flag); a direct write into oamMemory[] is not seen
 ```
+
+### A sprite renders as background garbage
+
+`oamInit`'s second argument is a name-base page number (0-7), not a VRAM
+address. Pass `OBJ_NAME_BASE(addr)` rather than the address.
+
+### A sprite appears where no entity is
+
+Off-camera OAM coordinates wrap around the screen. Hide a sprite that left
+the view with `oamHide()`; `oamPlaceWorld()` culls for you
+(@ref tutorial_sprites).
+
+### Sprites have the wrong colours
+
+Sprite palettes start at CGRAM entry 128, not 0: palette 0 of the sprites is
+entries 128-143. A palette loaded at 0 colours the backgrounds instead.
 
 ### Controller input not working
 
@@ -198,21 +223,35 @@ while (1) {
 
 ## Graphics Issues
 
-### Wrong colors / garbled palette
+### Wrong colours / garbled palette
 
 **Cause**: BGR555 format mismatch.
 
-SNES uses BGR555 (5 bits blue, 5 green, 5 red), not RGB. Use gfx4snes to convert PNGs correctly:
+SNES uses BGR555 (5 bits blue, 5 green, 5 red), not RGB. Let the converter write the palette from an indexed PNG:
 ```bash
-gfx4snes -i sprite.png -o sprite
+opensnes-sprite sheet res/sprite.png --size 16 --colors 16    # sprites
+opensnes-tileset convert res/bg.png --colors 16               # backgrounds
 ```
+(or the same settings in `res/sprite.png.toml`, which the build runs for you).
 
-### Tiles appear corrupted
+### Colours shift when you add a tile
+
+The converter derives the whole palette again from the new art. Author a fixed
+palette and impose it: `palette = "fixed.pal"` in the asset's settings file
+(@ref tools_conventions).
+
+### Tiles appear corrupted, or an upload only partly lands
 
 **Causes**:
-1. Wrong tile format (2bpp vs 4bpp vs 8bpp)
-2. VRAM address overlap
-3. DMA transfer size mismatch
+1. VRAM written during the picture: the PPU drops it without an error. Upload
+   in VBlank or under `setScreenOff()`
+2. Over the ~4 KB of DMA a VBlank holds: split the upload across frames or
+   do it under forced blank
+3. Wrong tile format (2bpp vs 4bpp vs 8bpp)
+4. VRAM address overlap
+5. DMA transfer size mismatch
+
+The first two are the first two entries of @ref known_limitations.
 
 **Check your graphics mode**:
 ```c
@@ -223,20 +262,33 @@ setMode(BG_MODE1, 0);
 bgInitTileSet(0, tiles_4bpp, ...);  // 4bpp for BG0 in Mode 1
 ```
 
-### Scrolling is jerky
+### Scrolling is jerky or tears
 
-**Cause**: Updating scroll registers outside VBlank.
+**Cause**: Writing `BGnHOFS` / `BGnVOFS` directly during the frame: the top
+of the picture uses the old value, the bottom the new one.
 
-**Fix**:
+**Fix**: use `bgSetScroll()`. It only records the position, and the NMI
+handler writes it during VBlank. Set it before `WaitForVBlank()`, with the
+rest of the frame's logic, so it is shown on the next frame:
+
 ```c
 while (1) {
-    WaitForVBlank();
-    // Update scroll AFTER VBlank starts
+    scrollX += 1;                       // game logic
     bgSetScroll(0, scrollX, scrollY);
-
-    // Game logic
+    WaitForVBlank();                    // the NMI commits the scroll
 }
 ```
+
+See [Scrolling](tutorials/scrolling.md) for per-line scroll (HDMA parallax).
+
+### Everything is one line off vertically
+
+The library already subtracts the 1 that the PPU's missing scanline 0
+requires (`bgSetScroll`, the map module, `mode7SetScroll`). Pass the row you
+want; keep your own -1 only in data that reaches the register without the
+library, such as an HDMA table on `BGnVOFS`. A PVSnesLib port that passed
+`y - 1` itself ends up one line off. The vertical scroll entry of
+@ref known_limitations has the details.
 
 ## Memory Issues
 
@@ -271,8 +323,12 @@ If it's in ROM ($8000+), you can't write to it.
 ### Diagnostic Commands
 
 ```bash
-# Check for memory overlaps
-python3 devtools/symmap/symmap.py --check-overlap game.sym
+# The post-link checks: bank $00, the RAM bands, bank-blind reads
+# (on game.sym when the build refused the ROM: a refused .sfc is deleted)
+opensnes-rom check game.sfc
+
+# What the game uses of ROM, RAM, VRAM and CGRAM
+opensnes-rom budget game.sfc
 
 # View symbol map
 cat game.sym | grep "variable_name"

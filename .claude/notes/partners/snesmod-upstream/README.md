@@ -39,8 +39,31 @@ the same plain style as the issues.
 |---|---|---|---|---|---|---|---|
 | 2026-10-03 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | posted today |
 | 2026-10-12 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved (two days late: the loop lot) |
+| 2026-10-17 | open, 0 | open, 0 | open, 0 | open, 0 | open, 0 | last commit 2025-01-31 | nothing moved (two days early, on the owner's word) |
 
-Next check due: 2026-10-19.
+Next check due: 2026-10-24.
+
+## Where the driver comes from (measured 2026-10-18)
+
+`lib/source/sm_spc.asm` is PVSnesLib's `pvsneslib/source/sm_spc.asm` (the
+driver with pause and resume, PVSnesLib commits of 2025-02-08) plus our KOF
+patch: the two differ at five bytes, $92-$99, and nowhere else. Its source
+is upstream: `pvsneslib/snesmod/sm_spc.as7` (TASM syntax, Mukunda Johnson
+2009, bugfixes by KungFuFurby), converted to WLA-DX syntax by PVSnesLib on
+2025-12-29 (`df062883`, `pvsneslib/snesmod/sm_spc_wla.asm` on `develop`).
+That file, assembled by our `bin/wla-spc700` and linked with `wlalink -b`,
+gives PVSnesLib's 5 522 bytes exactly (0 differ).
+
+The tool's former copy, `tools/lib/smconv/src/spc_program.h` (5 546 bytes),
+was PVSnesLib's `tools/smconv/spc_program.h`, an older build.
+
+Since 2026-10-18 (owner: import the source) the driver is built from source:
+`lib/source/sm_spc.spc700.asm` is PVSnesLib's `sm_spc_wla.asm` (blob
+`c8a67b39`, commit `df062883`) with the MIT notice and the KOF fix written in
+ResetSound (`mov sfx_mask,#0` moved between the two KOF writes). `lib/Makefile`
+assembles it into `sm_spc.spc700.bin`, which `sm_spc.asm` incbins and
+`opensnes-music` turns into its C array. The build gives our former 5 522
+bytes exactly, and the 85 example ROMs are identical.
 
 ## PVSnesLib: waits for Mukunda (owner decision, 2026-10-03)
 

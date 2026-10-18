@@ -1,7 +1,7 @@
 # opensnes-tileset — background images → tileset, tilemap and palette (the 1.x successor of gfx4snes -m)
 TOOL        := opensnes-tileset
 VERSION     := 1.0.0
-GFX         := ../gfx4snes/src
+GFX         := ../lib/gfx4snes/src
 SRCS        := $(wildcard src/*.c) ../common/cli.c ../common/incfile.c \
                $(GFX)/images.c $(GFX)/palettes.c $(GFX)/tiles.c $(GFX)/maps.c $(GFX)/metasprites.c \
                $(GFX)/lz77.c $(GFX)/loadbmp.c ../third_party/lodepng.c

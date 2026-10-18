@@ -33,7 +33,7 @@
 
 #include <snes.h>
 
-/** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
+/** @brief 4bpp background tile data (converted by the build from res/) */
 #include "res/back.inc"   /* generated: back_tiles[], back_tiles_end[], back_map[], back_pal[] */
 /** @brief 64x32 tilemap data for the parallax background */
 /** @brief 16-color palette for the background */
@@ -100,8 +100,8 @@ int main(void) {
     scroll_table[9] = 0x00;                     /**< End-of-table marker */
 
     /* Configure HDMA channel 6 to write the scroll table to BG1HOFS ($210D).
-     * hdmaParallax() sets up a 2-register HDMA that writes scroll_lo to $210D
-     * and scroll_hi to $210E at each zone boundary during HBlank. */
+     * hdmaParallax() sets up a write-twice HDMA (mode 2) that writes
+     * scroll_lo then scroll_hi to $210D at each zone boundary during HBlank. */
     hdmaParallax(HDMA_CHANNEL_6, 0, scroll_table);
     hdmaEnableMask(1 << HDMA_CHANNEL_6);
 

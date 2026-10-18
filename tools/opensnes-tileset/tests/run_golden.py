@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tests"))
 from golden import Golden  # noqa: E402
 
 g = Golden("opensnes-tileset", __file__)
-GFX = g.here.parents[1] / "gfx4snes" / "tests" / "golden"
+GFX = g.here.parents[1] / "lib" / "gfx4snes" / "tests" / "golden"
 
 g.expect_outputs("convert bg.png --colors 16 == gfx4snes -s 8 -o 16 -u 16 -p -m (the data)", ["convert", "-q", "--colors", "16", "bg.png"],
                  copy=["bg.png"], outputs=["bg.pic", "bg.pal", "bg.map"], want_dir=GFX)
@@ -133,6 +133,122 @@ def roundtrip(argv):
 g.check("convert banks.png --colors 48: every pixel round-trips", "pixel oracle", roundtrip(["convert", "-q", "--colors", "48", "banks.png"]))
 g.check("convert banks.png --colors 48 --rearrange: every pixel round-trips", "pixel oracle after the rearrangement",
         roundtrip(["convert", "-q", "--colors", "48", "--rearrange", "banks.png"]))
+def _indexed_png(rows, ncol=16, palette=None):
+    """An indexed PNG from rows of palette indices, written here so the test needs no imaging module."""
+    import zlib
+
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
+    if palette is None:
+        palette = [((i * 53) % 256, (i * 97) % 256, (i * 29) % 256) for i in range(ncol)]
+    plte = b"".join(bytes(c) for c in palette)
+    raw = b"".join(b"\0" + bytes(r) for r in rows)
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", len(rows[0]), len(rows), 8, 3, 0, 0, 0))
+            + chunk(b"PLTE", plte) + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+
+
+def blank_tile(first_blank, extra, mode5=False):
+    """--blank: every cell of the map shows its own block, whether the picture
+    starts with a blank block (it is tile 0, nothing is added) or not (a blank
+    tile is added and the map counts from 1). Until 2026-10-13 the blank tile
+    was written in both cases and the map shifted in one only: a picture that
+    started with a blank block came out one tile off in every cell. In Mode 5 a
+    cell is 16 pixels wide, two tiles side by side, and the blank is two tiles
+    (one was written, and every cell but the first was one tile off)."""
+    def run():
+        W, H, BW = 4, 2, (16 if mode5 else 8)
+        rows = [[0] * (W * BW) for _ in range(H * 8)]
+        for k in range(1 if first_blank else 0, W * H):
+            r, c = divmod(k, W)
+            for y in range(8):
+                for x in range(BW):
+                    rows[r * 8 + y][c * BW + x] = 1 + (k + x * 3 + y * 5) % 15   # no symmetry: --flip folds nothing
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "b.png").write_bytes(_indexed_png(rows))
+            proc = g.run(["convert", "-q", "--colors", "16", "--blank", *extra, "b.png"], work)
+            if g.failure(proc):
+                return [g.failure(proc)]
+            pic = (work / "b.pic").read_bytes()
+            mp = (work / "b.map").read_bytes()
+        entries = [struct.unpack_from("<H", mp, i * 2)[0] for i in range(W * H)]
+        errs = []
+        want_tiles = (W * H if first_blank else W * H + 1) * (BW // 8)
+        if len(pic) != want_tiles * 32:
+            errs.append(f"b.pic holds {len(pic) // 32} tiles, {want_tiles} expected")
+        if any(pic[:32]):
+            errs.append("tile 0 is not blank")
+        bad = []
+        for k, e in enumerate(entries):
+            r, c = divmod(k, W)
+            for y in range(8):
+                for x in range(BW):
+                    n = (e & 0x3FF) + x // 8
+                    t = pic[n * 32:n * 32 + 32]
+                    bit = 7 - x % 8
+                    idx = (((t[y * 2] >> bit) & 1) | (((t[y * 2 + 1] >> bit) & 1) << 1)
+                           | (((t[16 + y * 2] >> bit) & 1) << 2) | (((t[17 + y * 2] >> bit) & 1) << 3)) if len(t) == 32 else -1
+                    if idx != rows[r * 8 + y][c * BW + x]:
+                        bad.append(k)
+                        break
+                else:
+                    continue
+                break
+        if bad:
+            errs.append(f"cells {bad} do not show their own block (map tiles {[e & 0x3FF for e in entries]})")
+        return errs
+    return run
+
+
+for _first, _name in ((True, "a picture that starts with a blank block"), (False, "a picture with no blank block")):
+    for _extra in ([], ["--no-reduce"], ["--flip"]):
+        g.check(" ".join(["convert --blank", *_extra]) + ": " + _name, "every cell decoded against the source",
+                blank_tile(_first, _extra))
+    g.check("convert --blank --mode 5: " + _name, "every 16-pixel cell decoded against the source",
+            blank_tile(_first, ["--mode", "5"], mode5=True))
+def opaque_like_zero(shade, extra):
+    """Index 0 is transparent by its place, not by its colour: an opaque
+    square of index 5 whose colour is index 0's (black, or (2, 2, 2), black on
+    five bits) keeps a non-zero index. --rearrange used to fold every index
+    onto the first of the same colour, index 0 among them, and the square came
+    out transparent (2026-10-15)."""
+    def run():
+        rows = [[0] * 16 for _ in range(8)]
+        for y in range(2, 6):
+            for x in range(2, 6):
+                rows[y][x] = 5
+            for x in range(10, 14):
+                rows[y][x] = 7
+        pal = [(0, 0, 0)] * 16
+        pal[5] = shade
+        pal[7] = (200, 100, 50)
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            (work / "o.png").write_bytes(_indexed_png(rows, palette=pal))
+            proc = g.run(["convert", "-q", "--colors", "16", *extra, "o.png"], work)
+            if g.failure(proc):
+                return [g.failure(proc)]
+            pic = (work / "o.pic").read_bytes()
+            mp = (work / "o.map").read_bytes()
+        bad = 0
+        for tx in range(2):
+            n = struct.unpack_from("<H", mp, tx * 2)[0] & 0x3FF
+            t = pic[n * 32:n * 32 + 32]
+            for y in range(8):
+                for x in range(8):
+                    bit = 7 - x
+                    idx = (((t[y * 2] >> bit) & 1) | (((t[y * 2 + 1] >> bit) & 1) << 1)
+                           | (((t[16 + y * 2] >> bit) & 1) << 2) | (((t[17 + y * 2] >> bit) & 1) << 3))
+                    if (idx == 0) != (rows[y][tx * 8 + x] == 0):
+                        bad += 1
+        return [f"{bad} pixel(s) changed between transparent and opaque"] if bad else []
+    return run
+
+
+for _shade in ((0, 0, 0), (2, 2, 2)):
+    for _extra in ([], ["--rearrange"]):
+        g.check(" ".join(["convert", *_extra]) + f": an opaque index of colour {_shade}, index 0's colour",
+                "stays opaque", opaque_like_zero(_shade, _extra))
 g.expect_stdout("convert --json", ["convert", "--json", "--colors", "16", "bg.png"], golden="convert.json", copy=["bg.png"])
 g.expect_stdout("inspect --json", ["inspect", "--json", "bg.png", "banks.png"], golden="inspect.json", copy=["bg.png", "banks.png"])
 g.expect_outputs("convert --save writes bg.png.toml", ["convert", "-q", "--colors", "16", "--flip", "--save", "bg.png"],

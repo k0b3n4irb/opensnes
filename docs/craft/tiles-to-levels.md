@@ -70,26 +70,29 @@ the SNES's comfort zone.
 
 You do not hand-author map bytes. [Tiled](https://www.mapeditor.org/) is a free
 level editor, and the SDK bridges it to the hardware. The pipeline
-(@ref examples_maps_tiled is the complete worked example):
+(@ref examples_maps_map_scroll is the complete worked example):
 
 ```
-  Tiled  ──►  gfx4snes  ──►  tmx2snes  ──►  mapLoad()
- paint the    tileset PNG    the .tmj map    in your game
- level +      → tiles +      + tileset.map   loop
- tile props   palette+.map   → map binaries
+  Tiled  ──►  opensnes-tileset  ──►  opensnes-level  ──►  mapLoad()
+ paint the    tileset PNG          the .tmj map          in your game
+ level +      → tiles +            + tileset.map         loop
+ tile props   palette + .map       → map binaries
 ```
 
 1. **Paint** the level in Tiled from your tileset image, and set each tile's
    `attribute` / `palette` / `priority` custom properties (these become the
    collision and rendering data above).
-2. **Convert the tileset** with `gfx4snes` — it produces the tiles, the palette,
-   and a `.map` optimisation table.
-3. **Convert the level** with `tmx2snes`, handing it the `.tmj` export and that
-   `.map` table; it emits the tilemap, tile-definition, and attribute binaries.
+2. **Convert the tileset** with `opensnes-tileset` — a `tiles.png.toml` beside
+   the picture; it produces the tiles, the palette, and a `.map` optimisation
+   table.
+3. **Convert the level** with `opensnes-level` — a `level.tmj.toml` beside the
+   export whose `tileset` key names that `.map` table; it emits the tilemap,
+   tile-definition, and attribute binaries, and a `.inc` that declares them.
+   The build runs both conversions, the level after the tileset.
 4. **Load** them with `mapLoad()` and scroll with the map engine.
 
 The point of the tooling is that **the Tiled file stays the single source of
-truth.** Change the level in the editor, re-run two commands, and the collision,
+truth.** Change the level in the editor, run `make`, and the collision,
 palettes and visuals all move together — no separate hand-maintained collision
 map to drift out of sync.
 
@@ -103,8 +106,8 @@ what the game needs:
 | Scrolling platformer / action | **Map engine** (`mapLoad`, `mapUpdate`, `mapVblank`) | Streaming, built-in collision attributes, camera handling |
 | Fixed-screen puzzle / board | **Your own array** | A 64×64 area fits without streaming; you keep your own entity state |
 
-`tmx2snes` serves both: its default output feeds the map engine, and its `-Q`
-flag emits a quadrant-ordered tilemap you can DMA straight to VRAM and drive
+`opensnes-level` serves both: its default output feeds the map engine, and
+`quadrant = true` emits a quadrant-ordered tilemap you can DMA straight to VRAM and drive
 with `bgSetScroll` yourself — so even a game that does not use the engine still
 authors its levels in Tiled instead of by hand.
 

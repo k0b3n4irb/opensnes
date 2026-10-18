@@ -22,9 +22,9 @@ Mode 3 gives BG1 a full 256-color palette (8 bits per pixel). Each 8x8 tile uses
 
 An SC_64x64 tilemap consists of four 32x32 tile pages (8KB total). In memory, they are arranged as: page 0 (top-left), page 1 (top-right), page 2 (bottom-left), page 3 (bottom-right). Each tile entry is 2 bytes (tile number + attributes), so each page is 2048 bytes. The code maps logical (x, y) sprite coordinates to the correct page and byte offset within the tilemap buffer.
 
-### Extended WRAM and Assembly Helpers
+### A FAR Buffer for the Tilemap
 
-The SNES has 128KB of WRAM at banks $7E-$7F. The compiler generates `sta.l $0000,x` which can only reach bank $00:$0000-$1FFF (8KB). To use the remaining WRAM, the tilemap buffer lives at $7E:$2000 and is accessed through assembly helper functions (`smapWrite`, `smapClear`, `smapDma`) that set the correct bank byte.
+The SNES has 128 KB of WRAM in banks $7E-$7F. A plain C global lives in the first 8 KB; a buffer that does not fit is declared `FAR` and lives at $7E:2000 and up. The 16 KB tilemap buffer is one (`FAR u16 spritemap_buf[0x2000]` in `map32x32.c`): C indexes it like any array, and `dmaCopyVram()` takes it as its source, bank included. See the [far RAM tutorial](../../../docs/tutorials/far_ram.md).
 
 ### 1-Page-Per-VBlank DMA Pattern
 
@@ -42,16 +42,16 @@ The SNES PPU ignores VRAM writes during active display. VBlank provides roughly 
 
 ## How It Works
 
-**1. Initialization** -- The console is set up with Mode 3, BG1 for the sprite map, and BG2 for text. The tilemap buffer in bank $7E is cleared, and gargoyle tile data is DMA'd from ROM to VRAM during force blank:
+**1. Initialization** -- The console is set up with Mode 3, BG1 for the sprite map, and BG2 for text. The FAR tilemap buffer is cleared, and gargoyle tile data is DMA'd from ROM to VRAM during force blank:
 
 ```c
-REG_INIDISP = 0x80;  /* Force blank for safe VRAM writes */
-dmaFillVRAM(0, VRAM_SPRITE_GFX, 256);  /* Clear empty tile slot */
+setScreenOff();                        /* force blank for safe VRAM writes */
+dmaFillVRAM(0, VRAM_SPRITE_GFX, 256);  /* clear the empty tile slot */
 for (i = 1; i < 10; i++) {
     u16 vram_off = VRAM_SPRITE_GFX + element2sprite32x32(i) * 32;
-    dmaCopyVram((u8*)&sprite16, vram_off, 256);
+    dmaCopyVram(sprite16_tiles, vram_off, 256);
 }
-dmaCopyCGram((u8*)&palsprite16, 0, 32);
+dmaCopyCGram(sprite16_pal, 0, 32);
 ```
 
 **2. Drawing sprites on the tilemap** -- Each 16x16 sprite occupies 2x2 tiles in 8x8 mode (or 1 tile in 16x16 mode). The `drawSprite32x32()` function writes tile indices into the RAM buffer, mapping logical coordinates to the correct SC_64x64 page:
@@ -69,11 +69,10 @@ void drawSprite32x32(u8 x, u8 y, u16 sprite) {
 **3. Tilemap DMA to VRAM** -- After modifying the RAM buffer, changes are sent to VRAM one page per VBlank:
 
 ```c
-vblank_flag = 0;
 WaitForVBlank();
-smapDma(0,    VRAM_SPRITEMAP,        2048);  /* page 0 */
+spritemapDma(0,    VRAM_SPRITEMAP,        2048);  /* page 0 */
 WaitForVBlank();
-smapDma(2048, VRAM_SPRITEMAP + 1024, 2048);  /* page 1 */
+spritemapDma(2048, VRAM_SPRITEMAP + 1024, 2048);  /* page 1 */
 /* ... pages 2 and 3 */
 ```
 
@@ -84,13 +83,13 @@ smapDma(2048, VRAM_SPRITEMAP + 1024, 2048);  /* page 1 */
 ```
 dynamic_map/
 ├── main.c          — Main loop, controls, Rockford sprite data, demo init
-├── map32x32.c      — 32x32 grid engine (8x8 tile mode, 4 tiles per sprite)
+├── map32x32.c      — 32x32 grid engine (8x8 tile mode, 4 tiles per sprite),
+│                     and the FAR tilemap buffer with its DMA
 ├── map32x32.h      — API for 32x32 mode
 ├── map64x64.c      — 64x64 grid engine (16x16 tile mode, 1 tile per sprite)
 ├── map64x64.h      — API for 64x64 mode
 ├── res/*.png.toml  — import settings of the two 8bpp sheets (opensnes-tileset, opensnes-sprite);
 │                   the build converts and links them, res/*.inc declare the symbols
-├── ram.asm         — Bank $7E/$7F RAM sections and assembly DMA helpers
 ├── Makefile        — Build configuration
 └── res/
     ├── sprite16.png        — 16x16 gargoyle sprite (8x8 tiles, 8bpp)

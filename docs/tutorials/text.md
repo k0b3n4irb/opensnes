@@ -29,23 +29,27 @@ see @ref tutorial_far_ram for why that band matters).
 Every writer in the module — `textPutChar`, `textPrint`, `textPrintAt`,
 `textPrintU16`, `textPrintHex`, `textClear`, `textClearRect` — sets
 `tilemap_update_flag` on its way out. The NMI handler checks that flag at the
-top of each VBlank and, if set, DMAs the whole buffer to VRAM (step 2 of its
-execution order, right after the OAM DMA). Nothing you print is visible until
+top of each VBlank and, if set, DMAs the bytes written since the last VBlank to
+VRAM (step 2 of its execution order, right after the OAM DMA; see the cost
+section below). Nothing you print is visible until
 that VBlank happens.
 
 **Coming from PVSnesLib?** `consoleDrawText` wrote to a console buffer you then
 flushed. Here the flush is automatic: there is no call to forget. The
 counterpart, `textFlush()`, is documented as rarely needed for exactly that
-reason — it only sets the flag:
+reason — it marks the whole buffer and sets the flag:
 
 ```c
 void textFlush(void) {
+    tilemap_dirty_lo = 0;
+    tilemap_dirty_hi = 2048;
     tilemap_update_flag = 1;
 }
 ```
 
 Reach for it only when you patched `tilemapBuffer` by hand, outside the `text*`
-API. Calling it after a regular `textPrint` is a no-op.
+API. After a regular `textPrint` it is not free: it turns the next flush of a
+few bytes into a 2 KB transfer.
 
 ## Setting up in one call
 
@@ -110,8 +114,7 @@ void textLoadFont4bpp(u16 vram_addr);  /* 4bpp, needs `text4bpp` in LIB_MODULES 
 ```
 
 - `tilemap_addr` is a VRAM **word** address — the same unit as `bgSetMapPtr()`
-  and the rest of the SDK. (Before v0.23.0 it was a byte address; code that
-  passed `W * 2` now passes `W`.)
+  and the rest of the SDK.
 - `font_tile` is the tile number of the first glyph **relative to the layer's
   tile base**, not an absolute VRAM address.
 - `palette` is a slot 0–7; `textInit` masks it with `& 0x07`.
@@ -254,10 +257,9 @@ fields.
 The flush sends **the bytes written since the last VBlank**: every `text*`
 writer records the first and the last byte it touched in `tilemapBuffer`, and
 the NMI handler DMAs that range — one glyph costs 2 bytes, a counter that
-redraws one row costs that row, `textClear()` costs the whole 2048. (Until
-2026-10-12 the flush was all-or-nothing: 2048 bytes, 16,384 master cycles of
-the VBlank, for one glyph — against the roughly 4 KB of practical VBlank DMA
-budget of @ref tutorial_dma, half the frame's transfer capacity.) The range
+redraws one row costs that row, `textClear()` costs the whole 2048 (16,384
+master cycles of the VBlank, half the roughly 4 KB of practical VBlank DMA
+budget of @ref tutorial_dma). The range
 is one span: text written at the top and at the bottom of the screen in the
 same frame sends everything in between too, which is still the content the
 rows hold.
@@ -320,14 +322,23 @@ is the transparent background. To colour your text, write colour 1 of its slot:
 A custom font is just different tiles at the same VRAM address. Draw the 96
 glyphs (ASCII 32–127, space first) in 8x8 cells, put `res/myfont.png.toml`
 beside the picture with `tool = "opensnes-text"` and a `[font]` table
-(@ref tools_opensnes_text; the 0.x `font2snes` is @ref tools_font2snes), and
-the build writes the tiles and `res/myfont.inc`. Upload them yourself and
+(@ref tools_opensnes_text):
+
+```toml
+# res/myfont.png.toml
+tool = "opensnes-text"
+
+[font]
+bpp = 2          # 4 for a Mode 1 BG1 or BG2 text layer
+```
+
+The build writes the tiles and `res/myfont.inc`. Upload them yourself and
 point `textInit` at them:
 
 ```c
 #include "res/myfont.inc"
-dmaCopyVram(myfont_tiles, FONT_VRAM_ADDR, myfont_tiles_end - myfont_tiles);
-textInit(TEXT_DEFAULT_TILEMAP_ADDR, 0, 0);
+dmaCopyVram(myfont_tiles, 0x0000, myfont_tiles_end - myfont_tiles);   /* the layer's tile base */
+textInit(TEXT_DEFAULT_TILEMAP_ADDR, 0, 0);   /* first tile 0, palette slot 0 */
 ```
 
 No example needs a custom font, because `textLoadFont` already gives you a
@@ -373,7 +384,7 @@ it (see the `draw_score` idiom above).
 
 ### 🟡 Passing a byte address to `textInit`
 
-`tilemap_addr` has been a VRAM **word** address since v0.23.0. Ported code that
+`tilemap_addr` is a VRAM **word** address. Ported code that
 passes `0x7000` for a tilemap at word `$3800` puts the DMA target 16 KB past
 where the BG reads its map — a blank layer, no diagnostic.
 
@@ -386,14 +397,14 @@ something the module supports today.
 
 ## See also
 
-- @ref text.h "Text API reference" — the 14 public functions and `TextConfig`.
+- @ref text.h "Text API reference" — the 15 public functions and `TextConfig`.
 - `lib/source/text.c` and `lib/source/text.asm` — the buffer, the cursor, and
   the font data.
 - @ref tutorial_dma — the VBlank DMA budget the 2048-byte flush is spent from.
 - @ref craft_frame_budget — where text sits among everything else a frame does.
 - @ref tutorial_panel — bordered boxes to put text *in*; the box is one layer,
   the text another.
-- @ref tools_font2snes — converting your own typeface.
+- @ref tools_opensnes_text — converting your own typeface.
 - @ref examples_text_print_string — the minimum program.
 - @ref examples_text_scroll_message — the text layer scrolled like any BG.
 - @ref examples_fundamentals_text_glyphs — what the module hides: a glyph as

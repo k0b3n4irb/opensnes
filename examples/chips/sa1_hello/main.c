@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief SA-1 boot diagnostic (Phase 1)
+ * @brief SA-1 boot diagnostic
  * @ingroup examples
  *
  * Minimal SA-1 readiness check. The SA-1 coprocessor (Super Accelerator 1)
@@ -13,8 +13,8 @@
  * - SA-1 vs 65816 dual-CPU: same ISA, different clock, separate memory map
  * - Shared I-RAM as the dispatch / status channel
  * - The `sa1_boot.asm` per-example entry point (each SA-1 ROM brings its own)
- * - Pre-A6+A7 ABI quirks: the SA-1 wrapper API is minimal, all coordination
- *   happens in assembly today
+ * - The SA-1 side is assembly: C runs on the main CPU only, and the two
+ *   talk through I-RAM
  *
  * @par What to Observe
  * - On boot you see "SA1 status: NN" where NN is the byte the SA-1
@@ -28,7 +28,7 @@
  * @par Modules Used
  * console, sprite, dma, background, text, input, sa1
  *
- * @see sa1.h, .claude/notes/tech/sa1_phase1_diagnostic.md
+ * @see sa1.h, docs/tutorials/sa1.md
  */
 
 #include <snes.h>

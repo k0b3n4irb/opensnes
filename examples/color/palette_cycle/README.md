@@ -1,6 +1,6 @@
 # palette_cycle — animate by rotating CGRAM
 
-**Family 6 (Colour & effects) · rung 6b — palette cycling.**
+**Colour & effects · palette cycling.**
 
 ## Why it matters for your game
 

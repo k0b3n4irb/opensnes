@@ -14,15 +14,7 @@
 *.dbg
 
 # Binary executables (rebuilt from source)
-tools/aseprite2snes/aseprite2snes
-tools/font2snes/font2snes
-tools/gfx4snes/gfx4snes
-tools/img2snes/img2snes
-tools/palplan/palplan
 tools/sa1-patch/sa1_patch
-tools/smconv/smconv
-tools/wav2brr/wav2brr
-tools/tmx2snes/tmx2snes
 tools/opensnes-sample/opensnes-sample
 tools/opensnes-music/opensnes-music
 tools/opensnes-rom/opensnes-rom
@@ -137,6 +129,7 @@ examples/sprites/aseprite_pipeline/res/hero_anim.h
 
 .mcp.json
 lib/source/audio_driver.spc700.bin
+lib/source/sm_spc.spc700.bin
 # Build-config stamp written by make/common.mk (2026-09-26)
 .opensnes_config
 .opensnes_config.tmp
@@ -146,3 +139,4 @@ testing/manifests_pal/
 *_pal.sfc
 *_pal.sym
 tools/fuzz/fuzz_wav
+tools/fuzz/fuzz_rearrange

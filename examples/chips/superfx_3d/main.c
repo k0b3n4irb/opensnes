@@ -16,6 +16,8 @@
  * - GSU ↔ 65816 communication via SRAM as shared scratch
  * - DMA full-frame transfer from SRAM to VRAM each frame
  * - HDMA-driven force-blank during transfer (gsuSetupHdmaBlanking)
+ * - oamMemory[] written directly, the escape hatch beside oamSet(): every
+ *   sprite moved off screen once, at boot
  *
  * @par What to Observe
  * - A wireframe cube rotates continuously on two axes (X and Y).

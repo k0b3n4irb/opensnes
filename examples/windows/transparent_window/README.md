@@ -49,13 +49,13 @@ WH1 ($2127):
 ```
 Lines  0-95:  WH0=255, WH1=0  -> window disabled (left > right = no region)
 Lines 96-207: WH0=40,  WH1=216 -> rectangle from x=40 to x=216
-Lines 208+:   WH0=255, WH1=0  -> window disabled again
+Lines 208+:   WH0=255, WH1=216 -> window disabled again (left > right)
 ```
 
-The tables use **repeat mode** (bit 7 set in the line count byte) for the
-rectangle segment. Even though the values are constant across those scanlines,
-repeat mode ensures WH0/WH1 are re-written every line. This is required because
-WH0/WH1 are write-only PPU registers.
+Each table entry writes its register once and holds it for its line count,
+so a constant edge is one entry, not one byte per line. HDMA's repeat mode
+(bit 7 of the line count) writes a new value on every line: it is for a
+value that changes from line to line, such as a perspective or a wave.
 
 ### Color Math Configuration
 

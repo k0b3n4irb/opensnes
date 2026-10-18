@@ -1,0 +1,4 @@
+# Every element is emitted, the 20481st (99) last: the buffer grew past the
+# 16384 the emitter used to die at.
+count 20481 \t\.db [0-9]+
+present \t\.db 99\n\.ENDS

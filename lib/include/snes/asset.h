@@ -29,7 +29,8 @@
  *
  * @par After
  * @code{.c}
- *     // data.asm exports bg_tiles, bg_pal, bg_map (each with _end labels).
+ *     // bg_tiles, bg_pal, bg_map (each with _end labels) come from
+ *     // the res/bg.inc that opensnes-tileset convert writes.
  *     DECLARE_BG_ASSET(bg, BG_16COLORS, SC_32x32);
  *     bgLoad(0, &bg, 0, 0x4000, 0x0000);
  * @endcode
@@ -41,8 +42,10 @@
  * contract.
  *
  * The macros expect the symbol naming convention `<name>_tiles`,
- * `<name>_pal`, `<name>_map` plus their `_end` siblings. The user
- * chooses the prefix once in their `data.asm`.
+ * `<name>_pal`, `<name>_map` plus their `_end` siblings. `opensnes-tileset
+ * convert` writes these symbols itself, in a `<name>.inc` that already holds
+ * a ready `DECLARE_BG_ASSET` when the map is 32x32, 64x32, 32x64 or 64x64;
+ * hand-written assembly that exports the same labels works too.
  *
  * @par Why a typed value
  *
@@ -126,7 +129,7 @@ typedef struct {
 typedef struct {
     /** @brief Tileset (tiles + palette + color mode). */
     GfxAsset gfx;
-    /** @brief Pointer to tilemap data (gfx4snes `.map`). */
+    /** @brief Pointer to tilemap data (the `.map` that `opensnes-tileset` writes). */
     const u8 *tilemap;
     /** @brief One past the end of the tilemap data. */
     const u8 *tilemap_end;
@@ -170,7 +173,9 @@ void bgLoad(u8 bg, const BgAsset *asset, u8 palette_slot,
             u16 tiles_vram, u16 map_vram);
 
 /**
- * @brief Declare a `static const GfxAsset` from gfx4snes-style symbol pairs.
+ * @brief Declare a `static const GfxAsset` from `<name>_tiles` / `<name>_pal`
+ *        symbol pairs (the names `opensnes-tileset` and `opensnes-sprite`
+ *        write).
  *
  * Expands to extern declarations for `<name>_tiles`/`<name>_tiles_end`
  * and `<name>_pal`/`<name>_pal_end`, plus a `static const GfxAsset`
@@ -193,7 +198,8 @@ void bgLoad(u8 bg, const BgAsset *asset, u8 palette_slot,
     }
 
 /**
- * @brief Declare a `static const BgAsset` from gfx4snes-style symbol pairs.
+ * @brief Declare a `static const BgAsset` from `opensnes-tileset`-style
+ *        symbol pairs.
  *
  * Same convention as `DECLARE_GFX_ASSET`, plus `<name>_map` /
  * `<name>_map_end` for the tilemap blob.

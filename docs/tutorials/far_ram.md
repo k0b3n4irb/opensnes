@@ -173,7 +173,7 @@ as unsigned, of which only the sign matters.
 
 ## Debugging
 
-`symmap.py --check-ram-budget game.sym` prints both bands. In luna, a
+`opensnes-rom check game.sfc` prints both bands (the build runs it after every link). In luna, a
 `FAR` symbol resolves to its `$7E:xxxx` address from the `.sym` file, so
 `--peek far_buf:16` reads it directly. If a value reads as zero or as
 garbage where you expect data, check first that no explicit cast dropped

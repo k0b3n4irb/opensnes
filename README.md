@@ -22,7 +22,7 @@
 
 ## Introduction
 
-OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 88 example ROMs.
+OpenSNES lets you write Super Nintendo games in **standard C11** — no proprietary toolchain, no assembly required to get started. One `make` command builds the compiler, tools, library, and all 85 example ROMs.
 
 This project builds on **[PVSnesLib](https://github.com/alekmaul/pvsneslib)** by [Alekmaul](https://github.com/alekmaul) and its community. OpenSNES is a fork focused on a modern C11 compiler, comprehensive testing, and developer experience.
 
@@ -72,7 +72,7 @@ Two honest expectations before you start:
   the SDK. The difference here is that you can learn it incrementally, in C, with
   a worked example for each step.
 - **The SDK is late beta.** The test suite is green and CI is enforced on three
-  platforms, but several optimisations and chip APIs are still planned (see the
+  platforms, but several optimisations are still planned (see the
   [roadmap](ROADMAP.md)). It's a great place to learn and build; pin a commit if
   you need a frozen toolchain for a hard deadline.
 
@@ -90,7 +90,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **LoROM** | Stable | Default. Production-ready. |
 | **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
 | **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
-| **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP/CIWP write-protect polarity resolved 2026-09-02 against four references (see `KNOWN_LIMITATIONS.md`). |
+| **SA-1** | Experimental | C wrapper is minimal; the coprocessor runs `templates/sa1_boot.asm` unless an example brings its own `sa1_boot.asm`. SIWP/CIWP write-protect polarity settled against three references (see `KNOWN_LIMITATIONS.md`). |
 | **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validated by [luna](https://github.com/k0b3n4irb/luna)**, which detects and executes the GSU natively in the headless test harness. |
 
 ---
@@ -100,9 +100,9 @@ values) — required reading before porting any function from PVSnesLib.
 | | |
 |---|---|
 | **C11 compiler for the 65816** | cproc + QBE with a custom backend ([benchmark](docs/BENCHMARK.md)) |
-| **36 library headers** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
+| **39 library headers** | PPU, sprites, backgrounds, DMA, HDMA, input, audio, Mode 7, collision, SRAM... |
 | **Asset pipeline** | PNG to tiles, fonts, Impulse Tracker to SPC700 |
-| **88 examples** | From "Hello World" to Tetris with music — each with README and screenshot |
+| **85 examples** | From "Hello World" to Tetris with music — each with a README, and a screenshot unless it is an audio one |
 | **Framework opt-ins** | Game loop, scene stack, asset bundles — drop them in if they fit, ignore them otherwise |
 | **Debug emulator** | [luna](https://github.com/k0b3n4irb/luna) (cycle-accurate native emulator) — corpus liveness + visual regression + functional probes; SA-1 / Super FX / DSP-1 run natively |
 | **Cross-platform** | Linux, macOS, Windows — CI-enforced on all three |
@@ -153,16 +153,16 @@ up the PNG→tiles asset pipeline and a build workflow out of the box.
 
 ## Examples
 
-88 examples organized as a progressive learning path — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games.
+85 examples — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games. The learning path is the route through them; the catalogue lists every one by topic.
 
-**[Browse all examples](examples/README.md)** · **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)**
+**[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)** · **[Examples by category](https://k0b3n4irb.github.io/opensnes/examples_by_category.html)** · **[All the documentation](docs/README.md)**
 
 ### Supported Platforms
 
 | Platform | Architecture | Status |
 |----------|-------------|--------|
 | **Linux** | x86_64, arm64 | [![Linux](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=linux)](https://github.com/k0b3n4irb/opensnes/actions) |
-| **macOS** | arm64 (Apple Silicon), x86_64 | [![macOS](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=macos)](https://github.com/k0b3n4irb/opensnes/actions) |
+| **macOS** | arm64 (Apple Silicon) | [![macOS](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=macos)](https://github.com/k0b3n4irb/opensnes/actions) |
 | **Windows** | x86_64 (MSYS2) | [![Windows](https://img.shields.io/github/actions/workflow/status/k0b3n4irb/opensnes/opensnes_build.yml?branch=develop&label=windows)](https://github.com/k0b3n4irb/opensnes/actions) |
 
 ---

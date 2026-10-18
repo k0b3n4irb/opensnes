@@ -6,7 +6,7 @@
  *   opensnes-music spc     [--out DIR] [--json] <a.it>...
  *   opensnes-music inspect [--json] <a.it>...
  *
- * The converter is smconv's (tools/smconv/src: itloader, it2spc, brr —
+ * The converter is smconv's (tools/lib/smconv/src: itloader, it2spc, brr —
  * SNESMOD by Mukunda Johnson, (C) 2009): a soundbank from here is byte for
  * byte what `smconv -s -o NAME -b N -n -p NAME` wrote. `bank` writes
  * NAME.asm, NAME.h and NAME.bnk; `spc` writes a standalone .spc per module
@@ -52,10 +52,24 @@ static void json_warnings(cli_ctx *ctx)
     cli_json_close(ctx);
 }
 
-/* Bytes a module may take: 64 KB minus the driver and its module base
- * ($18CA), minus the two 616-byte headers it2spc.c subtracts when it
- * reports `bytesfree` under -V — the same figure smconv prints. */
-#define SPC_RAM_FOR_MUSIC (65535 - 0x18ca - 616 - 616)
+/* A module the driver cannot hold: it is refused, and nothing is written.
+ * The figures are spc_module_create's: the module and its BRR sources from
+ * $1A00, up to the echo region its delay asks for. */
+static bool too_big(cli_ctx *ctx, const itl_bank_t *bank, const spc_bank_t *out)
+{
+    bool refused = false;
+    for (int i = 0; i < out->module_count; i++) {
+        const spc_module_t *m = out->modules[i];
+        if (m->aram_size > m->aram_limit) {
+            cli_error(ctx, bank->modules[i]->filename,
+                      "needs %u bytes of SPC RAM, more than the %u the driver has for it from $1A00 "
+                      "(echo delay %u takes %u more) — drop samples or patterns, or shorten the echo",
+                      m->aram_size, m->aram_limit, m->echo_delay, m->echo_delay * 2048u);
+            refused = true;
+        }
+    }
+    return refused;
+}
 
 static itl_bank_t *load_modules(cli_ctx *ctx, const char **files, int n, int *rc)
 {
@@ -81,8 +95,8 @@ static void json_modules(cli_ctx *ctx, const itl_bank_t *bank, const spc_bank_t 
         cli_json_int(ctx, "samples", m->sample_count);
         cli_json_int(ctx, "orders", m->length);
         if (out && i < out->module_count) {
-            cli_json_int(ctx, "spc_ram_bytes", (long)out->modules[i]->totalsize);
-            cli_json_int(ctx, "spc_ram_free", (long)SPC_RAM_FOR_MUSIC - (long)out->modules[i]->totalsize);
+            cli_json_int(ctx, "spc_ram_bytes", (long)out->modules[i]->aram_size);
+            cli_json_int(ctx, "spc_ram_free", (long)out->modules[i]->aram_limit - (long)out->modules[i]->aram_size);
             cli_json_int(ctx, "sources", out->modules[i]->source_list_count);
         }
         cli_json_close(ctx);
@@ -161,15 +175,17 @@ static int run_bank(cli_ctx *ctx)
 
     spc_bank_t *out = spc_bank_create(bank, false, cli_has(ctx, "same-size"));
     if (!out) { cli_error(ctx, ctx->args[0], "the conversion produced nothing"); itl_bank_destroy(bank); return CLI_REFUSED; }
-    for (int i = 0; i < out->module_count; i++)
-        if (out->modules[i]->totalsize > SPC_RAM_FOR_MUSIC)
-            cli_warn(ctx, bank->modules[i]->filename, "needs %u bytes of SPC RAM, more than the %d a module may take — drop samples or patterns",
-                     out->modules[i]->totalsize, SPC_RAM_FOR_MUSIC);
-    spc_bank_export(out, base, true, name, banknum);
+    if (too_big(ctx, bank, out)) { spc_bank_destroy(out); itl_bank_destroy(bank); return CLI_REFUSED; }
+    if (!spc_bank_export(out, base, true, name, banknum)) {
+        cli_error(ctx, base, "cannot write the soundbank (.bnk, .asm or .h)");
+        spc_bank_destroy(out); itl_bank_destroy(bank); return CLI_IO;
+    }
 
     if (cli_has(ctx, "save") && !composed) {
         /* the composed form of this run: NAME.toml beside the outputs, listing the modules */
-        char toml[1100], list[2048] = "";
+        char toml[1100];
+        static char list[2048];   /* static: ctx->given points at it while the settings are saved */
+        list[0] = '\0';
         snprintf(toml, sizeof toml, "%s.toml", base);
         for (int i = 0; i < nfiles; i++) {
             const char *bn = strrchr(files[i], '/') ? strrchr(files[i], '/') + 1 : files[i];
@@ -178,8 +194,12 @@ static int run_bank(cli_ctx *ctx)
         }
         int idx = -1;
         for (int i = 0; i < ctx->cmd->nopts; i++) if (strcmp(ctx->cmd->opts[i].name, "inputs") == 0) idx = i;
+        /* the saved file lists the modules; the option is put back after,
+         * so that ctx never keeps a pointer to this block's buffer */
+        const char *was = idx >= 0 ? ctx->given[idx] : NULL;
         if (idx >= 0) ctx->given[idx] = list;
         rc = cli_save_settings_path(ctx, toml, name);
+        if (idx >= 0) ctx->given[idx] = was;
         if (rc != CLI_OK) { spc_bank_destroy(out); itl_bank_destroy(bank); return rc; }
     }
 
@@ -225,10 +245,14 @@ static int run_spc(cli_ctx *ctx)
         if (cli_output_path(ctx, ctx->args[i], ".spc", path, sizeof path) != CLI_OK) { itl_bank_destroy(bank); worst = CLI_IO; continue; }
         spc_bank_t *out = spc_bank_create(bank, false, false);
         if (!out) { cli_error(ctx, ctx->args[i], "the conversion produced nothing"); itl_bank_destroy(bank); worst = CLI_REFUSED; continue; }
-        spc_bank_make_spc(out, path);
+        if (too_big(ctx, bank, out)) { spc_bank_destroy(out); itl_bank_destroy(bank); worst = CLI_REFUSED; continue; }
+        if (!spc_bank_make_spc(out, path)) {
+            cli_error(ctx, path, "cannot write the .spc");
+            spc_bank_destroy(out); itl_bank_destroy(bank); worst = CLI_IO; continue;
+        }
         if (ctx->json) {
             cli_json_object(ctx, NULL); cli_json_str(ctx, "input", ctx->args[i]); cli_json_str(ctx, "path", path);
-            cli_json_int(ctx, "spc_ram_bytes", (long)out->modules[0]->totalsize); cli_json_close(ctx);
+            cli_json_int(ctx, "spc_ram_bytes", (long)out->modules[0]->aram_size); cli_json_close(ctx);
         } else if (!ctx->quiet) {
             printf("%s: %s -> %s\n", ctx->tool->name, ctx->args[i], path);
         }
@@ -259,8 +283,8 @@ static int run_inspect(cli_ctx *ctx)
             printf("%s: \"%s\", %u patterns, %u instruments, %u samples, %u orders", m->filename, m->title,
                    m->pattern_count, m->instrument_count, m->sample_count, m->length);
             if (out && i < out->module_count)
-                printf(" -> %u bytes of SPC RAM (%ld free of %d), %d BRR sources", out->modules[i]->totalsize,
-                       (long)SPC_RAM_FOR_MUSIC - (long)out->modules[i]->totalsize, SPC_RAM_FOR_MUSIC,
+                printf(" -> %u bytes of SPC RAM (%ld free of %u), %d BRR sources", out->modules[i]->aram_size,
+                       (long)out->modules[i]->aram_limit - (long)out->modules[i]->aram_size, out->modules[i]->aram_limit,
                        out->modules[i]->source_list_count);
             printf("\n");
         }

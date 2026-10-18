@@ -12,7 +12,8 @@
  * @par SNES Concepts
  * - SPC700 audio: separate coprocessor with 64 KB audio RAM
  * - SNESMOD workflow: init → setSoundbank → loadModule → play
- * - Per-frame snesmodProcess() to stream pattern data to SPC700
+ * - Per-frame snesmodProcess(): sends the queued commands (play, stop,
+ *   volume, sound effects) to the SPC700, which plays the patterns itself
  * - Module volume and fade control
  *
  * @par What to Observe
@@ -63,7 +64,7 @@ int main(void) {
     setScreenOn();
 
     /* State */
-    volume = 255;   /* the driver's own start value: 0-255 (until 2026-10-04 this was 127, so the first L press jumped from 255 to 117) */
+    volume = 255;   /* the driver's own start value: 0-255 */
     paused = 0;
 
     /* Main loop */

@@ -29,9 +29,9 @@ reformat without updating the script.
 <!-- BEGIN PINS -->
 | path | sha | source |
 |------|-----|--------|
-| compiler/cproc | 8c97293c3bd4d7c90c7348b5957de67f4f82e4ab | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
-| compiler/qbe | 2dd729f88510450d8e958f6adf486ccfbefd9ad5 | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
-| compiler/wla-dx | 8077133acf80a1515f71e40a16c81ac3d9890978 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 4) |
+| compiler/cproc | 075fa2cb03f026af20e403bce58d336cb1556d09 | github.com/k0b3n4irb/cproc:feat/b2-far-qualifier |
+| compiler/qbe | 40839d81eeee52c7661d742f6da53261cc0b187f | github.com/k0b3n4irb/qbe:feat/b2-far-qualifier |
+| compiler/wla-dx | 7382e4c8aff6b3e1a00459d9461cc487c5f55030 | github.com/k0b3n4irb/wla-dx:opensnes/ram-labels-ignore-base (v10.7 + 5) |
 <!-- END PINS -->
 
 ## Local patches carried on top of upstream
@@ -44,11 +44,11 @@ submodule, and `devtools/verify_toolchain.py` fails when it is not (a
 shallow clone skips the check with a note). Update the number in the
 commit that moves the pin.
 
-### compiler/cproc — 46 patches since upstream merge-base 7051114
+### compiler/cproc — 48 patches since upstream merge-base 7051114
 
 ```
-2dd729f w65816: the counter of a rotated loop lives in X — a text rule of the peephole stage: ldx / cpx on the way in, inx or txa/clc/adc/tax as the step, cpx at the bottom, when nothing in the body writes X or the counter's slot and the counter dies with the loop; farClear 31 → 18 CPU cycles a turn; `QBE_NO_PEEP_LOOPX=1` (stage 2 T3, 2026-10-12)
-a4ce67c ivar: a loop counter used only as one scaled index becomes that index — a pass before gcm: `for (k = 0; k < N; k++) a[k] = v` runs on j = 2k, stepping by 2, tested against 2N, no shift in the body; exact when nothing wraps at 16 bits, nothing created otherwise; `QBE_NO_IVAR=1`, `-d V` (stage 2 T2, 2026-10-12)
+075fa2c qbe: a whole-object copy carries the access flags of both sides — `r = kl;` from a named `static const` struct, an element of a const array of structs, a const union, a local initialised from a const object read bank $00 (refused at link); a volatile source lost `volat` (audit 04-2, 2026-10-17)
+b5ad29e decl: a variable-length array is refused — every local has a fixed frame slot on w65816, so `u16 a[n];` (or a `const` variable as the length) compiled into a pointer to 2 bytes the callee wrote past; the driver defines `__STDC_NO_VLA__` (audit 04-1, 2026-10-17)
 8c97293 qbe: Avoid redundant leaf ceq in switch (v2) — a case whose neighbours are the values just below and above needs no compare: `switch` workload -3.1 %, `state` -2.7 % (upstream 863e1e7, cherry-picked 2026-10-11)
 7e6a4e5 expr: a string literal is const char[] — handed to a plain `char *` it was read from the wrong bank in silence, and `"abc"[i]` was read bank-blind; a store to a literal is refused (2026-10-11)
 1071b97 expr: *"a" is the first character — the *& collapse skips string literals; it stopped on "unimplemented expression" (upstream 482c69c + d30bfcc, adapted, 2026-10-11)
@@ -100,7 +100,7 @@ own structural defect is tracked as A6 in the structural-defects catalogue;
 reducing pointer storage cascades through QBE w65816's indirect-call emit
 pass). Empirically validated against the full quick test suite.
 
-### compiler/qbe — 125 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
+### compiler/qbe — 135 patches since the fork's squash root 77fe846 (the bulk of the SDK's compiler magic)
 
 Upstream base: QBE `120f316` (2025-05-30, "skip deleted phis in use width
 scan"), located by blob matching on 2026-09-13 — the fork's root commit is
@@ -112,6 +112,18 @@ ratchets in `devtools/toolchain-suites/`); QBE's `tools/test.sh` is
 Selected highlights (full list via `git -C compiler/qbe log HEAD --not upstream/master --oneline`):
 
 ```
+40839d8 w65816: an alloc of a run-time size is refused — it had a fixed 2-byte frame slot; a defence behind cproc's VLA refusal, for any other front end (audit 04-1, 2026-10-17)
+d1ad402 reassoc: the symbol of a union member, `add $u, 0`, folds like a bare one (a game built on the SDK, 2026-10-16)
+653b143 w65816: a far pointer walked by a loop kept in tcc__r9 for the whole loop — staged once before the header, its step written to tcc__r9, copied back on the way out when read after; `QBE_NO_PEEP_R9LOOP=1` (a game built on the SDK, 2026-10-16)
+f3bb5bf reassoc: the constant of a bounded index folded into the symbol it indexes — `buf[i + 8]` reads `buf+16,x` on `buf[i]`'s X when i is proved bounded (extub, and with a constant, shr), never from an out-of-bounds access being undefined (owner decision); `QBE_NO_REASSOC=1` (a game built on the SDK, 2026-10-16)
+b6d9571 w65816: a value stored only to be copied goes to its slot at once; a counted loop tests at its end — peephole_forward_store (`q += stride` straight into q), the reload rule past a label, peephole_dec_loop (`dec n / bne @body`); `QBE_NO_PEEP_FWDSTORE=1`, `QBE_NO_PEEP_DECLOOP=1` (a game built on the SDK, 2026-10-16)
+f9c83c0 w65816: the staged pointer survives the ops that do not write tcc__r9; a stored value ORs the next load directly — q[0], q[1], q[2] in a loop staged q before each read, across the `asl a / tax` of an index; `sta T / ldy / lda Y / ora T` → `ldy / ora Y` (a game built on the SDK, 2026-10-16)
+42461f9 w65816: the peephole's liveness reads `-` labels; a loop counter read after its step stays in A — a variable shift's `-` loop made peephole_flow and pp_slot_live_at give up on the whole function (the OR fusion lost in a large function); that exposed peephole_loop_x keeping `sta 2,s` after the step of a counter whose address is taken, which stored a stale A (difftest_stmt seed 105) (a game built on the SDK, 2026-10-15)
+1721f6c w65816: an indexed load stays the operand of what it feeds across an ldx or an ldy, and an and/or/xor keeps tcc__r9 — `d[k] |= p[k]` from ROM into far RAM cost 9 or 10 instructions a word where 5 and 4 do; the fusion puts back the ldx that gave X its value at the first load when X is dead after the operation, and a 16-bit and/or/xor no longer drops the staged pointer (a game built on the SDK, 2026-10-15)
+a2cfdff emit: the buffer of an initialized object grows instead of dying at 16384 items — a const table of 16385 elements (16 KB of u8) died with "too many data items", naming nothing; what bounds an object now is the ROM bank, which wlalink says (a game built on the SDK, 2026-10-14)
+96be7ae w65816: X known across the blocks of a function, and an indexed load as the operand of what it feeds — two text rules of the peephole stage: a forward analysis of the frame slot A and X equal (a `tax` or `ldx` of what X already holds goes; a function indexing parallel arrays reloaded its index at the top of every block), and `lda SYM,x / sta T / lda Y / op T` as `lda Y / op SYM,x` for cmp, adc, sbc, and, ora, eor; `QBE_NO_PEEP_XFLOW=1`, `QBE_NO_PEEP_FUSE=1` (2026-10-13)
+2dd729f w65816: the counter of a rotated loop lives in X — a text rule of the peephole stage: ldx / cpx on the way in, inx or txa/clc/adc/tax as the step, cpx at the bottom, when nothing in the body writes X or the counter's slot and the counter dies with the loop; farClear 31 → 18 CPU cycles a turn; `QBE_NO_PEEP_LOOPX=1` (stage 2 T3, 2026-10-12)
+a4ce67c ivar: a loop counter used only as one scaled index becomes that index — a pass before gcm: `for (k = 0; k < N; k++) a[k] = v` runs on j = 2k, stepping by 2, tested against 2N, no shift in the body; exact when nothing wraps at 16 bits, nothing created otherwise; `QBE_NO_IVAR=1`, `-d V` (stage 2 T2, 2026-10-12)
 0301a5e parse: a message names the C source when the driver says which (`QBE_SOURCE_NAME`, set by cc65816 before stage 3): `qbe:main.c (IR line N): …` instead of a temporary file nobody can open; `identifier too long` says the 79-character limit and the start of the name (2026-10-12)
 c8e0f5f emit: the first operand of a 32-bit divide or remainder keeps its stack slot — the four operations push the second operand first and read the first from the stack, and `(!g ? 1L : 0L) % d` stopped the compiler with an internal error, "has no stack slot" (difftest_stmt seed 364296, 2026-10-11)
 fbdda87 emit: a block that ends in a jump to a block made of one compare and its branch (the condition of a `for` or a `while`) emits that compare and branch itself — one `jmp` less every turn; and `lda S` at a block's entry goes when every way in comes straight from a load or a store of S (`peephole_entry`, last and once; kept when anything could read its flags). `for (k = 0; k < n; k++) t[k] = 0;`: 36 to 29 CPU cycles a turn (2026-10-11)
@@ -192,14 +204,21 @@ These commits implement the cycle reductions documented in
 `~/.claude/.../memory/compiler_optimizations.md` (Phases 1 through 7a, total
 −22% vs PVSnesLib baseline). Lose them and benchmarks regress.
 
-### compiler/wla-dx — 4 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29)
+### compiler/wla-dx — 5 patches since the v10.7 release (chantier #127.3, 2026-09-07; sanitizer job H3, 2026-09-12; HiROM RAM pointers, 2026-09-20; HiROM .sym RAM listing, 2026-09-29; no-room message, 2026-10-14)
 
 ```
+7382e4c wlalink: a section with no room names its first label, and says when it is larger than a bank
 8077133 wlalink: the [ramsections] listing of the .sym ignores .BASE too
 9002e3d wlalink: the BANK operators ignore .BASE for RAMSECTION labels too
 9c784dc Fix two sanitizer findings: a one-byte read before g_tmp on short macro labels, and a signed shift overflow in wlalink's READ_T
 86df331 wlalink: .BASE does not apply to RAMSECTION labels on the 65816
 ```
+
+`7382e4c` (2026-10-14) changes a message only: a section that finds no
+room in ROM is refused naming its first label (for a C const object, its C
+name) and, when it is larger than a bank, saying that a section cannot span
+banks. A game built on the SDK hit it with a table larger than a bank
+that died, one step earlier, in QBE (see the QBE note). No ROM byte changes (88/88).
 
 `8077133` (2026-09-29) is the third place the base leaked: the
 `[ramsections]` block of the `.sym`, which listed a HiROM `$7E` section as

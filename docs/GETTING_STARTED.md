@@ -7,7 +7,7 @@ This guide will get you from zero to running your first SNES ROM in about 10 min
 | | **I want to make SNES games** | **I want to contribute to the SDK** |
 |---|---|---|
 | **What** | Download the pre-built SDK, write C code, build ROMs | Clone the repo, modify compiler/library/tools |
-| **Prerequisites** | `make`, `python3` + text editor | clang, cmake, git, python3 |
+| **Prerequisites** | `make`, a host C compiler + text editor | clang, cmake, git, python3 |
 | **Time to start** | ~5 minutes | ~15 minutes |
 | **Go to** | [Path A: Game Developer](#path-a-game-developer) | [Path B: SDK Developer](#path-b-sdk-developer) |
 
@@ -20,9 +20,10 @@ to download it, write code, and run `make`.
 
 ### A1. Install Prerequisites
 
-You need `make` (the build tool), `python3` (the build's post-link checks —
-ROM size, bank budgets — are Python scripts) and an emulator. No compiler
-installation required — the SDK ships with its own cross-compiler.
+You need `make` (the build tool), a host C compiler and an emulator. The SDK
+ships its own cross-compiler for the SNES; the host compiler (`cc`, `clang`
+or `gcc`) only lends it its C preprocessor. Nothing else: no Python, no
+runtime. `opensnes doctor` checks all of it.
 
 **macOS:**
 ```bash
@@ -31,18 +32,18 @@ xcode-select --install
 
 **Linux (Ubuntu/Debian):**
 ```bash
-sudo apt install make python3
+sudo apt install make clang
 ```
 
 **Linux (Fedora):**
 ```bash
-sudo dnf install make
+sudo dnf install make clang
 ```
 
 **Windows:**
 1. Install [MSYS2](https://www.msys2.org/)
 2. Open **MSYS2 UCRT64** terminal
-3. Run: `pacman -S make python`
+3. Run: `pacman -S make mingw-w64-ucrt-x86_64-clang`
 
 ### A2. Get an Emulator
 
@@ -81,10 +82,11 @@ every ROM already built under `examples/bin/`).
 
 ### A4. Run Your First ROM
 
-Extract the examples archive next to the SDK and pick a ROM:
+Extract the examples archive next to the SDK: every ROM is in `examples/bin/`,
+next to the sources of its example (`examples/text/print_string/` for this one).
 
 ```bash
-cd opensnes-examples_<version>/examples/text/print_string
+cd opensnes-examples_<version>/examples/bin
 
 # Play it in luna's window (install it once from the SDK root: scripts/install-luna.sh)
 ~/opensnes/testing/bin/luna-gui print_string.sfc
@@ -117,8 +119,11 @@ opensnes run                            # builds the ROM and launches your emula
 template:
 
 - **`--template blank`** — a "HELLO SNES!" text screen, the simplest starting point.
-- **`--template game`** — a white sprite you move with the D-pad, a starting
-  point for an action game.
+- **`--template game`** — a sprite you steer with the D-pad: the SDK's
+  starter project. Its picture, `res/player.png`, has a settings file beside
+  it (`res/player.png.toml`) that the build reads to convert it, the model
+  for every asset you add; `test/` holds two luna tests that `make test`
+  runs.
 
 Other commands (@ref tools_opensnes): `opensnes build`, `opensnes clean`, and `opensnes doctor` (checks
 your toolchain, library, and emulator and tells you what is missing). Run
@@ -136,24 +141,15 @@ cd ~/my-snes-game
 
 Create two files:
 
-**Makefile:**
-```makefile
-# Point to your OpenSNES installation
-OPENSNES := /path/to/opensnes
+**Makefile:** copy the template of @ref tools_build, which also lists every
+variable the build reads, and change the lines that are yours: where the SDK
+is, the ROM's name, and the modules this program uses.
 
-# ROM settings
+```makefile
+OPENSNES := /path/to/opensnes        # where you extracted the SDK
 TARGET   := my_game.sfc
 ROM_NAME := MY GAME
-
-# Source files
-CSRC     := main.c
-
-# Use OpenSNES library
-USE_LIB  := 1
 LIB_MODULES := console dma text background
-
-# Include the build system
-include $(OPENSNES)/make/common.mk
 ```
 
 **main.c:**
@@ -175,7 +171,7 @@ int main(void) {
 Build and run:
 ```bash
 make
-mesen my_game.sfc
+~/opensnes/testing/bin/luna-gui my_game.sfc     # or: opensnes run
 ```
 
 That's it — you're making SNES games.
@@ -199,11 +195,12 @@ my-snes-game/
 Projects can declare automated tests that run in **luna**, the same
 cycle-accurate emulator the SDK's own test suite uses, with luna's own
 manifests: one `test/<name>.toml` per test, run by `luna test`. Opt-in is
-simply the presence of a `test/*.toml` (the `game` template ships two):
+simply the presence of a `test/*.toml`. The `game` template ships these two
+(`rom` names the project's `TARGET`):
 
 ```toml
 # test/boot.toml — a visual baseline and WRAM values at frame 180
-rom = "../my-snes-game.sfc"
+rom = "../game.sfc"
 frames = 180
 
 [asserts]
@@ -212,20 +209,21 @@ fbhash = ""                       # the frame's hash; `make test-update` fills i
 [[checkpoint]]
 at_frame = 180
 [checkpoint.values]
-player_x = 120                    # by the variable's name in your C
-player_y = 100
+player_x = 112                    # by the variable's name in your C
+player_y = 96
 ```
 
 ```toml
 # test/walk_right.toml — hold RIGHT for 60 frames, then check the game state
-rom = "../my-snes-game.sfc"
+rom = "../game.sfc"
 frames = 150
 input = "30:0x100,90:0"           # "frame:buttons_hex" (RIGHT = 0x100), until frame 90
 
 [[checkpoint]]
 at_frame = 150
 [checkpoint.values]
-player_x = 180                    # 120 + 60
+player_x = 232                    # 112 + 60 frames x 2 pixels
+player_y = 96
 ```
 
 Workflow:
@@ -334,62 +332,20 @@ See [CLAUDE.md](https://github.com/k0b3n4irb/opensnes/blob/develop/CLAUDE.md) fo
 
 ## What's Next?
 
-You've built and run a ROM. Three complementary ways forward — pick by how you
-like to learn, or use all three:
+You've built and run a ROM. From here:
 
-- **Follow the journey.** @ref learning_path walks the examples as a developer's
+- **Follow the route.** @ref learning_path walks the examples as a developer's
   questions — "can I put something on screen?", "can I build a world?" — each
   stage buying real confidence, never a wall you can't climb.
-- **Make your own assets.** @ref tools is the converter pipeline that turns your
-  PNGs, Tiled maps, fonts, WAVs and tracker modules into SNES data — `gfx4snes`,
-  `tmx2snes`, `wav2brr` and friends, most wired into the build for you.
-- **Decide what to build.** @ref craft is hardware-grounded *design* advice:
-  budget your VRAM before you draw, choose a background mode from your genre,
-  compose layers, and scope a first game you can actually finish.
-
-Or explore the examples by complexity:
-
-| Level | Examples | What You'll Learn |
-|-------|----------|-------------------|
-| **Beginner** | `text/print_string`, `text/scroll_message` | Console output, text formatting |
-| **Intermediate** | `sprites/simple_sprite`, `input/two_players` | Sprites, controller input |
-| **Advanced** | `mode7/rotate_scale`, `audio/snesmod_music` | Mode 7, tracker music |
-| **Expert** | `games/breakout`, `games/likemario` | Complete game structure |
-| **SA-1 Coprocessor** | `chips/sa1_hello`, `chips/sa1_starfield` | 10.74 MHz second CPU ([tutorial](tutorials/sa1.md)) |
-| **SuperFX (GSU)** | `chips/superfx_hello`, `chips/superfx_3d` | RISC coprocessor, 3D rendering ([tutorial](tutorials/superfx.md)) |
-
-Browse all examples:
-```bash
-ls examples/*/
-```
-
-## Tutorials
-
-The full set of tutorials, always current, is on the docs home page —
-see @ref index "the tutorial navigation in mainpage". The most common
-starting points:
-
-| Topic | Guide |
-|-------|-------|
-| Graphics & Backgrounds | [tutorials/graphics.md](tutorials/graphics.md) |
-| Sprites & Animation | [tutorials/sprites.md](tutorials/sprites.md), [tutorials/animation.md](tutorials/animation.md) |
-| Scrolling & Parallax | [tutorials/scrolling.md](tutorials/scrolling.md) |
-| Collision Detection | [tutorials/collision.md](tutorials/collision.md) |
-| Input Handling | [tutorials/input.md](tutorials/input.md) |
-| Audio & Music | [tutorials/audio.md](tutorials/audio.md) |
-| Math & Fixed-Point | [tutorials/math.md](tutorials/math.md) |
-| DMA | [tutorials/dma.md](tutorials/dma.md) |
-| HDMA Effects | [tutorials/hdma.md](tutorials/hdma.md) |
-| Color Math | [tutorials/colormath.md](tutorials/colormath.md) |
-| Hardware Windows | [tutorials/window.md](tutorials/window.md) |
-| Mosaic | [tutorials/mosaic.md](tutorials/mosaic.md) |
-| Mode 7 | [tutorials/mode7.md](tutorials/mode7.md) |
-| Game States | [tutorials/game_states.md](tutorials/game_states.md) |
-| SRAM Saves | [tutorials/sram.md](tutorials/sram.md) |
-| Far RAM (`FAR` objects) | [tutorials/far_ram.md](tutorials/far_ram.md) |
-| SA-1 Coprocessor | [tutorials/sa1.md](tutorials/sa1.md) |
-| SuperFX (GSU) | [tutorials/superfx.md](tutorials/superfx.md) |
-| Debugging | [tutorials/debugging.md](tutorials/debugging.md) |
+- **Find an example by topic.** @ref examples_by_category lists every example,
+  one line each.
+- **Find the function.** @ref api_index indexes the SDK by what you are trying
+  to do, with the example that does it. Worth a scan before you write a
+  helper: several already exist.
+- **Make your own assets.** @ref tools turns your PNGs, Tiled maps, fonts, WAVs
+  and tracker modules into SNES data.
+- **Everything else** — the tutorials, the game-craft guides, the hardware
+  reference — is on the docs home page, @ref documentation.
 
 ## Troubleshooting the setup
 
@@ -411,31 +367,13 @@ Run `make` from the SDK root first — the library must be compiled before examp
 cd /path/to/opensnes && make lib
 ```
 
-### Black screen when running ROM
+### Anything else
 
-Your ROM built but doesn't display anything. Common causes:
-1. Missing `setScreenOn()` call
-2. Missing `WaitForVBlank()` in main loop
-3. Wrong `LIB_MODULES` — check that you include all needed modules
-
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for more solutions.
-
-### Build fails with "refusing to emit silently-wrong code"
-
-The compiler stops, with the feature named, rather than generate wrong code
-for what it does not support: struct assignment, structs passed or returned
-by value, variadic functions and inline assembly. Pass a pointer, copy the
-fields, or move the code to a `.asm` file. 32-bit `u32`/`s32` arithmetic is
-fully supported (it is slower than 16-bit, not wrong). See
-`KNOWN_LIMITATIONS.md` for the full list.
+A black screen, a compiler that stops with "refusing to emit silently-wrong
+code", sprites that do not show: @ref troubleshooting goes from the symptom to
+the cause.
 
 ## Getting Help
 
 - **Issues**: [github.com/k0b3n4irb/opensnes/issues](https://github.com/k0b3n4irb/opensnes/issues)
 - **SNES Dev Wiki**: [snes.nesdev.org](https://snes.nesdev.org/)
-
-## Which API do I need?
-
-See [API_INDEX.md](API_INDEX.md) — the SDK indexed by *what you are
-trying to do*, with the example that does it. Worth a scan before you
-write a helper: several already exist.

@@ -82,9 +82,9 @@ ASFLAGS = -I $(SRCDIR) -I $(INCDIR)/asm -I ../templates -o
 #       them as non-essential — examples that don't need them won't link them.
 C_SOURCES = $(wildcard $(SRCDIR)/*.c)
 # Exclude crt0 (per-ROM), sm_spc (included by snesmod), superfx (SuperFX-only),
-# audio_driver.spc700 (SPC700 source — built by wla-spc700 into the blob that
-# audio_blob.asm incbins, NOT a 65816 source)
-ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm $(SRCDIR)/superfx.asm $(SRCDIR)/audio_driver.spc700.asm, $(wildcard $(SRCDIR)/*.asm)) \
+# audio_driver.spc700 and sm_spc.spc700 (SPC700 sources — built by wla-spc700
+# into the blobs audio_blob.asm and sm_spc.asm incbin, NOT 65816 sources)
+ASM_SOURCES = $(filter-out $(SRCDIR)/crt0.asm $(SRCDIR)/sm_spc.asm $(SRCDIR)/superfx.asm $(SRCDIR)/audio_driver.spc700.asm $(SRCDIR)/sm_spc.spc700.asm, $(wildcard $(SRCDIR)/*.asm)) \
               $(wildcard $(CONTRIBDIR)/*.asm)
 ASM_SOURCES_SUPERFX_ONLY = $(SRCDIR)/superfx.asm
 
@@ -174,6 +174,37 @@ $(DRIVER_BIN): $(SRCDIR)/audio_driver.spc700.asm ../templates/memmap_spc700.inc
 		echo "FAIL: audio driver is $$size bytes > $(DRIVER_BUDGET)-byte ARAM budget"; \
 		rm -f $@; exit 1; \
 	fi
+
+# The SNESMOD driver, built from its source the same way (sm_spc.asm incbins
+# it, snesmod.asm includes sm_spc.asm). opensnes-music builds it too, through
+# this rule, for the .spc it writes. 5522 bytes: they load at $0400 and the
+# module at $1A00, so it may not pass $1600.
+SM_SPC_BIN = $(SRCDIR)/sm_spc.spc700.bin
+SM_SPC_BUDGET = 5632
+
+# Two makes may build it at once (`make tools lib`, `make -j`: the tool's
+# rule and the library's), so each assembles into files of its own, named
+# by its shell's PID, and moves the result in place: shared temporaries
+# made 17 of 20 concurrent builds fail.
+$(SM_SPC_BIN): $(SRCDIR)/sm_spc.spc700.asm
+	@echo "[SPC] $< -> $@"
+	@tmp=$(SRCDIR)/sm_spc.tmp$$$$; \
+	$(SPC_AS) -o $$tmp.o $< && \
+	printf '[objects]\n%s\n' $$tmp.o > $$tmp.link && \
+	$(LD) -b $$tmp.link $$tmp.bin; st=$$?; \
+	rm -f $$tmp.o $$tmp.link; \
+	if [ $$st -ne 0 ]; then rm -f $$tmp.bin; exit $$st; fi; \
+	size=$$(wc -c < $$tmp.bin | tr -d ' '); \
+	if [ $$size -gt $(SM_SPC_BUDGET) ]; then \
+		echo "FAIL: SNESMOD driver is $$size bytes > $(SM_SPC_BUDGET)"' ($$0400 to the module at $$1A00)'; \
+		rm -f $$tmp.bin; exit 1; \
+	fi; \
+	mv -f $$tmp.bin $@
+
+$(BUILDDIR_LOROM)/snesmod-asm.o: $(SM_SPC_BIN)
+$(BUILDDIR_HIROM)/snesmod-asm.o: $(SM_SPC_BIN)
+$(BUILDDIR_SA1)/snesmod-asm.o: $(SM_SPC_BIN)
+$(BUILDDIR_SUPERFX)/snesmod-asm.o: $(SM_SPC_BIN)
 
 # The blob wrapper must re-assemble whenever the driver binary changes
 # (dependency merged into the pattern rules of each variant).
@@ -301,4 +332,4 @@ $(BUILDDIR_SUPERFX):
 clean:
 	@echo "[CLEAN] Removing build files..."
 	-rm -rf build
-	-rm -f $(DRIVER_BIN)
+	-rm -f $(DRIVER_BIN) $(SM_SPC_BIN)

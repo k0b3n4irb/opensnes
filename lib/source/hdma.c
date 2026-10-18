@@ -143,7 +143,7 @@ static s16 hdmaSin(u8 angle) {
 extern volatile u8 bg_scroll_dirty;   /* crt0: bit n = BGn+1 scroll to rewrite at the next VBlank */
 extern u8 hdma_table_a[673];
 extern u8 hdma_table_b[673];
-extern u8 hdma_brightness_table[113];
+extern u8 hdma_brightness_table[169];
 extern u8 hdma_color_table[281];
 extern u8 hdma_iris_table_a[673];
 extern u8 hdma_iris_table_b[673];
@@ -334,13 +334,19 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
     p = (u8 *)hdma_brightness_table;
 
     /* 56 chunks of 4 scanlines, non-repeat mode.
-     * Each entry: linecount (4), brightness value.
+     * Each entry: linecount (4), then the brightness twice: the channel
+     * writes $21FF (nothing), then $2100. A one-register HDMA to INIDISP
+     * (BBAD = $00) can make a general DMA fail on an S-CPU-A console
+     * (snesdev-wiki Errata S-CPU, chunk 97b76d7d4e2e34a6), and two equal
+     * bytes avoid the INIDISP early-read pixel (undisbeliever, chunk
+     * 9cde32ae8100f0c1). Audit 1.0, 01-2.
      * INIDISP is latched — value persists until next HDMA write. */
     for (i = 0; i < WAVE_CHUNKS; i++) {
         u8 line = (u8)((i << 2) + 2);
         u8 bright = (u8)(top + (((s16)bot - (s16)top) * line) / 223);
         *p++ = 4;       /* 4 scanlines per chunk */
-        *p++ = bright;  /* INIDISP value (0-15) */
+        *p++ = bright;  /* to $21FF */
+        *p++ = bright;  /* to $2100, INIDISP (0-15) */
     }
     *p = 0x00;  /* End marker */
 
@@ -352,7 +358,7 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
     if (hdmaGetEnabled() & channel_mask(channel)) {
         hdmaSetTable(channel, hdma_brightness_table);
     } else {
-    hdmaSetup(channel, HDMA_MODE_1REG, HDMA_DEST_INIDISP, hdma_brightness_table);
+    hdmaSetup(channel, HDMA_MODE_2REG, 0xFF, hdma_brightness_table);
         hdmaEnableMask(channel_mask(channel));
     }
 }

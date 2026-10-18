@@ -1,9 +1,9 @@
 #==============================================================================
-# shmup_1942 — S1: Static tile library preview
+# shmup_1942 — a vertical 1942-style shoot 'em up
 #
 # Vertical 1942-style shoot 'em up, built on Kenney's CC0 Pixel Shmup pack.
-# S1 just proves the gfx4snes → bgLoad pipeline by displaying the
-# ground tile library on BG1 with no scrolling and no sprites.
+# A scrolling ground on BG1, the player's plane, enemies and bullets as
+# sprites; every picture is converted by the build from its settings file.
 #==============================================================================
 
 OPENSNES := $(shell cd ../../.. && pwd)

@@ -21,8 +21,9 @@ README; a script that none of them names is an orphan and is deleted
 
 | Script | What it refuses | Target |
 |--------|-----------------|--------|
-| `check_doc_drift.py` | the sixteen anchored doc/code claims (`.claude/rules/doc_consistency.md`) | `lint-docs` |
+| `check_doc_drift.py` | the eighteen anchored doc/code claims (`.claude/rules/doc_consistency.md`) | `lint-docs` |
 | `check_doc_render.py` | un-rendered Markdown in the generated Doxygen HTML | `doc-render` job |
+| `docs_relink.py` | (a build step, not a check) moves the site's links to an empty "X.md File Reference" page to the page itself | `docs` |
 | `check_asm_abi.py` | a `lda N,s` whose comment names a parameter at the wrong stack slot (`abi_lint.md`) | `lint-asm-abi` |
 | `lint_asm.py` | a `rep`/`sep` without its `.ACCU`/`.INDEX` marker | `lint` |
 | `lint_commits.py` | a commit subject outside Conventional Commits, or an attribution trailer | `lint-commits`, the git hooks |

@@ -1,18 +1,18 @@
 # Input & peripherals
 
-**Family 4 — "can the player act?"** This is the rung that turns a demo into a
+**"can the player act?"** This is the step that turns a demo into a
 game. Read the pad, move something with it, then branch out to the SNES's
 exotic controllers. The console auto-reads every input device each VBlank; you
 just read the result.
 
 ## The ladder
 
-| Rung | Example | Developer question |
-|------|---------|--------------------|
-| 4.1 | [controller](controller/) | How do I read a joypad — held vs just-pressed? |
-| 4.2 | [two_players](two_players/) | How do I read two players independently? |
-| 4.3 | [mouse](mouse/) | How do I read the SNES Mouse? |
-| 4.4 | [superscope](superscope/) | How do I read the Super Scope light gun? |
+| Example | Developer question |
+|---------|--------------------|
+| [controller](controller/) | How do I read a joypad — held vs just-pressed? |
+| [two_players](two_players/) | How do I read two players independently? |
+| [mouse](mouse/) | How do I read the SNES Mouse? |
+| [superscope](superscope/) | How do I read the Super Scope light gun? |
 
 Driving a sprite with the pad is the `starter/` project at the SDK root —
 the same program, with the asset pipeline of 1.x.
@@ -33,5 +33,5 @@ The **mouse** and **Super Scope** are read the same way after a device-ID
 check; the Super Scope lives on port 2 and latches its aim from the PPU's H/V
 counters.
 
-> Start at 4.1 to read the pad, then 4.2 to feel a sprite respond to it —
+> Start with `controller` to read the pad and feel the screen respond to it —
 > that's the moment it becomes a game.

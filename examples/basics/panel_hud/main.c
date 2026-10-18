@@ -44,7 +44,7 @@
  * HUD. `hero_hp` and `dialog_shown` are the probe oracles.
  *
  * @par Modules Used
- * console, dma, background, panel, input
+ * console, dma, background, panel, input, tile
  *
  * @see lib/include/snes/panel.h — panelInit/Draw/Put/Clear/Flush
  */

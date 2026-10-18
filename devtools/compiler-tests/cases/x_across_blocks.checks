@@ -1,0 +1,5 @@
+# one tax for the whole function, and no reload of the index
+in hardware: absent \ttax\n[\s\S]*\ttax\n
+in hardware: present \ttax\n
+in hardware: absent \tldx
+in with_call: present jsl note[\s\S]*(tax|ldx)

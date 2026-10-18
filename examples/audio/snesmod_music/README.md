@@ -10,7 +10,7 @@ After this lesson, you will understand:
 - Loading soundbanks and modules
 - Music playback controls (play, stop, pause, fade)
 - Volume control
-- The smconv tool workflow
+- How the build turns an `.it` file into a soundbank (`opensnes-music`)
 
 ## Prerequisites
 
@@ -63,7 +63,7 @@ SNESMOD is a tracker-based music playback system:
 Impulse Tracker file (.it)
          |
          v
-    [smconv tool]
+    [opensnes-music bank]
          |
          v
 soundbank.asm + soundbank.h
@@ -113,7 +113,7 @@ while (1) {
 }
 ```
 
-**Warning:** Failing to call `snesmodProcess()` every frame causes audio glitches, buffer underruns, and potential crashes.
+**Warning:** `snesmodProcess()` is what sends the commands (play, stop, volume, sound effects) to the SPC700. Without it they wait in a queue of 85 and the newest are dropped once it is full; the music already playing goes on.
 
 ### Playback Control
 
@@ -148,9 +148,9 @@ snesmodFadeVolume(0, 4);        /* Target volume, speed */
 
 ### Build Process
 
-The Makefile automatically:
-1. Runs `smconv` on your `.it` file
-2. Generates `soundbank.asm` and `soundbank.h`
+When the Makefile sets `SOUNDBANK_SRC` (with `USE_SNESMOD := 1`), the build:
+1. Runs `opensnes-music bank` on your `.it` file(s)
+2. Writes `soundbank.bnk`, `soundbank.asm` and `soundbank.h`
 3. Links the soundbank into the ROM
 
 ```makefile
@@ -161,19 +161,25 @@ SOUNDBANK_SRC := music/mymusic.it
 
 ## Generated Files
 
-After building with smconv:
+After a build:
 
-**soundbank.h:**
+**soundbank.h** (excerpt):
 ```c
-#define MOD_POLLEN8     0
-#define SOUNDBANK_BANK  0x02   /* ROM bank where soundbank lives */
+#define MOD_POLLEN8                     	0
+#define MOD_POLLEN8_SIZE                	44137
+#define SFX_SAW1                        	0
+...
+#define SOUNDBANK_BANK 1
 ```
 
-**soundbank.asm:**
+**soundbank.asm:** the bank is given to the soundbank alone, at its start:
 ```asm
-.SECTION ".soundbank" SUPERFREE
+.BANK 1
+.ORG 0
+.SECTION "SOUNDBANK" FORCE ; need dedicated bank(s)
+
 soundbank:
-    .INCBIN "soundbank.bnk"
+.incbin "./soundbank.bnk"
 .ENDS
 ```
 
@@ -186,7 +192,7 @@ cd $OPENSNES_HOME
 make -C examples/audio/snesmod_music
 ```
 
-Then open `music.sfc` in your emulator (Mesen2 recommended).
+Then run `music.sfc` in luna (`opensnes run`) or any SNES emulator.
 
 ---
 
@@ -211,8 +217,9 @@ Then open `music.sfc` in your emulator (Mesen2 recommended).
 
 ### ROM
 ```
-Bank 0-1:  Code, tiles, tilemaps
-Bank 2+:   Soundbank data (smconv output)
+Bank 0:    Code
+Bank 1:    Soundbank data (its own bank, at its start; more banks if it is larger)
+Others:    Tiles, tilemaps and other const data (the asset banks)
 ```
 
 ### SPC RAM
@@ -249,11 +256,11 @@ Enable echo in your tracker module and hear the reverb.
 - Check channel count (8 max)
 - Verify sample rate (32kHz max)
 
-### Build fails with smconv error
+### Build fails converting the module
 - Check `.it` file is valid Impulse Tracker format
-- Verify smconv is built: `make -C $OPENSNES/bin smconv`
+- `opensnes-music inspect music/song.it` says what the converter reads in it
 
-### Audio glitches
+### A press does nothing, or late
 - Ensure `snesmodProcess()` is called EVERY frame
 - Check for infinite loops blocking the main loop
 
@@ -269,14 +276,14 @@ Tracker modules are efficient for the SNES:
 - Volume, panning, effects per-channel
 - No streaming required
 
-### smconv Options
+### Converting by hand
 
 ```bash
-smconv -s -o soundbank music/song.it
+opensnes-music bank -o . --name soundbank music/song.it
 ```
-- `-s`: Generate assembly and header
-- `-o`: Output basename
-- Input: Impulse Tracker file(s)
+- `--name`: base name of the files written
+- `-o`: output directory
+- `opensnes-music --help` lists the rest
 
 ---
 

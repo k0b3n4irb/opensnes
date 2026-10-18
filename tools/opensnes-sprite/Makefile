@@ -2,8 +2,8 @@
 # (the 1.x successor of gfx4snes -s/-T and aseprite2snes; their converters, linked as libraries)
 TOOL        := opensnes-sprite
 VERSION     := 1.0.0
-GFX         := ../gfx4snes/src
-ASE         := ../aseprite2snes/src
+GFX         := ../lib/gfx4snes/src
+ASE         := ../lib/aseprite2snes/src
 SRCS        := $(wildcard src/*.c) ../common/cli.c ../common/incfile.c \
                $(GFX)/images.c $(GFX)/palettes.c $(GFX)/tiles.c $(GFX)/maps.c $(GFX)/metasprites.c \
                $(GFX)/lz77.c $(GFX)/loadbmp.c ../third_party/lodepng.c \

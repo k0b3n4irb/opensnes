@@ -720,6 +720,11 @@ checkout that sha here, `git merge --ff-only wip/<name>` (rebase the branch
 first if `develop` took note commits meanwhile), push the fork, `git
 ls-remote` to see it, remove the worktree, rebuild. Nothing in the main
 tree's git was disturbed during the chantier.
+The fork is pushed **from the main tree's submodule**: a clone's `origin` is
+that submodule, so `git push origin` from the worktree lands on this machine,
+not on GitHub. On 2026-10-17 a push made that way printed success, `develop`
+went out pointing at two SHAs GitHub did not have, and every CI job failed
+at checkout ("not our ref"); `ls-remote` before pushing `develop` catches it.
 
 ### Step 10 of #166: flow-aware dead stores, cost-ordered slots, the leaf rule off (2026-10-10, night)
 
@@ -988,3 +993,37 @@ and the reference was re-measured for both SDKs.
   (`txa` would be needed where the deleted `ldx` was: no line to put it
   on when the body has no `ldx`); `!=` and signed loop tests (`bne`/`beq`
   entries); stack-slot counters (`N,s`: no `ldx n,s` form).
+
+## 2026-10-13 — the sequencer workload: the library first, then two text rules
+
+The challenge (asked by a game built on the SDK, same date): the
+`stepseq` workload, 8 172 master cycles a channel-tick on 0.50.0, the
+criterion 5 000.
+
+Library (`793f2ed8`): `audioSetVoiceVolumePitch()` — its shape shown
+before landing, which changed it (a pan kept per voice) — and the 32-by-16
+division unrolled. Lesson kept from the first: written in C it gave back
+4 %, the function costing more than the handshake it saved; in assembly
+−48 % a voice.
+
+Compiler (qbe `96be7ae`): `peephole_xflow` and `peephole_fuse_indexed`.
+What the listing of `seqHardware` showed: `lda 2,s / tax` at the top of
+nearly every block, X having held that slot since the function's first
+lines — the emitter's X cache and the peephole's `xs` both forget at a
+label. A forward dataflow over the text fixes the general case, not the
+sequencer's alone: `physics` −26.5 %, `sort` −14.6 % on the bench, the
+workload itself 7 951 → 7 295 a channel-tick (`seqHardware` 174 lines to
+149, eleven `tax` to three; `seqStep` gains less: its blocks follow calls,
+which give X back to the callee).
+
+Where the reasonable stops, said before measuring and confirmed: 7 295
+is not 5 000. What is left of a channel-tick is the two loops of calls per
+channel (723, the price of the calls), the division at each period change
+(≈ 1 300 with `pitchOf`; a table by period is the caller's option), and
+the interpreter's own statements.
+
+Found on the way: `docs/BENCHMARK.md` showed `stepseq` with a PVSnesLib
+time although 816-tcc computes something else there (fixed in
+`8abaddd2`); and a battery launched with `&` inside an ordinary command
+is not a tracked task — it finished green and nobody was told for twenty
+minutes. Batteries are launched as tracked background tasks.

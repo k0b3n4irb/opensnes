@@ -4,13 +4,9 @@ This tutorial covers SNES graphics fundamentals including video modes, backgroun
 
 ## SNES Video Modes
 
-The SNES has 8 video modes (0-7). OpenSNES primarily uses:
-
-| Mode | BG1 | BG2 | BG3 | BG4 | Best For |
-|------|-----|-----|-----|-----|----------|
-| **0** | 4 colors | 4 colors | 4 colors | 4 colors | Text, simple UI |
-| **1** | 16 colors | 16 colors | 4 colors | - | Most games |
-| **7** | 256 colors (rotatable) | - | - | - | Racing, rotation effects |
+The SNES has eight background modes (0-7); most games use Mode 1, text and
+simple UI use Mode 0, rotation uses Mode 7. What each mode gives each layer
+is tabled in @ref hardware_ppu_modes "The PPU: background modes".
 
 ## Setting Up Graphics
 
@@ -41,7 +37,7 @@ int main(void) {
 
 ## Loading Tiles to VRAM
 
-Tiles are 8x8 pixel graphics stored in VRAM. For 4bpp (16 color) tiles:
+Tiles are 8x8 pixel graphics stored in VRAM. For 4bpp (16 colour) tiles:
 
 ```c
 // Tile data (32 bytes per 8x8 tile for 4bpp)
@@ -90,16 +86,9 @@ Like any DMA to VRAM, call it during force blank or VBlank.
 
 ## Setting Up Tilemaps
 
-Tilemaps define which tiles appear where on screen. Each entry is 2 bytes:
-
-```
-Bits: vhopppcc cccccccc
-  v = vertical flip
-  h = horizontal flip
-  o = priority
-  ppp = palette (0-7)
-  cccccccccc = tile number (0-1023)
-```
+Tilemaps define which tiles appear where on screen. Each entry is 2 bytes —
+tile number, palette, priority and flips; the bit layout is in
+@ref hardware_ppu_tilemaps "The PPU: tilemaps".
 
 ```c
 void setup_tilemap(void) {
@@ -121,7 +110,9 @@ void setup_tilemap(void) {
 
 ## Setting Palettes
 
-SNES uses 15-bit color (RGB555):
+Colours are 15-bit BGR555, written low byte first; the format and the
+split of CGRAM between backgrounds and sprites are in
+@ref hardware_ppu_cgram "The PPU: CGRAM and colours".
 
 ```c
 void setup_palette(void) {
@@ -152,73 +143,77 @@ void setup_palette(void) {
 
 ## Background Scrolling
 
+`bgSetScroll()` records a layer's position; the NMI handler writes it to the
+PPU during VBlank, and applies the vertical one-line correction the hardware
+needs (see [Scrolling](scrolling.md)):
+
 ```c
 s16 scroll_x = 0;
 s16 scroll_y = 0;
 
-void update_scroll(void) {
-    // Write scroll registers (write twice for 16-bit value)
-    REG_BG1HOFS = (u8)scroll_x;
-    REG_BG1HOFS = (u8)(scroll_x >> 8);
-    REG_BG1VOFS = (u8)scroll_y;
-    REG_BG1VOFS = (u8)(scroll_y >> 8);
+while (1) {
+    scroll_x++;
+    bgSetScroll(0, scroll_x, scroll_y);
+    WaitForVBlank();
 }
 ```
 
 ## Parallax Scrolling
 
-For depth effect, scroll backgrounds at different speeds:
+For depth, scroll the layers at different speeds:
 
 ```c
-// In main loop:
 scroll_x++;
-
-// BG1 (foreground) - full speed
-REG_BG1HOFS = (u8)scroll_x;
-REG_BG1HOFS = (u8)(scroll_x >> 8);
-
-// BG2 (background) - half speed
-REG_BG2HOFS = (u8)(scroll_x >> 1);
-REG_BG2HOFS = (u8)((scroll_x >> 1) >> 8);
+bgSetScroll(0, scroll_x, 0);          // BG1 (foreground): full speed
+bgSetScroll(1, scroll_x >> 1, 0);     // BG2 (background): half speed
 ```
 
-## Using gfx4snes
+For a different speed on each band of the screen, see the HDMA parallax in
+[Scrolling](scrolling.md).
 
-Convert PNG images to SNES format using gfx4snes (based on PVSnesLib):
+## Converting pictures
 
-```bash
-# Convert 8x8 tiles with palette output
-gfx4snes -s 8 -p -i tiles.png
-# Output: tiles.pic (tile data), tiles.pal (palette)
+A background picture becomes tiles, a tilemap and a palette with
+@ref tools_opensnes_tileset. Put a settings file beside the picture — its
+first line names the tool — and the build converts it before compiling
+anything; nothing goes in the Makefile:
 
-# Convert 16x16 sprites with palette
-gfx4snes -s 16 -p -i sprites.png
+```toml
+# res/opensnes.png.toml (examples/backgrounds/mode1)
+tool = "opensnes-tileset"
 
-# Convert with metasprite definition (for animation)
-gfx4snes -s 16 -p -T -X 32 -Y 48 -i character.png
-# Output: character.pic, character.pal, character_meta.inc
-
-# Convert against a committed palette (do not re-quantise)
-gfx4snes -s 8 -c master.pal -i tiles.png
+[convert]
+colors = 16
 ```
 
-`-c <file.pal>` imposes a committed palette instead of quantising the
-image's own colours. The build **fails** — naming the offending colour —
-if the image uses any colour not in that palette. This is the fix for the
-"adding one tile re-quantises the whole palette and shifts every existing
-tile's hue" problem: author the palette once, commit it, and impose it on
-every conversion so a new tile can only reuse existing entries.
+The same conversion by hand is `opensnes-tileset convert res/opensnes.png
+--colors 16` (`--save` writes the settings file for you). It writes
+`opensnes.pic` (the unique tiles), `opensnes.map` (the tilemap),
+`opensnes.pal` and `opensnes.inc`, which declares the arrays and a ready
+`BgAsset`:
 
-Include the generated data in your assembly file:
-```asm
-sprite_tiles:
-.incbin "res/sprites.pic"
-sprite_tiles_end:
+```c
+#include "res/opensnes.inc"   /* DECLARE_BG_ASSET(opensnes, BG_16COLORS, SC_32x32) */
 
-sprite_pal:
-.incbin "res/sprites.pal"
-sprite_pal_end:
+bgLoad(0, &opensnes, 0, 0x4000, 0x0000);   /* BG1, palette slot 0, tiles, map */
 ```
+
+The arrays behind it (`opensnes_tiles`, `opensnes_map`, `opensnes_pal`, each
+with `_end`) work with `dmaCopyVram` / `dmaCopyCGram` when you want to place
+each part yourself. Other keys of `[convert]` used by the examples: `bpp = 2`
+and `colors = 4` for a Mode 0 layer, `bpp = 8` for Mode 3,
+`mode = 7` for a Mode 7 plane, `priority = true`, `palette-entry = N` for a
+layer that uses a later palette bank, `pages = true` for a 64x64 scrolling
+map. Sprite sheets go through @ref tools_opensnes_sprite instead
+(@ref tutorial_sprites).
+
+`palette = "master.pal"` imposes a committed palette instead of deriving one
+from the image's own colours. The build **fails** — naming the offending
+colour — if the image uses any colour not in that palette. This is the fix
+for the problem where adding one tile re-derives the whole palette and shifts
+every existing tile's hue: author the palette once, commit it, and impose it
+on every conversion so a new tile can only reuse existing entries
+(`examples/games/rpg/res/tileset.png.toml` does this).
 
 ### Tiles made at run time
 
@@ -248,22 +243,32 @@ their art this way.
 
 Tile data compresses well — it is repetitive by construction — and the SDK
 can decompress it straight into VRAM, so the ROM carries the small form and
-the PPU gets the big one. Add `-z` to the gfx4snes invocation and link the
-module:
+the PPU gets the big one. Add `lz = true` to the picture's settings file
+and link the module:
+
+```toml
+# res/opensnes.png.toml (examples/backgrounds/mode1_lz77)
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+lz = true
+```
 
 ```makefile
 LIB_MODULES := console lzss background sprite
-...
-	$(GFX4SNES) -z -s 8 -o 16 -u 16 -e 0 -p -m -i $<
 ```
 
 ```c
-extern u8 patterns[];      /* the compressed .pic, as produced by -z */
+#include "res/opensnes.inc"   /* opensnes_tiles[] (compressed), opensnes_pal[], opensnes_map[] */
 
 setScreenOff();            /* VRAM writes need forced blank */
-lzssDecodeVram(patterns, VRAM_BG_TILES);
+lzssDecodeVram(opensnes_tiles, VRAM_BG_TILES);
 setScreenOn();
 ```
+
+With `lz = true` the `.inc` declares the arrays only, no `BgAsset`:
+`bgLoad()` would copy the compressed bytes.
 
 The saving is worth measuring rather than assuming. For the artwork in
 `examples/backgrounds/mode1_lz77`, the compressed `.pic` is **652 bytes**
@@ -275,8 +280,8 @@ The format is the familiar GBA-style LZ77: a `0x10` tag byte, a three-byte
 little-endian decompressed length, then flag bytes whose bits select a
 literal or a back-reference. Any tool that emits that layout will do.
 
-@warning `lzssDecodeVram` writes VRAM directly and disables interrupts
-while it runs. Call it during forced blank, with the rest of your setup —
+@warning `lzssDecodeVram` writes VRAM directly and masks IRQs (not the
+NMI) while it runs. Call it during forced blank, with the rest of your setup —
 not from a running frame, where the PPU would drop the writes silently.
 
 ## Example: Complete Background Setup

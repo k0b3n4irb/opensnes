@@ -25,11 +25,11 @@ void hero_animate(void) {
 
 A frame value is an **opaque u16** — the player sequences it without interpreting it. Three consumption patterns:
 
-- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`, `examples/sprites/animated_sprite`);
-- `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMetasprite()` directly (`examples/sprites/metasprite`);
-- `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything).
+- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`);
+- `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMetasprite()` directly (`examples/sprites/aseprite_pipeline`);
+- `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything; `examples/sprites/animated_sprite` passes it to `oamSet()`).
 
-`ANIM_ONCE` clips hold their last frame and raise `animDone(&p)`; pausing is simply not ticking. Per-frame durations use a raw `AnimClip` struct with a `durations` array — see `<snes/anim.h>` for the full API, the layout contract, and the bank $00 note for nearly-full ROMs.
+`ANIM_ONCE` clips hold their last frame and raise `animDone(&p)`; pausing is simply not ticking. Per-frame durations use a raw `AnimClip` struct with a `durations` array — see `<snes/anim.h>` for the full API and the layout contract.
 
 The sections below cover what the module does under the hood — worth understanding, and still the right tool for one-off effects.
 
@@ -132,23 +132,37 @@ Tile numbers for each direction:
 - **Right**: 12, 14, 32 (frame 3 wraps to next VRAM row)
 - **Left**: same tiles as Right, drawn with H-flip
 
-### Converting Sprite Sheets with gfx4snes
+### Converting Sprite Sheets
 
-```bash
-# 16x16 sprites, 4bpp, with palette output
-gfx4snes -s 16 -o 16 -u 16 -p -i sprites.png
+A settings file beside the sheet tells the build to convert it with
+@ref tools_opensnes_sprite (16x16 blocks, one 16-colour palette):
+
+```toml
+# res/sprites.png.toml
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
 ```
 
-Include the output in an assembly data file:
+The generated `res/sprites.inc` declares `sprites_tiles` and `sprites_pal`
+(each with `_end`); the data itself is placed in the asset banks by the
+build:
 
-```asm
-ASSET_SECTION "sprites"          ; templates/assets.inc: any bank but $00
-sprite_tiles: .incbin "res/sprites.pic"
-sprite_tiles_end:
-sprite_pal:   .incbin "res/sprites.pal"
-sprite_pal_end:
-.ends
+```c
+#include "res/sprites.inc"
+
+oamInitGfxSet(sprites_tiles, sprites_tiles_end - sprites_tiles,
+              sprites_pal, sprites_pal_end - sprites_pal,
+              0, 0x0000, OBJ_SIZE16_L32);
 ```
+
+Frames drawn in Aseprite go one step further: `metasprite = [32, 48]` in
+`[sheet]` writes one metasprite per frame (`hero_meta.inc`), and a
+`hero.json.toml` with `[anim]` turns the Aseprite tags into `AnimClip`s
+(`hero_anim.h`). `examples/sprites/aseprite_pipeline` is the worked
+example.
 
 ## Direction-Based Animation
 
@@ -320,9 +334,9 @@ while (1) {
 }
 ```
 
-### Action-Based Animation (LikeMario)
+### Action-Based Animation
 
-The `examples/games/likemario/` example shows how to combine the dynamic sprite engine with action states. Each action maps to specific frame indices:
+The dynamic sprite engine combines with action states by hand: each action maps to specific frame indices. (`examples/games/likemario/` does the same job with `AnimClip` clips and `animTickOam()`, as in the first section; the manual form below is what that call does for you.)
 
 ```c
 #define FRAME_STAND  6
@@ -367,7 +381,7 @@ Key details:
 
 `oamDynamicDraw(id)` looks up the sprite's pixel size from the size pair
 set at init plus an optional per-sprite override (`oamDynamicSetSize`),
-then dispatches to the matching internal routine. Callers no longer
+then dispatches to the matching internal routine. Callers do not
 pick a function by sprite size — the engine knows.
 
 For metasprite groups, `oamMetaDrawDyn(id, x, y, meta, gfx, size_class)`

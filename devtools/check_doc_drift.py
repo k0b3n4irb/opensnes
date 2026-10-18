@@ -179,6 +179,26 @@ def check_roadmap_status(canonical: str) -> list[str]:
     return []
 
 
+# The site's front page (docs/landing/index.html, copied to index.html by
+# `make docs`) shows the version twice. It said v0.35.0 from 0.35 to 0.50
+# (fifteen releases) before the docs review of 2026-10-18 saw it.
+LANDING_VERSION_RE = re.compile(r">v(\d+\.\d+\.\d+)\b")
+
+
+def check_landing_version(canonical: str) -> list[str]:
+    path = repo_path("docs/landing/index.html")
+    if not path.is_file():
+        return []
+    text = path.read_text(encoding="utf-8")
+    found = [(text.count("\n", 0, m.start()) + 1, m.group(1))
+             for m in LANDING_VERSION_RE.finditer(text)]
+    if not found:
+        return ["docs/landing/index.html: no version chip (>vX.Y.Z) found"]
+    return [f"docs/landing/index.html:{line}: shows v{ver} but CHANGELOG.md "
+            f"head is {canonical} — bump it in the same release commit"
+            for line, ver in found if ver != canonical]
+
+
 # --------------------------------------------------------------------------
 # Check 3: examples count consistency across active docs
 # --------------------------------------------------------------------------
@@ -201,6 +221,14 @@ COUNT_PATTERNS = [
     re.compile(r"\((\d{2,3})\s*/\s*\d{2,3}\)"),   # "(56 / 56)" completion claim, numerator
     re.compile(r"\(\d{2,3}\s*/\s*(\d{2,3})\)"),   # ...and its denominator
     re.compile(r"\b\d{2,3}/(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "54/56 examples" (Makefile comment)
+    # Since 2026-10-18 (docs review): README's "88 examples — backgrounds,
+    # sprites…" sat three lines under two correct "85", and the starter's
+    # "ships **82 examples**", the site's "83 worked examples" and its
+    # "83 / example ROMs" tile were in no file the anchor read.
+    re.compile(r"\b(\d{2,3})\s+examples?\s*[—–]", re.IGNORECASE),     # "88 examples — backgrounds…"
+    re.compile(r"\bships\s+(?:\*\*)?(\d{2,3})\s+examples?\b", re.IGNORECASE),  # "ships **82 examples**"
+    re.compile(r"\b(\d{2,3})\s+worked\s+examples?\b", re.IGNORECASE),  # "83 worked examples"
+    re.compile(r'class="n">(\d{2,3})</div>\s*<div class="l">example ROMs'),  # the landing page's stat tile
     # Targeted phrasings only (NOT a bare "\d examples") so prose like
     # "12 examples were flagged" in bank0_budget.md stays a non-match.
 ]
@@ -221,7 +249,8 @@ def _gather_active_doc_paths() -> list[Path]:
     # these are where a newcomer first reads "N examples". docs/ at large is NOT
     # scanned — some tutorials intentionally pin a past state.
     for rel in ("examples/README.md", "docs/EXAMPLES_BY_CATEGORY.md",
-                "docs/LEARNING_PATH.md", "docs/mainpage.md"):
+                "docs/LEARNING_PATH.md", "docs/mainpage.md",
+                "starter/README.md", "docs/landing/index.html"):
         p = repo_path(rel)
         if p.is_file():
             paths.append(p)
@@ -523,7 +552,48 @@ _STALE_EXAMPLE_CLAIMS = [
     (re.compile(r"spills? to bank 1|spill to bank \$01", re.IGNORECASE), "since #127.3 const data lives in the asset banks and is read far"),
     (re.compile(r"must be in bank \$00 WRAM", re.IGNORECASE), "a plain global sits below $2000 by the compiler's rule; the lib reads the pointer's bank"),
     (re.compile(r"due to a compiler quirk", re.IGNORECASE), "name the bug or drop the claim"),
+    # 2026-10-15, examples review before 1.0
+    (re.compile(r"refreshed every scanline", re.IGNORECASE),
+     "an HDMA register keeps its value: \"write once, then wait\" (snesdev wiki); repeat mode is for values that change"),
+    (re.compile(r"bank-\$00-hardcoded", re.IGNORECASE),
+     "every C read of const data is a far read (#121, #127.3)"),
+    (re.compile(r"right-to-left (?:push|order)|cproc right-to-left", re.IGNORECASE),
+     "cc65816 pushes arguments left to right (compiler/ABI.md)"),
+    (re.compile(r"CANNOT be read from C"), "C reads const data far and RAM above $2000 through FAR"),
+    (re.compile(r"\b(?:gfx4snes|tmx2snes|wav2brr|aseprite2snes|font2snes|img2snes|palplan)\b"),
+     "a retired converter: the opensnes-* tools replace it (docs/tools/legacy.md)"),
+    (re.compile(r"make -C \S+ smconv|\bsmconv\s+-[a-z]"),
+     "music is built by opensnes-music from res/soundbank.toml"),
 ]
+
+
+def _example_build_output(path: Path) -> bool:
+    """A file the build writes in an example's folder (the compiler's .c.asm,
+    the wrappers, the generated assets), not one somebody wrote."""
+    n = path.name
+    return (n.endswith((".c.asm", ".wrap.asm", "_data.as")) or n in (
+        "project_hdr.asm", "project_sa1_boot.asm", "assets_gen.asm", "soundbank.asm")
+        or "/build/" in path.as_posix() or not _git_tracked(path))
+
+
+_TRACKED: set[str] | None = None
+
+
+def _git_tracked(path: Path) -> bool:
+    """Whether git tracks the file (an untracked file in an example is a build
+    output); everything counts as tracked outside a git checkout."""
+    global _TRACKED
+    if _TRACKED is None:
+        import subprocess
+        try:
+            out = subprocess.run(["git", "ls-files", "examples"], cwd=repo_path(),
+                                 capture_output=True, text=True, check=True).stdout
+            _TRACKED = set(out.splitlines())
+        except (OSError, subprocess.CalledProcessError):
+            _TRACKED = set()
+    if not _TRACKED:
+        return True
+    return path.relative_to(repo_path()).as_posix() in _TRACKED
 
 
 def check_example_stale_claims() -> list[str]:
@@ -531,7 +601,9 @@ def check_example_stale_claims() -> list[str]:
     root = repo_path("examples")
     if not root.is_dir():
         return []
-    for path in sorted(p for p in root.rglob("*") if p.suffix in (".c", ".h", ".md") and p.is_file()):
+    for path in sorted(p for p in root.rglob("*")
+                       if (p.suffix in (".c", ".h", ".md", ".asm") or p.name == "Makefile")
+                       and p.is_file() and not _example_build_output(p)):
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
         # a claim may wrap onto the next line of a comment ("assumes\n * bank $00"):
         # match each line joined with the next, comment leaders stripped
@@ -971,9 +1043,33 @@ def modules_missing_from_readme(readme_text: str, declared: list[str]) -> list[s
     return [mod for mod in declared if mod not in words]
 
 
+_PAR_MODULES_RE = re.compile(r"@par Modules Used(.*?)(?=@par |@see|\*/)", re.S)
+
+
+def modules_missing_from_par(main_text: str, declared: list[str]) -> list[str] | None:
+    """None when main.c has no `@par Modules Used`; else the declared modules
+    the paragraph does not name."""
+    m = _PAR_MODULES_RE.search(main_text)
+    if not m:
+        return None
+    words = set(re.findall(r"[a-z0-9_]+", m.group(1)))
+    return [mod for mod in declared if mod not in words]
+
+
 def check_example_modules() -> list[str]:
     root = repo_path()
     drifts: list[str] = []
+    # main.c's `@par Modules Used` too (2026-10-15): eleven omitted a module
+    # their Makefile links, which the README check could not see
+    for mk in sorted(repo_path("examples").glob("*/*/Makefile")):
+        main = mk.parent / "main.c"
+        declared = declared_lib_modules(mk.read_text(encoding="utf-8"))
+        if not declared or not main.is_file():
+            continue
+        missing = modules_missing_from_par(main.read_text(encoding="utf-8"), declared)
+        if missing:
+            drifts.append(f"{main.relative_to(root).as_posix()}: '@par Modules Used' omits "
+                          f"{', '.join(missing)}, which the Makefile links")
     for mk in sorted(repo_path("examples").glob("*/*/Makefile")):
         readme = mk.parent / "README.md"
         if not readme.is_file():
@@ -1077,13 +1173,14 @@ def bench_table_drifts(page: str, baseline: dict[str, int]) -> list[str]:
 
 
 # --------------------------------------------------------------------------
-# Check 15: the header -> tutorial map of docs/README.md (added 2026-10-05,
-# docs audit rec 8). The page said the table was "generated"; nothing checked
+# Check 15: the header -> tutorial map of docs/API_INDEX.md (added 2026-10-05,
+# docs audit rec 8; the map lived in docs/README.md until lot 6 of the docs
+# plan, 2026-10-14). The page said the table was "generated"; nothing checked
 # it. Every public header must have a row, every header a row names must
 # exist, and every tutorial a row links must exist.
 # --------------------------------------------------------------------------
 
-HEADER_MAP_DOC = "docs/README.md"
+HEADER_MAP_DOC = "docs/API_INDEX.md"
 HEADER_MAP_HEADING = "## Header → tutorial map"
 
 
@@ -1171,6 +1268,118 @@ def check_removed_api_names() -> list[str]:
     return drifts
 
 
+# Anchor 18 (2026-10-14): user pages describe the present. A dated history
+# phrase ("until 2026-10-05 it did X", "fixed 2026-09-18", "since
+# 2026-05-09") and a link into the maintainer notes (.claude/) belong in the
+# CHANGELOG and the notes, not in a page a game developer reads. The
+# documentation review of that day took 600 such lines out.
+_HISTORY_SCAN_GLOBS = ["docs/**/*.md", "README.md", "KNOWN_LIMITATIONS.md",
+                       "PHILOSOPHY.md", "ROADMAP.md", "examples/README.md",
+                       # the examples are user pages too (2026-10-15)
+                       "examples/*/README.md", "examples/*/*/README.md", "examples/*/*/main.c"]
+_HISTORY_EXEMPT = {"docs/UPGRADING.md", "docs/MIGRATING_FROM_PVSNESLIB.md",
+                   "docs/tools/luna.md"}
+_HISTORY_RX = re.compile(r"\b(?:[Uu]ntil|[Ss]ince|[Ff]ixed(?: on)?|[Rr]esolved)\s+20\d\d-\d\d")
+_NOTES_RX = re.compile(r"\.claude/")
+
+
+def check_no_history_in_user_docs() -> list[str]:
+    drifts: list[str] = []
+    seen: set[Path] = set()
+    for g in _HISTORY_SCAN_GLOBS:
+        for path in sorted(repo_path().glob(g)):
+            if not path.is_file() or path in seen:
+                continue
+            seen.add(path)
+            rel = path.relative_to(repo_path()).as_posix()
+            if rel in _HISTORY_EXEMPT or "/build/" in rel or "doxygen-awesome" in rel:
+                continue
+            for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                m = _HISTORY_RX.search(line)
+                if m:
+                    drifts.append(f"{rel}:{lineno}: `{m.group(0)}…` is history; a user page says how "
+                                  f"things are now (the CHANGELOG keeps what changed when)")
+                if _NOTES_RX.search(line):
+                    drifts.append(f"{rel}:{lineno}: a user page points into `.claude/` (maintainer "
+                                  f"notes); cite a user document or nothing")
+    return drifts
+
+
+# Anchor 19 (2026-10-15): a file an example's comment names exists. Twenty-six
+# examples said a symbol was "defined in data.asm" in a folder with no
+# data.asm: the assets had moved to settings files and the comments stayed.
+_NAMED_FILE_RX = re.compile(r"\b(?:(?:defined|declared|generated|lives?|loaded|included) (?:in|from|by)"
+                            r"|(?:from|in)) "
+                            r"`?((?:[\w-]+/)*[\w-]+\.(?:asm|s|inc|bin|c|h|as|pic|pal|map))\b")
+_GENERATED_EXT = (".pic", ".pal", ".map", ".inc", ".as", ".bin", ".h", ".cmap", ".brr")
+
+
+def named_file_missing(example: Path, name: str) -> bool:
+    """Whether a file named by a comment of `example` is absent: not in the
+    folder (or res/), and not an output of a settings file there."""
+    for base in (example, example / "res"):
+        if (base / name).is_file() or (base / Path(name).name).is_file():
+            return False
+    for sdk in ("templates", "lib/include", "lib/include/snes", "lib/source"):
+        if (repo_path(sdk) / name).is_file():
+            return False                # a file of the SDK
+    if name.endswith(_GENERATED_EXT):
+        stem = Path(name).name.split(".")[0].split("_")[0]
+        for base in (example, example / "res"):
+            if any(base.glob(f"{stem}*.toml")):
+                return False
+    return True
+
+
+def check_named_files() -> list[str]:
+    drifts: list[str] = []
+    for main in sorted(repo_path("examples").glob("*/*/main.c")):
+        ex = main.parent
+        for path in sorted(p for p in ex.iterdir() if p.suffix in (".c", ".h") and _git_tracked(p)):
+            for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+                for m in _NAMED_FILE_RX.finditer(line):
+                    if named_file_missing(ex, m.group(1)):
+                        drifts.append(f"{path.relative_to(repo_path()).as_posix()}:{lineno}: names "
+                                      f"`{m.group(1)}`, which is not in the example and no settings "
+                                      f"file there produces it")
+    return drifts
+
+
+# Anchor 5, second half (2026-10-15): every example is cited by the learning
+# path or by its category README. Thirty-one examples were on neither path
+# (tetris among them) and eighteen missing from their category's table.
+LEARNING_PATH_DOC = "docs/LEARNING_PATH.md"
+
+
+def example_citation_gaps(examples: list[str], path_text: str, readmes: dict) -> list[str]:
+    """The examples (`cat/name`) the learning path does not name
+    (`examples_cat_name`) and their category README does not link
+    (`](name/)`)."""
+    gaps = []
+    for ex in examples:
+        cat, name = ex.split("/")
+        in_path = re.search(rf"\bexamples_{cat}_{name}\b", path_text) is not None
+        in_readme = f"]({name}/)" in readmes.get(cat, "")
+        if not in_path or not in_readme:
+            gaps.append(ex + (" (learning path)" if not in_path else "")
+                        + (" (its category README)" if not in_readme else ""))
+    return gaps
+
+
+def check_examples_cited() -> list[str]:
+    root = repo_path("examples")
+    path = repo_path(LEARNING_PATH_DOC)
+    if not root.is_dir() or not path.is_file():
+        return []
+    examples = sorted(m.parent.relative_to(root).as_posix() for m in root.glob("*/*/main.c"))
+    readmes = {c.name: (c / "README.md").read_text(encoding="utf-8")
+               for c in root.iterdir() if (c / "README.md").is_file()}
+    return [f"examples/{g.split(' ')[0]}: not cited by"
+            f"{g[len(g.split(' ')[0]):]} — every example is on the learning path "
+            f"and in its category's table" for g in
+            example_citation_gaps(examples, path.read_text(encoding="utf-8"), readmes)]
+
+
 def check_header_map() -> list[str]:
     drifts: list[str] = []
     doc = repo_path(HEADER_MAP_DOC)
@@ -1182,6 +1391,9 @@ def check_header_map() -> list[str]:
         return [f"{HEADER_MAP_DOC}: the '{HEADER_MAP_HEADING}' section is gone — "
                 f"the sentinel (anchor 15) checks it; restore it or retire the check"]
     section = text[text.index(HEADER_MAP_HEADING):]
+    nxt = section.find("\n## ", len(HEADER_MAP_HEADING))
+    if nxt != -1:
+        section = section[:nxt]
     rows = [l for l in section.splitlines() if l.startswith("| `")]
     named: set[str] = set()
     for line in rows:
@@ -1224,6 +1436,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts: list[str] = []
     all_drifts.extend(check_snes_h_version(canonical_ver))
     all_drifts.extend(check_roadmap_status(canonical_ver))
+    all_drifts.extend(check_landing_version(canonical_ver))
     all_drifts.extend(check_examples_count(canonical_n))
     all_drifts.extend(check_phantom_api())
     all_drifts.extend(check_abi_signatures())
@@ -1241,6 +1454,9 @@ def run_checks(quiet: bool) -> int:
     all_drifts.extend(check_header_map())
     all_drifts.extend(check_removed_api_names())
     all_drifts.extend(check_user_build_has_no_interpreter())
+    all_drifts.extend(check_no_history_in_user_docs())
+    all_drifts.extend(check_named_files())
+    all_drifts.extend(check_examples_cited())
 
     if all_drifts:
         print("DRIFT DETECTED:", file=sys.stderr)

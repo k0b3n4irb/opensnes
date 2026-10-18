@@ -24,8 +24,8 @@
  * - audioPlaySampleEx(): volume/pan/pitch per play, voices
  *   round-robin allocated by the engine
  * - ADSR set once per voice at init — notes ring and die naturally
- * - Echo: audioSetEcho() clears and sizes the ring, FIR tap 0,
- *   audioEnableEcho() routes voices in
+ * - Echo: audioSetEcho() clears and sizes the ring once at init, FIR tap 0,
+ *   audioEnableEcho() / audioDisableEcho() route the voices in and out
  *
  * @par What to Observe
  * Every button plays immediately, polyphonic up to 8 voices; START
@@ -35,7 +35,7 @@
  * console, audio, input
  *
  * @see lib/include/snes/audio.h — the full engine API
- * @see .claude/notes/chantiers/audio_v2.md — engine design
+ * @see docs/tutorials/audio_samples.md — the audio module
  */
 
 #include <snes.h>
@@ -104,6 +104,17 @@ int main(void) {
         audioSetADSR(i, AUDIO_ATTACK_INSTANT, 5, 6, 10);
     }
 
+    /* The hall, configured once while the screen is off (audioSetEcho()
+     * blocks for up to a quarter of a second: the sound chip takes a new
+     * delay only when the ring it is running ends) and left off: START
+     * routes the voices into it and out again, which costs one command. */
+    {
+        static const s8 hall_fir[8] = { 127, 0, 0, 0, 0, 0, 0, 0 };
+        audioSetEcho(5, 70, 35, 35);
+        audioSetEchoFilter(hall_fir);
+        audioDisableEcho();
+    }
+
     master_vol = AUDIO_VOL_MAX;
     setColor(0, RGB(4, 4, 8));
     setScreenOn();
@@ -146,9 +157,6 @@ int main(void) {
                 echo_on = 0;
                 setColor(0, RGB(4, 4, 8));
             } else {
-                static const s8 hall_fir[8] = { 127, 0, 0, 0, 0, 0, 0, 0 };
-                audioSetEcho(5, 70, 35, 35);
-                audioSetEchoFilter(hall_fir);
                 audioEnableEcho(0xFF);
                 echo_on = 1;
                 setColor(0, RGB(10, 4, 16));

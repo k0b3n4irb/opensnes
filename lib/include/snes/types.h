@@ -141,7 +141,7 @@ typedef unsigned int u32;
  * function (library, runtime helpers such as multiplication, other
  * non-RAM_CODE functions) nor read const data, which lives in ROM. A project
  * with no window fails to assemble with a message naming the function.
- * @see docs/tutorials/superfx.md
+ * @see docs/tutorials/superfx_advanced.md
  */
 #ifdef __OPENSNES__
 #define RAM_CODE __ramcode

@@ -69,8 +69,8 @@
 #define ENTRY_BYTES   3
 
 /** @brief Channel of the hand-built table (krom's channel 0) */
-#define CH_HAND       HDMA_CHANNEL_2   /* not 0 (dmaCopyVram) nor 1 (the NMI's text flush) */
-/** @brief Channel of the hdma module's wave (7 belongs to the OAM DMA) */
+#define CH_HAND       HDMA_CHANNEL_2   /* not 0 (dmaCopyVram) nor 7 (the NMI's DMA) */
+/** @brief Channel of the hdma module's wave (7 carries the NMI's DMA) */
 #define CH_LIB        HDMA_CHANNEL_6
 
 /** @brief Module-mode amplitude: default, bounds and step, in pixels */

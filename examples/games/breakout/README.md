@@ -239,12 +239,10 @@ static void run_frame(void) {
 - **Getting a pink flash on level change?** Your overlapping tilemap DMAs are split
   across two VBlanks. Put them both after the same `WaitForVBlank()` call.
 
-- **Sprite 0 looks glitched?** Known issue related to WRAM/OAM mirroring.
-  Just start at index 1 and hide sprite 0 with `oamHide(0)`. Not glamorous, but it works.
-
-- **Why `mycopy()` instead of `memcpy()`?** Standard memcpy can have issues with
-  cross-bank addressing on the 65816. The three-line `while(len--)` version is dumb
-  but reliable for bank 0 addresses.
+- **Why `mycopy()` instead of `memcpy()`?** Either works: `mycopy()` takes a
+  `const` (far) source and a `FAR` destination, and `memcpy()` of the `string`
+  module follows the 24-bit pointer on both sides too. The example keeps its
+  three-line loop so that it links one module less.
 
 - **Why are loop variables global?** `static u8 i, j, k;` at file scope reduces stack
   pressure. On the 65816, stack-relative addressing is slower than direct/zero-page access.
@@ -316,18 +314,23 @@ cycling colors), and C arrays can't be reliably placed at specific addresses.
 ### Pre-Converted Assets
 
 The `res/` folder contains `.dat` files — raw binary data ready for DMA to VRAM.
-These were originally converted from PVSnesLib's asset pipeline. No `gfx4snes` step
-in the Makefile because the conversion was done once, offline, and the results checked
+These were originally converted from PVSnesLib's asset pipeline. No conversion step
+runs at build time because the conversion was done once, offline, and the results checked
 into the repository.
 
-For a new game, you'd typically add a gfx4snes rule:
+For a new game, you'd typically put a settings file beside each PNG:
 
-```makefile
-GFXSRC := res/tiles.png res/sprites.png
+```toml
+# res/tiles.png.toml
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
 ```
 
-This tells `make/common.mk` to run `gfx4snes` on each PNG, producing `.pic` (tiles),
-`.pal` (palette), and `.map` (tilemap) files.
+This tells `make/common.mk` to run `opensnes-tileset` on the PNG, producing `.pic`
+(tiles), `.pal` (palette), `.map` (tilemap) and a `.inc` declaring them; a sprite sheet
+names `opensnes-sprite` instead.
 
 ### Why These Modules?
 

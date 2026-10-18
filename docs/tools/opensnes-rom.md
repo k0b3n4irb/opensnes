@@ -14,14 +14,17 @@ opensnes-rom check game.sfc --bank0-fail 0 --ram-fail 512    # what make/common.
 opensnes-rom check game.sfc --json
 ```
 
-Six checks, in this order; the build fails on the first four kinds of
-failure, the others are information:
+Seven checks, in this order; every one but the asset line can fail the
+build. A ROM the build's check refuses is deleted, so that a second `make`
+does not take it for up to date: run `opensnes-rom check` on its `.sym`,
+which stays.
 
 | Check | What it refuses | Why it is silent on hardware |
 |---|---|---|
-| **bank $00 ROM** | nothing by default: it reports the free bytes of the code bank and how much code the linker placed in the next banks (code runs from any bank). `--bank0-fail N` fails under N free bytes, for a project that wants it; asset payload that sits in bank $00 is named | — (until 2026-10-10 this was a failure under 1024 bytes, from the time C const data had to live there) |
+| **bank $00 ROM** | nothing by default: it reports the free bytes of the code bank and how much code the linker placed in the next banks (code runs from any bank). `--bank0-fail N` fails under N free bytes, for a project that wants it; asset payload that sits in bank $00 is named | — |
 | **C RAM band** | a RAM section that crosses or sits past `$2000`; fewer than `--ram-fail` bytes free; warns under `--ram-warn` with the three largest sections | plain C RAM addressing is bank-$00-implicit; above `$1FFF` it is wrong-banked or hits the registers (`FAR` is the way above) |
 | **data-init sentinel** | `DataInitEnd` not at the end of `.data_init` | an object linked after `data_init_end.o` has globals that boot uninitialised |
+| **SA-1 boot** | `SA1Start` outside the ROM of bank $00 (an SA-1 ROM only) | the SA-1 reset vector is 16-bit: the SA-1 never runs a line, the S-CPU waits for it, and a SUPERFREE boot section gets there as soon as bank $00 fills |
 | **bank-blind reads** | a symbol read with 16-bit addressing (`lda.w sym`, `lda.w #sym` without `#:sym`) that the linker placed in bank $01+ | the read returns garbage; pass the data as a far pointer or keep it in bank $00 |
 | **NMI / WRAM port** | a write to `$2180-$2183` in a function reachable from `NmiHandler` or from a callback given to `nmiSet` | a mid-sequence interrupt corrupts the port's address and the main thread writes to the wrong place |
 | **assets** | nothing: one line with the VRAM and CGRAM weight of the converted graphics on disk | an inventory, not a budget; `opensnes budget` measures the running scene |

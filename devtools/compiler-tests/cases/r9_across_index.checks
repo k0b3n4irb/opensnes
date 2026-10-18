@@ -1,0 +1,6 @@
+# peephole_r9_loop off: this case pins the rules underneath it (r9_loop_pointer pins the loop form)
+env QBE_NO_PEEP_R9LOOP=1
+# q is staged once per row (develop staged it before each of its three reads).
+in column: absent \tsta\.b tcc__r9\n[\s\S]*\tsta\.b tcc__r9\n
+in column: present \tldy\.w #2\n\tora \[tcc__r9\],y\n
+in column: present \tldy\.w #4\n\tora \[tcc__r9\],y\n

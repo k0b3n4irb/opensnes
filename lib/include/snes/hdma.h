@@ -62,14 +62,14 @@
  * // In main loop, HDMA runs automatically each frame
  * @endcode
  *
- * @warning **Do NOT use HDMA_CHANNEL_7** — the NMI handler uses DMA channel 7
- *          for OAM transfers every frame, which destroys any HDMA setup on that
- *          channel. Channel 0 is the DMA helpers' (dmaCopyVram and friends
- *          rewrite its registers at every call) and channel 1 is the NMI's
- *          text flush (every VBlank after a text write). Safe HDMA channels:
- *          **2-6**; the examples use 2 and 6. On a Super FX build,
- *          gsuSetupHdmaBlanking() also takes channel 1 for its INIDISP
- *          letterbox while the bands are on (superfx.h).
+ * @warning **Do NOT use HDMA_CHANNEL_7** — every DMA of the NMI handler runs
+ *          on channel 7 (the OAM transfer, the text flush, the dynamic sprite
+ *          uploads), which destroys any HDMA setup on that channel. Channel 0
+ *          is the DMA helpers' (dmaCopyVram and friends rewrite its registers
+ *          at every call). Safe HDMA channels: **1-6**; the examples use
+ *          all six. On a Super FX build, gsuSetupHdmaBlanking() takes channel 1
+ *          for its INIDISP letterbox while the bands are on (superfx.h).
+ *          Pinned by testing/fixtures/libtests_dma_channels.
  * @note HDMA tables must be in ROM or bank $7E RAM.
  *
  * ## Bank byte
@@ -97,8 +97,7 @@
  * then wait for X scanlines; $81-$FF: write every scanline for X-$80
  * scanlines"; in repeat mode "the total size of the data section is the
  * number of scanlines multiplied by the number of bytes in the pattern"), and
- * anomie's register doc, same wording. See also
- * `.claude/rules/hardware_claims.md`.
+ * anomie's register doc, same wording.
  *
  * - constant over a band (a colour band, a fixed split scroll): non-repeat
  * - different every line (wave, Mode 7 perspective): repeat, `$81` per line
@@ -133,7 +132,8 @@
 #define HDMA_CHANNEL_5  5
 /** @brief HDMA channel 6 (recommended for HDMA — never used by the runtime) */
 #define HDMA_CHANNEL_6  6
-/** @brief HDMA channel 7 — **reserved for the OAM DMA**, do not use for HDMA
+/** @brief HDMA channel 7 — **reserved for the NMI handler's DMA** (OAM,
+ *  text flush, dynamic sprites), do not use for HDMA
  *  (see the @warning at the top of this header) */
 #define HDMA_CHANNEL_7  7
 
@@ -232,7 +232,16 @@
 /** @brief Destination: Fixed color ($2132) */
 #define HDMA_DEST_COLDATA   0x32
 
-/** @brief Destination: INIDISP brightness ($2100) */
+/**
+ * @brief Destination: INIDISP brightness ($2100)
+ *
+ * @warning Do not stream INIDISP with this value: a one-register HDMA with
+ *          B-bus address $00 can make a general DMA fail on an S-CPU-A
+ *          console. Use `hdmaSetup(ch, HDMA_MODE_2REG, 0xFF, table)`
+ *          instead, which writes $21FF (nothing) then $2100, with entries
+ *          `count, value, value` and $8F (not $80) for a blank band. See
+ *          KNOWN_LIMITATIONS.md, "An HDMA to INIDISP".
+ */
 #define HDMA_DEST_INIDISP   0x00
 
 /** @brief Destination: BGMODE ($2105) — mid-frame BG mode switch (F-Zero split) */
@@ -263,7 +272,7 @@
  * Configures an HDMA channel with the specified parameters. The channel
  * is NOT enabled automatically - call hdmaEnableMask() to start it.
  *
- * @param channel HDMA channel (0-7, use HDMA_CHANNEL_6 or lower — 7 belongs to the NMI OAM DMA)
+ * @param channel HDMA channel (0-7, use HDMA_CHANNEL_6 or lower — 7 carries the NMI handler's DMA)
  * @param mode Transfer mode (HDMA_MODE_*)
  * @param destReg Destination B-bus register (low byte of $21xx address)
  * @param table Pointer to HDMA table in ROM or RAM
@@ -453,7 +462,7 @@ void hdmaWaveInit(void);
  * - Heat shimmer
  * - Dream/flashback sequences
  *
- * @param channel HDMA channel to use (6 or lower; 7 belongs to the NMI OAM DMA)
+ * @param channel HDMA channel to use (6 or lower; 7 carries the NMI handler's DMA)
  * @param bg Background layer to affect (0=BG1, 1=BG2, 2=BG3)
  * @param amplitude Wave amplitude in pixels (1-60, clamped internally)
  * @param frequency Wave frequency (1-16, higher = tighter waves). Period = 256/frequency scanlines.
@@ -513,7 +522,14 @@ void hdmaWaveSetSpeed(u8 speed);
  * - Spotlight / vignette effects
  * - Underwater depth dimming
  *
- * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
+ * @note The channel runs in HDMA_MODE_2REG to B-bus address $FF: it writes
+ *       $21FF (nothing), then $2100, so each brightness appears twice in the
+ *       table. This avoids the S-CPU-A DMA erratum of a one-register HDMA
+ *       to INIDISP (KNOWN_LIMITATIONS.md, "An HDMA to INIDISP"). The table
+ *       is 169 bytes of bank $00 RAM (56 entries of 3 bytes, then the end
+ *       marker).
+ *
+ * @param channel HDMA channel (6 or lower; 7 carries the NMI handler's DMA)
  * @param topBrightness Brightness at top of screen (0-15, 15=full)
  * @param bottomBrightness Brightness at bottom of screen (0-15)
  *
@@ -523,9 +539,6 @@ void hdmaWaveSetSpeed(u8 speed);
  *
  * Called again while the effect runs, it only moves the channel's table
  * pointer, which HDMA reads at the next frame: the change lands whole.
- * (Until 2026-10-03 the channel was set up again, which restarted the table
- * at the next HBlank — one frame with the top of the table on the bottom of
- * the screen.)
  */
 void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness);
 
@@ -549,7 +562,7 @@ void hdmaBrightnessGradientStop(u8 channel);
  * - Water depth color shifts
  * - Background atmosphere effects
  *
- * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
+ * @param channel HDMA channel (6 or lower; 7 carries the NMI handler's DMA)
  * @param colorIndex CGRAM color index to modify (0-255)
  * @param topColor 15-bit SNES color at top of screen (use RGB() macro)
  * @param bottomColor 15-bit SNES color at bottom of screen
@@ -563,9 +576,6 @@ void hdmaBrightnessGradientStop(u8 channel);
  *
  * Called again while the effect runs, it only moves the channel's table
  * pointer, which HDMA reads at the next frame: the change lands whole.
- * (Until 2026-10-03 the channel was set up again, which restarted the table
- * at the next HBlank — one frame with the top of the table on the bottom of
- * the screen.)
  */
 void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor);
 
@@ -590,7 +600,7 @@ void hdmaColorGradientStop(u8 channel);
  * - Spotlight effects
  * - Circular vignette
  *
- * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
+ * @param channel HDMA channel (6 or lower; 7 carries the NMI handler's DMA)
  * @param layers Layer bitmask to apply window masking (TM_BG1, TM_BG2, etc.)
  * @param centerX Horizontal center of circle (0-255)
  * @param centerY Vertical center of circle (0-223)
@@ -611,9 +621,6 @@ void hdmaColorGradientStop(u8 channel);
  *
  * Called again while the effect runs, it only moves the channel's table
  * pointer, which HDMA reads at the next frame: the change lands whole.
- * (Until 2026-10-03 the channel was set up again, which restarted the table
- * at the next HBlank — one frame with the top of the table on the bottom of
- * the screen.)
  *
  * While it runs the effect owns W12SEL, W34SEL, WOBJSEL and TMW and writes
  * them directly: the window module's own shadows do not see those writes,
@@ -650,7 +657,7 @@ void hdmaIrisWipeStop(u8 channel);
  * simulating underwater refraction or heat haze. Uses the wave system's
  * double-buffered tables internally.
  *
- * @param channel HDMA channel (6 or lower; 7 belongs to the NMI OAM DMA)
+ * @param channel HDMA channel (6 or lower; 7 carries the NMI handler's DMA)
  * @param bg Background layer (0=BG1, 1=BG2, 2=BG3)
  * @param amplitude Maximum ripple amplitude at bottom of screen (1-60 pixels, clamped)
  * @param speed Animation speed (1=slow, 4=fast)

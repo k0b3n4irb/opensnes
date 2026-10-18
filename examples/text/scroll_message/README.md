@@ -1,6 +1,6 @@
 # Scroll a message
 
-**Family 1 — Text · rung 1.4 (move text)**
+**Text · move text**
 
 The "make it move" rung of the Text ladder. It prints one line, then scrolls
 the whole text background horizontally every frame, so the message marches

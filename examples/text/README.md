@@ -10,10 +10,11 @@ These examples teach the tile/tilemap fundamentals that underpin all SNES graphi
 
 A ladder of developer questions: *how do I show text? → how do I move it?*
 
-| Example | Rung | Description |
-|---------|------|-------------|
-| [print_string](print_string/) | 1.1 | Print a string with the built-in font (`textModeInit` + `textPrintAt`) |
-| [scroll_message](scroll_message/) | 1.4 | Move text -- scroll the text BG layer for a marquee (`bgSetScroll`) |
+| Example | Description |
+|---------|-------------|
+| [print_string](print_string/) | Print a string with the built-in font (`textModeInit` + `textPrintAt`) |
+| [scroll_message](scroll_message/) | Move text -- scroll the text BG layer for a marquee (`bgSetScroll`) |
+| [pixel_text](pixel_text/) | Proportional text composed at the pixel in a 2bpp layer |
 
 > Under the hood — how a glyph is raw 2bpp bitplanes + a tilemap — lives in
 > [`fundamentals/text_glyphs`](../fundamentals/text_glyphs/).
@@ -23,8 +24,8 @@ A ladder of developer questions: *how do I show text? → how do I move it?*
 ### How Text Works on SNES
 
 ```
-Font Image (PNG) --> gfx4snes/font2snes --> Tile Data (VRAM)
-                                        --> Tilemap (VRAM)
+Font Image (PNG) --> opensnes-text   --> Tile Data (VRAM)
+  (or the built-in font of textLoadFont) --> Tilemap (VRAM)
                                                 |
                                         PPU renders screen
 ```

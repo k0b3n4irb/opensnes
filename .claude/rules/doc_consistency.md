@@ -43,6 +43,9 @@ opt-in list.
    `examples/`. Caught historically as GETTING_STARTED sending newcomers
    to `memory/superfx_3d` (real home: `graphics/effects/superfx_3d`) and
    ROADMAP listing a `sa1_speed` example that never existed.
+   Since 2026-10-15 the other way round too: every example is named by
+   `docs/LEARNING_PATH.md` and linked by its category README — thirty-one
+   examples were on no path (tetris among them).
 
 6. **Per-category counts in `examples/README.md`'s table** must match the
    per-directory `main.c` count, and their sum the corpus total. Caught
@@ -99,9 +102,10 @@ opt-in list.
     did, a string spill that #127.3 ended, and a stale cost figure
     (examples audit, F_examples.md PF4). Explain history in other words.
 
-15. **The header → tutorial map of `docs/README.md`** (since 2026-10-05):
-    every public header of `lib/include/snes/` has a row, and every header
-    and tutorial a row names exists. The page called the table "generated"
+15. **The header → tutorial map of `docs/API_INDEX.md`** (since 2026-10-05;
+    in `docs/README.md` until 2026-10-14): every public header of
+    `lib/include/snes/` has a row, and every header and tutorial a row names
+    exists. The page called the table "generated"
     while nothing produced or checked it (docs audit, E_docs.md rec 8).
     `CLAUDE.md` joined the files whose example count is checked (anchor 3).
 
@@ -120,6 +124,35 @@ opt-in list.
     became `opensnes upgrade`, in the CLI (compiled the same day), the next day
     (`.claude/rules/two_audiences.md`, rule 1). Comments may tell the
     history; a call may not come back.
+
+18. **User pages describe the present** (since 2026-10-14): in `docs/`,
+    `README.md`, `KNOWN_LIMITATIONS.md`, `PHILOSOPHY.md`, `ROADMAP.md` and
+    `examples/README.md`, no dated history phrase (`until / since / fixed /
+    resolved 20YY-MM`) and no link into `.claude/`. The documentation review
+    of that day took about 600 lines of history out of the user pages
+    (KNOWN_LIMITATIONS 866 → 425 lines, ROADMAP 360 → 76): fixed bugs are the
+    CHANGELOG's, maintainer notes are the maintainers'. `UPGRADING.md`, the
+    PVSnesLib migration guide and the generated `tools/luna.md` are exempt.
+    Since 2026-10-15 the examples are user pages too: their `README.md` and
+    `main.c` are read by this anchor.
+
+19. **A file an example's comment names exists** (since 2026-10-15): "defined
+    in data.asm", "from data.asm", "lives in res/x.bin" — the file is in the
+    example's folder, is an output of a settings file there, or is a file of
+    the SDK. Caught as twenty-six comments naming a data.asm their folder no
+    longer had (the assets had moved to settings files) — examples review
+    before 1.0, which also extended anchor 9 to `main.c`'s `@par Modules
+    Used` and anchor 14 to the examples' `.asm` and Makefiles, with the
+    motifs "refreshed every scanline", "bank-$00-hardcoded", "right-to-left
+    push", "CANNOT be read from C", the retired converters' names and smconv
+    run by hand.
+
+20. **The site's front page shows the release** (since 2026-10-18):
+    every `>vX.Y.Z` chip of `docs/landing/index.html` must equal the
+    `CHANGELOG.md` head, like the version macros (anchor 1). Caught as the
+    page saying v0.35.0, 83 examples and seven retired converters fifteen
+    releases later; anchor 3 reads its example counts (and the starter's
+    README) since the same day.
 
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —

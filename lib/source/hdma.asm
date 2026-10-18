@@ -401,7 +401,7 @@ hdmaSetTable:
 .ENDS
 
 .RAMSECTION ".hdma_brightness" BANK 0 SLOT 1
-    hdma_brightness_table: dsb 113   ; Brightness gradient (56 entries x 2 + 1)
+    hdma_brightness_table: dsb 169   ; Brightness gradient (56 entries x 3 + 1: count, then the value to $21FF and to $2100)
 .ENDS
 
 .RAMSECTION ".hdma_color" BANK 0 SLOT 1

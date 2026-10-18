@@ -17,15 +17,16 @@ machine actually paid.
 
 ## The unit: master cycles per frame
 
-luna reports **master clocks** (mclk). One NTSC frame is about **357 400**
-of them:
+luna reports **master clocks** (mclk). One NTSC frame is **357,368** of
+them (the exact figures, with their sources, are on [Measured frame
+costs](../PERF.md)):
 
 | Quantity | Value |
 |---|---|
 | Master clock | 21.477 MHz |
 | Frames per second | 60.1 |
-| Master cycles in one frame | ≈ 357 400 |
-| Master cycles in VBlank (~38 lines of 262) | ≈ 51 800 |
+| Master cycles in one frame | 357,368 |
+| Master cycles in VBlank (37 lines of 262) | 50,468 |
 
 Those two last rows are the numbers to hold in your head. A routine whose
 worst frame costs 30 000 mclk has eaten 8 % of the frame; one that costs
@@ -92,11 +93,13 @@ for a symbol that does not exist (a typo fails loudly instead of passing
 silently). The flag repeats, so several routines can be gated in one run.
 
 @warning Pick the symbol with the profile in front of you. On this SDK the NMI
-handler is emitted as five labels — `NmiHandler` plus four internal ones — so
-`--budget NmiHandler=…` measures only the entry stub (652 mclk on
-`sprite_swarm`), not the handler's real cost. Until luna folds child labels
-into their parent, budget a symbol that is genuinely one routine, and read the
-handler's cost by adding its rows in the JSON report by hand.
+handler carries internal labels (`NmiHandler@oam_done` and others), and luna
+folds each program counter onto the nearest label, so `--budget NmiHandler=…`
+on the ROM's own `.sym` measures only the entry stub, not the handler's real
+cost. Adding the child rows by hand is wrong too: the worst frame of a sum is
+not the sum of the worst frames. To budget the whole handler, give luna a copy
+of the `.sym` without the `NmiHandler@…` lines through `--sym`, as
+`testing/nmi_budget.py` does.
 
 ## Profiling from inside: `<snes/profile.h>`
 
@@ -153,9 +156,9 @@ u16 lag    = profileGetLagFrames();    /* frames that missed their VBlank */
 A rising lag count is the symptom; `luna profile` tells you which symbol
 caused it.
 
-@note No example links the profile module today, so its code path is exercised
-by nothing in the corpus. Treat it as a debugging aid you switch on while
-working, not as shipped code.
+@note No example links the profile module; the library fixture
+`testing/fixtures/libtests` exercises it. Treat it as a debugging aid you
+switch on while working, not as shipped code.
 
 ## Choosing between them
 
@@ -187,4 +190,3 @@ working, not as shipped code.
 - @ref craft_frame_budget — what fits in a frame, and the ~4 KB VBlank DMA ceiling
 - @ref tutorial_debugging — stepping, breakpoints and memory inspection with luna
 - @ref tools_luna — every luna subcommand and flag, generated from the pinned binary
-- `.claude/rules/testing.md` — where the profile and coverage passes sit in the suite

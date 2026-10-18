@@ -1,0 +1,72 @@
+name: compiler hunt
+
+# Nightly hunt of the compiler's differential tests beyond their gate
+# (2026-10-16). `make tests` runs difftest.py and difftest_stmt.py on fixed
+# seeds; a Class A change runs a few thousand by hand. The peephole rules
+# of 2026-10-15/16 showed what that misses: a defect that only a seed
+# outside the window reaches (seed 105, an address-taken loop counter; 13
+# and 250, a branch out of reach). Here every night takes a new window of
+# 3,000 seeds of each test, chosen by the date, so the windows walk the
+# seed space instead of re-running the same ones. A failure prints the
+# seed and its reduced program in the job log.
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'first seed (default: from the date)'
+        required: false
+  schedule:
+    - cron: '30 2 * * *'   # nightly, 02:30 UTC
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      # A scheduled run starts on the default branch (main), which lags
+      # develop: scheduled runs test develop's tip (as luna-bench does).
+      - name: Check out OpenSNES (with submodules)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'develop' || '' }}
+          submodules: recursive
+
+      - name: Restore prebuilt toolchain
+        id: toolchain
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            bin
+            compiler/cproc
+            compiler/qbe
+            compiler/wla-dx
+          key: toolchain-ubuntu-latest-x86_64-${{ hashFiles('compiler/PINS.md', 'compiler/Makefile', 'compiler/config.h.in', 'compiler/cc65816/cc65816.c') }}
+
+      - name: Stamp cached toolchain up-to-date (cache hit)
+        if: steps.toolchain.outputs.cache-hit == 'true'
+        run: find bin compiler/cproc compiler/qbe compiler/wla-dx -exec touch {} + 2>/dev/null || true
+
+      - name: Build the toolchain and the library
+        run: |
+          export OPENSNES_HOME=$(pwd)
+          make compiler tools lib
+          scripts/install-luna.sh
+
+      - name: The seed window
+        id: window
+        run: |
+          start="${{ github.event.inputs.start }}"
+          if [ -z "$start" ]; then
+            # a new window each day: 3,000 seeds from (day number x 3,000)
+            start=$(( ($(date -u +%s) / 86400) * 3000 ))
+          fi
+          echo "seeds=$start-$((start + 2999))" >> "$GITHUB_OUTPUT"
+          echo "seeds $start-$((start + 2999))"
+
+      - name: Expressions (difftest.py)
+        run: python3 testing/difftest.py --seeds ${{ steps.window.outputs.seeds }}
+
+      - name: Programs (difftest_stmt.py)
+        if: always()
+        run: python3 testing/difftest_stmt.py --seeds ${{ steps.window.outputs.seeds }}

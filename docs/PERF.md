@@ -1,13 +1,25 @@
 # Measured frame costs of the library {#perf}
 What the library functions cost per frame in real scenes, measured on luna
-(cycle-accurate) on 2026-10-09 with the SDK of that day (0.49.0 in
-preparation; first measured on 2026-09-26, and the differences are noted).
+(cycle-accurate) with OpenSNES 0.49; the call-for-call table against
+PVSnesLib (@ref perf-libbench) is measured again with `make bench-lib`.
 `PHILOSOPHY.md` asks every API with a cost to say it; this page is the
 measured side of that promise, and `docs/BENCHMARK.md` the compiler side.
 
-**Unit: master cycles (mclk) per frame.** An NTSC frame is about
-**357,370 mclk** (21.477 MHz / 60.1 Hz); the VBlank, where VRAM may be
-written, about 49,000 of them (48,988: 37 lines of 1324 available master clocks, snesdev-wiki "Timing"). 1 % of a frame is about 3,570 mclk.
+**Unit: master cycles (mclk) per frame.** These are the figures every
+page of this documentation uses:
+
+| Quantity (NTSC) | Value |
+|---|---|
+| Master clock | 21.477 MHz, 60.1 frames a second |
+| Scanline | 1364 mclk, of which the CPU loses 40 to DRAM refresh |
+| Frame | **357,368 mclk** (262 lines; every other frame one line is 4 mclk shorter) |
+| VBlank, 224-line display | 37 lines (225-261): **50,468 mclk**, 48,988 of them outside the refresh pause |
+| VBlank, 239-line display (overscan) | 22 lines: 30,008 mclk, 29,128 outside the refresh pause |
+| 1 % of a frame | about 3,574 mclk |
+
+Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
+(1364 mclk a line, 262 lines, the 1360-mclk short line); snesdev wiki,
+*Timing* (the 40-mclk refresh pause, VBlank from line 225 or 240 to 261).
 
 ## The scenes
 
@@ -19,9 +31,7 @@ written, about 49,000 of them (48,988: 37 lines of 1324 available master clocks,
 | `examples/games/tetris` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
 | `examples/audio/snesmod_music` | music playing, nothing else | 98 % of the frame |
 
-Idle time is what the game still has. On 2026-09-26 sprite_swarm had 17 %
-of its frame left and was close to dropping frames; on 2026-10-09 it has
-69 %.
+Idle time is what the game still has.
 
 ## Per function
 
@@ -44,23 +54,20 @@ above 300 mclk per frame.
 ## Reading it
 
 - **`NmiHandler`** is the fixed price of a frame: 5,650-8,170 mclk (1.6-2.3 %
-  of the frame, 11-16 % of the VBlank). The OAM upload it does every frame
-  is 544 bytes of DMA, at 8 mclk per byte (anomie's timing doc: "DMA takes
-  8 master cycles per byte transferred") about 4,350 of those. It
-  includes the 17th-bit pad read added on 2026-09-26 (+378 mclk). The
-  per-example gate is `testing/nmi_budget.py`.
+  of the frame, 11-16 % of the VBlank). The OAM upload it does on a frame
+  where a sprite changed is up to 544 bytes of DMA, at 8 mclk per byte (anomie's timing doc: "DMA takes
+  8 master cycles per byte transferred") about 4,350 of those; the
+  17th-bit pad read is about 380 more.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about
   5,800 mclk per frame (1.6 %) for its handful of characters and HUD
-  sprites; 13,600 on 2026-09-26, before the setters were written in
-  assembly. `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
+  sprites (the setters are assembly). `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
   `oamMemory[]` directly (sprite_swarm) are the escape hatches for large
   counts.
 - **Animation**: `animTick` + `animPlay` about 5,500 mclk per frame in
-  likemario (7,400 on 2026-09-26; both are compiled C).
-- **`bgSetScroll`**: about 570 mclk per frame in each of the three games
-  (1,650 on 2026-09-26).
-- **Pads**: `padPressed` / `padHeld` no longer appear: they are macros over
-  one word since 2026-10-09 (1,000-1,250 mclk per frame each before).
+  likemario (both are compiled C).
+- **`bgSetScroll`**: about 570 mclk per frame in each of the three games.
+- **Pads**: `padPressed` / `padHeld` do not appear: they are macros over
+  the word the NMI handler filled.
 
 The per-function figures are what luna counts at the function's own
 labels. Asm routines a function calls under their own names (the map
@@ -68,55 +75,23 @@ engine's `map_prepare_column`, SNESMOD's SPC transfer routines) are not
 added to it, and code the compiler inlined into the caller is counted in
 the caller.
 
-## What a call costs where there used to be none
+## What a call costs
 
-Until 2026-10-03 a handful of small functions were `inline` in their headers
-(`fixSin`, `fixCos`, `textSetPos`, `setScreenOn`, `setScreenOff`,
-`getBrightness`, `colorMathInit`, `colorMathSetLayers`, `colorMathDisable`,
-`mosaicInit`, `hdmaWaveSetSpeed`, `scopeCalibrate`, `scopeSetHoldDelay` and
-the two ease functions). An inline body needs its variables in the public
-header, and those were names a game would collide with (`sine_table`,
-`cursor_x`, `force_blanked`). They are ordinary lib functions now.
+A few small functions (`fixSin`, `fixCos`, `textSetPos`, `setScreenOn`,
+`setScreenOff`, `getBrightness`, the colour-math and mosaic setters, the
+two ease functions…) are ordinary library functions, not `inline` bodies in
+their headers: an inline body would need its variables in the public
+header, under names a game would collide with (`sine_table`, `cursor_x`).
+The one that runs per frame is `fixSin` / `fixCos`, written in assembly so
+that a call costs about 96 master cycles more than an inline lookup:
+`examples/backgrounds/mode2`, which calls `fixSin` 32 times a frame, spends
+18.5 % of its frame busy. The others run at setup or once per frame, where
+a call is not measurable.
 
-The one that runs per frame is `fixSin` / `fixCos`. Measured on
-`examples/backgrounds/mode2`, which calls `fixSin` 32 times a frame
-(`luna profile`, frames 60 to 300):
-
-| | busy master cycles per frame | share of the frame |
-|---|---|---|
-| inlined (before) | 62,896 | 17.60 % |
-| compiled C function | 77,415 | 21.66 % |
-| assembly function (what ships) | 65,959 | 18.46 % |
-
-So a call costs about 96 master cycles more than the inlined lookup did, and
-the first, compiled version cost about 450: `fixSin` and `fixCos` are written
-in assembly for that reason. The other functions run at setup or once per
-frame, where a call is not measurable.
-
-## What a style struct costs
-
-`oamDrawMetasprite()` (2026-10-03) takes the base tile, palette and size
-from a `MetaspriteStyle` instead of three arguments. Measured on
-`examples/sprites/metasprite`, two metasprites a frame (`luna profile`,
-frames 60 to 300):
-
-| | master cycles per frame in the draw | share of the frame |
-|---|---|---|
-| the former public `oamDrawMeta` (before; removed from the API 2026-10-05) | 51,992 | 14.55 % |
-| one function, flip tested per piece | 58,190 | 16.28 % |
-| one function, two loops | 61,252 | 17.14 % |
-| reads the style, then runs the old loop (what ships) | 56,057 | 15.69 % |
-
-About 2,000 master cycles per call, 0.6 % of a frame per metasprite drawn:
-three reads through the style pointer and one more call. (Since 2026-10-12
-the draw is assembly, `lib/source/sprite_meta.asm`, and writes each piece
-itself instead of calling `oamSet` and `oamSetSize`: 27,470 master cycles a
-frame for the two metasprites of this example, 61,460 before — the table
-above is the history of the C version.) The two attempts
-above it were slower although they add no call: with the mirrored loop in
-the same function, the compiler's copies between the two loops fell on
-every piece. The mirrored draw is therefore a function of its own, and the
-unflipped one still runs the same loop, now the internal (removed from the API) `oamDrawMeta`.
+`oamDrawMetasprite()` takes the base tile, palette and size from a
+`MetaspriteStyle`; it is assembly and writes each piece itself. Two
+metasprites of eight 16×16 pieces, drawn every frame, cost 27,470 master
+cycles a frame.
 
 ## Against PVSnesLib, call for call {#perf-libbench}
 
@@ -129,19 +104,19 @@ compilers.
 | Row | What it asks for | PVSnesLib | OpenSNES | |
 |---|---|---:|---:|---:|
 | `idle` | a frame that only waits (the SDK's vblank handler) | 7,184 | 5,780 | -19.5 % |
-| `pad` | held, pressed, released of pad 0, ten times | 11,427 | 9,722 | -14.9 % |
-| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,540 | 27,343 | -30.8 % |
-| `oamset` | `oamSet` on 32 sprites | 81,061 | 64,939 | -19.9 % |
-| `oamxy` | `oamSetXY` on 32 sprites | 45,048 | 42,453 | -5.8 % |
-| `oamsize` | the size of 32 sprites | 48,744 | 28,874 | -40.8 % |
-| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,897 | 17,868 | -0.2 % |
-| `text` | 20 characters printed and shown | 84,678 | 17,216 | -79.7 % |
-| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 91,147 | -46.3 % |
-| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,332 | 53,875 | -58.3 % |
-| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,332 | 31,738 | -75.5 % |
-| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,886 | -8.7 % |
-| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,738 | -38.3 % |
-| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,701 | 36,299 | -73.4 % |
+| `pad` | held, pressed, released of pad 0, ten times | 11,427 | 9,702 | -15.1 % |
+| `scroll` | `bgSetScroll` on three backgrounds, ten times | 39,540 | 27,336 | -30.9 % |
+| `oamset` | `oamSet` on 32 sprites | 81,061 | 64,937 | -19.9 % |
+| `oamxy` | `oamSetXY` on 32 sprites | 45,048 | 42,446 | -5.8 % |
+| `oamsize` | the size of 32 sprites | 48,744 | 28,870 | -40.8 % |
+| `dma` | 2 KB to VRAM, one `dmaCopyVram` | 17,897 | 17,858 | -0.2 % |
+| `text` | 20 characters printed and shown | 84,678 | 17,438 | -79.4 % |
+| `frame` | one frame: pad, three scrolls, 32 sprites, 20 characters | 169,798 | 91,339 | -46.2 % |
+| `worldc` | 19 world-space sprites placed by a loop in C (the same source) | 129,332 | 53,877 | -58.3 % |
+| `world` | the same 19 sprites: `oamPlaceWorld` here, the C loop there | 129,332 | 31,740 | -75.5 % |
+| `vramc` | six 128-byte VRAM transfers, six `dmaCopyVram` calls | 17,395 | 15,888 | -8.7 % |
+| `vramq` | the same six, the part paid in VBlank: one `vramQueueFlush` here, the calls there | 17,395 | 10,790 | -38.0 % |
+| `worldo` | the 19 sprites sorted by depth (an order array): `oamPlaceWorld` here, the C loop there | 136,701 | 36,297 | -73.4 % |
 
 OpenSNES costs no more than PVSnesLib on **14 of the 14 rows**. PVSnesLib at `fa758c9b 2025-12-28`.
 <!-- libbench:end -->
@@ -158,40 +133,18 @@ is that handler alone, in a ROM that only waits.
 
 **Reading it.**
 
-- **The first run of this bench, on 2026-10-09, had OpenSNES behind on
-  seven rows of eight**: the pad read at 3.5 times PVSnesLib's cost,
-  `oamSetXY` at 3.6 times, text +83 %, sprite size +41 %, scroll +13 %,
-  `oamSet` +9 %. The compiler had been measured against PVSnesLib for
-  months; the library had only been measured against itself (the tables
-  above).
-- What changed that day: `padHeld` and `padPressed` are also macros over
-  the word the handler filled, and `padReleased` is assembly; the sprite
-  setters (`oamSet`, `oamSetX`, `oamSetY`, `oamSetXY`, `oamSetSize`) and
-  the three scroll setters are assembly, with a table for the bits a shift
-  loop used to build; `textPrint` writes a run of characters with the
-  buffer position computed once instead of three calls and a multiply per
-  character.
-- On 2026-10-11 the run of characters inside `textPrint` became assembly
-  too (about 170 master cycles a character in compiled C until then): the
-  `text` row went from 59,684 to 32,316, and `frame` from 134,968 to
-  107,602.
-- **`oamxy` and `dma` are level**, within about 1 %, and sit on either side
-  of PVSnesLib's figure from one compiler step to the next (+0.2 % and
-  +0.1 % on the morning of 2026-10-10, −1.2 % and −0.1 % the day before,
-  −2.0 % and −0.1 % that evening, once a function that calls kept its short
-  temporaries in the direct page, then −2.5 % and +0.1 % — nine master
-  cycles in 17,900 — after the late peephole pass, and −4.8 % and −0.1 % on
-  2026-10-11, once a loop tested its condition at the bottom) although the
-  library routines did not change: a row is the difference between a loop
+- **`oamxy` and `dma` are level**, within a few %, and move to either side
+  of PVSnesLib's figure from one compiler change to the next although the
+  library routines do not change: a row is the difference between a loop
   with the calls and the same loop empty, and a compiler improvement that
-  helps the empty loop more than the loop around a call moves the row up.
-  Read these two as ties. PVSnesLib's
-  `oamSetXY` checks nothing and marks nothing; ours refuses an id that is
-  not a sprite, marks the table dirty and records the highest sprite
-  written, which is what lets the handler skip the upload on a frame where
-  no sprite moved and send only the sprites in use otherwise — the `idle`
-  row is where that is paid back. A 2 KB `dmaCopyVram` is the transfer
-  itself (16,384 of its master cycles) under either SDK.
+  helps the empty loop more than the loop around a call moves the row.
+  Read these two as ties. PVSnesLib's `oamSetXY` checks nothing and marks
+  nothing; ours refuses an id that is not a sprite, marks the table dirty
+  and records the highest sprite written, which is what lets the handler
+  skip the upload on a frame where no sprite moved and send only the
+  sprites in use otherwise — the `idle` row is where that is paid back. A
+  2 KB `dmaCopyVram` is the transfer itself (16,384 of its master cycles)
+  under either SDK.
 - **`frame` is the row to read for a whole game**: everything in one
   frame, uploads included.
 

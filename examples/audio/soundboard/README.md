@@ -32,8 +32,8 @@ ROM mode: LoROM (project default).
   hardware voices ARE the polyphony
 - ADSR as note articulation: one envelope per voice set at init —
   looping samples ring out and die instead of sustaining forever
-- Echo: `audioSetEcho()` sizes and clears the ring, `audioSetEchoFilter()`
-  sets the FIR, `audioEnableEcho()` routes voices in
+- Echo: `audioSetEcho()` sizes and clears the ring once at init, `audioSetEchoFilter()`
+  sets the FIR, `audioEnableEcho()` / `audioDisableEcho()` route the voices in and out
 
 ## Sample provenance
 

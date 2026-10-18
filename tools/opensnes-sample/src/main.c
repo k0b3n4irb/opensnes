@@ -5,7 +5,7 @@
  *   opensnes-sample encode  [--loop START END] [--out DIR] [--save] [--json] <input.wav>...
  *   opensnes-sample inspect [--json] <file.wav | file.brr>...
  *
- * The encoder is smconv's (tools/smconv/src/brr.c, (C) 2009 Mukunda
+ * The encoder is smconv's (tools/lib/smconv/src/brr.c, (C) 2009 Mukunda
  * Johnson): BRR block compression, 16-sample padding, loop unrolling and
  * resampling, overflow-driven amplitude backoff. A .brr from here is byte
  * for byte what wav2brr wrote and what a soundbank carries.
@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "cli.h"
-#include "brr.h"   /* tools/smconv/src */
+#include "brr.h"   /* tools/lib/smconv/src */
 #include "wav.h"
 
 /* The DSP plays BRR at 32 kHz whatever the source said; a sample above

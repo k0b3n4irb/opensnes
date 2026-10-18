@@ -51,7 +51,8 @@ main     ──────────●─●  (fast-forward; tag is the seco
    (`OPENSNES_VERSION_{MAJOR,MINOR,PATCH,STRING}`) updated to match the
    new `## [X.Y.Z]` heading. **In the same commit as the CHANGELOG bump.**
 6. **`ROADMAP.md` "Current Status: post-vX.Y.Z" line bumped** to match
-   the new release.
+   the new release, its footer dated, and the two version chips of
+   `docs/landing/index.html` (the site's front page) bumped.
 7. **`make lint-docs` exits 0** — version macros + ROADMAP status line +
    examples count consistency. See `.claude/rules/doc_consistency.md`
    for the full policy.

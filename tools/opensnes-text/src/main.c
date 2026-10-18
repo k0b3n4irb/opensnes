@@ -27,7 +27,7 @@
 #include "cli.h"
 #include "incfile.h"
 #include "lodepng.h"
-#include "tiles.h"   /* tools/font2snes/src: convert_tile_2bpp / 4bpp, rgb_to_bgr555 */
+#include "tiles.h"   /* tools/lib/font2snes/src: convert_tile_2bpp / 4bpp, rgb_to_bgr555 */
 
 #define CELL       8
 #define GLYPHS     96

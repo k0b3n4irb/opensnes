@@ -71,7 +71,7 @@ that can exceed ±1.0.
 | `dsp1Range(x,y,z,r)` | `$18` | 4 → 1 | sphere test: `(d² − r²) >> 15`, negative = inside |
 
 Multi-word results land in the globals `dsp1_o0`/`dsp1_o1`/`dsp1_o2`
-(`dsp1_o3` for Parameter); single-word commands return their value.
+(`dsp1_o3` for `dsp1SetCamera`); single-word commands return their value.
 
 ## The 3D pipeline (what dsp1_cube does)
 
@@ -213,7 +213,7 @@ not an open stream: inside a Raster stream every byte pair is swallowed
 as a 16-bit word, so a wedged stream never returns to command mode until
 `$8000` lands on a D slot. `dsp1Raster()` always closes its stream; do
 not hand-roll `$0A` (and never `$1A`, which the DSP-1B firmware never
-returns from — measured on luna, see the reference note).
+returns from — measured on luna).
 
 ### 🟡 Throughput is per-byte
 
@@ -227,5 +227,4 @@ Parameter when the camera moves, and batch what you can.
 - [`examples/chips/dsp1_cube`](../../examples/chips/dsp1_cube/README.md) — the 3D pipeline example
 - [`examples/mode7/dsp1_ground`](../../examples/mode7/dsp1_ground/README.md) — the Raster ground example
 - `snes/dsp1.h` — full API reference with per-slot types
-- `.claude/notes/tech/dsp1_reference.md` — command reference + open questions
 - [SA-1 tutorial](sa1.md), [Super FX tutorial](superfx.md) — the other chips

@@ -46,8 +46,12 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **Author**: Mukunda Johnson
 - **Repository**: https://github.com/mukunda-/snesmod
 - **License**: MIT
-- **What we use**: SPC700 audio driver (`sm_spc.asm`) and `smconv` tracker
-  converter (Impulse Tracker `.it` → SPC700 soundbank)
+- **What we use**: the SPC700 audio driver, built from its source
+  `lib/source/sm_spc.spc700.asm` — Mukunda Johnson's `sm_spc.as7`, with
+  KungFuFurby's bugfixes, in the WLA-DX syntax PVSnesLib converted it to
+  (`pvsneslib/snesmod/sm_spc_wla.asm`, MIT) — and the converter of
+  `smconv` (Impulse Tracker `.it` → SPC700 soundbank), built into
+  `opensnes-music`
 
 ### modlib
 - **Author**: Mukunda Johnson
@@ -55,9 +59,9 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **License**: MIT
 - **What we use**: the IT 2.14 / 2.15 sample decompressor of
   `itmod/itsamplecodec.go` and `itmod/bitstream.go`, ported to C in
-  `tools/smconv/src/itloader.c` (decoder only), and the test module
+  `tools/lib/smconv/src/itloader.c` (decoder only), and the test module
   `itmod/test/reflection.it`, copied as
-  `tools/smconv/tests/fixtures/reflection.it`
+  `tools/lib/smconv/tests/fixtures/reflection.it`
 - **Licence text**:
 
   > Copyright 2025 Mukunda Johnson (mukunda.com)
@@ -88,23 +92,17 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **License**: zlib
 - **Version**: 20260119
 - **Location**: `tools/third_party/lodepng.{c,h}`
-- **Used in**: `gfx4snes`, `img2snes` and the other PNG-reading tools
+- **Used in**: `opensnes-tileset`, `opensnes-sprite`, `opensnes-palette`,
+  `opensnes-image` and `opensnes-text` (the PNG-reading tools)
 - **What it does**: PNG decoding/encoding
-
-### cmdparser
-- **Author**: XUJINKAI (github.com/XUJINKAI/cmdparser)
-- **License**: Apache License 2.0 — full text and notice in
-  `tools/third_party/LICENSE-cmdparser`, shipped next to the source
-- **Location**: `tools/third_party/cmdparser.{c,h}`
-- **Used in**: `gfx4snes`, `img2snes` (inherited from PVSnesLib's gfx4snes)
-- **What it does**: command-line option parsing
 
 ### stb_image
 - **Author**: Sean Barrett (nothings.org)
 - **License**: public domain (Unlicense) or MIT, at the user's choice
 - **Version**: 2.30
 - **Location**: `tools/third_party/stb_image.h`
-- **What it does**: image loading for font2snes
+- **What it does**: image loading; no shipped tool links it today (the
+  font converter that did is retired), its fuzz harness still runs
 
 ### cute_tiled
 - **Author**: Randy Gaul; embeds a component by Mattias Gustavsson
@@ -113,7 +111,7 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
   end of the file
 - **Version**: 1.06
 - **Location**: `tools/third_party/cute_tiled.h`
-- **What it does**: Tiled `.tmx` / `.tmj` map parsing for tmx2snes
+- **What it does**: Tiled `.tmx` / `.tmj` map parsing for `opensnes-level`
 
 
 ## Tools

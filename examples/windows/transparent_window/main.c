@@ -9,16 +9,17 @@
  * color math unit is configured to subtract a fixed color intensity inside
  * the window region only (CGWSEL bit 5-4 = 01), producing a tinted overlay.
  *
- * The HDMA tables use repeat mode (bit 7 set in the line count byte) because
- * WH0/WH1 are write-only registers that must be refreshed every scanline,
- * even when the window position is constant across the rectangle height.
+ * Each HDMA table entry writes its register once and holds it for its line
+ * count: the edges are constant across the rectangle, so three entries per
+ * table say it all (a register keeps what it was given; repeat mode is for a
+ * value that changes on every line).
  *
  * Ported from PVSnesLib "TransparentWindow" example by Digifox.
  * Uses the colormath and window modules with PVSnesLib's register values,
  * so the frames match its original.
  *
  * @par SNES Concepts
- * - HDMA repeat mode for per-scanline window boundary updates
+ * - HDMA tables of a few entries, each held for a run of scanlines
  * - Window registers WH0/WH1 ($2126/$2127) defining a rectangular region
  * - Color math subtraction inside the window region (CGWSEL/CGADSUB)
  * - Fixed color source (COLDATA, $2132) for darkening intensity
@@ -37,13 +38,11 @@
 #include <snes.h>
 
 /*============================================================================
- * External Graphics Data (defined in data.asm)
+ * Background picture (res/background.png, converted by the build from
+ * res/background.png.toml)
  *============================================================================*/
 
-/** @brief 4bpp background tile data (defined in data.asm, stored in ROM) */
 #include "res/background.inc"   /* generated: background_tiles[], background_map[], background_pal[], each with _end */
-/** @brief Background tilemap data for the 32x32 tile grid */
-/** @brief 16-color palette for the background */
 
 /*============================================================================
  * Rectangle parameters
@@ -61,18 +60,15 @@
 /*============================================================================
  * HDMA Tables (in RAM — built dynamically at startup)
  *
- * These tables drive WH0 ($2126) and WH1 ($2127) to define the left and
- * right window boundaries per scanline. The tables use HDMA repeat mode
- * (bit 7 set in the line count) because WH0/WH1 are write-only registers
- * that must be refreshed every scanline — even when the position is constant.
+ * These tables drive WH0 ($2126) and WH1 ($2127), the left and right edges
+ * of window 1. An entry is a line count (1-127) and one byte: the register
+ * takes the byte, then keeps it for that many lines.
  *
  * Table structure:
- *   [y] [0xFF/0x00]              non-repeat: y lines, window disabled
- *   [0x80|height] [val]...[val]  repeat: height lines, per-scanline data
- *   [0x01] [0xFF/0x00]           non-repeat: 1 line, window disabled
- *   [0x00]                       end marker
- *
- * Max size: 2 + 1 + 112 + 2 + 1 = 118 bytes
+ *   [y]      [0xFF / 0x00]   y lines above the rectangle: window disabled
+ *   [height] [x / x+w]       the rectangle's lines: its edges
+ *   [0x01]   [0xFF]          (left only) window disabled again below it
+ *   [0x00]                   end of table: the register keeps its last value
  *============================================================================*/
 
 /**
@@ -82,7 +78,7 @@
  * on each scanline. Before and after the rectangle, WH0 is set to 0xFF
  * (disabling the window by placing the left edge beyond the right edge).
  */
-u8 hdma_left[128];
+u8 hdma_left[8];
 
 /**
  * @brief HDMA table for the right window boundary (WH1, $2127).
@@ -91,7 +87,7 @@ u8 hdma_left[128];
  * on each scanline. Before the rectangle, WH1 is set to 0x00 (disabling the
  * window by placing the right edge before the left edge).
  */
-u8 hdma_right[128];
+u8 hdma_right[8];
 
 /*============================================================================
  * Main
@@ -108,34 +104,31 @@ u8 hdma_right[128];
  * @return Never returns (infinite loop).
  */
 int main(void) {
-    u8 i;
+    consoleInit();
 
     /* Force blank during setup */
     setScreenOff();
 
     /*--------------------------------------------------------------------
-     * Build HDMA tables with repeat mode (matching PVSnesLib exactly)
+     * Build the HDMA tables: one entry per run of equal lines
      *--------------------------------------------------------------------*/
 
     /* Left table (WH0): disabled → x → disabled */
     hdma_left[0] = RECT_Y;
     hdma_left[1] = 0xFF;                       /* WH0=255: window disabled */
-    hdma_left[2] = (u8)(0x80 | RECT_HEIGHT);   /* Repeat mode, 112 lines */
-    for (i = 0; i < RECT_HEIGHT; i++) {
-        hdma_left[3 + i] = RECT_X;             /* WH0=40 each scanline */
-    }
-    hdma_left[3 + RECT_HEIGHT] = 0x01;         /* 1 line non-repeat */
-    hdma_left[4 + RECT_HEIGHT] = 0xFF;         /* WH0=255: disabled */
-    hdma_left[5 + RECT_HEIGHT] = 0x00;         /* End marker */
+    hdma_left[2] = RECT_HEIGHT;                /* 112 lines... */
+    hdma_left[3] = RECT_X;                     /* ...with WH0=40 */
+    hdma_left[4] = 0x01;
+    hdma_left[5] = 0xFF;                       /* WH0=255: disabled below */
+    hdma_left[6] = 0x00;                       /* End of table */
 
-    /* Right table (WH1): disabled → x+width → end */
+    /* Right table (WH1): disabled → x+width, kept to the bottom (WH0=255
+     * above it disables the window there) */
     hdma_right[0] = RECT_Y;
     hdma_right[1] = 0x00;                      /* WH1=0: window disabled */
-    hdma_right[2] = (u8)(0x80 | RECT_HEIGHT);  /* Repeat mode, 112 lines */
-    for (i = 0; i < RECT_HEIGHT; i++) {
-        hdma_right[3 + i] = (u8)(RECT_X + RECT_WIDTH); /* WH1=216 */
-    }
-    hdma_right[3 + RECT_HEIGHT] = 0x00;        /* End marker */
+    hdma_right[2] = RECT_HEIGHT;
+    hdma_right[3] = (u8)(RECT_X + RECT_WIDTH); /* WH1=216 */
+    hdma_right[4] = 0x00;                      /* End of table */
 
     /*--------------------------------------------------------------------
      * Load background on BG2 (index 1):
@@ -154,7 +147,7 @@ int main(void) {
     setMainScreen(TM_BG2);
 
     /*--------------------------------------------------------------------
-     * Color math: direct register writes matching PVSnesLib exactly
+     * Color math: the register values of the PVSnesLib original
      *
      * CGWSEL ($2130) = 0x10:
      *   bits 7-6 = 00: never force main screen black
@@ -180,7 +173,7 @@ int main(void) {
 
     /*--------------------------------------------------------------------
      * Window: the same register values as PVSnesLib, through the window
-     * module (direct writes until 2026-09-26)
+     * module
      *
      * W12SEL ($2123) = 0x20: BG2 Window 1 Enable
      * WOBJSEL ($2125) = 0x20: Color Math Window 1 Enable
@@ -192,7 +185,7 @@ int main(void) {
     /*--------------------------------------------------------------------
      * HDMA: drive WH0 and WH1 to define the rectangle
      *--------------------------------------------------------------------*/
-    /* NMI uses DMA channel 7 for OAM — use channels 4+5 for HDMA */
+    /* Every DMA of the NMI runs on channel 7 — use channels 4+5 for HDMA */
     hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0, hdma_left);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1, hdma_right);
     hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));

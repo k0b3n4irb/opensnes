@@ -11,7 +11,7 @@ changed, go look". The capture is deterministic run to run (same seed of
 nothing: the SPC700/DSP are integer machines).
 
 Examples covered: the eight that play without input (apu_switch, snesmod_music,
-pitch_mod, play_noise, echo, speech_synth, snesmod_music_large, and
+pitch_mod, play_noise, echo, speech_synth, the snesmod_music_large fixture, and
 chips/superfx_game_skeleton — music while the GSU works) and the three
 that need a button (soundboard, snesmod_sfx, sfx_from_wav), each pressed with
 the script of its luna test manifest. The button-driven ones joined on luna
@@ -49,7 +49,8 @@ EXAMPLES = {
     "audio/play_noise":    ("audio/play_noise/play_noise.sfc", None),
     "audio/echo":          ("audio/echo/echo.sfc", None),
     "audio/speech_synth":  ("audio/speech_synth/speech_synth.sfc", None),
-    "audio/snesmod_music_large": ("audio/snesmod_music_large/music_large.sfc", None),
+    # left the examples in the 1.0 review; a soundbank across two banks
+    "fixtures/snesmod_music_large": ("../testing/fixtures/retired_examples/snesmod_music_large/music_large.sfc", None),
     # the music fed from ROM while the GSU renders and the NMI moves frames
     # (gsuPresent): a stutter or a dropped tick changes the hash
     "chips/superfx_game_skeleton": ("chips/superfx_game_skeleton/superfx_game_skeleton.sfc", None),

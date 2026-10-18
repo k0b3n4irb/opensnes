@@ -19,7 +19,7 @@
  * panel above the play area.
  *
  * @par SNES Concepts
- * - `<snes/math.h>` square-root and atan2 (chantier B6, 2026-05-09):
+ * - `<snes/math.h>` square-root and atan2:
  *     - `sqrt16(n)` → integer floor of √n, range 0–255
  *     - `atan2_8(dy, dx)` → 8-bit angle in the same convention as
  *       the sin/cos LUT (0 = +X, 64 = +Y, 128 = −X, 192 = −Y)
@@ -46,31 +46,28 @@
  *       the unit direction vector. At `ANGLE = 0x40` (90°, target is
  *       straight south) you see `COS = 0x0000`, `SIN = 0x0100`.
  *     - `COS 16.16` / `SIN 16.16` are the SAME values lifted to the
- *       new fix32 type from B5 (2026-05-21). Look at the bottom hex
+ *       fix32 type. Look at the bottom hex
  *       digits: they're always `00` because `fix32Cos`/`fix32Sin`
  *       reuse the 8.8 LUT and shift up. A future 16-bit LUT would
  *       fill those bits with real precision — the comparison row
  *       makes the 8-bit-LUT precision floor visible at runtime.
  *
- * @par Before / after — fix32 demonstration
- * Pre-B5, this example only used `fixCos`/`fixSin` (8.8). The B5
- * chantier added the parallel `fix32Cos`/`fix32Sin` display rows so
- * users can see the 16.16 representation alongside, with the
- * trailing zeros that expose the LUT-lifting strategy. Not a
- * functional change — a pedagogical one.
+ * @par 8.8 and 16.16 side by side
+ * The `fixCos`/`fixSin` (8.8) rows have `fix32Cos`/`fix32Sin` (16.16)
+ * rows beside them, so the two representations can be compared; the
+ * trailing zeros of the 16.16 ones show that they lift the same 8.8
+ * table.
  *
  * @par Modules Used
  * console, sprite, dma, background, text, input, gameloop, math, fixed32
  *
  * @see math.h, fixed32.h, sprite.h, text.h, gameloop.h
- *
- * @copyright MIT License — chantier B6 (2026-05-09), B5 fix32 row added (2026-05-22)
  */
 
 #include <snes.h>
 #include <snes/text.h>
 #include <snes/math.h>
-#include <snes/fixed32.h>      /* fix32Cos / fix32Sin (B5 chantier, 2026-05-21) */
+#include <snes/fixed32.h>      /* fix32Cos / fix32Sin */
 #include <snes/gameloop.h>
 
 /*============================================================================
@@ -202,9 +199,8 @@ static void on_init(void) {
     textPrintAt(2, 19, "DIST:");
     textPrintAt(2, 20, "ANGLE:");
     /* COS / SIN shown in both formats to expose the 8.8 vs 16.16
-     * tradeoff at runtime. 8.8 is what the lib has always provided;
-     * 16.16 is the new fix32 stack (B5 chantier, 2026-05-21). Since
-     * our fix32Cos/Sin lift the same 8.8 LUT, the low byte of the
+     * tradeoff at runtime: fixed (8.8) and fixed32 (16.16). Since
+     * fix32Cos/Sin lift the same 8.8 LUT, the low byte of the
      * 16.16 fractional half is always zero — visible in the hex
      * readout as a trailing `00`. A future 16-bit LUT would fill
      * those bits with real precision. */
@@ -228,7 +224,7 @@ static void on_update(void) {
     u16 dist;
     u8  angle;
     fixed   cos_v,  sin_v;   /* 8.8 lib trig (original) */
-    fixed32 cos32, sin32;    /* 16.16 lifted trig (B5 chantier addition) */
+    fixed32 cos32, sin32;    /* 16.16 lifted trig */
 
     pad = padHeld(0);
 

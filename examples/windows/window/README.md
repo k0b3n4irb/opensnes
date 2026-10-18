@@ -41,8 +41,8 @@ boundaries **every scanline** using HDMA, you can create any shape -- circles,
 triangles, or custom silhouettes.
 
 This example uses two HDMA channels:
-- **Channel 6** writes to WH0 ($2126) -- window 1 left boundary
-- **Channel 7** writes to WH1 ($2127) -- window 1 right boundary
+- **Channel 4** writes to WH0 ($2126) -- window 1 left boundary
+- **Channel 5** writes to WH1 ($2127) -- window 1 right boundary
 
 ### The Triangle Tables
 

@@ -1,0 +1,4 @@
+in sum: present \tadc\.w (adj|base),x\n
+in sum: absent \tadc\.b tcc__lf
+in diff: present \tlda\.w base,x\n\tsec\n\tsbc\.w adj,x\n
+in changed: present \tcmp\.w sent,x\n

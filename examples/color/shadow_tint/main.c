@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Colour, rung 6c.2 — shadow & tint: recolour a whole scene at once
+ * @brief Colour — shadow & tint: recolour a whole scene at once
  * @ingroup examples
  *
  * Colour math against a *fixed* colour is how a game changes mood without

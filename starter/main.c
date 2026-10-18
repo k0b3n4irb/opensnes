@@ -13,7 +13,10 @@
  *                during VBlank.
  *   3. GAME LOOP — runs forever: read input, update state, wait for VBlank.
  *
- * @see https://github.com/k0b3n4irb/opensnes — docs, tutorials, 82 examples
+ * test/ holds two luna tests of it: `make test` runs them (and `make
+ * test-update` records the picture the first one checks).
+ *
+ * @see https://github.com/k0b3n4irb/opensnes — docs, tutorials, examples
  */
 
 #include <snes.h>
@@ -25,11 +28,11 @@
 /** Pixels the player moves per frame while a direction is held. */
 #define SPEED 2
 
-int main(void) {
-    /* --- your game's state lives here --- */
-    u16 x = 112;   /* sprite X (9-bit: 0..511) */
-    u8  y = 96;    /* sprite Y (8-bit: 0..255) */
+/* --- your game's state lives here (globals: the tests read them by name) --- */
+static s16 player_x = 112;   /* sprite X */
+static s16 player_y = 96;    /* sprite Y */
 
+int main(void) {
     /* === 1. SETUP (force blank) ============================================ */
     consoleInit();
     setMode(BG_MODE1, 0);
@@ -40,7 +43,7 @@ int main(void) {
     dmaCopyCGram(player_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     oamInit(OBJ_SIZE8_L32, 1);
-    oamSet(0, x, y, 0x0010, 0, 3, 0);   /* sprite 0: tile 0x10, priority 3 */
+    oamSet(0, player_x, player_y, 0x0010, 0, 3, 0);   /* sprite 0: tile 0x10, priority 3 */
     oamSetSize(0, OBJ_LARGE);
 
     setMainScreen(LAYER_OBJ);
@@ -53,12 +56,12 @@ int main(void) {
         u16 pad = padHeld(0);   /* held-button bitmask; the NMI reads the pad */
 
         /* --- your game logic goes here --- */
-        if (pad & KEY_LEFT)  x -= SPEED;
-        if (pad & KEY_RIGHT) x += SPEED;
-        if (pad & KEY_UP)    y -= SPEED;
-        if (pad & KEY_DOWN)  y += SPEED;
+        if (pad & KEY_LEFT)  player_x -= SPEED;
+        if (pad & KEY_RIGHT) player_x += SPEED;
+        if (pad & KEY_UP)    player_y -= SPEED;
+        if (pad & KEY_DOWN)  player_y += SPEED;
 
-        oamSetXY(0, x, y);      /* push the new position; NMI DMAs OAM at VBlank */
+        oamSetXY(0, player_x, player_y);   /* the new position; the NMI sends OAM at VBlank */
 
         WaitForVBlank();        /* one frame at 60 Hz (50 on PAL) */
     }

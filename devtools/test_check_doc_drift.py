@@ -197,6 +197,32 @@ class SlashCount(unittest.TestCase):
                              for m in r.finditer(text)))
 
 
+class CountPhrasings(unittest.TestCase):
+    def test_forms_seen_in_the_docs_review(self):
+        for text, n in (("88 examples — backgrounds, sprites, scrolling", 88),
+                        ("the SDK ships **82 examples** and a", 82),
+                        ("<p>83 worked examples on a guided learning path", 83),
+                        ('<div class="stat"><div class="n">83</div><div class="l">example ROMs</div>', 83)):
+            self.assertTrue(any(int(m.group(1)) == n for r in COUNT_PATTERNS
+                                for m in r.finditer(text)), text)
+
+    def test_starter_and_landing_are_read(self):
+        names = [str(p) for p in check_doc_drift._gather_active_doc_paths()]
+        self.assertTrue(any(p.endswith("starter/README.md") for p in names))
+        self.assertTrue(any(p.endswith("docs/landing/index.html") for p in names))
+
+
+class LandingVersion(unittest.TestCase):
+    def test_chips_are_read(self):
+        text = '<span class="chip">v0.35.0</span> … v0.35.0 &middot; MIT'
+        self.assertEqual([m.group(1) for m in
+                          check_doc_drift.LANDING_VERSION_RE.finditer(text)], ["0.35.0"])
+
+    def test_real_page_matches_changelog(self):
+        ver, _ = check_doc_drift.canonical_version()
+        self.assertEqual(check_doc_drift.check_landing_version(ver), [])
+
+
 class BenchmarkTable(unittest.TestCase):
     PAGE = (
         "| **Total cycle reduction** | **−20.0 %** vs PVSnesLib + 816-opt (40 vs 50 cycles) |\n"
@@ -222,6 +248,87 @@ class BenchmarkTable(unittest.TestCase):
         page = self.PAGE.replace("−20.0 %", "−32.2 %")
         out = check_doc_drift.bench_table_drifts(page, self.BASE)
         self.assertTrue(any("summary" in d for d in out))
+
+
+class NoHistoryInUserDocs(unittest.TestCase):
+    RX = check_doc_drift._HISTORY_RX
+
+    def test_dated_history_is_refused(self):
+        for line in ("Until 2026-10-05 the build refused it.",
+                     "### 🟢 `sramClear()` wrote a ramp (fixed 2026-09-15)",
+                     "works since 2026-10-03 for objects in bank $00",
+                     "SIWP polarity resolved 2026-09-02"):
+            self.assertIsNotNone(self.RX.search(line), line)
+
+    def test_present_tense_and_versions_pass(self):
+        for line in ("It is refused since 0.49.", "PVSnesLib at `fa758c9b 2025-12-28`.",
+                     "*Last updated: 2026-10-14.*", "the loop runs until the terminator"):
+            self.assertIsNone(self.RX.search(line), line)
+
+    def test_maintainer_notes_link(self):
+        self.assertIsNotNone(check_doc_drift._NOTES_RX.search("see `.claude/notes/tech/x.md`"))
+
+
+class ExampleReview20261015(unittest.TestCase):
+    """The examples review before 1.0: stale motifs, @par Modules Used,
+    files a comment names (anchor 19)."""
+
+    def _stale(self, line):
+        return [why for rx, why in check_doc_drift._STALE_EXAMPLE_CLAIMS if rx.search(line)]
+
+    def test_new_stale_motifs(self):
+        for line in ("WH0/WH1 must be refreshed every scanline",
+                     "C pointer dereferences are bank-$00-hardcoded",
+                     "Stack: 5-6,s = sy (cproc right-to-left push)",
+                     "the map CANNOT be read from C directly",
+                     "converted from a PNG by gfx4snes",
+                     "smconv -s -o soundbank music/song.it",
+                     "Verify smconv is built: `make -C $OPENSNES/bin smconv`"):
+            self.assertTrue(self._stale(line), line)
+
+    def test_present_wording_passes(self):
+        for line in ("an entry writes its register once and holds it",
+                     "the build runs opensnes-music bank on the .it file",
+                     "smconv keeps its page (docs/tools/smconv.md)",
+                     "C reads it as a const array"):
+            self.assertFalse(self._stale(line), line)
+
+    def test_par_modules(self):
+        main = "/**\n * @par Modules Used\n * console, dma, sprite\n *\n * @see x.h\n */"
+        self.assertEqual(check_doc_drift.modules_missing_from_par(main, ["console", "dma", "anim"]), ["anim"])
+        self.assertEqual(check_doc_drift.modules_missing_from_par(main, ["console", "sprite"]), [])
+        self.assertIsNone(check_doc_drift.modules_missing_from_par("/** no par */", ["console"]))
+
+    def test_named_file_regex(self):
+        rx = check_doc_drift._NAMED_FILE_RX
+        for line, name in (("/** @brief tiles (defined in data.asm) */", "data.asm"),
+                           ("Sprite palette (BGR555) from data.asm */", "data.asm"),
+                           ("lives in res/track_class.bin", "res/track_class.bin")):
+            m = rx.search(line)
+            self.assertIsNotNone(m, line)
+            self.assertEqual(m.group(1), name)
+        self.assertIsNone(rx.search("converted by the build from res/"))
+
+    def test_examples_cited(self):
+        path = "@subpage examples_sprites_simple_sprite\n@ref examples_audio_echo"
+        readmes = {"sprites": "| [simple_sprite](simple_sprite/) |", "audio": ""}
+        gaps = check_doc_drift.example_citation_gaps(
+            ["sprites/simple_sprite", "audio/echo", "sprites/world_sprites"], path, readmes)
+        self.assertEqual(gaps, ["audio/echo (its category README)",
+                                "sprites/world_sprites (learning path) (its category README)"])
+
+    def test_named_file_missing(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as td:
+            ex = Path(td)
+            (ex / "res").mkdir()
+            (ex / "res" / "hero.png.toml").write_text("tool = \"opensnes-sprite\"\n")
+            (ex / "data.asm").write_text("")
+            self.assertFalse(check_doc_drift.named_file_missing(ex, "data.asm"))
+            self.assertFalse(check_doc_drift.named_file_missing(ex, "hero.pic"))   # produced by a settings file
+            self.assertTrue(check_doc_drift.named_file_missing(ex, "ram.asm"))
+            self.assertFalse(check_doc_drift.named_file_missing(ex, "crt0.asm"))   # a file of the SDK
 
 
 if __name__ == "__main__":

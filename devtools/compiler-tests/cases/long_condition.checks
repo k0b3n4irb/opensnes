@@ -1,5 +1,6 @@
 # if (long): both halves, straight in the branch (no 0/1 materialised)
-in wide: present lda(?: \d+,s|\.b tcc__lf\+\d+)\n\tora(?: \d+,s|\.b tcc__lf\+\d+)\n\tbne @
+# (since 2026-10-16 the low half may be OR-ed from where it was loaded)
+in wide: present \tlda\.w big(?:\+2)?\n(?:\tsta\.b tcc__lf\+\d+\n\tlda\.w big(?:\+2)?\n)?\tora(?:\.[bw])? (?:big(?:\+2)?|tcc__lf\+\d+|\d+,s)\n\tbne @
 in wide: absent lda\.w #1\n\+\+
 # if ((short)long): the low word alone
 in narrowed: absent ora

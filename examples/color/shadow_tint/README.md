@@ -1,6 +1,6 @@
 # shadow_tint — recolour a whole scene at once
 
-**Family 6 (Colour & effects) · rung 6c.2 — shadow & tint.**
+**Colour & effects · shadow & tint.**
 
 ## Why it matters for your game
 

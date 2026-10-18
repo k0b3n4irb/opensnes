@@ -1,6 +1,6 @@
 # sprite_swarm — a bouncing swarm, and the OAM throughput ceiling
 
-**Family 3 (Sprites) · rung 3.7 — the showcase, and an honest one.**
+**Sprites · the showcase, and an honest one.**
 
 ## Why it matters for your game
 

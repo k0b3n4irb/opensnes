@@ -17,6 +17,11 @@ miscompilations until then: floating-point and 64-bit values computed at run
 time. They are not features waiting to land; `cases/wide_constants_fold` pins
 the other side, the constants of those types that must keep compiling.
 
+`vla` and `vla_const_length` (2026-10-17, audit 04-1) are the same kind: a
+variable-length array compiled without a word into a pointer to a 2-byte
+frame slot, and the callee wrote over the return address. A `const`
+variable as the length is the form a game is likely to write.
+
 `anim_clip_256` is of another kind: a refusal the **library** makes (a
 `_Static_assert` in `DECLARE_ANIM_CLIP`, `snes/anim.h`), pinned here because
 this is where a compile that must fail is checked. It stays for good.

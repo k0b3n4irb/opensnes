@@ -1,6 +1,6 @@
 # mode2 — offset-per-tile: per-column scroll from BG3
 
-**Family 2 (Backgrounds) · rung 2.8 — the offset-per-tile modes (2/4/6).**
+**Backgrounds · the offset-per-tile modes (2/4/6).**
 
 ## Why it matters for your game
 

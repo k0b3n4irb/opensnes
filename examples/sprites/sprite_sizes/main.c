@@ -36,7 +36,7 @@
 
 #include <snes.h>
 
-/** @brief 8x8 sprite tile data (defined in data.asm) */
+/** @brief 8x8 sprite tile data (converted by the build from res/) */
 #include "res/sprite8.inc"
 #include "res/sprite16.inc"
 #include "res/sprite32.inc"

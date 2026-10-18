@@ -70,7 +70,7 @@ snesmodPlayEffect(SFX_TADA, 127, 128, pitch);
 ### The Soundbank
 
 The soundbank is built from an Impulse Tracker `.it` file (`sfx/effectssfx.it`) that
-contains five instrument samples. The `smconv` tool converts it into a binary soundbank
+contains five instrument samples. The `opensnes-music` tool converts it into a binary soundbank
 at build time. The `.it` file holds the raw instrument definitions but no music patterns --
 this is an effects-only soundbank.
 

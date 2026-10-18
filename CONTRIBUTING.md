@@ -176,7 +176,7 @@ Per-user cross-project preferences (your editor habits, etc.) belong in
 your personal `~/.claude/projects/.../memory/`, not here. The convention
 is documented in [`.claude/rules/memory_routing.md`](https://github.com/k0b3n4irb/opensnes/blob/develop/.claude/rules/memory_routing.md).
 
-## Documentation
+## Documentation {#contributing_documentation}
 
 Every new feature or example must have:
 

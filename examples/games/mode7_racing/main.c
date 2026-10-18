@@ -7,16 +7,16 @@
  * near the bottom of the screen and the WORLD rotates and scrolls
  * under it — the classic SNES racing camera:
  * per frame, mode7SetAngle(heading) + mode7SetScroll/SetCenter follow
- * the car's fixed-point position. This is also the per-frame
- * dogfooding of the C-migrated mode7 module (C1 audit).
+ * the car's fixed-point position, through the mode7 module.
  *
  * - D-pad left/right: steer — A: accelerate — B: brake
  * - Grass slows the car down; the red wall ring stops it.
  *
- * The track is generated at build time (gen_track.py -> gfx4snes
- * -M 7); collision reads a 128x128 class map (road/grass/wall, one
- * byte per tile) through a far pointer — 16 KB of data deliberately
- * outside bank $00 (see the bank $00 budget rules).
+ * The track picture and its 128x128 class map (road/grass/wall, one
+ * byte per tile) are written by gen_track.py, a script kept with the
+ * example and run by hand; the build converts the picture with
+ * opensnes-tileset (mode = 7 in res/track.png.toml). Collision reads the
+ * 16 KB class map as a plain const array.
  *
  * ROM mode: LoROM (project default).
  *
@@ -37,7 +37,7 @@
  * grass visibly slows you; the border wall is solid.
  *
  * @par Modules Used
- * console, dma, background, sprite, math, input
+ * console, dma, background, sprite, math, input, mode7
  *
  * @see gen_track.py — the reproducible track generator
  * @see lib/source/mode7.c — the C Mode 7 module this game exercises
@@ -49,10 +49,9 @@
 #include <snes/input.h>
 
 #include "res/track.inc"   /* generated: track_tiles[], track_map[], track_pal[] (Mode 7 .pc7 / .mp7), each with _end */
-/** @brief Banked-data accessor (data.asm): C pointer derefs are
- * bank-$00-hardcoded (B2), so the 16 KB class map in bank $01+ is
- * read through one `lda.l track_class,x` in ASM. */
-extern u8 track_class_at(u16 idx);
+/** @brief Collision class of each track tile, 128x128 (data.asm,
+ * res/track_class.bin): 0 road, 1 grass, 2 wall. */
+extern const u8 track_class[];
 
 /** @brief Screen position of the car sprite (rotation pivot) */
 #define CAR_SCREEN_X 120
@@ -214,7 +213,7 @@ int main(void) {
         /* class of the DESTINATION tile: wall blocks, else move */
         px = (u16)(nx >> 7);                     /* 12.4 -> tile (px>>3) */
         py = (u16)(ny >> 7);
-        car_surface = track_class_at((u16)((py << 7) + px));
+        car_surface = track_class[(u16)((py << 7) + px)];
         if (car_surface == 2) {
             car_speed = 0;                       /* wall: full stop */
         } else {

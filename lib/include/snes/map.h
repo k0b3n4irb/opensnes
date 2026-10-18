@@ -146,7 +146,7 @@
  *                   address whatever the file's size — a 126-byte `.t16` is
  *                   followed in RAM by the ROM bytes that follow it. Entries
  *                   past the last defined metatile are therefore garbage; a
- *                   map must not reference them (tmx2snes never does).
+ *                   map must not reference them (opensnes-level never does).
  * @param tilesprop  Address of tile property data (collision types)
  *
  * @note Must be called during forced blank (screen off). The function

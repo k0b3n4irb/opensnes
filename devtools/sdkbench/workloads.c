@@ -1090,6 +1090,252 @@ void w_farfill(void) {
     res = acc;
 }
 
+
+/* 24. stepseq — a four-channel step sequencer ticked 2 000 times: the shape
+ * of a sound driver written in C (parallel u16 arrays indexed by the
+ * channel, a switch on an opcode byte, s8 effect tables read at e + 5 + k,
+ * a u32 division when the period changes, a checksum for the DSP writes).
+ * The line of measure: cycles per channel-tick (8 000 of them),
+ * criterion 5 000. */
+#define SQ_CHANNELS    4
+#define SQ_STACK       8
+#define SQ_EFFECTS     8               /* 15 signed bytes each */
+#define SQ_SEQUENCES   8
+#define SQ_SEQ_BYTES   1024
+#define SQ_NOTES       48
+#define SQ_TICKS       2000
+#define SQ_PITCH_K     454003UL
+#define SQ_PITCH_MAX   0x3FFF
+
+/* The byte code: a byte under 0x80 is a note (index into `periods`) followed by
+ * a duration; 0x80 and above are commands, with their operand after them. */
+#define SQ_OP_VOL      0x80            /* volume 0-63 */
+#define SQ_OP_REST     0x84            /* duration */
+#define SQ_OP_FX       0x88            /* effect number, 0 = none */
+#define SQ_OP_FOR      0x8C            /* count */
+#define SQ_OP_NEXT     0x90
+#define SQ_OP_CALL     0x94            /* sequence */
+#define SQ_OP_RET      0x98
+#define SQ_OP_JUMP     0x9C            /* sequence */
+#define SQ_OP_END      0xA0
+#define SQ_OP_TRANS    0xA4            /* signed transposition, in quarter tones */
+
+static u8 seq[SQ_SEQ_BYTES];
+static u16 seq_at[SQ_SEQUENCES];
+static s8 fx_table[SQ_EFFECTS * 15];   /* 0-4 : lengths ; 5-6 tremolo steps ; 7-9 vibrato steps ; 10-11 tremolo pauses ; 12-14 vibrato pauses */
+static u16 periods[SQ_NOTES];
+
+/* Per-channel state, in parallel arrays. */
+static u16 ch_pc[SQ_CHANNELS], ch_time[SQ_CHANNELS], ch_vol_base[SQ_CHANNELS], ch_vol_adj[SQ_CHANNELS];
+static u16 ch_period_base[SQ_CHANNELS], ch_period_adj[SQ_CHANNELS], ch_fx[SQ_CHANNELS], ch_trans[SQ_CHANNELS];
+static u16 ch_t_pause[SQ_CHANNELS * 2], ch_t_len[SQ_CHANNELS * 2];
+static u16 ch_v_pause[SQ_CHANNELS * 3], ch_v_len[SQ_CHANNELS * 3];
+static u16 ch_stack[SQ_CHANNELS * SQ_STACK], ch_sp[SQ_CHANNELS];
+static u16 ch_hw_vol[SQ_CHANNELS], ch_hw_period[SQ_CHANNELS], ch_needs_start[SQ_CHANNELS], ch_last_period[SQ_CHANNELS];
+static u16 ch_sent_vol[SQ_CHANNELS], ch_sent_pitch[SQ_CHANNELS];
+static u16 acc;
+
+static void put(u16 *at, u8 b) { seq[(*at)++] = b; }
+
+/* The sequences: four roots that loop for ever on a jump to themselves, each
+ * calling a sub-sequence inside a counted loop, with notes of 3 to 12 ticks
+ * and an effect that changes with the root. */
+static void makeSequences(void) {
+    u16 at = 0, s, k;
+
+    for (s = 0; s < SQ_NOTES; s++) periods[s] = (u16)(1712 - s * 29 + (s & 3) * 5);
+    for (s = 0; s < SQ_EFFECTS; s++) {
+        s8 *e = fx_table + s * 15;
+        e[0] = (s8)(3 + (s & 3)); e[1] = (s8)(2 + (s & 1)); e[2] = (s8)(4 + (s >> 1)); e[3] = (s8)(3 + (s & 2)); e[4] = (s8)(5 - (s & 1));
+        e[5] = (s8)(-2 - (s & 1)); e[6] = (s8)(1 + (s & 2));
+        e[7] = (s8)(-3 + (s & 1)); e[8] = (s8)(2 + (s & 1)); e[9] = (s8)(-1 - (s & 2));
+        e[10] = (s8)(1 + (s & 1)); e[11] = (s8)(2 + (s & 2));
+        e[12] = (s8)(1 + (s & 3)); e[13] = (s8)(2 - (s & 1)); e[14] = (s8)(1 + (s & 2));
+    }
+    for (s = 0; s < 4; s++) {               /* the four roots */
+        seq_at[s] = at;
+        put(&at, SQ_OP_VOL); put(&at, (u8)(40 + 6 * s));
+        put(&at, SQ_OP_FX); put(&at, (u8)((s * 3) % SQ_EFFECTS + 1));
+        put(&at, SQ_OP_TRANS); put(&at, (u8)(s * 2));
+        put(&at, SQ_OP_FOR); put(&at, (u8)(3 + s));
+        put(&at, SQ_OP_CALL); put(&at, (u8)(4 + s));
+        for (k = 0; k < 6; k++) { put(&at, (u8)((k * 7 + s * 5) % SQ_NOTES)); put(&at, (u8)(3 + (k & 3) * 3)); }
+        put(&at, SQ_OP_NEXT);
+        put(&at, SQ_OP_REST); put(&at, (u8)(4 + s));
+        put(&at, SQ_OP_JUMP); put(&at, (u8)s);
+    }
+    for (s = 4; s < SQ_SEQUENCES; s++) {       /* the sub-sequences: a phrase of eight notes and a rest */
+        seq_at[s] = at;
+        put(&at, SQ_OP_FX); put(&at, (u8)((s * 5) % SQ_EFFECTS + 1));
+        for (k = 0; k < 8; k++) { put(&at, (u8)((k * 5 + s * 11) % SQ_NOTES)); put(&at, (u8)(2 + (k & 1) * 4)); }
+        put(&at, SQ_OP_REST); put(&at, 6);
+        put(&at, SQ_OP_RET);
+    }
+}
+
+static void resetTremolo(u16 c) {
+    u16 e = ch_fx[c] * 15, at = c << 1;
+    ch_t_pause[at] = 0; ch_t_len[at] = (u16)fx_table[e + 0];
+    ch_t_pause[at + 1] = 0; ch_t_len[at + 1] = (u16)fx_table[e + 1];
+}
+
+static void resetVibrato(u16 c) {
+    u16 e = ch_fx[c] * 15, at = c * 3;
+    ch_v_pause[at] = 0; ch_v_len[at] = (u16)fx_table[e + 2];
+    ch_v_pause[at + 1] = 0; ch_v_len[at + 1] = (u16)fx_table[e + 3];
+    ch_v_pause[at + 2] = 0; ch_v_len[at + 2] = (u16)fx_table[e + 4];
+}
+
+static void startNote(u16 c, u16 note, u16 duration) {
+    u16 n = (note + ch_trans[c]) % SQ_NOTES;
+    ch_period_base[c] = periods[n];
+    ch_period_adj[c] = 0;
+    ch_vol_adj[c] = 0;
+    ch_time[c] = duration;
+    ch_needs_start[c] = 1;
+    if (ch_fx[c]) { resetTremolo(c); resetVibrato(c); }
+}
+
+/* Walk the byte code until a note or a rest sets the timer. */
+static void commands(u16 c) {
+    u16 pc = ch_pc[c];
+
+    while (1) {
+        u8 op = seq[pc++];
+
+        if (op < 0x80) { startNote(c, op, seq[pc++]); break; }
+        switch (op) {
+        case SQ_OP_VOL: ch_vol_base[c] = seq[pc++]; break;
+        case SQ_OP_REST: ch_time[c] = seq[pc++]; ch_needs_start[c] = 0; goto out;
+        case SQ_OP_FX: ch_fx[c] = seq[pc++]; break;
+        case SQ_OP_FOR: {
+            u16 n = seq[pc++], top = c * SQ_STACK + ch_sp[c];
+            ch_stack[top] = pc; ch_stack[top + 1] = n; ch_sp[c] += 2;
+            break;
+        }
+        case SQ_OP_NEXT: {
+            u16 top = c * SQ_STACK + ch_sp[c];
+            if (--ch_stack[top - 1]) pc = ch_stack[top - 2];
+            else ch_sp[c] -= 2;
+            break;
+        }
+        case SQ_OP_CALL: {
+            u16 s = seq[pc++];
+            ch_stack[c * SQ_STACK + ch_sp[c]++] = pc;
+            pc = seq_at[s];
+            break;
+        }
+        case SQ_OP_RET: pc = ch_stack[c * SQ_STACK + --ch_sp[c]]; break;
+        case SQ_OP_JUMP: pc = seq_at[seq[pc]]; break;
+        case SQ_OP_TRANS: ch_trans[c] = (u16)(s8)seq[pc++]; break;
+        case SQ_OP_END: ch_pc[c] = 0; return;
+        default: break;
+        }
+    }
+out:
+    ch_pc[c] = pc;
+}
+
+/* One tick of a channel: commands when the timer runs out, then tremolo, vibrato, period and volume. */
+void seqStep(u16 c) {
+    u16 e = ch_fx[c] * 15;
+    u16 k, applied;
+
+    if (!ch_pc[c]) return;
+    if (!ch_time[c]) {
+        commands(c);
+        if (!ch_pc[c]) return;
+    }
+    ch_time[c]--;
+    if (!ch_fx[c]) {
+        ch_hw_vol[c] = ch_vol_base[c] & 0x3F;
+        ch_hw_period[c] = ch_period_base[c];
+        return;
+    }
+    applied = 0;
+    {
+        u16 at = c << 1;
+        for (k = 0; k < 2; k++, at++) {
+            if (ch_t_pause[at]) { ch_t_pause[at]--; applied = 1; break; }
+            if (ch_t_len[at]) {
+                ch_t_len[at]--;
+                ch_vol_adj[c] += (u16)fx_table[e + 5 + k];
+                ch_t_pause[at] = (u16)fx_table[e + 10 + k];
+                applied = 1;
+                break;
+            }
+        }
+    }
+    if (!applied) { ch_vol_adj[c] = 0; resetTremolo(c); }
+    applied = 0;
+    {
+        u16 at = c * 3;
+        for (k = 0; k < 3; k++, at++) {
+            if (ch_v_pause[at]) { ch_v_pause[at]--; applied = 1; break; }
+            if (ch_v_len[at]) {
+                ch_v_len[at]--;
+                ch_period_adj[c] += (u16)fx_table[e + 7 + k];
+                ch_v_pause[at] = (u16)fx_table[e + 12 + k];
+                applied = 1;
+                break;
+            }
+        }
+    }
+    if (!applied) resetVibrato(c);
+    ch_hw_vol[c] = (ch_vol_base[c] + ch_vol_adj[c]) & 0x3F;
+    ch_hw_period[c] = ch_period_base[c] + ch_period_adj[c];
+}
+
+static u16 pitchOf(u16 period) {
+    u32 pitch;
+    if (!period) return SQ_PITCH_MAX;
+    pitch = SQ_PITCH_K / period;
+    return pitch > SQ_PITCH_MAX ? SQ_PITCH_MAX : (u16)pitch;
+}
+
+/* What would go to the DSP: the start of a sample, a volume, a pitch, each folded into the checksum. */
+void seqHardware(u16 c) {
+    u16 vol, pitch;
+
+    if (!ch_pc[c] && !ch_sent_vol[c]) return;
+    vol = (ch_hw_vol[c] << 1) | (ch_hw_vol[c] >> 5);
+    if (ch_needs_start[c]) {
+        ch_needs_start[c] = 0;
+        ch_last_period[c] = ch_hw_period[c];
+        pitch = pitchOf(ch_hw_period[c]);
+        acc = (u16)(((acc << 3) | (acc >> 13)) ^ (pitch + vol + c));
+        ch_sent_vol[c] = vol; ch_sent_pitch[c] = pitch;
+        return;
+    }
+    if (vol != ch_sent_vol[c]) { ch_sent_vol[c] = vol; acc = (u16)(((acc << 1) | (acc >> 15)) ^ vol); }
+    if (ch_hw_period[c] != ch_last_period[c]) {
+        ch_last_period[c] = ch_hw_period[c];
+        pitch = pitchOf(ch_hw_period[c]);
+        if (pitch != ch_sent_pitch[c]) { ch_sent_pitch[c] = pitch; acc = (u16)(((acc << 5) | (acc >> 11)) ^ pitch); }
+    }
+}
+
+void seqTick(void) {
+    u16 c;
+    for (c = 0; c < SQ_CHANNELS; c++) seqStep(c);
+    for (c = 0; c < SQ_CHANNELS; c++) seqHardware(c);
+}
+
+void w_stepseq(void) {
+    u16 c, t;
+
+    makeSequences();
+    acc = 0;
+    for (c = 0; c < SQ_CHANNELS; c++) {
+        ch_pc[c] = seq_at[c]; ch_time[c] = 0; ch_sp[c] = 0; ch_fx[c] = 0; ch_trans[c] = 0;
+        ch_vol_base[c] = 32; ch_vol_adj[c] = 0; ch_period_base[c] = 428; ch_period_adj[c] = 0;
+        ch_needs_start[c] = 0; ch_last_period[c] = 0; ch_sent_vol[c] = 0; ch_sent_pitch[c] = 0;
+        ch_hw_vol[c] = 0; ch_hw_period[c] = 0;
+    }
+    for (t = 0; t < SQ_TICKS; t++) seqTick();
+    res = acc;
+}
+
 int main(void) {
     consoleInit();
 #if WORKLOAD == 1
@@ -1138,6 +1384,8 @@ int main(void) {
     w_div32();
 #elif WORKLOAD == 23
     w_farfill();
+#elif WORKLOAD == 24
+    w_stepseq();
 #endif
     done = 0x600D;
     while (1) {

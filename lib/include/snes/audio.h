@@ -2,14 +2,11 @@
  * @file audio.h
  * @brief OpenSNES Audio System
  *
- * @note **v2 engine** (2026-07): rebuilt on the raw-APU path — a pure C
- *       command layer (`audio.c`) driving a resident SPC700 driver built
- *       from source at lib build time (the legacy PVSnesLib-ABI
- *       `audio.asm` is gone). The full surface below is implemented:
- *       init/ready, master volume, per-voice control, dynamic BRR
- *       loading, playback with pan/pitch, echo with FIR filter, and
- *       live voice-state readback. Design notes:
- *       `.claude/notes/chantiers/audio_v2.md`.
+ * @note Built on the raw-APU path: a pure C command layer (`audio.c`)
+ *       driving a resident SPC700 driver built from source at lib build
+ *       time. The full surface below is implemented: init/ready, master
+ *       volume, per-voice control, dynamic BRR loading, playback with
+ *       pan/pitch, echo with FIR filter, and live voice-state readback.
  *
  * @warning Main-thread only — do not call audio functions from an NMI
  *          callback. One engine per ROM: do not link `audio` and
@@ -263,9 +260,68 @@ u8 audioIsReady(void);
  */
 u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint);
 
+/** @brief What audioLoadSampleStep() returns when the driver stopped answering */
+#define AUDIO_LOAD_FAILED       0xFFFF
+
+/**
+ * @brief Start loading a sample in steps, while the game runs
+ *
+ * audioLoadSample() does not return before the whole sample is in the sound
+ * CPU's memory: about 560 bytes a frame, ten frames of a stopped game for
+ * 5.6 KB. This pair sends the same bytes a piece at a time, when the game
+ * says so: voices that are playing go on, and voice commands (play, volume,
+ * pitch, stop) pass between two steps.
+ *
+ * audioLoadSampleBegin() takes the place in memory and sends nothing; each
+ * audioLoadSampleStep() sends a piece. The slot is "not loaded" — playing
+ * it is refused — until a step returns 0.
+ *
+ * - One sample at a time: a second audioLoadSampleBegin() before the first
+ *   is whole is refused (AUDIO_ERR_INVALID_ID).
+ * - audioLoadSample() on other slots stays allowed meanwhile; those samples
+ *   go above the place taken here.
+ * - audioUnloadSample(id) before the last step gives the load up; the
+ *   memory comes back if nothing was loaded above it.
+ * - @p brrData must stay valid until the last step (it is ROM data in
+ *   every case we know).
+ *
+ * @param id Sample slot (0-63)
+ * @param brrData Pointer to the BRR data
+ * @param size Size in bytes (3 at least)
+ * @param loopPoint As for audioLoadSample()
+ * @return AUDIO_OK; AUDIO_ERR_NO_MEMORY; AUDIO_ERR_INVALID_ID (bad slot, or
+ *         a load in steps is already under way); AUDIO_ERR_TIMEOUT before
+ *         audioInit()
+ *
+ * @code
+ * audioLoadSampleBegin(SMP_VOICE, voice_brr, (u16)(voice_brr_end - voice_brr), 0);
+ * // then once a frame, in the game loop:
+ * if (voice_loading && audioLoadSampleStep(64) == 0) voice_loading = 0;
+ * @endcode
+ */
+u8 audioLoadSampleBegin(u8 id, const u8 *brrData, u16 size, u16 loopPoint);
+
+/**
+ * @brief Send the next piece of the sample audioLoadSampleBegin() started
+ *
+ * @param maxBytes How much to send at most. Bytes travel three at a time,
+ *                 so the step is @p maxBytes rounded down to a multiple of
+ *                 3 (3 at least); the last step takes up to two bytes more
+ *                 rather than leave them alone. The cost of a step is what
+ *                 the game chooses here, plus a fixed part: see
+ *                 docs/tutorials/audio_samples.md for the measured figures.
+ * @return Bytes still to send; 0 when the sample is whole and playable (and
+ *         when no load is under way); AUDIO_LOAD_FAILED if the driver
+ *         stopped answering — the load is given up
+ */
+u16 audioLoadSampleStep(u16 maxBytes);
+
 /**
  * @brief Unload a sample from a slot
  * @param id Sample slot (0-63)
+ *
+ * On the sample audioLoadSampleBegin() started and no step has finished:
+ * gives that load up.
  *
  * It does NOT stop a voice that is playing the sample — stop it first. The
  * allocator is a bump pointer: SPC memory comes back only when the sample
@@ -290,10 +346,14 @@ u8 audioGetSampleInfo(u8 id, AudioSample *info);
  * driver and the sample directory) and ends
  * - at **$FFC0, 62,656 bytes**, as long as the game has configured no
  *   echo;
- * - at **$C000, 46,336 bytes**, from the first audioSetEcho(): the echo
- *   ring lives above. audioSetEcho() answers AUDIO_ERR_NO_MEMORY when
- *   samples already loaded reach into it, so a game that wants an echo
- *   calls audioSetEcho() before loading, or keeps its samples under 46 KB.
+ * - at the **echo ring** once audioSetEcho() has been called: the ring
+ *   takes the top of the memory under $FF00, 2,048 bytes per unit of
+ *   delay — 58,112 bytes of samples with a delay of 2, 47,872 with the
+ *   longest, 7. audioSetEcho() answers AUDIO_ERR_NO_MEMORY when samples
+ *   already loaded reach into the ring it is asked for, so a game that
+ *   wants an echo calls audioSetEcho() before loading, or picks a delay
+ *   its samples leave room for. A shorter delay gives memory back, and
+ *   audioReleaseEcho() gives the whole ring back.
  *
  * @return Free bytes available, under the limit that applies now
  */
@@ -413,6 +473,43 @@ u8 audioSetVoiceVolume(u8 voice, u8 volumeL, u8 volumeR);
 u8 audioSetVoicePitch(u8 voice, u16 pitch);
 
 /**
+ * @brief Set the volume and the pitch of a voice in one command
+ *
+ * What a tracker or a sequencer does to a voice at every tick: the
+ * tremolo moves its volume and the vibrato its pitch. audioSetVoiceVolume()
+ * then audioSetVoicePitch() cost two handshakes with the driver; this is
+ * one, and the call itself is assembly (four voices updated every frame:
+ * about 10 600 master cycles a voice with the two calls, 5 500 with this
+ * one, measured on luna).
+ *
+ * The volume is split between the two channels by the voice's pan: the one
+ * the last audioPlaySampleOn() / audioPlaySampleEx() gave it, or the one
+ * audioSetVoicePan() set since — the same split as those calls make, so a
+ * voice that plays hard left stays hard left. The driver learns a voice's
+ * pan once, and again only when it changes.
+ *
+ * @param voice  Voice number (0-7)
+ * @param volume Volume (0-127), before the pan
+ * @param pitch  Pitch value ($1000 = normal, 14-bit)
+ * @return AUDIO_OK, AUDIO_ERR_INVALID_ID, or AUDIO_ERR_TIMEOUT when the
+ *         previous command was never acknowledged
+ */
+u8 audioSetVoiceVolumePitch(u8 voice, u8 volume, u16 pitch);
+
+/**
+ * @brief Set the pan audioSetVoiceVolumePitch() splits a voice's volume with
+ *
+ * Changes nothing that is sounding: it takes effect at the voice's next
+ * audioSetVoiceVolumePitch(). A voice started with audioPlaySampleOn()
+ * already has the pan of that call; this is for a voice whose side is
+ * decided once (a tracker channel) or changes without a new note.
+ *
+ * @param voice Voice number (0-7)
+ * @param pan   AUDIO_PAN_LEFT (0) to AUDIO_PAN_RIGHT (15), AUDIO_PAN_CENTER (8)
+ */
+void audioSetVoicePan(u8 voice, u8 pan);
+
+/**
  * @brief Get current state of a voice
  * @param voice Voice number (0-7)
  * @param state Pointer to AudioVoiceState to fill
@@ -463,19 +560,23 @@ u8 audioSetGain(u8 voice, u8 mode);
  * @brief Configure echo parameters
  *
  * @param delay Echo delay 1-7 (delay_ms = value * 16; values above 7
- *              are clamped — the echo ring takes up to 14 KB from $C000,
- *              and the first call brings the sample area down from 62 KB
- *              to 46 KB: see audioGetFreeMemory())
+ *              are clamped). The echo ring takes delay x 2 KB at the top
+ *              of the sample area: see audioGetFreeMemory()
  * @param feedback Feedback amount (-128 to 127)
  * @param volumeL Left echo volume (-128 to 127)
  * @param volumeR Right echo volume (-128 to 127)
  *
- * Reconfiguration clears the whole echo ring before re-enabling echo
- * writes (~9 ms per delay unit) — call at scene setup, not per frame.
+ * **This call blocks.** The S-DSP takes a new delay only when the ring it
+ * is running reaches its end, so the driver keeps the ring silent for that
+ * long before it uses the new one: up to 240 ms on the first call, 16 ms
+ * per unit of the previous delay after; then it clears the new ring (~9 ms
+ * per unit). Call it at scene setup or with the screen off, never during
+ * play. To turn the same echo off and on, use audioDisableEcho() and
+ * audioEnableEcho(): they cost one command.
  * Call this BEFORE audioEnableEcho().
  *
  * @return AUDIO_OK; AUDIO_ERR_NO_MEMORY when samples already loaded reach
- *         past $C000, where the ring goes (nothing is changed then);
+ *         into the ring this delay needs (nothing is changed then);
  *         AUDIO_ERR_TIMEOUT if the driver does not answer
  */
 u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR);
@@ -483,19 +584,50 @@ u8 audioSetEcho(u8 delay, s8 feedback, s8 volumeL, s8 volumeR);
 /**
  * @brief Set FIR filter coefficients for echo
  * @param fir Array of 8 signed coefficients
+ *
+ * Optional: from audioInit() the filter is { 127, 0, 0, 0, 0, 0, 0, 0 },
+ * which passes the echo through unchanged. (Until 2026-10-13 it was all
+ * zeros, and an echo configured without this call was silent.)
  */
 u8 audioSetEchoFilter(const s8 fir[8]);
 
 /**
  * @brief Enable echo for specific voices
  * @param voiceMask Bitmask (bit 0 = voice 0, etc.)
+ *
+ * After audioDisableEcho(), this starts the echo again as audioSetEcho()
+ * configured it, on a cleared ring (~9 ms per unit of delay in the driver;
+ * the call itself returns at once).
  */
 u8 audioEnableEcho(u8 voiceMask);
 
 /**
  * @brief Disable echo for all voices
+ *
+ * Mutes the echo and stops the ring's writes. The ring keeps its memory:
+ * audioEnableEcho() brings the same echo back.
  */
 u8 audioDisableEcho(void);
+
+/**
+ * @brief Turn the echo off and give its ring back to the samples
+ *
+ * Does what audioDisableEcho() does, then frees the ring: the sample area
+ * reaches $FFC0 again (audioGetFreeMemory() counts it at once), and
+ * samples may be loaded where the ring was as soon as this returns — the
+ * driver answers only once the sound chip has stopped writing there.
+ *
+ * For a game that wants an echo in one scene only: audioSetEcho() when
+ * the scene starts, this when it ends. audioEnableEcho() alone no longer
+ * brings an echo back afterwards; audioSetEcho() does, with its usual
+ * wait (16 ms per unit of the delay released), and it answers
+ * AUDIO_ERR_NO_MEMORY while samples loaded in the meantime occupy the
+ * ring it needs.
+ *
+ * @return AUDIO_OK, or AUDIO_ERR_TIMEOUT if the driver does not answer
+ *         (the ring is then still counted as taken)
+ */
+u8 audioReleaseEcho(void);
 
 /** @} */
 

@@ -79,8 +79,7 @@ The build converts `res/sunset.png` itself (`opensnes-image hicolor`, from
 
 ## Further: 3840 colours by splitting the channels
 
-A second HiColor technique, krom's HiColor3840, was the `hicolor_blend`
-example until 2026-10-05. It keeps CGRAM still and splits the image's RGB
+A second HiColor technique, krom's HiColor3840, keeps CGRAM still and splits the image's RGB
 channels across two layers blended by colour math (`colorMathSetSource`,
 `colorMathSetHalf`, one layer on the main screen, the other on the sub
 screen): each pixel's colour is the sum of two 15-bit colours, which reaches

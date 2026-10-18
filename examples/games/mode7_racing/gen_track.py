@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generate the Mode 7 race track: res/track.png (1024x1024, 128x128
-tiles of 8x8) for gfx4snes -M 7, plus res/track_class.bin — a 128x128
+tiles of 8x8) for opensnes-tileset --mode 7, plus res/track_class.bin — a 128x128
 byte map (one byte per tile: 0 = road, 1 = grass, 2 = wall) the game
 reads for collision/surface.
 
@@ -150,7 +150,7 @@ def main():
                 if is_grass(tx + 1, ty):
                     draw.rectangle([x0 + 5, y0, x0 + 7, y0 + 7], fill=EDGE)
 
-    # gfx4snes needs an INDEXED png; the track uses ~8 colors
+    # opensnes-tileset needs an INDEXED png; the track uses ~8 colors
     img.convert("P", palette=Image.ADAPTIVE, colors=64).save(RES / "track.png")
 
     # class map straight from the tile classes (the game reads one byte per tile)

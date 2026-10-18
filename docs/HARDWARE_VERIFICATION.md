@@ -80,7 +80,7 @@ behaviour, and the note under the table says which.
 | 21 | `input/mouse` | move the mouse, click both buttons, right-click cycles sensitivity | Optional (needs a SNES Mouse, port 1). The cursor tracks the hand at each of the three sensitivities. |
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
 | 23 | `backgrounds/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `examples/backgrounds/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
-| 24 | `chips/superfx_game_skeleton` | hold the D-pad, listen | The crosshair follows the pad at full frame rate while the GSU's cube turns at half rate and the music plays: no torn or half-drawn cube (`gsuPresent` double-buffers and the NMI swaps in blank), no pause in the music while the GSU runs from its cache. Firmware-dependent, like rows 16-18. |
+| 24 | `chips/superfx_game_skeleton` | hold the D-pad, listen | The crosshair follows the pad at full frame rate while the GSU's cube turns at half rate and the music plays: no torn or half-drawn cube (`gsuPresent` double-buffers and the NMI swaps in blank), no pause in the music while the GSU runs from its cache. The two letterbox bands (an HDMA to INIDISP) are black to their edge, with no fade at the end of a band; write down the console's CPU revision (1-CHIP or S-CPU-A), since the two errata this form avoids are each on one of them. Firmware-dependent, like rows 16-18. |
 | 25 | `chips/sa1_save` | read NOW, power-cycle, read again | The SA-1 save path: NOW is one more after every power cycle and FOUND shows the previous value (BW-RAM, battery). A NOW that stays at 1 means the cart's SA-1 core does not keep BW-RAM across power, or the header's `$35` is not honoured. |
 | 26 | `chips/superfx_save` | read NOW, power-cycle, read again | The Super FX save path: same check in the GSU's Game Pak RAM at `$E000` (header `$15`, size at `$FFBD`). Firmware-dependent, like rows 16-18 and 24. |
 
@@ -90,8 +90,7 @@ the one known difference between emulators and the console that the lib
 compensates for; if it fails, the compensation is being bypassed somewhere.
 Rows 4 to 10 are the PPU under load: a failure there is a timing claim in
 the lib (HDMA table shape, IRQ position, DMA length) that luna and the console
-disagree on — query the corpus before touching code
-(`.claude/rules/hardware_claims.md`). Rows 11 and 12 are the APU path,
+disagree on — query the corpus before touching code. Rows 11 and 12 are the APU path,
 including the cold-boot upload. Row 13 is the only test of battery-backed
 persistence the project has. Rows 16 to 18 and 24 to 26 depend on the cart as much as on
 the SDK; a failure needs the firmware version and, if possible, a second cart
@@ -160,7 +159,7 @@ Peripherals:   pads / mouse / scope
    moment. If luna shows it too, it is an ordinary bug: file it, fix it. If
    luna does not, it is either a hardware behaviour luna does not model or a
    wrong claim in the lib: query the corpus with the symptom
-   (`snes_search`, `.claude/rules/hardware_claims.md`), and only then
+   (`snes_search`), and only then
    decide which.
 3. Open an issue with the grid header (console, cart, firmware, display),
    the row, the note and the photo or video. A luna-side discrepancy is

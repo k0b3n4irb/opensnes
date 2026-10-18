@@ -19,7 +19,7 @@
 # Measured: `luna state --until-frame N --input <the script below> --peek
 # selectedItem:2 --out -` (+ `ppu.obsel`) at 60/120/200/300 -> 0/$00, 1/$20,
 # 0/$00, 2/$60.
-rom = "../../examples/sprites/metasprite/metasprite.sfc"
+rom = "../fixtures/retired_examples/metasprite/metasprite.sfc"
 
 [[checkpoint]]                 # DOWN at 60 lands after this frame: still mode 0
 at_frame = 60

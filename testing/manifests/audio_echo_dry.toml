@@ -26,6 +26,6 @@ EVOL_R = 0x00
 FLG    = 0x20        # changed: ECEN set — the DSP stopped writing the ring
 EFB    = 0x5A        # unchanged: feedback survives the toggle
 EDL    = 0x06        # unchanged: the ring is still sized
-ESA    = 0xC0        # unchanged: still at $C000
+ESA    = 0xCF        # unchanged: still at $CF00
 FIR0   = 0x7F        # unchanged: the FIR was not re-uploaded
 DIR    = 0x0A

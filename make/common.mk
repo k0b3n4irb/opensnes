@@ -11,11 +11,11 @@
 # Optional variables:
 #   CSRC      - C source files (default: main.c)
 #   ASMSRC    - Additional ASM files to include
-#   GFXSRC    - PNG files to convert (uses gfx4snes, outputs .pic/.pal)
-#   (BRR)     - a .wav .incbin'd as its .brr auto-converts via wav2brr
-#               (one-shot SFX; --loop samples: run wav2brr by hand)
 #   CFLAGS    - Additional C compiler flags
-#   SPRITE_SIZE - Sprite/tile size for gfx4snes (default: 8)
+#
+# Assets (pictures, sprite sheets, sounds, levels, fonts) need no variable:
+# a settings file beside each one (res/hero.png.toml, `tool = "opensnes-..."`)
+# and the build converts it — see ASSET_TOML below and docs/tools/README.md.
 #
 # Every variable, with its default: docs/tools/build.md (the doc sentinel
 # fails when a `?=` variable below is missing from that page).
@@ -31,7 +31,7 @@
 #
 # SNESMOD audio options:
 #   USE_SNESMOD   - Set to 1 to enable SNESMOD tracker audio
-#   SOUNDBANK_SRC - IT files to convert (e.g., music.it sfx.it)
+#   SOUNDBANK_SRC - IT files to convert with opensnes-music (e.g., music.it sfx.it)
 #   SOUNDBANK_OUT - Output name (default: soundbank)
 #
 # Usage:
@@ -41,6 +41,12 @@
 #   include $(OPENSNES)/make/common.mk
 #
 #==============================================================================
+
+# A target whose recipe fails is deleted. The ROM is written by the linker
+# before opensnes-rom check reads it; without this, a ROM the check refused
+# stayed on disk, and the next make found it newer than its objects, said
+# "Built" and exited 0 (audit 1.0, 04-3).
+.DELETE_ON_ERROR:
 
 #------------------------------------------------------------------------------
 # Paths and Tools
@@ -58,10 +64,6 @@ AS       := $(OPENSNES)/bin/wla-65816
 GSU_AS   := $(OPENSNES)/bin/wla-superfx
 SPC_AS   := $(OPENSNES)/bin/wla-spc700
 LD       := $(OPENSNES)/bin/wlalink
-GFX4SNES := $(OPENSNES)/bin/gfx4snes
-SMCONV   := $(OPENSNES)/bin/smconv
-WAV2BRR  := $(OPENSNES)/bin/wav2brr
-ASEPRITE2SNES := $(OPENSNES)/bin/aseprite2snes
 TEMPLATES := $(OPENSNES)/templates
 
 # Bank $00 free-space threshold (bytes free) under which the link fails.
@@ -111,8 +113,6 @@ endif
 CSRC        ?= main.c
 ASMSRC      ?=
 SPCSRC      ?=
-GFXSRC      ?=
-SPRITE_SIZE ?= 8
 USE_LIB     ?= 0
 USE_HIROM   ?= 0
 USE_FASTROM ?= 0
@@ -334,7 +334,8 @@ _DEP_vramqueue       :=                                                         
 _DEP_tile            :=                                                         # tileEncode*: pure C, no dependency
 # audio v2: C layer needs the apu upload primitives + the embedded
 # SPC700 driver image (audio_blob.asm -> audio_blob-asm.o)
-_DEP_audio           := apu audio_blob audio_stream
+_DEP_audio           := apu audio_blob audio_stream audio_vset
+_DEP_audio_vset      := audio                                                   # audioSetVoiceVolumePitch (asm): audio.c's pending command, sequence and voice mirror
 
 _resolve_one = $(1) $(foreach m,$(1),$(_DEP_$(m)))
 _resolve_deps = $(sort $(call _resolve_one,$(call _resolve_one,$(call _resolve_one,$(1)))))
@@ -375,7 +376,7 @@ ALL_CFLAGS := $(INCLUDES) $(CFLAGS)
 # assets_gen.asm — the .include of every <stem>_data.as (each carries its own
 # ASSET_SECTIONs, one per blob), assembled with the
 # project. The artist never opens this Makefile; a hand-written data.asm
-# and the GFXSRC rule below keep working for the projects that have them.
+# keeps working for the projects that have one.
 # ASSET_TOML lists the files (default: *.toml and res/*.toml that name a tool).
 ASSET_TOML ?= $(foreach t,$(wildcard *.toml res/*.toml),$(if $(shell grep -l '^tool = "opensnes-' $(t) 2>/dev/null),$(t),))
 ASSET_STAMPS := $(addsuffix .done,$(ASSET_TOML))
@@ -405,7 +406,12 @@ assets_gen.asm: $(ASSET_STAMPS)
 # Derived Variables
 #------------------------------------------------------------------------------
 
-GFX_HEADERS := $(notdir $(addsuffix .h,$(basename $(GFXSRC))))
+# GFXSRC and its gfx4snes rule left the build with the 0.x converters:
+# a settings file beside the picture replaces them.
+ifneq ($(strip $(GFXSRC)),)
+$(error GFXSRC is gone, with gfx4snes: put a settings file beside each picture instead (res/$(notdir $(firstword $(GFXSRC))).toml with tool = "opensnes-tileset" or "opensnes-sprite"; docs/tools/legacy.md maps the gfx4snes options))
+endif
+GEN_HEADERS :=
 C_OBJS := $(patsubst %.c,%.c.o,$(CSRC))
 
 # Example C objects must rebuild when the lib API changes (issue #105:
@@ -435,7 +441,7 @@ SOUNDBANK_OBJ := $(if $(_HAS_SOUNDBANK),$(SOUNDBANK_OUT).o)
 
 # Add soundbank header for C compilation dependency
 ifneq ($(_HAS_SOUNDBANK),)
-GFX_HEADERS += $(SOUNDBANK_OUT).h
+GEN_HEADERS += $(SOUNDBANK_OUT).h
 endif
 
 # Extract .incbin dependencies from ASMSRC
@@ -466,40 +472,20 @@ all: $(TARGET)
 
 ifneq ($(_HAS_SOUNDBANK),)
 # One recipe, one target: with both .asm and .h as targets of one rule, a
-# parallel make ran smconv twice and the second run truncated the .bnk the
-# first assembly was reading (2026-10-04, libtests_fx under make tests).
+# parallel make ran the converter twice and the second run truncated the .bnk
+# the first assembly was reading (2026-10-04, libtests_fx under make tests).
+# opensnes-music bank writes what smconv -s -o NAME -b N -n -p NAME wrote,
+# byte for byte (its golden suite runs smconv's cases).
 $(SOUNDBANK_OUT).h: $(SOUNDBANK_OUT).asm
-	@test -f $@ || { echo "soundbank: $@ missing after smconv" >&2; exit 1; }
+	@test -f $@ || { echo "soundbank: $@ missing after opensnes-music" >&2; exit 1; }
 $(SOUNDBANK_OUT).asm: $(SOUNDBANK_SRC) .opensnes_config
-	@echo "[SMCONV] Generating soundbank from: $(SOUNDBANK_SRC)"
-	@$(SMCONV) -s -o $(SOUNDBANK_OUT) -b $(SOUNDBANK_BANK) -n -p $(SOUNDBANK_OUT) $(SOUNDBANK_SRC)
+	@echo "[MUSIC] Generating soundbank from: $(SOUNDBANK_SRC)"
+	@$(OPENSNES)/bin/opensnes-music bank -q --name $(SOUNDBANK_OUT) --bank $(SOUNDBANK_BANK) -o . $(SOUNDBANK_SRC)
 ifeq ($(USE_HIROM),1)
 	@# HiROM: SNESMOD reads via $$00-$$3F:$$8000 mirrors, data must be at $$8000+
 	@sed -i.bak 's/^\.ORG 0$$/.ORG $$8000/' $(SOUNDBANK_OUT).asm && rm -f $(SOUNDBANK_OUT).asm.bak
 endif
 endif
-
-#------------------------------------------------------------------------------
-# Graphics Conversion
-#------------------------------------------------------------------------------
-
-define GFX_RULE
-$(notdir $(basename $(1)).pic) $(notdir $(basename $(1)).pal): $(1) .opensnes_config
-	@echo "[GFX] $$< -> $$(notdir $$(basename $$<)).pic/.pal"
-	@$$(GFX4SNES) -s $$(SPRITE_SIZE) -p -i $$<
-endef
-$(foreach src,$(GFXSRC),$(eval $(call GFX_RULE,$(src))))
-
-#------------------------------------------------------------------------------
-# BRR sample conversion — .wav → .brr (one-shot SFX)
-#------------------------------------------------------------------------------
-# Zero-config: drop a PCM .wav next to your source and .incbin the matching
-# .brr in an ASM file. The .incbin dependency (INCBIN_DEPS above) makes the
-# .brr a prerequisite, and this rule generates it with wav2brr. For a looping
-# sample, run wav2brr --loop by hand and commit the .brr instead.
-%.brr: %.wav
-	@echo "[BRR] $< -> $@"
-	@$(WAV2BRR) $< $@
 
 #------------------------------------------------------------------------------
 # SuperFX (GSU) Assembly — two-stage build: .sfx → .sfx.o → .sfx.bin
@@ -615,7 +601,7 @@ upgrade_hint = if [ -x $(OPENSNES)/bin/opensnes ] && ! $(OPENSNES)/bin/opensnes 
 _CSRC_DIRS := $(filter-out ./,$(sort $(dir $(CSRC))))
 LOCAL_HEADERS := $(wildcard *.h *.inc res/*.h res/*.inc \
                    $(foreach d,$(_CSRC_DIRS),$(d)*.h $(d)*.inc $(d)res/*.h $(d)res/*.inc))
-%.c.o: %.c $(GFX_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
+%.c.o: %.c $(GEN_HEADERS) $(GSU_HEADERS) $(MEMMAP_DEP) $(LIB_HEADERS) $(LOCAL_HEADERS) .opensnes_config | $(ASSET_STAMPS)
 ifneq ($(SKIP_LINT),1)
 	@if command -v clang >/dev/null 2>&1; then \
 		clang $(CLANG_LINT_FLAGS) -I $(OPENSNES)/lib/include $< || \
@@ -635,7 +621,7 @@ endif
 # ignored, and the old header shipped. The stamp holds every knob that
 # reaches the header, the assembler flags or the link; it is rewritten only
 # when that text changes, so a rebuild with the same knobs stays a no-op.
-_CONFIG_TEXT := [cc $(COMPILER_ID)] $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) $(SPRITE_SIZE) \
+_CONFIG_TEXT := [cc $(COMPILER_ID)] $(CARTRIDGETYPE) $(ROMSIZE) $(SRAMSIZE) $(GSU_RAM_SIZE_VAL) $(COUNTRY_VAL) \
   [$(ROM_NAME)] [$(ASFLAGS)] [$(CFLAGS)] [$(LIB_MODULES)] [$(LIBDIR)] \
   [$(USE_SNESMOD) $(SOUNDBANK_BANK)]
 .opensnes_config: FORCE
@@ -788,7 +774,7 @@ clean:
 	@rm -f project_hdr.asm project_config.inc project_sa1_boot.asm linkfile *.sym $(TARGET) .opensnes_config .opensnes_config.tmp
 	@rm -f $(ASSET_STAMPS) $(if $(ASSET_TOML),assets_gen.asm) \
 		$(foreach t,$(ASSET_TOML),$(addprefix $(basename $(basename $(t))),.pic .pal .map .cmap .pc7 .mp7 .inc _data.as _meta.inc _anim.h .brr .h .b16 .t16 .o16 _entities.inc _cos.hdma _sin.hdma _nsin.hdma))
-	@rm -f $(GFX_HEADERS)
+	@rm -f $(GEN_HEADERS)
 	@rm -f $(SOUNDBANK_OUT).asm $(SOUNDBANK_OUT).h $(SOUNDBANK_OUT).o $(SOUNDBANK_OUT).wrap.asm $(SOUNDBANK_OUT).bnk
 	@rm -f $(GSU_BINS) $(GSU_HEADERS) $(GSUSRC:.sfx=.sfx.o) $(GSUSRC:.sfx=.sfx.link) $(GSUSRC:.sfx=.sfx.sym)
 	@rm -f $(SPC_BINS) $(SPCSRC:.spc700.asm=.spc700.o) $(SPCSRC:.spc700.asm=.spc700.link)

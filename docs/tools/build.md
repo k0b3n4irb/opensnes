@@ -24,15 +24,15 @@ Every variable can also be set on the command line for one build:
 |---|---|---|
 | `CSRC` | `main.c` | C sources, compiled by `cc65816` and linked in order |
 | `ASMSRC` | (none) | Extra 65816 assembly sources (data sections, hand-written routines) |
-| `GFXSRC` | (none) | PNG files converted by `gfx4snes` into `.pic` / `.pal` (+ a C header) at build time |
-| `SPRITE_SIZE` | `8` | Tile size passed to `gfx4snes -s` for the `GFXSRC` files |
 | `LUNA` | `$(OPENSNES)/testing/bin/luna` | The luna binary `make test` / `make test-update` run the project's `test/*.toml` with (`scripts/install-luna.sh` puts it there); a `LUNA_BIN` in the environment, the installer's own override, takes precedence |
 | `SPCSRC` | (none) | SPC700 assembly (`*.spc700.asm`), assembled with `wla-spc700` into a `.spc700.bin` your 65816 code `.incbin`s |
 | `GSUSRC` | (none) | Super FX assembly (`*.sfx`), assembled with `wla-superfx` into a `.sfx.bin` (needs `USE_SUPERFX := 1`) |
 
-A `.wav` that an assembly file `.incbin`s as its `.brr` is converted by
-`wav2brr` automatically (one-shot samples; run `wav2brr --loop` by hand for
-looping ones).
+A sound is converted when a settings file sits beside it:
+`res/jump.wav.toml` with `tool = "opensnes-sample"` and an `[encode]` table
+(its keys are the options of `opensnes-sample encode`, `loop` among them)
+gives `res/jump.brr` and `res/jump.h`, and the build links the sample
+(@ref tools_opensnes_sample).
 
 ## Library
 
@@ -73,10 +73,10 @@ A cartridge carries one coprocessor: setting two of these is refused.
 
 | Variable | Default | What it does |
 |---|---|---|
-| `USE_SNESMOD` | `0` | `1` links the SNESMOD driver and converts `SOUNDBANK_SRC` with `smconv` |
+| `USE_SNESMOD` | `0` | `1` links the SNESMOD driver and converts `SOUNDBANK_SRC` with `opensnes-music` |
 | `SOUNDBANK_SRC` | (none) | Impulse Tracker `.it` files that make up the soundbank |
 | `SOUNDBANK_OUT` | `soundbank` | Base name of the generated soundbank files |
-| `SOUNDBANK_BANK` | `1` | ROM bank passed to `smconv -b` for the soundbank data |
+| `SOUNDBANK_BANK` | `1` | ROM bank passed to `opensnes-music bank --bank` for the soundbank data |
 
 ## What a change rebuilds
 
@@ -95,14 +95,14 @@ runs again whenever an object did.
 Every link runs checks that catch silent failures (a const table read
 through the wrong bank, RAM past `$2000`, the stack reaching the C
 variables). Their thresholds are variables; lowering one is a decision to
-write down, raising it is almost always wrong (`.claude/rules/bank0_budget.md`).
+write down, raising it is almost always wrong.
 
 | Variable | Default | What it does |
 |---|---|---|
 | `BANK0_FAIL_THRESHOLD` | `0` | `0`: never. Bank $00 holds code only, and code that does not fit goes to the next banks by itself (the link report says how much). A value fails the link when bank $00 has fewer free bytes: for a project that wants its code bank watched |
 | `RAM_FAIL_THRESHOLD` | `512` | Fail the link when the plain C RAM band (`$0000-$1FFF`) has fewer free bytes than this |
 | `RAM_WARN_THRESHOLD` | `1024` | Warn below this many free bytes in that band |
-| `LD_DISCARD` | `1` | Link only the sections something refers to (`wlalink -d`): the library functions and RAM your program does not use are left out of the ROM. `0` links every section of every listed module, as before 2026-10-08 |
+| `LD_DISCARD` | `1` | Link only the sections something refers to (`wlalink -d`): the library functions and RAM your program does not use are left out of the ROM. `0` links every section of every listed module |
 
 Each check has a bypass for debugging, never for a commit: `SKIP_LINT=1`
 (the clang syntax pass over your C), `SKIP_BANK0_CHECK=1`,

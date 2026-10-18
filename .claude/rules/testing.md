@@ -17,6 +17,7 @@ make test-manifests                                  # functional probes: `luna 
 # (LUNA_JOBS, default the CPU count; LUNA_JOBS=1 = serial, same output)
 python3 testing/difftest.py                 # the compiler against C's integer rules: random expressions run on luna in four shapes, model checked by clang (--seeds A-B to hunt; a Class A change runs a few thousand)
 python3 testing/difftest_stmt.py            # the same for small programs: loops, arrays, a struct, pointers, against an interpreter built on that model; a failure is reduced and names the wrong variable
+# compiler-hunt.yml runs both every night on a new window of 3,000 seeds each, chosen by the date (2026-10-16): the gate is fixed, the hunt walks
 python3 testing/wram_regress.py             # per-frame WRAM oracle over the corpus
 python3 testing/luna_runner.py --coverage --power-on random=1   # same liveness pass from pseudo-random RAM (fixed seed): catches reads of never-initialised memory
 python3 testing/diff_corpus.py --ref <examples tree built before the change>   # Class A A/B at equal PPU frame (luna diff)
@@ -45,7 +46,7 @@ runs inside the sanitizer job. A regression or an XPASS fails it.
 IT loader, cute_tiled, the aseprite2snes JSON parser, stb_image) for `FUZZ_SECONDS` each; `fuzz.yml` (on any push touching `tools/`, and weekly) gives them ten
 minutes, `make fuzz-replay` (in the sanitizer job) replays the committed
 crash inputs. `make lint` includes `lint-cppcheck` (tools' sources and lib C; skips
-where cppcheck is absent, CI installs it). `make test-link-modules` links every lib module alone with only the
+where cppcheck is absent; CI builds the pinned 2.22.0 from its tag, sha256-checked, since 2026-10-17: a newer cppcheck reports more, so the version is part of the gate). `make test-link-modules` links every lib module alone with only the
 dependencies `make/common.mk` declares (`_DEP_<module>`), and in two
 all-together groups; a module that needs a symbol from a module it does
 not declare fails here instead of in a user's project. Runs in

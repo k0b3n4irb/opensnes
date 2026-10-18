@@ -6,14 +6,14 @@ Demonstrates BG Mode 3 with a single 256-color (8bpp) background layer.
 
 ## Description
 
-Mode 3 provides one 256-color background, allowing photographic-quality images on the SNES. The tileset exceeds 32KB, requiring split DMA loading with explicit bank bytes via an assembly loader.
+Mode 3 provides one 256-color background, allowing photographic-quality images on the SNES. The tileset (39 KB) is larger than a ROM bank, so the converter writes it in two parts and the example copies each with `dmaCopyVram()`, whose pointer carries the bank.
 
 ## Architecture
 
-- **Mode 3**: One BG, 8bpp (256 colors)
+- **Mode 3**: BG1 at 8bpp (256 colors), BG2 at 4bpp (16 colors, unused here)
 - **BG1**: Full 256-color image
-- Tileset split: first 32KB + remaining ~7KB in separate DMA transfers
-- Assembly DMA loader handles bank byte for SUPERFREE sections in bank $01+
+- Tileset in two parts (`bg_tiles`, `bg_tiles_1`), two DMA transfers
+- Picture converted by the build from `res/bg.bmp` (`res/bg.bmp.toml`)
 
 ## Ported from
 

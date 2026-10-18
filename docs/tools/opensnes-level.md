@@ -61,11 +61,13 @@ A map is refused, with the reason, when a tile is rotated (the SNES has only
 horizontal and vertical flips), when a tile id passes 1024, when the map uses
 two tilesets (merge them in Tiled or split the layers), when it is larger than
 16384 cells or 256 rows, when its tiles are not 8x8, when more than 64
-entities are placed, or when `--quadrant` is asked of a map that is not 64x64.
+entities are placed, when `--quadrant` is asked of a map that is not 64x64,
+or when a tile layer's name is not a plain file name (1 to 64 characters, no
+`/`, `\`, `:` or `..`): the name is the output file's.
 `--tileset` is required for `convert`: without the tileset's table the `.t16`
 cannot be written.
 
 ## See also
 
-- @ref tools_tmx2snes — the earlier tool, same converter, one explicit Makefile line; shipped for one more version.
-- `examples/maps/map_scroll` and `examples/maps/tiled` convert their levels this way.
+- @ref tools_tmx2snes — the earlier tool, same converter (@ref tools_legacy).
+- `examples/maps/map_scroll` converts its level this way.

@@ -27,7 +27,7 @@
  *   so each 4-byte block is [CGADD][CGADD][color_lo][color_hi] —
  *   rewriting CGRAM color 0 (the backdrop) per band
  * - Extracting a C pointer's bank for $43x7:
- *   (u8)((u32)(void *)data >> 16) (post-A6 far pointers)
+ *   (u8)((u32)(void *)data >> 16) (a pointer carries its bank)
  *
  * @par What to Observe
  * - A pure red gradient: brightest red (BGR555 $001F) at the top fading
@@ -98,7 +98,7 @@ int main(void) {
     hdmaSetupIndirect(HDMA_CHANNEL_2, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
                       itable,
                       (u8)((u32)(void *)band_data >> 16));
-    hdmaEnableMask(1 << HDMA_CHANNEL_2);   /* not 0 (dmaCopyVram) nor 1 (the NMI's text flush) */
+    hdmaEnableMask(1 << HDMA_CHANNEL_2);   /* not 0 (dmaCopyVram) nor 7 (the NMI's DMA) */
 
     /* krom: TM = 0 — no layers; the backdrop is the whole picture */
     setMainScreen(0);

@@ -23,6 +23,8 @@
  * - Button polling for FIRE, PAUSE, and CURSOR buttons
  * - Multi-layer Mode 0 with text on BG1 and graphics on BG2
  * - Sprite positioning from light gun coordinates
+ * - oamMemory[] written directly, the escape hatch beside oamSet(): one
+ *   marker, its four OAM bytes set where the shot landed
  *
  * @par What to Observe
  * - "Connect SuperScope to Port 2" message on startup
@@ -41,14 +43,14 @@
 #include <snes/text.h>
 #include <snes/dma.h>
 
-/** @brief Aim target background tile data (2bpp, crosshair pattern) from data.asm */
+/** @brief Aim target background tile data (2bpp, crosshair pattern), converted by the build from res/ */
 #include "res/aim_adjust_target.inc"
 #include "res/sprites.inc"
 /* generated: aim_adjust_target_tiles/_map/_pal, sprites_tiles/_pal (each with _end) */
-/** @brief Aim target tilemap (32x32 BG2 layout) from data.asm */
-/** @brief Aim target palette (BGR555) from data.asm */
-/** @brief Sprite tile data (red dot marker, 4bpp) from data.asm */
-/** @brief Sprite palette (BGR555) from data.asm */
+/** @brief Aim target tilemap (32x32 BG2 layout), converted by the build from res/ */
+/** @brief Aim target palette (BGR555), converted by the build from res/ */
+/** @brief Sprite tile data (red dot marker, 4bpp), converted by the build from res/ */
+/** @brief Sprite palette (BGR555), converted by the build from res/ */
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 

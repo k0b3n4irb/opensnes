@@ -23,7 +23,7 @@ Classic Tetris game with Korobeiniki music.
 |--------|--------|
 | LEFT/RIGHT | Move piece |
 | DOWN | Soft drop |
-| A/X | Rotate clockwise |
+| A | Rotate clockwise |
 | B | Rotate counter-clockwise |
 | START | Start game / Pause |
 

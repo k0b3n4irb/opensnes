@@ -10,19 +10,14 @@ linkfile
 project_config.inc
 project_hdr.asm
 project_sa1_boot.asm
+.opensnes_config
 
-# gfx4snes / wav2brr generated assets (regenerated from res/*.png and res/*.wav)
-res/*.pic
-res/*.pal
-res/*.inc
-res/*_data.as
-res/*.brr
-res/*.map
-# generated from res/*.toml by the build
+# Generated from res/*.toml by the build
 assets_gen.asm
 *.toml.done
 res/*.pic
 res/*.pal
+res/*.map
 res/*.inc
 res/*_data.as
 res/*_meta.inc

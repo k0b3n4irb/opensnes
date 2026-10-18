@@ -1,0 +1,11 @@
+# bounded: the second access on the first one's X, the 16 folded into the symbol
+in f8: present \tlda\.l buf\+16,x\n
+in f8: absent adc\.w #8
+in fm: present \tlda\.l buf\+16,x\n
+in fm: absent adc\.w #8
+# unbounded u16: i + 8 computed (it may wrap)
+in fu: present adc\.w #8
+in fu: absent buf\+16
+# a union member indexed by a masked local in a loop
+in fl: present \tlda\.l u\+16,x\n
+in fl: absent adc\.w #8

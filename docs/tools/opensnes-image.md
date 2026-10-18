@@ -3,9 +3,8 @@
 The picture tool of the `opensnes-*` family (@ref tools_conventions), for the
 screens that are not a tileset-and-tilemap: the **HiColor** technique, and
 the **Mode 7 perspective** tables that turn a flat Mode 7 plane into a
-road receding to the horizon. Both were maintainer scripts until 2026-10
-(`hicolor64.py`, `m7ptables.py`); they are compiled now, so a game's build
-needs no Python. A Mode 7 *picture* is `opensnes-tileset convert --mode 7`
+road receding to the horizon. Like every tool of the SDK it is compiled:
+a game's build needs no Python. A Mode 7 *picture* is `opensnes-tileset convert --mode 7`
 (@ref tools_opensnes_tileset).
 
 ## HiColor
@@ -65,10 +64,11 @@ a terminator (673 bytes at 224 lines), in `perspective_cos.hdma`,
 #include "res/perspective.inc"
 
 u16 off = angle * PERSPECTIVE_STRIDE;
-hdmaSetup(HDMA_CHANNEL_0, HDMA_MODE_1REG_2X, HDMA_DEST_M7A, perspective_cos + off);
-hdmaSetup(HDMA_CHANNEL_1, HDMA_MODE_1REG_2X, HDMA_DEST_M7B, perspective_sin + off);
-hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_1REG_2X, HDMA_DEST_M7C, perspective_nsin + off);
-hdmaSetup(HDMA_CHANNEL_3, HDMA_MODE_1REG_2X, HDMA_DEST_M7D, perspective_cos + off);
+hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_1REG_2X, HDMA_DEST_M7A, perspective_cos + off);
+hdmaSetup(HDMA_CHANNEL_3, HDMA_MODE_1REG_2X, HDMA_DEST_M7B, perspective_sin + off);
+hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG_2X, HDMA_DEST_M7C, perspective_nsin + off);
+hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG_2X, HDMA_DEST_M7D, perspective_cos + off);
+hdmaEnableMask(0x3C);   /* channels 2-5: 0 is the DMA helpers', 7 the NMI's */
 ```
 
 With the defaults, the tables are krom (Peter Lemon)'s Perspective demo

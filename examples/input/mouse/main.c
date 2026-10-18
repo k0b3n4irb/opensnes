@@ -18,6 +18,8 @@
  * - Relative-to-absolute coordinate accumulation from mouse deltas
  * - Sensitivity control (hardware-level scaling of mouse movement)
  * - Sprite used as a cursor overlay on a text background
+ * - oamMemory[] written directly, the escape hatch beside oamSet(): one
+ *   cursor, its four OAM bytes set where the mouse moved it
  *
  * @par What to Observe
  * - A 16x16 cursor sprite follows mouse movement on screen
@@ -37,9 +39,9 @@
 #include <snes/text.h>
 #include <snes/dma.h>
 
-/** @brief Cursor sprite tile data (16x16, 4bpp) defined in data.asm */
+/** @brief Cursor sprite tile data (16x16, 4bpp) converted by the build from res/ */
 #include "res/cursor.inc"   /* generated: cursor_tiles[], cursor_tiles_end[], cursor_pal[], cursor_pal_end[] */
-/** @brief Cursor sprite palette (SNES BGR555 format) defined in data.asm */
+/** @brief Cursor sprite palette (SNES BGR555 format) converted by the build from res/ */
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
@@ -109,8 +111,8 @@ int main(void) {
 
     /* Load cursor sprite tiles to VRAM.
      * A 16x16 sprite uses tiles 0,1 (top) and 16,17 (bottom) in the
-     * sprite character page. gfx4snes outputs tiles sequentially (0,1,2,3)
-     * so we split the DMA: top half → tile 0, bottom half → tile 16. */
+     * sprite character page. The converted sheet (8x8 blocks, res/cursor.png.toml)
+     * holds its tiles in a row (0,1,2,3), so we split the DMA: top half → tile 0, bottom half → tile 16. */
     dmaCopyVram(cursor_tiles, 0x4000, 64);          /* tiles 0-1 (top) */
     dmaCopyVram(cursor_tiles + 64, 0x4100, 64);     /* tiles 16-17 (bottom) */
 

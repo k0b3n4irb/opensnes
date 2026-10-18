@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generate the Mode 7 flying terrain: res/terrain.png (1024x1024) for
-gfx4snes -M 7, plus res/terrain_class.bin — 128x128 bytes (one per
+opensnes-tileset --mode 7, plus res/terrain_class.bin — 128x128 bytes (one per
 tile: 0 = field, 1 = water, 2 = landing pad).
 
 A patchwork of fields crossed by a river with a lake, and three

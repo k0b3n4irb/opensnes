@@ -1,0 +1,3 @@
+# The step keeps A as the counter for its second store; no inx before it.
+in counted: present \tinc a\n\tsta\.b tcc__lf\+0\n\tsta 2,s\n
+in counted: absent \tinx\n\tsta 2,s

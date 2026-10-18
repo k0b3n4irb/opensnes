@@ -1,7 +1,7 @@
 # Direct exchanges with luna and the game (Auto-loaded)
 
 CRITICAL, owner decision (2026-10-10). OpenSNES, luna and the game
-(the game) talk to each other **directly, session to session**, and
+talk to each other **directly, session to session**, and
 challenge one another. Where this rule and an older one disagree on *how
 a partner is reached*, this one wins.
 
@@ -25,11 +25,38 @@ A gap of ours the game works around in silence is a failed proof.
      before a line was written);
    - say what rubs when we use a neighbour's work, with nothing to ask.
 
+## The SDK learns from the game; it does not bend to it
+
+Owner, 2026-10-17. The game tests the SDK; what the test reveals improves
+the SDK when **another game would need it too**. A request from the game
+lands only if it passes four checks, written in the reply to it:
+
+1. **The need is general.** A second game doing the same kind of thing
+   would hit it. A game that reads the lib's internals to compute
+   something (the queue's arrays, a private variable) is the usual sign
+   that the SDK lacks it.
+2. **The API speaks the SDK's terms.** Bytes, entries, frames, banks — not
+   a status bar or five 32x32 frames of a particular game. What the game sends is
+   reduced to a stand-alone case first (the compiler requests: synthetic
+   reproducers, never its sources).
+3. **Policy stays with the game.** The SDK gives the measure and the
+   mechanism; deciding priorities, budgets and trade-offs is the game's.
+   Precedent: `vramQueueCost()` was taken, a budget enforced by
+   `vramQueuePush()` was not (`01fe79bf`) — it would have decided by push
+   order which module gives way. Same for semantics: `i + 8` was folded
+   only where the index is proved bounded, not by leaning on undefined
+   behaviour the game wanted (owner's choice, `cdcc4580`).
+4. **The cost to every other user is small and stated.** Measured
+   (libbench, bench, WRAM drift explained) in the commit.
+
+A request that fails one of them gets a justified no, and the game finds
+another way (`How`, below).
+
 ## How
 
-- **`ListAgents`, then `SendMessage`**, to the sessions `luna` and
-  `the game` (recognised by their working directory when they do not
-  carry the name yet). **No GitHub issue between the three any more**: a
+- **`ListAgents`, then `SendMessage`**, to the session `luna` and to the
+  game's session (both recognised by their working directory; the game's
+  is in the user's private memory, never in this repository). **No GitHub issue between the three any more**: a
   capability request to luna is a direct message with its prototype, not
   `gh issue create`. The issues already open continue directly; closing one
   on GitHub is a public act and waits for the owner.
@@ -44,10 +71,18 @@ A gap of ours the game works around in silence is a failed proof.
 - **A claim comes with its piece** (a measurement, a command to replay, a
   ROM, a test); and before stating a limit at a neighbour's, provoke it.
 - The game may show us its real case by path, on this machine. **Nothing of
-  the game enters a commit, a test or a document here**;
-  what has to enter is a stand-alone example.
-- **What is decided is written here** (notes, `CHANGELOG`, the project
-  note): a message disappears with its session. A long piece is still a
+  the game enters a commit, a test, a note or a document here, nor a commit
+  message — its name and title first** (owner, 2026-10-17: the game is a
+  port under licence, private until its rights are negotiated; respect what
+  belongs to each). Nor its rights holder, its paths, the names of its source
+  files or functions, nor a measurement tied to its sources. In this
+  repository it is "the game", nothing more. What has to enter is a
+  stand-alone example, written by us.
+  On 2026-10-17 its name had been public for a week (a project note and
+  thirteen files, two release tags); the history was rewritten that day.
+- **What is decided is written down** (notes, `CHANGELOG`; what concerns the
+  game alone goes to its private folder outside this repository, named in
+  the user's private memory): a message disappears with its session. A long piece is still a
   dated report (`.claude/notes/partners/`, `~/workspace/partner-reports/`);
   the message points to it. snes-rag has no standing session: it is still
   reached by files (`partners.md`).

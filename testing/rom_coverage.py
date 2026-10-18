@@ -87,7 +87,9 @@ FIXTURES = [(FIXTURES_DIR / "libtests" / "libtest.sfc", "libtest", 120),
             (FIXTURES_DIR / "libtests_fx" / "libtest_fx.sfc", "libtest_fx", 240),
             (FIXTURES_DIR / "libtests_hirom" / "libtest_hirom.sfc", "libtest_hirom", 60),
             # the cache-resident GSU job (gsuCacheLoad / gsuStartCached / gsuBusy / gsuWait)
-            (FIXTURES_DIR / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60)] + [
+            (FIXTURES_DIR / "libtests_gsu" / "libtest_gsu.sfc", "libtest_gsu", 60),
+            # the sound CPU's memory: audioLoadSampleBegin / Step; done by frame 200
+            (FIXTURES_DIR / "libtests_aram" / "libtest_aram.sfc", "libtest_aram", 260)] + [
     (_RT / name / f"{name}.sfc", f"runtime/{name}", 70)
     for name in ("a6_farptr", "a7_32bit", "b2_far_ram", "c_features", "debug_channel", "d_quals")
 ]

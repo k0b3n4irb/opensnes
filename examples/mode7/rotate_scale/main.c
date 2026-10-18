@@ -32,10 +32,10 @@
 
 #include <snes.h>
 
-/** @brief Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), from data.asm. */
+/** @brief Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), converted by the build from res/ */
 #include "res/mode7bg.inc"   /* generated: mode7bg_tiles[], mode7bg_map[], mode7bg_pal[] (Mode 7 .pc7 / .mp7), each with _end */
-/** @brief Mode 7 tilemap (128x128 tile indices, one byte each), from data.asm. */
-/** @brief 256-colour palette for the Mode 7 plane (512 bytes), from data.asm. */
+/** @brief Mode 7 tilemap (128x128 tile indices, one byte each), converted by the build from res/ */
+/** @brief 256-colour palette for the Mode 7 plane (512 bytes), converted by the build from res/ */
 
 /**
  * @brief Entry point -- interactive Mode 7 rotation and scaling demo.

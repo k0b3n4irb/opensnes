@@ -34,7 +34,7 @@
 #include <snes.h>
 
 /*============================================================================
- * External Graphics Data (defined in data.asm)
+ * Graphics Data (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
 /* BG1 - Main scrolling background */
@@ -105,6 +105,8 @@ GameState game = {20, 100, 0, 32, 0, 32};
  */
 int main(void) {
     u16 pad;              /**< Current joypad button state (read from hardware) */
+
+    consoleInit();
 
     /* Force blank during setup */
     setScreenOff();

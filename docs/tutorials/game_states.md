@@ -111,7 +111,7 @@ int main(void) {
 }
 ```
 
-This is the exact pattern used in `examples/games/tetris/main.c`. Each state function runs once per frame and can change `game_state` to trigger a transition.
+`examples/games/tetris/main.c` is built the same way, with its own states (`STATE_TITLE`, `STATE_PLAYING`, `STATE_LINE_CLEAR`, `STATE_GAME_OVER`) and a `paused` flag rather than a pause state. Each state function runs once per frame and can change `game_state` to trigger a transition.
 
 ## State Transitions
 
@@ -182,26 +182,26 @@ The key rule: call `setScreenOff()` before bulk VRAM/CGRAM writes, and `setScree
 
 ## Title Screen Implementation
 
-A title screen waits for the player to press START, then transitions to gameplay. The pattern from `examples/games/tetris/main.c`:
+A title screen waits for the player to press START, then transitions to gameplay. A minimal form of the title state of `examples/games/tetris/main.c`:
 
 ```c
 static void stateTitle(void) {
     /* Poll for START press */
-    if ((pad_keys[0] & KEY_START) == 0) {
+    if ((padHeld(0) & KEY_START) == 0) {
         return;  /* Not pressed — keep waiting */
     }
 
     /* Wait for START release to prevent immediate pause */
     do {
         WaitForVBlank();
-    } while (pad_keys[0] & KEY_START);
+    } while (padHeld(0) & KEY_START);
 
     /* Transition to gameplay */
     startGame();
 }
 ```
 
-The release-wait loop (`do { WaitForVBlank(); } while (pad_keys[0] & KEY_START)`) prevents the START press from triggering an immediate pause in the gameplay state. This is a standard debounce pattern on the SNES.
+The release-wait loop (`do { WaitForVBlank(); } while (padHeld(0) & KEY_START)`) prevents the START press from triggering an immediate pause in the gameplay state. This is a standard debounce pattern on the SNES.
 
 ### Complete Title Flow
 
@@ -214,10 +214,10 @@ WaitForVBlank();
 dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
 
 /* Wait for START press */
-do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
+do { WaitForVBlank(); } while ((padHeld(0) & KEY_START) == 0);
 
 /* Wait for START release */
-do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+do { WaitForVBlank(); } while (padHeld(0) & KEY_START);
 
 /* Clear message and begin */
 writestring(ST_BLANK, blockmap, 0x248, 0x3F6);
@@ -241,9 +241,9 @@ static void handle_pause(void) {
     dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
 
     /* Three-phase wait: release -> press -> release */
-    do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
-    do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
-    do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+    do { WaitForVBlank(); } while (padHeld(0) & KEY_START);
+    do { WaitForVBlank(); } while ((padHeld(0) & KEY_START) == 0);
+    do { WaitForVBlank(); } while (padHeld(0) & KEY_START);
 
     /* Clear message and resume */
     writestring(ST_BLANK, blockmap, 0x269, 0x3F6);
@@ -252,10 +252,10 @@ static void handle_pause(void) {
 }
 ```
 
-The three-phase wait prevents the unpause START press from being read as a new pause request on the next frame. Tetris (`examples/games/tetris/main.c`) uses the same pattern with a `prev_pad` edge-detection approach:
+The three-phase wait prevents the unpause START press from being read as a new pause request on the next frame. Tetris (`examples/games/tetris/main.c`) uses the same three-phase wait, and detects the first press with `padPressed()`, which reports only the buttons that went down this frame:
 
 ```c
-u16 pressed = pad & ~prev_pad;  /* newly pressed this frame */
+u16 pressed = padPressed(0);  /* newly pressed this frame */
 
 if (pressed & KEY_START) {
     paused = 1;
@@ -278,20 +278,22 @@ if (paused) return;  /* skip all game logic */
 
 Game over detection happens in gameplay logic. When the end condition is met, display a message and wait for player input before restarting.
 
-### Simple Game Over (Breakout)
+### Game Over inside the game logic (Breakout)
 
-Breakout detects game over when lives reach zero. It shows a message and halts:
+Breakout detects game over when lives reach zero. It shows a message, waits for START, and starts a new game:
 
 ```c
 static void die(void) {
     if (lives == 0) {
-        /* Show GAME OVER message */
+        /* Game over: show it, wait for START, start a new game */
         writestring(ST_GAMEOVER, blockmap, 0x267, 0x3F6);
         WaitForVBlank();
-        dmaCopyVram((u8 *)blockmap, 0x0000, 0x800);
+        dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
+        waitStartPressRelease();
 
-        /* Halt — player must reset */
-        while (1) { WaitForVBlank(); }
+        start_game();
+        /* ... reload the tilemaps and palette under forced blank ... */
+        return;
     }
 
     /* Still have lives: reset ball position, continue */
@@ -302,9 +304,9 @@ static void die(void) {
 }
 ```
 
-### Restart Game Over (Tetris)
+### Game Over as a state (Tetris)
 
-Tetris allows restarting. When a new piece cannot spawn (board full), the game transitions to `STATE_GAME_OVER`, which shows a message, waits for START, then calls `startGame()` to reinitialize everything:
+Tetris restarts from a state of its own. When a new piece cannot spawn (board full), the game transitions to `STATE_GAME_OVER`, which shows a message, waits for START, then calls `startGame()` to reinitialize everything:
 
 ```c
 static void stateGameOver(void) {
@@ -318,11 +320,11 @@ static void stateGameOver(void) {
     setScreenOn();
 
     /* Wait for START to restart */
-    while ((pad_keys[0] & KEY_START) == 0) {
+    while ((padHeld(0) & KEY_START) == 0) {
         WaitForVBlank();
         renderFlush();
     }
-    do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+    do { WaitForVBlank(); } while (padHeld(0) & KEY_START);
 
     hudClearMessage();
     startGame();  /* reinitialize board, score, spawn first piece */
@@ -341,10 +343,10 @@ static void stateGameOver(void) {
     dmaCopyVram((u8 *)tilemap_buf, TILEMAP_ADDR, TILEMAP_SIZE);
 
     /* Wait for player acknowledgement */
-    while ((pad_keys[0] & KEY_START) == 0) {
+    while ((padHeld(0) & KEY_START) == 0) {
         WaitForVBlank();
     }
-    do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+    do { WaitForVBlank(); } while (padHeld(0) & KEY_START);
 
     /* Fade out, reload, fade in */
     fade_out(2);

@@ -20,6 +20,15 @@
  * - `<snes/scene.h>` — push/pop scene stack
  * - `<snes/panel.h>` — 9-slice HUD / dialog boxes on a BG layer
  * - `<snes/dsp1.h>` — DSP-1 coprocessor 3D math (needs USE_DSP1 := 1)
+ * - `<snes/tile.h>` — build 2/4/8bpp tiles from pixels at run time
+ * - `<snes/anim.h>` — declarative animation player
+ * - `<snes/fixed32.h>` — 16.16 fixed-point math
+ * - `<snes/apu.h>` — raw APU access: upload and run your own SPC700 program
+ * - `<snes/snesmod.h>` — SNESMOD tracker music and sound effects
+ * - `<snes/object.h>` — game object engine (contrib module)
+ * - `<snes/profile.h>` — performance profiling
+ * - `<snes/sa1.h>` — SA-1 coprocessor (needs USE_SA1 := 1)
+ * - `<snes/superfx.h>` — Super FX (GSU) coprocessor (needs USE_SUPERFX := 1)
  *
  * The Doxygen list at the bottom of this header repeats the same split
  * for IDE / cross-reference tooling.
@@ -57,13 +66,13 @@
 #define OPENSNES_VERSION_MAJOR 0
 
 /** @brief OpenSNES minor version */
-#define OPENSNES_VERSION_MINOR 50
+#define OPENSNES_VERSION_MINOR 51
 
 /** @brief OpenSNES patch version */
 #define OPENSNES_VERSION_PATCH 0
 
 /** @brief OpenSNES version string */
-#define OPENSNES_VERSION_STRING "0.50.0"
+#define OPENSNES_VERSION_STRING "0.51.0"
 
 /*============================================================================
  * Core Headers
@@ -143,6 +152,16 @@
  *   #include <snes/asset.h>     // typed BgAsset / GfxAsset bundles
  *   #include <snes/scene.h>     // push/pop scene stack
  *   #include <snes/tile.h>      // build 2/4/8bpp tiles from pixels at run time
+ *   #include <snes/panel.h>     // 9-slice HUD / dialog boxes on a BG layer
+ *   #include <snes/dsp1.h>      // DSP-1 3D math (needs USE_DSP1 := 1)
+ *   #include <snes/anim.h>      // declarative animation player
+ *   #include <snes/fixed32.h>   // 16.16 fixed-point math
+ *   #include <snes/apu.h>       // raw APU access: your own SPC700 program
+ *   #include <snes/snesmod.h>   // SNESMOD tracker music and sound effects
+ *   #include <snes/object.h>    // game object engine (contrib module)
+ *   #include <snes/profile.h>   // performance profiling
+ *   #include <snes/sa1.h>       // SA-1 coprocessor (needs USE_SA1 := 1)
+ *   #include <snes/superfx.h>   // Super FX coprocessor (needs USE_SUPERFX := 1)
  */
 
 #endif /* OPENSNES_H */

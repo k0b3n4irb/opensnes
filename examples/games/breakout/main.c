@@ -12,8 +12,8 @@
  * Key technical patterns: RAM tilemap buffers for runtime brick destruction,
  * overlapping BG1/BG3 tilemaps in VRAM to save memory (requiring atomic
  * dual-DMA updates), palette cycling for per-level color variation, and
- * direct oamMemory[] writes (the escape hatch next to oamSet(); oamSet has
- * been an asm routine since 2026-03-03, so either is fine at 10 sprites).
+ * direct oamMemory[] writes (the escape hatch next to oamSet(); either is
+ * fine at 10 sprites).
  *
  * Ball bounce angle varies by paddle hit zone (4 zones), creating the
  * classic Breakout aiming mechanic. Scoring uses level multipliers.
@@ -68,14 +68,6 @@ extern u8 palette[], palette_end[];
 /** @brief 7 level color sets for palette cycling (7 x 16 bytes = 112 bytes) */
 extern u8 backpal[], backpal_end[];
 
-/**
- * @brief Raw joypad state buffer written by the NMI handler every frame.
- *
- * pad_keys[0] = port 1 buttons, pad_keys[1] = port 2 buttons.
- * Used directly (instead of padHeld()) for the game loop because Breakout
- * was ported from PVSnesLib which reads pad_keys[] directly.
- */
-extern u16 pad_keys[];
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
 
@@ -93,7 +85,7 @@ extern u16 pad_keys[];
  */
 extern const u8 brick_map[];
 
-/** @brief "READY" message string (in data.asm for guaranteed bank $00 placement) */
+/** @brief "READY" message string (data.asm) */
 extern const char str_ready[];
 /** @brief "GAME OVER" message string */
 extern const char str_gameover[];
@@ -111,7 +103,7 @@ extern const char str_blank[];
  * RAM Buffers (defined in data.asm)
  *
  * They are `FAR` (bank $7E, above the 8 KB plain C band — data.asm), so the
- * linker places them and every access carries its bank (chantier B2).
+ * linker places them and every access carries its bank.
  *
  * Why RAM buffers?
  * - Tilemaps need runtime modification (brick destruction, score updates)
@@ -165,12 +157,21 @@ static u16 lives;            /**< Lives remaining (0 = game over on next death) 
 static u16 px;               /**< Paddle X position in pixels (clamped to 16-144) */
 static u16 pad0;             /**< Current frame's joypad button bitmask */
 
+/** @brief Wait, frame by frame, until START is released. */
+static void waitStartReleased(void) {
+    do { WaitForVBlank(); } while (padHeld(0) & KEY_START);
+}
+
+/** @brief Wait until START is pressed, then until it is released. */
+static void waitStartPressRelease(void) {
+    do { WaitForVBlank(); } while ((padHeld(0) & KEY_START) == 0);
+    waitStartReleased();
+}
+
 /**
  * @brief Ball X velocity (-2 to +2 pixels/frame).
  *
- * Kept as two variables for readability. (An older comment blamed compiler
- * quirks with compound operations on struct members; the C-feature runtime
- * ROM pins those operations since 2026-09-13.)
+ * Kept as two variables for readability.
  */
 static s16 vel_x;
 static s16 vel_y;             /**< Ball Y velocity (-2 to +2 pixels/frame) */
@@ -294,7 +295,7 @@ static void mycopy(u8 FAR *dest, const u8 *src, u16 len) {
 static void draw_screen(void) {
     /*
      * Direct OAM buffer writes — the escape hatch next to oamSet(), shown
-     * here on purpose (oamSet's old 158-byte frame is gone since 2026-03-03).
+     * here on purpose.
      *
      * OAM low table: 4 bytes per sprite at offset id*4
      *   [0] X low, [1] Y, [2] tile low, [3] attributes (vhoopppc)
@@ -459,15 +460,8 @@ static void new_level(void) {
 
     draw_screen();
 
-    /* Wait for START to begin */
-    do {
-        WaitForVBlank();
-    } while ((pad_keys[0] & KEY_START) == 0);
-
-    /* Wait for START release to prevent immediate pause */
-    do {
-        WaitForVBlank();
-    } while (pad_keys[0] & KEY_START);
+    /* Wait for START to begin, and for its release (no immediate pause) */
+    waitStartPressRelease();
 
     /* Clear READY message */
     writestring(ST_BLANK, blockmap, 0x248, 0x3F6);
@@ -480,8 +474,7 @@ static void new_level(void) {
  * @brief Set up a new game: fresh maps, bricks, palette, score, lives, level
  *
  * Called once at boot and again after GAME OVER, so the game loops title →
- * play → game over → play (until 2026-09-26 GAME OVER froze the console in
- * a `while (1)`). The fresh map carries the HUD's starting values; the
+ * play → game over → play. The fresh map carries the HUD's starting values; the
  * caller keeps a beaten high score. Works on the RAM buffers only; the
  * caller uploads them.
  */
@@ -538,8 +531,7 @@ static void die(void) {
         writestring(ST_GAMEOVER, blockmap, 0x267, 0x3F6);
         WaitForVBlank();
         dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
-        do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
-        do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+        waitStartPressRelease();
 
         start_game();
         /* The fresh map shows the ROM's high score; keep a beaten one */
@@ -555,8 +547,7 @@ static void die(void) {
         setScreenOn();
         draw_screen();
 
-        do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
-        do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+        waitStartPressRelease();
         writestring(ST_BLANK, blockmap, 0x248, 0x3F6);
         writestring(ST_BLANK, blockmap, 0x289, 0x3F6);
         WaitForVBlank();
@@ -586,7 +577,7 @@ static void die(void) {
     draw_screen();
 
     /* Wait for any button press */
-    while (pad_keys[0] == 0) {
+    while (padHeld(0) == 0) {
         WaitForVBlank();
     }
 
@@ -611,9 +602,8 @@ static void handle_pause(void) {
         dmaCopyVram((const u8 *)blockmap, 0x0000, 0x800);
 
         /* Wait for START release, press, release sequence */
-        do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
-        do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
-        do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+        waitStartReleased();
+        waitStartPressRelease();
 
         writestring(ST_BLANK, blockmap, 0x269, 0x3F6);
         WaitForVBlank();
@@ -805,7 +795,7 @@ static void check_bricks(void) {
  */
 static void run_frame(void) {
     /* Read joypad (updated by NMI handler) */
-    pad0 = pad_keys[0];
+    pad0 = padHeld(0);
 
     handle_pause();
     move_paddle();
@@ -840,12 +830,10 @@ static void run_frame(void) {
  * 7. Wait for START, then run game loop
  */
 int main(void) {
+    consoleInit();
+
     /* Force blank during setup - screen is black, VRAM accessible */
     setScreenOff();
-
-    /* Initialize joypad buffer */
-    pad_keys[0] = 0;
-    pad_keys[1] = 0;
 
     /* Wait for NMI handler to read joypads */
     for (i = 0; i < 5; i++) {
@@ -913,8 +901,7 @@ int main(void) {
     setScreenOn();
 
     /* Wait for START to begin game */
-    do { WaitForVBlank(); } while ((pad_keys[0] & KEY_START) == 0);
-    do { WaitForVBlank(); } while (pad_keys[0] & KEY_START);
+    waitStartPressRelease();
 
     /* Clear ready message */
     writestring(ST_BLANK, blockmap, 0x248, 0x3F6);

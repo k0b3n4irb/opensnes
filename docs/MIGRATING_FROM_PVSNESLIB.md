@@ -14,7 +14,7 @@ build system first, then the five traps, then the API table.
 Almost all of the surface. Both SDKs give you `consoleInit`, `setMode`,
 `bgSetGfxPtr`, `bgSetMapPtr`, `oamSet`, `WaitForVBlank`, the same PPU register
 model, the same VRAM layout decisions and the same `.pic` / `.pal` / `.map`
-asset trio produced by a gfx4snes-shaped converter. A simple sprite demo often
+asset trio, produced by converters built on gfx4snes's code. A simple sprite demo often
 ports by changing the Makefile and nothing else.
 
 `WaitForVBlank` keeps its capital W for that reason: it is the only function
@@ -29,24 +29,18 @@ of the library not written in camelCase, and it will not be renamed.
 | `int` | 2 bytes | 2 bytes | Same |
 | `long` | 4 bytes | 4 bytes | Same |
 | Modules | linked wholesale | **opt-in** `LIB_MODULES` | Link errors until you list what you use |
-| Text output | `consoleDrawText` | `textPrintAt` + `textFlush` | Nothing appears without the flush |
+| Text output | `consoleDrawText` | `textPrintAt` | The NMI sends what the `text*` calls wrote, on the next VBlank |
 | Vertical scroll | raw value to the register | lib subtracts 1 for you | Everything is one line off |
 | Const data | wherever it lands | asset banks, far reads | A cast away from `const` reads garbage |
 | Bulk RAM | plain globals | plain under `$2000`, else `FAR` | A big buffer silently wrong-banked |
 
 ## Step 1 — the Makefile
 
-An OpenSNES example Makefile is short, and the module list is the part that is
-new:
+An OpenSNES Makefile is a few variables and one `include`; @ref tools_build
+has the template and every variable. The module list is the part that is new:
 
 ```makefile
-OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := game.sfc
-ROM_NAME := MY GAME
-USE_LIB  := 1
 LIB_MODULES := console sprite dma input text
-CSRC := main.c
-include $(OPENSNES)/make/common.mk
 ```
 
 `LIB_MODULES` is the one real change of habit. OpenSNES links only the modules
@@ -107,7 +101,7 @@ Since the bank-$00 flip, C const data (arrays, string literals, const structs)
 is placed in the asset banks and every C read of it is a far read. That is
 invisible and free — until you cast the `const` away and read through a plain
 pointer, which reads bank $00 and returns garbage. The link fails on it
-(`devtools/check_bank_reads.py`), so you get told; the fix is to keep the
+(the bank-blind read check of `opensnes-rom check`), so you get told; the fix is to keep the
 `const`, or to pass the data to a library function as a far pointer.
 
 The RAM twin: plain C globals must sit below `$2000`. Anything bigger — a
@@ -122,7 +116,7 @@ miscompiled silently, and each has a mechanical workaround:
 | Refused | Workaround |
 |---|---|
 | Struct passed or returned **by value** | Pass a pointer to it |
-| Struct assignment by value (`a = b`) | Copy the fields, or `memcpy` (`<snes/string.h>`, module `string`) |
+| Struct assignment to or from a `FAR` object | Copy the fields, or `memcpy` (`<snes/string.h>`, module `string`); plain `a = b` works |
 | Variadic functions (`...`) | Fixed-arity wrappers |
 | Inline assembly inside C | A separate `.asm` file with a C prototype |
 
@@ -135,7 +129,7 @@ need output to the host rather than the screen.
 | PVSnesLib | OpenSNES | Note |
 |---|---|---|
 | `consoleInit()` | `consoleInit()` | Same |
-| `consoleDrawText(x, y, s)` | `textPrintAt(x, y, s)` then `textFlush()` | The flush is what uploads the tilemap |
+| `consoleDrawText(x, y, s)` | `textPrintAt(x, y, s)` | The NMI uploads the bytes written; `textFlush()` is only for a direct write to `tilemapBuffer` |
 | `consoleSetTextVramBGAdr` etc. | `textInit`, `textLoadFont`, `textModeInit` | Split into explicit steps |
 | `oamSet(...)` | `oamSet(id, x, y, tile, palette, priority, flags)` | Seven arguments; check the order |
 | `oamSetEx`, `oamSetVisible` | `oamSetSize`, `oamHide`, `oamSetXY` | Split by concern |
@@ -145,7 +139,7 @@ need output to the host rather than the screen.
 | `spcProcess()` | `snesmodProcess()` | Call once per frame |
 | `padsCurrent(pad)` | `padHeld(pad)` | Also `padPressed`, `padReleased` |
 | `rand()`, `srand(s)` | `rngNext()`, `rngSeed(s)` | Not libc's: 1-65535, a 16-bit LFSR. The libc names went at 0.49 |
-| `LzssDecodeVram(s, a)` | `lzssDecodeVram(s, a)` | Lower-case `l`; the old spelling is deprecated |
+| `LzssDecodeVram(s, a)` | `lzssDecodeVram(s, a)` | Lower-case `l`; the old spelling is removed |
 | `hdmaEnable(1 << ch)` | `hdmaEnable(ch)`, or `hdmaEnableMask(1 << ch)` for several | A channel number since 0.49, like the other `hdma*` calls; a mask above 7 is refused — see @ref upgrading |
 | `oamDrawMeta(id, x, y, m, tile, pal, size)` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | `tile`, `pal`, `size` are fields of a `static const MetaspriteStyle` |
 | `pvsneslibfont` | `textLoadFont()` with your own font | No implicit font |
@@ -168,8 +162,8 @@ has to write itself, and whether that is a decision or a gap.
 | `WaitNVBlank(n)` | a loop over `WaitForVBlank()` | **Decided.** One primitive |
 | `getFPScounter`, `showFPScounter` | `profileGetLagFrames`, `getFrameCount` | **Decided.** The library counts, the game displays |
 | `consoleCopySram*`, `consoleLoadSram*` | `sramSave`, `sramLoad`, `*Offset`, `sramChecksum` | Renamed, module `sram` |
-| `consoleRegionIsOK` | `getRegion()`, `isPAL()` | Renamed; `make test-pal` runs the corpus under PAL |
-| `consoleUpdate` | `textFlush()` | Renamed: the text module uploads on request, the NMI does not scan |
+| `consoleRegionIsOK` | `isPAL()` | Renamed; `make test-pal` runs the corpus under PAL |
+| `consoleUpdate` | — | Nothing to call: the NMI sends what the `text*` calls wrote |
 | `bgInitMapSet` | `bgSetMapPtr` + `dmaCopyVram` of the map | Split: VRAM address and upload are two steps |
 | `bgInitTileSetLz` | `lzssDecodeVram` + `bgSetGfxPtr` | Split |
 | `bgInitMapTileSet7`, `setMode7*`, `dmaCopyVram7` | module `mode7`: `mode7Init`, `mode7Rotate`, `mode7SetScale`, `mode7Transform`, `mode7SetScroll` | Renamed, own module |
@@ -191,29 +185,61 @@ has to write itself, and whether that is a decision or a gap.
 | `padsCurrent/Down/Up/Clear` | `padHeld`, `padPressed`, `padReleased` | Renamed |
 | `detectMouse`, `initMouse`, `mouseCycleSensitivity*` | `mouseInit`, `mouseIsConnected`, `mouseSetSensitivity` | Renamed |
 | `detectSuperScope` | `scopeInit`, `scopeIsConnected` | Renamed |
-| `detectMPlay5` | `padIsConnected(2..4)` | Renamed |
-| `spcPlaySound`, `spcPlaySoundV`, `spcLoadEffect`, `spcEffect`, `spcSetSound*` | `snesmodLoadEffect`, `snesmodPlayEffect` | Renamed; the sound table API is `snesmodSetSoundTable` |
+| `detectMPlay5` | — | **Not provided.** The multitap path cannot be switched on; pads 2 to 4 read 0 (`KNOWN_LIMITATIONS.md`) |
+| `spcPlaySound`, `spcPlaySoundV`, `spcLoadEffect`, `spcEffect`, `spcSetSound*` | `snesmodLoadEffect`, `snesmodPlayEffect` | Renamed |
 | `spcGetMusicPosition`, `spcFadeModuleVolume`, `spcPauseMusic`, `spcResumeMusic`, `spcStop`, `spcSetModuleVolume`, `spcSetBank` | the `snesmod*` names of the same words (`snesmodGetPosition`, `snesmodFadeVolume`, `snesmodPause`, `snesmodResume`, `snesmodStop`, `snesmodSetModuleVolume`, `snesmodSetSoundbank`) | Renamed |
 | `REG_*` aliases (`REG_A1B0`, `REG_APU00`, `REG_VMADDLH`, ...) | `snes/registers.h`: one name per register, the official mnemonics | Renamed |
 
-"Decided" means the library will not grow the function; "assumed" means it
-could, nobody asked yet — open an issue with the game that needs it.
+"Decided" means the library will not grow the function.
 
 ## Step 5 — assets
 
-The converters take the same shapes of input and, for graphics, the same flags
-PVSnesLib users know:
+The converters take the same shapes of input. Each asset gets a settings file
+beside it whose first line names the tool, and `make/common.mk` runs it before
+compiling — the Makefile lists no asset:
 
-```bash
-gfx4snes -i sprite.png -p -t -s 16     # 16x16 sprites
-gfx4snes -i bg.png -p -t -m            # background with tilemap
-gfx4snes -i bg.png -p -t -m -R         # ... without tile reduction
+```toml
+# res/sprite.png.toml — was: gfx4snes -s 16 -o 16 -u 16 -p -i sprite.png
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16
 ```
 
-Maps exported from Tiled go through `tmx2snes`, Aseprite sheets through
-`aseprite2snes`, audio through `smconv` and `wav2brr`. Each has a page under
-@ref tools, and `make/common.mk` runs them for you when the source file is
-listed in the example's Makefile.
+```toml
+# res/bg.png.toml — was: gfx4snes -s 8 -o 16 -u 16 -p -m -i bg.png
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+```
+
+The gfx4snes flags map onto the options of @ref tools_opensnes_tileset
+(backgrounds, `-m`) and @ref tools_opensnes_sprite (sprite sheets); a settings
+key is the option's name without the dashes:
+
+| gfx4snes | opensnes-tileset `convert` | opensnes-sprite `sheet` |
+|---|---|---|
+| `-m` (map output) | always written | — |
+| `-p` (palette output), `-o N` | always written; `--colors N` | always written; `--colors N` |
+| `-u 4` / `-u 16` / `-u 256` | `--bpp 2` / `--bpp 4` / `--bpp 8` | `--bpp 2` / `--bpp 4` / `--bpp 8` |
+| `-s N` | `--size N` (8 or 16) | `--size N` (8, 16, 32, 64) |
+| `-R` | `--no-reduce` | — |
+| `-F` | `--flip` | `--flip` |
+| `-g`, `-y`, `-f N` | `--priority`, `--pages`, `--offset N` | — |
+| `-M 7` | `--mode 7` | — |
+| `-e N`, `-c fixed.pal`, `-a` | `--palette-entry N`, `--palette fixed.pal`, `--rearrange` | `--palette-entry N`, `--palette fixed.pal`, — |
+| `-T -X W -Y H -P N` | — | `--metasprite W H --priority N` |
+| `-z`, `-k`, `-b`, `-d` | `--lz`, `--pack`, `--blank`, `--round` | `--lz`, —, `--blank`, `--round` |
+| `-t png` / `-t bmp` | the input's extension | the input's extension |
+
+Maps exported from Tiled go through `opensnes-level`, Aseprite exports through
+`opensnes-sprite anim`, WAV samples through `opensnes-sample`, fonts through
+`opensnes-text`; each has a page under @ref tools. SNESMOD music builds
+from `SOUNDBANK_SRC` with `USE_SNESMOD := 1`, converted by `opensnes-music`
+(PVSnesLib's `smconv` invocation is done for you). The earlier converters are on
+@ref tools_legacy.
 
 ## Step 6 — when it still looks wrong
 

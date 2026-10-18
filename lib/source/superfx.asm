@@ -21,7 +21,7 @@ gsu_cfgr:        dsb 1      ; CFGR value ($80=default; bit 5 MS0 is masked off b
 gsu_scmr:        dsb 1      ; SCMR value ($18=RAN+RON, $19=4bpp+RAN+RON)
 gsu_scbr:        dsb 1      ; SCBR value ($00=bufA, $10=bufB)
 gsu_dma_src_hi:  dsb 1      ; DMA source high byte ($00=bufA, $40=bufB)
-gsu_hdma_table:  dsb 20     ; HDMA table for INIDISP blanking
+gsu_hdma_table:  dsb 20     ; HDMA table for INIDISP blanking: up to 6 entries of 3 bytes + end
 gsu_tm_rows:     dsb 2      ; gsuSetupBitmapTilemap: tile rows per column
 ; SCMR is write-only: the value last written, kept by every lib path that
 ; starts or stops a job (set BEFORE the buses go to the GSU, cleared BEFORE
@@ -398,10 +398,13 @@ _vis_none:
     sta.l $000000,x            ; terminator
     bra _hdma_config
 
-; A = lines of forced blank (INIDISP = $80); X = table cursor (bank $00
+; A = lines of forced blank (INIDISP = $8F); X = table cursor (bank $00
 ; WRAM, written with absolute long so DB does not matter). Clobbers Y.
+; $8F, not $80: the brightness bits stay at 15 across the band, so a 1-CHIP
+; console does not fade in over 72 pixels or more at the end of each band
+; (snesdev-wiki Errata/Video, chunk 172b5b77ea6fae37; audit 1.0, 01-2).
 _gsu_hdma_band_blank:
-    ldy #$0080
+    ldy #$008F
     bra _gsu_hdma_band
 
 ; A = lines of display (INIDISP = $0F); X = table cursor. Clobbers Y.
@@ -419,6 +422,8 @@ _gsu_hdma_band:
     sta.l $000000,x
     tya
     sta.l $000001,x
+    sta.l $000002,x          ; the same byte twice (to $21FF, then $2100)
+    inx
     inx
     inx
     pla
@@ -431,6 +436,8 @@ _band_one:
     sta.l $000000,x
     tya
     sta.l $000001,x
+    sta.l $000002,x
+    inx
     inx
     inx
 _band_done:
@@ -438,11 +445,18 @@ _band_done:
 
 _hdma_config:
 
-    ; Configure HDMA channel 1 → REG_INIDISP ($2100)
-    lda #$00
-    sta.l $4310              ; transfer mode: 1 byte, direct
-    lda #$00
-    sta.l $4311              ; dest: $2100 (INIDISP)
+    ; Configure HDMA channel 1 → INIDISP through $21FF: mode 1 writes the
+    ; entry's two bytes to $21FF (nothing) then $2100, the B-bus address
+    ; wrapping $21FF -> $2100 (anomie-regs, chunk 86a167989f25767c). With
+    ; BBAD = $00, a recent HDMA to INIDISP can make a general DMA fail on an
+    ; S-CPU-A console, its size registers unchanged (snesdev-wiki Errata
+    ; S-CPU, chunk 97b76d7d4e2e34a6; undisbeliever, 8a82d25de6e99ae5), and
+    ; gsuPresent's DMAs run in these bands. Both bytes equal also avoid the
+    ; INIDISP early-read pixel (chunk 9cde32ae8100f0c1). Audit 1.0, 01-2.
+    lda #$01
+    sta.l $4310              ; transfer mode 1: 2 registers, write once
+    lda #$FF
+    sta.l $4311              ; dest: $21FF, then $2100 (INIDISP)
     rep #$20
     .ACCU 16
     lda #gsu_hdma_table

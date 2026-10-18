@@ -1,6 +1,6 @@
 # game_skeleton — the smallest complete game
 
-**Family 5 (Game math & framework) · a capstone.**
+**Game math & framework · a capstone.**
 
 ## Why it matters for your game
 

@@ -5,20 +5,24 @@
  * Uses 8x8 tile mode (BG1_TSIZE8x8), so each 16x16 sprite = 4 tiles (2x2).
  * The tilemap uses SC_64x64 layout (4 pages of 32x32 tiles).
  *
- * All buffer access goes through assembly helpers since the spritemap
- * lives in bank $7E (beyond compiler-accessible bank $00 WRAM).
+ * The map is built in spritemap_buf, a FAR buffer: 16 KB does not fit in
+ * the 8 KB of plain C RAM, so it lives at $7E:2000 and up, read and
+ * written by C like any array.
  */
 
 #include <snes.h>
 #include "map32x32.h"
 
-/* Assembly helpers */
-extern void smapWrite(u16 byte_offset, u16 value);
-extern void smapClear(u16 byte_count);
-extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
+FAR u16 spritemap_buf[0x2000];
+
+void spritemapDma(u16 byte_offset, u16 vram_addr, u16 byte_count) {
+    dmaCopyVram((const u8 *)spritemap_buf + byte_offset, vram_addr, byte_count);
+}
 
 void initSpriteMap32x32(u16 len) {
-    smapClear(len);
+    u16 i;
+    for (i = 0; i < len / 2; i++)
+        spritemap_buf[i] = 0;
 }
 
 /*
@@ -30,14 +34,14 @@ void initSpriteMap32x32(u16 len) {
  *   Bottom-right: y=48-63, x=0-15
  *
  * Each 16x16 sprite occupies 4 tiles (2x2 in 8x8 mode).
- * Row stride = 64 u16 entries = 128 bytes.
+ * Row stride = 32 u16 entries; a sprite's two rows are 32 entries apart.
  */
 static void drawSpriteRaw32x32(u8 x, u8 y, u16 sprite) {
-    u16 i = (u16)(64 * y + x * 2) * 2; /* byte offset (each u16 = 2 bytes) */
-    smapWrite(i, sprite);
-    smapWrite(i + 2, sprite + 1);
-    smapWrite(i + 64, sprite + 2);   /* 32 entries down = 64 bytes */
-    smapWrite(i + 66, sprite + 3);
+    u16 i = (u16)(64 * y + x * 2);     /* entry index */
+    spritemap_buf[i] = sprite;
+    spritemap_buf[i + 1] = sprite + 1;
+    spritemap_buf[i + 32] = sprite + 2;   /* the row below */
+    spritemap_buf[i + 33] = sprite + 3;
 }
 
 void drawSprite32x32(u8 x, u8 y, u16 sprite) {
@@ -67,6 +71,6 @@ void screenRefreshPos32x32(u8 x, u8 y, u16 address) {
         offset = 32 * 32 * 3 + (x - 16) + (u16)(y - 16) * 64;
 
     /* DMA 256 bytes from spritemap buffer to VRAM */
-    smapDma(offset * 2, address + offset, 256);
+    spritemapDma(offset * 2, address + offset, 256);
 }
 

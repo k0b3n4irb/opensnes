@@ -1,5 +1,5 @@
 # Migrated from probes/movement.py.
-rom = "../../examples/maps/tiled/tiled.sfc"
+rom = "../fixtures/retired_examples/tiled/tiled.sfc"
 frames = 180
 [[checkpoint]]
 at_frame = 60

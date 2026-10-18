@@ -36,6 +36,8 @@ g.expect_refused("check datainit_late.sym (sentinel not last)", ["check", "--no-
                  copy=["datainit_late.sym"], needles=["data-init sentinel is not last"])
 g.expect_refused("check bankblind.sym (bank-blind read)", ["check", "bankblind.sym"],
                  copy=["bankblind.sym", "bankblind.c.asm"], needles=["read bank-blind in bankblind.c.asm", "mapdata"])
+g.expect_refused("check sa1_bank1.sym (SA1Start out of bank $00)", ["check", "--no-nmi-race", "sa1_bank1.sym"],
+                 copy=["sa1_bank1.sym"], needles=["SA1Start is at $01:8000", "16-bit", "BANK 0"])
 g.expect_refused("check nmirace.sym (WRAM port from an NMI callback)", ["check", "nmirace.sym"],
                  copy=["nmirace.sym", "nmirace.c.asm"], needles=["NMI / WRAM port race", "fill", "sta.w $2180"])
 g.expect_stdout("inspect good.sfc hirom.sfc oddsize.sfc (header, checksum, digests)", ["inspect", "good.sfc", "hirom.sfc", "oddsize.sfc"],

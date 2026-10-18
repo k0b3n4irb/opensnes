@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 88 examples organized by topic. For a progressive learning path, see
+All 85 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -37,7 +37,7 @@ The PPU's background modes — colour vs layers vs resolution.
 | @subpage examples_backgrounds_mode1_bg3_priority | BG3 priority bit for overlay effects |
 | @subpage examples_backgrounds_mode1_lz77 | LZ77-compressed background data |
 | @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
-| @subpage examples_backgrounds_mode3 | Mode 3: 256-color (8bpp) single layer |
+| @subpage examples_backgrounds_mode3 | Mode 3: 256-colour (8bpp) single layer |
 | @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
 | @subpage examples_backgrounds_mode4 | Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words |
 | @subpage examples_backgrounds_mode6 | Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns |
@@ -54,11 +54,11 @@ Sprite display, animation, and OAM management.
 | @subpage examples_sprites_simple_sprite | Basic OAM setup, sprite display |
 | @subpage examples_sprites_sprite_sizes | OBJSEL size configurations (8x8 to 64x64) |
 | @subpage examples_sprites_animated_sprite | Frame animation, sprite sheets, H-flip |
-| @subpage examples_sprites_metasprite | Multi-tile composite sprites |
 | @subpage examples_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads |
 | @subpage examples_sprites_dynamic_metasprite | Dynamic metasprite engine with batched OAM updates |
 | @subpage examples_sprites_sprite_swarm | A bouncing swarm + the per-sprite OAM throughput ceiling |
 | @subpage examples_sprites_world_sprites | World-space sprites: a camera, culling and OAM in one call per batch |
+| @subpage examples_sprites_aseprite_pipeline | The asset pipeline: an Aseprite export through `opensnes-sprite` into an animated metasprite |
 
 ---
 
@@ -94,7 +94,7 @@ Change a register every scanline.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_hdma_gradient_colors | HDMA + CGRAM color gradients |
+| @subpage examples_hdma_gradient_colors | HDMA + CGRAM colour gradients |
 | @subpage examples_hdma_hdma_indirect_gradient | Indirect HDMA pointer-table gradient (krom port) |
 | @subpage examples_hdma_hdma_wave | HDMA wave: a hand-built table (krom port), then the hdma module's helper |
 | @subpage examples_hdma_hdma_helpers | High-level HDMA effect library (wave, ripple, iris) |
@@ -108,10 +108,10 @@ Colour math, palette bypass, and beating the 256-colour limit.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_color_palette_cycle | Palette cycling: animate by rotating CGRAM, no pixels moved |
-| @subpage examples_color_transparency | Color math (add/subtract blending) |
+| @subpage examples_color_transparency | Colour math (add/subtract blending) |
 | @subpage examples_color_shadow_tint | Shadow & tint: darken or colour-cast a whole scene via fixed-colour math |
-| @subpage examples_color_direct_color | Direct color mode: the 8bpp pixel byte IS the RGB color |
-| @subpage examples_color_hicolor_1792 | 1792 colors from a 4bpp background via per-tile-row HDMA (krom port) |
+| @subpage examples_color_direct_color | Direct colour mode: the 8bpp pixel byte IS the RGB colour |
+| @subpage examples_color_hicolor_1792 | 1792 colours from a 4bpp background via per-tile-row HDMA (krom port) |
 | @subpage examples_color_pseudo_hires | 50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math |
 
 ---
@@ -124,7 +124,7 @@ Mask part of the screen — static or HDMA-shaped.
 |---------|-------------|
 | @subpage examples_windows_window | Hardware window masking |
 | @subpage examples_windows_window_multi_hdma | Both hardware windows animated per scanline (krom port) |
-| @subpage examples_windows_transparent_window | Color math + HDMA windowed transparency |
+| @subpage examples_windows_transparent_window | Colour math + HDMA windowed transparency |
 
 ---
 
@@ -159,10 +159,9 @@ Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls (LoROM) |
-| @subpage examples_audio_snesmod_music_large | Large soundbank: multi-bank module split |
 | @subpage examples_audio_snesmod_sfx | Sound effects alongside music |
 | @subpage examples_audio_soundboard | Audio v2 engine driven entirely from C (resident SPC700 driver) |
-| @subpage examples_audio_sfx_from_wav | One-shot SFX from WAV: the zero-config .wav to .brr build rule (wav2brr) |
+| @subpage examples_audio_sfx_from_wav | One-shot SFX from WAV: a settings file beside each .wav, converted by opensnes-sample |
 | @subpage examples_audio_apu_switch | Hot-swapping APU programs at runtime |
 | @subpage examples_audio_play_noise | A drum kit from the S-DSP white-noise generator (krom port) |
 | @subpage examples_audio_pitch_mod | Hardware vibrato via pitch modulation (PMON) (krom port) |
@@ -178,7 +177,6 @@ Tile-based maps, streaming, Tiled pipeline, and collision.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_maps_map_scroll | Smooth tile-aligned scrolling with viewport tracking |
-| @subpage examples_maps_tiled | Tiled Map Editor (.tmx) integration |
 | @subpage examples_maps_dynamic_map | Dynamic tile map streaming |
 | @subpage examples_maps_slope_collision | Slopes and tile-based collision |
 
@@ -226,9 +224,9 @@ sharing I-RAM with the main CPU for inter-processor communication.
 | @subpage examples_chips_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
 | @subpage examples_chips_sa1_save | A boot counter in battery-backed BW-RAM: one more at every power-on |
 
-### SuperFX (GSU)
+### Super FX (GSU)
 
-The SuperFX is a custom RISC processor (GSU) with built-in pixel PLOT,
+The Super FX is a custom RISC processor (GSU) with built-in pixel PLOT,
 hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 
 | Example | Description |

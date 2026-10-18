@@ -2,6 +2,346 @@
 
 All notable changes to OpenSNES are documented in this file.
 
+## [Unreleased]
+
+## [0.51.0] — 2026-10-18
+
+The silent defects found by the 1.0 audit, fixed: a variable-length array
+is refused instead of compiled into a frame too small, a struct copied from
+a named const object reads its bank, the NMI's DMAs move to channel 7 and
+leave the HDMA channels alone, the HDMAs to INIDISP take the form two
+console errata ask for, an SA-1 ROM whose boot left bank $00 and a
+soundbank too big for the SPC700's RAM are refused, a ROM the post-link
+check refuses is deleted. The SNESMOD driver is built from its source. The
+compiler keeps a loop's pointers and indexes in place (the SDK bench at
+62 % faster than PVSnesLib), the eight earlier converters are retired for
+the `opensnes-*` tools, `opensnes init --template game` is the starter,
+and the documentation says what the code does.
+
+### Added
+- feat(lib): **`vramQueueCost()`** — what the VRAM queue already holds
+  will cost the VBlank, in bytes: each entry's size plus
+  `VRAM_QUEUE_ENTRY_COST` (96, the flush's per-entry overhead). Kept by
+  `vramQueuePush()` / `vramQueuePushSprite()`, set to 0 by the flush,
+  saturated at `$FFFF`. A module that streams sprite frames after others
+  have queued their own uploads can budget what is left without walking
+  the queue's arrays. Asked by a game built on the SDK.
+- feat(lib): **`audioReleaseEcho()`** turns the echo off and gives its ring
+  back to the samples: the sample area reaches `$FFC0` again, and samples
+  may be loaded where the ring was as soon as it returns (the driver
+  answers once the S-DSP has stopped writing there). Until now a ring, once
+  configured, stayed taken: `audioDisableEcho()` keeps it so that
+  `audioEnableEcho()` can bring the same echo back. Asked by a game built
+  on the SDK.
+- feat(lib): **a sample loaded while the game runs** —
+  `audioLoadSampleBegin(id, brrData, size, loopPoint)` takes the place in
+  the sound CPU's memory and sends nothing, `audioLoadSampleStep(maxBytes)`
+  sends a piece and returns what is left (0: playable; `AUDIO_LOAD_FAILED`
+  if the driver stopped answering). `audioLoadSample()` does not return
+  before the whole sample is sent, ten frames of a stopped game for 5.6 KB;
+  between two steps the driver is in its command loop, so playing voices go
+  on and voice commands pass. One sample at a time; other
+  `audioLoadSample()` calls stay allowed and go above the place taken;
+  `audioUnloadSample()` on the slot gives the load up. A step of 64 costs
+  about 59,750 master cycles (18,700 fixed, 650 a byte), 17 % of a frame.
+  Asked by a game built on the SDK.
+- feat(lib): **`audioSetVoiceVolumePitch(voice, volume, pitch)`** and
+  `audioSetVoicePan(voice, pan)`: the volume and the pitch of a voice in one
+  command to the driver (`VSET`, opcode `$10`), the volume split between
+  left and right by the voice's pan — the one `audioPlaySampleOn()` gave it
+  or `audioSetVoicePan()` set since, with the same formula, so a voice hard
+  left stays hard left; the driver learns a pan (`VPAN`, `$11`) only when it
+  changes. A sequencer in tremolo and vibrato sent `audioSetVoiceVolume()`
+  then `audioSetVoicePitch()` at every tick, two handshakes: four voices
+  updated every frame cost 10 621 master cycles a voice, 5 500 with the one
+  call (−48 %, luna), the DSP left in the same state. The call is assembly
+  (`audio_vset.asm`): in C it cost more than the handshake it saved.
+  Driver protocol version 2. Pinned by the libtests and by fourteen register
+  assertions of manifest `audio_v2` (left, right, a pan in between, the
+  centre by default, the clamps).
+- feat(bench): `stepseq`, the 24th workload of `make bench-sdk`, measured for
+  OpenSNES alone: a four-channel step sequencer ticked 2 000 times — parallel
+  `u16` arrays indexed by the channel, a `switch` on an opcode byte, `s8`
+  effect tables read at `e + 5 + k`, a 32-bit division at each period change
+  — the shape of a sound interpreter. 65,378,506 master
+  cycles, 8 172 a channel-tick (the criterion is 5 000). PVSnesLib's compiler
+  leaves another checksum (0x5078 for the 0x7552 of the native build and of
+  ours), so the runner prints the row "ours only" and keeps it out of the
+  totals (`OPENSNES_ONLY` in `run.py`).
+
+### Performance
+- perf(compiler): **a pointer walked by a loop stays in place for the whole
+  loop.** A loop that reads through a far pointer and steps it, such as
+  `for (; n; n--, q += stride) ... q[0] ... q[1] ...`, loaded the pointer
+  again at the top of every turn. It is now loaded once before the loop and
+  stepped where it lies: four instructions a turn fewer. When the pointer is
+  read after the loop, it is written back on the way out.
+- perf(compiler): **`a[i + 8]` next to `a[i]` reuses its index when i is
+  bounded.** When i is a byte or masked by a constant, `(i + 8) * 2` is
+  `i * 2 + 16` exactly, and the second access reads `a+16,x` on the X the
+  first one loaded, instead of computing the index again. An unbounded
+  16-bit index is left as it is, since `i + 8` may wrap: the compiler does
+  not assume an access stays inside its array. A member of a union
+  (`u.w[k + 8]`) is folded the same way.
+- perf(compiler): **counted loops lose their copies and their jump back.**
+  A step computed into temporaries then copied (`q += stride` on a far
+  pointer) is stored into the variable at once; a value stored and read
+  back before the step's label is not; and a loop whose count is tested at
+  its top tests it at its end (`dec n / bne @body` instead of a jump back
+  to the test).
+- perf(compiler): **a pointer read several times in a row is set up once.**
+  `q[0]`, `q[1]`, `q[2]` read through one pointer, with another array's
+  index computed between them, set the pointer up again before each read;
+  and `(d & m) | q[1]` ORs `q[1]` straight from memory.
+- perf(compiler): **a function holding a variable shift keeps its peephole
+  optimisations.** The shift's loop has an anonymous label, which made the
+  liveness of the peephole stage give up on the whole function: dead
+  stores stayed and no indexed load was fused into its operation.
+- perf(compiler): **`d[k] |= p[k]` from ROM into far RAM: 5 instructions a
+  word, 4 through a pointer, instead of 9 and 10.** An indexed load stays the
+  operand of the operation it feeds when the other operand is indexed by
+  another slot (X is set back before the operation) or read through a
+  pointer, and a 16-bit and, or or xor no longer makes the next word stage
+  that pointer again.
+- perf(compiler): **X is known across the blocks of a function, and an
+  indexed load is the operand of what it feeds.** Two text rules of the
+  emitter's peephole stage. A function that indexes parallel arrays by one
+  value — a channel, an entity — scaled it and put it in X at the
+  top of every block (`lda 2,s / tax`, seven cycles each time): a forward
+  analysis of what A and X hold now carries that knowledge across labels.
+  And `lda SYM,x / sta T / lda Y / cmp T` is `lda Y / cmp SYM,x` (also adc,
+  sbc, and, ora, eor), 17 cycles to 9. SDK bench: `physics` −26.5 %, `sort`
+  −14.6 %, `dist` −8.2 %, `collide` −5.4 %, `place` −3.8 %, `depot` −3.4 %,
+  the total −2.0 % (−61.4 % against PVSnesLib), 181 bytes smaller; the
+  sequencer workload 7 951 → 7 295 master cycles a channel-tick (−8.2 %).
+  `QBE_NO_PEEP_XFLOW=1` and `QBE_NO_PEEP_FUSE=1` switch each off.
+- perf(runtime): the 32-by-16 division of the runtime (`div32_ucore`, the
+  path `u32 / u16` takes) runs its sixteen low steps unrolled, the quotient
+  bit rolled in from the carry instead of an `inc` in memory: 1 167 → 946
+  master cycles a division on the sequencer workload (−19 %). 190 bytes
+  more in a ROM that divides 32 bits.
+
+### Changed
+- feat(tools): **`opensnes init --template game` is the SDK's starter.** It
+  copies `starter/`: `main.c`, `res/player.png` with the settings file the
+  build converts it from, `.gitignore` and two luna tests, the ROM they
+  name renamed after the project. A new project shows the one thing every
+  asset needs, a settings file beside it.
+- feat(tools): **`opensnes-sprite sheet --pack` is removed**, and `pack =
+  true` in a `[sheet]` table is refused. Packed pixels are the Mode 7
+  background format, which sprites cannot read; `opensnes-tileset convert
+  --pack` (and `--mode 7`) keeps it. `docs/UPGRADING.md` lists it.
+- build(release): **the zip ships the library's objects without the
+  compiler's intermediate `.asm`** (538 files to 348), and
+  `templates/gsu_boot.sfx`, which nothing used, is gone.
+  `docs/tools/README.md` says what is in `bin/`.
+- chore(testing): **luna is pinned to v1.39.0**, with no reference moved.
+- docs: **the documentation is brought back in line with the code.** A
+  review of every user page and of the commits since 0.50.0 found about 160
+  claims that no longer held; the ones a reader would follow and fail on
+  (`luna frames --out`, a `.wav` converted with no settings file, removed
+  names in the PVSnesLib guide, an HDMA mask that took the DMA helpers'
+  channel, a settings example the tool refuses, `colorMathDisable(layers)`)
+  are fixed, with the channel 7 guidance, the INIDISP HDMA form, the
+  retired converters' names and the stale figures across the tutorials,
+  the headers' comments, the examples' READMEs and the site's front page.
+  The SDK benchmark is measured again: 62 % faster than PVSnesLib on 23
+  workloads.
+- build(lib): **the SNESMOD driver is built from its source.**
+  `lib/source/sm_spc.asm` held the SPC700 driver as 5 522 bytes of
+  `.byte` lines, patched in place for the stop and pause fix; its source,
+  Mukunda Johnson's driver in the WLA-DX syntax PVSnesLib converted it to,
+  is now `lib/source/sm_spc.spc700.asm`, assembled by `wla-spc700` at
+  every library build like the audio engine's driver, with the stop and
+  pause fix written in it. The bytes are the same: every example ROM is
+  identical. `opensnes-music` takes its copy from the same build.
+- chore(tools): **cmdparser is gone.** The vendored option parser (Apache
+  2.0) came with PVSnesLib's gfx4snes; no tool has compiled it since the
+  `opensnes-*` tools replaced gfx4snes and img2snes, yet the release still
+  shipped its licence. Its sources, its licence and the copy in the release
+  recipe are removed.
+- docs(examples): **the examples reviewed before 1.0; 85 of them.** Six
+  taught the opposite of the SDK or the hardware and are corrected
+  (an HDMA window table that "must be refreshed every scanline", two
+  Mode 7 games reading a const table through assembly because C "cannot",
+  a tilemap buffer reached through assembly instead of `FAR`, a Mode 7
+  perspective re-arming HDMA during the display, Mode 3's second layer
+  called 4-colour); the retired converters, dated history and internal
+  jargon are gone from the example pages; fifteen examples now start with
+  `consoleInit()`; breakout and tetris read the joypad through
+  `padHeld()` / `padPressed()`; likemario streams its map column through
+  `vramqueue`. Three examples that repeated another left the corpus and
+  became test fixtures: `maps/tiled` (its Tiled walkthrough is now in
+  `maps/map_scroll`), `sprites/metasprite` (see `sprites/sprite_sizes` and
+  `sprites/aseprite_pipeline`) and `audio/snesmod_music_large`.
+- build(tools): **the eight earlier converters are retired.** `gfx4snes`,
+  `smconv`, `wav2brr`, `tmx2snes`, `aseprite2snes`, `font2snes`, `img2snes`
+  and `palplan` each did what an `opensnes-*` tool now does with the same
+  code, to the same bytes (every new tool's golden suite compares against
+  the old one's goldens; smconv's compressed-sample cases now run through
+  `opensnes-music`). Their binaries are no longer built or shipped; their
+  converter sources and goldens moved to `tools/lib/`, linked into the tools
+  that replaced them, so `tools/` lists only the shipped tools. SNESMOD
+  music (`SOUNDBANK_SRC`) is converted by `opensnes-music`, to identical
+  soundbanks and ROMs in the six examples that use it. `GFXSRC` (no example
+  or known project used it) stops the build with a message naming the
+  settings file that replaces it; the `.wav` -> `.brr` rule is gone (a
+  `.wav.toml` replaces it). `docs/UPGRADING.md` and `docs/tools/legacy.md`
+  say what to change.
+- feat(lib): **the echo ring takes what its delay needs.** It started at
+  `$C000` whatever the delay: the first `audioSetEcho()` took 16 KB off the
+  sample area for a ring of 2 KB per unit of delay, and a game with more
+  than 46 KB of samples could have no echo at all. The ring is now the top
+  delay x 2 KB under `$FF00` (`ESA = $FF - 8 x delay`): 58,112 bytes of
+  samples with a delay of 2, 47,872 with 7. `audioSetEcho()` still answers
+  `AUDIO_ERR_NO_MEMORY`, nothing changed, when samples already loaded are
+  in the ring's way; a shorter delay than the last gives memory back.
+  **`audioSetEcho()` blocks longer**: the S-DSP takes a new delay only when
+  the ring it runs reaches its end (snesdev wiki, Errata), and a longer old
+  ring from the new start would pass `$FFFF` and write over the driver, so
+  the driver keeps the ring's writes off for that time — up to 240 ms on
+  the first call, 16 ms per unit of the previous delay after. Call it at
+  scene setup. Asked by a game built on the SDK.
+
+### Fixed
+- fix(tools): **the `.spc` of `opensnes-music spc` runs the driver games
+  run.** The tool carried its own copy of the SNESMOD driver (5 546 bytes,
+  an older build from PVSnesLib's smconv), different from the library's
+  (5 522 bytes, with the stop and pause fix): 4 854 bytes differed. The
+  tool now takes the library's driver at compile time, and its golden
+  checks that the `.spc` holds that driver.
+- fix(tools): **`opensnes-music` puts the module where the driver reads it,
+  and refuses one the SPC700's RAM cannot hold.** `opensnes-music spc` wrote
+  the module at `$19AA` while the driver reads it at `$1A00`: the preview
+  `.spc` held `$FF` where the song should start. `opensnes-music bank` only
+  warned about a module too big for the SPC700's RAM, then wrote the
+  soundbank and exited 0; it now refuses it (exit 1, nothing written), and
+  so does `spc`. The limit is the driver's: the module and its BRR samples
+  from `$1A00` up to the echo buffer, which sits under `$FF00` and takes
+  2 KB per step of echo delay (58 368 bytes without echo). The figure
+  `inspect` and `--json` print (`spc_ram_bytes`, `spc_ram_free`) is that
+  one: for `pollen8.it`, 16 446 bytes of 29 952, where it said 44 137 of
+  57 957 — the old figure counted the echo as data and the instruments as
+  nothing. The soundbank itself is unchanged, byte for byte.
+- fix(tools,docs): **an SA-1 ROM whose `SA1Start` left bank $00 is refused.**
+  The SA-1 reset vector is 16-bit, so the SA-1 starts only in the ROM of
+  bank $00. The SA-1 tutorial taught a boot section in `SUPERFREE`, which
+  the linker moves to bank $01 once bank $00 fills: the build was green and
+  the SA-1 never ran. `opensnes-rom check` now refuses the ROM and names
+  the directive; the tutorial uses the template's `BANK 0 SLOT "ROM"
+  SEMIFREE` and enables BW-RAM writes (CBWE) as the template does.
+- fix(lib): **the HDMAs to INIDISP take the form two console errata ask
+  for.** `gsuSetupHdmaBlanking()` and `hdmaBrightnessGradient()` wrote
+  INIDISP with a one-register HDMA (B-bus address `$00`), which on an
+  S-CPU-A console can make a general DMA fail with no trace — and the Super
+  FX presentation runs its DMAs in those bands; and the letterbox blanked
+  with `$80`, which a 1-CHIP console fades in over 72 pixels or more at
+  each band's end. Both now write `$21FF` then `$2100` (transfer mode 1,
+  each value twice) and blank with `$8F` (snesdev-wiki Errata; undisbeliever).
+  luna models no console revision, so the change is in the tables and the
+  registers, asserted by the Super FX fixture; the console session will
+  see the rest. `hdmaBrightnessGradient()` takes 56 more bytes of RAM (169).
+- fix(compiler): **a struct copied from a named `const` object reads its
+  bank.** `r = kl;`, with `kl` a `static const` struct in an asset bank,
+  was copied with bank-$00 loads, where `s = kl.k` read the right bank;
+  an element of a const array of structs, a const union and a local
+  initialised from a const object did the same. The link check refused
+  those ROMs ("C code reads bank $01+ data with bank-$00 addressing"),
+  so nothing wrong shipped. The copy now carries the access flags of both
+  sides (`const` and `FAR` far, `volatile` kept). Pinned by the compiler
+  check `copy_from_named_const`.
+- fix(lib,runtime): **the NMI's DMAs leave the HDMA channels alone.** The
+  text flush ran on channel 1 and the dynamic sprite uploads on channels
+  1 to 4, so a Super FX letterbox (`gsuSetupHdmaBlanking`, HDMA channel 1)
+  with text on screen stayed black — the next frame read the text buffer as
+  its table — and the game's own HDMA on channels 2 to 4 was overwritten by
+  any dynamic sprite upload. Every DMA of the NMI now runs on channel 7,
+  after the OAM transfer's; `textInit()`'s immediate flush uses channel 0,
+  the DMA helpers'. Channels 1 to 6 are free for HDMA (`hdma.h`). Pinned by
+  the fixture `libtests_dma_channels`, which reads the channels' registers
+  back after forty frames of letterbox, HDMA, text and 32x32 uploads.
+- fix(build): **a ROM the post-link check refuses does not survive.** The
+  linker writes the `.sfc` before `opensnes-rom check` reads it, so a ROM
+  the check refused stayed on disk and the next `make`, finding it newer
+  than its objects, said "Built" and exited 0. `make/common.mk` now sets
+  `.DELETE_ON_ERROR:`; the failed target is deleted and every later `make`
+  links and fails again. Pinned by `make test-project`.
+- fix(compiler): **a variable-length array is refused.** `u16 a[n];` with
+  `n` known at run time — or a `const` variable, which is not a constant
+  expression in C — compiled without a word: the backend gave the array a
+  fixed 2-byte frame slot, and a function filling it wrote over its own
+  return address. cproc now stops with "variable-length arrays are not
+  supported on w65816", the driver
+  defines `__STDC_NO_VLA__`, and QBE refuses a run-time-sized alloc from
+  any front end. Use an `enum` or a `#define` for the length. No example or
+  library source changed. Pinned by `cases/negative/vla*.c`.
+- fix(tools): **an output `opensnes-music bank` cannot open is an error.**
+  When the `.asm` or `.h` could not be opened the tool wrote through a null
+  pointer and crashed; when the `.bnk` could not, it wrote nothing and
+  exited 0. It now says "cannot write the soundbank" and exits 3. The
+  converters behind `opensnes-music`, `opensnes-image` and
+  `opensnes-palette` also stop with "out of memory" (exit 3) on a failed
+  allocation instead of writing through a null pointer.
+- fix(tools): **`opensnes-level` refuses a tile layer whose name is not a
+  plain file name.** The name comes from the map and names the output file;
+  a layer called `../escape/PWN` wrote outside `--out`, and a name of 1000
+  characters overflowed the path buffer. A name is now 1 to 64 characters
+  with no `/`, `\`, `:` or `..`, and the paths are built bounded. The maps
+  of the examples (`BG1`, `Entities`) are unchanged.
+- fix(tools): **the `opensnes` CLI runs make and the SDK's tools without a
+  shell.** `build`, `test`, `run`, `budget`, `release` and `doctor` passed
+  paths to `system()` / `popen()` inside double quotes, so a project folder
+  named `p$(touch x)` ran `touch`, and a folder holding a quote broke the
+  build. They now start programs with an argument list (`fork` + `execvp`;
+  `_spawnvp` with each argument quoted on Windows).
+- fix(compiler): **a loop counter whose address is taken keeps its value.**
+  `for (i = 0; i < 3; i++)` with `&i` taken somewhere left `i` at 0: the
+  rule that keeps a loop counter in X moved the increment to X and left the
+  second store of the step, to the counter's home on the stack, storing a
+  stale value. The rule now leaves such a loop alone. Found by the
+  statement differential test.
+- fix(tools): **`opensnes-tileset --rearrange` keeps an opaque black
+  opaque.** Before regrouping the colours into banks, it folded every index
+  onto the first index of the same colour, index 0 among them: a pixel of
+  index 5 whose colour equalled index 0's (black, or anything black on five
+  bits) came out as 0, transparent. Index 0 is transparent by its place,
+  not by its colour; it is no longer a target of that folding. Found by a
+  game built on the SDK.
+- fix(compiler): **a const table of more than 16,384 elements compiles.**
+  QBE's emitter buffered the items of an initialized object in a fixed table
+  of 16,384 and died on the next with "too many data items", naming nothing
+  (found by a game built on the SDK). The buffer
+  grows. What bounds an object is the ROM bank — a section cannot span one —
+  and wlalink now says so: its no-room refusal names the object (the
+  section's first label), its size and the bank's (`KNOWN_LIMITATIONS.md`).
+  No ROM of the corpus changes (88/88 byte-identical).
+- fix(release): **the SDK zip installs luna again.** `scripts/install-luna.sh`
+  checks the archive it downloads against `testing/luna.sha256`, and the zip
+  shipped `luna.version` without it: in a freshly unzipped SDK, the installer
+  every page and message points to stopped with "no SHA-256" (every zip up
+  to v0.50.0). The release recipe copies the sums, and `release-smoke` fails
+  on a zip without them or without a sum for each of the four archives.
+- fix(tools): **`opensnes-tileset convert --blank`** (and `gfx4snes -b`) on a
+  picture whose first block is blank wrote the added blank tile **and** the
+  picture's own, while the map numbered the tiles as if there were one: every
+  cell showed the tile before its own. The blank tile is now written only
+  when the picture does not start with one (the map counts from 1 then, from
+  0 otherwise), so the `.pic` and the `.map` always agree. In Modes 5 and 6,
+  where a map entry names two tiles side by side, the option wrote one blank
+  tile and counted two: every cell but the first was one tile off; two are
+  written. Found by a game built on the SDK. No example used the option.
+- fix(lib): an echo configured without `audioSetEchoFilter()` was silent:
+  the filter's eight taps were the zeros a reset leaves. The driver starts
+  with tap 0 at 127, the filter that passes the echo through; the call is
+  optional.
+- fix(lib): `audioEnableEcho()` after `audioDisableEcho()` gave no echo:
+  the driver set the voice mask and left the echo volumes at 0 and the
+  ring's writes off, so only a new `audioSetEcho()` brought the echo back
+  (`examples/audio/echo` showed its "wet" colour over a dry sound after two
+  presses of START). The driver now starts the ring again as
+  `audioSetEcho()` configured it, cleared. `examples/audio/soundboard`
+  configures its hall once and toggles it with the two calls.
+
 ## [0.50.0] — 2026-10-12
 
 A primitive for text

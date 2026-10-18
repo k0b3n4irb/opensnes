@@ -38,11 +38,10 @@
 #include <snes/colormath.h>
 
 /**
- * @brief Assembly DMA loader for SUPERFREE graphics data.
+ * @brief The landscape and the clouds, converted by the build from res/.
  *
- * Asset symbols from data.asm (.incbin sections). Post-A6+A7 (v0.19.0)
- * C pointers carry the bank byte, so `dmaCopyVram` / `dmaCopyCGram`
- * resolve the correct source bank automatically — no ASM stub needed.
+ * A C pointer carries its bank byte, so `dmaCopyVram` / `dmaCopyCGram`
+ * take the data wherever the linker placed it.
  */
 #include "res/backgrounds.inc"
 #include "res/clouds.inc"
@@ -82,19 +81,14 @@ int main(void) {
     dmaCopyVram(clouds_map,   0x2400, clouds_map_end   - clouds_map);
     dmaCopyCGram(clouds_pal,  0,      clouds_pal_end   - clouds_pal);
 
-    /* BG1 screen map at VRAM $2000, 32x32 tile arrangement (SC_32x32).
-     * The screen size bits (0-1) are 0x00 = 32x32. The upper bits hold
-     * the VRAM base address >> 8. */
-    REG_BG1SC = (0x2000 >> 8) | 0x00;
-    /* BG1+BG2 character (tile) base at VRAM $0000.
-     * Low nibble = BG1 base >> 12, high nibble = BG2 base >> 12. */
-    REG_BG12NBA = 0x00;
+    /* BG1: map at VRAM $2000 (32x32 tiles), tiles at $0000 */
+    bgSetMapPtr(0, 0x2000, SC_32x32);
+    bgSetGfxPtr(0, 0x0000);
 
-    /* BG3 screen map at VRAM $2400, 32x32 tiles.
-     * BG3 uses 2bpp tiles (Mode 1), consuming half the VRAM per tile vs 4bpp. */
-    REG_BG3SC = (0x2400 >> 8) | 0x00;
-    /* BG3+BG4 tile base. Low nibble = BG3 base ($1000 >> 12 = 1). */
-    REG_BG34NBA = 0x01;
+    /* BG3: map at VRAM $2400, tiles at $1000. BG3 uses 2bpp tiles in
+     * Mode 1, half the VRAM per tile of a 4bpp layer. */
+    bgSetMapPtr(2, 0x2400, SC_32x32);
+    bgSetGfxPtr(2, 0x1000);
 
     /* Mode 1 with BG3 priority high. In Mode 1, BG3 is normally 2bpp and
      * drawn behind BG1/BG2. Setting BG3_MODE1_PRIORITY_HIGH promotes BG3's

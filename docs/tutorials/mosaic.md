@@ -192,13 +192,15 @@ just the boss layer while the player keeps moving".
 For non-blocking animation, write the manual loop yourself — see the
 "Animated transitions" section above.
 
-### 🟡 Mosaic state is not reset by `consoleInit`
+### 🟡 The module's mosaic state is not reset by `consoleInit`
 
-`consoleInit()` does not call `mosaicInit()`. If a previous scene left
-mosaic enabled (and you didn't call `mosaicDisable` or `mosaicInit`),
-the new scene boots with stale mosaic configuration. The PPU defaults
-at hard reset are "all off" so the first-boot case is fine, but
-scene-to-scene cycles need explicit `mosaicInit()` calls.
+`consoleInit()` writes `0` to the MOSAIC register, so the screen comes
+up without mosaic, but it does not call `mosaicInit()`. The module keeps
+its own copy of the layer mask and block size, and only `mosaicInit()`
+clears it. If a previous scene left mosaic enabled (and you didn't call
+`mosaicDisable` or `mosaicInit`), the next `mosaicSetSize()` or fade
+writes the stale layer mask back to the register. Scene-to-scene cycles
+need an explicit `mosaicInit()` call.
 
 ## Cycle cost
 
@@ -213,7 +215,7 @@ gameplay-pacing decision, not a CPU-budget one.
 ## See also
 
 - `lib/include/snes/mosaic.h` — full API reference.
-- `lib/source/mosaic.asm` — implementation (compact, mostly register
+- `lib/source/mosaic.c` — implementation (compact, mostly register
   bookkeeping and the fade loops).
 - [`examples/transitions/mosaic`](../../examples/transitions/mosaic/README.md) — four transitions cycled on button
   press: brightness fade out/in and mosaic fade out/in.

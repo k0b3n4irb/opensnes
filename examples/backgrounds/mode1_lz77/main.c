@@ -13,14 +13,14 @@
  * for a 31% saving; both figures were wrong.) The tilemap and palette are
  * stored uncompressed and loaded via standard DMA.
  *
- * The gfx4snes tool produces LZ77-compressed output when invoked with the
- * -z flag. lzssDecodeVram() handles the VRAM write timing internally.
+ * opensnes-tileset writes LZ77-compressed tiles when the settings file says
+ * `lz = true`. lzssDecodeVram() handles the VRAM write timing internally.
  *
  * Based on the PVSnesLib "Mode1LZ77" example by Alekmaul.
  *
  * @par SNES Concepts
  * - LZSS/LZ77 decompression: lzssDecodeVram() streams compressed data to VRAM word-by-word
- * - gfx4snes -z flag enables LZ77 compression for tile data at build time
+ * - `lz = true` in the picture's settings file compresses its tiles at build time
  * - Mode 1 BG1 at 4bpp (16 colors) with tilemap at $0000, tiles at $4000
  * - Force blank via REG_INIDISP during decompression (slower than DMA, needs full blanking)
  * - Palette loaded uncompressed via dmaCopyCGram(); only tile data benefits from compression
@@ -43,7 +43,7 @@
 #include <snes/background.h>
 #include <snes/lzss.h>
 
-/** @name Graphics data pointers (defined in data.asm via .incbin)
+/** @name Graphics data pointers (converted by the build from res/)
  * @{ */
 #include "res/opensnes.inc"   /* generated: opensnes_tiles[] (LZ77), opensnes_pal[], opensnes_map[], each with _end */
 /** @} */

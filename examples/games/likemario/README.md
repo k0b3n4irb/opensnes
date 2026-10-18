@@ -67,19 +67,14 @@ static void map_prepare_column(u16 map_col, u16 vram_col) {
     for (row = 0; row < map_height; row++) {
         col_buffer[row] = map_row_ptrs[row][map_col];
     }
-    col_pending = 1;  /* Flag: "I have data ready" */
+    /* Note the transfer: 64 bytes, the address stepping by 32 words
+     * (down the column) */
+    vramQueuePush((const u8 *)col_buffer, vram_addr, 64, VRAM_QUEUE_COLUMN);
 }
 ```
 
-**During VBlank** (PPU is idle, VRAM is writable):
-```c
-static void map_flush_column(void) {
-    if (!col_pending) return;
-    REG_VMAIN = 0x81;  /* Auto-increment vertically (down the column) */
-    /* Write col_buffer to VRAM */
-    col_pending = 0;
-}
-```
+**During VBlank** (PPU is idle, VRAM is writable), `vramQueueFlush()` sends
+what was noted, one DMA per entry (the `vramqueue` module).
 
 **The decision logic** (every frame):
 ```c
@@ -125,7 +120,6 @@ per frame — essential for smooth deceleration.
 > the intent is visible. cc65816's `>>` on a signed value IS arithmetic (the
 > compiler checks pin it: `devtools/compiler-tests/cases/test_signed_ops.c`), so
 > `val >> 8` would do the same; the helper is readability, not a workaround.
-> (Until 2026-10-04 this box claimed the compiler shifted logically.)
 
 ### 5. Gravity in Two Lines
 
@@ -200,7 +194,7 @@ while (1) {
 
     /* VBlank — hardware updates */
     WaitForVBlank();
-    map_flush_column();                  /* Write staged column to VRAM */
+    vramQueueFlush();                    /* Send the staged column to VRAM */
     bgSetScroll(0, camera_x, 0);        /* Update scroll register */
     /* NMI handler auto-flushes the dynamic sprite engine
      * (end-frame + VRAM tile queue) — no manual calls needed. */
@@ -295,6 +289,8 @@ The tools write the `.pic` / `.pal` (and the `.map` for the tileset), a
 | `dma` | Bulk transfers: tile data, palettes, OAM buffer |
 | `input` | `padHeld()`, `padPressed()` — NMI handler fills the buffers |
 | `background` | `bgSetScroll()`, `bgSetGfxPtr()`, `bgInitTileSet()` |
+| `anim` | Mario's walk and jump clips |
+| `vramqueue` | The map column, noted during the frame and sent in VBlank |
 
 ### Data Placement
 
@@ -313,15 +309,13 @@ tilesetatt:     .incbin "res/map_1_1.b16"
 
 The map and collision data are read by C too, and that works from any bank:
 the C side declares them `const`, and every C read of const data is a far
-read (since v0.41.0). Until 2026-09-23 they sat in `SEMIFREE BANK 0` "because
-the compiler reads bank $00" — true before far pointers, and what this page
-said until 2026-09-26.
+read.
 
 ---
 
 ## Modules Used
 
-`console`, `sprite`, `sprite_dynamic`, `sprite_lut`, `dma`, `input`, `background`, `anim` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `sprite_dynamic`, `sprite_lut`, `dma`, `input`, `background`, `anim`, `vramqueue` (`LIB_MODULES` in the Makefile).
 
 ## Technical Reference
 

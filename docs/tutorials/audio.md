@@ -1,6 +1,9 @@
-# Audio & Music Tutorial {#tutorial_audio}
+# Music with SNESMOD {#tutorial_audio}
 
-This tutorial covers SNES audio including the SPC700 sound chip, BRR samples, and SNESMOD tracker playback.
+Choose this page for tracker music: SNESMOD plays Impulse Tracker modules,
+and plays sound effects from the same soundbank. For samples driven from C
+with DSP effects (ADSR, GAIN, echo), or for an SPC700 program of your own,
+read @ref tutorial_audio_samples instead.
 
 ## SNES Audio Architecture
 
@@ -12,22 +15,18 @@ The SNES has a dedicated **SPC700** sound processor with:
 - Hardware ADSR envelopes
 - Echo/reverb effects
 
-## Audio Options in OpenSNES
+## Two engines, one per ROM
 
-| Method | Best For | Size | Complexity |
-|--------|----------|------|------------|
-| **Direct BRR samples** | One-shot SFX, voice clips | per sample | Low |
-| **SNESMOD** | Music + tracker SFX | ~5.5KB | Medium |
+| Module | Best for | Size in audio RAM |
+|--------|----------|-------------------|
+| `snesmod` (this page) | Music, and effects that share its soundbank | ~5.5KB driver |
+| `audio` (@ref tutorial_audio_samples) | One-shot effects, voice clips, DSP effects from C | per sample |
 
-Reach for **direct BRR samples** when you want a jump, a hit, a coin, or a
-voice clip played on demand — you load a `.brr` into the SPC700 and trigger it
-from C (see @ref examples_audio_soundboard). Reach for **SNESMOD** when you
-want music, or SFX that share a tracker soundbank with it. Pick one per
-ROM: `audio` and `snesmod` both own the SPC700, so they are never linked
-together. To *make* a `.brr` from your own audio, see
-[One-shot samples from WAV](#audio_wav2brr) below.
+Pick one per ROM: `audio` and `snesmod` both own the SPC700, so they are
+never linked together. A one-shot `.brr` made from a WAV belongs to the
+`audio` module: see @ref audio_wav2brr.
 
-## SNESMOD (Recommended)
+## SNESMOD
 
 SNESMOD is a tracker-based audio engine supporting Impulse Tracker (.it) modules.
 
@@ -35,7 +34,7 @@ SNESMOD is a tracker-based audio engine supporting Impulse Tracker (.it) modules
 
 1. Create music in a tracker (OpenMPT recommended)
 2. Export as Impulse Tracker (.it) format
-3. Convert with smconv tool
+3. List the modules in `SOUNDBANK_SRC`: the build converts them
 4. Link soundbank with your ROM
 
 ### Makefile Configuration
@@ -116,65 +115,6 @@ void play_coin_sound(void) {
 }
 ```
 
-### One-shot samples from WAV (wav2brr) {#audio_wav2brr}
-
-SNESMOD is built around tracker modules. For a plain one-shot effect — a jump,
-a hit, a UI blip, a bit of speech — the lighter path is a **direct BRR
-sample**: convert an audio file to the SNES's BRR format once, bake it into the
-ROM, and trigger it from C. This is what @ref examples_audio_soundboard does.
-
-**1. Convert your WAV to BRR.** `wav2brr` (built by `make tools`) turns a PCM
-`.wav` into a `.brr` using the same encoder smconv uses on its own samples:
-
-```sh
-# one-shot effect
-wav2brr res/jump.wav res/jump.brr
-
-# a looping sample (loop between sample indices 2048 and 8192)
-wav2brr --loop 2048 8192 res/cello.wav res/cello.brr
-```
-
-Input is PCM WAV (8- or 16-bit, mono or stereo — stereo is downmixed). Keep
-the source at or below **32 kHz**; that is the DSP's ceiling, and a higher rate
-just plays back sharp. Pass `-v` to see the block count, loop offset, and a
-ready-to-paste `audioLoadSample()` line.
-
-**2. Bake the `.brr` into the ROM.** Put a settings file beside the WAV and
-the build does the rest, exactly as `audio/sfx_from_wav` does:
-
-```toml
-# res/jump.wav.toml
-tool = "opensnes-sample"
-
-[encode]
-```
-
-`opensnes-sample encode` runs before the first C object; it writes
-`res/jump.brr`, a `res/jump_data.as` the build links (its own
-`ASSET_SECTION`, so any bank but $00), and a `res/jump.h` that declares
-`jump_brr[]`, `jump_brr_end[]` and the size. A looping sample adds
-`loop = [start, end]` to the table.
-
-**3. Load it once, play it on demand.** The label becomes a C symbol; the size
-is the two labels subtracted, and the loop point is the byte offset `wav2brr`
-reported (0 for a one-shot):
-
-```c
-extern u8 brr_jump[], brr_jump_end[];
-
-audioLoadSample(0, brr_jump, (u16)(brr_jump_end - brr_jump), 0);
-// ...later, when the player jumps:
-audioPlaySample(0);
-```
-
-See @ref audio_samples in the API reference for the full sample API
-(`audioLoadSample`, `audioPlaySample`, `audioUnloadSample`).
-
-> The build converts a one-shot sample for you: when an assembly file
-> `.incbin`s `res/jump.brr` and `res/jump.wav` exists, `make` runs `wav2brr`
-> on it. A looping sample needs its loop points, so run `wav2brr --loop` by
-> hand and commit the `.brr` next to its source WAV.
-
 ### Volume Control
 
 ```c
@@ -202,17 +142,22 @@ snesmodStop();
    - 32kHz max sample rate
 4. Export as .it file
 
-### smconv Tool
+### The converter
+
+The build runs this for you; by hand it is:
 
 ```bash
-# Convert music for soundbank
-smconv -s -o soundbank -b 1 music.it effects.it
+opensnes-music bank music.it effects.it --name soundbank --bank 1
 
 # Output files:
 # - soundbank.asm  (link with ROM)
 # - soundbank.h    (module/effect IDs)
 # - soundbank.bnk  (binary data)
 ```
+
+The build runs it from `SOUNDBANK_SRC` when `USE_SNESMOD := 1`
+(@ref tools_opensnes_music), and `opensnes-music inspect`
+tells you what each module costs in the SPC700's 64 KB.
 
 ## Pitch Constants
 
@@ -259,12 +204,6 @@ several queued, `snesmodProcess()` waits on the audio CPU for up to five
 scanlines (about 2 % of a frame) before leaving the rest to the next frame.
 A command sent while the queue is full is dropped, so a burst of dozens of
 effects in one frame loses the last ones rather than corrupting the queue.
-
-(The 0.x names `snesmodSetSoundTable` and `snesmodAllocateSoundRegion`, which set up a stream no SDK call could start, were removed on 2026-10-05.)
-They prepare the driver's streamed-sample path, and no SDK call starts a
-stream. The allocation reorganises the SPC700's memory and stops a
-module already loaded, so a call left in old code must stay before
-`snesmodLoadModule()`.
 
 ## Example: Music + SFX
 
@@ -323,7 +262,7 @@ int main(void) {
 |-----------|------|
 | SPC700 Driver | ~5.5KB |
 | Sample Data | Up to ~58KB |
-| Echo Buffer | ~4KB (at $D000-$FFFF) |
+| Echo Buffer | 2 KB per unit of delay, under $FF00 (none without an echo) |
 
 Total audio RAM: 64KB
 
@@ -332,7 +271,7 @@ Total audio RAM: 64KB
 1. **Keep samples small** - Use lower sample rates for less important sounds
 2. **Reuse samples** - Same sample at different pitches for variety
 3. **Test on hardware** - Emulator timing may differ
-4. **Use echo sparingly** - Takes 4KB+ of audio RAM
+4. **Size the echo to what you hear** - its ring takes 2 KB of audio RAM per 16 ms of delay
 
 ## Example ROMs
 
@@ -341,147 +280,6 @@ Total audio RAM: 64KB
 
 ## Next Steps
 
+- @ref tutorial_audio_samples "Samples, voices and the raw APU" — the `audio` and `apu` modules, and luna's `spc-dump` for debugging either engine
 - @ref snesmod.h "SNESMOD API Reference"
 - @ref tutorial_graphics "Back to Graphics"
-
-## The audio module (v2) — samples and effects from pure C
-
-For sound effects and sample playback, `LIB_MODULES += audio` gives
-you the full engine with no SPC700 code of your own: the lib ships a
-resident driver (built from source at lib build time) and `audio.h`'s
-functions drive it — `audioInit()`, `audioLoadSample()` (BRR
-streamed into APU RAM at runtime), `audioPlaySampleEx()` (volume/pan/
-pitch, 8-voice round-robin polyphony), per-voice ADSR/GAIN, and a
-configurable echo with FIR filter. Every call is bounded — the API
-returns `AUDIO_ERR_TIMEOUT` rather than hanging. Worked example:
-`audio/soundboard`. Main-thread only; one engine per ROM (don't link
-`audio` and `snesmod` together).
-
-### Choosing the voice
-
-`audioPlaySample()` and `audioPlaySampleEx()` pick a voice round-robin
-and return it (or `AUDIO_VOICE_NONE`). `audioPlaySampleOn(voice, sample,
-volume, pan, pitch)` plays on the voice you name — reserve one for a
-long sound that must not be cut by the next effects, and shape its
-envelope before the key-on:
-
-```c
-#define VOICE_ENGINE 7
-audioSetADSR(VOICE_ENGINE, 4, 7, 7, 0);                /* slow attack */
-audioPlaySampleOn(VOICE_ENGINE, SFX_ENGINE, 90, AUDIO_PAN_CENTER, 0x1000);
-/* ... */
-audioStopVoice(VOICE_ENGINE);                          /* key-off */
-```
-
-`audioStopAll()` keys off all eight voices. Passing `AUDIO_VOICE_AUTO`
-as the voice gives the round-robin choice.
-
-### Volume and pitch
-
-```c
-audioSetVolume(100);                     /* master, 0-127 */
-u8 v = audioGetVolume();                 /* the value last set */
-audioSetVoiceVolume(3, 127, 40);         /* voice 3, left/right */
-audioSetVoicePitch(3, 0x1800);           /* 0x1000 = the sample's own rate */
-```
-
-Pitch is clamped to 0x3FFF, the S-DSP's 14-bit range.
-
-### Shaping the envelope: ADSR or GAIN
-
-`audioSetADSR(voice, attack, decay, sustain, release)` gives a voice the
-classic envelope (the `AUDIO_ATTACK_*`, `AUDIO_DECAY_*`,
-`AUDIO_SUSTAIN_*`, `AUDIO_RELEASE_*` constants). `audioSetGain(voice,
-mode)` switches the voice to GAIN instead and writes `mode` to its GAIN
-register as is: `$00-$7F` hold the envelope at a fixed level (value × 16);
-with bit 7 set, bits 5-6 choose linear decrease, exponential decrease,
-linear increase or bent increase, and bits 0-4 the rate (snesdev-wiki,
-S-DSP registers, VxGAIN; anomie's S-DSP doc). They shape the attack, so
-set them before playing on that voice — which is why
-`audioPlaySampleOn()` lets you choose it.
-
-```c
-audioSetGain(2, 0x7F);                   /* voice 2 at a steady full level */
-audioSetGain(2, 0xC0 | 20);              /* voice 2 fades in linearly */
-```
-
-### Echo
-
-Echo takes three steps, in this order: the delay and levels, the filter,
-then the voices that feed it.
-
-```c
-static const s8 fir_flat[8] = { 0x7F, 0, 0, 0, 0, 0, 0, 0 };
-
-audioSetEcho(4, 40, 50, 50);             /* 64 ms, feedback 40, volume L/R */
-audioSetEchoFilter(fir_flat);
-audioEnableEcho(0x03);                   /* voices 0 and 1 */
-/* ... */
-audioDisableEcho();                      /* mutes the echo and stops the ring writes */
-```
-
-`{ 0x7F, 0, 0, 0, 0, 0, 0, 0 }` is the identity filter: the echo comes
-back unfiltered (snesdev-wiki, S-DSP registers, FIRx, which also says to
-set the filter before echo is enabled). `audioSetEcho()` clears the whole
-echo ring, which takes several milliseconds per delay step: call it when
-a scene starts, not every frame.
-
-### Asking the engine
-
-| Call | Returns |
-|---|---|
-| `audioIsReady()` | 1 once `audioInit()` has started the driver; 0 if the driver did not answer |
-| `audioGetFreeMemory()` | bytes left for samples in the SPC700's RAM |
-| `audioGetVoiceState(voice, &state)` | whether the voice's envelope is still sounding, and the sample, volume, pan and pitch last sent to it |
-
-The 0.x `audioUpdate` was removed on 2026-10-05 (it did nothing): the engine
-sends each command as you call it, nothing is deferred to a per-frame call.
-
-Choosing a path: **snesmod** for tracker music (IT modules),
-**audio** for C-driven samples and DSP effects, **apu** (below) for
-writing your own SPC700 program.
-
-## The raw APU path (no snesmod)
-
-Since the SPC700 arc, the SDK has a second audio path: the `apu` module
-uploads a wla-spc700-assembled program straight through the IPL boot-ROM
-protocol — `apuWaitBoot()`, `apuUpload()`, `apuExecute()` — giving full
-DSP control (voices, ADSR, echo, pitch) with no tracker involved. Worked
-example: `audio/speech_synth` (phoneme-bank speech — upload, DSP
-config, per-phoneme sequencing). The two paths are exclusive:
-don't link `apu` and `snesmod` in one ROM.
-
-APU-side memory layout matters: the flat binary is laid out by
-`wlalink -b`, and an `.ORG` section that overlaps your growing code
-OVERWRITES it silently (the SPC700-arc sequencer died exactly this way during development).
-Budget the code page before placing the sample directory.
-
-### Hot-swapping APU programs
-
-`apuWaitBoot()` only works once — the IPL handshake is consumed at
-boot. To replace the running program later, use the cooperative reset
-protocol (worked example: `audio/apu_switch`):
-
-1. Build the APU program with `APU_CHECK_RESET` (from
-   `templates/memmap_spc700.inc`) inside its wait loops. The idiom
-   polls CPUIO0 for `APU_RESET_MAGIC`; on match it silences the DSP,
-   acks, re-enables the IPL ROM and jumps to `$FFC0` — the boot ROM is
-   re-entrant.
-2. On the 65816, call `apuReset()`, then `apuUpload()`/`apuExecute()`
-   for the next program — but NOT `apuWaitBoot()` (the reset already
-   consumed the ready signal).
-
-Two contract points, both learned the hard way in `apu_switch`:
-`apuReset()` blocks forever on a program that never polls for the
-magic, and the next program receives the DSP *dirty* — a residual
-`ADSR1` bit 7 from the previous program silently overrides `GAIN`, so
-every register a voice depends on must be written explicitly.
-
-## Debugging audio: luna's spc-dump
-
-`luna spc-dump` runs a ROM and exports the complete APU state — 64 KB of
-ARAM plus all 128 DSP registers — as a standard playable `.spc`. Diffing
-two dumps (yours vs a reference, or two instants of your own ROM) answers
-in seconds what ears cannot localize: upload integrity, directory/loop
-addresses, per-voice ADSR/pitch/envelope state, phoneme/note schedules.
-`--audio-out` (WAV capture) complements it for spectral verification.

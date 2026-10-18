@@ -34,7 +34,7 @@
 #include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /*============================================================================
- * External Graphics Data (defined in data.asm)
+ * Graphics Data (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
 /** @brief 4bpp tile data for the background image. */
@@ -72,6 +72,8 @@ static void wait_for_key(void) {
  * @return Does not return (infinite loop).
  */
 int main(void) {
+    consoleInit();
+
     /* Force blank during setup -- required for safe VRAM writes */
     setScreenOff();
 

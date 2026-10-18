@@ -103,8 +103,7 @@ The minimum sequence to bring up a rotating Mode 7 plane:
 
 ```c
 #include <snes.h>
-
-extern void asm_loadMode7Data(void);   /* user-supplied, see examples */
+#include "res/mode7bg.inc"   /* generated: mode7bg_tiles[], mode7bg_map[], mode7bg_pal[], each with _end */
 
 int main(void) {
     u8 angle = 0;
@@ -115,7 +114,10 @@ int main(void) {
     /* Force blank for the bulk VRAM writes */
     setScreenOff();
 
-    asm_loadMode7Data();   /* writes interleaved tile data + map + palette */
+    /* interleaved tilemap + 8bpp tiles, then the palette */
+    dmaCopyVramMode7(mode7bg_map, (u16)(mode7bg_map_end - mode7bg_map),
+                     mode7bg_tiles, (u16)(mode7bg_tiles_end - mode7bg_tiles));
+    dmaCopyCGram(mode7bg_pal, 0, (u16)(mode7bg_pal_end - mode7bg_pal));
 
     /* Switch to Mode 7 + initialise the affine transform */
     setMode(BG_MODE7, 0);
@@ -174,8 +176,7 @@ The scale is in texels per screen pixel, 8.8 fixed point:
 peaks at 127/128). `0x0080` magnifies twice, `0x0200` shrinks twice (you
 see four times the area). Smaller is closer, counter-intuitive at first,
 but the formula tells you why: a larger `A`/`D` means each screen pixel
-steps over more plane pixels. (Before 0.48.0 the helpers wrote half the
-scale, so `0x0200` was 1:1; code written then halves its scales.)
+steps over more plane pixels.
 
 ## Out-of-bounds behaviour
 
@@ -215,10 +216,10 @@ say), `TRANSPARENT` or `TILE0` keeps the world bounded.
 The "hello-world" of Mode 7. `mode7SetAngle()` and `mode7SetScale()`
 update the matrix every frame in response to D-pad input — A/B rotate,
 UP/DOWN zoom. Read the example to see the exact init sequence
-(consoleInit, setScreenOff, asm_loadMode7Data, setMode(BG_MODE7, 0),
+(consoleInit, setScreenOff, dmaCopyVramMode7, dmaCopyCGram, setMode(BG_MODE7, 0),
 mode7Init, mode7SetScale, mode7SetAngle, setMainScreen(TM_BG1),
-setScreenOn) and the per-frame update path. ~100 lines of C; the entire
-demo fits on one screen.
+setScreenOn) and the per-frame update path. The entire demo is one short
+`main.c`.
 
 ### F-Zero perspective via HDMA — `examples/mode7/perspective`
 
@@ -231,7 +232,7 @@ the M7A and M7D registers.
 The example is a 4-channel HDMA orchestration:
 
 - **Channel A** writes BGMODE at the split scanline (~96), switching
-  from Mode 3 (sky on top) to Mode 7 (ground on bottom).
+  from Mode 1 (sky on top) to Mode 7 (ground on bottom).
 - **Channel B** writes TM (main screen enable), switching from BG2
   (sky) to BG1 (ground) at the split.
 - **Channel C** writes per-scanline M7A values — wide near the camera,
@@ -239,15 +240,15 @@ The example is a 4-channel HDMA orchestration:
 - **Channel D** writes per-scanline M7D values — same compression
   curve.
 
-Read the example's `asm_setupHdmaPerspective` for the table-build
-algorithm. The math is straightforward: for scanline `s` at distance
+Read the example's `perspective_x` / `perspective_y` tables and the four
+`hdmaSetup()` calls in its `main.c` for the table layout. The math is straightforward: for scanline `s` at distance
 `d` from the horizon, the matrix factor is `1.0 / d` (inverse depth).
 What's hard is the channel bookkeeping — get the timing wrong and you
 see the wrong mode for one scanline, or the perspective curve "jumps".
 
 This is also a textbook case for the [HDMA tutorial](hdma.md)'s
 gotchas: the example uses HDMA channels 1–4, leaves channel 0 for
-`dmaCopyVram` and channel 7 for the OAM DMA. Run any other split-mode
+`dmaCopyVram` and channel 7 for the NMI handler's DMAs. Run any other split-mode
 display through it; the scaffolding is the same.
 
 ### The Super Mario Kart floor via the DSP-1 — `examples/mode7/dsp1_ground`
@@ -409,7 +410,7 @@ perspective example consumes ~6 % of CPU during active display.
 ## See also
 
 - `lib/include/snes/mode7.h` — full API reference.
-- `lib/source/mode7.asm` — implementation (matrix multiply, sin/cos
+- `lib/source/mode7.c` — implementation (matrix multiply, sin/cos
   table).
 - [`examples/mode7/rotate_scale`](../../examples/mode7/rotate_scale/README.md) — basic rotation + scaling demo.
 - [`examples/mode7/perspective`](../../examples/mode7/perspective/README.md) — F-Zero-style perspective via 4-channel HDMA.

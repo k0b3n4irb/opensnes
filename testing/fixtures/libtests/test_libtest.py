@@ -94,7 +94,7 @@ CASES = [
     ("r_div32_bad", 2, 0), ("r_div32_n", 2, 73),   # 32-bit division vectors: 16-bit and wide divisors, signs
     ("r_audio_phase", 2, 0),     # 400 loads under a long vblank callback, each ending at another phase of the frame
     ("r_audio_free",  2, 0xF4B7),
-    ("r_audio_free_echo", 2, 0xB4F7),
+    ("r_audio_free_echo", 2, 0xDBF7),
     ("r_audio_addr",  2, 0x0B00),
     ("r_audio_voice", 2, 0),
     # phase 3: the DSP->CPU read path — voice 0's envelope is live
@@ -170,7 +170,7 @@ CASES = [
     ("r_bank_tpl_bk",  2, 1),      # premise: so is the const template
     # audio error returns (API audit 3.5, 2026-09-21): they used to be swallowed
     ("r_apu_boot_again", 2, 1),  # 2026-10-03: apuWaitBoot is bounded; 1 = no IPL
-    ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2),
+    ("r_aud_init", 2, 0), ("r_aud_badvoice", 2, 2), ("r_aud_badstop", 2, 2), ("r_aud_vset_bad", 2, 2),
     ("r_aud_setvol", 2, 0), ("r_aud_noplay", 2, 0xFF),
     ("r_aud_on", 2, 6), ("r_aud_on_bad", 2, 0xFF), ("r_aud_on_rr", 2, 1),   # audioPlaySampleOn: the caller picks the voice
     # types: fixLerp's t is a u16 so 1.0 is reachable; sprite ids are u16 so the range check sees 256
@@ -181,7 +181,7 @@ CASES = [
     # coverage lot C (2026-09-20)
     ("r_aud_v0_live",  2, 1),      ("r_aud_v0_stop",  2, 0),
     ("r_aud_v1_live",  2, 1),      ("r_aud_all_stop", 2, 0),
-    ("r_aud_unload",   2, 3),      ("r_aud_unfree",   2, 0xB500),
+    ("r_aud_unload",   2, 3),      ("r_aud_unfree",   2, 0xDC00),
     ("r_meta_style",   2, 22),     ("r_meta_plain",   2, 0x6C64),
     ("r_meta_flipx",   2, 0x646C), ("r_meta_flipattr", 2, 0x40),
     ("r_meta_piece32", 2, 42),     # the piece size comes from the style, not from "large = 16"
@@ -241,6 +241,9 @@ CASES = [
     # vramQueuePushSprite: a 16x16 frame is two strips 512 bytes and 256 words
     # apart; refused under 8 pixels and when the strips do not all fit
     ("r_vqs", 16, sum(w << (16 * i) for i, w in enumerate([1, 2, 512, 0x6500, 64 | (0x80 << 8), 0, 0, 30]))),
+    # vramQueueCost: bytes + 96 an entry (300 for 8 + 0 + 4 bytes, 320 for
+    # a 16x16 frame), 0 after a flush, $FFFF rather than a wrap three ways
+    ("r_vqc", 16, sum(w << (16 * i) for i, w in enumerate([300, 0, 320, 0xFFFF, 0, 0xFFFF, 0xFFFF, 0]))),
     ("r_done",     2, 0xBEEF),
 ]
 

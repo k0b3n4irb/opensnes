@@ -84,12 +84,12 @@ jobs:
             zip
             unzip
 
-      - name: Install dependencies for macOS
-        if: matrix.name == 'darwin'
-        run: |
-          brew update || true
-          brew install doxygen zip || true
-          # Xcode Command Line Tools provides the compiler
+      # macOS needs nothing installed: the Xcode Command Line Tools of the
+      # runner give the compiler, make and zip, and no step of this job runs
+      # Doxygen (`release` has not depended on `docs` since the zip stopped
+      # shipping the HTML). The step that was here ran `brew update` to
+      # install doxygen and zip: a minute, and a screen of warnings about the
+      # runner image's own packages, on every push.
 
       # ------------------------------------ #
       # Checkout the project                 #
@@ -323,7 +323,12 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: OpenSNES SDK (${{ matrix.name }}_${{ matrix.arch }})
-          path: release/opensnes_${{ matrix.name }}_${{ matrix.arch }}.zip
+          # `make release` names the zip after the tree's version
+          # (opensnes_vX.Y.Z_<os>_<arch>.zip). The path named it without the
+          # version, matched nothing, and the step only warned: no SDK zip
+          # was attached to a push until 2026-10-13. A miss is now an error.
+          path: release/opensnes_*_${{ matrix.name }}_${{ matrix.arch }}.zip
+          if-no-files-found: error
 
       # ------------------------------------ #
       # Upload build logs                    #

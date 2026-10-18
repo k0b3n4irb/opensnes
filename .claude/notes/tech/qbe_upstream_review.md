@@ -1,5 +1,9 @@
 # QBE upstream, read against our fork (2026-10-11)
 
+Since 2026-10-13 this reading is a monthly duty, and nothing goes back
+upstream (owner decision): `.claude/notes/partners/qbe-upstream/README.md`
+has the policy, the command and the log of checks.
+
 Our backend is a fork of QBE (Quentin Carbonneaux, `git://c9x.me/qbe.git`).
 The fork's root is a squash, so git knows no merge-base; `compiler/PINS.md`
 locates it at upstream `120f316` (2025-05-30). This note reviews what

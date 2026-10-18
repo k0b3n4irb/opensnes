@@ -131,7 +131,8 @@ analysis on `luna frames` sequences of both ROMs):
 - **Nothing moves?** An HDMA channel that is set up but not enabled does
   nothing: `hdmaSetup()` configures, `hdmaEnableMask()` arms. luna's
   `dma.hdmaen` in `luna state --out -` shows which channels are on.
-- **Channel 7 is taken** by the NMI handler's OAM DMA; do not put HDMA on it.
+- **Channel 7 is taken** by every DMA of the NMI handler (OAM, text flush, dynamic
+  sprites); do not put HDMA on it.
 - **A flat colour hides the effect.** The wave only shifts pixels
   horizontally: it needs an image with vertical detail to be seen.
 

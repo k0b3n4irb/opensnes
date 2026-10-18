@@ -1,29 +1,27 @@
 /**
  * @file main.c
- * @brief 16.16 fixed-point orbit demo (B5 capstone)
+ * @brief 16.16 fixed-point orbit demo
  * @ingroup examples
  *
  * A single 8x8 sprite orbits the screen centre. The orbit is driven
  * entirely by the lib's `<snes/fixed32.h>` API — `fix32Sin`,
- * `fix32Cos`, `fix32Mul`, plus straight Kl arithmetic on `fixed32`
+ * `fix32Cos`, `fix32Mul`, plus plain 32-bit arithmetic on `fixed32`
  * accumulators.
  *
- * What this example demonstrates
- * ------------------------------
+ * @par SNES Concepts
  * - `fixed32` (s32 16.16) for an angle accumulator that stays smooth
- *   across many frames without 8.8 rounding drift.
- * - `fix32Sin` / `fix32Cos` lifted from the 8.8 LUT to 16.16 (8 bits
+ *   across many frames without 8.8 rounding drift
+ * - `fix32Sin` / `fix32Cos` lifted from the 8.8 table to 16.16 (8 bits
  *   of fractional precision, ~25 cycles each — adequate for sub-pixel
- *   animation).
- * - `fix32Mul(radius, fix32Cos(angle))` as the canonical pattern for
- *   trig-driven motion: a `radius * sin/cos` term used in every 2D
- *   game that needs aim/orbit/parallax-around-a-point.
+ *   animation)
+ * - `fix32Mul(radius, fix32Cos(angle))`, the pattern of trig-driven
+ *   motion: a `radius * sin/cos` term, for aim, orbit or parallax around
+ *   a point
  *
- * Inputs / interaction
- * --------------------
- * None — the sprite orbits autonomously. The example is structured as
- * the simplest possible fixed32 fixture; later examples (likemario,
- * aim_target, breakout) compose the same primitives into game logic.
+ * @par What to Observe
+ * - A white dot circles the screen centre, smoothly, with no input
+ * - The simplest fixed32 example; basics/aim_target uses the same
+ *   primitives in game logic
  *
  * @par Modules Used
  * console, sprite, dma, background, fixed32, math

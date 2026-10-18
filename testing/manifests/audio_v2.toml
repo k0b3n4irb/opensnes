@@ -13,6 +13,28 @@ V1_ADSR1 = 0xFF
 V1_ADSR2 = 0xE8
 V4_ADSR1 = 0x00
 V4_GAIN = 0x5A
+# audioSetVoiceVolumePitch(): one command writes the four registers of the
+# voice, the volume split by the voice's pan (right = volume * weight / 16,
+# left = volume - right, as audioPlaySampleOn() splits it).
+# Voice 5, hard left: 77, 0x2ABC.
+V5_VOLL = 77
+V5_VOLR = 0
+V5_PITCHL = 0xBC
+V5_PITCHH = 0x2A
+# Voice 7, hard right: 200 and 0x7FFF, clamped to 127 and 0x3FFF.
+V7_VOLL = 0
+V7_VOLR = 127
+V7_PITCHL = 0xFF
+V7_PITCHH = 0x3F
+# Voice 4, pan 11 (weight 12): 100 -> 75 right, 25 left. Its GAIN above stays.
+V4_VOLL = 25
+V4_VOLR = 75
+V4_PITCHL = 0x00
+V4_PITCHH = 0x08
+# Voice 3, the centre nobody set: 101 -> 50 right, 51 left (its pitch is then
+# set by audioSetVoicePitch(), asserted above).
+V3_VOLL = 51
+V3_VOLR = 50
 # audioPlaySampleOn(6, ..., vol 100, pan AUDIO_PAN_CENTER, pitch 0x1A2B): the
 # registers of the voice that was ASKED for. The centre is exact since
 # 2026-10-04: L = R = 100/2 (before, 100*7/15 = 46 and 100*8/15 = 53 — the
@@ -26,7 +48,7 @@ DIR = 0x0A
 # verified — the old probe printed some decimal: EFB 40=0x28, EVOL 20=0x14,
 # FIR0 96=0x60).
 FLG = 0x00
-ESA = 0xC0
+ESA = 0xE7        # the top 6 KB under $FF00: $FF - 8 x 3
 EDL = 0x03
 EFB = 0x28
 EON = 0x01

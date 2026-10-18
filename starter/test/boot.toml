@@ -1,0 +1,18 @@
+# A project test: `make test` runs every test/*.toml in luna (`luna test`),
+# `make test-update` records the visual baseline (asserts.fbhash).
+# Docs: OpenSNES GETTING_STARTED.md, section "Test your game".
+
+rom = "../game.sfc"
+frames = 180                      # run until PPU frame 180, then judge
+
+[asserts]
+fbhash = "940346ed556af718"       # the frame's hash; `make test-update` rewrites it after a change
+
+# WRAM values at the end, by the name the variable has in your C. If two
+# sources define a static of the same name, luna asks which one:
+# "player_x.main" is player_x of main.c.
+[[checkpoint]]
+at_frame = 180
+[checkpoint.values]
+player_x = 112
+player_y = 96

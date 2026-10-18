@@ -1,19 +1,20 @@
 # Colour
 
-**Part of Family 6 (Colour & effects) — squeezing more colour out of the
+**Colour & effects — squeezing more colour out of the
 PPU.** The SNES shows 256 colours at once from a 15-bit (32768-colour) palette
 — unless you cheat. This family is the colour-math blend, the palette-bypass
 mode, and the tricks that push past 256 by reloading the palette mid-frame.
 
 ## The ladder
 
-| Rung | Example | Developer question |
-|------|---------|--------------------|
-| 6b   | [palette_cycle](palette_cycle/) | How do I animate (waterfall/fire/lights) by rotating CGRAM, no pixels moved? |
-| 6c.1 | [transparency](transparency/) | How do I blend two layers with colour math? |
-| 6c.2 | [shadow_tint](shadow_tint/) | How do I darken (night) or colour-cast (underwater/sunset) a whole scene? |
-| 6c.3 | [direct_color](direct_color/) | How do I use direct-colour mode (the pixel byte *is* the RGB)? |
-| 6d.1 | [hicolor_1792](hicolor_1792/) | How do I show 1792 colours via H-IRQ CGRAM streaming? |
+| Example | Developer question |
+|---------|--------------------|
+| [palette_cycle](palette_cycle/) | How do I animate (waterfall/fire/lights) by rotating CGRAM, no pixels moved? |
+| [transparency](transparency/) | How do I blend two layers with colour math? |
+| [shadow_tint](shadow_tint/) | How do I darken (night) or colour-cast (underwater/sunset) a whole scene? |
+| [direct_color](direct_color/) | How do I use direct-colour mode (the pixel byte *is* the RGB)? |
+| [hicolor_1792](hicolor_1792/) | How do I show 1792 colours via H-IRQ CGRAM streaming? |
+| [pseudo_hires](pseudo_hires/) | How do I blend two layers 50 % without colour math (pseudo-hires)? |
 
 ## The idea in one screen
 

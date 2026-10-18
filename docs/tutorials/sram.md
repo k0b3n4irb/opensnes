@@ -56,16 +56,13 @@ HiROM one and `$40:0000` (BW-RAM) on an SA-1 one. Two limits to know:
 
 - on **HiROM** the helpers address the first 8 KB window only
   (`offset + size <= 8192`, the default `SRAM_SIZE`);
-- on **SA-1** they work since 2026-09-26 (crt0 sets SBWE); until then the
-  build refused `USE_SRAM=1` with `USE_SA1=1`, because the writes were
-  dropped. Two luna manifests (`d_sa1_bwram_write.toml`,
+- on **SA-1** crt0 sets SBWE, so the CPU's writes reach BW-RAM. Two luna manifests (`d_sa1_bwram_write.toml`,
   `e_sa1_bwram_read.toml`) power the cartridge off and on between the save
   and the read.
 - **Super FX** — the save is the GSU's own Game Pak RAM, shared with the
-  framebuffers: see [Super FX: Saving](superfx.md#saving).
+  framebuffers: see [Super FX: Saving](superfx_advanced.md#saving).
 
-This paragraph claimed the helpers "hide these details" long before they
-did — until 2026-09-20 they used the LoROM address on every build. The HiROM
+The HiROM
 mapping is pinned by `testing/fixtures/libtests_hirom`, which reads the bytes back
 from `$30:6000`.
 
@@ -75,16 +72,11 @@ Two changes to enable SRAM in a project:
 
 ### 1. Makefile
 
+Add two lines to the project Makefile (@ref tools_build has the template):
+
 ```makefile
-OPENSNES := $(shell cd ../../.. && pwd)
-TARGET   := mygame.sfc
-ROM_NAME := MYGAME
-USE_LIB    := 1
-USE_SRAM   := 1            # turn on SRAM support
+USE_SRAM   := 1            # turn on SRAM support (links the sram module)
 SRAM_SIZE  := 3            # 3 = 8 KB (the common choice)
-LIB_MODULES := console sram dma background input
-CSRC := main.c
-include $(OPENSNES)/make/common.mk
 ```
 
 The `SRAM_SIZE` numeric value matches the ROM header's `SRAMSIZE`
@@ -97,6 +89,12 @@ byte. Map:
 | `3` | 8 KB | `$03` |
 | `4` | 16 KB | `$04` |
 | `5` | 32 KB | `$05` |
+| `6` | 64 KB | `$06` |
+| `7` | 128 KB | `$07` |
+
+The build accepts `1` to `7`, but the `sram` module addresses one bank
+only: 32 KB on LoROM (and SA-1), 8 KB on HiROM. A transfer past that is
+refused, whatever the header declares.
 
 Most homebrew picks 8 KB unless you genuinely need more. Larger SRAM
 declarations affect emulator save-state allocation and on real flash
@@ -294,7 +292,7 @@ random patterns. Your validation must catch both:
 - **Version field** (advanced): track save format version so old
   saves from a previous game build can be migrated or rejected.
 
-### 🟢 `SRAM_SIZE` mismatch between Makefile and code — refused since 2026-09-21
+### 🟢 `SRAM_SIZE` mismatch between Makefile and code — refused
 
 Every function of the family except `sramChecksum` returns a code:
 `SRAM_OK`, `SRAM_ERR_RANGE` (`offset + size` exceeds the declared SRAM) or
@@ -303,9 +301,8 @@ A refused call copies nothing. The capacity is read from your ROM's own
 header, so it always matches the `SRAM_SIZE` you built with (capped at what
 the module addresses in one bank: 32 KB on LoROM, 8 KB on HiROM).
 
-Before that the family returned `void` and copied whatever it was asked,
-past the declared size. The classic bug — `SRAM_SIZE := 1` (2 KB) in the
-Makefile, then `SLOT_SIZE = 1024` × 4 slots — now fails loudly on slot 2 if
+The classic bug — `SRAM_SIZE := 1` (2 KB) in the
+Makefile, then `SLOT_SIZE = 1024` × 4 slots — fails loudly on slot 2 if
 you look at the return value:
 
 ```c
@@ -348,9 +345,11 @@ compilers.
 
 - **snes9x** and **Mesen2**: persist SRAM to a `.srm` file alongside
   the ROM. Save game survives reset and emulator restart.
-- **luna** (the test harness): SRAM is in-memory (captured in save-states; cross-run `.srm` persistence is a luna roadmap item) —
-  only — does not persist across runs by default. The test harness
-  resets SRAM between tests.
+- **luna** (the test harness): each run starts from fresh SRAM unless
+  you give it a battery file. `--srm-out FILE` writes the SRAM after a
+  run and `--srm-in FILE` loads it before the next one (`luna state`);
+  in `luna test`, a manifest's `srm_out` feeds another's
+  `srm_in`, which is how the power-cycle manifests above work.
 - **Real hardware via FXPak Pro**: persists to the SD card's
   per-ROM `.srm`. Survives power-off.
 
@@ -389,7 +388,7 @@ MVN is the fastest option available.
 ## See also
 
 - `lib/include/snes/sram.h` — full API reference.
-- `lib/source/sram.asm` — implementation (331 LOC, all assembly).
+- `lib/source/sram.asm` — implementation (all assembly).
 - [`examples/memory/save_game`](../../examples/memory/save_game/README.md) — multi-slot save demo with on-screen
   hex verification.
 - [`examples/memory/hirom_demo`](../../examples/memory/hirom_demo/README.md) — companion read for the HiROM bank

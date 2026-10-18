@@ -146,3 +146,54 @@ the `echo` pair.
   `--audio` mode) that compares the DSP write sequences of the two ROMs,
   value and order, and reports the timing shift — the right oracle for a
   noise-driven example, where a waveform RMS cannot be. Light.
+
+## 2026-10-13 — `luna record` (luna `develop` fea4a77, not released)
+
+Announced, nothing asked (`2026-10-13_from_luna_luna_record.md`): one run
+writes a labelled video (`ffmpeg` needed; `--no-video` without it), a text
+account of when the picture moves, freezes or goes dark with the pad
+changes and the sound second by second, and one labelled picture a
+second. Not checked on their side: PAL, overscan, the libx264 path. To do
+at the pin bump that carries it: regenerate the luna reference page from
+`--help`, and try it on an example's manifest script — a bug report to the
+game or from it could carry the `.md` instead of a description.
+
+2026-10-17, direct exchange, nothing asked yet. luna's debugger foundations
+(MCP: `memory_kinds` / `read_memory`, `eval` in Mesen2's expression
+language, `bp_add` with `condition` and `mark`, `set_break_sources`,
+`step_kind`) and, on its develop 140d830, `until_if = "expr"` on an
+`at_symbol` checkpoint or a poke, and `luna state --until-pc X --until-if`.
+Our side: `SNES_ASSERT` (WDM $00) is our assert channel, read by
+`--wdm-out` on every compare run; `set_break_sources {wdm: true}` stops at
+the call site in an interactive session. Candidate, held by luna until a
+prototype of ours shows the need: `[asserts.expr] never = "…"` in a
+manifest, an invariant checked without code in the ROM. When we prototype
+it, say which granularity it needs — per frame is nearly free, per line
+about 262 evaluations a frame. To do at the pin bump that carries
+140d830: try `until_if` on a manifest that counts arrivals today.
+
+2026-10-17, direct exchange, nothing asked. luna develop 621758c, debugger
+wave D1 (MCP): exec breakpoints on the SA-1, the GSU and the DSP-1
+(`bp_add {kind: "exec", cpu: "sa1"|"gsu"|"dsp"}`); watchpoints on
+`Sa1Memory`, `GsuMemory`, `DspDataRam`, the ARAM (`SpcRam`), and read
+watchpoints on VRAM, CGRAM and OAM; `eval` in each chip's context
+(`{cpu: "gsu", expression: "r1 == 5"}`); `forbid` ranges as in Mesen2;
+every hit names its `cpu`. `luna test` unchanged, `[asserts.expr]` still
+held for our prototype. Where it serves us: the coprocessor examples
+(`chips/`) and the fixtures of the GSU and SA-1 jobs, where we read
+results after the fact today; an ARAM watchpoint for the audio driver's
+handshake races (two of them in `silent_defects_log.md`). To do at the
+pin bump that carries it: regenerate `docs/tools/luna.md`, and add a GSU
+or SA-1 breakpoint to `docs/tutorials/debugging.md`.
+
+2026-10-18, luna v1.39.0 released (`f2a8841`), nothing asked
+(`2026-10-18_from_luna_v1.39.0_released.md`, the four zip sums in it). Two
+changes can move our references at the pin bump: the 5A22 multiplier and
+divider return the value in progress when $4214-$4217 is read too early
+(our report), and arrival counts (`--hit`, `--peek-at`, `--input-at`,
+`at_symbol`, `profile --until-pc`) are exact where an interrupt fell on the
+watched instruction (one ahead before). Save states of 1.38.0 are refused
+(state v9). It also carries `gsu.ms0_at_21mhz`, which the 1.0 audit found
+missing from 1.38.0 (09-1 / 02-4). The bump is a lot of its own: the full
+suite, the corpus golden queries (`partners.md` step 4), the luna page
+regenerated from `--help`.

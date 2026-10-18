@@ -1,24 +1,21 @@
 /**
  * @file main.c
- * @brief Mode 3 full-color (256-color, 8bpp) background with assembly DMA loader
+ * @brief Mode 3 full-color (256-color, 8bpp) background
  * @ingroup examples
  *
  * Displays a 256-color background using Mode 3, the highest color-depth
- * tiled mode on the SNES. Each tile is 64 bytes (8 bitplanes), so even a
- * modest tileset exceeds 32 KB and cannot fit in a single ROM bank. The
- * tile data is placed in SUPERFREE sections by the linker, which may
- * assign them to bank $01 or higher. A hand-written assembly DMA loader
- * (loadGraphics in data.asm) uses the linker-provided bank byte (:label)
- * to transfer tile data, tilemap, and palette to VRAM/CGRAM correctly
- * regardless of which bank the data lands in.
+ * tiled mode on the SNES. Each tile is 64 bytes (8 bitplanes), so this
+ * tileset (39 KB) is larger than a ROM bank: the converter writes it in two
+ * parts, bg_tiles and bg_tiles_1, and the linker places each where it has
+ * room. A C pointer carries its bank byte, so dmaCopyVram() takes each part
+ * wherever it landed.
  *
- * This is a direct port of the PVSnesLib "Mode3" example.
+ * This is a port of the PVSnesLib "Mode3" example.
  *
  * @par SNES Concepts
- * - Mode 3: single BG layer at 8bpp (256 colors from a 256-entry CGRAM palette)
+ * - Mode 3: BG1 at 8bpp (256 colors from the whole CGRAM), BG2 at 4bpp
  * - 8bpp tile format: 64 bytes per tile (8 interleaved bitplanes)
- * - Bank overflow: >32 KB tile data requires SUPERFREE sections + assembly DMA with :label bank byte
- * - Assembly DMA loader pattern: sets $4304 (bank), $4302 (address), $4305 (size) per transfer
+ * - Data larger than a ROM bank: two parts, each copied with its own bank
  * - VRAM layout: tiles at $0000 (large), tilemap at $6000
  *
  * @par What to Observe
@@ -34,39 +31,27 @@
 
 #include <snes.h>
 
-/**
- * @brief Assembly DMA loader for large 8bpp tile data (defined in data.asm)
- *
- * Because Mode 3 tile data (64 bytes per 8x8 tile) typically exceeds 32KB,
- * it cannot fit in a single ROM bank. The linker places SUPERFREE sections
- * in whatever bank has space, potentially bank $01 or higher. Post-A6+A7
- * (v0.19.0) C pointers carry the bank byte natively, and dmaCopyVram /
- * dmaCopyCGram read it from the caller's Kl pointer — no more
- * `loadGraphics()` ASM stub needed.
- */
-
-/** @brief Tile/palette/tilemap symbols defined in data.asm (.incbin). */
+/** @brief The picture, converted by the build from res/bg.bmp (res/bg.bmp.toml). */
 #include "res/bg.inc"   /* generated: bg_tiles[] + bg_tiles_1[] (the 39 KB tileset in two bank-sized parts), bg_map[], bg_pal[] */
 
 /**
  * @brief Entry point -- load 256-color tileset and display Mode 3 image
  *
- * Forces blank, DMAs 8bpp tile data (split across two ROM sections to
- * exceed the 32KB bank-0 limit), tilemap, and 256-color palette into
- * VRAM/CGRAM, then configures Mode 3 and turns on the screen. Mode 3
- * supports a single BG layer with 256 colors per tile (8 bitplanes),
- * the richest color depth in any tiled SNES mode. The tradeoff is that
- * only one BG layer is available (plus a second 4-color direct-color
- * BG that is unused here).
+ * Forces blank, DMAs the 8bpp tile data (two parts, each at most a ROM
+ * bank), the tilemap and the 256-color palette into VRAM/CGRAM, then
+ * configures Mode 3 and turns on the screen. BG1 has 256 colors per tile
+ * (8 bitplanes), the richest color depth of any tiled SNES mode; the
+ * tradeoff is one such layer, plus a 16-color BG2 that is unused here.
  *
  * @return Never returns (infinite loop).
  */
 int main(void) {
+    consoleInit();
+
     setScreenOff();
 
-    /* Tile data is split across two SUPERFREE sections so the linker can
-     * place each half in whatever bank has room. The 4-byte Kl pointer
-     * pushed by cproc carries the bank byte; lib/source/dma.asm reads it. */
+    /* The tile data is in two parts so the linker can place each in a bank
+     * with room; the pointer passed carries the bank byte. */
     dmaCopyVram(bg_tiles,   0x0000, bg_tiles_end - bg_tiles);
     dmaCopyVram(bg_tiles_1,  0x4000, bg_tiles_1_end - bg_tiles_1);
     dmaCopyVram(bg_map, 0x6000, bg_map_end - bg_map);

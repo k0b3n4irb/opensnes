@@ -513,12 +513,13 @@ _vqu_start:
     sta.l oamqueuenumber            ; Save remainder for next frame
 
 _vqu_process:
-    ; Set up DMA channels for word transfer to VRAM
+    ; Every row goes through DMA channel 7, one after the other: the NMI's
+    ; OAM transfer, which runs after this hook, reprograms it anyway, and it
+    ; is the one channel no game gives to HDMA (hdma.h). Until 2026-10-17
+    ; the rows were preloaded on channels 1-4, which a Super FX letterbox
+    ; (channel 1) and the game's own HDMA (2-4) were using (audit 1.0, 01-1).
     lda #$1801
-    sta.l $4310                     ; Channel 1: word increment to $2118
-    sta.l $4320                     ; Channel 2
-    sta.l $4330                     ; Channel 3
-    sta.l $4340                     ; Channel 4
+    sta.l $4370                     ; word increment to $2118
 
     dex                             ; Start at last entry (will decrement more in loop)
 
@@ -529,9 +530,13 @@ _vqu_loop:
     dex
     dex
 
-    ; Check sprite size type
+    ; Source bank, the same for every row of the entry
     sep #$20
     .ACCU 8
+    lda.l oamQueueEntry+2,x
+    sta.l $4374
+
+    ; Check sprite size type
     lda.l oamQueueEntry+5,x         ; Get sprite type
     cmp #OBJ_SPRITE8
     bne +
@@ -542,82 +547,36 @@ _vqu_loop:
 
 ;------------------------------------------------------------------------------
 ; 32x32 sprite transfer (4 DMA transfers of 128 bytes each)
+; Row n: source + n * $200, VRAM + n * $100
 ;------------------------------------------------------------------------------
 _vqu_32x32:
     rep #$20
     .ACCU 16
-    lda.l oamQueueEntry+3,x         ; VRAM destination address
+    ldy #$0000                      ; row offset in the source: 0, $200, $400, $600
+_vqu_32_row:
+    tya
+    lsr a                           ; VRAM offset = source offset / 2
+    clc
+    adc.l oamQueueEntry+3,x
     sta.l $2116
-
-    ; Set up 4 source addresses (128 bytes apart in VRAM layout)
-    lda.l oamQueueEntry,x           ; Source address (low 16 bits)
-    sta.l $4312                     ; Channel 1 source
+    tya
     clc
-    adc #$200
-    sta.l $4322                     ; Channel 2 source
-    clc
-    adc #$200
-    sta.l $4332                     ; Channel 3 source
-    clc
-    adc #$200
-    sta.l $4342                     ; Channel 4 source
-
-    ; Set transfer size (128 bytes per row)
+    adc.l oamQueueEntry,x
+    sta.l $4372                     ; source of this row
     lda #$0080
-    sta.l $4315
-    sta.l $4325
-    sta.l $4335
-    sta.l $4345
-
-    ; Set source bank for all channels
+    sta.l $4375                     ; 128 bytes
     sep #$20
     .ACCU 8
-    lda.l oamQueueEntry+2,x         ; Source bank
-    sta.l $4314
-    sta.l $4324
-    sta.l $4334
-    sta.l $4344
-
-    ; Transfer row 1
-    lda #$02
-    sta.l $420b
-
-    ; Transfer row 2 (VRAM offset += $100)
+    lda #$80
+    sta.l $420b                     ; channel 7
     rep #$20
     .ACCU 16
-    lda #$100
+    tya
     clc
-    adc.l oamQueueEntry+3,x
-    sta.l $2116
-    sep #$20
-    .ACCU 8
-    lda #$04
-    sta.l $420b
-
-    ; Transfer row 3 (VRAM offset += $200)
-    rep #$20
-    .ACCU 16
-    lda #$200
-    clc
-    adc.l oamQueueEntry+3,x
-    sta.l $2116
-    sep #$20
-    .ACCU 8
-    lda #$08
-    sta.l $420b
-
-    ; Transfer row 4 (VRAM offset += $300)
-    rep #$20
-    .ACCU 16
-    lda #$300
-    clc
-    adc.l oamQueueEntry+3,x
-    sta.l $2116
-    sep #$20
-    .ACCU 8
-    lda #$10
-    sta.l $420b
-
+    adc #$0200
+    tay
+    cpy #$0800
+    bne _vqu_32_row
     jmp _vqu_next
 
 ;------------------------------------------------------------------------------
@@ -628,39 +587,30 @@ _vqu_16x16:
     .ACCU 16
     lda.l oamQueueEntry+3,x         ; VRAM destination address
     sta.l $2116
-
-    ; Set up 2 source addresses
     lda.l oamQueueEntry,x           ; Source address
-    sta.l $4322                     ; Channel 2 source
-    clc
-    adc #$200
-    sta.l $4332                     ; Channel 3 source
-
-    ; Set transfer size (64 bytes per row)
-    lda #$0040
-    sta.l $4325
-    sta.l $4335
-
-    ; Set source bank
+    sta.l $4372
+    lda #$0040                      ; 64 bytes
+    sta.l $4375
     sep #$20
     .ACCU 8
-    lda.l oamQueueEntry+2,x
-    sta.l $4324
-    sta.l $4334
+    lda #$80
+    sta.l $420b                     ; row 1
 
-    ; Transfer row 1
-    lda #$04
-    sta.l $420b
-
-    ; Transfer row 2 (VRAM offset += $100)
+    ; Row 2: VRAM offset |= $100, source + $200
     rep #$20
     .ACCU 16
     lda.l oamQueueEntry+3,x
     ora #$100
     sta.l $2116
+    lda.l oamQueueEntry,x
+    clc
+    adc #$200
+    sta.l $4372
+    lda #$0040
+    sta.l $4375
     sep #$20
     .ACCU 8
-    lda #$08
+    lda #$80
     sta.l $420b
 
     jmp _vqu_next
@@ -673,19 +623,13 @@ _vqu_8x8:
     .ACCU 16
     lda.l oamQueueEntry+3,x         ; VRAM destination
     sta.l $2116
-
     lda.l oamQueueEntry,x           ; Source address
-    sta.l $4322
-
+    sta.l $4372
     lda #$0020                      ; 32 bytes
-    sta.l $4325
-
+    sta.l $4375
     sep #$20
     .ACCU 8
-    lda.l oamQueueEntry+2,x
-    sta.l $4324
-
-    lda #$04
+    lda #$80
     sta.l $420b
 
 _vqu_next:

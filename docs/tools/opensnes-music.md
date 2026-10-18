@@ -23,8 +23,8 @@ samples, up to 8 channels (the SPC700 has eight voices).
 OpenSNES layout; bank 0 holds the code), `NAME.h` (one constant per module
 and per effect, prefixed `NAME`), `NAME.bnk` (the sample data). `NAME`
 defaults to the module's name for one input and to `soundbank` for
-several. A module that needs more SPC RAM than a module may take is named
-with its size.
+several. A module that does not fit the SPC700's RAM is refused, named
+with what it needs and what the driver has, and nothing is written.
 
 **The bank as an asset.** A soundbank has several sources, so its settings
 live in a file named after it (@ref tools_conventions):
@@ -41,23 +41,67 @@ bank = 1
 and `.bnk` beside the file; `opensnes-music bank music/*.it --name
 soundbank --save` writes that file from a command-line run.
 
-Today the build calls `smconv` through `USE_SNESMOD` and `SOUNDBANK_SRC`;
-`opensnes-music bank` produces the same files, and the build switches to it
-with the family's generic rule.
+## In a game
+
+The build runs `opensnes-music bank` for you; you list the modules in the
+Makefile:
+
+```makefile
+USE_SNESMOD   := 1
+SOUNDBANK_SRC := music/theme.it sfx/effects.it    # one module per file
+```
+
+It converts them (`--name soundbank`, `--bank` from `SOUNDBANK_BANK`, 1 by
+default) and links the soundbank; the HiROM build relocates its origin for
+you. A settings file is for running the tool by hand: the build links a
+soundbank only through `SOUNDBANK_SRC`. In C, the `.h` gives each module
+and effect a name:
+
+```c
+#include "soundbank.h"
+
+snesmodInit();
+snesmodSetSoundbank(SOUNDBANK_BANK);
+snesmodLoadModule(MOD_THEME);             // load a module
+u8 jump = snesmodLoadEffect(SFX_JUMP);    // load an effect, keep its slot
+snesmodPlay(0);                           // play from pattern 0
+
+/* in the game loop */
+snesmodPlayEffect(jump, 127, 128, SNESMOD_PITCH_NORMAL);   // volume, pan, pitch
+snesmodProcess();                         // once per frame
+```
+
+`examples/audio/snesmod_music`, `snesmod_sfx`, and the games `likemario` and
+`tetris` do this. The runtime side is @ref tutorial_audio.
+
+- **Many modules, one bank.** Songs through `snesmodLoadModule(N)` and
+  `snesmodPlay(0)`, effects through `snesmodLoadEffect(N)` and
+  `snesmodPlayEffect(slot, …)`.
+- **The SPC700 limits are real.** Eight channels; samples become BRR at
+  32 kHz at most; `inspect` says how much of the 64 KB a module takes, and
+  music and samples share it.
+
 
 ## Inspect
 
 ```sh
 opensnes-music inspect music/*.it
 # theme.it: "pollen resurrection", 18 patterns, 17 instruments, 17 samples, 21 orders
-#   -> 44137 bytes of SPC RAM (13820 free of 57957), 17 BRR sources
+#   -> 16446 bytes of SPC RAM (13506 free of 29952), 17 BRR sources
 ```
 
 Nothing is written. The figure is the one that decides whether a song
-fits: the SPC700 has 64 KB, the driver and its tables take the rest, and a
-module may use 57 957 bytes for its patterns, instruments, samples and
-echo buffer. Samples shared between modules of one bank are stored once
-(`BRR sources` counts them).
+fits. The driver loads the module at `$1A00` (its patterns, instruments
+and sample table) and the module's BRR samples right after it; the echo
+buffer sits under `$FF00` and takes 2 KB per step of the module's echo
+delay (`edl` in its `[[SNESMOD]]` message): with echo it starts at page
+`$FF - 8 * edl`. So a module has 58 368 bytes without echo and
+58 624 - 2 048 * edl with it: 29 952 for the `edl 14` above.
+The `MOD_<NAME>_SIZE` constant of the soundbank's `.h` is another figure,
+kept as smconv wrote it (it counts the echo and leaves out the module's
+tables); the one that decides whether a song fits is this one.
+Samples shared between modules of one bank are stored once in the bank
+(`BRR sources` counts them); in the SPC700's RAM each module holds its own.
 
 ## Spc
 
@@ -71,19 +115,10 @@ game.
 
 ## Exit codes and messages
 
-0 done; 1 the input was refused (a file that is not an IT module, a bank
-number outside 1..255); 2 usage; 3 the file system. `--json` puts the
+0 done; 1 the input was refused (a file that is not an IT module, a module
+too big for the SPC700's RAM, a bank number outside 1..255); 2 usage; 3 the
+file system. `--json` puts the
 outputs, the modules and their SPC RAM figures on stdout as one object.
 The converter's diagnostics come out in the same shape (`opensnes-music:
 file: message`), on stderr; under `--json` the warnings are listed in a
 `warnings` array.
-
-## From smconv
-
-| smconv | opensnes-music |
-|---|---|
-| `smconv -s -o NAME -b N -n -p NAME a.it b.it` | `opensnes-music bank a.it b.it --name NAME --bank N` |
-| `smconv -s -f ...` | `--same-size` |
-| `smconv a.it` (an `.spc`) | `opensnes-music spc a.it` |
-| `smconv -V` (RAM usage) | `opensnes-music inspect` |
-| `-i` (HiROM) | the build relocates the origin, as before |

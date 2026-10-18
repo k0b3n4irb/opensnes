@@ -1,4 +1,4 @@
-# OpenSNES Documentation {#mainpage}
+# OpenSNES Documentation {#documentation}
 
 A modern, open-source SDK for Super Nintendo development.
 Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
@@ -7,17 +7,13 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage getting_started -- Install the SDK and build your first ROM
 
-@subpage learning_path -- 88 examples from "Hello World" to complete games
+@subpage learning_path -- The route through the examples, from "Hello World" to complete games
 
-@subpage examples_by_category -- Browse examples by topic
+@subpage examples_by_category -- All 85 examples, by topic
 
-## Guides
+## Help
 
-@subpage snes_graphics_guide -- Backgrounds, sprites, modes, VRAM
-
-@subpage snes_sound_guide -- SPC700, SNESMOD, music and SFX
-
-@subpage troubleshooting -- Common problems and solutions
+@subpage troubleshooting -- From a symptom to its cause
 
 @subpage faq -- Frequently asked questions
 
@@ -26,8 +22,6 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 ## Game-Craft
 
 @subpage craft -- Design decisions: budgeting, choosing a mode, composing layers
-
-@subpage perf -- What the library functions cost per frame, measured in five real scenes
 
 ## Tools {#mainpage_tools}
 
@@ -49,7 +43,9 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_map -- Scrolling Maps & the Tiled Pipeline
 
-@subpage tutorial_audio -- Audio & Music
+@subpage tutorial_audio -- Music with SNESMOD
+
+@subpage tutorial_audio_samples -- Samples, Voices and the Raw APU
 
 @subpage tutorial_game_states -- Game States & Transitions
 
@@ -59,6 +55,8 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_object -- The Object Engine (entities, gravity, map collision)
 
+@subpage tutorial_object_engine -- How the Object Engine Works (workspace, fields, collision)
+
 @subpage tutorial_panel -- 9-Slice Panels (dialog boxes, HUDs)
 
 @subpage tutorial_dma -- DMA (direct memory access)
@@ -67,7 +65,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_mode7 -- Mode 7 Rotation and Scaling
 
-@subpage tutorial_colormath -- Colour Math (transparency, blending)
+@subpage tutorial_colormath -- Colour math (transparency, blending)
 
 @subpage tutorial_mosaic -- Mosaic pixelation effect
 
@@ -81,7 +79,13 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage tutorial_sa1 -- SA-1 Coprocessor (10.74 MHz second CPU)
 
-@subpage tutorial_superfx -- SuperFX (GSU) RISC Coprocessor
+@subpage tutorial_superfx -- Super FX: a First Job (GSU RISC coprocessor)
+
+@subpage tutorial_superfx_advanced -- Super FX: Running a Game Around the GSU
+
+@subpage tutorial_dsp1 -- DSP-1 Coprocessor (3D maths)
+
+@subpage tutorial_interrupts -- Interrupts: VBlank callbacks and timer IRQs
 
 @subpage tutorial_debugging -- Debugging with luna
 
@@ -90,6 +94,10 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 ## Hardware Reference
 
 @subpage hardware_overview -- CPU, PPU, APU architecture
+
+@subpage hardware_ppu -- Background modes, tiles, VRAM, palettes, sprite sizes
+
+@subpage hardware_apu -- SPC700, S-DSP, ARAM, BRR samples, echo
 
 @subpage memory_map -- Address space layout
 
@@ -101,9 +109,19 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage examples -- All examples grouped by category (sources + READMEs)
 
-@subpage example_sources -- Example Source Code (annotated by topic)
 
 ## API Reference
+
+@subpage api_index -- API index, by what you are trying to do
+
+@subpage known_limitations -- Known limitations: the silent failures, and how to avoid them
+
+@subpage perf -- What the library functions cost per frame, measured in five real scenes
+
+@subpage benchmark -- Compiler benchmark against PVSnesLib
+
+### Headers
+
 
 - @ref snes.h "Main Header (snes.h)"
 - @ref console.h "Console Functions"
@@ -120,7 +138,16 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 - @ref scene.h "Scene stack (scene.h)"
 - @ref asset.h "Asset bundle convention (asset.h)"
 
-## Contributing {#mainpage_contributing}
+## Project {#mainpage_contributing}
+
+@subpage philosophy -- Design philosophy
+
+@subpage stability -- What 1.0 will freeze
+
+@subpage upgrading -- Upgrading from 0.48 to 0.49
+
+@subpage hardware_verification -- Hardware verification protocol
+
 
 @subpage code_style -- Code style conventions
 
@@ -131,7 +158,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 ## Acknowledgments
 
 OpenSNES is built upon [PVSnesLib](https://github.com/alekmaul/pvsneslib) by **Alekmaul** and contributors.
-We owe them an enormous debt of gratitude for the hardware library, SNESMOD audio engine, asset tools, and decades of SNES development knowledge.
+We owe them an enormous debt of gratitude for the hardware library, the integration of Mukunda Johnson's SNESMOD audio engine, the asset tools, and decades of SNES development knowledge.
 
 For the full list of dependencies, licenses, and contributors, see [ATTRIBUTION.md](https://github.com/k0b3n4irb/opensnes/blob/develop/ATTRIBUTION.md).
 

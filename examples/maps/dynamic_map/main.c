@@ -8,11 +8,10 @@
  * This technique allows hundreds of on-screen objects without hitting the
  * 128-hardware-sprite limit, at the cost of tile-aligned positioning.
  *
- * The tilemap buffer lives in bank $7E extended WRAM (above the 8KB
- * low-WRAM limit) and is accessed via assembly helpers (smapWrite,
- * smapClear, smapDma) because the compiler generates `sta.l $0000,x`
- * which always reads bank $00. Tilemap DMA to VRAM uses the 1-page-per-
- * VBlank pattern (2KB per frame) to avoid flicker.
+ * The 16 KB tilemap buffer is a FAR array (spritemap_buf, in $7E:2000 and
+ * up, beyond the 8 KB of plain C RAM), written by C like any array.
+ * Tilemap DMA to VRAM uses the 1-page-per-VBlank pattern (2KB per frame)
+ * to avoid flicker.
  *
  * Also displays a C64 Boulder Dash Rockford sprite from a pre-computed
  * SNES 8bpp planar array, demonstrating direct VRAM tile upload while
@@ -22,7 +21,7 @@
  *
  * @par SNES Concepts
  * - Mode 3: 8bpp BG1 (256 colors) + 4bpp BG2 (text overlay)
- * - Extended WRAM ($7E:2000+) for large tilemap buffers
+ * - A FAR buffer ($7E:2000+) for a tilemap larger than plain C RAM
  * - SC_64x64 tilemap layout (4 nametable pages, 8KB total)
  * - 1-page-per-VBlank DMA pattern for flicker-free tilemap updates
  * - 8bpp planar tile format and direct VRAM tile upload
@@ -51,28 +50,10 @@
 /** @brief Tile index for the Rockford character sprite (pre-converted C64 data) */
 #define SPRITE_ROCKFORD 2
 
-/** @brief 8bpp gargoyle sprite tiles for 32x32 map mode (from data.asm) */
+/* The gargoyle's 8bpp tiles and palette, for each map mode (converted by the
+ * build from res/sprite16.png and res/sprite16_64x64.png) */
 #include "res/sprite16.inc"         /* generated: sprite16_tiles[], sprite16_pal[], each with _end */
 #include "res/sprite16_64x64.inc"   /* generated: sprite16_64x64_tiles[], sprite16_64x64_pal[] */
-/** @brief Palette for gargoyle sprite in 32x32 mode */
-/** @brief 8bpp gargoyle sprite tiles for 64x64 map mode (from data.asm) */
-/** @brief Palette for gargoyle sprite in 64x64 mode */
-
-/**
- * @brief DMA a portion of the WRAM tilemap buffer to VRAM.
- *
- * Because the tilemap lives in extended WRAM (bank $7E, above $2000),
- * C code cannot access it directly -- the compiler generates `sta.l $0000,x`
- * which always reads bank $00. This assembly helper sets the DMA source
- * bank to $7E and performs the transfer.
- *
- * @param byte_offset Byte offset into the WRAM tilemap buffer
- * @param vram_addr   VRAM word address destination
- * @param byte_count  Number of bytes to transfer
- */
-extern void smapDma(u16 byte_offset, u16 vram_addr, u16 byte_count);
-
-/* vblank_flag declared in <snes/system.h> (via <snes.h>) */
 
 /** @brief VRAM word address for BG1 tilemap (SC_64x64 = 4 nametable pages) */
 #define VRAM_SPRITEMAP  0x1000
@@ -195,7 +176,7 @@ static void initDemoMap32x32(void) {
     bgSetMapPtr(0, VRAM_SPRITEMAP, SC_64x64);
 
     /* DMA cleared tilemap to VRAM */
-    smapDma(0, VRAM_SPRITEMAP, spritemap_len);
+    spritemapDma(0, VRAM_SPRITEMAP, spritemap_len);
 }
 
 /**
@@ -245,7 +226,7 @@ static void initDemoMap64x64(void) {
     bgSetMapPtr(0, VRAM_SPRITEMAP, SC_64x64);
 
     /* DMA cleared tilemap to VRAM */
-    smapDma(0, VRAM_SPRITEMAP, spritemap_len);
+    spritemapDma(0, VRAM_SPRITEMAP, spritemap_len);
 }
 
 /*------------------------------------------------------------------------
@@ -333,7 +314,7 @@ int main(void) {
 
     /* DMA the updated tilemap to VRAM during force blank */
     setScreenOff();
-    smapDma(0, VRAM_SPRITEMAP, spritemap_len);
+    spritemapDma(0, VRAM_SPRITEMAP, spritemap_len);
 
     /* Restore text palette AFTER sprite palette (which overwrites CGRAM) */
     setColor(17, RGB(31, 31, 31));
@@ -393,15 +374,14 @@ int main(void) {
                 setScreenOn();
                 drawSpriteFrame64x64(SPRITE_GARGOYLE);
             }
-            vblank_flag = 0;
             WaitForVBlank();
-            smapDma(0,    VRAM_SPRITEMAP,        2048);
+            spritemapDma(0,    VRAM_SPRITEMAP,        2048);
             WaitForVBlank();
-            smapDma(2048, VRAM_SPRITEMAP + 1024, 2048);
+            spritemapDma(2048, VRAM_SPRITEMAP + 1024, 2048);
             WaitForVBlank();
-            smapDma(4096, VRAM_SPRITEMAP + 2048, 2048);
+            spritemapDma(4096, VRAM_SPRITEMAP + 2048, 2048);
             WaitForVBlank();
-            smapDma(6144, VRAM_SPRITEMAP + 3072, 2048);
+            spritemapDma(6144, VRAM_SPRITEMAP + 3072, 2048);
             sxbg0 = 0;
             sybg0 = 0;
         }
@@ -450,18 +430,17 @@ int main(void) {
                 dmaCopyVram((u8*)rockford_8bpp + 128, vram_base + 512, 128);
                 drawSpriteFrame64x64(SPRITE_ROCKFORD);
             }
-            /* Clear stale vblank_flag from computation, then DMA tilemap
-             * 1 page per VBlank (2KB DMA = ~16K cycles, well within ~41K
-             * available). 4 VBlanks total ≈ 67ms — imperceptible. */
-            vblank_flag = 0;
+            /* DMA the tilemap 1 page per VBlank (2KB DMA = ~16K cycles,
+             * well within ~41K available). 4 VBlanks total ≈ 67ms —
+             * imperceptible. */
             WaitForVBlank();
-            smapDma(0,    VRAM_SPRITEMAP,        2048);  /* page 0 */
+            spritemapDma(0,    VRAM_SPRITEMAP,        2048);  /* page 0 */
             WaitForVBlank();
-            smapDma(2048, VRAM_SPRITEMAP + 1024, 2048);  /* page 1 */
+            spritemapDma(2048, VRAM_SPRITEMAP + 1024, 2048);  /* page 1 */
             WaitForVBlank();
-            smapDma(4096, VRAM_SPRITEMAP + 2048, 2048);  /* page 2 */
+            spritemapDma(4096, VRAM_SPRITEMAP + 2048, 2048);  /* page 2 */
             WaitForVBlank();
-            smapDma(6144, VRAM_SPRITEMAP + 3072, 2048);  /* page 3 */
+            spritemapDma(6144, VRAM_SPRITEMAP + 3072, 2048);  /* page 3 */
         }
 
         bgSetScroll(0, sxbg0, sybg0);

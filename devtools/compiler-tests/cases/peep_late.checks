@@ -1,6 +1,8 @@
-# the second access reloads the index straight into X
-in index_x: present \tldx\.b tcc__lf\+\d+\n\tlda\.w tab,x\n
+# the second access needs no reload at all: X is known across the label
+# (peephole_xflow, 2026-10-13), and the addition reads tab,x as its operand
+in index_x: absent \tldx
 in index_x: absent \tlda\.b tcc__lf\+\d+\n\ttax\n\tlda
+in index_x: present \tadc\.w tab,x\n
 # 7 is loaded once for the two stores
 in same_const: present \tlda\.w #7\n\tsta\.w flag_a\n\tsta\.w flag_b\n
 # both loop variables start with a stz of their slot, and i++ is one inc

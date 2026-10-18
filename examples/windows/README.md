@@ -1,6 +1,6 @@
 # Windows
 
-**Part of Family 6 (Colour & effects) — masking part of the screen.** The PPU
+**Colour & effects — masking part of the screen.** The PPU
 has two hardware *windows*: rectangular (or, driven per scanline, any-shaped)
 regions that gate what each layer and colour-math shows. Spotlights, portholes,
 iris wipes, "only darken inside this shape" — all windows.
@@ -9,14 +9,14 @@ iris wipes, "only darken inside this shape" — all windows.
 
 ## The ladder
 
-| Rung | Example | Developer question |
-|------|---------|--------------------|
-| 6f.1 | [window](window/) | How do I mask part of the screen with one window? |
-| 6f.2 | [window_multi_hdma](window_multi_hdma/) | How do I shape *both* windows per scanline? |
-| 6f.3 | [transparent_window](transparent_window/) | How do I combine a window with colour math (a darkened region)? |
+| Example | Developer question |
+|---------|--------------------|
+| [window](window/) | How do I mask part of the screen with one window? |
+| [window_multi_hdma](window_multi_hdma/) | How do I shape *both* windows per scanline? |
+| [transparent_window](transparent_window/) | How do I combine a window with colour math (a darkened region)? |
 
-Climb from one static rectangle (6f.1) to two HDMA-shaped windows (6f.2) to a
-window gating colour math (6f.3).
+Climb from one static rectangle to two HDMA-shaped windows to a window gating
+colour math.
 
 ## The idea in one screen
 

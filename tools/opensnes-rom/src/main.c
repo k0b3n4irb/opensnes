@@ -9,7 +9,7 @@
  * Reads the wlalink .sym beside the ROM and the .c.asm intermediates in
  * its directory, and runs: the bank $00 ROM ratchet, the C RAM band
  * budget (and the far band figure), the data-init sentinel, the bank-blind
- * read guard, the NMI / WRAM-port race lint, and the asset inventory.
+ * read guard, the SA-1 boot check, the NMI / WRAM-port race lint, and the asset inventory.
  * Exit 1 when a check fails; warnings do not fail.
  *
  *   opensnes-rom inspect [--json] <game.sfc>...
@@ -64,12 +64,14 @@ static int run_check(cli_ctx *ctx)
     r.bank0 = check_bank0(ctx, &s, in, cli_int(ctx, "bank0-warn", 2048), cli_int(ctx, "bank0-fail", 0), &r);
     r.ram = check_ram(ctx, &s, in, cli_int(ctx, "ram-warn", 1024), cli_int(ctx, "ram-fail", 0), &r);
     r.datainit = check_data_init(ctx, &s, in);
+    r.sa1boot = check_sa1_boot(ctx, &s, in);
     if (!cli_has(ctx, "no-bank-reads")) r.bankreads = check_bank_reads(ctx, &s, dir);
     if (!cli_has(ctx, "no-nmi-race")) r.nmirace = check_nmi_race(ctx, dir);
     if (!cli_has(ctx, "no-assets")) report_assets(ctx, dir, &r);
     sym_free(&s);
 
-    int failed = r.bank0 == 1 || r.ram == 1 || r.datainit == 1 || r.bankreads == 1 || r.nmirace == 1;
+    int failed = r.bank0 == 1 || r.ram == 1 || r.datainit == 1 || r.bankreads == 1 || r.nmirace == 1
+              || r.sa1boot == 1;
     if (ctx->json) {
         cli_json_begin(ctx);
         cli_json_str(ctx, "input", in);
@@ -79,6 +81,7 @@ static int run_check(cli_ctx *ctx)
         cli_json_int(ctx, "used", r.ram_total); cli_json_int(ctx, "sections", r.ram_sections); cli_json_int(ctx, "verdict", r.ram); cli_json_close(ctx);
         cli_json_object(ctx, "far_ram"); cli_json_int(ctx, "free", r.far_free); cli_json_int(ctx, "top", r.far_top); cli_json_int(ctx, "sections", r.far_sections); cli_json_close(ctx);
         cli_json_int(ctx, "data_init", r.datainit);
+        cli_json_int(ctx, "sa1_boot", r.sa1boot);
         cli_json_int(ctx, "bank_reads", r.bankreads);
         cli_json_int(ctx, "nmi_race", r.nmirace);
         cli_json_object(ctx, "assets"); cli_json_int(ctx, "vram_bytes", r.asset_vram); cli_json_int(ctx, "colours", r.asset_colours);
@@ -271,7 +274,7 @@ static int run_budget(cli_ctx *ctx)
 }
 
 static const cli_cmd cmds[] = {
-    { "check", "the post-link checks: bank $00 ROM, C RAM band, data-init sentinel, bank-blind reads, NMI / WRAM-port race, asset inventory",
+    { "check", "the post-link checks: bank $00 ROM, C RAM band, data-init sentinel, SA-1 boot, bank-blind reads, NMI / WRAM-port race, asset inventory",
       check_opts, CLI_N(check_opts), "check game.sfc --bank0-fail 1024 --ram-fail 512", 1, run_check },
     { "inspect", "the cartridge header, the checksum against the image, CRC32 and SHA-1 (exit 1 on a wrong checksum)",
       NULL, 0, "inspect game.sfc", 1, run_inspect },

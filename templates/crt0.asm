@@ -1171,8 +1171,8 @@ FastNmi:
     lda.w tilemap_update_flag
     beq +
     stz.w tilemap_update_flag
-    jsl tilemapFlush
-    sep #$20            ; Restore 8-bit A after C function
+    jsl tilemapFlushNmi
+    sep #$20            ; Restore 8-bit A after the flush
     .ACCU 8
 +
 
@@ -2119,8 +2119,38 @@ DefaultIrqHandler:
 
 .SECTION ".tilemap_flush" SEMIFREE
 
-tilemapFlush:
+; Two entries, one body. The NMI flushes on DMA channel 7, the channel of its
+; OAM transfer: the general DMAs of the handler run one after the other, and
+; channel 7 is the one no game may give to HDMA (hdma.h). textInit() flushes
+; from the main thread on channel 0, the DMA helpers' channel, which the NMI
+; never touches. Until 2026-10-17 both used channel 1, which a Super FX
+; letterbox (gsuSetupHdmaBlanking) runs as HDMA: the next frame read the text
+; buffer as its table and the screen stayed black (audit 1.0, 01-1).
+
+tilemapFlush:           ; void tilemapFlush(void): main thread, channel 0
     php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    phx
+    phy
+    ldx #$0000          ; channel 0 registers: $4300
+    ldy #$0001          ; MDMAEN bit 0
+    bra tilemapFlushOn
+
+tilemapFlushNmi:        ; the NMI's entry, channel 7
+    php
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    phx
+    phy
+    ldx #$0070          ; channel 7 registers: $4370
+    ldy #$0080          ; MDMAEN bit 7
+
+tilemapFlushOn:
+    .ACCU 16
+    .INDEX 16
     phb                 ; Save current data bank
 
     ; Set DBR to $00 for hardware register access
@@ -2141,7 +2171,7 @@ tilemapFlush:
     sbc.w tilemap_dirty_lo
     beq @flush_none
     bcc @flush_none     ; lo above hi: the reset state, or a writer's mistake
-    sta $4315           ; DMA size: the bytes of the range
+    sta $4305,x         ; DMA size: the bytes of the range
 
     ; VRAM word address = tilemap_vram_addr + lo / 2
     lda.w tilemap_dirty_lo
@@ -2150,15 +2180,15 @@ tilemapFlush:
     adc.w tilemap_vram_addr
     sta $2116           ; VMADDL/H: VRAM word address
 
-    ; DMA channel 1: word write mode (2 regs write once: VMDATAL+VMDATAH)
+    ; word write mode (2 regs write once: VMDATAL+VMDATAH)
     lda #$1801          ; Mode 01 (ab), target $18 (VMDATAL)
-    sta $4310
+    sta $4300,x
 
     ; Source address = tilemap_src_addr (set by textInit in C) + lo
     lda.w tilemap_src_addr
     clc
     adc.w tilemap_dirty_lo
-    sta $4312           ; DMA source address (low word)
+    sta $4302,x         ; DMA source address (low word)
 
     ; the range is sent: reset it (the NMI is not interrupted, so no
     ; write can land between the DMA and this)
@@ -2169,20 +2199,20 @@ tilemapFlush:
     sep #$20            ; 8-bit A
     .ACCU 8
     lda #$00            ; Bank $00 (WRAM mirror, buffer always < $2000)
-    sta $4314           ; DMA source bank
+    sta $4304,x         ; DMA source bank
 
-    lda #$02            ; Enable DMA channel 1
+    tya                 ; the channel's MDMAEN bit
     sta $420B
 
+@flush_none:
     plb                 ; Restore data bank
+    rep #$30
+    .ACCU 16
+    .INDEX 16
+    ply
+    plx
     plp
     rtl                 ; Return long (called with JSL)
-
-@flush_none:
-    .ACCU 16
-    plb
-    plp
-    rtl
 
 .ENDS
 

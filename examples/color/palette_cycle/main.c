@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Colour, rung 6b — palette cycling: animate without touching a pixel
+ * @brief Colour — palette cycling: animate without touching a pixel
  * @ingroup examples
  *
  * The oldest trick in the 2D book. The picture on screen never changes:

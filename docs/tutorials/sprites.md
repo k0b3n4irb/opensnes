@@ -4,30 +4,11 @@ This tutorial covers SNES sprites (OBJ layer) including OAM management and anima
 
 ## SNES Sprite Basics
 
-- Up to **128 sprites** on screen
-- Sizes: 8x8, 16x16, 32x32, 64x64 (two sizes per mode)
-- 4bpp (16 colors per palette)
-- 8 palettes available (palettes 8-15 in CGRAM)
-- Stored in **OAM** (Object Attribute Memory) - 544 bytes
-
-## OAM Structure
-
-Each sprite uses 4 bytes in main OAM + 2 bits in high table:
-
-**Main OAM (4 bytes per sprite):**
-| Byte | Content |
-|------|---------|
-| 0 | X position (low 8 bits) |
-| 1 | Y position |
-| 2 | Tile number (low 8 bits) |
-| 3 | Attributes: vhoopppN |
-
-**Attributes:**
-- v = Vertical flip
-- h = Horizontal flip
-- oo = Priority (0-3)
-- ppp = Palette (0-7, maps to CGRAM 128-255)
-- N = Tile number bit 8
+The OBJ layer shows up to 128 sprites of 16 colours, each one of two sizes
+chosen for all sprites at once, with palettes in the upper half of CGRAM.
+The size combinations, the per-line limits and the palettes are in
+@ref hardware_ppu_sprites "The PPU: sprites"; each sprite's four bytes and
+two bits of OAM are in @ref oam.
 
 ## Using OpenSNES Sprite Functions
 
@@ -138,43 +119,59 @@ void load_sprite_tiles(void) {
 }
 ```
 
-### Converting a sheet: `-s` must match the sprite size
+### Converting a sheet: `size` must match the sprite size
 
 A 16x16 OBJ does not read four consecutive tiles. It reads `n`, `n+1`,
 `n+16`, `n+17` — the second row comes from **16 tiles later**, because
 the hardware treats the sheet as 16 tiles (128 px) wide. Same idea for
 32x32 (`n`, `n+1`, `n+2`, `n+3`, `n+16` …) and 64x64.
 
-`gfx4snes` produces exactly that layout **when you tell it the sprite
-size**:
+@ref tools_opensnes_sprite produces exactly that layout **when you tell it
+the sprite size**, in the settings file beside the sheet:
 
-```bash
-gfx4snes -s 8  -p -i cursor.png    # a sheet of 8x8 sprites
-gfx4snes -s 16 -p -i hero.png      # a sheet of 16x16 sprites
-gfx4snes -s 32 -p -i boss.png      # a sheet of 32x32 sprites
+```toml
+# res/sprite32.png.toml (examples/sprites/simple_sprite)
+tool = "opensnes-sprite"
+
+[sheet]
+size = 32        # a sheet of 32x32 sprites (8, 16, 32 or 64)
+colors = 16      # one OBJ palette
 ```
 
-With `-s 16` the converter cuts the image into 16x16 blocks and emits
+The build runs `opensnes-sprite sheet` on it and writes `sprite32.pic`,
+`sprite32.pal` and `sprite32.inc`, which declares `sprite32_tiles`,
+`sprite32_pal` (each with `_end`) and a `GfxAsset`:
+
+```c
+#include "res/sprite32.inc"
+
+dmaCopyVram(sprite32_tiles, 0x2100, sprite32_tiles_end - sprite32_tiles);
+dmaCopyCGram(sprite32_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+```
+
+With `size = 16` the converter cuts the image into 16x16 blocks and emits
 each one as the four tiles the hardware expects, whatever the sheet's
 width or height.
 
-**The trap**: converting a sheet of 16x16 frames with `-s 8`. It
+**The trap**: converting a sheet of 16x16 frames with `size = 8`. It
 succeeds, produces the right number of tiles, and the sprite renders —
 wrong. The top half is one frame and the bottom half is whatever tile
 happened to land 16 slots later, which depends on the PNG's width. A
 sheet 16 tiles wide happens to work; make it 18 tiles wide by adding a
 frame and every sprite in the game breaks at once, with no diagnostic.
 
-The rule is one line: **`-s` is the sprite's size, not the tile size.**
+The rule is one line: **`size` is the sprite's size, not the tile size.**
 
-`gfx4snes` cannot catch the mistake — with `-s 8` it has no way to know
-you meant 16x16 sprites. It *does* warn when the image is not an exact
+The converter cannot catch the mistake — with `size = 8` it has no way to
+know you meant 16x16 sprites. It *does* warn when the image is not an exact
 multiple of the block size, since the last row or column of blocks would
 then be built from pixels that are not in the image.
+`opensnes-sprite inspect res/hero.png --size 16` prints the block count and
+the VRAM cost before you convert.
 
 ## Sprite Palettes
 
-Sprite palettes use CGRAM addresses 128-255:
+Sprite palettes start at CGRAM colour 128 (`OBJ_CGRAM_BASE`):
 
 ```c
 void load_sprite_palette(void) {
@@ -197,27 +194,8 @@ void load_sprite_palette(void) {
 
 ### Frame-based Animation
 
-```c
-u8 anim_frame = 0;
-u8 anim_timer = 0;
-const u8 ANIM_SPEED = 8;  // Frames per animation step
-
-void update_animation(void) {
-    anim_timer++;
-    if (anim_timer >= ANIM_SPEED) {
-        anim_timer = 0;
-        anim_frame++;
-        if (anim_frame >= 4) {  // 4 frames of animation
-            anim_frame = 0;
-        }
-    }
-}
-
-// In main loop:
-update_animation();
-// Set tile based on frame (assuming tiles 0-3 are animation frames)
-oamSetTile(0, anim_frame);
-```
+Cycling a sprite's tile on a timer, and the `anim` module that does it from
+data, are in @ref tutorial_animation.
 
 ### Movement with Animation
 
@@ -243,25 +221,13 @@ void update_player(u16 pad) {
 
 ## Sprite Sizes
 
-Configure sprite sizes with REG_OBJSEL:
+`oamInit(size, name_base)` sets OBJSEL: `size` is one of `OBJ_SIZE8_L16` …
+`OBJ_SIZE32_L64`, the small and large size every sprite chooses between,
+and `oamSetSize(id, 1)` gives a sprite the large one. The table of size
+combinations is in @ref hardware_ppu_sprites "The PPU: sprites".
 
 ```c
-// REG_OBJSEL: sssnnbbb
-//   sss = size mode (see table)
-//   nn = name select (gap between tables)
-//   bbb = base address (/8192)
-
-// Size modes:
-// 0: 8x8 and 16x16
-// 1: 8x8 and 32x32
-// 2: 8x8 and 64x64
-// 3: 16x16 and 32x32
-// 4: 16x16 and 64x64
-// 5: 32x32 and 64x64
-
-REG_OBJSEL = 0x00;  // 8x8/16x16, tiles at $0000
-REG_OBJSEL = 0x20;  // 8x8/32x32, tiles at $0000
-REG_OBJSEL = 0x60;  // 16x16/32x32, tiles at $0000
+oamInit(OBJ_SIZE16_L32, OBJ_NAME_BASE(0x0000));   /* 16x16 and 32x32 sprites */
 ```
 
 ## Example: Two Players
@@ -319,9 +285,9 @@ What it does for each sprite, and what it leaves to you:
   graphics are not loaded yet, say) is one `oamHide(id)` after the call.
 
 Measured (`devtools/libbench`, rows `worldc` and `world`: 19 sprites, 13
-on screen, a moving camera): 31,800 master cycles a frame with
-`oamPlaceWorld()`, 57,300 for the same loop in C writing `oamMemory[]`
-directly — the cheapest way to write it in C.
+on screen, a moving camera; the table in `docs/PERF.md`): 31,740 master
+cycles a frame with `oamPlaceWorld()`, 53,877 for the same loop in C writing
+`oamMemory[]` directly — the cheapest way to write it in C.
 
 ### Sorted by depth: `order`
 
@@ -368,7 +334,7 @@ oamPlaceWorld(&actors, cam_x, cam_y);
 
 1. **Minimize oamUpdate() calls** - Only call once per frame
 2. **Use sprite pooling** - Reuse sprite slots instead of creating/destroying
-3. **Check sprite limits** - Max 32 sprites per scanline, 128 total
+3. **Check sprite limits** - the per-line limits are in @ref hardware_ppu_sprites "The PPU: sprites"
 4. **Batch similar sprites** - Group sprites using same tiles/palettes
 
 ## Next Steps

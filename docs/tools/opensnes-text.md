@@ -77,4 +77,4 @@ this tool's name and come after 1.0; the text module draws C strings.
 ## See also
 
 - @ref tutorial_text — drawing text, colours, the built-in font.
-- @ref tools_font2snes — the earlier tool; shipped for one more version.
+- @ref tools_font2snes — the earlier tool (@ref tools_legacy).

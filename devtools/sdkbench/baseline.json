@@ -8,21 +8,21 @@
       "res": 172
     },
     "sort": {
-      "cycles": 925720,
-      "size": 239,
+      "cycles": 790208,
+      "size": 231,
       "stack": 25,
       "res": 12563
     },
     "physics": {
-      "cycles": 3003034,
-      "size": 452,
-      "stack": 33,
+      "cycles": 2203644,
+      "size": 399,
+      "stack": 30,
       "res": 12530
     },
     "collide": {
-      "cycles": 5561408,
-      "size": 438,
-      "stack": 33,
+      "cycles": 5243496,
+      "size": 405,
+      "stack": 30,
       "res": 162
     },
     "mul": {
@@ -44,8 +44,8 @@
       "res": 35405
     },
     "bytes": {
-      "cycles": 3697872,
-      "size": 327,
+      "cycles": 3157202,
+      "size": 307,
       "stack": 23,
       "res": 819
     },
@@ -68,8 +68,8 @@
       "res": 2842
     },
     "list": {
-      "cycles": 1698250,
-      "size": 278,
+      "cycles": 1323922,
+      "size": 267,
       "stack": 23,
       "res": 17376
     },
@@ -86,20 +86,20 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 3255454,
-      "size": 531,
-      "stack": 33,
+      "cycles": 2991200,
+      "size": 489,
+      "stack": 30,
       "res": 12530
     },
     "copy": {
-      "cycles": 1006488,
-      "size": 309,
+      "cycles": 1006290,
+      "size": 302,
       "stack": 23,
       "res": 20921
     },
     "strings": {
-      "cycles": 1937314,
-      "size": 797,
+      "cycles": 1734876,
+      "size": 749,
       "stack": 48,
       "res": 65535
     },
@@ -110,34 +110,40 @@
       "res": 24876
     },
     "place": {
-      "cycles": 5377870,
-      "size": 358,
-      "stack": 29,
+      "cycles": 5172382,
+      "size": 350,
+      "stack": 23,
       "res": 30752
     },
     "dist": {
-      "cycles": 7792054,
-      "size": 472,
-      "stack": 25,
+      "cycles": 7147052,
+      "size": 452,
+      "stack": 29,
       "res": 29147
     },
     "depot": {
-      "cycles": 14405848,
-      "size": 3465,
-      "stack": 52,
+      "cycles": 12947774,
+      "size": 3224,
+      "stack": 56,
       "res": 54047
     },
     "div32": {
-      "cycles": 5010932,
+      "cycles": 4644986,
       "size": 452,
       "stack": 71,
       "res": 54707
     },
     "farfill": {
-      "cycles": 56433270,
-      "size": 2959,
+      "cycles": 55691046,
+      "size": 2933,
       "stack": 63,
       "res": 18907
+    },
+    "stepseq": {
+      "cycles": 58359746,
+      "size": 3168,
+      "stack": 62,
+      "res": 30034
     }
   }
 }
