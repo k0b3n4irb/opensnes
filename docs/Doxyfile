@@ -115,7 +115,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/color/hicolor_1792 \
                          ../examples/backgrounds/mode5_hires \
                          ../examples/mode7/perspective_rotate \
-                         ../examples/transitions/mosaic \
                          ../examples/scrolling/parallax_scroll \
                          ../examples/chips/superfx_3d \
                          ../examples/chips/superfx_game_skeleton \

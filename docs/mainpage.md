@@ -9,7 +9,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 
 @subpage learning_path -- The route through the examples, from "Hello World" to complete games
 
-@subpage examples_by_category -- All 85 examples, by topic
+@subpage examples_by_category -- All 84 examples, by topic
 
 ## Help
 

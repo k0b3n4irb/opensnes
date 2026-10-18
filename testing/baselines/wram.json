@@ -323,10 +323,6 @@
     "stream": "21382e598ba771a1a66ed75d761c8d16449c8b270ef5798c88bdc4921661ef14",
     "rom_sha256": "777bed6b1ac003f815045c789602fa79afb7e918bcc3ddfda70d161f482bf617"
   },
-  "transitions_mosaic": {
-    "stream": "73fc09489ce3572f4094e35f942aeb673d9155af08ba976f8cb2f1b3b84e402c",
-    "rom_sha256": "038c6f65dd7e863f50cdbbcce9ae80c8059ddf0070865c34a4845e8b0f17224d"
-  },
   "windows_transparent_window": {
     "stream": "3b2d3507307746d959a9a6473eb3d629eccdc45197e6aea4df6d9767732e663b",
     "rom_sha256": "8a4f007dcafb13732a4fdbdc5276c0d966fa3b0a7408599046932aeb9387d217"

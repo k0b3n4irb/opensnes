@@ -102,8 +102,6 @@ windows, the Mode 7 plane, and sound.
 
 @subpage examples_transitions_fading
 
-@subpage examples_transitions_mosaic
-
 @subpage examples_hdma_hdma_wave
 
 @subpage examples_scrolling_parallax_scroll

@@ -1,6 +1,6 @@
 # OpenSNES Examples
 
-The example corpus: 88 small ROMs, each a folder with its `main.c`, its
+The example corpus: small ROMs, each a folder with its `main.c`, its
 assets, a `Makefile` and a `README.md` that says what it shows. They go from
 a first line of text to complete games.
 
@@ -23,7 +23,7 @@ The table below counts them per folder.
 | [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 6 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
 | [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
-| [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
+| [transitions/](transitions/) | 1 | Screen transitions: fades and the mosaic dissolve |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
 | [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG |
 | [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |

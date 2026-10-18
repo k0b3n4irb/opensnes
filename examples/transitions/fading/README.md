@@ -1,167 +1,91 @@
-# Fading Example
+# Fade and Mosaic — Screen Transitions
 
 ![Demo](fading_demo.gif)
 
 ![Screenshot](fading.png)
 
-Screen brightness transitions for fade in/out effects.
+The two transitions the PPU gives for free: a brightness fade and the mosaic
+filter. Press any button to step through them: fade out and in at three
+speeds, then the picture breaking into growing blocks and sharpening again.
 
 ## Learning Objectives
 
 After this lesson, you will understand:
-- How SNES screen brightness control works
-- Creating smooth fade transitions
-- Different fade speeds and styles
-- Using fades for scene transitions
+- How master brightness works, and why brightness 0 is not force blank
+- How the mosaic filter groups pixels into blocks, and on which layers
+- How the speed of a transition is set, and what it costs (nothing but one
+  register write per step)
+- How the two combine into the classic RPG battle transition
+
+## SNES Concepts
+
+- Master brightness, INIDISP ($2100) bits 0-3; force blank, bit 7
+- The mosaic filter, MOSAIC ($2106): block size and per-layer enable
+- Frame-paced transitions: one register write per step, timed by VBlank
+- Sprites are not mosaicked; backgrounds are
 
 ## Prerequisites
 
-- Completed background examples
-- Understanding of VBlank timing
+- A background on screen (`backgrounds/mode1`)
+- VBlank timing (`basics/game_skeleton`)
 
----
+## Controls
 
-## What This Example Does
+| Button | Action |
+|--------|--------|
+| Any button | Next transition |
 
-Demonstrates multiple fade effects:
-- Fade from black to full brightness
-- Fade from full brightness to black
-- Fast and slow fade speeds
-- Button-triggered transitions
+The cycle: fade out / in at 1 frame per step, at 3, at 6, then mosaic out,
+mosaic in, and again.
 
-```
-Frame 1:    ████████████████  (Black)
-Frame 5:    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  (25%)
-Frame 10:   ░░░░░░░░░░░░░░░░  (50%)
-Frame 15:   ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  (75%)
-Frame 20:   [Full Image]      (100%)
-```
+## How It Works
 
-**Controls:**
-- Any button: Advance to next fade effect
-
----
-
-## Code Type
-
-**C with Direct Register Access**
-
-| Component | Type |
-|-----------|------|
-| Background setup | Library functions |
-| Brightness control | Direct register (`REG_INIDISP`) |
-| Fade timing | Frame counting with `WaitForVBlank()` |
-| Input detection | Direct register access |
-
----
-
-## INIDISP Register
-
-The INIDISP register ($2100) controls screen brightness:
-
-```
-Bits 0-3: Brightness level (0-15)
-Bit 4:    Force blank (1 = screen off)
-Bits 5-7: Unused
-```
-
-| Value | Effect |
-|-------|--------|
-| $00 | Brightness 0 (black, screen on) |
-| $0F | Brightness 15 (full) |
-| $80 | Force blank (screen completely off) |
-| $8F | Force blank at full brightness |
-
----
-
-## Basic Fade Implementation
-
-> **Already in the lib.** `fadeOut(u8 speed)` and `fadeIn(u8 speed)` are
-> exposed from `snes/console.h` since v0.20.x — same signature, same
-> semantics as the snippets below. The example calls those directly;
-> the algorithm below is kept for pedagogical purposes so you can see
-> how a fade works on the wire.
-
-### Fade In (Black to Full)
+### 1. Brightness: INIDISP ($2100)
 
 ```c
-void fadeIn(u8 speed) {
-    u8 brightness;
-
-    for (brightness = 0; brightness <= 15; brightness++) {
-        REG_INIDISP = brightness;
-
-        /* Wait multiple frames for slower fade */
-        for (u8 i = 0; i < speed; i++) {
-            WaitForVBlank();
-        }
-    }
-}
+fadeOut(1);   /* 15 -> 0, one step per frame: a quarter of a second */
+fadeIn(3);    /* 0 -> 15, one step every 3 frames */
 ```
 
-### Fade Out (Full to Black)
+Bits 0-3 of INIDISP are the master brightness, 0 (black) to 15 (full); bit 7
+is force blank. `fadeOut(speed)` and `fadeIn(speed)` (`snes/console.h`) step
+the brightness once every `speed` frames:
+
+| Speed | Frames per step | Whole fade |
+|-------|-----------------|------------|
+| 1 | 1 | 15 frames, 0.25 s |
+| 3 | 3 | 45 frames, 0.75 s |
+| 6 | 6 | 90 frames, 1.5 s |
+
+**Brightness 0 is not force blank.** The screen is black but the PPU still
+draws, so VRAM is still closed outside VBlank. To load a new scene, fade out,
+then `setScreenOff()`, load, `setScreenOn()` and fade in.
+
+### 2. Mosaic: MOSAIC ($2106)
 
 ```c
-void fadeOut(u8 speed) {
-    u8 brightness;
+mosaicSetLayers(LAYER_BG1);   /* which backgrounds the filter applies to */
+mosaicFadeOut(3);             /* block size 1x1 -> 16x16, 3 frames per size */
 
-    for (brightness = 15; brightness > 0; brightness--) {
-        REG_INIDISP = brightness;
-
-        for (u8 i = 0; i < speed; i++) {
-            WaitForVBlank();
-        }
-    }
-    REG_INIDISP = 0;  /* Ensure fully black */
-}
+mosaicFadeIn(3);              /* 16x16 -> 1x1 */
+mosaicDisable();              /* size 0 and no layer: the filter is off */
 ```
 
----
+Bits 7-4 of MOSAIC are the block size minus one (0 = 1x1, 15 = 16x16), bits
+3-0 the background layers it applies to. Each block takes the colour of its
+top-left pixel: the picture looks like a lower resolution of itself, it is
+not a blur. Sprites are never affected — only backgrounds — so characters can
+stay sharp while the scene dissolves behind them.
 
-## Fade Speeds
+### 3. Combining both
 
-Different speeds for different purposes:
+The classic battle transition of SNES RPGs:
 
-| Speed | Frames per step | Total frames | Duration |
-|-------|-----------------|--------------|----------|
-| 1 | 1 | 15 | 0.25 sec |
-| 2 | 2 | 30 | 0.5 sec |
-| 4 | 4 | 60 | 1.0 sec |
-| 8 | 8 | 120 | 2.0 sec |
-
-### Quick Flash
-
-```c
-void flash(void) {
-    REG_INIDISP = 0x0F;  /* Full white */
-    WaitForVBlank();
-    WaitForVBlank();
-    fadeIn(1);           /* Quick restore */
-}
-```
-
----
-
-## Scene Transition Pattern
-
-```c
-void changeScene(void) {
-    /* Fade out current scene */
-    fadeOut(2);
-
-    /* Force blank for safe VRAM updates */
-    REG_INIDISP = INIDISP_FORCE_BLANK;
-
-    /* Load new graphics (safe during blank) */
-    loadNewBackground();
-    loadNewSprites();
-
-    /* Fade in new scene */
-    fadeIn(2);
-}
-```
-
----
+1. mosaic out (the scene turns into blocks),
+2. fade to black,
+3. load the new scene in force blank,
+4. fade in (still blocky),
+5. mosaic in (the blocks shrink and the new scene appears).
 
 ## Build & Run
 
@@ -170,97 +94,30 @@ cd $OPENSNES_HOME
 make -C examples/transitions/fading
 ```
 
-Then open `fading.sfc` in your emulator (Mesen2 recommended).
-
----
+Then open `fading.sfc` in luna (`luna-gui fading.sfc`) or any emulator.
 
 ## Modules Used
 
-`console`, `sprite`, `dma`, `input`, `background` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `dma`, `input`, `background`, `mosaic` (`LIB_MODULES` in the Makefile).
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Fade logic and demo sequence |
+| `main.c` | the transitions, one per button press |
 | `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it, `res/opensnes.inc` declares the symbols |
-| `Makefile` | Build configuration (`LIB_MODULES := console sprite dma input background`) |
-
----
+| `vram.spec` | the VRAM regions of the example (`vram_map.h` is generated from it) |
+| `Makefile` | build configuration |
 
 ## Exercises
 
-### Exercise 1: Smooth Fade
-
-Create smoother fades using sub-frame timing (though limited by 16 brightness levels):
-```c
-/* Use longer waits between steps */
-for (u8 wait = 0; wait < 8; wait++) {
-    WaitForVBlank();
-}
-```
-
-### Exercise 2: Directional Wipe
-
-Combine with window masking for a wipe effect instead of fade.
-
-### Exercise 3: Color Fade
-
-Use color math to fade to a specific color instead of black:
-```c
-colorMathSetFixedColor(r, g, b);
-/* Increase color math intensity as brightness drops */
-```
-
-### Exercise 4: Pulse Effect
-
-Create a pulsing brightness effect:
-```c
-static u8 pulse_dir = 1;
-static u8 brightness = 8;
-
-brightness += pulse_dir;
-if (brightness >= 15 || brightness <= 4) {
-    pulse_dir = -pulse_dir;
-}
-REG_INIDISP = brightness;
-```
-
----
-
-## Technical Notes
-
-### Force Blank vs Brightness 0
-
-- **Brightness 0**: Screen shows black, but PPU still renders
-- **Force Blank**: PPU stops rendering, VRAM access is safe
-
-Use force blank when updating graphics, brightness 0 for visual fades.
-
-### Fade During Gameplay
-
-For in-game fades without stopping action:
-1. Use force blank only briefly for VRAM updates
-2. Fade brightness while game continues
-3. Game logic runs normally during fade
-
-### Alternative: Palette Fade
-
-Instead of hardware brightness, modify palette colors:
-```c
-/* Fade palette toward black */
-for (u8 i = 0; i < 256; i++) {
-    palette[i] = (palette[i] * fade_level) >> 4;
-}
-dmaCopyCGram(palette, 0, 512);
-```
-
-This allows fading specific layers independently.
-
----
+1. **Scene change**: load a second picture and switch to it with the five
+   steps of section 3.
+2. **Per-layer mosaic**: put a second background on BG2 and mosaic BG1 only.
+3. **Colour fade**: fade to white instead of black with colour math
+   (`color/transparency`).
 
 ## What's Next?
 
-**Mosaic:** [Mosaic Example](../mosaic/) - Pixelation transitions
-
-**Parallax:** [Parallax Scrolling](../parallax_scroll/) - Multi-speed scrolling with HDMA
+- [Parallax scrolling](../../scrolling/parallax_scroll/) — several layers moving at different speeds
+- [HDMA wave](../../hdma/hdma_wave/) — a register changed on every scanline

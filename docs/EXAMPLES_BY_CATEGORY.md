@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 85 examples organized by topic. For a progressive learning path, see
+All 84 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -134,8 +134,7 @@ How a scene leaves.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_transitions_fading | Brightness control, screen transitions |
-| @subpage examples_transitions_mosaic | Mosaic pixelation effect |
+| @subpage examples_transitions_fading | Brightness fades at three speeds and the mosaic dissolve |
 
 ---
 

@@ -44,7 +44,7 @@ Cuts feel cheap; transitions feel authored. Two are nearly free on the SNES:
   black and back. The standard scene bookend. See @ref examples_transitions_fading.
 - **Mosaic dissolve** — grow the mosaic size to pixelate the screen away, then
   shrink it back on the new scene. A distinctly SNES transition. See
-  @ref examples_transitions_mosaic.
+  @ref examples_transitions_fading, which shows both.
 
 Both are a single register animated over a dozen frames, and both read as
 production value far above their cost.
