@@ -9,7 +9,7 @@
  * Reads the wlalink .sym beside the ROM and the .c.asm intermediates in
  * its directory, and runs: the bank $00 ROM ratchet, the C RAM band
  * budget (and the far band figure), the data-init sentinel, the bank-blind
- * read guard, the NMI / WRAM-port race lint, and the asset inventory.
+ * read guard, the SA-1 boot check, the NMI / WRAM-port race lint, and the asset inventory.
  * Exit 1 when a check fails; warnings do not fail.
  *
  *   opensnes-rom inspect [--json] <game.sfc>...
@@ -274,7 +274,7 @@ static int run_budget(cli_ctx *ctx)
 }
 
 static const cli_cmd cmds[] = {
-    { "check", "the post-link checks: bank $00 ROM, C RAM band, data-init sentinel, bank-blind reads, NMI / WRAM-port race, asset inventory",
+    { "check", "the post-link checks: bank $00 ROM, C RAM band, data-init sentinel, SA-1 boot, bank-blind reads, NMI / WRAM-port race, asset inventory",
       check_opts, CLI_N(check_opts), "check game.sfc --bank0-fail 1024 --ram-fail 512", 1, run_check },
     { "inspect", "the cartridge header, the checksum against the image, CRC32 and SHA-1 (exit 1 on a wrong checksum)",
       NULL, 0, "inspect game.sfc", 1, run_inspect },

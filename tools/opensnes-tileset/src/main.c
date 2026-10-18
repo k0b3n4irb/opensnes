@@ -99,7 +99,7 @@ static const cli_opt convert_opts[] = {
     { "pages", 0, CLI_FLAG, NULL, "write the map in 32x32 pages (a scrolling 64x64 background)", NULL },
     { "no-reduce", 0, CLI_FLAG, NULL, "keep every block, duplicates included", NULL },
     { "flip", 0, CLI_FLAG, NULL, "deduplicate mirrored blocks; the map carries the flip bits", NULL },
-    { "blank", 0, CLI_FLAG, NULL, "prepend a blank tile", NULL },
+    { "blank", 0, CLI_FLAG, NULL, "start the tiles with a blank one (tile 0), unless the picture starts with a blank block", NULL },
     { "lz", 0, CLI_FLAG, NULL, "LZ77-compress the .pic", NULL },
     { "pack", 0, CLI_FLAG, NULL, "packed-pixel tiles (what --mode 7 implies)", NULL },
     { "round", 0, CLI_FLAG, NULL, "round each colour to the SNES's 5-bit channels instead of truncating it (the nearest colour the hardware shows)", NULL },
