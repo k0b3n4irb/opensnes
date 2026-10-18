@@ -182,18 +182,24 @@ $(DRIVER_BIN): $(SRCDIR)/audio_driver.spc700.asm ../templates/memmap_spc700.inc
 SM_SPC_BIN = $(SRCDIR)/sm_spc.spc700.bin
 SM_SPC_BUDGET = 5632
 
+# Two makes may build it at once (`make tools lib`, `make -j`: the tool's
+# rule and the library's), so each assembles into files of its own, named
+# by its shell's PID, and moves the result in place: shared temporaries
+# made 17 of 20 concurrent builds fail.
 $(SM_SPC_BIN): $(SRCDIR)/sm_spc.spc700.asm
 	@echo "[SPC] $< -> $@"
-	@$(SPC_AS) -o $(SRCDIR)/sm_spc.spc700.o $<
-	@echo "[objects]" > $(SRCDIR)/sm_spc.link
-	@echo "$(SRCDIR)/sm_spc.spc700.o" >> $(SRCDIR)/sm_spc.link
-	@$(LD) -b $(SRCDIR)/sm_spc.link $@
-	@rm -f $(SRCDIR)/sm_spc.spc700.o $(SRCDIR)/sm_spc.link
-	@size=$$(wc -c < $@ | tr -d ' '); \
+	@tmp=$(SRCDIR)/sm_spc.tmp$$$$; \
+	$(SPC_AS) -o $$tmp.o $< && \
+	printf '[objects]\n%s\n' $$tmp.o > $$tmp.link && \
+	$(LD) -b $$tmp.link $$tmp.bin; st=$$?; \
+	rm -f $$tmp.o $$tmp.link; \
+	if [ $$st -ne 0 ]; then rm -f $$tmp.bin; exit $$st; fi; \
+	size=$$(wc -c < $$tmp.bin | tr -d ' '); \
 	if [ $$size -gt $(SM_SPC_BUDGET) ]; then \
 		echo "FAIL: SNESMOD driver is $$size bytes > $(SM_SPC_BUDGET)"' ($$0400 to the module at $$1A00)'; \
-		rm -f $@; exit 1; \
-	fi
+		rm -f $$tmp.bin; exit 1; \
+	fi; \
+	mv -f $$tmp.bin $@
 
 $(BUILDDIR_LOROM)/snesmod-asm.o: $(SM_SPC_BIN)
 $(BUILDDIR_HIROM)/snesmod-asm.o: $(SM_SPC_BIN)
