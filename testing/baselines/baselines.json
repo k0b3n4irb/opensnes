@@ -449,12 +449,6 @@
     "luna_version": "v1.38.0",
     "rom_sha256": "027f89209268b4251dbe3063c120d2d87013a1569ce79f764cea124191bb1d42"
   },
-  "sprites_dynamic_metasprite": {
-    "fbhash": "fd3e944d112a9588",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "2fcfc8a4b75d336def21d096e267244d858fc00214c39dacd78bfe78ca259a8a"
-  },
   "sprites_dynamic_sprite": {
     "fbhash": [
       "1ea31be6d66d5b25",
@@ -464,8 +458,8 @@
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "e7f48a2f1fc8c6120d19176fc4da2bf39d82bcd77ac2fbdf2d22561bbdf8db61"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "cf84f9f9c25003c8601d2edc453baede7f3d40e1f7cbd75828248db75dc798df"
   },
   "sprites_simple_sprite": {
     "fbhash": "407d185323c90914",

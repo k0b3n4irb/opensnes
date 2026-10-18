@@ -33,7 +33,7 @@ from lib import find_luna  # noqa: E402
 import run as sdkbench  # noqa: E402
 
 WORK = REPO / "build" / "twinbench"
-RIGHT, START, A = "0x0100", "0x1000", "0x0080"
+RIGHT, START, A, SELECT = "0x0100", "0x1000", "0x0080", "0x2000"
 # Pairs read side by side and found NOT to do the same work: left out unless
 # --all is given, and never a figure to quote.
 NOT_TWINS = {
@@ -52,7 +52,7 @@ PAIRS = [
     ("tiled", "maps/tiled", "../testing/fixtures/retired_examples/tiled", f"130:{RIGHT}", 200, 500),
     ("animatedsprite", "graphics/Sprites/AnimatedSprite", "sprites/animated_sprite", f"130:{RIGHT}", 200, 500),
     ("dynamicsprite", "graphics/Sprites/DynamicSprite", "sprites/dynamic_sprite", None, 200, 500),
-    ("dynamicmetasprite", "graphics/Sprites/DynamicEngineMetaSprite", "sprites/dynamic_metasprite", None, 200, 500),
+    ("dynamicmetasprite", "graphics/Sprites/DynamicEngineMetaSprite", "sprites/dynamic_sprite", f"130:{SELECT},134:0", 200, 500),  # SELECT: our metasprite scene
     ("metasprite", "graphics/Sprites/MetaSprite", "../testing/fixtures/retired_examples/metasprite", None, 200, 500),
     ("objectsize", "graphics/Sprites/ObjectSize", "sprites/sprite_sizes", None, 200, 500),
     ("simplesprite", "graphics/Sprites/SimpleSprite", "sprites/simple_sprite", None, 200, 500),

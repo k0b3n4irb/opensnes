@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 70 examples organized by topic. For a progressive learning path, see
+All 69 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -51,8 +51,7 @@ Sprite display, animation, and OAM management.
 | @subpage examples_sprites_simple_sprite | Basic OAM setup, sprite display |
 | @subpage examples_sprites_sprite_sizes | OBJSEL size configurations (8x8 to 64x64) |
 | @subpage examples_sprites_animated_sprite | Frame animation, sprite sheets, H-flip |
-| @subpage examples_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads |
-| @subpage examples_sprites_dynamic_metasprite | Dynamic metasprite engine with batched OAM updates |
+| @subpage examples_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads; SELECT: metasprites under three OBJSEL size pairs |
 | @subpage examples_sprites_sprite_swarm | A bouncing swarm + the per-sprite OAM throughput ceiling |
 | @subpage examples_sprites_world_sprites | World-space sprites: a camera, culling and OAM in one call per batch |
 | @subpage examples_sprites_aseprite_pipeline | The asset pipeline: an Aseprite export through `opensnes-sprite` into an animated metasprite |

@@ -1,0 +1,39 @@
+# dynamic_sprite — SELECT goes to the metasprite scene and SELECT again comes
+# back to the four animated 16x16 sprites: the engine is re-initialised in
+# its 8/16 pair (OBJSEL $00), the screen is back on, the animation runs
+# again (frame0 steps every 8 frames from 0), and the metasprite heroes are
+# gone from OAM (sprite 0 is the first animated sprite at x 64, y 100).
+# Measured: luna state --input <script> --peek in_meta --peek frame0 at 200.
+rom = "../../examples/sprites/dynamic_sprite/dynamic_sprite.sfc"
+
+[[checkpoint]]                 # in the metasprite scene, size pair 8/32
+at_frame = 100
+input = "30:0x2000,34:0,60:0x0400,64:0"
+[checkpoint.values]
+in_meta = 1
+selectedItem = 1
+[checkpoint.ppu]
+obsel = 0x20
+
+[[checkpoint]]                 # SELECT again: back to the animation, 8/16
+at_frame = 200
+input = "100:0x2000,104:0"
+[checkpoint.values]
+in_meta = 0
+[checkpoint.ppu]
+obsel = 0x00
+inidisp = 0x0F
+
+[[checkpoint]]                 # the animation advances again
+at_frame = 240
+[checkpoint.delta]
+"frame0.main" = { dir = "increased", width = 2 }
+
+[asserts.oam.sprites.0]
+x = 64
+y = 100
+w = 16
+h = 16
+
+[asserts.oam.sprites.4]        # no fifth sprite: the heroes are gone
+y = 240                        # oamClear hides an entry at y 240

@@ -58,12 +58,11 @@ then branch out to the SNES's exotic controllers.
 @subpage examples_input_superscope
 
 Now that the pad moves things, the sprites that answer it: the OBJ size pairs
-one character is built from, a world larger than the screen with its sprites
+one character is built from (and, behind SELECT in @ref examples_sprites_dynamic_sprite,
+a metasprite streamed under each pair), a world larger than the screen with its sprites
 in world coordinates, and an Aseprite timeline played on a button.
 
 @subpage examples_sprites_sprite_sizes
-
-@subpage examples_sprites_dynamic_metasprite
 
 @subpage examples_sprites_world_sprites
 

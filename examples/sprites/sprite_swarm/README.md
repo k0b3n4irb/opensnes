@@ -63,6 +63,6 @@ Also linked: `math` — fixed-point sine / trigonometry.
 
 ## Where you are
 
-← previous: [dynamic_metasprite](../dynamic_metasprite/) · streaming a multi-tile character
+← previous: [dynamic_sprite](../dynamic_sprite/) · streaming sprite tiles, single and multi-tile
 · the family caps here — for 128 sprites of heavy math, see
 [chips/sa1_starfield](../../chips/sa1_starfield/)

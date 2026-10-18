@@ -237,4 +237,4 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   tags each `--dma-trace` write with `force_blank` (INIDISP), so a write is safe
   iff `blank || force_blank`. The probe asserts **zero unsafe writes** (active
   display, screen on — the #1 silent failure, now testable) and that the per-VBlank
-  peak stays ≤ 4 KB (real bytes now: `dynamic_metasprite` peaks ~3.5 KB).
+  peak stays ≤ 4 KB (real bytes now: `dynamic_sprite`, metasprite scene, peaks ~3.5 KB).

@@ -1,4 +1,8 @@
-# dynamic_metasprite — UP/DOWN re-initialises the dynamic sprite engine in
+# dynamic_sprite, the metasprite scene (it was the dynamic_metasprite
+# example, merged into dynamic_sprite on 2026-10-18; SELECT at frame 30
+# enters the scene, everything after is the old manifest unchanged).
+#
+# UP/DOWN re-initialises the dynamic sprite engine in
 # a new OBJSEL size mode under force blank; no other test presses them.
 #
 # What this proves that the other pillars cannot:
@@ -23,11 +27,13 @@
 # Measured: `luna state --until-frame N --input <the script below> --peek
 # selectedItem:2 --out -` (+ ppu.obsel, ppu.inidisp) at 60/120/200/320 ->
 # 0/$00, 1/$20, 0/$00, 2/$60, INIDISP $0F at each.
-rom = "../../examples/sprites/dynamic_metasprite/dynamic_metasprite.sfc"
+rom = "../../examples/sprites/dynamic_sprite/dynamic_sprite.sfc"
 
-[[checkpoint]]                 # boot, mode 0
+[[checkpoint]]                 # SELECT: the metasprite scene, mode 0
 at_frame = 60
+input = "30:0x2000,34:0"
 [checkpoint.values]
+in_meta = 1
 selectedItem = 0
 [checkpoint.ppu]
 obsel = 0x00

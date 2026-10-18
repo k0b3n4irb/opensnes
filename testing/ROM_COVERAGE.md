@@ -104,9 +104,9 @@ luna v1.34.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mouseInit` | `input/mouse` |
 | `mouseIsConnected` | `libtest` |
 | `mul16` | `libtest` |
-| `oamDynamicDrainQueue` | `sprites/dynamic_metasprite` |
+| `oamDynamicDrainQueue` | `sprites/dynamic_sprite` |
 | `oamDynamicSetSize` | `libtest` |
-| `oamMetaDrawDyn` | `sprites/dynamic_metasprite` |
+| `oamMetaDrawDyn` | `sprites/dynamic_sprite` |
 | `oamSetTile` | `libtest` |
 | `objCollidMap1D` | `libtest` |
 | `objCollidObj` | `libtest` |

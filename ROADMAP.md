@@ -24,7 +24,7 @@ jams, and educational use, building toward commercial-grade maturity. The
 compiler produces code about 38 % faster than PVSnesLib + 816-opt estimated
 on 34 functions, and 62 % faster measured on luna on 23 workloads, each of
 them faster, none larger, and level or shallower in stack on 22
-(`docs/BENCHMARK.md`). 70 working examples cover every major subsystem,
+(`docs/BENCHMARK.md`). 69 working examples cover every major subsystem,
 with cross-platform CI on Linux, macOS, and Windows enforcing not just "it
 compiles" but the full functional test suite (luna, cycle-accurate native —
 corpus liveness + visual regression + functional probes; SA-1/Super FX/DSP-1
