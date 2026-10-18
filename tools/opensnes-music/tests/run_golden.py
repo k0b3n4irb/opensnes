@@ -11,7 +11,6 @@ Run:  python3 tools/opensnes-music/tests/run_golden.py
 """
 from __future__ import annotations
 
-import re
 import sys
 import tempfile
 from pathlib import Path
@@ -54,17 +53,15 @@ def spc_written():
         at = data[0x100 + 0x1A00:0x100 + 0x1A04]
         if at != bytes.fromhex("806e0324"):
             return [f"pollen8.spc: ARAM $1A00 holds {at.hex()}, not the module header 806e0324"]
-        # the driver at $0400 is the library's, the one games run (one copy:
-        # lib/source/sm_spc.asm); the tool clears the two bytes at $3C
+        # the driver at $0400 is the library's, the one games run (built from
+        # lib/source/sm_spc.spc700.asm); the tool clears the two bytes at $3C
         # (a branch that waits for the console) so that a player starts it
-        asm = (g.here.parents[2] / "lib" / "source" / "sm_spc.asm").read_text()
-        driver = bytearray(int(x, 16) for line in asm.splitlines() if line.strip().startswith(".byte")
-                           for x in re.findall(r"\$([0-9A-Fa-f]{2})", line))
+        driver = bytearray((g.here.parents[2] / "lib" / "source" / "sm_spc.spc700.bin").read_bytes())
         driver[0x3C:0x3E] = b"\0\0"
         got = data[0x100 + 0x400:0x100 + 0x400 + len(driver)]
-        if len(driver) != 5522 or got != driver:
+        if got != driver:
             n = sum(1 for a, b in zip(got, driver) if a != b)
-            return [f"pollen8.spc: the driver at $0400 is not lib/source/sm_spc.asm ({len(driver)} bytes, {n} differ)"]
+            return [f"pollen8.spc: the driver at $0400 is not the library's ({len(driver)} bytes, {n} differ)"]
     return []
 
 

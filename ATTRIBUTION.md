@@ -46,7 +46,10 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **Author**: Mukunda Johnson
 - **Repository**: https://github.com/mukunda-/snesmod
 - **License**: MIT
-- **What we use**: SPC700 audio driver (`sm_spc.asm`) and `smconv` tracker
+- **What we use**: the SPC700 audio driver, built from its source
+  `lib/source/sm_spc.spc700.asm` — Mukunda Johnson's `sm_spc.as7`, with
+  KungFuFurby's bugfixes, in the WLA-DX syntax PVSnesLib converted it to
+  (`pvsneslib/snesmod/sm_spc_wla.asm`, MIT) — and the `smconv` tracker
   converter (Impulse Tracker `.it` → SPC700 soundbank)
 
 ### modlib

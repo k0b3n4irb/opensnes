@@ -55,8 +55,15 @@ That file, assembled by our `bin/wla-spc700` and linked with `wlalink -b`,
 gives PVSnesLib's 5 522 bytes exactly (0 differ).
 
 The tool's former copy, `tools/lib/smconv/src/spc_program.h` (5 546 bytes),
-was PVSnesLib's `tools/smconv/spc_program.h`, an older build. Since
-2026-10-18 the tool generates its array from `lib/source/sm_spc.asm`.
+was PVSnesLib's `tools/smconv/spc_program.h`, an older build.
+
+Since 2026-10-18 (owner: import the source) the driver is built from source:
+`lib/source/sm_spc.spc700.asm` is PVSnesLib's `sm_spc_wla.asm` (blob
+`c8a67b39`, commit `df062883`) with the MIT notice and the KOF fix written in
+ResetSound (`mov sfx_mask,#0` moved between the two KOF writes). `lib/Makefile`
+assembles it into `sm_spc.spc700.bin`, which `sm_spc.asm` incbins and
+`opensnes-music` turns into its C array. The build gives our former 5 522
+bytes exactly, and the 85 example ROMs are identical.
 
 ## PVSnesLib: waits for Mukunda (owner decision, 2026-10-03)
 

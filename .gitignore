@@ -129,6 +129,7 @@ examples/sprites/aseprite_pipeline/res/hero_anim.h
 
 .mcp.json
 lib/source/audio_driver.spc700.bin
+lib/source/sm_spc.spc700.bin
 # Build-config stamp written by make/common.mk (2026-09-26)
 .opensnes_config
 .opensnes_config.tmp

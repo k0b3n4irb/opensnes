@@ -108,6 +108,14 @@ All notable changes to OpenSNES are documented in this file.
   more in a ROM that divides 32 bits.
 
 ### Changed
+- build(lib): **the SNESMOD driver is built from its source.**
+  `lib/source/sm_spc.asm` held the SPC700 driver as 5 522 bytes of
+  `.byte` lines, patched in place for the stop and pause fix; its source,
+  Mukunda Johnson's driver in the WLA-DX syntax PVSnesLib converted it to,
+  is now `lib/source/sm_spc.spc700.asm`, assembled by `wla-spc700` at
+  every library build like the audio engine's driver, with the stop and
+  pause fix written in it. The bytes are the same: every example ROM is
+  identical. `opensnes-music` takes its copy from the same build.
 - chore(tools): **cmdparser is gone.** The vendored option parser (Apache
   2.0) came with PVSnesLib's gfx4snes; no tool has compiled it since the
   `opensnes-*` tools replaced gfx4snes and img2snes, yet the release still
@@ -161,8 +169,8 @@ All notable changes to OpenSNES are documented in this file.
   run.** The tool carried its own copy of the SNESMOD driver (5 546 bytes,
   an older build from PVSnesLib's smconv), different from the library's
   (5 522 bytes, with the stop and pause fix): 4 854 bytes differed. The
-  tool now builds its copy from `lib/source/sm_spc.asm` at compile time,
-  and its golden checks that the `.spc` holds that driver.
+  tool now takes the library's driver at compile time, and its golden
+  checks that the `.spc` holds that driver.
 - fix(tools): **`opensnes-music` puts the module where the driver reads it,
   and refuses one the SPC700's RAM cannot hold.** `opensnes-music spc` wrote
   the module at `$19AA` while the driver reads it at `$1A00`: the preview
