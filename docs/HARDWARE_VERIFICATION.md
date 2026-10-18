@@ -72,7 +72,7 @@ behaviour, and the note under the table says which.
 | 13 | `memory/save_game` | A writes slot 1, power-cycle, B reads slot 1 | The values read back are the ones written before the power cycle. Then X writes slot 2, power-cycle, Y reads it. On a flash cart this also checks that the cart writes the save file back; consult its manual if slot 1 reads blank. |
 | 14 | `input/controller` | hold buttons on both pads | Each pad's buttons show on its own line (PAD 1, PAD 2); releasing pad 2 does not affect pad 1's line. |
 | 15 | `memory/hirom_demo` | hold A | "HIROM MODE" is shown and the background turns light blue while A is held. |
-| 16 | `chips/dsp1_cube` | nothing | A wireframe cube tumbles with correct perspective. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
+| 16 | `mode7/dsp1_ground` | turn with LEFT/RIGHT, drive with UP | The ground recedes to a horizon under the sky and turns in perspective; four magenta beacons and the cyan cube tumbling above them stay put on the ground while you turn and drive, and disappear once you pass them. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
 | 17 | `chips/sa1_starfield` | nothing | 128 dots trace smooth Lissajous figures at full frame rate. Firmware-dependent. |
 | 18 | `chips/superfx_3d` | nothing | A wireframe cube rotates at full frame rate with no missing edges. Firmware-dependent. |
 | 19 | `games/likemario` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
@@ -136,7 +136,7 @@ Peripherals:   pads / mouse / scope
 13  memory/save_game
 14  input/controller (pad 2)
 15  memory/hirom_demo
-16  chips/dsp1_cube
+16  mode7/dsp1_ground
 17  chips/sa1_starfield
 18  chips/superfx_3d
 19  games/likemario

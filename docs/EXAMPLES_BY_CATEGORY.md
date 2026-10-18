@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 67 examples organized by topic. For a progressive learning path, see
+All 66 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -225,7 +225,6 @@ matrix, vector and projection ops for pseudo-3D (Pilotwings, Super Mario Kart).
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_chips_dsp1_cube | Pseudo-3D: a cube's 8 corners tumbling in 3D, rotated by the DSP-1 |
 
 ---
 

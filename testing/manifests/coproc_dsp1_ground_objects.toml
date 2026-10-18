@@ -1,0 +1,29 @@
+# mode7/dsp1_ground, the objects (chips/dsp1_cube merged into it on
+# 2026-10-18; this replaces coproc_dsp1.toml, migrated from probes/coproc.py).
+# Firmware gate: SKIPs where dsp1b.rom is not installed (CI).
+#
+# dsp1IsPresent()'s known-answer result (1 = the chip answered Multiply
+# 0.5*0.5 == 0.25) guards the DR/SR handshake. `shown` counts the sprites the
+# last placement pass put on screen: the cube's eight corners (dsp1Attitude,
+# dsp1Objective, then dsp1Project) and the four beacons (dsp1Project) —
+# twelve from the spawn point. Driving forward 80 frames (320 units) takes
+# the camera past them all: every projected point is then behind the eye or
+# below the screen, and `shown` drops to 0. Measured with
+# `luna state --until-frame N --input 60:0x0800 --peek shown:#2`.
+rom = "../../examples/mode7/dsp1_ground/dsp1_ground.sfc"
+firmware = "dsp1b.rom"
+
+[[checkpoint]]                  # the spawn: all twelve on screen
+at_frame = 60
+[checkpoint.values]
+dsp1_ok = { eq = 1, width = 2 }
+shown   = { eq = 12, width = 2 }
+
+[[checkpoint]]                  # UP held: past every object
+at_frame = 140
+input = "60:0x0800"
+[checkpoint.values]
+shown   = { eq = 0, width = 2 }
+
+[asserts.trace]
+dsp1 = { min = 1 }

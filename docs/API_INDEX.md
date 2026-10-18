@@ -98,7 +98,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 
 | I want to… | Use | Module | Notes |
 |---|---|---|---|
-| rotate + project points in 3D | `dsp1Attitude`, `dsp1Objective`, `dsp1Project` (setup: `dsp1SetCamera`) | `dsp1` | [chips/dsp1_cube](../examples/chips/dsp1_cube/) — needs `USE_DSP1 := 1` |
+| rotate + project points in 3D | `dsp1Attitude`, `dsp1Objective`, `dsp1Project` (setup: `dsp1SetCamera`) | `dsp1` | [mode7/dsp1_ground](../examples/mode7/dsp1_ground/) — needs `USE_DSP1 := 1` |
 | true 3D distance / sphere test | `dsp1Distance`, `dsp1Range` | `dsp1` | hardware sqrt — collision, LOD, homing |
 | sin/cos scaled by a radius | `dsp1Triangle` | `dsp1` | 16-bit angles (full turn = 2^16) |
 | check the chip is there | `dsp1IsPresent` | `dsp1` | known-answer probe, never hangs |

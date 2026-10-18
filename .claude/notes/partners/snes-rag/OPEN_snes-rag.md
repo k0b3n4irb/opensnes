@@ -71,3 +71,24 @@ v1.37.0. The request of `2026-10-10_to_snes-rag_apres-mise-a-jour-luna-docs.md`
 earlier index, as that report had allowed for. Golden query to add at each
 luna pin: "per-window shift --max-shift" must return a passage that names
 `--max-shift`.
+
+## 2026-10-18 — DSP-1 Project ($06): the sign of H and V, and M behind the eye
+
+- **Asked:** `snes_search("DSP-1 Project command $06 output H V M screen
+  coordinates sign direction: is V positive downward or upward",
+  exclude_sources=["opensnes-docs","opensnes-notes-tech"])`.
+- **Came back:** the arbiter (fullsnes, chunk 919f1a3794274d16) lists the
+  command, not the signs; the only statement is bsnes's dsp1emu.cpp, a
+  non-arbiter (chunks 46a9b364d25aec8e, 260268a3e4ac05ef): "H is positive
+  rightward, but V is positive downward", for Target and Project.
+- **Measured (a fact no arbiter states):** luna v1.39.0, DSP-1B firmware
+  (LLE), camera x 512 y 512 z 80, lfe 96, les 256, aas 0, azs $4000-655.
+  Project(Cx, Cy, 0) = H 0, V 29, M 135; the same point raised 40 = V 8;
+  (Cx+50, Cy-100, 0) = H 21, V 21, M 112. So H right-positive, V
+  down-positive (relative to the screen centre), aas 0 looks along −Y.
+  A point behind the eye comes back with M < 0 (−3 measured) and H, V
+  mirrored. Provenance: `.claude/notes/tech/dsp1_reference.md` §6b, the
+  ROM `examples/mode7/dsp1_ground` (commit of 2026-10-18).
+- **Needed:** a passage the corpus can serve for "which way is V in DSP-1
+  Project", with that provenance and status (measured on the firmware,
+  agreeing with bsnes's HLE).

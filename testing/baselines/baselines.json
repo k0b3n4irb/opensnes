@@ -113,18 +113,6 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "8a8a0dddaecad6a630ce90b781f178b496721d58de260cc6bb55499544817039"
   },
-  "chips_dsp1_cube": {
-    "fbhash": [
-      "5f5c59d382d18d25",
-      "6a68e5d1861d3925"
-    ],
-    "frames": [
-      200,
-      400
-    ],
-    "luna_version": "v1.36.0",
-    "rom_sha256": "e205aca14860545bba6cc34380c8a3972fcb22f76b44d6f93f76afb8fccab31c"
-  },
   "chips_sa1_hello": {
     "fbhash": "7aee1820d6cdfed5",
     "frames": 200,
@@ -354,10 +342,16 @@
     "rom_sha256": "14308b0c2187edac0d5ca053ee4e3fe6e92f27bdb3afbd0a22e03712fe019043"
   },
   "mode7_dsp1_ground": {
-    "fbhash": "9e22aec0c77399cd",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "953754f983966247db63db8a6540b11532a0c759bbf05256a6785ed5ba43547c"
+    "fbhash": [
+      "f9ca9f9be259bc9d",
+      "7f889749d99bb0f7"
+    ],
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.39.0",
+    "rom_sha256": "43dd09542426e58bafa2454dd74583840599799533a2e799bcafbff56041b535"
   },
   "mode7_extbg": {
     "fbhash": [

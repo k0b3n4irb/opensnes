@@ -18,21 +18,33 @@
  * ground point is under the screen centre (they go to M7X/M7Y), and the
  * Mode 7 scroll registers just pin that centre to the middle of the screen.
  *
+ * Objects in that world are the other half of the chip: four beacons stand on
+ * the esplanade and a wireframe cube (its eight corners) tumbles above it.
+ * dsp1Attitude + dsp1Objective rotate the cube's corners, and dsp1Project,
+ * with the same camera, turns every world point into a screen position —
+ * so the sprites stay glued to the ground as it turns and slides past. (The
+ * cube was the chips/dsp1_cube example.)
+ *
  * @par SNES Concepts
  * - DSP-1 Raster: open-ended command streaming Mode 7 matrices per raster
  * - Parameter outputs (Vof, Vva, Cx, Cy) driving M7X/M7Y and the HDMA split
  * - HDMA_MODE_2REG_2X repeat blocks feeding M7A/M7B and M7C/M7D
  * - Double-buffered HDMA tables swapped with hdmaSetTable in VBlank
  * - dsp1Triangle as the movement sin/cos
+ * - dsp1Attitude / dsp1Objective: rotating a model's points
+ * - dsp1Project: world point -> screen (H right-positive, V down-positive,
+ *   relative to the screen centre; measured on luna's firmware), M the scale
  *
  * @par What to Observe
  * - A textured ground plane receding to a horizon under a sky
  * - D-pad Left/Right turn the camera: the floor rotates in true perspective
  *   and the sky pans with the heading (one turn = the 512-px sky map)
  * - D-pad Up/Down drive forward/backward along the heading
+ * - Four beacons and a tumbling cube that stay put on the ground while the
+ *   view turns and moves; past the horizon or behind you they disappear
  *
  * @par Modules Used
- * console, dma, background, input, mode7, hdma, dsp1
+ * console, dma, background, input, mode7, hdma, sprite, dsp1
  *
  * @warning Needs the DSP-1 firmware in luna (dsp1b.rom) — see the README.
  * @see snes/dsp1.h, docs/tutorials/dsp1.md, examples/mode7/perspective
@@ -65,6 +77,16 @@
 #define TURN_STEP    0x0100
 /** @brief Forward speed in ground units per frame. */
 #define MOVE_STEP    4
+
+/** @brief VRAM word address of the sprite tile (the Mode 7 ground takes $0000-$3FFF, the sky $4000-$5FFF). */
+#define OBJ_VRAM     0x6000
+/** @brief The cube: world position of its centre and its half-size. */
+#define CUBE_X       512
+#define CUBE_Y       352
+#define CUBE_Z       40
+#define CUBE_HALF    20
+/** @brief Sprites: 8 cube corners (0-7), then the beacons (8-11). */
+#define NUM_BEACONS  4
 
 /** @brief Largest HDMA repeat block (7-bit count). The ground uses one. */
 #define GROUND_MAX   127
@@ -106,6 +128,74 @@ static u8 back;
 volatile u16 dsp1_ok = 0;
 /** @brief Rasters streamed in the last dsp1Raster call (luna manifest asserts it). */
 volatile u16 raster_lines = 0;
+
+/** @brief 8x8 4bpp tile, colour 1 everywhere (planes 0/1 interleave per row: plane 0 = even bytes). */
+static const u8 dot_tile[32] = {
+    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
+    0xFF,0x00, 0xFF,0x00, 0xFF,0x00, 0xFF,0x00,
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+};
+/** @brief OBJ palettes 0 and 1: colour 1 = neon cyan (the cube), then magenta
+ *  (the beacons). The ground uses CGRAM 0-33 only, so 128 and up are free. */
+static const u8 dot_pal[64] = {
+    0x00,0x00, 0xE0,0x7F, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,
+    0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,
+    0x00,0x00, 0x1F,0x7C, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,
+    0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,
+};
+/** @brief The cube's corners around its centre (model space). */
+static const s16 cube[8][3] = {
+    {-CUBE_HALF,-CUBE_HALF,-CUBE_HALF}, { CUBE_HALF,-CUBE_HALF,-CUBE_HALF},
+    { CUBE_HALF, CUBE_HALF,-CUBE_HALF}, {-CUBE_HALF, CUBE_HALF,-CUBE_HALF},
+    {-CUBE_HALF,-CUBE_HALF, CUBE_HALF}, { CUBE_HALF,-CUBE_HALF, CUBE_HALF},
+    { CUBE_HALF, CUBE_HALF, CUBE_HALF}, {-CUBE_HALF, CUBE_HALF, CUBE_HALF},
+};
+/** @brief The beacons: four points on the ground around the cube. */
+static const s16 beacon[NUM_BEACONS][2] = {
+    {472, 312}, {552, 312}, {472, 392}, {552, 392},
+};
+/** @brief The cube's two rotation angles (16-bit, 2^16 = 360 degrees). */
+static u16 cube_az, cube_ay;
+/** @brief Sprites on screen after the last placement pass (luna manifest asserts it). */
+u16 shown;
+
+/**
+ * @brief Place sprite @p id at world point (x, y, z), or hide it.
+ *
+ * dsp1Project gives H and V relative to the screen centre, H to the right
+ * and V downward, and M, the scale (here only its sign: a point behind the
+ * eye comes back with M <= 0). A point that lands above the horizon line,
+ * where the sky is drawn, or off screen, is hidden.
+ */
+static void placePoint(u8 id, s16 x, s16 y, s16 z, u8 pal) {
+    s16 sx, sy;
+    dsp1Project(x, y, z);
+    sx = (s16)(128 + dsp1_o0 - 4);      /* the 8x8 dot centred on the point */
+    sy = (s16)(112 + dsp1_o1 - 4);
+    if (dsp1_o2 <= 0 || sy < (s16)sky_lines || sy > 216 || sx < 0 || sx > 248) {
+        oamHide(id);
+        return;
+    }
+    oamSet(id, (u16)sx, (u16)sy, 0, pal, 3, 0);
+    shown++;
+}
+
+/** @brief Project the cube's corners and the beacons with the current camera. */
+static void placeObjects(void) {
+    u8 i;
+    shown = 0;
+    cube_az += 0x0140;
+    cube_ay += 0x00A0;
+    dsp1Attitude(0x7FFF, cube_az, cube_ay, 0);
+    for (i = 0; i < 8; i++) {
+        s16 ox, oy, oz;
+        dsp1Objective(cube[i][0], cube[i][1], cube[i][2]);
+        ox = dsp1_o0; oy = dsp1_o1; oz = dsp1_o2;   /* dsp1Project reuses the o-slots */
+        placePoint(i, (s16)(CUBE_X + ox), (s16)(CUBE_Y + oy), (s16)(CUBE_Z + oz), 0);
+    }
+    for (i = 0; i < NUM_BEACONS; i++)
+        placePoint((u8)(8 + i), beacon[i][0], beacon[i][1], 0, 1);
+}
 
 /**
  * @brief Build one matrix table skeleton: a sky entry holding the identity
@@ -177,8 +267,8 @@ int main(void) {
     tab_mode[0] = sky_lines; tab_mode[1] = 0x09;   /* Mode 3, BG1 16px (unused) */
     tab_mode[2] = 1;         tab_mode[3] = 0x07;   /* Mode 7 */
     tab_mode[4] = 0;
-    tab_tm[0] = sky_lines;   tab_tm[1] = 0x02;     /* BG2 = sky */
-    tab_tm[2] = 1;           tab_tm[3] = 0x01;     /* BG1 = ground */
+    tab_tm[0] = sky_lines;   tab_tm[1] = 0x12;     /* BG2 = sky, + OBJ */
+    tab_tm[2] = 1;           tab_tm[3] = 0x11;     /* BG1 = ground, + OBJ */
     tab_tm[4] = 0;
     tableInit(tab_ab[0], sky_lines, ground_lines, 0x0100);
     tableInit(tab_ab[1], sky_lines, ground_lines, 0x0100);
@@ -203,7 +293,11 @@ int main(void) {
      * D values the chip streams are slopes relative to that line. */
     mode7SetCenter(cx, cy);
     mode7SetScroll(cx - 128, cy - (112 + vof));
-    setMainScreen(LAYER_BG1);   /* the TM HDMA takes over per line */
+    /* The sprites: one dot tile at $6000 (OBJSEL's base), palettes 0 and 1 */
+    oamInitGfxSet(dot_tile, sizeof dot_tile, dot_pal, sizeof dot_pal,
+                  0, OBJ_VRAM, OBJ_SIZE8_L16);
+    placeObjects();
+    setMainScreen(LAYER_BG1 | LAYER_OBJ);   /* the TM HDMA takes over per line */
     setScreenOn();
 
     while (1) {
@@ -224,6 +318,8 @@ int main(void) {
         cameraUpdate();
         dsp1Raster(&tab_ab[back][TABLE_HDR], &tab_cd[back][TABLE_HDR], vva + 2, ground_lines);
         raster_lines = ground_lines;
+        /* ...then the objects, with the camera dsp1SetCamera just set */
+        placeObjects();
 
         WaitForVBlank();
         /* VBlank: swap tables (takes effect at the next HDMA init) and move

@@ -25,12 +25,12 @@ The table below counts them per folder.
 | [windows/](windows/) | 2 | Hardware window masking, shaped per scanline |
 | [transitions/](transitions/) | 1 | Screen transitions: fades and the mosaic dissolve |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
-| [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG |
+| [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground and objects, EXTBG |
 | [input/](input/) | 3 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 5 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 1 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
-| [chips/](chips/) | 8 | Enhancement chips: SA-1, SuperFX/GSU and DSP-1 coprocessors |
+| [chips/](chips/) | 7 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
 | [games/](games/) | 8 | Complete game projects (falling blocks, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
 
 ## Building

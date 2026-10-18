@@ -198,4 +198,4 @@ taught; read the one your game needs.
   plane), @ref examples_mode7_dsp1_ground (the DSP-1's projection).
 - **More sound** — @ref examples_audio_apu_switch,
   @ref examples_audio_speech_synth.
-- **More chips** — @ref examples_chips_dsp1_cube.
+- **More chips** — the DSP-1 is in Mode 7: @ref examples_mode7_dsp1_ground.
