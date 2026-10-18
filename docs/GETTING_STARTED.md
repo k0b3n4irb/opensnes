@@ -82,10 +82,11 @@ every ROM already built under `examples/bin/`).
 
 ### A4. Run Your First ROM
 
-Extract the examples archive next to the SDK and pick a ROM:
+Extract the examples archive next to the SDK: every ROM is in `examples/bin/`,
+next to the sources of its example (`examples/text/print_string/` for this one).
 
 ```bash
-cd opensnes-examples_<version>/examples/text/print_string
+cd opensnes-examples_<version>/examples/bin
 
 # Play it in luna's window (install it once from the SDK root: scripts/install-luna.sh)
 ~/opensnes/testing/bin/luna-gui print_string.sfc
@@ -194,11 +195,12 @@ my-snes-game/
 Projects can declare automated tests that run in **luna**, the same
 cycle-accurate emulator the SDK's own test suite uses, with luna's own
 manifests: one `test/<name>.toml` per test, run by `luna test`. Opt-in is
-simply the presence of a `test/*.toml` (the `game` template ships two):
+simply the presence of a `test/*.toml`. The `game` template ships these two
+(`rom` names the project's `TARGET`):
 
 ```toml
 # test/boot.toml — a visual baseline and WRAM values at frame 180
-rom = "../my-snes-game.sfc"
+rom = "../game.sfc"
 frames = 180
 
 [asserts]
@@ -207,20 +209,21 @@ fbhash = ""                       # the frame's hash; `make test-update` fills i
 [[checkpoint]]
 at_frame = 180
 [checkpoint.values]
-player_x = 120                    # by the variable's name in your C
-player_y = 100
+player_x = 112                    # by the variable's name in your C
+player_y = 96
 ```
 
 ```toml
 # test/walk_right.toml — hold RIGHT for 60 frames, then check the game state
-rom = "../my-snes-game.sfc"
+rom = "../game.sfc"
 frames = 150
 input = "30:0x100,90:0"           # "frame:buttons_hex" (RIGHT = 0x100), until frame 90
 
 [[checkpoint]]
 at_frame = 150
 [checkpoint.values]
-player_x = 180                    # 120 + 60
+player_x = 232                    # 112 + 60 frames x 2 pixels
+player_y = 96
 ```
 
 Workflow:

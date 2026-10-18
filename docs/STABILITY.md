@@ -68,8 +68,7 @@ version. A new module costs nothing to a project that does not link it.
 - A **bug fix that changes behaviour** (the hardware did not do what the
   function promised, or the function did not do what its header said) is
   not a break: the header is the contract, and the fix makes the code
-  meet it. `CHANGELOG.md` says what moved and `KNOWN_LIMITATIONS.md` keeps
-  the history of the hazard.
+  meet it. `CHANGELOG.md` says what moved and why.
 
 ## Where the line is drawn
 

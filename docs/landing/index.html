@@ -336,7 +336,7 @@
 <header class="bar">
   <div class="wrap row">
     <span class="brand"><span class="glyph" aria-hidden="true"></span>OpenSNES</span>
-    <span class="chip">v0.35.0</span>
+    <span class="chip">v0.50.0</span>
     <nav>
       <a class="navlink-hide" href="documentation.html">Docs</a>
       <a class="navlink-hide" href="examples.html">Examples</a>
@@ -362,9 +362,9 @@
           <a class="btn ghost" href="documentation.html">Browse the docs</a>
         </div>
         <div class="stats rise d5">
-          <div class="stat"><div class="n">83</div><div class="l">example ROMs</div></div>
-          <div class="stat"><div class="n">21</div><div class="l">API tutorials</div></div>
-          <div class="stat"><div class="n">7</div><div class="l">asset tools</div></div>
+          <div class="stat"><div class="n">85</div><div class="l">example ROMs</div></div>
+          <div class="stat"><div class="n">31</div><div class="l">tutorials</div></div>
+          <div class="stat"><div class="n">8</div><div class="l">asset tools</div></div>
           <div class="stat"><div class="n">3</div><div class="l">host OSes</div></div>
         </div>
       </div>
@@ -383,7 +383,7 @@
         <p class="eyebrow">The pipeline</p>
         <h2>From your art to a real cartridge.</h2>
         <p>The SNES does not eat PNGs, Tiled maps or WAV files — it eats tiles, BGR555
-          palettes and BRR samples. OpenSNES ships the converters that bridge the two,
+          palettes and BRR samples. OpenSNES ships the tools that bridge the two,
           and the build system chains them for you.</p>
       </div>
       <div class="pipe">
@@ -395,15 +395,16 @@
         <div class="arrow" aria-hidden="true">&rarr;</div>
         <div class="node center">
           <span class="k">the toolbox</span>
-          <h3 style="margin-bottom:12px">Seven converters</h3>
+          <h3 style="margin-bottom:12px">Eight asset tools</h3>
           <div class="tools-grid">
-            <span class="tool"><span class="dot" style="background:var(--sfc-blue)"></span>gfx4snes</span>
-            <span class="tool"><span class="dot" style="background:var(--sfc-blue)"></span>tmx2snes</span>
-            <span class="tool"><span class="dot" style="background:var(--sfc-green)"></span>img2snes</span>
-            <span class="tool"><span class="dot" style="background:var(--sfc-green)"></span>font2snes</span>
-            <span class="tool"><span class="dot" style="background:var(--sfc-yellow)"></span>wav2brr</span>
-            <span class="tool"><span class="dot" style="background:var(--sfc-yellow)"></span>smconv</span>
-            <span class="tool"><span class="dot" style="background:var(--sfc-red)"></span>palplan</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-blue)"></span>opensnes-tileset</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-blue)"></span>opensnes-sprite</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-blue)"></span>opensnes-level</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-green)"></span>opensnes-image</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-green)"></span>opensnes-text</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-yellow)"></span>opensnes-sample</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-yellow)"></span>opensnes-music</span>
+            <span class="tool"><span class="dot" style="background:var(--sfc-red)"></span>opensnes-palette</span>
             <span class="tool" style="opacity:.6"><span class="dot" style="background:var(--faint)"></span>&hellip;chained</span>
           </div>
         </div>
@@ -480,7 +481,7 @@
         <div class="pillar" style="--edge: var(--sfc-yellow)">
           <p class="eyebrow">Learn</p>
           <h3>Docs that build confidence</h3>
-          <p>83 worked examples on a guided learning path, 21 API tutorials, a game-craft track for
+          <p>85 worked examples on a guided learning path, 31 tutorials, a game-craft track for
             the design decisions, and a documented tool for every asset — so the hard parts are
             written down, not discovered at runtime.</p>
         </div>
@@ -552,7 +553,7 @@ CSRC        := main.c
   <div class="wrap">
     <div class="row">
       <span class="brand"><span class="glyph" aria-hidden="true"></span>OpenSNES</span>
-      <span class="chip mono" style="border:1px solid var(--line); border-radius:100px; padding:2px 9px; font-size:.72rem; color:var(--muted)">v0.35.0 &middot; MIT</span>
+      <span class="chip mono" style="border:1px solid var(--line); border-radius:100px; padding:2px 9px; font-size:.72rem; color:var(--muted)">v0.50.0 &middot; MIT</span>
       <nav>
         <a href="documentation.html">Documentation</a>
         <a href="getting_started.html">Getting started</a>

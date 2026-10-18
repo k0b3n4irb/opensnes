@@ -78,7 +78,7 @@ data carries the bank:
 - **Passed to a lib DMA/asset function — any bank.** `dmaCopyVram`,
   `dmaCopyCGram`, `dmaCopyVramMode7`, `lzssDecodeVram`, `mapLoad`, etc. take a
   4-byte pointer whose high byte is the real bank, and the asm reads it
-  (`dmaCopyVram` does `lda 11,s → sta.l $4304`, the DMA source-bank register).
+  (`dmaCopyVram` does `lda 10,s → sta.l $4304`, the DMA source-bank register).
 - **Dereferenced in C (`tab[i]`, `*p`, `p->field`) — any bank.** A read
   through a `const` pointee is compiled with far addressing:
   `lda.l sym`, `lda.l sym,x` or `[tcc__r9]`.
@@ -160,7 +160,7 @@ luna); it runs at 128.
 
 **Mitigation:** put the CGRAM DMA in H-blank and measure the window on
 luna after any change to the handler — a lenient emulator does not show
-the corruption. `dmaCopyCGram()` / `setPalette*()` from
+the corruption. `dmaCopyCGram()` / `setColor()` from
 the main loop are safe: they run in VBlank or forced blank.
 
 ### 🟡 An HDMA to INIDISP: write it through `$21FF`, and blank with `$8F`
@@ -422,15 +422,15 @@ CGRAM are BG palettes (palettes 0-7); sprite palettes start at offset 128
 for sprites.
 
 **Mitigation:** use `OBJ_CGRAM_BASE` (= 128) and the `OBJ_CGRAM_PAL(n)` helper
-defined in `lib/include/snes/sprite.h`. The naming convention separates BG
-(`PAL_n`) from OBJ (`OBJ_PAL_n`) palettes.
+defined in `lib/include/snes/sprite.h` for the CGRAM address, and
+`OBJ_PAL(n)` for the palette number in a sprite's attributes.
 
 ---
 
 ### 🟡 Struct parameters and struct returns by value are refused; a FAR struct is copied field by field
 cc65816 has no lowering for a struct passed or returned by value (QBE
 `parc` / `argc`). Whole-struct assignment (`a = b;`) works for objects in
-bank $00 or in ROM read through a pointer; a copy from or to a `FAR` struct
+bank $00 or in ROM, named or read through a pointer; a copy from or to a `FAR` struct
 or array is refused — "copy field by field". The build stops with
 `cc65816/qbe: unhandled IR op N (parc) … struct parameters and struct
 returns by value are not supported on w65816; pass a pointer` — it never

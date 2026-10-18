@@ -158,7 +158,7 @@ Write game logic in C, produce .sfc ROMs that run on emulators or real hardware.
 ## Acknowledgments
 
 OpenSNES is built upon [PVSnesLib](https://github.com/alekmaul/pvsneslib) by **Alekmaul** and contributors.
-We owe them an enormous debt of gratitude for the hardware library, SNESMOD audio engine, asset tools, and decades of SNES development knowledge.
+We owe them an enormous debt of gratitude for the hardware library, the integration of Mukunda Johnson's SNESMOD audio engine, the asset tools, and decades of SNES development knowledge.
 
 For the full list of dependencies, licenses, and contributors, see [ATTRIBUTION.md](https://github.com/k0b3n4irb/opensnes/blob/develop/ATTRIBUTION.md).
 

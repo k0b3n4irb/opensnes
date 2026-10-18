@@ -324,6 +324,7 @@ If it's in ROM ($8000+), you can't write to it.
 
 ```bash
 # The post-link checks: bank $00, the RAM bands, bank-blind reads
+# (on game.sym when the build refused the ROM: a refused .sfc is deleted)
 opensnes-rom check game.sfc
 
 # What the game uses of ROM, RAM, VRAM and CGRAM

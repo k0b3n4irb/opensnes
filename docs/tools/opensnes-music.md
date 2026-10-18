@@ -94,8 +94,12 @@ Nothing is written. The figure is the one that decides whether a song
 fits. The driver loads the module at `$1A00` (its patterns, instruments
 and sample table) and the module's BRR samples right after it; the echo
 buffer sits under `$FF00` and takes 2 KB per step of the module's echo
-delay (`edl` in its `[[SNESMOD]]` message). So a module has 58 368 bytes
-without echo, and 2 048 fewer per step: 29 952 for the `edl 14` above.
+delay (`edl` in its `[[SNESMOD]]` message): with echo it starts at page
+`$FF - 8 * edl`. So a module has 58 368 bytes without echo and
+58 624 - 2 048 * edl with it: 29 952 for the `edl 14` above.
+The `MOD_<NAME>_SIZE` constant of the soundbank's `.h` is another figure,
+kept as smconv wrote it (it counts the echo and leaves out the module's
+tables); the one that decides whether a song fits is this one.
 Samples shared between modules of one bank are stored once in the bank
 (`BRR sources` counts them); in the SPC700's RAM each module holds its own.
 

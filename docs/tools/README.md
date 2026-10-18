@@ -42,7 +42,7 @@ you tried by hand.
 | @subpage tools_opensnes_music | Impulse Tracker `.it` modules | a SNESMOD soundbank; a standalone `.spc` |
 | @subpage tools_opensnes_rom | a linked ROM | the post-link checks, its header, its budget |
 | @subpage tools_opensnes_save | a ROM or a `.srm` | a battery save file, read or patched |
-| @subpage tools_opensnes | your project | `init`, `build`, `run`, `test`, `budget`, `release`, `doctor` |
+| @subpage tools_opensnes | your project | `init`, `build`, `clean`, `run`, `test`, `budget`, `release`, `doctor`, `upgrade` |
 
 Every tool follows one contract — subcommands, long options, `--help`,
 `--json`, `inspect`, the same exit codes: @subpage tools_conventions.

@@ -1,6 +1,7 @@
 # Measured frame costs of the library {#perf}
 What the library functions cost per frame in real scenes, measured on luna
-(cycle-accurate) with OpenSNES 0.49.
+(cycle-accurate) with OpenSNES 0.49; the call-for-call table against
+PVSnesLib (@ref perf-libbench) is measured again with `make bench-lib`.
 `PHILOSOPHY.md` asks every API with a cost to say it; this page is the
 measured side of that promise, and `docs/BENCHMARK.md` the compiler side.
 
@@ -53,8 +54,8 @@ above 300 mclk per frame.
 ## Reading it
 
 - **`NmiHandler`** is the fixed price of a frame: 5,650-8,170 mclk (1.6-2.3 %
-  of the frame, 11-16 % of the VBlank). The OAM upload it does every frame
-  is 544 bytes of DMA, at 8 mclk per byte (anomie's timing doc: "DMA takes
+  of the frame, 11-16 % of the VBlank). The OAM upload it does on a frame
+  where a sprite changed is up to 544 bytes of DMA, at 8 mclk per byte (anomie's timing doc: "DMA takes
   8 master cycles per byte transferred") about 4,350 of those; the
   17th-bit pad read is about 380 more.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about

@@ -1,8 +1,7 @@
 # The opensnes-* tools: conventions {#tools_conventions}
 
 The `opensnes-*` family replaces the earlier converters (`gfx4snes`, `smconv`, `wav2brr`,
-`tmx2snes`, `font2snes`, `img2snes`, `palplan`, `aseprite2snes`,
-`sa1_patch`) with a family of tools written for a studio shipping a game:
+`tmx2snes`, `font2snes`, `img2snes`, `palplan`, `aseprite2snes`) with a family of tools written for a studio shipping a game:
 **one tool per function, the same conventions everywhere, settings that
 live beside the asset, no interpreter to install**. This page is the
 contract every tool in the family follows; a tool that does not is a bug.
@@ -19,11 +18,11 @@ The earlier tools (gfx4snes, smconv, font2snes…) are no longer shipped;
 | `opensnes-tileset` | PNG → tileset and tilemap, deduplicated, with per-tile palettes and flips |
 | `opensnes-level` | Tiled (later LDtk) → map, objects, collision |
 | `opensnes-text` | bitmap font → text tiles (string tables, per language: after 1.0) |
-| `opensnes-palette` | plan a project's palettes into CGRAM; quantize RGB art; preview |
+| `opensnes-palette` | plan a project's palettes into CGRAM; quantize RGB art |
 | `opensnes-image` | full-screen pictures: HiColor; the Mode 7 perspective tables (Mode 7 pictures are `opensnes-tileset --mode 7`) |
 | `opensnes-sample` | WAV → BRR |
 | `opensnes-music` | Impulse Tracker → soundbank, with the samples it shares |
-| `opensnes-rom` | finalize and check a ROM: header, size, mapper, checksum, the post-link checks, the credits |
+| `opensnes-rom` | check a ROM: the post-link checks, the header and checksum, what the game uses of the console |
 | `opensnes-save` | battery save files (`.srm`): create, read, patch, compare (verifying a save format: with the one planned for 1.1) |
 
 luna is not in the family: it is the emulator, debugger and test runner
@@ -39,7 +38,7 @@ opensnes-<tool> <subcommand> --help
 ```
 
 - **Subcommands are nouns or plain verbs**, one per thing the tool does:
-  `opensnes-sprite sheet`, `opensnes-sprite aseprite`, `opensnes-music
+  `opensnes-sprite sheet`, `opensnes-sprite anim`, `opensnes-music
   bank`, `opensnes-rom check`. Every tool has `inspect`, which prints what
   a file holds and what it costs (bytes, VRAM words, CGRAM entries, ARAM)
   without converting anything.
@@ -83,11 +82,10 @@ never opens the Makefile.
 
 ```toml
 tool = "opensnes-sprite"
-[sprite]
-size = 32          # 8, 16, 32 or 64
+[sheet]
+size = 32             # 8, 16, 32 or 64
 bpp = 4
-palette = "shared" # a .pal, a palette name from opensnes-palette, or "own"
-clips = "tags"     # Aseprite tags become animation clips
+palette = "hero.pal"  # a fixed palette beside the picture; leave it out to take the picture's
 ```
 
 **A composed asset** — a soundbank made of several modules, a string
@@ -124,9 +122,11 @@ back to a default.
   every OS. That is what makes the golden suites meaningful and the build
   reproducible. No timestamps, no paths, no host names inside an output.
 - **Named after the asset**, in `--out` (default: beside the input):
-  `hero.png` gives `hero.tiles`, `hero.pal`, `hero.meta`, `hero.clips`,
-  and a `hero.h` declaring every symbol with its size. The build includes
-  the `.h`; the game never hard-codes a size.
+  `opensnes-sprite sheet hero.png` gives `hero.pic` (the tiles),
+  `hero.pal`, `hero_meta.inc` (the metasprite table), `hero.inc` declaring
+  every symbol with its end, and `hero_data.as` (the fragment the build
+  assembles); `opensnes-sprite anim` adds `hero_anim.h`. The game includes
+  the `.inc`; it never hard-codes a size.
 - **Listed in `--json`** so a build can depend on exactly what was
   produced.
 

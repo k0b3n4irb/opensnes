@@ -33,11 +33,12 @@ Then point this project at it and build:
 make OPENSNES=/path/to/opensnes      # or edit the OPENSNES line in the Makefile
 ```
 
-That produces `game.sfc`. Run it in any SNES emulator, or with the SDK's
-bundled emulator:
+That produces `game.sfc`. Run it in any SNES emulator, or let the SDK build
+and open it (luna's window if it is installed, otherwise the first of Mesen,
+bsnes or snes9x it finds):
 
 ```sh
-/path/to/opensnes/testing/bin/luna run game.sfc
+opensnes run
 ```
 
 > If you copied this directory *while it was still inside the SDK repo*, the
@@ -53,6 +54,7 @@ starter/
   res/player.png.toml  how it is converted (opensnes-sprite: block size, colours);
                        the build runs the tool and links the result for you
   Makefile      TARGET, ROM_NAME, LIB_MODULES, OPENSNES path
+  test/         two luna tests (boot.toml, walk_right.toml): make test
   .github/workflows/build.yml   CI that builds your ROM on every push
 ```
 
@@ -64,9 +66,10 @@ the **game loop** — labelled in the file. To go further:
 - **Add graphics** — drop a `.png` in `res/` with a `.png.toml` beside it
   (copy `player.png.toml`); the build converts it and links the tiles, and
   `res/<name>.inc` declares the symbols (`<name>_tiles`, `<name>_pal`) and a ready `GfxAsset`.
-- **Add sound** — drop a `.wav` in `res/` and `.incbin` its `.brr`; it converts
-  automatically (see the SDK's audio tutorial).
-- **Add layers, text, scrolling, more** — the SDK ships **82 examples** and a
+- **Add sound** — drop a `.wav` in `res/` with a `.wav.toml` beside it
+  (`tool = "opensnes-sample"` and an `[encode]` table); the build converts it
+  to BRR and `res/<name>.h` declares it (see the SDK's audio tutorial).
+- **Add layers, text, scrolling, more** — the SDK ships **85 examples** and a
   set of [tutorials](https://github.com/k0b3n4irb/opensnes/tree/main/docs) plus
   game-craft guides (budgeting, choosing a background mode, composing layers).
   Add the module you need to `LIB_MODULES` and follow the matching example.

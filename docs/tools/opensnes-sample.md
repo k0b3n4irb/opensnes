@@ -3,9 +3,8 @@
 The first tool of the `opensnes-*` family (@ref tools_conventions). It turns a PCM
 `.wav` — a jump, a hit, a UI blip, a voice clip — into the `.brr` the SNES
 DSP plays, plus a header with its sizes, and it tells you what a sample
-costs before you commit to it. The encoder is the one `smconv` bakes into
-soundbanks and the one `wav2brr` used: a `.brr` from here is byte for byte
-what `wav2brr` wrote.
+costs before you commit to it. The encoder is the one `opensnes-music`
+bakes into soundbanks.
 
 ## Encode
 
@@ -22,9 +21,11 @@ file said, so a 44.1 kHz source comes out lower and slower (the tool warns
 and says by how much).
 
 **Out:** `jump.brr` (raw BRR, one 9-byte block per 16 samples, loop and end
-flags set) and `jump.h`:
+flags set), `jump_data.as` (the fragment the build assembles: the `.brr` in
+an `ASSET_SECTION`, between `jump_brr` and `jump_brr_end`) and `jump.h`:
 
 ```c
+extern u8 jump_brr[], jump_brr_end[];
 #define jump_brr_size 1035   /* bytes: 115 BRR blocks of 16 samples */
 #define jump_brr_loop 0      /* byte offset of the loop point; 0 with no loop */
 #define jump_brr_loops 0     /* 1 = the sample loops */
@@ -48,22 +49,21 @@ A loop that does not start on a block boundary is preceded by silence so
 that it does. `_brr_loop` is the byte offset the loop comes back to; 0
 means "from the start", not "no loop": `_brr_loops` says whether it loops.
 
-Bake the `.brr` into the ROM and load it with the sizes from the header:
-
-```asm
-ASSET_SECTION "samples"
-jump_brr:  .incbin "res/jump.brr"
-.ENDS
-```
+**In a project**, put the settings beside the sound — `res/jump.wav.toml`
+with `tool = "opensnes-sample"` and an `[encode]` table, which `--save`
+writes for you — and the build converts it and links `jump_data.as`: there
+is no assembly to write. Load the sample with the sizes from the header:
 
 ```c
 #include "res/jump.h"
-extern u8 jump_brr[];
 audioLoadSample(0, jump_brr, jump_brr_size, jump_brr_loop);
 audioPlaySample(0);
 ```
 
-`examples/audio/soundboard` is the worked example, @ref tutorial_audio_samples the
+Without a settings file, `.incbin` the `.brr` yourself in an
+`ASSET_SECTION` under the label `jump_brr`.
+
+`examples/audio/sfx_from_wav` is the worked example, @ref tutorial_audio_samples the
 tutorial.
 
 ## Settings beside the asset

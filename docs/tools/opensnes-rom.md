@@ -14,8 +14,10 @@ opensnes-rom check game.sfc --bank0-fail 0 --ram-fail 512    # what make/common.
 opensnes-rom check game.sfc --json
 ```
 
-Six checks, in this order; the build fails on the first four kinds of
-failure, the others are information:
+Seven checks, in this order; every one but the asset line can fail the
+build. A ROM the build's check refuses is deleted, so that a second `make`
+does not take it for up to date: run `opensnes-rom check` on its `.sym`,
+which stays.
 
 | Check | What it refuses | Why it is silent on hardware |
 |---|---|---|

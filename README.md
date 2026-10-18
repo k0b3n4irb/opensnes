@@ -72,7 +72,7 @@ Two honest expectations before you start:
   the SDK. The difference here is that you can learn it incrementally, in C, with
   a worked example for each step.
 - **The SDK is late beta.** The test suite is green and CI is enforced on three
-  platforms, but several optimisations and chip APIs are still planned (see the
+  platforms, but several optimisations are still planned (see the
   [roadmap](ROADMAP.md)). It's a great place to learn and build; pin a commit if
   you need a frozen toolchain for a hard deadline.
 
@@ -90,7 +90,7 @@ values) — required reading before porting any function from PVSnesLib.
 | **LoROM** | Stable | Default. Production-ready. |
 | **HiROM** | Stable | Set `USE_HIROM := 1` in your Makefile. |
 | **FastROM** | Stable | Set `USE_FASTROM := 1`. Adds ~33 % CPU bandwidth. |
-| **SA-1** | Experimental | C wrapper is minimal; coprocessor code lives in a per-example `sa1_boot.asm`. SIWP/CIWP write-protect polarity settled against three references (see `KNOWN_LIMITATIONS.md`). |
+| **SA-1** | Experimental | C wrapper is minimal; the coprocessor runs `templates/sa1_boot.asm` unless an example brings its own `sa1_boot.asm`. SIWP/CIWP write-protect polarity settled against three references (see `KNOWN_LIMITATIONS.md`). |
 | **SuperFX** | Experimental | GSU is assembly-only (no C compiler exists for the RISC ISA). **Validated by [luna](https://github.com/k0b3n4irb/luna)**, which detects and executes the GSU natively in the headless test harness. |
 
 ---
@@ -153,7 +153,7 @@ up the PNG→tiles asset pipeline and a build workflow out of the box.
 
 ## Examples
 
-88 examples — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games. The learning path is the route through them; the catalogue lists every one by topic.
+85 examples — backgrounds, sprites, scrolling, HDMA effects, audio, input, save games, and complete games. The learning path is the route through them; the catalogue lists every one by topic.
 
 **[Learning path](https://k0b3n4irb.github.io/opensnes/learning_path.html)** · **[Examples by category](https://k0b3n4irb.github.io/opensnes/examples_by_category.html)** · **[All the documentation](docs/README.md)**
 

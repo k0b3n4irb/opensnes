@@ -19,7 +19,7 @@ no `printf` in core lib, no mandatory framework lifecycle).
 ```bash
 make                    # Build everything: compiler → tools → library → examples
 make compiler           # Build cc65816 (cproc+QBE) and WLA-DX assembler/linker
-make tools              # Build gfx4snes, font2snes, smconv
+make tools              # Build the opensnes-* tools (tileset, sprite, music, rom…)
 make lib                # Build OpenSNES library (LoROM + HiROM + SA-1 + SuperFX)
 make examples           # Build all example ROMs
 make clean              # Clean all build artifacts
@@ -64,7 +64,7 @@ The `bin/cc65816` driver (compiled, `compiler/cc65816/`) orchestrates cproc→QB
 - **lib/** — Hardware library. C sources in `lib/source/*.c`, ASM in `lib/source/*.asm`, headers in `lib/include/snes/`. Built as separate LoROM, HiROM, SA-1, and SuperFX object sets.
 - **templates/** — ROM bootstrap: `crt0.asm` (startup + NMI handler), `hdr*.asm` (ROM headers), `runtime.asm` (math routines, now in lib/source/), `memmap*.inc` (memory maps). These are the single source of truth — examples don't duplicate them.
 - **make/common.mk** — Universal build rules included by every example. Handles graphics conversion, multi-file C compilation, SNESMOD audio, SA-1/SuperFX/HiROM mode selection, module linking.
-- **tools/** — `gfx4snes` (PNG→SNES tiles), `smconv` (IT→SPC700), and the other asset converters (shipped)
+- **tools/** — the `opensnes-*` tools (shipped): `opensnes-tileset`/`-sprite` (PNG→SNES tiles), `opensnes-music` (IT→SPC700), and the other asset tools; the converters' code lives in `tools/lib/`
 - **examples/** — 85 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
 
 ### Enhancement Chip Support

@@ -29,7 +29,7 @@ of the library not written in camelCase, and it will not be renamed.
 | `int` | 2 bytes | 2 bytes | Same |
 | `long` | 4 bytes | 4 bytes | Same |
 | Modules | linked wholesale | **opt-in** `LIB_MODULES` | Link errors until you list what you use |
-| Text output | `consoleDrawText` | `textPrintAt` + `textFlush` | Nothing appears without the flush |
+| Text output | `consoleDrawText` | `textPrintAt` | The NMI sends what the `text*` calls wrote, on the next VBlank |
 | Vertical scroll | raw value to the register | lib subtracts 1 for you | Everything is one line off |
 | Const data | wherever it lands | asset banks, far reads | A cast away from `const` reads garbage |
 | Bulk RAM | plain globals | plain under `$2000`, else `FAR` | A big buffer silently wrong-banked |
@@ -129,7 +129,7 @@ need output to the host rather than the screen.
 | PVSnesLib | OpenSNES | Note |
 |---|---|---|
 | `consoleInit()` | `consoleInit()` | Same |
-| `consoleDrawText(x, y, s)` | `textPrintAt(x, y, s)` then `textFlush()` | The flush is what uploads the tilemap |
+| `consoleDrawText(x, y, s)` | `textPrintAt(x, y, s)` | The NMI uploads the bytes written; `textFlush()` is only for a direct write to `tilemapBuffer` |
 | `consoleSetTextVramBGAdr` etc. | `textInit`, `textLoadFont`, `textModeInit` | Split into explicit steps |
 | `oamSet(...)` | `oamSet(id, x, y, tile, palette, priority, flags)` | Seven arguments; check the order |
 | `oamSetEx`, `oamSetVisible` | `oamSetSize`, `oamHide`, `oamSetXY` | Split by concern |
@@ -139,7 +139,7 @@ need output to the host rather than the screen.
 | `spcProcess()` | `snesmodProcess()` | Call once per frame |
 | `padsCurrent(pad)` | `padHeld(pad)` | Also `padPressed`, `padReleased` |
 | `rand()`, `srand(s)` | `rngNext()`, `rngSeed(s)` | Not libc's: 1-65535, a 16-bit LFSR. The libc names went at 0.49 |
-| `LzssDecodeVram(s, a)` | `lzssDecodeVram(s, a)` | Lower-case `l`; the old spelling is deprecated |
+| `LzssDecodeVram(s, a)` | `lzssDecodeVram(s, a)` | Lower-case `l`; the old spelling is removed |
 | `hdmaEnable(1 << ch)` | `hdmaEnable(ch)`, or `hdmaEnableMask(1 << ch)` for several | A channel number since 0.49, like the other `hdma*` calls; a mask above 7 is refused — see @ref upgrading |
 | `oamDrawMeta(id, x, y, m, tile, pal, size)` | `oamDrawMetasprite(id, x, y, m, &style, 0)` | `tile`, `pal`, `size` are fields of a `static const MetaspriteStyle` |
 | `pvsneslibfont` | `textLoadFont()` with your own font | No implicit font |
@@ -162,8 +162,8 @@ has to write itself, and whether that is a decision or a gap.
 | `WaitNVBlank(n)` | a loop over `WaitForVBlank()` | **Decided.** One primitive |
 | `getFPScounter`, `showFPScounter` | `profileGetLagFrames`, `getFrameCount` | **Decided.** The library counts, the game displays |
 | `consoleCopySram*`, `consoleLoadSram*` | `sramSave`, `sramLoad`, `*Offset`, `sramChecksum` | Renamed, module `sram` |
-| `consoleRegionIsOK` | `getRegion()`, `isPAL()` | Renamed; `make test-pal` runs the corpus under PAL |
-| `consoleUpdate` | `textFlush()` | Renamed: the text module uploads on request, the NMI does not scan |
+| `consoleRegionIsOK` | `isPAL()` | Renamed; `make test-pal` runs the corpus under PAL |
+| `consoleUpdate` | — | Nothing to call: the NMI sends what the `text*` calls wrote |
 | `bgInitMapSet` | `bgSetMapPtr` + `dmaCopyVram` of the map | Split: VRAM address and upload are two steps |
 | `bgInitTileSetLz` | `lzssDecodeVram` + `bgSetGfxPtr` | Split |
 | `bgInitMapTileSet7`, `setMode7*`, `dmaCopyVram7` | module `mode7`: `mode7Init`, `mode7Rotate`, `mode7SetScale`, `mode7Transform`, `mode7SetScroll` | Renamed, own module |
@@ -185,13 +185,12 @@ has to write itself, and whether that is a decision or a gap.
 | `padsCurrent/Down/Up/Clear` | `padHeld`, `padPressed`, `padReleased` | Renamed |
 | `detectMouse`, `initMouse`, `mouseCycleSensitivity*` | `mouseInit`, `mouseIsConnected`, `mouseSetSensitivity` | Renamed |
 | `detectSuperScope` | `scopeInit`, `scopeIsConnected` | Renamed |
-| `detectMPlay5` | `padIsConnected(2..4)` | Renamed |
-| `spcPlaySound`, `spcPlaySoundV`, `spcLoadEffect`, `spcEffect`, `spcSetSound*` | `snesmodLoadEffect`, `snesmodPlayEffect` | Renamed; the sound table API is `snesmodSetSoundTable` |
+| `detectMPlay5` | — | **Not provided.** The multitap path cannot be switched on; pads 2 to 4 read 0 (`KNOWN_LIMITATIONS.md`) |
+| `spcPlaySound`, `spcPlaySoundV`, `spcLoadEffect`, `spcEffect`, `spcSetSound*` | `snesmodLoadEffect`, `snesmodPlayEffect` | Renamed |
 | `spcGetMusicPosition`, `spcFadeModuleVolume`, `spcPauseMusic`, `spcResumeMusic`, `spcStop`, `spcSetModuleVolume`, `spcSetBank` | the `snesmod*` names of the same words (`snesmodGetPosition`, `snesmodFadeVolume`, `snesmodPause`, `snesmodResume`, `snesmodStop`, `snesmodSetModuleVolume`, `snesmodSetSoundbank`) | Renamed |
 | `REG_*` aliases (`REG_A1B0`, `REG_APU00`, `REG_VMADDLH`, ...) | `snes/registers.h`: one name per register, the official mnemonics | Renamed |
 
-"Decided" means the library will not grow the function; "assumed" means it
-could, nobody asked yet — open an issue with the game that needs it.
+"Decided" means the library will not grow the function.
 
 ## Step 5 — assets
 
@@ -232,7 +231,7 @@ key is the option's name without the dashes:
 | `-M 7` | `--mode 7` | — |
 | `-e N`, `-c fixed.pal`, `-a` | `--palette-entry N`, `--palette fixed.pal`, `--rearrange` | `--palette-entry N`, `--palette fixed.pal`, — |
 | `-T -X W -Y H -P N` | — | `--metasprite W H --priority N` |
-| `-z`, `-k`, `-b`, `-d` | `--lz`, `--pack`, `--blank`, `--round` | `--lz`, `--pack`, `--blank`, `--round` |
+| `-z`, `-k`, `-b`, `-d` | `--lz`, `--pack`, `--blank`, `--round` | `--lz`, —, `--blank`, `--round` |
 | `-t png` / `-t bmp` | the input's extension | the input's extension |
 
 Maps exported from Tiled go through `opensnes-level`, Aseprite exports through

@@ -29,7 +29,7 @@ if (condition)
 
 | Element | Convention | Example |
 |---------|------------|---------|
-| Functions | snake_case | `sprite_init()` |
+| Functions | camelCase, the module first | `playerSpawn()`, as the SDK's `oamSet()` |
 | Variables | snake_case | `player_x` |
 | Constants | UPPER_CASE | `MAX_SPRITES` |
 | Types | PascalCase | `SpriteData` |
@@ -68,19 +68,19 @@ Use Doxygen-style comments:
  * @return TRUE on success, FALSE if id is invalid
  *
  * @code
- * if (sprite_init(0, 100, 50)) {
- *     sprite_set_tile(0, PLAYER_TILE);
+ * if (playerSpawn(0, 100, 50)) {
+ *     playerSetTile(0, PLAYER_TILE);
  * }
  * @endcode
  */
-u8 sprite_init(u8 id, u16 x, u8 y);
+u8 playerSpawn(u8 id, u16 x, u8 y);
 ```
 
 ### Error Handling
 
 ```c
 // Return FALSE/NULL on error
-u8 sprite_init(u8 id, u16 x, u8 y) {
+u8 playerSpawn(u8 id, u16 x, u8 y) {
     if (id >= MAX_SPRITES) {
         return FALSE;
     }
@@ -89,7 +89,7 @@ u8 sprite_init(u8 id, u16 x, u8 y) {
 }
 
 // Check return values
-if (!sprite_init(id, x, y)) {
+if (!playerSpawn(id, x, y)) {
     // Handle error
 }
 ```
@@ -97,11 +97,7 @@ if (!sprite_init(id, x, y)) {
 ### Memory
 
 ```c
-// Always check allocations
-void* ptr = malloc(size);
-if (ptr == NULL) {
-    // Handle allocation failure
-}
+// No heap: memory is a global, a static or a local of known size
 
 // Zero-initialize structures
 SpriteData sprite;
@@ -120,7 +116,7 @@ memset(&sprite, 0, sizeof(sprite));
 
 ```asm
 ;============================================================================
-; Function: sprite_update
+; Function: playerUpdate
 ; Description: Update all active sprites
 ; Input: None
 ; Output: None
@@ -128,12 +124,13 @@ memset(&sprite, 0, sizeof(sprite));
 ;============================================================================
 .section ".text" superfree
 
-sprite_update:
+playerUpdate:
     php                     ; Save processor status
     rep #$20                ; 16-bit accumulator
+    .ACCU 16                ; tell WLA-DX: it does not follow rep/sep across branches
 
     ldx #0                  ; Start at sprite 0
--   lda sprite_active,x     ; Check if active
+-   lda player_active,x     ; Check if active
     beq +                   ; Skip if inactive
 
     jsr _update_single      ; Update this sprite
@@ -152,9 +149,11 @@ sprite_update:
 ### Register Documentation
 
 ```asm
-; Document register state changes
+; Document register state changes, and say each one to the assembler
     rep #$20                ; A = 16-bit
+    .ACCU 16
     sep #$10                ; X/Y = 8-bit
+    .INDEX 8
 
 ; Document expected register values
 ; Input: A = sprite ID (0-127)
@@ -164,8 +163,8 @@ sprite_update:
 ### Labels
 
 ```asm
-; Public labels: _function_name
-_sprite_init:
+; Public labels: the C name, as the header declares it (no underscore)
+playerSpawn:
 
 ; Local labels: use anonymous (+ -)
     bne +           ; Forward reference
@@ -201,8 +200,8 @@ typedef struct {
 } SpriteData;
 
 /* Functions */
-u8 sprite_init(u8 id, u16 x, u8 y);
-void sprite_update(void);
+u8 playerSpawn(u8 id, u16 x, u8 y);
+void playerUpdate(void);
 
 #endif /* OPENSNES_SPRITE_H */
 ```
@@ -221,7 +220,7 @@ void sprite_update(void);
 static SpriteData sprites[MAX_SPRITES];
 
 /* Public functions */
-u8 sprite_init(u8 id, u16 x, u8 y) {
+u8 playerSpawn(u8 id, u16 x, u8 y) {
     // Implementation
 }
 ```
@@ -229,5 +228,4 @@ u8 sprite_init(u8 id, u16 x, u8 y) {
 ## Formatting Tools
 
 Consider using:
-- `clang-format` for C code (config in `.clang-format`)
 - Consistent editor settings (`.editorconfig`)

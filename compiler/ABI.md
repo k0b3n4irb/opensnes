@@ -21,7 +21,7 @@ trust the source files and update this doc.
 | **Return value (32-bit: u32, s32, pointer)** | low 16 bits in `A`, high 16 bits (a pointer's bank) in `tcc__retval_hi` |
 | **Caller-saved registers** | A, X, Y, P, all `tcc__r*` direct-page slots |
 | **Callee-saved registers** | none (cc65816 ABI saves nothing) |
-| **Frame discipline** | callee adjusts SP by `framesize`; caller cleans up args via `plx` |
+| **Frame discipline** | callee adjusts SP by `framesize`; caller cleans up the args: one `plx` for a single 2-byte argument, `tsa / clc / adc.w #N / tas` for more |
 | **Stack growth** | down (pushing decreases SP) |
 
 ---
@@ -43,10 +43,15 @@ For `f(a, b, c)`, cc65816 emits:
     pea.w b       ; push 2nd
     pea.w c       ; push 3rd (rightmost) arg last → closest to SP
     jsl f
-    plx           ; pop 3 args (6 bytes) using 3 plx
-    plx
-    plx
+    tsa           ; pop the 3 args (6 bytes): SP += 6
+    clc
+    adc.w #6
+    tas
 ```
+
+A single 2-byte argument is popped with one `plx` instead. A sequence of
+`plx` works as well in hand-written assembly (it leaves `A`, the return
+value, alone).
 
 `u8` and `u16` occupy a 2-byte slot (a `u8` is zero-extended to 16 bits
 before pushing). `u32`, `s32` **and pointers** use 4 bytes (two 16-bit
@@ -163,7 +168,7 @@ and `lda.b tcc__retval_hi` to its high half. Hand-written asm that returns a
 reference; `testing/fixtures/libtests` asserts its full 32 bits at run time). The
 direct page must be `$0000` at the `sta.b`, as it is for all C code.
 
-**Runtime helpers (`__mul32`, `__[s]divmod32`)**: low 16 returned in `A`,
+**Runtime helpers (`tcc_mul32`, `tcc_udivmod32` / `tcc_sdivmod32`)**: low 16 returned in `A`,
 high 16 (and remainder halves where applicable) returned in named scratch
 slots — `mul32_hi`, `div32_qh`, `div32_rl`, `div32_rh` — that the caller
 reads with `lda.l`. This convention exists because the helpers are leaf
@@ -171,9 +176,9 @@ asm and `tcc__r0`/`tcc__r1` are user-clobberable.
 
 Helper call shape (compiler emits at every `Omul Kl` / `Odiv Kl` / etc.):
 ```asm
-    ; push 2 Kl args = 8 bytes (high then low per arg, r1 first per __mul16
+    ; push 2 Kl args = 8 bytes (high then low per arg, r1 first, as for tcc_mul16
     ; convention so the multiplicand sits at the lower stack offset)
-    jsl __mul32
+    jsl tcc_mul32
     tax                  ; save A = result low
     tsa
     clc
@@ -185,19 +190,12 @@ Helper call shape (compiler emits at every `Omul Kl` / `Odiv Kl` / etc.):
     sta <dest_high>,s    ; emit_store_high
 ```
 
-### Larger structs (deprecated path)
+### Structs
 
-Pre-A1-followup the comment here noted "caller reserves 4 stack bytes;
-callee writes the result there" — that text described a hypothetical
-not-quite-implemented convention. See the runtime-helper paragraph above
-for the actual mechanism.
-
-### Larger structs
-
-Returned via a hidden first pointer argument. Treat them as if you wrote a
-function returning `void` and passed `result*` as the first parameter — the
-backend handles this transparently in C-to-C calls; if you call such a C
-function from ASM, you must allocate the slot yourself and pass its address.
+A struct is not returned by value: the compiler refuses it ("struct returns
+by value are not supported on w65816; return through a pointer argument").
+Pass a pointer to the result instead (see "What the backend does NOT
+support" below).
 
 ### void
 
@@ -218,7 +216,7 @@ $00:001C-001F   tcc__r10, tcc__r10h
 $00:0020        tcc__retval_hi           (high half of a 32-bit return)
 $00:0022-0033   the handlers' pointers and flags (nmi_callback, …), tcc__fp
 $00:0080-009F   tcc__lf                  (32 bytes: values that do not live across a call)
-$00:1700 page   tcc__nmi_registers       (the NMI handler's own direct page)
+a page placed by the linker   tcc__nmi_registers   (the NMI handler's own direct page, 160 bytes, page-aligned)
 ```
 
 `tcc__r9` and `tcc__r10` are the **scratch registers** used for inline
@@ -347,13 +345,10 @@ Generates:
     pea.w 3          ; priority
     pea.w 64         ; flags (0x40)
     jsl oamSet
-    plx              ; pop 7 args (14 bytes total)
-    plx
-    plx
-    plx
-    plx
-    plx
-    plx
+    tsa              ; pop the 7 args (14 bytes): SP += 14
+    clc
+    adc.w #14
+    tas
 ```
 
 Inside `oamSet`'s ASM (with framesize F):
@@ -380,10 +375,10 @@ comment lists the same `16,s … 4,s` offsets at framesize 0).
 |--------|:------------:|:--------:|-------|
 | `u8` / `s8` / `bool` / `_Bool` | 1 (storage), 2 (stack slot) | Kw | Always zero/sign-extended when passed as argument. |
 | `u16` / `s16` / `int` / `unsigned int` | 2 | Kw | Native word size on the w65816 target. (Aligned with SNES expectations since chantier A1, 2026-05-08.) |
-| `u32` / `s32` / `long` / `unsigned long` | 4 | **Kl** | Two 16-bit halves on the stack (high then low at higher offset). All arithmetic flows through the QBE w65816 backend's Kl handlers (Oadd/Osub carry, Omul via `__mul32`, Odiv via `__[s]divmod32`, cascade compares, cross-half shifts). 32-bit semantics shipped in chantier A1-followup, 2026-05-16. |
+| `u32` / `s32` / `long` / `unsigned long` | 4 | **Kl** | Two 16-bit halves on the stack (high then low at higher offset). All arithmetic flows through the QBE w65816 backend's Kl handlers (Oadd/Osub carry, Omul via `tcc_mul32`, Odiv via `tcc_udivmod32` / `tcc_sdivmod32`, cascade compares, cross-half shifts). 32-bit semantics shipped in chantier A1-followup, 2026-05-16. |
 | `long long` / `unsigned long long` | 8 | (host) | C99 requires ≥ 64-bit. Not exercised in the SDK; cproc still emits via the host-target lowering. |
 | pointer (function / data) | 4 | Kl | Storage is 24-bit address (low 16 + bank byte) + 1 byte alignment. Indirect calls read the bank byte from the pointer's high half (chantier A6+A7, shipped 2026-05-15 in v0.19.0). |
-| `float` / `double` | 4 / 8 | Ks / Kd | Software floats — extremely slow, used only by `printf`-style helpers. Avoid in game code. |
+| `float` / `double` | 4 / 8 | Ks / Kd | **Not supported**: a function that computes in floating point is refused (no FPU, no soft-float library). A floating constant the compiler folds is fine (`(int)(1.5 * 256)`); use `fixed` (`<snes/math.h>`) or `fixed32`. |
 
 For SDK code, prefer the explicit fixed-width types `u8`, `u16`, `s16`,
 `u32` from `lib/include/snes/types.h` for **portability** (cross-compiler
@@ -409,9 +404,7 @@ my_function:
 ```
 
 Leaf functions with no locals and aliased parameters can be **frameless**
-(`framesize = 0`): no `sbc`/`tas`, no epilogue beyond `rtl`. This is one of
-the optimisations documented in `~/.claude/.../memory/compiler_optimizations.md`
-(Phase 3, Phase 5b).
+(`framesize = 0`): no `sbc`/`tas`, no epilogue beyond `rtl`.
 
 Epilogue for non-void return:
 
@@ -447,9 +440,12 @@ for a runtime address. cproc marks every load/store through a `const` or
 `__far` lvalue with an access flag (`cst` / `farram` in the IR) and the
 backend keys on it. A far access whose address is a `Kl add` uses the
 operands directly: `add $sym, idx` → indexed long; `add %p, N` → stage `p`
-in `tcc__r9` once, `ldy #N`; `add %p, idx` → `tay`. `tcc__r9` is a cache
-within a basic block across loads and stores only — any other op may
-scratch it.
+in `tcc__r9` once, `ldy #N`; `add %p, idx` → `tay`. `tcc__r9` is a cache:
+in a basic block only an operation that writes it drops it (a call, a
+division or remainder, a multiplication by other than 0, 1 or a power of
+two, an alloc), and a far pointer walked by a loop stays in it across the
+loop's blocks unless the loop makes a call. It is caller-saved like every
+`tcc__r*`.
 
 Type rules: a `T __far *` converts to `const T *` implicitly (a const
 read is already far); dropping `__far` into a plain pointer is an error;
@@ -482,7 +478,7 @@ of ROM bank 1 and `BASE $7D` makes every label `$7E:xxxx`
 calling convention does not change: callers `jsl`/`jml` to the `$7E`
 address, the function returns with `rtl`, and a pointer to it carries bank
 `$7E`. The code generator does nothing special inside: a call to another
-function, a runtime helper (`__mul16`, `__div16`, …) or a const read stays a
+function, a runtime helper (`tcc_mul16`, `tcc_div16`, …) or a const read stays a
 ROM access, which is what the tutorial's constraint is about. On an object
 the keyword is an error.
 

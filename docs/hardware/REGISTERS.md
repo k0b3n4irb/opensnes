@@ -509,7 +509,7 @@ void dmaToVRAM(const void* src, u16 vramAddr, u16 size) {
     REG_BBAD(0) = 0x18;           // Destination: $2118 (VMDATAL)
     REG_A1TL(0) = (u16)src & 0xFF;
     REG_A1TH(0) = (u16)src >> 8;
-    REG_A1B(0) = 0x7E;            // Source bank
+    REG_A1B(0) = (u32)src >> 16;  // Source bank: the pointer's third byte (const data is in ROM)
     REG_DASL(0) = size & 0xFF;
     REG_DASH(0) = size >> 8;
 
@@ -538,8 +538,10 @@ After auto-joypad read completes (check $4212 bit 0):
 
 | Byte | Bit 7 | Bit 6 | Bit 5 | Bit 4 | Bit 3 | Bit 2 | Bit 1 | Bit 0 |
 |------|-------|-------|-------|-------|-------|-------|-------|-------|
-| Low ($4218) | B | Y | Select | Start | Up | Down | Left | Right |
-| High ($4219) | A | X | L | R | - | - | - | - |
+| Low ($4218) | A | X | L | R | 0 | 0 | 0 | 0 |
+| High ($4219) | B | Y | Select | Start | Up | Down | Left | Right |
+
+(anomie-regs: `$4219` JOY1H, `$4218` JOY1L, bits `byetUDLR axlr0000`.)
 
 ```c
 // Read joypad 1

@@ -1,6 +1,6 @@
 # Third-Party Components {#third_party}
 
-This document lists third-party tools and libraries included in OpenSNES, along with their original authors and licenses.
+This page describes the main third-party components OpenSNES builds on, with their authors and licences. `ATTRIBUTION.md` is the complete list (the image and map libraries of the tools — LodePNG, stb_image, cute_tiled — and modlib among them).
 
 ---
 
@@ -51,11 +51,30 @@ legacy (@ref tools_legacy).
 
 ---
 
+## SNESMOD driver
+
+**Description**: the SPC700 driver that plays tracker music and sound
+effects (`USE_SNESMOD`), uploaded by `snesmodInit()`.
+
+**Original Author**: Mukunda Johnson (https://github.com/mukunda-/snesmod),
+with bugfixes by KungFuFurby
+
+**Source**: `lib/source/sm_spc.spc700.asm`, built by `wla-spc700` at every
+library build: the driver's source in the WLA-DX syntax
+[PVSnesLib](https://github.com/alekmaul/pvsneslib) converted it to
+(`pvsneslib/snesmod/sm_spc_wla.asm`), with one OpenSNES fix (the voices'
+key-off in `ResetSound`).
+
+**License**: MIT License (the notice is in the source file)
+
+---
+
 ## smconv
 
 **Description**: SNES audio converter for SNESMOD tracker music format.
 
-**Original Author**: Alekmaul (https://github.com/alekmaul)
+**Original Author**: Mukunda Johnson (SNESMOD), adapted by Alekmaul for
+PVSnesLib (https://github.com/alekmaul)
 
 **Source**: [PVSnesLib](https://github.com/alekmaul/pvsneslib) - `tools/lib/smconv/`
 

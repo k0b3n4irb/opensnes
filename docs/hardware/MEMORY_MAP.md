@@ -48,10 +48,13 @@ $C0-$FF                         Mirror of $40-$7F (ROM only)
 | Range | Size | Common Use |
 |-------|------|------------|
 | $7E:0000-$7E:00FF | 256 B | Direct Page (fast access) |
-| $7E:0100-$7E:01FF | 256 B | Stack |
-| $7E:0200-$7E:1FFF | 7.5 KB | Variables, BSS |
+| $7E:0100-$7E:1FFF | 7.75 KB | Variables, BSS, and the stack |
 | $7E:2000-$7E:FFFF | 56 KB | General use |
 | $7F:0000-$7F:FFFF | 64 KB | General use / buffers |
+
+In OpenSNES the stack starts at `$1FFF` and grows down, under the C
+globals of the `$0000-$1FFF` band; `FAR` objects live above `$2000`
+(`docs/tutorials/far_ram.md`).
 
 ### Video RAM, OAM and CGRAM
 
@@ -99,7 +102,7 @@ $40-$4F:0000    up to     BW-RAM (up to 256 KB of fast static RAM; the rest of t
 SNES main CPU and the SA-1. Both processors can read and write it, gated
 by the SIWP ($2229) and CIWP ($222A) write-protection registers.
 
-**BW-RAM** is battery-backed SRAM mapped in banks $40-$5F, with an 8 KB
+**BW-RAM** is battery-backed SRAM mapped in banks $40-$4F, with an 8 KB
 window visible at $6000-$7FFF for convenient access from bank $00 code.
 
 ### Super FX Cartridge
@@ -111,7 +114,7 @@ a shared framebuffer.
 Address         Size      Description
 ────────────────────────────────────────────────────────────────
 $3000-$303F     64 B      GSU registers (R0-R15, SFR, SCMR, PBR, etc.)
-$3100-$32FF     512 B     GSU code cache (read-only from SNES side)
+$3100-$32FF     512 B     GSU code cache (the SNES can read and write it)
 $70-$71:0000    32-64 KB  Cartridge SRAM (shared framebuffer + data)
 ```
 
@@ -119,7 +122,8 @@ $70-$71:0000    32-64 KB  Cartridge SRAM (shared framebuffer + data)
 CPU writes parameters and starts the GSU by writing to R15 ($301E-$301F).
 
 **Code cache ($3100-$32FF)** holds the currently cached GSU instructions.
-The SNES can read but not write this region.
+The SNES CPU can also write opcodes there, in 16-byte lines, to load code
+into the cache itself (fullsnes, "Writing to Code-Cache (by SNES CPU)").
 
 **Cartridge SRAM ($70-$71)** serves as the GSU framebuffer. The Super FX
 PLOT instruction writes pixels here, and the SNES reads it back for

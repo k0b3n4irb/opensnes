@@ -119,9 +119,9 @@ and the `TM_*` register bit names of `registers.h`.
 
 ## 5. Checking a project
 
-Build it with clang installed: every deprecated name prints a warning
-naming its replacement. Then search for the two calls that change
-meaning:
+Build it: a name that was removed fails to compile, and the build prints
+its replacement under the error (`opensnes upgrade <folder>` lists every
+one at once). Then search for the two calls that change meaning:
 
 ```sh
 grep -rnE 'hdma(Enable|Disable)\(|mode7SetScale\(|mode7Transform\(' src/
@@ -154,3 +154,26 @@ is linked into the `opensnes-*` tools, which write the same bytes.
 - **A script that called one of these commands**: @ref tools_legacy gives
   the replacing command, option by option.
 
+
+## After 0.50: what else a 0.50 project may meet
+
+- **`opensnes-sprite sheet --pack`** is gone, and so is `pack = true` in a
+  `[sheet]` table: the tool refuses both. Packed pixels are the Mode 7
+  background format, which sprites cannot read; `opensnes-tileset convert
+  --pack` (or `--mode 7`) still writes it.
+- **A variable-length array is refused.** `u16 a[n];` with `n` known only
+  at run time — a `const` variable is not a constant expression in C — used
+  to compile to a frame that was too small. The compiler now stops and says
+  so; give the length as an `enum` or a `#define`.
+- **`opensnes-music bank` refuses a module the SPC700's RAM cannot hold**
+  (exit 1, nothing written) where it used to warn and write the soundbank.
+  The figures `inspect` and `--json` print (`spc_ram_bytes`,
+  `spc_ram_free`) are now what the driver loads, against the room its echo
+  leaves (@ref tools_opensnes_music).
+- **A ROM the post-link check refuses is deleted.** The build used to stop
+  with the error but leave the `.sfc`, which a second `make` then took as
+  up to date. Run `opensnes-rom check` on the `.sym`, which stays.
+- **An SA-1 ROM whose `SA1Start` is outside bank $00 is refused**: the
+  SA-1 reset vector is 16-bit. Declare the boot section
+  `.SECTION ".sa1_boot" BANK 0 SLOT "ROM" SEMIFREE`, as
+  `templates/sa1_boot.asm` does (@ref tutorial_sa1).

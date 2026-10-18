@@ -108,6 +108,31 @@ All notable changes to OpenSNES are documented in this file.
   more in a ROM that divides 32 bits.
 
 ### Changed
+- feat(tools): **`opensnes init --template game` is the SDK's starter.** It
+  copies `starter/`: `main.c`, `res/player.png` with the settings file the
+  build converts it from, `.gitignore` and two luna tests, the ROM they
+  name renamed after the project. A new project shows the one thing every
+  asset needs, a settings file beside it.
+- feat(tools): **`opensnes-sprite sheet --pack` is removed**, and `pack =
+  true` in a `[sheet]` table is refused. Packed pixels are the Mode 7
+  background format, which sprites cannot read; `opensnes-tileset convert
+  --pack` (and `--mode 7`) keeps it. `docs/UPGRADING.md` lists it.
+- build(release): **the zip ships the library's objects without the
+  compiler's intermediate `.asm`** (538 files to 348), and
+  `templates/gsu_boot.sfx`, which nothing used, is gone.
+  `docs/tools/README.md` says what is in `bin/`.
+- chore(testing): **luna is pinned to v1.39.0**, with no reference moved.
+- docs: **the documentation is brought back in line with the code.** A
+  review of every user page and of the commits since 0.50.0 found about 160
+  claims that no longer held; the ones a reader would follow and fail on
+  (`luna frames --out`, a `.wav` converted with no settings file, removed
+  names in the PVSnesLib guide, an HDMA mask that took the DMA helpers'
+  channel, a settings example the tool refuses, `colorMathDisable(layers)`)
+  are fixed, with the channel 7 guidance, the INIDISP HDMA form, the
+  retired converters' names and the stale figures across the tutorials,
+  the headers' comments, the examples' READMEs and the site's front page.
+  The SDK benchmark is measured again: 62 % faster than PVSnesLib on 23
+  workloads.
 - build(lib): **the SNESMOD driver is built from its source.**
   `lib/source/sm_spc.asm` held the SPC700 driver as 5 522 bytes of
   `.byte` lines, patched in place for the stop and pause fix; its source,

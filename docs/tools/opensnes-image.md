@@ -64,10 +64,11 @@ a terminator (673 bytes at 224 lines), in `perspective_cos.hdma`,
 #include "res/perspective.inc"
 
 u16 off = angle * PERSPECTIVE_STRIDE;
-hdmaSetup(HDMA_CHANNEL_0, HDMA_MODE_1REG_2X, HDMA_DEST_M7A, perspective_cos + off);
-hdmaSetup(HDMA_CHANNEL_1, HDMA_MODE_1REG_2X, HDMA_DEST_M7B, perspective_sin + off);
-hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_1REG_2X, HDMA_DEST_M7C, perspective_nsin + off);
-hdmaSetup(HDMA_CHANNEL_3, HDMA_MODE_1REG_2X, HDMA_DEST_M7D, perspective_cos + off);
+hdmaSetup(HDMA_CHANNEL_2, HDMA_MODE_1REG_2X, HDMA_DEST_M7A, perspective_cos + off);
+hdmaSetup(HDMA_CHANNEL_3, HDMA_MODE_1REG_2X, HDMA_DEST_M7B, perspective_sin + off);
+hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG_2X, HDMA_DEST_M7C, perspective_nsin + off);
+hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG_2X, HDMA_DEST_M7D, perspective_cos + off);
+hdmaEnableMask(0x3C);   /* channels 2-5: 0 is the DMA helpers', 7 the NMI's */
 ```
 
 With the defaults, the tables are krom (Peter Lemon)'s Perspective demo

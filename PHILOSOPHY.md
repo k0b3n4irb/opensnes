@@ -72,13 +72,14 @@ the right shape (a sprite-heavy benchmark, a quirky port, an experiment).
 The user does not have to discover hardware traps the hard way. The
 person who *wants* to understand can find the explanation.
 
-**Example — sprite Y +1 scanline quirk:**
+**Example — the vertical scroll is off by one:**
 
-The SNES PPU draws sprite OAM_Y at scanlines N+1..N+8. `oamSet` and
-`oamSetY` subtract 1 internally so the user's `y` argument is the
-rendered top scanline. Direct `oamMemory[]` writers must subtract 1
-manually. **Both behaviours are documented in
-`docs/hardware/OAM.md`.**
+The PPU never outputs scanline 0, so a raw vertical scroll of 0 shows
+the tilemap from its line 1. `bgSetScroll()`, the map module and
+`mode7SetScroll()` write `y - 1` to the scroll register for you, so
+`y = 0` puts tilemap line 0 on the first picture line. Data that reaches the register without the lib —
+an HDMA table on `BGnVOFS` — carries the -1 itself. **Both paths are
+documented in `KNOWN_LIMITATIONS.md`** (the vertical-scroll entry).
 
 **Implication:** every piece of "magic" comes with a doc entry that
 explains *what* is being hidden, *why*, and *what changes if you go
@@ -188,7 +189,7 @@ to make a PR look cleaner.
   1-2 KB ROM for marginal value (Principle 5).
 - **Mandatory framework lifecycle.** A user is welcome to write a
   `main()` with their own `while(1) { WaitForVBlank(); ... }` loop.
-  The framework opt-ins (planned: `gameloop`, `scene_2d`) are
+  The framework opt-ins (`gameloop`, `scene`, `asset`) are
   recommendations, not requirements.
 - **Wrapping every PVSnesLib name in OpenSNES branding.** Where the
   name is good and the semantics match, we keep the name (Principle 1
@@ -206,7 +207,7 @@ message; significant shifts get an entry in `CHANGELOG.md` under a
 
 Cross-references:
 - `README.md` for the elevator pitch and getting-started link
-- `ROADMAP.md` for the planned framework opt-ins
+- `docs/tutorials/framework.md` for the framework opt-ins
 - `KNOWN_LIMITATIONS.md` for the silent-failure catalogue
 - `docs/hardware/` for the quirk documentation referenced in Principle 2
 - `compiler/ABI.md` for the calling convention referenced in Principle 4

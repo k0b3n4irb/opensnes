@@ -12,13 +12,14 @@ demonstrated the Tiled pipeline (now `examples/maps/map_scroll`). All four were 
 you are about to write a helper, scan this page first.
 
 Modules are opt-in: add the name to `LIB_MODULES` in your Makefile and
-nothing you do not list is linked.
+nothing you do not list is linked (SRAM and SNESMOD are switched on with
+`USE_SRAM := 1` and `USE_SNESMOD := 1` instead).
 
 ## Getting something on screen
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| print text | `textInit`, `textPrintAt`, `textFlush` | `text` | [text/print_string](../examples/text/print_string/) |
+| print text | `textModeInit`, `textPrintAt` | `text` | [text/print_string](../examples/text/print_string/) |
 | show a background from a PNG | `bgInitTileSet`, `bgSetGfxPtr`, `bgSetMapPtr` | `background` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | bundle a tileset + its palette as one thing | `BgAsset`, `DECLARE_BG_ASSET`, `bgLoad` | `asset` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
@@ -26,7 +27,7 @@ nothing you do not list is linked.
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
 | draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/aseprite_pipeline](../examples/sprites/aseprite_pipeline/) |
 | make a tile while the game runs (procedural art) | `tileEncode2bpp`, `tileEncode4bpp`, `tileEncode8bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
-| compose text at the pixel in a 2bpp layer (a proportional font, a label at any x and y) | `tileBlitGlyph2bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
+| compose text at the pixel in a 2bpp layer (a proportional font, a label at any x and y) | `tileBlitGlyph2bpp` | `tile` | [text/pixel_text](../examples/text/pixel_text/) |
 
 ## Moving around a world
 
@@ -35,9 +36,9 @@ nothing you do not list is linked.
 | scroll a background | `bgSetScroll` | `background` | [scrolling/parallax_scroll](../examples/scrolling/parallax_scroll/) |
 | scroll a map bigger than VRAM | `mapLoad`, `mapUpdate` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
 | load a map made in Tiled | `opensnes-level` → `.m16`/`.b16` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
-| ask whether a tile is solid | `collideTile`, `collideTileEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
-| ask whether two boxes overlap | `collideRect`, `collideRectEx` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
-| handle slopes | `collideTileEx` + per-tile attributes | `collision` | [maps/slope_collision](../examples/maps/slope_collision/) |
+| ask whether a tile is solid | `collideTile` (`collideTileEx` for 16- or 32-pixel tiles) | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
+| ask whether two boxes overlap | `collideRect` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
+| handle slopes | `objCollidMapWithSlopes` + per-tile attributes | `object` | [maps/slope_collision](../examples/maps/slope_collision/) |
 | place the sprite so collision *feels* right | the straddle convention | — | [collision tutorial](tutorials/collision.md#where-the-sprite-is-vs-where-it-collides) |
 
 ## Input
@@ -54,14 +55,14 @@ nothing you do not list is linked.
 |---|---|---|---|
 | a main loop you do not write | `gameLoopRun` | `gameloop` | [basics/timer](../examples/basics/timer/) |
 | title → play → pause, without a state enum | `Scene`, `scenePush`, `scenePop` | `scene` | [basics/scene_stack](../examples/basics/scene_stack/) |
-| save the player's progress | `sramSave`, `sramLoad` | `sram` | [memory/save_game](../examples/memory/save_game/) |
+| save the player's progress | `sramSave`, `sramLoad` | `USE_SRAM := 1` | [memory/save_game](../examples/memory/save_game/) |
 | a dialog box or a status bar | `panelDraw`, `panelPut`, `panelFlush` | `panel` | [games/rpg](../examples/games/rpg/) |
 
 ## Sound
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| play music from a tracker module | `snesmod*` | `snesmod` | [audio/snesmod_music](../examples/audio/snesmod_music/) |
+| play music from a tracker module | `snesmod*` | `USE_SNESMOD := 1` | [audio/snesmod_music](../examples/audio/snesmod_music/) |
 | play a sound effect | `audioPlaySample` | `audio` | [audio/soundboard](../examples/audio/soundboard/) |
 
 ## Effects
@@ -71,7 +72,7 @@ nothing you do not list is linked.
 | fade in or out | `fadeIn`, `fadeOut` | `console` | [transitions/fading](../examples/transitions/fading/) |
 | blend two layers | `colormath*` | `colormath` | [color/transparency](../examples/color/transparency/) |
 | mask part of the screen | `windowSet*` | `window` | [windows/window](../examples/windows/window/) |
-| change a register mid-frame | `hdmaEnableMask`, `hdmaGradient` | `hdma` | [windows/window_multi_hdma](../examples/windows/window_multi_hdma/) |
+| change a register mid-frame | `hdmaSetup`, `hdmaEnableMask` | `hdma` | [windows/window_multi_hdma](../examples/windows/window_multi_hdma/) |
 | rotate or scale a background | `mode7*` | `mode7` | [games/mode7_racing](../examples/games/mode7_racing/) |
 | pixelate | `mosaicSetLayers`, `mosaicFadeIn` | `mosaic` | [transitions/mosaic](../examples/transitions/mosaic/) |
 
@@ -87,7 +88,7 @@ nothing you do not list is linked.
 | draw a HUD / dialog box (9-slice) | `panelInit`, `panelDraw`, `panelPut`, `panelFlush` | `panel` | [basics/panel_hud](../examples/basics/panel_hud/) |
 | structure a whole game (title/play/over) | frame loop + `switch(state)` | — | [basics/game_skeleton](../examples/basics/game_skeleton/) |
 | scroll each column independently (flag ripple, heat-haze) | offset-per-tile, `setMode(BG_MODE2)` + BG3 offset table | `background` | [backgrounds/mode2](../examples/backgrounds/mode2/) |
-| send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushSprite`, `vramQueueFlush` | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
+| send several small VRAM uploads in one VBlank (streamed sprite frames, map rows and columns) | `vramQueuePush`, `vramQueuePushSprite`, `vramQueueFlush`, `vramQueueCost` (what the queue will cost the VBlank) | `vramqueue` | [DMA: several small uploads](tutorials/dma.md) |
 | place the sprites of a scrolling game (world coordinates, camera, culling) | `oamPlaceWorld`, `OamWorldBatch` | `sprite` | [sprites: a scrolling game's sprites](tutorials/sprites.md) |
 | move many sprites at once | `oamMemory`, `oam_update_flag`, `oamSetFast` | `sprite` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) — and its 60fps ceiling |
 | decompress | `lzssDecodeVram` | `lzss` | |
@@ -203,5 +204,5 @@ in-ROM debug channel in [Debugging](tutorials/debugging.md) (recipe 7).
 
 Example paths here, and the header map above, are checked by
 `devtools/check_doc_drift.py`, so a renamed or deleted example, a header
-without a row or a dead tutorial link fails `make lint-docs`. Function names are
-not checked — if you rename a public function, grep this file.
+without a row, a dead tutorial link or a function no header declares fails
+`make lint-docs`.

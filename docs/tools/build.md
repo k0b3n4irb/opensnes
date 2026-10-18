@@ -28,9 +28,11 @@ Every variable can also be set on the command line for one build:
 | `SPCSRC` | (none) | SPC700 assembly (`*.spc700.asm`), assembled with `wla-spc700` into a `.spc700.bin` your 65816 code `.incbin`s |
 | `GSUSRC` | (none) | Super FX assembly (`*.sfx`), assembled with `wla-superfx` into a `.sfx.bin` (needs `USE_SUPERFX := 1`) |
 
-A `.wav` that an assembly file `.incbin`s as its `.brr` is converted by
-`wav2brr` automatically (one-shot samples; run `wav2brr --loop` by hand for
-looping ones).
+A sound is converted when a settings file sits beside it:
+`res/jump.wav.toml` with `tool = "opensnes-sample"` and an `[encode]` table
+(its keys are the options of `opensnes-sample encode`, `loop` among them)
+gives `res/jump.brr` and `res/jump.h`, and the build links the sample
+(@ref tools_opensnes_sample).
 
 ## Library
 
