@@ -192,16 +192,17 @@ That is why the enemy init functions in `mapandobjects` copy `minx` / `maxx`
 into `objWorkspace` — those two words are how a level editor hands a patrol
 range to an enemy.
 
-You do not hand-author this table. It is the `.o16` file `tmx2snes` emits
-from a Tiled object layer **named `Entities`** (the name is matched exactly).
+You do not hand-author this table. It is the `.o16` file @ref tools_opensnes_level
+(`opensnes-level convert`) writes from a Tiled object layer **named `Entities`** (the name is matched exactly).
 Each Tiled object's *type* becomes word 2; custom string properties named
 `minx` and `maxx` become words 3 and 4. See @ref tutorial_map for the rest of
 the pipeline. The converter caps a map at 64 objects, below the engine's pool
 of 80.
 
 ```c
-extern u8 objmario;                     /* .incbin of the .o16 */
-objLoadObjects((u8 *)&objmario);
+#include "res/level.inc"   /* generated: extern const u8 level_objects[], ... */
+
+objLoadObjects(level_objects);
 ```
 
 ## The workspace, in short
@@ -311,9 +312,9 @@ your slot first).
 ## Gotchas {#object_gotchas}
 
 This module is inherited from PVSnesLib. Every public function is executed by
-a test, but seven of the sixteen (`objCollidMap1D`, `objCollidObj`,
+a test, but eight of the eighteen (`objCollidMap1D`, `objCollidObj`,
 `objInitFriction1D`, `objInitGravity`, `objKill`, `objKillAll`,
-`objRefreshAll`) only by the library fixture (`testing/fixtures/libtests`),
+`objKillCurrent`, `objRefreshAll`) only by the library fixture (`testing/fixtures/libtests`),
 not by any example — they have assertions, not mileage.
 
 ### `objCollidMap1D` has no friction unless you ask for it
@@ -354,7 +355,7 @@ for your own array when:
   fields per entity, you are already fighting `count` / `dir` / `tempo` /
   `hitpoints`. A struct of your own is clearer and cheaper.
 - **You want top-down movement.** `objCollidMap1D` is the intended answer and
-  is one of the seven never-executed functions.
+  is one of the eight functions no example executes.
 - **You want the tile-collision behaviour without the entity model.** The map
   module exposes `mapGetMetaTilesProp()` directly, and
   @ref tutorial_collision covers the hand-rolled patterns

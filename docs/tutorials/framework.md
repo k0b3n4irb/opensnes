@@ -77,7 +77,7 @@ int main(void) {
 }
 ```
 
-`cfg` may live on `main()`'s stack, as all four examples do, precisely
+`cfg` may live on `main()`'s stack, as all three examples do, precisely
 because `main` never returns while the loop runs. The `return 0` exists only
 to keep `int main(void)` well-formed; cproc/QBE has no `noreturn` path, so the
 compiler cannot know the call never comes back.
@@ -105,20 +105,16 @@ step 3 — including the input read that populates `padHeld` / `padPressed` —
 happens in the NMI handler and happens identically for a hand-written loop.
 The framework does not read input, does not draw, and does not flush anything.
 
-One consequence deserves emphasis: **`update()` does not run inside a usable
-VBlank window.** `WaitForVBlank` returns only after the NMI handler has run to
-completion and cleared the handshake flag (`crt0.asm`, the `stz.w vblank_flag`
-at the very end of the ISR), and the handler has already spent the VBlank on
-its own DMAs. By the time `update()` starts, VBlank is largely or entirely
-gone. Write to the shadow buffers the lib gives you (the text tilemap buffer,
-`oamMemory`, the scroll shadows) and let the *next* NMI upload them — which is
-what the examples do. Do not treat `update()` as a place where direct VRAM
-writes are safe.
-
-> The Doxygen on `examples/basics/timer`'s `on_update` currently claims the
-> opposite ("we are inside the VBlank window — VRAM/CGRAM/OAM writes are safe
-> at this point"). That comment is wrong; the example itself is fine because
-> `textPrint` only touches a RAM buffer. Trust this table, not that comment.
+One consequence deserves emphasis: **`update()` starts inside VBlank, but
+VBlank does not last through it.** `WaitForVBlank` returns only after the NMI
+handler has run to completion and cleared the handshake flag (`crt0.asm`, the
+`stz.w vblank_flag` at the very end of the ISR). The handler takes 11-16 % of
+the VBlank (`docs/PERF.md`), so most of it is still ahead when `update()`
+starts — a small DMA at the very top of `update()` is safe, as in the
+[DMA tutorial](dma.md). But the game logic that follows runs into active
+display. For anything larger, write to the shadow buffers the lib gives you
+(the text tilemap buffer, `oamMemory`, the scroll shadows) and let the *next*
+NMI upload them — which is what the examples do.
 
 ### What gameLoopRun will not do for you
 
@@ -151,17 +147,17 @@ value:
 
 ```c
 typedef struct {
-    u8 *tiles;
-    u8 *tiles_end;
-    u8 *palette;
-    u8 *palette_end;
+    const u8 *tiles;
+    const u8 *tiles_end;
+    const u8 *palette;
+    const u8 *palette_end;
     u16 color_mode;    /* BG_4COLORS, BG_4COLORS0, BG_16COLORS, BG_256COLORS */
 } GfxAsset;
 
 typedef struct {
     GfxAsset gfx;
-    u8 *tilemap;
-    u8 *tilemap_end;
+    const u8 *tilemap;
+    const u8 *tilemap_end;
     u8  map_size;      /* SC_32x32, SC_64x32, SC_32x64, SC_64x64 */
 } BgAsset;
 ```
@@ -308,15 +304,16 @@ The honest measure of a convenience is how much it removes. Here is
 `backgrounds/mode0`, which loads four layers manually, against the same shape
 written with bundles.
 
-Manual — `examples/backgrounds/mode0/main.c`, one layer's worth:
+Manual — `examples/backgrounds/mode0/main.c`, one layer's worth (the
+example gets these declarations from `res/bg0.inc`):
 
 ```c
-extern u8 t0[], t0_end[];      /* tiles   */
-extern u8 p0[];                /* palette */
-extern u8 bgm0[], bgm0_end[];  /* tilemap */
+extern const u8 bg0_tiles[], bg0_tiles_end[];  /* tiles   */
+extern const u8 bg0_pal[], bg0_pal_end[];      /* palette */
+extern const u8 bg0_map[], bg0_map_end[];      /* tilemap */
 
-bgInitTileSet(0, t0, p0, 0, t0_end - t0, 8, BG_4COLORS0, VRAM_BG0_TILES);
-dmaCopyVram(bgm0, VRAM_BG0_MAP, bgm0_end - bgm0);
+bgInitTileSet(0, bg0_tiles, bg0_pal, 0, bg0_tiles_end - bg0_tiles, 8, BG_4COLORS0, VRAM_BG0_TILES);
+dmaCopyVram(bg0_map, VRAM_BG0_MAP, bg0_map_end - bg0_map);
 bgSetMapPtr(0, VRAM_BG0_MAP, SC_32x32);
 ```
 

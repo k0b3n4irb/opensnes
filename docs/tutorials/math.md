@@ -136,8 +136,8 @@ Both `fixSin` and `fixCos` return values in `[-256, +256]` (i.e.,
 is a velocity vector component in 8.8 fixed.
 
 The LUTs are 256-entry, 2 bytes per entry, 512 bytes total. They live
-in ROM in `lib/source/math.asm`. Lookups are O(1) — ~20 cycles per
-call.
+in ROM in `lib/source/math.asm`. Lookups are O(1) — about 34 CPU cycles
+per call, plus the call.
 
 ## Hardware multiplier and divider
 
@@ -379,8 +379,8 @@ If you need values larger than `±127`, either:
 
 - Switch to **integer pixel coordinates** for position and reserve
   fixed-point for *velocity* / *acceleration* (which stay small).
-- Use a custom **16.16 format** in `s32` for higher range. The lib
-  doesn't ship 16.16 helpers — write them per-game.
+- Use the **16.16 format**, `fixed32` (`<snes/fixed32.h>`, see above),
+  for higher range.
 
 ### 🔴 `fixMul` truncates fractional precision
 
@@ -492,7 +492,7 @@ weight that most games don't.
 | `fixed + fixed` (addition) | 4–8 |
 | `fixMul(a, b)` | ~30 |
 | `fixDiv(a, b)` | ~80 |
-| `fixSin(angle)` / `fixCos(angle)` | ~20 (LUT lookup) |
+| `fixSin(angle)` / `fixCos(angle)` | ~34 (LUT lookup) |
 | `fixLerp(a, b, t)` | ~40 |
 | `mul16(a, b)` (hardware multiply) | ~10 |
 | `div16(a, b)` (hardware divide) | ~20 |
@@ -500,16 +500,17 @@ weight that most games don't.
 | `fixSqrt(x)` | ~80 (delegates to sqrt16) |
 | `atan2_8(dy, dx)` | ~120 (LUT + one 16-bit divide) |
 
-A typical sprite-physics frame (position update + sin/cos rotation +
-two `fixMul` calls per sprite × 64 sprites) is ~6 K cycles, well
-under 1 % of the frame. Fixed-point is *cheap*; the budget is rarely
-binding.
+Fixed-point is *cheap*, but a sprite-physics frame (position update +
+sin/cos rotation + two `fixMul` calls per sprite, for 64 sprites) adds
+up: measure your own loop with luna (see the
+[Profiling tutorial](profiling.md)) rather than estimating it from this
+table.
 
 ## See also
 
 - `lib/include/snes/math.h` — full API reference.
-- `lib/source/math.asm` — implementation (273 LOC; the sin/cos LUTs
-  live here).
+- `lib/source/math.asm` — implementation (the sin/cos LUTs live
+  here).
 - [Mode 7 tutorial](mode7.md) — the natural application: matrix
   building via `fixSin`/`fixCos`/`fixMul`.
 - [HDMA tutorial](hdma.md) — for runtime HDMA table generation that

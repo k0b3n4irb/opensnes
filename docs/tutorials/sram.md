@@ -89,6 +89,12 @@ byte. Map:
 | `3` | 8 KB | `$03` |
 | `4` | 16 KB | `$04` |
 | `5` | 32 KB | `$05` |
+| `6` | 64 KB | `$06` |
+| `7` | 128 KB | `$07` |
+
+The build accepts `1` to `7`, but the `sram` module addresses one bank
+only: 32 KB on LoROM (and SA-1), 8 KB on HiROM. A transfer past that is
+refused, whatever the header declares.
 
 Most homebrew picks 8 KB unless you genuinely need more. Larger SRAM
 declarations affect emulator save-state allocation and on real flash
@@ -339,9 +345,11 @@ compilers.
 
 - **snes9x** and **Mesen2**: persist SRAM to a `.srm` file alongside
   the ROM. Save game survives reset and emulator restart.
-- **luna** (the test harness): SRAM is in-memory (captured in save-states; cross-run `.srm` persistence is a luna roadmap item) —
-  only — does not persist across runs by default. The test harness
-  resets SRAM between tests.
+- **luna** (the test harness): each run starts from fresh SRAM unless
+  you give it a battery file. `--srm-out FILE` writes the SRAM after a
+  run and `--srm-in FILE` loads it before the next one (`luna state`);
+  in `luna test`, a manifest's `srm_out` feeds another's
+  `srm_in`, which is how the power-cycle manifests above work.
 - **Real hardware via FXPak Pro**: persists to the SD card's
   per-ROM `.srm`. Survives power-off.
 
@@ -380,7 +388,7 @@ MVN is the fastest option available.
 ## See also
 
 - `lib/include/snes/sram.h` — full API reference.
-- `lib/source/sram.asm` — implementation (331 LOC, all assembly).
+- `lib/source/sram.asm` — implementation (all assembly).
 - [`examples/memory/save_game`](../../examples/memory/save_game/README.md) — multi-slot save demo with on-screen
   hex verification.
 - [`examples/memory/hirom_demo`](../../examples/memory/hirom_demo/README.md) — companion read for the HiROM bank

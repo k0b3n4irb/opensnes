@@ -29,23 +29,27 @@ see @ref tutorial_far_ram for why that band matters).
 Every writer in the module — `textPutChar`, `textPrint`, `textPrintAt`,
 `textPrintU16`, `textPrintHex`, `textClear`, `textClearRect` — sets
 `tilemap_update_flag` on its way out. The NMI handler checks that flag at the
-top of each VBlank and, if set, DMAs the whole buffer to VRAM (step 2 of its
-execution order, right after the OAM DMA). Nothing you print is visible until
+top of each VBlank and, if set, DMAs the bytes written since the last VBlank to
+VRAM (step 2 of its execution order, right after the OAM DMA; see the cost
+section below). Nothing you print is visible until
 that VBlank happens.
 
 **Coming from PVSnesLib?** `consoleDrawText` wrote to a console buffer you then
 flushed. Here the flush is automatic: there is no call to forget. The
 counterpart, `textFlush()`, is documented as rarely needed for exactly that
-reason — it only sets the flag:
+reason — it marks the whole buffer and sets the flag:
 
 ```c
 void textFlush(void) {
+    tilemap_dirty_lo = 0;
+    tilemap_dirty_hi = 2048;
     tilemap_update_flag = 1;
 }
 ```
 
 Reach for it only when you patched `tilemapBuffer` by hand, outside the `text*`
-API. Calling it after a regular `textPrint` is a no-op.
+API. After a regular `textPrint` it is not free: it turns the next flush of a
+few bytes into a 2 KB transfer.
 
 ## Setting up in one call
 
@@ -393,7 +397,7 @@ something the module supports today.
 
 ## See also
 
-- @ref text.h "Text API reference" — the 14 public functions and `TextConfig`.
+- @ref text.h "Text API reference" — the 15 public functions and `TextConfig`.
 - `lib/source/text.c` and `lib/source/text.asm` — the buffer, the cursor, and
   the font data.
 - @ref tutorial_dma — the VBlank DMA budget the 2048-byte flush is spent from.

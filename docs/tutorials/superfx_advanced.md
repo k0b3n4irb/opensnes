@@ -385,6 +385,7 @@ and on between the save and the read.
 |---------|---------------------|
 | [superfx_3d](../../examples/chips/superfx_3d/) | Single-buffer presentation in the letterbox bands |
 | [superfx_game_skeleton](../../examples/chips/superfx_game_skeleton/) | A game loop at 60 fps while the GSU renders from its cache; double-buffered presentation |
+| [superfx_save](../../examples/chips/superfx_save/) | The saving section above: a boot counter in the Game Pak RAM, block at `$E000` |
 
 ## See also
 

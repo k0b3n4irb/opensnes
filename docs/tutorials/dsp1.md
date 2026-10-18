@@ -71,7 +71,7 @@ that can exceed ±1.0.
 | `dsp1Range(x,y,z,r)` | `$18` | 4 → 1 | sphere test: `(d² − r²) >> 15`, negative = inside |
 
 Multi-word results land in the globals `dsp1_o0`/`dsp1_o1`/`dsp1_o2`
-(`dsp1_o3` for Parameter); single-word commands return their value.
+(`dsp1_o3` for `dsp1SetCamera`); single-word commands return their value.
 
 ## The 3D pipeline (what dsp1_cube does)
 

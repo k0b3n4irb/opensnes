@@ -56,7 +56,7 @@ them:
 |:---:|---|---|
 | **0** | Main-thread DMA helpers (`dmaCopyVram`, `dmaCopyCGram`, `dmaFillVRAM`, etc.) | Used every time you call those functions. Re-using channel 0 for HDMA collides with these calls. |
 | **1–6** | Free for user use | This is where HDMA goes. |
-| **7** | NMI handler's OAM DMA | Pre-armed at boot to OAM-DMA params; the NMI handler triggers it conditionally on `oam_update_flag`. **Do not configure HDMA on channel 7** — see `KNOWN_LIMITATIONS.md` for why. |
+| **7** | Every DMA of the NMI handler | The OAM upload (when `oam_update_flag` is set), the text tilemap flush and the dynamic sprite uploads. The NMI handler reprograms the channel each time, so **do not configure HDMA on channel 7** — see the warning at the top of `lib/include/snes/hdma.h`. |
 
 If you use only the lib's helpers, you never touch the channel
 registers directly. If you write a custom DMA path (Mode 7 interleaved
@@ -186,8 +186,8 @@ while (1) {
 Two non-obvious points:
 
 1. **`WaitForVBlank()` returns *after* the NMI handler ran** — meaning
-   you have ~2,200 cycles before the *next* VBlank starts. Plan your
-   DMA budget accordingly.
+   most of the VBlank is still ahead of you: the NMI handler takes
+   11-16 % of it (see `docs/PERF.md`). Plan your DMA budget accordingly.
 2. **The NMI handler also does DMA** during the same window: the OAM
    DMA (~544 bytes) and any tilemap streaming. That work counts against
    the 4 KB budget too.
@@ -369,7 +369,7 @@ The lib's NMI handler skips the 544-byte OAM DMA on frames where
 
 - `lib/include/snes/dma.h` — full API reference (function signatures,
   parameter docs).
-- `lib/source/dma.asm` — the assembly implementation (390 LOC).
+- `lib/source/dma.asm` — the assembly implementation.
 - [HDMA tutorial](hdma.md) — the per-scanline cousin; required reading
   for any per-scanline effect work.
 - [Mode 7 tutorial](mode7.md) — the interleaved-VRAM use case for

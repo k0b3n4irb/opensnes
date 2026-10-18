@@ -219,7 +219,7 @@ For worlds larger than the tilemap (e.g., a side-scroller level), you must strea
 2. When the scroll crosses an 8-pixel tile boundary, DMA a new column (or row) of tilemap entries into VRAM
 3. The PPU wraps the tilemap, so the newly written column appears seamlessly at the leading edge
 
-The `continuous_scroll` example demonstrates this with player-controlled scrolling and a character sprite. Key elements from the example:
+The `continuous_scroll` example shows the camera half of this — threshold scrolling that follows a character sprite — over two fixed 32x32 maps loaded once, with the scroll capped at `MAX_SCROLL_X`; it streams no columns. For a level wider than the tilemap, with the column streaming done for you, use the `map` module (@ref tutorial_map, `examples/maps/map_scroll`). Key elements from the example:
 
 ```c
 typedef struct {
@@ -249,7 +249,7 @@ bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
 bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
 ```
 
-See `examples/scrolling/continuous_scroll/` for the full implementation including sprite setup, dual-layer parallax, and tilemap loading.
+See `examples/scrolling/continuous_scroll/` for the full implementation including sprite setup, the two layers (scrolled together) and tilemap loading.
 
 ### Streaming Tips
 

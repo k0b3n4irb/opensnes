@@ -26,8 +26,8 @@ sample**: convert an audio file to the SNES's BRR format once, bake it into the
 ROM, and trigger it from C. This is what @ref examples_audio_sfx_from_wav does.
 
 **1. Put a settings file beside the WAV.** @ref tools_opensnes_sample turns a
-PCM `.wav` into a `.brr` using the same encoder smconv uses on its own
-samples, and the build runs it for every settings file that names it:
+PCM `.wav` into a `.brr` using the same encoder @ref tools_opensnes_music uses
+on a module's samples, and the build runs it for every settings file that names it:
 
 ```toml
 # res/jump.wav.toml — a one-shot effect

@@ -93,11 +93,13 @@ for a symbol that does not exist (a typo fails loudly instead of passing
 silently). The flag repeats, so several routines can be gated in one run.
 
 @warning Pick the symbol with the profile in front of you. On this SDK the NMI
-handler is emitted as five labels — `NmiHandler` plus four internal ones — so
-`--budget NmiHandler=…` measures only the entry stub (652 mclk on
-`sprite_swarm`), not the handler's real cost. Until luna folds child labels
-into their parent, budget a symbol that is genuinely one routine, and read the
-handler's cost by adding its rows in the JSON report by hand.
+handler carries internal labels (`NmiHandler@oam_done` and others), and luna
+folds each program counter onto the nearest label, so `--budget NmiHandler=…`
+on the ROM's own `.sym` measures only the entry stub, not the handler's real
+cost. Adding the child rows by hand is wrong too: the worst frame of a sum is
+not the sum of the worst frames. To budget the whole handler, give luna a copy
+of the `.sym` without the `NmiHandler@…` lines through `--sym`, as
+`testing/nmi_budget.py` does.
 
 ## Profiling from inside: `<snes/profile.h>`
 
@@ -154,9 +156,9 @@ u16 lag    = profileGetLagFrames();    /* frames that missed their VBlank */
 A rising lag count is the symptom; `luna profile` tells you which symbol
 caused it.
 
-@note No example links the profile module today, so its code path is exercised
-by nothing in the corpus. Treat it as a debugging aid you switch on while
-working, not as shipped code.
+@note No example links the profile module; the library fixture
+`testing/fixtures/libtests` exercises it. Treat it as a debugging aid you
+switch on while working, not as shipped code.
 
 ## Choosing between them
 

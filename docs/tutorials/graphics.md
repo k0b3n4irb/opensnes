@@ -280,8 +280,8 @@ The format is the familiar GBA-style LZ77: a `0x10` tag byte, a three-byte
 little-endian decompressed length, then flag bytes whose bits select a
 literal or a back-reference. Any tool that emits that layout will do.
 
-@warning `lzssDecodeVram` writes VRAM directly and disables interrupts
-while it runs. Call it during forced blank, with the rest of your setup —
+@warning `lzssDecodeVram` writes VRAM directly and masks IRQs (not the
+NMI) while it runs. Call it during forced blank, with the rest of your setup —
 not from a running frame, where the PPU would drop the writes silently.
 
 ## Example: Complete Background Setup

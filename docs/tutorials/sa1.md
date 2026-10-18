@@ -76,7 +76,7 @@ AI, physics, and decompression that the main CPU couldn't keep up with.
 | PPU access | Yes | **No** |
 | APU access | Yes | **No** |
 | I-RAM access | Yes ($3000-$37FF) | Yes ($0000-$07FF, mirrors $3000) |
-| ROM access | Yes | Yes (separate bus, no conflicts) |
+| ROM access | Yes | Yes (shared with the main CPU: conflicts, see above) |
 | BW-RAM access | Yes (via $6000 window) | Yes (256 KB max) |
 
 The key constraint: **SA-1 cannot touch WRAM, PPU, or APU**. It can only
@@ -410,6 +410,7 @@ Common issues:
 |---------|---------------------|
 | [sa1_hello](../../examples/chips/sa1_hello/) | Boot diagnostic — verifies SA-1 initialization |
 | [sa1_starfield](../../examples/chips/sa1_starfield/) | 128 sprites with sine-wave Lissajous patterns |
+| [sa1_save](../../examples/chips/sa1_save/) | A boot counter kept in the battery-backed BW-RAM, through the `sram` module |
 
 ## What SA-1 Can't Do
 

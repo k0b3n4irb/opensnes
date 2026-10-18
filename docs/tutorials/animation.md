@@ -25,11 +25,11 @@ void hero_animate(void) {
 
 A frame value is an **opaque u16** — the player sequences it without interpreting it. Three consumption patterns:
 
-- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`, `examples/sprites/animated_sprite`);
+- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`);
 - `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMetasprite()` directly (`examples/sprites/aseprite_pipeline`);
-- `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything).
+- `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything; `examples/sprites/animated_sprite` passes it to `oamSet()`).
 
-`ANIM_ONCE` clips hold their last frame and raise `animDone(&p)`; pausing is simply not ticking. Per-frame durations use a raw `AnimClip` struct with a `durations` array — see `<snes/anim.h>` for the full API, the layout contract, and the bank $00 note for nearly-full ROMs.
+`ANIM_ONCE` clips hold their last frame and raise `animDone(&p)`; pausing is simply not ticking. Per-frame durations use a raw `AnimClip` struct with a `durations` array — see `<snes/anim.h>` for the full API and the layout contract.
 
 The sections below cover what the module does under the hood — worth understanding, and still the right tool for one-off effects.
 
@@ -334,9 +334,9 @@ while (1) {
 }
 ```
 
-### Action-Based Animation (LikeMario)
+### Action-Based Animation
 
-The `examples/games/likemario/` example shows how to combine the dynamic sprite engine with action states. Each action maps to specific frame indices:
+The dynamic sprite engine combines with action states by hand: each action maps to specific frame indices. (`examples/games/likemario/` does the same job with `AnimClip` clips and `animTickOam()`, as in the first section; the manual form below is what that call does for you.)
 
 ```c
 #define FRAME_STAND  6

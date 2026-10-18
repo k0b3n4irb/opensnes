@@ -178,10 +178,9 @@ runtime layer selection:
 - Press **B**: apply window to both BG1 and BG2.
 
 Two HDMA channels (4 and 5) write `WH0`/`WH1` per scanline. The example
-uses **bare-metal register writes** rather than the lib helpers
-because that path was tested for byte-perfect parity with the
-PVSnesLib original. For new code, the lib helpers are
-preferred — they read more like SNES vocabulary.
+configures everything through the lib helpers: `windowDisableAll()`,
+`windowEnable()`, `windowSetInvert()` and `windowSetMainMask()` for the
+window, `hdmaSetup()` and `hdmaEnableMask()` for the two channels.
 
 ### Window + colour math — `examples/windows/transparent_window`
 
@@ -271,10 +270,9 @@ follows the [HDMA tutorial's cycle table](hdma.md):
 
 - Static window (no HDMA): zero CPU cost per frame after the initial
   `windowSet*` register writes.
-- Animated window with one HDMA channel: ~16–24 cycles per scanline ×
-  224 scanlines ≈ 3.6–5.4 K cycles per frame, ~0.2–0.4 % of CPU.
-- Two-channel HDMA (W1 left/right): about double the above, still
-  under 1 % of CPU.
+- Animated window with one HDMA channel: the per-scanline cost of a
+  1-byte table in the HDMA tutorial, about 1–3 % of the bus time.
+- Two-channel HDMA (W1 left/right): about double the above.
 
 Window animation is one of the cheapest scanline-effect patterns
 because the data per scanline is small (1–2 bytes per channel).
@@ -282,7 +280,7 @@ because the data per scanline is small (1–2 bytes per channel).
 ## See also
 
 - `lib/include/snes/window.h` — full API reference.
-- `lib/source/window.c` — implementation (270 LOC, mostly register
+- `lib/source/window.c` — implementation (mostly register
   bookkeeping for the four-axis state).
 - [`examples/windows/window`](../../examples/windows/window/README.md) — animated triangle reveal.
 - [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window + colour math (the pair example).

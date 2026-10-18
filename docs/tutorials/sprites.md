@@ -285,9 +285,9 @@ What it does for each sprite, and what it leaves to you:
   graphics are not loaded yet, say) is one `oamHide(id)` after the call.
 
 Measured (`devtools/libbench`, rows `worldc` and `world`: 19 sprites, 13
-on screen, a moving camera): 31,800 master cycles a frame with
-`oamPlaceWorld()`, 57,300 for the same loop in C writing `oamMemory[]`
-directly — the cheapest way to write it in C.
+on screen, a moving camera; the table in `docs/PERF.md`): 31,740 master
+cycles a frame with `oamPlaceWorld()`, 53,877 for the same loop in C writing
+`oamMemory[]` directly — the cheapest way to write it in C.
 
 ### Sorted by depth: `order`
 

@@ -61,7 +61,7 @@ testing/bin/luna state -n 3000000 --screenshot /tmp/shot.png game.sfc
 
 The JSON snapshot contains the full CPU registers, PPU state (scroll, mode,
 windows, complete CGRAM and OAM), DMA channels, scheduler (frame/NMI
-counts) — everything the Mesen2 watch panel showed, machine-readable.
+counts), machine-readable.
 Over MCP: `load_rom` → `step` → `state`.
 
 ## Recipe 2 — "Who writes this variable?"
@@ -75,8 +75,7 @@ The classic corruption hunt, over MCP:
    annotations, `peek_memory` confirms the new value.
 3. `run_until_break` again to catch the next writer.
 
-This replaces the old snesdbg `dbg.watch()` callback — the "callback" is
-simply whatever you (or the agent driving MCP) do at each stop.
+What happens at each stop is up to you (or the agent driving MCP).
 
 ## Recipe 3 — Break at a function
 
@@ -86,7 +85,7 @@ path. Multiple breakpoints can be armed at once (`bp_list` shows them).
 
 ## Recipe 4 — Sprite/OAM debugging (shadow buffer vs hardware)
 
-The SDK keeps a shadow OAM (`oambuffer`) that the NMI handler DMAs to the
+The SDK keeps a shadow OAM (`oamMemory`) that the NMI handler DMAs to the
 PPU. When a sprite misbehaves, compare the two sides:
 
 ```bash
@@ -95,7 +94,7 @@ testing/bin/luna assets-dump -n 3000000 --out /tmp/dump game.sfc
 
 This writes `oam.json` (the hardware side, parsed), the sprite sheet, the
 VRAM tile sheet, the four BG tilemaps, the CGRAM palette and the composited
-screen as PNGs. Read the shadow side with `peek_memory` at the `oambuffer`
+screen as PNGs. Read the shadow side with `peek_memory` at the `oamMemory`
 symbol and compare entry by entry — a mismatch means the OAM DMA didn't run
 (check `oam_update_flag`) or wrote stale data.
 
@@ -114,7 +113,7 @@ being flushed).
 A single screenshot can't show a frame-to-frame blink:
 
 ```bash
-testing/bin/luna frames -n 3000000 --count 8 --out /tmp/frames game.sfc
+testing/bin/luna frames -n 3000000 --count 8 --out-dir /tmp/frames game.sfc
 ```
 
 captures strictly consecutive PPU frames, each tagged with its frame number
