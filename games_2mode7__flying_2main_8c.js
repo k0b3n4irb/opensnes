@@ -11,7 +11,6 @@ var games_2mode7__flying_2main_8c =
     [ "build_plane", "games_2mode7__flying_2main_8c.html#a1c0604961c837f1f319ea323c6d45c00", null ],
     [ "encode_16x16", "games_2mode7__flying_2main_8c.html#aee708296b7db01c9b774c81961785cf3", null ],
     [ "main", "games_2mode7__flying_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
-    [ "terrain_class_at", "games_2mode7__flying_2main_8c.html#adffdf154bc65129d27dcc65a861988e1", null ],
     [ "airborne", "games_2mode7__flying_2main_8c.html#a3669420760f75c33d787a4fc776e2877", null ],
     [ "landings", "games_2mode7__flying_2main_8c.html#a687da0a79cf0b0bffb02a65ae278196c", null ],
     [ "plane_alt", "games_2mode7__flying_2main_8c.html#a8d4e873d8b11e51094e72beb20c97b96", null ],
@@ -20,5 +19,6 @@ var games_2mode7__flying_2main_8c =
     [ "plane_x", "games_2mode7__flying_2main_8c.html#af4139b2e021811aa7083503b5f70921d", null ],
     [ "plane_y", "games_2mode7__flying_2main_8c.html#a85c1a2fa6ac57003584123ca0251abe2", null ],
     [ "shape_tiles", "games_2mode7__flying_2main_8c.html#a38aefd46976ba858c7007b4fa548c536", null ],
-    [ "surface", "games_2mode7__flying_2main_8c.html#af4da8279099100e3ffc14d0676a942e3", null ]
+    [ "surface", "games_2mode7__flying_2main_8c.html#af4da8279099100e3ffc14d0676a942e3", null ],
+    [ "terrain_class", "games_2mode7__flying_2main_8c.html#a41e533de498c12591353cdc3f967b7a8", null ]
 ];

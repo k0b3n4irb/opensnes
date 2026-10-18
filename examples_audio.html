@@ -122,42 +122,42 @@ $(function(){initNavTree('examples_audio.html','',''); });
   <div class="headertitle"><div class="title">Audio </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><b>Family 8 — "make it sound like a game."</b> The SNES has a whole second processor for sound — the SPC700, with its own 64 KB of RAM, its own S-DSP, and its own instruction set, talking to the main CPU through just 4 I/O bytes. This family has two on-ramps — tracker music, and driving the DSP straight from C — then the DSP's party tricks.</p>
+<div class="textblock"><p><b>"make it sound like a game."</b> The SNES has a whole second processor for sound — the SPC700, with its own 64 KB of RAM, its own S-DSP, and its own instruction set, talking to the main CPU through just 4 I/O bytes. This family has two on-ramps — tracker music, and driving the DSP straight from C — then the DSP's party tricks.</p>
 <h2 class="doxsection"><a class="anchor" id="the-ladder"></a>
 The ladder</h2>
-<p><b>Tracker music (SNESMOD)</b> — compose in a tracker, <span class="tt">smconv</span> converts the <span class="tt">.it</span>, the lib plays it:</p>
+<p><b>Tracker music (SNESMOD)</b> — compose in a tracker, <span class="tt">opensnes-music</span> converts the <span class="tt">.it</span>, the lib plays it:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
+<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">8.1  </td><td class="markdownTableBodyNone"><a href="snesmod_music/">snesmod_music</a>  </td><td class="markdownTableBodyNone">How do I play tracker music with transport controls?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_snesmod_music.html">snesmod_music</a>  </td><td class="markdownTableBodyNone">How do I play tracker music with transport controls?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">8.2  </td><td class="markdownTableBodyNone"><a href="snesmod_music_large/">snesmod_music_large</a>  </td><td class="markdownTableBodyNone">How do I play a &gt;32 KB multi-bank soundbank?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_snesmod_sfx.html">snesmod_sfx</a>  </td><td class="markdownTableBodyNone">How do I mix SFX over music?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">8.3  </td><td class="markdownTableBodyNone"><a href="snesmod_sfx/">snesmod_sfx</a>  </td><td class="markdownTableBodyNone">How do I mix SFX over music?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_sfx_from_wav.html">sfx_from_wav</a>  </td><td class="markdownTableBodyNone">How do I play a sound effect from a WAV file, converted by the build?  </td></tr>
 </table>
 <p><b>Raw APU from C (audio v2)</b> — the lib uploads its own resident SPC700 driver; everything else is plain C:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
+<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">8.4  </td><td class="markdownTableBodyNone"><a href="soundboard/">soundboard</a>  </td><td class="markdownTableBodyNone">How do I drive the whole audio-v2 engine from C?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_soundboard.html">soundboard</a>  </td><td class="markdownTableBodyNone">How do I drive the whole audio-v2 engine from C?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">8.5  </td><td class="markdownTableBodyNone"><a href="apu_switch/">apu_switch</a>  </td><td class="markdownTableBodyNone">How do I hot-swap APU programs at runtime?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_apu_switch.html">apu_switch</a>  </td><td class="markdownTableBodyNone">How do I hot-swap APU programs at runtime?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">8.6  </td><td class="markdownTableBodyNone"><a href="play_noise/">play_noise</a>  </td><td class="markdownTableBodyNone">How do I make drums from the S-DSP noise generator?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_play_noise.html">play_noise</a>  </td><td class="markdownTableBodyNone">How do I make drums from the S-DSP noise generator?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">8.7  </td><td class="markdownTableBodyNone"><a href="pitch_mod/">pitch_mod</a>  </td><td class="markdownTableBodyNone">How do I do hardware vibrato (pitch modulation)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_pitch_mod.html">pitch_mod</a>  </td><td class="markdownTableBodyNone">How do I do hardware vibrato (pitch modulation)?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">8.8  </td><td class="markdownTableBodyNone"><a href="speech_synth/">speech_synth</a>  </td><td class="markdownTableBodyNone">How do I play BRR speech?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_speech_synth.html">speech_synth</a>  </td><td class="markdownTableBodyNone">How do I play BRR speech?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">8.9  </td><td class="markdownTableBodyNone"><a href="echo/">echo</a>  </td><td class="markdownTableBodyNone">How do I add echo / reverb from the S-DSP?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio_echo.html">echo</a>  </td><td class="markdownTableBodyNone">How do I add echo / reverb from the S-DSP?  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="the-idea-in-one-screen"></a>
 The idea in one screen</h2>
 <p>Sound is a co-processor problem: you never touch the DSP registers from the 65816 directly — you hand a driver a command over the 4 I/O ports and it runs on the SPC700. SNESMOD's driver plays a compiled tracker module; the audio-v2 driver exposes voices, ADSR, BRR samples and the echo unit as C calls (<span class="tt"><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample</a></span>, <span class="tt"><a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx</a></span>, <span class="tt"><a class="el" href="group__audio__echo.html#gab48ad4e6beefd0728ba5fd76dfd9dd07" title="Configure echo parameters.">audioSetEcho</a></span>…). Both share the same 64 KB of ARAM, so samples, the echo ring and the driver all compete for it.</p>
 <p><em>(Audio examples have no screenshot — the lesson is audible. Run them with sound.)</em></p>
-<p><a class="el" href="examples_audio_apu_switch.html" title="apu_switch — hot-swapping APU programs at runtime">apu_switch — hot-swapping APU programs at runtime</a> <a class="el" href="examples_audio_echo.html" title="Echo / reverb">Echo / reverb</a> <a class="el" href="examples_audio_pitch_mod.html" title="pitch_mod — hardware vibrato via pitch modulation">pitch_mod — hardware vibrato via pitch modulation</a> <a class="el" href="examples_audio_play_noise.html" title="play_noise — a drum kit with zero samples">play_noise — a drum kit with zero samples</a> <a class="el" href="examples_audio_sfx_from_wav.html" title="SFX from WAV">SFX from WAV</a> <a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music Example">SNESMOD Music Example</a> <a class="el" href="examples_audio_snesmod_music_large.html" title="SNESMOD Large Soundbank Music">SNESMOD Large Soundbank Music</a> <a class="el" href="examples_audio_snesmod_sfx.html" title="SNESMOD Sound Effects">SNESMOD Sound Effects</a> <a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a> <a class="el" href="examples_audio_speech_synth.html" title="speech_synth — the SNES says &quot;OPEN SNES&quot;">speech_synth — the SNES says "OPEN SNES"</a> </p>
+<p><a class="el" href="examples_audio_apu_switch.html" title="apu_switch — hot-swapping APU programs at runtime">apu_switch — hot-swapping APU programs at runtime</a> <a class="el" href="examples_audio_echo.html" title="Echo / reverb">Echo / reverb</a> <a class="el" href="examples_audio_pitch_mod.html" title="pitch_mod — hardware vibrato via pitch modulation">pitch_mod — hardware vibrato via pitch modulation</a> <a class="el" href="examples_audio_play_noise.html" title="play_noise — a drum kit with zero samples">play_noise — a drum kit with zero samples</a> <a class="el" href="examples_audio_sfx_from_wav.html" title="SFX from WAV">SFX from WAV</a> <a class="el" href="examples_audio_snesmod_music.html" title="SNESMOD Music Example">SNESMOD Music Example</a> <a class="el" href="examples_audio_snesmod_sfx.html" title="SNESMOD Sound Effects">SNESMOD Sound Effects</a> <a class="el" href="examples_audio_soundboard.html" title="soundboard — the audio v2 engine, driven entirely from C">soundboard — the audio v2 engine, driven entirely from C</a> <a class="el" href="examples_audio_speech_synth.html" title="speech_synth — the SNES says &quot;OPEN SNES&quot;">speech_synth — the SNES says "OPEN SNES"</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
@@ -172,7 +172,7 @@ The idea in one screen</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

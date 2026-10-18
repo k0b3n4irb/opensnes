@@ -122,13 +122,13 @@ $(function(){initNavTree('craft_game_feel.html','',''); });
   <div class="headertitle"><div class="title">Game feel: juice on real hardware </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>"Game feel" is the layer of feedback that makes a jump feel springy and a hit feel like it landed — the same core mechanic reads as limp or delicious depending on it. The universal principles are covered definitively elsewhere (see Go-deeper); what nobody covers is <em>how to produce that juice on the SNES</em>, where you have no shader, no tween library, and a 4 KB VBlank budget. Almost every classic effect turns out to be a cheap trick on a PPU register. This guide is the SNES-specific toolbox; for the registers behind each, see <a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a>.</p>
+<div class="textblock"><p>"Game feel" is the layer of feedback that makes a jump feel springy and a hit feel like it landed — the same core mechanic reads as limp or delicious depending on it. The universal principles are covered definitively elsewhere (see Go-deeper); what nobody covers is <em>how to produce that juice on the SNES</em>, where you have no shader, no tween library, and a 4 KB VBlank budget. Almost every classic effect turns out to be a cheap trick on a PPU register. This guide is the SNES-specific toolbox; for the registers behind each, see <a class="el" href="hardware_ppu.html" title="The PPU">The PPU</a>.</p>
 <h2 class="doxsection"><a class="anchor" id="screen-shake--nudge-the-scroll"></a>
 Screen shake — nudge the scroll</h2>
 <p>The highest impact-per-byte effect on the machine: on a big hit, add a small random offset to every background's scroll for a few frames and decay it to zero. It is just the camera from <a class="el" href="craft_camera.html" title="Following the player: the camera">Following the player: the camera</a>, perturbed — a couple of pixels, three or four frames, fading out. Costs nothing, sells everything. Shake the sprite layer too (offset your OAM Y) for an impact that rattles the whole screen, or shake only the backgrounds for a softer thud.</p>
-<h2 class="doxsection"><a class="anchor" id="hit-flash--color-math-not-palette-edits"></a>
-Hit flash — color math, not palette edits</h2>
-<p>To flash a struck enemy white or tint the screen red on damage, do <b>not</b> rewrite palette entries every frame — that is a DMA you do not need. Use color math: the PPU adds or subtracts a fixed colour across a layer or the sprites in one register write. A one-frame white add on hit, a red subtract while the player is hurt, a blue wash underwater — all are <a class="el" href="examples_color_shadow_tint.html" title="shadow_tint — recolour a whole scene at once">shadow_tint — recolour a whole scene at once</a> and <a class="el" href="examples_color_transparency.html" title="Color Addition Transparency">Color Addition Transparency</a> territory, applied for a handful of frames.</p>
+<h2 class="doxsection"><a class="anchor" id="hit-flash--colour-math-not-palette-edits"></a>
+Hit flash — colour math, not palette edits</h2>
+<p>To flash a struck enemy white or tint the screen red on damage, do <b>not</b> rewrite palette entries every frame — that is a DMA you do not need. Use colour math: the PPU adds or subtracts a fixed colour across a layer or the sprites in one register write. A one-frame white add on hit, a red subtract while the player is hurt, a blue wash underwater — all are <a class="el" href="examples_color_shadow_tint.html" title="shadow_tint — recolour a whole scene at once">shadow_tint — recolour a whole scene at once</a> and <a class="el" href="examples_color_transparency.html" title="Color Addition Transparency">Color Addition Transparency</a> territory, applied for a handful of frames.</p>
 <h2 class="doxsection"><a class="anchor" id="freeze-the-frame--hitstop"></a>
 Freeze the frame — hitstop</h2>
 <p>The cheapest juice of all is <em>no</em> hardware: on a heavy hit, stop advancing the simulation for two to six frames. The image holds, the impact registers, then motion resumes. It is pure timing — a counter in your update loop — and it is what makes fighting games and action platformers feel like contact has weight. Pair it with a one-frame flash and a short shake and a plain collision becomes a <em>hit</em>.</p>
@@ -156,7 +156,7 @@ Layer the little things</h2>
 The one rule</h2>
 <p>Juice the verbs the player does most — jump, hit, collect, take damage — and make every effect <em>brief and decaying</em>: a few frames, fading to nothing. Feel comes from the sum of small, short responses to input, not from one big effect. Add them one at a time and stop when it feels right.</p>
 <blockquote class="doxtable">
-<p><b>Sources:</b> <a href="https://problemkaputt.de/fullsnes.htm">fullsnes</a> (color math, mosaic, INIDISP brightness) and the <a href="https://snes.nesdev.org/wiki">SNESdev Wiki</a>; the SDK's color-math and transition examples for the working code. </p>
+<p><b>Sources:</b> <a href="https://problemkaputt.de/fullsnes.htm">fullsnes</a> (colour math, mosaic, INIDISP brightness) and the <a href="https://snes.nesdev.org/wiki">SNESdev Wiki</a>; the SDK's colour-math and transition examples for the working code. </p>
 </blockquote>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
@@ -172,7 +172,7 @@ The one rule</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="craft.html">Game-Craft Guides</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="craft.html">Game-Craft Guides</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

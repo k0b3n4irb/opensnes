@@ -165,169 +165,33 @@ Work RAM ($7E:0000 - $7F:FFFF)</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">$7E:0000-$7E:00FF  </td><td class="markdownTableBodyNone">256 B  </td><td class="markdownTableBodyNone">Direct Page (fast access)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$7E:0100-$7E:01FF  </td><td class="markdownTableBodyNone">256 B  </td><td class="markdownTableBodyNone">Stack  </td></tr>
+<td class="markdownTableBodyNone">$7E:0100-$7E:1FFF  </td><td class="markdownTableBodyNone">7.75 KB  </td><td class="markdownTableBodyNone">Variables, BSS, and the stack  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$7E:0200-$7E:1FFF  </td><td class="markdownTableBodyNone">7.5 KB  </td><td class="markdownTableBodyNone">Variables, BSS  </td></tr>
-<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">$7E:2000-$7E:FFFF  </td><td class="markdownTableBodyNone">56 KB  </td><td class="markdownTableBodyNone">General use  </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">$7F:0000-$7F:FFFF  </td><td class="markdownTableBodyNone">64 KB  </td><td class="markdownTableBodyNone">General use / buffers  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="video-ram-2116-2119"></a>
-Video RAM ($2116-$2119)</h3>
-<p>64 KB accessed through registers, not directly mapped.</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Range  </th><th class="markdownTableHeadNone">Common Use  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$0000-$3FFF  </td><td class="markdownTableBodyNone">Background tiles  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$4000-$7FFF  </td><td class="markdownTableBodyNone">Sprite tiles  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$8000-$FFFF  </td><td class="markdownTableBodyNone">Tilemaps  </td></tr>
-</table>
-<p>Actual layout depends on your configuration.</p>
-<h3 class="doxsection"><a class="anchor" id="oam-object-attribute-memory"></a>
-OAM (Object Attribute Memory)</h3>
-<p>544 bytes accessed through registers $2102-$2104.</p>
-<div class="fragment"><div class="line"><span class="comment">// Structure per sprite (bytes 0-511, 4 bytes each)</span></div>
-<div class="line"><span class="keyword">struct </span>OAM_Entry {</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> x_low;      <span class="comment">// X position (low 8 bits)</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y;          <span class="comment">// Y position</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> tile;       <span class="comment">// Tile number (low 8 bits)</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> attr;       <span class="comment">// vhoopppc (flip, priority, palette, tile high)</span></div>
-<div class="line">};</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Extension table (bytes 512-543)</span></div>
-<div class="line"><span class="comment">// 2 bits per sprite: X high bit, size select</span></div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="cgram-color-ram"></a>
-CGRAM (Color RAM)</h3>
-<p>512 bytes (256 colors x 2 bytes each).</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Range  </th><th class="markdownTableHeadNone">Use  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">colours 0-127  </td><td class="markdownTableBodyNone">Background palettes (8 palettes x 16 colours in the 4bpp modes; 2bpp modes split them into 4-colour groups, Mode 3/4/7 8bpp use all 256)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">colours 128-255  </td><td class="markdownTableBodyNone">Sprite palettes (8 palettes x 16 colours; only palettes 4-7 take part in colour math)  </td></tr>
-</table>
-<p>Color format: <span class="tt">0BBBBBGGGGGRRRRR</span> (15-bit)</p>
-<h2 class="doxsection"><a class="anchor" id="ppu-registers-2100-213f"></a>
-PPU Registers ($2100-$213F)</h2>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Address  </th><th class="markdownTableHeadNone">Name  </th><th class="markdownTableHeadNone">Description  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$2100  </td><td class="markdownTableBodyNone">INIDISP  </td><td class="markdownTableBodyNone">Display control  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$2101  </td><td class="markdownTableBodyNone">OBJSEL  </td><td class="markdownTableBodyNone">Sprite settings  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$2102-03  </td><td class="markdownTableBodyNone">OAMADDL/H  </td><td class="markdownTableBodyNone">OAM address  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$2104  </td><td class="markdownTableBodyNone">OAMDATA  </td><td class="markdownTableBodyNone">OAM data write  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$2105  </td><td class="markdownTableBodyNone">BGMODE  </td><td class="markdownTableBodyNone">BG mode and tile size  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$2106  </td><td class="markdownTableBodyNone">MOSAIC  </td><td class="markdownTableBodyNone">Mosaic effect  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$2107-0A  </td><td class="markdownTableBodyNone">BGnSC  </td><td class="markdownTableBodyNone">BG tilemap addresses  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$210B-0C  </td><td class="markdownTableBodyNone">BGnNBA  </td><td class="markdownTableBodyNone">BG tile data addresses  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$210D-14  </td><td class="markdownTableBodyNone">BGnHOFS/VOFS  </td><td class="markdownTableBodyNone">BG scroll positions  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$2115  </td><td class="markdownTableBodyNone">VMAIN  </td><td class="markdownTableBodyNone">VRAM address increment  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$2116-17  </td><td class="markdownTableBodyNone">VMADDL/H  </td><td class="markdownTableBodyNone">VRAM address  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$2118-19  </td><td class="markdownTableBodyNone">VMDATAL/H  </td><td class="markdownTableBodyNone">VRAM data write  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$211A  </td><td class="markdownTableBodyNone">M7SEL  </td><td class="markdownTableBodyNone">Mode 7 settings  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$211B-20  </td><td class="markdownTableBodyNone">M7A-D/X/Y  </td><td class="markdownTableBodyNone">Mode 7 matrix  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$2121  </td><td class="markdownTableBodyNone">CGADD  </td><td class="markdownTableBodyNone">CGRAM address  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$2122  </td><td class="markdownTableBodyNone">CGDATA  </td><td class="markdownTableBodyNone">CGRAM data write  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$212C-2D  </td><td class="markdownTableBodyNone">TM/TS  </td><td class="markdownTableBodyNone">Main/sub screen enable  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$212E-2F  </td><td class="markdownTableBodyNone">TMW/TSW  </td><td class="markdownTableBodyNone">Window masks  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$2130-32  </td><td class="markdownTableBodyNone">CGWSEL/CGADSUB/COLDATA  </td><td class="markdownTableBodyNone">Color math  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$2133  </td><td class="markdownTableBodyNone">SETINI  </td><td class="markdownTableBodyNone">Screen settings  </td></tr>
-</table>
-<h2 class="doxsection"><a class="anchor" id="cpu-registers-4200-44ff"></a>
-CPU Registers ($4200-$44FF)</h2>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Address  </th><th class="markdownTableHeadNone">Name  </th><th class="markdownTableHeadNone">Description  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$4200  </td><td class="markdownTableBodyNone">NMITIMEN  </td><td class="markdownTableBodyNone">Interrupt enable  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$4201  </td><td class="markdownTableBodyNone">WRIO  </td><td class="markdownTableBodyNone">I/O port write  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$4202-03  </td><td class="markdownTableBodyNone">WRMPYA/B  </td><td class="markdownTableBodyNone">Multiplication operands  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$4204-06  </td><td class="markdownTableBodyNone">WRDIVL/H/B  </td><td class="markdownTableBodyNone">Division operands  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$4207-0A  </td><td class="markdownTableBodyNone">HTIMEL/H, VTIMEL/H  </td><td class="markdownTableBodyNone">IRQ timer  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$420B  </td><td class="markdownTableBodyNone">MDMAEN  </td><td class="markdownTableBodyNone">DMA enable  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$420C  </td><td class="markdownTableBodyNone">HDMAEN  </td><td class="markdownTableBodyNone">HDMA enable  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$420D  </td><td class="markdownTableBodyNone">MEMSEL  </td><td class="markdownTableBodyNone">FastROM enable  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$4210  </td><td class="markdownTableBodyNone">RDNMI  </td><td class="markdownTableBodyNone">NMI flag  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$4211  </td><td class="markdownTableBodyNone">TIMEUP  </td><td class="markdownTableBodyNone">IRQ flag  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$4212  </td><td class="markdownTableBodyNone">HVBJOY  </td><td class="markdownTableBodyNone">H/V blank and joypad status  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$4214-17  </td><td class="markdownTableBodyNone">RDDIVL/H, RDMPYL/H  </td><td class="markdownTableBodyNone">Division/multiplication result  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$4218-1F  </td><td class="markdownTableBodyNone">JOY1L-4H  </td><td class="markdownTableBodyNone">Joypad data  </td></tr>
-</table>
-<h2 class="doxsection"><a class="anchor" id="dma-registers-43x0-43xf"></a>
-DMA Registers ($43x0-$43xF)</h2>
-<p>8 DMA channels (x = 0-7):</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Offset  </th><th class="markdownTableHeadNone">Name  </th><th class="markdownTableHeadNone">Description  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$43x0  </td><td class="markdownTableBodyNone">DMAPx  </td><td class="markdownTableBodyNone">DMA parameters  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$43x1  </td><td class="markdownTableBodyNone">BBADx  </td><td class="markdownTableBodyNone">B-bus address  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$43x2-04  </td><td class="markdownTableBodyNone">A1TxL/H/B  </td><td class="markdownTableBodyNone">A-bus address  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$43x5-06  </td><td class="markdownTableBodyNone">DASxL/H  </td><td class="markdownTableBodyNone">Transfer size / HDMA count  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$43x7  </td><td class="markdownTableBodyNone">DASBx  </td><td class="markdownTableBodyNone">HDMA indirect bank  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">$43x8-09  </td><td class="markdownTableBodyNone">A2AxL/H  </td><td class="markdownTableBodyNone">HDMA table address  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">$43xA  </td><td class="markdownTableBodyNone">NTRLx  </td><td class="markdownTableBodyNone">HDMA line counter  </td></tr>
-</table>
+<p>In OpenSNES the stack starts at <span class="tt">$1FFF</span> and grows down, under the C globals of the <span class="tt">$0000-$1FFF</span> band; <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> objects live above <span class="tt">$2000</span> (<span class="tt"><a class="el" href="tutorial_far_ram.html">docs/tutorials/far_ram.md</a></span>).</p>
+<h3 class="doxsection"><a class="anchor" id="video-ram-oam-and-cgram"></a>
+Video RAM, OAM and CGRAM</h3>
+<p>The PPU's three memories are not in the CPU's address space: they are reached through ports ($2116-$2119 for VRAM, $2102-$2104 for OAM, $2121-$2122 for CGRAM). Their sizes, layout and formats are in <a class="el" href="hardware_ppu.html" title="The PPU">The PPU</a>; OAM byte by byte is in <a class="el" href="oam.html" title="SNES OAM (Object Attribute Memory)">SNES OAM (Object Attribute Memory)</a>.</p>
+<h3 class="doxsection"><a class="anchor" id="hardware-registers-1"></a>
+Hardware registers</h3>
+<p>The registers mapped at $2100-$21FF, $4200-$44FF and $4300-$437F are indexed, then detailed, in <a class="el" href="registers.html" title="SNES Hardware Register Reference">SNES Hardware Register Reference</a>.</p>
 <h2 class="doxsection"><a class="anchor" id="example-setting-up-memory"></a>
 Example: Setting Up Memory</h2>
-<div class="fragment"><div class="line"><span class="comment">// Define variables in different memory regions</span></div>
-<div class="line"><span class="preprocessor">#pragma bss-name(push, &quot;BSS&quot;)    </span><span class="comment">// Goes to $7E:0200+</span></div>
+<div class="fragment"><div class="line"><span class="comment">// A plain global lives in the 8 KB band $00:0000-$1FFF</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> game_variables[256];</div>
-<div class="line"> </div>
-<div class="line"><span class="preprocessor">#pragma bss-name(push, &quot;HRAM&quot;)   </span><span class="comment">// Goes to $7F:0000+</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> large_buffer[16384];</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Direct page variables (fast access)</span></div>
-<div class="line"><span class="preprocessor">#pragma zeropage-name(push, &quot;ZEROPAGE&quot;)</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> temp;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// A large buffer goes to far RAM, $7E:2000-$FFFF</span></div>
+<div class="line"><a class="code hl_define" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> large_buffer[16384];</div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+<div class="ttc" id="agroup__volatile__types_html_gaef060b3456fdcc093a7210a762d5f2ed"><div class="ttname"><a href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a></div><div class="ttdeci">#define FAR</div><div class="ttdoc">Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.</div><div class="ttdef"><b>Definition</b> types.h:130</div></div>
 <div class="ttc" id="asprites_2dynamic__sprite_2main_8c_html_af743d5de011168f86bbdb716e0afbc47"><div class="ttname"><a href="sprites_2dynamic__sprite_2main_8c.html#af743d5de011168f86bbdb716e0afbc47">frame_counter</a></div><div class="ttdeci">static u8 frame_counter</div><div class="ttdoc">Global frame counter for animation timing.</div><div class="ttdef"><b>Definition</b> main.c:61</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="enhancement-chip-memory"></a>
+</div><!-- fragment --><p>The linker places both; the build stops if the plain band overflows. See <a href="tutorial_far_ram.html">Far RAM</a>.</p>
+<h2 class="doxsection"><a class="anchor" id="enhancement-chip-memory"></a>
 Enhancement Chip Memory</h2>
 <h3 class="doxsection"><a class="anchor" id="sa-1-cartridge"></a>
 SA-1 Cartridge</h3>
@@ -340,23 +204,24 @@ SA-1 Cartridge</h3>
 <div class="line">$40-$4F:0000    up to     BW-RAM (up to 256 KB of fast static RAM; the rest of the range mirrors)</div>
 <div class="line">                256 KB</div>
 </div><!-- fragment --><p><b>I-RAM ($3000-$37FF)</b> is the primary communication channel between the SNES main CPU and the SA-1. Both processors can read and write it, gated by the SIWP ($2229) and CIWP ($222A) write-protection registers.</p>
-<p><b>BW-RAM</b> is battery-backed SRAM mapped in banks $40-$5F, with an 8 KB window visible at $6000-$7FFF for convenient access from bank $00 code.</p>
-<h3 class="doxsection"><a class="anchor" id="superfx-cartridge"></a>
-SuperFX Cartridge</h3>
-<p>The SuperFX (GSU) has its own register space and uses cartridge SRAM as a shared framebuffer.</p>
+<p><b>BW-RAM</b> is battery-backed SRAM mapped in banks $40-$4F, with an 8 KB window visible at $6000-$7FFF for convenient access from bank $00 code.</p>
+<h3 class="doxsection"><a class="anchor" id="super-fx-cartridge"></a>
+Super FX Cartridge</h3>
+<p>The Super FX (GSU) has its own register space and uses cartridge SRAM as a shared framebuffer.</p>
 <div class="fragment"><div class="line">Address         Size      Description</div>
 <div class="line">────────────────────────────────────────────────────────────────</div>
 <div class="line">$3000-$303F     64 B      GSU registers (R0-R15, SFR, SCMR, PBR, etc.)</div>
-<div class="line">$3100-$32FF     512 B     GSU code cache (read-only from SNES side)</div>
+<div class="line">$3100-$32FF     512 B     GSU code cache (the SNES can read and write it)</div>
 <div class="line">$70-$71:0000    32-64 KB  Cartridge SRAM (shared framebuffer + data)</div>
-</div><!-- fragment --><p><b>GSU registers ($3000-$303F)</b> control the SuperFX processor. The SNES CPU writes parameters and starts the GSU by writing to R15 ($301E-$301F).</p>
-<p><b>Code cache ($3100-$32FF)</b> holds the currently cached GSU instructions. The SNES can read but not write this region.</p>
-<p><b>Cartridge SRAM ($70-$71)</b> serves as the GSU framebuffer. The SuperFX PLOT instruction writes pixels here, and the SNES reads it back for display. Bus ownership is controlled by the SCMR register ($303A) — the SNES and GSU cannot access SRAM simultaneously.</p>
-<h2 class="doxsection"><a class="anchor" id="further-reading-2"></a>
+</div><!-- fragment --><p><b>GSU registers ($3000-$303F)</b> control the Super FX processor. The SNES CPU writes parameters and starts the GSU by writing to R15 ($301E-$301F).</p>
+<p><b>Code cache ($3100-$32FF)</b> holds the currently cached GSU instructions. The SNES CPU can also write opcodes there, in 16-byte lines, to load code into the cache itself (fullsnes, "Writing to Code-Cache (by SNES CPU)").</p>
+<p><b>Cartridge SRAM ($70-$71)</b> serves as the GSU framebuffer. The Super FX PLOT instruction writes pixels here, and the SNES reads it back for display. Bus ownership is controlled by the SCMR register ($303A) — the SNES and GSU cannot access SRAM simultaneously.</p>
+<h2 class="doxsection"><a class="anchor" id="further-reading-3"></a>
 Further Reading</h2>
 <ul>
-<li><a class="el" href="REGISTERS_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/REGISTERS.md">Hardware Registers</a> - PPU, DMA, I/O registers</li>
-<li><a class="el" href="OAM_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/OAM.md">OAM</a> - Sprite attribute memory</li>
+<li><a href="registers.html">Hardware Registers</a> - PPU, DMA, I/O registers</li>
+<li><a href="hardware_ppu.html">The PPU</a> - VRAM, OAM and CGRAM</li>
+<li><a href="oam.html">OAM</a> - Sprite attribute memory</li>
 <li><a href="https://snes.nesdev.org/wiki/Memory_map">SNESdev Wiki Memory Map</a> </li>
 </ul>
 </div></div><!-- contents -->
@@ -373,7 +238,7 @@ Further Reading</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

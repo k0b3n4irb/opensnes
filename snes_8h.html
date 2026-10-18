@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes.h File Reference</title>
+<title>lib/include/snes.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -150,11 +150,11 @@ $(function(){initNavTree('snes_8h.html','',''); });
 Macros</h2></td></tr>
 <tr class="memitem:a52dcd00f96e302db0233afedf45d42d3" id="r_a52dcd00f96e302db0233afedf45d42d3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a52dcd00f96e302db0233afedf45d42d3">OPENSNES_VERSION_MAJOR</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:a52dcd00f96e302db0233afedf45d42d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES major version.  <br /></td></tr>
-<tr class="memitem:ac7010da4aff784c937f4eb21b9aff806" id="r_ac7010da4aff784c937f4eb21b9aff806"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac7010da4aff784c937f4eb21b9aff806">OPENSNES_VERSION_MINOR</a>&#160;&#160;&#160;50</td></tr>
+<tr class="memitem:ac7010da4aff784c937f4eb21b9aff806" id="r_ac7010da4aff784c937f4eb21b9aff806"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac7010da4aff784c937f4eb21b9aff806">OPENSNES_VERSION_MINOR</a>&#160;&#160;&#160;51</td></tr>
 <tr class="memdesc:ac7010da4aff784c937f4eb21b9aff806"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES minor version.  <br /></td></tr>
 <tr class="memitem:af2660331ece9bb304cf9068ce6f4972a" id="r_af2660331ece9bb304cf9068ce6f4972a"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af2660331ece9bb304cf9068ce6f4972a">OPENSNES_VERSION_PATCH</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:af2660331ece9bb304cf9068ce6f4972a"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES patch version.  <br /></td></tr>
-<tr class="memitem:a409c167562806a982baffc275742c677" id="r_a409c167562806a982baffc275742c677"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a409c167562806a982baffc275742c677">OPENSNES_VERSION_STRING</a>&#160;&#160;&#160;&quot;0.50.0&quot;</td></tr>
+<tr class="memitem:a409c167562806a982baffc275742c677" id="r_a409c167562806a982baffc275742c677"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a409c167562806a982baffc275742c677">OPENSNES_VERSION_STRING</a>&#160;&#160;&#160;&quot;0.51.0&quot;</td></tr>
 <tr class="memdesc:a409c167562806a982baffc275742c677"><td class="mdescLeft">&#160;</td><td class="mdescRight">OpenSNES version string.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
@@ -173,6 +173,15 @@ Macros</h2></td></tr>
 <li><span class="tt">&lt;<a class="el" href="scene_8h.html" title="Opt-in scene/state stack — push/pop game scenes without rolling your own state machine.">snes/scene.h</a>&gt;</span> — push/pop scene stack</li>
 <li><span class="tt">&lt;<a class="el" href="panel_8h.html" title="Opt-in 9-slice panels — bordered boxes on a background layer.">snes/panel.h</a>&gt;</span> — 9-slice HUD / dialog boxes on a BG layer</li>
 <li><span class="tt">&lt;<a class="el" href="dsp1_8h.html" title="DSP-1 coprocessor (NEC µPD77C25) — fixed-point 3D math from C.">snes/dsp1.h</a>&gt;</span> — DSP-1 coprocessor 3D math (needs USE_DSP1 := 1)</li>
+<li><span class="tt">&lt;<a class="el" href="tile_8h.html" title="Build SNES tiles from pixels at run time.">snes/tile.h</a>&gt;</span> — build 2/4/8bpp tiles from pixels at run time</li>
+<li><span class="tt">&lt;<a class="el" href="anim_8h.html" title="Declarative animation player — data-driven frame sequencing.">snes/anim.h</a>&gt;</span> — declarative animation player</li>
+<li><span class="tt">&lt;<a class="el" href="fixed32_8h.html" title="SNES 16.16 Fixed-Point Math.">snes/fixed32.h</a>&gt;</span> — 16.16 fixed-point math</li>
+<li><span class="tt">&lt;<a class="el" href="apu_8h.html" title="Raw APU (SPC700) access — IPL upload and execution.">snes/apu.h</a>&gt;</span> — raw APU access: upload and run your own SPC700 program</li>
+<li><span class="tt">&lt;<a class="el" href="snesmod_8h.html" title="SNESMOD - Tracker-based Audio Engine.">snes/snesmod.h</a>&gt;</span> — SNESMOD tracker music and sound effects</li>
+<li><span class="tt">&lt;<a class="el" href="object_8h.html" title="Game object engine with physics and collision (CONTRIB module).">snes/object.h</a>&gt;</span> — game object engine (contrib module)</li>
+<li><span class="tt">&lt;<a class="el" href="profile_8h.html" title="Performance profiling tools for SNES development.">snes/profile.h</a>&gt;</span> — performance profiling</li>
+<li><span class="tt">&lt;<a class="el" href="sa1_8h.html" title="SA-1 Enhancement Chip Interface.">snes/sa1.h</a>&gt;</span> — SA-1 coprocessor (needs USE_SA1 := 1)</li>
+<li><span class="tt">&lt;<a class="el" href="superfx_8h.html" title="SuperFX (GSU) coprocessor library — registers, config, and API.">snes/superfx.h</a>&gt;</span> — Super FX (GSU) coprocessor (needs USE_SUPERFX := 1)</li>
 </ul>
 <p>The Doxygen list at the bottom of this header repeats the same split for IDE / cross-reference tooling.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
@@ -214,7 +223,7 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define OPENSNES_VERSION_MINOR&#160;&#160;&#160;50</td>
+          <td class="memname">#define OPENSNES_VERSION_MINOR&#160;&#160;&#160;51</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -246,7 +255,7 @@ Macros</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define OPENSNES_VERSION_STRING&#160;&#160;&#160;&quot;0.50.0&quot;</td>
+          <td class="memname">#define OPENSNES_VERSION_STRING&#160;&#160;&#160;&quot;0.51.0&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -129,7 +129,7 @@ Bank</h2>
 <div class="line">opensnes-music bank music/*.it --name soundbank --bank 1  # several modules, one bank</div>
 <div class="line">opensnes-music bank sfx/*.it --name sfx --same-size       # a sound-effect bank: every module sized like the first</div>
 </div><!-- fragment --><p><b>In:</b> Impulse Tracker modules, uncompressed or IT 2.14/2.15 compressed samples, up to 8 channels (the SPC700 has eight voices).</p>
-<p><b>Out:</b> <span class="tt">NAME.asm</span> (the data, in ROM bank <span class="tt">--bank</span>, default 1 — the OpenSNES layout; bank 0 holds the code), <span class="tt">NAME.h</span> (one constant per module and per effect, prefixed <span class="tt">NAME</span>), <span class="tt">NAME.bnk</span> (the sample data). <span class="tt">NAME</span> defaults to the module's name for one input and to <span class="tt">soundbank</span> for several. A module that needs more SPC RAM than a module may take is named with its size.</p>
+<p><b>Out:</b> <span class="tt">NAME.asm</span> (the data, in ROM bank <span class="tt">--bank</span>, default 1 — the OpenSNES layout; bank 0 holds the code), <span class="tt">NAME.h</span> (one constant per module and per effect, prefixed <span class="tt">NAME</span>), <span class="tt">NAME.bnk</span> (the sample data). <span class="tt">NAME</span> defaults to the module's name for one input and to <span class="tt">soundbank</span> for several. A module that does not fit the SPC700's RAM is refused, named with what it needs and what the driver has, and nothing is written.</p>
 <p><b>The bank as an asset.</b> A soundbank has several sources, so its settings live in a file named after it (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>):</p>
 <div class="fragment"><div class="line">tool = &quot;opensnes-music&quot;</div>
 <div class="line"> </div>
@@ -138,37 +138,51 @@ Bank</h2>
 <div class="line">bank = 1</div>
 </div><!-- fragment --><p><span class="tt">opensnes-music bank music/soundbank.toml</span> builds <span class="tt">soundbank.asm</span>, <span class="tt">.h</span> and <span class="tt">.bnk</span> beside the file; <span class="tt">opensnes-music bank music/*.it --name
 soundbank --save</span> writes that file from a command-line run.</p>
-<p>Today the build calls <span class="tt">smconv</span> through <span class="tt">USE_SNESMOD</span> and <span class="tt">SOUNDBANK_SRC</span>; <span class="tt">opensnes-music bank</span> produces the same files, and the build switches to it with the family's generic rule.</p>
+<h2 class="doxsection"><a class="anchor" id="in-a-game"></a>
+In a game</h2>
+<p>The build runs <span class="tt">opensnes-music bank</span> for you; you list the modules in the Makefile:</p>
+<div class="fragment"><div class="line">USE_SNESMOD   := 1</div>
+<div class="line">SOUNDBANK_SRC := music/theme.it sfx/effects.it    # one module per file</div>
+</div><!-- fragment --><p>It converts them (<span class="tt">--name soundbank</span>, <span class="tt">--bank</span> from <span class="tt">SOUNDBANK_BANK</span>, 1 by default) and links the soundbank; the HiROM build relocates its origin for you. A settings file is for running the tool by hand: the build links a soundbank only through <span class="tt">SOUNDBANK_SRC</span>. In C, the <span class="tt">.h</span> gives each module and effect a name:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;soundbank.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a>();</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a>(SOUNDBANK_BANK);</div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a>(MOD_THEME);             <span class="comment">// load a module</span></div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> jump = <a class="code hl_function" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a>(SFX_JUMP);    <span class="comment">// load an effect, keep its slot</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);                           <span class="comment">// play from pattern 0</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* in the game loop */</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(jump, 127, 128, <a class="code hl_define" href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a>);   <span class="comment">// volume, pan, pitch</span></div>
+<div class="line"><a class="code hl_function" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a>();                         <span class="comment">// once per frame</span></div>
+<div class="ttc" id="agroup__snesmod__init_html_ga4ee30188309d91d30e4d147b6292cae3"><div class="ttname"><a href="group__snesmod__init.html#ga4ee30188309d91d30e4d147b6292cae3">snesmodSetSoundbank</a></div><div class="ttdeci">void snesmodSetSoundbank(u8 bank)</div><div class="ttdoc">Set the soundbank bank number.</div></div>
+<div class="ttc" id="agroup__snesmod__init_html_ga5bc715831ba28701398dceb9484a069c"><div class="ttname"><a href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c">snesmodInit</a></div><div class="ttdeci">void snesmodInit(void)</div><div class="ttdoc">Initialize SNESMOD audio engine.</div></div>
+<div class="ttc" id="agroup__snesmod__module_html_ga8299a9a929e131b1c7c145fae1a1e2f1"><div class="ttname"><a href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a></div><div class="ttdeci">void snesmodPlay(u8 startPosition)</div><div class="ttdoc">Start module playback.</div></div>
+<div class="ttc" id="agroup__snesmod__module_html_gae805748fae02839bafc3b2c2e3a82358"><div class="ttname"><a href="group__snesmod__module.html#gae805748fae02839bafc3b2c2e3a82358">snesmodLoadModule</a></div><div class="ttdeci">void snesmodLoadModule(u16 moduleId)</div><div class="ttdoc">Load a module from the soundbank.</div></div>
+<div class="ttc" id="agroup__snesmod__pitch_html_ga6ade25aca1fe55755fcaa90121865cd7"><div class="ttname"><a href="group__snesmod__pitch.html#ga6ade25aca1fe55755fcaa90121865cd7">SNESMOD_PITCH_NORMAL</a></div><div class="ttdeci">#define SNESMOD_PITCH_NORMAL</div><div class="ttdef"><b>Definition</b> snesmod.h:339</div></div>
+<div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
+<div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
+<div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
+</div><!-- fragment --><p><span class="tt">examples/audio/snesmod_music</span>, <span class="tt"><a class="el" href="group__snesmod__sfx.html">Sound Effects</a></span>, and the games <span class="tt">likemario</span> and <span class="tt">tetris</span> do this. The runtime side is <a class="el" href="tutorial_audio.html" title="Music with SNESMOD">Music with SNESMOD</a>.</p>
+<ul>
+<li><b>Many modules, one bank.</b> Songs through <span class="tt">snesmodLoadModule(N)</span> and <span class="tt">snesmodPlay(0)</span>, effects through <span class="tt">snesmodLoadEffect(N)</span> and <span class="tt"><a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect</a>(slot, …)</span>.</li>
+<li><b>The SPC700 limits are real.</b> Eight channels; samples become BRR at 32 kHz at most; <span class="tt">inspect</span> says how much of the 64 KB a module takes, and music and samples share it.</li>
+</ul>
 <h2 class="doxsection"><a class="anchor" id="inspect-2"></a>
 Inspect</h2>
 <div class="fragment"><div class="line">opensnes-music inspect music/*.it</div>
 <div class="line"># theme.it: &quot;pollen resurrection&quot;, 18 patterns, 17 instruments, 17 samples, 21 orders</div>
-<div class="line">#   -&gt; 44137 bytes of SPC RAM (13820 free of 57957), 17 BRR sources</div>
-</div><!-- fragment --><p>Nothing is written. The figure is the one that decides whether a song fits: the SPC700 has 64 KB, the driver and its tables take the rest, and a module may use 57 957 bytes for its patterns, instruments, samples and echo buffer. Samples shared between modules of one bank are stored once (<span class="tt">BRR sources</span> counts them).</p>
+<div class="line">#   -&gt; 16446 bytes of SPC RAM (13506 free of 29952), 17 BRR sources</div>
+</div><!-- fragment --><p>Nothing is written. The figure is the one that decides whether a song fits. The driver loads the module at <span class="tt">$1A00</span> (its patterns, instruments and sample table) and the module's BRR samples right after it; the echo buffer sits under <span class="tt">$FF00</span> and takes 2 KB per step of the module's echo delay (<span class="tt">edl</span> in its <span class="tt">[[SNESMOD]]</span> message): with echo it starts at page <span class="tt">$FF - 8 * edl</span>. So a module has 58 368 bytes without echo and 58 624 - 2 048 * edl with it: 29 952 for the <span class="tt">edl 14</span> above. The <span class="tt">MOD_&lt;NAME&gt;_SIZE</span> constant of the soundbank's <span class="tt">.h</span> is another figure, kept as smconv wrote it (it counts the echo and leaves out the module's tables); the one that decides whether a song fits is this one. Samples shared between modules of one bank are stored once in the bank (<span class="tt">BRR sources</span> counts them); in the SPC700's RAM each module holds its own.</p>
 <h2 class="doxsection"><a class="anchor" id="spc"></a>
 Spc</h2>
 <div class="fragment"><div class="line">opensnes-music spc music/theme.it --out build/   # → build/theme.spc</div>
 </div><!-- fragment --><p>A 66 048-byte SPC file (the SPC700's RAM and registers with the driver and the module loaded), for an SPC player or for sharing a song outside the game.</p>
 <h2 class="doxsection"><a class="anchor" id="exit-codes-and-messages"></a>
 Exit codes and messages</h2>
-<p>0 done; 1 the input was refused (a file that is not an IT module, a bank number outside 1..255); 2 usage; 3 the file system. <span class="tt">--json</span> puts the outputs, the modules and their SPC RAM figures on stdout as one object. The converter's diagnostics come out in the same shape (<span class="tt">opensnes-music:
-file: <a class="el" href="fundamentals_2text__glyphs_2main_8c.html#ab3001e6fcd80f929ec89a02a0d5ad26e" title="&quot;HELLO WORLD!&quot; encoded as tile indices into font_tiles[]">message</a></span>), on stderr; under <span class="tt">--json</span> the warnings are listed in a <span class="tt">warnings</span> array.</p>
-<h2 class="doxsection"><a class="anchor" id="from-smconv"></a>
-From smconv</h2>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">smconv  </th><th class="markdownTableHeadNone">opensnes-music  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">smconv -s -o NAME -<a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a> N -n -p NAME a.it b.it</span>  </td><td class="markdownTableBodyNone"><span class="tt">opensnes-music bank a.it b.it --name NAME --bank N</span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">smconv -s -f ...</span>  </td><td class="markdownTableBodyNone"><span class="tt">--same-size</span>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">smconv a.it</span> (an <span class="tt">.spc</span>)  </td><td class="markdownTableBodyNone"><span class="tt">opensnes-music spc a.it</span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">smconv -V</span> (RAM usage)  </td><td class="markdownTableBodyNone"><span class="tt">opensnes-music inspect</span>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></span> (HiROM)  </td><td class="markdownTableBodyNone">the build relocates the origin, as before  </td></tr>
-</table>
+<p>0 done; 1 the input was refused (a file that is not an IT module, a module too big for the SPC700's RAM, a bank number outside 1..255); 2 usage; 3 the file system. <span class="tt">--json</span> puts the outputs, the modules and their SPC RAM figures on stdout as one object. The converter's diagnostics come out in the same shape (<span class="tt">opensnes-music:
+file: <a class="el" href="fundamentals_2text__glyphs_2main_8c.html#ab3001e6fcd80f929ec89a02a0d5ad26e" title="&quot;HELLO WORLD!&quot; encoded as tile indices into font_tiles[]">message</a></span>), on stderr; under <span class="tt">--json</span> the warnings are listed in a <span class="tt">warnings</span> array. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
@@ -183,7 +197,7 @@ From smconv</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

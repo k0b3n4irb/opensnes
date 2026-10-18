@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/mode7/rotate_scale/main.c File Reference</title>
+<title>examples/mode7/rotate_scale/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -131,7 +131,7 @@ $(function(){initNavTree('mode7_2rotate__scale_2main_8c.html','',''); });
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), from data.asm.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), converted by the build from res/.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Mode 7 rotation and scaling demo. </p>
@@ -168,9 +168,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), from data.asm. </p>
-<p>Mode 7 tilemap (128x128 tile indices, one byte each), from data.asm.</p>
-<p>256-colour palette for the Mode 7 plane (512 bytes), from data.asm.</p>
+<p>Mode 7 tile pixel data (256 tiles x 64 bytes, 8bpp), converted by the build from res/. </p>
+<p>Mode 7 tilemap (128x128 tile indices, one byte each), converted by the build from res/</p>
+<p>256-colour palette for the Mode 7 plane (512 bytes), converted by the build from res/</p>
 <p>Entry point &ndash; interactive Mode 7 rotation and scaling demo.</p>
 <p>Initializes the Mode 7 plane with an image, then allows the user to rotate (A/B buttons) and zoom (D-pad UP/DOWN) in real time. The transformation matrix is updated each frame via <a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a> and <a class="el" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668" title="Set Mode 7 scale factors.">mode7SetScale()</a>, which compute sin/cos values and write to the M7A-M7D hardware registers.</p>
 <dl class="section return"><dt>Returns</dt><dd>Does not return (infinite loop). </dd></dl>

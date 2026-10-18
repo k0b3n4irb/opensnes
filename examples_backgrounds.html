@@ -122,34 +122,33 @@ $(function(){initNavTree('examples_backgrounds.html','',''); });
   <div class="headertitle"><div class="title">Backgrounds </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><b>Family 2 — "fill the screen with your own art."</b> The background layers are the SNES's canvas. This family is a ladder through the PPU's background modes, from a single Mode 1 image up to 256-colour and hi-res, each mode a different trade of colours against layers against resolution.</p>
+<div class="textblock"><p><b>"fill the screen with your own art."</b> The background layers are the SNES's canvas. This family is a ladder through the PPU's background modes, from a single Mode 1 image up to 256-colour and hi-res, each mode a different trade of colours against layers against resolution.</p>
 <h2 class="doxsection"><a class="anchor" id="the-ladder-1"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
+<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2.1  </td><td class="markdownTableBodyNone"><a href="mode1/">mode1</a>  </td><td class="markdownTableBodyNone">How do I show a background from a PNG (the canonical Mode 1)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode1.html">mode1</a>  </td><td class="markdownTableBodyNone">How do I show a background from a PNG (the canonical Mode 1)?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">2.3  </td><td class="markdownTableBodyNone"><a href="mode1_lz77/">mode1_lz77</a>  </td><td class="markdownTableBodyNone">How do I load a background from <em>compressed</em> data?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode1_lz77.html">mode1_lz77</a>  </td><td class="markdownTableBodyNone">How do I load a background from <em>compressed</em> data?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2.4  </td><td class="markdownTableBodyNone"><a href="mode1_bg3_priority/">mode1_bg3_priority</a>  </td><td class="markdownTableBodyNone">How do I make BG3 draw in front for a HUD overlay?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode1_bg3_priority.html">mode1_bg3_priority</a>  </td><td class="markdownTableBodyNone">How do I make BG3 draw in front for a HUD overlay?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">2.5  </td><td class="markdownTableBodyNone"><a href="mode0/">mode0</a>  </td><td class="markdownTableBodyNone">How do I run four 2bpp layers (Mode 0)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode0.html">mode0</a>  </td><td class="markdownTableBodyNone">How do I run four 2bpp layers (Mode 0)?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2.6  </td><td class="markdownTableBodyNone"><a href="mode3/">mode3</a>  </td><td class="markdownTableBodyNone">How do I show a 256-colour (8bpp, Mode 3) background?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode3.html">mode3</a>  </td><td class="markdownTableBodyNone">How do I show a 256-colour (8bpp, Mode 3) background?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">2.7  </td><td class="markdownTableBodyNone"><a href="mode5_hires/">mode5_hires</a>  </td><td class="markdownTableBodyNone">How do I use a hi-res (512-wide, Mode 5 + interlace) background?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode5_hires.html">mode5_hires</a>  </td><td class="markdownTableBodyNone">How do I use a hi-res (512-wide, Mode 5 + interlace) background?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2.8  </td><td class="markdownTableBodyNone"><a href="mode2/">mode2</a>  </td><td class="markdownTableBodyNone">How do I scroll each column independently (offset-per-tile, modes 2/4/6)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode2.html">mode2</a>  </td><td class="markdownTableBodyNone">How do I scroll each column independently (offset-per-tile, modes 2/4/6)?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">2.9  </td><td class="markdownTableBodyNone"><a href="mode4/">mode4</a>  </td><td class="markdownTableBodyNone">How does offset-per-tile work with a 256-colour layer (Mode 4's single row)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode4.html">mode4</a>  </td><td class="markdownTableBodyNone">How does offset-per-tile work with a 256-colour layer (Mode 4's single row)?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2.10  </td><td class="markdownTableBodyNone"><a href="mode6/">mode6</a>  </td><td class="markdownTableBodyNone">How does offset-per-tile work in hi-res (Mode 6)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds_mode6.html">mode6</a>  </td><td class="markdownTableBodyNone">How does offset-per-tile work in hi-res (Mode 6)?  </td></tr>
 </table>
 <blockquote class="doxtable">
-<p>Under-the-hood rung to come — <b>2.2 a tilemap built by hand in C</b>: what the asset macro hides, for the <span class="tt">fundamentals/</span> tier.</p>
-<p>Moving the world past the camera lives in its own family: <a href="../scrolling/"><span class="tt">scrolling/</span></a>. </p>
+<p>Moving the world past the camera lives in its own family: <a href="examples_scrolling.html"><span class="tt">scrolling/</span></a>. </p>
 </blockquote>
 <h2 class="doxsection"><a class="anchor" id="the-idea-in-one-screen-1"></a>
 The idea in one screen</h2>
@@ -169,7 +168,7 @@ The idea in one screen</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

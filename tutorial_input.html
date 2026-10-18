@@ -159,95 +159,38 @@ Button Constants</h2>
 <div class="line"><span class="preprocessor">#define KEY_SELECT  0x2000</span></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="reading-controllers"></a>
 Reading Controllers</h2>
-<h3 class="doxsection"><a class="anchor" id="direct-register-access-recommended"></a>
-Direct Register Access (Recommended)</h3>
+<p>The NMI handler reads both pads during VBlank, every frame. Three calls give you that reading; each takes the pad number (0 or 1):</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Call  </th><th class="markdownTableHeadNone">Bits set for buttons that are  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld(pad)</a></span>  </td><td class="markdownTableBodyNone">down now  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed(pad)</a></span>  </td><td class="markdownTableBodyNone">down now and up last frame (fires once per press)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">padReleased(pad)</span>  </td><td class="markdownTableBodyNone">up now and down last frame  </td></tr>
+</table>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad;</div>
-<div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">// Wait for auto-joypad read to complete</span></div>
-<div class="line">    <span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Read controller 1</span></div>
-<div class="line">    pad = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Check for disconnected controller</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad == 0xFFFF) {</div>
-<div class="line">        <span class="comment">// No controller connected</span></div>
-<div class="line">        <span class="keywordflow">continue</span>;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_define" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="line">        player_jump();          <span class="comment">/* once per press */</span></div>
 <div class="line">    }</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Check buttons</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
-<div class="line">        <span class="comment">// A button pressed</span></div>
-<div class="line">    }</div>
-<div class="line">    <span class="keywordflow">if</span> (pad &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
-<div class="line">        <span class="comment">// D-pad up pressed</span></div>
-<div class="line">    }</div>
-<div class="line">}</div>
-<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agroup__cpu__regs_html_gaa7f10b9a2db0fb936560d2475717bf73"><div class="ttname"><a href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a></div><div class="ttdeci">#define REG_JOY1H</div><div class="ttdoc">Joypad 1 data high (R).</div><div class="ttdef"><b>Definition</b> registers.h:334</div></div>
-<div class="ttc" id="agroup__cpu__regs_html_gac0a6bd5981a6d53791eca06ea2bd5772"><div class="ttname"><a href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a></div><div class="ttdeci">#define REG_JOY1L</div><div class="ttdoc">Joypad 1 data low (R).</div><div class="ttdef"><b>Definition</b> registers.h:331</div></div>
-<div class="ttc" id="agroup__cpu__regs_html_gaf25c0fcc5e2519aa98aebe289d391ca2"><div class="ttname"><a href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a></div><div class="ttdeci">#define REG_HVBJOY</div><div class="ttdoc">H/V blank and joypad status (R).</div><div class="ttdef"><b>Definition</b> registers.h:307</div></div>
-<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
-<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
-<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="reading-controller-2"></a>
-Reading Controller 2</h3>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad1, pad2;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Wait for auto-joypad</span></div>
-<div class="line"><span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Read both controllers</span></div>
-<div class="line">pad1 = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
-<div class="line">pad2 = <a class="code hl_define" href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a> | (<a class="code hl_define" href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a> &lt;&lt; 8);</div>
-<div class="ttc" id="agroup__cpu__regs_html_ga02503a4acaf3d9cc9fa85ac9732fdb3a"><div class="ttname"><a href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a></div><div class="ttdeci">#define REG_JOY2H</div><div class="ttdoc">Joypad 2 data high (R).</div><div class="ttdef"><b>Definition</b> registers.h:340</div></div>
-<div class="ttc" id="agroup__cpu__regs_html_ga2dd548a4753566d81adb12473d4673af"><div class="ttname"><a href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a></div><div class="ttdeci">#define REG_JOY2L</div><div class="ttdoc">Joypad 2 data low (R).</div><div class="ttdef"><b>Definition</b> registers.h:337</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="edge-detection"></a>
-Edge Detection</h2>
-<p>Detect button presses (not just held state):</p>
-<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_current;</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_previous = 0;</div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_pressed;</div>
-<div class="line"> </div>
-<div class="line"><span class="keywordflow">while</span> (1) {</div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">    <span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Read current state</span></div>
-<div class="line">    pad_current = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Detect new presses (down this frame, not last frame)</span></div>
-<div class="line">    pad_pressed = pad_current &amp; ~pad_previous;</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Save for next frame</span></div>
-<div class="line">    pad_previous = pad_current;</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Skip if disconnected</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad_current == 0xFFFF) {</div>
-<div class="line">        pad_pressed = 0;</div>
-<div class="line">    }</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Now use pad_pressed for one-shot actions</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
-<div class="line">        <span class="comment">// A was just pressed (fires once)</span></div>
-<div class="line">        player_jump();</div>
-<div class="line">    }</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Use pad_current for continuous actions</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad_current &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
-<div class="line">        <span class="comment">// Right is held (fires every frame)</span></div>
-<div class="line">        <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>++;</div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_define" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) {</div>
+<div class="line">        <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>++;             <span class="comment">/* every frame while held */</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
+<div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="movement-example"></a>
+<div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
+<div class="ttc" id="ainput_8h_html_a91ebd3f122c9ba2913248112f7dc3647"><div class="ttname"><a href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></div><div class="ttdeci">#define padHeld(pad)</div><div class="ttdef"><b>Definition</b> input.h:158</div></div>
+<div class="ttc" id="ainput_8h_html_aed650db72d53439d6b554063a88de5cb"><div class="ttname"><a href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a></div><div class="ttdeci">#define padPressed(pad)</div><div class="ttdef"><b>Definition</b> input.h:159</div></div>
+<div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
+</div><!-- fragment --><p>Use <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> for one-shot actions (jump, menu choice) and <span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> for continuous ones (movement). An unplugged pad reads as no button down; <span class="tt"><a class="el" href="input_8h.html#a81de395bc8d5dc741526d1378981a261" title="Check if controller is connected.">padIsConnected()</a></span> tells the two apart (see below).</p>
+<h2 class="doxsection"><a class="anchor" id="movement-example"></a>
 Movement Example</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> = 128;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a> = 112;</div>
@@ -267,46 +210,33 @@ Movement Example</h2>
 <div class="line">        <span class="keywordflow">if</span> (<a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a> &lt; 248) <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>++;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">/* in the main loop: */</span></div>
+<div class="line">update_player(<a class="code hl_define" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(0));</div>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_abdf8116d2e38725db40315200d3e261b"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a></div><div class="ttdeci">static s16 player_y</div><div class="ttdoc">Player Y position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:58</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:79</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:80</div></div>
+<div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
+<div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="two-player-example"></a>
 Two-Player Example</h2>
-<div class="fragment"><div class="line"><span class="comment">// Player positions</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p1_x = 64, p1_y = 112;</div>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p1_x = 64, p1_y = 112;</div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> p2_x = 192, p2_y = 112;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordflow">while</span> (1) {</div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">    <span class="keywordflow">while</span> (<a class="code hl_define" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2">REG_HVBJOY</a> &amp; 0x01) {}</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad1 = <a class="code hl_define" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(0);</div>
+<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad2 = <a class="code hl_define" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a>(1);</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">// Read both controllers</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad1 = <a class="code hl_define" href="group__cpu__regs.html#gac0a6bd5981a6d53791eca06ea2bd5772">REG_JOY1L</a> | (<a class="code hl_define" href="group__cpu__regs.html#gaa7f10b9a2db0fb936560d2475717bf73">REG_JOY1H</a> &lt;&lt; 8);</div>
-<div class="line">    <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad2 = <a class="code hl_define" href="group__cpu__regs.html#ga2dd548a4753566d81adb12473d4673af">REG_JOY2L</a> | (<a class="code hl_define" href="group__cpu__regs.html#ga02503a4acaf3d9cc9fa85ac9732fdb3a">REG_JOY2H</a> &lt;&lt; 8);</div>
+<div class="line">    <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (p1_x &gt; 0) p1_x--; }</div>
+<div class="line">    <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (p1_x &lt; 248) p1_x++; }</div>
+<div class="line">    <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (p2_x &gt; 0) p2_x--; }</div>
+<div class="line">    <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (p2_x &lt; 248) p2_x++; }</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">// Player 1 movement</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad1 != 0xFFFF) {</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (p1_y &gt; 0) p1_y--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (p1_y &lt; 224) p1_y++; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (p1_x &gt; 0) p1_x--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad1 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (p1_x &lt; 248) p1_x++; }</div>
-<div class="line">    }</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Player 2 movement</span></div>
-<div class="line">    <span class="keywordflow">if</span> (pad2 != 0xFFFF) {</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>)    { <span class="keywordflow">if</span> (p2_y &gt; 0) p2_y--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>)  { <span class="keywordflow">if</span> (p2_y &lt; 224) p2_y++; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a>)  { <span class="keywordflow">if</span> (p2_x &gt; 0) p2_x--; }</div>
-<div class="line">        <span class="keywordflow">if</span> (pad2 &amp; <a class="code hl_define" href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a>) { <span class="keywordflow">if</span> (p2_x &lt; 248) p2_x++; }</div>
-<div class="line">    }</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Update sprites</span></div>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(0, p1_x, p1_y, 0, 0, 0, 0);  <span class="comment">// Player 1</span></div>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a>(1, p2_x, p2_y, 0, 1, 0, 0);  <span class="comment">// Player 2 (palette 1)</span></div>
-<div class="line">    <a class="code hl_function" href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a>();</div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">}</div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
-<div class="ttc" id="asprite_8h_html_a880416b4272104d4e9b83ea5331b6260"><div class="ttname"><a href="sprite_8h.html#a880416b4272104d4e9b83ea5331b6260">oamUpdate</a></div><div class="ttdeci">void oamUpdate(void)</div><div class="ttdoc">Copy OAM buffer to hardware.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="button-combinations"></a>
 Button Combinations</h2>
 <div class="fragment"><div class="line"><span class="comment">// Check for multiple buttons</span></div>
@@ -330,21 +260,21 @@ Menu Navigation</h2>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> menu_selection = 0;</div>
 <div class="line"><span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> MENU_ITEMS = 4;</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a>) {</div>
 <div class="line">    <span class="keywordflow">if</span> (menu_selection &gt; 0) {</div>
 <div class="line">        menu_selection--;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a>) {</div>
 <div class="line">    <span class="keywordflow">if</span> (menu_selection &lt; MENU_ITEMS - 1) {</div>
 <div class="line">        menu_selection++;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a>) {</div>
 <div class="line">    <span class="comment">// Confirm selection</span></div>
 <div class="line">    activate_menu_item(menu_selection);</div>
 <div class="line">}</div>
-<div class="line"><span class="keywordflow">if</span> (pad_pressed &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) {</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_define" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed</a>(0) &amp; <a class="code hl_define" href="group__input__buttons.html#gad2ae94d1ffed5c399aa6f8c40c0fc3c7">KEY_B</a>) {</div>
 <div class="line">    <span class="comment">// Cancel / go back</span></div>
 <div class="line">    close_menu();</div>
 <div class="line">}</div>
@@ -430,7 +360,7 @@ The Super Scope</h2>
 Scope" screen) to notice a gun plugged in later.</p>
 <h2 class="doxsection"><a class="anchor" id="hardware-registers"></a>
 Hardware Registers</h2>
-<p>For reference, the joypad registers:</p>
+<p>The library reads the pads for you; the registers are listed for reference and for porting code that reads them directly:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Register  </th><th class="markdownTableHeadNone">Address  </th><th class="markdownTableHeadNone">Description  </th></tr>
@@ -443,31 +373,22 @@ Hardware Registers</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">REG_JOY2H  </td><td class="markdownTableBodyNone">$421B  </td><td class="markdownTableBodyNone">Controller 2, high byte  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">REG_JOY3L  </td><td class="markdownTableBodyNone">$421C  </td><td class="markdownTableBodyNone">Controller 3 (multitap)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">REG_JOY3H  </td><td class="markdownTableBodyNone">$421D  </td><td class="markdownTableBodyNone">Controller 3 (multitap)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">REG_JOY4L  </td><td class="markdownTableBodyNone">$421E  </td><td class="markdownTableBodyNone">Controller 4 (multitap)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">REG_JOY4H  </td><td class="markdownTableBodyNone">$421F  </td><td class="markdownTableBodyNone">Controller 4 (multitap)  </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">REG_HVBJOY  </td><td class="markdownTableBodyNone">$4212  </td><td class="markdownTableBodyNone">Status (bit 0 = auto-read busy)  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="tips-1"></a>
 Tips</h2>
 <ol type="1">
-<li><b>Always wait for auto-joypad</b> - Check <span class="tt"><a class="el" href="group__cpu__regs.html#gaf25c0fcc5e2519aa98aebe289d391ca2" title="H/V blank and joypad status (R).">REG_HVBJOY</a> &amp; 0x01</span> before reading</li>
-<li><b>Check for disconnected controllers</b> - <span class="tt">0xFFFF</span> means no controller</li>
-<li><b>Use edge detection for menus</b> - Prevents rapid-fire selection</li>
-<li><b>Use held state for movement</b> - Smoother continuous motion</li>
+<li><b><span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> for menus and one-shot actions</b>: it fires once per press.</li>
+<li><b><span class="tt"><a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a></span> for movement</b>: true on every frame the button is down.</li>
+<li><b><span class="tt"><a class="el" href="input_8h.html#a81de395bc8d5dc741526d1378981a261" title="Check if controller is connected.">padIsConnected()</a></span> before asking for a second player</b>: an empty port reads as an idle pad.</li>
 </ol>
 <h2 class="doxsection"><a class="anchor" id="example"></a>
 Example</h2>
 <p>See <span class="tt">examples/input/two_players/</span> for a complete two-player demo.</p>
-<h2 class="doxsection"><a class="anchor" id="next-steps-5"></a>
+<h2 class="doxsection"><a class="anchor" id="next-steps-6"></a>
 Next Steps</h2>
 <ul>
-<li><a class="el" href="tutorial_audio.html" title="Audio &amp; Music Tutorial">Audio &amp; Music</a></li>
+<li><a class="el" href="tutorial_audio.html" title="Music with SNESMOD">Audio &amp; Music</a></li>
 <li><a class="el" href="input_8h.html" title="input.h">Input API Reference</a> </li>
 </ul>
 </div></div><!-- contents -->
@@ -484,7 +405,7 @@ Next Steps</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

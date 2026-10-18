@@ -316,9 +316,9 @@ HDMA Parallax (Per-Scanline Scroll)</h3>
 <div class="ttc" id="agroup__bg__size_html_ga6129b86a7c2913a31f1bca293fa7c1e7"><div class="ttname"><a href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a></div><div class="ttdeci">#define SC_64x32</div><div class="ttdef"><b>Definition</b> background.h:37</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="ahdma_8h_html_a4d4a4c331c20e8e81927d0cd5c195794"><div class="ttname"><a href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794">hdmaEnableMask</a></div><div class="ttdeci">void hdmaEnableMask(u8 channelMask)</div><div class="ttdoc">Enable HDMA channel(s), given as a bit mask.</div></div>
-<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA — never used by the runtime).</div><div class="ttdef"><b>Definition</b> hdma.h:135</div></div>
+<div class="ttc" id="ahdma_8h_html_adba8dbf5c2781225f99ce384c743db80"><div class="ttname"><a href="hdma_8h.html#adba8dbf5c2781225f99ce384c743db80">HDMA_CHANNEL_6</a></div><div class="ttdeci">#define HDMA_CHANNEL_6</div><div class="ttdoc">HDMA channel 6 (recommended for HDMA — never used by the runtime).</div><div class="ttdef"><b>Definition</b> hdma.h:134</div></div>
 <div class="ttc" id="ahdma_8h_html_adf1c0451139948b3f1049b84580ce906"><div class="ttname"><a href="hdma_8h.html#adf1c0451139948b3f1049b84580ce906">hdmaParallax</a></div><div class="ttdeci">void hdmaParallax(u8 channel, u8 bg, const void *scrollTable)</div><div class="ttdoc">Set up a background parallax scroll effect.</div></div>
-<div class="ttc" id="ascrolling_2parallax__scroll_2main_8c_html_aba022e1ff2be864bac42428679aea901"><div class="ttname"><a href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a></div><div class="ttdeci">u8 scroll_table[10]</div><div class="ttdoc">4bpp background tile data (defined in data.asm, stored in ROM)</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
+<div class="ttc" id="ascrolling_2parallax__scroll_2main_8c_html_aba022e1ff2be864bac42428679aea901"><div class="ttname"><a href="scrolling_2parallax__scroll_2main_8c.html#aba022e1ff2be864bac42428679aea901">scroll_table</a></div><div class="ttdeci">u8 scroll_table[10]</div><div class="ttdoc">4bpp background tile data (converted by the build from res/)</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
 </div><!-- fragment --><p>See <span class="tt">examples/scrolling/parallax_scroll/</span> for the complete implementation.</p>
 <p><b>Important:</b> The scroll table must live in RAM (not <span class="tt">const</span>) because the main loop updates it every frame. HDMA reads from the table during rendering, so always update the values <em>before</em> <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>.</p>
 <h2 class="doxsection"><a class="anchor" id="continuous--infinite-scrolling"></a>
@@ -331,7 +331,7 @@ The Streaming Pattern</h3>
 <li>When the scroll crosses an 8-pixel tile boundary, DMA a new column (or row) of tilemap entries into VRAM</li>
 <li>The PPU wraps the tilemap, so the newly written column appears seamlessly at the leading edge</li>
 </ol>
-<p>The <span class="tt">continuous_scroll</span> example demonstrates this with player-controlled scrolling and a character sprite. Key elements from the example:</p>
+<p>The <span class="tt">continuous_scroll</span> example shows the camera half of this — threshold scrolling that follows a character sprite — over two fixed 32x32 maps loaded once, with the scroll capped at <span class="tt"><a class="el" href="scrolling_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a></span>; it streams no columns. For a level wider than the tilemap, with the column streaming done for you, use the <span class="tt">map</span> module (<a class="el" href="tutorial_map.html" title="Scrolling maps">Scrolling maps</a>, <span class="tt">examples/maps/map_scroll</span>). Key elements from the example:</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a>;</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="code hl_variable" href="basics_2collision__demo_2main_8c.html#abdf8116d2e38725db40315200d3e261b">player_y</a>;</div>
@@ -359,7 +359,7 @@ The Streaming Pattern</h3>
 <div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(1, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg2_scroll_x, <a class="code hl_variable" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a>.bg2_scroll_y);</div>
 <div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_addf5d5626d788a05436c14e2a00c1974"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#addf5d5626d788a05436c14e2a00c1974">MAX_SCROLL_X</a></div><div class="ttdeci">#define MAX_SCROLL_X</div><div class="ttdef"><b>Definition</b> main.c:60</div></div>
 <div class="ttc" id="ascrolling_2continuous__scroll_2main_8c_html_ae3ddf372515f487a80742c4ac55de93f"><div class="ttname"><a href="scrolling_2continuous__scroll_2main_8c.html#ae3ddf372515f487a80742c4ac55de93f">SCROLL_THRESHOLD_RIGHT</a></div><div class="ttdeci">#define SCROLL_THRESHOLD_RIGHT</div><div class="ttdef"><b>Definition</b> main.c:61</div></div>
-</div><!-- fragment --><p>See <span class="tt">examples/scrolling/continuous_scroll/</span> for the full implementation including sprite setup, dual-layer parallax, and tilemap loading.</p>
+</div><!-- fragment --><p>See <span class="tt">examples/scrolling/continuous_scroll/</span> for the full implementation including sprite setup, the two layers (scrolled together) and tilemap loading.</p>
 <h3 class="doxsection"><a class="anchor" id="streaming-tips"></a>
 Streaming Tips</h3>
 <ul>
@@ -384,7 +384,7 @@ VBlank Timing</h2>
 <p>Also set initial scroll values <em>before</em> <span class="tt"><a class="el" href="console_8h.html#af8cb701c5b08484903555e77347f460a" title="Enable screen display.">setScreenOn()</a></span> to avoid a single-frame glitch where the tilemap appears at (0, 0) before your intended position takes effect:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, initial_x, initial_y);</div>
 <div class="line"><a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();   <span class="comment">/* First visible frame already has correct scroll */</span></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="next-steps-6"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="next-steps-7"></a>
 Next Steps</h2>
 <ul>
 <li><a class="el" href="tutorial_graphics.html" title="Graphics &amp; Backgrounds Tutorial">Graphics &amp; Backgrounds</a></li>
@@ -405,7 +405,7 @@ Next Steps</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

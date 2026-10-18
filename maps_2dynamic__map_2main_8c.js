@@ -13,7 +13,6 @@ var maps_2dynamic__map_2main_8c =
     [ "initDemoMap32x32", "maps_2dynamic__map_2main_8c.html#a654d38d017c0c89fe361aa787dfcc0a5", null ],
     [ "initDemoMap64x64", "maps_2dynamic__map_2main_8c.html#a9f6bc00b38bcfe94d921eed5e1c10c76", null ],
     [ "main", "maps_2dynamic__map_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
-    [ "smapDma", "maps_2dynamic__map_2main_8c.html#a917e20f94898d50947290c35e5612d6e", null ],
     [ "is_map32x32", "maps_2dynamic__map_2main_8c.html#aee4468215190b975dc2661b09e698851", null ],
     [ "max_scroll_height", "maps_2dynamic__map_2main_8c.html#a799e60ce2f39f87a4e9712520da582fd", null ],
     [ "max_scroll_width", "maps_2dynamic__map_2main_8c.html#ac31b92f2c43357d5d53909f29aa0734b", null ],

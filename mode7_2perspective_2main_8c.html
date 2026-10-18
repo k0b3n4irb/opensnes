@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/mode7/perspective/main.c File Reference</title>
+<title>examples/mode7/perspective/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -123,35 +123,51 @@ $(function(){initNavTree('mode7_2perspective_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Mode 7 perspective with HDMA split-screen (F-Zero style).  
+<p>Mode 7 perspective with an HDMA split screen (F-Zero style).  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="mode7_8h_source.html">snes/mode7.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="hdma_8h_source.html">snes/hdma.h</a>&gt;</code><br />
 <code>#include &quot;res/ground.inc&quot;</code><br />
 <code>#include &quot;res/sky.inc&quot;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:af5e07d5fed5796fb6d2abec5806175a9" id="r_af5e07d5fed5796fb6d2abec5806175a9"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#af5e07d5fed5796fb6d2abec5806175a9">SKYLINE</a>&#160;&#160;&#160;96</td></tr>
+<tr class="memdesc:af5e07d5fed5796fb6d2abec5806175a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The scanline where the sky ends and the ground begins.  <br /></td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad3aafbc6c7613c06add64a85321eb473" id="r_ad3aafbc6c7613c06add64a85321eb473"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad3aafbc6c7613c06add64a85321eb473">asm_setupHdmaPerspective</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#ad20c28dc8fb00b3174dce460e3598548">sx</a>, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> <a class="el" href="#a79b6065ee73ca292d26db6390aa19d63">sy</a>)</td></tr>
-<tr class="memdesc:ad3aafbc6c7613c06add64a85321eb473"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map).  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; F-Zero-style Mode 7 perspective with HDMA split-screen.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry point &ndash; F-Zero-style Mode 7 perspective with an HDMA split screen.  <br /></td></tr>
+<tr class="memitem:aca454876f36e8f32b3ef01f1eb441ecd" id="r_aca454876f36e8f32b3ef01f1eb441ecd"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aca454876f36e8f32b3ef01f1eb441ecd">setCamera</a> (void)</td></tr>
+<tr class="memdesc:aca454876f36e8f32b3ef01f1eb441ecd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Place the camera: Mode 7 scroll and center, and the sky's scroll.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:aeb70acc8c2b753a5582b5568c46c34e8" id="r_aeb70acc8c2b753a5582b5568c46c34e8"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aeb70acc8c2b753a5582b5568c46c34e8">layer_table</a> []</td></tr>
+<tr class="memdesc:aeb70acc8c2b753a5582b5568c46c34e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">TM (main screen layers) per line: OBJ + BG2 for the sky, OBJ + BG1 for the ground.  <br /></td></tr>
+<tr class="memitem:a5ad802b73906cc4b18f6228b7d61b77b" id="r_a5ad802b73906cc4b18f6228b7d61b77b"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a5ad802b73906cc4b18f6228b7d61b77b">mode_table</a> []</td></tr>
+<tr class="memdesc:a5ad802b73906cc4b18f6228b7d61b77b"><td class="mdescLeft">&#160;</td><td class="mdescRight">BGMODE per line: Mode 1 for the sky ($09: Mode 1 with the BG3 priority bit), Mode 7 for the ground. An entry writes once and holds.  <br /></td></tr>
 <tr class="memitem:a50a1287c6a673d98dd90c61df91fd33c" id="r_a50a1287c6a673d98dd90c61df91fd33c"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></td></tr>
-<tr class="memdesc:a50a1287c6a673d98dd90c61df91fd33c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mode 7 ground tilemap (128x128 entries, one byte per tile index).  <br /></td></tr>
+<tr class="memitem:a8242f1368aa029cac997299479962347" id="r_a8242f1368aa029cac997299479962347"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a8242f1368aa029cac997299479962347">perspective_x</a> []</td></tr>
+<tr class="memdesc:a8242f1368aa029cac997299479962347"><td class="mdescLeft">&#160;</td><td class="mdescRight">M7A per ground line: 512 / zoom, the zoom growing by 0.025 a line (8.8 fixed point, low byte first; the first line is the horizon).  <br /></td></tr>
+<tr class="memitem:a95f81030e6fd70dd6fd7bf1b88cf46d8" id="r_a95f81030e6fd70dd6fd7bf1b88cf46d8"><td class="memItemLeft">static const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a95f81030e6fd70dd6fd7bf1b88cf46d8">perspective_y</a> []</td></tr>
+<tr class="memdesc:a95f81030e6fd70dd6fd7bf1b88cf46d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">M7D per ground line: 4096 / zoom, the zoom growing by 0.05 a line (8.8 fixed point, low byte first; the first line is the horizon).  <br /></td></tr>
 <tr class="memitem:ad20c28dc8fb00b3174dce460e3598548" id="r_ad20c28dc8fb00b3174dce460e3598548"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad20c28dc8fb00b3174dce460e3598548">sx</a></td></tr>
 <tr class="memitem:a79b6065ee73ca292d26db6390aa19d63" id="r_a79b6065ee73ca292d26db6390aa19d63"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a79b6065ee73ca292d26db6390aa19d63">sy</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Mode 7 perspective with HDMA split-screen (F-Zero style). </p>
-<p>Creates an F-Zero-style pseudo-3D ground plane by combining two BG modes on a single screen using HDMA mid-frame register switching. The top portion (96 scanlines) displays a Mode 3 sky background, while the bottom portion (128 scanlines) renders a Mode 7 ground plane with per-scanline perspective scaling. Four HDMA channels cooperate each frame: one switches BGMODE from Mode 3 to Mode 7 at the split line, another toggles the main screen layer enable (BG2 for sky, BG1 for ground), and two more write per-scanline M7A and M7D values to create the perspective foreshortening effect where distant rows appear more compressed.</p>
+<div class="textblock"><p>Mode 7 perspective with an HDMA split screen (F-Zero style). </p>
+<p>Creates an F-Zero-style pseudo-3D ground plane by combining two BG modes on one screen. HDMA changes registers between scanlines: the top 96 lines show a sky in Mode 1 (BG2), the lines below a Mode 7 ground whose scale changes on every line, so that distant rows are compressed. Four HDMA channels share the work: one writes BGMODE at the split line, one the main screen layers (BG2 for the sky, BG1 for the ground), and two write M7A and M7D on every ground line.</p>
+<p>This is the first step: the two diagonal terms of the matrix give depth without rotation. mode7/perspective_rotate drives all four terms per line and turns the world.</p>
+<p>Based on PVSnesLib's Mode7Perspective (mills32 / alekmaul).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
-<li>Mid-frame BG mode switching via HDMA (Mode 3 sky + Mode 7 ground)</li>
-<li>Per-scanline M7A/M7D writes for perspective projection</li>
-<li>HDMA-driven main screen layer enable toggling</li>
-<li>Mode 7 ground plane scrolling with D-pad input</li>
-<li>Multi-channel HDMA coordination (4 channels synchronized)</li>
+<li>Mid-frame BG mode switching via HDMA (Mode 1 sky + Mode 7 ground)</li>
+<li>Per-scanline M7A/M7D writes (HDMA repeat mode) for the perspective</li>
+<li>HDMA-driven main screen layer switching</li>
+<li>HDMA tables set up once: the hardware restarts each one every frame</li>
+<li>Mode 7 scroll and center written in VBlank</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
@@ -160,55 +176,26 @@ Variables</h2></td></tr>
 <li>Distant ground rows appear more compressed (perspective foreshortening)</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, input, mode7</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, input, mode7, hdma</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="mode7_8h.html" title="SNES Mode 7 Support.">mode7.h</a>, <a class="el" href="hdma_8h.html" title="SNES HDMA (Horizontal-blanking DMA).">hdma.h</a>, <a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a> </dd></dl>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="ad3aafbc6c7613c06add64a85321eb473" name="ad3aafbc6c7613c06add64a85321eb473"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3aafbc6c7613c06add64a85321eb473">&#9670;&#160;</a></span>asm_setupHdmaPerspective()</h2>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="af5e07d5fed5796fb6d2abec5806175a9" name="af5e07d5fed5796fb6d2abec5806175a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5e07d5fed5796fb6d2abec5806175a9">&#9670;&#160;</a></span>SKYLINE</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void asm_setupHdmaPerspective </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>sx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>sy</em></span>&#160;)</td>
+          <td class="memname">#define SKYLINE&#160;&#160;&#160;96</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> to VRAM $5000 (tiles) and $4000 (map). </p>
-<p>Build and activate the 4-channel HDMA perspective split.</p>
-<p>Configures four HDMA channels that cooperate each frame:</p><ul>
-<li>Channel A: Switches BGMODE register from Mode 3 (sky) to Mode 7 (ground) at the split scanline (scanline 96).</li>
-<li>Channel B: Toggles TM (main screen enable) from BG2 (sky) to BG1 (ground).</li>
-<li>Channel C: Writes per-scanline M7A values for horizontal perspective scaling.</li>
-<li>Channel D: Writes per-scanline M7D values for vertical perspective scaling.</li>
-</ul>
-<p>The perspective tables compress distant rows and expand near rows, creating the illusion of a 3D ground plane receding into the horizon. The scroll offsets (sx, sy) control the camera position on the Mode 7 ground.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname"><a class="el" href="#ad20c28dc8fb00b3174dce460e3598548">sx</a></td><td>Horizontal scroll offset for the Mode 7 ground plane. </td></tr>
-    <tr><td class="paramname"><a class="el" href="#a79b6065ee73ca292d26db6390aa19d63">sy</a></td><td>Vertical scroll offset for the Mode 7 ground plane. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>The scanline where the sky ends and the ground begins. </p>
 
 </div>
 </div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>
 
@@ -224,13 +211,99 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Entry point &ndash; F-Zero-style Mode 7 perspective with HDMA split-screen. </p>
-<p>Sets up a dual-mode display: the top 96 scanlines render a Mode 3 sky background (BG2), while the bottom 128 scanlines render a Mode 7 ground plane (BG1) with per-scanline perspective scaling via HDMA. The D-pad scrolls the ground plane. HDMA tables are rebuilt every frame by the assembly helper to reflect the current scroll position.</p>
+<p>Entry point &ndash; F-Zero-style Mode 7 perspective with an HDMA split screen. </p>
+<p>Loads the ground and the sky, sets up the four HDMA channels once, then scrolls the ground with the D-pad.</p>
 <dl class="section return"><dt>Returns</dt><dd>Does not return (infinite loop). </dd></dl>
 
 </div>
 </div>
+<a id="aca454876f36e8f32b3ef01f1eb441ecd" name="aca454876f36e8f32b3ef01f1eb441ecd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca454876f36e8f32b3ef01f1eb441ecd">&#9670;&#160;</a></span>setCamera()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void setCamera </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Place the camera: Mode 7 scroll and center, and the sky's scroll. </p>
+<p><a class="el" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310" title="Set Mode 7 scroll position.">mode7SetScroll()</a> and <a class="el" href="mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter()</a> write the registers at once, so this runs in VBlank or force blank. The sky follows the ground horizontally (bgSetScroll, written by the NMI handler). </p>
+
+</div>
+</div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="aeb70acc8c2b753a5582b5568c46c34e8" name="aeb70acc8c2b753a5582b5568c46c34e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb70acc8c2b753a5582b5568c46c34e8">&#9670;&#160;</a></span>layer_table</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> layer_table[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                            = {</div>
+<div class="line">    96 , 0x12,</div>
+<div class="line">    1,       0x11,</div>
+<div class="line">    0x00</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>TM (main screen layers) per line: OBJ + BG2 for the sky, OBJ + BG1 for the ground. </p>
+
+</div>
+</div>
+<a id="a5ad802b73906cc4b18f6228b7d61b77b" name="a5ad802b73906cc4b18f6228b7d61b77b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ad802b73906cc4b18f6228b7d61b77b">&#9670;&#160;</a></span>mode_table</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> mode_table[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                           = {</div>
+<div class="line">    96 , 0x09,</div>
+<div class="line">    1,       0x07,</div>
+<div class="line">    0x00</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>BGMODE per line: Mode 1 for the sky ($09: Mode 1 with the BG3 priority bit), Mode 7 for the ground. An entry writes once and holds. </p>
+
+</div>
+</div>
 <a id="a50a1287c6a673d98dd90c61df91fd33c" name="a50a1287c6a673d98dd90c61df91fd33c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a50a1287c6a673d98dd90c61df91fd33c">&#9670;&#160;</a></span>pad0</h2>
 
@@ -242,12 +315,97 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Current joypad button state </p>
 
-<p>Mode 7 ground tilemap (128x128 entries, one byte per tile index). </p>
-<p>Mode 7 tilemaps are 128x128 bytes. Each byte is a tile index (0-255) referencing the 8bpp tile set. Loaded to VRAM via <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a> which handles the interleaved format (map in low bytes, tiles in high bytes).</p>
-<p>Mode 7 ground tile pixel data (256 tiles, 64 bytes each = 16KB).</p>
-<p>Each tile is 8x8 pixels at 8bpp (one byte per pixel, 64 bytes/tile). Written to the high bytes of VRAM words by <a class="el" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb" title="Load Mode 7 interleaved data to VRAM.">dmaCopyVramMode7()</a>.</p>
-<p>256-color palette for the ground plane (512 bytes). Current joypad button state </p>
+</div>
+</div>
+<a id="a8242f1368aa029cac997299479962347" name="a8242f1368aa029cac997299479962347"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8242f1368aa029cac997299479962347">&#9670;&#160;</a></span>perspective_x</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> perspective_x[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                              = {</div>
+<div class="line">    96 , 0x00, 0x01,    </div>
+<div class="line">    0x80 | 127,             </div>
+<div class="line">    1, 0, 0, 2, 243, 1, 231, 1, 220, 1, 209, 1, 199, 1, 189, 1,</div>
+<div class="line">    179, 1, 170, 1, 161, 1, 153, 1, 145, 1, 137, 1, 130, 1, 123, 1,</div>
+<div class="line">    116, 1, 109, 1, 103, 1, 97, 1, 91, 1, 85, 1, 79, 1, 74, 1,</div>
+<div class="line">    69, 1, 64, 1, 59, 1, 54, 1, 49, 1, 45, 1, 40, 1, 36, 1,</div>
+<div class="line">    32, 1, 28, 1, 24, 1, 20, 1, 17, 1, 13, 1, 9, 1, 6, 1,</div>
+<div class="line">    3, 1, 0, 1, 252, 0, 249, 0, 246, 0, 243, 0, 240, 0, 238, 0,</div>
+<div class="line">    235, 0, 232, 0, 230, 0, 227, 0, 225, 0, 222, 0, 220, 0, 217, 0,</div>
+<div class="line">    215, 0, 213, 0, 211, 0, 208, 0, 206, 0, 204, 0, 202, 0, 200, 0,</div>
+<div class="line">    198, 0, 196, 0, 195, 0, 193, 0, 191, 0, 189, 0, 187, 0, 186, 0,</div>
+<div class="line">    184, 0, 182, 0, 181, 0, 179, 0, 178, 0, 176, 0, 175, 0, 173, 0,</div>
+<div class="line">    172, 0, 170, 0, 169, 0, 167, 0, 166, 0, 165, 0, 163, 0, 162, 0,</div>
+<div class="line">    161, 0, 159, 0, 158, 0, 157, 0, 156, 0, 155, 0, 153, 0, 152, 0,</div>
+<div class="line">    151, 0, 150, 0, 149, 0, 148, 0, 147, 0, 146, 0, 145, 0, 144, 0,</div>
+<div class="line">    143, 0, 142, 0, 141, 0, 140, 0, 139, 0, 138, 0, 137, 0, 136, 0,</div>
+<div class="line">    135, 0, 134, 0, 133, 0, 132, 0, 132, 0, 131, 0, 130, 0, 129, 0,</div>
+<div class="line">    128, 0, 127, 0, 127, 0, 126, 0, 125, 0, 124, 0, 124, 0,</div>
+<div class="line">    0x00                    </div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>M7A per ground line: 512 / zoom, the zoom growing by 0.025 a line (8.8 fixed point, low byte first; the first line is the horizon). </p>
+
+</div>
+</div>
+<a id="a95f81030e6fd70dd6fd7bf1b88cf46d8" name="a95f81030e6fd70dd6fd7bf1b88cf46d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95f81030e6fd70dd6fd7bf1b88cf46d8">&#9670;&#160;</a></span>perspective_y</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> perspective_y[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">                              = {</div>
+<div class="line">    96 , 0x00, 0x01,    </div>
+<div class="line">    0x80 | 127,             </div>
+<div class="line">    122, 0, 0, 16, 60, 15, 139, 14, 233, 13, 85, 13, 204, 12, 78, 12,</div>
+<div class="line">    218, 11, 109, 11, 8, 11, 170, 10, 82, 10, 0, 10, 178, 9, 105, 9,</div>
+<div class="line">    36, 9, 227, 8, 166, 8, 107, 8, 52, 8, 0, 8, 206, 7, 158, 7,</div>
+<div class="line">    113, 7, 69, 7, 28, 7, 244, 6, 206, 6, 170, 6, 135, 6, 102, 6,</div>
+<div class="line">    70, 6, 39, 6, 9, 6, 237, 5, 209, 5, 182, 5, 157, 5, 132, 5,</div>
+<div class="line">    108, 5, 85, 5, 62, 5, 41, 5, 20, 5, 0, 5, 236, 4, 217, 4,</div>
+<div class="line">    198, 4, 180, 4, 163, 4, 146, 4, 129, 4, 113, 4, 98, 4, 83, 4,</div>
+<div class="line">    68, 4, 53, 4, 39, 4, 26, 4, 12, 4, 0, 4, 243, 3, 231, 3,</div>
+<div class="line">    218, 3, 207, 3, 195, 3, 184, 3, 173, 3, 162, 3, 152, 3, 142, 3,</div>
+<div class="line">    132, 3, 122, 3, 112, 3, 103, 3, 94, 3, 85, 3, 76, 3, 67, 3,</div>
+<div class="line">    59, 3, 51, 3, 43, 3, 35, 3, 27, 3, 19, 3, 12, 3, 4, 3,</div>
+<div class="line">    253, 2, 246, 2, 239, 2, 232, 2, 226, 2, 219, 2, 212, 2, 206, 2,</div>
+<div class="line">    200, 2, 194, 2, 188, 2, 182, 2, 176, 2, 170, 2, 165, 2, 159, 2,</div>
+<div class="line">    154, 2, 148, 2, 143, 2, 138, 2, 133, 2, 127, 2, 123, 2, 118, 2,</div>
+<div class="line">    113, 2, 108, 2, 103, 2, 99, 2, 94, 2, 90, 2, 85, 2, 81, 2,</div>
+<div class="line">    77, 2, 73, 2, 68, 2, 64, 2, 60, 2, 56, 2, 52, 2,</div>
+<div class="line">    0x00                    </div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p>M7D per ground line: 4096 / zoom, the zoom growing by 0.05 a line (8.8 fixed point, low byte first; the first line is the horizon). </p>
 
 </div>
 </div>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/maps/dynamic_map/map64x64.c File Reference</title>
+<title>examples/maps/dynamic_map/map64x64.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -132,9 +132,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ae6f7b12632afd5a34fd892392d927d5d" id="r_ae6f7b12632afd5a34fd892392d927d5d"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae6f7b12632afd5a34fd892392d927d5d">element2sprite64x64</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> elem)</td></tr>
 <tr class="memitem:a4188ed43499d3946aae9251087b1f175" id="r_a4188ed43499d3946aae9251087b1f175"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a4188ed43499d3946aae9251087b1f175">initSpriteMap64x64</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> len)</td></tr>
 <tr class="memitem:a323da0e00876fe0b122ebaad6c58d867" id="r_a323da0e00876fe0b122ebaad6c58d867"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a323da0e00876fe0b122ebaad6c58d867">screenRefreshPos64x64</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> x, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address)</td></tr>
-<tr class="memitem:a3c13d72fbe5aca196252d3046d42c7fd" id="r_a3c13d72fbe5aca196252d3046d42c7fd"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3c13d72fbe5aca196252d3046d42c7fd">smapClear</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_count)</td></tr>
-<tr class="memitem:a917e20f94898d50947290c35e5612d6e" id="r_a917e20f94898d50947290c35e5612d6e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a917e20f94898d50947290c35e5612d6e">smapDma</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_offset, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_addr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_count)</td></tr>
-<tr class="memitem:a050f9333a50d1016f983fdc9344d8cff" id="r_a050f9333a50d1016f983fdc9344d8cff"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a050f9333a50d1016f983fdc9344d8cff">smapWrite</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_offset, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> value)</td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a597829947e5cc8ee2f1e397c4762fdbe" name="a597829947e5cc8ee2f1e397c4762fdbe"></a>
@@ -253,94 +250,6 @@ Functions</h2></td></tr>
           <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>address</em></span>&#160;)</td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3c13d72fbe5aca196252d3046d42c7fd" name="a3c13d72fbe5aca196252d3046d42c7fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c13d72fbe5aca196252d3046d42c7fd">&#9670;&#160;</a></span>smapClear()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void smapClear </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_count</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a917e20f94898d50947290c35e5612d6e" name="a917e20f94898d50947290c35e5612d6e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a917e20f94898d50947290c35e5612d6e">&#9670;&#160;</a></span>smapDma()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void smapDma </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_offset</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vram_addr</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_count</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a050f9333a50d1016f983fdc9344d8cff" name="a050f9333a50d1016f983fdc9344d8cff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a050f9333a50d1016f983fdc9344d8cff">&#9670;&#160;</a></span>smapWrite()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void smapWrite </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_offset</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

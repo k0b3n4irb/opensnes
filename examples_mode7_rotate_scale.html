@@ -136,7 +136,7 @@ What This Example Shows</h2>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-7"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">backgrounds/mode1</span> first (basic background setup). Mode 7 is fundamentally different from tile-based modes but the initialization flow is similar.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-26"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-25"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -150,7 +150,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Down  </td><td class="markdownTableBodyNone">Zoom in (magnify)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-42"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-40"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/mode7/rotate_scale</div>
@@ -182,7 +182,7 @@ How It Works</h2>
 <div class="line">    <a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>++;</div>
 <div class="line">    <a class="code hl_function" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe">mode7SetAngle</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>);</div>
 <div class="line">}</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:166</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:158</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga024e62650f02bfd64a4ce2b158ec2dd7"><div class="ttname"><a href="group__input__buttons.html#ga024e62650f02bfd64a4ce2b158ec2dd7">KEY_A</a></div><div class="ttdeci">#define KEY_A</div><div class="ttdef"><b>Definition</b> input.h:84</div></div>
 <div class="ttc" id="amode7_2perspective__rotate_2main_8c_html_a313857711c86124ca4a23076d196f8e3"><div class="ttname"><a href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a></div><div class="ttdeci">static u16 angle</div><div class="ttdoc">Mode 7 ground: 9-tile prefab track (original art).</div><div class="ttdef"><b>Definition</b> main.c:46</div></div>
 </div><!-- fragment --><p><span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> recalculates the 2x2 transformation matrix (registers M7A-M7D at $211B-$211E) using the current angle and scale. The angle is 0-255, mapping to 0-360 degrees.</p>
@@ -221,7 +221,7 @@ One Layer Only</h3>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md88-fixed-point-scale"></a>
 8.8 Fixed-Point Scale</h3>
 <p><span class="tt">0x0100</span> = 1:1, <span class="tt">0x0200</span> = shrunk twice (shows more area), <span class="tt">0x0080</span> = magnified twice. The integer part is the high byte, the fractional part is the low byte.</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-13"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-12"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -235,7 +235,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console dma background sprite input mode7</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-6"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-7"></a>
 Going Further</h2>
 <ul>
 <li><b>Add scrolling</b>: Use <span class="tt">mode7SetPos()</span> to pan across the Mode 7 plane with the D-pad while rotating. This is how F-Zero navigates its tracks.</li>
@@ -246,7 +246,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-60"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-58"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">sprite</span>, <span class="tt">input</span>, <span class="tt">mode7</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
@@ -263,7 +263,7 @@ Modules Used</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_mode7.html">Mode 7</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_mode7.html">Mode 7</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

@@ -129,17 +129,18 @@ Contents</h2>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Document  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="MEMORY__MAP_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/MEMORY_MAP.md">Memory Map</a>  </td><td class="markdownTableBodyNone">RAM, ROM, and register layout  </td></tr>
+<td class="markdownTableBodyNone"><a href="hardware_ppu.html">The PPU</a>  </td><td class="markdownTableBodyNone">Background modes, tiles, VRAM, palettes, sprite sizes  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="REGISTERS_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/REGISTERS.md">Registers</a>  </td><td class="markdownTableBodyNone">Complete hardware register reference  </td></tr>
+<td class="markdownTableBodyNone"><a href="hardware_apu.html">The APU</a>  </td><td class="markdownTableBodyNone">SPC700, S-DSP, audio RAM, BRR samples, echo  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a class="el" href="OAM_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/OAM.md">OAM</a>  </td><td class="markdownTableBodyNone">Sprite attribute memory documentation  </td></tr>
+<td class="markdownTableBodyNone"><a href="memory_map.html">Memory Map</a>  </td><td class="markdownTableBodyNone">RAM, ROM, and register layout  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="registers.html">Registers</a>  </td><td class="markdownTableBodyNone">Complete hardware register reference  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a href="oam.html">OAM</a>  </td><td class="markdownTableBodyNone">Sprite attribute memory documentation  </td></tr>
 </table>
-<p>For graphics (PPU, tiles, modes, palettes), see the <a class="el" href="SNES__GRAPHICS__GUIDE_8md.html" title="/home/runner/work/opensnes/opensnes/docs/SNES_GRAPHICS_GUIDE.md">SNES Graphics Guide</a>. For audio (SPC700, DSP, BRR, SNESMOD), see the <a class="el" href="SNES__SOUND__GUIDE_8md.html" title="/home/runner/work/opensnes/opensnes/docs/SNES_SOUND_GUIDE.md">SNES Sound Guide</a>.</p>
-<h2 class="doxsection"><a class="anchor" id="quick-reference-2"></a>
-Quick Reference</h2>
-<h3 class="doxsection"><a class="anchor" id="specifications"></a>
-Specifications</h3>
+<h2 class="doxsection"><a class="anchor" id="specifications"></a>
+Specifications</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Component  </th><th class="markdownTableHeadNone">Specification  </th></tr>
@@ -148,35 +149,10 @@ Specifications</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Work RAM  </td><td class="markdownTableBodyNone">128 KB  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">VRAM  </td><td class="markdownTableBodyNone">64 KB  </td></tr>
+<td class="markdownTableBodyNone">PPU  </td><td class="markdownTableBodyNone">64 KB VRAM, 544-byte OAM, 512-byte CGRAM: <a class="el" href="hardware_ppu.html" title="The PPU">The PPU</a>  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">OAM  </td><td class="markdownTableBodyNone">544 bytes (128 sprites + size/position bits)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">CGRAM  </td><td class="markdownTableBodyNone">512 bytes (256 colors x 2 bytes)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">APU  </td><td class="markdownTableBodyNone">SPC700 @ 1.024 MHz + DSP  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Audio RAM  </td><td class="markdownTableBodyNone">64 KB  </td></tr>
+<td class="markdownTableBodyNone">APU  </td><td class="markdownTableBodyNone">SPC700 + S-DSP with 64 KB of audio RAM: <a class="el" href="hardware_apu.html" title="The APU">The APU</a>  </td></tr>
 </table>
-<h3 class="doxsection"><a class="anchor" id="resolution"></a>
-Resolution</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Mode  </th><th class="markdownTableHeadNone">Resolution  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">NTSC  </td><td class="markdownTableBodyNone">256x224 or 256x239  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">PAL  </td><td class="markdownTableBodyNone">256x239 or 256x224 (same picture sizes; more blank lines)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Hi-res  </td><td class="markdownTableBodyNone">512x224 (Modes 5/6), 448/478 lines in interlace  </td></tr>
-</table>
-<h3 class="doxsection"><a class="anchor" id="colors"></a>
-Colors</h3>
-<ul>
-<li>15-bit color (32768 colors)</li>
-<li>256 simultaneous colors (8 palettes x 16 colors for BG, same for sprites)</li>
-<li>Format: <span class="tt">0BBBBBGGGGGRRRRR</span></li>
-</ul>
 <h2 class="doxsection"><a class="anchor" id="key-concepts"></a>
 Key Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="vertical-blank-vblank"></a>
@@ -186,38 +162,9 @@ Vertical Blank (VBlank)</h3>
 <div class="line"><a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line"><span class="comment">// Now safe to DMA to VRAM</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="tiles-and-sprites"></a>
-Tiles and Sprites</h3>
-<p><b>Tiles</b> are 8x8 pixel graphics used for both backgrounds and sprites.</p>
-<p><b>Sprites</b> (Objects/OBJ) are movable graphics composed of one or more tiles:</p><ul>
-<li>128 sprites maximum</li>
-<li>Sizes: 8x8, 16x16, 32x32, 64x64</li>
-<li>32 sprites per scanline limit</li>
-<li>Can be flipped horizontally/vertically</li>
-</ul>
-<h3 class="doxsection"><a class="anchor" id="background-modes"></a>
-Background Modes</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Mode  </th><th class="markdownTableHeadNone">BG1  </th><th class="markdownTableHeadNone">BG2  </th><th class="markdownTableHeadNone">BG3  </th><th class="markdownTableHeadNone">BG4  </th><th class="markdownTableHeadNone">Colors  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">0  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">4 per BG  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Common  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Per-tile offset  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">256  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Direct color  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">256  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Per-tile offset  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Hi-res  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Hi-res + offset  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone">256  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">-  </td><td class="markdownTableBodyNone">Mode 7 rotation  </td></tr>
-</table>
-<p>Most games use <b>Mode 1</b> (good balance of features).</p>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="tiles-sprites-and-background-modes"></a>
+Tiles, sprites and background modes</h3>
+<p>Everything on screen is built from 8x8 tiles: background layers arranged by a tilemap, and up to 128 movable sprites. The eight background modes trade layers against colours; Mode 1 is the usual choice. The mode table, the sprite sizes and the per-line limits are in <a class="el" href="hardware_ppu.html" title="The PPU">The PPU</a>.</p>
 <h3 class="doxsection"><a class="anchor" id="banks-and-addressing"></a>
 Banks and Addressing</h3>
 <p>The 65816 has a 24-bit address space divided into 256 "banks" of 64KB each:</p>
@@ -239,7 +186,7 @@ LoROM vs HiROM</h3>
 <td class="markdownTableBodyNone">ExHiROM  </td><td class="markdownTableBodyNone">Varies  </td><td class="markdownTableBodyNone">8 MB  </td><td class="markdownTableBodyNone">Very large games  </td></tr>
 </table>
 <p>OpenSNES uses <b>LoROM</b> by default.</p>
-<h2 class="doxsection"><a class="anchor" id="further-reading-3"></a>
+<h2 class="doxsection"><a class="anchor" id="further-reading-5"></a>
 Further Reading</h2>
 <ul>
 <li><a href="https://snes.nesdev.org/">SNESdev Wiki</a> - Comprehensive hardware docs</li>
@@ -260,7 +207,7 @@ Further Reading</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

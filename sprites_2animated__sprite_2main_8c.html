@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/sprites/animated_sprite/main.c File Reference</title>
+<title>examples/sprites/animated_sprite/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -141,18 +141,18 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a5eed1fb26881e8db6c692cbf77f06ca3" id="r_a5eed1fb26881e8db6c692cbf77f06ca3"><td class="memItemLeft">enum &#160;</td><td class="memItemRight">{ <a class="el" href="#a5eed1fb26881e8db6c692cbf77f06ca3aec1308ece4e6f0658ecda1029ebdebcc">SCREEN_TOP</a> = -16
-, <a class="el" href="#a5eed1fb26881e8db6c692cbf77f06ca3a833861110149d50228768117b9a13d2e">SCREEN_BOTTOM</a> = 224
-, <a class="el" href="#a5eed1fb26881e8db6c692cbf77f06ca3a99ad03a7a836644946d286d1fe79cae9">SCREEN_LEFT</a> = -16
-, <a class="el" href="#a5eed1fb26881e8db6c692cbf77f06ca3afceaafc1121395c65a3e8c0af7ce1427">SCREEN_RIGHT</a> = 256
+<tr class="memitem:a7d98d35cffd6c90ec5e00e7f7772e772" id="r_a7d98d35cffd6c90ec5e00e7f7772e772"><td class="memItemLeft">enum &#160;</td><td class="memItemRight">{ <a class="el" href="#a7d98d35cffd6c90ec5e00e7f7772e772aec1308ece4e6f0658ecda1029ebdebcc">SCREEN_TOP</a> = -16
+, <a class="el" href="#a7d98d35cffd6c90ec5e00e7f7772e772a833861110149d50228768117b9a13d2e">SCREEN_BOTTOM</a> = 224
+, <a class="el" href="#a7d98d35cffd6c90ec5e00e7f7772e772a99ad03a7a836644946d286d1fe79cae9">SCREEN_LEFT</a> = -16
+, <a class="el" href="#a7d98d35cffd6c90ec5e00e7f7772e772afceaafc1121395c65a3e8c0af7ce1427">SCREEN_RIGHT</a> = 256
  }</td></tr>
-<tr class="memdesc:a5eed1fb26881e8db6c692cbf77f06ca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen edge boundaries for sprite clamping.  <a href="#a5eed1fb26881e8db6c692cbf77f06ca3">More...</a><br /></td></tr>
+<tr class="memdesc:a7d98d35cffd6c90ec5e00e7f7772e772"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen edge boundaries for sprite clamping.  <a href="#a7d98d35cffd6c90ec5e00e7f7772e772">More...</a><br /></td></tr>
 <tr class="memitem:af7ccac6abcbe8bf213b36feaa7b69cda" id="r_af7ccac6abcbe8bf213b36feaa7b69cda"><td class="memItemLeft">enum &#160;</td><td class="memItemRight"><a class="el" href="#af7ccac6abcbe8bf213b36feaa7b69cda">SpriteState</a> { <a class="el" href="#af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d">W_DOWN</a> = 0
 , <a class="el" href="#af7ccac6abcbe8bf213b36feaa7b69cdaa1b27b1e4284a41371a37847cc1dfe65d">W_UP</a> = 1
 , <a class="el" href="#af7ccac6abcbe8bf213b36feaa7b69cdaadb3898c81625762236e0f115992de1f0">W_RIGHT</a> = 2
 , <a class="el" href="#af7ccac6abcbe8bf213b36feaa7b69cdaaed37cc1ae9548b4a4f651e488ad14dfa">W_LEFT</a> = 2
  }</td></tr>
-<tr class="memdesc:af7ccac6abcbe8bf213b36feaa7b69cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite sheet tile data containing all animation frames (defined in data.asm).  <a href="#af7ccac6abcbe8bf213b36feaa7b69cda">More...</a><br /></td></tr>
+<tr class="memdesc:af7ccac6abcbe8bf213b36feaa7b69cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sprite sheet tile data containing all animation frames (converted by the build from res/).  <a href="#af7ccac6abcbe8bf213b36feaa7b69cda">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -188,7 +188,7 @@ Variables</h2></td></tr>
 <li>The sprite stops animating when no button is pressed</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, input</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, input, anim</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">sprite.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="aca96d6bd10d9a1eca2363540f9d3f5a8" name="aca96d6bd10d9a1eca2363540f9d3f5a8"></a>
@@ -209,8 +209,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
-<a id="a5eed1fb26881e8db6c692cbf77f06ca3" name="a5eed1fb26881e8db6c692cbf77f06ca3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5eed1fb26881e8db6c692cbf77f06ca3">&#9670;&#160;</a></span>anonymous enum</h2>
+<a id="a7d98d35cffd6c90ec5e00e7f7772e772" name="a7d98d35cffd6c90ec5e00e7f7772e772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d98d35cffd6c90ec5e00e7f7772e772">&#9670;&#160;</a></span>anonymous enum</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -224,13 +224,13 @@ Variables</h2></td></tr>
 <p>Screen edge boundaries for sprite clamping. </p>
 <p>Negative values allow the sprite to partially leave the screen (16px margin), which looks more natural than stopping exactly at the visible edge. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a5eed1fb26881e8db6c692cbf77f06ca3aec1308ece4e6f0658ecda1029ebdebcc" name="a5eed1fb26881e8db6c692cbf77f06ca3aec1308ece4e6f0658ecda1029ebdebcc"></a>SCREEN_TOP&#160;</td><td class="fielddoc"><p>Top clamp: 16px above visible area </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a7d98d35cffd6c90ec5e00e7f7772e772aec1308ece4e6f0658ecda1029ebdebcc" name="a7d98d35cffd6c90ec5e00e7f7772e772aec1308ece4e6f0658ecda1029ebdebcc"></a>SCREEN_TOP&#160;</td><td class="fielddoc"><p>Top clamp: 16px above visible area </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5eed1fb26881e8db6c692cbf77f06ca3a833861110149d50228768117b9a13d2e" name="a5eed1fb26881e8db6c692cbf77f06ca3a833861110149d50228768117b9a13d2e"></a>SCREEN_BOTTOM&#160;</td><td class="fielddoc"><p>Bottom clamp: bottom of visible area </p>
+<tr><td class="fieldname"><a id="a7d98d35cffd6c90ec5e00e7f7772e772a833861110149d50228768117b9a13d2e" name="a7d98d35cffd6c90ec5e00e7f7772e772a833861110149d50228768117b9a13d2e"></a>SCREEN_BOTTOM&#160;</td><td class="fielddoc"><p>Bottom clamp: bottom of visible area </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5eed1fb26881e8db6c692cbf77f06ca3a99ad03a7a836644946d286d1fe79cae9" name="a5eed1fb26881e8db6c692cbf77f06ca3a99ad03a7a836644946d286d1fe79cae9"></a>SCREEN_LEFT&#160;</td><td class="fielddoc"><p>Left clamp: 16px left of visible area </p>
+<tr><td class="fieldname"><a id="a7d98d35cffd6c90ec5e00e7f7772e772a99ad03a7a836644946d286d1fe79cae9" name="a7d98d35cffd6c90ec5e00e7f7772e772a99ad03a7a836644946d286d1fe79cae9"></a>SCREEN_LEFT&#160;</td><td class="fielddoc"><p>Left clamp: 16px left of visible area </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5eed1fb26881e8db6c692cbf77f06ca3afceaafc1121395c65a3e8c0af7ce1427" name="a5eed1fb26881e8db6c692cbf77f06ca3afceaafc1121395c65a3e8c0af7ce1427"></a>SCREEN_RIGHT&#160;</td><td class="fielddoc"><p>Right clamp: right edge of visible area </p>
+<tr><td class="fieldname"><a id="a7d98d35cffd6c90ec5e00e7f7772e772afceaafc1121395c65a3e8c0af7ce1427" name="a7d98d35cffd6c90ec5e00e7f7772e772afceaafc1121395c65a3e8c0af7ce1427"></a>SCREEN_RIGHT&#160;</td><td class="fielddoc"><p>Right clamp: right edge of visible area </p>
 </td></tr>
 </table>
 
@@ -248,7 +248,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Sprite sheet tile data containing all animation frames (defined in data.asm). </p>
+<p>Sprite sheet tile data containing all animation frames (converted by the build from res/). </p>
 <p>Palette for the character sprite (16 colors, 4bpp)</p>
 <p>Animation direction states.</p>
 <p>Each state maps to a row in the sprite sheet. W_LEFT reuses the W_RIGHT row and sets the OAM horizontal flip bit to mirror the frames, which is a common SNES technique to halve the sprite sheet size for left/right symmetric characters. </p>

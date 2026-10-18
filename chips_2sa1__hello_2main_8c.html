@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/chips/sa1_hello/main.c File Reference</title>
+<title>examples/chips/sa1_hello/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -123,7 +123,7 @@ $(function(){initNavTree('chips_2sa1__hello_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>SA-1 boot diagnostic (Phase 1).  
+<p>SA-1 boot diagnostic.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="sa1_8h_source.html">snes/sa1.h</a>&gt;</code><br />
@@ -137,13 +137,13 @@ Variables</h2></td></tr>
 <tr class="memitem:a25d8027e6c3f5d31c6a5f7e3f966146a" id="r_a25d8027e6c3f5d31c6a5f7e3f966146a"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a25d8027e6c3f5d31c6a5f7e3f966146a">sa1_status</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>SA-1 boot diagnostic (Phase 1). </p>
+<div class="textblock"><p>SA-1 boot diagnostic. </p>
 <p>Minimal SA-1 readiness check. The SA-1 coprocessor (Super Accelerator 1) runs the 65816 ISA at 10.74 MHz alongside the main CPU's 3.58 MHz. This example boots the SA-1, has it write a status byte to shared I-RAM (<span class="tt">$3000-$37FF</span>), then reports the byte's value on screen — proving that the SA-1 coprocessor is running and the main CPU can read its output.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>SA-1 vs 65816 dual-CPU: same ISA, different clock, separate memory map</li>
 <li>Shared I-RAM as the dispatch / status channel</li>
 <li>The <span class="tt">sa1_boot.asm</span> per-example entry point (each SA-1 ROM brings its own)</li>
-<li>Pre-A6+A7 ABI quirks: the SA-1 wrapper API is minimal, all coordination happens in assembly today</li>
+<li>The SA-1 side is assembly: C runs on the main CPU only, and the two talk through I-RAM</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
@@ -152,7 +152,7 @@ Variables</h2></td></tr>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, text, input, sa1</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="sa1_8h.html" title="SA-1 Enhancement Chip Interface.">sa1.h</a>, .claude/notes/tech/sa1_phase1_diagnostic.md </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="sa1_8h.html" title="SA-1 Enhancement Chip Interface.">sa1.h</a>, <a class="el" href="tutorial_sa1.html">docs/tutorials/sa1.md</a> </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a840291bc02cba5474a4cb46a9b9566fe" name="a840291bc02cba5474a4cb46a9b9566fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&#160;</a></span>main()</h2>

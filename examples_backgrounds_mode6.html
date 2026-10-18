@@ -122,7 +122,7 @@ $(function(){initNavTree('examples_backgrounds_mode6.html','',''); });
   <div class="headertitle"><div class="title">mode6 — one hi-res layer with offset-per-tile </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><b>Family 2 (Backgrounds) · the offset-per-tile modes (2/4/6), after <a class="el" href="dir_267d387ea08e427049032bac7d31a82f.html" title="/home/runner/work/opensnes/opensnes/examples/backgrounds/mode2/README.md"><span class="tt">mode2</span></a> and <a class="el" href="dir_d6034bfafb13cb7ab8a0c777619c5747.html" title="/home/runner/work/opensnes/opensnes/examples/backgrounds/mode4/README.md"><span class="tt">mode4</span></a>.</b></p>
+<div class="textblock"><p><b>Backgrounds · the offset-per-tile modes (2/4/6), after <a href="examples_backgrounds_mode2.html"><span class="tt">mode2</span></a> and <a href="examples_backgrounds_mode4.html"><span class="tt">mode4</span></a>.</b></p>
 <div class="image">
 <img src="mode6.png" alt=""/>
 <div class="caption">
@@ -130,7 +130,7 @@ Screenshot</div></div>
     <p><em>The screenshot is luna's native 512×448 output: the stripes are one half-pixel wide.</em></p>
 <p>Mode 6 is the hi-res member of the offset-per-tile family. It gives you one 4bpp (16-colour) BG1 drawn 512 half-pixels wide, like Mode 5, and BG3 as the offset table, read like Mode 2's: one row of horizontal offset words, one row of vertical ones. Its tiles are always 16 half-pixels wide, and so are the table's columns, so 32 words still cover the screen.</p>
 <p>BG1 here is diagonal colour bands drawn in one-half-pixel stripes, which no 256-pixel mode can show. A sine wave written into the vertical row makes the columns ripple; press <b>A</b> and the wave moves to the horizontal row, and the columns slide sideways. <b>B</b> shows a still test card for a question the references leave open (below).</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-8"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-7"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/backgrounds/mode6</div>
@@ -166,13 +166,13 @@ is retained"), so offsets move whole 8-pixel tiles. In Mode 6 the scroll counts 
 <ul>
 <li><b>luna and ares</b> apply it (and bsnes, by luna's team's reading of its code): odd columns move by half a tile, and the steps of the diagonal bands are cut into half steps (the image above). ares: <span class="tt">sfc/ppu/background.cpp</span>, <span class="tt">hoffset = hpixel + (hlookup &amp; ~7) + …</span> (corpus chunk <span class="tt">a81897dc4e20fe4b</span>).</li>
 <li><b>Mesen2</b> drops it: it puts the offset into a doubled scroll and halves the result (<span class="tt">Core/SNES/SnesPpu.cpp</span>, corpus chunk <span class="tt">008321f6eaec1f44</span>), so the card looks like the plain bands. luna's team measured the two disagreeing exactly on the columns whose offset has bit 3 set.</li>
-<li><b>A console</b>: not measured yet. It is row 23 of the hardware protocol (<span class="tt"><a class="el" href="HARDWARE__VERIFICATION_8md.html">docs/HARDWARE_VERIFICATION.md</a></span>). ares and bsnes share an author, so their agreement is one implementation, not two witnesses.</li>
+<li><b>A console</b>: not measured yet. It is row 23 of the hardware protocol (<span class="tt"><a class="el" href="hardware_verification.html">docs/HARDWARE_VERIFICATION.md</a></span>). ares and bsnes share an author, so their agreement is one implementation, not two witnesses.</li>
 </ul>
 <p>For a game: horizontal offsets that are multiples of 16 look the same everywhere. If you check this example in Mesen2, its wave columns differ from luna's wherever an offset has bit 3 set; neither the example nor the lib is at fault. The corpus note is <span class="tt">cartouche-fiches</span> chunk <span class="tt">61be8d9e9e954b38</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="testing-1"></a>
 Testing</h2>
 <p><span class="tt">testing/manifests/backgrounds_mode6.toml</span> checks the mode, both screens and BG3VOFS, the wave in the vertical row at frame 100, then in the horizontal row after A with the vertical row back to zero (VRAM <span class="tt">$6000</span> and <span class="tt">$6040</span>), and that every upload lands in blank. Without the A press it fails. <span class="tt">backgrounds_mode6_card.toml</span> checks the card: B at frame 110, then at 140 the wave is frozen and row 0 holds <span class="tt">$2000</span>/<span class="tt">$2008</span> alternately with row 1 zero. It pins what the ROM writes, not what the PPU draws.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-15"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-14"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -204,7 +204,7 @@ Modules Used</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_backgrounds.html">Backgrounds</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_backgrounds.html">Backgrounds</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

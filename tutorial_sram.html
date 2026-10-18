@@ -123,7 +123,7 @@ $(function(){initNavTree('tutorial_sram.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial covers SRAM — the battery-backed RAM region on a SNES cartridge that survives power-off, used for save games on every cart that has one (Zelda, Final Fantasy VI, Super Mario World, …). The lib exposes a small set of byte-array helpers; the discipline lives in treating SRAM as <b>untrusted</b> data that needs validation on every load.</p>
-<p>It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial. The <a class="el" href="dma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/dma.md">DMA tutorial</a> is useful background but not required — SRAM access goes through plain CPU loads/stores, not DMA.</p>
+<p>It assumes you have read the <a href="tutorial_graphics.html">Graphics</a> tutorial. The <a href="tutorial_dma.html">DMA tutorial</a> is useful background but not required — SRAM access goes through plain CPU loads/stores, not DMA.</p>
 <h2 class="doxsection"><a class="anchor" id="what-sram-actually-is"></a>
 What SRAM actually is</h2>
 <p>A SNES cartridge contains:</p>
@@ -154,24 +154,18 @@ Memory map</h2>
 <p>The lib's <span class="tt"><a class="el" href="sram_8h.html#ae59c751326cb355338a21605adb09325" title="Save data to SRAM.">sramSave</a></span>/<span class="tt"><a class="el" href="sram_8h.html#a271e24b7e809f10b1d8d2979b512bb0b" title="Load data from SRAM.">sramLoad</a></span> hide the layout: you pass a pointer and a byte count, and the helper uses <span class="tt">$70:0000</span> on a LoROM build, <span class="tt">$30:6000</span> on a HiROM one and <span class="tt">$40:0000</span> (BW-RAM) on an SA-1 one. Two limits to know:</p>
 <ul>
 <li>on <b>HiROM</b> the helpers address the first 8 KB window only (<span class="tt">offset + size &lt;= 8192</span>, the default <span class="tt">SRAM_SIZE</span>);</li>
-<li>on <b>SA-1</b> they work since 2026-09-26 (crt0 sets SBWE); until then the build refused <span class="tt">USE_SRAM=1</span> with <span class="tt">USE_SA1=1</span>, because the writes were dropped. Two luna manifests (<span class="tt">d_sa1_bwram_write.toml</span>, <span class="tt">e_sa1_bwram_read.toml</span>) power the cartridge off and on between the save and the read.</li>
-<li><b>Super FX</b> — the save is the GSU's own Game Pak RAM, shared with the framebuffers: see <a class="el" href="tutorial_superfx.html#saving" title="Saving">Super FX: Saving</a>.</li>
+<li>on <b>SA-1</b> crt0 sets SBWE, so the CPU's writes reach BW-RAM. Two luna manifests (<span class="tt">d_sa1_bwram_write.toml</span>, <span class="tt">e_sa1_bwram_read.toml</span>) power the cartridge off and on between the save and the read.</li>
+<li><b>Super FX</b> — the save is the GSU's own Game Pak RAM, shared with the framebuffers: see <a class="el" href="tutorial_superfx_advanced.html#saving" title="Saving">Super FX: Saving</a>.</li>
 </ul>
-<p>This paragraph claimed the helpers "hide these details" long before they did — until 2026-09-20 they used the LoROM address on every build. The HiROM mapping is pinned by <span class="tt">testing/fixtures/libtests_hirom</span>, which reads the bytes back from <span class="tt">$30:6000</span>.</p>
+<p>The HiROM mapping is pinned by <span class="tt">testing/fixtures/libtests_hirom</span>, which reads the bytes back from <span class="tt">$30:6000</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="build-setup"></a>
 Build setup</h2>
 <p>Two changes to enable SRAM in a project:</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-makefile"></a>
 1. Makefile</h3>
-<div class="fragment"><div class="line">OPENSNES := $(shell cd ../../.. &amp;&amp; pwd)</div>
-<div class="line">TARGET   := mygame.sfc</div>
-<div class="line">ROM_NAME := MYGAME</div>
-<div class="line">USE_LIB    := 1</div>
-<div class="line">USE_SRAM   := 1            # turn on SRAM support</div>
+<p>Add two lines to the project Makefile (<a class="el" href="tools_build.html" title="Your project&#39;s Makefile">Your project's Makefile</a> has the template):</p>
+<div class="fragment"><div class="line">USE_SRAM   := 1            # turn on SRAM support (links the sram module)</div>
 <div class="line">SRAM_SIZE  := 3            # 3 = 8 KB (the common choice)</div>
-<div class="line">LIB_MODULES := console sram dma background input</div>
-<div class="line">CSRC := main.c</div>
-<div class="line">include $(OPENSNES)/make/common.mk</div>
 </div><!-- fragment --><p>The <span class="tt">SRAM_SIZE</span> numeric value matches the ROM header's <span class="tt">SRAMSIZE</span> byte. Map:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -186,7 +180,12 @@ Build setup</h2>
 <td class="markdownTableBodyCenter"><span class="tt">4</span>  </td><td class="markdownTableBodyCenter">16 KB  </td><td class="markdownTableBodyCenter"><span class="tt">$04</span>  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyCenter"><span class="tt">5</span>  </td><td class="markdownTableBodyCenter">32 KB  </td><td class="markdownTableBodyCenter"><span class="tt">$05</span>  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter"><span class="tt">6</span>  </td><td class="markdownTableBodyCenter">64 KB  </td><td class="markdownTableBodyCenter"><span class="tt">$06</span>  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter"><span class="tt">7</span>  </td><td class="markdownTableBodyCenter">128 KB  </td><td class="markdownTableBodyCenter"><span class="tt">$07</span>  </td></tr>
 </table>
+<p>The build accepts <span class="tt">1</span> to <span class="tt">7</span>, but the <span class="tt">sram</span> module addresses one bank only: 32 KB on LoROM (and SA-1), 8 KB on HiROM. A transfer past that is refused, whatever the header declares.</p>
 <p>Most homebrew picks 8 KB unless you genuinely need more. Larger SRAM declarations affect emulator save-state allocation and on real flash carts the actual reserved region.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md2-rom-header"></a>
 2. ROM header</h3>
@@ -279,8 +278,8 @@ The minimum viable save</h2>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
 <div class="ttc" id="abasics_2game__skeleton_2main_8c_html_af38f63b0c5a57bead247e022200124e5"><div class="ttname"><a href="basics_2game__skeleton_2main_8c.html#af38f63b0c5a57bead247e022200124e5">score</a></div><div class="ttdeci">u16 score</div><div class="ttdoc">Probe oracle: coins collected.</div><div class="ttdef"><b>Definition</b> main.c:70</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a2989ab51c6e2faaa6dc3284b285fa1fa"><div class="ttname"><a href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a></div><div class="ttdeci">static u16 lives</div><div class="ttdef"><b>Definition</b> main.c:164</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a8d6bbdce86e8fb8b71511fa2a996c1bf"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a></div><div class="ttdeci">static u16 level</div><div class="ttdef"><b>Definition</b> main.c:163</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a2989ab51c6e2faaa6dc3284b285fa1fa"><div class="ttname"><a href="games_2breakout_2main_8c.html#a2989ab51c6e2faaa6dc3284b285fa1fa">lives</a></div><div class="ttdeci">static u16 lives</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a8d6bbdce86e8fb8b71511fa2a996c1bf"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a></div><div class="ttdeci">static u16 level</div><div class="ttdef"><b>Definition</b> main.c:155</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
@@ -343,10 +342,10 @@ Gotchas</h2>
 <li><b>Checksum</b>: deterministic — fails on partial corruption (one bad byte mid-struct).</li>
 <li><b>Version field</b> (advanced): track save format version so old saves from a previous game build can be migrated or rejected.</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md-sram_size-mismatch-between-makefile-and-code--refused-since-2026-09-21"></a>
-🟢 <span class="tt">SRAM_SIZE</span> mismatch between Makefile and code — refused since 2026-09-21</h3>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md-sram_size-mismatch-between-makefile-and-code--refused"></a>
+🟢 <span class="tt">SRAM_SIZE</span> mismatch between Makefile and code — refused</h3>
 <p>Every function of the family except <span class="tt"><a class="el" href="sram_8h.html#a1112f8f7d8aaf47129938cc4c35d0309" title="Calculate simple checksum.">sramChecksum</a></span> returns a code: <span class="tt"><a class="el" href="sram_8h.html#a03d071b39713a7e13ca63eac2cba04f7" title="The transfer fits and was done (a size of 0 is also OK).">SRAM_OK</a></span>, <span class="tt"><a class="el" href="sram_8h.html#a4b63695b18f1219d4bd926a2018fbaa5" title="offset + size exceeds the declared SRAM; nothing was copied.">SRAM_ERR_RANGE</a></span> (<span class="tt">offset + size</span> exceeds the declared SRAM) or <span class="tt"><a class="el" href="sram_8h.html#ac212fcfc7b67cd50eb15d00e099a3b82" title="The ROM header declares no SRAM (USE_SRAM := 1 is missing).">SRAM_ERR_NO_SRAM</a></span> (the header declares none — <span class="tt">USE_SRAM := 1</span> is missing). A refused call copies nothing. The capacity is read from your ROM's own header, so it always matches the <span class="tt">SRAM_SIZE</span> you built with (capped at what the module addresses in one bank: 32 KB on LoROM, 8 KB on HiROM).</p>
-<p>Before that the family returned <span class="tt">void</span> and copied whatever it was asked, past the declared size. The classic bug — <span class="tt">SRAM_SIZE := 1</span> (2 KB) in the Makefile, then <span class="tt">SLOT_SIZE = 1024</span> × 4 slots — now fails loudly on slot 2 if you look at the return value:</p>
+<p>The classic bug — <span class="tt">SRAM_SIZE := 1</span> (2 KB) in the Makefile, then <span class="tt">SLOT_SIZE = 1024</span> × 4 slots — fails loudly on slot 2 if you look at the return value:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code hl_function" href="sram_8h.html#a8c9b2eba46831adcd280dcdca9e6e04d">sramSaveOffset</a>((<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> *)&amp;save, <span class="keyword">sizeof</span>(save), SLOT_OFFSET(slot)) != <a class="code hl_define" href="sram_8h.html#a03d071b39713a7e13ca63eac2cba04f7">SRAM_OK</a>) {</div>
 <div class="line">    <span class="comment">/* this slot does not exist on this cartridge */</span></div>
 <div class="line">}</div>
@@ -365,7 +364,7 @@ Gotchas</h2>
 🟡 Emulator persistence varies</h3>
 <ul>
 <li><b>snes9x</b> and <b>Mesen2</b>: persist SRAM to a <span class="tt">.srm</span> file alongside the ROM. Save game survives reset and emulator restart.</li>
-<li><b>luna</b> (the test harness): SRAM is in-memory (captured in save-states; cross-run <span class="tt">.srm</span> persistence is a luna roadmap item) — only — does not persist across runs by default. The test harness resets SRAM between tests.</li>
+<li><b>luna</b> (the test harness): each run starts from fresh SRAM unless you give it a battery file. <span class="tt">--srm-out FILE</span> writes the SRAM after a run and <span class="tt">--srm-in FILE</span> loads it before the next one (<span class="tt">luna state</span>); in <span class="tt">luna test</span>, a manifest's <span class="tt">srm_out</span> feeds another's <span class="tt">srm_in</span>, which is how the power-cycle manifests above work.</li>
 <li><b>Real hardware via FXPak Pro</b>: persists to the SD card's per-ROM <span class="tt">.srm</span>. Survives power-off.</li>
 </ul>
 <p>If you write a tutorial / demo that "saves on cycle X and loads on
@@ -381,16 +380,16 @@ Cycle cost</h2>
 </ul>
 <p>A full 8 KB save: ~57 K CPU cycles ≈ 430 K master cycles — slightly <em>more</em> than one full frame (a frame is ~357 K master cycles). SRAM access needs no VBlank window, so nothing corrupts, but the frame that runs the save arrives late. For multi-KB auto-saves during gameplay, split the save across frames (say 2 KB per frame) or accept the one-off hitch.</p>
 <p>There is no DMA path for SRAM — general DMA cannot copy between two A-bus addresses (WRAM and cartridge SRAM both live on the A bus), so MVN is the fastest option available.</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-14"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-15"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="sram_8h.html" title="SNES SRAM (Save RAM) Functions.">lib/include/snes/sram.h</a></span> — full API reference.</li>
-<li><span class="tt">lib/source/sram.asm</span> — implementation (331 LOC, all assembly).</li>
-<li><a class="el" href="dir_625983682e2ea858bb635bda77752bf9.html" title="/home/runner/work/opensnes/opensnes/examples/memory/save_game/README.md"><span class="tt">examples/memory/save_game</span></a> — multi-slot save demo with on-screen hex verification.</li>
-<li><a class="el" href="dir_947159ae9cd3221b0e807b63eeb2ccf4.html" title="/home/runner/work/opensnes/opensnes/examples/memory/hirom_demo/README.md"><span class="tt">examples/memory/hirom_demo</span></a> — companion read for the HiROM bank layout that affects SRAM mapping.</li>
-<li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — for the BG/text rendering used to show save state on screen.</li>
-<li><a class="el" href="KNOWN__LIMITATIONS_8md.html" title="/home/runner/work/opensnes/opensnes/KNOWN_LIMITATIONS.md"><span class="tt">KNOWN_LIMITATIONS.md</span></a> — covers the bank-mapping rules and the emulator persistence variance.</li>
-<li><a class="el" href="sa1_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/sa1.md">SA-1 tutorial</a> — the SA-1 side of BW-RAM (the SA-1 CPU has its own write enable, CBWE <span class="tt">$2227</span>). </li>
+<li><span class="tt">lib/source/sram.asm</span> — implementation (all assembly).</li>
+<li><a href="examples_memory_save_game.html"><span class="tt">examples/memory/save_game</span></a> — multi-slot save demo with on-screen hex verification.</li>
+<li><a href="examples_memory_hirom_demo.html"><span class="tt">examples/memory/hirom_demo</span></a> — companion read for the HiROM bank layout that affects SRAM mapping.</li>
+<li><a href="tutorial_graphics.html">Graphics tutorial</a> — for the BG/text rendering used to show save state on screen.</li>
+<li><a href="known_limitations.html"><span class="tt">KNOWN_LIMITATIONS.md</span></a> — covers the bank-mapping rules and the emulator persistence variance.</li>
+<li><a href="tutorial_sa1.html">SA-1 tutorial</a> — the SA-1 side of BW-RAM (the SA-1 CPU has its own write enable, CBWE <span class="tt">$2227</span>). </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
@@ -406,7 +405,7 @@ See also</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

@@ -151,18 +151,18 @@ The level is bigger than VRAM — so stream it</h2>
 <p>The design consequence: <b>build wide, not dense.</b> Level width is nearly free because it streams; what costs you is unique tiles (VRAM) and simultaneous on-screen sprites (<a class="el" href="craft_frame_budget.html" title="The frame budget">The frame budget</a>). A long level of reused metatiles is the SNES's comfort zone.</p>
 <h2 class="doxsection"><a class="anchor" id="the-workflow-design-in-tiled-convert-for-the-snes"></a>
 The workflow: design in Tiled, convert for the SNES</h2>
-<p>You do not hand-author map bytes. <a href="https://www.mapeditor.org/">Tiled</a> is a free level editor, and the SDK bridges it to the hardware. The pipeline (<a class="el" href="examples_maps_tiled.html" title="Tiled Map Editor Integration">Tiled Map Editor Integration</a> is the complete worked example):</p>
-<div class="fragment"><div class="line"> Tiled  ──►  gfx4snes  ──►  tmx2snes  ──►  mapLoad()</div>
-<div class="line">paint the    tileset PNG    the .tmj map    in your game</div>
-<div class="line">level +      → tiles +      + tileset.map   loop</div>
-<div class="line">tile props   palette+.map   → map binaries</div>
+<p>You do not hand-author map bytes. <a href="https://www.mapeditor.org/">Tiled</a> is a free level editor, and the SDK bridges it to the hardware. The pipeline (<a class="el" href="examples_maps_map_scroll.html" title="Map Scroll">Map Scroll</a> is the complete worked example):</p>
+<div class="fragment"><div class="line"> Tiled  ──►  opensnes-tileset  ──►  opensnes-level  ──►  mapLoad()</div>
+<div class="line">paint the    tileset PNG          the .tmj map          in your game</div>
+<div class="line">level +      → tiles +            + tileset.map         loop</div>
+<div class="line">tile props   palette + .map       → map binaries</div>
 </div><!-- fragment --><ol type="1">
 <li><b>Paint</b> the level in Tiled from your tileset image, and set each tile's <span class="tt">attribute</span> / <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a></span> / <span class="tt">priority</span> custom properties (these become the collision and rendering data above).</li>
-<li><b>Convert the tileset</b> with <span class="tt">gfx4snes</span> — it produces the tiles, the palette, and a <span class="tt">.map</span> optimisation table.</li>
-<li><b>Convert the level</b> with <span class="tt">tmx2snes</span>, handing it the <span class="tt">.tmj</span> export and that <span class="tt">.map</span> table; it emits the tilemap, tile-definition, and attribute binaries.</li>
+<li><b>Convert the tileset</b> with <span class="tt">opensnes-tileset</span> — a <span class="tt">tiles.png.toml</span> beside the picture; it produces the tiles, the palette, and a <span class="tt">.map</span> optimisation table.</li>
+<li><b>Convert the level</b> with <span class="tt">opensnes-level</span> — a <span class="tt">level.tmj.toml</span> beside the export whose <span class="tt">tileset</span> key names that <span class="tt">.map</span> table; it emits the tilemap, tile-definition, and attribute binaries, and a <span class="tt">.inc</span> that declares them. The build runs both conversions, the level after the tileset.</li>
 <li><b>Load</b> them with <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> and scroll with the map engine.</li>
 </ol>
-<p>The point of the tooling is that <b>the Tiled file stays the single source of truth.</b> Change the level in the editor, re-run two commands, and the collision, palettes and visuals all move together — no separate hand-maintained collision map to drift out of sync.</p>
+<p>The point of the tooling is that <b>the Tiled file stays the single source of truth.</b> Change the level in the editor, run <span class="tt">make</span>, and the collision, palettes and visuals all move together — no separate hand-maintained collision map to drift out of sync.</p>
 <h2 class="doxsection"><a class="anchor" id="two-ways-to-hold-a-level"></a>
 Two ways to hold a level</h2>
 <p>Not every game wants the streaming map engine. Choose your representation from what the game needs:</p>
@@ -174,7 +174,7 @@ Two ways to hold a level</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Fixed-screen puzzle / board  </td><td class="markdownTableBodyNone"><b>Your own array</b>  </td><td class="markdownTableBodyNone">A 64×64 area fits without streaming; you keep your own entity state  </td></tr>
 </table>
-<p><span class="tt">tmx2snes</span> serves both: its default output feeds the map engine, and its <span class="tt">-Q</span> flag emits a quadrant-ordered tilemap you can DMA straight to VRAM and drive with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> yourself — so even a game that does not use the engine still authors its levels in Tiled instead of by hand.</p>
+<p><span class="tt">opensnes-level</span> serves both: its default output feeds the map engine, and <span class="tt">quadrant = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span> emits a quadrant-ordered tilemap you can DMA straight to VRAM and drive with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> yourself — so even a game that does not use the engine still authors its levels in Tiled instead of by hand.</p>
 <h2 class="doxsection"><a class="anchor" id="designing-the-level-not-just-building-it"></a>
 Designing the level, not just building it</h2>
 <p>Tooling gets pixels on screen; it does not make a level <em>good</em>. That is its own craft — pacing, teaching a mechanic before testing it, visual variety from a limited tileset. The best free primer is <a href="https://www.smwcentral.net/?p=beginners">SMW Central's beginners' guide</a>; it is about Super Mario World, but the level-design principles are universal.</p>
@@ -200,7 +200,7 @@ Designing the level, not just building it</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="craft.html">Game-Craft Guides</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="craft.html">Game-Craft Guides</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

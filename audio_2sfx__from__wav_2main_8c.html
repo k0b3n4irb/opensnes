@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/audio/sfx_from_wav/main.c File Reference</title>
+<title>examples/audio/sfx_from_wav/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -119,11 +119,11 @@ $(function(){initNavTree('audio_2sfx__from__wav_2main_8c.html','',''); });
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">main.c File Reference</div></div>
+  <div class="headertitle"><div class="title">main.c File Reference<div class="ingroups"><a class="el" href="group__examples.html">Examples</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>One-shot sound effects from WAV files — the wav2brr pipeline.  
+<p>One-shot sound effects from WAV files, converted by the build.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="audio_8h_source.html">snes/audio.h</a>&gt;</code><br />
@@ -142,11 +142,21 @@ Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>One-shot sound effects from WAV files — the wav2brr pipeline. </p>
+<div class="textblock"><p>One-shot sound effects from WAV files, converted by the build. </p>
 <p>The smallest "press a button, hear a sound" example, and a showcase of the settings-file build: <span class="tt">res/blip.wav</span> and <span class="tt">res/coin.wav</span> are plain PCM WAV files with a <span class="tt">.wav.toml</span> beside each (<span class="tt">tool = "opensnes-sample"</span>); the build converts them with opensnes-sample and links the .brr — no .brr is committed, they are generated on demand like a .pic from a .png.</p>
-<p>See <a class="el" href="audio_8md.html">docs/tutorials/audio.md</a> ("One-shot samples from WAV") and tools/wav2brr for the converter.</p>
-<p>Init order: textModeInit (display), audioInit, load samples, setScreenOn. Modules: console, dma, audio, input, background, text.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="audio_8h.html" title="OpenSNES Audio System.">lib/include/snes/audio.h</a> — <a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample</a> / <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample</a> </dd></dl>
+<p>See <a class="el" href="tutorial_audio_samples.html">docs/tutorials/audio_samples.md</a> ("One-shot samples from WAV").</p>
+<dl class="section user"><dt>SNES Concepts</dt><dd><ul>
+<li>BRR samples: the S-DSP plays BRR, nothing else</li>
+<li><a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample()</a> uploads a sample to the SPC700 once; <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample()</a> triggers it on demand</li>
+<li>Edge-triggered input: <a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a> fires once per press</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>What to Observe</dt><dd><ul>
+<li>Press A for a blip, B for a coin; one press, one sound</li>
+</ul>
+</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, dma, audio, input, background, text</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="audio_8h.html" title="OpenSNES Audio System.">audio.h</a> — <a class="el" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d" title="Load a BRR sample into SPC700 RAM.">audioLoadSample</a> / <a class="el" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff" title="Play a sample with default settings.">audioPlaySample</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a07a2d0c457e8c150006457cb0269538d" name="a07a2d0c457e8c150006457cb0269538d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a07a2d0c457e8c150006457cb0269538d">&#9670;&#160;</a></span>SMP_BLIP</h2>

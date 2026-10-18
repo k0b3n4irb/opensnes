@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/maps/dynamic_map/map32x32.h File Reference</title>
+<title>examples/maps/dynamic_map/map32x32.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -137,6 +137,11 @@ Functions</h2></td></tr>
 <tr class="memitem:ae672de960d84e9e82707e6e2fe664ffd" id="r_ae672de960d84e9e82707e6e2fe664ffd"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae672de960d84e9e82707e6e2fe664ffd">element2sprite32x32</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> elem)</td></tr>
 <tr class="memitem:aa2ad4600d3cbd188ae7ec1735ae02540" id="r_aa2ad4600d3cbd188ae7ec1735ae02540"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa2ad4600d3cbd188ae7ec1735ae02540">initSpriteMap32x32</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> len)</td></tr>
 <tr class="memitem:a15a7282dac140931c08ec533dcf76d4b" id="r_a15a7282dac140931c08ec533dcf76d4b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a15a7282dac140931c08ec533dcf76d4b">screenRefreshPos32x32</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> x, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> address)</td></tr>
+<tr class="memitem:a97f749d5587e4077f1ba6150b783380a" id="r_a97f749d5587e4077f1ba6150b783380a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a97f749d5587e4077f1ba6150b783380a">spritemapDma</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_offset, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_addr, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> byte_count)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aca64fcec303340ec732eeafd1749e9d9" id="r_aca64fcec303340ec732eeafd1749e9d9"><td class="memItemLeft"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aca64fcec303340ec732eeafd1749e9d9">spritemap_buf</a> [0x2000]</td></tr>
 </table>
 <a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="acf80be370e497957e58c72f1d3b92f0b" name="acf80be370e497957e58c72f1d3b92f0b"></a>
@@ -250,6 +255,55 @@ Functions</h2></td></tr>
           <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>address</em></span>&#160;)</td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a97f749d5587e4077f1ba6150b783380a" name="a97f749d5587e4077f1ba6150b783380a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97f749d5587e4077f1ba6150b783380a">&#9670;&#160;</a></span>spritemapDma()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void spritemapDma </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_offset</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>vram_addr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>byte_count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
+<a id="aca64fcec303340ec732eeafd1749e9d9" name="aca64fcec303340ec732eeafd1749e9d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca64fcec303340ec732eeafd1749e9d9">&#9670;&#160;</a></span>spritemap_buf</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a> <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> spritemap_buf[0x2000]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

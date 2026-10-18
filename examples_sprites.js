@@ -5,8 +5,8 @@ var examples_sprites =
       [ "Reference — OAM in one screen", "examples_sprites.html#reference--oam-in-one-screen", [
         [ "What This Example Shows", "examples_sprites_animated_sprite.html#what-this-example-shows-7", null ],
         [ "Prerequisites", "examples_sprites_animated_sprite.html#prerequisites-8", null ],
-        [ "Controls", "examples_sprites_animated_sprite.html#controls-30", null ],
-        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#build--run-46", null ],
+        [ "Controls", "examples_sprites_animated_sprite.html#controls-29", null ],
+        [ "Build &amp; Run", "examples_sprites_animated_sprite.html#build--run-44", null ],
         [ "How It Works", "examples_sprites_animated_sprite.html#how-it-works-15", [
           [ "1. Sprite sheet layout", "examples_sprites_animated_sprite.html#autotoc_md1-sprite-sheet-layout", null ],
           [ "2. State machine", "examples_sprites_animated_sprite.html#autotoc_md2-state-machine", null ],
@@ -18,15 +18,14 @@ var examples_sprites =
           [ "Sprite Sheets in VRAM", "examples_sprites_animated_sprite.html#sprite-sheets-in-vram", null ],
           [ "16x16 Tiles in OAM", "examples_sprites_animated_sprite.html#autotoc_md16x16-tiles-in-oam", null ]
         ] ],
-        [ "Project Structure", "examples_sprites_animated_sprite.html#project-structure-16", null ],
-        [ "Going Further", "examples_sprites_animated_sprite.html#going-further-8", null ],
-        [ "Modules Used", "examples_sprites_animated_sprite.html#modules-used-64", null ]
+        [ "Project Structure", "examples_sprites_animated_sprite.html#project-structure-15", null ],
+        [ "Going Further", "examples_sprites_animated_sprite.html#going-further-9", null ],
+        [ "Modules Used", "examples_sprites_animated_sprite.html#modules-used-62", null ]
       ] ]
     ] ],
     [ "Aseprite Pipeline", "examples_sprites_aseprite_pipeline.html", null ],
     [ "Dynamic Metasprite Engine", "examples_sprites_dynamic_metasprite.html", null ],
     [ "Dynamic Sprite -- VRAM Streaming for Animated Sprites", "examples_sprites_dynamic_sprite.html", null ],
-    [ "Metasprite", "examples_sprites_metasprite.html", null ],
     [ "Simple Sprite -- Your First OAM Sprite", "examples_sprites_simple_sprite.html", null ],
     [ "Object Size -- All 6 SNES Sprite Size Modes", "examples_sprites_sprite_sizes.html", null ],
     [ "sprite_swarm — a bouncing swarm, and the OAM throughput ceiling", "examples_sprites_sprite_swarm.html", null ],

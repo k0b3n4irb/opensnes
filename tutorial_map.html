@@ -129,50 +129,68 @@ What the map module is</h2>
 <p>It works in <b>metatiles</b>: 8×8 blocks indexed through a small tile definition, which is how a large map fits in ROM. You give it three things at load time and then just move the camera each frame.</p>
 <h2 class="doxsection"><a class="anchor" id="the-tiled-pipeline"></a>
 The Tiled pipeline</h2>
-<p>You do not hand-author the binary formats. Draw the map in <a href="https://www.mapeditor.org/">Tiled</a>, export JSON (<span class="tt">.tmj</span>), and convert with the SDK's <span class="tt">tmx2snes</span>:</p>
-<div class="fragment"><div class="line">tmx2snes town.tmj tileset.map</div>
-</div><!-- fragment --><p>It emits four files the module consumes:</p>
+<p>You do not hand-author the binary formats. Draw the map in <a href="https://www.mapeditor.org/">Tiled</a> against a tileset picture, export JSON (<span class="tt">.tmj</span>), and put two settings files in <span class="tt">res/</span>: one converts the tileset picture with <span class="tt">opensnes-tileset</span>, the other the level with <a class="el" href="tools_opensnes_level.html" title="opensnes-level — Tiled levels to SNES map data">opensnes-level — Tiled levels to SNES map data</a>, against the <span class="tt">.map</span> the first one writes (<span class="tt">examples/maps/map_scroll</span>):</p>
+<div class="fragment"><div class="line"># res/tilesMario.png.toml</div>
+<div class="line">tool = &quot;opensnes-tileset&quot;</div>
+<div class="line"> </div>
+<div class="line">[convert]</div>
+<div class="line">colors = 48</div>
+</div><!-- fragment --><div class="fragment"><div class="line"># res/tiledMario.tmj.toml</div>
+<div class="line">tool = &quot;opensnes-level&quot;</div>
+<div class="line"> </div>
+<div class="line">[convert]</div>
+<div class="line">tileset = &quot;tilesMario.map&quot;</div>
+</div><!-- fragment --><p>The build converts the level after the pictures, so the tileset's <span class="tt">.map</span> is fresh when the level reads it; the Makefile names neither. By hand it is <span class="tt">opensnes-level convert res/tiledMario.tmj --tileset res/tilesMario.map</span>. It emits four files the modules consume:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Content  </th><th class="markdownTableHeadNone">Consumed by  </th></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.m16</span>  </td><td class="markdownTableBodyNone">the streaming tilemap (tile indices + flip bits)  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> arg 1  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.t16</span>  </td><td class="markdownTableBodyNone">per-tile palette + priority  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> arg 2 (tileset def)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">&lt;map&gt;.t16</span>  </td><td class="markdownTableBodyNone">per-tile palette + priority  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> arg 2 (tileset def)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.b16</span>  </td><td class="markdownTableBodyNone">per-tile collision attribute  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> arg 3  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">&lt;map&gt;.b16</span>  </td><td class="markdownTableBodyNone">per-tile collision attribute  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> arg 3  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.o16</span>  </td><td class="markdownTableBodyNone">the Entities object layer  </td><td class="markdownTableBodyNone">the <span class="tt">object</span> module  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">&lt;map&gt;.o16</span>  </td><td class="markdownTableBodyNone">the Entities object layer  </td><td class="markdownTableBodyNone">the <span class="tt">object</span> module  </td></tr>
 </table>
-<p><span class="tt">tmx2snes</span> also has three flags for games that do <b>not</b> use the <span class="tt">map</span> module and want the same content in a different shape:</p>
+<p>and <span class="tt">&lt;map&gt;.inc</span>, which declares them for C: <span class="tt">tiledMario_BG1_map</span>, <span class="tt">tiledMario_tiledef</span>, <span class="tt">tiledMario_tileattr</span>, <span class="tt">tiledMario_objects</span> (each with <span class="tt">_end</span>).</p>
+<p>Three more keys of <span class="tt">[convert]</span> serve games that do <b>not</b> use the <span class="tt">map</span> module and want the same content in a different shape:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Flag  </th><th class="markdownTableHeadNone">Output  </th><th class="markdownTableHeadNone">For  </th></tr>
+<th class="markdownTableHeadNone">Key  </th><th class="markdownTableHeadNone">Output  </th><th class="markdownTableHeadNone">For  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-e</span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;map&gt;.inc</span> — entities as C defines (struct + rows, custom properties)  </td><td class="markdownTableBodyNone">a game that keeps its own entity structs  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">entities = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;map&gt;_entities.inc</span> — entities as C defines (struct + rows, custom properties)  </td><td class="markdownTableBodyNone">a game that keeps its own entity structs  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-Q</span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.q16</span> — a quadrant-ordered 64×64 tilemap  </td><td class="markdownTableBodyNone">scrolling a fixed 64×64 area with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> (the <span class="tt">background</span> module, not <span class="tt">map</span>)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">quadrant = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.q16</span> — a quadrant-ordered 64×64 tilemap  </td><td class="markdownTableBodyNone">scrolling a fixed 64×64 area with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> (the <span class="tt">background</span> module, not <span class="tt">map</span>)  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-C</span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.c16</span> — one collision byte per map cell  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> (a flattened grid, indexed directly)  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">collision = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>  </td><td class="markdownTableBodyNone"><span class="tt">&lt;<a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer</a>&gt;.c16</span> — one collision byte per map cell  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> (a flattened grid, indexed directly)  </td></tr>
 </table>
-<p><span class="tt">examples/games/rpg</span> uses <span class="tt">-Q</span>/<span class="tt">-e</span>/<span class="tt">-C</span> (it scrolls a fixed 64×64 town with <span class="tt">background</span>, not <span class="tt">map</span>); <span class="tt">examples/maps/tiled</span> uses the default <span class="tt">map</span> pipeline. Pick the module that matches the map size — <span class="tt">map</span> for worlds larger than 64×64, <span class="tt">background</span> for a fixed screen or two.</p>
+<p><span class="tt">examples/games/rpg</span> scrolls a fixed 64×64 town with <span class="tt">background</span>, not <span class="tt">map</span> (its <span class="tt">town.tmj</span> gives the same quadrant map under <span class="tt">--quadrant</span>); <span class="tt">examples/maps/map_scroll</span> uses the default <span class="tt">map</span> pipeline. Pick the module that matches the map size — <span class="tt">map</span> for worlds larger than 64×64, <span class="tt">background</span> for a fixed screen or two.</p>
 <blockquote class="doxtable">
-<p><b>cute_tiled needs no special export.</b> <span class="tt">tmx2snes</span> minifies the JSON itself, so a pretty-printed <span class="tt">.tmj</span> from a generator script parses fine. </p>
+<p><b>cute_tiled needs no special export.</b> <span class="tt">opensnes-level</span> minifies the JSON itself, so a pretty-printed <span class="tt">.tmj</span> from a generator script parses fine. </p>
 </blockquote>
 <h2 class="doxsection"><a class="anchor" id="the-minimum-viable-scroller"></a>
 The minimum viable scroller</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;<a class="code" href="map_8h.html">snes/map.h</a>&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> world_map[], world_tiles[], world_props[];   <span class="comment">// the .m16/.t16/.b16</span></div>
+<div class="line"><span class="preprocessor">#include &quot;res/tileslevel1.inc&quot;</span>   <span class="comment">// the tileset: tileslevel1_tiles[], tileslevel1_pal[]</span></div>
+<div class="line"><span class="preprocessor">#include &quot;res/maplevel01.inc&quot;</span>    <span class="comment">// the level: the .m16/.t16/.b16</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// The tileset and the map&#39;s VRAM home; the map engine streams to $6800.</span></div>
+<div class="line">    <a class="code hl_function" href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a>(0, tileslevel1_tiles, tileslevel1_pal, 0,</div>
+<div class="line">                  tileslevel1_tiles_end - tileslevel1_tiles,</div>
+<div class="line">                  tileslevel1_pal_end - tileslevel1_pal,</div>
+<div class="line">                  <a class="code hl_define" href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a>, 0x2000);</div>
+<div class="line">    <a class="code hl_function" href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a>(0, 0x6800, <a class="code hl_define" href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a>);</div>
 <div class="line">    <a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);</div>
 <div class="line"> </div>
-<div class="line">    <span class="comment">// mapLoad configures BG1, uploads the tileset, and flushes the first</span></div>
-<div class="line">    <span class="comment">// screen of tilemap to VRAM. It must run BEFORE setScreenOn().</span></div>
-<div class="line">    <a class="code hl_function" href="map_8h.html#a4895959148c67700bc9d52dab9501136">mapLoad</a>(world_map, world_tiles, world_props);</div>
+<div class="line">    <span class="comment">// mapLoad flushes the first screen of tilemap to VRAM.</span></div>
+<div class="line">    <span class="comment">// It must run BEFORE setScreenOn().</span></div>
+<div class="line">    <a class="code hl_function" href="map_8h.html#a4895959148c67700bc9d52dab9501136">mapLoad</a>(maplevel01_BG1_map, maplevel01_tiledef, maplevel01_tileattr);</div>
 <div class="line"> </div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a>();</div>
 <div class="line"> </div>
@@ -191,16 +209,19 @@ The minimum viable scroller</h2>
 <div class="line">    }</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2apu__switch_2main_8c_html_a840291bc02cba5474a4cb46a9b9566fe"><div class="ttname"><a href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a></div><div class="ttdeci">int main(void)</div><div class="ttdef"><b>Definition</b> main.c:66</div></div>
+<div class="ttc" id="abackground_8h_html_a196c1345cc8194b1dd3ae1d8d1287924"><div class="ttname"><a href="background_8h.html#a196c1345cc8194b1dd3ae1d8d1287924">bgSetMapPtr</a></div><div class="ttdeci">void bgSetMapPtr(u8 bg, u16 vramAddr, u8 mapSize)</div><div class="ttdoc">Set background tilemap address and size.</div></div>
+<div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
+<div class="ttc" id="agroup__bg__colors_html_ga4818d4e1c65ed78d65f1d3e6d9d1232a"><div class="ttname"><a href="group__bg__colors.html#ga4818d4e1c65ed78d65f1d3e6d9d1232a">BG_16COLORS</a></div><div class="ttdeci">#define BG_16COLORS</div><div class="ttdef"><b>Definition</b> background.h:47</div></div>
 <div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:35</div></div>
+<div class="ttc" id="agroup__bg__size_html_ga6129b86a7c2913a31f1bca293fa7c1e7"><div class="ttname"><a href="group__bg__size.html#ga6129b86a7c2913a31f1bca293fa7c1e7">SC_64x32</a></div><div class="ttdeci">#define SC_64x32</div><div class="ttdef"><b>Definition</b> background.h:37</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga004194639b9ad76cea01d9e93716d4d6"><div class="ttname"><a href="group__input__buttons.html#ga004194639b9ad76cea01d9e93716d4d6">KEY_RIGHT</a></div><div class="ttdeci">#define KEY_RIGHT</div><div class="ttdef"><b>Definition</b> input.h:81</div></div>
 <div class="ttc" id="agroup__input__buttons_html_ga203163bc0189184a1de6ca8d1e53c6bf"><div class="ttname"><a href="group__input__buttons.html#ga203163bc0189184a1de6ca8d1e53c6bf">KEY_DOWN</a></div><div class="ttdeci">#define KEY_DOWN</div><div class="ttdef"><b>Definition</b> input.h:79</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gaf4d1b8a2912354646c74cf36c69f8223"><div class="ttname"><a href="group__input__buttons.html#gaf4d1b8a2912354646c74cf36c69f8223">KEY_LEFT</a></div><div class="ttdeci">#define KEY_LEFT</div><div class="ttdef"><b>Definition</b> input.h:80</div></div>
 <div class="ttc" id="agroup__input__buttons_html_gafa086fc916a81e7fd348ec00cf786916"><div class="ttname"><a href="group__input__buttons.html#gafa086fc916a81e7fd348ec00cf786916">KEY_UP</a></div><div class="ttdeci">#define KEY_UP</div><div class="ttdef"><b>Definition</b> input.h:78</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="ainput_8h_html_a91ebd3f122c9ba2913248112f7dc3647"><div class="ttname"><a href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld</a></div><div class="ttdeci">#define padHeld(pad)</div><div class="ttdef"><b>Definition</b> input.h:158</div></div>
 <div class="ttc" id="amap_8h_html"><div class="ttname"><a href="map_8h.html">map.h</a></div><div class="ttdoc">Scrolling tilemap engine for Mode 1 backgrounds.</div></div>
 <div class="ttc" id="amap_8h_html_a310e106b68443357988f941a95a27266"><div class="ttname"><a href="map_8h.html#a310e106b68443357988f941a95a27266">mapUpdateCamera</a></div><div class="ttdeci">void mapUpdateCamera(u16 xpos, u16 ypos)</div><div class="ttdoc">Update camera position to follow an object.</div></div>
@@ -228,7 +249,7 @@ Collision against the map</h2>
 <div class="ttc" id="abasics_2collision__demo_2main_8c_html_afcd2e46ba400e64d8137a05e55980b26"><div class="ttname"><a href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26">player_x</a></div><div class="ttdeci">static s16 player_x</div><div class="ttdoc">Player X position in screen coordinates.</div><div class="ttdef"><b>Definition</b> main.c:56</div></div>
 <div class="ttc" id="amap_8h_html_a49fd2a70bfc38c5c4ba5ea883b863dc7"><div class="ttname"><a href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7">mapGetMetaTilesProp</a></div><div class="ttdeci">u16 mapGetMetaTilesProp(u16 xpos, u16 ypos)</div><div class="ttdoc">Get tile collision property at map coordinates.</div></div>
 <div class="ttc" id="amap_8h_html_ad95ef475b3953c77cd646919e1cf1ce3"><div class="ttname"><a href="map_8h.html#ad95ef475b3953c77cd646919e1cf1ce3">mapGetMetaTile</a></div><div class="ttdeci">u16 mapGetMetaTile(u16 xpos, u16 ypos)</div><div class="ttdoc">Get metatile index at map coordinates.</div></div>
-</div><!-- fragment --><p><span class="tt"><a class="el" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7" title="Get tile collision property at map coordinates.">mapGetMetaTilesProp</a></span> is the map-engine equivalent of <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span>; use it when the map lives in the <span class="tt">map</span> module. (A game on the <span class="tt">background</span> module with a <span class="tt">-C</span> grid uses <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> instead — see the <a class="el" href="collision_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/collision.md">collision tutorial</a>.)</p>
+</div><!-- fragment --><p><span class="tt"><a class="el" href="map_8h.html#a49fd2a70bfc38c5c4ba5ea883b863dc7" title="Get tile collision property at map coordinates.">mapGetMetaTilesProp</a></span> is the map-engine equivalent of <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span>; use it when the map lives in the <span class="tt">map</span> module. (A game on the <span class="tt">background</span> module with a <span class="tt">.c16</span> grid (<span class="tt">collision = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>) uses <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> instead — see the <a href="tutorial_collision.html">collision tutorial</a>.)</p>
 <h2 class="doxsection"><a class="anchor" id="one-way-and-second-layer-options"></a>
 One-way and second-layer options</h2>
 <div class="fragment"><div class="line"><a class="code hl_function" href="map_8h.html#a58e5d28fd6d1ce78aaba19e7bb697e13">mapSetMapOptions</a>(<a class="code hl_define" href="map_8h.html#aaaaeb07f437c99e9497c94bf585d7a30">MAP_OPT_1WAY</a>);   <span class="comment">// horizontal-only — skips the vertical</span></div>
@@ -240,8 +261,7 @@ One-way and second-layer options</h2>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="worked-patterns-the-shipped-examples-1"></a>
 Worked patterns (the shipped examples)</h2>
 <ul>
-<li><b><span class="tt">examples/maps/map_scroll</span></b> — the minimum scroller above, a large map moved with the D-pad.</li>
-<li><b><span class="tt">examples/maps/tiled</span></b> — the full Tiled pipeline: a <span class="tt">.tmj</span> drawn in Tiled, converted with <span class="tt">tmx2snes</span>, loaded with <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad</a></span>.</li>
+<li><b><span class="tt">examples/maps/map_scroll</span></b> — the full Tiled pipeline (a <span class="tt">.tmj</span> drawn in Tiled, converted with <span class="tt">opensnes-level</span>, loaded with <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad</a></span>) and the minimum scroller above, a large map followed by a sprite.</li>
 <li><b><span class="tt">examples/maps/slope_collision</span></b> — per-tile collision <em>attributes</em> driving slope physics (the <span class="tt">.b16</span> values mean more than solid/empty).</li>
 <li><b><span class="tt">examples/maps/dynamic_map</span></b> — rewriting map tiles at runtime.</li>
 </ul>
@@ -255,13 +275,13 @@ Gotchas</h2>
 <p><span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate</a></span> stages (cheap, active frame); <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank</a></span> writes VRAM (must be in VBlank). Swapping them, or calling <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank</a></span> outside VBlank, drops the reveal strip and the leading edge of the scroll shows stale tiles.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md-map-streams-m16-background-wants-q16"></a>
 🟡 <span class="tt">map</span> streams <span class="tt">.m16</span>; <span class="tt">background</span> wants <span class="tt">.q16</span></h3>
-<p>These are different formats for different modules. A 64×64 fixed area scrolled with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> needs the quadrant layout (<span class="tt">tmx2snes -Q</span>), not the streaming <span class="tt">.m16</span>. Feeding one module the other's format is silent garbage. Match the format to the module.</p>
+<p>These are different formats for different modules. A 64×64 fixed area scrolled with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> needs the quadrant layout (<span class="tt">quadrant = <a class="el" href="group__bool__type.html#ga41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a></span>), not the streaming <span class="tt">.m16</span>. Feeding one module the other's format is silent garbage. Match the format to the module.</p>
 <h2 class="doxsection"><a class="anchor" id="see-also-7"></a>
 See also</h2>
 <ul>
-<li><a class="el" href="scrolling_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/scrolling.md">Scrolling &amp; parallax</a> — raw <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> when you don't need a streamed map.</li>
-<li><a class="el" href="collision_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/collision.md">Collision detection</a> — <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> and the <span class="tt">-C</span> grid.</li>
-<li><a class="el" href="map_8h.html" title="map.h">Map API reference</a> · <span class="tt">tools/tmx2snes/README.md</span> </li>
+<li><a href="tutorial_scrolling.html">Scrolling &amp; parallax</a> — raw <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span> when you don't need a streamed map.</li>
+<li><a href="tutorial_collision.html">Collision detection</a> — <span class="tt"><a class="el" href="collision_8h.html#a3d1308f57854050bc7d9b288aefcdc04" title="Check collision with tile at pixel coordinates.">collideTile()</a></span> and the <span class="tt">.c16</span> grid.</li>
+<li><a class="el" href="map_8h.html" title="map.h">Map API reference</a> · <a class="el" href="tools_opensnes_level.html" title="opensnes-level — Tiled levels to SNES map data">opensnes-level — Tiled levels to SNES map data</a> </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
@@ -277,7 +297,7 @@ See also</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

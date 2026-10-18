@@ -129,6 +129,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga9d4ca0a00107c3c5cdb4ef80cf75e875"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable echo for all voices.  <br /></td></tr>
 <tr class="memitem:ga66fe4109c3920b0a0aaa2a3dbe1c9d5c" id="r_ga66fe4109c3920b0a0aaa2a3dbe1c9d5c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c">audioEnableEcho</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> voiceMask)</td></tr>
 <tr class="memdesc:ga66fe4109c3920b0a0aaa2a3dbe1c9d5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable echo for specific voices.  <br /></td></tr>
+<tr class="memitem:gaef5a3db0aa4adfc51fb2da4e6c9f1516" id="r_gaef5a3db0aa4adfc51fb2da4e6c9f1516"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gaef5a3db0aa4adfc51fb2da4e6c9f1516">audioReleaseEcho</a> (void)</td></tr>
+<tr class="memdesc:gaef5a3db0aa4adfc51fb2da4e6c9f1516"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn the echo off and give its ring back to the samples.  <br /></td></tr>
 <tr class="memitem:gab48ad4e6beefd0728ba5fd76dfd9dd07" id="r_gab48ad4e6beefd0728ba5fd76dfd9dd07"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gab48ad4e6beefd0728ba5fd76dfd9dd07">audioSetEcho</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> delay, <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a> feedback, <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a> volumeL, <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a> volumeR)</td></tr>
 <tr class="memdesc:gab48ad4e6beefd0728ba5fd76dfd9dd07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure echo parameters.  <br /></td></tr>
 <tr class="memitem:gac6dba35011e0371c1fef74f7a55ae20f" id="r_gac6dba35011e0371c1fef74f7a55ae20f"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gac6dba35011e0371c1fef74f7a55ae20f">audioSetEchoFilter</a> (const <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a> fir[8])</td></tr>
@@ -152,6 +154,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Disable echo for all voices. </p>
+<p>Mutes the echo and stops the ring's writes. The ring keeps its memory: <a class="el" href="#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c" title="Enable echo for specific voices.">audioEnableEcho()</a> brings the same echo back. </p>
 
 </div>
 </div>
@@ -173,10 +176,33 @@ Functions</h2></td></tr>
 <p>Enable echo for specific voices. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">voiceMask</td><td>Bitmask (bit 0 = voice 0, etc.) </td></tr>
+    <tr><td class="paramname">voiceMask</td><td>Bitmask (bit 0 = voice 0, etc.)</td></tr>
   </table>
   </dd>
 </dl>
+<p>After <a class="el" href="#ga9d4ca0a00107c3c5cdb4ef80cf75e875" title="Disable echo for all voices.">audioDisableEcho()</a>, this starts the echo again as <a class="el" href="#gab48ad4e6beefd0728ba5fd76dfd9dd07" title="Configure echo parameters.">audioSetEcho()</a> configured it, on a cleared ring (~9 ms per unit of delay in the driver; the call itself returns at once). </p>
+
+</div>
+</div>
+<a id="gaef5a3db0aa4adfc51fb2da4e6c9f1516" name="gaef5a3db0aa4adfc51fb2da4e6c9f1516"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaef5a3db0aa4adfc51fb2da4e6c9f1516">&#9670;&#160;</a></span>audioReleaseEcho()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioReleaseEcho </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Turn the echo off and give its ring back to the samples. </p>
+<p>Does what <a class="el" href="#ga9d4ca0a00107c3c5cdb4ef80cf75e875" title="Disable echo for all voices.">audioDisableEcho()</a> does, then frees the ring: the sample area reaches $FFC0 again (<a class="el" href="group__audio__samples.html#ga76b4689468ab6db5a7a0180111a27d85" title="Get available SPC700 RAM for samples.">audioGetFreeMemory()</a> counts it at once), and samples may be loaded where the ring was as soon as this returns — the driver answers only once the sound chip has stopped writing there.</p>
+<p>For a game that wants an echo in one scene only: <a class="el" href="#gab48ad4e6beefd0728ba5fd76dfd9dd07" title="Configure echo parameters.">audioSetEcho()</a> when the scene starts, this when it ends. <a class="el" href="#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c" title="Enable echo for specific voices.">audioEnableEcho()</a> alone no longer brings an echo back afterwards; <a class="el" href="#gab48ad4e6beefd0728ba5fd76dfd9dd07" title="Configure echo parameters.">audioSetEcho()</a> does, with its usual wait (16 ms per unit of the delay released), and it answers AUDIO_ERR_NO_MEMORY while samples loaded in the meantime occupy the ring it needs.</p>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK, or AUDIO_ERR_TIMEOUT if the driver does not answer (the ring is then still counted as taken) </dd></dl>
 
 </div>
 </div>
@@ -212,15 +238,15 @@ Functions</h2></td></tr>
 <p>Configure echo parameters. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">delay</td><td>Echo delay 1-7 (delay_ms = value * 16; values above 7 are clamped — the echo ring takes up to 14 KB from $C000, and the first call brings the sample area down from 62 KB to 46 KB: see <a class="el" href="group__audio__samples.html#ga76b4689468ab6db5a7a0180111a27d85" title="Get available SPC700 RAM for samples.">audioGetFreeMemory()</a>) </td></tr>
+    <tr><td class="paramname">delay</td><td>Echo delay 1-7 (delay_ms = value * 16; values above 7 are clamped). The echo ring takes delay x 2 KB at the top of the sample area: see <a class="el" href="group__audio__samples.html#ga76b4689468ab6db5a7a0180111a27d85" title="Get available SPC700 RAM for samples.">audioGetFreeMemory()</a> </td></tr>
     <tr><td class="paramname">feedback</td><td>Feedback amount (-128 to 127) </td></tr>
     <tr><td class="paramname">volumeL</td><td>Left echo volume (-128 to 127) </td></tr>
     <tr><td class="paramname">volumeR</td><td>Right echo volume (-128 to 127)</td></tr>
   </table>
   </dd>
 </dl>
-<p>Reconfiguration clears the whole echo ring before re-enabling echo writes (~9 ms per delay unit) — call at scene setup, not per frame. Call this BEFORE <a class="el" href="#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c" title="Enable echo for specific voices.">audioEnableEcho()</a>.</p>
-<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK; AUDIO_ERR_NO_MEMORY when samples already loaded reach past $C000, where the ring goes (nothing is changed then); AUDIO_ERR_TIMEOUT if the driver does not answer </dd></dl>
+<p><b>This call blocks.</b> The S-DSP takes a new delay only when the ring it is running reaches its end, so the driver keeps the ring silent for that long before it uses the new one: up to 240 ms on the first call, 16 ms per unit of the previous delay after; then it clears the new ring (~9 ms per unit). Call it at scene setup or with the screen off, never during play. To turn the same echo off and on, use <a class="el" href="#ga9d4ca0a00107c3c5cdb4ef80cf75e875" title="Disable echo for all voices.">audioDisableEcho()</a> and <a class="el" href="#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c" title="Enable echo for specific voices.">audioEnableEcho()</a>: they cost one command. Call this BEFORE <a class="el" href="#ga66fe4109c3920b0a0aaa2a3dbe1c9d5c" title="Enable echo for specific voices.">audioEnableEcho()</a>.</p>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK; AUDIO_ERR_NO_MEMORY when samples already loaded reach into the ring this delay needs (nothing is changed then); AUDIO_ERR_TIMEOUT if the driver does not answer </dd></dl>
 
 </div>
 </div>
@@ -242,10 +268,11 @@ Functions</h2></td></tr>
 <p>Set FIR filter coefficients for echo. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">fir</td><td>Array of 8 signed coefficients </td></tr>
+    <tr><td class="paramname">fir</td><td>Array of 8 signed coefficients</td></tr>
   </table>
   </dd>
 </dl>
+<p>Optional: from <a class="el" href="group__audio__init.html#ga7d44cacb545a813f38250020bbfa5ecd" title="Initialize the audio system.">audioInit()</a> the filter is { 127, 0, 0, 0, 0, 0, 0, 0 }, which passes the echo through unchanged. (Until 2026-10-13 it was all zeros, and an echo configured without this call was silent.) </p>
 
 </div>
 </div>

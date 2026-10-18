@@ -127,7 +127,7 @@ $(function(){initNavTree('examples_maps_slope_collision.html','',''); });
 <img src="slope_collision.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-28"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-27"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to use <span class="tt"><a class="el" href="object_8h.html#a828cd84eb41cd28c18ba0625cad1fd2a" title="Check object collision with map tiles including slopes.">objCollidMapWithSlopes()</a></span> for diagonal terrain collision</li>
@@ -136,7 +136,7 @@ What You'll Learn</h2>
 <li>How dynamic sprites handle animation frames with state machines</li>
 <li>How to register object type callbacks from assembly (for correct bank bytes)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-34"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-35"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="the-map-engine"></a>
 The Map Engine</h3>
@@ -223,7 +223,7 @@ How It Works</h2>
 <div class="line">    <a class="code hl_function" href="sprite_8h.html#a6160a02efb71cd4b2bac8c1553f9f57c">oamDynamicDraw</a>(0);</div>
 <div class="line">    <a class="code hl_function" href="map_8h.html#a310e106b68443357988f941a95a27266">mapUpdateCamera</a>(<a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2">mariox</a>, <a class="code hl_variable" href="games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1">marioy</a>);</div>
 <div class="line">}</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:166</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a50a1287c6a673d98dd90c61df91fd33c"><div class="ttname"><a href="games_2breakout_2main_8c.html#a50a1287c6a673d98dd90c61df91fd33c">pad0</a></div><div class="ttdeci">static u16 pad0</div><div class="ttdef"><b>Definition</b> main.c:158</div></div>
 <div class="ttc" id="agames_2mapandobjects_2mario_8c_html_a1940f6c79dc61a38090f9f76e5cdd6d2"><div class="ttname"><a href="games_2mapandobjects_2mario_8c.html#a1940f6c79dc61a38090f9f76e5cdd6d2">mariox</a></div><div class="ttdeci">u16 mariox</div><div class="ttdef"><b>Definition</b> mario.c:24</div></div>
 <div class="ttc" id="agames_2mapandobjects_2mario_8c_html_a20b89bc2758ce8e0058a5d8a227793a7"><div class="ttname"><a href="games_2mapandobjects_2mario_8c.html#a20b89bc2758ce8e0058a5d8a227793a7">marioupdate</a></div><div class="ttdeci">void marioupdate(u16 idx)</div><div class="ttdef"><b>Definition</b> mario.c:82</div></div>
 <div class="ttc" id="agames_2mapandobjects_2mario_8c_html_ad21b0092689f2ffa549ecaabf2bcada1"><div class="ttname"><a href="games_2mapandobjects_2mario_8c.html#ad21b0092689f2ffa549ecaabf2bcada1">marioy</a></div><div class="ttdeci">u16 marioy</div><div class="ttdef"><b>Definition</b> mario.c:24</div></div>
@@ -262,12 +262,12 @@ Project Structure</h2>
 <div class="line">    ├── map_1_1.o16      — Object placement data (Mario spawn point)</div>
 <div class="line">    ├── map_1_1.t16      — Tile type definitions (solid, slope, empty)</div>
 <div class="line">    └── map_1_1.b16      — Tile behavior/attribute data</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build--run-36"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build--run-35"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/slope_collision</div>
 </div><!-- fragment --><p>Then open <span class="tt">slope_collision.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-52"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-51"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">sprite_dynamic</span>, <span class="tt">sprite_lut</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">map</span>, <span class="tt">object</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
@@ -284,7 +284,7 @@ Modules Used</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_maps.html">Maps</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_maps.html">Maps</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

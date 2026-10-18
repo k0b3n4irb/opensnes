@@ -131,13 +131,13 @@ Screenshot</div></div>
 <div class="line">               │                                    (tiles, palette, metasprite pointer table)</div>
 <div class="line">               └─ res/hero.json + hero.json.toml → opensnes-sprite anim  → hero_anim.h</div>
 <div class="line">                                                    (one AnimClip per Aseprite tag)</div>
-</div><!-- fragment --><p><span class="tt">sheet</span> owns the pixels and the metasprite geometry; <span class="tt">anim</span> owns the timeline (tags, per-frame durations, direction). They meet at the frame value: a clip's frame <em>i</em> selects <span class="tt">hero_metasprites[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span>, resolved inline by <span class="tt"><a class="el" href="anim_8h.html#ab970a01564cd5be48c73a8a6897e1f57" title="Tick + resolve against a gfx4snes metasprite pointer table.">animTickMeta()</a></span> and drawn with <span class="tt"><a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a></span>.</p>
+</div><!-- fragment --><p><span class="tt">sheet</span> owns the pixels and the metasprite geometry; <span class="tt">anim</span> owns the timeline (tags, per-frame durations, direction). They meet at the frame value: a clip's frame <em>i</em> selects <span class="tt">hero_metasprites[<a class="el" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>]</span>, resolved inline by <span class="tt"><a class="el" href="anim_8h.html#ab970a01564cd5be48c73a8a6897e1f57" title="Tick + resolve against a metasprite pointer table (the one opensnes-sprite sheet --metasprite writes)...">animTickMeta()</a></span> and drawn with <span class="tt"><a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a></span>.</p>
 <p>The artist authored two tags in Aseprite — <b>walk</b> (forward loop) and <b>wave</b> (ping-pong) — with per-frame millisecond durations. <span class="tt">opensnes-sprite anim</span> converted those to ticks and folded the ping-pong into the frame order. Press <b>A</b> to toggle between the two generated clips.</p>
 <h2 class="doxsection"><a class="anchor" id="snes-concepts-46"></a>
 SNES Concepts</h2>
 <ul>
 <li>Metasprite composition from multiple OAM entries (<span class="tt"><a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite</a></span>)</li>
-<li>The <span class="tt"><a class="el" href="anim_8h.html" title="Declarative animation player — data-driven frame sequencing.">anim.h</a></span> player driving a metasprite via <span class="tt"><a class="el" href="anim_8h.html#ab970a01564cd5be48c73a8a6897e1f57" title="Tick + resolve against a gfx4snes metasprite pointer table.">animTickMeta()</a></span></li>
+<li>The <span class="tt"><a class="el" href="anim_8h.html" title="Declarative animation player — data-driven frame sequencing.">anim.h</a></span> player driving a metasprite via <span class="tt"><a class="el" href="anim_8h.html#ab970a01564cd5be48c73a8a6897e1f57" title="Tick + resolve against a metasprite pointer table (the one opensnes-sprite sheet --metasprite writes)...">animTickMeta()</a></span></li>
 <li>Machine-generated metasprite table (<span class="tt">opensnes-sprite sheet --metasprite</span>) + animation clips (<span class="tt">opensnes-sprite anim</span>)</li>
 <li>OBJSEL size mode and OBJ VRAM base for 16×16 hardware sprites</li>
 <li>Sprite palette at CGRAM 128 (<span class="tt"><a class="el" href="sprite_8h.html#a6e29a6aabd5aef0cc3449f9104d4bc32" title="CGRAM base offset for sprite palettes (sprites use colors 128-255).">OBJ_CGRAM_BASE</a></span>)</li>
@@ -145,15 +145,15 @@ SNES Concepts</h2>
 <h2 class="doxsection"><a class="anchor" id="how-to-build-19"></a>
 How to Build</h2>
 <div class="fragment"><div class="line">cd examples/sprites/aseprite_pipeline &amp;&amp; make</div>
-</div><!-- fragment --><p>The build runs the full pipeline from the two settings files beside the assets (<span class="tt">res/hero.png.toml</span>, <span class="tt">res/hero.json.toml</span>): <span class="tt">opensnes-sprite sheet</span> and <span class="tt">opensnes-sprite anim</span>, then the generated <span class="tt">assets_gen.asm</span> links the tiles, then <span class="tt">main.c</span> compiles (it <span class="tt">#include</span>s both generated headers). No <span class="tt">data.asm</span>, no conversion rule in the Makefile (<span class="tt"><a class="el" href="CONVENTIONS_8md.html">docs/tools/CONVENTIONS.md</a></span>).</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-65"></a>
+</div><!-- fragment --><p>The build runs the full pipeline from the two settings files beside the assets (<span class="tt">res/hero.png.toml</span>, <span class="tt">res/hero.json.toml</span>): <span class="tt">opensnes-sprite sheet</span> and <span class="tt">opensnes-sprite anim</span>, then the generated <span class="tt">assets_gen.asm</span> links the tiles, then <span class="tt">main.c</span> compiles (it <span class="tt">#include</span>s both generated headers). No <span class="tt">data.asm</span>, no conversion rule in the Makefile (<span class="tt"><a class="el" href="tools_conventions.html">docs/tools/CONVENTIONS.md</a></span>).</p>
+<h2 class="doxsection"><a class="anchor" id="modules-used-63"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">text</span>, <span class="tt">text4bpp</span>, <span class="tt">background</span>, <span class="tt">input</span>, <span class="tt">anim</span></p>
-<h2 class="doxsection"><a class="anchor" id="see-also-26"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-28"></a>
 See Also</h2>
 <ul>
-<li><span class="tt">tools/opensnes-sprite</span> — sheets, metasprites and Aseprite clips (<span class="tt"><a class="el" href="opensnes-sprite_8md.html">docs/tools/opensnes-sprite.md</a></span>)</li>
-<li><span class="tt">examples/sprites/metasprite</span> — hand-authored metasprite composition</li>
+<li><span class="tt">tools/opensnes-sprite</span> — sheets, metasprites and Aseprite clips (<span class="tt"><a class="el" href="tools_opensnes_sprite.html">docs/tools/opensnes-sprite.md</a></span>)</li>
+<li><span class="tt">examples/sprites/sprite_sizes</span> — the OBJ size pairs a metasprite is built from</li>
 <li><span class="tt">examples/sprites/animated_sprite</span> — single-sprite frame animation </li>
 </ul>
 </div></div><!-- contents -->
@@ -170,7 +170,7 @@ See Also</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_sprites.html">Sprites</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_sprites.html">Sprites</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

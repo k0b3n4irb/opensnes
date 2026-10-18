@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/apu.h File Reference</title>
+<title>lib/include/snes/apu.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -142,7 +142,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Raw APU (SPC700) access — IPL upload and execution. </p>
-<p>The S-SMP boots into a 64-byte IPL ROM speaking a handshake protocol over the APU I/O ports ($2140-$2143). This module drives it from C: wait for boot, push a wla-spc700-assembled binary into APU RAM, and start it. It is the modern, ABI-verified alternative to the legacy snesmod path for projects that want direct DSP control.</p>
+<p>The S-SMP boots into a 64-byte IPL ROM speaking a handshake protocol over the APU I/O ports ($2140-$2143). This module drives it from C: wait for boot, push a wla-spc700-assembled binary into APU RAM, and start it. It is the alternative to SNESMOD (<a class="el" href="snesmod_8h.html" title="SNESMOD - Tracker-based Audio Engine.">snesmod.h</a>) for projects that want direct DSP control with a program of their own.</p>
 <p>Build side: list your APU program in the example Makefile's <span class="tt">SPCSRC</span> (e.g. <span class="tt">SPCSRC := player.spc700.asm</span>); common.mk assembles it with wla-spc700 against templates/memmap_spc700.inc into a flat <span class="tt">player.spc700.bin</span> you <span class="tt">.incbin</span> and upload.</p>
 <div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="audio_2pitch__mod_2main_8c.html#a826858a5f187837639cbac80446de290">spc_image</a>[], <a class="code hl_variable" href="audio_2pitch__mod_2main_8c.html#a68c6bd9a6b7a4a4c060f3394036226bd">spc_image_end</a>[];</div>
 <div class="line"> </div>

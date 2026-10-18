@@ -129,10 +129,14 @@ Functions</h2></td></tr>
 <tr class="memdesc:gab4c6d490fc3f1e7048c99b7fe357ec11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current state of a voice.  <br /></td></tr>
 <tr class="memitem:ga369cd526622e459d207ce9cf59a4b2cb" id="r_ga369cd526622e459d207ce9cf59a4b2cb"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ga369cd526622e459d207ce9cf59a4b2cb">audioGetVolume</a> (void)</td></tr>
 <tr class="memdesc:ga369cd526622e459d207ce9cf59a4b2cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current master volume.  <br /></td></tr>
+<tr class="memitem:gab6710735760f8a00d313f374bf53f9c7" id="r_gab6710735760f8a00d313f374bf53f9c7"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#gab6710735760f8a00d313f374bf53f9c7">audioSetVoicePan</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> voice, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pan)</td></tr>
+<tr class="memdesc:gab6710735760f8a00d313f374bf53f9c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the pan <a class="el" href="#gac00ddac1a52cd4b8f89bf44395071d6e" title="Set the volume and the pitch of a voice in one command.">audioSetVoiceVolumePitch()</a> splits a voice's volume with.  <br /></td></tr>
 <tr class="memitem:gade37a040ad0796f30cbbb2b310bee4c6" id="r_gade37a040ad0796f30cbbb2b310bee4c6"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gade37a040ad0796f30cbbb2b310bee4c6">audioSetVoicePitch</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> voice, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pitch)</td></tr>
 <tr class="memdesc:gade37a040ad0796f30cbbb2b310bee4c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pitch for a specific voice.  <br /></td></tr>
 <tr class="memitem:gabdcfc3d4cbc315dc7fda9e9f63ec87d4" id="r_gabdcfc3d4cbc315dc7fda9e9f63ec87d4"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gabdcfc3d4cbc315dc7fda9e9f63ec87d4">audioSetVoiceVolume</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> voice, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> volumeL, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> volumeR)</td></tr>
 <tr class="memdesc:gabdcfc3d4cbc315dc7fda9e9f63ec87d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set volume for a specific voice.  <br /></td></tr>
+<tr class="memitem:gac00ddac1a52cd4b8f89bf44395071d6e" id="r_gac00ddac1a52cd4b8f89bf44395071d6e"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gac00ddac1a52cd4b8f89bf44395071d6e">audioSetVoiceVolumePitch</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> voice, <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> volume, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pitch)</td></tr>
+<tr class="memdesc:gac00ddac1a52cd4b8f89bf44395071d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the volume and the pitch of a voice in one command.  <br /></td></tr>
 <tr class="memitem:gae5aa27f79f19beb398a3163a76a87d05" id="r_gae5aa27f79f19beb398a3163a76a87d05"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#gae5aa27f79f19beb398a3163a76a87d05">audioSetVolume</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> volume)</td></tr>
 <tr class="memdesc:gae5aa27f79f19beb398a3163a76a87d05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set master volume.  <br /></td></tr>
 </table>
@@ -185,6 +189,37 @@ Functions</h2></td></tr>
 
 <p>Get current master volume. </p>
 <dl class="section return"><dt>Returns</dt><dd>Current volume (0-127) </dd></dl>
+
+</div>
+</div>
+<a id="gab6710735760f8a00d313f374bf53f9c7" name="gab6710735760f8a00d313f374bf53f9c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab6710735760f8a00d313f374bf53f9c7">&#9670;&#160;</a></span>audioSetVoicePan()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void audioSetVoicePan </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>voice</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>pan</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the pan <a class="el" href="#gac00ddac1a52cd4b8f89bf44395071d6e" title="Set the volume and the pitch of a voice in one command.">audioSetVoiceVolumePitch()</a> splits a voice's volume with. </p>
+<p>Changes nothing that is sounding: it takes effect at the voice's next <a class="el" href="#gac00ddac1a52cd4b8f89bf44395071d6e" title="Set the volume and the pitch of a voice in one command.">audioSetVoiceVolumePitch()</a>. A voice started with <a class="el" href="group__audio__playback.html#gabd9ad2a4f0279d90e4a8e9d33acc5020" title="Play a sample on a voice YOU choose.">audioPlaySampleOn()</a> already has the pan of that call; this is for a voice whose side is decided once (a tracker channel) or changes without a new note.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">voice</td><td>Voice number (0-7) </td></tr>
+    <tr><td class="paramname">pan</td><td>AUDIO_PAN_LEFT (0) to AUDIO_PAN_RIGHT (15), AUDIO_PAN_CENTER (8) </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -251,6 +286,45 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="gac00ddac1a52cd4b8f89bf44395071d6e" name="gac00ddac1a52cd4b8f89bf44395071d6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac00ddac1a52cd4b8f89bf44395071d6e">&#9670;&#160;</a></span>audioSetVoiceVolumePitch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> audioSetVoiceVolumePitch </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>voice</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></td>          <td class="paramname"><span class="paramname"><em>volume</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>pitch</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the volume and the pitch of a voice in one command. </p>
+<p>What a tracker or a sequencer does to a voice at every tick: the tremolo moves its volume and the vibrato its pitch. <a class="el" href="#gabdcfc3d4cbc315dc7fda9e9f63ec87d4" title="Set volume for a specific voice.">audioSetVoiceVolume()</a> then <a class="el" href="#gade37a040ad0796f30cbbb2b310bee4c6" title="Set pitch for a specific voice.">audioSetVoicePitch()</a> cost two handshakes with the driver; this is one, and the call itself is assembly (four voices updated every frame: about 10 600 master cycles a voice with the two calls, 5 500 with this one, measured on luna).</p>
+<p>The volume is split between the two channels by the voice's pan: the one the last <a class="el" href="group__audio__playback.html#gabd9ad2a4f0279d90e4a8e9d33acc5020" title="Play a sample on a voice YOU choose.">audioPlaySampleOn()</a> / <a class="el" href="group__audio__playback.html#gaabc5f4c3e8d426c4f321cad86a5838d1" title="Play a sample with custom settings.">audioPlaySampleEx()</a> gave it, or the one <a class="el" href="#gab6710735760f8a00d313f374bf53f9c7" title="Set the pan audioSetVoiceVolumePitch() splits a voice&#39;s volume with.">audioSetVoicePan()</a> set since — the same split as those calls make, so a voice that plays hard left stays hard left. The driver learns a voice's pan once, and again only when it changes.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">voice</td><td>Voice number (0-7) </td></tr>
+    <tr><td class="paramname">volume</td><td>Volume (0-127), before the pan </td></tr>
+    <tr><td class="paramname">pitch</td><td>Pitch value ($1000 = normal, 14-bit) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>AUDIO_OK, AUDIO_ERR_INVALID_ID, or AUDIO_ERR_TIMEOUT when the previous command was never acknowledged </dd></dl>
 
 </div>
 </div>

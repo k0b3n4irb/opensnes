@@ -4,12 +4,12 @@ var examples_mode7 =
       [ "The ladder", "examples_mode7.html#the-ladder-7", null ],
       [ "The idea in one screen", "examples_mode7.html#the-idea-in-one-screen-6", [
         [ "How it works", "examples_mode7_dsp1_ground.html#how-it-works-10", null ],
-        [ "Controls", "examples_mode7_dsp1_ground.html#controls-24", null ],
+        [ "Controls", "examples_mode7_dsp1_ground.html#controls-23", null ],
         [ "SNES Concepts", "examples_mode7_dsp1_ground.html#snes-concepts-38", null ],
         [ "How to Build", "examples_mode7_dsp1_ground.html#how-to-build-17", null ],
-        [ "Modules Used", "examples_mode7_dsp1_ground.html#modules-used-56", null ],
-        [ "Project Structure", "examples_mode7_dsp1_ground.html#project-structure-11", null ],
-        [ "Going Further", "examples_mode7_dsp1_ground.html#going-further-4", null ]
+        [ "Modules Used", "examples_mode7_dsp1_ground.html#modules-used-54", null ],
+        [ "Project Structure", "examples_mode7_dsp1_ground.html#project-structure-10", null ],
+        [ "Going Further", "examples_mode7_dsp1_ground.html#going-further-5", null ]
       ] ]
     ] ],
     [ "Mode 7 EXTBG", "examples_mode7_extbg.html", null ],

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/audio/snesmod_music/main.c File Reference</title>
+<title>examples/audio/snesmod_music/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -142,7 +142,7 @@ Functions</h2></td></tr>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>SPC700 audio: separate coprocessor with 64 KB audio RAM</li>
 <li>SNESMOD workflow: init → setSoundbank → loadModule → play</li>
-<li>Per-frame <a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a> to stream pattern data to SPC700</li>
+<li>Per-frame <a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a>: sends the queued commands (play, stop, volume, sound effects) to the SPC700, which plays the patterns itself</li>
 <li>Module volume and fade control</li>
 </ul>
 </dd></dl>

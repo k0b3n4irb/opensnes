@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/scene.h File Reference</title>
+<title>lib/include/snes/scene.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -152,7 +152,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Opt-in scene/state stack — push/pop game scenes without rolling your own state machine. </p>
-<p>Third "framework opt-in" from <span class="tt"><a class="el" href="PHILOSOPHY_8md.html">PHILOSOPHY.md</a></span> (alongside <span class="tt">gameloop</span> D.1 and the asset bundle convention D.2). This module gives you a tiny stack of <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span> callbacks: the topmost scene's <span class="tt">update</span> runs every VBlank; pushing a new scene suspends the current one and runs the new scene's <span class="tt">init</span> + <span class="tt">update</span>; popping restores the suspended scene without re-running its init.</p>
+<p>Third "framework opt-in" from <span class="tt"><a class="el" href="philosophy.html">PHILOSOPHY.md</a></span> (alongside <span class="tt">gameloop</span> D.1 and the asset bundle convention D.2). This module gives you a tiny stack of <span class="tt"><a class="el" href="structScene.html" title="A single scene&#39;s callbacks.">Scene</a></span> callbacks: the topmost scene's <span class="tt">update</span> runs every VBlank; pushing a new scene suspends the current one and runs the new scene's <span class="tt">init</span> + <span class="tt">update</span>; popping restores the suspended scene without re-running its init.</p>
 <dl class="section user"><dt>Before</dt><dd><div class="fragment"><div class="line"><span class="keyword">enum</span> State { TITLE, PLAY, PAUSE };</div>
 <div class="line"><span class="keyword">enum</span> State current = TITLE;</div>
 <div class="line"><span class="keyword">enum</span> State suspend_stack[4]; <span class="keywordtype">int</span> suspend_top = 0;</div>

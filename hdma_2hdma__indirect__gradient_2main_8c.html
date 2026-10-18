@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/hdma/hdma_indirect_gradient/main.c File Reference</title>
+<title>examples/hdma/hdma_indirect_gradient/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -155,7 +155,7 @@ Variables</h2></td></tr>
 <li>INDIRECT HDMA (DMAP bit 6): table entries are [count][ptr16]; the pointed-to data lives in the bank programmed in $43x7 — which plain hdmaSetup never writes; <a class="el" href="hdma_8h.html#a35d67e382ab2f45cb99ec5943d38d318" title="Configure an INDIRECT HDMA channel (table of pointers to data).">hdmaSetupIndirect()</a> handles both</li>
 <li>Non-repeat count semantics: count=7 fetches the payload ONCE and holds it for 7 scanlines (a repeat count $87 would fetch a fresh payload every line — that is the HiColor pattern)</li>
 <li>HDMA_MODE_2REG_2X to CGADD: bytes stream as $2121,$2121,$2122,$2122 so each 4-byte block is [CGADD][CGADD][color_lo][color_hi] — rewriting CGRAM color 0 (the backdrop) per band</li>
-<li>Extracting a C pointer's bank for $43x7: (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)((<a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a>)(void *)data &gt;&gt; 16) (post-A6 far pointers)</li>
+<li>Extracting a C pointer's bank for $43x7: (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)((<a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a>)(void *)data &gt;&gt; 16) (a pointer carries its bank)</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>

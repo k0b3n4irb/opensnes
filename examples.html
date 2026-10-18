@@ -122,193 +122,51 @@ $(function(){initNavTree('examples.html','',''); });
   <div class="headertitle"><div class="title">OpenSNES Examples </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Learn SNES development step by step. 88 examples organized by topic, building from basic concepts to complete games.</p>
+<div class="textblock"><p>The example corpus: 88 small ROMs, each a folder with its <span class="tt">main.c</span>, its assets, a <span class="tt">Makefile</span> and a <span class="tt">README.md</span> that says what it shows. They go from a first line of text to complete games.</p>
+<ul>
+<li><b>In what order?</b> <a href="learning_path.html">Learning Path</a> is the route through them, stage by stage.</li>
+<li><b>Every example, by topic:</b> <a href="examples_by_category.html">Examples by Category</a> is the full catalogue, one line each.</li>
+</ul>
+<p>The table below counts them per folder.</p>
 <h2 class="doxsection"><a class="anchor" id="categories"></a>
 Categories</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Category  </th><th class="markdownTableHeadNone">Examples  </th><th class="markdownTableHeadNone">What It Covers  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="text/">text/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Text display, fonts, tilemaps  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_text.html">text/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Text display, fonts, tilemaps  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="fundamentals/">fundamentals/</a>  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">Under-the-hood: raw tiles, direct VRAM writes  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_fundamentals.html">fundamentals/</a>  </td><td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">Under-the-hood: raw tiles, direct VRAM writes  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="basics/">basics/</a>  </td><td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone">Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_basics.html">basics/</a>  </td><td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone">Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="backgrounds/">backgrounds/</a>  </td><td class="markdownTableBodyNone">9  </td><td class="markdownTableBodyNone">BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_backgrounds.html">backgrounds/</a>  </td><td class="markdownTableBodyNone">9  </td><td class="markdownTableBodyNone">BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="sprites/">sprites/</a>  </td><td class="markdownTableBodyNone">9  </td><td class="markdownTableBodyNone">Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites.html">sprites/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="hdma/">hdma/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Per-scanline HDMA effects: gradients, waves, raster  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_hdma.html">hdma/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Per-scanline HDMA effects: gradients, waves, raster  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="color/">color/</a>  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_color.html">color/</a>  </td><td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone">Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="windows/">windows/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Hardware window masking, shaped per scanline  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_windows.html">windows/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Hardware window masking, shaped per scanline  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="transitions/">transitions/</a>  </td><td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">Screen transitions: fade, mosaic pixelate  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_transitions.html">transitions/</a>  </td><td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">Screen transitions: fade, mosaic pixelate  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="scrolling/">scrolling/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Layer scrolling: parallax, streaming, per-scanline HDMA  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_scrolling.html">scrolling/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Layer scrolling: parallax, streaming, per-scanline HDMA  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="mode7/">mode7/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_mode7.html">mode7/</a>  </td><td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone">Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="input/">input/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Joypads, mouse, Super Scope, multi-player  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_input.html">input/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Joypads, mouse, Super Scope, multi-player  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="audio/">audio/</a>  </td><td class="markdownTableBodyNone">10  </td><td class="markdownTableBodyNone">Music and sound effects: SNESMOD and raw APU/DSP  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_audio.html">audio/</a>  </td><td class="markdownTableBodyNone">9  </td><td class="markdownTableBodyNone">Music and sound effects: SNESMOD and raw APU/DSP  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="maps/">maps/</a>  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">Tile maps, dynamic streaming, slopes  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_maps.html">maps/</a>  </td><td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Tile maps, dynamic streaming, slopes  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="memory/">memory/</a>  </td><td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">HiROM mode, battery-backed saves  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_memory.html">memory/</a>  </td><td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">HiROM mode, battery-backed saves  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="chips/">chips/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Enhancement chips: SA-1 and SuperFX/GSU coprocessors  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_chips.html">chips/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Enhancement chips: SA-1, SuperFX/GSU and DSP-1 coprocessors  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="games/">games/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG)  </td></tr>
-</table>
-<h2 class="doxsection"><a class="anchor" id="learning-path"></a>
-Learning Path</h2>
-<p>A curated progression — it doesn't list every example. Use the category table above for the full set; anything not listed here is a variant or deep-dive of a step below.</p>
-<h3 class="doxsection"><a class="anchor" id="level-1----first-steps"></a>
-Level 1 &ndash; First Steps</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">#  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What You Will Learn  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone"><a href="text/print_string/">text/print_string</a>  </td><td class="markdownTableBodyNone">Your first ROM: text on a background, the VBlank rhythm  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone"><a href="text/scroll_message/">text/scroll_message</a>  </td><td class="markdownTableBodyNone">Move text &ndash; bgSetScroll on the text layer  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone"><a href="text/pixel_text/">text/pixel_text</a>  </td><td class="markdownTableBodyNone">Proportional text composed at the pixel: <span class="tt"><a class="el" href="tile_8h.html#aa9eef28679b52dd479bff3449a952524" title="OR rows of a 2bpp glyph into a tile at a pixel offset.">tileBlitGlyph2bpp()</a></span> into a 2bpp layer  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone"><a href="sprites/simple_sprite/">sprites/simple_sprite</a>  </td><td class="markdownTableBodyNone">OAM, sprite display, CGRAM split  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">5  </td><td class="markdownTableBodyNone"><a href="input/two_players/">input/two_players</a>  </td><td class="markdownTableBodyNone">Joypad reading, multiplayer input  </td></tr>
-</table>
-<h3 class="doxsection"><a class="anchor" id="level-2----graphics-fundamentals"></a>
-Level 2 &ndash; Graphics Fundamentals</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">#  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What You Will Learn  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">6  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode1/">backgrounds/mode1</a>  </td><td class="markdownTableBodyNone">Mode 1 multi-layer backgrounds  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode1_bg3_priority/">backgrounds/mode1_bg3_priority</a>  </td><td class="markdownTableBodyNone">BG3 priority bit in Mode 1  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode1_lz77/">backgrounds/mode1_lz77</a>  </td><td class="markdownTableBodyNone">LZ77-compressed background data  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">9  </td><td class="markdownTableBodyNone"><a href="sprites/animated_sprite/">sprites/animated_sprite</a>  </td><td class="markdownTableBodyNone">Frame animation, sprite sheets, H-flip  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">10  </td><td class="markdownTableBodyNone"><a href="sprites/dynamic_sprite/">sprites/dynamic_sprite</a>  </td><td class="markdownTableBodyNone">VRAM streaming, dynamic tile uploads  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">11  </td><td class="markdownTableBodyNone"><a href="sprites/sprite_sizes/">sprites/sprite_sizes</a>  </td><td class="markdownTableBodyNone">OBJSEL sprite size configurations  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">12  </td><td class="markdownTableBodyNone"><a href="transitions/fading/">transitions/fading</a>  </td><td class="markdownTableBodyNone">Brightness control, screen transitions  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">13  </td><td class="markdownTableBodyNone"><a href="transitions/mosaic/">transitions/mosaic</a>  </td><td class="markdownTableBodyNone">Mosaic pixelation effect  </td></tr>
-</table>
-<h3 class="doxsection"><a class="anchor" id="level-3----scrolling-and-effects"></a>
-Level 3 &ndash; Scrolling and Effects</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">#  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What You Will Learn  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">14  </td><td class="markdownTableBodyNone"><a href="scrolling/continuous_scroll/">scrolling/continuous_scroll</a>  </td><td class="markdownTableBodyNone">Streaming background scroll with dynamic tile loading  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">15  </td><td class="markdownTableBodyNone"><a href="scrolling/mixed_scroll/">scrolling/mixed_scroll</a>  </td><td class="markdownTableBodyNone">Multiple BG layers scrolling at different rates  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone"><a href="hdma/hdma_wave/">hdma/hdma_wave</a>  </td><td class="markdownTableBodyNone">HDMA wave: build the table by hand (krom port), then use the hdma module  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">17  </td><td class="markdownTableBodyNone"><a href="hdma/hdma_indirect_gradient/">hdma/hdma_indirect_gradient</a>  </td><td class="markdownTableBodyNone">Indirect HDMA: pointer table drives a backdrop gradient (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">18  </td><td class="markdownTableBodyNone"><a href="color/hicolor_1792/">color/hicolor_1792</a>  </td><td class="markdownTableBodyNone">H-IRQ CGRAM streaming: 1792 colors from a 4bpp BG (krom port)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone"><a href="mode7/perspective_rotate/">mode7/perspective_rotate</a>  </td><td class="markdownTableBodyNone">Full Mode 7 matrix per scanline: rotating perspective (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">20  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode5_hires/">backgrounds/mode5_hires</a>  </td><td class="markdownTableBodyNone">BG Mode 5 + interlace: 512x448 hi-res text (krom port)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">21  </td><td class="markdownTableBodyNone"><a href="windows/window_multi_hdma/">windows/window_multi_hdma</a>  </td><td class="markdownTableBodyNone">Both windows shaped per scanline: HDMA porthole grid (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">22  </td><td class="markdownTableBodyNone"><a href="color/direct_color/">color/direct_color</a>  </td><td class="markdownTableBodyNone">Direct color: 8bpp pixel bytes read as BBGGGRRR, CGRAM bypassed  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">23  </td><td class="markdownTableBodyNone"><a href="color/pseudo_hires/">color/pseudo_hires</a>  </td><td class="markdownTableBodyNone">Pseudo-hires: a 50 % blend of two layers without colour math (SETINI bit 3)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">24  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode4/">backgrounds/mode4</a>  </td><td class="markdownTableBodyNone">Mode 4: offset-per-tile on a 256-colour layer, one row of H-or-V words  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">25  </td><td class="markdownTableBodyNone"><a href="backgrounds/mode6/">backgrounds/mode6</a>  </td><td class="markdownTableBodyNone">Mode 6: offset-per-tile on a hi-res layer, 16-half-pixel columns  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">26  </td><td class="markdownTableBodyNone"><a href="hdma/gradient_colors/">hdma/gradient_colors</a>  </td><td class="markdownTableBodyNone">HDMA + CGRAM color gradients  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">27  </td><td class="markdownTableBodyNone"><a href="scrolling/parallax_scroll/">scrolling/parallax_scroll</a>  </td><td class="markdownTableBodyNone">HDMA parallax scrolling  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">28  </td><td class="markdownTableBodyNone"><a href="color/transparency/">color/transparency</a>  </td><td class="markdownTableBodyNone">Color math (add/subtract blending)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">29  </td><td class="markdownTableBodyNone"><a href="windows/window/">windows/window</a>  </td><td class="markdownTableBodyNone">Hardware window masking  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">30  </td><td class="markdownTableBodyNone"><a href="windows/transparent_window/">windows/transparent_window</a>  </td><td class="markdownTableBodyNone">Color math + HDMA windowed transparency  </td></tr>
-</table>
-<h3 class="doxsection"><a class="anchor" id="level-4----advanced-topics"></a>
-Level 4 &ndash; Advanced Topics</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">#  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What You Will Learn  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">31  </td><td class="markdownTableBodyNone"><a href="mode7/rotate_scale/">mode7/rotate_scale</a>  </td><td class="markdownTableBodyNone">Mode 7 rotation and scaling  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">32  </td><td class="markdownTableBodyNone"><a href="mode7/perspective/">mode7/perspective</a>  </td><td class="markdownTableBodyNone">Pseudo-3D perspective (F-Zero style)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">33  </td><td class="markdownTableBodyNone"><a href="mode7/dsp1_ground/">mode7/dsp1_ground</a>  </td><td class="markdownTableBodyNone">Super Mario Kart floor: DSP-1 Raster streams the per-scanline Mode 7 matrices  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">34  </td><td class="markdownTableBodyNone"><a href="mode7/extbg/">mode7/extbg</a>  </td><td class="markdownTableBodyNone">Mode 7 EXTBG: one plane, two layers split by bit 7, a sprite between them  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">35  </td><td class="markdownTableBodyNone"><a href="sprites/metasprite/">sprites/metasprite</a>  </td><td class="markdownTableBodyNone">Multi-tile composite sprites  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">36  </td><td class="markdownTableBodyNone"><a href="sprites/aseprite_pipeline/">sprites/aseprite_pipeline</a>  </td><td class="markdownTableBodyNone">Full asset pipeline: Aseprite → gfx4snes -P + aseprite2snes → animated metasprite  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">37  </td><td class="markdownTableBodyNone"><a href="sprites/world_sprites/">sprites/world_sprites</a>  </td><td class="markdownTableBodyNone">World-space sprites: a camera, culling and OAM in one call per batch (<span class="tt"><a class="el" href="sprite_8h.html#abd8864858828dc6c2646b15d59420b5a" title="Place a batch of world-space sprites: camera, culling, OAM, in one call.">oamPlaceWorld</a></span>)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">38  </td><td class="markdownTableBodyNone"><a href="input/mouse/">input/mouse</a>  </td><td class="markdownTableBodyNone">Mouse detection, cursor, sensitivity  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">39  </td><td class="markdownTableBodyNone"><a href="input/superscope/">input/superscope</a>  </td><td class="markdownTableBodyNone">Light gun detection, PPU H/V counters  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">40  </td><td class="markdownTableBodyNone"><a href="memory/hirom_demo/">memory/hirom_demo</a>  </td><td class="markdownTableBodyNone">HiROM vs LoROM memory mapping  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">41  </td><td class="markdownTableBodyNone"><a href="memory/save_game/">memory/save_game</a>  </td><td class="markdownTableBodyNone">SRAM persistence (battery saves)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">42  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_music/">audio/snesmod_music</a>  </td><td class="markdownTableBodyNone">SPC700 music playback via SNESMOD  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">43  </td><td class="markdownTableBodyNone"><a href="audio/snesmod_sfx/">audio/snesmod_sfx</a>  </td><td class="markdownTableBodyNone">Sound effects via SNESMOD  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">44  </td><td class="markdownTableBodyNone"><a href="audio/speech_synth/">audio/speech_synth</a>  </td><td class="markdownTableBodyNone">Phoneme-bank speech synthesis: the SNES says "OPEN SNES" (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">45  </td><td class="markdownTableBodyNone"><a href="audio/play_noise/">audio/play_noise</a>  </td><td class="markdownTableBodyNone">Drum kit from the DSP noise generator — zero samples (krom port)  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">46  </td><td class="markdownTableBodyNone"><a href="audio/pitch_mod/">audio/pitch_mod</a>  </td><td class="markdownTableBodyNone">Hardware vibrato: PMON pitch modulation + LFO voice (krom port)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">47  </td><td class="markdownTableBodyNone"><a href="audio/apu_switch/">audio/apu_switch</a>  </td><td class="markdownTableBodyNone">Hot-swap APU programs at runtime: <a class="el" href="apu_8h.html#ab391987f295100930d62f078c5a6ffce" title="Hot-swap: return a cooperating APU program to the IPL ROM.">apuReset()</a> + IPL re-entry  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">48  </td><td class="markdownTableBodyNone"><a href="audio/soundboard/">audio/soundboard</a>  </td><td class="markdownTableBodyNone">The audio v2 engine from pure C: dynamic samples, pan/pitch, echo  </td></tr>
-</table>
-<h3 class="doxsection"><a class="anchor" id="level-5----maps-and-complete-projects"></a>
-Level 5 &ndash; Maps and Complete Projects</h3>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">#  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">What You Will Learn  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">49  </td><td class="markdownTableBodyNone"><a href="maps/dynamic_map/">maps/dynamic_map</a>  </td><td class="markdownTableBodyNone">Dynamic tile map streaming  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">50  </td><td class="markdownTableBodyNone"><a href="maps/slope_collision/">maps/slope_collision</a>  </td><td class="markdownTableBodyNone">Slopes and tile-based collision  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">51  </td><td class="markdownTableBodyNone"><a href="basics/collision_demo/">basics/collision_demo</a>  </td><td class="markdownTableBodyNone">Bounding-box sprite collision  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">52  </td><td class="markdownTableBodyNone"><a href="games/breakout/">games/breakout</a>  </td><td class="markdownTableBodyNone">Complete game: sprites, input, game logic  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">53  </td><td class="markdownTableBodyNone"><a href="games/likemario/">games/likemario</a>  </td><td class="markdownTableBodyNone">Platformer with scrolling and animation  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">54  </td><td class="markdownTableBodyNone"><a href="games/mapandobjects/">games/mapandobjects</a>  </td><td class="markdownTableBodyNone">Maps with interactive objects  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">55  </td><td class="markdownTableBodyNone"><a href="games/mode7_racing/">games/mode7_racing</a>  </td><td class="markdownTableBodyNone">F-Zero-style racing: the Mode 7 camera, fixed-point physics, banked data  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">56  </td><td class="markdownTableBodyNone"><a href="games/mode7_flying/">games/mode7_flying</a>  </td><td class="markdownTableBodyNone">Pilotwings-style flying: altitude-as-scale, shadow depth cue, landings  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">57  </td><td class="markdownTableBodyNone"><a href="games/rpg/">games/rpg</a>  </td><td class="markdownTableBodyNone">RPG template: a Tiled (.tmj) map drives terrain, collision and entities; 9-slice dialog box  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_games.html">games/</a>  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG)  </td></tr>
 </table>
 <h2 class="doxsection"><a class="anchor" id="building"></a>
 Building</h2>
@@ -323,19 +181,16 @@ Building</h2>
 <div class="line">make clean &amp;&amp; make</div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="running"></a>
 Running</h2>
-<p>We recommend <a href="https://github.com/SourMesen/Mesen2">Mesen2</a> for accurate SNES emulation:</p>
-<div class="fragment"><div class="line">mesen examples/text/print_string/print_string.sfc</div>
-</div><!-- fragment --><p>Use Mesen's built-in debugger to inspect VRAM, OAM, palettes, and registers in real time.</p>
+<p>luna, the SDK's emulator (<span class="tt">scripts/install-luna.sh</span> installs it), plays any example in a window:</p>
+<div class="fragment"><div class="line">testing/bin/luna-gui examples/text/print_string/print_string.sfc</div>
+</div><!-- fragment --><p>The headless <span class="tt">luna</span> dumps VRAM, OAM, palettes and registers (<span class="tt">luna assets-dump</span>, <span class="tt">luna state</span>) and is a full debugger over MCP: see <a href="tutorial_debugging.html">Debugging</a>. Any other SNES emulator works too.</p>
 <h2 class="doxsection"><a class="anchor" id="tips-2"></a>
 Tips</h2>
 <ol type="1">
-<li><b>Follow the order</b> &ndash; each example builds on concepts from earlier ones</li>
 <li><b>Read the source</b> &ndash; every <span class="tt">main.c</span> is commented to explain the "why"</li>
 <li><b>Experiment</b> &ndash; change values, break things, see what happens</li>
-<li><b>Use the debugger</b> &ndash; Mesen2's PPU viewer is invaluable for understanding VRAM</li>
+<li><b>Look at the machine</b> &ndash; <span class="tt">luna assets-dump</span> shows what the code put in VRAM, OAM and the palettes</li>
 </ol>
-<hr  />
-<p><b>Ready?</b> Start with <a href="text/print_string/">text/print_string</a> and build your first SNES ROM.</p>
 <p><a class="el" href="examples_audio.html" title="Audio">Audio</a> <a class="el" href="examples_backgrounds.html" title="Backgrounds">Backgrounds</a> <a class="el" href="examples_basics.html" title="Basics Examples">Basics Examples</a> <a class="el" href="examples_chips.html" title="Enhancement chips">Enhancement chips</a> <a class="el" href="examples_color.html" title="Colour">Colour</a> <a class="el" href="examples_fundamentals.html" title="Fundamentals">Fundamentals</a> <a class="el" href="examples_games.html" title="Complete Game Examples">Complete Game Examples</a> <a class="el" href="examples_hdma.html" title="HDMA &amp; raster">HDMA &amp; raster</a> <a class="el" href="examples_input.html" title="Input &amp; peripherals">Input &amp; peripherals</a> <a class="el" href="examples_maps.html" title="Maps">Maps</a> <a class="el" href="examples_memory.html" title="Memory Examples">Memory Examples</a> <a class="el" href="examples_mode7.html" title="Mode 7">Mode 7</a> <a class="el" href="examples_scrolling.html" title="Scrolling">Scrolling</a> <a class="el" href="examples_sprites.html" title="Sprites">Sprites</a> <a class="el" href="examples_text.html" title="Text Examples">Text Examples</a> <a class="el" href="examples_transitions.html" title="Transitions">Transitions</a> <a class="el" href="examples_windows.html" title="Windows">Windows</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
@@ -351,7 +206,7 @@ Tips</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

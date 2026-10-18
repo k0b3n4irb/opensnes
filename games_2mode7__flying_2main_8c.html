@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/games/mode7_flying/main.c File Reference</title>
+<title>examples/games/mode7_flying/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -151,8 +151,6 @@ Functions</h2></td></tr>
 <tr class="memitem:aee708296b7db01c9b774c81961785cf3" id="r_aee708296b7db01c9b774c81961785cf3"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aee708296b7db01c9b774c81961785cf3">encode_16x16</a> (<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pix[16][16])</td></tr>
 <tr class="memdesc:aee708296b7db01c9b774c81961785cf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode a 16x16 palette-index grid into 4bpp OBJ quadrants.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memitem:adffdf154bc65129d27dcc65a861988e1" id="r_adffdf154bc65129d27dcc65a861988e1"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#adffdf154bc65129d27dcc65a861988e1">terrain_class_at</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx)</td></tr>
-<tr class="memdesc:adffdf154bc65129d27dcc65a861988e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Banked-data accessor (data.asm) for the class map.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -167,6 +165,8 @@ Variables</h2></td></tr>
 <tr class="memitem:a38aefd46976ba858c7007b4fa548c536" id="r_a38aefd46976ba858c7007b4fa548c536"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a38aefd46976ba858c7007b4fa548c536">shape_tiles</a> [128]</td></tr>
 <tr class="memdesc:a38aefd46976ba858c7007b4fa548c536"><td class="mdescLeft">&#160;</td><td class="mdescRight">4 8x8 4bpp tiles = one 16x16 shape (built at init)  <br /></td></tr>
 <tr class="memitem:af4da8279099100e3ffc14d0676a942e3" id="r_af4da8279099100e3ffc14d0676a942e3"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#af4da8279099100e3ffc14d0676a942e3">surface</a></td></tr>
+<tr class="memitem:a41e533de498c12591353cdc3f967b7a8" id="r_a41e533de498c12591353cdc3f967b7a8"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a41e533de498c12591353cdc3f967b7a8">terrain_class</a> []</td></tr>
+<tr class="memdesc:a41e533de498c12591353cdc3f967b7a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Surface class of each terrain tile, 128x128 (data.asm, res/terrain_class.bin): 0 field, 1 water, 2 landing pad.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Mode 7 flying — a Pilotwings-style demo (#4, part 2). </p>
@@ -180,7 +180,7 @@ Variables</h2></td></tr>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Altitude as Mode 7 scale: mode7SetScale(0x0080 + alt / 2) then SetAngle (the scale feeds the matrix at SetAngle time)</li>
 <li>The shadow depth cue: same sprite shape, dark palette, screen offset proportional to altitude</li>
-<li>Surface classes read through a banked-data ASM accessor (B2 — same pattern as mode7_racing)</li>
+<li>A 16 KB surface class map read from C as a const array (it sits in an asset bank; C reads it with its bank)</li>
 <li>Fixed-point flight model: heading/speed/altitude in 8.8, the math module's shared 0-255 angle unit</li>
 </ul>
 </dd></dl>
@@ -376,33 +376,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="adffdf154bc65129d27dcc65a861988e1" name="adffdf154bc65129d27dcc65a861988e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adffdf154bc65129d27dcc65a861988e1">&#9670;&#160;</a></span>terrain_class_at()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_class_at </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>idx</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Banked-data accessor (data.asm) for the class map. </p>
-
-</div>
-</div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
 <a id="a3669420760f75c33d787a4fc776e2877" name="a3669420760f75c33d787a4fc776e2877"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3669420760f75c33d787a4fc776e2877">&#9670;&#160;</a></span>airborne</h2>
@@ -539,6 +512,30 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a41e533de498c12591353cdc3f967b7a8" name="a41e533de498c12591353cdc3f967b7a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41e533de498c12591353cdc3f967b7a8">&#9670;&#160;</a></span>terrain_class</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> terrain_class[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Surface class of each terrain tile, 128x128 (data.asm, res/terrain_class.bin): 0 field, 1 water, 2 landing pad. </p>
 
 </div>
 </div>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/sa1.h File Reference</title>
+<title>lib/include/snes/sa1.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -200,7 +200,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>SA-1 Enhancement Chip Interface. </p>
-<p>The SA-1 is a 65c816 coprocessor clocked at 10.74 MHz, integrated into SA-1 cartridges. Its effective speed depends on where both CPUs run from: ~10.7 MHz when the SA-1 runs from I-RAM, about 5.0 MHz when both CPUs run from ROM, ~2.7 MHz when both hit BW-RAM (the SA-1 Speed Test of the higan test ROMs, as photographed on one real console; its README table says 5.4 for ROM / ROM, the photographs 5.04). It shares the main CPU's instruction set, but the SDK runs assembly on it, not C: the SA-1 cannot see work RAM, where the C runtime keeps its globals and its register file (see <a class="el" href="sa1_8md.html">docs/tutorials/sa1.md</a>).</p>
+<p>The SA-1 is a 65c816 coprocessor clocked at 10.74 MHz, integrated into SA-1 cartridges. Its effective speed depends on where both CPUs run from: ~10.7 MHz when the SA-1 runs from I-RAM, about 5.0 MHz when both CPUs run from ROM, ~2.7 MHz when both hit BW-RAM (the SA-1 Speed Test of the higan test ROMs, as photographed on one real console; its README table says 5.4 for ROM / ROM, the photographs 5.04). It shares the main CPU's instruction set, but the SDK runs assembly on it, not C: the SA-1 cannot see work RAM, where the C runtime keeps its globals and its register file (see <a class="el" href="tutorial_sa1.html">docs/tutorials/sa1.md</a>).</p>
 <p>Memory accessible by SA-1:</p><ul>
 <li>ROM ($00-$3F:$8000-$FFFF via Super MMC)</li>
 <li>I-RAM ($3000-$37FF, 2KB, shared with main CPU)</li>
@@ -1078,7 +1078,7 @@ Functions</h2></td></tr>
 
 <p>Did the SA-1 boot? (crt0 starts it; this only reads the outcome). </p>
 <p>crt0 writes the SA-1 reset vector, enables I-RAM/BW-RAM access, releases the chip from reset and waits for its ready byte in I-RAM — all before <a class="el" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main()</a>. This function reads that outcome. Until 2026-09-22 it bore a name ending in Init (removed on 2026-10-05), whose doc claimed it did the boot itself; docs cited <a class="el" href="#aa2c5d1881453f27ceaa36ab5ebf122fc" title="Did the SA-1 boot? (crt0 starts it; this only reads the outcome).">sa1IsReady()</a> for years before it existed.</p>
-<dl class="section return"><dt>Returns</dt><dd>1 if the SA-1 wrote SA1_READY_MAGIC ($A5) to I-RAM, 0 if crt0 timed out (no chip, or a boot failure — <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>1 if the SA-1 wrote SA1_READY_MAGIC ($A5) to I-RAM, 0 if crt0 timed out (no chip, or a boot failure — <a class="el" href="known_limitations.html">KNOWN_LIMITATIONS.md</a>) </dd></dl>
 
 </div>
 </div>

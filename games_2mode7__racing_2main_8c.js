@@ -10,11 +10,11 @@ var games_2mode7__racing_2main_8c =
     [ "STEER_STEP", "games_2mode7__racing_2main_8c.html#a643a8d74684cc8d4b8e7366c8b4910d1", null ],
     [ "build_car_sprite", "games_2mode7__racing_2main_8c.html#a1580bc37c059028db01ad52698d0ee1b", null ],
     [ "main", "games_2mode7__racing_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
-    [ "track_class_at", "games_2mode7__racing_2main_8c.html#aac3b2597ae4d9977d6dc44bbcbf754a1", null ],
     [ "car_heading", "games_2mode7__racing_2main_8c.html#a1160e461fb3dcdd8091f25d121276c02", null ],
     [ "car_speed", "games_2mode7__racing_2main_8c.html#ab450d40bc6cbb6a5ec64ac40fc433a5a", null ],
     [ "car_surface", "games_2mode7__racing_2main_8c.html#a4ec1ea176eeefb26906fdf312ec4f98f", null ],
     [ "car_tiles", "games_2mode7__racing_2main_8c.html#a5166f1d245bca63c25726e6479a3ae56", null ],
     [ "car_x", "games_2mode7__racing_2main_8c.html#abcb5c457114635db8310446698d4f3b6", null ],
-    [ "car_y", "games_2mode7__racing_2main_8c.html#a546e1ce171b0deba47ed2d8dc8c46402", null ]
+    [ "car_y", "games_2mode7__racing_2main_8c.html#a546e1ce171b0deba47ed2d8dc8c46402", null ],
+    [ "track_class", "games_2mode7__racing_2main_8c.html#a43591b44430a5cc795ddc6e2661e1167", null ]
 ];

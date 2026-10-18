@@ -137,11 +137,11 @@ Controls</h2>
 <td class="markdownTableBodyNone">D-Pad Left/Right  </td><td class="markdownTableBodyNone">Module mode: amplitude 2 to 24 pixels, in steps of 2  </td></tr>
 </table>
 <p>The ripple runs from boot, with no input.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-29"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-28"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">make -C examples/hdma/hdma_wave</div>
 </div><!-- fragment --><p>Then open <span class="tt">hdma_wave.sfc</span> in luna (<span class="tt">luna-gui hdma_wave.sfc</span>) or any SNES emulator.</p>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-22"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-21"></a>
 What You'll Learn</h2>
 <ul>
 <li>What HDMA does that DMA cannot: a different register value on every scanline</li>
@@ -185,7 +185,7 @@ Walkthrough</h2>
 <div class="line">...</div>
 <div class="line">hdmaWaveUpdate();                        <span class="comment">/* once per frame */</span></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_a43a6b3b5ca7ab7763d85bec4ccf9342b"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#a43a6b3b5ca7ab7763d85bec4ccf9342b">amp</a></div><div class="ttdeci">static u8 amp</div><div class="ttdoc">Module-mode amplitude in pixels.</div><div class="ttdef"><b>Definition</b> main.c:111</div></div>
-<div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_a9f93adb560cbcb94bb3cc6f017e39f21"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#a9f93adb560cbcb94bb3cc6f017e39f21">CH_LIB</a></div><div class="ttdeci">#define CH_LIB</div><div class="ttdoc">Channel of the hdma module&#39;s wave (7 belongs to the OAM DMA).</div><div class="ttdef"><b>Definition</b> main.c:74</div></div>
+<div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_a9f93adb560cbcb94bb3cc6f017e39f21"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#a9f93adb560cbcb94bb3cc6f017e39f21">CH_LIB</a></div><div class="ttdeci">#define CH_LIB</div><div class="ttdoc">Channel of the hdma module&#39;s wave (7 carries the NMI&#39;s DMA).</div><div class="ttdef"><b>Definition</b> main.c:74</div></div>
 <div class="ttc" id="ahdma_2hdma__wave_2main_8c_html_aa15808dca75aef694bf558fd894edc7f"><div class="ttname"><a href="hdma_2hdma__wave_2main_8c.html#aa15808dca75aef694bf558fd894edc7f">WAVE_FREQ</a></div><div class="ttdeci">#define WAVE_FREQ</div><div class="ttdoc">Module-mode frequency: period = 256 / 10 = 25.6 lines.</div><div class="ttdef"><b>Definition</b> main.c:82</div></div>
 <div class="ttc" id="ahdma_8h_html_a2658bf1d97761d3e7a940b29ac560438"><div class="ttname"><a href="hdma_8h.html#a2658bf1d97761d3e7a940b29ac560438">hdmaWaveInit</a></div><div class="ttdeci">void hdmaWaveInit(void)</div><div class="ttdoc">Initialize HDMA wave effect system.</div></div>
 <div class="ttc" id="ahdma_8h_html_a2ef7d5f50fba237731cac30b5a3af241"><div class="ttname"><a href="hdma_8h.html#a2ef7d5f50fba237731cac30b5a3af241">hdmaWaveH</a></div><div class="ttdeci">void hdmaWaveH(u8 channel, u8 bg, u8 amplitude, u8 frequency)</div><div class="ttdoc">Set up horizontal wave effect (water reflection).</div></div>
@@ -236,18 +236,18 @@ Fidelity to the original (hand mode; measured, not assumed)</h2>
 Tips &amp; Tricks</h2>
 <ul>
 <li><b>Nothing moves?</b> An HDMA channel that is set up but not enabled does nothing: <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> configures, <span class="tt"><a class="el" href="hdma_8h.html#a4d4a4c331c20e8e81927d0cd5c195794" title="Enable HDMA channel(s), given as a bit mask.">hdmaEnableMask()</a></span> arms. luna's <span class="tt">dma.hdmaen</span> in <span class="tt">luna state --out -</span> shows which channels are on.</li>
-<li><b>Channel 7 is taken</b> by the NMI handler's OAM DMA; do not put HDMA on it.</li>
+<li><b>Channel 7 is taken</b> by every DMA of the NMI handler (OAM, text flush, dynamic sprites); do not put HDMA on it.</li>
 <li><b>A flat colour hides the effect.</b> The wave only shifts pixels horizontally: it needs an image with vertical detail to be seen.</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="go-further-3"></a>
 Go Further</h2>
 <ul>
-<li><b>Vertical wave:</b> target <span class="tt">BG1VOFS</span> (<span class="tt"><a class="el" href="hdma_8h.html#a899a6ccfefa526caa0c124abab769a16" title="Destination: BG1 V scroll ($210E).">HDMA_DEST_BG1VOFS</a></span>) instead; the lib writes <span class="tt">y - 1</span> for you, but an HDMA table on <span class="tt">BGnVOFS</span> must carry the -1 itself (see <span class="tt"><a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a></span>).</li>
+<li><b>Vertical wave:</b> target <span class="tt">BG1VOFS</span> (<span class="tt"><a class="el" href="hdma_8h.html#a899a6ccfefa526caa0c124abab769a16" title="Destination: BG1 V scroll ($210E).">HDMA_DEST_BG1VOFS</a></span>) instead; the lib writes <span class="tt">y - 1</span> for you, but an HDMA table on <span class="tt">BGnVOFS</span> must carry the -1 itself (see <span class="tt"><a class="el" href="known_limitations.html">KNOWN_LIMITATIONS.md</a></span>).</li>
 <li><b>Two layers:</b> a second channel on <span class="tt">BG2HOFS</span> with another amplitude.</li>
-<li><b>Next example:</b> <a href="../hdma_helpers/">HDMA Helpers</a> — the module's other effects (brightness and colour gradients, iris wipe, water ripple).</li>
+<li><b>Next example:</b> <a href="examples_hdma_hdma_helpers.html">HDMA Helpers</a> — the module's other effects (brightness and colour gradients, iris wipe, water ripple).</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-45"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-44"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">input</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <table class="markdownTable">
@@ -314,7 +314,7 @@ Files</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_hdma.html">HDMA &amp; raster</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_hdma.html">HDMA &amp; raster</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

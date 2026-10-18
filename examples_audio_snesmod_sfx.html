@@ -125,7 +125,7 @@ $(function(){initNavTree('examples_audio_snesmod_sfx.html','',''); });
 <div class="textblock"><blockquote class="doxtable">
 <p>Sound effect playback with pitch control. Five instrument samples on the buttons, three pitch settings on the D-pad. No background music &ndash; effects only. </p>
 </blockquote>
-<h2 class="doxsection"><a class="anchor" id="controls-1"></a>
+<h2 class="doxsection"><a class="anchor" id="controls"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -143,7 +143,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-Pad Left / Right  </td><td class="markdownTableBodyNone">Cycle pitch (Low / Normal / High)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="what-youll-learn-2"></a>
+<h2 class="doxsection"><a class="anchor" id="what-youll-learn-1"></a>
 What You'll Learn</h2>
 <ul>
 <li>How to initialize SNESMOD for effects-only playback (no music)</li>
@@ -153,7 +153,7 @@ What You'll Learn</h2>
 <li>Why <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> must be called every frame, even without music</li>
 </ul>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-2"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-1"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/audio/snesmod_sfx</div>
@@ -175,14 +175,14 @@ Loading and Playing Effects</h3>
 <div class="line">    <a class="code hl_function" href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>);</div>
 <div class="line">}</div>
 <div class="ttc" id="aaudio_2snesmod__sfx_2main_8c_html_adae8021d63052c74619497c15c70595e"><div class="ttname"><a href="audio_2snesmod__sfx_2main_8c.html#adae8021d63052c74619497c15c70595e">NUM_EFFECTS</a></div><div class="ttdeci">#define NUM_EFFECTS</div><div class="ttdoc">Number of sound effects in the soundbank.</div><div class="ttdef"><b>Definition</b> main.c:36</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:155</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
 <div class="ttc" id="agroup__snesmod__sfx_html_ga1708ded38dac865f9518ba5480c28c97"><div class="ttname"><a href="group__snesmod__sfx.html#ga1708ded38dac865f9518ba5480c28c97">snesmodLoadEffect</a></div><div class="ttdeci">u8 snesmodLoadEffect(u16 sfxIndex)</div><div class="ttdoc">Load a sound effect from the soundbank.</div></div>
 </div><!-- fragment --><p>To play an effect, call <span class="tt"><a class="el" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2" title="Play a sound effect.">snesmodPlayEffect()</a></span> with four parameters &ndash; the effect ID, volume (0-127), pan (0=left, 128=center, 255=right), and pitch:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a>(SFX_TADA, 127, 128, pitch);</div>
 <div class="ttc" id="agroup__snesmod__sfx_html_gabcbd651eaa6e4cbfd8c8764a423a74e2"><div class="ttname"><a href="group__snesmod__sfx.html#gabcbd651eaa6e4cbfd8c8764a423a74e2">snesmodPlayEffect</a></div><div class="ttdeci">u8 snesmodPlayEffect(u16 effectId, u8 volume, u8 pan, u16 pitch)</div><div class="ttdoc">Play a sound effect.</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="the-soundbank"></a>
 The Soundbank</h3>
-<p>The soundbank is built from an Impulse Tracker <span class="tt">.it</span> file (<span class="tt">sfx/effectssfx.it</span>) that contains five instrument samples. The <span class="tt">smconv</span> tool converts it into a binary soundbank at build time. The <span class="tt">.it</span> file holds the raw instrument definitions but no music patterns &ndash; this is an effects-only soundbank.</p>
+<p>The soundbank is built from an Impulse Tracker <span class="tt">.it</span> file (<span class="tt">sfx/effectssfx.it</span>) that contains five instrument samples. The <span class="tt">opensnes-music</span> tool converts it into a binary soundbank at build time. The <span class="tt">.it</span> file holds the raw instrument definitions but no music patterns &ndash; this is an effects-only soundbank.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Index  </th><th class="markdownTableHeadNone">Effect  </th><th class="markdownTableHeadNone">Constant  </th></tr>
@@ -201,7 +201,7 @@ The Soundbank</h3>
 Text Display</h3>
 <p>The on-screen HUD uses the <span class="tt">text</span> library module (<span class="tt"><a class="el" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e" title="Initialize the text rendering system.">textInit</a></span>, <span class="tt"><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont</a></span>, <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a></span>, <span class="tt"><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush</a></span>) for rendering control labels and the current pitch setting. <span class="tt"><a class="el" href="text_8h.html#a9cdc7b56636a72b2aa26c75d43dcf404" title="Request tilemap DMA transfer to VRAM (rarely needed).">textFlush()</a></span> is called after updating the pitch display to transfer the text buffer to VRAM.</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-7"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-6"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">text</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="files-1"></a>
@@ -220,8 +220,8 @@ Files</h2>
 </table>
 <h2 class="doxsection"><a class="anchor" id="whats-next-2"></a>
 What's Next?</h2>
-<p><b>SNESMOD Music:</b> <a href="../snesmod_music/">SNESMOD Music</a> - Tracker music playback</p>
-<p><b>Graphics:</b> <a href="../../sprites/simple_sprite/">Simple Sprite</a> - Display a sprite on screen </p>
+<p><b>SNESMOD Music:</b> <a href="examples_audio_snesmod_music.html">SNESMOD Music</a> - Tracker music playback</p>
+<p><b>Graphics:</b> <a href="examples_sprites_simple_sprite.html">Simple Sprite</a> - Display a sprite on screen </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
@@ -236,7 +236,7 @@ What's Next?</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_audio.html">Audio</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_audio.html">Audio</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

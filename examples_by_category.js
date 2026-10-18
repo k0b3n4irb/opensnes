@@ -18,14 +18,14 @@ var examples_by_category =
       [ "Memory &amp; mappers", "examples_by_category.html#memory--mappers", null ],
       [ "Enhancement chips", "examples_by_category.html#enhancement-chips", [
         [ "SA-1 Coprocessor", "examples_by_category.html#sa-1-coprocessor", null ],
-        [ "SuperFX (GSU)", "examples_by_category.html#superfx-gsu", null ],
+        [ "Super FX (GSU)", "examples_by_category.html#super-fx-gsu", null ],
         [ "DSP-1 Coprocessor", "examples_by_category.html#dsp-1-coprocessor", null ]
       ] ],
       [ "Games (capstones)", "examples_by_category.html#games-capstones", [
-        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-35", null ],
-        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-53", null ],
+        [ "What you'll learn", "examples_text_print_string.html#what-youll-learn-32", null ],
+        [ "SNES concepts", "examples_text_print_string.html#snes-concepts-52", null ],
         [ "How to build", "examples_text_print_string.html#how-to-build-22", null ],
-        [ "Modules used", "examples_text_print_string.html#modules-used-74", null ],
+        [ "Modules used", "examples_text_print_string.html#modules-used-71", null ],
         [ "Next rung", "examples_text_print_string.html#next-rung", null ]
       ] ]
     ] ],
@@ -44,11 +44,11 @@ var examples_by_category =
     [ "Simple Sprite -- Your First OAM Sprite", "examples_sprites_simple_sprite.html", null ],
     [ "Object Size -- All 6 SNES Sprite Size Modes", "examples_sprites_sprite_sizes.html", null ],
     [ "Animated Sprite -- Direction States and Sprite Sheets", "examples_sprites_animated_sprite.html", null ],
-    [ "Metasprite", "examples_sprites_metasprite.html", null ],
     [ "Dynamic Sprite -- VRAM Streaming for Animated Sprites", "examples_sprites_dynamic_sprite.html", null ],
     [ "Dynamic Metasprite Engine", "examples_sprites_dynamic_metasprite.html", null ],
     [ "sprite_swarm — a bouncing swarm, and the OAM throughput ceiling", "examples_sprites_sprite_swarm.html", null ],
     [ "World Sprites", "examples_sprites_world_sprites.html", null ],
+    [ "Aseprite Pipeline", "examples_sprites_aseprite_pipeline.html", null ],
     [ "Mixed Scroll", "examples_scrolling_mixed_scroll.html", null ],
     [ "Continuous Scroll", "examples_scrolling_continuous_scroll.html", null ],
     [ "Parallax Scrolling", "examples_scrolling_parallax_scroll.html", null ],
@@ -77,7 +77,6 @@ var examples_by_category =
     [ "SNES Mouse", "examples_input_mouse.html", null ],
     [ "Super Scope", "examples_input_superscope.html", null ],
     [ "SNESMOD Music Example", "examples_audio_snesmod_music.html", null ],
-    [ "SNESMOD Large Soundbank Music", "examples_audio_snesmod_music_large.html", null ],
     [ "SNESMOD Sound Effects", "examples_audio_snesmod_sfx.html", null ],
     [ "soundboard — the audio v2 engine, driven entirely from C", "examples_audio_soundboard.html", null ],
     [ "SFX from WAV", "examples_audio_sfx_from_wav.html", null ],
@@ -87,7 +86,6 @@ var examples_by_category =
     [ "speech_synth — the SNES says \"OPEN SNES\"", "examples_audio_speech_synth.html", null ],
     [ "Echo / reverb", "examples_audio_echo.html", null ],
     [ "Map Scroll", "examples_maps_map_scroll.html", null ],
-    [ "Tiled Map Editor Integration", "examples_maps_tiled.html", null ],
     [ "Dynamic Map", "examples_maps_dynamic_map.html", null ],
     [ "Slope Mario", "examples_maps_slope_collision.html", null ],
     [ "Collision Detection Demo", "examples_basics_collision_demo.html", null ],

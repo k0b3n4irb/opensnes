@@ -150,7 +150,7 @@ Naming Conventions</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Element  </th><th class="markdownTableHeadNone">Convention  </th><th class="markdownTableHeadNone">Example  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Functions  </td><td class="markdownTableBodyNone">snake_case  </td><td class="markdownTableBodyNone"><span class="tt">sprite_init()</span>  </td></tr>
+<td class="markdownTableBodyNone">Functions  </td><td class="markdownTableBodyNone">camelCase, the module first  </td><td class="markdownTableBodyNone"><span class="tt">playerSpawn()</span>, as the SDK's <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Variables  </td><td class="markdownTableBodyNone">snake_case  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="basics_2collision__demo_2main_8c.html#afcd2e46ba400e64d8137a05e55980b26" title="Player X position in screen coordinates.">player_x</a></span>  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -182,11 +182,11 @@ Types</h3>
 Function Documentation</h3>
 <p>Use Doxygen-style comments:</p>
 <div class="fragment"><div class="line"></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_init(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y);</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> playerSpawn(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y);</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="error-handling"></a>
 Error Handling</h3>
 <div class="fragment"><div class="line"><span class="comment">// Return FALSE/NULL on error</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_init(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y) {</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> playerSpawn(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y) {</div>
 <div class="line">    <span class="keywordflow">if</span> (<span class="keywordtype">id</span> &gt;= <a class="code hl_define" href="sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4">MAX_SPRITES</a>) {</div>
 <div class="line">        <span class="keywordflow">return</span> <a class="code hl_define" href="group__bool__type.html#gaa93f0eb578d23995850d61f7d61c55c1">FALSE</a>;</div>
 <div class="line">    }</div>
@@ -195,7 +195,7 @@ Error Handling</h3>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Check return values</span></div>
-<div class="line"><span class="keywordflow">if</span> (!sprite_init(<span class="keywordtype">id</span>, x, y)) {</div>
+<div class="line"><span class="keywordflow">if</span> (!playerSpawn(<span class="keywordtype">id</span>, x, y)) {</div>
 <div class="line">    <span class="comment">// Handle error</span></div>
 <div class="line">}</div>
 <div class="ttc" id="agroup__bool__type_html_gaa8cecfc5c5c054d2875c03e77b7be15d"><div class="ttname"><a href="group__bool__type.html#gaa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a></div><div class="ttdeci">#define TRUE</div><div class="ttdef"><b>Definition</b> types.h:201</div></div>
@@ -203,16 +203,11 @@ Error Handling</h3>
 <div class="ttc" id="asprite_8h_html_aeb21c7ac080eea985b7701df626d9cf4"><div class="ttname"><a href="sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4">MAX_SPRITES</a></div><div class="ttdeci">#define MAX_SPRITES</div><div class="ttdoc">Maximum number of hardware sprites.</div><div class="ttdef"><b>Definition</b> sprite.h:49</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="memory"></a>
 Memory</h3>
-<div class="fragment"><div class="line"><span class="comment">// Always check allocations</span></div>
-<div class="line"><span class="keywordtype">void</span>* ptr = malloc(size);</div>
-<div class="line"><span class="keywordflow">if</span> (ptr == <a class="code hl_define" href="group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>) {</div>
-<div class="line">    <span class="comment">// Handle allocation failure</span></div>
-<div class="line">}</div>
+<div class="fragment"><div class="line"><span class="comment">// No heap: memory is a global, a static or a local of known size</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Zero-initialize structures</span></div>
 <div class="line">SpriteData sprite;</div>
 <div class="line"><a class="code hl_function" href="string_8h.html#a4f2933a10c46fe88c376b49f50dea67c">memset</a>(&amp;sprite, 0, <span class="keyword">sizeof</span>(sprite));</div>
-<div class="ttc" id="agroup__macros_html_ga070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="group__macros.html#ga070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div><div class="ttdoc">Null pointer constant.</div><div class="ttdef"><b>Definition</b> types.h:217</div></div>
 <div class="ttc" id="astring_8h_html_a4f2933a10c46fe88c376b49f50dea67c"><div class="ttname"><a href="string_8h.html#a4f2933a10c46fe88c376b49f50dea67c">memset</a></div><div class="ttdeci">void FAR * memset(void FAR *dst, int c, unsigned int n)</div><div class="ttdoc">Fill n bytes with a value.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="assembly-65816---wla-dx"></a>
 Assembly (65816 - WLA-DX)</h2>
@@ -226,7 +221,7 @@ General</h3>
 <h3 class="doxsection"><a class="anchor" id="format"></a>
 Format</h3>
 <div class="fragment"><div class="line">;============================================================================</div>
-<div class="line">; Function: sprite_update</div>
+<div class="line">; Function: playerUpdate</div>
 <div class="line">; Description: Update all active sprites</div>
 <div class="line">; Input: None</div>
 <div class="line">; Output: None</div>
@@ -234,12 +229,13 @@ Format</h3>
 <div class="line">;============================================================================</div>
 <div class="line">.section &quot;.text&quot; superfree</div>
 <div class="line"> </div>
-<div class="line">sprite_update:</div>
+<div class="line">playerUpdate:</div>
 <div class="line">    php                     ; Save processor status</div>
 <div class="line">    rep #$20                ; 16-bit accumulator</div>
+<div class="line">    .ACCU 16                ; tell WLA-DX: it does not follow rep/sep across branches</div>
 <div class="line"> </div>
 <div class="line">    ldx #0                  ; Start at sprite 0</div>
-<div class="line">-   lda sprite_active,x     ; Check if active</div>
+<div class="line">-   lda player_active,x     ; Check if active</div>
 <div class="line">    beq +                   ; Skip if inactive</div>
 <div class="line"> </div>
 <div class="line">    jsr _update_single      ; Update this sprite</div>
@@ -255,17 +251,19 @@ Format</h3>
 <div class="line">.ends</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="register-documentation"></a>
 Register Documentation</h3>
-<div class="fragment"><div class="line">; Document register state changes</div>
+<div class="fragment"><div class="line">; Document register state changes, and say each one to the assembler</div>
 <div class="line">    rep #$20                ; A = 16-bit</div>
+<div class="line">    .ACCU 16</div>
 <div class="line">    sep #$10                ; X/Y = 8-bit</div>
+<div class="line">    .INDEX 8</div>
 <div class="line"> </div>
 <div class="line">; Document expected register values</div>
 <div class="line">; Input: A = sprite ID (0-127)</div>
 <div class="line">; Output: X = OAM offset</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="labels"></a>
 Labels</h3>
-<div class="fragment"><div class="line">; Public labels: _function_name</div>
-<div class="line">_sprite_init:</div>
+<div class="fragment"><div class="line">; Public labels: the C name, as the header declares it (no underscore)</div>
+<div class="line">playerSpawn:</div>
 <div class="line"> </div>
 <div class="line">; Local labels: use anonymous (+ -)</div>
 <div class="line">    bne +           ; Forward reference</div>
@@ -295,8 +293,8 @@ Headers (.h)</h3>
 <div class="line">} SpriteData;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Functions */</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_init(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y);</div>
-<div class="line"><span class="keywordtype">void</span> sprite_update(<span class="keywordtype">void</span>);</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> playerSpawn(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y);</div>
+<div class="line"><span class="keywordtype">void</span> playerUpdate(<span class="keywordtype">void</span>);</div>
 <div class="line"> </div>
 <div class="line"><span class="preprocessor">#endif </span><span class="comment">/* OPENSNES_SPRITE_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="asnes_8h_html"><div class="ttname"><a href="snes_8h.html">snes.h</a></div><div class="ttdoc">OpenSNES common-case master header.</div></div>
@@ -310,14 +308,13 @@ Source (.c)</h3>
 <div class="line"><span class="keyword">static</span> SpriteData sprites[<a class="code hl_define" href="sprite_8h.html#aeb21c7ac080eea985b7701df626d9cf4">MAX_SPRITES</a>];</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">/* Public functions */</span></div>
-<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> sprite_init(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y) {</div>
+<div class="line"><a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> playerSpawn(<a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <span class="keywordtype">id</span>, <a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> x, <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> y) {</div>
 <div class="line">    <span class="comment">// Implementation</span></div>
 <div class="line">}</div>
 <div class="ttc" id="asprite_8h_html"><div class="ttname"><a href="sprite_8h.html">sprite.h</a></div><div class="ttdoc">SNES Sprite (Object) Management.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="formatting-tools"></a>
 Formatting Tools</h2>
 <p>Consider using:</p><ul>
-<li><span class="tt">clang-format</span> for C code (config in <span class="tt">.clang-format</span>)</li>
 <li>Consistent editor settings (<span class="tt">.editorconfig</span>) </li>
 </ul>
 </div></div><!-- contents -->
@@ -334,7 +331,7 @@ Formatting Tools</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

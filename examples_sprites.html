@@ -122,38 +122,40 @@ $(function(){initNavTree('examples_sprites.html','',''); });
   <div class="headertitle"><div class="title">Sprites </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><b>Family 3 of the developer journey — "things that move independently of the
+<div class="textblock"><p><b>"things that move independently of the
 background."</b> Sprites (OBJ) are the heart of any game: the player, enemies, bullets, pickups. The SNES gives you 128 hardware sprites; this family is a ladder from one static sprite up to streaming a multi-tile character every frame.</p>
 <h2 class="doxsection"><a class="anchor" id="the-ladder-9"></a>
 The ladder</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
+<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Developer question  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">3.1  </td><td class="markdownTableBodyNone"><a href="simple_sprite/">simple_sprite</a>  </td><td class="markdownTableBodyNone">How do I put one sprite on screen?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites_simple_sprite.html">simple_sprite</a>  </td><td class="markdownTableBodyNone">How do I put one sprite on screen?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">3.2  </td><td class="markdownTableBodyNone"><a href="sprite_sizes/">sprite_sizes</a>  </td><td class="markdownTableBodyNone">How do I use the six OBJ size modes (8×8…64×64)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites_sprite_sizes.html">sprite_sizes</a>  </td><td class="markdownTableBodyNone">How do I use the six OBJ size modes (8×8…64×64)?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">3.3  </td><td class="markdownTableBodyNone"><a href="animated_sprite/">animated_sprite</a>  </td><td class="markdownTableBodyNone">How do I frame-animate a sprite (+H-flip)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites_animated_sprite.html">animated_sprite</a>  </td><td class="markdownTableBodyNone">How do I frame-animate a sprite (+H-flip)?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">3.4  </td><td class="markdownTableBodyNone"><a href="metasprite/">metasprite</a>  </td><td class="markdownTableBodyNone">How do I compose one character from many tiles?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites_dynamic_sprite.html">dynamic_sprite</a>  </td><td class="markdownTableBodyNone">How do I stream sprite tiles into VRAM per frame?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">3.5  </td><td class="markdownTableBodyNone"><a href="dynamic_sprite/">dynamic_sprite</a>  </td><td class="markdownTableBodyNone">How do I stream sprite tiles into VRAM per frame?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites_dynamic_metasprite.html">dynamic_metasprite</a>  </td><td class="markdownTableBodyNone">How do I stream a <em>multi-tile</em> character (dynamic + meta)?  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">3.6  </td><td class="markdownTableBodyNone"><a href="dynamic_metasprite/">dynamic_metasprite</a>  </td><td class="markdownTableBodyNone">How do I stream a <em>multi-tile</em> character (dynamic + meta)?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites_sprite_swarm.html">sprite_swarm</a>  </td><td class="markdownTableBodyNone">How many sprites can I actually move at 60 fps, and why?  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">3.7  </td><td class="markdownTableBodyNone"><a href="sprite_swarm/">sprite_swarm</a>  </td><td class="markdownTableBodyNone">How many sprites can I actually move at 60 fps, and why?  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_sprites_world_sprites.html">world_sprites</a>  </td><td class="markdownTableBodyNone">How do I place sprites in world coordinates under a camera (culling, depth sort, one call per batch)?  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="examples_sprites_aseprite_pipeline.html">aseprite_pipeline</a>  </td><td class="markdownTableBodyNone">How do I animate a metasprite from an Aseprite export?  </td></tr>
 </table>
 <blockquote class="doxtable">
-<p>3.7 is the showcase <em>and</em> a reality check: a smooth 32-sprite swarm plus the honest per-sprite budget (the base CPU tops out around three dozen in C — see <a href="../chips/sa1_starfield/">chips/sa1_starfield</a> for 128 via the SA-1). </p>
+<p>3.7 is the showcase <em>and</em> a reality check: a smooth 32-sprite swarm plus the honest per-sprite budget (the base CPU tops out around three dozen in C — see <a href="examples_chips_sa1_starfield.html">chips/sa1_starfield</a> for 128 via the SA-1). </p>
 </blockquote>
-<p>Start at 3.1 and climb: each rung adds exactly one idea onto the last.</p>
+<p>Start at the top and climb: each example adds one idea onto the last.</p>
 <h2 class="doxsection"><a class="anchor" id="reference--oam-in-one-screen"></a>
 Reference — OAM in one screen</h2>
 <p><b>OAM structure</b> — 128 sprites, 4 bytes each in the low table (512 bytes): X (low 8), Y, tile number (low 8), attributes (<span class="tt">vhoopppc</span> — flip, priority, palette, tile high bit). The high table (32 bytes) holds 2 bits/sprite: X high bit and size select.</p>
-<p><b>Sizes (OBJSEL <span class="tt">$2101</span>)</b> — each value picks a <em>small</em>/*large* pair, e.g. <span class="tt">1</span> = 8×8 / 32×32, <span class="tt">5</span> = 32×32 / 64×64. Rung 3.2 walks all six.</p>
-<p><b>Many sprites per frame</b> — write straight to the <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> buffer rather than calling <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> repeatedly; the NMI handler DMAs the buffer to OAM hardware when <span class="tt"><a class="el" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494" title="OAM DMA trigger flag.">oam_update_flag</a></span> is set. Rungs 3.5–3.6 build on this.</p>
-<p><a class="el" href="examples_sprites_animated_sprite.html" title="Animated Sprite -- Direction States and Sprite Sheets">Animated Sprite -- Direction States and Sprite Sheets</a> <a class="el" href="examples_sprites_aseprite_pipeline.html" title="Aseprite Pipeline">Aseprite Pipeline</a> <a class="el" href="examples_sprites_dynamic_metasprite.html" title="Dynamic Metasprite Engine">Dynamic Metasprite Engine</a> <a class="el" href="examples_sprites_dynamic_sprite.html" title="Dynamic Sprite -- VRAM Streaming for Animated Sprites">Dynamic Sprite -- VRAM Streaming for Animated Sprites</a> <a class="el" href="examples_sprites_metasprite.html" title="Metasprite">Metasprite</a> <a class="el" href="examples_sprites_simple_sprite.html" title="Simple Sprite -- Your First OAM Sprite">Simple Sprite -- Your First OAM Sprite</a> <a class="el" href="examples_sprites_sprite_sizes.html" title="Object Size -- All 6 SNES Sprite Size Modes">Object Size -- All 6 SNES Sprite Size Modes</a> <a class="el" href="examples_sprites_sprite_swarm.html" title="sprite_swarm — a bouncing swarm, and the OAM throughput ceiling">sprite_swarm — a bouncing swarm, and the OAM throughput ceiling</a> <a class="el" href="examples_sprites_world_sprites.html" title="World Sprites">World Sprites</a> </p>
+<p><b>Sizes (OBJSEL <span class="tt">$2101</span>)</b> — each value picks a <em>small</em>/*large* pair, e.g. <span class="tt">1</span> = 8×8 / 32×32, <span class="tt">5</span> = 32×32 / 64×64. <span class="tt">sprite_sizes</span> walks all six.</p>
+<p><b>Many sprites per frame</b> — write straight to the <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> buffer rather than calling <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> repeatedly; the NMI handler DMAs the buffer to OAM hardware when <span class="tt"><a class="el" href="system_8h.html#aebb6082d6353b65122e8009f24a5e494" title="OAM DMA trigger flag.">oam_update_flag</a></span> is set. <span class="tt">dynamic_sprite</span> and <span class="tt">dynamic_metasprite</span> build on this.</p>
+<p><a class="el" href="examples_sprites_animated_sprite.html" title="Animated Sprite -- Direction States and Sprite Sheets">Animated Sprite -- Direction States and Sprite Sheets</a> <a class="el" href="examples_sprites_aseprite_pipeline.html" title="Aseprite Pipeline">Aseprite Pipeline</a> <a class="el" href="examples_sprites_dynamic_metasprite.html" title="Dynamic Metasprite Engine">Dynamic Metasprite Engine</a> <a class="el" href="examples_sprites_dynamic_sprite.html" title="Dynamic Sprite -- VRAM Streaming for Animated Sprites">Dynamic Sprite -- VRAM Streaming for Animated Sprites</a> <a class="el" href="examples_sprites_simple_sprite.html" title="Simple Sprite -- Your First OAM Sprite">Simple Sprite -- Your First OAM Sprite</a> <a class="el" href="examples_sprites_sprite_sizes.html" title="Object Size -- All 6 SNES Sprite Size Modes">Object Size -- All 6 SNES Sprite Size Modes</a> <a class="el" href="examples_sprites_sprite_swarm.html" title="sprite_swarm — a bouncing swarm, and the OAM throughput ceiling">sprite_swarm — a bouncing swarm, and the OAM throughput ceiling</a> <a class="el" href="examples_sprites_world_sprites.html" title="World Sprites">World Sprites</a> </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
@@ -168,7 +170,7 @@ Reference — OAM in one screen</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

@@ -124,26 +124,28 @@ $(function(){initNavTree('examples_text.html','',''); });
 <div class="contents">
 <div class="textblock"><p>The SNES has no built-in text rendering. Text is displayed the same way as any other graphics: font characters are stored as tiles in VRAM, and a tilemap references those tiles to spell out words on screen.</p>
 <p>These examples teach the tile/tilemap fundamentals that underpin all SNES graphics.</p>
-<h2 class="doxsection"><a class="anchor" id="example-roms-7"></a>
+<h2 class="doxsection"><a class="anchor" id="example-roms-9"></a>
 Example ROMs</h2>
 <p>A ladder of developer questions: <em>how do I show text? → how do I move it?</em></p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Rung  </th><th class="markdownTableHeadNone">Description  </th></tr>
+<th class="markdownTableHeadNone">Example  </th><th class="markdownTableHeadNone">Description  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><a href="print_string/">print_string</a>  </td><td class="markdownTableBodyNone">1.1  </td><td class="markdownTableBodyNone">Print a string with the built-in font (<span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit</a></span> + <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a></span>)  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_text_print_string.html">print_string</a>  </td><td class="markdownTableBodyNone">Print a string with the built-in font (<span class="tt"><a class="el" href="text_8h.html#a3e1f9117d2dceb9fbc3f44875d92b259" title="Initialize text display mode — one-call setup for text-based examples.">textModeInit</a></span> + <span class="tt"><a class="el" href="text_8h.html#a57d1c6fb6592214ea0fdd6e548dd7efc" title="Print a string at specific position.">textPrintAt</a></span>)  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a href="scroll_message/">scroll_message</a>  </td><td class="markdownTableBodyNone">1.4  </td><td class="markdownTableBodyNone">Move text &ndash; scroll the text BG layer for a marquee (<span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span>)  </td></tr>
+<td class="markdownTableBodyNone"><a href="examples_text_scroll_message.html">scroll_message</a>  </td><td class="markdownTableBodyNone">Move text &ndash; scroll the text BG layer for a marquee (<span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span>)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a href="examples_text_pixel_text.html">pixel_text</a>  </td><td class="markdownTableBodyNone">Proportional text composed at the pixel in a 2bpp layer  </td></tr>
 </table>
 <blockquote class="doxtable">
-<p>Under the hood — how a glyph is raw 2bpp bitplanes + a tilemap — lives in <a href="../fundamentals/text_glyphs/"><span class="tt">fundamentals/text_glyphs</span></a>. </p>
+<p>Under the hood — how a glyph is raw 2bpp bitplanes + a tilemap — lives in <a href="examples_fundamentals_text_glyphs.html"><span class="tt">fundamentals/text_glyphs</span></a>. </p>
 </blockquote>
 <h2 class="doxsection"><a class="anchor" id="key-concepts-3"></a>
 Key Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="how-text-works-on-snes"></a>
 How Text Works on SNES</h3>
-<div class="fragment"><div class="line">Font Image (PNG) --&gt; gfx4snes/font2snes --&gt; Tile Data (VRAM)</div>
-<div class="line">                                        --&gt; Tilemap (VRAM)</div>
+<div class="fragment"><div class="line">Font Image (PNG) --&gt; opensnes-text   --&gt; Tile Data (VRAM)</div>
+<div class="line">  (or the built-in font of textLoadFont) --&gt; Tilemap (VRAM)</div>
 <div class="line">                                                |</div>
 <div class="line">                                        PPU renders screen</div>
 </div><!-- fragment --><p>Each character is an 8x8 pixel tile. A font is a collection of tiles covering the ASCII range. The tilemap is a grid of tile numbers that defines which character appears at each screen position.</p>
@@ -179,7 +181,7 @@ Mode 0 Palette</h3>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

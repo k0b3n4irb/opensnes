@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/math.h File Reference</title>
+<title>lib/include/snes/math.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -201,7 +201,7 @@ Fixed-Point Format</h2>
 <div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> velocity = <a class="code hl_define" href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a>(1) / 4;   <span class="comment">// 0.25 (64 in fixed)</span></div>
 <div class="line"><a class="code hl_variable" href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a> = <a class="code hl_variable" href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a> + velocity;      <span class="comment">// 100.25</span></div>
 <div class="line"><a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> screen_x = <a class="code hl_define" href="#a05738893be2affe52229eb12b99f4fba">UNFIX</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a>);   <span class="comment">// 100 (truncated)</span></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a03956d7bf1f05c56957071e0c5e4dba7"><div class="ttname"><a href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a></div><div class="ttdeci">static s16 pos_x</div><div class="ttdef"><b>Definition</b> main.c:177</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a03956d7bf1f05c56957071e0c5e4dba7"><div class="ttname"><a href="games_2breakout_2main_8c.html#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a></div><div class="ttdeci">static s16 pos_x</div><div class="ttdef"><b>Definition</b> main.c:178</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
 <div class="ttc" id="amath_8h_html_a05738893be2affe52229eb12b99f4fba"><div class="ttname"><a href="#a05738893be2affe52229eb12b99f4fba">UNFIX</a></div><div class="ttdeci">#define UNFIX(x)</div><div class="ttdoc">Convert fixed-point to integer (floor).</div><div class="ttdef"><b>Definition</b> math.h:100</div></div>
 <div class="ttc" id="amath_8h_html_a740431a9a1d25e39e670cd5f48454ce4"><div class="ttname"><a href="#a740431a9a1d25e39e670cd5f48454ce4">FIX</a></div><div class="ttdeci">#define FIX(x)</div><div class="ttdoc">Convert integer to fixed-point.</div><div class="ttdef"><b>Definition</b> math.h:86</div></div>
@@ -306,7 +306,7 @@ Angles</h2>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">((<a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a>)(((<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>) &lt;&lt; 8) | (f)))</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:155</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
 </div><!-- fragment -->
 <p>Create fixed-point from integer and fraction. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -744,7 +744,7 @@ Angles</h2>
 <div class="line"><a class="code hl_typedef" href="#ac1976de9516b58f7a0352917f8d8bedd">fixed</a> result = <a class="code hl_function" href="#aaa8ca4460928f28892217658eca661bf">fixMul</a>(speed, scale);  <span class="comment">// 1.0</span></div>
 </div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>The 32-bit product is shifted back to 8.8 and the RESULT is 16 bits: a product outside -128.0..127.996 wraps without a sign — <span class="tt"><a class="el" href="#aaa8ca4460928f28892217658eca661bf" title="Multiply two fixed-point values.">fixMul</a>(<a class="el" href="#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(20)</a>,
   <a class="el" href="#a740431a9a1d25e39e670cd5f48454ce4" title="Convert integer to fixed-point.">FIX(20)</a>)</span> is 400.0, which does not fit, and reads as -112.0. Keep |a × b| under 128, or use the 16.16 <span class="tt"><a class="el" href="fixed32_8h.html#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul()</a></span> (<span class="tt"><a class="el" href="fixed32_8h.html" title="SNES 16.16 Fixed-Point Math.">snes/fixed32.h</a></span>). (This line said "32-bit intermediate for accuracy" and nothing about the 16-bit result until 2026-10-05.)</dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>NOT safe inside an <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback: uses the hardware multiplier, which is not reentrant (a callback multiply destroys a main-thread multiply it interrupted), plus shared WRAM temporaries. Plain C <span class="tt">*</span> / <span class="tt">/</span> / <span class="tt">%</span> ARE callback-safe (the runtime switches to a software path there — see .claude/notes/tech/nmi_context_hardware_muldiv.md). <a class="el" href="#ae34cfd84f2c85f3ad0d03ae9fd61a332" title="Linear interpolation.">fixLerp()</a> carries the same restriction. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>NOT safe inside an <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback: uses the hardware multiplier, which is not reentrant (a callback multiply destroys a main-thread multiply it interrupted), plus shared WRAM temporaries. Plain C <span class="tt">*</span> / <span class="tt">/</span> / <span class="tt">%</span> ARE callback-safe (the runtime switches to a software path there). <a class="el" href="#ae34cfd84f2c85f3ad0d03ae9fd61a332" title="Linear interpolation.">fixLerp()</a> carries the same restriction. </dd></dl>
 
 </div>
 </div>

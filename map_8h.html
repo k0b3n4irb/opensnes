@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/map.h File Reference</title>
+<title>lib/include/snes/map.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -704,14 +704,14 @@ Attribution</h2>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">layer1map</td><td>Address of map data (format: <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> width, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> height, <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a> pad, then tile indices) </td></tr>
-    <tr><td class="paramname">layertiles</td><td>Address of metatile definitions (4 tiles per metatile, max 512 metatiles). The engine copies the full 4096 bytes (512 × 8) from this address whatever the file's size — a 126-byte <span class="tt">.t16</span> is followed in RAM by the ROM bytes that follow it. Entries past the last defined metatile are therefore garbage; a map must not reference them (tmx2snes never does). </td></tr>
+    <tr><td class="paramname">layertiles</td><td>Address of metatile definitions (4 tiles per metatile, max 512 metatiles). The engine copies the full 4096 bytes (512 × 8) from this address whatever the file's size — a 126-byte <span class="tt">.t16</span> is followed in RAM by the ROM bytes that follow it. Entries past the last defined metatile are therefore garbage; a map must not reference them (opensnes-level never does). </td></tr>
     <tr><td class="paramname">tilesprop</td><td>Address of tile property data (collision types)</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Must be called during forced blank (screen off). The function writes directly to VRAM via DMA.</dd>
 <dd>
-Data placement: the three blobs may live in ANY bank — mapLoad and the scroll runtime honour each far pointer's bank byte, so pinning the map out of bank $00 (e.g. <span class="tt">.section ".rodata2" semifree bank 2</span>) is the recommended layout for big maps. But that data is then for the MAP ENGINE only: reading it directly from C (<span class="tt">mapdata[6]</span>, <span class="tt">*ptr</span>) silently reads bank $00 instead (cc65816 near-pointer deref — see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>). To consult tiles/attributes from C, use <a class="el" href="#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a>/mapGetMetaTilesProp() — they are bank-safe. </dd></dl>
+Data placement: the three blobs may live in ANY bank — mapLoad and the scroll runtime honour each far pointer's bank byte, so pinning the map out of bank $00 (e.g. <span class="tt">.section ".rodata2" semifree bank 2</span>) is the recommended layout for big maps. But that data is then for the MAP ENGINE only: reading it directly from C (<span class="tt">mapdata[6]</span>, <span class="tt">*ptr</span>) silently reads bank $00 instead (cc65816 near-pointer deref — see <a class="el" href="known_limitations.html">KNOWN_LIMITATIONS.md</a>). To consult tiles/attributes from C, use <a class="el" href="#ad95ef475b3953c77cd646919e1cf1ce3" title="Get metatile index at map coordinates.">mapGetMetaTile()</a>/mapGetMetaTilesProp() — they are bank-safe. </dd></dl>
 
 </div>
 </div>

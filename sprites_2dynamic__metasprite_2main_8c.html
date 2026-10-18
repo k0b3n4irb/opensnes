@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/sprites/dynamic_metasprite/main.c File Reference</title>
+<title>examples/sprites/dynamic_metasprite/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -134,8 +134,8 @@ $(function(){initNavTree('sprites_2dynamic__metasprite_2main_8c.html','',''); })
 Functions</h2></td></tr>
 <tr class="memitem:a99b104ba99a16132b181b2938e27a66b" id="r_a99b104ba99a16132b181b2938e27a66b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a99b104ba99a16132b181b2938e27a66b">changeObjSize</a> (void)</td></tr>
 <tr class="memdesc:a99b104ba99a16132b181b2938e27a66b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reinitialize sprite engine and upload all tiles during force blank.  <br /></td></tr>
-<tr class="memitem:ad6eba0f1fac53c1e89b6ad3f444b3f09" id="r_ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad6eba0f1fac53c1e89b6ad3f444b3f09">drawSprites</a> (void)</td></tr>
-<tr class="memdesc:ad6eba0f1fac53c1e89b6ad3f444b3f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw metasprites for the current OBJSEL configuration.  <br /></td></tr>
+<tr class="memitem:adcce301da5cde16dca45a2ee1f49d2a8" id="r_adcce301da5cde16dca45a2ee1f49d2a8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adcce301da5cde16dca45a2ee1f49d2a8">drawSprites</a> (void)</td></tr>
+<tr class="memdesc:adcce301da5cde16dca45a2ee1f49d2a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw metasprites for the current OBJSEL configuration.  <br /></td></tr>
 <tr class="memitem:a10ff78cf96efa1288ccd4155d97161a4" id="r_a10ff78cf96efa1288ccd4155d97161a4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a10ff78cf96efa1288ccd4155d97161a4">drawText</a> (void)</td></tr>
 <tr class="memdesc:a10ff78cf96efa1288ccd4155d97161a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw the configuration menu text.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
@@ -198,8 +198,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad6eba0f1fac53c1e89b6ad3f444b3f09" name="ad6eba0f1fac53c1e89b6ad3f444b3f09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6eba0f1fac53c1e89b6ad3f444b3f09">&#9670;&#160;</a></span>drawSprites()</h2>
+<a id="adcce301da5cde16dca45a2ee1f49d2a8" name="adcce301da5cde16dca45a2ee1f49d2a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcce301da5cde16dca45a2ee1f49d2a8">&#9670;&#160;</a></span>drawSprites()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -214,9 +214,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Draw metasprites for the current OBJSEL configuration. </p>
-<p>Render metasprites using <a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> for the current size mode.</p>
-<p><a class="el" href="sprite_8h.html#ad029b6c418d7e2b620009d54aec5cb0e" title="Draw one frame of a metasprite.">oamDrawMetasprite()</a> reads metasprite frame data (tile offsets + positions) and populates multiple OAM entries to compose a large character from smaller hardware sprite pieces. It returns the next available OAM ID, allowing multiple metasprites to be drawn without ID conflicts.</p>
-<p>Each size mode uses a different combination of LARGE and SMALL sprites to render two characters: one larger (left) and one smaller (right). </p>
 
 </div>
 </div>

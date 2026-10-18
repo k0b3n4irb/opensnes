@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/input/mouse/main.c File Reference</title>
+<title>examples/input/mouse/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -139,7 +139,7 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a03956d7bf1f05c56957071e0c5e4dba7" id="r_a03956d7bf1f05c56957071e0c5e4dba7"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a03956d7bf1f05c56957071e0c5e4dba7">pos_x</a></td></tr>
-<tr class="memdesc:a03956d7bf1f05c56957071e0c5e4dba7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cursor sprite tile data (16x16, 4bpp) defined in data.asm.  <br /></td></tr>
+<tr class="memdesc:a03956d7bf1f05c56957071e0c5e4dba7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cursor sprite tile data (16x16, 4bpp) converted by the build from res/.  <br /></td></tr>
 <tr class="memitem:aa4286d0de16674bb408ebd89c0e74fc5" id="r_aa4286d0de16674bb408ebd89c0e74fc5"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa4286d0de16674bb408ebd89c0e74fc5">pos_y</a></td></tr>
 <tr class="memdesc:aa4286d0de16674bb408ebd89c0e74fc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Absolute cursor Y position on screen.  <br /></td></tr>
 <tr class="memitem:acd26b2a904712bc651190b1348ba0c63" id="r_acd26b2a904712bc651190b1348ba0c63"><td class="memItemLeft">static const char&#160;</td><td class="memItemRight"><a class="el" href="#acd26b2a904712bc651190b1348ba0c63">sens_hi</a> [] = &quot;HIGH&quot;</td></tr>
@@ -158,6 +158,7 @@ Variables</h2></td></tr>
 <li>Relative-to-absolute coordinate accumulation from mouse deltas</li>
 <li>Sensitivity control (hardware-level scaling of mouse movement)</li>
 <li>Sprite used as a cursor overlay on a text background</li>
+<li>oamMemory[] written directly, the escape hatch beside <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>: one cursor, its four OAM bytes set where the mouse moved it</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
@@ -213,8 +214,8 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Cursor sprite tile data (16x16, 4bpp) defined in data.asm. </p>
-<p>Cursor sprite palette (SNES BGR555 format) defined in data.asm</p>
+<p>Cursor sprite tile data (16x16, 4bpp) converted by the build from res/. </p>
+<p>Cursor sprite palette (SNES BGR555 format) converted by the build from res/</p>
 <p>Absolute cursor X position on screen.</p>
 <p>Accumulated from relative mouse X deltas each frame. The SNES mouse reports displacement, not position, so we must integrate the deltas ourselves and clamp to the visible screen range (0-255). </p>
 

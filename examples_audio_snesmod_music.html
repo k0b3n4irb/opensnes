@@ -130,7 +130,7 @@ Learning Objectives</h2>
 <li>Loading soundbanks and modules</li>
 <li>Music playback controls (play, stop, pause, fade)</li>
 <li>Volume control</li>
-<li>The smconv tool workflow</li>
+<li>How the build turns an <span class="tt">.it</span> file into a soundbank (<span class="tt">opensnes-music</span>)</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="prerequisites"></a>
 Prerequisites</h2>
@@ -192,7 +192,7 @@ SNESMOD Overview</h2>
 <div class="fragment"><div class="line">Impulse Tracker file (.it)</div>
 <div class="line">         |</div>
 <div class="line">         v</div>
-<div class="line">    [smconv tool]</div>
+<div class="line">    [opensnes-music bank]</div>
 <div class="line">         |</div>
 <div class="line">         v</div>
 <div class="line">soundbank.asm + soundbank.h</div>
@@ -241,7 +241,7 @@ Main Loop (CRITICAL!)</h3>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
-</div><!-- fragment --><p><b>Warning:</b> Failing to call <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> every frame causes audio glitches, buffer underruns, and potential crashes.</p>
+</div><!-- fragment --><p><b>Warning:</b> <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> is what sends the commands (play, stop, volume, sound effects) to the SPC700. Without it they wait in a queue of 85 and the newest are dropped once it is full; the music already playing goes on.</p>
 <h3 class="doxsection"><a class="anchor" id="playback-control"></a>
 Playback Control</h3>
 <div class="fragment"><div class="line"><a class="code hl_function" href="group__snesmod__module.html#ga8299a9a929e131b1c7c145fae1a1e2f1">snesmodPlay</a>(0);      <span class="comment">/* Play from start */</span></div>
@@ -276,28 +276,34 @@ Using OpenMPT (Recommended)</h3>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="build-process"></a>
 Build Process</h3>
-<p>The Makefile automatically:</p><ol type="1">
-<li>Runs <span class="tt">smconv</span> on your <span class="tt">.it</span> file</li>
-<li>Generates <span class="tt">soundbank.asm</span> and <span class="tt">soundbank.h</span></li>
+<p>When the Makefile sets <span class="tt">SOUNDBANK_SRC</span> (with <span class="tt">USE_SNESMOD := 1</span>), the build:</p><ol type="1">
+<li>Runs <span class="tt">opensnes-music bank</span> on your <span class="tt">.it</span> file(s)</li>
+<li>Writes <span class="tt">soundbank.bnk</span>, <span class="tt">soundbank.asm</span> and <span class="tt">soundbank.h</span></li>
 <li>Links the soundbank into the ROM</li>
 </ol>
 <div class="fragment"><div class="line">SOUNDBANK_SRC := music/mymusic.it</div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="generated-files"></a>
 Generated Files</h2>
-<p>After building with smconv:</p>
-<p><b>soundbank.h:</b> </p><div class="fragment"><div class="line"><span class="preprocessor">#define MOD_POLLEN8     0</span></div>
-<div class="line"><span class="preprocessor">#define SOUNDBANK_BANK  0x02   </span><span class="comment">/* ROM bank where soundbank lives */</span><span class="preprocessor"></span></div>
-</div><!-- fragment --><p><b>soundbank.asm:</b> </p><div class="fragment"><div class="line">.SECTION &quot;.soundbank&quot; SUPERFREE</div>
+<p>After a build:</p>
+<p><b>soundbank.h</b> (excerpt): </p><div class="fragment"><div class="line"><span class="preprocessor">#define MOD_POLLEN8                         0</span></div>
+<div class="line"><span class="preprocessor">#define MOD_POLLEN8_SIZE                    44137</span></div>
+<div class="line"><span class="preprocessor">#define SFX_SAW1                            0</span></div>
+<div class="line">...</div>
+<div class="line">#define SOUNDBANK_BANK 1</div>
+</div><!-- fragment --><p><b>soundbank.asm:</b> the bank is given to the soundbank alone, at its start: </p><div class="fragment"><div class="line">.BANK 1</div>
+<div class="line">.ORG 0</div>
+<div class="line">.SECTION &quot;SOUNDBANK&quot; FORCE ; need dedicated bank(s)</div>
+<div class="line"> </div>
 <div class="line">soundbank:</div>
-<div class="line">    .INCBIN &quot;soundbank.bnk&quot;</div>
+<div class="line">.incbin &quot;./soundbank.bnk&quot;</div>
 <div class="line">.ENDS</div>
 </div><!-- fragment --><hr  />
 <h2 class="doxsection"><a class="anchor" id="build--run"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/audio/snesmod_music</div>
-</div><!-- fragment --><p>Then open <span class="tt">music.sfc</span> in your emulator (Mesen2 recommended).</p>
+</div><!-- fragment --><p>Then run <span class="tt">music.sfc</span> in luna (<span class="tt">opensnes run</span>) or any SNES emulator.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="modules-used-5"></a>
 Modules Used</h2>
@@ -325,8 +331,9 @@ Files</h2>
 Memory Layout</h2>
 <h3 class="doxsection"><a class="anchor" id="rom"></a>
 ROM</h3>
-<div class="fragment"><div class="line">Bank 0-1:  Code, tiles, tilemaps</div>
-<div class="line">Bank 2+:   Soundbank data (smconv output)</div>
+<div class="fragment"><div class="line">Bank 0:    Code</div>
+<div class="line">Bank 1:    Soundbank data (its own bank, at its start; more banks if it is larger)</div>
+<div class="line">Others:    Tiles, tilemaps and other const data (the asset banks)</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="spc-ram"></a>
 SPC RAM</h3>
 <div class="fragment"><div class="line">$0000-$00FF: Driver variables</div>
@@ -361,14 +368,14 @@ Music sounds wrong</h3>
 <li>Check channel count (8 max)</li>
 <li>Verify sample rate (32kHz max)</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="build-fails-with-smconv-error"></a>
-Build fails with smconv error</h3>
+<h3 class="doxsection"><a class="anchor" id="build-fails-converting-the-module"></a>
+Build fails converting the module</h3>
 <ul>
 <li>Check <span class="tt">.it</span> file is valid Impulse Tracker format</li>
-<li>Verify smconv is built: <span class="tt">make -C $OPENSNES/bin smconv</span></li>
+<li><span class="tt">opensnes-music inspect music/song.it</span> says what the converter reads in it</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="audio-glitches"></a>
-Audio glitches</h3>
+<h3 class="doxsection"><a class="anchor" id="a-press-does-nothing-or-late"></a>
+A press does nothing, or late</h3>
 <ul>
 <li>Ensure <span class="tt"><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a></span> is called EVERY frame</li>
 <li>Check for infinite loops blocking the main loop</li>
@@ -384,19 +391,19 @@ Why Tracker-Based Music?</h3>
 <li>Volume, panning, effects per-channel</li>
 <li>No streaming required</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="smconv-options"></a>
-smconv Options</h3>
-<div class="fragment"><div class="line">smconv -s -o soundbank music/song.it</div>
+<h3 class="doxsection"><a class="anchor" id="converting-by-hand"></a>
+Converting by hand</h3>
+<div class="fragment"><div class="line">opensnes-music bank -o . --name soundbank music/song.it</div>
 </div><!-- fragment --><ul>
-<li><span class="tt">-s</span>: Generate assembly and header</li>
-<li><span class="tt">-o</span>: Output basename</li>
-<li>Input: Impulse Tracker file(s)</li>
+<li><span class="tt">--name</span>: base name of the files written</li>
+<li><span class="tt">-o</span>: output directory</li>
+<li><span class="tt">opensnes-music --help</span> lists the rest</li>
 </ul>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="whats-next-1"></a>
 What's Next?</h2>
-<p><b>Sound Effects:</b> <a href="../snesmod_sfx/">SNESMOD SFX</a> - Sound effect playback with pitch control</p>
-<p><b>Graphics:</b> <a href="../../sprites/simple_sprite/">Simple Sprite</a> - Display a sprite on screen</p>
+<p><b>Sound Effects:</b> <a href="examples_audio_snesmod_sfx.html">SNESMOD SFX</a> - Sound effect playback with pitch control</p>
+<p><b>Graphics:</b> <a href="examples_sprites_simple_sprite.html">Simple Sprite</a> - Display a sprite on screen</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="credits"></a>
 Credits</h2>
@@ -420,7 +427,7 @@ License</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_audio.html">Audio</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_audio.html">Audio</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

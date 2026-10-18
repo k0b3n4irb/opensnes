@@ -122,7 +122,7 @@ $(function(){initNavTree('troubleshooting.html','',''); });
   <div class="headertitle"><div class="title">Troubleshooting OpenSNES </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Common issues and their solutions.</p>
+<div class="textblock"><p>From a symptom to its cause. The SNES fails quietly, so many symptoms below lead to an entry of <a class="el" href="known_limitations.html" title="Known Limitations">Known Limitations</a>, the catalogue of silent failures: this page names the trap, that one explains it.</p>
 <h2 class="doxsection"><a class="anchor" id="build-issues"></a>
 Build Issues</h2>
 <h3 class="doxsection"><a class="anchor" id="opensnes-not-defined-or-no-rule-to-make-target-commonmk"></a>
@@ -160,17 +160,10 @@ Empty <span class="tt">compiler/</span> directories or "cc65816 not found"</h3>
 <div class="line"> </div>
 <div class="line"># Windows MSYS2 (UCRT64)</div>
 <div class="line">pacman -S mingw-w64-ucrt-x86_64-clang</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="build-fails-with-refusing-to-emit-silently-wrong-code-1"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="build-fails-with-refusing-to-emit-silently-wrong-code"></a>
 Build fails with "refusing to emit silently-wrong code"</h3>
-<p><b>Cause</b>: The code uses a C feature the 65816 backend does not lower. The message names it: struct assignment, a struct passed or returned by value, a variadic function, or inline assembly (<span class="tt">asm</span>).</p>
+<p><b>Cause</b>: The code uses a C feature the 65816 backend does not lower. The message names it: a struct passed or returned by value, a struct copied to or from a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> object, a variadic function, or inline assembly (<span class="tt">asm</span>). Plain struct assignment (<span class="tt"><a class="el" href="games_2breakout_2main_8c.html#ae1fba7bfd4f26a466097c410bef1473a">a</a> = <a class="el" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>;</span>) works.</p>
 <p><b>Fix</b>: pass a pointer to the struct, copy it field by field (or with a loop), give the function a fixed argument list, or move the assembly into a <span class="tt">.asm</span> file of the project. 32-bit arithmetic (<span class="tt"><a class="el" href="group__types.html#ga10e94b422ef0c20dcdec20d31a1f5049" title="32-bit unsigned integer (0 to 4294967295)">u32</a></span>, <span class="tt"><a class="el" href="group__types.html#ga0ce6887c26c1c49ad3be5710dd42bfd6" title="32-bit signed integer (-2147483648 to 2147483647)">s32</a></span>, <span class="tt">*</span>, <span class="tt">/</span>, <span class="tt">%</span>, shifts) is supported and tested — prefer <span class="tt"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054" title="16-bit unsigned integer (0 to 65535)">u16</a></span> for speed, not for correctness.</p>
-<h3 class="doxsection"><a class="anchor" id="static-variables-with-initializers"></a>
-Static variables with initializers</h3>
-<p>Initialized static variables now work correctly: </p><div class="fragment"><div class="line"><span class="comment">// Both work correctly:</span></div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> counter = 0;   <span class="comment">// Initial value copied from ROM to RAM at startup</span></div>
-<div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> counter;       <span class="comment">// Zero-initialized by C standard</span></div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><p>The <span class="tt">CopyInitData</span> routine in crt0.asm copies initial values from ROM to RAM before <span class="tt"><a class="el" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main()</a></span> is called.</p>
 <h2 class="doxsection"><a class="anchor" id="runtime-issues-black-screen--crash"></a>
 Runtime Issues (Black Screen / Crash)</h2>
 <h3 class="doxsection"><a class="anchor" id="rom-loads-but-screen-is-black"></a>
@@ -188,10 +181,16 @@ ROM loads but screen is black</h3>
 </div><!-- fragment --><p><b>3. Console not initialized</b> </p><div class="fragment"><div class="line"><span class="comment">// Always call consoleInit() first if using text/console functions</span></div>
 <div class="line"><a class="code hl_function" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a>();</div>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
-</div><!-- fragment --><p><b>4. Memory overlap (WRAM mirror bug)</b></p>
-<p>Bank $00 addresses $0000-$1FFF mirror Bank $7E addresses $7E:0000-$1FFF. If you have variables in both ranges, they'll overwrite each other.</p>
-<p><b>Diagnose</b>: </p><div class="fragment"><div class="line">python3 devtools/symmap/symmap.py --check-overlap game.sym</div>
-</div><!-- fragment --><p><b>Fix</b>: The library uses <span class="tt">ORGA $0300</span> to avoid the overlap zone.</p>
+</div><!-- fragment --><p><b>4. A DMA under <span class="tt">setBrightness(0)</span></b></p>
+<p><span class="tt">setBrightness(0)</span> darkens the picture but is not forced blank: the PPU still rejects VRAM writes. Upload under <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a></span>.</p>
+<p><b>5. C variables past the 8 KB RAM band</b></p>
+<p>Plain C variables must sit in <span class="tt">$0000-$1FFF</span>; a large buffer belongs in far RAM (<span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span>, see <a href="tutorial_far_ram.html">Far RAM</a>). The build checks it after every link and stops when the band overflows; <span class="tt">opensnes-rom check game.sfc</span> prints how much of it is left, and <span class="tt">opensnes-rom budget game.sfc</span> what uses it.</p>
+<h3 class="doxsection"><a class="anchor" id="a-big-buffer-behaves-strangely"></a>
+A big buffer behaves strangely</h3>
+<p>Same cause as above: a plain C global past <span class="tt">$2000</span> is wrong-banked. Declare bulk buffers <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> (<a class="el" href="tutorial_far_ram.html" title="Far RAM Tutorial — FAR objects beyond the 8 KB band">Far RAM Tutorial — FAR objects beyond the 8 KB band</a>; the RAM entry of <a class="el" href="known_limitations.html" title="Known Limitations">Known Limitations</a>).</p>
+<h3 class="doxsection"><a class="anchor" id="a-const-array-reads-garbage"></a>
+A <span class="tt">const</span> array reads garbage</h3>
+<p>The <span class="tt">const</span> was cast away and the data read through a plain pointer. C const data lives in the asset banks and every C read of it is a far read; a plain pointer reads bank $00 instead. Keep the <span class="tt">const</span>, or hand the data to a library function that takes a far pointer. The build's bank-blind read check fails the link on this pattern; the bank $00 entry of <a class="el" href="known_limitations.html" title="Known Limitations">Known Limitations</a> has the details.</p>
 <h3 class="doxsection"><a class="anchor" id="rom-runs-but-crashes-after-a-few-seconds"></a>
 ROM runs but crashes after a few seconds</h3>
 <p><b>Causes</b>:</p><ol type="1">
@@ -200,7 +199,7 @@ ROM runs but crashes after a few seconds</h3>
 <li><b>Uninitialized pointers</b> - C doesn't zero local variables</li>
 </ol>
 <p><b>Debug</b>:</p><ol type="1">
-<li>Use luna to see where it crashes (<span class="tt">run_until_pc</span> / <span class="tt">state</span> over MCP — see the <a class="el" href="debugging_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/debugging.md">debugging tutorial</a>)</li>
+<li>Use luna to see where it crashes (<span class="tt">run_until_pc</span> / <span class="tt">state</span> over MCP — see the <a href="tutorial_debugging.html">debugging tutorial</a>)</li>
 <li>Check the call stack depth</li>
 <li>Look for NULL pointer dereferences</li>
 </ol>
@@ -223,14 +222,23 @@ Sprites don't appear</h3>
 <div class="line"><span class="comment">// 5. Update OAM (done in VBlank by the library)</span></div>
 <div class="line"><span class="comment">// The NMI handler uploads the OAM shadow when a sprite call changed it</span></div>
 <div class="line"><span class="comment">// (oam_update_flag); a direct write into oamMemory[] is not seen</span></div>
-<div class="ttc" id="abasics_2aim__target_2main_8c_html_ad00b9a7770bb3ca84c9ff3c5504255e1"><div class="ttname"><a href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a></div><div class="ttdeci">static const u8 sprite_pal[]</div><div class="ttdoc">Sprite palette — single palette shared by player and target.</div><div class="ttdef"><b>Definition</b> main.c:124</div></div>
+<div class="ttc" id="abasics_2aim__target_2main_8c_html_ad00b9a7770bb3ca84c9ff3c5504255e1"><div class="ttname"><a href="basics_2aim__target_2main_8c.html#ad00b9a7770bb3ca84c9ff3c5504255e1">sprite_pal</a></div><div class="ttdeci">static const u8 sprite_pal[]</div><div class="ttdoc">Sprite palette — single palette shared by player and target.</div><div class="ttdef"><b>Definition</b> main.c:121</div></div>
 <div class="ttc" id="asprite_8h_html_a0ab1cfd8e05842654a0e146b83d62664"><div class="ttname"><a href="sprite_8h.html#a0ab1cfd8e05842654a0e146b83d62664">oamInit</a></div><div class="ttdeci">void oamInit(u16 size, u16 name_base)</div><div class="ttdoc">Initialize the sprite (OAM) system.</div></div>
 <div class="ttc" id="asprite_8h_html_a209aae598e419d8117a9e2813dabc667"><div class="ttname"><a href="sprite_8h.html#a209aae598e419d8117a9e2813dabc667">OAM_DEFAULT_SIZE</a></div><div class="ttdeci">#define OAM_DEFAULT_SIZE</div><div class="ttdoc">Default sprite size mode — small=8×8 / large=16×16.</div><div class="ttdef"><b>Definition</b> sprite.h:211</div></div>
 <div class="ttc" id="asprite_8h_html_a2ae2a968b390cd097d6362def10c0e11"><div class="ttname"><a href="sprite_8h.html#a2ae2a968b390cd097d6362def10c0e11">OAM_DEFAULT_TILE_BASE</a></div><div class="ttdeci">#define OAM_DEFAULT_TILE_BASE</div><div class="ttdoc">Default sprite tile base — 0 = tiles at VRAM word $0000.</div><div class="ttdef"><b>Definition</b> sprite.h:213</div></div>
 <div class="ttc" id="asprite_8h_html_a697c4b66632525f55f21fb6008582b3f"><div class="ttname"><a href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f">oamSet</a></div><div class="ttdeci">void oamSet(u16 id, u16 x, u16 y, u16 tile, u16 palette, u16 priority, u16 flags)</div><div class="ttdoc">Set sprite properties.</div></div>
 <div class="ttc" id="asprite_8h_html_aa91348e1375ed07236694a7d81fa9ecf"><div class="ttname"><a href="sprite_8h.html#aa91348e1375ed07236694a7d81fa9ecf">OBJ_SIZE8_L16</a></div><div class="ttdeci">#define OBJ_SIZE8_L16</div><div class="ttdoc">Sprite size indices (for oamInit, oamInitGfxSet).</div><div class="ttdef"><b>Definition</b> sprite.h:52</div></div>
 <div class="ttc" id="asprite_8h_html_aadaab0bfc2df6de17aee9515212c290c"><div class="ttname"><a href="sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c">oamInitGfxSet</a></div><div class="ttdeci">void oamInitGfxSet(const u8 *tileSource, u16 tileSize, const u8 *tilePalette, u16 paletteSize, u8 paletteEntry, u16 vramAddr, u8 oamSize)</div><div class="ttdoc">Initialize sprite graphics and palette (PVSnesLib compatible).</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="controller-input-not-working"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="a-sprite-renders-as-background-garbage"></a>
+A sprite renders as background garbage</h3>
+<p><span class="tt"><a class="el" href="sprite_8h.html#a0ab1cfd8e05842654a0e146b83d62664" title="Initialize the sprite (OAM) system.">oamInit</a></span>'s second argument is a name-base page number (0-7), not a VRAM address. Pass <span class="tt"><a class="el" href="sprite_8h.html#a3ffc1c6494c1ac6cfec29f637278758f" title="Convert a VRAM word address into an OBJ name base (0-7).">OBJ_NAME_BASE(addr)</a></span> rather than the address.</p>
+<h3 class="doxsection"><a class="anchor" id="a-sprite-appears-where-no-entity-is"></a>
+A sprite appears where no entity is</h3>
+<p>Off-camera OAM coordinates wrap around the screen. Hide a sprite that left the view with <span class="tt"><a class="el" href="sprite_8h.html#ab3ca644deefaf56572cb0cb18e533279" title="Park a sprite off screen.">oamHide()</a></span>; <span class="tt"><a class="el" href="sprite_8h.html#abd8864858828dc6c2646b15d59420b5a" title="Place a batch of world-space sprites: camera, culling, OAM, in one call.">oamPlaceWorld()</a></span> culls for you (<a class="el" href="tutorial_sprites.html" title="Sprites &amp; Animation Tutorial">Sprites &amp; Animation Tutorial</a>).</p>
+<h3 class="doxsection"><a class="anchor" id="sprites-have-the-wrong-colours"></a>
+Sprites have the wrong colours</h3>
+<p>Sprite palettes start at CGRAM entry 128, not 0: palette 0 of the sprites is entries 128-143. A palette loaded at 0 colours the backgrounds instead.</p>
+<h3 class="doxsection"><a class="anchor" id="controller-input-not-working"></a>
 Controller input not working</h3>
 <p><b>Checklist</b>: </p><div class="fragment"><div class="line"><span class="comment">// Input is read automatically by the NMI handler every VBlank.</span></div>
 <div class="line"><span class="comment">// Just call the query functions after WaitForVBlank:</span></div>
@@ -273,17 +281,25 @@ Audio not playing</h3>
 <div class="ttc" id="agroup__snesmod__process_html_ga2417eea32f0b78cdf861508795c213a7"><div class="ttname"><a href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7">snesmodProcess</a></div><div class="ttdeci">void snesmodProcess(void)</div><div class="ttdoc">Process audio commands.</div></div>
 </div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="graphics-issues"></a>
 Graphics Issues</h2>
-<h3 class="doxsection"><a class="anchor" id="wrong-colors--garbled-palette"></a>
-Wrong colors / garbled palette</h3>
+<h3 class="doxsection"><a class="anchor" id="wrong-colours--garbled-palette"></a>
+Wrong colours / garbled palette</h3>
 <p><b>Cause</b>: BGR555 format mismatch.</p>
-<p>SNES uses BGR555 (5 bits blue, 5 green, 5 red), not RGB. Use gfx4snes to convert PNGs correctly: </p><div class="fragment"><div class="line">gfx4snes -i sprite.png -o sprite</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="tiles-appear-corrupted"></a>
-Tiles appear corrupted</h3>
+<p>SNES uses BGR555 (5 bits blue, 5 green, 5 red), not RGB. Let the converter write the palette from an indexed PNG: </p><div class="fragment"><div class="line">opensnes-sprite sheet res/sprite.png --size 16 --colors 16    # sprites</div>
+<div class="line">opensnes-tileset convert res/bg.png --colors 16               # backgrounds</div>
+</div><!-- fragment --><p> (or the same settings in <span class="tt">res/sprite.png.toml</span>, which the build runs for you).</p>
+<h3 class="doxsection"><a class="anchor" id="colours-shift-when-you-add-a-tile"></a>
+Colours shift when you add a tile</h3>
+<p>The converter derives the whole palette again from the new art. Author a fixed palette and impose it: <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a> = "fixed.pal"</span> in the asset's settings file (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>).</p>
+<h3 class="doxsection"><a class="anchor" id="tiles-appear-corrupted-or-an-upload-only-partly-lands"></a>
+Tiles appear corrupted, or an upload only partly lands</h3>
 <p><b>Causes</b>:</p><ol type="1">
+<li>VRAM written during the picture: the PPU drops it without an error. Upload in VBlank or under <span class="tt"><a class="el" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512" title="Disable screen display (blank).">setScreenOff()</a></span></li>
+<li>Over the ~4 KB of DMA a VBlank holds: split the upload across frames or do it under forced blank</li>
 <li>Wrong tile format (2bpp vs 4bpp vs 8bpp)</li>
 <li>VRAM address overlap</li>
 <li>DMA transfer size mismatch</li>
 </ol>
+<p>The first two are the first two entries of <a class="el" href="known_limitations.html" title="Known Limitations">Known Limitations</a>.</p>
 <p><b>Check your graphics mode</b>: </p><div class="fragment"><div class="line"><span class="comment">// Mode 1: BG1/BG2 are 4bpp, BG3 is 2bpp</span></div>
 <div class="line"><a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a>, 0);</div>
 <div class="line"> </div>
@@ -292,18 +308,21 @@ Tiles appear corrupted</h3>
 <div class="ttc" id="abackground_8h_html_aa5997825b35bb8c02b746ae83ca86e39"><div class="ttname"><a href="background_8h.html#aa5997825b35bb8c02b746ae83ca86e39">bgInitTileSet</a></div><div class="ttdeci">void bgInitTileSet(u8 bgNumber, const u8 *tileSource, const u8 *tilePalette, u8 paletteEntry, u16 tileSize, u16 paletteSize, u16 colorMode, u16 vramAddr)</div><div class="ttdoc">Initialize tileset with tiles and palette.</div></div>
 <div class="ttc" id="agroup__bg__modes_html_ga05c862edb7f8f75036f10c04dcc3c2a6"><div class="ttname"><a href="group__bg__modes.html#ga05c862edb7f8f75036f10c04dcc3c2a6">BG_MODE1</a></div><div class="ttdeci">#define BG_MODE1</div><div class="ttdef"><b>Definition</b> video.h:35</div></div>
 <div class="ttc" id="avideo_8h_html_ad89d023577743a32d3407027e535b0ff"><div class="ttname"><a href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a></div><div class="ttdeci">void setMode(u8 mode, u8 flags)</div><div class="ttdoc">Set background mode.</div></div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="scrolling-is-jerky"></a>
-Scrolling is jerky</h3>
-<p><b>Cause</b>: Updating scroll registers outside VBlank.</p>
-<p><b>Fix</b>: </p><div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
-<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
-<div class="line">    <span class="comment">// Update scroll AFTER VBlank starts</span></div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="scrolling-is-jerky-or-tears"></a>
+Scrolling is jerky or tears</h3>
+<p><b>Cause</b>: Writing <span class="tt">BGnHOFS</span> / <span class="tt">BGnVOFS</span> directly during the frame: the top of the picture uses the old value, the bottom the new one.</p>
+<p><b>Fix</b>: use <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span>. It only records the position, and the NMI handler writes it during VBlank. Set it before <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span>, with the rest of the frame's logic, so it is shown on the next frame:</p>
+<div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
+<div class="line">    scrollX += 1;                       <span class="comment">// game logic</span></div>
 <div class="line">    <a class="code hl_function" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a>(0, scrollX, scrollY);</div>
-<div class="line"> </div>
-<div class="line">    <span class="comment">// Game logic</span></div>
+<div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();                    <span class="comment">// the NMI commits the scroll</span></div>
 <div class="line">}</div>
 <div class="ttc" id="abackground_8h_html_a9bf45b3dbc30dec36aeb592b58b120f4"><div class="ttname"><a href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4">bgSetScroll</a></div><div class="ttdeci">void bgSetScroll(u8 bg, u16 x, u16 y)</div><div class="ttdoc">Set background scroll position.</div></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="memory-issues"></a>
+</div><!-- fragment --><p>See <a href="tutorial_scrolling.html">Scrolling</a> for per-line scroll (HDMA parallax).</p>
+<h3 class="doxsection"><a class="anchor" id="everything-is-one-line-off-vertically"></a>
+Everything is one line off vertically</h3>
+<p>The library already subtracts the 1 that the PPU's missing scanline 0 requires (<span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span>, the map module, <span class="tt"><a class="el" href="mode7_8h.html#a43ff7fa2834e9151b5c1d1bc3837c310" title="Set Mode 7 scroll position.">mode7SetScroll</a></span>). Pass the row you want; keep your own -1 only in data that reaches the register without the library, such as an HDMA table on <span class="tt">BGnVOFS</span>. A PVSnesLib port that passed <span class="tt">y - 1</span> itself ends up one line off. The vertical scroll entry of <a class="el" href="known_limitations.html" title="Known Limitations">Known Limitations</a> has the details.</p>
+<h2 class="doxsection"><a class="anchor" id="memory-issues"></a>
 Memory Issues</h2>
 <h3 class="doxsection"><a class="anchor" id="rom-too-large-or-linker-errors-about-size"></a>
 "ROM too large" or linker errors about size</h3>
@@ -326,8 +345,12 @@ Variables have wrong values</h3>
 Getting More Help</h2>
 <h3 class="doxsection"><a class="anchor" id="diagnostic-commands"></a>
 Diagnostic Commands</h3>
-<div class="fragment"><div class="line"># Check for memory overlaps</div>
-<div class="line">python3 devtools/symmap/symmap.py --check-overlap game.sym</div>
+<div class="fragment"><div class="line"># The post-link checks: bank $00, the RAM bands, bank-blind reads</div>
+<div class="line"># (on game.sym when the build refused the ROM: a refused .sfc is deleted)</div>
+<div class="line">opensnes-rom check game.sfc</div>
+<div class="line"> </div>
+<div class="line"># What the game uses of ROM, RAM, VRAM and CGRAM</div>
+<div class="line">opensnes-rom budget game.sfc</div>
 <div class="line"> </div>
 <div class="line"># View symbol map</div>
 <div class="line">cat game.sym | grep &quot;variable_name&quot;</div>
@@ -339,7 +362,7 @@ Diagnostic Commands</h3>
 <div class="line">ls -la game.sfc</div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="interactive-debugging-with-luna"></a>
 Interactive debugging with luna</h3>
-<p>See the <a class="el" href="debugging_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/debugging.md">debugging tutorial</a> for the full workflows (who-writes-this-variable, break-at-function, OAM shadow-vs-hardware, poke and observe). A third-party GUI debugger also works:</p>
+<p>See the <a href="tutorial_debugging.html">debugging tutorial</a> for the full workflows (who-writes-this-variable, break-at-function, OAM shadow-vs-hardware, poke and observe). A third-party GUI debugger also works:</p>
 <h3 class="doxsection"><a class="anchor" id="using-mesen-debugger-alternative"></a>
 Using Mesen Debugger (alternative)</h3>
 <ol type="1">
@@ -371,7 +394,7 @@ Reporting Bugs</h3>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

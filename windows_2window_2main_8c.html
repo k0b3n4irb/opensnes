@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/windows/window/main.c File Reference</title>
+<title>examples/windows/window/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -148,7 +148,7 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:ae8ca7c4d0b07e2c52fa9fd77df638833" id="r_ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae8ca7c4d0b07e2c52fa9fd77df638833">tablelefttriangle</a> []</td></tr>
-<tr class="memdesc:ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for background layer 1 (defined in data.asm)  <br /></td></tr>
+<tr class="memdesc:ae8ca7c4d0b07e2c52fa9fd77df638833"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp tile data for background layer 1 (converted by the build from res/)  <br /></td></tr>
 <tr class="memitem:a05283269f5b57e738841b4cfe551530c" id="r_a05283269f5b57e738841b4cfe551530c"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a05283269f5b57e738841b4cfe551530c">tablerighttriangle</a> []</td></tr>
 <tr class="memdesc:a05283269f5b57e738841b4cfe551530c"><td class="mdescLeft">&#160;</td><td class="mdescRight">HDMA table for the right window boundary (WH1, $2127).  <br /></td></tr>
 </table>
@@ -274,7 +274,7 @@ Variables</h2></td></tr>
 <p>Configure HDMA-driven window masking on the specified BG layers. </p>
 <p>Sets up the SNES window hardware and HDMA channels to clip the specified background layers using the triangle-shaped boundary tables, with the same register values as PVSnesLib's setModeHdmaWindow().</p>
 <p>The window "inverts" masking (via the invert bits in W12SEL), so pixels OUTSIDE the triangle shape are clipped to black, while pixels inside remain visible. This is the opposite of the default behavior (which masks inside).</p>
-<p>HDMA channels 4 and 5 are used (not 7, which the NMI handler reserves for OAM DMA). HDMA is disabled before reconfiguration and re-enabled after to avoid partial-table reads during the transition.</p>
+<p>HDMA channels 4 and 5 are used (not 7, which carries every DMA of the NMI handler). HDMA is disabled before reconfiguration and re-enabled after to avoid partial-table reads during the transition.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">layers</td><td>Bitmask of BG layers for TMW (e.g., TM_BG1 | TM_BG2) </td></tr>
@@ -311,10 +311,10 @@ Variables</h2></td></tr>
 <div class="line">    0xFF, 0             </div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p>4bpp tile data for background layer 1 (defined in data.asm) </p>
+<p>4bpp tile data for background layer 1 (converted by the build from res/) </p>
 <p>Tilemap data for BG1 (32x32 grid)</p>
 <p>16-color palette for BG1</p>
-<p>4bpp tile data for background layer 2 (defined in data.asm)</p>
+<p>4bpp tile data for background layer 2 (converted by the build from res/)</p>
 <p>Tilemap data for BG2 (32x32 grid)</p>
 <p>16-color palette for BG2 (loaded to CGRAM palette slot 1)</p>
 <p>HDMA table for the left window boundary (WH0, $2126).</p>

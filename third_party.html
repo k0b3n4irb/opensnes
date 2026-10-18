@@ -122,13 +122,13 @@ $(function(){initNavTree('third_party.html','',''); });
   <div class="headertitle"><div class="title">Third-Party Components </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>This document lists third-party tools and libraries included in OpenSNES, along with their original authors and licenses.</p>
+<div class="textblock"><p>This page describes the main third-party components OpenSNES builds on, with their authors and licences. <span class="tt">ATTRIBUTION.md</span> is the complete list (the image and map libraries of the tools — LodePNG, stb_image, cute_tiled — and modlib among them).</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="gfx4snes"></a>
 gfx4snes</h2>
 <p><b>Description</b>: SNES graphics converter for tiles, sprites, metasprites, and tilemaps.</p>
 <p><b>Original Author</b>: Alekmaul (<a href="https://github.com/alekmaul">https://github.com/alekmaul</a>)</p>
-<p><b>Source</b>: <a href="https://github.com/alekmaul/pvsneslib">PVSnesLib</a> - <span class="tt">tools/gfx4snes/</span></p>
+<p><b>Source</b>: <a href="https://github.com/alekmaul/pvsneslib">PVSnesLib</a> - <span class="tt">tools/lib/gfx4snes/</span></p>
 <p><b>Version</b>: 2.0.0 (develop branch, 2025-01-25)</p>
 <p><b>License</b>: MIT License</p>
 <div class="fragment"><div class="line">MIT License</div>
@@ -152,17 +152,25 @@ gfx4snes</h2>
 <div class="line">LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</div>
 <div class="line">OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</div>
 <div class="line">SOFTWARE.</div>
-</div><!-- fragment --><p><b>Notes</b>:</p><ul>
-<li>Use the <span class="tt">-T -X -Y</span> flags for metasprite generation</li>
+</div><!-- fragment --><p><b>Embedded in</b>: <span class="tt">opensnes-tileset</span> and <span class="tt">opensnes-sprite</span>, which link its converter sources (<span class="tt">tools/lib/gfx4snes/src/</span>: images, palettes, tiles, maps, metasprites, lz77, loadbmp) as a library; their <span class="tt">.pic</span>, <span class="tt">.map</span>, <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> and <span class="tt">_meta.inc</span> are byte for byte gfx4snes's. The standalone <span class="tt">gfx4snes</span> is legacy (<a class="el" href="tools_legacy.html" title="Legacy tools">Legacy tools</a>).</p>
+<p><b>Notes</b>:</p><ul>
 <li>Critical bug fixes are in the develop branch (main branch has tile index issues)</li>
 </ul>
+<hr  />
+<h2 class="doxsection"><a class="anchor" id="snesmod-driver"></a>
+SNESMOD driver</h2>
+<p><b>Description</b>: the SPC700 driver that plays tracker music and sound effects (<span class="tt">USE_SNESMOD</span>), uploaded by <span class="tt"><a class="el" href="group__snesmod__init.html#ga5bc715831ba28701398dceb9484a069c" title="Initialize SNESMOD audio engine.">snesmodInit()</a></span>.</p>
+<p><b>Original Author</b>: Mukunda Johnson (<a href="https://github.com/mukunda-/snesmod">https://github.com/mukunda-/snesmod</a>), with bugfixes by KungFuFurby</p>
+<p><b>Source</b>: <span class="tt">lib/source/sm_spc.spc700.asm</span>, built by <span class="tt">wla-spc700</span> at every library build: the driver's source in the WLA-DX syntax <a href="https://github.com/alekmaul/pvsneslib">PVSnesLib</a> converted it to (<span class="tt">pvsneslib/snesmod/sm_spc_wla.asm</span>), with one OpenSNES fix (the voices' key-off in <span class="tt">ResetSound</span>).</p>
+<p><b>License</b>: MIT License (the notice is in the source file)</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="smconv"></a>
 smconv</h2>
 <p><b>Description</b>: SNES audio converter for SNESMOD tracker music format.</p>
-<p><b>Original Author</b>: Alekmaul (<a href="https://github.com/alekmaul">https://github.com/alekmaul</a>)</p>
-<p><b>Source</b>: <a href="https://github.com/alekmaul/pvsneslib">PVSnesLib</a> - <span class="tt">tools/smconv/</span></p>
+<p><b>Original Author</b>: Mukunda Johnson (SNESMOD), adapted by Alekmaul for PVSnesLib (<a href="https://github.com/alekmaul">https://github.com/alekmaul</a>)</p>
+<p><b>Source</b>: <a href="https://github.com/alekmaul/pvsneslib">PVSnesLib</a> - <span class="tt">tools/lib/smconv/</span></p>
 <p><b>License</b>: MIT License (same as above)</p>
+<p><b>Embedded in</b>: <span class="tt">opensnes-music</span>, which links the converter sources of <span class="tt">tools/lib/smconv/src/</span> (IT loader, IT-to-SPC conversion, BRR encoder, report), and <span class="tt">opensnes-sample</span>, which links its BRR encoder (<span class="tt">brr.c</span>). The build converts <span class="tt">SOUNDBANK_SRC</span> with <span class="tt">opensnes-music</span>.</p>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="wla-dx"></a>
 WLA-DX</h2>
@@ -198,7 +206,7 @@ QBE (w65816 backend)</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

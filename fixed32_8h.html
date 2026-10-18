@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/fixed32.h File Reference</title>
+<title>lib/include/snes/fixed32.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -293,7 +293,7 @@ Sign convention</h2>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(((<a class="code hl_typedef" href="#a886e7dff0120e084cbc483cd438ba56a">fixed32</a>)(<a class="code hl_typedef" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>)(<a class="code hl_variable" href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a>) &lt;&lt; 16) | (<a class="code hl_typedef" href="#a886e7dff0120e084cbc483cd438ba56a">fixed32</a>)(<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(f))</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:155</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
 <div class="ttc" id="agroup__types_html_ga5ffa4f640862b25ba6d4f635b78bdbe1"><div class="ttname"><a href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a></div><div class="ttdeci">signed short s16</div><div class="ttdoc">16-bit signed integer (-32768 to 32767)</div><div class="ttdef"><b>Definition</b> types.h:50</div></div>
 </div><!-- fragment -->
 <p>Build a <a class="el" href="#a886e7dff0120e084cbc483cd438ba56a" title="16.16 signed fixed-point type">fixed32</a> from integer + fractional parts. </p>
@@ -660,7 +660,7 @@ Sign convention</h2>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>sin(angle) in 16.16, range [FIX32(-1), <a class="el" href="#a57f95a127af818ef04a0248e76c08570" title="Convert integer to fixed32 (shift left 16).">FIX32(1)</a>]</dd></dl>
-<p>Lifted from the existing 8.8 <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> LUT by shifting left 8 bits to fill the upper half of the 16-bit fractional field. The lower 8 bits are always zero (no precision gained beyond what the 8.8 LUT provides). Cost: one LUT lookup, a sign-extend and a shift (the measured figure is in <a class="el" href="PERF_8md.html">docs/PERF.md</a>; "about 30 cycles" stood here until 2026-10-04).</p>
+<p>Lifted from the existing 8.8 <span class="tt"><a class="el" href="math_8h.html#abc155bebfc5f7c5240e9c2a3d9f5835c" title="Get sine value for angle.">fixSin</a></span> LUT by shifting left 8 bits to fill the upper half of the 16-bit fractional field. The lower 8 bits are always zero (no precision gained beyond what the 8.8 LUT provides). Cost: one LUT lookup, a sign-extend and a shift (the measured figure is in <a class="el" href="perf.html">docs/PERF.md</a>; "about 30 cycles" stood here until 2026-10-04).</p>
 <p>Precision: each LUT step is 1/256 ≈ 0.0039, so for fine animation (sub-pixel motion over many frames) this is adequate. For high- precision physics that compound thousands of operations, the 8-bit-fractional limit may show as drift; a future chantier could add a 16-bit LUT for a 256× precision improvement at 512 bytes ROM.</p>
 <div class="fragment"><div class="line"><a class="code hl_typedef" href="#a886e7dff0120e084cbc483cd438ba56a">fixed32</a> dx = <a class="code hl_function" href="#a50cdc9c5bb142d23688bb7dbbd40f673">fix32Mul</a>(speed, <a class="code hl_function" href="#ae768d89e719729bb2c993cef7d07bda3">fix32Sin</a>(<a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a>));</div>
 </div><!-- fragment --> <dl class="section warning"><dt>Warning</dt><dd>NOT safe inside an <a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet()</a> callback: both write the result scratch of <a class="el" href="#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul()</a> (<span class="tt">f32_res_lo/hi</span>), so a call from the NMI corrupts a main-thread <a class="el" href="#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul()</a> / <a class="el" href="#a95491946dfb53ae88bcca37c07350848" title="16.16 fixed-point divide">fix32Div()</a> in flight — the warning on <a class="el" href="#a50cdc9c5bb142d23688bb7dbbd40f673" title="16.16 fixed-point multiply">fix32Mul()</a> applies to them (library audit, 2026-10-04). </dd></dl>

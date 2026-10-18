@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/vramqueue.h File Reference</title>
+<title>lib/include/snes/vramqueue.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -133,10 +133,14 @@ $(function(){initNavTree('vramqueue_8h.html','',''); });
 Macros</h2></td></tr>
 <tr class="memitem:a6149a4889c141db3a6546557bd1142ec" id="r_a6149a4889c141db3a6546557bd1142ec"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6149a4889c141db3a6546557bd1142ec">VRAM_QUEUE_COLUMN</a>&#160;&#160;&#160;0x81</td></tr>
 <tr class="memdesc:a6149a4889c141db3a6546557bd1142ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Step after each word: 32 words on (a column of a 32-wide tilemap).  <br /></td></tr>
+<tr class="memitem:a4e5eea7ec2d0965a705d36ae61d30fa5" id="r_a4e5eea7ec2d0965a705d36ae61d30fa5"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a4e5eea7ec2d0965a705d36ae61d30fa5">VRAM_QUEUE_ENTRY_COST</a>&#160;&#160;&#160;96</td></tr>
+<tr class="memdesc:a4e5eea7ec2d0965a705d36ae61d30fa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">What one entry costs the flush beyond its bytes, in bytes.  <br /></td></tr>
 <tr class="memitem:a1bce8318ea743a7fe71ff9a01f4d0f88" id="r_a1bce8318ea743a7fe71ff9a01f4d0f88"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a1bce8318ea743a7fe71ff9a01f4d0f88">VRAM_QUEUE_MAX</a>&#160;&#160;&#160;32</td></tr>
 <tr class="memdesc:a1bce8318ea743a7fe71ff9a01f4d0f88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transfers the queue holds.  <br /></td></tr>
 <tr class="memitem:a31a3e5ed50414936dd498d0727c3611d" id="r_a31a3e5ed50414936dd498d0727c3611d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a31a3e5ed50414936dd498d0727c3611d">VRAM_QUEUE_ROW</a>&#160;&#160;&#160;0x80</td></tr>
 <tr class="memdesc:a31a3e5ed50414936dd498d0727c3611d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Step after each word: the next VRAM word (a row, tiles).  <br /></td></tr>
+<tr class="memitem:ab06208e0076eda7a2e051fb87acd218d" id="r_ab06208e0076eda7a2e051fb87acd218d"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab06208e0076eda7a2e051fb87acd218d">vramQueueCost</a>()</td></tr>
+<tr class="memdesc:ab06208e0076eda7a2e051fb87acd218d"><td class="mdescLeft">&#160;</td><td class="mdescRight">VBlank cost of what is queued, in bytes: each entry's size plus VRAM_QUEUE_ENTRY_COST.  <br /></td></tr>
 <tr class="memitem:a94704dd016478729ab4e5463343fd32c" id="r_a94704dd016478729ab4e5463343fd32c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a94704dd016478729ab4e5463343fd32c">vramQueueFree</a>()</td></tr>
 <tr class="memdesc:a94704dd016478729ab4e5463343fd32c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entries still free.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -153,6 +157,7 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a2a5ee7ba048d1b5463825d1aa75f723e" id="r_a2a5ee7ba048d1b5463825d1aa75f723e"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a2a5ee7ba048d1b5463825d1aa75f723e">vram_queue_addr</a> [32]</td></tr>
 <tr class="memitem:a315d78677e4433a2634b66a078ccd5c5" id="r_a315d78677e4433a2634b66a078ccd5c5"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a315d78677e4433a2634b66a078ccd5c5">vram_queue_bank</a> [32]</td></tr>
+<tr class="memitem:aa60c70a83627b2e80a32d3bc7ee6656d" id="r_aa60c70a83627b2e80a32d3bc7ee6656d"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aa60c70a83627b2e80a32d3bc7ee6656d">vram_queue_cost</a></td></tr>
 <tr class="memitem:a70aaa84c6d6707ffcf45ba53bd9768de" id="r_a70aaa84c6d6707ffcf45ba53bd9768de"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a70aaa84c6d6707ffcf45ba53bd9768de">vram_queue_count</a></td></tr>
 <tr class="memitem:add4b248595d18586fbc43babee9f7416" id="r_add4b248595d18586fbc43babee9f7416"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#add4b248595d18586fbc43babee9f7416">vram_queue_size</a> [32]</td></tr>
 <tr class="memitem:a25d849788160a7c4c9dad7aa016c3520" id="r_a25d849788160a7c4c9dad7aa016c3520"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a25d849788160a7c4c9dad7aa016c3520">vram_queue_src</a> [32]</td></tr>
@@ -174,12 +179,12 @@ Variables</h2></td></tr>
 <div class="line"><a class="code hl_function" href="#afbd23358a6f4ed779b6b4361ab054234">vramQueueFlush</a>();                    <span class="comment">// first thing in VBlank</span></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="avramqueue_8h_html"><div class="ttname"><a href="vramqueue_8h.html">vramqueue.h</a></div><div class="ttdoc">A queue of VRAM uploads, filled during the frame and sent in VBlank.</div></div>
-<div class="ttc" id="avramqueue_8h_html_a31a3e5ed50414936dd498d0727c3611d"><div class="ttname"><a href="#a31a3e5ed50414936dd498d0727c3611d">VRAM_QUEUE_ROW</a></div><div class="ttdeci">#define VRAM_QUEUE_ROW</div><div class="ttdoc">Step after each word: the next VRAM word (a row, tiles).</div><div class="ttdef"><b>Definition</b> vramqueue.h:50</div></div>
-<div class="ttc" id="avramqueue_8h_html_a94704dd016478729ab4e5463343fd32c"><div class="ttname"><a href="#a94704dd016478729ab4e5463343fd32c">vramQueueFree</a></div><div class="ttdeci">#define vramQueueFree()</div><div class="ttdoc">Entries still free.</div><div class="ttdef"><b>Definition</b> vramqueue.h:63</div></div>
+<div class="ttc" id="avramqueue_8h_html_a31a3e5ed50414936dd498d0727c3611d"><div class="ttname"><a href="#a31a3e5ed50414936dd498d0727c3611d">VRAM_QUEUE_ROW</a></div><div class="ttdeci">#define VRAM_QUEUE_ROW</div><div class="ttdoc">Step after each word: the next VRAM word (a row, tiles).</div><div class="ttdef"><b>Definition</b> vramqueue.h:51</div></div>
+<div class="ttc" id="avramqueue_8h_html_a94704dd016478729ab4e5463343fd32c"><div class="ttname"><a href="#a94704dd016478729ab4e5463343fd32c">vramQueueFree</a></div><div class="ttdeci">#define vramQueueFree()</div><div class="ttdoc">Entries still free.</div><div class="ttdef"><b>Definition</b> vramqueue.h:65</div></div>
 <div class="ttc" id="avramqueue_8h_html_ade39bb80a8d7cf72a11075c930410086"><div class="ttname"><a href="#ade39bb80a8d7cf72a11075c930410086">vramQueuePush</a></div><div class="ttdeci">u16 vramQueuePush(const u8 *src, u16 addr, u16 size, u16 step)</div><div class="ttdoc">Note one transfer for the next vramQueueFlush().</div></div>
 <div class="ttc" id="avramqueue_8h_html_afbd23358a6f4ed779b6b4361ab054234"><div class="ttname"><a href="#afbd23358a6f4ed779b6b4361ab054234">vramQueueFlush</a></div><div class="ttdeci">void vramQueueFlush(void)</div><div class="ttdoc">Send every queued transfer to VRAM and empty the queue.</div></div>
 </div><!-- fragment --><p><b>What it buys is VBlank time, not time.</b> Noting an entry is a call too, so in total the queue costs more than the <a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram()</a> calls it replaces: six 128-byte transfers measure 21,700 master cycles queued against 16,600 called directly. But only 10,700 of the 21,700 fall in the VBlank — 8 per byte plus about 770 per entry — where the six calls put all 16,600 (<span class="tt">devtools/libbench</span>, rows <span class="tt">vramc</span> and <span class="tt">vramq</span>).</p>
-<p><b>The budget is yours to keep.</b> A VBlank is about 49,000 master cycles and the NMI handler takes the first 5,000 to 8,000 of them. What does not fit lands in active display, where the PPU ignores it: no error, missing tiles.</p>
+<p><b>The budget is yours to keep.</b> A VBlank is about 49,000 master cycles and the NMI handler takes the first 5,000 to 8,000 of them. What does not fit lands in active display, where the PPU ignores it: no error, missing tiles. <a class="el" href="#ab06208e0076eda7a2e051fb87acd218d" title="VBlank cost of what is queued, in bytes: each entry&#39;s size plus VRAM_QUEUE_ENTRY_COST.">vramQueueCost()</a> says what the entries already queued will take, whichever module queued them.</p>
 <p>Request and first user: issue #165. </p>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a6149a4889c141db3a6546557bd1142ec" name="a6149a4889c141db3a6546557bd1142ec"></a>
@@ -195,6 +200,23 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Step after each word: 32 words on (a column of a 32-wide tilemap). </p>
+
+</div>
+</div>
+<a id="a4e5eea7ec2d0965a705d36ae61d30fa5" name="a4e5eea7ec2d0965a705d36ae61d30fa5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e5eea7ec2d0965a705d36ae61d30fa5">&#9670;&#160;</a></span>VRAM_QUEUE_ENTRY_COST</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define VRAM_QUEUE_ENTRY_COST&#160;&#160;&#160;96</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>What one entry costs the flush beyond its bytes, in bytes. </p>
+<p>The flush spends about 8 master cycles per byte and 770 per entry; 770 / 8 is 96 bytes' worth. </p>
 
 </div>
 </div>
@@ -230,6 +252,37 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="ab06208e0076eda7a2e051fb87acd218d" name="ab06208e0076eda7a2e051fb87acd218d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab06208e0076eda7a2e051fb87acd218d">&#9670;&#160;</a></span>vramQueueCost</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define vramQueueCost</td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_variable" href="#aa60c70a83627b2e80a32d3bc7ee6656d">vram_queue_cost</a>)</div>
+<div class="ttc" id="avramqueue_8h_html_aa60c70a83627b2e80a32d3bc7ee6656d"><div class="ttname"><a href="#aa60c70a83627b2e80a32d3bc7ee6656d">vram_queue_cost</a></div><div class="ttdeci">u16 vram_queue_cost</div></div>
+</div><!-- fragment -->
+<p>VBlank cost of what is queued, in bytes: each entry's size plus VRAM_QUEUE_ENTRY_COST. </p>
+<p>Kept by <a class="el" href="#ade39bb80a8d7cf72a11075c930410086" title="Note one transfer for the next vramQueueFlush().">vramQueuePush()</a> and <a class="el" href="#a910d5040c609176a6d5518da95567518" title="Note one frame of a streamed sprite: all its strips in one call.">vramQueuePushSprite()</a>, set to 0 by <a class="el" href="#afbd23358a6f4ed779b6b4361ab054234" title="Send every queued transfer to VRAM and empty the queue.">vramQueueFlush()</a>; it stops at 0xFFFF rather than wrap. Multiply by 8 for master cycles. A module that streams what is left of the VBlank checks it against its own budget before each push:</p>
+<div class="fragment"><div class="line"><span class="comment">// a 32x32 frame: four strips of 128 bytes</span></div>
+<div class="line"><span class="keywordflow">while</span> (next &lt; wanted &amp;&amp; <a class="code hl_define" href="#ab06208e0076eda7a2e051fb87acd218d">vramQueueCost</a>() + 512 + 4 * <a class="code hl_define" href="#a4e5eea7ec2d0965a705d36ae61d30fa5">VRAM_QUEUE_ENTRY_COST</a> &lt;= BUDGET) {</div>
+<div class="line">    <a class="code hl_function" href="#a910d5040c609176a6d5518da95567518">vramQueuePushSprite</a>(frame_src[next], frame_dst[next], 32);</div>
+<div class="line">    next++;</div>
+<div class="line">}</div>
+<div class="ttc" id="avramqueue_8h_html_a4e5eea7ec2d0965a705d36ae61d30fa5"><div class="ttname"><a href="#a4e5eea7ec2d0965a705d36ae61d30fa5">VRAM_QUEUE_ENTRY_COST</a></div><div class="ttdeci">#define VRAM_QUEUE_ENTRY_COST</div><div class="ttdoc">What one entry costs the flush beyond its bytes, in bytes.</div><div class="ttdef"><b>Definition</b> vramqueue.h:73</div></div>
+<div class="ttc" id="avramqueue_8h_html_a910d5040c609176a6d5518da95567518"><div class="ttname"><a href="#a910d5040c609176a6d5518da95567518">vramQueuePushSprite</a></div><div class="ttdeci">u16 vramQueuePushSprite(const u8 *src, u16 addr, u16 size_px)</div><div class="ttdoc">Note one frame of a streamed sprite: all its strips in one call.</div></div>
+<div class="ttc" id="avramqueue_8h_html_ab06208e0076eda7a2e051fb87acd218d"><div class="ttname"><a href="#ab06208e0076eda7a2e051fb87acd218d">vramQueueCost</a></div><div class="ttdeci">#define vramQueueCost()</div><div class="ttdoc">VBlank cost of what is queued, in bytes: each entry&#39;s size plus VRAM_QUEUE_ENTRY_COST.</div><div class="ttdef"><b>Definition</b> vramqueue.h:95</div></div>
+</div><!-- fragment --><p>A count written by hand (<span class="tt"><a class="el" href="#a70aaa84c6d6707ffcf45ba53bd9768de">vram_queue_count</a> = 0</span>) leaves it as it was until the next flush. </p>
+
+</div>
+</div>
 <a id="a94704dd016478729ab4e5463343fd32c" name="a94704dd016478729ab4e5463343fd32c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a94704dd016478729ab4e5463343fd32c">&#9670;&#160;</a></span>vramQueueFree</h2>
 
@@ -245,7 +298,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_define" href="#a1bce8318ea743a7fe71ff9a01f4d0f88">VRAM_QUEUE_MAX</a> - <a class="code hl_variable" href="#a70aaa84c6d6707ffcf45ba53bd9768de">vram_queue_count</a>)</div>
-<div class="ttc" id="avramqueue_8h_html_a1bce8318ea743a7fe71ff9a01f4d0f88"><div class="ttname"><a href="#a1bce8318ea743a7fe71ff9a01f4d0f88">VRAM_QUEUE_MAX</a></div><div class="ttdeci">#define VRAM_QUEUE_MAX</div><div class="ttdoc">Transfers the queue holds.</div><div class="ttdef"><b>Definition</b> vramqueue.h:47</div></div>
+<div class="ttc" id="avramqueue_8h_html_a1bce8318ea743a7fe71ff9a01f4d0f88"><div class="ttname"><a href="#a1bce8318ea743a7fe71ff9a01f4d0f88">VRAM_QUEUE_MAX</a></div><div class="ttdeci">#define VRAM_QUEUE_MAX</div><div class="ttdoc">Transfers the queue holds.</div><div class="ttdef"><b>Definition</b> vramqueue.h:48</div></div>
 <div class="ttc" id="avramqueue_8h_html_a70aaa84c6d6707ffcf45ba53bd9768de"><div class="ttname"><a href="#a70aaa84c6d6707ffcf45ba53bd9768de">vram_queue_count</a></div><div class="ttdeci">u16 vram_queue_count</div></div>
 </div><!-- fragment -->
 <p>Entries still free. </p>
@@ -389,6 +442,28 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_queue_bank[32]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa60c70a83627b2e80a32d3bc7ee6656d" name="aa60c70a83627b2e80a32d3bc7ee6656d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa60c70a83627b2e80a32d3bc7ee6656d">&#9670;&#160;</a></span>vram_queue_cost</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> vram_queue_cost</td>
         </tr>
       </table>
   </td>

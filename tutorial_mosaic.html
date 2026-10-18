@@ -129,7 +129,7 @@ mosaic example</div></div>
     <p><em><span class="tt">examples/transitions/mosaic</span>: the pixel-block effect mid-transition.</em></p>
 <p>This tutorial covers the SNES PPU's mosaic effect: a hardware pixel-block filter that progressively enlarges the pixels of selected BG layers. Used canonically for <b>RPG battle transitions</b> (Final Fantasy IV–VI), <b>death sequences</b>, <b>damage flashes</b>, <b>scene transitions</b> ("the
 screen pixelates, then resolves into the new room"), and any retro visual style that wants chunky pixels on demand.</p>
-<p>It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial. Mosaic is one of the simplest PPU effects on the SNES — under 100 lines of C typically suffices.</p>
+<p>It assumes you have read the <a href="tutorial_graphics.html">Graphics</a> tutorial. Mosaic is one of the simplest PPU effects on the SNES — under 100 lines of C typically suffices.</p>
 <h2 class="doxsection"><a class="anchor" id="what-mosaic-actually-is"></a>
 What mosaic actually is</h2>
 <p>The PPU has a single hardware filter that says "render this BG layer at
@@ -278,9 +278,9 @@ visible mosaic step", remember to start at register value 1, not 0. The lib's <s
 <p>They call <span class="tt"><a class="el" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b" title="Wait for next VBlank period.">WaitForVBlank()</a></span> internally per step. While they run, your main thread does nothing else. That's fine for screen transitions (the "fade until the level swap" pattern) but wrong for "mosaic on
 just the boss layer while the player keeps moving".</p>
 <p>For non-blocking animation, write the manual loop yourself — see the "Animated transitions" section above.</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md-mosaic-state-is-not-reset-by-consoleinit"></a>
-🟡 Mosaic state is not reset by <span class="tt">consoleInit</span></h3>
-<p><span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></span> does not call <span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649" title="Initialize mosaic system.">mosaicInit()</a></span>. If a previous scene left mosaic enabled (and you didn't call <span class="tt"><a class="el" href="mosaic_8h.html#a88e76eb7d8b0e6093e2b0b7ed3cd05a0" title="Disable mosaic effect for all backgrounds.">mosaicDisable</a></span> or <span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649" title="Initialize mosaic system.">mosaicInit</a></span>), the new scene boots with stale mosaic configuration. The PPU defaults at hard reset are "all off" so the first-boot case is fine, but scene-to-scene cycles need explicit <span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649" title="Initialize mosaic system.">mosaicInit()</a></span> calls.</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md-the-modules-mosaic-state-is-not-reset-by-consoleinit"></a>
+🟡 The module's mosaic state is not reset by <span class="tt">consoleInit</span></h3>
+<p><span class="tt"><a class="el" href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1" title="Initialize SNES hardware.">consoleInit()</a></span> writes <span class="tt">0</span> to the MOSAIC register, so the screen comes up without mosaic, but it does not call <span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649" title="Initialize mosaic system.">mosaicInit()</a></span>. The module keeps its own copy of the layer mask and block size, and only <span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649" title="Initialize mosaic system.">mosaicInit()</a></span> clears it. If a previous scene left mosaic enabled (and you didn't call <span class="tt"><a class="el" href="mosaic_8h.html#a88e76eb7d8b0e6093e2b0b7ed3cd05a0" title="Disable mosaic effect for all backgrounds.">mosaicDisable</a></span> or <span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649" title="Initialize mosaic system.">mosaicInit</a></span>), the next <span class="tt"><a class="el" href="mosaic_8h.html#a0333ef4f70cfb2c89a88ef320a2fc823" title="Set mosaic pixel block size.">mosaicSetSize()</a></span> or fade writes the stale layer mask back to the register. Scene-to-scene cycles need an explicit <span class="tt"><a class="el" href="mosaic_8h.html#a2f5de63e60c8e8345a1a170e533ca649" title="Initialize mosaic system.">mosaicInit()</a></span> call.</p>
 <h2 class="doxsection"><a class="anchor" id="cycle-cost-4"></a>
 Cycle cost</h2>
 <p>Mosaic costs <b>zero CPU</b> during display — the PPU does the pixel-block sampling in hardware. The configuration writes are a single byte to <span class="tt">$2106</span> per change (~10 cycles total).</p>
@@ -289,10 +289,10 @@ Cycle cost</h2>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mosaic_8h.html" title="SNES Mosaic Effects.">lib/include/snes/mosaic.h</a></span> — full API reference.</li>
-<li><span class="tt">lib/source/mosaic.asm</span> — implementation (compact, mostly register bookkeeping and the fade loops).</li>
-<li><a class="el" href="dir_d8cebe9da14b04610db02310d3d59b09.html" title="/home/runner/work/opensnes/opensnes/examples/transitions/mosaic/README.md"><span class="tt">examples/transitions/mosaic</span></a> — four transitions cycled on button press: brightness fade out/in and mosaic fade out/in.</li>
-<li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — for the BG layer fundamentals mosaic operates on.</li>
-<li><a class="el" href="game__states_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/game_states.md">Game States tutorial</a> — for putting transitions into the game loop (state-machine pattern for "fade out → swap
+<li><span class="tt">lib/source/mosaic.c</span> — implementation (compact, mostly register bookkeeping and the fade loops).</li>
+<li><a href="examples_transitions_mosaic.html"><span class="tt">examples/transitions/mosaic</span></a> — four transitions cycled on button press: brightness fade out/in and mosaic fade out/in.</li>
+<li><a href="tutorial_graphics.html">Graphics tutorial</a> — for the BG layer fundamentals mosaic operates on.</li>
+<li><a href="tutorial_game_states.html">Game States tutorial</a> — for putting transitions into the game loop (state-machine pattern for "fade out → swap
   level → fade in"). </li>
 </ul>
 </div></div><!-- contents -->
@@ -309,7 +309,7 @@ See also</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

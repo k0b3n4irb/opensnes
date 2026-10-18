@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/games/mode7_racing/main.c File Reference</title>
+<title>examples/games/mode7_racing/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -149,8 +149,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a1580bc37c059028db01ad52698d0ee1b" id="r_a1580bc37c059028db01ad52698d0ee1b"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a1580bc37c059028db01ad52698d0ee1b">build_car_sprite</a> (void)</td></tr>
 <tr class="memdesc:a1580bc37c059028db01ad52698d0ee1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Draw the car arrow into a 16x16 pixel grid, encode as 4bpp.  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memitem:aac3b2597ae4d9977d6dc44bbcbf754a1" id="r_aac3b2597ae4d9977d6dc44bbcbf754a1"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aac3b2597ae4d9977d6dc44bbcbf754a1">track_class_at</a> (<a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> idx)</td></tr>
-<tr class="memdesc:aac3b2597ae4d9977d6dc44bbcbf754a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Banked-data accessor (data.asm): C pointer derefs are bank-$00-hardcoded (B2), so the 16 KB class map in bank $01+ is read through one <span class="tt">lda.l track_class,x</span> in ASM.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -162,15 +160,17 @@ Variables</h2></td></tr>
 <tr class="memitem:abcb5c457114635db8310446698d4f3b6" id="r_abcb5c457114635db8310446698d4f3b6"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#abcb5c457114635db8310446698d4f3b6">car_x</a></td></tr>
 <tr class="memdesc:abcb5c457114635db8310446698d4f3b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Probe oracles / game state (12.4 fixed-point pixels).  <br /></td></tr>
 <tr class="memitem:a546e1ce171b0deba47ed2d8dc8c46402" id="r_a546e1ce171b0deba47ed2d8dc8c46402"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a546e1ce171b0deba47ed2d8dc8c46402">car_y</a></td></tr>
+<tr class="memitem:a43591b44430a5cc795ddc6e2661e1167" id="r_a43591b44430a5cc795ddc6e2661e1167"><td class="memItemLeft">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a43591b44430a5cc795ddc6e2661e1167">track_class</a> []</td></tr>
+<tr class="memdesc:a43591b44430a5cc795ddc6e2661e1167"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collision class of each track tile, 128x128 (data.asm, res/track_class.bin): 0 road, 1 grass, 2 wall.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Mode 7 racing — an F-Zero-style mini game (#4, part 1). </p>
-<p>A drivable race circuit on the Mode 7 plane. The car stays fixed near the bottom of the screen and the WORLD rotates and scrolls under it — the classic SNES racing camera: per frame, mode7SetAngle(heading) + mode7SetScroll/SetCenter follow the car's fixed-point position. This is also the per-frame dogfooding of the C-migrated mode7 module (C1 audit).</p>
+<p>A drivable race circuit on the Mode 7 plane. The car stays fixed near the bottom of the screen and the WORLD rotates and scrolls under it — the classic SNES racing camera: per frame, mode7SetAngle(heading) + mode7SetScroll/SetCenter follow the car's fixed-point position, through the mode7 module.</p>
 <ul>
 <li>D-pad left/right: steer — A: accelerate — B: brake</li>
 <li>Grass slows the car down; the red wall ring stops it.</li>
 </ul>
-<p>The track is generated at build time (gen_track.py -&gt; gfx4snes -M 7); collision reads a 128x128 class map (road/grass/wall, one byte per tile) through a far pointer — 16 KB of data deliberately outside bank $00 (see the bank $00 budget rules).</p>
+<p>The track picture and its 128x128 class map (road/grass/wall, one byte per tile) are written by gen_track.py, a script kept with the example and run by hand; the build converts the picture with opensnes-tileset (mode = 7 in res/track.png.toml). Collision reads the 16 KB class map as a plain const array.</p>
 <p>ROM mode: LoROM (project default).</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>The F-Zero camera: SetCenter(car) makes the car the rotation pivot, SetScroll places it low on screen, SetAngle spins the world opposite to the car's heading</li>
@@ -180,7 +180,7 @@ Variables</h2></td></tr>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd>Boot on the start line. Hold A: the checker line recedes and the track streams under the car; steer through the chicane. Cutting the grass visibly slows you; the border wall is solid.</dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, math, input</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, dma, background, sprite, math, input, mode7</dd></dl>
 <dl class="section see"><dt>See also</dt><dd>gen_track.py — the reproducible track generator </dd>
 <dd>
 lib/source/mode7.c — the C Mode 7 module this <a class="el" href="games_2shmup__1942_2main_8c.html#a73de383a83473e9a755b640ccca7fd44">game</a> exercises </dd></dl>
@@ -347,33 +347,6 @@ lib/source/mode7.c — the C Mode 7 module this <a class="el" href="games_2shmup
 
 </div>
 </div>
-<a id="aac3b2597ae4d9977d6dc44bbcbf754a1" name="aac3b2597ae4d9977d6dc44bbcbf754a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac3b2597ae4d9977d6dc44bbcbf754a1">&#9670;&#160;</a></span>track_class_at()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_class_at </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></td>          <td class="paramname"><span class="paramname"><em>idx</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Banked-data accessor (data.asm): C pointer derefs are bank-$00-hardcoded (B2), so the 16 KB class map in bank $01+ is read through one <span class="tt">lda.l track_class,x</span> in ASM. </p>
-
-</div>
-</div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
 <a id="a1160e461fb3dcdd8091f25d121276c02" name="a1160e461fb3dcdd8091f25d121276c02"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1160e461fb3dcdd8091f25d121276c02">&#9670;&#160;</a></span>car_heading</h2>
@@ -468,6 +441,30 @@ lib/source/mode7.c — the C Mode 7 module this <a class="el" href="games_2shmup
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="a43591b44430a5cc795ddc6e2661e1167" name="a43591b44430a5cc795ddc6e2661e1167"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43591b44430a5cc795ddc6e2661e1167">&#9670;&#160;</a></span>track_class</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> track_class[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Collision class of each track tile, 128x128 (data.asm, res/track_class.bin): 0 road, 1 grass, 2 wall. </p>
 
 </div>
 </div>

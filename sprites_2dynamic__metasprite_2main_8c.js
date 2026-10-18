@@ -1,7 +1,7 @@
 var sprites_2dynamic__metasprite_2main_8c =
 [
     [ "changeObjSize", "sprites_2dynamic__metasprite_2main_8c.html#a99b104ba99a16132b181b2938e27a66b", null ],
-    [ "drawSprites", "sprites_2dynamic__metasprite_2main_8c.html#ad6eba0f1fac53c1e89b6ad3f444b3f09", null ],
+    [ "drawSprites", "sprites_2dynamic__metasprite_2main_8c.html#adcce301da5cde16dca45a2ee1f49d2a8", null ],
     [ "drawText", "sprites_2dynamic__metasprite_2main_8c.html#a10ff78cf96efa1288ccd4155d97161a4", null ],
     [ "main", "sprites_2dynamic__metasprite_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "hero16_frame0", "sprites_2dynamic__metasprite_2main_8c.html#ae2ffd37454763f04bc54b520f8e8c323", null ],

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/color/palette_cycle/main.c File Reference</title>
+<title>examples/color/palette_cycle/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -123,7 +123,7 @@ $(function(){initNavTree('color_2palette__cycle_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Colour, rung 6b — palette cycling: animate without touching a pixel.  
+<p>Colour — palette cycling: animate without touching a pixel.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="input_8h_source.html">snes/input.h</a>&gt;</code><br />
@@ -157,7 +157,7 @@ Variables</h2></td></tr>
 <tr class="memdesc:a5aa3c524bddd1f3cd623a6daeae2fefe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The 16 live colours, rotated in place each step (RAM master copy).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Colour, rung 6b — palette cycling: animate without touching a pixel. </p>
+<div class="textblock"><p>Colour — palette cycling: animate without touching a pixel. </p>
 <p>The oldest trick in the 2D book. The picture on screen never changes: every tile, every tilemap entry, every scroll register is frozen after init. All that moves is CGRAM — each frame we rotate the 16 palette entries by one slot, and the diagonal bands appear to flow. This is how the SNES animates waterfalls, lava, fire, marquee lights and "loading" shimmers for the cost of a 32-byte CGRAM reload, no VRAM traffic at all.</p>
 <p>The scene is built procedurally — zero assets. Sixteen solid 4bpp tiles (tile i is a flat fill of palette index i) are generated in C at init, and the tilemap is laid out as <span class="tt">tile = (row + col) &amp; 15</span> so colour index runs along every diagonal. Cycling the palette then slides those diagonals across the screen.</p>
 <p>ROM mode: LoROM (project default).</p>

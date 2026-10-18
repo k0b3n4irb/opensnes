@@ -1,7 +1,7 @@
 var searchData=
 [
   ['🔴_20battery_20dies_20→_20silent_20corruption_0',['🔴 Battery dies → silent corruption',['../tutorial_sram.html#autotoc_md-battery-dies--silent-corruption',1,'']]],
-  ['🔴_20channel_207_20is_20reserved_20for_20oam_20dma_1',['🔴 Channel 7 is reserved for OAM DMA',['../tutorial_hdma.html#autotoc_md-channel-7-is-reserved-for-oam-dma',1,'']]],
+  ['🔴_20channel_207_20is_20reserved_20for_20the_20nmi_20handler_20s_20dma_1',['🔴 Channel 7 is reserved for the NMI handler&apos;s DMA',['../tutorial_hdma.html#autotoc_md-channel-7-is-reserved-for-the-nmi-handlers-dma',1,'']]],
   ['🔴_20fix_20x_20overflows_20for_20x_20≥_20128_2',['🔴 &lt;span class=&quot;tt&quot;&gt;FIX(x)&lt;/span&gt; overflows for &lt;span class=&quot;tt&quot;&gt;|x| ≥ 128&lt;/span&gt;',['../tutorial_math.html#autotoc_md-fixx-overflows-for-x--128',1,'']]],
   ['🔴_20fixmul_20truncates_20fractional_20precision_3',['🔴 &lt;span class=&quot;tt&quot;&gt;fixMul&lt;/span&gt; truncates fractional precision',['../tutorial_math.html#autotoc_md-fixmul-truncates-fractional-precision',1,'']]],
   ['🔴_20loading_20the_20font_20or_20calling_20textinit_20with_20the_20screen_20on_4',['🔴 Loading the font or calling &lt;span class=&quot;tt&quot;&gt;textInit&lt;/span&gt; with the screen on',['../tutorial_text.html#autotoc_md-loading-the-font-or-calling-textinit-with-the-screen-on',1,'']]],
@@ -11,7 +11,7 @@ var searchData=
   ['🔴_20sprite_20or_20bg_20tiles_20at_20vram_20after_20textmodeinit_8',['🔴 Sprite or BG tiles at VRAM &lt;span class=&quot;tt&quot;&gt;$0000&lt;/span&gt; after &lt;span class=&quot;tt&quot;&gt;textModeInit()&lt;/span&gt;',['../tutorial_text.html#autotoc_md-sprite-or-bg-tiles-at-vram-0000-after-textmodeinit',1,'']]],
   ['🔴_20sram_20contents_20on_20first_20boot_20are_20undefined_9',['🔴 SRAM contents on first boot are undefined',['../tutorial_sram.html#autotoc_md-sram-contents-on-first-boot-are-undefined',1,'']]],
   ['🔴_20the_20bg2_20is_20sub_20screen_20only_20trap_10',['🔴 The &quot;BG2 is sub-screen-only&quot; trap',['../tutorial_colormath.html#autotoc_md-the-bg2-is-sub-screen-only-trap',1,'']]],
-  ['🔴_20vblank_20dma_20budget_20is_204_20kb_20per_20frame_11',['🔴 VBlank DMA budget is 4 KB per frame',['../tutorial_dma.html#autotoc_md-vblank-dma-budget-is-4-kb-per-frame',1,'🔴 VBlank DMA budget is ~4 KB per frame'],['../KNOWN_LIMITATIONS.html#autotoc_md-vblank-dma-budget-is-4-kb-per-frame-1',1,'🔴 VBlank DMA budget is ~4 KB per frame']]],
+  ['🔴_20vblank_20dma_20budget_20is_204_20kb_20per_20frame_11',['🔴 VBlank DMA budget is 4 KB per frame',['../tutorial_dma.html#autotoc_md-vblank-dma-budget-is-4-kb-per-frame',1,'🔴 VBlank DMA budget is ~4 KB per frame'],['../known_limitations.html#autotoc_md-vblank-dma-budget-is-4-kb-per-frame-1',1,'🔴 VBlank DMA budget is ~4 KB per frame']]],
   ['🔴_20vram_20cgram_20oam_20writes_20outside_20vblank_20or_20force_20blank_20are_20silently_20dropped_12',['🔴 VRAM/CGRAM/OAM writes outside VBlank or force blank are silently dropped',['../tutorial_dma.html#autotoc_md-vramcgramoam-writes-outside-vblank-or-force-blank-are-silently-dropped',1,'']]],
-  ['🔴_20vram_20writes_20outside_20vblank_20are_20silently_20dropped_13',['🔴 VRAM writes outside VBlank are silently dropped',['../KNOWN_LIMITATIONS.html#autotoc_md-vram-writes-outside-vblank-are-silently-dropped',1,'']]]
+  ['🔴_20vram_20writes_20outside_20vblank_20are_20silently_20dropped_13',['🔴 VRAM writes outside VBlank are silently dropped',['../known_limitations.html#autotoc_md-vram-writes-outside-vblank-are-silently-dropped',1,'']]]
 ];

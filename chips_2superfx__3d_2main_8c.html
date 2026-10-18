@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/chips/superfx_3d/main.c File Reference</title>
+<title>examples/chips/superfx_3d/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -164,6 +164,7 @@ Variables</h2></td></tr>
 <li>GSU ↔ 65816 communication via SRAM as shared scratch</li>
 <li>DMA full-frame transfer from SRAM to VRAM each frame</li>
 <li>HDMA-driven force-blank during transfer (gsuSetupHdmaBlanking)</li>
+<li>oamMemory[] written directly, the escape hatch beside <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>: every sprite moved off screen once, at boot</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>

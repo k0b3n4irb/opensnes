@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/gameloop.h File Reference</title>
+<title>lib/include/snes/gameloop.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -142,7 +142,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Opt-in game loop framework — write your update, the engine runs the VBlank synchronisation. </p>
-<p>One of the three "framework opt-ins" promised by <span class="tt"><a class="el" href="PHILOSOPHY_8md.html">PHILOSOPHY.md</a></span> (alongside <span class="tt">scene_2d</span> and the asset bundle convention). This module exists to remove a single repetitive piece of SNES boilerplate:</p>
+<p>One of the three "framework opt-ins" promised by <span class="tt"><a class="el" href="philosophy.html">PHILOSOPHY.md</a></span> (alongside <span class="tt">scene_2d</span> and the asset bundle convention). This module exists to remove a single repetitive piece of SNES boilerplate:</p>
 <div class="fragment"><div class="line"><span class="keywordflow">while</span> (1) {</div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a>();</div>
 <div class="line">    <span class="comment">// ... your update logic</span></div>

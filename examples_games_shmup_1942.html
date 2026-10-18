@@ -122,52 +122,33 @@ $(function(){initNavTree('examples_games_shmup_1942.html','',''); });
   <div class="headertitle"><div class="title">shmup_1942 </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Vertical "1942-style" shoot 'em up built iteratively on Kenney's CC0 <em>Pixel Shmup</em> pack. Lands in stages so each commit is a working ROM.</p>
+<div class="textblock"><p>A vertical "1942-style" shoot 'em up on Kenney's CC0 <em>Pixel Shmup</em> pack: a terrain that scrolls down on BG1, the player's plane, a pool of enemies and the player's bullets as sprites, and the collision between bullets and enemies.</p>
 <div class="image">
 <img src="shmup_1942.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="roadmap-status"></a>
-Roadmap status</h2>
+    <h2 class="doxsection"><a class="anchor" id="controls-11"></a>
+Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Stage  </th><th class="markdownTableHeadNone">What it added  </th></tr>
+<th class="markdownTableHeadNone">Input  </th><th class="markdownTableHeadNone">Action  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">S1  </td><td class="markdownTableBodyNone">asset pipeline (settings files beside the PNGs) + procedural land-with-water-channels  </td></tr>
+<td class="markdownTableBodyNone">D-pad  </td><td class="markdownTableBodyNone">move the plane  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">S2  </td><td class="markdownTableBodyNone">256×512 scene + SC_32x64 + vertical auto-scroll  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">S3  </td><td class="markdownTableBodyNone"><a class="el" href="structPlayer.html" title="Per-player position state.">Player</a> ship (sprite) + D-pad movement  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">S4  </td><td class="markdownTableBodyNone">Enemy spawn pool (≤8 simultaneous)  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">S5  </td><td class="markdownTableBodyNone">Bullets + AABB collision  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">S5.2 <em>(this stage)</em>  </td><td class="markdownTableBodyNone">Bullet despawn fix — clears top of screen properly  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>S6</b> <em>(open chantier)</em>  </td><td class="markdownTableBodyNone">HUD on BG3 (deferred — see below)  </td></tr>
+<td class="markdownTableBodyNone">A  </td><td class="markdownTableBodyNone">fire (a short cooldown between two shots)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="bullet-despawn-fix-s52"></a>
-Bullet despawn fix (S5.2)</h2>
-<p>Earlier the bullet's <span class="tt">despawn</span> test was <span class="tt">y &lt; -<a class="el" href="games_2shmup__1942_2main_8c.html#a72605ae476d1728c661c90513b007ef5">BULLET_SPRITE</a></span> (= <span class="tt">-32</span>). That left the bullet "alive" all the way down to the moment its sprite-anchor <span class="tt">y</span> reached <span class="tt">-32</span>, but the actual visible ball pixels (canvas y=4..11 of the 32×32 sprite) had already cleared the top of the screen at <span class="tt">y ≈ -12</span>. Between those two thresholds, the SNES 8-bit OAM <span class="tt">y</span> byte wrapped (<span class="tt">(<a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de" title="8-bit unsigned integer (0 to 255)">u8</a>)(-33) = 223</span>) and the bullet flashed at the <em>bottom</em> of the screen for one frame before despawning.</p>
-<p>Symptom from the user POV: "bullets stop before reaching the top of
-the screen". Fix in code: despawn at <span class="tt">y &lt; -12</span>, just after the visible ball exits the top of the playfield.</p>
-<h2 class="doxsection"><a class="anchor" id="open-chantier--s6-hud-on-bg3"></a>
-Open chantier — S6 HUD on BG3</h2>
-<p>I attempted a BG3 + <span class="tt">text</span> module HUD (score / lives) and it produced two symptoms I couldn't resolve in one session:</p>
-<ol type="1">
-<li><b>Bank $00 ROM was razor-tight</b> when this was written: the <span class="tt">text</span> module plus two string literals brought bank 0 to 12 bytes free, under the fail threshold, and at the time a string in bank 1 was read as garbage. Neither holds since v0.41.0: C const data, strings included, goes to the asset banks and every read of it is a far read (see <span class="tt"><a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a></span>, "Bank $00 ROM is code only"). The <span class="tt"><a class="el" href="text_8h.html#acd3f984c3d3308883e2729a50db16413" title="Print a single character at cursor position.">textPutChar</a>('S')</span> form stayed for brevity, not out of need.</li>
-<li><b>BG3 enable hides BG1.</b> As soon as <span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen</a></span> includes <span class="tt"><a class="el" href="group__reg__const.html#ga4bb07912d1f93dcb1ab7d52ba2c7d758">TM_BG3</a></span>, the procedural terrain disappears and the screen turns solid backdrop colour, regardless of:<ul>
-<li>BG3 priority bit (<span class="tt"><a class="el" href="group__bg__priority.html#gaae7e8057f1919684b5f32fd7b7b3f24f">BG3_MODE1_PRIORITY_HIGH</a></span> on/off)</li>
-<li>BG3 tile priority in tilemap entries (<span class="tt">text_config.priority = 0</span> or <span class="tt">1</span>)</li>
-<li>Whether <span class="tt"><a class="el" href="text_8h.html#a9a7338f84dc102993e17953ceaaf2a8e" title="Initialize the text rendering system.">textInit</a></span> / <span class="tt"><a class="el" href="text_8h.html#a1bd8589dd96d7cbbdc80905483892a1f" title="Load font tiles to VRAM.">textLoadFont</a></span> are called at all</li>
-<li>VRAM address alignment for BG3 tiles + tilemap (verified at word-vs-byte level against <span class="tt">mode1_bg3_priority</span> and <span class="tt">text_test</span>) Other layers (BG1, sprites) keep working; the HUD text itself renders correctly on BG3. There's just a mystery interaction between enabling BG3 and BG1's visibility that the surrounding examples in the repo don't trigger and that I couldn't find in the SDK docs.</li>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-28"></a>
+SNES Concepts</h2>
+<ul>
+<li><b>Vertical auto-scroll</b> of a 256×512 scene (<span class="tt"><a class="el" href="group__bg__size.html#gaeaa1585b5a34aea00df0224fdcc4a5ab">SC_32x64</a></span>) with <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll</a></span></li>
+<li><b>Sprite pools</b>: fixed-size arrays of <span class="tt">{x, y, active}</span> slots; the player has OAM slot 0, the enemies 1-8, the bullets 9-16</li>
+<li><b>Several sprite types in one OAM grid</b>: distinct VRAM regions and distinct sprite palettes (0, 1, 2)</li>
+<li><b>AABB overlap test</b> between 32×32 sprites</li>
+<li><b>Edge-triggered fire</b> with <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span></li>
 </ul>
-</li>
-</ol>
-<p>The S6 work was reverted to keep the ROM in a known-good state. A future chantier can pick up the investigation — likely candidates: the BG3 tile priority bit semantics, REG_BG3SC quirks at non-default word boundaries, or a CGRAM colour-math interaction with the HUD palette slot.</p>
-<h2 class="doxsection"><a class="anchor" id="architecture-current"></a>
-Architecture (current)</h2>
+<p>A bullet despawns once its visible pixels leave the top of the screen (<span class="tt">y &lt; -12</span>), not when its 32×32 frame does: past that point the 8-bit OAM <span class="tt">y</span> wraps and the bullet would flash at the bottom for a frame.</p>
+<h2 class="doxsection"><a class="anchor" id="architecture-4"></a>
+Architecture</h2>
 <div class="fragment"><div class="line">VRAM (BYTE / WORD addresses)</div>
 <div class="line">  $0000 / $0000  BG1 tilemap          (SC_32x64, 4 KB)</div>
 <div class="line">  $4000 / $2000  BG1 tiles            (49 unique 8×8)</div>
@@ -195,7 +176,7 @@ Re-generating assets</h2>
 <div class="fragment"><div class="line">python3 res/extract_sprites.py   # re-extract player + enemy + draw bullet</div>
 <div class="line">python3 res/compose_scene.py     # redraw the terrain (bump SEED)</div>
 <div class="line">make</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-42"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-41"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">asset</span>, <span class="tt">sprite</span>, <span class="tt">input</span>.</p>
 <h2 class="doxsection"><a class="anchor" id="licence"></a>
@@ -215,7 +196,7 @@ Licence</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_games.html">Complete Game Examples</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_games.html">Complete Game Examples</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

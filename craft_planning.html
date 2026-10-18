@@ -123,23 +123,13 @@ $(function(){initNavTree('craft_planning.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The single most common way a first SNES game dies is not a bug — it is a scene that cannot fit in the hardware, discovered <em>after</em> the art is drawn and the code is written. This guide is the planning you do first: budget the three scarce resources, pick a background mode from your genre, and scope something you can actually finish.</p>
-<p>For the register-level detail behind every number here, see <a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a>. This guide is about the <em>decisions</em>.</p>
+<p>For the register-level detail behind every number here, see <a class="el" href="hardware_ppu.html" title="The PPU">The PPU</a>. This guide is about the <em>decisions</em>.</p>
 <h2 class="doxsection"><a class="anchor" id="the-three-budgets"></a>
 The three budgets</h2>
 <p>A SNES scene lives inside three fixed pools. Plan them on paper before you draw, the way you would a level's layout.</p>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md1-vram--64-kb-shared-by-everything-on-screen"></a>
 1. VRAM — 64 KB, shared by everything on screen</h3>
-<p>VRAM holds your background tiles, your background maps, <b>and</b> your sprite tiles, all at once. It is one pool, not three. The cost of a tile depends only on its colour depth:</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Colour depth  </th><th class="markdownTableHeadNone">Colours  </th><th class="markdownTableHeadNone">Bytes per 8×8 tile  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">2bpp  </td><td class="markdownTableBodyNone">4  </td><td class="markdownTableBodyNone">16  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">4bpp  </td><td class="markdownTableBodyNone">16  </td><td class="markdownTableBodyNone">32  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">8bpp  </td><td class="markdownTableBodyNone">256  </td><td class="markdownTableBodyNone">64  </td></tr>
-</table>
+<p>VRAM holds your background tiles, your background maps, <b>and</b> your sprite tiles, all at once. It is one pool, not three. The cost of a tile depends only on its colour depth: 16 bytes at 2bpp, 32 at 4bpp, 64 at 8bpp (the tile formats are tabled in <a class="el" href="hardware_ppu.html" title="The PPU">The PPU</a>).</p>
 <p>A background <em>map</em> is separate from its tiles: a 32×32 screen of map entries is <b>2 KB</b> (each entry is 2 bytes — tile number, flip, palette, priority). A 64×64 scrolling map is 8 KB.</p>
 <p>Rule of thumb, and your worksheet:</p>
 <div class="fragment"><div class="line">VRAM used  =  BG tiles     (bytes/tile × unique tiles, per layer)</div>
@@ -183,10 +173,10 @@ Choose a background mode from your genre</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Per-column effects (flag, heat-haze)  </td><td class="markdownTableBodyNone"><b>Mode 2</b>  </td><td class="markdownTableBodyNone">Offset-per-tile: each column scrolls independently  </td><td class="markdownTableBodyNone"><a class="el" href="examples_backgrounds_mode2.html" title="mode2 — offset-per-tile: per-column scroll from BG3">mode2 — offset-per-tile: per-column scroll from BG3</a>  </td></tr>
 </table>
-<p>Default to <b>Mode 1</b> unless your game has a specific reason not to — it is what most of the library used, and every other mode trades a layer or colour depth for its special power. Put your HUD on the low-priority layer (Mode 1's BG3) so it draws over the action; see <a class="el" href="craft_backgrounds.html" title="Composing with backgrounds &amp; layers">Composing with backgrounds &amp; layers</a> for how to compose layers, and <a class="el" href="examples_backgrounds_mode1_bg3_priority.html" title="Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds">Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds</a> for the HUD overlay in practice.</p>
+<p>Default to <b>Mode 1</b> unless your game has a specific reason not to — it is what most of the library used, and every other mode trades a layer or colour depth for its special power. Put your HUD on the 4-colour layer (Mode 1's BG3) with its high-priority bit, so it draws over the action; see <a class="el" href="craft_backgrounds.html" title="Composing with backgrounds &amp; layers">Composing with backgrounds &amp; layers</a> for how to compose layers, and <a class="el" href="examples_backgrounds_mode1_bg3_priority.html" title="Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds">Mode 1 BG3 High Priority -- HUD Layer Over Backgrounds</a> for the HUD overlay in practice.</p>
 <h3 class="doxsection"><a class="anchor" id="the-cost-side-tiles-by-mode"></a>
 The cost side: tiles by mode</h3>
-<p>Each mode also trades layers and colour depth against <b>how much VRAM a tile costs</b>, because a tile's size is fixed by its colour depth (<a class="el" href="snes_graphics_guide.html" title="SNES Graphics Programming Guide">SNES Graphics Programming Guide</a> for the register detail):</p>
+<p>Each mode also trades layers and colour depth against <b>how much VRAM a tile costs</b>, because a tile's size is fixed by its colour depth (<a class="el" href="hardware_ppu.html" title="The PPU">The PPU</a> for the register detail):</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Mode  </th><th class="markdownTableHeadNone">Layers (colours)  </th><th class="markdownTableHeadNone">Bytes/tile  </th><th class="markdownTableHeadNone">The budget trade  </th></tr>
@@ -254,7 +244,7 @@ Checklist before you write code</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="craft.html">Game-Craft Guides</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="craft.html">Game-Craft Guides</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

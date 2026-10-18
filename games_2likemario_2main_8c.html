@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/games/likemario/main.c File Reference</title>
+<title>examples/games/likemario/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -126,6 +126,7 @@ $(function(){initNavTree('games_2likemario_2main_8c.html','',''); });
 <p>Side-scrolling platformer with scroll streaming and SNESMOD audio.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="vramqueue_8h_source.html">snes/vramqueue.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="anim_8h_source.html">snes/anim.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="snesmod_8h_source.html">snes/snesmod.h</a>&gt;</code><br />
 <code>#include &quot;soundbank.h&quot;</code><br />
@@ -169,7 +170,7 @@ Macros</h2></td></tr>
 <tr class="memitem:aec9dcf2ea648f7c52b3593d354a663a3" id="r_aec9dcf2ea648f7c52b3593d354a663a3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aec9dcf2ea648f7c52b3593d354a663a3">VRAM_BG_TILES</a>&#160;&#160;&#160;0x2000</td></tr>
 <tr class="memdesc:aec9dcf2ea648f7c52b3593d354a663a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address for BG1 tile character data.  <br /></td></tr>
 <tr class="memitem:a307f7a66d00de9b68d22f059e6490ee3" id="r_a307f7a66d00de9b68d22f059e6490ee3"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a307f7a66d00de9b68d22f059e6490ee3">VRAM_SPR_LARGE</a>&#160;&#160;&#160;0x0000</td></tr>
-<tr class="memdesc:a307f7a66d00de9b68d22f059e6490ee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asset symbols from data.asm (.incbin sections in SUPERFREE banks). Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram read it directly — no ASM loader stub needed.  <br /></td></tr>
+<tr class="memdesc:a307f7a66d00de9b68d22f059e6490ee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asset symbols from data.asm (.incbin sections in the asset banks). A C pointer carries its bank byte, and dmaCopyVram/dmaCopyCGram read it.  <br /></td></tr>
 <tr class="memitem:a7969a37ad80a90f7ec11c8eccd822291" id="r_a7969a37ad80a90f7ec11c8eccd822291"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a7969a37ad80a90f7ec11c8eccd822291">VRAM_SPR_SMALL</a>&#160;&#160;&#160;0x1000</td></tr>
 <tr class="memdesc:a7969a37ad80a90f7ec11c8eccd822291"><td class="mdescLeft">&#160;</td><td class="mdescRight">VRAM word address for small (8x8) sprite tiles.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -179,8 +180,6 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab9e45c26644c427a0c4a665d44d2c2bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Arithmetic right shift by 8 bits (extract integer part of 8.8 fixed-point).  <br /></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
 <tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main entry point &ndash; platformer initialization and game loop.  <br /></td></tr>
-<tr class="memitem:a6e673294f4ea577471b6a8b49aeb0575" id="r_a6e673294f4ea577471b6a8b49aeb0575"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a6e673294f4ea577471b6a8b49aeb0575">map_flush_column</a> (void)</td></tr>
-<tr class="memdesc:a6e673294f4ea577471b6a8b49aeb0575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flush the buffered column to VRAM via DMA (flush phase).  <br /></td></tr>
 <tr class="memitem:a239872ea5ac806101f72b27dca4fcea4" id="r_a239872ea5ac806101f72b27dca4fcea4"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a239872ea5ac806101f72b27dca4fcea4">map_get_tile_prop</a> (<a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="backgrounds_2mode2_2main_8c.html#a74098e4602b8556df3349bc817680573">px</a>, <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a> <a class="el" href="basics_2game__skeleton_2main_8c.html#ad2d4e104bf5a92d475b47d12bf7e4453">py</a>)</td></tr>
 <tr class="memdesc:a239872ea5ac806101f72b27dca4fcea4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Look up the collision property of the tile at pixel coordinates.  <br /></td></tr>
 <tr class="memitem:aa4b870388d79b1b7bf19a1e5fad1d571" id="r_aa4b870388d79b1b7bf19a1e5fad1d571"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#aa4b870388d79b1b7bf19a1e5fad1d571">map_load</a> (void)</td></tr>
@@ -220,8 +219,6 @@ Variables</h2></td></tr>
 <tr class="memitem:acfa2283641bd5e2a930ba51b59c5c647" id="r_acfa2283641bd5e2a930ba51b59c5c647"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#acfa2283641bd5e2a930ba51b59c5c647">clip_walk_frames</a> [] = { 2 , 3 }</td></tr>
 <tr class="memitem:a00f92a2e1ceca5a59009973e4e9c85da" id="r_a00f92a2e1ceca5a59009973e4e9c85da"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a00f92a2e1ceca5a59009973e4e9c85da">col_buffer</a> [32]</td></tr>
 <tr class="memdesc:a00f92a2e1ceca5a59009973e4e9c85da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Column tile buffer for deferred VRAM streaming.  <br /></td></tr>
-<tr class="memitem:ada8c20d885ae7f2fca648d33d5ee7e06" id="r_ada8c20d885ae7f2fca648d33d5ee7e06"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ada8c20d885ae7f2fca648d33d5ee7e06">col_pending</a></td></tr>
-<tr class="memitem:aeaf219553df60aec9bc94d606d2fc2b5" id="r_aeaf219553df60aec9bc94d606d2fc2b5"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#aeaf219553df60aec9bc94d606d2fc2b5">col_vram_base</a></td></tr>
 <tr class="memitem:a651d5e42c88d986bb70cfdc5138afda4" id="r_a651d5e42c88d986bb70cfdc5138afda4"><td class="memItemLeft">static <a class="el" href="group__types.html#ga5ffa4f640862b25ba6d4f635b78bdbe1">s16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a651d5e42c88d986bb70cfdc5138afda4">last_tile_x</a></td></tr>
 <tr class="memitem:a410c7f31a0aef6c95709fec195df9ee3" id="r_a410c7f31a0aef6c95709fec195df9ee3"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a410c7f31a0aef6c95709fec195df9ee3">map_data</a></td></tr>
 <tr class="memitem:a049c05a8a11068162a7ccaaafbdc3496" id="r_a049c05a8a11068162a7ccaaafbdc3496"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a049c05a8a11068162a7ccaaafbdc3496">map_height</a></td></tr>
@@ -248,7 +245,7 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Side-scrolling platformer with scroll streaming and SNESMOD audio. </p>
 <p>A Mario-style platformer demonstrating the core techniques of a scrolling SNES game: tile-based map streaming, subpixel physics, tile collision, camera tracking, animated sprites, and SPC700 music/sound effects via the SNESMOD audio driver.</p>
-<p>The map engine streams one tile column per frame using a prepare/flush pattern: during active display, the next column is read from ROM into a RAM buffer (map_prepare_column); during VBlank, a 64-byte DMA writes it to VRAM (map_flush_column). This keeps VRAM writes within the VBlank budget. The column at +32 tiles ahead is streamed to cover the 33rd partial tile at the screen edge.</p>
+<p>The map engine streams one tile column per frame using a prepare/flush pattern: during active display, the next column is read from ROM into a RAM buffer (map_prepare_column) and noted in the VRAM queue; during VBlank, <a class="el" href="vramqueue_8h.html#afbd23358a6f4ed779b6b4361ab054234" title="Send every queued transfer to VRAM and empty the queue.">vramQueueFlush()</a> sends it with one 64-byte DMA. This keeps VRAM writes within the VBlank budget. The column at +32 tiles ahead is streamed to cover the 33rd partial tile at the screen edge.</p>
 <p>Physics use 8.8 fixed-point velocities with arithmetic right shift for signed values. Collision checks test two probe points per axis against the tile property table (T_SOLID / T_EMPTY).</p>
 <p>Port of the PVSnesLib likemario example.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
@@ -269,7 +266,7 @@ Variables</h2></td></tr>
 <li>Falling off the bottom respawns Mario at the top</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, sprite_dynamic, sprite_lut, dma, input, background</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, sprite_dynamic, sprite_lut, dma, input, background, anim, vramqueue</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="sprite_8h.html" title="SNES Sprite (Object) Management.">sprite.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a>, <a class="el" href="snesmod_8h.html" title="SNESMOD - Tracker-based Audio Engine.">snesmod.h</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="aeef02da41fe024e74efcfcb5fe7c9e68" name="aeef02da41fe024e74efcfcb5fe7c9e68"></a>
@@ -557,7 +554,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Asset symbols from data.asm (.incbin sections in SUPERFREE banks). Post-A6+A7, C pointers carry the bank byte and dmaCopyVram/dmaCopyCGram read it directly — no ASM loader stub needed. </p>
+<p>Asset symbols from data.asm (.incbin sections in the asset banks). A C pointer carries its bank byte, and dmaCopyVram/dmaCopyCGram read it. </p>
 <p>VRAM word address for large (16x16) sprite tiles </p>
 
 </div>
@@ -605,7 +602,7 @@ Variables</h2></td></tr>
 <p>Arithmetic right shift by 8 bits (extract integer part of 8.8 fixed-point). </p>
 <p>The 65816 has no arithmetic shift right instruction, but cc65816's <span class="tt">&gt;&gt;</span> on a signed value IS arithmetic (compiler check test_signed_ops.c), so <span class="tt">val &gt;&gt; 8</span> would do; this helper spells the sign handling out:</p><ul>
 <li>Positive values: simple unsigned shift</li>
-<li>Negative values: bitwise NOT, unsigned shift, NOT back &ndash; preserves the sign bit through the inversion trick. (Until 2026-10-04 this comment claimed the compiler shifted logically.)</li>
+<li>Negative values: bitwise NOT, unsigned shift, NOT back &ndash; preserves the sign bit through the inversion trick.</li>
 </ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -644,40 +641,12 @@ Variables</h2></td></tr>
 <li><a class="el" href="#ad3a5b03471bc92a1d4453b3326eaeeb3" title="Check if the camera has scrolled to a new tile column and prepare it.">map_update()</a> - prepare next column in RAM buffer</li>
 </ol>
 <p>VBlank (VRAM writes allowed):</p><ol type="1">
-<li><a class="el" href="#a6e673294f4ea577471b6a8b49aeb0575" title="Flush the buffered column to VRAM via DMA (flush phase).">map_flush_column()</a> - DMA one column (64 bytes)</li>
+<li><a class="el" href="vramqueue_8h.html#afbd23358a6f4ed779b6b4361ab054234" title="Send every queued transfer to VRAM and empty the queue.">vramQueueFlush()</a> - DMA the column noted (64 bytes)</li>
 <li><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a> - update hardware scroll registers</li>
 <li>oamVramQueueUpdate() - upload sprite tiles</li>
 <li><a class="el" href="group__snesmod__process.html#ga2417eea32f0b78cdf861508795c213a7" title="Process audio commands.">snesmodProcess()</a> - SPC700 communication (no VBlank restriction)</li>
 </ol>
 <dl class="section return"><dt>Returns</dt><dd>0 (never reached &ndash; infinite game loop) </dd></dl>
-
-</div>
-</div>
-<a id="a6e673294f4ea577471b6a8b49aeb0575" name="a6e673294f4ea577471b6a8b49aeb0575"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e673294f4ea577471b6a8b49aeb0575">&#9670;&#160;</a></span>map_flush_column()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void map_flush_column </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Flush the buffered column to VRAM via DMA (flush phase). </p>
-<p>Must be called during VBlank. Uses DMA channel 1 in word mode to transfer 64 bytes (32 tilemap entries) to VRAM with vertical increment addressing. DMA takes ~512 master cycles vs ~57,600 for a compiled C register-write loop &ndash; a 100x speedup that fits easily within the VBlank budget. </p>
 
 </div>
 </div>
@@ -777,7 +746,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Buffer a map column for deferred VRAM write (prepare phase). </p>
-<p>Called during active display (not VBlank). Reads tile indices from ROM map data into the col_buffer[] RAM array and records the target VRAM address. No VRAM writes occur here &ndash; those happen in <a class="el" href="#a6e673294f4ea577471b6a8b49aeb0575" title="Flush the buffered column to VRAM via DMA (flush phase).">map_flush_column()</a> during the next VBlank.</p>
+<p>Called during active display (not VBlank). Reads tile indices from ROM map data into the col_buffer[] RAM array and notes the transfer in the VRAM queue (a column: the address steps by 32 words). No VRAM write occurs here &ndash; <a class="el" href="vramqueue_8h.html#afbd23358a6f4ed779b6b4361ab054234" title="Send every queued transfer to VRAM and empty the queue.">vramQueueFlush()</a> sends it during the next VBlank.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">map_col</td><td>Source column index in the map data </td></tr>
@@ -1008,7 +977,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initialize Mario's position, velocity, animation, and sprite configuration. </p>
-<p>Places Mario at a safe spawn point, sets the dynamic sprite engine's frame to the standing pose, and configures the sprite attribute byte (priority 3, H-flip for facing right). The tile data may sit in any ROM bank (SUPERFREE placement); <a class="el" href="sprite_8h.html#a1c1735026f1119e7fd947aa6eed9a2ec" title="Set sprite graphics address — any bank.">OAM_SET_GFX()</a> records the bank byte of the pointer it is given. Until 2026-09-20 it recorded bank 0, and this example carried a hand-written getSpriteTilBank() helper to work around it. </p>
+<p>Places Mario at a safe spawn point, sets the dynamic sprite engine's frame to the standing pose, and configures the sprite attribute byte (priority 3, H-flip for facing right). The tile data may sit in any ROM bank (SUPERFREE placement); <a class="el" href="sprite_8h.html#a1c1735026f1119e7fd947aa6eed9a2ec" title="Set sprite graphics address — any bank.">OAM_SET_GFX()</a> records the bank byte of the pointer it is given. </p>
 
 </div>
 </div>
@@ -1279,53 +1248,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Column tile buffer for deferred VRAM streaming. </p>
-<p>During active display, <a class="el" href="#a067264ada1c6c457ab1ba1fecb7221b7" title="Buffer a map column for deferred VRAM write (prepare phase).">map_prepare_column()</a> fills this 32-entry buffer from ROM map data (RAM-only writes). During VBlank, <a class="el" href="#a6e673294f4ea577471b6a8b49aeb0575" title="Flush the buffered column to VRAM via DMA (flush phase).">map_flush_column()</a> DMAs these 64 bytes to VRAM in one transfer. </p>
-
-</div>
-</div>
-<a id="ada8c20d885ae7f2fca648d33d5ee7e06" name="ada8c20d885ae7f2fca648d33d5ee7e06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada8c20d885ae7f2fca648d33d5ee7e06">&#9670;&#160;</a></span>col_pending</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> col_pending</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Nonzero when col_buffer contains data awaiting flush </p>
-
-</div>
-</div>
-<a id="aeaf219553df60aec9bc94d606d2fc2b5" name="aeaf219553df60aec9bc94d606d2fc2b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeaf219553df60aec9bc94d606d2fc2b5">&#9670;&#160;</a></span>col_vram_base</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> col_vram_base</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>VRAM word address for the pending column DMA </p>
+<p>During active display, <a class="el" href="#a067264ada1c6c457ab1ba1fecb7221b7" title="Buffer a map column for deferred VRAM write (prepare phase).">map_prepare_column()</a> fills this 32-entry buffer from ROM map data (RAM-only writes) and notes it in the VRAM queue; <a class="el" href="vramqueue_8h.html#afbd23358a6f4ed779b6b4361ab054234" title="Send every queued transfer to VRAM and empty the queue.">vramQueueFlush()</a> sends the 64 bytes in VBlank. </p>
 
 </div>
 </div>

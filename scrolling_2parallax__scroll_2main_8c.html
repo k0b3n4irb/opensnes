@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/scrolling/parallax_scroll/main.c File Reference</title>
+<title>examples/scrolling/parallax_scroll/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -136,7 +136,7 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:aba022e1ff2be864bac42428679aea901" id="r_aba022e1ff2be864bac42428679aea901"><td class="memItemLeft"><a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#aba022e1ff2be864bac42428679aea901">scroll_table</a> [10]</td></tr>
-<tr class="memdesc:aba022e1ff2be864bac42428679aea901"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp background tile data (defined in data.asm, stored in ROM)  <br /></td></tr>
+<tr class="memdesc:aba022e1ff2be864bac42428679aea901"><td class="mdescLeft">&#160;</td><td class="mdescRight">4bpp background tile data (converted by the build from res/)  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>HDMA-driven parallax scrolling with three speed zones. </p>
@@ -204,7 +204,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>4bpp background tile data (defined in data.asm, stored in ROM) </p>
+<p>4bpp background tile data (converted by the build from res/) </p>
 <p>64x32 tilemap data for the parallax background</p>
 <p>16-color palette for the background</p>
 <p>HDMA scroll table in RAM — a plain C global, so it sits in $00:0000-$1FFF like every non-FAR variable; <a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a> reads the bank from the pointer and would take a const table too.</p>

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/games/tetris/main.c File Reference</title>
+<title>examples/games/tetris/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -178,6 +178,8 @@ Functions</h2></td></tr>
 <tr class="memdesc:aedc342cc3777dac516ecfd0311f029a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main gameplay state: handle input, apply gravity, lock pieces.  <br /></td></tr>
 <tr class="memitem:ad8a61053de03cf7f9efbc95d349ba66e" id="r_ad8a61053de03cf7f9efbc95d349ba66e"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#ad8a61053de03cf7f9efbc95d349ba66e">stateTitle</a> (void)</td></tr>
 <tr class="memdesc:ad8a61053de03cf7f9efbc95d349ba66e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Title screen state: rainbow "PRESS START" text until player begins.  <br /></td></tr>
+<tr class="memitem:a593f646017b7122ac1466e6e1ddd7ed5" id="r_a593f646017b7122ac1466e6e1ddd7ed5"><td class="memItemLeft">static void&#160;</td><td class="memItemRight"><a class="el" href="#a593f646017b7122ac1466e6e1ddd7ed5">waitStartReleased</a> (void)</td></tr>
+<tr class="memdesc:a593f646017b7122ac1466e6e1ddd7ed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait, frame by frame, until START is released.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-var-members" class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -201,11 +203,7 @@ Variables</h2></td></tr>
 <tr class="memitem:a941373ea86f8c3a624bbac3e0f4502fb" id="r_a941373ea86f8c3a624bbac3e0f4502fb"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#a941373ea86f8c3a624bbac3e0f4502fb">msg_colors</a> []</td></tr>
 <tr class="memdesc:a941373ea86f8c3a624bbac3e0f4502fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rainbow color cycle palette for animated message text (BGR555).  <br /></td></tr>
 <tr class="memitem:ab8d32ebe6b1edb3e0429f2e4ceb04080" id="r_ab8d32ebe6b1edb3e0429f2e4ceb04080"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab8d32ebe6b1edb3e0429f2e4ceb04080">next_type</a></td></tr>
-<tr class="memitem:ae9c339aae8aff07a48de9f6355e02321" id="r_ae9c339aae8aff07a48de9f6355e02321"><td class="memItemLeft"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ae9c339aae8aff07a48de9f6355e02321">pad_keys</a> []</td></tr>
-<tr class="memdesc:ae9c339aae8aff07a48de9f6355e02321"><td class="mdescLeft">&#160;</td><td class="mdescRight">Raw joypad state buffer written by the NMI handler every frame.  <br /></td></tr>
 <tr class="memitem:a3ade7f893f61c2117f2ed3b49842cd64" id="r_a3ade7f893f61c2117f2ed3b49842cd64"><td class="memItemLeft">static <a class="el" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a3ade7f893f61c2117f2ed3b49842cd64">paused</a></td></tr>
-<tr class="memitem:ad5bad3d3ae9d56603b80d2eca3e8ee44" id="r_ad5bad3d3ae9d56603b80d2eca3e8ee44"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad5bad3d3ae9d56603b80d2eca3e8ee44">prev_pad</a></td></tr>
-<tr class="memdesc:ad5bad3d3ae9d56603b80d2eca3e8ee44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Previous frame's joypad state (for edge-triggered button detection).  <br /></td></tr>
 <tr class="memitem:af38f63b0c5a57bead247e022200124e5" id="r_af38f63b0c5a57bead247e022200124e5"><td class="memItemLeft">static <a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>&#160;</td><td class="memItemRight"><a class="el" href="#af38f63b0c5a57bead247e022200124e5">score</a></td></tr>
 <tr class="memitem:a92203f3a1cb3cacc4738e3ac55a59d19" id="r_a92203f3a1cb3cacc4738e3ac55a59d19"><td class="memItemLeft">static const <a class="el" href="group__types.html#ga151f780fb455885061d3b77ec1c90c03">s8</a>&#160;</td><td class="memItemRight"><a class="el" href="#a92203f3a1cb3cacc4738e3ac55a59d19">shake_dx</a> [] = { 2, -2, 1, -1, 2, -1, 1, 0 }</td></tr>
 <tr class="memdesc:a92203f3a1cb3cacc4738e3ac55a59d19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Screen shake X offsets during line clear animation.  <br /></td></tr>
@@ -249,7 +247,7 @@ Variables</h2></td></tr>
 <li>START pauses with a "PAUSED" overlay; GAME OVER cycles rainbow text</li>
 </ul>
 </dd></dl>
-<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, input</dd></dl>
+<dl class="section user"><dt>Modules Used</dt><dd>console, sprite, dma, background, input, hdma</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="background_8h.html" title="SNES Background Layer Management.">background.h</a>, <a class="el" href="dma_8h.html" title="SNES DMA (Direct Memory Access).">dma.h</a>, <a class="el" href="input_8h.html" title="SNES Controller Input.">input.h</a>, <a class="el" href="snesmod_8h.html" title="SNESMOD - Tracker-based Audio Engine.">snesmod.h</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a11996a84f344476033f7052d2b949663" name="a11996a84f344476033f7052d2b949663"></a>
@@ -711,6 +709,33 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a593f646017b7122ac1466e6e1ddd7ed5" name="a593f646017b7122ac1466e6e1ddd7ed5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a593f646017b7122ac1466e6e1ddd7ed5">&#9670;&#160;</a></span>waitStartReleased()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void waitStartReleased </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait, frame by frame, until START is released. </p>
+
+</div>
+</div>
 <a name="doc-var-members" id="doc-var-members"></a><h2 id="header-doc-var-members" class="groupheader">Variable Documentation</h2>
 <a id="ac771b3a28ecd7bc6ad27b48feee3e94c" name="ac771b3a28ecd7bc6ad27b48feee3e94c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac771b3a28ecd7bc6ad27b48feee3e94c">&#9670;&#160;</a></span>clear_result</h2>
@@ -1118,31 +1143,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ae9c339aae8aff07a48de9f6355e02321" name="ae9c339aae8aff07a48de9f6355e02321"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9c339aae8aff07a48de9f6355e02321">&#9670;&#160;</a></span>pad_keys</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> pad_keys[]</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Raw joypad state buffer written by the NMI handler every frame. </p>
-<p>Used directly (instead of <a class="el" href="input_8h.html#a91ebd3f122c9ba2913248112f7dc3647">padHeld()</a>) for precise edge detection: pressed = pad_keys[0] &amp; ~prev_pad gives newly-pressed buttons this frame. </p>
-
-</div>
-</div>
 <a id="a3ade7f893f61c2117f2ed3b49842cd64" name="a3ade7f893f61c2117f2ed3b49842cd64"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3ade7f893f61c2117f2ed3b49842cd64">&#9670;&#160;</a></span>paused</h2>
 
@@ -1163,30 +1163,6 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Nonzero when game is paused </p>
-
-</div>
-</div>
-<a id="ad5bad3d3ae9d56603b80d2eca3e8ee44" name="ad5bad3d3ae9d56603b80d2eca3e8ee44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5bad3d3ae9d56603b80d2eca3e8ee44">&#9670;&#160;</a></span>prev_pad</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a> prev_pad</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Previous frame's joypad state (for edge-triggered button detection). </p>
 
 </div>
 </div>
@@ -1289,7 +1265,7 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 <p>NES NTSC gravity speed table (frames per automatic drop). </p>
 <p>Index = level number. Level 0 = 48 frames/drop (slowest), level 29+ = 1 frame/drop (fastest). Values match the original NES Tetris for authentic feel.</p>
-<p><span class="tt">const</span>: it lives in ROM, in whichever bank the linker picks, and every C read of const data is a far read (since v0.41.0). Until 2026-09-26 these tables were left non-const out of an older fear of bank-$00-only reads, which cost WRAM for nothing. </p>
+<p><span class="tt">const</span>: it lives in ROM, in whichever bank the linker picks, and every C read of const data is a far read. </p>
 
 </div>
 </div>
@@ -1339,7 +1315,7 @@ Variables</h2></td></tr>
 
 <p>Global frame counter incremented by the NMI handler. </p>
 <p>Used to seed <a class="el" href="console_8h.html#a82344e91af2df5885fa4f7e92fa42efd" title="Seed the generator (the srand() of 0.x, removed 2026-10-05).">rngSeed()</a> at game start &ndash; the player's variable-length wait on the title screen produces a different seed each game, ensuring different piece sequences.</p>
-<p>"PAUSED" overlay message string (in data.asm for bank $00 placement) </p>
+<p>"PAUSED" overlay message string (data.asm) </p>
 
 </div>
 </div>

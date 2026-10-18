@@ -122,7 +122,7 @@ $(function(){initNavTree('tools_opensnes_palette.html','',''); });
   <div class="headertitle"><div class="title">opensnes-palette — a project's palettes </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The palette tool of the <span class="tt">opensnes-*</span> family (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>). Two jobs a game has around colour, before and after the picture tools: <b>planning</b> how every <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> of the project fits the SNES's 8 background and 8 sprite palettes of 16 colours (CGRAM 0..127 and 128..255), and <b>quantizing</b> the RGB art an artist draws into the indexed PNG that <a class="el" href="tools_opensnes_sprite.html" title="opensnes-sprite — sheets, metasprites and Aseprite clips">opensnes-sprite — sheets, metasprites and Aseprite clips</a> and <a class="el" href="tools_opensnes_tileset.html" title="opensnes-tileset — pictures to tilesets and tilemaps">opensnes-tileset — pictures to tilesets and tilemaps</a> eat. The planner is <span class="tt">palplan</span>'s (<a class="el" href="tools_palplan.html" title="palplan — project shared-palette planner">palplan — project shared-palette planner</a>) and the quantizer <span class="tt">img2snes</span>'s (<a class="el" href="tools_img2snes.html" title="img2snes — RGB artwork to indexed palettes">img2snes — RGB artwork to indexed palettes</a>), linked as libraries: same slots, same bytes.</p>
+<div class="textblock"><p>The palette tool of the <span class="tt">opensnes-*</span> family (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>). Two jobs a game has around colour, before and after the picture tools: <b>planning</b> how every <span class="tt">.<a class="el" href="backgrounds_2mode4_2main_8c.html#aac60372fe4d6c084814898fafeb64f13" title="The 256-colour palette, built at boot.">pal</a></span> of the project fits the SNES's 8 background and 8 sprite palettes of 16 colours (CGRAM 0..127 and 128..255), and <b>quantizing</b> the RGB art an artist draws into the indexed PNG that <a class="el" href="tools_opensnes_sprite.html" title="opensnes-sprite — sheets, metasprites and Aseprite clips">opensnes-sprite — sheets, metasprites and Aseprite clips</a> and <a class="el" href="tools_opensnes_tileset.html" title="opensnes-tileset — pictures to tilesets and tilemaps">opensnes-tileset — pictures to tilesets and tilemaps</a> eat. The planner is <span class="tt">palplan</span>'s (<a class="el" href="tools_legacy.html#tools_palplan" title="palplan">palplan</a>) and the quantizer <span class="tt">img2snes</span>'s (<a class="el" href="tools_legacy.html#tools_img2snes" title="img2snes">img2snes</a>), linked as libraries: same slots, same bytes.</p>
 <h2 class="doxsection"><a class="anchor" id="plan"></a>
 Plan</h2>
 <div class="fragment"><div class="line">opensnes-palette plan res/palettes.toml                                  # the plan written in the settings file</div>
@@ -181,11 +181,11 @@ From palplan and img2snes</h2>
 <td class="markdownTableBodyNone"><span class="tt">-s 2.0</span>, <span class="tt">-t 8</span>  </td><td class="markdownTableBodyNone"><span class="tt">--scale 200</span>, <span class="tt">--align 8</span>  </td></tr>
 </table>
 <p>The same CGRAM image and the same <span class="tt">PAL_</span> macros as palplan, the same indexed PNGs as img2snes (both golden suites are the family's). One change under both tools: the quantizer's sort now breaks ties by index, so a picture quantizes to the same bytes on every OS (it depended on the C library's <span class="tt">qsort</span> before).</p>
-<h2 class="doxsection"><a class="anchor" id="see-also-19"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-21"></a>
 See also</h2>
 <ul>
 <li><a class="el" href="craft_planning.html" title="Planning your SNES game">Planning your SNES game</a> — why 8 + 8 slots, and how to budget them.</li>
-<li><a class="el" href="tools_palplan.html" title="palplan — project shared-palette planner">palplan — project shared-palette planner</a>, <a class="el" href="tools_img2snes.html" title="img2snes — RGB artwork to indexed palettes">img2snes — RGB artwork to indexed palettes</a> — the earlier tools; shipped for one more version. </li>
+<li><a class="el" href="tools_legacy.html#tools_palplan" title="palplan">palplan</a>, <a class="el" href="tools_legacy.html#tools_img2snes" title="img2snes">img2snes</a> — the earlier tools (<a class="el" href="tools_legacy.html" title="Legacy tools">Legacy tools</a>). </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
@@ -201,7 +201,7 @@ See also</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

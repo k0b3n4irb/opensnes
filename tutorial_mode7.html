@@ -127,7 +127,7 @@ $(function(){initNavTree('tutorial_mode7.html','',''); });
 <div class="caption">
 mode7 example</div></div>
     <p><em><span class="tt">examples/mode7/perspective</span>: the Mode 7 plane receding to a horizon, one HDMA-fed matrix per scanline.</em></p>
-<p>This tutorial covers SNES Mode 7: what the affine background mode actually is, why its VRAM format is interleaved, the matrix maths the lib hides behind <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle</a></span>/<span class="tt"><a class="el" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668" title="Set Mode 7 scale factors.">mode7SetScale</a></span>, and how the F-Zero / Pilotwings "perspective ground plane" pattern is built by combining Mode 7 with HDMA. It assumes you have read the <a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics</a> tutorial and (for the perspective section) the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a>.</p>
+<p>This tutorial covers SNES Mode 7: what the affine background mode actually is, why its VRAM format is interleaved, the matrix maths the lib hides behind <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle</a></span>/<span class="tt"><a class="el" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668" title="Set Mode 7 scale factors.">mode7SetScale</a></span>, and how the F-Zero / Pilotwings "perspective ground plane" pattern is built by combining Mode 7 with HDMA. It assumes you have read the <a href="tutorial_graphics.html">Graphics</a> tutorial and (for the perspective section) the <a href="tutorial_hdma.html">HDMA tutorial</a>.</p>
 <h2 class="doxsection"><a class="anchor" id="what-mode-7-actually-is"></a>
 What Mode 7 actually is</h2>
 <p>The SNES PPU has eight BG modes, numbered 0–7. The first seven (Mode 0 through Mode 6) are variations on tilemap-based rendering with different colour-depth / layer-count tradeoffs. Mode 7 is the odd one out:</p>
@@ -187,8 +187,7 @@ tilesSize)</span> runs the two DMAs (tilemap into the low bytes with VMAIN=$00, 
 Setup pattern</h2>
 <p>The minimum sequence to bring up a rotating Mode 7 plane:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="snes_8h.html">snes.h</a>&gt;</span></div>
-<div class="line"> </div>
-<div class="line"><span class="keyword">extern</span> <span class="keywordtype">void</span> asm_loadMode7Data(<span class="keywordtype">void</span>);   <span class="comment">/* user-supplied, see examples */</span></div>
+<div class="line"><span class="preprocessor">#include &quot;res/mode7bg.inc&quot;</span>   <span class="comment">/* generated: mode7bg_tiles[], mode7bg_map[], mode7bg_pal[], each with _end */</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> <a class="code hl_function" href="audio_2apu__switch_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a>(<span class="keywordtype">void</span>) {</div>
 <div class="line">    <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> <a class="code hl_variable" href="mode7_2perspective__rotate_2main_8c.html#a313857711c86124ca4a23076d196f8e3">angle</a> = 0;</div>
@@ -199,7 +198,10 @@ Setup pattern</h2>
 <div class="line">    <span class="comment">/* Force blank for the bulk VRAM writes */</span></div>
 <div class="line">    <a class="code hl_function" href="console_8h.html#a5380410c3dc97fbaa3b36b095d631512">setScreenOff</a>();</div>
 <div class="line"> </div>
-<div class="line">    asm_loadMode7Data();   <span class="comment">/* writes interleaved tile data + map + palette */</span></div>
+<div class="line">    <span class="comment">/* interleaved tilemap + 8bpp tiles, then the palette */</span></div>
+<div class="line">    <a class="code hl_function" href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb">dmaCopyVramMode7</a>(mode7bg_map, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(mode7bg_map_end - mode7bg_map),</div>
+<div class="line">                     mode7bg_tiles, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(mode7bg_tiles_end - mode7bg_tiles));</div>
+<div class="line">    <a class="code hl_function" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a>(mode7bg_pal, 0, (<a class="code hl_typedef" href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a>)(mode7bg_pal_end - mode7bg_pal));</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">/* Switch to Mode 7 + initialise the affine transform */</span></div>
 <div class="line">    <a class="code hl_function" href="video_8h.html#ad89d023577743a32d3407027e535b0ff">setMode</a>(<a class="code hl_define" href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a>, 0);</div>
@@ -222,6 +224,8 @@ Setup pattern</h2>
 <div class="ttc" id="aconsole_8h_html_aa4254c9de45f6aa2de26e8ea70dd96e1"><div class="ttname"><a href="console_8h.html#aa4254c9de45f6aa2de26e8ea70dd96e1">consoleInit</a></div><div class="ttdeci">void consoleInit(void)</div><div class="ttdoc">Initialize SNES hardware.</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
 <div class="ttc" id="aconsole_8h_html_af8cb701c5b08484903555e77347f460a"><div class="ttname"><a href="console_8h.html#af8cb701c5b08484903555e77347f460a">setScreenOn</a></div><div class="ttdeci">void setScreenOn(void)</div><div class="ttdoc">Enable screen display.</div></div>
+<div class="ttc" id="adma_8h_html_a7124f044ed12d1073cafd7192a00d09f"><div class="ttname"><a href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f">dmaCopyCGram</a></div><div class="ttdeci">void dmaCopyCGram(const u8 *source, u16 startColor, u16 size)</div><div class="ttdoc">Copy palette data to CGRAM (PVSnesLib compatible).</div></div>
+<div class="ttc" id="adma_8h_html_a9a9ce9e607d6aa14f3dfeb40fad3c3eb"><div class="ttname"><a href="dma_8h.html#a9a9ce9e607d6aa14f3dfeb40fad3c3eb">dmaCopyVramMode7</a></div><div class="ttdeci">void dmaCopyVramMode7(const u8 *tilemap, u16 tilemapSize, const u8 *tiles, u16 tilesSize)</div><div class="ttdoc">Load Mode 7 interleaved data to VRAM.</div></div>
 <div class="ttc" id="agroup__bg__modes_html_gac2995da5a6139bd6ca1091ae3358d4f3"><div class="ttname"><a href="group__bg__modes.html#gac2995da5a6139bd6ca1091ae3358d4f3">BG_MODE7</a></div><div class="ttdeci">#define BG_MODE7</div><div class="ttdef"><b>Definition</b> video.h:41</div></div>
 <div class="ttc" id="agroup__reg__const_html_ga07879034d13022fee2fa22fd6ff0c811"><div class="ttname"><a href="group__reg__const.html#ga07879034d13022fee2fa22fd6ff0c811">TM_BG1</a></div><div class="ttdeci">#define TM_BG1</div><div class="ttdef"><b>Definition</b> registers.h:443</div></div>
 <div class="ttc" id="agroup__types_html_ga9e6c91d77e24643b888dbd1a1a590054"><div class="ttname"><a href="group__types.html#ga9e6c91d77e24643b888dbd1a1a590054">u16</a></div><div class="ttdeci">unsigned short u16</div><div class="ttdoc">16-bit unsigned integer (0 to 65535)</div><div class="ttdef"><b>Definition</b> types.h:53</div></div>
@@ -252,7 +256,7 @@ Coordinate system</h2>
 <li>centre</li>
 </ul>
 <p></span>, so the screen pixel where <span class="tt">screen + scroll = centre</span> is the one that does not move. To <b>rotate around the screen centre</b>, keep the two 128 × 112 apart: <span class="tt"><a class="el" href="mode7_8h.html#a2ebd44e45d6c3a6c754115fc750aa3f0" title="Set Mode 7 center point.">mode7SetCenter</a>(<a class="el" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a> + 128, <a class="el" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a> + 112)</span> for a scroll of <span class="tt">(<a class="el" href="mode7_2perspective_2main_8c.html#ad20c28dc8fb00b3174dce460e3598548">sx</a>, <a class="el" href="mode7_2perspective_2main_8c.html#a79b6065ee73ca292d26db6390aa19d63">sy</a>)</span>.</p>
-<p>The scale is in texels per screen pixel, 8.8 fixed point: <span class="tt">mode7SetScale(0x0100, 0x0100)</span> gives A = D = <span class="tt">$00FE</span>, 1:1 (the sine table peaks at 127/128). <span class="tt">0x0080</span> magnifies twice, <span class="tt">0x0200</span> shrinks twice (you see four times the area). Smaller is closer, counter-intuitive at first, but the formula tells you why: a larger <span class="tt">A</span>/<span class="tt">D</span> means each screen pixel steps over more plane pixels. (Before 0.48.0 the helpers wrote half the scale, so <span class="tt">0x0200</span> was 1:1; code written then halves its scales.)</p>
+<p>The scale is in texels per screen pixel, 8.8 fixed point: <span class="tt">mode7SetScale(0x0100, 0x0100)</span> gives A = D = <span class="tt">$00FE</span>, 1:1 (the sine table peaks at 127/128). <span class="tt">0x0080</span> magnifies twice, <span class="tt">0x0200</span> shrinks twice (you see four times the area). Smaller is closer, counter-intuitive at first, but the formula tells you why: a larger <span class="tt">A</span>/<span class="tt">D</span> means each screen pixel steps over more plane pixels.</p>
 <h2 class="doxsection"><a class="anchor" id="out-of-bounds-behaviour"></a>
 Out-of-bounds behaviour</h2>
 <p>What happens at screen pixels that map outside the 128 × 128 tilemap? Three options, controlled by the high two bits of M7SEL (<span class="tt">$211A</span>), exposed via <span class="tt"><a class="el" href="mode7_8h.html#a5fdfa5a6feaf4eb76c6b9a02535fb890" title="Set Mode 7 settings register.">mode7SetSettings()</a></span>:</p>
@@ -297,19 +301,19 @@ The lib helpers and what they do</h2>
 Worked patterns (the shipped examples)</h2>
 <h3 class="doxsection"><a class="anchor" id="basic-rotation--scaling--examplesmode7rotate_scale"></a>
 Basic rotation + scaling — <span class="tt">examples/mode7/rotate_scale</span></h3>
-<p>The "hello-world" of Mode 7. <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> and <span class="tt"><a class="el" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668" title="Set Mode 7 scale factors.">mode7SetScale()</a></span> update the matrix every frame in response to D-pad input — A/B rotate, UP/DOWN zoom. Read the example to see the exact init sequence (consoleInit, setScreenOff, asm_loadMode7Data, setMode(BG_MODE7, 0), mode7Init, mode7SetScale, mode7SetAngle, <a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(TM_BG1)</a>, setScreenOn) and the per-frame update path. ~100 lines of C; the entire demo fits on one screen.</p>
+<p>The "hello-world" of Mode 7. <span class="tt"><a class="el" href="mode7_8h.html#aa09e1447cada89498932411fc81452fe" title="Set Mode 7 rotation angle.">mode7SetAngle()</a></span> and <span class="tt"><a class="el" href="mode7_8h.html#a606b68a9ff05a4c930d30640277a4668" title="Set Mode 7 scale factors.">mode7SetScale()</a></span> update the matrix every frame in response to D-pad input — A/B rotate, UP/DOWN zoom. Read the example to see the exact init sequence (consoleInit, setScreenOff, dmaCopyVramMode7, dmaCopyCGram, setMode(BG_MODE7, 0), mode7Init, mode7SetScale, mode7SetAngle, <a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen(TM_BG1)</a>, setScreenOn) and the per-frame update path. The entire demo is one short <span class="tt">main.c</span>.</p>
 <h3 class="doxsection"><a class="anchor" id="f-zero-perspective-via-hdma--examplesmode7perspective"></a>
 F-Zero perspective via HDMA — <span class="tt">examples/mode7/perspective</span></h3>
 <p>The trick that gives Mode 7 its reputation. The 2 × 2 matrix is <em>constant per frame</em> in plain Mode 7, which means the BG plane stays "flat" — no perspective. To create the F-Zero "ground recedes into the distance" effect, you write <b>different matrix values per scanline</b> using HDMA on the M7A and M7D registers.</p>
 <p>The example is a 4-channel HDMA orchestration:</p>
 <ul>
-<li><b>Channel A</b> writes BGMODE at the split scanline (~96), switching from Mode 3 (sky on top) to Mode 7 (ground on bottom).</li>
+<li><b>Channel A</b> writes BGMODE at the split scanline (~96), switching from Mode 1 (sky on top) to Mode 7 (ground on bottom).</li>
 <li><b>Channel B</b> writes TM (main screen enable), switching from BG2 (sky) to BG1 (ground) at the split.</li>
 <li><b>Channel C</b> writes per-scanline M7A values — wide near the camera, narrow far from it.</li>
 <li><b>Channel D</b> writes per-scanline M7D values — same compression curve.</li>
 </ul>
-<p>Read the example's <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#ad3aafbc6c7613c06add64a85321eb473" title="Sky (Mode 3, BG2) tiles and 64x32 tilemap, from data.asm. Loaded with dmaCopyVram() to VRAM $5000 (ti...">asm_setupHdmaPerspective</a></span> for the table-build algorithm. The math is straightforward: for scanline <span class="tt">s</span> at distance <span class="tt">d</span> from the horizon, the matrix factor is <span class="tt">1.0 / d</span> (inverse depth). What's hard is the channel bookkeeping — get the timing wrong and you see the wrong mode for one scanline, or the perspective curve "jumps".</p>
-<p>This is also a textbook case for the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a>'s gotchas: the example uses HDMA channels 1–4, leaves channel 0 for <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> and channel 7 for the OAM DMA. Run any other split-mode display through it; the scaffolding is the same.</p>
+<p>Read the example's <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#a8242f1368aa029cac997299479962347" title="M7A per ground line: 512 / zoom, the zoom growing by 0.025 a line (8.8 fixed point,...">perspective_x</a></span> / <span class="tt"><a class="el" href="mode7_2perspective_2main_8c.html#a95f81030e6fd70dd6fd7bf1b88cf46d8" title="M7D per ground line: 4096 / zoom, the zoom growing by 0.05 a line (8.8 fixed point,...">perspective_y</a></span> tables and the four <span class="tt"><a class="el" href="hdma_8h.html#accfc69511911e1c0fdc59823c43c7a23" title="Set up an HDMA channel.">hdmaSetup()</a></span> calls in its <span class="tt">main.c</span> for the table layout. The math is straightforward: for scanline <span class="tt">s</span> at distance <span class="tt">d</span> from the horizon, the matrix factor is <span class="tt">1.0 / d</span> (inverse depth). What's hard is the channel bookkeeping — get the timing wrong and you see the wrong mode for one scanline, or the perspective curve "jumps".</p>
+<p>This is also a textbook case for the <a href="tutorial_hdma.html">HDMA tutorial</a>'s gotchas: the example uses HDMA channels 1–4, leaves channel 0 for <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> and channel 7 for the NMI handler's DMAs. Run any other split-mode display through it; the scaffolding is the same.</p>
 <h3 class="doxsection"><a class="anchor" id="the-super-mario-kart-floor-via-the-dsp-1--examplesmode7dsp1_ground"></a>
 The Super Mario Kart floor via the DSP-1 — <span class="tt">examples/mode7/dsp1_ground</span></h3>
 <p>Same four-channel split as <span class="tt">perspective</span>, but the M7A–M7D tables are not precomputed: the DSP-1's Raster command streams them every frame for a real camera (position, height, heading, tilt), so the floor rotates and moves in true perspective. The M7A/M7B pair rides one <span class="tt"><a class="el" href="hdma_8h.html#a21680673893284141c68b3fb38e775e4" title="HDMA mode: 2 registers, 4 bytes (2 to each).">HDMA_MODE_2REG_2X</a></span> channel and M7C/M7D the other, double-buffered and swapped with <span class="tt"><a class="el" href="hdma_8h.html#a60a2966565cd8b728a5acd019859e8e6" title="Update HDMA table pointer (for dynamic effects).">hdmaSetTable</a></span> in VBlank. The geometry that pins the matrices to the screen — horizon raster, Mode 7 centre and scroll — comes from <span class="tt"><a class="el" href="dsp1_8h.html#af14660034a8e2f3a7a33516e48f1ba16" title="Set up the projection plane (DSP-1 command $02, &quot;Parameter&quot;).">dsp1SetCamera</a></span>; see the <a class="el" href="tutorial_dsp1.html#the-ground-what-dsp1_ground-does" title="The ground (what dsp1_ground does)">DSP-1 tutorial</a>.</p>
@@ -335,7 +339,7 @@ EXTBG: one plane, two layers</h2>
 <td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone">BG2 pixels with bit 7 clear  </td></tr>
 </table>
 <p>So a priority-1 sprite passes in front of the bit-7-clear pixels and behind the bit-7-set ones — a ball rolling over a floor and under a bridge drawn in the same plane. Put <b>BG2, not BG1</b>, on the main screen (<span class="tt"><a class="el" href="video_8h.html#a1f4198496c1cb892dbd9eb108bd6845d" title="Enable layers on the main screen.">setMainScreen</a>(<a class="el" href="group__layer__enable.html#ga4491b560e6f9decf7efa9c0b23906ec2">LAYER_BG2</a> | <a class="el" href="group__layer__enable.html#ga900967011f520c45c1cba018d929baa0">LAYER_OBJ</a>)</span>): BG1 sits above BG2's low pixels and would cover them. The two layers are not transformed or scrolled independently, and BG2 does not take direct colour (snesdev-wiki, <em>Backgrounds</em>). Colour your pixels knowing that BG1 reads all eight bits: <span class="tt">0x83</span> is colour 3 on BG2 and colour 131 on BG1.</p>
-<p><a class="el" href="dir_9319767168103aa28aebca4fd134d8d7.html" title="/home/runner/work/opensnes/opensnes/examples/mode7/extbg/README.md"><span class="tt">examples/mode7/extbg</span></a> runs a sprite under a row of pillars and toggles EXTBG with A.</p>
+<p><a href="examples_mode7_extbg.html"><span class="tt">examples/mode7/extbg</span></a> runs a sprite under a row of pillars and toggles EXTBG with A.</p>
 <h2 class="doxsection"><a class="anchor" id="gotchas-6"></a>
 Gotchas</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md-bg1-scroll-and-the-mode-7-registers-share-one-write-twice-latch"></a>
@@ -387,18 +391,18 @@ Cycle cost</h2>
 <li><span class="tt"><a class="el" href="mode7_8h.html#a6063eb2e9a238110cd87ee75221fb9b4" title="Set rotation and scale together.">mode7Transform()</a></span> — same, with the degrees → angle conversion ≈ 100–120 cycles.</li>
 <li>A direct <span class="tt"><a class="el" href="mode7_8h.html#a86be6a317594dfefb05d0786baecf98c" title="Set Mode 7 matrix directly.">mode7SetMatrix()</a></span> — just the four PPU writes ≈ 30–40 cycles.</li>
 </ul>
-<p>Per-frame matrix updates are cheap (well under 0.1 % of the frame). Per-scanline updates via HDMA are more expensive — see the <a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial's cycle-cost section</a>. The 4-channel perspective example consumes ~6 % of CPU during active display.</p>
+<p>Per-frame matrix updates are cheap (well under 0.1 % of the frame). Per-scanline updates via HDMA are more expensive — see the <a href="tutorial_hdma.html">HDMA tutorial's cycle-cost section</a>. The 4-channel perspective example consumes ~6 % of CPU during active display.</p>
 <h2 class="doxsection"><a class="anchor" id="see-also-9"></a>
 See also</h2>
 <ul>
 <li><span class="tt"><a class="el" href="mode7_8h.html" title="SNES Mode 7 Support.">lib/include/snes/mode7.h</a></span> — full API reference.</li>
-<li><span class="tt">lib/source/mode7.asm</span> — implementation (matrix multiply, sin/cos table).</li>
-<li><a class="el" href="dir_91a615ea1a84656dce823a29fa9fdcc8.html" title="/home/runner/work/opensnes/opensnes/examples/mode7/rotate_scale/README.md"><span class="tt">examples/mode7/rotate_scale</span></a> — basic rotation + scaling demo.</li>
-<li><a class="el" href="dir_95ea0abe4773cff1cc22e5bd3c576b1b.html" title="/home/runner/work/opensnes/opensnes/examples/mode7/perspective/README.md"><span class="tt">examples/mode7/perspective</span></a> — F-Zero-style perspective via 4-channel HDMA.</li>
-<li><a class="el" href="dir_fd5082750b92adad098a614dbe58c5c6.html" title="/home/runner/work/opensnes/opensnes/examples/mode7/dsp1_ground/README.md"><span class="tt">examples/mode7/dsp1_ground</span></a> — the same split with matrices streamed by the DSP-1.</li>
-<li><a class="el" href="hdma_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/hdma.md">HDMA tutorial</a> — required reading for the perspective pattern.</li>
-<li><a class="el" href="graphics_8md.html" title="/home/runner/work/opensnes/opensnes/docs/tutorials/graphics.md">Graphics tutorial</a> — companion read for the regular BG modes (0–6).</li>
-<li><a class="el" href="KNOWN__LIMITATIONS_8md.html" title="/home/runner/work/opensnes/opensnes/KNOWN_LIMITATIONS.md"><span class="tt">KNOWN_LIMITATIONS.md</span></a> — VBlank DMA budget, bank <span class="tt">$00</span> overflow, and the runtime traps that bite Mode 7 projects with large 8 bpp tilesets.</li>
+<li><span class="tt">lib/source/mode7.c</span> — implementation (matrix multiply, sin/cos table).</li>
+<li><a href="examples_mode7_rotate_scale.html"><span class="tt">examples/mode7/rotate_scale</span></a> — basic rotation + scaling demo.</li>
+<li><a href="examples_mode7_perspective.html"><span class="tt">examples/mode7/perspective</span></a> — F-Zero-style perspective via 4-channel HDMA.</li>
+<li><a href="examples_mode7_dsp1_ground.html"><span class="tt">examples/mode7/dsp1_ground</span></a> — the same split with matrices streamed by the DSP-1.</li>
+<li><a href="tutorial_hdma.html">HDMA tutorial</a> — required reading for the perspective pattern.</li>
+<li><a href="tutorial_graphics.html">Graphics tutorial</a> — companion read for the regular BG modes (0–6).</li>
+<li><a href="known_limitations.html"><span class="tt">KNOWN_LIMITATIONS.md</span></a> — VBlank DMA budget, bank <span class="tt">$00</span> overflow, and the runtime traps that bite Mode 7 projects with large 8 bpp tilesets.</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="per-scanline-matrix-rotating-perspective"></a>
 Per-scanline matrix: rotating perspective</h2>
@@ -418,7 +422,7 @@ Per-scanline matrix: rotating perspective</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

@@ -5,7 +5,7 @@ var examples_color =
       [ "The idea in one screen", "examples_color.html#the-idea-in-one-screen-2", [
         [ "SNES Concepts", "examples_color_direct_color.html#snes-concepts-20", null ],
         [ "How to Build", "examples_color_direct_color.html#how-to-build-11", null ],
-        [ "Modules Used", "examples_color_direct_color.html#modules-used-29", null ]
+        [ "Modules Used", "examples_color_direct_color.html#modules-used-28", null ]
       ] ]
     ] ],
     [ "HiColor — 1792 colors from a 4bpp background", "examples_color_hicolor_1792.html", null ],

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/color/shadow_tint/main.c File Reference</title>
+<title>examples/color/shadow_tint/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -123,7 +123,7 @@ $(function(){initNavTree('color_2shadow__tint_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>Colour, rung 6c.2 — shadow &amp; tint: recolour a whole scene at once.  
+<p>Colour — shadow &amp; tint: recolour a whole scene at once.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="colormath_8h_source.html">snes/colormath.h</a>&gt;</code><br />
@@ -151,7 +151,7 @@ Variables</h2></td></tr>
 <tr class="memdesc:a4b24fbfead388e007e43fcdc6e13e592"><td class="mdescLeft">&#160;</td><td class="mdescRight">One solid 4bpp tile (two interleaved bitplane pairs, 32 bytes).  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Colour, rung 6c.2 — shadow &amp; tint: recolour a whole scene at once. </p>
+<div class="textblock"><p>Colour — shadow &amp; tint: recolour a whole scene at once. </p>
 <p>Colour math against a <em>fixed</em> colour is how a game changes mood without touching a single tile or palette entry. Subtract a grey and the scene darkens — dusk, a dungeon, nightfall. Add a colour and the scene takes that cast — the blue of being underwater, the orange of a sunset or lava glow, the red flash of taking a hit. One register pair does it to every pixel of a layer, every frame, for free.</p>
 <p>The scene here is a 4x4 chart of sixteen game-world colours (sky, water, foliage, earth, stone, accents) built procedurally — zero assets — so you can watch the effect land on every hue at once. Press A to cycle:</p>
 <p>none -&gt; shadow (darken) -&gt; underwater tint -&gt; sunset tint -&gt; none</p>

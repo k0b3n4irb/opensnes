@@ -122,14 +122,16 @@ $(function(){initNavTree('examples_maps_map_scroll.html','',''); });
   <div class="headertitle"><div class="title">Map Scroll </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>A large Tiled map scrolls as a Mario sprite moves left and right. The map engine streams only the visible tile columns to VRAM, so the map can be much wider than the screen. This is the stepping stone between "static background" and the full continuous_scroll example.</p>
+<div class="textblock"><p>A level drawn in the <a href="https://www.mapeditor.org/">Tiled</a> map editor scrolls as a Mario sprite moves left and right. The map engine streams only the visible tile columns to VRAM, so the map can be much wider than the screen; the level, its tile properties and its tileset are converted by the build from settings files beside them.</p>
 <div class="image">
 <img src="map_scroll.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-27"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-26"></a>
 What You'll Learn</h2>
 <ul>
+<li>How to design a level in Tiled and convert it for the SNES (Tiled → opensnes-level → ROM)</li>
+<li>How tile properties (collision, palette, priority) flow from Tiled to the game</li>
 <li>How the map engine streams a large level through a small VRAM window</li>
 <li>How camera-follow works: sprite position drives the viewport</li>
 <li>How to combine a scrolling background with an animated sprite</li>
@@ -146,7 +148,45 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">RIGHT  </td><td class="markdownTableBodyNone">Move Mario right  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-33"></a>
+<h2 class="doxsection"><a class="anchor" id="the-tiled-workflow"></a>
+The Tiled Workflow</h2>
+<div class="fragment"><div class="line">  Tiled Editor           opensnes-tileset       opensnes-level</div>
+<div class="line">┌──────────────┐        ┌──────────────┐      ┌──────────────┐</div>
+<div class="line">│ Paint tiles  │        │ tileset.png  │      │ level.tmj    │</div>
+<div class="line">│ Set props    │        │      ↓       │      │ + tileset.map│</div>
+<div class="line">│ Export .tmj  │        │ .pic .pal .map│     │      ↓       │</div>
+<div class="line">└──────┬───────┘        └──────────────┘      │ .m16 .t16 .b16│</div>
+<div class="line">       │                                      └──────────────┘</div>
+<div class="line">       └── Your level data, ready for mapLoad()</div>
+</div><!-- fragment --><p><b>Step 1.</b> Design the level in Tiled (8x8 pixel tiles, any width/height up to 16384 tiles in all). Set per-tile properties: <span class="tt">attribute</span> (collision), <span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a></span> (0-7), <span class="tt">priority</span> (0-1).</p>
+<p><b>Step 2.</b> Export it as <span class="tt">.tmj</span> (JSON).</p>
+<p><b>Step 3.</b> The tileset picture is converted by <span class="tt">opensnes-tileset</span>, from its settings file <span class="tt">res/tilesMario.png.toml</span>: </p><div class="fragment"><div class="line">tool = &quot;opensnes-tileset&quot;</div>
+<div class="line"> </div>
+<div class="line">[convert]</div>
+<div class="line">colors = 48</div>
+<div class="line"># Outputs: .pic (tiles), .pal (palette), .map (tile optimization table), .inc (the C declarations)</div>
+</div><!-- fragment --><p><b>Step 4.</b> The level is converted by <span class="tt">opensnes-level</span>, after the tileset whose <span class="tt">.map</span> its settings file names (<span class="tt">res/tiledMario.tmj.toml</span>): </p><div class="fragment"><div class="line">tool = &quot;opensnes-level&quot;</div>
+<div class="line"> </div>
+<div class="line">[convert]</div>
+<div class="line">tileset = &quot;tilesMario.map&quot;</div>
+<div class="line"># Outputs: BG1.m16 (tilemap), tiledMario.t16 (tile defs), tiledMario.b16 (attributes),</div>
+<div class="line">#          tiledMario.o16 (entities), tiledMario.inc (the C declarations)</div>
+</div><!-- fragment --><p><b>Step 5.</b> The build links the converted data (<span class="tt">res/tilesMario.inc</span> and <span class="tt">res/tiledMario.inc</span> declare it); <span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span> takes it — no <span class="tt">data.asm</span>.</p>
+<h3 class="doxsection"><a class="anchor" id="tile-properties"></a>
+Tile Properties</h3>
+<p>Each tile in the Tiled editor can carry custom properties:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Property  </th><th class="markdownTableHeadNone">Tiled Field  </th><th class="markdownTableHeadNone">SNES Effect  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">attribute</span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"FF00"</span>)  </td><td class="markdownTableBodyNone">Collision type: <span class="tt"><a class="el" href="map_8h.html#af873aaa17834669d0f263af08c2912c3" title="Solid tile (blocks movement).">T_SOLID</a></span>, <span class="tt"><a class="el" href="map_8h.html#a7b834046275ade27bcb100e684cdbf2a" title="Ladder tile (object can climb).">T_LADDER</a></span>, <span class="tt"><a class="el" href="map_8h.html#a87a89f657f33f4eab646bb7f6ad21fa3" title="Spike tile (object dies).">T_SPIKE</a></span>, etc.  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt"><a class="el" href="games_2breakout_2main_8c.html#aa81235770612a39a2668d11264dc308f" title="Full 256-color palette for BG and sprite layers (512 bytes).">palette</a></span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"1"</span>)  </td><td class="markdownTableBodyNone">Palette bank (bits 10-12 of tilemap entry)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">priority</span>  </td><td class="markdownTableBodyNone">Hex string (e.g., <span class="tt">"1"</span>)  </td><td class="markdownTableBodyNone">BG priority bit (bit 13 of tilemap entry)  </td></tr>
+</table>
+<p>opensnes-level stores them in the <span class="tt">.b16</span> (attributes) and <span class="tt">.t16</span> (palette and priority) files.</p>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-34"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="map-engine-two-phase-update"></a>
 Map Engine Two-Phase Update</h3>
@@ -168,7 +208,7 @@ Camera-Relative Sprite Positioning</h3>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="walk-animation"></a>
 Walk Animation</h3>
 <p>The sprite cycles through 4 frames (tiles 0, 2, 4, 6). Each 16x16 sprite uses 2 VRAM tiles (top-left + top-right), so frames are spaced by 2. Animation advances every other input frame for natural pacing.</p>
-<h2 class="doxsection"><a class="anchor" id="modules-used-51"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-50"></a>
 Modules Used</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -186,11 +226,11 @@ Modules Used</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">map</span>  </td><td class="markdownTableBodyNone"><span class="tt"><a class="el" href="map_8h.html#a4895959148c67700bc9d52dab9501136" title="Load map data into the engine and flush to VRAM.">mapLoad()</a></span>, <span class="tt"><a class="el" href="map_8h.html#ac833e2572ce808bac75d10df2817df03" title="Update map scroll buffers based on camera position.">mapUpdate()</a></span>, <span class="tt"><a class="el" href="map_8h.html#aa36598a0b40be791f4845574e0c5db1f" title="Transfer map updates to VRAM.">mapVblank()</a></span> — the streaming map engine  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-35"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-34"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/maps/map_scroll</div>
-</div><!-- fragment --><p>Open <span class="tt">map_scroll.sfc</span> in Mesen2 and scroll with LEFT/RIGHT. </p>
+</div><!-- fragment --><p>Run <span class="tt">map_scroll.sfc</span> in luna (<span class="tt">opensnes run</span>) or any SNES emulator and scroll with LEFT/RIGHT. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
@@ -205,7 +245,7 @@ Build &amp; Run</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_maps.html">Maps</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_maps.html">Maps</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

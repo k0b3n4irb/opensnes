@@ -123,7 +123,7 @@ $(function(){initNavTree('oam.html','',''); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>OAM stores sprite attributes for the PPU. Understanding how OAM works is critical for sprite programming.</p>
-<h2 class="doxsection"><a class="anchor" id="oam-structure-1"></a>
+<h2 class="doxsection"><a class="anchor" id="oam-structure"></a>
 OAM Structure</h2>
 <p>OAM is <b>544 bytes</b> total:</p>
 <table class="markdownTable">
@@ -216,25 +216,9 @@ Setting OAM Address</h3>
 </div><!-- fragment --><p>For the extended table: </p><div class="fragment"><div class="line"><span class="comment">// Set OAM address to extended table</span></div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gae7e3753ff8b20eb03256385da37eaf38">REG_OAMADDL</a> = 0;</div>
 <div class="line"><a class="code hl_define" href="group__ppu__regs.html#gad8e30bb8ad62f2a58545ff770db95174">REG_OAMADDH</a> = 1;  <span class="comment">// Bit 0 = 1 selects high table (bytes 512+)</span></div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="sprite-sizes-2"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="sprite-sizes-1"></a>
 Sprite Sizes</h2>
-<p><span class="tt">$2101</span> (OBJSEL) configures sprite sizes:</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Value  </th><th class="markdownTableHeadNone">Small  </th><th class="markdownTableHeadNone">Large  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">0x00  </td><td class="markdownTableBodyNone">8x8  </td><td class="markdownTableBodyNone">16x16  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">0x20  </td><td class="markdownTableBodyNone">8x8  </td><td class="markdownTableBodyNone">32x32  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">0x40  </td><td class="markdownTableBodyNone">8x8  </td><td class="markdownTableBodyNone">64x64  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">0x60  </td><td class="markdownTableBodyNone">16x16  </td><td class="markdownTableBodyNone">32x32  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">0x80  </td><td class="markdownTableBodyNone">16x16  </td><td class="markdownTableBodyNone">64x64  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">0xA0  </td><td class="markdownTableBodyNone">32x32  </td><td class="markdownTableBodyNone">64x64  </td></tr>
-</table>
+<p><span class="tt">$2101</span> (OBJSEL) chooses the small and large size for all sprites; each sprite's size bit in the extended table picks one of the two. The size combinations are tabled in <a class="el" href="hardware_ppu.html#hardware_ppu_sprites" title="Sprites">The PPU: sprites</a>.</p>
 <h2 class="doxsection"><a class="anchor" id="hiding-sprites-1"></a>
 Hiding Sprites</h2>
 <p>To hide a sprite, set its Y position to 240 <b>and</b> set its X-position high bit (placing it at X=256, off-screen to the right):</p>
@@ -252,8 +236,8 @@ Sprite Y: no correction</h2>
 <p>Like the NES, sprites appear 1 line lower than their Y value, however because the first line of rendering is always hidden on SNES, a sprite with Y=0 will appear to begin on the first visible line. However, a background with Y scroll of 0 will appear to have its top pixel cut off by the hidden line. </p>
 </blockquote>
 <p>So only the <b>background</b> needs a correction, and the library applies it: <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span> writes <span class="tt">y - 1</span> to <span class="tt">BGnVOFS</span>. Every sprite API stores the <span class="tt">y</span> it is given, and a direct write to <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[id * 4 + 1]</span> stores <span class="tt">y</span> too. A sprite and the background it stands on take the same camera value.</p>
-<p>Measured on luna (2026-10-09): an 8x8 sprite with OAM <span class="tt">Y</span> = 0 covers picture lines 0 to 7; with <span class="tt">Y</span> = 255 it covers lines 0 to 6, its top row lost on the scanline that is never output.</p>
-<p><b>History, because code written against it exists.</b> From 2026-04-27 to 2026-10-09 <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a1e502976736192dfc725c51f471a24d6" title="Set sprite Y position.">oamSetY()</a></span>, <span class="tt"><a class="el" href="sprite_8h.html#a7797ff0c3210fcbd0cbbe0e55d23a83c" title="Set sprite position.">oamSetXY()</a></span> and the <span class="tt"><a class="el" href="sprite_8h.html#ad6fdb30b5354a8869da17ca73a1e51f3" title="Set sprite properties with zero function-call overhead.">oamSetFast</a></span> macros stored <span class="tt">y - 1</span>, on a reading of the first half of the sentence above without the second; the dynamic engine followed on 2026-09-26. Every sprite was drawn one line too high, and since <span class="tt"><a class="el" href="background_8h.html#a9bf45b3dbc30dec36aeb592b58b120f4" title="Set background scroll position.">bgSetScroll()</a></span> got its <span class="tt">- 1</span> (2026-09-12) one line above a background scrolled to the same <span class="tt">y</span>. Code that subtracted 1 by hand before a direct <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> write must stop; code that added 1 to a <span class="tt">y</span> passed to <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> to line a sprite up with the background must stop too.</p>
+<p>Measured on luna: an 8x8 sprite with OAM <span class="tt">Y</span> = 0 covers picture lines 0 to 7; with <span class="tt">Y</span> = 255 it covers lines 0 to 6, its top row lost on the scanline that is never output.</p>
+<p>So do not subtract 1 by hand before a direct <span class="tt"><a class="el" href="system_8h.html#a7c7ba6f353be470fff7b41590a12a0e9" title="Hardware OAM buffer (544 bytes at $7E:0300).">oamMemory</a>[]</span> write, and do not add 1 to a <span class="tt">y</span> passed to <span class="tt"><a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a></span> to line a sprite up with the background: the sprite would land one line off.</p>
 <p>Sentinel values that hide a sprite (<span class="tt"><a class="el" href="sprite_8h.html#aa4a3dec16e47237ca76dafdef88883b8" title="Y position to hide sprite.">OBJ_HIDE_Y</a> = 240</span>) are positions like any other: 240 is below the last visible line (223).</p>
 <p>The X axis has no such subtlety.</p>
 <h2 class="doxsection"><a class="anchor" id="timing"></a>
@@ -291,12 +275,12 @@ Common Pitfalls</h2>
 <li><b>Forgetting extended table</b> - Large sprites need size bit set</li>
 <li><b>X position &gt; 255</b> - Need to set bit 0 in extended table</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="see-also-23"></a>
+<h2 class="doxsection"><a class="anchor" id="see-also-25"></a>
 See Also</h2>
 <ul>
-<li><a class="el" href="REGISTERS_8md.html" title="/home/runner/work/opensnes/opensnes/docs/hardware/REGISTERS.md">Registers</a> - Full register reference</li>
-<li><a class="el" href="SNES__GRAPHICS__GUIDE_8md.html" title="/home/runner/work/opensnes/opensnes/docs/SNES_GRAPHICS_GUIDE.md">SNES Graphics Guide</a> - Graphics system overview</li>
-<li><a href="/examples/sprites/animated_sprite/">Animated Sprite Example</a> - Working sprite animation code </li>
+<li><a href="registers.html">Registers</a> - Full register reference</li>
+<li><a href="hardware_ppu.html">The PPU</a> - Modes, tiles, palettes, sprite sizes</li>
+<li><a href="examples_sprites_animated_sprite.html">Animated Sprite Example</a> - Working sprite animation code </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
@@ -312,7 +296,7 @@ See Also</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

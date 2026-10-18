@@ -219,7 +219,7 @@ Fade In (Black to Full)</h3>
 <div class="line">}</div>
 <div class="ttc" id="aconsole_8h_html_a54ab05fa0c4c26a7efb81e86d57661fb"><div class="ttname"><a href="console_8h.html#a54ab05fa0c4c26a7efb81e86d57661fb">fadeIn</a></div><div class="ttdeci">void fadeIn(u8 speed)</div><div class="ttdoc">Fade the screen from black (0) up to full brightness (15).</div></div>
 <div class="ttc" id="aconsole_8h_html_abd33830487e4764e5ec22ec98b749f4b"><div class="ttname"><a href="console_8h.html#abd33830487e4764e5ec22ec98b749f4b">WaitForVBlank</a></div><div class="ttdeci">void WaitForVBlank(void)</div><div class="ttdoc">Wait for next VBlank period.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:155</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_abf0a803c9f19fa09bc230ae54a46bb4c"><div class="ttname"><a href="games_2breakout_2main_8c.html#abf0a803c9f19fa09bc230ae54a46bb4c">i</a></div><div class="ttdeci">static u8 i</div><div class="ttdef"><b>Definition</b> main.c:147</div></div>
 <div class="ttc" id="agroup__ppu__regs_html_gabec6eb1bc9f87a1143464c7418c96388"><div class="ttname"><a href="group__ppu__regs.html#gabec6eb1bc9f87a1143464c7418c96388">REG_INIDISP</a></div><div class="ttdeci">#define REG_INIDISP</div><div class="ttdoc">Display control (W).</div><div class="ttdef"><b>Definition</b> registers.h:49</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="fade-out-full-to-black"></a>
@@ -280,13 +280,13 @@ Scene Transition Pattern</h2>
 <div class="line">}</div>
 <div class="ttc" id="agroup__reg__const_html_gab18ce2bcee19d38256a74af702ebe4a3"><div class="ttname"><a href="group__reg__const.html#gab18ce2bcee19d38256a74af702ebe4a3">INIDISP_FORCE_BLANK</a></div><div class="ttdeci">#define INIDISP_FORCE_BLANK</div><div class="ttdef"><b>Definition</b> registers.h:430</div></div>
 </div><!-- fragment --><hr  />
-<h2 class="doxsection"><a class="anchor" id="build--run-53"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-50"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/transitions/fading</div>
 </div><!-- fragment --><p>Then open <span class="tt">fading.sfc</span> in your emulator (Mesen2 recommended).</p>
 <hr  />
-<h2 class="doxsection"><a class="anchor" id="modules-used-76"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-73"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span> (<span class="tt">LIB_MODULES</span> in the Makefile).</p>
 <h2 class="doxsection"><a class="anchor" id="files-12"></a>
@@ -318,7 +318,7 @@ Exercise 3: Color Fade</h3>
 <p>Use color math to fade to a specific color instead of black: </p><div class="fragment"><div class="line"><a class="code hl_function" href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a>(r, g, <a class="code hl_variable" href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a>);</div>
 <div class="line"><span class="comment">/* Increase color math intensity as brightness drops */</span></div>
 <div class="ttc" id="acolormath_8h_html_a94502e76334cf02b8e862126427f62c7"><div class="ttname"><a href="colormath_8h.html#a94502e76334cf02b8e862126427f62c7">colorMathSetFixedColor</a></div><div class="ttdeci">void colorMathSetFixedColor(u8 r, u8 g, u8 b)</div><div class="ttdoc">Set fixed color for blending.</div></div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a15f49ee344ac4630061e33b7661f1405"><div class="ttname"><a href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></div><div class="ttdeci">static u16 b</div><div class="ttdef"><b>Definition</b> main.c:156</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a15f49ee344ac4630061e33b7661f1405"><div class="ttname"><a href="games_2breakout_2main_8c.html#a15f49ee344ac4630061e33b7661f1405">b</a></div><div class="ttdeci">static u16 b</div><div class="ttdef"><b>Definition</b> main.c:148</div></div>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="exercise-4-pulse-effect"></a>
 Exercise 4: Pulse Effect</h3>
 <p>Create a pulsing brightness effect: </p><div class="fragment"><div class="line"><span class="keyword">static</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> pulse_dir = 1;</div>
@@ -360,7 +360,7 @@ Alternative: Palette Fade</h3>
 <hr  />
 <h2 class="doxsection"><a class="anchor" id="whats-next-7"></a>
 What's Next?</h2>
-<p><b>Mosaic:</b> <a href="../mosaic/">Mosaic Example</a> - Pixelation transitions</p>
+<p><b>Mosaic:</b> <a href="examples_transitions_mosaic.html">Mosaic Example</a> - Pixelation transitions</p>
 <p><b>Parallax:</b> <a href="../parallax_scroll/">Parallax Scrolling</a> - Multi-speed scrolling with HDMA </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
@@ -376,7 +376,7 @@ What's Next?</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_transitions.html">Transitions</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_transitions.html">Transitions</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

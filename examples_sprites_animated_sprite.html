@@ -132,7 +132,7 @@ What This Example Shows</h2>
 <h2 class="doxsection"><a class="anchor" id="prerequisites-8"></a>
 Prerequisites</h2>
 <p>Read <span class="tt">sprites/simple_sprite</span> first (OAM basics, tile loading).</p>
-<h2 class="doxsection"><a class="anchor" id="controls-30"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-29"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -146,7 +146,7 @@ Controls</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D-PAD Right  </td><td class="markdownTableBodyNone">Walk right  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-46"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-44"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/sprites/animated_sprite</div>
@@ -170,7 +170,7 @@ How It Works</h2>
 <div class="line">    <a class="code hl_enumvalue" href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaadb3898c81625762236e0f115992de1f0">W_RIGHT</a> = 2,</div>
 <div class="line">    <a class="code hl_enumvalue" href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaaed37cc1ae9548b4a4f651e488ad14dfa">W_LEFT</a> = 2  <span class="comment">/* Reuses W_RIGHT with flipx */</span></div>
 <div class="line">};</div>
-<div class="ttc" id="asprites_2animated__sprite_2main_8c_html_af7ccac6abcbe8bf213b36feaa7b69cda"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cda">SpriteState</a></div><div class="ttdeci">SpriteState</div><div class="ttdoc">Sprite sheet tile data containing all animation frames (defined in data.asm).</div><div class="ttdef"><b>Definition</b> main.c:61</div></div>
+<div class="ttc" id="asprites_2animated__sprite_2main_8c_html_af7ccac6abcbe8bf213b36feaa7b69cda"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cda">SpriteState</a></div><div class="ttdeci">SpriteState</div><div class="ttdoc">Sprite sheet tile data containing all animation frames (converted by the build from res/).</div><div class="ttdef"><b>Definition</b> main.c:61</div></div>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_af7ccac6abcbe8bf213b36feaa7b69cdaa1b27b1e4284a41371a37847cc1dfe65d"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaa1b27b1e4284a41371a37847cc1dfe65d">W_UP</a></div><div class="ttdeci">@ W_UP</div><div class="ttdef"><b>Definition</b> main.c:63</div></div>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaa99ff5764901f536e4d81e18a9027553d">W_DOWN</a></div><div class="ttdeci">@ W_DOWN</div><div class="ttdef"><b>Definition</b> main.c:62</div></div>
 <div class="ttc" id="asprites_2animated__sprite_2main_8c_html_af7ccac6abcbe8bf213b36feaa7b69cdaadb3898c81625762236e0f115992de1f0"><div class="ttname"><a href="sprites_2animated__sprite_2main_8c.html#af7ccac6abcbe8bf213b36feaa7b69cdaadb3898c81625762236e0f115992de1f0">W_RIGHT</a></div><div class="ttdeci">@ W_RIGHT</div><div class="ttdef"><b>Definition</b> main.c:64</div></div>
@@ -206,7 +206,7 @@ Sprite Sheets in VRAM</h3>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md16x16-tiles-in-oam"></a>
 16x16 Tiles in OAM</h3>
 <p>In OAM, a 16x16 sprite uses 4 hardware 8x8 tiles arranged in a 2x2 grid. The tile number refers to the top-left tile; the PPU fills in the rest automatically using the SNES tile numbering convention (right tile = tile+1, bottom tiles follow the 16-tile-per-row VRAM layout).</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-16"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-15"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -220,7 +220,7 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite dma input</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-8"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-9"></a>
 Going Further</h2>
 <ul>
 <li><b>Add diagonal movement</b>: Check for simultaneous Up+Right, Down+Left, etc. Choose a direction state based on the last-pressed direction.</li>
@@ -231,7 +231,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-64"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-62"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">anim</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
@@ -248,7 +248,7 @@ Modules Used</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_sprites.html">Sprites</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_sprites.html">Sprites</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

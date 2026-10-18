@@ -30,9 +30,10 @@ var searchData=
   ['max_5fscroll_5fwidth_27',['max_scroll_width',['../maps_2dynamic__map_2main_8c.html#ac31b92f2c43357d5d53909f29aa0734b',1,'main.c']]],
   ['message_28',['message',['../fundamentals_2text__glyphs_2main_8c.html#ab3001e6fcd80f929ec89a02a0d5ad26e',1,'main.c']]],
   ['mode_29',['mode',['../structAnimClip.html#a141343eb22d0ef950eee467dcd3578a9',1,'AnimClip']]],
-  ['monster_30',['monster',['../sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024',1,'main.c']]],
-  ['monster_5fanim_31',['monster_anim',['../sprites_2animated__sprite_2main_8c.html#a4ec2838b1e79778c47a2d4700a27be3a',1,'main.c']]],
-  ['msg_5fcolor_32',['msg_color',['../render_8c.html#a469f97fefc467199cf6aff4660f44a64',1,'render.c']]],
-  ['msg_5fcolor_5fdirty_33',['msg_color_dirty',['../render_8c.html#ad5580510b96399f26c9b790102375a05',1,'render.c']]],
-  ['msg_5fcolors_34',['msg_colors',['../games_2tetris_2main_8c.html#a941373ea86f8c3a624bbac3e0f4502fb',1,'main.c']]]
+  ['mode_5ftable_30',['mode_table',['../mode7_2perspective_2main_8c.html#a5ad802b73906cc4b18f6228b7d61b77b',1,'main.c']]],
+  ['monster_31',['monster',['../sprites_2animated__sprite_2main_8c.html#a22e2bc93d6832b63ced1b19352729024',1,'main.c']]],
+  ['monster_5fanim_32',['monster_anim',['../sprites_2animated__sprite_2main_8c.html#a4ec2838b1e79778c47a2d4700a27be3a',1,'main.c']]],
+  ['msg_5fcolor_33',['msg_color',['../render_8c.html#a469f97fefc467199cf6aff4660f44a64',1,'render.c']]],
+  ['msg_5fcolor_5fdirty_34',['msg_color_dirty',['../render_8c.html#ad5580510b96399f26c9b790102375a05',1,'render.c']]],
+  ['msg_5fcolors_35',['msg_colors',['../games_2tetris_2main_8c.html#a941373ea86f8c3a624bbac3e0f4502fb',1,'main.c']]]
 ];

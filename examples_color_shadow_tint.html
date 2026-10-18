@@ -122,7 +122,7 @@ $(function(){initNavTree('examples_color_shadow_tint.html','',''); });
   <div class="headertitle"><div class="title">shadow_tint — recolour a whole scene at once </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><b>Family 6 (Colour &amp; effects) · rung 6c.2 — shadow &amp; tint.</b></p>
+<div class="textblock"><p><b>Colour &amp; effects · shadow &amp; tint.</b></p>
 <h2 class="doxsection"><a class="anchor" id="why-it-matters-for-your-game-4"></a>
 Why it matters for your game</h2>
 <p>Mood is colour. Nightfall, a dungeon, a cave — subtract a grey and the whole screen darkens. Underwater, poison gas, a lava cavern, a sepia flashback, the red flash of taking a hit — add a colour and everything takes that cast. The SNES does this to every pixel of a layer in one PPU pass, so a single register pair changes the entire scene's atmosphere for zero per-frame cost. It is the difference between one tileset and a tileset that reads as day, dusk, and midnight.</p>
@@ -130,7 +130,7 @@ Why it matters for your game</h2>
 <img src="shadow_tint.png" alt=""/>
 <div class="caption">
 Screenshot</div></div>
-    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-16"></a>
+    <h2 class="doxsection"><a class="anchor" id="what-youll-learn-15"></a>
 What you'll learn</h2>
 <p>The single new idea: <b>colour math against a <em>fixed</em> colour.</b> The PPU takes the finished main-screen image and adds or subtracts a constant colour per layer — <span class="tt"><a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow()</a></span> subtracts a grey (darken), <span class="tt"><a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint()</a></span> adds a colour (cast). This rests on the layers, tiles and palette you already know; the effect sits <em>on top</em> of them and touches no VRAM, CGRAM or OAM.</p>
 <p>Because both effects share the one fixed-colour register and the single add/subtract bit, <b>only one is active at a time</b> — which is exactly why the demo cycles through them rather than combining them. The scene is a 4×4 chart of sixteen game-world colours, built procedurally (zero assets), so you can watch the transform land on every hue together.</p>
@@ -144,16 +144,16 @@ What to observe / if it breaks</h2>
 <li><b>Shadow goes fully black / tint blows out white:</b> the fixed-colour intensity is too high — <span class="tt"><a class="el" href="colormath_8h.html#a74617df72273156acc7bf429ed1d25d5" title="Set up shadow/darkening effect.">colorMathShadow</a></span> subtracts, <span class="tt"><a class="el" href="colormath_8h.html#ac4a5f6de5270e9e6c34109a254c163d4" title="Set up color tint effect.">colorMathTint</a></span> adds, both clamp at the channel limits.</li>
 </ul>
 <p>Probe oracle: <span class="tt"><a class="el" href="color_2shadow__tint_2main_8c.html#adf08111f5aa78a7eb0efff8c23f8d70a" title="Probe oracle: current effect (0 none, 1 shadow, 2 underwater, 3 sunset).">fx_state</a></span> (0 none, 1 shadow, 2 underwater, 3 sunset) advances on each A press; the effect matches CGADSUB (add/subtract) and COLDATA (the fixed colour).</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-22"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-21"></a>
 Build &amp; run</h2>
 <div class="fragment"><div class="line">make</div>
 <div class="line">../../../testing/bin/luna run -n 3000000 shadow_tint.sfc</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-33"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="modules-used-32"></a>
 Modules used</h2>
 <p><span class="tt">console</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">colormath</span>, <span class="tt">input</span></p>
 <h2 class="doxsection"><a class="anchor" id="where-you-are-4"></a>
 Where you are</h2>
-<p>← previous: <a href="../transparency/">transparency</a> · colour math between two layers · → next in family: <a href="../direct_color/">direct_color</a> · the pixel byte <em>is</em> the colour </p>
+<p>← previous: <a href="examples_color_transparency.html">transparency</a> · colour math between two layers · → next in family: <a href="examples_color_direct_color.html">direct_color</a> · the pixel byte <em>is</em> the colour </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->
@@ -168,7 +168,7 @@ Where you are</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_color.html">Colour</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_color.html">Colour</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

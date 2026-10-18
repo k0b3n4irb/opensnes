@@ -128,21 +128,23 @@ Check</h2>
 <div class="fragment"><div class="line">opensnes-rom check game.sfc                                  # the .sym and the .c.asm beside it</div>
 <div class="line">opensnes-rom check game.sfc --bank0-fail 0 --ram-fail 512    # what make/common.mk passes</div>
 <div class="line">opensnes-rom check game.sfc --json</div>
-</div><!-- fragment --><p>Six checks, in this order; the build fails on the first four kinds of failure, the others are information:</p>
+</div><!-- fragment --><p>Seven checks, in this order; every one but the asset line can fail the build. A ROM the build's check refuses is deleted, so that a second <span class="tt">make</span> does not take it for up to date: run <span class="tt">opensnes-rom check</span> on its <span class="tt">.sym</span>, which stays.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Check  </th><th class="markdownTableHeadNone">What it refuses  </th><th class="markdownTableHeadNone">Why it is silent on hardware  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>bank $00 ROM</b>  </td><td class="markdownTableBodyNone">nothing by default: it reports the free bytes of the code bank and how much code the linker placed in the next banks (code runs from any bank). <span class="tt">--bank0-fail N</span> fails under N free bytes, for a project that wants it; asset payload that sits in bank $00 is named  </td><td class="markdownTableBodyNone">— (until 2026-10-10 this was a failure under 1024 bytes, from the time C const data had to live there)  </td></tr>
+<td class="markdownTableBodyNone"><b>bank $00 ROM</b>  </td><td class="markdownTableBodyNone">nothing by default: it reports the free bytes of the code bank and how much code the linker placed in the next banks (code runs from any bank). <span class="tt">--bank0-fail N</span> fails under N free bytes, for a project that wants it; asset payload that sits in bank $00 is named  </td><td class="markdownTableBodyNone">—  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><b>C RAM band</b>  </td><td class="markdownTableBodyNone">a RAM section that crosses or sits past <span class="tt">$2000</span>; fewer than <span class="tt">--ram-fail</span> bytes free; warns under <span class="tt">--ram-warn</span> with the three largest sections  </td><td class="markdownTableBodyNone">plain C RAM addressing is bank-$00-implicit; above <span class="tt">$1FFF</span> it is wrong-banked or hits the registers (<span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> is the way above)  </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>data-init sentinel</b>  </td><td class="markdownTableBodyNone"><span class="tt">DataInitEnd</span> not at the end of <span class="tt">.data_init</span>  </td><td class="markdownTableBodyNone">an object linked after <span class="tt">data_init_end.o</span> has globals that boot uninitialised  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><b>bank-blind reads</b>  </td><td class="markdownTableBodyNone">a symbol read with 16-bit addressing (<span class="tt">lda.w sym</span>, <span class="tt">lda.w #sym</span> without <span class="tt">#:sym</span>) that the linker placed in bank $01+  </td><td class="markdownTableBodyNone">the read returns garbage; pass the data as a far pointer or keep it in bank $00  </td></tr>
+<td class="markdownTableBodyNone"><b>SA-1 boot</b>  </td><td class="markdownTableBodyNone"><span class="tt">SA1Start</span> outside the ROM of bank $00 (an SA-1 ROM only)  </td><td class="markdownTableBodyNone">the SA-1 reset vector is 16-bit: the SA-1 never runs a line, the S-CPU waits for it, and a SUPERFREE boot section gets there as soon as bank $00 fills  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><b>NMI / WRAM port</b>  </td><td class="markdownTableBodyNone">a write to <span class="tt">$2180-$2183</span> in a function reachable from <span class="tt">NmiHandler</span> or from a callback given to <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet</a></span>  </td><td class="markdownTableBodyNone">a mid-sequence interrupt corrupts the port's address and the main thread writes to the wrong place  </td></tr>
+<td class="markdownTableBodyNone"><b>bank-blind reads</b>  </td><td class="markdownTableBodyNone">a symbol read with 16-bit addressing (<span class="tt">lda.w sym</span>, <span class="tt">lda.w #sym</span> without <span class="tt">#:sym</span>) that the linker placed in bank $01+  </td><td class="markdownTableBodyNone">the read returns garbage; pass the data as a far pointer or keep it in bank $00  </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><b>NMI / WRAM port</b>  </td><td class="markdownTableBodyNone">a write to <span class="tt">$2180-$2183</span> in a function reachable from <span class="tt">NmiHandler</span> or from a callback given to <span class="tt"><a class="el" href="interrupt_8h.html#a54a7e26f751984f6f3241ed2d2c5eda7" title="Register a VBlank callback function.">nmiSet</a></span>  </td><td class="markdownTableBodyNone">a mid-sequence interrupt corrupts the port's address and the main thread writes to the wrong place  </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>assets</b>  </td><td class="markdownTableBodyNone">nothing: one line with the VRAM and CGRAM weight of the converted graphics on disk  </td><td class="markdownTableBodyNone">an inventory, not a budget; <span class="tt">opensnes budget</span> measures the running scene  </td></tr>
 </table>
 <p>The figures print at every link (<span class="tt">OK: bank $00 ROM (code): 19177 bytes
@@ -173,7 +175,7 @@ Budget</h2>
 <div class="line">  VRAM                         20768 / 65536   bytes    32%   44768 free</div>
 <div class="line">  CGRAM                          128 / 256     colours  50%   128 free</div>
 </div><!-- fragment --><p>One report where the build prints several lines: what the linker placed in each ROM bank, the two RAM bands C can use (<a class="el" href="tutorial_far_ram.html" title="Far RAM Tutorial — FAR objects beyond the 8 KB band">Far RAM Tutorial — FAR objects beyond the 8 KB band</a>), the cartridge's save RAM, and the weight of the project's converted assets against VRAM and CGRAM (an upper bound: a game seldom loads every asset at once). It never fails on a figure — the thresholds are <span class="tt">check</span>'s — and <span class="tt">--json</span> gives the same numbers per bank. <span class="tt">opensnes budget</span> builds the project and runs it (<a class="el" href="tools_opensnes.html" title="opensnes — the project tool">opensnes — the project tool</a>).</p>
-<p>Not in the report yet, because a link cannot know them: the time the NMI handler takes in VBlank and the size of the SPC700 sound data; luna measures the first (<span class="tt">luna profile</span>, <a class="el" href="tools_luna.html" title="luna — command reference (pinned v1.38.0)">luna — command reference (pinned v1.38.0)</a>).</p>
+<p>Not in the report yet, because a link cannot know them: the time the NMI handler takes in VBlank and the size of the SPC700 sound data; luna measures the first (<span class="tt">luna profile</span>, <a class="el" href="tools_luna.html" title="luna — command reference (pinned v1.39.0)">luna — command reference (pinned v1.39.0)</a>).</p>
 <h2 class="doxsection"><a class="anchor" id="where-the-checks-came-from"></a>
 Where the checks came from</h2>
 <p><span class="tt">symmap.py --check-bank0-overflow / --check-ram-budget / --check-data-init</span>, <span class="tt">check_bank_reads.py</span>, <span class="tt">check_nmi_wram_race.py</span> and <span class="tt">asset_budget.py --oneline</span> in <span class="tt">devtools/</span>. The port was compared against them on every built ROM of the repository (99: same verdicts, same free byte counts, same far-band figures). The Python stays for the contributor gates that use it (<span class="tt">symmap.py --check-overlap</span> on the release ROMs, the unit tests). </p>
@@ -191,7 +193,7 @@ Where the checks came from</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

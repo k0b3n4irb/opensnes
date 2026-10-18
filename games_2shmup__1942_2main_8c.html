@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/games/shmup_1942/main.c File Reference</title>
+<title>examples/games/shmup_1942/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -123,7 +123,7 @@ $(function(){initNavTree('games_2shmup__1942_2main_8c.html','',''); });
 </div><!--header-->
 <div class="contents">
 
-<p>shmup_1942 — S5: bullets, collision and enemy destruction  
+<p>shmup_1942 — a vertical shoot 'em up: scrolling, enemies, bullets  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="snes_8h_source.html">snes.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="asset_8h_source.html">snes/asset.h</a>&gt;</code><br />
@@ -194,19 +194,20 @@ Variables</h2></td></tr>
 <tr class="memitem:a73de383a83473e9a755b640ccca7fd44" id="r_a73de383a83473e9a755b640ccca7fd44"><td class="memItemLeft">static <a class="el" href="structGameState.html">GameState</a>&#160;</td><td class="memItemRight"><a class="el" href="#a73de383a83473e9a755b640ccca7fd44">game</a></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>shmup_1942 — S5: bullets, collision and enemy destruction </p>
-<p>Adds player bullets and bullet↔enemy AABB collision on top of S4. Pressing A fires a bullet upward (with a small cooldown). Bullets travel at 4 px/frame; when a bullet's bounding box overlaps an enemy, both deactivate. The scene composition, scroll direction and enemy spawn logic are unchanged from S4.</p>
+<div class="textblock"><p>shmup_1942 — a vertical shoot 'em up: scrolling, enemies, bullets </p>
+<p>The terrain scrolls down on BG1; the player's plane moves with the D-pad and fires with A (a small cooldown between shots). Bullets travel at 4 px/frame; when a bullet's bounding box overlaps an enemy, both deactivate. Enemies spawn from a pool of eight and fly down.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Sprite pools as fixed-size arrays of <span class="tt">{x, y, active}</span> slots (player gets OAM slot 0, enemies 1-8, bullets 9-16)</li>
 <li>Multiple sprite types in the same OAM grid: distinct VRAM regions (player @ $6000, enemy @ $6400, bullet @ $6800 — all word addresses) plus distinct sprite palettes (0/1/2)</li>
 <li>Axis-aligned bounding-box (AABB) overlap test for 32×32 sprites</li>
 <li>Input edge detection via <span class="tt"><a class="el" href="input_8h.html#aed650db72d53439d6b554063a88de5cb">padPressed()</a></span> for one-shot fire</li>
+<li>oamMemory[] written directly, the escape hatch beside <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>: 17 sprites rewritten each frame from the pools, oam_update_flag set once a frame</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>Press A to fire a bullet upward from the player's nose</li>
 <li>Bullets travel at 4 px/frame; they despawn at the top of the screen or on hitting an enemy</li>
-<li>Enemies hit by a bullet vanish immediately (S5.1 will add explosion animations)</li>
+<li>Enemies hit by a bullet vanish immediately</li>
 <li>The terrain keeps scrolling and the enemy pool keeps spawning</li>
 </ul>
 </dd></dl>

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['→_20animclip_20tables_0',['aseprite2snes — Aseprite animations → AnimClip tables',['../tools_aseprite2snes.html',1,'tools']]],
-  ['→_20silent_20corruption_1',['🔴 Battery dies → silent corruption',['../tutorial_sram.html#autotoc_md-battery-dies--silent-corruption',1,'']]]
+  ['→_20silent_20corruption_0',['🔴 Battery dies → silent corruption',['../tutorial_sram.html#autotoc_md-battery-dies--silent-corruption',1,'']]],
+  ['→_20tutorial_20map_1',['Header → tutorial map',['../api_index.html#header--tutorial-map',1,'']]]
 ];

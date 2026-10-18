@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['–_20is_20not_20safe_20in_20nmi_0',['🟡 WRAM data port &lt;span class=&quot;tt&quot;&gt;$2180&lt;/span&gt;–&lt;span class=&quot;tt&quot;&gt;$2183&lt;/span&gt; is NOT safe in NMI',['../tutorial_dma.html#autotoc_md-wram-data-port-21802183-is-not-safe-in-nmi',1,'']]]
+  ['–_20in_20an_20nmi_20callback_20caught_20at_20build_20time_0',['🟢 WRAM data port &lt;span class=&quot;tt&quot;&gt;$2180&lt;/span&gt;–&lt;span class=&quot;tt&quot;&gt;$2183&lt;/span&gt; in an NMI callback (caught at build time)',['../tutorial_dma.html#autotoc_md-wram-data-port-21802183-in-an-nmi-callback-caught-at-build-time',1,'']]]
 ];

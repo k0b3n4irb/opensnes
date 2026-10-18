@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/chips/sa1_starfield/main.c File Reference</title>
+<title>examples/chips/sa1_starfield/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -147,6 +147,13 @@ Variables</h2></td></tr>
 <div class="textblock"><p>SA-1 Murmuration Demo — 128 dots in Lissajous sine patterns. </p>
 <p>The SA-1 computes 128 "bird" positions using overlapping Lissajous sine patterns at 10.74 MHz. The main CPU reads positions from I-RAM and displays them as pixel sprites. No assets — generated in code.</p>
 <p>Each bird's position is the sum of two sine harmonics per axis, with prime-number phase multipliers creating organic flock spread: X = sin[bird*3 + frame]/2 + sin[bird*7 + frame*2]/4 + 32 Y = sin[bird*5 + frame+64]/2 + sin[bird*11 + frame*3]/4 + 16</p>
+<dl class="section user"><dt>SNES Concepts</dt><dd><ul>
+<li>The SA-1 computes while the main CPU displays: positions written to shared I-RAM, read by the 65816 each frame</li>
+<li>A sync byte in I-RAM as the handshake between the two CPUs</li>
+<li>Sprites built in code (a 2x2 dot tile), no asset</li>
+<li>oamMemory[] written directly, the escape hatch beside <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>: 128 positions copied from I-RAM each frame in one loop</li>
+</ul>
+</dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
 <li>128 dots moving in smooth, coordinated flock-like patterns</li>
 <li>The pattern resembles a murmuration (starling flock)</li>

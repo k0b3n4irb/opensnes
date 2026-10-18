@@ -25,16 +25,7 @@
 var NAVTREE =
 [
   [ "OpenSNES", "index.html", [
-    [ "OpenSNES Documentation", "index.html", "index" ],
-    [ "OpenSNES — Design Philosophy", "PHILOSOPHY.html", null ],
-    [ "Compiler Benchmark — OpenSNES vs PVSnesLib", "BENCHMARK.html", null ],
-    [ "DSP-1 Coprocessor Tutorial", "tutorial_dsp1.html", null ],
-    [ "Interrupts: VBlank callbacks and timer IRQs", "tutorial_interrupts.html", null ],
-    [ "Hardware verification protocol", "hardware_verification.html", null ],
-    [ "Upgrading from 0.48 to 0.49", "upgrading.html", null ],
-    [ "What 1.0 will freeze", "stability.html", null ],
-    [ "Known Limitations", "KNOWN_LIMITATIONS.html", null ],
-    [ "API index — by what you are trying to do", "api_index.html", null ],
+    [ "OpenSNES Documentation", "documentation.html", "documentation" ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -61,16 +52,16 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"BENCHMARK.html",
-"dir_6b17615a765730034c6961a55152114f.html",
-"examples_color_direct_color.html",
-"examples_sprites.html#the-ladder-9",
-"globals_vars_b.html",
-"group__ppu__regs.html#ga31783a38f8bf7129cd0186641e598fe4",
-"input_8h.html#a4f095dc343f6b5ac5712cc69e1bd20b5",
-"piece_8h.html#a91553c0e2fac0272cc71951d9787bf7e",
-"sprite_8h.html#afaa85a4b677edfc58a4b9e26df8890f7",
-"superfx_8h.html#a5c6d08013690338aaa4dc06074da9d73"
+"anim_8h.html",
+"dir_799e5ff613eee8f881f50db81391cba4.html",
+"examples_color.html#the-idea-in-one-screen-2",
+"examples_scrolling_parallax_scroll.html",
+"globals_func_l.html",
+"group__macros.html#ga3acffbd305ee72dcd4593c0d8af64a4f",
+"hud_8c.html#abfe0c0c48c9ee899e46c35374cb86a48",
+"pages.html",
+"sprite_8h.html#aadaab0bfc2df6de17aee9515212c290c",
+"superfx_8h.html#a20b4afdcc076097e24c44fe840dacc0c"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

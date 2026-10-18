@@ -128,7 +128,7 @@ $(function(){initNavTree('examples_windows_window.html','',''); });
 Screenshot</div></div>
     <p>A triangle-shaped window mask driven by HDMA, showing how per-scanline window boundary updates create non-rectangular shapes. Press <b>A</b>, <b>X</b>, or <b>B</b> to apply the window to different background layers.</p>
 <p>Ported from PVSnesLib "Window" example.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-40"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-38"></a>
 Controls</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,12 +140,12 @@ Controls</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><b>B</b>  </td><td class="markdownTableBodyNone">Window on both BG1 and BG2  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="build--run-56"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-53"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/windows/window</div>
 </div><!-- fragment --><p>Then open <span class="tt">window.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-22"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-21"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="snes-window-system"></a>
 SNES Window System</h3>
@@ -154,8 +154,8 @@ SNES Window System</h3>
 Making Non-Rectangular Shapes with HDMA</h3>
 <p>A single window is always a horizontal band. But by changing the left/right boundaries <b>every scanline</b> using HDMA, you can create any shape &ndash; circles, triangles, or custom silhouettes.</p>
 <p>This example uses two HDMA channels:</p><ul>
-<li><b>Channel 6</b> writes to WH0 ($2126) &ndash; window 1 left boundary</li>
-<li><b>Channel 7</b> writes to WH1 ($2127) &ndash; window 1 right boundary</li>
+<li><b>Channel 4</b> writes to WH0 ($2126) &ndash; window 1 left boundary</li>
+<li><b>Channel 5</b> writes to WH1 ($2127) &ndash; window 1 right boundary</li>
 </ul>
 <h3 class="doxsection"><a class="anchor" id="the-triangle-tables"></a>
 The Triangle Tables</h3>
@@ -177,7 +177,7 @@ Switching Layers</h3>
 <li>Sets TMW for the new <a class="el" href="text_2pixel__text_2main_8c.html#ac5dc75c53d056fc2eac4a38a985682dc">layer(s)</a></li>
 <li>Re-enables HDMA</li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-57"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-56"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="w12sel-register-2123"></a>
 W12SEL Register ($2123)</h3>
@@ -198,7 +198,7 @@ W12SEL Register ($2123)</h3>
 <h3 class="doxsection"><a class="anchor" id="window-shapes-in-commercial-games"></a>
 Window Shapes in Commercial Games</h3>
 <p>This technique was used extensively: spotlight effects in Mega Man X, the title screen reveal in Donkey Kong Country, and dialog box cutouts in RPGs. Any shape that can be described as a left-right boundary pair per scanline can be rendered as a window.</p>
-<h2 class="doxsection"><a class="anchor" id="vram-layout-4"></a>
+<h2 class="doxsection"><a class="anchor" id="vram-layout-3"></a>
 VRAM Layout</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -212,7 +212,7 @@ VRAM Layout</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">$6000  </td><td class="markdownTableBodyNone">BG2 tiles (4bpp, 16 colors)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="project-structure-23"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-21"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -228,7 +228,7 @@ Project Structure</h2>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite dma input background window hdma math</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-14"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-15"></a>
 Going Further</h2>
 <ul>
 <li><b>Animated window</b>: Modify the triangle tables each frame to make the shape pulse or rotate. Copy the tables to RAM and adjust the boundary values.</li>
@@ -239,7 +239,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-79"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-76"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">input</span>, <span class="tt">background</span>, <span class="tt">window</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
@@ -256,7 +256,7 @@ Modules Used</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_windows.html">Windows</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_windows.html">Windows</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

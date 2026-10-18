@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/input/superscope/main.c File Reference</title>
+<title>examples/input/superscope/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -137,7 +137,7 @@ Macros</h2></td></tr>
 <tr class="memitem:aec55d6f47fd0fe1a42e7bd09f0e2929c" id="r_aec55d6f47fd0fe1a42e7bd09f0e2929c"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aec55d6f47fd0fe1a42e7bd09f0e2929c">STATE_CALIBRATE</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memdesc:aec55d6f47fd0fe1a42e7bd09f0e2929c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Asking player to shoot screen center for aim offset calibration.  <br /></td></tr>
 <tr class="memitem:ac3bd49a6808ba1a64a446fdd14cb2a21" id="r_ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ac3bd49a6808ba1a64a446fdd14cb2a21">STATE_DETECT</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aim target background tile data (2bpp, crosshair pattern) from data.asm.  <br /></td></tr>
+<tr class="memdesc:ac3bd49a6808ba1a64a446fdd14cb2a21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aim target background tile data (2bpp, crosshair pattern), converted by the build from res/.  <br /></td></tr>
 <tr class="memitem:aa74af0876332d1a6258cff9745a1bd53" id="r_aa74af0876332d1a6258cff9745a1bd53"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aa74af0876332d1a6258cff9745a1bd53">STATE_READY</a>&#160;&#160;&#160;2</td></tr>
 <tr class="memdesc:aa74af0876332d1a6258cff9745a1bd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calibrated and tracking fire events; placing red dot markers.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -163,6 +163,7 @@ Functions</h2></td></tr>
 <li>Button polling for FIRE, PAUSE, and CURSOR buttons</li>
 <li>Multi-layer Mode 0 with text on BG1 and graphics on BG2</li>
 <li>Sprite positioning from light gun coordinates</li>
+<li>oamMemory[] written directly, the escape hatch beside <a class="el" href="sprite_8h.html#a697c4b66632525f55f21fb6008582b3f" title="Set sprite properties.">oamSet()</a>: one marker, its four OAM bytes set where the shot landed</li>
 </ul>
 </dd></dl>
 <dl class="section user"><dt>What to Observe</dt><dd><ul>
@@ -203,11 +204,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Aim target background tile data (2bpp, crosshair pattern) from data.asm. </p>
-<p>Aim target tilemap (32x32 BG2 layout) from data.asm</p>
-<p>Aim target palette (BGR555) from data.asm</p>
-<p>Sprite tile data (red dot marker, 4bpp) from data.asm</p>
-<p>Sprite palette (BGR555) from data.asm</p>
+<p>Aim target background tile data (2bpp, crosshair pattern), converted by the build from res/. </p>
+<p>Aim target tilemap (32x32 BG2 layout), converted by the build from res/</p>
+<p>Aim target palette (BGR555), converted by the build from res/</p>
+<p>Sprite tile data (red dot marker, 4bpp), converted by the build from res/</p>
+<p>Sprite palette (BGR555), converted by the build from res/</p>
 <p>Waiting for Super Scope to be connected to port 2 </p>
 
 </div>

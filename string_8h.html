@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/string.h File Reference</title>
+<title>lib/include/snes/string.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -151,7 +151,7 @@ Functions</h2></td></tr>
 <p>The seven functions of the C library a game uses most, written in assembly. Add <span class="tt">string</span> to <span class="tt">LIB_MODULES</span>; a ROM links only the functions it calls.</p>
 <h2 class="doxsection"><a class="anchor" id="why-not-a-loop-in-c"></a>
 Why not a loop in C</h2>
-<p>A C loop over a plain pointer reads and writes bank $00 (see <a class="el" href="KNOWN__LIMITATIONS_8md.html">KNOWN_LIMITATIONS.md</a>): it cannot copy out of a <span class="tt">const</span> table in ROM into a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> buffer. These functions follow the full 24-bit pointer on both sides, so every combination works — ROM, plain RAM, <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> RAM:</p>
+<p>A C loop over a plain pointer reads and writes bank $00 (see <a class="el" href="known_limitations.html">KNOWN_LIMITATIONS.md</a>): it cannot copy out of a <span class="tt">const</span> table in ROM into a <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> buffer. These functions follow the full 24-bit pointer on both sides, so every combination works — ROM, plain RAM, <span class="tt"><a class="el" href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed" title="Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.">FAR</a></span> RAM:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="string_8h.html">snes/string.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> level1[64] = { ... };   <span class="comment">// in ROM, any bank</span></div>
@@ -159,7 +159,7 @@ Why not a loop in C</h2>
 <div class="line"> </div>
 <div class="line"><a class="code hl_function" href="#aa9d0690efb1119eb2e6acfbcbaee0127">memcpy</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a>, level1, <span class="keyword">sizeof</span>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a>));</div>
 <div class="line"><a class="code hl_function" href="#a4f2933a10c46fe88c376b49f50dea67c">memset</a>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a>, 0, <span class="keyword">sizeof</span>(<a class="code hl_variable" href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a>));</div>
-<div class="ttc" id="agames_2breakout_2main_8c_html_a8d6bbdce86e8fb8b71511fa2a996c1bf"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a></div><div class="ttdeci">static u16 level</div><div class="ttdef"><b>Definition</b> main.c:163</div></div>
+<div class="ttc" id="agames_2breakout_2main_8c_html_a8d6bbdce86e8fb8b71511fa2a996c1bf"><div class="ttname"><a href="games_2breakout_2main_8c.html#a8d6bbdce86e8fb8b71511fa2a996c1bf">level</a></div><div class="ttdeci">static u16 level</div><div class="ttdef"><b>Definition</b> main.c:155</div></div>
 <div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 <div class="ttc" id="agroup__volatile__types_html_gaef060b3456fdcc093a7210a762d5f2ed"><div class="ttname"><a href="group__volatile__types.html#gaef060b3456fdcc093a7210a762d5f2ed">FAR</a></div><div class="ttdeci">#define FAR</div><div class="ttdoc">Place a global in bank $7E WRAM, outside the 8 KB bank-0 band.</div><div class="ttdef"><b>Definition</b> types.h:130</div></div>
 <div class="ttc" id="astring_8h_html"><div class="ttname"><a href="string_8h.html">string.h</a></div><div class="ttdoc">Memory and string functions: memcpy, memmove, memset, strlen, strcmp, strcpy, strncpy.</div></div>

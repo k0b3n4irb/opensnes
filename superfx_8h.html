@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/superfx.h File Reference</title>
+<title>lib/include/snes/superfx.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -301,7 +301,7 @@ Presenting frames: double buffer, moved by the NMI</h2></td></tr>
 <li>Column-major tilemap setup for PLOT rendering</li>
 </ul>
 <p>The GSU code itself is written in SuperFX assembly (.sfx files). The C API handles all SNES-side boilerplate.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="superfx_8md.html">docs/tutorials/superfx.md</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="tutorial_superfx.html">docs/tutorials/superfx.md</a> </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a5a3917720fd6600f998ba4998696bcd2" name="a5a3917720fd6600f998ba4998696bcd2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5a3917720fd6600f998ba4998696bcd2">&#9670;&#160;</a></span>CFGR_FAST_MUL</h2>
@@ -1326,7 +1326,7 @@ Presenting frames: double buffer, moved by the NMI</h2></td></tr>
   </dd>
 </dl>
 <p>Creates black bars like Star Fox, on HDMA channel 1 (INIDISP). HDMA starts a channel at line 0, so the bands appear from the next frame: the function returns only once they are on screen (it waits up to a frame) and then publishes them to <a class="el" href="#ae76c8e0f8bfa078d0bc18b4be1f4f6a8" title="One 16 KB DMA from Game Pak RAM to VRAM $0000, in the letterbox.">gsuDmaFullFrame()</a> and the <a class="el" href="#a3765f516c293b584f063a05ac723f75a" title="Queue the frame the last job drew; the next job draws in the other.">gsuPresent()</a> NMI, which use the blanked lines as extra transfer time. Leave the bands on while either is in use.</p>
-<p>A band may be 0 (no band) to 224 lines; a band of 128 lines or more takes two HDMA entries. top + bottom above 224 leaves no visible lines. (Until 2026-10-03 a top band of 0 ended the table before it began, and the whole frame was then transferred on visible lines.) The visible lines are written with INIDISP = $0F, full brightness: <a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a> and the fades do not apply while the bands are on. </p>
+<p>A band may be 0 (no band) to 224 lines; a band of 128 lines or more takes two HDMA entries. top + bottom above 224 leaves no visible lines. (Until 2026-10-03 a top band of 0 ended the table before it began, and the whole frame was then transferred on visible lines.) The visible lines are written with INIDISP = $0F, full brightness: <a class="el" href="console_8h.html#a5a1bfaf2babf4d8dac31cafc468c735f" title="Set screen brightness.">setBrightness()</a> and the fades do not apply while the bands are on. The bands are $8F (forced blank, brightness kept at 15: no fade-in on a 1-CHIP console), and the channel writes $21FF then $2100, the form that keeps an S-CPU-A console's general DMAs from failing. </p>
 
 </div>
 </div>

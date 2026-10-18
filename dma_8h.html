@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/lib/include/snes/dma.h File Reference</title>
+<title>lib/include/snes/dma.h File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -434,7 +434,7 @@ Banks</h2>
 </div><div class="memdoc">
 
 <p>Perform generic DMA transfer. </p>
-<p>Programs one channel and starts it at once: use it when no named helper fits (the WRAM data port, an experimental mode). The source's bank comes from the far pointer, like every other <span class="tt">dmaCopy*</span> call — until 0.48 this function took the bank and the 16-bit address as two arguments (the 1.0 API since 2026-10-05; a six-argument call no longer compiles, see <a class="el" href="UPGRADING_8md.html">docs/UPGRADING.md</a>). A channel above 7 is refused.</p>
+<p>Programs one channel and starts it at once: use it when no named helper fits (the WRAM data port, an experimental mode). The source's bank comes from the far pointer, like every other <span class="tt">dmaCopy*</span> call — until 0.48 this function took the bank and the 16-bit address as two arguments (the 1.0 API since 2026-10-05; a six-argument call no longer compiles, see <a class="el" href="upgrading.html">docs/UPGRADING.md</a>). A channel above 7 is refused.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">channel</td><td>DMA channel (0-7) </td></tr>

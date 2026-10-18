@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/hdma/hdma_helpers/main.c File Reference</title>
+<title>examples/hdma/hdma_helpers/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -230,7 +230,7 @@ Variables</h2></td></tr>
 
 <p>Stop whichever HDMA effect is currently running and restore defaults. </p>
 <p>This function performs a complete cleanup:</p><ol type="1">
-<li>Stops ALL HDMA helper channels (ch6 and ch7) unconditionally, because different effects use different channels and a previous effect's channel may still be running when switching.</li>
+<li>Stops ALL HDMA helper channels (ch5 and ch6) unconditionally, because different effects use different channels and a previous effect's channel may still be running when switching.</li>
 <li>Re-enables ch6 with a null (terminator-only) table. This is critical because the SNES HDMA controller initializes table pointers (A1T -&gt; A2A) only for channels that are enabled at VBlank. If ch6 is disabled and then enabled mid-frame, the first frame reads stale A2A data, causing a visible one-frame glitch (horizontal lines).</li>
 <li>Reloads the original palette from ROM, because the color gradient effect modifies CGRAM per-scanline and those values persist after HDMA stops. CGRAM DMA must happen during VBlank to avoid visual artifacts. </li>
 </ol>

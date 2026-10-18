@@ -128,15 +128,15 @@ $(function(){initNavTree('examples_windows_transparent_window.html','',''); });
 Screenshot</div></div>
     <p>A semi-transparent darkened rectangle rendered over a background image using SNES color math and HDMA-driven window boundaries. No input &ndash; the effect is static.</p>
 <p>Ported from PVSnesLib "TransparentWindow" example by Digifox.</p>
-<h2 class="doxsection"><a class="anchor" id="controls-39"></a>
+<h2 class="doxsection"><a class="anchor" id="controls-37"></a>
 Controls</h2>
 <p>No interactive controls. The darkened rectangle is displayed statically.</p>
-<h2 class="doxsection"><a class="anchor" id="build--run-55"></a>
+<h2 class="doxsection"><a class="anchor" id="build--run-52"></a>
 Build &amp; Run</h2>
 <div class="fragment"><div class="line">cd $OPENSNES_HOME</div>
 <div class="line">make -C examples/windows/transparent_window</div>
 </div><!-- fragment --><p>Then open <span class="tt">transparent_window.sfc</span> in your emulator (Mesen2 recommended).</p>
-<h2 class="doxsection"><a class="anchor" id="how-it-works-21"></a>
+<h2 class="doxsection"><a class="anchor" id="how-it-works-20"></a>
 How It Works</h2>
 <h3 class="doxsection"><a class="anchor" id="the-technique"></a>
 The Technique</h3>
@@ -160,8 +160,8 @@ HDMA Rectangle</h3>
 <p>Two HDMA channels define the rectangle shape by driving WH0 ($2126) and WH1 ($2127):</p>
 <div class="fragment"><div class="line">Lines  0-95:  WH0=255, WH1=0  -&gt; window disabled (left &gt; right = no region)</div>
 <div class="line">Lines 96-207: WH0=40,  WH1=216 -&gt; rectangle from x=40 to x=216</div>
-<div class="line">Lines 208+:   WH0=255, WH1=0  -&gt; window disabled again</div>
-</div><!-- fragment --><p>The tables use <b>repeat mode</b> (bit 7 set in the line count byte) for the rectangle segment. Even though the values are constant across those scanlines, repeat mode ensures WH0/WH1 are re-written every line. This is required because WH0/WH1 are write-only PPU registers.</p>
+<div class="line">Lines 208+:   WH0=255, WH1=216 -&gt; window disabled again (left &gt; right)</div>
+</div><!-- fragment --><p>Each table entry writes its register once and holds it for its line count, so a constant edge is one entry, not one byte per line. HDMA's repeat mode (bit 7 of the line count) writes a new value on every line: it is for a value that changes from line to line, such as a perspective or a wave.</p>
 <h3 class="doxsection"><a class="anchor" id="color-math-configuration-1"></a>
 Color Math Configuration</h3>
 <table class="markdownTable">
@@ -174,7 +174,7 @@ Color Math Configuration</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">COLDATA ($2132)  </td><td class="markdownTableBodyNone"><span class="tt">0xEC</span>  </td><td class="markdownTableBodyNone">Subtract intensity 12 from R+G+B (moderate darkening)  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="snes-concepts-56"></a>
+<h2 class="doxsection"><a class="anchor" id="snes-concepts-55"></a>
 SNES Concepts</h2>
 <h3 class="doxsection"><a class="anchor" id="color-math-window-vs-bg-window"></a>
 Color Math Window vs BG Window</h3>
@@ -186,7 +186,7 @@ Color Math Window vs BG Window</h3>
 <h3 class="doxsection"><a class="anchor" id="practical-use"></a>
 Practical Use</h3>
 <p>This technique is used in RPGs for dialog boxes (darken the area behind text), menu overlays, and spotlight effects. It costs zero CPU time &ndash; all hardware.</p>
-<h2 class="doxsection"><a class="anchor" id="project-structure-22"></a>
+<h2 class="doxsection"><a class="anchor" id="project-structure-20"></a>
 Project Structure</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -200,10 +200,10 @@ Project Structure</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">Makefile</span>  </td><td class="markdownTableBodyNone"><span class="tt">LIB_MODULES := console sprite dma background window colormath hdma math</span>  </td></tr>
 </table>
-<h2 class="doxsection"><a class="anchor" id="going-further-13"></a>
+<h2 class="doxsection"><a class="anchor" id="going-further-14"></a>
 Going Further</h2>
 <ul>
-<li><b>Animated rectangle</b>: Move the rectangle by modifying the HDMA table values each frame. Change the <span class="tt"><a class="el" href="windows_2transparent__window_2main_8c.html#ad6fe08fee16c0be07cb7169dc930f5cc" title="4bpp background tile data (defined in data.asm, stored in ROM)">RECT_X</a></span> and <span class="tt"><a class="el" href="windows_2transparent__window_2main_8c.html#a4c5652672cd5d440a5b822630e978559" title="Y coordinate of the darkened rectangle&#39;s top edge (scanlines from top).">RECT_Y</a></span> offsets and rebuild the tables.</li>
+<li><b>Animated rectangle</b>: Move the rectangle by modifying the HDMA table values each frame. Change the <span class="tt"><a class="el" href="windows_2transparent__window_2main_8c.html#ad6fe08fee16c0be07cb7169dc930f5cc" title="X coordinate of the darkened rectangle&#39;s left edge (pixels).">RECT_X</a></span> and <span class="tt"><a class="el" href="windows_2transparent__window_2main_8c.html#a4c5652672cd5d440a5b822630e978559" title="Y coordinate of the darkened rectangle&#39;s top edge (scanlines from top).">RECT_Y</a></span> offsets and rebuild the tables.</li>
 <li><b>Rounded corners</b>: Use per-scanline HDMA values that curve inward at the top and bottom of the rectangle, creating a rounded window.</li>
 <li><b>Explore related examples</b>:<ul>
 <li><span class="tt">effects/window</span> &ndash; Triangle-shaped HDMA window (BG masking, not color math)</li>
@@ -211,7 +211,7 @@ Going Further</h2>
 </ul>
 </li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="modules-used-78"></a>
+<h2 class="doxsection"><a class="anchor" id="modules-used-75"></a>
 Modules Used</h2>
 <p><span class="tt">console</span>, <span class="tt">sprite</span>, <span class="tt">dma</span>, <span class="tt">background</span>, <span class="tt">window</span>, <span class="tt">colormath</span>, <span class="tt">hdma</span> (<span class="tt">LIB_MODULES</span> in the Makefile). </p>
 </div></div><!-- contents -->
@@ -228,7 +228,7 @@ Modules Used</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_windows.html">Windows</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="examples.html">OpenSNES Examples</a></li><li class="navelem"><a href="examples_windows.html">Windows</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>

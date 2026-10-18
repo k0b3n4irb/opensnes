@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/mode7/perspective_rotate/main.c File Reference</title>
+<title>examples/mode7/perspective_rotate/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -148,7 +148,7 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Rotating Mode 7 perspective — full matrix driven by 4 HDMA channels. </p>
-<p>Port of krom (Peter Lemon)'s Mode7 Perspective demo (PeterLemon/SNES, PPU/Mode7/Perspective). Four HDMA channels each feed one Mode 7 matrix register per scanline (M7A/M7B/M7C/M7D from cos, sin, -sin, cos tables), so the ground plane is BOTH perspective-projected (each line scaled by 20480/y) AND rotated (48 angle steps) — the full affine matrix per line, where graphics/backgrounds/mode7_perspective drives only the two diagonal terms (no rotation).</p>
+<p>Port of krom (Peter Lemon)'s Mode7 Perspective demo (PeterLemon/SNES, PPU/Mode7/Perspective). Four HDMA channels each feed one Mode 7 matrix register per scanline (M7A/M7B/M7C/M7D from cos, sin, -sin, cos tables), so the ground plane is BOTH perspective-projected (each line scaled by 20480/y) AND rotated (48 angle steps) — the full affine matrix per line, where mode7/perspective drives only the two diagonal terms (no rotation).</p>
 <p>Rotating means the whole matrix changes per angle: the demo precomputes 48 tables per trig function (krom's exact tables, extracted verbatim; entry(a,y) = trig(2*PI*a/48) * 20480 / y in 8.8 fixed point) and repoints all four HDMA channels each frame.</p>
 <dl class="section user"><dt>SNES Concepts</dt><dd><ul>
 <li>Per-scanline Mode 7 matrix writes (perspective + rotation combined)</li>

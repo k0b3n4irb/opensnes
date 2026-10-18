@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="keywords" content="SNES,Super Nintendo,SDK,development,homebrew,retro gaming"/>
-<title>/home/runner/work/opensnes/opensnes/examples/color/transparency/main.c File Reference</title>
+<title>examples/color/transparency/main.c File Reference</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="32x32" href="logo_32x32.png"/>
 <link rel="icon" type="image/png" sizes="16x16" href="logo_16x16.png"/>
@@ -136,7 +136,7 @@ $(function(){initNavTree('color_2transparency_2main_8c.html','',''); });
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe" id="r_a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
-<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembly DMA loader for SUPERFREE graphics data.  <br /></td></tr>
+<tr class="memdesc:a840291bc02cba5474a4cb46a9b9566fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The landscape and the clouds, converted by the build from res/.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Color addition transparency between two background layers. </p>
@@ -174,8 +174,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Assembly DMA loader for SUPERFREE graphics data. </p>
-<p>Asset symbols from data.asm (.incbin sections). Post-A6+A7 (v0.19.0) C pointers carry the bank byte, so <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span> resolve the correct source bank automatically — no ASM stub needed.</p>
+<p>The landscape and the clouds, converted by the build from res/. </p>
+<p>A C pointer carries its bank byte, so <span class="tt"><a class="el" href="dma_8h.html#a428ee7d96f20485046c89d95f8719ca5" title="Copy data to VRAM (PVSnesLib compatible).">dmaCopyVram</a></span> / <span class="tt"><a class="el" href="dma_8h.html#a7124f044ed12d1073cafd7192a00d09f" title="Copy palette data to CGRAM (PVSnesLib compatible).">dmaCopyCGram</a></span> take the data wherever the linker placed it.</p>
 <p>Entry point: color math transparency with scrolling clouds over a landscape.</p>
 <p>Sets up Mode 1 with two background layers:</p><ul>
 <li>BG1 (main screen): 4bpp landscape, static</li>

@@ -122,7 +122,7 @@ $(function(){initNavTree('tools_opensnes_sample.html','',''); });
   <div class="headertitle"><div class="title">opensnes-sample — WAV to BRR samples </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The first tool of the <span class="tt">opensnes-*</span> family (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>). It turns a PCM <span class="tt">.wav</span> — a jump, a hit, a UI blip, a voice clip — into the <span class="tt">.brr</span> the SNES DSP plays, plus a header with its sizes, and it tells you what a sample costs before you commit to it. The encoder is the one <span class="tt">smconv</span> bakes into soundbanks and the one <span class="tt">wav2brr</span> used: a <span class="tt">.brr</span> from here is byte for byte what <span class="tt">wav2brr</span> wrote.</p>
+<div class="textblock"><p>The first tool of the <span class="tt">opensnes-*</span> family (<a class="el" href="tools_conventions.html" title="The opensnes-* tools: conventions">The opensnes-* tools: conventions</a>). It turns a PCM <span class="tt">.wav</span> — a jump, a hit, a UI blip, a voice clip — into the <span class="tt">.brr</span> the SNES DSP plays, plus a header with its sizes, and it tells you what a sample costs before you commit to it. The encoder is the one <span class="tt">opensnes-music</span> bakes into soundbanks.</p>
 <h2 class="doxsection"><a class="anchor" id="encode"></a>
 Encode</h2>
 <div class="fragment"><div class="line">opensnes-sample encode res/jump.wav                 # → res/jump.brr, res/jump.h</div>
@@ -130,30 +130,28 @@ Encode</h2>
 <div class="line">opensnes-sample encode res/*.wav --out build/       # several at once, elsewhere</div>
 <div class="line">opensnes-sample encode res/hum.wav --loop 40 200 --save   # remember the loop beside the file</div>
 </div><!-- fragment --><p><b>In:</b> PCM WAV, 8- or 16-bit, mono or stereo (stereo is downmixed). Keep the source at 32 kHz or below: the DSP plays BRR at 32 kHz whatever the file said, so a 44.1 kHz source comes out lower and slower (the tool warns and says by how much).</p>
-<p><b>Out:</b> <span class="tt">jump.brr</span> (raw BRR, one 9-byte block per 16 samples, loop and end flags set) and <span class="tt">jump.h</span>:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#define jump_brr_size 1035   </span><span class="comment">/* bytes: 115 BRR blocks of 16 samples */</span><span class="preprocessor"></span></div>
+<p><b>Out:</b> <span class="tt">jump.brr</span> (raw BRR, one 9-byte block per 16 samples, loop and end flags set), <span class="tt">jump_data.as</span> (the fragment the build assembles: the <span class="tt">.brr</span> in an <span class="tt">ASSET_SECTION</span>, between <span class="tt">jump_brr</span> and <span class="tt">jump_brr_end</span>) and <span class="tt">jump.h</span>:</p>
+<div class="fragment"><div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> jump_brr[], jump_brr_end[];</div>
+<div class="line"><span class="preprocessor">#define jump_brr_size 1035   </span><span class="comment">/* bytes: 115 BRR blocks of 16 samples */</span><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#define jump_brr_loop 0      </span><span class="comment">/* byte offset of the loop point; 0 with no loop */</span><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#define jump_brr_loops 0     </span><span class="comment">/* 1 = the sample loops */</span><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#define jump_tuning 4096     </span><span class="comment">/* x4096: 4096 = plays at the pitch it was encoded at */</span><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#define jump_rate 32000      </span><span class="comment">/* Hz of the source; the DSP plays at 32000 */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
 </div><!-- fragment --><p><b>A loop has to be a whole number of 16-sample blocks</b>, because BRR is. When the one you give is not, the tool makes it so, in one of two ways:</p>
 <ul>
 <li><b>it repeats the loop</b> until the total is a multiple of 16, when that stays under 2,000 samples: a waveform of 8 samples becomes one block holding it twice, one of 12 samples becomes three blocks holding it four times. Nothing changes in pitch, and <span class="tt">_tuning</span> is 4096;</li>
 <li><b>it resamples the loop</b> to the next multiple of 16 otherwise. The sample then plays slightly lower, the tool warns, and <span class="tt">_tuning</span> (and <span class="tt">"tuning_x4096"</span> in <span class="tt">--json</span>) carries the factor: multiply the playback pitch by <span class="tt">_tuning / 4096</span> to get the original pitch back.</li>
 </ul>
 <p>A loop that does not start on a block boundary is preceded by silence so that it does. <span class="tt">_brr_loop</span> is the byte offset the loop comes back to; 0 means "from the start", not "no loop": <span class="tt">_brr_loops</span> says whether it loops.</p>
-<p>Bake the <span class="tt">.brr</span> into the ROM and load it with the sizes from the header:</p>
-<div class="fragment"><div class="line">ASSET_SECTION &quot;samples&quot;</div>
-<div class="line">jump_brr:  .incbin &quot;res/jump.brr&quot;</div>
-<div class="line">.ENDS</div>
-</div><!-- fragment --><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;res/jump.h&quot;</span></div>
-<div class="line"><span class="keyword">extern</span> <a class="code hl_typedef" href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a> jump_brr[];</div>
+<p><b>In a project</b>, put the settings beside the sound — <span class="tt">res/jump.wav.toml</span> with <span class="tt">tool = "opensnes-sample"</span> and an <span class="tt">[encode]</span> table, which <span class="tt">--save</span> writes for you — and the build converts it and links <span class="tt">jump_data.as</span>: there is no assembly to write. Load the sample with the sizes from the header:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;res/jump.h&quot;</span></div>
 <div class="line"><a class="code hl_function" href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d">audioLoadSample</a>(0, jump_brr, jump_brr_size, jump_brr_loop);</div>
 <div class="line"><a class="code hl_function" href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff">audioPlaySample</a>(0);</div>
 <div class="ttc" id="agroup__audio__playback_html_gac3b302f98812d4adfcb042412d3d64ff"><div class="ttname"><a href="group__audio__playback.html#gac3b302f98812d4adfcb042412d3d64ff">audioPlaySample</a></div><div class="ttdeci">u8 audioPlaySample(u8 sampleId)</div><div class="ttdoc">Play a sample with default settings.</div></div>
 <div class="ttc" id="agroup__audio__samples_html_gadeb5b5b2ca5fd6cad1127442a546af6d"><div class="ttname"><a href="group__audio__samples.html#gadeb5b5b2ca5fd6cad1127442a546af6d">audioLoadSample</a></div><div class="ttdeci">u8 audioLoadSample(u8 id, const u8 *brrData, u16 size, u16 loopPoint)</div><div class="ttdoc">Load a BRR sample into SPC700 RAM.</div></div>
-<div class="ttc" id="agroup__types_html_gaed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="group__types.html#gaed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdoc">8-bit unsigned integer (0 to 255)</div><div class="ttdef"><b>Definition</b> types.h:47</div></div>
-</div><!-- fragment --><p><span class="tt">examples/audio/soundboard</span> is the worked example, <a class="el" href="tutorial_audio.html" title="Audio &amp; Music Tutorial">Audio &amp; Music Tutorial</a> the tutorial.</p>
+</div><!-- fragment --><p>Without a settings file, <span class="tt">.incbin</span> the <span class="tt">.brr</span> yourself in an <span class="tt">ASSET_SECTION</span> under the label <span class="tt">jump_brr</span>.</p>
+<p><span class="tt">examples/audio/sfx_from_wav</span> is the worked example, <a class="el" href="tutorial_audio_samples.html" title="Samples, Voices and the Raw APU">Samples, Voices and the Raw APU</a> the tutorial.</p>
 <h2 class="doxsection"><a class="anchor" id="settings-beside-the-asset-1"></a>
 Settings beside the asset</h2>
 <p><span class="tt">--save</span> writes <span class="tt">res/hum.wav.toml</span> next to the file:</p>
@@ -198,7 +196,7 @@ From wav2brr</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a href="index.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
+    <li class="navelem"><a href="documentation.html">OpenSNES Documentation</a></li><li class="navelem"><a href="tools.html">The OpenSNES toolbox</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.16.1 </li>
   </ul>
 </div>
