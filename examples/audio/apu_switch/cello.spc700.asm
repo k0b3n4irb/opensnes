@@ -119,7 +119,7 @@ bow_loop:
 .ORG $0800
 sample_dir:
     .dw lfo_block, lfo_block        ; DIR 0: single looping BRR block
-    .dw cello, cello + 4167         ; DIR 1: cello (krom's loop point)
+    .dw cello, cello + 2457         ; DIR 1: cello, looping after its attack
 
 ;----------------------------------------------------------------------
 ; Sample data from $0900

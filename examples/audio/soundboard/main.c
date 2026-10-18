@@ -89,10 +89,11 @@ int main(void) {
     dmaClearVRAM();
     audioInit();
 
-    /* Stream the four samples into APU RAM. The cello loops at krom's
-     * 4167; the vowel, hiss and pop are one-shots (the vowel's decay
-     * is baked into the PCM — see gen_au_boost.py). */
-    audioLoadSample(SMP_CELLO, brr_cello, (u16)(brr_cello_end - brr_cello), 4167);
+    /* Stream the four samples into APU RAM. The cello loops from byte
+     * 2457 (its loop point, sample 4368: the end of the bow's attack); the
+     * vowel, hiss and pop are one-shots (the vowel's decay is baked into
+     * the PCM — see gen_au_boost.py). */
+    audioLoadSample(SMP_CELLO, brr_cello, (u16)(brr_cello_end - brr_cello), 2457);
     audioLoadSample(SMP_AU, brr_au, (u16)(brr_au_end - brr_au), 0);
     audioLoadSample(SMP_SS, brr_ss, (u16)(brr_ss_end - brr_ss), 0);
     audioLoadSample(SMP_PP, brr_pp, (u16)(brr_pp_end - brr_pp), 0);

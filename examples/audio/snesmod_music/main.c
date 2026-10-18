@@ -7,16 +7,17 @@
  * using the SNESMOD library, with transport controls (play, stop,
  * pause/resume, volume, fade out), and fires sound effects over the music.
  *
- * The soundbank holds two modules: the music (pollen8) and a module that is
- * only a set of instruments (effectssfx), whose samples become the sound
- * effects. Effects are uploaded into the SPC700's RAM after the module, in
- * the room the module and its echo buffer leave: pollen8 keeps 13 506 bytes
- * free (`opensnes-music inspect music/pollen8.it`), enough for four of the
- * five effect samples. The fifth, the 8 740-byte "tada", would not fit —
- * and the driver does not check: an effect past the room is copied over the
- * echo buffer, which the echo then overwrites. So this example loads four.
+ * The soundbank holds two modules: the music (nocturne) and a module that
+ * is only a set of instruments (neo_lumen_sfx), whose samples become the
+ * sound effects. Effects are uploaded into the SPC700's RAM after the
+ * module, in the room the module and its echo buffer leave, and the driver
+ * does not check: an effect past the room is copied over the echo buffer,
+ * which the echo then overwrites. `opensnes-music inspect` gives the room
+ * (the README has the figures); the four effects fit.
  *
- * Ported from PVSnesLib's "music" and "effects" examples by alekmaul.
+ * The music and the instruments are composed and synthesized for OpenSNES
+ * (devtools/audio_assets); the effects are Kenney's (kenney.nl, CC0). The
+ * program began as PVSnesLib's "music" and "effects" examples by alekmaul.
  *
  * @par SNES Concepts
  * - SPC700 audio: separate coprocessor with 64 KB audio RAM
@@ -44,17 +45,17 @@
 #include <snes/text.h>
 #include "soundbank.h"
 
-/** @brief Number of effects loaded: the four that fit beside the music */
+/** @brief Number of effects loaded */
 #define NUM_EFFECTS 4
 
 /** @brief The effects' sources in the soundbank, in the order they are loaded */
 static const u16 effect_source[NUM_EFFECTS] = {
-    SFX_HALL_STRINGS, SFX_HONKY_TONK_PIANO, SFX_MARIMBA_1, SFX_COWBELL
+    SFX_JUMP, SFX_POWERUP, SFX_LASER, SFX_CONFIRM
 };
 
 /** @brief Their names on screen, padded to the same width */
 static const char *const effect_name[NUM_EFFECTS] = {
-    "STRINGS", "PIANO  ", "MARIMBA", "COWBELL"
+    "JUMP   ", "POWERUP", "LASER  ", "CONFIRM"
 };
 
 /** @brief The three pitches of snesmodPlayEffect(), and their names */
@@ -91,15 +92,15 @@ int main(void) {
     textPrintAt(7, 12, "Y - PLAY EFFECT");
     textPrintAt(7, 13, "LEFT/RIGHT - EFFECT");
     textPrintAt(7, 14, "UP/DOWN - PITCH");
-    textPrintAt(5, 17, "NOW PLAYING: POLLEN8");
-    textPrintAt(5, 19, "EFFECT: STRINGS");
+    textPrintAt(5, 17, "NOW PLAYING: NOCTURNE");
+    textPrintAt(5, 19, "EFFECT: JUMP");
     textPrintAt(5, 20, "PITCH:  NORMAL");
     WaitForVBlank();
 
     /* Initialize SNESMOD */
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
-    snesmodLoadModule(MOD_POLLEN8);
+    snesmodLoadModule(MOD_NOCTURNE);
 
     /* The effects go after the module: load them after it, and keep the
      * slot each one gets — snesmodPlayEffect() takes the slot, not the

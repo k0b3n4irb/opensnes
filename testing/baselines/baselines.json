@@ -12,10 +12,10 @@
     "rom_sha256": "e3dbfeef1d522d74f657ac9eaf352f5391f8027f20cd9ea9c0a95c1f91bbf55e"
   },
   "audio_snesmod_music": {
-    "fbhash": "d6a5e3dafcc55029",
+    "fbhash": "d631f1ada4173575",
     "frames": 200,
     "luna_version": "v1.39.0",
-    "rom_sha256": "701332a798b9ff22cf4d295ae344253dc679108f1f51d7da25e2af4fe3fc2fc4"
+    "rom_sha256": "5dae0be70ca5f167da457b21c264ff5caaa1abb691c9b5ab4081d432b23d9fc5"
   },
   "audio_soundboard": {
     "fbhash": "25bd331298456325",

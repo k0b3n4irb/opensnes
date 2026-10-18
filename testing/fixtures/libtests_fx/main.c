@@ -79,7 +79,7 @@ int main(void) {
      * and the command queue mean something. */
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
-    snesmodLoadModule(MOD_POLLEN8);
+    snesmodLoadModule(MOD_NOCTURNE);
     snesmodPlay(0);
     snesmodSetModuleVolume(90);
     /* Asymmetric, non-zero arguments on purpose: a fade to 45 at speed 3.

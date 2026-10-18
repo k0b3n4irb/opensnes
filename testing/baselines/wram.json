@@ -1,19 +1,19 @@
 {
   "audio_apu_switch": {
-    "stream": "4caf501b465ba54055a709047d29a0a2cd06d7f1e6976b7662b636c6a9af0ae6",
-    "rom_sha256": "2b3dbb00fd737387dabb5b7a453887ded8ac02b4b09d545eff4d454b63896c95"
+    "stream": "9af9227dc8e78bd09d5881d9b19fdb929020250c40a811d18d1bc8320a8798c2",
+    "rom_sha256": "8140b12860521529854e9941fbf882789bb013d955e1880755b406c2784f039c"
   },
   "audio_sfx_from_wav": {
     "stream": "8aa5eeb95c3ffc1bf481334577c96405db97f224e40f5e5558a65e2ba64c290c",
     "rom_sha256": "f9d930e5514c62ac31926db41834fa1a726618f81975d232f12e7ced48ff9d97"
   },
   "audio_snesmod_music": {
-    "stream": "5b2fda6523ec627ba270739e64d7b1ca7cf32a17529e85473fa64f869226879c",
-    "rom_sha256": "701332a798b9ff22cf4d295ae344253dc679108f1f51d7da25e2af4fe3fc2fc4"
+    "stream": "88b6e1e8e29f437199b0d8a0837e9502013f61483b1cef74a128e67777bc6775",
+    "rom_sha256": "5dae0be70ca5f167da457b21c264ff5caaa1abb691c9b5ab4081d432b23d9fc5"
   },
   "audio_soundboard": {
-    "stream": "69b6fb4a6224653f3482452c8654cadbfbbea43a1e40e7c201f2dde24be7ec70",
-    "rom_sha256": "de7d850c629dca2e52afc1665c18e841412ed92e00afaa252a166ec616171f1b"
+    "stream": "cd4b6f266679d5444baa33cbb66f1cc2212522d018e4d62ecce4bfba1b1282cf",
+    "rom_sha256": "1cf9fb9054fb95d1cedcd883fdc15e8b31b03144dcc4e5c14ff92f19e3240ae9"
   },
   "audio_speech_synth": {
     "stream": "e3a10b00ee91a40aac9de08a81caf2395cbc9d6dd068cbd30fde4f77214b86cd",

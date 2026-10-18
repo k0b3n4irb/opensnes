@@ -202,8 +202,8 @@ Incompatible (do not use without isolation):
 
 ## examples/audio/soundboard
 
-- `res/cello.brr` — same sample and caveat as
-  `examples/audio/apu_switch` (byte-identical copy).
+- `res/cello.brr` — the same synthesized cello as
+  `examples/audio/apu_switch` (byte-identical copy, original work).
 - `res/ss.brr`, `res/pp.brr` — OpenSNES-original formant-synthesized
   phonemes (byte-identical copies from `examples/audio/speech_synth`,
   original work, MIT).
@@ -225,13 +225,12 @@ Incompatible (do not use without isolation):
 
 ## examples/audio/apu_switch
 
-- `res/cello.brr` — the cello BRR sample shipped with krom (Peter
-  Lemon)'s PitchMod demo (github.com/PeterLemon/SNES,
-  `SPC700/PitchMod/BRR/`), used at his exact loop point (4167) and
-  pitch by the cello program. krom's repository carries no explicit
-  license, and the recording's original source is unknown — revisit
-  before any commercial redistribution. The companion 9-byte LFO square
-  wave is transcribed in `cello.spc700.asm` (technique, not an asset).
+- `res/cello.brr` — synthesized for OpenSNES by
+  `devtools/audio_assets/build.py` (original work, CC0). It replaced the
+  cello sample of krom (Peter Lemon)'s PitchMod demo, whose repository
+  carries no explicit licence. The companion 9-byte LFO square wave of
+  krom's demo is transcribed in `cello.spc700.asm` (technique, not an
+  asset).
 - The drum program ships no assets at all (the DSP noise generator
   only; PlayNoise technique credited to the same repository).
 - krom's PlayTwoSong demo, whose *protocol* this example ports, ships

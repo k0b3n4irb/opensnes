@@ -91,9 +91,12 @@ ADSR, parks in a clean idle loop, and re-keys the voice every 7 s.
 
 ## Sample Provenance
 
-`res/cello.brr` is the cello sample shipped with krom's PitchMod demo (loop
-point 4167, played at his exact C5 pitch `$08BB` = `$8BB0 >> 4`). See
-`ATTRIBUTION.md` at the repo root for the provenance caveat.
+`res/cello.brr` is synthesized here (`devtools/audio_assets/build.py`): a
+bow's scratch settling into an exactly periodic string tone, 100 samples a
+period at 17 463 Hz — the rate krom's pitch `$08BB` (`$8BB0 >> 4`) plays a
+sample at — so the note is the F3 (174.6 Hz) the program was written for. It
+loops on its last 8 periods, from byte 2457. It replaced krom's own cello,
+whose repository carries no licence.
 
 ## Validation
 

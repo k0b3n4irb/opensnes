@@ -76,7 +76,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade audio-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -303,6 +303,12 @@ test-nmi-budget:
 # Scripted game manifests replayed on PAL builds of their game (test-pal).
 PAL_GAME_MANIFESTS := state_blocks movement_breakout state_breakout_game_over \
                       movement_likemario movement_shmup_1942 movement_rpg
+
+# The examples' sounds (contributor-only): the tracker modules composed for
+# OpenSNES and the synthesized samples, written where the examples read
+# them. Needs ffmpeg. `.claude/notes/tech/audio_assets.md`.
+audio-assets:
+	@python3 devtools/audio_assets/build.py
 
 test-pal:
 	@scripts/install-luna.sh

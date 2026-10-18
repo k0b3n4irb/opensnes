@@ -122,8 +122,8 @@ written over the echo buffer, and both are heard wrong, with no error
 (`KNOWN_LIMITATIONS.md`). `opensnes-music inspect music.it` prints what the
 module leaves free ("N free of M"); add up the effects before loading them.
 `snesmodLoadModule()` frees every effect, so load the effects after it.
-`examples/audio/snesmod_music` loads four effects beside a module with a long
-echo, and says why it leaves the fifth out.
+`examples/audio/snesmod_music` loads four effects beside a module with an
+echo, with the figures: what the module leaves, what each effect takes.
 
 ### Volume Control
 
