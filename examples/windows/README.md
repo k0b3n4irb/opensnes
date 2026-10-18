@@ -11,12 +11,11 @@ iris wipes, "only darken inside this shape" — all windows.
 
 | Example | Developer question |
 |---------|--------------------|
-| [window](window/) | How do I mask part of the screen with one window? |
+| [window](window/) | How do I mask part of the screen with one window, or darken only inside it? |
 | [window_multi_hdma](window_multi_hdma/) | How do I shape *both* windows per scanline? |
-| [transparent_window](transparent_window/) | How do I combine a window with colour math (a darkened region)? |
 
-Climb from one static rectangle to two HDMA-shaped windows to a window gating
-colour math.
+Climb from one HDMA-shaped window — used as a mask, then as the region of
+colour math — to both windows shaped per scanline.
 
 ## The idea in one screen
 

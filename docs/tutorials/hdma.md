@@ -231,26 +231,26 @@ Walks through the lib's HDMA helpers (`hdmaSetup`,
 single screen. The example to skim
 when you want to remember the API surface.
 
-### Window and colour math — `examples/windows/transparent_window`
+### Window and colour math — `examples/windows/window`
 
 Combines HDMA with the window/colour-math pipeline. Two channels (4 and 5)
-in `HDMA_MODE_1REG` write the window edges `WH0` and `WH1`, a few
-non-repeat entries each, to define a rectangle; colour math subtracts a
-fixed colour from BG2 inside it, so the rectangle looks darkened. The
-effect is static.
+in `HDMA_MODE_1REG` write the window edges `WH0` and `WH1` on every line
+to draw a triangle; the example's A, X and B buttons use it as a mask,
+and Y uses it as the region where colour math subtracts a fixed colour,
+so the triangle looks darkened.
 
 Driving both windows' edges from one channel is mode 4 (4 bytes, 4
 sequential registers, `WH0`-`WH3` in one HDMA group):
 `examples/windows/window_multi_hdma` does it with `HDMA_MODE_4REG`.
 
-### Stationary window — `examples/windows/window`
+### Repeat or not — the shape decides
 
-The non-animated cousin: a static window band needs only **non-repeat**
-entries — the window registers latch, so one write per band holds
-(end the table with an empty-window entry, left > right, if the shape
-must stop before the bottom of the frame). The shipped example keeps
-the repeat-mode table because it shares its build path with the
-animated variant; both produce the same static masked area.
+The triangle's edges change on every line, so its tables are in
+**repeat** mode (`0x80 | 64`: 64 lines, one byte each). A rectangle needs
+only **non-repeat** entries — the window registers keep what they were
+given, so one write per band holds: a band with the window empty
+(left > right), the rectangle's edges for its height, then empty again
+to stop it before the bottom of the frame. Three entries a table.
 
 ### Indirect HDMA — `examples/hdma/hdma_indirect_gradient`
 
@@ -330,8 +330,7 @@ call it before setting up your own channels, not after. The ripple and
 `hdmaWindowShape(channel, table)` points a channel at your own table of
 window edges (a line count, then left and right, written to `WH0`/`WH1`).
 It only configures the channel: enable it with `hdmaEnableMask()` and choose
-which layers the window masks with the `window` module, as
-`examples/windows/transparent_window` does.
+which layers the window masks with the `window` module.
 
 Two calls read or reset the enable state the module keeps:
 `hdmaGetEnabled()` returns the bitmask of channels the module has
@@ -442,7 +441,7 @@ missed timing in inner game-logic loops.
 - [`examples/scrolling/parallax_scroll`](../../examples/scrolling/parallax_scroll/README.md) — RAM table, three-zone parallax.
 - [`examples/hdma/gradient_colors`](../../examples/hdma/gradient_colors/README.md) — static ROM gradient table.
 - [`examples/windows/window`](../../examples/windows/window/README.md) — stationary window via HDMA.
-- [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — HDMA window + colour math.
+- [`examples/windows/window`](../../examples/windows/window/README.md) — HDMA window as a mask (A, X, B) and as the region of colour math (Y).
 - [`KNOWN_LIMITATIONS.md`](../../KNOWN_LIMITATIONS.md) — the INIDISP HDMA
   form and the runtime traps that bite HDMA work.
 - [Scrolling tutorial](scrolling.md) — companion read; HDMA on

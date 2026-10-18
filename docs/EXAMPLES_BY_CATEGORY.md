@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 84 examples organized by topic. For a progressive learning path, see
+All 83 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -124,7 +124,6 @@ Mask part of the screen — static or HDMA-shaped.
 |---------|-------------|
 | @subpage examples_windows_window | Hardware window masking |
 | @subpage examples_windows_window_multi_hdma | Both hardware windows animated per scanline (krom port) |
-| @subpage examples_windows_transparent_window | Colour math + HDMA windowed transparency |
 
 ---
 

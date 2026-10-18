@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief HDMA-driven triangle window masking on selectable BG layers
+ * @brief An HDMA-shaped window: masking layers, or framing colour math
  * @ingroup examples
  *
  * Demonstrates the SNES window masking hardware combined with HDMA to create
@@ -14,7 +14,14 @@
  * layers are affected by Window 1, with the invert bit set so pixels
  * outside the triangle are masked (clipped to black).
  *
- * Ported from PVSnesLib "Window" example.
+ * The same window has a second use: instead of hiding layers, it can mark
+ * where colour math happens. Press Y and the triangle stops clipping and
+ * darkens instead — colour math subtracts a fixed colour inside it only
+ * (CGWSEL "inside the colour window"), the way a game draws a shadow or a
+ * dialogue box over the scene.
+ *
+ * Ported from PVSnesLib's "Window" example; the shading mode is its
+ * "TransparentWindow" example (by Digifox) on the triangle.
  * Uses the window module (windowEnable / windowSetInvert / windowSetMainMask)
  * with PVSnesLib's register values, so the frames match its original.
  *
@@ -23,17 +30,21 @@
  * - HDMA repeat mode for per-scanline WH0/WH1 updates
  * - Window inversion (mask outside vs inside the region)
  * - Runtime window reconfiguration via register writes
+ * - The colour window (WOBJSEL) as the region of colour math (CGWSEL/CGADSUB)
+ * - Fixed colour source (COLDATA, $2132) subtracted to darken
  *
  * @par What to Observe
  * - A triangle/diamond shape masks portions of the background layers
  * - Press A to apply window to BG1 only
  * - Press X to apply window to BG2 only
  * - Press B to apply window to both BG1 and BG2
+ * - Press Y to shade the triangle instead: both layers stay visible and the
+ *   triangle is darkened by colour math
  *
  * @par Modules Used
- * console, sprite, dma, input, background, window, hdma
+ * console, sprite, dma, input, background, window, hdma, colormath
  *
- * @see hdma.h, video.h, background.h
+ * @see hdma.h, window.h, colormath.h, video.h, background.h
  */
 
 #include <snes.h>
@@ -147,6 +158,9 @@ static void setup_window(u8 layers, u8 w12sel_val) {
     /* Disable HDMA first to prevent partial table reads during reconfiguration */
     hdmaDisableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
+    /* Masking mode: no colour math (the shading mode below turns it on) */
+    colorMathDisable();
+
     /* Window 1, inverted (pixels OUTSIDE the triangle are clipped), on the
      * BGs W12SEL names — and, as PVSnesLib's setModeHdmaWindow does, the same
      * bits mirrored into WOBJSEL: OBJ with BG1, the colour window with BG2,
@@ -168,6 +182,34 @@ static void setup_window(u8 layers, u8 w12sel_val) {
               tablelefttriangle);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1,
               tablerighttriangle);
+    hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
+}
+
+/**
+ * @brief Use the triangle as the region of colour math instead of a mask.
+ *
+ * The HDMA tables are the same; what changes is what the window is for.
+ * No layer is clipped (TMW = 0): the colour window, not inverted, is the
+ * triangle, and colour math subtracts a fixed grey (12, 12, 12) from BG1
+ * and BG2 inside it only (CGWSEL bits 5-4 = 01). The registers are
+ * PVSnesLib's TransparentWindow values, applied to both layers.
+ */
+static void setup_shade(void) {
+    hdmaDisableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
+
+    windowDisableAll();
+    windowEnable(WINDOW_1, WINDOW_MATH);           /* WOBJSEL $20: the colour window */
+    windowSetMainMask(0);                          /* TMW $00: nothing is clipped */
+
+    colorMathInit();
+    colorMathSetCondition(COLORMATH_INSIDE);       /* CGWSEL bits 5-4 = 01 */
+    colorMathSetSource(COLORMATH_SRC_FIXED);       /* CGWSEL bit 1 = 0 */
+    colorMathSetOp(COLORMATH_SUB);                 /* CGADSUB bit 7 */
+    colorMathSetLayers(LAYER_BG1 | LAYER_BG2);     /* CGADSUB bits 0-1 */
+    colorMathSetFixedColor(12, 12, 12);            /* COLDATA: R = G = B = 12 */
+
+    hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0, tablelefttriangle);
+    hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1, tablerighttriangle);
     hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 }
 
@@ -244,6 +286,11 @@ int main(void) {
         /* B: window on both BGs */
         if (padPressed(0) & KEY_B) {
             setup_window(TM_BG1 | TM_BG2, W12SEL_BOTH);
+        }
+
+        /* Y: the same triangle shades both BGs through colour math */
+        if (padPressed(0) & KEY_Y) {
+            setup_shade();
         }
     }
 

@@ -176,21 +176,23 @@ runtime layer selection:
 - Press **A**: apply window to BG1 only.
 - Press **X**: apply window to BG2 only.
 - Press **B**: apply window to both BG1 and BG2.
+- Press **Y**: shade the triangle instead (below).
 
 Two HDMA channels (4 and 5) write `WH0`/`WH1` per scanline. The example
 configures everything through the lib helpers: `windowDisableAll()`,
 `windowEnable()`, `windowSetInvert()` and `windowSetMainMask()` for the
 window, `hdmaSetup()` and `hdmaEnableMask()` for the two channels.
 
-### Window + colour math — `examples/windows/transparent_window`
+### Window + colour math — `examples/windows/window` (press Y)
 
-Pairs the window system with the colour-math pipeline to produce a
-spotlight that **blends** BG1 onto BG2 (rather than just hiding it).
-The window covers part of the screen; inside the window, BG1 is
-half-transparent over BG2; outside, BG1 is fully opaque. The bridge is
-`WINDOW_MATH` — a layer mask bit that targets the *colour-math area*
-rather than a BG/OBJ. See the [Colormath tutorial](colormath.md) for
-the blending side; this example is the canonical "you need both" demo.
+The same window can mark **where colour math happens** instead of what
+is hidden. With Y, no layer is clipped (`windowSetMainMask(0)`); the
+colour window (`WINDOW_MATH`, a mask bit that targets the colour-math
+area rather than a BG/OBJ) is the triangle, and colour math subtracts a
+fixed grey from BG1 and BG2 inside it only (`COLORMATH_INSIDE`). The
+triangle is darkened — the way a game draws a shadow or a dialogue box
+over the scene. See the [Colormath tutorial](colormath.md) for the
+colour-math side.
 
 ## Gotchas
 
@@ -282,12 +284,11 @@ because the data per scanline is small (1–2 bytes per channel).
 - `lib/include/snes/window.h` — full API reference.
 - `lib/source/window.c` — implementation (mostly register
   bookkeeping for the four-axis state).
-- [`examples/windows/window`](../../examples/windows/window/README.md) — animated triangle reveal.
-- [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window + colour math (the pair example).
+- [`examples/windows/window`](../../examples/windows/window/README.md) — the triangle window as a mask (A, X, B) and as the region of colour math (Y).
 - [HDMA tutorial](hdma.md) — required reading for animated window
   shapes.
 - [Colormath tutorial](colormath.md) — the pair tutorial; covers the
-  blending side of `transparent_window`.
+  colour-math side of the Y mode.
 - [Graphics tutorial](graphics.md) — companion read for the BG-layer
   fundamentals the window operates on.
 

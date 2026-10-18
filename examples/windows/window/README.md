@@ -1,12 +1,16 @@
-# Window -- HDMA Triangle Masking
+# Window -- HDMA Triangle: Masking and Shading
 
 ![Screenshot](window.png)
 
-A triangle-shaped window mask driven by HDMA, showing how per-scanline window
-boundary updates create non-rectangular shapes. Press **A**, **X**, or **B** to
-apply the window to different background layers.
+A triangle-shaped window driven by HDMA, showing how per-scanline window
+boundary updates create non-rectangular shapes, and the window's two uses.
+Press **A**, **X** or **B** and it masks background layers; press **Y** and
+it marks where colour math darkens the picture instead.
 
-Ported from PVSnesLib "Window" example.
+![Shaded](window_shade.png)
+
+Ported from PVSnesLib's "Window" example; the shading mode is its
+"TransparentWindow" example (by Digifox), applied to the triangle.
 
 ## Controls
 
@@ -15,6 +19,7 @@ Ported from PVSnesLib "Window" example.
 | **A** | Window on BG1 only |
 | **X** | Window on BG2 only |
 | **B** | Window on both BG1 and BG2 |
+| **Y** | Shade the triangle: colour math darkens both BGs inside it |
 
 ## Build & Run
 
@@ -23,7 +28,7 @@ cd $OPENSNES_HOME
 make -C examples/windows/window
 ```
 
-Then open `window.sfc` in your emulator (Mesen2 recommended).
+Then open `window.sfc` in luna (`luna-gui window.sfc`) or any emulator.
 
 ## How It Works
 
@@ -97,6 +102,32 @@ title screen reveal in Donkey Kong Country, and dialog box cutouts in RPGs.
 Any shape that can be described as a left-right boundary pair per scanline
 can be rendered as a window.
 
+### Shading: the Window as the Region of Colour Math (Y)
+
+Pressing Y keeps the same HDMA tables and changes what the window is for:
+
+| Register | Value | Meaning |
+|----------|-------|---------|
+| W12SEL / TMW | `$00` / `$00` | no layer is clipped |
+| WOBJSEL | `$20` | the colour window is window 1, not inverted: the triangle |
+| CGWSEL | `$10` | colour math only inside the colour window, from the fixed colour |
+| CGADSUB | `$83` | subtract, on BG1 and BG2 |
+| COLDATA | 12, 12, 12 | the grey subtracted |
+
+```c
+windowEnable(WINDOW_1, WINDOW_MATH);       /* the colour window */
+windowSetMainMask(0);                      /* nothing clipped */
+colorMathSetCondition(COLORMATH_INSIDE);
+colorMathSetSource(COLORMATH_SRC_FIXED);
+colorMathSetOp(COLORMATH_SUB);
+colorMathSetLayers(LAYER_BG1 | LAYER_BG2);
+colorMathSetFixedColor(12, 12, 12);
+```
+
+The masking modes call `colorMathDisable()` first, so A, X or B after Y
+clips again with no shading left over. The same pattern draws a shadow, a
+spotlight (add instead of subtract) or the darkened box behind a dialogue.
+
 ## VRAM Layout
 
 | Region | Content |
@@ -114,7 +145,7 @@ can be rendered as a window.
 | `res/bg1.png.toml`, `res/bg2.png.toml` | the import settings of the two pictures (`opensnes-tileset`, palette bank 1 for BG2); the build converts and links them, `res/bgN.inc` declares the symbols |
 | `res/bg1.png` | Background 1 (palette slot 0) |
 | `res/bg2.png` | Background 2 (palette slot 1) |
-| `Makefile` | `LIB_MODULES := console sprite dma input background window hdma math` |
+| `Makefile` | `LIB_MODULES := console sprite dma input background window hdma colormath` |
 
 ## Going Further
 
@@ -124,10 +155,13 @@ can be rendered as a window.
 - **Circle window**: Replace the linear expansion/contraction with a circular
   profile calculated from the equation `x = sqrt(r^2 - y^2)`.
 
+- **A rectangle**: a static box needs only three non-repeat entries per table
+  (window empty, the edges for the box's height, empty again).
+
 - **Explore related examples**:
-  - `effects/transparent_window` -- Window + color math for semi-transparent overlays
-  - `effects/hdma_wave` -- Another HDMA-driven per-scanline effect
+  - `windows/window_multi_hdma` -- both windows shaped per scanline
+  - `hdma/hdma_wave` -- another HDMA-driven per-scanline effect
 
 ## Modules Used
 
-`console`, `sprite`, `dma`, `input`, `background`, `window`, `hdma` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `dma`, `input`, `background`, `window`, `hdma`, `colormath` (`LIB_MODULES` in the Makefile).

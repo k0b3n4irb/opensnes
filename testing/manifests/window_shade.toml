@@ -1,0 +1,47 @@
+# The window's second use: the region of colour math rather than a mask.
+# Y switches the triangle of windows/window from clipping to shading — the
+# lesson of PVSnesLib's TransparentWindow, which was its own example until
+# 2026-10-18 (windows/transparent_window, a rectangle) and is now this mode.
+#
+# The registers are the subject: no layer clipped (W12SEL $00, TMW $00), the
+# colour window on (WOBJSEL $20, window 1 not inverted), colour math "inside
+# the colour window" from a fixed colour (CGWSEL $10), subtracting on BG1 and
+# BG2 (CGADSUB $83), the grey 12/12/12 in COLDATA. The middle leg is the
+# negative: A goes back to masking, and the masking mode must switch colour
+# math off (CGADSUB keeps only its operation bit, $80: no layer takes part).
+# The hash is the shaded picture; the same frame without the presses hashes
+# 29d2968d214acaac on the day this was written, so the shade is what it sees.
+rom = "../../examples/windows/window/window.sfc"
+
+[[checkpoint]]                 # Y: the triangle shades both BGs
+at_frame = 100
+input = "60:0x4000,64:0"
+[checkpoint.values]
+hdma_enabled_state = { eq = 0x30, width = 1 }   # channels 4 (WH0) + 5 (WH1)
+[checkpoint.ppu]
+w12sel = 0x00
+wobjsel = 0x20
+tmw = 0x00
+cgwsel = 0x10
+cgadsub = 0x83
+coldata_r = 12
+coldata_g = 12
+coldata_b = 12
+
+[[checkpoint]]                 # A: back to masking BG1 — colour math off
+at_frame = 150
+input = "110:0x0080,114:0"
+[checkpoint.ppu]
+w12sel = 0x03
+tmw = 0x11
+cgadsub = 0x80
+
+[[checkpoint]]                 # Y again: shaded, held for the hash
+at_frame = 220
+input = "160:0x4000,164:0"
+[checkpoint.ppu]
+wobjsel = 0x20
+cgadsub = 0x83
+
+[asserts]
+fbhash = "83e4faf95c2c462e"

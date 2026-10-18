@@ -211,7 +211,7 @@ taught; read the one your game needs.
 - **More colour** — @ref examples_color_direct_color, @ref examples_color_hicolor_1792,
   @ref examples_color_pseudo_hires.
 - **More HDMA and windows** — @ref examples_hdma_hdma_helpers,
-  @ref examples_hdma_hdma_indirect_gradient, @ref examples_windows_transparent_window,
+  @ref examples_hdma_hdma_indirect_gradient,
   @ref examples_windows_window_multi_hdma.
 - **More Mode 7** — @ref examples_mode7_extbg (a second layer from the same
   plane), @ref examples_mode7_dsp1_ground (the DSP-1's projection).

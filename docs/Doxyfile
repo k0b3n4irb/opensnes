@@ -125,7 +125,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/backgrounds/mode4 \
                          ../examples/backgrounds/mode6 \
                          ../examples/color/transparency \
-                         ../examples/windows/transparent_window \
                          ../examples/windows/window \
                          ../examples/windows/window_multi_hdma \
                          ../examples/sprites/aseprite_pipeline \

@@ -623,12 +623,6 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "e82e68e52ddb5bdece57ba746c6cb9e1fd890fa0225b59a62de393de47f7374d"
   },
-  "windows_transparent_window": {
-    "fbhash": "8f928391fd44d2a6",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "c7faea29dda26936a08722372214fc33be9db6677bc37bb435d296a7919da17d"
-  },
   "windows_window": {
     "fbhash": "29d2968d214acaac",
     "frames": 200,
