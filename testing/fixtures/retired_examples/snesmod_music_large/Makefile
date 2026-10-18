@@ -7,7 +7,8 @@
 # ROM banks by smconv. The SNESMOD library handles bank crossing
 # transparently via the incptr macro.
 #
-# "What Is Love" by Haddaway — 108KB IT module → 56KB soundbank (2 banks)
+# The nocturne with long 32 kHz instruments (devtools/audio_assets,
+# nocturne_large) — a 46 KB soundbank (2 banks)
 #
 #==============================================================================
 
@@ -22,6 +23,6 @@ USE_SNESMOD    := 1
 USE_LIB        := 1
 LIB_MODULES    := console sprite dma input background text
 
-SOUNDBANK_SRC  := music/whatislove.it
+SOUNDBANK_SRC  := music/nocturne_large.it
 
 include $(OPENSNES)/make/common.mk

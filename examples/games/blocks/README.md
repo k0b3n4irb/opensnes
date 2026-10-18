@@ -1,6 +1,6 @@
 # Blocks
 
-A falling-blocks puzzle with Korobeiniki music.
+A falling-blocks puzzle with Korobeiniki music (the 19th-century Russian song, public domain, arranged for OpenSNES).
 
 ![Screenshot](blocks.png)
 

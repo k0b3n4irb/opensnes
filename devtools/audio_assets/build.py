@@ -20,6 +20,10 @@ import synth as sy      # noqa: E402
 MODULES = {
     "examples/audio/snesmod_music/music/nocturne.it": songs.nocturne,
     "examples/audio/snesmod_music/sfx/neo_lumen_sfx.it": songs.neo_lumen_sfx,
+    "examples/games/blocks/music/blocks_theme.it": songs.korobeiniki,
+    "examples/games/likemario/res/rooftops.it": songs.rooftops,
+    "examples/games/likemario/res/jump_sfx.it": songs.rooftops_sfx,
+    "testing/fixtures/retired_examples/snesmod_music_large/music/nocturne_large.it": songs.nocturne_large,
 }
 
 # The cello of apu_switch and soundboard: played at pitch $08BB (17 463 Hz

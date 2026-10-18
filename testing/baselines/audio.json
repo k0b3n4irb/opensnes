@@ -13,9 +13,9 @@
       "peak": 22960
     },
     "fixtures/snesmod_music_large": {
-      "sha256": "722c9775b3e49cfed7efcd0b31da8c84312b7268252ee0bc5885287f3f6412fd",
+      "sha256": "478ae49323024d05874db14a9e9a4187d6593530eb35084e67eb14fa4860a457",
       "samples": 159936,
-      "peak": 17197
+      "peak": 8269
     },
     "chips/superfx_game_skeleton": {
       "sha256": "f776c03e04475934a354335f167b5da5d2e0e7320abfffde8ced513ac760f486",

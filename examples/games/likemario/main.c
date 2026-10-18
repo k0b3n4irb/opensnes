@@ -678,7 +678,7 @@ int main(void) {
     /* Initialize SNESMOD audio */
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
-    snesmodLoadModule(MOD_OVERWORLD);
+    snesmodLoadModule(MOD_ROOFTOPS);
     sfx_jump_slot = snesmodLoadEffect(SFX_JUMP);
 
     setMainScreen(TM_BG1 | TM_OBJ);

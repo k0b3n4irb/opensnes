@@ -233,9 +233,10 @@ Everything below it writes to hardware. Break this rule and you get visual corru
 - **Add coins:** Mark certain tiles as collectible in `tile_props[]`. When Mario touches
   one, replace the tilemap entry with an empty tile and increment a counter.
 
-- **Add sound:** The assets include `mariojump.brr` (a jump sound effect) and
-  `overworld.it` (music). Wire them up with SNESMOD — see
-  [SNESMOD Music](../../audio/snesmod_music/) for the pattern.
+- **More sound:** the music and the jump go through SNESMOD (`res/rooftops.it`,
+  `res/jump_sfx.it`). Add a landing or a coin effect the same way — see
+  [SNESMOD Music](../../audio/snesmod_music/) for the pattern, and for the
+  room the effects need beside the music.
 
 - **Study the physics:** Change `GRAVITY`, `MARIO_ACCEL`, and `MARIO_JUMPING`. Small
   tweaks completely change how the game feels. This is how real platformers are tuned.
@@ -340,8 +341,8 @@ read.
 | `res/mario_sprite.png` | Sprite sheet source (16x16 frames) |
 | `res/BG1.m16` | World tilemap (tile indices + flip/palette bits) |
 | `res/map_1_1.b16` | Per-tile collision properties (solid/empty) |
-| `res/overworld.it` | Music file (Impulse Tracker, not yet wired up) |
-| `res/mariojump.brr` | Jump sound effect (BRR, not yet wired up) |
+| `res/rooftops.it` | The music, "Neo-Lumen Rooftops" (Impulse Tracker), composed for OpenSNES (`devtools/audio_assets`, CC0) |
+| `res/jump_sfx.it` | The jump effect: Kenney's `phaseJump1` (kenney.nl, CC0) as a one-instrument module |
 | `Makefile` | `LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background` |
 
 ## Credits

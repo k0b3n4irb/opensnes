@@ -17,6 +17,6 @@ USE_LIB     := 1
 LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background anim vramqueue
 
 USE_SNESMOD    := 1
-SOUNDBANK_SRC  := res/overworld.it res/jump_sfx.it
+SOUNDBANK_SRC  := res/rooftops.it res/jump_sfx.it
 
 include $(OPENSNES)/make/common.mk

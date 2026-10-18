@@ -295,15 +295,15 @@
   },
   "games_blocks": {
     "fbhash": [
-      "ff847e81e01fa2a0",
-      "36c92bac2d64bad0"
+      "5bfe83ab431d12b0",
+      "8bc68861b3a27d3c"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "164bac1d9d5ca3b6a612ebb9f512b6262e1284acadef9fe0976c21ceea9b8279"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "9a789bb05578e7cbefe4eb51d20e075e8b7055c4235a421cb26df4f67531f4b5"
   },
   "games_breakout": {
     "fbhash": "50ca4bf125070506",

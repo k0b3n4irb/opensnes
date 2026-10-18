@@ -136,6 +136,27 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
   `ground.png` split outputs derived from `tiles_packed.png` via
   `res/import.sh`.
 
+### Kenney "Digital Audio" and "Interface Sounds"
+- **Author**: Kenney (https://kenney.nl/)
+- **Packs**: https://kenney.nl/assets/digital-audio,
+  https://kenney.nl/assets/interface-sounds
+- **License**: CC0 (Public Domain); each pack's `License.txt` is kept in
+  `devtools/audio_assets/kenney/` beside the OGG files the examples use
+- **Used in**: the effects of `examples/audio/snesmod_music`
+  (`sfx/neo_lumen_sfx.it`: `phaseJump1`, `powerUp1`, `laser1`,
+  `confirmation_001`) and the jump of `examples/games/likemario`
+  (`res/jump_sfx.it`: `phaseJump1`), cut and converted by
+  `devtools/audio_assets/build.py`.
+
+### Music and instruments composed for OpenSNES
+- **License**: CC0 (original work)
+- **What**: every tracker module of the examples — `snesmod_music`'s
+  "Neo-Lumen Nocturne", `blocks`' Korobeiniki (the 19th-century Russian
+  song, public domain, arranged here), likemario's "Neo-Lumen Rooftops",
+  the large-bank fixture's long nocturne — and their instruments, and the
+  cello of `apu_switch` and `soundboard`, all synthesized by
+  `devtools/audio_assets/` (`make audio-assets` writes them again).
+
 ## Documentation Sources
 - **SNESdev Wiki** (https://snes.nesdev.org/) — CC-BY-SA
 - **Fullsnes by Nocash** (https://problemkaputt.de/fullsnes.htm)

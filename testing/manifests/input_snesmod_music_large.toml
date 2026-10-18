@@ -1,5 +1,6 @@
 # snesmod_music_large — A (play), B (stop) and X (pause/resume) on the
-# 56 KB two-bank soundbank; the committed manifest only checks that the
+# 46 KB two-bank soundbank (the long nocturne since 2026-10-18; a cover
+# of a song we had no rights to before); the committed manifest only checks that the
 # music plays at boot.
 #
 # What this proves that the other pillars cannot:
@@ -15,10 +16,10 @@
 #   * Nothing is lost: the whole FIFO reads boot PLAY, then the five
 #     commands in order, 18 bytes.
 #   * After B, every voice's envelope is 0 at frame 500; the same script
-#     without B leaves voices 1 and 2 sounding (ENVX 14 and 121) — the
+#     without B leaves voices 1 and 2 sounding (ENVX 928 and 800) — the
 #     stop is real on this module too (the KOFF fix of v0.45.0).
-#   * Presses must come after boot: the 56 KB upload runs until about
-#     frame 85 (the boot PLAY reaches the FIFO then), and a press during
+#   * Presses must come after boot: the 46 KB upload runs until about
+#     frame 73 (the boot PLAY reaches the FIFO then), and a press during
 #     it is never seen as an edge.
 #
 # Measured: `luna state --until-frame N --input <the script below> --peek
