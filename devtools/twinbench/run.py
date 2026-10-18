@@ -48,7 +48,7 @@ PAIRS = [
     ("breakout", "games/breakout", "games/breakout", f"100:{START},110:0,150:{A},160:0", 200, 500),
     ("mapandobjects", "objects/mapandobjects", "games/mapandobjects", f"130:{RIGHT}", 200, 500),
     ("mapscroll", "maps/mapscroll", "maps/map_scroll", f"130:{RIGHT}", 200, 500),
-    ("slopemario", "maps/slopemario", "maps/slope_collision", f"130:{RIGHT}", 200, 500),
+    ("slopemario", "maps/slopemario", "games/mapandobjects", f"130:{RIGHT}", 200, 500),  # the slope level is mapandobjects' since 2026-10-18
     ("tiled", "maps/tiled", "../testing/fixtures/retired_examples/tiled", f"130:{RIGHT}", 200, 500),
     ("animatedsprite", "graphics/Sprites/AnimatedSprite", "sprites/animated_sprite", f"130:{RIGHT}", 200, 500),
     ("dynamicsprite", "graphics/Sprites/DynamicSprite", "sprites/dynamic_sprite", None, 200, 500),

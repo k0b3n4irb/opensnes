@@ -48,7 +48,7 @@
 #include "koopatroopa.h"
 
 /** @brief BG1 tileset tile data (4bpp) -- start label */
-#include "res/tilesMario.inc"    /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
+#include "res/tiles.inc"         /* generated: tiles_tiles[], tiles_pal[], tiles_map[], each with _end */
 #include "res/mario.inc"         /* generated: mario_tiles[], mario_pal[] */
 #include "res/goomba.inc"        /* generated: goomba_tiles[], goomba_pal[] */
 #include "res/koopatroopa.inc"   /* generated: koopatroopa_tiles[], koopatroopa_pal[] */
@@ -92,8 +92,8 @@ int main(void) {
     consoleInit();
 
     /* Init BG1 tileset at VRAM $2000, tilemap at $6800 (mandatory for map engine) */
-    bgInitTileSet(0, tilesMario_tiles, tilesMario_pal, 0,
-                  (tilesMario_tiles_end - tilesMario_tiles), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
+    bgInitTileSet(0, tiles_tiles, tiles_pal, 0,
+                  (tiles_tiles_end - tiles_tiles), PALETTE_16_SIZE, BG_16COLORS, 0x2000);
     bgSetMapPtr(0, 0x6800, SC_64x32);
 
     /* Mode 1, enable only BG1 + sprites */

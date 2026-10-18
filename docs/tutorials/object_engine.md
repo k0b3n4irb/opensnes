@@ -184,7 +184,7 @@ underneath but the last tile property read was non-zero *and* the object's
 
 ## Slopes, and what the tests pin
 
-`objCollidMapWithSlopes` is what `examples/maps/slope_collision` is named for.
+`objCollidMapWithSlopes` is what Mario uses in `examples/games/mapandobjects`.
 A slope tile is not a wall: walking into one must *lift* the object to the
 surface height for its horizontal position within the tile, not stop it. The
 routine does that by indexing a per-slope-type height table with the object's
@@ -196,7 +196,7 @@ upper halves of a 2×1 slope in each direction (`T_SLOPELU2`, `T_SLOPELD2`,
 `T_SLOPEUU2`, `T_SLOPEUD2`). You assign them per tile in the map's attribute
 layer.
 
-The functional test `testing/manifests/movement_slope_collision.toml`
+The functional test `testing/manifests/movement_mapandobjects_slope.toml`
 pins exactly the distinction that matters, measured on luna with RIGHT held:
 
 | Frame | Position | What it proves |
@@ -208,9 +208,9 @@ pins exactly the distinction that matters, measured on luna with RIGHT held:
 | 300 | `(209, 96)` | RIGHT still held, but a solid tile stops him dead |
 
 Frames 144 and 300 are the two halves of the contract: a slope lifts, a wall
-stops. The companion manifest for `mapandobjects` pins the flat-ground case
-for `objCollidMap` the same way — walking right and left along a floor with
-Y constant at 192, which is the "he never falls through the floor" negative.
+stops. The companion manifest `movement_mapandobjects.toml` pins the
+flat-ground case the same way — walking right and left along a floor with
+Y constant at 96, which is the "he never falls through the floor" negative.
 
 One practical note from the same example: Mario is declared with
 `width = 14` and `xofs = 1` rather than a full 16. The comment in `mario.c`

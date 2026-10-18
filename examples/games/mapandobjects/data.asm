@@ -4,13 +4,13 @@ mapmario:
 .incbin "res/BG1.m16"
 
 objmario:
-.incbin "res/tiledMario.o16"
+.incbin "res/level.o16"
 
 tilesetatt:
-.incbin "res/tiledMario.b16"
+.incbin "res/level.b16"
 
 tilesetdef:
-.incbin "res/tiledMario.t16"
+.incbin "res/level.t16"
 
 .ends
 

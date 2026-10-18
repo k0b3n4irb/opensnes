@@ -2,8 +2,9 @@
 
 A scrolling platformer that combines the **map engine** (tile-based world scrolling)
 with the **object engine** (entity management with physics and collision). A player
-character (Mario) walks and jumps through a side-scrolling level populated with
-enemies (Goombas and Koopa Troopas) that patrol back and forth. This example
+character (Mario) walks and jumps through a side-scrolling level — flat ground,
+pipes to jump over, and slopes he walks up and down — populated with enemies
+(Goombas and Koopa Troopas) that patrol back and forth. This example
 demonstrates how real SNES games organize their world and entity logic.
 
 ![Screenshot](mapandobjects.png)
@@ -11,6 +12,7 @@ demonstrates how real SNES games organize their world and entity logic.
 ## What You'll Learn
 
 - How to use the map engine for tile-based level scrolling with collision data
+- How slope tiles lift a character instead of stopping him (`objCollidMapWithSlopes`)
 - How to use the object engine to manage multiple entities with init/update callbacks
 - How to implement enemy AI with patrol boundaries and animation
 - How to build a multi-file C project on the SNES (separate .c files per entity)
@@ -23,11 +25,17 @@ demonstrates how real SNES games organize their world and entity logic.
 The SNES PPU renders backgrounds from tilemaps in VRAM, but it has no built-in
 concept of "solid ground." The map engine bridges this gap by maintaining a
 collision attribute table (`tilesetatt` / `.b16` file) that marks each tile as
-solid, passable, or hazardous. When `objCollidMap()` is called, it checks the
-object's position against this table and adjusts velocity accordingly -- stopping
-downward movement when standing on a solid tile, for example. The tilemap sits at
-VRAM $6800 in a 64x32 layout (`SC_64x32`), giving a world 512 pixels wide --
-wider than the 256-pixel screen, which is what enables scrolling.
+solid, passable, hazardous — or a slope. When `objCollidMapWithSlopes()` is
+called, it checks the object's position against this table and adjusts velocity
+accordingly -- stopping downward movement when standing on a solid tile, for
+example. A slope tile (`T_SLOPEU1` … `T_SLOPEUD2` in `map.h`) is not a wall:
+walking into one lifts Mario to the surface height for his position inside the
+tile. `objCollidMap()` is the same routine without the slopes; the enemies here
+patrol flat stretches and need neither. Mario's box is 14 pixels wide from x + 1
+(`width = 14`, `xofs = 1`), as in PVSnesLib's slope example: with 16 he does not
+follow a slope correctly (observed; the cause is not traced). The level is 2400
+pixels wide (300 tiles of 8); the map engine streams it into a 64x32 tilemap at
+VRAM $6800 (`SC_64x32`) as the camera moves.
 
 ### Object Engine
 
@@ -136,7 +144,7 @@ mapandobjects/
 ├── mario.c / .h       — Player: input, physics, walk/jump/fall animation
 ├── goomba.c / .h      — Goomba enemy: patrol AI, 2-frame animation
 ├── koopatroopa.c / .h — Koopa Troopa: 2-sprite composite, flip on turn
-├── res/*.png.toml     — import settings of the tileset and the three sprite sheets; the
+├── res/*.png.toml     — import settings of the tileset (tiles.png) and the three sprite sheets; the
 │                       build converts and links them, res/*.inc declare the symbols
 ├── data.asm           — ROM data no tool converts: the level (.m16/.o16/.t16/.b16)
 ├── Makefile           — Build config (4 C files, 8 library modules)
@@ -150,7 +158,9 @@ cd $OPENSNES_HOME
 make -C examples/games/mapandobjects
 ```
 
-Then open `mapandobjects.sfc` in your emulator (Mesen2 recommended).
+Then open `mapandobjects.sfc` in luna (`luna-gui mapandobjects.sfc`) or any
+emulator. Walk right: the first bumps lift Mario; jump the first pipe with A
+and the second, taller one with UP+A to reach the first Goomba.
 
 ## Modules Used
 

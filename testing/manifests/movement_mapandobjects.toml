@@ -1,4 +1,6 @@
-# The map+object engine drives mario through objCollidMap / objUpdateXY;
+# The map+object engine drives mario through objCollidMapWithSlopes /
+# objUpdateXY (the level is the slope level since 2026-10-18; spawn (32, 96),
+# the walk stays on the flat before the first bump at x 123);
 # mario.c mirrors the workspace position back into mariox/marioy every
 # frame, and the lib's camera is map_cam_x/map_cam_y.
 #
@@ -6,7 +8,7 @@
 # leave mariox, marioy AND the camera exactly where they were — gravity
 # has already settled him on the ground, so any drift is a bug.
 #
-# Legs 3 and 4 walk right then left. marioy = 192 at every checkpoint is
+# Legs 3 and 4 walk right then left. marioy = 96 at every checkpoint is
 # the second negative: he walks along the floor, he never falls through
 # it. marioflp is the facing flag the animation code sets, so it proves
 # the direction reached the object callback, not just the position.
@@ -15,8 +17,8 @@ rom = "../../examples/games/mapandobjects/mapandobjects.sfc"
 [[checkpoint]]                 # spawn, standing on the ground
 at_frame = 60
 [checkpoint.values]
-mariox = 15
-marioy = 192
+mariox = 32
+marioy = 96
 map_cam_x = 0                                # camera has not scrolled
 marioflp = { eq = 0, width = 1 }         # facing right
 
@@ -31,16 +33,16 @@ map_cam_x = "unchanged"
 at_frame = 180
 input = "120:0x0100,179:0"
 [checkpoint.values]
-mariox = 82
-marioy = 192                             # still on the floor
+mariox = 99
+marioy = 96                              # still on the floor
 marioflp = { eq = 0, width = 1 }
 
 [[checkpoint]]                 # LEFT for 30 frames: back west, sprite flips
 at_frame = 240
 input = "180:0x0200,210:0"
 [checkpoint.values]
-mariox = 46
-marioy = 192
+mariox = 63
+marioy = 96
 marioflp = { eq = 1, width = 1 }         # facing left
 
 # Every VRAM DMA of this input-driven run lands in blank or forced blank

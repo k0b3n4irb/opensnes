@@ -258,10 +258,10 @@
     "rom_sha256": "d4a9fd03d5c5724104475045918eeee2c59ec304ca21d1c48be45ada99440d00"
   },
   "games_mapandobjects": {
-    "fbhash": "5b15edfbfe84018c",
+    "fbhash": "ba3043020ed171e2",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "6a1d463b919265cbe91e2bfc36216dffb738848555a318343d4227d7894da870"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "2c4d9a4780a2fa73288db712d0ea2579e3e50603c46fafacd59857dc2a2ccc8e"
   },
   "games_mode7_flying": {
     "fbhash": "0e1b10f54ebed0df",
@@ -340,12 +340,6 @@
     "frames": 200,
     "luna_version": "v1.34.0",
     "rom_sha256": "480138bed2e98d59dee48a4ab55d0897e2ffc959fa46be6ef221a4dfc33511a1"
-  },
-  "maps_slope_collision": {
-    "fbhash": "717518b98f70aeaf",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "2923bd4c836d76766920baeda0f9c692c89f956775bd02f9b6c276fe9d3801cb"
   },
   "memory_hirom_demo": {
     "fbhash": "b194bdb8baf889bd",

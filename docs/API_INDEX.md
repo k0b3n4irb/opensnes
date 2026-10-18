@@ -38,7 +38,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | load a map made in Tiled | `opensnes-level` → `.m16`/`.b16` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
 | ask whether a tile is solid | `collideTile` (`collideTileEx` for 16- or 32-pixel tiles) | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
 | ask whether two boxes overlap | `collideRect` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
-| handle slopes | `objCollidMapWithSlopes` + per-tile attributes | `object` | [maps/slope_collision](../examples/maps/slope_collision/) |
+| handle slopes | `objCollidMapWithSlopes` + per-tile attributes | `object` | [games/mapandobjects](../examples/games/mapandobjects/) |
 | place the sprite so collision *feels* right | the straddle convention | — | [collision tutorial](tutorials/collision.md#where-the-sprite-is-vs-where-it-collides) |
 
 ## Input

@@ -11,10 +11,10 @@ collision, and walked with slopes. This is Stage 3, "can I build a world?"
 | Example | Developer question |
 |---------|--------------------|
 | [map_scroll](map_scroll/) | How do I author a map in Tiled and scroll it past the camera when it is bigger than VRAM (the `map` module)? |
-| [slope_collision](slope_collision/) | How do I do tile collision with slopes — a full platformer? |
 
 Climb from a world authored in Tiled and scrolled past the camera
-(`map_scroll`) to a character that stands on its slopes (`slope_collision`).
+(`map_scroll`) to a character that stands on its slopes and enemies that
+patrol it (`games/mapandobjects`).
 
 ## The idea in one screen
 

@@ -131,7 +131,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/input/mouse \
                          ../examples/input/superscope \
                          ../examples/maps/map_scroll \
-                         ../examples/maps/slope_collision \
                          ../examples/memory/hirom_demo \
                          ../examples/chips/dsp1_cube \
                          ../examples/chips/sa1_hello \

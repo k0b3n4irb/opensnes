@@ -12,7 +12,6 @@
 #define GOOMBA_RIGHT   2
 #define GOOMBA_XVELOC  0x028A
 
-#include "res/tilesMario.inc"    /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
 #include "res/mario.inc"         /* generated: mario_tiles[], mario_pal[] */
 #include "res/goomba.inc"        /* generated: goomba_tiles[], goomba_pal[] */
 #include "res/koopatroopa.inc"   /* generated: koopatroopa_tiles[], koopatroopa_pal[] */

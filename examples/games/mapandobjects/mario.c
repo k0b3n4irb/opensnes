@@ -13,7 +13,6 @@
 #define MARIO_JUMPING   0x0394
 #define MARIO_HIJUMPING 0x0594
 
-#include "res/tilesMario.inc"    /* generated: tilesMario_tiles[], tilesMario_pal[], tilesMario_map[], each with _end */
 #include "res/mario.inc"         /* generated: mario_tiles[], mario_pal[] */
 #include "res/goomba.inc"        /* generated: goomba_tiles[], goomba_pal[] */
 #include "res/koopatroopa.inc"   /* generated: koopatroopa_tiles[], koopatroopa_pal[] */
@@ -63,7 +62,11 @@ void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     /* objNew copies the new object to objWorkspace — set fields here */
     objGetPointer(objGetCurrentId());
     marioid = objGetCurrentId();
-    objWorkspace.width = 16;
+    /* 14 wide from x + 1 for the slopes, as PVSnesLib's slope example
+     * does: with a 16-wide box Mario does not follow a slope correctly
+     * (observed; the cause in the engine is not traced) */
+    objWorkspace.width = 14;
+    objWorkspace.xofs = 1;
     objWorkspace.height = 16;
 
     mariofidx = 0;
@@ -110,8 +113,8 @@ void marioupdate(u16 idx) {
         }
     }
 
-    /* Collision with map tiles (syncs workspace automatically) */
-    objCollidMap(idx);
+    /* Collision with map tiles, slopes included (syncs workspace automatically) */
+    objCollidMapWithSlopes(idx);
 
     /* Animation state machine */
     if (objWorkspace.action == ACT_WALK)

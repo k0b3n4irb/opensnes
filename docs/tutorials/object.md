@@ -3,8 +3,7 @@
 This tutorial covers the `object` module — the entity engine that manages a
 fixed pool of game objects, dispatches per-type callbacks, and resolves
 collision against the `map` module's tile properties. It is what
-`examples/games/mapandobjects` and `examples/maps/slope_collision` are built
-on. Add `object` to `LIB_MODULES`.
+`examples/games/mapandobjects` is built on. Add `object` to `LIB_MODULES`.
 
 This page is the tutorial: what the engine is, how to register a type,
 spawn, run the frame, pick a collision routine and remove objects. How the
@@ -72,7 +71,7 @@ That is the line both shipped examples use.
 | Bank `$00` (the 8 KB C band) | 5 | the engine's current id, slot and kill flag |
 | Bank `$7E` (the far band) | 6910 | 80 × 64-byte records, `objWorkspace` (64) right behind them, the per-type active-list heads, the three 256-byte callback tables, the object-loading scratch buffer |
 
-Measured on `examples/maps/slope_collision`: the `.obj_bank7e` RAMSECTION is
+Measured on `examples/games/mapandobjects`: the `.obj_bank7e` RAMSECTION is
 `$1AFE` bytes at `$7E:2466`, `.obj_bank00` is 5 bytes. The
 big allocation sits in the far band, so it does not eat your scarce bank-`$00`
 RAM budget (see @ref tutorial_far_ram) — but 6.8 KB is 6.8 KB, and the pool
@@ -107,8 +106,8 @@ The parameters are typed, so a callback with the wrong signature is a compile
 error rather than a corrupted stack. Any of the three may be 0: the engine
 tests every pointer before dispatching and skips a null one.
 
-C callbacks routinely land outside bank `$00` — in `slope_collision.sym`,
-`marioinit` sits in bank `$01`. That works because the compiler pushes a
+C callbacks may land outside bank `$00` — the linker puts each function
+where it fits, bank `$01` and up once bank `$00` is full. That works because the compiler pushes a
 function pointer as a four-byte slot, bank byte included, and
 `objInitFunctions` stores all three bytes. Code ported from an older version
 that registered its types through a hand-written assembly routine can drop
@@ -148,7 +147,7 @@ detected. It returns 0 when the pool is full, and also stores the handle in
 `objGetCurrentId()`.
 
 The canonical init callback looks like this (from
-`examples/maps/slope_collision/mario.c`):
+`examples/games/mapandobjects/mario.c`):
 
 ```c
 void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
@@ -378,7 +377,6 @@ data-driven spawning matter. That is exactly
   dynamic sprite engine your callbacks draw through.
 - `examples/games/mapandobjects` — three entity types, map-driven spawning,
   patrol AI.
-- `examples/maps/slope_collision` — one entity type, slope-aware collision.
 - `lib/contrib/README.md` — what contrib status means for API stability.
 - @ref tutorial_object_engine "How the object engine works" — the engine reference.
 - @ref object.h "Object API reference" · @ref map.h "Map API reference"
