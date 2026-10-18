@@ -10,6 +10,7 @@
 typedef struct {
     u16 length;
     u16 loop;
+    u32 brr_size;   /* the encoder's length before the u16 above: the ARAM check reads this one */
     u8 *data;
     double tuning_factor;
     char id[256];
@@ -96,7 +97,9 @@ typedef struct {
     char id[256];
     u16 *source_list;
     int source_list_count;
-    u32 totalsize;
+    u32 totalsize;     /* smconv's figure, written to the .h as is (its goldens pin it) */
+    u32 aram_size;     /* what the driver loads at MODULE_BASE: the module and its BRR sources */
+    u32 aram_limit;    /* bytes from MODULE_BASE to the echo region this module's delay asks for */
 } spc_module_t;
 
 spc_module_t *spc_module_create(const itl_module_t *mod,
@@ -120,7 +123,9 @@ void spc_bank_destroy(spc_bank_t *b);
 /* false when one of the three outputs (.bnk, .asm, .h) cannot be opened */
 bool spc_bank_export(const spc_bank_t *b, const char *output,
                      bool no_header, const char *symbol_prefix, int banknum);
-void spc_bank_make_spc(const spc_bank_t *b, const char *spcfile);
+/* false when the module does not fit the driver's ARAM, or the file cannot be
+ * opened; nothing is written then */
+bool spc_bank_make_spc(const spc_bank_t *b, const char *spcfile);
 void spc_bank_set_verbose(bool v);
 
 /*--- Helpers ---*/

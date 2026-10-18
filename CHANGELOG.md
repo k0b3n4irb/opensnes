@@ -157,6 +157,19 @@ All notable changes to OpenSNES are documented in this file.
   scene setup. Asked by a game built on the SDK.
 
 ### Fixed
+- fix(tools): **`opensnes-music` puts the module where the driver reads it,
+  and refuses one the SPC700's RAM cannot hold.** `opensnes-music spc` wrote
+  the module at `$19AA` while the driver reads it at `$1A00`: the preview
+  `.spc` held `$FF` where the song should start. `opensnes-music bank` only
+  warned about a module too big for the SPC700's RAM, then wrote the
+  soundbank and exited 0; it now refuses it (exit 1, nothing written), and
+  so does `spc`. The limit is the driver's: the module and its BRR samples
+  from `$1A00` up to the echo buffer, which sits under `$FF00` and takes
+  2 KB per step of echo delay (58 368 bytes without echo). The figure
+  `inspect` and `--json` print (`spc_ram_bytes`, `spc_ram_free`) is that
+  one: for `pollen8.it`, 16 446 bytes of 29 952, where it said 44 137 of
+  57 957 — the old figure counted the echo as data and the instruments as
+  nothing. The soundbank itself is unchanged, byte for byte.
 - fix(tools,docs): **an SA-1 ROM whose `SA1Start` left bank $00 is refused.**
   The SA-1 reset vector is 16-bit, so the SA-1 starts only in the ROM of
   bank $00. The SA-1 tutorial taught a boot section in `SUPERFREE`, which

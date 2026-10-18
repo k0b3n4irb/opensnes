@@ -148,8 +148,9 @@ def new_stats() -> dict[str, int]:
 
 
 def rewrite(src: bytes, *, compress_as: str | None = None, bits16: bool = False,
-            factor: int = 1) -> tuple[bytes, dict[str, int]]:
-    """Returns the new module and the encoder's mode counts."""
+            factor: int = 1, only: int | None = None) -> tuple[bytes, dict[str, int]]:
+    """Returns the new module and the encoder's mode counts. `only` (1-based)
+    stretches that sample alone; the others are rewritten at their length."""
     if src[:4] != b"IMPM":
         raise ValueError("not an IT module")
     mod = bytearray(src)
@@ -172,7 +173,7 @@ def rewrite(src: bytes, *, compress_as: str | None = None, bits16: bool = False,
         if bits16 and bits == 8:
             pcm, bits = [x * 256 for x in pcm], 16
             flags |= 2
-        if factor > 1:
+        if factor > 1 and only in (None, n + 1):
             pcm = stretch(pcm, factor)
             length, loop_a, loop_b, c5, sus_a, sus_b = (
                 v * factor for v in (length, loop_a, loop_b, c5, sus_a, sus_b))

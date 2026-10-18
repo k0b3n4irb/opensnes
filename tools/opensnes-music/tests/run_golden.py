@@ -47,6 +47,12 @@ def spc_written():
         data = spc.read_bytes()
         if len(data) != 66048 or not data.startswith(b"SNES-SPC700 Sound File Data"):
             return [f"pollen8.spc: {len(data)} bytes, header {data[:12]!r}"]
+        # the module where the driver reads it: `luna spc-dump` of
+        # snesmod_music (the same module, played by the game) shows these
+        # bytes at $1A00; the file's ARAM starts at offset $100
+        at = data[0x100 + 0x1A00:0x100 + 0x1A04]
+        if at != bytes.fromhex("806e0324"):
+            return [f"pollen8.spc: ARAM $1A00 holds {at.hex()}, not the module header 806e0324"]
     return []
 
 
@@ -72,7 +78,7 @@ for blocked in ("soundbank.bnk", "soundbank.asm", "soundbank.h"):
     g.check(f"bank with {blocked} unwritable", "exit 3, said", unwritable(blocked))
 
 
-g.check("spc pollen8.it: a 66048-byte SPC file", "SPC700 header, 64 KB RAM + registers", spc_written)
+g.check("spc pollen8.it: a 66048-byte SPC file", "SPC700 header, 64 KB RAM + registers, module at $1A00", spc_written)
 g.expect_refused("bank junk.it (not an IT module)", ["bank", "junk.it"], write={"junk.it": b"junk" * 16},
                  needles=["opensnes-music: junk.it: 'junk.it' is not an Impulse Tracker module"], nothing_written=["junk.asm", "junk.h", "junk.bnk"])
 g.expect_refused("bank --bank 0", ["bank", "--bank", "0", "pollen8.it"], copy=["pollen8.it"],
@@ -93,6 +99,7 @@ import struct  # noqa: E402
 
 OUTPUTS = ["soundbank.asm", "soundbank.h", "soundbank.bnk"]
 STRETCH = 16   # the longest pollen8 sample spans two 8-bit blocks, three 16-bit ones
+LONGEST = 10   # that sample (2122 frames): stretched alone, so the module still fits the driver's ARAM
 
 
 def _convert(work: Path, data: bytes, name: str = "pollen8.it"):
@@ -111,6 +118,8 @@ def _compressed(src: bytes, how: str, **kw) -> tuple[bytes, list[str]]:
 
 def smconv_cases() -> None:
     pollen8 = (SMCONV_TESTS / "fixtures" / "pollen8.it").read_bytes()
+    # its echo (delay 14, 28 KB) leaves 29952 bytes from $1A00; the stretched twin needs more
+    short_echo = pollen8.replace(b"edl 14", b"edl 02")
     reflection = (SMCONV_TESTS / "fixtures" / "reflection.it").read_bytes()
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
@@ -124,7 +133,7 @@ def smconv_cases() -> None:
                      errs + _same(work, _convert(work, data), SMCONV))
         for bits16 in (False, True):
             label = f"pollen8.it x{STRETCH} {'16' if bits16 else '8'}-bit"
-            twin, _ = itcompress.rewrite(pollen8, bits16=bits16, factor=STRETCH)
+            twin, _ = itcompress.rewrite(short_echo, bits16=bits16, factor=STRETCH, only=LONGEST)
             ref = root / f"twin{int(bits16)}"
             proc = _convert(ref, twin)
             if proc.returncode != 0 or not all((ref / o).is_file() for o in OUTPUTS):
@@ -132,9 +141,16 @@ def smconv_cases() -> None:
                 continue
             for how in ("it214", "it215"):
                 work = root / f"twin{int(bits16)}_{how}"
-                data, errs = _compressed(pollen8, how, bits16=bits16, factor=STRETCH)
+                data, errs = _compressed(short_echo, how, bits16=bits16, factor=STRETCH, only=LONGEST)
                 g.record(f"{label} as {how}", "same soundbank as its uncompressed twin",
                          errs + _same(work, _convert(work, data), ref))
+        # every sample stretched: 84734 bytes, where the driver has 29952
+        # from $1A00 under this module's echo — refused, nothing written
+        big, _ = itcompress.rewrite(pollen8, factor=STRETCH)
+        g.expect_refused(f"bank pollen8.it x{STRETCH} (too big for the ARAM)", BANK, write={"pollen8.it": big},
+                         needles=["needs 84734 bytes of SPC RAM, more than the 29952"], nothing_written=OUTPUTS)
+        g.expect_refused(f"spc pollen8.it x{STRETCH} (too big for the ARAM)", ["spc", "pollen8.it"], write={"pollen8.it": big},
+                         needles=["more than the 29952"], nothing_written=["pollen8.spc"])
         ordnum, insnum = struct.unpack_from("<HH", reflection, 0x20)
         hdr, = struct.unpack_from("<I", reflection, 0xC0 + ordnum + 4 * insnum)
         ptr = struct.unpack_from("<I", reflection, hdr + 0x48)[0]

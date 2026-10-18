@@ -23,8 +23,8 @@ samples, up to 8 channels (the SPC700 has eight voices).
 OpenSNES layout; bank 0 holds the code), `NAME.h` (one constant per module
 and per effect, prefixed `NAME`), `NAME.bnk` (the sample data). `NAME`
 defaults to the module's name for one input and to `soundbank` for
-several. A module that needs more SPC RAM than a module may take is named
-with its size.
+several. A module that does not fit the SPC700's RAM is refused, named
+with what it needs and what the driver has, and nothing is written.
 
 **The bank as an asset.** A soundbank has several sources, so its settings
 live in a file named after it (@ref tools_conventions):
@@ -87,14 +87,17 @@ snesmodProcess();                         // once per frame
 ```sh
 opensnes-music inspect music/*.it
 # theme.it: "pollen resurrection", 18 patterns, 17 instruments, 17 samples, 21 orders
-#   -> 44137 bytes of SPC RAM (13820 free of 57957), 17 BRR sources
+#   -> 16446 bytes of SPC RAM (13506 free of 29952), 17 BRR sources
 ```
 
 Nothing is written. The figure is the one that decides whether a song
-fits: the SPC700 has 64 KB, the driver and its tables take the rest, and a
-module may use 57 957 bytes for its patterns, instruments, samples and
-echo buffer. Samples shared between modules of one bank are stored once
-(`BRR sources` counts them).
+fits. The driver loads the module at `$1A00` (its patterns, instruments
+and sample table) and the module's BRR samples right after it; the echo
+buffer sits under `$FF00` and takes 2 KB per step of the module's echo
+delay (`edl` in its `[[SNESMOD]]` message). So a module has 58 368 bytes
+without echo, and 2 048 fewer per step: 29 952 for the `edl 14` above.
+Samples shared between modules of one bank are stored once in the bank
+(`BRR sources` counts them); in the SPC700's RAM each module holds its own.
 
 ## Spc
 
@@ -108,8 +111,9 @@ game.
 
 ## Exit codes and messages
 
-0 done; 1 the input was refused (a file that is not an IT module, a bank
-number outside 1..255); 2 usage; 3 the file system. `--json` puts the
+0 done; 1 the input was refused (a file that is not an IT module, a module
+too big for the SPC700's RAM, a bank number outside 1..255); 2 usage; 3 the
+file system. `--json` puts the
 outputs, the modules and their SPC RAM figures on stdout as one object.
 The converter's diagnostics come out in the same shape (`opensnes-music:
 file: message`), on stderr; under `--json` the warnings are listed in a

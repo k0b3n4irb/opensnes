@@ -19,7 +19,6 @@ static const u8 max_patterns = 64;
 static const u8 max_samples = 64;
 static const u16 header_size = 616;
 static const u16 driver_base = 0x400;
-static const u16 module_base = 0x18ca;
 static const u16 sample_table_offset = 0x200;
 static u16 spc_ram_size_g = 0;
 static u16 totalsizem1 = 0;
@@ -107,6 +106,7 @@ spc_source_t *spc_source_create(const itl_sample_data_t *src)
      * is at most 64 KB). Writing through an (int *) cast on the u16
      * fields, as this used to, stored 4 bytes over two 2-byte fields
      * and only worked on little-endian hosts (UBSan: misaligned store). */
+    s->brr_size = (u32)length;
     s->length = (u16)length;
     s->loop = (u16)loop;
     return s;
@@ -604,7 +604,7 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
 
         u32 echosize = m->echo_delay * 2048;
         m->totalsize = pattsize + sampsize + instrsize + envsize + echosize;
-        spc_ram_size_g = 65535 - module_base - header_size;
+        spc_ram_size_g = 65535 - MODULE_BASE - header_size;
         u32 bytesfree = spc_ram_size_g - m->totalsize - header_size;
         totabanksize += m->totalsize;
 
@@ -649,6 +649,24 @@ spc_module_t *spc_module_create(const itl_module_t *mod,
 
         if (totalsizem1 == 0)
             totalsizem1 = m->totalsize;
+
+        /* The ARAM the driver really needs. It copies the module to
+         * MODULE_BASE ($1A00), its BRR sources after it, and puts the echo
+         * region at ESA = $FF - 8 * delay pages (one page under $FF00 for a
+         * delay of 0): `luna spc-dump` of snesmod_music shows EDL $0E and
+         * ESA $8F. totalsize above undercounts the instruments (its
+         * export-size helper returns 0) and leaves out the header and the
+         * sample table, so the limit is checked on this figure instead. */
+        u32 body = header_size + pattsize + 6u * m->sample_count;
+        for (int i = 0; i < m->instrument_count; i++) {
+            const spc_instrument_t *in = m->instruments[i];
+            body += 5 + (in->envelope_length ? 3 + (in->envelope_length / 4) * 4 : 0);
+        }
+        m->aram_size = (body + 1) & ~1u;
+        for (int i = 0; i < source_list_count; i++)
+            m->aram_size += (sources[source_list[i]]->brr_size + 1) & ~1u;
+        u32 echo_page = m->echo_delay ? 0xFFu - 8u * m->echo_delay : 0xFEu;
+        m->aram_limit = echo_page * 256u - MODULE_BASE;
     }
 
     return m;
@@ -888,11 +906,18 @@ void spc_bank_destroy(spc_bank_t *b)
  * Export
  *==========================================================================*/
 
-void spc_bank_make_spc(const spc_bank_t *b, const char *spcfile)
+bool spc_bank_make_spc(const spc_bank_t *b, const char *spcfile)
 {
+    /* the tool's driver must end below the module, and the module must fit;
+     * the caller has said which one did not */
+    if (driver_base + spc_program_size > MODULE_BASE
+        || b->modules[0]->aram_size > b->modules[0]->aram_limit)
+        return false;
+
     io_file_t f;
     io_init(&f);
-    io_open(&f, spcfile, IO_MODE_WRITE);
+    if (!io_open(&f, spcfile, IO_MODE_WRITE))
+        return false;
 
     io_write_ascii(&f, "SNES-SPC700 Sound File Data v0.30");
     io_write8(&f, 26);
@@ -934,7 +959,7 @@ void spc_bank_make_spc(const spc_bank_t *b, const char *spcfile)
             io_write8(&f, spc_program[i]);
     }
 
-    io_zero_fill(&f, module_base - driver_base - spc_program_size);
+    io_zero_fill(&f, MODULE_BASE - driver_base - spc_program_size);
 
     int start_of_module = io_tell(&f);
     spc_module_export(b->modules[0], &f, false);
@@ -962,6 +987,7 @@ void spc_bank_make_spc(const spc_bank_t *b, const char *spcfile)
     for (int i = 0; i < 128; i++) io_write8(&f, 0);
 
     io_close(&f);
+    return true;
 }
 
 static bool export_asm(const spc_bank_t *b, const char *inputfile, const char *outputfile)
