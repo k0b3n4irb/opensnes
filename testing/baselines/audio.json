@@ -1,16 +1,11 @@
 {
-  "luna": "v1.38.0",
+  "luna": "v1.39.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
       "sha256": "765ad9889609d5cd44dbebfe8e54c6950f50c053b3ccd2a1ad30f40e0a0c9316",
       "samples": 159936,
       "peak": 21264
-    },
-    "audio/snesmod_music": {
-      "sha256": "bd1f352af6e1b1e17cedaf227918aa87fd5529e0cf7b904864302d0c4c703a6b",
-      "samples": 159936,
-      "peak": 20922
     },
     "audio/pitch_mod": {
       "sha256": "2960dce3f647bbd63c1a2fad357dc8a538071ef1099c39f6a2ee07532250e2e8",
@@ -47,10 +42,10 @@
       "samples": 159936,
       "peak": 9323
     },
-    "audio/snesmod_sfx": {
-      "sha256": "3492c5730765067381d2c35260d6a2292b541e9e1f3b4f0eb2e6ef6d08735a0f",
+    "audio/snesmod_music": {
+      "sha256": "a902284e5ef3fb97e94ded28e43ff02f1a27c3b57778231565b5b1fc9ed4de33",
       "samples": 159936,
-      "peak": 2644
+      "peak": 20897
     },
     "audio/sfx_from_wav": {
       "sha256": "64951fc867c2a0fd156fdc64141f9c4cf8e3789ee83a3c6395ad8a65f1da45a6",

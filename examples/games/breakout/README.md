@@ -256,7 +256,7 @@ static void run_frame(void) {
   the paddle to activate bonuses (wide paddle, slow ball, multiball).
 
 - **Add sound:** Play a BRR sample on each bounce. Check out
-  [SNESMOD SFX](../../audio/snesmod_sfx/) for the sound effect pattern.
+  [SNESMOD music and effects](../../audio/snesmod_music/) for the sound effect pattern.
 
 - **Design your own levels:** Edit `brick_map` in `data.asm`. Values 0-7 are colors,
   8 is empty. The grid is 10 columns x 10 rows — go wild.

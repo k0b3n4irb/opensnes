@@ -66,7 +66,6 @@ PAIRS = [
     ("waves", "graphics/Effects/Waves", "hdma/hdma_wave", None, 200, 500),
     ("gradient", "graphics/Effects/GradientColors", "hdma/gradient_colors", None, 200, 500),
     ("music", "audio/music", "audio/snesmod_music", None, 200, 500),
-    ("effects", "audio/effects", "audio/snesmod_sfx", f"210:{A},220:0,300:{A},310:0", 200, 500),
     ("controller", "input/controller", "input/controller", f"210:{A},260:{RIGHT},300:0", 200, 500),
     ("hello", "hello_world", "text/print_string", None, 200, 500),
     ("timer", "timer", "basics/timer", None, 200, 500),

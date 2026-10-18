@@ -124,8 +124,6 @@ windows, the Mode 7 plane, and sound.
 
 @subpage examples_audio_snesmod_music
 
-@subpage examples_audio_snesmod_sfx
-
 @subpage examples_audio_sfx_from_wav
 
 @subpage examples_audio_soundboard

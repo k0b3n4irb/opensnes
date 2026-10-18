@@ -13,7 +13,7 @@ nothing: the SPC700/DSP are integer machines).
 Examples covered: the eight that play without input (apu_switch, snesmod_music,
 pitch_mod, play_noise, echo, speech_synth, the snesmod_music_large fixture, and
 chips/superfx_game_skeleton — music while the GSU works) and the three
-that need a button (soundboard, snesmod_sfx, sfx_from_wav), each pressed with
+that need a button (soundboard, snesmod_music, sfx_from_wav), each pressed with
 the script of its luna test manifest. The button-driven ones joined on luna
 v1.29.0: before it, `--audio-out` under `--input` kept only 16 384 samples
 from the boot and then jumped to the last checkpoint.
@@ -44,7 +44,6 @@ FRAMES = 300  # 5 s NTSC — past every driver's boot + sample upload
 # example key -> ROM path (relative to examples/)
 EXAMPLES = {
     "audio/apu_switch":    ("audio/apu_switch/apu_switch.sfc", None),
-    "audio/snesmod_music": ("audio/snesmod_music/music.sfc", None),
     "audio/pitch_mod":     ("audio/pitch_mod/pitch_mod.sfc", None),
     "audio/play_noise":    ("audio/play_noise/play_noise.sfc", None),
     "audio/echo":          ("audio/echo/echo.sfc", None),
@@ -55,10 +54,9 @@ EXAMPLES = {
     # (gsuPresent): a stutter or a dropped tick changes the hash
     "chips/superfx_game_skeleton": ("chips/superfx_game_skeleton/superfx_game_skeleton.sfc", None),
     # joypad-1 scripts from their manifests (soundboard.toml,
-    # audio_snesmod_sfx_play.toml, audio_sfx_from_wav.toml)
+    # audio_snesmod_music_effect.toml, audio_sfx_from_wav.toml)
     "audio/soundboard":    ("audio/soundboard/soundboard.sfc", "220:0x0080"),
-    "audio/snesmod_sfx":   ("audio/snesmod_sfx/sfx.sfc",
-                            "40:0x0100,44:0,50:0x0100,54:0,80:0x0080,84:0"),
+    "audio/snesmod_music": ("audio/snesmod_music/music.sfc", "80:0x4000,84:0"),
     "audio/sfx_from_wav":  ("audio/sfx_from_wav/sfx_from_wav.sfc",
                             "100:0x0080,104:0,130:0x8000,134:0"),
 }

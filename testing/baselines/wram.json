@@ -20,12 +20,8 @@
     "rom_sha256": "f9d930e5514c62ac31926db41834fa1a726618f81975d232f12e7ced48ff9d97"
   },
   "audio_snesmod_music": {
-    "stream": "2e4722089b3a588f20c16696af451e18c4920e22539270c301ad546b7a200318",
-    "rom_sha256": "5afd91e50722f4cae28fbc338d9f5e773e9162ee470b07003bd447b6aa62ed23"
-  },
-  "audio_snesmod_sfx": {
-    "stream": "792d20e24b8c0f3bd9f5d451f2a37c09b20a240d6cf16cd63c35dc9f423d487e",
-    "rom_sha256": "8507a661790aead1c945514549f0cd8bdc47680c23cc55d7dc237f4a39058ab8"
+    "stream": "5b2fda6523ec627ba270739e64d7b1ca7cf32a17529e85473fa64f869226879c",
+    "rom_sha256": "701332a798b9ff22cf4d295ae344253dc679108f1f51d7da25e2af4fe3fc2fc4"
   },
   "audio_soundboard": {
     "stream": "69b6fb4a6224653f3482452c8654cadbfbbea43a1e40e7c201f2dde24be7ec70",

@@ -233,6 +233,20 @@ debugging.
 
 ---
 
+### 🔴 A SNESMOD sound effect larger than the free SPC RAM overwrites the echo buffer
+`snesmodLoadEffect()` copies the sample into the SPC700's RAM right after
+the module, and the driver does not check where the echo buffer starts: an
+effect that does not fit is written over it, the echo then overwrites the
+effect, and both are heard wrong. No error, on the CPU side or the SPC700's.
+Measured on luna with `examples/audio/snesmod_music`: pollen8 and its echo
+leave 13 506 bytes, and the five effects of the example's sound-effect
+module take about 20 500.
+
+**Mitigation:** check the room with `opensnes-music inspect` (the
+"free of" figure of the module) and load only the effects that fit, as
+`examples/audio/snesmod_music` does; a shorter echo delay in the tracker
+gives more room. `snesmodLoadModule()` frees every effect: load them after it.
+
 ## Build-time / linker traps
 
 ### 🟢 The data-init terminator must close `.data_init` (checked after every link)

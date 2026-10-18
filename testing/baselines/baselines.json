@@ -30,16 +30,10 @@
     "rom_sha256": "e3dbfeef1d522d74f657ac9eaf352f5391f8027f20cd9ea9c0a95c1f91bbf55e"
   },
   "audio_snesmod_music": {
-    "fbhash": "45f77dcb8cff9551",
+    "fbhash": "d6a5e3dafcc55029",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "11ba5ba9f4fb21892530e6552bd089031c3e72c0acb7b222bc5ed5336371fb4d"
-  },
-  "audio_snesmod_sfx": {
-    "fbhash": "e5637b4fb28bb709",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "2b7bc287acfa89a647ec26e652e741ae509f8f393833a6da309dddda9581f356"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "701332a798b9ff22cf4d295ae344253dc679108f1f51d7da25e2af4fe3fc2fc4"
   },
   "audio_soundboard": {
     "fbhash": "25bd331298456325",
@@ -317,6 +311,18 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "7a347a9736e3bbe67de96937b9cc69b84c0a4a1a49f19dc5543d5b7ce149aaaf"
   },
+  "games_blocks": {
+    "fbhash": [
+      "ff847e81e01fa2a0",
+      "36c92bac2d64bad0"
+    ],
+    "frames": [
+      200,
+      400
+    ],
+    "luna_version": "v1.34.0",
+    "rom_sha256": "164bac1d9d5ca3b6a612ebb9f512b6262e1284acadef9fe0976c21ceea9b8279"
+  },
   "games_breakout": {
     "fbhash": "50ca4bf125070506",
     "frames": 200,
@@ -364,18 +370,6 @@
     ],
     "luna_version": "v1.34.0",
     "rom_sha256": "3e9e992661a4cc9209721e53e08776c59be38a77e8f95602329ba291de6f4f2c"
-  },
-  "games_blocks": {
-    "fbhash": [
-      "ff847e81e01fa2a0",
-      "36c92bac2d64bad0"
-    ],
-    "frames": [
-      200,
-      400
-    ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "164bac1d9d5ca3b6a612ebb9f512b6262e1284acadef9fe0976c21ceea9b8279"
   },
   "hdma_gradient_colors": {
     "fbhash": "c69f3a932b9d2e95",

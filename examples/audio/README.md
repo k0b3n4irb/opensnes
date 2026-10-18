@@ -13,8 +13,7 @@ from C — then the DSP's party tricks.
 
 | Example | Developer question |
 |---------|--------------------|
-| [snesmod_music](snesmod_music/) | How do I play tracker music with transport controls? |
-| [snesmod_sfx](snesmod_sfx/) | How do I mix SFX over music? |
+| [snesmod_music](snesmod_music/) | How do I play tracker music with transport controls, and mix sound effects over it? |
 | [sfx_from_wav](sfx_from_wav/) | How do I play a sound effect from a WAV file, converted by the build? |
 
 **Raw APU from C (audio v2)** — the lib uploads its own resident SPC700 driver;

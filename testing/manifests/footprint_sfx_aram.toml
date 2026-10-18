@@ -1,7 +1,9 @@
 # Migrated from probes/audio.py (sfx): the SPC driver is alive -> ARAM populated
 # (driver image + BRR samples uploaded). Footprint floor stands in for the
-# probe's spc_stopped==false liveness check.
-rom = "../../examples/audio/snesmod_sfx/sfx.sfc"
+# probe's spc_stopped==false liveness check. Written for audio/snesmod_sfx;
+# on snesmod_music since the two merged (2026-10-18), where the ARAM holds
+# the module and the four effects.
+rom = "../../examples/audio/snesmod_music/music.sfc"
 steps = 5000000
 [asserts.footprint]
 aram = { nonzero_min = 2000 }
