@@ -190,8 +190,7 @@ Every example not on the path above, by topic. Each stands on what the path
 taught; read the one your game needs.
 
 - **The other background modes** — @ref examples_backgrounds_mode0 (four 4-colour
-  layers), @ref examples_backgrounds_mode1_bg3_priority (BG3 above the others),
-  @ref examples_backgrounds_mode2 (offset-per-tile in Modes 2 and 4) and
+  layers), @ref examples_backgrounds_mode2 (offset-per-tile in Modes 2 and 4) and
   @ref examples_backgrounds_mode6 (offset-per-tile in hi-res), @ref examples_backgrounds_mode3
   (256 colours), @ref examples_backgrounds_mode5_hires (512 pixels, interlace).
 - **More colour** — @ref examples_color_direct_color, @ref examples_color_hicolor_1792.

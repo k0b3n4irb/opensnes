@@ -9,27 +9,29 @@
 # The heart row is HUD_Y+1 = 2, so +2*32*2 = $80, and the first heart is at
 # HUD_X+1 = 2, so +4: $00:05A4, five words. The dialog's top-left corner is
 # DLG_Y = 20, DLG_X = 4: $0520 + 20*64 + 8 = $00:0A28. Panel entries carry
-# palette 1 and priority 1, hence the $2400 attribute bits: $240A filled
-# heart, $240B empty, $2401 the 9-slice top-left corner, $0000 blank.
+# palette 4 and priority 1 (the panels are on BG3 since mode1_bg3_priority
+# merged in, 2026-10-18), hence the $3000 attribute bits: $300A filled
+# heart, $300B empty, $3001 the 9-slice top-left corner, $0000 blank.
 #
 # Measured on luna with this script: hearts 3 -> 2 -> 1 on two B taps, the
 # dialog opens on START with the heart row byte-identical across it, A puts
 # a heart back, START closes the dialog and the row is again untouched.
 rom = "../../examples/basics/panel_hud/panel_hud.sfc"
-frames = 280
+frames = 360
 #        B          B            START (open)  A            START (close)
-input = "60:0x8000,64:0,100:0x8000,104:0,140:0x1000,144:0,200:0x0080,204:0,240:0x1000,244:0"
+#        ...        SELECT (behind)  SELECT (in front)
+input = "60:0x8000,64:0,100:0x8000,104:0,140:0x1000,144:0,200:0x0080,204:0,240:0x1000,244:0,290:0x2000,294:0,330:0x2000,334:0"
 
 [[checkpoint]]                 # boot: hero_hp = 3, no dialog
 at_frame = 50
 [checkpoint.values]
 hero_hp      = { eq = 3, width = 1 }
 dialog_shown = { eq = 0, width = 1 }
-"panel_map.main+132" = { eq = 0x240A, width = 2 }   # heart 0 filled
-"panel_map.main+134" = { eq = 0x240A, width = 2 }
-"panel_map.main+136" = { eq = 0x240A, width = 2 }
-"panel_map.main+138" = { eq = 0x240B, width = 2 }   # heart 3 empty
-"panel_map.main+140" = { eq = 0x240B, width = 2 }
+"panel_map.main+132" = { eq = 0x300A, width = 2 }   # heart 0 filled
+"panel_map.main+134" = { eq = 0x300A, width = 2 }
+"panel_map.main+136" = { eq = 0x300A, width = 2 }
+"panel_map.main+138" = { eq = 0x300B, width = 2 }   # heart 3 empty
+"panel_map.main+140" = { eq = 0x300B, width = 2 }
 "panel_map.main+1288" = { eq = 0x0000, width = 2 }   # dialog area is blank tile 0
 
 [[checkpoint]]                 # one B tap
@@ -41,16 +43,16 @@ hero_hp = { eq = 2, width = 1 }
 at_frame = 120
 [checkpoint.values]
 hero_hp   = { eq = 1, width = 1 }
-"panel_map.main+132" = { eq = 0x240A, width = 2 }
-"panel_map.main+134" = { eq = 0x240B, width = 2 }
-"panel_map.main+136" = { eq = 0x240B, width = 2 }
+"panel_map.main+132" = { eq = 0x300A, width = 2 }
+"panel_map.main+134" = { eq = 0x300B, width = 2 }
+"panel_map.main+136" = { eq = 0x300B, width = 2 }
 
 [[checkpoint]]                 # THE POINT: panelFlush for the dialog leaves
 at_frame = 180                 # the HUD row byte-identical
 [checkpoint.values]
 dialog_shown = { eq = 1, width = 1 }
 hero_hp      = { eq = 1, width = 1 }
-"panel_map.main+1288"    = { eq = 0x2401, width = 2 }   # 9-slice top-left corner stamped
+"panel_map.main+1288"    = { eq = 0x3001, width = 2 }   # 9-slice top-left corner stamped
 [checkpoint.delta]
 "panel_map.main+132" = "unchanged"
 "panel_map.main+134" = "unchanged"
@@ -63,7 +65,7 @@ at_frame = 220
 [checkpoint.values]
 hero_hp      = { eq = 2, width = 1 }
 dialog_shown = { eq = 1, width = 1 }
-"panel_map.main+134"    = { eq = 0x240A, width = 2 }
+"panel_map.main+134"    = { eq = 0x300A, width = 2 }
 
 [[checkpoint]]                 # START again: panelClear wipes the dialog only
 at_frame = 280
@@ -76,10 +78,34 @@ hero_hp      = { eq = 2, width = 1 }
 "panel_map.main+134" = "unchanged"
 "panel_map.main+136" = "unchanged"
 
+[[checkpoint]]                 # boot state of the layer: Mode 1, BG3 high
+at_frame = 285                 # (BGMODE $09), BG1 + BG3 on the main screen
+[checkpoint.values]
+bg3_high = { eq = 1, width = 1 }
+[checkpoint.ppu]
+bgmode = 0x09
+tm = 0x05
+
+[[checkpoint]]                 # SELECT: the bit off, BG3 behind BG1 (BGMODE $01);
+at_frame = 320                 # the panels' map is not touched
+[checkpoint.values]
+bg3_high = { eq = 0, width = 1 }
+[checkpoint.ppu]
+bgmode = 0x01
+[checkpoint.delta]
+"panel_map.main+132" = "unchanged"
+
+[[checkpoint]]                 # SELECT again: in front once more
+at_frame = 360
+[checkpoint.values]
+bg3_high = { eq = 1, width = 1 }
+[checkpoint.ppu]
+bgmode = 0x09
+
 # The HUD row as the PPU actually holds it. panel_map is only RAM; the
 # example's flush_hud_row() pushes just this 64-byte row with an ordinary
-# VBlank DMA (no forced blank), so VRAM must mirror it. BG2_MAP is word
+# VBlank DMA (no forced blank), so VRAM must mirror it. BG3_MAP is word
 # $4400 = byte $8800, plus row 2 = +$80 -> $8880. Two filled hearts, three
-# empty, between the box's left ($2404) and right ($2405) edge tiles.
+# empty, between the box's left ($3004) and right ($3005) edge tiles.
 [asserts.blocks]
-hud_row = { space = "vram", offset = "8880", hex = "000004240a240a240b240b240b240524" }
+hud_row = { space = "vram", offset = "8880", hex = "000004300a300a300b300b300b300530" }

@@ -47,12 +47,6 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "ab60045a1039eef426be4a26f6a6f44589baf82cdfa0f4fcce49574ce041862d"
   },
-  "backgrounds_mode1_bg3_priority": {
-    "fbhash": "7638530d52fc9186",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "e54f328d416840a7701b19aa449f539c24fefc13cf9bdab5a32dae6f4ca4e047"
-  },
   "backgrounds_mode2": {
     "fbhash": [
       "85f3d975bdb4cd75",
@@ -108,10 +102,10 @@
     "rom_sha256": "13dc2cfd0cecc8d37150bc4fb8eb5c6cc4ba6b81628a91cf46b020bd1321c050"
   },
   "basics_panel_hud": {
-    "fbhash": "c0d72c5cc0350575",
+    "fbhash": "c720030f282db315",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "1a219ce6e78b43fb034ca9eefeb4782df1d32c1f13427e303145454d650fe782"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "441dc58c124e8c3e865c8f8b9e99731e1bd34096224d4ae88324a4b027f83aaa"
   },
   "basics_scene_stack": {
     "fbhash": "094c06534a796b35",

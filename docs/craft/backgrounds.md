@@ -62,11 +62,11 @@ past. Two ways to do it:
 
 ### The HUD — always on top, cheaply
 Put the status bar on the layer whose priority keeps it above the action —
-Mode 1's BG3 is the classic home. Two routes:
-- **Tiles with the priority bit set** — a fixed HUD baked into BG3. See
-  @ref examples_backgrounds_mode1_bg3_priority.
-- **A 9-slice panel** — bordered boxes stamped at runtime (health, dialog).
-  See @ref examples_basics_panel_hud.
+Mode 1's BG3 is the classic home: with `BG3_MODE1_PRIORITY_HIGH` and the
+tile priority bit, BG3 is in front of every other layer and the sprites.
+The boxes themselves are **9-slice panels**, stamped at runtime (health,
+dialog). @ref examples_basics_panel_hud does both, and SELECT there turns
+the priority bit off to show the difference.
 
 Keep the HUD out of the scrolling world: it should not move when the camera
 does. Give it its own layer (or a fixed region) so gameplay scroll never drags

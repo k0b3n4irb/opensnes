@@ -95,7 +95,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/scrolling/mixed_scroll \
                          ../examples/backgrounds/mode0 \
                          ../examples/backgrounds/mode1 \
-                         ../examples/backgrounds/mode1_bg3_priority \
                          ../examples/backgrounds/mode3 \
                          ../examples/backgrounds/mode2 \
                          ../examples/mode7/rotate_scale \

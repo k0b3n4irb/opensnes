@@ -26,8 +26,7 @@ beyond the runtime that every ROM already links.
 
 The corpus votes with its feet: three examples call `gameLoopRun`
 (`basics/aim_target`, `input/controller`);
-three use the asset bundles (`backgrounds/mode1`,
-`backgrounds/mode1_bg3_priority`, `games/shmup_1942`). Everything else writes
+two use the asset bundles (`backgrounds/mode1`, `games/shmup_1942`). Everything else writes
 the loop and the loads by hand, and nothing about those examples is
 second-class. `games/shmup_1942` uses `bgLoad` *and* hand-writes its loop —
 the two opt-ins are independent of each other.
@@ -225,9 +224,8 @@ according to `color_mode`, and the conversion is not uniform:
 | `BG_4COLORS0` (Mode 0) | `bg * 32 + slot * 4` — the **BG number participates** |
 | `BG_256COLORS` | always `0` — `palette_slot` is ignored |
 
-`backgrounds/mode1_bg3_priority` is the worked example: three
-`BG_16COLORS` bundles at slots 2, 4 and 0, which land at CGRAM colours 32-47,
-64-79 and 0-15 respectively.
+For instance, three `BG_16COLORS` bundles loaded at slots 2, 4 and 0 land
+at CGRAM colours 32-47, 64-79 and 0-15 respectively:
 
 ```c
 DECLARE_BG_ASSET(bg1, BG_16COLORS, SC_32x32);
@@ -247,9 +245,9 @@ correct:
 
 - **Explicit** — `backgrounds/mode1` and `games/shmup_1942` open with
   `setScreenOff()`, load, then `setScreenOn()`.
-- **Implicit** — `backgrounds/mode1_bg3_priority` opens with `consoleInit()`
-  and a `WaitForVBlank()`, relying on the fact that `crt0.asm` leaves INIDISP
-  in forced blank from reset until the first `setScreenOn()`.
+- **Implicit** — load right after `consoleInit()`, relying on the fact that
+  `crt0.asm` leaves INIDISP in forced blank from reset until the first
+  `setScreenOn()`.
 
 Prefer the explicit form in new code; it survives being moved into a scene's
 `init`, where the screen is already on.

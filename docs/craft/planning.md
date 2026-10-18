@@ -99,7 +99,7 @@ Default to **Mode 1** unless your game has a specific reason not to — it is
 what most of the library used, and every other mode trades a layer or colour
 depth for its special power. Put your HUD on the 4-colour layer (Mode 1's
 BG3) with its high-priority bit, so it draws over the action; see @ref craft_backgrounds for how to
-compose layers, and @ref examples_backgrounds_mode1_bg3_priority for the HUD
+compose layers, and @ref examples_basics_panel_hud for the HUD
 overlay in practice.
 
 ### The cost side: tiles by mode

@@ -271,7 +271,7 @@ Mode 1 palette organization:
 
 ## What's Next?
 
-**More BG layers:** [BG3 Priority](../mode1_bg3_priority/) - HUD overlay in Mode 1
+**More BG layers:** [Panel HUD](../../basics/panel_hud/) - a HUD on BG3, in front of the scene
 
 **Sprites:** [Simple Sprite](../../sprites/simple_sprite/) - Display a sprite
 

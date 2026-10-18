@@ -42,24 +42,49 @@ Two things worth internalising:
 
 The border and heart icons are generated in C — zero assets.
 
+## The layer: BG3, in front
+
+The panels are on **BG3**, Mode 1's 2bpp layer — the classic home of a HUD,
+cheap in VRAM (16 bytes a tile). Two things put it in front of the scene:
+
+```c
+setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);   /* the BGMODE bit ($2105 bit 3) */
+/* ...and Panel.priority = 1: every panel tile carries its priority bit */
+```
+
+In Mode 1, BG3's priority-1 tiles are drawn in front of everything —
+sprites, BG1 and BG2 — only when the BGMODE bit is set; with it clear they
+sit behind BG1 and BG2 (anomie's register doc, the Mode 1 priority list).
+**SELECT** clears and sets the bit: the boxes drop behind the rainbow and
+come back, while their tilemap does not change. A 2bpp palette has four
+colours (0 transparent) taken from CGRAM 0-31; the boxes use palette 4,
+CGRAM 16-19, which the scene (palette 0) leaves free — so the empty heart's
+outline reuses the border colour. (This lesson was the
+`backgrounds/mode1_bg3_priority` example.)
+
 ## What to observe / if it breaks
 
 - **Correct run:** a HUD box with 3 filled + 2 empty hearts sits over a
   rainbow background. **B** loses a heart, **A** gains one, **START**
   opens/closes a dialog box lower down — and the HUD never flinches when
-  the dialog appears.
+  the dialog appears. **SELECT** sends both boxes behind the background,
+  SELECT again brings them back.
 - **Corners/edges tiled everywhere instead of one box:** tile 0 isn't
   transparent, so `panelInit`'s blank entry is drawing a real tile. Keep
   the 9-slice at `base_tile ≥ 1` and leave tile 0 empty.
 - **The box is opaque black / hides the background:** the fill palette
   entry, not transparency — only pixel value 0 is transparent; the fill
   uses a real colour on purpose.
+- **The boxes are hidden behind the scene:** the BGMODE bit
+  `BG3_MODE1_PRIORITY_HIGH` is clear, or `Panel.priority` is 0 — both are
+  needed.
 - **Top of the screen blinks dark when hearts change:** you're calling
   `panelFlush()` for the HUD. Its forced blank overruns into the first
   scanlines. Push just the changed row with a small VBlank DMA instead
   (`flush_hud_row`); keep `panelFlush` for the dialog.
 
-Probe oracles: `hero_hp` (0–5, hearts shown) and `dialog_shown` (0/1).
+Probe oracles: `hero_hp` (0–5, hearts shown), `dialog_shown` (0/1) and
+`bg3_high` (0/1).
 
 ## Build & run
 
@@ -70,7 +95,7 @@ make
 
 ## Modules used
 
-`console`, `dma`, `background`, `panel`, `input`, `tile` (`tileEncode4bpp`)
+`console`, `dma`, `background`, `panel`, `input`, `tile` (`tileEncode4bpp` for the scene, `tileEncode2bpp` for the panels)
 
 ## Where you are
 

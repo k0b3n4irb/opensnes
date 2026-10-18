@@ -24,11 +24,19 @@
  * left transparent (that is what panelInit() stamps everywhere), so the
  * colourful BG1 shows through wherever no panel has been drawn.
  *
+ * The panel layer is BG3, the 2bpp layer of Mode 1 — the usual home of a
+ * HUD, cheap in VRAM. In Mode 1, BG3 is drawn behind BG1 and BG2 unless the
+ * BGMODE bit BG3_MODE1_PRIORITY_HIGH is set and the BG3 tiles carry their
+ * priority bit; then it is in front of everything, sprites included. SELECT
+ * turns the bit off and on, and the HUD goes behind the scene and comes
+ * back. (That lesson was the mode1_bg3_priority example.)
+ *
  * ROM mode: LoROM (project default).
  *
  * @par Controls
  * - B: lose a heart · A: gain one (small VBlank DMA of the heart row)
  * - START: toggle the dialog box (panelFlush; the HUD stays put)
+ * - SELECT: BG3_MODE1_PRIORITY_HIGH off / on (the panels behind / in front)
  *
  * @par SNES Concepts
  * - 9-slice stamping: panelDraw() picks corner/edge/fill from the sheet by
@@ -37,11 +45,15 @@
  * - panelFlush() uploads under real forced blank (INIDISP bit 7): safe for
  *   2 KB but it blanks briefly, so use it for structural changes; push a
  *   frequently-updated HUD row with a small ordinary VBlank DMA instead
+ * - BG3 in Mode 1: 2bpp tiles (8 words each), 4-colour palettes taken from
+ *   CGRAM 0-31; in front of BG1/BG2 only with BG3_MODE1_PRIORITY_HIGH and
+ *   the tile priority bit (Panel.priority = 1)
  *
  * @par What to Observe
  * A HUD box with hearts sits over a colourful background. A/B change the
  * hearts; START opens/closes a dialog box lower down without touching the
- * HUD. `hero_hp` and `dialog_shown` are the probe oracles.
+ * HUD. SELECT sends both boxes behind the scene, SELECT again brings them
+ * back. `hero_hp`, `dialog_shown` and `bg3_high` are the probe oracles.
  *
  * @par Modules Used
  * console, dma, background, panel, input, tile
@@ -50,17 +62,17 @@
  */
 
 #include <snes.h>
-#include <snes/tile.h>   /* tileEncode4bpp */
+#include <snes/tile.h>   /* tileEncode4bpp, tileEncode2bpp */
 #include <snes/panel.h>
 #include <snes/input.h>
 
 /* --- VRAM layout (word addresses) --- */
 #define BG1_CHR 0x0000    /**< BG1 scene tiles           */
 #define BG1_MAP 0x1000    /**< BG1 tilemap               */
-#define BG2_CHR 0x2000    /**< BG2 panel sheet tiles      */
-#define BG2_MAP 0x4400    /**< BG2 panel tilemap (uploaded by panelFlush) */
+#define BG3_CHR 0x2000    /**< BG3 panel sheet tiles (2bpp) */
+#define BG3_MAP 0x4400    /**< BG3 panel tilemap (uploaded by panelFlush) */
 
-/* --- The panel sheet, laid out in BG2's tile space ---
+/* --- The panel sheet, laid out in BG3's tile space ---
  * Tile 0 MUST be transparent: panelInit() fills the map with entry 0, and
  * that is what shows the background through the layer. The 9-slice sheet
  * therefore starts at tile 1 (stride 3 → tiles 1..9), icons follow. */
@@ -70,12 +82,14 @@
 #define TILE_HEART        10    /* icons live past the 9-slice            */
 #define TILE_HEART_EMPTY  11
 
-/* --- Palette 1 (BOX_PAL) pixel values inside the sheet tiles --- */
-#define BOX_PAL     1
+/* --- Palette 4 (BOX_PAL) pixel values inside the sheet tiles ---
+ * A 2bpp palette has 4 colours, colour 0 transparent; BG3's palette 4 is
+ * CGRAM 16-19, which the BG1 scene (palette 0, CGRAM 0-15) leaves free. */
+#define BOX_PAL     4
 #define FILL_IDX    1          /* box interior            */
-#define BORDER_IDX  2          /* box border              */
+#define BORDER_IDX  2          /* box border, and the empty heart's outline */
 #define HEART_IDX   3          /* heart red               */
-#define EMPTY_IDX   4          /* empty-heart grey        */
+#define EMPTY_IDX   BORDER_IDX
 
 /* --- HUD and dialog geometry (tiles) --- */
 #define HUD_X 1
@@ -93,6 +107,8 @@
 u8 hero_hp;
 /** @brief Probe oracle: 1 while the dialog box is open */
 u8 dialog_shown;
+/** @brief Probe oracle: 1 while BG3_MODE1_PRIORITY_HIGH is set */
+u8 bg3_high;
 
 /** @brief The panel tilemap — caller-owned (the module never allocates 2 KB). */
 static u16 panel_map[32 * 32];
@@ -100,21 +116,21 @@ static u16 panel_map[32 * 32];
 /** @brief The panel: HUD + dialog share this one layer and one upload. */
 static const Panel ui = {
     panel_map,        /* map        */
-    BG2_MAP,          /* vram_addr  */
+    BG3_MAP,          /* vram_addr  */
     SHEET_BASE,       /* base_tile — 9-slice starts at tile 1 (tile 0 blank) */
     SHEET_STRIDE,     /* stride     */
     BOX_PAL,          /* palette    */
-    1,                /* priority — in front of the BG1 scene */
+    1,                /* priority — with BG3_MODE1_PRIORITY_HIGH: in front */
 };
 
-/** @brief Scratch: one 8x8 tile as pixel indices, then packed to 4bpp. */
+/** @brief Scratch: one 8x8 tile as pixel indices, then packed (4bpp for BG1, 2bpp for BG3). */
 static u8 px[64];
 static u8 tilebuf[32];
 
-/** @brief Upload the just-encoded tile to a tile slot in BG2's char space. */
+/** @brief Upload the just-encoded tile to a tile slot in BG3's char space (16 bytes a 2bpp tile). */
 static void put_tile(u16 tile) {
-    tileEncode4bpp(px, tilebuf);
-    dmaCopyVram(tilebuf, (u16)(BG2_CHR + tile * 16), 32);
+    tileEncode2bpp(px, tilebuf);
+    dmaCopyVram(tilebuf, (u16)(BG3_CHR + tile * 8), 16);
 }
 
 /**
@@ -148,7 +164,7 @@ static void build_heart(u8 filled) {
     }
 }
 
-/** @brief Build the whole BG2 sheet: blank, 9-slice, two heart icons. */
+/** @brief Build the whole BG3 sheet: blank, 9-slice, two heart icons. */
 static void build_sheet(void) {
     u8 i;
     /* tile 0: fully transparent */
@@ -227,7 +243,7 @@ static void draw_hearts(void) {
 static void flush_hud_row(void) {
     u16 row = (u16)(HUD_Y + 1);
     dmaCopyVram((const u8 *)&panel_map[row * 32],
-                (u16)(BG2_MAP + row * 32), 32 * 2);
+                (u16)(BG3_MAP + row * 32), 32 * 2);
 }
 
 int main(void) {
@@ -236,21 +252,22 @@ int main(void) {
     consoleInit();
 
     build_scene();          /* BG1: palette + tiles + map */
-    build_sheet();          /* BG2: the panel sheet        */
+    build_sheet();          /* BG3: the panel sheet        */
 
-    /* BG2 palette (palette 1): fill, border, heart, empty */
-    setColor(BOX_PAL * 16 + FILL_IDX,   RGB( 3,  6, 16));
-    setColor(BOX_PAL * 16 + BORDER_IDX, RGB(28, 28, 31));
-    setColor(BOX_PAL * 16 + HEART_IDX,  RGB(31,  4,  8));
-    setColor(BOX_PAL * 16 + EMPTY_IDX,  RGB(10, 10, 12));
+    /* BG3 palette 4 (CGRAM 16-19, 4 colours a 2bpp palette): fill, border, heart */
+    setColor(BOX_PAL * 4 + FILL_IDX,   RGB( 3,  6, 16));
+    setColor(BOX_PAL * 4 + BORDER_IDX, RGB(28, 28, 31));
+    setColor(BOX_PAL * 4 + HEART_IDX,  RGB(31,  4,  8));
 
     bgSetGfxPtr(0, BG1_CHR);
     bgSetMapPtr(0, BG1_MAP, SC_32x32);
-    bgSetGfxPtr(1, BG2_CHR);
-    bgSetMapPtr(1, BG2_MAP, SC_32x32);
+    bgSetGfxPtr(2, BG3_CHR);
+    bgSetMapPtr(2, BG3_MAP, SC_32x32);
 
-    setMode(BG_MODE1, 0);
-    setMainScreen(LAYER_BG1 | LAYER_BG2);
+    /* BG3 in front: the BGMODE bit, and the panel tiles' priority bit */
+    bg3_high = 1;
+    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+    setMainScreen(LAYER_BG1 | LAYER_BG3);
 
     /* Stamp the permanent HUD, then upload once (panelFlush ends screen-on) */
     hero_hp = 3;
@@ -287,6 +304,11 @@ int main(void) {
                 dialog_shown = 1;
             }
             panelFlush(&ui);
+        }
+        /* SELECT: the BGMODE bit alone decides whether BG3 is in front */
+        if (keys & KEY_SELECT) {
+            bg3_high ^= 1;
+            setMode(BG_MODE1, bg3_high ? BG3_MODE1_PRIORITY_HIGH : 0);
         }
     }
 

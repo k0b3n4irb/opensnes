@@ -18,7 +18,7 @@ The table below counts them per folder.
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 5 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
-| [backgrounds/](backgrounds/) | 7 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
+| [backgrounds/](backgrounds/) | 6 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 7 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 3 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 5 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |

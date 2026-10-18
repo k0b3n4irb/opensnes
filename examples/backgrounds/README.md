@@ -10,7 +10,6 @@ trade of colours against layers against resolution.
 | Example | Developer question |
 |---------|--------------------|
 | [mode1](mode1/) | How do I show a background from a PNG (the canonical Mode 1) — and from *compressed* data? |
-| [mode1_bg3_priority](mode1_bg3_priority/) | How do I make BG3 draw in front for a HUD overlay? |
 | [mode0](mode0/) | How do I run four 2bpp layers (Mode 0)? |
 | [mode3](mode3/) | How do I show a 256-colour (8bpp, Mode 3) background? |
 | [mode5_hires](mode5_hires/) | How do I use a hi-res (512-wide, Mode 5 + interlace) background? |

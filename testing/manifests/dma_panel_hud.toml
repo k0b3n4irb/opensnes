@@ -1,0 +1,13 @@
+# panel_hud — every VRAM write lands in blank: the heart row is pushed with an
+# ordinary 64-byte VBlank DMA, the dialog with panelFlush() under forced
+# blank (2 KB), and SELECT only rewrites BGMODE. The input opens and closes
+# the dialog and changes the hearts and the priority bit.
+# (Replaces dma_mode1_bg3_priority.toml: that example merged into panel_hud
+# on 2026-10-18.)
+rom = "../../examples/basics/panel_hud/panel_hud.sfc"
+frames = 300
+input = "40:0x8000,44:0,80:0x1000,84:0,120:0x0080,124:0,160:0x2000,164:0,200:0x1000,204:0,240:0x2000,244:0"
+
+[asserts.dma]
+unsafe_writes = 0
+max_vblank_bytes = 4096
