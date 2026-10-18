@@ -589,3 +589,28 @@ On 5000 generations, about 40 fully animated characters still leave room for til
   (`wang_0` … `wang_15`, corners `upper` = air, `lower` = solid), all on
   the 15-bit grid here, but `color_image` stayed a hint: the "teal neon
   trim" asked for did not appear.
+
+## Measured on the second trial (2026-10-18)
+
+- `create-character-v3` from a 32×32 front pose (`reference_image`) plus
+  a side pose as `direction_images.east`, `view: side`, 4 directions:
+  1 generation, the character stays 32×32. Kit is character
+  `03128401-265a-4ee1-8edd-0bac220e1b03` on the project's account.
+- `characters/animations` in `template` mode, one direction (east):
+  **billed in USD credits, about $0.01 each, not in generations**.
+  Templates that exist (a fake `character_id` answers 404 for a real
+  template and 422 for an unknown one, which costs nothing):
+  `walking-8-frames`, `running-8-frames`, `jumping-1`, `breathing-idle`,
+  `walking`, `walk`, `jump`, `crouching`… and not `running`, `jumping`,
+  `falling`, `landing`. The 422 lists only the first ten templates.
+- The template frames come back off-palette (template mode has no
+  `target_palette`); `reduce-colors` with `palette_image` puts them back
+  exactly (no semi-transparent pixel). Running and the jump (crouch,
+  rise, fall, land in 9 frames) read well; the walk stays timid.
+- `generate-image-v2` at 256×224 with a 15-colour `target_palette`:
+  10 generations for one image, every pixel on the palette, 10 colours
+  used. A city skyline came out good enough to ship as is; on a 256 px
+  wrap its edges do not match, so the ROM lays it out 512 wide with a
+  mirrored copy (`opensnes-tileset --flip`: 724 tiles for 512×256).
+- `create-tileset-sidescroller` with `transition_size: 0.5` and
+  `text_guidance_scale: 10` drew the neon edge asked for (1 px).
