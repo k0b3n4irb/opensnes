@@ -131,10 +131,6 @@
     "stream": "e8853ce7f3814371fbc03b45cd2b861f5f86a84844e8eb5af9d9773787318c5f",
     "rom_sha256": "2c4d9a4780a2fa73288db712d0ea2579e3e50603c46fafacd59857dc2a2ccc8e"
   },
-  "games_mode7_flying": {
-    "stream": "9b17c605ba24c1197bc521a69c0e31d80eeb381a4435f28545f2f8649fc6ca6d",
-    "rom_sha256": "2bbcae175c75995571a31c4d4f57cc8ce03d093871e2464248c30468359ae23c"
-  },
   "games_mode7_racing": {
     "stream": "6e5cc45416403f744526d16eabf8ed93f6e245e6cb30799fc99356299d563ee6",
     "rom_sha256": "713b2f29f1d7797a2dc860af911659f7dab224c1634efc27092b4895689e4c8b"
@@ -200,8 +196,8 @@
     "rom_sha256": "5cd0326da514064d93e178758bd602a241d3de4c86647700cbe1428a27c63b62"
   },
   "mode7_rotate_scale": {
-    "stream": "733a4fe493ba5cdcaa453588aeeb7ff3ba05cbf51f43d3d46fcd2983eee451f8",
-    "rom_sha256": "30c384a26faa0b7154909672ce3e2e1baabc1053c7bd8b044870eece003cd9b1"
+    "stream": "51b43f34e64367ee0eab8aa3b96e6da0c2f9054e348ef72b084f755f4124ed5b",
+    "rom_sha256": "0da0d63db7943bb781283f1c0e1e4485e00bc1882b55d6bb5af317eb027624c7"
   },
   "scrolling_continuous_scroll": {
     "stream": "af0ea274e51851c9ee86d4be08e49bdce29f078000f5f9b889968998d48baee5",

@@ -86,7 +86,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/games/breakout \
                          ../examples/games/likemario \
                          ../examples/games/mapandobjects \
-                         ../examples/games/mode7_flying \
                          ../examples/games/mode7_racing \
                          ../examples/games/rpg \
                          ../examples/games/shmup_1942 \

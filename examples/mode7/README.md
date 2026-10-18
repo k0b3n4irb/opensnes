@@ -30,8 +30,8 @@ HDMA and each line samples the texture at a different scale, so the plane
 appears to recede into the distance (`perspective` does the diagonal terms;
 `perspective_rotate` drives all four for a horizon that rotates too).
 
-The capstone games live in [`games/`](../games/): **mode7_racing** (F-Zero
-style) and **mode7_flying** (Pilotwings style) put this whole family to work.
+The capstone game lives in [`games/`](../games/): **mode7_racing** (F-Zero
+style) puts this whole family to work.
 
 > luna models the Mode 7 PPU natively, so each example's render is verified by
 > the visual-regression baseline — no emulator side channel needed.

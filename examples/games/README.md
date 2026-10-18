@@ -15,7 +15,6 @@ working through the individual topic examples.
 | [shmup_1942](shmup_1942/) | Intermediate | A vertical shoot 'em up: scrolling, an enemy pool, bullets and collision |
 | [rpg](rpg/) | Advanced | An RPG template: a Tiled-driven overworld with dialog boxes |
 | [mode7_racing](mode7_racing/) | Advanced | An F-Zero-style racer on the Mode 7 plane |
-| [mode7_flying](mode7_flying/) | Advanced | A Pilotwings-style flight over the Mode 7 plane, with landings |
 
 ## What These Demonstrate
 

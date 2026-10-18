@@ -31,7 +31,7 @@ The table below counts them per folder.
 | [maps/](maps/) | 1 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
 | [chips/](chips/) | 7 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
-| [games/](games/) | 8 | Complete game projects (falling blocks, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
+| [games/](games/) | 7 | Complete game projects (falling blocks, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
 
 ## Building
 

@@ -251,12 +251,6 @@
     "luna_version": "v1.39.0",
     "rom_sha256": "2c4d9a4780a2fa73288db712d0ea2579e3e50603c46fafacd59857dc2a2ccc8e"
   },
-  "games_mode7_flying": {
-    "fbhash": "0e1b10f54ebed0df",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "23b555522c1c8081e95101faea47ce68575a41311d4174f6c9fd0411c3333e36"
-  },
   "games_mode7_racing": {
     "fbhash": "06cc637f6ad6d28d",
     "frames": 200,
@@ -378,10 +372,10 @@
     "rom_sha256": "d0c54852e64e2f4a9a7309f0a9e45cb9a2d89e524f24820e12f084eeea6b8e31"
   },
   "mode7_rotate_scale": {
-    "fbhash": "d9ad9c85c1bb9af3",
+    "fbhash": "be2875f66daaecb6",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "9537ad77fbcb82aedd0a6d5807a16d5cd6f4fb35dd430426bca1b6e60331e7f4"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "0da0d63db7943bb781283f1c0e1e4485e00bc1882b55d6bb5af317eb027624c7"
   },
   "scrolling_continuous_scroll": {
     "fbhash": "cddaea614547e147",

@@ -65,7 +65,7 @@ The `bin/cc65816` driver (compiled, `compiler/cc65816/`) orchestrates cproc→QB
 - **templates/** — ROM bootstrap: `crt0.asm` (startup + NMI handler), `hdr*.asm` (ROM headers), `runtime.asm` (math routines, now in lib/source/), `memmap*.inc` (memory maps). These are the single source of truth — examples don't duplicate them.
 - **make/common.mk** — Universal build rules included by every example. Handles graphics conversion, multi-file C compilation, SNESMOD audio, SA-1/SuperFX/HiROM mode selection, module linking.
 - **tools/** — the `opensnes-*` tools (shipped): `opensnes-tileset`/`-sprite` (PNG→SNES tiles), `opensnes-music` (IT→SPC700), and the other asset tools; the converters' code lives in `tools/lib/`
-- **examples/** — 66 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
+- **examples/** — 65 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
 
 ### Enhancement Chip Support
 

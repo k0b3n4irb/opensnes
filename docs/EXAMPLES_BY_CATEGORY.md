@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 66 examples organized by topic. For a progressive learning path, see
+All 65 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -240,5 +240,4 @@ Complete game projects combining multiple subsystems.
 | @subpage examples_games_mapandobjects | Map engine with interactive objects |
 | @subpage examples_games_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |
 | @subpage examples_games_mode7_racing | F-Zero-style racer on the rotating Mode 7 plane |
-| @subpage examples_games_mode7_flying | Pilotwings-style flight: altitude drives Mode 7 scale |
 | @subpage examples_games_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |

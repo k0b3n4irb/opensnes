@@ -158,8 +158,6 @@ everything above.
 
 @subpage examples_games_mode7_racing
 
-@subpage examples_games_mode7_flying
-
 ### More horsepower — the cartridge coprocessors
 
 When the base hardware isn't enough. SA-1 is the same 65816 ISA at 10.74 MHz;
