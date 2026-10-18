@@ -17,11 +17,6 @@
       "samples": 159936,
       "peak": 21264
     },
-    "audio/echo": {
-      "sha256": "f0592672c7977b9ba22a246371bb3ab8534b8e96a61dd9c4ea37813288de1132",
-      "samples": 159936,
-      "peak": 10922
-    },
     "audio/speech_synth": {
       "sha256": "1e6a2d700f590151bd68d0e2dbfee371e85161a53d80a90fad995b5959da35f7",
       "samples": 159936,
@@ -38,9 +33,9 @@
       "peak": 20893
     },
     "audio/soundboard": {
-      "sha256": "397cce0ec3e2c5f45730b1e924ac3e23eb03f69c02cfda3c8d50e1cf11436bcb",
+      "sha256": "1faa59c3bf1d4c5abd77ceabeb6c18b12f4772f49a117fcd201c699d14cac242",
       "samples": 159936,
-      "peak": 9323
+      "peak": 13078
     },
     "audio/snesmod_music": {
       "sha256": "a902284e5ef3fb97e94ded28e43ff02f1a27c3b57778231565b5b1fc9ed4de33",

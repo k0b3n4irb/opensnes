@@ -5,12 +5,6 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "30b4fafc829d3ef7437856155884c447daeceb81ee8fa23024b77953dd381455"
   },
-  "audio_echo": {
-    "fbhash": "8479be7724206325",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "f94de62f2a39afffc8291642059e7949a0d4719cd87232e7137507882386dca1"
-  },
   "audio_pitch_mod": {
     "fbhash": "15700ef1ad4ba325",
     "frames": 200,

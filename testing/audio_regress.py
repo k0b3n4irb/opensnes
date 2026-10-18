@@ -46,7 +46,6 @@ EXAMPLES = {
     "audio/apu_switch":    ("audio/apu_switch/apu_switch.sfc", None),
     "audio/pitch_mod":     ("audio/pitch_mod/pitch_mod.sfc", None),
     "audio/play_noise":    ("audio/play_noise/play_noise.sfc", None),
-    "audio/echo":          ("audio/echo/echo.sfc", None),
     "audio/speech_synth":  ("audio/speech_synth/speech_synth.sfc", None),
     # left the examples in the 1.0 review; a soundbank across two banks
     "fixtures/snesmod_music_large": ("../testing/fixtures/retired_examples/snesmod_music_large/music_large.sfc", None),
@@ -55,7 +54,7 @@ EXAMPLES = {
     "chips/superfx_game_skeleton": ("chips/superfx_game_skeleton/superfx_game_skeleton.sfc", None),
     # joypad-1 scripts from their manifests (soundboard.toml,
     # audio_snesmod_music_effect.toml, audio_sfx_from_wav.toml)
-    "audio/soundboard":    ("audio/soundboard/soundboard.sfc", "220:0x0080"),
+    "audio/soundboard":    ("audio/soundboard/soundboard.sfc", "200:0x1000,204:0,220:0x0080"),
     "audio/snesmod_music": ("audio/snesmod_music/music.sfc", "80:0x4000,84:0"),
     "audio/sfx_from_wav":  ("audio/sfx_from_wav/sfx_from_wav.sfc",
                             "100:0x0080,104:0,130:0x8000,134:0"),

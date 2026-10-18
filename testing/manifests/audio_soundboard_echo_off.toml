@@ -1,0 +1,22 @@
+# The hall of soundboard, configured but off: audioSetEcho(5, 70, 35, 35)
+# sized the ring and set the feedback while the screen was off, then
+# audioDisableEcho() left it silent until START. These legs were the echo
+# example's (audio/echo, merged into soundboard on 2026-10-18, whose echo
+# was on at boot): the configuration survives being off.
+#
+# Measured with `luna state --out -` (apu.dsp_regs) at frame 300.
+rom = "../../examples/audio/soundboard/soundboard.sfc"
+frames = 300
+
+[asserts.dsp]
+EON    = 0x00        # no voice routed into the echo
+EVOL_L = 0x00        # wet signal muted
+EVOL_R = 0x00
+FLG    = 0x20        # ECEN set: the DSP does not write the ring
+EFB    = 0x46        # feedback 70, set while off
+EDL    = 0x05        # a 5 x 2 KB ring
+ESA    = 0xD7        # at ARAM $D700: the top 10 KB under $FF00 ($FF - 8 x 5)
+FIR0   = 0x7F        # tap 0 open, the FIR uploaded while off
+FIR1   = 0x00
+FIR7   = 0x00
+DIR    = 0x0A        # sample directory: the four samples registered

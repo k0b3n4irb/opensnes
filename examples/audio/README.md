@@ -21,12 +21,11 @@ everything else is plain C:
 
 | Example | Developer question |
 |---------|--------------------|
-| [soundboard](soundboard/) | How do I drive the whole audio-v2 engine from C? |
+| [soundboard](soundboard/) | How do I drive the whole audio-v2 engine from C — samples, envelopes, echo? |
 | [apu_switch](apu_switch/) | How do I hot-swap APU programs at runtime? |
 | [play_noise](play_noise/) | How do I make drums from the S-DSP noise generator? |
 | [pitch_mod](pitch_mod/) | How do I do hardware vibrato (pitch modulation)? |
 | [speech_synth](speech_synth/) | How do I play BRR speech? |
-| [echo](echo/) | How do I add echo / reverb from the S-DSP? |
 
 ## The idea in one screen
 

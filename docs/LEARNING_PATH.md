@@ -213,7 +213,7 @@ taught; read the one your game needs.
   @ref examples_windows_window_multi_hdma.
 - **More Mode 7** — @ref examples_mode7_extbg (a second layer from the same
   plane), @ref examples_mode7_dsp1_ground (the DSP-1's projection).
-- **More sound** — @ref examples_audio_apu_switch, @ref examples_audio_echo,
+- **More sound** — @ref examples_audio_apu_switch,
   @ref examples_audio_pitch_mod, @ref examples_audio_play_noise,
   @ref examples_audio_speech_synth.
 - **More chips** — @ref examples_chips_dsp1_cube.

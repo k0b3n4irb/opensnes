@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 82 examples organized by topic. For a progressive learning path, see
+All 81 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -163,7 +163,6 @@ Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.
 | @subpage examples_audio_play_noise | A drum kit from the S-DSP white-noise generator (krom port) |
 | @subpage examples_audio_pitch_mod | Hardware vibrato via pitch modulation (PMON) (krom port) |
 | @subpage examples_audio_speech_synth | BRR speech playback: the SNES says "OPEN SNES" (krom port) |
-| @subpage examples_audio_echo | S-DSP echo / reverb, isolated — START toggles dry/wet |
 
 ---
 
