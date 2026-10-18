@@ -11,12 +11,10 @@ collision, and walked with slopes. This is Stage 3, "can I build a world?"
 | Example | Developer question |
 |---------|--------------------|
 | [map_scroll](map_scroll/) | How do I author a map in Tiled and scroll it past the camera when it is bigger than VRAM (the `map` module)? |
-| [dynamic_map](dynamic_map/) | How do I drive a sprite from a tilemap and swap 32×32 ↔ 64×64 map modes? |
 | [slope_collision](slope_collision/) | How do I do tile collision with slopes — a full platformer? |
 
 Climb from a world authored in Tiled and scrolled past the camera
-(`map_scroll`) to a map rewritten at runtime (`dynamic_map`) to a character
-that stands on its slopes (`slope_collision`).
+(`map_scroll`) to a character that stands on its slopes (`slope_collision`).
 
 ## The idea in one screen
 
@@ -29,7 +27,7 @@ the `.m16`/`.b16` data it consumes. **Collision** reads tile *properties*
 (solid, platform, slope angle) from the map rather than testing sprite boxes;
 `collideTileEx` / `objCollidMapWithSlopes` add diagonal surfaces.
 
-Everything here runs inside the ~4 KB VBlank DMA budget by streaming one page
-per frame — the pattern `dynamic_map` demonstrates directly.
+Everything here runs inside the ~4 KB VBlank DMA budget by streaming a few
+rows or columns per frame (`map_scroll`).
 
 > The capstone that fuses maps + entities + dialog is [`games/rpg`](../games/rpg/).

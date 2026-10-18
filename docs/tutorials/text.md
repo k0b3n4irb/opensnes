@@ -142,8 +142,8 @@ TextConfig text_config`), and its `priority` field goes into bit 13 of every
 tilemap entry the module builds from then on. Setting it right after `textInit`
 is the supported way to put text in front of an opaque background.
 
-@ref examples_maps_dynamic_map shows the 4bpp case, and the `font_tile`
-arithmetic that goes with a font *not* placed at the layer's tile base:
+The 4bpp case, and the `font_tile` arithmetic that goes with a font *not*
+placed at the layer's tile base:
 
 ```c
 #define VRAM_BG2_GFX    0x2000
@@ -312,7 +312,7 @@ is the transparent background. To colour your text, write colour 1 of its slot:
 | Depth | Colours per slot | Text colour for slot `P` | Example |
 |---|---|---|---|
 | 2bpp | 4 | `setColor(P * 4 + 1, c)` | `rpg`, slot 4 → `setColor(17, …)` |
-| 4bpp | 16 | `setColor(P * 16 + 1, c)` | `dynamic_map`, slot 1 → `setColor(17, …)` |
+| 4bpp | 16 | `setColor(P * 16 + 1, c)` | `sprite_sizes`, slot 0 → `setColor(1, …)`; slot 1 → `setColor(17, …)` |
 
 `textModeInit()` does the 2bpp slot-0 case for you: `setColor(1, RGB(31, 31,
 31))`, white on a black backdrop.
@@ -409,5 +409,5 @@ something the module supports today.
 - @ref examples_text_scroll_message — the text layer scrolled like any BG.
 - @ref examples_fundamentals_text_glyphs — what the module hides: a glyph as
   raw 2bpp bitplanes plus a tilemap entry.
-- @ref examples_games_rpg and @ref examples_maps_dynamic_map — the explicit
-  `textInit` path, 2bpp and 4bpp.
+- @ref examples_games_rpg and @ref examples_sprites_sprite_sizes — the
+  explicit `textInit` path, 2bpp and 4bpp.

@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 73 examples organized by topic. For a progressive learning path, see
+All 72 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -166,7 +166,6 @@ Tile-based maps, streaming, Tiled pipeline, and collision.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_maps_map_scroll | Smooth tile-aligned scrolling with viewport tracking |
-| @subpage examples_maps_dynamic_map | Dynamic tile map streaming |
 | @subpage examples_maps_slope_collision | Slopes and tile-based collision |
 
 ---

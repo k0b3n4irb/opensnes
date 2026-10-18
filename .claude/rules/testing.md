@@ -169,8 +169,8 @@ For every change, run this three-step pipeline before committing:
 
    | Example | Why kept | What to look for |
    |---|---|---|
-   | `examples/maps/dynamic_map` | exercises 2 framed-tail-call wrappers | press **D** (SNES A) — the map should toggle 32×32 ↔ 64×64 cleanly without flicker |
-   | `examples/graphics/effects/mosaic` | only `framesize=2` phantom-frame site in the diagnostic trace | press **A** (SNES Y) — fade-in should complete and stop, no garbage tiles |
+   | `examples/backgrounds/mode2` | the only example that switches BG mode and BG1's pointers at run time | press **B** — Mode 2's bands become Mode 4's diagonals and back, no garbage tiles, the wave keeps travelling |
+   | `examples/transitions/fading` | the only `mosaicFadeOut` / `mosaicFadeIn` caller | press any button until the mosaic — the blocks must grow to 16×16, stop, and shrink back |
 
    Keep the list to 2–5 entries when possible. If the change genuinely needs
    wider coverage say so explicitly with the reasoning.

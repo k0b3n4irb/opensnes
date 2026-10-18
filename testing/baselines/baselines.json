@@ -353,12 +353,6 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "d0c4d48fa3830047fce3373ef46c7c167992db56d7e368ad27a160407f61dcd9"
   },
-  "maps_dynamic_map": {
-    "fbhash": "a7c2094ed5fae536",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "e38a74cb75d5b3d53949bee14b1bfe2b984308511492251767f1d06878718659"
-  },
   "maps_map_scroll": {
     "fbhash": "b15f6c4b0d36b931",
     "frames": 200,

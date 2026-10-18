@@ -17,8 +17,8 @@ and the four underlying tiles come along for free.
 This is not just convenience — it is the reuse that makes the VRAM budget work.
 A 40-screen level built from 200 unique metatiles still only needs those 200
 metatiles' worth of tiles in VRAM; the size lives in the *map* (cheap, 2 bytes
-per cell), not the tileset. @ref examples_maps_dynamic_map treats a whole
-background as a grid of 16×16 blocks for exactly this reason.
+per cell), not the tileset. @ref examples_maps_map_scroll streams a level
+built from 16×16 metatiles for exactly this reason.
 
 > **Go deeper.** nesdoug's [Metatiles](https://nesdoug.com/2018/09/05/11-metatiles/)
 > is the clearest explanation of the technique anywhere. It is written for the

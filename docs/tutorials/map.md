@@ -158,7 +158,6 @@ mapSetMapOptions(MAP_OPT_BG2);    // stream a second map onto BG2
   minimum scroller above, a large map followed by a sprite.
 - **`examples/maps/slope_collision`** — per-tile collision *attributes* driving
   slope physics (the `.b16` values mean more than solid/empty).
-- **`examples/maps/dynamic_map`** — rewriting map tiles at runtime.
 
 ## Gotchas
 

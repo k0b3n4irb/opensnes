@@ -133,7 +133,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/input/controller \
                          ../examples/input/mouse \
                          ../examples/input/superscope \
-                         ../examples/maps/dynamic_map \
                          ../examples/maps/map_scroll \
                          ../examples/maps/slope_collision \
                          ../examples/memory/hirom_demo \

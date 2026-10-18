@@ -50,7 +50,6 @@ PAIRS = [
     ("mapscroll", "maps/mapscroll", "maps/map_scroll", f"130:{RIGHT}", 200, 500),
     ("slopemario", "maps/slopemario", "maps/slope_collision", f"130:{RIGHT}", 200, 500),
     ("tiled", "maps/tiled", "../testing/fixtures/retired_examples/tiled", f"130:{RIGHT}", 200, 500),
-    ("dynamicmap", "maps/DynamicMap", "maps/dynamic_map", None, 200, 500),
     ("animatedsprite", "graphics/Sprites/AnimatedSprite", "sprites/animated_sprite", f"130:{RIGHT}", 200, 500),
     ("dynamicsprite", "graphics/Sprites/DynamicSprite", "sprites/dynamic_sprite", None, 200, 500),
     ("dynamicmetasprite", "graphics/Sprites/DynamicEngineMetaSprite", "sprites/dynamic_metasprite", None, 200, 500),
