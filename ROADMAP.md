@@ -9,7 +9,7 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.50.0
+## Current Status: post-v0.51.0
 
 Since 0.49 the SDK carries the public API meant for 1.0: the deprecated
 aliases are gone and the two calls that change meaning have changed
@@ -72,5 +72,5 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-14. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-18. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`.*

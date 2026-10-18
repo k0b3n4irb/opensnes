@@ -212,6 +212,17 @@ class CountPhrasings(unittest.TestCase):
         self.assertTrue(any(p.endswith("docs/landing/index.html") for p in names))
 
 
+class LandingVersion(unittest.TestCase):
+    def test_chips_are_read(self):
+        text = '<span class="chip">v0.35.0</span> … v0.35.0 &middot; MIT'
+        self.assertEqual([m.group(1) for m in
+                          check_doc_drift.LANDING_VERSION_RE.finditer(text)], ["0.35.0"])
+
+    def test_real_page_matches_changelog(self):
+        ver, _ = check_doc_drift.canonical_version()
+        self.assertEqual(check_doc_drift.check_landing_version(ver), [])
+
+
 class BenchmarkTable(unittest.TestCase):
     PAGE = (
         "| **Total cycle reduction** | **−20.0 %** vs PVSnesLib + 816-opt (40 vs 50 cycles) |\n"

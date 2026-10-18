@@ -179,6 +179,26 @@ def check_roadmap_status(canonical: str) -> list[str]:
     return []
 
 
+# The site's front page (docs/landing/index.html, copied to index.html by
+# `make docs`) shows the version twice. It said v0.35.0 from 0.35 to 0.50
+# (fifteen releases) before the docs review of 2026-10-18 saw it.
+LANDING_VERSION_RE = re.compile(r">v(\d+\.\d+\.\d+)\b")
+
+
+def check_landing_version(canonical: str) -> list[str]:
+    path = repo_path("docs/landing/index.html")
+    if not path.is_file():
+        return []
+    text = path.read_text(encoding="utf-8")
+    found = [(text.count("\n", 0, m.start()) + 1, m.group(1))
+             for m in LANDING_VERSION_RE.finditer(text)]
+    if not found:
+        return ["docs/landing/index.html: no version chip (>vX.Y.Z) found"]
+    return [f"docs/landing/index.html:{line}: shows v{ver} but CHANGELOG.md "
+            f"head is {canonical} — bump it in the same release commit"
+            for line, ver in found if ver != canonical]
+
+
 # --------------------------------------------------------------------------
 # Check 3: examples count consistency across active docs
 # --------------------------------------------------------------------------
@@ -1416,6 +1436,7 @@ def run_checks(quiet: bool) -> int:
     all_drifts: list[str] = []
     all_drifts.extend(check_snes_h_version(canonical_ver))
     all_drifts.extend(check_roadmap_status(canonical_ver))
+    all_drifts.extend(check_landing_version(canonical_ver))
     all_drifts.extend(check_examples_count(canonical_n))
     all_drifts.extend(check_phantom_api())
     all_drifts.extend(check_abi_signatures())

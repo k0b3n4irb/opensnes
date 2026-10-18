@@ -147,6 +147,13 @@ opt-in list.
     push", "CANNOT be read from C", the retired converters' names and smconv
     run by hand.
 
+20. **The site's front page shows the release** (since 2026-10-18):
+    every `>vX.Y.Z` chip of `docs/landing/index.html` must equal the
+    `CHANGELOG.md` head, like the version macros (anchor 1). Caught as the
+    page saying v0.35.0, 83 examples and seven retired converters fifteen
+    releases later; anchor 3 reads its example counts (and the starter's
+    README) since the same day.
+
 Count claims (anchor 3) are matched on a **soft-wrapped** view of each doc
 (single newlines count as spaces), so a claim split across two lines —
 ROADMAP's historical `54\nworking examples` — can no longer hide, and the

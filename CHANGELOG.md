@@ -4,6 +4,20 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.51.0] — 2026-10-18
+
+The silent defects found by the 1.0 audit, fixed: a variable-length array
+is refused instead of compiled into a frame too small, a struct copied from
+a named const object reads its bank, the NMI's DMAs move to channel 7 and
+leave the HDMA channels alone, the HDMAs to INIDISP take the form two
+console errata ask for, an SA-1 ROM whose boot left bank $00 and a
+soundbank too big for the SPC700's RAM are refused, a ROM the post-link
+check refuses is deleted. The SNESMOD driver is built from its source. The
+compiler keeps a loop's pointers and indexes in place (the SDK bench at
+62 % faster than PVSnesLib), the eight earlier converters are retired for
+the `opensnes-*` tools, `opensnes init --template game` is the starter,
+and the documentation says what the code does.
+
 ### Added
 - feat(lib): **`vramQueueCost()`** — what the VRAM queue already holds
   will cost the VBlank, in bytes: each entry's size plus
