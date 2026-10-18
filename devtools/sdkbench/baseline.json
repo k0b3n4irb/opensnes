@@ -14,14 +14,14 @@
       "res": 12563
     },
     "physics": {
-      "cycles": 2207688,
-      "size": 415,
+      "cycles": 2203644,
+      "size": 399,
       "stack": 30,
       "res": 12530
     },
     "collide": {
-      "cycles": 5262508,
-      "size": 417,
+      "cycles": 5243496,
+      "size": 405,
       "stack": 30,
       "res": 162
     },
@@ -44,8 +44,8 @@
       "res": 35405
     },
     "bytes": {
-      "cycles": 3697616,
-      "size": 323,
+      "cycles": 3157202,
+      "size": 307,
       "stack": 23,
       "res": 819
     },
@@ -68,8 +68,8 @@
       "res": 2842
     },
     "list": {
-      "cycles": 1698250,
-      "size": 278,
+      "cycles": 1323922,
+      "size": 267,
       "stack": 23,
       "res": 17376
     },
@@ -86,8 +86,8 @@
       "res": 40897
     },
     "entities": {
-      "cycles": 3252782,
-      "size": 521,
+      "cycles": 2991200,
+      "size": 489,
       "stack": 30,
       "res": 12530
     },
@@ -98,8 +98,8 @@
       "res": 20921
     },
     "strings": {
-      "cycles": 1937314,
-      "size": 797,
+      "cycles": 1734876,
+      "size": 749,
       "stack": 48,
       "res": 65535
     },
@@ -110,20 +110,20 @@
       "res": 24876
     },
     "place": {
-      "cycles": 5173638,
-      "size": 354,
-      "stack": 29,
+      "cycles": 5172382,
+      "size": 350,
+      "stack": 23,
       "res": 30752
     },
     "dist": {
-      "cycles": 7150890,
-      "size": 460,
-      "stack": 28,
+      "cycles": 7147052,
+      "size": 452,
+      "stack": 29,
       "res": 29147
     },
     "depot": {
-      "cycles": 13911792,
-      "size": 3387,
+      "cycles": 12947774,
+      "size": 3224,
       "stack": 56,
       "res": 54047
     },
@@ -134,8 +134,8 @@
       "res": 54707
     },
     "farfill": {
-      "cycles": 56433270,
-      "size": 2959,
+      "cycles": 55691046,
+      "size": 2933,
       "stack": 63,
       "res": 18907
     },

@@ -11,7 +11,7 @@ program built by both SDKs and counts the master cycles the machine
 really spent.
 
 On these 34 functions OpenSNES is **about 38 %** faster; measured on 23
-whole workloads, 61 % (below). What made the difference on code that
+whole workloads, 62 % (below). What made the difference on code that
 indexes an array or follows a pointer was not the pointer width: it was the
 stack frame and stack slots for values PVSnesLib keeps in the direct page,
 and code the optimiser left dead. Both are gone (see "Reading it" at the
@@ -152,8 +152,10 @@ for comparison.
 ## Reproducing
 
 ```bash
-# Requires both OpenSNES and PVSnesLib toolchains
-PVSNESLIB_HOME=/path/to/pvsneslib devtools/benchmark/compare_compilers.sh
+make bench                                   # the 34 functions (cycle counts of the generated code)
+make bench-sdk                               # the 23 workloads on luna, against PVSnesLib's recorded figures
+PVSNESLIB_HOME=/path/to/pvsneslib make bench-sdk   # the same, PVSnesLib rebuilt from that tree
+PVSNESLIB_HOME=/path/to/pvsneslib make bench-twins   # whole examples both SDKs have, side by side on luna
 ```
 
 ## Caveats
@@ -193,29 +195,29 @@ while it runs (bytes below the initial stack pointer).
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | `sieve` | sieve of 1024 in a byte array | 4,199,010 | 1,137,028 | -72.9 % | 296 | 107 | -63.9 % | 31 | 23 |
 | `sort` | insertion sort of 64 words | 2,620,372 | 790,208 | -69.8 % | 507 | 231 | -54.4 % | 43 | 25 |
-| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 2,207,688 | -78.0 % | 1174 | 415 | -64.7 % | 60 | 30 |
-| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 5,262,508 | -61.9 % | 983 | 417 | -57.6 % | 74 | 30 |
+| `physics` | 32 entities bouncing, 60 steps, by index | 10,031,542 | 2,203,644 | -78.0 % | 1174 | 399 | -66.0 % | 60 | 30 |
+| `collide` | 496 box pairs tested, 8 rounds | 13,820,564 | 5,243,496 | -62.1 % | 983 | 405 | -58.8 % | 74 | 30 |
 | `mul` | 2304 multiplies of two variables | 6,389,830 | 4,358,600 | -31.8 % | 188 | 91 | -51.6 % | 34 | 29 |
 | `decimal` | 200 numbers to decimal digits (`/ 10`, `% 10`) | 8,994,226 | 2,243,024 | -75.1 % | 154 | 73 | -52.6 % | 34 | 28 |
 | `long` | 300 steps of a 32-bit generator and hash | 5,944,048 | 2,354,368 | -60.4 % | 594 | 289 | -51.3 % | 76 | 33 |
-| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 3,697,616 | -53.0 % | 605 | 323 | -46.6 % | 41 | 23 |
+| `bytes` | 512-byte fill, copy and compare, 4 passes | 7,862,640 | 3,157,202 | -59.8 % | 605 | 307 | -49.3 % | 41 | 23 |
 | `calls` | recursive `fib(17)` | 5,041,934 | 2,561,730 | -49.2 % | 105 | 57 | -45.7 % | 159 | 159 |
 | `switch` | 1280 operations of a `switch` interpreter | 2,697,252 | 911,554 | -66.2 % | 523 | 284 | -45.7 % | 34 | 23 |
 | `crc` | CRC-16 of 256 bytes, bit by bit | 2,752,004 | 1,342,978 | -51.2 % | 233 | 108 | -53.6 % | 34 | 23 |
-| `list` | a 64-node linked list walked 40 times | 2,858,640 | 1,698,250 | -40.6 % | 402 | 278 | -30.8 % | 37 | 23 |
+| `list` | a 64-node linked list walked 40 times | 2,858,640 | 1,323,922 | -53.7 % | 402 | 267 | -33.6 % | 37 | 23 |
 | `tilemap` | a 32×16 tilemap written, then 1200 lookups | 2,916,886 | 813,208 | -72.1 % | 397 | 181 | -54.4 % | 33 | 23 |
 | `grid` | a 16×32 byte grid, four neighbours of each cell | 5,262,594 | 1,997,894 | -62.0 % | 694 | 444 | -36.0 % | 39 | 44 |
-| `entities` | the 32 entities again, through a pointer | 8,851,406 | 3,252,782 | -63.3 % | 1098 | 521 | -52.6 % | 62 | 30 |
+| `entities` | the 32 entities again, through a pointer | 8,851,406 | 2,991,200 | -66.2 % | 1098 | 489 | -55.5 % | 62 | 30 |
 | `copy` | word and byte copies as index loops | 4,485,144 | 1,006,290 | -77.6 % | 709 | 302 | -57.4 % | 31 | 23 |
-| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 1,937,314 | -37.1 % | 1156 | 797 | -31.1 % | 48 | 48 |
+| `strings` | `strlen`, `strcmp`, `strcpy` written by hand | 3,082,190 | 1,734,876 | -43.7 % | 1156 | 749 | -35.2 % | 48 | 48 |
 | `state` | 600 steps of a `switch` state machine and a table of functions | 1,831,136 | 944,974 | -48.4 % | 392 | 270 | -31.1 % | 42 | 29 |
-| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 5,173,638 | -64.0 % | 831 | 354 | -57.4 % | 52 | 29 |
-| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 7,150,890 | -74.3 % | 1018 | 460 | -54.8 % | 61 | 28 |
-| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 13,911,792 | -63.2 % | 7722 | 3387 | -56.1 % | 93 | 56 |
+| `place` | 19 sprites placed 200 times: a loop over parallel tables with an on-screen test (issue #166) | 14,391,130 | 5,172,382 | -64.1 % | 831 | 350 | -57.9 % | 52 | 23 |
+| `dist` | 81 distances between two groups of points, 40 times: a nested loop, two absolute values and a call (issue #166) | 27,816,270 | 7,147,052 | -74.3 % | 1018 | 452 | -55.6 % | 61 | 29 |
+| `depot` | eighteen agents deciding where to go, 30 bursts of 16 decisions: parallel arrays, helpers called from loops, values live across calls (issue #166) | 37,827,628 | 12,947,774 | -65.8 % | 7722 | 3224 | -58.2 % | 93 | 56 |
 | `div32` | 200 steps of 32-bit division: `u32 / u16` twice a step, `u32 / u32` every eighth | 11,361,754 | 4,644,986 | -59.1 % | 888 | 452 | -49.1 % | 94 | 71 |
-| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,854,318 | 56,433,270 | -58.2 % | 5132 | 2959 | -42.3 % | 84 | 63 |
+| `farfill` | a screen of 96 glyphs and 24 bars composed at the pixel into a far 2bpp layer, 4 times, then on a near buffer | 134,854,318 | 55,691,046 | -58.7 % | 5132 | 2933 | -42.8 % | 84 | 63 |
 | `stepseq` | a four-channel step sequencer ticked 2000 times: byte code, effect tables, a 32-bit division per period change | — | 58,359,746 | ours only | — | 3168 | | — | 62 |
-| **Total** | | **325,892,518** | **125,832,590** | **-61.4 %** | **25801** | **12800** | **-50.4 %** | | |
+| **Total** | | **325,892,518** | **122,719,436** | **-62.3 %** | **25801** | **12464** | **-51.7 %** | | |
 
 Of the 23 workloads both SDKs build OpenSNES is **faster on 23**, **no larger on 23**, and **no deeper in stack on 22**. Both ROMs leave the same checksum for each of them, so they computed the same thing.
 
