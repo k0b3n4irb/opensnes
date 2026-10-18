@@ -565,3 +565,27 @@ On 5000 generations, about 40 fully animated characters still leave room for til
 - Seamless self-tiling of tiles-pro variations and backgrounds.
 - What the current PyPI `pixellab` package wraps.
 - Tier 2's official contents (the pricing page did not render).
+
+## Measured on the first trial (2026-10-18, Néo-Lumen, 15 generations)
+
+- `generate-image-v2` at 32×32 with `no_background` and a 15-colour
+  `target_palette`: 64 images for 10 generations, **every pixel one of the
+  palette's colours, no semi-transparent pixel** (11 colours used, at most
+  10 per image). The 64 images kept one character and varied the pose by
+  themselves (front, walk, run, jump, ladder, actions): a pose sheet, not
+  64 different heroes. A fox kit with its tail is about 20×27 px, so the
+  hero is a 32×32 OBJ, not 16×32.
+- `animate-with-text-v3` answered **200 with a `background_job_id`**
+  (the spec lists 200, our §1.4 says async; both are true: poll the job).
+  8 frames at 32×32 cost 1 generation and return 9 images (the first frame
+  is kept). The action "jumping" gave a forward lunge, not a jump: give a
+  `last_frame` for a jump.
+- `reduce-colors` with `palette_image` (a 15×1 strip) put the frames back
+  on the palette; usage was not reported in the response.
+- `create-tileset-sidescroller`: **`color_image` must be 64×64** — a 15×1
+  strip fails the job with "Expected image of size 64x64 … Got 60 RGBA
+  bytes, need 16384" (not charged). A 4×4 grid of 16 px colour blocks
+  works. 16 px tiles cost 3 generations and come back as 16 Wang tiles
+  (`wang_0` … `wang_15`, corners `upper` = air, `lower` = solid), all on
+  the 15-bit grid here, but `color_image` stayed a hint: the "teal neon
+  trim" asked for did not appear.
