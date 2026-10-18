@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 75 examples organized by topic. For a progressive learning path, see
+All 73 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -140,7 +140,6 @@ Controller input: joypads, mouse, and Super Scope.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_input_controller | Standard joypad: button state, edge detection |
-| @subpage examples_input_two_players | Joypad reading, two-player movement |
 | @subpage examples_input_mouse | Mouse detection, cursor, sensitivity |
 | @subpage examples_input_superscope | Light gun detection, PPU H/V counters |
 
@@ -181,7 +180,6 @@ The reusable logic toolbox.
 | @subpage examples_basics_collision_demo | Bounding-box sprite collision detection |
 | @subpage examples_basics_aim_target | Aim a cursor at moving targets — sprites + input |
 | @subpage examples_basics_fix32_orbit | 16.16 fixed-point API: a sprite orbits the screen centre |
-| @subpage examples_basics_timer | Frame-accurate timers with VBlank counters |
 | @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
 | @subpage examples_basics_panel_hud | 9-slice HUD + dialog box on one layer (the `panel` module) |
 | @subpage examples_basics_game_skeleton | The smallest complete game: title → play → game-over state machine |

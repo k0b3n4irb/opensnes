@@ -46,14 +46,14 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | I want to… | Use | Module | Example |
 |---|---|---|---|
 | read a joypad | `padHeld`, `padPressed` | `input` | [input/controller](../examples/input/controller/) |
-| read two players | `padHeld(0)` / `padHeld(1)` | `input` | [input/two_players](../examples/input/two_players/) |
+| read two players | `padHeld(0)` / `padHeld(1)` | `input` | [input/controller](../examples/input/controller/) |
 | read a mouse or Super Scope | `mouse*` / `scope*` | `input` | [input/mouse](../examples/input/mouse/) |
 
 ## Structuring a game
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| a main loop you do not write | `gameLoopRun` | `gameloop` | [basics/timer](../examples/basics/timer/) |
+| a main loop you do not write | `gameLoopRun` | `gameloop` | [input/controller](../examples/input/controller/) |
 | title → play → pause, without a state enum | `Scene`, `scenePush`, `scenePop` | `scene` | [basics/scene_stack](../examples/basics/scene_stack/) |
 | save the player's progress | `sramSave`, `sramLoad` | `USE_SRAM := 1` | [memory/save_game](../examples/memory/save_game/) |
 | a dialog box or a status bar | `panelDraw`, `panelPut`, `panelFlush` | `panel` | [games/rpg](../examples/games/rpg/) |

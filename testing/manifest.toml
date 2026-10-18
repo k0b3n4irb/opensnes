@@ -94,9 +94,6 @@ frames = [200, 400]
 [examples."basics/fix32_orbit"]
 frames = [200, 400]
 
-[examples."basics/timer"]
-frames = [200, 400]
-
 [examples."chips/superfx_3d"]
 frames = [200, 400]
 

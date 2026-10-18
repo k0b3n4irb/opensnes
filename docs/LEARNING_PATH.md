@@ -54,8 +54,6 @@ then branch out to the SNES's exotic controllers.
 
 @subpage examples_input_controller
 
-@subpage examples_input_two_players
-
 @subpage examples_input_mouse
 
 @subpage examples_input_superscope
@@ -133,8 +131,6 @@ windows, the Mode 7 plane, and sound.
 *Confidence: architecture, not spaghetti.* Stop hand-rolling the main loop
 and the state machine; assemble a skeleton, and pick up the reusable maths
 every game needs.
-
-@subpage examples_basics_timer
 
 @subpage examples_basics_scene_stack
 

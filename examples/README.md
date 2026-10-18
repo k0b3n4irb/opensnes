@@ -17,7 +17,7 @@ The table below counts them per folder.
 |----------|----------|----------------|
 | [text/](text/) | 3 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
-| [basics/](basics/) | 7 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
+| [basics/](basics/) | 6 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
 | [backgrounds/](backgrounds/) | 7 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 3 | Per-scanline HDMA effects: gradients, waves, raster |
@@ -26,7 +26,7 @@ The table below counts them per folder.
 | [transitions/](transitions/) | 1 | Screen transitions: fades and the mosaic dissolve |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
 | [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG |
-| [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
+| [input/](input/) | 3 | Joypads, mouse, Super Scope, multi-player |
 | [audio/](audio/) | 5 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 3 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |

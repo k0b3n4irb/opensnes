@@ -4,7 +4,7 @@
 # or a leak between ports fails. `input2` is luna's second-pad script
 # (v1.21.0, gaps-review item R7's acceptance case); pad_keys[1] is
 # addressed as the word after pad_keys ($00:0041 + 2).
-rom = "../../examples/input/two_players/two_players.sfc"
+rom = "../../examples/input/controller/controller.sfc"
 [[checkpoint]]
 at_frame = 60
 input = "30:0x0800"            # pad 1: UP

@@ -84,7 +84,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/basics/panel_hud \
                          ../examples/basics/fix32_orbit \
                          ../examples/basics/scene_stack \
-                         ../examples/basics/timer \
                          ../examples/games/breakout \
                          ../examples/games/likemario \
                          ../examples/games/mapandobjects \
@@ -134,7 +133,6 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/input/controller \
                          ../examples/input/mouse \
                          ../examples/input/superscope \
-                         ../examples/input/two_players \
                          ../examples/maps/dynamic_map \
                          ../examples/maps/map_scroll \
                          ../examples/maps/slope_collision \

@@ -1,27 +1,33 @@
-# Controller Input
+# Controller Input — Both Pads, the Edges, the Frame Count
 
-Reads the SNES controller and displays which button is currently held. The simplest possible input example — press a button, see its name on screen.
+Reads both SNES controllers and shows, for each, every button held — one
+letter a button, so several at once show together. Under them: the last
+button pressed and the last button released on pad 1, and the number of
+VBlanks since boot. The screen the console check uses (rows 2 and 14 of
+`docs/HARDWARE_VERIFICATION.md`).
 
 ![Screenshot](controller.png)
 
 ## What You'll Learn
 
-- How to read controller state with `padHeld(0)` (returns a 16-bit bitmask)
-- The SNES button constants: `KEY_A`, `KEY_B`, `KEY_X`, `KEY_Y`, `KEY_L`, `KEY_R`, `KEY_UP`, `KEY_DOWN`, `KEY_LEFT`, `KEY_RIGHT`, `KEY_START`, `KEY_SELECT`
+- How to read controller state with `padHeld(pad)` (a 16-bit bitmask), for
+  pad 1 and pad 2
+- The edges: `padPressed(pad)` (went down this frame) and `padReleased(pad)`
+  (came up this frame)
+- The SNES button constants, in the order the pad shifts them out: `KEY_B`,
+  `KEY_Y`, `KEY_SELECT`, `KEY_START`, `KEY_UP`, `KEY_DOWN`, `KEY_LEFT`,
+  `KEY_RIGHT`, `KEY_A`, `KEY_X`, `KEY_L`, `KEY_R`
 - That the NMI handler reads joypads automatically — no manual polling needed
-- The difference between `padHeld()` (held right now) and `padPressed()` (just pressed this frame)
+- `frame_count`, the VBlank counter the NMI handler keeps
+- The `gameloop` framework: `on_init` once, `on_update` once per VBlank
 
 ## Controls
 
-| Button | Display |
-|--------|---------|
-| A | "A PRESSED" |
-| B | "B PRESSED" |
-| X / Y | "X PRESSED" / "Y PRESSED" |
-| L / R | "L PRESSED" / "R PRESSED" |
-| D-pad | "UP/DOWN/LEFT/RIGHT PRESSED" |
-| START / SELECT | "START/SELECT PRESSED" |
-| None | (blank) |
+| Input | Display |
+|-------|---------|
+| Any buttons on pad 1 / pad 2 | their letters on the PAD 1 / PAD 2 line while held: `B Y E S ^ V < > A X L R` (E = SELECT, S = START, the arrows = the D-pad) |
+| A press / a release on pad 1 | PRESSED / RELEASED name the button |
+| L and R together | the frame counter goes back to 0, once, on the frame the pair is completed |
 
 ## SNES Concepts
 
@@ -36,7 +42,12 @@ u16 held = padHeld(0);      // Buttons held RIGHT NOW (every frame)
 u16 pressed = padPressed(0); // Buttons pressed THIS FRAME ONLY (edge detection)
 ```
 
-Use `padHeld` for continuous actions (movement, charging). Use `padPressed` for one-shot actions (jump, menu select, pause toggle).
+Use `padHeld` for continuous actions (movement, charging). Use `padPressed` for one-shot actions (jump, menu select, pause toggle), and `padReleased` for what happens when a button comes up (release a charged shot, end a long jump early).
+
+### Two Pads
+
+`padHeld(1)`, `padPressed(1)` and `padReleased(1)` read the second pad the same
+way; each pad has its own state, so releasing pad 2 changes nothing on pad 1.
 
 ### Button Bitmask
 
@@ -44,7 +55,7 @@ Multiple buttons can be held simultaneously. Test with bitwise AND:
 
 ```c
 if (pad & KEY_A) { /* A is held */ }
-if ((pad & KEY_L) && (pad & KEY_R)) { /* both shoulders held */ }
+if ((pad & (KEY_L | KEY_R)) == (KEY_L | KEY_R)) { /* both shoulders held */ }
 ```
 
 ## Modules Used
@@ -56,9 +67,9 @@ if ((pad & KEY_L) && (pad & KEY_R)) { /* both shoulders held */ }
 | `dma` | DMA transfers used internally by console init |
 | `background` | BG layer configuration |
 | `text` | `textInit()`, `textPrintAt()`, `textFlush()` for button name display |
-| `input` | `padHeld()`, `padPressed()` for reading controller state |
+| `input` | `padHeld()`, `padPressed()`, `padReleased()` for both pads |
+| `gameloop` | `gameLoopRun()`: the init / update shape of the program |
 
-Also linked: `gameloop` — the `gameLoopRun()` frame loop.
 
 ## Build & Run
 

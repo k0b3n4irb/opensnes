@@ -71,10 +71,6 @@
     "stream": "ffa7cc7df0c92f1818ba56bfa03fc119fb4bfe83004b0dfec582e54800724201",
     "rom_sha256": "0de7cbe79634b24c1ee9a6ba34543acfa3989cce02183ca279d310838d22c8d2"
   },
-  "basics_timer": {
-    "stream": "315d018b5307366b6bf1cdade24a71f9432a78dca13e355b07c6b6eb7889b8ca",
-    "rom_sha256": "2579d5a0bbd93d0d27b7798164bb48e9347bf1db9cfad7cddf8dc0f2f9dd6a96"
-  },
   "chips_dsp1_cube": {
     "stream": "99f5b4d6ade95c71ae691e1470b80f684c0fd906ea62857cf580ae7270197ea2",
     "rom_sha256": "97d83d7fcc444074be985bc6a64958402ad6b24104a3ee88b0bc64549119dc63"
@@ -176,8 +172,8 @@
     "rom_sha256": "fa90ee84029a19fc22d806097b191bedda94d0ffcc43dde9ee78b9b1304c8412"
   },
   "input_controller": {
-    "stream": "1cdf2e885d5e9f6aba4402510ea735271833a80a4fc1203076ab28d3fb27a9ec",
-    "rom_sha256": "5245d1ffff47d7fb118268576936f56eee9b1ac8dc93f589785c7ffbfd9770ef"
+    "stream": "aa9771653e32901e3dd2f24ee7ac586398c5f89c32421b20418e8722a8820086",
+    "rom_sha256": "c4ba306adabb7d72324d2c3ffd2039e6cddefe7c9c8e842dd32edbefbe35e81f"
   },
   "input_mouse": {
     "stream": "bf23cc49951753e18c75ad47a06c817f30cf837a2a321679afb91e4a72596273",
@@ -186,10 +182,6 @@
   "input_superscope": {
     "stream": "c7d0b022e5fb374dc1721beb8331a3efa8fc92d0416ac282053d72e73844bd0a",
     "rom_sha256": "5ed5969bbb110db0a3fb3202d899bb3ace36ff51f72c691cd21de61cef0b7b15"
-  },
-  "input_two_players": {
-    "stream": "dc2bc3399b2f8aa02b5210ce125a978cbaed9a07e80d1b7039fb103b82b6db99",
-    "rom_sha256": "e4e2406fc4902059796fbfe1f33cd93922d1c16596a46025c061d7dca4e61944"
   },
   "maps_dynamic_map": {
     "stream": "c2b35be43ce4e3b8098f6c102f4c0314c71784845bb22a8893364c165c87926f",

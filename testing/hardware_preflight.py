@@ -121,7 +121,8 @@ def main() -> int:
             print(f"  FAIL  {num:2} {key}: " + "; ".join(problems))
         else:
             print(f"  {tag:9} {num:2} {key}  (frame {frame}, seeds {args.seeds}, pal)")
-        checked_roms.append(rom)
+        if rom not in checked_roms:     # two rows may check one ROM (pad 1, pad 2)
+            checked_roms.append(rom)
 
     if checked_roms:
         for f in check_blank(luna, checked_roms, args.frames):

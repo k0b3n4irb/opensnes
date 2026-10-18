@@ -131,18 +131,6 @@
     "luna_version": "v1.34.0",
     "rom_sha256": "8a8a0dddaecad6a630ce90b781f178b496721d58de260cc6bb55499544817039"
   },
-  "basics_timer": {
-    "fbhash": [
-      "acf3026b53fe387c",
-      "21678aea42b0b424"
-    ],
-    "frames": [
-      200,
-      400
-    ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "a2cc355be472c0c61636327219e18e2b66078cff2ddaed3c01c5e2d51146bba0"
-  },
   "chips_dsp1_cube": {
     "fbhash": [
       "5f5c59d382d18d25",
@@ -348,10 +336,10 @@
     "rom_sha256": "7159ff82509eb545ef932eda6354fefab87bc3a5bb0b93c3028fc23e6b5d6ac8"
   },
   "input_controller": {
-    "fbhash": "05151eefd8351b2c",
+    "fbhash": "8324c9e551b832d4",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "f76dc4aea626e15b6833b3f17d0d05ff6d49e9cc6be1460da587e93ff9429c73"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "c4ba306adabb7d72324d2c3ffd2039e6cddefe7c9c8e842dd32edbefbe35e81f"
   },
   "input_mouse": {
     "fbhash": "43fae5cff6c8514d",
@@ -364,12 +352,6 @@
     "frames": 200,
     "luna_version": "v1.34.0",
     "rom_sha256": "d0c4d48fa3830047fce3373ef46c7c167992db56d7e368ad27a160407f61dcd9"
-  },
-  "input_two_players": {
-    "fbhash": "4f1052d6992be325",
-    "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "aa52f1aff14fc6c1e5490f75b56b3bc43067aa2d885510eb6050d472a760b616"
   },
   "maps_dynamic_map": {
     "fbhash": "a7c2094ed5fae536",

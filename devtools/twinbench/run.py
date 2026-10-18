@@ -68,7 +68,6 @@ PAIRS = [
     ("music", "audio/music", "audio/snesmod_music", None, 200, 500),
     ("controller", "input/controller", "input/controller", f"210:{A},260:{RIGHT},300:0", 200, 500),
     ("hello", "hello_world", "text/print_string", None, 200, 500),
-    ("timer", "timer", "basics/timer", None, 200, 500),
 ]
 
 

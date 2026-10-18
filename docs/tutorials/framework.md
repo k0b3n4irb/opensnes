@@ -25,7 +25,7 @@ LIB_MODULES := console dma background asset gameloop
 beyond the runtime that every ROM already links.
 
 The corpus votes with its feet: three examples call `gameLoopRun`
-(`basics/timer`, `basics/aim_target`, `input/controller`);
+(`basics/aim_target`, `input/controller`);
 three use the asset bundles (`backgrounds/mode1`,
 `backgrounds/mode1_bg3_priority`, `games/shmup_1942`). Everything else writes
 the loop and the loads by hand, and nothing about those examples is
@@ -331,8 +331,8 @@ body goes from twelve statements to four. What actually reaches the hardware
 is identical — same `bgInitTileSet`, same `dmaCopyVram`, same `bgSetMapPtr`,
 in a slightly different order.
 
-The same comparison for the loop, `examples/basics/timer` against its
-hand-written form:
+The same comparison for the loop, the shape of `examples/input/controller`
+against its hand-written form:
 
 ```c
 /* hand-written */                   /* framework */
@@ -404,5 +404,5 @@ Reach for the hand-written version when:
   per-VBlank budget is.
 - `examples/backgrounds/mode1` — the minimum `bgLoad` program, and the ROM the
   `dma_mode1_bgasset` manifest measures.
-- `examples/basics/timer` — the minimum `gameLoopRun` program.
+- `examples/input/controller` — a small `gameLoopRun` program: init once, one body per VBlank.
 - @ref gameloop.h "Game loop API reference" and @ref asset.h "Asset bundle API reference"
