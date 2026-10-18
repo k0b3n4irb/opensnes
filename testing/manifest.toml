@@ -117,6 +117,3 @@ frames = [200, 400]
 
 [examples."sprites/dynamic_sprite"]
 frames = [200, 400]
-
-[examples."text/scroll_message"]
-frames = [200, 400]

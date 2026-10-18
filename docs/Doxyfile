@@ -142,8 +142,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/chips/superfx_hello \
                          ../examples/fundamentals/text_glyphs \
                          ../examples/text/pixel_text \
-                         ../examples/text/print_string \
-                         ../examples/text/scroll_message
+                         ../examples/text/print_string
 
 #---------------------------------------------------------------------------
 # Build Configuration

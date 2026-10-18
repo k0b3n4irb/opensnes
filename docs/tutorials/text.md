@@ -199,8 +199,9 @@ column 8, not column 31 and not an error.
 
 One geometry note: the buffer is 32 rows but a standard 224-line display shows
 only **28** of them (224 / 8). Rows 28–31 exist, are flushed, and are simply
-off-screen until you scroll the layer — which is exactly what
-@ref examples_text_scroll_message does with `bgSetScroll`.
+off-screen until you scroll the layer — the text layer scrolls like any
+background: @ref examples_scrolling_mixed_scroll slides a message on BG3
+with `bgSetScroll`.
 
 ## Printing numbers
 
@@ -406,7 +407,7 @@ something the module supports today.
   the text another.
 - @ref tools_opensnes_text — converting your own typeface.
 - @ref examples_text_print_string — the minimum program.
-- @ref examples_text_scroll_message — the text layer scrolled like any BG.
+- @ref examples_scrolling_mixed_scroll — a line of text on BG3, scrolled like any BG.
 - @ref examples_fundamentals_text_glyphs — what the module hides: a glyph as
   raw 2bpp bitplanes plus a tilemap entry.
 - @ref examples_games_rpg and @ref examples_sprites_sprite_sizes — the

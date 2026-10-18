@@ -15,7 +15,7 @@ The table below counts them per folder.
 
 | Category | Examples | What It Covers |
 |----------|----------|----------------|
-| [text/](text/) | 3 | Text display, fonts, tilemaps |
+| [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 5 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
 | [backgrounds/](backgrounds/) | 7 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |

@@ -10,7 +10,7 @@ TARGET     := mixed_scroll.sfc
 ROM_NAME   := MODE1 MIXED SCROLL
 
 USE_LIB    := 1
-LIB_MODULES := console sprite dma background
+LIB_MODULES := console sprite dma background text
 
 CSRC       := main.c
 

@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Mixed scrolling with fixed and auto-scrolling background layers
+ * @brief Mixed scrolling: three layers, three scrolls — a diagonal pattern, a fixed logo, a moving message
  * @ingroup examples
  *
  * Layers two Mode 1 backgrounds: BG1 displays a repeating shader pattern that
@@ -12,24 +12,35 @@
  * PPU composites multiple BG layers with independent scroll offsets, making
  * it straightforward to combine static UI elements with animated backgrounds.
  *
+ * A third layer, BG3 (2bpp), carries a line of text from the text module,
+ * scrolled horizontally at its own pace: a scrolling message is a scrolled
+ * background like any other (it was the scroll_message example).
+ *
  * @par SNES Concepts
  * - Independent per-layer scroll registers (BG1 scrolls, BG2 stays fixed)
  * - Multiple tile sets sharing VRAM without overlap
  * - Separate palette slots per layer (`palette-entry` in a picture's settings file)
  * - Mode 1 dual-layer compositing (BG1 behind BG2)
+ * - BG3 in Mode 1: 2bpp, its palettes in CGRAM 0-31 (shared with the 4bpp
+ *   layers' — the text takes 2bpp slot 5, colours 20-23, which BG1 leaves
+ *   free), above the others with BG3_MODE1_PRIORITY_HIGH and the tile
+ *   priority bit
+ * - The text module on a layer of your choice: textLoadFont / textInit
  *
  * @par What to Observe
  * - The shader pattern (BG1) scrolls diagonally and wraps seamlessly
  * - The logo (BG2) remains stationary in the center
  * - Both layers composite together with proper priority ordering
+ * - The message (BG3) slides left one pixel a frame, in front of both
  *
  * @par Modules Used
- * console, sprite, dma, background
+ * console, sprite, dma, background, text
  *
  * @see background.h, dma.h, video.h
  */
 
 #include <snes.h>
+#include <snes/text.h>
 #include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
 /** @brief BG1 tile data -- repeating shader pattern (4bpp, tiles at VRAM $4000). */
@@ -46,6 +57,8 @@
 s16 scrX = 0;
 /** @brief BG1 vertical scroll offset (auto-incremented each frame). */
 s16 scrY = 0;
+/** @brief The message's horizontal scroll (BG3) */
+u16 msgX = 0;
 
 /**
  * @brief Entry point -- mixed scrolling with auto-scrolling BG1 and fixed BG2.
@@ -98,8 +111,17 @@ int main(void) {
 
     /* Mode 1, enable only BG1 + BG2 (BG3 disabled).
      * TM_BG1 | TM_BG2 enables both layers on the main screen. */
-    setMode(BG_MODE1, 0);
-    setMainScreen(TM_BG1 | TM_BG2);
+    /* BG3: the text module's 2bpp font and its tilemap, palette slot 5 */
+    textLoadFont(VRAM_BG3_FONT);
+    textInit(VRAM_BG3_MAP, 0, 5);
+    text_config.priority = 1;            /* in front of BG1 and BG2 */
+    setColor(21, RGB(31, 31, 31));       /* slot 5, colour 1: white */
+    bgSetGfxPtr(2, VRAM_BG3_FONT);
+    bgSetMapPtr(2, VRAM_BG3_MAP, SC_32x32);
+    textPrintAt(2, 24, "OPENSNES -- TEXT THAT MOVES!");
+
+    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+    setMainScreen(TM_BG1 | TM_BG2 | TM_BG3);
 
     setScreenOn();
 
@@ -110,6 +132,8 @@ int main(void) {
         scrX++;
         scrY++;
         bgSetScroll(0, scrX, scrY);
+        msgX++;
+        bgSetScroll(2, msgX, 0);         /* the message slides left */
 
         WaitForVBlank();
     }

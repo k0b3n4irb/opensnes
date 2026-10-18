@@ -409,15 +409,15 @@
   },
   "scrolling_mixed_scroll": {
     "fbhash": [
-      "0776a56c64b14a38",
-      "f817ee9d34c711cd"
+      "1c3e267ca584d008",
+      "1dec3dc73ce7b510"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "457ab233570b63d8434091e1aa196a58080ae3704a241be892ea5fffac4a2da0"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "44631718035756e64b384d4201dacd9c429182711a72f8bdd626ae620d518bf1"
   },
   "scrolling_parallax_scroll": {
     "fbhash": [
@@ -508,18 +508,6 @@
     "frames": 200,
     "luna_version": "v1.34.0",
     "rom_sha256": "b12a6046a48aea4f0180a9f68b843677c543dfb0a0f701764590004e7b4a0a59"
-  },
-  "text_scroll_message": {
-    "fbhash": [
-      "d93409a4d5bd98f5",
-      "0fa4c738939125d5"
-    ],
-    "frames": [
-      200,
-      400
-    ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "15ddd773f2537d8b77cb78ef8877b2fea906077b4f8b02fabfad5b2315125b77"
   },
   "transitions_fading": {
     "fbhash": "cd685395875fba95",

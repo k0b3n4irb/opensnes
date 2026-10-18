@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 71 examples organized by topic. For a progressive learning path, see
+All 70 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -12,7 +12,6 @@ Print text, then move it.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_text_print_string | Print a string with the built-in font (`textModeInit` + `textPrintAt`) |
-| @subpage examples_text_scroll_message | Move text: scroll the text layer for a marquee (`bgSetScroll`) |
 | @subpage examples_text_pixel_text | Proportional text composed at the pixel: tileBlitGlyph2bpp() into a 2bpp layer |
 
 ---

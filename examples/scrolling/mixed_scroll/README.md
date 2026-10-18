@@ -1,8 +1,10 @@
 # Mixed Scroll
 
-Two Mode 1 background layers displayed simultaneously with independent scroll
+Three Mode 1 background layers displayed simultaneously with independent scroll
 behavior: BG1 (a repeating shader pattern) auto-scrolls diagonally every frame,
-while BG2 (a logo image) remains fixed in place. This demonstrates how the SNES
+BG2 (a logo image) remains fixed in place, and BG3 carries a line of text
+that slides left — a scrolling message is a scrolled background like any
+other. This demonstrates how the SNES
 PPU can scroll each background layer independently, which is the foundation for
 parallax effects, title screens with animated backgrounds, and layered game worlds.
 
@@ -13,6 +15,7 @@ parallax effects, title screens with animated backgrounds, and layered game worl
 - How to load two background layers with separate tilesets and palettes
 - How to assign different CGRAM palette slots to different layers
 - How to scroll one background while keeping another stationary
+- How to put the text module on a layer of your choice (BG3) and scroll it
 - How the SNES VRAM layout must be planned to avoid tile/tilemap overlap
 
 ## SNES Concepts
@@ -20,9 +23,27 @@ parallax effects, title screens with animated backgrounds, and layered game worl
 ### Mode 1 with Multiple Backgrounds
 
 Mode 1 provides three background layers: BG1 and BG2 are 4bpp (16 colors each),
-and BG3 is 2bpp (4 colors). This example uses BG1 and BG2, disabling BG3 via
-`REG_TM` ($212C). Each layer has its own tilemap and tile data in VRAM, and each
-can reference a different 16-color palette slot from CGRAM.
+and BG3 is 2bpp (4 colors). Each layer has its own tilemap and tile data in
+VRAM, and each can reference a different palette slot from CGRAM.
+
+### BG3: the Message
+
+```c
+textLoadFont(VRAM_BG3_FONT);         /* the 2bpp font, BG3's character base */
+textInit(VRAM_BG3_MAP, 0, 5);        /* BG3's map, font tile 0, palette slot 5 */
+text_config.priority = 1;            /* the tile priority bit */
+setColor(21, RGB(31, 31, 31));       /* slot 5, colour 1 */
+textPrintAt(2, 24, "OPENSNES -- TEXT THAT MOVES!");
+setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+...
+bgSetScroll(2, ++msgX, 0);           /* each frame: the message slides left */
+```
+
+BG3's 2bpp palettes come from CGRAM 0-31, the same colours as the 4bpp
+layers' first two slots: here BG2 takes 0-15 and BG1 16-31 but uses only
+16-19, so the text takes 2bpp slot 5 (colours 20-23). In Mode 1, BG3 is
+behind the other layers unless `BG3_MODE1_PRIORITY_HIGH` is set and its
+tiles carry the priority bit — both are, so the message is in front.
 
 ### VRAM Layout Planning
 
@@ -139,9 +160,10 @@ cd $OPENSNES_HOME
 make -C examples/scrolling/mixed_scroll
 ```
 
-Then open `mixed_scroll.sfc` in your emulator (Mesen2 recommended). You should
-see a logo image with a colorful pattern scrolling diagonally behind/over it.
+Then open `mixed_scroll.sfc` in luna (`luna-gui mixed_scroll.sfc`) or any
+emulator. You should see a logo image with a colorful pattern scrolling
+diagonally behind/over it, and the message sliding along the bottom.
 
 ## Modules Used
 
-`console`, `sprite`, `dma`, `background` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `dma`, `background`, `text` (`LIB_MODULES` in the Makefile).

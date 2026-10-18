@@ -13,7 +13,6 @@ A ladder of developer questions: *how do I show text? → how do I move it?*
 | Example | Description |
 |---------|-------------|
 | [print_string](print_string/) | Print a string with the built-in font (`textModeInit` + `textPrintAt`) |
-| [scroll_message](scroll_message/) | Move text -- scroll the text BG layer for a marquee (`bgSetScroll`) |
 | [pixel_text](pixel_text/) | Proportional text composed at the pixel in a 2bpp layer |
 
 > Under the hood — how a glyph is raw 2bpp bitplanes + a tilemap — lives in
@@ -56,6 +55,6 @@ In Mode 0, each background layer gets 4 colors:
 
 ---
 
-Start with **print_string** to get your first ROM running, then **scroll_message**
-to make it move. To see what the `text` module hides, read
+Start with **print_string** to get your first ROM running; a text layer
+scrolls like any background (`scrolling/mixed_scroll` slides a message). To see what the `text` module hides, read
 **fundamentals/text_glyphs**.

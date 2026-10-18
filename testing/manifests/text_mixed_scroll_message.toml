@@ -1,0 +1,42 @@
+# scrolling/mixed_scroll, the message on BG3 (it was text/scroll_message,
+# merged into mixed_scroll on 2026-10-18): a line of text printed once on
+# BG3, then scrolled one pixel a frame by its own register, while BG1 scrolls
+# diagonally and BG2 stays put.
+#
+# So: bg_scroll_x[2] (BG3's buffered scroll, flushed to BG3HOFS by the NMI;
+# the table is 2 bytes a layer, hence +4) is the oracle, asserted
+# `increased` on top, and bg_scroll_y[2] `unchanged` at 0 — the message
+# only moves sideways. The counts are the old example's: 57, 117, 237 at
+# frames 60, 120, 240.
+#
+# The blocks pin the text itself, row 24 of BG3's map at word $1C00 (byte
+# $3800 + 24 x 64 + 4 = $3E04): each entry is the glyph (ASCII - 32) with
+# palette slot 5 and the priority bit ($34 in the high byte), and the two
+# entries before it are blank (tile 0, palette 5: $1400).
+rom = "../../examples/scrolling/mixed_scroll/mixed_scroll.sfc"
+
+[[checkpoint]]                     # one increment per frame since boot
+at_frame = 60
+[checkpoint.values]
+"bg_scroll_x+4" = { eq = 57, width = 2 }
+"bg_scroll_y+4" = { eq = 0, width = 2 }
+
+[[checkpoint]]                     # 60 frames later, 60 pixels further
+at_frame = 120
+[checkpoint.values]
+"bg_scroll_x+4" = { eq = 117, width = 2 }
+"bg_scroll_y+4" = { eq = 0, width = 2 }
+[checkpoint.delta]
+"bg_scroll_x+4" = "increased"          # BG1 H-scroll is what carries the text
+"bg_scroll_y+4" = "unchanged"          # ...and only BG1 H-scroll
+
+[[checkpoint]]
+at_frame = 240
+[checkpoint.values]
+"bg_scroll_x+4" = { eq = 237, width = 2 }
+
+[asserts.blocks]
+# the tilemap is written once at boot and never again — still intact at frame 240
+row24_msg    = { space = "vram", offset = "3E04", hex = "2f34303425342e3433342e342534333400340d340d34003434342534383434340034343428342134343400342d342f343634253433340134" }
+row24_before = { space = "vram", offset = "3E00", hex = "00140014" }
+row24_after  = { space = "vram", offset = "3E3C", hex = "00140014" }

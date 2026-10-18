@@ -220,8 +220,8 @@
     "rom_sha256": "32f88f38db3862ed234091ad7443711f78ccb153829b8d04b5bbd3ce03fb98a7"
   },
   "scrolling_mixed_scroll": {
-    "stream": "069367347eae92a2acc3f8741aafeb06415241eba63d5d7e742cb49af93d3bad",
-    "rom_sha256": "0ade12e7734829143493f87819cd64f721e0ab1c8dfb81fa0697850c9c0d9ba8"
+    "stream": "e194aba7f30e0523602b0cf86ce2da99be338170838437bb04169d6677b17e04",
+    "rom_sha256": "44631718035756e64b384d4201dacd9c429182711a72f8bdd626ae620d518bf1"
   },
   "scrolling_parallax_scroll": {
     "stream": "002073e38e1bb2bd431c5ca03e7694a33db5d220590288f81cccc3bb121af9ad",
@@ -266,10 +266,6 @@
   "text_print_string": {
     "stream": "0c4f90054bd94148d0444e11d8485f9528fa1d628e0a161a2c4c25142283ff88",
     "rom_sha256": "e06e35ede6b7510e7116ae0641f1684dd5c500caa61acf33a5aa8652a6529105"
-  },
-  "text_scroll_message": {
-    "stream": "341087e5b71458d7b154e1d1d7a5eaaafa9e72deb24aa5c7380c25e374195efc",
-    "rom_sha256": "1e1ef7aeb80e51ba162dfb505ecfa317fddc78a35bf74fd1950774b7f6a80dd7"
   },
   "transitions_fading": {
     "stream": "21382e598ba771a1a66ed75d761c8d16449c8b270ef5798c88bdc4921661ef14",

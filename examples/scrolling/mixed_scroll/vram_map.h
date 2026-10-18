@@ -6,6 +6,8 @@
 
 #define VRAM_BG2_MAP    0x1400  /* bg_map, 1024 words */
 #define VRAM_BG1_MAP    0x1800  /* bg_map, 1024 words */
+#define VRAM_BG3_MAP    0x1C00  /* bg_map, 1024 words */
+#define VRAM_BG3_FONT   0x2000  /* bg_char, 4096 words */
 #define VRAM_BG1_TILES  0x4000  /* bg_char, 4096 words */
 #define VRAM_BG2_TILES  0x5000  /* bg_char, 4096 words */
 
