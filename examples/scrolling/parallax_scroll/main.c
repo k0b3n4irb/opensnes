@@ -12,7 +12,12 @@
  * BG1HOFS at each zone boundary. The scroll table lives in RAM so the
  * main loop can increment each zone's offset at different rates every frame.
  *
- * Ported from PVSnesLib ParallaxScrolling example.
+ * The picture is the city at night in three bands: the far towers, the
+ * mid-distance blocks, the roofs and the street close by. Each band is a
+ * 256-pixel half and its mirror, so it wraps at 512 without a seam, and the
+ * converter stores the mirrored half as flip bits, not as new tiles.
+ *
+ * This began as the PVSnesLib ParallaxScrolling example.
  *
  * @par SNES Concepts
  * - HDMA (H-Blank DMA) for per-scanline register writes
@@ -22,7 +27,8 @@
  *
  * @par What to Observe
  * - Three horizontal bands scroll at different speeds automatically
- * - Top (sky): slow, middle: medium, bottom (foreground): fast
+ * - Top (far towers): slow, middle (mid-distance blocks): medium, bottom
+ *   (the roofs close by): fast
  * - No input required; the effect runs continuously
  *
  * @par Modules Used
@@ -35,8 +41,6 @@
 
 /** @brief 4bpp background tile data (converted by the build from res/) */
 #include "res/back.inc"   /* generated: back_tiles[], back_tiles_end[], back_map[], back_pal[] */
-/** @brief 64x32 tilemap data for the parallax background */
-/** @brief 16-color palette for the background */
 
 /**
  * @brief HDMA scroll table in RAM — a plain C global, so it sits in
@@ -71,11 +75,11 @@ u8 scroll_table[10];
 int main(void) {
     consoleInit();
 
-    /* Load 4bpp tiles to VRAM word address $1000, palette to CGRAM slot 0.
-     * 2 * PALETTE_16_SIZE = 64 bytes = 2 palettes. */
+    /* Load 4bpp tiles to VRAM word address $1000 (742 tiles, up to $3E60),
+     * palette to CGRAM slot 0 (one palette of 16 colours). */
     bgInitTileSet(0, back_tiles, back_pal, 0,
                   back_tiles_end - back_tiles,
-                  2 * PALETTE_16_SIZE,
+                  back_pal_end - back_pal,
                   BG_16COLORS, 0x1000);
 
     /* Load 64x32 tilemap to VRAM $0000.
@@ -91,11 +95,11 @@ int main(void) {
     /* Build the initial HDMA scroll table with three zones.
      * Each entry: [scanline_count] [scroll_lo] [scroll_hi].
      * The u16 cast writes both scroll bytes at once (little-endian). */
-    scroll_table[0] = 72;                       /**< Zone 1 (sky): 72 scanlines */
+    scroll_table[0] = 72;                       /**< Zone 1 (far towers): 72 scanlines */
     *(u16 *)&scroll_table[1] = 1;               /**< Initial horizontal scroll = 1 pixel */
-    scroll_table[3] = 88;                       /**< Zone 2 (hills): 88 scanlines */
+    scroll_table[3] = 88;                       /**< Zone 2 (mid-distance): 88 scanlines */
     *(u16 *)&scroll_table[4] = 2;               /**< Initial horizontal scroll = 2 pixels */
-    scroll_table[6] = 64;                       /**< Zone 3 (ground): 64 scanlines */
+    scroll_table[6] = 64;                       /**< Zone 3 (roofs close by): 64 scanlines */
     *(u16 *)&scroll_table[7] = 4;               /**< Initial horizontal scroll = 4 pixels */
     scroll_table[9] = 0x00;                     /**< End-of-table marker */
 
@@ -107,12 +111,12 @@ int main(void) {
 
     while (1) {
         /* Each frame, advance each zone's scroll offset by a different amount.
-         * Slow zones (sky) create the illusion of being far away, while fast
-         * zones (ground) appear close — this is the parallax depth effect.
+         * Slow zones (the far towers) create the illusion of being far away, while fast
+         * zones (the roofs) appear close — this is the parallax depth effect.
          * HDMA automatically picks up the new values next frame. */
-        *(u16 *)&scroll_table[1] += 1;          /**< Sky: +1 pixel/frame (slow) */
-        *(u16 *)&scroll_table[4] += 2;          /**< Hills: +2 pixels/frame (medium) */
-        *(u16 *)&scroll_table[7] += 4;          /**< Ground: +4 pixels/frame (fast) */
+        *(u16 *)&scroll_table[1] += 1;          /**< Far towers: +1 pixel/frame (slow) */
+        *(u16 *)&scroll_table[4] += 2;          /**< Mid-distance: +2 pixels/frame (medium) */
+        *(u16 *)&scroll_table[7] += 4;          /**< Roofs close by: +4 pixels/frame (fast) */
 
         WaitForVBlank();
     }

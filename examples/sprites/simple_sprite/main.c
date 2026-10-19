@@ -4,7 +4,7 @@
  * @ingroup examples
  *
  * Minimal example showing how to load and display one hardware sprite on
- * the SNES. Sprite tile data is DMA'd to VRAM, a 16-color palette is loaded
+ * the SNES: Kit, the fox-kit courier of the examples. Sprite tile data is DMA'd to VRAM, a 16-color palette is loaded
  * to CGRAM at address 128 (sprite palette 0), and the OBJ size register
  * (OBJSEL, $2101) is configured for small=8x8 / large=32x32 mode.
  *
@@ -32,7 +32,7 @@
 #include <snes.h>
 
 /** @brief 4bpp 32x32 sprite tile data (converted by the build from res/) */
-#include "res/sprite32.inc"   /* generated: sprite32_tiles[], sprite32_tiles_end[], sprite32_pal[] */
+#include "res/kit.inc"   /* generated: kit_tiles[], kit_tiles_end[], kit_pal[] */
 /** @brief 16-color palette for the 32x32 sprite */
 
 /**
@@ -57,12 +57,12 @@ int main(void) {
      * WaitForVBlank() ensures we are in VBlank when the DMA runs, because
      * the PPU silently ignores VRAM writes during active display. */
     WaitForVBlank();
-    dmaCopyVram(sprite32_tiles, 0x2100, sprite32_tiles_end - sprite32_tiles);
+    dmaCopyVram(kit_tiles, 0x2100, kit_tiles_end - kit_tiles);
 
     /* Load the 16-color sprite palette to CGRAM address 128.
      * CGRAM 0-127 = BG palettes, 128-255 = OBJ (sprite) palettes.
      * 32 bytes = 16 colors x 2 bytes/color (15-bit BGR format). */
-    dmaCopyCGram(sprite32_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    dmaCopyCGram(kit_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
 
     /* Configure OBJSEL ($2101):
      * - Size mode OBJ_SIZE8_L32: small=8x8, large=32x32

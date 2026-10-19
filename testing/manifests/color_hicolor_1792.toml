@@ -10,16 +10,16 @@
 # lands on whatever entry CGADD happens to hold, so CGRAM mid-frame is not
 # a stable oracle. The snapshot point here is the frame boundary, i.e. in
 # VBlank AFTER hicolorVblank() has rewound CGADD to 0 and DMA'd 128 bytes
-# from the top of sunset_pal (the bytes below are sunset.pal[0:64] and
+# from the top of canal_pal (the bytes below are canal.pal[0:64] and
 # [3520:3584] as opensnes-image hicolor writes them). Measured bit-identical at frames 120, 121,
 # 122, 180 and 240 (same md5 over all 512 CGRAM bytes), so this is the one
 # phase of the frame where the streamed palette stands still.
 #
 # What the two blocks prove, and they are the two halves of the trick:
-#   0000  CGRAM 0-31 == sunset_pal[0:64] — the VBlank rewind ran. If
+#   0000  CGRAM 0-31 == canal_pal[0:64] — the VBlank rewind ran. If
 #         nmiSet()'s callback stopped firing, the even-row bank would
 #         hold some other row's colours and the picture would tear.
-#   00C0  CGRAM 96-127 == sunset_pal[3520:3584], the LAST 32 colours of the
+#   00C0  CGRAM 96-127 == canal_pal[3520:3584], the LAST 32 colours of the
 #         3584-byte table (row 27, the bottom tile row). The DMA source
 #         auto-advances across transfers and is only reset in VBlank, so
 #         these bytes can only be here if the H-IRQ fired on essentially
@@ -30,5 +30,5 @@ rom = "../../examples/color/hicolor_1792/hicolor_1792.sfc"
 frames = 180
 
 [asserts.blocks]
-even_bank_row0   = { space = "cgram", offset = "0000", hex = "00002220222423242224232422202224222423242220222022242220232422200000222022242224232422202324232422242324222022242220222423242324" }
-odd_bank_row27   = { space = "cgram", offset = "00C0", hex = "0000470c8810a914680cc9148910ea18670c88108910aa14670c2a1d8810cb1400002708480c6810470c680c490c8810480c6910690c8910680c470c480c680c" }
+even_bank_row0   = { space = "cgram", offset = "0000", hex = "0000642c000000000000000000000000000000000000000000000000000000000000642c00000000000000000000000000000000000000000000000000000000" }
+odd_bank_row27   = { space = "cgram", offset = "00C0", hex = "0000862c6430662c4d45642c00000000000000000000000000000000000000000000862c00046314841ca71c6430662ca7180c25641c652c642c63180b250000" }

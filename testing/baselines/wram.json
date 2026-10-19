@@ -77,7 +77,7 @@
   },
   "color_hicolor_1792": {
     "stream": "163c76ba0abfdb628c41a9c674a2952958c8526cb6076ce20fb7a217202d787e",
-    "rom_sha256": "e073865de2e018a694a826da74544dbc2e52ebaac843df8a7f424ef15b22fbc9"
+    "rom_sha256": "b565973364db80110bd6996c18b7cd8270cbf52ef81ce33bc3d0003a5cc3ed59"
   },
   "color_palette_cycle": {
     "stream": "f68c2f63bdddd43e4d0f11484d1ea6bb0773f6ee4157d22108e23f25aa609fde",
@@ -188,8 +188,8 @@
     "rom_sha256": "44631718035756e64b384d4201dacd9c429182711a72f8bdd626ae620d518bf1"
   },
   "scrolling_parallax_scroll": {
-    "stream": "002073e38e1bb2bd431c5ca03e7694a33db5d220590288f81cccc3bb121af9ad",
-    "rom_sha256": "d4d3450b049e059f3881696770cbe305c6eedacd0b84ae88a4c973cabeadf346"
+    "stream": "0fe305818cc64f267c1067da15b3bcf4eee10b9fd3503d7ca7a8feeb26b86c21",
+    "rom_sha256": "fcf7c30e86b79e9efc6902e1890bb928c24294134b94d61ff7f97b3e193ee886"
   },
   "sprites_animated_sprite": {
     "stream": "2bda8147d562eee2bcbf4a5b413fd2cbd7d7f5b5e634543ea08ea90020b3a546",
@@ -205,7 +205,7 @@
   },
   "sprites_simple_sprite": {
     "stream": "d8a785cd9137282234880cdd4e22b7c0c3a1e79e8a59ef76f88f4d122a981531",
-    "rom_sha256": "91a2745851e594ee9abdcb523178a4c7d581837fdda824f25d8332d9439505b9"
+    "rom_sha256": "3e22449a9f876ebcd721a672db8ddda3c0b64e90886a95349937dc271e112e63"
   },
   "sprites_sprite_sizes": {
     "stream": "dde8281798eb13f6f50e1676143fe53cbfa788f7047a257e6193d46d5b076c4a",

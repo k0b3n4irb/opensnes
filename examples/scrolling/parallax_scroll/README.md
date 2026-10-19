@@ -1,7 +1,5 @@
 # Parallax Scrolling
 
-![Demo](parallax_scroll_demo.gif)
-
 ![Screenshot](parallax_scroll.png)
 
 Multi-speed horizontal scrolling using HDMA -- one background image, three scroll zones.
@@ -39,9 +37,9 @@ The screen is divided into three zones:
 
 | Zone | Scanlines | Speed | Visual |
 |------|-----------|-------|--------|
-| Top | 72 lines | +1 px/frame | Stars/sky (distant, slow) |
-| Middle | 88 lines | +2 px/frame | Midground pattern |
-| Bottom | 64 lines | +4 px/frame | Grass/ground (close, fast) |
+| Top | 72 lines | +1 px/frame | The far towers (distant, slow) |
+| Middle | 88 lines | +2 px/frame | The mid-distance blocks |
+| Bottom | 64 lines | +4 px/frame | The roofs and the street (close, fast) |
 
 ### HDMA Scroll Table
 
@@ -108,8 +106,8 @@ the zones -- each zone is a strict horizontal band.
 | File | Purpose |
 |------|---------|
 | `main.c` | HDMA table setup, per-frame scroll updates |
-| `res/back.png.toml` | the import settings of the picture (`opensnes-tileset`, 32 colours); the build converts and links it, `res/back.inc` declares the symbols |
-| `res/back.png` | Source background image (512 pixels wide) |
+| `res/back.png.toml` | the import settings of the picture (`opensnes-tileset`: 16 colours, `flip` folds the mirrored half into flip bits, `pages` lays the 64-wide map out as two 32x32 pages); the build converts and links it, `res/back.inc` declares the symbols |
+| `res/back.png` | the city at night in three bands, 512x256, each band a 256-pixel half and its mirror; composed from generated pictures, CC0 (`assets/neo-lumen/`) |
 | `Makefile` | `LIB_MODULES := console dma background sprite hdma input math` |
 
 ## Going Further

@@ -21,8 +21,50 @@ generated again or varied.
 | File | What | Made with | Used by |
 |---|---|---|---|
 | `backgrounds/canal.png` | a city canal at night, 256x224, 29 colours | `generate-image-v2`, seed 113, no palette given | the source of `canal_256.png` |
+| `backgrounds/canal_haze.png` | the canal with the haze below, before the cut to 256 colours: 392 colours on the 15-bit grid | the blend below, by hand | `examples/color/hicolor_1792` (`res/canal.png`; the converter cuts each 64x8 segment to 15 colours) |
 | `backgrounds/canal_256.png` | the same, with a haze added by hand: each row blended towards a magenta glow (`#e05090`, at most 42 %, strongest on the horizon row 118) and towards the night (`#101028`, up to 30 % at the top, 22 % at the bottom), snapped to the 15-bit grid, then cut to 256 colours by median cut without dithering: 253 colours | the blend above, by hand | `examples/backgrounds/mode3` (`res/canal.png`) |
+| `backgrounds/city_far.png` | far skyline at night in the rain, 256x224 | `generate-image-v2`, seed 1018, the city's 15 colours | a source of `parallax_city.png` |
+| `backgrounds/city_near.png` | close apartment blocks and a noodle sign, 256x224 | the same, seed 1018 | a source of `parallax_city.png` |
+| `backgrounds/parallax_city.png` | three bands on 512x256, composed by hand: rows 20-91 of `city_far` (72 lines), rows 92-179 of `city_far` under rows 136-223 of `skyline_mid` (88 lines), rows 160-223 of `city_near` (64 lines); the left 256 pixels, then their mirror; 16 colours by median cut | composition | `examples/scrolling/parallax_scroll` (`res/back.png`) |
 | `backgrounds/street.png` | a rainy street at night, 256x224, 12 colours of the city palette | `generate-image-v2`, seed 112, `target_palette` = the city's 15 colours | `examples/backgrounds/mode1` (`res/street.png`: indexed, padded to 256x256 with the ink colour) |
+
+
+### Characters (32x32, index 0 transparent once indexed)
+
+Each one is the candidate kept from a sheet of 64 that `generate-image-v2`
+returns at 32x32 for 10 generations, with Kit's front pose as `style_image`
+and the character's own 15 colours as `target_palette`.
+
+| File | Who | Seed, candidate | Used by |
+|---|---|---|---|
+| `characters/kit.png` | Kit, the fox-kit courier, front | 1018, #0 | `examples/sprites/simple_sprite` (`res/kit.png`) |
+| `characters/owl.png` | the owl who keeps the noodle bar | 33, #2 | — |
+| `characters/raccoon.png` | the raccoon hacker, the second player | 101, #22 | — |
+| `characters/pangolin.png` | the pangolin guard | 102, #1 | — |
+| `characters/frog.png` | the frog mechanic | 103, #16 | — |
+| `characters/rat.png` | the rat junk dealer | 104, #9 | — |
+| `characters/drone.png` | a one-eyed security drone | 105, #32 | — |
+| `characters/automaton.png` | a patrol automaton with a riot shield, side view | 106, #8 | — |
+| `characters/insect.png` | a crawling robot insect, side view | 107, #13 | — |
+| `characters/hunter.png` | a security hunter aircraft, from above | 108, #10 | — |
+| `characters/bike.png` | Kit on a hover-bike, from behind | 109, #40 | — |
+| `characters/glider.png` | Kit's delivery glider, from above | 110, #51 | — |
+
+`characters/topdown/<who>_<south|east|north|west>.png`: the first six
+registered as PixelLab characters with `create-character-v3` (`view: high
+top-down`, 4 directions, the front pose above as `reference_image`, seeds
+2000 to 2005 in the order Kit, raccoon, owl, pangolin, frog, rat).
+
+### More backgrounds, not used yet
+
+| File | What | Seed | Note |
+|---|---|---|---|
+| `backgrounds/skyline_mid.png` | mid-distance towers, 512x224, transparent sky | 113 | a parallax layer; its bottom rows are in `parallax_city.png` |
+| `backgrounds/noodlebar.png` | the noodle bar from above, 256x224 | 114 | an RPG interior |
+| `backgrounds/aerial.png` | the city from above, 512x512 | 115 | to bring down to 256 tiles for Mode 7 |
+| `backgrounds/title.png` | moon and skyline with room for a logo, 256x224 | 116 | its top and bottom four rows are an amber frame: repaint them before use |
+
+All four with `generate-image-v2` and the city's 15 colours.
 
 An example keeps its own copy in its `res/` folder, in the form its
 converter takes (indexed, padded, cut); this folder keeps the picture as
