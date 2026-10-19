@@ -28,19 +28,21 @@ cd $OPENSNES_HOME
 make -C examples/sprites/animated_sprite
 ```
 
-Then open `animated_sprite.sfc` in your emulator (Mesen2 recommended).
+Then open `animated_sprite.sfc` in luna (`luna-gui animated_sprite.sfc`) or any emulator.
 
 ## How It Works
 
 ### 1. Sprite sheet layout
 
-The sprite sheet is a PNG strip containing 9 frames of 16x16 sprites, loaded
-to VRAM at startup via `oamInitGfxSet()`. Each 16x16 sprite occupies 2 tile
-columns in VRAM. The frame index maps to tile numbers:
+The sprite sheet is a column of fifteen 32x32 frames of Kit seen from above:
+five walking down, five walking up, five walking to the right. It is loaded
+to VRAM at startup via `oamInitGfxSet()`. The converter lays 32x32 blocks out
+four to a 128-pixel row of OBJ VRAM, so block `k` starts at tile
+`(k % 4) * 4 + (k / 4) * 64`:
 
-- Walking down: tiles 0, 2, 4
-- Walking up: tiles 6, 8, 10
-- Walking right: tiles 12, 14, 32
+- Walking down (blocks 0-4): tiles 0, 4, 8, 12, 64
+- Walking up (blocks 5-9): tiles 68, 72, 76, 128, 132
+- Walking right (blocks 10-14): tiles 136, 140, 192, 196, 200
 - Walking left: same as right, but with `OBJ_FLIPX`
 
 ### 2. State machine
@@ -60,30 +62,18 @@ technique that halves the sprite art needed for left/right movement.
 
 ### 3. Animation timing
 
+One clip per facing, from the `anim` module; the clip holds the tile numbers
+and the cadence:
+
 ```c
-monster.anim_delay++;
-if (monster.anim_delay >= ANIM_DELAY) {
-    monster.anim_delay = 0;
-    monster.anim_frame++;
-    if (monster.anim_frame >= 3) monster.anim_frame = 0;
-}
+DECLARE_ANIM_CLIP(walk_down, ANIM_LOOP, ANIM_DELAY, 0, 4, 8, 12, 64);
+
+animPlay(&kit_anim, &walk_down);       /* continues if already playing */
+kit.gfx_frame = animTick(&kit_anim);   /* the tile number for oamSet() */
 ```
 
 Animation only advances when a direction button is held. `ANIM_DELAY` (6 frames)
 controls walking speed -- at 60 fps, this means about 10 animation steps per second.
-
-### 4. Tile calculation
-
-The tile number is computed from the state and frame:
-
-```c
-if (state == W_DOWN)  tile = frame * 2;          /* 0, 2, 4 */
-if (state == W_UP)    tile = 6 + frame * 2;      /* 6, 8, 10 */
-if (state == W_RIGHT) tile = 12 + frame * 2;     /* 12, 14, (32) */
-```
-
-Frame 2 of the right-walk is at tile 32 (next row in VRAM) because the sheet wraps
-at 16 tiles per row.
 
 ## SNES Concepts
 
@@ -99,20 +89,21 @@ All animation frames are loaded into VRAM at once via `oamInitGfxSet()`. The
 active frame is selected by changing the tile number in `oamSet()`. This means
 switching frames is instant -- just change a number, no DMA needed.
 
-### 16x16 Tiles in OAM
+### 32x32 Tiles in OAM
 
-In OAM, a 16x16 sprite uses 4 hardware 8x8 tiles arranged in a 2x2 grid. The
+In OAM, a 32x32 sprite uses 16 hardware 8x8 tiles arranged in a 4x4 grid. The
 tile number refers to the top-left tile; the PPU fills in the rest automatically
-using the SNES tile numbering convention (right tile = tile+1, bottom tiles follow
-the 16-tile-per-row VRAM layout).
+using the SNES tile numbering convention (right tile = tile+1, each row below is
+16 tiles further, the 16-tile-per-row VRAM layout). `OBJ_SIZE16_L32` makes
+"large" mean 32x32, and `oamSetSize(0, OBJ_LARGE)` picks it for this sprite.
 
 ## Project Structure
 
 | File | Purpose |
 |------|---------|
 | `main.c` | Input handling, state machine, animation logic |
-| `res/sprites.png.toml` | the import settings of the sprite sheet (`opensnes-sprite`: 16-pixel blocks, 16 colours); the build converts the PNG and links the result, `res/sprites.inc` declares the symbols |
-| `res/sprites.png` | Source sprite sheet (9 frames, 16x16 each) |
+| `res/kit_walk.png.toml` | the import settings of the sprite sheet (`opensnes-sprite`: 32-pixel blocks, 16 colours); the build converts the PNG and links the result, `res/kit_walk.inc` declares the symbols |
+| `res/kit_walk.png` | Kit's walk seen from above, 15 frames of 32x32 in a column; generated for OpenSNES, CC0 (`assets/neo-lumen/`) |
 | `Makefile` | `LIB_MODULES := console sprite dma input` |
 
 ## Going Further

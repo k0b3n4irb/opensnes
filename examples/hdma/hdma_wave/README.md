@@ -1,6 +1,6 @@
 # HDMA Wave
 
-> One water image, one per-scanline ripple, made two ways: first by an HDMA
+> One picture (the city canal at night), one per-scanline ripple, made two ways: first by an HDMA
 > table written by hand and animated krom-style, then by the `hdma` module's
 > wave helper. Press A to switch between them.
 
@@ -175,8 +175,8 @@ analysis on `luna frames` sequences of both ROMs):
 | File | What's in it |
 |------|-------------|
 | `main.c` | Setup, the hand-built repoint loop, the switch to the `hdma` module |
-| `res/water.bmp.toml` | the import settings of the Mode 3 image (`opensnes-tileset`, 8bpp); the 57 KB tileset comes out in two bank-sized parts, `water_tiles` and `water_tiles_1` |
+| `res/canal.png.toml` | the import settings of the Mode 3 image (`opensnes-tileset`, 8bpp); the 48 KB tileset comes out in two bank-sized parts, `canal_tiles` and `canal_tiles_1` |
 | `data.asm` | krom's wave table (`wavetable.bin`), hand-written |
-| `res/water.bmp` | Original art: procedurally generated water caustics (256 colours) |
+| `res/canal.png` | the city canal at night, 253 colours, the same picture as `backgrounds/mode3`; generated for OpenSNES, its haze added by hand, CC0 (`assets/neo-lumen/`) |
 | `res/wavetable.bin` | krom's 896-entry HDMA table, extracted verbatim |
 | `Makefile` | `LIB_MODULES` (no conversion rule: the settings file drives it) |

@@ -26,6 +26,7 @@ generated again or varied.
 | `backgrounds/city_far.png` | far skyline at night in the rain, 256x224 | `generate-image-v2`, seed 1018, the city's 15 colours | a source of `parallax_city.png` |
 | `backgrounds/city_near.png` | close apartment blocks and a noodle sign, 256x224 | the same, seed 1018 | a source of `parallax_city.png` |
 | `backgrounds/parallax_city.png` | three bands on 512x256, composed by hand: rows 20-91 of `city_far` (72 lines), rows 92-179 of `city_far` under rows 136-223 of `skyline_mid` (88 lines), rows 160-223 of `city_near` (64 lines); the left 256 pixels, then their mirror; 16 colours by median cut | composition | `examples/scrolling/parallax_scroll` (`res/back.png`) |
+| `backgrounds/mist.png` | mist wisps, 256x224, 2 colours (0 transparent, 1 = `#283050`), seamless at 256 | procedural, below | `examples/color/transparency` (`res/mist.png`, BG3 added over the street) |
 | `backgrounds/street.png` | a rainy street at night, 256x224, 12 colours of the city palette | `generate-image-v2`, seed 112, `target_palette` = the city's 15 colours | `examples/backgrounds/mode1` (`res/street.png`: indexed, padded to 256x256 with the ink colour) |
 
 
@@ -55,6 +56,18 @@ registered as PixelLab characters with `create-character-v3` (`view: high
 top-down`, 4 directions, the front pose above as `reference_image`, seeds
 2000 to 2005 in the order Kit, raccoon, owl, pangolin, frog, rat).
 
+`characters/topdown/walk/<who>_<direction>_<0-4>.png`: a walk of five
+frames per direction for each of the six, `POST /characters/animations` in
+`mode: v3` on the character above, `frame_count` 4 with
+`keep_first_frame: false` (PixelLab returned five), the character's 15
+colours as `target_palette`, seeds 3000 to 3005 in the same order. Frames
+come on a 40x40 canvas.
+
+`characters/topdown/kit_walk_sheet.png`: Kit's walk down, up and right
+(15 frames), each cropped to 32x32 with one window for all (feet aligned),
+indexed (0 transparent, then his 15 colours) and stacked in a column; used
+by `examples/sprites/animated_sprite` (`res/kit_walk.png`).
+
 ### More backgrounds, not used yet
 
 | File | What | Seed | Note |
@@ -69,3 +82,15 @@ All four with `generate-image-v2` and the city's 15 colours.
 An example keeps its own copy in its `res/` folder, in the form its
 converter takes (indexed, padded, cut); this folder keeps the picture as
 it came out, so the next example starts from the same source.
+
+## The mist's recipe
+
+For each pixel, with `t = 2*pi*x/256` (every term has a whole number of
+periods across the width, so the picture wraps):
+
+```
+yy    = y + 9 sin(2t + 0.6) + 5 sin(3t + 0.03 y) + 3 sin(5t + 1.9)
+v     = sin(2*pi*yy / 60) + 0.55 sin(t + 0.05 y) + 0.30 sin(4t - 0.07 y + 0.8)
+d     = v - 0.75
+pixel = 1 if d > 0.35, or if d > -0.05 and (d + 0.05) / 0.4 * 16 > the 4x4 Bayer value at (x, y)
+```

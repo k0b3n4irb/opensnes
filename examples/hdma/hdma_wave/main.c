@@ -3,7 +3,7 @@
  * @brief HDMA wave: build the table by hand, then let the hdma module do it
  * @ingroup examples
  *
- * One water image, one per-scanline ripple, two ways to make it.
+ * One picture, one per-scanline ripple, two ways to make it.
  *
  * At boot the ripple comes from an HDMA table written BY HAND and animated
  * the way krom's assembler demo does it: the table is never rewritten; each
@@ -23,8 +23,8 @@
  * C port of "SNES Wave HDMA Demo" by krom (Peter Lemon),
  * github.com/PeterLemon/SNES, PPU/HDMA/WaveHDMA — technique reproduced on
  * the snes/hdma.h API in the original demo configuration (BG Mode 3,
- * full-screen 256-color image). Art is original: procedurally generated
- * water caustics (res/water.bmp), no krom assets.
+ * full-screen 256-color image). The picture is ours, no krom assets: the
+ * city canal at night (res/canal.png), the one backgrounds/mode3 shows.
  *
  * @par SNES Concepts
  * - HDMA table format: `count` byte (1 = apply to one scanline) followed
@@ -42,7 +42,7 @@
  *   across two ROM banks; the tilemap sits above them at VRAM $7C00)
  *
  * @par What to Observe
- * - At boot: the water image in tight sine ripples flowing UPWARD at one
+ * - At boot: the canal at night in tight sine ripples flowing UPWARD at one
  *   scanline per frame — krom's exact table (896 entries, verbatim) and
  *   cadence (wrap at 672); the white rulers every 64px stay straight
  * - Press A: the hdma module takes over (channel 6 instead of 0); the
@@ -90,7 +90,7 @@
 #define VRAM_BG1_MAP  0x7C00
 
 /** @brief Mode 3 image data (from data.asm; generated original art) */
-#include "res/water.inc"   /* generated: water_tiles[] + water_tiles_1[] (two bank-sized parts), water_map[], water_pal[] */
+#include "res/canal.inc"   /* generated: canal_tiles[] + canal_tiles_1[] (two bank-sized parts), canal_map[], canal_pal[] */
 
 /**
  * @brief krom's exact HDMA table, in ROM (data.asm).
@@ -139,10 +139,10 @@ int main(void) {
     /* Load the full-screen 8bpp image: two tile halves (>32KB tileset),
      * tilemap above them, 256-color palette — krom's Mode 3 setup on
      * the SDK API. All transfers run during the boot force blank. */
-    dmaCopyVram(water_tiles,   VRAM_BG1_GFX,  (u16)(water_tiles_end - water_tiles));
-    dmaCopyVram(water_tiles_1,  VRAM_BG1_GFX2, (u16)(water_tiles_1_end - water_tiles_1));
-    dmaCopyVram(water_map, VRAM_BG1_MAP,  (u16)(water_map_end - water_map));
-    dmaCopyCGram(water_pal, 0, (u16)(water_pal_end - water_pal));
+    dmaCopyVram(canal_tiles,   VRAM_BG1_GFX,  (u16)(canal_tiles_end - canal_tiles));
+    dmaCopyVram(canal_tiles_1,  VRAM_BG1_GFX2, (u16)(canal_tiles_1_end - canal_tiles_1));
+    dmaCopyVram(canal_map, VRAM_BG1_MAP,  (u16)(canal_map_end - canal_map));
+    dmaCopyCGram(canal_pal, 0, (u16)(canal_pal_end - canal_pal));
 
     bgSetGfxPtr(0, VRAM_BG1_GFX);
     bgSetMapPtr(0, VRAM_BG1_MAP, SC_32x32);

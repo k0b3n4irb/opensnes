@@ -1,15 +1,15 @@
 # color/transparency, A: SETINI bit 3 interleaves the sub screen (even
 # columns) and the main screen (odd columns) into a 512-pixel line, a 50 %
-# blend without colour math — the second way the example mixes its clouds
-# into the landscape. (Written for color/pseudo_hires, merged into
+# blend without colour math — the second way the example mixes its mist
+# into the street. (Written for color/pseudo_hires, merged into
 # transparency on 2026-10-18.) What this pins that the fbhash cannot:
 #   * the register really toggles: SETINI = $00 at boot, $08 after one A,
 #     $00 after the second (luna's PPU view of the write-only register);
 #   * in pseudo-hires no layer is in colour math (CGADSUB $00), so the
-#     interleaving is the only way the sub screen's clouds reach the
+#     interleaving is the only way the sub screen's mist reaches the
 #     output; the second A gives addition back (CGADSUB $21: add, BG1 and
 #     the backdrop); TM and TS do not move (BG1+BG3 main, BG3 sub);
-#   * the game loop runs: the clouds keep scrolling one pixel a frame.
+#   * the game loop runs: the mist keeps scrolling one pixel a frame.
 # Measured on luna v1.39.0 (`luna state --until-frame N --input … --out -`).
 rom = "../../examples/color/transparency/transparency.sfc"
 
@@ -40,7 +40,7 @@ input = "100:0x0080,102:0"        # A again
 [checkpoint.values]
 ph_on = { eq = 0, width = 1 }
 [checkpoint.delta]
-"bg_scroll_x+4" = "increased"     # the clouds keep scrolling, whatever pseudo-hires does
+"bg_scroll_x+4" = "increased"     # the mist keeps scrolling, whatever pseudo-hires does
 [checkpoint.ppu]
 setini = 0
 cgadsub = 0x21
