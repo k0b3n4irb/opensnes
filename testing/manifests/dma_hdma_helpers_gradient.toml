@@ -1,0 +1,17 @@
+# hdma_helpers: the colour gradient (B, pressed twice to re-call it)
+# reaches the screen. The example keeps channel 6 enabled on BG1HOFS with an
+# empty table between effects; from 2026-10-03 to 2026-10-19 an effect that
+# found its channel enabled only moved the table pointer, so the gradient's
+# table went to BG1HOFS and nothing was drawn, while
+# dma_hdma_helpers_effects.toml (state and window registers) kept passing.
+# The registers cannot show a table sent to the wrong register; the frame
+# can. Measured with the fix; the build without it gives another hash.
+rom = "../../examples/hdma/hdma_helpers/hdma_helpers.sfc"
+frames = 160
+input = "60:0x8000,64:0,100:0x8000,104:0"
+
+[asserts]
+fbhash = "931008d6e2fff8d7"     # the deep blue to orange gradient behind Kit
+
+[asserts.values]
+fx = { eq = 2, width = 1 }

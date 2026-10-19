@@ -4,6 +4,17 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- fix(lib): `hdmaColorGradient()`, `hdmaIrisWipe()` and `hdmaBrightnessGradient()`
+  set their channel up again when it is enabled for something else. Since 0.48
+  they only moved the table pointer whenever the channel was enabled, so a
+  channel left running another table (hdma_helpers keeps channel 6 on BG1HOFS
+  between effects) received the effect's table in the wrong register and mode:
+  the colour gradient and the iris drew nothing. They now read the channel's
+  DMAP and BBAD, which are readable (anomie-regs), and move only the table when
+  the channel already runs that effect. `dma_hdma_helpers_gradient` and
+  `dma_hdma_helpers_iris` hash the drawn frame; both fail without the fix.
+
 ## [0.51.0] — 2026-10-18
 
 The silent defects found by the 1.0 audit, fixed: a variable-length array
