@@ -1,4 +1,4 @@
 tool = "opensnes-level"
 
 [convert]
-tileset = "tilesMario.map"
+tileset = "roofs.map"

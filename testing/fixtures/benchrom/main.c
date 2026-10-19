@@ -51,7 +51,7 @@ u16 r_map_vblankf;   /* mapVblank() with pending scroll work        */
  * through cached far pointers. Correctness pinned against the ASM
  * (same query must yield tile 21, as in libtest). */
 u16 r_map_getmeta_c; /* the C model's cycles                        */
-u16 r_map_c_val;     /* c_getmetatile(1280,80) -> 21 (correctness)  */
+u16 r_map_c_val;     /* c_getmetatile(1280,80): the same value as the asm (correctness) */
 
 /* sprite_dynamic.asm measurement points (16x16 sheet, engine inited
  * as in the dynamic_sprite example). The flush is the NMI-time path,

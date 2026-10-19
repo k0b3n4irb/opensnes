@@ -1,4 +1,5 @@
 tool = "opensnes-tileset"
 
 [convert]
-colors = 48
+bpp = 2
+colors = 4

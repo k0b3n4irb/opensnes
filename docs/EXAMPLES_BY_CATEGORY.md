@@ -33,7 +33,7 @@ The PPU's background modes — colour vs layers vs resolution.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_backgrounds_mode1 | Mode 1 multi-layer backgrounds (4bpp + 2bpp) |
-| @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
+| @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (the city in parallax) |
 | @subpage examples_backgrounds_mode3 | Mode 3: 256-colour (8bpp) single layer |
 | @subpage examples_backgrounds_mode2 | Offset-per-tile in Mode 2 (two rows) and Mode 4 (one row, 256 colours): per-column scroll from BG3 |
 | @subpage examples_backgrounds_mode5_hires | Mode 5 + interlace hi-res text (512×448) (krom port) |

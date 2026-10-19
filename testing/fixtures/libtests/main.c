@@ -162,12 +162,14 @@ u16 r_rmw_u8;  /* 3 steps from {idx0,cnt2}: 100,100,200 -> expected 200 */
  * caller's DB ($00 from C) -> open bus. Real tmx2snes data (shared
  * with examples/maps/map_scroll), pinned in bank 2 (B1 path).
  * Expected values host-parsed from the committed blobs:
- * entry(1280,80) = tile 21, b16[21] = 0xFF00 (T_SOLID); (0,0) -> 0. */
+ * entry(1280,200) = tile 518 (the wall under a roof), b16[518] = 0xFF00
+ * (T_SOLID); (0,0) -> 0, the sky. The map is map_scroll's rooftops since
+ * 2026-10-19 (it was PVSnesLib's level, tile 21 at (1280,80)). */
 extern u8 mapdata[];     /* BG1.m16        (data.asm, bank 2) */
-extern u8 tilesetdef[];  /* tiledMario.t16 */
-extern u8 tilesetatt[];  /* tiledMario.b16 */
-u16 r_map_tile;   /* mapGetMetaTile(1280,80)      -> 21     */
-u16 r_map_prop;   /* mapGetMetaTilesProp(1280,80) -> 0xFF00 */
+extern u8 tilesetdef[];  /* rooftops.t16 */
+extern u8 tilesetatt[];  /* rooftops.b16 */
+u16 r_map_tile;   /* mapGetMetaTile(1280,200)     -> 518    */
+u16 r_map_prop;   /* mapGetMetaTilesProp(1280,200) -> 0xFF00 */
 u16 r_map_prop0;  /* mapGetMetaTilesProp(0,0)     -> 0      */
 
 /* --- audio v2 (phase 1): driver boot + command round-trips.
@@ -960,8 +962,8 @@ static void part_math_anim(void) {
 
     /* map getters from C (issue #103): load the real map, consult it */
     mapLoad(mapdata, tilesetdef, tilesetatt);
-    r_map_tile  = mapGetMetaTile(1280, 80);
-    r_map_prop  = mapGetMetaTilesProp(1280, 80);
+    r_map_tile  = mapGetMetaTile(1280, 200);
+    r_map_prop  = mapGetMetaTilesProp(1280, 200);
     r_map_prop0 = mapGetMetaTilesProp(0, 0);
 
     textModeInit();

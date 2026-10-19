@@ -31,15 +31,15 @@
   },
   "backgrounds_mode0": {
     "fbhash": [
-      "b0795af7af84e2a5",
-      "c3fb07aac006d18e"
+      "40ef8098bbb49b34",
+      "85211c157d37cd5f"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.38.0",
-    "rom_sha256": "84f47ed4049baa62aa5e1462e1ed3aa7a499d7e96f99cad503c3ccf985e6d9d2"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "b71bb1195ca801ff68c83e9d504c2291a2aab98a6dbc47336754302eec5a49e1"
   },
   "backgrounds_mode1": {
     "fbhash": "d547f3e9159077bd",
@@ -282,10 +282,10 @@
     "rom_sha256": "d0c4d48fa3830047fce3373ef46c7c167992db56d7e368ad27a160407f61dcd9"
   },
   "maps_map_scroll": {
-    "fbhash": "b15f6c4b0d36b931",
+    "fbhash": "66d6c6c04d9dfc8a",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "480138bed2e98d59dee48a4ab55d0897e2ffc959fa46be6ef221a4dfc33511a1"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "c3c4c23ac56dc1bce4ae7fd25b08d76974ed10e5b6f23d972841faeb0e9c0bbb"
   },
   "memory_hirom_demo": {
     "fbhash": "b194bdb8baf889bd",
