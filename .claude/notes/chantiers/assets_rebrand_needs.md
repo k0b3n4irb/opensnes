@@ -14,7 +14,7 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 > **Fix** sont sous `testing/fixtures/retired_examples/` (`mode6`, `sa1_hello`, `sa1_save`,
 > `superfx_hello`, `superfx_save`). Les lignes 23, 25 et 26 du protocole matériel les nomment par
 > leur chemin ; `make hardware-kit` et `make hardware-preflight` construisent ces fixtures avant de
-> lire la table. Reste ouvert : `superfx_3d` gardé (à confirmer par le propriétaire). Le tutoriel
+> lire la table. `superfx_3d` est gardé (propriétaire, 2026-10-19). Le tutoriel
 > SA-1 porte la sauvegarde en BW-RAM que `sa1_save` enseignait.
 
 - **85 exemples** (le `examples/README.md` annonce « 88 small ROMs » alors que son propre tableau totalise 85 :
@@ -202,7 +202,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 | chips/sa1_hello | diagnostic de démarrage SA-1 | texte, codes d'état | **Fix** — diagnostic, pas cas d'usage | — | — |
 | chips/sa1_save | sauvegarde en BW-RAM SA-1 (compteur de démarrages) | texte | **Fix** — ROM de protocole (ligne 25) ; le guide dit que l'API `sram` est la même | — | — |
 | chips/sa1_starfield | SA-1 : 128 positions par trame, I-RAM partagée | points procéduraux, 4 palettes de luminosité | **G** — la démonstration de puissance SA-1 | une nuée de papillons-néons au-dessus du canal | P1 |
-| chips/superfx_3d | GSU : cube fil de fer, Bresenham, letterbox | procédural | **G (révisé le 2026-10-18, proposition à confirmer par le propriétaire ; était F→superfx_game_skeleton)** — ce n'est pas un doublon : c'est le chemin simple (job lancé depuis la ROM par `gsuLaunch`, le CPU attend ; un seul tampon, `gsuDmaFullFrame` ; IRQ V-timer armée pendant les jobs) que le squelette écarte exprès (cache, double tampon, `gsuPresent`). Trois tutoriels l'enseignent comme marche (`superfx.md`, `superfx_advanced.md`, `interrupts.md`), il est le seul appelant de `gsuDmaFullFrame` et la référence de `nmi_budget.py`. Fusionner = un squelette à deux modes de présentation (gros travail GSU) ou une fixture + trois tutoriels réécrits sans la marche simple. Même raisonnement que mode7/perspective. | — | — |
+| chips/superfx_3d | GSU : cube fil de fer, Bresenham, letterbox | procédural | **G (révisé le 2026-10-18, confirmé par le propriétaire le 2026-10-19 ; était F→superfx_game_skeleton)** — ce n'est pas un doublon : c'est le chemin simple (job lancé depuis la ROM par `gsuLaunch`, le CPU attend ; un seul tampon, `gsuDmaFullFrame` ; IRQ V-timer armée pendant les jobs) que le squelette écarte exprès (cache, double tampon, `gsuPresent`). Trois tutoriels l'enseignent comme marche (`superfx.md`, `superfx_advanced.md`, `interrupts.md`), il est le seul appelant de `gsuDmaFullFrame` et la référence de `nmi_budget.py`. Fusionner = un squelette à deux modes de présentation (gros travail GSU) ou une fixture + trois tutoriels réécrits sans la marche simple. Même raisonnement que mode7/perspective. | — | — |
 | chips/superfx_game_skeleton | jeu à 60 i/s, GSU à 30, double tampon, SNESMOD | procédural + module de snesmod_music | **R** — reste la référence Super FX ; l'objet 3D devient un hologramme (logo ou cube de données) | un hologramme tourne au-dessus d'une place, un viseur suit le pad | O4, MU1 |
 | chips/superfx_hello | diagnostic GSU (SRAM, FMULT) | texte | **Fix** | — | — |
 | chips/superfx_save | sauvegarde en Game Pak RAM (ligne 26) | texte | **Fix** | — | — |
