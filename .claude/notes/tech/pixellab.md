@@ -636,3 +636,29 @@ On 5000 generations, about 40 fully animated characters still leave room for til
   required") — `style_options.color_palette: false` and the owl's own
   15-colour palette: 64 owls for 10 generations, one character, same
   outline and pixel size as Kit.
+
+## Measured on wave A (2026-10-19, about 280 generations)
+
+- **Ten background jobs at once on Tier 2.** The eleventh POST answers 429
+  "Maximum 10 concurrent background jobs allowed (Tier 2). You have 10
+  active jobs." and is not charged. A batch runner must cap itself at ten.
+- **`rotation_urls` need a User-Agent.** The character's rotation PNGs
+  (backblaze) answer 403 to Python's default urllib agent and 200 with
+  `User-Agent: Mozilla/5.0`. The character is created either way.
+- **`generate-image-v2` keeps few colours even without `target_palette`.**
+  Two canal pictures asked for "about 200 distinct colours" came back with
+  28 and 29. For Mode 3 (256 colours) the shades have to be added after
+  generation: a per-row blend towards a glow and towards the night, snapped
+  to the 15-bit grid, gave 392 colours, cut to 253 by median cut
+  (`assets/neo-lumen/README.md` gives the exact blend).
+- **A 256x224 background can come back framed.** The first street had a
+  flat border more than 12 px wide on all four sides, the title screen four
+  amber rows at the top and the bottom. "full-bleed picture edge to edge, no
+  frame, no border, no vignette" at the head of the description gave a clean
+  street. Check the outer rows of every background before using it.
+- **Costs seen:** a 32x32 pose sheet (64 candidates) 10 generations; a
+  256x224 picture 10; 512x224 15; 512x512 25; `create-character-v3` from a
+  32x32 reference with 4 directions, 1.
+- **`create-character-v3` with `view: high top-down`** from a front pose
+  gives four directions that read as the classic 3/4 RPG view, and keeps the
+  props (the owl's bowl, the rat's sack, the frog's wrench).

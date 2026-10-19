@@ -2,17 +2,18 @@
 # to the last byte of the last tile. (Written for backgrounds/mode1_lz77,
 # which merged into mode1 on 2026-10-18.)
 #
-# mode1 loads its picture twice: bgLoad() DMAs the plain tiles to $4000, and
-# `lzssDecodeVram(opensnes_lz_tiles, $5000)` expands the LZ77 copy of the SAME
-# png (652 ROM bytes, 2592 of tiles) through the PPU data port into VRAM that
-# nothing had written. The oracle is free and exact: the two areas must be
-# byte-identical. Verified on the day of the merge: VRAM bytes $8000-$8A1F
-# equal $A000-$AA1F, and A (bgSetGfxPtr to $5000) leaves the frame hash
-# unchanged (cd685395875fba95 both ways). `bg_tiles_w5000` is literally the
-# block dma_mode1_bgasset.toml asserts at $82E0, $2000 bytes further.
+# mode1 loads its picture twice: bgLoad() DMAs the plain tiles to $0000, and
+# `lzssDecodeVram(street_lz_tiles, $4000)` expands the LZ77 copy of the SAME
+# png (18816 ROM bytes, 28256 of tiles: the rainy street since 2026-10-19)
+# through the PPU data port into VRAM that nothing had written. The oracle is
+# free and exact: the two areas must be byte-identical. Verified on
+# 2026-10-19: VRAM bytes $0000-$6E5F equal $8000-$EE5F, and A (bgSetGfxPtr to
+# $4000) leaves the frame hash unchanged (d547f3e9159077bd both ways).
+# `bg_tiles_w4000` is literally the block dma_mode1_bgasset.toml asserts at
+# $0C80, $8000 bytes further.
 #
 # `tail_of_decode` is the assert that earns this file. It is the LAST 32 bytes
-# of the 2592-byte expansion. The characteristic LZSS failure is not garbage —
+# of the 28256-byte expansion. The characteristic LZSS failure is not garbage —
 # it is a decode that stops early (a mishandled final flag byte, a back
 # reference that runs past the end, an off-by-one on the length header), which
 # leaves the tail as the zeros VRAM already held. Those high tiles may be
@@ -25,14 +26,14 @@ rom = "../../examples/backgrounds/mode1/mode1.sfc"
 at_frame = 200
 input = "100:0x0080,104:0"
 [checkpoint.ppu]
-"bgs.0.char_addr_words" = 0x5000
+"bgs.0.char_addr_words" = 0x4000
 
 [asserts]                      # ...and the picture is the plain one's, pixel for pixel
-fbhash = "cd685395875fba95"
+fbhash = "d547f3e9159077bd"
 
 [asserts.blocks]
-bg_tiles_w5000 = { space = "vram",  offset = "A2E0", hex = "008000800080008f008f008f00810081ff7fff7fff7fff70ff70ff70ff7eff7e" }
-tail_of_decode = { space = "vram",  offset = "AA00", hex = "0000000000000000f0f0f0f0f0f0f0f0000000000000000000f000f000f000f0" }
+bg_tiles_w4000 = { space = "vram",  offset = "8C80", hex = "070407040704030003000300030001000007000700072403a003a003a003a001" }
+tail_of_decode = { space = "vram",  offset = "EE40", hex = "fccbfccbfccbfccbfc8bfc8bfc8bfc8b40bf40bf40bf40bf00ff00ff00ff00ff" }
 
 # Every VRAM/CGRAM transfer in this example happens once, at boot, under force
 # blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —

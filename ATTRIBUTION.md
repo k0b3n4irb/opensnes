@@ -157,6 +157,14 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
   cello of `apu_switch` and `soundboard`, all synthesized by
   `devtools/audio_assets/` (`make audio-assets` writes them again).
 
+### Néo-Lumen art generated for OpenSNES
+- **License**: CC0 (Public Domain)
+- **What**: the pictures, sprites and tiles the examples are being redrawn
+  with, AI-generated with PixelLab (https://www.pixellab.ai/) for OpenSNES,
+  some edited by hand. The originals, the tool and the seed of each, the
+  edits and the examples that use them are listed in
+  `assets/neo-lumen/README.md`.
+
 ## Documentation Sources
 - **SNESdev Wiki** (https://snes.nesdev.org/) — CC-BY-SA
 - **Fullsnes by Nocash** (https://problemkaputt.de/fullsnes.htm)

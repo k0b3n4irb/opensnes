@@ -6,18 +6,20 @@ Demonstrates BG Mode 3 with a single 256-color (8bpp) background layer.
 
 ## Description
 
-Mode 3 provides one 256-color background, allowing photographic-quality images on the SNES. The tileset (39 KB) is larger than a ROM bank, so the converter writes it in two parts and the example copies each with `dmaCopyVram()`, whose pointer carries the bank.
+Mode 3 provides one 256-color background, allowing photographic-quality images on the SNES. The picture is a city canal at night in 253 colours: the haze over the water fades through dozens of shades, which no 16-colour palette could hold. Its tileset (770 tiles, 48 KB) is larger than a ROM bank, so the converter writes it in two parts and the example copies each with `dmaCopyVram()`, whose pointer carries the bank.
 
 ## Architecture
 
 - **Mode 3**: BG1 at 8bpp (256 colors), BG2 at 4bpp (16 colors, unused here)
 - **BG1**: Full 256-color image
-- Tileset in two parts (`bg_tiles`, `bg_tiles_1`), two DMA transfers
-- Picture converted by the build from `res/bg.bmp` (`res/bg.bmp.toml`)
+- Tileset in two parts (`canal_tiles`, `canal_tiles_1`), two DMA transfers
+- VRAM: tiles at $0000 (770 x 32 words, up to $6040), tilemap at $7000
+- Picture converted by the build from `res/canal.png` (`res/canal.png.toml`):
+  generated for OpenSNES, CC0 (`assets/neo-lumen/`), its haze added by hand
 
-## Ported from
+## Origin
 
-PVSnesLib "Mode3" example.
+Began as the PVSnesLib "Mode3" example.
 
 ## Modules
 

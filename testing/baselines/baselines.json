@@ -42,10 +42,10 @@
     "rom_sha256": "84f47ed4049baa62aa5e1462e1ed3aa7a499d7e96f99cad503c3ccf985e6d9d2"
   },
   "backgrounds_mode1": {
-    "fbhash": "cd685395875fba95",
+    "fbhash": "d547f3e9159077bd",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "ab60045a1039eef426be4a26f6a6f44589baf82cdfa0f4fcce49574ce041862d"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "d059161037953715f497756936eb2c4cf2d36367bb52fd7c95c008bfbbe0bdc0"
   },
   "backgrounds_mode2": {
     "fbhash": [
@@ -60,10 +60,10 @@
     "rom_sha256": "37e724aa66b7a947793eed8366524f2fa35f0ed2cfdbfe86015f687a2e9610cb"
   },
   "backgrounds_mode3": {
-    "fbhash": "dcdc281d00d69ece",
+    "fbhash": "83f634143d0256d0",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "42ac7a599f55b907db5a1ae1b8cbd06c25192abe8ff6ce5cbac0d695b7b251b9"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "44dfd2fde3b50070c17741ca07af01ce0f8ed3788c12ad70953d903ebb5de318"
   },
   "backgrounds_mode5_hires": {
     "fbhash": "aaf77640375cfea4",

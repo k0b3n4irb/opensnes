@@ -21,8 +21,8 @@ After this lesson, you will understand:
 
 ## What This Example Does
 
-Displays a static background image using Mode 1:
-- BG1 with 16 colors (4bpp)
+Displays a static background image using Mode 1, a rainy street at night:
+- BG1 with 16 colors (4bpp), 883 distinct tiles
 - Demonstrates standard SNES background setup
 - Foundation for most SNES games
 
@@ -41,29 +41,31 @@ Displays a static background image using Mode 1:
 
 | Button | Action |
 |--------|--------|
-| A | Show BG1 from the LZ77-decompressed copy of the tiles (VRAM $5000) |
-| B | Show it from the plain copy (VRAM $4000) |
+| A | Show BG1 from the LZ77-decompressed copy of the tiles (VRAM $4000) |
+| B | Show it from the plain copy (VRAM $0000) |
 
 The picture does not change: that is the point of the second copy.
 
 ### The same tiles, compressed
 
-`res/opensnes_lz.png` is the same picture with `lz = true` in its settings
-file: the build stores its tiles LZ77-compressed, **652 bytes** in ROM for
-the **2592** of the plain copy. At boot the example decodes them straight
+`res/street_lz.png` is the same picture with `lz = true` in its settings
+file: the build stores its tiles LZ77-compressed, **18816 bytes** in ROM for
+the **28256** of the plain copy. At boot the example decodes them straight
 into VRAM, in force blank:
 
 ```c
-#include "res/opensnes_lz.inc"   /* opensnes_lz_tiles[] (compressed), _pal[], _map[] */
+#include "res/street_lz.inc"   /* street_lz_tiles[] (compressed), _pal[], _map[] */
 
-lzssDecodeVram(opensnes_lz_tiles, 0x5000);
+lzssDecodeVram(street_lz_tiles, 0x4000);
 ```
 
 and A / B switch BG1's character base between the two copies
-(`bgSetGfxPtr(0, 0x5000)` or `0x4000`) — one register, at any time. With
+(`bgSetGfxPtr(0, 0x4000)` or `0x0000`) — one register, at any time. With
 `lz = true` the `.inc` declares the arrays only, no `BgAsset`: `bgLoad()`
-would copy the compressed bytes. A quarter of the ROM for one call at load
-time.
+would copy the compressed bytes. Two thirds of the ROM for one call at load
+time. A painting compresses less than a flat logo: LZ77 saves on repeats,
+and almost every tile of this picture is a little different (a 2592-byte
+logo went to 652 bytes, a quarter).
 
 ---
 
@@ -135,14 +137,17 @@ setScreenOn();
 
 ## VRAM Layout
 
-A typical Mode 1 VRAM layout:
+This example's layout (word addresses), tight because the picture is there
+twice:
 
 ```
-$0000-$0FFF: BG1 tilemap (32x32 = 2KB)
-$1000-$1FFF: BG2 tilemap (optional)
-$2000-$3FFF: BG3 tilemap (optional)
-$4000-$7FFF: Tile graphics (16KB available)
+$0000-$372F: BG1 tiles, plain copy (883 tiles x 16 words)
+$4000-$772F: BG1 tiles, the LZ77-decompressed copy
+$7800-$7BFF: BG1 tilemap (32x32 entries)
 ```
+
+A character base is a multiple of $1000 words and a tilemap base a multiple
+of $400, which is what decides these three addresses.
 
 ### Tilemap Format
 
@@ -195,8 +200,9 @@ Then open `mode1.sfc` in luna (`luna-gui mode1.sfc`) or any emulator.
 | File | Purpose |
 |------|---------|
 | `main.c` | Background setup code |
-| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`, 16 colours); the build converts it and links the result, `res/opensnes.inc` declares the `BgAsset` |
-| `res/opensnes_lz.png.toml` | the same picture with `lz = true`: its tiles are linked LZ77-compressed, `res/opensnes_lz.inc` declares the arrays |
+| `res/street.png` | the picture: a rainy street at night, 256x256 (the last 32 rows are below the screen), 16 colours; generated for OpenSNES, CC0 (`assets/neo-lumen/`) |
+| `res/street.png.toml` | its import settings (`opensnes-tileset`, 16 colours); the build converts it and links the result, `res/street.inc` declares the `BgAsset` |
+| `res/street_lz.png.toml` | the same picture with `lz = true`: its tiles are linked LZ77-compressed, `res/street_lz.inc` declares the arrays |
 | `Makefile` | Build configuration (`LIB_MODULES := console sprite dma background asset lzss input`) |
 | `res/` | Source graphics files |
 
