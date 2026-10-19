@@ -95,8 +95,8 @@ per frame and `0x0140` is 1.25 pixels per frame.
 Read a pixel position the way the examples do:
 
 ```c
-mariox = objWorkspace.xpos[1] | (objWorkspace.xpos[2] << 8);
-marioy = objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8);
+kitx = objWorkspace.xpos[1] | (objWorkspace.xpos[2] << 8);
+kity = objWorkspace.ypos[1] | (objWorkspace.ypos[2] << 8);
 ```
 
 Write one by setting both bytes (and zeroing the fraction if you want an
@@ -184,7 +184,7 @@ underneath but the last tile property read was non-zero *and* the object's
 
 ## Slopes, and what the tests pin
 
-`objCollidMapWithSlopes` is what Mario uses in `examples/games/mapandobjects`.
+`objCollidMapWithSlopes` is what Kit uses in `examples/games/mapandobjects`.
 A slope tile is not a wall: walking into one must *lift* the object to the
 surface height for its horizontal position within the tile, not stop it. The
 routine does that by indexing a per-slope-type height table with the object's
@@ -196,24 +196,25 @@ upper halves of a 2×1 slope in each direction (`T_SLOPELU2`, `T_SLOPELD2`,
 `T_SLOPEUU2`, `T_SLOPEUD2`). You assign them per tile in the map's attribute
 layer.
 
-The functional test `testing/manifests/movement_mapandobjects_slope.toml`
-pins exactly the distinction that matters, measured on luna with RIGHT held:
+The functional tests `testing/manifests/movement_mapandobjects_slope.toml` and
+`movement_mapandobjects_wall.toml` pin exactly the distinction that matters,
+measured on luna with RIGHT held (the first one jumps the first vent at frame
+150 to reach the first ramp, 22.5 degrees, two rows up):
 
 | Frame | Position | What it proves |
 |---|---|---|
-| 60 | `(32, 96)` | spawned and settled on flat ground |
-| 120 | `(99, 96)` | 67 pixels along the flat — Y untouched |
-| 144 | `(127, 89)` | on the slope: 28 pixels right, lifted 7 pixels up |
-| 216 | `(209, 96)` | back on flat ground past the slope |
-| 300 | `(209, 96)` | RIGHT still held, but a solid tile stops him dead |
+| 280 | `(268, 160)` | on the flat before the ramp |
+| 300 | `(292, 154)` | on the ramp: moving right, lifted 6 pixels |
+| 340 | `(331, 144)` | on the flat at the top, 16 pixels higher |
+| 200 and 400 | `(129, 160)` | without the jump: the vent, a solid tile, stops him dead |
 
-Frames 144 and 300 are the two halves of the contract: a slope lifts, a wall
-stops. The companion manifest `movement_mapandobjects.toml` pins the
+The ramp and the vent are the two halves of the contract: a slope lifts, a
+wall stops. The companion manifest `movement_mapandobjects.toml` pins the
 flat-ground case the same way — walking right and left along a floor with
-Y constant at 96, which is the "he never falls through the floor" negative.
+Y constant at 160, which is the "he never falls through the floor" negative.
 
-One practical note from the same example: Mario is declared with
-`width = 14` and `xofs = 1` rather than a full 16. The comment in `mario.c`
+One practical note from the same example: Kit is declared with
+`width = 14` and `xofs = 1` rather than a full 16. The comment in `kit.c`
 says a width of 16 misbehaves on slopes. Leave a pixel of slack on each side
 of a 16-pixel sprite.
 

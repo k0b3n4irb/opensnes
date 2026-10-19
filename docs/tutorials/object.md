@@ -98,8 +98,8 @@ directly:
 
 ```c
 objInitEngine();
-objInitFunctions(0, marioinit,  marioupdate,  0);
-objInitFunctions(1, goombainit, goombaupdate, 0);
+objInitFunctions(0, kitinit,    kitupdate,    0);
+objInitFunctions(1, insectinit, insectupdate, 0);
 ```
 
 The parameters are typed, so a callback with the wrong signature is a compile
@@ -133,9 +133,9 @@ anything.
 
 ```c
 objInitEngine();
-objInitFunctions(0, marioinit,  marioupdate,  0);   /* the calls shown above */
-objInitFunctions(1, goombainit, goombaupdate, 0);
-objLoadObjects((u8 *)&objmario);
+objInitFunctions(0, kitinit,    kitupdate,    0);   /* the calls shown above */
+objInitFunctions(1, insectinit, insectupdate, 0);
+objLoadObjects((u8 *)&objlevel);
 ```
 
 ### Spawning one object by hand
@@ -147,17 +147,17 @@ detected. It returns 0 when the pool is full, and also stores the handle in
 `objGetCurrentId()`.
 
 The canonical init callback looks like this (from
-`examples/games/mapandobjects/mario.c`):
+`examples/games/mapandobjects/kit.c`):
 
 ```c
-void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
+void kitinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     if (objNew(type, xp, yp) == 0)
         return;                     /* pool full */
 
     /* objNew already copied the new record into objWorkspace;
        objGetPointer re-selects it and validates the handle. */
     objGetPointer(objGetCurrentId());
-    marioid = objGetCurrentId();
+    kitid = objGetCurrentId();
 
     /* Width 14 + xofs 1 is critical for slope collision (width 16 bugs) */
     objWorkspace.width  = 14;
@@ -257,7 +257,7 @@ and how the `T_*` tile properties act is in @ref tutorial_object_engine.
 All three write back into the workspace:
 
 - **`tilestand`** — non-zero when the object is resting on something. This is
-  the ground test. `mario.c` gates its jump on it:
+  the ground test. `kit.c` gates its jump on it:
   `if (objWorkspace.tilestand != 0) { ... }`.
 - **`tilesprop`** — the property word of the tile under the object's feet.
 - **`tilebprop`** — the property word of the tile hit on the left or right

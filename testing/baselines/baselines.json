@@ -210,10 +210,10 @@
     "rom_sha256": "5f2ffb8ec2aef5b3ef44b5ef87905de1c813443e685608fabd30e4025949664e"
   },
   "games_mapandobjects": {
-    "fbhash": "ba3043020ed171e2",
+    "fbhash": "509ce3b81e6d90f7",
     "frames": 200,
     "luna_version": "v1.39.0",
-    "rom_sha256": "2c4d9a4780a2fa73288db712d0ea2579e3e50603c46fafacd59857dc2a2ccc8e"
+    "rom_sha256": "17a3fe7caf3604865065fdb1b257561da2ab9043f5a2b3ca8fb2a8741357d950"
   },
   "games_mode7_racing": {
     "fbhash": "06cc637f6ad6d28d",

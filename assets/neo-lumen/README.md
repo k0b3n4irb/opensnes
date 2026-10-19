@@ -76,6 +76,15 @@ by `examples/sprites/animated_sprite` (`res/kit_walk.png`).
 | `tiles/roof_2.png` to `tiles/roof_5.png` | four more in their style, the strip on the same row | `generate-with-style-v2`, `roof_0` and `roof_1` as style, seed 4100 | `examples/games/likemario`, `examples/maps/map_scroll` (the same) |
 | `characters/kit_side_sheet.png` | Kit seen from the side, 32x32 frames, four a row: idle 0-3, walk 4-11, run 12-19, jump 20-27 (block 28 is the owl's, unused) | PixelLab: the character with an east view, its `breathing-idle`, `running-8-frames` and `jumping-1` templates and a v3 walk, all put back on his 15 colours with `reduce-colors` (2026-10-18) | `examples/games/likemario`, `examples/maps/map_scroll` (`res/kit.png`) |
 
+### The machines' cycles
+
+`characters/walk/insect_<0-3>.png`, `automaton_<0-3>.png`, `drone_<0-3>.png`: four
+frames each (the frames after the first one PixelLab returns), `animate-with-text-v3`
+on `insect.png`, `automaton.png` and `drone.png` (a crawl, a walk with the shield, a
+hover), seeds 5000 to 5002; no palette is given there, so the build's conversion
+puts them back on the machines' 15 colours (`devtools/art_assets/build.py`). The
+insect and the automaton walk in `examples/games/mapandobjects`.
+
 ### More backgrounds, not used yet
 
 | File | What | Seed | Note |

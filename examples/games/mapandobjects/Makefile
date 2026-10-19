@@ -10,7 +10,7 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET      := mapandobjects.sfc
 ROM_NAME    := OPENSNES MAPNOBJ
 
-CSRC        := main.c mario.c goomba.c koopatroopa.c
+CSRC        := main.c kit.c insect.c automaton.c
 ASMSRC      := data.asm
 
 USE_LIB     := 1

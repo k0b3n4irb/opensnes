@@ -1,9 +1,9 @@
 ASSET_SECTION ".rodata1"
 
-mapmario:
+maplevel:
 .incbin "res/BG1.m16"
 
-objmario:
+objlevel:
 .incbin "res/level.o16"
 
 tilesetatt:

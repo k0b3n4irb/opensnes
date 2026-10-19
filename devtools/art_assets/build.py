@@ -20,6 +20,19 @@ maps/map_scroll:
                       its `attribute` (FF00 solid) for opensnes-level
   res/kit.png         Kit seen from the side, as for likemario
 
+games/mapandobjects:
+  res/tiles.png       roofs with ramps, 8x8 tiles drawn here: the strip and
+                      the wall sampled from roof_1, the six slope shapes of
+                      the object engine (45 degrees, and 22.5 in two
+                      halves) and the vents as code
+  res/BG1.m16         the map (the map module's format)
+  res/level.t16       one word per tile: its VRAM tile (no palette bits)
+  res/level.b16       one word per tile: T_EMPTY, T_SOLID or a T_SLOPE*
+  res/level.o16       the objects: Kit, two robot insects, two automatons
+  res/kit.png         Kit from the side; res/insect.png, res/automaton.png
+                      their walks, 32x32 frames four to a row
+  res/skyline.png     BG2, the far towers (likemario's)
+
 games/likemario:
   res/tiles.png       the level's distinct 8x8 tiles, in the order the map
                       numbers them (tile 0 is the empty sky), 128 px wide
@@ -54,6 +67,7 @@ ART = ROOT / "assets" / "neo-lumen"
 LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
 MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
+MAPANDOBJECTS = ROOT / "examples" / "games" / "mapandobjects" / "res"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)
@@ -340,6 +354,199 @@ def build_map_scroll() -> dict[str, bytes]:
             "_report": f"{width_px} px wide, {len(tiles)} tiles".encode()}
 
 
+# The object engine's slope codes (lib/include/snes/map.h)
+T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
+# a slope tile's surface: the first filled row at each x (0..7)
+SLOPE_TOP = {
+    T_SLOPEU1: lambda x: 7 - x,             # rises one row per pixel, to the right
+    T_SLOPED1: lambda x: x,
+    T_SLOPELU2: lambda x: 7 - x // 2,       # the lower half of a 2-wide ramp, rising
+    T_SLOPEUU2: lambda x: 3 - x // 2,       # its upper half
+    T_SLOPEUD2: lambda x: x // 2,           # the upper half of a 2-wide ramp, descending
+    T_SLOPELD2: lambda x: 4 + x // 2,
+}
+STRIP = (12, 11)                            # the neon strip's two rows: #48a0a0 then #307078
+
+# (kind, n): flat for n columns; up45 / down45 by n rows (one column a row);
+# up22 / down22 by n rows (two columns a row); vent: a 2x3 block on the flat
+SLOPES_LEVEL = [
+    ("flat", 22), ("vent", 0), ("flat", 12), ("up22", 2), ("flat", 10), ("up45", 3), ("flat", 14),
+    ("vent", 0), ("flat", 10), ("down45", 3), ("flat", 6), ("down22", 2), ("flat", 16), ("up45", 2),
+    ("flat", 8), ("up22", 2), ("flat", 18), ("vent", 0), ("flat", 12), ("down22", 4), ("flat", 12),
+    ("up45", 3), ("flat", 10), ("down45", 3), ("flat", 10), ("vent", 0), ("flat", 20),
+]
+BASE_ROW = 22
+
+
+def build_mapandobjects() -> dict[str, bytes]:
+    pal = palette()
+    roof = load_piece(1, pal)                       # moved 2 px down: the strip's top on row 64
+    wall = [[roof[64 + 16 + y][x] for x in range(64)] for y in range(32)]   # 8x4 tiles of windows and pipes
+    strip = [[roof[64 + y][x] for x in range(64)] for y in range(8)]        # the strip and the wall's top
+    deco = [[roof[16 + y][x] for x in range(128)] for y in range(48)]       # the equipment above the roof
+
+    def wall_px(gx, gy):
+        return wall[gy % 32][gx % 64]
+
+    def vent_px(x, y):                              # a 16x24 vent: a teal box, its grille, ink outline
+        if x in (0, 15) or y in (0, 23):
+            return 1
+        if y < 3:
+            return 12 if x % 2 else 11              # the lit top: #48a0a0 / #307078
+        return 11 if (y % 3 == 0) else 10           # the grille's slats: #307078 on #205058
+
+    cols = 2
+    for kind, n in SLOPES_LEVEL:
+        cols += {"flat": n, "up45": n, "down45": n, "up22": 2 * n, "down22": 2 * n, "vent": 0}[kind]
+    cols = max(cols, 40)
+    cell = [[None] * cols for _ in range(ROWS)]      # (pixels, attribute) per cell
+    top = [BASE_ROW] * cols                          # the surface row of each column
+    shape = [None] * cols                            # the slope code where there is one
+    vents = []
+    c, row = 0, BASE_ROW
+    plan = [("flat", 2)] + SLOPES_LEVEL
+    for kind, n in plan:
+        if kind == "flat":
+            for _ in range(n):
+                top[c] = row; c += 1
+        elif kind == "vent":
+            vents.append(c - 6)
+        elif kind in ("up45", "down45"):
+            # a rising tile sits on the row of the new height (from its bottom
+            # to its top); a falling one on the row it leaves
+            for _ in range(n):
+                if kind == "up45":
+                    row -= 1; top[c] = row; shape[c] = T_SLOPEU1
+                else:
+                    top[c] = row; shape[c] = T_SLOPED1; row += 1
+                c += 1
+        else:
+            for _ in range(n):
+                if kind == "up22":
+                    row -= 1
+                    top[c], shape[c] = row, T_SLOPELU2
+                    top[c + 1], shape[c + 1] = row, T_SLOPEUU2
+                else:
+                    top[c], shape[c] = row, T_SLOPEUD2
+                    top[c + 1], shape[c + 1] = row, T_SLOPELD2
+                    row += 1
+                c += 2
+    for k in range(c, cols):
+        top[k] = row
+    width_px = cols * 8
+
+    for cx in range(cols):
+        for cy in range(ROWS):
+            gx = cx * 8
+            if shape[cx] is not None and cy == top[cx]:
+                f = SLOPE_TOP[shape[cx]]
+                px = []
+                for yy in range(8):
+                    for xx in range(8):
+                        t = f(xx)
+                        if yy < t:
+                            px.append(0)
+                        elif yy - t < 2:
+                            px.append(STRIP[yy - t])
+                        else:
+                            px.append(wall_px(gx + xx, cy * 8 + yy))
+                cell[cy][cx] = (bytes(px), shape[cx])
+            elif cy == top[cx] and shape[cx] is None:
+                cell[cy][cx] = (bytes(strip[yy][(gx + xx) % 64] for yy in range(8) for xx in range(8)), T_SOLID)
+            elif cy > top[cx]:
+                cell[cy][cx] = (bytes(wall_px(gx + xx, cy * 8 + yy) for yy in range(8) for xx in range(8)), T_SOLID)
+            else:
+                cell[cy][cx] = (bytes(64), 0)
+    # equipment on some long flats (never solid): the 48 rows above the strip of roof_1
+    for x0 in (40, 120, 200):
+        if x0 + 16 < cols and all(shape[k] is None and top[k] == top[x0] for k in range(x0, x0 + 16)):
+            for k in range(16):
+                for r in range(6):
+                    cy = top[x0] - 6 + r
+                    px = bytes(deco[r * 8 + yy][k * 8 + xx] for yy in range(8) for xx in range(8))
+                    if any(px):
+                        cell[cy][x0 + k] = (px, 0)
+    for v in vents:
+        for k in range(2):
+            for r in range(3):
+                cy = top[v] - 3 + r
+                cell[cy][v + k] = (bytes(vent_px(k * 8 + xx, r * 8 + yy) for yy in range(8) for xx in range(8)), T_SOLID)
+
+    tiles: list[bytes] = [bytes(64)]
+    attrs = [0]
+    index = {(bytes(64), 0): 0}
+    entries = []
+    for cy in range(ROWS):
+        for cx in range(cols):
+            key = cell[cy][cx]
+            if key not in index:
+                index[key] = len(tiles)
+                tiles.append(key[0])
+                attrs.append(key[1])
+            entries.append(index[key])
+    if len(tiles) > 1024:
+        sys.exit(f"mapandobjects: {len(tiles)} tiles")
+
+    m16 = struct.pack("<3H", width_px, ROWS * 8, len(entries) * 2) + struct.pack(f"<{len(entries)}H", *entries)
+    t16 = struct.pack(f"<{len(tiles)}H", *range(len(tiles)))
+    b16 = struct.pack(f"<{len(tiles)}H", *attrs)
+
+    def flat_run(k0, k1):
+        """(x min, x max) of the flat stretch of column k0..k1 at one height, in px."""
+        return k0 * 8, k1 * 8
+    def surface_y(k):
+        return top[k] * 8
+    # objects: x, y (top of a 16x16 box), type (0 Kit, 1 insect, 2 automaton), patrol x min, x max
+    flats = []
+    k = 0
+    while k < cols:
+        if shape[k] is None:
+            j = k
+            while j + 1 < cols and shape[j + 1] is None and top[j + 1] == top[k]:
+                j += 1
+            if j - k >= 9:
+                flats.append((k, j))
+            k = j + 1
+        else:
+            k += 1
+    objs = [(32, surface_y(4) - 16, 0, 0, 0)]
+    for n, (k0, k1) in enumerate(flats[1:5]):
+        obstacles = [v for v in vents if k0 <= v <= k1]
+        lo, hi = k0 + 1, k1 - 2
+        if obstacles:                                  # patrol on the side of the vent with more room
+            v = obstacles[0]
+            lo, hi = (k0 + 1, v - 3) if v - k0 > k1 - v else (v + 3, k1 - 2)
+        x = (lo + hi) // 2 * 8
+        objs.append((x, surface_y(k0) - 16, 1 if n % 2 == 0 else 2, lo * 8, hi * 8))
+    o16 = b"".join(struct.pack("<5H", *o) for o in objs) + struct.pack("<H", 0xFFFF)
+
+    def strip_sheet(frames, palname):
+        """Frames of 32x32 RGBA on a 128-px wide sheet, four a row, indexed on one of the cast palettes."""
+        cast = {"MACHINE": ["#080810", "#101828", "#203048", "#384050", "#586878", "#8898a8", "#b0c0d0",
+                            "#601838", "#a02860", "#e05090", "#684018", "#b07028", "#f0b050", "#28a0b0", "#e8e8f0"]}[palname]
+        pal2 = [(0, 0, 0)] + [rgb(c) for c in cast]
+        rows_ = (len(frames) + 3) // 4
+        out = Image.new("P", (128, rows_ * 32), 0)
+        out.putpalette([v for c in pal2 for v in c] + [0] * (768 - 3 * len(pal2)))
+        for n_, f in enumerate(frames):
+            im = Image.open(f).convert("RGBA")
+            for y in range(32):
+                for x in range(32):
+                    r, g, b, a = im.getpixel((x, y))
+                    if a < 128:
+                        continue
+                    k_ = min(range(15), key=lambda i: sum((p - q) ** 2 for p, q in zip(pal2[i + 1], (r, g, b))))
+                    out.putpixel(((n_ % 4) * 32 + x, (n_ // 4) * 32 + y), k_ + 1)
+        return out
+    walk = ART / "characters" / "walk"
+    return {"tiles.png": png(tile_sheet(tiles, pal)), "BG1.m16": m16, "level.t16": t16, "level.b16": b16,
+            "level.o16": o16, "kit.png": (ART / "characters" / "kit_side_sheet.png").read_bytes(),
+            "skyline.png": build_likemario()["skyline.png"],
+            "insect.png": png(strip_sheet([walk / f"insect_{i}.png" for i in range(4)], "MACHINE")),
+            "automaton.png": png(strip_sheet([walk / f"automaton_{i}.png" for i in range(4)], "MACHINE")),
+            "_report": f"{width_px} px wide, {len(tiles)} tiles, {len(objs)} objects {objs}".encode()}
+
+
 def png(im: Image.Image) -> bytes:
     import io
     buf = io.BytesIO()
@@ -351,9 +558,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--check", action="store_true", help="compare with the committed files instead of writing them")
     args = ap.parse_args()
-    jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll())]
+    jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
+            (MAPANDOBJECTS, build_mapandobjects())]
     print("likemario:", jobs[0][1].pop("_report").decode())
     print("map_scroll:", jobs[2][1].pop("_report").decode())
+    print("mapandobjects:", jobs[3][1].pop("_report").decode())
     bad = 0
     for folder, files in jobs:
         for name, data in files.items():

@@ -1,28 +1,27 @@
-# games/mapandobjects — the first Goomba patrols its stretch of the slope
-# level (world x 352-432, between the pipe and the first slope). Mario
-# crosses the two pipes on the way (a jump, then a high jump with UP+A) so
-# the camera reaches it.
+# games/mapandobjects: the first robot insect patrols its roof (world x
+# 328-376, after the first vent) while Kit walks towards it and the camera
+# follows.
 #
-# goombax is the Goomba's SCREEN x once its callback has run (world x minus
-# map_cam_x). Measured with this script: frame 330, goombax 150 with the
-# camera at 220 (world 370); frame 340, goombax 135 with the camera at 232
-# (world 367): it walks left, inside its range, while the camera follows
-# Mario. A Goomba that did not move, or ran off its range, changes both.
+# insectx is the insect's SCREEN x once its callback has run (world x minus
+# map_cam_x). Measured on luna on 2026-10-19 with this script: frame 280,
+# insectx 190 with the camera at 140 (world 330); frame 300, insectx 169
+# with the camera at 164 (world 333): it has reached the left end of its
+# range and turned back east (330 -> 333) while the camera follows Kit. An
+# insect that did not move, or walked out of its range, changes both.
 rom = "../../examples/games/mapandobjects/mapandobjects.sfc"
-#        RIGHT      A over pipe 1          UP+A over pipe 2
-input = "60:0x0100,195:0x0180,215:0x0100,225:0x0980,250:0x0100"
+input = "60:0x0100,150:0x0180,152:0x0100"
 
 [[checkpoint]]
-at_frame = 330
+at_frame = 280
 [checkpoint.values]
-goombax   = { eq = 150, width = 2 }
-map_cam_x = { eq = 220, width = 2 }
+insectx   = { eq = 190, width = 2 }
+map_cam_x = { eq = 140, width = 2 }
 
 [[checkpoint]]
-at_frame = 340
+at_frame = 300
 [checkpoint.values]
-goombax   = { eq = 135, width = 2 }
-map_cam_x = { eq = 232, width = 2 }
+insectx   = { eq = 169, width = 2 }
+map_cam_x = { eq = 164, width = 2 }
 
 [asserts.dma]
 unsafe_writes = 0
