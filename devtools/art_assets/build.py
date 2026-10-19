@@ -28,6 +28,18 @@ assets/ (the logo, devtools/art_assets/logo.py):
   logo_16x16.png      the two icons; logo.svg the 256 one as rects
   logo_256x224.png, favicon.ico, logo.svg
 
+mode7/perspective, mode7/dsp1_ground, mode7/perspective_rotate, mode7/rotate_scale
+(devtools/art_assets/mode7.py):
+  res/ground.png      the city from above, 1024x1024 in 235 distinct 8x8
+                      tiles (a Mode 7 map names 256): streets, roofs and
+                      two canals from two PixelLab Wang tilesets, the plaza
+                      and the helipads cut from the aerial view; rotate_scale
+                      calls it res/mode7bg.png
+  res/sky.png         the towers over the horizon, 512x256, the ground's
+                      first 16 colours (the 4bpp sky reads CGRAM 0-15);
+                      perspective and dsp1_ground only
+  res/glider.png      Kit's glider from above, 32x32; rotate_scale only
+
 hdma/gradient_colors, hdma/hdma_helpers:
   res/logo.png        the 256x224 logo on a transparent sky (index 0, never
                       drawn), so the HDMA gradients show behind Kit
@@ -76,6 +88,7 @@ from PIL import Image, ImageOps
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
+from mode7 import build_city, glider  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "neo-lumen"
@@ -86,6 +99,7 @@ MAPANDOBJECTS = ROOT / "examples" / "games" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
 HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
+MODE7 = ROOT / "examples" / "mode7"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)
@@ -576,12 +590,19 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--check", action="store_true", help="compare with the committed files instead of writing them")
     args = ap.parse_args()
+    city = build_city(ART)
+    ground, sky = png(city["ground"]), png(city["sky"])
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
             (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART)),
-            (GRADIENT_COLORS, {"logo.png": screen_logo(ART)}), (HDMA_HELPERS, {"logo.png": screen_logo(ART)})]
+            (GRADIENT_COLORS, {"logo.png": screen_logo(ART)}), (HDMA_HELPERS, {"logo.png": screen_logo(ART)}),
+            (MODE7 / "perspective" / "res", {"ground.png": ground, "sky.png": sky}),
+            (MODE7 / "dsp1_ground" / "res", {"ground.png": ground, "sky.png": sky}),
+            (MODE7 / "perspective_rotate" / "res", {"ground.png": ground}),
+            (MODE7 / "rotate_scale" / "res", {"mode7bg.png": ground, "glider.png": png(glider(ART))})]
     print("likemario:", jobs[0][1].pop("_report").decode())
     print("map_scroll:", jobs[2][1].pop("_report").decode())
     print("mapandobjects:", jobs[3][1].pop("_report").decode())
+    print(f"mode7 city: {city['_tiles']} tiles, {city['_colours']} colours")
     bad = 0
     for folder, files in jobs:
         for name, data in files.items():

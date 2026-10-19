@@ -87,7 +87,7 @@ console, dma, background, input, mode7, hdma, sprite, dsp1 (auto-added by `USE_D
 |------|---------|
 | `main.c` | Camera, DSP-1 calls, HDMA tables, double buffering |
 | `res/ground.png.toml`, `res/sky.png.toml` | the import settings of the Mode 7 ground (`mode = 7`) and the Mode 3 sky (`opensnes-tileset`); the build converts and links them, `res/*.inc` declare the symbols |
-| `res/ground.png`, `res/sky.png` | Textures shared with `mode7/perspective` (PVSnesLib Mode7Perspective, mills32 / alekmaul) |
+| `res/ground.png`, `res/sky.png` | the city from above and its towers over the horizon, shared with `mode7/perspective`; written by `devtools/art_assets/mode7.py` on one palette (the Mode 3 sky reads CGRAM 0-15, the ground's first sixteen colours), CC0, `assets/neo-lumen/` |
 
 ## Going Further
 

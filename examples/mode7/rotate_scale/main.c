@@ -49,66 +49,21 @@
 /** @brief Mode 7 tilemap (128x128 tile indices, one byte each), converted by the build from res/ */
 /** @brief 256-colour palette for the Mode 7 plane (512 bytes), converted by the build from res/ */
 
-/** @brief Where the glider is drawn: its 16x16 box centred on screen (128, 112). */
-#define GLIDER_X 120
-#define GLIDER_Y 104
+/** @brief Kit's glider seen from above, 32x32, converted by the build from res/glider.png */
+#include "res/glider.inc"    /* generated: glider_tiles[], glider_pal[], each with _end */
+
+/** @brief Where the glider is drawn: its 32x32 box centred on screen (128, 112). */
+#define GLIDER_X 112
+#define GLIDER_Y 96
 
 /** @brief Probe oracle: the shadow's offset below the glider, in pixels. */
 u16 shadow_dy;
 
-/** @brief 4 8x8 4bpp tiles = one 16x16 shape (built at init). */
-static u8 shape_tiles[128];
-
-/** @brief Encode a 16x16 palette-index grid into 4bpp OBJ quadrants. */
-static void encode_16x16(u8 pix[16][16]) {
-    u8 row, plane_i, t, q;
-    for (q = 0; q < 4; q++) {
-        u8 qx = (u8)((q & 1) * 8);
-        u8 qy = (u8)((q >> 1) * 8);
-        for (row = 0; row < 8; row++) {
-            for (plane_i = 0; plane_i < 4; plane_i += 2) {
-                u8 b0 = 0, b1 = 0;
-                for (t = 0; t < 8; t++) {
-                    u8 p = pix[qy + row][qx + t];
-                    b0 = (u8)((b0 << 1) | ((p >> plane_i) & 1));
-                    b1 = (u8)((b1 << 1) | ((p >> (plane_i + 1)) & 1));
-                }
-                shape_tiles[(u16)(q * 32) + (plane_i ? 16 : 0) + row * 2] = b0;
-                shape_tiles[(u16)(q * 32) + (plane_i ? 16 : 0) + row * 2 + 1] = b1;
-            }
-        }
-    }
-}
-
-/** @brief Draw the glider seen from above (index 1 body, 2 canopy). */
-static void build_glider(void) {
-    static u8 pix[16][16];
-    u8 x, y;
-    for (y = 0; y < 16; y++) {
-        for (x = 0; x < 16; x++) {
-            u8 dx = (u8)(x >= 8 ? x - 8 : 7 - x);
-            u8 v = 0;
-            if (y >= 2 && y <= 13 && dx <= 1)
-                v = 1;                                   /* fuselage */
-            if (y >= 6 && y <= 9 && dx <= (u8)(7 - (y - 6) * 2))
-                v = 1;                                   /* wings */
-            if (y >= 12 && y <= 13 && dx <= 3)
-                v = 1;                                   /* tail */
-            pix[y][x] = v;
-        }
-    }
-    for (y = 4; y < 7; y++) {
-        pix[y][7] = 2;
-        pix[y][8] = 2;                                   /* canopy */
-    }
-    encode_16x16(pix);
-}
-
 /** @brief Draw the shadow below the glider, further away the higher it flies. */
 static void place_shadow(u16 zscale) {
     shadow_dy = (u16)(zscale >> 5);           /* 8 px at 1:1, 60 at the widest view */
-    oamSet(0, GLIDER_X + 2, (u16)(GLIDER_Y + shadow_dy), 0, 1, 2, 0);
-    oamSetSize(0, OBJ_LARGE);
+    oamSet(1, GLIDER_X + 4, (u16)(GLIDER_Y + shadow_dy), 0, 1, 2, 0);
+    oamSetSize(1, OBJ_LARGE);
 }
 
 /**
@@ -152,21 +107,22 @@ int main(void) {
      * screen; this scroll puts it at screen (128, 112), under the glider */
     mode7SetScroll(0, 16);
 
-    /* The glider and its shadow: one 16x16 shape at OBJ base 3 ($6000),
-     * palette 0 orange and dark blue (it must show over a pale plane),
-     * palette 1 all dark for the shadow (the plane uses CGRAM 0-13, so 128
-     * and up are free) */
-    build_glider();
-    dmaCopyVram(shape_tiles, 0x6000, 64);
-    dmaCopyVram(shape_tiles + 64, 0x6100, 64);
-    setColor(129, RGB(31, 14, 0));
-    setColor(130, RGB(4, 6, 20));
-    setColor(145, RGB(3, 5, 3));
-    setColor(146, RGB(3, 5, 3));
-    oamInit(OBJ_SIZE8_L16, 3);
-    oamSet(1, GLIDER_X, GLIDER_Y, 0, 0, 3, 0);        /* sprite 1 = glider, in front */
-    oamSetSize(1, OBJ_LARGE);
-    place_shadow(zscale);                            /* sprite 0 = shadow, behind it */
+    /* The glider and its shadow: one 32x32 picture at OBJ base 3 ($6000),
+     * palette 0 its own colours, palette 1 all dark for the shadow (the
+     * plane uses CGRAM 0-15, so 128 and up are free) */
+    dmaCopyVram(glider_tiles, 0x6000, (u16)(glider_tiles_end - glider_tiles));
+    dmaCopyCGram(glider_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    {
+        u8 i;
+        for (i = 1; i < 16; i++)
+            setColor((u16)(OBJ_CGRAM_BASE + 16 + i), RGB(1, 1, 3));
+    }
+    oamInit(OBJ_SIZE8_L32, 3);
+    /* Between sprites the lower OAM index is drawn in front, whatever the
+     * priority bits (those only rank a sprite against the BGs) */
+    oamSet(0, GLIDER_X, GLIDER_Y, 0, 0, 3, 0);        /* sprite 0 = glider, in front */
+    oamSetSize(0, OBJ_LARGE);
+    place_shadow(zscale);                            /* sprite 1 = shadow, behind it */
 
     /* Turn on display with BG1 -- Mode 7 only supports a single BG layer
      * (BG1), so we enable just that on the main screen via REG_TM. */

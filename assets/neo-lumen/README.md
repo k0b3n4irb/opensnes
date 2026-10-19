@@ -49,7 +49,7 @@ and the character's own 15 colours as `target_palette`.
 | `characters/insect.png` | a crawling robot insect, side view | 107, #13 | — |
 | `characters/hunter.png` | a security hunter aircraft, from above | 108, #10 | — |
 | `characters/bike.png` | Kit on a hover-bike, from behind | 109, #40 | — |
-| `characters/glider.png` | Kit's delivery glider, from above | 110, #51 | — |
+| `characters/glider.png` | Kit's delivery glider, from above | 110, #51 | `examples/mode7/rotate_scale` (`res/glider.png`) |
 
 `characters/topdown/<who>_<south|east|north|west>.png`: the first six
 registered as PixelLab characters with `create-character-v3` (`view: high
@@ -97,16 +97,34 @@ The wordmark and the 16x16 icon are drawn in `devtools/art_assets/logo.py`
 (OPEN in the cyan neon, SNES in the magenta, letters on a 6x7 grid with
 two-pixel stems), which composes the eight files of `assets/` (`make art-assets`).
 
+### The Mode 7 city
+
+A Mode 7 map names at most 256 distinct 8x8 tiles, and the aerial view has
+3448: cut down by clustering, it smears. So the ground is laid out from
+pieces instead (`devtools/art_assets/mode7.py`, `make art-assets`): 235
+tiles, 16 colours.
+
+| File | What | Made with | Used by |
+|---|---|---|---|
+| `tiles/wang_street_roof.png` | 16 Wang tiles of 16x16, street (lower) to roof (upper) with a neon curb; tile `NW<<3 \| NE<<2 \| SW<<1 \| SE` (1 = roof) at `(k % 4, k / 4)` | `create-tileset`, standard, `high top-down`, `transition_size` 0.25, 16x16 crops of `aerial.png` as lower and upper references and the whole of it as `color_image`, seed 7100 | the Mode 7 ground below |
+| `tiles/wang_street_canal.png` | the same from street to canal water, on the first set's street tile (`lower_base_tile_id`) | the same, seed 7101 | the same |
+| `backgrounds/aerial.png` | the city from above, 512x512 | `generate-image-v2`, seed 115, the city's 15 colours | the plaza (a disk of radius 40 round its centre), two helipads and a skylight, stamped on the ground |
+| `backgrounds/skyline_mid.png` | mid-distance towers, 512x224, transparent sky | `generate-image-v2`, seed 113, the city's 15 colours | the bottom rows are in `parallax_city.png`; at half size, mirrored to wrap at 512, the sky of the Mode 7 city |
+
+The ground is `res/ground.png` of `examples/mode7/perspective`, `dsp1_ground`
+and `perspective_rotate`, and `res/mode7bg.png` of `rotate_scale`; the sky is
+`res/sky.png` of the first two. The sky's 16 colours are the ground's first
+sixteen, because its 4bpp layer reads CGRAM 0-15, the start of the ground's
+palette.
+
 ### More backgrounds, not used yet
 
 | File | What | Seed | Note |
 |---|---|---|---|
-| `backgrounds/skyline_mid.png` | mid-distance towers, 512x224, transparent sky | 113 | a parallax layer; its bottom rows are in `parallax_city.png` |
 | `backgrounds/noodlebar.png` | the noodle bar from above, 256x224 | 114 | an RPG interior |
-| `backgrounds/aerial.png` | the city from above, 512x512 | 115 | to bring down to 256 tiles for Mode 7 |
 | `backgrounds/title.png` | moon and skyline with room for a logo, 256x224 | 116 | its top and bottom four rows are an amber frame: repaint them before use |
 
-All four with `generate-image-v2` and the city's 15 colours.
+Both with `generate-image-v2` and the city's 15 colours.
 
 An example keeps its own copy in its `res/` folder, in the form its
 converter takes (indexed, padded, cut); this folder keeps the picture as

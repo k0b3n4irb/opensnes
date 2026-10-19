@@ -288,6 +288,36 @@ What the owner hit while playing, and why, so the examples do not repeat it:
   `luna state --peek-at WaitForVBlank`); the GUI fell to 8–16 fps while
   the machine ran a dozen `rustc` at a load of 17 on 8 cores.
 
+### Mode 7: a ground in 256 tiles (2026-10-19)
+
+The four Mode 7 examples (perspective, dsp1_ground, perspective_rotate,
+rotate_scale) took the city from above. What was learnt:
+
+- **A generated picture does not reduce to 256 tiles.** `aerial.png` has
+  3448 distinct 8x8 tiles out of 4096: nothing in it sits on the 8-px grid,
+  so even its repeated helipads differ tile by tile. Clustering to 256
+  medoids (each cluster replaced by a real tile of it, weighted by use)
+  kept the streets and smeared the roofs and the plaza.
+- **A Wang tileset does.** `create-tileset` (standard, 16 px, 16x16 crops
+  of the aerial view as lower and upper references, the whole picture as
+  `color_image`) gave street→roof and, chained on the same street tile,
+  street→canal: 72 tiles of 8x8 for the whole road network, in the
+  picture's own colours (9). The pieces that make it a place (the plaza at
+  full size, two helipads, a skylight) are cut from the aerial view and
+  stamped on the 16-px grid, so each stamp costs its tiles once. Result:
+  235 tiles, 16 colours, `devtools/art_assets/mode7.py`.
+- **A layout rule for corner Wang sets**: two upper terrains never meet,
+  so the canal has a street on each side (vertices 15 and 18 around water
+  on 16-17); the generator asserts it per cell.
+- **The sky shares the ground's palette.** perspective and dsp1_ground draw
+  a 4bpp sky that reads CGRAM 0-15, which the 8bpp ground palette fills: the
+  sky's colours are written first and the ground's appended. The city's art
+  all being on the same 15-bit palette, the ground added two colours.
+- **Sprite order, not priority**: rotate_scale drew the shadow (OAM 0) over
+  the glider (OAM 1) while its comment said the opposite; the lower index
+  wins between sprites (snesdev-wiki *Sprites*, chunk c2d3d31a61323196). It
+  showed only once the glider was a real picture.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.

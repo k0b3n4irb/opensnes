@@ -99,9 +99,12 @@ scrolls by (0, 16) to put it on screen line 112, the middle:
 mode7SetScroll(0, 16);       /* plane point (128, 128) -> screen (128, 112) */
 ```
 
-The glider is a 16x16 sprite drawn there; the plane turns under it. Its
-shadow is the same shape in an all-dark palette, one priority lower, drawn
-`zscale >> 5` pixels below: 8 at 1:1, up to 60 at the widest view.
+The glider is Kit's, a 32x32 sprite drawn there; the plane turns under it.
+Its shadow is the same picture in an all-dark palette, drawn `zscale >> 5`
+pixels below: 8 at 1:1, up to 60 at the widest view. The glider is OAM entry
+0 and the shadow entry 1: between two sprites the lower index is drawn in
+front, whatever their priority bits, which only rank a sprite against the
+backgrounds ([SNESdev wiki, Sprites](https://snes.nesdev.org/wiki/Sprites)).
 
 ## SNES Concepts
 
@@ -139,7 +142,8 @@ the low byte.
 |------|---------|
 | `main.c` | Input handling, rotation/zoom logic, the glider and its shadow |
 | `res/mode7bg.png.toml` | the import settings of the Mode 7 picture (`opensnes-tileset`, `mode = 7`); the build converts and links it, `res/mode7bg.inc` declares the symbols |
-| `res/mode7bg.png` | Source image for Mode 7 ground |
+| `res/mode7bg.png` | the city from above, 1024x1024 in 235 tiles, written by `devtools/art_assets/mode7.py` (CC0, `assets/neo-lumen/`) |
+| `res/glider.png`, `res/glider.png.toml` | Kit's glider from above, 32x32 (`opensnes-sprite`) |
 | `Makefile` | `LIB_MODULES := console dma background sprite input mode7` |
 
 ## Going Further

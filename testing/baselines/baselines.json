@@ -301,15 +301,15 @@
   },
   "mode7_dsp1_ground": {
     "fbhash": [
-      "f9ca9f9be259bc9d",
-      "7f889749d99bb0f7"
+      "d4d3878cec617a8b",
+      "9b693b7138cc8c2b"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.39.0",
-    "rom_sha256": "43dd09542426e58bafa2454dd74583840599799533a2e799bcafbff56041b535"
+    "rom_sha256": "98c34085aeac96a506ef63730525570202cb202100cfc7077809941001cc13eb"
   },
   "mode7_extbg": {
     "fbhash": [
@@ -324,22 +324,22 @@
     "rom_sha256": "0d9ffd4c5b7f4e351d2767e38fc2fe225c6e3796ce06afdae9d85ca37c7d15df"
   },
   "mode7_perspective": {
-    "fbhash": "8c766c7491e36bef",
-    "frames": 200,
-    "luna_version": "v1.38.0",
-    "rom_sha256": "2d3d076998854498ffa3205b4cf678f05face17b531d7e6ffe02865c42d6cdfc"
-  },
-  "mode7_perspective_rotate": {
-    "fbhash": "42ad05319dbf8d47",
-    "frames": 200,
-    "luna_version": "v1.38.0",
-    "rom_sha256": "d0c54852e64e2f4a9a7309f0a9e45cb9a2d89e524f24820e12f084eeea6b8e31"
-  },
-  "mode7_rotate_scale": {
-    "fbhash": "be2875f66daaecb6",
+    "fbhash": "09a387b992e38993",
     "frames": 200,
     "luna_version": "v1.39.0",
-    "rom_sha256": "0da0d63db7943bb781283f1c0e1e4485e00bc1882b55d6bb5af317eb027624c7"
+    "rom_sha256": "d432ae9e4543e13a62ea9d41f9217ebbed589925e74b658f3bb91f7c2125bc74"
+  },
+  "mode7_perspective_rotate": {
+    "fbhash": "02d0fb981bad93bc",
+    "frames": 200,
+    "luna_version": "v1.39.0",
+    "rom_sha256": "d179bd534f3b5f5e4078326d2125befc3d45d04c088eb6ad6d144b3e9d8cc616"
+  },
+  "mode7_rotate_scale": {
+    "fbhash": "c1f5fddba80da5ad",
+    "frames": 200,
+    "luna_version": "v1.39.0",
+    "rom_sha256": "e6fd64fa737303ce96d81816e7ce3e8d14a6241d02ced70fffa801b7964c39f2"
   },
   "scrolling_continuous_scroll": {
     "fbhash": "cddaea614547e147",

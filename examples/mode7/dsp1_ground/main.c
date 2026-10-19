@@ -136,7 +136,7 @@ static const u8 dot_tile[32] = {
     0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
 };
 /** @brief OBJ palettes 0 and 1: colour 1 = neon cyan (the cube), then magenta
- *  (the beacons). The ground uses CGRAM 0-33 only, so 128 and up are free. */
+ *  (the beacons). The ground uses CGRAM 0-15 only, so 128 and up are free. */
 static const u8 dot_pal[64] = {
     0x00,0x00, 0xE0,0x7F, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,
     0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,
