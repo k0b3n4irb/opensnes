@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo_128x128.png" alt="OpenSNES" width="128" height="128"/>
+<img src="assets/logo_256x256.png" alt="OpenSNES: Kit the fox-kit courier over the OPENSNES wordmark" width="256" height="256"/>
 
 # OpenSNES
 

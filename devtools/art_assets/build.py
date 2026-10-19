@@ -20,6 +20,14 @@ maps/map_scroll:
                       its `attribute` (FF00 solid) for opensnes-level
   res/kit.png         Kit seen from the side, as for likemario
 
+assets/ (the logo, devtools/art_assets/logo.py):
+  logo_256x256.png    Kit the mascot over the OPENSNES wordmark; 256x224 the
+  logo_128x128.png    same on the night sky (a SNES screen); 128 his head
+  logo_64x64.png      over a smaller wordmark; 64 his head; 32 and 16 an
+  logo_32x32.png      icon of his head (the 16 drawn by hand); favicon.ico
+  logo_16x16.png      the two icons; logo.svg the 256 one as rects
+  logo_256x224.png, favicon.ico, logo.svg
+
 games/mapandobjects:
   res/tiles.png       roofs with ramps, 8x8 tiles drawn here: the strip and
                       the wall sampled from roof_1, the six slope shapes of
@@ -62,12 +70,16 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from logo import build_logo  # noqa: E402  (the logo is a module of its own)
+
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "neo-lumen"
 LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
 MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "games" / "mapandobjects" / "res"
+LOGO = ROOT / "assets"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)
@@ -559,7 +571,7 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="compare with the committed files instead of writing them")
     args = ap.parse_args()
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
-            (MAPANDOBJECTS, build_mapandobjects())]
+            (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART))]
     print("likemario:", jobs[0][1].pop("_report").decode())
     print("map_scroll:", jobs[2][1].pop("_report").decode())
     print("mapandobjects:", jobs[3][1].pop("_report").decode())

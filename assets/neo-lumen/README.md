@@ -85,6 +85,18 @@ hover), seeds 5000 to 5002; no palette is given there, so the build's conversion
 puts them back on the machines' 15 colours (`devtools/art_assets/build.py`). The
 insect and the automaton walk in `examples/games/mapandobjects`.
 
+### The logo
+
+| File | What | Made with | Used by |
+|---|---|---|---|
+| `logo/kit_mascot.png` | Kit in a logo pose, a fist raised, 128x128 | `generate-image-v2`, Kit's front pose as style, his 15 colours, seed 6000, candidate #0 of 4 | `assets/logo_256x256.png`, `logo_256x224.png`, `logo.svg` |
+| `logo/kit_head.png` | his head and shoulders, 64x64 | the same, seed 6001, #0 of 16 | `assets/logo_128x128.png`, `logo_64x64.png` |
+| `logo/kit_icon.png` | his head as an icon, 32x32 | the same, seed 6000, #63 of 64 | `assets/logo_32x32.png`, `favicon.ico` |
+
+The wordmark and the 16x16 icon are drawn in `devtools/art_assets/logo.py`
+(OPEN in the cyan neon, SNES in the magenta, letters on a 6x7 grid with
+two-pixel stems), which composes the eight files of `assets/` (`make art-assets`).
+
 ### More backgrounds, not used yet
 
 | File | What | Seed | Note |
