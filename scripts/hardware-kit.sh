@@ -11,13 +11,19 @@ n=0; missing=0
 grep -E '^\| [0-9]+ \| `[a-z0-9_/]+` \|' "$doc" | while IFS= read -r line; do
     num=$(printf '%s' "$line" | sed -E 's/^\| ([0-9]+) \|.*/\1/')
     ex=$(printf '%s' "$line" | sed -E 's/^\| [0-9]+ \| `([a-z0-9_/]+)`.*/\1/')
-    rom=$(ls "$here/examples/$ex"/*.sfc 2>/dev/null | head -1)
+    # A row names an example (examples/<ex>) or, for a ROM that asks the
+    # hardware a question no reader needs, a fixture by its path from the root
+    case "$ex" in
+        testing/*) dir="$ex"; name=$(basename "$ex"); build="make fixtures" ;;
+        *) dir="examples/$ex"; name=$(printf '%s' "$ex" | tr '/' '_'); build="make examples" ;;
+    esac
+    rom=$(ls "$here/$dir"/*.sfc 2>/dev/null | head -1)
     if [ -z "$rom" ]; then
-        echo "MISSING $ex (no .sfc in examples/$ex) — build it first (make examples)" >&2
+        echo "MISSING $ex (no .sfc in $dir) — build it first ($build)" >&2
         touch "$out/.missing"
         continue
     fi
-    dst=$(printf '%02d_%s.sfc' "$num" "$(printf '%s' "$ex" | tr '/' '_')")
+    dst=$(printf '%02d_%s.sfc' "$num" "$name")
     cp "$rom" "$out/$dst"
     echo "$dst"
 done

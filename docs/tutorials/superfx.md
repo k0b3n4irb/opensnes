@@ -126,8 +126,7 @@ int main(void) {
 `gsuLaunch()` copies nothing and disables nothing: the CPU waits in a WRAM
 loop while the GSU owns the cartridge, and interrupts keep working
 (@ref tutorial_superfx_advanced explains how). Adjust `gsu_cfgr` (IRQ mask, fast multiply) and `gsu_scmr`
-(colour depth, bus grants) before the call when your program needs it —
-`examples/chips/superfx_hello` sets both.
+(colour depth, bus grants) before the call when your program needs it.
 
 ## Super FX Assembly Rules
 
@@ -281,10 +280,8 @@ presents, and saving to the battery-backed Game Pak RAM.
 
 | Example | What it demonstrates |
 |---------|---------------------|
-| [superfx_hello](../../examples/chips/superfx_hello/) | Boot, registers, SRAM read/write |
 | [superfx_3d](../../examples/chips/superfx_3d/) | Rotating wireframe cube, Bresenham line drawing, 3D projection |
 | [superfx_game_skeleton](../../examples/chips/superfx_game_skeleton/) | A game loop at 60 fps while the GSU renders from its cache; double-buffered presentation |
-| [superfx_save](../../examples/chips/superfx_save/) | A boot counter kept in the battery-backed Game Pak RAM, through the `sram` module |
 
 ## Further Reading
 

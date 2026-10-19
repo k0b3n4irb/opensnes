@@ -3,7 +3,7 @@
 # header's native vectors point at them (manual Book II §5.4.1, table
 # 2-5-1), so an NMI while the GSU owns the ROM lands on the same handler as
 # an NMI while it does not. Opcode byte of each stub:
-rom = "../../examples/chips/superfx_hello/superfx_hello.sfc"
+rom = "../fixtures/retired_examples/superfx_hello/superfx_hello.sfc"
 [[checkpoint]]
 at_frame = 30
 [checkpoint.values]

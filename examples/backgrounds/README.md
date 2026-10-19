@@ -14,7 +14,6 @@ trade of colours against layers against resolution.
 | [mode3](mode3/) | How do I show a 256-colour (8bpp, Mode 3) background? |
 | [mode5_hires](mode5_hires/) | How do I use a hi-res (512-wide, Mode 5 + interlace) background? |
 | [mode2](mode2/) | How do I scroll each column independently (offset-per-tile, modes 2/4/6)? |
-| [mode6](mode6/) | How does offset-per-tile work in hi-res (Mode 6)? |
 
 > Moving the world past the camera lives in its own family: [`scrolling/`](../scrolling/).
 

@@ -2,7 +2,7 @@
 # power cycles. USE_SUPERFX + USE_SRAM: the header says $15 (GSU + battery),
 # the RAM size at $FFBD (GSU_RAM_KB, 64), and the sram module addresses
 # $70:0000 — the GSU's RAM, which is also the cartridge's save memory.
-OPENSNES := $(shell cd ../../.. && pwd)
+OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET      := superfx_save.sfc
 ROM_NAME    := SUPERFX SAVE

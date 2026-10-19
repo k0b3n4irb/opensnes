@@ -1,4 +1,4 @@
-OPENSNES := $(shell cd ../../.. && pwd)
+OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET      := superfx_hello.sfc
 ROM_NAME    := SUPERFX HELLO        

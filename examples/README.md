@@ -18,7 +18,7 @@ The table below counts them per folder.
 | [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
 | [basics/](basics/) | 5 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
-| [backgrounds/](backgrounds/) | 6 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
+| [backgrounds/](backgrounds/) | 5 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
 | [sprites/](sprites/) | 7 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
 | [hdma/](hdma/) | 3 | Per-scanline HDMA effects: gradients, waves, raster |
 | [color/](color/) | 5 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
@@ -30,7 +30,7 @@ The table below counts them per folder.
 | [audio/](audio/) | 5 | Music and sound effects: SNESMOD and raw APU/DSP |
 | [maps/](maps/) | 1 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
-| [chips/](chips/) | 7 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
+| [chips/](chips/) | 3 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
 | [games/](games/) | 7 | Complete game projects (falling blocks, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
 
 ## Building

@@ -61,9 +61,6 @@ frames = [200, 400]
 [examples."backgrounds/mode2"]
 frames = [200, 400]
 
-[examples."backgrounds/mode6"]
-frames = [200, 400]          # the offset-per-tile wave travels
-
 # DSP-1 ground: the coprocessor streams the floor every frame and the camera
 # idles while the cube tumbles above it (two capture points: the cube turns
 # between them). Firmware-gated — luna LLE-emulates the DSP-1 and needs

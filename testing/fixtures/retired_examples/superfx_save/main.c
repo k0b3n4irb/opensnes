@@ -1,47 +1,48 @@
 /**
  * @file main.c
- * @brief SA-1 save: a boot counter that survives the power switch, in BW-RAM
+ * @brief Super FX save: a boot counter that survives the power switch, in Game Pak RAM
  * @ingroup examples
  *
- * On an SA-1 cartridge the battery-backed memory is not the LoROM SRAM at
- * $70:0000 but the SA-1's BW-RAM, seen by the SNES CPU at $40:0000 and
- * writable only once SBWE ($2226) is set — which crt0 does on an SA-1 build.
- * The sram module addresses it for you: this example is the same call
- * sequence as memory/save_game, on the other memory.
+ * A Super FX cartridge has one RAM, the GSU's Game Pak RAM at $70:0000: the
+ * chip draws into it, and when the board has a battery it is also the save
+ * memory (header type $15, `USE_SRAM := 1`; its size is declared at $FFBD,
+ * `GSU_RAM_KB`). The sram module addresses it like any other save memory —
+ * this example is memory/save_game's call sequence on a Super FX board, with
+ * the GSU stopped the whole time.
  *
  * It keeps one number: how many times the console has been switched on.
  * At boot it reads the counter and a magic word; a matching magic means a
- * previous run saved here (a fresh cart reads whatever the chip powered up
+ * previous run saved here (a fresh cart reads whatever the RAM powered up
  * with, so the magic decides, not a zero). It adds one, saves, and prints
- * both the value it found and the value it wrote. Power-cycle: the screen
- * shows one more. That is the whole test — and the one a console session
- * needs (docs/HARDWARE_VERIFICATION.md, row 25).
+ * both. Power-cycle: the screen shows one more. The block sits at $E000,
+ * above the two 16 KB framebuffers a game would use (chips/superfx_game_skeleton)
+ * — a game that presents frames must keep its save out of them.
  *
  * @par SNES Concepts
- * - SA-1 BW-RAM as the save memory: $40:0000 for the SNES CPU, SBWE first
+ * - Game Pak RAM is the GSU's work RAM and the battery-backed save memory
+ * - The save block must not overlap the framebuffers the GSU draws into
  * - A magic word tells a saved block from power-on garbage
- * - The sram module is the same API on LoROM, HiROM, SA-1 and Super FX carts
  *
  * @par What to Observe
  * - "FOUND" is the saved counter (or "NONE" on a fresh cart), "NOW" is
- *   FOUND + 1; both printed as decimal
+ *   FOUND + 1
  * - Switch the console off and on: NOW increments by one each time
- * - "SA-1 READY" confirms the coprocessor booted (sa1IsReady)
+ * - "GSU PRESENT" confirms the header and the chip agree (gsuIsPresent)
  *
  * @par Modules Used
- * console, dma, background, text, sa1, sram
+ * console, dma, background, text, sram, superfx
  *
- * @see sram.h, sa1.h, memory/save_game, chips/superfx_save
+ * @see sram.h, superfx.h, memory/save_game, the sa1_save fixture
  */
 
 #include <snes.h>
 #include <snes/sram.h>
-#include <snes/sa1.h>
+#include <snes/superfx.h>
 
-/** @brief Marks a block this program wrote (any value a powered-up chip is unlikely to hold) */
-#define SAVE_MAGIC 0x5A1E
-/** @brief BW-RAM byte offset of the save block */
-#define SAVE_AT    0x0000
+/** @brief Marks a block this program wrote */
+#define SAVE_MAGIC 0x5F5A
+/** @brief Game Pak RAM byte offset of the save block: above two 16 KB framebuffers */
+#define SAVE_AT    0xE000
 
 /** @brief The saved block: the magic word, then the counter */
 typedef struct {
@@ -55,17 +56,15 @@ SaveBlock found;
 SaveBlock now;
 /** @brief 1 when `found` carried the magic word (a previous run saved here) */
 u16 had_save;
-/** @brief sa1IsReady() at boot: 1 on a working SA-1 cartridge */
-u16 sa1_ready;
+/** @brief gsuIsPresent() at boot: 1 on a Super FX cartridge */
+u16 gsu_present;
 
 int main(void) {
     consoleInit();
     textModeInit();
 
-    sa1_ready = sa1IsReady();
+    gsu_present = gsuInit();
 
-    /* Read first: on a fresh cartridge this is power-on garbage, which the
-     * magic word tells apart from a block we wrote. */
     sramLoadOffset((u8 *)&found, sizeof(SaveBlock), SAVE_AT);
     had_save = (found.magic == SAVE_MAGIC) ? 1 : 0;
 
@@ -73,7 +72,7 @@ int main(void) {
     now.boots = had_save ? (u16)(found.boots + 1) : 1;
     sramSaveOffset((u8 *)&now, sizeof(SaveBlock), SAVE_AT);
 
-    textPrintAt(5, 3, "SA-1 BW-RAM SAVE");
+    textPrintAt(4, 3, "SUPER FX RAM SAVE");
     textPrintAt(3, 7, had_save ? "FOUND:" : "FOUND: NONE");
     if (had_save) {
         textSetPos(10, 7);
@@ -82,7 +81,7 @@ int main(void) {
     textPrintAt(3, 9, "NOW:");
     textSetPos(10, 9);
     textPrintU16(now.boots);
-    textPrintAt(3, 13, sa1_ready ? "SA-1 READY" : "SA-1 NOT READY");
+    textPrintAt(3, 13, gsu_present ? "GSU PRESENT" : "GSU NOT PRESENT");
     textPrintAt(3, 17, "POWER OFF AND ON:");
     textPrintAt(3, 18, "NOW COUNTS ONE MORE");   /* the writers raise the flush themselves */
 

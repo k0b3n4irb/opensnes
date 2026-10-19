@@ -1,7 +1,7 @@
 # SA-1 Hello World Example
 # Verifies SA-1 cartridge type is detected by emulator
 
-OPENSNES := $(shell cd ../../.. && pwd)
+OPENSNES := $(shell cd ../../../.. && pwd)
 
 TARGET   := sa1_hello.sfc
 ROM_NAME := SA1 HELLO WORLD

@@ -10,6 +10,13 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 
 ## 1. Résumé
 
+> **Avancement au 2026-10-19 :** les fusions de la section 2 sont faites (60 exemples), et les cinq
+> **Fix** sont sous `testing/fixtures/retired_examples/` (`mode6`, `sa1_hello`, `sa1_save`,
+> `superfx_hello`, `superfx_save`). Les lignes 23, 25 et 26 du protocole matériel les nomment par
+> leur chemin ; `make hardware-kit` et `make hardware-preflight` construisent ces fixtures avant de
+> lire la table. Reste ouvert : `superfx_3d` gardé (à confirmer par le propriétaire). Le tutoriel
+> SA-1 porte la sauvegarde en BW-RAM que `sa1_save` enseignait.
+
 - **85 exemples** (le `examples/README.md` annonce « 88 small ROMs » alors que son propre tableau totalise 85 :
   l'ancre 3 de `check_doc_drift.py` ne voit pas cette formulation).
 - Verdicts proposés : **31 gardés** (même leçon, nouveaux assets) · **27 recadrés** (la plupart absorbent

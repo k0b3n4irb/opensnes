@@ -22,5 +22,9 @@ def discover_example_roms() -> list[Path]:
 
 
 def example_key(rom: Path) -> str:
-    """Example path relative to examples/ (the dir holding main.c)."""
-    return str(rom.parent.relative_to(REPO_ROOT / "examples"))
+    """Example path relative to examples/ (the dir holding main.c); a ROM
+    outside examples/ (a fixture a protocol row names) keys by its path from
+    the repository root, testing/fixtures/...."""
+    if rom.parent.is_relative_to(REPO_ROOT / "examples"):
+        return str(rom.parent.relative_to(REPO_ROOT / "examples"))
+    return str(rom.parent.relative_to(REPO_ROOT))

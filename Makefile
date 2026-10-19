@@ -55,7 +55,7 @@ FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_qu
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
 # manifests that read them: twins of PVSnesLib examples, library coverage.
-FIXTURES_RETIRED  := tiled metasprite snesmod_music_large
+FIXTURES_RETIRED  := tiled metasprite snesmod_music_large mode6 sa1_hello sa1_save superfx_hello superfx_save
 FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
                      $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
                      $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS)) \
@@ -727,9 +727,15 @@ clean-release:
 # Help
 #------------------------------------------------------------------------------
 
+# The protocol rows that name a fixture (a ROM that asks the hardware a
+# question, out of examples/): `make` does not build fixtures, so the two
+# targets below build these first.
+PROTOCOL_FIXTURES = $(shell grep -oE '^\| [0-9]+ \| `testing/[a-z0-9_/]+`' docs/HARDWARE_VERIFICATION.md | grep -oE 'testing/[a-z0-9_/]+')
+
 # The ROMs of the hardware verification protocol (docs/HARDWARE_VERIFICATION.md),
 # numbered in grid order, for a flash cart's SD card.
 hardware-kit:
+	@for d in $(PROTOCOL_FIXTURES); do $(MAKE) -s -C $$d || exit 1; done
 	@sh scripts/hardware-kit.sh
 
 # Before a console session: every protocol ROM alive from pseudo-random RAM
@@ -737,6 +743,7 @@ hardware-kit:
 # table as hardware-kit. ROWS=1-7 restricts it to the gate rows.
 hardware-preflight:
 	@scripts/install-luna.sh
+	@for d in $(PROTOCOL_FIXTURES); do $(MAKE) -s -C $$d || exit 1; done
 	@python3 testing/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
 
 # A project's sources against the names 0.49 removed and the two calls that

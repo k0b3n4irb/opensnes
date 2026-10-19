@@ -163,22 +163,15 @@ everything above.
 When the base hardware isn't enough. SA-1 is the same 65816 ISA at 10.74 MHz;
 Super FX / GSU is a custom RISC processor for bitmaps and 3D.
 
-@subpage examples_chips_sa1_hello
-
 @subpage examples_chips_sa1_starfield
-
-@subpage examples_chips_superfx_hello
 
 @subpage examples_chips_superfx_3d
 
 @subpage examples_chips_superfx_game_skeleton
 
-Saving on a coprocessor cartridge is its own case: SA-1 BW-RAM, and the Super
-FX's save RAM while a job may run.
-
-@subpage examples_chips_sa1_save
-
-@subpage examples_chips_superfx_save
+Saving on a coprocessor cartridge uses the same `sram` calls as any other:
+@ref tutorial_sa1 shows it in BW-RAM, @ref tutorial_superfx_advanced in the
+Game Pak RAM while a job may run.
 
 ## Further — the rest of the hardware
 
@@ -186,8 +179,8 @@ Every example not on the path above, by topic. Each stands on what the path
 taught; read the one your game needs.
 
 - **The other background modes** — @ref examples_backgrounds_mode0 (four 4-colour
-  layers), @ref examples_backgrounds_mode2 (offset-per-tile in Modes 2 and 4) and
-  @ref examples_backgrounds_mode6 (offset-per-tile in hi-res), @ref examples_backgrounds_mode3
+  layers), @ref examples_backgrounds_mode2 (offset-per-tile in Modes 2 and 4),
+  @ref examples_backgrounds_mode3
   (256 colours), @ref examples_backgrounds_mode5_hires (512 pixels, interlace).
 - **More colour** — @ref examples_color_direct_color, @ref examples_color_hicolor_1792.
 - **More HDMA and windows** — @ref examples_hdma_hdma_helpers,

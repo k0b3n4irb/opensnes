@@ -21,7 +21,7 @@ for the rows that need no enhancement chip.
 | A display | Record what it is and how the console is connected (composite, S-Video, RGB, an upscaler and its model). A CRT is the reference for anything about timing or interlace. A light gun generally needs a CRT; on an LCD, mark the Super Scope row as not testable rather than failed. |
 | Two pads | Port 2 is used by the two-player and Super Scope rows. |
 | Optional | A SNES Mouse, a Super Scope. |
-| The ROMs | `make hardware-kit` collects the ROMs of this protocol into `release/hardware-kit/`, numbered in the order of the grid. Copy that folder to the SD card. Build from a clean tree at the tag you are verifying (`git checkout vX.Y.Z && make clean && make`). |
+| The ROMs | `make hardware-kit` builds the few fixtures the grid names (ROMs kept under `testing/fixtures/` because they ask the hardware a question rather than teach) and collects the ROMs of this protocol into `release/hardware-kit/`, numbered in the order of the grid. Copy that folder to the SD card. Build from a clean tree at the tag you are verifying (`git checkout vX.Y.Z && make clean && make`). |
 
 Record the tag or commit the ROMs were built from. The grid is meaningless
 without it.
@@ -79,10 +79,10 @@ behaviour, and the note under the table says which.
 | 20 | `games/rpg` | walk, talk to a villager with A, open the chest | The full game path: map, dialogue, chest state. |
 | 21 | `input/mouse` | move the mouse, click both buttons, right-click cycles sensitivity | Optional (needs a SNES Mouse, port 1). The cursor tracks the hand at each of the three sensitivities. |
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
-| 23 | `backgrounds/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `examples/backgrounds/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
+| 23 | `testing/fixtures/retired_examples/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `testing/fixtures/retired_examples/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
 | 24 | `chips/superfx_game_skeleton` | hold the D-pad, listen | The crosshair follows the pad at full frame rate while the GSU's cube turns at half rate and the music plays: no torn or half-drawn cube (`gsuPresent` double-buffers and the NMI swaps in blank), no pause in the music while the GSU runs from its cache. The two letterbox bands (an HDMA to INIDISP) are black to their edge, with no fade at the end of a band; write down the console's CPU revision (1-CHIP or S-CPU-A), since the two errata this form avoids are each on one of them. Firmware-dependent, like rows 16-18. |
-| 25 | `chips/sa1_save` | read NOW, power-cycle, read again | The SA-1 save path: NOW is one more after every power cycle and FOUND shows the previous value (BW-RAM, battery). A NOW that stays at 1 means the cart's SA-1 core does not keep BW-RAM across power, or the header's `$35` is not honoured. |
-| 26 | `chips/superfx_save` | read NOW, power-cycle, read again | The Super FX save path: same check in the GSU's Game Pak RAM at `$E000` (header `$15`, size at `$FFBD`). Firmware-dependent, like rows 16-18 and 24. |
+| 25 | `testing/fixtures/retired_examples/sa1_save` | read NOW, power-cycle, read again | The SA-1 save path: NOW is one more after every power cycle and FOUND shows the previous value (BW-RAM, battery). A NOW that stays at 1 means the cart's SA-1 core does not keep BW-RAM across power, or the header's `$35` is not honoured. |
+| 26 | `testing/fixtures/retired_examples/superfx_save` | read NOW, power-cycle, read again | The Super FX save path: same check in the GSU's Game Pak RAM at `$E000` (header `$15`, size at `$FFBD`). Firmware-dependent, like rows 16-18 and 24. |
 
 **What a failure in each row points at.** Rows 1 and 2 failing means nothing
 else is worth running: the boot path or the joypad read is wrong. Row 3 is
@@ -143,10 +143,10 @@ Peripherals:   pads / mouse / scope
 20  games/rpg
 21  input/mouse                 n/a
 22  input/superscope            n/a
-23  backgrounds/mode6
+23  testing/fixtures/retired_examples/mode6
 24  chips/superfx_game_skeleton
-25  chips/sa1_save
-26  chips/superfx_save
+25  testing/fixtures/retired_examples/sa1_save
+26  testing/fixtures/retired_examples/superfx_save
 ```
 
 ## What to do with a KO

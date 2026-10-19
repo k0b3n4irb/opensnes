@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 65 examples organized by topic. For a progressive learning path, see
+All 60 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -36,7 +36,6 @@ The PPU's background modes — colour vs layers vs resolution.
 | @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
 | @subpage examples_backgrounds_mode3 | Mode 3: 256-colour (8bpp) single layer |
 | @subpage examples_backgrounds_mode2 | Offset-per-tile in Mode 2 (two rows) and Mode 4 (one row, 256 colours): per-column scroll from BG3 |
-| @subpage examples_backgrounds_mode6 | Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns |
 | @subpage examples_backgrounds_mode5_hires | Mode 5 + interlace hi-res text (512×448) (krom port) |
 
 ---
@@ -202,9 +201,7 @@ sharing I-RAM with the main CPU for inter-processor communication.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_chips_sa1_hello | Boot diagnostic: SA-1 init, I-RAM handshake, register verification |
 | @subpage examples_chips_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
-| @subpage examples_chips_sa1_save | A boot counter in battery-backed BW-RAM: one more at every power-on |
 
 ### Super FX (GSU)
 
@@ -213,9 +210,7 @@ hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_chips_superfx_hello | Boot + SRAM + FMULT hardware tests |
 | @subpage examples_chips_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |
-| @subpage examples_chips_superfx_save | A boot counter in the GSU's battery-backed Game Pak RAM, above the framebuffers |
 | @subpage examples_chips_superfx_game_skeleton | A 60 fps game loop while the GSU renders; double-buffered presentation |
 
 ### DSP-1 Coprocessor

@@ -39,10 +39,6 @@
     "stream": "0a3410637a5c45c5d79d5614b9ee90f568ad96f19e8c890a86f3d8599f968d28",
     "rom_sha256": "0a9c5b2aeb5ef5e7db594b0c95cd0b865cd1025f87cb3d1654ecfbe6cb0f1bb1"
   },
-  "backgrounds_mode6": {
-    "stream": "c0d129fbed350eafc4ef4ac68b4bb5c81903a432d6b66a5241a492e56de1a754",
-    "rom_sha256": "28c4ee1d72abd8179d9157054306ca4d6e88d2c18246e24c282950be88d4c25f"
-  },
   "basics_aim_target": {
     "stream": "4599e7b04171efecd8d51edc37116bcb321189ce06faf312602b7562ea8a1f29",
     "rom_sha256": "5cf7ab397afee1b997d10df0540706bb7b5fdd82b64fe3127ca5decd0d88fb33"
@@ -63,14 +59,6 @@
     "stream": "ffa7cc7df0c92f1818ba56bfa03fc119fb4bfe83004b0dfec582e54800724201",
     "rom_sha256": "0de7cbe79634b24c1ee9a6ba34543acfa3989cce02183ca279d310838d22c8d2"
   },
-  "chips_sa1_hello": {
-    "stream": "cbb4f947aef1e066af0377ab181949b6eb0a365f749c23133f50847e002c49f1",
-    "rom_sha256": "9cf18ddec482044479cbd01e5cc5da987c6b713c72a30465df437a6371d823d3"
-  },
-  "chips_sa1_save": {
-    "stream": "37cbc599877a9e18003d350879cc542b1709ddfd0b11cbd423afc29c8c628c3d",
-    "rom_sha256": "6f52b825ce6f2fcc4560c7c48a6ada5a330ea78568d96092deeab0c39ba14d24"
-  },
   "chips_sa1_starfield": {
     "stream": "bad8b5f7b7871b649b274363f37bbd3943705768da848d8992d63c66ff7bf54d",
     "rom_sha256": "fc53a4dbb87d42bace16d04a961c85bbfd7fd8ea4dad5ad54cd0d119ced64fbc"
@@ -82,14 +70,6 @@
   "chips_superfx_game_skeleton": {
     "stream": "7b3876967ca2a7c8f1c39482b05aee07e9456231638334aa2f303cb68d4d00fe",
     "rom_sha256": "102f4be2be50e5f578c04ee2421cbd6b950a65de713e81d0d06449c4fc1de6ed"
-  },
-  "chips_superfx_hello": {
-    "stream": "a0beebd17d200b4353ceecff54f8e78ad51fea24a266dabdfc383a7681759441",
-    "rom_sha256": "277740cb0cd6f393400196560f6d84df46cb8376b881ec9d45e0f4011a3f4d9f"
-  },
-  "chips_superfx_save": {
-    "stream": "437e1984f348bf8f1eb78ae05dc0f2e8fcac5720e2c039715134ab944fc451e8",
-    "rom_sha256": "ce3f78afc37cefcd75c8ba09b4c3b6caf0c5fc11bbe9e7b3957a155bbabdc690"
   },
   "color_direct_color": {
     "stream": "60335c436ccf4fdacf346fd7a712aa42df86e834b7da3f11e4e02bf7b511c9b8",
