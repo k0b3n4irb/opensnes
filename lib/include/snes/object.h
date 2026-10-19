@@ -258,9 +258,9 @@ u16 objGetPointer(u16 objhandle);
  * not returned yet, so its return value is not available there.
  *
  * @code
- * void marioInit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
+ * void kitInit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
  *     objGetPointer(objGetCurrentId());   // load the new object
- *     mario_id = objGetCurrentId();
+ *     kit_id = objGetCurrentId();
  * }
  * @endcode
  *

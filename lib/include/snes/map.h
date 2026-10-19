@@ -12,14 +12,14 @@
  * #include <snes.h>
  * #include <snes/map.h>
  *
- * extern u8 mapmario, tilesetdef, tilesetatt;
+ * extern u8 maplevel, tilesetdef, tilesetatt;
  *
  * // Background tileset must be loaded at VRAM $2000 (tiles) and $6800 (tilemap)
  * bgInitTileSet(0, &tileset, &tilesetpal, 0, size, 16*2, BG_16COLORS, 0x2000);
  * bgSetMapPtr(0, 0x6800, SC_64x32);
  *
  * // Load map data (flushes VRAM internally — screen must be off)
- * mapLoad(&mapmario, &tilesetdef, &tilesetatt);
+ * mapLoad(&maplevel, &tilesetdef, &tilesetatt);
  *
  * setScreenOn();  // VRAM is ready
  *

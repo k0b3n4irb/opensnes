@@ -189,8 +189,8 @@ u16 animTick(AnimPlayer *p);
  * @brief Declare a static const AnimClip with uniform frame duration.
  *
  * @code
- * DECLARE_ANIM_CLIP(mario_walk, ANIM_LOOP, 4, FRAME_WALK0, FRAME_WALK1);
- * animPlay(&mario_anim, &mario_walk);
+ * DECLARE_ANIM_CLIP(kit_walk, ANIM_LOOP, 4, FRAME_WALK0, FRAME_WALK1);
+ * animPlay(&kit_anim, &kit_walk);
  * @endcode
  *
  * Per-frame durations can't be expressed variadically — declare those
