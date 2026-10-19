@@ -172,6 +172,28 @@ def ico(ims: list[Image.Image]) -> bytes:
     return buf.getvalue()
 
 
+def screen_logo(art_dir: Path) -> bytes:
+    """The 256x224 logo for a background layer, as an indexed PNG of 16: index 0 is the
+    night sky and is never drawn (the backdrop shows there, which an HDMA gradient
+    rewrites), the 15 others the logo's colours; the rarest colour beyond 15 takes the
+    nearest one kept."""
+    im = compose((256, 224), trimmed(art_dir / "logo" / "kit_mascot.png"), 4, 2, gap=4)
+    counts: dict = {}
+    for p in im.getdata():
+        if p[3] >= 128:
+            counts[p[:3]] = counts.get(p[:3], 0) + 1
+    kept = sorted(counts, key=lambda c: -counts[c])[:15]
+    near = {c: min(kept, key=lambda k: sum((a - b) ** 2 for a, b in zip(c, k))) for c in counts}
+    out = Image.new("P", im.size, 0)
+    out.putpalette([v for c in [NIGHT[:3]] + kept for v in c])
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            if px[x, y][3] >= 128:
+                out.putpixel((x, y), 1 + kept.index(near[px[x, y][:3]]))
+    return png(out)
+
+
 def build_logo(art_dir: Path) -> dict[str, bytes]:
     mascot = trimmed(art_dir / "logo" / "kit_mascot.png")
     head = trimmed(art_dir / "logo" / "kit_head.png")

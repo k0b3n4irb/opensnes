@@ -124,12 +124,12 @@
     "rom_sha256": "8a05026d32d29b66c339455dd854dfa8c113767134558df51e158ac1b5dcfedc"
   },
   "hdma_gradient_colors": {
-    "stream": "e72b61ba76031779d69747a024aef87b475954b295706780b9878c6c65133577",
-    "rom_sha256": "91b36b8d5873f93c8142628002e57e96aa9ed34b7774954456292dd8e9a15d2e"
+    "stream": "2913b455d180f1dd64e5ce0262fdd83a702320dbb636459c18905f5d4ec16230",
+    "rom_sha256": "6bfa98f6ac7c8ad42c9cb1702d44e5d67d73b643af9d36bd798bb6a18b91dbbb"
   },
   "hdma_hdma_helpers": {
-    "stream": "53d96a9359ccc44476bb5293a0ba2bc56c4f4597e89a48a7a6a538e9efbbefac",
-    "rom_sha256": "e00309df8b9bd22ae8d8ad43e9a5c48e90628bc8ce34f5904de7c113abde4b1f"
+    "stream": "78ae87b25d713fca03f3e80b08d4159fc6eb32d9101271f50ff21a064d95ef49",
+    "rom_sha256": "ae73fe971d7c004af76eeffafce0b04f40ca895f534328bbea890a6d2e9d7f78"
   },
   "hdma_hdma_wave": {
     "stream": "c81444ef7e6c2a0d0c741933fd875e0f31c5c64471889adb7d186ba4d7513201",

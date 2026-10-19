@@ -240,16 +240,16 @@
     "rom_sha256": "3e9e992661a4cc9209721e53e08776c59be38a77e8f95602329ba291de6f4f2c"
   },
   "hdma_gradient_colors": {
-    "fbhash": "c69f3a932b9d2e95",
+    "fbhash": "3a9873030e6da097",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "ce427e6204cce6d2b3a04164b72daa3754a012f03f41005490a461e0946077e9"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "6bfa98f6ac7c8ad42c9cb1702d44e5d67d73b643af9d36bd798bb6a18b91dbbb"
   },
   "hdma_hdma_helpers": {
-    "fbhash": "bbbdc35d17d49740",
+    "fbhash": "205fa5fd7ba5e527",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "a683b8dba9e8a849a4b6074f49535c27f1e482f7333e990503e60fd7141f0fbe"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "ae73fe971d7c004af76eeffafce0b04f40ca895f534328bbea890a6d2e9d7f78"
   },
   "hdma_hdma_wave": {
     "fbhash": [

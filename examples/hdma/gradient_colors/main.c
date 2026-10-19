@@ -9,7 +9,8 @@
  * 4 bytes per entry to consecutive register pairs: two bytes to CGADD
  * ($2121) to select color index 0, then two bytes to CGDATA ($2122) to
  * write the 15-bit BGR color value. A pre-built HDMA table in ROM defines
- * the gradient colors for each scanline group. This technique was widely
+ * the gradient colors for each scanline group: the city's sky at dusk,
+ * behind the OpenSNES logo. This technique was widely
  * used in SNES games for sky gradients, underwater tinting, and lava glow
  * effects without consuming any CPU time.
  *
@@ -31,7 +32,7 @@
  * - A C pointer's bank for $43x7: (u8)((u32)(void *)data >> 16)
  *
  * @par What to Observe
- * - A vertical color gradient covers the screen behind the background tiles
+ * - A dusk gradient (night, violet, magenta, amber) behind Kit and the wordmark
  * - Press A to disable the gradient (flat backdrop color returns)
  * - Press B to re-enable the gradient effect
  * - Press X for the indirect gradient: 32 red bands, brightest at the top
@@ -46,7 +47,7 @@
 #include <snes/hdma.h>
 
 /** @brief 4bpp tile data for the background layer. */
-#include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
+#include "res/logo.inc"   /* generated: logo_tiles[], logo_map[], logo_pal[], each with _end */
 /** @brief Tilemap data (32x32 tile grid) for the background layer. */
 /** @brief 15-bit BGR palette for the background (up to 16 colors). */
 
@@ -163,14 +164,14 @@ int main(void) {
     consoleInit();
 
     /* Load BG1 tiles and palette */
-    bgInitTileSet(0, opensnes_tiles, opensnes_pal, 0,
-                  opensnes_tiles_end - opensnes_tiles,
-                  opensnes_pal_end - opensnes_pal,
+    bgInitTileSet(0, logo_tiles, logo_pal, 0,
+                  logo_tiles_end - logo_tiles,
+                  logo_pal_end - logo_pal,
                   BG_16COLORS, 0x4000);
 
     /* Load tilemap */
     bgSetMapPtr(0, 0x0000, BG_MAP_32x32);
-    dmaCopyVram(opensnes_map, 0x0000, opensnes_map_end - opensnes_map);
+    dmaCopyVram(logo_map, 0x0000, logo_map_end - logo_map);
 
     setMode(BG_MODE1, 0);
     setMainScreen(TM_BG1);

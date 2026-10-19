@@ -89,7 +89,7 @@ insect and the automaton walk in `examples/games/mapandobjects`.
 
 | File | What | Made with | Used by |
 |---|---|---|---|
-| `logo/kit_mascot.png` | Kit in a logo pose, a fist raised, 128x128 | `generate-image-v2`, Kit's front pose as style, his 15 colours, seed 6000, candidate #0 of 4 | `assets/logo_256x256.png`, `logo_256x224.png`, `logo.svg` |
+| `logo/kit_mascot.png` | Kit in a logo pose, a fist raised, 128x128 | `generate-image-v2`, Kit's front pose as style, his 15 colours, seed 6000, candidate #0 of 4 | `assets/logo_256x256.png`, `logo_256x224.png`, `logo.svg`; the `res/logo.png` of `examples/hdma/gradient_colors` and `hdma_helpers` |
 | `logo/kit_head.png` | his head and shoulders, 64x64 | the same, seed 6001, #0 of 16 | `assets/logo_128x128.png`, `logo_64x64.png` |
 | `logo/kit_icon.png` | his head as an icon, 32x32 | the same, seed 6000, #63 of 64 | `assets/logo_32x32.png`, `favicon.ico` |
 

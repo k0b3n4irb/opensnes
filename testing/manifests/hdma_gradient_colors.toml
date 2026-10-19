@@ -45,4 +45,4 @@ hdma_enabled_state = { eq = 0x40, width = 1 }
 
 # HDMA wrote the gradient's last colour over the BG palette's backdrop.
 [asserts.blocks]
-backdrop_after_gradient = { space = "cgram", offset = "0000", hex = "A63E" }
+backdrop_after_gradient = { space = "cgram", offset = "0000", hex = "DC19" }   # the last band, the amber of the streets

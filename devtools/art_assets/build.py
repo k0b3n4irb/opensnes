@@ -28,6 +28,10 @@ assets/ (the logo, devtools/art_assets/logo.py):
   logo_16x16.png      the two icons; logo.svg the 256 one as rects
   logo_256x224.png, favicon.ico, logo.svg
 
+hdma/gradient_colors, hdma/hdma_helpers:
+  res/logo.png        the 256x224 logo on a transparent sky (index 0, never
+                      drawn), so the HDMA gradients show behind Kit
+
 games/mapandobjects:
   res/tiles.png       roofs with ramps, 8x8 tiles drawn here: the strip and
                       the wall sampled from roof_1, the six slope shapes of
@@ -71,7 +75,7 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from logo import build_logo  # noqa: E402  (the logo is a module of its own)
+from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
 
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "neo-lumen"
@@ -80,6 +84,8 @@ MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "games" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
+GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
+HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)
@@ -571,7 +577,8 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="compare with the committed files instead of writing them")
     args = ap.parse_args()
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
-            (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART))]
+            (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART)),
+            (GRADIENT_COLORS, {"logo.png": screen_logo(ART)}), (HDMA_HELPERS, {"logo.png": screen_logo(ART)})]
     print("likemario:", jobs[0][1].pop("_report").decode())
     print("map_scroll:", jobs[2][1].pop("_report").decode())
     print("mapandobjects:", jobs[3][1].pop("_report").decode())

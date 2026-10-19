@@ -56,8 +56,11 @@ Each entry in `hdmaGradientList` is:
 [line_count] [cgadd_lo=0x00] [cgadd_hi=0x00] [color_lo] [color_hi]
 ```
 
-The table defines color 0 (backdrop) for groups of scanlines. By stepping through
-blues, purples, and oranges, it creates a smooth vertical gradient.
+The table defines color 0 (backdrop) for groups of scanlines: 28 bands of 8 lines,
+the city's sky at dusk, from the night at the top through indigo, violet and
+magenta to the amber glow of the streets at the bottom. The picture on BG1 is
+the OpenSNES logo, Kit over the wordmark; its sky is colour 0, never drawn, so
+the backdrop shows all around him.
 
 The table ends with a `0x00` byte (zero line count = end of HDMA table).
 
@@ -119,16 +122,16 @@ writes every scanline.
 | File | Purpose |
 |------|---------|
 | `main.c` | Gradient setup, enable/disable, input handling |
-| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it |
+| `res/logo.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it |
 | `data.asm` | the HDMA gradient table (`hdmaGradientList`), hand-written |
-| `res/opensnes.png` | Source background image |
+| `res/logo.png` | the OpenSNES logo on a transparent sky, written by `devtools/art_assets/build.py` (CC0) |
 | `Makefile` | `LIB_MODULES := console dma background sprite hdma input math` |
 
 ## Going Further
 
 - **Custom gradient**: Edit the `hdmaGradientList` table in data.asm. Each entry
-  is a 15-bit SNES color (BBBBBGGGGGRRRRR in little-endian). Try creating a sunset
-  (orange to purple to dark blue).
+  is a 15-bit SNES color (BBBBBGGGGGRRRRR in little-endian). Try a dawn instead
+  (dark blue to pale gold).
 
 - **Animated gradient**: Copy the table to RAM and rotate the color entries each
   frame. This creates a flowing color effect like underwater caustics.
