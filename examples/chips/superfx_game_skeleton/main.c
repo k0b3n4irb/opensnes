@@ -208,7 +208,7 @@ int main(void) {
     /* Music: the driver goes to the SPC700 while the screen is off */
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
-    snesmodLoadModule(MOD_POLLEN8);
+    snesmodLoadModule(MOD_NOCTURNE);
     snesmodPlay(0);
 
     if (!gsuInit()) {

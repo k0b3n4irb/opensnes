@@ -13,6 +13,6 @@ LIB_MODULES := console sprite dma background input   # superfx auto-added by USE
 
 # Music while the GSU draws: SNESMOD, the module of audio/snesmod_music
 USE_SNESMOD   := 1
-SOUNDBANK_SRC := ../../audio/snesmod_music/music/pollen8.it
+SOUNDBANK_SRC := ../../audio/snesmod_music/music/nocturne.it
 
 include $(OPENSNES)/make/common.mk
