@@ -3,10 +3,11 @@
  * @brief Side-scrolling platformer with scroll streaming and SNESMOD audio
  * @ingroup examples
  *
- * A Mario-style platformer demonstrating the core techniques of a scrolling
- * SNES game: tile-based map streaming, subpixel physics, tile collision,
- * camera tracking, animated sprites, and SPC700 music/sound effects via
- * the SNESMOD audio driver.
+ * A platformer on the rooftops of the city at night: Kit, the fox-kit
+ * courier, runs and jumps from roof to roof. It demonstrates the core
+ * techniques of a scrolling SNES game: tile-based map streaming, subpixel
+ * physics, tile collision, camera tracking, animated sprites, a parallax
+ * layer, and SPC700 music/sound effects via the SNESMOD audio driver.
  *
  * The map engine streams one tile column per frame using a prepare/flush
  * pattern: during active display, the next column is read from ROM into
@@ -19,23 +20,27 @@
  * signed values. Collision checks test two probe points per axis against
  * the tile property table (T_SOLID / T_EMPTY).
  *
- * Port of the PVSnesLib likemario example.
+ * This began as the PVSnesLib likemario example; the level, the roofs, the
+ * skyline and Kit are ours (devtools/art_assets/build.py writes the level
+ * data from the pictures in assets/neo-lumen/).
  *
  * @par SNES Concepts
  * - Scroll streaming: 1 column/frame prepare-during-display, DMA-in-VBlank
  * - SC_64x32 tilemap with 64-column wraparound for seamless scrolling
  * - Subpixel 8.8 fixed-point physics (acceleration, gravity, max velocity)
  * - Tile collision via property lookup table (tilesetatt)
- * - Dynamic sprite engine with frame-based animation
+ * - Dynamic sprite engine with frame-based animation (32x32 frames)
+ * - A second layer scrolled at a quarter of the camera's speed (parallax)
  * - SNESMOD: SPC700 module playback and sound effects
  * - Assembly DMA loader with bank bytes for SUPERFREE ROM data
  *
  * @par What to Observe
- * - Mario walks left/right with acceleration and deceleration
- * - Press A to jump (hold UP for a higher jump)
- * - Camera follows Mario; background scrolls smoothly
+ * - Kit walks left/right with acceleration and deceleration
+ * - Press A to jump (hold UP for a higher jump): the gaps between the roofs
+ *   need a jump, a few of the higher roofs need the high one
+ * - Camera follows Kit; the far towers behind drift by more slowly
  * - Music plays continuously; a jump sound effect triggers on A press
- * - Falling off the bottom respawns Mario at the top
+ * - Falling between two roofs respawns Kit on the first one
  *
  * @par Modules Used
  * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, anim,
@@ -54,11 +59,12 @@
  * External Data (from data.asm)
  *============================================================================*/
 
-/** @brief Mario sprite tile data (16x16, 4bpp) for the dynamic sprite engine */
+/** @brief The level's tiles, the skyline of BG2 and Kit's frames (32x32, 4bpp, for the dynamic sprite engine) */
 #include "res/tiles.inc"          /* generated: tiles_tiles[], tiles_pal[], tiles_map[], each with _end */
-#include "res/mario_sprite.inc"   /* generated: mario_sprite_tiles[], mario_sprite_pal[], each with _end */
+#include "res/skyline.inc"        /* generated: skyline_tiles[], skyline_pal[], skyline_map[] (64x32 in two pages), each with _end */
+#include "res/kit.inc"            /* generated: kit_tiles[], kit_pal[], each with _end */
 /** @brief Map data (tile indices + header with width/height) */
-extern const u8 mapmario[];   /* asset bank: every C read must be a far read, hence const */
+extern const u8 maplevel[];   /* asset bank: every C read must be a far read, hence const */
 /** @brief Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format) */
 extern const u8 tilesetatt[];
 
@@ -69,53 +75,64 @@ extern const u8 tilesetatt[];
  * Constants
  *============================================================================*/
 
-/** @brief VRAM word address for large (16x16) sprite tiles */
+/** @brief VRAM word address for large (32x32) sprite tiles */
 #define VRAM_SPR_LARGE  0x0000
-/** @brief VRAM word address for small (8x8) sprite tiles */
+/** @brief VRAM word address for small sprite tiles: the engine's fixed
+ *  second pool; this game draws no small sprite, so BG2 uses the room */
 #define VRAM_SPR_SMALL  0x1000
-/** @brief VRAM word address for BG1 tile character data */
+/** @brief VRAM word address for BG2 (the skyline) tiles, at most 256 */
+#define VRAM_BG2_TILES  0x1000
+/** @brief VRAM word address for BG1 tile character data (802 tiles, to $5220) */
 #define VRAM_BG_TILES   0x2000
 /** @brief VRAM word address for BG1 tilemap (SC_64x32) */
 #define VRAM_BG_MAP     0x6800
+/** @brief VRAM word address for BG2 tilemap (SC_64x32) */
+#define VRAM_BG2_MAP    0x7000
+/** @brief Where the 32x32 sprite is drawn relative to the 16x16 collision
+ *  box: Kit's feet are on row 30 of his frame, the box's bottom is row 16 */
+#define KIT_DRAW_DX     (-8)
+/** @brief Vertical offset of the frame from the box (see KIT_DRAW_DX) */
+#define KIT_DRAW_DY     (-14)
 
 /**
  * @brief Gravity acceleration in 8.8 fixed-point units per frame.
  *
- * Applied to mario_yvel every frame when airborne (jumping or falling).
+ * Applied to kit_yvel every frame when airborne (jumping or falling).
  * 48/256 = 0.1875 pixels/frame^2 -- gives a natural parabolic arc.
  */
 #define GRAVITY         48
 /** @brief Maximum horizontal velocity in 8.8 fixed-point (1.25 pixels/frame) */
-#define MARIO_MAXACCEL  0x0140
+#define KIT_MAXACCEL  0x0140
 /** @brief Horizontal acceleration per frame in 8.8 fixed-point (0.22 pixels/frame) */
-#define MARIO_ACCEL     0x0038
+#define KIT_ACCEL     0x0038
 /** @brief Normal jump initial upward velocity in 8.8 fixed-point */
-#define MARIO_JUMPING   0x0394
+#define KIT_JUMPING   0x0394
 /** @brief High jump initial upward velocity (when holding UP during jump) */
-#define MARIO_HIJUMPING 0x0594
+#define KIT_HIJUMPING 0x0594
 
 /** @brief Tile property: passable (air, background decoration) */
 #define T_EMPTY  0x0000
 /** @brief Tile property: solid (ground, walls, platforms) */
 #define T_SOLID  0xFF00
 
-/** @brief Mario is standing on solid ground, idle */
-#define MARIO_ACT_STAND  0
-/** @brief Mario is walking (horizontal velocity nonzero, on ground) */
-#define MARIO_ACT_WALK   1
-/** @brief Mario is jumping (upward velocity, ascending phase) */
-#define MARIO_ACT_JUMP   2
-/** @brief Mario is falling (downward velocity or walked off an edge) */
-#define MARIO_ACT_FALL   3
+/** @brief Kit is standing on solid ground, idle */
+#define KIT_ACT_STAND  0
+/** @brief Kit is walking (horizontal velocity nonzero, on ground) */
+#define KIT_ACT_WALK   1
+/** @brief Kit is jumping (upward velocity, ascending phase) */
+#define KIT_ACT_JUMP   2
+/** @brief Kit is falling (downward velocity or walked off an edge) */
+#define KIT_ACT_FALL   3
 
-/** @brief Dynamic sprite frame index: jump pose */
-#define FRAME_JUMP   1
-/** @brief Dynamic sprite frame index: walk animation frame 0 */
-#define FRAME_WALK0  2
-/** @brief Dynamic sprite frame index: walk animation frame 1 */
-#define FRAME_WALK1  3
-/** @brief Dynamic sprite frame index: standing idle pose */
-#define FRAME_STAND  6
+/** @brief Kit's sheet (res/kit.png, four 32x32 frames a row): idle 0-3,
+ *  walk 4-11, run 12-19, jump 20-27 (crouch, rise, top, fall, land) */
+#define FRAME_IDLE   0
+/** @brief First frame of the walk cycle */
+#define FRAME_WALK   4
+/** @brief Jump pose while going up */
+#define FRAME_RISE   23
+/** @brief Jump pose while coming down */
+#define FRAME_FALL   25
 
 /*============================================================================
  * Global State
@@ -123,7 +140,7 @@ extern const u8 tilesetatt[];
 
 static u16 map_width;          /**< Map width in tiles (parsed from map header) */
 static u16 map_height;         /**< Map height in tiles (parsed from map header) */
-static const u16 *map_data;          /**< Pointer to the tile index array within mapmario */
+static const u16 *map_data;          /**< Pointer to the tile index array within maplevel */
 static const u16 *tile_props;        /**< Pointer to the tile property table (T_SOLID/T_EMPTY) */
 
 /**
@@ -138,13 +155,13 @@ static const u16 *map_row_ptrs[32];
 static s16 camera_x;          /**< Current camera X scroll offset in pixels */
 static s16 last_tile_x;       /**< Last tile column for which streaming was performed */
 
-static s16 mario_x;           /**< Mario world X position in pixels */
-static s16 mario_y;           /**< Mario world Y position in pixels */
-static u8  mario_xfrac;       /**< Mario X sub-pixel fraction (8.8 fixed-point low byte) */
-static u8  mario_yfrac;       /**< Mario Y sub-pixel fraction (8.8 fixed-point low byte) */
-static s16 mario_xvel;        /**< Mario X velocity in 8.8 fixed-point */
-static s16 mario_yvel;        /**< Mario Y velocity in 8.8 fixed-point (negative = upward) */
-static u8  mario_action;      /**< Current action state (MARIO_ACT_STAND/WALK/JUMP/FALL) */
+static s16 kit_x;           /**< Kit world X position in pixels */
+static s16 kit_y;           /**< Kit world Y position in pixels */
+static u8  kit_xfrac;       /**< Kit X sub-pixel fraction (8.8 fixed-point low byte) */
+static u8  kit_yfrac;       /**< Kit Y sub-pixel fraction (8.8 fixed-point low byte) */
+static s16 kit_xvel;        /**< Kit X velocity in 8.8 fixed-point */
+static s16 kit_yvel;        /**< Kit Y velocity in 8.8 fixed-point (negative = upward) */
+static u8  kit_action;      /**< Current action state (KIT_ACT_STAND/WALK/JUMP/FALL) */
 
 /* Animation as data (anim module): one clip per action, one player.
  * animPlay() is called unconditionally each frame — continue-if-same
@@ -157,15 +174,18 @@ static u8  mario_action;      /**< Current action state (MARIO_ACT_STAND/WALK/JU
  * DECLARE_ANIM_CLIP would work here too. The 44 bytes of WRAM stay for
  * now; the layout and the API are identical. (Comment corrected
  * 2026-10-04; it described the pre-#127.3 world.) */
-static u16 clip_walk_frames[]  = { FRAME_WALK0, FRAME_WALK1 };
-static u16 clip_jump_frames[]  = { FRAME_JUMP };
-static u16 clip_stand_frames[] = { FRAME_STAND };
-static AnimClip clip_walk  = { clip_walk_frames,  0, 2, 4, ANIM_LOOP, 0 };
+static u16 clip_walk_frames[]  = { FRAME_WALK, FRAME_WALK + 1, FRAME_WALK + 2, FRAME_WALK + 3,
+                                   FRAME_WALK + 4, FRAME_WALK + 5, FRAME_WALK + 6, FRAME_WALK + 7 };
+static u16 clip_jump_frames[]  = { FRAME_RISE };
+static u16 clip_fall_frames[]  = { FRAME_FALL };
+static u16 clip_stand_frames[] = { FRAME_IDLE, FRAME_IDLE + 1, FRAME_IDLE + 2, FRAME_IDLE + 3 };
+static AnimClip clip_walk  = { clip_walk_frames,  0, 8, 5, ANIM_LOOP, 0 };
 static AnimClip clip_jump  = { clip_jump_frames,  0, 1, 1, ANIM_LOOP, 0 };
-static AnimClip clip_stand = { clip_stand_frames, 0, 1, 1, ANIM_LOOP, 0 };
-static AnimPlayer mario_anim = ANIM_PLAYER_INIT;  /**< Mario's animation state */
+static AnimClip clip_fall  = { clip_fall_frames,  0, 1, 1, ANIM_LOOP, 0 };
+static AnimClip clip_stand = { clip_stand_frames, 0, 4, 12, ANIM_LOOP, 0 };
+static AnimPlayer kit_anim = ANIM_PLAYER_INIT;  /**< Kit's animation state */
 
-static s16 map_max_x;         /**< Rightmost valid Mario X position (map_width*8 - 16) */
+static s16 map_max_x;         /**< Rightmost valid Kit X position (map_width*8 - 16) */
 static s16 cam_max_x;         /**< Maximum camera X offset (map_width*8 - 256) */
 
 /** @brief SPC700 sound effect slot index for the jump sound */
@@ -260,7 +280,7 @@ static void map_load(void) {
     u16 col, row;
     const u16 *hdr, *ptr;
 
-    hdr = (const u16 *)mapmario;
+    hdr = (const u16 *)maplevel;
     map_width = hdr[0] >> 3;
     map_height = hdr[1] >> 3;
     map_data = &hdr[3];
@@ -350,78 +370,78 @@ static void map_update(void) {
 }
 
 /*============================================================================
- * Mario - Split into small functions to keep stack frames manageable
+ * Kit - Split into small functions to keep stack frames manageable
  *============================================================================*/
 
 /**
- * @brief Initialize Mario's position, velocity, animation, and sprite configuration.
+ * @brief Initialize Kit's position, velocity, animation, and sprite configuration.
  *
- * Places Mario at a safe spawn point, sets the dynamic sprite engine's
+ * Places Kit at a safe spawn point, sets the dynamic sprite engine's
  * frame to the standing pose, and configures the sprite attribute byte
  * (priority 3, H-flip for facing right). The tile data may sit in any ROM
  * bank (SUPERFREE placement); OAM_SET_GFX() records the bank byte of the
  * pointer it is given.
  */
-static void mario_init(void) {
-    mario_x = 48;
-    mario_y = 96;       /* Ground level (row 14 = tile 40 SOLID at y=112, so feet at 112 → y=96) */
-    mario_xfrac = 0;
-    mario_yfrac = 0;
-    mario_xvel = 0;
-    mario_yvel = 0;
-    mario_action = MARIO_ACT_STAND;
-    animPlay(&mario_anim, &clip_stand);
+static void kit_init(void) {
+    kit_x = 48;
+    kit_y = 128;      /* on the first roof: its surface is row 18 (y 144), the box is 16 tall */       /* Ground level (row 14 = tile 40 SOLID at y=112, so feet at 112 → y=96) */
+    kit_xfrac = 0;
+    kit_yfrac = 0;
+    kit_xvel = 0;
+    kit_yvel = 0;
+    kit_action = KIT_ACT_STAND;
+    animPlay(&kit_anim, &clip_stand);
 
-    oambuffer[0].oamframeid = FRAME_STAND;
+    oambuffer[0].oamframeid = FRAME_IDLE;
     oambuffer[0].oamrefresh = 1;
-    oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
-    OAM_SET_GFX(0, mario_sprite_tiles);
+    oambuffer[0].oamattribute = OBJ_PRIO(3);       /* the sheet faces right */
+    OAM_SET_GFX(0, kit_tiles);
 }
 
 /**
- * @brief Process D-pad and button input for Mario's movement.
+ * @brief Process D-pad and button input for Kit's movement.
  *
  * LEFT/RIGHT apply acceleration (with max velocity clamping and
  * deceleration when released). A triggers a jump if grounded; holding
  * UP during jump gives a higher arc. The sprite's H-flip attribute is
  * set to match the facing direction.
  */
-static void mario_handle_input(void) {
+static void kit_handle_input(void) {
     u16 pad;
 
     pad = padHeld(0);
 
     if (pad & KEY_LEFT) {
-        oambuffer[0].oamattribute = OBJ_PRIO(3);
-        if (mario_action == MARIO_ACT_STAND)
-            mario_action = MARIO_ACT_WALK;
-        mario_xvel -= MARIO_ACCEL;
-        if (mario_xvel < -MARIO_MAXACCEL)
-            mario_xvel = -MARIO_MAXACCEL;
+        oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;   /* mirror the right-facing sheet */
+        if (kit_action == KIT_ACT_STAND)
+            kit_action = KIT_ACT_WALK;
+        kit_xvel -= KIT_ACCEL;
+        if (kit_xvel < -KIT_MAXACCEL)
+            kit_xvel = -KIT_MAXACCEL;
     } else if (pad & KEY_RIGHT) {
-        oambuffer[0].oamattribute = OBJ_PRIO(3) | OBJ_FLIPX;
-        if (mario_action == MARIO_ACT_STAND)
-            mario_action = MARIO_ACT_WALK;
-        mario_xvel += MARIO_ACCEL;
-        if (mario_xvel > MARIO_MAXACCEL)
-            mario_xvel = MARIO_MAXACCEL;
+        oambuffer[0].oamattribute = OBJ_PRIO(3);
+        if (kit_action == KIT_ACT_STAND)
+            kit_action = KIT_ACT_WALK;
+        kit_xvel += KIT_ACCEL;
+        if (kit_xvel > KIT_MAXACCEL)
+            kit_xvel = KIT_MAXACCEL;
     } else {
-        if (mario_xvel > 0) {
-            mario_xvel -= MARIO_ACCEL;
-            if (mario_xvel < 0) mario_xvel = 0;
-        } else if (mario_xvel < 0) {
-            mario_xvel += MARIO_ACCEL;
-            if (mario_xvel > 0) mario_xvel = 0;
+        if (kit_xvel > 0) {
+            kit_xvel -= KIT_ACCEL;
+            if (kit_xvel < 0) kit_xvel = 0;
+        } else if (kit_xvel < 0) {
+            kit_xvel += KIT_ACCEL;
+            if (kit_xvel > 0) kit_xvel = 0;
         }
     }
 
     if (padPressed(0) & KEY_A) {
-        if (mario_action == MARIO_ACT_STAND || mario_action == MARIO_ACT_WALK) {
-            mario_action = MARIO_ACT_JUMP;
+        if (kit_action == KIT_ACT_STAND || kit_action == KIT_ACT_WALK) {
+            kit_action = KIT_ACT_JUMP;
             if (pad & KEY_UP)
-                mario_yvel = -MARIO_HIJUMPING;
+                kit_yvel = -KIT_HIJUMPING;
             else
-                mario_yvel = -MARIO_JUMPING;
+                kit_yvel = -KIT_JUMPING;
             snesmodPlayEffect(sfx_jump_slot, 127, 128, 3);
         }
     }
@@ -455,61 +475,61 @@ static s16 asr8(s16 val) {
  * extracts the integer pixel displacement via asr8(), and stores the
  * remaining fraction for sub-pixel precision next frame.
  */
-static void mario_apply_physics(void) {
+static void kit_apply_physics(void) {
     s16 new_frac;
 
-    if (mario_action == MARIO_ACT_JUMP || mario_action == MARIO_ACT_FALL) {
-        mario_yvel += GRAVITY;
-        if (mario_yvel > 0x0400)
-            mario_yvel = 0x0400;
+    if (kit_action == KIT_ACT_JUMP || kit_action == KIT_ACT_FALL) {
+        kit_yvel += GRAVITY;
+        if (kit_yvel > 0x0400)
+            kit_yvel = 0x0400;
     }
 
-    new_frac = (s16)mario_xfrac + mario_xvel;
-    mario_x += asr8(new_frac);
-    mario_xfrac = new_frac & 0xFF;
+    new_frac = (s16)kit_xfrac + kit_xvel;
+    kit_x += asr8(new_frac);
+    kit_xfrac = new_frac & 0xFF;
 
-    new_frac = (s16)mario_yfrac + mario_yvel;
-    mario_y += asr8(new_frac);
-    mario_yfrac = new_frac & 0xFF;
+    new_frac = (s16)kit_yfrac + kit_yvel;
+    kit_y += asr8(new_frac);
+    kit_yfrac = new_frac & 0xFF;
 }
 
 /**
  * @brief Check vertical tile collisions (ground landing and ceiling bonk).
  *
- * Ground check: probes two points at Mario's feet (left+2, right+13).
+ * Ground check: probes two points at Kit's feet (left+2, right+13).
  * If either hits a solid tile, snaps Y to the tile boundary and resets
- * vertical velocity. Ceiling check: probes one point above Mario's head.
+ * vertical velocity. Ceiling check: probes one point above Kit's head.
  * Collision detection uses the tile property table, not per-pixel checks.
  */
-static void mario_collide_vertical(void) {
+static void kit_collide_vertical(void) {
     u16 prop;
 
     /* Ground check */
-    if (mario_yvel >= 0) {
-        prop = map_get_tile_prop(mario_x + 2, mario_y + 16);
+    if (kit_yvel >= 0) {
+        prop = map_get_tile_prop(kit_x + 2, kit_y + 16);
         if (prop == T_EMPTY)
-            prop = map_get_tile_prop(mario_x + 13, mario_y + 16);
+            prop = map_get_tile_prop(kit_x + 13, kit_y + 16);
 
         if (prop != T_EMPTY) {
-            mario_y = ((mario_y + 16) & 0xFFF8) - 16;
-            mario_yfrac = 0;
-            mario_yvel = 0;
-            if (mario_action == MARIO_ACT_FALL || mario_action == MARIO_ACT_JUMP)
-                mario_action = MARIO_ACT_STAND;
+            kit_y = ((kit_y + 16) & 0xFFF8) - 16;
+            kit_yfrac = 0;
+            kit_yvel = 0;
+            if (kit_action == KIT_ACT_FALL || kit_action == KIT_ACT_JUMP)
+                kit_action = KIT_ACT_STAND;
         } else {
-            if (mario_action == MARIO_ACT_STAND || mario_action == MARIO_ACT_WALK)
-                mario_action = MARIO_ACT_FALL;
+            if (kit_action == KIT_ACT_STAND || kit_action == KIT_ACT_WALK)
+                kit_action = KIT_ACT_FALL;
         }
     }
 
     /* Ceiling check */
-    if (mario_yvel < 0) {
-        prop = map_get_tile_prop(mario_x + 8, mario_y - 1);
+    if (kit_yvel < 0) {
+        prop = map_get_tile_prop(kit_x + 8, kit_y - 1);
         if (prop != T_EMPTY) {
-            mario_y = (mario_y & 0xFFF8) + 8;
-            mario_yfrac = 0;
-            mario_yvel = 0;
-            mario_action = MARIO_ACT_FALL;
+            kit_y = (kit_y & 0xFFF8) + 8;
+            kit_yfrac = 0;
+            kit_yvel = 0;
+            kit_action = KIT_ACT_FALL;
         }
     }
 }
@@ -517,106 +537,109 @@ static void mario_collide_vertical(void) {
 /**
  * @brief Check horizontal tile collisions (wall sliding).
  *
- * Probes one point at Mario's vertical midpoint in the direction of
+ * Probes one point at Kit's vertical midpoint in the direction of
  * movement. If a solid tile is hit, snaps X to the tile boundary and
- * zeroes horizontal velocity. Only checks the direction Mario is
+ * zeroes horizontal velocity. Only checks the direction Kit is
  * actually moving to avoid false positives.
  */
-static void mario_collide_horizontal(void) {
+static void kit_collide_horizontal(void) {
     u16 prop;
     s16 mid_y;
 
-    mid_y = mario_y + 8;
+    mid_y = kit_y + 8;
 
-    if (mario_xvel > 0) {
-        prop = map_get_tile_prop(mario_x + 15, mid_y);
+    if (kit_xvel > 0) {
+        prop = map_get_tile_prop(kit_x + 15, mid_y);
         if (prop != T_EMPTY) {
-            mario_x = ((mario_x + 15) & 0xFFF8) - 16;
-            mario_xfrac = 0;
-            mario_xvel = 0;
+            kit_x = ((kit_x + 15) & 0xFFF8) - 16;
+            kit_xfrac = 0;
+            kit_xvel = 0;
         }
     }
 
-    if (mario_xvel < 0) {
-        prop = map_get_tile_prop(mario_x, mid_y);
+    if (kit_xvel < 0) {
+        prop = map_get_tile_prop(kit_x, mid_y);
         if (prop != T_EMPTY) {
-            mario_x = (mario_x & 0xFFF8) + 8;
-            mario_xfrac = 0;
-            mario_xvel = 0;
+            kit_x = (kit_x & 0xFFF8) + 8;
+            kit_xfrac = 0;
+            kit_xvel = 0;
         }
     }
 }
 
 /**
- * @brief Clamp Mario to world boundaries and handle action state transitions.
+ * @brief Clamp Kit to world boundaries and handle action state transitions.
  *
- * Prevents Mario from leaving the map horizontally or going above the
- * top. If Mario falls below Y=240 (off the bottom of the screen),
+ * Prevents Kit from leaving the map horizontally or going above the
+ * top. If Kit falls below Y=240 (off the bottom of the screen),
  * respawns at the top-left. Also handles state machine transitions:
  * WALK->STAND when velocity reaches zero, JUMP->FALL at the apex.
  */
-static void mario_clamp_and_transition(void) {
-    if (mario_x < 0) {
-        mario_x = 0;
-        mario_xvel = 0;
+static void kit_clamp_and_transition(void) {
+    if (kit_x < 0) {
+        kit_x = 0;
+        kit_xvel = 0;
     }
-    if (mario_x > map_max_x) {
-        mario_x = map_max_x;
-        mario_xvel = 0;
+    if (kit_x > map_max_x) {
+        kit_x = map_max_x;
+        kit_xvel = 0;
     }
-    if (mario_y < 0) {
-        mario_y = 0;
-        mario_yvel = 0;
+    if (kit_y < 0) {
+        kit_y = 0;
+        kit_yvel = 0;
     }
-    if (mario_y > 240) {
-        mario_x = 48;
-        mario_y = 32;
-        mario_xvel = 0;
-        mario_yvel = 0;
-        mario_action = MARIO_ACT_FALL;
+    if (kit_y > 240) {
+        kit_x = 48;
+        kit_y = 64;
+        kit_xvel = 0;
+        kit_yvel = 0;
+        kit_action = KIT_ACT_FALL;
     }
 
-    if (mario_action == MARIO_ACT_WALK && mario_xvel == 0)
-        mario_action = MARIO_ACT_STAND;
-    if (mario_action == MARIO_ACT_JUMP && mario_yvel >= 0)
-        mario_action = MARIO_ACT_FALL;
+    if (kit_action == KIT_ACT_WALK && kit_xvel == 0)
+        kit_action = KIT_ACT_STAND;
+    if (kit_action == KIT_ACT_JUMP && kit_yvel >= 0)
+        kit_action = KIT_ACT_FALL;
 }
 
 /**
- * @brief Update Mario's sprite animation frame based on current action.
+ * @brief Update Kit's sprite animation frame based on current action.
  *
  * Pure state->clip mapping: select the clip for the current action and
  * tick. The anim module handles cadence (walk alternates every 4 ticks),
  * continue-if-same (walking keeps its phase), and the oamrefresh flag
  * (tile re-upload only when the frame actually changes).
  */
-static void mario_animate(void) {
-    if (mario_action == MARIO_ACT_WALK)
-        animPlay(&mario_anim, &clip_walk);
-    else if (mario_action == MARIO_ACT_JUMP || mario_action == MARIO_ACT_FALL)
-        animPlay(&mario_anim, &clip_jump);
+static void kit_animate(void) {
+    if (kit_action == KIT_ACT_WALK)
+        animPlay(&kit_anim, &clip_walk);
+    else if (kit_action == KIT_ACT_JUMP)
+        animPlay(&kit_anim, &clip_jump);
+    else if (kit_action == KIT_ACT_FALL)
+        animPlay(&kit_anim, &clip_fall);
     else
-        animPlay(&mario_anim, &clip_stand);
-    animTickOam(&mario_anim, 0);
+        animPlay(&kit_anim, &clip_stand);
+    animTickOam(&kit_anim, 0);
 }
 
 /**
- * @brief Update camera to follow Mario and position the sprite on screen.
+ * @brief Update camera to follow Kit and position the sprite on screen.
  *
- * Centers the camera on Mario (offset by half-screen width = 128 pixels),
- * clamped to the map boundaries. Then converts Mario's world position
+ * Centers the camera on Kit (offset by half-screen width = 128 pixels),
+ * clamped to the map boundaries. Then converts Kit's world position
  * to screen-relative coordinates for the sprite engine and triggers
  * the dynamic sprite draw for OAM buffer update.
  */
-static void mario_update_camera(void) {
-    camera_x = mario_x - 128;
+static void kit_update_camera(void) {
+    camera_x = kit_x - 128;
     if (camera_x < 0) camera_x = 0;
     if (camera_x > cam_max_x)
         camera_x = cam_max_x;
 
-    oambuffer[0].oamx = mario_x - camera_x;
-    oambuffer[0].oamy = mario_y;
+    oambuffer[0].oamx = kit_x - camera_x + KIT_DRAW_DX;
+    oambuffer[0].oamy = kit_y + KIT_DRAW_DY;
     oamDynamicDraw(0);
+    bgSetScroll(1, camera_x >> 2, 0);   /* the far towers: a quarter of the speed */
 }
 
 /*============================================================================
@@ -627,17 +650,17 @@ static void mario_update_camera(void) {
  * @brief Main entry point -- platformer initialization and game loop.
  *
  * Initializes all subsystems during force blank: Mode 1 video, tile/palette
- * DMA via assembly loader, dynamic sprite engine, map loading, Mario state,
+ * DMA via assembly loader, dynamic sprite engine, map loading, Kit state,
  * and SNESMOD audio (music + jump sound effect). Then enters the main loop
  * with a strict pipeline:
  *
  * Active display (CPU-only, no VRAM):
- *   1. mario_handle_input() - read pad, apply acceleration
- *   2. mario_apply_physics() - gravity, velocity integration
- *   3. mario_collide_vertical/horizontal() - tile collision response
- *   4. mario_clamp_and_transition() - boundary checks, state transitions
- *   5. mario_animate() - frame selection
- *   6. mario_update_camera() - camera + sprite positioning
+ *   1. kit_handle_input() - read pad, apply acceleration
+ *   2. kit_apply_physics() - gravity, velocity integration
+ *   3. kit_collide_vertical/horizontal() - tile collision response
+ *   4. kit_clamp_and_transition() - boundary checks, state transitions
+ *   5. kit_animate() - frame selection
+ *   6. kit_update_camera() - camera + sprite positioning
  *   7. map_update() - prepare next column in RAM buffer
  *
  * VBlank (VRAM writes allowed):
@@ -655,11 +678,16 @@ int main(void) {
 
     bgSetGfxPtr(0, VRAM_BG_TILES);
     bgSetMapPtr(0, VRAM_BG_MAP, SC_64x32);
+    bgSetGfxPtr(1, VRAM_BG2_TILES);
+    bgSetMapPtr(1, VRAM_BG2_MAP, SC_64x32);
 
     /* DMA tile + palette assets: the pointers carry their bank. */
     dmaCopyVram(tiles_tiles,        VRAM_BG_TILES, tiles_tiles_end - tiles_tiles);
     dmaCopyCGram(tiles_pal,        0,             tiles_pal_end - tiles_pal);
-    dmaCopyCGram(mario_sprite_pal, 128,           mario_sprite_pal_end - mario_sprite_pal);
+    dmaCopyVram(skyline_tiles,      VRAM_BG2_TILES, skyline_tiles_end - skyline_tiles);
+    dmaCopyVram(skyline_map,        VRAM_BG2_MAP,   skyline_map_end - skyline_map);
+    dmaCopyCGram(skyline_pal,      16,            skyline_pal_end - skyline_pal);
+    dmaCopyCGram(kit_pal,          128,           kit_pal_end - kit_pal);
 
     {
         static const OamDynamicConfig dyn_cfg = {
@@ -667,13 +695,13 @@ int main(void) {
             .vramSmall     = VRAM_SPR_SMALL,
             .slotLargeInit = 0,
             .slotSmallInit = 0,
-            .sizeMode      = OBJ_SIZE8_L16,
+            .sizeMode      = OBJ_SIZE16_L32,
         };
         oamDynamicInit(&dyn_cfg);
     }
 
     map_load();     /* All VRAM writes safe — force blank from consoleInit */
-    mario_init();
+    kit_init();
 
     /* Initialize SNESMOD audio */
     snesmodInit();
@@ -681,14 +709,14 @@ int main(void) {
     snesmodLoadModule(MOD_ROOFTOPS);
     sfx_jump_slot = snesmodLoadEffect(SFX_JUMP);
 
-    setMainScreen(TM_BG1 | TM_OBJ);
+    setMainScreen(TM_BG1 | TM_BG2 | TM_OBJ);
 
-    /* Initial sprite draw — queue Mario's tile upload. The NMI handler
+    /* Initial sprite draw — queue Kit's tile upload. The NMI handler
      * runs even under force blank, so the WaitForVBlank below lets the
      * auto-flush hook drain the VRAM queue + sync OAM before we release
-     * force blank. Mario is in VRAM by the time the first frame renders. */
-    oambuffer[0].oamx = mario_x;
-    oambuffer[0].oamy = mario_y;
+     * force blank. Kit is in VRAM by the time the first frame renders. */
+    oambuffer[0].oamx = kit_x + KIT_DRAW_DX;
+    oambuffer[0].oamy = kit_y + KIT_DRAW_DY;
     oamDynamicDraw(0);
     WaitForVBlank();
 
@@ -700,13 +728,13 @@ int main(void) {
     WaitForVBlank();
 
     while (1) {
-        mario_handle_input();
-        mario_apply_physics();
-        mario_collide_vertical();
-        mario_collide_horizontal();
-        mario_clamp_and_transition();
-        mario_animate();
-        mario_update_camera();
+        kit_handle_input();
+        kit_apply_physics();
+        kit_collide_vertical();
+        kit_collide_horizontal();
+        kit_clamp_and_transition();
+        kit_animate();
+        kit_update_camera();
         map_update();
 
         WaitForVBlank();

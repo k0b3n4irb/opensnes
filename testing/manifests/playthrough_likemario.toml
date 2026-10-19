@@ -1,0 +1,26 @@
+# games/likemario, the whole level: hold RIGHT from frame 60 and press A
+# nine times, once before each gap between two roofs, and Kit reaches the
+# end of the level (x = map width - 16 = 2336) standing on the last roof
+# (surface row 15: y = 120 - 16 = 104).
+#
+# What this proves that the other manifests cannot: the level is beatable
+# with the normal jump. Each step up is at most 16 px and each gap at most
+# 24 (devtools/art_assets/build.py, LEVEL); a level edit that puts a roof
+# out of reach, a collision table that marks an equipment tile solid, or a
+# change to the jump physics fails here instead of in a player's hands. A
+# fall between two roofs respawns Kit at x = 48, which this script never
+# brings back to the end.
+#
+# The nine frames were found on luna on 2026-10-19, gap by gap: the first
+# frame, 2 frames apart, from which a press lands Kit beyond the gap.
+rom = "../../examples/games/likemario/likemario.sfc"
+
+[[checkpoint]]
+at_frame = 2100
+input = "60:0x0100,200:0x0180,202:0x0100,314:0x0180,316:0x0100,538:0x0180,540:0x0100,654:0x0180,656:0x0100,978:0x0180,980:0x0100,1098:0x0180,1100:0x0100,1218:0x0180,1220:0x0100,1434:0x0180,1436:0x0100,1658:0x0180,1660:0x0100"
+[checkpoint.values]
+"kit_x.main" = { eq = 2336, width = 2 }
+"kit_y.main" = { eq = 104, width = 2 }
+
+[asserts.dma]
+unsafe_writes = 0

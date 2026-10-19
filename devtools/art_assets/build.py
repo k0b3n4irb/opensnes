@@ -1,0 +1,371 @@
+#!/usr/bin/env python3
+"""Write the examples' Néo-Lumen level data from the art in assets/neo-lumen/.
+
+A generator, not a check (like devtools/audio_assets/build.py): the files it
+writes are committed, and an example's build only converts them with the
+compiled tools. `--check` says whether the committed files are what it
+writes.
+
+backgrounds/mode0:
+  res/bg0.png .. bg3.png  four 2bpp layers of the city, 256x256, each one
+                      palette of 4 (0 transparent): a status panel (BG0,
+                      still), the roofs (BG1, fastest), the mid-distance
+                      blocks (BG2), the far towers (BG3, slowest); each
+                      scrolling layer is a 128-px half and its mirror, so
+                      it wraps at 256
+
+maps/map_scroll:
+  res/roofs.png       the tiles of one long row of roofs, in the order of
+  res/rooftops.tmj    the Tiled map that numbers them, each tile carrying
+                      its `attribute` (FF00 solid) for opensnes-level
+  res/kit.png         Kit seen from the side, as for likemario
+
+games/likemario:
+  res/tiles.png       the level's distinct 8x8 tiles, in the order the map
+                      numbers them (tile 0 is the empty sky), 128 px wide
+  res/BG1.m16         the level map as main.c reads it: width and height in
+                      pixels, size in bytes, then one u16 entry per 8x8 cell
+  res/map_1_1.b16     one u16 per tile number: $FF00 solid, $0000 empty
+  res/skyline.png     BG2: a band of far towers, 512x256 (a half and its
+                      mirror), the rest transparent
+  res/kit.png         Kit seen from the side, 32x32 frames (the sheet of
+                      assets/neo-lumen/characters/kit_side_sheet.png)
+
+The level is a row of buildings, each one or more 128-px roof pieces at one
+height, with gaps between them; it is laid out by LEVEL below. A roof's
+walkable surface is the top of its neon strip, row 64 of a piece once the
+pieces are moved 2 px down (the strip is on row 62 of every generated
+piece): a cell is solid if it is on row 8 of its piece or below.
+
+Run: python3 devtools/art_assets/build.py [--check]
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import struct
+import sys
+from pathlib import Path
+
+from PIL import Image, ImageOps
+
+ROOT = Path(__file__).resolve().parents[2]
+ART = ROOT / "assets" / "neo-lumen"
+LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
+MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
+MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
+
+# The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
+SKY = (16, 24, 40)
+CITY = ["#080810", "#101828", "#182838", "#203048", "#281838", "#402858", "#604080", "#8060a8",
+        "#183840", "#205058", "#307078", "#48a0a0", "#a02860", "#e05090", "#f0b050"]
+
+ROWS = 30                     # 240 px: the engine's map height
+PIECE_SURFACE = 64            # the strip's top inside a piece, after the 2-px move
+
+# (piece numbers left to right, surface row in 8-px rows, gap in px after it).
+# A step up is at most 16 px and a gap at most 24, so the normal jump (34 px
+# high) crosses every one; the high jump (UP+A) is there to spare.
+LEVEL = [
+    ((0, 1), 18, 16),
+    ((2,), 16, 24),
+    ((3, 4), 16, 16),
+    ((5,), 14, 24),
+    ((1, 0, 2), 16, 16),
+    ((4,), 18, 24),
+    ((3,), 17, 16),
+    ((5, 1), 15, 24),
+    ((2, 0), 17, 16),
+    ((4, 3), 15, 0),
+]
+
+
+def rgb(h: str) -> tuple[int, int, int]:
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+def palette() -> list[tuple[int, int, int]]:
+    return [SKY] + [rgb(c) for c in CITY]
+
+
+def to_indices(im: Image.Image, pal: list[tuple[int, int, int]]) -> list[list[int]]:
+    """RGBA picture -> rows of indices: 0 where transparent, else the nearest colour 1..15."""
+    w, h = im.size
+    px = im.load()
+    out = []
+    for y in range(h):
+        row = []
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a < 128:
+                row.append(0)
+                continue
+            row.append(1 + min(range(15), key=lambda i: sum((p - q) ** 2 for p, q in zip(pal[i + 1], (r, g, b)))))
+        out.append(row)
+    return out
+
+
+def load_piece(n: int, pal) -> list[list[int]]:
+    """A 128x128 piece moved 2 px down; transparent bottom rows filled by repeating the last 8 opaque ones."""
+    rows = to_indices(Image.open(ART / "tiles" / f"roof_{n}.png").convert("RGBA"), pal)
+    rows = [[0] * 128, [0] * 128] + rows[:126]
+    last = max(y for y, r in enumerate(rows) if any(r))
+    for y in range(last + 1, 128):
+        rows[y] = list(rows[last - 7 + (y - last - 1) % 8])
+    return rows
+
+
+def compose(level, pieces) -> tuple[int, list[bytes], list[int], list[bool]]:
+    """Lay the buildings of `level` out on a ROWS-high canvas: (width in px, the distinct
+    8x8 tiles in reading order with the empty one first, one entry per cell, solid per tile)."""
+    width_px = sum(128 * len(p) + gap for p, _, gap in level)
+    width_px = (width_px + 7) // 8 * 8
+    cols = width_px // 8
+    canvas = [[0] * width_px for _ in range(ROWS * 8)]
+    solid_cell = [[False] * cols for _ in range(ROWS)]
+    x = 0
+    for numbers, surface_row, gap in level:
+        for n in numbers:
+            top = surface_row * 8 - PIECE_SURFACE
+            piece = pieces[n]
+            for y in range(ROWS * 8):
+                py = y - top
+                if py < 0:
+                    continue
+                src = piece[py] if py < 128 else piece[120 + (py - 128) % 8]   # the wall goes on down
+                canvas[y][x:x + 128] = src
+            for cy in range(ROWS):
+                if cy * 8 - top >= PIECE_SURFACE:
+                    for cx in range(x // 8, x // 8 + 16):
+                        solid_cell[cy][cx] = True
+            x += 128
+        x += gap
+
+    empty = bytes(64)
+    tiles: list[bytes] = [empty]
+    index: dict[bytes, int] = {empty: 0}
+    entries = []
+    for cy in range(ROWS):
+        for cx in range(cols):
+            t = bytes(canvas[cy * 8 + yy][cx * 8 + xx] for yy in range(8) for xx in range(8))
+            if t not in index:
+                index[t] = len(tiles)
+                tiles.append(t)
+            entries.append(index[t])
+    if len(tiles) > 1024:
+        sys.exit(f"{len(tiles)} distinct tiles, a map entry numbers 1024")
+
+    solid = [False] * len(tiles)
+    seen = [False] * len(tiles)
+    clash = 0
+    for cy in range(ROWS):
+        for cx in range(cols):
+            t = entries[cy * cols + cx]
+            if seen[t] and solid[t] != solid_cell[cy][cx]:
+                clash += 1
+            if not seen[t]:
+                seen[t] = True
+                solid[t] = solid_cell[cy][cx]
+    solid[0] = False
+    if clash:
+        sys.exit(f"{clash} cells whose tile is solid in one place and empty in another")
+    return width_px, tiles, entries, solid
+
+
+def tile_sheet(tiles: list[bytes], pal) -> Image.Image:
+    """The tiles, 16 to a 128-px row, in their order."""
+    sheet = Image.new("P", (128, (len(tiles) + 15) // 16 * 8), 0)
+    flat = [v for c in pal for v in c]
+    sheet.putpalette(flat + [0] * (768 - len(flat)))
+    for k, t in enumerate(tiles):
+        tx, ty = (k % 16) * 8, (k // 16) * 8
+        for yy in range(8):
+            for xx in range(8):
+                sheet.putpixel((tx + xx, ty + yy), t[yy * 8 + xx])
+    return sheet
+
+
+def build_likemario() -> dict[str, bytes]:
+    pal = palette()
+    pieces = {n: load_piece(n, pal) for n in range(6)}
+    width_px, tiles, entries, solid = compose(LEVEL, pieces)
+    flat = [v for c in pal for v in c]
+    sheet = tile_sheet(tiles, pal)
+
+    m16 = struct.pack("<3H", width_px, ROWS * 8, len(entries) * 2) + struct.pack(f"<{len(entries)}H", *entries)
+    b16 = struct.pack(f"<{len(tiles)}H", *(0xFF00 if s else 0 for s in solid))
+
+    # BG2: the far towers, rows 20-83 of city_far, at rows 40-103 of a 512x256 picture
+    far = Image.open(ART / "backgrounds" / "city_far.png").convert("RGBA")
+    band = far.crop((0, 20, 256, 84))
+    half = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
+    half.paste(band, (0, 40))
+    full = Image.new("RGBA", (512, 256), (0, 0, 0, 0))
+    full.paste(half, (0, 0))
+    full.paste(ImageOps.mirror(half), (256, 0))
+    sky = Image.new("P", (512, 256), 0)
+    sky.putpalette(flat + [0] * (768 - len(flat)))
+    for yy, row in enumerate(to_indices(full, pal)):
+        for xx, v in enumerate(row):
+            if v:
+                sky.putpixel((xx, yy), v)
+
+    return {"tiles.png": png(sheet), "BG1.m16": m16, "map_1_1.b16": b16, "skyline.png": png(sky),
+            "kit.png": (ART / "characters" / "kit_side_sheet.png").read_bytes(),
+            "_report": f"{width_px} px wide, {len(tiles)} tiles, {sum(solid)} solid".encode()}
+
+
+def font8() -> dict[str, list[int]]:
+    """The library's 8x8 font (lib/source/text.asm, 2bpp): each glyph's eight rows of plane 0."""
+    import re
+    src = (ROOT / "lib" / "source" / "text.asm").read_text()
+    body = src[src.index("opensnes_font_2bpp:"):]
+    glyphs: dict[str, list[int]] = {}
+    for m in re.finditer(r"; (\d+): .*\n\s*\.db ([^\n]+)", body):
+        code = int(m.group(1))
+        b = [int(v.strip().lstrip("$"), 16) for v in m.group(2).split(",")]
+        if len(b) == 16:
+            glyphs[chr(code)] = b[0::2]
+        if code == 126:
+            break
+    return glyphs
+
+
+def layer4(im: Image.Image, colours: list[str], mid: int = 55, bright: int = 90) -> Image.Image:
+    """RGBA -> 2bpp indexed: 0 where transparent, else 1..3 by brightness rank: the darkest
+    `mid` per cent of the opaque pixels, the next ones up to `bright` per cent, the rest."""
+    pal = [rgb(c) for c in colours]
+    w, h = im.size
+    lum = lambda p: 0.3 * p[0] + 0.59 * p[1] + 0.11 * p[2]
+    opaque = sorted(lum(p) for p in getattr(im, "get_flattened_data", im.getdata)() if p[3] >= 128)
+    cut1 = opaque[len(opaque) * mid // 100] if opaque else 0
+    cut2 = opaque[len(opaque) * bright // 100] if opaque else 0
+    out = Image.new("P", (w, h), 0)
+    flat = [16, 24, 40] + [v for c in pal for v in c]
+    out.putpalette(flat + [0] * (768 - len(flat)))
+    px = im.load()
+    for y in range(h):
+        for x in range(w):
+            p = px[x, y]
+            if p[3] < 128:
+                continue
+            l = lum(p)
+            out.putpixel((x, y), 1 if l <= cut1 else 2 if l <= cut2 else 3)
+    return out
+
+
+def wrap256(half: Image.Image) -> Image.Image:
+    """A 128-px wide picture and its mirror: 256 px that wrap without a seam."""
+    full = Image.new("RGBA", (256, half.height), (0, 0, 0, 0))
+    full.paste(half, (0, 0))
+    full.paste(ImageOps.mirror(half), (128, 0))
+    return full
+
+
+def build_mode0() -> dict[str, bytes]:
+    far = Image.open(ART / "backgrounds" / "city_far.png").convert("RGBA")
+    mid = Image.open(ART / "backgrounds" / "skyline_mid.png").convert("RGBA")
+    out = {}
+    # BG3, the far towers: rows 0-111 of city_far, at the top of the screen
+    l3 = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
+    l3.paste(wrap256(far.crop((0, 0, 128, 112))), (0, 8))
+    out["bg3.png"] = png(layer4(l3, ["#183840", "#307078", "#f0b050"], 55, 95))
+    # BG2, the mid-distance blocks: rows 128-223 of skyline_mid (its sky is transparent),
+    # low enough to leave the far towers in sight; amber for the lit windows only
+    l2 = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
+    l2.alpha_composite(wrap256(mid.crop((0, 128, 128, 224))), (0, 80))
+    out["bg2.png"] = png(layer4(l2, ["#281838", "#402858", "#f0b050"], 60, 96))
+    # BG1, the roofs: roof_0's left half, its strip's top on screen row 136
+    roof = Image.open(ART / "tiles" / "roof_0.png").convert("RGBA").crop((0, 0, 128, 119))
+    l1 = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
+    l1.alpha_composite(wrap256(roof), (0, 136 - 62))
+    out["bg1.png"] = png(layer4(l1, ["#080810", "#205058", "#48a0a0"]))
+    # BG0, the status panel: rows 192-223, ink with a teal frame, amber text
+    glyphs = font8()
+    hud = Image.new("P", (256, 256), 0)
+    flat = [16, 24, 40] + [v for c in ("#080810", "#48a0a0", "#f0b050") for v in rgb(c)]
+    hud.putpalette(flat + [0] * (768 - len(flat)))
+    for y in range(192, 224):
+        for x in range(0, 256):
+            edge = y in (193, 222) or x in (1, 254)
+            hud.putpixel((x, y), 2 if edge and 1 <= x <= 254 and 193 <= y <= 222 else 1)
+    def text(x, y, s):
+        for k, ch in enumerate(s):
+            rows = glyphs.get(ch, glyphs[" "])
+            for r, bits in enumerate(rows):
+                for c in range(8):
+                    if bits & (0x80 >> c):
+                        hud.putpixel((x + k * 8 + c, y + r), 3)
+    text(16, 200, "KIT")
+    text(16, 210, "COURIER")
+    text(104, 200, "SHARDS  0012")
+    text(104, 210, "DISTRICT  ROOFS")
+    out["bg0.png"] = png(hud)
+    return out
+
+
+# maps/map_scroll: one long row of roofs at one height, no gap (Kit walks along
+# it at a fixed height: the example is about the map, not about jumping)
+FLAT = [((0, 1, 2, 3, 4, 5, 1, 0, 2, 4, 3, 5, 0, 2, 1, 3, 4, 5), 22, 0)]
+
+
+def build_map_scroll() -> dict[str, bytes]:
+    pal = palette()
+    pieces = {n: load_piece(n, pal) for n in range(6)}
+    width_px, tiles, entries, solid = compose(FLAT, pieces)
+    cols = width_px // 8
+    tmj = {
+        "compressionlevel": -1, "height": ROWS, "infinite": False, "nextlayerid": 3, "nextobjectid": 1,
+        "orientation": "orthogonal", "renderorder": "right-down", "tiledversion": "1.10.2",
+        "tileheight": 8, "tilewidth": 8, "type": "map", "version": "1.10", "width": cols,
+        "layers": [
+            {"data": [e + 1 for e in entries], "height": ROWS, "id": 1, "name": "BG1", "opacity": 1,
+             "type": "tilelayer", "visible": True, "width": cols, "x": 0, "y": 0},
+            {"color": "#ff0000", "draworder": "topdown", "id": 2, "name": "Entities", "objects": [],
+             "opacity": 1, "type": "objectgroup", "visible": True, "x": 0, "y": 0},
+        ],
+        "tilesets": [{
+            "columns": 16, "firstgid": 1, "image": "roofs.png", "imageheight": (len(tiles) + 15) // 16 * 8,
+            "imagewidth": 128, "margin": 0, "name": "roofs", "spacing": 0, "tilecount": len(tiles),
+            "tileheight": 8, "tilewidth": 8,
+            "tiles": [{"id": k, "properties": [
+                {"name": "attribute", "type": "string", "value": "FF00" if solid[k] else "0"},
+                {"name": "palette", "type": "string", "value": "0"},
+                {"name": "priority", "type": "string", "value": "0"}]} for k in range(len(tiles))],
+        }],
+    }
+    return {"roofs.png": png(tile_sheet(tiles, pal)),
+            "rooftops.tmj": (json.dumps(tmj, indent=1) + "\n").encode(),
+            "kit.png": (ART / "characters" / "kit_side_sheet.png").read_bytes(),
+            "_report": f"{width_px} px wide, {len(tiles)} tiles".encode()}
+
+
+def png(im: Image.Image) -> bytes:
+    import io
+    buf = io.BytesIO()
+    im.save(buf, format="PNG", transparency=0, optimize=False)
+    return buf.getvalue()
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--check", action="store_true", help="compare with the committed files instead of writing them")
+    args = ap.parse_args()
+    jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll())]
+    print("likemario:", jobs[0][1].pop("_report").decode())
+    print("map_scroll:", jobs[2][1].pop("_report").decode())
+    bad = 0
+    for folder, files in jobs:
+        for name, data in files.items():
+            path = folder / name
+            if args.check:
+                if not path.is_file() or path.read_bytes() != data:
+                    print(f"  DIFFERS {path.relative_to(ROOT)}")
+                    bad += 1
+            else:
+                path.write_bytes(data)
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,4 +1,4 @@
-; data.asm - LikeMario asset data
+; data.asm - likemario asset data: the level map and its tile properties
 ;
 ; Tile/sprite graphics go in SUPERFREE (any bank, accessed via DMA only).
 ; Map/collision data are read from C through const pointers (far reads).
@@ -18,7 +18,7 @@
 ;----------------------------------------------------------------------
 ASSET_SECTION "rodata2"
 
-mapmario:       .incbin "res/BG1.m16"
+maplevel:       .incbin "res/BG1.m16"
 
 tilesetatt:     .incbin "res/map_1_1.b16"
 

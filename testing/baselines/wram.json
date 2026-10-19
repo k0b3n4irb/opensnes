@@ -104,8 +104,8 @@
     "rom_sha256": "03051a8039a51c10812b33a8e1425939fe35e31350e87795a5dad32522bc16ad"
   },
   "games_likemario": {
-    "stream": "b512b4bd5bc66ecacf0cbe5ca2d41320cc49b4c25b7b6e6daf81b46c15102104",
-    "rom_sha256": "d376e741a02a6e0f9dc03dd06d6304141bcc8d2e8be59327a63d37dc258b6ea5"
+    "stream": "17b1758ca35fb68f4a8c24de7458a0557b79a684a18aaeb7e4686c169de3a1da",
+    "rom_sha256": "5f2ffb8ec2aef5b3ef44b5ef87905de1c813443e685608fabd30e4025949664e"
   },
   "games_mapandobjects": {
     "stream": "e8853ce7f3814371fbc03b45cd2b861f5f86a84844e8eb5af9d9773787318c5f",

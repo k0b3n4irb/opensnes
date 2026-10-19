@@ -40,6 +40,7 @@ README; a script that none of them names is an orphan and is deleted
 | `check_debug_info.sh` | debug metadata leaking into a normal build, or `-g` emission broken | `opensnes_build.yml` |
 | `release_smoke.py` | a release zip from which the starter or a scaffolded project does not build | `release-smoke`, the build and release workflows |
 | `audio_assets/build.py` | (a generator, not a check) writes the examples' tracker modules and synthesized samples, composed for OpenSNES, and the Kenney (CC0) effects; `--check` says whether the committed files are what it writes. Needs ffmpeg. `.claude/notes/tech/audio_assets.md` | `audio-assets` |
+| `art_assets/build.py` | (a generator, not a check) writes the examples' Néo-Lumen level data from the pictures in `assets/neo-lumen/`: likemario's tileset in map order, its map, its collision table and its skyline; `--check` says whether the committed files are what it writes | `art-assets` |
 
 Their unit tests: `test_check_doc_drift.py`, `test_check_nmi_wram_race.py`,
 `test_check_vram_layout.py`, `test_asset_budget.py`, `symmap/test_symmap.py`

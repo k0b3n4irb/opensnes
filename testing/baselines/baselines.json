@@ -204,10 +204,10 @@
     "rom_sha256": "840a199f45f403d02bde58c76c3bfdbab55d97a8f99e6bd9c4418e767e6cf2d5"
   },
   "games_likemario": {
-    "fbhash": "f3cd33e1b833bf19",
+    "fbhash": "26c343fa25fa45fc",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "d4a9fd03d5c5724104475045918eeee2c59ec304ca21d1c48be45ada99440d00"
+    "luna_version": "v1.39.0",
+    "rom_sha256": "5f2ffb8ec2aef5b3ef44b5ef87905de1c813443e685608fabd30e4025949664e"
   },
   "games_mapandobjects": {
     "fbhash": "ba3043020ed171e2",
