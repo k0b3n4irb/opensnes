@@ -176,7 +176,7 @@ mapandobjects/
 
 ```bash
 cd $OPENSNES_HOME
-make -C examples/games/mapandobjects
+make -C examples/demos/mapandobjects
 ```
 
 Then open `mapandobjects.sfc` in luna (`luna-gui mapandobjects.sfc`) or any

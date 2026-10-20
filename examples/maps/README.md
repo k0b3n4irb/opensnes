@@ -14,7 +14,7 @@ collision, and walked with slopes. This is Stage 3, "can I build a world?"
 
 Climb from a world authored in Tiled and scrolled past the camera
 (`map_scroll`) to a character that stands on its slopes and enemies that
-patrol it (`games/mapandobjects`).
+patrol it (`demos/mapandobjects`).
 
 ## The idea in one screen
 
@@ -30,4 +30,4 @@ the `.m16`/`.b16` data it consumes. **Collision** reads tile *properties*
 Everything here runs inside the ~4 KB VBlank DMA budget by streaming a few
 rows or columns per frame (`map_scroll`).
 
-> The capstone that fuses maps + entities + dialog is [`games/rpg`](../games/rpg/).
+> The capstone that fuses maps + entities + dialog is [`demos/rpg`](../demos/rpg/).

@@ -327,7 +327,7 @@ PVSnesLib's audio calls map to the `snesmod` module (same SNESMOD driver):
 - `spcPlaySound(sfx)` → `slot = snesmodLoadEffect(sfx)` once, then
   `snesmodPlayEffect(slot, volume, pan, pitch)`
 - `spcProcess()` → `snesmodProcess()`, once per frame
-`examples/games/likemario` shows the whole sequence.
+`examples/demos/likemario` shows the whole sequence.
 
 ## Checklist Before Requesting User Validation
 

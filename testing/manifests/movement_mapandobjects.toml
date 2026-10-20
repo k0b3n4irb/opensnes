@@ -12,7 +12,7 @@
 # the second negative: he walks along the floor, he never falls through
 # it. kitflp is the facing flag the animation code sets, so it proves
 # the direction reached the object callback, not just the position.
-rom = "../../examples/games/mapandobjects/mapandobjects.sfc"
+rom = "../../examples/demos/mapandobjects/mapandobjects.sfc"
 
 [[checkpoint]]                 # spawn, standing on the ground
 at_frame = 60

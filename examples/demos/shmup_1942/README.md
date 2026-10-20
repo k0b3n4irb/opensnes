@@ -54,7 +54,7 @@ setMainScreen(TM_BG1 | TM_OBJ);
 ## Build
 
 ```bash
-cd examples/games/shmup_1942 && make
+cd examples/demos/shmup_1942 && make
 ```
 
 Produces `shmup_1942.sfc` (LoROM, 256 KB).

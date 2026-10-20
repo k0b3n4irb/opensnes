@@ -101,4 +101,4 @@ make
 
 Uses the `panel` module in isolation. For a full game that combines it
 with text in the box (dialog lines, a numeric score), see
-[games/rpg](../../games/rpg/).
+[demos/rpg](../../demos/rpg/).

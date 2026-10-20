@@ -124,7 +124,7 @@ glyph and performs an **immediate** DMA to VRAM — not a flagged one. That is a
 raw VRAM write, so like `textLoadFont`, it belongs in forced blank, before
 `setScreenOn()`.
 
-Wiring the BG layer is still yours. @ref examples_games_rpg puts 2bpp text on
+Wiring the BG layer is still yours. @ref examples_demos_rpg puts 2bpp text on
 BG3 in Mode 1, in front of the map:
 
 ```c
@@ -410,5 +410,5 @@ something the module supports today.
 - @ref examples_scrolling_mixed_scroll — a line of text on BG3, scrolled like any BG.
 - @ref examples_fundamentals_text_glyphs — what the module hides: a glyph as
   raw 2bpp bitplanes plus a tilemap entry.
-- @ref examples_games_rpg and @ref examples_sprites_sprite_sizes — the
+- @ref examples_demos_rpg and @ref examples_sprites_sprite_sizes — the
   explicit `textInit` path, 2bpp and 4bpp.

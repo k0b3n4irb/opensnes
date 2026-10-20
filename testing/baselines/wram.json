@@ -103,23 +103,23 @@
     "stream": "1eff8454f60ff4373c9360bc5b20f385d06f0689f7e08217f0eea1474cc5b7c1",
     "rom_sha256": "03051a8039a51c10812b33a8e1425939fe35e31350e87795a5dad32522bc16ad"
   },
-  "games_likemario": {
+  "demos_likemario": {
     "stream": "17b1758ca35fb68f4a8c24de7458a0557b79a684a18aaeb7e4686c169de3a1da",
     "rom_sha256": "5f2ffb8ec2aef5b3ef44b5ef87905de1c813443e685608fabd30e4025949664e"
   },
-  "games_mapandobjects": {
+  "demos_mapandobjects": {
     "stream": "de25b37a2b784b9ff7de8381480ba21fa5d065e3a4cf5115ad67f8125ee6e89b",
     "rom_sha256": "17a3fe7caf3604865065fdb1b257561da2ab9043f5a2b3ca8fb2a8741357d950"
   },
-  "games_mode7_racing": {
+  "mode7_mode7_racing": {
     "stream": "0849ff5ff41794d53d29a2b330e49d31abdd101ca3b945dfb81a08039221141c",
     "rom_sha256": "3306be2fcd2715966d8c7ae37a2cb410f8e19530cfbccd757fbf8ff854aa7970"
   },
-  "games_rpg": {
+  "demos_rpg": {
     "stream": "a08f18012715d08b445c671e03a1bde19bd90f4d9ea3de5bf3db371a316ae474",
     "rom_sha256": "99b8038258664b3a1edcdc4c251ea3986fb0b4b1ce8f832319a53a6e53776cfa"
   },
-  "games_shmup_1942": {
+  "demos_shmup_1942": {
     "stream": "1644221767848221665f18d89dd5b2c85bf308295fd6674967482746d90229fd",
     "rom_sha256": "8a05026d32d29b66c339455dd854dfa8c113767134558df51e158ac1b5dcfedc"
   },

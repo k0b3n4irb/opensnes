@@ -122,7 +122,7 @@ automatically.
 
 - **Explore related examples**:
   - `memory/save_game` -- SRAM persistence (works in both LoROM and HiROM)
-  - `games/likemario` -- A larger project that benefits from understanding memory layout
+  - `demos/likemario` -- A larger project that benefits from understanding memory layout
 
 ## Modules Used
 

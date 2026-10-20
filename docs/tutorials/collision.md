@@ -237,7 +237,7 @@ oamSet(id, sx, sy, ...);
         └───┴────┘      and the only thing that collides
 ```
 
-Now what you see is what collides, from every direction. `examples/games/rpg`
+Now what you see is what collides, from every direction. `examples/demos/rpg`
 does this in `draw_char()`.
 
 Two consequences worth knowing:
@@ -376,7 +376,7 @@ if (bx < 10 && by >= 1 && by <= 10) {
 
 - `examples/basics/collision_demo/` -- AABB sprite collision with tile-based wall collision and visual feedback
 - `examples/games/breakout/` -- Ball vs walls, ball vs paddle (angle control), ball vs brick grid
-- `examples/games/likemario/` -- Platformer tile collision with gravity, ground snapping, and wall sliding
+- `examples/demos/likemario/` -- Platformer tile collision with gravity, ground snapping, and wall sliding
 
 ## Next Steps
 

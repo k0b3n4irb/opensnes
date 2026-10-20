@@ -184,7 +184,7 @@ underneath but the last tile property read was non-zero *and* the object's
 
 ## Slopes, and what the tests pin
 
-`objCollidMapWithSlopes` is what Kit uses in `examples/games/mapandobjects`.
+`objCollidMapWithSlopes` is what Kit uses in `examples/demos/mapandobjects`.
 A slope tile is not a wall: walking into one must *lift* the object to the
 surface height for its horizontal position within the tile, not stop it. The
 routine does that by indexing a per-slope-type height table with the object's

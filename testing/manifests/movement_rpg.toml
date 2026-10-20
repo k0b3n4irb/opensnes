@@ -13,7 +13,7 @@
 # gold and chest_opened stay 0 at every checkpoint — the hero never
 # walks onto the chest on this route, so a ROM that handed out gold
 # without a KEY_A on the chest tile fails here.
-rom = "../../examples/games/rpg/rpg.sfc"
+rom = "../../examples/demos/rpg/rpg.sfc"
 
 [[checkpoint]]                 # fading in
 at_frame = 30

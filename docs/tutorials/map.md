@@ -66,7 +66,7 @@ module and want the same content in a different shape:
 | `quadrant = true` | `<layer>.q16` — a quadrant-ordered 64×64 tilemap | scrolling a fixed 64×64 area with `bgSetScroll` (the `background` module, not `map`) |
 | `collision = true` | `<layer>.c16` — one collision byte per map cell | `collideTile()` (a flattened grid, indexed directly) |
 
-`examples/games/rpg` scrolls a fixed 64×64 town with `background`, not
+`examples/demos/rpg` scrolls a fixed 64×64 town with `background`, not
 `map` (its `town.tmj` gives the same quadrant map under `--quadrant`);
 `examples/maps/map_scroll` uses the default `map` pipeline. Pick the module that
 matches the map size — `map` for worlds larger than 64×64, `background` for
@@ -156,7 +156,7 @@ mapSetMapOptions(MAP_OPT_BG2);    // stream a second map onto BG2
 - **`examples/maps/map_scroll`** — the full Tiled pipeline (a `.tmj` drawn in
   Tiled, converted with `opensnes-level`, loaded with `mapLoad`) and the
   minimum scroller above, a large map followed by a sprite.
-- **`examples/games/mapandobjects`** — per-tile collision *attributes* driving
+- **`examples/demos/mapandobjects`** — per-tile collision *attributes* driving
   slope physics (the `.b16` values mean more than solid/empty).
 
 ## Gotchas

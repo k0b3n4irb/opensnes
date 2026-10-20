@@ -63,8 +63,8 @@ FRAMES = 150
 DRIFT = 0.10
 SUBSET = [
     ("games/breakout",        8490, "the corpus worst: sprites + tilemap + text"),
-    ("games/likemario",       8170, "sprites, scrolling and audio together"),
-    ("games/rpg",             8170, "map module, panel and text"),
+    ("demos/likemario",       8170, "sprites, scrolling and audio together"),
+    ("demos/rpg",             8170, "map module, panel and text"),
     ("sprites/dynamic_sprite", 7676, "the dynamic-sprite VRAM queue flush"),
     ("maps/map_scroll",       7668, "the map module's scroll DMA"),
     ("audio/snesmod_music",   5650, "the audio driver's per-frame work"),

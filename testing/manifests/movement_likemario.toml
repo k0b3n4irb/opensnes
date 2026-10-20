@@ -1,5 +1,5 @@
 # Migrated from probes/movement.py.
-rom = "../../examples/games/likemario/likemario.sfc"
+rom = "../../examples/demos/likemario/likemario.sfc"
 frames = 120
 [[checkpoint]]
 at_frame = 60

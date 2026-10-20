@@ -1,10 +1,10 @@
-# games/mapandobjects: a solid tile stops Kit dead. RIGHT held from frame 60
+# demos/mapandobjects: a solid tile stops Kit dead. RIGHT held from frame 60
 # with no jump: Kit walks the first flat and stops against the first vent
 # (x 144, three rows high), his 14-wide box from x + 1 ending at x 144
 # (kitx 129), on the roof (kity 160), and stays there with RIGHT still
 # held. The other half of movement_mapandobjects_slope.toml's contract: a
 # slope lifts, a wall stops. Measured on luna on 2026-10-19.
-rom = "../../examples/games/mapandobjects/mapandobjects.sfc"
+rom = "../../examples/demos/mapandobjects/mapandobjects.sfc"
 input = "60:0x0100"
 
 [[checkpoint]]

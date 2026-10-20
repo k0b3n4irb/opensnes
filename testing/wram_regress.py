@@ -58,7 +58,7 @@ from luna_runner import _pool_map, load_manifest, missing_firmware  # noqa: E402
 BASELINE = HERE / "baselines" / "wram.json"
 FRAMES = 90   # consecutive vblank-aligned frames to hash
 
-# Cross-arch WRAM stability. Historically two examples (games_mapandobjects,
+# Cross-arch WRAM stability. Historically two examples (demos_mapandobjects,
 # maps_slope_collision) hashed differently x86_64 ↔ aarch64 and were excluded
 # from the cross-arch gate. Re-verified on luna v1.14.0 via CI on BOTH runner
 # arches (2026-08-09): CI x86_64, CI arm64 and the committed aarch64 baseline

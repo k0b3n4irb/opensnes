@@ -27,7 +27,7 @@
 
 ```bash
 cd $OPENSNES_HOME
-make -C examples/games/likemario
+make -C examples/demos/likemario
 ```
 
 Then open `likemario.sfc` in luna (`luna-gui likemario.sfc`) or any emulator.

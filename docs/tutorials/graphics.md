@@ -213,7 +213,7 @@ colour — if the image uses any colour not in that palette. This is the fix
 for the problem where adding one tile re-derives the whole palette and shifts
 every existing tile's hue: author the palette once, commit it, and impose it
 on every conversion so a new tile can only reuse existing entries
-(`examples/games/rpg/res/tileset.png.toml` does this).
+(`examples/demos/rpg/res/tileset.png.toml` does this).
 
 ### Tiles made at run time
 

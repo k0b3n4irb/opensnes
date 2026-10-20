@@ -1,4 +1,4 @@
-# games/mapandobjects: the first robot insect patrols its roof (world x
+# demos/mapandobjects: the first robot insect patrols its roof (world x
 # 328-376, after the first vent) while Kit walks towards it and the camera
 # follows.
 #
@@ -8,7 +8,7 @@
 # with the camera at 164 (world 333): it has reached the left end of its
 # range and turned back east (330 -> 333) while the camera follows Kit. An
 # insect that did not move, or walked out of its range, changes both.
-rom = "../../examples/games/mapandobjects/mapandobjects.sfc"
+rom = "../../examples/demos/mapandobjects/mapandobjects.sfc"
 input = "60:0x0100,150:0x0180,152:0x0100"
 
 [[checkpoint]]

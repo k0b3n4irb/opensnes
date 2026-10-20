@@ -25,8 +25,8 @@ Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
 
 | Scene | What runs | Idle (in `WaitForVBlank`) |
 |---|---|---|
-| `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
-| `examples/games/rpg` | walking: map, sprites, HUD | 91 % of the frame |
+| `examples/demos/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
+| `examples/demos/rpg` | walking: map, sprites, HUD | 91 % of the frame |
 | `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 69 % of the frame |
 | `examples/games/blocks` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
 | `examples/audio/snesmod_music` | music playing, nothing else | 98 % of the frame |
@@ -151,7 +151,7 @@ is that handler alone, in a ROM that only waits.
 ## Reproduce
 
 ```sh
-testing/bin/luna profile examples/games/rpg/rpg.sfc \
+testing/bin/luna profile examples/demos/rpg/rpg.sfc \
     --from-frame 120 --until-frame 420 \
     --input "130:0x0100,250:0,260:0x0400,400:0" --out - --top 0
 ```

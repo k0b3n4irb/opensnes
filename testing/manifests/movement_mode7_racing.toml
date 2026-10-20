@@ -16,7 +16,7 @@
 # Leg 3 holds A. The car accelerates along the heading leg 2 left it on
 # (202 ~ north-west), so both coordinates fall, and car_heading is
 # asserted exactly again: the throttle must not steer.
-rom = "../../examples/games/mode7_racing/mode7_racing.sfc"
+rom = "../../examples/mode7/mode7_racing/mode7_racing.sfc"
 
 [[checkpoint]]                 # on the start line, engine off
 at_frame = 60

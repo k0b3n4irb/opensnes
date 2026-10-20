@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LUNA = ROOT / "testing" / "bin" / "luna"
 WORK = ROOT / "build" / "spill"          # three levels under the root, like examples/<cat>/<name>
-EXAMPLES = ["games/likemario", "games/breakout", "sprites/dynamic_sprite", "text/print_string"]
+EXAMPLES = ["demos/likemario", "games/breakout", "sprites/dynamic_sprite", "text/print_string"]
 FRAMES = "60,120,200,300"
 EVICT = 3000                             # bytes of code the filler pushes out of bank $00
 

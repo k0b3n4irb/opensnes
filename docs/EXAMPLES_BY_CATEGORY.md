@@ -79,6 +79,7 @@ The rotate/scale plane — the SNES's signature trick.
 | @subpage examples_mode7_perspective_rotate | Full Mode 7 matrix rotation per scanline (krom port) |
 | @subpage examples_mode7_dsp1_ground | Super Mario Kart floor: DSP-1 Raster streams the per-scanline matrices |
 | @subpage examples_mode7_extbg | EXTBG: one plane split in two layers by bit 7, a sprite between them |
+| @subpage examples_mode7_mode7_racing | F-Zero camera: a hover-bike race, rivals placed on the turning plane |
 
 ---
 
@@ -223,16 +224,25 @@ matrix, vector and projection ops for pseudo-3D (Pilotwings, Super Mario Kart).
 
 ---
 
-## Games (capstones)
+## Demos
 
-Complete game projects combining multiple subsystems.
+Playable demonstrations: several modules in one scene, without a game's
+rules (no score, no end).
+
+| Example | Description |
+|---------|-------------|
+| @subpage examples_demos_likemario | Platformer with scrolling, animation, physics |
+| @subpage examples_demos_mapandobjects | Map engine with interactive objects |
+| @subpage examples_demos_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |
+| @subpage examples_demos_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |
+
+---
+
+## Games
+
+Complete games, from the title screen to the game over.
 
 | Example | Description |
 |---------|-------------|
 | @subpage examples_games_breakout | Breakout clone: sprites, input, game logic, scoring |
 | @subpage examples_games_blocks | Falling-blocks puzzle with Korobeiniki music, multi-line clear |
-| @subpage examples_games_likemario | Platformer with scrolling, animation, physics |
-| @subpage examples_games_mapandobjects | Map engine with interactive objects |
-| @subpage examples_games_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |
-| @subpage examples_games_mode7_racing | F-Zero-style racer on the rotating Mode 7 plane |
-| @subpage examples_games_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |

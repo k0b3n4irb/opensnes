@@ -40,7 +40,7 @@ mode7/perspective, mode7/dsp1_ground, mode7/perspective_rotate, mode7/rotate_sca
                       perspective and dsp1_ground only
   res/glider.png      Kit's glider from above, 32x32; rotate_scale only
 
-games/mode7_racing (devtools/art_assets/racing.py):
+mode7/mode7_racing (devtools/art_assets/racing.py):
   res/track.png       the circuit on the rooftops round a lagoon, 1024x1024,
                       from two PixelLab Wang tilesets (asphalt and gravel,
                       gravel and water), the start line, two boost pads and
@@ -56,7 +56,7 @@ hdma/gradient_colors, hdma/hdma_helpers:
   res/logo.png        the 256x224 logo on a transparent sky (index 0, never
                       drawn), so the HDMA gradients show behind Kit
 
-games/mapandobjects:
+demos/mapandobjects:
   res/tiles.png       roofs with ramps, 8x8 tiles drawn here: the strip and
                       the wall sampled from roof_1, the six slope shapes of
                       the object engine (45 degrees, and 22.5 in two
@@ -69,7 +69,7 @@ games/mapandobjects:
                       their walks, 32x32 frames four to a row
   res/skyline.png     BG2, the far towers (likemario's)
 
-games/likemario:
+demos/likemario:
   res/tiles.png       the level's distinct 8x8 tiles, in the order the map
                       numbers them (tile 0 is the empty sky), 128 px wide
   res/BG1.m16         the level map as main.c reads it: width and height in
@@ -105,15 +105,15 @@ from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "neo-lumen"
-LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
+LIKEMARIO = ROOT / "examples" / "demos" / "likemario" / "res"
 MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
-MAPANDOBJECTS = ROOT / "examples" / "games" / "mapandobjects" / "res"
+MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
 HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
 MODE7 = ROOT / "examples" / "mode7"
-RACING = ROOT / "examples" / "games" / "mode7_racing" / "res"
+RACING = ROOT / "examples" / "mode7" / "mode7_racing" / "res"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)

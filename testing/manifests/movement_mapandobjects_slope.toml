@@ -1,4 +1,4 @@
-# games/mapandobjects on its rooftops with ramps: the objCollidMapWithSlopes()
+# demos/mapandobjects on its rooftops with ramps: the objCollidMapWithSlopes()
 # fixture. Walking into a slope tile must push the object's Y to the slope's
 # surface instead of stopping it like a wall. That distinction is invisible
 # to both other pillars: the example needs the D-pad to move at all, and
@@ -17,7 +17,7 @@
 #
 # A slope treated as a wall stops kitx before the ramp; a slope ignored
 # leaves kity at 160, under the ramp's surface.
-rom = "../../examples/games/mapandobjects/mapandobjects.sfc"
+rom = "../../examples/demos/mapandobjects/mapandobjects.sfc"
 input = "60:0x0100,150:0x0180,152:0x0100"
 
 [[checkpoint]]                 # the flat before the ramp

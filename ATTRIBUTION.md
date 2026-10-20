@@ -131,7 +131,7 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **Author**: Kenney (https://kenney.nl/)
 - **Pack**: https://kenney.nl/assets/pixel-shmup
 - **License**: CC0 (Public Domain)
-- **Used in**: `examples/games/shmup_1942/res/` —
+- **Used in**: `examples/demos/shmup_1942/res/` —
   `tiles_packed.png`, `ships_packed.png`, and the `sprites.png` /
   `ground.png` split outputs derived from `tiles_packed.png` via
   `res/import.sh`.
@@ -144,7 +144,7 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
   `devtools/audio_assets/kenney/` beside the OGG files the examples use
 - **Used in**: the effects of `examples/audio/snesmod_music`
   (`sfx/neo_lumen_sfx.it`: `phaseJump1`, `powerUp1`, `laser1`,
-  `confirmation_001`) and the jump of `examples/games/likemario`
+  `confirmation_001`) and the jump of `examples/demos/likemario`
   (`res/jump_sfx.it`: `phaseJump1`), cut and converted by
   `devtools/audio_assets/build.py`.
 

@@ -149,7 +149,7 @@ the low byte.
 ## Going Further
 
 - **Fly forward**: move the centre along the heading with `mode7SetCenter()`
-  and the same scroll offset, as `games/mode7_racing` drives its kart.
+  and the same scroll offset, as `mode7/mode7_racing` drives its kart.
 
 - **Explore related examples**:
   - `mode7/perspective` -- Per-scanline scaling for pseudo-3D (F-Zero style)

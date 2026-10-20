@@ -137,8 +137,8 @@ every game needs.
 ## Stage 6 — "Can I finish and ship?"
 
 *Confidence: a complete cartridge.* Persist progress, choose a mapper, fit
-more data in the cartridge with compression, reach for a coprocessor when you need more, and study complete games that fuse
-everything above.
+more data in the cartridge with compression, reach for a coprocessor when you need more, study playable demos that fuse
+everything above, and two complete games.
 
 @subpage examples_memory_save_game
 
@@ -148,15 +148,15 @@ everything above.
 
 @subpage examples_games_blocks
 
-@subpage examples_games_likemario
+@subpage examples_demos_likemario
 
-@subpage examples_games_mapandobjects
+@subpage examples_demos_mapandobjects
 
-@subpage examples_games_rpg
+@subpage examples_demos_rpg
 
-@subpage examples_games_shmup_1942
+@subpage examples_demos_shmup_1942
 
-@subpage examples_games_mode7_racing
+@subpage examples_mode7_mode7_racing
 
 ### More horsepower — the cartridge coprocessors
 

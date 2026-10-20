@@ -50,7 +50,7 @@ oamSet(0, x, y, hero_tile, PAL_HERO_SLOT, 3, 0);
 ```
 
 The build runs a plan **after** the pictures' conversions, so the `.pal`
-files it reads are fresh (`make/common.mk`). `examples/games/rpg` plans its
+files it reads are fresh (`make/common.mk`). `examples/demos/rpg` plans its
 sprite palettes this way.
 
 ## Quantize

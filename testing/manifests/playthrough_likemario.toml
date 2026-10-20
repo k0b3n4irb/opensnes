@@ -1,4 +1,4 @@
-# games/likemario, the whole level: hold RIGHT from frame 60 and press A
+# demos/likemario, the whole level: hold RIGHT from frame 60 and press A
 # nine times, once before each gap between two roofs, and Kit reaches the
 # end of the level (x = map width - 16 = 2336) standing on the last roof
 # (surface row 15: y = 120 - 16 = 104).
@@ -13,7 +13,7 @@
 #
 # The nine frames were found on luna on 2026-10-19, gap by gap: the first
 # frame, 2 frames apart, from which a press lands Kit beyond the gap.
-rom = "../../examples/games/likemario/likemario.sfc"
+rom = "../../examples/demos/likemario/likemario.sfc"
 
 [[checkpoint]]
 at_frame = 2100

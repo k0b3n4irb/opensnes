@@ -11,7 +11,7 @@
 # the bullet's X (16) is derived from the clamped ship position: a test
 # that only checked "a bullet exists" would pass on a ROM that fired
 # from the wrong place.
-rom = "../../examples/games/shmup_1942/shmup_1942.sfc"
+rom = "../../examples/demos/shmup_1942/shmup_1942.sfc"
 
 [[checkpoint]]                 # spawn state, nothing fired
 at_frame = 60
