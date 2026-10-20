@@ -79,7 +79,7 @@
  *
  * @ref stride is the sheet's width in tiles, which is 3 for a bare
  * 9-slice and more when the sheet carries other art in later columns —
- * `examples/games/rpg` uses a 4-wide sheet whose fourth column holds HUD
+ * `examples/demos/rpg` uses a 4-wide sheet whose fourth column holds HUD
  * icons.
  */
 typedef struct {

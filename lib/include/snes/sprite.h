@@ -497,7 +497,7 @@ void oamSetTile(u16 id, u16 tile);
  *
  * @param id Sprite ID (0-127)
  *
- * @see examples/games/rpg — culls its villagers this way
+ * @see examples/demos/rpg — culls its villagers this way
  * @see @ref perf "Measured frame costs" — what this call costs per frame in five real scenes.
  */
 void oamHide(u16 id);
