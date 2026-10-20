@@ -117,6 +117,23 @@ and `perspective_rotate`, and `res/mode7bg.png` of `rotate_scale`; the sky is
 sixteen, because its 4bpp layer reads CGRAM 0-15, the start of the ground's
 palette.
 
+### The race on the rooftops
+
+`examples/games/mode7_racing`: a circuit round a lagoon and three
+hover-bikes (`devtools/art_assets/racing.py`, `make art-assets`): 227 tiles,
+19 colours. The 64x64 `color_image` of the two tilesets is the city's 15
+colours with a curb red (`#e03838`) and white (`#e8e8f0`), in stripes; the
+lower and upper references are 16x16 noise in those colours, drawn by a
+script (without them the asphalt came out with white lane lines in random
+places, seed 7200).
+
+| File | What | Made with | Used by |
+|---|---|---|---|
+| `tiles/wang_track_gravel.png` | 16 Wang tiles of 16x16, asphalt (lower) to rooftop gravel (upper) with a red and white curb; keyed like the city's | `create-tileset`, standard, `high top-down`, `transition_size` 0.25, seed 7201 | the circuit |
+| `tiles/wang_gravel_lagoon.png` | the same from that gravel to the lagoon's water, a quay with amber lamps between, on the first set's gravel tile (`lower_base_tile_id`) | the same, seed 7202 | the infield and the border |
+| `props/roof_helipad.png`, `roof_aircon.png`, `roof_aircon_violet.png`, `roof_tank.png`, `roof_solar.png`, `roof_dish.png` | rooftop props from above, 32x32 | `generate-image-v2`, seeds 130 (#24), 131 (#1, #12), 132 (#52), 133 (#0), 134 (#2), the city's 15 colours with the curb's two | scattered on the gravel, solid |
+| `characters/racebike_kit.png`, `racebike_white.png`, `racebike_crimson.png` | Kit's racing hover-bike from above, pointing up, and two rivals in other colours; 11 colours for the three | `generate-image-v2`, seed 120 (#0, #23, #33), `glider.png` as `style_image` (its colours off), Kit's colours with the city's magenta, amber and violet | the three bikes; the rivals' turned frames are made from these by the script |
+
 ### More backgrounds, not used yet
 
 | File | What | Seed | Note |

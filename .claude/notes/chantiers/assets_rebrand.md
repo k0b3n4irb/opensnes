@@ -318,6 +318,36 @@ rotate_scale) took the city from above. What was learnt:
   wins between sprites (snesdev-wiki *Sprites*, chunk c2d3d31a61323196). It
   showed only once the glider was a real picture.
 
+### The race on the rooftops (2026-10-20)
+
+mode7_racing went from a green rounded rectangle and an arrow built in C
+to a hover-bike race round a lagoon, with two rivals. What was learnt:
+
+- **`create-tileset` checks two things the docs do not say**: in
+  `standard` mode it refuses `target_palette` (422, "works with mode='pro'
+  only"), and its `color_image` must be 64x64 (a 17x1 strip failed the job
+  with "Expected image of size 64x64 ... got 68 RGBA bytes"; the job then
+  reads `failed` and `GET /tilesets/{id}` answers 410). A 64x64 image of
+  palette stripes works.
+- **References tame the texture**: asphalt asked in words only came out
+  with white lane lines in random places (seed 7200); 16x16 noise in the
+  wanted colours as lower and upper references gave plain asphalt and a
+  clean red and white curb (seed 7201).
+- **Chaining across the two roles**: the gravel is the *upper* terrain of
+  the first set and the *lower* of the second; passing the first set's
+  upper terrain id as the second's `lower_base_tile_id` gave a pixel-equal
+  gravel tile in both.
+- **One request, many variants**: `generate-image-v2` at 32x32 returns 64
+  candidates, which for the bike came in six colour schemes; Kit and the two
+  rivals are three of them, 11 colours together, so one OBJ palette.
+- **Turned sprites without a rotation tool**: PixelLab's rotations turn a
+  character between camera directions, not a top-down sprite in the plane.
+  RotSprite does that well at 32x32 (Scale2x three times, turn without
+  filtering, back by the commonest colour of each 8x8 block); 0 to 90
+  degrees in five frames, and the OAM flips give the sixteen directions.
+- **Props on the 16-px grid** cost their tiles once: six props scattered
+  over the gravel took the map from 138 to 227 tiles.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.

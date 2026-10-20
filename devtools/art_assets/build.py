@@ -40,6 +40,18 @@ mode7/perspective, mode7/dsp1_ground, mode7/perspective_rotate, mode7/rotate_sca
                       perspective and dsp1_ground only
   res/glider.png      Kit's glider from above, 32x32; rotate_scale only
 
+games/mode7_racing (devtools/art_assets/racing.py):
+  res/track.png       the circuit on the rooftops round a lagoon, 1024x1024,
+                      from two PixelLab Wang tilesets (asphalt and gravel,
+                      gravel and water), the start line, two boost pads and
+                      the rooftop props
+  res/track_class.bin one byte per 8x8 tile: 0 road, 1 gravel, 2 water or a
+                      prop, 3 boost
+  res/lanes_xy.bin    the rivals' two lanes, 256 points each (x, y as u16)
+  res/lanes_heading.bin  their headings, one byte per point (64 = east)
+  res/bikes.png       the three hover-bikes in one palette, 32x32 frames four
+                      to a row: Kit's, then each rival's turned 0 to 90 degrees
+
 hdma/gradient_colors, hdma/hdma_helpers:
   res/logo.png        the 256x224 logo on a transparent sky (index 0, never
                       drawn), so the HDMA gradients show behind Kit
@@ -88,7 +100,8 @@ from PIL import Image, ImageOps
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
-from mode7 import build_city, glider  # noqa: E402  (and so is the Mode 7 city)
+from mode7 import build_city, glider
+from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "neo-lumen"
@@ -100,6 +113,7 @@ LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
 HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
 MODE7 = ROOT / "examples" / "mode7"
+RACING = ROOT / "examples" / "games" / "mode7_racing" / "res"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)
@@ -591,6 +605,7 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="compare with the committed files instead of writing them")
     args = ap.parse_args()
     city = build_city(ART)
+    race = build_track(ART)
     ground, sky = png(city["ground"]), png(city["sky"])
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
             (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART)),
@@ -598,11 +613,15 @@ def main() -> int:
             (MODE7 / "perspective" / "res", {"ground.png": ground, "sky.png": sky}),
             (MODE7 / "dsp1_ground" / "res", {"ground.png": ground, "sky.png": sky}),
             (MODE7 / "perspective_rotate" / "res", {"ground.png": ground}),
-            (MODE7 / "rotate_scale" / "res", {"mode7bg.png": ground, "glider.png": png(glider(ART))})]
+            (MODE7 / "rotate_scale" / "res", {"mode7bg.png": ground, "glider.png": png(glider(ART))}),
+            (RACING, {"track.png": png(race["track"]), "track_class.bin": race["classes"],
+                      "lanes_xy.bin": race["lanes"][0], "lanes_heading.bin": race["lanes"][1],
+                      "bikes.png": png(bikes(ART))})]
     print("likemario:", jobs[0][1].pop("_report").decode())
     print("map_scroll:", jobs[2][1].pop("_report").decode())
     print("mapandobjects:", jobs[3][1].pop("_report").decode())
     print(f"mode7 city: {city['_tiles']} tiles, {city['_colours']} colours")
+    print(f"mode7 race: {race['_tiles']} tiles, {race['_colours']} colours")
     bad = 0
     for folder, files in jobs:
         for name, data in files.items():
