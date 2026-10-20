@@ -23,7 +23,7 @@ and canals in 235 tiles, CC0, `assets/neo-lumen/`).
 ## Controls (krom's map)
 
 - **D-pad** — move over the plane (scroll + pivot together)
-- **L / R** — rotate the world in 7.5° steps
+- **L / R** — rotate the world in 7.5° steps, one every 4 frames (a full turn in 3.2 s)
 - **Y / A** — nudge the pivot on X · **X / B** — nudge it on Y
 
 ## SNES Concepts

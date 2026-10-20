@@ -172,8 +172,8 @@
     "rom_sha256": "d432ae9e4543e13a62ea9d41f9217ebbed589925e74b658f3bb91f7c2125bc74"
   },
   "mode7_perspective_rotate": {
-    "stream": "2b3f7c58ed9acdb363fdd8b1941c5504846f067786b9e74318007a52e582b2f7",
-    "rom_sha256": "d179bd534f3b5f5e4078326d2125befc3d45d04c088eb6ad6d144b3e9d8cc616"
+    "stream": "00d5d098082cdd49d8d647a6db5b5c89ac559818fbe8f365d351471ebf32481d",
+    "rom_sha256": "a946bfe7eb49d4c14b006d0510c6db5d4d5db89e0fb43bd19b7210febf806d66"
   },
   "mode7_rotate_scale": {
     "stream": "1d33005535b8eb783cb17c93f4ce1c7d14becd63c84198577d88021ea759b868",

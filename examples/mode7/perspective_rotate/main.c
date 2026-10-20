@@ -24,7 +24,7 @@
  *
  * @par What to Observe
  * The city's avenues receding to the horizon. D-pad moves over the plane,
- * L/R rotate the world in 7.5-degree steps, Y/A nudge the pivot on X,
+ * L/R rotate the world in 7.5-degree steps (one every 4 frames), Y/A nudge the pivot on X,
  * X/B nudge it on Y (krom's control map).
  *
  * @par Modules Used
@@ -44,6 +44,10 @@
 
 /** @brief Rotation step index, 0..47 */
 static u16 angle;
+/** @brief Frames between two rotation steps while L or R is held (7.5 deg per step) */
+#define TURN_FRAMES 4
+/** @brief Frames left before the next rotation step; 0 = step at once */
+static u16 turn_wait;
 /** @brief BG1 scroll shadows (krom init: 384, 768) */
 static u16 scr_x, scr_y;
 /** @brief Mode 7 pivot shadows (krom init: 512, 1152) */
@@ -92,6 +96,7 @@ int main(void) {
     scr_x = 384; scr_y = 768;
     pos_x = 512; pos_y = 1152;
     angle = 0;
+    turn_wait = 0;
 
     setMainScreen(TM_BG1);
     repointTables();
@@ -112,8 +117,18 @@ int main(void) {
 
         pad = padHeld(0);
 
-        if (pad & KEY_L) { angle++; if (angle >= PERSPECTIVE_ANGLES) angle = 0; }
-        if (pad & KEY_R) { if (angle == 0) angle = PERSPECTIVE_ANGLES; angle--; }
+        /* one 7.5-degree step every TURN_FRAMES frames: a step per frame
+         * would be 450 degrees a second */
+        if (pad & (KEY_L | KEY_R)) {
+            if (turn_wait == 0) {
+                if (pad & KEY_L) { angle++; if (angle >= PERSPECTIVE_ANGLES) angle = 0; }
+                if (pad & KEY_R) { if (angle == 0) angle = PERSPECTIVE_ANGLES; angle--; }
+                turn_wait = TURN_FRAMES;
+            }
+            turn_wait--;
+        } else {
+            turn_wait = 0;
+        }
 
         if (pad & KEY_UP)    { scr_y--; pos_y--; }
         if (pad & KEY_DOWN)  { scr_y++; pos_y++; }
