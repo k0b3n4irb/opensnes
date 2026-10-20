@@ -29,13 +29,13 @@ luna v1.39.0 · `luna state --until-frame <N>` per ROM · 60 ROMs · **58 OK, 2 
 | `color/palette_cycle` | OK | live (400f/398nmi) |
 | `color/shadow_tint` | OK | live (200f/198nmi) |
 | `color/transparency` | OK | live (400f/398nmi) |
-| `demos/likemario` | OK | live (200f/190nmi) |
 | `demos/mapandobjects` | OK | live (200f/198nmi) |
 | `demos/rpg` | OK | live (200f/198nmi) |
 | `demos/shmup_1942` | OK | live (400f/398nmi) |
 | `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
 | `games/blocks` | OK | live (400f/390nmi) |
 | `games/breakout` | OK | live (200f/198nmi) |
+| `games/likemario` | OK | live (200f/190nmi) |
 | `hdma/gradient_colors` | OK | live (200f/198nmi) |
 | `hdma/hdma_helpers` | OK | live (200f/198nmi) |
 | `hdma/hdma_wave` | OK | live (400f/398nmi) |

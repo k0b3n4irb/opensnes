@@ -159,7 +159,7 @@ GameState game = {20, 100, 0, 32, 0, 32};
 ## Go Further
 
 - **Add tile streaming:** Right now the tilemap is static. For larger worlds, you'd
-  upload new tile columns as the camera scrolls. See [LikeMario](../../../demos/likemario/)
+  upload new tile columns as the camera scrolls. See [LikeMario](../../../games/likemario/)
   for a working implementation.
 
 - **Add vertical scrolling:** Same pattern, but with Y thresholds and `bg_scroll_y`.
@@ -168,7 +168,7 @@ GameState game = {20, 100, 0, 32, 0, 32};
 - **Add animation:** Use different sprite tiles based on direction. Tile 0 for right,
   tile 1 for left, advance every few frames for a walk cycle.
 
-- **Next example:** [LikeMario](../../../demos/likemario/) -- full platformer with gravity,
+- **Next example:** [LikeMario](../../../games/likemario/) -- full platformer with gravity,
   collision, and tile streaming.
 
 ---

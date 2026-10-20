@@ -69,7 +69,7 @@ demos/mapandobjects:
                       their walks, 32x32 frames four to a row
   res/skyline.png     BG2, the far towers (likemario's)
 
-demos/likemario:
+games/likemario:
   res/tiles.png       the level's distinct 8x8 tiles, in the order the map
                       numbers them (tile 0 is the empty sky), 128 px wide
   res/BG1.m16         the level map as main.c reads it: width and height in
@@ -79,6 +79,15 @@ demos/likemario:
                       mirror), the rest transparent
   res/kit.png         Kit seen from the side, 32x32 frames (the sheet of
                       assets/neo-lumen/characters/kit_side_sheet.png)
+  res/enemies.png     the machines, 32x32 four to a row: the robot insect's
+                      walk, the drone's hover, each one stomped (squashed by
+                      this script), one palette
+  res/shard.png       the data shard turning on its axis, eight 16x16 frames
+                      made here from props/shard.png
+  res/level_objects.h the shards, the machines and their patrols, the
+                      checkpoints and the goal, placed from LEVEL's buildings;
+                      the beacon (props/beacon.png) is stamped on the last
+                      roof of the map
 
 The level is a row of buildings, each one or more 128-px roof pieces at one
 height, with gaps between them; it is laid out by LEVEL below. A roof's
@@ -92,6 +101,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import struct
 import sys
 from pathlib import Path
@@ -105,7 +115,7 @@ from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "neo-lumen"
-LIKEMARIO = ROOT / "examples" / "demos" / "likemario" / "res"
+LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
 MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -175,9 +185,10 @@ def load_piece(n: int, pal) -> list[list[int]]:
     return rows
 
 
-def compose(level, pieces) -> tuple[int, list[bytes], list[int], list[bool]]:
+def compose(level, pieces, stamps=()) -> tuple[int, list[bytes], list[int], list[bool]]:
     """Lay the buildings of `level` out on a ROWS-high canvas: (width in px, the distinct
-    8x8 tiles in reading order with the empty one first, one entry per cell, solid per tile)."""
+    8x8 tiles in reading order with the empty one first, one entry per cell, solid per tile).
+    `stamps` are (rows of indices, x, y) drawn over it where not 0; they are never solid."""
     width_px = sum(128 * len(p) + gap for p, _, gap in level)
     width_px = (width_px + 7) // 8 * 8
     cols = width_px // 8
@@ -200,6 +211,11 @@ def compose(level, pieces) -> tuple[int, list[bytes], list[int], list[bool]]:
                         solid_cell[cy][cx] = True
             x += 128
         x += gap
+    for rows, sx, sy in stamps:
+        for yy, row in enumerate(rows):
+            for xx, v in enumerate(row):
+                if v:
+                    canvas[sy + yy][sx + xx] = v
 
     empty = bytes(64)
     tiles: list[bytes] = [empty]
@@ -232,6 +248,27 @@ def compose(level, pieces) -> tuple[int, list[bytes], list[int], list[bool]]:
     return width_px, tiles, entries, solid
 
 
+def strip_sheet(frames, palname: str) -> Image.Image:
+    """Frames of 32x32 RGBA (paths or pictures) on a 128-px wide sheet, four a row,
+    indexed on one of the cast palettes."""
+    cast = {"MACHINE": ["#080810", "#101828", "#203048", "#384050", "#586878", "#8898a8", "#b0c0d0",
+                        "#601838", "#a02860", "#e05090", "#684018", "#b07028", "#f0b050", "#28a0b0", "#e8e8f0"]}[palname]
+    pal2 = [(0, 0, 0)] + [rgb(c) for c in cast]
+    rows_ = (len(frames) + 3) // 4
+    out = Image.new("P", (128, rows_ * 32), 0)
+    out.putpalette([v for c in pal2 for v in c] + [0] * (768 - 3 * len(pal2)))
+    for n_, f in enumerate(frames):
+        im = (f if isinstance(f, Image.Image) else Image.open(f)).convert("RGBA")
+        for y in range(32):
+            for x in range(32):
+                r, g, b, a = im.getpixel((x, y))
+                if a < 128:
+                    continue
+                k_ = min(range(15), key=lambda i: sum((p - q) ** 2 for p, q in zip(pal2[i + 1], (r, g, b))))
+                out.putpixel(((n_ % 4) * 32 + x, (n_ // 4) * 32 + y), k_ + 1)
+    return out
+
+
 def tile_sheet(tiles: list[bytes], pal) -> Image.Image:
     """The tiles, 16 to a 128-px row, in their order."""
     sheet = Image.new("P", (128, (len(tiles) + 15) // 16 * 8), 0)
@@ -245,10 +282,86 @@ def tile_sheet(tiles: list[bytes], pal) -> Image.Image:
     return sheet
 
 
+def buildings(level) -> list[tuple[int, int, int]]:
+    """Each building of `level` as (left x, right x, surface y) in pixels."""
+    out, x = [], 0
+    for numbers, surface_row, gap in level:
+        out.append((x, x + 128 * len(numbers), surface_row * 8))
+        x += 128 * len(numbers) + gap
+    return out
+
+
+def spin(im: Image.Image, frames: int = 8) -> list[Image.Image]:
+    """A pickup turning on its vertical axis: each frame squeezed by |cos|, mirrored on its back half."""
+    out = []
+    w, h = im.size
+    for k in range(frames):
+        a = math.pi * k / frames
+        f = max(abs(math.cos(a)), 0.15)
+        src = im if math.cos(a) >= 0 else ImageOps.mirror(im)
+        fr = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+        for x in range(w):
+            sx = int((x + 0.5 - w / 2) / f + w / 2)
+            if 0 <= sx < w:
+                for y in range(h):
+                    fr.putpixel((x, y), src.getpixel((sx, y)))
+        out.append(fr)
+    return out
+
+
+def squash(im: Image.Image) -> Image.Image:
+    """A stomped machine: half its height, standing on the same bottom row."""
+    box = im.getbbox()
+    body = im.crop(box)
+    flat = body.resize((body.width, max(1, body.height // 2)), Image.Resampling.NEAREST)
+    out = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    out.paste(flat, (box[0], box[3] - flat.height))
+    return out
+
+
+def likemario_objects(level) -> tuple[str, int]:
+    """level_objects.h: the shards to pick up, the machines and their patrols, the
+    checkpoints (each roof's start) and the goal, from the buildings of `level`."""
+    b = buildings(level)
+    shards = []
+    for x0, x1, sy in b:                      # two at walking height on every roof
+        shards += [(x0 + 48, sy - 16), (x0 + 80, sy - 16)]
+    for (_, x1, s1), (x2, _, s2) in zip(b, b[1:]):   # one at the top of every jump
+        shards.append(((x1 + x2) // 2 - 8, min(s1, s2) - 44))
+    # type 0 a robot insect walking on a roof, 1 a drone flying over: x, y (top of the
+    # 16x16 box), patrol x min and max
+    enemies = []
+    for i in (2, 4, 8):
+        x0, x1, sy = b[i]
+        enemies.append((0, x0 + 128, sy - 16, x0 + 24, x1 - 40))
+    x0, x1, sy = b[9]
+    enemies.append((0, x0 + 40, sy - 16, x0 + 16, x1 - 112))
+    for i, j in ((5, 6), (7, 7)):
+        enemies.append((1, b[i][0] + 64, min(b[i][2], b[j][2]) - 52, b[i][0] + 16, b[j][1] - 32))
+    checkpoints = [(x0 + 16, sy - 16) for x0, _, sy in b]
+    goal = b[-1][1] - 96
+
+    def table(name, ctype, rows):
+        body = ",\n".join("    { " + ", ".join(str(v) for v in r) + " }" for r in rows)
+        return f"static const {ctype} {name}[{len(rows)}][{len(rows[0])}] = {{\n{body}\n}};\n"
+
+    text = ("/* level_objects.h — generated by devtools/art_assets/build.py; do not edit. */\n"
+            f"#define SHARD_COUNT {len(shards)}\n#define ENEMY_COUNT {len(enemies)}\n"
+            f"#define CHECKPOINT_COUNT {len(checkpoints)}\n#define GOAL_X {goal}\n\n"
+            "/** @brief Each shard: x, y of its 16x16 sprite */\n" + table("shard_pos", "s16", shards) +
+            "/** @brief Each machine: type (0 insect, 1 drone), x, y of its 16x16 box, patrol x min, x max */\n" +
+            table("enemy_def", "s16", enemies) +
+            "/** @brief Where Kit comes back after a fall: each roof's start, x and y of his box */\n" +
+            table("checkpoint_pos", "s16", checkpoints))
+    return text, goal
+
+
 def build_likemario() -> dict[str, bytes]:
     pal = palette()
     pieces = {n: load_piece(n, pal) for n in range(6)}
-    width_px, tiles, entries, solid = compose(LEVEL, pieces)
+    text, goal = likemario_objects(LEVEL)
+    beacon = to_indices(Image.open(ART / "props" / "beacon.png").convert("RGBA"), pal)
+    width_px, tiles, entries, solid = compose(LEVEL, pieces, [(beacon, goal, buildings(LEVEL)[-1][2] - 64)])
     flat = [v for c in pal for v in c]
     sheet = tile_sheet(tiles, pal)
 
@@ -270,8 +383,27 @@ def build_likemario() -> dict[str, bytes]:
             if v:
                 sky.putpixel((xx, yy), v)
 
+    # the machines: the insect's walk, the drone's hover, then each one stomped
+    walk = ART / "characters" / "walk"
+    insect = [Image.open(walk / f"insect_{i}.png").convert("RGBA") for i in range(4)]
+    drone = [Image.open(walk / f"drone_{i}.png").convert("RGBA") for i in range(4)]
+    enemies = strip_sheet(insect + drone + [squash(insect[0]), squash(drone[0])], "MACHINE")
+
+    # the shard turning, eight 16x16 frames in a row, its own colours
+    shard = Image.open(ART / "props" / "shard.png").convert("RGBA")
+    colours = sorted({p[:3] for p in shard.getdata() if p[3] >= 128})
+    shards = Image.new("P", (128, 16), 0)
+    shards.putpalette([0, 0, 0] + [v for c in colours for v in c] + [0] * (765 - 3 * len(colours)))
+    for k, fr in enumerate(spin(shard)):
+        for y in range(16):
+            for x in range(16):
+                q = fr.getpixel((x, y))
+                if q[3] >= 128:
+                    shards.putpixel((k * 16 + x, y), colours.index(q[:3]) + 1)
+
     return {"tiles.png": png(sheet), "BG1.m16": m16, "map_1_1.b16": b16, "skyline.png": png(sky),
             "kit.png": (ART / "characters" / "kit_side_sheet.png").read_bytes(),
+            "enemies.png": png(enemies), "shard.png": png(shards), "level_objects.h": text.encode(),
             "_report": f"{width_px} px wide, {len(tiles)} tiles, {sum(solid)} solid".encode()}
 
 
@@ -566,24 +698,6 @@ def build_mapandobjects() -> dict[str, bytes]:
         objs.append((x, surface_y(k0) - 16, 1 if n % 2 == 0 else 2, lo * 8, hi * 8))
     o16 = b"".join(struct.pack("<5H", *o) for o in objs) + struct.pack("<H", 0xFFFF)
 
-    def strip_sheet(frames, palname):
-        """Frames of 32x32 RGBA on a 128-px wide sheet, four a row, indexed on one of the cast palettes."""
-        cast = {"MACHINE": ["#080810", "#101828", "#203048", "#384050", "#586878", "#8898a8", "#b0c0d0",
-                            "#601838", "#a02860", "#e05090", "#684018", "#b07028", "#f0b050", "#28a0b0", "#e8e8f0"]}[palname]
-        pal2 = [(0, 0, 0)] + [rgb(c) for c in cast]
-        rows_ = (len(frames) + 3) // 4
-        out = Image.new("P", (128, rows_ * 32), 0)
-        out.putpalette([v for c in pal2 for v in c] + [0] * (768 - 3 * len(pal2)))
-        for n_, f in enumerate(frames):
-            im = Image.open(f).convert("RGBA")
-            for y in range(32):
-                for x in range(32):
-                    r, g, b, a = im.getpixel((x, y))
-                    if a < 128:
-                        continue
-                    k_ = min(range(15), key=lambda i: sum((p - q) ** 2 for p, q in zip(pal2[i + 1], (r, g, b))))
-                    out.putpixel(((n_ % 4) * 32 + x, (n_ // 4) * 32 + y), k_ + 1)
-        return out
     walk = ART / "characters" / "walk"
     return {"tiles.png": png(tile_sheet(tiles, pal)), "BG1.m16": m16, "level.t16": t16, "level.b16": b16,
             "level.o16": o16, "kit.png": (ART / "characters" / "kit_side_sheet.png").read_bytes(),

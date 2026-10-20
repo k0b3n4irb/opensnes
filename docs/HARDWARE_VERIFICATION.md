@@ -75,7 +75,7 @@ behaviour, and the note under the table says which.
 | 16 | `mode7/dsp1_ground` | turn with LEFT/RIGHT, drive with UP | The ground recedes to a horizon under the sky and turns in perspective; four magenta beacons and the cyan cube tumbling above them stay put on the ground while you turn and drive, and disappear once you pass them. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
 | 17 | `chips/sa1_starfield` | nothing | 128 dots trace smooth Lissajous figures at full frame rate. Firmware-dependent. |
 | 18 | `chips/superfx_3d` | nothing | A wireframe cube rotates at full frame rate with no missing edges. Firmware-dependent. |
-| 19 | `demos/likemario` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
+| 19 | `games/likemario` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
 | 20 | `demos/rpg` | walk, talk to a villager with A, open the chest | The full game path: map, dialogue, chest state. |
 | 21 | `input/mouse` | move the mouse, click both buttons, right-click cycles sensitivity | Optional (needs a SNES Mouse, port 1). The cursor tracks the hand at each of the three sensitivities. |
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
@@ -139,7 +139,7 @@ Peripherals:   pads / mouse / scope
 16  mode7/dsp1_ground
 17  chips/sa1_starfield
 18  chips/superfx_3d
-19  demos/likemario
+19  games/likemario
 20  demos/rpg
 21  input/mouse                 n/a
 22  input/superscope            n/a

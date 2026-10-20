@@ -91,6 +91,18 @@
     "stream": "a6db785730e48426112eac905a3ea5f4439fd0fc900a1b28363a723942f12bbd",
     "rom_sha256": "f8f6b174ff14bfd98eda591c3f40c063269a756bdd8506d0224e516ec23642d3"
   },
+  "demos_mapandobjects": {
+    "stream": "de25b37a2b784b9ff7de8381480ba21fa5d065e3a4cf5115ad67f8125ee6e89b",
+    "rom_sha256": "17a3fe7caf3604865065fdb1b257561da2ab9043f5a2b3ca8fb2a8741357d950"
+  },
+  "demos_rpg": {
+    "stream": "a08f18012715d08b445c671e03a1bde19bd90f4d9ea3de5bf3db371a316ae474",
+    "rom_sha256": "99b8038258664b3a1edcdc4c251ea3986fb0b4b1ce8f832319a53a6e53776cfa"
+  },
+  "demos_shmup_1942": {
+    "stream": "1644221767848221665f18d89dd5b2c85bf308295fd6674967482746d90229fd",
+    "rom_sha256": "8a05026d32d29b66c339455dd854dfa8c113767134558df51e158ac1b5dcfedc"
+  },
   "fundamentals_text_glyphs": {
     "stream": "3177766bc6e314a76ddcb61bb2ea016c2dab5e6117b32bb654d4670f6f3f0f4b",
     "rom_sha256": "fa8bb2a592d3bcf8d94f751cb7eb636b8b88e9f768c20bd697c222ec961a0d16"
@@ -103,25 +115,9 @@
     "stream": "1eff8454f60ff4373c9360bc5b20f385d06f0689f7e08217f0eea1474cc5b7c1",
     "rom_sha256": "03051a8039a51c10812b33a8e1425939fe35e31350e87795a5dad32522bc16ad"
   },
-  "demos_likemario": {
-    "stream": "17b1758ca35fb68f4a8c24de7458a0557b79a684a18aaeb7e4686c169de3a1da",
-    "rom_sha256": "5f2ffb8ec2aef5b3ef44b5ef87905de1c813443e685608fabd30e4025949664e"
-  },
-  "demos_mapandobjects": {
-    "stream": "de25b37a2b784b9ff7de8381480ba21fa5d065e3a4cf5115ad67f8125ee6e89b",
-    "rom_sha256": "17a3fe7caf3604865065fdb1b257561da2ab9043f5a2b3ca8fb2a8741357d950"
-  },
-  "mode7_mode7_racing": {
-    "stream": "0849ff5ff41794d53d29a2b330e49d31abdd101ca3b945dfb81a08039221141c",
-    "rom_sha256": "3306be2fcd2715966d8c7ae37a2cb410f8e19530cfbccd757fbf8ff854aa7970"
-  },
-  "demos_rpg": {
-    "stream": "a08f18012715d08b445c671e03a1bde19bd90f4d9ea3de5bf3db371a316ae474",
-    "rom_sha256": "99b8038258664b3a1edcdc4c251ea3986fb0b4b1ce8f832319a53a6e53776cfa"
-  },
-  "demos_shmup_1942": {
-    "stream": "1644221767848221665f18d89dd5b2c85bf308295fd6674967482746d90229fd",
-    "rom_sha256": "8a05026d32d29b66c339455dd854dfa8c113767134558df51e158ac1b5dcfedc"
+  "games_likemario": {
+    "stream": "3d1bb18839ccdd74dc5a7d4f93ae52a79189b6b2405415ef24d643fa9cea385d",
+    "rom_sha256": "d658d14259d68e5af823972acbe0b480a9b80b401096940621745e9d66935b4c"
   },
   "hdma_gradient_colors": {
     "stream": "2913b455d180f1dd64e5ce0262fdd83a702320dbb636459c18905f5d4ec16230",
@@ -166,6 +162,10 @@
   "mode7_extbg": {
     "stream": "945f700f140617e6aee3f89c688a07fde2ae6d026b9e83b8e47b6c17ffd9984c",
     "rom_sha256": "bcf50a5059d6a90af2ee1ba0e0bd9f2abf97cab0c98b69f4330e9aeab04cb81b"
+  },
+  "mode7_mode7_racing": {
+    "stream": "0849ff5ff41794d53d29a2b330e49d31abdd101ca3b945dfb81a08039221141c",
+    "rom_sha256": "3306be2fcd2715966d8c7ae37a2cb410f8e19530cfbccd757fbf8ff854aa7970"
   },
   "mode7_perspective": {
     "stream": "1416f3bd97618d403b1a8e7829c3034691d7a704b5a9629c78301e5211e1fec6",

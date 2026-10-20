@@ -358,7 +358,7 @@ for your own array when:
 - **You want the tile-collision behaviour without the entity model.** The map
   module exposes `mapGetMetaTilesProp()` directly, and
   @ref tutorial_collision covers the hand-rolled patterns
-  `examples/demos/likemario` uses to do platformer physics with no object
+  `examples/games/likemario` uses to do platformer physics with no object
   engine at all.
 
 Where it earns its keep is the case it was written for: a scrolling

@@ -2,7 +2,7 @@
 
 The example corpus: small ROMs, each a folder with its `main.c`, its
 assets, a `Makefile` and a `README.md` that says what it shows. They go from
-a first line of text to playable demonstrations and two complete games.
+a first line of text to playable demonstrations and three complete games.
 
 - **In what order?** [Learning Path](../docs/LEARNING_PATH.md) is the route
   through them, stage by stage.
@@ -31,8 +31,8 @@ The table below counts them per folder.
 | [maps/](maps/) | 1 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
 | [chips/](chips/) | 3 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
-| [demos/](demos/) | 4 | Playable demonstrations: several modules in one scene, without a game's rules (platformer, map engine + object engine, 1942-style shmup, Tiled-driven RPG) |
-| [games/](games/) | 2 | Complete games, from the title screen to the game over (falling blocks, Breakout) |
+| [demos/](demos/) | 3 | Playable demonstrations: several modules in one scene, without a game's rules (map engine + object engine, 1942-style shmup, Tiled-driven RPG) |
+| [games/](games/) | 3 | Complete games, from the title screen to the game over (falling blocks, Breakout, a rooftop platformer) |
 
 ## Building
 

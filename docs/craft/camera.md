@@ -62,7 +62,7 @@ reach:
 - **Platform bands.** Move the vertical camera in discrete steps when the player
   settles on a new platform, not continuously.
 
-@ref examples_demos_likemario is a full platformer to read for how camera,
+@ref examples_games_likemario is a full platformer to read for how camera,
 scroll and streaming fit together.
 
 ## Clamp to the world — room-locking

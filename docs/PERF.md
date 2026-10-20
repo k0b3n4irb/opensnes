@@ -25,7 +25,7 @@ Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
 
 | Scene | What runs | Idle (in `WaitForVBlank`) |
 |---|---|---|
-| `examples/demos/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
+| `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
 | `examples/demos/rpg` | walking: map, sprites, HUD | 91 % of the frame |
 | `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 69 % of the frame |
 | `examples/games/blocks` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |

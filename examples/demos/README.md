@@ -2,13 +2,12 @@
 
 Playable demonstrations: each puts several modules together in one scene
 you can move through, without a game's rules — no score, no end. They show
-how the parts assemble; the two complete games are in [games](../games/).
+how the parts assemble; the complete games are in [games](../games/).
 
 ## Example ROMs
 
 | Example | Difficulty | Description |
 |---------|------------|-------------|
-| [likemario](likemario/) | Advanced | Side-scrolling platformer: gravity, tile collision, a camera that follows, music |
 | [mapandobjects](mapandobjects/) | Advanced | The map engine and the object engine together: slopes, patrolling machines, streamed sprites |
 | [shmup_1942](shmup_1942/) | Intermediate | A vertical shoot 'em up: scrolling, an enemy pool, bullets and collision |
 | [rpg](rpg/) | Advanced | An RPG template: a Tiled-driven overworld with dialog boxes |
@@ -25,5 +24,5 @@ The Mode 7 race, `mode7_racing`, is with the other Mode 7 examples in
 
 ---
 
-Start with **shmup_1942** for one screen of moving parts, then **likemario**
-for a scrolling platformer.
+Start with **shmup_1942** for one screen of moving parts, then **mapandobjects**
+for a scrolling world run by the map and object engines.

@@ -364,3 +364,31 @@ to a hover-bike race round a lagoon, with two rivals. What was learnt:
   https://mcpservers.org/servers/pixellab-code/pixellab-mcp
 - Retro Diffusion: https://mcpservers.org/servers/retro-diffusion/retro-diffusion-mcp
 - Copyright frame: https://blog.promise.legal/ai-game-assets-copyright-steam-disclosure-2026/
+
+### likemario becomes a game (2026-10-20)
+
+The owner found the demos were demos and asked for the platformer with Kit as
+a real game. It has a title, 29 shards, four robot insects and two drones
+(stomped from above, fatal from the side), three lives, a checkpoint per roof,
+a beacon to reach and a game over, and went back to `examples/games/`. What
+was learnt:
+
+- **A dynamic sprite's slot is its draw order.** The engine hands out its
+  32x32 slots in the order of the `oamDynamicDraw()` calls of a frame; a
+  machine skipped off screen shifts every later sprite onto someone else's
+  tiles. Draw them all every frame, hidden when unseen.
+- **A 32-px sprite at y = 240 is not hidden**: sprites wrap at line 256 and
+  its bottom 16 rows show at the top. `oamHide()` also sets the ninth x bit;
+  a raw `oamy` must be 224 (below the 224 lines).
+- **Static sprites beside the engine** work in the same OAM: the engine
+  hides only the entries it drew the frame before, and its last slots' tiles
+  are free when it uses fewer than twelve.
+- **The 2 KB text map in the VBlank** fits beside seven sprite uploads and
+  a map column: the three manifests' DMA asserts stay at zero unsafe writes.
+- **A greedy search finds the playthrough.** RIGHT held, a press at a time,
+  keeping the earliest press after which Kit has his three lives and is
+  furthest right 70 frames later: ten presses, 22 shards, two stomps. A
+  140-frame horizon got stuck, because the jump over a gap leads straight
+  into the next insect and only a second press can stomp it.
+- **The scratchpad is not durable**: `/tmp` was emptied twice during the lot.
+  Helpers that a long search needs go to `~/.cache`.

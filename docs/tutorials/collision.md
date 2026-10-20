@@ -376,7 +376,7 @@ if (bx < 10 && by >= 1 && by <= 10) {
 
 - `examples/basics/collision_demo/` -- AABB sprite collision with tile-based wall collision and visual feedback
 - `examples/games/breakout/` -- Ball vs walls, ball vs paddle (angle control), ball vs brick grid
-- `examples/demos/likemario/` -- Platformer tile collision with gravity, ground snapping, and wall sliding
+- `examples/games/likemario/` -- Platformer tile collision with gravity, ground snapping, and wall sliding
 
 ## Next Steps
 

@@ -205,14 +205,20 @@ def neo_lumen_sfx():
 
 
 def rooftops_sfx():
-    """likemario's effect: Kit's jump (Kenney, CC0). The sample is named
-    `jump`, so soundbank.h calls it SFX_JUMP, the name the game uses."""
+    """likemario's effects (Kenney, CC0): Kit's jump, a shard picked up, a machine
+    stomped, Kit hurt, the roof cleared. Each sample's name gives its SFX_ name in
+    soundbank.h (SFX_JUMP, SFX_SHARD, SFX_STOMP, SFX_HURT, SFX_CLEAR), the names
+    the game uses; they are cut short to leave the music its SPC700 RAM."""
     import kenney
     rate = 16000
-    s = it.Sample("jump", sy.to16(kenney.load("phaseJump1", rate)), rate)
+    samples = [it.Sample("jump", sy.to16(kenney.load("phaseJump1", rate)), rate),
+               it.Sample("shard", sy.to16(kenney.load("pepSound1", rate, seconds=0.25)), rate),
+               it.Sample("stomp", sy.to16(kenney.load("zapTwoTone", rate, seconds=0.2)), rate),
+               it.Sample("hurt", sy.to16(kenney.load("error_004", rate, seconds=0.35)), rate),
+               it.Sample("clear", sy.to16(kenney.load("powerUp1", rate, seconds=0.6)), rate)]
     p = it.Pattern(4)
     p.set(0, 0, note=it.note("C-5"), smp=1)
-    return dict(title="Neo-Lumen jump", samples=[s], patterns=[p], orders=[0])
+    return dict(title="Neo-Lumen rooftop effects", samples=samples, patterns=[p], orders=[0])
 
 
 def nocturne_large():

@@ -162,7 +162,7 @@ allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank on
 
 - **Explore related examples**:
   - `games/breakout` -- Dynamic sprites in a real game context
-  - `demos/likemario` -- Dynamic sprites with scrolling backgrounds
+  - `games/likemario` -- Dynamic sprites with scrolling backgrounds
 
 ## Modules Used
 

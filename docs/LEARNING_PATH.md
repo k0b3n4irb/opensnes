@@ -138,7 +138,7 @@ every game needs.
 
 *Confidence: a complete cartridge.* Persist progress, choose a mapper, fit
 more data in the cartridge with compression, reach for a coprocessor when you need more, study playable demos that fuse
-everything above, and two complete games.
+everything above, and three complete games.
 
 @subpage examples_memory_save_game
 
@@ -148,7 +148,7 @@ everything above, and two complete games.
 
 @subpage examples_games_blocks
 
-@subpage examples_demos_likemario
+@subpage examples_games_likemario
 
 @subpage examples_demos_mapandobjects
 

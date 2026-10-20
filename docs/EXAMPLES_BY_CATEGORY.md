@@ -231,7 +231,6 @@ rules (no score, no end).
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_demos_likemario | Platformer with scrolling, animation, physics |
 | @subpage examples_demos_mapandobjects | Map engine with interactive objects |
 | @subpage examples_demos_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |
 | @subpage examples_demos_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |
@@ -246,3 +245,4 @@ Complete games, from the title screen to the game over.
 |---------|-------------|
 | @subpage examples_games_breakout | Breakout clone: sprites, input, game logic, scoring |
 | @subpage examples_games_blocks | Falling-blocks puzzle with Korobeiniki music, multi-line clear |
+| @subpage examples_games_likemario | Kit's Rooftop Run: a platformer with shards, stompable machines, lives, checkpoints and a goal |

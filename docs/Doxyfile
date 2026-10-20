@@ -84,7 +84,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/basics/panel_hud \
                          ../examples/basics/scene_stack \
                          ../examples/games/breakout \
-                         ../examples/demos/likemario \
+                         ../examples/games/likemario \
                          ../examples/demos/mapandobjects \
                          ../examples/mode7/mode7_racing \
                          ../examples/demos/rpg \

@@ -144,7 +144,7 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
   `devtools/audio_assets/kenney/` beside the OGG files the examples use
 - **Used in**: the effects of `examples/audio/snesmod_music`
   (`sfx/neo_lumen_sfx.it`: `phaseJump1`, `powerUp1`, `laser1`,
-  `confirmation_001`) and the jump of `examples/demos/likemario`
+  `confirmation_001`) and the jump of `examples/games/likemario`
   (`res/jump_sfx.it`: `phaseJump1`), cut and converted by
   `devtools/audio_assets/build.py`.
 

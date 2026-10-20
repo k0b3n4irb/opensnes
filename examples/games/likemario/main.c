@@ -1,13 +1,19 @@
 /**
  * @file main.c
- * @brief Side-scrolling platformer with scroll streaming and SNESMOD audio
+ * @brief Kit's Rooftop Run — a side-scrolling platformer, title to game over
  * @ingroup examples
  *
- * A platformer on the rooftops of the city at night: Kit, the fox-kit
- * courier, runs and jumps from roof to roof. It demonstrates the core
- * techniques of a scrolling SNES game: tile-based map streaming, subpixel
- * physics, tile collision, camera tracking, animated sprites, a parallax
- * layer, and SPC700 music/sound effects via the SNESMOD audio driver.
+ * A complete platformer on the rooftops of the city at night: Kit, the
+ * fox-kit courier, runs from roof to roof to the radio beacon at the end of
+ * the level, picking up data shards and stomping the security machines on
+ * the way. Three lives; a fall between two roofs or a machine touched from
+ * the side costs one, and Kit comes back at the start of the last roof he
+ * reached. The game goes title → play → roof cleared or game over → title.
+ *
+ * It shows the core techniques of a scrolling SNES game: tile-based map
+ * streaming, subpixel physics, tile collision, camera tracking, animated
+ * sprites, a parallax layer, a text HUD in front of everything, and SPC700
+ * music and sound effects through SNESMOD.
  *
  * The map engine streams one tile column per frame using a prepare/flush
  * pattern: during active display, the next column is read from ROM into
@@ -16,42 +22,50 @@
  * writes within the VBlank budget. The column at +32 tiles ahead is streamed to cover the 33rd
  * partial tile at the screen edge.
  *
- * Physics use 8.8 fixed-point velocities with arithmetic right shift for
- * signed values. Collision checks test two probe points per axis against
- * the tile property table (T_SOLID / T_EMPTY).
+ * Kit and the machines are dynamic sprites: the engine gives each one drawn
+ * a 32x32 slot of VRAM in the order they are drawn, so all of them are
+ * drawn every frame, in the same order (a machine off screen or stomped is
+ * drawn hidden), and each one keeps its slot. The shards are plain 16x16
+ * sprites whose eight frames sit once in VRAM, in the tiles the engine's
+ * last slots would use (it uses seven).
  *
  * This began as the PVSnesLib likemario example; the level, the roofs, the
- * skyline and Kit are ours (devtools/art_assets/build.py writes the level
- * data from the pictures in assets/neo-lumen/).
+ * skyline, Kit, the machines and the shards are ours
+ * (devtools/art_assets/build.py writes the level and its objects from the
+ * pictures in assets/neo-lumen/).
  *
  * @par SNES Concepts
  * - Scroll streaming: 1 column/frame prepare-during-display, DMA-in-VBlank
  * - SC_64x32 tilemap with 64-column wraparound for seamless scrolling
  * - Subpixel 8.8 fixed-point physics (acceleration, gravity, max velocity)
  * - Tile collision via property lookup table (tilesetatt)
- * - Dynamic sprite engine with frame-based animation (32x32 frames)
+ * - Dynamic sprites in stable slots, beside static sprites in the same OAM
+ * - Box collision between sprites, from above (a stomp) or from the side
+ * - A BG3 text HUD in front of BG1 and BG2 (BG3_MODE1_PRIORITY_HIGH)
  * - A second layer scrolled at a quarter of the camera's speed (parallax)
- * - SNESMOD: SPC700 module playback and sound effects
- * - Assembly DMA loader with bank bytes for SUPERFREE ROM data
+ * - SNESMOD: SPC700 module playback and five sound effects
+ * - A game state machine: title, play, a life lost, game over, cleared
  *
  * @par What to Observe
- * - Kit walks left/right with acceleration and deceleration
- * - Press A to jump (hold UP for a higher jump): the gaps between the roofs
- *   need a jump, a few of the higher roofs need the high one
- * - Camera follows Kit; the far towers behind drift by more slowly
- * - Music plays continuously; a jump sound effect triggers on A press
- * - Falling between two roofs respawns Kit on the first one
+ * - START on the title screen starts the run
+ * - Kit walks left/right with acceleration and deceleration; A jumps (hold
+ *   UP for a higher jump)
+ * - Shards spin; walking or jumping through one counts it, a chime plays
+ * - Landing on a robot insect or a drone flattens it and bounces Kit;
+ *   touching one from the side, or falling, costs a life
+ * - Reaching the beacon clears the roof: the shards left give a bonus
  *
  * @par Modules Used
  * console, sprite, sprite_dynamic, sprite_lut, dma, input, background, anim,
- * vramqueue
+ * vramqueue, text
  *
- * @see background.h, sprite.h, input.h, dma.h, snesmod.h
+ * @see background.h, sprite.h, input.h, dma.h, snesmod.h, text.h
  */
 
 #include <snes.h>
 #include <snes/vramqueue.h>
 #include <snes/anim.h>
+#include <snes/text.h>
 #include <snes/snesmod.h>
 #include "soundbank.h"
 
@@ -63,13 +77,15 @@
 #include "res/tiles.inc"          /* generated: tiles_tiles[], tiles_pal[], tiles_map[], each with _end */
 #include "res/skyline.inc"        /* generated: skyline_tiles[], skyline_pal[], skyline_map[] (64x32 in two pages), each with _end */
 #include "res/kit.inc"            /* generated: kit_tiles[], kit_pal[], each with _end */
+/** @brief The machines' frames (32x32) and the shard's eight frames (16x16) */
+#include "res/enemies.inc"        /* generated: enemies_tiles[], enemies_pal[], each with _end */
+#include "res/shard.inc"          /* generated: shard_tiles[], shard_pal[], each with _end */
+/** @brief Where the shards, the machines and the checkpoints are, and the goal */
+#include "res/level_objects.h"    /* generated by devtools/art_assets/build.py */
 /** @brief Map data (tile indices + header with width/height) */
 extern const u8 maplevel[];   /* asset bank: every C read must be a far read, hence const */
 /** @brief Tile attribute table (T_SOLID/T_EMPTY per tile index, b16 format) */
 extern const u8 tilesetatt[];
-
-/** @brief Asset symbols from data.asm (.incbin sections in the asset banks).
- * A C pointer carries its bank byte, and dmaCopyVram/dmaCopyCGram read it. */
 
 /*============================================================================
  * Constants
@@ -78,16 +94,25 @@ extern const u8 tilesetatt[];
 /** @brief VRAM word address for large (32x32) sprite tiles */
 #define VRAM_SPR_LARGE  0x0000
 /** @brief VRAM word address for small sprite tiles: the engine's fixed
- *  second pool; this game draws no small sprite, so BG2 uses the room */
+ *  second pool; this game draws no small dynamic sprite, so BG2 uses the room */
 #define VRAM_SPR_SMALL  0x1000
+/** @brief The shard's frames: tile $C0 of the first OBJ table, where the
+ *  engine's slots 12-15 would go (it never uses more than seven) */
+#define VRAM_SHARD      0x0C00
+/** @brief OBJ tile number of the shard's first frame */
+#define SHARD_TILE      0xC0
 /** @brief VRAM word address for BG2 (the skyline) tiles, at most 256 */
 #define VRAM_BG2_TILES  0x1000
-/** @brief VRAM word address for BG1 tile character data (802 tiles, to $5220) */
+/** @brief VRAM word address for BG1 tile character data (831 tiles, to $53F0) */
 #define VRAM_BG_TILES   0x2000
+/** @brief VRAM word address for the BG3 font (2bpp, 96 glyphs) */
+#define VRAM_BG3_TILES  0x6000
 /** @brief VRAM word address for BG1 tilemap (SC_64x32) */
 #define VRAM_BG_MAP     0x6800
 /** @brief VRAM word address for BG2 tilemap (SC_64x32) */
 #define VRAM_BG2_MAP    0x7000
+/** @brief VRAM word address for the BG3 tilemap, the HUD (SC_32x32) */
+#define VRAM_BG3_MAP    0x7800
 /** @brief Where the 32x32 sprite is drawn relative to the 16x16 collision
  *  box: Kit's feet are on row 30 of his frame, the box's bottom is row 16 */
 #define KIT_DRAW_DX     (-8)
@@ -109,6 +134,8 @@ extern const u8 tilesetatt[];
 #define KIT_JUMPING   0x0394
 /** @brief High jump initial upward velocity (when holding UP during jump) */
 #define KIT_HIJUMPING 0x0594
+/** @brief The bounce off a stomped machine */
+#define KIT_BOUNCE    0x0300
 
 /** @brief Tile property: passable (air, background decoration) */
 #define T_EMPTY  0x0000
@@ -133,6 +160,51 @@ extern const u8 tilesetatt[];
 #define FRAME_RISE   23
 /** @brief Jump pose while coming down */
 #define FRAME_FALL   25
+
+/** @brief The machines' sheet (res/enemies.png): the insect's walk 0-3, the
+ *  drone's hover 4-7, the insect stomped 8, the drone stomped 9 */
+#define FRAME_INSECT  0
+/** @brief First frame of the drone's hover */
+#define FRAME_DRONE   4
+/** @brief The stomped insect, then the stomped drone */
+#define FRAME_SQUASH  8
+
+/** @brief Machine types of enemy_def[][0] */
+#define ENEMY_INSECT  0
+/** @brief A drone flies over the roofs */
+#define ENEMY_DRONE   1
+/** @brief A machine patrols; stomped, it lies flat for a while; then it is gone */
+#define EN_ALIVE      0
+/** @brief See EN_ALIVE */
+#define EN_FLAT       1
+/** @brief See EN_ALIVE */
+#define EN_GONE       2
+
+/** @brief Where a 32x32 dynamic sprite is drawn to be unseen: below the 224
+ *  visible lines. OBJ_HIDE_Y (240) is for 8 and 16-px sprites: a 32-px one
+ *  there wraps past line 255 and shows its bottom 16 rows at the top. */
+#define HIDE_Y_32     224
+
+/** @brief The first OAM entry of the shards: the dynamic sprites take 0-6 */
+#define OAM_SHARD     32
+
+/** @brief The game's states */
+#define GS_TITLE      0
+/** @brief Running */
+#define GS_PLAY       1
+/** @brief A life lost: Kit blinks, the world waits */
+#define GS_DOWN       2
+/** @brief No life left */
+#define GS_OVER       3
+/** @brief The beacon reached */
+#define GS_CLEAR      4
+
+/** @brief Lives at the start */
+#define START_LIVES   3
+/** @brief Frames the world waits after a life lost */
+#define DOWN_FRAMES   60
+/** @brief Frames Kit cannot be hurt after coming back */
+#define SAFE_FRAMES   90
 
 /*============================================================================
  * Global State
@@ -162,18 +234,13 @@ static u8  kit_yfrac;       /**< Kit Y sub-pixel fraction (8.8 fixed-point low b
 static s16 kit_xvel;        /**< Kit X velocity in 8.8 fixed-point */
 static s16 kit_yvel;        /**< Kit Y velocity in 8.8 fixed-point (negative = upward) */
 static u8  kit_action;      /**< Current action state (KIT_ACT_STAND/WALK/JUMP/FALL) */
+static u8  kit_safe;        /**< Frames left during which Kit cannot be hurt */
 
 /* Animation as data (anim module): one clip per action, one player.
  * animPlay() is called unconditionally each frame — continue-if-same
- * keeps the walk cycle running instead of restarting it.
- *
- * The clips are initialized RAM statics rather than DECLARE_ANIM_CLIP
- * (ROM const). That was a workaround when this ROM's bank $00 was within
- * a few bytes of full and a const read past it was wrong; since v0.41.0
- * const data lives in the asset banks and every C read of it is far, so
- * DECLARE_ANIM_CLIP would work here too. The 44 bytes of WRAM stay for
- * now; the layout and the API are identical. (Comment corrected
- * 2026-10-04; it described the pre-#127.3 world.) */
+ * keeps the walk cycle running instead of restarting it. The clips are
+ * initialized RAM statics; DECLARE_ANIM_CLIP (ROM const) would work as
+ * well, since const data is read far wherever it lies. */
 static u16 clip_walk_frames[]  = { FRAME_WALK, FRAME_WALK + 1, FRAME_WALK + 2, FRAME_WALK + 3,
                                    FRAME_WALK + 4, FRAME_WALK + 5, FRAME_WALK + 6, FRAME_WALK + 7 };
 static u16 clip_jump_frames[]  = { FRAME_RISE };
@@ -188,8 +255,8 @@ static AnimPlayer kit_anim = ANIM_PLAYER_INIT;  /**< Kit's animation state */
 static s16 map_max_x;         /**< Rightmost valid Kit X position (map_width*8 - 16) */
 static s16 cam_max_x;         /**< Maximum camera X offset (map_width*8 - 256) */
 
-/** @brief SPC700 sound effect slot index for the jump sound */
-static u8 sfx_jump_slot;
+/** @brief SPC700 sound effect slots */
+static u8 sfx_jump, sfx_shard, sfx_stomp, sfx_hurt, sfx_clear;
 
 /**
  * @brief Column tile buffer for deferred VRAM streaming.
@@ -199,6 +266,29 @@ static u8 sfx_jump_slot;
  * queue; vramQueueFlush() sends the 64 bytes in VBlank.
  */
 static u16 col_buffer[32];
+
+/** @brief Probe oracles: the state (GS_*), the score in tens, the lives, the shards taken */
+u8  game_state;
+u16 score;
+u8  lives;
+u8  shards_got;
+/** @brief Frames since the state began (blink, waits) */
+static u16 state_timer;
+/** @brief The last checkpoint Kit stood beyond (index into checkpoint_pos) */
+static u8 cp_index;
+/** @brief 1 for each shard picked up this run */
+static u8 shard_taken[SHARD_COUNT];
+
+/** @brief Each machine: position (its 16x16 box), direction, state, timer, frame */
+static s16 en_x[ENEMY_COUNT];
+static s16 en_y[ENEMY_COUNT];
+static s8  en_dir[ENEMY_COUNT];
+static u8  en_state[ENEMY_COUNT];
+static u8  en_timer[ENEMY_COUNT];
+static u8  en_frame[ENEMY_COUNT];
+
+/** @brief The drone's bob, 16 steps of a slow wave, in pixels */
+static const s8 bob[16] = { 0, 1, 2, 3, 4, 3, 2, 1, 0, -1, -2, -3, -4, -3, -2, -1 };
 
 /*============================================================================
  * Map Engine
@@ -369,33 +459,51 @@ static void map_update(void) {
     }
 }
 
+/**
+ * @brief Write the columns the camera shows, in forced blank, after a jump of the camera.
+ *
+ * The streaming of map_update() follows a camera that moves a few pixels
+ * a frame; a camera that jumps (Kit back at a checkpoint, the run started
+ * again) needs the 33 columns it now shows written at once. The caller
+ * turns the screen off around it.
+ */
+static void map_redraw(void) {
+    u16 col, first;
+
+    first = (u16)camera_x >> 3;
+    for (col = first; col < first + 33 && col < map_width; col++)
+        write_vram_column(col, col & 63);
+    last_tile_x = (s16)first;
+}
+
 /*============================================================================
  * Kit - Split into small functions to keep stack frames manageable
  *============================================================================*/
 
 /**
- * @brief Initialize Kit's position, velocity, animation, and sprite configuration.
+ * @brief Put Kit at a point, at rest, and the camera on him.
  *
- * Places Kit at a safe spawn point, sets the dynamic sprite engine's
- * frame to the standing pose, and configures the sprite attribute byte
- * (priority 3, H-flip for facing right). The tile data may sit in any ROM
- * bank (SUPERFREE placement); OAM_SET_GFX() records the bank byte of the
- * pointer it is given.
+ * The sprite is the dynamic engine's slot 0; its tile data may sit in any
+ * ROM bank, OAM_SET_GFX() records the bank byte of the pointer it is given.
  */
-static void kit_init(void) {
-    kit_x = 48;
-    kit_y = 128;      /* on the first roof: its surface is row 18 (y 144), the box is 16 tall */       /* Ground level (row 14 = tile 40 SOLID at y=112, so feet at 112 → y=96) */
+static void kit_place(s16 x, s16 y) {
+    kit_x = x;
+    kit_y = y;
     kit_xfrac = 0;
     kit_yfrac = 0;
     kit_xvel = 0;
     kit_yvel = 0;
-    kit_action = KIT_ACT_STAND;
+    kit_action = KIT_ACT_FALL;
     animPlay(&kit_anim, &clip_stand);
 
     oambuffer[0].oamframeid = FRAME_IDLE;
     oambuffer[0].oamrefresh = 1;
     oambuffer[0].oamattribute = OBJ_PRIO(3);       /* the sheet faces right */
     OAM_SET_GFX(0, kit_tiles);
+
+    camera_x = kit_x - 128;
+    if (camera_x < 0) camera_x = 0;
+    if (camera_x > cam_max_x) camera_x = cam_max_x;
 }
 
 /**
@@ -442,18 +550,17 @@ static void kit_handle_input(void) {
                 kit_yvel = -KIT_HIJUMPING;
             else
                 kit_yvel = -KIT_JUMPING;
-            snesmodPlayEffect(sfx_jump_slot, 127, 128, 3);
+            snesmodPlayEffect(sfx_jump, 127, 128, 3);
         }
     }
-
 }
 
 /**
  * @brief Arithmetic right shift by 8 bits (extract integer part of 8.8 fixed-point).
  *
- * The 65816 has no arithmetic shift right instruction, but cc65816's `>>`
- * on a signed value IS arithmetic (compiler check test_signed_ops.c), so
- * `val >> 8` would do; this helper spells the sign handling out:
+ * cc65816's `>>` on a signed value IS arithmetic (compiler check
+ * test_signed_ops.c), so `val >> 8` would do; this helper spells the sign
+ * handling out:
  * - Positive values: simple unsigned shift
  * - Negative values: bitwise NOT, unsigned shift, NOT back -- preserves
  *   the sign bit through the inversion trick.
@@ -568,14 +675,15 @@ static void kit_collide_horizontal(void) {
 }
 
 /**
- * @brief Clamp Kit to world boundaries and handle action state transitions.
+ * @brief Clamp Kit to the world and handle action state transitions.
  *
  * Prevents Kit from leaving the map horizontally or going above the
- * top. If Kit falls below Y=240 (off the bottom of the screen),
- * respawns at the top-left. Also handles state machine transitions:
- * WALK->STAND when velocity reaches zero, JUMP->FALL at the apex.
+ * top, and moves WALK->STAND when velocity reaches zero, JUMP->FALL at
+ * the apex.
+ *
+ * @return 1 if Kit fell below the screen (between two roofs)
  */
-static void kit_clamp_and_transition(void) {
+static u8 kit_clamp_and_transition(void) {
     if (kit_x < 0) {
         kit_x = 0;
         kit_xvel = 0;
@@ -588,27 +696,21 @@ static void kit_clamp_and_transition(void) {
         kit_y = 0;
         kit_yvel = 0;
     }
-    if (kit_y > 240) {
-        kit_x = 48;
-        kit_y = 64;
-        kit_xvel = 0;
-        kit_yvel = 0;
-        kit_action = KIT_ACT_FALL;
-    }
 
     if (kit_action == KIT_ACT_WALK && kit_xvel == 0)
         kit_action = KIT_ACT_STAND;
     if (kit_action == KIT_ACT_JUMP && kit_yvel >= 0)
         kit_action = KIT_ACT_FALL;
+    return (u8)(kit_y > 240);
 }
 
 /**
  * @brief Update Kit's sprite animation frame based on current action.
  *
  * Pure state->clip mapping: select the clip for the current action and
- * tick. The anim module handles cadence (walk alternates every 4 ticks),
- * continue-if-same (walking keeps its phase), and the oamrefresh flag
- * (tile re-upload only when the frame actually changes).
+ * tick. The anim module handles cadence, continue-if-same (walking keeps
+ * its phase), and the oamrefresh flag (tile re-upload only when the frame
+ * actually changes).
  */
 static void kit_animate(void) {
     if (kit_action == KIT_ACT_WALK)
@@ -626,9 +728,9 @@ static void kit_animate(void) {
  * @brief Update camera to follow Kit and position the sprite on screen.
  *
  * Centers the camera on Kit (offset by half-screen width = 128 pixels),
- * clamped to the map boundaries. Then converts Kit's world position
- * to screen-relative coordinates for the sprite engine and triggers
- * the dynamic sprite draw for OAM buffer update.
+ * clamped to the map boundaries, and draws Kit through the dynamic sprite
+ * engine. While he cannot be hurt, or the world waits after a life lost,
+ * he blinks: drawn hidden one frame in four.
  */
 static void kit_update_camera(void) {
     camera_x = kit_x - 128;
@@ -638,8 +740,272 @@ static void kit_update_camera(void) {
 
     oambuffer[0].oamx = kit_x - camera_x + KIT_DRAW_DX;
     oambuffer[0].oamy = kit_y + KIT_DRAW_DY;
+    if ((kit_safe || game_state == GS_DOWN) && (state_timer & 4))
+        oambuffer[0].oamy = HIDE_Y_32;
     oamDynamicDraw(0);
     bgSetScroll(1, camera_x >> 2, 0);   /* the far towers: a quarter of the speed */
+}
+
+/*============================================================================
+ * The HUD (BG3, in front of everything)
+ *============================================================================*/
+
+/**
+ * @brief Print `value` with `digits` digits, zeros in front, at (x, y).
+ */
+static void put_num(u8 x, u8 y, u16 value, u8 digits) {
+    char buf[6];
+    u8 i;
+
+    buf[digits] = 0;
+    for (i = digits; i > 0; i--) {
+        buf[i - 1] = (char)('0' + value % 10);
+        value /= 10;
+    }
+    textPrintAt(x, y, buf);
+}
+
+/**
+ * @brief The top line: score, shards, lives. The score is kept in tens.
+ */
+static void hud_draw(void) {
+    textPrintAt(1, 1, "SCORE");
+    put_num(7, 1, score, 5);
+    textPrintAt(12, 1, "0");
+    textPrintAt(14, 1, "SHARDS");
+    put_num(21, 1, shards_got, 2);
+    textPrintAt(23, 1, "/");
+    put_num(24, 1, SHARD_COUNT, 2);
+    textPrintAt(27, 1, "KIT");
+    put_num(31, 1, lives, 1);
+    textFlush();
+}
+
+/**
+ * @brief Two centred lines over the level (title, game over, cleared), the HUD kept.
+ */
+static void banner(const char *line1, u8 x1, const char *line2, u8 x2) {
+    textClearRect(0, 10, 32, 8);
+    textPrintAt(x1, 12, line1);
+    if (line2)
+        textPrintAt(x2, 15, line2);
+    textFlush();
+}
+
+/*============================================================================
+ * Shards and machines
+ *============================================================================*/
+
+/**
+ * @brief Do two 16x16 boxes, shrunk by `inset` on each side, overlap?
+ */
+static u8 boxes_touch(s16 ax, s16 ay, s16 bx, s16 by, s16 inset) {
+    s16 dx = ax - bx, dy = ay - by;
+
+    if (dx < 0) dx = -dx;
+    if (dy < 0) dy = -dy;
+    return (u8)(dx < 16 - inset && dy < 16 - inset);
+}
+
+/**
+ * @brief Draw the shards on screen, and take the ones Kit touches.
+ *
+ * Each shard is its own OAM entry (OAM_SHARD + i), a plain 16x16 sprite on
+ * the frame tiles loaded once; one off screen or taken is hidden.
+ */
+static void shards_update(u8 take) {
+    u8 i;
+    u16 tile = (u16)(SHARD_TILE + (((getFrameCount() >> 3) & 7) << 1));
+
+    for (i = 0; i < SHARD_COUNT; i++) {
+        s16 sx = shard_pos[i][0] - camera_x;
+
+        if (shard_taken[i] || sx <= -16 || sx >= 256) {
+            oamHide((u16)(OAM_SHARD + i));
+            continue;
+        }
+        if (take && boxes_touch(kit_x, kit_y, shard_pos[i][0], shard_pos[i][1], 4)) {
+            shard_taken[i] = 1;
+            shards_got++;
+            score += 1;                                  /* 10 points */
+            snesmodPlayEffect(sfx_shard, 127, 128, 4);
+            hud_draw();
+            oamHide((u16)(OAM_SHARD + i));
+            continue;
+        }
+        oamSet((u16)(OAM_SHARD + i), (u16)sx, (u16)shard_pos[i][1], tile, 2, 2, 0);
+    }
+}
+
+/**
+ * @brief Put the machines back where the level places them, alive.
+ */
+static void enemies_reset(void) {
+    u8 i;
+
+    for (i = 0; i < ENEMY_COUNT; i++) {
+        en_x[i] = enemy_def[i][1];
+        en_y[i] = enemy_def[i][2];
+        en_dir[i] = 1;
+        en_state[i] = EN_ALIVE;
+        en_timer[i] = 0;
+        en_frame[i] = 0xFF;                              /* none uploaded yet */
+        oambuffer[1 + i].oamattribute = OBJ_PAL(1) | OBJ_PRIO(2);
+        OAM_SET_GFX(1 + i, enemies_tiles);
+    }
+}
+
+/** @brief Kit loses a life: the world waits, then he comes back or the game is over */
+static void lose_life(void) {
+    lives--;
+    snesmodPlayEffect(sfx_hurt, 127, 128, 5);
+    game_state = GS_DOWN;
+    state_timer = 0;
+    hud_draw();
+}
+
+/**
+ * @brief Move the machines (when `move`), meet Kit (when `meet`), and draw them.
+ *
+ * A machine patrols between its two bounds at half a pixel a frame; a
+ * drone also bobs. Kit falling onto one from above flattens it and
+ * bounces; any other touch hurts him. Every machine is drawn every frame,
+ * hidden when gone or off screen, so each keeps its slot of the dynamic
+ * engine; its frame is changed (and uploaded) only while it is seen.
+ */
+static void enemies_update(u8 move, u8 meet) {
+    u8 i, f;
+
+    for (i = 0; i < ENEMY_COUNT; i++) {
+        u8 drone = (u8)(enemy_def[i][0] == ENEMY_DRONE);
+        s16 y = en_y[i];
+        s16 sx;
+
+        if (drone)
+            y += bob[(getFrameCount() >> 3) & 15];
+        if (en_state[i] == EN_ALIVE && move && (getFrameCount() & 1)) {
+            en_x[i] += en_dir[i];
+            if (en_x[i] <= enemy_def[i][3]) en_dir[i] = 1;
+            if (en_x[i] >= enemy_def[i][4]) en_dir[i] = -1;
+        }
+        if (en_state[i] == EN_FLAT && --en_timer[i] == 0)
+            en_state[i] = EN_GONE;
+
+        if (meet && en_state[i] == EN_ALIVE && boxes_touch(kit_x, kit_y, en_x[i], y, 2)) {
+            if (kit_yvel > 0 && kit_y + 16 <= y + 8) {   /* from above: a stomp */
+                en_state[i] = EN_FLAT;
+                en_timer[i] = 40;
+                kit_yvel = -KIT_BOUNCE;
+                kit_action = KIT_ACT_JUMP;
+                score += 10;                             /* 100 points */
+                snesmodPlayEffect(sfx_stomp, 127, 128, 4);
+                hud_draw();
+            } else if (!kit_safe) {
+                lose_life();
+            }
+        }
+
+        sx = en_x[i] - camera_x;
+        if (en_state[i] == EN_GONE || sx <= -24 || sx >= 264) {
+            oambuffer[1 + i].oamy = HIDE_Y_32;
+        } else {
+            if (en_state[i] == EN_FLAT)
+                f = (u8)(FRAME_SQUASH + drone);
+            else if (drone)
+                f = (u8)(FRAME_DRONE + ((getFrameCount() >> 3) & 3));
+            else
+                f = (u8)(FRAME_INSECT + ((getFrameCount() >> 3) & 3));
+            if (f != en_frame[i]) {
+                en_frame[i] = f;
+                oambuffer[1 + i].oamframeid = f;
+                oambuffer[1 + i].oamrefresh = 1;
+            }
+            /* the sheet faces right: mirrored walking left */
+            oambuffer[1 + i].oamattribute = OBJ_PAL(1) | OBJ_PRIO(2) | (en_dir[i] < 0 ? OBJ_FLIPX : 0);
+            oambuffer[1 + i].oamx = sx + KIT_DRAW_DX;
+            oambuffer[1 + i].oamy = y + KIT_DRAW_DY;
+        }
+        oamDynamicDraw((u16)(1 + i));
+    }
+}
+
+/*============================================================================
+ * The run
+ *============================================================================*/
+
+/**
+ * @brief A new run: score, lives, shards, machines, Kit on the first roof.
+ *
+ * Called in forced blank: the camera jumps back to the start of the map.
+ */
+static void run_reset(void) {
+    u8 i;
+
+    score = 0;
+    lives = START_LIVES;
+    shards_got = 0;
+    cp_index = 0;
+    kit_safe = 0;
+    for (i = 0; i < SHARD_COUNT; i++)
+        shard_taken[i] = 0;
+    enemies_reset();
+    kit_place(checkpoint_pos[0][0], checkpoint_pos[0][1]);
+    map_redraw();
+}
+
+/** @brief Set when the screen was turned off for a camera jump: the loop
+ *  turns it on after the next VBlank, once the NMI has sent the sprites' tiles */
+static u8 screen_off;
+
+/** @brief Back to the title screen: a new run under the title's two lines */
+static void to_title(void) {
+    setScreenOff();
+    screen_off = 1;
+    run_reset();
+    game_state = GS_TITLE;
+    state_timer = 0;
+    textClear();
+    banner("KIT'S ROOFTOP RUN", 7, "PRESS START", 10);
+}
+
+/** @brief After a life lost: Kit at the last checkpoint he passed, safe for a while */
+static void come_back(void) {
+    setScreenOff();
+    screen_off = 1;
+    kit_place(checkpoint_pos[cp_index][0], checkpoint_pos[cp_index][1]);
+    map_redraw();
+    kit_safe = SAFE_FRAMES;
+    game_state = GS_PLAY;
+    state_timer = 0;
+}
+
+/**
+ * @brief One frame of the run: Kit, the checkpoints, the goal.
+ */
+static void play_frame(void) {
+    kit_handle_input();
+    kit_apply_physics();
+    kit_collide_vertical();
+    kit_collide_horizontal();
+    if (kit_clamp_and_transition()) {
+        lose_life();
+        return;
+    }
+    if (kit_safe)
+        kit_safe--;
+    /* the checkpoint: the start of the last roof Kit has stood on */
+    if (kit_action == KIT_ACT_STAND || kit_action == KIT_ACT_WALK) {
+        while (cp_index + 1 < CHECKPOINT_COUNT && kit_x >= checkpoint_pos[cp_index + 1][0])
+            cp_index++;
+    }
+    if (kit_x >= GOAL_X) {
+        score += (u16)(lives * 50);                      /* 500 points a life left */
+        snesmodPlayEffect(sfx_clear, 127, 128, 6);
+        game_state = GS_CLEAR;
+        state_timer = 0;
+        hud_draw();
+        banner("ROOF CLEARED!", 9, "PRESS START", 10);
+    }
 }
 
 /*============================================================================
@@ -647,39 +1013,43 @@ static void kit_update_camera(void) {
  *============================================================================*/
 
 /**
- * @brief Main entry point -- platformer initialization and game loop.
+ * @brief Main entry point -- initialization and the game loop.
  *
- * Initializes all subsystems during force blank: Mode 1 video, tile/palette
- * DMA via assembly loader, dynamic sprite engine, map loading, Kit state,
- * and SNESMOD audio (music + jump sound effect). Then enters the main loop
- * with a strict pipeline:
+ * Initializes all subsystems during force blank: Mode 1 video with BG3 in
+ * front, tiles and palettes by DMA, the dynamic sprite engine, the shard
+ * frames, the map, the text HUD and SNESMOD (music + five effects). Then
+ * the loop, a strict pipeline:
  *
  * Active display (CPU-only, no VRAM):
- *   1. kit_handle_input() - read pad, apply acceleration
- *   2. kit_apply_physics() - gravity, velocity integration
- *   3. kit_collide_vertical/horizontal() - tile collision response
- *   4. kit_clamp_and_transition() - boundary checks, state transitions
- *   5. kit_animate() - frame selection
- *   6. kit_update_camera() - camera + sprite positioning
- *   7. map_update() - prepare next column in RAM buffer
+ *   1. the state's work: the title waits for START, the run moves Kit and
+ *      meets the shards and the machines, a life lost waits, the end
+ *      waits for START
+ *   2. Kit's animation and camera, the shards and the machines drawn
+ *   3. map_update() - prepare next column in RAM buffer
  *
  * VBlank (VRAM writes allowed):
  *   1. vramQueueFlush() - DMA the column noted (64 bytes)
  *   2. bgSetScroll() - update hardware scroll registers
- *   3. oamVramQueueUpdate() - upload sprite tiles
+ *   3. the NMI sends the OAM, the HUD when it changed, and the sprite tiles
  *   4. snesmodProcess() - SPC700 communication (no VBlank restriction)
  *
  * @return 0 (never reached -- infinite game loop)
  */
 int main(void) {
+    u8 i;
+
     consoleInit();      /* Sets force blank ON — stays until setScreenOn */
 
-    setMode(BG_MODE1, 0);
+    /* BG3 (the text) in front of BG1 and BG2: the priority bit of BGMODE,
+     * and the priority bit of each text tile (text_config.priority) */
+    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
 
     bgSetGfxPtr(0, VRAM_BG_TILES);
     bgSetMapPtr(0, VRAM_BG_MAP, SC_64x32);
     bgSetGfxPtr(1, VRAM_BG2_TILES);
     bgSetMapPtr(1, VRAM_BG2_MAP, SC_64x32);
+    bgSetGfxPtr(2, VRAM_BG3_TILES);
+    bgSetMapPtr(2, VRAM_BG3_MAP, SC_32x32);
 
     /* DMA tile + palette assets: the pointers carry their bank. */
     dmaCopyVram(tiles_tiles,        VRAM_BG_TILES, tiles_tiles_end - tiles_tiles);
@@ -687,7 +1057,21 @@ int main(void) {
     dmaCopyVram(skyline_tiles,      VRAM_BG2_TILES, skyline_tiles_end - skyline_tiles);
     dmaCopyVram(skyline_map,        VRAM_BG2_MAP,   skyline_map_end - skyline_map);
     dmaCopyCGram(skyline_pal,      16,            skyline_pal_end - skyline_pal);
+    /* sprite palettes 0 Kit, 1 the machines, 2 the shard (CGRAM 128 up) */
     dmaCopyCGram(kit_pal,          128,           kit_pal_end - kit_pal);
+    dmaCopyCGram(enemies_pal,      144,           enemies_pal_end - enemies_pal);
+    dmaCopyCGram(shard_pal,        160,           shard_pal_end - shard_pal);
+    dmaCopyVram(shard_tiles,        VRAM_SHARD,    shard_tiles_end - shard_tiles);
+
+    /* The HUD: the font at BG3's tiles, its map at VRAM_BG3_MAP, palette 5.
+     * A 2bpp palette n reads CGRAM 4n..4n+3; 21-23 are among the colours
+     * the skyline's palette (CGRAM 16-31) leaves unused, so they are the text's. */
+    textInit(VRAM_BG3_MAP, 0, 5);
+    text_config.priority = 1;
+    textLoadFont(VRAM_BG3_TILES);
+    setColor(21, RGB(29, 29, 30));
+    setColor(22, RGB(30, 22, 10));
+    setColor(23, RGB(28, 10, 18));
 
     {
         static const OamDynamicConfig dyn_cfg = {
@@ -699,53 +1083,87 @@ int main(void) {
         };
         oamDynamicInit(&dyn_cfg);
     }
+    for (i = 0; i < SHARD_COUNT; i++)
+        oamSetSize((u16)(OAM_SHARD + i), OBJ_SMALL);
 
     map_load();     /* All VRAM writes safe — force blank from consoleInit */
-    kit_init();
 
     /* Initialize SNESMOD audio */
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
     snesmodLoadModule(MOD_ROOFTOPS);
-    sfx_jump_slot = snesmodLoadEffect(SFX_JUMP);
+    sfx_jump  = snesmodLoadEffect(SFX_JUMP);
+    sfx_shard = snesmodLoadEffect(SFX_SHARD);
+    sfx_stomp = snesmodLoadEffect(SFX_STOMP);
+    sfx_hurt  = snesmodLoadEffect(SFX_HURT);
+    sfx_clear = snesmodLoadEffect(SFX_CLEAR);
 
-    setMainScreen(TM_BG1 | TM_BG2 | TM_OBJ);
+    setMainScreen(TM_BG1 | TM_BG2 | TM_BG3 | TM_OBJ);
 
-    /* Initial sprite draw — queue Kit's tile upload. The NMI handler
-     * runs even under force blank, so the WaitForVBlank below lets the
-     * auto-flush hook drain the VRAM queue + sync OAM before we release
-     * force blank. Kit is in VRAM by the time the first frame renders. */
-    oambuffer[0].oamx = kit_x + KIT_DRAW_DX;
-    oambuffer[0].oamy = kit_y + KIT_DRAW_DY;
-    oamDynamicDraw(0);
-    WaitForVBlank();
-
-    setScreenOn();      /* Release force blank — display begins */
+    /* The title, still in forced blank: the loop's first frame draws the
+     * sprites, the NMI sends their tiles, then the screen comes on. */
+    to_title();
 
     snesmodPlay(0);
     snesmodSetModuleVolume(60);
 
-    WaitForVBlank();
-
     while (1) {
-        kit_handle_input();
-        kit_apply_physics();
-        kit_collide_vertical();
-        kit_collide_horizontal();
-        kit_clamp_and_transition();
-        kit_animate();
+        u16 pressed = padPressed(0);
+
+        switch (game_state) {
+        case GS_TITLE:
+            kit_apply_physics();                 /* Kit settles on the first roof */
+            kit_collide_vertical();
+            if (pressed & KEY_START) {
+                game_state = GS_PLAY;
+                state_timer = 0;
+                textClear();
+                hud_draw();
+            } else if ((state_timer & 31) == 0) {
+                textPrintAt(10, 15, (state_timer & 32) ? "           " : "PRESS START");
+                textFlush();
+            }
+            break;
+        case GS_PLAY:
+            play_frame();
+            break;
+        case GS_DOWN:
+            if (state_timer >= DOWN_FRAMES) {
+                if (lives == 0) {
+                    game_state = GS_OVER;
+                    state_timer = 0;
+                    banner("GAME OVER", 11, "PRESS START", 10);
+                } else {
+                    come_back();
+                }
+            }
+            break;
+        default:                                 /* GS_OVER, GS_CLEAR */
+            if ((pressed & KEY_START) && state_timer > 30)
+                to_title();
+            break;
+        }
+
+        if (game_state == GS_TITLE || game_state == GS_PLAY)
+            kit_animate();
         kit_update_camera();
+        enemies_update((u8)(game_state <= GS_PLAY), (u8)(game_state == GS_PLAY));
+        shards_update((u8)(game_state == GS_PLAY));
         map_update();
 
         WaitForVBlank();
         /* VRAM operations first — must complete within VBlank.
          * NMI auto-flushes the dynamic sprite engine (end-frame +
-         * VRAM tile queue), so no manual oamInit*EndFrame /
-         * oamVramQueueUpdate calls are needed here. */
+         * VRAM tile queue) and the text buffer once textFlush() asked. */
         vramQueueFlush();
         bgSetScroll(0, camera_x, 0);
+        if (screen_off) {                        /* after a camera jump: tiles are in */
+            screen_off = 0;
+            setScreenOn();
+        }
         /* SPC700 communication last — no VBlank restriction */
         snesmodProcess();
+        state_timer++;
     }
 
     return 0;

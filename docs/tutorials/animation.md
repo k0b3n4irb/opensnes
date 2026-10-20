@@ -25,7 +25,7 @@ void hero_animate(void) {
 
 A frame value is an **opaque u16** — the player sequences it without interpreting it. Three consumption patterns:
 
-- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/demos/likemario`);
+- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`);
 - `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMetasprite()` directly (`examples/sprites/aseprite_pipeline`);
 - `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything; `examples/sprites/animated_sprite` passes it to `oamSet()`).
 
@@ -336,7 +336,7 @@ while (1) {
 
 ### Action-Based Animation
 
-The dynamic sprite engine combines with action states by hand: each action maps to specific frame indices. (`examples/demos/likemario/` does the same job with `AnimClip` clips and `animTickOam()`, as in the first section; the manual form below is what that call does for you.)
+The dynamic sprite engine combines with action states by hand: each action maps to specific frame indices. (`examples/games/likemario/` does the same job with `AnimClip` clips and `animTickOam()`, as in the first section; the manual form below is what that call does for you.)
 
 ```c
 #define FRAME_STAND  6
@@ -469,7 +469,7 @@ Background tile animation involves VRAM writes, which **must happen during VBlan
 
 - `examples/sprites/animated_sprite/` -- basic 4-direction sprite animation with H-flip
 - `examples/sprites/dynamic_sprite/` -- dynamic sprite engine with VRAM streaming
-- `examples/demos/likemario/` -- action-state animation (walk, jump, stand) with camera and physics
+- `examples/games/likemario/` -- action-state animation (walk, jump, stand) with camera and physics
 
 ## Next Steps
 

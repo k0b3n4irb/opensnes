@@ -44,7 +44,7 @@ NOT_TWINS = {
 }
 # name, PVSnesLib directory, ours, input script (or None), first and last frame
 PAIRS = [
-    ("likemario", "games/likemario", "demos/likemario", f"130:{RIGHT}", 200, 500),
+    ("likemario", "games/likemario", "games/likemario", f"130:{RIGHT}", 200, 500),
     ("breakout", "games/breakout", "games/breakout", f"100:{START},110:0,150:{A},160:0", 200, 500),
     ("mapandobjects", "objects/mapandobjects", "demos/mapandobjects", f"130:{RIGHT}", 200, 500),
     ("mapscroll", "maps/mapscroll", "maps/map_scroll", f"130:{RIGHT}", 200, 500),
