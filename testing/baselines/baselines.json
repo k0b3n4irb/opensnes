@@ -379,15 +379,15 @@
   },
   "sprites_aseprite_pipeline": {
     "fbhash": [
-      "d3b75da41218e7f6",
-      "977f6875078f2962"
+      "088b2f8cd4ea0ba4",
+      "96669e4d245bc2ba"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.38.0",
-    "rom_sha256": "027f89209268b4251dbe3063c120d2d87013a1569ce79f764cea124191bb1d42"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "918bcc63bdc638a7cacffd1577c7698023ffee9c3bb94d6084f29952e4d1865e"
   },
   "sprites_dynamic_sprite": {
     "fbhash": [

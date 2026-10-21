@@ -2,9 +2,9 @@
 
 ![Screenshot](aseprite_pipeline.png)
 
-An animated 32×48 hero metasprite whose **every byte of data is generated from a
-single Aseprite project** — no hand-written frame tables, no hand-typed
-animation clips. This is the working reference for the two-tool sprite pipeline:
+An animated 32×48 metasprite — Kit, the fox-kit courier — whose **every byte of
+data is generated from an Aseprite export** — no hand-written frame tables, no
+hand-typed animation clips. This is the working reference for the two-tool sprite pipeline:
 
 ```
 hero.aseprite ─┬─ res/hero.png  + hero.png.toml  → opensnes-sprite sheet → hero.pic/.pal + hero_meta.inc
@@ -18,10 +18,20 @@ timeline (tags, per-frame durations, direction). They meet at the frame value: a
 clip's frame *i* selects `hero_metasprites[i]`, resolved inline by
 `animTickMeta()` and drawn with `oamDrawMetasprite()`.
 
-The artist authored two tags in Aseprite — **walk** (forward loop) and **wave**
-(ping-pong) — with per-frame millisecond durations. `opensnes-sprite anim` converted
-those to ticks and folded the ping-pong into the frame order. Press **A** to
-toggle between the two generated clips.
+The sheet holds eight frames and two tags — **walk** (frames 0-3, forward loop)
+and **wave** (frames 4-7, ping-pong) — with per-frame millisecond durations.
+`opensnes-sprite anim` converted those to ticks and folded the ping-pong into the
+frame order (4, 5, 6, 7, 6, 5). Press **A** to toggle between the two generated
+clips.
+
+## Assets
+
+`res/hero.png` and `res/hero.json` are what Aseprite writes with
+`--sheet hero.png --data hero.json --list-tags` (the JSON-array form). Here they
+are made by `devtools/art_assets/build.py` from `characters/kit_tall_sheet.png`:
+Kit drawn by PixelLab at 32×48, his walk and his wave animated by its
+`animate-with-text-v3` (CC0, `assets/neo-lumen/README.md`). A real `.aseprite`
+project exported with those options gives the same two files.
 
 ## SNES Concepts
 

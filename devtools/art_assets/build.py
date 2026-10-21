@@ -71,6 +71,12 @@ sprites/sprite_sizes:
                       drawn here, the 16 and 64 from PixelLab, the 32 is
                       characters/kit.png), each indexed on its own colours
 
+sprites/aseprite_pipeline:
+  res/hero.png        Kit 32x48 (characters/kit_tall_sheet.png), eight
+                      frames: walk 0-3, wave 4-7
+  res/hero.json       the sheet's data as Aseprite's `--data --list-tags`
+                      export writes it: per-frame durations, the two tags
+
 games/breakout (devtools/art_assets/breakout.py), Neon Breaker, the bar's
 arcade cabinet, all drawn by the script in the tile numbering the game uses:
   res/tiles.png       128 4bpp tiles shared by BG1 and the sprites (the
@@ -152,6 +158,7 @@ MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
 CONTINUOUS = ROOT / "examples" / "scrolling" / "continuous_scroll" / "res"
 SPRITE_SIZES = ROOT / "examples" / "sprites" / "sprite_sizes" / "res"
+ASEPRITE = ROOT / "examples" / "sprites" / "aseprite_pipeline" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -620,6 +627,21 @@ def build_sprite_sizes() -> dict[str, bytes]:
             "sprite64.png": png(sprite_sheet(Image.open(ART / "characters" / "kit_64.png").convert("RGBA")))}
 
 
+def build_aseprite_pipeline() -> dict[str, bytes]:
+    """sprites/aseprite_pipeline: Kit 32x48, eight frames (walk 0-3, wave 4-7), and the
+    sheet's data as Aseprite exports it (`--sheet --data --list-tags`, JSON array)."""
+    sheet = Image.open(ART / "characters" / "kit_tall_sheet.png").convert("RGBA")
+    durations = [140, 140, 140, 140, 120, 120, 120, 200]
+    frames = [{"filename": f"kit {i}.aseprite", "frame": {"x": i * 32, "y": 0, "w": 32, "h": 48},
+               "duration": d} for i, d in enumerate(durations)]
+    data = {"frames": frames,
+            "meta": {"app": "http://www.aseprite.org/", "version": "1.3.7", "image": "hero.png",
+                     "format": "RGBA8888", "size": {"w": 256, "h": 48}, "scale": "1",
+                     "frameTags": [{"name": "walk", "from": 0, "to": 3, "direction": "forward", "repeat": "0"},
+                                   {"name": "wave", "from": 4, "to": 7, "direction": "pingpong", "repeat": "0"}]}}
+    return {"hero.png": png(sprite_sheet(sheet)), "hero.json": (json.dumps(data, indent=1) + "\n").encode()}
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -823,6 +845,7 @@ def main() -> int:
             (MODE7 / "extbg" / "res", {"plane.png": png(plane), "orb.png": png(orb())}),
             (CONTINUOUS, continuous),
             (SPRITE_SIZES, build_sprite_sizes()),
+            (ASEPRITE, build_aseprite_pipeline()),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),
                         "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
                         "backpal.bin": arcade["backpal"]}),

@@ -196,8 +196,8 @@
     "rom_sha256": "74c3ab3efdc6c3dc4b9886e7b415b734eb810a90cfb453d0e7ade7601eef4ec2"
   },
   "sprites_aseprite_pipeline": {
-    "stream": "a81b73762f1a893557e8cb2c61a3acd4ace2bd8028beccb0d21f0da0d2b7a942",
-    "rom_sha256": "4b01209e2edd02fcc4e9e3298e9309e5ca40319547b3b313593308d25f89cd60"
+    "stream": "7f32aaf58534b7bae574880d1d0b373d9eb4757568b3099ae50d3d53ee6cecc3",
+    "rom_sha256": "918bcc63bdc638a7cacffd1577c7698023ffee9c3bb94d6084f29952e4d1865e"
   },
   "sprites_dynamic_sprite": {
     "stream": "e37bc33895f0a223452da03ec45a9d2f395dc45905cd93e2ccc2bdcb7a087a3c",
