@@ -408,10 +408,10 @@
     "rom_sha256": "3e22449a9f876ebcd721a672db8ddda3c0b64e90886a95349937dc271e112e63"
   },
   "sprites_sprite_sizes": {
-    "fbhash": "2ddf21c66f88a7ab",
+    "fbhash": "ed4f854a379f98d5",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "20a2c0420e4a5c98b31f9ea7e94c3ae90ef99da537bf368fb976d1140b8fa4e1"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "06d610b0a553808725b1721be434f74c99b91d565da9a8200b7611641bed0058"
   },
   "sprites_sprite_swarm": {
     "fbhash": [

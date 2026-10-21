@@ -66,6 +66,11 @@ scrolling/continuous_scroll:
   res/skyline.png     likemario's far towers, 512x256 (the parallax layer)
   res/kit.png         Kit, 32x32: idle (frames 0-3) then run (4-11)
 
+sprites/sprite_sizes:
+  res/sprite8.png ... sprite64.png   Kit at 8, 16, 32 and 64 px (the 8
+                      drawn here, the 16 and 64 from PixelLab, the 32 is
+                      characters/kit.png), each indexed on its own colours
+
 games/breakout (devtools/art_assets/breakout.py), Neon Breaker, the bar's
 arcade cabinet, all drawn by the script in the tile numbering the game uses:
   res/tiles.png       128 4bpp tiles shared by BG1 and the sprites (the
@@ -146,6 +151,7 @@ LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
 MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
 CONTINUOUS = ROOT / "examples" / "scrolling" / "continuous_scroll" / "res"
+SPRITE_SIZES = ROOT / "examples" / "sprites" / "sprite_sizes" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -585,6 +591,35 @@ def build_continuous_scroll(skyline: bytes) -> dict[str, bytes]:
             "_report": f"{width_px} px wide, {len(tiles)} tiles".encode()}
 
 
+# Kit at 8x8, drawn here: ears, eyes, muzzle, the jacket, the tail on the right
+KIT8 = [".5....5.", ".557755.", ".505505.", "..5885..", "..6446.5", ".2666625", "..2..2..", "..0..0.."]
+
+
+def sprite_sheet(im: Image.Image) -> Image.Image:
+    """An RGBA sprite as an indexed PNG: 0 transparent, then its colours by brightness."""
+    colours = sorted({p[:3] for p in im.getdata() if p[3] >= 128}, key=sum)
+    assert len(colours) <= 15, len(colours)
+    out = Image.new("P", im.size, 0)
+    out.putpalette([0, 0, 0] + [v for c in colours for v in c] + [0] * (765 - 3 * len(colours)))
+    out.putdata([colours.index(p[:3]) + 1 if p[3] >= 128 else 0 for p in im.getdata()])
+    return out
+
+
+def build_sprite_sizes() -> dict[str, bytes]:
+    """sprites/sprite_sizes: Kit at 8, 16, 32 and 64 px, one picture (and palette) each."""
+    kit32 = Image.open(ART / "characters" / "kit.png").convert("RGBA")
+    colours = sorted({p[:3] for p in kit32.getdata() if p[3] >= 128}, key=sum)   # the digits of KIT8
+    kit8 = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+    for y, row in enumerate(KIT8):
+        for x, ch in enumerate(row):
+            if ch != ".":
+                kit8.putpixel((x, y), colours[int(ch)] + (255,))
+    return {"sprite8.png": png(sprite_sheet(kit8)),
+            "sprite16.png": png(sprite_sheet(Image.open(ART / "characters" / "kit_16.png").convert("RGBA"))),
+            "sprite32.png": png(sprite_sheet(kit32)),
+            "sprite64.png": png(sprite_sheet(Image.open(ART / "characters" / "kit_64.png").convert("RGBA")))}
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -787,6 +822,7 @@ def main() -> int:
             (MODE7 / "rotate_scale" / "res", {"mode7bg.png": ground, "glider.png": png(glider(ART))}),
             (MODE7 / "extbg" / "res", {"plane.png": png(plane), "orb.png": png(orb())}),
             (CONTINUOUS, continuous),
+            (SPRITE_SIZES, build_sprite_sizes()),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),
                         "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
                         "backpal.bin": arcade["backpal"]}),

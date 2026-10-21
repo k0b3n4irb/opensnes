@@ -74,6 +74,8 @@ by `examples/sprites/animated_sprite` (`res/kit_walk.png`).
 |---|---|---|---|
 | `tiles/roof_0.png`, `tiles/roof_1.png` | two rooftops, 128x128, transparent sky, the neon strip's top on row 62 | `generate-with-style-v2`, two 128x96 crops of `city_far` as style, the city's 15 colours, seed 31 | `examples/games/likemario`, `examples/maps/map_scroll`, `examples/backgrounds/mode0` (`roof_0`) (through `devtools/art_assets/build.py`) |
 | `tiles/roof_2.png` to `tiles/roof_5.png` | four more in their style, the strip on the same row | `generate-with-style-v2`, `roof_0` and `roof_1` as style, seed 4100 | `examples/games/likemario`, `examples/maps/map_scroll` (the same) |
+| `characters/kit_64.png` | Kit, front, 64x64 (the 32 one drawn larger) | `generate-image-v2`, seed 1301 (#0), `characters/kit.png` as a reference image, its 9 colours as `target_palette` | `examples/sprites/sprite_sizes` (`res/sprite64.png`) |
+| `characters/kit_16.png` | Kit, three-quarter, 16x16 | `generate-image-v2`, seed 1302 (#0), the same reference and colours | `examples/sprites/sprite_sizes` (`res/sprite16.png`); its 8x8 one is drawn by `devtools/art_assets/build.py` (`KIT8`) |
 | `characters/kit_side_sheet.png` | Kit seen from the side, 32x32 frames, four a row: idle 0-3, walk 4-11, run 12-19, jump 20-27 (block 28 is the owl's, unused) | PixelLab: the character with an east view, its `breathing-idle`, `running-8-frames` and `jumping-1` templates and a v3 walk, all put back on his 15 colours with `reduce-colors` (2026-10-18) | `examples/games/likemario`, `examples/maps/map_scroll` (`res/kit.png`) |
 
 ### The machines' cycles
