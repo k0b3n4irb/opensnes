@@ -209,3 +209,17 @@ form that does not move with the boot's length, and the offset rows of
 `dma_mode2_opt_table.toml` are 32 words: they are now 40 `"vram:NNNN"` value
 lines where one block line said it. Replay: any manifest with a
 `[checkpoint.blocks]` table. Not blocking; a light request.
+
+## 2026-10-21 — luna's commercial corpus as a negative control for its oracles (sent to luna's session)
+
+The owner's idea: ROMs written in assembly by professional teams separate a
+luna false positive from a defect of ours. Run locally (luna 1.39.0, luna's
+own `tests/roms`, outputs kept outside both repositories): `luna bench -f 600`
+gives 41 ok, 0 bug, 0 suspect (its compatibility page still dates from
+1.32.0); our `[asserts.dma] unsafe_writes = 0` at 600 frames passes on all
+42 files in 14 s (`luna test --jobs 0`). Asked: (a) run its oracles (dma,
+`profile --budget`, bench's "suspect" heuristic) on that corpus at each
+release; (b) `bench` has no `--jobs` (82 s, serial, where `luna test` does
+the same set in 14 s). Open: the ❌ bug verdict of our nightly bench run
+39567752990 is not identified yet (needs the artifact, `gh` auth), and is
+not reproduced on arm64 at `b6b1556b`.
