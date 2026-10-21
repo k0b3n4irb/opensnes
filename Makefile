@@ -495,7 +495,9 @@ coverage-host:
 # per finding. It wants a flat directory, so the ROMs are collected first.
 # Only a "bug" verdict fails the target; "suspect" is luna's word for a
 # screen that never changes while the CPU runs, which is what most examples
-# do on purpose (first run 2026-09-15: 28 ok, 0 bug, 57 suspect). The
+# do on purpose (first run 2026-09-15: 28 ok, 0 bug, 57 suspect), and
+# "firmware" is a chip ROM luna cannot find (dsp1b.rom is never in CI: the
+# DSP-1 example comes out 🔑, not ❌, since luna v1.40.0). The
 # report is the artifact to read. Nightly in luna-bench.yml; locally when a
 # luna release lands.
 BENCH_ROMS := /tmp/opensnes_bench_roms
@@ -503,12 +505,10 @@ BENCH_OUT  := /tmp/opensnes_bench
 luna-bench:
 	@scripts/install-luna.sh
 	@rm -rf $(BENCH_ROMS) && mkdir -p $(BENCH_ROMS)
-	@fw=$${XDG_CONFIG_HOME:-$$HOME/.config}/luna/firmware/dsp1b.rom; \
-	for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
-		if [ ! -f "$$fw" ] && grep -q '^USE_DSP1 *:\?= *1' $$d/Makefile; then echo "luna-bench: SKIP $$d (no $$fw)"; continue; fi; \
+	@for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
 		for r in $$d/*.sfc; do [ -f "$$r" ] && cp "$$r" "$(BENCH_ROMS)/$$(echo $$d | sed 's|examples/||; s|/|_|g').sfc"; done; done; \
 		echo "luna-bench: $$(ls $(BENCH_ROMS) | wc -l) ROMs"
-	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
+	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600} --jobs 0
 	@[ -f $(BENCH_OUT)/report.md ] || { echo "luna-bench: no report.md under $(BENCH_OUT)"; exit 1; }; \
 		grep -m1 '^\*\*Summary:' $(BENCH_OUT)/report.md; \
 		bugs=$$(grep -l '^# ❌' $(BENCH_OUT)/bugs/*.md 2>/dev/null); n=$$(echo "$$bugs" | grep -c .); \
