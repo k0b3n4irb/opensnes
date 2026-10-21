@@ -507,8 +507,11 @@ luna-bench:
 		for r in $$d/*.sfc; do [ -f "$$r" ] && cp "$$r" "$(BENCH_ROMS)/$$(echo $$d | sed 's|examples/||; s|/|_|g').sfc"; done; done; \
 		echo "luna-bench: $$(ls $(BENCH_ROMS) | wc -l) ROMs"
 	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
-	@ls $(BENCH_OUT); n=$$(ls $(BENCH_OUT)/*.md 2>/dev/null | grep -vc "report.md\|README"); \
-		echo "luna-bench: $$n bug file(s) under $(BENCH_OUT)"; [ "$$n" -eq 0 ]
+	@[ -f $(BENCH_OUT)/report.md ] || { echo "luna-bench: no report.md under $(BENCH_OUT)"; exit 1; }; \
+		grep -m1 '^\*\*Summary:' $(BENCH_OUT)/report.md; \
+		bugs=$$(grep -l '^# ❌' $(BENCH_OUT)/bugs/*.md 2>/dev/null); n=$$(echo "$$bugs" | grep -c .); \
+		echo "luna-bench: $$n bug verdict(s) under $(BENCH_OUT)/bugs"; \
+		for f in $$bugs; do head -1 $$f; done; [ "$$n" -eq 0 ]
 
 # The upstream test suites of the three toolchain submodules, run on the
 # fork's own binaries against known-fail ratchets (gaps review H1,
