@@ -1,0 +1,9 @@
+tool = "opensnes-tileset"
+
+# BG3 reads these 2bpp tiles at VRAM $2000; the colours come from
+# backpal.bin, one set per level
+[convert]
+bpp = 2
+colors = 4
+no-reduce = true
+no-palette = true

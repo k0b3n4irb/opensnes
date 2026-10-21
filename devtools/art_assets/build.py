@@ -60,6 +60,18 @@ mode7/mode7_racing (devtools/art_assets/racing.py):
   res/bikes.png       the three hover-bikes in one palette, 32x32 frames four
                       to a row: Kit's, then each rival's turned 0 to 90 degrees
 
+games/breakout (devtools/art_assets/breakout.py), Neon Breaker, the bar's
+arcade cabinet, all drawn by the script in the tile numbering the game uses:
+  res/tiles.png       128 4bpp tiles shared by BG1 and the sprites (the
+                      cabinet, the brick, the paddle, the ball and their
+                      shadows, the library's font, the lives icon); its PNG
+                      palette is the whole CGRAM image, one BG palette per
+                      brick colour
+  res/back.png        BG3's circuit board, 13 2bpp tiles
+  res/bg1map.bin      the cabinet and the HUD labels, 32x32
+  res/bg2map.bin      the board, 32x32, palette 4
+  res/backpal.bin     seven levels of BG3 colours (CGRAM 16-23)
+
 hdma/gradient_colors, hdma/hdma_helpers:
   res/logo.png        the 256x224 logo on a transparent sky (index 0, never
                       drawn), so the HDMA gradients show behind Kit
@@ -119,6 +131,7 @@ from PIL import Image, ImageOps
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
 from mode7 import build_city, extbg_plane, glider, orb
+from breakout import build_breakout  # noqa: E402
 from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -132,6 +145,7 @@ GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
 HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
 MODE7 = ROOT / "examples" / "mode7"
 RACING = ROOT / "examples" / "mode7" / "mode7_racing" / "res"
+BREAKOUT = ROOT / "examples" / "games" / "breakout" / "res"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)
@@ -730,6 +744,7 @@ def main() -> int:
     race = build_track(ART)
     ground, sky = png(city["ground"]), png(city["sky"])
     plane, plane_tiles = extbg_plane(ART)
+    arcade = build_breakout(font8())
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
             (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART)),
             (GRADIENT_COLORS, {"logo.png": screen_logo(ART)}), (HDMA_HELPERS, {"logo.png": screen_logo(ART)}),
@@ -738,6 +753,9 @@ def main() -> int:
             (MODE7 / "perspective_rotate" / "res", {"ground.png": ground}),
             (MODE7 / "rotate_scale" / "res", {"mode7bg.png": ground, "glider.png": png(glider(ART))}),
             (MODE7 / "extbg" / "res", {"plane.png": png(plane), "orb.png": png(orb())}),
+            (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),
+                        "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
+                        "backpal.bin": arcade["backpal"]}),
             (RACING, {"track.png": png(race["track"]), "track_class.bin": race["classes"],
                       "lanes_xy.bin": race["lanes"][0], "lanes_heading.bin": race["lanes"][1],
                       "bikes.png": png(bikes(ART))})]

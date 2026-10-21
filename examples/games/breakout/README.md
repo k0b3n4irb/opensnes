@@ -2,6 +2,7 @@
 
 > A fully playable Breakout clone — ball, paddle, bricks, levels, score, and shadows.
 > This is the "put it all together" example. If you can follow this one, you can make a game.
+> Dressed as **Neon Breaker**, the arcade cabinet of the bar in the Neo-Lumen city.
 
 ![Screenshot](breakout.png)
 
@@ -32,7 +33,7 @@ cd $OPENSNES_HOME
 make -C examples/games/breakout
 ```
 
-Then open `breakout.sfc` in your emulator (Mesen2 recommended).
+Then open `breakout.sfc` in luna (or any SNES emulator).
 
 ## Walkthrough
 
@@ -41,10 +42,10 @@ Then open `breakout.sfc` in your emulator (Mesen2 recommended).
 The very first thing the game does is kill the display:
 
 ```c
-REG_INIDISP = 0x80;  // Force blank — screen goes black, VRAM is ours
+setScreenOff();  // Force blank — screen goes black, VRAM is ours
 
-dmaCopyVram(tiles1, 0x1000, 0x0F00);  // 3840 bytes of BG tiles
-dmaCopyVram(tiles2, 0x2000, 0x0250);  // 592 bytes of sprite tiles
+dmaCopyVram(tiles_tiles, 0x1000, tiles_tiles_end - tiles_tiles);  // 4096 bytes: BG1 and sprite tiles
+dmaCopyVram(back_tiles, 0x2000, back_tiles_end - back_tiles);     // BG3's 2bpp tiles
 ```
 
 > **Why force blank?** Outside of VBlank, the PPU owns the VRAM bus for rendering.
@@ -59,8 +60,8 @@ Here's where it gets interesting. This game's VRAM layout has an intentional ove
 ```
 $0000─$07FF  BG1 tilemap (playfield, HUD, bricks)
 $0400─$0BFF  BG3 tilemap (background pattern)   ← overlaps BG1!
-$1000─$1EFF  BG tiles (borders, bricks, font)
-$2000─$224F  Sprite tiles (ball, paddle)
+$1000─$17FF  BG1 tiles (cabinet, bricks, font) — and the sprites' (ball, paddle)
+$2000─$2067  BG3 tiles (the circuit board)
 ```
 
 BG1's tilemap is 32x32 entries but the game only uses the top 16 rows. Rows 16-31
@@ -88,19 +89,19 @@ Bricks get destroyed. Score changes. Colors cycle each level. You can't modify R
 so you copy everything to RAM and work on the copies:
 
 ```c
-extern u16 blockmap[];  // Writable copy of BG1 tilemap  — 2 KB at $0800
-extern u16 backmap[];   // Writable copy of BG3 tilemap  — 2 KB at $1000
-extern u16 pal[];       // Writable copy of the palette   — 512 bytes at $1800
+extern FAR u16 blockmap[];  // Writable copy of BG1 tilemap — 2 KB
+extern FAR u16 backmap[];   // Writable copy of BG3 tilemap — 2 KB
+extern FAR u16 pal[];       // Writable copy of the palette  — 512 bytes
 
-mycopy((u8 *)blockmap, bg1map, 0x800);
-mycopy((u8 *)backmap,  bg2map, 0x800);
-mycopy((u8 *)pal,      palette, 0x200);
+mycopy((u8 FAR *)blockmap, bg1map, 0x800);
+mycopy((u8 FAR *)backmap,  bg2map, 0x800);
+mycopy((u8 FAR *)pal,      tiles_pal, 0x200);
 ```
 
-> **Why are these in `data.asm` instead of C?** They're big — 2 KB each. If you declared
-> them as C static arrays, the compiler would place them around `$00A0`, which crashes into
-> the OAM buffer at `$0300`-`$051F`. In assembly, we pin them to `$0800` with
-> `.RAMSECTION ... ORGA $0800 FORCE`. Problem solved.
+> **Why `FAR`?** They're big — 4.6 KB with the brick state. Plain C RAM lives in the
+> first 8 KB of bank $00, which they would crowd; `FAR` puts them in bank $7E above it,
+> and every access carries its bank (`docs/tutorials/far_ram.md`). `data.asm` reserves
+> them in a `RAMSECTION` of bank $7E.
 
 ### 4. Bricks Are Not Sprites
 
@@ -164,8 +165,8 @@ at the same angle every time and the game plays itself.
 
 Every visible sprite has a shadow twin: same shape, darker palette, offset a few pixels
 down-right, drawn at a lower priority. Sprites are positioned via direct `oamMemory[]`
-writes instead of `oamSet()` to avoid the 158-byte stack frame overhead per call (10
-sprites per frame would cause visible slowdown):
+writes — the escape hatch next to `oamSet()`, shown here on purpose (either is fine at
+10 sprites):
 
 ```c
 // Ball — priority 3 (front), tile 20, attr 0x31
@@ -184,20 +185,23 @@ oamMemory[27] = 0x11;
 It costs 5 extra sprites (one per visible piece), but the result looks surprisingly polished
 for something so simple.
 
-> **What's `tile | 256`?** Sprite tiles live at VRAM `$2000` (the secondary name table,
-> selected by `REG_OBJSEL = 0x00`). Bit 8 of the tile number picks this table.
-> Without it, the PPU looks for tiles at `$0000` — which is your tilemap. You'll get
-> garbage sprites and spend an hour debugging before you remember this bit.
+> **What's `tile | 256`?** With OBJSEL's name base at `$0000` and a gap of 0, the
+> sprites' second name table starts at word `$1000` — exactly where BG1's tiles are. So
+> the paddle and the ball are tiles 15-21 of the same sheet as the bricks, and bit 8 of
+> the tile number (the attribute's low bit) picks that table. Without it, the PPU looks
+> for tiles at `$0000` — which is your tilemap. You'll get garbage sprites and spend an
+> hour debugging before you remember this bit.
 
 ### 8. Color Cycling Between Levels
 
-Each new level swaps CGRAM colors 8-15 with one of 7 pre-made color sets:
+Each new level swaps CGRAM colors 16-23 — BG3's palette 4 (the board) and 5 (its
+shadow) — with one of 7 pre-made color sets:
 
 ```c
 if (color < 6) color++;
 else color = 0;
 
-mycopy((u8 *)pal + 16, backpal + color * 16, 0x10);
+mycopy((u8 FAR *)pal + 32, backpal + color * 16, 0x10);
 
 WaitForVBlank();
 dmaCopyCGram((u8 *)pal, 0, 256 * 2);
@@ -282,55 +286,45 @@ LIB_MODULES := console sprite dma background input
 
 `data.asm` serves two purposes in Breakout:
 
-**1. ROM asset storage** — tile data, tilemaps, and palettes are pre-converted binary
-files included via `.INCBIN`:
+**1. ROM data the converters do not make** — the two tilemaps and the level colours
+are binaries, included via `.INCBIN` in an asset section (the linker places it in any
+bank but $00):
 
 ```asm
-.SECTION ".bg1tiles" SUPERFREE
-tiles1: .INCBIN "res/tiles1.dat"    ; 3840 bytes of BG tiles
+ASSET_SECTION ".rodata1"
+bg1map:
+.incbin "res/bg1map.bin"
+bg1map_end:
 .ENDS
 ```
 
-`SUPERFREE` lets the linker place each section in any ROM bank with space. A typical
-game has 10-30 KB of tile data — far too much for a single bank.
+**2. The RAM buffers** — the writable tilemap copies, the palette and the brick state
+(4.6 KB) in a `RAMSECTION` of bank $7E. C declares them `FAR`, so they sit above the
+8 KB plain C band and every access carries its bank (`docs/tutorials/far_ram.md`).
 
-**2. Pinned RAM buffers** — the writable tilemap copies need specific addresses:
+### The Assets
 
-```asm
-.RAMSECTION ".blockmap" BANK $7E SLOT 2 ORGA $0800 FORCE
-blockmap: DSB 2048    ; BG1 tilemap copy — $0800-$0FFF
-.ENDS
-```
-
-`ORGA $0800 FORCE` pins the buffer at exactly address `$0800` in bank $7E WRAM.
-This is necessary because the game modifies tilemaps at runtime (destroying bricks,
-cycling colors), and C arrays can't be reliably placed at specific addresses.
-
-> **Why not just use C arrays?** Two problems. First, the compiler places C arrays
-> in low WRAM ($0000-$01FF range), which collides with the OAM buffer at $0300.
-> Second, for overlapping VRAM regions (BG1 and BG3 share $0400-$07FF), you need
-> precise control over DMA source addresses — assembly gives you that control.
-
-### Pre-Converted Assets
-
-The `res/` folder contains `.dat` files — raw binary data ready for DMA to VRAM.
-These were originally converted from PVSnesLib's asset pipeline. No conversion step
-runs at build time because the conversion was done once, offline, and the results checked
-into the repository.
-
-For a new game, you'd typically put a settings file beside each PNG:
+`res/tiles.png` and `res/back.png` are converted by the build, from the settings file
+beside each:
 
 ```toml
 # res/tiles.png.toml
 tool = "opensnes-tileset"
 
 [convert]
-colors = 16
+bpp = 4
+colors = 256
+no-reduce = true
 ```
 
-This tells `make/common.mk` to run `opensnes-tileset` on the PNG, producing `.pic`
-(tiles), `.pal` (palette), `.map` (tilemap) and a `.inc` declaring them; a sprite sheet
-names `opensnes-sprite` instead.
+`no-reduce` keeps every tile where it is in the sheet: the game addresses its tiles by
+number (a brick is tiles 13-14, the font is ASCII − 10, the sprites are 15-21). The
+sheet's PNG palette is the whole CGRAM image, written as `tiles.pal`: one BG palette per
+brick colour (colours 13-15), the font in 10-12, the sprites' palette at 128. BG3's
+sheet takes `bpp = 2` and no palette, since its colours come from `backpal.bin`.
+
+All of `res/` — the two sheets, the two maps and the level colours — is drawn by
+`devtools/art_assets/breakout.py` (`make art-assets`), in the game's tile numbering.
 
 ### Why These Modules?
 
@@ -359,20 +353,19 @@ names `opensnes-sprite` instead.
 | BG12NBA  | $210B   | BG1 tile data at $1000 |
 | BG34NBA  | $210C   | BG3 tile data at $2000 |
 | TM       | $212C   | Enable OBJ + BG3 + BG1 (`0x15`) |
-| OBJSEL   | $2101   | 8x8 sprites, secondary name table at $2000 |
+| OBJSEL   | $2101   | 8x8 sprites, name base $0000, second table at word $1000 (BG1's tiles) |
 
 ## Files
 
 | File | What's in it |
 |------|-------------|
-| `main.c` | All game logic (~770 lines) |
-| `data.asm` | RAM buffers at `$0800`, string constants, asset includes |
-| `res/tiles1.dat` | BG tiles: borders, bricks, font |
-| `res/tiles2.dat` | Sprite tiles: ball, paddle, shadows |
-| `res/bg1map.dat` | Playfield tilemap |
-| `res/bg2map.dat` | 4 background patterns (one per level, 2 KB each) |
-| `res/palette.dat` | Full 256-color palette |
-| `res/backpal.dat` | 7 color sets for level cycling |
+| `main.c` | All game logic |
+| `data.asm` | The far RAM buffers, string constants, the map and colour binaries |
+| `res/tiles.png` | BG1 and sprite tiles (cabinet, bricks, paddle, ball, shadows, font, lives icon); its palette is the whole CGRAM |
+| `res/back.png` | BG3's circuit board (2bpp) |
+| `res/bg1map.bin` | The cabinet and the HUD labels |
+| `res/bg2map.bin` | The board under the playfield |
+| `res/backpal.bin` | 7 color sets for level cycling |
 | `Makefile` | `LIB_MODULES := console sprite dma background input` |
 
 ## Credits
@@ -380,3 +373,5 @@ names `opensnes-sprite` instead.
 - Original game: Ulrich Hecht (SNES SDK)
 - PVSnesLib port: alekmaul
 - OpenSNES port: OpenSNES team
+- Art (Neon Breaker): drawn by `devtools/art_assets/breakout.py`, CC0, with the
+  library's own font

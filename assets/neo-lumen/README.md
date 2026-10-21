@@ -129,6 +129,17 @@ the city's colours start at 16. `res/orb.png`, the energy orb (O6), eight
 16x16 frames of a pulse, is drawn by the same script (`orb`). No new
 PixelLab call.
 
+### Neon Breaker (the arcade cabinet)
+
+`examples/games/breakout`: everything in `res/` is drawn by
+`devtools/art_assets/breakout.py`, in the tile numbering the game addresses:
+the cabinet (a steel bevel with a magenta neon tube, a speaker grille), a
+16x8 brick in eight colours (one BG palette each), the paddle with its
+cyan emitters, the ball, their shadows, the lives icon, the library's 8x8
+font with a highlight and a shadow, and BG3's circuit board in seven
+level colours. The colours are the city's, with a green and a red for two
+bricks. No PixelLab call.
+
 ### The race on the rooftops
 
 `examples/mode7/mode7_racing`: a circuit round a lagoon and three

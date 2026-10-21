@@ -1,0 +1,8 @@
+tool = "opensnes-tileset"
+
+# the sheet keeps the tile numbers the game addresses (no reduction); its
+# PNG palette is the whole CGRAM image, written as tiles.pal
+[convert]
+bpp = 4
+colors = 256
+no-reduce = true

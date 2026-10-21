@@ -362,6 +362,20 @@ palette stops at 143 under the orb's OBJ palette). The boot is shorter
 (nothing built at run time): the manifest's bound on the orb's x at frame
 100 went from 96 to 160.
 
+### breakout becomes Neon Breaker (2026-10-21)
+
+The game addresses its tiles by number (a brick is tiles 13-14 in one of
+eight palettes, the font ASCII − 10, the sprites 15-21 of the BG sheet
+read through the second name table at word $1000), so the new art keeps
+that numbering and the game's code is unchanged but for the asset names:
+`breakout.py` draws a 128-tile sheet whose PNG palette is the whole CGRAM
+image, converted with `no-reduce` (`tiles.pal` is the old palette.dat),
+BG3's 13 2bpp tiles (`bpp = 2`, `no-palette`), and the two maps and the
+level colours as binaries. The seven PVSnesLib .dat files and their
+preview PNGs are gone. One trap: CGRAM 16-23 (BG3) must hold the first
+level's colours in the palette itself, as the game copies a level set only
+from the second level on. Both manifests pass unchanged.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.

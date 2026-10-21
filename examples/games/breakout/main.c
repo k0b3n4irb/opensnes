@@ -47,25 +47,22 @@
 #include <snes.h>
 
 /*============================================================================
- * External Assets (defined in data.asm)
+ * Assets
  *
- * Assets are compiled into the ROM and accessed via these extern declarations.
- * The _end labels allow calculating sizes: (tiles1_end - tiles1) = byte count
+ * res/tiles.png and res/back.png are converted by the build (their .toml
+ * settings beside them); the maps and the level colours are binaries made
+ * with them by devtools/art_assets/breakout.py and included by data.asm.
+ * The _end labels give the sizes: (tiles_tiles_end - tiles_tiles) bytes.
  *============================================================================*/
 
-/** @brief BG tiles: border, bricks, and font glyphs (4bpp, ~3840 bytes) */
-extern u8 tiles1[], tiles1_end[];
-/** @brief Sprite tiles: ball, paddle, and shadow shapes (4bpp, ~592 bytes) */
-extern u8 tiles2[], tiles2_end[];
-/** @brief BG1 tilemap: playfield border frame and HUD layout (2KB) */
+#include "res/tiles.inc"   /* generated: tiles_tiles[], tiles_pal[] — the cabinet, bricks, paddle, ball, font (4bpp) and the whole CGRAM image */
+#include "res/back.inc"    /* generated: back_tiles[] — BG3's circuit board (2bpp) */
+
+/** @brief BG1 tilemap: the cabinet and the HUD labels (2KB, data.asm) */
 extern u8 bg1map[], bg1map_end[];
-/** @brief BG3 tilemap: all 4 background fill patterns concatenated (2KB) */
+/** @brief BG3 tilemap: the circuit board under the playfield (2KB, data.asm) */
 extern u8 bg2map[], bg2map_end[];
-/** @brief Individual BG3 patterns (pointers into bg2map for per-level selection) */
-extern u8 bg2map0[], bg2map1[], bg2map2[], bg2map3[];
-/** @brief Full 256-color palette for BG and sprite layers (512 bytes) */
-extern u8 palette[], palette_end[];
-/** @brief 7 level color sets for palette cycling (7 x 16 bytes = 112 bytes) */
+/** @brief 7 level colour sets for BG3 (7 x 16 bytes = 112 bytes, data.asm) */
 extern u8 backpal[], backpal_end[];
 
 
@@ -274,10 +271,12 @@ static void mycopy(u8 FAR *dest, const u8 *src, u16 len) {
  *   Sprites 7-10: Paddle shadow (offset +4,+4 pixels, lower priority)
  *
  * TILE NUMBERING:
- * Sprite tiles are at VRAM $2000 (secondary name table).
- * To access secondary table, set bit 8 of tile number: tile | 256
+ * OBJSEL's name base is $0000 and its gap 0, so the second name table
+ * starts at word $1000 — where BG1's tiles are. The sprites therefore use
+ * the BG sheet's tiles 15-21, reached with bit 8 of the tile number
+ * (tile | 256, the attribute's low bit).
  *
- * Tile Layout in tiles2:
+ * Tile Layout in res/tiles.png:
  *   Tile 15: Paddle left cap
  *   Tile 16: Paddle middle (used twice, second time H-flipped)
  *   Tile 17: Paddle right cap
@@ -400,12 +399,9 @@ static void new_level(void) {
     pos_y = 109;
     px = 80;
 
-    /* Select background pattern for this level.
-     * Pattern 0 (tiles 1-12) is the smoothest — it includes flat fill tiles
-     * that hide tile boundaries. Patterns 1-3 use multi-shade tiles that
-     * create visible banding. Reuse pattern 0 for all levels; the palette
-     * cycling already provides visual variety per level. */
-    mycopy((u8 FAR *)backmap, bg2map0, 0x800);
+    /* Reset the board under the bricks; each level recolours it instead
+     * (palette cycling, below). */
+    mycopy((u8 FAR *)backmap, bg2map, 0x800);
     mycopy((u8 FAR *)blocks, brick_map, 100);
 
     /* Update level display in tilemap */
@@ -417,7 +413,7 @@ static void new_level(void) {
     else color = 0;
 
     /* PALETTE CYCLING:
-     * backpal.dat contains 7 sets of 8 colors (7 x 16 bytes).
+     * backpal.bin contains 7 sets of 8 colors (7 x 16 bytes).
      * Each set replaces CGRAM colors 16-23 (byte offset 32) = BG3 palettes 4-5.
      * This changes the background pattern color each level. */
     mycopy((u8 FAR *)pal + 32, backpal + color * 16, 0x10);
@@ -483,7 +479,7 @@ static void start_game(void) {
     mycopy((u8 FAR *)blockmap, bg1map, 0x800);
     mycopy((u8 FAR *)backmap, bg2map, 0x800);
     mycopy((u8 FAR *)blocks, brick_map, 100);
-    mycopy((u8 FAR *)pal, palette, 0x200);
+    mycopy((u8 FAR *)pal, tiles_pal, 0x200);
 
     /* Initialize game state */
     blockcount = 0;
@@ -843,14 +839,15 @@ int main(void) {
     /* VRAM LAYOUT:
      * 0x0000-0x07FF: BG1 tilemap (32x32)
      * 0x0400-0x0BFF: BG3 tilemap (32x32) - overlaps BG1!
-     * 0x1000-0x1EFF: BG tiles (tiles1)
-     * 0x2000-0x224F: Sprite tiles (tiles2)
+     * 0x1000-0x17FF: BG1 tiles (tiles.png, 128 4bpp tiles), which the
+     *                sprites' second name table reads too
+     * 0x2000-0x2067: BG3 tiles (back.png, 13 2bpp tiles)
      *
      * Note: BG1 and BG3 tilemaps overlap at 0x0400-0x07FF.
      * This saves 1KB VRAM because BG1 only uses rows 0-15.
      */
-    dmaCopyVram(tiles1, 0x1000, 0x0F00);  /* 3840 bytes of BG tiles */
-    dmaCopyVram(tiles2, 0x2000, 0x0250);  /* 592 bytes of sprite tiles */
+    dmaCopyVram(tiles_tiles, 0x1000, tiles_tiles_end - tiles_tiles);   /* 4096 bytes, in force blank */
+    dmaCopyVram(back_tiles, 0x2000, back_tiles_end - back_tiles);
 
     hiscore = 50000;
     start_game();

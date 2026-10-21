@@ -59,42 +59,19 @@ brick_map:
 
 .ENDS
 ASSET_SECTION ".rodata1"
-; Palette data (512 bytes - full 256 color palette)
-palette:
-.incbin "res/palette.dat"
-palette_end:
-
-; Background color palette variations (7 sets x 16 bytes = 112 bytes)
+; Seven levels of BG3 colours (7 sets x 16 bytes = 112 bytes, CGRAM 16-23)
 backpal:
-.incbin "res/backpal.dat"
+.incbin "res/backpal.bin"
 backpal_end:
 
-; BG1 tilemap (foreground - bricks and HUD)
+; BG1 tilemap: the cabinet and the HUD labels (2KB)
 bg1map:
-.incbin "res/bg1map.dat"
+.incbin "res/bg1map.bin"
 bg1map_end:
 
-; BG2 tilemap (background patterns - 4 variations)
-; Split into separate labels for each 0x800-byte pattern to avoid pointer arithmetic
+; BG3 tilemap: the circuit board under the playfield (2KB)
 bg2map:
-bg2map0:
-.incbin "res/bg2map.dat" SKIP 0 READ $800
-bg2map1:
-.incbin "res/bg2map.dat" SKIP $800 READ $800
-bg2map2:
-.incbin "res/bg2map.dat" SKIP $1000 READ $800
-bg2map3:
-.incbin "res/bg2map.dat" SKIP $1800 READ $800
+.incbin "res/bg2map.bin"
 bg2map_end:
-
-; Tiles for BG1 (foreground graphics)
-tiles1:
-.incbin "res/tiles1.dat"
-tiles1_end:
-
-; Tiles for sprites (ball, paddle)
-tiles2:
-.incbin "res/tiles2.dat"
-tiles2_end:
 
 .ends
