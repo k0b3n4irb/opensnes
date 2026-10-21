@@ -1,0 +1,6 @@
+tool = "opensnes-tileset"
+
+# the city behind the portholes, 8bpp (Mode 3); colour 0 is the tram wall
+[convert]
+bpp = 8
+colors = 256

@@ -129,7 +129,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 |---|---|---|---|---|---|
 | windows/transparent_window | fenêtre + color math : rectangle assombri | image PVSL | **F→windows/window** — même registre, autre cible (color math au lieu du masquage) | — | — |
 | windows/window | fenêtre HDMA en triangle, masquage par calque | 2 images PVSL | **R** — absorbe transparent_window : le triangle devient le faisceau d'une lampe dans une ruelle noire (masquage) puis un cadre de dialogue assombri (color math) | Kit à la lampe torche dans la ruelle | B2, K1 |
-| windows/window_multi_hdma | deux fenêtres, 4 registres par ligne | anneaux procéduraux 254 couleurs | **G** — ligne 6 ; derrière les hublots, le panorama | les hublots d'un tram aérien, la ville défile derrière | B3 |
+| windows/window_multi_hdma | deux fenêtres, 4 registres par ligne | anneaux procéduraux 254 couleurs | **G** — ligne 6 ; derrière les hublots, le panorama | les hublots d'un tram aérien, la ville défile derrière ; **fait le 2026-10-21** (`build.py`, `tram_view`, 546 tuiles 8bpp en deux morceaux de banque) | B3 |
 
 ### transitions (2 → 1)
 

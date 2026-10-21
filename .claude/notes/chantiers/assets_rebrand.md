@@ -389,6 +389,22 @@ he went past it (it pushed him back one pixel a frame while he ran two,
 so he ended at the edge of the screen). The manifest was rewritten on the
 new measurements.
 
+### Six examples on 2026-10-21, and two traps worth a check in the SDK
+
+extbg, breakout, continuous_scroll, sprite_sizes, aseprite_pipeline,
+mixed_scroll and window_multi_hdma were redone that day (one commit each).
+Two traps cost a screenshot each and are the SDK's, not the examples':
+
+- `bgSetGfxPtr()` takes any word address, and BG12NBA keeps only its top
+  four bits (word address = AAAA << 12, snesdev-wiki PPU registers, chunk
+  `904cd2792cb25948`): tiles put at $0400 are read from $0000, the map read
+  as tiles, with no message. A debug check in the setter (or in
+  `bgInitTileSet`) would name it. Not done; to propose as its own lot.
+- `opensnes-tileset` splits a .pic larger than a LoROM bank into `x_tiles`
+  and `x_tiles_1`; a caller that loads only `x_tiles` gets the first 32 KB.
+  The split is documented by the generated .inc only (it declares both);
+  `bgInitTileSet` / `bgLoad` do not know the second part.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.

@@ -456,9 +456,9 @@
     "rom_sha256": "92388fc832b67204b5e55e7bdddde6bb2af4e31e28bedf5965a6ed90b9507961"
   },
   "windows_window_multi_hdma": {
-    "fbhash": "67bd5ea20fc37865",
+    "fbhash": "010faa399c044aff",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "16c04f93b57b2edc501741b16f89e3485e79920f8cb335dce3f77e89654423b8"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "0d946a292270a2dc06d9f970e052634c32978f62de7a37d54b3a13e285f1fcff"
   }
 }

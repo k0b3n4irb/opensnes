@@ -152,6 +152,16 @@ transparent sky (the one of the HDMA examples, `logo.py`'s `screen_logo`),
 faint diagonal bands, far lights out of focus and rain streaks falling one
 pixel left for two down — the direction the layer scrolls. No PixelLab call.
 
+### The tram's portholes (window_multi_hdma)
+
+`examples/windows/window_multi_hdma`: `res/city.png`, the city at dusk seen
+from an aerial tram, 256x256 so that the scroll wraps both ways: the
+mid-distance towers (`backgrounds/skyline_mid.png`) at half size over a
+gradient of 168 rows (one colour a row), their reflection in a canal, by
+`devtools/art_assets/build.py` (`tram_view`): 546 8bpp tiles, 104 colours,
+colour 0 the tram's wall (the backdrop around the portholes). No PixelLab
+call.
+
 ### Neon Breaker (the arcade cabinet)
 
 `examples/games/breakout`: everything in `res/` is drawn by

@@ -6,10 +6,11 @@
  * Port of krom (Peter Lemon)'s WindowMultiHDMA demo (PeterLemon/SNES,
  * PPU/Window/WindowMultiHDMA). One HDMA channel in 4-register mode
  * streams WH0-WH3 ($2126-$2129) — BOTH windows' left/right edges —
- * every scanline band, cutting a grid of portholes into BG1. The green
- * backdrop (CGRAM color 0) shows wherever the combined window mask
- * disables the layer; the D-pad scrolls the artwork underneath the
- * static mask.
+ * every scanline band, cutting a grid of portholes into BG1: the four
+ * windows of an aerial tram, with the city at dusk behind them. The
+ * backdrop (CGRAM color 0, the tram's wall) shows wherever the combined
+ * window mask disables the layer; the D-pad scrolls the city underneath
+ * the static mask.
  *
  * Window algebra (krom's exact setup): W1 and W2 both enabled on BG1
  * and both INVERTED, combined with AND — the layer is masked where
@@ -23,8 +24,8 @@
  * - Backdrop color as the "outside the windows" fill
  *
  * @par What to Observe
- * A grid of rectangular portholes over a color-ring artwork; green
- * everywhere else. D-pad scrolls the rings behind the fixed portholes.
+ * Four portholes in the tram's dark wall, the city and its reflection in
+ * a canal behind them. D-pad scrolls the city behind the fixed portholes.
  *
  * @par Modules Used
  * console, dma, background, hdma, window, input
@@ -35,12 +36,15 @@
 
 #include <snes.h>
 
-/** @brief 256-color ring artwork (original, procedural) */
-#include "res/rings.inc"   /* generated: rings_tiles[], rings_map[], rings_pal[], each with _end */
+/** @brief The city behind the portholes, 8bpp (devtools/art_assets/build.py) */
+#include "res/city.inc"   /* generated: city_tiles[] and city_tiles_1[] (the tiles, split at a bank), city_map[], city_pal[], each with _end */
 
-/** @brief krom's VRAM layout: map at word $0000, tiles at word $4000 */
+/** @brief VRAM: the map at word $0000, the tiles at $1000 (546 8bpp tiles,
+ * 34 KB, up to $543F: krom's $4000 would run past the end of VRAM). A BG's
+ * character base moves in steps of $1000 words (BG12NBA), so $1000 is the
+ * first one past the map. */
 #define VRAM_MAP 0x0000
-#define VRAM_GFX 0x4000
+#define VRAM_GFX 0x1000
 
 /**
  * @brief krom's exact HDMA window table: 16-line bands alternating
@@ -78,13 +82,17 @@ int main(void) {
     bgSetGfxPtr(0, VRAM_GFX);
     bgSetMapPtr(0, VRAM_MAP, SC_32x32);
 
-    dmaCopyCGram(rings_pal, 0, (u16)(rings_pal_end - rings_pal));
-    dmaCopyVram(rings_map, VRAM_MAP, (u16)(rings_map_end - rings_map));
-    dmaCopyVram(rings_tiles, VRAM_GFX, (u16)(rings_tiles_end - rings_tiles));
+    dmaCopyCGram(city_pal, 0, (u16)(city_pal_end - city_pal));
+    dmaCopyVram(city_map, VRAM_MAP, (u16)(city_map_end - city_map));
+    /* 34 KB of tiles is more than a LoROM bank: the converter splits them,
+     * city_tiles (the first 32 KB) then city_tiles_1, which follows it in VRAM
+     * (each byte is a word's half: 32 KB is 0x4000 words). */
+    dmaCopyVram(city_tiles, VRAM_GFX, (u16)(city_tiles_end - city_tiles));
+    dmaCopyVram(city_tiles_1, VRAM_GFX + 0x4000, (u16)(city_tiles_1_end - city_tiles_1));
 
-    /* Backdrop (CGRAM color 0) = krom's green — what shows outside the
-     * windows once TMW masks BG1 there. */
-    setColor(0, RGB(0, 31, 0));
+    /* Backdrop (CGRAM color 0) = the tram's wall, the picture's colour 0
+     * (krom's was green) — what shows outside the windows once TMW masks
+     * BG1 there. */
 
     /* krom's window algebra: both windows on BG1, both inverted,
      * combined with AND, mask applied on the main screen. */

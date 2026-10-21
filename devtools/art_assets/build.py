@@ -77,6 +77,12 @@ sprites/aseprite_pipeline:
   res/hero.json       the sheet's data as Aseprite's `--data --list-tags`
                       export writes it: per-frame durations, the two tags
 
+windows/window_multi_hdma:
+  res/city.png        the city from an aerial tram at dusk, 256x256 (the
+                      mid towers at half size over a gradient, their
+                      reflection in a canal), 8bpp; colour 0 is the tram's
+                      wall, never in the picture
+
 scrolling/mixed_scroll, the title screen:
   res/logo.png        the 256x224 logo on a transparent sky (as for the
                       HDMA examples), the fixed layer
@@ -156,6 +162,7 @@ from PIL import Image, ImageOps
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
 from mode7 import build_city, extbg_plane, glider, orb
+from mode7 import indexed as mode7_indexed  # noqa: E402
 from breakout import build_breakout  # noqa: E402
 from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
@@ -168,6 +175,7 @@ CONTINUOUS = ROOT / "examples" / "scrolling" / "continuous_scroll" / "res"
 SPRITE_SIZES = ROOT / "examples" / "sprites" / "sprite_sizes" / "res"
 ASEPRITE = ROOT / "examples" / "sprites" / "aseprite_pipeline" / "res"
 MIXED = ROOT / "examples" / "scrolling" / "mixed_scroll" / "res"
+MULTI_HDMA = ROOT / "examples" / "windows" / "window_multi_hdma" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -689,6 +697,51 @@ def rain() -> Image.Image:
     return im
 
 
+# windows/window_multi_hdma: the city seen from an aerial tram at dusk, behind
+# its portholes — 256x256 so that the D-pad's scroll wraps both ways
+TRAM_SKY = ((24, 16, 56), (112, 40, 104), (240, 120, 96))   # the top, the middle, the glow on the horizon
+TRAM_HORIZON = 168
+TRAM_WALL = (16, 24, 32)                                       # colour 0: the tram's wall, around the portholes
+
+
+def tram_view() -> Image.Image:
+    """The view, indexed: colour 0 is the wall (the backdrop, never in the picture), then its colours."""
+    from mode7 import half_size
+
+    def lerp(a, b, t):
+        return tuple(int(round(x + (y - x) * t)) for x, y in zip(a, b))
+
+    def snap(c):
+        return tuple(v & 0xF8 for v in c)
+
+    towers = half_size(Image.open(ART / "backgrounds" / "skyline_mid.png").convert("RGBA"))   # 256x112
+    top, mid, glow = TRAM_SKY
+    rgbim = Image.new("RGB", (256, 256))
+    for y in range(256):
+        if y < TRAM_HORIZON:                        # one colour a row: a row of tiles is one tile
+            t = y / TRAM_HORIZON
+            c = lerp(top, mid, t / 0.6) if t < 0.6 else lerp(mid, glow, (t - 0.6) / 0.4)
+        else:
+            c = lerp((40, 16, 48), (8, 8, 24), (y - TRAM_HORIZON) / (256 - TRAM_HORIZON))
+        for x in range(256):
+            rgbim.putpixel((x, y), snap(c))
+    y0 = TRAM_HORIZON - towers.height
+    for y in range(towers.height):
+        for x in range(256):
+            p = towers.getpixel((x, y))
+            if p[3] < 128:
+                continue
+            rgbim.putpixel((x, y0 + y), snap(p[:3]))
+            ry = TRAM_HORIZON + (towers.height - 1 - y) // 2   # the reflection in the canal, broken by ripples
+            if ry < 256 and (x + ry) % 3:
+                q = rgbim.getpixel((x, ry))
+                r = tuple((a * 2 + b) // 3 for a, b in zip(snap(p[:3]), q))
+                rgbim.putpixel((x, ry), snap(tuple(v * 3 // 5 for v in r)))
+    colours = [TRAM_WALL] + sorted(set(rgbim.getdata()) - {TRAM_WALL}, key=sum)
+    assert len(colours) <= 256, len(colours)
+    return mode7_indexed(rgbim, colours)
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -893,6 +946,7 @@ def main() -> int:
             (CONTINUOUS, continuous),
             (SPRITE_SIZES, build_sprite_sizes()),
             (ASEPRITE, build_aseprite_pipeline()),
+            (MULTI_HDMA, {"city.png": png(tram_view())}),
             (MIXED, {"logo.png": screen_logo(ART), "rain.png": png(rain())}),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),
                         "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
