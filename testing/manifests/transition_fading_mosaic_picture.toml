@@ -8,7 +8,9 @@
 # Same script as transition_fading.toml up to the press that starts the
 # mosaic, stopped where mosaicFadeOut(3) has reached and holds MOSAIC_MAX:
 # the frame hashed is BG1 in 16x16 blocks. (Written for the mosaic example,
-# moved to fading with it on 2026-10-18: same picture, same hash.) Negative control on the day it was written: luna v1.32.0
+# moved to fading with it on 2026-10-18: same picture, same hash; the picture
+# became the moon over the skyline on 2026-10-21, hash re-taken on luna
+# v1.40.0.) Negative control on the day it was written: luna v1.32.0
 # gives another hash for this frame (b40b834549507f25) and fails this manifest,
 # while the corpus hashes and the mosaic legs were the same on both.
 rom = "../../examples/transitions/fading/fading.sfc"
@@ -29,4 +31,4 @@ mosaic_bg_mask = { eq = 1, width = 1 }
 console_brightness = { eq = 15, width = 1 }
 
 [asserts]
-fbhash = "9980548a31063b25"
+fbhash = "08dabbb8b15e5725"

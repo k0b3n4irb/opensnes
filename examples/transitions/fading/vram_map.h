@@ -5,6 +5,6 @@
 #define VRAM_MAP_H
 
 #define VRAM_BG_MAP    0x1000  /* bg_map, 1024 words */
-#define VRAM_BG_TILES  0x4000  /* bg_char, 4096 words */
+#define VRAM_BG_TILES  0x2000  /* bg_char, 13312 words */
 
 #endif /* VRAM_MAP_H */

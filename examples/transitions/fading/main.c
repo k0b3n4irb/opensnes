@@ -37,7 +37,7 @@
  *============================================================================*/
 
 /** @brief 4bpp tile data for the background image. */
-#include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
+#include "res/moonrise.inc"   /* generated: moonrise_tiles[], moonrise_map[], moonrise_pal[], each with _end */
 /** @brief Tilemap data (32x32 tile grid) for the background image. */
 /** @brief 15-bit BGR palette (up to 16 colors) for the background image. */
 
@@ -87,16 +87,16 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     /* BG1: tiles at $4000, palette at slot 0 (offset 0) */
-    bgInitTileSet(0, opensnes_tiles, opensnes_pal, 0,
-                  opensnes_tiles_end - opensnes_tiles,
-                  opensnes_pal_end - opensnes_pal,
+    bgInitTileSet(0, moonrise_tiles, moonrise_pal, 0,
+                  moonrise_tiles_end - moonrise_tiles,
+                  moonrise_pal_end - moonrise_pal,
                   BG_16COLORS, VRAM_BG_TILES);
 
     /*------------------------------------------------------------------------
      * Load Tilemap Data
      *------------------------------------------------------------------------*/
 
-    dmaCopyVram(opensnes_map, VRAM_BG_MAP, opensnes_map_end - opensnes_map);
+    dmaCopyVram(moonrise_map, VRAM_BG_MAP, moonrise_map_end - moonrise_map);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode

@@ -199,7 +199,7 @@ places, seed 7200).
 | File | What | Seed | Note |
 |---|---|---|---|
 | `backgrounds/noodlebar.png` | the noodle bar from above, 256x224 | 114 | an RPG interior |
-| `backgrounds/title.png` | moon and skyline with room for a logo, 256x224 | 116 | its top and bottom four rows are an amber frame: repaint them before use |
+| `backgrounds/title.png` | moon and skyline with room for a logo, 256x224 | 116 | its top and bottom four rows are an amber frame: repaint them before use; `examples/transitions/fading` (`res/moonrise.png`: `build.py`'s `moonrise` paints the frame out with the rows next to it) |
 
 Both with `generate-image-v2` and the city's 15 colours.
 

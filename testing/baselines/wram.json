@@ -228,8 +228,8 @@
     "rom_sha256": "e06e35ede6b7510e7116ae0641f1684dd5c500caa61acf33a5aa8652a6529105"
   },
   "transitions_fading": {
-    "stream": "21382e598ba771a1a66ed75d761c8d16449c8b270ef5798c88bdc4921661ef14",
-    "rom_sha256": "777bed6b1ac003f815045c789602fa79afb7e918bcc3ddfda70d161f482bf617"
+    "stream": "30c212b9bba0d04753c324bb96b814584317e6bffcd95d803c9ff94b189f4bf5",
+    "rom_sha256": "9fd97db69666be24dfe2fa02401dd8224237ea6b4475408bd15dbff1743bb01a"
   },
   "windows_window": {
     "stream": "b57df1ab53b6ea94ff0edaacffa1dee4d57ef1127c28a8f97fb25949a9d94ecc",

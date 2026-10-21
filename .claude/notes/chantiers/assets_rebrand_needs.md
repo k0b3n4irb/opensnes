@@ -135,7 +135,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 
 | Exemple | Capacité | Aujourd'hui | Verdict | Scène | Assets |
 |---|---|---|---|---|---|
-| transitions/fading | luminosité INIDISP, 3 vitesses | logo actuel | **R** — absorbe `mosaic` (qui refait déjà le fondu) : un seul exemple « transitions » | passage d'un quartier à l'autre (rue → panorama) | B2, B3 |
+| transitions/fading | luminosité INIDISP, 3 vitesses | logo actuel | **R** — absorbe `mosaic` (qui refait déjà le fondu) : un seul exemple « transitions » | passage d'un quartier à l'autre (rue → panorama) ; **fait le 2026-10-21** avec une seule image, la lune sur la skyline (`title.png`, cadre repeint) | B2, B3 |
 | transitions/mosaic | registre mosaïque + fondu | logo actuel | **F→transitions/fading** — les manifestes `transition_mosaic*` suivent | — | — |
 
 ### scrolling (3 → 3)

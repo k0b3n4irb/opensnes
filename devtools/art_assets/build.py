@@ -83,6 +83,10 @@ sprites/dynamic_sprite:
                       32x48 and 64x64 (one frame each), on kit.png's colours,
                       the one palette the metasprite scene loads
 
+transitions/fading:
+  res/moonrise.png    the moon over the skyline (backgrounds/title.png), its
+                      amber frame painted out
+
 windows/window:
   res/alley.png       a dark back alley at night (backgrounds/alley.png), BG1
   res/rain.png        rain on nothing, 256x256 of a 128x128 motif, BG2
@@ -189,6 +193,7 @@ MIXED = ROOT / "examples" / "scrolling" / "mixed_scroll" / "res"
 MULTI_HDMA = ROOT / "examples" / "windows" / "window_multi_hdma" / "res"
 WINDOW = ROOT / "examples" / "windows" / "window" / "res"
 DYNAMIC = ROOT / "examples" / "sprites" / "dynamic_sprite" / "res"
+FADING = ROOT / "examples" / "transitions" / "fading" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -806,6 +811,19 @@ def build_dynamic_sprite() -> dict[str, bytes]:
             "spritehero32.png": png(on_palette(Image.open(ART / "characters" / "kit_64.png").convert("RGBA"), kit_colours))}
 
 
+def moonrise() -> Image.Image:
+    """transitions/fading: backgrounds/title.png with its amber frame painted out (the top
+    four rows take row 4, the bottom four row 219), indexed on its colours."""
+    im = Image.open(ART / "backgrounds" / "title.png").convert("RGB")
+    for y in range(4):
+        for x in range(256):
+            im.putpixel((x, y), im.getpixel((x, 4)))
+            im.putpixel((x, 223 - y), im.getpixel((x, 219)))
+    colours = sorted(set(im.getdata()), key=sum)
+    assert len(colours) <= 16, len(colours)
+    return mode7_indexed(im, colours)
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -1012,6 +1030,7 @@ def main() -> int:
             (ASEPRITE, build_aseprite_pipeline()),
             (WINDOW, build_window()),
             (DYNAMIC, build_dynamic_sprite()),
+            (FADING, {"moonrise.png": png(moonrise())}),
             (MULTI_HDMA, {"city.png": png(tram_view())}),
             (MIXED, {"logo.png": screen_logo(ART), "rain.png": png(rain())}),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),

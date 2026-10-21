@@ -105,7 +105,7 @@ Then open `fading.sfc` in luna (`luna-gui fading.sfc`) or any emulator.
 | File | Purpose |
 |------|---------|
 | `main.c` | the transitions, one per button press |
-| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it, `res/opensnes.inc` declares the symbols |
+| `res/moonrise.png` (+ `.toml`) | the moon over the skyline, Néo-Lumen art (PixelLab, CC0) with its frame painted out by `devtools/art_assets/build.py`; the build converts it (`opensnes-tileset`), `res/moonrise.inc` declares the symbols |
 | `vram.spec` | the VRAM regions of the example (`vram_map.h` is generated from it) |
 | `Makefile` | build configuration |
 
