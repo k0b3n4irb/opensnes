@@ -21,6 +21,7 @@ sixteen colours, so the ground's palette starts with the sky's.
 """
 from __future__ import annotations
 
+import math
 import random
 from pathlib import Path
 
@@ -198,4 +199,116 @@ def glider(art: Path) -> Image.Image:
     out = Image.new("P", im.size, 0)
     out.putpalette([0, 0, 0] + [v for c in colours for v in c] + [0] * (765 - 3 * len(colours)))
     out.putdata([colours.index(p[:3]) + 1 if p[3] >= 128 else 0 for p in im.getdata()])
+    return out
+
+
+# mode7/extbg: the city seen from above with the elevated metro over it. The
+# viaducts are the high half of the plane (bit 7 set): their colours sit at
+# indices 1-13, so that 0x81-0x8D read as colours 1-13 on EXTBG's BG2 and, as
+# BG1 reads all eight bits, as CGRAM 129-141, which the palette repeats; the
+# city's own colours start at 16. The window shown is 256x224 at 1:1; the
+# rest of the 1024x1024 plane repeats it.
+EXTBG_WINDOW = (160, 400)               # the city crop: two roof blocks, a canal, a cross street
+DECKS = (24, 144, 208)                  # the viaducts' left edges, on the 8-px grid
+DECK_W = 24
+DECK = {"hi": "#b8b0d0", "con": "#8880a8", "mid": "#686088", "lo": "#403858", "ballast": "#282438",
+        "sleeper": "#504868", "rail": "#a8c8d8", "glint": "#e8f8ff", "amber": "#f0b050",
+        "roof": "#585070", "stripe": "#e05090", "window": "#f8d888", "head": "#ffffff"}
+
+
+def hexrgb(h: str) -> tuple:
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+def extbg_plane(art: Path) -> tuple[Image.Image, int]:
+    """plane.png for mode7/extbg (1024x1024, indexed as above) and its count of distinct tiles."""
+    city = ground_rgb(art).crop((*EXTBG_WINDOW, EXTBG_WINDOW[0] + 256, EXTBG_WINDOW[1] + 224))
+    deck = {k: hexrgb(v) for k, v in DECK.items()}
+    tones = sorted(set(city.getdata()), key=sum)
+
+    def shade(c: tuple) -> tuple:
+        return tones[max(0, tones.index(c) - 4)]
+
+    low = city.copy()
+    high = {}                                       # (x, y) -> a deck colour
+    for x0 in DECKS:
+        for y in range(224):
+            for x in range(x0 + DECK_W, x0 + DECK_W + 8):   # the shadow, light from the upper left
+                low.putpixel((x, y), shade(city.getpixel((x, y))))
+            for dx in range(DECK_W):
+                if dx == 0:
+                    c = "hi"
+                elif dx == DECK_W - 1:
+                    c = "lo"
+                elif dx in (1, DECK_W - 2):
+                    c = "amber" if dx == 1 and y % 32 == 16 else "con"
+                elif dx in (2, DECK_W - 3, 11, 12):
+                    c = "mid"                        # the walkways and the centre beam
+                elif dx in (5, 8, 15, 18):
+                    c = "glint" if y % 16 == 3 else "rail"
+                else:
+                    c = "sleeper" if y % 4 == 0 else "ballast"
+                high[(x0 + dx, y)] = c
+    tx = DECKS[1] + 3                               # a three-car train on the middle viaduct
+    for car in range(3):
+        ty = 20 + car * 46
+        for y in range(ty, ty + 42):
+            for x in range(tx, tx + 8):
+                edge = x in (tx, tx + 7) or y in (ty, ty + 41)
+                c = "lo" if edge else "roof"
+                if not edge and x in (tx + 1, tx + 6) and (y - ty) % 6 < 4 and 3 < y - ty < 38:
+                    c = "window"
+                if not edge and x in (tx + 3, tx + 4):
+                    c = "stripe"
+                if car == 0 and y == ty + 1 and x in (tx + 2, tx + 5):
+                    c = "head"
+                high[(x, y)] = c
+
+    names = list(DECK)
+    citycols = [INK] + [c for c in tones if c != INK]
+    assert len(names) <= 15 and len(citycols) - 1 <= 112, (len(names), len(citycols))
+    lut = {c: (0 if i == 0 else 15 + i) for i, c in enumerate(citycols)}
+    window = Image.new("P", (256, 224), 0)
+    for y in range(224):
+        for x in range(256):
+            k = high.get((x, y))
+            window.putpixel((x, y), 0x81 + names.index(k) if k else lut[low.getpixel((x, y))])
+    pal = [(0, 0, 0)] * 256
+    for c, i in lut.items():
+        pal[i] = c
+    for i, k in enumerate(names):
+        pal[1 + i] = pal[0x81 + i] = deck[k]
+    plane = Image.new("P", (1024, 1024), 0)
+    for y in range(0, 1024, 224):
+        for x in range(0, 1024, 256):
+            plane.paste(window, (x, y))
+    plane.putpalette([v for c in pal for v in c])
+    tiles = {window.crop((x, y, x + 8, y + 8)).tobytes() for y in range(0, 224, 8) for x in range(0, 256, 8)}
+    assert len(tiles) <= 256, len(tiles)
+    return plane, len(tiles)
+
+
+def orb() -> Image.Image:
+    """The energy orb (O6), eight 16x16 frames of a pulse in a 128-px row (one VRAM tile row), indexed: 0 transparent."""
+    cols = ["#000000", "#ffffff", "#c0fcff", "#58d8e8", "#2890a8", "#e05090", "#f8a0d0"]
+    out = Image.new("P", (128, 16), 0)
+    out.putpalette([v for c in cols for v in hexrgb(c)] + [0] * (768 - 3 * len(cols)))
+    for f in range(8):
+        g = (0, 1, 2, 3, 4, 3, 2, 1)[f] / 4                 # the glow breathes out and back
+        for y in range(16):
+            for x in range(16):
+                r = math.hypot(x - 7.5, y - 7.5) + ((x - 7.5) + (y - 7.5)) * 0.12   # lit from the upper left
+                if r <= 1.6 + g:
+                    c = 1
+                elif r <= 3.2 + g:
+                    c = 2
+                elif r <= 4.6 + g:
+                    c = 3
+                elif r <= 5.6 + g * 0.5:
+                    c = 4
+                elif r <= 7.6 and (x + y + f) % 2 == 0:
+                    c = 5 if (x * 5 + y * 3 + f * 4) % 7 else 6     # the halo, dithered, a spark here and there
+                else:
+                    c = 0
+                out.putpixel((f * 16 + x, y), c)
     return out

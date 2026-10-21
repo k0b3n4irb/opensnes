@@ -348,6 +348,20 @@ to a hover-bike race round a lagoon, with two rivals. What was learnt:
 - **Props on the 16-px grid** cost their tiles once: six props scattered
   over the gravel took the map from 138 to 227 tiles.
 
+### extbg: the orb under the metro (2026-10-21)
+
+The last Mode 7 example on the old art. The plane and the ball were built
+in C at run time (a checkerboard, grey pillars, `tileEncode4bpp`); they
+are now two converted assets (`res/plane.png`, `mode = 7`, `colors = 144`;
+`res/orb.png`, 16x16 sheet) and main.c only uploads them (the `tile`
+module is gone from the example). What made it simple: `opensnes-tileset`
+keeps the indices of an indexed PNG, so the viaducts' pixels are written
+0x81-0x8D in the picture and arrive as such; the only rule is the
+palette's (BG1 reads all eight bits, so CGRAM 129-141 repeat 1-13, and the
+palette stops at 143 under the orb's OBJ palette). The boot is shorter
+(nothing built at run time): the manifest's bound on the orb's x at frame
+100 went from 96 to 160.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.

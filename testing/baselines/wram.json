@@ -160,8 +160,8 @@
     "rom_sha256": "98c34085aeac96a506ef63730525570202cb202100cfc7077809941001cc13eb"
   },
   "mode7_extbg": {
-    "stream": "945f700f140617e6aee3f89c688a07fde2ae6d026b9e83b8e47b6c17ffd9984c",
-    "rom_sha256": "bcf50a5059d6a90af2ee1ba0e0bd9f2abf97cab0c98b69f4330e9aeab04cb81b"
+    "stream": "ce868dad55354b565b1b210117c10cfc5a07dee49c9af9dd95c68380137606f1",
+    "rom_sha256": "17788c45e2035257a574564a1633d53ad82ec7b7ee4f099f1f2211d6d9fabff8"
   },
   "mode7_mode7_racing": {
     "stream": "0849ff5ff41794d53d29a2b330e49d31abdd101ca3b945dfb81a08039221141c",

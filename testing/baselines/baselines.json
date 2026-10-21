@@ -307,15 +307,15 @@
   },
   "mode7_extbg": {
     "fbhash": [
-      "ea864a34e5423d3b",
-      "82f36ed633cfc18b"
+      "0e06110896f5d405",
+      "2b6b4d08b084ce1c"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.38.0",
-    "rom_sha256": "0d9ffd4c5b7f4e351d2767e38fc2fe225c6e3796ce06afdae9d85ca37c7d15df"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "17788c45e2035257a574564a1633d53ad82ec7b7ee4f099f1f2211d6d9fabff8"
   },
   "mode7_mode7_racing": {
     "fbhash": "e6e03c5ec045af6e",

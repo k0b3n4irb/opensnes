@@ -40,6 +40,14 @@ mode7/perspective, mode7/dsp1_ground, mode7/perspective_rotate, mode7/rotate_sca
                       perspective and dsp1_ground only
   res/glider.png      Kit's glider from above, 32x32; rotate_scale only
 
+mode7/extbg (devtools/art_assets/mode7.py):
+  res/plane.png       a 256x224 window of the same city with three viaducts
+                      of the elevated metro and a train over it, repeated
+                      over 1024x1024: the viaducts' pixels carry bit 7
+                      (colours 0x81-0x8D, repeated at CGRAM 129-141), the
+                      city's start at colour 16
+  res/orb.png         the energy orb, eight 16x16 frames of a pulse
+
 mode7/mode7_racing (devtools/art_assets/racing.py):
   res/track.png       the circuit on the rooftops round a lagoon, 1024x1024,
                       from two PixelLab Wang tilesets (asphalt and gravel,
@@ -110,7 +118,7 @@ from PIL import Image, ImageOps
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
-from mode7 import build_city, glider
+from mode7 import build_city, extbg_plane, glider, orb
 from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -721,6 +729,7 @@ def main() -> int:
     city = build_city(ART)
     race = build_track(ART)
     ground, sky = png(city["ground"]), png(city["sky"])
+    plane, plane_tiles = extbg_plane(ART)
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
             (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART)),
             (GRADIENT_COLORS, {"logo.png": screen_logo(ART)}), (HDMA_HELPERS, {"logo.png": screen_logo(ART)}),
@@ -728,6 +737,7 @@ def main() -> int:
             (MODE7 / "dsp1_ground" / "res", {"ground.png": ground, "sky.png": sky}),
             (MODE7 / "perspective_rotate" / "res", {"ground.png": ground}),
             (MODE7 / "rotate_scale" / "res", {"mode7bg.png": ground, "glider.png": png(glider(ART))}),
+            (MODE7 / "extbg" / "res", {"plane.png": png(plane), "orb.png": png(orb())}),
             (RACING, {"track.png": png(race["track"]), "track_class.bin": race["classes"],
                       "lanes_xy.bin": race["lanes"][0], "lanes_heading.bin": race["lanes"][1],
                       "bikes.png": png(bikes(ART))})]
@@ -735,6 +745,7 @@ def main() -> int:
     print("map_scroll:", jobs[2][1].pop("_report").decode())
     print("mapandobjects:", jobs[3][1].pop("_report").decode())
     print(f"mode7 city: {city['_tiles']} tiles, {city['_colours']} colours")
+    print(f"mode7 extbg: {plane_tiles} tiles")
     print(f"mode7 race: {race['_tiles']} tiles, {race['_colours']} colours")
     bad = 0
     for folder, files in jobs:

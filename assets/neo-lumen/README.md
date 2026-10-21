@@ -117,6 +117,18 @@ and `perspective_rotate`, and `res/mode7bg.png` of `rotate_scale`; the sky is
 sixteen, because its 4bpp layer reads CGRAM 0-15, the start of the ground's
 palette.
 
+### The metro over the city (EXTBG)
+
+`examples/mode7/extbg`: `res/plane.png` is a 256x224 window of the same
+ground (from x 160, y 400), with three viaducts of the elevated metro, a
+three-car train and the viaducts' shadows drawn over it by
+`devtools/art_assets/mode7.py` (`extbg_plane`), repeated over 1024x1024:
+93 tiles. The viaducts' 13 colours are new (concrete greys, the rails, the
+train's roof, windows and stripe) and sit at indices 1-13 with bit 7 set;
+the city's colours start at 16. `res/orb.png`, the energy orb (O6), eight
+16x16 frames of a pulse, is drawn by the same script (`orb`). No new
+PixelLab call.
+
 ### The race on the rooftops
 
 `examples/mode7/mode7_racing`: a circuit round a lagoon and three

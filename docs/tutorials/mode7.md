@@ -289,8 +289,9 @@ independently, and BG2 does not take direct colour (snesdev-wiki,
 *Backgrounds*). Colour your pixels knowing that BG1 reads all eight bits:
 `0x83` is colour 3 on BG2 and colour 131 on BG1.
 
-[`examples/mode7/extbg`](../../examples/mode7/extbg/README.md) runs a
-sprite under a row of pillars and toggles EXTBG with A.
+[`examples/mode7/extbg`](../../examples/mode7/extbg/README.md) flies a
+sprite over a city and under the viaducts of its elevated metro, all in
+one plane, and toggles EXTBG with A.
 
 ## Gotchas
 
