@@ -16,7 +16,7 @@
  *
  *   moving sprites is cheap in principle (one OAM DMA), but touching each
  *   one from C is not free. For all 128 you either move the work off the
- *   main CPU — `chips/sa1_starfield` runs 128 birds of Lissajous trig on
+ *   main CPU — `chips/sa1_starfield` runs 128 moths of Lissajous trig on
  *   the SA-1 at 10.74 MHz — or hand-write the update loop in assembly.
  *
  * Motion is deliberately cheap (integer add + edge bounce, no multiply or

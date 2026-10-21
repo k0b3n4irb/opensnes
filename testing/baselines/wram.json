@@ -60,8 +60,8 @@
     "rom_sha256": "0de7cbe79634b24c1ee9a6ba34543acfa3989cce02183ca279d310838d22c8d2"
   },
   "chips_sa1_starfield": {
-    "stream": "bad8b5f7b7871b649b274363f37bbd3943705768da848d8992d63c66ff7bf54d",
-    "rom_sha256": "fc53a4dbb87d42bace16d04a961c85bbfd7fd8ea4dad5ad54cd0d119ced64fbc"
+    "stream": "da4590808e88b35917a494aaaf6efeabf2587853fc8c8338db1ccb84ddf25478",
+    "rom_sha256": "797a091d76448142e41b48afa65f2cb2f9f903467d4bd79e679ef6c0048f9081"
   },
   "chips_superfx_3d": {
     "stream": "aac371d5f8042c0bb6d488863e6b75e9f3e0b893bb8ea983a7d6681a2d641ac7",

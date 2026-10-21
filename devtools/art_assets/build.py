@@ -87,6 +87,10 @@ sprites/sprite_swarm:
   res/moth.png        a neon moth, wings open then closed (two 8x8 frames)
   res/alley.png       the alley of windows/window, behind the swarm
 
+chips/sa1_starfield:
+  res/mote.png        a moth far away, 4x3 pixels in an 8x8 tile
+  res/skyline.png     the far skyline in the rain (backgrounds/city_far.png)
+
 color/shadow_tint:
   res/street.png      the apartment blocks and the noodle sign
                       (backgrounds/city_near.png), indexed
@@ -214,6 +218,7 @@ SUPERSCOPE = ROOT / "examples" / "input" / "superscope" / "res"
 MOUSE = ROOT / "examples" / "input" / "mouse" / "res"
 SHADOW_TINT = ROOT / "examples" / "color" / "shadow_tint" / "res"
 SWARM = ROOT / "examples" / "sprites" / "sprite_swarm" / "res"
+SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -932,6 +937,18 @@ def moth_sheet() -> Image.Image:
     return im
 
 
+# chips/sa1_starfield: a moth far away, 4x3 pixels in an 8x8 tile (the sprites of a
+# 128-strong cloud must stay small: 32 sprites a line); 1 the wings, 2 the body
+MOTE = ["........", "........", "..1..1..", "..1221..", "...22...", "........", "........", "........"]
+
+
+def mote() -> Image.Image:
+    im = Image.new("P", (8, 8), 0)
+    im.putpalette([0, 0, 0, 72, 208, 224, 232, 248, 255] + [0] * 759)
+    im.putdata([0 if ch == "." else int(ch) for row in MOTE for ch in row])
+    return im
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -1141,6 +1158,7 @@ def main() -> int:
             (SWARM, {"moth.png": png(moth_sheet()), "alley.png": png(mode7_indexed(
                 Image.open(ART / "backgrounds" / "alley.png").convert("RGB"),
                 sorted(set(Image.open(ART / "backgrounds" / "alley.png").convert("RGB").getdata()), key=sum)))}),
+            (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
             (SUPERSCOPE, {"aim_adjust_target.png": png(scope_target()), "marker.png": png(scope_marker())}),

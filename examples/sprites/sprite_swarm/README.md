@@ -35,7 +35,7 @@ and all 32 change together: animating a crowd is a VRAM write, not 32 OAM
 edits.
 
 **To go past the ceiling** you move the work off the main CPU or out of C:
-[chips/sa1_starfield](../../chips/sa1_starfield/) runs 128 birds of
+[chips/sa1_starfield](../../chips/sa1_starfield/) runs 128 moths of
 Lissajous *trig* on the SA-1 at 10.74 MHz; a hand-written assembly update
 loop is the other route. Same 128-sprite hardware, a bigger compute budget.
 

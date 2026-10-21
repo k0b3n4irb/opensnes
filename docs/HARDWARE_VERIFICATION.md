@@ -73,7 +73,7 @@ behaviour, and the note under the table says which.
 | 14 | `input/controller` | hold buttons on both pads | Each pad's buttons show on its own line (PAD 1, PAD 2); releasing pad 2 does not affect pad 1's line. |
 | 15 | `memory/hirom_demo` | hold A | "HIROM MODE" is shown and the background turns light blue while A is held. |
 | 16 | `mode7/dsp1_ground` | turn with LEFT/RIGHT, drive with UP | The ground recedes to a horizon under the sky and turns in perspective; four magenta beacons and the cyan cube tumbling above them stay put on the ground while you turn and drive, and disappear once you pass them. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
-| 17 | `chips/sa1_starfield` | nothing | 128 dots trace smooth Lissajous figures at full frame rate. Firmware-dependent. |
+| 17 | `chips/sa1_starfield` | nothing | 128 moths trace smooth Lissajous figures over the skyline at full frame rate. Firmware-dependent. |
 | 18 | `chips/superfx_3d` | nothing | A wireframe cube rotates at full frame rate with no missing edges. Firmware-dependent. |
 | 19 | `games/likemario` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
 | 20 | `demos/rpg` | walk, talk to a villager with A, open the chest | The full game path: map, dialogue, chest state. |
