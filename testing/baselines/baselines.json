@@ -162,10 +162,10 @@
     "rom_sha256": "9c6615da09928e5c3097faca5853177f73f5b4580fb7116940db8b0d04990b7f"
   },
   "color_shadow_tint": {
-    "fbhash": "3e382b3e3e0f0325",
+    "fbhash": "11ce311bbd8cfc9d",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "834fe3bdc901fd9c19fd14ffa04fafd0cdc8556c15dfb1f2f98144e1ace4bd53"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "eb16ebd28e80a3112e87e699daffd311f7810bb37a479c0a98cb8be8cee24a97"
   },
   "color_transparency": {
     "fbhash": [

@@ -83,6 +83,10 @@ sprites/dynamic_sprite:
                       32x48 and 64x64 (one frame each), on kit.png's colours,
                       the one palette the metasprite scene loads
 
+color/shadow_tint:
+  res/street.png      the apartment blocks and the noodle sign
+                      (backgrounds/city_near.png), indexed
+
 input/mouse:
   res/cursor.png      the terminal's cursor, a 16x16 arrow drawn here
 
@@ -204,6 +208,7 @@ DYNAMIC = ROOT / "examples" / "sprites" / "dynamic_sprite" / "res"
 FADING = ROOT / "examples" / "transitions" / "fading" / "res"
 SUPERSCOPE = ROOT / "examples" / "input" / "superscope" / "res"
 MOUSE = ROOT / "examples" / "input" / "mouse" / "res"
+SHADOW_TINT = ROOT / "examples" / "color" / "shadow_tint" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -896,6 +901,14 @@ def mouse_cursor() -> Image.Image:
     return im
 
 
+def indexed_scene(name: str) -> Image.Image:
+    """A 256x224 background of the art, indexed on its own colours by brightness (at most 16)."""
+    im = Image.open(ART / "backgrounds" / name).convert("RGB")
+    colours = sorted(set(im.getdata()), key=sum)
+    assert len(colours) <= 16, (name, len(colours))
+    return mode7_indexed(im, colours)
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -1102,6 +1115,7 @@ def main() -> int:
             (ASEPRITE, build_aseprite_pipeline()),
             (WINDOW, build_window()),
             (DYNAMIC, build_dynamic_sprite()),
+            (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
             (SUPERSCOPE, {"aim_adjust_target.png": png(scope_target()), "marker.png": png(scope_marker())}),
             (FADING, {"moonrise.png": png(moonrise())}),

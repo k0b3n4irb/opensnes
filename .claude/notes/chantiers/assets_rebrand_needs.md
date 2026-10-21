@@ -120,7 +120,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 | color/hicolor_1792 | IRQ H par ligne + DMA CGRAM : 1792 couleurs | coucher de soleil procédural | **G** — ligne 7 ; source = le même panorama que mode3, converti par segments | le panorama du canal en 1792 couleurs | B3 |
 | color/palette_cycle | rotation de CGRAM | tuiles procédurales | **G** — mais sur un vrai décor : une enseigne et un tuyau de liquide dont les indices sont dessinés pour tourner | une enseigne qui s'allume lettre par lettre, du liquide de refroidissement qui coule | T1 (enseignes à indices cyclables) |
 | color/pseudo_hires | SETINI bit 3 : mélange 50 % sans color math | barres procédurales | **F→color/transparency** — deux façons de mêler deux calques ; l'exemple les compare (A) | — | — |
-| color/shadow_tint | color math contre une couleur fixe (assombrir / teinter) | procédural | **G** — sur la rue : nuit, alerte rouge, pluie verte | la rue sous trois ambiances | B2 |
+| color/shadow_tint | color math contre une couleur fixe (assombrir / teinter) | procédural | **G** — sur la rue : nuit, alerte rouge, pluie verte | la rue sous trois ambiances ; **fait le 2026-10-21** (`city_near.png` : coupure, pluie verte, alerte rouge) | B2 |
 | color/transparency | addition de couleurs main/sub, BG3 en surimpression | 2 BMP PVSL | **R** — absorbe pseudo_hires : brouillard en addition, ou en pseudo-hires (A) | la brume qui glisse sur la ville | B2, B4 |
 
 ### windows (3 → 2)
