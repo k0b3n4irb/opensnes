@@ -27,7 +27,7 @@ generated again or varied.
 | `backgrounds/city_near.png` | close apartment blocks and a noodle sign, 256x224 | the same, seed 1018 | a source of `parallax_city.png`; `examples/color/shadow_tint` (`res/street.png`) |
 | `backgrounds/parallax_city.png` | three bands on 512x256, composed by hand: rows 20-91 of `city_far` (72 lines), rows 92-179 of `city_far` under rows 136-223 of `skyline_mid` (88 lines), rows 160-223 of `city_near` (64 lines); the left 256 pixels, then their mirror; 16 colours by median cut | composition | `examples/scrolling/parallax_scroll` (`res/back.png`) |
 | `backgrounds/mist.png` | mist wisps, 256x224, 2 colours (0 transparent, 1 = `#283050`), seamless at 256 | procedural, below | `examples/color/transparency` (`res/mist.png`, BG3 added over the street) |
-| `backgrounds/alley.png` | a dark back alley at night in the rain, 256x224, 11 colours | `generate-image-v2`, seed 1501, `street.png` as `style_image` (its colours off), the city's 15 colours as `target_palette` | `examples/windows/window` (`res/alley.png`) |
+| `backgrounds/alley.png` | a dark back alley at night in the rain, 256x224, 11 colours | `generate-image-v2`, seed 1501, `street.png` as `style_image` (its colours off), the city's 15 colours as `target_palette` | `examples/windows/window` (`res/alley.png`), `examples/sprites/sprite_swarm` (`res/alley.png`, behind the moths of `build.py`'s `MOTH`) |
 | `backgrounds/street.png` | a rainy street at night, 256x224, 12 colours of the city palette | `generate-image-v2`, seed 112, `target_palette` = the city's 15 colours | `examples/backgrounds/mode1` (`res/street.png`: indexed, padded to 256x256 with the ink colour) |
 
 

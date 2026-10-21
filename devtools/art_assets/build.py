@@ -83,6 +83,10 @@ sprites/dynamic_sprite:
                       32x48 and 64x64 (one frame each), on kit.png's colours,
                       the one palette the metasprite scene loads
 
+sprites/sprite_swarm:
+  res/moth.png        a neon moth, wings open then closed (two 8x8 frames)
+  res/alley.png       the alley of windows/window, behind the swarm
+
 color/shadow_tint:
   res/street.png      the apartment blocks and the noodle sign
                       (backgrounds/city_near.png), indexed
@@ -209,6 +213,7 @@ FADING = ROOT / "examples" / "transitions" / "fading" / "res"
 SUPERSCOPE = ROOT / "examples" / "input" / "superscope" / "res"
 MOUSE = ROOT / "examples" / "input" / "mouse" / "res"
 SHADOW_TINT = ROOT / "examples" / "color" / "shadow_tint" / "res"
+SWARM = ROOT / "examples" / "sprites" / "sprite_swarm" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -909,6 +914,24 @@ def indexed_scene(name: str) -> Image.Image:
     return mode7_indexed(im, colours)
 
 
+# sprites/sprite_swarm: a neon moth from above, wings open then closed (8x8 each).
+# 1 the wing, 2 its glow, 3 the body; the four OBJ palettes the example loads
+# colour them.
+MOTH = [["11....11", "121..121", "12133121", ".113311.", ".113311.", "12133121", "121..121", ".1....1."],
+        ["...11...", "..1221..", "..1331..", "..1331..", "..1331..", "..1331..", "..1221..", "...11..."]]
+
+
+def moth_sheet() -> Image.Image:
+    im = Image.new("P", (16, 8), 0)
+    im.putpalette([0, 0, 0, 224, 80, 144, 248, 176, 216, 24, 16, 40] + [0] * 756)
+    for f, rows in enumerate(MOTH):
+        for y, row in enumerate(rows):
+            for x, ch in enumerate(row):
+                if ch != ".":
+                    im.putpixel((f * 8 + x, y), int(ch))
+    return im
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -1115,6 +1138,9 @@ def main() -> int:
             (ASEPRITE, build_aseprite_pipeline()),
             (WINDOW, build_window()),
             (DYNAMIC, build_dynamic_sprite()),
+            (SWARM, {"moth.png": png(moth_sheet()), "alley.png": png(mode7_indexed(
+                Image.open(ART / "backgrounds" / "alley.png").convert("RGB"),
+                sorted(set(Image.open(ART / "backgrounds" / "alley.png").convert("RGB").getdata()), key=sum)))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
             (SUPERSCOPE, {"aim_adjust_target.png": png(scope_target()), "marker.png": png(scope_marker())}),

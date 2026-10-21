@@ -1,0 +1,6 @@
+tool = "opensnes-sprite"
+
+# two 8x8 frames: wings open, wings closed
+[sheet]
+size = 8
+colors = 16
