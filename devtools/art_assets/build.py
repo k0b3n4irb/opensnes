@@ -83,6 +83,11 @@ sprites/dynamic_sprite:
                       32x48 and 64x64 (one frame each), on kit.png's colours,
                       the one palette the metasprite scene loads
 
+input/superscope:
+  res/aim_adjust_target.png  the calibration target, 2bpp: rings and a cross
+                      over the panels of the range's wall
+  res/marker.png      the impact marker, 16x16
+
 transitions/fading:
   res/moonrise.png    the moon over the skyline (backgrounds/title.png), its
                       amber frame painted out
@@ -194,6 +199,7 @@ MULTI_HDMA = ROOT / "examples" / "windows" / "window_multi_hdma" / "res"
 WINDOW = ROOT / "examples" / "windows" / "window" / "res"
 DYNAMIC = ROOT / "examples" / "sprites" / "dynamic_sprite" / "res"
 FADING = ROOT / "examples" / "transitions" / "fading" / "res"
+SUPERSCOPE = ROOT / "examples" / "input" / "superscope" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -824,6 +830,53 @@ def moonrise() -> Image.Image:
     return mode7_indexed(im, colours)
 
 
+def scope_target() -> Image.Image:
+    """input/superscope's BG2 (2bpp): the security range's calibration target, a hologram of
+    rings round the screen centre (128, 112) over the faint grid of the range's wall.
+    Colour 0 is transparent (the backdrop), 1 the grid, 2 the rings, 3 the cross."""
+    im = Image.new("P", (256, 224), 0)
+    im.putpalette([8, 16, 40, 24, 56, 72, 224, 80, 144, 232, 248, 255] + [0] * 756)
+    cx, cy = 128, 112
+    for y in range(224):
+        for x in range(256):
+            v = 0
+            if x % 16 == 0 or y % 16 == 0:
+                v = 1                                   # the wall's panels
+            r = math.hypot(x - cx, y - cy)
+            for ring in (12, 32, 56, 84):
+                if abs(r - ring) < 1.0 or (ring == 84 and abs(r - ring) < 1.6 and (x + y) % 2):
+                    v = 2
+            if (abs(x - cx) <= 0 and abs(y - cy) < 96) or (abs(y - cy) <= 0 and abs(x - cx) < 96):
+                v = 3                                   # the cross
+            if r < 3:
+                v = 3
+            im.putpixel((x, y), v)
+    return im
+
+
+def scope_marker() -> Image.Image:
+    """The impact marker, 16x16: a cyan ring with a magenta core, colour 0 transparent."""
+    cols = ["#000000", "#ffffff", "#c0fcff", "#48d0e0", "#e05090"]
+    im = Image.new("P", (16, 16), 0)
+    im.putpalette([v for c in cols for v in hexrgb_(c)] + [0] * (768 - 3 * len(cols)))
+    for y in range(16):
+        for x in range(16):
+            r = math.hypot(x - 7.5, y - 7.5)
+            v = 0
+            if 5.2 < r < 7.2:
+                v = 3 if (x + y) % 3 else 2
+            elif r < 2.2:
+                v = 1
+            elif r < 3.6:
+                v = 4
+            im.putpixel((x, y), v)
+    return im
+
+
+def hexrgb_(h: str) -> tuple:
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -1030,6 +1083,7 @@ def main() -> int:
             (ASEPRITE, build_aseprite_pipeline()),
             (WINDOW, build_window()),
             (DYNAMIC, build_dynamic_sprite()),
+            (SUPERSCOPE, {"aim_adjust_target.png": png(scope_target()), "marker.png": png(scope_marker())}),
             (FADING, {"moonrise.png": png(moonrise())}),
             (MULTI_HDMA, {"city.png": png(tram_view())}),
             (MIXED, {"logo.png": screen_logo(ART), "rain.png": png(rain())}),

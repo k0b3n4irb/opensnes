@@ -164,6 +164,14 @@ gradient of 168 rows (one colour a row), their reflection in a canal, by
 colour 0 the tram's wall (the backdrop around the portholes). No PixelLab
 call.
 
+### The security range (superscope)
+
+`examples/input/superscope`: `res/aim_adjust_target.png`, the calibration
+target (2bpp: rings and a cross over the panels of the range's wall), and
+`res/marker.png`, the 16x16 impact marker, both drawn by
+`devtools/art_assets/build.py` (`scope_target`, `scope_marker`). They replace
+PVSnesLib's 48-colour sprite sheet, of which the example used one dot.
+
 ### Neon Breaker (the arcade cabinet)
 
 `examples/games/breakout`: everything in `res/` is drawn by

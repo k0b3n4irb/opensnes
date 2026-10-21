@@ -12,10 +12,10 @@
  * The example uses a three-state machine: DETECT waits for the Super Scope
  * to be connected, CALIBRATE asks the player to shoot the screen center
  * so the library can compute the aim offset, and READY tracks fire events
- * and marks the hit position with a red dot sprite.
+ * and marks the hit position with an impact marker sprite.
  *
- * Video setup: Mode 0 with BG1 (text overlay) and BG2 (crosshair target
- * background for calibration), plus OBJ sprites for the red dot marker.
+ * Video setup: Mode 0 with BG1 (text overlay) and BG2 (the calibration
+ * target of the security range), plus an OBJ sprite for the impact marker.
  *
  * @par SNES Concepts
  * - Super Scope peripheral detection and calibration flow
@@ -29,7 +29,7 @@
  * @par What to Observe
  * - "Connect SuperScope to Port 2" message on startup
  * - After connection, a crosshair target for calibration
- * - Shooting places a red dot at the hit position
+ * - Shooting places an impact marker at the hit position
  * - PAUSE button returns to calibration; CURSOR transitions to play
  *
  * @par Modules Used
@@ -45,11 +45,11 @@
 
 /** @brief Aim target background tile data (2bpp, crosshair pattern), converted by the build from res/ */
 #include "res/aim_adjust_target.inc"
-#include "res/sprites.inc"
-/* generated: aim_adjust_target_tiles/_map/_pal, sprites_tiles/_pal (each with _end) */
+#include "res/marker.inc"
+/* generated: aim_adjust_target_tiles/_map/_pal, marker_tiles/_pal (each with _end) */
 /** @brief Aim target tilemap (32x32 BG2 layout), converted by the build from res/ */
 /** @brief Aim target palette (BGR555), converted by the build from res/ */
-/** @brief Sprite tile data (red dot marker, 4bpp), converted by the build from res/ */
+/** @brief Sprite tile data (impact marker, 4bpp), converted by the build from res/ */
 /** @brief Sprite palette (BGR555), converted by the build from res/ */
 
 /* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
@@ -58,11 +58,11 @@
 #define STATE_DETECT    0
 /** @brief Asking player to shoot screen center for aim offset calibration */
 #define STATE_CALIBRATE 1
-/** @brief Calibrated and tracking fire events; placing red dot markers */
+/** @brief Calibrated and tracking fire events; placing impact markers */
 #define STATE_READY     2
 
 /**
- * @brief Hide the red dot marker sprite by moving it off-screen.
+ * @brief Hide the impact marker sprite by moving it off-screen.
  *
  * Y coordinate OAM_Y_OFFSCREEN (224) is below the NTSC visible area,
  * so the SNES PPU will not render this sprite. This is cheaper than
@@ -74,7 +74,7 @@ static void hideDot(void) {
 }
 
 /**
- * @brief Show the red dot marker at the given screen coordinates.
+ * @brief Show the impact marker at the given screen coordinates.
  *
  * Updates sprite 0's X/Y in the OAM low table and signals the NMI
  * handler to DMA the OAM buffer to the PPU next VBlank.
@@ -108,7 +108,7 @@ static void clearBottom(void) {
  *   player to shoot the center. scopeCalibrate() records the aim offset
  *   so subsequent coordinate readings are accurate.
  * - STATE_READY: tracks FIRE events, reads calibrated X/Y via scopeGetX()
- *   / scopeGetY(), and places a red dot sprite at the hit position. The
+ *   / scopeGetY(), and places an impact marker sprite at the hit position. The
  *   PAUSE button returns to calibration for re-aiming.
  *
  * The fire_armed flag prevents stale FIRE events from the previous state
@@ -132,12 +132,12 @@ int main(void) {
     bgSetMapPtr(1, 0x2000, BG_MAP_32x32);
 
     /* --- Sprites --- */
-    dmaCopyVram(sprites_tiles, 0x4000,
-                (u16)(sprites_tiles_end - sprites_tiles));
+    dmaCopyVram(marker_tiles, 0x4000,
+                (u16)(marker_tiles_end - marker_tiles));
     REG_OBJSEL = OBJSEL(OBJ_SIZE16_L32, 0x4000);
 
     /* --- Palettes --- */
-    setColor(0, RGB(6, 11, 31));   /* Backdrop: blue */
+    setColor(0, RGB(1, 2, 5));     /* Backdrop: the range's dark wall */
     setColor(1, RGB(31, 31, 31)); /* Text: white */
 
     /* BG2: all 4 sub-palettes (CGRAM 32-47) */
@@ -147,19 +147,19 @@ int main(void) {
     dmaCopyCGram(aim_adjust_target_pal, 44, 8);
 
     /* Sprite palette (CGRAM 128+) */
-    dmaCopyCGram(sprites_pal, OBJ_CGRAM_BASE,
-                 (u16)(sprites_pal_end - sprites_pal));
+    dmaCopyCGram(marker_pal, OBJ_CGRAM_BASE,
+                 (u16)(marker_pal_end - marker_pal));
 
     /* --- Scroll --- */
     bgSetScroll(0, 0, (u16)-1);
     bgSetScroll(1, 0, (u16)-1);
 
-    /* --- OAM: sprite 0 = red dot, hidden --- */
+    /* --- OAM: sprite 0 = impact marker, hidden --- */
     oamClear();
     oamMemory[0] = 0;
     oamMemory[1] = OAM_Y_OFFSCREEN;
-    oamMemory[2] = 0x80;     /* Tile 0x80 (red dot) */
-    oamMemory[3] = 0x34;     /* Priority 3, palette 2 */
+    oamMemory[2] = 0x00;     /* Tile 0 (the impact marker) */
+    oamMemory[3] = 0x30;     /* Priority 3, palette 0 */
     oamMemory[512] = 0x00;   /* Small (16x16), X high = 0 */
     oam_update_flag = 1;
 

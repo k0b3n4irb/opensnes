@@ -270,10 +270,10 @@
     "rom_sha256": "4b061068ce703cf40d9f0d8dfcb95f8e3e1000f383f76e847008f416b245f21e"
   },
   "input_superscope": {
-    "fbhash": "947b9ddb0e2d17b0",
+    "fbhash": "63ab74d7fa189035",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "d0c4d48fa3830047fce3373ef46c7c167992db56d7e368ad27a160407f61dcd9"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "b16cd5699b4e74ae4085937e9bb0027d6a5f3531b746d6269b88ab43fe548634"
   },
   "maps_map_scroll": {
     "fbhash": "66d6c6c04d9dfc8a",

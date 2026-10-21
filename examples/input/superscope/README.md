@@ -2,7 +2,7 @@
 
 ![Screenshot](superscope.png)
 
-Light gun detection, calibration via PPU H/V counters, and fire tracking with a red dot sprite.
+Light gun detection, calibration via PPU H/V counters, and fire tracking with an impact marker sprite — at the calibration target of the city's security range.
 
 ## Controls
 
@@ -19,8 +19,8 @@ cd $OPENSNES_HOME
 make -C examples/input/superscope
 ```
 
-Then open `superscope.sfc` in your emulator (Mesen2 recommended).
-Enable Super Scope in Mesen2 Input settings, port 2.
+Then open `superscope.sfc` in an emulator with a Super Scope on port 2
+(luna drives one from a test manifest).
 
 ## What You'll Learn
 
@@ -70,15 +70,15 @@ dmaCopyVram(sprites_tiles, 0x4000, ...);
 REG_OBJSEL = OBJSEL(OBJ_SIZE16_L32, 0x4000);
 ```
 
-The `OBJSEL()` macro replaces the cryptic `0x62` with a readable size + base address. `OBJ_SIZE16_L32` means small=16x16, large=32x32. The sprite sheet has the red dot at tile 0x80 (pixel position 0,64 in the 128-wide sheet).
+The `OBJSEL()` macro replaces the cryptic `0x62` with a readable size + base address. `OBJ_SIZE16_L32` means small=16x16, large=32x32. The sprite sheet is the impact marker alone, a 16x16 sprite: tile 0.
 
 ### 5. Direct OAM Setup
 
 ```c
 oamMemory[0] = 0;
 oamMemory[1] = 0xE0;     /* Off-screen */
-oamMemory[2] = 0x80;     /* Tile 0x80 (red dot) */
-oamMemory[3] = 0x34;     /* Priority 3, palette 2 */
+oamMemory[2] = 0x00;     /* Tile 0 (the impact marker) */
+oamMemory[3] = 0x30;     /* Priority 3, palette 0 */
 oamMemory[512] = 0x00;   /* Small (16x16), X high = 0 */
 oam_update_flag = 1;
 ```
@@ -91,19 +91,19 @@ The example uses three states:
 
 - **DETECT**: Calls `scopeInit()` each frame until `scopeIsConnected()` returns true
 - **CALIBRATE**: Waits for a fire event, then calls `scopeCalibrate()` to set the aim offset
-- **READY**: Reads `scopeGetX()`/`scopeGetY()` on fire events and moves the red dot
+- **READY**: Reads `scopeGetX()`/`scopeGetY()` on fire events and moves the impact marker
 
 The `fire_armed` flag prevents the calibration fire from immediately re-triggering in the next state (debouncing).
 
 ## Tips & Tricks
 
-- **2bpp quantization**: When converting images with mostly one color (blue background), the converter may lose minority colors (white crosshair lines). Pre-process the PNG with a fixed indexed palette (e.g. via PIL `quantize()`) to control which colors are preserved.
+- **2bpp pictures**: draw them indexed on their four colours (here `devtools/art_assets/build.py` writes the target pixel by pixel): an RGB picture quantized down to 4 colours can lose a thin line that covers few pixels.
 
-- **Sprite tile numbering**: In a 128px-wide sprite sheet with 16x16 sprites, tile numbers follow `row * 32 + col * 2`. `opensnes-sprite inspect` reports the block and tile counts.
+- **Sprite tile numbering**: in a 128px-wide sprite sheet of 16x16 sprites, tile numbers follow `row * 32 + col * 2`. `opensnes-sprite inspect` reports the block and tile counts.
 
 - **OBJSEL macro**: Instead of memorizing that `0x62` means "16/32 sizes at VRAM $4000", use `OBJSEL(OBJ_SIZE16_L32, 0x4000)`.
 
-- **Mesen2 Super Scope setup**: In Input settings, assign Super Scope to port 2. Map Fire and Pause to keyboard keys. The scope cursor must be over the emulator window for H/V counters to register.
+- **Trying it without a gun**: luna drives the Super Scope from a test manifest (`superscope = "frame:x,y,buttons"`, see `testing/manifests/superscope.toml`).
 
 ## Under the Hood: The Build
 
