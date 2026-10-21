@@ -164,6 +164,12 @@ gradient of 168 rows (one colour a row), their reflection in a canal, by
 colour 0 the tram's wall (the backdrop around the portholes). No PixelLab
 call.
 
+### The terminal's cursor (mouse)
+
+`examples/input/mouse`: `res/cursor.png`, a 16x16 arrow drawn pixel by pixel
+in `devtools/art_assets/build.py` (`CURSOR`): cyan, a white edge, a dark
+outline, a magenta hot spot at its top-left pixel.
+
 ### The security range (superscope)
 
 `examples/input/superscope`: `res/aim_adjust_target.png`, the calibration

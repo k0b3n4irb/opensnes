@@ -266,8 +266,8 @@
   "input_mouse": {
     "fbhash": "43fae5cff6c8514d",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "4b061068ce703cf40d9f0d8dfcb95f8e3e1000f383f76e847008f416b245f21e"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "d69e927ae62b79cfbb478209bf4054a4305b220aacccb82fc144eab37c2176a9"
   },
   "input_superscope": {
     "fbhash": "63ab74d7fa189035",
