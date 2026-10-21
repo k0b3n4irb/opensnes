@@ -87,6 +87,12 @@ sprites/sprite_swarm:
   res/moth.png        a neon moth, wings open then closed (two 8x8 frames)
   res/alley.png       the alley of windows/window, behind the swarm
 
+color/palette_cycle:
+  res/sign.png        a noodle bar's sign and a coolant pipe on a brick wall,
+                      two palettes: the letters on indices 8-14 of palette 0,
+                      the coolant on 8-15 of palette 1, the indices the
+                      example rotates
+
 chips/sa1_starfield:
   res/mote.png        a moth far away, 4x3 pixels in an 8x8 tile
   res/skyline.png     the far skyline in the rain (backgrounds/city_far.png)
@@ -219,6 +225,7 @@ MOUSE = ROOT / "examples" / "input" / "mouse" / "res"
 SHADOW_TINT = ROOT / "examples" / "color" / "shadow_tint" / "res"
 SWARM = ROOT / "examples" / "sprites" / "sprite_swarm" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
+PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -949,6 +956,56 @@ def mote() -> Image.Image:
     return im
 
 
+# color/palette_cycle
+CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
+CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
+CYCLE_BANK1 = ["#000000","#101828","#203048","#405068","#6878a0","#a0b0d0","#283040","#182030"]
+CYCLE_FLOW = ["#b0f8ff","#80d8e0","#48a0a0","#307078","#205058","#307078","#48a0a0","#80d8e0"]
+def neon_sign() -> Image.Image:
+    """color/palette_cycle: a noodle bar's sign and a coolant pipe on a brick wall. Palette 0:
+    the wall and the frame (0-7), the letters (8-14, one index each); palette 1: the pipe's
+    metal (1-7) and its coolant (8-15, along x). The example rotates 8-15 of both."""
+    font=font8()
+    im=Image.new('P',(256,224),0)
+    pal=[hexrgb_(c) for c in CYCLE_BANK0 + CYCLE_SIGN + CYCLE_BANK1 + CYCLE_FLOW]
+    im.putpalette([v for c in pal for v in c]+[0]*(768-3*len(pal)))
+    PIPE_TOP,PIPE_BOT=160,184
+    for y in range(224):
+        for x in range(256):
+            if PIPE_TOP<=y<PIPE_BOT:
+                dy=y-PIPE_TOP
+                if dy in (0,23): v=16+1
+                elif dy in (1,22): v=16+3
+                elif dy in (2,21): v=16+5 if dy==2 else 16+2
+                elif dy in (3,20): v=16+4 if dy==3 else 16+6
+                else: v=24+((x//4 - (dy%2))%8) if 6<=dy<=17 else 16+7
+                if x%64 in (0,1) : v=16+1 if dy in(0,23) else 16+3   # couplings
+                if x%64 in (2,3,4): v=16+5 if dy<12 else 16+4
+                im.putpixel((x,y),v); continue
+            # brick wall
+            row=y//8; off=(row%2)*8
+            if y%8==7 or (x+off)%16==15: v=1
+            else: v=2 if ((x+off)//16+row)%3 else 3
+            if y>=PIPE_BOT+16: v=1 if y%2 else 4   # the wet floor
+            im.putpixel((x,y),v)
+    # the sign: a frame and seven letters, each on its own index 8+k
+    word="NOODLES"; S=3; lw=8*S; gap=4
+    w=len(word)*lw+(len(word)-1)*gap; x0=(256-w)//2; y0=48
+    for y in range(y0-10,y0+lw+10):
+        for x in range(x0-10,x0+w+10):
+            e=min(x-(x0-10),(x0+w+9)-x,y-(y0-10),(y0+lw+9)-y)
+            im.putpixel((x,y),7 if e==0 else (6 if e==1 else (5 if e<3 else 0)))
+    for k,ch in enumerate(word):
+        g=font[ch]
+        for gy in range(8):
+            for gx in range(8):
+                if g[gy]>>(7-gx)&1:
+                    for sy in range(S):
+                        for sx in range(S):
+                            im.putpixel((x0+k*(lw+gap)+gx*S+sx,y0+gy*S+sy),8+k)
+    return im
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -1158,6 +1215,7 @@ def main() -> int:
             (SWARM, {"moth.png": png(moth_sheet()), "alley.png": png(mode7_indexed(
                 Image.open(ART / "backgrounds" / "alley.png").convert("RGB"),
                 sorted(set(Image.open(ART / "backgrounds" / "alley.png").convert("RGB").getdata()), key=sum)))}),
+            (PALETTE_CYCLE, {"sign.png": png(neon_sign())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

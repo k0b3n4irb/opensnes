@@ -151,15 +151,15 @@
   },
   "color_palette_cycle": {
     "fbhash": [
-      "4907daec7caffb25",
-      "f3541e3189a7fb25"
+      "88906081cff2a48d",
+      "fee92f57664c8b05"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.34.0",
-    "rom_sha256": "9c6615da09928e5c3097faca5853177f73f5b4580fb7116940db8b0d04990b7f"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "61adf9b5214e822f230f779c168316e800c27f77c50ec36123ca540077533653"
   },
   "color_shadow_tint": {
     "fbhash": "11ce311bbd8cfc9d",

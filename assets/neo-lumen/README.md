@@ -164,6 +164,14 @@ gradient of 168 rows (one colour a row), their reflection in a canal, by
 colour 0 the tram's wall (the backdrop around the portholes). No PixelLab
 call.
 
+### The noodle bar's sign (palette_cycle)
+
+`examples/color/palette_cycle`: `res/sign.png`, drawn by
+`devtools/art_assets/build.py` (`neon_sign`): a brick wall, the word NOODLES
+in a neon frame (the library's font at three times its size, each letter on
+its own colour index, 8-14 of palette 0) and a coolant pipe (its liquid on
+indices 8-15 of palette 1, along x), for the example to rotate.
+
 ### The terminal's cursor (mouse)
 
 `examples/input/mouse`: `res/cursor.png`, a 16x16 arrow drawn pixel by pixel

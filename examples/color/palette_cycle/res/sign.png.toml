@@ -1,0 +1,5 @@
+tool = "opensnes-tileset"
+
+# two palettes: the converter gives each tile the bank of its colours
+[convert]
+colors = 32
