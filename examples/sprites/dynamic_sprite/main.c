@@ -90,16 +90,16 @@ static u16 frame3;
  * Metasprite Definitions
  *========================================================================*/
 
-/** @brief 32x32 metasprite: 64x64 character (2x2 grid of 32x32) */
+/** @brief 32x32 metasprite: Kit 64x64 (2x2 grid of 32x32, blocks 0-3 of the sheet) */
 static const MetaspriteItem hero32_frame0[] = {
     METASPR_ITEM(0,  0,  0, OBJ_PAL(0) | OBJ_PRIO(3)),
     METASPR_ITEM(32, 0,  1, OBJ_PAL(0) | OBJ_PRIO(3)),
-    METASPR_ITEM(0,  32, 6, OBJ_PAL(0) | OBJ_PRIO(3)),
-    METASPR_ITEM(32, 32, 7, OBJ_PAL(0) | OBJ_PRIO(3)),
+    METASPR_ITEM(0,  32, 2, OBJ_PAL(0) | OBJ_PRIO(3)),
+    METASPR_ITEM(32, 32, 3, OBJ_PAL(0) | OBJ_PRIO(3)),
     METASPR_TERM
 };
 
-/** @brief 16x16 metasprite: 32x48 character (2x3 grid of 16x16) */
+/** @brief 16x16 metasprite: Kit 32x48 (2x3 grid of 16x16) */
 static const MetaspriteItem hero16_frame0[] = {
     METASPR_ITEM(0,  0,  0, OBJ_PAL(0) | OBJ_PRIO(3)),
     METASPR_ITEM(16, 0,  1, OBJ_PAL(0) | OBJ_PRIO(3)),
@@ -110,12 +110,12 @@ static const MetaspriteItem hero16_frame0[] = {
     METASPR_TERM
 };
 
-/** @brief 8x8 metasprite: 16x16 character (2x2 grid of 8x8) */
+/** @brief 8x8 metasprite: Kit 16x16 (2x2 grid of 8x8, tiles 0-3 of the sheet) */
 static const MetaspriteItem hero8_frame0[] = {
     METASPR_ITEM(0, 0, 0, OBJ_PAL(0) | OBJ_PRIO(3)),
     METASPR_ITEM(8, 0, 1, OBJ_PAL(0) | OBJ_PRIO(3)),
-    METASPR_ITEM(0, 8, 8, OBJ_PAL(0) | OBJ_PRIO(3)),
-    METASPR_ITEM(8, 8, 9, OBJ_PAL(0) | OBJ_PRIO(3)),
+    METASPR_ITEM(0, 8, 2, OBJ_PAL(0) | OBJ_PRIO(3)),
+    METASPR_ITEM(8, 8, 3, OBJ_PAL(0) | OBJ_PRIO(3)),
     METASPR_TERM
 };
 

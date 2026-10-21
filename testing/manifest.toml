@@ -109,4 +109,6 @@ frames = [200, 400]
 frames = [200, 400]
 
 [examples."sprites/dynamic_sprite"]
-frames = [200, 400]
+# 260, not 400: the shard turning in 24 frames shows the same picture at 200
+# and 400 (2026-10-21, the Néo-Lumen sheet)
+frames = [200, 260]

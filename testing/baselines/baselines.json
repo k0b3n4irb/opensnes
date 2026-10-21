@@ -391,15 +391,15 @@
   },
   "sprites_dynamic_sprite": {
     "fbhash": [
-      "1ea31be6d66d5b25",
-      "1cc0ee425b5dc725"
+      "5ffda9c943e49bed",
+      "16e24523dcdd5ebd"
     ],
     "frames": [
       200,
-      400
+      260
     ],
-    "luna_version": "v1.39.0",
-    "rom_sha256": "cf84f9f9c25003c8601d2edc453baede7f3d40e1f7cbd75828248db75dc798df"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "74d69557993fae8ec032267f6064f9bdc64e23848adbb0e47d6b53fc36662faf"
   },
   "sprites_simple_sprite": {
     "fbhash": "e2e4940ba44f8820",

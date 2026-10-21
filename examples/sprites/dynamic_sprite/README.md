@@ -8,9 +8,10 @@ How to use the **dynamic sprite system** to stream sprite tile data into VRAM ev
 Unlike static sprites (where all frames live in VRAM permanently), dynamic sprites upload
 only the current animation frame, saving VRAM space when sprites have many frames.
 
-This demo displays 4 animated 16x16 sprites, each cycling through 24 frames of animation.
-SELECT switches to the next step of the same engine: **metasprites**, characters built
-from several OBJ, streamed the same way under the three OBJSEL size pairs.
+This demo displays four data shards, 16x16 sprites, each turning through 24 frames of
+animation. SELECT switches to the next step of the same engine: **metasprites** — Kit,
+built from several OBJ at 16x16, 32x48 and 64x64 — streamed the same way under the
+three OBJSEL size pairs.
 
 ## Prerequisites
 
@@ -148,8 +149,12 @@ allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank on
 | File | Purpose |
 |------|---------|
 | `main.c` | Dynamic sprite initialization, animation loop |
-| `res/sprite16_grid.png.toml`, `res/sprite32.png.toml` | the import settings of the two sheets (`opensnes-sprite`); the build converts them and links the result, `res/sprite16_grid.inc` declares the symbols |
-| `res/sprite16_grid.png` | 16x16 sprite sheet source |
+| `res/*.png.toml` | the import settings of the four sheets (`opensnes-sprite`, the three Kit sheets with `metasprite`); the build converts them and links the result, `res/<name>.inc` declares the symbols |
+| `res/sprite16_grid.png` | the data shard turning, 24 16x16 frames, 8 a row |
+| `res/spritehero8.png`, `spritehero16.png`, `spritehero32.png` | Kit at 16x16, 32x48 and 64x64, one frame each, on one palette (the metasprite scene loads one) |
+
+The shard and Kit are the Néo-Lumen art (PixelLab, CC0), turned and indexed by
+`devtools/art_assets/build.py` (`assets/neo-lumen/README.md`).
 | `Makefile` | `LIB_MODULES := console sprite sprite_dynamic sprite_lut dma background input` |
 
 ## Going Further

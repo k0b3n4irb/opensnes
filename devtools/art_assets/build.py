@@ -77,6 +77,12 @@ sprites/aseprite_pipeline:
   res/hero.json       the sheet's data as Aseprite's `--data --list-tags`
                       export writes it: per-frame durations, the two tags
 
+sprites/dynamic_sprite:
+  res/sprite16_grid.png  the data shard turning, 24 16x16 frames, 8 a row
+  res/spritehero8.png, spritehero16.png, spritehero32.png  Kit at 16x16,
+                      32x48 and 64x64 (one frame each), on kit.png's colours,
+                      the one palette the metasprite scene loads
+
 windows/window:
   res/alley.png       a dark back alley at night (backgrounds/alley.png), BG1
   res/rain.png        rain on nothing, 256x256 of a 128x128 motif, BG2
@@ -182,6 +188,7 @@ ASEPRITE = ROOT / "examples" / "sprites" / "aseprite_pipeline" / "res"
 MIXED = ROOT / "examples" / "scrolling" / "mixed_scroll" / "res"
 MULTI_HDMA = ROOT / "examples" / "windows" / "window_multi_hdma" / "res"
 WINDOW = ROOT / "examples" / "windows" / "window" / "res"
+DYNAMIC = ROOT / "examples" / "sprites" / "dynamic_sprite" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -772,6 +779,33 @@ def build_window() -> dict[str, bytes]:
             "kit.png": png(sprite_sheet(Image.open(ART / "characters" / "kit_torch.png").convert("RGBA")))}
 
 
+def on_palette(im: Image.Image, colours: list[tuple]) -> Image.Image:
+    """An RGBA sprite indexed on a given palette: 0 transparent, colour i at i + 1 (each pixel the nearest)."""
+    out = Image.new("P", im.size, 0)
+    out.putpalette([0, 0, 0] + [v for c in colours for v in c] + [0] * (765 - 3 * len(colours)))
+
+    def near(c):
+        return min(range(len(colours)), key=lambda k: sum((a - b) ** 2 for a, b in zip(c, colours[k])))
+    out.putdata([near(p[:3]) + 1 if p[3] >= 128 else 0 for p in im.getdata()])
+    return out
+
+
+def build_dynamic_sprite() -> dict[str, bytes]:
+    """sprites/dynamic_sprite: the data shard turning in 24 frames (8 a row), and Kit at
+    16x16, 32x48 and 64x64 on one palette (kit.png's), for the metasprite scene."""
+    shard = Image.open(ART / "props" / "shard.png").convert("RGBA")
+    colours = sorted({p[:3] for p in shard.getdata() if p[3] >= 128})
+    grid = Image.new("RGBA", (128, 48), (0, 0, 0, 0))
+    for k, fr in enumerate(spin(shard, 24)):
+        grid.paste(fr, ((k % 8) * 16, (k // 8) * 16))
+    kit_colours = sorted({p[:3] for p in Image.open(ART / "characters" / "kit.png").convert("RGBA").getdata()
+                          if p[3] >= 128}, key=sum)
+    return {"sprite16_grid.png": png(on_palette(grid, colours)),
+            "spritehero8.png": png(on_palette(Image.open(ART / "characters" / "kit_16.png").convert("RGBA"), kit_colours)),
+            "spritehero16.png": png(on_palette(Image.open(ART / "characters" / "kit_tall.png").convert("RGBA"), kit_colours)),
+            "spritehero32.png": png(on_palette(Image.open(ART / "characters" / "kit_64.png").convert("RGBA"), kit_colours))}
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -977,6 +1011,7 @@ def main() -> int:
             (SPRITE_SIZES, build_sprite_sizes()),
             (ASEPRITE, build_aseprite_pipeline()),
             (WINDOW, build_window()),
+            (DYNAMIC, build_dynamic_sprite()),
             (MULTI_HDMA, {"city.png": png(tram_view())}),
             (MIXED, {"logo.png": screen_logo(ART), "rain.png": png(rain())}),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),

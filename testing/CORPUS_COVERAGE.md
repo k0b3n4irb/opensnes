@@ -56,7 +56,7 @@ luna v1.40.0 · `luna state --until-frame <N>` per ROM · 60 ROMs · **58 OK, 2 
 | `scrolling/parallax_scroll` | OK | live (400f/398nmi) |
 | `sprites/animated_sprite` | OK | live (200f/198nmi) |
 | `sprites/aseprite_pipeline` | OK | live (400f/398nmi) |
-| `sprites/dynamic_sprite` | OK | live (400f/398nmi) |
+| `sprites/dynamic_sprite` | OK | live (260f/258nmi) |
 | `sprites/simple_sprite` | OK | live (200f/198nmi) |
 | `sprites/sprite_sizes` | OK | live (200f/198nmi) |
 | `sprites/sprite_swarm` | OK | live (400f/398nmi) |

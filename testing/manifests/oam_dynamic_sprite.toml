@@ -62,5 +62,7 @@ oamMemory = { dir = "unchanged", width = 4 }
 [asserts.blocks]
 oamMemory = "40640030"
 # The large-tile pool at VRAM word $0000 after a whole animation cycle:
-# the same 32 bytes the streamer put there at frame 60.
-dyn_tile0 = { space = "vram", offset = "0000", hex = "00ff7f80639c5ea167985fa0639c7f8000007f0063005e0067005f0063007f00" }
+# the same 32 bytes the streamer put there at frame 60 (the shard's frame-7
+# top-left tile since the Néo-Lumen sheet of 2026-10-21; measured on luna
+# v1.40.0 with `--peek VRAM:0000:#32` at frames 60 and 252).
+dyn_tile0 = { space = "vram", offset = "0000", hex = "0000010101000100010001020300070000000100010001000100010001000300" }
