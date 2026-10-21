@@ -143,7 +143,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 | Exemple | Capacité | Aujourd'hui | Verdict | Scène | Assets |
 |---|---|---|---|---|---|
 | scrolling/continuous_scroll | caméra à seuil, parallaxe à 2 calques | 3 PNG + perso 16x16 | **G** — la caméra sans moteur de carte | Kit court sur les toits, la skyline suit plus lentement | K1, T1, B1 |
-| scrolling/mixed_scroll | un calque fixe, un calque qui défile | logo + motif | **R** — devient « l'écran-titre » : logo fixe, motif qui défile, absorbe le bandeau de `scroll_message` | l'écran-titre de Néo-Lumen | B5, B6, F1 |
+| scrolling/mixed_scroll | un calque fixe, un calque qui défile | logo + motif | **R** — devient « l'écran-titre » : logo fixe, motif qui défile, absorbe le bandeau de `scroll_message` | l'écran-titre de Néo-Lumen ; **fait le 2026-10-21** : le logo fixe (priorité de tuile, BG1 est devant BG2 en Mode 1), la pluie qui tombe en diagonale (`build.py`, `rain`), le message | B5, B6, F1 |
 | scrolling/parallax_scroll | parallaxe HDMA sur un seul calque (BG1HOFS par bande) | image PVSL 28 couleurs | **G** — ligne 3 | la skyline en trois bandes de vitesse | B1 (assemblage en bandes) |
 
 ### mode7 (5 → 4, + 2 absorbés d'ailleurs)

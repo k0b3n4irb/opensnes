@@ -143,6 +143,15 @@ run (12-19) rows of `characters/kit_side_sheet.png`, the run frames moved
 `devtools/art_assets/build.py` (`build_continuous_scroll`); no new
 PixelLab call.
 
+### The title screen (mixed_scroll)
+
+`examples/scrolling/mixed_scroll`: `res/logo.png` is the 256x224 logo on a
+transparent sky (the one of the HDMA examples, `logo.py`'s `screen_logo`),
+`res/rain.png` the night behind it, drawn by `devtools/art_assets/build.py`
+(`rain`): a 128x128 motif repeated to 256x256 (102 tiles, 13 colours) of
+faint diagonal bands, far lights out of focus and rain streaks falling one
+pixel left for two down — the direction the layer scrolls. No PixelLab call.
+
 ### Neon Breaker (the arcade cabinet)
 
 `examples/games/breakout`: everything in `res/` is drawn by

@@ -1,42 +1,42 @@
 # scrolling/mixed_scroll — two layers, two palette slots, and only one of them
-# moves.
+# moves: the title screen, the rain (BG1) scrolling behind the fixed logo (BG2).
 #
-# The example composites a scrolling BG1 (shader pattern) under a stationary
-# BG2 (logo), and the README's own table is the specification: BG2 map at word
-# $1400, BG1 map at word $1800, BG1 tiles at word $4000, BG2 tiles at word
-# $5000, BG2 palette in CGRAM slot 0, BG1 palette in slot 1 (the gfx4snes
-# `-e 1` flag bakes slot 1 into BG1's tilemap entries). VRAM byte = word * 2.
-# Six destinations, six blocks.
+# vram.spec is the specification: BG2 map at word $1400, BG1 map at word
+# $1800, BG1 tiles at word $4000, BG2 tiles at word $5000; BG2 palette in
+# CGRAM slot 0, BG1 palette in slot 1 (`palette-entry = 1` bakes slot 1 into
+# BG1's tilemap entries, the $04 high bytes below). VRAM byte = word * 2.
+# Six destinations, six blocks, each where the picture has something:
+# BG2's map row 20 (the wordmark, with the priority bit: $20), BG1's row 3,
+# BG1 tile 5, BG2 tile 100.
 #
-# The palette-slot pair is the assert that earns its place. Slot 1 holds only
-# two non-black colours, so an `-e` regression that collapsed BG1 onto slot 0
-# would let BG1 render in the LOGO's 16-colour palette — a full, colourful,
-# completely wrong picture. `bg1_pal_slot1` says CGRAM 16-19 and nothing else.
+# The palette-slot pair is the assert that earns its place: an `-e` /
+# palette-entry regression that collapsed BG1 onto slot 0 would let BG1
+# render in the LOGO's colours — a full, colourful, completely wrong picture.
+# `bg1_pal_slot1` holds the rain's 13 colours at CGRAM 16-28.
 #
-# scrX/scrY pin the motion: +1 px on both axes per frame, diagonal, never
-# decoupled. At frame 200 both are 197 (boot costs a few frames before the loop
-# starts). Asserting them EQUAL to each other and to a fixed number is the
-# machine form of "the pattern scrolls diagonally and wraps seamlessly" — a
-# regression that scrolls one axis only, or double-steps X, is one wrong
-# integer here rather than a shifted image nobody can attribute.
+# scrX/scrY pin the motion: +1 px on X and -2 on Y per frame (the rain falls
+# one left and two down). At frame 200, 197 and -394 (boot costs a few frames
+# before the loop starts): a regression that scrolls one axis only, or the
+# wrong way, is one wrong integer here rather than a shifted image nobody can
+# attribute.
 #
-# Why liveness/fbhash would not catch these: the visual baseline for this
-# example is a single frame-200 hash of a composited two-layer scene. Every
-# failure above is still a composited two-layer scene.
+# Measured on luna v1.40.0: `luna state --until-frame 200 --peek scrX:2
+# --peek scrY:2 --peek CGRAM:0:#32 --peek CGRAM:10:#26 --peek VRAM:1684:#16
+# --peek VRAM:1860:#16 --peek VRAM:4050:#16 --peek VRAM:5640:#16 --out -`.
 rom = "../../examples/scrolling/mixed_scroll/mixed_scroll.sfc"
 frames = 200
 
 [asserts.values]
-scrX = 197                        # +1 per frame from the loop, diagonal
-scrY = 197                        # must track scrX exactly — same increment site
+scrX = 197                        # +1 per frame from the loop
+scrY = 0xFE76                     # -2 per frame: -394, the same increment site
 
 [asserts.blocks]
-bg2_pal_slot0   = { space = "cgram", offset = "0000", hex = "420c4b51f175a524ad450529a31c612be1267c305e0bc734d54ede7b00000000" }
-bg1_pal_slot1   = { space = "cgram", offset = "0020", hex = "1f7c1f0200000000" }
-bg2_map_w1400   = { space = "vram",  offset = "2BD0", hex = "12001200140015001600170018001900" }
-bg1_map_w1800   = { space = "vram",  offset = "34E0", hex = "00041604170405040504050405040504" }
-bg1_tiles_w4000 = { space = "vram",  offset = "81A0", hex = "ff00fe00fc00f800f000e000c0008000" }
-bg2_tiles_w5000 = { space = "vram",  offset = "A410", hex = "ff7eff70ff70ff70ff7fff7fff7fff00" }
+bg2_pal_slot0   = { space = "cgram", offset = "0000", hex = "62142108fc196c1c8339bd7bae088952c63d8e73855afe42b4305c49a31c442d" }
+bg1_pal_slot1   = { space = "cgram", offset = "0020", hex = "000041106218a320e42c463989527073ac28b4305c499011de2a" }
+bg2_map_w1400   = { space = "vram",  offset = "2D08", hex = "a620a820a920aa20ab20a620ac20ad20" }
+bg1_map_w1800   = { space = "vram",  offset = "30C0", hex = "1c041d041e0401041f04200401042104" }
+bg1_tiles_w4000 = { space = "vram",  offset = "80A0", hex = "ff00ff00ff00ff00ff00ff00ff00fd00" }
+bg2_tiles_w5000 = { space = "vram",  offset = "AC80", hex = "00000000000080008000800080008000" }
 
 # Every VRAM/CGRAM transfer in this example happens once, at boot, under force
 # blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —

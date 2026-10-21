@@ -77,6 +77,13 @@ sprites/aseprite_pipeline:
   res/hero.json       the sheet's data as Aseprite's `--data --list-tags`
                       export writes it: per-frame durations, the two tags
 
+scrolling/mixed_scroll, the title screen:
+  res/logo.png        the 256x224 logo on a transparent sky (as for the
+                      HDMA examples), the fixed layer
+  res/rain.png        the night behind it, 256x256 of a 128x128 motif
+                      (rain falling down-left, far lights), the layer that
+                      scrolls
+
 games/breakout (devtools/art_assets/breakout.py), Neon Breaker, the bar's
 arcade cabinet, all drawn by the script in the tile numbering the game uses:
   res/tiles.png       128 4bpp tiles shared by BG1 and the sprites (the
@@ -139,6 +146,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import random
 import struct
 import sys
 from pathlib import Path
@@ -159,6 +167,7 @@ MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
 CONTINUOUS = ROOT / "examples" / "scrolling" / "continuous_scroll" / "res"
 SPRITE_SIZES = ROOT / "examples" / "sprites" / "sprite_sizes" / "res"
 ASEPRITE = ROOT / "examples" / "sprites" / "aseprite_pipeline" / "res"
+MIXED = ROOT / "examples" / "scrolling" / "mixed_scroll" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -642,6 +651,44 @@ def build_aseprite_pipeline() -> dict[str, bytes]:
     return {"hero.png": png(sprite_sheet(sheet)), "hero.json": (json.dumps(data, indent=1) + "\n").encode()}
 
 
+# scrolling/mixed_scroll: the night behind the title, rain falling down-left
+# (two pixels down for one left) and far lights out of focus
+RAIN = ["#000000", "#0c1424", "#121c30", "#1a2840", "#24385a", "#305070", "#48a0a0", "#80d8e0",
+        "#602850", "#a02860", "#e05090", "#806020", "#f0b050"]
+
+
+def rain() -> Image.Image:
+    """A 256x256 picture of a 128x128 motif repeated, so the layer wraps seamlessly."""
+    rng = random.Random(7)
+    m = 128
+    a = [[1] * m for _ in range(m)]
+    for y in range(m):
+        for x in range(m):
+            if (x + y) % 64 < 6:
+                a[y][x] = 2                         # faint diagonal bands of the night
+    for _ in range(16):                             # the far lights: a dim rim, a body, a bright core
+        cx, cy, r = rng.randrange(m), rng.randrange(m), rng.choice((2, 3, 4, 5))
+        hue = rng.choice(((3, 4, 5), (8, 9, 10), (11, 11, 12), (4, 5, 6)))
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                d = dx * dx + dy * dy
+                if d <= r * r:
+                    c = hue[0] if d > r * r // 2 else hue[1]
+                    if d == 0 and r > 1:
+                        c = hue[2]
+                    y, x = (cy + dy) % m, (cx + dx) % m
+                    a[y][x] = max(a[y][x], c) if c < 6 else c
+    for _ in range(34):                             # the rain: short streaks, bright at their head
+        x, y, n = rng.randrange(m), rng.randrange(m), rng.choice((4, 5, 6))
+        for k in range(n):
+            a[(y + 2 * k) % m][(x - k) % m] = 7 if k == 0 else 5
+            a[(y + 2 * k + 1) % m][(x - k) % m] = 5 if k == 0 else 4
+    im = Image.new("P", (256, 256), 0)
+    im.putpalette([v for c in RAIN for v in rgb(c)] + [0] * (768 - 3 * len(RAIN)))
+    im.putdata([a[y % m][x % m] for y in range(256) for x in range(256)])
+    return im
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -846,6 +893,7 @@ def main() -> int:
             (CONTINUOUS, continuous),
             (SPRITE_SIZES, build_sprite_sizes()),
             (ASEPRITE, build_aseprite_pipeline()),
+            (MIXED, {"logo.png": screen_logo(ART), "rain.png": png(rain())}),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),
                         "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
                         "backpal.bin": arcade["backpal"]}),

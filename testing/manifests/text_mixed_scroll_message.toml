@@ -11,8 +11,11 @@
 #
 # The blocks pin the text itself, row 24 of BG3's map at word $1C00 (byte
 # $3800 + 24 x 64 + 4 = $3E04): each entry is the glyph (ASCII - 32) with
-# palette slot 5 and the priority bit ($34 in the high byte), and the two
-# entries before it are blank (tile 0, palette 5: $1400).
+# palette slot 7 and the priority bit ($3C in the high byte), and the two
+# entries on each side are blank (tile 0, palette 7: $1C00). The message is
+# "WELCOME TO NEO-LUMEN, KIT!" (26 characters) since the title screen of
+# 2026-10-21; measured on luna v1.40.0 (`--peek VRAM:1F00:#4 --peek
+# VRAM:1F02:#52 --peek VRAM:1F1C:#4`).
 rom = "../../examples/scrolling/mixed_scroll/mixed_scroll.sfc"
 
 [[checkpoint]]                     # one increment per frame since boot
@@ -37,6 +40,6 @@ at_frame = 240
 
 [asserts.blocks]
 # the tilemap is written once at boot and never again — still intact at frame 240
-row24_msg    = { space = "vram", offset = "3E04", hex = "2f34303425342e3433342e342534333400340d340d34003434342534383434340034343428342134343400342d342f343634253433340134" }
-row24_before = { space = "vram", offset = "3E00", hex = "00140014" }
-row24_after  = { space = "vram", offset = "3E3C", hex = "00140014" }
+row24_msg    = { space = "vram", offset = "3E04", hex = "373c253c2c3c233c2f3c2d3c253c003c343c2f3c003c2e3c253c2f3c0d3c2c3c353c2d3c253c2e3c0c3c003c2b3c293c343c013c" }
+row24_before = { space = "vram", offset = "3E00", hex = "001c001c" }
+row24_after  = { space = "vram", offset = "3E38", hex = "001c001c" }

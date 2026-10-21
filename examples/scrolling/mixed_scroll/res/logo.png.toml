@@ -1,0 +1,8 @@
+tool = "opensnes-tileset"
+
+# the fixed layer: the logo on a transparent sky (colour 0), BG palette 0.
+# Its tiles carry the priority bit: in Mode 1, BG1 is in front of BG2 at
+# the same priority, and the rain is opaque.
+[convert]
+colors = 16
+priority = true

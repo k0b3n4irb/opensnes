@@ -132,7 +132,7 @@ while (1) {
 }
 ```
 
-See `examples/scrolling/mixed_scroll/` for a complete example where a shader pattern auto-scrolls behind a static logo.
+See `examples/scrolling/mixed_scroll/` for a complete example, a title screen: the rain auto-scrolls behind a static logo, whose tiles carry the priority bit to stay in front of BG1.
 
 ## Parallax Scrolling
 
