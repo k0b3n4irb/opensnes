@@ -450,10 +450,10 @@
     "rom_sha256": "e82e68e52ddb5bdece57ba746c6cb9e1fd890fa0225b59a62de393de47f7374d"
   },
   "windows_window": {
-    "fbhash": "29d2968d214acaac",
+    "fbhash": "26e1d6839230b9c7",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "92388fc832b67204b5e55e7bdddde6bb2af4e31e28bedf5965a6ed90b9507961"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "1c7a5ba34379880082b7286603fa4d7bee6868f71e80969a1e96318a1bee7c47"
   },
   "windows_window_multi_hdma": {
     "fbhash": "010faa399c044aff",

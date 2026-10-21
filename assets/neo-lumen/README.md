@@ -27,6 +27,7 @@ generated again or varied.
 | `backgrounds/city_near.png` | close apartment blocks and a noodle sign, 256x224 | the same, seed 1018 | a source of `parallax_city.png` |
 | `backgrounds/parallax_city.png` | three bands on 512x256, composed by hand: rows 20-91 of `city_far` (72 lines), rows 92-179 of `city_far` under rows 136-223 of `skyline_mid` (88 lines), rows 160-223 of `city_near` (64 lines); the left 256 pixels, then their mirror; 16 colours by median cut | composition | `examples/scrolling/parallax_scroll` (`res/back.png`) |
 | `backgrounds/mist.png` | mist wisps, 256x224, 2 colours (0 transparent, 1 = `#283050`), seamless at 256 | procedural, below | `examples/color/transparency` (`res/mist.png`, BG3 added over the street) |
+| `backgrounds/alley.png` | a dark back alley at night in the rain, 256x224, 11 colours | `generate-image-v2`, seed 1501, `street.png` as `style_image` (its colours off), the city's 15 colours as `target_palette` | `examples/windows/window` (`res/alley.png`) |
 | `backgrounds/street.png` | a rainy street at night, 256x224, 12 colours of the city palette | `generate-image-v2`, seed 112, `target_palette` = the city's 15 colours | `examples/backgrounds/mode1` (`res/street.png`: indexed, padded to 256x256 with the ink colour) |
 
 
@@ -78,6 +79,7 @@ by `examples/sprites/animated_sprite` (`res/kit_walk.png`).
 | `characters/kit_16.png` | Kit, three-quarter, 16x16 | `generate-image-v2`, seed 1302 (#0), the same reference and colours | `examples/sprites/sprite_sizes` (`res/sprite16.png`); its 8x8 one is drawn by `devtools/art_assets/build.py` (`KIT8`) |
 | `characters/kit_tall.png` | Kit, front, 32x48 | `generate-image-v2`, seed 1401 (#24), `characters/kit_64.png` as reference, its 7 colours as `target_palette` | the first frame of the two animations below |
 | `characters/kit_tall_sheet.png` | Kit 32x48, eight frames: walk in place 0-3, wave 4-7 | `animate-with-text-v3` from `kit_tall.png`, 4 frames each (seeds 1411 and 1412; the first frame, a copy of the input, dropped), each pixel put back on the 7 colours of `kit_tall.png` | `examples/sprites/aseprite_pipeline` (`res/hero.png`, `res/hero.json`) |
+| `characters/kit_torch.png` | Kit, side view facing right, holding a torch out, 32x32 | `generate-image-v2`, seed 1502 (#17), the side sheet's frame 0 as reference, its colours with a white and a grey | `examples/windows/window` (`res/kit.png`) |
 | `characters/kit_side_sheet.png` | Kit seen from the side, 32x32 frames, four a row: idle 0-3, walk 4-11, run 12-19, jump 20-27 (block 28 is the owl's, unused) | PixelLab: the character with an east view, its `breathing-idle`, `running-8-frames` and `jumping-1` templates and a v3 walk, all put back on his 15 colours with `reduce-colors` (2026-10-18) | `examples/games/likemario`, `examples/maps/map_scroll` (`res/kit.png`) |
 
 ### The machines' cycles

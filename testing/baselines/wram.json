@@ -232,8 +232,8 @@
     "rom_sha256": "777bed6b1ac003f815045c789602fa79afb7e918bcc3ddfda70d161f482bf617"
   },
   "windows_window": {
-    "stream": "71e2b1acc02ccb71ed39338b26aa77c2ce457d3fb8a7e7bac5416144bc2a8587",
-    "rom_sha256": "64ec22962f9eeb78dc320922259f8f1cb2df4edee57dcac45492810fee1ed7dc"
+    "stream": "b57df1ab53b6ea94ff0edaacffa1dee4d57ef1127c28a8f97fb25949a9d94ecc",
+    "rom_sha256": "1c7a5ba34379880082b7286603fa4d7bee6868f71e80969a1e96318a1bee7c47"
   },
   "windows_window_multi_hdma": {
     "stream": "3bbb2ac87e06ea8100ccb9d21df4d983054aef8bf5376a0055d7be858efdfc08",

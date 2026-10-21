@@ -1,45 +1,46 @@
 /**
  * @file main.c
- * @brief An HDMA-shaped window: masking layers, or framing colour math
+ * @brief An HDMA-shaped window: a torch beam in a dark alley, masking layers or lighting them
  * @ingroup examples
  *
- * Demonstrates the SNES window masking hardware combined with HDMA to create
- * a triangle-shaped cutout that clips background layers. Two backgrounds
- * are loaded (BG1 and BG2), and the user can apply the window mask to either
- * or both layers via button presses.
+ * Kit stands in a dark back alley with a torch. The beam is a window: its
+ * left edge (WH0) changes on every scanline, driven by HDMA, so the window
+ * is a cone that leaves the torch and opens to the right. Two backgrounds
+ * are loaded — the alley (BG1) and the rain falling in front of it (BG2) —
+ * and the buttons choose what the beam does to them.
  *
  * HDMA channels 4 and 5 drive WH0 ($2126) and WH1 ($2127) in repeat mode,
- * updating the left and right window boundaries every scanline to form a
- * diamond/triangle shape. The W12SEL register ($2123) controls which BG
- * layers are affected by Window 1, with the invert bit set so pixels
- * outside the triangle are masked (clipped to black).
+ * updating the left and right window boundaries every scanline. The W12SEL
+ * register ($2123) controls which BG layers are affected by Window 1, with
+ * the invert bit set so pixels outside the beam are masked (clipped to
+ * black). Kit is a sprite, and the window is not enabled on sprites: he
+ * stays visible in the dark.
  *
  * The same window has a second use: instead of hiding layers, it can mark
- * where colour math happens. Press Y and the triangle stops clipping and
- * darkens instead — colour math subtracts a fixed colour inside it only
- * (CGWSEL "inside the colour window"), the way a game draws a shadow or a
+ * where colour math happens. Press Y and the beam stops clipping and lights
+ * instead — colour math adds a warm fixed colour inside it only (CGWSEL
+ * "inside the colour window"), the way a game draws a light, a shadow or a
  * dialogue box over the scene.
  *
- * Ported from PVSnesLib's "Window" example; the shading mode is its
- * "TransparentWindow" example (by Digifox) on the triangle.
- * Uses the window module (windowEnable / windowSetInvert / windowSetMainMask)
- * with PVSnesLib's register values, so the frames match its original.
+ * Ported from PVSnesLib's "Window" example; the colour-math mode is its
+ * "TransparentWindow" example (by Digifox), adding instead of subtracting.
  *
  * @par SNES Concepts
  * - Window masking via W12SEL ($2123) and TMW ($212E) registers
- * - HDMA repeat mode for per-scanline WH0/WH1 updates
+ * - HDMA repeat mode for per-scanline WH0/WH1 updates, the table computed
+ *   at boot from the shape it draws
  * - Window inversion (mask outside vs inside the region)
  * - Runtime window reconfiguration via register writes
  * - The colour window (WOBJSEL) as the region of colour math (CGWSEL/CGADSUB)
- * - Fixed colour source (COLDATA, $2132) subtracted to darken
+ * - Fixed colour source (COLDATA, $2132) added to brighten
  *
  * @par What to Observe
- * - A triangle/diamond shape masks portions of the background layers
- * - Press A to apply window to BG1 only
- * - Press X to apply window to BG2 only
- * - Press B to apply window to both BG1 and BG2
- * - Press Y to shade the triangle instead: both layers stay visible and the
- *   triangle is darkened by colour math
+ * - At boot the alley and the rain are black but for the torch's beam
+ * - Press A: the beam on the alley only — the rain falls everywhere
+ * - Press X: the beam on the rain only — the alley is lit, the rain shows
+ *   only where the torch catches it
+ * - Press B: the beam on both again
+ * - Press Y: nothing is clipped, and the beam brightens what it falls on
  *
  * @par Modules Used
  * console, sprite, dma, input, background, window, hdma, colormath
@@ -53,71 +54,76 @@
  * Graphics Data (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
-/** @brief 4bpp tile data for background layer 1 (converted by the build from res/) */
-#include "res/bg1.inc"
-#include "res/bg2.inc"
-/* generated: bgN_tiles[], bgN_map[], bgN_pal[] (each with _end) and a BgAsset bgN */
-/** @brief Tilemap data for BG1 (32x32 grid) */
-/** @brief 16-color palette for BG1 */
+#include "res/alley.inc"
+#include "res/rain.inc"
+#include "res/kit.inc"
+/* generated: alley_tiles/_map/_pal, rain_tiles/_map/_pal, kit_tiles/_pal (each with _end) */
 
-/** @brief 4bpp tile data for background layer 2 (converted by the build from res/) */
-/** @brief Tilemap data for BG2 (32x32 grid) */
-/** @brief 16-color palette for BG2 (loaded to CGRAM palette slot 1) */
+/** @name VRAM layout (word addresses; a BG's tiles start on a $1000 boundary)
+ *  @{ */
+#define VRAM_BG1_MAP   0x0000   /**< the alley's map, 32x32 */
+#define VRAM_BG2_MAP   0x0400   /**< the rain's map, 32x32 */
+#define VRAM_BG1_TILES 0x1000   /**< the alley's 889 tiles, up to $478F */
+#define VRAM_BG2_TILES 0x5000   /**< the rain's tiles */
+#define VRAM_OBJ       0x6000   /**< Kit */
+/** @} */
+
+/** @name Kit and his torch
+ *  @{ */
+#define KIT_X   16   /**< Kit's sprite x */
+#define KIT_Y   168  /**< Kit's sprite y: his feet on the alley's ground */
+#define BEAM_X  44   /**< the beam's tip: the torch, at (27, 19) in his frame */
+#define BEAM_Y  187
+/** @} */
 
 /*============================================================================
- * HDMA Triangle Tables (in RAM)
- *
- * Plain globals: hdmaSetup() takes a far pointer and reads the bank from
- * it, so a const table in the asset banks would work just as well; these
- * stay in RAM because nothing here needs them in ROM.
+ * HDMA Beam Tables (in RAM, computed by buildBeam())
  *
  * Format: [count | 0x80] [data per scanline...]
  *   - 0x80 bit = repeat mode (HDMA reads one new byte per scanline)
  *   - Without 0x80 = non-repeat (same data held for count scanlines)
  *============================================================================*/
 
+/** @brief First line of the beam: it widens by one line every 3 pixels, so
+ *  at x 255 it spans BEAM_Y - 70 to the bottom of the screen */
+#define BEAM_TOP   (BEAM_Y - 70)
+/** @brief Lines of the beam, BEAM_TOP to the last visible line (223) */
+#define BEAM_LINES (224 - BEAM_TOP)
+
 /**
  * @brief HDMA table for the left window boundary (WH0, $2126).
  *
- * Defines a diamond/triangle shape: the left edge starts at x=0x7F (pixel 127,
- * center of screen), narrows toward x=0x60 (pixel 96) over 32 scanlines, then
- * widens back to 0x7F over 32 more scanlines. The 60-line header disables the
- * window above the triangle by setting WH0=0xFF (left > right = no window).
+ * BEAM_TOP lines with WH0 = 255 (left > right: no window), then one value a
+ * line for the beam — BEAM_X + 3 x |line - BEAM_Y|, the cone's edge, or 255
+ * where that is past the screen — then the end of the table.
  */
-u8 tablelefttriangle[] = {
-    60, 0xFF,           /**< 60 lines: WH0=255 (left > right -> window disabled) */
-    0x80 | 64,          /**< 64 lines of per-scanline entries (repeat mode) */
-    0x7F, 0x7E, 0x7D, 0x7C, 0x7B, 0x7A, 0x79, 0x78,
-    0x77, 0x76, 0x75, 0x74, 0x73, 0x72, 0x71, 0x70,
-    0x6F, 0x6E, 0x6D, 0x6C, 0x6B, 0x6A, 0x69, 0x68,
-    0x67, 0x66, 0x65, 0x64, 0x63, 0x62, 0x61, 0x60,
-    0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68,
-    0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,
-    0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
-    0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F,
-    0xFF, 0             /**< Tail: WH0=255 (disabled) + end-of-table marker */
-};
-
+u8 tablelefttriangle[2 + 1 + BEAM_LINES + 1];
 /**
  * @brief HDMA table for the right window boundary (WH1, $2127).
  *
- * Mirrors the left table: starts at x=0x81 (pixel 129), expands outward to
- * x=0xA0 (pixel 160) then converges back. Together with tablelefttriangle,
- * this creates a diamond shape centered at pixel 128 that is 64 scanlines tall.
+ * The cone reaches the right edge of the screen on every line it covers:
+ * WH1 = 255 there, and 0 (no window) above it.
  */
-u8 tablerighttriangle[] = {
-    60, 0x00,           /**< 60 lines: WH1=0 (left > right -> window disabled) */
-    0x80 | 64,          /**< 64 lines of per-scanline entries (repeat mode) */
-    0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88,
-    0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90,
-    0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x98,
-    0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, 0xA0,
-    0x9F, 0x9E, 0x9D, 0x9C, 0x9B, 0x9A, 0x99, 0x98,
-    0x97, 0x96, 0x95, 0x94, 0x93, 0x92, 0x91, 0x90,
-    0x8F, 0x8E, 0x8D, 0x8C, 0x8B, 0x8A, 0x89, 0x88,
-    0x87, 0x86, 0x85, 0x84, 0x83, 0x82, 0x81,
-    0x00, 0             /**< Tail: WH1=0 (disabled) + end-of-table marker */
-};
+u8 tablerighttriangle[2 + 1 + BEAM_LINES + 1];
+
+/** @brief Compute the two tables of the beam */
+static void buildBeam(void) {
+    u16 i, y, d, left;
+
+    tablelefttriangle[0] = BEAM_TOP;  tablelefttriangle[1] = 0xFF;   /* no window above */
+    tablerighttriangle[0] = BEAM_TOP; tablerighttriangle[1] = 0x00;
+    tablelefttriangle[2] = 0x80 | BEAM_LINES;                       /* one byte a line */
+    tablerighttriangle[2] = 0x80 | BEAM_LINES;
+    for (i = 0; i < BEAM_LINES; i++) {
+        y = BEAM_TOP + i;
+        d = (y > BEAM_Y) ? (u16)(y - BEAM_Y) : (u16)(BEAM_Y - y);
+        left = BEAM_X + 3 * d;
+        tablelefttriangle[3 + i] = (u8)(left > 255 ? 255 : left);
+        tablerighttriangle[3 + i] = 255;
+    }
+    tablelefttriangle[3 + BEAM_LINES] = 0;                           /* end of table */
+    tablerighttriangle[3 + BEAM_LINES] = 0;
+}
 
 /*============================================================================
  * W12SEL bit layout for Window 1:
@@ -128,7 +134,6 @@ u8 tablerighttriangle[] = {
  *
  * Precomputed masks: Enable + Invert (MSKOUT) for each BG combo
  *============================================================================*/
-
 /** @brief W12SEL value to enable Window 1 on BG1 with inversion (mask outside) */
 #define W12SEL_BG1  0x03   /* BG1: enable(0x02) + invert(0x01) */
 /** @brief W12SEL value to enable Window 1 on BG2 with inversion */
@@ -136,15 +141,14 @@ u8 tablerighttriangle[] = {
 /** @brief W12SEL value to enable Window 1 on both BG1 and BG2 with inversion */
 #define W12SEL_BOTH 0x33   /* Both BGs */
 
+/** @brief The rain's scroll: it falls a pixel left for four down */
+static u16 rain_x, rain_y;
+
 /**
  * @brief Configure HDMA-driven window masking on the specified BG layers.
  *
- * Sets up the SNES window hardware and HDMA channels to clip the specified
- * background layers using the triangle-shaped boundary tables, with the same
- * register values as PVSnesLib's setModeHdmaWindow().
- *
  * The window "inverts" masking (via the invert bits in W12SEL), so pixels
- * OUTSIDE the triangle shape are clipped to black, while pixels inside remain
+ * OUTSIDE the beam are clipped to black, while pixels inside remain
  * visible. This is the opposite of the default behavior (which masks inside).
  *
  * HDMA channels 4 and 5 are used (not 7, which carries every DMA of the NMI
@@ -155,59 +159,51 @@ u8 tablerighttriangle[] = {
  * @param w12sel_val  W12SEL register value specifying which BGs use Window 1
  */
 static void setup_window(u8 layers, u8 w12sel_val) {
+    u8 w1 = 0;
+
     /* Disable HDMA first to prevent partial table reads during reconfiguration */
     hdmaDisableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 
-    /* Masking mode: no colour math (the shading mode below turns it on) */
+    /* Masking mode: no colour math (the lighting mode below turns it on) */
     colorMathDisable();
 
-    /* Window 1, inverted (pixels OUTSIDE the triangle are clipped), on the
-     * BGs W12SEL names — and, as PVSnesLib's setModeHdmaWindow does, the same
-     * bits mirrored into WOBJSEL: OBJ with BG1, the colour window with BG2,
-     * through the window module. */
-    {
-        u8 w1 = 0;
-        if (w12sel_val & 0x02) w1 |= LAYER_BG1 | LAYER_OBJ;
-        if (w12sel_val & 0x20) w1 |= LAYER_BG2 | WINDOW_MATH;
-        windowDisableAll();
-        windowEnable(WINDOW_1, w1);
-        windowSetInvert(WINDOW_1, w1, 1);
-        windowSetMainMask(layers | LAYER_OBJ);
-    }
+    /* Window 1, inverted (pixels OUTSIDE the beam are clipped), on the BGs
+     * W12SEL names. Not on sprites: Kit stays visible in the dark. */
+    if (w12sel_val & 0x02) w1 |= LAYER_BG1;
+    if (w12sel_val & 0x20) w1 |= LAYER_BG2;
+    windowDisableAll();
+    windowEnable(WINDOW_1, w1);
+    windowSetInvert(WINDOW_1, w1, 1);
+    windowSetMainMask(layers);
 
     /* Configure HDMA: channel 4 drives WH0 (left boundary),
      * channel 5 drives WH1 (right boundary). Mode 1REG = one byte per
      * scanline written to the target register. */
-    hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0,
-              tablelefttriangle);
-    hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1,
-              tablerighttriangle);
+    hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0, tablelefttriangle);
+    hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1, tablerighttriangle);
     hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
 }
 
 /**
- * @brief Use the triangle as the region of colour math instead of a mask.
+ * @brief Use the beam as the region of colour math instead of a mask.
  *
  * The HDMA tables are the same; what changes is what the window is for.
  * No layer is clipped (TMW = 0): the colour window, not inverted, is the
- * triangle, and colour math subtracts a fixed grey (12, 12, 12) from BG1
- * and BG2 inside it only (CGWSEL bits 5-4 = 01). The registers are
- * PVSnesLib's TransparentWindow values, applied to both layers.
+ * beam, and colour math adds a warm fixed colour (6, 5, 2) to BG1 and BG2
+ * inside it only (CGWSEL bits 5-4 = 01). PVSnesLib's TransparentWindow
+ * subtracted, to darken; adding lights.
  */
-static void setup_shade(void) {
+static void setup_light(void) {
     hdmaDisableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
-
     windowDisableAll();
     windowEnable(WINDOW_1, WINDOW_MATH);           /* WOBJSEL $20: the colour window */
     windowSetMainMask(0);                          /* TMW $00: nothing is clipped */
-
     colorMathInit();
     colorMathSetCondition(COLORMATH_INSIDE);       /* CGWSEL bits 5-4 = 01 */
     colorMathSetSource(COLORMATH_SRC_FIXED);       /* CGWSEL bit 1 = 0 */
-    colorMathSetOp(COLORMATH_SUB);                 /* CGADSUB bit 7 */
+    colorMathSetOp(COLORMATH_ADD);                 /* CGADSUB bit 7 clear */
     colorMathSetLayers(LAYER_BG1 | LAYER_BG2);     /* CGADSUB bits 0-1 */
-    colorMathSetFixedColor(12, 12, 12);            /* COLDATA: R = G = B = 12 */
-
+    colorMathSetFixedColor(6, 5, 2);               /* COLDATA: a warm light */
     hdmaSetup(HDMA_CHANNEL_4, HDMA_MODE_1REG, HDMA_DEST_WH0, tablelefttriangle);
     hdmaSetup(HDMA_CHANNEL_5, HDMA_MODE_1REG, HDMA_DEST_WH1, tablerighttriangle);
     hdmaEnableMask((1 << HDMA_CHANNEL_4) | (1 << HDMA_CHANNEL_5));
@@ -218,10 +214,10 @@ static void setup_shade(void) {
  *============================================================================*/
 
 /**
- * @brief Entry point: HDMA triangle window masking with selectable BG layers.
+ * @brief Entry point: an HDMA beam window with selectable BG layers.
  *
- * Loads two BG layers, applies a diamond-shaped window mask via HDMA, and
- * enters a loop where button presses reconfigure which layers are clipped.
+ * Loads the alley, the rain and Kit, computes the beam, and enters a loop
+ * where button presses reconfigure what the beam does.
  *
  * @return Never returns (infinite loop).
  */
@@ -231,33 +227,33 @@ int main(void) {
     /* Force blank during setup — screen off prevents visible VRAM corruption */
     setScreenOff();
 
-    /*--------------------------------------------------------------------
-     * Load BG1: tiles at VRAM $4000, tilemap at $0000, palette slot 0
-     *--------------------------------------------------------------------*/
-    bgSetMapPtr(0, 0x0000, SC_32x32);
-    bgInitTileSet(0, bg1_tiles, bg1_pal, 0,
-                  bg1_tiles_end - bg1_tiles,
-                  PALETTE_16_SIZE, BG_16COLORS, 0x4000);
-    dmaCopyVram(bg1_map, 0x0000, bg1_map_end - bg1_map);
+    /* BG1: the alley, palette slot 0 */
+    bgSetMapPtr(0, VRAM_BG1_MAP, SC_32x32);
+    bgInitTileSet(0, alley_tiles, alley_pal, 0,
+                  alley_tiles_end - alley_tiles,
+                  PALETTE_16_SIZE, BG_16COLORS, VRAM_BG1_TILES);
+    dmaCopyVram(alley_map, VRAM_BG1_MAP, alley_map_end - alley_map);
 
-    /*--------------------------------------------------------------------
-     * Load BG2: tiles at VRAM $6000, tilemap at $1000, palette slot 1
-     *--------------------------------------------------------------------*/
-    bgSetMapPtr(1, 0x1000, SC_32x32);
-    bgInitTileSet(1, bg2_tiles, bg2_pal, 1,
-                  bg2_tiles_end - bg2_tiles,
-                  PALETTE_16_SIZE, BG_16COLORS, 0x6000);
-    dmaCopyVram(bg2_map, 0x1000, bg2_map_end - bg2_map);
+    /* BG2: the rain, palette slot 1 */
+    bgSetMapPtr(1, VRAM_BG2_MAP, SC_32x32);
+    bgInitTileSet(1, rain_tiles, rain_pal, 1,
+                  rain_tiles_end - rain_tiles,
+                  PALETTE_16_SIZE, BG_16COLORS, VRAM_BG2_TILES);
+    dmaCopyVram(rain_map, VRAM_BG2_MAP, rain_map_end - rain_map);
 
-    /*--------------------------------------------------------------------
-     * Video mode: Mode 1, enable BG1 + BG2
-     *--------------------------------------------------------------------*/
+    /* Kit, OBJ palette 0, a 32x32 sprite */
+    oamInitGfxSet(kit_tiles, kit_tiles_end - kit_tiles,
+                  kit_pal, kit_pal_end - kit_pal,
+                  0, VRAM_OBJ, OBJ_SIZE16_L32);
+    oamSet(0, KIT_X, KIT_Y, 0, 0, 3, 0);
+    oamSetSize(0, OBJ_LARGE);
+
+    /* Video mode: Mode 1, BG1 + BG2 + sprites */
     setMode(BG_MODE1, 0);
-    setMainScreen(TM_BG1 | TM_BG2);
+    setMainScreen(TM_BG1 | TM_BG2 | TM_OBJ);
 
-    /*--------------------------------------------------------------------
-     * Initialize triangle window on both BGs
-     *--------------------------------------------------------------------*/
+    /* The beam on both BGs */
+    buildBeam();
     setup_window(TM_BG1 | TM_BG2, W12SEL_BOTH);
 
     /* Turn on screen */
@@ -273,25 +269,30 @@ int main(void) {
     while (1) {
         WaitForVBlank();
 
-        /* A: window on BG1 only */
+        /* A: the beam on the alley only */
         if (padPressed(0) & KEY_A) {
             setup_window(TM_BG1, W12SEL_BG1);
         }
 
-        /* X: window on BG2 only */
+        /* X: the beam on the rain only */
         if (padPressed(0) & KEY_X) {
             setup_window(TM_BG2, W12SEL_BG2);
         }
 
-        /* B: window on both BGs */
+        /* B: the beam on both BGs */
         if (padPressed(0) & KEY_B) {
             setup_window(TM_BG1 | TM_BG2, W12SEL_BOTH);
         }
 
-        /* Y: the same triangle shades both BGs through colour math */
+        /* Y: the beam lights both BGs through colour math */
         if (padPressed(0) & KEY_Y) {
-            setup_shade();
+            setup_light();
         }
+
+        /* The rain falls: a pixel left every four frames, four down a frame */
+        rain_y -= 4;
+        if ((rain_y & 15) == 0) rain_x++;
+        bgSetScroll(1, rain_x, rain_y);
     }
 
     return 0;

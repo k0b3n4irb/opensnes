@@ -77,6 +77,11 @@ sprites/aseprite_pipeline:
   res/hero.json       the sheet's data as Aseprite's `--data --list-tags`
                       export writes it: per-frame durations, the two tags
 
+windows/window:
+  res/alley.png       a dark back alley at night (backgrounds/alley.png), BG1
+  res/rain.png        rain on nothing, 256x256 of a 128x128 motif, BG2
+  res/kit.png         Kit holding a torch, 32x32 (characters/kit_torch.png)
+
 windows/window_multi_hdma:
   res/city.png        the city from an aerial tram at dusk, 256x256 (the
                       mid towers at half size over a gradient, their
@@ -176,6 +181,7 @@ SPRITE_SIZES = ROOT / "examples" / "sprites" / "sprite_sizes" / "res"
 ASEPRITE = ROOT / "examples" / "sprites" / "aseprite_pipeline" / "res"
 MIXED = ROOT / "examples" / "scrolling" / "mixed_scroll" / "res"
 MULTI_HDMA = ROOT / "examples" / "windows" / "window_multi_hdma" / "res"
+WINDOW = ROOT / "examples" / "windows" / "window" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -742,6 +748,30 @@ def tram_view() -> Image.Image:
     return mode7_indexed(rgbim, colours)
 
 
+def alley_rain() -> Image.Image:
+    """windows/window's BG2: rain on nothing (colour 0 transparent), 256x256 of a 128x128 motif."""
+    rng = random.Random(15)
+    m = 128
+    a = [[0] * m for _ in range(m)]
+    for _ in range(60):                             # streaks falling a pixel left for four down
+        x, y, n = rng.randrange(m), rng.randrange(m), rng.choice((5, 6, 8))
+        for k in range(n):
+            a[(y + k) % m][(x - k // 4) % m] = 3 if k == n - 1 else (2 if k > n // 2 else 1)
+    im = Image.new("P", (256, 256), 0)
+    im.putpalette([0, 0, 0, 40, 72, 96, 88, 136, 168, 176, 224, 240] + [0] * 756)
+    im.putdata([a[y % m][x % m] for y in range(256) for x in range(256)])
+    return im
+
+
+def build_window() -> dict[str, bytes]:
+    """windows/window: the alley (BG1), its rain (BG2), Kit holding his torch."""
+    alley = Image.open(ART / "backgrounds" / "alley.png").convert("RGB")
+    colours = sorted(set(alley.getdata()), key=sum)
+    assert len(colours) <= 16, len(colours)
+    return {"alley.png": png(mode7_indexed(alley, colours)), "rain.png": png(alley_rain()),
+            "kit.png": png(sprite_sheet(Image.open(ART / "characters" / "kit_torch.png").convert("RGBA")))}
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -946,6 +976,7 @@ def main() -> int:
             (CONTINUOUS, continuous),
             (SPRITE_SIZES, build_sprite_sizes()),
             (ASEPRITE, build_aseprite_pipeline()),
+            (WINDOW, build_window()),
             (MULTI_HDMA, {"city.png": png(tram_view())}),
             (MIXED, {"logo.png": screen_logo(ART), "rain.png": png(rain())}),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),

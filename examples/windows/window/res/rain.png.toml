@@ -1,0 +1,6 @@
+tool = "opensnes-tileset"
+
+# the rain, BG2, palette slot 1 (colour 0 transparent)
+[convert]
+colors = 16
+palette-entry = 1
