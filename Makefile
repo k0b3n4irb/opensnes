@@ -503,7 +503,9 @@ BENCH_OUT  := /tmp/opensnes_bench
 luna-bench:
 	@scripts/install-luna.sh
 	@rm -rf $(BENCH_ROMS) && mkdir -p $(BENCH_ROMS)
-	@for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
+	@fw=$${XDG_CONFIG_HOME:-$$HOME/.config}/luna/firmware/dsp1b.rom; \
+	for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
+		if [ ! -f "$$fw" ] && grep -q '^USE_DSP1 *:\?= *1' $$d/Makefile; then echo "luna-bench: SKIP $$d (no $$fw)"; continue; fi; \
 		for r in $$d/*.sfc; do [ -f "$$r" ] && cp "$$r" "$(BENCH_ROMS)/$$(echo $$d | sed 's|examples/||; s|/|_|g').sfc"; done; done; \
 		echo "luna-bench: $$(ls $(BENCH_ROMS) | wc -l) ROMs"
 	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}

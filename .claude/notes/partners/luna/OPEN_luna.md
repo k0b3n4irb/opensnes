@@ -220,6 +220,18 @@ gives 41 ok, 0 bug, 0 suspect (its compatibility page still dates from
 42 files in 14 s (`luna test --jobs 0`). Asked: (a) run its oracles (dma,
 `profile --budget`, bench's "suspect" heuristic) on that corpus at each
 release; (b) `bench` has no `--jobs` (82 s, serial, where `luna test` does
-the same set in 14 s). Open: the ❌ bug verdict of our nightly bench run
-39567752990 is not identified yet (needs the artifact, `gh` auth), and is
-not reproduced on arm64 at `b6b1556b`.
+the same set in 14 s). luna answered the same day: yes to (a) for the DMA oracle and bench's
+"suspect" verdict, no to `profile --budget` (commercial games really lag, so
+an overrun does not point at luna); yes to (b), `bench --jobs N` with
+`luna test`'s semantics.
+
+The ❌ of run 39567752990 is `mode7/dsp1_ground`, and it is the firmware:
+CI has no `dsp1b.rom` (Nintendo's, not distributable), luna reports "CPU
+stuck in a 30-address loop… hang" plus "missing coprocessor firmware
+'dsp1b.rom' (inert)" and files it as ❌ bug, not 🔑 firmware. Reproduced on
+arm64 with `XDG_CONFIG_HOME=/nonexistent luna bench` (1 bug), ok with the
+firmware: not an architecture gap. Asked: when the firmware is missing, the
+verdict should be 🔑 firmware, whatever the CPU then does. Our side,
+`make luna-bench` skips the DSP-1 examples when the firmware is absent, as
+the manifests do. Small rub also sent: `bench` ignores `HDMADEMO.SMC`
+(upper-case extension) where `luna test` takes it — the 42nd file.
