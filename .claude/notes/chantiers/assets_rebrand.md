@@ -376,6 +376,19 @@ preview PNGs are gone. One trap: CGRAM 16-23 (BG3) must hold the first
 level's colours in the palette itself, as the game copies a level set only
 from the second level on. Both manifests pass unchanged.
 
+### continuous_scroll: Kit on the roofs (2026-10-21)
+
+From the likemario pieces, no new art: four roof pieces at one height
+(512 px, a 64x32 BG1), the far towers (BG2), Kit's idle and run frames.
+The example also changed what it teaches, as the needs table asked: BG2
+now scrolls at half BG1's speed (it moved with BG1, "parallax could use a
+slower increment"), the maps are loaded whole as 64x32 (only the first
+32x32 page was, so the scroll wrapped one screen), Kit stays on the roofs
+(no up and down), and the camera puts him back on the threshold by what
+he went past it (it pushed him back one pixel a frame while he ran two,
+so he ended at the edge of the screen). The manifest was rewritten on the
+new measurements.
+
 ## Open questions for the owner
 
 - Identity: a mascot, which world.

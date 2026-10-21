@@ -342,10 +342,10 @@
     "rom_sha256": "e6fd64fa737303ce96d81816e7ce3e8d14a6241d02ced70fffa801b7964c39f2"
   },
   "scrolling_continuous_scroll": {
-    "fbhash": "cddaea614547e147",
+    "fbhash": "1dea7d5cc353d841",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "b407ba1a0ba30bacf76fb5ddcf895307ea5ac283dbe329203700429d626a0173"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "663c93b6064129be06fc1d5b148580fc654f204bbf508b1c15b655e10a9d671b"
   },
   "scrolling_mixed_scroll": {
     "fbhash": [

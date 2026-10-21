@@ -60,6 +60,12 @@ mode7/mode7_racing (devtools/art_assets/racing.py):
   res/bikes.png       the three hover-bikes in one palette, 32x32 frames four
                       to a row: Kit's, then each rival's turned 0 to 90 degrees
 
+scrolling/continuous_scroll:
+  res/roofs.png       four roof pieces of likemario side by side at one
+                      height, 512x256
+  res/skyline.png     likemario's far towers, 512x256 (the parallax layer)
+  res/kit.png         Kit, 32x32: idle (frames 0-3) then run (4-11)
+
 games/breakout (devtools/art_assets/breakout.py), Neon Breaker, the bar's
 arcade cabinet, all drawn by the script in the tile numbering the game uses:
   res/tiles.png       128 4bpp tiles shared by BG1 and the sprites (the
@@ -139,6 +145,7 @@ ART = ROOT / "assets" / "neo-lumen"
 LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
 MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
+CONTINUOUS = ROOT / "examples" / "scrolling" / "continuous_scroll" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
@@ -554,6 +561,30 @@ def build_map_scroll() -> dict[str, bytes]:
             "_report": f"{width_px} px wide, {len(tiles)} tiles".encode()}
 
 
+def build_continuous_scroll(skyline: bytes) -> dict[str, bytes]:
+    """scrolling/continuous_scroll: one stretch of roofs 512 px wide, the far towers, Kit idle and running."""
+    pal = palette()
+    pieces = {n: load_piece(n, pal) for n in range(6)}
+    width_px, tiles, entries, _ = compose([((0, 3, 1, 4), 18, 0)], pieces)
+    cols = width_px // 8
+    roofs = Image.new("P", (width_px, 256), 0)
+    roofs.putpalette([v for c in pal for v in c] + [0] * (768 - 3 * len(pal)))
+    for cy in range(32):
+        for cx in range(cols):
+            t = tiles[entries[min(cy, ROWS - 1) * cols + cx]]       # the walls go on down past row 29
+            for k, v in enumerate(t):
+                roofs.putpixel((cx * 8 + k % 8, cy * 8 + k // 8), v)
+    # Kit: idle (frames 0-3) then run (12-19) of the side sheet, 32x32, four a row
+    sheet = Image.open(ART / "characters" / "kit_side_sheet.png")
+    kit = Image.new("P", (128, 96), 0)
+    kit.putpalette(sheet.getpalette())
+    for row, src in enumerate((0, 3, 4)):
+        drop = 4 if src else 0                      # the run frames' feet are 4 px higher than the idle's
+        kit.paste(sheet.crop((0, src * 32, 128, src * 32 + 32 - drop)), (0, row * 32 + drop))
+    return {"roofs.png": png(roofs), "skyline.png": skyline, "kit.png": png(kit),
+            "_report": f"{width_px} px wide, {len(tiles)} tiles".encode()}
+
+
 # The object engine's slope codes (lib/include/snes/map.h)
 T_SOLID, T_SLOPEU1, T_SLOPED1, T_SLOPELU2, T_SLOPELD2, T_SLOPEUU2, T_SLOPEUD2 = 0xFF00, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25
 # a slope tile's surface: the first filled row at each x (0..7)
@@ -745,6 +776,8 @@ def main() -> int:
     ground, sky = png(city["ground"]), png(city["sky"])
     plane, plane_tiles = extbg_plane(ART)
     arcade = build_breakout(font8())
+    likemario = build_likemario()
+    continuous = build_continuous_scroll(likemario["skyline.png"])
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
             (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART)),
             (GRADIENT_COLORS, {"logo.png": screen_logo(ART)}), (HDMA_HELPERS, {"logo.png": screen_logo(ART)}),
@@ -753,6 +786,7 @@ def main() -> int:
             (MODE7 / "perspective_rotate" / "res", {"ground.png": ground}),
             (MODE7 / "rotate_scale" / "res", {"mode7bg.png": ground, "glider.png": png(glider(ART))}),
             (MODE7 / "extbg" / "res", {"plane.png": png(plane), "orb.png": png(orb())}),
+            (CONTINUOUS, continuous),
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),
                         "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
                         "backpal.bin": arcade["backpal"]}),
@@ -761,6 +795,7 @@ def main() -> int:
                       "bikes.png": png(bikes(ART))})]
     print("likemario:", jobs[0][1].pop("_report").decode())
     print("map_scroll:", jobs[2][1].pop("_report").decode())
+    print("continuous_scroll:", continuous.pop("_report").decode())
     print("mapandobjects:", jobs[3][1].pop("_report").decode())
     print(f"mode7 city: {city['_tiles']} tiles, {city['_colours']} colours")
     print(f"mode7 extbg: {plane_tiles} tiles")

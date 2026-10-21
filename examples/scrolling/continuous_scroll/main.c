@@ -1,29 +1,29 @@
 /**
  * @file main.c
- * @brief Two-layer parallax scrolling with player sprite
+ * @brief A threshold camera over two layers in parallax: Kit runs on the roofs
  * @ingroup examples
  *
- * Demonstrates continuous horizontal scrolling with two independent background
- * layers moving at different speeds (parallax) and a player-controlled sprite.
- * BG1 and BG2 are loaded with separate tile sets and palettes in different
- * VRAM/CGRAM slots to avoid conflicts. The scroll position is updated each
- * frame based on player movement: when the sprite crosses a screen threshold,
- * the background auto-scrolls and the player is pushed back, creating a
- * camera-follow effect common in side-scrolling games. Scroll registers are
- * written via bgSetScroll(), which defers the actual PPU register write to the
- * NMI handler via a dirty-flag mechanism.
+ * Kit runs along a stretch of roofs 512 px wide (BG1, a 64x32 map) in front
+ * of the far towers (BG2). The camera follows him without a map engine:
+ * while he is between two thresholds of the screen he moves and the world
+ * stays; what he goes past one, the world scrolls instead and he is put
+ * back on it, so he keeps his place on screen while the roofs go by. BG2 scrolls
+ * at half BG1's speed, which is what makes the towers look far away.
+ * Scroll registers are written via bgSetScroll(), which defers the actual
+ * PPU register write to the NMI handler via a dirty flag.
  *
  * @par SNES Concepts
  * - Multi-layer parallax scrolling (BG1 + BG2 at independent speeds)
+ * - A 64x32 background map: two 32x32 pages side by side, 512 px of world
  * - Deferred scroll register writes via NMI dirty flags
  * - Multiple tile sets and palette slots in VRAM/CGRAM
- * - Sprite overlay on scrolling backgrounds
- * - Auto-scroll camera with player threshold tracking
+ * - A 32x32 sprite, animated and mirrored by its attribute's H-flip bit
  *
  * @par What to Observe
- * - Move the character with D-pad; background scrolls when near screen edges
- * - BG1 and BG2 scroll together (parallax could use different speeds)
- * - The sprite animates and moves freely within the scroll boundaries
+ * - Hold RIGHT: Kit runs to x 140 and stays there; the roofs scroll by
+ *   under him and the towers behind them follow at half the speed
+ * - At the end of the roofs the camera stops and Kit runs on to the edge
+ * - Release: Kit stands and breathes; LEFT runs back
  *
  * @par Modules Used
  * console, sprite, input, background, dma
@@ -37,74 +37,82 @@
  * Graphics Data (converted by the build from res/, one settings file beside each picture)
  *============================================================================*/
 
-/* BG1 - Main scrolling background */
-#include "res/BG1.inc"
-#include "res/BG2.inc"
-#include "res/character.inc"
-/* generated: BG1_tiles/_pal/_map, BG2_tiles/_pal/_map, character_tiles/_pal (each with _end) */
-
-/* BG2 - Sub scrolling background (parallax) */
-
-/* BG3 assets not used in this example */
-
-/* Character sprite */
+#include "res/roofs.inc"
+#include "res/skyline.inc"
+#include "res/kit.inc"
+/* generated: roofs_tiles/_pal/_map, skyline_tiles/_pal/_map, kit_tiles/_pal (each with _end) */
 
 /*============================================================================
  * Game State
  *============================================================================*/
 
 /** @name Scroll Configuration
- *  @brief Constants controlling the auto-scroll behavior
+ *  @brief Constants controlling the camera
  *  @{
  */
-#define MAX_SCROLL_X 512            /**< Maximum horizontal scroll (depends on tilemap size) */
-#define SCROLL_THRESHOLD_RIGHT 140  /**< When player X > this, scroll right */
-#define SCROLL_THRESHOLD_LEFT  80   /**< When player X < this, scroll left */
+#define MAX_SCROLL_X 256            /**< BG1's last scroll: 512 px of roofs minus one 256 px screen */
+#define SCROLL_THRESHOLD_RIGHT 140  /**< When Kit's x > this, scroll right */
+#define SCROLL_THRESHOLD_LEFT  80   /**< When Kit's x < this, scroll left */
 /** @} */
+
+/** @brief Kit's sprite y: his feet (row 30 of the frame) on the roofs (picture row 144, scrolled by 8) */
+#define KIT_Y        105
+/** @brief The frames in res/kit.png, 32x32, four a row: idle 0-3, run 4-11 */
+#define FRAME_IDLE   0
+#define FRAME_RUN    4
 
 /**
  * @struct GameState
  * @brief Centralized game state structure
  *
  * Coordinates are `s16` because the scroll thresholds subtract and compare
- * them: a signed type keeps "left of the threshold" a plain `<`. (This
- * comment used to claim that separate `static u16` coordinates were
- * miscompiled and that the struct was REQUIRED. That described a compiler
- * of early 2026; `examples/input/move_sprite` moves a sprite from plain
- * `u16` locals and its luna manifest pins the motion to the pixel.)
- *
- * @see animated_sprite example for reference implementation
+ * them: a signed type keeps "left of the threshold" a plain `<`.
  */
 typedef struct {
-    s16 player_x;       /**< Player X position (screen coords) */
-    s16 player_y;       /**< Player Y position (screen coords) */
+    s16 player_x;       /**< Kit's X position (screen coords) */
+    s16 player_y;       /**< Kit's Y position (screen coords) */
     s16 bg1_scroll_x;   /**< BG1 horizontal scroll offset */
     s16 bg1_scroll_y;   /**< BG1 vertical scroll offset */
-    s16 bg2_scroll_x;   /**< BG2 horizontal scroll offset (parallax) */
+    s16 bg2_scroll_x;   /**< BG2 horizontal scroll offset (parallax: half of BG1's) */
     s16 bg2_scroll_y;   /**< BG2 vertical scroll offset */
 } GameState;
 
 /** @brief Global game state instance with initial values */
-GameState game = {20, 100, 0, 32, 0, 32};
+GameState game = {20, KIT_Y, 0, 8, 0, 240};   /* BG2 at y 240 = -16: the towers 16 px lower */
+
+/** @brief Kit faces left (his frames face right; the sprite is mirrored) */
+static u8 facing_left;
+
+/**
+ * @brief The OAM tile number of frame @p f of the sheet
+ *
+ * A 32x32 frame is 4x4 tiles. VRAM rows of sprite tiles are 16 tiles wide,
+ * so a frame row of four is one VRAM row of tiles: frame f starts at
+ * column (f % 4) * 4 of tile row (f / 4) * 4.
+ */
+static u16 frame_tile(u16 f) {
+    return (u16)(((f & 3) << 2) + ((f >> 2) << 6));
+}
 
 /*============================================================================
  * Main Program
  *============================================================================*/
 
 /**
- * @brief Entry point -- two-layer parallax scrolling with player sprite.
+ * @brief Entry point -- a threshold camera over two layers in parallax.
  *
- * Loads two independent background layers (BG1 and BG2) with separate tile
- * sets and palette slots, plus a character sprite. Each frame, the D-pad
- * moves the player sprite; when the sprite crosses the scroll threshold,
- * the backgrounds auto-scroll and the sprite is pushed back, creating a
- * camera-follow effect. Scroll registers are deferred to the NMI handler
- * via bgSetScroll()'s dirty-flag mechanism for safe VBlank-only writes.
+ * Loads the roofs (BG1, 64x32), the far towers (BG2, 64x32) and Kit's
+ * frames, each in its own VRAM and CGRAM slot. Each frame, the D-pad moves
+ * Kit; past a threshold the camera scrolls instead, BG2 at half speed.
  *
  * @return Does not return (infinite loop).
  */
 int main(void) {
     u16 pad;              /**< Current joypad button state (read from hardware) */
+    u16 frame;            /**< Kit's current frame */
+    u16 tick = 0;         /**< Frames since the animation started */
+    u8 running;
+    s16 d;                /**< How far past a threshold Kit went this frame */
 
     consoleInit();
 
@@ -114,125 +122,107 @@ int main(void) {
     /*------------------------------------------------------------------------
      * Configure Background Tilemaps (where tilemap data goes in VRAM)
      *------------------------------------------------------------------------*/
-
-    /* BG1 tilemap at VRAM $0000, 32x32 tiles */
-    bgSetMapPtr(0, 0x0000, SC_32x32);
-
-    /* BG2 tilemap at VRAM $0800, 32x32 tiles */
-    bgSetMapPtr(1, 0x0800, SC_32x32);
-
-    /* BG3 disabled - this example focuses on parallax scrolling */
+    /* BG1 and BG2 maps, 64x32 each: two 32x32 pages (1024 words) side by side */
+    bgSetMapPtr(0, 0x0000, SC_64x32);
+    bgSetMapPtr(1, 0x0800, SC_64x32);
 
     /*------------------------------------------------------------------------
      * Load Background Tiles and Palettes
      *------------------------------------------------------------------------*/
+    /* BG1: the roofs' 600 tiles at $1000 (19 KB, up to $357F), palette slot 2 */
+    bgInitTileSet(0, roofs_tiles, roofs_pal, 2,
+                  roofs_tiles_end - roofs_tiles,
+                  roofs_pal_end - roofs_pal,
+                  BG_16COLORS, 0x1000);
 
-    /* BG1: tiles at $2000, palette at slot 2 (offset 32)
-     * BG1 tiles = 7552 bytes, occupies $2000-$3D7F */
-    bgInitTileSet(0, BG1_tiles, BG1_pal, 2,
-                  BG1_tiles_end - BG1_tiles,
-                  BG1_pal_end - BG1_pal,
-                  BG_16COLORS, 0x2000);
-
-    /* BG2: tiles at $4000, palette at slot 4 (offset 64)
-     * Must not overlap with BG1! */
-    bgInitTileSet(1, BG2_tiles, BG2_pal, 4,
-                  BG2_tiles_end - BG2_tiles,
-                  BG2_pal_end - BG2_pal,
+    /* BG2: the towers at $4000, palette slot 4. Must not overlap with BG1! */
+    bgInitTileSet(1, skyline_tiles, skyline_pal, 4,
+                  skyline_tiles_end - skyline_tiles,
+                  skyline_pal_end - skyline_pal,
                   BG_16COLORS, 0x4000);
 
-    /* BG3 disabled - not loading tiles */
+    /* The backdrop: the night behind the towers */
+    setColor(0, RGB(2, 3, 5));
 
     /*------------------------------------------------------------------------
-     * Load Tilemap Data
+     * Load Tilemap Data (both pages of each map, 4 KB each)
      *------------------------------------------------------------------------*/
-
-    /* Load initial tilemaps (first 2KB of each) */
-    dmaCopyVram(BG1_map, 0x0000, 2048);
-    dmaCopyVram(BG2_map, 0x0800, 2048);
+    dmaCopyVram(roofs_map, 0x0000, roofs_map_end - roofs_map);
+    dmaCopyVram(skyline_map, 0x0800, skyline_map_end - skyline_map);
 
     /*------------------------------------------------------------------------
      * Load Sprite Graphics
      *------------------------------------------------------------------------*/
-
-    /* Sprite tiles at $6000, palette 0 (colors 128-143) */
-    oamInitGfxSet(character_tiles, character_tiles_end - character_tiles,
-                  character_pal, character_pal_end - character_pal,
+    /* Kit's 12 frames at $6000, palette 0 (colors 128-143), 32x32 large sprites */
+    oamInitGfxSet(kit_tiles, kit_tiles_end - kit_tiles,
+                  kit_pal, kit_pal_end - kit_pal,
                   0, 0x6000, OBJ_SIZE16_L32);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode
      *------------------------------------------------------------------------*/
-
-    /* Mode 1 for parallax scrolling */
     setMode(BG_MODE1, 0);
-
-    /* Enable BG1, BG2, and sprites on main screen */
     setMainScreen(LAYER_BG1 | LAYER_BG2 | LAYER_OBJ);
 
-    /*------------------------------------------------------------------------
-     * Initialize Game State (values already set in global initializer)
-     *------------------------------------------------------------------------*/
-
-    /* Set initial sprite - tile 0, palette 0, priority 2 */
-    oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
-
-    /* Transfer OAM buffer to hardware before turning screen on */
+    oamSet(0, game.player_x, game.player_y, frame_tile(FRAME_IDLE), 0, 2, 0);
+    oamSetSize(0, OBJ_LARGE);
     oamUpdate();
 
-    /* Set initial scroll BEFORE enabling display.
-     * Hardware scroll defaults to (0,0). Without this, the first visible
-     * frame shows the tilemap at Y=0 instead of Y=32, causing a visible
-     * "jump" when the correct scroll is applied on the next frame. */
+    /* Set the initial scroll BEFORE enabling display, so the first frame
+     * already shows the right rows. */
     bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
     bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
 
-    /* Enable display at full brightness */
     setScreenOn();
 
     /*------------------------------------------------------------------------
      * Main Loop
      *------------------------------------------------------------------------*/
-
     while (1) {
         WaitForVBlank();
+
         pad = padHeld(0);
+        running = 0;
 
-        /* Handle vertical movement - player moves freely */
-        if (pad & KEY_UP) {
-            if (game.player_y > 32) game.player_y -= 2;
-        }
-        if (pad & KEY_DOWN) {
-            if (game.player_y < 200) game.player_y += 2;
-        }
-
-        /* Handle horizontal movement - player always moves when pressing D-pad */
+        /* Kit always moves when the D-pad is held */
         if (pad & KEY_LEFT) {
             if (game.player_x > 8) game.player_x -= 2;
+            facing_left = 1;
+            running = 1;
         }
         if (pad & KEY_RIGHT) {
-            if (game.player_x < 230) game.player_x += 2;
+            if (game.player_x < 216) game.player_x += 2;
+            facing_left = 0;
+            running = 1;
         }
 
-        /* PVSnesLib-style auto-scroll: when player passes threshold, scroll background */
-        /* and push player back to keep them visually centered */
+        /* The threshold camera: what Kit went past a threshold, the world
+         * scrolls instead, and he is put back on the threshold — so he keeps
+         * his place on screen while there are roofs to scroll to */
         if (game.player_x > SCROLL_THRESHOLD_RIGHT && game.bg1_scroll_x < MAX_SCROLL_X) {
-            game.bg1_scroll_x += 1;
-            game.bg2_scroll_x += 1;  /* Parallax: could use slower increment */
-            game.player_x -= 1;      /* Push player back to keep them in place */
+            d = game.player_x - SCROLL_THRESHOLD_RIGHT;
+            if (d > MAX_SCROLL_X - game.bg1_scroll_x) d = MAX_SCROLL_X - game.bg1_scroll_x;
+            game.bg1_scroll_x += d;
+            game.player_x -= d;
         }
         if (game.player_x < SCROLL_THRESHOLD_LEFT && game.bg1_scroll_x > 0) {
-            game.bg1_scroll_x -= 1;
-            game.bg2_scroll_x -= 1;
-            game.player_x += 1;      /* Push player forward to keep them in place */
+            d = SCROLL_THRESHOLD_LEFT - game.player_x;
+            if (d > game.bg1_scroll_x) d = game.bg1_scroll_x;
+            game.bg1_scroll_x -= d;
+            game.player_x += d;
         }
+        /* Parallax: the far layer moves half as fast */
+        game.bg2_scroll_x = game.bg1_scroll_x >> 1;
 
-        /* Update sprite position
-         * NOTE: Use oamSet() instead of oamSetXY() for reliable updates.
-         * The NMI handler automatically transfers OAM buffer to hardware
-         * when WaitForVBlank() is called, so no manual oamUpdate() needed.
-         */
-        oamSet(0, game.player_x, game.player_y, 0, 0, 2, 0);
+        /* Run: eight frames, five vblanks each; stand: four, twelve each */
+        tick++;
+        if (running)
+            frame = FRAME_RUN + (tick / 5) % 8;
+        else
+            frame = FRAME_IDLE + (tick / 12) % 4;
+
+        oamSet(0, game.player_x, game.player_y, frame_tile(frame), 0, 2,
+               facing_left ? OBJ_FLIPX : 0);
 
         /* Update scroll — bgSetScroll defers to NMI via dirty flag */
         bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);

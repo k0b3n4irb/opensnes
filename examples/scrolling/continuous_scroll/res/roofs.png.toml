@@ -1,7 +1,7 @@
 tool = "opensnes-tileset"
 
+# 512x256: two 32x32 pages, for a 64x32 BG1
 [convert]
 colors = 16
-palette-entry = 4
+palette-entry = 2
 pages = true
-priority = true

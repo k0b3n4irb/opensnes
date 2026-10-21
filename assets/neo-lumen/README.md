@@ -129,6 +129,16 @@ the city's colours start at 16. `res/orb.png`, the energy orb (O6), eight
 16x16 frames of a pulse, is drawn by the same script (`orb`). No new
 PixelLab call.
 
+### Kit on the roofs (continuous_scroll)
+
+`examples/scrolling/continuous_scroll`: `res/roofs.png` is roof pieces 0,
+3, 1 and 4 of likemario side by side at one height (512x256, 600 tiles),
+`res/skyline.png` likemario's far towers, `res/kit.png` the idle (0-3) and
+run (12-19) rows of `characters/kit_side_sheet.png`, the run frames moved
+4 px down so that Kit's feet are on the same row in both. Made by
+`devtools/art_assets/build.py` (`build_continuous_scroll`); no new
+PixelLab call.
+
 ### Neon Breaker (the arcade cabinet)
 
 `examples/games/breakout`: everything in `res/` is drawn by

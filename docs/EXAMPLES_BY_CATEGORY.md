@@ -63,7 +63,7 @@ Move a world past the camera.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_scrolling_mixed_scroll | Multiple BG layers at different scroll rates |
-| @subpage examples_scrolling_continuous_scroll | Streaming scroll with dynamic tile loading |
+| @subpage examples_scrolling_continuous_scroll | A threshold camera over two layers in parallax |
 | @subpage examples_scrolling_parallax_scroll | Per-scanline HDMA parallax scrolling |
 
 ---
