@@ -409,6 +409,15 @@ Two traps cost a screenshot each and are the SDK's, not the examples':
   months under a comment calling them signed; redone on 2026-10-22, it
   writes the sign and the magnitude itself. A `textPrintS16` would be the
   SDK's answer (a public header: its own lot, in a worktree).
+- `make tests` and `make lint-docs` do not run Doxygen. The Lint workflow's
+  `doc-render` job does, as `make docs-strict` (warnings are errors). It
+  failed on `47047fb1` (2026-10-22) and nobody looked until the owner asked.
+  Two mistakes caused it: `@name Title @{` on one line, where Doxygen reads
+  the `@{` as part of the title and the closing `@}` is left unbalanced
+  (game_skeleton, panel_hud), and a new function inserted between `main()`
+  and its doc block, which gave the function main's `@return` (save_game).
+  For each example rewritten, run `make docs-strict` before the commit, and
+  read the CI verdict after each push.
 
 ## Open questions for the owner
 

@@ -109,7 +109,8 @@
 
 #define MAX_HP 5
 
-/** @name Where Kit and the raccoon stand (top-left of their 32x32 sprites) @{ */
+/** @name Where Kit and the raccoon stand (top-left of their 32x32 sprites)
+ *  @{ */
 #define KIT_X 112
 #define KIT_Y 132
 #define NPC_X 112

@@ -84,7 +84,8 @@
 
 #define PLAYER_SPEED 2
 #define START_TIME   30     /**< seconds on the clock */
-/** @name The field Kit's pickup box may cover (inside the kerb, under the HUD) @{ */
+/** @name The field Kit's pickup box may cover (inside the kerb, under the HUD)
+ *  @{ */
 #define PX_MIN 16
 #define PX_MAX 232
 #define PY_MIN 32

@@ -88,22 +88,6 @@ u16 pad0;
 #define SAVE_SIZE 8
 
 /**
- * @brief Main entry point -- SRAM save/load demo with two slots.
- *
- * Sets up a text display with instructions and enters a loop where
- * each button performs a different SRAM operation:
- * - A: write test values to Slot 1
- * - B: read Slot 1 and display values as hex
- * - X: write different test values to Slot 2
- * - Y: read Slot 2 and display values as hex
- *
- * The SRAM region is battery-backed, so saved data persists across
- * power cycles on real hardware and across emulator sessions (if SRAM
- * saving is enabled in the emulator settings).
- *
- * @return 0 (never reached -- infinite game loop)
- */
-/**
  * @brief Write a slot's status in its card, and show Kit's icon there
  *
  * @param row The card's first text row (CARD1_ROW or CARD2_ROW)
@@ -128,6 +112,22 @@ static void show_slot(u8 row, u8 id, const char *what, const SaveState *s) {
     oamSet(id, 22, (u16)(row * 8), 0, 0, 3, 0);
 }
 
+/**
+ * @brief Main entry point -- SRAM save/load demo with two slots.
+ *
+ * Sets up a text display with instructions and enters a loop where
+ * each button performs a different SRAM operation:
+ * - A: write test values to Slot 1
+ * - B: read Slot 1 and display values as hex
+ * - X: write different test values to Slot 2
+ * - Y: read Slot 2 and display values as hex
+ *
+ * The SRAM region is battery-backed, so saved data persists across
+ * power cycles on real hardware and across emulator sessions (if SRAM
+ * saving is enabled in the emulator settings).
+ *
+ * @return 0 (never reached -- infinite game loop)
+ */
 int main(void) {
     textModeInit();                 /* Mode 0, the text on BG1, font at $0000 */
 
