@@ -84,10 +84,10 @@
     "rom_sha256": "3f7b1297714dfb961cc1cdb847c351868b463a4f9583095bcd98ef76b94240f3"
   },
   "basics_game_skeleton": {
-    "fbhash": "4960ffea16eaeb4d",
+    "fbhash": "1218d2ec94260063",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "13dc2cfd0cecc8d37150bc4fb8eb5c6cc4ba6b81628a91cf46b020bd1321c050"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "c8781f4e6dfaf6fdbdedaf80fe2378681baf1eaa7e0567e7ec32b30288516939"
   },
   "basics_panel_hud": {
     "fbhash": "c720030f282db315",

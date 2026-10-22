@@ -18,100 +18,146 @@
  * the same idea lifted into the opt-in `scene` framework once the enum +
  * switch starts to sprawl.
  *
- * The game: steer the arrow with the D-pad, touch the coin to score, before
- * the timer runs out. Zero assets — both sprites are built in C.
+ * The game: walk Kit across a square of the Rue basse with the D-pad and
+ * pick up the data shard before the timer runs out; each one picked up
+ * respawns elsewhere. The title and the game-over screens show the logo.
  *
  * ROM mode: LoROM (project default).
  *
  * @par Controls
  * - Title / Game over: START to begin / play again
- * - Play: D-pad to move; touch the coin to score
+ * - Play: D-pad to walk; reach the shard to score
  *
  * @par SNES Concepts
  * - The frame loop: WaitForVBlank -> read input -> update -> the NMI flushes
  * - A plain `enum` + `switch` state machine (title / play / over)
- * - Sprites (player + coin) via the OAM buffer; text HUD via the auto-flush
- * - Bounding-box collision; rngNext()/rngSeed() seeded for varied coin spawns
+ * - Mode 1: BG1 the play square, BG2 the logo, BG3 the text in front;
+ *   each screen picks its layers with setMainScreen()
+ * - Sprites (Kit + the shard) via the OAM buffer; text HUD via the auto-flush
+ * - Bounding-box collision on a pickup box smaller than the sprites;
+ *   rngNext()/rngSeed() seeded for varied shard spawns
  *
  * @par What to Observe
- * Title shows "PRESS START". In play, moving onto the coin bumps SCORE and
- * respawns it; TIME counts down; at zero the game-over screen shows the
- * final score. `game_state`, `score`, `time_left` are the probe oracles.
+ * Title shows the logo and "PRESS START". In play, Kit faces the way he
+ * walks; reaching the turning shard bumps SCORE and respawns it; TIME
+ * counts down; at zero the game-over screen shows the final score.
+ * `game_state`, `score`, `time_left` are the probe oracles.
  *
  * @par Modules Used
- * console, dma, background, sprite, text, input, tile
+ * console, dma, background, sprite, text, input
  *
  * @see examples/basics/scene_stack — the same idea via the `scene` framework
  */
 
 #include <snes.h>
-#include <snes/tile.h>   /* tileEncode4bpp */
 #include <snes/input.h>
+#include <snes/text.h>
+
+#include "res/field.inc"
+#include "res/logo.inc"
+#include "res/cast.inc"
+/* generated: field_, logo_ tiles/_pal/_map, cast_tiles/_pal (each with _end) */
 
 /** @brief Game states — the whole game is a switch over these. */
 #define ST_TITLE 0
 #define ST_PLAY  1
 #define ST_OVER  2
 
-#define SPR_VRAM   0x4000   /**< sprite tiles (text font is at $0000) */
-#define TILE_PLAYER 0
-#define TILE_COIN   1
+/** @name VRAM (word addresses): three maps, then each layer's tiles on a $1000 boundary
+ *  @{ */
+#define VRAM_BG1_MAP  0x0000   /**< the play square */
+#define VRAM_BG2_MAP  0x0400   /**< the logo */
+#define VRAM_BG3_MAP  0x0800   /**< the text */
+#define VRAM_BG1_GFX  0x1000
+#define VRAM_BG2_GFX  0x2000
+#define VRAM_BG3_FONT 0x3000
+#define SPR_VRAM      0x4000   /**< sprite tiles */
+/** @} */
+
+/** @name Frames of res/cast.png: Kit 32x32 four a row, then the shard 16x16
+ *  @{ */
+#define FRAME_DOWN  0          /**< Kit walking down: frames 0-4 */
+#define FRAME_UP    5          /**< walking up: 5-9 */
+#define FRAME_RIGHT 10         /**< walking right: 10-14; left mirrored */
+#define TILE_SHARD  256        /**< the shard's frame k is tile 256 + 2k */
+/** @} */
 
 #define PLAYER_SPEED 2
 #define START_TIME   30     /**< seconds on the clock */
-#define PX_MIN 8
-#define PX_MAX 240
-#define PY_MIN 24
-#define PY_MAX 208
+/** @name The field Kit's pickup box may cover (inside the kerb, under the HUD) @{ */
+#define PX_MIN 16
+#define PX_MAX 232
+#define PY_MIN 32
+#define PY_MAX 200
+/** @} */
 
 /** @brief Probe oracle: current state (0 title, 1 play, 2 over). */
 u8 game_state;
-/** @brief Probe oracle: coins collected. */
+/** @brief Probe oracle: shards collected. */
 u16 score;
 /** @brief Probe oracle: seconds remaining in a round. */
 u8 time_left;
 
-static u8 px, py;          /* player position */
-static u8 cx, cy;          /* coin position   */
+/* Kit's and the shard's pickup boxes are 8x8, top-left corner here; the
+ * sprites are drawn round them (Kit 32x32, the shard 16x16) */
+static u8 px, py;          /* Kit's box */
+static u8 cx, cy;          /* the shard's box */
 static u8 tick;            /* frame counter for the 1-second timer */
+static u8 anim;            /* frame counter for the walk and the shard's turn */
+static u8 facing;          /* FRAME_DOWN, FRAME_UP or FRAME_RIGHT */
+static u8 facing_left;     /* his right frames, mirrored */
+static u8 moving;          /* a direction was held this frame */
 static u16 seed_ctr;       /* advances on the title so each run differs */
 
-static u8 pixbuf[64];
-static u8 tilebuf[32];
-
-/** @brief Build an 8x8 tile from an 8-row bitmap, using palette index @p idx. */
-static void build_tile(const u8 *rows, u8 idx, u16 tile) {
-    u8 r, c;
-    for (r = 0; r < 8; r++)
-        for (c = 0; c < 8; c++)
-            pixbuf[r * 8 + c] = (u8)(((rows[r] >> (7 - c)) & 1) ? idx : 0);
-    tileEncode4bpp(pixbuf, tilebuf);
-    dmaCopyVram(tilebuf, (u16)(SPR_VRAM + tile * 16), 32);
+/**
+ * @brief The OAM tile of Kit's frame @p f: 32x32 frames are 4x4 tiles, and
+ * a row of OBJ tiles is 16 wide, so frame f starts at column (f % 4) * 4 of
+ * tile row (f / 4) * 4.
+ */
+static u16 kit_tile(u16 f) {
+    return (u16)(((f & 3) << 2) + ((f >> 2) << 6));
 }
 
-/** @brief Move the coin to a fresh pseudo-random spot. */
-static void spawn_coin(void) {
+/** @brief Move the shard to a fresh pseudo-random spot. */
+static void spawn_shard(void) {
     cx = (u8)(16 + (rngNext() % 216));
     cy = (u8)(PY_MIN + (rngNext() % (PY_MAX - PY_MIN)));
 }
 
-/** @brief Draw the two gameplay sprites into the OAM buffer. */
+/**
+ * @brief Draw the two gameplay sprites into the OAM buffer
+ *
+ * Kit's 32x32 frame is drawn 12 px left of and 20 px above his box, so
+ * the box sits at his feet; the shard's 16x16 frame is centred on its box.
+ * Kit walks through five frames while he moves (six vblanks each); the
+ * shard turns through eight (four vblanks each).
+ */
 static void draw_sprites(void) {
-    oamSetFast(0, px, py, TILE_PLAYER, 0, 3, 0);
-    oamSetFast(1, cx, cy, TILE_COIN,   1, 3, 0);
+    u16 f = facing;
+    if (moving)
+        f += (anim / 6) % 5;
+    oamSet(0, px - 12, py - 20, kit_tile(f), 0, 3, facing_left ? OBJ_FLIPX : 0);
+    oamSet(1, cx - 4, cy - 4, TILE_SHARD + 2 * ((anim / 4) % 8), 1, 2, 0);
 }
 
-/** @brief Title screen text. */
-static void show_title(void) {
+/** @brief Show the logo screen: BG2 and the text, no square, no sprites. */
+static void logo_screen(void) {
     textClear();
-    textPrintAt(10, 10, "TINY QUEST");
-    textPrintAt(8, 14, "PRESS START");
-    oamClear();               /* no gameplay sprites on the title */
+    oamClear();
+    setMainScreen(LAYER_BG2 | LAYER_BG3);
+}
+
+/** @brief Title screen: the logo, the game's name and the prompt. */
+static void show_title(void) {
+    logo_screen();
+    textPrintAt(11, 2, "SHARD RUN");
+    textPrintAt(10, 25, "PRESS START");
 }
 
 /** @brief Print the fixed HUD labels once (numbers refreshed as they change). */
 static void draw_hud_labels(void) {
     textClear();
+    setMainScreen(LAYER_BG1 | LAYER_BG3 | LAYER_OBJ);
     textPrintAt(2, 1, "SCORE");
     textPrintAt(18, 1, "TIME");
 }
@@ -132,13 +178,17 @@ static void draw_time(void) {
 
 /** @brief Enter the play state: reset score/timer, centre the player. */
 static void start_game(void) {
-    rngSeed(seed_ctr);          /* varied coin spawns per run */
+    rngSeed(seed_ctr);          /* varied shard spawns per run */
     score = 0;
     time_left = START_TIME;
     tick = 0;
     px = 120;
     py = 112;
-    spawn_coin();
+    facing = FRAME_DOWN;
+    facing_left = 0;
+    moving = 0;
+    oamSetSize(0, OBJ_LARGE);   /* the title's oamClear() reset the size bits */
+    spawn_shard();
     draw_hud_labels();
     draw_score();
     draw_time();
@@ -148,13 +198,12 @@ static void start_game(void) {
 
 /** @brief Game-over screen. */
 static void show_over(void) {
-    textClear();
-    textPrintAt(9, 10, "GAME OVER");
-    textPrintAt(8, 13, "SCORE");
-    textSetPos(14, 13);
+    logo_screen();
+    textPrintAt(11, 2, "GAME OVER");
+    textPrintAt(11, 4, "SCORE");
+    textSetPos(17, 4);
     textPrintU16(score);
-    textPrintAt(8, 16, "PRESS START");
-    oamClear();
+    textPrintAt(10, 25, "PRESS START");
     game_state = ST_OVER;
 }
 
@@ -162,18 +211,19 @@ static void show_over(void) {
 static void update_play(u16 held) {
     u8 dx, dy;
 
-    /* Move the player, clamped to the field. */
-    if ((held & KEY_LEFT)  && px > PX_MIN) px -= PLAYER_SPEED;
-    if ((held & KEY_RIGHT) && px < PX_MAX) px += PLAYER_SPEED;
-    if ((held & KEY_UP)    && py > PY_MIN) py -= PLAYER_SPEED;
-    if ((held & KEY_DOWN)  && py < PY_MAX) py += PLAYER_SPEED;
+    /* Move Kit, clamped to the field; he faces the way he walks. */
+    moving = 0;
+    if ((held & KEY_LEFT)  && px > PX_MIN) { px -= PLAYER_SPEED; facing = FRAME_RIGHT; facing_left = 1; moving = 1; }
+    if ((held & KEY_RIGHT) && px < PX_MAX) { px += PLAYER_SPEED; facing = FRAME_RIGHT; facing_left = 0; moving = 1; }
+    if ((held & KEY_UP)    && py > PY_MIN) { py -= PLAYER_SPEED; facing = FRAME_UP;    facing_left = 0; moving = 1; }
+    if ((held & KEY_DOWN)  && py < PY_MAX) { py += PLAYER_SPEED; facing = FRAME_DOWN;  facing_left = 0; moving = 1; }
 
-    /* Bounding-box overlap with the coin (both 8x8). */
+    /* Bounding-box overlap of the two pickup boxes (both 8x8). */
     dx = (u8)((px > cx) ? px - cx : cx - px);
     dy = (u8)((py > cy) ? py - cy : cy - py);
     if (dx < 8 && dy < 8) {
         score++;
-        spawn_coin();
+        spawn_shard();
         draw_score();
     }
 
@@ -192,23 +242,36 @@ static void update_play(u16 held) {
 }
 
 int main(void) {
-    textModeInit();                 /* BG_MODE0, text on BG1, font at $0000 */
-    setColor(0, RGB(1, 2, 6));      /* dark blue backdrop */
+    consoleInit();
+    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+    setColor(0, RGB(2, 3, 5));      /* the backdrop: the night behind the logo */
 
-    /* Build the two sprite tiles (arrow player, round coin). */
-    {
-        static const u8 player[8] = {0x18,0x3C,0x7E,0xFF,0x3C,0x3C,0x3C,0x00};
-        static const u8 coin[8]   = {0x00,0x3C,0x7E,0x7E,0x7E,0x3C,0x00,0x00};
-        build_tile(player, 1, TILE_PLAYER);
-        build_tile(coin,   1, TILE_COIN);
-    }
-    setColor(OBJ_CGRAM_BASE + 0 * 16 + 1, RGB(10, 28, 31));  /* player: cyan   */
-    setColor(OBJ_CGRAM_BASE + 1 * 16 + 1, RGB(31, 28,  6));  /* coin:   yellow */
+    /* BG1: the play square, palette slot 0; BG2: the logo, slot 1 */
+    bgInitTileSet(0, field_tiles, field_pal, 0, field_tiles_end - field_tiles,
+                  field_pal_end - field_pal, BG_16COLORS, VRAM_BG1_GFX);
+    bgInitTileSet(1, logo_tiles, logo_pal, 1, logo_tiles_end - logo_tiles,
+                  logo_pal_end - logo_pal, BG_16COLORS, VRAM_BG2_GFX);
+    bgSetMapPtr(0, VRAM_BG1_MAP, SC_32x32);
+    bgSetMapPtr(1, VRAM_BG2_MAP, SC_32x32);
+    dmaCopyVram(field_map, VRAM_BG1_MAP, field_map_end - field_map);
+    dmaCopyVram(logo_map, VRAM_BG2_MAP, logo_map_end - logo_map);
+    setColor(0, RGB(2, 3, 5));      /* bgInitTileSet loaded the square's colour 0 there */
 
-    oamInit(OBJ_SIZE8_L16, SPR_VRAM >> 13);
+    /* BG3: the text module's 2bpp font, palette slot 7, in front of both */
+    textLoadFont(VRAM_BG3_FONT);
+    textInit(VRAM_BG3_MAP, 0, 7);
+    text_config.priority = 1;
+    setColor(29, RGB(31, 31, 31));  /* slot 7, colour 1: white */
+    bgSetGfxPtr(2, VRAM_BG3_FONT);
+    bgSetMapPtr(2, VRAM_BG3_MAP, SC_32x32);
+
+    /* Sprites: Kit's walk and the shard, OBJ palettes 0 and 1; Kit is the
+     * LARGE size (32x32) of OBJ_SIZE16_L32, set by start_game(), the shard
+     * the small one */
+    oamInitGfxSet(cast_tiles, cast_tiles_end - cast_tiles,
+                  cast_pal, cast_pal_end - cast_pal,
+                  0, SPR_VRAM, OBJ_SIZE16_L32);
     oamClear();
-
-    setMainScreen(LAYER_BG1 | LAYER_OBJ);
 
     game_state = ST_TITLE;
     seed_ctr = 0;
@@ -222,6 +285,7 @@ int main(void) {
         WaitForVBlank();
         pressed = padPressed(0);
         held    = padHeld(0);
+        anim++;
 
         switch (game_state) {
         case ST_TITLE:

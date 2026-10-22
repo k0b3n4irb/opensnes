@@ -48,8 +48,8 @@
     "rom_sha256": "3f7b1297714dfb961cc1cdb847c351868b463a4f9583095bcd98ef76b94240f3"
   },
   "basics_game_skeleton": {
-    "stream": "dc2a0e4b5bb13567dc94dac3aae9fc3a8df6ac9c79be18946b78cff0bc2e4c0e",
-    "rom_sha256": "c32d1e867e74a4b68c63d675b1a9b1ee3f380dd68d961b0424485643c96459d0"
+    "stream": "7677c6c18ac3e7a13293f1843faaa256756fd14a0a7d9df069346cf6929f57bf",
+    "rom_sha256": "c8781f4e6dfaf6fdbdedaf80fe2378681baf1eaa7e0567e7ec32b30288516939"
   },
   "basics_panel_hud": {
     "stream": "a174b1236543c775781047ba04beb9bb3f2ee74c47cc4a7e49c3ba030af4b846",

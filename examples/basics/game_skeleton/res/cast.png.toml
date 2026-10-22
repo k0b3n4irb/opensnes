@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+# Kit's walk from above (32x32, OBJ palette 0) and the shard turning
+# (16x16, palette 1)
+[sheet]
+size = 32
+colors = 32

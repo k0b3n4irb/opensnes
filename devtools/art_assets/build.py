@@ -227,6 +227,7 @@ SWARM = ROOT / "examples" / "sprites" / "sprite_swarm" / "res"
 WORLD = ROOT / "examples" / "sprites" / "world_sprites" / "res"
 AIM = ROOT / "examples" / "basics" / "aim_target" / "res"
 COLLISION = ROOT / "examples" / "basics" / "collision_demo" / "res"
+SKELETON = ROOT / "examples" / "basics" / "game_skeleton" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1222,6 +1223,46 @@ def collision_sprites() -> Image.Image:
     return im
 
 
+# basics/game_skeleton: the play square (a piece of world_sprites' square with a kerb round
+# the field), the title's logo, Kit walking from above and a data shard turning
+def skeleton_field() -> Image.Image:
+    """256x224 on PLAZA's colours: the paving of the square round its ring, a kerb with its
+    cyan strip round the field Kit may walk (x 8-247, y 24-215: the HUD row is above)."""
+    im = plaza().crop((128, 112, 384, 336))
+    px = im.load()
+    for y in range(224):
+        for x in range(256):
+            d = min(x - 0, 255 - x, y - 16, 223 - y)
+            if y < 16 or d < 4:
+                px[x, y] = 0 if y < 16 else (6 if d == 0 else 5)  # the HUD band; the kerb
+            elif d < 6:
+                px[x, y] = 12 if d == 4 else 13
+    return im
+
+
+def skeleton_sprites() -> Image.Image:
+    """128 px wide: Kit's walk from above (32x32, four a row: 0-4 down, 5-9 up, 10-14
+    right, OBJ palette 0), then the data shard turning in eight 16x16 frames on the fifth
+    row (tile 256 + 2k, palette 1)."""
+    kit = Image.open(ART / "characters" / "topdown" / "kit_walk_sheet.png")
+    im = Image.new("P", (128, 160), 0)
+    for n in range(15):
+        fr = kit.crop((0, 32 * n, 32, 32 * n + 32))
+        im.paste(fr, ((n % 4) * 32, (n // 4) * 32))
+    shard = Image.open(ART / "props" / "shard.png").convert("RGBA")
+    colours = sorted({p[:3] for p in shard.getdata() if p[3] >= 128}, key=sum)
+    for k, fr in enumerate(spin(shard, 8)):
+        for y in range(16):
+            for x in range(16):
+                p = fr.getpixel((x, y))
+                if p[3] >= 128:
+                    c = min(range(len(colours)), key=lambda j: sum((a - b) ** 2 for a, b in zip(p[:3], colours[j])))
+                    im.putpixel((16 * k + x, 128 + y), 17 + c)
+    pal = kit.getpalette()[:48] + [0, 0, 0] + [v for c in colours for v in c]
+    im.putpalette(pal + [0] * (768 - len(pal)))
+    return im
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1485,6 +1526,8 @@ def main() -> int:
             (WORLD, {"plaza.png": png(plaza()), "residents.png": png(residents())}),
             (AIM, {"units.png": png(aim_sprites()), "roof.png": png(rooftop())}),
             (COLLISION, {"cells.png": png(warehouse_cells()), "cast.png": png(collision_sprites())}),
+            (SKELETON, {"field.png": png(skeleton_field()), "logo.png": screen_logo(ART),
+                        "cast.png": png(skeleton_sprites())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

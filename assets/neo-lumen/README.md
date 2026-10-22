@@ -176,6 +176,15 @@ in a neon frame (the library's font at three times its size, each letter on
 its own colour index, 8-14 of palette 0) and a coolant pipe (its liquid on
 indices 8-15 of palette 1, along x), for the example to rotate.
 
+### The play square (game_skeleton)
+
+`examples/basics/game_skeleton`: `res/field.png` is a piece of
+world_sprites' square round its ring (`skeleton_field` in
+`devtools/art_assets/build.py`) with a kerb round the field and a dark band
+for the HUD; `res/logo.png` the screen logo (`screen_logo`, `logo/`);
+`res/cast.png` (`skeleton_sprites`) Kit's walk from above and the data shard
+(`props/shard.png`) turning in eight frames (`spin`).
+
 ### The warehouse (collision_demo)
 
 `examples/basics/collision_demo`: `res/cells.png`, four 16x16 cells drawn

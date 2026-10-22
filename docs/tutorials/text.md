@@ -93,13 +93,13 @@ bite in every example that does more than print:
 
 - It ends with `setMainScreen(LAYER_BG1)`, so **sprites are off**. Call
   `setMainScreen(LAYER_BG1 | LAYER_OBJ)` afterwards if you want both, as
-  @ref examples_basics_game_skeleton does.
+  @ref examples_basics_aim_target does (with its roof on BG2 as well).
 - It puts the font at VRAM `$0000`, so **your sprite or BG tiles must go
-  somewhere else**. `game_skeleton` and @ref examples_basics_aim_target both
-  park sprite graphics at `$4000` for this reason:
+  somewhere else**. @ref examples_basics_aim_target parks its sprite
+  graphics at `$4000` for this reason:
 
   ```c
-  #define SPR_VRAM   0x4000   /**< sprite tiles (text font is at $0000) */
+  #define OBJ_VRAM   0x4000
   ```
 
 ## Setting up by hand
