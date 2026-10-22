@@ -1,0 +1,7 @@
+tool = "opensnes-tileset"
+
+# 512x512: four 32x32 pages, for a 64x64 BG1 (the world is 512x448)
+[convert]
+colors = 16
+pages = true
+flip = true

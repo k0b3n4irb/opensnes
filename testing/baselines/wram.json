@@ -216,8 +216,8 @@
     "rom_sha256": "37e566f824b02085c0415fced575cb6494a9c4aef22e0d6b5ec3c66b2e1952cc"
   },
   "sprites_world_sprites": {
-    "stream": "de60d85269560642721420ca07e481d91e7a5eee167860acf85dc39832fba033",
-    "rom_sha256": "9186205c94abccefe96f72e754b8700e6e1ba8debc6dfce1d781271a0285e694"
+    "stream": "bb8eaf9da51df11d02a8e9f3b469aeeb7d8b2c73834ef9a49d822844bd7dbe9b",
+    "rom_sha256": "a5329a4cc12ceb589e744f82b640237bd39066353c8cb7cd905e341dc756f9b8"
   },
   "text_pixel_text": {
     "stream": "5b798ce6c97f247edfc573d34b782ba04da7b1a35d6a2539f92466d500c764be",

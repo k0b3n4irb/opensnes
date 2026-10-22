@@ -55,7 +55,11 @@ and the character's own 15 colours as `target_palette`.
 `characters/topdown/<who>_<south|east|north|west>.png`: the first six
 registered as PixelLab characters with `create-character-v3` (`view: high
 top-down`, 4 directions, the front pose above as `reference_image`, seeds
-2000 to 2005 in the order Kit, raccoon, owl, pangolin, frog, rat).
+2000 to 2005 in the order Kit, raccoon, owl, pangolin, frog, rat). Their
+south and north views are the residents of `examples/sprites/world_sprites`
+(`res/residents.png`, laid out by `devtools/art_assets/build.py`'s
+`residents`: one OBJ palette each; the frog's two views, 17 colours
+together, quantized to 15).
 
 `characters/topdown/walk/<who>_<direction>_<0-4>.png`: a walk of five
 frames per direction for each of the six, `POST /characters/animations` in
@@ -172,6 +176,15 @@ in a neon frame (the library's font at three times its size, each letter on
 its own colour index, 8-14 of palette 0) and a coolant pipe (its liquid on
 indices 8-15 of palette 1, along x), for the example to rotate.
 
+### A square of the Rue basse (world_sprites)
+
+`examples/sprites/world_sprites`: `res/plaza.png`, 512x512, drawn by
+`devtools/art_assets/build.py` (`plaza`, colours `PLAZA`): running-bond
+paving slabs in two tones, a kerb with a cyan neon strip round the 512x448
+world, a pink ring inlaid at its centre, five manhole covers and five
+puddles holding a sign's neon. 275 tiles with mirrored blocks merged. No
+PixelLab call.
+
 ### The terminal's cursor (mouse)
 
 `examples/input/mouse`: `res/cursor.png`, a 16x16 arrow drawn pixel by pixel
@@ -211,7 +224,7 @@ places, seed 7200).
 |---|---|---|---|
 | `tiles/wang_track_gravel.png` | 16 Wang tiles of 16x16, asphalt (lower) to rooftop gravel (upper) with a red and white curb; keyed like the city's | `create-tileset`, standard, `high top-down`, `transition_size` 0.25, seed 7201 | the circuit |
 | `tiles/wang_gravel_lagoon.png` | the same from that gravel to the lagoon's water, a quay with amber lamps between, on the first set's gravel tile (`lower_base_tile_id`) | the same, seed 7202 | the infield and the border |
-| `props/shard.png` | a data shard, a faceted crystal, 16x16 | `generate-image-v2`, seed 140 (#6), the city's 15 colours with white | `examples/games/likemario`: turned into eight frames by `devtools/art_assets/build.py`; `examples/sprites/dynamic_sprite`: into twenty-four |
+| `props/shard.png` | a data shard, a faceted crystal, 16x16 | `generate-image-v2`, seed 140 (#6), the city's 15 colours with white | `examples/games/likemario`: turned into eight frames by `devtools/art_assets/build.py`; `examples/sprites/dynamic_sprite`: into twenty-four; `examples/sprites/world_sprites`: as is, the shards on the square |
 | `props/beacon.png` | a rooftop radio mast with a magenta beacon, 32x64 | `generate-image-v2`, seed 141 (#3), the same colours | `examples/games/likemario`: the goal, stamped on the last roof |
 | `props/roof_helipad.png`, `roof_aircon.png`, `roof_aircon_violet.png`, `roof_tank.png`, `roof_solar.png`, `roof_dish.png` | rooftop props from above, 32x32 | `generate-image-v2`, seeds 130 (#24), 131 (#1, #12), 132 (#52), 133 (#0), 134 (#2), the city's 15 colours with the curb's two | scattered on the gravel, solid |
 | `characters/racebike_kit.png`, `racebike_white.png`, `racebike_crimson.png` | Kit's racing hover-bike from above, pointing up, and two rivals in other colours; 11 colours for the three | `generate-image-v2`, seed 120 (#0, #23, #33), `glider.png` as `style_image` (its colours off), Kit's colours with the city's magenta, amber and violet | the three bikes; the rivals' turned frames are made from these by the script |

@@ -224,6 +224,7 @@ SUPERSCOPE = ROOT / "examples" / "input" / "superscope" / "res"
 MOUSE = ROOT / "examples" / "input" / "mouse" / "res"
 SHADOW_TINT = ROOT / "examples" / "color" / "shadow_tint" / "res"
 SWARM = ROOT / "examples" / "sprites" / "sprite_swarm" / "res"
+WORLD = ROOT / "examples" / "sprites" / "world_sprites" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -956,6 +957,107 @@ def mote() -> Image.Image:
     return im
 
 
+# sprites/world_sprites: a square of the Rue basse seen from above, 512x512 (the world is
+# 512x448; the 64x64 map's last 64 rows are never shown), and its residents.
+PLAZA = ["#06060c", "#0c0e18", "#161c2a", "#1a2232", "#222a3c", "#2a3044", "#3a4258", "#0a1220",
+         "#2a8090", "#a03070", "#e05090", "#5a2050", "#48d0e0", "#1a4858", "#3a3a48", "#5a5a6c"]
+RESIDENTS = ["kit", "frog", "owl", "pangolin", "raccoon", "rat"]
+
+
+def plaza() -> Image.Image:
+    """Running-bond slabs (32x16, two tones), a kerb with a cyan neon strip round the world's
+    edge, a pink neon ring inlaid at the centre (256, 224), manhole covers and puddles that
+    hold the neon. Index 0 is the backdrop, never drawn."""
+    W, H, WH = 512, 512, 448
+    im = Image.new("P", (W, H), 1)
+    im.putpalette([v for c in PLAZA for v in hexrgb_(c)] + [0] * (768 - 3 * len(PLAZA)))
+    px = im.load()
+    for y in range(H):
+        for x in range(W):
+            row = y // 16
+            sx = (x + (16 if row % 2 else 0)) % 32
+            if y % 16 == 15 or sx == 31:
+                v = 1                                       # the grout
+            else:
+                slab = ((x + (16 if row % 2 else 0)) // 32 + row * 3) % 5
+                v = 3 if slab in (1, 3) else 2
+                if y % 16 == 0 or sx == 0:
+                    v = 4                                   # the slab's lit edge
+            px[x, y] = v
+    # the kerb round the world, its neon strip on the inside
+    for y in range(H):
+        for x in range(W):
+            d = min(x, y, W - 1 - x, WH - 1 - y) if y < WH else 0
+            if y >= WH or d < 12:
+                px[x, y] = 6 if (d < 12 and d % 12 == 0) else 5
+                if y < WH and d < 12 and (x // 8 + y // 8) % 2 and d in (4, 5):
+                    px[x, y] = 6                            # the kerb's stones
+            elif d < 14:
+                px[x, y] = 12 if d == 12 else 13            # the cyan strip and its glow
+    cx, cy = 256, 224
+    for y in range(cy - 90, cy + 91):
+        for x in range(cx - 90, cx + 91):
+            r = math.hypot(x - cx, y - cy)
+            if 78 <= r < 81:
+                px[x, y] = 10                               # the ring
+            elif 76 <= r < 78 or 81 <= r < 84:
+                px[x, y] = 11                               # its glow on the stone
+            elif r < 6:
+                px[x, y] = 10 if r < 2.5 else 11
+    for gx, gy in ((88, 72), (416, 96), (120, 360), (392, 352), (256, 56)):
+        for y in range(gy - 8, gy + 8):                     # a manhole cover, 16x16
+            for x in range(gx - 8, gx + 8):
+                r = math.hypot(x - gx + 0.5, y - gy + 0.5)
+                if r < 7.5:
+                    px[x, y] = 15 if r >= 6.5 else (14 if (x + y) % 3 else 1)
+    for bx, by, rx, ry, glow in ((160, 120, 22, 9, 9), (360, 300, 28, 11, 8), (64, 260, 16, 7, 8),
+                                 (300, 400, 20, 8, 9), (440, 200, 14, 10, 9)):
+        for y in range(by - ry, by + ry + 1):               # a puddle and the neon in it
+            for x in range(bx - rx, bx + rx + 1):
+                e = ((x - bx) / rx) ** 2 + ((y - by) / ry) ** 2 + 0.12 * math.sin(x * 0.45)
+                if e < 1.0:
+                    px[x, y] = 7
+                    if y in (by - 2, by + 1) and abs(x - bx) < rx * (0.6 if y < by else 0.4) and (x + y) % 4:
+                        px[x, y] = glow                     # the neon of a sign, broken by ripples
+                    elif y == by - 1 and abs(x - bx) < rx * 0.3:
+                        px[x, y] = 12 if glow == 8 else 10
+    return im
+
+
+def residents() -> Image.Image:
+    """The six residents from above, 32x32, four frames a row: frame 2k the resident k facing
+    south (walking down), 2k + 1 facing north; resident k on OBJ palette 1 + k (colour index
+    16 (1 + k) + c). The data shard, 16x16 on palette 0, is the first block of the fourth
+    row (tile 192). 128 px wide: one row of the sheet is one row of OBJ tiles."""
+    td = ART / "characters" / "topdown"
+    im = Image.new("P", (128, 128), 0)
+    pal = [(0, 0, 0)] * 112
+    def put(src, pal_no, ox, oy, colours):
+        for k, c in enumerate(colours):
+            pal[pal_no * 16 + 1 + k] = c
+        for y in range(src.height):
+            for x in range(src.width):
+                p = src.getpixel((x, y))
+                if p[3] >= 128:
+                    k = min(range(len(colours)), key=lambda j: sum((a - b) ** 2 for a, b in zip(p[:3], colours[j])))
+                    im.putpixel((ox + x, oy + y), pal_no * 16 + 1 + k)
+    for k, name in enumerate(RESIDENTS):
+        frames = [Image.open(td / f"{name}_{d}.png").convert("RGBA") for d in ("south", "north")]
+        colours = sorted({p[:3] for f in frames for p in f.getdata() if p[3] >= 128}, key=sum)
+        if len(colours) > 15:                               # two looks of one resident on one palette
+            q = Image.new("RGB", (64, 32))
+            for i, f in enumerate(frames):
+                q.paste(f.convert("RGB"), (32 * i, 0))
+            colours = sorted({c for c in q.quantize(15, method=Image.Quantize.MEDIANCUT).convert("RGB").getdata()}, key=sum)
+        for i, f in enumerate(frames):
+            n = 2 * k + i
+            put(f, 1 + k, (n % 4) * 32, (n // 4) * 32, colours)
+    shard = Image.open(ART / "props" / "shard.png").convert("RGBA")
+    put(shard, 0, 0, 96, sorted({p[:3] for p in shard.getdata() if p[3] >= 128}, key=sum))
+    im.putpalette([v for c in pal for v in c] + [0] * (768 - 3 * len(pal)))
+    return im
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1216,6 +1318,7 @@ def main() -> int:
                 Image.open(ART / "backgrounds" / "alley.png").convert("RGB"),
                 sorted(set(Image.open(ART / "backgrounds" / "alley.png").convert("RGB").getdata()), key=sum)))}),
             (PALETTE_CYCLE, {"sign.png": png(neon_sign())}),
+            (WORLD, {"plaza.png": png(plaza()), "residents.png": png(residents())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
