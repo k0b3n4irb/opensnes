@@ -176,6 +176,13 @@ in a neon frame (the library's font at three times its size, each letter on
 its own colour index, 8-14 of palette 0) and a coolant pipe (its liquid on
 indices 8-15 of palette 1, along x), for the example to rotate.
 
+### The save terminal (save_game)
+
+`examples/memory/save_game`: `res/terminal.png`, a terminal's bezel and
+glass with scanlines and the outlines of two slot cards, four colours
+(BG2 of Mode 0), drawn by `devtools/art_assets/build.py` (`terminal`);
+`res/icon.png` is `logo/kit_icon.png` (`save_icon`).
+
 ### The play square (game_skeleton)
 
 `examples/basics/game_skeleton` (and `basics/scene_stack`, the same field and logo): `res/field.png` is a piece of

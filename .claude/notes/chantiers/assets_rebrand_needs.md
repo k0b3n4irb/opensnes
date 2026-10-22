@@ -192,7 +192,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 | Exemple | Capacité | Aujourd'hui | Verdict | Scène | Assets |
 |---|---|---|---|---|---|
 | memory/hirom_demo | construire en HiROM (`USE_HIROM`) | texte, police en ligne | **G** — ligne 15 ; aucun asset nécessaire au-delà de F1 | — | F1 |
-| memory/save_game | SRAM : 2 emplacements, sauver/charger | texte | **R** — un vrai écran de sauvegarde (cases, icône, nom du quartier) : c'est le cas d'usage | la borne de sauvegarde d'un terminal | U1, K5, F1 |
+| memory/save_game | SRAM : 2 emplacements, sauver/charger | texte | **R** — un vrai écran de sauvegarde (cases, icône, nom du quartier) : c'est le cas d'usage | la borne de sauvegarde d'un terminal ; **fait le 2026-10-22** : l'écran du terminal en BG2 (Mode 0, 2bpp, `terminal`), deux cartes d'emplacement, l'icône de Kit dans la carte d'un emplacement utilisé ; les données et les manifestes SRAM inchangés | U1, K5, F1 |
 
 ### chips (8 → 2)
 

@@ -1,0 +1,6 @@
+tool = "opensnes-sprite"
+
+# Kit's icon, 32x32, OBJ palette 0
+[sheet]
+size = 32
+colors = 16

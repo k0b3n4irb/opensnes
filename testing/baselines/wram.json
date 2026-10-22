@@ -152,8 +152,8 @@
     "rom_sha256": "552a5a6ffad18daa19e8357b1f0ffeab43e2bd42baa87e2489634eb9a40a8016"
   },
   "memory_save_game": {
-    "stream": "937d28298efda2640ae92610fe5a773636b822103ded109143fa3d19c8675263",
-    "rom_sha256": "1cd55aded9ae19ca4f6faa2433658e04b612b7c340591b8245af59c0278d232a"
+    "stream": "8558b74875be78000aed3c19ed205525bd2b7ab92cc5746b261a322ba0b3fc49",
+    "rom_sha256": "de663338c7cac623e4a619023455fd6d1da294319ddb665008d951df14c90b91"
   },
   "mode7_dsp1_ground": {
     "stream": "3ccc656ab9801acbf340ba7de6ba8d9010fff84b9117f4ad475dee8f299cb8b3",

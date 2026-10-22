@@ -92,3 +92,19 @@ luna pin: "per-window shift --max-shift" must return a passage that names
 - **Needed:** a passage the corpus can serve for "which way is V in DSP-1
   Project", with that provenance and status (measured on the firmware,
   agreeing with bsnes's HLE).
+
+## 2026-10-22 — a question naming Mode 0 is answered with Modes 4 and 5
+
+- **Asked:** `snes_search("Mode 0 BG priority order: is BG1 drawn in front
+  of BG2 at equal tile priority? Mode 0 per-BG palettes BG2 CGRAM 32-63",
+  exclude_sources=["opensnes-docs","opensnes-notes-tech"], k=4)`.
+- **Came back:** anomie-regs "BACKGROUNDS / Mode 4" (`943bda46218f4492`)
+  and "Mode 5" (`881c669572ec8717`), each with its sfc-dev-wiki copy.
+  There was no Mode 0 passage among the four.
+- **What answered:** a second query phrased like the passage's own
+  heading ("BACKGROUNDS Mode 0: four 4-color BGs…", `authority_min=arbitre`)
+  returned anomie-regs "BACKGROUNDS / Mode 0" (`2e7870254dc96b2d`) first.
+  That passage states the point (BG1 priority-1 tiles before BG2's;
+  palette `ppp*4 + (BG#-1)*32`).
+- **Needed:** a query naming a BG mode ("Mode 0") should rank that mode's
+  section above the other modes' sections, which share most of their words.

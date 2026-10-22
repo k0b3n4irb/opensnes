@@ -230,6 +230,7 @@ COLLISION = ROOT / "examples" / "basics" / "collision_demo" / "res"
 SKELETON = ROOT / "examples" / "basics" / "game_skeleton" / "res"
 SCENE_STACK = ROOT / "examples" / "basics" / "scene_stack" / "res"
 PANEL_HUD = ROOT / "examples" / "basics" / "panel_hud" / "res"
+SAVE_GAME = ROOT / "examples" / "memory" / "save_game" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1322,6 +1323,41 @@ def panel_residents() -> Image.Image:
     return im
 
 
+# memory/save_game: the save terminal of the Rue basse (BG2 of Mode 0, 2bpp) and Kit's icon
+TERMINAL = ["#000000", "#0a1a22", "#1a3038", "#48d0e0"]
+TERMINAL_CARDS = ((13, 16), (19, 22))   # the slot cards, in text rows (8 px), inclusive
+
+
+def terminal() -> Image.Image:
+    """256x224, four colours: the terminal's bezel (2) round its glass (1, every other
+    line a shade lighter: index 2, the scanlines), a cyan rule under the title row and
+    the outlines of the two slot cards (3). The text module writes on BG1, over it."""
+    im = Image.new("P", (256, 224), 0)
+    im.putpalette([v for c in TERMINAL for v in hexrgb_(c)] + [0] * 756)
+    for y in range(224):
+        for x in range(256):
+            bezel = x < 8 or x >= 248 or y < 4 or y >= 212
+            c = 2 if bezel else (2 if y % 4 == 0 else 1)
+            if not bezel and y == 22:
+                c = 3                                        # the rule under the title
+            for top, bottom in TERMINAL_CARDS:
+                y0, y1 = top * 8 - 4, bottom * 8 + 11
+                if 16 <= x <= 239 and y0 <= y <= y1:
+                    if x in (16, 239) or y in (y0, y1):
+                        c = 3                                # the card's outline
+                    elif 20 <= x <= 55 and y0 + 4 <= y <= y0 + 39:
+                        c = 1                                # the icon's well
+            im.putpixel((x, y), c)
+    return im
+
+
+def save_icon() -> Image.Image:
+    """Kit's head, 32x32 (logo/kit_icon.png), indexed on its 8 colours (OBJ palette 0)."""
+    icon = Image.open(ART / "logo" / "kit_icon.png").convert("RGBA")
+    cols = sorted({p[:3] for p in icon.getdata() if p[3] >= 128}, key=sum)
+    return on_palette(icon, cols)
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1590,6 +1626,7 @@ def main() -> int:
             (SCENE_STACK, {"field.png": png(skeleton_field()), "logo.png": screen_logo(ART)}),
             (PANEL_HUD, {"noodlebar.png": png(indexed_scene("noodlebar.png")), "boxes.png": png(panel_sheet()),
                          "residents.png": png(panel_residents())}),
+            (SAVE_GAME, {"terminal.png": png(terminal()), "icon.png": png(save_icon())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

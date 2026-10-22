@@ -288,10 +288,10 @@
     "rom_sha256": "5b71782e116d32cf4be507d0ad13d2ff0b047e5552d4079957ab2377c8e5ab1f"
   },
   "memory_save_game": {
-    "fbhash": "d46556c594dbfe15",
+    "fbhash": "2b8ed20f6316b07e",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "14308b0c2187edac0d5ca053ee4e3fe6e92f27bdb3afbd0a22e03712fe019043"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "de663338c7cac623e4a619023455fd6d1da294319ddb665008d951df14c90b91"
   },
   "mode7_dsp1_ground": {
     "fbhash": [
