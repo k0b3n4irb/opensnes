@@ -226,6 +226,7 @@ SHADOW_TINT = ROOT / "examples" / "color" / "shadow_tint" / "res"
 SWARM = ROOT / "examples" / "sprites" / "sprite_swarm" / "res"
 WORLD = ROOT / "examples" / "sprites" / "world_sprites" / "res"
 AIM = ROOT / "examples" / "basics" / "aim_target" / "res"
+COLLISION = ROOT / "examples" / "basics" / "collision_demo" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1146,6 +1147,81 @@ def rooftop() -> Image.Image:
     return im
 
 
+# basics/collision_demo: a warehouse of the Rue basse, 16x16 cells (the example builds
+# its map from its collision array), Kit walking from above and the security drones
+WAREHOUSE = ["#06060c", "#141820", "#1a2028", "#222a34", "#2c3440", "#3a2410", "#6a4420", "#a06828",
+             "#d09838", "#202838", "#384458", "#586a80", "#48d0e0", "#e05090", "#f0c040", "#0c0e14"]
+
+
+def warehouse_cells() -> Image.Image:
+    """Four 16x16 cells side by side (64x16, converted without reduction so that cell k is
+    tiles 2k, 2k + 1, 8 + 2k, 9 + 2k): 0 the concrete floor, 1 a crate seen from above,
+    2 a wall plate with its cyan light, 3 the floor with a drain grate."""
+    im = Image.new("P", (64, 16), 0)
+    im.putpalette([v for c in WAREHOUSE for v in hexrgb_(c)] + [0] * (768 - 3 * len(WAREHOUSE)))
+    rnd = random.Random(2210)
+    for k in range(4):
+        for y in range(16):
+            for x in range(16):
+                if k in (0, 3):
+                    c = 2 if rnd.random() < 0.8 else rnd.choice((1, 3))
+                    if x == 15 or y == 15:
+                        c = 1                                    # the slabs' joints
+                    if k == 3 and 3 <= x <= 11 and 3 <= y <= 11:
+                        c = 4 if x in (3, 11) or y in (3, 11) else (15 if x % 2 else 1)  # a drain grate
+                elif k == 1:
+                    edge = x in (0, 15) or y in (0, 15)
+                    c = 5 if edge else (7 if (y // 3) % 2 else 6)  # boards
+                    if (x - y) in (0, 1) or (x + y) in (14, 15):
+                        c = 8 if not edge else 5                 # the straps, a cross
+                    if x in (1, 14) and y in (1, 14):
+                        c = 8
+                    if 10 <= x <= 13 and 2 <= y <= 3:
+                        c = 13                                   # a neon shipping tag
+                else:
+                    c = 10 if x % 4 else 9                       # corrugated metal
+                    if y in (0, 15):
+                        c = 11
+                    if y in (7, 8):
+                        c = 12 if y == 7 else 15                 # the light strip and its shade
+                im.putpixel((16 * k + x, y), c)
+    return im
+
+
+def collision_sprites() -> Image.Image:
+    """collision_demo's OBJ sheet, 128 px wide, 32x32 frames four a row: Kit's walk from
+    above (frames 0-4 down, 5-9 up, 10-14 right, OBJ palette 0) then the drone's hover
+    (15-18, palette 1). Palette 2 is the drone's with its pink lights green: the colour of
+    a drone the player touches."""
+    kit = Image.open(ART / "characters" / "topdown" / "kit_walk_sheet.png")
+    walk = ART / "characters" / "walk"
+    drone = strip_sheet([walk / f"drone_{i}.png" for i in range(4)], "MACHINE")
+    im = Image.new("P", (128, 160), 0)
+    kpal = kit.getpalette()[:48]
+    for n in range(15):
+        fr = kit.crop((0, 32 * n, 32, 32 * n + 32))
+        for y in range(32):
+            for x in range(32):
+                v = fr.getpixel((x, y))
+                if v:
+                    im.putpixel(((n % 4) * 32 + x, (n // 4) * 32 + y), v)
+    for n in range(4):
+        fr = drone.crop((32 * n, 0, 32 * n + 32, 32))
+        for y in range(32):
+            for x in range(32):
+                v = fr.getpixel((x, y))
+                if v:
+                    m = 15 + n
+                    im.putpixel(((m % 4) * 32 + x, (m // 4) * 32 + y), 16 + v)
+    dpal = drone.getpalette()[:48]
+    greens = {"#601838": "#185830", "#a02860": "#28a050", "#e05090": "#60f090"}
+    mach = ["#080810", "#101828", "#203048", "#384050", "#586878", "#8898a8", "#b0c0d0",
+            "#601838", "#a02860", "#e05090", "#684018", "#b07028", "#f0b050", "#28a0b0", "#e8e8f0"]
+    apal = [0, 0, 0] + [v for c in mach for v in rgb(greens.get(c, c))]
+    im.putpalette(kpal + dpal + apal + [0] * (768 - 144))
+    return im
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1408,6 +1484,7 @@ def main() -> int:
             (PALETTE_CYCLE, {"sign.png": png(neon_sign())}),
             (WORLD, {"plaza.png": png(plaza()), "residents.png": png(residents())}),
             (AIM, {"units.png": png(aim_sprites()), "roof.png": png(rooftop())}),
+            (COLLISION, {"cells.png": png(warehouse_cells()), "cast.png": png(collision_sprites())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

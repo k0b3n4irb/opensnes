@@ -176,6 +176,17 @@ in a neon frame (the library's font at three times its size, each letter on
 its own colour index, 8-14 of palette 0) and a coolant pipe (its liquid on
 indices 8-15 of palette 1, along x), for the example to rotate.
 
+### The warehouse (collision_demo)
+
+`examples/basics/collision_demo`: `res/cells.png`, four 16x16 cells drawn
+by `devtools/art_assets/build.py` (`warehouse_cells`, colours `WAREHOUSE`):
+the concrete floor, a crate seen from above (boards, a cross of straps, a
+neon tag), a wall plate of corrugated metal with its cyan light, the floor
+with a drain grate. `res/cast.png` (`collision_sprites`) lays out Kit's walk
+from above (`characters/topdown/kit_walk_sheet.png`) and the drone's hover
+(`characters/walk/drone_*.png` on the cast's MACHINE colours), with a third
+palette where the drone's pink lights are green.
+
 ### The turret on the roof (aim_target)
 
 `examples/basics/aim_target`: `res/units.png` and `res/roof.png`, by

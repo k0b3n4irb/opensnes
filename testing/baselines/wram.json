@@ -44,8 +44,8 @@
     "rom_sha256": "65991e352eaa7cccb5a45309176d3c89e02394fce5b6f975a28a3e1bd2d0e5e6"
   },
   "basics_collision_demo": {
-    "stream": "7cfd9c53b9ac71f0bf5d3f21264f14eaf12e6a9201bf385e1cb99e5e69612022",
-    "rom_sha256": "361ffebaa25121a6fd3ac8ade24f0a29734418d7aaf25a9ac07caeacc719cf77"
+    "stream": "7e1a4c661eead34e809f9cc3d9a604b0fb56534b5d1e4e24b23528eb32879ed5",
+    "rom_sha256": "3f7b1297714dfb961cc1cdb847c351868b463a4f9583095bcd98ef76b94240f3"
   },
   "basics_game_skeleton": {
     "stream": "dc2a0e4b5bb13567dc94dac3aae9fc3a8df6ac9c79be18946b78cff0bc2e4c0e",

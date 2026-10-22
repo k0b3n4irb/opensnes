@@ -5,31 +5,35 @@
  *
  * Demonstrates the OpenSNES collision module with two complementary
  * techniques: axis-aligned bounding box (AABB) tests between sprites, and
- * tile-based collision against a static map. A white player sprite moves
- * through a walled arena while four red enemy sprites sit at fixed
- * positions. Collisions are detected every frame and indicated by color
- * changes (white -> green). Wall collisions use corner-point checks against
- * a 16x14 collision map, with per-axis rejection so the player can slide
- * along walls.
+ * tile-based collision against a map. Kit walks through a warehouse of the
+ * Rue basse, between wall plates and stacks of crates, while four security
+ * drones hover at fixed places. Collisions are detected every frame: a
+ * drone Kit touches turns its lights green. Wall collisions use corner-point
+ * checks against a 16x14 collision map of 16x16 cells, with per-axis
+ * rejection so that Kit slides along walls.
  *
- * The example also illustrates the direct oamMemory[] write pattern instead
- * of calling oamSet() per sprite, which avoids the 158-byte stack frame
- * overhead of oamSet() and keeps the main loop fast enough for 5 sprites
- * at 60 fps.
+ * The collision map is also the picture: the example builds BG1's tilemap
+ * from it at boot (a wall plate, a crate or the floor for each cell), so
+ * what Kit bumps into is exactly what is drawn.
+ *
+ * A hitbox is not a sprite. Kit is a 32x32 sprite; what collides is a
+ * 16x16 box at his feet, and the sprite is drawn around it. The drones'
+ * boxes are their bodies, smaller than their frames too.
  *
  * @par SNES Concepts
  * - AABB collision via collideRect() for sprite-vs-sprite overlap testing
- * - Tile collision via collideTile() for sprite-vs-map wall rejection
- * - Direct OAM buffer writes (oamMemory[]) with oam_update_flag for NMI DMA
- * - OAM high table management (bytes 512+) for X high bit and sprite size
- * - Separate sprite palette banks for normal and collision-highlight colors
- * - Mode 0 BG with hand-coded wall/empty tiles for the collision arena
+ * - Tile collision via collideTileEx() (16x16 cells) for sprite-vs-map
+ *   wall rejection
+ * - A tilemap built from game data in force blank: one DMA a row
+ * - A hitbox smaller than its sprite, and the sprite drawn from the box
+ * - A palette per state: the same tiles, OBJ palette 1 or 2
  *
  * @par What to Observe
- * - Move the white square with D-pad through the gray-walled arena
- * - The player cannot pass through walls; it slides along them
- * - When the player overlaps a red enemy, both turn green
- * - Multiple simultaneous collisions are tracked independently
+ * - Walk Kit with the D-pad: he faces the way he walks (left is his right
+ *   frames mirrored) and takes steps while he moves
+ * - He cannot pass through the crates or the walls; he slides along them
+ * - When his box overlaps a drone's, the drone's lights turn green
+ * - Two drones can be touched at once; each is tracked on its own
  *
  * @par Modules Used
  * console, input, sprite, dma, collision, background
@@ -41,178 +45,103 @@
 #include <snes/collision.h>
 #include "vram_map.h"  /* generated VRAM bases (devtools/vram_layout) */
 
-/* oamMemory[] and oam_update_flag declared in <snes/system.h> (via <snes.h>) */
+#include "res/cells.inc"
+#include "res/cast.inc"
+/* generated: cells_tiles/_pal, cast_tiles/_pal (each with _end) */
 
 /*============================================================================
  * Game Objects
  *============================================================================*/
 
-#define PLAYER_SIZE  8  /**< Player sprite width/height in pixels (8x8) */
-#define ENEMY_SIZE   8  /**< Enemy sprite width/height in pixels (8x8) */
-#define NUM_ENEMIES  4  /**< Number of static enemy sprites in the arena */
-#define PLAYER_SPEED 2  /**< Player movement speed in pixels per frame */
+#define BOX_SIZE     16  /**< Kit's and the drones' hitboxes, 16x16 pixels */
+#define NUM_ENEMIES  4   /**< Number of drones in the warehouse */
+#define PLAYER_SPEED 2   /**< Kit's speed in pixels per frame */
 
-/** @brief Player X position in screen coordinates */
+/** @name Sprite frames in res/cast.png (32x32, four a row)
+ *  @{ */
+#define FRAME_DOWN   0   /**< Kit walking down: frames 0-4 */
+#define FRAME_UP     5   /**< walking up: 5-9 */
+#define FRAME_RIGHT  10  /**< walking right: 10-14; left is the same, mirrored */
+#define FRAME_DRONE  15  /**< the drone's hover: 15-18 */
+/** @} */
+
+/** @name OBJ palettes
+ *  @{ */
+#define PAL_KIT        0
+#define PAL_DRONE      1  /**< pink lights */
+#define PAL_DRONE_SEEN 2  /**< the same drone, its lights green: Kit is touching it */
+/** @} */
+
+/** @brief Kit's hitbox, top-left corner, in screen coordinates */
 static s16 player_x;
-/** @brief Player Y position in screen coordinates */
+/** @brief Kit's hitbox, top-left corner, Y */
 static s16 player_y;
-/** @brief Player bounding box for AABB collision tests via collideRect() */
+/** @brief Kit's bounding box for AABB collision tests via collideRect() */
 static Rect player_box;
 
-/** @brief X positions of the four static enemy sprites */
+/** @brief Drones' hitboxes, top-left corner X */
 static s16 enemy_x[NUM_ENEMIES];
-/** @brief Y positions of the four static enemy sprites */
+/** @brief Drones' hitboxes, top-left corner Y */
 static s16 enemy_y[NUM_ENEMIES];
-/** @brief Bounding boxes for each enemy, rebuilt every frame for collideRect() */
+/** @brief Bounding boxes for each drone, rebuilt every frame for collideRect() */
 static Rect enemy_box[NUM_ENEMIES];
 
 /**
- * @brief Bitmask tracking which enemies the player is currently overlapping
+ * @brief Bitmask tracking which drones Kit is currently overlapping
  *
- * Bit N is set when the player's AABB overlaps enemy N. Used to switch
- * both the player and the colliding enemy to the green "collision" palette.
+ * Bit N is set when Kit's box overlaps drone N's. It picks each drone's
+ * palette (PAL_DRONE or PAL_DRONE_SEEN).
  */
 static u8 collision_flags;
 
+/** @brief The way Kit faces: FRAME_DOWN, FRAME_UP or FRAME_RIGHT (with facing_left) */
+static u8 facing;
+/** @brief Kit faces left: his right frames, mirrored */
+static u8 facing_left;
+/** @brief Frames since boot, for the walk and the hover */
+static u16 tick;
+
 /*============================================================================
- * Tile Collision Map (16x14 tiles, 8x8 pixels each = 128x112 area)
+ * Tile Collision Map (16x14 cells, 16x16 pixels each = the whole screen)
  *============================================================================*/
 
-#define MAP_WIDTH  16  /**< Collision map width in 8x8 tiles */
-#define MAP_HEIGHT 14  /**< Collision map height in 8x8 tiles */
+#define MAP_WIDTH  16  /**< Collision map width in 16x16 cells */
+#define MAP_HEIGHT 14  /**< Collision map height in 16x16 cells */
+#define CELL       16  /**< A cell's size in pixels, as collideTileEx() is told */
+
+/** @name Cell values: 0 passable, anything else solid
+ *  @{ */
+#define FLOOR 0
+#define CRATE 1
+#define WALL  2
+/** @} */
 
 /**
- * @brief Tile-based collision map (16x14 = 224 bytes, 128x112 pixel area)
+ * @brief Tile-based collision map (16x14 = 224 bytes, 256x224 pixels)
  *
- * A flat 2D array where 1 = solid wall and 0 = passable. The map is stored
- * in row-major order. collideTile() converts a pixel coordinate to a tile
- * index (px/8) and looks up this array to determine if the tile is solid.
- * The border is all walls with internal platforms at symmetric positions.
+ * Row-major, one byte a cell: FLOOR is passable, CRATE and WALL are solid
+ * (collideTileEx() returns the value; the example only asks "non-zero").
+ * The two solid kinds differ only in how they are drawn.
  *
- * @note `const`, so it lives in ROM and costs zero WRAM. collideTile()
+ * @note `const`, so it lives in ROM and costs zero WRAM. collideTileEx()
  *       takes a `const u8 *`, and const-qualified loads compile to
  *       bank-honouring far reads — the map may sit in any bank.
  */
 static const u8 collision_map[MAP_WIDTH * MAP_HEIGHT] = {
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  /* Top wall */
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,  /* Platforms */
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1,  /* Center platform */
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,1,1,0,0,0,0,0,0,1,1,0,0,1,  /* Platforms */
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  /* Bottom wall */
-};
-
-/** @brief Screen X offset where the collision map starts (centers the 128px map on 256px screen) */
-#define MAP_OFFSET_X 64
-/** @brief Screen Y offset where the collision map starts (centers the 112px map on 224px screen) */
-#define MAP_OFFSET_Y 56
-
-/*============================================================================
- * Sprite Graphics
- *============================================================================*/
-
-/**
- * @brief Player sprite tile (8x8, 4bpp = 32 bytes) — TRON-style wireframe
- *
- * A 1-pixel outlined square in palette color 1 (white). Top/bottom rows
- * fully lit (0xFF), middle rows light only the left/right edges (0x81 =
- * b10000001). 4bpp format: 8 rows of [bp0 bp1], then 8 rows of [bp2 bp3].
- */
-static const u8 player_tile[] = {
-    /* Bitplanes 0,1: outlined square in color 1 */
-    0xFF,0x00, 0x81,0x00, 0x81,0x00, 0x81,0x00,
-    0x81,0x00, 0x81,0x00, 0x81,0x00, 0xFF,0x00,
-    /* Bitplanes 2,3: all zero */
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-};
-
-/**
- * @brief Enemy sprite tile (8x8, 4bpp = 32 bytes) — TRON-style wireframe
- *
- * A 1-pixel outlined square in palette color 2 (red). Same outline pattern
- * as the player tile but on bitplane 1 instead of bitplane 0.
- */
-static const u8 enemy_tile[] = {
-    /* Bitplanes 0,1: outlined square in color 2 */
-    0x00,0xFF, 0x00,0x81, 0x00,0x81, 0x00,0x81,
-    0x00,0x81, 0x00,0x81, 0x00,0x81, 0x00,0xFF,
-    /* Bitplanes 2,3: all zero */
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-};
-
-/**
- * @brief Wall background tile (8x8, 2bpp = 16 bytes)
- *
- * An outlined square: border pixels use color 1 (gray), interior is
- * color 0 (black/transparent). This provides visual feedback for the
- * collision map walls while the collision logic uses the separate
- * collision_map[] array.
- */
-static const u8 wall_tile[] = {
-    /* TRON-style 1-pixel outline: top/bottom rows full, middle rows edges only */
-    0xFF,0x00, 0x81,0x00, 0x81,0x00, 0x81,0x00,
-    0x81,0x00, 0x81,0x00, 0x81,0x00, 0xFF,0x00,
-};
-
-/** @brief Empty background tile (8x8, 2bpp = 16 bytes, all zeros = transparent) */
-static const u8 empty_tile[] = {
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-    0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
-};
-
-/** @brief BG palette (2 BGR555 colors): black background + gray walls */
-static const u8 bg_palette[] = {
-    0x00, 0x00,  /* Color 0: Black (background) */
-    0x94, 0x52,  /* Color 1: Gray (walls) */
-};
-
-/*============================================================================
- * Sprite Palette
- *============================================================================*/
-
-/**
- * @brief Sprite palette 0 -- normal state (CGRAM offset 128, 16 colors)
- *
- * Loaded at CGRAM byte offset 128 (sprite palette bank 0). Color 0 is
- * transparent (ignored by PPU for sprites), color 1 = white (player),
- * color 2 = red (enemy), color 3 = green (unused in normal state).
- */
-static const u8 sprite_palette[] = {
-    0x00, 0x00,  /* Color 0: Transparent */
-    0xFF, 0x7F,  /* Color 1: White (player) - BGR555: max all channels */
-    0x1F, 0x00,  /* Color 2: Red (enemy) - BGR555: B=0,G=0,R=31 */
-    0xE0, 0x03,  /* Color 3: Green - BGR555: B=0,G=31,R=0 */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/**
- * @brief Sprite palette 1 -- collision highlight (CGRAM offset 144)
- *
- * When a collision is detected, the sprite's OAM attribute byte is
- * switched to palette bank 1, turning both the player and enemy green
- * as visual feedback. Colors 1 and 2 are both green so both the player
- * tile (color 1) and enemy tile (color 2) appear highlighted.
- */
-static const u8 collision_palette[] = {
-    0x00, 0x00,  /* Color 0: Transparent */
-    0xE0, 0x03,  /* Color 1: Green (player colliding) */
-    0xE0, 0x03,  /* Color 2: Green (enemy colliding) */
-    0xFF, 0x7F,  /* Color 3: White */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  /* The north wall */
+    2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+    2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+    2,0,0,1,1,0,0,0,0,0,0,1,1,0,0,2,  /* Crate stacks */
+    2,0,0,1,1,0,0,0,0,0,0,1,1,0,0,2,
+    2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+    2,0,0,0,0,0,1,1,1,1,0,0,0,0,0,2,  /* The middle stack */
+    2,0,0,0,0,0,1,1,1,1,0,0,0,0,0,2,
+    2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+    2,0,0,1,1,0,0,0,0,0,0,1,1,0,0,2,  /* Crate stacks */
+    2,0,0,1,1,0,0,0,0,0,0,1,1,0,0,2,
+    2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+    2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  /* The south wall */
 };
 
 /*============================================================================
@@ -220,129 +149,97 @@ static const u8 collision_palette[] = {
  *============================================================================*/
 
 /**
- * @brief Load all tile and palette data into VRAM/CGRAM via DMA
+ * @brief The OAM tile of frame @p f of res/cast.png
  *
- * Called once during initialization with screen off (force blank).
- * Loads BG tiles (empty + wall) at VRAM $0000, sprite tiles (player +
- * enemy) at VRAM $4000, and sets up both BG and sprite color palettes.
- * Sprite palettes are loaded at CGRAM offsets 128 and 144 (banks 0 and 1).
+ * A 32x32 frame is 4x4 tiles and a row of OBJ tiles is 16 wide, so frame f
+ * (four a row of the sheet) starts at column (f % 4) * 4 of tile row
+ * (f / 4) * 4. Frames 16 and up are past tile 255: the second OBJ name
+ * table, which oamSet() reaches through the tile's ninth bit.
  */
-static void load_graphics(void) {
-    setScreenOff();
-
-    /* Load BG tiles via DMA (tile 0 = empty, tile 1 = wall) */
-    dmaCopyVram((u8 *)empty_tile, VRAM_BG_TILES, 16);
-    dmaCopyVram((u8 *)wall_tile, VRAM_BG_TILES + 8, 16);
-
-    /* Load sprite tiles via DMA */
-    dmaCopyVram((u8 *)player_tile, VRAM_OBJ_TILES, 32);
-    dmaCopyVram((u8 *)enemy_tile, VRAM_OBJ_TILES + 0x10, 32);
-
-    /* Load palettes via DMA */
-    dmaCopyCGram((u8 *)sprite_palette, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
-    dmaCopyCGram((u8 *)collision_palette, OBJ_CGRAM_PAL(1), PALETTE_16_SIZE);
-    dmaCopyCGram((u8 *)bg_palette, 0, 4);
+static u16 frame_tile(u16 f) {
+    return (u16)(((f & 3) << 2) + ((f >> 2) << 6));
 }
 
 /**
- * @brief Render the collision map as BG tiles in VRAM
+ * @brief Build BG1's tilemap from the collision map, in force blank
  *
- * First clears the entire 32x32 BG1 tilemap at VRAM $0400 with tile 0
- * (empty), then writes the 16x14 collision map into the tilemap at an
- * offset that centers it on screen. Each collision_map[] entry of 1
- * becomes BG tile 1 (wall outline), and 0 stays as tile 0 (empty).
- *
- * VRAM writes are done via direct PPU register access (REG_VMDATAL/H),
- * which only works during forced blank or VBlank.
+ * Each cell is 2x2 tiles of res/cells.png: cell k of the picture (0 floor,
+ * 1 crate, 2 wall, 3 floor with a drain) is tiles 2k, 2k + 1 above
+ * 8 + 2k, 9 + 2k. A floor cell gets the drain now and then, chosen from its
+ * position so the floor is not one repeated slab. One row of 32 map entries
+ * is built in RAM and sent with one DMA, 28 times.
  */
-static void draw_tilemap(void) {
-    u8 tx, ty;
-    u16 addr;
-    u8 tile;
+static void build_tilemap(void) {
+    static u16 row[32];
+    u8 tx, ty, half;
+    u8 cell;
 
-    REG_VMAIN = VMAIN_INC1;
-
-    /* Clear entire 32x32 tilemap at $0400 with tile 0 (empty) */
-    dmaFillVRAM(0, VRAM_BG_TILEMAP, 1024 * 2);
-
-    /* Draw collision map tiles */
     for (ty = 0; ty < MAP_HEIGHT; ty++) {
-        for (tx = 0; tx < MAP_WIDTH; tx++) {
-            /* Calculate screen position */
-            addr = VRAM_BG_TILEMAP + ((ty + 7) * 32) + (tx + 8);
-
-            REG_VMADDL = addr & 0xFF;
-            REG_VMADDH = addr >> 8;
-
-            /* Get collision tile value */
-            tile = collision_map[ty * MAP_WIDTH + tx];
-
-            REG_VMDATAL = tile;  /* Tile 0 = empty, 1 = wall */
-            REG_VMDATAH = 0;
+        for (half = 0; half < 2; half++) {
+            for (tx = 0; tx < MAP_WIDTH; tx++) {
+                cell = collision_map[ty * MAP_WIDTH + tx];
+                if (cell == FLOOR && (u8)(tx * 7 + ty * 3) % 11 == 0)
+                    cell = 3;
+                row[tx * 2]     = (u16)(cell * 2 + half * 8);
+                row[tx * 2 + 1] = (u16)(cell * 2 + half * 8 + 1);
+            }
+            dmaCopyVram((u8 *)row, (u16)(VRAM_BG_TILEMAP + (ty * 2 + half) * 32), 64);
         }
     }
 }
 
 /**
- * @brief Write all sprite positions and attributes into the OAM buffer
+ * @brief Place the five sprites from their hitboxes
  *
- * Uses direct oamMemory[] writes instead of oamSet() to avoid the
- * 158-byte stack frame overhead per call. Each sprite occupies 4 bytes:
- * [X_low, Y, tile_number, attribute]. The attribute byte encodes
- * priority (bits 5-4) and palette bank (bits 3-1). When a collision is
- * active, the palette bank switches from 0 (normal colors) to 1 (green
- * highlight). Setting oam_update_flag = 1 tells the NMI handler to DMA
- * the buffer to OAM during the next VBlank.
+ * The drones take OAM slots 0-3 and Kit slot 4: the lower slot is drawn in
+ * front, and the drones fly, so a drone Kit walks under stays visible —
+ * its green lights are the feedback.
+ * Kit's 32x32 frame is drawn so that his 16x16 box sits at its bottom
+ * centre (8 pixels in, 16 down): his feet. The drones' boxes sit 8 pixels
+ * into their frames each way, round their bodies. Kit walks while he
+ * moves (five frames, six vblanks each) and stands on the first frame of
+ * his direction otherwise; the drones hover through four frames together.
  */
-static void update_sprites(void) {
+static void update_sprites(u8 moving) {
     u8 i;
-    u8 palette;
-    u16 offset;
+    u16 f;
+    u16 hover;
 
-    palette = (collision_flags != 0) ? 1 : 0;
-    oamMemory[0] = (u8)player_x;
-    oamMemory[1] = (u8)player_y;
-    oamMemory[2] = 0;  /* tile 0 */
-    oamMemory[3] = (u8)((3 << 4) | (palette << 1));  /* priority 3 */
+    f = facing;
+    if (moving)
+        f += (tick / 6) % 5;
+    oamSet(NUM_ENEMIES, player_x - 8, player_y - 16, frame_tile(f), PAL_KIT, 3,
+           facing_left ? OBJ_FLIPX : 0);
 
-    /* Enemy sprites (IDs 1-4) */
+    hover = frame_tile(FRAME_DRONE + (tick / 8) % 4);
     for (i = 0; i < NUM_ENEMIES; i++) {
-        offset = (i + 1) << 2;
-        palette = (collision_flags & (1 << i)) ? 1 : 0;
-        oamMemory[offset] = (u8)enemy_x[i];
-        oamMemory[offset + 1] = (u8)enemy_y[i];
-        oamMemory[offset + 2] = 1;  /* tile 1 */
-        oamMemory[offset + 3] = (u8)((2 << 4) | (palette << 1));  /* priority 2 */
+        oamSet(i, enemy_x[i] - 8, enemy_y[i] - 8, hover,
+               (collision_flags & (1 << i)) ? PAL_DRONE_SEEN : PAL_DRONE, 3, 0);
     }
-
-    oam_update_flag = 1;
 }
 
 /**
- * @brief Test player-vs-enemy AABB overlap and update collision_flags
+ * @brief Test Kit-vs-drone AABB overlap and update collision_flags
  *
- * Rebuilds the player and all enemy bounding boxes from their current
- * positions, then calls collideRect() for each player-enemy pair. The
- * result is stored in collision_flags as a bitmask (bit N = enemy N is
- * overlapping). This bitmask drives the palette swap in update_sprites().
+ * Rebuilds Kit's and every drone's box from their current positions, then
+ * calls collideRect() for each Kit-drone pair. The result is stored in
+ * collision_flags as a bitmask (bit N = drone N is overlapped).
  */
 static void check_collisions(void) {
     u8 i;
 
     collision_flags = 0;
 
-    /* Update player bounding box */
     player_box.x = player_x;
     player_box.y = player_y;
-    player_box.width = PLAYER_SIZE;
-    player_box.height = PLAYER_SIZE;
+    player_box.width = BOX_SIZE;
+    player_box.height = BOX_SIZE;
 
-    /* Check player vs each enemy */
     for (i = 0; i < NUM_ENEMIES; i++) {
         enemy_box[i].x = enemy_x[i];
         enemy_box[i].y = enemy_y[i];
-        enemy_box[i].width = ENEMY_SIZE;
-        enemy_box[i].height = ENEMY_SIZE;
+        enemy_box[i].width = BOX_SIZE;
+        enemy_box[i].height = BOX_SIZE;
 
         if (collideRect(&player_box, &enemy_box[i])) {
             collision_flags |= (1 << i);
@@ -351,35 +248,25 @@ static void check_collisions(void) {
 }
 
 /**
- * @brief Test whether a position would overlap a solid wall tile
+ * @brief Test whether Kit's box at a position would overlap a solid cell
  *
- * Converts screen coordinates to collision map coordinates (subtracting
- * the map offset), then probes all four corners of the player's 8x8
- * bounding box against the collision_map[] via collideTile(). If any
- * corner lands on a solid tile (value 1), the function returns 1 to
- * reject the movement.
+ * Probes the four corners of the 16x16 box against collision_map[] via
+ * collideTileEx() with 16-pixel cells. If any corner lands on a solid cell,
+ * the function returns 1 to reject the movement.
  *
  * The caller uses per-axis rejection: if the combined (new_x, new_y)
- * collides, it tries each axis independently so the player can slide
- * along walls instead of stopping dead.
+ * collides, it tries each axis independently so that Kit slides along
+ * walls instead of stopping dead.
  *
- * @param new_x Proposed player X position in screen coordinates
- * @param new_y Proposed player Y position in screen coordinates
- * @return 1 if the position overlaps a wall, 0 if clear
+ * @param new_x Proposed box X in screen coordinates (the map covers the screen)
+ * @param new_y Proposed box Y
+ * @return 1 if the position overlaps a solid cell, 0 if clear
  */
 static u8 check_wall_collision(s16 new_x, s16 new_y) {
-    s16 map_x, map_y;
-
-    /* Convert screen coords to map coords */
-    map_x = new_x - MAP_OFFSET_X;
-    map_y = new_y - MAP_OFFSET_Y;
-
-    /* Check if new position would hit a wall */
-    /* Check all four corners of player box */
-    if (collideTile(map_x, map_y, collision_map, MAP_WIDTH)) return 1;
-    if (collideTile(map_x + PLAYER_SIZE - 1, map_y, collision_map, MAP_WIDTH)) return 1;
-    if (collideTile(map_x, map_y + PLAYER_SIZE - 1, collision_map, MAP_WIDTH)) return 1;
-    if (collideTile(map_x + PLAYER_SIZE - 1, map_y + PLAYER_SIZE - 1, collision_map, MAP_WIDTH)) return 1;
+    if (collideTileEx(new_x, new_y, collision_map, MAP_WIDTH, CELL)) return 1;
+    if (collideTileEx(new_x + BOX_SIZE - 1, new_y, collision_map, MAP_WIDTH, CELL)) return 1;
+    if (collideTileEx(new_x, new_y + BOX_SIZE - 1, collision_map, MAP_WIDTH, CELL)) return 1;
+    if (collideTileEx(new_x + BOX_SIZE - 1, new_y + BOX_SIZE - 1, collision_map, MAP_WIDTH, CELL)) return 1;
 
     return 0;
 }
@@ -389,80 +276,77 @@ static u8 check_wall_collision(s16 new_x, s16 new_y) {
  *============================================================================*/
 
 /**
- * @brief Entry point -- initialize arena, run game loop with collision tests
+ * @brief Entry point -- build the warehouse, run the loop with collision tests
  *
- * Sets up Mode 0 with BG1 for the wall tilemap and sprites for the player
- * and enemies. The main loop reads the D-pad every frame, proposes a new
+ * Sets up Mode 1 with BG1 for the warehouse and sprites for Kit and the
+ * drones. The main loop reads the D-pad every frame, proposes a new
  * position, validates it against the wall collision map (with per-axis
- * sliding), checks AABB overlaps with enemies, and updates all sprite
- * positions in the OAM buffer. The NMI handler handles the actual OAM
- * DMA transfer during VBlank.
+ * sliding), checks AABB overlaps with the drones, and places the sprites.
+ * The NMI handler sends the OAM buffer during VBlank.
  *
  * @return Never returns (infinite loop).
  */
 int main(void) {
     u16 pad;            /**< Current joypad button state (bitmask) */
-    s16 new_x, new_y;  /**< Proposed player position before wall check */
+    s16 new_x, new_y;   /**< Proposed box position before the wall check */
+    u8 moving;
 
-    /* Initialize */
     consoleInit();
-    setMode(BG_MODE0, 0);
-    oamInit(OAM_DEFAULT_SIZE, OAM_DEFAULT_TILE_BASE);
+    setMode(BG_MODE1, 0);
 
-    /* Load graphics */
-    load_graphics();
-
-    /* Draw tilemap */
-    draw_tilemap();
-
-    /* Configure BG1 */
+    /* BG1: the four cells' tiles and palette, then the map built from the
+     * collision array (everything here runs in force blank) */
+    bgInitTileSet(0, cells_tiles, cells_pal, 0,
+                  cells_tiles_end - cells_tiles,
+                  cells_pal_end - cells_pal,
+                  BG_16COLORS, VRAM_BG_TILES);
     bgSetMapPtr(0, VRAM_BG_TILEMAP, BG_MAP_32x32);
-    bgSetGfxPtr(0, VRAM_BG_TILES);
+    build_tilemap();
+
+    /* The sprites: Kit's walk and the drone's hover, 320 tiles, 32x32;
+     * OBJ palettes 0-2 (Kit, the drone, the drone seen) */
+    oamInitGfxSet(cast_tiles, cast_tiles_end - cast_tiles,
+                  cast_pal, cast_pal_end - cast_pal,
+                  0, VRAM_OBJ_TILES, OBJ_SIZE16_L32);
+
     setMainScreen(TM_BG1 | TM_OBJ);
 
-    /* Object settings */
-    REG_OBJSEL = OBJSEL(OBJ_SIZE8_L16, VRAM_OBJ_TILES);
+    /* Kit's box: cell (7, 8), the open row below the middle stack */
+    player_x = 7 * CELL;
+    player_y = 8 * CELL;
+    facing = FRAME_DOWN;
 
-    /* Initialize player position - tile (7,7) = open area below center platform */
-    player_x = MAP_OFFSET_X + 56;
-    player_y = MAP_OFFSET_Y + 56;
+    /* The drones: the four corners of the floor */
+    enemy_x[0] = 2 * CELL;   enemy_y[0] = 1 * CELL;
+    enemy_x[1] = 13 * CELL;  enemy_y[1] = 1 * CELL;
+    enemy_x[2] = 2 * CELL;   enemy_y[2] = 12 * CELL;
+    enemy_x[3] = 13 * CELL;  enemy_y[3] = 12 * CELL;
 
-    /* Initialize enemy positions - in the 4 open corners */
-    enemy_x[0] = MAP_OFFSET_X + 16;   /* tile (2,2) - top-left open area */
-    enemy_y[0] = MAP_OFFSET_Y + 16;
+    /* All five are 32x32: the LARGE size, set once */
+    {
+        u8 i;
+        for (i = 0; i < 1 + NUM_ENEMIES; i++)
+            oamSetSize(i, OBJ_LARGE);
+    }
 
-    enemy_x[1] = MAP_OFFSET_X + 104;  /* tile (13,2) - top-right open area */
-    enemy_y[1] = MAP_OFFSET_Y + 16;
-
-    enemy_x[2] = MAP_OFFSET_X + 16;   /* tile (2,11) - bottom-left open area */
-    enemy_y[2] = MAP_OFFSET_Y + 88;
-
-    enemy_x[3] = MAP_OFFSET_X + 104;  /* tile (13,11) - bottom-right open area */
-    enemy_y[3] = MAP_OFFSET_Y + 88;
-
-    /* Show sprites 0-4 (clear X high bits set by oamClear) */
-    oamMemory[512] = 0x00;  /* Sprites 0-3: X high=0, size=small */
-    oamMemory[513] = oamMemory[513] & 0xFC;  /* Sprite 4: clear X high bit */
-
-    /* Initial update */
     check_collisions();
-    update_sprites();
+    update_sprites(0);
 
-    /* Enable screen */
     setScreenOn();
 
-    /* Main loop */
     while (1) {
         WaitForVBlank();
+        tick++;
 
         pad = padHeld(0);
         new_x = player_x;
         new_y = player_y;
+        moving = 0;
 
-        if (pad & KEY_LEFT)  new_x = player_x - PLAYER_SPEED;
-        if (pad & KEY_RIGHT) new_x = player_x + PLAYER_SPEED;
-        if (pad & KEY_UP)    new_y = player_y - PLAYER_SPEED;
-        if (pad & KEY_DOWN)  new_y = player_y + PLAYER_SPEED;
+        if (pad & KEY_LEFT)  { new_x = player_x - PLAYER_SPEED; facing = FRAME_RIGHT; facing_left = 1; moving = 1; }
+        if (pad & KEY_RIGHT) { new_x = player_x + PLAYER_SPEED; facing = FRAME_RIGHT; facing_left = 0; moving = 1; }
+        if (pad & KEY_UP)    { new_y = player_y - PLAYER_SPEED; facing = FRAME_UP;    facing_left = 0; moving = 1; }
+        if (pad & KEY_DOWN)  { new_y = player_y + PLAYER_SPEED; facing = FRAME_DOWN;  facing_left = 0; moving = 1; }
 
         /* Wall collision */
         if (!check_wall_collision(new_x, new_y)) {
@@ -480,8 +364,7 @@ int main(void) {
         /* Sprite collisions */
         check_collisions();
 
-        /* Update all sprites via direct buffer writes */
-        update_sprites();
+        update_sprites(moving);
     }
 
     return 0;

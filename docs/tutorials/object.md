@@ -344,7 +344,7 @@ Most of the corpus does not use it, and that is a reasonable default. Reach
 for your own array when:
 
 - **Your entities are few and homogeneous.** `examples/games/breakout` tracks
-  one ball and one paddle; `collision_demo` tracks four enemies in four
+  one ball and one paddle; `collision_demo` tracks four drones in four
   parallel arrays. A 64-byte record and a callback dispatch buy nothing there.
 - **You are not on the `map` module.** The collision routines are
   map-module-only, the culling window is relative to the map camera, and the

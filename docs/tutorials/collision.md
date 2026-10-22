@@ -64,7 +64,7 @@ static void check_collisions(void) {
 
 ### Testing Multiple Enemies
 
-The `collision_demo` example checks the player against four enemies each frame using a bitmask to track which enemies are currently colliding:
+The `collision_demo` example checks Kit against four drones each frame using a bitmask to track which drones are currently overlapped:
 
 ```c
 #define NUM_ENEMIES 4
@@ -79,14 +79,14 @@ static void check_collisions(void) {
 
     player_box.x = player_x;
     player_box.y = player_y;
-    player_box.width = PLAYER_SIZE;
-    player_box.height = PLAYER_SIZE;
+    player_box.width = BOX_SIZE;
+    player_box.height = BOX_SIZE;
 
     for (i = 0; i < NUM_ENEMIES; i++) {
         enemy_box[i].x = enemy_x[i];
         enemy_box[i].y = enemy_y[i];
-        enemy_box[i].width = ENEMY_SIZE;
-        enemy_box[i].height = ENEMY_SIZE;
+        enemy_box[i].width = BOX_SIZE;
+        enemy_box[i].height = BOX_SIZE;
 
         if (collideRect(&player_box, &enemy_box[i])) {
             collision_flags |= (1 << i);
@@ -133,23 +133,18 @@ if (collideTile(player_x + 8, player_y + 16, collision_map, MAP_WIDTH)) {
 
 ### Checking All Four Corners
 
-A single point check misses edges. The `collision_demo` example checks all four corners of the player bounding box to prevent clipping through walls:
+A single point check misses edges. The `collision_demo` example checks all four corners of Kit's bounding box to prevent clipping through walls. Its map has 16x16 cells, so it asks `collideTileEx()` with a cell size of 16 (`CELL`); the map covers the screen, so box coordinates are map coordinates:
 
 ```c
 static u8 check_wall_collision(s16 new_x, s16 new_y) {
-    s16 map_x, map_y;
-
-    map_x = new_x - MAP_OFFSET_X;
-    map_y = new_y - MAP_OFFSET_Y;
-
     /* Top-left */
-    if (collideTile(map_x, map_y, collision_map, MAP_WIDTH)) return 1;
+    if (collideTileEx(new_x, new_y, collision_map, MAP_WIDTH, CELL)) return 1;
     /* Top-right */
-    if (collideTile(map_x + PLAYER_SIZE - 1, map_y, collision_map, MAP_WIDTH)) return 1;
+    if (collideTileEx(new_x + BOX_SIZE - 1, new_y, collision_map, MAP_WIDTH, CELL)) return 1;
     /* Bottom-left */
-    if (collideTile(map_x, map_y + PLAYER_SIZE - 1, collision_map, MAP_WIDTH)) return 1;
+    if (collideTileEx(new_x, new_y + BOX_SIZE - 1, collision_map, MAP_WIDTH, CELL)) return 1;
     /* Bottom-right */
-    if (collideTile(map_x + PLAYER_SIZE - 1, map_y + PLAYER_SIZE - 1, collision_map, MAP_WIDTH)) return 1;
+    if (collideTileEx(new_x + BOX_SIZE - 1, new_y + BOX_SIZE - 1, collision_map, MAP_WIDTH, CELL)) return 1;
 
     return 0;
 }
@@ -374,7 +369,7 @@ if (bx < 10 && by >= 1 && by <= 10) {
 
 ## Complete Examples
 
-- `examples/basics/collision_demo/` -- AABB sprite collision with tile-based wall collision and visual feedback
+- `examples/basics/collision_demo/` -- AABB sprite collision with tile-based wall collision (16x16 cells, the map built from the collision array) and visual feedback
 - `examples/games/breakout/` -- Ball vs walls, ball vs paddle (angle control), ball vs brick grid
 - `examples/games/likemario/` -- Platformer tile collision with gravity, ground snapping, and wall sliding
 

@@ -4,6 +4,6 @@
 # Validated at build by `make lint-vram`.
 #
 # name        kind     size_words
-bg_tiles      bg_char  0x10     # empty + wall, 2bpp (8 words each)
+bg_tiles      bg_char  0x100    # the four 16x16 cells, 16 tiles 4bpp (16 words each)
 bg_tilemap    bg_map   0x400    # 32x32 tilemap (1024 words)
-obj_tiles     obj      0x20     # player + enemy, 4bpp (16 words each)
+obj_tiles     obj      0x1400   # Kit's 15 frames and the drone's 4, 32x32: 320 tiles 4bpp
