@@ -1,0 +1,6 @@
+tool = "opensnes-sprite"
+
+# Kit (OBJ palette 0) and the raccoon (palette 1), 32x32
+[sheet]
+size = 32
+colors = 32

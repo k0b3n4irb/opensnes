@@ -52,8 +52,8 @@
     "rom_sha256": "c8781f4e6dfaf6fdbdedaf80fe2378681baf1eaa7e0567e7ec32b30288516939"
   },
   "basics_panel_hud": {
-    "stream": "a174b1236543c775781047ba04beb9bb3f2ee74c47cc4a7e49c3ba030af4b846",
-    "rom_sha256": "441dc58c124e8c3e865c8f8b9e99731e1bd34096224d4ae88324a4b027f83aaa"
+    "stream": "5baf6c348a10a3a72da0d6dc49792aa3efabdb4b547916267ab41570db50ea7a",
+    "rom_sha256": "dc62d5c3a8f646ecadbe109ca50f9e896ad9dcdc620188911d03f9dbb0923e41"
   },
   "basics_scene_stack": {
     "stream": "c0eb189f97a735b6091f2ab297cb368d427ea14d2dbe9562518d2bc10301de0d",

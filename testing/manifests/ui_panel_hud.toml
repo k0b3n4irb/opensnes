@@ -79,12 +79,12 @@ hero_hp      = { eq = 2, width = 1 }
 "panel_map.main+136" = "unchanged"
 
 [[checkpoint]]                 # boot state of the layer: Mode 1, BG3 high
-at_frame = 285                 # (BGMODE $09), BG1 + BG3 on the main screen
-[checkpoint.values]
-bg3_high = { eq = 1, width = 1 }
+at_frame = 285                 # (BGMODE $09), BG1 + BG3 + OBJ on the main
+[checkpoint.values]            # screen ($15; $05 until 2026-10-22, when Kit
+bg3_high = { eq = 1, width = 1 }   # and the raccoon came to the noodle bar)
 [checkpoint.ppu]
 bgmode = 0x09
-tm = 0x05
+tm = 0x15
 
 [[checkpoint]]                 # SELECT: the bit off, BG3 behind BG1 (BGMODE $01);
 at_frame = 320                 # the panels' map is not touched

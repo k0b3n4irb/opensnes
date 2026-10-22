@@ -229,6 +229,7 @@ AIM = ROOT / "examples" / "basics" / "aim_target" / "res"
 COLLISION = ROOT / "examples" / "basics" / "collision_demo" / "res"
 SKELETON = ROOT / "examples" / "basics" / "game_skeleton" / "res"
 SCENE_STACK = ROOT / "examples" / "basics" / "scene_stack" / "res"
+PANEL_HUD = ROOT / "examples" / "basics" / "panel_hud" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1264,6 +1265,63 @@ def skeleton_sprites() -> Image.Image:
     return im
 
 
+# basics/panel_hud: the noodle bar from above, the panel sheet (2bpp) and two residents
+PANEL = ["#000000", "#0c1428", "#48d0e0", "#e05090"]
+HEART = ["........", ".33..33.", "33333333", "33333333", ".333333.", "..3333..", "...33...", "........"]
+HEART_EMPTY = ["........", ".22..22.", "2..22..2", "2......2", ".2....2.", "..2..2..", "...22...", "........"]
+
+
+def panel_sheet() -> Image.Image:
+    """BG3's sheet for the panel module, twelve 8x8 tiles in a row (96x8, converted without
+    reduction, 2bpp): 0 transparent (what panelInit() stamps), 1-9 the 9-slice of a neon
+    box in raster order (a cyan line one pixel in from the edge, rounded corners, a dark
+    fill), 10 a heart, 11 an empty heart. Colour 1 the fill, 2 the line, 3 the heart."""
+    im = Image.new("P", (96, 8), 0)
+    im.putpalette([v for c in PANEL for v in hexrgb_(c)] + [0] * 756)
+    for k in range(9):
+        top, bottom, left, right = k < 3, k > 5, k % 3 == 0, k % 3 == 2
+        for y in range(8):
+            for x in range(8):
+                c = 1
+                if (top and y == 0) or (bottom and y == 7) or (left and x == 0) or (right and x == 7):
+                    c = 0                                        # outside the line: the scene shows
+                elif (top and y == 1) or (bottom and y == 6) or (left and x == 1) or (right and x == 6):
+                    c = 2                                        # the line
+                if (top or bottom) and (left or right):          # a rounded corner
+                    cx, cy = (x if left else 7 - x), (y if top else 7 - y)
+                    if cx + cy < 3:
+                        c = 0
+                    elif cx + cy == 3:
+                        c = 2
+                im.putpixel((8 * (1 + k) + x, y), c)
+    for t, rows in ((10, HEART), (11, HEART_EMPTY)):
+        for y, row in enumerate(rows):
+            for x, ch in enumerate(row):
+                im.putpixel((8 * t + x, y), 1 if ch == "." else int(ch))
+    return im
+
+
+def panel_residents() -> Image.Image:
+    """Kit (OBJ palette 0) and the raccoon behind the counter (palette 1), from above,
+    facing south, 32x32 side by side."""
+    td = ART / "characters" / "topdown"
+    im = Image.new("P", (64, 32), 0)
+    pal = [(0, 0, 0)] * 32
+    for bank, name in ((0, "kit"), (1, "raccoon")):
+        fr = Image.open(td / f"{name}_south.png").convert("RGBA")
+        cols = sorted({p[:3] for p in fr.getdata() if p[3] >= 128}, key=sum)
+        assert len(cols) <= 15, (name, len(cols))
+        for k, c in enumerate(cols):
+            pal[16 * bank + 1 + k] = c
+        for y in range(32):
+            for x in range(32):
+                p = fr.getpixel((x, y))
+                if p[3] >= 128:
+                    im.putpixel((32 * bank + x, y), 16 * bank + 1 + cols.index(p[:3]))
+    im.putpalette([v for c in pal for v in c] + [0] * (768 - 3 * len(pal)))
+    return im
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1530,6 +1588,8 @@ def main() -> int:
             (SKELETON, {"field.png": png(skeleton_field()), "logo.png": screen_logo(ART),
                         "cast.png": png(skeleton_sprites())}),
             (SCENE_STACK, {"field.png": png(skeleton_field()), "logo.png": screen_logo(ART)}),
+            (PANEL_HUD, {"noodlebar.png": png(indexed_scene("noodlebar.png")), "boxes.png": png(panel_sheet()),
+                         "residents.png": png(panel_residents())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

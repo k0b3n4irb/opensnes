@@ -90,10 +90,10 @@
     "rom_sha256": "c8781f4e6dfaf6fdbdedaf80fe2378681baf1eaa7e0567e7ec32b30288516939"
   },
   "basics_panel_hud": {
-    "fbhash": "c720030f282db315",
+    "fbhash": "69f33df92f74e0d1",
     "frames": 200,
-    "luna_version": "v1.39.0",
-    "rom_sha256": "441dc58c124e8c3e865c8f8b9e99731e1bd34096224d4ae88324a4b027f83aaa"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "dc62d5c3a8f646ecadbe109ca50f9e896ad9dcdc620188911d03f9dbb0923e41"
   },
   "basics_scene_stack": {
     "fbhash": "65f812bced3ec393",

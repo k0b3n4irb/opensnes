@@ -235,8 +235,8 @@ dmaCopyVram(tile, 0x1000, 32);      /* during VBlank or force blank */
 ```
 
 A tile costs about 47 000 master cycles, an eighth of a frame: build tiles
-while loading, or a few per frame. `backgrounds/mode2` and
-`basics/panel_hud` build their art this way.
+while loading, or a few per frame. `backgrounds/mode2` builds its art this
+way.
 
 ## Compressed tiles (LZ77)
 

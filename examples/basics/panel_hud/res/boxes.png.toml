@@ -1,0 +1,8 @@
+tool = "opensnes-tileset"
+
+# BG3's panel sheet: twelve 2bpp tiles kept in order (0 blank, 1-9 the
+# 9-slice, 10-11 the hearts); the panel module writes the map, not this tool
+[convert]
+bpp = 2
+colors = 4
+no-reduce = true
