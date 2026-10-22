@@ -231,6 +231,7 @@ SKELETON = ROOT / "examples" / "basics" / "game_skeleton" / "res"
 SCENE_STACK = ROOT / "examples" / "basics" / "scene_stack" / "res"
 PANEL_HUD = ROOT / "examples" / "basics" / "panel_hud" / "res"
 SAVE_GAME = ROOT / "examples" / "memory" / "save_game" / "res"
+CONTROLLER = ROOT / "examples" / "input" / "controller" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1358,6 +1359,117 @@ def save_icon() -> Image.Image:
     return on_palette(icon, cols)
 
 
+# input/controller: a test screen in a city terminal, two generic pads drawn, a test bay
+PAD_ORIGINS = ((16, 32), (136, 32))     # each pad's top-left: 104x48, the shoulders on its top 4 lines
+# The lamps main.c lights over a pad, (x, y) from its origin, then the lamp tile:
+# 0 a face button (disc), 1 a D-pad arm (square), 2 SELECT / START (pill), 3 half a shoulder
+PAD_LAMPS = {
+    "B": (74, 31, 0), "Y": (65, 22, 0), "SELECT": (42, 30, 2), "START": (54, 30, 2),
+    "UP": (22, 14, 1), "DOWN": (22, 30, 1), "LEFT": (14, 22, 1), "RIGHT": (30, 22, 1),
+    "A": (83, 22, 0), "X": (74, 13, 0), "L": (10, 0, 3), "L2": (18, 0, 3), "R": (78, 0, 3), "R2": (86, 0, 3),
+}
+TEST_BAY = (16, 152, 239, 207)          # the bay the two avatars walk in, outline included
+LAMP_GLOW = (["#b0f8ff", "#48d0e0"], ["#ffd0f0", "#e05090"])    # pad 1 cyan, pad 2 pink: core, halo
+
+
+def lamp_shape(kind: int, x: int, y: int) -> bool:
+    """Whether pixel (x, y) of an 8x8 cell belongs to the lamp or button of that kind."""
+    if kind == 0:
+        return math.hypot(x - 3.5, y - 3.5) < 3.8
+    if kind == 1:
+        return True
+    if kind == 2:
+        return 2 <= y <= 5 and not ((x in (0, 7)) and y in (2, 5))
+    return y <= 3
+
+
+def pad_screen() -> Image.Image:
+    """256x224 on TERMINAL's four colours: the bezel and scanlines of save_game's terminal,
+    the rule under the title, two pads (body 2, outline and buttons 3, the buttons' wells 0,
+    the cells main.c lights in PAD_LAMPS) and the test bay's floor grid."""
+    im = Image.new("P", (256, 224), 0)
+    im.putpalette([v for c in TERMINAL for v in hexrgb_(c)] + [0] * 756)
+    px = im.load()
+    for y in range(224):
+        for x in range(256):
+            bezel = x < 8 or x >= 248 or y < 4 or y >= 212
+            px[x, y] = 2 if bezel or y % 4 == 0 else 1
+            if not bezel and y == 22:
+                px[x, y] = 3
+    for ox, oy in PAD_ORIGINS:
+        for y in range(4, 48):                              # the body, a rounded slab
+            for x in range(104):
+                cx = min(x - 12, 0) if x < 12 else max(x - 91, 0)
+                cy = min(y - 16, 0) if y < 16 else max(y - 35, 0)
+                d = math.hypot(cx, cy)
+                if d < 12:
+                    px[ox + x, oy + y] = 3 if d >= 11 or y in (4, 47) or x in (0, 103) else 2
+        for name, (lx, ly, kind) in PAD_LAMPS.items():
+            if kind == 3:
+                continue
+            for y in range(8):
+                for x in range(8):
+                    if lamp_shape(kind, x, y):
+                        edge = not all(lamp_shape(kind, x + dx, y + dy) if 0 <= x + dx < 8 and 0 <= y + dy < 8
+                                       else kind == 1 for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+                        px[ox + lx + x, oy + ly + y] = 3 if edge or kind == 3 else 0
+        for y in range(8):                                  # the D-pad's hub joins the four arms
+            for x in range(8):
+                px[ox + 22 + x, oy + 22 + y] = 0
+        for sx in (10, 78):                                 # the shoulders, an outlined bar each
+            for y in range(4):
+                for x in range(16):
+                    px[ox + sx + x, oy + y] = 3 if y == 0 or x in (0, 15) else 2
+    x0, y0, x1, y1 = TEST_BAY
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            if x in (x0, x1) or y in (y0, y1):
+                px[x, y] = 3
+            elif (x - x0) % 16 == 0 or (y - y0) % 16 == 0:
+                px[x, y] = 2                                # the floor's grid
+            else:
+                px[x, y] = 0
+    return im
+
+
+def pad_sprites() -> Image.Image:
+    """128x96, OBJ_SIZE8_L32: Kit facing south, north, east, west (tiles 0, 4, 8, 12, OBJ
+    palette 0), the raccoon the same (tiles 64-76, palette 1), then the four 8x8 lamps of
+    lamp_shape at tiles 128-131, on palette 2 (pad 1's glow) - main.c lights pad 2's on 3."""
+    td = ART / "characters" / "topdown"
+    im = Image.new("P", (128, 96), 0)
+    pal = [(0, 0, 0)] * 64
+    for bank, name in ((0, "kit"), (1, "raccoon")):
+        frames = [Image.open(td / f"{name}_{d}.png").convert("RGBA") for d in ("south", "north", "east", "west")]
+        cols = sorted({p[:3] for f in frames for p in f.getdata() if p[3] >= 128}, key=sum)
+        if len(cols) > 15:                                  # four facings on one palette
+            q = Image.new("RGB", (128, 32))
+            for i, f in enumerate(frames):
+                q.paste(f.convert("RGB"), (32 * i, 0), f)
+            cols = sorted({c for c in q.quantize(15, method=Image.Quantize.MEDIANCUT).convert("RGB").getdata()}, key=sum)
+        for k, c in enumerate(cols):
+            pal[16 * bank + 1 + k] = c
+        for i, f in enumerate(frames):
+            for y in range(32):
+                for x in range(32):
+                    p = f.getpixel((x, y))
+                    if p[3] >= 128:
+                        k = min(range(len(cols)), key=lambda j: sum((a - b) ** 2 for a, b in zip(p[:3], cols[j])))
+                        im.putpixel((32 * i + x, 32 * bank + y), 16 * bank + 1 + k)
+    for bank, (core, halo) in enumerate(LAMP_GLOW):
+        pal[16 * (2 + bank) + 1] = hexrgb_(core)
+        pal[16 * (2 + bank) + 2] = hexrgb_(halo)
+    for kind in range(4):
+        for y in range(8):
+            for x in range(8):
+                if lamp_shape(kind, x, y):
+                    edge = not all(lamp_shape(kind, x + dx, y + dy) if 0 <= x + dx < 8 and 0 <= y + dy < 8
+                                   else kind in (1, 3) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+                    im.putpixel((8 * kind + x, 64 + y), 16 * 2 + (2 if edge else 1))
+    im.putpalette([v for c in pal for v in c] + [0] * (768 - 3 * len(pal)))
+    return im
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1627,6 +1739,7 @@ def main() -> int:
             (PANEL_HUD, {"noodlebar.png": png(indexed_scene("noodlebar.png")), "boxes.png": png(panel_sheet()),
                          "residents.png": png(panel_residents())}),
             (SAVE_GAME, {"terminal.png": png(terminal()), "icon.png": png(save_icon())}),
+            (CONTROLLER, {"screen.png": png(pad_screen()), "cast.png": png(pad_sprites())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

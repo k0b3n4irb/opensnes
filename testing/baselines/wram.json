@@ -132,8 +132,8 @@
     "rom_sha256": "6f041664f854a3550e6a45f205a6c1f1ad694c69c6592e04230a724e51c359f1"
   },
   "input_controller": {
-    "stream": "aa9771653e32901e3dd2f24ee7ac586398c5f89c32421b20418e8722a8820086",
-    "rom_sha256": "c4ba306adabb7d72324d2c3ffd2039e6cddefe7c9c8e842dd32edbefbe35e81f"
+    "stream": "6515c2af502e2e8369fe61337195fec560ea844d351f768e7cd5c2883ccff7dd",
+    "rom_sha256": "c4333c21cde22a9719b4ca1aadee1b08cf78dd298bebb8bc9f912054429e01e6"
   },
   "input_mouse": {
     "stream": "bf23cc49951753e18c75ad47a06c817f30cf837a2a321679afb91e4a72596273",

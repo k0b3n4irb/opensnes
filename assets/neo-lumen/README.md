@@ -183,6 +183,16 @@ glass with scanlines and the outlines of two slot cards, four colours
 (BG2 of Mode 0), drawn by `devtools/art_assets/build.py` (`terminal`);
 `res/icon.png` is `logo/kit_icon.png` (`save_icon`).
 
+### The pad test (controller)
+
+`examples/input/controller`: `res/screen.png`, the same terminal's bezel and
+glass with two generic controllers (no console maker's shape) and the floor
+grid of a test bay, four colours (BG2 of Mode 0, `pad_screen`); `res/cast.png`,
+Kit and the raccoon from above in four facings (`characters/topdown/`), then
+four 8x8 lamps (a disc, a square, a pill, half a shoulder) that the example
+lays over a button while it is held (`pad_sprites`). The lamps' places on a
+pad are `PAD_LAMPS` in `build.py`, copied in `main.c`.
+
 ### The play square (game_skeleton)
 
 `examples/basics/game_skeleton` (and `basics/scene_stack`, the same field and logo): `res/field.png` is a piece of

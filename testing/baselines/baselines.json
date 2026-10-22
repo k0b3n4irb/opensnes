@@ -258,10 +258,10 @@
     "rom_sha256": "6f041664f854a3550e6a45f205a6c1f1ad694c69c6592e04230a724e51c359f1"
   },
   "input_controller": {
-    "fbhash": "8324c9e551b832d4",
+    "fbhash": "ebb6b698ab0a03c5",
     "frames": 200,
-    "luna_version": "v1.39.0",
-    "rom_sha256": "c4ba306adabb7d72324d2c3ffd2039e6cddefe7c9c8e842dd32edbefbe35e81f"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "c4333c21cde22a9719b4ca1aadee1b08cf78dd298bebb8bc9f912054429e01e6"
   },
   "input_mouse": {
     "fbhash": "43fae5cff6c8514d",

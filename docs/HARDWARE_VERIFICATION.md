@@ -58,7 +58,7 @@ behaviour, and the note under the table says which.
 | # | ROM | Do | Check |
 |---|---|---|---|
 | 1 | `text/print_string` | nothing | Text legible, stable, no rolling. This is the boot smoke test: font upload, palette, screen on. |
-| 2 | `input/controller` | press every button on pad 1, then hold two at once | Each button's letter appears on the PAD 1 line while held, two at once together, and disappears on release; PRESSED and RELEASED name the last edge. Pad 2 is checked by row 14. |
+| 2 | `input/controller` | press every button on pad 1, then hold two at once | Each button lights up in cyan on the PAD 1 drawing while held, two at once together, and goes out on release; HELD shows its bit, PRESSED and RELEASED name the last edge; the D-pad walks Kit in the test bay. Pad 2 is checked by row 14. |
 | 3 | `scrolling/parallax_scroll` | watch the top line | The first visible line must be picture, not a strip of garbage or a line from the bottom of the map. This is the vertical-scroll-by-one fix (`KNOWN_LIMITATIONS.md`, "the PPU never outputs scanline 0"); emulators forgive it, the console does not. Layers scroll at different speeds without tearing. |
 | 4 | `sprites/sprite_swarm` | watch the densest moments | Sprites flicker or drop out only where more than the per-line budget overlap; no garbage tiles, no sprite stuck at the top-left corner. |
 | 5 | `hdma/hdma_wave` | watch, then A to switch to the hdma module, LEFT/RIGHT for the amplitude | A smooth horizontal sine flowing up the water image, no horizontal tearing, no line where the wave jumps — in both modes, and across the switch. |
@@ -70,7 +70,7 @@ behaviour, and the note under the table says which.
 | 11 | `audio/snesmod_music` | A plays, B stops, START fades out | Music starts within a second, no crackle, no note hanging after stop. Power-cycle before this row: the SPC upload must work from a cold APU. |
 | 12 | `audio/sfx_from_wav` | press the buttons | Each sound fires once per press, no click at the start, no click at the end. |
 | 13 | `memory/save_game` | A writes slot 1, power-cycle, B reads slot 1 | The values read back are the ones written before the power cycle. Then X writes slot 2, power-cycle, Y reads it. On a flash cart this also checks that the cart writes the save file back; consult its manual if slot 1 reads blank. |
-| 14 | `input/controller` | hold buttons on both pads | Each pad's buttons show on its own line (PAD 1, PAD 2); releasing pad 2 does not affect pad 1's line. |
+| 14 | `input/controller` | hold buttons on both pads | Each pad's buttons light up on its own drawing (PAD 1 cyan, PAD 2 pink) and in its own HELD value; pad 2's D-pad walks the raccoon, not Kit; releasing pad 2 does not affect pad 1. |
 | 15 | `memory/hirom_demo` | hold A | "HIROM MODE" is shown and the background turns light blue while A is held. |
 | 16 | `mode7/dsp1_ground` | turn with LEFT/RIGHT, drive with UP | The ground recedes to a horizon under the sky and turns in perspective; four magenta beacons and the cyan cube tumbling above them stay put on the ground while you turn and drive, and disappear once you pass them. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
 | 17 | `chips/sa1_starfield` | nothing | 128 moths trace smooth Lissajous figures over the skyline at full frame rate. Firmware-dependent. |
