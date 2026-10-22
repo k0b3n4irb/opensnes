@@ -404,6 +404,11 @@ Two traps cost a screenshot each and are the SDK's, not the examples':
   and `x_tiles_1`; a caller that loads only `x_tiles` gets the first 32 KB.
   The split is documented by the generated .inc only (it declares both);
   `bgInitTileSet` / `bgLoad` do not know the second part.
+- The text module prints no signed number (`textPrintU16`, `textPrintHex`
+  only). aim_target printed its signed DX / DY as u16 (65484 for -52) for
+  months under a comment calling them signed; redone on 2026-10-22, it
+  writes the sign and the magnitude itself. A `textPrintS16` would be the
+  SDK's answer (a public header: its own lot, in a worktree).
 
 ## Open questions for the owner
 

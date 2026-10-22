@@ -72,10 +72,10 @@
     "rom_sha256": "c1ef59c76a6b5cf081be29d0cbc16c001661456e11aecaa8ef2f17c3c7107ae6"
   },
   "basics_aim_target": {
-    "fbhash": "8e75f0026aa50a0c",
+    "fbhash": "29b6b6fff09feb89",
     "frames": 200,
-    "luna_version": "v1.39.0",
-    "rom_sha256": "5cf7ab397afee1b997d10df0540706bb7b5fdd82b64fe3127ca5decd0d88fb33"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "65991e352eaa7cccb5a45309176d3c89e02394fce5b6f975a28a3e1bd2d0e5e6"
   },
   "basics_collision_demo": {
     "fbhash": "b651581ee61b0bf5",

@@ -1,0 +1,6 @@
+tool = "opensnes-tileset"
+
+# BG2 of Mode 0: four colours, kept dark under the text of BG1
+[convert]
+bpp = 2
+colors = 4

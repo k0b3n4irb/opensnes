@@ -45,7 +45,7 @@ and the character's own 15 colours as `target_palette`.
 | `characters/pangolin.png` | the pangolin guard | 102, #1 | — |
 | `characters/frog.png` | the frog mechanic | 103, #16 | — |
 | `characters/rat.png` | the rat junk dealer | 104, #9 | — |
-| `characters/drone.png` | a one-eyed security drone | 105, #32 | — |
+| `characters/drone.png` | a one-eyed security drone | 105, #32 | `examples/basics/aim_target` (`res/units.png`: as is, and its cyan twin, the orbiter) |
 | `characters/automaton.png` | a patrol automaton with a riot shield, side view | 106, #8 | — |
 | `characters/insect.png` | a crawling robot insect, side view | 107, #13 | — |
 | `characters/hunter.png` | a security hunter aircraft, from above | 108, #10 | — |
@@ -175,6 +175,16 @@ call.
 in a neon frame (the library's font at three times its size, each letter on
 its own colour index, 8-14 of palette 0) and a coolant pipe (its liquid on
 indices 8-15 of palette 1, along x), for the example to rotate.
+
+### The turret on the roof (aim_target)
+
+`examples/basics/aim_target`: `res/units.png` and `res/roof.png`, by
+`devtools/art_assets/build.py`. `turret` draws a 32x32 security turret from
+above in sixteen headings (a round mount, a head and a barrel turned by
+geometry, a pink lens and muzzle, colours `TURRET`); `aim_sprites` lays them
+out four a row with the security drone and its cyan twin after them;
+`rooftop` draws the roof, four dark colours (`ROOFTOP`), with the turret's
+pad and a stairwell's hatch. No PixelLab call beyond the drone.
 
 ### A square of the Rue basse (world_sprites)
 

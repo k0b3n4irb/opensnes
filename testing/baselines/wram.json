@@ -40,8 +40,8 @@
     "rom_sha256": "0a9c5b2aeb5ef5e7db594b0c95cd0b865cd1025f87cb3d1654ecfbe6cb0f1bb1"
   },
   "basics_aim_target": {
-    "stream": "4599e7b04171efecd8d51edc37116bcb321189ce06faf312602b7562ea8a1f29",
-    "rom_sha256": "5cf7ab397afee1b997d10df0540706bb7b5fdd82b64fe3127ca5decd0d88fb33"
+    "stream": "88e27ad8d04c26d641e04393d00bfb7e9b6461ff0c7d6568ae5ac55114995d39",
+    "rom_sha256": "65991e352eaa7cccb5a45309176d3c89e02394fce5b6f975a28a3e1bd2d0e5e6"
   },
   "basics_collision_demo": {
     "stream": "7cfd9c53b9ac71f0bf5d3f21264f14eaf12e6a9201bf385e1cb99e5e69612022",

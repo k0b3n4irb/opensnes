@@ -225,6 +225,7 @@ MOUSE = ROOT / "examples" / "input" / "mouse" / "res"
 SHADOW_TINT = ROOT / "examples" / "color" / "shadow_tint" / "res"
 SWARM = ROOT / "examples" / "sprites" / "sprite_swarm" / "res"
 WORLD = ROOT / "examples" / "sprites" / "world_sprites" / "res"
+AIM = ROOT / "examples" / "basics" / "aim_target" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1058,6 +1059,93 @@ def residents() -> Image.Image:
     return im
 
 
+# basics/aim_target: a security turret on a roof, in 16 headings, and the drones it aims at
+TURRET = ["#101018", "#20242e", "#3a4050", "#5a6274", "#8890a4", "#c8d0e0", "#a02860", "#e05090",
+          "#ffd0f0"]
+ROOFTOP = ["#000000", "#0a0e16", "#141a26", "#3a1830"]
+
+
+def turret(heading: int) -> Image.Image:
+    """A 32x32 turret from above turned to `heading` (0-15, sixteenths of a turn, 0 = +x,
+    4 = +y as atan2_8 counts): a round mount, a head and a barrel that turn, a pink lens
+    and muzzle. Indices 1-9 of TURRET, 0 transparent."""
+    a = heading * math.pi / 8
+    ca, sa = math.cos(a), math.sin(a)
+    im = Image.new("P", (32, 32), 0)
+    for y in range(32):
+        for x in range(32):
+            dx, dy = x - 15.5, y - 15.5
+            u, v = dx * ca + dy * sa, -dx * sa + dy * ca         # along / across the barrel
+            r = math.hypot(dx, dy)
+            c = 0
+            if r < 11.5:
+                c = 2 if r >= 10.5 else (3 if (dx + dy) < 0 else 2)  # the mount, lit from top-left
+                if 7.5 <= r < 8.5:
+                    c = 1
+            if -6 <= u <= 5 and abs(v) <= 5.5 and not (u < -4.5 and abs(v) > 4):
+                c = 4 if v < -2 else (5 if u < 2 else 4)         # the head
+                if abs(v) > 4.5 or u < -5.5 or u > 4.5:
+                    c = 3
+                if 1 <= u <= 3.5 and -1.5 <= v <= 1.5:
+                    c = 8 if abs(v) <= 0.5 else 7                # the lens
+            if 5 < u <= 15 and abs(v) <= 1.6:
+                c = 5 if v < 0 else 4                            # the barrel
+                if u > 13.5:
+                    c = 9 if abs(v) < 0.8 else 8                 # the muzzle
+            im.putpixel((x, y), c)
+    return im
+
+
+def aim_sprites() -> Image.Image:
+    """aim_target's OBJ sheet, 128 px wide: the turret's 16 headings (4 a row, OBJ palette 0),
+    then the security drone (palette 1) and the same drone with its eye cyan (palette 2),
+    which orbits. Tiles: turret heading h at ((h % 4) * 4 + (h / 4) * 64), drones 256, 260."""
+    im = Image.new("P", (128, 160), 0)
+    for h in range(16):
+        im.paste(turret(h), ((h % 4) * 32, (h // 4) * 32))
+    drone = Image.open(ART / "characters" / "drone.png").convert("RGBA")
+    dcol = sorted({p[:3] for p in drone.getdata() if p[3] >= 128}, key=sum)
+    assert len(dcol) <= 15, len(dcol)
+    def cyan(c):                                                 # the orbiter: pinks to cyans
+        r, g, b = c
+        return (g // 2, max(r, g), max(r, b)) if r > g + 40 else c
+    pal = [(0, 0, 0)] + [hexrgb_(c) for c in TURRET] + [(0, 0, 0)] * (6)
+    pal += [(0, 0, 0)] + dcol + [(0, 0, 0)] * (15 - len(dcol))
+    pal += [(0, 0, 0)] + [cyan(c) for c in dcol] + [(0, 0, 0)] * (15 - len(dcol))
+    for bank, ox in ((1, 0), (2, 32)):
+        for y in range(32):
+            for x in range(32):
+                p = drone.getpixel((x, y))
+                if p[3] >= 128:
+                    im.putpixel((ox + x, 128 + y), bank * 16 + 1 + dcol.index(p[:3]))
+    im.putpalette([v for c in pal for v in c] + [0] * (768 - 3 * len(pal)))
+    return im
+
+
+def rooftop() -> Image.Image:
+    """aim_target's BG2 (Mode 0, 2bpp): a dark roof under the text, 256x224 — slabs, the
+    turret's pad (a dim pink ring and its bolts round the centre, (128, 112)) and the
+    hatch of a stairwell. Colour 0 is the backdrop; the others stay dark for the text."""
+    im = Image.new("P", (256, 224), 1)
+    im.putpalette([v for c in ROOFTOP for v in hexrgb_(c)] + [0] * 756)
+    for y in range(224):
+        for x in range(256):
+            c = 1
+            if x % 32 == 0 or y % 32 == 0:
+                c = 2                                            # the slabs' seams
+            r = math.hypot(x - 127.5, y - 111.5)
+            if 24 <= r < 26 or 32 <= r < 33:
+                c = 3                                            # the pad
+            elif r < 24:
+                c = 2 if (x // 4 + y // 4) % 2 else 1            # its tread plate
+            if 26 <= r < 32 and abs(math.atan2(y - 111.5, x - 127.5) % (math.pi / 4) - math.pi / 8) < 0.06:
+                c = 2                                            # the bolts
+            if 200 <= x < 240 and 24 <= y < 56:
+                c = 2 if (x in (200, 239) or y in (24, 55)) else (1 if (y - 24) % 6 else 2)  # a hatch
+            im.putpixel((x, y), c)
+    return im
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1319,6 +1407,7 @@ def main() -> int:
                 sorted(set(Image.open(ART / "backgrounds" / "alley.png").convert("RGB").getdata()), key=sum)))}),
             (PALETTE_CYCLE, {"sign.png": png(neon_sign())}),
             (WORLD, {"plaza.png": png(plaza()), "residents.png": png(residents())}),
+            (AIM, {"units.png": png(aim_sprites()), "roof.png": png(rooftop())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
