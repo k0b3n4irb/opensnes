@@ -56,8 +56,8 @@
     "rom_sha256": "441dc58c124e8c3e865c8f8b9e99731e1bd34096224d4ae88324a4b027f83aaa"
   },
   "basics_scene_stack": {
-    "stream": "ffa7cc7df0c92f1818ba56bfa03fc119fb4bfe83004b0dfec582e54800724201",
-    "rom_sha256": "0de7cbe79634b24c1ee9a6ba34543acfa3989cce02183ca279d310838d22c8d2"
+    "stream": "c0eb189f97a735b6091f2ab297cb368d427ea14d2dbe9562518d2bc10301de0d",
+    "rom_sha256": "d1cbf29d221e98939c2313da0f34f10f51b27939ae631dc5a59144745204309c"
   },
   "chips_sa1_starfield": {
     "stream": "da4590808e88b35917a494aaaf6efeabf2587853fc8c8338db1ccb84ddf25478",

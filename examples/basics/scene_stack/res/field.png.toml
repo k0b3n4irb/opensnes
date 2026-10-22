@@ -1,0 +1,6 @@
+tool = "opensnes-tileset"
+
+# BG1, the play square, palette slot 0
+[convert]
+colors = 16
+flip = true

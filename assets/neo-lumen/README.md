@@ -178,7 +178,7 @@ indices 8-15 of palette 1, along x), for the example to rotate.
 
 ### The play square (game_skeleton)
 
-`examples/basics/game_skeleton`: `res/field.png` is a piece of
+`examples/basics/game_skeleton` (and `basics/scene_stack`, the same field and logo): `res/field.png` is a piece of
 world_sprites' square round its ring (`skeleton_field` in
 `devtools/art_assets/build.py`) with a kerb round the field and a dark band
 for the HUD; `res/logo.png` the screen logo (`screen_logo`, `logo/`);

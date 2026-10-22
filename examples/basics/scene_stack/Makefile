@@ -4,7 +4,7 @@ TARGET     := scene_stack.sfc
 ROM_NAME   := SCENE STACK DEMO
 
 USE_LIB    := 1
-LIB_MODULES := console sprite dma background text input scene
+LIB_MODULES := console sprite dma background text input scene colormath
 
 CSRC       := main.c
 

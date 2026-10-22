@@ -228,6 +228,7 @@ WORLD = ROOT / "examples" / "sprites" / "world_sprites" / "res"
 AIM = ROOT / "examples" / "basics" / "aim_target" / "res"
 COLLISION = ROOT / "examples" / "basics" / "collision_demo" / "res"
 SKELETON = ROOT / "examples" / "basics" / "game_skeleton" / "res"
+SCENE_STACK = ROOT / "examples" / "basics" / "scene_stack" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1528,6 +1529,7 @@ def main() -> int:
             (COLLISION, {"cells.png": png(warehouse_cells()), "cast.png": png(collision_sprites())}),
             (SKELETON, {"field.png": png(skeleton_field()), "logo.png": screen_logo(ART),
                         "cast.png": png(skeleton_sprites())}),
+            (SCENE_STACK, {"field.png": png(skeleton_field()), "logo.png": screen_logo(ART)}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

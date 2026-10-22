@@ -96,10 +96,10 @@
     "rom_sha256": "441dc58c124e8c3e865c8f8b9e99731e1bd34096224d4ae88324a4b027f83aaa"
   },
   "basics_scene_stack": {
-    "fbhash": "094c06534a796b35",
+    "fbhash": "65f812bced3ec393",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "8a8a0dddaecad6a630ce90b781f178b496721d58de260cc6bb55499544817039"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "d1cbf29d221e98939c2313da0f34f10f51b27939ae631dc5a59144745204309c"
   },
   "chips_sa1_starfield": {
     "fbhash": [
