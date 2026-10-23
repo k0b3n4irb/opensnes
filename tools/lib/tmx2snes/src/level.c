@@ -168,14 +168,19 @@ static void WriteQuadrantMap(void)
                     if (tileattr)
                     {
                         int t = (tileattr - 1) & 0x03FF;
-                        tilesnes = t;
+                        // the VRAM tile the tileset converter made of tileset tile t,
+                        // with the flips and the palette bank of its map entry: a Tiled
+                        // tile id is not a VRAM tile once the converter has merged
+                        // duplicates (the .t16 and the map module do the same lookup)
+                        tilesnes = tilesetmap[t] & 0xDFFF;
                         tilesnes |= (tileprop[t][2] & 0x07) << 10;  // palette
                         if (tileprop[t][1])
                             tilesnes |= (1 << 13);                  // priority
+                        // a flip in Tiled mirrors the tile as the converter stored it
                         if (tileattr & CUTE_TILED_FLIPPED_HORIZONTALLY_FLAG)
-                            tilesnes |= (1 << 14);
+                            tilesnes ^= (1 << 14);
                         if (tileattr & CUTE_TILED_FLIPPED_VERTICALLY_FLAG)
-                            tilesnes |= (1 << 15);
+                            tilesnes ^= (1 << 15);
                         PutWord(tilesnes, fpo);
                     }
                     else

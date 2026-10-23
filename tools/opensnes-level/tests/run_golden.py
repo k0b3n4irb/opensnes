@@ -55,6 +55,47 @@ for name, patch, expect in [("rotated tile", _rotated, "is rotated"),
     g.expect_refused(f"refused: {name}", ["convert", "--tileset", "tileset.map", "bad.tmj"], copy=["tileset.map"],
                      write={"bad.tmj": json.dumps(bad)}, needles=[expect])
 
+# The .q16 is written in VRAM tiles, through the tileset's table: once the
+# converter has merged duplicate tiles, a Tiled tile id is not a VRAM tile.
+# Until 2026-10-23 the quadrant map wrote the Tiled id, which equals the VRAM
+# tile only while the table is the identity (the fixture's is, on the tiles
+# its map uses); a 32-wide picture of 822 tiles came out as garbage.
+def _quadrant_through_table():
+    import struct
+    import tempfile
+    table = [((n * 7 + 3) % 16) for n in range(1024)]
+    table[2] |= 0x4000                      # stored mirrored by the converter
+    table[5] |= 0x0C00                      # in palette bank 3
+    with tempfile.TemporaryDirectory() as td:
+        work = Path(td)
+        proc = g.run(["convert", "-q", "--tileset", "perm.map", "--quadrant", "town.tmj"], work,
+                     copy=["town.tmj"], write={"perm.map": struct.pack("<1024H", *table)})
+        err = g.failure(proc)
+        if err:
+            return [err]
+        q = (work / "BG1.q16").read_bytes()
+        data = town["layers"][0]["data"]
+        errs = []
+        for cy in range(64):
+            for cx in range(64):
+                gid = data[cy * 64 + cx]
+                page = (cy // 32) * 2 + cx // 32
+                got = struct.unpack_from("<H", q, (page * 1024 + (cy % 32) * 32 + cx % 32) * 2)[0]
+                t = (gid & 0x0FFFFFFF) - 1
+                want = 0 if not gid else table[t] & 0xDFFF
+                if gid & 0x80000000:
+                    want ^= 0x4000
+                if gid & 0x40000000:
+                    want ^= 0x8000
+                if got & 0xDFFF != want and len(errs) < 3:
+                    errs.append(f"cell ({cx},{cy}): tile id {t} -> {got:#06x}, the table gives {want:#06x}")
+        return errs
+
+
+town = json.loads((g.fixtures / "town.tmj").read_text(encoding="utf-8"))
+g.check("convert --quadrant: the map goes through the tileset's table", "every cell is the table's entry",
+        _quadrant_through_table)
+
 # The layer's name names the output file: a map from someone else must not
 # choose where the tool writes, nor overflow the path buffer (audit 07-1).
 for name, lname in [("layer name with ..", "../escape/PWN"),
