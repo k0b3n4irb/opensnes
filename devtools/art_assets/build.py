@@ -234,6 +234,7 @@ PANEL_HUD = ROOT / "examples" / "basics" / "panel_hud" / "res"
 SAVE_GAME = ROOT / "examples" / "memory" / "save_game" / "res"
 CONTROLLER = ROOT / "examples" / "input" / "controller" / "res"
 PIXEL_TEXT = ROOT / "examples" / "text" / "pixel_text" / "res"
+MODE2 = ROOT / "examples" / "backgrounds" / "mode2" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1513,6 +1514,21 @@ def bar_terminal() -> Image.Image:
     return im
 
 
+# backgrounds/mode2: mode1's rainy street (4bpp) for Mode 2, mode3's canal (8bpp) for Mode 4
+def mode2_canal() -> bytes:
+    """canal_256.png, 256x224, with eight rows more below it, its last eight mirrored: the
+    offset-per-tile wave lowers a column by up to three lines, which then shows tilemap row 28."""
+    import io
+    src = Image.open(ART / "backgrounds" / "canal_256.png")
+    im = Image.new("P", (256, 232), 0)
+    im.putpalette(src.getpalette())
+    im.paste(src, (0, 0))
+    im.paste(src.crop((0, 216, 256, 224)).transpose(Image.FLIP_TOP_BOTTOM), (0, 224))
+    buf = io.BytesIO()
+    im.save(buf, format="PNG", optimize=False)
+    return buf.getvalue()
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1785,6 +1801,8 @@ def main() -> int:
             (SAVE_GAME, {"terminal.png": png(terminal()), "icon.png": png(save_icon())}),
             (CONTROLLER, {"screen.png": png(pad_screen()), "cast.png": png(pad_sprites())}),
             (PIXEL_TEXT, {"terminal.png": png(bar_terminal())}),
+            (MODE2, {"street.png": (ROOT / "examples" / "backgrounds" / "mode1" / "res" / "street.png").read_bytes(),
+                     "canal.png": mode2_canal()}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),

@@ -3,11 +3,11 @@
 # In Mode 2 BG3 is not a picture, it is an offset table: per screen column the
 # PPU reads BG3 tile-row 0 for the H offset word and tile-row 1 for the V
 # offset word. The example writes only V words, each carrying the 0x2000 bit
-# that says "apply to BG1". BG3's map is at word $3000, so row 0 is VRAM byte
-# $6000 (32 words = 64 bytes) and row 1 is byte $6040.
+# that says "apply to BG1". BG3's map is at word $7400, so row 0 is VRAM byte
+# $E800 (32 words = 64 bytes) and row 1 is byte $E840.
 #
-# The row-1 words are the whole example in 64 bytes: every word's high byte
-# is 0x20 (the BG1-enable bit) and the low bits walk a sine. The README lists
+# The row-1 words are the whole example in 64 bytes: every word carries
+# the 0x2000 bit (BG1) and its low ten bits walk a sine. The README lists
 # the three ways this goes wrong, and each is a distinct failure of this one
 # block:
 #   * "bands stay flat"          -> the row is zeros; the DMA missed VBlank.
@@ -23,10 +23,13 @@
 # reorders those two lines is invisible to every other pillar — the ROM still
 # runs, still animates its counter, and the bands just stop rippling.
 #
-# The BG1 side is asserted with two self-evident blocks: the example builds 16
-# solid tiles where tile N is uniformly colour N, so tile 3 (0b0011) must be
-# bitplanes 0+1 set and 2+3 clear, tile 12 (0b1100) the exact mirror. The map
-# rows are "tile = row & 15", so map row 3 is 32 copies of tile 3.
+# The BG1 side is asserted with four blocks of the street as the converter
+# wrote it (res/street.pic and res/street.map, since 2026-10-23: the solid
+# colour bands of before became mode1's rainy street): tiles 0 and 12 at
+# VRAM $0000, map rows 3 and 12 at word $7000.
+#
+# The wave is small since the street (-1 to 2 lines, words $23FF to $2002):
+# -1 is column 0's place, an offset word being the raw scroll value.
 #
 # Since the Mode 4 scene joined this example (2026-10-18, backgrounds/mode4
 # merged into it), the boot builds both scenes and lasts 15 frames longer:
@@ -42,55 +45,55 @@ at_symbol = "WaitForVBlank"
 hit = 192
 [checkpoint.values]
 wave_phase = 384                  # +2 per loop iteration
-"vram:3020" = { eq = 0x2044 }
-"vram:3021" = { eq = 0x203B }
-"vram:3022" = { eq = 0x2032 }
-"vram:3023" = { eq = 0x2029 }
-"vram:3024" = { eq = 0x2021 }
-"vram:3025" = { eq = 0x201B }
-"vram:3026" = { eq = 0x2015 }
-"vram:3027" = { eq = 0x2012 }
-"vram:3028" = { eq = 0x2010 }
-"vram:3029" = { eq = 0x2010 }
-"vram:302A" = { eq = 0x2012 }
-"vram:302B" = { eq = 0x2015 }
-"vram:302C" = { eq = 0x201B }
-"vram:302D" = { eq = 0x2021 }
-"vram:302E" = { eq = 0x2029 }
-"vram:302F" = { eq = 0x2032 }
-"vram:3030" = { eq = 0x203B }
-"vram:3031" = { eq = 0x2044 }
-"vram:3032" = { eq = 0x204D }
-"vram:3033" = { eq = 0x2056 }
-"vram:3034" = { eq = 0x205E }
-"vram:3035" = { eq = 0x2064 }
-"vram:3036" = { eq = 0x206A }
-"vram:3037" = { eq = 0x206D }
-"vram:3038" = { eq = 0x206F }
-"vram:3039" = { eq = 0x206F }
-"vram:303A" = { eq = 0x206D }
-"vram:303B" = { eq = 0x206A }
-"vram:303C" = { eq = 0x2064 }
-"vram:303D" = { eq = 0x205E }
-"vram:303E" = { eq = 0x2056 }
-"vram:303F" = { eq = 0x204D }
-"vram:3000" = { eq = 0x0000 }   # row 0: no H offsets
-"vram:3001" = { eq = 0x0000 }   # row 0: no H offsets
-"vram:3002" = { eq = 0x0000 }   # row 0: no H offsets
-"vram:3003" = { eq = 0x0000 }   # row 0: no H offsets
-"vram:3004" = { eq = 0x0000 }   # row 0: no H offsets
-"vram:3005" = { eq = 0x0000 }   # row 0: no H offsets
-"vram:3006" = { eq = 0x0000 }   # row 0: no H offsets
-"vram:3007" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7420" = { eq = 0x2001 }
+"vram:7421" = { eq = 0x2000 }
+"vram:7422" = { eq = 0x23FF }
+"vram:7423" = { eq = 0x23FF }
+"vram:7424" = { eq = 0x23FF }
+"vram:7425" = { eq = 0x23FF }
+"vram:7426" = { eq = 0x23FF }
+"vram:7427" = { eq = 0x2000 }
+"vram:7428" = { eq = 0x2000 }
+"vram:7429" = { eq = 0x2001 }
+"vram:742A" = { eq = 0x2002 }
+"vram:742B" = { eq = 0x2002 }
+"vram:742C" = { eq = 0x2002 }
+"vram:742D" = { eq = 0x2002 }
+"vram:742E" = { eq = 0x2002 }
+"vram:742F" = { eq = 0x2001 }
+"vram:7430" = { eq = 0x2001 }
+"vram:7431" = { eq = 0x2000 }
+"vram:7432" = { eq = 0x23FF }
+"vram:7433" = { eq = 0x23FF }
+"vram:7434" = { eq = 0x23FF }
+"vram:7435" = { eq = 0x23FF }
+"vram:7436" = { eq = 0x23FF }
+"vram:7437" = { eq = 0x2000 }
+"vram:7438" = { eq = 0x2000 }
+"vram:7439" = { eq = 0x2001 }
+"vram:743A" = { eq = 0x2002 }
+"vram:743B" = { eq = 0x2002 }
+"vram:743C" = { eq = 0x2002 }
+"vram:743D" = { eq = 0x2002 }
+"vram:743E" = { eq = 0x2002 }
+"vram:743F" = { eq = 0x2001 }
+"vram:7400" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7401" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7402" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7403" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7404" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7405" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7406" = { eq = 0x0000 }   # row 0: no H offsets
+"vram:7407" = { eq = 0x0000 }   # row 0: no H offsets
 [checkpoint.ppu]
 bgmode = 2
 "bgs.2.v_scroll" = 0              # row 0 = H offsets, row 1 = V offsets
 
-[asserts.blocks]                  # the scene itself, unchanged for the run
-bg1_tile3_solid    = { space = "vram", offset = "0060", hex = "ffffffffffffffffffffffffffffffff00000000000000000000000000000000" }
-bg1_tile12_solid   = { space = "vram", offset = "0180", hex = "00000000000000000000000000000000ffffffffffffffffffffffffffffffff" }
-bg1_map_row3       = { space = "vram", offset = "40C0", hex = "03000300030003000300030003000300" }
-bg1_map_row12      = { space = "vram", offset = "4300", hex = "0c000c000c000c000c000c000c000c00" }
+[asserts.blocks]                  # the scene itself, unchanged for the run: the street's tiles and map as converted
+bg1_tile0          = { space = "vram", offset = "0000", hex = "fd1afd1afd1afd1afd12fd12fd12fd1208f708f708f708f700ff10ef10ef10ef" }
+bg1_tile12         = { space = "vram", offset = "0180", hex = "ff00ff00ff00ff00ff00ff00ff00ff0000ff00ff00ff00ff00ff00ff00ff00ff" }
+bg1_map_row3       = { space = "vram", offset = "E0C0", hex = "5f006000610062006300640065006600" }
+bg1_map_row12      = { space = "vram", offset = "E300", hex = "7f018001810182018301840185018601" }
 
 [asserts.dma]
 unsafe_writes    = 0

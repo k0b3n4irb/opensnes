@@ -49,15 +49,15 @@
   },
   "backgrounds_mode2": {
     "fbhash": [
-      "85f3d975bdb4cd75",
-      "dc81299438bb0755"
+      "3ccfb36411e4cb49",
+      "48213515c7925959"
     ],
     "frames": [
       200,
       400
     ],
-    "luna_version": "v1.39.0",
-    "rom_sha256": "37e724aa66b7a947793eed8366524f2fa35f0ed2cfdbfe86015f687a2e9610cb"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "120290f57bc79597584ac0fe39fde7ae82eff90be9f565914014827223dac6ae"
   },
   "backgrounds_mode3": {
     "fbhash": "83f634143d0256d0",
