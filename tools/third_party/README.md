@@ -25,3 +25,13 @@ suppresses this directory (upstream code with its own noise).
   by the nightly fuzzer). A genuine image still gets its buffer in one
   allocation; a lying header fails with lodepng error 91. Re-apply on any
   lodepng update — regression input `tools/fuzz/crashes/lodepng/`.
+- `cute_tiled.h` `cute_tiled_read_properties_internal` (2026-10-23): the scan
+  that tells a float from an int stops at the number's end (`,`, `}` or
+  `]`) and at the end of the buffer. Upstream looked for the next `,`
+  only: an int property last in its object scanned into the rest of the
+  map, and one last in the last object off the end of the buffer, where a
+  `.` made it a float, read back as 0 — nondeterministically (found by
+  demos/rpg's `look` property, `HOST_LOOK` 4 or 0 from one run to the
+  next). Re-apply on any cute_tiled update — regression case in
+  `tools/opensnes-level/tests/run_golden.py`. The file carries other
+  `OpenSNES:` bounds on its reads, marked in place.

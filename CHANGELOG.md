@@ -22,6 +22,14 @@ All notable changes to OpenSNES are documented in this file.
   through the table, as the `.t16` and the `map` module do, with the
   converter's flips and palette bank and Tiled's flips on top. A golden case
   permutes the table; it fails without the fix.
+- fix(tools): `opensnes-level` reads an integer property right when it is the
+  last of the last object of a map. The Tiled parser (cute_tiled) told an
+  int from a float by looking for a `.` up to the next `,`; after the map's
+  last object there is none when `layers` is the last key, so it read past
+  the end of the buffer, and the value came out right or as 0 from one run
+  to the next (a heap-buffer-overflow under ASan). The scan now stops at the
+  number's end. A golden case runs that map; under `make test-sanitizers`
+  it fails without the fix.
 
 ## [0.51.0] — 2026-10-18
 

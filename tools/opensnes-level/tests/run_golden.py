@@ -92,6 +92,40 @@ def _quadrant_through_table():
         return errs
 
 
+# An int property last in the last object of the map: cute_tiled told it
+# from a float by looking for a '.' up to the next ',', of which there is
+# none after the last object when "layers" is the map's last key: the scan
+# ran off the buffer and the value came out 0 or right depending on the heap
+# (a heap-buffer-overflow under ASan, which `make test-sanitizers` runs this
+# case under). Until 2026-10-23.
+def _last_int_property():
+    import tempfile
+    m = json.loads((g.fixtures / "town.tmj").read_text(encoding="utf-8"))
+    objs = [l for l in m["layers"] if l["type"] == "objectgroup"][0]["objects"]
+    objs.append({"id": 99, "name": "host", "type": "host", "rotation": 0, "x": 96, "y": 128,
+                 "width": 8, "height": 8, "visible": True,
+                 "properties": [{"name": "text", "type": "string", "value": "MIND THE CABLES."},
+                                {"name": "look", "type": "int", "value": 4}]})
+    m["layers"] = m.pop("layers")          # last, as Tiled may write it: no ',' after the object
+    errs = []
+    for _ in range(8):
+        with tempfile.TemporaryDirectory() as td:
+            work = Path(td)
+            proc = g.run(["convert", "-q", "--tileset", "tileset.map", "--entities", "last.tmj"], work,
+                         copy=["tileset.map"], write={"last.tmj": json.dumps(m, separators=(",", ":"))})
+            err = g.failure(proc)
+            if err:
+                return [err]
+            inc = (work / "last_entities.inc").read_text()
+            if "#define HOST_LOOK 4" not in inc:
+                errs.append("HOST_LOOK is not 4: " + [l for l in inc.splitlines() if "HOST_LOOK" in l][0])
+                break
+    return errs
+
+
+g.check("convert --entities: an int property last in the last object", "HOST_LOOK 4, eight runs",
+        _last_int_property)
+
 town = json.loads((g.fixtures / "town.tmj").read_text(encoding="utf-8"))
 g.check("convert --quadrant: the map goes through the tileset's table", "every cell is the table's entry",
         _quadrant_through_table)
