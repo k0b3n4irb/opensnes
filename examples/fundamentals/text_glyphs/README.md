@@ -1,6 +1,6 @@
 # Fundamentals: how a glyph is drawn
 
-> The under-the-hood companion to the Text family. Nine tiles, two colours,
+> The under-the-hood companion to the Text family. Nine tiles, three colours,
 > one message — hand-coded 2bpp bitplanes written straight into VRAM, no
 > `text` module. Read [`text/print_string`](../../text/print_string/) for the
 > easy way; read this to see what that module hides.
@@ -48,25 +48,30 @@ That's exactly what this example does.
 ### 2. Drawing Letters in Hex
 
 Each letter is hand-encoded as a 16-byte tile in 2bpp format (2 bits per pixel = 4 possible
-colors). Every pair of bytes is one row of 8 pixels:
+colors). Every pair of bytes is one row of 8 pixels: the first byte is bitplane 0, the
+second bitplane 1. The letters are the glyphs of the city's font, the one the `text`
+module uses (`lib/source/text.asm`):
 
 ```c
 static const u8 font_tiles[] = {
     /* Tile 1: H */
-    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x7E, 0x00,
-    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x00, 0x00,
+    0x66, 0x00, 0x66, 0x11, 0x66, 0x11, 0x7E, 0x01,
+    0x66, 0x19, 0x66, 0x11, 0x66, 0x11, 0x00, 0x33,
     /* ... */
 };
 ```
 
-Take `0x66` = binary `01100110`. Each `1` is a lit pixel, each `0` is background.
-Draw it out and you'll see two vertical bars — the sides of the letter H.
-The `0x7E` row (`01111110`) is the crossbar.
+Take the first byte of each pair, `0x66` = binary `01100110`. Each `1` is a lit pixel,
+each `0` is background. Draw them out and you'll see two vertical bars — the sides of
+the letter H. The `0x7E` row (`01111110`) is the crossbar.
 
-> **Why are all the second bytes `0x00`?** In 2bpp format, byte 1 is bitplane 0
-> and byte 2 is bitplane 1. We only use color 1 (bitplane 0 = 1, bitplane 1 = 0),
-> so the second byte is always zero. If you set both to `0xFF`, you'd get color 3
-> instead. That's how the SNES packs multiple color choices into minimal memory.
+> **And the second bytes?** They are bitplane 1. A pixel's colour is its bitplane 1 bit
+> times two plus its bitplane 0 bit: colour 1 is plane 0 alone, colour 2 plane 1 alone,
+> colour 3 both. Bitplane 0 holds the letter (colour 1, cyan); bitplane 1 holds its
+> shadow (colour 2, pink): the row above moved one pixel right (`>> 1`, bit 7 is the
+> leftmost pixel), minus the pixels the letter covers. Row 1 of H:
+> `(0x66 >> 1) & ~0x66` = `0x33 & 0x99` = `0x11`. No pixel has both bits set, so
+> colour 3 never shows. That's how the SNES packs four colours into two bits a pixel.
 
 ### 3. Setting Up the PPU
 
@@ -76,14 +81,14 @@ Before writing anything to VRAM, you need to tell the PPU where to find things:
 consoleInit();
 setMode(BG_MODE0, 0);
 
-REG_BG1SC = 0x04;    /* Tilemap at VRAM $0400, 32x32 entries */
-REG_BG12NBA = 0x00;  /* BG1 tile graphics at VRAM $0000 */
+bgSetMapPtr(0, 0x0400, BG_MAP_32x32);   /* BG1SC: tilemap at VRAM $0400, 32x32 entries */
+bgSetGfxPtr(0, 0x0000);                 /* BG12NBA: BG1 tile graphics at VRAM $0000 */
 ```
 
 Mode 0 gives you four background layers, each with 4 colors (2bpp). For a simple
-text display, one layer is plenty. `BG1SC = 0x04` tells the PPU "the tilemap for
-BG1 starts at VRAM word address `$0400`", and `BG12NBA = 0x00` says "the actual tile
-graphics start at `$0000`."
+text display, one layer is plenty. `bgSetMapPtr` writes `BG1SC`: "the tilemap for
+BG1 starts at VRAM word address `$0400`"; `bgSetGfxPtr` writes `BG12NBA`: "the
+actual tile graphics start at `$0000`."
 
 > **Why two separate addresses?** Because tiles and tilemaps are different data.
 > Tiles are the pixel art. The tilemap is the layout — which tile goes where on
@@ -94,37 +99,35 @@ graphics start at `$0000`."
 ### 4. Uploading Tiles to VRAM
 
 VRAM isn't regular memory — you can't just write to it with a pointer. You talk to it
-through a pair of registers: set the address, then write data byte by byte:
+through registers: set the address (`VMADDL`/`VMADDH`), then write data, low byte then
+high byte (`VMDATAL`/`VMDATAH`). For a block of bytes, a DMA channel does those writes:
 
 ```c
-REG_VMAIN = 0x80;   /* Auto-increment after writing high byte */
-REG_VMADDL = 0x00;  /* Target: VRAM $0000 */
-REG_VMADDH = 0x00;
-
-for (i = 0; i < 144; i += 2) {
-    REG_VMDATAL = font_tiles[i];      /* Low byte */
-    REG_VMDATAH = font_tiles[i + 1];  /* High byte → address increments */
-}
+dmaCopyVram((u8 *)font_tiles, 0x0000, 144);   /* VRAM $0000, 144 bytes */
 ```
 
-VRAM is organized in 16-bit words. `VMAIN = 0x80` means "auto-increment the address
-after I write the high byte." So you write low, write high, and the address moves
-forward by one word. 144 bytes = 9 tiles × 16 bytes each = our complete font.
+VRAM is organized in 16-bit words. With `VMAIN = 0x80` ("auto-increment the address
+after the high byte", which the library sets), each low/high pair lands in one word and
+the address moves forward by one. 144 bytes = 9 tiles × 16 bytes each = our complete
+font. Section 6 does the same writes by hand, for the tilemap.
 
-### 5. Two Colors, Four Bytes
+### 5. Three Colors, Six Bytes
 
-The SNES palette uses 15-bit BGR color (5 bits per channel, little-endian):
+The SNES palette uses 15-bit BGR color (5 bits per channel, `0bbbbbgggggrrrrr`,
+little-endian):
 
 ```c
-REG_CGADD = 0;       /* Start at color 0 */
-REG_CGDATA = 0x00;   /* Color 0 low:  dark blue */
-REG_CGDATA = 0x28;   /* Color 0 high: dark blue */
-REG_CGDATA = 0xFF;   /* Color 1 low:  white */
-REG_CGDATA = 0x7F;   /* Color 1 high: white */
+static const u8 bg_palette[] = {
+    0x61, 0x10,  /* Color 0: the glass, #0a1a22 */
+    0x49, 0x73,  /* Color 1: cyan, #48d0e0 */
+    0xB4, 0x30,  /* Color 2: pink, #a02860 */
+};
+dmaCopyCGram((u8 *)bg_palette, 0, 6);
 ```
 
-Color 0 is the background, color 1 is the text. Four bytes, two colors. That's all
-we need for a monochrome font.
+Color 0 is the background, color 1 the letters, color 2 their shadow. Cyan is
+`#48d0e0`: each 8-bit channel loses its three low bits (red 72 → 9, green 208 → 26,
+blue 224 → 28), and `9 | 26 << 5 | 28 << 10` = `$7349`, stored low byte first.
 
 ### 6. Spelling the Message
 
@@ -168,8 +171,8 @@ attributes (palette, flip, priority). We set them all to 0 — palette 0, no fli
 ### 7. Lights On
 
 ```c
-REG_TM = TM_BG1;  /* Show BG1 on the main screen */
-setScreenOn();     /* Turn on the display */
+setMainScreen(LAYER_BG1);   /* TM: show BG1 on the main screen */
+setScreenOn();              /* Turn on the display */
 
 while (1) {
     WaitForVBlank();
@@ -185,7 +188,7 @@ and cause timing issues.
 
 ## Tips & Tricks
 
-- **Screen is black?** Check that `REG_TM` has the right layer enabled. If BG1 isn't
+- **Screen is black?** Check that `setMainScreen()` (the `TM` register) has the right layer enabled. If BG1 isn't
   in the TM register, the PPU won't draw it, no matter what's in VRAM.
 
 - **Tiles look wrong?** Count your bytes. 2bpp = 16 bytes per tile. If your array is
@@ -206,8 +209,8 @@ and cause timing issues.
 - **Change the message:** Add tiles for your own letters. Each tile is 16 bytes — sketch
   it on graph paper first, convert to hex, add it to `font_tiles[]`.
 
-- **Add color:** Set bitplane 1 to non-zero values in your tile data and add more
-  colors to the palette. Color 2 uses bitplane 1 only, color 3 uses both bitplanes.
+- **Use colour 3:** set both bitplanes on some pixels (an inner highlight on each
+  letter, say) and add a fourth colour to the palette.
 
 - **Two lines of text:** Write a second message at a different tilemap row. Row N starts
   at base address + N×32.
@@ -285,5 +288,5 @@ source files via `ASMSRC`.
 
 | File | What's in it |
 |------|-------------|
-| `main.c` | Everything — tiles, palette, tilemap, main loop (~136 lines) |
+| `main.c` | Everything — tiles, palette, tilemap, main loop (~180 lines) |
 | `Makefile` | `LIB_MODULES := console sprite dma background` |

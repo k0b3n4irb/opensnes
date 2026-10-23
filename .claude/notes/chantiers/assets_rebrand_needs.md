@@ -62,7 +62,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 
 | Exemple | Capacité | Aujourd'hui | Verdict | Scène | Assets |
 |---|---|---|---|---|---|
-| fundamentals/text_glyphs | tuiles 2bpp écrites à la main dans la VRAM, sans module | 9 tuiles en tableau C | **G** — le « sous le capot » ; garder procédural, redessiner les 9 glyphes dans le style de F1 | « HELLO WORLD! » dans la police de la ville | F1 (glyphes recopiés en C) |
+| fundamentals/text_glyphs | tuiles 2bpp écrites à la main dans la VRAM, sans module | 9 tuiles en tableau C | **G** — le « sous le capot » ; garder procédural, redessiner les 9 glyphes dans le style de F1 | « HELLO WORLD! » dans la police de la ville ; **fait le 2026-10-23** : les glyphes étaient déjà ceux de F1 ; le plan 1 porte maintenant leur ombre (couleur 2, rose) sous des lettres cyan, sur le verre du terminal, et le README suit le code (`bgSetMapPtr`, `dmaCopyVram`, `setMainScreen`) | F1 (glyphes recopiés en C) |
 
 ### basics (7 → 5)
 
