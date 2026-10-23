@@ -62,3 +62,38 @@ closed and has noted constraints (a) and (b). When the loop commit is
 announced, it will measure its real case with the same scenario (luna
 profile, frames 200 to 1400) and send us the before/after figures. The
 loop thread stays open until those figures arrive.
+
+## Next in the compiler queue: `p[i]` through a far pointer (accepted 2026-10-23)
+
+The game sent a stand-alone case. On develop `e8374a97`, the two chained
+reads `lv->w[lv->order[i]]` through far pointers held in a ROM struct cost
+74 instructions. Two places waste the most:
+
+1. The high word of the offset `i * 2` takes 9 instructions:
+   `sta / asl / sta / lda / xba / and #$00FF / lsr x7`. Right after `asl`,
+   the carry already holds that bit, so `lda #0 / rol` would do it in 2.
+2. A 32-bit add follows, plus a copy of the pointer into `tcc__r9`, before
+   `lda [tcc__r9]`. With the pointer already on the direct page,
+   `ldy offset / lda [dp],y` would do the whole read. The compiler already
+   uses that form for struct fields.
+
+Accepted, Class A, in the compiler worktree, after the loop chantier:
+
+1. **The carry for the high word.** A local change with no risk.
+2. **`[dp],y`, only where the offset is proved below $10000.** With `i`
+   a u16 and 2-byte elements, `i * 2` can need 17 bits, and Y carries 16.
+   Without a proved bound the 32-bit add stays. This is the same rule as
+   the `i + 8` fold (`cdcc4580`).
+
+Whether `[dp],y` carries into the bank byte is a hardware claim. The game
+found no arbiter stating it, so it gets arbitrated against the corpus
+(`hardware_claims.md`), or measured on luna, before any codegen relies on it.
+
+The thread closes when the reduced case is well under 74 instructions and
+the game has measured its real case.
+
+The game's figures for the loop thread (worst case, 2026-10-23):
+
+- a step costs about 0.87 M master cycles (median);
+- `path_move` costs about 124 000 on average, up to about 200 000. That
+  is the largest item left.
