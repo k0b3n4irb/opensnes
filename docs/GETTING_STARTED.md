@@ -95,7 +95,7 @@ cd opensnes-examples_<version>/examples/bin
 > Any other SNES emulator opens the `.sfc` as well (Mesen, bsnes, Snes9x —
 > see the table above).
 
-You should see "TEXT MODULE TEST" in white on a dark blue screen.
+You should see "OS: RUE BASSE NET" and "READY" in white on a dark blue-green screen.
 
 ### A5. Create Your Own Project
 

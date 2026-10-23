@@ -7,8 +7,8 @@
  * (tiles + palette + VRAM + VBlank). `textModeInit()` sets up the hardware
  * *and* the text engine in one call, `textPrintAt()` writes into an
  * off-screen buffer, and the NMI handler DMAs that buffer to VRAM as a
- * tilemap on the next VBlank — no manual flush needed. One string, on BG1,
- * in Mode 0. This is the first rung of the Text ladder; the under-the-hood
+ * tilemap on the next VBlank — no manual flush needed. Two lines on BG1,
+ * in Mode 0: the boot screen of a terminal in the Rue basse. This is the first rung of the Text ladder; the under-the-hood
  * version (a glyph as raw 2bpp bitplanes) lives in
  * `examples/fundamentals/text_glyphs`.
  *
@@ -18,7 +18,7 @@
  * - setScreenOn() comes last, after VRAM is ready, to avoid a garbage first frame
  *
  * @par What to Observe
- * - A dark blue screen with "TEXT MODULE TEST" printed in white
+ * - A terminal's dark glass with "OS: RUE BASSE NET" and "READY" in white
  *
  * @par Modules Used
  * console, dma, text, background, sprite
@@ -42,9 +42,10 @@
  */
 int main(void) {
     textModeInit();
-    setColor(0, RGB(0, 0, 10));
+    setColor(0, RGB(1, 3, 4));          /* the terminal's glass, #0a1a22 */
 
-    textPrintAt(8, 14, "TEXT MODULE TEST");
+    textPrintAt(7, 13, "OS: RUE BASSE NET");
+    textPrintAt(7, 15, "READY");
 
     WaitForVBlank();
     setScreenOn();

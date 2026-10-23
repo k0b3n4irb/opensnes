@@ -54,7 +54,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 
 | Exemple | Capacité enseignée | Aujourd'hui | Verdict | Scène proposée | Assets |
 |---|---|---|---|---|---|
-| text/print_string | `textModeInit` + `textPrintAt`, la poignée de main VBlank ; ROM de fumée (ligne 1 du protocole matériel) | police intégrée, aucun asset | **G** — le plus petit ROM, doit le rester | l'écran de démarrage d'un terminal : « OS: » puis une ligne | F1 |
+| text/print_string | `textModeInit` + `textPrintAt`, la poignée de main VBlank ; ROM de fumée (ligne 1 du protocole matériel) | police intégrée, aucun asset | **G** — le plus petit ROM, doit le rester | l'écran de démarrage d'un terminal : « OS: » puis une ligne ; **fait le 2026-10-23** : « OS: RUE BASSE NET » puis « READY », en blanc sur le verre du terminal ; toujours aucun asset | F1 |
 | text/scroll_message | `bgSetScroll` sur le calque de texte (marquee) | police intégrée | **F→scrolling/mixed_scroll** — le défilement est enseigné par scrolling/ ; une ligne qui défile appartient à l'écran-titre | (le bandeau défilant de l'écran-titre) | F1 |
 | text/pixel_text | texte proportionnel composé en RAM, `tileBlitGlyph2bpp` | police 5x7 déclarée en bits, procédural | **G** — seul exemple de texte hors grille | l'écran d'un terminal de bar : messages en police étroite, A les décale ; **fait le 2026-10-23** : le terminal de save_game avec un bol de nouilles au-dessus du panneau en BG2 (`bar_terminal`), le menu du bar en ambre dans le calque, la police 5x7 inchangée | F2, U1 |
 

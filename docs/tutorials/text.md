@@ -75,9 +75,10 @@ colour 1 white. That is all of @ref examples_text_print_string —
 ```c
 int main(void) {
     textModeInit();
-    setColor(0, RGB(0, 0, 10));
+    setColor(0, RGB(1, 3, 4));          /* the terminal's glass, #0a1a22 */
 
-    textPrintAt(8, 14, "TEXT MODULE TEST");
+    textPrintAt(7, 13, "OS: RUE BASSE NET");
+    textPrintAt(7, 15, "READY");
 
     WaitForVBlank();
     setScreenOn();
