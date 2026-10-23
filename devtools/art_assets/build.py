@@ -235,6 +235,7 @@ SAVE_GAME = ROOT / "examples" / "memory" / "save_game" / "res"
 CONTROLLER = ROOT / "examples" / "input" / "controller" / "res"
 PIXEL_TEXT = ROOT / "examples" / "text" / "pixel_text" / "res"
 MODE2 = ROOT / "examples" / "backgrounds" / "mode2" / "res"
+MODE5 = ROOT / "examples" / "backgrounds" / "mode5_hires" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1529,6 +1530,83 @@ def mode2_canal() -> bytes:
     return buf.getvalue()
 
 
+# backgrounds/mode5_hires: a page of the city's terminal at 512 columns, converted to Mode 5's tile pairs
+HIRES_COLOURS = ["#0a1a22", "#e8f8ff", "#48d0e0", "#f0b050"]     # the glass, white, cyan, amber
+HIRES_LINES = [
+    (8, 1, "RUE BASSE NET  TERMINAL 512  BG MODE 5 + INTERLACE (512 x 448)"),
+    (32, 2, "Every glyph on this page is 8 pixels wide: a 256-wide mode"),
+    (48, 2, "would have to draw each character in 4 pixels."),
+    (80, 1, " !\"#$%&'()*+,-./0123456789:;<=>?"),
+    (96, 1, "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"),
+    (112, 1, "`abcdefghijklmnopqrstuvwxyz{|}~"),
+    (144, 3, "videoSetInterlace(1);"),
+    (160, 3, "setMainScreen(LAYER_BG1); setSubScreen(LAYER_BG1);"),
+    (192, 2, "1-pixel vertical stripes (white/glass then cyan/amber):"),
+    (328, 2, "1-pixel checkerboard:"),
+    (424, 1, "Technique: krom (Peter Lemon), InterlaceFont. Art: OpenSNES"),
+]
+
+
+def hires_page() -> dict[str, bytes]:
+    """512x448 in four colours: the library's 8x8 font, 63 columns after an 8-pixel margin,
+    stripe bands and a checkerboard that a 256-wide mode cannot show. Converted as Mode 5 reads it: 4bpp 8x8 subtiles emitted in left/right
+    pairs (a 16x8 tile reads characters N and N+1), a 32x64 map of the pairs (interlace maps
+    texel rows 1:1 to lines, so the page needs 56 of the 64 rows), a 4-colour palette."""
+    font = font8()
+    W, H = 512, 448
+    a = [[0] * W for _ in range(H)]
+    for y0, c, text in HIRES_LINES:
+        for i, ch in enumerate(text):
+            rows = font.get(ch)
+            if rows is None:
+                continue
+            for y in range(8):
+                for x in range(8):
+                    if rows[y] >> (7 - x) & 1:
+                        a[y0 + y][8 + i * 8 + x] = c
+    for y in range(208, 248):
+        a[y] = [1 if x % 2 == 0 else 0 for x in range(W)]
+    for y in range(262, 302):
+        a[y] = [(2, 0, 3, 0)[x % 4] for x in range(W)]
+    for y in range(344, 400):
+        for x in range(8, 504):
+            a[y][x] = (x + y) % 2
+
+    def tile4bpp(rows):
+        out = bytearray(32)
+        for y in range(8):
+            planes = [0, 0, 0, 0]
+            for x in range(8):
+                for p in range(4):
+                    planes[p] |= (rows[y][x] >> p & 1) << (7 - x)
+            out[y * 2], out[y * 2 + 1], out[16 + y * 2], out[16 + y * 2 + 1] = planes
+        return bytes(out)
+
+    tiles, pairs, tilemap = [], {}, []
+    blank = [[0] * 8 for _ in range(8)]
+    for ty in range(64):
+        for tx in range(32):
+            if ty * 8 < H:
+                left = [a[ty * 8 + y][tx * 16:tx * 16 + 8] for y in range(8)]
+                right = [a[ty * 8 + y][tx * 16 + 8:tx * 16 + 16] for y in range(8)]
+            else:
+                left = right = blank
+            key = (str(left), str(right))
+            if key not in pairs:
+                pairs[key] = len(tiles)
+                tiles += [tile4bpp(left), tile4bpp(right)]
+            tilemap.append(pairs[key])
+    pal = bytearray(32)
+    for i, c in enumerate(HIRES_COLOURS):
+        r, g, b = hexrgb_(c)
+        struct.pack_into("<H", pal, i * 2, (r >> 3) | (g >> 3) << 5 | (b >> 3) << 10)
+    src = Image.new("P", (W, H), 0)
+    src.putpalette([v for c in HIRES_COLOURS for v in hexrgb_(c)] + [0] * 756)
+    src.putdata([v for row in a for v in row])
+    return {"text.pic": b"".join(tiles), "text.map": struct.pack("<%dH" % len(tilemap), *tilemap),
+            "text.pal": bytes(pal), "source.png": png(src)}
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1801,6 +1879,7 @@ def main() -> int:
             (SAVE_GAME, {"terminal.png": png(terminal()), "icon.png": png(save_icon())}),
             (CONTROLLER, {"screen.png": png(pad_screen()), "cast.png": png(pad_sprites())}),
             (PIXEL_TEXT, {"terminal.png": png(bar_terminal())}),
+            (MODE5, hires_page()),
             (MODE2, {"street.png": (ROOT / "examples" / "backgrounds" / "mode1" / "res" / "street.png").read_bytes(),
                      "canal.png": mode2_canal()}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),

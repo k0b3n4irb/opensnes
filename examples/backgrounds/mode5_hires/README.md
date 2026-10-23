@@ -11,11 +11,12 @@ all composing through a write-only-register shadow) with a text page as
 the canonical hi-res payload — every glyph is 8 px wide, unrepresentable
 at 256.
 
-The page is original art (`gen_assets.py` renders it and converts to
-Mode 5's paired-tile format; outputs committed so builds don't need
-Pillow). The 1-pixel stripe/checker bands are the acid test: at true
-512 px they alternate every column — a 256-wide mode would alias them
-to flat gray.
+The page is a screen of the Rue basse's terminal, 63 columns of the
+library's 8x8 font in the city's colours (white, cyan and amber on the
+glass), drawn and converted to Mode 5's paired-tile format by
+`devtools/art_assets/build.py` (`hires_page`); the outputs are committed. The
+1-pixel stripe/checker bands are the acid test: at true 512 px they
+alternate every column — a 256-wide mode would alias them to flat gray.
 
 ## SNES Concepts
 
@@ -36,10 +37,10 @@ strokes, while a modern LCD's crisp pixel grid shows them individually:
 - **Text looks slightly "double-struck"** — those are the real alternating
   columns. Authentic PPU output (hi-res games like Seiken Densetsu 3 show
   the same fringing in emulators); a CRT melts it into clean strokes.
-- **The white/black 1-px band reads as flat gray** — 1-px columns are
+- **The white/glass 1-px band reads as flat gray** — 1-px columns are
   finer than typical window scaling can resolve. That IS the acid test:
   at 256 wide this band couldn't exist at all. On a CRT it shimmers.
-- **The cyan/gold band still resolves into visible stripes** — its period
+- **The cyan/amber band still resolves into visible stripes** — its period
   is 4 px (2 px per color), coarse enough to survive scaling: direct
   visual proof you are looking at 512 columns.
 - **The 1-px checkerboard reads as gray** — same physics, both axes.
@@ -54,26 +55,34 @@ strokes, while a modern LCD's crisp pixel grid shows them individually:
 | BG1SC | map word $4000 | same (`bgSetMapPtr`), 32×64 (krom: 64×32 — his page is wider, ours taller) |
 | BG12NBA | tiles word $8000 | same (`bgSetGfxPtr`) — verified |
 
-## Validation notes (luna v1.9.0)
+## Validation notes
 
-luna renders hi-res/interlace CONTENT correctly but captures at 256×224
-(≈2×2 downsample of the 512×448 field pair) — native-resolution capture
-is [luna#115](https://github.com/k0b3n4irb/luna/issues/115). The full
-448-line page displays once with no vertical wrap (the 32×64 map fix —
-a 32-row map only covers 256 hi-res lines in interlace), and the 1-px
-bands render as the correct blend grays.
+The screenshot above is luna's capture at native resolution
+(`luna run --native-res`, 512×448: the field pair, every column), and the
+visual baseline is taken the same way. The full 448-line page displays once
+with no vertical wrap (the 32×64 map: a 32-row map only covers 256 hi-res
+lines in interlace).
 
 ## How to Build
 
 ```bash
 cd examples/backgrounds/mode5_hires && make
-# regenerate the page (needs Pillow + numpy):
-python3 gen_assets.py && make
+# redraw the page (contributors, needs Pillow):
+python3 ../../../devtools/art_assets/build.py && make
 ```
 
 ## Modules Used
 
 `console`, `dma`, `background`
+
+## Assets
+
+| File | What | Made by |
+|---|---|---|
+| `res/text.pic`, `res/text.map`, `res/text.pal` | the page as Mode 5 reads it: 4bpp tile pairs, a 32×64 map, four colours | `devtools/art_assets/build.py` (`hires_page`) |
+| `res/source.png` | the page itself, 512×448, for reference | the same |
+
+CC0, like the rest of the Néo-Lumen assets (`assets/neo-lumen/README.md`).
 
 ## Further: Mode 5 without interlace (512 x 256)
 

@@ -66,10 +66,10 @@
     "rom_sha256": "44dfd2fde3b50070c17741ca07af01ce0f8ed3788c12ad70953d903ebb5de318"
   },
   "backgrounds_mode5_hires": {
-    "fbhash": "aaf77640375cfea4",
+    "fbhash": "e931acbf46d9972b",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "c1ef59c76a6b5cf081be29d0cbc16c001661456e11aecaa8ef2f17c3c7107ae6"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "199e35e5903c93a40b62b93b7641a632feea8ff7a40d9aa9119ac46f05c4e7b9"
   },
   "basics_aim_target": {
     "fbhash": "29b6b6fff09feb89",

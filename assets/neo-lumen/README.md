@@ -265,6 +265,15 @@ font with a highlight and a shadow, and BG3's circuit board in seven
 level colours. The colours are the city's, with a green and a red for two
 bricks. No PixelLab call.
 
+### The hi-res page (mode5_hires)
+
+`examples/backgrounds/mode5_hires`: a screen of the city's terminal at 512
+columns, the library's 8x8 font in white, cyan and amber on the glass, with
+1-pixel stripe bands and a checkerboard, converted to Mode 5's tile pairs and
+a 32x64 map by `hires_page` in `build.py` (`res/text.pic`, `.map`, `.pal`,
+and `res/source.png` for reference). It replaces the example's own
+`gen_assets.py`, which drew the page with Pillow's default font.
+
 ### The well (blocks)
 
 `examples/games/blocks`: `res/tiles.png` and `res/font2bpp.bin` are drawn by
