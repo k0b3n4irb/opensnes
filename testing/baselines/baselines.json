@@ -186,10 +186,10 @@
     "rom_sha256": "17a3fe7caf3604865065fdb1b257561da2ab9043f5a2b3ca8fb2a8741357d950"
   },
   "demos_rpg": {
-    "fbhash": "c7d995fee61e3218",
+    "fbhash": "eaa8fa6fa3217509",
     "frames": 200,
-    "luna_version": "v1.34.0",
-    "rom_sha256": "38e7175e8243080bba698e33bde8728729939c99bb136364aa483a3e4482d5c8"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "bf5048ed5b272909230073375e4ab1b230dacff2a1b5759a2c03cada23ff7d7e"
   },
   "demos_shmup_1942": {
     "fbhash": [

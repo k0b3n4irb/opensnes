@@ -1,66 +1,75 @@
 /**
  * @file main.c
- * @brief RPG template (#7) — Tiled-driven overworld with dialog boxes
+ * @brief RPG template — a Tiled-driven street of the city, its residents, a dialog box
  * @ingroup examples
  *
- * The SDK's modules composed into a playable RPG skeleton. Two things
- * make it a template rather than a demo:
+ * The SDK's modules composed into a playable RPG skeleton: Kit the courier
+ * walks the Rue basse at night, between a noodle bar, a garage, a junk shop
+ * and a canal, talks to the residents, opens a locker, and steps into the
+ * raccoon's den. Three things make it a template rather than a demo:
  *
- * 1. **The map is a real Tiled map** (`res/town.tmj`): terrain,
- *    per-tile collision (the `attribute` property), entity positions
- *    AND each villager's dialogue line (a `text` property on the
- *    object) all live in the map, not in the code. Adding a villager
- *    is a map edit. Edit it in Tiled, re-run `gen_assets.py`, rebuild.
- * 2. **A real bordered dialog box and a HUD**, both 9-slice panels on
- *    BG2 with their text on BG3 above — the classic SNES RPG window.
- * 3. **Two scenes**: the town, and the inside of the blue-roofed house.
- *    A scene is a tileset + a palette + a tilemap + a collision map +
- *    entities; switching one is four DMAs under force blank. The
- *    interior is its own Tiled map (`res/house.tmj`) with its own
- *    16-colour palette, so neither scene gives up colours for the other.
+ * 1. **The map is a real Tiled map** (`res/town.tmj`): terrain, per-tile
+ *    collision (the `attribute` property), entity positions AND each
+ *    resident's line and look (`text` and `look` properties on the object)
+ *    all live in the map, not in the code. The build converts it with
+ *    `opensnes-level` (`res/town.tmj.toml`): the VRAM map, the collision
+ *    bytes and the entities as C defines. Adding a resident is a map edit.
+ * 2. **A real bordered dialog box and a HUD**, both 9-slice panels on BG2
+ *    with their text on BG3 above — the classic SNES RPG window.
+ * 3. **Two scenes**: the street, and the inside of the apartment with the
+ *    teal door. A scene is a tileset + a palette + a tilemap + a collision
+ *    map + entities; switching one is three DMAs under force blank. The den
+ *    is its own Tiled map (`res/house.tmj`).
  *
  * Layer roles (Mode 1):
- * - BG1: the town (4bpp, 64x64 scrolling)
+ * - BG1: the scene (4bpp, 64x64 scrolling)
  * - BG2: the HUD (always) and the dialog panel (while talking)
  * - BG3: the dialog text (2bpp, high priority)
- * - OBJ: the hero and the villagers (same tiles, two palettes)
+ * - OBJ: Kit and the residents, 32x32, one palette each
  *
  * ROM mode: LoROM (project default).
  *
  * @par SNES Concepts
  * - Tiled (.tmj) as the content pipeline: collision and entities are
- *   data, not hardcoded
- * - Tile-exact collision: the hero OCCUPIES one tile and its 16x16
- *   sprite is drawn straddling it (feet on the tile), so what you see
- *   is what collides — the classic top-down RPG convention
+ *   data, not hardcoded, and the build converts them (opensnes-level)
+ * - Metatile movement: the map is 8x8 cells, the world is walked on a
+ *   grid of 16x16 metatiles (two cells a side). A character occupies one
+ *   metatile and its 32x32 sprite is drawn over it, feet on it, head
+ *   overhanging upward: what you see is what collides
+ * - A 32x32 sprite is a 4x4 block of the OBJ name table, which is 16 tiles
+ *   wide: a frame converted alone is copied in four rows of 128 bytes
+ * - The sprite-palette plan: res/palettes.toml gives every character its
+ *   OBJ slot, and palettes.inc names it (PAL_OWL_SLOT, PAL_OWL_CGRAM)
  * - A 9-slice dialog box DMA'd to BG2 on open, with layer priorities
  *   stacking town < box < text
  * - Forced blank (`setScreenOff`, INIDISP bit 7) around a multi-KB VRAM
  *   upload — `setBrightness(0)` only blacks the screen, it does NOT open
  *   the VRAM write window, and the tail of the transfer is dropped
- * - A fixed 16-colour palette per scene, authored by hand rather than
- *   quantised: adding one tile to a quantised sheet re-derives the whole
- *   palette and every existing tile shifts hue
- * - Off-camera entities MUST be parked at OBJ_HIDE_Y, not just drawn:
- *   OAM coordinates wrap, so an entity two screens away reappears
- *   somewhere plausible on screen (a villager standing in the wall)
- * - Collision through the SDK's `collideTile()` over the Tiled map —
- *   its `const` tilemap parameter means the read is bank-honouring
- *   (#121), so a multi-KB map needs neither bank $00 nor RAM
+ * - A fixed 16-colour palette per scene, imposed on the converter rather
+ *   than quantised: adding one tile to a quantised sheet re-derives the
+ *   whole palette and every existing tile shifts hue
+ * - Off-camera entities MUST be hidden, not just drawn: OAM coordinates
+ *   wrap, so an entity two screens away reappears somewhere plausible on
+ *   screen (a resident standing inside a wall)
+ * - Collision through the SDK's `collideTile()` over the converted map —
+ *   its `const` tilemap parameter means the read is bank-honouring, so a
+ *   4 KB map needs neither bank $00 nor RAM
  *
  * @par What to Observe
- * The town fades in, with hearts and a purse in the HUD. Walk with the
- * D-pad — houses, water, trees and the fence block you exactly where
- * they look. Face either villager and press A (each has its own line,
- * from the map), or step onto the chest and press A: the purse goes up
- * by 10. Walk into the door of the BLUE-roofed house, bottom right of
- * the crossroads, and you step inside — the host greets you with no
- * button press. The mat by the door takes you back out.
+ * The street fades in, with hearts and credits in the HUD. Walk with the
+ * D-pad, a metatile a step: buildings, the canal and the railing block you
+ * where they look. Face a resident and press A (the owl at the noodle bar,
+ * the frog at the garage, the rat at the junk shop, the pangolin over the
+ * bridge: each says its line, from the map), or face the lockers south of
+ * the street and press A: the credits go up by 10. Walk into the teal door
+ * of the apartment, south of the street, and you step inside — the raccoon
+ * greets you with no button press. The mat by the door takes you back out.
  *
  * @par Modules Used
  * console, dma, background, sprite, text, input, collision, panel
  *
- * @see gen_assets.py, res/town.tmj — the Tiled content pipeline
+ * @see res/town.tmj, res/house.tmj — the Tiled content pipeline;
+ *      devtools/art_assets/rpg.py, which composes them
  */
 
 #include <snes.h>
@@ -71,39 +80,42 @@
 #include <snes/collision.h>
 #include <snes/panel.h>
 
-#include "res/entities.inc"     /* SPAWN/CHEST/NPC_TABLE from the .tmj */
-#include "res/palettes.inc"     /* PAL_HERO_* / PAL_NPC_* — the sprite-slot plan (opensnes-palette) */
+#include "res/town_entities.inc"   /* SPAWN, NPC_TABLE, LOCKER, DOOR: the town's Entities layer */
+#include "res/house_entities.inc"  /* ARRIVAL, HOST, MAT: the den's */
+#include "res/palettes.inc"        /* PAL_HERO_* / PAL_OWL_* …: the sprite-slot plan (opensnes-palette) */
 
-/** @brief A villager: where it stands and what it says. The struct
- * shape and the rows both come from the Entities layer of town.tmj, so
- * adding one is a map edit. */
+#include "res/town.inc"       /* generated: town_street_quad[] (the VRAM map), town_street_cells[] (collision) */
+#include "res/house.inc"      /* generated: house_den_quad[], house_den_cells[] */
+#include "res/tileset.inc"    /* generated: tileset_tiles[], tileset_pal[] (the town), each with _end */
+#include "res/interior.inc"   /* generated: interior_tiles[], interior_pal[] (the den) */
+#include "res/uibox.inc"      /* generated: uibox_tiles[], uibox_pal[] */
+#include "res/hero.inc"       /* generated: hero_tiles[], hero_pal[]: Kit's walk */
+#include "res/owl.inc"
+#include "res/frog.inc"
+#include "res/rat.inc"
+#include "res/pangolin.inc"
+#include "res/raccoon.inc"
+
+/** @brief A resident of the street: where it stands, what it says, how it looks.
+ * The struct shape and the rows both come from the Entities layer of
+ * town.tmj, so adding one is a map edit. */
 typedef struct { NPC_FIELDS } Npc;
 
-/** @brief The villagers. `const`, so the table lives in ROM and is read
- * with bank-honouring far addressing — `npcs[i].tx` compiles to
- * `lda.l npcs,x` (this needed issue #132 fixed; before that a const
- * array of structs was read from bank $00). */
+/** @brief The residents. `const`, so the table lives in ROM and is read
+ * with bank-honouring far addressing. */
 static const Npc npcs[NPC_COUNT] = NPC_TABLE;
 
-#include "res/tileset.inc"    /* generated: tileset_tiles[], tileset_pal[] (the town), each with _end */
-#include "res/interior.inc"   /* generated: interior_tiles[], interior_pal[] (the house) */
-#include "res/uibox.inc"      /* generated: uibox_tiles[], uibox_pal[] */
-#include "res/hero.inc"       /* generated: hero_tiles[], hero_pal[] */
-extern u8 town_map[];
-extern const u8 town_collision[];      /* const -> far reads (#121) */
-extern u8 npc_pal[];
-extern u8 house_map[];
-extern const u8 house_collision[];     /* const -> far reads (#121) */
-
 /* VRAM word layout */
-#define VRAM_TOWN_TILES 0x0000
-#define VRAM_HOUSE_TILES 0x1000
-#define VRAM_TOWN_MAP   0x2000
-#define VRAM_FONT       0x3000
-#define VRAM_TEXT_MAP   0x3800
-#define VRAM_UI_TILES   0x4000
-#define VRAM_UI_MAP     0x4400
-#define VRAM_HERO       0x6000
+#define VRAM_SCENE_TILES 0x0000   /* the scene's tiles, up to 1024 (the town has 822) */
+#define VRAM_SCENE_MAP   0x4000   /* 64x64: four 32x32 pages */
+#define VRAM_FONT        0x5000   /* BG3's and BG2's character base: tile 0 blank, the font from 2bpp tile 2 */
+#define FONT_TILE        2        /* the font's first 2bpp tile: words $5000-$500F are BG2's blank tile 0 */
+#define VRAM_UI_TILES    0x5400   /* BG2's tiles: tile 64 from the base at $5000 */
+#define VRAM_TEXT_MAP    0x5800
+#define VRAM_UI_MAP      0x5C00
+#define VRAM_OBJ         0x6000   /* Kit's 15 frames (tiles 0-255), the residents from tile 256 ($7000) */
+
+#define UI_BASE_TILE 64           /* ($5400 - $5000) / 16 words a 4bpp tile */
 
 /* uibox.png is a 4x3 sheet: the 9-slice border in the first three
  * columns, the HUD icons in the fourth. Raster order, so row n starts
@@ -119,7 +131,7 @@ extern const u8 house_collision[];     /* const -> far reads (#121) */
 #define BOX_BL 8
 #define BOX_B  9
 #define BOX_BR 10
-#define ICON_COIN 11
+#define ICON_CHIP 11
 #define BOX_PAL 2                 /* BG2 palette 2 -> CGRAM 32-47 */
 
 /* HUD panel (BG2, always on screen) */
@@ -134,74 +146,109 @@ extern const u8 house_collision[];     /* const -> far reads (#121) */
 #define PANEL_Y 22
 #define PANEL_W 28
 #define PANEL_H 6
-#define TEXT_W  (PANEL_W - 4)     /* usable characters per line */
 
 #define FACE_DOWN 0
 #define FACE_UP   1
 #define FACE_LEFT 2
 #define FACE_RIGHT 3
 
-#define MAP_TILES 64
-#define WORLD_W (MAP_TILES * 8)
-#define WORLD_H (MAP_TILES * 8)
-#define SCREEN_CX 124             /* where the hero tile sits on screen */
-#define SCREEN_CY 108
+#define MAP_CELLS 64              /* the map, in 8x8 cells */
+#define MT 2                      /* a metatile, in cells */
+#define WORLD_W (MAP_CELLS * 8)
+#define WORLD_H (MAP_CELLS * 8)
+#define SCREEN_CX 120             /* where the hero's metatile sits on screen */
+#define SCREEN_CY 104
+
+/* The OBJ tiles: Kit's frame f (down 0-4, up 5-9, right 10-14) four to a
+ * row of the name table; resident k from tile 256 on, four to a row too. */
+#define HERO_FRAME(f) ((u16)(((f) & 3) * 4 + ((f) >> 2) * 64))
+#define RESIDENT_TILE(k) ((u16)(256 + ((k) & 3) * 4 + ((k) >> 2) * 64))
+#define RESIDENTS 5
 
 enum { ST_FADEIN, ST_EXPLORE, ST_DIALOG };
 enum { SCENE_TOWN, SCENE_HOUSE };
 
-#define MAP_TILES_HOUSE 32
+/** @brief A resident's look: its 32x32 frame (converted alone) and its OBJ slot. */
+typedef struct {
+    const u8 *tiles;
+    const u8 *pal;
+    u16 cgram;
+    u8 slot;
+} Look;
+
+/** @brief The `look` property of an entity indexes this table: owl, frog, rat, pangolin, raccoon. */
+static const Look looks[RESIDENTS] = {
+    { owl_tiles,      owl_pal,      PAL_OWL_CGRAM,      PAL_OWL_SLOT },
+    { frog_tiles,     frog_pal,     PAL_FROG_CGRAM,     PAL_FROG_SLOT },
+    { rat_tiles,      rat_pal,      PAL_RAT_CGRAM,      PAL_RAT_SLOT },
+    { pangolin_tiles, pangolin_pal, PAL_PANGOLIN_CGRAM, PAL_PANGOLIN_SLOT },
+    { raccoon_tiles,  raccoon_pal,  PAL_RACCOON_CGRAM,  PAL_RACCOON_SLOT },
+};
 
 /** @brief Probe oracles / state. hero_x/hero_y are the PIXEL position
- * of the tile the hero occupies (a multiple of 8 when idle). */
+ * of the metatile the hero occupies (a multiple of 16 when idle). */
 u16 hero_x;
 u16 hero_y;
 u8  hero_facing;
 u8  game_state;
-u8  chest_opened;
+u8  chest_opened;          /**< the locker */
 u8  scene;                 /**< SCENE_TOWN or SCENE_HOUSE */
-u16 gold;                  /**< HUD: coins, +10 per chest */
+u16 gold;                  /**< HUD: credits, +10 from the locker */
 u8  hero_hp;               /**< HUD: static in this template */
 
 static s8 step_dx, step_dy;
 static u8 step_count;
-static u8 walk_phase, anim_tick;
+static u8 walk_frame, anim_tick;
 static u8 fade_level;
 static u16 panel_map[32 * 32];
 
-/* ---- collision: the SDK's collideTile() over the Tiled map ----
- * collideTile takes PIXEL coordinates, converts to 8x8 tiles and
- * returns the map byte (nonzero = solid). It bounds X and negative
- * coordinates itself (off-map = solid) but cannot bound Y — it does
- * not know the map height — so we clamp that here, as its docs ask.
- * Its `tilemap` parameter is const, so the read is bank-honouring:
- * our 4 KB map lives outside bank $00. */
-static u8 tile_walkable(u16 tx, u16 ty) {
-    if (scene == SCENE_HOUSE) {
-        if (ty >= MAP_TILES_HOUSE) {
-            return 0;
-        }
-        return (u8)(collideTile((s16)(tx << 3), (s16)(ty << 3),
-                                house_collision, MAP_TILES_HOUSE) == 0);
-    }
-    if (ty >= MAP_TILES) {
+/* ---- collision: the SDK's collideTile() over the converted map ----
+ * collideTile takes PIXEL coordinates, converts to 8x8 cells and returns
+ * the cell's byte (nonzero = solid). It bounds X and negative coordinates
+ * itself (off-map = solid) but cannot bound Y — it does not know the map
+ * height — so we clamp that here, as its docs ask. Its `tilemap`
+ * parameter is const, so the read is bank-honouring: the 4 KB maps live
+ * outside bank $00. */
+static u8 cell_walkable(u16 cx, u16 cy) {
+    if (cy >= MAP_CELLS) {
         return 0;
     }
-    return (u8)(collideTile((s16)(tx << 3), (s16)(ty << 3),
-                            town_collision, MAP_TILES) == 0);
+    return (u8)(collideTile((s16)(cx << 3), (s16)(cy << 3),
+                            scene == SCENE_HOUSE ? house_den_cells : town_street_cells,
+                            MAP_CELLS) == 0);
+}
+
+/** @brief A metatile (its top-left cell) is walkable if its four cells
+ * are, and no one stands on it. */
+static u8 metatile_walkable(u16 cx, u16 cy) {
+    u8 i;
+    if (!cell_walkable(cx, cy) || !cell_walkable(cx + 1, cy)
+        || !cell_walkable(cx, cy + 1) || !cell_walkable(cx + 1, cy + 1)) {
+        return 0;
+    }
+    if (scene == SCENE_HOUSE) {
+        return (u8)!(cx == HOST_TX && cy == HOST_TY);
+    }
+    for (i = 0; i < NPC_COUNT; i++) {
+        if (cx == npcs[i].tx && cy == npcs[i].ty) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 static u16 hero_tx(void) { return (u16)(hero_x >> 3); }
 static u16 hero_ty(void) { return (u16)(hero_y >> 3); }
 
+/** @brief The metatile in front of the hero (its top-left cell). */
 static void front_tile(u16 *tx, u16 *ty) {
     u16 cx = hero_tx();
     u16 cy = hero_ty();
     switch (hero_facing) {
-    case FACE_UP:    cy--; break;
-    case FACE_DOWN:  cy++; break;
-    case FACE_LEFT:  cx--; break;
-    case FACE_RIGHT: cx++; break;
+    case FACE_UP:    cy -= MT; break;
+    case FACE_DOWN:  cy += MT; break;
+    case FACE_LEFT:  cx -= MT; break;
+    case FACE_RIGHT: cx += MT; break;
     default: break;
     }
     *tx = cx;
@@ -217,14 +264,14 @@ static void front_tile(u16 *tx, u16 *ty) {
 static const Panel ui = {
     panel_map,          /* map        */
     VRAM_UI_MAP,        /* vram_addr  */
-    0,                  /* base_tile — the sheet starts at tile 0 */
+    UI_BASE_TILE,       /* base_tile — the sheet sits after BG3's font */
     4,                  /* stride — 4 wide: col 4 holds the HUD icons */
     BOX_PAL,            /* palette    */
     1,                  /* priority — in front of the opaque town */
 };
 
 /**
- * @brief Draw the HUD icons: hearts for HP, a coin for the purse.
+ * @brief Draw the HUD icons: hearts for HP, a chip for the credits.
  *
  * The icons are tiles on BG2 (they came out of the same 4x3 sheet as
  * the dialog border), the number is text on BG3. Splitting it that way
@@ -232,11 +279,12 @@ static const Panel ui = {
  */
 static void hud_icons(void) {
     u16 i;
+    /* panelPut takes an absolute tile: the sheet's index plus its base */
     for (i = 0; i < HERO_MAX_HP; i++) {
         panelPut(&ui, (u8)(1 + i), 1,
-                 (i < hero_hp) ? ICON_HEART : ICON_HEART_EMPTY);
+                 UI_BASE_TILE + ((i < hero_hp) ? ICON_HEART : ICON_HEART_EMPTY));
     }
-    panelPut(&ui, 8, 1, ICON_COIN);
+    panelPut(&ui, 8, 1, UI_BASE_TILE + ICON_CHIP);
 }
 
 /** @brief The HUD's numeric half, on BG3. Re-drawn after every
@@ -247,12 +295,14 @@ static void hud_text(void) {
     textPrintU16(gold);
 }
 
+/** @brief Stamp the HUD's frame and icons into the BG2 buffer. */
 static void build_panel(void) {
     panelInit(&ui);
     panelDraw(&ui, HUD_X, HUD_Y, HUD_W, HUD_H);
     hud_icons();
 }
 
+/** @brief Open the dialog box on a line of text. */
 static void dialog_open(const char *line) {
     panelDraw(&ui, PANEL_X, PANEL_Y, PANEL_W, PANEL_H);
     panelFlush(&ui);
@@ -261,6 +311,7 @@ static void dialog_open(const char *line) {
     game_state = ST_DIALOG;
 }
 
+/** @brief Close the dialog box, the HUD untouched. */
 static void dialog_close(void) {
     /* clear only the dialog rows: textClear() would wipe the HUD too */
     textClearRect(PANEL_X, PANEL_Y, PANEL_W, PANEL_H);
@@ -269,28 +320,26 @@ static void dialog_close(void) {
     game_state = ST_EXPLORE;
 }
 
-/* ---- scenes: town <-> house interior ----
+/* ---- scenes: the street <-> the den ----
  * A scene is a tileset, a palette, a tilemap, a collision map and a set
- * of entities. Switching one is four DMAs under force blank — there is
- * no engine here, just the data swapped over. */
+ * of entities. Switching one is three DMAs under force blank — there is
+ * no engine here, just the data swapped over; the collision map and the
+ * entities are read in place, by `scene`. */
 static void scene_load(u8 which, u16 tx, u16 ty, u8 facing) {
-    setScreenOff();                 /* forced blank: 8 KB will not fit VBlank */
+    setScreenOff();                 /* forced blank: 34 KB will not fit VBlank */
     if (which == SCENE_HOUSE) {
-        dmaCopyVram(interior_tiles, VRAM_HOUSE_TILES,
+        dmaCopyVram(interior_tiles, VRAM_SCENE_TILES,
                     (u16)(interior_tiles_end - interior_tiles));
-        dmaCopyVram(house_map, VRAM_TOWN_MAP, 32 * 32 * 2);
+        dmaCopyVram(house_den_quad, VRAM_SCENE_MAP,
+                    (u16)(house_den_quad_end - house_den_quad));
         dmaCopyCGram(interior_pal, 0, 32);
-        bgSetGfxPtr(0, VRAM_HOUSE_TILES);
-        bgSetMapPtr(0, VRAM_TOWN_MAP, SC_32x32);
         bgSetScroll(0, 0, 0);
     } else {
-        dmaCopyVram(tileset_tiles, VRAM_TOWN_TILES,
+        dmaCopyVram(tileset_tiles, VRAM_SCENE_TILES,
                     (u16)(tileset_tiles_end - tileset_tiles));
-        dmaCopyVram(town_map, VRAM_TOWN_MAP, 8192);
+        dmaCopyVram(town_street_quad, VRAM_SCENE_MAP,
+                    (u16)(town_street_quad_end - town_street_quad));
         dmaCopyCGram(tileset_pal, 0, 32);
-        bgSetGfxPtr(0, VRAM_TOWN_TILES);
-        bgSetMapPtr(0, VRAM_TOWN_MAP, SC_64x64);
-    dmaCopyCGram(tileset_pal, 0, 32);
     }
     scene = which;
     hero_x = (u16)(tx * 8);
@@ -300,11 +349,11 @@ static void scene_load(u8 which, u16 tx, u16 ty, u8 facing) {
     setScreenOn();
 }
 
-/* ---- movement: one tile per step, slid over 8 frames ---- */
+/* ---- movement: one metatile per step, slid over 8 frames ---- */
 static void begin_step(s8 dx, s8 dy) {
-    u16 ntx = (u16)(hero_tx() + dx);
-    u16 nty = (u16)(hero_ty() + dy);
-    if (tile_walkable(ntx, nty)) {
+    u16 ntx = (u16)(hero_tx() + dx * MT);
+    u16 nty = (u16)(hero_ty() + dy * MT);
+    if (metatile_walkable(ntx, nty)) {
         step_dx = dx;
         step_dy = dy;
         step_count = 8;
@@ -312,86 +361,145 @@ static void begin_step(s8 dx, s8 dy) {
 }
 
 /**
- * @brief Draw a 16x16 character straddling its 8x8 tile, or hide it.
+ * @brief Copy a resident's 32x32 frame into its block of the OBJ name table.
+ *
+ * The converter writes a sheet in 128-px rows of tiles, the way the name
+ * table is laid out: a 32x32 frame converted on its own becomes four rows of
+ * 16 tiles, the frame in the first four of each. The block of a 32x32 sprite
+ * is four tiles wide and four rows deep, so the frame goes in four copies of
+ * 128 bytes, one name-table row (256 words) apart.
+ */
+static void load_resident(const u8 *tiles, u16 first_tile) {
+    u8 r;
+    for (r = 0; r < 4; r++) {
+        dmaCopyVram(tiles + r * 512, (u16)(VRAM_OBJ + (first_tile + r * 16) * 16), 128);
+    }
+}
+
+/**
+ * @brief Draw a 32x32 character over its metatile, or hide it.
  *
  * Two things happen here, both of them load-bearing.
  *
- * **The straddle** is what makes collision feel exact: the character's
- * logical position is one tile; the sprite is drawn 4 px left and 8 px
- * up of it, so its feet stand on that tile and its body overhangs
- * upward — the standard top-down RPG convention. Drawing the sprite at
- * the tile's corner instead (the naive version) puts the visible body
- * half a tile away from what collides.
+ * **The overhang** is what makes collision feel exact: the character's
+ * logical position is one 16x16 metatile; the sprite is drawn 8 px left
+ * and 16 px up of it, so its feet stand on that metatile and its head
+ * overhangs upward — the standard top-down RPG convention. Drawing the
+ * sprite at the metatile's corner instead (the naive version) puts the
+ * visible body half a metatile away from what collides.
  *
  * **The cull** is not an optimisation, it is correctness. OAM X is 9
  * bits and Y is 8, so an entity standing outside the camera does not
  * quietly vanish — its coordinates WRAP and it reappears somewhere
- * plausible-looking on screen. A villager two screens away shows up
- * standing inside the town wall. Anything off-camera goes to oamHide(),
+ * plausible-looking on screen. Anything off-camera goes to oamHide(),
  * which parks it properly (Y AND the X high bit — Y alone still wraps
  * for sprites over 16 px tall).
  */
 static void draw_char(u8 oam_id, u16 wx, u16 wy, u16 cam_x, u16 cam_y,
-                      u8 facing, u8 phase, u8 palette) {
-    s16 sx = (s16)((s16)wx - (s16)cam_x - 4);
-    s16 sy = (s16)((s16)wy - (s16)cam_y - 8);
-    u8 f;
+                      u16 tile, u8 palette, u8 flags) {
+    s16 sx = (s16)((s16)wx - (s16)cam_x - 8);
+    s16 sy = (s16)((s16)wy - (s16)cam_y - 16);
 
-    if (sx < -16 || sx > 255 || sy < -16 || sy > 223) {
+    if (sx < -32 || sx > 255 || sy < -32 || sy > 223) {
         oamHide(oam_id);
         return;
     }
-    f = (u8)(facing * 4 + phase * 2);
-    oamSet(oam_id, (u16)sx, (u16)sy, f, palette, 2, 0);
+    oamSet(oam_id, (u16)sx, (u16)sy, tile, palette, 2, flags);
     oamSetSize(oam_id, OBJ_LARGE);
+}
+
+/** @brief Kit's tile for the current facing and walk frame. */
+static u16 hero_tile(void) {
+    static const u8 first[4] = { 0, 5, 10, 10 };   /* down, up, left (= right mirrored), right */
+    return HERO_FRAME(first[hero_facing] + walk_frame);
+}
+
+/** @brief Is the metatile (ftx, fty) one of the lockers' four? */
+static u8 at_locker(u16 ftx, u16 fty) {
+    return (u8)(ftx >= LOCKER_TX && ftx < LOCKER_TX + 2 * MT
+                && fty >= LOCKER_TY && fty < LOCKER_TY + 2 * MT);
+}
+
+/** @brief A press of A while exploring: talk to who stands in front, or open the locker. */
+static void interact(void) {
+    u16 ftx, fty;
+    u8 i;
+    front_tile(&ftx, &fty);
+    if (scene == SCENE_HOUSE) {
+        if (ftx == HOST_TX && fty == HOST_TY) {
+            dialog_open(HOST_TEXT);
+        }
+        return;
+    }
+    for (i = 0; i < NPC_COUNT; i++) {
+        if (ftx == npcs[i].tx && fty == npcs[i].ty) {
+            dialog_open(npcs[i].text);
+            return;
+        }
+    }
+    if (at_locker(ftx, fty)) {
+        if (chest_opened) {
+            dialog_open("THE LOCKER IS EMPTY.");
+        } else {
+            chest_opened = 1;
+            gold = (u16)(gold + 10);
+            hud_text();
+            dialog_open("YOU FOUND 10 CREDITS!");
+        }
+    }
 }
 
 int main(void) {
     u16 keys, cam_x, cam_y;
-    u8 moving;
+    u8 moving, i;
 
     consoleInit();
     setMode(BG_MODE1, 0x08);               /* BG3 high priority */
 
-    /* BG1 town, from the Tiled map */
-    dmaCopyVram(tileset_tiles, VRAM_TOWN_TILES, (u16)(tileset_tiles_end - tileset_tiles));
-    dmaCopyVram(town_map, VRAM_TOWN_MAP, 8192);
-    bgSetGfxPtr(0, VRAM_TOWN_TILES);
-    bgSetMapPtr(0, VRAM_TOWN_MAP, SC_64x64);
+    /* BG1 the street, from the Tiled map */
+    dmaCopyVram(tileset_tiles, VRAM_SCENE_TILES, (u16)(tileset_tiles_end - tileset_tiles));
+    dmaCopyVram(town_street_quad, VRAM_SCENE_MAP, (u16)(town_street_quad_end - town_street_quad));
+    bgSetGfxPtr(0, VRAM_SCENE_TILES);
+    bgSetMapPtr(0, VRAM_SCENE_MAP, SC_64x64);
     dmaCopyCGram(tileset_pal, 0, 32);
 
-    /* BG3 text overlay */
-    textInit(VRAM_TEXT_MAP, 0, 4);
+    /* BG3 text overlay. BG2 shares its character base, and an empty cell of
+     * a panel is tile 0: the first 16 words stay zero, a blank 4bpp tile,
+     * and the font starts after them (2bpp tiles 0-1 are those words). */
+    dmaFillVRAM(0, VRAM_FONT, 32);
+    textInit(VRAM_TEXT_MAP, FONT_TILE, 4);
     text_config.priority = 1;
-    textLoadFont(VRAM_FONT);
+    textLoadFont((u16)(VRAM_FONT + FONT_TILE * 8));
     bgSetGfxPtr(2, VRAM_FONT);
     bgSetMapPtr(2, VRAM_TEXT_MAP, SC_32x32);
-    setColor(4 * 4 + 1, RGB(31, 31, 31));
+    setColor(4 * 4 + 1, RGB(29, 31, 31));
 
-    /* BG2 dialog box */
+    /* BG2 dialog box: its tiles after the font, on the same character base */
     dmaCopyVram(uibox_tiles, VRAM_UI_TILES, (u16)(uibox_tiles_end - uibox_tiles));
     dmaCopyCGram(uibox_pal, BOX_PAL * 16, 32);
-    bgSetGfxPtr(1, VRAM_UI_TILES);
+    bgSetGfxPtr(1, VRAM_FONT);
     bgSetMapPtr(1, VRAM_UI_MAP, SC_32x32);
     build_panel();
 
-    /* OBJ: hero and villager share the tiles, one palette slot each.
-     * The CGRAM offsets come from res/palettes.inc — the plan assigned the
-     * slots, so these never collide even as more sprite palettes appear. */
-    dmaCopyVram(hero_tiles, VRAM_HERO, (u16)(hero_tiles_end - hero_tiles));
-    dmaCopyCGram(hero_pal, PAL_HERO_CGRAM, 32);   /* OBJ slot PAL_HERO_SLOT */
-    dmaCopyCGram(npc_pal, PAL_NPC_CGRAM, 32);     /* OBJ slot PAL_NPC_SLOT  */
-    oamInit(OBJ_SIZE8_L16, OBJ_NAME_BASE(VRAM_HERO));
+    /* OBJ: Kit's walk in the first name table, the residents in the second;
+     * one palette each, at the CGRAM offset the plan gave it
+     * (res/palettes.inc), so a new resident never collides with the others. */
+    dmaCopyVram(hero_tiles, VRAM_OBJ, (u16)(hero_tiles_end - hero_tiles));
+    dmaCopyCGram(hero_pal, PAL_HERO_CGRAM, 32);
+    for (i = 0; i < RESIDENTS; i++) {
+        load_resident(looks[i].tiles, RESIDENT_TILE(i));
+        dmaCopyCGram(looks[i].pal, looks[i].cgram, 32);
+    }
+    oamInit(OBJ_SIZE8_L32, OBJ_NAME_BASE(VRAM_OBJ));
 
     /* spawn from the Tiled Entities layer */
     hero_x = SPAWN_TX * 8;
     hero_y = SPAWN_TY * 8;
-    hero_facing = FACE_UP;
+    hero_facing = FACE_DOWN;
     chest_opened = 0;
     scene = SCENE_TOWN;
     gold = 0;
     hero_hp = HERO_MAX_HP;
-
 
     /* BG2 carries the HUD, so it is on screen for good — the dialog
      * panel just appears in its lower half when someone talks. */
@@ -418,23 +526,20 @@ int main(void) {
             }
         } else if (game_state == ST_EXPLORE) {
             if (step_count > 0) {
-                hero_x = (u16)(hero_x + step_dx);
-                hero_y = (u16)(hero_y + step_dy);
+                hero_x = (u16)(hero_x + step_dx * 2);
+                hero_y = (u16)(hero_y + step_dy * 2);
                 step_count--;
                 moving = 1;
                 if (step_count == 0) {
-                    /* the step just landed: did it land on a door? */
+                    /* the step just landed: on a door, or on the mat? */
                     if (scene == SCENE_TOWN
                         && hero_tx() == DOOR_TX && hero_ty() == DOOR_TY) {
-                        scene_load(SCENE_HOUSE, HOUSE_SPAWN_TX,
-                                   HOUSE_SPAWN_TY, FACE_UP);
+                        scene_load(SCENE_HOUSE, ARRIVAL_TX, ARRIVAL_TY, FACE_UP);
                         /* the host greets you — no button to press */
-                        dialog_open(HOUSE_NPC_LINE);
+                        dialog_open(HOST_TEXT);
                     } else if (scene == SCENE_HOUSE
-                               && hero_tx() == HOUSE_EXIT_TX
-                               && hero_ty() == HOUSE_EXIT_TY) {
-                        scene_load(SCENE_TOWN, DOOR_TX, DOOR_TY + 1,
-                                   FACE_DOWN);
+                               && hero_tx() == MAT_TX && hero_ty() == MAT_TY) {
+                        scene_load(SCENE_TOWN, DOOR_TX, DOOR_TY + MT, FACE_DOWN);
                     }
                 }
             } else {
@@ -447,36 +552,7 @@ int main(void) {
                 } else if (keys & KEY_RIGHT) {
                     hero_facing = FACE_RIGHT; begin_step(1, 0); moving = 1;
                 } else if (padPressed(0) & KEY_A) {
-                    u16 ftx, fty;
-                    u8 i, talked = 0;
-                    front_tile(&ftx, &fty);
-                    if (scene == SCENE_HOUSE) {
-                        if (ftx == HOUSE_NPC_TX && fty == HOUSE_NPC_TY) {
-                            dialog_open(HOUSE_NPC_LINE);
-                            talked = 1;
-                        }
-                    } else {
-                        for (i = 0; i < NPC_COUNT; i++) {
-                            if (ftx == npcs[i].tx && fty == npcs[i].ty) {
-                                dialog_open(npcs[i].text);
-                                talked = 1;
-                                break;
-                            }
-                        }
-                    }
-                    if (talked || scene == SCENE_HOUSE) {
-                        /* done */
-                    } else if ((hero_tx() == CHEST_TX && hero_ty() == CHEST_TY)
-                               || (ftx == CHEST_TX && fty == CHEST_TY)) {
-                        if (chest_opened) {
-                            dialog_open("THE CHEST IS EMPTY.");
-                        } else {
-                            chest_opened = 1;
-                            gold = (u16)(gold + 10);
-                            hud_text();
-                            dialog_open("YOU FOUND 10 GOLD!");
-                        }
-                    }
+                    interact();
                 }
             }
         } else {                            /* ST_DIALOG */
@@ -485,15 +561,20 @@ int main(void) {
             }
         }
 
+        /* the walk: frames 1-4 of the facing, one every 4 frames; 0 standing */
         if (moving) {
             anim_tick++;
-            if (anim_tick >= 8) { anim_tick = 0; walk_phase ^= 1; }
+            if (anim_tick >= 4) {
+                anim_tick = 0;
+                walk_frame = (u8)(walk_frame >= 4 ? 1 : walk_frame + 1);
+            }
         } else {
-            walk_phase = 0;
+            walk_frame = 0;
+            anim_tick = 0;
         }
 
-        /* The interior is exactly one screen, so it does not scroll.
-         * The town scrolls with the hero, clamped to the world. */
+        /* The den is exactly one screen, so it does not scroll.
+         * The street scrolls with the hero, clamped to the world. */
         if (scene == SCENE_HOUSE) {
             cam_x = 0;
             cam_y = 0;
@@ -505,23 +586,19 @@ int main(void) {
             bgSetScroll(0, cam_x, cam_y);
         }
 
-        draw_char(0, hero_x, hero_y, cam_x, cam_y, hero_facing, walk_phase,
-                  PAL_HERO_SLOT);
-        {
-            u8 n;
-            if (scene == SCENE_HOUSE) {
-                draw_char(1, HOUSE_NPC_TX * 8, HOUSE_NPC_TY * 8,
-                          cam_x, cam_y, FACE_DOWN, 0, PAL_NPC_SLOT);
-                for (n = 1; n < NPC_COUNT; n++) {
-                    oamHide((u8)(n + 1));
-                }
-            } else {
-                /* the villagers: same tiles as the hero, palette 1 */
-                for (n = 0; n < NPC_COUNT; n++) {
-                    draw_char((u8)(n + 1), (u16)(npcs[n].tx * 8),
-                              (u16)(npcs[n].ty * 8), cam_x, cam_y,
-                              FACE_DOWN, 0, PAL_NPC_SLOT);
-                }
+        draw_char(0, hero_x, hero_y, cam_x, cam_y, hero_tile(), PAL_HERO_SLOT,
+                  hero_facing == FACE_LEFT ? OBJ_FLIPX : 0);
+        if (scene == SCENE_HOUSE) {
+            draw_char(1, HOST_TX * 8, HOST_TY * 8, cam_x, cam_y,
+                      RESIDENT_TILE(HOST_LOOK), looks[HOST_LOOK].slot, 0);
+            for (i = 1; i < NPC_COUNT; i++) {
+                oamHide((u8)(i + 1));
+            }
+        } else {
+            for (i = 0; i < NPC_COUNT; i++) {
+                draw_char((u8)(i + 1), (u16)(npcs[i].tx * 8), (u16)(npcs[i].ty * 8),
+                          cam_x, cam_y, RESIDENT_TILE(npcs[i].look),
+                          looks[npcs[i].look].slot, 0);
             }
         }
     }

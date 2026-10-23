@@ -26,7 +26,7 @@ Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
 | Scene | What runs | Idle (in `WaitForVBlank`) |
 |---|---|---|
 | `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
-| `examples/demos/rpg` | walking: map, sprites, HUD | 91 % of the frame |
+| `examples/demos/rpg` | walking: map, sprites, HUD | 88 % of the frame |
 | `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 69 % of the frame |
 | `examples/games/blocks` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
 | `examples/audio/snesmod_music` | music playing, nothing else | 98 % of the frame |
@@ -42,14 +42,15 @@ above 300 mclk per frame.
 | Function | likemario | rpg | sprite_swarm | blocks | snesmod_music |
 |---|---|---|---|---|---|
 | `NmiHandler` | 8,162 (8,170) | 8,163 (8,170) | 7,670 (7,716) | 5,676 (5,676) | 5,650 (5,650) |
-| `oamSet` |  | 3,426 (4,068) |  |  |  |
+| `oamSet` |  | 3,957 (7,812) |  |  |  |
 | `animTick` | 3,387 (5,306) |  |  |  |  |
 | `animPlay` | 2,125 (3,214) |  |  |  |  |
 | `dmaCopyVram` |  |  |  | 1,747 (2,248) |  |
-| `oamSetSize` |  | 1,736 (1,970) |  |  |  |
+| `oamSetSize` |  | 2,043 (3,900) |  |  |  |
 | `oamDynamicDraw` | 1,351 (1,626) |  |  |  |  |
-| `oamHide` |  | 624 (4,290) |  |  |  |
-| `bgSetScroll` | 561 (600) | 589 (640) |  | 560 (560) |  |
+| `oamHide` |  | 2,867 (5,176) |  |  |  |
+| `collideTile` |  | 765 (5,376) |  |  |  |
+| `bgSetScroll` | 561 (600) | 580 (640) |  | 560 (560) |  |
 
 ## Reading it
 
@@ -59,8 +60,8 @@ above 300 mclk per frame.
   8 master cycles per byte transferred") about 4,350 of those; the
   17th-bit pad read is about 380 more.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about
-  5,800 mclk per frame (1.6 %) for its handful of characters and HUD
-  sprites (the setters are assembly). `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
+  8,900 mclk per frame (2.5 %) for its five characters, each a 32x32
+  sprite placed or hidden every frame (the setters are assembly). `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
   `oamMemory[]` directly (sprite_swarm) are the escape hatches for large
   counts.
 - **Animation**: `animTick` + `animPlay` about 5,500 mclk per frame in

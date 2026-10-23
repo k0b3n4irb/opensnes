@@ -1,9 +1,9 @@
-# the hero sheet holds 16x16 frames, so the blocks are 16x16 (docs/tutorials/sprites.md);
-# the game loads its first 16 colours into one OBJ slot, so the palette is capped at 16
-# (a full 256-colour .pal would be 480 bytes of ROM the game never reads, and res/palettes.toml
-# plans the sprite palettes from these 16).
+# Kit's walk, 15 frames of 32x32 (down, up, right; five each), four to a 128-px
+# row: frame f starts at OBJ tile (f % 4) * 4 + (f / 4) * 64. The game loads its
+# first 16 colours into one OBJ slot, so the palette is capped at 16
+# (res/palettes.toml plans the sprite palettes from these 16).
 tool = "opensnes-sprite"
 
 [sheet]
-size = 16
+size = 32
 colors = 16

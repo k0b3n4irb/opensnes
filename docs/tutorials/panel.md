@@ -99,7 +99,7 @@ panelClear(&ui, 2, 22, 28, 6);
 panelFlush(&ui);
 ```
 
-This is exactly how `examples/demos/rpg` draws its HUD (hearts + a purse)
+This is exactly how `examples/demos/rpg` draws its HUD (hearts and credits)
 and dialog box on one BG2 tilemap.
 
 ## Gotchas

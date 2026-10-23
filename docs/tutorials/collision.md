@@ -233,7 +233,10 @@ oamSet(id, sx, sy, ...);
 ```
 
 Now what you see is what collides, from every direction. `examples/demos/rpg`
-does this in `draw_char()`.
+does this in `draw_char()` at twice the scale: its characters stand on a
+16×16 metatile (two cells a side) and their 32×32 sprites are drawn 8 px
+left and 16 px up of it; a step asks `collideTile()` about the metatile's
+four cells.
 
 Two consequences worth knowing:
 

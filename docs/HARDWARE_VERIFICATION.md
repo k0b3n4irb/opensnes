@@ -76,7 +76,7 @@ behaviour, and the note under the table says which.
 | 17 | `chips/sa1_starfield` | nothing | 128 moths trace smooth Lissajous figures over the skyline at full frame rate. Firmware-dependent. |
 | 18 | `chips/superfx_3d` | nothing | A wireframe cube rotates at full frame rate with no missing edges. Firmware-dependent. |
 | 19 | `games/likemario` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
-| 20 | `demos/rpg` | walk, talk to a villager with A, open the chest | The full game path: map, dialogue, chest state. |
+| 20 | `demos/rpg` | walk, talk to a resident with A, open the lockers, walk into the teal door and out by the mat | The full game path: map, dialogue, locker state, the two scenes. |
 | 21 | `input/mouse` | move the mouse, click both buttons, right-click cycles sensitivity | Optional (needs a SNES Mouse, port 1). The cursor tracks the hand at each of the three sensitivities. |
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
 | 23 | `testing/fixtures/retired_examples/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `testing/fixtures/retired_examples/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |

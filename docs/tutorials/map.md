@@ -67,7 +67,8 @@ module and want the same content in a different shape:
 | `collision = true` | `<layer>.c16` — one collision byte per map cell | `collideTile()` (a flattened grid, indexed directly) |
 
 `examples/demos/rpg` scrolls a fixed 64×64 town with `background`, not
-`map` (its `town.tmj` gives the same quadrant map under `--quadrant`);
+`map` (its `res/town.tmj.toml` asks for `quadrant`, `collision` and
+`entities`);
 `examples/maps/map_scroll` uses the default `map` pipeline. Pick the module that
 matches the map size — `map` for worlds larger than 64×64, `background` for
 a fixed screen or two.

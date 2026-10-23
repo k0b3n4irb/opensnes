@@ -14,6 +14,14 @@ All notable changes to OpenSNES are documented in this file.
   DMAP and BBAD, which are readable (anomie-regs), and move only the table when
   the channel already runs that effect. `dma_hdma_helpers_gradient` and
   `dma_hdma_helpers_iris` hash the drawn frame; both fail without the fix.
+- fix(tools): `opensnes-level convert --quadrant` writes VRAM tiles. The
+  `.q16` took each cell's Tiled tile id as its VRAM tile, which holds only
+  while the tileset converter's table is the identity; once it has merged
+  duplicate tiles, or the tileset is wider than 16 tiles (its map is written
+  in rows of 32), the map named the wrong tiles. The quadrant map now goes
+  through the table, as the `.t16` and the `map` module do, with the
+  converter's flips and palette bank and Tiled's flips on top. A golden case
+  permutes the table; it fails without the fix.
 
 ## [0.51.0] — 2026-10-18
 

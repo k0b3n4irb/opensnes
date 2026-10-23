@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+# the pangolin from above, facing south: one 32x32 frame on its own 15 colours
+# (res/palettes.toml gives the palette its OBJ slot)
+[sheet]
+size = 32
+colors = 16

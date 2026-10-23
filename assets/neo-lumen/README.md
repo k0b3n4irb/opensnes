@@ -193,6 +193,44 @@ four 8x8 lamps (a disc, a square, a pill, half a shoulder) that the example
 lays over a button while it is held (`pad_sprites`). The lamps' places on a
 pad are `PAD_LAMPS` in `build.py`, copied in `main.c`.
 
+### The Rue basse (rpg)
+
+`examples/demos/rpg`: the street and the den are composed by
+`devtools/art_assets/rpg.py` on a grid of 16x16 metatiles: the ground drawn
+there (asphalt with a cyan centre line, paving slabs with a puddle in one
+in seven, curbs, the canal with its ripples and reflections, the bridge,
+the railing), the pieces below placed on it, the whole cut into its
+distinct 8x8 tiles (822 for the street, 474 for the den). Kit's walk and the
+five residents come from `characters/topdown/`.
+
+Every piece is a `generate-image-v2` call with Kit's south view
+(`characters/topdown/kit_south.png`) as `style_image` (its colours off) and
+the city's 15 colours as `target_palette`, the description opening on "16-bit
+JRPG town building (or street prop) sprite in orthographic top-down view like
+classic SNES RPGs, NOT isometric, perfectly rectangular and axis-aligned:
+the flat roof seen from above fills the top half, the front facade faces the
+camera straight on in the bottom half" (the first try, without it, came out
+isometric). The candidate kept is the one numbered from 0 in the order the
+call returned them.
+
+| File | What | Seed, candidate |
+|---|---|---|
+| `town/noodle_bar.png` | the owl's noodle bar, a NOODLE sign, two lanterns, 96x96 | 7401, #0 |
+| `town/garage.png` | the frog's garage, its shutter glowing, a wrench sign, 96x96 | 7410, #0 |
+| `town/junk_shop.png` | the rat's junk shop, crates of screens, 96x96 | 7420, #2 |
+| `town/apartment.png` | the apartment block with the teal door, 96x96 | 7430, #1 |
+| `town/residential.png` | balconies, air conditioners, a dish, 96x96 | 7450, #1 |
+| `town/guard_post.png` | the pangolin's checkpoint booth, 64x64 | 7440, #5 |
+| `town/lockers.png` | public lockers, one lit amber, 32x32 | 7500, #9 |
+| `town/vending.png` | a drinks machine, 32x32 | 7510, #1 |
+| `town/lamp.png` | a double pink street lamp, 32x48 | 7520, #9 |
+| `town/crates.png` | crates and trash bags, 32x32 | 7530, #5 |
+| `backgrounds/den.png` | the raccoon's den, one room, 256x224 (its amber margin painted black by `rpg.py`) | 7600, `noodle_bar.png` as `style_image` |
+
+The ground came from code after two `create-tileset` tries (street to
+paving, `pro` mode with the city's palette, seeds 7300 and 7302): the
+palette has no grey, and the paving came out bright teal, then as pink noise.
+
 ### The bar's menu screen (pixel_text)
 
 `examples/text/pixel_text`: `res/terminal.png`, save_game's terminal bezel and
