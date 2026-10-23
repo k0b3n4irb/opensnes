@@ -1,0 +1,7 @@
+tool = "opensnes-tileset"
+
+# BG2 of Mode 0: the bar's terminal, four colours
+[convert]
+bpp = 2
+colors = 4
+flip = true

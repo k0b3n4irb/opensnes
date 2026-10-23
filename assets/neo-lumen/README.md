@@ -193,6 +193,14 @@ four 8x8 lamps (a disc, a square, a pill, half a shoulder) that the example
 lays over a button while it is held (`pad_sprites`). The lamps' places on a
 pad are `PAD_LAMPS` in `build.py`, copied in `main.c`.
 
+### The bar's menu screen (pixel_text)
+
+`examples/text/pixel_text`: `res/terminal.png`, save_game's terminal bezel and
+glass with a bowl of noodles (its steam, its chopsticks) over a message panel,
+four colours (BG2 of Mode 0, `bar_terminal`). The panel's outline is
+`BAR_PANEL` in `build.py`, round the layer `main.c` composes; the text and its
+5x7 font are not an asset, they are bits in `main.c`.
+
 ### The play square (game_skeleton)
 
 `examples/basics/game_skeleton` (and `basics/scene_stack`, the same field and logo): `res/field.png` is a piece of

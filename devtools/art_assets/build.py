@@ -232,6 +232,7 @@ SCENE_STACK = ROOT / "examples" / "basics" / "scene_stack" / "res"
 PANEL_HUD = ROOT / "examples" / "basics" / "panel_hud" / "res"
 SAVE_GAME = ROOT / "examples" / "memory" / "save_game" / "res"
 CONTROLLER = ROOT / "examples" / "input" / "controller" / "res"
+PIXEL_TEXT = ROOT / "examples" / "text" / "pixel_text" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
@@ -1470,6 +1471,46 @@ def pad_sprites() -> Image.Image:
     return im
 
 
+# text/pixel_text: the menu screen of a noodle bar's terminal, its text composed by main.c
+BAR_PANEL = (40, 74, 215, 149)          # the message panel's outline: main.c's layer is x 48-207, y 80-143
+
+
+def bar_terminal() -> Image.Image:
+    """256x224 on TERMINAL's four colours: the bezel and scanlines of save_game's terminal,
+    a bowl of noodles with its steam and chopsticks over the message panel, and the
+    panel's double outline (3 outside, 2 inside) round the layer main.c composes on BG1."""
+    im = Image.new("P", (256, 224), 0)
+    im.putpalette([v for c in TERMINAL for v in hexrgb_(c)] + [0] * 756)
+    px = im.load()
+    for y in range(224):
+        for x in range(256):
+            bezel = x < 8 or x >= 248 or y < 4 or y >= 212
+            px[x, y] = 2 if bezel or y % 4 == 0 else 1
+    x0, y0, x1, y1 = BAR_PANEL
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            if x in (x0, x1) or y in (y0, y1):
+                px[x, y] = 3
+            elif x in (x0 + 2, x1 - 2) or y in (y0 + 2, y1 - 2):
+                px[x, y] = 2
+            else:
+                px[x, y] = 1                                # the glass, without scanlines
+    for y in range(50, 63):                                 # the bowl: a half ellipse under its rim
+        for x in range(106, 151):
+            d = ((x - 128) / 22) ** 2 + ((y - 50) / 12) ** 2
+            if d <= 1:
+                px[x, y] = 3 if d > 0.8 or y == 50 else 2
+    for x in range(121, 136):                               # its foot
+        px[x, 63] = 3
+    for sx in (120, 128, 136):                              # the steam, three wavy strands
+        for y in range(30, 47):
+            px[sx + round(2 * math.sin((y + sx) / 3)), y] = 2
+    for i in range(17):                                     # the chopsticks, across the rim
+        px[140 + i, 45 - i] = 3
+        px[143 + i, 47 - i] = 3
+    return im
+
+
 # color/palette_cycle
 CYCLE_BANK0 = ["#06060c","#101828","#182838","#203048","#281838","#402858","#604080","#8060a8"]
 CYCLE_SIGN = ["#ffd0f0","#f8a0d0","#e05090","#a02860","#a02860","#a02860","#a02860","#e05090"]
@@ -1740,6 +1781,7 @@ def main() -> int:
                          "residents.png": png(panel_residents())}),
             (SAVE_GAME, {"terminal.png": png(terminal()), "icon.png": png(save_icon())}),
             (CONTROLLER, {"screen.png": png(pad_screen()), "cast.png": png(pad_sprites())}),
+            (PIXEL_TEXT, {"terminal.png": png(bar_terminal())}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
