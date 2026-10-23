@@ -38,13 +38,13 @@ static void bg1MarkRow(u8 row) {
 /* Tile indices */
 #define TILE_EMPTY     0
 
-/* Breakout-style border: 3 base tiles + SNES flip flags + palette 1 */
+/* The cabinet's frame: 3 base tiles + SNES flip flags + palette 1 */
 #define TILE_CORNER    8   /* corner (base = TL) */
 #define TILE_BORDER_H  9   /* horizontal bar */
 #define TILE_BORDER_V  10  /* vertical bar */
 
 /* Tilemap attribute flags */
-#define PAL1     0x0400   /* palette 1 (grey gradient) */
+#define PAL1     0x0400   /* palette 1 (the cabinet) */
 #define HFLIP    0x4000
 #define VFLIP    0x8000
 
@@ -232,14 +232,15 @@ void renderInit(void) {
     bgSetScroll(1, 0, 0);  /* BG2: HUD */
     bgSetScroll(2, 0, 0);  /* BG3: messages */
 
-    /* Build HDMA gradient on CGRAM color 0: lighter blue (top) → deep blue (bottom) */
+    /* Build HDMA gradient on CGRAM color 0: the arcade's violet night (top,
+     * #281838) down to the cabinet's black (bottom, #080810) */
     {
         u8 i;
         u8 *p = hdma_grad_tbl;
-        /* Top: R=7, G=12, B=14  Bottom: R=3, G=5, B=7 (5-bit components) */
-        s16 r_fp = 7 * 256;   /* 8.8 fixed point */
-        s16 g_fp = 12 * 256;
-        s16 b_fp = 14 * 256;
+        /* Top: R=5, G=3, B=7  Bottom: R=1, G=1, B=2 (5-bit components) */
+        s16 r_fp = 5 * 256;   /* 8.8 fixed point */
+        s16 g_fp = 3 * 256;
+        s16 b_fp = 7 * 256;
 
         /* 56 chunks of 4 scanlines = 224 scanlines */
         for (i = 0; i < 56; i++) {
@@ -253,9 +254,9 @@ void renderInit(void) {
             *p++ = (u8)(color);         /* CGDATA low */
             *p++ = (u8)(color >> 8);    /* CGDATA high */
 
-            r_fp -= 19;  /* (7-3)*256/55 ≈ 19 */
-            g_fp -= 33;  /* (12-5)*256/55 ≈ 33 */
-            b_fp -= 33;  /* (14-7)*256/55 ≈ 33 */
+            r_fp -= 19;  /* (5-1)*256/55 ≈ 19 */
+            g_fp -= 9;   /* (3-1)*256/55 ≈ 9 */
+            b_fp -= 23;  /* (7-2)*256/55 ≈ 23 */
         }
         *p = 0;  /* HDMA terminator */
 

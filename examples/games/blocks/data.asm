@@ -38,28 +38,30 @@ font2bpp_gfx:
 .incbin "res/font2bpp.bin"
 font2bpp_gfx_end:
 
-; 4bpp Palette 1 (CGRAM 16-31): border grey gradient + HUD font colors
-; Also serves as BG3 2bpp palette 4 (color 0=transparent, 1=white)
+; 4bpp Palette 1 (CGRAM 16-31): the cabinet's frame (1-7, breakout's colours),
+; the HUD's white font (11-12); colours 8-11 are also BG3's 2bpp palette 6,
+; the messages: 9 their colour (cycled at runtime), 10 their shadow.
+; Tiles and colours: devtools/art_assets/blocks.py (BORDER).
 border_pal:
 .dw $0000    ; idx 0  (CGRAM 16): transparent
-.dw $7FFF    ; idx 1  (CGRAM 17): white (BG3 font color 1)
-.dw $6739    ; idx 2  (CGRAM 18): light grey (border)
-.dw $4E73    ; idx 3  (CGRAM 19): medium grey (border)
-.dw $3DEF    ; idx 4  (CGRAM 20): medium-dark grey (border)
-.dw $2D6B    ; idx 5  (CGRAM 21): dark grey (border)
-.dw $1CE7    ; idx 6  (CGRAM 22): darker grey (border)
-.dw $0421    ; idx 7  (CGRAM 23): near black (border)
+.dw $1462    ; idx 1  (CGRAM 17): #101828, unused by the frame
+.dw $1C85    ; idx 2  (CGRAM 18): #282438, the beam's outer edge
+.dw $2CE8    ; idx 3  (CGRAM 19): #403858, steel
+.dw $458D    ; idx 4  (CGRAM 20): #686088, steel
+.dw $6AD7    ; idx 5  (CGRAM 21): #b8b0d0, the beam's lit ridge
+.dw $495C    ; idx 6  (CGRAM 22): #e05090, the neon tube
+.dw $6A9F    ; idx 7  (CGRAM 23): #f8a0d0, the tube's core
 .dw $0000    ; idx 8  (CGRAM 24): BG3 palette 6 color 0 (transparent)
-.dw $7FFF    ; idx 9  (CGRAM 25): BG3 palette 6 color 1 (white — cycled at runtime)
-.dw $0000    ; idx 10 (CGRAM 26): unused
-.dw $7FFF    ; idx 11 (CGRAM 27): white (font body)
-.dw $4C21    ; idx 12 (CGRAM 28): mid-blue (font shadow)
+.dw $7FFD    ; idx 9  (CGRAM 25): BG3 palette 6 color 1, the message (cycled at runtime)
+.dw $0821    ; idx 10 (CGRAM 26): BG3 palette 6 color 2, the message's shadow #080810
+.dw $7FFD    ; idx 11 (CGRAM 27): #e8f8ff, the HUD font's body
+.dw $28E5    ; idx 12 (CGRAM 28): #283850, the HUD font's shadow
 .dw $0000    ; idx 13 (CGRAM 29): unused
 .dw $0000    ; idx 14 (CGRAM 30): unused
 .dw $0000    ; idx 15 (CGRAM 31): unused
 border_pal_end:
 
-; 4bpp Palette 2 (CGRAM 32-47): magenta font for SCORE label (#e71861)
+; 4bpp Palette 2 (CGRAM 32-47): pink font for the SCORE label (#e05090)
 ; Only indices 11-12 used (font body + shadow)
 red_pal:
 .dw $0000    ; idx 0  (CGRAM 32): transparent
@@ -73,14 +75,14 @@ red_pal:
 .dw $0000    ; idx 8
 .dw $0000    ; idx 9
 .dw $0000    ; idx 10
-.dw $307C    ; idx 11 (CGRAM 43): bright magenta #e71861 (font body)
-.dw $102B    ; idx 12 (CGRAM 44): dark magenta (font shadow)
+.dw $495C    ; idx 11 (CGRAM 43): pink #e05090 (font body)
+.dw $1448    ; idx 12 (CGRAM 44): dark pink (font shadow)
 .dw $0000    ; idx 13
 .dw $0000    ; idx 14
 .dw $0000    ; idx 15
 red_pal_end:
 
-; 4bpp Palette 3 (CGRAM 48-63): green font for LEVEL label (#0bdb52)
+; 4bpp Palette 3 (CGRAM 48-63): cyan font for the LEVEL label (#48d0e0)
 ; Only indices 11-12 used (font body + shadow)
 green_pal:
 .dw $0000    ; idx 0  (CGRAM 48): transparent
@@ -94,14 +96,14 @@ green_pal:
 .dw $0000    ; idx 8
 .dw $0000    ; idx 9
 .dw $0000    ; idx 10
-.dw $2B61    ; idx 11 (CGRAM 59): neon green #0bdb52 (font body)
-.dw $1160    ; idx 12 (CGRAM 60): dark green (font shadow)
+.dw $7349    ; idx 11 (CGRAM 59): cyan #48d0e0 (font body)
+.dw $20C2    ; idx 12 (CGRAM 60): dark cyan (font shadow)
 .dw $0000    ; idx 13
 .dw $0000    ; idx 14
 .dw $0000    ; idx 15
 green_pal_end:
 
-; 4bpp Palette 4 (CGRAM 64-79): purple font for LINES label (#7161de)
+; 4bpp Palette 4 (CGRAM 64-79): violet font for the LINES label (#a888d8)
 ; Only indices 11-12 used (font body + shadow)
 purple_pal:
 .dw $0000    ; idx 0  (CGRAM 64): transparent
@@ -115,14 +117,14 @@ purple_pal:
 .dw $0000    ; idx 8
 .dw $0000    ; idx 9
 .dw $0000    ; idx 10
-.dw $6E2E    ; idx 11 (CGRAM 75): purple #7161de (font body)
-.dw $3408    ; idx 12 (CGRAM 76): dark purple (font shadow)
+.dw $6E35    ; idx 11 (CGRAM 75): violet #a888d8 (font body)
+.dw $1C65    ; idx 12 (CGRAM 76): dark violet (font shadow)
 .dw $0000    ; idx 13
 .dw $0000    ; idx 14
 .dw $0000    ; idx 15
 purple_pal_end:
 
-; 4bpp Palette 5 (CGRAM 80-95): orange font for NEXT label (#dc6f0f)
+; 4bpp Palette 5 (CGRAM 80-95): amber font for the NEXT label (#f0b050)
 ; Only indices 11-12 used (font body + shadow)
 orange_pal:
 .dw $0000    ; idx 0  (CGRAM 80): transparent
@@ -136,8 +138,8 @@ orange_pal:
 .dw $0000    ; idx 8
 .dw $0000    ; idx 9
 .dw $0000    ; idx 10
-.dw $01BC    ; idx 11 (CGRAM 91): orange #dc6f0f (font body)
-.dw $0097    ; idx 12 (CGRAM 92): dark orange (font shadow)
+.dw $2ADE    ; idx 11 (CGRAM 91): amber #f0b050 (font body)
+.dw $08A8    ; idx 12 (CGRAM 92): dark amber (font shadow)
 .dw $0000    ; idx 13
 .dw $0000    ; idx 14
 .dw $0000    ; idx 15

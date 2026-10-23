@@ -205,6 +205,7 @@ from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of
 from mode7 import build_city, extbg_plane, glider, orb
 from mode7 import indexed as mode7_indexed  # noqa: E402
 from breakout import build_breakout  # noqa: E402
+from blocks import build_blocks  # noqa: E402
 from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -242,6 +243,7 @@ HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
 MODE7 = ROOT / "examples" / "mode7"
 RACING = ROOT / "examples" / "mode7" / "mode7_racing" / "res"
 BREAKOUT = ROOT / "examples" / "games" / "breakout" / "res"
+BLOCKS = ROOT / "examples" / "games" / "blocks" / "res"
 
 # The city's 15 colours (assets/neo-lumen/README.md); index 0 is the sky.
 SKY = (16, 24, 40)
@@ -1752,6 +1754,7 @@ def main() -> int:
     ground, sky = png(city["ground"]), png(city["sky"])
     plane, plane_tiles = extbg_plane(ART)
     arcade = build_breakout(font8())
+    well = build_blocks(font8())
     likemario = build_likemario()
     continuous = build_continuous_scroll(likemario["skyline.png"])
     jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
@@ -1792,6 +1795,7 @@ def main() -> int:
             (BREAKOUT, {"tiles.png": png(arcade["tiles"]), "back.png": png(arcade["back"]),
                         "bg1map.bin": arcade["bg1map"], "bg2map.bin": arcade["bg2map"],
                         "backpal.bin": arcade["backpal"]}),
+            (BLOCKS, {"tiles.png": png(well["tiles"]), "font2bpp.bin": well["font2bpp"]}),
             (RACING, {"track.png": png(race["track"]), "track_class.bin": race["classes"],
                       "lanes_xy.bin": race["lanes"][0], "lanes_heading.bin": race["lanes"][1],
                       "bikes.png": png(bikes(ART))})]

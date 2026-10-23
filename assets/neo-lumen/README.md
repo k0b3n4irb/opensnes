@@ -265,6 +265,17 @@ font with a highlight and a shadow, and BG3's circuit board in seven
 level colours. The colours are the city's, with a green and a red for two
 bricks. No PixelLab call.
 
+### The well (blocks)
+
+`examples/games/blocks`: `res/tiles.png` and `res/font2bpp.bin` are drawn by
+`devtools/art_assets/blocks.py`, in the tile numbering the game addresses:
+seven data containers (two grooves and a lit diode, one colour per piece),
+the ghost, breakout's cabinet frame (its steel beam and magenta neon tube,
+in three tiles the map flips round the well), and the library's 8x8 font at
+its ASCII codes with a shadow, in 4bpp for the HUD and 2bpp for BG3's
+messages. The HUD's label colours and the messages' cycle are in `data.asm`
+and `main.c`, the gradient behind the well in `render.c`. No PixelLab call.
+
 ### The race on the rooftops
 
 `examples/mode7/mode7_racing`: a circuit round a lagoon and three

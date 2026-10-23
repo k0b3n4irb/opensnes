@@ -166,14 +166,14 @@ static void waitStartReleased(void) {
  * rainbow shimmer on "PRESS START" and "GAME OVER" overlay text.
  */
 static const u16 msg_colors[] = {
-    0x7FFF,  /* white */
-    0x307C,  /* magenta (#e71861) */
-    0x0B5E,  /* yellow (#f6d714) */
-    0x2B61,  /* green (#0bdb52) */
-    0x6EF0,  /* cyan (#80bedb) */
-    0x6E2E,  /* purple (#7161de) */
-    0x01BC,  /* orange (#dc6f0f) */
-    0x3E22,  /* teal (#138e7d) */
+    0x7FFD,  /* white (#e8f8ff) */
+    0x495C,  /* pink (#e05090) */
+    0x2ADE,  /* amber (#f0b050) */
+    0x3B48,  /* green (#40d070) */
+    0x7349,  /* cyan (#48d0e0) */
+    0x6E35,  /* violet (#a888d8) */
+    0x1DDC,  /* orange (#e07038) */
+    0x5289,  /* teal (#48a0a0) */
 };
 /** @brief Number of colors in the rainbow cycle array */
 #define MSG_COLOR_COUNT  8
@@ -596,7 +596,7 @@ static void stateGameOver(void) {
     }
     waitStartReleased();
 
-    renderSetMsgColor(0x7FFF);
+    renderSetMsgColor(0x7FFD);
     hudClearMessage();
     startGame();
 }
@@ -628,7 +628,7 @@ static void stateTitle(void) {
     /* Wait for START release */
     waitStartReleased();
 
-    renderSetMsgColor(0x7FFF);  /* restore white */
+    renderSetMsgColor(0x7FFD);  /* restore white */
     hudClearMessage();
     startGame();
 }

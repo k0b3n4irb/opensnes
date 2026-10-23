@@ -42,12 +42,12 @@ extern const char str_next[];
  */
 #define BG3_ATTR  0x3800  /* palette 6 + priority high (isolated from border) */
 
-/* Palette attributes for BG2 HUD text (breakout font uses colors 11-12) */
+/* Palette attributes for BG2 HUD text (the font uses colors 11-12) */
 #define HUD_ATTR          0x0400  /* palette 1: white text */
-#define HUD_ATTR_RED      0x0800  /* palette 2: magenta text */
-#define HUD_ATTR_GREEN    0x0C00  /* palette 3: green text */
-#define HUD_ATTR_PURPLE   0x1000  /* palette 4: purple text */
-#define HUD_ATTR_ORANGE   0x1400  /* palette 5: orange text */
+#define HUD_ATTR_RED      0x0800  /* palette 2: pink text (SCORE) */
+#define HUD_ATTR_GREEN    0x0C00  /* palette 3: cyan text (LEVEL) */
+#define HUD_ATTR_PURPLE   0x1000  /* palette 4: violet text (LINES) */
+#define HUD_ATTR_ORANGE   0x1400  /* palette 5: amber text (NEXT) */
 
 static void writestring_bg2_attr(const char *st, u16 pos, u16 attr) {
     u8 ch;
