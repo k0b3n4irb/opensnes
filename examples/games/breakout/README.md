@@ -361,7 +361,7 @@ All of `res/` — the two sheets, the two maps and the level colours — is draw
 |------|-------------|
 | `main.c` | All game logic |
 | `data.asm` | The far RAM buffers, string constants, the map and colour binaries |
-| `res/tiles.png` | BG1 and sprite tiles (cabinet, bricks, paddle, ball, shadows, font, lives icon); its palette is the whole CGRAM |
+| `res/tiles.png` | BG1 and sprite tiles (cabinet, bricks, paddle, ball, shadows, font, lives icon); its palette is the whole CGRAM. The brick is PixelLab's (`assets/neo-lumen/ui/brick.png`), the rest drawn by `devtools/art_assets/breakout.py` |
 | `res/back.png` | BG3's circuit board (2bpp) |
 | `res/bg1map.bin` | The cabinet and the HUD labels |
 | `res/bg2map.bin` | The board under the playfield |

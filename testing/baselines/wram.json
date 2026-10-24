@@ -113,7 +113,7 @@
   },
   "games_breakout": {
     "stream": "32b86d215157754a6ddf0dbfed5eaafa97dd5b0291c124db8e75efa08415c1c6",
-    "rom_sha256": "7785e3a3b1886322378e005a6dc300428b493ed7f54a127546c8a228cf1fe35d"
+    "rom_sha256": "a6f300a14eb820996334994e7b8682818cd7997065af92e7423ba0e833b5f45f"
   },
   "games_rooftop_run": {
     "stream": "3d1bb18839ccdd74dc5a7d4f93ae52a79189b6b2405415ef24d643fa9cea385d",
@@ -220,8 +220,8 @@
     "rom_sha256": "a5329a4cc12ceb589e744f82b640237bd39066353c8cb7cd905e341dc756f9b8"
   },
   "text_pixel_text": {
-    "stream": "fae7958430a1662e625ac8a8836eb69f3a1963467c644de6856edb2433f14d84",
-    "rom_sha256": "2834ef12aa37489aae19872fa972889433d38b0a95957a4d521c0f494db1428d"
+    "stream": "62bafac25edff3c66daaf211ce2349696ac056c2144fdd677c61934addcbe2a4",
+    "rom_sha256": "b6a2a15fb617ce5c092e4984b419fd6bd94384d8a8e386ca3a5bcddd7626dd14"
   },
   "text_print_string": {
     "stream": "512718d74f238601f27e825b91cd52ed82c60525757cbca07c80da88c8ca4e42",

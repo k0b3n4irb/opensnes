@@ -40,8 +40,12 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 >   PixelLab, mesuré** : ce qui fait moins de 16 px (papillons 8x8, grain 4x3, balle 8x8 : PixelLab ne
 >   produit rien sous 16 px) et l'orbe pulsé d'extbg (deux animations `animate-with-text-v3` perdent
 >   la forme de l'orbe d'une trame à l'autre). Sol du RPG **fait le même jour** (deux jeux Wang
->   PixelLab enchaînés, variantes, pont, ruelles : `assets/neo-lumen/README.md`). Reste à faire :
->   briques, blocs, polices, terminaux, brume, pluie.
+>   PixelLab enchaînés, variantes, pont, ruelles : `assets/neo-lumen/README.md`). Brique de breakout et bol de
+>   pixel_text **faits le même jour** (PixelLab). **Gardés dessinés, mesuré** : le plateau de circuit de
+>   breakout (PixelLab : des petits cœurs, chargé sous le jeu), les conteneurs et le cadre de blocks
+>   (8x8), les écrans de terminal et la mire Mode 5 (géométrie calée sur la grille de texte). Restent :
+>   brume et pluie (bouclage sans couture), et la police, qui est celle de la bibliothèque (décision
+>   du propriétaire : changement de SDK, vu par le second jeu).
 > - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (tranchés le jour même :
 >   `games/rooftop_run`, `demos/platform_objects`) ;
 >   `audio/speech_synth` (sa phrase attend le nom de la ville) ; la musique (MU1-MU3, modules

@@ -255,8 +255,8 @@ palette has no grey, and the paving came out bright teal, then as pink noise.
 ### The bar's menu screen (pixel_text)
 
 `examples/text/pixel_text`: `res/terminal.png`, save_game's terminal bezel and
-glass with a bowl of noodles (its steam, its chopsticks) over a message panel,
-four colours (BG2 of Mode 0, `bar_terminal`). The panel's outline is
+glass with a bowl of noodles (`ui/noodle_bowl.png`, below: its steam, its
+chopsticks) over a message panel, four colours (BG2 of Mode 0, `bar_terminal`). The panel's outline is
 `BAR_PANEL` in `build.py`, round the layer `main.c` composes; the text and its
 5x7 font are not an asset, they are bits in `main.c`.
 
@@ -357,6 +357,8 @@ colours by brightness). The palette given is the city's interface colours:
 | `ui/marker.png` | a white ring round a magenta core, dark outline | 8001, #3 | `examples/input/superscope` (`res/marker.png`) |
 | `ui/cursor.png` | an arrow, cyan with a magenta tip and a dark outline | 8002, #0 | `examples/input/mouse` (`res/cursor.png`, its tip moved to (0, 0)) |
 | `ui/bolt.png` | Kit's shot, an aqua capsule with a white core | 8003, #0 | `examples/demos/shmup` (`res/bullet.png`) |
+| `ui/noodle_bowl.png` | a steaming bowl of ramen, chopsticks across it, 41x37 in a 64x48 canvas, two colours | 8300, #1 (the palette given: the terminal's `#1a3038 #48d0e0`, its colours 2 and 3) | `examples/text/pixel_text` (`res/terminal.png`, centred above the panel) |
+| `ui/brick.png` | a glossy arcade brick, 16x7 in the top half (a joint row under it), three greys | 8200, #4 (the palette given: `#484848 #909090 #e0e0e0`, a ramp to map on colours 13-15) | `examples/games/breakout` (tiles 13-14 of `res/tiles.png`) |
 
 What PixelLab could not do here, measured: it makes nothing smaller than 16
 pixels a side, so the 8x8 moths of `sprite_swarm`, the 4x3 speck of
@@ -367,14 +369,21 @@ by script too (`mode7.py`, `orb`).
 
 ### Neon Breaker (the arcade cabinet)
 
-`examples/games/breakout`: everything in `res/` is drawn by
-`devtools/art_assets/breakout.py`, in the tile numbering the game addresses:
-the cabinet (a steel bevel with a magenta neon tube, a speaker grille), a
-16x8 brick in eight colours (one BG palette each), the paddle with its
-cyan emitters, the ball, their shadows, the lives icon, the library's 8x8
-font with a highlight and a shadow, and BG3's circuit board in seven
-level colours. The colours are the city's, with a green and a red for two
-bricks. No PixelLab call.
+`examples/games/breakout`: everything in `res/` is written by
+`devtools/art_assets/breakout.py`, in the tile numbering the game addresses.
+The brick is `ui/brick.png` (below): its three greys become colours 13-15 of
+whichever BG palette names it, eight colours in all. The rest is drawn
+there: the cabinet (a steel bevel with a magenta neon tube, a speaker
+grille), the paddle with its cyan emitters, the ball, their shadows, the
+lives icon, the library's 8x8 font with a highlight and a shadow, and BG3's
+circuit board in seven level colours. The colours are the city's, with a
+green and a red for two bricks.
+
+PixelLab was tried for the board too (`create-tiles-pro`, seeds 8201 and
+8202): on four colours its traces were darker than the board, which the
+level palettes would invert, and remapped they read as clusters of little
+hearts, busy under the bricks and the ball; on three colours the cells came
+out nearly empty. The drawn board stays: under a playfield, quiet wins.
 
 ### The hi-res page (mode5_hires)
 

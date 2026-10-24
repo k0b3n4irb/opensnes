@@ -1495,7 +1495,7 @@ BAR_PANEL = (40, 74, 215, 149)          # the message panel's outline: main.c's 
 
 def bar_terminal() -> Image.Image:
     """256x224 on TERMINAL's four colours: the bezel and scanlines of save_game's terminal,
-    a bowl of noodles with its steam and chopsticks over the message panel, and the
+    a bowl of noodles with its steam and chopsticks over the message panel (PixelLab), and the
     panel's double outline (3 outside, 2 inside) round the layer main.c composes on BG1."""
     im = Image.new("P", (256, 224), 0)
     im.putpalette([v for c in TERMINAL for v in hexrgb_(c)] + [0] * 756)
@@ -1513,19 +1513,19 @@ def bar_terminal() -> Image.Image:
                 px[x, y] = 2
             else:
                 px[x, y] = 1                                # the glass, without scanlines
-    for y in range(50, 63):                                 # the bowl: a half ellipse under its rim
-        for x in range(106, 151):
-            d = ((x - 128) / 22) ** 2 + ((y - 50) / 12) ** 2
-            if d <= 1:
-                px[x, y] = 3 if d > 0.8 or y == 50 else 2
-    for x in range(121, 136):                               # its foot
-        px[x, 63] = 3
-    for sx in (120, 128, 136):                              # the steam, three wavy strands
-        for y in range(30, 47):
-            px[sx + round(2 * math.sin((y + sx) / 3)), y] = 2
-    for i in range(17):                                     # the chopsticks, across the rim
-        px[140 + i, 45 - i] = 3
-        px[143 + i, 47 - i] = 3
+    # the bowl of noodles (ui/noodle_bowl.png, PixelLab, two colours: its dark one is the
+    # bezel's 2, its cyan the 3), centred where the panel leaves room above it
+    bowl = Image.open(ART / "ui" / "noodle_bowl.png").convert("RGBA")
+    bx0, by0, bx1, by1 = bowl.getbbox()
+    ox, oy = 132 - (bx1 - bx0) // 2 - bx0, 46 - (by1 - by0) // 2 - by0
+    cols = sorted({bowl.getpixel((x, y))[:3] for y in range(bowl.height) for x in range(bowl.width)
+                   if bowl.getpixel((x, y))[3] >= 128}, key=sum)
+    assert len(cols) == 2 and oy + by1 < BAR_PANEL[1], (cols, oy + by1)
+    for y in range(bowl.height):
+        for x in range(bowl.width):
+            p = bowl.getpixel((x, y))
+            if p[3] >= 128:
+                px[ox + x, oy + y] = 2 + cols.index(p[:3])
     return im
 
 
@@ -1861,7 +1861,7 @@ def main() -> int:
     race = build_track(ART)
     ground, sky = png(city["ground"]), png(city["sky"])
     plane, plane_tiles = extbg_plane(ART)
-    arcade = build_breakout(font8())
+    arcade = build_breakout(ART, font8())
     well = build_blocks(font8())
     town = build_rpg(ART)
     aerial = build_shmup(ART)

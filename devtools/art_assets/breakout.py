@@ -8,8 +8,10 @@ drawn here in that layout:
   the sprites' second name table, which reads the same words: 0 blank,
   1 the cabinet's corner, 2-7 its top edge, 8 its sides (the right
   ones are the left ones mirrored by the map), 9-12 a
-  speaker grille on the sides, 13-14 a brick (colours 13-15 of whichever
-  BG palette the map entry names: one palette per brick colour), 15-17 the
+  speaker grille on the sides, 13-14 a brick (ui/brick.png, PixelLab: its
+  three greys become colours 13-15 of whichever BG palette the map entry
+  names, one palette per brick colour; its top row is empty, the joint
+  between two rows of bricks), 15-17 the
   paddle (left end, middle, right end; the middle drawn twice, the second
   mirrored), 18-19 its shadow, 20 the ball, 21 its shadow, 22-117 the font
   (ASCII 32-127, colours 10-12), 118-119 the lives icon. The sheet's PNG
@@ -27,6 +29,7 @@ from __future__ import annotations
 
 import random
 import struct
+from pathlib import Path
 
 from PIL import Image
 
@@ -96,7 +99,17 @@ def _put(sheet: Image.Image, n: int, rows: list[str], key: dict[str, int]) -> No
             sheet.putpixel((x0 + x, y0 + y), key[ch])
 
 
-def tiles(font: dict[str, list[int]]) -> Image.Image:
+def brick(art: Path) -> list[list[int]]:
+    """The brick, 16x8 (ui/brick.png, 16x16 from PixelLab, the brick in its top half): its
+    three greys, dark to light, as colours 13-15; transparent as 0."""
+    im = Image.open(art / "ui" / "brick.png").convert("RGBA")
+    greys = sorted({im.getpixel((x, y))[:3] for y in range(8) for x in range(16) if im.getpixel((x, y))[3] >= 128}, key=sum)
+    assert len(greys) == 3, greys
+    return [[13 + greys.index(im.getpixel((x, y))[:3]) if im.getpixel((x, y))[3] >= 128 else 0
+             for x in range(16)] for y in range(8)]
+
+
+def tiles(art: Path, font: dict[str, list[int]]) -> Image.Image:
     sheet = Image.new("P", (128, 64), 0)
     sheet.putpalette([v for c in palette() for v in c])
     k = {".": 0, "0": 1, "1": 2, "2": 3, "3": 4, "4": 5, "m": 6, "n": 7, "t": 8, "g": 9}
@@ -119,10 +132,10 @@ def tiles(font: dict[str, list[int]]) -> Image.Image:
     for x, y in ((0, 0), (1, 0), (0, 1)):
         corner[y][x] = "."
     _put(sheet, 1, ["".join(r) for r in corner], k)
-    # the brick, 16x8 in two tiles: light top and left, dark bottom and right
-    b = {".": 0, "d": 13, "b": 14, "l": 15}
-    _put(sheet, 13, ["llllllll", "lbbbbbbb", "lbbbbbbb", "lbbbbbbb", "lbbbbbbb", "lbbbbbbb", "lddddddd", "dddddddd"], b)
-    _put(sheet, 14, ["lllllllc".replace("c", "d"), "bbbbbbbd", "bbbbbbbd", "bbbbbbbd", "bbbbbbbd", "bbbbbbbd", "dddddddd", "dddddddd"], b)
+    # the brick, 16x8 in two tiles (13 its left half, 14 its right)
+    for y, row in enumerate(brick(art)):
+        for x, v in enumerate(row):
+            sheet.putpixel(((13 + x // 8) % 16 * 8 + x % 8, (13 // 16) * 8 + y), v)
     # the paddle: cyan emitters at the ends, a violet body with a magenta stripe
     o = {".": 0, "W": 1, "s": 2, "C": 3, "c": 4, "e": 5, "m": 6, "v": 7, "V": 8, "h": 9, "p": 10}
     _put(sheet, 15, ["..eccchh", ".ecCCvhh", "ecCWCvvv", "ecWWCmpp", "ecCWCmmm", "ecCCCvvv", ".eccVVVV", "..eeVVVV"], o)
@@ -229,6 +242,6 @@ def bg2map() -> bytes:
     return struct.pack("<1024H", *m)
 
 
-def build_breakout(font: dict[str, list[int]]) -> dict[str, Image.Image | bytes]:
-    return {"tiles": tiles(font), "back": back(), "bg1map": bg1map(), "bg2map": bg2map(),
+def build_breakout(art: Path, font: dict[str, list[int]]) -> dict[str, Image.Image | bytes]:
+    return {"tiles": tiles(art, font), "back": back(), "bg1map": bg1map(), "bg2map": bg2map(),
             "backpal": backpal()}
