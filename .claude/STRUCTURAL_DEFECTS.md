@@ -1342,6 +1342,39 @@ animTickMeta 1346 → 1108 (−18 %), const u8 walk ×32 7689 → 6832
 pointer-variable loads carry no pointee taint; corpus green on the
 frame-equal protocol; `make bench` re-baselined with the gain stated.
 
+#### A10. A plain pointer built from an address above `$FFFF` loses its bank in silence — OPEN 🟡 (noted 2026-10-24)
+
+**Symptom**: `#define EDGE_TABLE ((u8 *)0x708040)` compiles without a word.
+At a constant index the store keeps the bank (`EDGE_TABLE[5] = v` →
+`sta.l $708045`); at a variable index it does not (`EDGE_TABLE[i] = v` →
+`adc.w #$8040 / tax / sta.l $000000,x`), and the byte goes to `$00:8040+i`,
+in ROM. Loads behave the same way. Found while writing Game Pak RAM from C in
+`chips/superfx_game_skeleton` (commit `05718d92`): the edge table and 16 of
+19 points stayed zero, the three written at constant indices were right.
+
+**Root cause**: none in the codegen. A plain pointer is bank `$00` by design
+(B2: plain C RAM below `$2000`, `FAR` above); `u8 FAR *` carries the bank
+(`adc #112` then `sta [dp]`), and cproc already refuses to assign a `FAR`
+pointer to a plain one ("discards qualifiers"). What is missing is the
+diagnostic for the other direction: an integer constant above `$FFFF`
+converted to a plain pointer type is always a mistake, since the bank it
+names can only survive by accident (the constant-index fold).
+
+**Proposal**: in cproc, a warning (an error under `-Werror`, which the game
+builds with) when an integer constant whose value exceeds `$FFFF` is
+converted to a pointer type without the `__far` qualifier on its target,
+naming `FAR` as the fix. Frontend only; no IR, no codegen change, so the
+corpus bytes must not move.
+
+**Cost / risk**: small (one check in the conversion, a fixture), but it is a
+compiler change: separate worktree, announced to the game before it lands
+(its `-Werror` build would stop on any such cast it has).
+
+**Acceptance criteria**: a `devtools/compiler-tests` fixture that expects the
+diagnostic on `(u8 *)0x708040` and none on `(u8 FAR *)0x708040` nor on
+`(u8 *)0x2100`; the corpus builds with zero new warnings; Class A A/B
+(`diff_corpus.py`) shows every example MATCH.
+
 #### B1. 16-bit pointer ABI in lib helpers — RESOLVED 🟢 (superseded by A6+A7 + #122 + #127)
 
 > **Status: RESOLVED, by a better path than the `*Bank`-variant plan
