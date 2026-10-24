@@ -281,16 +281,16 @@ PixelLab call.
 
 ### The terminal's cursor (mouse)
 
-`examples/input/mouse`: `res/cursor.png`, a 16x16 arrow drawn pixel by pixel
-in `devtools/art_assets/build.py` (`CURSOR`): cyan, a white edge, a dark
-outline, a magenta hot spot at its top-left pixel.
+`examples/input/mouse`: `res/cursor.png` is `ui/cursor.png` (below), moved
+by `devtools/art_assets/build.py` so that its tip, the hot spot, is the
+top-left pixel: the example draws the sprite at the pointer.
 
 ### The security range (superscope)
 
 `examples/input/superscope`: `res/aim_adjust_target.png`, the calibration
 target (2bpp: rings and a cross over the panels of the range's wall), and
-`res/marker.png`, the 16x16 impact marker, both drawn by
-`devtools/art_assets/build.py` (`scope_target`, `scope_marker`). They replace
+`res/marker.png`, the 16x16 impact marker (`ui/marker.png`, below). The target
+is drawn by `devtools/art_assets/build.py` (`scope_target`). They replace
 PVSnesLib's 48-colour sprite sheet, of which the example used one dot.
 
 ### Kit's glider over the city (shmup)
@@ -304,8 +304,8 @@ plaza of `backgrounds/aerial.png` on an esplanade of one block, helipads and
 a skylight from the same view on most roofs. 184 tiles, 10 colours. The
 glider (`res/player.png`) and the hunter (`res/enemy.png`) are
 `characters/glider.png` and `characters/hunter.png` indexed; Kit's shot
-(`res/bullet.png`, an aqua bolt) is drawn in `shmup.py` (`BOLT`). No PixelLab
-call. They replace Kenney's *Pixel Shmup* pack.
+(`res/bullet.png`, an aqua capsule) is `ui/bolt.png` (below). They replace
+Kenney's *Pixel Shmup* pack.
 
 ### The hologram's square (superfx_game_skeleton)
 
@@ -318,9 +318,32 @@ above it, where the GSU draws the hologram. `generate-image-v2`, 256x144 (the
 lines between the 40-line letterbox bands), seed 7702 (the third of seeds
 7700-7702: the only one whose sky stays dark above the projector),
 `backgrounds/street.png` as `style_image` with its colours off, the city's 15
-colours as `target_palette`. 541 tiles. `res/sight.png`, the pad's sight
-(16x16: four aqua brackets and a pink cross, each pixel ringed with ink), is
-drawn by `devtools/art_assets/build.py` (`sight`).
+colours as `target_palette`. 541 tiles. `res/sight.png`, the pad's sight,
+is `ui/sight.png` (below) with a ring of ink added round every lit pixel by
+`devtools/art_assets/build.py`, so that it reads over the hologram's lines.
+
+### The small interface sprites (ui/)
+
+16x16 pieces from `generate-image-v2`, which returns 64 candidates at that
+size; the one kept is chosen on screen, in its example, against the sprite it
+replaced. `devtools/art_assets/ui.py` indexes them (0 transparent, then their
+colours by brightness). The palette given is the city's interface colours:
+`#080810 #203048 #307078 #48a0a0 #70e0e0 #e8e8f0 #a02860 #e05090 #f0b050`
+(the city's, with the bright aqua and the white of Kit's).
+
+| File | What | Seed, candidate | Used by |
+|---|---|---|---|
+| `ui/sight.png` | four bright corner brackets and a magenta centre | 8020, #6 (no palette given: with it, two runs gave blurred squares) | `examples/chips/superfx_game_skeleton` (`res/sight.png`, ringed with ink) |
+| `ui/marker.png` | a white ring round a magenta core, dark outline | 8001, #3 | `examples/input/superscope` (`res/marker.png`) |
+| `ui/cursor.png` | an arrow, cyan with a magenta tip and a dark outline | 8002, #0 | `examples/input/mouse` (`res/cursor.png`, its tip moved to (0, 0)) |
+| `ui/bolt.png` | Kit's shot, an aqua capsule with a white core | 8003, #0 | `examples/demos/shmup` (`res/bullet.png`) |
+
+What PixelLab could not do here, measured: it makes nothing smaller than 16
+pixels a side, so the 8x8 moths of `sprite_swarm`, the 4x3 speck of
+`sa1_starfield` and breakout's 8x8 ball stay drawn by script; and its
+animation of the orb (`animate-with-text-v3`, seeds 8030 and 8031) lost the
+orb's shape from one frame to the next, so extbg's pulsing orb stays drawn
+by script too (`mode7.py`, `orb`).
 
 ### Neon Breaker (the arcade cabinet)
 

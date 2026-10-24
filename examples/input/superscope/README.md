@@ -142,6 +142,7 @@ LIB_MODULES := console input sprite dma text background
 | File | What's in it |
 |------|-------------|
 | `main.c` | State machine, sprite control, text display |
-| `res/*.png.toml` | the import settings of the target picture (`opensnes-tileset`, 2bpp) and the sprite sheet (`opensnes-sprite`, 32-pixel blocks, 48 colours); the build converts and links them |
-| `res/` | Pre-converted graphics (.pic, .pal, .map) and source PNGs |
+| `res/*.png.toml` | the import settings of the target picture (`opensnes-tileset`, 2bpp, 4 colours) and of the marker (`opensnes-sprite`, 16-pixel blocks, 16 colours); the build converts and links them |
+| `res/aim_adjust_target.png` | the calibration target, drawn by `devtools/art_assets/build.py` (`scope_target`): the rings and the cross must be exact, the aim adjustment reads them |
+| `res/marker.png` | the impact marker, a white ring round a magenta core: `assets/neo-lumen/ui/marker.png` (PixelLab, CC0), indexed |
 | `Makefile` | `LIB_MODULES := console input sprite dma text background` |

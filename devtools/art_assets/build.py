@@ -106,20 +106,20 @@ demos/shmup:
                       city's Wang tiles on a strip of two blocks and a canal (shmup.py)
   res/player.png      Kit's glider (characters/glider.png), indexed
   res/enemy.png       the security's hunter (characters/hunter.png), indexed
-  res/bullet.png      Kit's shot, an aqua bolt, 16x16, drawn here
+  res/bullet.png      Kit's shot, an aqua bolt, 16x16 (ui/bolt.png)
 
 chips/superfx_game_skeleton:
   res/square.png      the square the hologram turns above (backgrounds/square.png),
                       256x144 padded to 256x256 with its darkest colour
-  res/sight.png       the pad's sight, 16x16, drawn here
+  res/sight.png       the pad's sight, 16x16 (ui/sight.png), ringed with ink here
 
 input/mouse:
-  res/cursor.png      the terminal's cursor, a 16x16 arrow drawn here
+  res/cursor.png      the terminal's cursor, a 16x16 arrow (ui/cursor.png), its tip moved to (0, 0)
 
 input/superscope:
   res/aim_adjust_target.png  the calibration target, 2bpp: rings and a cross
                       over the panels of the range's wall
-  res/marker.png      the impact marker, 16x16
+  res/marker.png      the impact marker, 16x16 (ui/marker.png)
 
 transitions/fading:
   res/moonrise.png    the moon over the skyline (backgrounds/title.png), its
@@ -215,6 +215,7 @@ from PIL import Image, ImageOps
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
 from shmup import build_shmup  # noqa: E402
+from ui import ui_sprite  # noqa: E402
 from mode7 import build_city, extbg_plane, glider, orb
 from mode7 import indexed as mode7_indexed  # noqa: E402
 from breakout import build_breakout  # noqa: E402
@@ -911,41 +912,18 @@ def scope_target() -> Image.Image:
 
 
 def scope_marker() -> Image.Image:
-    """The impact marker, 16x16: a cyan ring with a magenta core, colour 0 transparent."""
-    cols = ["#000000", "#ffffff", "#c0fcff", "#48d0e0", "#e05090"]
-    im = Image.new("P", (16, 16), 0)
-    im.putpalette([v for c in cols for v in hexrgb_(c)] + [0] * (768 - 3 * len(cols)))
-    for y in range(16):
-        for x in range(16):
-            r = math.hypot(x - 7.5, y - 7.5)
-            v = 0
-            if 5.2 < r < 7.2:
-                v = 3 if (x + y) % 3 else 2
-            elif r < 2.2:
-                v = 1
-            elif r < 3.6:
-                v = 4
-            im.putpixel((x, y), v)
-    return im
+    """The impact marker, 16x16 (ui/marker.png, PixelLab): a white ring with a magenta core."""
+    return ui_sprite(ART, "marker.png")
 
 
 def hexrgb_(h: str) -> tuple:
     return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
 
 
-# input/mouse: the terminal's cursor, an arrow (its hot spot the top-left pixel)
-CURSOR = ["m...............", "Xm..............", "XWX.............", "XWcX............",
-          "XWccX...........", "XWcccX..........", "XWccccX.........", "XWcccccX........",
-          "XWccccccX.......", "XWcccXXXXX......", "XWcXccX.........", "XWX.XccX........",
-          "XX..XccX........", "X....XccX.......", ".....XccX.......", "......XX........"]
-
-
+# input/mouse: the terminal's cursor (ui/cursor.png, PixelLab), its tip moved to the top-left
+# pixel, the hot spot: the example draws the sprite at the pointer
 def mouse_cursor() -> Image.Image:
-    cols = {".": 0, "X": 1, "c": 2, "W": 3, "m": 4}
-    im = Image.new("P", (16, 16), 0)
-    im.putpalette([0, 0, 0, 16, 24, 40, 72, 208, 224, 232, 248, 255, 224, 80, 144] + [0] * 753)
-    im.putdata([cols[ch] for row in CURSOR for ch in row])
-    return im
+    return ui_sprite(ART, "cursor.png", shift=(-4, -1))
 
 
 # chips/superfx_game_skeleton: the square the hologram turns above (BG2, behind the GSU's
@@ -962,27 +940,9 @@ def square() -> Image.Image:
 
 
 def sight() -> Image.Image:
-    """The sight, 16x16: four aqua corner brackets and a pink cross at (7, 7), each pixel
-    of them ringed with ink so it reads over the hologram's lines and the neon alike.
-    0 transparent, 1 ink, 2 aqua, 3 pink."""
-    cols = ["#000000", "#080810", "#70e0e0", "#e05090"]
-    im = Image.new("P", (16, 16), 0)
-    im.putpalette([v for c in cols for v in hexrgb_(c)] + [0] * (768 - 3 * len(cols)))
-    lit = {}
-    for a in (1, 13):
-        for b in (1, 13):
-            for k in range(4):
-                lit[(a + (k if a == 1 else -k), b)] = 2      # the bracket's arm along x
-                lit[(a, b + (k if b == 1 else -k))] = 2      # and along y
-    for x, y in ((7, 6), (6, 7), (7, 7), (8, 7), (7, 8)):
-        lit[(x, y)] = 3
-    for y in range(16):
-        for x in range(16):
-            if (x, y) in lit:
-                im.putpixel((x, y), lit[(x, y)])
-            elif any((x + dx, y + dy) in lit for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
-                im.putpixel((x, y), 1)
-    return im
+    """The sight, 16x16 (ui/sight.png, PixelLab): four corner brackets and a magenta centre,
+    each lit pixel ringed with ink here so it reads over the hologram's lines and the neon."""
+    return ui_sprite(ART, "sight.png", outline=True)
 
 
 def indexed_scene(name: str) -> Image.Image:

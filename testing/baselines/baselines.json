@@ -127,15 +127,15 @@
   },
   "chips_superfx_game_skeleton": {
     "fbhash": [
-      "ecdd5f749c3d0ab1",
-      "8b80d58ac3574f16"
+      "85f498c70d17e0f3",
+      "44f3e3e4af92aaa1"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.40.0",
-    "rom_sha256": "4e3756060d7c0bbfede4c485d86ce5c7c9220e42cb9a2d23459fdd739d4f6a3e"
+    "rom_sha256": "343c6c2c8ab1b1885fa43b424bf2584abd2b35d8a9e41d87484260c4118c7c39"
   },
   "color_direct_color": {
     "fbhash": "3607ecf1978ea925",

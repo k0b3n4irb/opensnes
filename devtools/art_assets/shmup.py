@@ -10,8 +10,8 @@ again on a strip of 256x512 that wraps vertically, so the auto-scroll loops:
   esplanade of one block, helipads and a skylight on most roofs.
 
 The sprites: Kit's glider (characters/glider.png), the hunter
-(characters/hunter.png; nose up, the game flips it to dive), and Kit's shot,
-drawn here.
+(characters/hunter.png; nose up, the game flips it to dive), and Kit's shot
+(ui/bolt.png). All three from PixelLab.
 """
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ from pathlib import Path
 from PIL import Image
 
 from mode7 import disk, glider, rect, wang
+from ui import ui_sprite
 
 W, H = 16, 32                 # the strip, in 16-px cells: 256x512
 BLOCK = 8                     # cells per block, street included
@@ -98,21 +99,6 @@ def hunter(art: Path) -> Image.Image:
     return out
 
 
-# Kit's shot: an aqua bolt pointing up, in the 8x8 the game's collision box
-# assumes at the centre of its 16x16. 1 the core, 2 the bolt, 3 its rim.
-BOLT = ["................", "................", "................", ".......22.......",
-        "......2112......", "......2112......", ".....321123.....", ".....321123.....",
-        ".....321123.....", "......3223......", "......3223......", ".......33.......",
-        "................", "................", "................", "................"]
-
-
-def bolt() -> Image.Image:
-    im = Image.new("P", (16, 16), 0)
-    im.putpalette([0, 0, 0, 232, 248, 255, 112, 224, 224, 42, 128, 144] + [0] * 756)
-    im.putdata([0 if ch == "." else int(ch) for row in BOLT for ch in row])
-    return im
-
-
 def build_shmup(art: Path) -> dict[str, Image.Image]:
     scene, tiles = ground(art)
-    return {"scene": scene, "player": glider(art), "enemy": hunter(art), "bullet": bolt(), "_tiles": tiles}
+    return {"scene": scene, "player": glider(art), "enemy": hunter(art), "bullet": ui_sprite(art, "bolt.png"), "_tiles": tiles}

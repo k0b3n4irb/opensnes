@@ -93,7 +93,7 @@ OAM, then gsu_present_step:         GSU (from its cache)
 | File | What | Made by |
 |---|---|---|
 | `res/square.png` | the square in the rain, its projector in the middle, 256x144 padded to 256x256 | `devtools/art_assets/build.py` from `assets/neo-lumen/backgrounds/square.png` (PixelLab) |
-| `res/sight.png` | the sight: four aqua brackets and a pink cross, ringed with ink | `devtools/art_assets/build.py`, drawn there |
+| `res/sight.png` | the sight: four bright corner brackets and a magenta centre, ringed with ink | `assets/neo-lumen/ui/sight.png` (PixelLab), the ink ring added by `devtools/art_assets/build.py` |
 
 CC0, like the rest of the Néo-Lumen assets (`assets/neo-lumen/README.md`). The
 music is `audio/snesmod_music`'s module.

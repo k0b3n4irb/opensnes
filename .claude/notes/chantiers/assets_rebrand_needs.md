@@ -35,6 +35,12 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 >   viennent de PixelLab ; les petits sprites (viseurs, curseur, tir, papillons, orbe), le sol du
 >   RPG, les briques, les blocs, les polices, les terminaux, la brume et la pluie sont dessinés par
 >   script, au pixel près.
+> - **Refaits avec PixelLab le 2026-10-24** (consigne ci-dessus) : le viseur, le curseur, le marqueur
+>   Super Scope et le tir du shmup (`assets/neo-lumen/ui/`, comparés à l'écran). **Pas faisables avec
+>   PixelLab, mesuré** : ce qui fait moins de 16 px (papillons 8x8, grain 4x3, balle 8x8 : PixelLab ne
+>   produit rien sous 16 px) et l'orbe pulsé d'extbg (deux animations `animate-with-text-v3` perdent
+>   la forme de l'orbe d'une trame à l'autre). Reste à faire : sol du RPG (tilesets Wang en cours),
+>   briques, blocs, polices, terminaux, brume, pluie.
 > - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (tranchés le jour même :
 >   `games/rooftop_run`, `demos/platform_objects`) ;
 >   `audio/speech_synth` (sa phrase attend le nom de la ville) ; la musique (MU1-MU3, modules
@@ -282,7 +288,7 @@ Conventions : tuiles 8x8, métatuiles 16x16 pour les décors, 4bpp sauf indicati
 | O1 | objet | éclat de données (la « pièce » du monde) | 16x16, rotation 8 trames ; variante 24 trames pour le streaming ; Pal OBJ5 ; **fait le 2026-10-20** pour likemario : une image PixelLab (`props/shard.png`), les 8 trames de rotation par script | game_skeleton, world_sprites, dynamic_sprite, likemario | PixelLab *animate* ou **à la main** (petit, cyclique) |
 | O2 | objet | objets de carte vue de dessus : casier (fermé/ouvert), caisse, borne-terminal, porte | 16x16 chacun ; tuiles BG (Pal BG T2) | rpg, collision_demo | PixelLab *map object* |
 | O3 | objet | projectiles : tir de Kit, tir ennemi | 8x8 et 16x16, 2 trames ; Pal OBJ5 | shmup, aim_target | **à la main** ou PixelLab |
-| O4 | UI/objet | curseur de souris, viseur Super Scope, viseur de pad | 16x16, 3 dessins ; Pal OBJ7 ; viseur de pad **fait le 2026-10-24** pour superfx_game_skeleton (`build.py`, `sight`) | mouse, superscope, superfx_game_skeleton, aim_target | **à la main** (quelques pixels) |
+| O4 | UI/objet | curseur de souris, viseur Super Scope, viseur de pad | 16x16, 3 dessins ; Pal OBJ7 ; viseur de pad **fait le 2026-10-24** pour superfx_game_skeleton, puis **refait avec PixelLab le même jour** avec le curseur de souris et le marqueur Super Scope (`assets/neo-lumen/ui/`, `ui.py`) | mouse, superscope, superfx_game_skeleton, aim_target | **à la main** (quelques pixels) |
 | O5 | effet | explosion / impact | 16x16 et 32x32, 5 trames ; Pal OBJ6 | shmup, superscope | PixelLab *animate* |
 | O6 | objet | orbe d'énergie (balle) | 8x8 et 16x16 ; Pal OBJ5 ; **fait le 2026-10-21** pour extbg : 16x16, 8 trames de pulsation, dessiné par script (`mode7.py`, `orb`) ; le 8x8 de breakout le 2026-10-21 (la balle, dessinée par `breakout.py`) | breakout, extbg | **à la main** |
 | O7 | objet | raquette du casse-briques | 32x8 + ombre ; Pal OBJ5 ; **fait le 2026-10-21** (`breakout.py`, dans la palette OBJ 0 que le jeu utilise) | breakout | **à la main** |

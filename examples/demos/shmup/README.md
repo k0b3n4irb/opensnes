@@ -26,9 +26,11 @@ shot that meets a hunter takes both out.
   glider; its OAM attribute's vertical flip turns it to dive
 - **Edge-triggered fire** with `padPressed()`
 
-A shot despawns once its visible pixels leave the top of the screen
-(`y < -12`), not when its 32×32 frame does: past that point the 8-bit OAM
-`y` wraps and the shot would flash at the bottom for a frame.
+A shot despawns when its `y` goes below 0. The OAM holds `y - 1` in eight
+bits, so `y = 0` is written as 255, a line the PPU never shows: one step
+further and the shot would come back at the bottom of the screen for a
+frame. A hit is decided on the shot's centre, (8, 8) in its 16×16 sprite,
+falling inside the hunter's 20×20 box.
 
 ## Architecture
 
@@ -68,7 +70,7 @@ Produces `shmup.sfc` (LoROM, 256 KB).
 | `res/scene.png` | the city from the sky, 256x512, wrapping vertically: two blocks of roofs either side of a canal, the round plaza, helipads | `devtools/art_assets/shmup.py`: the Mode 7 city's Wang tiles (PixelLab) laid out on a strip, pieces of `backgrounds/aerial.png` stamped on it |
 | `res/player.png` | Kit's delivery glider from above | `characters/glider.png` (PixelLab), indexed |
 | `res/enemy.png` | the security's hunter from above, nose up | `characters/hunter.png` (PixelLab), indexed |
-| `res/bullet.png` | Kit's shot, an aqua bolt in the middle of 16x16 | `devtools/art_assets/shmup.py`, drawn there |
+| `res/bullet.png` | Kit's shot, an aqua capsule centred in 16x16 | `assets/neo-lumen/ui/bolt.png` (PixelLab), indexed |
 
 `python3 devtools/art_assets/build.py` writes the four again (contributors).
 
