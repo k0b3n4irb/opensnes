@@ -152,14 +152,14 @@
  * @note Must be called during forced blank (screen off). The function
  *       writes directly to VRAM via DMA.
  *
- * @note Data placement: the three blobs may live in ANY bank — mapLoad
- * and the scroll runtime honour each far pointer's bank byte, so pinning
- * the map out of bank $00 (e.g. `.section ".rodata2" semifree bank 2`)
- * is the recommended layout for big maps. But that data is then for the
- * MAP ENGINE only: reading it directly from C (`mapdata[6]`, `*ptr`)
- * silently reads bank $00 instead (cc65816 near-pointer deref — see
- * KNOWN_LIMITATIONS.md). To consult tiles/attributes from C, use
- * mapGetMetaTile()/mapGetMetaTilesProp() — they are bank-safe.
+ * @note Data placement: the three blobs may live in any bank — mapLoad
+ * and the scroll runtime honour each far pointer's bank byte. The blobs
+ * opensnes-level writes are declared with ASSET_SECTION, which keeps them
+ * out of bank $00; a map written by hand in assembly is declared the
+ * same way. C may read the blobs through a `const` pointer, which is
+ * compiled as a far read; casting the `const` away is the one bank-blind
+ * read (KNOWN_LIMITATIONS.md). To read the map at a position in pixels,
+ * use mapGetMetaTile() and mapGetMetaTilesProp().
  */
 void mapLoad(const u8 *layer1map, const u8 *layertiles, const u8 *tilesprop);
 
@@ -223,7 +223,9 @@ u16 mapGetCameraY(void);
  *
  * @param xpos X coordinate in map pixels
  * @param ypos Y coordinate in map pixels
- * @return Metatile index (0-511)
+ * @return Metatile index: the low 10 bits of the map entry, 0 to 1023.
+ *         mapLoad() copies 512 metatiles, so on a map whose tileset
+ *         holds at most 512 tiles the result is 0 to 511.
  */
 u16 mapGetMetaTile(u16 xpos, u16 ypos);
 
