@@ -73,7 +73,7 @@ ROM mode: LoROM (project default).
   `setScreenOff()` sets INIDISP bit 7, the only state besides VBlank in
   which the PPU accepts VRAM writes. `setBrightness(0)` just makes the
   screen black — the PPU keeps fetching and the write is dropped. A scene
-  switch moves 34 KB.
+  switch moves 37 KB (the street's 939 tiles, its 8 KB map, a palette).
 - **A fixed 16-colour palette per scene**, imposed on the converter
   (`palette = "town_fixed.pal"` in `res/tileset.png.toml`) instead of
   quantised from the picture. With a quantiser, adding one tile re-derives
@@ -93,7 +93,7 @@ ROM mode: LoROM (project default).
 
 | Word address | Content |
 |---|---|
-| `$0000` | the scene's tiles (822 for the street, 474 for the den) |
+| `$0000` | the scene's tiles (939 for the street, to `$3AB0`; 470 for the den) |
 | `$4000` | BG1's map, 64×64 |
 | `$5000` | BG2's and BG3's character base: a blank tile, then the font |
 | `$5400` | BG2's tiles: the frame and the HUD icons (tile 64 from the base) |
@@ -114,17 +114,22 @@ objects in the `Entities` layer, typed `spawn`, `npc`, `locker` or `door`
 4 the raccoon.
 
 The street itself is composed by `devtools/art_assets/rpg.py`
-(contributors): the ground drawn there on the metatile grid, the buildings
-and props of `assets/neo-lumen/town/` placed on it, the whole cut into its
-distinct 8×8 tiles — 32 to a row of the tileset, the width the tileset
-converter's map is written in. Running it again rewrites both maps from its
-layout.
+(contributors). The ground is laid on the metatile grid from PixelLab's
+tiles (`assets/neo-lumen/tiles/`): two Wang sets, road to sidewalk and canal
+to sidewalk, placed by the terrain at each metatile's corners, so the curbs
+and the quays follow the layout; variants of the full tiles (cracks, a
+puddle, a grate) drawn from a seeded generator so every build is the same;
+the street's centre line, the bridge deck with its railings, the alleys.
+The buildings and props of `assets/neo-lumen/town/` are placed over it, and
+the whole is cut into its distinct 8×8 tiles — 32 to a row of the tileset,
+the width the tileset converter's map is written in. Running it again
+rewrites both maps from its layout.
 
 ## Assets
 
 | File | What | Made by |
 |---|---|---|
-| `res/tileset.png`, `res/town.tmj` | the street's 822 tiles and its map, entities included | `devtools/art_assets/rpg.py`, from `assets/neo-lumen/town/` (PixelLab) and its own ground |
+| `res/tileset.png`, `res/town.tmj` | the street's 939 tiles and its map, entities included | `devtools/art_assets/rpg.py`, from `assets/neo-lumen/town/` and `assets/neo-lumen/tiles/` (PixelLab) |
 | `res/interior.png`, `res/house.tmj` | the den's tiles and map | the same, from `assets/neo-lumen/backgrounds/den.png` (PixelLab) |
 | `res/town_fixed.pal`, `res/interior_fixed.pal` | the city's 15 colours, imposed on both | the same |
 | `res/hero.png` | Kit's walk, 15 frames of 32×32 | the same, from `characters/topdown/kit_walk_sheet.png` |

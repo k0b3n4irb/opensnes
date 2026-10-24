@@ -39,7 +39,8 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 >   Super Scope et le tir du shmup (`assets/neo-lumen/ui/`, comparés à l'écran). **Pas faisables avec
 >   PixelLab, mesuré** : ce qui fait moins de 16 px (papillons 8x8, grain 4x3, balle 8x8 : PixelLab ne
 >   produit rien sous 16 px) et l'orbe pulsé d'extbg (deux animations `animate-with-text-v3` perdent
->   la forme de l'orbe d'une trame à l'autre). Reste à faire : sol du RPG (tilesets Wang en cours),
+>   la forme de l'orbe d'une trame à l'autre). Sol du RPG **fait le même jour** (deux jeux Wang
+>   PixelLab enchaînés, variantes, pont, ruelles : `assets/neo-lumen/README.md`). Reste à faire :
 >   briques, blocs, polices, terminaux, brume, pluie.
 > - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (tranchés le jour même :
 >   `games/rooftop_run`, `demos/platform_objects`) ;

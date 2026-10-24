@@ -3,8 +3,9 @@
 Imported by build.py. Everything the example's res/ holds is written here:
 
 - tileset.png and town.tmj: the town, 512x512, composed on a grid of 16x16
-  metatiles from the ground drawn below (asphalt, paving, curbs, the canal,
-  its bridge) and the buildings and props of assets/neo-lumen/town/ (PixelLab,
+  metatiles from the ground of assets/neo-lumen/tiles/ (PixelLab: two Wang
+  sets, road to sidewalk and canal to sidewalk, and their variants, the bridge,
+  the alleys) and the buildings and props of assets/neo-lumen/town/ (PixelLab,
   the city's 15 colours), then cut into its distinct 8x8 tiles. The sheet is
   the Tiled tileset (32 tiles a row, one tile per distinct look and
   collision), the map names them, and each tile carries its `attribute`
@@ -22,6 +23,7 @@ Positions are in metatiles (16 px, two map cells) unless they say cells.
 from __future__ import annotations
 
 import json
+import random
 import struct
 from pathlib import Path
 
@@ -43,89 +45,75 @@ def rgb(h: str) -> tuple:
 PAL = [rgb(c) for c in CITY]
 
 
-# --- the ground, drawn: each kind is one 16x16 pattern, so its tiles repeat ---------------
-def _asphalt(x, y):
-    v = (x * 7 + y * 13 + (x * y) % 5) % 23
-    return DUSK if v == 0 else NIGHT
+# --- the ground, from PixelLab: two Wang sets placed by the corners, variants on the full tiles --
+# tiles/wang_road_walk.png and tiles/wang_canal_walk.png: 16 tiles each, tile NW<<3 | NE<<2 |
+# SW<<1 | SE at (k % 4, k / 4), 1 = the sidewalk (the upper terrain). The two share the same
+# sidewalk, pixel for pixel (the second was made with the first's full tile as reference).
+# walk_variants.png, road_variants.png: full tiles of either, in the same style; the road's
+# last one is the centre line. bridge_alley_rail.png: the bridge deck (bare, its railing left,
+# its railing right), the alley floor (two), the sidewalk with its guard rail.
+WALK_WEIGHTS = [10, 6, 6, 1, 1, 1]               # plain slabs, then a crack, a crack, a puddle
+ROAD_WEIGHTS = [30, 24, 1, 1, 1, 1, 1]           # plain asphalt, then tracks, cracks, a puddle, a grate
+CENTRE_ROW = 9                                   # the street's centre line, a dash every other metatile
 
 
-def _paving(x, y, mx=0, my=0):
-    if x == 15 or y == 15:
-        return DUSK                                   # the seam between two slabs
-    if (mx * 5 + my * 3) % 7 == 0:                    # one slab in seven holds a puddle
-        dx, dy = x - 8, (y - 7) * 2
-        if dx * dx + dy * dy < 30:
-            return TEAL if (x + y) % 5 == 0 else DEEP
-    return SLATE if (x * 3 + y * 5) % 17 else DUSK
+def strip(art: Path, name: str) -> list[Image.Image]:
+    im = Image.open(art / "tiles" / name).convert("RGB")
+    return [im.crop((x, 0, x + MT, MT)) for x in range(0, im.width, MT)]
 
 
-def _water(x, y, row):
-    if (y % 4 == 1) and (x + y * 5 + row * 3) % 16 < 5:
-        return DUSK                                   # a ripple
-    if (y % 8 == 3) and (x * 3 + row * 7) % 32 < 2:
-        return PINK if (x + row) % 3 else AQUA        # a sign's reflection
-    return NIGHT
+def wang(art: Path, name: str) -> dict[int, Image.Image]:
+    im = Image.open(art / "tiles" / name).convert("RGB")
+    return {k: im.crop(((k % 4) * MT, (k // 4) * MT, (k % 4) * MT + MT, (k // 4) * MT + MT)) for k in range(16)}
 
 
-def _plank(x, y):
-    return MAUVE if y % 4 == 0 else PLUM
+def vertex_terrain(grid) -> list[list[str]]:
+    """The terrain at each metatile corner: the canal where any of the four cells round it is
+    water, else the road where any is street, else the sidewalk. The curb and the quay so
+    fall inside the sidewalk's cells, half a metatile from the street; the bridge, drawn over
+    its own cells, meets the street's end with no water between them."""
+    v = [["walk"] * (W + 1) for _ in range(H + 1)]
+    for vy in range(H + 1):
+        for vx in range(W + 1):
+            near = {grid[y][x] for y in (vy - 1, vy) for x in (vx - 1, vx) if 0 <= y < H and 0 <= x < W}
+            if "water" in near:
+                v[vy][vx] = "water"
+            elif "street" in near:
+                v[vy][vx] = "street"
+    return v
 
 
-def ground(kind: str, mx: int, my: int) -> list[list[int]]:
-    """A metatile of ground, 16x16 colour indices."""
-    if kind == "street":
-        px = [[_asphalt(x, y) for x in range(MT)] for y in range(MT)]
-        if my == 9:                                   # the centre line, cyan dashes
-            for x in range(2, 10):
-                px[15][x] = SEA
-        return px
-    if kind == "walk":
-        return [[_paving(x, y, mx, my) for x in range(MT)] for y in range(MT)]
-    if kind == "water":
-        return [[_water(x, y, my) for x in range(MT)] for y in range(MT)]
-    if kind == "bridge":
-        return [[_plank(x, y) for x in range(MT)] for y in range(MT)]
-    if kind == "alley":
-        return [[INK] * MT for _ in range(MT)]
-    if kind == "rail":
-        px = [[_paving(x, y) for x in range(MT)] for y in range(MT)]
-        for x in range(MT):
-            px[9][x] = px[10][x] = VIOLET
-            px[11][x] = INK
-        for y in range(6, 16):
-            px[y][3] = px[y][12] = MAUVE
-        return px
-    raise ValueError(kind)
-
-
-def edges(img, grid):
-    """Curbs where paving meets the street, a stone lip where it meets the water,
-    rails on the bridge's sides: drawn over the ground, on the paving's side."""
-    for my in range(len(grid)):
-        for mx in range(len(grid[0])):
+def ground_rgb(art: Path, grid) -> Image.Image:
+    """The town's ground, 512x512 in RGB. The variants come from one generator with a fixed
+    seed, walked over the town row by row: the town is the same at every build, and the
+    details spread (one seed per metatile, consecutive seeds, bunched them)."""
+    road, canal = wang(art, "wang_road_walk.png"), wang(art, "wang_canal_walk.png")
+    walk_v, road_v = strip(art, "walk_variants.png"), strip(art, "road_variants.png")
+    deck, rail_l, rail_r, alley, alley2, guard = strip(art, "bridge_alley_rail.png")
+    v = vertex_terrain(grid)
+    rng = random.Random(8150)
+    out = Image.new("RGB", (W * MT, H * MT))
+    for my in range(H):
+        for mx in range(W):
+            c = (v[my][mx], v[my][mx + 1], v[my + 1][mx], v[my + 1][mx + 1])
+            if "water" in c and "street" in c:           # where the lane meets the bridge: a curb
+                c = tuple("walk" if t == "water" else t for t in c)
+            water = "water" in c
+            key = sum((t == "walk") << b for t, b in zip(c, (3, 2, 1, 0)))
+            tile = (canal if water else road)[key]
+            if key == 15:
+                tile = rng.choices(walk_v, WALK_WEIGHTS)[0]
+            elif key == 0 and not water:
+                tile = road_v[-1] if (my == CENTRE_ROW and mx % 2 == 0) else rng.choices(road_v[:-1], ROAD_WEIGHTS)[0]
             k = grid[my][mx]
-            x0, y0 = mx * MT, my * MT
-
-            def other(dx, dy):
-                nx, ny = mx + dx, my + dy
-                return grid[ny][nx] if 0 <= ny < len(grid) and 0 <= nx < len(grid[0]) else k
-            if k in ("walk", "rail"):
-                for (dx, dy), band in (((0, 1), [(15, AQUA), (14, SEA)]), ((0, -1), [(0, SEA), (1, TEAL)]),
-                                        ((1, 0), [(15, SEA)]), ((-1, 0), [(0, SEA)])):
-                    o = other(dx, dy)
-                    if o not in ("street", "water"):
-                        continue
-                    for off, c in band:
-                        c = c if o == "street" else (MAUVE if off in (0, 15) else PLUM)
-                        for t in range(MT):
-                            x, y = (x0 + t, y0 + off) if dx == 0 else (x0 + off, y0 + t)
-                            img[y][x] = c
             if k == "bridge":
-                for dx, xx in ((-1, 0), (1, 15)):
-                    if other(dx, 0) == "water":
-                        for y in range(MT):
-                            img[y0 + y][x0 + xx] = LILAC
-                            img[y0 + y][x0 + (1 if xx == 0 else 14)] = INK
+                tile = rail_l if grid[my][mx - 1] == "water" else rail_r if grid[my][mx + 1] == "water" else deck
+            elif k == "alley":
+                tile = alley if (mx + my) % 2 else alley2
+            elif k == "rail":
+                tile = guard
+            out.paste(tile, (mx * MT, my * MT))
+    return out
 
 
 # --- the town -------------------------------------------------------------------------------
@@ -188,13 +176,9 @@ def nearest(c):
 def compose_town(art: Path):
     """The town as colour indices (512x512) and its solid metatiles."""
     grid = town_terrain()
-    img = [[0] * (W * MT) for _ in range(H * MT)]
-    for my in range(H):
-        for mx in range(W):
-            g = ground(grid[my][mx], mx, my)
-            for y in range(MT):
-                img[my * MT + y][mx * MT:(mx + 1) * MT] = g[y]
-    edges(img, grid)
+    g = ground_rgb(art, grid)
+    lut = {c: nearest(c) for c in set(g.getdata())}
+    img = [[lut[g.getpixel((x, y))] for x in range(W * MT)] for y in range(H * MT)]
     solid = [[grid[my][mx] in SOLID_GROUND for mx in range(W)] for my in range(H)]
     cache = {}
     for name, mx, my, rows in TOWN_PIECES:

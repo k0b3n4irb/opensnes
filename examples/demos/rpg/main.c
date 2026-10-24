@@ -326,7 +326,7 @@ static void dialog_close(void) {
  * no engine here, just the data swapped over; the collision map and the
  * entities are read in place, by `scene`. */
 static void scene_load(u8 which, u16 tx, u16 ty, u8 facing) {
-    setScreenOff();                 /* forced blank: 34 KB will not fit VBlank */
+    setScreenOff();                 /* forced blank: 37 KB will not fit VBlank */
     if (which == SCENE_HOUSE) {
         dmaCopyVram(interior_tiles, VRAM_SCENE_TILES,
                     (u16)(interior_tiles_end - interior_tiles));

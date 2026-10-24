@@ -197,12 +197,32 @@ pad are `PAD_LAMPS` in `build.py`, copied in `main.c`.
 ### The Rue basse (rpg)
 
 `examples/demos/rpg`: the street and the den are composed by
-`devtools/art_assets/rpg.py` on a grid of 16x16 metatiles: the ground drawn
-there (asphalt with a cyan centre line, paving slabs with a puddle in one
-in seven, curbs, the canal with its ripples and reflections, the bridge,
-the railing), the pieces below placed on it, the whole cut into its
-distinct 8x8 tiles (822 for the street, 474 for the den). Kit's walk and the
-five residents come from `characters/topdown/`.
+`devtools/art_assets/rpg.py` on a grid of 16x16 metatiles: the ground from
+the tiles below, the pieces below placed on it, the whole cut into its
+distinct 8x8 tiles (939 for the street, 470 for the den once converted).
+Kit's walk and the five residents come from `characters/topdown/`.
+
+The ground (PixelLab, 16 px, `mode: pro`, high top-down, a dark subset of the
+city's colours as `target_palette`: `#080810 #101828 #182838 #203048 #183840
+#205058 #307078 #48a0a0 #a02860`, so the sidewalk stays under the buildings
+instead of competing with them). Made in this order, each step using the
+previous one as reference, so that a sidewalk is the same pixels in every set:
+
+| File | What | Endpoint, seed |
+|---|---|---|
+| `tiles/walk_variants.png` | six full sidewalk tiles: plain slabs, two cracks, a puddle | `create-tiles-pro`, square top-down, seed 8122, styled on a first tileset's sidewalk (no palette given: a palette turned them teal) |
+| `tiles/road_variants.png` | eight full asphalt tiles: plain, tyre tracks, cracks, a puddle, a grate, the centre line's dash (last) | `create-tiles-pro`, seed 8121 |
+| `tiles/wang_road_walk.png` | 16 Wang tiles, road (lower) to sidewalk (upper), a curb with a cyan line between | `create-tileset`, seed 8130, the plain asphalt and the plain slab as lower and upper reference |
+| `tiles/wang_canal_walk.png` | the same from canal water to sidewalk, a stone quay between | `create-tileset`, seed 8131, the same slab as upper reference: its full sidewalk tile equals the road set's |
+| `tiles/bridge_alley_rail.png` | the bridge deck (bare, railing left, railing right), two alley floors, the sidewalk with a guard rail | `create-tiles-pro`, seed 8140, styled on the plain slab |
+
+Placement: the terrain at each metatile corner is the canal if a cell round
+it is water, else the road if one is street, else the sidewalk; a Wang tile
+is chosen by its four corners, so the curbs and the quays fall inside the
+sidewalk's cells and follow the layout. Where the lane meets the bridge, the
+water corners count as sidewalk (a curb, not a puddle in the road). The full
+tiles take their variants from one generator with a fixed seed, walked row by
+row (one seed per metatile bunched the details).
 
 Every piece is a `generate-image-v2` call with Kit's south view
 (`characters/topdown/kit_south.png`) as `style_image` (its colours off) and
