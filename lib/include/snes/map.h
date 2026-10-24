@@ -141,11 +141,12 @@
  * before setScreenOn().
  *
  * @param layer1map  Address of map data (format: u16 width, u16 height, u16 pad, then tile indices)
- * @param layertiles Address of metatile definitions (4 tiles per metatile, max 512 metatiles).
- *                   The engine copies the full 4096 bytes (512 × 8) from this
+ * @param layertiles Address of the tile definitions: one 16-bit tilemap
+ *                   entry per tile id of the map (opensnes-level's `.t16`),
+ *                   up to 1024. The engine copies 4096 bytes from this
  *                   address whatever the file's size — a 126-byte `.t16` is
  *                   followed in RAM by the ROM bytes that follow it. Entries
- *                   past the last defined metatile are therefore garbage; a
+ *                   past the last defined tile are therefore garbage; a
  *                   map must not reference them (opensnes-level never does).
  * @param tilesprop  Address of tile property data (collision types)
  *
@@ -223,9 +224,7 @@ u16 mapGetCameraY(void);
  *
  * @param xpos X coordinate in map pixels
  * @param ypos Y coordinate in map pixels
- * @return Metatile index: the low 10 bits of the map entry, 0 to 1023.
- *         mapLoad() copies 512 metatiles, so on a map whose tileset
- *         holds at most 512 tiles the result is 0 to 511.
+ * @return Tile id: the low 10 bits of the map entry, 0 to 1023.
  */
 u16 mapGetMetaTile(u16 xpos, u16 ypos);
 
