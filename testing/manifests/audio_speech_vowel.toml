@@ -1,4 +1,4 @@
-# examples/audio/speech_synth, leg 1 of 2 — a sustained vowel, and the phoneme
+# examples/audio/speech_synth, leg 1 of 3 — a sustained vowel, and the phoneme
 # bank that makes speech possible at all.
 #
 # The console "speaks" over a static violet backdrop: liveness and fbhash see a
@@ -7,21 +7,24 @@
 # Two things are asserted that the framebuffer cannot carry:
 #
 #  1. the BANK reached ARAM. DIR = $08 puts the sample directory at ARAM $0800;
-#     the 20 bytes there are the 5 phoneme entries (start/loop pairs), and two
-#     of them (index 1 and 4) have loop = $0000 — the plosives, which are
+#     the 40 bytes there are the 10 phoneme entries (start/loop pairs), and
+#     three of them (index 1, 4 and 5: P, S and D) have loop = $0000 — the
 #     one-shots. A truncated or mis-addressed apuUpload changes these bytes.
 #  2. the SEQUENCER is mid-vowel: SRCN 0x02 with the sustained-vowel envelope
 #     (ADSR1 0xF7 / ADSR2 0xFC) and an UP-inflected pitch (PITCHH 0x11 vs the
 #     bank's nominal 0x10) — prosody, applied per phoneme by SPC code.
 #
-# Measured with `--until-frame 40` and `--dump-aram`; this phoneme holds frames
-# ~35-48. Pair: audio_speech_plosive.toml.
+# Measured on luna v1.40.0 (`--until-frame N` over the voice's state, and
+# `--peek APU:0800:28`); this phoneme holds frames ~44-57 since the bank grew
+# to ten phonemes for "DAVEO" (the larger APU image uploads about 9 frames
+# later). Pair: audio_speech_plosive.toml; the new phonemes:
+# audio_speech_daveo.toml.
 rom = "../../examples/audio/speech_synth/speech_synth.sfc"
-frames = 40
+frames = 50
 
 [asserts.blocks]
-# 5 x 4-byte directory entries at ARAM $0800 — the uploaded phoneme bank.
-phoneme_dir = { space = "aram", offset = "0800", hex = "00090909ad0d0000930f9c0f40144914ed180000" }
+# 10 x 4-byte directory entries at ARAM $0800 — the uploaded phoneme bank.
+phoneme_dir = { space = "aram", offset = "0800", hex = "00090909ad0d0000930f9c0f40144914ed180000c5220000b925c225662a6f2a132f1c2fc033c933" }
 
 [asserts.dsp]
 DIR       = 0x08     # directory page $0800 (player.spc700.asm: WDSP $5D, $08)

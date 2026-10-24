@@ -16,8 +16,8 @@
     "rom_sha256": "1cf9fb9054fb95d1cedcd883fdc15e8b31b03144dcc4e5c14ff92f19e3240ae9"
   },
   "audio_speech_synth": {
-    "stream": "e3a10b00ee91a40aac9de08a81caf2395cbc9d6dd068cbd30fde4f77214b86cd",
-    "rom_sha256": "a1ecc83fa6a1da2723274f561e9632ded0e306219490ff8d297393c0bf042142"
+    "stream": "d946d15d89fe6eafa99750eceb2d43f1bcf294ff04b11443b08b9043ec231600",
+    "rom_sha256": "9b3c461f7bd3061f67eb3a09e6ecc4cad141e8ebcf345955de2b31f71473a3c4"
   },
   "backgrounds_mode0": {
     "stream": "1c51e5d4e1333763e1deac7f6cd7ab4ab7efa1987e12a190b1b7a62f6c2ca46d",
@@ -184,8 +184,8 @@
     "rom_sha256": "663c93b6064129be06fc1d5b148580fc654f204bbf508b1c15b655e10a9d671b"
   },
   "scrolling_mixed_scroll": {
-    "stream": "16387e7a9faf38a05e4a3b06ba3632d13cbb6c97e701d2d8f472ef88111c82ee",
-    "rom_sha256": "1117f6387854757ddd0b2c1dfbb93cf4587d10925ff1f9434bf94351978ca8d2"
+    "stream": "f09b157a5793cefd184f5d3ac895a047d7fa69b7da12343acfae75981facf23f",
+    "rom_sha256": "7f7af1c00feba48d2182364cea7097f822f96f9766083775078cd17cb0460782"
   },
   "scrolling_parallax_scroll": {
     "stream": "0fe305818cc64f267c1067da15b3bcf4eee10b9fd3503d7ca7a8feeb26b86c21",

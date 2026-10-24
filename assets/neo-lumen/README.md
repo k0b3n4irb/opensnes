@@ -1,9 +1,11 @@
 # Néo-Lumen: the examples' art
 
-The pictures, sprites and tiles the examples are being redrawn with: one
-city at night in the rain (the Rooftops, the Low street, the Canal, the Sky,
-the Arcade), Kit the fox-kit courier and the people around him, and the
-security machines. One palette family, on the 15-bit grid.
+The pictures, sprites and tiles the examples are drawn with: one city at
+night in the rain, **Daveo** (said the French way, da-ve-o), in its quarters
+(the Rooftops, the Low street, the Canal, the Sky, the Arcade); Kit the
+fox-kit courier and the people around him; and the security machines. One
+palette family, on the 15-bit grid. Néo-Lumen is the name of this art, not
+of the city.
 
 ## Licence: CC0
 

@@ -349,15 +349,15 @@
   },
   "scrolling_mixed_scroll": {
     "fbhash": [
-      "fff979821a554501",
-      "edaf9be821f9ea48"
+      "9f28fb1d339faad8",
+      "5e2189b04614ad65"
     ],
     "frames": [
       200,
       400
     ],
     "luna_version": "v1.40.0",
-    "rom_sha256": "1117f6387854757ddd0b2c1dfbb93cf4587d10925ff1f9434bf94351978ca8d2"
+    "rom_sha256": "7f7af1c00feba48d2182364cea7097f822f96f9766083775078cd17cb0460782"
   },
   "scrolling_parallax_scroll": {
     "fbhash": [

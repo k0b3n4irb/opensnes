@@ -76,7 +76,7 @@ def nocturne():
     samples = [f() for f in SET]
     message = "[[SNESMOD]]\nedl 5\nefb 48\nevol 28\nefir 127 0 0 0 0 0 0 0\neon 1 2\n"
     pan = [36, 22, 32, 32, 32, 44, 32, 32]
-    return dict(title="Neo-Lumen Nocturne", samples=samples, patterns=pats,
+    return dict(title="Daveo Nocturne", samples=samples, patterns=pats,
                 orders=[0, 1, 2, 3, 4, 2, 3], speed=6, tempo=104,
                 message=message, pan=pan)
 
@@ -183,7 +183,7 @@ def rooftops():
     pats = [intro, bars(verse, m_verse), bars(chorus[:4], m_chorus[:4]), bars(chorus[4:], m_chorus[4:])]
     samples = [f() for f in SET]
     message = "[[SNESMOD]]\nedl 3\nefb 32\nevol 22\nefir 127 0 0 0 0 0 0 0\neon 1 2\n"
-    return dict(title="Neo-Lumen Rooftops", samples=samples, patterns=pats,
+    return dict(title="Daveo Rooftops", samples=samples, patterns=pats,
                 orders=[0, 1, 1, 2, 3, 1, 2, 3], speed=5, tempo=128,
                 message=message, pan=[34, 24, 32, 32, 32, 42, 32, 32])
 

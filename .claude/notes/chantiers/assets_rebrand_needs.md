@@ -426,7 +426,10 @@ adaptés à la nouvelle géométrie des niveaux.
    des animaux (un gang de rats, des corbeaux de la sécurité) ?
 2. **[Tranché le 2026-10-18 : Néo-Lumen, sans laiton.]** **Le côté vapeur/laiton** de la note de chantier reste-t-il dans le cyberpunk, ou part-on sur un
    cyberpunk pur (la rampe laiton disparaît alors au profit d'une rampe acier) ?
-3. **Une seule ville en quartiers** (proposé : Toits, Rue basse, Canal, Ciel, Arcade) ou plusieurs lieux ?
+3. **[Tranché le 2026-10-24 : la ville s'appelle Daveo.** Néo-Lumen reste le nom de la collection
+   d'art (`assets/neo-lumen/`, « Néo-Lumen art ») ; tout ce qui nomme la ville passe à Daveo : la phrase
+   de speech_synth, l'écran-titre de mixed_scroll, le README de breakout, les titres des musiques.**]**
+   **Une seule ville en quartiers** (proposé : Toits, Rue basse, Canal, Ciel, Arcade) ou plusieurs lieux ?
    Le nom de la ville (« Néo-Lumen » est un exemple) servira aussi à speech_synth et aux écrans-titres.
 4. **Garder à la fois un plateformer et un RPG vue de dessus ?** Recommandation : oui, ce sont les deux
    formes de jeu les plus courantes, mais cela coûte deux jeux de Kit (K1 et K5) et deux tilesets.

@@ -34,7 +34,7 @@ textLoadFont(VRAM_BG3_FONT);         /* the 2bpp font, BG3's character base */
 textInit(VRAM_BG3_MAP, 0, 7);        /* BG3's map, font tile 0, palette slot 7 */
 text_config.priority = 1;            /* the tile priority bit */
 setColor(29, RGB(31, 31, 31));       /* slot 7, colour 1 */
-textPrintAt(2, 24, "WELCOME TO NEO-LUMEN, KIT!");
+textPrintAt(2, 24, "WELCOME TO DAVEO, KIT!");
 setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
 ...
 bgSetScroll(2, ++msgX, 0);           /* each frame: the message slides left */

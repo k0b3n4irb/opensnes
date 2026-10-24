@@ -2,7 +2,7 @@
 
 > A fully playable Breakout clone — ball, paddle, bricks, levels, score, and shadows.
 > This is the "put it all together" example. If you can follow this one, you can make a game.
-> Dressed as **Neon Breaker**, the arcade cabinet of the bar in the Neo-Lumen city.
+> Dressed as **Neon Breaker**, the arcade cabinet of a bar in Daveo, the city of the examples.
 
 ![Screenshot](breakout.png)
 

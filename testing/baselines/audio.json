@@ -8,9 +8,9 @@
       "peak": 21264
     },
     "audio/speech_synth": {
-      "sha256": "1e6a2d700f590151bd68d0e2dbfee371e85161a53d80a90fad995b5959da35f7",
+      "sha256": "d02cd4b3a0192fb60c8f4b80af629cb47d8116dcd69450b5cca478be1771f7a8",
       "samples": 159936,
-      "peak": 22960
+      "peak": 23051
     },
     "fixtures/snesmod_music_large": {
       "sha256": "478ae49323024d05874db14a9e9a4187d6593530eb35084e67eb14fa4860a457",

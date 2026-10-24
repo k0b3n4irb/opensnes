@@ -1,0 +1,24 @@
+# examples/audio/speech_synth, leg 3 of 3 — the city's name, "DAVEO", spoken
+# after "OPEN SNES" and a pause: the five phonemes added for it are in the bank
+# and the sequencer reaches them.
+#
+# At frame 131 the voice holds the A of DA-ve-o: SRCN 0x06 (PH_AA), the
+# sustained-vowel envelope, and the pitch raised to 0x11 like the E of "open".
+# A sequencer that stopped at the end of "OPEN SNES", or a pause entry ($FE)
+# read as a phoneme, leaves another SRCN here.
+#
+# Measured on luna v1.40.0 (`--until-frame N` over the voice's state): the A
+# holds frames ~125-137. Pair: audio_speech_vowel.toml (leg 1, which also pins
+# the ten directory entries), audio_speech_plosive.toml (leg 2).
+rom = "../../examples/audio/speech_synth/speech_synth.sfc"
+frames = 131
+
+[asserts.dsp]
+DIR       = 0x08     # same bank, never re-uploaded
+V0_SRCN   = 0x06     # the A of "DAVEO" (PH_AA)
+V0_PITCHH = 0x11     # the syllable's raised pitch
+V0_PITCHL = 0x00
+V0_ADSR1  = 0xF7     # sustained vowel shape
+V0_ADSR2  = 0xFC
+NON       = 0x00
+EON       = 0x00

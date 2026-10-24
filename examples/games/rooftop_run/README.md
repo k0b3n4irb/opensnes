@@ -461,7 +461,7 @@ read.
 | `res/kit.png` | Kit seen from the side, 32x32 frames: idle, walk, run, jump |
 | `res/BG1.m16` | the level map: width, height, size, then one entry per 8x8 cell |
 | `res/map_1_1.b16` | per-tile collision properties (solid/empty) |
-| `res/rooftops.it` | The music, "Neo-Lumen Rooftops" (Impulse Tracker), composed for OpenSNES (`devtools/audio_assets`, CC0) |
+| `res/rooftops.it` | The music, "Daveo Rooftops" (Impulse Tracker), composed for OpenSNES (`devtools/audio_assets`, CC0) |
 | `res/jump_sfx.it` | The five effects (jump, shard, stomp, hurt, cleared): Kenney's `phaseJump1`, `pepSound1`, `zapTwoTone`, `error_004`, `powerUp1` (kenney.nl, CC0) |
 | `Makefile` | `LIB_MODULES := console sprite sprite_dynamic sprite_lut dma input background anim vramqueue text` |
 

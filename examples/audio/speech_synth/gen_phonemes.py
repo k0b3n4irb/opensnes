@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Generate the phoneme bank for speech_synth — own art, krom's method.
 
-Five phonemes spell "OPEN SNES": AU (o), PP (p), EA (e), NN (n), SS (s).
-Vowels/nasal: formant-filtered glottal loops (loop from block 1, krom's
-layout). Plosive: a shaped broadband burst, one-shot. Fricative: shaped
-high-frequency noise, one-shot. Encoded with the filter-searching BRR
-encoder (block 0 and the loop block forced to filter 0).
+Ten phonemes spell "OPEN SNES" and "DAVEO" (the city, said the French way,
+da-ve-o): AU (the open o of "open"), PP (p), EA (e), NN (n), SS (s), then
+DD (d), AA (a), VV (v), EE (the closed e of "ve") and OO (the closed o of
+the end). Vowels/nasal: formant-filtered glottal loops (loop from block 1,
+krom's layout). Plosives: a shaped burst, one-shot; the voiced one starts
+with a voice bar. Fricatives: shaped high-frequency noise, one-shot; the
+voiced one is a low voice with that noise over it, looped. Encoded with
+the filter-searching BRR encoder (block 0 and the loop block forced to
+filter 0).
 """
 import math
 import numpy as np
@@ -46,6 +50,21 @@ def noise_burst(ms, color_fc, color_bw, env_pow):
     y = y * env
     return y / np.abs(y).max() * 22000
 
+def voiced_plosive(bar_ms, burst_ms, burst_fc, burst_bw):
+    """A voice bar (the low hum before the release), then the burst."""
+    n = int(SR * bar_ms / 1000 / 16) * 16
+    bar = formant(glottal(n * 3), 250, 80, 1.0)[n:2*n]
+    bar = bar / np.abs(bar).max() * 9000
+    return np.concatenate([bar, noise_burst(burst_ms, burst_fc, burst_bw, 2.0)])
+
+def voiced_fricative(formants, noise_fc, noise_bw, noise_mix):
+    """A voiced loop (the hum of the vocal folds) with fricative noise over it."""
+    v = voiced_loop(formants)
+    rng = np.random.default_rng(11)
+    x = formant(rng.normal(0, 1, len(v) * 3), noise_fc, noise_bw, 1.0)[len(v):2*len(v)]
+    y = v * (1 - noise_mix) + x / np.abs(x).max() * 24000 * noise_mix
+    return y / np.abs(y).max() * 20000
+
 PHONEMES = {
     # name: (samples, looped)
     'AU': (voiced_loop([(570, 80, 1.0), (840, 90, 0.7), (2410, 150, 0.15)]), True),   # 'o'
@@ -53,6 +72,11 @@ PHONEMES = {
     'EA': (voiced_loop([(530, 80, 1.0), (1840, 110, 0.5), (2480, 150, 0.2)]), True),  # 'e'
     'NN': (voiced_loop([(250, 60, 1.0), (1200, 150, 0.12), (2200, 200, 0.08)]), True),# nasal
     'SS': (noise_burst(140, 5200, 2200, 1.2), False),                                  # fricative
+    'DD': (voiced_plosive(24, 18, 3400, 1800), False),                                  # voiced plosive
+    'AA': (voiced_loop([(750, 90, 1.0), (1350, 110, 0.6), (2550, 160, 0.15)]), True), # French 'a'
+    'VV': (voiced_fricative([(250, 70, 1.0), (1400, 200, 0.1)], 4200, 2500, 0.35), True),  # voiced fricative
+    'EE': (voiced_loop([(390, 70, 1.0), (2300, 120, 0.45), (2850, 160, 0.2)]), True), # closed 'e' (e acute)
+    'OO': (voiced_loop([(360, 70, 1.0), (750, 90, 0.6), (2400, 160, 0.1)]), True),   # closed 'o'
 }
 
 FILTERS = {0: (0.0, 0.0), 1: (0.9375, 0.0),

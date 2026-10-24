@@ -121,7 +121,7 @@ int main(void) {
     setColor(29, RGB(31, 31, 31));       /* slot 7, colour 1: white */
     bgSetGfxPtr(2, VRAM_BG3_FONT);
     bgSetMapPtr(2, VRAM_BG3_MAP, SC_32x32);
-    textPrintAt(2, 24, "WELCOME TO NEO-LUMEN, KIT!");
+    textPrintAt(2, 24, "WELCOME TO DAVEO, KIT!");
 
     setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
     setMainScreen(TM_BG1 | TM_BG2 | TM_BG3);

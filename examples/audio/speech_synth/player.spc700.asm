@@ -1,12 +1,12 @@
 ;----------------------------------------------------------------------
-; speech_synth — APU-side program: the SNES says "OPEN SNES"
+; speech_synth — APU-side program: the SNES says "OPEN SNES... DAVEO"
 ;
 ; Port of krom (Peter Lemon)'s SpeechSynth method: speech = sequencing
 ; a PHONEME BANK on one DSP voice — per phoneme: SRCN (sample select),
 ; ADSR (plosives one-shot fast-release, vowels sustained), pitch for
 ; prosody, and a timed wait. krom's bank has 32 phonemes and spells
-; "PETER LEMON"; ours is a 5-phoneme original bank (formant-synthesized)
-; spelling "OPEN SNES".
+; "PETER LEMON"; ours is a 10-phoneme original bank (formant-synthesized)
+; spelling "OPEN SNES", then the name of the city, "DAVEO" (da-ve-o).
 ;
 ; Memory layout rule: code page is $0200-$07FF,
 ; directory at $0800, samples from $0900 — the sequencer will NOT crash
@@ -26,6 +26,13 @@
 .DEFINE PH_EA 2
 .DEFINE PH_NN 3
 .DEFINE PH_SS 4
+.DEFINE PH_DD 5
+.DEFINE PH_AA 6
+.DEFINE PH_VV 7
+.DEFINE PH_EE 8
+.DEFINE PH_OO 9
+; not a phoneme: wait without striking a new one (the gap between words)
+.DEFINE PAUSE $FE
 
 .BANK 0 SLOT 0
 .ORG $0200
@@ -59,9 +66,11 @@ start:
 speak_loop:
     mov x, #0
 next_phoneme:
-    mov a, !phrase+0+x  ; SRCN (or $FF = end of phrase)
+    mov a, !phrase+0+x  ; SRCN (or $FF = end of phrase, $FE = a pause)
     cmp a, #$FF
     beq phrase_done
+    cmp a, #PAUSE
+    beq timed_wait      ; no KON: the last phoneme decays through the gap
     mov $F2, #$04       ; V0SRCN
     mov $F3, a
     mov a, !phrase+1+x  ; ADSR1
@@ -80,7 +89,8 @@ next_phoneme:
     ; waveform mid-sample: audible click + crackle, owner-tested.)
     mov $F2, #$4C       ; KON: speak the phoneme
     mov $F3, #%00000001
-    mov a, !phrase+4+x  ; duration in ~32 ms ticks
+timed_wait:
+    mov a, !phrase+4+x  ; duration in 4 ms ticks
     mov y, a
 wait_ph:
     mov a, $FD          ; T0OUT (read clears)
@@ -103,8 +113,11 @@ wait_gap:
     bra speak_loop
 
 ;----------------------------------------------------------------------
-; The phrase: "OPEN SNES" = AU P EA N (pause) S N EA S
-; Per entry: SRCN, ADSR1, ADSR2, PITCHH, ticks(~32 ms)
+; The phrase: "OPEN SNES" = AU P EA N (pause) S N EA S, then a pause and
+; "DAVEO" = D AA V EE OO, three even syllables the French way, the pitch
+; falling on the last.
+; Per entry: SRCN, ADSR1, ADSR2, PITCHH, ticks (4 ms); a PAUSE entry uses
+; only its ticks.
 ; ADSR values from krom: vowels %11110111/%11111100 (sustained decay),
 ; plosives/fricatives %11111111/%11100000 (fast one-shot)
 ;----------------------------------------------------------------------
@@ -120,6 +133,12 @@ phrase:
     .db PH_NN, %11110111, %11111100, $10, 32  ; N
     .db PH_EA, %11110111, %11111100, $0F, 64  ; E
     .db PH_SS, %11111111, %11100000, $10, 16  ; S
+    .db PAUSE, 0, 0, 0, 96                     ; (384 ms)
+    .db PH_DD, %11111111, %11100000, $10, 10  ; D   (40 ms)
+    .db PH_AA, %11110111, %11111100, $11, 48  ; A   (192 ms)
+    .db PH_VV, %11110111, %11111100, $10, 14  ; V   (56 ms)
+    .db PH_EE, %11110111, %11111100, $11, 48  ; E
+    .db PH_OO, %11110111, %11111100, $0E, 80  ; O   (320 ms, falling)
     .db $FF                                    ; end of phrase
 
 ;----------------------------------------------------------------------
@@ -133,6 +152,11 @@ sample_dir:
     .dw ph_ea, ph_ea + 9
     .dw ph_nn, ph_nn + 9
     .dw ph_ss, 0
+    .dw ph_dd, 0
+    .dw ph_aa, ph_aa + 9
+    .dw ph_vv, ph_vv + 9
+    .dw ph_ee, ph_ee + 9
+    .dw ph_oo, ph_oo + 9
 
 ;----------------------------------------------------------------------
 ; Phoneme bank (original, gen_phonemes.py)
@@ -143,3 +167,8 @@ ph_pp:  .incbin "res/pp.brr"
 ph_ea:  .incbin "res/ea.brr"
 ph_nn:  .incbin "res/nn.brr"
 ph_ss:  .incbin "res/ss.brr"
+ph_dd:  .incbin "res/dd.brr"
+ph_aa:  .incbin "res/aa.brr"
+ph_vv:  .incbin "res/vv.brr"
+ph_ee:  .incbin "res/ee.brr"
+ph_oo:  .incbin "res/oo.brr"
