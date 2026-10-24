@@ -232,7 +232,7 @@ rules (no score, no end).
 | Example | Description |
 |---------|-------------|
 | @subpage examples_demos_mapandobjects | Map engine with interactive objects |
-| @subpage examples_demos_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |
+| @subpage examples_demos_shmup | Vertical shoot 'em up: Kit's glider over the city against the security's hunters |
 | @subpage examples_demos_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |
 
 ---

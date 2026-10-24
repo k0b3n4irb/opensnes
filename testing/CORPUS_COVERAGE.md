@@ -31,7 +31,7 @@ luna v1.40.0 · `luna state --until-frame <N>` per ROM · 60 ROMs · **58 OK, 2 
 | `color/transparency` | OK | live (400f/398nmi) |
 | `demos/mapandobjects` | OK | live (200f/198nmi) |
 | `demos/rpg` | OK | live (200f/198nmi) |
-| `demos/shmup_1942` | OK | live (400f/398nmi) |
+| `demos/shmup` | OK | live (400f/398nmi) |
 | `fundamentals/text_glyphs` | OK | live (200f/198nmi) |
 | `games/blocks` | OK | live (400f/390nmi) |
 | `games/breakout` | OK | live (200f/198nmi) |

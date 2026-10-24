@@ -1,12 +1,14 @@
 /**
  * @file main.c
- * @brief shmup_1942 — a vertical shoot 'em up: scrolling, enemies, bullets
+ * @brief shmup — a vertical shoot 'em up: scrolling, enemies, bullets
  * @ingroup examples
  *
- * The terrain scrolls down on BG1; the player's plane moves with the D-pad
- * and fires with A (a small cooldown between shots). Bullets travel at
- * 4 px/frame; when a bullet's bounding box overlaps an enemy, both
- * deactivate. Enemies spawn from a pool of eight and fly down.
+ * Kit's delivery glider over the city at night, against the security's
+ * hunters. The city scrolls down on BG1; the glider moves with the D-pad
+ * and fires with A (a small cooldown between shots). Shots travel at
+ * 4 px/frame; when a shot's bounding box overlaps a hunter, both
+ * deactivate. Hunters spawn from a pool of eight and dive down (the
+ * sprite is drawn nose up; the OAM's vertical flip turns it).
  *
  * @par SNES Concepts
  * - Sprite pools as fixed-size arrays of `{x, y, active}` slots
@@ -20,11 +22,12 @@
  *   sprites rewritten each frame from the pools, oam_update_flag set once a frame
  *
  * @par What to Observe
- * - Press A to fire a bullet upward from the player's nose
+ * - Press A to fire a shot upward from the glider's nose
  * - Bullets travel at 4 px/frame; they despawn at the top of the
  *   screen or on hitting an enemy
- * - Enemies hit by a bullet vanish immediately
- * - The terrain keeps scrolling and the enemy pool keeps spawning
+ * - Hunters hit by a shot vanish immediately
+ * - The city keeps scrolling (it wraps every 512 lines) and the hunter
+ *   pool keeps spawning
  *
  * @par Modules Used
  * console, dma, background, asset, sprite, input

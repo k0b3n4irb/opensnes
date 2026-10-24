@@ -88,7 +88,7 @@ IMAGE_PATH             = ../examples/audio/sfx_from_wav \
                          ../examples/demos/mapandobjects \
                          ../examples/mode7/mode7_racing \
                          ../examples/demos/rpg \
-                         ../examples/demos/shmup_1942 \
+                         ../examples/demos/shmup \
                          ../examples/games/blocks \
                          ../examples/scrolling/continuous_scroll \
                          ../examples/scrolling/mixed_scroll \

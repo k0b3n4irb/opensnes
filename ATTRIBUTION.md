@@ -127,15 +127,6 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 
 ## Game Assets
 
-### Kenney "Pixel Shmup"
-- **Author**: Kenney (https://kenney.nl/)
-- **Pack**: https://kenney.nl/assets/pixel-shmup
-- **License**: CC0 (Public Domain)
-- **Used in**: `examples/demos/shmup_1942/res/` —
-  `tiles_packed.png`, `ships_packed.png`, and the `sprites.png` /
-  `ground.png` split outputs derived from `tiles_packed.png` via
-  `res/import.sh`.
-
 ### Kenney "Digital Audio" and "Interface Sounds"
 - **Author**: Kenney (https://kenney.nl/)
 - **Packs**: https://kenney.nl/assets/digital-audio,

@@ -72,7 +72,7 @@ layer, per-scanline distortion via HDMA does what sprite scaling cannot — see
 
 Juice compounds. A coin pickup that is satisfying is rarely one effect — it is a
 flash, a small sound, a number that pops and rises, and maybe a one-frame
-freeze, all at once and all gone within a quarter-second. @ref examples_demos_shmup_1942
+freeze, all at once and all gone within a quarter-second. @ref examples_demos_shmup
 is worth reading for how modest effects stack into a game that feels responsive.
 
 > **Go deeper.** Watch Jonasson & Purho's

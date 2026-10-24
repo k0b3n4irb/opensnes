@@ -22,7 +22,7 @@ generated again or varied.
 |---|---|---|---|
 | `backgrounds/canal.png` | a city canal at night, 256x224, 29 colours | `generate-image-v2`, seed 113, no palette given | the source of `canal_256.png` |
 | `backgrounds/canal_haze.png` | the canal with the haze below, before the cut to 256 colours: 392 colours on the 15-bit grid | the blend below, by hand | `examples/color/hicolor_1792` (`res/canal.png`; the converter cuts each 64x8 segment to 15 colours) |
-| `backgrounds/canal_256.png` | the same, with a haze added by hand: each row blended towards a magenta glow (`#e05090`, at most 42 %, strongest on the horizon row 118) and towards the night (`#101028`, up to 30 % at the top, 22 % at the bottom), snapped to the 15-bit grid, then cut to 256 colours by median cut without dithering: 253 colours | the blend above, by hand | `examples/backgrounds/mode3` (`res/canal.png`); `examples/backgrounds/mode2` (`res/canal.png`, eight mirrored rows added below, `mode2_canal`) |
+| `backgrounds/canal_256.png` | the same, with a haze added by hand: each row blended towards a magenta glow (`#e05090`, at most 42 %, strongest on the horizon row 118) and towards the night (`#101028`, up to 30 % at the top, 22 % at the bottom), snapped to the 15-bit grid, then cut to 256 colours by median cut without dithering: 253 colours | the blend above, by hand | `examples/backgrounds/mode3` (`res/canal.png`), `examples/hdma/hdma_wave` (`res/canal.png`, the same file); `examples/backgrounds/mode2` (`res/canal.png`, eight mirrored rows added below, `mode2_canal`) |
 | `backgrounds/city_far.png` | far skyline at night in the rain, 256x224 | `generate-image-v2`, seed 1018, the city's 15 colours | a source of `parallax_city.png`; `examples/chips/sa1_starfield` (`res/skyline.png`, behind the moths of `build.py`'s `MOTE`) |
 | `backgrounds/city_near.png` | close apartment blocks and a noodle sign, 256x224 | the same, seed 1018 | a source of `parallax_city.png`; `examples/color/shadow_tint` (`res/street.png`) |
 | `backgrounds/parallax_city.png` | three bands on 512x256, composed by hand: rows 20-91 of `city_far` (72 lines), rows 92-179 of `city_far` under rows 136-223 of `skyline_mid` (88 lines), rows 160-223 of `city_near` (64 lines); the left 256 pixels, then their mirror; 16 colours by median cut | composition | `examples/scrolling/parallax_scroll` (`res/back.png`) |
@@ -49,9 +49,9 @@ and the character's own 15 colours as `target_palette`.
 | `characters/drone.png` | a one-eyed security drone | 105, #32 | `examples/basics/aim_target` (`res/units.png`: as is, and its cyan twin, the orbiter) |
 | `characters/automaton.png` | a patrol automaton with a riot shield, side view | 106, #8 | — |
 | `characters/insect.png` | a crawling robot insect, side view | 107, #13 | — |
-| `characters/hunter.png` | a security hunter aircraft, from above | 108, #10 | — |
+| `characters/hunter.png` | a security hunter aircraft, from above | 108, #10 | `examples/demos/shmup` (`res/enemy.png`, flipped by the OAM to dive) |
 | `characters/bike.png` | Kit on a hover-bike, from behind | 109, #40 | — |
-| `characters/glider.png` | Kit's delivery glider, from above | 110, #51 | `examples/mode7/rotate_scale` (`res/glider.png`) |
+| `characters/glider.png` | Kit's delivery glider, from above | 110, #51 | `examples/mode7/rotate_scale` (`res/glider.png`), `examples/demos/shmup` (`res/player.png`) |
 
 `characters/topdown/<who>_<south|east|north|west>.png`: the first six
 registered as PixelLab characters with `create-character-v3` (`view: high
@@ -292,6 +292,20 @@ target (2bpp: rings and a cross over the panels of the range's wall), and
 `res/marker.png`, the 16x16 impact marker, both drawn by
 `devtools/art_assets/build.py` (`scope_target`, `scope_marker`). They replace
 PVSnesLib's 48-colour sprite sheet, of which the example used one dot.
+
+### Kit's glider over the city (shmup)
+
+`examples/demos/shmup`: `res/scene.png` is the Mode 7 city laid out again by
+`devtools/art_assets/shmup.py` on a strip of 256x512 that wraps vertically,
+so the auto-scroll loops: the same two Wang tilesets
+(`tiles/wang_street_roof.png`, `tiles/wang_street_canal.png`) on a vertex
+grid of two blocks either side of a canal, streets every 128 px, the round
+plaza of `backgrounds/aerial.png` on an esplanade of one block, helipads and
+a skylight from the same view on most roofs. 184 tiles, 10 colours. The
+glider (`res/player.png`) and the hunter (`res/enemy.png`) are
+`characters/glider.png` and `characters/hunter.png` indexed; Kit's shot
+(`res/bullet.png`, an aqua bolt) is drawn in `shmup.py` (`BOLT`). No PixelLab
+call. They replace Kenney's *Pixel Shmup* pack.
 
 ### The hologram's square (superfx_game_skeleton)
 

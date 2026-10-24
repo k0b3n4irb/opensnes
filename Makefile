@@ -302,7 +302,7 @@ test-nmi-budget:
 # touching V-timer, frame-budget or region code.
 # Scripted game manifests replayed on PAL builds of their game (test-pal).
 PAL_GAME_MANIFESTS := state_blocks movement_breakout state_breakout_game_over \
-                      movement_likemario movement_shmup_1942 movement_rpg
+                      movement_likemario movement_shmup movement_rpg
 
 # The examples' sounds (contributor-only): the tracker modules composed for
 # OpenSNES and the synthesized samples, written where the examples read

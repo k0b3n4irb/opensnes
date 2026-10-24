@@ -17,6 +17,22 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 > lire la table. `superfx_3d` est gardé (propriétaire, 2026-10-19). Le tutoriel
 > SA-1 porte la sauvegarde en BW-RAM que `sa1_save` enseignait.
 
+> **État vérifié au 2026-10-24** (la colonne « fait » des tableaux ci-dessous n'a pas été tenue ligne à
+> ligne ; ce paragraphe fait foi). Méthode : chaque fichier d'image, de carte ou de palette suivi sous
+> `examples/` (hors captures d'écran) comparé à ce qu'écrit `devtools/art_assets/build.py`, le reste
+> tracé dans `assets/neo-lumen/README.md` ou le README de l'exemple, et `ATTRIBUTION.md` relu.
+> - **Aucun graphisme tiers ne reste dans les exemples.** Tout est Néo-Lumen : écrit par `build.py`
+>   à partir de `assets/neo-lumen/`, ou copie directe d'une image Néo-Lumen (`street`, `canal`,
+>   `parallax_city`, Kit). Le dernier pack tiers (Kenney *Pixel Shmup*) est parti avec `demos/shmup`.
+> - **Pas tout par PixelLab, par choix** : décors, personnages, engins, tilesets Wang et bâtiments
+>   viennent de PixelLab ; les petits sprites (viseurs, curseur, tir, papillons, orbe), le sol du
+>   RPG, les briques, les blocs, les polices, les terminaux, la brume et la pluie sont dessinés par
+>   script, au pixel près.
+> - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (au propriétaire) ;
+>   `audio/speech_synth` (sa phrase attend le nom de la ville) ; la musique (MU1-MU3, modules
+>   générés par nos scripts en attendant une commande) ; les effets de `snesmod_music`, de Kenney
+>   (CC0, cités dans `ATTRIBUTION.md`).
+
 - **85 exemples** (le `examples/README.md` annonce « 88 small ROMs » alors que son propre tableau totalise 85 :
   l'ancre 3 de `check_doc_drift.py` ne voit pas cette formulation).
 - Verdicts proposés : **31 gardés** (même leçon, nouveaux assets) · **27 recadrés** (la plupart absorbent
@@ -217,7 +233,7 @@ de la sécurité de la ville (drones, automates, insectes-robots).
 | games/mode7_flying | altitude → échelle Mode 7, ombre, atterrissage | terrain généré (à nous) | **F→mode7/rotate_scale** — les deux indices de profondeur sont la leçon ; le reste double mode7_racing comme « jeu Mode 7 » | — | — |
 | games/mode7_racing | caméra de course Mode 7, carte de classes | circuit généré par `gen_track.py` (à nous) | **G** — le jeu Mode 7 | course d'aéro-motos sur un circuit aérien | M2, V1, F1 |
 | games/rpg | Tiled (terrain, collision, entités, dialogues), panneaux, HUD | tuiles, héros, PNJ (à nous mais fonctionnels) | **G** — le gabarit vue de dessus | la Rue basse : parler aux habitants, ouvrir un casier ; **fait le 2026-10-23** (`demos/rpg`) : six bâtiments et quatre objets PixelLab en vue de face orthogonale, le sol dessiné par `rpg.py` sur une grille de métatuiles 16x16, la pièce du raton laveur en une image ; Kit et cinq habitants en 32x32 de `characters/topdown/`, un `.pal` chacun dans le plan ; les cartes converties par `opensnes-level` dans le build (`gen_assets.py` retiré), ce qui a montré que `--quadrant` n'appliquait pas la table du convertisseur (corrigé dans `tools/lib/tmx2snes`) | K5, N1, T2, T3, O2, U1, F1 |
-| games/shmup_1942 | défilement vertical, pools de sprites, collisions tirs/ennemis | pack CC0 de Kenney | **R + renommer** (« 1942 » est un titre Capcom ; p. ex. `games/shmup`) | le planeur de Kit au-dessus de la ville contre des drones | T4, V2, E4, O3, O5 |
+| games/shmup_1942 → **demos/shmup** | défilement vertical, pools de sprites, collisions tirs/ennemis | pack CC0 de Kenney | **R + renommer** (« 1942 » est un titre Capcom ; nom `demos/shmup` choisi par le propriétaire le 2026-10-24) | le planeur de Kit au-dessus de la ville contre des drones ; **fait le 2026-10-24** : la ville du Mode 7 recomposée en bande 256x512 qui boucle (`shmup.py`, 184 tuiles), `glider.png` pour Kit, `hunter.png` pour les chasseurs (retournés par l'OAM), le tir dessiné ; aucun appel PixelLab ; O5 (explosion) non utilisé : le jeu n'en affiche pas | T4, V2, E4, O3, O5 |
 | games/blocks | puzzle complet, DAS, HDMA, SNESMOD | tuiles générées (à nous), Korobeiniki | **R + renommer** (« Tetris » est une marque) — p. ex. `games/blocks` | empiler des conteneurs de données dans un puits ; **fait le 2026-10-23** (sans la musique) : sept conteneurs à rainures et diode, le fantôme, le cadre de borne de breakout, la police de la lib avec ombre en 4bpp (HUD) et 2bpp (messages), tout dessiné par `blocks.py` (`gen_tiles.py`, qui lisait l'ancien `tiles1.dat` de breakout, est retiré) ; le dégradé violet vers le noir ; Korobeiniki reste jusqu'à MU3 | T5, MU3, F1 |
 
 ### Remarques transverses relevées pendant la revue
@@ -397,7 +413,7 @@ adaptés à la nouvelle géométrie des niveaux.
 6. **[Tranché le 2026-10-18 : oui, moins d'exemples.]** **Les fusions et le passage en fixtures** : acceptez-vous de passer de 85 à 58 exemples, de déplacer
    `mode6`, `sa1_hello`, `sa1_save`, `superfx_hello`, `superfx_save` hors de `examples/` (toujours construits
    pour le protocole matériel) et de supprimer `maps/dynamic_map` ?
-7. **[Tranché le 2026-10-18 : `tetris` devient `blocks` ; les autres attendent.]** **Les renommages** : `likemario`, `mapandobjects`, `shmup_1942`, `tetris` (marque déposée) — vos noms ?
+7. **[Tranché le 2026-10-18 : `tetris` devient `blocks` ; les autres attendent.]** **Les renommages** : `likemario`, `mapandobjects`, `shmup_1942` (**devenu `demos/shmup` le 2026-10-24**), `tetris` (marque déposée) — vos noms ?
 8. **La police intégrée de la lib** (F1) : la redessiner dans l'identité ? Elle change l'image de chaque
    ROM à texte et toutes les références fbhash.
 9. **La musique** : commander 3 modules et une banque d'effets à un musicien chiptune (budget ?), ou des

@@ -26,9 +26,9 @@ beyond the runtime that every ROM already links.
 
 The corpus votes with its feet: three examples call `gameLoopRun`
 (`basics/aim_target`, `input/controller`);
-two use the asset bundles (`backgrounds/mode1`, `demos/shmup_1942`). Everything else writes
+two use the asset bundles (`backgrounds/mode1`, `demos/shmup`). Everything else writes
 the loop and the loads by hand, and nothing about those examples is
-second-class. `demos/shmup_1942` uses `bgLoad` *and* hand-writes its loop —
+second-class. `demos/shmup` uses `bgLoad` *and* hand-writes its loop —
 the two opt-ins are independent of each other.
 
 The third member of this family is the scene stack (`sceneRun` / `scenePush` /
@@ -243,7 +243,7 @@ bgLoad(2, &bg3, 0, 0x4000, 0x0800);
 own. They are setup calls, not per-frame calls. Two idioms in the corpus, both
 correct:
 
-- **Explicit** — `backgrounds/mode1` and `demos/shmup_1942` open with
+- **Explicit** — `backgrounds/mode1` and `demos/shmup` open with
   `setScreenOff()`, load, then `setScreenOn()`.
 - **Implicit** — load right after `consoleInit()`, relying on the fact that
   `crt0.asm` leaves INIDISP in forced blank from reset until the first

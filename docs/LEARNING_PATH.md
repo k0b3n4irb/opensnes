@@ -154,7 +154,7 @@ everything above, and three complete games.
 
 @subpage examples_demos_rpg
 
-@subpage examples_demos_shmup_1942
+@subpage examples_demos_shmup
 
 @subpage examples_mode7_mode7_racing
 

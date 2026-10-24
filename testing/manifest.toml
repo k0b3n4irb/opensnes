@@ -93,7 +93,7 @@ frames = [200, 400]
 [examples."chips/superfx_game_skeleton"]
 frames = [200, 400]
 
-[examples."demos/shmup_1942"]
+[examples."demos/shmup"]
 frames = [200, 400]
 
 [examples."games/blocks"]

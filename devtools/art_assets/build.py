@@ -101,6 +101,13 @@ color/shadow_tint:
   res/street.png      the apartment blocks and the noodle sign
                       (backgrounds/city_near.png), indexed
 
+demos/shmup:
+  res/scene.png       the city from the sky, 256x512, wrapping vertically: the Mode 7
+                      city's Wang tiles on a strip of two blocks and a canal (shmup.py)
+  res/player.png      Kit's glider (characters/glider.png), indexed
+  res/enemy.png       the security's hunter (characters/hunter.png), indexed
+  res/bullet.png      Kit's shot, an aqua bolt, 16x16, drawn here
+
 chips/superfx_game_skeleton:
   res/square.png      the square the hologram turns above (backgrounds/square.png),
                       256x144 padded to 256x256 with its darkest colour
@@ -207,6 +214,7 @@ from PIL import Image, ImageOps
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from logo import build_logo, screen_logo  # noqa: E402  (the logo is a module of its own)
+from shmup import build_shmup  # noqa: E402
 from mode7 import build_city, extbg_plane, glider, orb
 from mode7 import indexed as mode7_indexed  # noqa: E402
 from breakout import build_breakout  # noqa: E402
@@ -244,6 +252,7 @@ MODE2 = ROOT / "examples" / "backgrounds" / "mode2" / "res"
 MODE5 = ROOT / "examples" / "backgrounds" / "mode5_hires" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 SFX_SKELETON = ROOT / "examples" / "chips" / "superfx_game_skeleton" / "res"
+SHMUP = ROOT / "examples" / "demos" / "shmup" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
@@ -1895,6 +1904,8 @@ def main() -> int:
     arcade = build_breakout(font8())
     well = build_blocks(font8())
     town = build_rpg(ART)
+    aerial = build_shmup(ART)
+    print(f"shmup: {aerial.pop('_tiles')} tiles")
     print("rpg:", town.pop("_report").decode())
     likemario = build_likemario()
     continuous = build_continuous_scroll(likemario["skyline.png"])
@@ -1930,6 +1941,7 @@ def main() -> int:
             (MODE2, {"street.png": (ROOT / "examples" / "backgrounds" / "mode1" / "res" / "street.png").read_bytes(),
                      "canal.png": mode2_canal()}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
+            (SHMUP, {name + ".png": png(im) for name, im in aerial.items()}),
             (SFX_SKELETON, {"square.png": png(square()), "sight.png": png(sight())}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
