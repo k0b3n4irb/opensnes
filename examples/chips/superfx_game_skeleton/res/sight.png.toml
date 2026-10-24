@@ -1,0 +1,6 @@
+# The pad's sight, 16x16: OBJ tiles 256, 257, 272, 273 (the second name table).
+tool = "opensnes-sprite"
+
+[sheet]
+size = 16
+colors = 16

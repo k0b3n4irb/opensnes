@@ -289,9 +289,9 @@ while (1) {
 }
 ```
 
-`examples/chips/superfx_game_skeleton` is that loop: a crosshair follows the
-D-pad at 60 frames per second while the cube is rendered and presented at
-30. With a blocking `gsuLaunch()` the loop is simpler (`gsuLaunch();
+`examples/chips/superfx_game_skeleton` is that loop: a sight follows the
+D-pad at 60 frames per second while a hologram of 34 lines is rendered and
+presented at 30. With a blocking `gsuLaunch()` the loop is simpler (`gsuLaunch();
 gsuPresent();`) and the transfer still overlaps the next job, but the game
 waits for each job.
 
@@ -309,11 +309,12 @@ line 0). The bottom band gives the NMI nothing: the NMI starts at line
 | none | 4 712 | 15 |
 | 40 / 40 | 10 640 | 30 |
 | 76 / 4 | 16 112 | 30 |
-| 84 / 4 | 16 384, the whole frame | 30: the job is now the limit |
+| 84 / 4 | 16 384, the whole frame | 31: the job is now the limit |
 
 Past that point the job decides: while the previous frame moves, the job
-waits for Game Pak RAM, and in the skeleton the worst job took 135 000
-clocks of work plus 137 000 of waiting, about three quarters of a frame.
+waits for Game Pak RAM, and the skeleton's (clear 16 KB, then draw 34
+lines) presents 31 frames a second with the whole frame moved in one
+VBlank, against 30 at 40 / 40.
 
 **What it costs.** The DMA halts the CPU and the GSU waits for Game Pak RAM
 for as long as a piece takes; a RAM-heavy job (clearing a buffer, PLOT)

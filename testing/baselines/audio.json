@@ -1,5 +1,5 @@
 {
-  "luna": "v1.39.0",
+  "luna": "v1.40.0",
   "frames": 300,
   "examples": {
     "audio/apu_switch": {
@@ -18,9 +18,9 @@
       "peak": 8269
     },
     "chips/superfx_game_skeleton": {
-      "sha256": "7847c8990e773d6e1e836bd851af36b08c6eea1a4890fa43dc52d77005c5912f",
+      "sha256": "e1a0c85e61f54478aab61c697d8498571d9decf982d3c94740fdf2a0cdaeb5c2",
       "samples": 160006,
-      "peak": 8325
+      "peak": 8304
     },
     "audio/soundboard": {
       "sha256": "4b6d3d786250a13d9950edd30b1195036ea16d10a81e05f5886d321ed85c4974",

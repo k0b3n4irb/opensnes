@@ -29,6 +29,7 @@ generated again or varied.
 | `backgrounds/mist.png` | mist wisps, 256x224, 2 colours (0 transparent, 1 = `#283050`), seamless at 256 | procedural, below | `examples/color/transparency` (`res/mist.png`, BG3 added over the street) |
 | `backgrounds/alley.png` | a dark back alley at night in the rain, 256x224, 11 colours | `generate-image-v2`, seed 1501, `street.png` as `style_image` (its colours off), the city's 15 colours as `target_palette` | `examples/windows/window` (`res/alley.png`), `examples/sprites/sprite_swarm` (`res/alley.png`, behind the moths of `build.py`'s `MOTH`) |
 | `backgrounds/street.png` | a rainy street at night, 256x224, 12 colours of the city palette | `generate-image-v2`, seed 112, `target_palette` = the city's 15 colours | `examples/backgrounds/mode1` (`res/street.png`: indexed, padded to 256x256 with the ink colour), and the same file in `examples/backgrounds/mode2` |
+| `backgrounds/square.png` | a small square at night in the rain, a round projector in its middle, 256x144, 11 colours | `generate-image-v2`, seed 7702, `street.png` as `style_image` (its colours off), the city's 15 colours as `target_palette` | `examples/chips/superfx_game_skeleton` (`res/square.png`: indexed, padded to 256x256 with its darkest colour) |
 
 
 ### Characters (32x32, index 0 transparent once indexed)
@@ -291,6 +292,21 @@ target (2bpp: rings and a cross over the panels of the range's wall), and
 `res/marker.png`, the 16x16 impact marker, both drawn by
 `devtools/art_assets/build.py` (`scope_target`, `scope_marker`). They replace
 PVSnesLib's 48-colour sprite sheet, of which the example used one dot.
+
+### The hologram's square (superfx_game_skeleton)
+
+`examples/chips/superfx_game_skeleton`: `res/square.png`, BG2 behind the
+GSU's bitmap, is `backgrounds/square.png` indexed by brightness on its 11
+colours and padded to 256x256 with the darkest one (index 0, which the
+backdrop shows through): a small square in the rain, closed left and right by
+apartment blocks and neon signs, a round projector in its middle and dark sky
+above it, where the GSU draws the hologram. `generate-image-v2`, 256x144 (the
+lines between the 40-line letterbox bands), seed 7702 (the third of seeds
+7700-7702: the only one whose sky stays dark above the projector),
+`backgrounds/street.png` as `style_image` with its colours off, the city's 15
+colours as `target_palette`. 541 tiles. `res/sight.png`, the pad's sight
+(16x16: four aqua brackets and a pink cross, each pixel ringed with ink), is
+drawn by `devtools/art_assets/build.py` (`sight`).
 
 ### Neon Breaker (the arcade cabinet)
 

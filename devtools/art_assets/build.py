@@ -101,6 +101,11 @@ color/shadow_tint:
   res/street.png      the apartment blocks and the noodle sign
                       (backgrounds/city_near.png), indexed
 
+chips/superfx_game_skeleton:
+  res/square.png      the square the hologram turns above (backgrounds/square.png),
+                      256x144 padded to 256x256 with its darkest colour
+  res/sight.png       the pad's sight, 16x16, drawn here
+
 input/mouse:
   res/cursor.png      the terminal's cursor, a 16x16 arrow drawn here
 
@@ -238,6 +243,7 @@ PIXEL_TEXT = ROOT / "examples" / "text" / "pixel_text" / "res"
 MODE2 = ROOT / "examples" / "backgrounds" / "mode2" / "res"
 MODE5 = ROOT / "examples" / "backgrounds" / "mode5_hires" / "res"
 SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
+SFX_SKELETON = ROOT / "examples" / "chips" / "superfx_game_skeleton" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
 MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
 LOGO = ROOT / "assets"
@@ -930,6 +936,43 @@ def mouse_cursor() -> Image.Image:
     im = Image.new("P", (16, 16), 0)
     im.putpalette([0, 0, 0, 16, 24, 40, 72, 208, 224, 232, 248, 255, 224, 80, 144] + [0] * 753)
     im.putdata([cols[ch] for row in CURSOR for ch in row])
+    return im
+
+
+# chips/superfx_game_skeleton: the square the hologram turns above (BG2, behind the GSU's
+# bitmap), and the pad's sight (O4), 16x16.
+def square() -> Image.Image:
+    """backgrounds/square.png (256x144, the 144 lines between the letterbox bands), indexed by
+    brightness and padded to 256x256 with its darkest colour, index 0: the backdrop shows there."""
+    im = Image.open(ART / "backgrounds" / "square.png").convert("RGB")
+    colours = sorted(set(im.getdata()), key=sum)
+    assert len(colours) <= 16, len(colours)
+    out = Image.new("RGB", (256, 256), colours[0])
+    out.paste(im, (0, 0))
+    return mode7_indexed(out, colours)
+
+
+def sight() -> Image.Image:
+    """The sight, 16x16: four aqua corner brackets and a pink cross at (7, 7), each pixel
+    of them ringed with ink so it reads over the hologram's lines and the neon alike.
+    0 transparent, 1 ink, 2 aqua, 3 pink."""
+    cols = ["#000000", "#080810", "#70e0e0", "#e05090"]
+    im = Image.new("P", (16, 16), 0)
+    im.putpalette([v for c in cols for v in hexrgb_(c)] + [0] * (768 - 3 * len(cols)))
+    lit = {}
+    for a in (1, 13):
+        for b in (1, 13):
+            for k in range(4):
+                lit[(a + (k if a == 1 else -k), b)] = 2      # the bracket's arm along x
+                lit[(a, b + (k if b == 1 else -k))] = 2      # and along y
+    for x, y in ((7, 6), (6, 7), (7, 7), (8, 7), (7, 8)):
+        lit[(x, y)] = 3
+    for y in range(16):
+        for x in range(16):
+            if (x, y) in lit:
+                im.putpixel((x, y), lit[(x, y)])
+            elif any((x + dx, y + dy) in lit for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
+                im.putpixel((x, y), 1)
     return im
 
 
@@ -1887,6 +1930,7 @@ def main() -> int:
             (MODE2, {"street.png": (ROOT / "examples" / "backgrounds" / "mode1" / "res" / "street.png").read_bytes(),
                      "canal.png": mode2_canal()}),
             (SA1_FIELD, {"mote.png": png(mote()), "skyline.png": png(indexed_scene("city_far.png"))}),
+            (SFX_SKELETON, {"square.png": png(square()), "sight.png": png(sight())}),
             (SHADOW_TINT, {"street.png": png(indexed_scene("city_near.png"))}),
             (MOUSE, {"cursor.png": png(mouse_cursor())}),
             (SUPERSCOPE, {"aim_adjust_target.png": png(scope_target()), "marker.png": png(scope_marker())}),
