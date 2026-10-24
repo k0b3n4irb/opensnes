@@ -55,7 +55,7 @@
 ; `.DEFINE` captures only the 16-bit offset at parse time — section bank
 ; placement isn't resolved until link, so `__X` would resolve to $00:8000
 ; and collide with whatever bank-0 helper happened to land there. This
-; was the bug that broke tetris via `__mul32` colliding with `tcc_mul16`
+; was the bug that broke blocks via `__mul32` colliding with `tcc_mul16`
 ; (see commit 1208c53).
 ; Any bank but $00, highest first — the same placement as the asset
 ; sections (templates/assets.inc). Reached by `jsl` only, so any bank works;

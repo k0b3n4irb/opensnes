@@ -4,7 +4,7 @@ TARGET   := extbg.sfc
 ROM_NAME := MODE7 EXTBG
 
 USE_LIB  := 1
-LIB_MODULES := console dma sprite input mode7 tile
+LIB_MODULES := console dma sprite input mode7
 
 CSRC := main.c
 

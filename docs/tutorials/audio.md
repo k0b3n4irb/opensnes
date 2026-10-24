@@ -115,6 +115,16 @@ void play_coin_sound(void) {
 }
 ```
 
+**An effect has to fit.** `snesmodLoadEffect()` copies the sample into the
+SPC700's RAM after the module, and the echo buffer sits at the top of that
+RAM. The driver does not check the room: an effect that does not fit is
+written over the echo buffer, and both are heard wrong, with no error
+(`KNOWN_LIMITATIONS.md`). `opensnes-music inspect music.it` prints what the
+module leaves free ("N free of M"); add up the effects before loading them.
+`snesmodLoadModule()` frees every effect, so load the effects after it.
+`examples/audio/snesmod_music` loads four effects beside a module with an
+echo, with the figures: what the module leaves, what each effect takes.
+
 ### Volume Control
 
 ```c
@@ -275,8 +285,7 @@ Total audio RAM: 64KB
 
 ## Example ROMs
 
-- `examples/audio/snesmod_music/` - Music playback demo
-- `examples/audio/snesmod_sfx/` - Sound effects demo
+- `examples/audio/snesmod_music/` - Music playback with transport controls, and effects over it
 
 ## Next Steps
 

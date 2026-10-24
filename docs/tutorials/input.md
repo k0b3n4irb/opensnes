@@ -293,7 +293,7 @@ and for porting code that reads them directly:
 
 ## Example
 
-See `examples/input/two_players/` for a complete two-player demo.
+See `examples/input/controller/` for both pads on one screen, with the held, pressed and released buttons.
 
 ## Next Steps
 

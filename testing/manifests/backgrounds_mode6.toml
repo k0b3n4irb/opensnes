@@ -1,4 +1,4 @@
-# backgrounds/mode6 — hi-res BG1 with Mode 6's offset-per-tile table.
+# mode6 (fixture, testing/fixtures/retired_examples/mode6) — hi-res BG1 with Mode 6's offset-per-tile table.
 #
 # Mode 6 reads the offset table like Mode 2: BG3 row 0 holds horizontal
 # words, row 1 vertical words, bit 13 = apply to BG1; its columns are 16
@@ -11,7 +11,7 @@
 #   * frame 140, after A at 110: the wave is in the horizontal row and the
 #     vertical row is back to zero.
 # Measured on luna v1.30.3 (`luna state --until-frame N --input … --dump-vram`).
-rom = "../../examples/backgrounds/mode6/mode6.sfc"
+rom = "../fixtures/retired_examples/mode6/mode6.sfc"
 frames = 139                           # 140 until 2026-10-10: the boot is a frame shorter (direct-page temporaries), the wave one step further at a given frame
 input = "110:0x0080,112:0"        # A: vertical -> horizontal
 

@@ -9,7 +9,7 @@ ROM_NAME := DSP1 GROUND
 
 USE_LIB     := 1
 USE_DSP1    := 1
-LIB_MODULES := console dma background input mode7 hdma   # dsp1 auto-added by USE_DSP1
+LIB_MODULES := console dma background input mode7 hdma sprite   # dsp1 auto-added by USE_DSP1
 
 CSRC   := main.c
 include $(OPENSNES)/make/common.mk

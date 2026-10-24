@@ -1,8 +1,8 @@
 # OpenSNES Examples
 
-The example corpus: 88 small ROMs, each a folder with its `main.c`, its
+The example corpus: small ROMs, each a folder with its `main.c`, its
 assets, a `Makefile` and a `README.md` that says what it shows. They go from
-a first line of text to complete games.
+a first line of text to playable demonstrations and three complete games.
 
 - **In what order?** [Learning Path](../docs/LEARNING_PATH.md) is the route
   through them, stage by stage.
@@ -15,23 +15,24 @@ The table below counts them per folder.
 
 | Category | Examples | What It Covers |
 |----------|----------|----------------|
-| [text/](text/) | 3 | Text display, fonts, tilemaps |
+| [text/](text/) | 2 | Text display, fonts, tilemaps |
 | [fundamentals/](fundamentals/) | 1 | Under-the-hood: raw tiles, direct VRAM writes |
-| [basics/](basics/) | 7 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
-| [backgrounds/](backgrounds/) | 9 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
-| [sprites/](sprites/) | 8 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
-| [hdma/](hdma/) | 4 | Per-scanline HDMA effects: gradients, waves, raster |
-| [color/](color/) | 6 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
-| [windows/](windows/) | 3 | Hardware window masking, shaped per scanline |
-| [transitions/](transitions/) | 2 | Screen transitions: fade, mosaic pixelate |
+| [basics/](basics/) | 5 | Collision, timing, scene stack, randomness, fixed-point, aiming, HUD panels, game skeleton |
+| [backgrounds/](backgrounds/) | 5 | BG modes 0/1/2/3/4/5/6, priority, LZ77, hi-res, offset-per-tile |
+| [sprites/](sprites/) | 7 | Sprite display, animation, OAM, metasprites, VRAM streaming, swarm, Aseprite pipeline |
+| [hdma/](hdma/) | 3 | Per-scanline HDMA effects: gradients, waves, raster |
+| [color/](color/) | 5 | Palette cycling, colour math, shadow/tint, direct colour, HiColor, pseudo-hires blend |
+| [windows/](windows/) | 2 | Hardware window masking, shaped per scanline |
+| [transitions/](transitions/) | 1 | Screen transitions: fades and the mosaic dissolve |
 | [scrolling/](scrolling/) | 3 | Layer scrolling: parallax, streaming, per-scanline HDMA |
-| [mode7/](mode7/) | 5 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground, EXTBG |
-| [input/](input/) | 4 | Joypads, mouse, Super Scope, multi-player |
-| [audio/](audio/) | 9 | Music and sound effects: SNESMOD and raw APU/DSP |
-| [maps/](maps/) | 3 | Tile maps, dynamic streaming, slopes |
+| [mode7/](mode7/) | 6 | Mode 7: rotation, scaling, per-scanline perspective, DSP-1 ground and objects, EXTBG, a racing camera with sprites on the plane |
+| [input/](input/) | 3 | Joypads, mouse, Super Scope, multi-player |
+| [audio/](audio/) | 5 | Music and sound effects: SNESMOD and raw APU/DSP |
+| [maps/](maps/) | 1 | Tile maps, dynamic streaming, slopes |
 | [memory/](memory/) | 2 | HiROM mode, battery-backed saves |
-| [chips/](chips/) | 8 | Enhancement chips: SA-1, SuperFX/GSU and DSP-1 coprocessors |
-| [games/](games/) | 8 | Complete game projects (Tetris, Breakout, Mario-like, map+objects, 1942-style shmup, Mode 7 racing + flying, Tiled-driven RPG) |
+| [chips/](chips/) | 3 | Enhancement chips: SA-1 and SuperFX/GSU (the DSP-1 is in mode7/) |
+| [demos/](demos/) | 3 | Playable demonstrations: several modules in one scene, without a game's rules (map engine + object engine, a vertical shmup, Tiled-driven RPG) |
+| [games/](games/) | 3 | Complete games, from the title screen to the game over (falling blocks, Breakout, a rooftop platformer) |
 
 ## Building
 

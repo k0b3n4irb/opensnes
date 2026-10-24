@@ -1,7 +1,7 @@
 # Continuous Scroll
 
-> Two-layer parallax scrolling with a player sprite that triggers camera movement.
-> Move with the D-pad. Walk past the threshold and the world scrolls to follow.
+> A threshold camera over two layers in parallax: Kit runs on the roofs, the far
+> towers follow at half the speed. Hold the D-pad and the world scrolls to follow him.
 
 ![Screenshot](continuous_scroll.png)
 
@@ -9,13 +9,14 @@
 
 | Button | Action |
 |--------|--------|
-| D-Pad | Move the character |
+| D-Pad Left/Right | Run |
 
 ## What You'll Learn
 
 - How SNES background scrolling actually works (it's not moving tiles -- it's moving the camera)
-- The threshold pattern: only scroll when the player reaches the screen edge
-- Parallax scrolling: two layers with independent scroll offsets
+- The threshold camera: only scroll when the player reaches a line of the screen
+- Parallax: two layers with independent scroll offsets, the far one slower
+- A 64x32 background: two 32x32 pages, 512 px of world without a map engine
 - Why scroll register updates must happen during VBlank (and how bgSetScroll's dirty-flag mechanism guarantees it)
 
 ---
@@ -27,65 +28,64 @@ cd $OPENSNES_HOME
 make -C examples/scrolling/continuous_scroll
 ```
 
-Then open `continuous_scroll.sfc` in your emulator (Mesen2 recommended).
+Then open `continuous_scroll.sfc` in luna (or any SNES emulator).
 
 ## Walkthrough
 
 ### 1. Two Layers, Two Speeds
 
-This example uses Mode 1 with two background layers: BG1 is the main scene,
-BG2 is a distant backdrop. When the camera scrolls, both layers move together
-(though parallax could use different speeds for a depth illusion). A character
-sprite overlays the scrolling backgrounds.
+This example uses Mode 1 with two background layers: BG1 is the roofs Kit runs
+on, BG2 the far towers behind them. Both are 512 px wide, so each map is 64x32
+entries — two 32x32 pages side by side:
 
 ```c
-setMode(BG_MODE1, 0);
-REG_TM = 0x13;  /* Enable OBJ + BG2 + BG1 */
-```
+bgSetMapPtr(0, 0x0000, SC_64x32);   /* BG1 map at $0000, 2 pages */
+bgSetMapPtr(1, 0x0800, SC_64x32);   /* BG2 map at $0800, 2 pages */
 
-Both layers get their own tile data and tilemaps, loaded to different VRAM regions
-to avoid overlap:
-
-```c
-bgSetMapPtr(0, 0x0000, SC_32x32);   /* BG1 tilemap at $0000 */
-bgSetMapPtr(1, 0x0800, SC_32x32);   /* BG2 tilemap at $0800 */
-
-bgInitTileSet(0, bg1_tiles, bg1_pal, 2,   /* BG1 tiles at $2000 */
-              ..., BG_16COLORS, 0x2000);
-bgInitTileSet(1, bg2_tiles, bg2_pal, 4,   /* BG2 tiles at $4000 */
+bgInitTileSet(0, roofs_tiles, roofs_pal, 2,     /* BG1 tiles at $1000 */
+              ..., BG_16COLORS, 0x1000);
+bgInitTileSet(1, skyline_tiles, skyline_pal, 4, /* BG2 tiles at $4000 */
               ..., BG_16COLORS, 0x4000);
 ```
+
+The roofs are 600 distinct tiles (19 KB, $1000-$357F): they are loaded in force
+blank, before `setScreenOn()`, far over one VBlank's DMA budget.
 
 > **Why palette slot 2 and 4?** Each BG palette slot holds 16 colors. Slot 0 starts
 > at CGRAM address 0, slot 2 at address 32, slot 4 at address 64. Using different
 > slots means BG1 and BG2 get independent color palettes.
 
-### 2. The Threshold Scroll Pattern
+### 2. The Threshold Camera
 
-The player moves freely on screen. But when they reach a threshold (column 140 going right,
-column 80 going left), the background starts scrolling and the player gets pushed back:
+Kit moves freely between two lines of the screen (x 80 and x 140). What he goes
+past one, the world scrolls instead, and he is put back on the line:
 
 ```c
-#define SCROLL_THRESHOLD_RIGHT 140
-#define SCROLL_THRESHOLD_LEFT  80
-
 if (game.player_x > SCROLL_THRESHOLD_RIGHT && game.bg1_scroll_x < MAX_SCROLL_X) {
-    game.bg1_scroll_x += 1;
-    game.bg2_scroll_x += 1;
-    game.player_x -= 1;   /* Push player back to keep them visually centered */
+    d = game.player_x - SCROLL_THRESHOLD_RIGHT;
+    if (d > MAX_SCROLL_X - game.bg1_scroll_x) d = MAX_SCROLL_X - game.bg1_scroll_x;
+    game.bg1_scroll_x += d;
+    game.player_x -= d;   /* back on the threshold */
 }
 ```
 
-The player walks right, reaches column 140, the world scrolls right while the player
-stays at column 140. It looks like the camera is following the character, but it's actually
-the background moving in the opposite direction.
+Kit runs right, reaches x 140, and stays there while the roofs go by under him. It
+looks like the camera is following him, but it's actually the background moving in
+the opposite direction. At the end of the roofs (`MAX_SCROLL_X`, 512 − 256) the
+scroll stops and Kit runs on to the edge of the screen.
 
-> **Why push the player back?** Without `player_x -= 1`, the player would walk past
-> the threshold and keep going off-screen. The push-back keeps them locked to the
-> threshold while the world scrolls beneath them. This is the same pattern used in
-> Super Mario World's camera system.
+### 3. Parallax
 
-### 3. Scroll Updates via bgSetScroll Dirty Flags
+The far layer moves at half the speed of the near one:
+
+```c
+game.bg2_scroll_x = game.bg1_scroll_x >> 1;
+```
+
+The difference in speed is the whole depth illusion: the eye reads what moves
+slower as further away.
+
+### 4. Scroll Updates via bgSetScroll Dirty Flags
 
 Scroll registers are write-only and take effect immediately. If you write them during
 active display (while the PPU is drawing), you'll get a visible tear -- the top half of
@@ -102,54 +102,23 @@ bgSetScroll(0, game.bg1_scroll_x, game.bg1_scroll_y);
 bgSetScroll(1, game.bg2_scroll_x, game.bg2_scroll_y);
 ```
 
-This deferred-write mechanism ensures glitch-free scrolling without needing a custom
-VBlank callback. The initial scroll values are also set before `setScreenOn()` so the
-first visible frame shows the correct position.
+The initial scroll values are also set before `setScreenOn()` so the first visible
+frame shows the right rows.
 
-### 4. Input Reading
+### 5. Kit
 
-The example reads the joypad directly from hardware registers after waiting for the
-auto-joypad read to complete:
-
-```c
-WaitForVBlank();
-while (REG_HVBJOY & 0x01) { }  /* Wait for auto-joypad */
-pad = REG_JOY1L | (REG_JOY1H << 8);
-```
-
-### 5. The Game State Struct
-
-All game variables live in one struct:
-
-```c
-typedef struct {
-    s16 player_x;
-    s16 player_y;
-    s16 bg1_scroll_x;
-    s16 bg1_scroll_y;
-    s16 bg2_scroll_x;
-    s16 bg2_scroll_y;
-} GameState;
-
-GameState game = {20, 100, 0, 32, 0, 32};
-```
-
-> **Why a struct instead of separate variables?** The OpenSNES compiler has a known
-> quirk: separate `static u16` variables can generate broken code for some access
-> patterns, while struct members work correctly. Using a struct also keeps related
-> state together, which makes the code easier to follow.
+Kit is one 32x32 sprite: four idle frames and eight running frames in
+`res/kit.png`. A 32x32 frame is 4x4 tiles, and a row of sprite tiles in VRAM is
+16 tiles wide, so frame f starts at tile `(f % 4) * 4 + (f / 4) * 64`. His
+frames face right; running left sets the attribute's H-flip bit (`OBJ_FLIPX`).
 
 ---
 
 ## Tips & Tricks
 
-- **Player gets stuck at the edge?** Check your threshold values. If
-  `SCROLL_THRESHOLD_RIGHT` is too high (close to 256), the player can walk off-screen
+- **Kit gets stuck at the edge?** Check your threshold values. If
+  `SCROLL_THRESHOLD_RIGHT` is too high (close to 256), he can run off-screen
   before scrolling kicks in.
-
-- **Want true parallax?** Change BG2's scroll increment to be slower than BG1's.
-  `bg2_scroll_x += 1` every other frame while `bg1_scroll_x += 1` every frame.
-  The speed difference creates the depth illusion.
 
 - **Sprite disappears at the left edge?** The SNES uses 9-bit X coordinates for sprites.
   Values below 0 wrap to 256+, which is off-screen. Clamp `player_x` to a minimum of 0.
@@ -158,70 +127,57 @@ GameState game = {20, 100, 0, 32, 0, 32};
 
 ## Go Further
 
-- **Add tile streaming:** Right now the tilemap is static. For larger worlds, you'd
-  upload new tile columns as the camera scrolls. See [LikeMario](../../../games/likemario/)
-  for a working implementation.
+- **A longer world:** 64x32 is the largest map one BG holds. For more, upload new
+  tile columns as the camera scrolls. See [map_scroll](../../maps/map_scroll/) and
+  [rooftop_run](../../games/rooftop_run/).
 
 - **Add vertical scrolling:** Same pattern, but with Y thresholds and `bg_scroll_y`.
-  Vertical scrolling is slightly trickier because the SNES tilemap wraps every 32 rows.
 
-- **Add animation:** Use different sprite tiles based on direction. Tile 0 for right,
-  tile 1 for left, advance every few frames for a walk cycle.
-
-- **Next example:** [LikeMario](../../../games/likemario/) -- full platformer with gravity,
+- **Next example:** [rooftop_run](../../games/rooftop_run/) -- full platformer with gravity,
   collision, and tile streaming.
 
 ---
 
-## Under the Hood: The Build
+## Assets
 
-### The Makefile
-
-```makefile
-TARGET      := continuous_scroll.sfc
-USE_LIB     := 1
-LIB_MODULES := console sprite input background dma
-CSRC        := main.c
-```
-
-### Why These Modules?
-
-| Module | Why it's here |
-|--------|--------------|
-| `console` | PPU setup, NMI handler, `WaitForVBlank()` |
-| `sprite` | OAM buffer for the player character sprite |
-| `input` | Joypad buffer symbols needed by NMI handler |
-| `background` | `bgSetMapPtr()`, `bgSetScroll()`, `bgInitTileSet()` with dirty-flag deferred writes |
-| `dma` | `dmaCopyVram()`, `dmaCopyCGram()` for bulk asset transfers, plus OAM DMA in NMI |
-
----
+`res/roofs.png` is four roof pieces of rooftop_run side by side at one height,
+`res/skyline.png` rooftop_run's far towers, and `res/kit.png` Kit's idle and running
+frames from his side sheet: all made by `devtools/art_assets/build.py` from the
+Néo-Lumen art (PixelLab, CC0; `assets/neo-lumen/README.md`). The build converts
+them, from the settings file beside each (`opensnes-tileset`, `opensnes-sprite`).
 
 ## Modules Used
 
 `console`, `sprite`, `input`, `background`, `dma` (`LIB_MODULES` in the Makefile).
+
+| Module | Why it's here |
+|--------|--------------|
+| `console` | PPU setup, NMI handler, `WaitForVBlank()` |
+| `sprite` | OAM buffer for Kit |
+| `input` | `padHeld()` |
+| `background` | `bgSetMapPtr()`, `bgSetScroll()`, `bgInitTileSet()` with dirty-flag deferred writes |
+| `dma` | `dmaCopyVram()` for the maps, plus OAM DMA in NMI |
 
 ## Technical Reference
 
 | Register | Address | Role in this example |
 |----------|---------|---------------------|
 | BGMODE   | $2105   | Mode 1 (two 4bpp layers + one 2bpp) |
-| BG1SC    | $2107   | BG1 tilemap at $0000 |
-| BG2SC    | $2108   | BG2 tilemap at $0800 |
+| BG1SC    | $2107   | BG1 map at $0000, 64x32 |
+| BG2SC    | $2108   | BG2 map at $0800, 64x32 |
 | BG1HOFS  | $210D   | BG1 horizontal scroll (via bgSetScroll) |
-| BG2HOFS  | $210F   | BG2 horizontal scroll |
+| BG2HOFS  | $210F   | BG2 horizontal scroll, half of BG1's |
 | TM       | $212C   | Enable OBJ + BG2 + BG1 |
-| INIDISP  | $2100   | Force blank / brightness control |
 
 ## Files
 
 | File | What's in it |
 |------|-------------|
-| `main.c` | Game loop, scrolling logic, input handling (~265 lines) |
-| `res/*.png.toml` | the import settings of the three layers and the character sheet (`opensnes-tileset`, `opensnes-sprite`); the build converts and links them, `res/<name>.inc` declares the symbols |
+| `main.c` | The camera, the parallax, Kit's animation |
+| `res/*.png.toml` | the import settings of the two layers and Kit's sheet (`opensnes-tileset`, `opensnes-sprite`); the build converts and links them, `res/<name>.inc` declares the symbols |
 | `Makefile` | `LIB_MODULES := console sprite input background dma` |
 
 ## Credits
 
-- Original: odelot (PVSnesLib example)
-- Sprite: Calciumtrice (CC-BY 3.0)
-- Backgrounds inspired by Streets of Rage 2
+- Original example: odelot (PVSnesLib)
+- Art: Néo-Lumen (PixelLab, CC0), arranged by `devtools/art_assets/build.py`

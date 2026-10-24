@@ -6,9 +6,9 @@
  * Port of krom (Peter Lemon)'s InterlaceFont demo (PeterLemon/SNES,
  * PPU/Interlace/InterlaceFont). BG Mode 5 renders 512 horizontal pixels
  * with 16x8 tiles; SETINI bit 0 adds interlace for 448 vertical lines.
- * The text page is original art (a procedurally rendered 512x256 text
- * image with 1-pixel-column test bands), converted to Mode 5's paired
- * 8x8 tile layout.
+ * The text page is a screen of the city's terminal: the library's 8x8
+ * font at 63 columns, with 1-pixel-column test bands, drawn and converted
+ * to Mode 5's paired 8x8 tile layout by devtools/art_assets/build.py.
  *
  * @par SNES Concepts
  * - BG Mode 5: 512px horizontal, 16x8 tiles (stored as 8x8 pairs)
@@ -33,7 +33,7 @@
 extern u8 text_pic[], text_pic_end[];
 /** @brief 32x32 tilemap of 16x8 entries — 32 entries x 16px = the full 512 */
 extern u8 text_map[], text_map_end[];
-/** @brief 4 colors: black, white, cyan, gold */
+/** @brief 4 colors: the glass, white, cyan, amber */
 extern u8 text_pal[], text_pal_end[];
 
 /** @brief krom's VRAM layout: map at word $4000, tiles at word $8000 */

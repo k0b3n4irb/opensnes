@@ -15,7 +15,8 @@
  * without rotation. mode7/perspective_rotate drives all four terms per line
  * and turns the world.
  *
- * Based on PVSnesLib's Mode7Perspective (mills32 / alekmaul).
+ * Based on PVSnesLib's Mode7Perspective (mills32 / alekmaul); the city and
+ * its sky are ours (devtools/art_assets/mode7.py writes them).
  *
  * @par SNES Concepts
  * - Mid-frame BG mode switching via HDMA (Mode 1 sky + Mode 7 ground)

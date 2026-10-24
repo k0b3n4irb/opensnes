@@ -2,7 +2,7 @@
 # the run writes boots = 1 to BW-RAM and the battery file keeps it (srm_out).
 # Power-cycle chain with i_sa1_save_boot2.toml (luna >= v1.30.1 runs the two
 # in order inside the parallel batch).
-rom = "../../examples/chips/sa1_save/sa1_save.sfc"
+rom = "../fixtures/retired_examples/sa1_save/sa1_save.sfc"
 frames = 120
 # struct fields are not symbols: `now+2` is the boots word two bytes into the block
 srm_out = "sa1_save.srm"

@@ -1,0 +1,33 @@
+# games/rooftop_run starts on its title screen: the loop runs from frame 66,
+# START at 100 starts the run, RIGHT from 110 to 168 walks Kit off the first
+# checkpoint (x = 16) and through the first two shards (10 points each,
+# score kept in tens).
+#
+# Every VRAM DMA of this input-driven run lands in blank or forced blank: the
+# HUD's 2 KB text map, the machines' and Kit's frames and the map columns
+# share the VBlanks of the first steps (the gate for what a button press
+# triggers is here, one manifest at a time).
+rom = "../../examples/games/rooftop_run/rooftop_run.sfc"
+frames = 170
+
+[[checkpoint]]                 # the title: Kit waits on the first roof
+at_frame = 100
+[checkpoint.values]
+game_state = { eq = 0, width = 1 }
+"kit_x.main" = { eq = 16, width = 2 }
+"kit_y.main" = { eq = 128, width = 2 }
+lives = { eq = 3, width = 1 }
+
+[[checkpoint]]                 # START, then RIGHT: Kit runs and takes two shards
+at_frame = 170
+input = "100:0x1000,102:0,110:0x0100,169:0"
+[checkpoint.values]
+game_state = { eq = 1, width = 1 }
+"kit_x.main" = { eq = 87, width = 2 }
+shards_got = { eq = 2, width = 1 }
+score = 2
+[checkpoint.delta]
+"kit_x.main" = "increased"
+
+[asserts.dma]
+unsafe_writes = 0

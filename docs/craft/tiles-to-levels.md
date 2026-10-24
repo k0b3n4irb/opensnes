@@ -17,8 +17,8 @@ and the four underlying tiles come along for free.
 This is not just convenience — it is the reuse that makes the VRAM budget work.
 A 40-screen level built from 200 unique metatiles still only needs those 200
 metatiles' worth of tiles in VRAM; the size lives in the *map* (cheap, 2 bytes
-per cell), not the tileset. @ref examples_maps_dynamic_map treats a whole
-background as a grid of 16×16 blocks for exactly this reason.
+per cell), not the tileset. @ref examples_maps_map_scroll streams a level
+built from 16×16 metatiles for exactly this reason.
 
 > **Go deeper.** nesdoug's [Metatiles](https://nesdoug.com/2018/09/05/11-metatiles/)
 > is the clearest explanation of the technique anywhere. It is written for the
@@ -40,7 +40,7 @@ game:
 So a floor tile is not "the grey one" — it is a tile tagged `T_SOLID`, and the
 physics code asks the map "what is at this pixel?" rather than hard-coding
 geometry. Slopes, ladders, one-way platforms and spikes are all just tile
-attributes; @ref examples_maps_slope_collision walks Mario up diagonal terrain
+attributes; @ref examples_demos_platform_objects walks Kit up diagonal terrain
 purely from the slope attributes on its tiles, with no per-level collision code.
 Design your tile *semantics* alongside your tile art — decide early which tiles
 are solid, which hurt, which you can climb.
@@ -56,7 +56,7 @@ camera crosses each tile boundary.
 That is a direct application of the @ref craft_frame_budget rules: a single
 column is a tiny DMA, easily inside the ~4 KB VBlank budget, so scrolling stays
 smooth no matter how wide the world is. @ref examples_maps_map_scroll is the
-stepping stone — a Mario walking a level wider than the screen — and
+stepping stone — Kit walking a level wider than the screen — and
 @ref examples_scrolling_continuous_scroll is the same idea run continuously. You
 do not manage the window by hand: the map engine's `mapUpdate` / `mapVblank`
 detect the boundary crossing and queue the column for you.

@@ -21,7 +21,7 @@ for the rows that need no enhancement chip.
 | A display | Record what it is and how the console is connected (composite, S-Video, RGB, an upscaler and its model). A CRT is the reference for anything about timing or interlace. A light gun generally needs a CRT; on an LCD, mark the Super Scope row as not testable rather than failed. |
 | Two pads | Port 2 is used by the two-player and Super Scope rows. |
 | Optional | A SNES Mouse, a Super Scope. |
-| The ROMs | `make hardware-kit` collects the ROMs of this protocol into `release/hardware-kit/`, numbered in the order of the grid. Copy that folder to the SD card. Build from a clean tree at the tag you are verifying (`git checkout vX.Y.Z && make clean && make`). |
+| The ROMs | `make hardware-kit` builds the few fixtures the grid names (ROMs kept under `testing/fixtures/` because they ask the hardware a question rather than teach) and collects the ROMs of this protocol into `release/hardware-kit/`, numbered in the order of the grid. Copy that folder to the SD card. Build from a clean tree at the tag you are verifying (`git checkout vX.Y.Z && make clean && make`). |
 
 Record the tag or commit the ROMs were built from. The grid is meaningless
 without it.
@@ -58,7 +58,7 @@ behaviour, and the note under the table says which.
 | # | ROM | Do | Check |
 |---|---|---|---|
 | 1 | `text/print_string` | nothing | Text legible, stable, no rolling. This is the boot smoke test: font upload, palette, screen on. |
-| 2 | `input/controller` | press every button on pad 1, then hold two at once | Each name appears while held and disappears on release. Pad 2 is checked by row 14. |
+| 2 | `input/controller` | press every button on pad 1, then hold two at once | Each button lights up in cyan on the PAD 1 drawing while held, two at once together, and goes out on release; HELD shows its bit, PRESSED and RELEASED name the last edge; the D-pad walks Kit in the test bay. Pad 2 is checked by row 14. |
 | 3 | `scrolling/parallax_scroll` | watch the top line | The first visible line must be picture, not a strip of garbage or a line from the bottom of the map. This is the vertical-scroll-by-one fix (`KNOWN_LIMITATIONS.md`, "the PPU never outputs scanline 0"); emulators forgive it, the console does not. Layers scroll at different speeds without tearing. |
 | 4 | `sprites/sprite_swarm` | watch the densest moments | Sprites flicker or drop out only where more than the per-line budget overlap; no garbage tiles, no sprite stuck at the top-left corner. |
 | 5 | `hdma/hdma_wave` | watch, then A to switch to the hdma module, LEFT/RIGHT for the amplitude | A smooth horizontal sine flowing up the water image, no horizontal tearing, no line where the wave jumps — in both modes, and across the switch. |
@@ -70,19 +70,19 @@ behaviour, and the note under the table says which.
 | 11 | `audio/snesmod_music` | A plays, B stops, START fades out | Music starts within a second, no crackle, no note hanging after stop. Power-cycle before this row: the SPC upload must work from a cold APU. |
 | 12 | `audio/sfx_from_wav` | press the buttons | Each sound fires once per press, no click at the start, no click at the end. |
 | 13 | `memory/save_game` | A writes slot 1, power-cycle, B reads slot 1 | The values read back are the ones written before the power cycle. Then X writes slot 2, power-cycle, Y reads it. On a flash cart this also checks that the cart writes the save file back; consult its manual if slot 1 reads blank. |
-| 14 | `input/two_players` | move both pads | Each pad drives its own object; releasing pad 2 does not affect pad 1. |
+| 14 | `input/controller` | hold buttons on both pads | Each pad's buttons light up on its own drawing (PAD 1 cyan, PAD 2 pink) and in its own HELD value; pad 2's D-pad walks the raccoon, not Kit; releasing pad 2 does not affect pad 1. |
 | 15 | `memory/hirom_demo` | hold A | "HIROM MODE" is shown and the background turns light blue while A is held. |
-| 16 | `chips/dsp1_cube` | nothing | A wireframe cube tumbles with correct perspective. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
-| 17 | `chips/sa1_starfield` | nothing | 128 dots trace smooth Lissajous figures at full frame rate. Firmware-dependent. |
+| 16 | `mode7/dsp1_ground` | turn with LEFT/RIGHT, drive with UP | The ground recedes to a horizon under the sky and turns in perspective; four magenta beacons and the cyan cube tumbling above them stay put on the ground while you turn and drive, and disappear once you pass them. Firmware-dependent: the DSP-1 is emulated by the cart, and the FXPak / sd2snes runs it only with the DSP ROM dumps (`dsp1.bin`, `dsp1b.bin`, …) in its `sd2snes` system folder ([sd2snes downloads page](https://sd2snes.de/blog/downloads)); without them the row shows nothing, which is the cart, not the SDK. |
+| 17 | `chips/sa1_starfield` | nothing | 128 moths trace smooth Lissajous figures over the skyline at full frame rate. Firmware-dependent. |
 | 18 | `chips/superfx_3d` | nothing | A wireframe cube rotates at full frame rate with no missing edges. Firmware-dependent. |
-| 19 | `games/likemario` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
-| 20 | `games/rpg` | walk, talk to a villager with A, open the chest | The full game path: map, dialogue, chest state. |
+| 19 | `games/rooftop_run` | walk with the D-pad, jump with A | Walking, jumping and landing feel like luna: no fall through the floor, no stuck-in-wall; camera follows without judder. |
+| 20 | `demos/rpg` | walk, talk to a resident with A, open the lockers, walk into the teal door and out by the mat | The full game path: map, dialogue, locker state, the two scenes. |
 | 21 | `input/mouse` | move the mouse, click both buttons, right-click cycles sensitivity | Optional (needs a SNES Mouse, port 1). The cursor tracks the hand at each of the three sensitivities. |
 | 22 | `input/superscope` | calibrate, then fire at a target | Optional (needs a Super Scope in port 2 and, in practice, a CRT). The red dot lands where the scope points. |
-| 23 | `backgrounds/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `examples/backgrounds/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
-| 24 | `chips/superfx_game_skeleton` | hold the D-pad, listen | The crosshair follows the pad at full frame rate while the GSU's cube turns at half rate and the music plays: no torn or half-drawn cube (`gsuPresent` double-buffers and the NMI swaps in blank), no pause in the music while the GSU runs from its cache. The two letterbox bands (an HDMA to INIDISP) are black to their edge, with no fade at the end of a band; write down the console's CPU revision (1-CHIP or S-CPU-A), since the two errata this form avoids are each on one of them. Firmware-dependent, like rows 16-18. |
-| 25 | `chips/sa1_save` | read NOW, power-cycle, read again | The SA-1 save path: NOW is one more after every power cycle and FOUND shows the previous value (BW-RAM, battery). A NOW that stays at 1 means the cart's SA-1 core does not keep BW-RAM across power, or the header's `$35` is not honoured. |
-| 26 | `chips/superfx_save` | read NOW, power-cycle, read again | The Super FX save path: same check in the GSU's Game Pak RAM at `$E000` (header `$15`, size at `$FFBD`). Firmware-dependent, like rows 16-18 and 24. |
+| 23 | `testing/fixtures/retired_examples/mode6` | press B, photograph the screen | A question, not a pass/fail: does a horizontal offset of 8 move a hi-res column? Compare with `testing/fixtures/retired_examples/mode6/mode6_card.png` (luna's capture; ares and bsnes compute the same): every odd column shifted half a tile, so the diagonal steps are cut into half steps. If instead the bands climb in clean whole-tile steps, the console drops bit 3 like Mesen2. Either answer goes in the note with the photo. |
+| 24 | `chips/superfx_game_skeleton` | hold the D-pad, listen | The sight follows the pad at full frame rate while the GSU's hologram turns at half rate above the square and the music plays: no torn or half-drawn hologram (`gsuPresent` double-buffers and the NMI swaps in blank), no pause in the music while the GSU runs from its cache. The two letterbox bands (an HDMA to INIDISP) are black to their edge, with no fade at the end of a band; write down the console's CPU revision (1-CHIP or S-CPU-A), since the two errata this form avoids are each on one of them. Firmware-dependent, like rows 16-18. |
+| 25 | `testing/fixtures/retired_examples/sa1_save` | read NOW, power-cycle, read again | The SA-1 save path: NOW is one more after every power cycle and FOUND shows the previous value (BW-RAM, battery). A NOW that stays at 1 means the cart's SA-1 core does not keep BW-RAM across power, or the header's `$35` is not honoured. |
+| 26 | `testing/fixtures/retired_examples/superfx_save` | read NOW, power-cycle, read again | The Super FX save path: same check in the GSU's Game Pak RAM at `$E000` (header `$15`, size at `$FFBD`). Firmware-dependent, like rows 16-18 and 24. |
 
 **What a failure in each row points at.** Rows 1 and 2 failing means nothing
 else is worth running: the boot path or the joypad read is wrong. Row 3 is
@@ -134,19 +134,19 @@ Peripherals:   pads / mouse / scope
 11  audio/snesmod_music
 12  audio/sfx_from_wav
 13  memory/save_game
-14  input/two_players
+14  input/controller (pad 2)
 15  memory/hirom_demo
-16  chips/dsp1_cube
+16  mode7/dsp1_ground
 17  chips/sa1_starfield
 18  chips/superfx_3d
-19  games/likemario
-20  games/rpg
+19  games/rooftop_run
+20  demos/rpg
 21  input/mouse                 n/a
 22  input/superscope            n/a
-23  backgrounds/mode6
+23  testing/fixtures/retired_examples/mode6
 24  chips/superfx_game_skeleton
-25  chips/sa1_save
-26  chips/superfx_save
+25  testing/fixtures/retired_examples/sa1_save
+26  testing/fixtures/retired_examples/superfx_save
 ```
 
 ## What to do with a KO

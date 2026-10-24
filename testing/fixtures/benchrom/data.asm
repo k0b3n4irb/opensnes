@@ -11,11 +11,11 @@ mapdata:
 mapdata_end:
 
 tilesetdef:
-.incbin "../../../examples/maps/map_scroll/res/tiledMario.t16"
+.incbin "../../../examples/maps/map_scroll/res/rooftops.t16"
 tilesetdef_end:
 
 tilesetatt:
-.incbin "../../../examples/maps/map_scroll/res/tiledMario.b16"
+.incbin "../../../examples/maps/map_scroll/res/rooftops.b16"
 tilesetatt_end:
 
 .ends

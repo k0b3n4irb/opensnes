@@ -1,20 +1,26 @@
-# Window -- HDMA Triangle Masking
+# Window -- HDMA Torch Beam: Masking and Lighting
 
 ![Screenshot](window.png)
 
-A triangle-shaped window mask driven by HDMA, showing how per-scanline window
-boundary updates create non-rectangular shapes. Press **A**, **X**, or **B** to
-apply the window to different background layers.
+Kit stands in a dark back alley with a torch. The beam is a window driven by
+HDMA: its left edge changes every scanline, so the window is a cone that leaves
+the torch and opens to the right. Press **A**, **X** or **B** and it masks
+background layers — the alley, the rain in front of it, or both; press **Y** and
+it marks where colour math lights the picture instead.
 
-Ported from PVSnesLib "Window" example.
+![Lit](window_shade.png)
+
+Ported from PVSnesLib's "Window" example; the colour-math mode is its
+"TransparentWindow" example (by Digifox), adding instead of subtracting.
 
 ## Controls
 
 | Button | Action |
 |--------|--------|
-| **A** | Window on BG1 only |
-| **X** | Window on BG2 only |
-| **B** | Window on both BG1 and BG2 |
+| **A** | The beam on BG1 (the alley) only: the rain falls everywhere |
+| **X** | The beam on BG2 (the rain) only: the alley is lit, the rain shows where the torch catches it |
+| **B** | The beam on both BG1 and BG2 (the boot state) |
+| **Y** | Light the beam: nothing is clipped, colour math brightens both BGs inside it |
 
 ## Build & Run
 
@@ -23,39 +29,38 @@ cd $OPENSNES_HOME
 make -C examples/windows/window
 ```
 
-Then open `window.sfc` in your emulator (Mesen2 recommended).
+Then open `window.sfc` in luna (`luna-gui window.sfc`) or any emulator.
 
 ## How It Works
 
 ### SNES Window System
 
-The SNES PPU has two hardware windows -- rectangular regions defined by left and
-right X coordinates. These windows can mask (hide) portions of any background
-layer or sprite layer. Window operations cost zero CPU time because they are
-handled entirely by the PPU.
+The SNES PPU has two hardware windows -- regions defined by a left and a right X
+coordinate. These windows can mask (hide) portions of any background layer or
+sprite layer. Window operations cost zero CPU time because they are handled
+entirely by the PPU.
 
 ### Making Non-Rectangular Shapes with HDMA
 
 A single window is always a horizontal band. But by changing the left/right
 boundaries **every scanline** using HDMA, you can create any shape -- circles,
-triangles, or custom silhouettes.
+cones, or custom silhouettes.
 
 This example uses two HDMA channels:
 - **Channel 4** writes to WH0 ($2126) -- window 1 left boundary
 - **Channel 5** writes to WH1 ($2127) -- window 1 right boundary
 
-### The Triangle Tables
+### The Beam Tables
 
-The HDMA tables define a diamond/triangle shape centered on screen:
+`buildBeam()` computes the two tables at boot from the shape they draw. The
+torch's tip is at (44, 187); the cone widens by one line every three pixels:
 
 ```
-Line  0-59:  WH0=255, WH1=0   -> left > right -> window disabled (no mask)
-Line 60-91:  WH0 shrinks 127->96, WH1 grows 129->160 -> triangle expands
-Line 92-123: WH0 grows 96->127, WH1 shrinks 160->129 -> triangle contracts
-Line 124+:   WH0=255, WH1=0   -> window disabled again
+Line   0-116:  WH0=255, WH1=0    -> left > right -> no window
+Line 117-223:  WH0 = 44 + 3 x |line - 187| (255 past the screen), WH1 = 255
 ```
 
-The tables use **repeat mode** (bit 7 set in the line count) because each
+The beam lines use **repeat mode** (bit 7 set in the line count) because each
 scanline needs a different value. Non-repeat mode would write once and hold,
 which does not work when the shape changes per line.
 
@@ -63,13 +68,18 @@ which does not work when the shape changes per line.
 
 By default, TMW (main screen window at $212E) hides pixels **inside** the window.
 The code sets the **invert** flag in W12SEL ($2123) so that pixels **outside**
-the window are hidden instead -- revealing only the triangle-shaped area.
+the window are hidden instead -- revealing only the beam.
+
+### Kit Stays Visible
+
+Kit is a sprite, and the window is not enabled on sprites (WOBJSEL and TMW's OBJ
+bit stay 0), so he stands out in the dark whatever the beam masks.
 
 ### Switching Layers
 
 When you press A/X/B, the code:
 1. Disables HDMA channels
-2. Resets all window registers via `windowInit()`
+2. Resets all window registers via `windowDisableAll()`
 3. Enables window 1 on the new layer(s) with inversion
 4. Sets TMW for the new layer(s)
 5. Re-enables HDMA
@@ -90,44 +100,74 @@ This register controls Window 1 enable and inversion for BG1 and BG2:
 Setting both the enable and invert bits for a BG makes pixels **outside** the
 window invisible, revealing only the windowed region.
 
-### Window Shapes in Commercial Games
+### Lighting: the Window as the Region of Colour Math (Y)
 
-This technique was used extensively: spotlight effects in Mega Man X, the
-title screen reveal in Donkey Kong Country, and dialog box cutouts in RPGs.
-Any shape that can be described as a left-right boundary pair per scanline
-can be rendered as a window.
+Pressing Y keeps the same HDMA tables and changes what the window is for:
+
+| Register | Value | Meaning |
+|----------|-------|---------|
+| W12SEL / TMW | `$00` / `$00` | no layer is clipped |
+| WOBJSEL | `$20` | the colour window is window 1, not inverted: the beam |
+| CGWSEL | `$10` | colour math only inside the colour window, from the fixed colour |
+| CGADSUB | `$03` | add (bit 7 clear), on BG1 and BG2 |
+| COLDATA | 6, 5, 2 | the warm colour added |
+
+```c
+windowEnable(WINDOW_1, WINDOW_MATH);       /* the colour window */
+windowSetMainMask(0);                      /* nothing clipped */
+colorMathSetCondition(COLORMATH_INSIDE);
+colorMathSetSource(COLORMATH_SRC_FIXED);
+colorMathSetOp(COLORMATH_ADD);
+colorMathSetLayers(LAYER_BG1 | LAYER_BG2);
+colorMathSetFixedColor(6, 5, 2);
+```
+
+The masking modes call `colorMathDisable()` first, so A, X or B after Y
+clips again with no light left over. The same pattern draws a shadow
+(subtract instead of add) or the darkened box behind a dialogue.
 
 ## VRAM Layout
 
 | Region | Content |
 |--------|---------|
 | $0000 | BG1 tilemap (32x32) |
-| $1000 | BG2 tilemap (32x32) |
-| $4000 | BG1 tiles (4bpp, 16 colors) |
-| $6000 | BG2 tiles (4bpp, 16 colors) |
+| $0400 | BG2 tilemap (32x32) |
+| $1000 | BG1 tiles: the alley, 889 tiles (4bpp) |
+| $5000 | BG2 tiles: the rain (4bpp) |
+| $6000 | Kit (OBJ) |
+
+A BG's tiles start on a $1000-word boundary (BG12NBA keeps the top four bits
+of the address).
 
 ## Project Structure
 
 | File | Purpose |
 |------|---------|
-| `main.c` | HDMA triangle tables, window setup, input loop |
-| `res/bg1.png.toml`, `res/bg2.png.toml` | the import settings of the two pictures (`opensnes-tileset`, palette bank 1 for BG2); the build converts and links them, `res/bgN.inc` declares the symbols |
-| `res/bg1.png` | Background 1 (palette slot 0) |
-| `res/bg2.png` | Background 2 (palette slot 1) |
-| `Makefile` | `LIB_MODULES := console sprite dma input background window hdma math` |
+| `main.c` | The beam tables, window setup, input loop, the falling rain |
+| `res/alley.png` | BG1, the alley (palette slot 0) |
+| `res/rain.png` | BG2, the rain on nothing (palette slot 1) |
+| `res/kit.png` | Kit holding his torch, 32x32 |
+| `res/*.png.toml` | the import settings (`opensnes-tileset`, `opensnes-sprite`); the build converts and links them, `res/<name>.inc` declares the symbols |
+| `Makefile` | `LIB_MODULES := console sprite dma input background window hdma colormath` |
+
+The alley and Kit with his torch come from PixelLab, the rain is drawn by
+`devtools/art_assets/build.py` (CC0, `assets/neo-lumen/README.md`).
 
 ## Going Further
 
-- **Animated window**: Modify the triangle tables each frame to make the shape
-  pulse or rotate. Copy the tables to RAM and adjust the boundary values.
+- **A moving beam**: rebuild the tables each frame with the tip following a
+  sprite, or sweep the cone by changing its slope.
 
-- **Circle window**: Replace the linear expansion/contraction with a circular
-  profile calculated from the equation `x = sqrt(r^2 - y^2)`.
+- **Circle window**: replace the cone with a circular profile calculated from
+  the equation `x = sqrt(r^2 - y^2)`.
+
+- **A rectangle**: a static box needs only three non-repeat entries per table
+  (window empty, the edges for the box's height, empty again).
 
 - **Explore related examples**:
-  - `effects/transparent_window` -- Window + color math for semi-transparent overlays
-  - `effects/hdma_wave` -- Another HDMA-driven per-scanline effect
+  - `windows/window_multi_hdma` -- both windows shaped per scanline
+  - `hdma/hdma_wave` -- another HDMA-driven per-scanline effect
 
 ## Modules Used
 
-`console`, `sprite`, `dma`, `input`, `background`, `window`, `hdma` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `dma`, `input`, `background`, `window`, `hdma`, `colormath` (`LIB_MODULES` in the Makefile).

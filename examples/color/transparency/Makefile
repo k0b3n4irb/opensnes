@@ -9,7 +9,7 @@ TARGET     := transparency.sfc
 ROM_NAME   := TRANSPARENCY DEMO
 
 USE_LIB    := 1
-LIB_MODULES := console sprite dma background colormath
+LIB_MODULES := console sprite dma background colormath input
 
 CSRC       := main.c
 

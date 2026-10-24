@@ -11,11 +11,13 @@ refills 64-127 for the odd rows, and vice versa — 28 rows × 64 = **1792
 palette slots** from a mode that nominally allows 128. HDMA cannot do this:
 its widest mode moves 4 bytes per scanline; the technique needs 16.
 
-The sunset art is original (procedural, `res/sunset.png` — 15,885 source
-colors); `opensnes-image hicolor` converts it at build time to krom's asset
-contract (64×8-pixel segments quantized to 15 colors + black, settings in
-`res/sunset.png.toml`). 377 distinct colors land on screen — any static 4bpp
-screen caps at 128.
+The picture is the city canal at night (`res/canal.png`, 392 source colors:
+generated for OpenSNES, its haze added by hand, CC0, `assets/neo-lumen/`);
+`opensnes-image hicolor` converts it at build time to krom's asset contract
+(64×8-pixel segments quantized to 15 colors + black, settings in
+`res/canal.png.toml`). 400 distinct colors land on screen — any static 4bpp
+screen caps at 128, and the same canal in Mode 3 (`backgrounds/mode3`), one
+256-colour palette for the whole screen, shows 253.
 
 ## SNES Concepts
 
@@ -70,8 +72,8 @@ screen caps at 128.
 cd examples/color/hicolor_1792 && make
 ```
 
-The build converts `res/sunset.png` itself (`opensnes-image hicolor`, from
-`res/sunset.png.toml`); replace the picture with any 256×224 art and `make`.
+The build converts `res/canal.png` itself (`opensnes-image hicolor`, from
+`res/canal.png.toml`); replace the picture with any 256×224 art and `make`.
 
 ## Modules Used
 

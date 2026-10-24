@@ -1,6 +1,9 @@
 # SNESMOD Large Soundbank Music
 
-> Large soundbank music playback (>32KB, multi-bank LoROM)
+> Large soundbank music playback (>32KB, multi-bank LoROM). The module is the
+> nocturne of `examples/audio/snesmod_music` with long 32 kHz instruments and
+> no echo (`devtools/audio_assets/songs.py`, `nocturne_large`): a 46 KB
+> soundbank, two banks.
 
 
 ## What You'll Learn

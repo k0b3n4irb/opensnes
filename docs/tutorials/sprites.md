@@ -232,7 +232,7 @@ oamInit(OBJ_SIZE16_L32, OBJ_NAME_BASE(0x0000));   /* 16x16 and 32x32 sprites */
 
 ## Example: Two Players
 
-See `examples/input/two_players/` for a complete example with two independently controlled sprites.
+`examples/input/controller` reads both pads (`padHeld(0)`, `padHeld(1)`); give each its own OAM entry and palette to move two sprites independently.
 
 ## A scrolling game's sprites: `oamPlaceWorld`
 

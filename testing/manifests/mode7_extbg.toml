@@ -8,22 +8,18 @@
 #   * the plane is 1:1 and scrolled to row 0: matrix A = D = $00FE
 #     (mode7SetScale(0x0200) — the lib's matrix is scale / 2), M7VOFS -1
 #     (row 0 on the first line; mode7Init alone leaves $17F);
-#   * the ball keeps moving.
-# The occlusion itself (ball hidden by the bit-7 pixels with EXTBG on,
-# drawn over them off) is what the visual baselines capture.
-# Measured on luna v1.30.2.
+#   * the orb keeps moving.
+# The occlusion itself (the orb hidden by the viaducts' bit-7 pixels with
+# EXTBG on, drawn over them off) is what the visual baselines capture.
+# Measured on luna v1.30.2; the plane and the orb became converted assets on
+# luna v1.40.0 (2026-10-21), the checks are the same.
 rom = "../../examples/mode7/extbg/extbg.sfc"
 
 [[checkpoint]]
 at_frame = 100
 [checkpoint.values]
 extbg_on = { eq = 1, width = 1 }
-# 61 since 2026-10-10 (38 before 2026-10-08): the plane and the ball are
-# built 23 frames sooner (conditions that branch directly: 16; indexed
-# addressing: 1; leaf frames in the direct page: 4; short branches: 1; the
-# peephole's compare and dead-slot rules: 1), so the ball starts that many
-# pixels earlier.
-ball_x = { ge = 48, le = 96, width = 2 }   # the ball has left its start and is still on screen; an exact value here moved with the length of the boot three times on 2026-10-10 (61, 62, 69, 70)
+orb_x = { ge = 48, le = 160, width = 2 }   # the orb has left its start and is still on screen; an exact value here moves with the length of the boot
 [checkpoint.ppu]
 setini = 0x40
 tm = 0x12
@@ -46,7 +42,7 @@ input = "140:0x0080,142:0"        # A: EXTBG on again
 [checkpoint.values]
 extbg_on = { eq = 1, width = 1 }
 [checkpoint.delta]
-ball_x = "increased"
+orb_x = "increased"
 [checkpoint.ppu]
 setini = 0x40
 tm = 0x12

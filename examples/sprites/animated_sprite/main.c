@@ -3,8 +3,8 @@
  * @brief Direction-based sprite animation with horizontal flip
  * @ingroup examples
  *
- * Demonstrates a classic sprite animation pattern: a character sprite with
- * multiple directional walk cycles (down, up, left, right). Each direction
+ * Demonstrates a classic sprite animation pattern: Kit, the fox-kit courier
+ * seen from above, with a walk cycle per direction (down, up, left, right). Each direction
  * uses a different row of frames in the sprite sheet, and the left-facing
  * animation reuses the right-facing frames with the OAM horizontal flip
  * bit (bit 6 of attribute byte).
@@ -14,7 +14,7 @@
  * at the correct frame in the pre-loaded sprite sheet. Movement is
  * controlled with the D-PAD and clamped to screen boundaries.
  *
- * Ported from PVSnesLib AnimatedSprite example.
+ * This began as the PVSnesLib AnimatedSprite example.
  *
  * @par SNES Concepts
  * - Sprite animation via OAM tile number updates
@@ -23,9 +23,9 @@
  * - Frame-paced animation with delay counters
  *
  * @par What to Observe
- * - A 16x16 character sprite that walks in 4 directions with D-PAD
+ * - A 32x32 character sprite that walks in 4 directions with D-PAD
  * - Walking left mirrors the right-facing animation
- * - The animation cycles through 3 frames per direction
+ * - The animation cycles through 5 frames per direction
  * - The sprite stops animating when no button is pressed
  *
  * @par Modules Used
@@ -42,7 +42,7 @@
  *============================================================================*/
 
 /** @brief Sprite sheet tile data containing all animation frames (converted by the build from res/) */
-#include "res/sprites.inc"   /* generated: sprites_tiles[], sprites_tiles_end[], sprites_pal[], sprites_pal_end[] */
+#include "res/kit_walk.inc"   /* generated: kit_walk_tiles[], kit_walk_tiles_end[], kit_walk_pal[], kit_walk_pal_end[] */
 /** @brief Palette for the character sprite (16 colors, 4bpp) */
 
 /*============================================================================
@@ -94,34 +94,37 @@ typedef struct {
     u16 gfx_frame;     /**< Current tile number to display in OAM */
     u8 state;          /**< Current direction (SpriteState enum value) */
     u8 flipx;          /**< Horizontal flip flag: 1 = mirror sprite for left-facing */
-} Monster;
+} Walker;
 
 /**
  * @brief Number of frames to hold each animation frame before advancing.
  *
  * At 60fps, a delay of 6 means each walk frame lasts 6/60 = 100ms,
- * producing a 300ms walk cycle (3 frames x 100ms). Adjust this value
+ * producing a 500ms walk cycle (5 frames x 100ms). Adjust this value
  * to make the animation faster (lower) or slower (higher).
  */
 #define ANIM_DELAY 6
 
-/** @brief The player-controlled character sprite, initialized facing down at (100, 100) */
-Monster monster = {100, 100, 0, W_DOWN, 0};
+/** @brief Kit, the player-controlled sprite, initialized facing down at (100, 100) */
+Walker kit = {100, 100, 0, W_DOWN, 0};
 
 /*============================================================================
  * Animation clips (anim module) — one clip per facing.
  *
- * A frame value here is a raw OAM tile number (the sheet lays 16x16
- * sprites two tiles apart). LEFT reuses the RIGHT clip with H-flip.
+ * A frame value here is a raw OAM tile number. The converter lays the
+ * sheet's 32x32 blocks out four to a 128-pixel row of OBJ VRAM, so block k
+ * starts at tile (k % 4) * 4 + (k / 4) * 64: the sheet holds five frames
+ * walking down (blocks 0-4), five up (5-9), five to the right (10-14).
+ * LEFT reuses the RIGHT clip with H-flip.
  * ANIM_DELAY ticks per frame = the same 100ms cadence the old hand-rolled
  * anim_delay counter produced.
  *============================================================================*/
-DECLARE_ANIM_CLIP(walk_down, ANIM_LOOP, ANIM_DELAY, 0, 2, 4);
-DECLARE_ANIM_CLIP(walk_up,   ANIM_LOOP, ANIM_DELAY, 6, 8, 10);
-DECLARE_ANIM_CLIP(walk_side, ANIM_LOOP, ANIM_DELAY, 12, 14, 32);
+DECLARE_ANIM_CLIP(walk_down, ANIM_LOOP, ANIM_DELAY, 0, 4, 8, 12, 64);
+DECLARE_ANIM_CLIP(walk_up,   ANIM_LOOP, ANIM_DELAY, 68, 72, 76, 128, 132);
+DECLARE_ANIM_CLIP(walk_side, ANIM_LOOP, ANIM_DELAY, 136, 140, 192, 196, 200);
 
-/** @brief Playback head for the monster (zero-init = stopped). */
-AnimPlayer monster_anim = ANIM_PLAYER_INIT;
+/** @brief Playback head for Kit (zero-init = stopped). */
+AnimPlayer kit_anim = ANIM_PLAYER_INIT;
 
 /*============================================================================
  * Main
@@ -149,16 +152,16 @@ int main(void) {
      * 2. DMAs palette to CGRAM address 128 (sprite palette 0)
      * 3. Sets OBJSEL size mode to 16x16 small / 32x32 large
      * Palette slot 0 = CGRAM 128-159 (16 colors x 2 bytes) */
-    oamInitGfxSet(sprites_tiles, sprites_tiles_end - sprites_tiles,
-                  sprites_pal, sprites_pal_end - sprites_pal,
+    oamInitGfxSet(kit_walk_tiles, kit_walk_tiles_end - kit_walk_tiles,
+                  kit_walk_pal, kit_walk_pal_end - kit_walk_pal,
                   0, 0x0000, OBJ_SIZE16_L32);
 
-    /* Initialize OAM entry 0 at the monster's starting position.
+    /* Initialize OAM entry 0 at Kit's starting position.
      * Tile 0, palette 0, priority 3 (in front of all BGs), no flip.
      * The valid on-screen Y set here is what makes the sprite visible —
      * SNES visibility is Y-based, there is no separate "show" call. */
-    oamSet(0, monster.x, monster.y, 0, 0, 3, 0);
-    oamSetSize(0, 0);       /* 0 = use small size (16x16 in this OBJSEL mode) */
+    oamSet(0, kit.x, kit.y, 0, 0, 3, 0);
+    oamSetSize(0, OBJ_LARGE);   /* large = 32x32 in this OBJSEL mode */
 
     /* The SNES has 128 hardware sprites. Any unused sprites must be hidden
      * (moved off-screen) to prevent garbage tiles from appearing. */
@@ -186,43 +189,43 @@ int main(void) {
         if (pad0 != 0) {
             /* Handle movement */
             if (pad0 & KEY_UP) {
-                if (monster.y >= SCREEN_TOP) monster.y--;
-                monster.state = W_UP;
-                monster.flipx = 0;
+                if (kit.y >= SCREEN_TOP) kit.y--;
+                kit.state = W_UP;
+                kit.flipx = 0;
             }
             if (pad0 & KEY_LEFT) {
-                if (monster.x >= SCREEN_LEFT) monster.x--;
-                monster.state = W_LEFT;
-                monster.flipx = 1;
+                if (kit.x >= SCREEN_LEFT) kit.x--;
+                kit.state = W_LEFT;
+                kit.flipx = 1;
             }
             if (pad0 & KEY_RIGHT) {
-                if (monster.x <= SCREEN_RIGHT) monster.x++;
-                monster.state = W_RIGHT;
-                monster.flipx = 0;
+                if (kit.x <= SCREEN_RIGHT) kit.x++;
+                kit.state = W_RIGHT;
+                kit.flipx = 0;
             }
             if (pad0 & KEY_DOWN) {
-                if (monster.y <= SCREEN_BOTTOM) monster.y++;
-                monster.state = W_DOWN;
-                monster.flipx = 0;
+                if (kit.y <= SCREEN_BOTTOM) kit.y++;
+                kit.state = W_DOWN;
+                kit.flipx = 0;
             }
 
             /* Select the clip for the current facing — animPlay's
              * continue-if-same semantics make this safe to call every
              * frame: holding a direction keeps the cycle running, and
              * changing direction restarts the new clip cleanly. */
-            if (monster.state == W_DOWN)      animPlay(&monster_anim, &walk_down);
-            else if (monster.state == W_UP)   animPlay(&monster_anim, &walk_up);
-            else                              animPlay(&monster_anim, &walk_side);
+            if (kit.state == W_DOWN)      animPlay(&kit_anim, &walk_down);
+            else if (kit.state == W_UP)   animPlay(&kit_anim, &walk_up);
+            else                              animPlay(&kit_anim, &walk_side);
 
             /* Advance one tick — the clip data owns the cadence (the old
              * anim_delay/anim_frame counters are gone). */
-            monster.gfx_frame = animTick(&monster_anim);
+            kit.gfx_frame = animTick(&kit_anim);
         }
         /* Idle: no tick — a paused animation costs nothing and the last
          * frame simply stays in OAM (same behavior as before). */
 
-        u16 flags = monster.flipx ? OBJ_FLIPX : 0;
-        oamSet(0, monster.x, monster.y, monster.gfx_frame, 0, 3, flags);
+        u16 flags = kit.flipx ? OBJ_FLIPX : 0;
+        oamSet(0, kit.x, kit.y, kit.gfx_frame, 0, 3, flags);
     }
 
     return 0;

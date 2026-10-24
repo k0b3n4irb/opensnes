@@ -23,7 +23,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | show a background from a PNG | `bgInitTileSet`, `bgSetGfxPtr`, `bgSetMapPtr` | `background` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | bundle a tileset + its palette as one thing | `BgAsset`, `DECLARE_BG_ASSET`, `bgLoad` | `asset` | [backgrounds/mode1](../examples/backgrounds/mode1/) |
 | draw a sprite | `oamInit`, `oamSet`, `oamUpdate` | `sprite` | [sprites/simple_sprite](../examples/sprites/simple_sprite/) |
-| hide a sprite that left the screen | `oamHide` | `sprite` | [games/rpg](../examples/games/rpg/) |
+| hide a sprite that left the screen | `oamHide` | `sprite` | [demos/rpg](../examples/demos/rpg/) |
 | animate a sprite | `AnimClip`, `animPlay`, `animTickOam` | `anim` | [sprites/animated_sprite](../examples/sprites/animated_sprite/) |
 | draw one character out of many tiles | `oamDrawMetasprite`, `MetaspriteItem`, `MetaspriteStyle` | `sprite` | [sprites/aseprite_pipeline](../examples/sprites/aseprite_pipeline/) |
 | make a tile while the game runs (procedural art) | `tileEncode2bpp`, `tileEncode4bpp`, `tileEncode8bpp` | `tile` | [sprites/sprite_swarm](../examples/sprites/sprite_swarm/) |
@@ -38,7 +38,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | load a map made in Tiled | `opensnes-level` → `.m16`/`.b16` | `map` | [maps/map_scroll](../examples/maps/map_scroll/) |
 | ask whether a tile is solid | `collideTile` (`collideTileEx` for 16- or 32-pixel tiles) | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
 | ask whether two boxes overlap | `collideRect` | `collision` | [basics/collision_demo](../examples/basics/collision_demo/) |
-| handle slopes | `objCollidMapWithSlopes` + per-tile attributes | `object` | [maps/slope_collision](../examples/maps/slope_collision/) |
+| handle slopes | `objCollidMapWithSlopes` + per-tile attributes | `object` | [demos/platform_objects](../examples/demos/platform_objects/) |
 | place the sprite so collision *feels* right | the straddle convention | — | [collision tutorial](tutorials/collision.md#where-the-sprite-is-vs-where-it-collides) |
 
 ## Input
@@ -46,17 +46,17 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | I want to… | Use | Module | Example |
 |---|---|---|---|
 | read a joypad | `padHeld`, `padPressed` | `input` | [input/controller](../examples/input/controller/) |
-| read two players | `padHeld(0)` / `padHeld(1)` | `input` | [input/two_players](../examples/input/two_players/) |
+| read two players | `padHeld(0)` / `padHeld(1)` | `input` | [input/controller](../examples/input/controller/) |
 | read a mouse or Super Scope | `mouse*` / `scope*` | `input` | [input/mouse](../examples/input/mouse/) |
 
 ## Structuring a game
 
 | I want to… | Use | Module | Example |
 |---|---|---|---|
-| a main loop you do not write | `gameLoopRun` | `gameloop` | [basics/timer](../examples/basics/timer/) |
+| a main loop you do not write | `gameLoopRun` | `gameloop` | [input/controller](../examples/input/controller/) |
 | title → play → pause, without a state enum | `Scene`, `scenePush`, `scenePop` | `scene` | [basics/scene_stack](../examples/basics/scene_stack/) |
 | save the player's progress | `sramSave`, `sramLoad` | `USE_SRAM := 1` | [memory/save_game](../examples/memory/save_game/) |
-| a dialog box or a status bar | `panelDraw`, `panelPut`, `panelFlush` | `panel` | [games/rpg](../examples/games/rpg/) |
+| a dialog box or a status bar | `panelDraw`, `panelPut`, `panelFlush` | `panel` | [demos/rpg](../examples/demos/rpg/) |
 
 ## Sound
 
@@ -73,8 +73,8 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 | blend two layers | `colormath*` | `colormath` | [color/transparency](../examples/color/transparency/) |
 | mask part of the screen | `windowSet*` | `window` | [windows/window](../examples/windows/window/) |
 | change a register mid-frame | `hdmaSetup`, `hdmaEnableMask` | `hdma` | [windows/window_multi_hdma](../examples/windows/window_multi_hdma/) |
-| rotate or scale a background | `mode7*` | `mode7` | [games/mode7_racing](../examples/games/mode7_racing/) |
-| pixelate | `mosaicSetLayers`, `mosaicFadeIn` | `mosaic` | [transitions/mosaic](../examples/transitions/mosaic/) |
+| rotate or scale a background | `mode7*` | `mode7` | [mode7/mode7_racing](../examples/mode7/mode7_racing/) |
+| pixelate | `mosaicSetLayers`, `mosaicFadeIn` | `mosaic` | [transitions/fading](../examples/transitions/fading/) |
 
 ## Moving data around
 
@@ -98,7 +98,7 @@ nothing you do not list is linked (SRAM and SNESMOD are switched on with
 
 | I want to… | Use | Module | Notes |
 |---|---|---|---|
-| rotate + project points in 3D | `dsp1Attitude`, `dsp1Objective`, `dsp1Project` (setup: `dsp1SetCamera`) | `dsp1` | [chips/dsp1_cube](../examples/chips/dsp1_cube/) — needs `USE_DSP1 := 1` |
+| rotate + project points in 3D | `dsp1Attitude`, `dsp1Objective`, `dsp1Project` (setup: `dsp1SetCamera`) | `dsp1` | [mode7/dsp1_ground](../examples/mode7/dsp1_ground/) — needs `USE_DSP1 := 1` |
 | true 3D distance / sphere test | `dsp1Distance`, `dsp1Range` | `dsp1` | hardware sqrt — collision, LOD, homing |
 | sin/cos scaled by a radius | `dsp1Triangle` | `dsp1` | 16-bit angles (full turn = 2^16) |
 | check the chip is there | `dsp1IsPresent` | `dsp1` | known-answer probe, never hangs |

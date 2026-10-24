@@ -6,7 +6,8 @@
 
 How to display a single 32x32 pixel sprite on screen using the SNES Object Attribute
 Memory (OAM). This is the simplest possible sprite program -- no animation, no input,
-just one sprite at the center of the screen.
+just one sprite at the center of the screen: Kit, the fox-kit courier you will meet
+again across the examples.
 
 ## Prerequisites
 
@@ -23,14 +24,14 @@ cd $OPENSNES_HOME
 make -C examples/sprites/simple_sprite
 ```
 
-Then open `simple_sprite.sfc` in your emulator (Mesen2 recommended).
+Then open `simple_sprite.sfc` in luna (`luna-gui simple_sprite.sfc`) or any emulator.
 
 ## How It Works
 
 ### 1. Load sprite graphics into VRAM
 
 ```c
-dmaCopyVram(sprite32, 0x2100, sprite32_end - sprite32);
+dmaCopyVram(kit_tiles, 0x2100, kit_tiles_end - kit_tiles);
 ```
 
 Sprite tiles go to a different VRAM region than background tiles. Here we load them
@@ -40,7 +41,7 @@ coexist by using non-overlapping address ranges.
 ### 2. Load the sprite palette
 
 ```c
-dmaCopyCGram(palsprite32, 128, 32);
+dmaCopyCGram(kit_pal, 128, 32);
 ```
 
 CGRAM (Color Generator RAM) holds 256 entries. The first 128 are for backgrounds,
@@ -115,8 +116,8 @@ an offset from this base.
 | File | Purpose |
 |------|---------|
 | `main.c` | Sprite loading, OAM setup, display configuration |
-| `res/sprite32.png.toml` | the import settings of the sprite sheet (`opensnes-sprite`: 32-pixel blocks, 16 colours); the build converts the PNG and links the result, `res/sprite32.inc` declares the symbols |
-| `res/sprite32.png` | Source 32x32 sprite image |
+| `res/kit.png.toml` | the import settings of the sprite sheet (`opensnes-sprite`: 32-pixel blocks, 16 colours); the build converts the PNG and links the result, `res/kit.inc` declares the symbols |
+| `res/kit.png` | Kit, 32x32, index 0 transparent then his 15 colours; generated for OpenSNES, CC0 (`assets/neo-lumen/`) |
 | `Makefile` | `LIB_MODULES := console dma sprite` |
 
 ## Going Further

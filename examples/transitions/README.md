@@ -3,14 +3,13 @@
 **Colour & effects — how a scene *leaves*.** Cutting hard
 between screens looks cheap; a transition sells the change. The SNES gives you
 two cheap, hardware-cheap ways to do it — dim the whole screen, or dissolve it
-into blocks — and this family is those two.
+into blocks — and one example shows both.
 
 ## The ladder
 
 | Example | Developer question |
 |---------|--------------------|
-| [fading](fading/) | How do I fade the screen in and out? |
-| [mosaic](mosaic/) | How do I pixelate / mosaic-dissolve the screen? |
+| [fading](fading/) | How do I fade the screen in and out, or dissolve it into blocks? |
 
 > An iris wipe — an HDMA-shaped window closing to a shrinking circle — is
 > `hdmaIrisWipe()`, shown in [`hdma/hdma_helpers`](../hdma/hdma_helpers/).

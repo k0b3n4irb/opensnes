@@ -26,24 +26,24 @@ picture with `opensnes-tileset`, the other the level with
 (`examples/maps/map_scroll`):
 
 ```toml
-# res/tilesMario.png.toml
+# res/roofs.png.toml
 tool = "opensnes-tileset"
 
 [convert]
-colors = 48
+colors = 16
 ```
 
 ```toml
-# res/tiledMario.tmj.toml
+# res/rooftops.tmj.toml
 tool = "opensnes-level"
 
 [convert]
-tileset = "tilesMario.map"
+tileset = "roofs.map"
 ```
 
 The build converts the level after the pictures, so the tileset's `.map` is
 fresh when the level reads it; the Makefile names neither. By hand it is
-`opensnes-level convert res/tiledMario.tmj --tileset res/tilesMario.map`.
+`opensnes-level convert res/rooftops.tmj --tileset res/roofs.map`.
 It emits four files the modules consume:
 
 | File | Content | Consumed by |
@@ -53,8 +53,8 @@ It emits four files the modules consume:
 | `<map>.b16` | per-tile collision attribute | `mapLoad()` arg 3 |
 | `<map>.o16` | the Entities object layer | the `object` module |
 
-and `<map>.inc`, which declares them for C: `tiledMario_BG1_map`,
-`tiledMario_tiledef`, `tiledMario_tileattr`, `tiledMario_objects` (each
+and `<map>.inc`, which declares them for C: `rooftops_BG1_map`,
+`rooftops_tiledef`, `rooftops_tileattr`, `rooftops_objects` (each
 with `_end`).
 
 Three more keys of `[convert]` serve games that do **not** use the `map`
@@ -66,8 +66,9 @@ module and want the same content in a different shape:
 | `quadrant = true` | `<layer>.q16` — a quadrant-ordered 64×64 tilemap | scrolling a fixed 64×64 area with `bgSetScroll` (the `background` module, not `map`) |
 | `collision = true` | `<layer>.c16` — one collision byte per map cell | `collideTile()` (a flattened grid, indexed directly) |
 
-`examples/games/rpg` scrolls a fixed 64×64 town with `background`, not
-`map` (its `town.tmj` gives the same quadrant map under `--quadrant`);
+`examples/demos/rpg` scrolls a fixed 64×64 town with `background`, not
+`map` (its `res/town.tmj.toml` asks for `quadrant`, `collision` and
+`entities`);
 `examples/maps/map_scroll` uses the default `map` pipeline. Pick the module that
 matches the map size — `map` for worlds larger than 64×64, `background` for
 a fixed screen or two.
@@ -156,9 +157,8 @@ mapSetMapOptions(MAP_OPT_BG2);    // stream a second map onto BG2
 - **`examples/maps/map_scroll`** — the full Tiled pipeline (a `.tmj` drawn in
   Tiled, converted with `opensnes-level`, loaded with `mapLoad`) and the
   minimum scroller above, a large map followed by a sprite.
-- **`examples/maps/slope_collision`** — per-tile collision *attributes* driving
+- **`examples/demos/platform_objects`** — per-tile collision *attributes* driving
   slope physics (the `.b16` values mean more than solid/empty).
-- **`examples/maps/dynamic_map`** — rewriting map tiles at runtime.
 
 ## Gotchas
 

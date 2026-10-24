@@ -19,6 +19,7 @@ Read `effects/hdma_wave` first (HDMA basics and table format).
 |--------|--------|
 | A | Remove the gradient (flat background) |
 | B | Re-enable the gradient |
+| X | The indirect gradient: 32 red bands through a pointer table |
 
 ## Build & Run
 
@@ -27,7 +28,7 @@ cd $OPENSNES_HOME
 make -C examples/hdma/gradient_colors
 ```
 
-Then open `gradient_colors.sfc` in your emulator (Mesen2 recommended).
+Then open `gradient_colors.sfc` in luna (`luna-gui gradient_colors.sfc`) or any emulator.
 
 ## How It Works
 
@@ -55,8 +56,11 @@ Each entry in `hdmaGradientList` is:
 [line_count] [cgadd_lo=0x00] [cgadd_hi=0x00] [color_lo] [color_hi]
 ```
 
-The table defines color 0 (backdrop) for groups of scanlines. By stepping through
-blues, purples, and oranges, it creates a smooth vertical gradient.
+The table defines color 0 (backdrop) for groups of scanlines: 28 bands of 8 lines,
+the city's sky at dusk, from the night at the top through indigo, violet and
+magenta to the amber glow of the streets at the bottom. The picture on BG1 is
+the OpenSNES logo, Kit over the wordmark; its sky is colour 0, never drawn, so
+the backdrop shows all around him.
 
 The table ends with a `0x00` byte (zero line count = end of HDMA table).
 
@@ -69,6 +73,27 @@ if (pad0 & KEY_B) enableGradient();
 
 HDMA can be enabled/disabled at any time. When disabled, color 0 reverts to
 whatever was last written to CGRAM.
+
+### 4. The same effect through indirect HDMA (X)
+
+![Indirect](gradient_colors_indirect.png)
+
+```c
+hdmaSetupIndirect(HDMA_CHANNEL_6, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
+                  itable, (u8)((u32)(void *)band_data >> 16));
+```
+
+With DMAP bit 6 set, a table entry is `[count][ptr_lo][ptr_hi]`: the PPU
+fetches the entry's 4-byte payload (`[CGADD][CGADD][color_lo][color_hi]`)
+through the pointer, from the bank in `$43x7` — the register plain
+`hdmaSetup()` never writes, and `hdmaSetupIndirect()` does. The payloads live
+in a WRAM array (`band_data`) the CPU can rewrite at any time without
+touching the table: the layout of dynamic per-scanline palettes. A count of
+7 fetches the payload once and holds it for 7 lines; a repeat count (`$87`)
+would fetch a fresh payload every line, the HiColor pattern.
+
+The gradient is krom (Peter Lemon)'s "Red Space Indirect HDMA" demo, ported
+to C: 32 red bands of 7 lines, `$001F` at the top fading to black.
 
 ## SNES Concepts
 
@@ -97,16 +122,16 @@ writes every scanline.
 | File | Purpose |
 |------|---------|
 | `main.c` | Gradient setup, enable/disable, input handling |
-| `res/opensnes.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it |
+| `res/logo.png.toml` | the import settings of the picture (`opensnes-tileset`); the build converts and links it |
 | `data.asm` | the HDMA gradient table (`hdmaGradientList`), hand-written |
-| `res/opensnes.png` | Source background image |
+| `res/logo.png` | the OpenSNES logo on a transparent sky, written by `devtools/art_assets/build.py` (CC0) |
 | `Makefile` | `LIB_MODULES := console dma background sprite hdma input math` |
 
 ## Going Further
 
 - **Custom gradient**: Edit the `hdmaGradientList` table in data.asm. Each entry
-  is a 15-bit SNES color (BBBBBGGGGGRRRRR in little-endian). Try creating a sunset
-  (orange to purple to dark blue).
+  is a 15-bit SNES color (BBBBBGGGGGRRRRR in little-endian). Try a dawn instead
+  (dark blue to pale gold).
 
 - **Animated gradient**: Copy the table to RAM and rotate the color entries each
   frame. This creates a flowing color effect like underwater caustics.

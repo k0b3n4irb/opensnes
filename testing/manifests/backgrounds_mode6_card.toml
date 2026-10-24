@@ -1,4 +1,4 @@
-# backgrounds/mode6 — the B test card: hi-res horizontal offset bit 3.
+# mode6 (fixture, testing/fixtures/retired_examples/mode6) — the B test card: hi-res horizontal offset bit 3.
 #
 # B freezes the wave and writes a still card into BG3's offset table: row 0
 # (horizontal words, VRAM byte $6000) = $2000 on even columns, $2008 on odd
@@ -12,7 +12,7 @@
 #   * frame 120, after B at 110: the card is up;
 #   * frame 140: the wave is frozen (wave_phase unchanged), the table is the card.
 # Measured on luna v1.30.4 (`luna state --until-frame N --input … --dump-vram`).
-rom = "../../examples/backgrounds/mode6/mode6.sfc"
+rom = "../fixtures/retired_examples/mode6/mode6.sfc"
 frames = 140
 input = "110:0x8000,112:0"        # B: test card on
 

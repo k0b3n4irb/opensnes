@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Sprites showcase — a bouncing swarm, and the OAM throughput ceiling
+ * @brief Sprites showcase — a swarm of neon moths, and the OAM throughput ceiling
  * @ingroup examples
  *
  * The finale of the sprites family, and an honest one. The SNES has 128
@@ -10,18 +10,21 @@
  * a slow long address) and cc65816 spills registers in a busy loop, so the
  * smooth ceiling for per-sprite C motion is around three dozen sprites.
  *
- * So this swarm runs a comfortable 32 dots at a rock-steady 60 fps, each
- * bouncing independently — and that number *is* the lesson:
+ * So this swarm runs a comfortable 32 neon moths at a rock-steady 60 fps,
+ * each bouncing independently through a dark alley — and that number *is*
+ * the lesson:
  *
  *   moving sprites is cheap in principle (one OAM DMA), but touching each
  *   one from C is not free. For all 128 you either move the work off the
- *   main CPU — `chips/sa1_starfield` runs 128 birds of Lissajous trig on
+ *   main CPU — `chips/sa1_starfield` runs 128 moths of Lissajous trig on
  *   the SA-1 at 10.74 MHz — or hand-write the update loop in assembly.
  *
  * Motion is deliberately cheap (integer add + edge bounce, no multiply or
  * trig) so the cost you see is the OAM update itself, not the maths.
  * Positions go straight into `oamMemory[]`; one `oam_update_flag` lets the
- * NMI's DMA push them all. Four palettes tint the cloud. Zero assets.
+ * NMI's DMA push them all. Four palettes tint the cloud. The moths flap
+ * their wings at no per-sprite cost: every one of them is tile 0, and every
+ * 8 frames one 32-byte DMA writes the other wing frame over that tile.
  *
  * ROM mode: LoROM (project default).
  *
@@ -34,25 +37,30 @@
  *   ceiling is OAM writes (bank $7E long addressing) + loop overhead, not
  *   the sprite hardware. sa1_starfield shows the coprocessor way past it
  *
+ * - Animating many sprites at once by rewriting their shared tile in VRAM
+ *   (one DMA), not their 32 OAM entries
+ *
  * @par What to Observe
- * 32 colourful dots bounce around at a steady 60 fps. `swarm_frame` (probe
- * oracle) advances every frame.
+ * 32 moths in four colours bounce around the alley at a steady 60 fps, all
+ * flapping together. `swarm_frame` (probe oracle) advances every frame.
  *
  * @par Modules Used
- * console, dma, background, sprite, math, tile
+ * console, dma, background, sprite, math
  *
  * @see lib/include/snes/sprite.h — oamSetFast, oamMemory, oam_update_flag
  * @see examples/chips/sa1_starfield — 128 sprites of trig, offloaded to the SA-1
  */
 
 #include <snes.h>
-#include <snes/tile.h>   /* tileEncode4bpp */
+
+#include "res/moth.inc"    /* generated: moth_tiles[] (two 8x8 frames), moth_pal[], each with _end */
+#include "res/alley.inc"   /* generated: alley_tiles[], alley_map[], alley_pal[], each with _end */
 
 /** @brief Sprite count — the smooth-60fps ceiling for per-sprite C motion. */
 #define NBIRDS 32
 
-/** @brief Sprite tile VRAM word address. */
-#define SPR_VRAM 0x4000
+/** @brief Sprite tile VRAM word address (after the alley's tiles, $1000-$478F). */
+#define SPR_VRAM 0x6000
 
 /* Bounce bounds (pixels), kept inside 0..255 / 0..223 so positions fit u8. */
 #define XMIN 8
@@ -69,19 +77,6 @@ static u8 by[NBIRDS];   /**< Y position */
 static s8 bvx[NBIRDS];  /**< X velocity */
 static s8 bvy[NBIRDS];  /**< Y velocity */
 
-/** @brief Scratch 8x8 tile as pixel indices, packed to 4bpp. */
-static u8 px[64];
-static u8 tilebuf[32];
-
-/** @brief Build the 8x8 dot (a filled ball), pixel index 1, rest transparent. */
-static void build_dot(void) {
-    static const u8 ball[8] = {0x3C,0x7E,0xFF,0xFF,0xFF,0xFF,0x7E,0x3C};
-    u8 r, c;
-    for (r = 0; r < 8; r++)
-        for (c = 0; c < 8; c++)
-            px[r * 8 + c] = (u8)(((ball[r] >> (7 - c)) & 1) ? 1 : 0);
-}
-
 int main(void) {
     u16 pal[64];
     u16 i;
@@ -91,17 +86,25 @@ int main(void) {
     consoleInit();
     setMode(BG_MODE1, 0);
 
-    /* Four sprite palettes (CGRAM 128+): a colourful cloud. Only colour 1. */
+    /* The alley behind them: BG1, tiles at $1000, map at $0000, palette 0 */
+    bgSetMapPtr(0, 0x0000, SC_32x32);
+    bgInitTileSet(0, alley_tiles, alley_pal, 0,
+                  alley_tiles_end - alley_tiles,
+                  PALETTE_16_SIZE, BG_16COLORS, 0x1000);
+    dmaCopyVram(alley_map, 0x0000, alley_map_end - alley_map);
+
+    /* Four sprite palettes (CGRAM 128+): a moth's colours 1 (wing), 2 (its
+     * glow) and 3 (the body) in four tints. */
     for (i = 0; i < 64; i++) pal[i] = 0;
-    pal[0 * 16 + 1] = RGB(31,  8,  8);   /* red    */
-    pal[1 * 16 + 1] = RGB( 8, 28, 31);   /* cyan   */
-    pal[2 * 16 + 1] = RGB(31, 28,  8);   /* yellow */
-    pal[3 * 16 + 1] = RGB(31, 31, 31);   /* white  */
+    pal[0 * 16 + 1] = RGB(28, 10, 18); pal[0 * 16 + 2] = RGB(31, 22, 27);   /* magenta */
+    pal[1 * 16 + 1] = RGB( 9, 26, 28); pal[1 * 16 + 2] = RGB(24, 31, 31);   /* cyan    */
+    pal[2 * 16 + 1] = RGB(30, 22, 10); pal[2 * 16 + 2] = RGB(31, 30, 24);   /* amber   */
+    pal[3 * 16 + 1] = RGB(18, 12, 28); pal[3 * 16 + 2] = RGB(27, 24, 31);   /* violet  */
+    for (i = 0; i < 4; i++) pal[i * 16 + 3] = RGB(3, 2, 5);                /* the body */
     dmaCopyCGram((u8 *)pal, OBJ_CGRAM_BASE, 128);
 
-    build_dot();
-    tileEncode4bpp(px, tilebuf);
-    dmaCopyVram(tilebuf, SPR_VRAM, 32);
+    /* Tile 0, shared by every moth: wings open (the sheet's first frame) */
+    dmaCopyVram(moth_tiles, SPR_VRAM, 32);
 
     oamInit(OBJ_SIZE8_L16, SPR_VRAM >> 13);
     oamClear();
@@ -117,7 +120,7 @@ int main(void) {
         oamSetFast(i, bx[i], by[i], 0, (u8)(i & 3), 3, 0);
     }
 
-    setMainScreen(LAYER_OBJ);
+    setMainScreen(LAYER_BG1 | LAYER_OBJ);
     setScreenOn();
 
     swarm_frame = 0;
@@ -138,6 +141,10 @@ int main(void) {
         oam_update_flag = 1;
         swarm_frame = (u16)(swarm_frame + 1);
         WaitForVBlank();
+        /* Every 8 frames, the other wing frame over tile 0: one 32-byte DMA,
+         * in VBlank, flaps all 32 moths */
+        if ((swarm_frame & 7) == 0)
+            dmaCopyVram(moth_tiles + (((swarm_frame >> 3) & 1) << 5), SPR_VRAM, 32);
     }
 
     return 0;

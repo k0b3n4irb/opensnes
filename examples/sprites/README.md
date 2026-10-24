@@ -13,8 +13,7 @@ frame.
 | [simple_sprite](simple_sprite/) | How do I put one sprite on screen? |
 | [sprite_sizes](sprite_sizes/) | How do I use the six OBJ size modes (8×8…64×64)? |
 | [animated_sprite](animated_sprite/) | How do I frame-animate a sprite (+H-flip)? |
-| [dynamic_sprite](dynamic_sprite/) | How do I stream sprite tiles into VRAM per frame? |
-| [dynamic_metasprite](dynamic_metasprite/) | How do I stream a *multi-tile* character (dynamic + meta)? |
+| [dynamic_sprite](dynamic_sprite/) | How do I stream sprite tiles into VRAM per frame — single sprites, and (SELECT) a *multi-tile* character? |
 | [sprite_swarm](sprite_swarm/) | How many sprites can I actually move at 60 fps, and why? |
 | [world_sprites](world_sprites/) | How do I place sprites in world coordinates under a camera (culling, depth sort, one call per batch)? |
 | [aseprite_pipeline](aseprite_pipeline/) | How do I animate a metasprite from an Aseprite export? |
@@ -37,5 +36,4 @@ bit and size select.
 
 **Many sprites per frame** — write straight to the `oamMemory[]` buffer rather
 than calling `oamSet()` repeatedly; the NMI handler DMAs the buffer to OAM
-hardware when `oam_update_flag` is set. `dynamic_sprite` and
-`dynamic_metasprite` build on this.
+hardware when `oam_update_flag` is set. `dynamic_sprite` builds on this.

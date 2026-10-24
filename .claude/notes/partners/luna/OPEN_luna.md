@@ -197,3 +197,41 @@ watched instruction (one ahead before). Save states of 1.38.0 are refused
 missing from 1.38.0 (09-1 / 02-4). The bump is a lot of its own: the full
 suite, the corpus golden queries (`partners.md` step 4), the luna page
 regenerated from `--help`.
+
+2026-10-18, a manifest checkpoint takes no `[blocks]` (luna v1.39.0, the pin).
+Asked: `[checkpoint.blocks]`, the same
+`{ space, offset, hex }` entries as `[asserts.blocks]`, checked at the
+checkpoint's frame or symbol arrival. Came back: `unknown field 'blocks',
+expected one of 'at_frame', 'at_symbol', 'hit', 'until_if', 'input',
+'input2', 'mouse', 'superscope', 'values', 'ppu', 'gsu', 'delta', 'fbhash'`.
+Needed because a checkpoint at a loop iteration (`at_symbol` + `hit`) is the
+form that does not move with the boot's length, and the offset rows of
+`dma_mode2_opt_table.toml` are 32 words: they are now 40 `"vram:NNNN"` value
+lines where one block line said it. Replay: any manifest with a
+`[checkpoint.blocks]` table. Not blocking; a light request.
+
+## 2026-10-21 — luna's commercial corpus as a negative control for its oracles (sent to luna's session)
+
+The owner's idea: ROMs written in assembly by professional teams separate a
+luna false positive from a defect of ours. Run locally (luna 1.39.0, luna's
+own `tests/roms`, outputs kept outside both repositories): `luna bench -f 600`
+gives 41 ok, 0 bug, 0 suspect (its compatibility page still dates from
+1.32.0); our `[asserts.dma] unsafe_writes = 0` at 600 frames passes on all
+42 files in 14 s (`luna test --jobs 0`). Asked: (a) run its oracles (dma,
+`profile --budget`, bench's "suspect" heuristic) on that corpus at each
+release; (b) `bench` has no `--jobs` (82 s, serial, where `luna test` does
+the same set in 14 s). luna answered the same day: yes to (a) for the DMA oracle and bench's
+"suspect" verdict, no to `profile --budget` (commercial games really lag, so
+an overrun does not point at luna); yes to (b), `bench --jobs N` with
+`luna test`'s semantics.
+
+The ❌ of run 39567752990 is `mode7/dsp1_ground`, and it is the firmware:
+CI has no `dsp1b.rom` (Nintendo's, not distributable), luna reports "CPU
+stuck in a 30-address loop… hang" plus "missing coprocessor firmware
+'dsp1b.rom' (inert)" and files it as ❌ bug, not 🔑 firmware. Reproduced on
+arm64 with `XDG_CONFIG_HOME=/nonexistent luna bench` (1 bug), ok with the
+firmware: not an architecture gap. Asked: when the firmware is missing, the
+verdict should be 🔑 firmware, whatever the CPU then does. Our side,
+`make luna-bench` skips the DSP-1 examples when the firmware is absent, as
+the manifests do. Small rub also sent: `bench` ignores `HDMADEMO.SMC`
+(upper-case extension) where `luna test` takes it — the 42nd file.

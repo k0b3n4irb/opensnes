@@ -137,7 +137,9 @@ mouse/
 │                     the build converts and links it, res/cursor.inc declares the symbols
 ├── Makefile      — Build configuration (6 library modules)
 └── res/
-    └── cursor.png — 16x16 cursor sprite source graphic (4bpp)
+    └── cursor.png — the 16x16 cursor: assets/neo-lumen/ui/cursor.png (PixelLab, CC0),
+                     moved by devtools/art_assets/build.py so its tip, the hot
+                     spot, is the top-left pixel
 ```
 
 ## Build & Run

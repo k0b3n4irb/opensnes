@@ -1,7 +1,5 @@
 # Mode 7 -- Rotation and Scaling
 
-![Demo](rotate_scale_demo.gif)
-
 ![Screenshot](rotate_scale.png)
 
 ## What This Example Shows
@@ -9,6 +7,11 @@
 How to use the SNES Mode 7 -- a special background mode that applies an affine
 transformation (rotation + scaling) to a single 128x128 tile layer. This is the
 same technique behind F-Zero's ground, Mario Kart's tracks, and Pilotwings' maps.
+
+A glider flies over the plane, and the zoom is its altitude: zoom out and the
+view widens as if it climbed, while its shadow slides further away; zoom in
+and the shadow closes in. Scale and shadow are the two cues that make a flat
+Mode 7 plane read as height.
 
 ## Prerequisites
 
@@ -21,8 +24,8 @@ different from tile-based modes but the initialization flow is similar.
 |--------|--------|
 | A | Rotate clockwise |
 | B | Rotate counter-clockwise |
-| D-PAD Up | Zoom out (see more of the plane) |
-| D-PAD Down | Zoom in (magnify) |
+| D-PAD Up | Zoom out (see more of the plane) — the glider climbs, its shadow drifts away |
+| D-PAD Down | Zoom in (magnify) — the glider descends, its shadow closes in |
 
 ## Build & Run
 
@@ -31,7 +34,7 @@ cd $OPENSNES_HOME
 make -C examples/mode7/rotate_scale
 ```
 
-Then open `mode7.sfc` in your emulator (Mesen2 recommended).
+Then open `rotate_scale.sfc` in luna (`luna-gui rotate_scale.sfc`) or any emulator.
 
 ## How It Works
 
@@ -85,6 +88,24 @@ After changing the scale, you must call `mode7SetAngle()` again because the matr
 depends on both angle and scale. The scale range is clamped to `0x0008`-`0x0780` --
 values outside this range produce extreme distortion.
 
+### 4. The rotation centre, and the glider on it
+
+`M7X`/`M7Y` name the point of the plane the matrix turns around; the scroll
+(`M7HOFS`/`M7VOFS`) says where that point lands on screen. `mode7Init()` sets
+the centre to (128, 128) and leaves it above the screen, so the example
+scrolls by (0, 16) to put it on screen line 112, the middle:
+
+```c
+mode7SetScroll(0, 16);       /* plane point (128, 128) -> screen (128, 112) */
+```
+
+The glider is Kit's, a 32x32 sprite drawn there; the plane turns under it.
+Its shadow is the same picture in an all-dark palette, drawn `zscale >> 5`
+pixels below: 8 at 1:1, up to 60 at the widest view. The glider is OAM entry
+0 and the shadow entry 1: between two sprites the lower index is drawn in
+front, whatever their priority bits, which only rank a sprite against the
+backgrounds ([SNESdev wiki, Sprites](https://snes.nesdev.org/wiki/Sprites)).
+
 ## SNES Concepts
 
 ### Affine Transformation
@@ -119,22 +140,20 @@ the low byte.
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Input handling, rotation/zoom logic |
+| `main.c` | Input handling, rotation/zoom logic, the glider and its shadow |
 | `res/mode7bg.png.toml` | the import settings of the Mode 7 picture (`opensnes-tileset`, `mode = 7`); the build converts and links it, `res/mode7bg.inc` declares the symbols |
-| `res/mode7bg.png` | Source image for Mode 7 ground |
+| `res/mode7bg.png` | the city from above, 1024x1024 in 235 tiles, written by `devtools/art_assets/mode7.py` (CC0, `assets/neo-lumen/`) |
+| `res/glider.png`, `res/glider.png.toml` | Kit's glider from above, 32x32 (`opensnes-sprite`) |
 | `Makefile` | `LIB_MODULES := console dma background sprite input mode7` |
 
 ## Going Further
 
-- **Add scrolling**: Use `mode7SetPos()` to pan across the Mode 7 plane with the
-  D-pad while rotating. This is how F-Zero navigates its tracks.
-
-- **Add sprites on top**: Load sprite tiles and place an OAM sprite over the
-  rotating background. Mode 7 supports full sprite rendering.
+- **Fly forward**: move the centre along the heading with `mode7SetCenter()`
+  and the same scroll offset, as `mode7/mode7_racing` drives its kart.
 
 - **Explore related examples**:
   - `mode7/perspective` -- Per-scanline scaling for pseudo-3D (F-Zero style)
-  - `effects/hdma_wave` -- HDMA can modify Mode 7 parameters per scanline
+  - `hdma/hdma_wave` -- HDMA can modify Mode 7 parameters per scanline
 
 ## Modules Used
 

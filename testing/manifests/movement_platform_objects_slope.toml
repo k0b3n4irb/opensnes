@@ -1,0 +1,51 @@
+# demos/platform_objects on its rooftops with ramps: the objCollidMapWithSlopes()
+# fixture. Walking into a slope tile must push the object's Y to the slope's
+# surface instead of stopping it like a wall. That distinction is invisible
+# to both other pillars: the example needs the D-pad to move at all, and
+# liveness and the fbhash baseline run it with no input, so Kit stands on
+# his spawn tile for the whole captured run.
+#
+# RIGHT held from frame 60, A at frame 150 over the first vent; the first
+# ramp is a 22.5-degree one, two rows up over four columns (x 288-319),
+# measured on luna on 2026-10-19 (kitx/kity are world coordinates of the
+# 16x16 box, Y growing downward):
+#
+#   frame 280  (268, 160)  on the flat before the ramp
+#   frame 300  (292, 154)  on the ramp: lifted 6 px while moving right
+#   frame 320  (312, 145)  higher up the ramp
+#   frame 340  (331, 144)  on the flat at the top, two rows (16 px) higher
+#
+# A slope treated as a wall stops kitx before the ramp; a slope ignored
+# leaves kity at 160, under the ramp's surface.
+rom = "../../examples/demos/platform_objects/platform_objects.sfc"
+input = "60:0x0100,150:0x0180,152:0x0100"
+
+[[checkpoint]]                 # the flat before the ramp
+at_frame = 280
+[checkpoint.values]
+kitx = { eq = 268, width = 2 }
+kity = { eq = 160, width = 2 }
+
+[[checkpoint]]                 # on the ramp: pushed UP, not stopped
+at_frame = 300
+[checkpoint.values]
+kitx = { eq = 292, width = 2 }
+kity = { eq = 154, width = 2 }
+[checkpoint.delta]
+kitx = "increased"
+kity = "decreased"
+
+[[checkpoint]]
+at_frame = 320
+[checkpoint.values]
+kitx = { eq = 312, width = 2 }
+kity = { eq = 145, width = 2 }
+
+[[checkpoint]]                 # the top of the ramp
+at_frame = 340
+[checkpoint.values]
+kitx = { eq = 331, width = 2 }
+kity = { eq = 144, width = 2 }
+
+[asserts.dma]
+unsafe_writes = 0

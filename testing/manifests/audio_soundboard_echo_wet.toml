@@ -1,0 +1,20 @@
+# START turns the hall on: every voice routed into the echo, the wet
+# volumes audioSetEcho() was given, the DSP writing the ring. The ring and
+# the FIR are the ones configured at boot, not re-uploaded.
+# (Was audio_echo_wet.toml, on the echo example, before the merge.)
+rom = "../../examples/audio/soundboard/soundboard.sfc"
+frames = 300
+input = "220:0x1000,225:0"
+
+[asserts.dsp]
+EON    = 0xFF        # every voice into the echo
+EVOL_L = 0x23        # wet volume 35, both sides
+EVOL_R = 0x23
+FLG    = 0x00        # ECEN clear: the DSP writes the ring
+EFB    = 0x46
+EDL    = 0x05
+ESA    = 0xD7
+FIR0   = 0x7F
+FIR1   = 0x00
+MVOL_L = 0x7F
+MVOL_R = 0x7F

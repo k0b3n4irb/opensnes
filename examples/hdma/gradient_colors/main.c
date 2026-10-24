@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief HDMA-driven per-scanline backdrop color gradient
+ * @brief HDMA-driven backdrop gradients: a direct table, and an indirect one
  * @ingroup examples
  *
  * Uses HDMA to rewrite CGRAM color 0 (the backdrop color) on every scanline
@@ -9,20 +9,33 @@
  * 4 bytes per entry to consecutive register pairs: two bytes to CGADD
  * ($2121) to select color index 0, then two bytes to CGDATA ($2122) to
  * write the 15-bit BGR color value. A pre-built HDMA table in ROM defines
- * the gradient colors for each scanline group. This technique was widely
+ * the gradient colors for each scanline group: the city's sky at dusk,
+ * behind the OpenSNES logo. This technique was widely
  * used in SNES games for sky gradients, underwater tinting, and lava glow
  * effects without consuming any CPU time.
+ *
+ * Press X for the same effect through INDIRECT HDMA: the table holds
+ * [count][pointer] entries and the PPU fetches each band's 4-byte payload
+ * through the pointer ($43x7 selects its bank). The payloads live in a WRAM
+ * array the CPU can rewrite freely — the layout of dynamic per-scanline
+ * palettes. The indirect gradient is krom (Peter Lemon)'s "Red Space
+ * Indirect HDMA" (32 red bands of 7 lines), ported to C.
  *
  * @par SNES Concepts
  * - HDMA mode 3 (2REG_2X) targeting CGADD + CGDATA
  * - Per-scanline CGRAM color modification (color 0 = backdrop)
  * - HDMA table format: [count] [CGADD_lo] [CGADD_hi] [color_lo] [color_hi]
  * - Runtime HDMA enable/disable toggling
+ * - INDIRECT HDMA (DMAP bit 6): [count][ptr16] entries, the payload's bank in
+ *   $43x7, which hdmaSetupIndirect() writes; a count of 7 fetches the payload
+ *   once and holds it for 7 lines
+ * - A C pointer's bank for $43x7: (u8)((u32)(void *)data >> 16)
  *
  * @par What to Observe
- * - A vertical color gradient covers the screen behind the background tiles
+ * - A dusk gradient (night, violet, magenta, amber) behind Kit and the wordmark
  * - Press A to disable the gradient (flat backdrop color returns)
  * - Press B to re-enable the gradient effect
+ * - Press X for the indirect gradient: 32 red bands, brightest at the top
  *
  * @par Modules Used
  * console, dma, background, sprite, hdma, input
@@ -34,7 +47,7 @@
 #include <snes/hdma.h>
 
 /** @brief 4bpp tile data for the background layer. */
-#include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
+#include "res/logo.inc"   /* generated: logo_tiles[], logo_map[], logo_pal[], each with _end */
 /** @brief Tilemap data (32x32 tile grid) for the background layer. */
 /** @brief 15-bit BGR palette for the background (up to 16 colors). */
 
@@ -55,6 +68,55 @@ extern u8 hdmaGradientList[];
 
 u8 pada;    /**< Edge-detection flag for A button (prevents repeat triggers while held) */
 u8 padb;    /**< Edge-detection flag for B button */
+u8 padx;    /**< Edge-detection flag for X button */
+
+/** @brief Bands of the indirect gradient, and scanlines per band (32 x 7 = 224) */
+#define NBANDS       32
+#define BAND_LINES   7
+
+/** @brief The bands' payloads: [CGADD][CGADD][color_lo][color_hi] each */
+static u8 band_data[NBANDS][4];
+
+/** @brief The indirect table: [count][ptr_lo][ptr_hi] per band + terminator */
+static u8 itable[NBANDS * 3 + 1];
+
+/**
+ * @brief Build the indirect gradient's payloads and pointer table, once.
+ *
+ * A red ramp $1F..$00 (BGR555: red is bits 0-4, so the high byte stays 0);
+ * each band's entry points at its payload and holds it for BAND_LINES lines.
+ */
+static void buildIndirect(void) {
+    u8 i;
+    u8 *p = itable;
+
+    for (i = 0; i < NBANDS; i++) {
+        band_data[i][0] = 0;                    /* $2121: CGADD = 0     */
+        band_data[i][1] = 0;                    /* $2121 (second write) */
+        band_data[i][2] = (u8)(0x1F - i);       /* $2122: color low     */
+        band_data[i][3] = 0;                    /* $2122: color high    */
+    }
+    for (i = 0; i < NBANDS; i++) {
+        u16 ptr = (u16)(u32)(void *)band_data[i];
+        *p++ = BAND_LINES;
+        *p++ = (u8)(ptr & 0xFF);
+        *p++ = (u8)(ptr >> 8);
+    }
+    *p = 0;                                     /* end of HDMA table */
+}
+
+/**
+ * @brief Switch channel 6 to the indirect gradient.
+ *
+ * Same channel, same registers (2REG_2X to CGADD); the table is the pointer
+ * table, and the payloads' bank goes in $43x7.
+ */
+void enableIndirect(void) {
+    hdmaDisableAll();
+    hdmaSetupIndirect(HDMA_CHANNEL_6, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD,
+                      itable, (u8)((u32)(void *)band_data >> 16));
+    hdmaEnableMask(1 << HDMA_CHANNEL_6);
+}
 u16 pad0;   /**< Current joypad button state */
 
 /**
@@ -102,14 +164,14 @@ int main(void) {
     consoleInit();
 
     /* Load BG1 tiles and palette */
-    bgInitTileSet(0, opensnes_tiles, opensnes_pal, 0,
-                  opensnes_tiles_end - opensnes_tiles,
-                  opensnes_pal_end - opensnes_pal,
+    bgInitTileSet(0, logo_tiles, logo_pal, 0,
+                  logo_tiles_end - logo_tiles,
+                  logo_pal_end - logo_pal,
                   BG_16COLORS, 0x4000);
 
     /* Load tilemap */
     bgSetMapPtr(0, 0x0000, BG_MAP_32x32);
-    dmaCopyVram(opensnes_map, 0x0000, opensnes_map_end - opensnes_map);
+    dmaCopyVram(logo_map, 0x0000, logo_map_end - logo_map);
 
     setMode(BG_MODE1, 0);
     setMainScreen(TM_BG1);
@@ -118,8 +180,10 @@ int main(void) {
 
     /* Initialize gradient effect */
     enableGradient();
+    buildIndirect();
     pada = 0;
     padb = 0;
+    padx = 0;
 
     while (1) {
         pad0 = padHeld(0);
@@ -142,6 +206,16 @@ int main(void) {
             }
         } else {
             padb = 0;
+        }
+
+        /* Press X for the indirect gradient */
+        if (pad0 & KEY_X) {
+            if (!padx) {
+                padx = 1;
+                enableIndirect();
+            }
+        } else {
+            padx = 0;
         }
 
         WaitForVBlank();

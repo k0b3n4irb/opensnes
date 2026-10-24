@@ -1,6 +1,6 @@
 # Browse Examples by Category {#examples_by_category}
 
-All 85 examples organized by topic. For a progressive learning path, see
+All 60 examples organized by topic. For a progressive learning path, see
 @ref learning_path.
 
 ---
@@ -12,7 +12,6 @@ Print text, then move it.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_text_print_string | Print a string with the built-in font (`textModeInit` + `textPrintAt`) |
-| @subpage examples_text_scroll_message | Move text: scroll the text layer for a marquee (`bgSetScroll`) |
 | @subpage examples_text_pixel_text | Proportional text composed at the pixel: tileBlitGlyph2bpp() into a 2bpp layer |
 
 ---
@@ -34,13 +33,9 @@ The PPU's background modes — colour vs layers vs resolution.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_backgrounds_mode1 | Mode 1 multi-layer backgrounds (4bpp + 2bpp) |
-| @subpage examples_backgrounds_mode1_bg3_priority | BG3 priority bit for overlay effects |
-| @subpage examples_backgrounds_mode1_lz77 | LZ77-compressed background data |
-| @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (Kirby parallax) |
+| @subpage examples_backgrounds_mode0 | Mode 0: four 2bpp background layers (the city in parallax) |
 | @subpage examples_backgrounds_mode3 | Mode 3: 256-colour (8bpp) single layer |
-| @subpage examples_backgrounds_mode2 | Mode 2 offset-per-tile: per-column scroll from BG3 (modes 2/4/6) |
-| @subpage examples_backgrounds_mode4 | Mode 4: a 256-colour layer with offset-per-tile, one row of H-or-V words |
-| @subpage examples_backgrounds_mode6 | Mode 6: one hi-res 4bpp layer with offset-per-tile, 16-half-pixel columns |
+| @subpage examples_backgrounds_mode2 | Offset-per-tile in Mode 2 (two rows) and Mode 4 (one row, 256 colours): per-column scroll from BG3 |
 | @subpage examples_backgrounds_mode5_hires | Mode 5 + interlace hi-res text (512×448) (krom port) |
 
 ---
@@ -54,8 +49,7 @@ Sprite display, animation, and OAM management.
 | @subpage examples_sprites_simple_sprite | Basic OAM setup, sprite display |
 | @subpage examples_sprites_sprite_sizes | OBJSEL size configurations (8x8 to 64x64) |
 | @subpage examples_sprites_animated_sprite | Frame animation, sprite sheets, H-flip |
-| @subpage examples_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads |
-| @subpage examples_sprites_dynamic_metasprite | Dynamic metasprite engine with batched OAM updates |
+| @subpage examples_sprites_dynamic_sprite | VRAM streaming, dynamic tile uploads; SELECT: metasprites under three OBJSEL size pairs |
 | @subpage examples_sprites_sprite_swarm | A bouncing swarm + the per-sprite OAM throughput ceiling |
 | @subpage examples_sprites_world_sprites | World-space sprites: a camera, culling and OAM in one call per batch |
 | @subpage examples_sprites_aseprite_pipeline | The asset pipeline: an Aseprite export through `opensnes-sprite` into an animated metasprite |
@@ -69,7 +63,7 @@ Move a world past the camera.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_scrolling_mixed_scroll | Multiple BG layers at different scroll rates |
-| @subpage examples_scrolling_continuous_scroll | Streaming scroll with dynamic tile loading |
+| @subpage examples_scrolling_continuous_scroll | A threshold camera over two layers in parallax |
 | @subpage examples_scrolling_parallax_scroll | Per-scanline HDMA parallax scrolling |
 
 ---
@@ -85,6 +79,7 @@ The rotate/scale plane — the SNES's signature trick.
 | @subpage examples_mode7_perspective_rotate | Full Mode 7 matrix rotation per scanline (krom port) |
 | @subpage examples_mode7_dsp1_ground | Super Mario Kart floor: DSP-1 Raster streams the per-scanline matrices |
 | @subpage examples_mode7_extbg | EXTBG: one plane split in two layers by bit 7, a sprite between them |
+| @subpage examples_mode7_mode7_racing | F-Zero camera: a hover-bike race, rivals placed on the turning plane |
 
 ---
 
@@ -95,7 +90,6 @@ Change a register every scanline.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_hdma_gradient_colors | HDMA + CGRAM colour gradients |
-| @subpage examples_hdma_hdma_indirect_gradient | Indirect HDMA pointer-table gradient (krom port) |
 | @subpage examples_hdma_hdma_wave | HDMA wave: a hand-built table (krom port), then the hdma module's helper |
 | @subpage examples_hdma_hdma_helpers | High-level HDMA effect library (wave, ripple, iris) |
 
@@ -112,7 +106,6 @@ Colour math, palette bypass, and beating the 256-colour limit.
 | @subpage examples_color_shadow_tint | Shadow & tint: darken or colour-cast a whole scene via fixed-colour math |
 | @subpage examples_color_direct_color | Direct colour mode: the 8bpp pixel byte IS the RGB colour |
 | @subpage examples_color_hicolor_1792 | 1792 colours from a 4bpp background via per-tile-row HDMA (krom port) |
-| @subpage examples_color_pseudo_hires | 50 % blend of two layers by pseudo-hires (SETINI bit 3), no colour math |
 
 ---
 
@@ -124,7 +117,6 @@ Mask part of the screen — static or HDMA-shaped.
 |---------|-------------|
 | @subpage examples_windows_window | Hardware window masking |
 | @subpage examples_windows_window_multi_hdma | Both hardware windows animated per scanline (krom port) |
-| @subpage examples_windows_transparent_window | Colour math + HDMA windowed transparency |
 
 ---
 
@@ -134,8 +126,7 @@ How a scene leaves.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_transitions_fading | Brightness control, screen transitions |
-| @subpage examples_transitions_mosaic | Mosaic pixelation effect |
+| @subpage examples_transitions_fading | Brightness fades at three speeds and the mosaic dissolve |
 
 ---
 
@@ -146,7 +137,6 @@ Controller input: joypads, mouse, and Super Scope.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_input_controller | Standard joypad: button state, edge detection |
-| @subpage examples_input_two_players | Joypad reading, two-player movement |
 | @subpage examples_input_mouse | Mouse detection, cursor, sensitivity |
 | @subpage examples_input_superscope | Light gun detection, PPU H/V counters |
 
@@ -158,15 +148,11 @@ Tracker music (SNESMOD), the raw-APU engine from C, and DSP tricks.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls (LoROM) |
-| @subpage examples_audio_snesmod_sfx | Sound effects alongside music |
+| @subpage examples_audio_snesmod_music | SPC700 music playback, transport controls, sound effects over the music |
 | @subpage examples_audio_soundboard | Audio v2 engine driven entirely from C (resident SPC700 driver) |
 | @subpage examples_audio_sfx_from_wav | One-shot SFX from WAV: a settings file beside each .wav, converted by opensnes-sample |
 | @subpage examples_audio_apu_switch | Hot-swapping APU programs at runtime |
-| @subpage examples_audio_play_noise | A drum kit from the S-DSP white-noise generator (krom port) |
-| @subpage examples_audio_pitch_mod | Hardware vibrato via pitch modulation (PMON) (krom port) |
 | @subpage examples_audio_speech_synth | BRR speech playback: the SNES says "OPEN SNES" (krom port) |
-| @subpage examples_audio_echo | S-DSP echo / reverb, isolated — START toggles dry/wet |
 
 ---
 
@@ -177,8 +163,6 @@ Tile-based maps, streaming, Tiled pipeline, and collision.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_maps_map_scroll | Smooth tile-aligned scrolling with viewport tracking |
-| @subpage examples_maps_dynamic_map | Dynamic tile map streaming |
-| @subpage examples_maps_slope_collision | Slopes and tile-based collision |
 
 ---
 
@@ -189,9 +173,7 @@ The reusable logic toolbox.
 | Example | Description |
 |---------|-------------|
 | @subpage examples_basics_collision_demo | Bounding-box sprite collision detection |
-| @subpage examples_basics_aim_target | Aim a cursor at moving targets — sprites + input |
-| @subpage examples_basics_fix32_orbit | 16.16 fixed-point API: a sprite orbits the screen centre |
-| @subpage examples_basics_timer | Frame-accurate timers with VBlank counters |
+| @subpage examples_basics_aim_target | Aim, distance and angle; a sprite orbiting in 16.16 fixed point |
 | @subpage examples_basics_scene_stack | Scene stack: title → game → pause workflow |
 | @subpage examples_basics_panel_hud | 9-slice HUD + dialog box on one layer (the `panel` module) |
 | @subpage examples_basics_game_skeleton | The smallest complete game: title → play → game-over state machine |
@@ -220,9 +202,7 @@ sharing I-RAM with the main CPU for inter-processor communication.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_chips_sa1_hello | Boot diagnostic: SA-1 init, I-RAM handshake, register verification |
 | @subpage examples_chips_sa1_starfield | 128-dot Lissajous murmuration driven by SA-1 math |
-| @subpage examples_chips_sa1_save | A boot counter in battery-backed BW-RAM: one more at every power-on |
 
 ### Super FX (GSU)
 
@@ -231,9 +211,7 @@ hardware multiply, and direct framebuffer access for 3D and bitmap effects.
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_chips_superfx_hello | Boot + SRAM + FMULT hardware tests |
 | @subpage examples_chips_superfx_3d | Rotating wireframe cube (Star Fox style 3D) |
-| @subpage examples_chips_superfx_save | A boot counter in the GSU's battery-backed Game Pak RAM, above the framebuffers |
 | @subpage examples_chips_superfx_game_skeleton | A 60 fps game loop while the GSU renders; double-buffered presentation |
 
 ### DSP-1 Coprocessor
@@ -243,21 +221,28 @@ matrix, vector and projection ops for pseudo-3D (Pilotwings, Super Mario Kart).
 
 | Example | Description |
 |---------|-------------|
-| @subpage examples_chips_dsp1_cube | Pseudo-3D: a cube's 8 corners tumbling in 3D, rotated by the DSP-1 |
 
 ---
 
-## Games (capstones)
+## Demos
 
-Complete game projects combining multiple subsystems.
+Playable demonstrations: several modules in one scene, without a game's
+rules (no score, no end).
+
+| Example | Description |
+|---------|-------------|
+| @subpage examples_demos_platform_objects | Map engine with interactive objects |
+| @subpage examples_demos_shmup | Vertical shoot 'em up: Kit's glider over the city against the security's hunters |
+| @subpage examples_demos_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |
+
+---
+
+## Games
+
+Complete games, from the title screen to the game over.
 
 | Example | Description |
 |---------|-------------|
 | @subpage examples_games_breakout | Breakout clone: sprites, input, game logic, scoring |
-| @subpage examples_games_tetris | Tetris with Korobeiniki music, multi-line clear |
-| @subpage examples_games_likemario | Platformer with scrolling, animation, physics |
-| @subpage examples_games_mapandobjects | Map engine with interactive objects |
-| @subpage examples_games_shmup_1942 | Vertical shoot 'em up (Kenney Pixel Shmup assets) |
-| @subpage examples_games_mode7_racing | F-Zero-style racer on the rotating Mode 7 plane |
-| @subpage examples_games_mode7_flying | Pilotwings-style flight: altitude drives Mode 7 scale |
-| @subpage examples_games_rpg | RPG template: Tiled map drives collision and entities, dialog boxes |
+| @subpage examples_games_blocks | Falling-blocks puzzle with Korobeiniki music, multi-line clear |
+| @subpage examples_games_rooftop_run | Kit's Rooftop Run: a platformer with shards, stompable machines, lives, checkpoints and a goal |

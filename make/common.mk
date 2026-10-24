@@ -82,7 +82,7 @@ BANK0_FAIL_THRESHOLD ?= 0
 # $2000 always hard-fails; the free-space ratchet is set just below the
 # corpus minimum (breakout: 668 bytes free as of 2026-07-11) so the next
 # big RAMSECTION fails fast instead of corrupting at runtime. The warn
-# threshold gives early drift visibility (breakout/tetris warn today —
+# threshold gives early drift visibility (breakout/blocks warn today —
 # deliberate: they ARE within 1 KB of the ceiling).
 RAM_FAIL_THRESHOLD ?= 512
 
@@ -580,7 +580,7 @@ CLANG_LINT_FLAGS := -fsyntax-only -fno-builtin -Wall -Wextra -Werror \
 # Step 3: wrap with memmap and assemble via wla-65816.
 # SKIP_LINT=1 disables the syntax check (escape hatch for environments
 # without clang; CI always runs with the check enabled).
-# Local headers count too (2026-09-26): tetris's main.c includes board.h,
+# Local headers count too (2026-09-26): blocks's main.c includes board.h,
 # piece.h, render.h and hud.h, and editing them rebuilt nothing. Every .h
 # next to a C source, rather than exact -MD deps: cheap and never stale.
 # When a source fails to compile, say which of its names OpenSNES 0.49 removed

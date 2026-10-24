@@ -128,9 +128,9 @@ and see where it lands.
 ### Perspective projection (the pseudo-3D pipeline)
 | Opcode | Name | In | Out | Purpose |
 |--------|------|----|----|---------|
-| `$02`,`$12`,`$22`,`$32` | Parameter | 7 | **4** | set global viewpoint/perspective (Fx,Fy,Fz,Lfe,Les,Aas,Azs → **Vof, Vva, Cx, Cy** — order per the official manual §5.4.1, confirmed by the Raster probe 2026-09-03, see §15). Out=4 CONFIRMED twice: luna SMK trace (#161) AND direct probing 2026-09-02. Behaviour characterised empirically (luna DSP-1B): all-zero setup is **degenerate** (every Project → 0,0); `azs=$4000` → view axis = **+Y** (X across, Z up); projected offset ≈ `(lfe+les)·x/y`; `fz` = camera height; H is mirrored (negative for +x) and Project V is up-positive. ★ |
+| `$02`,`$12`,`$22`,`$32` | Parameter | 7 | **4** | set global viewpoint/perspective (Fx,Fy,Fz,Lfe,Les,Aas,Azs → **Vof, Vva, Cx, Cy** — order per the official manual §5.4.1, confirmed by the Raster probe 2026-09-03, see §15). Out=4 CONFIRMED twice: luna SMK trace (#161) AND direct probing 2026-09-02. Behaviour characterised empirically (luna DSP-1B): all-zero setup is **degenerate** (every Project → 0,0); projected offset ≈ `(lfe+les)·x/depth`; `fz` = camera height. **Corrected 2026-10-18:** with `aas=0` the view looks along **−Y**, and Project's **H is right-positive, V down-positive**, relative to the screen centre; **M > 0 in front of the eye, < 0 behind** (§6b). The earlier "view axis +Y, H mirrored, V up-positive" was read off the cube, whose points sat behind the eye. ★ |
 | `$06`,`$16`,`$26`,`$36` | **Project** | 3 (I x,y,z) | 3 (H,V,M) | world point → screen X, screen Y, scale/depth ★ |
-| `$0E`,`$1E`,`$2E`,`$3E` | Target | 2 (h,v) | 2 (x,y) | inverse of Project: screen → ground plane (aim/pick). Probed 2026-09-03: (h,v) are **raster-style** screen coords relative to the imaginary centre (v down-positive, NOT Project's up-positive V); Target(0,0) returns exactly (Cx,Cy). ★ |
+| `$0E`,`$1E`,`$2E`,`$3E` | Target | 2 (h,v) | 2 (x,y) | inverse of Project: screen → ground plane (aim/pick). Probed 2026-09-03: (h,v) are **raster-style** screen coords relative to the imaginary centre (h right-positive, v down-positive, like Project's H and V; measured 2026-10-19, §6b); Target(0,0) returns exactly (Cx,Cy). ★ |
 | `$0A` (**use this**), `$1A` (wedges — see §15) | Raster | **1** (Vs) + sentinel | 4 per raster, **unbounded** | per-scanline Mode-7 matrix STREAM: A→B→C→D→A… for rasters Vs, Vs+1, … until the CPU writes **`$8000` to DR in place of reading a D**. luna's "5 setup words" on SMK = Vs + 4×`$8000` (the game writes the sentinel four times so one lands on a D slot). Fully characterised by the 2026-09-03 probe, §15. ★ |
 ### Control / diagnostics (not demo math)
 - `$80` **Sync/Reset** — 0 in / 0 out. Flushes pending command state
@@ -152,7 +152,7 @@ Minimal cube (the module's first target):
 Init (once, or when camera moves):
   Parameter ($02): camera setup  -> cache Cx,Cy (tune Lfe/Les for FOV empirically)
   [dsp1-v2, 2026-09-02: working reference config = (0,0,0, lfe=96, les=256,
-   aas=0, azs=$4000) — the dsp1_cube example + docs/tutorials/dsp1.md use it]
+   aas=0, azs=$4000) — used by the dsp1_cube example until 2026-10-18; see §6b]
 Per frame:
   Attitude A ($01): S=$7FFF, θz,θy,θx        -> rotation matrix in slot A
   for each of 8 vertices (model x,y,z):
@@ -161,6 +161,43 @@ Per frame:
   CPU draws the 12 edges between the 8 projected (H,V) points
       (the DSP-1 has NO line/pixel command — rasterization is the CPU's job)
 ```
+### 6b. Project's conventions, measured again (2026-10-18)
+
+Measured while merging chips/dsp1_cube into mode7/dsp1_ground, on luna
+(DSP-1B firmware, LLE), with dsp1_ground's camera (x 512, y 512, z 80,
+lfe 96, les 256, aas 0, azs $4000-655; SetCamera gives Vof 30, Vva -46,
+Cx 512, Cy 127):
+
+| Point | H | V | M |
+|---|---|---|---|
+| (Cx, Cy, 0), under the imaginary centre (screen line 112+30) | 0 | 29 | 135 |
+| (Cx + 50, Cy - 100, 0), right and further ahead | 21 | 21 | 112 |
+| (Cx, Cy, 40), raised 40 | 0 | 8 | 135 |
+
+So V is **down-positive** relative to the screen centre (the raised point
+moves up the screen; the centre point lands at 112 + 29 against the raster
+112 + 30), H is right-positive (+X is to the right when heading 0 looks
+along −Y), and with aas 0 the camera looks along −Y (the beacons at y < 512
+are in front of it). Corpus: bsnes's dsp1emu.cpp (non-arbiter) states "H is
+positive rightward, but V is positive downward" for Target and Project
+alike (cartouche chunk 46a9b364d25aec8e, 260268a3e4ac05ef); no arbiter
+states the sign.
+
+The cube (camera at the origin, aas 0, azs $4000, corners pushed to y +400)
+projected points **behind** the eye: its last corner comes back with M = −3
+(`luna state dsp1_cube.sfc --until-frame 60 --peek dsp1_o0:#6` →
+CC FF CF FF FD FF). Behind the eye both H and V come back mirrored, and a
+symmetric tumbling cube looks right either way, which is how "H mirrored,
+V up-positive" got written as the convention (docs/tutorials/dsp1.md fixed
+the same day; the comments of lib/include/snes/dsp1.h on 2026-10-19, in a
+worktree since the game reads that header).
+
+Target, measured on 2026-10-19 with the same camera (Cx 512, Cy 127), from a
+throwaway ROM: Target(40, 0) gives (587, 127) and Target(0, 40) gives
+(512, 358). So h is right-positive (+X, as Project's H) and v down-positive
+(towards the camera, which sits at y 512 looking along −Y). Project of
+(Cx + 50, Cy − 100, 0) gave H 21, V 21 again, as in the table above.
+
 **Even-more-minimal:** skip Parameter/Project; use `Polar` ($1C) to rotate each
 vertex, then software-divide x/z, y/z for perspective. Fewer under-documented
 constants; slightly more CPU. Good first bring-up path.

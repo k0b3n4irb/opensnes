@@ -6,11 +6,15 @@
  * Showcases BG Mode 0, the only SNES video mode that provides four
  * simultaneous background layers. Each layer is limited to 4 colors (2bpp),
  * giving a total of 16 on-screen palette entries across four independent
- * palette banks. The four layers are loaded from separate BMP assets and
- * scroll horizontally at different speeds every 3 frames, creating a
- * parallax depth effect.
+ * palette banks. The four layers are the city at night, each drawn in four
+ * colours: a status panel in front (BG0, still), the roofs (BG1), the
+ * mid-distance blocks (BG2) and the far towers (BG3). They scroll
+ * horizontally at different speeds every 3 frames, creating a parallax
+ * depth effect; each scrolling layer is a 128-pixel half and its mirror, so
+ * it wraps at 256 without a seam.
  *
- * This is a direct port of the PVSnesLib "Mode0" example.
+ * This began as the PVSnesLib "Mode0" example; the four layers are ours
+ * (devtools/art_assets/build.py writes them from assets/neo-lumen/).
  *
  * @par SNES Concepts
  * - Mode 0: four BG layers, each 2bpp (4 colors), each with its own palette bank

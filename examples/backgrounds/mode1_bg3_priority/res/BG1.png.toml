@@ -1,5 +1,0 @@
-tool = "opensnes-tileset"
-
-[convert]
-colors = 16
-palette-entry = 2

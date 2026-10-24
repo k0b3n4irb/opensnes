@@ -1,0 +1,27 @@
+# demos/platform_objects: the first robot insect patrols its roof (world x
+# 328-376, after the first vent) while Kit walks towards it and the camera
+# follows.
+#
+# insectx is the insect's SCREEN x once its callback has run (world x minus
+# map_cam_x). Measured on luna on 2026-10-19 with this script: frame 280,
+# insectx 190 with the camera at 140 (world 330); frame 300, insectx 169
+# with the camera at 164 (world 333): it has reached the left end of its
+# range and turned back east (330 -> 333) while the camera follows Kit. An
+# insect that did not move, or walked out of its range, changes both.
+rom = "../../examples/demos/platform_objects/platform_objects.sfc"
+input = "60:0x0100,150:0x0180,152:0x0100"
+
+[[checkpoint]]
+at_frame = 280
+[checkpoint.values]
+insectx   = { eq = 190, width = 2 }
+map_cam_x = { eq = 140, width = 2 }
+
+[[checkpoint]]
+at_frame = 300
+[checkpoint.values]
+insectx   = { eq = 169, width = 2 }
+map_cam_x = { eq = 164, width = 2 }
+
+[asserts.dma]
+unsafe_writes = 0

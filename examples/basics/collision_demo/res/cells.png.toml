@@ -1,0 +1,7 @@
+tool = "opensnes-tileset"
+
+# four 16x16 cells side by side, kept in order (no reduction): the example
+# builds its map from them, cell k = tiles 2k, 2k + 1, 8 + 2k, 9 + 2k
+[convert]
+colors = 16
+no-reduce = true

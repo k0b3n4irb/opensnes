@@ -1,33 +1,32 @@
 /**
  * @file main.c
- * @brief Screen fade in/out using INIDISP brightness control
+ * @brief Screen transitions: brightness fades and the mosaic filter
  * @ingroup examples
  *
- * Demonstrates smooth screen fading by stepping through the 16 brightness
- * levels of the SNES INIDISP register ($2100). Bits 0-3 of INIDISP control
- * master brightness from 0 (black) to 15 (full), while bit 7 is the force
- * blank flag. By writing successive brightness values with timed delays
- * between frames, the display fades smoothly to or from black. Three fade
- * speeds are showcased: fast (1 frame/step), medium (3 frames/step), and
- * slow (6 frames/step). This technique is used in virtually every SNES game
- * for scene transitions, title screens, and game-over sequences.
+ * The two transitions the PPU gives for free. A fade steps the master
+ * brightness of INIDISP ($2100) from 15 (full) to 0 (black) and back; the
+ * mosaic filter (MOSAIC, $2106) fills N x N blocks of a background with
+ * the colour of their top-left pixel, from 1 x 1 up to 16 x 16. Three fade
+ * speeds are shown, then the mosaic growing and shrinking back. Neither
+ * costs CPU time beyond one register write per step.
  *
  * @par SNES Concepts
- * - INIDISP register ($2100) brightness levels 0-15
- * - Frame-counted delay loops for animation timing
- * - setBrightness() library wrapper for safe INIDISP writes
- * - Force blank (bit 7) vs brightness dimming (bits 0-3)
+ * - INIDISP ($2100) brightness levels 0-15; brightness 0 is not force blank
+ * - MOSAIC ($2106): block size in bits 7-4, the BG layers it applies to in bits 3-0
+ * - fadeOut() / fadeIn(): one brightness step every `speed` frames
+ * - mosaicSetLayers() / mosaicFadeOut() / mosaicFadeIn() / mosaicDisable()
+ * - Sprites are never mosaicked: only background layers are
  *
  * @par What to Observe
- * - Press any button to advance through fade effects
- * - Fast fade out (instant-feeling), then fast fade in
- * - Medium fade (noticeable transition), then slow fade (cinematic pace)
- * - The cycle repeats: fast, medium, slow, fast, ...
+ * - Press any button to advance to the next transition
+ * - Fast fade out and in (1 frame per step), then 3 frames per step, then 6
+ * - Then the mosaic: the picture breaks into growing blocks, then sharpens again
+ * - The cycle repeats
  *
  * @par Modules Used
- * console, sprite, dma, input, background
+ * console, sprite, dma, input, background, mosaic
  *
- * @see video.h, input.h, background.h
+ * @see video.h, mosaic.h, input.h, background.h
  */
 
 #include <snes.h>
@@ -38,7 +37,7 @@
  *============================================================================*/
 
 /** @brief 4bpp tile data for the background image. */
-#include "res/opensnes.inc"   /* generated: opensnes_tiles[], opensnes_map[], opensnes_pal[], each with _end */
+#include "res/moonrise.inc"   /* generated: moonrise_tiles[], moonrise_map[], moonrise_pal[], each with _end */
 /** @brief Tilemap data (32x32 tile grid) for the background image. */
 /** @brief 15-bit BGR palette (up to 16 colors) for the background image. */
 
@@ -61,13 +60,12 @@ static void wait_for_key(void) {
  * Use those directly — same signature, same semantics. */
 
 /**
- * @brief Entry point -- cycles through fade-out/fade-in at three speeds.
+ * @brief Entry point -- cycles through the fades at three speeds, then the mosaic.
  *
  * Loads a background image, then enters an interactive loop where each
- * button press triggers the next fade effect: fast (1 frame/step),
- * medium (3 frames/step), and slow (6 frames/step). The cycle repeats
- * indefinitely. This demonstrates how INIDISP brightness control provides
- * smooth scene transitions without any per-pixel computation.
+ * button press triggers the next transition: fade out and in at 1, 3 and
+ * 6 frames per step, then the mosaic growing to 16 x 16 blocks and
+ * shrinking back. The cycle repeats indefinitely.
  *
  * @return Does not return (infinite loop).
  */
@@ -89,16 +87,16 @@ int main(void) {
      *------------------------------------------------------------------------*/
 
     /* BG1: tiles at $4000, palette at slot 0 (offset 0) */
-    bgInitTileSet(0, opensnes_tiles, opensnes_pal, 0,
-                  opensnes_tiles_end - opensnes_tiles,
-                  opensnes_pal_end - opensnes_pal,
+    bgInitTileSet(0, moonrise_tiles, moonrise_pal, 0,
+                  moonrise_tiles_end - moonrise_tiles,
+                  moonrise_pal_end - moonrise_pal,
                   BG_16COLORS, VRAM_BG_TILES);
 
     /*------------------------------------------------------------------------
      * Load Tilemap Data
      *------------------------------------------------------------------------*/
 
-    dmaCopyVram(opensnes_map, VRAM_BG_MAP, opensnes_map_end - opensnes_map);
+    dmaCopyVram(moonrise_map, VRAM_BG_MAP, moonrise_map_end - moonrise_map);
 
     /*------------------------------------------------------------------------
      * Configure Video Mode
@@ -148,6 +146,18 @@ int main(void) {
 
         /* Very slow fade in */
         fadeIn(6);
+        WaitForVBlank();
+        wait_for_key();
+
+        /* Mosaic out: BG1's blocks grow from 1x1 to 16x16, 3 frames per size */
+        mosaicSetLayers(LAYER_BG1);
+        mosaicFadeOut(3);
+        WaitForVBlank();
+        wait_for_key();
+
+        /* Mosaic in: the blocks shrink back, then the filter is switched off */
+        mosaicFadeIn(3);
+        mosaicDisable();
         WaitForVBlank();
         wait_for_key();
     }

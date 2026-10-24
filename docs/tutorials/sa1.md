@@ -280,7 +280,7 @@ while (1) {
 ### Pattern 2: Free-Running Counter
 
 The SA-1 increments a value continuously. The main CPU reads it whenever needed.
-No synchronization required — just atomic reads. See sa1_hello for register readback examples.
+No synchronization required — just atomic reads.
 
 ```asm
 ; SA-1 side: increment 32-bit counter forever
@@ -300,6 +300,35 @@ _sa1_count_loop:
 u16 lo = *(volatile u16*)0x3002;
 u16 hi = *(volatile u16*)0x3004;
 ```
+
+## Saving to BW-RAM
+
+On an SA-1 cartridge the battery keeps the SA-1's BW-RAM, not a separate
+SRAM chip. The SNES CPU sees it in banks `$40`-`$43`, and writes to it only
+once SBWE (`$2226`) bit 7 is set
+([fullsnes](https://problemkaputt.de/fullsnes.htm#snescartsa1memorycontrol));
+the crt0 sets it on an SA-1 build. `USE_SRAM := 1` beside `USE_SA1 := 1`
+declares the battery (cartridge type `$35`), and the `sram` module then
+reads and writes BW-RAM with the same calls as on any cartridge:
+
+```c
+#include <snes/sram.h>
+
+typedef struct { u16 magic; u16 boots; } SaveBlock;
+SaveBlock save;
+
+sramLoadOffset((u8 *)&save, sizeof(save), 0);
+if (save.magic != 0x5A1E) {     /* a fresh cart holds power-on garbage */
+    save.magic = 0x5A1E;
+    save.boots = 0;
+}
+save.boots++;
+sramSaveOffset((u8 *)&save, sizeof(save), 0);
+```
+
+A magic word, not a zero, tells a block you wrote from whatever the chip
+powered up with. BW-RAM is also the SA-1's work RAM: keep the save in a
+region your SA-1 code does not use.
 
 ## I-RAM Layout Convention
 
@@ -408,9 +437,7 @@ Common issues:
 
 | Example | What it demonstrates |
 |---------|---------------------|
-| [sa1_hello](../../examples/chips/sa1_hello/) | Boot diagnostic — verifies SA-1 initialization |
 | [sa1_starfield](../../examples/chips/sa1_starfield/) | 128 sprites with sine-wave Lissajous patterns |
-| [sa1_save](../../examples/chips/sa1_save/) | A boot counter kept in the battery-backed BW-RAM, through the `sram` module |
 
 ## What SA-1 Can't Do
 

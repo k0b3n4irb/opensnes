@@ -45,7 +45,7 @@ opt-in list.
    ROADMAP listing a `sa1_speed` example that never existed.
    Since 2026-10-15 the other way round too: every example is named by
    `docs/LEARNING_PATH.md` and linked by its category README — thirty-one
-   examples were on no path (tetris among them).
+   examples were on no path (blocks among them).
 
 6. **Per-category counts in `examples/README.md`'s table** must match the
    per-directory `main.c` count, and their sum the corpus total. Caught

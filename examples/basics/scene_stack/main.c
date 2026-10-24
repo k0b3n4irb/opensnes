@@ -5,23 +5,28 @@
  *
  * Demonstrates the opt-in `scene` framework: the running game is split
  * into three Scene structs that push and pop without a hand-rolled
- * state machine. The demo is deliberately minimal — three text screens
- * that swap when buttons are pressed — so you can read the dispatch
- * shape without graphics noise getting in the way.
+ * state machine. The demo is deliberately small — three screens that
+ * swap when buttons are pressed — so you can read the dispatch shape. It
+ * uses the pictures of basics/game_skeleton (the logo, the play square),
+ * so the two ways of structuring a game can be compared side by side.
  *
  * Flow:
- *   1. `title` scene: shows "PRESS START". Start pushes `counter`.
- *   2. `counter` scene: increments a number every frame. Select pushes
- *      `pause` (counter is suspended; numbers stop). Start pops back
- *      to title.
- *   3. `pause` scene: shows "PAUSED". Select pops back to counter
- *      (numbers resume from where they stopped, no init replay).
+ *   1. `title` scene: the logo and "PRESS START". Start pushes `counter`.
+ *   2. `counter` scene: the square, and a number that increments every
+ *      frame. Select pushes `pause` (counter is suspended; numbers stop).
+ *      Start pops back to title.
+ *   3. `pause` scene: shows "PAUSED" and darkens the square beneath it
+ *      (colour math): an overlay, the scene below still drawn but frozen.
+ *      Select pops back to counter (numbers resume from where they
+ *      stopped, no init replay).
  *
  * @par SNES Concepts
  * - Scene stack: push/pop without enum + switch boilerplate
  * - `init` runs once on first push; resume after pop does not re-init
  * - Suspended scenes get no callbacks (pause overlay = counter frozen)
- * - Text rendering through the auto-flush NMI hook
+ * - Text rendering through the auto-flush NMI hook, on BG3 in front
+ * - Each scene picks its layers (setMainScreen) when it is entered or resumed
+ * - A pause overlay by colour math: colorMathShadow() darkens BG1
  *
  * @par What to Observe
  * - **Start** on title: enters counter, numbers increment from 0
@@ -33,7 +38,7 @@
  *   re-runs on the next push)
  *
  * @par Modules Used
- * console, sprite, dma, background, text, input, scene
+ * console, sprite, dma, background, text, input, scene, colormath
  *
  * @see scene.h, gameloop.h
  */
@@ -41,6 +46,21 @@
 #include <snes.h>
 #include <snes/text.h>
 #include <snes/scene.h>
+#include <snes/colormath.h>
+
+#include "res/field.inc"
+#include "res/logo.inc"
+/* generated: field_, logo_ tiles/_pal/_map (each with _end) */
+
+/** @name VRAM (word addresses), as in basics/game_skeleton
+ *  @{ */
+#define VRAM_BG1_MAP  0x0000   /**< the square */
+#define VRAM_BG2_MAP  0x0400   /**< the logo */
+#define VRAM_BG3_MAP  0x0800   /**< the text */
+#define VRAM_BG1_GFX  0x1000
+#define VRAM_BG2_GFX  0x2000
+#define VRAM_BG3_FONT 0x3000
+/** @} */
 
 /* Forward declarations so the Scene structs can name each other. */
 static void title_init(void);
@@ -84,12 +104,39 @@ u16 title_redraws;
 
 static void title_draw(void) {
     textClear();
-    textPrintAt(11, 12, "SCENE STACK");
-    textPrintAt(11, 14, "PRESS START");
+    setMainScreen(LAYER_BG2 | LAYER_BG3);   /* the logo and the text */
+    textPrintAt(10, 2, "SCENE STACK");
+    textPrintAt(10, 25, "PRESS START");
 }
 
+/**
+ * @brief The root scene's init: load everything once, then draw the title
+ *
+ * The title is pushed once, by sceneRun(), so its init is where the
+ * program sets up the hardware — the same layers as basics/game_skeleton:
+ * Mode 1, BG1 the square, BG2 the logo, BG3 the text in front.
+ */
 static void title_init(void) {
-    textModeInit();
+    consoleInit();
+    setMode(BG_MODE1, BG3_MODE1_PRIORITY_HIGH);
+
+    bgInitTileSet(0, field_tiles, field_pal, 0, field_tiles_end - field_tiles,
+                  field_pal_end - field_pal, BG_16COLORS, VRAM_BG1_GFX);
+    bgInitTileSet(1, logo_tiles, logo_pal, 1, logo_tiles_end - logo_tiles,
+                  logo_pal_end - logo_pal, BG_16COLORS, VRAM_BG2_GFX);
+    bgSetMapPtr(0, VRAM_BG1_MAP, SC_32x32);
+    bgSetMapPtr(1, VRAM_BG2_MAP, SC_32x32);
+    dmaCopyVram(field_map, VRAM_BG1_MAP, field_map_end - field_map);
+    dmaCopyVram(logo_map, VRAM_BG2_MAP, logo_map_end - logo_map);
+    setColor(0, RGB(2, 3, 5));      /* the backdrop: the night behind the logo */
+
+    textLoadFont(VRAM_BG3_FONT);
+    textInit(VRAM_BG3_MAP, 0, 7);
+    text_config.priority = 1;
+    setColor(29, RGB(31, 31, 31));  /* slot 7, colour 1: white */
+    bgSetGfxPtr(2, VRAM_BG3_FONT);
+    bgSetMapPtr(2, VRAM_BG3_MAP, SC_32x32);
+
     title_draw();
     WaitForVBlank();
     setScreenOn();
@@ -114,6 +161,7 @@ static void title_update(void) {
 static void counter_init(void) {
     counter_value = 0;
     textClear();
+    setMainScreen(LAYER_BG1 | LAYER_BG3);   /* the square and the text */
     textPrintAt(8, 12, "COUNTER:");
     textPrintAt(7, 14, "SELECT=PAUSE");
     textPrintAt(7, 16, "START=TITLE");
@@ -141,12 +189,16 @@ static void counter_update(void) {
 
 static void pause_init(void) {
     textPrintAt(13, 18, "PAUSED");
+    /* The counter's screen stays on the layers, frozen: darken its square
+     * (BG1 only, so the text stays bright) to say it is behind the pause */
+    colorMathShadow(LAYER_BG1, 8);
 }
 
 static void pause_update(void) {
     if (padPressed(0) & KEY_SELECT) {
         /* Erase the PAUSED label so the resumed counter screen is clean. */
         textPrintAt(13, 18, "      ");
+        colorMathDisable();
         scenePop();
     }
 }

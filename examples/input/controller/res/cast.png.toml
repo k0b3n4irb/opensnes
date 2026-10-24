@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+# Kit and the raccoon from above (32x32, OBJ palettes 0 and 1), then the lamps
+# (8x8, palette 2; pad 2 lights them on palette 3)
+[sheet]
+size = 32
+colors = 64

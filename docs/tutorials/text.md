@@ -75,9 +75,10 @@ colour 1 white. That is all of @ref examples_text_print_string —
 ```c
 int main(void) {
     textModeInit();
-    setColor(0, RGB(0, 0, 10));
+    setColor(0, RGB(1, 3, 4));          /* the terminal's glass, #0a1a22 */
 
-    textPrintAt(8, 14, "TEXT MODULE TEST");
+    textPrintAt(7, 13, "OS: RUE BASSE NET");
+    textPrintAt(7, 15, "READY");
 
     WaitForVBlank();
     setScreenOn();
@@ -93,13 +94,13 @@ bite in every example that does more than print:
 
 - It ends with `setMainScreen(LAYER_BG1)`, so **sprites are off**. Call
   `setMainScreen(LAYER_BG1 | LAYER_OBJ)` afterwards if you want both, as
-  @ref examples_basics_game_skeleton does.
+  @ref examples_basics_aim_target does (with its roof on BG2 as well).
 - It puts the font at VRAM `$0000`, so **your sprite or BG tiles must go
-  somewhere else**. `game_skeleton` and @ref examples_basics_aim_target both
-  park sprite graphics at `$4000` for this reason:
+  somewhere else**. @ref examples_basics_aim_target parks its sprite
+  graphics at `$4000` for this reason:
 
   ```c
-  #define SPR_VRAM   0x4000   /**< sprite tiles (text font is at $0000) */
+  #define OBJ_VRAM   0x4000
   ```
 
 ## Setting up by hand
@@ -124,7 +125,7 @@ glyph and performs an **immediate** DMA to VRAM — not a flagged one. That is a
 raw VRAM write, so like `textLoadFont`, it belongs in forced blank, before
 `setScreenOn()`.
 
-Wiring the BG layer is still yours. @ref examples_games_rpg puts 2bpp text on
+Wiring the BG layer is still yours. @ref examples_demos_rpg puts 2bpp text on
 BG3 in Mode 1, in front of the map:
 
 ```c
@@ -142,8 +143,8 @@ TextConfig text_config`), and its `priority` field goes into bit 13 of every
 tilemap entry the module builds from then on. Setting it right after `textInit`
 is the supported way to put text in front of an opaque background.
 
-@ref examples_maps_dynamic_map shows the 4bpp case, and the `font_tile`
-arithmetic that goes with a font *not* placed at the layer's tile base:
+The 4bpp case, and the `font_tile` arithmetic that goes with a font *not*
+placed at the layer's tile base:
 
 ```c
 #define VRAM_BG2_GFX    0x2000
@@ -199,8 +200,9 @@ column 8, not column 31 and not an error.
 
 One geometry note: the buffer is 32 rows but a standard 224-line display shows
 only **28** of them (224 / 8). Rows 28–31 exist, are flushed, and are simply
-off-screen until you scroll the layer — which is exactly what
-@ref examples_text_scroll_message does with `bgSetScroll`.
+off-screen until you scroll the layer — the text layer scrolls like any
+background: @ref examples_scrolling_mixed_scroll slides a message on BG3
+with `bgSetScroll`.
 
 ## Printing numbers
 
@@ -312,7 +314,7 @@ is the transparent background. To colour your text, write colour 1 of its slot:
 | Depth | Colours per slot | Text colour for slot `P` | Example |
 |---|---|---|---|
 | 2bpp | 4 | `setColor(P * 4 + 1, c)` | `rpg`, slot 4 → `setColor(17, …)` |
-| 4bpp | 16 | `setColor(P * 16 + 1, c)` | `dynamic_map`, slot 1 → `setColor(17, …)` |
+| 4bpp | 16 | `setColor(P * 16 + 1, c)` | `sprite_sizes`, slot 0 → `setColor(1, …)`; slot 1 → `setColor(17, …)` |
 
 `textModeInit()` does the 2bpp slot-0 case for you: `setColor(1, RGB(31, 31,
 31))`, white on a black backdrop.
@@ -406,8 +408,8 @@ something the module supports today.
   the text another.
 - @ref tools_opensnes_text — converting your own typeface.
 - @ref examples_text_print_string — the minimum program.
-- @ref examples_text_scroll_message — the text layer scrolled like any BG.
+- @ref examples_scrolling_mixed_scroll — a line of text on BG3, scrolled like any BG.
 - @ref examples_fundamentals_text_glyphs — what the module hides: a glyph as
   raw 2bpp bitplanes plus a tilemap entry.
-- @ref examples_games_rpg and @ref examples_maps_dynamic_map — the explicit
-  `textInit` path, 2bpp and 4bpp.
+- @ref examples_demos_rpg and @ref examples_sprites_sprite_sizes — the
+  explicit `textInit` path, 2bpp and 4bpp.

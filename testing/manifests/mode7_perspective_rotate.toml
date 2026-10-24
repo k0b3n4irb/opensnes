@@ -24,7 +24,7 @@
 # hdma_enabled_state:1`, PPU side from `luna state --out -`:
 #   f60  m7x 512, m7y 1152, m7_hofs 384, m7_vofs 767 (= 768-1, the lib's
 #        documented vertical -1), m7sel 0x80, m7a = m7d = 91, m7b = m7c = 0
-#   f120 after L: m7a = m7d = 24, m7b = 88, m7c = -88 — the matrix rotated
+#   f120 after L: m7a = m7d = -35, m7b = 84, m7c = -84 — the matrix rotated
 #   f180 after RIGHT: m7x 571, m7_hofs 442 — camera and pivot moved together
 rom = "../../examples/mode7/perspective_rotate/perspective_rotate.sfc"
 
@@ -38,11 +38,11 @@ at_frame = 60
 "pos_y.main" = 1152
 hdma_enabled_state = { eq = 0x3C, width = 1 }   # M7A, M7B, M7C, M7D
 
-[[checkpoint]]                 # L held: the angle selector advances, mod 48
+[[checkpoint]]                 # L held: the angle selector advances, one step every 4 frames
 at_frame = 120
 input = "60:0x0020,119:0"
 [checkpoint.values]
-"angle.main" = 11                                      # 59 steps wrapped at ANGLES=48
+"angle.main" = 15                                      # 59 frames held: a step on the 1st, 5th … 57th
 "scr_x.main" = 384                                     # rotating must not move the
 "scr_y.main" = 768                                     # camera or the pivot
 "pos_x.main" = 512
@@ -57,7 +57,7 @@ input = "120:0x0100,179:0"
 "pos_x.main" = 571                                     # 512 + 59, the same 59
 "scr_y.main" = 768                                     # and only on the X axis
 "pos_y.main" = 1152
-"angle.main" = 11                                      # panning must not rotate
+"angle.main" = 15                                      # panning must not rotate
 hdma_enabled_state = { eq = 0x3C, width = 1 }
 [checkpoint.delta]
 "scr_x.main" = "increased"

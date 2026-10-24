@@ -16,13 +16,14 @@ The tables are generated at build time by `opensnes-image perspective`
 from `res/perspective.toml` (48 angles, 224 lines, zoom 80):
 `entry(a,y) = trig(2πa/48)·20480/y` in 8.8 fixed point, rounded to the
 nearest — which is krom's exact bytes, all 32256 entries (the tool's golden
-suite keeps his tables as the reference). The track art is original (9
-prefab tiles composed into a 128×128 Mode 7 world).
+suite keeps his tables as the reference). The ground is the
+city from above that `devtools/art_assets/mode7.py` lays out (streets, roofs
+and canals in 235 tiles, CC0, `assets/neo-lumen/`).
 
 ## Controls (krom's map)
 
 - **D-pad** — move over the plane (scroll + pivot together)
-- **L / R** — rotate the world in 7.5° steps
+- **L / R** — rotate the world in 7.5° steps, one every 4 frames (a full turn in 3.2 s)
 - **Y / A** — nudge the pivot on X · **X / B** — nudge it on Y
 
 ## SNES Concepts

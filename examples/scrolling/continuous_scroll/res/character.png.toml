@@ -1,5 +1,0 @@
-tool = "opensnes-sprite"
-
-[sheet]
-size = 16
-colors = 16

@@ -1,0 +1,8 @@
+# The square the hologram turns above: BG2, behind the GSU's bitmap. Its 144
+# picture lines sit between the letterbox bands; index 0, the darkest colour,
+# is transparent and the backdrop (CGRAM 0, the same ink) shows through.
+tool = "opensnes-tileset"
+
+[convert]
+colors = 16
+palette-entry = 1      # the map names slot 1, where bgLoad puts the colours

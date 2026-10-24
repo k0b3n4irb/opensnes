@@ -1116,7 +1116,7 @@ markers in the same file but didn't tighten this assertion either.
   (since `(s32)a << 8` truncates). Every example that does
   `fixDiv(FIX(N), M)` for `N > 0.5` gets garbage. Today no example
   hits the path, so the bug is latent.
-- **`examples/games/tetris/render.c:169-194`** — uses `(u16)(u32)(ptr_a - ptr_b)`
+- **`examples/games/blocks/render.c:169-194`** — uses `(u16)(u32)(ptr_a - ptr_b)`
   patterns to compute size differences. The `(u32)` cast is
   immediately narrowed back to `u16`, so these survive — the truncation
   affects the *intermediate*, but the final cast ignores the upper 16
@@ -1342,6 +1342,39 @@ animTickMeta 1346 → 1108 (−18 %), const u8 walk ×32 7689 → 6832
 pointer-variable loads carry no pointee taint; corpus green on the
 frame-equal protocol; `make bench` re-baselined with the gain stated.
 
+#### A10. A plain pointer built from an address above `$FFFF` loses its bank in silence — OPEN 🟡 (noted 2026-10-24)
+
+**Symptom**: `#define EDGE_TABLE ((u8 *)0x708040)` compiles without a word.
+At a constant index the store keeps the bank (`EDGE_TABLE[5] = v` →
+`sta.l $708045`); at a variable index it does not (`EDGE_TABLE[i] = v` →
+`adc.w #$8040 / tax / sta.l $000000,x`), and the byte goes to `$00:8040+i`,
+in ROM. Loads behave the same way. Found while writing Game Pak RAM from C in
+`chips/superfx_game_skeleton` (commit `05718d92`): the edge table and 16 of
+19 points stayed zero, the three written at constant indices were right.
+
+**Root cause**: none in the codegen. A plain pointer is bank `$00` by design
+(B2: plain C RAM below `$2000`, `FAR` above); `u8 FAR *` carries the bank
+(`adc #112` then `sta [dp]`), and cproc already refuses to assign a `FAR`
+pointer to a plain one ("discards qualifiers"). What is missing is the
+diagnostic for the other direction: an integer constant above `$FFFF`
+converted to a plain pointer type is always a mistake, since the bank it
+names can only survive by accident (the constant-index fold).
+
+**Proposal**: in cproc, a warning (an error under `-Werror`, which the game
+builds with) when an integer constant whose value exceeds `$FFFF` is
+converted to a pointer type without the `__far` qualifier on its target,
+naming `FAR` as the fix. Frontend only; no IR, no codegen change, so the
+corpus bytes must not move.
+
+**Cost / risk**: small (one check in the conversion, a fixture), but it is a
+compiler change: separate worktree, announced to the game before it lands
+(its `-Werror` build would stop on any such cast it has).
+
+**Acceptance criteria**: a `devtools/compiler-tests` fixture that expects the
+diagnostic on `(u8 *)0x708040` and none on `(u8 FAR *)0x708040` nor on
+`(u8 *)0x2100`; the corpus builds with zero new warnings; Class A A/B
+(`diff_corpus.py`) shows every example MATCH.
+
 #### B1. 16-bit pointer ABI in lib helpers — RESOLVED 🟢 (superseded by A6+A7 + #122 + #127)
 
 > **Status: RESOLVED, by a better path than the `*Bank`-variant plan
@@ -1428,7 +1461,7 @@ mechanical (each is ≤ 30 LOC of C + ASM helper); the audit + migration
 - `lib/include/snes/*.h` has `*Bank` variants for every public function
   accepting `u8 *` / `const u8 *` from user data.
 - The 6 tightest examples (`mapscroll`, `likemario`, `mapandobjects`,
-  `window`, `tetris`, `continuous_scroll`) have ≥ 256 bytes free in
+  `window`, `blocks`, `continuous_scroll`) have ≥ 256 bytes free in
   bank `$00` after migration.
 - `BANK0_FAIL_THRESHOLD` bumped to 256.
 - All 54 examples build and pass visual regression.
@@ -1450,7 +1483,7 @@ mechanical (each is ≤ 30 LOC of C + ASM helper); the audit + migration
 **Investigation log — 2026-06-20 (P1-2 from the engine review):**
 
 Measured the 11 currently-tight examples (all report **exactly 12 bytes
-free**: `likemario`, `mapandobjects`, `tetris`, `continuous_scroll`,
+free**: `likemario`, `mapandobjects`, `blocks`, `continuous_scroll`,
 `mode5`, `mode7`, `mode7_perspective`, `window`, `mapscroll`, `slopemario`,
 `tiled`). Two findings refine — but do **not** invalidate — this entry:
 
@@ -1585,7 +1618,7 @@ the correct 24-bit form for above-`$2000` data.
   ROM ratchet. Hard-fails a bank-$00 RAM section crossing/past $2000
   and free space < `RAM_FAIL_THRESHOLD` (512); warns < 1024 with the
   largest sections listed. Corpus baseline at introduction: breakout
-  668 bytes free (`.game_buffers` 4708 B), tetris 928 — the two real
+  668 bytes free (`.game_buffers` 4708 B), blocks 928 — the two real
   games are already within 1 KB of the ceiling, which is the empirical
   trigger data for scheduling this chantier: if the showcase RPG's
   free-space number trends below ~2 KB with state still to add, B2

@@ -99,7 +99,7 @@ panelClear(&ui, 2, 22, 28, 6);
 panelFlush(&ui);
 ```
 
-This is exactly how `examples/games/rpg` draws its HUD (hearts + a purse)
+This is exactly how `examples/demos/rpg` draws its HUD (hearts and credits)
 and dialog box on one BG2 tilemap.
 
 ## Gotchas
@@ -135,5 +135,5 @@ row reads the wrong tiles.
 - [Text rendering](text.md) and the `text` module — the text that goes in
   the box.
 - [DMA & VBlank](dma.md) — why `setScreenOff()` and not `setBrightness(0)`.
-- `examples/games/rpg` — the module in a real dialog box + HUD.
+- `examples/demos/rpg` — the module in a real dialog box + HUD.
 - @ref panel.h "Panel API reference"

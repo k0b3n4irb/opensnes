@@ -13,8 +13,7 @@ from C — then the DSP's party tricks.
 
 | Example | Developer question |
 |---------|--------------------|
-| [snesmod_music](snesmod_music/) | How do I play tracker music with transport controls? |
-| [snesmod_sfx](snesmod_sfx/) | How do I mix SFX over music? |
+| [snesmod_music](snesmod_music/) | How do I play tracker music with transport controls, and mix sound effects over it? |
 | [sfx_from_wav](sfx_from_wav/) | How do I play a sound effect from a WAV file, converted by the build? |
 
 **Raw APU from C (audio v2)** — the lib uploads its own resident SPC700 driver;
@@ -22,12 +21,9 @@ everything else is plain C:
 
 | Example | Developer question |
 |---------|--------------------|
-| [soundboard](soundboard/) | How do I drive the whole audio-v2 engine from C? |
-| [apu_switch](apu_switch/) | How do I hot-swap APU programs at runtime? |
-| [play_noise](play_noise/) | How do I make drums from the S-DSP noise generator? |
-| [pitch_mod](pitch_mod/) | How do I do hardware vibrato (pitch modulation)? |
+| [soundboard](soundboard/) | How do I drive the whole audio-v2 engine from C — samples, envelopes, echo? |
+| [apu_switch](apu_switch/) | How do I write S-DSP programs of my own — noise drums, hardware vibrato — and hot-swap them at runtime? |
 | [speech_synth](speech_synth/) | How do I play BRR speech? |
-| [echo](echo/) | How do I add echo / reverb from the S-DSP? |
 
 ## The idea in one screen
 

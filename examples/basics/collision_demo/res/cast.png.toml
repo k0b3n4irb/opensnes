@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+# Kit's walk from above and the drone's hover, 32x32 frames four a row;
+# OBJ palettes 0 (Kit), 1 (the drone) and 2 (the drone, its lights green)
+[sheet]
+size = 32
+colors = 48

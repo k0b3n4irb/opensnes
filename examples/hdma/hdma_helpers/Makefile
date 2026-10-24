@@ -16,8 +16,8 @@ CSRC       := main.c
 include $(OPENSNES)/make/common.mk
 
 #------------------------------------------------------------------------------
-# Graphics conversion (reuse opensnes logo)
+# Graphics conversion (the OpenSNES logo, devtools/art_assets)
 #------------------------------------------------------------------------------
 
 clean-hdma-helpers:
-	@rm -f res/bg.pic res/bg.pal res/bg.map res/bg.inc res/bg_data.as
+	@rm -f res/logo.pic res/logo.pal res/logo.map res/logo.inc res/logo_data.as

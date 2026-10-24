@@ -1,5 +1,7 @@
 # fading cycles six brightness ramps at three speeds: fadeOut/fadeIn(1),
-# then (3), then (6) — one VBlank wait per step, three, then six. Every
+# then (3), then (6) — one VBlank wait per step, three, then six — and then
+# the mosaic out and back in (the mosaic example's legs, merged here on
+# 2026-10-18 with the example itself). Every
 # transition is gated on a button press, so the ROM sits on a full-bright
 # static picture forever if nobody presses anything: liveness sees a healthy
 # NMI and the fbhash baseline captures frame-N of that same idle picture.
@@ -22,6 +24,17 @@
 # (console.h carries that warning), so a fade to black must leave the
 # force-blank shadow at 0 — a fadeOut that blanked the screen instead of
 # dimming it would make VRAM writable mid-fade and look identical.
+#
+# The mosaic legs: mosaic_size / mosaic_bg_mask are the lib's shadow of
+# $2106 (the register is write-only; checked against the PPU on the day it
+# was written, the shadow pair 15/1 matched ppu.mosaic = $F1). The ramp is
+# pinned mid-flight: 15 frames into mosaicFadeOut(3) the size is 5, at 30
+# it is 10, at 50 it has reached MOSAIC_MAX = 15 and STOPPED there (a size
+# that wrapped to 0 would pixelate forever); coming back it is 10, then 5,
+# and mosaicDisable() leaves the pair at 0/0. The two negatives are what
+# sharing one screen costs: mosaic_size stays 0 through every brightness
+# fade (fadeOut must not reach $2106) and console_brightness stays 15
+# through both mosaic ramps (mosaicFade* must not reach $2100).
 rom = "../../examples/transitions/fading/fading.sfc"
 
 [[checkpoint]]                 # idle at full brightness, waiting for the first press
@@ -35,6 +48,7 @@ at_frame = 70
 input = "60:0x0080,64:0"
 [checkpoint.values]
 console_brightness = { eq = 6, width = 1 }
+mosaic_size = { eq = 0, width = 1 }        # the fade must not touch $2106
 
 [[checkpoint]]                 # fadeOut(1) complete: exactly 0, and NOT force blank
 at_frame = 80
@@ -94,3 +108,55 @@ at_frame = 400
 [checkpoint.values]
 console_brightness = { eq = 0, width = 1 }
 console_force_blanked = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # fadeIn(6) complete: full brightness, mosaic still off
+at_frame = 520
+input = "420:0x0080,424:0"
+[checkpoint.values]
+console_brightness = { eq = 15, width = 1 }
+mosaic_size = { eq = 0, width = 1 }
+mosaic_bg_mask = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # mosaicSetLayers(BG1) + mosaicFadeOut(3), 15 frames in
+at_frame = 555
+input = "540:0x0080,544:0"
+[checkpoint.values]
+mosaic_bg_mask = { eq = 1, width = 1 }     # LAYER_BG1
+mosaic_size = { eq = 5, width = 1 }
+console_brightness = { eq = 15, width = 1 }   # the mosaic must not touch $2100
+
+[[checkpoint]]                 # 30 frames in: 10 blocks, linear in speed
+at_frame = 570
+[checkpoint.values]
+mosaic_size = { eq = 10, width = 1 }
+[checkpoint.delta]
+mosaic_size = "increased"
+
+[[checkpoint]]                 # at MOSAIC_MAX and clamped there
+at_frame = 590
+[checkpoint.values]
+mosaic_size = { eq = 15, width = 1 }
+mosaic_bg_mask = { eq = 1, width = 1 }
+console_brightness = { eq = 15, width = 1 }
+
+[[checkpoint]]                 # mosaicFadeIn(3) unwinding
+at_frame = 625
+input = "610:0x0080,614:0"
+[checkpoint.values]
+mosaic_size = { eq = 10, width = 1 }
+[checkpoint.delta]
+mosaic_size = "decreased"
+
+[[checkpoint]]
+at_frame = 640
+[checkpoint.values]
+mosaic_size = { eq = 5, width = 1 }
+[checkpoint.delta]
+mosaic_size = "decreased"
+
+[[checkpoint]]                 # mosaicDisable(): size AND the BG bit cleared
+at_frame = 665
+[checkpoint.values]
+mosaic_size = { eq = 0, width = 1 }
+mosaic_bg_mask = { eq = 0, width = 1 }
+console_brightness = { eq = 15, width = 1 }

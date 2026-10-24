@@ -25,10 +25,10 @@ Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
 
 | Scene | What runs | Idle (in `WaitForVBlank`) |
 |---|---|---|
-| `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
-| `examples/games/rpg` | walking: map, sprites, HUD | 91 % of the frame |
+| `examples/games/rooftop_run` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
+| `examples/demos/rpg` | walking: map, sprites, HUD | 88 % of the frame |
 | `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 69 % of the frame |
-| `examples/games/tetris` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
+| `examples/games/blocks` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
 | `examples/audio/snesmod_music` | music playing, nothing else | 98 % of the frame |
 
 Idle time is what the game still has.
@@ -39,17 +39,18 @@ Mean mclk per frame over 300 frames, and in brackets an upper bound of the
 worst frame. A function appears only in the scenes that call it, and only
 above 300 mclk per frame.
 
-| Function | likemario | rpg | sprite_swarm | tetris | snesmod_music |
+| Function | rooftop_run | rpg | sprite_swarm | blocks | snesmod_music |
 |---|---|---|---|---|---|
 | `NmiHandler` | 8,162 (8,170) | 8,163 (8,170) | 7,670 (7,716) | 5,676 (5,676) | 5,650 (5,650) |
-| `oamSet` |  | 3,426 (4,068) |  |  |  |
+| `oamSet` |  | 3,957 (7,812) |  |  |  |
 | `animTick` | 3,387 (5,306) |  |  |  |  |
 | `animPlay` | 2,125 (3,214) |  |  |  |  |
 | `dmaCopyVram` |  |  |  | 1,747 (2,248) |  |
-| `oamSetSize` |  | 1,736 (1,970) |  |  |  |
+| `oamSetSize` |  | 2,043 (3,900) |  |  |  |
 | `oamDynamicDraw` | 1,351 (1,626) |  |  |  |  |
-| `oamHide` |  | 624 (4,290) |  |  |  |
-| `bgSetScroll` | 561 (600) | 589 (640) |  | 560 (560) |  |
+| `oamHide` |  | 2,867 (5,176) |  |  |  |
+| `collideTile` |  | 765 (5,376) |  |  |  |
+| `bgSetScroll` | 561 (600) | 580 (640) |  | 560 (560) |  |
 
 ## Reading it
 
@@ -59,12 +60,12 @@ above 300 mclk per frame.
   8 master cycles per byte transferred") about 4,350 of those; the
   17th-bit pad read is about 380 more.
 - **Sprites**: in the RPG, `oamSet` + `oamSetSize` + `oamHide` cost about
-  5,800 mclk per frame (1.6 %) for its handful of characters and HUD
-  sprites (the setters are assembly). `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
+  8,900 mclk per frame (2.5 %) for its five characters, each a 32x32
+  sprite placed or hidden every frame (the setters are assembly). `oamSetFast` / `oamSetXYFast` (macros, `sprite.h`) or writing
   `oamMemory[]` directly (sprite_swarm) are the escape hatches for large
   counts.
 - **Animation**: `animTick` + `animPlay` about 5,500 mclk per frame in
-  likemario (both are compiled C).
+  rooftop_run (both are compiled C).
 - **`bgSetScroll`**: about 570 mclk per frame in each of the three games.
 - **Pads**: `padPressed` / `padHeld` do not appear: they are macros over
   the word the NMI handler filled.
@@ -151,14 +152,14 @@ is that handler alone, in a ROM that only waits.
 ## Reproduce
 
 ```sh
-testing/bin/luna profile examples/games/rpg/rpg.sfc \
+testing/bin/luna profile examples/demos/rpg/rpg.sfc \
     --from-frame 120 --until-frame 420 \
     --input "130:0x0100,250:0,260:0x0400,400:0" --out - --top 0
 ```
 
 `entries[].per_frame.mean` / `.max` per symbol; sum the `function@label`
 entries of one function. The other scenes use the same window (frames
-120-420; tetris 300-600, START at frame 100) with the inputs of the table
-above: likemario RIGHT held from frame 130, rpg RIGHT then DOWN, tetris
+120-420; blocks 300-600, START at frame 100) with the inputs of the table
+above: rooftop_run RIGHT held from frame 130, rpg RIGHT then DOWN, blocks
 START. Re-measure after a change to the NMI handler, the sprite or
 animation modules, and update this page.

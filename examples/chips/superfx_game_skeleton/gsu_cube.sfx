@@ -1,14 +1,22 @@
-; SuperFX (GSU) Wireframe — 12 lines from SRAM via Bresenham + PLOT
+; SuperFX (GSU) Wireframe — 34 coloured lines between points in SRAM, Bresenham + PLOT
 ;
-; superfx_3d's renderer, made to run from the GSU code cache: its two CACHE
+; Derived from superfx_3d's renderer, made to run from the GSU code cache: its two CACHE
 ; instructions are gone (CACHE empties the cache and refetches from ROM,
 ; which the GSU does not own here), and it reads nothing from ROM. The CPU
 ; loads it with gsuCacheLoad() and starts it with gsuStartCached(): the ROM
 ; stays the CPU's, so the game loop keeps running during the job. It clears
 ; and draws the buffer at R8 (gsu_scbr x 1024, set by the launcher).
 ;
-; Edge data at SRAM $8000: 12 x 4 bytes (x0, y0, x1, y1)
-; SRAM pointer saved at $8100 (R12/R13 used by LOOP)
+; Game Pak RAM, past the two framebuffers ($0000 and $4000):
+;   $8000  x of the 19 points, one byte each (the CPU writes them every job)
+;   $8020  y of the same points
+;   $8040  the edge table, 34 x 3 bytes (point, point, colour), written once
+;          at boot: the hologram's outer cube, its inner cube, the struts
+;          between them and the projector's two beams, each in its own colour
+;          of BG palette 0
+; The CPU projects the points; joining them is the GSU's work, so the CPU
+; sends 33 bytes a job (16 points and the centre's y) instead of 5 per edge.
+; Edge-table pointer saved at $8100 (R12/R13 used by LOOP)
 ;
 ; Bresenham: PLOT with DEC R1 to compensate auto-increment.
 
@@ -17,9 +25,11 @@
 .BANK 0 SLOT 0
 .ORG 0
 
-.EQU EDGE_DATA  $8000
+.EQU POINT_X    $8000
+.EQU POINT_Y    $8020
+.EQU EDGE_DATA  $8040
 .EQU PTR_SAVE   $8100
-.EQU NUM_EDGES  12
+.EQU NUM_EDGES  34
 
 gsu_start:
     IBT R0, #$70
@@ -57,25 +67,20 @@ _next_edge:
     NOP
     MOVE R6, R0
 
-    ; Read x0, y0, x1, y1
+    ; Read the edge: point a, point b, colour
     LDB (R6)
     NOP
-    MOVE R1, R0
+    MOVE R7, R0             ; a (R7 is dx later, free until then)
     INC R6
     NOP
     LDB (R6)
     NOP
-    MOVE R2, R0
+    MOVE R9, R0             ; b (R9 is sx later)
     INC R6
     NOP
     LDB (R6)
     NOP
-    MOVE R3, R0
-    INC R6
-    NOP
-    LDB (R6)
-    NOP
-    MOVE R4, R0
+    COLOR                   ; the edge's colour, from R0
     INC R6
     NOP
 
@@ -83,6 +88,32 @@ _next_edge:
     MOVE R0, R6
     IWT R6, #PTR_SAVE
     STW (R6)
+
+    ; x0, y0 = point a; x1, y1 = point b
+    IWT R0, #POINT_X
+    ADD R7
+    MOVE R6, R0
+    LDB (R6)
+    NOP
+    MOVE R1, R0
+    IWT R0, #POINT_Y
+    ADD R7
+    MOVE R6, R0
+    LDB (R6)
+    NOP
+    MOVE R2, R0
+    IWT R0, #POINT_X
+    ADD R9
+    MOVE R6, R0
+    LDB (R6)
+    NOP
+    MOVE R3, R0
+    IWT R0, #POINT_Y
+    ADD R9
+    MOVE R6, R0
+    LDB (R6)
+    NOP
+    MOVE R4, R0
 
     ; === Bresenham setup ===
     ; dx = abs(x1-x0), sx = sign(x1-x0)
@@ -150,9 +181,6 @@ _dy_done:
     MOVE R5, R0
 
     ; === Bresenham pixel loop ===
-    IBT R0, #$0F
-    COLOR
-
 _bres:
     PLOT
     DEC R1                  ; undo PLOT auto-increment

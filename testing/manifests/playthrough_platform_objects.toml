@@ -1,0 +1,17 @@
+# demos/platform_objects, the whole level: RIGHT held from frame 60 and four
+# presses of A, one before each vent, take Kit to the end of the rooftops
+# (x 1692 of 1728, standing on the last roof at y 160). The ramps are
+# walked, never jumped. The four frames were found on luna on 2026-10-19:
+# where Kit stopped at a vent, the first press 10 to 60 frames earlier that
+# took him past it.
+rom = "../../examples/demos/platform_objects/platform_objects.sfc"
+
+[[checkpoint]]
+at_frame = 1560
+input = "60:0x0100,150:0x0180,152:0x0100,470:0x0180,472:0x0100,970:0x0180,972:0x0100,1370:0x0180,1372:0x0100"
+[checkpoint.values]
+kitx = { ge = 1690, width = 2 }
+kity = { eq = 160, width = 2 }
+
+[asserts.dma]
+unsafe_writes = 0

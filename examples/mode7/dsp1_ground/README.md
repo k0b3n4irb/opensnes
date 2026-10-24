@@ -12,6 +12,12 @@ perspective, because the rotation is inside the matrices the chip computed.
 This is the technique Super Mario Kart and Pilotwings shipped with — the
 reason the DSP-1 was on the cartridge at all.
 
+On that floor stand four beacons, and above them a cube (its eight corners)
+tumbles: the other half of the chip, the 3D pipeline. `dsp1Attitude` +
+`dsp1Objective` rotate the cube's corners, and `dsp1Project`, with the same
+camera, turns every world point into a screen position — so the objects stay
+on the ground as it turns and slides past.
+
 ## How it works
 
 1. `dsp1SetCamera(&cam)` describes the
@@ -34,6 +40,14 @@ reason the DSP-1 was on the cartridge at all.
 Moving forward uses the chip too: `dsp1Triangle(heading, speed)` gives the
 sin/cos step on the ground plane.
 
+5. The objects, after the ground in the same frame: for each point,
+   `dsp1Project(x, y, z)` returns **H** and **V** relative to the screen
+   centre — H to the right, V downward (measured on luna) — and **M**, the
+   scale, positive in front of the eye and negative behind it. A point behind
+   the eye, above the horizon (where the sky is drawn) or off screen is
+   hidden; the others are 8x8 sprites at (128 + H, 112 + V). The TM HDMA
+   keeps OBJ on in both halves of the screen.
+
 ## Controls
 
 | Button | Action |
@@ -49,6 +63,8 @@ sin/cos step on the ground plane.
 - HDMA `2REG_2X` repeat blocks feeding two Mode 7 registers per channel
 - Double-buffered HDMA tables swapped in VBlank
 - Mid-frame BG mode switch (sky above, Mode 7 below)
+- dsp1Attitude / dsp1Objective / dsp1Project: rotating and projecting points
+  with the camera that draws the ground; M's sign for points behind the eye
 
 ## How to Build
 
@@ -63,7 +79,7 @@ firmware-gated and skips cleanly in CI.
 
 ## Modules Used
 
-console, dma, background, input, mode7, hdma, dsp1 (auto-added by `USE_DSP1`)
+console, dma, background, input, mode7, hdma, sprite, dsp1 (auto-added by `USE_DSP1`)
 
 ## Project Structure
 
@@ -71,7 +87,7 @@ console, dma, background, input, mode7, hdma, dsp1 (auto-added by `USE_DSP1`)
 |------|---------|
 | `main.c` | Camera, DSP-1 calls, HDMA tables, double buffering |
 | `res/ground.png.toml`, `res/sky.png.toml` | the import settings of the Mode 7 ground (`mode = 7`) and the Mode 3 sky (`opensnes-tileset`); the build converts and links them, `res/*.inc` declare the symbols |
-| `res/ground.png`, `res/sky.png` | Textures shared with `mode7/perspective` (PVSnesLib Mode7Perspective, mills32 / alekmaul) |
+| `res/ground.png`, `res/sky.png` | the city from above and its towers over the horizon, shared with `mode7/perspective`; written by `devtools/art_assets/mode7.py` on one palette (the Mode 3 sky reads CGRAM 0-15, the ground's first sixteen colours), CC0, `assets/neo-lumen/` |
 
 ## Going Further
 
@@ -79,5 +95,4 @@ console, dma, background, input, mode7, hdma, dsp1 (auto-added by `USE_DSP1`)
   pixel — the missile scope of Pilotwings, a cursor on the track.
 - Change `CAM_AZS` (tilt) and watch Vof/Vva move the horizon; keep the ground
   under 127 rasters per repeat block, or call `dsp1Raster` twice for two blocks.
-- `chips/dsp1_cube` — the other half of the chip: Attitude / Objective /
-  Project for objects on top of this floor.
+- Size the sprites with M: a beacon that grows as you drive at it.

@@ -62,7 +62,7 @@ reach:
 - **Platform bands.** Move the vertical camera in discrete steps when the player
   settles on a new platform, not continuously.
 
-@ref examples_games_likemario is a full platformer to read for how camera,
+@ref examples_games_rooftop_run is a full platformer to read for how camera,
 scroll and streaming fit together.
 
 ## Clamp to the world — room-locking
@@ -79,7 +79,7 @@ the view at the edge stops you streaming past the last column.
 | Whole screen scrolls with the player | `bgSetScroll` per layer | @ref examples_scrolling_mixed_scroll |
 | Layers scroll at different rates | one camera × per-layer fraction | @ref examples_scrolling_parallax_scroll |
 | World wider than VRAM, streamed | camera drives column streaming | @ref examples_maps_map_scroll, @ref examples_scrolling_continuous_scroll |
-| Free-scrolling 2D field | clamp both axes to bounds | @ref examples_maps_dynamic_map |
+| Free-scrolling 2D field | clamp both axes to bounds | @ref examples_demos_rpg |
 
 ## Write it at the right moment
 

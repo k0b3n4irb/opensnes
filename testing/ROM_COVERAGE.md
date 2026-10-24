@@ -48,11 +48,11 @@ luna v1.34.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `div16` | `libtest` |
 | `dmaCopyOam` | `libtest` |
 | `dmaTransfer` | `libtest` |
-| `dsp1Attitude` | `chips/dsp1_cube` |
+| `dsp1Attitude` | `mode7/dsp1_ground` |
 | `dsp1Distance` | `libtest_dsp1` |
 | `dsp1Multiply` | `libtest_dsp1` |
-| `dsp1Objective` | `chips/dsp1_cube` |
-| `dsp1Project` | `chips/dsp1_cube` |
+| `dsp1Objective` | `mode7/dsp1_ground` |
+| `dsp1Project` | `mode7/dsp1_ground` |
 | `dsp1Range` | `libtest_dsp1` |
 | `dsp1Raster` | `mode7/dsp1_ground` |
 | `dsp1Rotate` | `libtest_dsp1` |
@@ -104,9 +104,9 @@ luna v1.34.0 · `luna profile --pc-set` per ROM: the input-free idle path to the
 | `mouseInit` | `input/mouse` |
 | `mouseIsConnected` | `libtest` |
 | `mul16` | `libtest` |
-| `oamDynamicDrainQueue` | `sprites/dynamic_metasprite` |
+| `oamDynamicDrainQueue` | `sprites/dynamic_sprite` |
 | `oamDynamicSetSize` | `libtest` |
-| `oamMetaDrawDyn` | `sprites/dynamic_metasprite` |
+| `oamMetaDrawDyn` | `sprites/dynamic_sprite` |
 | `oamSetTile` | `libtest` |
 | `objCollidMap1D` | `libtest` |
 | `objCollidObj` | `libtest` |

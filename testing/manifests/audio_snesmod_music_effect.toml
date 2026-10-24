@@ -1,0 +1,19 @@
+# An effect over the music: Y at frame 80 plays the selected effect (the
+# jump, normal pitch) while the nocturne goes on. The snesmod_sfx example
+# proved snesmodPlayEffect alone (audio_snesmod_sfx_play.toml); since the
+# two examples merged on 2026-10-18 the effect has to share the SPC700 with
+# a module, which is the case a game is in.
+#
+# Measured on luna at frame 88: the effect is on V7 (ENVX 2032) and the
+# music still sounds on V1 and V2 (ENVX 928, 800). Without the press,
+# V7 is silent at the same frame (ENVX 0): the assert sees the effect,
+# not the song. The loop starts at frame 60 (the four effects are uploaded
+# before snesmodPlay), so a press before it is not seen.
+rom = "../../examples/audio/snesmod_music/music.sfc"
+frames = 88
+input = "80:0x4000,84:0"
+[asserts]
+audio_rms_min = 50.0
+[asserts.dsp]
+V7_ENVX = { ge = 1 }
+V1_ENVX = { ge = 1 }

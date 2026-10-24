@@ -3,9 +3,10 @@
  * @brief Large soundbank music playback (>32KB, multi-bank LoROM)
  * @ingroup examples
  *
- * Plays "What Is Love" — a 108KB IT module that produces a 56KB soundbank,
- * split across 2 ROM banks by smconv. The SNESMOD library handles bank
- * crossing transparently.
+ * Plays the nocturne of examples/audio/snesmod_music with long 32 kHz
+ * instruments and no echo (devtools/audio_assets, nocturne_large): a 46 KB
+ * soundbank, split across 2 ROM banks by the converter. The SNESMOD library
+ * handles bank crossing transparently.
  *
  * Ported from PVSnesLib "musicGreaterThan32k" example.
  *
@@ -43,12 +44,12 @@ int main(void) {
     textPrintAt(5, 8, "B - STOP");
     textPrintAt(5, 9, "X - PAUSE/RESUME");
     textPrintAt(5, 12, "NOW PLAYING:");
-    textPrintAt(5, 13, "WHAT IS LOVE (108KB IT)");
+    textPrintAt(5, 13, "NOCTURNE (46KB BANK)");
     WaitForVBlank();
 
     snesmodInit();
     snesmodSetSoundbank(SOUNDBANK_BANK);
-    snesmodLoadModule(MOD_WHATISLOVE);
+    snesmodLoadModule(MOD_NOCTURNE_LARGE);
     snesmodPlay(0);
 
     setScreenOn();

@@ -127,14 +127,35 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 
 ## Game Assets
 
-### Kenney "Pixel Shmup"
+### Kenney "Digital Audio" and "Interface Sounds"
 - **Author**: Kenney (https://kenney.nl/)
-- **Pack**: https://kenney.nl/assets/pixel-shmup
+- **Packs**: https://kenney.nl/assets/digital-audio,
+  https://kenney.nl/assets/interface-sounds
+- **License**: CC0 (Public Domain); each pack's `License.txt` is kept in
+  `devtools/audio_assets/kenney/` beside the OGG files the examples use
+- **Used in**: the effects of `examples/audio/snesmod_music`
+  (`sfx/neo_lumen_sfx.it`: `phaseJump1`, `powerUp1`, `laser1`,
+  `confirmation_001`) and the jump of `examples/games/rooftop_run`
+  (`res/jump_sfx.it`: `phaseJump1`), cut and converted by
+  `devtools/audio_assets/build.py`.
+
+### Music and instruments composed for OpenSNES
+- **License**: CC0 (original work)
+- **What**: every tracker module of the examples — `snesmod_music`'s
+  "Daveo Nocturne", `blocks`' Korobeiniki (the 19th-century Russian
+  song, public domain, arranged here), rooftop_run's "Daveo Rooftops",
+  the large-bank fixture's long nocturne — and their instruments, and the
+  cello of `apu_switch` and `soundboard`, all synthesized by
+  `devtools/audio_assets/` (`make audio-assets` writes them again).
+
+### Néo-Lumen art generated for OpenSNES
 - **License**: CC0 (Public Domain)
-- **Used in**: `examples/games/shmup_1942/res/` —
-  `tiles_packed.png`, `ships_packed.png`, and the `sprites.png` /
-  `ground.png` split outputs derived from `tiles_packed.png` via
-  `res/import.sh`.
+- **What**: the pictures, sprites and tiles the examples are drawn with:
+  most generated with PixelLab (https://www.pixellab.ai/) for OpenSNES,
+  some edited by hand, and the pieces PixelLab cannot draw (under 16
+  pixels, or tied to the text grid) drawn by `devtools/art_assets/`. The
+  originals, the tool and the seed of each, the edits and the examples
+  that use them are listed in `assets/neo-lumen/README.md`.
 
 ## Documentation Sources
 - **SNESdev Wiki** (https://snes.nesdev.org/) — CC-BY-SA
@@ -200,20 +221,10 @@ Incompatible (do not use without isolation):
   table, extracted verbatim from the demo (data of the technique,
   credited).
 
-## examples/audio/pitch_mod
-
-- `res/cello.brr` — the cello BRR sample shipped with krom (Peter
-  Lemon)'s PitchMod demo (github.com/PeterLemon/SNES,
-  `SPC700/PitchMod/BRR/`), used at his exact loop point (4167) and
-  pitch. krom's repository carries no explicit license, and the
-  recording's original source is unknown — revisit before any
-  commercial redistribution. The companion 9-byte LFO square wave is
-  transcribed in `player.spc700.asm` (technique, not an asset).
-
 ## examples/audio/soundboard
 
-- `res/cello.brr` — same sample and caveat as
-  `examples/audio/pitch_mod` (byte-identical copy).
+- `res/cello.brr` — the same synthesized cello as
+  `examples/audio/apu_switch` (byte-identical copy, original work).
 - `res/ss.brr`, `res/pp.brr` — OpenSNES-original formant-synthesized
   phonemes (byte-identical copies from `examples/audio/speech_synth`,
   original work, MIT).
@@ -235,11 +246,14 @@ Incompatible (do not use without isolation):
 
 ## examples/audio/apu_switch
 
-- `res/cello.brr` — same sample and caveat as
-  `examples/audio/pitch_mod` above (byte-identical copy; the example
-  hot-swaps between this repo's own drum and cello APU programs).
-  krom's PlayTwoSong demo, whose *protocol* this example ports, ships
+- `res/cello.brr` — synthesized for OpenSNES by
+  `devtools/audio_assets/build.py` (original work, CC0). It replaced the
+  cello sample of krom (Peter Lemon)'s PitchMod demo, whose repository
+  carries no explicit licence. The companion 9-byte LFO square wave of
+  krom's demo is transcribed in `cello.spc700.asm` (technique, not an
+  asset).
+- The drum program ships no assets at all (the DSP noise generator
+  only; PlayNoise technique credited to the same repository).
+- krom's PlayTwoSong demo, whose *protocol* this example ports, ships
   songs built from samples ripped from commercial games — none of
   those assets are used here.
-  `audio/play_noise` ships no assets at all (DSP noise generator only,
-  technique credited to the same repository).

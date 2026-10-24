@@ -1,37 +1,55 @@
 # Migrated from probes/movement.py (luna#205 [[checkpoint]]/delta). Pressing a
-# direction moves the world coordinate the expected way. Baseline settles, then
-# each leg holds a direction and asserts the delta vs the previous checkpoint.
+# direction moves Kit the expected way and the walls stop him; walking into a
+# drone sets its bit of collision_flags. Baseline settles, then each leg
+# holds a direction and asserts the delta vs the previous checkpoint.
+#
+# Measured on luna v1.40.0 (2026-10-22, the warehouse): Kit's 16x16 box
+# starts at cell (7, 8), (112, 128), and walks 2 px a frame. RIGHT from
+# frame 60 stops it at x 224 (the east wall is cell 15, x 240); DOWN from
+# 120 at y 192 (the south wall, row 13, y 208). There it touches the
+# bottom-right drone's box (208-223) edge to edge, which collideRect() does
+# not count; LEFT from 180 for ten frames takes it to x 206, inside: bit 3.
 rom = "../../examples/basics/collision_demo/collision_demo.sfc"
-frames = 180
+frames = 200
 
 [[checkpoint]]              # baseline
 at_frame = 60
 [checkpoint.values]
-"player_x.main" = { eq = 120, width = 2 }
-"player_y.main" = { eq = 112, width = 2 }
-[[checkpoint]]             # hold RIGHT -> player_x increases
+"player_x.main" = { eq = 112, width = 2 }
+"player_y.main" = { eq = 128, width = 2 }
+"collision_flags.main" = { eq = 0, width = 1 }
+[[checkpoint]]             # hold RIGHT -> player_x increases, up to the wall
 at_frame = 120
 input = "60:0x0100,119:0"
 [checkpoint.delta]
 "player_x.main" = "increased"
 [checkpoint.values]
-"player_x.main" = { eq = 176, width = 2 }
-"player_y.main" = { eq = 112, width = 2 }
-[[checkpoint]]             # hold DOWN -> player_y increases
+"player_x.main" = { eq = 224, width = 2 }
+"player_y.main" = { eq = 128, width = 2 }
+[[checkpoint]]             # hold DOWN -> player_y increases, up to the wall
 at_frame = 180
 input = "120:0x0400,179:0"
 [checkpoint.delta]
 "player_y.main" = "increased"
+[checkpoint.values]
+"player_x.main" = { eq = 224, width = 2 }
+"player_y.main" = { eq = 192, width = 2 }
+"collision_flags.main" = { eq = 0, width = 1 }
+[[checkpoint]]             # LEFT into the bottom-right drone: its bit
+at_frame = 200
+input = "180:0x0200,189:0"
+[checkpoint.delta]
+"player_x.main" = "decreased"
 
 # Every VRAM DMA of this input-driven run lands in blank or forced blank
 # (added 2026-10-04: vram_dma_blank.py only sees the boot path; the gate for
 # what a button press triggers is here, one manifest at a time).
 [checkpoint.values]
-"player_x.main" = { eq = 176, width = 2 }
-"player_y.main" = { eq = 152, width = 2 }
+"player_x.main" = { eq = 206, width = 2 }
+"player_y.main" = { eq = 192, width = 2 }
+"collision_flags.main" = { eq = 8, width = 1 }
 [asserts.dma]
 unsafe_writes = 0
-# Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
-# the square walks one pixel per frame and stops at the wall: 120 -> 176 (right wall), 112 -> 152.
+# The image after the whole script: the drone's lights green over Kit.
 [asserts]
-fbhash = "39b4d33362dc3375"
+fbhash = "26e13a032e493b9c"

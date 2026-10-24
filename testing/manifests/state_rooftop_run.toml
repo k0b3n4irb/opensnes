@@ -1,0 +1,43 @@
+# games/rooftop_run's states: RIGHT held from 110 and never a jump, so Kit
+# falls into the first gap three times. Each fall costs a life: the world
+# waits (GS_DOWN), Kit comes back at the first roof's checkpoint, and the
+# third fall ends the game (GS_OVER). START then brings back the title with
+# a new run: three lives, score 0, Kit at x = 16.
+#
+# What this proves: the lives count down, the checkpoint brings Kit back
+# alive, the game over is reached and left, and the reset is whole. Each of
+# those is invisible to a manifest that only plays well.
+rom = "../../examples/games/rooftop_run/rooftop_run.sfc"
+
+[[checkpoint]]                 # the first fall: a life lost, the world waits
+at_frame = 400
+input = "100:0x1000,102:0,110:0x0100"
+[checkpoint.values]
+game_state = { eq = 2, width = 1 }       # GS_DOWN
+lives = { eq = 2, width = 1 }
+
+[[checkpoint]]                 # back on the first roof, running again
+at_frame = 600
+[checkpoint.values]
+game_state = { eq = 1, width = 1 }
+lives = { eq = 2, width = 1 }
+"kit_y.main" = { eq = 128, width = 2 }
+
+[[checkpoint]]                 # the third fall: no life left
+at_frame = 1000
+[checkpoint.values]
+game_state = { eq = 3, width = 1 }       # GS_OVER
+lives = { eq = 0, width = 1 }
+
+[[checkpoint]]                 # START: the title, a new run
+at_frame = 1150
+input = "1000:0,1100:0x1000,1102:0"
+[checkpoint.values]
+game_state = { eq = 0, width = 1 }       # GS_TITLE
+lives = { eq = 3, width = 1 }
+score = 0
+shards_got = { eq = 0, width = 1 }
+"kit_x.main" = { eq = 16, width = 2 }
+
+[asserts.dma]
+unsafe_writes = 0

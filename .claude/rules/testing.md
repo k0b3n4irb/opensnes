@@ -26,7 +26,7 @@ python3 testing/audio_regress.py            # APU output hashed for eleven examp
 python3 testing/nmi_budget.py               # VBlank time budget: the NMI handler's worst frame vs a 12 000 mclk ceiling (luna profile --budget) on a representative subset
 python3 testing/vram_dma_blank.py           # every VRAM DMA byte of every example lands in blank or force blank (luna --dma-trace); gsuPresent frames whole, double-buffered, swapped in blank
 make hardware-preflight                              # before a console session: the 26 protocol ROMs (docs/HARDWARE_VERIFICATION.md) alive from random RAM (3 seeds) and under PAL, VRAM DMA in blank (hardware_preflight.py; ROWS=1-7 for the gate rows; not in make tests)
-make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() + the games playing their manifests under `region = "pal"`, and tetris built ROM_REGION=pal (weekly pal.yml, not in make tests)
+make test-pal                                        # PAL pass: corpus liveness under --force-region pal + libtest getRegion()/isPAL() + the games playing their manifests under `region = "pal"`, and blocks built ROM_REGION=pal (weekly pal.yml, not in make tests)
 make luna-bench                                      # luna's own corpus anomaly scan (nightly luna-bench.yml); only a `bug` verdict fails, `suspect` = static screen
 make coverage-host                                   # llvm-cov line coverage of QBE + cproc-qbe over the fixtures and the lib build (report, not a gate)
 make docs-strict                                     # Doxygen with warnings as errors (the doc-render job); plain `make docs` stays non-fatal so a doc warning cannot block a release build
@@ -169,8 +169,8 @@ For every change, run this three-step pipeline before committing:
 
    | Example | Why kept | What to look for |
    |---|---|---|
-   | `examples/maps/dynamic_map` | exercises 2 framed-tail-call wrappers | press **D** (SNES A) — the map should toggle 32×32 ↔ 64×64 cleanly without flicker |
-   | `examples/graphics/effects/mosaic` | only `framesize=2` phantom-frame site in the diagnostic trace | press **A** (SNES Y) — fade-in should complete and stop, no garbage tiles |
+   | `examples/backgrounds/mode2` | the only example that switches BG mode and BG1's pointers at run time | press **B** — Mode 2's bands become Mode 4's diagonals and back, no garbage tiles, the wave keeps travelling |
+   | `examples/transitions/fading` | the only `mosaicFadeOut` / `mosaicFadeIn` caller | press any button until the mosaic — the blocks must grow to 16×16, stop, and shrink back |
 
    Keep the list to 2–5 entries when possible. If the change genuinely needs
    wider coverage say so explicitly with the reasoning.

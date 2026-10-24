@@ -44,7 +44,7 @@ Cuts feel cheap; transitions feel authored. Two are nearly free on the SNES:
   black and back. The standard scene bookend. See @ref examples_transitions_fading.
 - **Mosaic dissolve** — grow the mosaic size to pixelate the screen away, then
   shrink it back on the new scene. A distinctly SNES transition. See
-  @ref examples_transitions_mosaic.
+  @ref examples_transitions_fading, which shows both.
 
 Both are a single register animated over a dozen frames, and both read as
 production value far above their cost.
@@ -72,7 +72,7 @@ layer, per-scanline distortion via HDMA does what sprite scaling cannot — see
 
 Juice compounds. A coin pickup that is satisfying is rarely one effect — it is a
 flash, a small sound, a number that pops and rises, and maybe a one-frame
-freeze, all at once and all gone within a quarter-second. @ref examples_games_shmup_1942
+freeze, all at once and all gone within a quarter-second. @ref examples_demos_shmup
 is worth reading for how modest effects stack into a game that feels responsive.
 
 > **Go deeper.** Watch Jonasson & Purho's

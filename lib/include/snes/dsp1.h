@@ -182,11 +182,11 @@ typedef struct {
  *   point under the imaginary centre — write them to M7X/M7Y
  *   (mode7SetCenter) when driving Mode 7 from dsp1Raster.
  *
- * Raster numbers are down-positive and relative to the screen centre; note
- * that dsp1Project's V is the opposite (up-positive). Call once (and again
- * whenever the camera moves), then dsp1Project points or dsp1Raster the
- * ground. `lfe`/`les` are best tuned empirically — see the values used by
- * examples/chips/dsp1_cube; `les` is also the vertical focal length.
+ * Raster numbers are down-positive and relative to the screen centre, like
+ * dsp1Project's V. With `aas` = 0 the camera looks along −Y. Call once (and
+ * again whenever the camera moves), then dsp1Project points or dsp1Raster
+ * the ground. `lfe`/`les` are best tuned empirically — see the values used
+ * by examples/mode7/dsp1_ground; `les` is also the vertical focal length.
  */
 void dsp1SetCamera(const Dsp1Camera *cam);
 
@@ -196,8 +196,11 @@ void dsp1SetCamera(const Dsp1Camera *cam);
  * @param y world Y (I)
  * @param z world Z (I)
  *
- * Writes @ref dsp1_o0 = H (screen X), @ref dsp1_o1 = V (screen Y),
+ * Writes @ref dsp1_o0 = H (screen X, right-positive), @ref dsp1_o1 = V
+ * (screen Y, down-positive), both relative to the screen centre, and
  * @ref dsp1_o2 = M (scale/depth — use it to size sprites with distance).
+ * M is positive for a point in front of the eye; behind it (M <= 0) H and
+ * V come back mirrored, so hide such a point instead of drawing it.
  * Requires a prior dsp1SetCamera. Takes ~627 DSP cycles (~83 µs); the driver
  * polls, so timing is handled for you.
  */
@@ -205,7 +208,7 @@ void dsp1Project(s16 x, s16 y, s16 z);
 
 /**
  * @brief Screen point → ground plane (DSP-1 command $0E, "Target").
- * @param h screen X relative to the centre (I; mirrored like dsp1Project's H)
+ * @param h screen X relative to the centre (I; right-positive, like dsp1Project's H)
  * @param v screen raster relative to the imaginary centre (I; down-positive)
  *
  * The inverse of dsp1Project for the ground plane: which ground (x, y) is

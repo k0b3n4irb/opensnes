@@ -3,7 +3,7 @@ OPENSNES := $(shell cd ../../.. && pwd)
 TARGET   := panel_hud.sfc
 ROM_NAME := PANEL HUD
 USE_LIB  := 1
-LIB_MODULES := console dma background panel input tile
+LIB_MODULES := console dma background panel input sprite
 
 CSRC := main.c
 

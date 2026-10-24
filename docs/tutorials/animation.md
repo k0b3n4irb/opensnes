@@ -25,7 +25,7 @@ void hero_animate(void) {
 
 A frame value is an **opaque u16** — the player sequences it without interpreting it. Three consumption patterns:
 
-- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/likemario`);
+- `animTickOam(&p, id)` — the value is an `oamframeid` for the dynamic sprite engine; the VRAM re-upload happens only when the frame actually changes (`examples/games/rooftop_run`);
 - `animTickMeta(&p, table)` — the value indexes a `MetaspriteItem*` pointer table, feeding `oamDrawMetasprite()` directly (`examples/sprites/aseprite_pipeline`);
 - `animTick(&p)` — raw value, yours to apply (`oamSetTile()`, a background tile, anything; `examples/sprites/animated_sprite` passes it to `oamSet()`).
 
@@ -336,7 +336,7 @@ while (1) {
 
 ### Action-Based Animation
 
-The dynamic sprite engine combines with action states by hand: each action maps to specific frame indices. (`examples/games/likemario/` does the same job with `AnimClip` clips and `animTickOam()`, as in the first section; the manual form below is what that call does for you.)
+The dynamic sprite engine combines with action states by hand: each action maps to specific frame indices. (`examples/games/rooftop_run/` does the same job with `AnimClip` clips and `animTickOam()`, as in the first section; the manual form below is what that call does for you.)
 
 ```c
 #define FRAME_STAND  6
@@ -344,20 +344,20 @@ The dynamic sprite engine combines with action states by hand: each action maps 
 #define FRAME_WALK0  2
 #define FRAME_WALK1  3
 
-u8 mario_anim_idx = 0;
+u8 kit_anim_idx = 0;
 u8 anim_tick = 0;
 
-void mario_animate(void) {
+void kit_animate(void) {
     anim_tick++;
 
-    if (mario_action == ACT_WALK) {
+    if (kit_action == ACT_WALK) {
         /* Toggle between walk frames every 4 VBlanks */
         if ((anim_tick & 3) == 3) {
-            mario_anim_idx ^= 1;
-            oambuffer[0].oamframeid = FRAME_WALK0 + mario_anim_idx;
+            kit_anim_idx ^= 1;
+            oambuffer[0].oamframeid = FRAME_WALK0 + kit_anim_idx;
             oambuffer[0].oamrefresh = 1;
         }
-    } else if (mario_action == ACT_JUMP || mario_action == ACT_FALL) {
+    } else if (kit_action == ACT_JUMP || kit_action == ACT_FALL) {
         if (oambuffer[0].oamframeid != FRAME_JUMP) {
             oambuffer[0].oamframeid = FRAME_JUMP;
             oambuffer[0].oamrefresh = 1;
@@ -469,7 +469,7 @@ Background tile animation involves VRAM writes, which **must happen during VBlan
 
 - `examples/sprites/animated_sprite/` -- basic 4-direction sprite animation with H-flip
 - `examples/sprites/dynamic_sprite/` -- dynamic sprite engine with VRAM streaming
-- `examples/games/likemario/` -- action-state animation (walk, jump, stand) with camera and physics
+- `examples/games/rooftop_run/` -- action-state animation (walk, jump, stand) with camera and physics
 
 ## Next Steps
 

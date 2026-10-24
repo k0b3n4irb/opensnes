@@ -8,7 +8,7 @@ that never reach the screen (an uninitialised read, a mis-stepped counter, a
 changed allocation) — which the framebuffer fbhash can't see.
 
 CI gate on both arches — the WHOLE corpus. Historically two examples
-(mapandobjects, slope_collision) hashed differently x86_64 ↔ aarch64 and were
+(platform_objects, slope_collision) hashed differently x86_64 ↔ aarch64 and were
 excluded; re-verified on luna v1.14.0 via CI on both runner arches (2026-08-09),
 CI x86_64 == CI arm64 == the committed aarch64 baseline (bit-identical stream
 hash), so the exclusion is gone and every example gates WRAM on both arches now.
@@ -36,7 +36,7 @@ drops those of the plain C band ($00:0000-$1FFF, mirrored at $7E) that lie
 wholly above the ROM's last C variable (from its .sym, like the stack-floor
 gate of rom_coverage.py): only the stack lives there, and how deep it goes is
 gated separately. Measured on the compiler change of 2026-09-26 (qbe
-9a17010): tetris and rpg differed in stack pages only — no re-capture needed
+9a17010): blocks and rpg differed in stack pages only — no re-capture needed
 now; the direct page and moved globals still count, as they should.
 
 Exit 0 = all match, 1 = any drift.
@@ -58,11 +58,11 @@ from luna_runner import _pool_map, load_manifest, missing_firmware  # noqa: E402
 BASELINE = HERE / "baselines" / "wram.json"
 FRAMES = 90   # consecutive vblank-aligned frames to hash
 
-# Cross-arch WRAM stability. Historically two examples (games_mapandobjects,
+# Cross-arch WRAM stability. Historically two examples (demos_platform_objects,
 # maps_slope_collision) hashed differently x86_64 ↔ aarch64 and were excluded
 # from the cross-arch gate. Re-verified on luna v1.14.0 via CI on BOTH runner
 # arches (2026-08-09): CI x86_64, CI arm64 and the committed aarch64 baseline
-# all produce the IDENTICAL stream hash (mapandobjects 56571bbf…,
+# all produce the IDENTICAL stream hash (platform_objects 56571bbf…,
 # slope_collision 824adfbd…). The old divergence was a stale/older-luna
 # artifact — the whole corpus now gates WRAM on both arches. The set stays
 # (empty) as an escape hatch should a future luna regression re-introduce a

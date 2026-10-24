@@ -55,7 +55,7 @@ FIXTURES_COMPILER := a6_farptr a7_32bit b2_far_ram c_features debug_channel d_qu
 FIXTURES_STRESS   := hwmath ppumul openbus bcd sprite_overflow
 # Examples that left the corpus in the 1.0 review (2026-10-15) and keep the
 # manifests that read them: twins of PVSnesLib examples, library coverage.
-FIXTURES_RETIRED  := tiled metasprite snesmod_music_large
+FIXTURES_RETIRED  := tiled metasprite snesmod_music_large mode6 sa1_hello sa1_save superfx_hello superfx_save
 FIXTURE_DIRS      := $(addprefix testing/fixtures/,$(FIXTURES_LIB)) \
                      $(addprefix testing/fixtures/compiler/,$(FIXTURES_COMPILER)) \
                      $(addprefix testing/fixtures/stress/,$(FIXTURES_STRESS)) \
@@ -76,7 +76,7 @@ else
 endif
 
 .DEFAULT_GOAL := all
-.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade
+.PHONY: all clean clean-examples install compiler tools lib examples cli tests test-compiler test-difftest test-tools test-sanitizers coverage-host luna-bench test-toolchain-suites test-link-modules test-bank-spill fuzz fuzz-replay test-manifests test-pal test-nmi-budget test-wram test-project rom-coverage bench bench-sdk bench-lib bench-twins budget asset-budget submodules verify-toolchain hooks check-clean-export lint-commits lint-cproc-widths lint-docs lint-asm-abi lint-vram lint-cppcheck lint docs docs-strict help release release-smoke clean-release hardware-kit hardware-preflight check-upgrade audio-assets art-assets
 
 #------------------------------------------------------------------------------
 # Main targets
@@ -134,6 +134,13 @@ lint-cproc-widths:
 hooks:
 	@git config core.hooksPath scripts/githooks
 	@echo "hooks: core.hooksPath = scripts/githooks (commit-msg, pre-push)"
+
+# Every example built from a clean export of HEAD (git archive, make clean,
+# make), the way CI builds it: a file the commit leaves out fails here
+# instead of on every CI leg (91419502: five .brr hidden by .gitignore).
+# Also run by the pre-push hook on the commit being pushed.
+check-clean-export:
+	@python3 devtools/check_clean_export.py
 
 # Doc-drift sentinel — version macros, ROADMAP status line, examples count
 # across active rules. See devtools/check_doc_drift.py and
@@ -301,8 +308,19 @@ test-nmi-budget:
 # standard); the weekly `pal.yml` workflow runs it, and so should anyone
 # touching V-timer, frame-budget or region code.
 # Scripted game manifests replayed on PAL builds of their game (test-pal).
-PAL_GAME_MANIFESTS := state_tetris movement_breakout state_breakout_game_over \
-                      movement_likemario movement_shmup_1942 movement_rpg
+PAL_GAME_MANIFESTS := state_blocks movement_breakout state_breakout_game_over \
+                      movement_rooftop_run movement_shmup movement_rpg
+
+# The examples' sounds (contributor-only): the tracker modules composed for
+# OpenSNES and the synthesized samples, written where the examples read
+# them. Needs ffmpeg. `.claude/notes/tech/audio_assets.md`.
+audio-assets:
+	@python3 devtools/audio_assets/build.py
+
+# The examples' Néo-Lumen level data, written from assets/neo-lumen/ (a
+# generator like audio-assets: its outputs are committed).
+art-assets:
+	@python3 devtools/art_assets/build.py
 
 test-pal:
 	@scripts/install-luna.sh
@@ -327,7 +345,7 @@ test-pal:
 	@# ROM_REGION itself (header $$FFD9 = $$02): one game built as a PAL
 	@# cartridge must be PAL for luna with nothing forced, and play its
 	@# manifest. The NTSC build is restored afterwards.
-	@set -e; g=tetris; m=state_tetris; \
+	@set -e; g=blocks; m=state_blocks; \
 	    $(MAKE) -s -C examples/games/$$g ROM_REGION=pal TARGET=$${g}_pal.sfc >/dev/null; \
 	    testing/bin/luna state examples/games/$$g/$${g}_pal.sfc --until-frame 1 --out - 2>/dev/null \
 	        | grep -q '"region": "Pal"' || { echo "test-pal: $${g}_pal.sfc is not a PAL cartridge for luna"; exit 1; }; \
@@ -484,7 +502,9 @@ coverage-host:
 # per finding. It wants a flat directory, so the ROMs are collected first.
 # Only a "bug" verdict fails the target; "suspect" is luna's word for a
 # screen that never changes while the CPU runs, which is what most examples
-# do on purpose (first run 2026-09-15: 28 ok, 0 bug, 57 suspect). The
+# do on purpose (first run 2026-09-15: 28 ok, 0 bug, 57 suspect), and
+# "firmware" is a chip ROM luna cannot find (dsp1b.rom is never in CI: the
+# DSP-1 example comes out 🔑, not ❌, since luna v1.40.0). The
 # report is the artifact to read. Nightly in luna-bench.yml; locally when a
 # luna release lands.
 BENCH_ROMS := /tmp/opensnes_bench_roms
@@ -495,9 +515,12 @@ luna-bench:
 	@for m in $$(git ls-files 'examples/**/main.c' 'examples/*/*/main.c'); do d=$$(dirname $$m); \
 		for r in $$d/*.sfc; do [ -f "$$r" ] && cp "$$r" "$(BENCH_ROMS)/$$(echo $$d | sed 's|examples/||; s|/|_|g').sfc"; done; done; \
 		echo "luna-bench: $$(ls $(BENCH_ROMS) | wc -l) ROMs"
-	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600}
-	@ls $(BENCH_OUT); n=$$(ls $(BENCH_OUT)/*.md 2>/dev/null | grep -vc "report.md\|README"); \
-		echo "luna-bench: $$n bug file(s) under $(BENCH_OUT)"; [ "$$n" -eq 0 ]
+	testing/bin/luna bench $(BENCH_ROMS) --out $(BENCH_OUT) -f $${BENCH_FRAMES:-600} --jobs 0
+	@[ -f $(BENCH_OUT)/report.md ] || { echo "luna-bench: no report.md under $(BENCH_OUT)"; exit 1; }; \
+		grep -m1 '^\*\*Summary:' $(BENCH_OUT)/report.md; \
+		bugs=$$(grep -l '^# ❌' $(BENCH_OUT)/bugs/*.md 2>/dev/null); n=$$(echo "$$bugs" | grep -c .); \
+		echo "luna-bench: $$n bug verdict(s) under $(BENCH_OUT)/bugs"; \
+		for f in $$bugs; do head -1 $$f; done; [ "$$n" -eq 0 ]
 
 # The upstream test suites of the three toolchain submodules, run on the
 # fork's own binaries against known-fail ratchets (gaps review H1,
@@ -721,9 +744,15 @@ clean-release:
 # Help
 #------------------------------------------------------------------------------
 
+# The protocol rows that name a fixture (a ROM that asks the hardware a
+# question, out of examples/): `make` does not build fixtures, so the two
+# targets below build these first.
+PROTOCOL_FIXTURES = $(shell grep -oE '^\| [0-9]+ \| `testing/[a-z0-9_/]+`' docs/HARDWARE_VERIFICATION.md | grep -oE 'testing/[a-z0-9_/]+')
+
 # The ROMs of the hardware verification protocol (docs/HARDWARE_VERIFICATION.md),
 # numbered in grid order, for a flash cart's SD card.
 hardware-kit:
+	@for d in $(PROTOCOL_FIXTURES); do $(MAKE) -s -C $$d || exit 1; done
 	@sh scripts/hardware-kit.sh
 
 # Before a console session: every protocol ROM alive from pseudo-random RAM
@@ -731,6 +760,7 @@ hardware-kit:
 # table as hardware-kit. ROWS=1-7 restricts it to the gate rows.
 hardware-preflight:
 	@scripts/install-luna.sh
+	@for d in $(PROTOCOL_FIXTURES); do $(MAKE) -s -C $$d || exit 1; done
 	@python3 testing/hardware_preflight.py $(if $(ROWS),--rows $(ROWS))
 
 # A project's sources against the names 0.49 removed and the two calls that
@@ -768,6 +798,7 @@ help:
 	@echo "  lint      - Run every lint we have (lint-docs + lint_asm + test-devtools + lint-commits)"
 	@echo "  test-devtools - Unit tests of the sentinels (devtools/test_*.py) and of the luna harness"
 	@echo "  hooks     - Install the commit-msg and pre-push git hooks (scripts/githooks)"
+	@echo "  check-clean-export - Build every example from a clean export of HEAD, as CI does"
 	@echo "  test-sanitizers - Rebuild the host toolchain and tools with ASan+UBSan and run fixtures, lib, goldens, corpus (leaves sanitized binaries: make clean && make after)"
 	@echo "  test-toolchain-suites - Run cproc / QBE / wla-dx upstream test suites on the fork binaries (known-fail ratchets in devtools/toolchain-suites/)"
 	@echo "  test-link-modules - Link every lib module alone (declared deps only) and in two all-together groups"

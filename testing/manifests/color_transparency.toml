@@ -1,6 +1,6 @@
-# transparency blends a 2bpp cloud layer (BG3, sub screen) additively over a
-# 4bpp landscape (BG1, main screen) in Mode 1 with BG3 priority high, and
-# scrolls the clouds one pixel per frame. There is no input and no game
+# transparency blends a 2bpp mist layer (BG3, sub screen) additively over a
+# 4bpp street (BG1, main screen) in Mode 1 with BG3 priority high, and
+# scrolls the mist one pixel per frame. There is no input and no game
 # state, so the whole example is invisible to the liveness pillar, and the
 # fbhash baseline samples a single frame — which cannot tell a scrolling
 # sub screen from a frozen one, nor a blended frame from an opaque one.
@@ -8,13 +8,13 @@
 # What this pins:
 #   * the colour-math pair CGWSEL $02 (source = sub screen) + CGADSUB $21
 #     (add, half off, BG1 $01 + backdrop $20). Drop the sub-screen bit and
-#     the clouds become opaque rather than transparent.
+#     the mist becomes opaque rather than transparent.
 #   * the scroll shadows: BG3's bg_scroll_x advances by exactly 60 over 60
 #     frames (1 px/frame) across two legs, while BG1's stays 0 — the
-#     landscape must not drift with the clouds. bg_scroll_x lives at
+#     street must not drift with the mist. bg_scroll_x lives at
 #     00:0063 as 4 u16 entries, so BG1 is 00:0063 and BG3 is 00:0067.
-#   * the two palettes landed at DIFFERENT CGRAM offsets: clouds at entry 0
-#     (2bpp) and the landscape at entry 16 (4bpp). An off-by-one in either
+#   * the two palettes landed at DIFFERENT CGRAM offsets: mist at entry 0
+#     (2bpp) and the street at entry 16 (4bpp). An off-by-one in either
 #     dmaCopyCGram destination would silently overwrite the other.
 rom = "../../examples/color/transparency/transparency.sfc"
 # Keys are `bg_scroll_x+N` (bytes, decimal; luna v1.28.0): they follow the array
@@ -39,12 +39,9 @@ colormath_cgadsub = { eq = 0x21, width = 1 }
 "bg_scroll_x" = "unchanged"
 
 [asserts.blocks]
-cloud_pal = { space = "cgram", offset = "0000", hex = "0000a438" }
-# land_pal: the landscape's colours as opensnes-tileset --rearrange lays
-# them out. Until 2026-10-05 the tool reordered the .pal without rewriting the
-# tiles (the picture was brown and mauve). Until 2026-10-15 it also folded an
-# opaque black onto index 0, transparent: the picture's black is now colour 1
-# of each bank, and 0x0320 moved to the second bank with 0x03e0 and 0x0200
-# (the frame is unchanged: the backdrop behind is black).
-land_pal  = { space = "cgram", offset = "0020", hex = "00000000183f5322ad2d492dc524c9084e19d329783e1d53dd7ff87f957f347f" }
-land_pal2 = { space = "cgram", offset = "0040", hex = "00000000e00320030002" }
+# mist_pal: the mist at CGRAM 0 (2bpp: colour 0, then the mist colour
+# $28C5 = rgb 5,6,10 out of 31). street_pal: the street at CGRAM 16, its
+# sixteen colours as opensnes-tileset writes them. Measured on luna on
+# 2026-10-19, when the street and the mist replaced PVSnesLib's art.
+mist_pal   = { space = "cgram", offset = "0000", hex = "0000c528" }
+street_pal = { space = "cgram", offset = "0020", hex = "de2a89525c49c63d442d0c41e320c424b430a31c621421080000000000000000" }

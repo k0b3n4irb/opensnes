@@ -27,7 +27,6 @@ machine run at 60 Hz.
 sprite that isn't tied to the grid. The tile / palette / VRAM trinity that
 underpins everything visual on the SNES.
 
-@subpage examples_text_scroll_message
 @subpage examples_text_pixel_text
 
 @subpage examples_backgrounds_mode1
@@ -54,19 +53,16 @@ then branch out to the SNES's exotic controllers.
 
 @subpage examples_input_controller
 
-@subpage examples_input_two_players
-
 @subpage examples_input_mouse
 
 @subpage examples_input_superscope
 
 Now that the pad moves things, the sprites that answer it: the OBJ size pairs
-one character is built from, a world larger than the screen with its sprites
+one character is built from (and, behind SELECT in @ref examples_sprites_dynamic_sprite,
+a metasprite streamed under each pair), a world larger than the screen with its sprites
 in world coordinates, and an Aseprite timeline played on a button.
 
 @subpage examples_sprites_sprite_sizes
-
-@subpage examples_sprites_dynamic_metasprite
 
 @subpage examples_sprites_world_sprites
 
@@ -84,11 +80,7 @@ ground with tile collision.
 
 @subpage examples_scrolling_continuous_scroll
 
-@subpage examples_maps_dynamic_map
-
 @subpage examples_basics_collision_demo
-
-@subpage examples_maps_slope_collision
 
 > Author the world, don't hand-code it: @ref craft_tiles_to_levels is the
 > think-in-metatiles workflow, and @ref tools_opensnes_level converts a Tiled level
@@ -101,8 +93,6 @@ SNES — fades and mosaic transitions, per-scanline HDMA effects, colour math,
 windows, the Mode 7 plane, and sound.
 
 @subpage examples_transitions_fading
-
-@subpage examples_transitions_mosaic
 
 @subpage examples_hdma_hdma_wave
 
@@ -126,8 +116,6 @@ windows, the Mode 7 plane, and sound.
 
 @subpage examples_audio_snesmod_music
 
-@subpage examples_audio_snesmod_sfx
-
 @subpage examples_audio_sfx_from_wav
 
 @subpage examples_audio_soundboard
@@ -138,67 +126,52 @@ windows, the Mode 7 plane, and sound.
 and the state machine; assemble a skeleton, and pick up the reusable maths
 every game needs.
 
-@subpage examples_basics_timer
-
 @subpage examples_basics_scene_stack
 
 @subpage examples_basics_panel_hud
 
 @subpage examples_basics_game_skeleton
 
-@subpage examples_basics_fix32_orbit
-
 @subpage examples_basics_aim_target
 
 ## Stage 6 — "Can I finish and ship?"
 
 *Confidence: a complete cartridge.* Persist progress, choose a mapper, fit
-more data in the cartridge with compression, reach for a coprocessor when you need more, and study complete games that fuse
-everything above.
+more data in the cartridge with compression, reach for a coprocessor when you need more, study playable demos that fuse
+everything above, and three complete games.
 
 @subpage examples_memory_save_game
 
 @subpage examples_memory_hirom_demo
 
-@subpage examples_backgrounds_mode1_lz77
-
 @subpage examples_games_breakout
 
-@subpage examples_games_tetris
+@subpage examples_games_blocks
 
-@subpage examples_games_likemario
+@subpage examples_games_rooftop_run
 
-@subpage examples_games_mapandobjects
+@subpage examples_demos_platform_objects
 
-@subpage examples_games_rpg
+@subpage examples_demos_rpg
 
-@subpage examples_games_shmup_1942
+@subpage examples_demos_shmup
 
-@subpage examples_games_mode7_racing
-
-@subpage examples_games_mode7_flying
+@subpage examples_mode7_mode7_racing
 
 ### More horsepower — the cartridge coprocessors
 
 When the base hardware isn't enough. SA-1 is the same 65816 ISA at 10.74 MHz;
 Super FX / GSU is a custom RISC processor for bitmaps and 3D.
 
-@subpage examples_chips_sa1_hello
-
 @subpage examples_chips_sa1_starfield
-
-@subpage examples_chips_superfx_hello
 
 @subpage examples_chips_superfx_3d
 
 @subpage examples_chips_superfx_game_skeleton
 
-Saving on a coprocessor cartridge is its own case: SA-1 BW-RAM, and the Super
-FX's save RAM while a job may run.
-
-@subpage examples_chips_sa1_save
-
-@subpage examples_chips_superfx_save
+Saving on a coprocessor cartridge uses the same `sram` calls as any other:
+@ref tutorial_sa1 shows it in BW-RAM, @ref tutorial_superfx_advanced in the
+Game Pak RAM while a job may run.
 
 ## Further — the rest of the hardware
 
@@ -206,18 +179,14 @@ Every example not on the path above, by topic. Each stands on what the path
 taught; read the one your game needs.
 
 - **The other background modes** — @ref examples_backgrounds_mode0 (four 4-colour
-  layers), @ref examples_backgrounds_mode1_bg3_priority (BG3 above the others),
-  @ref examples_backgrounds_mode2, @ref examples_backgrounds_mode4 and
-  @ref examples_backgrounds_mode6 (offset-per-tile), @ref examples_backgrounds_mode3
+  layers), @ref examples_backgrounds_mode2 (offset-per-tile in Modes 2 and 4),
+  @ref examples_backgrounds_mode3
   (256 colours), @ref examples_backgrounds_mode5_hires (512 pixels, interlace).
-- **More colour** — @ref examples_color_direct_color, @ref examples_color_hicolor_1792,
-  @ref examples_color_pseudo_hires.
+- **More colour** — @ref examples_color_direct_color, @ref examples_color_hicolor_1792.
 - **More HDMA and windows** — @ref examples_hdma_hdma_helpers,
-  @ref examples_hdma_hdma_indirect_gradient, @ref examples_windows_transparent_window,
   @ref examples_windows_window_multi_hdma.
 - **More Mode 7** — @ref examples_mode7_extbg (a second layer from the same
   plane), @ref examples_mode7_dsp1_ground (the DSP-1's projection).
-- **More sound** — @ref examples_audio_apu_switch, @ref examples_audio_echo,
-  @ref examples_audio_pitch_mod, @ref examples_audio_play_noise,
+- **More sound** — @ref examples_audio_apu_switch,
   @ref examples_audio_speech_synth.
-- **More chips** — @ref examples_chips_dsp1_cube.
+- **More chips** — the DSP-1 is in Mode 7: @ref examples_mode7_dsp1_ground.

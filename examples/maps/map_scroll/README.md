@@ -1,6 +1,6 @@
 # Map Scroll
 
-A level drawn in the [Tiled](https://www.mapeditor.org/) map editor scrolls as a Mario sprite moves left and right. The map engine streams only the visible tile columns to VRAM, so the map can be much wider than the screen; the level, its tile properties and its tileset are converted by the build from settings files beside them.
+A level drawn in the [Tiled](https://www.mapeditor.org/) map editor scrolls as Kit, the fox-kit courier, walks left and right along a row of rooftops at night. The map engine streams only the visible tile columns to VRAM, so the map can be much wider than the screen; the level, its tile properties and its tileset are converted by the build from settings files beside them.
 
 ![Screenshot](map_scroll.png)
 
@@ -18,8 +18,8 @@ A level drawn in the [Tiled](https://www.mapeditor.org/) map editor scrolls as a
 
 | Button | Action |
 |--------|--------|
-| LEFT | Move Mario left (sprite flips, map scrolls) |
-| RIGHT | Move Mario right |
+| LEFT | Move Kit left (sprite flips, map scrolls) |
+| RIGHT | Move Kit right |
 
 ## The Tiled Workflow
 
@@ -41,28 +41,35 @@ A level drawn in the [Tiled](https://www.mapeditor.org/) map editor scrolls as a
 **Step 2.** Export it as `.tmj` (JSON).
 
 **Step 3.** The tileset picture is converted by `opensnes-tileset`, from its
-settings file `res/tilesMario.png.toml`:
+settings file `res/roofs.png.toml`:
 ```toml
 tool = "opensnes-tileset"
 
 [convert]
-colors = 48
+colors = 16
 # Outputs: .pic (tiles), .pal (palette), .map (tile optimization table), .inc (the C declarations)
 ```
 
 **Step 4.** The level is converted by `opensnes-level`, after the tileset whose
-`.map` its settings file names (`res/tiledMario.tmj.toml`):
+`.map` its settings file names (`res/rooftops.tmj.toml`):
 ```toml
 tool = "opensnes-level"
 
 [convert]
-tileset = "tilesMario.map"
-# Outputs: BG1.m16 (tilemap), tiledMario.t16 (tile defs), tiledMario.b16 (attributes),
-#          tiledMario.o16 (entities), tiledMario.inc (the C declarations)
+tileset = "roofs.map"
+# Outputs: BG1.m16 (tilemap), rooftops.t16 (tile defs), rooftops.b16 (attributes),
+#          rooftops.o16 (entities), rooftops.inc (the C declarations)
 ```
 
-**Step 5.** The build links the converted data (`res/tilesMario.inc` and
-`res/tiledMario.inc` declare it); `mapLoad()` takes it — no `data.asm`.
+**Step 5.** The build links the converted data (`res/roofs.inc` and
+`res/rooftops.inc` declare it); `mapLoad()` takes it — no `data.asm`.
+
+The level here is one long row of rooftops (2304 pixels, 802 distinct tiles)
+and Kit is a 32x32 sprite of eight walk frames; both are generated for
+OpenSNES (CC0, `assets/neo-lumen/`), and `devtools/art_assets/build.py`
+writes `res/rooftops.tmj` and its tile sheet `res/roofs.png` from them. Open
+the `.tmj` in Tiled to edit the level: each tile of the sheet carries its
+`attribute` (`FF00` for the roof and the walls under it).
 
 ### Tile Properties
 
@@ -103,7 +110,7 @@ The sprite cycles through 4 frames (tiles 0, 2, 4, 6). Each 16x16 sprite uses 2 
 | Module | Why it's here |
 |--------|--------------|
 | `console` | `consoleInit()`, `WaitForVBlank()`, NMI handler setup |
-| `sprite` | OAM buffer for the Mario sprite |
+| `sprite` | OAM buffer for Kit, a 32x32 sprite |
 | `dma` | DMA transfers for tiles, palette, and map column streaming |
 | `input` | `padHeld()` for continuous D-pad reading |
 | `background` | BG layer and scroll register configuration |

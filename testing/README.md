@@ -228,7 +228,7 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
   invisible to the framebuffer. **A CI gate since 2026-09-11**, inside `make tests`
   on both luna legs; raw WRAM content isn't a luna cross-arch guarantee for two
-  examples (mapandobjects, slope_collision diverge x86_64 ↔ aarch64), which the
+  examples (platform_objects, slope_collision diverge x86_64 ↔ aarch64), which the
   oracle skips per arch. Baseline entries carry `rom_sha256` provenance
   (#120): a mismatch reports whether the ROM itself changed vs the capture, and
   `--update` refuses a stale tree (corpus-fresh guard #105 + per-example
@@ -237,4 +237,4 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   tags each `--dma-trace` write with `force_blank` (INIDISP), so a write is safe
   iff `blank || force_blank`. The probe asserts **zero unsafe writes** (active
   display, screen on — the #1 silent failure, now testable) and that the per-VBlank
-  peak stays ≤ 4 KB (real bytes now: `dynamic_metasprite` peaks ~3.5 KB).
+  peak stays ≤ 4 KB (real bytes now: `dynamic_sprite`, metasprite scene, peaks ~3.5 KB).

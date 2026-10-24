@@ -9,15 +9,11 @@ trade of colours against layers against resolution.
 
 | Example | Developer question |
 |---------|--------------------|
-| [mode1](mode1/) | How do I show a background from a PNG (the canonical Mode 1)? |
-| [mode1_lz77](mode1_lz77/) | How do I load a background from *compressed* data? |
-| [mode1_bg3_priority](mode1_bg3_priority/) | How do I make BG3 draw in front for a HUD overlay? |
+| [mode1](mode1/) | How do I show a background from a PNG (the canonical Mode 1) — and from *compressed* data? |
 | [mode0](mode0/) | How do I run four 2bpp layers (Mode 0)? |
 | [mode3](mode3/) | How do I show a 256-colour (8bpp, Mode 3) background? |
 | [mode5_hires](mode5_hires/) | How do I use a hi-res (512-wide, Mode 5 + interlace) background? |
 | [mode2](mode2/) | How do I scroll each column independently (offset-per-tile, modes 2/4/6)? |
-| [mode4](mode4/) | How does offset-per-tile work with a 256-colour layer (Mode 4's single row)? |
-| [mode6](mode6/) | How does offset-per-tile work in hi-res (Mode 6)? |
 
 > Moving the world past the camera lives in its own family: [`scrolling/`](../scrolling/).
 

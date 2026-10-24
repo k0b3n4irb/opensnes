@@ -70,7 +70,7 @@ CASES = [
     # map getters called from C (issue #103): expected values host-parsed
     # from the committed map_scroll blobs (entry(1280,80)=tile 21,
     # b16[21]=0xFF00=T_SOLID). Pre-fix these read open bus at $00:3000+.
-    ("r_map_tile",  2, 21),
+    ("r_map_tile",  2, 518),
     ("r_map_prop",  2, 0xFF00),
     ("r_map_prop0", 2, 0),
     ("s_map_width", 1, 32),

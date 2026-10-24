@@ -30,6 +30,6 @@ USE_LIB        := 1
 LIB_MODULES    := console sprite dma input background text
 
 # Soundbank source files
-SOUNDBANK_SRC  := music/pollen8.it
+SOUNDBANK_SRC  := music/nocturne.it sfx/neo_lumen_sfx.it
 
 include $(OPENSNES)/make/common.mk

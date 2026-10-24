@@ -4,7 +4,8 @@
 
 The gentlest program that still exercises the whole SNES rhythm — tiles,
 palette, VRAM and the VBlank handshake — on the smallest possible surface.
-It prints one string in white on a dark blue screen and idles. If text ever
+It prints the two lines of a terminal's boot screen in the Rue basse, white
+on the terminal's dark glass, and idles. If text ever
 breaks, this is the simplest ROM that reveals it.
 
 ![Screenshot](print_string.png)
@@ -34,7 +35,8 @@ make -C examples/text/print_string
 ```
 
 Then run `print_string.sfc` in [luna](https://github.com/k0b3n4irb/luna) (or
-any SNES emulator). You should see **TEXT MODULE TEST** in white on dark blue.
+any SNES emulator). You should see **OS: RUE BASSE NET** and **READY** in white on a dark
+blue-green glass.
 
 ## Modules used
 

@@ -8,10 +8,15 @@
 # That is the negative this example most needs: those two words feed the
 # mode 7 centre and scroll every frame.
 #
+# The two rivals (rival_pos, a point number in 8.8 on their lanes; the bare
+# symbol reads its first word, the first rival) wait on
+# the line until Kit moves: leg 2 must leave them at 0x0100, and leg 3 must
+# start them. A rival that leaves before the player is the failure here.
+#
 # Leg 3 holds A. The car accelerates along the heading leg 2 left it on
 # (202 ~ north-west), so both coordinates fall, and car_heading is
 # asserted exactly again: the throttle must not steer.
-rom = "../../examples/games/mode7_racing/mode7_racing.sfc"
+rom = "../../examples/mode7/mode7_racing/mode7_racing.sfc"
 
 [[checkpoint]]                 # on the start line, engine off
 at_frame = 60
@@ -20,6 +25,8 @@ car_x = 4992                             # 312 << 4
 car_y = 4352                             # 272 << 4
 car_speed = 0
 car_heading = { eq = 64, width = 1 }     # due east
+rival_pos = 256                     # on the line, one point ahead
+race_on = { eq = 0, width = 1 }
 
 [[checkpoint]]                 # LEFT alone: the wheel turns, the car does not move
 at_frame = 120
@@ -29,6 +36,8 @@ car_heading = { eq = 202, width = 1 }    # 64 - 59*STEER_STEP, mod 256
 car_x = 4992
 car_y = 4352
 car_speed = 0
+rival_pos = 256                     # turning the wheel does not start the race
+race_on = { eq = 0, width = 1 }
 
 [[checkpoint]]                 # A: accelerate along the new heading
 at_frame = 180
@@ -36,7 +45,9 @@ input = "120:0x0080,179:0"
 [checkpoint.values]
 car_speed = 352
 car_heading = { eq = 202, width = 1 }    # throttle must not steer
+race_on = { eq = 1, width = 1 }
 [checkpoint.delta]
+rival_pos = "increased"             # the rivals left with Kit
 car_x = "decreased"                      # heading 202 -> north-west
 car_y = "decreased"
 

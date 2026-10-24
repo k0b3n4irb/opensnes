@@ -1,0 +1,6 @@
+tool = "opensnes-tileset"
+
+# the layer that scrolls: the night and its rain, BG palette 1
+[convert]
+colors = 16
+palette-entry = 1

@@ -1,34 +1,30 @@
-# SNESMOD Music Example
+# SNESMOD Music and Sound Effects
 
-
-Full music playback using SNESMOD, a tracker-based audio engine for the SNES.
+Tracker music with transport controls, and sound effects fired over it, with
+SNESMOD, the tracker engine that runs on the SNES's sound processor.
 
 ## Learning Objectives
 
 After this lesson, you will understand:
-- How SNESMOD works (module-based music)
-- Loading soundbanks and modules
-- Music playback controls (play, stop, pause, fade)
-- Volume control
-- How the build turns an `.it` file into a soundbank (`opensnes-music`)
+- How SNESMOD works (module-based music on the SPC700)
+- Loading a soundbank, a module, and sound effects
+- Music playback controls (play, stop, pause, volume, fade)
+- Playing an effect over the music, with volume, pan and pitch
+- How the module, its echo and the effects share the SPC700's 64 KB
+- How the build turns `.it` files into a soundbank (`opensnes-music`)
 
-## Prerequisites
+## SNES Concepts
 
-- Basic understanding of SNES audio concepts
-- Understanding of BG text rendering
-- Basic tracker music concepts (optional)
+- The SPC700 is a separate processor with its own 64 KB of RAM; the CPU only
+  sends it commands through four ports
+- `snesmodProcess()` every frame sends the queued commands
+- A sound effect is a sample uploaded into the SPC700's RAM after the module,
+  played on a voice of its own
+- The echo buffer takes the top of that RAM: what is left between the module
+  and the echo is all the effects get
 
----
+## Controls
 
-## What This Example Does
-
-- Displays a menu showing controls
-- Plays an Impulse Tracker module on startup
-- Full playback controls via joypad
-- Volume adjustment with L/R triggers
-- Fade out effect
-
-**Controls:**
 | Button | Action |
 |--------|--------|
 | A | Play music |
@@ -36,60 +32,31 @@ After this lesson, you will understand:
 | X | Pause/Resume toggle |
 | L/R | Volume down/up |
 | START | Fade out |
+| LEFT/RIGHT | Choose the effect (jump, powerup, laser, confirm) |
+| UP/DOWN | Its pitch (low, normal, high) |
+| Y | Play the effect over the music |
 
 ---
 
-## Code Type
-
-**Mixed C + Library + SNESMOD**
-
-| Component | Type |
-|-----------|------|
-| Hardware init | Library (`consoleInit()`) |
-| Video mode | Library (`setMode()`) |
-| Screen enable | Library (`setScreenOn()`) |
-| VBlank sync | Library (`WaitForVBlank()`) |
-| Audio | SNESMOD library |
-| Font tiles | text module (`textLoadFont`) |
-| Text rendering | text module (`textPrintAt`, `textFlush`) |
-
----
-
-## SNESMOD Overview
-
-SNESMOD is a tracker-based music playback system:
+## SNESMOD Workflow
 
 ```
-Impulse Tracker file (.it)
-         |
-         v
+Impulse Tracker files (.it)          music/nocturne.it  sfx/neo_lumen_sfx.it
+         |                                     \             /
+         v                                      SOUNDBANK_SRC
     [opensnes-music bank]
          |
          v
-soundbank.asm + soundbank.h
+soundbank.asm + soundbank.h  ->  linked into the ROM
          |
          v
-   Linked into ROM
-         |
-         v
-    [SNESMOD driver]
-         |
-         v
-    SPC700 playback
+    [SNESMOD driver on the SPC700]
 ```
 
-### Key Features
-
-- 8 simultaneous channels
-- Impulse Tracker module support
-- Automatic BRR sample compression
-- Volume control and fading
-- Echo/reverb effects
-- ~5.5KB driver footprint
-
----
-
-## SNESMOD API
+The soundbank holds two modules. `nocturne` is the music. `neo_lumen_sfx` has
+no song: it is a list of four instruments, and every sample of a soundbank can
+be loaded as an effect. `soundbank.h` names each one after its sample
+(`SFX_JUMP`, `SFX_LASER`…).
 
 ### Initialization
 
@@ -97,10 +64,12 @@ soundbank.asm + soundbank.h
 #include <snes/snesmod.h>
 #include "soundbank.h"
 
-snesmodInit();                    /* Initialize SPC driver */
-snesmodSetSoundbank(SOUNDBANK_BANK);  /* Set soundbank bank */
-snesmodLoadModule(MOD_POLLEN8);   /* Load module by ID */
-snesmodPlay(0);                   /* Start from position 0 */
+snesmodInit();                        /* upload the driver to the SPC700 */
+snesmodSetSoundbank(SOUNDBANK_BANK);
+snesmodLoadModule(MOD_NOCTURNE);      /* resets the SPC RAM: load effects AFTER it */
+
+u8 jump = snesmodLoadEffect(SFX_JUMP);   /* keep the slot it returns */
+snesmodPlay(0);
 ```
 
 ### Main Loop (CRITICAL!)
@@ -113,75 +82,48 @@ while (1) {
 }
 ```
 
-**Warning:** `snesmodProcess()` is what sends the commands (play, stop, volume, sound effects) to the SPC700. Without it they wait in a queue of 85 and the newest are dropped once it is full; the music already playing goes on.
+`snesmodProcess()` is what sends the commands (play, stop, volume, sound
+effects) to the SPC700. Without it they wait in a queue of 85 and the newest
+are dropped once it is full; the music already playing goes on.
 
-### Playback Control
-
-```c
-snesmodPlay(0);      /* Play from start */
-snesmodStop();       /* Stop playback */
-snesmodPause();      /* Pause */
-snesmodResume();     /* Resume from pause */
-```
-
-### Volume Control
+### Playback and Effects
 
 ```c
-snesmodSetModuleVolume(255);    /* 0-255, 255 at load */
-snesmodFadeVolume(0, 4);        /* Target volume, speed */
+snesmodPlay(0);                  /* play from the start */
+snesmodStop();
+snesmodPause();  snesmodResume();
+snesmodSetModuleVolume(255);     /* 0-255, 255 at load */
+snesmodFadeVolume(0, 4);         /* target volume, speed */
+
+snesmodPlayEffect(jump, 127, 128, SNESMOD_PITCH_HIGH);   /* slot, volume, pan, pitch */
 ```
 
 ---
 
-## Creating Music
+## Room for the Effects
 
-### Using OpenMPT (Recommended)
+Effects are copied into the SPC700's RAM right after the module, and the echo
+buffer sits at the top. `opensnes-music inspect` says how much is left:
 
-1. Download [OpenMPT](https://openmpt.org/) (free for Windows/Wine)
-2. Create new Impulse Tracker (.it) module
-3. Follow SNES constraints:
-   - Maximum 8 channels
-   - 32kHz sample rate
-   - Total samples under 58KB
-4. Export as `.it` file
-5. Place in `music/` directory
-
-### Build Process
-
-When the Makefile sets `SOUNDBANK_SRC` (with `USE_SNESMOD := 1`), the build:
-1. Runs `opensnes-music bank` on your `.it` file(s)
-2. Writes `soundbank.bnk`, `soundbank.asm` and `soundbank.h`
-3. Links the soundbank into the ROM
-
-```makefile
-SOUNDBANK_SRC := music/mymusic.it
+```
+$ opensnes-music inspect music/nocturne.it
+music/nocturne.it: "Daveo Nocturne", ... -> 18376 bytes of SPC RAM (30008 free of 48384), 8 BRR sources
 ```
 
----
+The nocturne's echo (a delay of 5, 10 KB of buffer) leaves 30 008 bytes. The
+four effects take 18 460 of them:
 
-## Generated Files
+| Effect | Bytes of BRR |
+|--------|--------------|
+| jump | 4 150 |
+| powerup (cut to 0.8 s) | 7 200 |
+| laser (cut to 0.5 s) | 4 500 |
+| confirm | 2 610 |
 
-After a build:
-
-**soundbank.h** (excerpt):
-```c
-#define MOD_POLLEN8                     	0
-#define MOD_POLLEN8_SIZE                	44137
-#define SFX_SAW1                        	0
-...
-#define SOUNDBANK_BANK 1
-```
-
-**soundbank.asm:** the bank is given to the soundbank alone, at its start:
-```asm
-.BANK 1
-.ORG 0
-.SECTION "SOUNDBANK" FORCE ; need dedicated bank(s)
-
-soundbank:
-.incbin "./soundbank.bnk"
-.ENDS
-```
+**The driver does not check.** An effect loaded past the room is copied over
+the echo buffer: the echo overwrites the effect and plays its bytes back as
+noise, with no error anywhere. Count the bytes, or ask `inspect`, before
+adding an effect to a game with echo — a longer echo delay takes 2 KB a step.
 
 ---
 
@@ -204,12 +146,11 @@ Then run `music.sfc` in luna (`opensnes run`) or any SNES emulator.
 
 | File | Purpose |
 |------|---------|
-| `main.c` | UI and SNESMOD API calls |
-| `Makefile` | Build config with SNESMOD rules |
-| `music/pollen8.it` | Sample Impulse Tracker module |
-| `soundbank.h` | Generated: module IDs, bank number |
-| `soundbank.asm` | Generated: soundbank data |
-| `soundbank.bnk` | Generated: compiled soundbank |
+| `main.c` | UI, transport, effect selection, SNESMOD calls |
+| `Makefile` | Build config with SNESMOD rules (`SOUNDBANK_SRC` lists both modules) |
+| `music/nocturne.it` | The music: "Daveo Nocturne" |
+| `sfx/neo_lumen_sfx.it` | The effects: four samples |
+| `soundbank.h`, `soundbank.asm`, `soundbank.bnk` | Generated by the build |
 
 ---
 
@@ -222,25 +163,24 @@ Bank 1:    Soundbank data (its own bank, at its start; more banks if it is large
 Others:    Tiles, tilemaps and other const data (the asset banks)
 ```
 
-### SPC RAM
+### SPC RAM, as this example leaves it
 ```
-$0000-$00FF: Driver variables
-$0200-$CFFF: Module data, samples
-$D000-$FFFF: Echo buffer (if enabled)
+$0400-$19FF: the SNESMOD driver
+$1A00-$61C7: the nocturne: module data and its 8 instruments
+$61C8-$A9E3: the four effects (jump, powerup, laser, confirm)
+$A9E4-$D6FF: free (11 548 bytes)
+$D700-$FEFF: the echo buffer
 ```
 
 ---
 
 ## Exercises
 
-### Exercise 1: Add Sound Effects
-Use `snesmodPlayEffect()` to trigger sounds on button presses.
-
-### Exercise 2: Multiple Modules
-Add a second `.it` file and switch between them with SELECT button.
-
-### Exercise 3: Echo Effects
-Enable echo in your tracker module and hear the reverb.
+1. **A longer echo**: give the nocturne `edl 10` in its song message
+   (`devtools/audio_assets/songs.py`), check `inspect` again, and see which
+   effects still fit.
+2. **Pan**: play the effect left or right of the player (`pan` 0 or 255).
+3. **A second song**: add a third `.it` file and switch with SELECT.
 
 ---
 
@@ -249,47 +189,19 @@ Enable echo in your tracker module and hear the reverb.
 ### No audio output
 - Check `snesmodProcess()` is called every frame
 - Verify `snesmodInit()` before `snesmodPlay()`
-- Check emulator audio is enabled
 
-### Music sounds wrong
-- Verify module exports correctly from OpenMPT
-- Check channel count (8 max)
-- Verify sample rate (32kHz max)
+### An effect sounds wrong, or the echo crackles
+- The effect probably does not fit: see "Room for the Effects"
+- Effects loaded before `snesmodLoadModule()` are lost: load them after
 
 ### Build fails converting the module
-- Check `.it` file is valid Impulse Tracker format
 - `opensnes-music inspect music/song.it` says what the converter reads in it
-
-### A press does nothing, or late
-- Ensure `snesmodProcess()` is called EVERY frame
-- Check for infinite loops blocking the main loop
-
----
-
-## Technical Notes
-
-### Why Tracker-Based Music?
-
-Tracker modules are efficient for the SNES:
-- Compact pattern data (repeatable)
-- Samples shared across patterns
-- Volume, panning, effects per-channel
-- No streaming required
-
-### Converting by hand
-
-```bash
-opensnes-music bank -o . --name soundbank music/song.it
-```
-- `--name`: base name of the files written
-- `-o`: output directory
-- `opensnes-music --help` lists the rest
 
 ---
 
 ## What's Next?
 
-**Sound Effects:** [SNESMOD SFX](../snesmod_sfx/) - Sound effect playback with pitch control
+**Sound from a WAV:** [sfx_from_wav](../sfx_from_wav/) - effects without SNESMOD
 
 **Graphics:** [Simple Sprite](../../sprites/simple_sprite/) - Display a sprite on screen
 
@@ -297,13 +209,13 @@ opensnes-music bank -o . --name soundbank music/song.it
 
 ## Credits
 
-SNESMOD driver by Mukunda Johnson.
+SNESMOD driver by Mukunda Johnson. The program began as PVSnesLib's "music"
+and "effects" examples by alekmaul.
 
-Sample music "pollen8" - Public domain.
-
----
+"Daveo Nocturne" and its instruments are composed and synthesized for
+OpenSNES (`devtools/audio_assets/`, CC0). The four effects are Kenney's
+"Digital Audio" and "Interface Sounds" (kenney.nl, CC0).
 
 ## License
 
-Code: MIT
-SNESMOD: See snesmod.org license
+Code: MIT. The music and the effects: CC0.

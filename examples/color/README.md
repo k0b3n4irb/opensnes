@@ -10,11 +10,10 @@ mode, and the tricks that push past 256 by reloading the palette mid-frame.
 | Example | Developer question |
 |---------|--------------------|
 | [palette_cycle](palette_cycle/) | How do I animate (waterfall/fire/lights) by rotating CGRAM, no pixels moved? |
-| [transparency](transparency/) | How do I blend two layers with colour math? |
+| [transparency](transparency/) | How do I blend two layers — with colour math, or 50 % without it (pseudo-hires)? |
 | [shadow_tint](shadow_tint/) | How do I darken (night) or colour-cast (underwater/sunset) a whole scene? |
 | [direct_color](direct_color/) | How do I use direct-colour mode (the pixel byte *is* the RGB)? |
 | [hicolor_1792](hicolor_1792/) | How do I show 1792 colours via H-IRQ CGRAM streaming? |
-| [pseudo_hires](pseudo_hires/) | How do I blend two layers 50 % without colour math (pseudo-hires)? |
 
 ## The idea in one screen
 

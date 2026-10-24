@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+# the turret's sixteen headings, 32x32 (OBJ palette 0), then the security
+# drone (palette 1) and the orbiter, its cyan twin (palette 2)
+[sheet]
+size = 32
+colors = 48

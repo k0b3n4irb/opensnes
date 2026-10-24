@@ -1,0 +1,43 @@
+# Two controllers read every frame by the NMI auto-joypad path
+# (crt0 ReadPads): pad_keys[0] is port 1, pad_keys[1] is port 2. Each leg
+# holds a different button on each pad and asserts BOTH words, so a swap
+# or a leak between ports fails. `input2` is luna's second-pad script
+# (v1.21.0, gaps-review item R7's acceptance case); pad_keys[1] is
+# addressed as the word after pad_keys ($00:0041 + 2).
+#
+# Each D-pad also walks its own avatar (Kit for pad 1, the raccoon for pad 2,
+# from (56, 164) and (168, 164), one pixel a frame, inside the test bay
+# x 18-206, y 154-174), so the same legs check that a pad moves its avatar
+# only: pad 1's UP never moves the raccoon, pad 2's RIGHT never moves Kit.
+rom = "../../examples/input/controller/controller.sfc"
+[[checkpoint]]
+at_frame = 60
+input = "30:0x0800"            # pad 1: UP
+input2 = "30:0x0400"           # pad 2: DOWN
+[checkpoint.values]
+pad_keys = 0x0800
+"pad_keys+2" = 0x0400
+avatar_x = { eq = 56, width = 2 }            # Kit went up only
+avatar_y = { eq = 154, width = 2 }           # 164 - 10, stopped at the bay's top
+"avatar_x+2" = { eq = 168, width = 2 }       # the raccoon went down only
+"avatar_y+2" = { eq = 174, width = 2 }       # 164 + 10, stopped at the bay's bottom
+[[checkpoint]]
+at_frame = 120
+input = "90:0x0200"            # pad 1: LEFT
+input2 = "90:0x0100"           # pad 2: RIGHT
+[checkpoint.values]
+pad_keys = 0x0200
+"pad_keys+2" = 0x0100
+avatar_x = { eq = 27, width = 2 }            # 56 - 29: left since frame 90
+avatar_y = { eq = 154, width = 2 }
+"avatar_x+2" = { eq = 197, width = 2 }       # 168 + 29: right since frame 90
+"avatar_y+2" = { eq = 174, width = 2 }
+[[checkpoint]]
+at_frame = 180
+input = "150:0"                # pad 1 released
+input2 = "150:0x8000"          # pad 2: B alone
+[checkpoint.values]
+pad_keys = 0x0000
+"pad_keys+2" = 0x8000
+avatar_x = { eq = 18, width = 2 }            # stopped at the bay's left edge
+"avatar_x+2" = { eq = 206, width = 2 }       # and the raccoon at its right edge

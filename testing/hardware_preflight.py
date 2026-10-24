@@ -54,6 +54,16 @@ def protocol_rows() -> list[tuple[int, str]]:
     return rows
 
 
+def protocol_rom(key: str, roms: dict[str, Path]) -> Path | None:
+    """The ROM a row names: an example by its key under examples/, or a
+    fixture by its path from the repository root (testing/fixtures/...),
+    for the ROMs that ask the hardware a question no reader needs."""
+    if key.startswith("testing/"):
+        sfcs = sorted((lr.REPO_ROOT / key).glob("*.sfc"))
+        return sfcs[0] if sfcs else None
+    return roms.get(key)
+
+
 def parse_rows(spec: str | None, rows: list[tuple[int, str]]) -> list[tuple[int, str]]:
     if not spec:
         return rows
@@ -95,9 +105,10 @@ def main() -> int:
     skipped = 0
     checked_roms: list[Path] = []
     for num, key in rows:
-        rom = roms.get(key)
+        rom = protocol_rom(key, roms)
         if rom is None:
-            print(f"  FAIL  {num:2} {key}: no built ROM (make examples)")
+            build = "make fixtures" if key.startswith("testing/") else "make examples"
+            print(f"  FAIL  {num:2} {key}: no built ROM ({build})")
             fails += 1
             continue
         fw = lr.missing_firmware(key, manifest)
@@ -121,7 +132,8 @@ def main() -> int:
             print(f"  FAIL  {num:2} {key}: " + "; ".join(problems))
         else:
             print(f"  {tag:9} {num:2} {key}  (frame {frame}, seeds {args.seeds}, pal)")
-        checked_roms.append(rom)
+        if rom not in checked_roms:     # two rows may check one ROM (pad 1, pad 2)
+            checked_roms.append(rom)
 
     if checked_roms:
         for f in check_blank(luna, checked_roms, args.frames):

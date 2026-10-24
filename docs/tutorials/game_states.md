@@ -69,7 +69,7 @@ games — it is the approach the manual pattern below exists to replace.
 The classic SNES pattern uses a state variable and a `switch` in the main
 loop. It is what `scene` is built on top of, and it is still the right tool
 when you need a custom rhythm (half-rate updates, a bespoke transition) or
-are reading the shipped games `tetris`/`breakout`, which use it directly.
+are reading the shipped games `blocks`/`breakout`, which use it directly.
 Define states as constants and dispatch each frame:
 
 ```c
@@ -111,7 +111,7 @@ int main(void) {
 }
 ```
 
-`examples/games/tetris/main.c` is built the same way, with its own states (`STATE_TITLE`, `STATE_PLAYING`, `STATE_LINE_CLEAR`, `STATE_GAME_OVER`) and a `paused` flag rather than a pause state. Each state function runs once per frame and can change `game_state` to trigger a transition.
+`examples/games/blocks/main.c` is built the same way, with its own states (`STATE_TITLE`, `STATE_PLAYING`, `STATE_LINE_CLEAR`, `STATE_GAME_OVER`) and a `paused` flag rather than a pause state. Each state function runs once per frame and can change `game_state` to trigger a transition.
 
 ## State Transitions
 
@@ -182,7 +182,7 @@ The key rule: call `setScreenOff()` before bulk VRAM/CGRAM writes, and `setScree
 
 ## Title Screen Implementation
 
-A title screen waits for the player to press START, then transitions to gameplay. A minimal form of the title state of `examples/games/tetris/main.c`:
+A title screen waits for the player to press START, then transitions to gameplay. A minimal form of the title state of `examples/games/blocks/main.c`:
 
 ```c
 static void stateTitle(void) {
@@ -252,7 +252,7 @@ static void handle_pause(void) {
 }
 ```
 
-The three-phase wait prevents the unpause START press from being read as a new pause request on the next frame. Tetris (`examples/games/tetris/main.c`) uses the same three-phase wait, and detects the first press with `padPressed()`, which reports only the buttons that went down this frame:
+The three-phase wait prevents the unpause START press from being read as a new pause request on the next frame. Blocks (`examples/games/blocks/main.c`) uses the same three-phase wait, and detects the first press with `padPressed()`, which reports only the buttons that went down this frame:
 
 ```c
 u16 pressed = padPressed(0);  /* newly pressed this frame */
@@ -304,9 +304,9 @@ static void die(void) {
 }
 ```
 
-### Game Over as a state (Tetris)
+### Game Over as a state (blocks)
 
-Tetris restarts from a state of its own. When a new piece cannot spawn (board full), the game transitions to `STATE_GAME_OVER`, which shows a message, waits for START, then calls `startGame()` to reinitialize everything:
+Blocks restarts from a state of its own. When a new piece cannot spawn (board full), the game transitions to `STATE_GAME_OVER`, which shows a message, waits for START, then calls `startGame()` to reinitialize everything:
 
 ```c
 static void stateGameOver(void) {

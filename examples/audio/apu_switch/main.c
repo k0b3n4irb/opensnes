@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Hot-swapping APU programs at runtime — apuReset() in action
+ * @brief Two S-DSP programs — noise drums and hardware vibrato — hot-swapped with apuReset()
  * @ingroup examples
  *
  * The apu module's upload path (apuWaitBoot/apuUpload/apuExecute) runs
@@ -11,9 +11,12 @@
  * for it in its wait loops (the APU_CHECK_RESET idiom), silences the
  * DSP, and jumps back to the IPL boot ROM — ready for the next upload.
  *
- * Press A for the play_noise drum kit, B for the pitch_mod vibrato
- * cello. Both APU programs are this repo's own — no external assets
- * beyond the cello sample already attributed.
+ * Press A for the drum kit, B for the vibrato cello. Both APU programs
+ * are this repo's own ports of krom's demos: the drums are the DSP's
+ * white-noise generator alone (NON, the FLG noise clock, one ADSR per
+ * drum: krom's PlayNoise), the cello sings by pitch modulation (PMON:
+ * a silent voice as a hardware LFO: krom's PitchMod). No external
+ * assets beyond the cello sample already attributed.
  *
  * ROM mode: LoROM (project default).
  *
@@ -22,6 +25,10 @@
  * - The IPL ROM is re-entrant — jump to $FFC0 with the ROM re-enabled
  *   and the full boot handshake ($AA/$BB, $CC upload) works again
  * - Two independent APU programs in one ROM, uploaded on demand
+ * - The S-DSP noise source (NON, FLG bits 0-4) as an instrument; the
+ *   ADSR envelope is the drum type
+ * - Pitch modulation (PMON): voice N-1's output scales voice N's pitch
+ * - FIR echo setup (ESA/EDL/EFB/FIR0) in each program
  *
  * @par What to Observe
  * Drums start immediately. Press B: the kit cuts, the cello blooms.

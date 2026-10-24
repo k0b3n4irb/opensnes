@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Mode 7 rotation and scaling demo
+ * @brief Mode 7 rotation and scaling, flown over: a glider, its shadow and the altitude
  * @ingroup examples
  *
  * Demonstrates SNES Mode 7, the hardware affine transformation mode that
@@ -12,17 +12,29 @@
  * and mode7SetScale() computing the sin/cos matrix entries from an
  * 8-bit angle and 8.8 fixed-point scale factors.
  *
+ * A glider flies over the plane at the rotation centre, and the zoom is its
+ * altitude: zooming out widens the view as if it climbed, and its shadow —
+ * the same sprite in a dark palette, behind it — slides further away. The
+ * two together are how a flat Mode 7 plane reads as height. (The glider
+ * and its shadow were the games/mode7_flying example.)
+ *
  * @par SNES Concepts
  * - Mode 7 affine transformation (rotation + scaling via M7A-M7D)
  * - Interleaved VRAM format (tilemap in low bytes, pixels in high bytes)
  * - 8.8 fixed-point scale representation
  * - 8-bit angle for hardware sin/cos lookup
+ * - The rotation centre on screen: M7X/M7Y is a point of the plane, the
+ *   scroll says where it lands (here under the glider, the screen centre)
+ * - Two depth cues on a flat plane: the scale, and a shadow offset that
+ *   grows with it
  *
  * @par What to Observe
  * - Press A to rotate the background clockwise
  * - Press B to rotate counter-clockwise
  * - Press UP to zoom out (background shrinks, more visible)
  * - Press DOWN to zoom in (background magnifies)
+ * - The plane turns under the glider; its shadow drifts away as you zoom
+ *   out (climb) and closes in as you zoom in (descend)
  *
  * @par Modules Used
  * console, dma, background, sprite, input, mode7
@@ -36,6 +48,23 @@
 #include "res/mode7bg.inc"   /* generated: mode7bg_tiles[], mode7bg_map[], mode7bg_pal[] (Mode 7 .pc7 / .mp7), each with _end */
 /** @brief Mode 7 tilemap (128x128 tile indices, one byte each), converted by the build from res/ */
 /** @brief 256-colour palette for the Mode 7 plane (512 bytes), converted by the build from res/ */
+
+/** @brief Kit's glider seen from above, 32x32, converted by the build from res/glider.png */
+#include "res/glider.inc"    /* generated: glider_tiles[], glider_pal[], each with _end */
+
+/** @brief Where the glider is drawn: its 32x32 box centred on screen (128, 112). */
+#define GLIDER_X 112
+#define GLIDER_Y 96
+
+/** @brief Probe oracle: the shadow's offset below the glider, in pixels. */
+u16 shadow_dy;
+
+/** @brief Draw the shadow below the glider, further away the higher it flies. */
+static void place_shadow(u16 zscale) {
+    shadow_dy = (u16)(zscale >> 5);           /* 8 px at 1:1, 60 at the widest view */
+    oamSet(1, GLIDER_X + 4, (u16)(GLIDER_Y + shadow_dy), 0, 1, 2, 0);
+    oamSetSize(1, OBJ_LARGE);
+}
 
 /**
  * @brief Entry point -- interactive Mode 7 rotation and scaling demo.
@@ -74,10 +103,30 @@ int main(void) {
     mode7Init();
     mode7SetScale(0x0100, 0x0100);
     mode7SetAngle(0);
+    /* mode7Init leaves the rotation centre (M7X/M7Y = 128, 128) above the
+     * screen; this scroll puts it at screen (128, 112), under the glider */
+    mode7SetScroll(0, 16);
+
+    /* The glider and its shadow: one 32x32 picture at OBJ base 3 ($6000),
+     * palette 0 its own colours, palette 1 all dark for the shadow (the
+     * plane uses CGRAM 0-15, so 128 and up are free) */
+    dmaCopyVram(glider_tiles, 0x6000, (u16)(glider_tiles_end - glider_tiles));
+    dmaCopyCGram(glider_pal, OBJ_CGRAM_BASE, PALETTE_16_SIZE);
+    {
+        u8 i;
+        for (i = 1; i < 16; i++)
+            setColor((u16)(OBJ_CGRAM_BASE + 16 + i), RGB(1, 1, 3));
+    }
+    oamInit(OBJ_SIZE8_L32, 3);
+    /* Between sprites the lower OAM index is drawn in front, whatever the
+     * priority bits (those only rank a sprite against the BGs) */
+    oamSet(0, GLIDER_X, GLIDER_Y, 0, 0, 3, 0);        /* sprite 0 = glider, in front */
+    oamSetSize(0, OBJ_LARGE);
+    place_shadow(zscale);                            /* sprite 1 = shadow, behind it */
 
     /* Turn on display with BG1 -- Mode 7 only supports a single BG layer
      * (BG1), so we enable just that on the main screen via REG_TM. */
-    setMainScreen(TM_BG1);
+    setMainScreen(TM_BG1 | TM_OBJ);
     setScreenOn();
 
     while (1) {
@@ -107,6 +156,7 @@ int main(void) {
                 zscale += 8;
             mode7SetScale(zscale, zscale);
             mode7SetAngle(angle);
+            place_shadow(zscale);
         }
 
         /* Zoom in with DOWN (decrease scale = magnifies).
@@ -117,6 +167,7 @@ int main(void) {
                 zscale -= 8;
             mode7SetScale(zscale, zscale);
             mode7SetAngle(angle);
+            place_shadow(zscale);
         }
 
         WaitForVBlank();

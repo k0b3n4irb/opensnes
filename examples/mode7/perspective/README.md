@@ -101,8 +101,8 @@ scanline lasts.
 |------|---------|
 | `main.c` | The HDMA tables, their setup, input and the camera |
 | `res/ground.png.toml`, `res/sky.png.toml` | the import settings of the ground (Mode 7) and the sky (`opensnes-tileset`); the build converts and links them |
-| `res/ground.png` | Mode 7 ground texture source |
-| `res/sky.png` | Sky background source |
+| `res/ground.png` | the city from above, 1024x1024 in 235 tiles (CC0, `assets/neo-lumen/`) |
+| `res/sky.png` | the towers over the horizon, 512x256; its 16 colours are the ground's first sixteen, the palette both read (`devtools/art_assets/mode7.py` writes the two) |
 | `Makefile` | `LIB_MODULES := console dma background sprite input mode7 hdma` |
 
 ## Going Further
@@ -116,7 +116,7 @@ scanline lasts.
 
 - **Explore related examples**:
   - `hdma/gradient_colors` -- Another HDMA technique (color gradients)
-  - `games/likemario` -- Scrolling backgrounds with sprites (different approach)
+  - `games/rooftop_run` -- Scrolling backgrounds with sprites (different approach)
 
 ## Modules Used
 

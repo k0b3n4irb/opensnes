@@ -8,6 +8,10 @@ How to save and load game data using the SNES cartridge SRAM (Static RAM). The S
 is battery-backed -- data persists even when the console is powered off. This is how
 classic SNES games like Zelda and Final Fantasy save progress.
 
+The screen is a save terminal of the Rue basse: two slot cards on the terminal's
+glass. Saving or loading a slot writes its status in its card and puts Kit's icon
+there; a load prints the values read back.
+
 ## Prerequisites
 
 Read `text/print_string` first (console setup, text display).
@@ -17,9 +21,9 @@ Read `text/print_string` first (console setup, text display).
 | Button | Action |
 |--------|--------|
 | A | Write test data to Slot 1 |
-| B | Read and display Slot 1 |
+| B | Read Slot 1 and show it in its card |
 | X | Write test data to Slot 2 |
-| Y | Read and display Slot 2 |
+| Y | Read Slot 2 and show it in its card |
 
 ## Build & Run
 
@@ -28,7 +32,9 @@ cd $OPENSNES_HOME
 make -C examples/memory/save_game
 ```
 
-Then open `save_game.sfc` in your emulator (Mesen2 recommended).
+Then open `save_game.sfc` in luna or any emulator. luna keeps the battery in a `.srm`
+file when asked (`srm_out` / `srm_in` in a test manifest: this example's three
+manifests save, power-cycle and read back).
 
 ## How It Works
 
@@ -72,19 +78,19 @@ SRAM_SIZE = 3
 `USE_SRAM` sets the ROM header flag telling the emulator (or real hardware) that the
 cartridge has battery-backed SRAM. `SRAM_SIZE = 3` means 8 KB (2^3 = 8 KB).
 
-### 5. Text display
+### 5. The screen: text on BG1, the terminal on BG2
 
-The example uses the text system on BG1 in Mode 0 (2bpp):
+`textModeInit()` sets Mode 0 with the text on BG1 (font at VRAM $0000, map at $3800).
+The terminal is a four-colour picture on BG2; in Mode 0 each BG has its own palettes,
+BG2's from CGRAM 32, which `BG_4COLORS0` selects:
 
 ```c
-textInit(TEXT_DEFAULT_TILEMAP_ADDR, TEXT_DEFAULT_FONT_TILE, TEXT_DEFAULT_PALETTE);
-textLoadFont(0x0000);
-bgSetGfxPtr(0, 0x0000);
-bgSetMapPtr(0, 0x3800, BG_MAP_32x32);
+bgInitTileSet(1, terminal_tiles, terminal_pal, 0, ..., BG_4COLORS0, TERM_TILES);
 ```
 
-After each save/load operation, `textPrintAt()` updates the on-screen feedback and
-`textFlush()` sends the updated text buffer to VRAM.
+BG1 is in front of BG2 in Mode 0, so the text sits on the glass. `show_slot()` writes
+a slot's status in its card and moves that slot's sprite, Kit's icon, into the card's
+well. The text module's NMI hook sends what was written at the next VBlank.
 
 ## SNES Concepts
 
@@ -117,7 +123,9 @@ saved to a `.srm` file on disk.
 
 | File | Purpose |
 |------|---------|
-| `main.c` | Save/load logic, text display, input handling |
+| `main.c` | Save/load logic, the cards, input handling |
+| `res/terminal.png` | BG2, the terminal (2bpp, four colours) |
+| `res/icon.png` | Kit's icon, 32x32 |
 | `Makefile` | `USE_SRAM := 1`, `LIB_MODULES := console dma text background sprite input` |
 
 ## Going Further
@@ -132,6 +140,13 @@ saved to a `.srm` file on disk.
 - **Explore related examples**:
   - `memory/hirom_demo` -- Understand LoROM vs HiROM memory mapping
   - `games/breakout` -- See game state management in a complete game
+
+## Assets
+
+`res/terminal.png` is drawn by `devtools/art_assets/build.py` (`terminal`), `res/icon.png`
+is the Néo-Lumen `logo/kit_icon.png` indexed by `save_icon` (CC0;
+`assets/neo-lumen/README.md`); the build converts both from the settings file beside
+each.
 
 ## Modules Used
 

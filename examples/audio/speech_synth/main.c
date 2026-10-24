@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @brief Speech synthesis — the SNES says "OPEN SNES"
+ * @brief Speech synthesis — the SNES says "OPEN SNES... DAVEO"
  * @ingroup examples
  *
  * Port of krom (Peter Lemon)'s SpeechSynth demo (PeterLemon/SNES,
@@ -8,8 +8,9 @@
  * on one DSP voice: per phoneme, the APU-side program selects the
  * sample (SRCN), shapes it (ADSR: plosives one-shot, vowels sustained),
  * inflects the pitch (prosody) and times the wait — krom's bank spells
- * "PETER LEMON"; our original formant-synthesized bank says
- * "OPEN SNES" on loop.
+ * "PETER LEMON"; our original formant-synthesized bank of ten phonemes
+ * says "OPEN SNES", then the name of the examples' city, "DAVEO"
+ * (da-ve-o), on loop.
  *
  * ROM mode: LoROM (project default).
  *

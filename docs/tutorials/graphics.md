@@ -213,7 +213,7 @@ colour — if the image uses any colour not in that palette. This is the fix
 for the problem where adding one tile re-derives the whole palette and shifts
 every existing tile's hue: author the palette once, commit it, and impose it
 on every conversion so a new tile can only reuse existing entries
-(`examples/games/rpg/res/tileset.png.toml` does this).
+(`examples/demos/rpg/res/tileset.png.toml` does this).
 
 ### Tiles made at run time
 
@@ -235,9 +235,8 @@ dmaCopyVram(tile, 0x1000, 32);      /* during VBlank or force blank */
 ```
 
 A tile costs about 47 000 master cycles, an eighth of a frame: build tiles
-while loading, or a few per frame. `backgrounds/mode2`,
-`basics/game_skeleton`, `basics/panel_hud` and `sprites/sprite_swarm` build
-their art this way.
+while loading, or a few per frame. `backgrounds/mode2` builds its art this
+way.
 
 ## Compressed tiles (LZ77)
 
@@ -247,7 +246,7 @@ the PPU gets the big one. Add `lz = true` to the picture's settings file
 and link the module:
 
 ```toml
-# res/opensnes.png.toml (examples/backgrounds/mode1_lz77)
+# res/opensnes_lz.png.toml (examples/backgrounds/mode1)
 tool = "opensnes-tileset"
 
 [convert]
@@ -256,25 +255,25 @@ lz = true
 ```
 
 ```makefile
-LIB_MODULES := console lzss background sprite
+LIB_MODULES := console sprite dma background asset lzss input
 ```
 
 ```c
-#include "res/opensnes.inc"   /* opensnes_tiles[] (compressed), opensnes_pal[], opensnes_map[] */
+#include "res/opensnes_lz.inc"   /* opensnes_lz_tiles[] (compressed), _pal[], _map[] */
 
 setScreenOff();            /* VRAM writes need forced blank */
-lzssDecodeVram(opensnes_tiles, VRAM_BG_TILES);
+lzssDecodeVram(opensnes_lz_tiles, 0x5000);
 setScreenOn();
 ```
 
 With `lz = true` the `.inc` declares the arrays only, no `BgAsset`:
 `bgLoad()` would copy the compressed bytes.
 
-The saving is worth measuring rather than assuming. For the artwork in
-`examples/backgrounds/mode1_lz77`, the compressed `.pic` is **652 bytes**
-and its LZ77 header declares **2592 bytes** of tile data — the same 2592
-bytes that `examples/backgrounds/mode1` stores uncompressed for the same
-image. That is a quarter of the ROM footprint for one call at load time.
+The saving is worth measuring rather than assuming.
+`examples/backgrounds/mode1` links its picture twice, plain and with
+`lz = true`: the compressed `.pic` is **652 bytes** and its LZ77 header
+declares **2592 bytes** of tile data — the 2592 bytes of the plain copy. A
+and B show one copy or the other, and the picture does not change. That is a quarter of the ROM footprint for one call at load time.
 
 The format is the familiar GBA-style LZ77: a `0x10` tag byte, a three-byte
 little-endian decompressed length, then flag bytes whose bits select a

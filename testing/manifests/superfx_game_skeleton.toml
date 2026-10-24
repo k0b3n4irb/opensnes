@@ -45,9 +45,13 @@ r_ship_x = 184
 r_game_frames = { ge = 358, le = 364 }
 gsu_pres_frames = { ge = 176, le = 186 }
 r_jobs = { ge = 176, le = 187 }
-r_music_pos = { ge = 2 }
 [checkpoint.gsu]
 bus_violations = 0
+
+[[checkpoint]]                 # the nocturne's first pattern ends between frames 600 and 800
+at_frame = 800
+[checkpoint.values]
+r_music_pos = { ge = 1 }
 
 [asserts]
 audio_rms_min = 100.0

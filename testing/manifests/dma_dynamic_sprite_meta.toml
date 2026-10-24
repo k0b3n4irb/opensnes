@@ -1,0 +1,9 @@
+# Migrated from probes/dma_budget.py (#217: [asserts.dma] buckets like the probe).
+# dynamic_sprite with the metasprite scene entered (SELECT at frame 30) and
+# the three size pairs walked: every switch re-uploads under force blank.
+rom = "../../examples/sprites/dynamic_sprite/dynamic_sprite.sfc"
+steps = 5000000
+input = "30:0x2000,34:0,90:0x0400,94:0,150:0x0400,154:0,210:0x2000,214:0"
+[asserts.dma]
+unsafe_writes = 0
+max_vblank_bytes = 4096

@@ -1,0 +1,44 @@
+# backgrounds/mode1, the LZ77 copy — the LZSS decode reproduces the raw DMA,
+# to the last byte of the last tile. (Written for backgrounds/mode1_lz77,
+# which merged into mode1 on 2026-10-18.)
+#
+# mode1 loads its picture twice: bgLoad() DMAs the plain tiles to $0000, and
+# `lzssDecodeVram(street_lz_tiles, $4000)` expands the LZ77 copy of the SAME
+# png (18816 ROM bytes, 28256 of tiles: the rainy street since 2026-10-19)
+# through the PPU data port into VRAM that nothing had written. The oracle is
+# free and exact: the two areas must be byte-identical. Verified on
+# 2026-10-19: VRAM bytes $0000-$6E5F equal $8000-$EE5F, and A (bgSetGfxPtr to
+# $4000) leaves the frame hash unchanged (d547f3e9159077bd both ways).
+# `bg_tiles_w4000` is literally the block dma_mode1_bgasset.toml asserts at
+# $0C80, $8000 bytes further.
+#
+# `tail_of_decode` is the assert that earns this file. It is the LAST 32 bytes
+# of the 28256-byte expansion. The characteristic LZSS failure is not garbage —
+# it is a decode that stops early (a mishandled final flag byte, a back
+# reference that runs past the end, an off-by-one on the length header), which
+# leaves the tail as the zeros VRAM already held. Those high tiles may be
+# barely used by the tilemap, so a truncated decode can look almost right on
+# screen: liveness passes, the fbhash differs by a handful of pixels or not at
+# all. Here it is a named failure at a named address.
+rom = "../../examples/backgrounds/mode1/mode1.sfc"
+
+[[checkpoint]]                 # A: BG1 now reads the decompressed copy...
+at_frame = 200
+input = "100:0x0080,104:0"
+[checkpoint.ppu]
+"bgs.0.char_addr_words" = 0x4000
+
+[asserts]                      # ...and the picture is the plain one's, pixel for pixel
+fbhash = "d547f3e9159077bd"
+
+[asserts.blocks]
+bg_tiles_w4000 = { space = "vram",  offset = "8C80", hex = "070407040704030003000300030001000007000700072403a003a003a003a001" }
+tail_of_decode = { space = "vram",  offset = "EE40", hex = "fccbfccbfccbfccbfc8bfc8bfc8bfc8b40bf40bf40bf40bf00ff00ff00ff00ff" }
+
+# Every VRAM/CGRAM transfer in this example happens once, at boot, under force
+# blank; nothing is uploaded per frame. `unsafe_writes = 0` is that invariant —
+# the project's first silent failure ("VRAM writes only work during VBlank or
+# forced blank"). No `max_vblank_bytes` ceiling: measured VBlank traffic is 0,
+# so a ceiling over it would assert nothing.
+[asserts.dma]
+unsafe_writes = 0

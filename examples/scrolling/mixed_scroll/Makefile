@@ -1,6 +1,6 @@
 #==============================================================================
 # Mode 1 Mixed Scroll Example
-# Two Mode 1 backgrounds: BG1 (shader) auto-scrolls, BG2 (opensnes logo) fixed
+# Two Mode 1 backgrounds: BG1 (the rain) auto-scrolls, BG2 (the logo) fixed
 # Port of PVSnesLib Mode1MixedScroll example
 #==============================================================================
 
@@ -10,7 +10,7 @@ TARGET     := mixed_scroll.sfc
 ROM_NAME   := MODE1 MIXED SCROLL
 
 USE_LIB    := 1
-LIB_MODULES := console sprite dma background
+LIB_MODULES := console sprite dma background text
 
 CSRC       := main.c
 

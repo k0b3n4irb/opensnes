@@ -1,0 +1,45 @@
+# scrolling/mixed_scroll, the message on BG3 (it was text/scroll_message,
+# merged into mixed_scroll on 2026-10-18): a line of text printed once on
+# BG3, then scrolled one pixel a frame by its own register, while BG1 scrolls
+# diagonally and BG2 stays put.
+#
+# So: bg_scroll_x[2] (BG3's buffered scroll, flushed to BG3HOFS by the NMI;
+# the table is 2 bytes a layer, hence +4) is the oracle, asserted
+# `increased` on top, and bg_scroll_y[2] `unchanged` at 0 — the message
+# only moves sideways. The counts are the old example's: 57, 117, 237 at
+# frames 60, 120, 240.
+#
+# The blocks pin the text itself, row 24 of BG3's map at word $1C00 (byte
+# $3800 + 24 x 64 + 4 = $3E04): each entry is the glyph (ASCII - 32) with
+# palette slot 7 and the priority bit ($3C in the high byte), and the two
+# entries on each side are blank (tile 0, palette 7: $1C00). The message is
+# "WELCOME TO DAVEO, KIT!" (22 characters: the city is Daveo); measured on
+# luna v1.40.0 (`--peek VRAM:1F00:#4 --peek VRAM:1F02:#44 --peek
+# VRAM:1F18:#4`).
+rom = "../../examples/scrolling/mixed_scroll/mixed_scroll.sfc"
+
+[[checkpoint]]                     # one increment per frame since boot
+at_frame = 60
+[checkpoint.values]
+"bg_scroll_x+4" = { eq = 57, width = 2 }
+"bg_scroll_y+4" = { eq = 0, width = 2 }
+
+[[checkpoint]]                     # 60 frames later, 60 pixels further
+at_frame = 120
+[checkpoint.values]
+"bg_scroll_x+4" = { eq = 117, width = 2 }
+"bg_scroll_y+4" = { eq = 0, width = 2 }
+[checkpoint.delta]
+"bg_scroll_x+4" = "increased"          # BG1 H-scroll is what carries the text
+"bg_scroll_y+4" = "unchanged"          # ...and only BG1 H-scroll
+
+[[checkpoint]]
+at_frame = 240
+[checkpoint.values]
+"bg_scroll_x+4" = { eq = 237, width = 2 }
+
+[asserts.blocks]
+# the tilemap is written once at boot and never again — still intact at frame 240
+row24_msg    = { space = "vram", offset = "3E04", hex = "373c253c2c3c233c2f3c2d3c253c003c343c2f3c003c243c213c363c253c2f3c0c3c003c2b3c293c343c013c" }
+row24_before = { space = "vram", offset = "3E00", hex = "001c001c" }
+row24_after  = { space = "vram", offset = "3E30", hex = "001c001c" }

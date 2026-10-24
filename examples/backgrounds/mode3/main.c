@@ -4,19 +4,20 @@
  * @ingroup examples
  *
  * Displays a 256-color background using Mode 3, the highest color-depth
- * tiled mode on the SNES. Each tile is 64 bytes (8 bitplanes), so this
- * tileset (39 KB) is larger than a ROM bank: the converter writes it in two
- * parts, bg_tiles and bg_tiles_1, and the linker places each where it has
- * room. A C pointer carries its bank byte, so dmaCopyVram() takes each part
- * wherever it landed.
+ * tiled mode on the SNES: a city canal at night, 253 colours, its haze a
+ * gradient no 16-colour palette could hold. Each tile is 64 bytes
+ * (8 bitplanes), so this tileset (770 tiles, 48 KB) is larger than a ROM
+ * bank: the converter writes it in two parts, canal_tiles and canal_tiles_1,
+ * and the linker places each where it has room. A C pointer carries its bank
+ * byte, so dmaCopyVram() takes each part wherever it landed.
  *
- * This is a port of the PVSnesLib "Mode3" example.
+ * This began as the PVSnesLib "Mode3" example.
  *
  * @par SNES Concepts
  * - Mode 3: BG1 at 8bpp (256 colors from the whole CGRAM), BG2 at 4bpp
  * - 8bpp tile format: 64 bytes per tile (8 interleaved bitplanes)
  * - Data larger than a ROM bank: two parts, each copied with its own bank
- * - VRAM layout: tiles at $0000 (large), tilemap at $6000
+ * - VRAM layout: tiles at $0000 (24640 words), tilemap at $7000
  *
  * @par What to Observe
  * - A single full-screen image with up to 256 unique colors
@@ -31,8 +32,11 @@
 
 #include <snes.h>
 
-/** @brief The picture, converted by the build from res/bg.bmp (res/bg.bmp.toml). */
-#include "res/bg.inc"   /* generated: bg_tiles[] + bg_tiles_1[] (the 39 KB tileset in two bank-sized parts), bg_map[], bg_pal[] */
+/** @brief The picture, converted by the build from res/canal.png (res/canal.png.toml). */
+#include "res/canal.inc"   /* generated: canal_tiles[] + canal_tiles_1[] (the 48 KB tileset in two bank-sized parts), canal_map[], canal_pal[] */
+
+/** @brief VRAM word address of the tilemap, past the 770 tiles (770 x 32 words = $6040) */
+#define MAP_ADDR 0x7000
 
 /**
  * @brief Entry point -- load 256-color tileset and display Mode 3 image
@@ -52,12 +56,12 @@ int main(void) {
 
     /* The tile data is in two parts so the linker can place each in a bank
      * with room; the pointer passed carries the bank byte. */
-    dmaCopyVram(bg_tiles,   0x0000, bg_tiles_end - bg_tiles);
-    dmaCopyVram(bg_tiles_1,  0x4000, bg_tiles_1_end - bg_tiles_1);
-    dmaCopyVram(bg_map, 0x6000, bg_map_end - bg_map);
-    dmaCopyCGram(bg_pal, 0,     bg_pal_end - bg_pal);
+    dmaCopyVram(canal_tiles,   0x0000, canal_tiles_end - canal_tiles);
+    dmaCopyVram(canal_tiles_1, 0x4000, canal_tiles_1_end - canal_tiles_1);
+    dmaCopyVram(canal_map, MAP_ADDR, canal_map_end - canal_map);
+    dmaCopyCGram(canal_pal, 0,       canal_pal_end - canal_pal);
 
-    bgSetMapPtr(0, 0x6000, SC_32x32);
+    bgSetMapPtr(0, MAP_ADDR, SC_32x32);
 
     /* Mode 3: 256 colors, BG1 only */
     setMode(BG_MODE3, 0);

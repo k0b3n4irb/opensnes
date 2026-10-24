@@ -1,4 +1,4 @@
-# speech_synth — the SNES says "OPEN SNES"
+# speech_synth — the SNES says "OPEN SNES… DAVEO"
 
 
 Port of krom (Peter Lemon)'s **SpeechSynth**
@@ -7,8 +7,22 @@ Speech on the SNES = sequencing a **phoneme bank** on one DSP voice: per
 phoneme, the APU-side program selects the sample (SRCN), shapes it
 (ADSR: plosives one-shot, vowels/nasals looped and sustained), inflects
 pitch for prosody, and waits (4 ms timer grain). krom's 32-phoneme bank
-spells "PETER LEMON"; our original 5-phoneme bank (formant synthesis,
-`gen_phonemes.py`) says **"OPEN SNES"** on loop.
+spells "PETER LEMON"; our original 10-phoneme bank (formant synthesis,
+`gen_phonemes.py`) says **"OPEN SNES"**, then, after a pause, the name of the
+examples' city, **"DAVEO"** (said the French way, da-ve-o: three even
+syllables, the pitch falling on the last), on loop.
+
+| Phonemes | What they are |
+|---|---|
+| AU, EA, AA, EE, OO | vowels: a glottal pulse train through three formant filters, looped (the open o of "open", its e, the a, the closed e and the closed o of "Daveo") |
+| NN | the nasal: the same, with one low formant |
+| PP, DD | plosives, one-shot: a burst; the voiced D starts with a short voice bar |
+| SS | the fricative, one-shot: high-frequency noise |
+| VV | the voiced fricative, looped: a low voice with that noise over it |
+
+A phrase entry is SRCN, ADSR1, ADSR2, pitch and a duration in 4 ms ticks;
+SRCN `$FE` is a pause (a wait without a new KON, so the last phoneme decays
+through the gap) and `$FF` ends the phrase.
 
 ROM mode: **LoROM** (project default).
 

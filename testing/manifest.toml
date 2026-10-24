@@ -61,25 +61,15 @@ frames = [200, 400]
 [examples."backgrounds/mode2"]
 frames = [200, 400]
 
-[examples."backgrounds/mode4"]
-frames = [200, 400]          # the offset-per-tile wave travels
-
-[examples."backgrounds/mode6"]
-frames = [200, 400]          # the offset-per-tile wave travels
-
-# DSP-1 cube: the coprocessor rotates 8 corners every frame (self-animating,
-# two capture points). Firmware-gated — luna LLE-emulates the DSP-1 and needs
+# DSP-1 ground: the coprocessor streams the floor every frame and the camera
+# idles while the cube tumbles above it (two capture points: the cube turns
+# between them). Firmware-gated — luna LLE-emulates the DSP-1 and needs
 # Sony's dsp1b.rom (copyright, not shipped); CI without it SKIPs the visual +
 # WRAM pillars for this example (coverage/liveness still runs — it boots fine,
-# the coprocessor just stays inert). A dev/CI with the firmware gets full coverage.
-[examples."chips/dsp1_cube"]
-firmware = "dsp1b.rom"
-frames = [200, 400]
-
-# DSP-1 ground: the coprocessor streams the floor every frame and the camera
-# idles, so one capture point suffices; firmware-gated like dsp1_cube.
+# the coprocessor just stays inert).
 [examples."mode7/dsp1_ground"]
 firmware = "dsp1b.rom"
+frames = [200, 400]
 
 # --- Hi-res capture (gaps review R8): luna's default view averages the two
 # horizontal subpixels of modes 5/6 (512 dots) into 256; `native_res = true`
@@ -94,12 +84,6 @@ native_res = true
 [examples."backgrounds/mode0"]
 frames = [200, 400]
 
-[examples."basics/fix32_orbit"]
-frames = [200, 400]
-
-[examples."basics/timer"]
-frames = [200, 400]
-
 [examples."chips/superfx_3d"]
 frames = [200, 400]
 
@@ -109,13 +93,10 @@ frames = [200, 400]
 [examples."chips/superfx_game_skeleton"]
 frames = [200, 400]
 
-[examples."color/pseudo_hires"]
+[examples."demos/shmup"]
 frames = [200, 400]
 
-[examples."games/shmup_1942"]
-frames = [200, 400]
-
-[examples."games/tetris"]
+[examples."games/blocks"]
 frames = [200, 400]
 
 [examples."mode7/extbg"]
@@ -128,7 +109,6 @@ frames = [200, 400]
 frames = [200, 400]
 
 [examples."sprites/dynamic_sprite"]
-frames = [200, 400]
-
-[examples."text/scroll_message"]
-frames = [200, 400]
+# 260, not 400: the shard turning in 24 frames shows the same picture at 200
+# and 400 (2026-10-21, the Néo-Lumen sheet)
+frames = [200, 260]

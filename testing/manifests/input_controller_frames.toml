@@ -1,0 +1,43 @@
+# input/controller's frame counter (the timer example, merged into controller
+# on 2026-10-18): `frame_count`, the NMI heartbeat crt0.asm bumps once per
+# VBlank, and the one thing the example adds on top of reading it: L and R
+# held together reset it to zero (A was the reset in timer; on the pad test
+# A is a button like the others). The visual baseline renders the digits,
+# so it pins the counter at its own capture frames — but it runs with NO
+# input, so the reset path, and the "only L+R does it" part of it, is never
+# reached. Liveness sees neither.
+#
+# Measured on luna: frame_count == PPU frame - 2 at frames 60 and 150 —
+# exactly one NMI per displayed frame, no double-increment and no missed
+# VBlank. The B leg is the negative: B alone must NOT reset.
+rom = "../../examples/input/controller/controller.sfc"
+#        B tap (must NOT reset)   L+R tap (must reset)
+input = "100:0x8000,104:0,200:0x0030,204:0"
+
+[[checkpoint]]                 # the NMI heartbeat, before any input
+at_frame = 60
+[checkpoint.values]
+frame_count = { eq = 58, width = 2 }         # 60 - 2 boot frames
+
+[[checkpoint]]                 # B is not the reset
+at_frame = 150
+[checkpoint.values]
+frame_count = { eq = 148, width = 2 }        # still frame - 2: B did nothing
+
+[[checkpoint]]                 # L+R landed: the counter restarted at 0
+at_frame = 202
+[checkpoint.values]
+frame_count = { eq = 1, width = 2 }
+
+[[checkpoint]]                 # ...and resumed at one per frame from there
+at_frame = 240
+[checkpoint.values]
+frame_count = { eq = 39, width = 2 }         # 240 - 201
+
+# The NMI's text flush sends only the bytes written since the last VBlank
+# (2026-10-12): a counter that redraws one row costs a few dozen bytes of
+# VBlank DMA, where it cost the whole 2048-byte buffer until then. The ceiling
+# fails on the ROM built before the change (negative control run that day).
+[asserts.dma]
+unsafe_writes = 0
+max_vblank_bytes = 1024

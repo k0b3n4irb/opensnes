@@ -1,4 +1,4 @@
-# examples/audio/speech_synth, leg 2 of 2 — a plosive: a different sample, a
+# examples/audio/speech_synth, leg 2 of 3 — a plosive: a different sample, a
 # different envelope, a different pitch, on the SAME voice.
 #
 # Speech on the SNES is not a sample being played; it is one DSP voice being
@@ -12,7 +12,9 @@
 # while the bank itself (DIR $08) and the voice's volume are unchanged: the
 # sequencer re-points the voice, it does not re-upload anything.
 #
-# Measured with `--until-frame 105`; this phoneme holds frames ~90-120.
+# Measured on luna v1.40.0 (`--until-frame N` over the voice's state): the
+# last S of "SNES" holds frames ~96-123, the pause before "DAVEO" included
+# (a pause strikes no new phoneme, so the voice stays on S until the D).
 rom = "../../examples/audio/speech_synth/speech_synth.sfc"
 frames = 105
 

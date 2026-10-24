@@ -65,7 +65,7 @@ The `bin/cc65816` driver (compiled, `compiler/cc65816/`) orchestrates cproc→QB
 - **templates/** — ROM bootstrap: `crt0.asm` (startup + NMI handler), `hdr*.asm` (ROM headers), `runtime.asm` (math routines, now in lib/source/), `memmap*.inc` (memory maps). These are the single source of truth — examples don't duplicate them.
 - **make/common.mk** — Universal build rules included by every example. Handles graphics conversion, multi-file C compilation, SNESMOD audio, SA-1/SuperFX/HiROM mode selection, module linking.
 - **tools/** — the `opensnes-*` tools (shipped): `opensnes-tileset`/`-sprite` (PNG→SNES tiles), `opensnes-music` (IT→SPC700), and the other asset tools; the converters' code lives in `tools/lib/`
-- **examples/** — 85 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
+- **examples/** — 60 ROMs organized by category (basics, fundamentals, text, backgrounds, sprites, scrolling, input, hdma, windows, color, transitions, mode7, maps, memory, audio, chips, games)
 
 ### Enhancement Chip Support
 
@@ -107,6 +107,7 @@ in `KNOWN_LIMITATIONS.md` at the repo root. Keep this section in sync.
 - **cc65816 pushes args LEFT-TO-RIGHT** (not right-to-left like tcc816/PVSnesLib) — ASM functions ported from PVSnesLib have swapped stack offsets. See `compiler/ABI.md` for the full calling convention reference.
 - **`data_init_end.o` provides the data-init terminator** — `make/common.mk` lists it last; wlalink's size-descending sort of appended sections is what keeps the 5-byte terminator after every record, and `symmap.py --check-data-init` verifies it after every link (since 2026-10-05)
 - **WRAM data port ($2180-$2183) is NOT safe in NMI** — silent corruption if NMI fires mid-sequence
+- **A SNESMOD effect that does not fit in the SPC RAM left by the module overwrites the echo buffer** — the driver never checks; size the effects with `opensnes-music inspect` (since 2026-10-18, open)
 - **`volatile` is honoured by QBE** (since chantier A2, 2026-05-09) — each load/store carrying `volatile` survives the IR pipeline and is not coalesced. The lib still favours plain globals for NMI handshakes (`vblank_flag`, `oam_update_flag`) for cycle-cost equivalence and contract clarity, but user code can use `volatile` freely for MMIO patterns.
 - **Vertical scroll is off by one on hardware** (the PPU never outputs scanline 0): the lib writes `y - 1` to `BGnVOFS`/`M7VOFS` for you (`bgSetScroll`, map module, `mode7SetScroll`, reset default, since 2026-09-12), so `y = 0` shows tilemap row 0 on the first line. Data that reaches the register without the lib — HDMA tables on `BGnVOFS` — must carry the -1 itself. Exception: BG3 in Modes 2/4/6 is the offset-per-tile table and its VOFS is written raw (`setMode` tells the NMI, since 2026-10-02). PVSnesLib writes the raw value.
 - **WLA-DX loses .ACCU/.INDEX tracking after branch merges** — always add explicit `.ACCU 8`/`.ACCU 16` after every `rep`/`sep` in hand-written ASM

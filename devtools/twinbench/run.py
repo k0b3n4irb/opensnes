@@ -12,7 +12,7 @@ costs under each SDK, and a row whose two ROMs do not do the same work says
 nothing (see PAIRS for what was checked).
 
     PVSNESLIB_HOME=~/pvsneslib python3 devtools/twinbench/run.py
-    python3 devtools/twinbench/run.py --only likemario,breakout
+    python3 devtools/twinbench/run.py --only rooftop_run,breakout
 
 PVSnesLib's ROMs are the ones built in its tree (`make` in snes-examples).
 """
@@ -33,7 +33,7 @@ from lib import find_luna  # noqa: E402
 import run as sdkbench  # noqa: E402
 
 WORK = REPO / "build" / "twinbench"
-RIGHT, START, A = "0x0100", "0x1000", "0x0080"
+RIGHT, START, A, SELECT = "0x0100", "0x1000", "0x0080", "0x2000"
 # Pairs read side by side and found NOT to do the same work: left out unless
 # --all is given, and never a figure to quote.
 NOT_TWINS = {
@@ -44,16 +44,15 @@ NOT_TWINS = {
 }
 # name, PVSnesLib directory, ours, input script (or None), first and last frame
 PAIRS = [
-    ("likemario", "games/likemario", "games/likemario", f"130:{RIGHT}", 200, 500),
+    ("rooftop_run", "games/likemario", "games/rooftop_run", f"130:{RIGHT}", 200, 500),
     ("breakout", "games/breakout", "games/breakout", f"100:{START},110:0,150:{A},160:0", 200, 500),
-    ("mapandobjects", "objects/mapandobjects", "games/mapandobjects", f"130:{RIGHT}", 200, 500),
+    ("mapandobjects", "objects/mapandobjects", "demos/platform_objects", f"130:{RIGHT}", 200, 500),
     ("mapscroll", "maps/mapscroll", "maps/map_scroll", f"130:{RIGHT}", 200, 500),
-    ("slopemario", "maps/slopemario", "maps/slope_collision", f"130:{RIGHT}", 200, 500),
+    ("slopemario", "maps/slopemario", "demos/platform_objects", f"130:{RIGHT}", 200, 500),  # the slope level is platform_objects' since 2026-10-18
     ("tiled", "maps/tiled", "../testing/fixtures/retired_examples/tiled", f"130:{RIGHT}", 200, 500),
-    ("dynamicmap", "maps/DynamicMap", "maps/dynamic_map", None, 200, 500),
     ("animatedsprite", "graphics/Sprites/AnimatedSprite", "sprites/animated_sprite", f"130:{RIGHT}", 200, 500),
     ("dynamicsprite", "graphics/Sprites/DynamicSprite", "sprites/dynamic_sprite", None, 200, 500),
-    ("dynamicmetasprite", "graphics/Sprites/DynamicEngineMetaSprite", "sprites/dynamic_metasprite", None, 200, 500),
+    ("dynamicmetasprite", "graphics/Sprites/DynamicEngineMetaSprite", "sprites/dynamic_sprite", f"130:{SELECT},134:0", 200, 500),  # SELECT: our metasprite scene
     ("metasprite", "graphics/Sprites/MetaSprite", "../testing/fixtures/retired_examples/metasprite", None, 200, 500),
     ("objectsize", "graphics/Sprites/ObjectSize", "sprites/sprite_sizes", None, 200, 500),
     ("simplesprite", "graphics/Sprites/SimpleSprite", "sprites/simple_sprite", None, 200, 500),
@@ -66,10 +65,8 @@ PAIRS = [
     ("waves", "graphics/Effects/Waves", "hdma/hdma_wave", None, 200, 500),
     ("gradient", "graphics/Effects/GradientColors", "hdma/gradient_colors", None, 200, 500),
     ("music", "audio/music", "audio/snesmod_music", None, 200, 500),
-    ("effects", "audio/effects", "audio/snesmod_sfx", f"210:{A},220:0,300:{A},310:0", 200, 500),
     ("controller", "input/controller", "input/controller", f"210:{A},260:{RIGHT},300:0", 200, 500),
     ("hello", "hello_world", "text/print_string", None, 200, 500),
-    ("timer", "timer", "basics/timer", None, 200, 500),
 ]
 
 

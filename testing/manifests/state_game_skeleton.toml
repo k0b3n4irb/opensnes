@@ -5,24 +5,24 @@
 # title screen. The entire example is untested by them.
 #
 # This plays one complete round, start to loop-back, and pins each stage.
-# Values measured on luna with this exact script (the coin spawn is
+# Values measured on luna with this exact script (the shard spawn is
 # rngNext()-driven but seeded from seed_ctr, the title-screen frame count, so
 # a fixed script gives a fixed level):
 #
 #   frame   50  game_state 0   the title screen ignores the D-pad
 #   frame   70  game_state 1   START taken: px,py = (120,112), time_left 30,
-#                              coin spawned at (195, 45)
-#   frame  130  score 1        RIGHT+UP 34 then RIGHT 4 -> (196,44), within
-#                              the 8 px box of the coin; it respawns at (158,99)
+#                              shard spawned at (195, 133)
+#   frame  130  score 1        RIGHT+DOWN 10 then RIGHT 28 -> (196,132), within
+#                              the 8 px box of the shard; it respawns at (158,195)
 #   frame 1850  time_left 1    the one-second tick ran 29 times
 #   frame 1900  game_state 2   time_left hit 0 -> game over, score preserved
 #   frame 1960  game_state 0   START on the game-over screen loops back
 #
-# The (196, 44) player position is predicted from the script, not observed:
-# PLAYER_SPEED is 2, the diagonal hold is 34 frames then 4 to the right,
+# The (196, 132) position is predicted from the script and observed:
+# PLAYER_SPEED is 2, the diagonal hold is 10 frames then 28 to the right,
 # the start is (120,112).
 #
-# The coin depends on how long the boot took (the seed is the title
+# The shard depends on how long the boot took (the seed is the title
 # screen's frame count): (41, 36) until 2026-09-29, when the tile module's
 # asm encoder shortened the boot and moved it to (42, 53) — the old script
 # (LEFT+UP for 40 frames, to (40, 32)) then walked past it. (43, 37) since
@@ -30,12 +30,17 @@
 # frame, and the script before (LEFT+UP 30, LEFT 10, to (40, 52)) missed it.
 # (195, 45) since 2026-10-11, when loops tested at their bottom shortened
 # the boot again: the script now goes RIGHT+UP 34 then RIGHT 4, to
-# (196, 44), and the respawn is at (158, 99).
+# (196, 44), and the respawn is at (158, 99). (195, 133) since 2026-10-22,
+# when the example took its assets (the square, the logo, Kit) and the
+# twenty-tile encoder left the boot: the script goes RIGHT+DOWN 10 then
+# RIGHT 28, to (196, 132), and the respawn is at (158, 195). Kit's box and
+# the field moved too (x 16-232, y 32-200: the sprites are drawn round the
+# 8x8 boxes), which the script does not reach.
 # So a movement or collision regression fails here on an arithmetic ground,
 # and a state-machine regression fails on game_state.
 rom = "../../examples/basics/game_skeleton/game_skeleton.sfc"
-#        START        RIGHT+UP 34, RIGHT 4           START (on game over)
-input = "60:0x1000,64:0,80:0x0900,114:0x0100,118:0,1900:0x1000,1904:0"
+#        START        RIGHT+DOWN 10, RIGHT 28        START (on game over)
+input = "60:0x1000,64:0,80:0x0500,90:0x0100,118:0,1900:0x1000,1904:0"
 
 [[checkpoint]]                 # title: nothing has started
 at_frame = 50
@@ -53,16 +58,16 @@ score      = { eq = 0,   width = 2 }
 "px.main"         = { eq = 120, width = 1 }
 "py.main"         = { eq = 112, width = 1 }
 "cx.main"         = { eq = 195, width = 1 }
-"cy.main"         = { eq = 45,  width = 1 }
+"cy.main"         = { eq = 133, width = 1 }
 
-[[checkpoint]]                 # walked onto the coin: scored and respawned
+[[checkpoint]]                 # walked onto the shard: scored and respawned
 at_frame = 130
 [checkpoint.values]
 score = { eq = 1,  width = 2 }
 "px.main"    = { eq = 196, width = 1 }     # 120 + 38 frames * 2 px
-"py.main"    = { eq = 44, width = 1 }      # 112 - 34 frames * 2 px
-"cx.main"    = { eq = 158, width = 1 }     # the coin moved
-"cy.main"    = { eq = 99, width = 1 }
+"py.main"    = { eq = 132, width = 1 }     # 112 + 10 frames * 2 px
+"cx.main"    = { eq = 158, width = 1 }     # the shard moved
+"cy.main"    = { eq = 195, width = 1 }
 
 [[checkpoint]]                 # one second left, still playing
 at_frame = 1850

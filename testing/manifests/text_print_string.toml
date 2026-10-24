@@ -9,15 +9,16 @@
 #      here as the 'T' glyph (tile 52 = font_tile 0 + 'T' - 32) at byte $0340 —
 #      the bitplanes .######. / ...##... x6. A wrong VRAM target, a wrong
 #      FONT_SIZE or a broken asm_textDMAFont moves or corrupts exactly this.
-#   2. textPrintAt(8, 14, "TEXT MODULE TEST") fills the RAM tilemap buffer and
-#      the NMI DMAs it to the tilemap at VRAM word $3800. Asserted as the 16
-#      tilemap entries at byte $7390 = ($3800 * 2) + (14 * 32 + 8) * 2 — each
+#   2. textPrintAt(7, 13, "OS: RUE BASSE NET") and textPrintAt(7, 15, "READY")
+#      fill the RAM tilemap buffer and the NMI DMAs it to the tilemap at VRAM
+#      word $3800. Asserted as the 17 tilemap entries at byte $734E =
+#      ($3800 * 2) + (13 * 32 + 7) * 2 and the 5 at byte $73CE (row 15) — each
 #      entry is font_tile + (c - 32) with palette 0, so the hex below literally
-#      spells T E X T _ M O D U L E _ T E S T. A build where the tilemap never
+#      spells O S : _ R U E ... and R E A D Y. A build where the tilemap never
 #      flushed, where the cursor maths shifted by a row, or where build_tile_entry
-#      started emitting a palette/priority bit, fails on this block alone.
-# Both neighbours are asserted blank (columns 6-7 before the string, columns
-# 24-25 after it), so a print that spilled would fail even if the glyphs landed.
+#      started emitting a palette/priority bit, fails on these blocks alone.
+# Both neighbours of the first line are asserted blank (columns 5-6 before it,
+# columns 24-25 after it), so a print that spilled would fail even if the glyphs landed.
 #
 # Measured with `luna state ... --until-frame 60 --dump-vram`. VRAM block
 # offsets are byte offsets, and both are fixed by textModeInit(), not by link
@@ -27,6 +28,7 @@ frames = 60
 
 [asserts.blocks]
 font_glyph_T = { space = "vram", offset = "0340", hex = "7e001800180018001800180018000000" }
-row14_text   = { space = "vram", offset = "7390", hex = "340025003800340000002d002f00240035002c00250000003400250033003400" }
-row14_before = { space = "vram", offset = "738C", hex = "00000000" }
-row14_after  = { space = "vram", offset = "73B0", hex = "00000000" }
+row13_text   = { space = "vram", offset = "734E", hex = "2f0033001a00000032003500250000002200210033003300250000002e0025003400" }
+row13_before = { space = "vram", offset = "734A", hex = "00000000" }
+row13_after  = { space = "vram", offset = "7370", hex = "00000000" }
+row15_text   = { space = "vram", offset = "73CE", hex = "32002500210024003900" }

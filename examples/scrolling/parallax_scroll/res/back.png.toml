@@ -1,4 +1,6 @@
 tool = "opensnes-tileset"
 
 [convert]
-colors = 32
+colors = 16
+flip = true
+pages = true

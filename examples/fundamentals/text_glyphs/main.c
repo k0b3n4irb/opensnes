@@ -6,20 +6,23 @@
  * The under-the-hood companion to the Text family. Instead of calling the
  * `text` module, it writes a hand-coded 2bpp bitmap font straight into VRAM,
  * builds a tilemap row to spell "HELLO WORLD!", and shows it on BG1 in Mode
- * 0. Every tile is raw bitplane data in a C array — no assets, no font
+ * 0, in the city's colours: cyan letters with a pink shadow on a terminal's
+ * glass. Every tile is raw bitplane data in a C array — no assets, no font
  * library — so you see exactly how the SNES PPU turns bytes into pixels.
  * Read `examples/text/print_string` first for the easy way; read this to
  * understand what that module hides.
  *
  * @par SNES Concepts
- * - 2bpp tile format: each 8x8 tile is 16 bytes (two bitplanes interleaved)
+ * - 2bpp tile format: each 8x8 tile is 16 bytes (two bitplanes interleaved);
+ *   plane 0 draws colour 1, plane 1 colour 2
  * - VRAM tilemap structure: 32x32 entries, each a 16-bit word (tile index + attributes)
- * - CGRAM palette: two BGR555 colors loaded at palette index 0
+ * - CGRAM palette: three BGR555 colors loaded at palette index 0
  * - Mode 0: four BG layers, each limited to 4 colors (2bpp)
  * - DMA transfers for tile data and palette via dmaCopyVram / dmaCopyCGram
  *
  * @par What to Observe
- * - "HELLO WORLD!" rendered in white text on a dark blue background
+ * - "HELLO WORLD!" in cyan, each letter with a pink shadow one pixel right
+ *   and down, on the dark glass of a terminal
  * - The text appears centered at row 14, column 10 of the 32x32 tilemap
  * - The screen is otherwise blank (tilemap filled with tile 0, the space glyph)
  *
@@ -35,9 +38,12 @@
  * @brief Hand-coded 2bpp bitmap font tiles (9 glyphs, 16 bytes each)
  *
  * Each 8x8 tile occupies 16 bytes in SNES 2bpp format: two interleaved
- * bitplanes per pixel row. Bitplane 0 selects palette color 1, bitplane 1
- * selects color 2, and both together select color 3. All bitplane-1 bytes
- * are zero here, so every lit pixel maps to palette color 1 (white).
+ * bitplanes per pixel row, plane 0 first. A pixel's colour is its plane 1
+ * bit times two plus its plane 0 bit. Plane 0 holds the letter, the glyph of
+ * the city's font (the `text` module's, lib/source/text.asm): colour 1, cyan.
+ * Plane 1 holds its shadow, the letter moved one pixel right and one down,
+ * where the letter is not: colour 2, pink. No pixel has both bits, so colour
+ * 3 is never drawn.
  *
  * Tile index map: 0=Space, 1=H, 2=E, 3=L, 4=O, 5=W, 6=R, 7=D, 8=!
  */
@@ -47,36 +53,36 @@ static const u8 font_tiles[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
     /* Tile 1: H */
-    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x7E, 0x00,
-    0x66, 0x00, 0x66, 0x00, 0x66, 0x00, 0x00, 0x00,
+    0x66, 0x00, 0x66, 0x11, 0x66, 0x11, 0x7E, 0x01,
+    0x66, 0x19, 0x66, 0x11, 0x66, 0x11, 0x00, 0x33,
 
     /* Tile 2: E */
-    0x7E, 0x00, 0x60, 0x00, 0x60, 0x00, 0x7C, 0x00,
-    0x60, 0x00, 0x60, 0x00, 0x7E, 0x00, 0x00, 0x00,
+    0x7E, 0x00, 0x60, 0x1F, 0x60, 0x10, 0x7C, 0x00,
+    0x60, 0x1E, 0x60, 0x10, 0x7E, 0x00, 0x00, 0x3F,
 
     /* Tile 3: L */
-    0x60, 0x00, 0x60, 0x00, 0x60, 0x00, 0x60, 0x00,
-    0x60, 0x00, 0x60, 0x00, 0x7E, 0x00, 0x00, 0x00,
+    0x60, 0x00, 0x60, 0x10, 0x60, 0x10, 0x60, 0x10,
+    0x60, 0x10, 0x60, 0x10, 0x7E, 0x00, 0x00, 0x3F,
 
     /* Tile 4: O */
-    0x3C, 0x00, 0x66, 0x00, 0x66, 0x00, 0x66, 0x00,
-    0x66, 0x00, 0x66, 0x00, 0x3C, 0x00, 0x00, 0x00,
+    0x3C, 0x00, 0x66, 0x18, 0x66, 0x11, 0x66, 0x11,
+    0x66, 0x11, 0x66, 0x11, 0x3C, 0x03, 0x00, 0x1E,
 
     /* Tile 5: W */
-    0xC6, 0x00, 0xC6, 0x00, 0xC6, 0x00, 0xD6, 0x00,
-    0xFE, 0x00, 0xEE, 0x00, 0xC6, 0x00, 0x00, 0x00,
+    0xC6, 0x00, 0xC6, 0x21, 0xC6, 0x21, 0xD6, 0x21,
+    0xFE, 0x01, 0xEE, 0x11, 0xC6, 0x31, 0x00, 0x63,
 
     /* Tile 6: R */
-    0x7C, 0x00, 0x66, 0x00, 0x66, 0x00, 0x7C, 0x00,
-    0x6C, 0x00, 0x66, 0x00, 0x66, 0x00, 0x00, 0x00,
+    0x7C, 0x00, 0x66, 0x18, 0x66, 0x11, 0x7C, 0x03,
+    0x6C, 0x12, 0x66, 0x10, 0x66, 0x11, 0x00, 0x33,
 
     /* Tile 7: D */
-    0x78, 0x00, 0x6C, 0x00, 0x66, 0x00, 0x66, 0x00,
-    0x66, 0x00, 0x6C, 0x00, 0x78, 0x00, 0x00, 0x00,
+    0x78, 0x00, 0x6C, 0x10, 0x66, 0x10, 0x66, 0x11,
+    0x66, 0x11, 0x6C, 0x13, 0x78, 0x06, 0x00, 0x3C,
 
     /* Tile 8: ! */
-    0x18, 0x00, 0x18, 0x00, 0x18, 0x00, 0x18, 0x00,
-    0x18, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00,
+    0x18, 0x00, 0x18, 0x04, 0x18, 0x04, 0x18, 0x04,
+    0x18, 0x04, 0x00, 0x0C, 0x18, 0x00, 0x00, 0x0C,
 };
 
 /**
@@ -94,15 +100,17 @@ static const u8 message[] = {
 };
 
 /**
- * @brief Background palette in BGR555 format (2 colors, 4 bytes total)
+ * @brief Background palette in BGR555 format (3 colors, 6 bytes total)
  *
- * SNES CGRAM stores colors as 15-bit BGR555: bbbbbgggggrrrrr in two bytes
- * (little-endian). Color 0 is the background fill, color 1 is the text.
- * Only 2 of the 4 available Mode 0 palette entries are used.
+ * SNES CGRAM stores colors as 15-bit BGR555: 0bbbbbgggggrrrrr in two bytes
+ * (little-endian). Color 0 is the background fill (a terminal's glass),
+ * color 1 the letters, color 2 their shadow: the neon of the Rue basse.
+ * Color 3 of the 4 Mode 0 palette entries is not used.
  */
 static const u8 bg_palette[] = {
-    0x00, 0x28,  /* Color 0: Dark blue */
-    0xFF, 0x7F,  /* Color 1: White */
+    0x61, 0x10,  /* Color 0: the glass, #0a1a22 */
+    0x49, 0x73,  /* Color 1: cyan, #48d0e0 */
+    0xB4, 0x30,  /* Color 2: pink, #a02860 */
 };
 
 /**
@@ -135,7 +143,7 @@ int main(void) {
     dmaCopyVram((u8 *)font_tiles, 0x0000, 144);
 
     /* Load palette via DMA */
-    dmaCopyCGram((u8 *)bg_palette, 0, 4);
+    dmaCopyCGram((u8 *)bg_palette, 0, 6);
 
     /* Fill tilemap with spaces (tile 0) */
     dmaFillVRAM(0, 0x0400, 1024 * 2);

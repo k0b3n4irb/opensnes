@@ -46,9 +46,12 @@ both goals concurrently (clean deleted `crt0.o` mid-link).
 
 ## Examples that left the corpus (`retired_examples/`)
 
-Three examples left `examples/` in the review before 1.0 (2026-10-15): they
-duplicated another example for a reader, but tests and comparisons read
-them. They are built by `make fixtures` and profiled by `make rom-coverage`
+Eight examples left `examples/` before 1.0. Three in the examples review
+(2026-10-15): they duplicated another example for a reader, but tests and
+comparisons read them. Five in the assets rework (2026-10-19): chip boot
+diagnostics and ROMs that ask the console a question, which a reader does not
+need but the luna manifests and the console protocol
+(`docs/HARDWARE_VERIFICATION.md`, rows 23, 25 and 26, by their path here) do. They are built by `make fixtures` and profiled by `make rom-coverage`
 like the others; nothing of them is in the user documentation.
 
 | Fixture | Read by | Its example now |
@@ -56,6 +59,11 @@ like the others; nothing of them is in the user documentation.
 | `tiled/` | `dma_tiled.toml`, `movement_tiled.toml`; `devtools/twinbench` (PVSnesLib's maps/tiled) | `maps/map_scroll` (the same Tiled pipeline) |
 | `metasprite/` | `footprint_metasprite.toml`, `input_metasprite.toml`, `oam_metasprite.toml`; twinbench (PVSnesLib's MetaSprite); the `anim.h` cost figure | `sprites/sprite_sizes`, `sprites/aseprite_pipeline` |
 | `snesmod_music_large/` | `audio_snesmod_music_large.toml`, `input_snesmod_music_large.toml`; `audio_regress.py` | `audio/snesmod_music` (one call loads a soundbank of any size) |
+| `mode6/` | `backgrounds_mode6.toml`, `backgrounds_mode6_card.toml`; protocol row 23 (the hi-res offset-per-tile question, `mode6_card.png`) | `backgrounds/mode2` (offset-per-tile in Modes 2 and 4) |
+| `sa1_hello/` | `coproc_sa1_hello.toml` (the SA-1 boot and I-RAM handshake) | `chips/sa1_starfield` |
+| `sa1_save/` | `h_sa1_save_boot1.toml`, `i_sa1_save_boot2.toml` (BW-RAM kept across a power cycle); protocol row 25 | the SA-1 tutorial, "Saving to BW-RAM" |
+| `superfx_hello/` | `coproc_superfx_hello.toml`, `coproc_superfx_vectors.toml` (GSU boot, SRAM, FMULT) | `chips/superfx_3d` |
+| `superfx_save/` | `j_gsu_save_boot1.toml`, `k_gsu_save_boot2.toml` (Game Pak RAM kept across a power cycle); protocol row 26 | the advanced Super FX tutorial, "Saving" |
 
 ## luna stress ROMs (`stress/`)
 

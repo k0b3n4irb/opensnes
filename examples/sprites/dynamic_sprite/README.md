@@ -8,7 +8,10 @@ How to use the **dynamic sprite system** to stream sprite tile data into VRAM ev
 Unlike static sprites (where all frames live in VRAM permanently), dynamic sprites upload
 only the current animation frame, saving VRAM space when sprites have many frames.
 
-This demo displays 4 animated 16x16 sprites, each cycling through 24 frames of animation.
+This demo displays four data shards, 16x16 sprites, each turning through 24 frames of
+animation. SELECT switches to the next step of the same engine: **metasprites** — Kit,
+built from several OBJ at 16x16, 32x48 and 64x64 — streamed the same way under the
+three OBJSEL size pairs.
 
 ## Prerequisites
 
@@ -17,7 +20,12 @@ Read `sprites/simple_sprite` first (OAM basics), then `sprites/animated_sprite`
 
 ## Controls
 
-No interactive controls. Four sprites animate automatically.
+| Button | Action |
+|--------|--------|
+| SELECT | Switch between the four animated sprites and the metasprite scene |
+| D-PAD Up/Down | (metasprite scene) switch the OBJSEL size pair: 8/16, 8/32, 16/32 |
+
+At boot the four sprites animate by themselves.
 
 ## Build & Run
 
@@ -26,7 +34,7 @@ cd $OPENSNES_HOME
 make -C examples/sprites/dynamic_sprite
 ```
 
-Then open `dynamic_sprite.sfc` in your emulator (Mesen2 recommended).
+Then open `dynamic_sprite.sfc` in luna (`luna-gui dynamic_sprite.sfc`) or any emulator.
 
 ## How It Works
 
@@ -89,6 +97,29 @@ oambuffer[0].oamrefresh = 1;
 Every 8 frames, the animation advances. Setting `oamrefresh = 1` tells the engine
 to upload the new frame's tiles to VRAM on the next VBlank.
 
+## The Metasprite Scene
+
+A metasprite is a list of pieces, each an offset, a tile and attributes:
+
+```c
+static const MetaspriteItem hero16_frame0[] = {
+    METASPR_ITEM(0,  0,  0, OBJ_PAL(0) | OBJ_PRIO(3)),
+    METASPR_ITEM(16, 0,  1, OBJ_PAL(0) | OBJ_PRIO(3)),
+    ...
+    METASPR_TERM
+};
+oamMetaDrawDyn(10, 192, 140, hero16_frame0, spritehero16_tiles, OBJ_SMALL);
+```
+
+`oamMetaDrawDyn(id, x, y, meta, gfx, size_class)` streams each piece's tiles
+with the dynamic engine; `OBJ_SMALL` / `OBJ_LARGE` say which half of the
+OBJSEL pair the pieces use. Changing the pair (UP/DOWN) re-runs
+`oamDynamicInit()` with a new `sizeMode` under force blank, and
+`oamDynamicDrainQueue()` uploads both heroes before the screen comes back
+on. The menu is text on BG1 (Mode 0, font at VRAM $3000, map at $3800);
+the engine's tiles stay at $0000 (large) and $1000 (small). The scene was the
+`dynamic_metasprite` example, a port of PVSnesLib's DynamicEngineMetaSprite.
+
 ## SNES Concepts
 
 ### VRAM Budget During VBlank
@@ -118,8 +149,12 @@ allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank on
 | File | Purpose |
 |------|---------|
 | `main.c` | Dynamic sprite initialization, animation loop |
-| `res/sprite16_grid.png.toml`, `res/sprite32.png.toml` | the import settings of the two sheets (`opensnes-sprite`); the build converts them and links the result, `res/sprite16_grid.inc` declares the symbols |
-| `res/sprite16_grid.png` | 16x16 sprite sheet source |
+| `res/*.png.toml` | the import settings of the four sheets (`opensnes-sprite`, the three Kit sheets with `metasprite`); the build converts them and links the result, `res/<name>.inc` declares the symbols |
+| `res/sprite16_grid.png` | the data shard turning, 24 16x16 frames, 8 a row |
+| `res/spritehero8.png`, `spritehero16.png`, `spritehero32.png` | Kit at 16x16, 32x48 and 64x64, one frame each, on one palette (the metasprite scene loads one) |
+
+The shard and Kit are the Néo-Lumen art (PixelLab, CC0), turned and indexed by
+`devtools/art_assets/build.py` (`assets/neo-lumen/README.md`).
 | `Makefile` | `LIB_MODULES := console sprite sprite_dynamic sprite_lut dma background input` |
 
 ## Going Further
@@ -132,8 +167,8 @@ allow unlimited VRAM writes. During gameplay, writes happen via DMA in VBlank on
 
 - **Explore related examples**:
   - `games/breakout` -- Dynamic sprites in a real game context
-  - `games/likemario` -- Dynamic sprites with scrolling backgrounds
+  - `games/rooftop_run` -- Dynamic sprites with scrolling backgrounds
 
 ## Modules Used
 
-`console`, `sprite`, `sprite_dynamic`, `sprite_lut`, `dma`, `background`, `input` (`LIB_MODULES` in the Makefile).
+`console`, `sprite`, `sprite_dynamic`, `sprite_dynamic_meta`, `sprite_lut`, `dma`, `background`, `text`, `input` (`LIB_MODULES` in the Makefile).

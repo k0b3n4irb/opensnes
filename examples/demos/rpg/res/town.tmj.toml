@@ -1,0 +1,10 @@
+# the town: drawn against the tileset's table, converted to the four 32x32
+# pages of a 64x64 map (.q16), one collision byte per cell (.c16, from each
+# tile's `attribute`) and the Entities layer as C defines (town_entities.inc)
+tool = "opensnes-level"
+
+[convert]
+tileset = "tileset.map"
+quadrant = true
+collision = true
+entities = true

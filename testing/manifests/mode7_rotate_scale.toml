@@ -37,6 +37,7 @@ at_frame = 60
 "m7_scale_y.mode7" = 256
 "m7_sin" = { eq = 0, width = 1 }                  # sin(0)
 "m7_cos" = { eq = 127, width = 1 }                # cos(0) = +1.0 as s8
+shadow_dy = { eq = 8, width = 2 }                 # 0x0100 >> 5: the shadow just below the glider
 [checkpoint.ppu]
 m7a = 254                                       # 1:1 with no rotation (127/128 of $0100)
 m7d = 254
@@ -44,6 +45,7 @@ m7b = 0
 m7c = 0
 m7x = 128                                       # pivot: screen centre
 m7y = 128
+m7_vofs = 15                                    # scroll (0, 16) - 1: the pivot lands on screen line 112, under the glider
 bgmode = 7
 
 [[checkpoint]]                 # A held: rotate only
@@ -70,6 +72,7 @@ input = "120:0x0800,179:0"
 "m7_scale_y.mode7" = 728
 "m7_sin" = { eq = 126, width = 1 }                # zoom must not rotate
 "m7_cos" = { eq = 15, width = 1 }
+shadow_dy = { eq = 22, width = 2 }                # 728 >> 5: climbed, the shadow drifts away
 [checkpoint.ppu]
 m7a = 85                                        # zoomed: every term grew
 m7d = 85
@@ -80,3 +83,13 @@ m7y = 128
 [checkpoint.delta]
 "m7_scale_x.mode7" = "increased"
 "m7_scale_y.mode7" = "increased"
+shadow_dy = "increased"
+
+[[checkpoint]]                 # DOWN held as long: back to 1:1, the shadow closes in
+at_frame = 240
+input = "180:0x0400,239:0"
+[checkpoint.values]
+"m7_scale_x.mode7" = 256
+shadow_dy = { eq = 8, width = 2 }
+[checkpoint.delta]
+shadow_dy = "decreased"

@@ -1,0 +1,44 @@
+# The two scenes of the RPG: the street and the raccoon's den. A scene
+# switch is three DMAs (tiles, map, palette) under forced blank, and the
+# collision map and the entities it reads change with `scene`.
+#
+# The route walks from the spawn to the apartment's teal door: RIGHT into
+# the lane, DOWN to the promenade, LEFT along it, UP into the door
+# metatile (DOOR_TX, DOOR_TY of the town's Entities layer, cells 8, 38).
+# Landing there loads the den: scene 1, the hero on the den's `arrival`
+# entity (cells 14, 22 -> pixels 112, 176) and the host's greeting open
+# (ST_DIALOG, no button pressed). A closes it; DOWN steps onto the `mat`
+# and the street comes back with the hero two cells below the door
+# (pixels 64, 320), facing down.
+# Steps take 9 frames each (the frame that starts one, then 8 of 2 px).
+rom = "../../examples/demos/rpg/rpg.sfc"
+
+[[checkpoint]]                 # on the promenade, in front of the door
+at_frame = 345
+input = "100:0x0100,135:0,140:0x0400,238:0,245:0x0200,343:0"
+[checkpoint.values]
+scene = { eq = 0, width = 1 }
+hero_x = 64
+hero_y = 320
+
+[[checkpoint]]                 # UP into the door: the den, and the host speaks
+at_frame = 400
+input = "350:0x0800,357:0"
+[checkpoint.values]
+scene = { eq = 1, width = 1 }            # SCENE_HOUSE
+hero_x = 112
+hero_y = 176
+game_state = { eq = 2, width = 1 }       # ST_DIALOG: the greeting
+
+[[checkpoint]]                 # A closes it, DOWN onto the mat: the street again
+at_frame = 460
+input = "410:0x0080,412:0,420:0x0400,427:0"
+[checkpoint.values]
+scene = { eq = 0, width = 1 }            # SCENE_TOWN
+hero_x = 64
+hero_y = 320                             # (DOOR_TY + 2) * 8
+hero_facing = { eq = 0, width = 1 }      # FACE_DOWN
+game_state = { eq = 1, width = 1 }       # ST_EXPLORE
+
+[asserts.dma]
+unsafe_writes = 0

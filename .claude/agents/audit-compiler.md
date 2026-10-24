@@ -14,7 +14,7 @@ Tu audites la **chaîne de compilation** : les forks `compiler/cproc`, `compiler
 Questions auxquelles tu dois répondre avec des chiffres :
 - Combien de patches locaux par fork (PINS.md) ; à quelle distance de l'amont ; quel est le risque de resynchronisation.
 - Ce que le compilateur **refuse** (struct par valeur, varargs, asm inline…) et ce qu'il **compile mal en silence** encore aujourd'hui (grep les notes `tech/` pour OPEN, les entrées 🔴/🟡 de KNOWN_LIMITATIONS, `test_function_ptr.c` TODO).
-- Qualité du code généré : lis 2-3 `.c.asm` d'exemples (`examples/games/tetris/main.c.asm`, `examples/basics/collision_demo/main.c.asm`) et relève les motifs coûteux (recharges de A, pointeurs far à 4 octets sur chaque appel, `jsl` runtime pour mul/div 16 bits, prologue/épilogue de frame). Compare aux affirmations de `docs/BENCHMARK.md`.
+- Qualité du code généré : lis 2-3 `.c.asm` d'exemples (`examples/games/blocks/main.c.asm`, `examples/basics/collision_demo/main.c.asm`) et relève les motifs coûteux (recharges de A, pointeurs far à 4 octets sur chaque appel, `jsl` runtime pour mul/div 16 bits, prologue/épilogue de frame). Compare aux affirmations de `docs/BENCHMARK.md`.
 - Couverture des tests compilateur : 34 cas vérifiés / 41 non vérifiés (`devtools/compiler-tests/run.py`), ce que couvre la ROM `c_features`, ce qui n'a AUCUN test (lis `README.md` du dossier).
 - Le bug de la semaine (`&local` sans banque, 40746ed1) : quelle classe de bug il révèle et si d'autres producteurs de valeurs longues ont le même trou (grep `emit_store_high` dans `compiler/qbe/w65816/emit.c` et les `case O...` qui n'en ont pas).
 

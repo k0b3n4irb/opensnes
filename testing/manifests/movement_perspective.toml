@@ -31,4 +31,4 @@ unsafe_writes = 0
 # Measured values and the image after the whole script (testing audit T7/T10, 2026-10-05):
 # the camera moves one unit per frame: 59 frames of RIGHT then of DOWN give 59 and 59.
 [asserts]
-fbhash = "2a6ccf38abeb01c5"
+fbhash = "185617ffcc5201ea"

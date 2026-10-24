@@ -1,0 +1,6 @@
+tool = "opensnes-tileset"
+
+# BG1, the noodle bar from above, palette 0
+[convert]
+colors = 16
+flip = true

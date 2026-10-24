@@ -154,7 +154,7 @@ Each rung cites the real lib entry point that makes it buildable.
 12.4 A minimal game skeleton `[build]` **NEW P2** (`gameLoopRun` + `scenePush` + `padHeld` + `oamSet`)
 
 ### Family 13 — Games (capstones)
-breakout · tetris · likemario · mapandobjects · rpg · shmup_1942 · mode7_flying · mode7_racing — each annotated with the families it fuses, as an index back into the tree.
+breakout · blocks · likemario · mapandobjects · rpg · shmup_1942 · mode7_flying · mode7_racing — each annotated with the families it fuses, as an index back into the tree.
 
 ---
 

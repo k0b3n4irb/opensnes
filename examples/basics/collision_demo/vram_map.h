@@ -4,8 +4,8 @@
 #ifndef VRAM_MAP_H
 #define VRAM_MAP_H
 
-#define VRAM_OBJ_TILES   0x0000  /* obj, 32 words */
-#define VRAM_BG_TILEMAP  0x0400  /* bg_map, 1024 words */
-#define VRAM_BG_TILES    0x1000  /* bg_char, 16 words */
+#define VRAM_OBJ_TILES   0x0000  /* obj, 5120 words */
+#define VRAM_BG_TILEMAP  0x1400  /* bg_map, 1024 words */
+#define VRAM_BG_TILES    0x2000  /* bg_char, 256 words */
 
 #endif /* VRAM_MAP_H */

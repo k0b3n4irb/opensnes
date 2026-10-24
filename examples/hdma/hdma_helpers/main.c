@@ -39,7 +39,7 @@
 #include <snes/hdma.h>
 
 /** @brief 4bpp tile data for the background image. */
-#include "res/bg.inc"   /* generated: bg_tiles[], bg_map[], bg_pal[], each with _end (and a BgAsset bg) */
+#include "res/logo.inc"   /* generated: logo_tiles[], logo_map[], logo_pal[], each with _end (and a BgAsset logo) */
 /** @brief 15-bit BGR palette for the background (up to 16 colors). */
 /** @brief Tilemap data (32x32 tile grid) for the background. */
 
@@ -108,7 +108,7 @@ static void stopCurrentEffect(void) {
 
     /* Restore original palette from ROM source during VBlank */
     WaitForVBlank();
-    dmaCopyCGram(bg_pal, 0, bg_pal_end - bg_pal);
+    dmaCopyCGram(logo_pal, 0, logo_pal_end - logo_pal);
 
     fx.active_effect = 0;
 }
@@ -138,11 +138,11 @@ int main(void) {
 
     /* Load background: tiles at $0000, tilemap at $1000 (no overlap) */
     bgSetMapPtr(0, 0x1000, SC_32x32);
-    bgInitTileSet(0, bg_tiles, bg_pal, 0,
-                  bg_tiles_end - bg_tiles,
-                  bg_pal_end - bg_pal,
+    bgInitTileSet(0, logo_tiles, logo_pal, 0,
+                  logo_tiles_end - logo_tiles,
+                  logo_pal_end - logo_pal,
                   BG_16COLORS, 0x0000);
-    dmaCopyVram(bg_map, 0x1000, bg_map_end - bg_map);
+    dmaCopyVram(logo_map, 0x1000, logo_map_end - logo_map);
 
     setMode(BG_MODE1, 0);
     setMainScreen(LAYER_BG1);

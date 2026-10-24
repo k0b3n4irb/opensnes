@@ -1,0 +1,5 @@
+tool = "opensnes-tileset"
+
+# the alley, BG1, palette slot 0
+[convert]
+colors = 16

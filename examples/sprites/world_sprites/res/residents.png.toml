@@ -1,0 +1,7 @@
+tool = "opensnes-sprite"
+
+# twelve 32x32 frames (six residents, south and north) and the shard, 16x16;
+# palettes 0 (the shard) to 6 (one a resident)
+[sheet]
+size = 32
+colors = 112

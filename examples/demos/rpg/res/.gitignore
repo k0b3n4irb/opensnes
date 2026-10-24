@@ -1,0 +1,15 @@
+# The two fixed palettes are written by devtools/art_assets/rpg.py but are
+# BUILD INPUTS: tileset.png.toml and interior.png.toml impose them. The
+# repo-wide ignore rules (*.pal) would drop them, and the example would not
+# build from a clean clone. Negate the ignore rather than relying on
+# `git add -f`, which any later `git add -A` silently undoes.
+!town_fixed.pal
+!interior_fixed.pal
+
+# opensnes-level's outputs of the two maps: written by every build
+*.q16
+*.m16
+*.c16
+*.b16
+*.o16
+*.t16

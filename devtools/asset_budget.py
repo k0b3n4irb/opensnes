@@ -34,7 +34,7 @@ Usage:
   python3 devtools/asset_budget.py                  # whole corpus, sorted heaviest first
   python3 devtools/asset_budget.py --only mode1     # examples whose path contains "mode1"
   python3 devtools/asset_budget.py --warn 80        # flag examples >= 80% of any limit
-  python3 devtools/asset_budget.py examples/games/rpg
+  python3 devtools/asset_budget.py examples/demos/rpg
 """
 from __future__ import annotations
 

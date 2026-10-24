@@ -1,6 +1,6 @@
 # Migrated from probes/dma_cgram.py. text_glyphs performs two boot DMAs:
 #   dmaCopyVram(font_tiles  -> VRAM word 0, 144 bytes)
-#   dmaCopyCGram(bg_palette -> CGRAM 0,     2 colours)
+#   dmaCopyCGram(bg_palette -> CGRAM 0,     3 colours)
 # Assert both landed exactly. Merged from the former dma_cgram_vram.toml +
 # dma_cgram_cgram.toml: pre-#210 the [asserts.blocks] key WAS the offset, so
 # two spaces at offset 0 (VRAM[0] + CGRAM[0]) collided as a duplicate TOML key
@@ -9,5 +9,5 @@
 rom = "../../examples/fundamentals/text_glyphs/text_glyphs.sfc"
 steps = 1000000
 [asserts.blocks]
-font_tiles = { space = "vram",  offset = "0000", hex = "000000000000000000000000000000006600660066007e0066006600660000007e00600060007c00600060007e0000006000600060006000600060007e0000003c00660066006600660066003c000000c600c600c600d600fe00ee00c60000007c00660066007c006c0066006600000078006c006600660066006c007800000018001800180018001800000018000000" }
-bg_palette = { space = "cgram", offset = "0000", hex = "0028ff7f" }
+font_tiles = { space = "vram",  offset = "0000", hex = "000000000000000000000000000000006600661166117e0166196611661100337e00601f60107c00601e60107e00003f6000601060106010601060107e00003f3c00661866116611661166113c03001ec600c621c621d621fe01ee11c63100637c00661866117c036c1266106611003378006c106610661166116c137806003c18001804180418041804000c1800000c" }
+bg_palette = { space = "cgram", offset = "0000", hex = "61104973b430" }

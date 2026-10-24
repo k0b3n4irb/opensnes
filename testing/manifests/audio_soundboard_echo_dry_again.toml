@@ -1,0 +1,17 @@
+# START again turns it off, and only what the toggle owns changes: routing,
+# wet volume and ECEN go back; feedback, delay, address and FIR stay.
+# (Was audio_echo_dry.toml / audio_echo_wet_again.toml before the merge.)
+rom = "../../examples/audio/soundboard/soundboard.sfc"
+frames = 380
+input = "220:0x1000,225:0,300:0x1000,305:0"
+
+[asserts.dsp]
+EON    = 0x00        # changed: no voice routed into the echo
+EVOL_L = 0x00        # changed: wet signal muted
+EVOL_R = 0x00
+FLG    = 0x20        # changed: ECEN set again
+EFB    = 0x46        # unchanged: feedback survives the toggle
+EDL    = 0x05        # unchanged
+ESA    = 0xD7        # unchanged
+FIR0   = 0x7F        # unchanged: the FIR was not re-uploaded
+DIR    = 0x0A

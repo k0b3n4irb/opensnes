@@ -1,8 +1,8 @@
 # Mosaic Tutorial {#tutorial_mosaic}
 
-![mosaic example](mosaic.png)
+![mosaic example](fading_mosaic.png)
 
-*`examples/transitions/mosaic`: the pixel-block effect mid-transition.*
+*`examples/transitions/fading`: the pixel-block effect at its largest, 16x16.*
 
 This tutorial covers the SNES PPU's mosaic effect: a hardware pixel-block
 filter that progressively enlarges the pixels of selected BG layers.
@@ -117,11 +117,11 @@ for (u8 size = 0; size <= 15; size++) {
 
 ## Worked pattern (the shipped example)
 
-`examples/transitions/mosaic` cycles through four transitions on
-button press: brightness fade out, brightness fade in, mosaic fade out,
-mosaic fade in. The example pairs **`setBrightness()`** (the
-`INIDISP`-based global brightness scale) with mosaic so you can compare
-the two transition shapes side by side.
+`examples/transitions/fading` steps through its transitions on button
+press: brightness fade out and in at three speeds, then mosaic fade out
+and mosaic fade in. It pairs the brightness fades (`fadeOut()` /
+`fadeIn()`, the `INIDISP`-based global brightness scale) with the mosaic
+so you can compare the two transition shapes side by side.
 
 The takeaway: brightness goes through black; mosaic goes through chunky
 pixels. They have very different aesthetics and very different
@@ -217,8 +217,8 @@ gameplay-pacing decision, not a CPU-budget one.
 - `lib/include/snes/mosaic.h` — full API reference.
 - `lib/source/mosaic.c` — implementation (compact, mostly register
   bookkeeping and the fade loops).
-- [`examples/transitions/mosaic`](../../examples/transitions/mosaic/README.md) — four transitions cycled on button
-  press: brightness fade out/in and mosaic fade out/in.
+- [`examples/transitions/fading`](../../examples/transitions/fading/README.md) — the transitions cycled on button
+  press: brightness fades at three speeds, then mosaic fade out/in.
 - [Graphics tutorial](graphics.md) — for the BG layer fundamentals
   mosaic operates on.
 - [Game States tutorial](game_states.md) — for putting transitions

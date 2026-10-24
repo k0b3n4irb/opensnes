@@ -1970,7 +1970,13 @@ int cute_tiled_read_properties_internal(cute_tiled_map_internal_t* m, cute_tiled
 		{
 			char* s = m->in;
 			int is_float = 0;
-			while ((c = *s++) != ',')
+			// OpenSNES: the number ends at ',', '}' or ']', and the scan at
+			// m->end. Upstream looked for the next ',' only, so the last
+			// property of an object (followed by '}') scanned on into the
+			// rest of the map, and the last property of the last object off
+			// the end of the buffer: a '.' found out there made an int a
+			// float (read back as 0), depending on what the heap held.
+			while (s < m->end && (c = *s++) != ',' && c != '}' && c != ']')
 			{
 				if (c == '.')
 				{

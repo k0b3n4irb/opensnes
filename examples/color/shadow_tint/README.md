@@ -26,14 +26,16 @@ touches no VRAM, CGRAM or OAM.
 Because both effects share the one fixed-colour register and the single
 add/subtract bit, **only one is active at a time** — which is exactly why
 the demo cycles through them rather than combining them. The scene is a
-4×4 chart of sixteen game-world colours, built procedurally (zero
-assets), so you can watch the transform land on every hue together.
+street of the city at night — apartment blocks and a noodle sign
+(`res/street.png`, Néo-Lumen art, CC0) — so you can watch the transform
+land on a picture. The sky is the backdrop, not BG1: it keeps its colour,
+because colour math here is enabled on BG1 only.
 
 ## What to observe / if it breaks
 
-- **Correct run:** the plain colour chart. Press **A** to cycle:
-  `none → shadow (darkens) → underwater (blue cast) → sunset (warm cast)
-  → none`. Every swatch shifts together each press.
+- **Correct run:** the plain street. Press **A** to cycle:
+  `none → blackout (darkens) → green rain (green cast) → red alert (red
+  cast) → none`. Every pixel of BG1 shifts together each press.
 - **Nothing changes when you press A:** colour math applies only to layers
   you enabled *and* that are on the main screen — check
   `setMainScreen(LAYER_BG1)` and that the effect targets `LAYER_BG1`.
@@ -44,7 +46,7 @@ assets), so you can watch the transform land on every hue together.
   intensity is too high — `colorMathShadow` subtracts, `colorMathTint`
   adds, both clamp at the channel limits.
 
-Probe oracle: `fx_state` (0 none, 1 shadow, 2 underwater, 3 sunset)
+Probe oracle: `fx_state` (0 none, 1 blackout, 2 green rain, 3 red alert)
 advances on each A press; the effect matches CGADSUB (add/subtract) and
 COLDATA (the fixed colour).
 
@@ -54,6 +56,11 @@ COLDATA (the fixed colour).
 make
 ../../../testing/bin/luna run -n 3000000 shadow_tint.sfc
 ```
+
+## Assets
+
+`res/street.png` is `backgrounds/city_near.png` of `assets/neo-lumen/`, indexed by
+`devtools/art_assets/build.py`; the build converts it (`res/street.png.toml`).
 
 ## Modules used
 

@@ -71,8 +71,8 @@ snesmodPlayEffect(jump, 127, 128, SNESMOD_PITCH_NORMAL);   // volume, pan, pitch
 snesmodProcess();                         // once per frame
 ```
 
-`examples/audio/snesmod_music`, `snesmod_sfx`, and the games `likemario` and
-`tetris` do this. The runtime side is @ref tutorial_audio.
+`examples/audio/snesmod_music` (music and effects), and the games `rooftop_run` and
+`blocks` do this. The runtime side is @ref tutorial_audio.
 
 - **Many modules, one bank.** Songs through `snesmodLoadModule(N)` and
   `snesmodPlay(0)`, effects through `snesmodLoadEffect(N)` and

@@ -5,24 +5,22 @@ SNES cartridges carry a coprocessor. These examples boot one, prove it runs,
 then put it to real work — the branch you reach for late in a project, not on
 day one.
 
-Three chips — SA-1 and Super FX as boot-then-work pairs, the DSP-1 as a single worked example (it needs no boot: the firmware is already on the chip):
+Two chips here — SA-1 and Super FX. The third, the DSP-1, needs no boot (its firmware is on the chip) and has one worked example, in Mode 7: [mode7/dsp1_ground](../mode7/dsp1_ground/), the floor and the objects on it.
 
 ## The ladder
 
 | Example | Developer question | Chip |
 |---------|--------------------|------|
-| [sa1_hello](sa1_hello/) | How do I boot the SA-1 and hand data back via I-RAM? | SA-1 |
 | [sa1_starfield](sa1_starfield/) | How do I offload real math to the SA-1? | SA-1 |
-| [sa1_save](sa1_save/) | How do I save to SA-1 BW-RAM so it survives the power switch? | SA-1 |
-| [superfx_hello](superfx_hello/) | How do I boot the GSU and run a hardware test? | SuperFX |
 | [superfx_3d](superfx_3d/) | How do I render 3D with the SuperFX? | SuperFX |
 | [superfx_game_skeleton](superfx_game_skeleton/) | How do I run a 60 fps game loop while the GSU renders? | SuperFX |
-| [superfx_save](superfx_save/) | How do I save to a Super FX cartridge's RAM? | SuperFX |
-| [dsp1_cube](dsp1_cube/) | How do I offload 3D rotation + perspective to the DSP-1? | DSP-1 |
 
-Boot first (`sa1_hello`, `superfx_hello` — prove the chip is alive and
-talking), then a real workload (`sa1_starfield`, `superfx_3d`), then a game
-loop and a save (`superfx_game_skeleton`, `sa1_save`, `superfx_save`).
+A real workload on each chip (`sa1_starfield`, `superfx_3d`), then a game
+loop the GSU renders under (`superfx_game_skeleton`). Saving on these
+cartridges uses the same `sram` calls as any other: the
+[SA-1 tutorial](../../docs/tutorials/sa1.md) and the
+[advanced Super FX tutorial](../../docs/tutorials/superfx_advanced.md) say
+where the battery-backed RAM is.
 
 ## The two chips, in one screen
 
@@ -39,4 +37,4 @@ All three are validated natively by luna, which detects and runs the SA-1,
 the GSU and the DSP-1 in the headless test harness — no chip-ROM side channel
 needed. The DSP-1 leg additionally needs Sony's `dsp1b.rom` firmware installed
 into luna (copyrighted, not shipped); without it the test SKIPs rather than
-fails — see [dsp1_cube](dsp1_cube/).
+fails — see [mode7/dsp1_ground](../mode7/dsp1_ground/), the DSP-1 example.

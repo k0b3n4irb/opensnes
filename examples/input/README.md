@@ -9,8 +9,7 @@ just read the result.
 
 | Example | Developer question |
 |---------|--------------------|
-| [controller](controller/) | How do I read a joypad — held vs just-pressed? |
-| [two_players](two_players/) | How do I read two players independently? |
+| [controller](controller/) | How do I read the joypads — both pads, held, just pressed, just released? |
 | [mouse](mouse/) | How do I read the SNES Mouse? |
 | [superscope](superscope/) | How do I read the Super Scope light gun? |
 

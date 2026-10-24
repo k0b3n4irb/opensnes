@@ -3,8 +3,7 @@
 This tutorial covers the `object` module — the entity engine that manages a
 fixed pool of game objects, dispatches per-type callbacks, and resolves
 collision against the `map` module's tile properties. It is what
-`examples/games/mapandobjects` and `examples/maps/slope_collision` are built
-on. Add `object` to `LIB_MODULES`.
+`examples/demos/platform_objects` is built on. Add `object` to `LIB_MODULES`.
 
 This page is the tutorial: what the engine is, how to register a type,
 spawn, run the frame, pick a collision routine and remove objects. How the
@@ -72,7 +71,7 @@ That is the line both shipped examples use.
 | Bank `$00` (the 8 KB C band) | 5 | the engine's current id, slot and kill flag |
 | Bank `$7E` (the far band) | 6910 | 80 × 64-byte records, `objWorkspace` (64) right behind them, the per-type active-list heads, the three 256-byte callback tables, the object-loading scratch buffer |
 
-Measured on `examples/maps/slope_collision`: the `.obj_bank7e` RAMSECTION is
+Measured on `examples/demos/platform_objects`: the `.obj_bank7e` RAMSECTION is
 `$1AFE` bytes at `$7E:2466`, `.obj_bank00` is 5 bytes. The
 big allocation sits in the far band, so it does not eat your scarce bank-`$00`
 RAM budget (see @ref tutorial_far_ram) — but 6.8 KB is 6.8 KB, and the pool
@@ -99,16 +98,16 @@ directly:
 
 ```c
 objInitEngine();
-objInitFunctions(0, marioinit,  marioupdate,  0);
-objInitFunctions(1, goombainit, goombaupdate, 0);
+objInitFunctions(0, kitinit,    kitupdate,    0);
+objInitFunctions(1, insectinit, insectupdate, 0);
 ```
 
 The parameters are typed, so a callback with the wrong signature is a compile
 error rather than a corrupted stack. Any of the three may be 0: the engine
 tests every pointer before dispatching and skips a null one.
 
-C callbacks routinely land outside bank `$00` — in `slope_collision.sym`,
-`marioinit` sits in bank `$01`. That works because the compiler pushes a
+C callbacks may land outside bank `$00` — the linker puts each function
+where it fits, bank `$01` and up once bank `$00` is full. That works because the compiler pushes a
 function pointer as a four-byte slot, bank byte included, and
 `objInitFunctions` stores all three bytes. Code ported from an older version
 that registered its types through a hand-written assembly routine can drop
@@ -134,9 +133,9 @@ anything.
 
 ```c
 objInitEngine();
-objInitFunctions(0, marioinit,  marioupdate,  0);   /* the calls shown above */
-objInitFunctions(1, goombainit, goombaupdate, 0);
-objLoadObjects((u8 *)&objmario);
+objInitFunctions(0, kitinit,    kitupdate,    0);   /* the calls shown above */
+objInitFunctions(1, insectinit, insectupdate, 0);
+objLoadObjects((u8 *)&objlevel);
 ```
 
 ### Spawning one object by hand
@@ -148,17 +147,17 @@ detected. It returns 0 when the pool is full, and also stores the handle in
 `objGetCurrentId()`.
 
 The canonical init callback looks like this (from
-`examples/maps/slope_collision/mario.c`):
+`examples/demos/platform_objects/kit.c`):
 
 ```c
-void marioinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
+void kitinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
     if (objNew(type, xp, yp) == 0)
         return;                     /* pool full */
 
     /* objNew already copied the new record into objWorkspace;
        objGetPointer re-selects it and validates the handle. */
     objGetPointer(objGetCurrentId());
-    marioid = objGetCurrentId();
+    kitid = objGetCurrentId();
 
     /* Width 14 + xofs 1 is critical for slope collision (width 16 bugs) */
     objWorkspace.width  = 14;
@@ -188,7 +187,7 @@ entry, terminated by a single `0xFFFF`:
 
 It does **not** create the objects itself. For each row it calls that type's
 *init* callback with the five values; the callback is what calls `objNew`.
-That is why the enemy init functions in `mapandobjects` copy `minx` / `maxx`
+That is why the enemy init functions in `platform_objects` copy `minx` / `maxx`
 into `objWorkspace` — those two words are how a level editor hands a patrol
 range to an enemy.
 
@@ -258,7 +257,7 @@ and how the `T_*` tile properties act is in @ref tutorial_object_engine.
 All three write back into the workspace:
 
 - **`tilestand`** — non-zero when the object is resting on something. This is
-  the ground test. `mario.c` gates its jump on it:
+  the ground test. `kit.c` gates its jump on it:
   `if (objWorkspace.tilestand != 0) { ... }`.
 - **`tilesprop`** — the property word of the tile under the object's feet.
 - **`tilebprop`** — the property word of the tile hit on the left or right
@@ -345,7 +344,7 @@ Most of the corpus does not use it, and that is a reasonable default. Reach
 for your own array when:
 
 - **Your entities are few and homogeneous.** `examples/games/breakout` tracks
-  one ball and one paddle; `collision_demo` tracks four enemies in four
+  one ball and one paddle; `collision_demo` tracks four drones in four
   parallel arrays. A 64-byte record and a callback dispatch buy nothing there.
 - **You are not on the `map` module.** The collision routines are
   map-module-only, the culling window is relative to the map camera, and the
@@ -359,14 +358,14 @@ for your own array when:
 - **You want the tile-collision behaviour without the entity model.** The map
   module exposes `mapGetMetaTilesProp()` directly, and
   @ref tutorial_collision covers the hand-rolled patterns
-  `examples/games/likemario` uses to do platformer physics with no object
+  `examples/games/rooftop_run` uses to do platformer physics with no object
   engine at all.
 
 Where it earns its keep is the case it was written for: a scrolling
 side-view level with a dozen or more heterogeneous entities placed in a map
 editor, each with its own behaviour, where off-screen culling and
 data-driven spawning matter. That is exactly
-`examples/games/mapandobjects`.
+`examples/demos/platform_objects`.
 
 ## See also
 
@@ -376,9 +375,8 @@ data-driven spawning matter. That is exactly
   sprite-versus-hitbox alignment problem that bites either way.
 - [Sprites & animation](sprites.md) — `oambuffer`, `oamDynamicDraw` and the
   dynamic sprite engine your callbacks draw through.
-- `examples/games/mapandobjects` — three entity types, map-driven spawning,
+- `examples/demos/platform_objects` — three entity types, map-driven spawning,
   patrol AI.
-- `examples/maps/slope_collision` — one entity type, slope-aware collision.
 - `lib/contrib/README.md` — what contrib status means for API stability.
 - @ref tutorial_object_engine "How the object engine works" — the engine reference.
 - @ref object.h "Object API reference" · @ref map.h "Map API reference"

@@ -195,14 +195,14 @@ layer renders above BG1). It configures the blend with
 `colorMathInit()`, `colorMathSetSource()`, `colorMathSetOp()` and
 `colorMathSetLayers()`.
 
-### Window-gated darkening — `examples/windows/transparent_window`
+### Window-gated darkening — `examples/windows/window` (press Y)
 
-Combines colour math with a *window-gated* math area. BG2 alone is on
-screen; inside a rectangular window, colour math subtracts a fixed colour
-(12, 12, 12) from BG2, so the rectangle looks darkened; outside it, BG2
-is untouched. Two HDMA channels write the window edges to define the
-rectangle, and the effect is static — see the [Window](window.md) and
-[HDMA](hdma.md) tutorials for those sides.
+Combines colour math with a *window-gated* math area. Press Y and the
+example's triangle window stops clipping: inside it, colour math
+subtracts a fixed colour (12, 12, 12) from BG1 and BG2, so the triangle
+looks darkened; outside it, both layers are untouched. Two HDMA channels
+write the window edges on every line to draw the shape — see the
+[Window](window.md) and [HDMA](hdma.md) tutorials for those sides.
 
 This is the canonical demonstration of how three SNES PPU subsystems
 (window, colour math, HDMA) compose: window says where, colour math
@@ -299,8 +299,8 @@ SNES. The discipline is configuring it correctly, not avoiding it.
   definitions.
 - `lib/source/colormath.c` — implementation.
 - [`examples/color/transparency`](../../examples/color/transparency/README.md) — additive cloud overlay.
-- [`examples/windows/transparent_window`](../../examples/windows/transparent_window/README.md) — window-gated spotlight blend.
-- [`examples/color/pseudo_hires`](../../examples/color/pseudo_hires/README.md) — a 50 % blend
+- [`examples/windows/window`](../../examples/windows/window/README.md) — press Y: the window as the region of colour math.
+- [`examples/color/transparency`](../../examples/color/transparency/README.md) (press A) — a 50 % blend
   with no colour math at all: pseudo-hires (SETINI bit 3) puts the sub screen on the even
   columns of a 512-pixel line and the main screen on the odd ones, and the display blends each
   pair. It leaves colour math free for another effect, at the cost of horizontal detail.

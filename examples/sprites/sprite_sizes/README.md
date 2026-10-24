@@ -7,6 +7,8 @@
 An interactive menu to switch between all **6 SNES sprite size combinations**.
 The SNES OBJSEL register defines two sizes (small and large) that apply to all
 128 sprites. Each sprite chooses small or large via its OAM high-table bit.
+Every size is the same character — Kit, the fox-kit courier, at 8, 16, 32 and
+64 px — so what changes from one mode to the next is only how big he is.
 
 ## Controls
 
@@ -122,7 +124,7 @@ A 64x64 sprite is 8 KB of tile data -- far too much for VBlank DMA. Use
 |------|---------|
 | `main.c` | Menu UI, size mode switching, sprite loading |
 | `res/sprite{8,16,32,64}.png.toml` | the import settings of the four sheets (`opensnes-sprite`, one block size each); the build converts them and links the result, `res/spriteN.inc` declares the symbols |
-| `res/` | Source PNGs for each sprite size |
+| `res/sprite{8,16,32,64}.png` | Kit at each size, on his own colours (made by `devtools/art_assets/build.py`: the 8 drawn there, the 16 and 64 from PixelLab, the 32 is the Kit of `simple_sprite`; CC0, `assets/neo-lumen/README.md`) |
 | `Makefile` | `LIB_MODULES := console sprite dma text text4bpp input background` |
 
 ## Going Further

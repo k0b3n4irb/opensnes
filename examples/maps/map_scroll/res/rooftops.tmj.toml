@@ -1,0 +1,4 @@
+tool = "opensnes-level"
+
+[convert]
+tileset = "roofs.map"

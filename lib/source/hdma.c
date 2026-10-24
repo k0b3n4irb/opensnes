@@ -178,6 +178,22 @@ static void fillRippleTableRAM(u8 *table, u8 frame, u8 maxAmplitude, u8 frequenc
  */
 #define channel_mask(n) ((u8)(1 << (n)))
 
+/*
+ * Does the channel run this effect already? Enabled is not enough: the
+ * channel may be enabled for something else (hdma_helpers keeps channel 6
+ * on BG1HOFS with an empty table between effects), and moving only the
+ * table pointer then sends the effect's table to that other register with
+ * that other mode — the colour gradient and the iris drew nothing from
+ * 2026-10-03 to 2026-10-19. DMAP and BBAD are readable (anomie-regs,
+ * "43x0 rwb++++ DMAPx", chunk 1d0ed609135338d1), so the channel's own
+ * registers say what it runs.
+ */
+static u8 runsEffect(u8 channel, u8 mode, u8 dest) {
+    if (!(hdmaGetEnabled() & channel_mask(channel)))
+        return 0;
+    return REG_DMAP(channel) == mode && REG_BBAD(channel) == dest;
+}
+
 
 /**
  * Fill a wave table in bank $00 RAM via C pointer writes.
@@ -355,7 +371,7 @@ void hdmaBrightnessGradient(u8 channel, u8 topBrightness, u8 bottomBrightness) {
      * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
      * for the rest of that frame the bottom of the screen showed the top
      * of the table (luna, hdma_helpers f150, until 2026-10-03). */
-    if (hdmaGetEnabled() & channel_mask(channel)) {
+    if (runsEffect(channel, HDMA_MODE_2REG, 0xFF)) {
         hdmaSetTable(channel, hdma_brightness_table);
     } else {
     hdmaSetup(channel, HDMA_MODE_2REG, 0xFF, hdma_brightness_table);
@@ -414,7 +430,7 @@ void hdmaColorGradient(u8 channel, u8 colorIndex, u16 topColor, u16 bottomColor)
      * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
      * for the rest of that frame the bottom of the screen showed the top
      * of the table (luna, hdma_helpers f150, until 2026-10-03). */
-    if (hdmaGetEnabled() & channel_mask(channel)) {
+    if (runsEffect(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD)) {
         hdmaSetTable(channel, hdma_color_table);
     } else {
     hdmaSetup(channel, HDMA_MODE_2REG_2X, HDMA_DEST_CGADD, hdma_color_table);
@@ -505,7 +521,7 @@ void hdmaIrisWipe(u8 channel, u8 layers, u8 centerX, u8 centerY, u8 radius) {
      * resets A2A and NTRL, which restarts the table at the NEXT HBLANK:
      * for the rest of that frame the bottom of the screen showed the top
      * of the table (luna, hdma_helpers f150, until 2026-10-03). */
-    if (hdmaGetEnabled() & channel_mask(channel)) {
+    if (runsEffect(channel, HDMA_MODE_2REG, HDMA_DEST_WH0)) {
         hdmaSetTable(channel, build_table);
     } else {
         hdmaSetup(channel, HDMA_MODE_2REG, HDMA_DEST_WH0, build_table);
