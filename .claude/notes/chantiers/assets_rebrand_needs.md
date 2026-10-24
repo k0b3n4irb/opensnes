@@ -47,8 +47,12 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 >   aussi, mesuré : celle de PixelLab (`generate-image-v2`, seed 8400) a une couture au bouclage et une
 >   silhouette de ville en bas, et la réparation par `inpaint-v3` (décalage d'une demi-largeur, bande
 >   masquée, seed 8401) rend une bande opaque ; la recette boucle par construction. La pluie n'a pas
->   été tentée : même contrainte, sur deux axes. Reste la police, qui est celle de la bibliothèque
->   (décision du propriétaire : changement de SDK, vu par le second jeu).
+>   été tentée : même contrainte, sur deux axes. La police de la bibliothèque (F1) : le propriétaire a
+>   dit oui le 2026-10-24 à une police PixelLab ; mesuré le jour même, `generate-font-pro` en
+>   `glyph_px` 8 (seeds 9001 à 9005, Regular et Bold, cinq descriptions) rend des minuscules en pâtés,
+>   des chiffres illisibles et une ponctuation cassée, sur 80 glyphes au lieu des 96 de l'ASCII
+>   (9005 : « could not generate a font atlas »). La police actuelle reste ; aucune ligne de la lib
+>   n'a bougé.
 > - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (tranchés le jour même :
 >   `games/rooftop_run`, `demos/platform_objects`) ;
 >   `audio/speech_synth` (sa phrase attend le nom de la ville) ; la musique (MU1-MU3, modules
@@ -439,7 +443,7 @@ adaptés à la nouvelle géométrie des niveaux.
    `mode6`, `sa1_hello`, `sa1_save`, `superfx_hello`, `superfx_save` hors de `examples/` (toujours construits
    pour le protocole matériel) et de supprimer `maps/dynamic_map` ?
 7. **[Tranché le 2026-10-18 : `tetris` devient `blocks` ; les autres attendent.]** **Les renommages** : `likemario` (**devenu `games/rooftop_run` le 2026-10-24**), `mapandobjects` (**devenu `demos/platform_objects` le 2026-10-24**), `shmup_1942` (**devenu `demos/shmup` le 2026-10-24**), `tetris` (marque déposée) — vos noms ?
-8. **La police intégrée de la lib** (F1) : la redessiner dans l'identité ? Elle change l'image de chaque
+8. **[Oui le 2026-10-24 pour PixelLab ; essayé, illisible à 8 px : la police reste.]** **La police intégrée de la lib** (F1) : la redessiner dans l'identité ? Elle change l'image de chaque
    ROM à texte et toutes les références fbhash.
 9. **La musique** : commander 3 modules et une banque d'effets à un musicien chiptune (budget ?), ou des
    modules libres vérifiés un par un ? Korobeiniki (domaine public mais lié à Tetris) part-il ?
