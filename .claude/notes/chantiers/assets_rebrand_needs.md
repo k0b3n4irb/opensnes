@@ -43,9 +43,12 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 >   PixelLab enchaînés, variantes, pont, ruelles : `assets/neo-lumen/README.md`). Brique de breakout et bol de
 >   pixel_text **faits le même jour** (PixelLab). **Gardés dessinés, mesuré** : le plateau de circuit de
 >   breakout (PixelLab : des petits cœurs, chargé sous le jeu), les conteneurs et le cadre de blocks
->   (8x8), les écrans de terminal et la mire Mode 5 (géométrie calée sur la grille de texte). Restent :
->   brume et pluie (bouclage sans couture), et la police, qui est celle de la bibliothèque (décision
->   du propriétaire : changement de SDK, vu par le second jeu).
+>   (8x8), les écrans de terminal et la mire Mode 5 (géométrie calée sur la grille de texte). La brume
+>   aussi, mesuré : celle de PixelLab (`generate-image-v2`, seed 8400) a une couture au bouclage et une
+>   silhouette de ville en bas, et la réparation par `inpaint-v3` (décalage d'une demi-largeur, bande
+>   masquée, seed 8401) rend une bande opaque ; la recette boucle par construction. La pluie n'a pas
+>   été tentée : même contrainte, sur deux axes. Reste la police, qui est celle de la bibliothèque
+>   (décision du propriétaire : changement de SDK, vu par le second jeu).
 > - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (tranchés le jour même :
 >   `games/rooftop_run`, `demos/platform_objects`) ;
 >   `audio/speech_synth` (sa phrase attend le nom de la ville) ; la musique (MU1-MU3, modules

@@ -365,7 +365,11 @@ pixels a side, so the 8x8 moths of `sprite_swarm`, the 4x3 speck of
 `sa1_starfield` and breakout's 8x8 ball stay drawn by script; and its
 animation of the orb (`animate-with-text-v3`, seeds 8030 and 8031) lost the
 orb's shape from one frame to the next, so extbg's pulsing orb stays drawn
-by script too (`mode7.py`, `orb`).
+by script too (`mode7.py`, `orb`). The mist of `color/transparency` stays its
+recipe (below): PixelLab's (seed 8400) did not wrap at 256 and drew a city
+skyline along its bottom, and repainting the seam with `inpaint-v3` (the
+picture shifted by half its width, a 48-px band masked, seed 8401) filled the
+band opaque. A layer that scrolls must wrap by construction; the recipe does.
 
 ### Neon Breaker (the arcade cabinet)
 
