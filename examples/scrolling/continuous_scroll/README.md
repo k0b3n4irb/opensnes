@@ -129,19 +129,19 @@ frames face right; running left sets the attribute's H-flip bit (`OBJ_FLIPX`).
 
 - **A longer world:** 64x32 is the largest map one BG holds. For more, upload new
   tile columns as the camera scrolls. See [map_scroll](../../maps/map_scroll/) and
-  [likemario](../../games/likemario/).
+  [rooftop_run](../../games/rooftop_run/).
 
 - **Add vertical scrolling:** Same pattern, but with Y thresholds and `bg_scroll_y`.
 
-- **Next example:** [likemario](../../games/likemario/) -- full platformer with gravity,
+- **Next example:** [rooftop_run](../../games/rooftop_run/) -- full platformer with gravity,
   collision, and tile streaming.
 
 ---
 
 ## Assets
 
-`res/roofs.png` is four roof pieces of likemario side by side at one height,
-`res/skyline.png` likemario's far towers, and `res/kit.png` Kit's idle and running
+`res/roofs.png` is four roof pieces of rooftop_run side by side at one height,
+`res/skyline.png` rooftop_run's far towers, and `res/kit.png` Kit's idle and running
 frames from his side sheet: all made by `devtools/art_assets/build.py` from the
 Néo-Lumen art (PixelLab, CC0; `assets/neo-lumen/README.md`). The build converts
 them, from the settings file beside each (`opensnes-tileset`, `opensnes-sprite`).

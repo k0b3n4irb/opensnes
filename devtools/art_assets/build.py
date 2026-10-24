@@ -18,7 +18,7 @@ maps/map_scroll:
   res/roofs.png       the tiles of one long row of roofs, in the order of
   res/rooftops.tmj    the Tiled map that numbers them, each tile carrying
                       its `attribute` (FF00 solid) for opensnes-level
-  res/kit.png         Kit seen from the side, as for likemario
+  res/kit.png         Kit seen from the side, as for rooftop_run
 
 assets/ (the logo, devtools/art_assets/logo.py):
   logo_256x256.png    Kit the mascot over the OPENSNES wordmark; 256x224 the
@@ -61,9 +61,9 @@ mode7/mode7_racing (devtools/art_assets/racing.py):
                       to a row: Kit's, then each rival's turned 0 to 90 degrees
 
 scrolling/continuous_scroll:
-  res/roofs.png       four roof pieces of likemario side by side at one
+  res/roofs.png       four roof pieces of rooftop_run side by side at one
                       height, 512x256
-  res/skyline.png     likemario's far towers, 512x256 (the parallax layer)
+  res/skyline.png     rooftop_run's far towers, 512x256 (the parallax layer)
   res/kit.png         Kit, 32x32: idle (frames 0-3) then run (4-11)
 
 sprites/sprite_sizes:
@@ -159,7 +159,7 @@ hdma/gradient_colors, hdma/hdma_helpers:
   res/logo.png        the 256x224 logo on a transparent sky (index 0, never
                       drawn), so the HDMA gradients show behind Kit
 
-demos/mapandobjects:
+demos/platform_objects:
   res/tiles.png       roofs with ramps, 8x8 tiles drawn here: the strip and
                       the wall sampled from roof_1, the six slope shapes of
                       the object engine (45 degrees, and 22.5 in two
@@ -170,9 +170,9 @@ demos/mapandobjects:
   res/level.o16       the objects: Kit, two robot insects, two automatons
   res/kit.png         Kit from the side; res/insect.png, res/automaton.png
                       their walks, 32x32 frames four to a row
-  res/skyline.png     BG2, the far towers (likemario's)
+  res/skyline.png     BG2, the far towers (rooftop_run's)
 
-games/likemario:
+games/rooftop_run:
   res/tiles.png       the level's distinct 8x8 tiles, in the order the map
                       numbers them (tile 0 is the empty sky), 128 px wide
   res/BG1.m16         the level map as main.c reads it: width and height in
@@ -224,7 +224,7 @@ from racing import bikes, build_track  # noqa: E402  (and so is the Mode 7 city)
 
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "assets" / "neo-lumen"
-LIKEMARIO = ROOT / "examples" / "games" / "likemario" / "res"
+ROOFTOP_RUN = ROOT / "examples" / "games" / "rooftop_run" / "res"
 MODE0 = ROOT / "examples" / "backgrounds" / "mode0" / "res"
 MAP_SCROLL = ROOT / "examples" / "maps" / "map_scroll" / "res"
 CONTINUOUS = ROOT / "examples" / "scrolling" / "continuous_scroll" / "res"
@@ -254,7 +254,7 @@ SA1_FIELD = ROOT / "examples" / "chips" / "sa1_starfield" / "res"
 SFX_SKELETON = ROOT / "examples" / "chips" / "superfx_game_skeleton" / "res"
 SHMUP = ROOT / "examples" / "demos" / "shmup" / "res"
 PALETTE_CYCLE = ROOT / "examples" / "color" / "palette_cycle" / "res"
-MAPANDOBJECTS = ROOT / "examples" / "demos" / "mapandobjects" / "res"
+PLATFORM_OBJECTS = ROOT / "examples" / "demos" / "platform_objects" / "res"
 LOGO = ROOT / "assets"
 GRADIENT_COLORS = ROOT / "examples" / "hdma" / "gradient_colors" / "res"
 HDMA_HELPERS = ROOT / "examples" / "hdma" / "hdma_helpers" / "res"
@@ -458,7 +458,7 @@ def squash(im: Image.Image) -> Image.Image:
     return out
 
 
-def likemario_objects(level) -> tuple[str, int]:
+def rooftop_run_objects(level) -> tuple[str, int]:
     """level_objects.h: the shards to pick up, the machines and their patrols, the
     checkpoints (each roof's start) and the goal, from the buildings of `level`."""
     b = buildings(level)
@@ -495,10 +495,10 @@ def likemario_objects(level) -> tuple[str, int]:
     return text, goal
 
 
-def build_likemario() -> dict[str, bytes]:
+def build_rooftop_run() -> dict[str, bytes]:
     pal = palette()
     pieces = {n: load_piece(n, pal) for n in range(6)}
-    text, goal = likemario_objects(LEVEL)
+    text, goal = rooftop_run_objects(LEVEL)
     beacon = to_indices(Image.open(ART / "props" / "beacon.png").convert("RGBA"), pal)
     width_px, tiles, entries, solid = compose(LEVEL, pieces, [(beacon, goal, buildings(LEVEL)[-1][2] - 64)])
     flat = [v for c in pal for v in c]
@@ -1735,7 +1735,7 @@ SLOPES_LEVEL = [
 BASE_ROW = 22
 
 
-def build_mapandobjects() -> dict[str, bytes]:
+def build_platform_objects() -> dict[str, bytes]:
     pal = palette()
     roof = load_piece(1, pal)                       # moved 2 px down: the strip's top on row 64
     wall = [[roof[64 + 16 + y][x] for x in range(64)] for y in range(32)]   # 8x4 tiles of windows and pipes
@@ -1842,7 +1842,7 @@ def build_mapandobjects() -> dict[str, bytes]:
                 attrs.append(key[1])
             entries.append(index[key])
     if len(tiles) > 1024:
-        sys.exit(f"mapandobjects: {len(tiles)} tiles")
+        sys.exit(f"platform_objects: {len(tiles)} tiles")
 
     m16 = struct.pack("<3H", width_px, ROWS * 8, len(entries) * 2) + struct.pack(f"<{len(entries)}H", *entries)
     t16 = struct.pack(f"<{len(tiles)}H", *range(len(tiles)))
@@ -1880,7 +1880,7 @@ def build_mapandobjects() -> dict[str, bytes]:
     walk = ART / "characters" / "walk"
     return {"tiles.png": png(tile_sheet(tiles, pal)), "BG1.m16": m16, "level.t16": t16, "level.b16": b16,
             "level.o16": o16, "kit.png": (ART / "characters" / "kit_side_sheet.png").read_bytes(),
-            "skyline.png": build_likemario()["skyline.png"],
+            "skyline.png": build_rooftop_run()["skyline.png"],
             "insect.png": png(strip_sheet([walk / f"insect_{i}.png" for i in range(4)], "MACHINE")),
             "automaton.png": png(strip_sheet([walk / f"automaton_{i}.png" for i in range(4)], "MACHINE")),
             "_report": f"{width_px} px wide, {len(tiles)} tiles, {len(objs)} objects {objs}".encode()}
@@ -1907,10 +1907,10 @@ def main() -> int:
     aerial = build_shmup(ART)
     print(f"shmup: {aerial.pop('_tiles')} tiles")
     print("rpg:", town.pop("_report").decode())
-    likemario = build_likemario()
-    continuous = build_continuous_scroll(likemario["skyline.png"])
-    jobs = [(LIKEMARIO, build_likemario()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
-            (MAPANDOBJECTS, build_mapandobjects()), (LOGO, build_logo(ART)),
+    rooftop_run = build_rooftop_run()
+    continuous = build_continuous_scroll(rooftop_run["skyline.png"])
+    jobs = [(ROOFTOP_RUN, build_rooftop_run()), (MODE0, build_mode0()), (MAP_SCROLL, build_map_scroll()),
+            (PLATFORM_OBJECTS, build_platform_objects()), (LOGO, build_logo(ART)),
             (GRADIENT_COLORS, {"logo.png": screen_logo(ART)}), (HDMA_HELPERS, {"logo.png": screen_logo(ART)}),
             (MODE7 / "perspective" / "res", {"ground.png": ground, "sky.png": sky}),
             (MODE7 / "dsp1_ground" / "res", {"ground.png": ground, "sky.png": sky}),
@@ -1957,10 +1957,10 @@ def main() -> int:
             (RACING, {"track.png": png(race["track"]), "track_class.bin": race["classes"],
                       "lanes_xy.bin": race["lanes"][0], "lanes_heading.bin": race["lanes"][1],
                       "bikes.png": png(bikes(ART))})]
-    print("likemario:", jobs[0][1].pop("_report").decode())
+    print("rooftop_run:", jobs[0][1].pop("_report").decode())
     print("map_scroll:", jobs[2][1].pop("_report").decode())
     print("continuous_scroll:", continuous.pop("_report").decode())
-    print("mapandobjects:", jobs[3][1].pop("_report").decode())
+    print("platform_objects:", jobs[3][1].pop("_report").decode())
     print(f"mode7 city: {city['_tiles']} tiles, {city['_colours']} colours")
     print(f"mode7 extbg: {plane_tiles} tiles")
     print(f"mode7 race: {race['_tiles']} tiles, {race['_colours']} colours")

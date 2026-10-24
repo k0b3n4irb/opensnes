@@ -157,7 +157,7 @@ mapSetMapOptions(MAP_OPT_BG2);    // stream a second map onto BG2
 - **`examples/maps/map_scroll`** — the full Tiled pipeline (a `.tmj` drawn in
   Tiled, converted with `opensnes-level`, loaded with `mapLoad`) and the
   minimum scroller above, a large map followed by a sprite.
-- **`examples/demos/mapandobjects`** — per-tile collision *attributes* driving
+- **`examples/demos/platform_objects`** — per-tile collision *attributes* driving
   slope physics (the `.b16` values mean more than solid/empty).
 
 ## Gotchas

@@ -11,7 +11,7 @@ machine. Study them after the topic examples and the [demos](../demos/).
 |---------|------------|-------------|
 | [breakout](breakout/) | Intermediate | Breakout: paddle, ball, destructible bricks, levels, score and lives |
 | [blocks](blocks/) | Intermediate | Falling-blocks puzzle with three BG layers, delayed auto-shift input and SNESMOD music |
-| [likemario](likemario/) | Advanced | Kit's Rooftop Run: a scrolling platformer with shards to pick up, machines to stomp, three lives, checkpoints and a beacon to reach |
+| [rooftop_run](rooftop_run/) | Advanced | Kit's Rooftop Run: a scrolling platformer with shards to pick up, machines to stomp, three lives, checkpoints and a beacon to reach |
 
 ## What These Demonstrate
 
@@ -24,5 +24,5 @@ machine. Study them after the topic examples and the [demos](../demos/).
 ---
 
 Start with **breakout** for a self-contained game loop, then **blocks** for
-three layers, timed input and music, then **likemario** for a world bigger
+three layers, timed input and music, then **rooftop_run** for a world bigger
 than the screen.

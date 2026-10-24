@@ -116,7 +116,7 @@ int main(void) {
      * focusx is the point to FOLLOW (in a game: the player), in map pixel
      * coordinates. mapUpdateCamera() centers the view on it and clamps at
      * the map edges; the engine converts to tile-aligned VRAM updates.
-     * See mapandobjects, which passes the player position (mariox, marioy).
+     * See platform_objects, which passes the player position (mariox, marioy).
      *
      * Bounds: 128px (half screen) to 1664px (map width - half screen)
      */

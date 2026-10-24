@@ -135,7 +135,7 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
   `devtools/audio_assets/kenney/` beside the OGG files the examples use
 - **Used in**: the effects of `examples/audio/snesmod_music`
   (`sfx/neo_lumen_sfx.it`: `phaseJump1`, `powerUp1`, `laser1`,
-  `confirmation_001`) and the jump of `examples/games/likemario`
+  `confirmation_001`) and the jump of `examples/games/rooftop_run`
   (`res/jump_sfx.it`: `phaseJump1`), cut and converted by
   `devtools/audio_assets/build.py`.
 
@@ -143,7 +143,7 @@ in the SNES homebrew community. We are grateful for their pioneering efforts.
 - **License**: CC0 (original work)
 - **What**: every tracker module of the examples — `snesmod_music`'s
   "Neo-Lumen Nocturne", `blocks`' Korobeiniki (the 19th-century Russian
-  song, public domain, arranged here), likemario's "Neo-Lumen Rooftops",
+  song, public domain, arranged here), rooftop_run's "Neo-Lumen Rooftops",
   the large-bank fixture's long nocturne — and their instruments, and the
   cello of `apu_switch` and `soundboard`, all synthesized by
   `devtools/audio_assets/` (`make audio-assets` writes them again).

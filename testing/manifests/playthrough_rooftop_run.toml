@@ -1,4 +1,4 @@
-# games/likemario, the whole game: START at 100, RIGHT held from 110, and A
+# games/rooftop_run, the whole game: START at 100, RIGHT held from 110, and A
 # pressed ten times. Kit crosses every gap, gets past the four robot insects
 # and the two drones (two of them stomped), takes 22 of the 29 shards and
 # reaches the beacon at x = GOAL_X = 2256 on the last roof (surface row 15:
@@ -14,7 +14,7 @@
 # The ten presses were found on luna on 2026-10-20 by a greedy search, press
 # after press: from the last press, the earliest frame after which Kit still
 # has three lives and is furthest right 70 frames later.
-rom = "../../examples/games/likemario/likemario.sfc"
+rom = "../../examples/games/rooftop_run/rooftop_run.sfc"
 
 [[checkpoint]]
 at_frame = 1960

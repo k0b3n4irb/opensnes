@@ -205,7 +205,7 @@ def neo_lumen_sfx():
 
 
 def rooftops_sfx():
-    """likemario's effects (Kenney, CC0): Kit's jump, a shard picked up, a machine
+    """rooftop_run's effects (Kenney, CC0): Kit's jump, a shard picked up, a machine
     stomped, Kit hurt, the roof cleared. Each sample's name gives its SFX_ name in
     soundbank.h (SFX_JUMP, SFX_SHARD, SFX_STOMP, SFX_HURT, SFX_CLEAR), the names
     the game uses; they are cut short to leave the music its SPC700 RAM."""

@@ -12,7 +12,7 @@ costs under each SDK, and a row whose two ROMs do not do the same work says
 nothing (see PAIRS for what was checked).
 
     PVSNESLIB_HOME=~/pvsneslib python3 devtools/twinbench/run.py
-    python3 devtools/twinbench/run.py --only likemario,breakout
+    python3 devtools/twinbench/run.py --only rooftop_run,breakout
 
 PVSnesLib's ROMs are the ones built in its tree (`make` in snes-examples).
 """
@@ -44,11 +44,11 @@ NOT_TWINS = {
 }
 # name, PVSnesLib directory, ours, input script (or None), first and last frame
 PAIRS = [
-    ("likemario", "games/likemario", "games/likemario", f"130:{RIGHT}", 200, 500),
+    ("rooftop_run", "games/likemario", "games/rooftop_run", f"130:{RIGHT}", 200, 500),
     ("breakout", "games/breakout", "games/breakout", f"100:{START},110:0,150:{A},160:0", 200, 500),
-    ("mapandobjects", "objects/mapandobjects", "demos/mapandobjects", f"130:{RIGHT}", 200, 500),
+    ("mapandobjects", "objects/mapandobjects", "demos/platform_objects", f"130:{RIGHT}", 200, 500),
     ("mapscroll", "maps/mapscroll", "maps/map_scroll", f"130:{RIGHT}", 200, 500),
-    ("slopemario", "maps/slopemario", "demos/mapandobjects", f"130:{RIGHT}", 200, 500),  # the slope level is mapandobjects' since 2026-10-18
+    ("slopemario", "maps/slopemario", "demos/platform_objects", f"130:{RIGHT}", 200, 500),  # the slope level is platform_objects' since 2026-10-18
     ("tiled", "maps/tiled", "../testing/fixtures/retired_examples/tiled", f"130:{RIGHT}", 200, 500),
     ("animatedsprite", "graphics/Sprites/AnimatedSprite", "sprites/animated_sprite", f"130:{RIGHT}", 200, 500),
     ("dynamicsprite", "graphics/Sprites/DynamicSprite", "sprites/dynamic_sprite", None, 200, 500),

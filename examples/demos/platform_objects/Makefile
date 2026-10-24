@@ -7,8 +7,8 @@
 
 OPENSNES := $(shell cd ../../.. && pwd)
 
-TARGET      := mapandobjects.sfc
-ROM_NAME    := OPENSNES MAPNOBJ
+TARGET      := platform_objects.sfc
+ROM_NAME    := PLATFORM OBJECTS
 
 CSRC        := main.c kit.c insect.c automaton.c
 ASMSRC      := data.asm

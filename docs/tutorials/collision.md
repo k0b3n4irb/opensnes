@@ -171,7 +171,7 @@ if (collideTileEx(player_x, player_y + 16, collision_map, MAP_WIDTH, 16)) {
 
 ### Tile Properties from a Tilemap (Platformer Pattern)
 
-The `likemario` example uses 16-bit tile properties looked up from the visual tilemap, rather than a separate collision map. Each tile index maps to a property value (`T_SOLID` or `T_EMPTY`):
+The `rooftop_run` example uses 16-bit tile properties looked up from the visual tilemap, rather than a separate collision map. Each tile index maps to a property value (`T_SOLID` or `T_EMPTY`):
 
 ```c
 #define T_EMPTY  0x0000
@@ -330,14 +330,14 @@ When a falling character hits the ground, snap their Y position to the tile boun
 
 ```c
 /* Ground check: test two points at the bottom edge */
-prop = map_get_tile_prop(mario_x + 2, mario_y + 16);
+prop = map_get_tile_prop(kit_x + 2, kit_y + 16);
 if (prop == T_EMPTY)
-    prop = map_get_tile_prop(mario_x + 13, mario_y + 16);
+    prop = map_get_tile_prop(kit_x + 13, kit_y + 16);
 
 if (prop != T_EMPTY) {
     /* Snap to tile boundary */
-    mario_y = ((mario_y + 16) & 0xFFF8) - 16;
-    mario_yvel = 0;
+    kit_y = ((kit_y + 16) & 0xFFF8) - 16;
+    kit_yvel = 0;
     on_ground = 1;
 }
 ```
@@ -374,7 +374,7 @@ if (bx < 10 && by >= 1 && by <= 10) {
 
 - `examples/basics/collision_demo/` -- AABB sprite collision with tile-based wall collision (16x16 cells, the map built from the collision array) and visual feedback
 - `examples/games/breakout/` -- Ball vs walls, ball vs paddle (angle control), ball vs brick grid
-- `examples/games/likemario/` -- Platformer tile collision with gravity, ground snapping, and wall sliding
+- `examples/games/rooftop_run/` -- Platformer tile collision with gravity, ground snapping, and wall sliding
 
 ## Next Steps
 

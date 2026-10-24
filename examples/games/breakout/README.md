@@ -265,7 +265,7 @@ static void run_frame(void) {
 - **Design your own levels:** Edit `brick_map` in `data.asm`. Values 0-7 are colors,
   8 is empty. The grid is 10 columns x 10 rows — go wild.
 
-- **Next example:** [LikeMario](../likemario/) — scrolling camera, platformer physics,
+- **Next example:** [rooftop_run](../rooftop_run/) — scrolling camera, platformer physics,
   and tile streaming.
 
 ---

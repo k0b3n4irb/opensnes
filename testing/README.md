@@ -228,7 +228,7 @@ the emptied directory was deleted on 2026-09-14. Same coverage, declarative form
   `wram-trace` hash stream vs a baseline; catches runtime-state regressions
   invisible to the framebuffer. **A CI gate since 2026-09-11**, inside `make tests`
   on both luna legs; raw WRAM content isn't a luna cross-arch guarantee for two
-  examples (mapandobjects, slope_collision diverge x86_64 ↔ aarch64), which the
+  examples (platform_objects, slope_collision diverge x86_64 ↔ aarch64), which the
   oracle skips per arch. Baseline entries carry `rom_sha256` provenance
   (#120): a mismatch reports whether the ROM itself changed vs the capture, and
   `--update` refuses a stale tree (corpus-fresh guard #105 + per-example

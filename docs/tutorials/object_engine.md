@@ -184,7 +184,7 @@ underneath but the last tile property read was non-zero *and* the object's
 
 ## Slopes, and what the tests pin
 
-`objCollidMapWithSlopes` is what Kit uses in `examples/demos/mapandobjects`.
+`objCollidMapWithSlopes` is what Kit uses in `examples/demos/platform_objects`.
 A slope tile is not a wall: walking into one must *lift* the object to the
 surface height for its horizontal position within the tile, not stop it. The
 routine does that by indexing a per-slope-type height table with the object's
@@ -196,8 +196,8 @@ upper halves of a 2×1 slope in each direction (`T_SLOPELU2`, `T_SLOPELD2`,
 `T_SLOPEUU2`, `T_SLOPEUD2`). You assign them per tile in the map's attribute
 layer.
 
-The functional tests `testing/manifests/movement_mapandobjects_slope.toml` and
-`movement_mapandobjects_wall.toml` pin exactly the distinction that matters,
+The functional tests `testing/manifests/movement_platform_objects_slope.toml` and
+`movement_platform_objects_wall.toml` pin exactly the distinction that matters,
 measured on luna with RIGHT held (the first one jumps the first vent at frame
 150 to reach the first ramp, 22.5 degrees, two rows up):
 
@@ -209,7 +209,7 @@ measured on luna with RIGHT held (the first one jumps the first vent at frame
 | 200 and 400 | `(129, 160)` | without the jump: the vent, a solid tile, stops him dead |
 
 The ramp and the vent are the two halves of the contract: a slope lifts, a
-wall stops. The companion manifest `movement_mapandobjects.toml` pins the
+wall stops. The companion manifest `movement_platform_objects.toml` pins the
 flat-ground case the same way — walking right and left along a floor with
 Y constant at 160, which is the "he never falls through the floor" negative.
 

@@ -8,7 +8,7 @@ how the parts assemble; the complete games are in [games](../games/).
 
 | Example | Difficulty | Description |
 |---------|------------|-------------|
-| [mapandobjects](mapandobjects/) | Advanced | The map engine and the object engine together: slopes, patrolling machines, streamed sprites |
+| [platform_objects](platform_objects/) | Advanced | The map engine and the object engine together: slopes, patrolling machines, streamed sprites |
 | [shmup](shmup/) | Intermediate | A vertical shoot 'em up: scrolling, an enemy pool, bullets and collision |
 | [rpg](rpg/) | Advanced | An RPG template: a Tiled-driven overworld with dialog boxes |
 
@@ -24,5 +24,5 @@ The Mode 7 race, `mode7_racing`, is with the other Mode 7 examples in
 
 ---
 
-Start with **shmup** for one screen of moving parts, then **mapandobjects**
+Start with **shmup** for one screen of moving parts, then **platform_objects**
 for a scrolling world run by the map and object engines.

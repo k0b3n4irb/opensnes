@@ -25,7 +25,7 @@ Sources: anomie's S-CPU timing doc and fullsnes, *Timing H/V Counters*
 
 | Scene | What runs | Idle (in `WaitForVBlank`) |
 |---|---|---|
-| `examples/games/likemario` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
+| `examples/games/rooftop_run` | walking right: map scroll, dynamic sprite, animation, SNESMOD | 88 % of the frame |
 | `examples/demos/rpg` | walking: map, sprites, HUD | 88 % of the frame |
 | `examples/sprites/sprite_swarm` | many sprites moved every frame (direct OAM writes) | 69 % of the frame |
 | `examples/games/blocks` | playing: board redraw, HUD, SNESMOD | 81 % of the frame |
@@ -39,7 +39,7 @@ Mean mclk per frame over 300 frames, and in brackets an upper bound of the
 worst frame. A function appears only in the scenes that call it, and only
 above 300 mclk per frame.
 
-| Function | likemario | rpg | sprite_swarm | blocks | snesmod_music |
+| Function | rooftop_run | rpg | sprite_swarm | blocks | snesmod_music |
 |---|---|---|---|---|---|
 | `NmiHandler` | 8,162 (8,170) | 8,163 (8,170) | 7,670 (7,716) | 5,676 (5,676) | 5,650 (5,650) |
 | `oamSet` |  | 3,957 (7,812) |  |  |  |
@@ -65,7 +65,7 @@ above 300 mclk per frame.
   `oamMemory[]` directly (sprite_swarm) are the escape hatches for large
   counts.
 - **Animation**: `animTick` + `animPlay` about 5,500 mclk per frame in
-  likemario (both are compiled C).
+  rooftop_run (both are compiled C).
 - **`bgSetScroll`**: about 570 mclk per frame in each of the three games.
 - **Pads**: `padPressed` / `padHeld` do not appear: they are macros over
   the word the NMI handler filled.
@@ -160,6 +160,6 @@ testing/bin/luna profile examples/demos/rpg/rpg.sfc \
 `entries[].per_frame.mean` / `.max` per symbol; sum the `function@label`
 entries of one function. The other scenes use the same window (frames
 120-420; blocks 300-600, START at frame 100) with the inputs of the table
-above: likemario RIGHT held from frame 130, rpg RIGHT then DOWN, blocks
+above: rooftop_run RIGHT held from frame 130, rpg RIGHT then DOWN, blocks
 START. Re-measure after a change to the NMI handler, the sprite or
 animation modules, and update this page.

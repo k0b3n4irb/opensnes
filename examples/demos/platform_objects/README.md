@@ -7,7 +7,7 @@ walks up and down, vents to jump over, and the security machines (robot insects 
 patrol automatons) that walk back and forth. This example demonstrates how real SNES
 games organize their world and entity logic.
 
-![Screenshot](mapandobjects.png)
+![Screenshot](platform_objects.png)
 
 ## What You'll Learn
 
@@ -154,13 +154,13 @@ sampled from a generated rooftop, the six slope shapes and the vents are drawn b
 the script, and the map is laid out from a list of flats, ramps and vents. It
 writes `res/tiles.png`, `res/BG1.m16`, `res/level.t16` (each tile's VRAM tile),
 `res/level.b16` (each tile's `T_SOLID`, `T_SLOPE*` or empty) and `res/level.o16`.
-`testing/manifests/playthrough_mapandobjects.toml` walks the whole level with four
+`testing/manifests/playthrough_platform_objects.toml` walks the whole level with four
 jumps.
 
 ## Project Structure
 
 ```
-mapandobjects/
+platform_objects/
 ├── main.c             — Initialization, main loop, map/object engine setup
 ├── kit.c / .h         — Kit: input, physics, slopes, walk/jump/fall animation
 ├── insect.c / .h      — The robot insect: patrol AI, 4-frame walk
@@ -176,10 +176,10 @@ mapandobjects/
 
 ```bash
 cd $OPENSNES_HOME
-make -C examples/demos/mapandobjects
+make -C examples/demos/platform_objects
 ```
 
-Then open `mapandobjects.sfc` in luna (`luna-gui mapandobjects.sfc`) or any
+Then open `platform_objects.sfc` in luna (`luna-gui platform_objects.sfc`) or any
 emulator. Walk right: jump the first vent with A, then walk up the ramp to the
 first robot insect.
 

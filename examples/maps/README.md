@@ -14,7 +14,7 @@ collision, and walked with slopes. This is Stage 3, "can I build a world?"
 
 Climb from a world authored in Tiled and scrolled past the camera
 (`map_scroll`) to a character that stands on its slopes and enemies that
-patrol it (`demos/mapandobjects`).
+patrol it (`demos/platform_objects`).
 
 ## The idea in one screen
 

@@ -78,14 +78,14 @@ by `examples/sprites/animated_sprite` (`res/kit_walk.png`).
 
 | File | What | Made with | Used by |
 |---|---|---|---|
-| `tiles/roof_0.png`, `tiles/roof_1.png` | two rooftops, 128x128, transparent sky, the neon strip's top on row 62 | `generate-with-style-v2`, two 128x96 crops of `city_far` as style, the city's 15 colours, seed 31 | `examples/games/likemario`, `examples/maps/map_scroll`, `examples/backgrounds/mode0` (`roof_0`) (through `devtools/art_assets/build.py`) |
-| `tiles/roof_2.png` to `tiles/roof_5.png` | four more in their style, the strip on the same row | `generate-with-style-v2`, `roof_0` and `roof_1` as style, seed 4100 | `examples/games/likemario`, `examples/maps/map_scroll` (the same) |
+| `tiles/roof_0.png`, `tiles/roof_1.png` | two rooftops, 128x128, transparent sky, the neon strip's top on row 62 | `generate-with-style-v2`, two 128x96 crops of `city_far` as style, the city's 15 colours, seed 31 | `examples/games/rooftop_run`, `examples/maps/map_scroll`, `examples/backgrounds/mode0` (`roof_0`) (through `devtools/art_assets/build.py`) |
+| `tiles/roof_2.png` to `tiles/roof_5.png` | four more in their style, the strip on the same row | `generate-with-style-v2`, `roof_0` and `roof_1` as style, seed 4100 | `examples/games/rooftop_run`, `examples/maps/map_scroll` (the same) |
 | `characters/kit_64.png` | Kit, front, 64x64 (the 32 one drawn larger) | `generate-image-v2`, seed 1301 (#0), `characters/kit.png` as a reference image, its 9 colours as `target_palette` | `examples/sprites/sprite_sizes` (`res/sprite64.png`), `examples/sprites/dynamic_sprite` (`res/spritehero32.png`) |
 | `characters/kit_16.png` | Kit, three-quarter, 16x16 | `generate-image-v2`, seed 1302 (#0), the same reference and colours | `examples/sprites/sprite_sizes` (`res/sprite16.png`), `examples/sprites/dynamic_sprite` (`res/spritehero8.png`); its 8x8 one is drawn by `devtools/art_assets/build.py` (`KIT8`) |
 | `characters/kit_tall.png` | Kit, front, 32x48 | `generate-image-v2`, seed 1401 (#24), `characters/kit_64.png` as reference, its 7 colours as `target_palette` | the first frame of the two animations below; `examples/sprites/dynamic_sprite` (`res/spritehero16.png`) |
 | `characters/kit_tall_sheet.png` | Kit 32x48, eight frames: walk in place 0-3, wave 4-7 | `animate-with-text-v3` from `kit_tall.png`, 4 frames each (seeds 1411 and 1412; the first frame, a copy of the input, dropped), each pixel put back on the 7 colours of `kit_tall.png` | `examples/sprites/aseprite_pipeline` (`res/hero.png`, `res/hero.json`) |
 | `characters/kit_torch.png` | Kit, side view facing right, holding a torch out, 32x32 | `generate-image-v2`, seed 1502 (#17), the side sheet's frame 0 as reference, its colours with a white and a grey | `examples/windows/window` (`res/kit.png`) |
-| `characters/kit_side_sheet.png` | Kit seen from the side, 32x32 frames, four a row: idle 0-3, walk 4-11, run 12-19, jump 20-27 (block 28 is the owl's, unused) | PixelLab: the character with an east view, its `breathing-idle`, `running-8-frames` and `jumping-1` templates and a v3 walk, all put back on his 15 colours with `reduce-colors` (2026-10-18) | `examples/games/likemario`, `examples/maps/map_scroll` (`res/kit.png`) |
+| `characters/kit_side_sheet.png` | Kit seen from the side, 32x32 frames, four a row: idle 0-3, walk 4-11, run 12-19, jump 20-27 (block 28 is the owl's, unused) | PixelLab: the character with an east view, its `breathing-idle`, `running-8-frames` and `jumping-1` templates and a v3 walk, all put back on his 15 colours with `reduce-colors` (2026-10-18) | `examples/games/rooftop_run`, `examples/maps/map_scroll` (`res/kit.png`) |
 
 ### The machines' cycles
 
@@ -94,7 +94,7 @@ frames each (the frames after the first one PixelLab returns), `animate-with-tex
 on `insect.png`, `automaton.png` and `drone.png` (a crawl, a walk with the shield, a
 hover), seeds 5000 to 5002; no palette is given there, so the build's conversion
 puts them back on the machines' 15 colours (`devtools/art_assets/build.py`). The
-insect and the automaton walk in `examples/demos/mapandobjects`.
+insect and the automaton walk in `examples/demos/platform_objects`.
 
 ### The logo
 
@@ -143,8 +143,8 @@ PixelLab call.
 ### Kit on the roofs (continuous_scroll)
 
 `examples/scrolling/continuous_scroll`: `res/roofs.png` is roof pieces 0,
-3, 1 and 4 of likemario side by side at one height (512x256, 600 tiles),
-`res/skyline.png` likemario's far towers, `res/kit.png` the idle (0-3) and
+3, 1 and 4 of rooftop_run side by side at one height (512x256, 600 tiles),
+`res/skyline.png` rooftop_run's far towers, `res/kit.png` the idle (0-3) and
 run (12-19) rows of `characters/kit_side_sheet.png`, the run frames moved
 4 px down so that Kit's feet are on the same row in both. Made by
 `devtools/art_assets/build.py` (`build_continuous_scroll`); no new
@@ -367,8 +367,8 @@ places, seed 7200).
 |---|---|---|---|
 | `tiles/wang_track_gravel.png` | 16 Wang tiles of 16x16, asphalt (lower) to rooftop gravel (upper) with a red and white curb; keyed like the city's | `create-tileset`, standard, `high top-down`, `transition_size` 0.25, seed 7201 | the circuit |
 | `tiles/wang_gravel_lagoon.png` | the same from that gravel to the lagoon's water, a quay with amber lamps between, on the first set's gravel tile (`lower_base_tile_id`) | the same, seed 7202 | the infield and the border |
-| `props/shard.png` | a data shard, a faceted crystal, 16x16 | `generate-image-v2`, seed 140 (#6), the city's 15 colours with white | `examples/games/likemario`: turned into eight frames by `devtools/art_assets/build.py`; `examples/sprites/dynamic_sprite`: into twenty-four; `examples/sprites/world_sprites`: as is, the shards on the square |
-| `props/beacon.png` | a rooftop radio mast with a magenta beacon, 32x64 | `generate-image-v2`, seed 141 (#3), the same colours | `examples/games/likemario`: the goal, stamped on the last roof |
+| `props/shard.png` | a data shard, a faceted crystal, 16x16 | `generate-image-v2`, seed 140 (#6), the city's 15 colours with white | `examples/games/rooftop_run`: turned into eight frames by `devtools/art_assets/build.py`; `examples/sprites/dynamic_sprite`: into twenty-four; `examples/sprites/world_sprites`: as is, the shards on the square |
+| `props/beacon.png` | a rooftop radio mast with a magenta beacon, 32x64 | `generate-image-v2`, seed 141 (#3), the same colours | `examples/games/rooftop_run`: the goal, stamped on the last roof |
 | `props/roof_helipad.png`, `roof_aircon.png`, `roof_aircon_violet.png`, `roof_tank.png`, `roof_solar.png`, `roof_dish.png` | rooftop props from above, 32x32 | `generate-image-v2`, seeds 130 (#24), 131 (#1, #12), 132 (#52), 133 (#0), 134 (#2), the city's 15 colours with the curb's two | scattered on the gravel, solid |
 | `characters/racebike_kit.png`, `racebike_white.png`, `racebike_crimson.png` | Kit's racing hover-bike from above, pointing up, and two rivals in other colours; 11 colours for the three | `generate-image-v2`, seed 120 (#0, #23, #33), `glider.png` as `style_image` (its colours off), Kit's colours with the city's magenta, amber and violet | the three bikes; the rivals' turned frames are made from these by the script |
 

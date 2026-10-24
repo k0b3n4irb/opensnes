@@ -1,4 +1,4 @@
-# games/likemario starts on its title screen: the loop runs from frame 66,
+# games/rooftop_run starts on its title screen: the loop runs from frame 66,
 # START at 100 starts the run, RIGHT from 110 to 168 walks Kit off the first
 # checkpoint (x = 16) and through the first two shards (10 points each,
 # score kept in tens).
@@ -7,7 +7,7 @@
 # HUD's 2 KB text map, the machines' and Kit's frames and the map columns
 # share the VBlanks of the first steps (the gate for what a button press
 # triggers is here, one manifest at a time).
-rom = "../../examples/games/likemario/likemario.sfc"
+rom = "../../examples/games/rooftop_run/rooftop_run.sfc"
 frames = 170
 
 [[checkpoint]]                 # the title: Kit waits on the first roof

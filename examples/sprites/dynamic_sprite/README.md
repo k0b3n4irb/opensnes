@@ -167,7 +167,7 @@ The shard and Kit are the Néo-Lumen art (PixelLab, CC0), turned and indexed by
 
 - **Explore related examples**:
   - `games/breakout` -- Dynamic sprites in a real game context
-  - `games/likemario` -- Dynamic sprites with scrolling backgrounds
+  - `games/rooftop_run` -- Dynamic sprites with scrolling backgrounds
 
 ## Modules Used
 

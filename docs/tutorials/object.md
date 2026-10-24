@@ -3,7 +3,7 @@
 This tutorial covers the `object` module — the entity engine that manages a
 fixed pool of game objects, dispatches per-type callbacks, and resolves
 collision against the `map` module's tile properties. It is what
-`examples/demos/mapandobjects` is built on. Add `object` to `LIB_MODULES`.
+`examples/demos/platform_objects` is built on. Add `object` to `LIB_MODULES`.
 
 This page is the tutorial: what the engine is, how to register a type,
 spawn, run the frame, pick a collision routine and remove objects. How the
@@ -71,7 +71,7 @@ That is the line both shipped examples use.
 | Bank `$00` (the 8 KB C band) | 5 | the engine's current id, slot and kill flag |
 | Bank `$7E` (the far band) | 6910 | 80 × 64-byte records, `objWorkspace` (64) right behind them, the per-type active-list heads, the three 256-byte callback tables, the object-loading scratch buffer |
 
-Measured on `examples/demos/mapandobjects`: the `.obj_bank7e` RAMSECTION is
+Measured on `examples/demos/platform_objects`: the `.obj_bank7e` RAMSECTION is
 `$1AFE` bytes at `$7E:2466`, `.obj_bank00` is 5 bytes. The
 big allocation sits in the far band, so it does not eat your scarce bank-`$00`
 RAM budget (see @ref tutorial_far_ram) — but 6.8 KB is 6.8 KB, and the pool
@@ -147,7 +147,7 @@ detected. It returns 0 when the pool is full, and also stores the handle in
 `objGetCurrentId()`.
 
 The canonical init callback looks like this (from
-`examples/demos/mapandobjects/kit.c`):
+`examples/demos/platform_objects/kit.c`):
 
 ```c
 void kitinit(u16 xp, u16 yp, u16 type, u16 minx, u16 maxx) {
@@ -187,7 +187,7 @@ entry, terminated by a single `0xFFFF`:
 
 It does **not** create the objects itself. For each row it calls that type's
 *init* callback with the five values; the callback is what calls `objNew`.
-That is why the enemy init functions in `mapandobjects` copy `minx` / `maxx`
+That is why the enemy init functions in `platform_objects` copy `minx` / `maxx`
 into `objWorkspace` — those two words are how a level editor hands a patrol
 range to an enemy.
 
@@ -358,14 +358,14 @@ for your own array when:
 - **You want the tile-collision behaviour without the entity model.** The map
   module exposes `mapGetMetaTilesProp()` directly, and
   @ref tutorial_collision covers the hand-rolled patterns
-  `examples/games/likemario` uses to do platformer physics with no object
+  `examples/games/rooftop_run` uses to do platformer physics with no object
   engine at all.
 
 Where it earns its keep is the case it was written for: a scrolling
 side-view level with a dozen or more heterogeneous entities placed in a map
 editor, each with its own behaviour, where off-screen culling and
 data-driven spawning matter. That is exactly
-`examples/demos/mapandobjects`.
+`examples/demos/platform_objects`.
 
 ## See also
 
@@ -375,7 +375,7 @@ data-driven spawning matter. That is exactly
   sprite-versus-hitbox alignment problem that bites either way.
 - [Sprites & animation](sprites.md) — `oambuffer`, `oamDynamicDraw` and the
   dynamic sprite engine your callbacks draw through.
-- `examples/demos/mapandobjects` — three entity types, map-driven spawning,
+- `examples/demos/platform_objects` — three entity types, map-driven spawning,
   patrol AI.
 - `lib/contrib/README.md` — what contrib status means for API stability.
 - @ref tutorial_object_engine "How the object engine works" — the engine reference.

@@ -1,4 +1,4 @@
-# games/likemario's states: RIGHT held from 110 and never a jump, so Kit
+# games/rooftop_run's states: RIGHT held from 110 and never a jump, so Kit
 # falls into the first gap three times. Each fall costs a life: the world
 # waits (GS_DOWN), Kit comes back at the first roof's checkpoint, and the
 # third fall ends the game (GS_OVER). START then brings back the title with
@@ -7,7 +7,7 @@
 # What this proves: the lives count down, the checkpoint brings Kit back
 # alive, the game over is reached and left, and the reset is whole. Each of
 # those is invisible to a manifest that only plays well.
-rom = "../../examples/games/likemario/likemario.sfc"
+rom = "../../examples/games/rooftop_run/rooftop_run.sfc"
 
 [[checkpoint]]                 # the first fall: a life lost, the world waits
 at_frame = 400

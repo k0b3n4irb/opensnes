@@ -91,9 +91,9 @@
     "stream": "a6db785730e48426112eac905a3ea5f4439fd0fc900a1b28363a723942f12bbd",
     "rom_sha256": "f8f6b174ff14bfd98eda591c3f40c063269a756bdd8506d0224e516ec23642d3"
   },
-  "demos_mapandobjects": {
+  "demos_platform_objects": {
     "stream": "de25b37a2b784b9ff7de8381480ba21fa5d065e3a4cf5115ad67f8125ee6e89b",
-    "rom_sha256": "17a3fe7caf3604865065fdb1b257561da2ab9043f5a2b3ca8fb2a8741357d950"
+    "rom_sha256": "a9b8b5c4fd03404f0836c2c3be4867ca89d268031d1779dbcf8f5680dff1be00"
   },
   "demos_rpg": {
     "stream": "b13918f1f1b43543480231870b967ed7baa6de4049f80d50cf6371673f5fbb5c",
@@ -115,9 +115,9 @@
     "stream": "32b86d215157754a6ddf0dbfed5eaafa97dd5b0291c124db8e75efa08415c1c6",
     "rom_sha256": "7785e3a3b1886322378e005a6dc300428b493ed7f54a127546c8a228cf1fe35d"
   },
-  "games_likemario": {
+  "games_rooftop_run": {
     "stream": "3d1bb18839ccdd74dc5a7d4f93ae52a79189b6b2405415ef24d643fa9cea385d",
-    "rom_sha256": "d658d14259d68e5af823972acbe0b480a9b80b401096940621745e9d66935b4c"
+    "rom_sha256": "2e49ae43662a8c9240b49b50fe7bbdb5692f17fdfc1664aeb1c1809aed657ad3"
   },
   "hdma_gradient_colors": {
     "stream": "2913b455d180f1dd64e5ce0262fdd83a702320dbb636459c18905f5d4ec16230",

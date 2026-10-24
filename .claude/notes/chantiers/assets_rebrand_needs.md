@@ -17,6 +17,13 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 > lire la table. `superfx_3d` est gardé (propriétaire, 2026-10-19). Le tutoriel
 > SA-1 porte la sauvegarde en BW-RAM que `sa1_save` enseignait.
 
+> **Consigne du propriétaire, 2026-10-24** : « on approche lentement d'un SDK professionnel, sans
+> aucune concession sur la qualité : performance, qualité des assets, documentation claire et bien
+> rédigée ». Et : les pièces dessinées par script (petits sprites, sol du RPG, briques, blocs, polices,
+> terminaux, brume, pluie) sont **refaites avec PixelLab**. Chaque pièce PixelLab est comparée à
+> l'écran avec celle qu'elle remplace ; si une limite de taille la rend moins bonne, on le dit au
+> propriétaire au lieu de la faire passer.
+>
 > **État vérifié au 2026-10-24** (la colonne « fait » des tableaux ci-dessous n'a pas été tenue ligne à
 > ligne ; ce paragraphe fait foi). Méthode : chaque fichier d'image, de carte ou de palette suivi sous
 > `examples/` (hors captures d'écran) comparé à ce qu'écrit `devtools/art_assets/build.py`, le reste
@@ -28,7 +35,8 @@ Direction retenue par le propriétaire : **cyberpunk, personnages animaux anthro
 >   viennent de PixelLab ; les petits sprites (viseurs, curseur, tir, papillons, orbe), le sol du
 >   RPG, les briques, les blocs, les polices, les terminaux, la brume et la pluie sont dessinés par
 >   script, au pixel près.
-> - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (au propriétaire) ;
+> - **Reste** : les noms de `games/likemario` et `demos/mapandobjects` (tranchés le jour même :
+>   `games/rooftop_run`, `demos/platform_objects`) ;
 >   `audio/speech_synth` (sa phrase attend le nom de la ville) ; la musique (MU1-MU3, modules
 >   générés par nos scripts en attendant une commande) ; les effets de `snesmod_music`, de Kenney
 >   (CC0, cités dans `ATTRIBUTION.md`).
@@ -413,7 +421,7 @@ adaptés à la nouvelle géométrie des niveaux.
 6. **[Tranché le 2026-10-18 : oui, moins d'exemples.]** **Les fusions et le passage en fixtures** : acceptez-vous de passer de 85 à 58 exemples, de déplacer
    `mode6`, `sa1_hello`, `sa1_save`, `superfx_hello`, `superfx_save` hors de `examples/` (toujours construits
    pour le protocole matériel) et de supprimer `maps/dynamic_map` ?
-7. **[Tranché le 2026-10-18 : `tetris` devient `blocks` ; les autres attendent.]** **Les renommages** : `likemario`, `mapandobjects`, `shmup_1942` (**devenu `demos/shmup` le 2026-10-24**), `tetris` (marque déposée) — vos noms ?
+7. **[Tranché le 2026-10-18 : `tetris` devient `blocks` ; les autres attendent.]** **Les renommages** : `likemario` (**devenu `games/rooftop_run` le 2026-10-24**), `mapandobjects` (**devenu `demos/platform_objects` le 2026-10-24**), `shmup_1942` (**devenu `demos/shmup` le 2026-10-24**), `tetris` (marque déposée) — vos noms ?
 8. **La police intégrée de la lib** (F1) : la redessiner dans l'identité ? Elle change l'image de chaque
    ROM à texte et toutes les références fbhash.
 9. **La musique** : commander 3 modules et une banque d'effets à un musicien chiptune (budget ?), ou des

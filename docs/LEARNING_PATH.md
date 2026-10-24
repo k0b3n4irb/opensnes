@@ -148,9 +148,9 @@ everything above, and three complete games.
 
 @subpage examples_games_blocks
 
-@subpage examples_games_likemario
+@subpage examples_games_rooftop_run
 
-@subpage examples_demos_mapandobjects
+@subpage examples_demos_platform_objects
 
 @subpage examples_demos_rpg
 

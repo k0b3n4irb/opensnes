@@ -179,11 +179,11 @@
     "luna_version": "v1.39.0",
     "rom_sha256": "f8f6b174ff14bfd98eda591c3f40c063269a756bdd8506d0224e516ec23642d3"
   },
-  "demos_mapandobjects": {
+  "demos_platform_objects": {
     "fbhash": "509ce3b81e6d90f7",
     "frames": 200,
-    "luna_version": "v1.39.0",
-    "rom_sha256": "17a3fe7caf3604865065fdb1b257561da2ab9043f5a2b3ca8fb2a8741357d950"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "a9b8b5c4fd03404f0836c2c3be4867ca89d268031d1779dbcf8f5680dff1be00"
   },
   "demos_rpg": {
     "fbhash": "eaa8fa6fa3217509",
@@ -227,11 +227,11 @@
     "luna_version": "v1.40.0",
     "rom_sha256": "7785e3a3b1886322378e005a6dc300428b493ed7f54a127546c8a228cf1fe35d"
   },
-  "games_likemario": {
+  "games_rooftop_run": {
     "fbhash": "9689c900cb7436ab",
     "frames": 200,
-    "luna_version": "v1.39.0",
-    "rom_sha256": "d658d14259d68e5af823972acbe0b480a9b80b401096940621745e9d66935b4c"
+    "luna_version": "v1.40.0",
+    "rom_sha256": "2e49ae43662a8c9240b49b50fe7bbdb5692f17fdfc1664aeb1c1809aed657ad3"
   },
   "hdma_gradient_colors": {
     "fbhash": "3a9873030e6da097",

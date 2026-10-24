@@ -1,4 +1,4 @@
-; data.asm - likemario asset data: the level map and its tile properties
+; data.asm - rooftop_run asset data: the level map and its tile properties
 ;
 ; Tile/sprite graphics go in SUPERFREE (any bank, accessed via DMA only).
 ; Map/collision data are read from C through const pointers (far reads).

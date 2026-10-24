@@ -63,7 +63,7 @@ FRAMES = 150
 DRIFT = 0.10
 SUBSET = [
     ("games/breakout",        8490, "the corpus worst: sprites + tilemap + text"),
-    ("games/likemario",       8648, "sprites, scrolling, text and audio together"),
+    ("games/rooftop_run",       8648, "sprites, scrolling, text and audio together"),
     ("demos/rpg",             8170, "map module, panel and text"),
     ("sprites/dynamic_sprite", 7676, "the dynamic-sprite VRAM queue flush"),
     ("maps/map_scroll",       7668, "the map module's scroll DMA"),

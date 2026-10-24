@@ -149,7 +149,7 @@ objbuffers      INSTANCEOF t_objs OB_MAX    ; object struct array (80 * 64 = 512
 ; routines work on it in place (OBJ_ENTER / OBJ_LEAVE below) instead of
 ; copying it to its slot and back. In bank $00 until then, and each of those
 ; calls cost two 60-byte block moves — devtools/twinbench measured 25,000
-; master cycles a frame of copies in demos/mapandobjects.
+; master cycles a frame of copies in demos/platform_objects.
 objWorkspace    INSTANCEOF t_objs
 objactives      DSW OB_TYPE_MAX             ; active object list heads
 

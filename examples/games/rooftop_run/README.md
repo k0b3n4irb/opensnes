@@ -1,4 +1,4 @@
-# likemario — Kit's Rooftop Run
+# rooftop_run — Kit's Rooftop Run
 
 > A complete side-scrolling platformer: Kit, the fox-kit courier, runs over the
 > rooftops of the city at night to the radio beacon at the end of the level,
@@ -7,7 +7,7 @@
 > gravity, tile collision, and a camera that follows him across a world bigger
 > than the screen.
 
-![Screenshot](likemario.png)
+![Screenshot](rooftop_run.png)
 
 ## Controls
 
@@ -48,10 +48,10 @@
 
 ```bash
 cd $OPENSNES_HOME
-make -C examples/games/likemario
+make -C examples/games/rooftop_run
 ```
 
-Then open `likemario.sfc` in luna (`luna-gui likemario.sfc`) or any emulator.
+Then open `rooftop_run.sfc` in luna (`luna-gui rooftop_run.sfc`) or any emulator.
 
 ## Walkthrough
 
@@ -133,7 +133,7 @@ and `res/skyline.png`. A roof's walkable surface is the top of its neon strip, s
 tile is solid when it sits at the surface's row or below; the script refuses a tile
 that would be solid in one place and empty in another. Each step up is at most 16
 pixels and each gap at most 24, so the normal jump crosses them all
-(`testing/manifests/playthrough_likemario.toml` plays the level to its end).
+(`testing/manifests/playthrough_rooftop_run.toml` plays the level to its end).
 The same script stamps the radio beacon (`assets/neo-lumen/props/beacon.png`)
 on the last roof and writes `res/level_objects.h`: where the shards, the
 machines and the checkpoints are, read from the same list of buildings, so
@@ -345,7 +345,7 @@ Everything below it writes to hardware. Break this rule and you get visual corru
 ### The Makefile
 
 ```makefile
-TARGET      := likemario.sfc
+TARGET      := rooftop_run.sfc
 CSRC        := main.c
 ASMSRC      := data.asm
 USE_LIB     := 1

@@ -40,7 +40,7 @@ game:
 So a floor tile is not "the grey one" — it is a tile tagged `T_SOLID`, and the
 physics code asks the map "what is at this pixel?" rather than hard-coding
 geometry. Slopes, ladders, one-way platforms and spikes are all just tile
-attributes; @ref examples_demos_mapandobjects walks Mario up diagonal terrain
+attributes; @ref examples_demos_platform_objects walks Kit up diagonal terrain
 purely from the slope attributes on its tiles, with no per-level collision code.
 Design your tile *semantics* alongside your tile art — decide early which tiles
 are solid, which hurt, which you can climb.
@@ -56,7 +56,7 @@ camera crosses each tile boundary.
 That is a direct application of the @ref craft_frame_budget rules: a single
 column is a tiny DMA, easily inside the ~4 KB VBlank budget, so scrolling stays
 smooth no matter how wide the world is. @ref examples_maps_map_scroll is the
-stepping stone — a Mario walking a level wider than the screen — and
+stepping stone — Kit walking a level wider than the screen — and
 @ref examples_scrolling_continuous_scroll is the same idea run continuously. You
 do not manage the window by hand: the map engine's `mapUpdate` / `mapVblank`
 detect the boundary crossing and queue the column for you.

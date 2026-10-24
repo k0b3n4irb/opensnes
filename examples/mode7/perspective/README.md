@@ -116,7 +116,7 @@ scanline lasts.
 
 - **Explore related examples**:
   - `hdma/gradient_colors` -- Another HDMA technique (color gradients)
-  - `games/likemario` -- Scrolling backgrounds with sprites (different approach)
+  - `games/rooftop_run` -- Scrolling backgrounds with sprites (different approach)
 
 ## Modules Used
 

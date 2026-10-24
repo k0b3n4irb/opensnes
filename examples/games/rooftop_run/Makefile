@@ -1,5 +1,5 @@
 #==============================================================================
-# LikeMario - Side-scrolling platformer example
+# rooftop_run - Kit's Rooftop Run, a side-scrolling platformer
 #==============================================================================
 # Demonstrates: tile-based scrolling, sprite animation, physics, collision,
 #               camera tracking, and SNESMOD music playback.
@@ -7,8 +7,8 @@
 
 OPENSNES := $(shell cd ../../.. && pwd)
 
-TARGET      := likemario.sfc
-ROM_NAME    := OPENSNES LIKEMARIO
+TARGET      := rooftop_run.sfc
+ROM_NAME    := ROOFTOP RUN
 
 CSRC        := main.c
 ASMSRC      := data.asm
