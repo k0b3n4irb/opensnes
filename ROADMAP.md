@@ -9,13 +9,13 @@ and **what is next**.
 
 ---
 
-## Current Status: post-v0.51.0
+## Current Status: post-v0.52.0
 
 Since 0.49 the SDK carries the public API meant for 1.0: the deprecated
 aliases are gone and the two calls that change meaning have changed
 (`docs/UPGRADING.md`). It is not 1.0: before 1.0 come the compiler and
-library work still under way, a review of the examples with their assets
-redone, and the first console session of the hardware protocol
+library work still under way, the showcase game, and the first console
+session of the hardware protocol
 (`docs/HARDWARE_VERIFICATION.md`, rows 1 to 7). `docs/STABILITY.md` is the
 promise 1.0 will make.
 
@@ -50,7 +50,7 @@ of your own.
 | Pre-built binary releases | Done (`release.yml`) | Users do not compile the compiler |
 | Hardware verification | Protocol written (`docs/HARDWARE_VERIFICATION.md`, `make hardware-kit`); first console session pending | Credibility: tested on a real SNES through an FXPak Pro |
 | Showcase game (not a port) | In progress outside this repository | Proves the SDK can ship a complete game |
-| Asset provenance | Every asset redone and the examples reviewed before a 1.0 release candidate. 66 asset files in 23 examples are PVSnesLib's, some of them Nintendo characters (Mario, Goomba, Koopa); they are listed in `ATTRIBUTION.md` until then | Legal clarity for a 1.0 that would ship Nintendo-derived art |
+| Asset provenance | Done: every asset of the examples is made for OpenSNES or CC0 (`ATTRIBUTION.md`, `assets/neo-lumen/README.md`); no PVSnesLib or Nintendo art is left | Legal clarity for a 1.0 that would ship Nintendo-derived art |
 | Published performance benchmark | Done (`docs/BENCHMARK.md`, `docs/PERF.md`) | Where cc65816 and the library stand against PVSnesLib, with data |
 | Migration guide from PVSnesLib | Done (`docs/MIGRATING_FROM_PVSNESLIB.md`) | The smoothest path for existing PVSnesLib users |
 
@@ -72,5 +72,5 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines, branch policy
 (`main` = stable / `develop` = active), and PR rules. Build instructions
 live in [`README.md`](README.md).
 
-*Last updated: 2026-10-18. Anchored claims (version, examples count, framework
+*Last updated: 2026-10-24. Anchored claims (version, examples count, framework
 opt-in list) verified by `make lint-docs` — see `devtools/check_doc_drift.py`.*

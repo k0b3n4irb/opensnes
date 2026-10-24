@@ -4,7 +4,77 @@ All notable changes to OpenSNES are documented in this file.
 
 ## [Unreleased]
 
+## [0.52.0] — 2026-10-24
+
+The examples are ours. Every picture, sprite, tile, sample and module they
+carry was made for OpenSNES, except four effects from Kenney's packs, and
+all of it is CC0: the PVSnesLib art (Mario, Goomba,
+Koopa and the rest), its songs and krom's cello sample are gone. They are set in
+Daveo, a city at night where Kit the fox runs courier, drawn with PixelLab
+where it holds up at the SNES's sizes and by script where it does not
+(`assets/neo-lumen/README.md` lists both, with seeds and reasons). The
+corpus goes from 85 examples to 60 by merging the ones that taught the same
+thing twice; five diagnostic ROMs become test fixtures. Three fixes in the
+library and the level converter, and a pre-push check that builds every
+example from the pushed commit alone.
+
+### Added
+- feat(examples): **the Néo-Lumen art** in `assets/neo-lumen/` (characters,
+  backgrounds, tiles, props, UI, the logo), CC0, generated with PixelLab and
+  edited by hand where noted; `devtools/art_assets/` (`make art-assets`)
+  converts it into the examples' tilesets, maps and palettes, with
+  `--check` to prove the committed files are what it writes.
+- feat(examples): **our own sound** — `devtools/audio_assets/`
+  (`make audio-assets`) composes the tracker modules ("Daveo Nocturne",
+  "Daveo Rooftops", an arrangement of Korobeiniki, the large-bank
+  fixture's long nocturne) and synthesizes their instruments and the cello
+  of `apu_switch` and `soundboard`; the effects are Kenney's CC0 packs.
+- feat(examples): `games/rooftop_run` is a complete game (title to game
+  over) on the rooftops; `games/breakout` is Neon Breaker, the bar's arcade
+  cabinet; `mode7/mode7_racing` a hover-bike race round a lagoon;
+  `audio/speech_synth` says "OPEN SNES... DAVEO" with five new phonemes and
+  a pause in its sequencer.
+- feat(devtools): `make check-clean-export`, also run by the pre-push hook
+  (`make hooks`): every example is built from a `git archive` of the pushed
+  commit, after a `make clean`, so a file the commit leaves out (one that
+  `.gitignore` hides, say) fails before the push instead of on every CI leg.
+
+### Changed
+- refactor(examples): **85 examples become 60.** Merged into the example
+  that teaches the same thing: `mosaic` into `fading`, `transparent_window`
+  into `window`, `snesmod_sfx` into `snesmod_music`, `echo` into
+  `soundboard`, `pitch_mod` and `play_noise` into `apu_switch`,
+  `hdma_indirect_gradient` into `gradient_colors`, `mode1_lz77` into
+  `mode1`, `mode4` into `mode2`, `pseudo_hires` into `transparency`,
+  `timer` and `two_players` into `controller`, `fix32_orbit` into
+  `aim_target`, `scroll_message` into `mixed_scroll`, `dynamic_metasprite`
+  into `dynamic_sprite`, `mode1_bg3_priority` into `panel_hud`,
+  `slope_collision` into `platform_objects`, `dsp1_cube` into
+  `dsp1_ground`. `maps/dynamic_map` is removed. `mode6`, `sa1_hello`, `sa1_save`, `superfx_hello` and
+  `superfx_save` move to `testing/fixtures/retired_examples/`, still built
+  for the tests and the hardware protocol.
+- refactor(examples): **renamed and moved** — `games/` keeps the two
+  complete games: `games/tetris` is `games/blocks` (a trademark),
+  `games/likemario` is `games/rooftop_run`, `games/breakout` stays;
+  `games/mapandobjects` is `demos/platform_objects`, `games/shmup_1942` is
+  `demos/shmup`, `games/rpg` is `demos/rpg`, `games/mode7_racing` is
+  `mode7/mode7_racing`, and `games/mode7_flying` merges into
+  `mode7/rotate_scale`.
+- refactor(examples): every remaining example is redrawn in the city, with
+  its README and screenshot: Kit walks, scrolls, collides and saves; the
+  windows are a torch beam and a tram's portholes; the Mode 7 examples fly
+  over its streets and canals; the terminals of its back street boot,
+  print and save.
+- chore(testing): luna pinned to v1.40.0.
+- docs(lib): the comments of `anim.h`, `map.h`, `object.h`, `panel.h` and
+  `sprite.h` use the new example names; `dsp1.h` states the signs of
+  `dsp1Project()` and `dsp1Target()` as measured (H right-positive, V
+  down-positive).
+- docs(readme): a new logo, Kit over an OPENSNES wordmark.
+
 ### Fixed
+- fix(examples): `perspective_rotate` turns one 7.5-degree step every four
+  frames, as its README says, instead of one a frame.
 - fix(lib): `hdmaColorGradient()`, `hdmaIrisWipe()` and `hdmaBrightnessGradient()`
   set their channel up again when it is enabled for something else. Since 0.48
   they only moved the table pointer whenever the channel was enabled, so a
